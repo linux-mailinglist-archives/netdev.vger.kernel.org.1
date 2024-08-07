@@ -1,91 +1,120 @@
-Return-Path: <netdev+bounces-116287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE20949D4F
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 03:17:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5475A949D6E
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 03:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D96561F22494
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 01:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CF541C220D8
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 01:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2ECB1E520;
-	Wed,  7 Aug 2024 01:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A6115B980;
+	Wed,  7 Aug 2024 01:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASTo3l38"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="NYO4au5E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD292C1BA
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 01:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D7510E6;
+	Wed,  7 Aug 2024 01:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722993418; cv=none; b=sOwJXv8UXMa1lqLoPGhos8ogmFHQ+xUCRm5mdRxCs8dmBf91jiHbf3VaDsCwRZKEHAj6l60xZxBN52zzK/bPHbk4XzLXfPT4pcc7uEWIklcoSc5brzPfzAon0lP9ZiZsatnqg/G5OCxDkr8cSF94wlb4NnHCjBqFPkdvPbC6tOE=
+	t=1722994972; cv=none; b=Oz3S2emWMPHLIamset5044EcUk/E6inBXi0No4CJXJIhHh6rBBAXuEoGEuvfbq4KL8xNjv/e4wEoFBWAzfGlCztXcvQeWQoQye9/rbLFxufWbRLiG5Ii9z/xH74R7v9tZbYHnAj7G0azpF7WRuUSYJ63vmi1bxrmaupXUvu/kiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722993418; c=relaxed/simple;
-	bh=HQ4lNOfZ4aYOA2R0EvfkgxjJzs4j5xM6+QlVmxOkYT4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jNifee+GI67D38n3VQ33qVsij8hcr6PYBogGRC1v4OMN3SPc78UaQMeE8GTVTo2S8H01VC0RtJ8irXKhWDjWkw3o3Uxdhgsuef2R0YXWOWXCGV8wQTQhIi9Yy9acqPvuIPX6ngW6S6hYTX5NVxThugmn8Wyyi3k9f01ELw5ru9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ASTo3l38; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCC2CC32786;
-	Wed,  7 Aug 2024 01:16:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722993418;
-	bh=HQ4lNOfZ4aYOA2R0EvfkgxjJzs4j5xM6+QlVmxOkYT4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ASTo3l38I3x+NwxOGQ85K0pGyxgPWqchIsCosjDAiatow1v3cJJrzj0oNNsomXksb
-	 z+JJLvHaz59+97uAj0FFjcY8UKaHVpbgFfF2oZtI9h/YP29CQ3CTlYW8hKA3qXluW6
-	 ZLQ+6298nAWx56BgPYICua4FhX4kGRoY3bkbK+RdpTRZ9Zs+5G3lqVxsEITSOzxow0
-	 lEa0zNS+numUsN/vdRKPnb5USN5CB8RCh0Sg7s3l3qi2kgjgzuS2qyFSZvcXaciu6l
-	 BKY69U5I7ZerOguzdCa42pqG1+ci8ceA1IfPT5zVyoXpxzohfBBwAIBHTLqboif99i
-	 eJGCjrxKGPItw==
-Date: Tue, 6 Aug 2024 18:16:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next 06/11] net/mlx5e: Use extack in set ringparams
- callback
-Message-ID: <20240806181656.2c908cfd@kernel.org>
-In-Reply-To: <20240806125804.2048753-7-tariqt@nvidia.com>
-References: <20240806125804.2048753-1-tariqt@nvidia.com>
-	<20240806125804.2048753-7-tariqt@nvidia.com>
+	s=arc-20240116; t=1722994972; c=relaxed/simple;
+	bh=nJc/EA5aX6HYio1FRcTvW+nGYVDvgNrrwuK9u2kXc74=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=Zc5CkBZraaBQU0sVii+FRPh+qRLbsWD1p+xub6C3ROLku9oVcu1kkR/5Z/H7evxjJdrvOD8TSEBYcX48ZQiw5C1DXto7xuWBouO11gTfNe6t32EqKRLXPWpDuVD2j1JTHAN6XxanBLmTLrBjACGu6qYmuxHNLFrBfUQXPOW6p2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=NYO4au5E; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1722994964; bh=oEjPWbgLYa2owMiTzsj3wTp8GPNjpwQfhs8OU5kPAe4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=NYO4au5ECSgeNojeTuCBXKVf5FeaPqixvh85Hi9jxgwnVqoDqDibRKM2+KYDIywCZ
+	 hiPQ6JS5t6vqIWRbhbJQ2nco2YU/ffJA463V1u9B7lyceMOr3hdV3n+TS0qj9x8wuj
+	 4vGjMlD4BmmBdQo5h5/l56x9nPcQC8bon84hR8HI=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
+	id AA802823; Wed, 07 Aug 2024 09:42:40 +0800
+X-QQ-mid: xmsmtpt1722994960toihf7mun
+Message-ID: <tencent_2878E872ED62CC507B1A6F702C096FD8960A@qq.com>
+X-QQ-XMAILINFO: MmuCfgcSBfHxKKwxo/p8YL1xiGHNfKFtuBEW8I4yF+aKQOuLCtiS0xtdslArfI
+	 h54xGnl3oJuktD7cSc1A3sGEw3GzfMcokw9AKTMN/Zn6ZPvOs5QKcp3uH8MvuTJQ5SdV6R5kUIU1
+	 jQaEi5L6x7ytl+qRKXEnfG2IVFupe5JpZ4DqI24sR6Xrz9YQplc4C9cYTPIiR1czLO4FWC7C1ErX
+	 jcQVp5jJkeFhXF8RsQcrrkMPdOrCNMa0lFES6x+XinI2dGefhoYfSEAhzoXrn8G/wb/NOnyEbyyh
+	 eEdfP96Ncq++SW/9ZrwTXSWVsBoqORXbbM+GMTo1cB9uJ2+sClGKz2oDiXXypyhndyUKYi1SxyZu
+	 1M49MTNMj1lAioJ8NdAAW6OwWwPlcii4KIMyx9K6K9Bsec1lgLC+9cYHgHrWldT4jjlf3lGU6ksb
+	 2/r862Vh1YhOrQjvRAp2Y6U0g3IrngiRihqPFPqCRhOtptJv43SBYLx85Fcqp6uqo3w/7Dxh5SNy
+	 apsUDQxebk7uwrBeBJxQPslVbt2r01Dk8Dk8CKSV2nP1LFRio8guIU9XCKkPHxQktmKJbab+tY73
+	 XTxWZHxWbbnf4F2pkpr3Z3eWrHEu9+4SSHxxYlAfNf8yBgHfEqTFoPmNIaFw1j4FD9F8i+GxUYua
+	 1j8TckjqaVkMOYOWnqhTsqIx/MIUS1jXb9PMvsiX1+22e/AWk98ayN5OX1SzJt2qDheDpgs0uW6+
+	 VQhnbpqTu835+RsxSoR6WIptoIkmvCMaJVhzYaZLS+i0O++CEqMTca9f6JPrUDHQ4Wj8YZLPDv1g
+	 FvX67ju/4cme5IE2+P6pheshN+kng4L31m+X1Wou60/tP0zx/0scTkhqsHMcqxIJHTtcsjH2VWPF
+	 9aOAhpreyE38MeafAJ6a31OYKFmxzVi0ZGUtGw8ZdGQkGVFH7w956AdnIOGo3bmpEVGft5RfH8LP
+	 tdqVi1dtmCXs/WPytsawuE3/I9/AaNhwkoT+/thb8=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kernel@pengutronix.de,
+	kuba@kernel.org,
+	leitao@debian.org,
+	linux-can@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mkl@pengutronix.de,
+	netdev@vger.kernel.org,
+	o.rempel@pengutronix.de,
+	pabeni@redhat.com,
+	robin@protonic.nl,
+	socketcan@hartkopp.net,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [can?] WARNING: refcount bug in j1939_session_put
+Date: Wed,  7 Aug 2024 09:42:40 +0800
+X-OQ-MSGID: <20240807014239.3997268-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000af9991061ef63774@google.com>
+References: <000000000000af9991061ef63774@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 6 Aug 2024 15:57:59 +0300 Tariq Toukan wrote:
->  	if (param->rx_jumbo_pending) {
-> -		netdev_info(priv->netdev, "%s: rx_jumbo_pending not supported\n",
-> -			    __func__);
-> +		NL_SET_ERR_MSG_MOD(extack, "rx-jumbo not supported");
->  		return -EINVAL;
->  	}
->  	if (param->rx_mini_pending) {
-> -		netdev_info(priv->netdev, "%s: rx_mini_pending not supported\n",
-> -			    __func__);
-> +		NL_SET_ERR_MSG_MOD(extack, "rx-mini not supported");
->  		return -EINVAL;
->  	}
+Fixes: c9c0ee5f20c5 ("net: skbuff: Skip early return in skb_unref when debugging")
 
-This is dead code in the first place, mlx5 doesn't set associated max
-values so:
+Root cause: In commit c9c0ee5f20c5, There are following rules:
+In debug builds (CONFIG_DEBUG_NET set), the reference count is always  decremented, even when it's 1
 
-	if (ringparam.rx_pending > max.rx_max_pending ||
-	    ringparam.rx_mini_pending > max.rx_mini_max_pending ||
-	    ringparam.rx_jumbo_pending > max.rx_jumbo_max_pending ||
-	    ringparam.tx_pending > max.tx_max_pending)
-		return -EINVAL;
+This rule will cause the reference count to be 0 after calling skc_unref,
+which will affect the release of skb.
 
-in the core will reject any attempts at using these.
+The solution I have proposed is:
+Before releasing the SKB during session destroy, check the CONFIG_DEBUG_NET
+and skb_unref return values to avoid reference count errors caused by a 
+reference count of 0 when releasing the SKB.
+
+#syz test: net-next 743ff02152bc
+
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+index 4be73de5033c..50d96015c125 100644
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -278,7 +278,8 @@ static void j1939_session_destroy(struct j1939_session *session)
+ 
+ 	while ((skb = skb_dequeue(&session->skb_queue)) != NULL) {
+ 		/* drop ref taken in j1939_session_skb_queue() */
+-		skb_unref(skb);
++		if (skb_unref(skb) && IS_ENABLED(CONFIG_DEBUG_NET))
++			skb_get(skb);
+ 		kfree_skb(skb);
+ 	}
+ 	__j1939_session_drop(session);
+
 
