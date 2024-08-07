@@ -1,190 +1,124 @@
-Return-Path: <netdev+bounces-116572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20F4B94B012
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:54:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD2E94B029
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D250D28457E
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:54:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8E17B237B3
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A98813E8B6;
-	Wed,  7 Aug 2024 18:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9F21419B5;
+	Wed,  7 Aug 2024 18:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="w7TFhca1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4GJ7/iJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AC82770E;
-	Wed,  7 Aug 2024 18:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5C585654
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 18:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723056863; cv=none; b=X9H8RrdSV2D67nhKWY5ICQJdOYp9Y7Ja74JH/gcmLcFj/qtjb3FcUqVmnZqSTvVw9nenLgtrgWiqQFhR8npXvzx7Nnyc6J7MpE1v5ORfGaqaP7apwHRP60iYNwaYCNLUy9bTp4ZsHtTO/8jO0Uj8jTjszDJF83exr2xgnn/d9zQ=
+	t=1723057161; cv=none; b=n3uDXVG7EidJS5C1Ov+/KXP7DDjSksHltVZp394cVgLYMdm7UTpNptOxHvT+o4P8ipyX/mYUlZp63659KCrJpoItI2z2GuuUKkpuK/a97Qpqsh+EoIuEVl+vZbdFpDA3OKRcBD2M2HQgfRMifYPyO7H2xcU8/U165BUOFCFamXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723056863; c=relaxed/simple;
-	bh=Oy3Arc9xnm29CObRN4hnz61tzv8F5MKNJjwlTCeU/D4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UwEICz14WjSSTp2ENWgbyeVJUkzMSQS4u5thgJiMuPrxrK2NjAUZHzo6IFedwhK7jiA9zU90v09tuB2MwZmE0vZBB3c541neZlEQ4EpkIZFDBS9U6L1sRSRehvIsR0s9XmX0Fhj01W6nNXdemabim/GHE6k8M5FW++f0xSNOqrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=w7TFhca1; arc=none smtp.client-ip=108.61.200.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
-Received: from [192.168.10.7] (unknown [10.0.12.132])
-	by kozue.soulik.info (Postfix) with ESMTPSA id ECB522FE4F7;
-	Thu,  8 Aug 2024 03:54:47 +0900 (JST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info ECB522FE4F7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
-	t=1723056888; bh=a4G2GaIu3qEW2hkacxQ3XBO0hk1/jOYpCv/D8YD+r2I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=w7TFhca1n/5Pp47Cz5kUFBfYNgckGPV3rQicX+X+b0Xw3eMg3VJyAXXbyB4K9TZvG
-	 CnpnrMRcFmn5XthsMw5iq8v+OblghItw5l9D86UZ4AHukmaTrAVSbCLnSaPlqYYJOn
-	 NInnI6EemCUkIlNVm4hy2s0LvBe+4GzJIz/5D+JY=
-Message-ID: <3a3695a1-367c-4868-b6e1-1190b927b8e7@soulik.info>
-Date: Thu, 8 Aug 2024 02:54:12 +0800
+	s=arc-20240116; t=1723057161; c=relaxed/simple;
+	bh=hIVvH2+pkzcMIYysNKzNwlFqVnhplPZAuQ4/Vw3FqaU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SGweLP9wq6zz7/9j656c5vABQX9yZqG/+Kom8gPrdKhjoQMcDMJc4CBVMWQJpi4LvifjMWN+oGBXxY6cViq89Fsj1XNQs2vGUurhmmkk0bWbkMijsr19M9y9TF0oxuEnnAKvikWc1sUx7N7cv+cW21qHQDpaEjYA0wMt1FBTlLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h4GJ7/iJ; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70d1c655141so183784b3a.1
+        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 11:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723057160; x=1723661960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NwA3//Ou6zwzrPvy2p6hCN4QlFE1pyGZu8UJO3gleZ0=;
+        b=h4GJ7/iJ2EBu+0mVnQl6xTvT0BRXaVxdEQi5DtiU551oa+BDKpdXJ2ehfVz2VdrQQQ
+         dcFhtuKqxQcEp1Ep92VKD6CKQAet5HTIHlSi5GJV0ZhcVv5HKWq/7cEhI/FPcBpXOVZP
+         zdIHTfZxrs7tAWAbtgGz/ZzDwmugt4vNMTuOp2Qxbp7hHQk8cUD+8PiE/NSnLLdUatUp
+         9JZ+TjQKf9PHXimy3NG5IBvIvgkAIP1c7VGOELTxtw1K05HhklB4hHyEEXJl85Wg0vp6
+         2a/YW7b4fN8PbbJrKPupaKBQ2f0rhSLFG/dLYFXRPyQQ9StyGMyV77AwraZM9rapvZok
+         gwtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723057160; x=1723661960;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NwA3//Ou6zwzrPvy2p6hCN4QlFE1pyGZu8UJO3gleZ0=;
+        b=TVY/JsmfI20af8qSWsOllC1MrTStpN/cYHo9viLr1+v1Oh7JasWXBHqsV7K1ww1z6g
+         VrFBZx8/a4GK+5T4Nu+3wF70Xx4DFCyfmbFln2AlQ2ibHMMW52cVAXd8UIdQivjgq3gD
+         c+PE2rwRp/EhJIM+FpO8xNk5sr7R1Kokhd5ec9aa5abpcaCvFeFBX5x8asxLfyP1WgbN
+         +dDLOSrNRSYnsDBA1c9BzxomdtaVW17A2/635+uBDttHMxPRPZ/YB2LyWCR4dgwufDqy
+         lYjb2hJ1b/IhD86QORNq+A2QyOC6+Aefj8ZZo/t2oze5R/G6NFmLd1llaGGy/+Z1CEAN
+         IZDQ==
+X-Gm-Message-State: AOJu0YxXMQrrFrx99l4VnNogk2GdnPFVMJy/KlPLLpwh7Iejxy+90nil
+	w0CkaDv70/RaqSPdGklcFBxAVfKBEZPSULch+gCaJn425Jiwe2633yEgog==
+X-Google-Smtp-Source: AGHT+IFyXxodopox3nBjlB3YXGz2TXuDyzuuBDUpnc89Q49ZGmCGd58fUpUOYJRBL0nIXF8lxzrn/g==
+X-Received: by 2002:a05:6a21:9181:b0:1c0:f648:8574 with SMTP id adf61e73a8af0-1c6995ab30amr20579291637.29.1723057159609;
+        Wed, 07 Aug 2024 11:59:19 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5905b3f3sm109550275ad.136.2024.08.07.11.59.19
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 11:59:19 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Subject: [PATCH] net: ag71xx: use phylink_mii_ioctl
+Date: Wed,  7 Aug 2024 11:58:46 -0700
+Message-ID: <20240807185918.5815-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
- index
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
-References: <20240731111940.8383-1-ayaka@soulik.info>
- <66aa463e6bcdf_20b4e4294ea@willemb.c.googlers.com.notmuch>
- <bd69202f-c0da-4f46-9a6c-2375d82a2579@soulik.info>
- <66aab3614bbab_21c08c29492@willemb.c.googlers.com.notmuch>
- <3d8b1691-6be5-4fe5-aa3f-58fd3cfda80a@soulik.info>
- <66ab87ca67229_2441da294a5@willemb.c.googlers.com.notmuch>
- <343bab39-65c5-4f02-934b-84b6ceed1c20@soulik.info>
- <66ab99162673_246b0d29496@willemb.c.googlers.com.notmuch>
- <328c71e7-17c7-40f4-83b3-f0b8b40f4730@soulik.info>
- <66acf6cc551a0_2751b6294bf@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Randy Li <ayaka@soulik.info>
-In-Reply-To: <66acf6cc551a0_2751b6294bf@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hello Willem
+f1294617d2f38bd2b9f6cce516b0326858b61182 removed the custom function for
+ndo_eth_ioctl and used the standard phy_do_ioctl which calls
+phy_mii_ioctl. However since then, this driver was ported to phylink
+where it makes more sense to call phylink_mii_ioctl.
 
-On 2024/8/2 23:10, Willem de Bruijn wrote:
-> Randy Li wrote:
->> On 2024/8/1 22:17, Willem de Bruijn wrote:
->>> Randy Li wrote:
->>>> On 2024/8/1 21:04, Willem de Bruijn wrote:
->>>>> Randy Li wrote:
->>>>>> On 2024/8/1 05:57, Willem de Bruijn wrote:
->>>>>>> nits:
->>>>>>>
->>>>>>> - INDX->INDEX. It's correct in the code
->>>>>>> - prefix networking patches with the target tree: PATCH net-next
->>>>>> I see.
->>>>>>> Randy Li wrote:
->>>>>>>> On 2024/7/31 22:12, Willem de Bruijn wrote:
->>>>>>>>> Randy Li wrote:
->>>>>>>>>> We need the queue index in qdisc mapping rule. There is no way to
->>>>>>>>>> fetch that.
->>>>>>>>> In which command exactly?
->>>>>>>> That is for sch_multiq, here is an example
->>>>>>>>
->>>>>>>> tc qdisc add dev  tun0 root handle 1: multiq
->>>>>>>>
->>>>>>>> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->>>>>>>> 172.16.10.1 action skbedit queue_mapping 0
->>>>>>>> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->>>>>>>> 172.16.10.20 action skbedit queue_mapping 1
->>>>>>>>
->>>>>>>> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->>>>>>>> 172.16.10.10 action skbedit queue_mapping 2
->>>>>>> If using an IFF_MULTI_QUEUE tun device, packets are automatically
->>>>>>> load balanced across the multiple queues, in tun_select_queue.
->>>>>>>
->>>>>>> If you want more explicit queue selection than by rxhash, tun
->>>>>>> supports TUNSETSTEERINGEBPF.
->>>>>> I know this eBPF thing. But I am newbie to eBPF as well I didn't figure
->>>>>> out how to config eBPF dynamically.
->>>>> Lack of experience with an existing interface is insufficient reason
->>>>> to introduce another interface, of course.
->>>> tc(8) was old interfaces but doesn't have the sufficient info here to
->>>> complete its work.
->>> tc is maintained.
->>>
->>>> I think eBPF didn't work in all the platforms? JIT doesn't sound like a
->>>> good solution for embeded platform.
->>>>
->>>> Some VPS providers doesn't offer new enough kernel supporting eBPF is
->>>> another problem here, it is far more easy that just patching an old
->>>> kernel with this.
->>> We don't add duplicative features because they are easier to
->>> cherry-pick to old kernels.
->> I was trying to say the tc(8) or netlink solution sound more suitable
->> for general deploying.
->>>> Anyway, I would learn into it while I would still send out the v2 of
->>>> this patch. I would figure out whether eBPF could solve all the problem
->>>> here.
->>> Most importantly, why do you need a fixed mapping of IP address to
->>> queue? Can you explain why relying on the standard rx_hash based
->>> mapping is not sufficient for your workload?
->> Server
->>
->>     |
->>
->>     |------ tun subnet (e.x. 172.16.10.0/24) ------- peer A (172.16.10.1)
->>
->> |------ peer B (172.16.10.3)
->>
->> |------  peer C (172.16.10.20)
->>
->> I am not even sure the rx_hash could work here, the server here acts as
->> a router or gateway, I don't know how to filter the connection from the
->> external interface based on rx_hash. Besides, VPN application didn't
->> operate on the socket() itself.
->>
->> I think this question is about why I do the filter in the kernel not the
->> userspace?
->>
->> It would be much more easy to the dispatch work in kernel, I only need
->> to watch the established peer with the help of epoll(). Kernel could
->> drop all the unwanted packets. Besides, if I do the filter/dispatcher
->> work in the userspace, it would need to copy the packet's data to the
->> userspace first, even decide its fate by reading a few bytes from its
->> beginning offset. I think we can avoid such a cost.
-> A custom mapping function is exactly the purpose of TUNSETSTEERINGEBPF.
->
-> Please take a look at that. It's a lot more elegant than going through
-> userspace and then inserting individual tc skbedit filters.
+Bring back custom function that calls phylink_mii_ioctl.
 
-I checked how this socket filter works, I think we still need this 
-serial of patch.
+Fixes: 892e09153fa3 ("net: ag71xx: port to phylink")
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/atheros/ag71xx.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-If I was right, this eBPF doesn't work like a regular socket filter. The 
-eBPF's return value here means the target queue index not the size of 
-the data that we want to keep from the sk_buf parameter's buf.
-
-Besides, according to 
-https://ebpf-docs.dylanreimerink.nl/linux/program-type/BPF_PROG_TYPE_SOCKET_FILTER/
-
-I think the eBPF here can modify neither queue_mapping field nor hash 
-field here.
-
-> See SKF_AD_QUEUE for classic BPF and __sk_buff queue_mapping for eBPF.
-
-Is it a map type BPF_MAP_TYPE_QUEUE?
-
-Besides, I think the eBPF in TUNSETSTEERINGEBPF would NOT take 
-queue_mapping.
-
-If I want to drop packets for unwanted destination, I think 
-TUNSETFILTEREBPF is what I need?
-
-That would lead to lookup the same mapping table twice, is there a 
-better way for the CPU cache?
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index 6fc4996c8131..e252eca985b1 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -447,6 +447,13 @@ static void ag71xx_int_disable(struct ag71xx *ag, u32 ints)
+ 	ag71xx_cb(ag, AG71XX_REG_INT_ENABLE, ints);
+ }
+ 
++static int ag71xx_do_ioctl(struct net_device *ndev, struct ifreq *ifr, int cmd)
++{
++	struct ag71xx *ag = netdev_priv(ndev);
++
++	return phylink_mii_ioctl(ag->phylink, ifr, cmd);
++}
++
+ static void ag71xx_get_drvinfo(struct net_device *ndev,
+ 			       struct ethtool_drvinfo *info)
+ {
+@@ -1798,7 +1805,7 @@ static const struct net_device_ops ag71xx_netdev_ops = {
+ 	.ndo_open		= ag71xx_open,
+ 	.ndo_stop		= ag71xx_stop,
+ 	.ndo_start_xmit		= ag71xx_hard_start_xmit,
+-	.ndo_eth_ioctl		= phy_do_ioctl,
++	.ndo_eth_ioctl		= ag71xx_do_ioctl,
+ 	.ndo_tx_timeout		= ag71xx_tx_timeout,
+ 	.ndo_change_mtu		= ag71xx_change_mtu,
+ 	.ndo_set_mac_address	= eth_mac_addr,
+-- 
+2.45.2
 
 
