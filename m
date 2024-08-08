@@ -1,217 +1,189 @@
-Return-Path: <netdev+bounces-117028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A5294C663
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:42:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5523394C669
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA307B2244B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:42:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D51411F21A7F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FDC71465BA;
-	Thu,  8 Aug 2024 21:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8B015820F;
+	Thu,  8 Aug 2024 21:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Qgw/wre"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785A915B0FC
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 21:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422602A1DF
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 21:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723153371; cv=none; b=ILu89XRzGPMhJ9zcEaS1CjhyrElHHdMOngW2mymEmMiMvw++E4oB6lbg2xhhrl9V6hV9Dr+Z2mwsLu+SQ92H9lzQLz9J2uN0EI7V0/OzYNQ1nqs95KbjL23Tn56grZgygSNPoibBPdFQi4hWUiYO+e5Ihs7DQ8z9O0REzBfPjYw=
+	t=1723153524; cv=none; b=cSJwvcnYaiiiKQKA7Ps4O7btaa3XrmfWm7Ma2fP4d3PlJFHdeuApSAh2T2cnrQaZyXxKkaCB70DwDY2oa96iB14PVZpKF+LgTR0NzlTWqFWTlYye3uibQQVoo+9ZOjm/yaeIrfCq6w8lr6rJrs+dMSDCdcmaUjr1zIw6oUslsR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723153371; c=relaxed/simple;
-	bh=tuT0u0AMfYCSTSh/I1baAP9AXjthsIPnqMsk9MVGhtM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=nNJrQjLpZvdtNXTc04Yzh7Pm4QjAhGrWmB4TL/WRKcvKQP9QaJcVNuZd3dTW84qZ2OGG9bDcagVbfofZDOUvauR4wNkRWRQRd4jTAzk/hJW02N9W0iBoJ4Q+T2/H1Zhk86G4UtI73v1oVGF1frtrcgOOjBVJDR7TUP8RTBzOxUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from smtpclient.apple (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 6BC177D064;
-	Thu,  8 Aug 2024 21:42:48 +0000 (UTC)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1723153524; c=relaxed/simple;
+	bh=69cziFFAZjQ/eDktjxM5mM+/jpzNLZpyXq1ik0zmeys=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VT7nHvOJnWOe8FDv+yidlZw/bAWoftqs4GIeMxAYukdXANqdrQbTG6Dr5lJFJ1r0Go5cAOSmq1RVhDQ7RHO8IQu83FQlrU8CzvAbdiPdjF7aMZsLKYWDByVMtd+QQMwYlaBTs4m5/Z5iHIIMQMFWEQl5EuUlVajoH0XEuzoSaMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Qgw/wre; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-699c81a261eso31190437b3.2
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 14:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723153522; x=1723758322; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xcPPvcPRwxXVxdlXqs3yv30ISGaFacQoI1PGRx6DtEw=;
+        b=0Qgw/wreMFnRyx9nlyyHMlNGJqYJMEMRPxiW03+qFkUw6U8USqgy+mfqM6BT1z0F82
+         KvXFMYSq/aFYBF3ecRWmKHgA5zoCZDRsV+j9NFL2dlgcpZoRusKWed9vRxunQWTWEx6a
+         jzSfza2ZJT0OZiZDQKiKa8hKa1CZbDRmRNoT61sKLxsrEPW9NP0EfU86J4fPI6ikUmqJ
+         Utlbq+VaTNd0+KOwQVVeqnrQXnt9KrX4jh7SYcK0zZDLKWmLVa7GGD6mclqT08nLFWMI
+         Fwxj5iTXV4CKEStjFv7uxLqYUJuzbf/dvhbAle9aOzfiRiOalfu00tHWjjmoBPG6EQwl
+         uXuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723153522; x=1723758322;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xcPPvcPRwxXVxdlXqs3yv30ISGaFacQoI1PGRx6DtEw=;
+        b=JxTbVLi/+tWPCeEJR2fzVKhj6syZMbTTaoE/pbOVyGTqdqR0JRtsAle3r5n/WZLpcF
+         Q96rNPDhbB2NWA+LJcnzCRHtN866KbDfD5gzU8wnmHGf6SN0Ezr/ExMJasgp0uxlsvUW
+         mgMLHAoU4DBFbPhCS4OsHDkLQLpL4iUZsu2wrRLdjcOsSpkvrSAMHSyFKhFD2EoLJyrR
+         rbfTMHKLnf7/I9+6I+AwVQ0nlaqMOngditKuD6ywSsQcqqQCtXDsF9u0pQqrORHpdwzG
+         CtdqDQJV4zK1YiVCh/HeG+wDfv8yO5eRWzcuIgAgt3wFVjrp0C2CeAowtu9cz8DNSNcs
+         BVqg==
+X-Gm-Message-State: AOJu0YybNevERUFlwcNIa54IcjWxcJk6vvOTOtj8mRQONuUVeKrh2gMw
+	eQK+fSm9h696WW4qzk7yIs2KSHlIvTjANeT5/t58ztw0zY+awX6LtSfxin18MmFbglwN1s00yuO
+	4fdOQCQI4oQurgRvMgdG5KPC7ruUwK9pff4ywfDy5Wilb6t6RYwdG3foRn7Uxe/LgK/lOlec1XS
+	BdW84XCTBwSpmYyiWLfTAqg2QRB3jETfoHQfjAN5p001HZwkSZ47COaZwNPZ0=
+X-Google-Smtp-Source: AGHT+IHjq3IWl8119yLZ1MLHMgj3sC96WrT2g2xXdZ8R7JZd3eIR92qX4u49H3OhyifuuXgN+Z/IrbZtAjSh76ix7A==
+X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
+ (user=almasrymina job=sendgmr) by 2002:a25:840b:0:b0:e05:ec8f:b497 with SMTP
+ id 3f1490d57ef6-e0e9db1383bmr18971276.4.1723153521565; Thu, 08 Aug 2024
+ 14:45:21 -0700 (PDT)
+Date: Thu,  8 Aug 2024 21:45:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-From: Christian Hopps <chopps@chopps.org>
-In-Reply-To: <ZrTPyM3V7JKca6SZ@hog>
-Date: Thu, 8 Aug 2024 17:42:37 -0400
-Cc: Christian Hopps <chopps@chopps.org>,
- devel@linux-ipsec.org,
- Steffen Klassert <steffen.klassert@secunet.com>,
- netdev@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <75B597AE-43D8-4A41-AF3E-7169C696FEC6@chopps.org>
-References: <20240804203346.3654426-1-chopps@chopps.org>
- <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
- <m2a5hr7iek.fsf@ja-home.int.chopps.org> <ZrHjByjZnnDgjvfo@hog>
- <m2le1aouzf.fsf@ja-home.int.chopps.org> <ZrIDfN2uFpktGJYD@hog>
- <m2a5hnnsw8.fsf@ja-home.int.chopps.org> <ZrTH665G9b3P054t@hog>
- <3BAC517C-C896-489F-A7E8-DE5046E38073@chopps.org> <ZrTPyM3V7JKca6SZ@hog>
-To: Sabrina Dubroca <sd@queasysnail.net>
-X-Mailer: Apple Mail (2.3774.600.62)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
+Message-ID: <20240808214520.2648194-1-almasrymina@google.com>
+Subject: [PATCH net-next v2] page_pool: unexport set dma_addr helper
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
+This helper doesn't need to be exported. Move it to page_pool_priv.h
 
+Moving the implementation to the .c file allows us to hide netmem
+implementation details in internal header files rather than the public
+file.
 
-> On Aug 8, 2024, at 10:01, Sabrina Dubroca <sd@queasysnail.net> wrote:
->=20
-> 2024-08-08, 09:35:04 -0400, Christian Hopps wrote:
->>=20
->>=20
->>> On Aug 8, 2024, at 09:28, Sabrina Dubroca <sd@queasysnail.net> =
-wrote:
->>>=20
->>> 2024-08-08, 07:30:13 -0400, Christian Hopps wrote:
->>>>=20
->>>> Sabrina Dubroca <sd@queasysnail.net> writes:
->>>>=20
->>>>> 2024-08-06, 04:54:53 -0400, Christian Hopps wrote:
->>>>>>=20
->>>>>> Sabrina Dubroca <sd@queasysnail.net> writes:
->>>>>>=20
->>>>>>> 2024-08-04, 22:33:05 -0400, Christian Hopps wrote:
->>>>>>>>>> +/* 1) skb->head should be cache aligned.
->>>>>>>>>> + * 2) when resv is for L2 headers (i.e., ethernet) we want =
-the cacheline to
->>>>>>>>>> + * start -16 from data.
->>>>>>>>>> + * 3) when resv is for L3+L2 headers IOW skb->data points at =
-the IPTFS payload
->>>>>>>>>> + * we want data to be cache line aligned so all the pushed =
-headers will be in
->>>>>>>>>> + * another cacheline.
->>>>>>>>>> + */
->>>>>>>>>> +#define XFRM_IPTFS_MIN_L3HEADROOM 128
->>>>>>>>>> +#define XFRM_IPTFS_MIN_L2HEADROOM (64 + 16)
->>>>>>>>>=20
->>>>>>>>> How did you pick those values?
->>>>>>>>=20
->>>>>>>> That's what the comment is talking to. When reserving space for =
-L2 headers we
->>>>>>>> pick 64 + 16 (a 2^(<=3D6) cacheline + 16 bytes so the the =
-cacheline should start
->>>>>>>> -16 from where skb->data will point at.
->>>>>>>=20
->>>>>>> Hard-coding the x86 cacheline size is not a good idea. And =
-what's the
->>>>>>> 16B for? You don't know that it's enough for the actual L2 =
-headers.
->>>>>>=20
->>>>>> I am not hard coding the x86 cacheline. I am picking 64 as the =
-largest cacheline that this is optimized for, it also works for smaller =
-cachelines.
->>>>>=20
->>>>> At least use SMP_CACHE_BYTES then?
->>>>=20
->>>> Right, I have changed this work with L1_CACHE_BYTES value.
->>>>=20
->>>>>> 16B is to allow for the incredibly common 14B L2 header to fit.
->>>>>=20
->>>>> Why not use skb->dev->needed_headroom, like a bunch of tunnels are
->>>>> already doing? No guessing required. ethernet is the most common, =
-but
->>>>> there's no reason to penalize other protocols when the information =
-is
->>>>> available.
->>>>=20
->>>> We can't use `skb->dev->needed_headroom`, b/c `skb->dev` is not
->>>> correct for the new packets. `skb->dev` is from the received IPTFS
->>>> tunnel packet. The skb being created here are the inner user =
-packets
->>>> leaving the tunnel, so they have an L3 header (thus why we are only
->>>> making room for L2 header). They are being handed to gro receive =
-and
->>>> still have to be routed to their correct destination interface/dev.
->>>=20
->>> You're talking about RX now. You're assuming the main use-case is an
->>> IPsec GW that's going to send the decapped packets out on another
->>> ethernet interface? (or at least, that's that's a use-case worth
->>> optimizing for)
->>>=20
->>> What about TX? Is skb->dev->needed_headroom also incorrect there?
->>>=20
->>> Is iptfs_alloc_skb's l3resv argument equivalent to a RX/TX switch?
->>=20
->> Exactly right. When we are generating IPTFS tunnel packets we need
->> to add all the L3+l2 headers, and in that case we pass l3resv =3D
->> true.
->=20
-> Could you add a little comment alongside iptfs_alloc_skb? It would
-> help make sense of the sizes you're choosing and how they fit the use
-> of those skbs (something like "l3resv=3Dtrue is used on TX, because we
-> need to reserve L2+L3 headers. On RX, we only need L2 headers because
-> [reason why we need L2 headers].").
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-Sure.
+---
 
-> And if skb->dev->needed_headroom is correct in the TX case, I'd still
-> prefer (skb->dev->needed_headroom + <some space for l3>) to a fixed =
-128.
+v2: https://patchwork.kernel.org/project/netdevbpf/patch/20240805212536.2172174-6-almasrymina@google.com/
+- Move get back to the public header. (Jakub)
+- Move set to the internal header page_pool_priv.h (Jakub)
 
-So dev->needed_headroom is defined as possible extra needed headroom.For =
-ethernet it is 12. It's not what we want.
+---
+ include/net/page_pool/helpers.h | 23 -----------------------
+ net/core/page_pool.c            | 17 +++++++++++++++++
+ net/core/page_pool_priv.h       |  6 ++++++
+ 3 files changed, 23 insertions(+), 23 deletions(-)
 
-The actual MAC size value in this case is: dev->hard_header_len which is =
-14..
-
-(gdb) p st->root_skb
-$2 =3D (struct sk_buff *) 0xffff888012969a00
-(gdb) p (struct dst_entry *)$2->_skb_refdst
-$3 =3D (struct dst_entry *) 0xffff888012ef7180
-(gdb) p $3->deb
-$5 =3D (struct net_device *) 0xffff88800dca8000
-(gdb) p $5->needed_headroom
-$6 =3D 12
-(gdb) p $5->hard_header_len
-$7 =3D 14
-(gdb) p $5->min_header_len
-$8 =3D 14 '\016'
-
-We also have access to the IPTFS required header space by looking in the =
-tpl->dst...
-
-# L3 header space requirement for xfrm
-(gdb) p $3->header_len
-$4 =3D 40
-
-which in this case is 40 =3D=3D IP (20) + ESP (8) + GCM-IV (8) + IPTFS =
-(4)
-
-So what I think you're looking for is this:
-
-struct dst_entry *dst =3D skb_dst(tpl);
-
-resv =3D LL_RESERVED_SPACE(dst->dev) + dst->header_len;
-resv =3D L1_CACHE_ALIGN(resv);
-
-FWIW (not that much) this is 128 in the ethernet dev case :)
-
-# LL_RESERVED_SPACE()
-(gdb) p (14 + 12 + 16) & ~15
-$9 =3D 32
-
-# above + dst->header_len
-(gdb) p 40 + 32
-$10 =3D 72
-
-# aligned to L1_CACHE_BYTES
-(gdb) p (72 + 64) & ~63
-$12 =3D 128
-
-Thanks,
-Chris.
-
->=20
-> --=20
-> Sabrina
-
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 2b43a893c619d..375656baa2d45 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -423,24 +423,6 @@ static inline dma_addr_t page_pool_get_dma_addr(const struct page *page)
+ 	return page_pool_get_dma_addr_netmem(page_to_netmem((struct page *)page));
+ }
+ 
+-static inline bool page_pool_set_dma_addr_netmem(netmem_ref netmem,
+-						 dma_addr_t addr)
+-{
+-	struct page *page = netmem_to_page(netmem);
+-
+-	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
+-		page->dma_addr = addr >> PAGE_SHIFT;
+-
+-		/* We assume page alignment to shave off bottom bits,
+-		 * if this "compression" doesn't work we need to drop.
+-		 */
+-		return addr != (dma_addr_t)page->dma_addr << PAGE_SHIFT;
+-	}
+-
+-	page->dma_addr = addr;
+-	return false;
+-}
+-
+ /**
+  * page_pool_dma_sync_for_cpu - sync Rx page for CPU after it's written by HW
+  * @pool: &page_pool the @page belongs to
+@@ -463,11 +445,6 @@ static inline void page_pool_dma_sync_for_cpu(const struct page_pool *pool,
+ 				      page_pool_get_dma_dir(pool));
+ }
+ 
+-static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+-{
+-	return page_pool_set_dma_addr_netmem(page_to_netmem(page), addr);
+-}
+-
+ static inline bool page_pool_put(struct page_pool *pool)
+ {
+ 	return refcount_dec_and_test(&pool->user_cnt);
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 2abe6e919224d..d689a20780f40 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1099,3 +1099,20 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
+ 	}
+ }
+ EXPORT_SYMBOL(page_pool_update_nid);
++
++bool page_pool_set_dma_addr_netmem(netmem_ref netmem, dma_addr_t addr)
++{
++	struct page *page = netmem_to_page(netmem);
++
++	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
++		page->dma_addr = addr >> PAGE_SHIFT;
++
++		/* We assume page alignment to shave off bottom bits,
++		 * if this "compression" doesn't work we need to drop.
++		 */
++		return addr != (dma_addr_t)page->dma_addr << PAGE_SHIFT;
++	}
++
++	page->dma_addr = addr;
++	return false;
++}
+diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
+index 90665d40f1eb7..4fbc69ace7d21 100644
+--- a/net/core/page_pool_priv.h
++++ b/net/core/page_pool_priv.h
+@@ -8,5 +8,11 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict);
+ int page_pool_list(struct page_pool *pool);
+ void page_pool_detached(struct page_pool *pool);
+ void page_pool_unlist(struct page_pool *pool);
++bool page_pool_set_dma_addr_netmem(netmem_ref netmem, dma_addr_t addr);
++
++static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
++{
++	return page_pool_set_dma_addr_netmem(page_to_netmem(page), addr);
++}
+ 
+ #endif
+-- 
+2.46.0.76.ge559c4bf1a-goog
 
 
