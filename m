@@ -1,132 +1,213 @@
-Return-Path: <netdev+bounces-117013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0606394C5B3
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:27:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3371D94C5C2
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C4DE1C22334
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:27:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80FE0B2281A
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0A515687C;
-	Thu,  8 Aug 2024 20:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A7B1552E0;
+	Thu,  8 Aug 2024 20:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLNsTjOq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vsn9B0oC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E406713D8A2;
-	Thu,  8 Aug 2024 20:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D652F88;
+	Thu,  8 Aug 2024 20:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723148856; cv=none; b=eX9aTdbHeICcItJ/u7oyzAcmN+YlaqW/jOXvI/H85oYjXggOVpKUdoKAUZWkliJznbSZCveGUteWjcPhG9wdoTX4EbDmdoNxQ7t4ePabDSviFxsgOKtWqEY3jWgZOsCqtWjmiKgzGcG10+8Wx65rgl+Ptb6zwlNJAdOp/c7L4U0=
+	t=1723149332; cv=none; b=ax9CTXRbbJiSWAwHJMWdkE097oPMMfaaQtl2zPI/ojIeBAmN8PNh64tgw7Xa90hKhU0gC8oYuVA+DV7WP0uhuLEvLFKxFnuDO6UWDT81qszLCrKznlstF0pp+iiouRGaxVKtqsTNwIKyDjQBOUt53hvRTUhfnFI5e+5mjNiezMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723148856; c=relaxed/simple;
-	bh=dSe/NQDOZybyAI/QEDENLBxxuP0YnOgfcnO74JQuNRw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cLctz5edLRu33Y2fR5P+wPvgUG7nfDHFFk2hcL7R1ut17NXIlcRjjWuuIZGpEvzKKTtWiP+C9KNugLOAI/piBJ58ZaGTHPF/afO3Yfah8liaw+U+In9BlCHvz0jhDS4L18cVQbYhED+AVnGATrZ/FmUwa2VvElV7ZCuKrvSqbsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLNsTjOq; arc=none smtp.client-ip=209.85.222.50
+	s=arc-20240116; t=1723149332; c=relaxed/simple;
+	bh=Z3cZHo0C5dOGdJs4XsVHj5/15eTWcTCsSV4t/f39zoI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ie11jfkxkNayKhQUGyNSKslbDq2ZnyX8fkUeqHtWhyO5DA8XZ5KKR3HZgnOYCUoQNeKf4dJ3S/AWkwus0goXLJ8ArRusSjkaxzu/e3a7MgEyoCwxsCiKuJRqqdylWM0x1qtzyqQ96eLLs6P3M8qb+PrfxOUJScmoY59IDAggaXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vsn9B0oC; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-83120879efcso450185241.1;
-        Thu, 08 Aug 2024 13:27:34 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a156557029so1704290a12.2;
+        Thu, 08 Aug 2024 13:35:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723148854; x=1723753654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5gOD9qHt5HUAzpjDzA7tGTtcYiqR7JCDvKLS0bt8yaw=;
-        b=gLNsTjOqvBskOxWVm7pXTkYYtDb72Ldw760X57nSDjY6yROmZEp60ci+xTNLyp5zMS
-         VFV/mJC14i1fl7mOlMvPGAs1BZIRyKXNXzhjtQuF5+2ID3bDJ/cFp47W0zt4Jsseoq/j
-         4aVE/C9R2JB+eM278C8y51vxBQzcU5/U8Hxtr9GC3/GolSXP0ydC7/O10Zeoefe1cbL3
-         GtpQFouLu7t4tJ6zSBaK7gpQe9FAOnnSVOjwwaS3D1wSLTTZIht/d0tuMqr9mcZJosLm
-         Zq/nLkj19+htLnKWG8hHsYaoTLaWZ69eW/kCNfMApTJO+Sb9g/ie5uD9JwkwAhzPcwlE
-         h4Ew==
+        d=gmail.com; s=20230601; t=1723149329; x=1723754129; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BckQp3equBHDw/iWdFm9ZpTvFrdGPYRY5a2tKkfZo0=;
+        b=Vsn9B0oCUqBUHTVYVRgdKVGiJNqt7okkcANodbc8v/6+WkhW2mp8as0lfl9i0QYx19
+         9izdxq+sMlQv2UKXUkJuNImP5tqoViZkG/F4wsg6cJbojHuwop2tWydEa//iZzpbckvj
+         oln8RZe3eqwk76zrr7jSq0whvCmzYeB+KJhK4NeJhr76yh2IBx2DXLFxxV7s0dPMQGnm
+         j0R2iVx8od5nxvuIdnaA2+FHxdfQYyLZlZQSY5JqrDaPQZZ/6USmDyvo3jy+6mxty5tr
+         7iGMKePFmoBdorEsJG6itRsh1bjYjKAhRA7M+NmlOpQVVHKVqwEPNIKF/MD1fIbjVPQR
+         HJuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723148854; x=1723753654;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5gOD9qHt5HUAzpjDzA7tGTtcYiqR7JCDvKLS0bt8yaw=;
-        b=wBNxsd0+/l4CFUFwaVNca/Z4ssHLnrd5rJu7iK6M1Nx8SZ8W9FP03MVUTvfRn0+egs
-         VEn4Weet3NQwIT/L0m68dnhk58IXeV1Wr93m5XCtTzmv3Wd90kh0cEPl37jSgmB3KRLO
-         25uVhgr/4aPGJIlpXK0mjPsZ3BySwB+PtrqGgfsocsQoVPBXSdxFnLG+RvIOH6e2Nv2M
-         t48opdkxvaT+L46KNxTbwgV0Xp8o9xXfXR0NG0vUL2EHOZnjI6A6ePyUICI3gWnuMotE
-         IarQNrBrKX0WNG1oi4D79OmPPlrRUHgMyQekJ5XsN9ab41jNDG980MVpQRm5ITx4TOIo
-         moMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUN6iJR7HxeVk/gfclf+dPGUn7X9t0VG7uSrSbp8Rf0yiiAHsvZOssm/hpLKkbQh+fq0bHJypHPytWeh2QEFRjE9SLSA06+ttbOL1N51+MHBPqN+ub+sMkoVeLK3w+0dnsfyfZnBCF/Tt5V8hDSRAf038x2w4m2HxHgvSrdunkO
-X-Gm-Message-State: AOJu0YwypKRI+BspLE2vskwNdEJzN2IISrb33eXN2xJJ3ov79l5QaUzj
-	ZAEFXVjMc1+V/H+FlggSnQmvsvJuIH5UydTPrvLjBa6n8mwyHdN8
-X-Google-Smtp-Source: AGHT+IGW2UA5p/eZkCZn8DEwKY8mnsYkSQuCjz251ezP2c+lz/BFeKpTNm8aOQnLxWNlMZckWfAOGw==
-X-Received: by 2002:a05:6102:2923:b0:493:e642:38b1 with SMTP id ada2fe7eead31-495c5c37076mr3749651137.25.1723148853569;
-        Thu, 08 Aug 2024 13:27:33 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-83c09925db4sm1946473241.36.2024.08.08.13.27.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 13:27:33 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: socketcan@hartkopp.net,
-	mkl@pengutronix.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: david.hunter.linux@gmail.com,
-	skhan@linuxfoundation.org,
-	javier.carrasco.cruz@gmail.com
-Subject: [PATCH 1/1] Net: bcm.c: Remove Subtree Instead of Entry
-Date: Thu,  8 Aug 2024 16:26:58 -0400
-Message-Id: <20240808202658.5933-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1723149329; x=1723754129;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/BckQp3equBHDw/iWdFm9ZpTvFrdGPYRY5a2tKkfZo0=;
+        b=NqnUI7Q5VmwHxcPud0yz3IUncC4xp4i1nkKIj4D4nldGMa/L9xomUvZ2CH8KcjuHL6
+         Px6Yln91wRZxlxL5WyzQcfgTKYfpi1XOZDsnqhymob3JlQ3+JXvtrWDYXaZDzkekJskD
+         S9kLu8kuyoeqXrQ1UH2WQL5qcDXY2FXMTtrnbxEky8Ob6BulacWlVvZbWNMJGnkdK4OP
+         m9gXM5j60dvZ+/AlKtnQNXHxwy/1t0ksXFOiWSfAtjc0n1psn0UMfKkajQTFGlN2bnrr
+         z+UOPzqFcSLKZASDd/ISUBjRht4rtl/usXWJ1sIoZINIaZdxOrIuC+G/dhujB7opr0qv
+         yrAg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0gzcMzL0frQuTASKwmRrpLhxMb3zH6KM84/MYc4wbTCMUoHlCpiU4bZoPGKWnSShYypyze/y9s5zL/9kSXSxanQyJNb+iLvwBJNbSfCTkfK8Qxcb0kCjGPP88Zqy/BrRzxFydhiYkvITUuB7nPK7YAmALQ3KAvyhW3GQ47aMpXcqNpgYN3w1L0NwzOTUunBXjhZwivNoRnwOAbxKDkzjryXF06U+3AwM=
+X-Gm-Message-State: AOJu0YyRZqE3N/DqaYJu33LP9N8hGlRFdldLsNLQvFnUKBpSltNcj86i
+	0pw0uFZHbRSMoU0b15JHfrWzOhpJmStV8HWSG7cw73uDUIumsirMeCliyWz36sytgxZKjvTihEe
+	Na4BygOkrGMjDmPA4oPhpmGat5Pazyw==
+X-Google-Smtp-Source: AGHT+IG4oe0p6bZ+T5aZ4llYKbhvvCigDfXVXTLyvXUGYJ3vy2BD0AdCsmhO+xVhCMcs3KROzGsFRQjEW1tbCe49jCg=
+X-Received: by 2002:a17:907:f701:b0:a7d:c148:ec85 with SMTP id
+ a640c23a62f3a-a8090f2dad8mr204887866b.62.1723149328292; Thu, 08 Aug 2024
+ 13:35:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
+ <20240807-fehlschlag-entfiel-f03a6df0e735@brauner> <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
+ <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+In-Reply-To: <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 8 Aug 2024 13:35:13 -0700
+Message-ID: <CAEf4Bzauw1tD4UsyhX1PmRs_Y1MzfPqsoRUf40cmNuu7SJKi9w@mail.gmail.com>
+Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
+ single ldimm64 insn into helper
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Christian Brauner <brauner@kernel.org>, viro@kernel.org, bpf <bpf@vger.kernel.org>, 
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, Amir Goldstein <amir73il@gmail.com>, 
+	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, kvm@vger.kernel.org, 
+	Network Development <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix a warning with bcm.c that is caused by removing an entry. If the
-entry had a process as a child, a warning is generated:
+On Thu, Aug 8, 2024 at 9:51=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Wed, Aug 7, 2024 at 8:31=E2=80=AFAM Andrii Nakryiko
+> <andrii.nakryiko@gmail.com> wrote:
+> >
+> > On Wed, Aug 7, 2024 at 3:30=E2=80=AFAM Christian Brauner <brauner@kerne=
+l.org> wrote:
+> > >
+> > > On Tue, Aug 06, 2024 at 03:32:20PM GMT, Andrii Nakryiko wrote:
+> > > > On Mon, Jul 29, 2024 at 10:20=E2=80=AFPM <viro@kernel.org> wrote:
+> > > > >
+> > > > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > > >
+> > > > > Equivalent transformation.  For one thing, it's easier to follow =
+that way.
+> > > > > For another, that simplifies the control flow in the vicinity of =
+struct fd
+> > > > > handling in there, which will allow a switch to CLASS(fd) and mak=
+e the
+> > > > > thing much easier to verify wrt leaks.
+> > > > >
+> > > > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > > > > ---
+> > > > >  kernel/bpf/verifier.c | 342 +++++++++++++++++++++---------------=
+------
+> > > > >  1 file changed, 172 insertions(+), 170 deletions(-)
+> > > > >
+> > > >
+> > > > This looks unnecessarily intrusive. I think it's best to extract th=
+e
+> > > > logic of fetching and adding bpf_map by fd into a helper and that w=
+ay
+> > > > contain fdget + fdput logic nicely. Something like below, which I c=
+an
+> > > > send to bpf-next.
+> > > >
+> > > > commit b5eec08241cc0263e560551de91eda73ccc5987d
+> > > > Author: Andrii Nakryiko <andrii@kernel.org>
+> > > > Date:   Tue Aug 6 14:31:34 2024 -0700
+> > > >
+> > > >     bpf: factor out fetching bpf_map from FD and adding it to used_=
+maps list
+> > > >
+> > > >     Factor out the logic to extract bpf_map instances from FD embed=
+ded in
+> > > >     bpf_insns, adding it to the list of used_maps (unless it's alre=
+ady
+> > > >     there, in which case we just reuse map's index). This simplifie=
+s the
+> > > >     logic in resolve_pseudo_ldimm64(), especially around `struct fd=
+`
+> > > >     handling, as all that is now neatly contained in the helper and=
+ doesn't
+> > > >     leak into a dozen error handling paths.
+> > > >
+> > > >     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > >
+> > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > > > index df3be12096cf..14e4ef687a59 100644
+> > > > --- a/kernel/bpf/verifier.c
+> > > > +++ b/kernel/bpf/verifier.c
+> > > > @@ -18865,6 +18865,58 @@ static bool bpf_map_is_cgroup_storage(stru=
+ct
+> > > > bpf_map *map)
+> > > >          map->map_type =3D=3D BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE);
+> > > >  }
+> > > >
+> > > > +/* Add map behind fd to used maps list, if it's not already there,=
+ and return
+> > > > + * its index. Also set *reused to true if this map was already in =
+the list of
+> > > > + * used maps.
+> > > > + * Returns <0 on error, or >=3D 0 index, on success.
+> > > > + */
+> > > > +static int add_used_map_from_fd(struct bpf_verifier_env *env, int =
+fd,
+> > > > bool *reused)
+> > > > +{
+> > > > +    struct fd f =3D fdget(fd);
+> > >
+> > > Use CLASS(fd, f)(fd) and you can avoid all that fdput() stuff.
+> >
+> > That was the point of Al's next patch in the series, so I didn't want
+> > to do it in this one that just refactored the logic of adding maps.
+> > But I can fold that in and send it to bpf-next.
+>
+> +1.
+>
+> The bpf changes look ok and Andrii's approach is easier to grasp.
+> It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
+> so it goes through bpf CI and our other testing.
+>
+> bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
+> and fderr, so pretty much independent from other patches.
 
-remove_proc_entry: removing non-empty directory 'net/can-bcm'...
-WARNING: CPU: 1 PID: 71 at fs/proc/generic.c:717 remove_proc_entry
-Call Trace:
-remove_proc_entry
-canbcm_pernet_exit
-ops_exit_list
+Ok, so CLASS(fd, f) won't work just yet because of peculiar
+__bpf_map_get() contract: if it gets valid struct fd but it doesn't
+contain a valid struct bpf_map, then __bpf_map_get() does fdput()
+internally. In all other cases the caller has to do fdput() and
+returned struct bpf_map's refcount has to be bumped by the caller
+(__bpf_map_get() doesn't do that, I guess that's why it's
+double-underscored).
 
-Instead of simply removing the entry, remove the entire subdirectory.
-The child process will still be removed, but without a warning occurring.
+I think the reason it was done was just a convenience to not have to
+get/put bpf_map for temporary uses (and instead rely on file's
+reference keeping bpf_map alive), plus we have bpf_map_inc() and
+bpf_map_inc_uref() variants, so in some cases we need to bump just
+refcount, and in some both user and normal refcounts.
 
-This patch was compiled and the code traced with gdb to see that the
-tree  was removed. The code was run to see that the warning was removed. 
-In addition, the code was tested with the kselftest
-net subsystem. No regressions were detected.
+So can't use CLASS(fd, ...) without some more clean up.
 
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
- net/can/bcm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Alexei, how about changing __bpf_map_get(struct fd f) to
+__bpf_map_get_from_fd(int ufd), doing fdget/fdput internally, and
+always returning bpf_map with (normal) refcount bumped (if successful,
+of course). We can then split bpf_map_inc_with_uref() into just
+bpf_map_inc() and bpf_map_inc_uref(), and callers will be able to do
+extra uref-only increment, if necessary.
 
-diff --git a/net/can/bcm.c b/net/can/bcm.c
-index 27d5fcf0eac9..fea48fd793e5 100644
---- a/net/can/bcm.c
-+++ b/net/can/bcm.c
-@@ -1779,7 +1779,7 @@ static void canbcm_pernet_exit(struct net *net)
- #if IS_ENABLED(CONFIG_PROC_FS)
- 	/* remove /proc/net/can-bcm directory */
- 	if (net->can.bcmproc_dir)
--		remove_proc_entry("can-bcm", net->proc_net);
-+		remove_proc_subtree("can-bcm", net->proc_net);
- #endif /* CONFIG_PROC_FS */
- }
- 
--- 
-2.34.1
-
+I can do that as a pre-patch, there are about 15 callers, so not too
+much work to clean this up. Let me know.
 
