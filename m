@@ -1,121 +1,157 @@
-Return-Path: <netdev+bounces-117037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDAA94C73E
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:14:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A85594C743
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:15:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E10A81F22810
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:14:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A59FA2883B8
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7348015F3EF;
-	Thu,  8 Aug 2024 23:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110FE15ECC3;
+	Thu,  8 Aug 2024 23:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTcS92UO"
+	dkim=pass (2048-bit key) header.d=pappasbrent.com header.i=@pappasbrent.com header.b="SLWAQcFw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from h7.fbrelay.privateemail.com (h7.fbrelay.privateemail.com [162.0.218.230])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0555E15F316;
-	Thu,  8 Aug 2024 23:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B3B15CD42;
+	Thu,  8 Aug 2024 23:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.0.218.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723158846; cv=none; b=QjVMI2FlKO+dCxjtSLeYOFQWJzo7bRDVMAWzHx2k8fTN1WTCFCZbu17wKXYUin/QGfaWzzCyBkRG4iXHqlxCWNrCDMrDJed/Fm475VTYo+T1ecQjlOc7jxJyBMgMbx3KYF363ab1zwGGw7rZALqmM8koPan9aTQ2GXlmd1W1ydA=
+	t=1723158908; cv=none; b=dcNpr1RdA04k8NJXiE9+/URNKQ7HH5nvo1qh7cZ22FXRQAdzPv0hM9yPU97lC/84Z8zk9MNM+xyGfMpzVwD+lYoKEJ34ppMVGdbbDiuA4nkMr4xc4C4UyZUAHhCFVQKLeF8+wm+CNLqF6GTcxPV9VJJFmDCsox6YkB8f3ID1JUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723158846; c=relaxed/simple;
-	bh=SzxAnNd+2P5RagrV70uSTDmukSTtgzZlqgxHDGW9DCk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=STjUEbfLZgf22jP5Muc69a23hn6FEK6KPfYa0tcgm4wEGsV6bhBaZfbDFvxg7huUt6ouqO8LEJAQjIAGrG4c2YOG6JplaG11k5OL3ioLKoPgUn498Gd3qV4CvT5dW/s4fi8n1H94bu9BRDt0vqY7fXLrZiqIc0AFSSQeM7NW7lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GTcS92UO; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fc569440e1so14119665ad.3;
-        Thu, 08 Aug 2024 16:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723158844; x=1723763644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SzxAnNd+2P5RagrV70uSTDmukSTtgzZlqgxHDGW9DCk=;
-        b=GTcS92UOxM5r+IY+f18shqYQaqilorIAtPshUcgksZ+ieXQIUwvvsYiD+62NgCubm6
-         fPsy27sg8sF/hWI+bw+/ViJbV8Y+Ww8yl4IDRy1jemSUixARqVyHln8okBzdsS2HfVlj
-         4u5InMpneuRPfMDKLadGVBEyACWyMlhpzK5vbfHuwqIeWSLjsClX3eBcfy4Dc/RUJQJX
-         TQl3sk6ChjSk5wEdlyRiyHV22TZc8YIvTtG5dJXcLj/URy4gk6Mg/lOU3lqKVKOrFjIO
-         I2SNMBNKOte5gGJw+JALZciRaSeeD6/ZqOG37BUAGJzKeJifrpzVIxg4xlxFRqKKY9sJ
-         wxMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723158844; x=1723763644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SzxAnNd+2P5RagrV70uSTDmukSTtgzZlqgxHDGW9DCk=;
-        b=eAx+jOJ3MuMCcYuTcz9TV0ZdoBx/0IHc5rRMoK+jVChaVyhljbbLQlRONy+9Wcs3OI
-         ZXWDwfHhYAw1JwE2sj/p8FV5GthsmCiPeLFCOYrj/+6xmoJOs9WP4zEwA2YnKN39jMpm
-         REt4/OL1kOKpIsHDznWHO/qfx813lRCgputLK+o1XHPvmVVWpCXT+Q+vJnMcCD/CdbCb
-         KG/DgTJp8fdU4XeV2retNgJwgJVU+2Lh+vGmZEbCFl1katfm3zmV3EdJtvr5B9DR8ZyI
-         fCWAa9xiUqVdZSAB6WXjlnrLgKaulzDFUafpIX2hJbRh005AbOxJ3sAJOe4O1ahsewQ3
-         JdZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIRIkjney0s2GoCvQsJK0YwZGG+tEMMgJNqorJMyzmNA+iTpjuUjx5yxSdAAzpfdKLrMNW4DxCms6RJHeBq/aIu5SDY+cCV4sw2q5dYFqW32d9uoQVV+BZPcKY66RUoAADP3gQoxOnB1xxQ2GXXbnQs4BY8oyfyB+9MFVK6/zKPivOR+AjHNRftV0tiXFY4t3XUwKTtup/JD8ViA==
-X-Gm-Message-State: AOJu0YwUhJBKtZRx5ZcfNjizIQa+sAuwfeabptjSXN9FbcmO0Mqrak3c
-	tirdNI0bDUYJ8vvXzyHrtS7J5q3Ez8XbrXuCLuVXq9SN64z6uKsjjlCunPxjSTDk6Qn0/xHUkIk
-	DyeDUt3ef5s3dSFv3ZuCw6vC3mWA=
-X-Google-Smtp-Source: AGHT+IG1/DdoAKFjvHg9EVP5I2kaAQyATplTDXAqOEcpfBC4JM11ab36k7mIWy41WyBWVbFkeNIGORA/STIiVejkIG8=
-X-Received: by 2002:a17:902:d503:b0:1fb:5b83:48d9 with SMTP id
- d9443c01a7336-200952a285cmr45534635ad.37.1723158844196; Thu, 08 Aug 2024
- 16:14:04 -0700 (PDT)
+	s=arc-20240116; t=1723158908; c=relaxed/simple;
+	bh=Rxcemb5AM9icEFOPV8G026DZTivKZkLwihXXrq2Vv0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GOl9shFcBNIUk8CGKpNtSMElnhIz8+/VBn/ig8eWlRq4QQQLQDnCztPwSRLkbsS/cuZ8CIyvYs2Ce3/MmHWc9V5nflqJar/vdPpKoe1Pjif2SIEszjkwqQ5h4hyeoDNJLKdf+yAvWJsRWq05bOrceSz497xQJ0EI81gDQ4fEQ6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pappasbrent.com; spf=pass smtp.mailfrom=pappasbrent.com; dkim=pass (2048-bit key) header.d=pappasbrent.com header.i=@pappasbrent.com header.b=SLWAQcFw; arc=none smtp.client-ip=162.0.218.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pappasbrent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pappasbrent.com
+Received: from MTA-09-4.privateemail.com (mta-09.privateemail.com [198.54.127.58])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by h7.fbrelay.privateemail.com (Postfix) with ESMTPSA id F2692604EB;
+	Thu,  8 Aug 2024 19:15:02 -0400 (EDT)
+Received: from mta-09.privateemail.com (localhost [127.0.0.1])
+	by mta-09.privateemail.com (Postfix) with ESMTP id 9102A18000BB;
+	Thu,  8 Aug 2024 19:14:54 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pappasbrent.com;
+	s=default; t=1723158894;
+	bh=Rxcemb5AM9icEFOPV8G026DZTivKZkLwihXXrq2Vv0o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SLWAQcFwgBg/JAuWcCYZSK1/SY7USZP4B6xU60BzkzYLVxqplXrzyRnfVltiGJZiQ
+	 CBd5ZNy+f12BQMnO6UdnkhdO6oInNyxoXiitwJ1+CsPW79/qhoVz3FsaJ6J/mieGft
+	 VblyurbOjDmVCO2RLjcOAmJOT0n+NmKZDMjH4uYFnOC5DPZUA7uIIDWdIRMy2ofOvN
+	 YsjnqbVQgP5bVKBg7rz73CaHvRyLzqkILhY8PkzA3b8nGgomf+4sGUQ8l9NIvc/ABo
+	 nPiYE+cu2H9lfatb82uqEf1CeQ+JojeToK9IkA/kUevFj9ukVyPHwRDw9nDeixcd8X
+	 HsO9zy+lUB3nQ==
+Received: from pappasbrent.com (syn-050-088-208-203.res.spectrum.com [50.88.208.203])
+	by mta-09.privateemail.com (Postfix) with ESMTPA;
+	Thu,  8 Aug 2024 19:14:45 -0400 (EDT)
+Date: Thu, 8 Aug 2024 19:14:42 -0400
+From: Brent Pappas <bpappas@pappasbrent.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH] ipv6: mcast: Add __must_hold() annotations.
+Message-ID: <ZrVRYiA8Nk3c/7lp@pappasbrent.com>
+References: <20240808190256.149602-1-bpappas@pappasbrent.com>
+ <20240808202347.32112-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <alpine.DEB.2.21.2408071241160.61955@angie.orcam.me.uk> <20240808020753.16282-1-mattc@purestorage.com>
-In-Reply-To: <20240808020753.16282-1-mattc@purestorage.com>
-From: "Oliver O'Halloran" <oohall@gmail.com>
-Date: Fri, 9 Aug 2024 09:13:52 +1000
-Message-ID: <CAOSf1CEcUgVg3bj4s-zRM0RUCkLq-udiyA7QGOy66=Bam8PDFw@mail.gmail.com>
-Subject: Re: PCI: Work around PCIe link training failures
-To: Matthew W Carlis <mattc@purestorage.com>
-Cc: macro@orcam.me.uk, alex.williamson@redhat.com, bhelgaas@google.com, 
-	davem@davemloft.net, david.abdurachmanov@gmail.com, edumazet@google.com, 
-	helgaas@kernel.org, kuba@kernel.org, leon@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, lukas@wunner.de, 
-	mahesh@linux.ibm.com, mika.westerberg@linux.intel.com, netdev@vger.kernel.org, 
-	npiggin@gmail.com, pabeni@redhat.com, pali@kernel.org, saeedm@nvidia.com, 
-	sr@denx.de, wilson@tuliptree.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240808202347.32112-1-kuniyu@amazon.com>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Thu, Aug 8, 2024 at 12:08=E2=80=AFPM Matthew W Carlis <mattc@purestorage=
-.com> wrote:
->
-> On Wed, 7 Aug 2024 22:29:35 +1000 Oliver O'Halloran Wrote
-> > My read was that Matt is essentially doing a surprise hot-unplug by
-> > removing power to the card without notifying the OS. I thought the
-> > LBMS bit wouldn't be set in that case since the link goes down rather
-> > than changes speed, but the spec is a little vague and that appears to
-> > be happening in Matt's testing. It might be worth disabling the
-> > workaround if the port has the surprise hotplug capability bit set.
->
-> Most of the systems I have are using downstream port containment which do=
-es
-> not recommend setting the Hot-Plug Surprise in Slot Capabilities & theref=
-ore
-> we do not. The first time we noticed an issue with this patch was in test
-> automation which was power cycling the endpoints & injecting uncorrectabl=
-e
-> errors to ensure our hosts are robust in the face of PCIe chaos & that th=
-ey
-> will recover. Later we started to see other teams on other products
-> encountering the same bug in simpler cases where humans turn on and off
-> EP power for development purposes.
+The 08/08/2024 13:23, Kuniyuki Iwashima wrote:
+> From: Brent Pappas <bpappas@pappasbrent.com>
+> Date: Thu,  8 Aug 2024 15:02:55 -0400
+> > Add __must_hold(RCU) annotations to igmp6_mc_get_first(),
+> > igmp6_mc_get_next(), and igmp6_mc_get_idx() to signify that they are
+> > meant to be called in RCU critical sections.
+> > 
+> > Signed-off-by: Brent Pappas <bpappas@pappasbrent.com>
+> > ---
+> >  net/ipv6/mcast.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> > index 7ba01d8cfbae..843d0d065242 100644
+> > --- a/net/ipv6/mcast.c
+> > +++ b/net/ipv6/mcast.c
+> > @@ -22,6 +22,7 @@
+> >   *		- MLDv2 support
+> >   */
+> >  
+> > +#include "linux/compiler_types.h"
+> Why "" ?
 
-Ok? If we have to check for DPC being enabled in addition to checking
-the surprise bit in the slot capabilities then that's fine, we can do
-that. The question to be answered here is: how should this feature
-work on ports where it's normal for a device to be removed without any
-notice?
+That was an accident; my language server (clangd) inserted the include
+for me while I was typing and included the header with quotes instead of
+angle brackets. I will submit a corrected patch if that will make this
+change acceptable.
+
+> Btw, I think for_each_netdev_rcu() / rcu_dereference() in touched
+> functions are enough to cleary annotate RCU is needed there.
+
+I see your point. I noticed that igmp6_mc_seq_start() calls
+rcu_read_lock() and is annotated with __acquires(), and
+igmp6_mc_seq_stop() calls rcu_read_unlock() and is annotated with
+__releases(), so it seemed to me that the extra __must_hold()
+annotations would be preferable. Unless there's a reason to prefer
+__acquires() and __releases() over __must_hold()?
+
+> Even without it, I prefer rcu_read_lock_held(), I'm not sure to
+> what extent sparse can analyse functions statically though.
+
+AFAIK, Sparse only uses these annotations to check for context
+imbalances, and does not check, e.g., whether macros that access shared
+values such as rcu_dereference() are only invoked in critical sections.
+Full disclosure, I am working on a static analysis tool called Macroni
+to provide more static checks for RCU (this is how I found these
+unannotated functions).
+
+> >  #include <linux/module.h>
+> >  #include <linux/errno.h>
+> >  #include <linux/types.h>
+> > @@ -2861,6 +2862,7 @@ struct igmp6_mc_iter_state {
+> >  #define igmp6_mc_seq_private(seq)	((struct igmp6_mc_iter_state *)(seq)->private)
+> >  
+> >  static inline struct ifmcaddr6 *igmp6_mc_get_first(struct seq_file *seq)
+> > +	__must_hold(RCU)
+> >  {
+> >  	struct ifmcaddr6 *im = NULL;
+> >  	struct igmp6_mc_iter_state *state = igmp6_mc_seq_private(seq);
+> > @@ -2882,7 +2884,9 @@ static inline struct ifmcaddr6 *igmp6_mc_get_first(struct seq_file *seq)
+> >  	return im;
+> >  }
+> >  
+> > -static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq, struct ifmcaddr6 *im)
+> > +static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq,
+> > +					   struct ifmcaddr6 *im)
+> > +	__must_hold(RCU)
+> >  {
+> >  	struct igmp6_mc_iter_state *state = igmp6_mc_seq_private(seq);
+> >  
+> > @@ -2902,6 +2906,7 @@ static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq, struct ifmcaddr
+> >  }
+> >  
+> >  static struct ifmcaddr6 *igmp6_mc_get_idx(struct seq_file *seq, loff_t pos)
+> > +	__must_hold(RCU)
+> >  {
+> >  	struct ifmcaddr6 *im = igmp6_mc_get_first(seq);
+> >  	if (im)
+> > -- 
+> > 2.46.0
 
