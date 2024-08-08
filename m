@@ -1,351 +1,218 @@
-Return-Path: <netdev+bounces-116812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C220794BC70
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:41:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A77F94BC49
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A766B22531
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:41:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACF261C20B29
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A957C18B475;
-	Thu,  8 Aug 2024 11:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9AA15534B;
+	Thu,  8 Aug 2024 11:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="LSM1/aCO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C92189F52
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 11:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723117307; cv=none; b=G64M3Hf0Cz/+5qqutCQW1ltpunU7h6LwUa68ZwX/E736v6SRShE/wb8GjccVic1A03AQHU5WtwwS3TGJfhuA9FXQYmn4lMLNgM1lcDH4jt/yRtmS6kPvK9TQcsC/hmUnLCl3cDcLGmLH9ToyvCVRFV6x7RKrAK49473hXQnbHKY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723117307; c=relaxed/simple;
-	bh=Bwma7/k6HpJURS7C+x+be1tbZew6HIj1M1fWGGiLXcU=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=ImSgHRUqCtaGUkBnWTZ4yzidE62++j1RIK8T1mONbojKUTIm+018wUxeBHeuau4yxe3rA09H9vz9rN90XsmgoC7T0B8Cp5yk4C4FPdF0YAw+DJKeyoK0KcFpuCsx8qNmRP9qh+qbLH3fEaHoP0TAup+AFeJcqb5XSsInWupPzBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 8F7DE7D064;
-	Thu,  8 Aug 2024 11:41:44 +0000 (UTC)
-References: <20240804203346.3654426-1-chopps@chopps.org>
- <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
- <m2a5hr7iek.fsf@ja-home.int.chopps.org> <ZrHjByjZnnDgjvfo@hog>
- <m2le1aouzf.fsf@ja-home.int.chopps.org> <ZrIDfN2uFpktGJYD@hog>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
- Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Date: Thu, 08 Aug 2024 07:30:13 -0400
-In-reply-to: <ZrIDfN2uFpktGJYD@hog>
-Message-ID: <m2a5hnnsw8.fsf@ja-home.int.chopps.org>
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EE218D651;
+	Thu,  8 Aug 2024 11:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723116655; cv=fail; b=EcnbyYtv7y7i0wUjEp3yEUfodIPYInadVBhBKD6vJy1S3T2ckqyflwgVKpULwRZozSD+C3fGzdH0bIsmx+jtrD0gO0H6sgIhus8Qicr1UnlqjZFyzDtBKU6cejPtOt+8whcjPoFUNLsV3lsmjqpnaz4+6ESZCniCZvKhqfF7U8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723116655; c=relaxed/simple;
+	bh=NecCh77U3jFSiWUDikw51Gpoi7aET9CYVDgcelecvqA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DK/H9RBpcLYkFCJlxSlnyZtKyW8U/8JBkQ9S1T5cxigLEs2droVsAK8J9Qja8fDqfM2gGXeKpAfsQ9f/zrhSj7Ak+xdCkvcwzAmZrTYnFVbVlXYqVBPSiZYe+l3+JGbap8MDSfDDzTU2yNphjuMTscdv6mN4W541cGu1iE6PysU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=LSM1/aCO; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4788jv9N003125;
+	Thu, 8 Aug 2024 04:30:34 -0700
+Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2173.outbound.protection.outlook.com [104.47.73.173])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40vtssgfwh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 04:30:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qkZWBYA0akJvtjAubwvb8a4vN43bsEbp4TrEyqseamounIozmEb7sQGB02TS4mhMBq6+pHv/vUm3D0jTy409caB22wNxdxY64qZufK7RmSPUppaaJx6b3vy53tAn90qk94UNXF8uhfZMUOXJjd7mj4mE33dmTqe/3ex1U7LMhno8pHz3lz/mmzzTclcyltbpXY8pT3ytJYZQW2rUCLMmtcsO+oIiyqv3P4sg134mxsiTX77ZwB0pcfa0eGT45Ez/5EriqLnb2GwCbuQK3cPDhDWi+Anu4oabz7EgCcf/9DwAuN0auOKQ2AXKIMIgsuab+pF0sWw6IP3pcGQ+9zdChg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NecCh77U3jFSiWUDikw51Gpoi7aET9CYVDgcelecvqA=;
+ b=oPf0r0y0t91ftfaMq3X/tAswpY+HTCEsp3Yetnue6MDTLFMoVPT018wNwMGJsA1nzfNeFmYhzODlQdShOckqc1gY5zMZAOo8gYd+6+PygBVFTlKohrcB66ibbkS70gTZYtXw/ADFAmMnbgrgf1rDiUzH8ukQLQdcLvYe0+48KZVyFKCyzBN5duZB6t4vZcsdrlz0+z3GyvpcdUkdYjWOcHVPctYGXkuGkQMWFGx7khR42b6ba5/m/oVSEkadEC/79tIFHfOX3gIblN8MMcLQd1kAchhbxcMD9h6c1UW2WPbhJru9lOB2bTQ30tedScArp+D838v8Snt4SVUZjcFxnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NecCh77U3jFSiWUDikw51Gpoi7aET9CYVDgcelecvqA=;
+ b=LSM1/aCOhHhI5M7Ij9zageNunXSS7FUtHIpEkLEpS2S6+WIe7Jj8+8xa+OXyHhXrygnK80EeEJhs7RX8rI5sOYYVqbeLlx17unfHv5hhdQABLaQSVgQLajyFyjlvaF70B+Mv1kqvP7uARZsBTW7YW2lADUqRyrht1VlBVVnXimw=
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com (2603:10b6:a03:3c8::7)
+ by PH0PR18MB4427.namprd18.prod.outlook.com (2603:10b6:510:d5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13; Thu, 8 Aug
+ 2024 11:30:29 +0000
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::1598:abb8:3973:da4e]) by BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::1598:abb8:3973:da4e%5]) with mapi id 15.20.7828.023; Thu, 8 Aug 2024
+ 11:30:29 +0000
+From: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+        Geethasowjanya Akula
+	<gakula@marvell.com>,
+        Jiri Pirko <jiri@resnulli.us>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "pabeni@redhat.com"
+	<pabeni@redhat.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Subbaraya
+ Sundeep Bhatta <sbhatta@marvell.com>,
+        Hariprasad Kelam <hkelam@marvell.com>
+Subject: RE: [EXTERNAL] Re: [net-next PATCH v10 00/11] Introduce RVU
+ representors
+Thread-Topic: [EXTERNAL] Re: [net-next PATCH v10 00/11] Introduce RVU
+ representors
+Thread-Index: AQHa6T08IPC5BXJp7020zkbaPAtMLbIdJnKQ
+Date: Thu, 8 Aug 2024 11:30:29 +0000
+Message-ID:
+ <BY3PR18MB473740348BD4FF7241E79C27C6B92@BY3PR18MB4737.namprd18.prod.outlook.com>
+References: <20240805131815.7588-1-gakula@marvell.com>
+ <20240807194647.1dc92a9e@kernel.org>
+In-Reply-To: <20240807194647.1dc92a9e@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR18MB4737:EE_|PH0PR18MB4427:EE_
+x-ms-office365-filtering-correlation-id: 358a2872-3f5a-45d9-defa-08dcb79d819a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?SThqMVhxRDFTVHFGcnYxdm80aHZTZDVkYVB6THZUaXBCTmJoQ1ZpbWxZRWFp?=
+ =?utf-8?B?WDdFaEZDbnMxNmY0VzhOOXV5WFF6a2FxeUtNaUQ3VWt1RWpNU1FadlF2TjJL?=
+ =?utf-8?B?RXc4ZHd1ZGRMQVlJRFhJTFM1RzF3cDBXTTdJc0lnRFIzYmxwMU5INThnM2pF?=
+ =?utf-8?B?MUhZYVd2Uno5Vnpqa09Jb3RjL3h3SDlkSlhyaXVteTd6U1NSMEhwTGJYbVJS?=
+ =?utf-8?B?SUE4NU9VSFJqSU80Tk5QQ2wyOWdDUkx3TkhMTWIrMklLUXpEdXkwVUdRc20y?=
+ =?utf-8?B?WUYya1BOSyt0Y1IvNFZQbTVLUCtKSG1aemU1Qm1zWnRveDZQWDFBcFMxaGlW?=
+ =?utf-8?B?d3c4TjFMNWxtdy9vY2xuTmpsTTloWUNqYjRlT01oMmI5K3pRNGZmenBiWkds?=
+ =?utf-8?B?NW5yR25iM1VBSjR5ck50eW5mZ2FwVmxta21lRjFSbVlidzVrQ2hpUU5pL3ll?=
+ =?utf-8?B?dG8xWVBIU1ozcm9XaStPT2JrRm9UcFdqYlVKQ2I4WGFMOFVTallWZzNsRzVZ?=
+ =?utf-8?B?SEFCVFpnRVRIbzNsNkdncU4xSVluOXRDWmFUMlU0UzNFWnJ3YUVMOVVnWFVX?=
+ =?utf-8?B?aUl2NmN2RlFqa2NOc3dCeWl6NjhnakFFcmRuSXkrdC9mTG1CMTlERHQzTXJ0?=
+ =?utf-8?B?WkhRd2Y5VCtEWFNHTklHRWZvc2VsOHpyaDVkWDFxMUtZMjloV3VrUHNUQklk?=
+ =?utf-8?B?RlZoWE0yakRGVVNxVHdlQlRmUjh6Tk9yc0RJdkFmWWZ1MTlEZktIVnpGKzh6?=
+ =?utf-8?B?SmJLVWhUVnhjOXVyT3dNZ21aVW1lR3NMdUVEd1JiUElyN09QdEQ5d2FSelV3?=
+ =?utf-8?B?RTBnL1FJeWk0S0kxcGlHeUIwRnNKZFcxdmZ2andreERjUGlsZ0JRSGNkQVp1?=
+ =?utf-8?B?MkF2TDZlVzdMcTBGZXd0Zlg3ejN5cWVKWnR2YTVad0hVVWI5MUlyQzA2ckxy?=
+ =?utf-8?B?dHB3V3J5UE1aWWV6QmZMMnNPVjhvWk1WZkFIOCtzNTluRFpGOHpzaUZmaHdh?=
+ =?utf-8?B?VHQ1VlFXOHB1SG02Q2xEMnhPc1ZCdjhvai96ZnExM2grUHJaVWxzRk1haHFa?=
+ =?utf-8?B?dFdTOEJLVW1vSlhVMzhlajM1YWc2OXk4RUxJVnZCR01sRFNBcmhpWDd6MGt6?=
+ =?utf-8?B?eE9BSGxyc3huQzBRV2tLWjdVc2JpeDNVcU81YjRyek5vTGZuZGRWS2hOd1VO?=
+ =?utf-8?B?bmNxL2dJTmdLYVVNanE2dXB1bEpZaHlkREhYQUZ5SUQyek5KbngwSGhmdThk?=
+ =?utf-8?B?VFBVMFpxOWFUSkhaVFRrbHp0eGJDd1M1S1U0cXgzMGhHdm9vWTFrV2lwSlVL?=
+ =?utf-8?B?L2p5K3RMS3BRRDZwQlR4NUYzaUlGMW93VTE3bHBoQWxSTEo2aFpuSkN2NVA4?=
+ =?utf-8?B?VGRoR0ZYN3VNcmZpeUhnaXpmbVpHQUw1K3VUOUxvc01GUmVUZFg1Vmp2UHlR?=
+ =?utf-8?B?ZVgralRKT2lhN3FRUDliU3V0bUtEUnlrOFgzRUljemU4TTVKY2cvRVJETW9F?=
+ =?utf-8?B?aUwyWkV6Y1V1RWZsSHpHRkR6eFJFVWJoeTM3N1Bmd2xIMUlHcmJuMDJhaVh0?=
+ =?utf-8?B?cHlkdlpqNDRUZzV5Q1NVekZzTEw5QkNka2pOVjd0eGFSKy90dDBmOUVPWENp?=
+ =?utf-8?B?ZW5Wc0lRVDZxOFdZMkRQeWd6Nm5oRUl2cERKNGVNMHhQQ203UVhMc29OWWhv?=
+ =?utf-8?B?STA3UmpOcjJ6TGxyQ3Qrenhkb09DdHJEVDNGV2tGSnFpZisxc014dkhMY2Ra?=
+ =?utf-8?B?QkZ3UWwxUExxbGtENTZ4b2UvVERKNGgyYmxqODVaZlRDaDhLR1pGbFpuY0p4?=
+ =?utf-8?B?cEZtNWJ0WnJzcnZOcHBJek5aOE53SzlPK3d1NjE1SGZmUE5ld0hFWXN3NXhk?=
+ =?utf-8?B?aEpxZUJWVG1teXRJbkUzTlVGMjZudUhNNXFNTmFUbjBjK0E9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4737.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WFBIdFNqR0VOVC9IYlNIZ3JiMEZaOUpzQVptOWNJN0lxcWY2RmZKMWpHL1Av?=
+ =?utf-8?B?dHVhTzFsV1oxQitSZUhzOFNld0pXSUppQUx0L0FqTTd3WTZkc3J0K05sRVJ1?=
+ =?utf-8?B?ZmF0b2ZDNytUTjFlWGovUEM2blMyMjkxYWt1M1MyOWllSGdMUk1YaTBzSEVB?=
+ =?utf-8?B?akltSDc4T3E1TnBPUkl2eTBCVmduSnowOGthUkJRYUtWWUVOMWZjYTBSYlUr?=
+ =?utf-8?B?OThrZ0puWW9xRmNQekhxWTZ6T1lhSzJ2TEZzM2tFbnh4TlJpU05SRkNnM0I5?=
+ =?utf-8?B?UTJBaGJteW1BMDZMa3c0bUpiYnFiclpYT2NCS1NOdmpZY3pFTC9NRjNsMkpC?=
+ =?utf-8?B?R2VDaEhjd1ZTblpWNEZpeXI1R3d0NjJxS3FjUDNFT0QyOXNTSFRDNkhFL1la?=
+ =?utf-8?B?VHcyYzR2MjlTOE52Y2xqN3BSTk4yUFdEeGx5bE5vSDlucndSTE5NMTFLdlo5?=
+ =?utf-8?B?bDB3eTc0NFQ1T3AxNWp5MURDRUova21aSFNqWE01ZzZSN3BqWG8wZk1yUlJN?=
+ =?utf-8?B?cEZIbnpjOWRqWHlWVmV3ejk5RW9GL2xYU1hMQjVZK0kzdWppdGY1YXM5K3V4?=
+ =?utf-8?B?d3EwS1Nqc2xsdS9EUTdCVEdBaktiMElxNUxXb3ZnQSt1bklPcklzN2p0V3F6?=
+ =?utf-8?B?T3UyZFFPaHBZVVVuK2QwcmVFbTA3aFEvNnNWVHNiRUE2VGNBa0ZOa3RYV1Bh?=
+ =?utf-8?B?UXoxV2ZSRXlZUy9XMFI1ZXdqeldDZHB0T2pBMHQvS0Y2c2hHaUM5TDJqYVc3?=
+ =?utf-8?B?MncvdEh1bDhQSlhzTW94VW56SElZSkgxZ0pqRTIzcUJ3Ui9vT05JMlZMOXNh?=
+ =?utf-8?B?VVJNVm5tczJtSFZQSHpGKzNqR2FjaHVtdnAzOGlyR0pFR0taY0VsUjBvQmNB?=
+ =?utf-8?B?SnhJbDlRSk1vZSsvTlFoc3JScXpkdVl6eTZZc0xnNVc4cHVtek1SSlRqcytC?=
+ =?utf-8?B?dUVzRlE4S3BxWVc3VGF0dGYydTdHMkxDTzFQTWVOS0hsVG83WnNPbjNZM0s4?=
+ =?utf-8?B?czIzS3hWTDhXZ1hWTmJveWt6dURQVnJKRSs3VHJLcmp3YitRODM0V21oRk5U?=
+ =?utf-8?B?UVpWNjdzbklSaURqa3FsNjlSYU40WjBtU1FYR1V2R2FyNzMyT3AwV3FxVVpI?=
+ =?utf-8?B?WVVHNmJEa1oxT0tLdm92SFpMVnY2NVk2T0duY051NjB6TTROZXpXVWJXMEI0?=
+ =?utf-8?B?R1NyRVJKOHR1SzRBTURiN2R0ZlFWS1dTWlJmZGVmdjkvZVRkSGw4RUF5N0JF?=
+ =?utf-8?B?ZEJ6dktEWlp1M0NoK2hyVkhiUEJ2ampjeHhyWjRNQWNJOFo1dEtEYjdDKzNP?=
+ =?utf-8?B?c2hQY2piaFNwS1RJbTBnM2J4RGdMZ0xtN3ljSm1uTncyVklyK3I1RFE4Vjlv?=
+ =?utf-8?B?RW9IeUJsK1BBamU0NVNsN01DY01iK3hNMnovY2dYN05qaUhZcWVnVFNMenNs?=
+ =?utf-8?B?eDRodXRIZ3VMbk96M09mNVdRS3BBRzg1a3BlT2t3eE9pTlRmK0NrLzNxVzhQ?=
+ =?utf-8?B?M3pFeWFsSnZQbHBweE1HaitOTFBIS2lVY0RiSnRlTVl4WXROdmhnT0ZiNXVw?=
+ =?utf-8?B?V3RITUFHNmE0dkdTYmJ4OHVlV2lSM1RlVDNSd1pCdm53eEkrRXhCUVM0dUQ0?=
+ =?utf-8?B?NDZiaEVKSFo0OE1EYlEvZ2RlamFNaHNabzVOYTVFeVBFYkhTQllQU0t1Nm5L?=
+ =?utf-8?B?aDJnYTFZNXZaQmxzQ1JNWHZ5WlcyUWVVeEF1bmJ2ZWRGWTl3UERVTENYV0xn?=
+ =?utf-8?B?N0NqUkJzUkFQUkQ5VGE2QXBqWjFYV0pRdmQ0SWV3SElyMXc2cCsyRm14ZmJ0?=
+ =?utf-8?B?SFB0SHJnRDI3S0R0cVl6allIbFFJM2FlZW9iME1DRWlvQjFnQVNsRWJtSUFh?=
+ =?utf-8?B?Y0FuTUhNMlR0YjBaRVFVOGtpeVlZRm5rRlE0RGNFdVVrZG51cFgxeVE4OFlp?=
+ =?utf-8?B?ZjJTZHBraDFQMVpqbkdXMGJvelkyaUNuMmg5S2YzWHNOYzI0R0c0ZWZjVVUr?=
+ =?utf-8?B?VDlOcU52N1ZEZW5DdHVrK0FjbmRSVXFhbWhWclJqS3pNN1ZYbnJxVGw5QkY5?=
+ =?utf-8?B?TzJWTGQ4ZlMwSEEyb0RZRExHVUJkZk5kdUdidGpTQmtRZURoeU1QMzNFTnFJ?=
+ =?utf-8?Q?zQd4fHep7Xs/VNg9xraDEKuSL?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4737.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 358a2872-3f5a-45d9-defa-08dcb79d819a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2024 11:30:29.1608
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2oFwQeasFpA1YsFNUMrOVvOsRQXdO/5RvTkcCr6+H/G9vK+vSsyoCMYEVQyhHYWf9JrfklnhW4I23SE1D4LSsg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR18MB4427
+X-Proofpoint-GUID: 4hm9h1BSkMFIUv1pByo1ur3Sk3CXQKqv
+X-Proofpoint-ORIG-GUID: 4hm9h1BSkMFIUv1pByo1ur3Sk3CXQKqv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-08_11,2024-08-07_01,2024-05-17_01
 
---=-=-=
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-
-Sabrina Dubroca <sd@queasysnail.net> writes:
-
-> 2024-08-06, 04:54:53 -0400, Christian Hopps wrote:
->>
->> Sabrina Dubroca <sd@queasysnail.net> writes:
->>
->> > 2024-08-04, 22:33:05 -0400, Christian Hopps wrote:
->> > > > > +/* 1) skb->head should be cache aligned.
->> > > > > + * 2) when resv is for L2 headers (i.e., ethernet) we want the =
-cacheline to
->> > > > > + * start -16 from data.
->> > > > > + * 3) when resv is for L3+L2 headers IOW skb->data points at th=
-e IPTFS payload
->> > > > > + * we want data to be cache line aligned so all the pushed head=
-ers will be in
->> > > > > + * another cacheline.
->> > > > > + */
->> > > > > +#define XFRM_IPTFS_MIN_L3HEADROOM 128
->> > > > > +#define XFRM_IPTFS_MIN_L2HEADROOM (64 + 16)
->> > > >
->> > > > How did you pick those values?
->> > >
->> > > That's what the comment is talking to. When reserving space for L2 h=
-eaders we
->> > > pick 64 + 16 (a 2^(<=3D6) cacheline + 16 bytes so the the cacheline =
-should start
->> > > -16 from where skb->data will point at.
->> >
->> > Hard-coding the x86 cacheline size is not a good idea. And what's the
->> > 16B for? You don't know that it's enough for the actual L2 headers.
->>
->> I am not hard coding the x86 cacheline. I am picking 64 as the largest c=
-acheline that this is optimized for, it also works for smaller cachelines.
->
-> At least use SMP_CACHE_BYTES then?
-
-Right, I have changed this work with L1_CACHE_BYTES value.
-
->> 16B is to allow for the incredibly common 14B L2 header to fit.
->
-> Why not use skb->dev->needed_headroom, like a bunch of tunnels are
-> already doing? No guessing required. ethernet is the most common, but
-> there's no reason to penalize other protocols when the information is
-> available.
-
-We can't use `skb->dev->needed_headroom`, b/c `skb->dev` is not correct for=
- the new packets. `skb->dev` is from the received IPTFS tunnel packet. The =
-skb being created here are the inner user packets leaving the tunnel, so th=
-ey have an L3 header (thus why we are only making room for L2 header). They=
- are being handed to gro receive and still have to be routed to their corre=
-ct destination interface/dev.
-
-16 handles the general common case an ethernet device being the destination=
-, if it's not correct after routing, nothing is broken, it just means that =
-we may or may not achieve this maximal cache locality (but we still might e=
-.g., if its destined to a GRE tunnel then we are looking at a bunch more he=
-aders so they and the existing L3 header will occupy 2 cachelines anyway). =
-Again, this is a best effort thing.
-
-Thanks,
-Chris.
-
-
->
->> > > For L3 we reserve double the power of 2 space we reserved for L2 onl=
-y.
->> >
->> > But that's the core of my question. Why is that correct/enough?
->>
->> I have to pick a value. There is no magically perfect number that I can =
-pick.
->> I've given you technical reasons and justifications for the numbers I ha=
-ve
->> chosen -- not sure what else I can say. Do you have better suggestions f=
-or the
->> sizes which would be more optimal on more architectures? If not then let=
-'s use
->> the numbers that I have given technical reasons for choosing.
->
-> Yes, now you've spelled it out, and we can evaluate your choices.
->
->> Put this another way. I could just pick 128 b/c it's 2 cachelines
->> and fits lots of different headers and would be "good
->> enough". That's plenty justification too. I think you looking for
->> too much here -- this isn't a precision thing, it's a "Good Enough"
->> thing.
->
-> I'm asking questions. That's kind of the reviewer's job, understanding
-> how the thing they're reviewing works. =C2=AF\_(=E3=83=84)_/=C2=AF
->
->> > > We have to reserve some amount of space for pushed headers, so the a=
-bove made sense to me for good performance/cache locality.
->> > >
->> > > > > +static struct sk_buff *iptfs_alloc_skb(struct sk_buff *tpl, u32=
- len,
->> > > > > +				       bool l3resv)
->> > > > > +{
->> > > > > +	struct sk_buff *skb;
->> > > > > +	u32 resv;
->> > > > > +
->> > > > > +	if (!l3resv) {
->> > > > > +		resv =3D XFRM_IPTFS_MIN_L2HEADROOM;
->> > > > > +	} else {
->> > > > > +		resv =3D skb_headroom(tpl);
->> > > > > +		if (resv < XFRM_IPTFS_MIN_L3HEADROOM)
->> > > > > +			resv =3D XFRM_IPTFS_MIN_L3HEADROOM;
->> > > > > +	}
->> > > > > +
->> > > > > +	skb =3D alloc_skb(len + resv, GFP_ATOMIC);
->> > > > > +	if (!skb) {
->> > > > > +		XFRM_INC_STATS(dev_net(tpl->dev), LINUX_MIB_XFRMNOSKBERROR);
->> > > >
->> > > > Hmpf, so we've gone from incrementing the wrong counter to
->> > > > incrementing a new counter that doesn't have a precise meaning.
->> > >
->> > > The new "No SKB" counter is supposed to mean "couldn't get an SKB",
->> > > given plenty of other errors are logged under "OutErr" or "InErr"
->> > > i'm not sure what level of precision you're looking for here. :)
->> >
->> > OutErr and InErr would be better than that new counter IMO.
->>
->> Why?
->>
->> My counter tracks the SKB depletion failure that is actually happening. =
-Would
->> you have me now pass in the direction argument just so I can tick the co=
-rrect
->> overly general MIB counter that provides less value to the user in ident=
-ifying
->> the actual problem? How is that good design?
->>
->> I'm inclined to just delete the thing altogether rather than block on th=
-is thing that will almost never happen.
->
-> Fine.
->
->> > > > > +		return NULL;
->> > > > > +	}
->> > > > > +
->> > > > > +	skb_reserve(skb, resv);
->> > > > > +
->> > > > > +	/* We do not want any of the tpl->headers copied over, so we do
->> > > > > +	 * not use `skb_copy_header()`.
->> > > > > +	 */
->> > > >
->> > > > This is a bit of a bad sign for the implementation. It also worries
->> > > > me, as this may not be updated when changes are made to
->> > > > __copy_skb_header().
->> > > > (c/p'd from v1 review since this was still not answered)
->> > >
->> > > I don't agree that this is a bad design at all, I'm curious what you=
- think a good design to be.
->> >
->> > Strange skb manipulations hiding in a protocol module is not good
->> > design.
->>
->> It's a fragmentation and aggregation protocol, it's needs work with skbs=
- by design. It's literally the function of the protocol to manipulate packe=
-t content.
->
-> packet content !=3D cherry-picked parts of sk_buff
->
->> I would appreciate it if you could provide technical reasons to justify =
-referring to things as "bad" or "strange" -- it's not helpful otherwise.
->
-> I did say it's a bad sign, not a blocking issue on its own. But that
-> bad sign, combined with the unusual use of skb_seq and a lot of
-> copying data around, indicates that this is not the right way to
-> implement this part of the protocol.
->
->> > c/p bits of core code into a module (where they will never get fixed
->> > up when the core code gets updated) is always a bad idea.
->>
->> I need some values from the SKB, so I copy them -- it's that simple.
->>
->> > > I did specifically state why we are not re-using
->> > > skb_copy_header(). The functionality is different. We are not trying
->> > > to make a copy of an skb we are using an skb as a template for new
->> > > skbs.
->> >
->> > I saw that. That doesn't mean it's a good thing to do.
->>
->> Please suggest an alternative.
->
-> A common helper in a location where people are going to know that they
-> need to fix it up when they modify things about sk_buff would be a
-> good start.
->
->> > > > > +/**
->> > > > > + * skb_copy_bits_seq - copy bits from a skb_seq_state to kernel=
- buffer
->> > > > > + * @st: source skb_seq_state
->> > > > > + * @offset: offset in source
->> > > > > + * @to: destination buffer
->> > > > > + * @len: number of bytes to copy
->> > > > > + *
->> > > > > + * Copy @len bytes from @offset bytes into the source @st to th=
-e destination
->> > > > > + * buffer @to. `offset` should increase (or be unchanged) with =
-each subsequent
->> > > > > + * call to this function. If offset needs to decrease from the =
-previous use `st`
->> > > > > + * should be reset first.
->> > > > > + *
->> > > > > + * Return: 0 on success or a negative error code on failure
->> > > > > + */
->> > > > > +static int skb_copy_bits_seq(struct skb_seq_state *st, int offs=
-et, void *to,
->> > > > > +			     int len)
->> > > >
->> > > > Probably belongs in net/core/skbuff.c, although I'm really not
->> > > > convinced copying data around is the right way to implement the ty=
-pe
->> > > > of packet splitting IPTFS does (which sounds a bit like a kind of
->> > > > GSO). And there are helpers in net/core/skbuff.c (such as
->> > > > pskb_carve/pskb_extract) that seem to do similar things to what you
->> > > > need here, without as much data copying.
->> > >
->> > > I don't have an issue with moving more general skb functionality
->> > > into skbuff.c; however, I do not want to gate IP-TFS on this change
->> > > to the general net infra, it is appropriate for a patchset of it's
->> > > own.
->> >
->> > If you need helpers that don't exist, it's part of your job to make
->> > the core changes that are required to implement the functionality.
->>
->> This is part of a new code protocol and feature addition and it's a sing=
-le use.
->
-> Of course the helper would be single use when it's introduced. You
-> don't know if it will remain single use. And pskb_extract is single
-> use, it's fine.
->
->> Another patchset can present this code to the general network
->> community to see if they think it *also* has value outside of
->> IPTFS. There is *no* reason to delay IPTFS on general network
->> infrastructure improvements. Please don't do this.
->
-> Sorry, I don't think that's how it works.
->
->> > > Re copying: Let's be clear here, we are not always copying data,
->> > > there are sharing code paths as well; however, there are times when
->> > > it is the best (and even fastest) way to accomplish things (e.g.,
->> > > b/c the packet is small or the data is arranged in skbs in a way to
->> > > make sharing ridiculously complex and thus slow).
->> >
->> > I'm not finding the sharing code. You mean iptfs_first_should_copy
->> > returning false?
->>
->>
->>        /* Try share then copy. */
->>        if (fragwalk && skb_can_add_frags(newskb, fragwalk, data, copylen=
-)) {
->>        ...
->>                leftover =3D skb_add_frags(newskb, fragwalk, data, copyle=
-n);
->>        } else {
->>                /* copy fragment data into newskb */
->>                if (skb_copy_bits_seq(st, data, skb_put(newskb, copylen),
->>                ...
->>        }
->
-> You're talking about reassembly now. This patch is fragmentation/TX.
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAma0rvcSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAlG3AP/RtOOhmRmgiF/gXDCBcQe7uH92wTMkwY
-+7EdfRWHEqZ0b2D3/EkjQXBp8Lq8Xji0EY1vEFyT7NKWOhYcS+CUv1nE0BHVwOe7
-hFOJuG+mbP1WGzlZvyW45VO3VLlt30xSQyAWz2uPIULfnYOHaTOuNQO+iVoEgTtP
-nw7xqmVYgKqklJyB2K4sn0LcggmsE3FHJ5mnQ2tJcp1pUBdT7TewViF56JuNAK1f
-Vbxqa/h/plYhvLCrgBYTKNfubUbPqZYPDuvjWh9GLEOFsYm7dsXdRZr6VwCoeqTC
-e1biRbbIWKKLuoNlCoxLCrIfHAZ2O0Bg0POszAet/LUKQY/HZHnb9eg4IggxELbe
-RjjMaRTD/g5wJhuRBM8PQP8dyBbJvDikDvmFSbJY9gTAPXkfCOXM7wIwlCEuqhQD
-0CdWYK55AXi59efJF6iUXVa9euVvAcaPcgtwC7EGp3xyE3WgZchBt9GFvuHG/2a/
-I3HmSpiDaWlnNbwcEqd79WvQYEF8+7ie5u4jWrlK0fmXOYoHTisW//t0WuRBIpKA
-KbG6yXEF/nvw7FIjK8oI2Ki29GOt0968yrnCXpf33g7yWlfKUG3BC84zxr9zfsMv
-TL7F1GE6MeIvf2Hx1BSi/+VfxWjujulgt5PiahaHZodocFlNY+TuWxFvzDYQr4vW
-iNerdMHstbAN
-=1Ikb
------END PGP SIGNATURE-----
---=-=-=--
+LSBQYXRjaCAxMDogQWRkIGRldmxpbmsgcG9ydCBzdXBwb3J0Lg0KPg0KPkkgY2FuJ3QgYnJpbmcg
+bXlzZWxmIHRvIGFwcGx5IHRoaXMuDQo+SmlyaSBkbyB5b3UgaGF2ZSBhbiBvcGluaW9uPw0KPlRo
+ZSBkZXZpY2UgaXMgYSBOUFUvU21hcnROSUMvRFBVL0lQVSwgaXQgc2hvdWxkIGJlIHZlcnkgZmxl
+eGlibGUuDQo+WWV0LCBpbnN0ZWFkIG9mIGp1c3QgaW1wbGVtZW50aW5nIHRoZSByZXByZXNlbnRv
+cnMgbGlrZSBldmVyeW9uZSBlbHNlIHlvdSBkbyB5b3VyDQo+b3duIHRoaW5nIGFuZCBjcmVhdGUg
+c2VwYXJhdGUgYnVzIGRldmljZXMuDQoNCkNhbiB5b3UgcGxlYXNlIGVsYWJvcmF0ZSB3aGF0IHlv
+dSBtZWFuIGJ5ICJjcmVhdGUgc2VwYXJhdGUgYnVzIGRldmljZXMiDQoNCkp1c3QgdG8gY2xhcmlm
+eSB3ZSBhcmUgbm90IGNyZWF0aW5nIHNlcGFyYXRlIGJ1cyBkZXZpY2VzIGZvciByZXByZXNlbnRv
+cnMgcGVyc2UuDQpPbiBvdXIgSFcsIHRoZXJlIGFyZSBtdWx0aXBsZSBTUklPViBQQ0kgZGV2aWNl
+cy4NCldlIGFyZSB1c2luZyBvbmUgb2YgdGhvc2UgUENJIGRldmljZXMgKHBjaS8wMDAyOjFjOjAw
+LjApLCB0byBhdHRhY2ggcmVxdWlyZWQgaGFyZHdhcmUgcmVzb3VyY2VzIHRvIGl0LCBmb3IgZG9p
+bmcgcGFja2V0IElPDQpCZXR3ZWVuIHJlcHJlc2VudG9ycyBhbmQgdGhlIHJlcHJlc2VudGVlcy4g
+T25jZSB0aGUgSFcgcmVzb3VyY2VzIChSeCwgVHggcXVldWVzKSBhcmUgYXR0YWNoZWQgdG8gaXQg
+DQp3ZSBhcmUgcmVnaXN0ZXJpbmcgbXVsdGlwbGUgbmV0ZGV2cyBmcm9tIHRoaXMgaWUgb25lIHJ4
+L3R4IHF1ZXVlIGZvciBvbmUgcmVwcmVzZW50b3IuDQpCZXlvbmQgdGhhdCB0aGVyZSBhcmUgbm8g
+b3RoZXIgYnVzIGRldmljZXMgYmVpbmcgY3JlYXRlZC91c2VkLg0KDQo+Tm90IHN1cmUgaWYgdGhp
+cyBicmVha3MgYW55dGhpbmcgdG9kYXksIGJ1dCBpdCBjZXJ0YWlubHkgc3VidmVydHMgdGhlIG1v
+ZGVsIHdoZXJlDQo+cmVwcmVzZW50b3JzIHJlcHJlc2VudCBidXMgZGV2aWNlcy4NCj5Zb3UgY2Fu
+J3QgcmVwcmVzZW50IGFsbCBidXMgZGV2aWNlcywgYmVjYXVzZSBvZiB0aGUgb2J2aW91cyBjeWNs
+ZS4NCj4NCg==
 
