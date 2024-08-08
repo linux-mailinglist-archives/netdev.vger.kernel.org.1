@@ -1,84 +1,78 @@
-Return-Path: <netdev+bounces-116747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EC194B915
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:34:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DB194B94C
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C1441C23D69
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:34:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FF8282874
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989EF14533F;
-	Thu,  8 Aug 2024 08:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54349189914;
+	Thu,  8 Aug 2024 08:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="L33wqI5r"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="r9yfHUnp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27D3146019
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 08:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DC625634
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 08:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723106091; cv=none; b=q4PyU5vLCz1UvSG0hb6SZpI1gWJGDPKRQPxyXKQx1NtkJNyl1Rb4uwaOZMDRzAvYrk+Hk3by22yxozqwOnoz/QhI+9IxFFV1q1ZdUjmlpjnKhZXnCV6Y3iaQI4WTgB88SkkGA6eY2yoGWoD4jlKyPndn5M7gJNNW4WUez5261rs=
+	t=1723107091; cv=none; b=uQ9oYtndAaHoOT0YxXA6jZuRc+qVbQ50rB+mPIc2QHwToCwycregI7IMrrZiQ0PyRcIHESVd8Hxogc/a1RZLX3Wfk8fOsHBBjqiam8/37YZ/L0x0lvZxykkU0bTgDt7qc2B8oPSIKlsA3t1fQdhMMiM9DF8WjwGMOHCIk4yW6u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723106091; c=relaxed/simple;
-	bh=E8ahB7jnkan/YWznrFB7n83kqiQtOdcxqbrJZ6IQ9I8=;
+	s=arc-20240116; t=1723107091; c=relaxed/simple;
+	bh=OylNvV/2Jxg8HgS+79ZrnAuN8bkc8uwnAF60VfIODao=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1wCJFn4n4TWlAvpT5lznsx6iGUOkv0S5w8JXfuXn8om7rCrK6GyKunQV8IJluZDD3SZtsMg+K5KA5oCFIrb/eT3knSVxH0oupdpx/QxZz3SIyvkg2GOBqTgy11gDHBL0MuLSnJGJsQdubWr/XOnsrvxAYkgzQOSUcktw3cJggQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=L33wqI5r; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZwYDFU8affVMU6qIda37/cuqfG2vBUEenSt5+NU1BC/DOUTrYF0JBtMTFH1tROKlBjmeWjfiSx5UDgRgc2TURtTGdFFsFY5qW0skVq0CsNkQBImVDWX/HDCSv8hbT621vHbcPVxZv93NXf6UpL915qhXY8ZQRm/fwELOF1TPXHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=r9yfHUnp; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-428101fa30aso5033015e9.3
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 01:34:49 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2eeb1ba0481so8638121fa.2
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 01:51:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723106088; x=1723710888; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1723107087; x=1723711887; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FMyVywQb8vDAq8yqKAjxDJSLbsTFMH68OzT2M5QEc3c=;
-        b=L33wqI5rpZrbwjx2ontygG1HZsiakRGqxZaqTGDiYNeA19CGhKeRMAch3Xg3yoAQUp
-         iONMAwNoPF9bV1zx/5bbavF6VXxT8uqcF0hNjGpzj+YmdcB68Kkty4NmoAZw+9MkfpTK
-         US2cvb0Zd6rxtih3gRBAG36E8h3SDJo1WDEkY=
+        bh=wDZAVwW6W7U68HIAf2CDuICmRI1k9Gjd2s0qzMn5MdE=;
+        b=r9yfHUnpQ9YOr4fgdev2DvXWHVC4/FeXLrBAY30ZxY4/fi4kek0hdeT+7P9roJ0gZ/
+         hQxcQJ8ojdTPdnN6GUKB+FK43DXQLCZRFE1zxUd+UT46rrw1/oSLaVqsJ2HWYBUbY384
+         Z33umdU/OMWo+vZUYI9dbiJ/jY+T7qidLws9Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723106088; x=1723710888;
+        d=1e100.net; s=20230601; t=1723107087; x=1723711887;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMyVywQb8vDAq8yqKAjxDJSLbsTFMH68OzT2M5QEc3c=;
-        b=tsSXdE5F3N8jVm0rNvy7EZvt2IRT9tMSlv2i1CCpFvoobWBZGtr6DG6YHrKiG9z84N
-         RWbbmVyhAm/OxupAtg14OWpzWRPOYdp8v+sDk4wA4t2taDcVoDqWZwVhVC641l1GiuvK
-         y/O6TsUE9Xh7UTOAzgvB9DJXEs2jSblyXNO/j+demWg/DtJHmExdSQ6J1Gd6fVl1lZeS
-         8fB9IjxG6eE5CSJdLzcIlWzY1o9fidEvpZtuW0FFM5ZlUf3rI8FX8N6pbrPY9+0Kneui
-         ei2y2EG6dQFYBFK5TH6UtaJEvRXFURPhfVXzdw7/RLqC553+L7vSxiOIpQaTNyT0RUn2
-         mfmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaxXh2Qeu0kYTGtJDsR52ExeSVEjLn7jFnpVMiPZ7vlPensWynmbMIATDsSYMT/me3TtsZGvw8XSuua09i3luP2U8Gh893
-X-Gm-Message-State: AOJu0YxQZnqAtFNxW6NP+0FbD9jikbjBV5NVJ7SPTVkyPcUDwobePnga
-	Noh+OmjDBOpM+XszTalgnr1UAPLz08T23Ru4J0Ldj4mZdO9cXlprRbbO8dkKZWY=
-X-Google-Smtp-Source: AGHT+IFT4eAtZy1C2cFR4Q2FDL0LQc67lOoe7uGtjmlAA1RBNAoA9yj/C38JFOVh7omtehQgpbq38A==
-X-Received: by 2002:a5d:5f42:0:b0:368:12ef:92cf with SMTP id ffacd0b85a97d-36d2755f1femr992329f8f.48.1723106087860;
-        Thu, 08 Aug 2024 01:34:47 -0700 (PDT)
+        bh=wDZAVwW6W7U68HIAf2CDuICmRI1k9Gjd2s0qzMn5MdE=;
+        b=Uovc6NAzV4tB7NQzHVEmEV3DBV5VHqaWnMIHiVbrXoiVg4ylKM1BFoPxKiQ6N8fkb1
+         bKmlr52d25ryUR1CWoVAlkZHOdUvtQp/KPokui+/gksbOHNsJCrzndLNteIJ37Zg4AVq
+         MpvB2shrSgDNWUNCVv2JMmueB5TBoPn6n6uo1h/eI6e0OlY1eOUVj7IVx33MjCGiuSJJ
+         /pEaFbO9M7Em7agtF8EbHdEOSTAeMEXFUuOcCf+hFlNmUvKSRoSuIH5KLVCgeQvKappU
+         d4MreznmKRGgG2WntEgTRLTA5v6kGS1E+ZbA9jIbVH4IlFwepLfVs8thqyed1VJ8jOqt
+         jeag==
+X-Gm-Message-State: AOJu0YxtR4iPVHfuNMn/SQHVtHI83ojacADJlR+qpETox+nD0KB2uzKX
+	FTRnpVw3+Tt5wvXBjuZMxrLN2S1SqnH4VadmHZaz75vr6oEOtpTV5ZtMoOvU5OEr5x9MxKH0IUo
+	4MQw=
+X-Google-Smtp-Source: AGHT+IGCRE9WVyR6A4ka6TTrK9acN1AtsnhfdXconCkBPP1mL84gRbnCT+4qQIt419Mh0Pm9d7CIGQ==
+X-Received: by 2002:a2e:a595:0:b0:2ef:2c0f:283e with SMTP id 38308e7fff4ca-2f19de326d0mr8895071fa.12.1723107087353;
+        Thu, 08 Aug 2024 01:51:27 -0700 (PDT)
 Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27208e02sm1119786f8f.67.2024.08.08.01.34.47
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27229757sm1168687f8f.107.2024.08.08.01.51.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 01:34:47 -0700 (PDT)
-Date: Thu, 8 Aug 2024 09:34:46 +0100
+        Thu, 08 Aug 2024 01:51:27 -0700 (PDT)
+Date: Thu, 8 Aug 2024 09:51:25 +0100
 From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, alexanderduyck@fb.com
-Subject: Re: [PATCH net-next 1/2] eth: fbnic: add basic rtnl stats
-Message-ID: <ZrSDJn3QnU8DZZz6@LQ3V64L9R2>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] net: atlantic: use ethtool_sprintf
+Message-ID: <ZrSHDR2hoEGx-kNi@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	alexanderduyck@fb.com
-References: <20240807022631.1664327-1-kuba@kernel.org>
- <20240807022631.1664327-2-kuba@kernel.org>
- <ZrOWM_F-BZRJEAAV@LQ3V64L9R2>
- <20240807093837.6aaa6566@kernel.org>
+	Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+References: <20240807190303.6143-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,38 +81,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240807093837.6aaa6566@kernel.org>
+In-Reply-To: <20240807190303.6143-1-rosenp@gmail.com>
 
-On Wed, Aug 07, 2024 at 09:38:37AM -0700, Jakub Kicinski wrote:
-> On Wed, 7 Aug 2024 16:43:47 +0100 Joe Damato wrote:
-> > > +static void fbnic_aggregate_ring_rx_counters(struct fbnic_net *fbn,
-> > > +					     struct fbnic_ring *rxr)
-> > > +{
-> > > +	struct fbnic_queue_stats *stats = &rxr->stats;
-> > > +
-> > > +	if (!(rxr->flags & FBNIC_RING_F_STATS))
-> > > +		return;
-> > > +  
-> > 
-> > Nit: I noticed this check is in both aggregate functions and just
-> > before where the functions are called below. I'm sure you have
-> > better folks internally to review this than me, but: maybe the extra
-> > flags check isn't necessary?
-> > 
-> > Could be good if you are trying to be defensive, though.
+On Wed, Aug 07, 2024 at 12:02:53PM -0700, Rosen Penev wrote:
+> Allows simplifying get_strings and avoids manual pointer manipulation.
 > 
-> Perils of upstreaming code that live out of tree for too long :(
-> These functions will also be called from the path which does runtime
-> ring changes (prepare/swap) and there the caller has no such check.
-> 
-> I'll drop it, and make a note to bring it back later.
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  .../ethernet/aquantia/atlantic/aq_ethtool.c   | 21 +++++++------------
+>  1 file changed, 7 insertions(+), 14 deletions(-)
+>
 
-I suppose you could drop it from the call sites and leave it in the
-fbnic_aggregate_ring* functions? Sorry, didn't intend to cause you
-to send a v2.
+[...]
 
-I think the extra checks are harmless, so if you want to leave them
-that seems fine to me.
+Patch seems fine overall, but two suggestions:
 
-- Joe
+  - Use the subject line '[PATCH net-next]' so this goes to the
+    right tree.
+
+  - As Andrew mentioned for your other submission: use the
+    get_maintainers script to ensure all the right people are CC'd.
+    For more info check the docs:
+
+        https://www.kernel.org/doc/html/v6.11-rc2/process/submitting-patches.html#select-the-recipients-for-your-patch
+
+I'll admit that it is not clear to me if this should be marked as
+"RESEND" or "v2", but I'd go with v2:
+
+  example:
+  git format-patch HEAD~1 --subject-prefix="PATCH net-next" \
+        -v 2 -o /output/path/
+
+Assuming the code remains the same (and you are just modifying the
+subject line and to/cc list in the v2), you can add my Reviewed-by
+tag to the patch:
+
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
