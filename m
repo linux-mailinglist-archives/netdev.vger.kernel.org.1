@@ -1,247 +1,207 @@
-Return-Path: <netdev+bounces-116636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB3B94B3DE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:47:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 431B894B445
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 02:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30621C20803
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:47:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7005C1C219C0
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 00:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6585315099D;
-	Wed,  7 Aug 2024 23:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9108D4A2D;
+	Thu,  8 Aug 2024 00:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QJ48A+MN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IhodNeVS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1FD84037;
-	Wed,  7 Aug 2024 23:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7BC2C95;
+	Thu,  8 Aug 2024 00:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723074449; cv=none; b=i/5Geac+p/cSqhwRaeXLZyWoHiHmV00J/eDF2qRAxDfHHW+ZMArcsmsfneH/LmNJok89iEPA8KbE2Oy8QClA/f6s3fEwFVQ06ABGZEnTWN1BAz1BbbsqWvK9aPwEcTgb6187NRzpi0yyn01Pq8F9kf6rbUjzMKtzzgpK5XiNkAg=
+	t=1723077808; cv=none; b=o6dHGwLIJ59McX/ousi4PMR18EVBTRhzU1Hd4hZhUr5AzVxu/w5ONm9kQ9JydIu2cIHXGWDiN94Y83Yt1uofSNdfx8faTmVD8XR0yJvKW5GCGiVjL4gWA2TvW4Cpa50pwUqkpk4nGxv9S8Hwl222t5UdNCzk9QPiwX2amiTcVOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723074449; c=relaxed/simple;
-	bh=/qm83qDVxnY3QrhFxh2kmo0YUOGlFKEd9jGuhFx0DZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=snE3qgMZOiVO5yZF1jPMrpo1+XL3ROZEwHg9WF4qDRkKCRxp3aOB84/6cWkoS8vPnrih4Q9KwsJdZo5iXMp3iDOMmaMk+WFHjktnKmKf9OV4Ch8peq/fkh30nIqoRSbrwMnCu7QUy6ZBzemeWcfPanqA7ZKJx+marXSm3WLzd9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QJ48A+MN; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 477Jh3f5000990;
-	Wed, 7 Aug 2024 23:46:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	mgbchAj6xcR2jFXLYmMGd4v6aq2N9KiFTX1IIgdca7w=; b=QJ48A+MNaGvSmfTw
-	YQsIzjqomBiC8XLpiFuqSs3SHBajHCFzPHVyP5kIx2J6TdDZShIXypzTg2Fx7jYJ
-	FonydqI34elfCglK12A2Bxg106DWGqK7EvkFHRYOcwH1KCPetx6jciOA3TVnxGEf
-	yQZUZq+FsAUGRvu8syhd2MEfQz+tFmCXav99tF6CNP52mSyRce1NoC+J7OrgQvpo
-	mVMco+jIbXv9DWyYRMfIfJQTudvENmyBtIaC0Rxkzt3PwdjgFLUXSc2sV6rEKsIt
-	QMTEDUZQKyITDr4zYb67LGLNIfaqmssRnrMZXnT/l6+OzM+s1RUykjl+630qfFSW
-	OkJ9xw==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40vfav0df2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 23:46:55 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 477NksMn011658
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 7 Aug 2024 23:46:54 GMT
-Received: from [10.110.61.128] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 7 Aug 2024
- 16:46:51 -0700
-Message-ID: <eddef7d0-9e3d-4c3f-8457-54b2eb8a3947@quicinc.com>
-Date: Wed, 7 Aug 2024 16:46:46 -0700
+	s=arc-20240116; t=1723077808; c=relaxed/simple;
+	bh=feWacHYaPnIbpAOajEpd3LHUQ+7MZKIahPasyzDrR1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QzoFXw1dIvoBSyqlb5P7q5WCKaVfZAzKG73wPdu28LI10hkelEcMpX+Qm4lZV69Vdxsg7HagJs+cwNmp5IodHaApHGVmRKFHBBs0wWEc6BpL6x1wytQ1gqWI98XgW30rFn4cZR4ObbTV1G9rnKZfPDTQK+l3rMO3PFoaCZ2RfN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IhodNeVS; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723077806; x=1754613806;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=feWacHYaPnIbpAOajEpd3LHUQ+7MZKIahPasyzDrR1o=;
+  b=IhodNeVSfcwSP00eBL6MCvP8TfsZhqeMNv3yjpbvCabLFf3PuOh/xc1w
+   VmlzKO7L0PKjdyDvmRGCOXsvZcAXwgqoVem1CLAf2LsI1MTE+BftXqAVw
+   ZgrqGp/s2LnT6J+eb9Cq0e495/8CUtKkyqXHollMLHOD06Yhs0+mYWsD5
+   UoCX56p5V/N84GW37eNEz9BxEghoa9p8w4gNdGKEjyCIfXgQAYh1jNwVr
+   xgCBBa5qGq1rOXUO7l+km+30KbUJq+LOtOZsnhXtPKrvsFKZeOmlQl4S+
+   nX/uEIPGDS+yiJUAVmSAhj8eJi33k9B61c1D6z2VcGgfVhg7+Gl0s0oeP
+   Q==;
+X-CSE-ConnectionGUID: jesNHD88QTi1Yep/5sEUWw==
+X-CSE-MsgGUID: 42gH53z9SIGT4DS/XBtKEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="20844369"
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="20844369"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 17:43:26 -0700
+X-CSE-ConnectionGUID: YJCq9+jkTTaPj1f0roGVpQ==
+X-CSE-MsgGUID: oWQmbrKORhWLZQIh8ShSbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="57003374"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa009.fm.intel.com with ESMTP; 07 Aug 2024 17:43:23 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sbrFQ-0005p4-2p;
+	Thu, 08 Aug 2024 00:43:20 +0000
+Date: Thu, 8 Aug 2024 08:42:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next] net: ibm/emac: Constify struct mii_phy_def
+Message-ID: <202408080850.QKqTbf5o-lkp@intel.com>
+References: <dfc7876d660d700a840e64c35de0a6519e117539.1723031352.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] net: stmmac: Add interconnect support
-To: Serge Semin <fancer.lancer@gmail.com>
-CC: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
-        Andrew Halaney <ahalaney@redhat.com>, Andrew Lunn
-	<andrew@lunn.ch>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-References: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
- <20240708-icc_bw_voting_from_ethqos-v4-2-c6bc3db86071@quicinc.com>
- <zsdjc53fxh44bpra5cfishtvmyok2rprbtnbthimnu6quxkxyj@kvtijkxylwb3>
-Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <zsdjc53fxh44bpra5cfishtvmyok2rprbtnbthimnu6quxkxyj@kvtijkxylwb3>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 9hjmxXrOpSYZifNt35BEWYmSC-EDuTnJ
-X-Proofpoint-GUID: 9hjmxXrOpSYZifNt35BEWYmSC-EDuTnJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-07_14,2024-08-07_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- lowpriorityscore=0 mlxscore=0 bulkscore=0 phishscore=0 suspectscore=0
- impostorscore=0 clxscore=1011 spamscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408070166
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dfc7876d660d700a840e64c35de0a6519e117539.1723031352.git.christophe.jaillet@wanadoo.fr>
+
+Hi Christophe,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-JAILLET/net-ibm-emac-Constify-struct-mii_phy_def/20240807-195146
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/dfc7876d660d700a840e64c35de0a6519e117539.1723031352.git.christophe.jaillet%40wanadoo.fr
+patch subject: [PATCH net-next] net: ibm/emac: Constify struct mii_phy_def
+config: powerpc-allyesconfig (https://download.01.org/0day-ci/archive/20240808/202408080850.QKqTbf5o-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 423aec6573df4424f90555468128e17073ddc69e)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080850.QKqTbf5o-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408080850.QKqTbf5o-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/ibm/emac/core.c:28:
+   In file included from include/linux/pci.h:38:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/powerpc/include/asm/io.h:24:
+   In file included from include/linux/mm.h:2228:
+   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     501 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     508 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     520 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     529 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/ibm/emac/core.c:2648:23: error: cannot assign to non-static data member 'def' with const-qualified type 'const struct mii_phy_def *'
+    2648 |         dev->phy.def->phy_id = dev->phy_dev->drv->phy_id;
+         |         ~~~~~~~~~~~~~~~~~~~~ ^
+   drivers/net/ethernet/ibm/emac/phy.h:50:28: note: non-static data member 'def' declared const here
+      50 |         const struct mii_phy_def *def;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+   drivers/net/ethernet/ibm/emac/core.c:2649:28: error: cannot assign to non-static data member 'def' with const-qualified type 'const struct mii_phy_def *'
+    2649 |         dev->phy.def->phy_id_mask = dev->phy_dev->drv->phy_id_mask;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+   drivers/net/ethernet/ibm/emac/phy.h:50:28: note: non-static data member 'def' declared const here
+      50 |         const struct mii_phy_def *def;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+   drivers/net/ethernet/ibm/emac/core.c:2650:21: error: cannot assign to non-static data member 'def' with const-qualified type 'const struct mii_phy_def *'
+    2650 |         dev->phy.def->name = dev->phy_dev->drv->name;
+         |         ~~~~~~~~~~~~~~~~~~ ^
+   drivers/net/ethernet/ibm/emac/phy.h:50:28: note: non-static data member 'def' declared const here
+      50 |         const struct mii_phy_def *def;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+   drivers/net/ethernet/ibm/emac/core.c:2651:20: error: cannot assign to non-static data member 'def' with const-qualified type 'const struct mii_phy_def *'
+    2651 |         dev->phy.def->ops = &emac_dt_mdio_phy_ops;
+         |         ~~~~~~~~~~~~~~~~~ ^
+   drivers/net/ethernet/ibm/emac/phy.h:50:28: note: non-static data member 'def' declared const here
+      50 |         const struct mii_phy_def *def;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+   drivers/net/ethernet/ibm/emac/core.c:2818:25: error: cannot assign to non-static data member 'def' with const-qualified type 'const struct mii_phy_def *'
+    2818 |         dev->phy.def->features &= ~dev->phy_feat_exc;
+         |         ~~~~~~~~~~~~~~~~~~~~~~ ^
+   drivers/net/ethernet/ibm/emac/phy.h:50:28: note: non-static data member 'def' declared const here
+      50 |         const struct mii_phy_def *def;
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+   5 warnings and 5 errors generated.
 
 
+vim +2648 drivers/net/ethernet/ibm/emac/core.c
 
-On 8/1/2024 11:32 AM, Serge Semin wrote:
-> Hi Sagar
-> 
-> On Mon, Jul 08, 2024 at 02:30:01PM -0700, Sagar Cheluvegowda wrote:
->> Add interconnect support to vote for bus bandwidth based
->> on the current speed of the driver.
->> Adds support for two different paths - one from ethernet to
->> DDR and the other from CPU to ethernet, Vote from each
->> interconnect client is aggregated and the on-chip interconnect
->> hardware is configured to the most appropriate bandwidth profile.
->>
->> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
->> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
->> ---
->>  drivers/net/ethernet/stmicro/stmmac/stmmac.h          |  1 +
->>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     |  8 ++++++++
->>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 12 ++++++++++++
->>  include/linux/stmmac.h                                |  2 ++
->>  4 files changed, 23 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
->> index b23b920eedb1..56a282d2b8cd 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
->> @@ -21,6 +21,7 @@
->>  #include <linux/ptp_clock_kernel.h>
->>  #include <linux/net_tstamp.h>
->>  #include <linux/reset.h>
->> +#include <linux/interconnect.h>
->>  #include <net/page_pool/types.h>
->>  #include <net/xdp.h>
->>  #include <uapi/linux/bpf.h>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> index b3afc7cb7d72..ec7c61ee44d4 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> @@ -985,6 +985,12 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
->>  	}
->>  }
->>  
->> +static void stmmac_set_icc_bw(struct stmmac_priv *priv, unsigned int speed)
->> +{
-> 
->> +	icc_set_bw(priv->plat->axi_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
->> +	icc_set_bw(priv->plat->ahb_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
-> 
-> I've got two questions in this regard:
-> 
-> 1. Don't we need to call icc_enable()/icc_disable() in someplace in
-> the driver? For instance the CPU-MEM path must be enabled before even
-> the stmmac_dvr_probe() is called, otherwise the CSR won't be
-> accessible. Right? For the same reason the CPU-MEM bandwidth should be
-> set in sync with that.
-> 
-> 2. Why is the CPU-MAC speed is specified to match the Ethernet link
-> speed? It doesn't seem reasonable. It's the CSR's access speed and
-> should be done as fast as possible. Shouldn't it?
-> 
->> +}
+a577ca6badb526 Christian Lamparter 2017-02-20  2632  
+a577ca6badb526 Christian Lamparter 2017-02-20  2633  static int emac_dt_phy_connect(struct emac_instance *dev,
+a577ca6badb526 Christian Lamparter 2017-02-20  2634  			       struct device_node *phy_handle)
+a577ca6badb526 Christian Lamparter 2017-02-20  2635  {
+a577ca6badb526 Christian Lamparter 2017-02-20  2636  	dev->phy.def = devm_kzalloc(&dev->ofdev->dev, sizeof(*dev->phy.def),
+a577ca6badb526 Christian Lamparter 2017-02-20  2637  				    GFP_KERNEL);
+a577ca6badb526 Christian Lamparter 2017-02-20  2638  	if (!dev->phy.def)
+a577ca6badb526 Christian Lamparter 2017-02-20  2639  		return -ENOMEM;
+a577ca6badb526 Christian Lamparter 2017-02-20  2640  
+a577ca6badb526 Christian Lamparter 2017-02-20  2641  	dev->phy_dev = of_phy_connect(dev->ndev, phy_handle, &emac_adjust_link,
+a577ca6badb526 Christian Lamparter 2017-02-20  2642  				      0, dev->phy_mode);
+a577ca6badb526 Christian Lamparter 2017-02-20  2643  	if (!dev->phy_dev) {
+a577ca6badb526 Christian Lamparter 2017-02-20  2644  		dev_err(&dev->ofdev->dev, "failed to connect to PHY.\n");
+a577ca6badb526 Christian Lamparter 2017-02-20  2645  		return -ENODEV;
+a577ca6badb526 Christian Lamparter 2017-02-20  2646  	}
+a577ca6badb526 Christian Lamparter 2017-02-20  2647  
+a577ca6badb526 Christian Lamparter 2017-02-20 @2648  	dev->phy.def->phy_id = dev->phy_dev->drv->phy_id;
+a577ca6badb526 Christian Lamparter 2017-02-20  2649  	dev->phy.def->phy_id_mask = dev->phy_dev->drv->phy_id_mask;
+a577ca6badb526 Christian Lamparter 2017-02-20  2650  	dev->phy.def->name = dev->phy_dev->drv->name;
+a577ca6badb526 Christian Lamparter 2017-02-20  2651  	dev->phy.def->ops = &emac_dt_mdio_phy_ops;
+3c1bcc8614db10 Andrew Lunn         2018-11-10  2652  	ethtool_convert_link_mode_to_legacy_u32(&dev->phy.features,
+3c1bcc8614db10 Andrew Lunn         2018-11-10  2653  						dev->phy_dev->supported);
+a577ca6badb526 Christian Lamparter 2017-02-20  2654  	dev->phy.address = dev->phy_dev->mdio.addr;
+a577ca6badb526 Christian Lamparter 2017-02-20  2655  	dev->phy.mode = dev->phy_dev->interface;
+a577ca6badb526 Christian Lamparter 2017-02-20  2656  	return 0;
+a577ca6badb526 Christian Lamparter 2017-02-20  2657  }
+a577ca6badb526 Christian Lamparter 2017-02-20  2658  
 
-I am having internal discussions with clocks team, I will revert back soon with answers.
->> +
->>  static void stmmac_mac_link_down(struct phylink_config *config,
->>  				 unsigned int mode, phy_interface_t interface)
->>  {
->> @@ -1080,6 +1086,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
->>  	if (priv->plat->fix_mac_speed)
->>  		priv->plat->fix_mac_speed(priv->plat->bsp_priv, speed, mode);
->>  
->> +	stmmac_set_icc_bw(priv, speed);
->> +
->>  	if (!duplex)
->>  		ctrl &= ~priv->hw->link.duplex;
->>  	else
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> index 54797edc9b38..201f9dea6da9 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> @@ -642,6 +642,18 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->>  		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
->>  	}
->>  
->> +	plat->axi_icc_path = devm_of_icc_get(&pdev->dev, "mac-mem");
->> +	if (IS_ERR(plat->axi_icc_path)) {
->> +		ret = ERR_CAST(plat->axi_icc_path);
->> +		goto error_hw_init;
->> +	}
->> +
->> +	plat->ahb_icc_path = devm_of_icc_get(&pdev->dev, "cpu-mac");
->> +	if (IS_ERR(plat->ahb_icc_path)) {
->> +		ret = ERR_CAST(plat->ahb_icc_path);
->> +		goto error_hw_init;
->> +	}
->> +
->>  	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
->>  							   STMMAC_RESOURCE_NAME);
->>  	if (IS_ERR(plat->stmmac_rst)) {
->> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
->> index f92c195c76ed..385f352a0c23 100644
->> --- a/include/linux/stmmac.h
->> +++ b/include/linux/stmmac.h
->> @@ -283,6 +283,8 @@ struct plat_stmmacenet_data {
->>  	struct reset_control *stmmac_rst;
->>  	struct reset_control *stmmac_ahb_rst;
->>  	struct stmmac_axi *axi;
-> 
->> +	struct icc_path *axi_icc_path;
-> 
-> The MAC<->MEM interface isn't always AXI (it can be AHB or custom) and
-> 
->> +	struct icc_path *ahb_icc_path;
-> 
-> the CPU<->MAC isn't always AHB (it can also be APB, AXI, custom). So
-> the more generic naming would be:
-> 
-> axi_icc_path -> dma_icc_path
-> and
-> ahb_icc_path -> csr_icc_path
-> 
-> -Serge(y)
-> 
->>  	int has_gmac4;
->>  	int rss_en;
->>  	int mac_port_sel_speed;
->>
->> -- 
->> 2.34.1
->>
->>
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
