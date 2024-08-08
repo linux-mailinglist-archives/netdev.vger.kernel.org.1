@@ -1,129 +1,159 @@
-Return-Path: <netdev+bounces-116714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2E194B6C7
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:33:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF7894B6CB
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D3B285618
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:33:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C5A1C20C66
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392DD187858;
-	Thu,  8 Aug 2024 06:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="tKFv5GZ9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701BA18784C;
+	Thu,  8 Aug 2024 06:34:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE61D18785B;
-	Thu,  8 Aug 2024 06:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D2B13210D
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 06:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723098758; cv=none; b=W5ANI5oYW4qRX1DCSkOPIKQ6wlau99zhG2YwcwCbr2m2JjnyhOLrkfIpzhVP92qeB0mjHRgDxp/iz3elxwVfnf7Un2TzdFGhBfTG/ilcPDmWS0rCEsjdeqynju56ty53hcvFYXNlyG8FGR8LFlUOyMkUpVgJgszxZQZYmyMTXtQ=
+	t=1723098865; cv=none; b=jl33AjkLf0yonCJRiPXfirfjmlwDsp/ghY44BSI9wndg4PM4w2Qutxla73QaClHRTfmVNlrEbU81I6ASLc6u2kjYGC0dVeuYWJrxWJaKBkJowgnmmTRiQgxCe7hq+PQhlxLxEBSH8dXti2GXva6rnndjHwBpPdXJuTorUbO4aFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723098758; c=relaxed/simple;
-	bh=33jPo4vhPLqsyySaNcevP8gg0qfJrI7Z546GA/oleCw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hivNTXgxC3d/kwaE/jQmoYen18w67SnykTR71YtdQRMv6ZtyCcH6l3JVhP/jcZcGkxBcvtRt5gxZsRJkQoghTzHkXi0BRi3lGq1YFdd5q43+km+WspseUHqRSozM9wGCg2J5ys4vxAC4KHVMqYKNpqZn9zc7PHE7uXoe+BQ3we4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=tKFv5GZ9; arc=none smtp.client-ip=80.12.242.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id bwhJsmEy4IDadbwhJsi83k; Thu, 08 Aug 2024 08:32:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1723098752;
-	bh=9n2P6IRzAGh+cFhbPIBM2pmgk2vAQEV42VzZZngjGKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=tKFv5GZ9se01NVzobXg1CwuAfRk9fH18mUG17VqbjiuKidda2BJLc6Y3ap6VAw4hI
-	 zlltn8hguaRyrMEyThFHbFjqFulRaTXhG1lrEM3+/oimhD2tl24WwZ5rn+dnn0BIkW
-	 yMuXJfsTNQjilOhdVkenTm4PEy77Jt6JCCf0EQYdTYFpGTPpG8uEOcYGdOR8+oT8EK
-	 4apQoVvl3saELTcYAKs+Nl00vgcId9t+xuZ9sQ0OTJtip2AOThmmn4Ets0psM9nS0I
-	 DpiL+9imtzqXyYP30X3AzBW83LByx0D0UnZjWyjOZbpKamCgPX6zoO67CamoIxIMbl
-	 QgWv66utheizg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Thu, 08 Aug 2024 08:32:32 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <733a8111-5e7a-41fe-b01b-75d8190fa752@wanadoo.fr>
-Date: Thu, 8 Aug 2024 08:32:29 +0200
+	s=arc-20240116; t=1723098865; c=relaxed/simple;
+	bh=X0Ywof9eKRr0mCWWZtzPcFfnMDsOZ7Px9FQfHnQkg2w=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=G63nvdd6ov67QGafyWzwzvnyfV63HaW2VmDLxrNbuM0AHdbbrKAb00wmPhbb1MGvvUpk+55f5t2J7YyR7RJ+gmWs5gOvHTfvQjTnEtNQ88lXjo0B2QNBeAeNCitv4Y+bIee6TEqnosRFofoPjQHa6C+FB4wI4cCNTIBQA9PSVjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39b3a9f9f5bso7831745ab.1
+        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 23:34:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723098863; x=1723703663;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cGCP6x6qpwug1AwJ39Kr2WZDwQ9R9XX2ZSoy2u5wdt0=;
+        b=QFhJaRfEmULqvZSM9XuCT0IMXeUWotQNL9u6F8l3xfgZZ03koZTiN+5jxnRuNS3Qyx
+         2J98n913LbugDMGJgI1MMRfMl+ODkX7KVn2kTkXL9rbB1mBeWiJ7gOV444ooLYbZRQrp
+         v9zz3V2RfBYiLH5zkNNA7KF8Ecpo61EXashWyStVE5NuJUq03bRQe92k+Y2eqUGF4Hhh
+         7mWROpo5Er9bNVAPCPx4EOIILs9ckypatcQGJl9f+kPi1eRt+t+I3ZLkm0ftv/tynzHB
+         hwef9UlwFCgl4TQzuL6WphdZwMu+0yy8KXoInF59DmI572y0DbUAiH9eeVCL4WgDPUpg
+         SpAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGPjqaDK5pUfK0ofuWIsQNnU7OgpEmmjH/PkbpWFLGS2ZGL0Q6yNYmOQLM8itDP+y+sjK4dRuaHThBRpiIDLwOFepIxRiw
+X-Gm-Message-State: AOJu0YyB9k3n4BX/qm0krY5WNgN343Ea1F+MmQBT5E3ULyjmRF2XFukC
+	faExS342AJ0q4tRevFSp9+xzfwcjpgdlPlpUK7oOu1PLJGfSeO+l/2dM3xrQ827PfbtixjzO1lj
+	XOfawLH14WVo/aYWw8kIko7v13EuzT1Ygq+F1ql9ZDxksVFcggryv038=
+X-Google-Smtp-Source: AGHT+IEgtnjm28cVKYMmpwei9SVf9ut9VVrgjLyTXr1y/VqKia1zSODc6XrJopZUqNdHSESxjKSw0JYwLOaVgPChSPmMi1/lAw+n
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ibm/emac: Constify struct mii_phy_def
-To: kernel test robot <lkp@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <dfc7876d660d700a840e64c35de0a6519e117539.1723031352.git.christophe.jaillet@wanadoo.fr>
- <202408080631.rKnoa41D-lkp@intel.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <202408080631.rKnoa41D-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1c0d:b0:39a:ea7d:2a9a with SMTP id
+ e9e14a558f8ab-39b5edaacadmr654145ab.6.1723098863086; Wed, 07 Aug 2024
+ 23:34:23 -0700 (PDT)
+Date: Wed, 07 Aug 2024 23:34:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a5c527061f263729@google.com>
+Subject: [syzbot] [ppp?] KMSAN: uninit-value in ppp_sync_receive (2)
+From: syzbot <syzbot+d73ee3b9fbad2067c916@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Le 08/08/2024 à 01:00, kernel test robot a écrit :
-> Hi Christophe,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-JAILLET/net-ibm-emac-Constify-struct-mii_phy_def/20240807-195146
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/dfc7876d660d700a840e64c35de0a6519e117539.1723031352.git.christophe.jaillet%40wanadoo.fr
-> patch subject: [PATCH net-next] net: ibm/emac: Constify struct mii_phy_def
-> config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20240808/202408080631.rKnoa41D-lkp@intel.com/config)
-> compiler: powerpc64-linux-gcc (GCC) 14.1.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080631.rKnoa41D-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202408080631.rKnoa41D-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->     drivers/net/ethernet/ibm/emac/core.c: In function 'emac_dt_phy_connect':
->>> drivers/net/ethernet/ibm/emac/core.c:2648:30: error: assignment of member 'phy_id' in read-only object
->      2648 |         dev->phy.def->phy_id = dev->phy_dev->drv->phy_id;
->           |                              ^
->>> drivers/net/ethernet/ibm/emac/core.c:2649:35: error: assignment of member 'phy_id_mask' in read-only object
->      2649 |         dev->phy.def->phy_id_mask = dev->phy_dev->drv->phy_id_mask;
->           |                                   ^
->>> drivers/net/ethernet/ibm/emac/core.c:2650:28: error: assignment of member 'name' in read-only object
->      2650 |         dev->phy.def->name = dev->phy_dev->drv->name;
->           |                            ^
->>> drivers/net/ethernet/ibm/emac/core.c:2651:27: error: assignment of member 'ops' in read-only object
->      2651 |         dev->phy.def->ops = &emac_dt_mdio_phy_ops;
->           |                           ^
->     drivers/net/ethernet/ibm/emac/core.c: In function 'emac_init_phy':
->>> drivers/net/ethernet/ibm/emac/core.c:2818:32: error: assignment of member 'features' in read-only object
->      2818 |         dev->phy.def->features &= ~dev->phy_feat_exc;
->           |                                ^~
-> 
-> 
+Hello,
 
-Ouch,
+syzbot found the following issue on:
 
-I missed the depends on PPC_DCR.
+HEAD commit:    defaf1a2113a Merge tag 'scsi-fixes' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1034ded9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9d6059ad10dde6fd
+dashboard link: https://syzkaller.appspot.com/bug?extid=d73ee3b9fbad2067c916
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-I did:
-    - make -j8 drivers/net/ethernet/ibm/emac/phy.o
-then
-    - make -j8 drivers/net/ethernet/ibm/emac/
+Unfortunately, I don't have any reproducer for this issue yet.
 
-but the later does not build anything on x86, and I missed that.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d4b583db7f7f/disk-defaf1a2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a61e18e13b2d/vmlinux-defaf1a2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/386b01bc4565/bzImage-defaf1a2.xz
 
-CJ
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d73ee3b9fbad2067c916@syzkaller.appspotmail.com
 
+=====================================================
+BUG: KMSAN: uninit-value in ppp_sync_input drivers/net/ppp/ppp_synctty.c:679 [inline]
+BUG: KMSAN: uninit-value in ppp_sync_receive+0x56a/0xf10 drivers/net/ppp/ppp_synctty.c:334
+ ppp_sync_input drivers/net/ppp/ppp_synctty.c:679 [inline]
+ ppp_sync_receive+0x56a/0xf10 drivers/net/ppp/ppp_synctty.c:334
+ tty_ldisc_receive_buf+0x202/0x290 drivers/tty/tty_buffer.c:391
+ tty_port_default_receive_buf+0xdf/0x190 drivers/tty/tty_port.c:37
+ receive_buf drivers/tty/tty_buffer.c:445 [inline]
+ flush_to_ldisc+0x473/0xdb0 drivers/tty/tty_buffer.c:495
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3312
+ worker_thread+0xea5/0x1520 kernel/workqueue.c:3390
+ kthread+0x3dd/0x540 kernel/kthread.c:389
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3994 [inline]
+ slab_alloc_node mm/slub.c:4037 [inline]
+ __do_kmalloc_node mm/slub.c:4157 [inline]
+ __kmalloc_noprof+0x661/0xf30 mm/slub.c:4170
+ kmalloc_noprof include/linux/slab.h:685 [inline]
+ tty_buffer_alloc drivers/tty/tty_buffer.c:180 [inline]
+ __tty_buffer_request_room+0x36e/0x6d0 drivers/tty/tty_buffer.c:273
+ __tty_insert_flip_string_flags+0x140/0x570 drivers/tty/tty_buffer.c:309
+ tty_insert_flip_char include/linux/tty_flip.h:77 [inline]
+ uart_insert_char+0x39e/0xa10 drivers/tty/serial/serial_core.c:3560
+ serial8250_read_char+0x1a7/0x5d0 drivers/tty/serial/8250/8250_port.c:1743
+ serial8250_rx_chars drivers/tty/serial/8250/8250_port.c:1760 [inline]
+ serial8250_handle_irq+0x77a/0xb80 drivers/tty/serial/8250/8250_port.c:1924
+ serial8250_default_handle_irq+0x120/0x2b0 drivers/tty/serial/8250/8250_port.c:1949
+ serial8250_interrupt+0xc5/0x360 drivers/tty/serial/8250/8250_core.c:86
+ __handle_irq_event_percpu+0x118/0xca0 kernel/irq/handle.c:158
+ handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
+ handle_irq_event+0xef/0x2c0 kernel/irq/handle.c:210
+ handle_edge_irq+0x340/0xfb0 kernel/irq/chip.c:831
+ generic_handle_irq_desc include/linux/irqdesc.h:173 [inline]
+ handle_irq arch/x86/kernel/irq.c:247 [inline]
+ call_irq_handler arch/x86/kernel/irq.c:259 [inline]
+ __common_interrupt+0x97/0x1f0 arch/x86/kernel/irq.c:285
+ common_interrupt+0x8f/0xa0 arch/x86/kernel/irq.c:278
+ asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
+
+CPU: 1 UID: 0 PID: 3154 Comm: kworker/u8:16 Not tainted 6.11.0-rc1-syzkaller-00293-gdefaf1a2113a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: events_unbound flush_to_ldisc
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
