@@ -1,76 +1,104 @@
-Return-Path: <netdev+bounces-116753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE3F94B996
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:23:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B8D94B99A
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D5711C2102D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:23:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DA8EB221D9
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4518146A62;
-	Thu,  8 Aug 2024 09:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12E21474A9;
+	Thu,  8 Aug 2024 09:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bt17wLI5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWU8/L6r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8A81465BE
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 09:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F571465BE;
+	Thu,  8 Aug 2024 09:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723109007; cv=none; b=cNLlv99zQ7b3RYUmjIFrRNrFfy9ozIwbvoCUqEZw0YwsRtZjaMWPavODf94bMj18fcRH7sWQ2yxmKgE9hTZoZVBNm3KOgP2bbQfrF8cOLWJqb906N4EPfoB8ZxvQAWOkM09ZZGB36T39cCrhoPKkSlXvnC9iXeEF/zvjaKdnb3Q=
+	t=1723109069; cv=none; b=Ru7Zl0jflk9VnAGVeqtHXcMbKRAWr22PPZGxI7O2F2vwn3ex4x5NpP3rj9ClBLrT70LYGVwq2zjTEGqCNyR7e1KH/CZGfCjfFdaCmdfZHvxfKJcGBbRMmLBtFotdNM2wYXSXsdk8oqnMLPD0w5xxRqOeqTOt5LDikMQik7ykPFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723109007; c=relaxed/simple;
-	bh=iX1EZO3yB15rqCO9EMHQKda+8yUGAiCcnTG3M9Qyztc=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nqUZ1YLHHL9UnvMX/g4YERYFBRDgKU0sBM60JwXE6VjpCXY3I7xMST4F4x+eHjtaFnUeFttRwBFpUS6RQ+oyWoViFsFMzMkwMIR5eehH329di7sKT91kryQePm+CMfNRNQMJKtaVKugaf/6cIXLXz7M5WDzcoAwj8wYVd/K/2HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bt17wLI5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA9CCC32782;
-	Thu,  8 Aug 2024 09:23:25 +0000 (UTC)
+	s=arc-20240116; t=1723109069; c=relaxed/simple;
+	bh=uX5ep/PSOVtOKHu44Nss6ozVLTd5AuP0lWO5Jg0wheA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qunA790C6XxSsZfDtb0SZG69IU7Xps1ErhX8JTh9hg6PFbjxW7OOUxuEUejHAtvaLsQ4Qn5P79I7Ef3zZhvPsRnYATHrTDUkChrjLssN7WlXvG1L7uSGoajPRBf7LTnes+UVT6L5a0TVgZI2mzdTkF7TDRvh+EswOgxyDJ6VnGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWU8/L6r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 081A7C32782;
+	Thu,  8 Aug 2024 09:24:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723109006;
-	bh=iX1EZO3yB15rqCO9EMHQKda+8yUGAiCcnTG3M9Qyztc=;
-	h=From:To:Subject:In-Reply-To:References:Date:From;
-	b=bt17wLI5ZTjvggrJW8j/SRhYSu7B2gtrSvaMInrouW025Wn7XladRSdmxvEob2OvS
-	 T4tIJPbE5+0MA4GM2Ayr7/DnCpEgwipV8lpsFo9nQ9ilCHJO5aB0ubR7dC5Zzhr6N0
-	 s4suCXQ2R/LrDBgLxYkGAL/OfZKnklM7iJnxbKDkJQjAyJkg2Owm69qoFm/jztCFwh
-	 MZddzNyioWOOPGVRfKhZhGs9fXZOCgsFAb4ApyB0Jr2qlHHntDtt7+GA38IEg2cQZj
-	 /V33K+puHZnth0eSXcARZdzDSv+Fiyp8k2KSzqq9xkMHFhBUocAu9z9+U5cwx+bIKc
-	 PRRaRc93M/wYQ==
+	s=k20201202; t=1723109069;
+	bh=uX5ep/PSOVtOKHu44Nss6ozVLTd5AuP0lWO5Jg0wheA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=CWU8/L6rtcD/JU2QJr5xEWmJ5IFCbthmLwc6ZChNljQljQK/wgMEMlJZkyEFEMyZ0
+	 PZjSB3Wd/q8XJ4bq2Q4WwKAr2eA50ihT8nLDFNc1vYxs8DpwwyreiAwoHXBUiB8ltw
+	 1MwBXX3ogBujRv2dEj9dPh6xUI17dhw0bkfv5l9Zo9oTbWTBjiESn71NBRkR7tli/D
+	 K8BXDNq4vSxXxE5BifRbfFmPhNgYAWP3DqvDJ1MUMShmPlIf61Ol3MKk0DMMKiSZ7p
+	 8F0CwtBEW341rsK9KJ5m1z1iaNmqIZ+EHzCjheFQZmeBTIcD9bCDABtkVmCIGtVsfT
+	 TPeQdWovWJz7w==
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 863A514AD648; Thu, 08 Aug 2024 11:23:22 +0200 (CEST)
+	id 2A41414AD64A; Thu, 08 Aug 2024 11:24:26 +0200 (CEST)
 From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Duan Jiong <djduanjiong@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
-In-Reply-To: <20240808070428.13643-1-djduanjiong@gmail.com>
-References: <20240808070428.13643-1-djduanjiong@gmail.com>
+To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
+ <ast@fiberby.net>, bpf@vger.kernel.org
+Cc: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
+ <ast@fiberby.net>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko
+ <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, Tushar Vyavahare
+ <tushar.vyavahare@intel.com>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next] selftests/bpf: Avoid subtraction after htons()
+ in ipip tests
+In-Reply-To: <20240808075906.1849564-1-ast@fiberby.net>
+References: <20240808075906.1849564-1-ast@fiberby.net>
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 08 Aug 2024 11:23:22 +0200
-Message-ID: <87v80bpdv9.fsf@toke.dk>
+Date: Thu, 08 Aug 2024 11:24:25 +0200
+Message-ID: <87sevfpdti.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Duan Jiong <djduanjiong@gmail.com> writes:
+Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net> writes:
 
-> When the mtu of the veth card is not the same at both ends, there
-> is no need to check the mtu when forwarding packets, and it should
-> be a permissible behavior to allow receiving packets with larger
-> mtu than your own.
+> On little-endian systems, doing subtraction after htons()
+> leads to interesting results:
+>
+> Given:
+>   MAGIC_BYTES =3D 123 =3D 0x007B aka. in big endian: 0x7B00 =3D 31488
+>   sizeof(struct iphdr) =3D 20
+>
+> Before this patch:
+> __bpf_constant_htons(MAGIC_BYTES) - sizeof(struct iphdr) =3D 0x7AEC
+> 0x7AEC =3D htons(0xEC7A) =3D htons(60538)
+>
+> So these were outer IP packets with a total length of 123 bytes,
+> containing an inner IP packet with a total length of 60538 bytes.
 
-Erm, huh? The MTU check is against the receiving interface, so AFAICT
-your patch just disables MTU checking entirely for veth devices, which
-seems ill-advised.
+It's just using bag of holding technology!
 
-What's the issue you are trying to fix, exactly?
+> After this patch:
+> __bpf_constant_htons(MAGIC_BYTES - sizeof(struct iphdr)) =3D htons(103)
+>
+> Now these packets are outer IP packets with a total length of 123 bytes,
+> containing an inner IP packet with a total length of 103 bytes.
+>
+> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
 
--Toke
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@kernel.org>
 
