@@ -1,95 +1,83 @@
-Return-Path: <netdev+bounces-116875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D5A94BEA8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:41:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63D694BED4
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFF70B20E45
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9823F1F22216
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0AE418DF7A;
-	Thu,  8 Aug 2024 13:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC713148307;
+	Thu,  8 Aug 2024 13:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="je0hpw8h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9h4wjy2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B56A18A958
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A6A63D
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723124476; cv=none; b=Xfe+n/7qd0rnlRXIPFtF20mkoZwEOehpY/C97h9zclOJX6MUCGdpPpEE9++RPnwzXlcaxTHvyiSubxTtDMVqoTEJvsmcqR7sm/hxUVzkjy6S/P1EYQsRt4cqxLw4Pq6zQsXwXQr6gaZn2BFpAeEKow9guZyxbQMJKSMykKrjW1I=
+	t=1723125151; cv=none; b=MJkuwpXSC3nOeh4Q9w77Av2A+IGgKsfP4CtEFbzJZ0FEDE99sNJNMGKUyQTyC7R5XeQk/hA1BoJOne67TFss0bZwHTbEovMfg05p5i+S7mNqzWmJisyAE5AC3Rr1CfJKr3pn/IMO65eKFlhxJRDcTlEOUoZhd9vrafGDooL21ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723124476; c=relaxed/simple;
-	bh=jjchqss2SFXhlE4HCQsuC/0jD1qlA7c5B0iranSCJqg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sk4A41XvMa3xWMDzoOVsg5cTLaz6NF7SpC8f2GdqYYDPhhjIWs7Y100N2BgMWGreVpPfmmo1Z2FZ8HfdkclnPPdFKGfh5U9QkmOY+Dn97KryIZ0nZ7wXPUYA4OvSKFaC2s65v247K6vSwhGoQ0xJbAqQA2DM8YxS7IQDTIIZFHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=je0hpw8h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30767C32782;
-	Thu,  8 Aug 2024 13:41:16 +0000 (UTC)
+	s=arc-20240116; t=1723125151; c=relaxed/simple;
+	bh=wFyFcx/mm1Nsd/3gDjiCbhCXx9zjXCrOWuYKeuUaEKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dkajT4KJEKfkZ+Ih/MRNeTkaJnbPzUNk5o3jXkSQwm31XneBAqqe5oAq8FX8BcrYQyAxtPGI1TqHJ2l2xNYXLYgrmzgOUUFDeO4DyPt7mkxbet8c1SP7mcEuPqhZUcrqXYefOXjzJ0E7d6U45bCeC4VpgWD7VJLr7I16PCEYWII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9h4wjy2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E66DC32782;
+	Thu,  8 Aug 2024 13:52:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723124476;
-	bh=jjchqss2SFXhlE4HCQsuC/0jD1qlA7c5B0iranSCJqg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=je0hpw8hKmNSf1k/N1LmYyOejkkZz3czC7R6b44y6hhNMpBtSDqym/xenzQDw+50L
-	 SotXCgpkmxTf0C5N1IDeW10vULb8H74YNBn5iQhFeessIV3Sjwv+9I42Ng+X+j00In
-	 KPUtd9qPLYXkDOn79JMzzWX+wxdcqqhpxYslj29fHMwjAukNdnT8VsfyF4ULeUzBUb
-	 aHmyN+9y8zA0taouS4oVLn2uXe+AjabhovwdqIKOEYlkJ5lkS3J2/UUtYHtkV05lY2
-	 sH6hjAY/5x5FJaQhQ2o81TPY5qH3HnOr6wGczZZNWs/e8fKaYy34gTxn6jm0FGw2hD
-	 63UpuZy0ro1+w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34BD8382336A;
-	Thu,  8 Aug 2024 13:41:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1723125150;
+	bh=wFyFcx/mm1Nsd/3gDjiCbhCXx9zjXCrOWuYKeuUaEKU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O9h4wjy2gpztoL6Zf+2SobETADA1WWvIUdU9+4ATChtAy2BaeNsDh/Gzt0G0ZXFcN
+	 5vhrumTlenNgkYRHL662hQF7GF/HipkaBa3cNxy6Q3BnE8clZJDxSUzp+QgGQ0Y+Qr
+	 j79koKFPaZqncxP36MYTIVqFngaZQ2qv5bYB4DjjnPn+GvpdDmpUjfiemkRSfcc+t6
+	 2O9ZYWGUcyXCEa0g2WYyyXz1tjZokrgTiA1k9aiEmXiTTXOPwxPSprPnc818W7TUid
+	 zxMDHSyhP4El6mjsY8zhK7w0WKOZgszq7WN4uuNt1sl4NqAzmqXUCWMiyTbajYNf+v
+	 p+0MxmDE76TRA==
+Date: Thu, 8 Aug 2024 06:52:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, Jesper Dangaard Brouer <hawk@kernel.org>, Alexander
+ Duyck <alexander.duyck@gmail.com>, Yonglong Liu <liuyonglong@huawei.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>
+Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
+ avoid IOMMU crashes
+Message-ID: <20240808065228.4188e5d3@kernel.org>
+In-Reply-To: <CAC_iWj+G_Rrqw8R5PR3vZsL5Oid+_tzNOLOg6Hoo1jt3vhGx5A@mail.gmail.com>
+References: <20240806151618.1373008-1-kuba@kernel.org>
+	<CAC_iWj+G_Rrqw8R5PR3vZsL5Oid+_tzNOLOg6Hoo1jt3vhGx5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 ethtool] qsfp: Better handling of Page 03h netlink read
- failure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172312447466.3185699.11856007398398183094.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Aug 2024 13:41:14 +0000
-References: <0d2504d1-e150-40bf-8e30-bf6414d42b60@ans.pl>
-In-Reply-To: <0d2504d1-e150-40bf-8e30-bf6414d42b60@ans.pl>
-To: =?utf-8?q?Krzysztof_Ol=C4=99dzki_=3Cole=40ans=2Epl=3E?=@codeaurora.org
-Cc: idosch@nvidia.com, andrew@lunn.ch, mkubecek@suse.cz, moshe@nvidia.com,
- netdev@vger.kernel.org, tariqt@nvidia.com, git@dan.merillat.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 8 Aug 2024 14:12:34 +0300 Ilias Apalodimas wrote:
+> In any case why do you want to hold on the IOMMU? The network
+> interface -- at least in theory -- should be down and we wont be
+> processing any more packets.
 
-This patch was applied to ethtool/ethtool.git (master)
-by Michal Kubecek <mkubecek@suse.cz>:
+I should have you a link to Yonglong's report:
 
-On Tue, 30 Jul 2024 17:49:33 -0700 you wrote:
-> When dumping the EEPROM contents of a QSFP transceiver module, ethtool
-> will only ask the kernel to retrieve Upper Page 03h if the module
-> advertised it as supported.
-> 
-> However, some kernel drivers like mlx4 are currently unable to provide
-> the page, resulting in the kernel returning an error. Since Upper Page
-> 03h is optional, do not treat the error as fatal. Instead, print an
-> error message and allow ethtool to continue and parse / print the
-> contents of the other pages.
-> 
-> [...]
+https://lore.kernel.org/all/8743264a-9700-4227-a556-5f931c720211@huawei.com/
 
-Here is the summary with links:
-  - [v2,ethtool] qsfp: Better handling of Page 03h netlink read failure
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=e1a65d47551f
+we get_device() hoping that it will keep the IOMMU machinery active
+(even if the device won't use the page we need to unmap it when it's
+freed), but it sounds like IOMMU dies when driver is unbound. Even if
+there are outstanding references to the device.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I occasionally hit this problem reloading drivers during development,
+TBH, too. And we have been told we "use the API wrong" so let's fix
+it on our end?..
 
