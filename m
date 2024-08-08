@@ -1,128 +1,109 @@
-Return-Path: <netdev+bounces-117006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D76EF94C51D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:19:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E3994C524
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14AA51C21DAA
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:19:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D2A1B212D8
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3727D14EC62;
-	Thu,  8 Aug 2024 19:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCB31494CE;
+	Thu,  8 Aug 2024 19:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pappasbrent.com header.i=@pappasbrent.com header.b="C1ZtKlaS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CGgbxDAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from h7.fbrelay.privateemail.com (h7.fbrelay.privateemail.com [162.0.218.230])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9CA12C81F;
-	Thu,  8 Aug 2024 19:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.0.218.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B95433AD
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 19:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723144739; cv=none; b=ScGo60wuj24IIEa+sy9Hrnewap0BQaH+Jlr0V93VTQWMAtu2H/g0XS04LczbAf3jXZCmXdDnNMet/4L+Knc22+MRWdpancAX/Phs9q/Ae28VZPjdMUuyEC0VnLY8VyIx/lfbBQBNoSbvp0oQjn+ixKQ16XzipIgAXNp7XTYVIY8=
+	t=1723145288; cv=none; b=AZuTSPDC5ziPFNtdiQQek/zu3FOu4vbH1ENffT0naKyl9bw49cb4q+shcafyH/3jVznpirjnLvuIhbgKx0PVMnpgrhCNw1S2kNepWKLcBoDGPbNyxtmg+C5fVDK0zevdZwN6a0pub6N3s4r0dlUmJnUnyNFuYHmjd7skvbvsJfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723144739; c=relaxed/simple;
-	bh=rgLCQeZ7+U0CpJiowNUqrHoJ5FC9wf4c1MrLH5GyYos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oNFCiVsQfIxiEJwwcTg4EYjsbRkiL37vfw263Wl4eEuqiPMMN6KG8Accr6o8A3DWu6i+Ss8UGFPvG+a3UT2vyk6oTkXpmftwhFGKxuVf7KKMapiB1wwaIbg/fpSl+szYgW/H43hw9Yhrfa3791ZQH1ZpsrNv8gyPsIYc0RlAI08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pappasbrent.com; spf=pass smtp.mailfrom=pappasbrent.com; dkim=pass (2048-bit key) header.d=pappasbrent.com header.i=@pappasbrent.com header.b=C1ZtKlaS; arc=none smtp.client-ip=162.0.218.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pappasbrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pappasbrent.com
-Received: from MTA-07-3.privateemail.com (mta-07.privateemail.com [198.54.127.57])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by h7.fbrelay.privateemail.com (Postfix) with ESMTPSA id EBF2D601A7;
-	Thu,  8 Aug 2024 15:06:49 -0400 (EDT)
-Received: from mta-07.privateemail.com (localhost [127.0.0.1])
-	by mta-07.privateemail.com (Postfix) with ESMTP id 441DF180004F;
-	Thu,  8 Aug 2024 15:06:42 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pappasbrent.com;
-	s=default; t=1723144002;
-	bh=rgLCQeZ7+U0CpJiowNUqrHoJ5FC9wf4c1MrLH5GyYos=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C1ZtKlaScFK0/XJGEGa8NgDPjIjHVGUCkZnl+g5XmwGkCZLzuPSEm2LwjjXvA03uQ
-	 Z4JA3xKkomnkhaXDEMw9wNzbQBb92ce1TogHaVsNaWcUUFyXRZvR4wy8zNRSqsZo+G
-	 X459HRv+FLA9xCPMsIHLWuv4s6dj/I5I+Ot2EwIRLwtjsf4KrTqLR6G0SwoKxJcj+i
-	 6EmFdhLYsveM3DvbW53rrzu6y8GWGJIYWagOc/P6qR0BwyThK4fyHDzcAZjpuM8TjE
-	 D3HmS9uYYf75DaUsMMbCnwuvvTwAtvxn27XJo641uK5wb2X+IL30/RITA2Qkok8MFI
-	 eM7VwxOzGVFtA==
-Received: from bpappas-XPS-13-9310.. (65-123-224-58.dia.static.qwest.net [65.123.224.58])
-	by mta-07.privateemail.com (Postfix) with ESMTPA;
-	Thu,  8 Aug 2024 15:06:33 -0400 (EDT)
-From: Brent Pappas <bpappas@pappasbrent.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Brent Pappas <bpappas@pappasbrent.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ipv6: mcast: Add __must_hold() annotations.
-Date: Thu,  8 Aug 2024 15:02:55 -0400
-Message-ID: <20240808190256.149602-1-bpappas@pappasbrent.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1723145288; c=relaxed/simple;
+	bh=pYIYtpSDcBkGz5YGj+6ttm8HNDbP8VLiDXOqihTeBZc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Tsq0GzcKN+u0im2TeeejhT/a8SkRsw2UcGf+6sf1yWcS/FQoek3snpjky0KWE0cG/M6copzsi6aggj1sw82tIs93uMo/Qw/l2lZuWxXqeyj8ejeBzC3bGwAXTzfd/4B3UNzqFMeh334H4dZn6NV9ButcUrmjCKxSGWtBo6p3w00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGgbxDAl; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a1e31bc1efso80741785a.3
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 12:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723145286; x=1723750086; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1AdGvHvQeGM2/3/1z86/xJ+xGDENkwM+YrRBA7tUy0s=;
+        b=CGgbxDAl14p6I1RYQDO+tfZ8FGLG2VQD9EsdExVAcFQisMXtNqpSIq9ult9Zrfv6nS
+         0aosKJmdf5OTzicLJQS/9x+gKGEGcM12LlWT55W069PODNEDJ2pW9fIQ6rRHGSpVr74V
+         91lbuY1ooWUJ4r7qAgco8sREdxCoPxrYzRabDFxJoXSkmHY3jG7ZSt1Ptpv1burCC2mf
+         R1USgNHdMRx/L2EVWn+V+bAttVEFSpvqq5qE7m6p268c2bGlEHZiNNLGbvKuU/cdkKdr
+         tly6aUXrJ/pPyJ4ZbJU521+Sh+O9ng4PMO8TuCSJ7eFpCsxs3+n8mhTVpeESZ4hg4eZ2
+         3Ybw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723145286; x=1723750086;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1AdGvHvQeGM2/3/1z86/xJ+xGDENkwM+YrRBA7tUy0s=;
+        b=bV5z3bluqGEr2nf5MHyWwZbPVjMq08fNRrqD5cglaK9ZXnvr2/BVVWdNslPjtAI2qk
+         kIUalypZlrsCuI7PLGYKMO4rJHEU/H6JVcd9taUJLcUIrY3E/PhEDVi8ZpowTMR2/hAe
+         NFJyhnagak2pRvzBt6I3kE97oVsld9ZxNZi/hmqtIoFGdhBpCFmxlVusXaYuiVxIqqeC
+         vu5s5wqGqxOSRHAi67N7q4Ub6TH1NEp1pidoQq+jjRnjwYpvXb0bdEcwkyNBQzLF3wsC
+         HnF1vm2GW4C8e9t1zqkTtz1H3oiicvvKhWR31TxAlUHcp6yQt6dS4RvkH3Pqt2XTAVeN
+         +ChA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvJYmzu1YntMgWP4Zdo+dEBBIR6zhQ+HP2xGBSdCenqSjRODh+x+NcNtf37BtTMxjs2DDsGHKv5sykuZffCZa3hMPf6FWg
+X-Gm-Message-State: AOJu0YyitfKdK+wdVWStlAuczoW172oSvtfBC6VFemSkj2D0Z6cPNxlw
+	KWLHIsbRj8WNKcZcBHfT8iupdRdmh0rXyJlnptbUKxIKVAqAOWU9
+X-Google-Smtp-Source: AGHT+IF63Y6/Vh3L6sRutSHVcILb4GTF+px2/O135smYVM7aVBRipBfPraMv8UOaApw8T934uDVgWQ==
+X-Received: by 2002:a05:6214:3a07:b0:6b7:ab98:b8b3 with SMTP id 6a1803df08f44-6bd6bd33c03mr32853786d6.34.1723145286178;
+        Thu, 08 Aug 2024 12:28:06 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c765e56sm69524436d6.11.2024.08.08.12.28.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 12:28:04 -0700 (PDT)
+Date: Thu, 08 Aug 2024 15:28:04 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ kernel-team@cloudflare.com
+Message-ID: <66b51c448f327_39ab9f294b3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240808-udp-gso-egress-from-tunnel-v4-1-f5c5b4149ab9@cloudflare.com>
+References: <20240808-udp-gso-egress-from-tunnel-v4-0-f5c5b4149ab9@cloudflare.com>
+ <20240808-udp-gso-egress-from-tunnel-v4-1-f5c5b4149ab9@cloudflare.com>
+Subject: Re: [PATCH net v4 1/3] net: Make USO depend on CSUM offload
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Add __must_hold(RCU) annotations to igmp6_mc_get_first(),
-igmp6_mc_get_next(), and igmp6_mc_get_idx() to signify that they are
-meant to be called in RCU critical sections.
+Jakub Sitnicki wrote:
+> UDP segmentation offload inherently depends on checksum offload. It should
+> not be possible to disable checksum offload while leaving USO enabled.
+> Enforce this dependency in code.
+> 
+> There is a single tx-udp-segmentation feature flag to indicate support for
+> both IPv4/6, hence the devices wishing to support USO must offer checksum
+> offload for both IP versions.
+> 
+> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-Signed-off-by: Brent Pappas <bpappas@pappasbrent.com>
----
- net/ipv6/mcast.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 7ba01d8cfbae..843d0d065242 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -22,6 +22,7 @@
-  *		- MLDv2 support
-  */
- 
-+#include "linux/compiler_types.h"
- #include <linux/module.h>
- #include <linux/errno.h>
- #include <linux/types.h>
-@@ -2861,6 +2862,7 @@ struct igmp6_mc_iter_state {
- #define igmp6_mc_seq_private(seq)	((struct igmp6_mc_iter_state *)(seq)->private)
- 
- static inline struct ifmcaddr6 *igmp6_mc_get_first(struct seq_file *seq)
-+	__must_hold(RCU)
- {
- 	struct ifmcaddr6 *im = NULL;
- 	struct igmp6_mc_iter_state *state = igmp6_mc_seq_private(seq);
-@@ -2882,7 +2884,9 @@ static inline struct ifmcaddr6 *igmp6_mc_get_first(struct seq_file *seq)
- 	return im;
- }
- 
--static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq, struct ifmcaddr6 *im)
-+static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq,
-+					   struct ifmcaddr6 *im)
-+	__must_hold(RCU)
- {
- 	struct igmp6_mc_iter_state *state = igmp6_mc_seq_private(seq);
- 
-@@ -2902,6 +2906,7 @@ static struct ifmcaddr6 *igmp6_mc_get_next(struct seq_file *seq, struct ifmcaddr
- }
- 
- static struct ifmcaddr6 *igmp6_mc_get_idx(struct seq_file *seq, loff_t pos)
-+	__must_hold(RCU)
- {
- 	struct ifmcaddr6 *im = igmp6_mc_get_first(seq);
- 	if (im)
--- 
-2.46.0
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
