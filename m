@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-116732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D47594B7F9
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:36:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6162694B81D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 870BB1C24541
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92A2D1C23B7D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA93F136330;
-	Thu,  8 Aug 2024 07:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029E218133C;
+	Thu,  8 Aug 2024 07:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTVCyNuh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UnIJMwtN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921127464;
-	Thu,  8 Aug 2024 07:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E9D1373;
+	Thu,  8 Aug 2024 07:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723102613; cv=none; b=leJ4TovJPOgHOEEtIWSVVvZswPavlpHlp5Jp/s/Z50W55vIA4nNOeFpQmkt7fCWuyYNzhkmN1oRIiuGBvvHw6qwgJzAUDNQR/nW1vQr5XM9uWROAwalGSqieJ8rW8KFsgbgOCpsOjZUsYcODkUiilq+VSCemh8cbKBS0bagM4V8=
+	t=1723103122; cv=none; b=SRtJKT3AsxBrlM1graE3AR5IdgthnZg5RCn7VYAXeSBp+dSUXhVCkTwRoftPtLr8lqEExip1y4uvF6y7NR81icJf7zuynABv8EP4rvrinjyZU5KYisv5RP4/MDDcIbmbzjIHeVP0oyiHjBsF0IogHRgVeaQHejvcj89NSkluOPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723102613; c=relaxed/simple;
-	bh=IArkuA/rezyzXAsivv8x1VsmdgMdM4imAqtpxCdcriw=;
+	s=arc-20240116; t=1723103122; c=relaxed/simple;
+	bh=Ji1rWP1Fc8ibwtETj7Rzu0jAsVwOvyhTs6fPFh/zhk4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ocufZ4//ToLQOxHBDhbVBblnMwUXjERdlxTZZtoAnUuUd7SoKNhQg+kkh0IKAGgVAgGLRWbgzOZBtVJ60GNo86ND5BN6HvYdaAfUmacAe0a+4iQVD0PusGg5G2oIh7PIuBT2yaLupQWMMo1K8lQV5PdbcAwlKeyrqvt9Kk59YK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTVCyNuh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49728C32782;
-	Thu,  8 Aug 2024 07:36:48 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=jDltUYtoqXIxpdIuEnP5Cj3BbBAkQStwlqmqLxwdMpqpGw3UM8LVSrwyXtUTG4+m4mWwt4hi3TiaOk/LMSPOATSacygG5TD+vv73UQ5REMQfLwzsTG5HG90P4WBmadHAB+VUGUrq/L7F9kAYTsbY6S3002ktYtqyjWLanwEX0gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UnIJMwtN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F1CDC32782;
+	Thu,  8 Aug 2024 07:45:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723102613;
-	bh=IArkuA/rezyzXAsivv8x1VsmdgMdM4imAqtpxCdcriw=;
+	s=k20201202; t=1723103122;
+	bh=Ji1rWP1Fc8ibwtETj7Rzu0jAsVwOvyhTs6fPFh/zhk4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JTVCyNuhgnNMF7vhdRXASkM9KJ/pQJ4jCEovor5D/krRQBnIbil3TbCzJAyjwYry2
-	 HN0NbcKtZ2V76VSOjXDMZ3qZjuWSj0MVhrs6dGPMj98o20Eowwgp0Zrr0qjOLpKWI7
-	 J6X5b7nI4w+VuFTCbbBwcaUsL9nrdjkzFv91n60OO4agNMLIVIBdy/HyiogyFhHI0l
-	 8V0Z6Vz4FRtsrCFnntI4iMwIvFF2Sd/59AwHPW+AG15SwqRPFWYxoQFq/4NpSFy3Tq
-	 YuVKpHE2xhfr8AQCQhk8A/Mu874FQlrJovXF09pyz0C30ZdiwkNUCt6dLyBwTg2+dU
-	 qYmHCy8LYuI0A==
-Message-ID: <efaf459f-dd22-4200-9ad5-76a90d8038d2@kernel.org>
-Date: Thu, 8 Aug 2024 09:36:46 +0200
+	b=UnIJMwtNgLNw6gtRTffhLWErMrfTTWwgvdx+srUhL3llXwodtL0ufS/E12nK/6fC4
+	 oHNCXJIIrZRuWw1JrwSrFbfHI5EJjRpqD+GzdePSXwKo/Rr63rEteY+IAAX+MC3Oe2
+	 5owXd+SZioa9ASjaYr4hZf6Lm+sKYG+X+EHikIW9EPOlNktHOYqr3tx4ijsTEU7mxB
+	 0NAMxwlMQuHmHXnUzR2covWuENNPLsxr8qxPVM8zCr5IXIDjrn5DPPdm4qp2e8FirP
+	 aC9Zk02nMzKey66E3aIBQX3Bpz8gyQLeIfypt4mF+/KmfqAzFgBEW4Q2KQuOZgetsy
+	 vR+ec5JVRqOsw==
+Message-ID: <d682bc48-5ba5-4031-a0e6-ad1beedd1057@kernel.org>
+Date: Thu, 8 Aug 2024 09:45:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,18 +50,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] dt-bindings: net: dsa: Add KSZ8895/KSZ8864
- switch support
-To: Tristram.Ha@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- Vivien Didelot <vivien.didelot@gmail.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+Subject: Re: [PATCH v3 03/17] wifi: cc33xx: Add sdio.c, io.c, io.h
+To: "Nemanov, Michael" <michael.nemanov@ti.com>, Kalle Valo
+ <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20240807232023.1373779-1-Tristram.Ha@microchip.com>
- <20240807232023.1373779-3-Tristram.Ha@microchip.com>
+Cc: Sabeeh Khan <sabeeh-khan@ti.com>
+References: <20240806170018.638585-1-michael.nemanov@ti.com>
+ <20240806170018.638585-4-michael.nemanov@ti.com>
+ <5020193f-64f5-48ff-8597-8e6a5ca0fb36@kernel.org>
+ <68d0852a-2390-4fe4-be16-3f691e99bd86@ti.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -107,41 +109,46 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240807232023.1373779-3-Tristram.Ha@microchip.com>
+In-Reply-To: <68d0852a-2390-4fe4-be16-3f691e99bd86@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/08/2024 01:20, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
+On 07/08/2024 16:55, Nemanov, Michael wrote:
+> On 8/7/2024 10:12 AM, Krzysztof Kozlowski wrote:
 > 
-> KSZ8895/KSZ8864 is a switch family developed before KSZ8795 and after
-> KSZ8863, so it shares some registers and functions in those switches.
-> KSZ8895 has 5 ports and so is more similar to KSZ8795.
 > 
-> KSZ8864 is a 4-port version of KSZ8895.  The first port is removed
-> while port 5 remains as a host port.
+> 
+>>> +static const struct of_device_id cc33xx_sdio_of_match_table[] = {
+>>> +	{ .compatible = "ti,cc3300", .data = &cc33xx_data },
+>>> +	{ .compatible = "ti,cc3301", .data = &cc33xx_data },
+>>> +	{ .compatible = "ti,cc3350", .data = &cc33xx_data },
+>>> +	{ .compatible = "ti,cc3351", .data = &cc33xx_data },
+>>> +	{ }
+>>> +};
+>>
+>>
+>> Eh? What happened here? So devices are compatibles thus make them
+>> compatible in the bindings.
+>>
+> 
+> I thought this is the right way to do it (originally taken from [1]).
+> How can I solve it via DT bindings?
 
-<form letter>
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
+It's all over the bindings (also example-schema). Use fallback and oneOf.
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
+> 
+>>
+>>> +
+>>> +module_param(dump, bool, 0600);
+>>> +MODULE_PARM_DESC(dump, "Enable sdio read/write dumps.");
+>>
+>> This should be rather debug interface, not module param.
+>>
+> 
+> Meaning debugFS?
 
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
+Yes.
 
-Please kindly resend and include all necessary To/Cc entries.
-</form letter>
-
-Also, bindings come before users.
 
 Best regards,
 Krzysztof
