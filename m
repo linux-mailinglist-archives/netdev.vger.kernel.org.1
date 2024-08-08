@@ -1,81 +1,93 @@
-Return-Path: <netdev+bounces-116670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E986C94B570
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 05:28:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75B9294B577
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 05:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72D16B2276D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A78E21C21441
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29532CCC2;
-	Thu,  8 Aug 2024 03:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED91D10A1E;
+	Thu,  8 Aug 2024 03:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MKdogcg0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZn+ggdH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D18F8BF0
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 03:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9292E567
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 03:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723087701; cv=none; b=gDJgaxxbi8+paWbSZFFJTraRYfr1n7EmBTYYtOJXbA8WyBHyZ9r+GQ4dLs89u53b7MiPKPdyrUUhvK+ZtHXqXb4oDu/e7Dox23nH9v7IXb2JXCBHkUNVf+UST9HHb3vdVeATtuxIWdddQxotCRnmCbx4VEfVd4uHL+D+smpViYw=
+	t=1723087831; cv=none; b=JKmkplPNq6cwhbroqk4BESWv1mh8JHMOU+HuegDWznCuKOI9fM05YYMC3+s4pZjf9B2+gj4Am1gZc0m3ortINYLv0tNfukfDn5B2I/BQ7ZOVdU+9ps8BIkLZq67+w1Y2TSv+jhp2odxJZvXvBDW/0IkFY+cWeQW42Fv1rxQ8e1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723087701; c=relaxed/simple;
-	bh=ktkOq9+4ea01uDNOmGVJ55tOm/JmaQ6x0hST87bC63k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q4E5V1py/aNixpdD0wnuZd3sufBcsFzLMpp+L4AyfgMXuVFy/W1WHjfddyWkJN36yJT/KgbV86/xKETy6+6r7R1MnXorTrimx8w2Jmx4Nbz4xWr6eU1hoBZubeyg28xA/7i1u+ElemP4ZjeshsGZlybFjGWzw9y11d8c4fiv4F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MKdogcg0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDBF5C32781;
-	Thu,  8 Aug 2024 03:28:19 +0000 (UTC)
+	s=arc-20240116; t=1723087831; c=relaxed/simple;
+	bh=0YbwGfnI8UGqDLJJrUdJWYGQB7VqfB7LlUifIbcbIkU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LLzQfzWS2tvj9tilwFdk6gdZb5Z8vhN/nqsdKEcDFr0PtijafCB8M9/0QXxcIh9qpN8HiulhioSC5lqAEHAReACvFDbw/xwV5MzN4zM9mXgxKVqrkVAYIPfHxxbStUciYCkCyEvBmwQGiAObazCcgFrQQ38oiZNGmnjsGKUNUPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZn+ggdH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A019EC32781;
+	Thu,  8 Aug 2024 03:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723087701;
-	bh=ktkOq9+4ea01uDNOmGVJ55tOm/JmaQ6x0hST87bC63k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MKdogcg0ew7g9BNTA362FLXQlrNsBly8J0MhPZq9Xduyqa1iC/v5fSv6sOoMXHERC
-	 3twgWLgHl3kjwaaVVbOU4PHrs6xM64UgcsGXnVy2HQTSmWHBYrfzuFHkbBFxCcyXvl
-	 1TdG+wfkU0n643yzxRpAMXYC+bE92vae/kzmpStVU3SwgBZ84PJCE/Gfj4sowZ3uyZ
-	 ZvZl46AT3DThtJwiDwFCNSRZEMJxQNaUCHpnKKpdtWXhUnGUa0DZhSRwwSSTrGl55M
-	 zot5t2bhnzQ0zIuABMFFZoGDAFla050+AZl2BK8xoLzb5tigYdnrtGS7YnYuvaPekF
-	 g2Rqxlaeojfxg==
-Date: Wed, 7 Aug 2024 20:28:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, aleksander.lobakin@intel.com, horms@kernel.org
-Subject: Re: [PATCH net 0/3][pull request] idpf: fix 3 bugs revealed by the
- Chapter I
-Message-ID: <20240807202818.12a0069a@kernel.org>
-In-Reply-To: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
-References: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
+	s=k20201202; t=1723087831;
+	bh=0YbwGfnI8UGqDLJJrUdJWYGQB7VqfB7LlUifIbcbIkU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FZn+ggdHZrxKoHhLNf8EeyGRRF1pxCG1DmAgPLzsUDXj62iO+ygrFnptcSfSFlRP1
+	 dQ9RrxxwnyMhol/8c7HghgEw9i8kMmsT6o3uncHN8NcTC7JEDA1W5dqU6Csog0+kCd
+	 iqRt6KSvvfiU28LSF6BCmmjhbH98st06UHYu2P3X7ogF6++zOGoI3AI+rnP2OdKUUT
+	 1ValxLFMtV9iGxE14F2TAw9U7JCvdy4Xuv0FiWpWSa11+td1ODxQLtN8LECSnT39zn
+	 +BGcEBIWGdyoas6W0q7IYsH53d6ZOlPKEmdY4k0DBV7GFUPRF+tdAyeWNKLPs1Q9Fv
+	 HpkMWgpKKWKkQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFF03822D3B;
+	Thu,  8 Aug 2024 03:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: dsa: bcm_sf2: Fix a possible memory leak in
+ bcm_sf2_mdio_register()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172308783051.2759733.17175721563938757744.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Aug 2024 03:30:30 +0000
+References: <20240806011327.3817861-1-joe@pf.is.s.u-tokyo.ac.jp>
+In-Reply-To: <20240806011327.3817861-1-joe@pf.is.s.u-tokyo.ac.jp>
+To: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Cc: f.fainelli@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-On Tue,  6 Aug 2024 15:09:19 -0700 Tony Nguyen wrote:
-> The libeth conversion revealed 2 serious issues which lead to sporadic
-> crashes or WARNs under certain configurations. Additional one was found
-> while debugging these two with kmemleak.
-> This one is targeted stable, the rest can be backported manually later
-> if needed. They can be reproduced only after the conversion is applied
-> anyway.
-> ---
-> iwl-net: https://lore.kernel.org/intel-wired-lan/20240724134024.2182959-1-aleksander.lobakin@intel.com/
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  6 Aug 2024 10:13:27 +0900 you wrote:
+> bcm_sf2_mdio_register() calls of_phy_find_device() and then
+> phy_device_remove() in a loop to remove existing PHY devices.
+> of_phy_find_device() eventually calls bus_find_device(), which calls
+> get_device() on the returned struct device * to increment the refcount.
+> The current implementation does not decrement the refcount, which causes
+> memory leak.
 > 
-> The following are changes since commit 3e7917c0cdad835a5121520fc5686d954b7a61ab:
->   net: linkwatch: use system_unbound_wq
-> and are available in the git repository at:
->   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
+> [...]
 
-Hm, my script doesn't like this branch, not sure why, I think it's
-a bug in the script itself. But not enough time to investigate now,
-I'll apply from the list.
+Here is the summary with links:
+  - [v2] net: dsa: bcm_sf2: Fix a possible memory leak in bcm_sf2_mdio_register()
+    https://git.kernel.org/netdev/net/c/e3862093ee93
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
