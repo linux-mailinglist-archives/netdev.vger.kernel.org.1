@@ -1,106 +1,139 @@
-Return-Path: <netdev+bounces-116836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D70B94BD83
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:30:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693BB94BD8A
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADB0FB24E52
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C65D1C21DE2
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C008818C90E;
-	Thu,  8 Aug 2024 12:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A1518A94D;
+	Thu,  8 Aug 2024 12:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNgCi2wp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PowFAQPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B06154C17;
-	Thu,  8 Aug 2024 12:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD8F18A937;
+	Thu,  8 Aug 2024 12:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723120136; cv=none; b=ouAwWbKz/4tr2xE73jkRYdtO1MIK0GHgCnQejSZhLiHaoEI+JGyyUmhoNKlnWIcjMQJO+E//xn40OYgF3yFxbe/4p76ycrmWP1bUWSCiFh7F45hF9HoOWKH5nON/YC9/FStOGiOHYTCcdf8b5ECElpD3hyoGDjLyXueZS45j0FE=
+	t=1723120368; cv=none; b=NGcB4LXB/Wp98jyerC7SZcXRELBYi/lmiKDR2r47Xab1K8TRoMkPm1DG08SC9p3M4a4KvNIU6Akp0EsnQW705dPHp+RmYqSw5yDdYf1vD9LKhNRN7sqi3lwVC5093Eau+feRf/ktsJCfESlJqXOpvgE6k0jHaYiK4kDmIdslzi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723120136; c=relaxed/simple;
-	bh=0FdOeou9MfhtoDpBtONpO0k3RoBpQmdH3thG2TSFsD4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JotMc7NkM4IrGtVBI4AT0XwbEVKsULfLZTN8EraXPFGhMUt4RBeMEAqUxkOafqWG+f9r11F/kkY+4Fpn2sNYr3VZfkZ6twVbOXdeyuITW5oe9vF7T9vkXWrlcmq5Geq2q9GFpfgkarSek4BWdQwFbpUYMZjFk+DmOs/kUS7V2NM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CNgCi2wp; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1723120368; c=relaxed/simple;
+	bh=nTalzfrNCjKlLWKsns4urkDENdMZzxYdv7NUi8Kvc44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RpqPdAVL6wxvNiXtiHXIxPLWCLB+TRGUXpWj0NFjQ5wVfdYC1RA6HqDEB8VvDd4ggOrsyFTLiLIV8OPuvgaKGP0n/pbrpyvTyYCMaUzzj8ZKSWUSqm0TZZS/+vfqK92voZcf6UFrTpwjA8FwKr8OKGYkxhFhmoyM3kUA7dLS1l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PowFAQPT; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1ff1cd07f56so8054765ad.2;
-        Thu, 08 Aug 2024 05:28:55 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a7ab76558a9so135751866b.1;
+        Thu, 08 Aug 2024 05:32:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723120135; x=1723724935; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1723120365; x=1723725165; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0FdOeou9MfhtoDpBtONpO0k3RoBpQmdH3thG2TSFsD4=;
-        b=CNgCi2wpUmRZojjGLmBAkNq3kvT8jIEYdD7CWiXrtrhenXBtPhEwT/M9hEZn1kvMc4
-         Q1YYY4y5/4ONbFM3lr3p/+JSMQdX7g/jwcaopeVq22+uwPc4BIq+mYBNcKgSLkd9O+Pf
-         Wfk6b+CxlMhJOopRH0O/mCUOwfKVTnNE/i2FhEFEWps4riOauiKq+gClfe6CEev62wgl
-         9CdWXPaCdau9vVfE4XcVo4ulxW+wQtMaIgc8OEoXl6m6sYRKCu0RFd95ehVO003Y7aLV
-         m2lgtKuhkixUv9V+j3Zb3aIP2J7hrfXwtmePsUPhacHy3ABOb5IZE9+ds8vev+e4cJ/h
-         AEYQ==
+        bh=4VV1dTykEhoT9nZ9CwTmUeuc8Dm5mUMbxnCuJKvSQ9M=;
+        b=PowFAQPTSvAo8ZIZLmJrS81YbkAw5dOH3HcnYHUwdvh/HdVzMUI4np9voemjs3OVN8
+         +r+29aWlyTzMptJ7L/2fYqZoNo0w3tkGfkTaoZ5UuyMhxiPcJQEgWbgJQcYKAqRqLL24
+         ReNzvFVUPDdJYcrY7IjUUtXmd6vK7QPmZoYV5igzFJDj6eCwrRdbA40lgiluiGxRrmSw
+         vFI6D6yusp3vjSb8Ih/SHpVOGvhvcgYPiGXHrXuZJpzGvduX+8VtE/OskzCawE3aEBBY
+         LDqMFEo3jaC8BW5eV6zX2r4fTIbFPjy1a1TZBWwCZSTpbZPgPK5FpGIgpSHksH7I3ErZ
+         RShQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723120135; x=1723724935;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723120365; x=1723725165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0FdOeou9MfhtoDpBtONpO0k3RoBpQmdH3thG2TSFsD4=;
-        b=tzke7E/hCCQvd63Tm51o6CZE+SaxBHiPa9HTfxf4bJoHGccnkfBrRDpvfDT50lzcU1
-         9KrZBi8WMkR0Jxu8he5x/8gMnD0M4IW4FeM27MDeqnVnaJJZ3q6hv7VroT8BcHgxXMOA
-         jgvw4tHdbo3HTDVP3AzgiHI4gTUK4KzHqvXYW+WR2UHJY2hlknTzFehc7Xewic0zaq7Z
-         lUdxkxKU7eanEH8/CPFWzwjePoN/vdK5StmjRAv2AiPxQSPSyVZ9l2TT4XmQGgELEk9d
-         QrzYNbg24swbn+86DzxJjgFZWfaXMeZwspF0TjFqb4/ygvh1XE+vBhYwCbhmATU1hPCQ
-         HTIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlmvdHBiLdz6D2gxhDIAj3SlACCXtRxRjPKCYns03GqoocQwZpoqeD2otxHAbLx5C5eAR1/oY82Dc7aZNV5+S5ErYqZtgjd7qTmGiIb/+A8vUQ22RUiGoYoPI/hR3oI8gRKc9JjaU2MQsphd835j6ZQAnHdTgXil0DHdAv8rO/UkQJTnPM
-X-Gm-Message-State: AOJu0Ywfr/J1nQ2CiFBA4XL9EaYnOSJf3J4GY9gjPgb0489vQzHsofom
-	jdusNinoIiob9JcLYmHqZy2PQbIhvi5mw/6jZN2sajojB1SRi+Jp
-X-Google-Smtp-Source: AGHT+IFlI/nsaAsoAwlZ930o2MviWWEEUgxZQpRbcm/HigNXs4xBllGLYD/zd0E0rXPSBOqj+jqbQw==
-X-Received: by 2002:a17:902:ef10:b0:1fb:94e2:5643 with SMTP id d9443c01a7336-200952248e8mr18880575ad.12.1723120134582;
-        Thu, 08 Aug 2024 05:28:54 -0700 (PDT)
-Received: from dev0.. ([49.43.168.245])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5905f64dsm123258585ad.126.2024.08.08.05.28.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 05:28:54 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jain.abhinav177@gmail.com,
-	javier.carrasco.cruz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v4 1/2] selftests: net: Create veth pair for testing in networkless kernel
-Date: Thu,  8 Aug 2024 12:28:47 +0000
-Message-Id: <20240808122847.25721-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240807182834.25b8df00@kernel.org>
-References: <20240807182834.25b8df00@kernel.org>
+        bh=4VV1dTykEhoT9nZ9CwTmUeuc8Dm5mUMbxnCuJKvSQ9M=;
+        b=bgT43rji0zjvaix7IksgytcxsY9uJKBhjewFD+Bu7pFhmlr58fZMotfAVwhL6uXfeU
+         s4cWCRVUUGM96nLXfWIQ6YMBIMIM1EKCouHk6ca4i7+hRuHF8m/HwW+OwC7G6G3vKmh8
+         LL4SM8n7tN0nlCefTJxXL6HrFu7CGV8PuIgfpMG/ZZdyU61gVvZIfB3v4FltFasRO1Jx
+         muenoAOBL573+njhemnXk9V3dWoJMZxuvc7x0Sgytltaeze3JBLYXYLW7mimJO7PDyQV
+         tBz24hlQqp0d528xqN3QeVHiHdSpkZC35VQ79eDfqmuCImlz3ak4FvH/Q7vTDj6+eeeX
+         nRQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjnBfAUWJDEimTka8baJRt9XMIXkb9e4Vp0s4caRemyVT6BzQuFxfhUzJoBqf3v6oc+3tUOgJYLOo6@vger.kernel.org, AJvYcCWZChc3AXZXNr2RK/PgbNVyK3lABBus+TbbY34vB157VKlVAvA16hX6oAdcbL8mBLY0G0EFBieU@vger.kernel.org, AJvYcCWxIUwOeyQAWbmvoKdif+1gl4wCqROg/R3Vzu5mqOkYeGqC/AHf0L9Uv21giZti0ezyV7+vqBn/NbAkMVbF@vger.kernel.org, AJvYcCXnnkOvM5B7NWlU8Eeknl0JaSJhMqbGlU5GWWTIl5sVXCawXAwFc9kvyi2iMG207r9PuRQR6r70n6rx@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq5FGYZV4RAtco7vxDFoX6zZLRVnpfJSacXJPvRHPVKzyrRYfE
+	UN35iS5p0wGw1cvemw+rsobIMpDVFIFqXB/rsmeqtI+xCuLALpJstBuRWBPWUCY8fLzQBpCiN+B
+	6QmB5/DiytDTSqLCfsjwu9xa6kb4=
+X-Google-Smtp-Source: AGHT+IFUNX1ekCclzfjH7BCH130vbtHkmXnzNDQGQNHgUQtZNFLCYl0pxpBbwHki1DFA7Qhthd0swzZQZh7Gam147QY=
+X-Received: by 2002:a17:907:7f9f:b0:a77:cdae:6a59 with SMTP id
+ a640c23a62f3a-a8092016903mr164012466b.21.1723120364320; Thu, 08 Aug 2024
+ 05:32:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+ <20240805101725.93947-2-herve.codina@bootlin.com> <CAHp75VdtFET87R9DZbz27vEeyv4K5bn7mxDCnBVdpFVJ=j6qtg@mail.gmail.com>
+ <20240807120956.30c8264e@bootlin.com>
+In-Reply-To: <20240807120956.30c8264e@bootlin.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Thu, 8 Aug 2024 15:32:07 +0300
+Message-ID: <CAHp75Ve0SVSzM36srTY7DwqY5_T9Bkqa0_xyDC2RzU=D1nsTwg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/8] misc: Add support for LAN966x PCI device
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, 
+	Dragan Cvetic <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
+	Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>, 
+	Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 7 Aug 2024 18:28:34 -0700 Jakub Kicinski wrote:
-> That's not the right syntax..
+On Wed, Aug 7, 2024 at 1:10=E2=80=AFPM Herve Codina <herve.codina@bootlin.c=
+om> wrote:
+> On Mon, 5 Aug 2024 22:13:38 +0200
+> Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+> > On Mon, Aug 5, 2024 at 12:19=E2=80=AFPM Herve Codina <herve.codina@boot=
+lin.com> wrote:
 
-Thanks for the feedback Jakub. I have rectified this and while at it,
-I tested using vng on a network based kernel and found another issue in
-veth removal logic. I have fixed that as well.
+...
 
-Please kindly check the v5 series here:
-https://lore.kernel.org/all/20240808122452.25683-1-jain.abhinav177@gmail.com/
----
+> > > +       if (!pdev->irq)
+> > > +               return ERR_PTR(-EOPNOTSUPP);
+> >
+> > Before even trying to get it via APIs? (see below as well)
+> > Also, when is it possible to have 0 here?
+>
+> pdev->irq can be 0 if the PCI device did not request any IRQ
+> (i.e. PCI_INTERRUPT_PIN in PCI config header is 0).
+
+> I use that to check whether or not INTx is supported.
+
+But why do you need that? What happens if you get a new device that
+supports let's say MSI?
+
+> Even if this code is present in the LAN966x PCI driver, it can be use as =
+a
+> starting point for other drivers and may be moved to a common part in the
+> future.
+>
+> Do you think I should remove it ?
+
+I think pci_alloc_vectors() should be enough. Make it to be the first
+call, if you think it's better.
+
+> If keeping it is fine, I will add a comment.
+
+
+--=20
+With Best Regards,
+Andy Shevchenko
 
