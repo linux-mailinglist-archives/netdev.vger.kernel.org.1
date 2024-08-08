@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-116831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E21494BD61
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:26:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9543894BD62
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1CCF1F2392D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:26:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4582B2304B
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F0918E033;
-	Thu,  8 Aug 2024 12:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1B318E039;
+	Thu,  8 Aug 2024 12:25:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BD818DF79;
-	Thu,  8 Aug 2024 12:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BEC18E029;
+	Thu,  8 Aug 2024 12:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723119934; cv=none; b=uIXU37mDKzTIfYFa3xtEgG8AeWHquBzxxGWdl7qRDVCLjTlDhiOwDklfqKI/wLeZMuhEcuvDoB9+GW8mt8t8bNVVCQ9je3taKHwI/XSMolwS9S/UeB8CLaSyuw8iTlzSXQPqPX7Nt/B5qSgDec+QDqoAXHPkTw1MESB8GyxU44w=
+	t=1723119934; cv=none; b=MNAYjya55aCW7jCbp/GnSkMxQHhJZs5KmvnHJRf2ZKZxLYFR1VKomqEGcxdWoVZ678Kj4jZqFIAJgpas53kZgNpBcqOpFzreX/comuJsaHbY4BThiI9qAiBwj7e9Dmg4iwDiaIUbmQKt8+2gzUjSJuzb5p9u4u2i9XON2HY1ogU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723119934; c=relaxed/simple;
-	bh=21NE45D05kd+63ejuqgp1rSDb0fTwjxyjDDlDLdKAD0=;
+	bh=uNPMmyO2gJaRHLVOL+/dVDGM5xdsI27/SpA8OMMZpis=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GGAOKu1pvkOQOPhgwgns63l+eafqWUOJNDB/Pt08zj9++RbkNI8h/dOf8VuvfMJHwW2+Q8dr6fMpzpC2VYuyO9RDs5sxBCBLAv9wCaA0MboqRsIQQ22JH5Tq3X8DDIMFk9poWlkXuJSe1vrSzaL4XJx54XPuaTLhBL/s0hrdrv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+	 MIME-Version; b=CufOQ2xcRQjpmL9SrxS1+2Jws0gCA/WxBM0cyQw9e2KvPm8GhoEvYhacu5131/DuvXIMzGHKXUIC63oKm4AgzrHpebwhxllOv2bvotHJrQhfylpXZFh9jOKdsH7BgCVdLsk4L8cv9fd/TZVXuTWSFjiSzntQncYyz3q0tvSepEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a7a83a968ddso101058066b.0;
-        Thu, 08 Aug 2024 05:25:30 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7aa086b077so88700766b.0;
+        Thu, 08 Aug 2024 05:25:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723119929; x=1723724729;
+        d=1e100.net; s=20230601; t=1723119932; x=1723724732;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Oetxee9IMfZJjcpz+QqY4cG+Xmvizi5jKcfwfQxazyM=;
-        b=IvwtdGR+KEV89yp9EiVqmHyoRTWP64BMJ1yE57IfQnfs+q5yZn8TLy0m8Pn8nV9Hy8
-         J/9H2YXsOWOPbLSQtmcJV4M1dmWD2rNYMlGM4XhSoy0AKBhfnr+eYmi0JHNN8uv7Gw6i
-         O+DW4siqPlRMoewM1QJl0yYml9K90usyRi6UkcLcPS5Ccty2uxStBrcPXgHdPf7Sl2tP
-         pHniLkQyA+UPIM+ijhzr6ee+poJfTiNrp8u1qXgVR3PJmntdLzy9kQE2nb1XqsaUoTtu
-         RADexqIRcXjM9lKfbRd4JRVS4fXYB5pWyIrIyBah1u/E2UzjeonK8KJAV3RBV1+QtOvA
-         lSAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUEYrfKxVnqBkp4k4S1jTrXkj6JfYr3+l7TSbzzBwz4vKdsRF2nF+rQMmHbLQVYhS4r0RUKXcz624Nkqnns4bBBPjfy2gBebIC+5WtfVjO9GUnFxdwPndr692TpI6y3VswL9lMd
-X-Gm-Message-State: AOJu0Yw4a1nbTRPttrK9EPwmxd6y5HdzG+1xNAH9Gl7yK0Mlfle/n6oB
-	Hdz60USB6Et3iFMG5n0teTgDgiPhxmaQo83FdGKBw9pkkJflD0Gx
-X-Google-Smtp-Source: AGHT+IFeyf71IZdc5qIXVp3SwJjPT4RpTtvIOqRQYR0rG7xzU0sBIJ8uS8MHh+0md/VzgBPFt6V6vg==
-X-Received: by 2002:a17:907:e698:b0:a7d:a29e:5c41 with SMTP id a640c23a62f3a-a8090dc0e7amr111218866b.40.1723119929307;
-        Thu, 08 Aug 2024 05:25:29 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9ecabb2sm732411166b.214.2024.08.08.05.25.28
+        bh=9KhhVYpxynjfN7h4t5a1WXRfToCFw5V8n+fHSGGgbFM=;
+        b=V0IxGmnWfeuy9qZDlW7gakVxPGeHDMkdnEmp3fErbgdoNurLm/hAnQZVYIdy6gWtDB
+         UNOlc2gpVLo3zuX+F8YaA4vedY5Nz/pmQEkn5KdYDJS2EBuog6NYsGIyzVh0k15FMHpW
+         aq7Lq9b/oq4t1nk6LmumLfRsjkBlGRzKgzTZGl8FvFq4b7aWl8XsEZP6bTIouPW1M3Yh
+         U7shGAL8c1YQ6MX7SZDheBC1Mm+eaIrdpDtg5sMjFfrhabOAODdaOjt+4IoAA9HkeLvK
+         iLOdKQenWBIgUndPC59AtZ5VWnjifh8AEXABB1bNapeK3I0/okPmrNog6PKt9cnUieFX
+         bXjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVZr3Gq6IYgqm8oF0jycTlPqbR5eANoOcdjNWyxi3bPS3RgVGQKPmocfSyUOPL+wjLjj6L7QflIAq1X1SM+iE3U80w7cemdinTgnRYItlzk74Gus3XJauwWrKPlz5vEIgX971em
+X-Gm-Message-State: AOJu0Yx/xUGh0ghefPUpFo8T3+SUS/SiDS57Xi9Q45VlDUJwOtazPGXm
+	cNBP4frfwgCgUD93g63zrkgrAffA6eQJXZvXDTRqhVu6rAco1d0/
+X-Google-Smtp-Source: AGHT+IGE0v3w8mV3R26kohgNkIzIE2idRulRz3a9k+sHNowvjgfs8zGyd97KjnKKs5cGdjHupRKAGQ==
+X-Received: by 2002:a17:907:f756:b0:a77:e48d:bae with SMTP id a640c23a62f3a-a8090c6b6d6mr133994466b.28.1723119931268;
+        Thu, 08 Aug 2024 05:25:31 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-010.fbsv.net. [2a03:2880:30ff:a::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9d88741sm740044066b.150.2024.08.08.05.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 05:25:28 -0700 (PDT)
+        Thu, 08 Aug 2024 05:25:30 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -65,9 +65,9 @@ Cc: thepacketgeek@gmail.com,
 	linux-kernel@vger.kernel.org,
 	paulmck@kernel.org,
 	davej@codemonkey.org.uk
-Subject: [PATCH net-next v2 1/5] net: netpoll: extract core of netpoll_cleanup
-Date: Thu,  8 Aug 2024 05:25:07 -0700
-Message-ID: <20240808122518.498166-2-leitao@debian.org>
+Subject: [PATCH net-next v2 2/5] net: netconsole: Correct mismatched return types
+Date: Thu,  8 Aug 2024 05:25:08 -0700
+Message-ID: <20240808122518.498166-3-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240808122518.498166-1-leitao@debian.org>
 References: <20240808122518.498166-1-leitao@debian.org>
@@ -79,67 +79,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extract the core part of netpoll_cleanup(), so, it could be called from
-a caller that has the rtnl lock already.
+netconsole incorrectly mixes int and ssize_t types by using int for
+return variables in functions that should return ssize_t.
 
-Netconsole uses this in a weird way right now:
-
-	__netpoll_cleanup(&nt->np);
-	spin_lock_irqsave(&target_list_lock, flags);
-	netdev_put(nt->np.dev, &nt->np.dev_tracker);
-	nt->np.dev = NULL;
-	nt->enabled = false;
-
-This will be replaced by do_netpoll_cleanup() as the locking situation
-is overhauled.
+This is fixed by updating the return variables to the appropriate
+ssize_t type, ensuring consistency across the function definitions.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Rik van Riel <riel@surriel.com>
 ---
- include/linux/netpoll.h |  1 +
- net/core/netpoll.c      | 12 +++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ drivers/net/netconsole.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
-index bd19c4b91e31..cd4e28db0cbd 100644
---- a/include/linux/netpoll.h
-+++ b/include/linux/netpoll.h
-@@ -64,6 +64,7 @@ int netpoll_setup(struct netpoll *np);
- void __netpoll_cleanup(struct netpoll *np);
- void __netpoll_free(struct netpoll *np);
- void netpoll_cleanup(struct netpoll *np);
-+void do_netpoll_cleanup(struct netpoll *np);
- netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb);
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index ffedf7648bed..b4d2ef109e31 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -336,7 +336,7 @@ static ssize_t enabled_store(struct config_item *item,
+ 	struct netconsole_target *nt = to_target(item);
+ 	unsigned long flags;
+ 	bool enabled;
+-	int err;
++	ssize_t err;
  
- #ifdef CONFIG_NETPOLL
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 55bcacf67df3..a58ea724790c 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -853,14 +853,20 @@ void __netpoll_free(struct netpoll *np)
- }
- EXPORT_SYMBOL_GPL(__netpoll_free);
- 
-+void do_netpoll_cleanup(struct netpoll *np)
-+{
-+	__netpoll_cleanup(np);
-+	netdev_put(np->dev, &np->dev_tracker);
-+	np->dev = NULL;
-+}
-+EXPORT_SYMBOL(do_netpoll_cleanup);
-+
- void netpoll_cleanup(struct netpoll *np)
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	err = kstrtobool(buf, &enabled);
+@@ -394,7 +394,7 @@ static ssize_t release_store(struct config_item *item, const char *buf,
  {
- 	rtnl_lock();
- 	if (!np->dev)
- 		goto out;
--	__netpoll_cleanup(np);
--	netdev_put(np->dev, &np->dev_tracker);
--	np->dev = NULL;
-+	do_netpoll_cleanup(np);
- out:
- 	rtnl_unlock();
- }
+ 	struct netconsole_target *nt = to_target(item);
+ 	bool release;
+-	int err;
++	ssize_t err;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	if (nt->enabled) {
+@@ -422,7 +422,7 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
+ {
+ 	struct netconsole_target *nt = to_target(item);
+ 	bool extended;
+-	int err;
++	ssize_t err;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	if (nt->enabled) {
+@@ -469,7 +469,7 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
+ 		size_t count)
+ {
+ 	struct netconsole_target *nt = to_target(item);
+-	int rv = -EINVAL;
++	ssize_t rv = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	if (nt->enabled) {
+@@ -492,7 +492,7 @@ static ssize_t remote_port_store(struct config_item *item,
+ 		const char *buf, size_t count)
+ {
+ 	struct netconsole_target *nt = to_target(item);
+-	int rv = -EINVAL;
++	ssize_t rv = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	if (nt->enabled) {
+@@ -685,7 +685,7 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+ 	struct userdatum *udm = to_userdatum(item);
+ 	struct netconsole_target *nt;
+ 	struct userdata *ud;
+-	int ret;
++	ssize_t ret;
+ 
+ 	if (count > MAX_USERDATA_VALUE_LENGTH)
+ 		return -EMSGSIZE;
 -- 
 2.43.5
 
