@@ -1,87 +1,95 @@
-Return-Path: <netdev+bounces-116943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7BD94C22C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:59:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB3D94C284
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D06C1C20E1D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:59:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C47C6B275A2
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A67018FC93;
-	Thu,  8 Aug 2024 15:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A1318C925;
+	Thu,  8 Aug 2024 16:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KoEQo8pM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EG2Bue/v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7746318FC8C
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86AC646;
+	Thu,  8 Aug 2024 16:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723132794; cv=none; b=hSba9i3U6L0qPbJjOdFm/EA7ZKb+THOdS8Hd/YRj17HFTsLWC0NcGwuxLVsUG6/AjMLOvA+Yyk1sB6CZwNSnJb28SUNN61t04zCQImgMAaa98N79wtWD7kWcMVc/yK3J5oflACkRadicQrmQlGL8DGxjUNQycGhJqccx/JAOR6Y=
+	t=1723134037; cv=none; b=rxQx0/oYtJib19wjsBm+s9pnrtBJC8ZY4boOtlbzlpEv4BKZoJsbn0YIpPW191DTUNdEqwebeO4XWsVeFYvMMFsD42/ZElxL8OaGzpiq+JrsAEKol8UTs7UAdrr5Sz6bDexvBpiddabgJep6R0rB6lL8r/id4baZ7FUD/peB2ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723132794; c=relaxed/simple;
-	bh=kO+VSao6Ch3m6waMToU2WPWtR3u4LtsSf7Y7Oiz0nd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h+idNSDI4wRx+A+J4HGG/5mZ+z+BPcyJHyDQt/hpgAXIDkzxEMTmjmUUoFCLWpWOyCAqOpc68zWpK2K1OniovvHYAGNuGmLy8XB+Wl6xiaVza7V+sboF5yHwcwKGtjpifUqEJM8JeI0nJyG/U4eG1egzW8VZ7SMhzJNhRpF1jr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KoEQo8pM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5153C32782;
-	Thu,  8 Aug 2024 15:59:53 +0000 (UTC)
+	s=arc-20240116; t=1723134037; c=relaxed/simple;
+	bh=/F9CzbDaHZlcXmh2nFEN2EBENa7yJncXVXhwq9kWCSg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uQR/x6ij3i6s2x8w+0ThzWpO8KOOkX7kBtn9+KZv8xAi6XZBEgI86jdMnQr/K6WfkMW2pDgP3Tosl15pVZCU7d6wtfgUrfU17jH8u+RoMC+pt+ryEHeuwwGZIRajuNBhSY8QMdZm+6NQQpYkTDRk3zXlQU0jd9v87tx8anx2X/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EG2Bue/v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EB66C32786;
+	Thu,  8 Aug 2024 16:20:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723132794;
-	bh=kO+VSao6Ch3m6waMToU2WPWtR3u4LtsSf7Y7Oiz0nd4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KoEQo8pMalmr0x1TNztKvpfQXAFoOZYQgcIejBIxPOZw8RACGktDwZjhLESzjUaWG
-	 kCaBcUHfdm9W9vR+jlmOB7SiWG3fu9Y18y/uGrZyTPL8kmQ1SL2JQDs6kYz4CL7bdr
-	 v050O1/vPo2nz/y6a/JWEJBZiOgIKy5rgq6BMXMrVLMk0BLJbW1//xvxhY10Q2/xnE
-	 k2Vea7h1jQFSXq6OQEuA6o+NeYvUj+Ji9zJYSALl7dqy17evXN4IR4j2/OFgWzfGuN
-	 6gkbLYWqQ9DbMeIMi7c+DwN7c/ur/mVMOKvedCelVKjYZK5duLNj0QlPsZzcY+muW6
-	 ONOlDza3mAOZA==
-Date: Thu, 8 Aug 2024 08:59:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Dragos
- Tatulea <dtatulea@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
-Subject: Re: [PATCH net v2] ethtool: Fix context creation with no parameters
-Message-ID: <20240808085951.15a522f2@kernel.org>
-In-Reply-To: <20240807173352.3501746-1-gal@nvidia.com>
-References: <20240807173352.3501746-1-gal@nvidia.com>
+	s=k20201202; t=1723134037;
+	bh=/F9CzbDaHZlcXmh2nFEN2EBENa7yJncXVXhwq9kWCSg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EG2Bue/vE/dgXHELWVDPsC/Fh8x0u6VNSoKtRFExlOVYaaMifUFJvfoZtV+8iI3i3
+	 3HI2gPNEzEJeTv2W6ghXmYkoOgB+B2oMF0lFaFI8eFPfGXkgkeQfpOP3qLZ1AXPQRK
+	 XDtQ1ZBTZcvYn/cUDfTZHX+yDhWUd9mYkFXrYN7K0C3BIdNl5Rv0LpsEC5bdUg10ib
+	 YBbH2m4/VVZSVzUP8r7IAVgqf4Qbo4ADiLF9MgNesb5WPFPZyy4GSAfLUAcs4uuh9c
+	 4YEb2djkjpsx7IMMe7CNEzLdCpeKRhJJL06Fk+miC5DeSidnt2hEq1A9oUY0YtScxo
+	 gJcn8FoixvySA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5F2DF382336A;
+	Thu,  8 Aug 2024 16:20:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: bcmgenet: Properly overlay PHY and MAC
+ Wake-on-LAN capabilities
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172313403624.3227143.18053785706101144239.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Aug 2024 16:20:36 +0000
+References: <20240806175659.3232204-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20240806175659.3232204-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, opendmb@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
 
-I'll make some minor modifications when applying..
+Hello:
 
-On Wed, 7 Aug 2024 20:33:52 +0300 Gal Pressman wrote:
->  	if ((rxfh.indir_size &&
->  	     rxfh.indir_size != ETH_RXFH_INDIR_NO_CHANGE &&
->  	     rxfh.indir_size != dev_indir_size) ||
-> -	    (rxfh.key_size && (rxfh.key_size != dev_key_size)) ||
-> -	    (rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE &&
-> +	    (rxfh.key_size && (rxfh.key_size != dev_key_size)))
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-We should take this opportunity to remove the pointless brackets
-around key size comparison. Same clause for indir is not bracketed.
+On Tue,  6 Aug 2024 10:56:59 -0700 you wrote:
+> Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
+> while others might be only supported by the PHY. Make sure that the .get_wol()
+> returns the union of both rather than only that of the PHY if the PHY supports
+> Wake-on-LAN.
+> 
+> Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> 
+> [...]
 
-> +		return -EINVAL;
-> +
-> +	/* Must request at least one change: indir size, hash key, function
-> +	 * or input transformation.
-> +	 * There's no need for any of it in case of context creation.
-> +	 */
-> +	if (!create && (rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE &&
->  	     rxfh.key_size == 0 && rxfh.hfunc == ETH_RSS_HASH_NO_CHANGE &&
+Here is the summary with links:
+  - [net,v2] net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities
+    https://git.kernel.org/netdev/net/c/9ee09edc05f2
 
-And here if (!create should probably be on a line of its own.
-Otherwise continuation lines don't align with the opening bracket.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
