@@ -1,83 +1,76 @@
-Return-Path: <netdev+bounces-116752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F1B94B982
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:13:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE3F94B996
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E42B282B9A
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:13:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D5711C2102D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B561898E1;
-	Thu,  8 Aug 2024 09:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4518146A62;
+	Thu,  8 Aug 2024 09:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTQv1zwO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bt17wLI5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028A184DF1
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 09:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8A81465BE
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 09:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723108394; cv=none; b=NHNdfn+3Op4lrkHlb6tMU4CHuXek4wwbvK9WKDsKXBbo3FEtWNf33ZdF3RRujnYmzzb0TR+hgvYIF8grYD2UVs9Omx/rYk17HMMDeFKcQZAgU7DRnATlaxJDw3mgpT73B5zgZeTrLube7Uz/DsVaB7vSn8Wr1gopPflcR/2oATk=
+	t=1723109007; cv=none; b=cNLlv99zQ7b3RYUmjIFrRNrFfy9ozIwbvoCUqEZw0YwsRtZjaMWPavODf94bMj18fcRH7sWQ2yxmKgE9hTZoZVBNm3KOgP2bbQfrF8cOLWJqb906N4EPfoB8ZxvQAWOkM09ZZGB36T39cCrhoPKkSlXvnC9iXeEF/zvjaKdnb3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723108394; c=relaxed/simple;
-	bh=lfGCWziQmTXbafbuX+UYpXVp1VnfckN0oeWBv1XTfTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rB6SUes2UqXBOMC9qljdjC8Gbp+g0YcvcTVs0KoMCgxDrmzNj6gPFgZwq3WDqRkO48XNpBgRXUomL2ozaATjjpraBep1YqBEnICaLF2s/9RWcdKey4zy9CFe+ik5bklVX9A03FVz/c+m7zSaPxvfunnsPFXr0AdjOd1JTIGA0Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTQv1zwO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0422C32782;
-	Thu,  8 Aug 2024 09:13:11 +0000 (UTC)
+	s=arc-20240116; t=1723109007; c=relaxed/simple;
+	bh=iX1EZO3yB15rqCO9EMHQKda+8yUGAiCcnTG3M9Qyztc=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nqUZ1YLHHL9UnvMX/g4YERYFBRDgKU0sBM60JwXE6VjpCXY3I7xMST4F4x+eHjtaFnUeFttRwBFpUS6RQ+oyWoViFsFMzMkwMIR5eehH329di7sKT91kryQePm+CMfNRNQMJKtaVKugaf/6cIXLXz7M5WDzcoAwj8wYVd/K/2HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bt17wLI5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA9CCC32782;
+	Thu,  8 Aug 2024 09:23:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723108393;
-	bh=lfGCWziQmTXbafbuX+UYpXVp1VnfckN0oeWBv1XTfTM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PTQv1zwOvCYGHr8KqXsVDcUTNzy4C0vg5uVJgjPKFDYc4/6xrT76dtTq9EztIcQNG
-	 b/yE6NfBcdENza4Ay0JEVffv7SjmagadXlazU0zEZmBFDriTDbucB/UJIxMsy+nJnP
-	 o1EBqMgQM42cb78AIR2iTHTPFzvF3IEj4TH2WVKQFzqwVYxCYGfuu5KqhqmP+Y33it
-	 m2fJAzu4wn8Aw81+PUBa/hq96k4M8EiUHsnFCZXb4YhXoEAEeEukd8VU7qvr92c+a+
-	 1V70eBHWp3pCsjSGcvobR5UyxEuQnxzCuvveu6pM6WGIsaYUEul6wZEiYlc0Gp6sNX
-	 VX8RhcLs7FVkA==
-Date: Thu, 8 Aug 2024 10:13:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] docs: ABI: update OCP TimeCard sysfs entries
-Message-ID: <20240808091309.GF3006561@kernel.org>
-References: <20240805220500.1808797-1-vadfed@meta.com>
- <20240805220500.1808797-2-vadfed@meta.com>
+	s=k20201202; t=1723109006;
+	bh=iX1EZO3yB15rqCO9EMHQKda+8yUGAiCcnTG3M9Qyztc=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=bt17wLI5ZTjvggrJW8j/SRhYSu7B2gtrSvaMInrouW025Wn7XladRSdmxvEob2OvS
+	 T4tIJPbE5+0MA4GM2Ayr7/DnCpEgwipV8lpsFo9nQ9ilCHJO5aB0ubR7dC5Zzhr6N0
+	 s4suCXQ2R/LrDBgLxYkGAL/OfZKnklM7iJnxbKDkJQjAyJkg2Owm69qoFm/jztCFwh
+	 MZddzNyioWOOPGVRfKhZhGs9fXZOCgsFAb4ApyB0Jr2qlHHntDtt7+GA38IEg2cQZj
+	 /V33K+puHZnth0eSXcARZdzDSv+Fiyp8k2KSzqq9xkMHFhBUocAu9z9+U5cwx+bIKc
+	 PRRaRc93M/wYQ==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 863A514AD648; Thu, 08 Aug 2024 11:23:22 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Duan Jiong <djduanjiong@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
+In-Reply-To: <20240808070428.13643-1-djduanjiong@gmail.com>
+References: <20240808070428.13643-1-djduanjiong@gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 08 Aug 2024 11:23:22 +0200
+Message-ID: <87v80bpdv9.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240805220500.1808797-2-vadfed@meta.com>
+Content-Type: text/plain
 
-On Mon, Aug 05, 2024 at 03:05:00PM -0700, Vadim Fedorenko wrote:
-> Update documentation according to the changes in the driver.
-> 
-> New attributes group tty is exposed and ttyGNSS, ttyGNSS2, ttyMAC and
-> ttyNMEA are moved to this gruop. Also, these attributes are no more
+Duan Jiong <djduanjiong@gmail.com> writes:
 
-nit: group
+> When the mtu of the veth card is not the same at both ends, there
+> is no need to check the mtu when forwarding packets, and it should
+> be a permissible behavior to allow receiving packets with larger
+> mtu than your own.
 
-     Flagged by checkpatch --codespell
+Erm, huh? The MTU check is against the receiving interface, so AFAICT
+your patch just disables MTU checking entirely for veth devices, which
+seems ill-advised.
 
-> links to the devices but rather simple text files containing names of
-> tty devices.
-> 
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+What's the issue you are trying to fix, exactly?
 
-...
+-Toke
 
