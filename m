@@ -1,85 +1,92 @@
-Return-Path: <netdev+bounces-116798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33AB94BC23
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:21:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 724BE94BBF8
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5387B1F223F4
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:21:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0B21B21A1F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F1018A6D2;
-	Thu,  8 Aug 2024 11:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0645918C34D;
+	Thu,  8 Aug 2024 11:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="D2YO23hM"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="wDObhFiC"
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.44])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5E212C7FD;
-	Thu,  8 Aug 2024 11:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBD418C32B;
+	Thu,  8 Aug 2024 11:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723116093; cv=none; b=GCQOhE5t1aIQNcenFWQf3Ttn/7Mpy5Bkphmd94AxTLRdkF/HR9kvqu9sPiFFLVCDHcVToZWVUJuePmc1RxREbrwpPzVNtN9+Gd1LRuwTPinIJBO8RZ1NWMBr3NHZt3YvgrEs8rn1KrIn5tlPw0/0d3yH3wQDlmC9Jw5tRC02cc8=
+	t=1723115309; cv=none; b=OqX0HfwSXjUVsgXdHRL0JhXuzaFCWBr5aJsvjhHMvpWyqm0NR76faUGR2Kp9AtpeF+VeLZNU12wONafNF86LZPVHWRo7CMk2OpVLABJPMyS0avtfKat+4MMxt0wdRaO3rCqwsFFiLBoVDEXS4ptisweAomhJHfBbI68LVXnQWVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723116093; c=relaxed/simple;
-	bh=WvKLrbLPtyPdz8DsDfZEWTqHSa/FHwwozHbEKXfZA+w=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=t/Undp9Vd7Xo9IBHrlh62FfUYOp/AAX2jq6S6olauQU1SgZdIAXC57PhX852WWSTR5WmXaoxfaCfvhpIdlIjg/9HSihnoZWVPQ3Gb3LI7B4kINzClmQeeMc+nCpNoUOGgBgUlECJE8Dyg0SlbJ7+oW7KBr8labs/hOob+kLaKwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=D2YO23hM; arc=none smtp.client-ip=43.163.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1723116083; bh=mciiCE8n/RMJG+duOZ5Cgc6TInq3o/PUTzIa4pY+guI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=D2YO23hMjcoCDogAWPVYR+snmvdBz6VHGj46ilxV0jJF7huuTfX/f2Mvz3a1dKZ12
-	 dDoDjbO4NCN+VORdF10g/ERhgXFXjm55aZlV5+i8PztSiSQhHB8oGafSHsusce8Vtr
-	 /Qssjcy7iDmJz1iXAkEcalbv/Ar02CblLPxK8uZ0=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id 200226FF; Thu, 08 Aug 2024 19:08:00 +0800
-X-QQ-mid: xmsmtpt1723115280t566hic8d
-Message-ID: <tencent_5B8967E03C7737A897DA36604A8A75DB7709@qq.com>
-X-QQ-XMAILINFO: MyirvGjpKb1juxRMfdrWAiJwNzMYX353FdSsj78E7OkuZFUn3hi5/W6fI+4SLR
-	 l9rv3pQWiKGVuMBpkmXs0AsaC+YF6Cwjkfc2n1cvkhTCsox2O+x72jpQzngZOiEhHKMWjIZDjgcn
-	 cjXiV+Yua+FU8rd6LOV4yOZdSTU3xf68DYWW1fY5mN8JhpaId12vg0oN8NeRbx9z4hMnImA053ot
-	 hdVlkJOrxp6CjUej3yI1pdjRONLNnHKgN/wHlJ+nfTfRg1ztZHna1LPCBTQFuTy4XuqQArNHgq9x
-	 kVTpAFuLI5cHdQU81EiSet1IxX3NWGYr2nf0mNn0zVzl2y+98xrjmbwa1ppL8JOB7nQVppOSnQv/
-	 gaZqD+sueV/ZILAcEc9zUgzksE23ibega473tXglEPdqo2vqxsjYn7ehfoEO3KXXmEm5bWgw1+ut
-	 1O0GzJJICUYUzExKMt8VIISlQfaUg6t3IlZFf4ObLxI07BqYpeKXvmTe0Qe70F9z8iNq8kRERbxx
-	 5yx9fVF1XRZYD/TpfYmRDF2BkT9jJrA2f0z6xXF0LCw3xU1HsOsdRqjhImqUAj35nlcIToqTYV7j
-	 gFvBwwDw4rfbPKDtejKfH8d/2d1vyrDourR7eWzBazGfuAu4/hdmn2ybxTNTenPKMPjJTz/mCsoi
-	 w/HvqKskDLpbA8g3hW6cGpDWY42BCT00oq/W0j4mx+K7cFCajr6eodcdW1LGRxbh2SInh7mk1kbr
-	 rI8GVv4a/KKsh8wECOwiqWitmu+jW9MQQOv0T604od25QIdBVkwF2fPITUV07KMST/nik5Mj7/Ww
-	 VluLOWvn5gJK4d4UgTlggk9PH8FIFzel1C9ZSV7eWGy80/hEC/aUehYszew5yCIoH2x3sO6nth8V
-	 UHS9xv0wtbSBJHxik8z/rcGuf199cZngXhCZ36Wl6L9ztnt+J86uqamXRzwp+9v83No2o53JFbv2
-	 +UxMgVGR5mCBO7pWLARiE0+riyzdHup5ww12JhDKw=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: o.rempel@pengutronix.de
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	kernel@pengutronix.de,
-	kuba@kernel.org,
-	leitao@debian.org,
-	linux-can@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mkl@pengutronix.de,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	robin@protonic.nl,
-	socketcan@hartkopp.net,
-	syzbot+ad601904231505ad6617@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net-next V2] can: j1939: fix uaf warning in j1939_session_destroy
-Date: Thu,  8 Aug 2024 19:07:55 +0800
-X-OQ-MSGID: <20240808110754.1276329-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <ZrR4fsTgDud3Uyo0@pengutronix.de>
-References: <ZrR4fsTgDud3Uyo0@pengutronix.de>
+	s=arc-20240116; t=1723115309; c=relaxed/simple;
+	bh=dkHrlZ8cnZIRu6+k/09dceV4xJqjMLZ57uoKcrIjH0k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IGnWP0DN4ObpM+6Z5gfgPG49cIgnoRFRf75qpYOwAepRINN0D46MzhjGExfl98nWlwVmn4OO7h1VfFGi1XvX6gvU2BjEHKqBUnUA263JkYnsviiNAVhOKKhyqYVyfZtITPtK1xbjl4Z0R7ak9zjUHugDt6fkM43b5Ozk2Eh/Ir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=wDObhFiC; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 478B85hD121883;
+	Thu, 8 Aug 2024 06:08:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1723115285;
+	bh=unFGtIaLV852e7NhQ88rKDTvf4aXBnMYM/ojLpB9pCg=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References;
+	b=wDObhFiC9wTvQcNl86pIimGk2BZ6Dce6A9GldXrb2vxo9T0O1gp3EyOs0gvlrmWIa
+	 OE9/LYPCsZohWCS+hHALn5Z/RKbEAPLgytgZuuL4vftnvo8krD+lh3s+VQG0147anb
+	 RBH1ZiIkX4qH2de91Td1Ut36aCEvMmMrK9wzfzWw=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 478B85Qa017878
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 8 Aug 2024 06:08:05 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 8
+ Aug 2024 06:08:05 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 8 Aug 2024 06:08:05 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 478B85vu087519;
+	Thu, 8 Aug 2024 06:08:05 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 478B84Kw011988;
+	Thu, 8 Aug 2024 06:08:04 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+        Diogo
+ Ivo <diogo.ivo@siemens.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Simon
+ Horman <horms@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+Subject: [PATCH net-next 1/6] net: ti: icssg-prueth: Enable IEP1
+Date: Thu, 8 Aug 2024 16:37:55 +0530
+Message-ID: <20240808110800.1281716-2-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240808110800.1281716-1-danishanwar@ti.com>
+References: <20240808110800.1281716-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,30 +94,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Thu, 8 Aug 2024 09:49:18 +0200, Oleksij Rempel wrote:
-> > the skb to the queue and increase the skb reference count through it.
-> > 
-> > Reported-and-tested-by: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
-> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> 
-> This patch breaks j1939.
-> The issue can be reproduced by running following commands:
-I tried to reproduce the problem using the following command, but was 
-unsuccessful. Prompt me to install j1939cat and j1939acd, and there are
-some other errors.
+IEP1 is needed by firmware to enable FDB learning and FDB ageing.
+Always enable IEP1
 
-Can you share the logs from when you reproduced the problem?
-> git clone git@github.com:linux-can/can-tests.git
-> cd can-tests/j1939/
-> ip link add type vcan
-> ip l s dev vcan0 up
-> ./run_all.sh vcan0 vcan0
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-BR,
-
---
-Edward
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 9dc9de39bb8f..c61423118319 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1255,12 +1255,8 @@ static int prueth_probe(struct platform_device *pdev)
+ 		goto put_iep0;
+ 	}
+ 
+-	if (prueth->pdata.quirk_10m_link_issue) {
+-		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
+-		 * traffic.
+-		 */
+-		icss_iep_init_fw(prueth->iep1);
+-	}
++	/* Enable IEP1 for FW as it's needed by FW for FDB Learning and FDB ageing */
++	icss_iep_init_fw(prueth->iep1);
+ 
+ 	/* setup netdev interfaces */
+ 	if (eth0_node) {
+@@ -1365,8 +1361,7 @@ static int prueth_probe(struct platform_device *pdev)
+ 	}
+ 
+ exit_iep:
+-	if (prueth->pdata.quirk_10m_link_issue)
+-		icss_iep_exit_fw(prueth->iep1);
++	icss_iep_exit_fw(prueth->iep1);
+ 	icss_iep_put(prueth->iep1);
+ 
+ put_iep0:
+@@ -1423,8 +1418,7 @@ static void prueth_remove(struct platform_device *pdev)
+ 		prueth_netdev_exit(prueth, eth_node);
+ 	}
+ 
+-	if (prueth->pdata.quirk_10m_link_issue)
+-		icss_iep_exit_fw(prueth->iep1);
++	icss_iep_exit_fw(prueth->iep1);
+ 
+ 	icss_iep_put(prueth->iep1);
+ 	icss_iep_put(prueth->iep0);
+-- 
+2.34.1
 
 
