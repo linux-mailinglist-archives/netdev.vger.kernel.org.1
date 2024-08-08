@@ -1,120 +1,282 @@
-Return-Path: <netdev+bounces-116748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DB194B94C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:51:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C7394B958
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FF8282874
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71BF91F21A7E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54349189914;
-	Thu,  8 Aug 2024 08:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3535189B84;
+	Thu,  8 Aug 2024 08:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="r9yfHUnp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NK8lQ3g2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DC625634
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 08:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B1D146019;
+	Thu,  8 Aug 2024 08:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723107091; cv=none; b=uQ9oYtndAaHoOT0YxXA6jZuRc+qVbQ50rB+mPIc2QHwToCwycregI7IMrrZiQ0PyRcIHESVd8Hxogc/a1RZLX3Wfk8fOsHBBjqiam8/37YZ/L0x0lvZxykkU0bTgDt7qc2B8oPSIKlsA3t1fQdhMMiM9DF8WjwGMOHCIk4yW6u4=
+	t=1723107238; cv=none; b=VIzTNjTBDLjd87R5sZbMcLNb2kq2wxzFvpB7RidJwW7CIviitYNP7RuzjyHbMYVaF7DcxqKqcfCRgjhyttjKPmlhdfjwbyM1vTKrLfNWhQIzoeZe3LpTLzeKaS+c4EYKqq3baGdC5bwQ86WsFM+fwmKyNGGDhaNb7Mcr06EQVLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723107091; c=relaxed/simple;
-	bh=OylNvV/2Jxg8HgS+79ZrnAuN8bkc8uwnAF60VfIODao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZwYDFU8affVMU6qIda37/cuqfG2vBUEenSt5+NU1BC/DOUTrYF0JBtMTFH1tROKlBjmeWjfiSx5UDgRgc2TURtTGdFFsFY5qW0skVq0CsNkQBImVDWX/HDCSv8hbT621vHbcPVxZv93NXf6UpL915qhXY8ZQRm/fwELOF1TPXHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=r9yfHUnp; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2eeb1ba0481so8638121fa.2
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 01:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723107087; x=1723711887; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wDZAVwW6W7U68HIAf2CDuICmRI1k9Gjd2s0qzMn5MdE=;
-        b=r9yfHUnpQ9YOr4fgdev2DvXWHVC4/FeXLrBAY30ZxY4/fi4kek0hdeT+7P9roJ0gZ/
-         hQxcQJ8ojdTPdnN6GUKB+FK43DXQLCZRFE1zxUd+UT46rrw1/oSLaVqsJ2HWYBUbY384
-         Z33umdU/OMWo+vZUYI9dbiJ/jY+T7qidLws9Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723107087; x=1723711887;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDZAVwW6W7U68HIAf2CDuICmRI1k9Gjd2s0qzMn5MdE=;
-        b=Uovc6NAzV4tB7NQzHVEmEV3DBV5VHqaWnMIHiVbrXoiVg4ylKM1BFoPxKiQ6N8fkb1
-         bKmlr52d25ryUR1CWoVAlkZHOdUvtQp/KPokui+/gksbOHNsJCrzndLNteIJ37Zg4AVq
-         MpvB2shrSgDNWUNCVv2JMmueB5TBoPn6n6uo1h/eI6e0OlY1eOUVj7IVx33MjCGiuSJJ
-         /pEaFbO9M7Em7agtF8EbHdEOSTAeMEXFUuOcCf+hFlNmUvKSRoSuIH5KLVCgeQvKappU
-         d4MreznmKRGgG2WntEgTRLTA5v6kGS1E+ZbA9jIbVH4IlFwepLfVs8thqyed1VJ8jOqt
-         jeag==
-X-Gm-Message-State: AOJu0YxtR4iPVHfuNMn/SQHVtHI83ojacADJlR+qpETox+nD0KB2uzKX
-	FTRnpVw3+Tt5wvXBjuZMxrLN2S1SqnH4VadmHZaz75vr6oEOtpTV5ZtMoOvU5OEr5x9MxKH0IUo
-	4MQw=
-X-Google-Smtp-Source: AGHT+IGCRE9WVyR6A4ka6TTrK9acN1AtsnhfdXconCkBPP1mL84gRbnCT+4qQIt419Mh0Pm9d7CIGQ==
-X-Received: by 2002:a2e:a595:0:b0:2ef:2c0f:283e with SMTP id 38308e7fff4ca-2f19de326d0mr8895071fa.12.1723107087353;
-        Thu, 08 Aug 2024 01:51:27 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27229757sm1168687f8f.107.2024.08.08.01.51.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 01:51:27 -0700 (PDT)
-Date: Thu, 8 Aug 2024 09:51:25 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] net: atlantic: use ethtool_sprintf
-Message-ID: <ZrSHDR2hoEGx-kNi@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-References: <20240807190303.6143-1-rosenp@gmail.com>
+	s=arc-20240116; t=1723107238; c=relaxed/simple;
+	bh=gZrWnBAuUCvrkVq9DeGaE1/Xcu2JHw98lkPfGDe46xI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YsnH70h5ERzqinaNwtW0lR8NDaKcXQD6tY2qIx11BYpgYma4OkVQNEltA0rR9jY6R04y54J8bUsx7EoaBTiPN4+DydrAaF2MTdaVlL6oGu9+oMlR1ATpckpSFKAE3vAeV9LPyeLPJ5TTEOuFPQ8HM1emn7LZU5GJApkxv8i0klQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NK8lQ3g2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF68AC32782;
+	Thu,  8 Aug 2024 08:53:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723107238;
+	bh=gZrWnBAuUCvrkVq9DeGaE1/Xcu2JHw98lkPfGDe46xI=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=NK8lQ3g2ViF69knaHl8GC6+bqs8YR13WwZ8/+KSxPQgd2e181iZKxu+zW9sOASkcy
+	 g87WUunM7aJ634STyyfb4S91N+cbUvBj1eTbyhvSO1YFqtBYp59dyPXDGD8c3YjUDt
+	 52Mx7cro1uYMRDWOlvh8YuzIwybiFAF09S9etOn4C+NWcQWHE5ntt5TJBAV1+ujkDk
+	 WdjWzpouYX3CwVqQ6zqVoDxZpnFq9SFpnYh7xyOuloXf7dMksOwtADApY8wBSHXo9y
+	 wxBX2UyRDWhSqjoCYiJB0MKpuRFiecHTC5fq8naKrfQQBiGMGfeLY/AeTex9ZhBD+z
+	 UUVM9yq8BQWIA==
+Message-ID: <95b6f3afa55f607c4328b686144a9005f954dc80.camel@kernel.org>
+Subject: Re: [PATCH net-next] selftests: forwarding: lib.sh: ignore "Address
+ not found"
+From: Geliang Tang <geliang@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,  Petr Machata
+ <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>, Benjamin Poirier
+ <bpoirier@nvidia.com>,  Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Geliang Tang <tanggeliang@kylinos.cn>,
+ netdev@vger.kernel.org,  linux-kselftest@vger.kernel.org
+Date: Thu, 08 Aug 2024 16:53:51 +0800
+In-Reply-To: <ZrMbbIrNpCISI63I@shredder.lan>
+References: 
+	<764585b6852537a93c6fba3260e311b79280267a.1722917654.git.tanggeliang@kylinos.cn>
+	 <ZrHTafNilRs6dx6E@shredder.mtl.com>
+	 <a22d9e0eb835e40000bc1955b57ae115ae44353c.camel@kernel.org>
+	 <ZrMbbIrNpCISI63I@shredder.lan>
+Autocrypt: addr=geliang@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ Px+2P2cKc7LXXedb/qQ3M
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240807190303.6143-1-rosenp@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 07, 2024 at 12:02:53PM -0700, Rosen Penev wrote:
-> Allows simplifying get_strings and avoids manual pointer manipulation.
+On Wed, 2024-08-07 at 09:59 +0300, Ido Schimmel wrote:
+> On Wed, Aug 07, 2024 at 12:08:15PM +0800, Geliang Tang wrote:
+> > On Tue, 2024-08-06 at 10:40 +0300, Ido Schimmel wrote:
+> > > On Tue, Aug 06, 2024 at 12:20:38PM +0800, Geliang Tang wrote:
+> > > > From: Geliang Tang <tanggeliang@kylinos.cn>
+> > > > 
+> > > > So many "Address not found" messages occur at the end of
+> > > > forwarding
+> > > > tests
+> > > > when using "ip address del" command for an invalid address:
+> > > 
+> > > Can you give an example of an invalid address that triggers this
+> > > message?
+> > > 
+> > > > 
+> > > > TEST: FDB limits interacting with FDB type
+> > > > local                   
+> > > > [ OK ]
+> > > > Error: ipv4: Address not found.
+> > > > 
+> > > > ... ...
+> > > > TEST: IGMPv3 S,G port entry automatic add to a *,G
+> > > > port            
+> > > > [ OK ]
+> > > > Error: ipv4: Address not found.
+> > > > Error: ipv6: address not found.
+> > > > 
+> > > > ... ...
+> > > > TEST: Isolated port
+> > > > flooding                                       
+> > > > [ OK ]
+> > > > Error: ipv4: Address not found.
+> > > > Error: ipv6: address not found.
+> > > > 
+> > > > ... ...
+> > > > TEST: Externally learned FDB entry - ageing &
+> > > > roaming              
+> > > > [ OK ]
+> > > > Error: ipv4: Address not found.
+> > > > Error: ipv6: address not found.
+> > > 
+> > > I'm unable to reproduce these with net-next and iproute2-next.
+> > > Please
+> > > debug this to understand the root cause or provide more details
+> > > on
+> > > how
+> > > to reproduce.
+> > 
+> > I did get these errors with the latest net-next and iproute2-next.
+> > For
+> > example, I got these errors of "bridge_mdb_port_down.sh":
+> > 
+> > $ sudo ./bridge_mdb_port_down.sh 
+> > TEST: MDB add/del entry to port with state down                  [
+> > OK ]
+> > Error: ipv4: Address not found.
+> > Error: ipv6: address not found.
+> > Error: ipv4: Address not found.
+> > Error: ipv6: address not found.
+> > 
+> > These errors occur when using h1_destroy() and h2_destroy() to
+> > delete
+> > the addresses of h1 (192.0.2.1, 2001:db8:1::1) and h2 (192.0.2.2,
+> > 2001:db8:1::2):
+> > 
+> > h1_destroy()
+> > {
+> >         simple_if_fini $h1 192.0.2.1/24 2001:db8:1::1/64
+> > }
+> > 
+> > h2_destroy()
+> > {
+> >         simple_if_fini $h2 192.0.2.2/24 2001:db8:1::2/64
+> > }
+> > 
+> > It seems that when invoking h1_destroy() and h2_destroy(), both h1
+> > and
+> > h2 no longer have IP addresses.
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  .../ethernet/aquantia/atlantic/aq_ethtool.c   | 21 +++++++------------
->  1 file changed, 7 insertions(+), 14 deletions(-)
->
+> This is unexpected, I do see the addresses on my end. Maybe you have
+> some network manager that is deleting these addresses for some
+> reason?
+> 
+> Try tracing __inet_del_ifa() while running the tests:
+> 
+> # bpftrace -e 'k:__inet_del_ifa { @bla[comm] = count(); }'
+> Attaching 1 probe...
+> ^C
+> 
+> @bla[ip]: 2
 
-[...]
+@bla[NetworkManager]: 2
 
-Patch seems fine overall, but two suggestions:
+Yes indeed, the addresses are deleted by NetworkManager. Does this mean
+that this test will be affected by the network environment in which it
+is running? Is it necessary to run this test in a new network
+namespace? If necessary, I can add it.
 
-  - Use the subject line '[PATCH net-next]' so this goes to the
-    right tree.
+Thanks,
+-Geliang
 
-  - As Andrew mentioned for your other submission: use the
-    get_maintainers script to ensure all the right people are CC'd.
-    For more info check the docs:
+> 
+> > 
+> > I added "ifconfig" to show the addresses of h1 and h2 before
+> > invoking
+> > h1_destroy() and h2_destroy() like this:
+> > 
+> > '''
+> > @@ -105,7 +105,9 @@ cleanup()
+> >         pre_cleanup
+> >  
+> >         switch_destroy
+> > +       ifconfig $h1
+> >         h1_destroy
+> > +       ifconfig $h2
+> >         h2_destroy
+> >  
+> >         vrf_cleanup
+> > '''
+> > 
+> > And got these messages:
+> > 
+> > TEST: MDB add/del entry to port with state down                 [
+> > OK ]
+> > veth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+> >         ether f2:ca:02:ee:05:19  txqueuelen 1000  (Ethernet)
+> >         RX packets 149  bytes 17355 (17.3 KB)
+> >         RX errors 0  dropped 0  overruns 0  frame 0
+> >         TX packets 81  bytes 9165 (9.1 KB)
+> >         TX errors 0  dropped 12 overruns 0  carrier 0  collisions 0
+> > 
+> > Error: ipv4: Address not found.
+> > Error: ipv6: address not found.
+> > veth3: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+> >         ether 92:df:97:5c:98:7e  txqueuelen 1000  (Ethernet)
+> >         RX packets 67  bytes 6252 (6.2 KB)
+> >         RX errors 0  dropped 0  overruns 0  frame 0
+> >         TX packets 39  bytes 4997 (4.9 KB)
+> >         TX errors 0  dropped 56 overruns 0  carrier 0  collisions 0
+> > 
+> > Error: ipv4: Address not found.
+> > Error: ipv6: address not found.
+> > 
+> > -Geliang
+> > 
+> > > 
+> > > > 
+> > > > This patch gnores these messages and redirects them to
+> > > > /dev/null in
+> > > > __addr_add_del().
+> > > > 
+> > > > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> > > > ---
+> > > >  tools/testing/selftests/net/forwarding/lib.sh | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/tools/testing/selftests/net/forwarding/lib.sh
+> > > > b/tools/testing/selftests/net/forwarding/lib.sh
+> > > > index ff96bb7535ff..8670b6053cde 100644
+> > > > --- a/tools/testing/selftests/net/forwarding/lib.sh
+> > > > +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> > > > @@ -839,7 +839,7 @@ __addr_add_del()
+> > > >  	array=("${@}")
+> > > >  
+> > > >  	for addrstr in "${array[@]}"; do
+> > > > -		ip address $add_del $addrstr dev $if_name
+> > > > +		ip address $add_del $addrstr dev $if_name &>
+> > > > /dev/null
+> > > >  	done
+> > > >  }
+> > > >  
+> > > > -- 
+> > > > 2.43.0
+> > > > 
+> > 
 
-        https://www.kernel.org/doc/html/v6.11-rc2/process/submitting-patches.html#select-the-recipients-for-your-patch
-
-I'll admit that it is not clear to me if this should be marked as
-"RESEND" or "v2", but I'd go with v2:
-
-  example:
-  git format-patch HEAD~1 --subject-prefix="PATCH net-next" \
-        -v 2 -o /output/path/
-
-Assuming the code remains the same (and you are just modifying the
-subject line and to/cc list in the v2), you can add my Reviewed-by
-tag to the patch:
-
-Reviewed-by: Joe Damato <jdamato@fastly.com>
 
