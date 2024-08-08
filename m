@@ -1,126 +1,404 @@
-Return-Path: <netdev+bounces-116818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D3F294BCB3
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:58:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E0D94BCE4
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 236831F231BE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:58:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA49F1C21246
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B7818C90C;
-	Thu,  8 Aug 2024 11:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D1218C32B;
+	Thu,  8 Aug 2024 12:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jxBELbKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB1018C344
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 11:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A6A126F1E
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 12:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723118263; cv=none; b=bWT40XwwgwJnHe7ykdSFTH/7UzR10OsGW+oKyF6Csn4XNtSG4l94ArjDcdMl+OO44Aq7pvQTRnQt6j996TaxL9cs5khnTcC3AKE40Y0GMiKYjzeT/Ec/Vfac27njVqk9Ghe8w9MWgk7UXnHNPfTQJjiU/pXHXEb8t1HtzDBwP5E=
+	t=1723118715; cv=none; b=H3H+6WKYEQxlxaHRx68+pPpEebW669Cov3wv0lRgmDvuVu9wKxQ9yNy6Y7MZTFIt/OcbUhuWs9AhsT6lko1Asx/Dn79HPEnvf/ID/4sIW52udaFivE5mv8N1kShPnbb8XNr/InOQB2nepQQC3q7pPZlVp6ZaQgqFvsVBCD6Mhf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723118263; c=relaxed/simple;
-	bh=qNMmsEQ2EZ4cxvh69JOIOtIXnSx28gl37GRrOb3EQwk=;
+	s=arc-20240116; t=1723118715; c=relaxed/simple;
+	bh=BRhwVea1jfWa00EA7+oEYr4OJZtqWu79KHDXLIKjicw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I/VS4McWA8eMfci5Mt9W0DnTKvBfcCw5LYJ/ZTScW30g8TJrLkZpR03mxCeHiWJvEGZu04Jxx8ccoMaRi2fmAfLvSjrscm5sEzPjlau1wwZ1dZ60BAYa83XLeriIfBPqCT7gqGkv29IPM+fR7Orn95TlMTpudt7MrWE2646igzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sc1lW-0002TZ-3n; Thu, 08 Aug 2024 13:57:10 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sc1lT-005PwN-8z; Thu, 08 Aug 2024 13:57:07 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id DA2D53197FE;
-	Thu, 08 Aug 2024 11:57:06 +0000 (UTC)
-Date: Thu, 8 Aug 2024 13:57:06 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: o.rempel@pengutronix.de, davem@davemloft.net, edumazet@google.com, 
-	kernel@pengutronix.de, kuba@kernel.org, leitao@debian.org, linux-can@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, robin@protonic.nl, 
-	socketcan@hartkopp.net, syzbot+ad601904231505ad6617@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net-next V2] can: j1939: fix uaf warning in
- j1939_session_destroy
-Message-ID: <20240808-awesome-agama-of-cubism-b68cf0-mkl@pengutronix.de>
-References: <ZrR4fsTgDud3Uyo0@pengutronix.de>
- <tencent_5B8967E03C7737A897DA36604A8A75DB7709@qq.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGoJa7rR/Bz3Ey+LXO0v9lW7grBv0gEMyQF9XJx7ZK5lUDVOhhSVmaGOAXXT+gyNwoqsqAFltFEj73tnNjWGA8581JM2ErJZiKtKWDpX1jSjOKxx1ndtBGID3TDW7g3HBFgGWVsGvIHUt7dA/yGpK9JHKkYhKJ5C1yoR1gwQPfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jxBELbKT; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723118713; x=1754654713;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=BRhwVea1jfWa00EA7+oEYr4OJZtqWu79KHDXLIKjicw=;
+  b=jxBELbKTzE4TUEGTjon0Z9ks1eAQOwgsD45er51pEroSsdTPdMT6yq0/
+   ABfI0Nssx8w+6OzUO5/etdpuQoGviYDRtuOX+2v2IBwcwfIGVtUAQJb+d
+   g/pELHq+RcXyDqrICwlSF5BRXvQM75DDMLxntSAoTrbsH/6FifTuol31z
+   Rn7KF0rv676X+8twwR0isuU+rsidRX5bkQfU62UI+eeU5m3TI3pG7VS6Z
+   YUscY0i6AFQ3a4953TI/mveqgZfjD+4uXZUGyA/WYM2oOGU1ideI/C8V9
+   7dfCJvvYw96bqNsfr7Raddsd6UccwDwHROHMOzGe/Y+asiHdNs618qmOa
+   w==;
+X-CSE-ConnectionGUID: ck8Yh/DeQDGpkrOzyGzlBg==
+X-CSE-MsgGUID: y2PCc/xsQNSV0Hd+pSzAow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21398924"
+X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
+   d="scan'208";a="21398924"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 05:05:12 -0700
+X-CSE-ConnectionGUID: mcZ3NNG+SJSO8amXOzt8lA==
+X-CSE-MsgGUID: mIt0Mw+WQO2gklfTIKjKKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
+   d="scan'208";a="61838041"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 08 Aug 2024 05:05:11 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sc1tE-00069i-2I;
+	Thu, 08 Aug 2024 12:05:08 +0000
+Date: Thu, 8 Aug 2024 20:04:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH] net: freescale: use devm for alloc_etherdev_mqs
+Message-ID: <202408081943.CM7N9ThW-lkp@intel.com>
+References: <20240807190556.6817-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="urdcdsf4vvoztryz"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <tencent_5B8967E03C7737A897DA36604A8A75DB7709@qq.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240807190556.6817-1-rosenp@gmail.com>
+
+Hi Rosen,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master v6.11-rc2 next-20240808]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-freescale-use-devm-for-alloc_etherdev_mqs/20240808-060734
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240807190556.6817-1-rosenp%40gmail.com
+patch subject: [PATCH] net: freescale: use devm for alloc_etherdev_mqs
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240808/202408081943.CM7N9ThW-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 408d82d352eb98e2d0a804c66d359cd7a49228fe)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408081943.CM7N9ThW-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408081943.CM7N9ThW-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/freescale/fec_main.c:29:
+   In file included from include/linux/ptrace.h:10:
+   In file included from include/linux/pid_namespace.h:7:
+   In file included from include/linux/mm.h:2228:
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from drivers/net/ethernet/freescale/fec_main.c:33:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/net/ethernet/freescale/fec_main.c:33:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/net/ethernet/freescale/fec_main.c:33:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> drivers/net/ethernet/freescale/fec_main.c:4562:1: warning: unused label 'failed_ioremap' [-Wunused-label]
+    4562 | failed_ioremap:
+         | ^~~~~~~~~~~~~~~
+   8 warnings generated.
 
 
---urdcdsf4vvoztryz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+vim +/failed_ioremap +4562 drivers/net/ethernet/freescale/fec_main.c
 
-On 08.08.2024 19:07:55, Edward Adam Davis wrote:
-> On Thu, 8 Aug 2024 09:49:18 +0200, Oleksij Rempel wrote:
-> > > the skb to the queue and increase the skb reference count through it.
-> > >=20
-> > > Reported-and-tested-by: syzbot+ad601904231505ad6617@syzkaller.appspot=
-mail.com
-> > > Closes: https://syzkaller.appspot.com/bug?extid=3Dad601904231505ad6617
-> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> >=20
-> > This patch breaks j1939.
-> > The issue can be reproduced by running following commands:
-> I tried to reproduce the problem using the following command, but was=20
-> unsuccessful. Prompt me to install j1939cat and j1939acd, and there are
-> some other errors.
+baa70a5c48a01e drivers/net/ethernet/freescale/fec.c      Frank Li           2013-01-16  4340  
+5bbde4d2ec8061 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-27  4341  	/* Select default pin state */
+5bbde4d2ec8061 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-27  4342  	pinctrl_pm_select_default_state(&pdev->dev);
+5bbde4d2ec8061 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-27  4343  
+4f830a5af7b5b3 drivers/net/ethernet/freescale/fec_main.c YueHaibing         2019-08-21  4344  	fep->hwp = devm_platform_ioremap_resource(pdev, 0);
+a1f542e013d953 drivers/net/ethernet/freescale/fec_main.c Rosen Penev        2024-08-07  4345  	if (IS_ERR(fep->hwp))
+a1f542e013d953 drivers/net/ethernet/freescale/fec_main.c Rosen Penev        2024-08-07  4346  		return PTR_ERR(fep->hwp);
+941e173a538c58 drivers/net/ethernet/freescale/fec_main.c Tushar Behera      2013-06-10  4347  
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4348  	fep->pdev = pdev;
+43af940c54d712 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2011-12-05  4349  	fep->dev_id = dev_id++;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4350  
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4351  	platform_set_drvdata(pdev, ndev);
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4352  
+29380905565655 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2016-06-03  4353  	if ((of_machine_is_compatible("fsl,imx6q") ||
+29380905565655 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2016-06-03  4354  	     of_machine_is_compatible("fsl,imx6dl")) &&
+29380905565655 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2016-06-03  4355  	    !of_property_read_bool(np, "fsl,err006687-workaround-present"))
+29380905565655 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2016-06-03  4356  		fep->quirks |= FEC_QUIRK_ERR006687;
+29380905565655 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2016-06-03  4357  
+40c79ce13b035b drivers/net/ethernet/freescale/fec_main.c Wei Fang           2022-09-02  4358  	ret = fec_enet_ipc_handle_init(fep);
+40c79ce13b035b drivers/net/ethernet/freescale/fec_main.c Wei Fang           2022-09-02  4359  	if (ret)
+40c79ce13b035b drivers/net/ethernet/freescale/fec_main.c Wei Fang           2022-09-02  4360  		goto failed_ipc_init;
+40c79ce13b035b drivers/net/ethernet/freescale/fec_main.c Wei Fang           2022-09-02  4361  
+1a87e641d8a50c drivers/net/ethernet/freescale/fec_main.c Rob Herring        2023-03-14  4362  	if (of_property_read_bool(np, "fsl,magic-packet"))
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4363  		fep->wol_flag |= FEC_WOL_HAS_MAGIC_PACKET;
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4364  
+8a448bf832af53 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2020-05-26  4365  	ret = fec_enet_init_stop_mode(fep, np);
+da722186f6549d drivers/net/ethernet/freescale/fec_main.c Martin Fuzzey      2020-04-02  4366  	if (ret)
+da722186f6549d drivers/net/ethernet/freescale/fec_main.c Martin Fuzzey      2020-04-02  4367  		goto failed_stop_mode;
+da722186f6549d drivers/net/ethernet/freescale/fec_main.c Martin Fuzzey      2020-04-02  4368  
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4369  	phy_node = of_parse_phandle(np, "phy-handle", 0);
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4370  	if (!phy_node && of_phy_is_fixed_link(np)) {
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4371  		ret = of_phy_register_fixed_link(np);
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4372  		if (ret < 0) {
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4373  			dev_err(&pdev->dev,
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4374  				"broken fixed-link specification\n");
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4375  			goto failed_phy;
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4376  		}
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4377  		phy_node = of_node_get(np);
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4378  	}
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4379  	fep->phy_node = phy_node;
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4380  
+0c65b2b90d13c1 drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2019-11-04  4381  	ret = of_get_phy_mode(pdev->dev.of_node, &interface);
+0c65b2b90d13c1 drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2019-11-04  4382  	if (ret) {
+94660ba09079dd drivers/net/ethernet/freescale/fec_main.c Jingoo Han         2013-08-30  4383  		pdata = dev_get_platdata(&pdev->dev);
+5eb32bd0593795 drivers/net/fec.c                         Baruch Siach       2010-05-24  4384  		if (pdata)
+5eb32bd0593795 drivers/net/fec.c                         Baruch Siach       2010-05-24  4385  			fep->phy_interface = pdata->phy;
+ca2cc333920690 drivers/net/fec.c                         Shawn Guo          2011-06-25  4386  		else
+ca2cc333920690 drivers/net/fec.c                         Shawn Guo          2011-06-25  4387  			fep->phy_interface = PHY_INTERFACE_MODE_MII;
+ca2cc333920690 drivers/net/fec.c                         Shawn Guo          2011-06-25  4388  	} else {
+0c65b2b90d13c1 drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2019-11-04  4389  		fep->phy_interface = interface;
+ca2cc333920690 drivers/net/fec.c                         Shawn Guo          2011-06-25  4390  	}
+ca2cc333920690 drivers/net/fec.c                         Shawn Guo          2011-06-25  4391  
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4392  	ret = fec_enet_parse_rgmii_delay(fep, np);
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4393  	if (ret)
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4394  		goto failed_rgmii_delay;
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4395  
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4396  	fep->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4397  	if (IS_ERR(fep->clk_ipg)) {
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4398  		ret = PTR_ERR(fep->clk_ipg);
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4399  		goto failed_clk;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4400  	}
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4401  
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4402  	fep->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4403  	if (IS_ERR(fep->clk_ahb)) {
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4404  		ret = PTR_ERR(fep->clk_ahb);
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4405  		goto failed_clk;
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4406  	}
+f4d40de39a23f0 drivers/net/ethernet/freescale/fec.c      Sascha Hauer       2012-03-07  4407  
+d851b47b22fc4c drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2014-09-17  4408  	fep->itr_clk_rate = clk_get_rate(fep->clk_ahb);
+d851b47b22fc4c drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2014-09-17  4409  
+daa7d392ffe67e drivers/net/ethernet/freescale/fec.c      Wolfram Sang       2013-01-29  4410  	/* enet_out is optional, depends on board */
+5ff851b7be752a drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-20  4411  	fep->clk_enet_out = devm_clk_get_optional(&pdev->dev, "enet_out");
+5ff851b7be752a drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-20  4412  	if (IS_ERR(fep->clk_enet_out)) {
+5ff851b7be752a drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-20  4413  		ret = PTR_ERR(fep->clk_enet_out);
+5ff851b7be752a drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-20  4414  		goto failed_clk;
+5ff851b7be752a drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-20  4415  	}
+daa7d392ffe67e drivers/net/ethernet/freescale/fec.c      Wolfram Sang       2013-01-29  4416  
+91c0d987a9788d drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-08-21  4417  	fep->ptp_clk_on = false;
+01b825f997ac28 drivers/net/ethernet/freescale/fec_main.c Francesco Dolcini  2022-09-12  4418  	mutex_init(&fep->ptp_clk_mutex);
+9b5330edf1f8e2 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2014-09-13  4419  
+9b5330edf1f8e2 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2014-09-13  4420  	/* clk_ref is optional, depends on board */
+43252ed15f4665 drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-21  4421  	fep->clk_ref = devm_clk_get_optional(&pdev->dev, "enet_clk_ref");
+43252ed15f4665 drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-21  4422  	if (IS_ERR(fep->clk_ref)) {
+43252ed15f4665 drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-21  4423  		ret = PTR_ERR(fep->clk_ref);
+43252ed15f4665 drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-21  4424  		goto failed_clk;
+43252ed15f4665 drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2022-05-21  4425  	}
+b82f8c3f1409f1 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4426  	fep->clk_ref_rate = clk_get_rate(fep->clk_ref);
+9b5330edf1f8e2 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2014-09-13  4427  
+fc539459e900a8 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4428  	/* clk_2x_txclk is optional, depends on board */
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4429  	if (fep->rgmii_txc_dly || fep->rgmii_rxc_dly) {
+fc539459e900a8 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4430  		fep->clk_2x_txclk = devm_clk_get(&pdev->dev, "enet_2x_txclk");
+fc539459e900a8 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4431  		if (IS_ERR(fep->clk_2x_txclk))
+fc539459e900a8 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4432  			fep->clk_2x_txclk = NULL;
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4433  	}
+fc539459e900a8 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2021-07-28  4434  
+6b7e4008389c8c drivers/net/ethernet/freescale/fec_main.c Lothar Waßmann     2014-11-17  4435  	fep->bufdesc_ex = fep->quirks & FEC_QUIRK_HAS_BUFDESC_EX;
+6605b730c061f6 drivers/net/ethernet/freescale/fec.c      Frank Li           2012-10-30  4436  	fep->clk_ptp = devm_clk_get(&pdev->dev, "ptp");
+6605b730c061f6 drivers/net/ethernet/freescale/fec.c      Frank Li           2012-10-30  4437  	if (IS_ERR(fep->clk_ptp)) {
+c29dc2d7714118 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2013-03-18  4438  		fep->clk_ptp = NULL;
+217b5844e279c2 drivers/net/ethernet/freescale/fec_main.c Lothar Waßmann     2014-11-17  4439  		fep->bufdesc_ex = false;
+6605b730c061f6 drivers/net/ethernet/freescale/fec.c      Frank Li           2012-10-30  4440  	}
+6605b730c061f6 drivers/net/ethernet/freescale/fec.c      Frank Li           2012-10-30  4441  
+e8fcfcd5684a41 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-20  4442  	ret = fec_enet_clk_enable(ndev, true);
+13a097bd35a15b drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-07-21  4443  	if (ret)
+13a097bd35a15b drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-07-21  4444  		goto failed_clk;
+13a097bd35a15b drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-07-21  4445  
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4446  	ret = clk_prepare_enable(fep->clk_ipg);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4447  	if (ret)
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4448  		goto failed_clk_ipg;
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4449  	ret = clk_prepare_enable(fep->clk_ahb);
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4450  	if (ret)
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4451  		goto failed_clk_ahb;
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4452  
+25974d8af1bc51 drivers/net/ethernet/freescale/fec_main.c Stefan Agner       2019-01-21  4453  	fep->reg_phy = devm_regulator_get_optional(&pdev->dev, "phy");
+f4e9f3d2fdb141 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4454  	if (!IS_ERR(fep->reg_phy)) {
+f4e9f3d2fdb141 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4455  		ret = regulator_enable(fep->reg_phy);
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4456  		if (ret) {
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4457  			dev_err(&pdev->dev,
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4458  				"Failed to enable phy regulator: %d\n", ret);
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4459  			goto failed_regulator;
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4460  		}
+f6a4d607b3fdfa drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4461  	} else {
+3f38c683033a9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-03  4462  		if (PTR_ERR(fep->reg_phy) == -EPROBE_DEFER) {
+3f38c683033a9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-03  4463  			ret = -EPROBE_DEFER;
+3f38c683033a9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-03  4464  			goto failed_regulator;
+3f38c683033a9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-03  4465  		}
+f6a4d607b3fdfa drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4466  		fep->reg_phy = NULL;
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4467  	}
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4468  
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4469  	pm_runtime_set_autosuspend_delay(&pdev->dev, FEC_MDIO_PM_TIMEOUT);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4470  	pm_runtime_use_autosuspend(&pdev->dev);
+14d2b7c1a96ef3 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2015-08-03  4471  	pm_runtime_get_noresume(&pdev->dev);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4472  	pm_runtime_set_active(&pdev->dev);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4473  	pm_runtime_enable(&pdev->dev);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4474  
+9269e5560b261e drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2017-04-11  4475  	ret = fec_reset_phy(pdev);
+9269e5560b261e drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2017-04-11  4476  	if (ret)
+9269e5560b261e drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2017-04-11  4477  		goto failed_reset;
+2ca9b2aa0d5a43 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4478  
+4ad1ceec05e491 drivers/net/ethernet/freescale/fec_main.c Troy Kisky         2017-11-03  4479  	irq_cnt = fec_enet_get_irq_cnt(pdev);
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4480  	if (fep->bufdesc_ex)
+4ad1ceec05e491 drivers/net/ethernet/freescale/fec_main.c Troy Kisky         2017-11-03  4481  		fec_ptp_init(pdev, irq_cnt);
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4482  
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4483  	ret = fec_enet_init(ndev);
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4484  	if (ret)
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4485  		goto failed_init;
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4486  
+4ad1ceec05e491 drivers/net/ethernet/freescale/fec_main.c Troy Kisky         2017-11-03  4487  	for (i = 0; i < irq_cnt; i++) {
+3ded9f2b35f02c drivers/net/ethernet/freescale/fec_main.c Arnd Bergmann      2018-05-28  4488  		snprintf(irq_name, sizeof(irq_name), "int%d", i);
+3b56be218f65e2 drivers/net/ethernet/freescale/fec_main.c Anson Huang        2019-10-29  4489  		irq = platform_get_irq_byname_optional(pdev, irq_name);
+4ad1ceec05e491 drivers/net/ethernet/freescale/fec_main.c Troy Kisky         2017-11-03  4490  		if (irq < 0)
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4491  			irq = platform_get_irq(pdev, i);
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4492  		if (irq < 0) {
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4493  			ret = irq;
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4494  			goto failed_irq;
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4495  		}
+0d9b2ab1c3760a drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-07-21  4496  		ret = devm_request_irq(&pdev->dev, irq, fec_enet_interrupt,
+44a272ddfdd7e7 drivers/net/ethernet/freescale/fec_main.c Michael Opdenacker 2013-09-13  4497  				       0, pdev->name, ndev);
+0d9b2ab1c3760a drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-07-21  4498  		if (ret)
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4499  			goto failed_irq;
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4500  
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4501  		fep->irq[i] = irq;
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4502  	}
+e2f8d555ec04a0 drivers/net/ethernet/freescale/fec.c      Fabio Estevam      2013-02-22  4503  
+b7cdc9658ac860 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-12  4504  	/* Decide which interrupt line is wakeup capable */
+b7cdc9658ac860 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-12  4505  	fec_enet_get_wakeup_irq(pdev);
+b7cdc9658ac860 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-12  4506  
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4507  	ret = fec_enet_mii_init(pdev);
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4508  	if (ret)
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4509  		goto failed_mii_init;
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4510  
+03c698c93fc15d drivers/net/fec.c                         Oskar Schirmer     2010-10-07  4511  	/* Carrier starts down, phylib will bring it up */
+03c698c93fc15d drivers/net/fec.c                         Oskar Schirmer     2010-10-07  4512  	netif_carrier_off(ndev);
+e8fcfcd5684a41 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-20  4513  	fec_enet_clk_enable(ndev, false);
+5bbde4d2ec8061 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-27  4514  	pinctrl_pm_select_sleep_state(&pdev->dev);
+03c698c93fc15d drivers/net/fec.c                         Oskar Schirmer     2010-10-07  4515  
+5919305351475d drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2020-07-11  4516  	ndev->max_mtu = PKT_MAXBUF_SIZE - ETH_HLEN - ETH_FCS_LEN;
+5919305351475d drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2020-07-11  4517  
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4518  	ret = register_netdev(ndev);
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4519  	if (ret)
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4520  		goto failed_register;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4521  
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4522  	device_init_wakeup(&ndev->dev, fep->wol_flag &
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4523  			   FEC_WOL_HAS_MAGIC_PACKET);
+de40ed31b3c577 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-12-24  4524  
+eb1d064058c7c7 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-04-13  4525  	if (fep->bufdesc_ex && fep->ptp_clock)
+eb1d064058c7c7 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-04-13  4526  		netdev_info(ndev, "registered PHC device %d\n", fep->dev_id);
+eb1d064058c7c7 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-04-13  4527  
+36cdc743a320e7 drivers/net/ethernet/freescale/fec_main.c Russell King       2014-07-08  4528  	INIT_WORK(&fep->tx_timeout_work, fec_enet_timeout_work);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4529  
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4530  	pm_runtime_mark_last_busy(&pdev->dev);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4531  	pm_runtime_put_autosuspend(&pdev->dev);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4532  
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4533  	return 0;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4534  
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4535  failed_register:
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4536  	fec_enet_mii_remove(fep);
+e6b043d512fa8d drivers/net/fec.c                         Bryan Wu           2010-03-31  4537  failed_mii_init:
+7a2bbd8d8e36c4 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4538  failed_irq:
+bf0497f53c8535 drivers/net/ethernet/freescale/fec_main.c Xiaolei Wang       2024-05-24  4539  	fec_enet_deinit(ndev);
+7a2bbd8d8e36c4 drivers/net/ethernet/freescale/fec_main.c Fabio Estevam      2013-05-27  4540  failed_init:
+32cba57ba74be5 drivers/net/ethernet/freescale/fec_main.c Lucas Stach        2015-07-23  4541  	fec_ptp_stop(pdev);
+9269e5560b261e drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2017-04-11  4542  failed_reset:
+ce8d24f9a5965a drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-05-23  4543  	pm_runtime_put_noidle(&pdev->dev);
+9269e5560b261e drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2017-04-11  4544  	pm_runtime_disable(&pdev->dev);
+c6165cf0dbb82d drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2020-08-13  4545  	if (fep->reg_phy)
+c6165cf0dbb82d drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2020-08-13  4546  		regulator_disable(fep->reg_phy);
+5fa9c0fe3ec0a0 drivers/net/ethernet/freescale/fec.c      Shawn Guo          2012-06-27  4547  failed_regulator:
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4548  	clk_disable_unprepare(fep->clk_ahb);
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4549  failed_clk_ahb:
+d7c3a206e6338e drivers/net/ethernet/freescale/fec_main.c Andy Duan          2019-04-09  4550  	clk_disable_unprepare(fep->clk_ipg);
+8fff755e9f8d0f drivers/net/ethernet/freescale/fec_main.c Andrew Lunn        2015-07-25  4551  failed_clk_ipg:
+e8fcfcd5684a41 drivers/net/ethernet/freescale/fec_main.c Nimrod Andy        2014-05-20  4552  	fec_enet_clk_enable(ndev, false);
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4553  failed_clk:
+b820c114eba7e1 drivers/net/ethernet/freescale/fec_main.c Joakim Zhang       2021-08-03  4554  failed_rgmii_delay:
+82005b1c19b119 drivers/net/ethernet/freescale/fec_main.c Johan Hovold       2016-11-28  4555  	if (of_phy_is_fixed_link(np))
+82005b1c19b119 drivers/net/ethernet/freescale/fec_main.c Johan Hovold       2016-11-28  4556  		of_phy_deregister_fixed_link(np);
+407066f8f3716c drivers/net/ethernet/freescale/fec_main.c Uwe Kleine-König   2014-08-11  4557  	of_node_put(phy_node);
+da722186f6549d drivers/net/ethernet/freescale/fec_main.c Martin Fuzzey      2020-04-02  4558  failed_stop_mode:
+40c79ce13b035b drivers/net/ethernet/freescale/fec_main.c Wei Fang           2022-09-02  4559  failed_ipc_init:
+d1616f07e8f1a4 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-04  4560  failed_phy:
+d1616f07e8f1a4 drivers/net/ethernet/freescale/fec_main.c Fugang Duan        2018-01-04  4561  	dev_id--;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28 @4562  failed_ioremap:
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4563  	free_netdev(ndev);
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4564  
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4565  	return ret;
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4566  }
+ead731837d142b drivers/net/fec.c                         Sascha Hauer       2009-01-28  4567  
 
-The j1939 commands are part of the can-utils package. On Debian
-compatible systems it's "sudo apt install can-utils". Or you can build
-them from source: https://github.com/linux-can/can-utils
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---urdcdsf4vvoztryz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAma0so8ACgkQKDiiPnot
-vG97YAf/eKz8zsiBtjdl0rll7tKLB1PQOdPOHCssA3DTt3c2qYzJWEF/wEHAuvLI
-oDb8FmhHQzxF4UOlkiKJwK2k7Ca5mfYl9RrAzasVCeaoOwT5XthO7SYfpNTM+1cg
-jCKZ3X1fcbf9zL6PV7VkGrjEj0BQrbJgTI8V1+1tt6OXHs9s0gdnmnty7R4A+fIu
-vz4wihs5Qcg9zN+vs+gHbbajKnvsBJY+rjxTcpsCaEWYSXp955QnSumWjpRgZ2I6
-lzTPCfk9Wn2oIxA+DMLELpSNulza4FTsD0Zv3oYVyzkQRuPvfzspAam5zUw5JYGJ
-85mWsdYGrvgwrtoRIBLicnvMywU7tg==
-=i28/
------END PGP SIGNATURE-----
-
---urdcdsf4vvoztryz--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
