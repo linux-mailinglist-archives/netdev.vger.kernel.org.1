@@ -1,106 +1,81 @@
-Return-Path: <netdev+bounces-116654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A73294B517
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:33:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FFA94B519
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 957FDB20FD8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 02:33:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74E271C21303
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 02:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC60BA3F;
-	Thu,  8 Aug 2024 02:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB5ED26D;
+	Thu,  8 Aug 2024 02:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qq4Qrl0Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HF2OA+3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5E76FD3
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 02:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E482CA7
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 02:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723084409; cv=none; b=tuBCraxy9AlYQyZmHrSNQquRTi2oWRJqIh+/biStiahAkAGIJ58a05KD77GzCi8V7LswoflYlBVhfITj8PFfT5q8k4DfcKSKHonV8RNQVGCOzlyQRnyfQZ5gmZ7cw5X3yghOoYiWaHhD1H9eWcNxUv2VgGzpsN0rOmAeiM4ooPw=
+	t=1723084434; cv=none; b=ck5zKUp597qdENMBge0ZNf/MJ9JvR11BX+z6TMHSXAzXagfS+bqWE37jrJ6UcvWvl5UfYxGCm2tfZOgLf0AL7Pf/TbSAEH0znp6uJpvwaVr7LMldeTv95Mufdg3oNHYV7bWXzDIh9tDoBWkWRsBofRGtPQkZonph7/lDr65ghss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723084409; c=relaxed/simple;
-	bh=Z5k9G0db02yEHmXxmkEGgJqZYQkpPePYZyx7AWCsZJ4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Rq5kJdQYydLklaI7r0G0PAHwuUXJ2qiyasLaQYAsXtTFWPydk9Z3Fb/ebDfc7+nuBEpDn6G0tSFTG53EJ+EK3aMeLpE0S4utFL22b32Em8s1qLT0v4gwlKPf+bE+wqqrcWYZAOxRpiH4dc5r5+paa4t6HD/1ooRuMJ+NT6RNyAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qq4Qrl0Q; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a1dd2004e1so27628585a.3
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 19:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723084406; x=1723689206; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1wANc4Ej9BDeutz7cYoGZQDWS4Nq8qKIXob9m8ZKcAQ=;
-        b=Qq4Qrl0QQQHRVRURk8DuDr7qPx/hIdgX0aV5zyRU1FOA5IGHbDQDz5RuHzRiTTxhbE
-         T9CXcI4FP/l3WNhpSc6HNvR4m9TWITNMC7epaSlpSElXCjUR0PReTBMAetDB07i7Gida
-         cnall0+nNUMpjLzxlnmjVGTBRcAbRRX6xYOc55yFmplpSqulNSXsJynkz3xnsMo1t9UX
-         AD9YNqtq+BZxamHlVzhIEbxwgVFt3LIYejr5noro28RWJGb/dJOrIFV4+I8UdlgBqq16
-         SgDG3mZN/XnEc8XCaPku4pWaFbCBWRzKLk/xo05gXhCVatcjWj1I/0LJckI+jd1/tHMj
-         9bgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723084406; x=1723689206;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1wANc4Ej9BDeutz7cYoGZQDWS4Nq8qKIXob9m8ZKcAQ=;
-        b=KSJTPhJSMFlNzehzhpUsQv2vXmgl6oF/O8K+84OEhfGSR98//v1r6zt8rUe0S3IH5I
-         DfYlP7+oJGw6BzrMBGg0fl4/ByTbjrkiVol3ahlof3FY2y4PLun2T+LpeEwgC2bXk8/V
-         ajNeKIpdMB+KIh0+HC6ZeSeRpcOYugDylsiowaUUmpOe70fI4eZ36E61nzAJ5jqtvicT
-         0IKIIqcN1Q9dUgxzOtgzbDr0XmK8QSRni+Wtr44CIB3gkcEGiaGumgaaV/k0S6MlQtRM
-         UPHsysv6gHsNmW0QUADv3hYlQXfKiAAsbcTyN5/gvUh0W3aHeI4q2iPG+4enEL5SG1q/
-         ryWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXlqYWA5uXFI/KM7yt8cUX3qwn4Ew16gv4bjh72l3krRyqsst3/v8l72wRPnCmmjYGzBtHxUMJ2M9KbnhojQPaiwJwsv7VU
-X-Gm-Message-State: AOJu0YzrDCWEUfEN0WU6xSi0CBeUeXP1lcCIng+Anzd5nwAoFtPEvyjY
-	nAMqXPX6qwOHm5F3+F5ll7qwXLRCN/YPi1nffRJD7PCftJynWdpYSqQmag==
-X-Google-Smtp-Source: AGHT+IFTSbvDhqkYGjRHsYHsb+sYLl5fo3xFCSsfCdz9qcm2DIDp2hGe65LR0hNcqgzo5C9r7Wd3nQ==
-X-Received: by 2002:a05:620a:1aa5:b0:7a1:e3e5:c8c with SMTP id af79cd13be357-7a3817b21a5mr52906885a.5.1723084406356;
-        Wed, 07 Aug 2024 19:33:26 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3786c1d63sm113002685a.102.2024.08.07.19.33.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 19:33:25 -0700 (PDT)
-Date: Wed, 07 Aug 2024 22:33:25 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- kernel-team@cloudflare.com
-Message-ID: <66b42e75a0918_37950029475@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240801-udp-gso-egress-from-tunnel-v2-2-9a2af2f15d8d@cloudflare.com>
-References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
- <20240801-udp-gso-egress-from-tunnel-v2-2-9a2af2f15d8d@cloudflare.com>
-Subject: Re: [PATCH net v2 2/2] selftests/net: Add coverage for UDP GSO with
- IPv6 extension headers
+	s=arc-20240116; t=1723084434; c=relaxed/simple;
+	bh=NF0LnwxNuK9i5xXJHkPbw9xzBDM4Uzc1qfT/CulcVQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aS6eaqRWNJ6kCiDZSlo9HeruZ4XTqnpfDzV1cu+p/p9DU2H/hx3se+5VBfTaONle4MxcQinyrZykY6iOlfev2uE5osJwd2WI7n5MZYoxwjr8bmXw8IHe+GSrVRDeOAJYNevKPXljJHBL3Mk+gtbWInZ0g1cUqGYBqh/PGE1egyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HF2OA+3p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9E6C4AF0B;
+	Thu,  8 Aug 2024 02:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723084433;
+	bh=NF0LnwxNuK9i5xXJHkPbw9xzBDM4Uzc1qfT/CulcVQ0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HF2OA+3pqa3ejl2hHlCDucwSYeW4ElI5irZX7iDkpAizTqcXUZjUO3ML6iH1rmDLu
+	 22XDeJK+u8C7S+MltVTbRUw+dlc01zo+zt/cWF61OTa71C9r9ZwNr9rfgKH1QMk2nv
+	 NYRvW2KS6fU+6NdmmCjhQp3eG0Wj4YEVQgpu5hg6p7z06DtWsldgrUCRDwj96q0iHm
+	 EO4L3ybgsV6UYgHzmfHq/p141T+A/1gAmAnL7+ZBpIIcj5v+dfDycCTj43lX/NHAvK
+	 tiBE3OgY/1E9MALXjvnCkiPUFZ1RNQRhWjf/kWNdZr0uY9AaGAPAC5YcXE9AKfAtol
+	 tF1n2vKX1QwXg==
+Date: Wed, 7 Aug 2024 19:33:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/3] net: sched: fix use-after-free in taprio_change()
+Message-ID: <20240807193352.66ceaab8@kernel.org>
+In-Reply-To: <20240807103943.1633950-1-dmantipov@yandex.ru>
+References: <20240807103943.1633950-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Jakub Sitnicki wrote:
-> After enabling UDP GSO for devices not offering checksum offload, we have
-> hit a regression where a bad offload warning can be triggered when sending
-> a datagram with IPv6 extension headers.
+On Wed,  7 Aug 2024 13:39:41 +0300 Dmitry Antipov wrote:
+> In 'taprio_change()', 'admin' pointer may become dangling due to sched
+> switch / removal caused by 'advance_sched()', and critical section
+> protected by 'q->current_entry_lock' is too small to prevent from such
+> a scenario (which causes use-after-free detected by KASAN). Fix this
+> by prefer 'rcu_replace_pointer()' over 'rcu_assign_pointer()' to update
+> 'admin' immediately before an attempt to schedule freeing.
 > 
-> Extend the UDP GSO IPv6 tests to cover this scenario.
-> 
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Fixes: a3d43c0d56f1 ("taprio: Add support adding an admin schedule")
+> Reported-by: syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+No need to repost (yet?) but quick process note, please err on the side
+of incrementing patch versions, this should be a v2 even if only diff 
+is that there are new patches. The version is for the _series_.
+
+https://lore.kernel.org/all/20240805135145.37604-1-dmantipov@yandex.ru/
 
