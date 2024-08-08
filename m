@@ -1,180 +1,169 @@
-Return-Path: <netdev+bounces-116866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6242994BE42
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:12:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 820DE94BE7E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF26AB24833
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:12:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F406B20C63
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3578318DF67;
-	Thu,  8 Aug 2024 13:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E2118CC1E;
+	Thu,  8 Aug 2024 13:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fI6QuV5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A663C18CC0F
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF724A33
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723122721; cv=none; b=gNiDnUE+xI3S8i9IyKpODMeixpnfC0zlH+DAfxv1yuuWOj2jxkBUJUt3He1D8eoV2kz9Q8GxfsFjHggP+bjL8SLixNJSTSOKiE44fXYAZWs8vZfgShIJLWU0NoQ3YjTvSAM7bcQhkniojy03GnWRXNdDst23ywm055foxlIhflc=
+	t=1723123500; cv=none; b=kbwwtgCvGprFZfdKYlSEfZAr/F2vHibxDKkAwUjQAfGEDUZ9zCD5tMkcTcSzRsbOInl/ONZv/3NlU/RG/HoBdxxxZty/xZL34eYbesPGfypjL5xgwYNQi6zBOHXS/v1aAaXp4yTa1Riw0usWBFzrqKpXoYLwrem0p21JFV64f64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723122721; c=relaxed/simple;
-	bh=ORzPHVPKGLPHY2vJXbiktUt8Hp2pFCkHIRqmRPTgtnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bvUXckFCEmJhhmwKhEtTR2Txq6v7g+PbAXRnnluqhVRN4lPt7POKnEW6fe5OIwR8DBgXisHVNAQP/xtmizP4oir3uoV3Y6tmcWMfvl/T8CORf8WdKMh8Fb5/EzNQKj+aTnm2QgWviN0++xq3bl4+mN79IxdlXAxoz9CuG+S5NU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sc2vl-0001BD-T3; Thu, 08 Aug 2024 15:11:49 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sc2vl-005R2i-DZ; Thu, 08 Aug 2024 15:11:49 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 133CE3198F4;
-	Thu, 08 Aug 2024 13:11:49 +0000 (UTC)
-Date: Thu, 8 Aug 2024 15:11:48 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the
- PHY framework
-Message-ID: <20240808-abstract-affable-tuatara-4ab55a-mkl@pengutronix.de>
-References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
- <20240808130833.2083875-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1723123500; c=relaxed/simple;
+	bh=z0wF5/DsHofxXVeO4ZTAg8RY9B+Nv2dlVyDhMPJy5Xc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SM+t/WLMsRy7k1rpC1vy+wskb6mgMJnhfS3Y3QwN71mLYsqJ9J2n4ws5FqiTXv2afUinNYA25m58LA/8yrym80h7BlA0Uaz5CoSW1yDGqSMN023kxU3veVoYWmpG7DhP4gj8DFz0JWce+tDrPc+6XSDDuuObAIKrT6lr+xOL8/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fI6QuV5+; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0baf2a2ed1so3073123276.1
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 06:24:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723123497; x=1723728297; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eq5pkd26vFRb0yXorRbn2L0KGs5TiRJ/jRcU6k+Nfwc=;
+        b=fI6QuV5+ayqiA+Yq8d3Mqg7DHUhLBoBViqL4sytCbMEtG1vNhM6JnLvSrb2NxxU3E5
+         36No6OWwSQj6pyhI+gEATlyWyg0tFOmVZQdXUcP0Wr3YKJ1GPm3Nsc6oCTgacjNJn/z1
+         yFNi+PG3vie7U/4CG7RtGX6DW6SY7Yw1j5aX0O+8uigUE2OnGfLhf8la4KI6qBDjmLLT
+         6q7Js5nONXxHbBcKaZgbYSMlq0JeJkaspZlCo/j1VPrSameLeABCfMfWPNl8eMdQrnOT
+         WckM63AMyqCO/sG90vZG1hnSzDOOP/O/ehGSx36hbm9j/lpstJ0h1bO6ncK+weVMa+VM
+         tqHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723123497; x=1723728297;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eq5pkd26vFRb0yXorRbn2L0KGs5TiRJ/jRcU6k+Nfwc=;
+        b=XftHi8/IzwoX9DW2AjfZnwt8bXrKWnRW0z9wIEJHjy0fgvHr4dBWtNMHrCv/OnUf9+
+         HBmwdRDnrwGPTcO9qBGD/VBsy6poR57zsriCvCb1FJ1w9riasMMTgA54+iRkE3mZya3s
+         vM+kePIZrQDO+1f3YVGZxD7/uDEI54SKBxRjXJWsef/qJAKM9RRP4HJIOOrj6g/fmdQu
+         +6YgL6AGfIJlK5z4eq7UEcrF6hE/oWF17utI8CgOsi7BEypLLeEY5yPhztmWiLkxjkvW
+         MYXY4vQ7fUiMFRf9NvCJCXagfg/5FPLRCpHePE1RVtMZA8l3PW5dpEcLXU544Pxt1x+g
+         tLGw==
+X-Gm-Message-State: AOJu0YwQyzTlUmHESuhos6bojMLZOyhzlR1DtLmIV7n8e6ivHB7j3Ux6
+	fol4bIDCNmi79RQaHKDlVUAXzxYKrwm+LSIBeAiE5+cNSDyqXeVIFjtp8UsTEMiCWGZXV+FccyM
+	4J3Sa2vT2MA==
+X-Google-Smtp-Source: AGHT+IF/JmGVpr/eHJyQgd8LepVl1CqWAD95vTR7MoV+7Yz5WrSGjriLPJJNGIKGSKTEUESKkxDomoLT9YTQEA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:eb10:0:b0:e0b:e23a:9713 with SMTP id
+ 3f1490d57ef6-e0e9f6e9261mr45230276.1.1723123497143; Thu, 08 Aug 2024 06:24:57
+ -0700 (PDT)
+Date: Thu,  8 Aug 2024 13:24:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="grqbxbweaehct3d6"
-Content-Disposition: inline
-In-Reply-To: <20240808130833.2083875-2-o.rempel@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240808132455.3413916-1-edumazet@google.com>
+Subject: [PATCH net] gtp: pull network headers in gtp_dev_xmit()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Harald Welte <laforge@gnumonks.org>
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot/KMSAN reported use of uninit-value in get_dev_xmit() [1]
 
---grqbxbweaehct3d6
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We must make sure the IPv4 or Ipv6 header is pulled in skb->head
+before accessing fields in them.
 
-On 08.08.2024 15:08:32, Oleksij Rempel wrote:
-> Introduce helper functions specific to Open Alliance diagnostics,
-> integrating them into the PHY framework. Currently, these helpers
-> are limited to 1000BaseT1 specific TDR functionality.
->=20
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  drivers/net/phy/Makefile                |  2 +-
->  drivers/net/phy/open_alliance_helpers.c | 70 +++++++++++++++++++++++++
->  include/linux/open_alliance_helpers.h   | 47 +++++++++++++++++
->  3 files changed, 118 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/phy/open_alliance_helpers.c
->  create mode 100644 include/linux/open_alliance_helpers.h
->=20
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index 202ed7f450da6..8a46a04af01a5 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -2,7 +2,7 @@
->  # Makefile for Linux PHY drivers
-> =20
->  libphy-y			:=3D phy.o phy-c45.o phy-core.o phy_device.o \
-> -				   linkmode.o
-> +				   linkmode.o open_alliance_helpers.o
->  mdio-bus-y			+=3D mdio_bus.o mdio_device.o
-> =20
->  ifdef CONFIG_MDIO_DEVICE
-> diff --git a/drivers/net/phy/open_alliance_helpers.c b/drivers/net/phy/op=
-en_alliance_helpers.c
-> new file mode 100644
-> index 0000000000000..eac1004c065ae
-> --- /dev/null
-> +++ b/drivers/net/phy/open_alliance_helpers.c
-> @@ -0,0 +1,70 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * open_alliance_helpers.c - OPEN Alliance specific PHY diagnostic helpe=
-rs
-> + *
-> + * This file contains helper functions for implementing advanced diagnos=
-tic
-> + * features as specified by the OPEN Alliance for automotive Ethernet PH=
-Ys.
-> + * These helpers include functionality for Time Delay Reflection (TDR), =
-dynamic
-> + * channel quality assessment, and other PHY diagnostics.
-> + *
-> + * For more information on the specifications, refer to the OPEN Alliance
-> + * documentation: https://opensig.org/automotive-ethernet-specifications/
-> + */
-> +
-> +#include <linux/ethtool_netlink.h>
-> +#include <linux/open_alliance_helpers.h>
-> +
-> +/**
-> + * oa_1000bt1_get_ethtool_cable_result_code - Convert TDR status to etht=
-ool
-> + *					      result code
-> + * @reg_value: Value read from the TDR register
-> + *
-> + * This function takes a register value from the HDD.TDR register and co=
-nverts
-> + * the TDR status to the corresponding ethtool cable test result code.
-> + *
-> + * Return: The appropriate ethtool result code based on the TDR status
-> + */
-> +int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value)
-> +{
-> +	u8 tdr_status =3D (reg_value & OA_1000BT1_HDD_TDR_STATUS_MASK) >> 4;
-> +	u8 dist_val =3D (reg_value & OA_1000BT1_HDD_TDR_DISTANCE_MASK) >> 8;
+Use pskb_inet_may_pull() to fix this issue.
 
-can you make use of FIELD_GET() here and in the other functions?
+[1]
+BUG: KMSAN: uninit-value in ipv6_pdp_find drivers/net/gtp.c:220 [inline]
+ BUG: KMSAN: uninit-value in gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
+ BUG: KMSAN: uninit-value in gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
+  ipv6_pdp_find drivers/net/gtp.c:220 [inline]
+  gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
+  gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
+  __netdev_start_xmit include/linux/netdevice.h:4913 [inline]
+  netdev_start_xmit include/linux/netdevice.h:4922 [inline]
+  xmit_one net/core/dev.c:3580 [inline]
+  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3596
+  __dev_queue_xmit+0x358c/0x5610 net/core/dev.c:4423
+  dev_queue_xmit include/linux/netdevice.h:3105 [inline]
+  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+  packet_snd net/packet/af_packet.c:3145 [inline]
+  packet_sendmsg+0x90e3/0xa3a0 net/packet/af_packet.c:3177
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2204
+  __do_sys_sendto net/socket.c:2216 [inline]
+  __se_sys_sendto net/socket.c:2212 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
+  x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Marc
+Uninit was created at:
+  slab_post_alloc_hook mm/slub.c:3994 [inline]
+  slab_alloc_node mm/slub.c:4037 [inline]
+  kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
+  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
+  __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
+  alloc_skb include/linux/skbuff.h:1320 [inline]
+  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6526
+  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2815
+  packet_alloc_skb net/packet/af_packet.c:2994 [inline]
+  packet_snd net/packet/af_packet.c:3088 [inline]
+  packet_sendmsg+0x749c/0xa3a0 net/packet/af_packet.c:3177
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+  __sys_sendto+0x685/0x830 net/socket.c:2204
+  __do_sys_sendto net/socket.c:2216 [inline]
+  __se_sys_sendto net/socket.c:2212 [inline]
+  __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
+  x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+CPU: 0 UID: 0 PID: 7115 Comm: syz.1.515 Not tainted 6.11.0-rc1-syzkaller-00043-g94ede2a3e913 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
 
---grqbxbweaehct3d6
-Content-Type: application/pgp-signature; name="signature.asc"
+Fixes: 999cb275c807 ("gtp: add IPv6 support")
+Fixes: 459aa660eb1d ("gtp: add initial driver for datapath of GPRS Tunneling Protocol (GTP-U)")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Harald Welte <laforge@gnumonks.org>
+---
+ drivers/net/gtp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index 427b91aca50d3a370e4ad00071f0c477fefa5076..0696faf60013e0669ceb4aa39dfbac17ad741540 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -1269,6 +1269,9 @@ static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	if (skb_cow_head(skb, dev->needed_headroom))
+ 		goto tx_err;
+ 
++	if (!pskb_inet_may_pull(skb))
++		goto tx_err;
++
+ 	skb_reset_inner_headers(skb);
+ 
+ 	/* PDP context lookups in gtp_build_skb_*() need rcu read-side lock. */
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAma0xBEACgkQKDiiPnot
-vG8jKgf/c8gCG2Uo98J9/izj5O2Cc6IUgNmhpsM/nOYt1y7fpPrBSVyAAJLGRWeh
-xvUXxFhxIBzyODAIvd7tsjn5vJ0ifHB2ktUHQgsa+L/qrUJzBZqGTG8Q7vR/aDp6
-UYsEUYCSQepKCf1etwY/y6nYro5C/hx4RJPk8M3aUhisL5jKsF0kdxfgRlou3IZE
-xwy6lkUGHINTHr0/vZVIC9VMT9abmuLzvgo2tW7fuZ4Vd0nd+gnFEIGf1M5/6wpq
-PiPeqb0RjjCF4TCI4iEu9RDpJaauhbgJMfHbSes3y4k4F1XZUm+kYBjcwvUx76oo
-wKJt2cgfaUHluy9NamMNG4hQwF4pFQ==
-=z3G6
------END PGP SIGNATURE-----
-
---grqbxbweaehct3d6--
 
