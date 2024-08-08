@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-116668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A1094B564
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 05:19:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1114394B56B
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 05:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BD811C20FC8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC893B21724
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC052CCC2;
-	Thu,  8 Aug 2024 03:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4F541C6D;
+	Thu,  8 Aug 2024 03:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BS4ykAC/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LsEc++iS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AC6CA6F;
-	Thu,  8 Aug 2024 03:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16AE26AF7;
+	Thu,  8 Aug 2024 03:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723087139; cv=none; b=lVbSOifnbJaJ34Og+ao7VttARgLDl3BRnW1H2tlXe5vzR5HsLCuZv5J9OnhZTXSmcEEj04cUXSQ0tCkJGx+okowD/bYu7y0LTMjAeI+y2vdopd1nRwD/GPOv1lDHaW0w9G2TJVqm61Vm9taelmGdiz9IfeZ8a/5WkgGWLQZfJ8Y=
+	t=1723087346; cv=none; b=k9INNwoRRwikPoSom4D1K4vf/+rJcmVpHigKSp75DZMX5LRvoEnuOoOA+3fOmdxerOTmunITdXFjE3tLajQJtoBy1nrEueD13UOq/KQLo13ie1WKbl4ajvWwGcUfBOfM6ccxqlS02LCIGRjF/8fh4zB51pUrBLOEVrWIjpmtvGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723087139; c=relaxed/simple;
-	bh=VVR+xEtsgA7xj816NAm5owc3atP8G1fTSEBkGMayaR8=;
+	s=arc-20240116; t=1723087346; c=relaxed/simple;
+	bh=UQttgjTk6MpDHnQe0vVAsTbqSfrXqTtNF0aq3AVcO8A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jXX0wO+Dmm+j3Pco6/+8EHaBX8T288NgYqGTRvzJyv1mk+NQODWjueHSYVkQ4RyRysH7jkbrQYtMFMs6RSI6KVAZsdTqwSlTbiT7yeIE1hyCn6Q5b3r0pk+S+0jD6VTl6Poe2D23eXwncMKNVdGAGEe6xe/fER4OuElmKtU2dOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BS4ykAC/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97B36C32781;
-	Thu,  8 Aug 2024 03:18:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QOW3JYFaq4Y6THcuoGgpGRpkcxQC3XmAGBnjRmbvR1Qg7xKY0IlkRrKRhHGEzY4X4KWWxgBd4FVRxFan5uTzAEhZV2U+6HpHpxmEb6fq9KephmY5Tq12A1iRRMReow1uVTiEIDxACSOdjFJu532ydYhl0b3fTphlaP0XLXHRWQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsEc++iS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2A4DC32781;
+	Thu,  8 Aug 2024 03:22:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723087139;
-	bh=VVR+xEtsgA7xj816NAm5owc3atP8G1fTSEBkGMayaR8=;
+	s=k20201202; t=1723087346;
+	bh=UQttgjTk6MpDHnQe0vVAsTbqSfrXqTtNF0aq3AVcO8A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BS4ykAC/Y4nza/CoFDs74AMtAxKcxtjAR92RS3nukMWmWdqymlWlOjLnuZ0Cr+B3/
-	 +GIIkS66/58n9rcU3U77a8lC93af/0QdTzlemtkMvCodoq04Tb6megb1eNs78eqk+Q
-	 9N7RoMMg6/kQx//eq7xYYbCrVuCkx5mOmSMjZBES3EwKOIuh7ajiTWRgSbI+fIBg0X
-	 5wC1RPHwpst4Jqd1MrSSyHyEJkgqgYnDOky2KByeDwyNLQMJ3oryBe7q7EiKOvKKsT
-	 EgE84IuUayR08jrLumr/NA+DHN6EzkXjeEaIeWwU3WNUPwe/p0ZGVrSsmen+TJbv8v
-	 93RDiFKm6PRMw==
-Date: Wed, 7 Aug 2024 20:18:57 -0700
+	b=LsEc++iS35P3NdSDtzwhdHIBUGb1WkckuaY7K7XMZFBzKTszmLSqOFPJPcWQUYkWU
+	 1fWCnAXPKgo3R7dgBJ0NHGNF/HYbatmcxsYV+a5qSOX7h6yJyAeDu044ATMZoADs48
+	 IvmJVuyvA0CqlINtyWZs2qp0TpiG4Arx343hp+1OLT0Bx3eB7nzghwMYXRrJ98uVH3
+	 biWHDg9jubfQXaO2iftNL/lI144/QfJbcjXNOAGfW1PrO5PDVtYWnSENs5SsgwsbtO
+	 ISHk4D6DbcdMq7TU9oFh1FXUkHFv5GNQIKqN8OQZ41LX3sVxCvOxcIuCN2J0gYlFs9
+	 +q0Pco1dVuR2w==
+Date: Wed, 7 Aug 2024 20:22:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, ernis@microsoft.com
-Subject: Re: [PATCH] net: netvsc: Increase default VMBus channel from 8 to
- 16
-Message-ID: <20240807201857.445f9f95@kernel.org>
-In-Reply-To: <1722923751-27296-1-git-send-email-ernis@linux.microsoft.com>
-References: <1722923751-27296-1-git-send-email-ernis@linux.microsoft.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+ stable@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
+ Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Stanislav Fomichev
+ <sdf@fomichev.me>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>
+Subject: Re: [PATCH net] eventpoll: Annotate data-race of busy_poll_usecs
+Message-ID: <20240807202224.0fe40c4b@kernel.org>
+In-Reply-To: <20240806123301.167557-1-jdamato@fastly.com>
+References: <20240806123301.167557-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,21 +63,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  5 Aug 2024 22:55:51 -0700 Erni Sri Satya Vennela wrote:
-> Performance tests showed significant improvement in throughput:
-> - 0.54% for 16 vCPUs
-> - 1.51% for 32 vCPUs
-> - 0.72% for 48 vCPUs
-> - 5.57% for 64 vCPUs
-> - 9.14% for 96 vCPUs
+On Tue,  6 Aug 2024 12:33:01 +0000 Joe Damato wrote:
+> From: Martin Karsten <mkarsten@uwaterloo.ca>
+> 
+> A struct eventpoll's busy_poll_usecs field can be modified via a user
+> ioctl at any time. All reads of this field should be annotated with
+> READ_ONCE.
+> 
+> Fixes: 85455c795c07 ("eventpoll: support busy poll per epoll instance")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
 
-Could you please switch to netif_get_num_default_rss_queues() ?
-It used to return hard coded 8, but now it returns #physical cores / 2.
-That's based on broad experience with Meta's workloads. Some workloads
-need more some needs fewer, but broadly half of physical cores is
-a good guess for 90%+
-Assuming you have thread siblings in those vCPUs above it should
-match what you want, too.
+Christian took the net-next cleanup, I presume he'll take this too.
 -- 
-pw-bot: cr
+pw-bot: not-applicable
 
