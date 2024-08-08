@@ -1,191 +1,515 @@
-Return-Path: <netdev+bounces-116814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1383C94BC74
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:46:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A956494BC91
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:54:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8B3B2837C4
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:46:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 363981F21CBD
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19F3156220;
-	Thu,  8 Aug 2024 11:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822CD18C327;
+	Thu,  8 Aug 2024 11:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gLoLfY8Q"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ovBnGy4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2074.outbound.protection.outlook.com [40.107.101.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1283013D265;
-	Thu,  8 Aug 2024 11:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723117589; cv=fail; b=qkcQtIQ7pAnWBfojjCliqZdMHFhJsvYljllCg828t/tiz03Fyv0sdMbDHqbyb3g0dBZ+av+Ve3kA9/pbG+gtH8mVosRLFpqHvH9tXXWOUBt1OaFtOVamEXHTDybuHZUldwlk7tErWCiLa7EaLyqnCP8ERffqKlTSBKYxdvy176A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723117589; c=relaxed/simple;
-	bh=Ly+h6zQhpj4F+uYJlv2DJzsmMjLl1C52Jss0dE5pfsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=KoT0+Y11+P7Hn9KtaHkAaLYu23jUu0BK7pI+uccjalDdk5YahRyhbKv8vZs68ZfLQuZI34sWjsBUN+TC99xEHuHCwitrVZ6qD6OcSYvFao+hyQ0TWmAuL8Yr8zusppnc7aqAqWlFGiSnNd4znFW8U7fWPgGqfI9xyw5HXDDxtHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gLoLfY8Q; arc=fail smtp.client-ip=40.107.101.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QdDLklqqWZzfCWetyplhBCdhAZuTAqof8NfRbKd3sr5StVgzSU+U1mqFV8MqxKiRImt/q1ZV7MWcHOEUO7VoHZjSyt6ZYmRYaB6YLYurG+q8ODkHixFnLGzLR3nfD+uar4hSU4ArVEXEtNO2ypyEYwwxVht2bljhOXfNFh7U2qH9EWfKOz5ecJJmC2+UQj4Fx+rrXtVwKtCmipOXq8kMAwv//PWLQAItj6Kr8bR2eY4jkEyGKZ78aNm/ghCGbZeHEadEoNR+Dxtq60/2rXqKUt5SYqYNGWwiLgg5d6WTWggWAuZRs95WbJcArZNWjc5MQn6GMDOjt1W+whuPEM9e7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e7VmUeN2bPZUZQ3pglkA2B7eMGe7LNoZz2CPFZVHm/0=;
- b=PAHE52WQ1duDRAXHoK9fqnk/+JsyNeme6KHn/uvQQ0FaPZAoyl4q8OA9dxSTWxUG4bGhD708ji6eVf565pNGt6Av/+TYW2wQjJlPE9H1e88ZwnQiUX59UYthLEq1UvcinoVTIAcfs9HdKW8e1ewxdSwejybJZBNqi8zlXKYjnpin8KOoSr1lyNwEze/JO8XcRoIJ44U5zk5ZETPfXlyyWMUb85VXOLjmYJCRvChTfdDcb2FN8ovVNLh+JYKR23Dbwzeqc4Ckf9vu7sWbqu7PmMJ7o7PYXpcj+I5/DOVbwm0Ann7UlbyVV5U8lMSIj3xkMYWHtDRijVGr7PEFo1DcoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7VmUeN2bPZUZQ3pglkA2B7eMGe7LNoZz2CPFZVHm/0=;
- b=gLoLfY8Q5KjXvwIwFY5R2EksduKt7KwVEBmSOd4hw4fVaPR+CWItHBJlbuIHoQy0GInToEe5NJTweT75Jr2ZiPia4ZGuJIAxlCjxa+qt8GnJ5mURK1BFTVZ5CZ5/OLO5+SI3LS7MnvIUCHDf+UkCsLMndcWfN5KdD0+2Cnt3aK20MQtzsUjwycmvHXx4g4h+Q+jHbykzqT6Ydy8eu6ghW7svUHBysvMUQVpnfEh7oHq1GACEJ7oh/rdejlIVIy/s48kxm7tA1pxK9Bv6FD0g0c6REYD5xW/zpJXj4k6/qk3VQqvHsZGbuSGPLLmakY6TtB7L4kVX4jwak9gUDtqNWg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by PH8PR12MB6819.namprd12.prod.outlook.com (2603:10b6:510:1ca::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Thu, 8 Aug
- 2024 11:46:24 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7849.014; Thu, 8 Aug 2024
- 11:46:24 +0000
-Date: Thu, 8 Aug 2024 08:46:22 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Oded Gabbay <ogabbay@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH v2 5/8] fwctl: FWCTL_RPC to execute a Remote Procedure
- Call to device firmware
-Message-ID: <20240808114622.GA8378@nvidia.com>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <ZrMl1bkPP-3G9B4N@T14sgabbay.>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrMl1bkPP-3G9B4N@T14sgabbay.>
-X-ClientProxiedBy: BLAPR03CA0166.namprd03.prod.outlook.com
- (2603:10b6:208:32f::18) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082A818A6A1
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 11:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723118045; cv=none; b=vDsXRMxcgMnPxX8dZ12oLNG4bctV4RYv7Dz5JpnZIk0euq/deXCQH6V5xmT/e83Lma31BplJpbGxWy4/DLg6B84yE6+/W0K4Yz5kqzTXfc+/YrFeRcGZS1cK1cBr0bjBwjxuzLSxFz+ZGnseudYk7O+A1QzIsdxHrAh9bgLmk6M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723118045; c=relaxed/simple;
+	bh=qORwyzZNVy+LEfLQUhKyUT6dDm8Pd+lt5k8zjI+Wak0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=shzuVbhZGFOoWTykPOnGDhpuwzIPeuFPfoWBXfYUc3tFPVTwing3TlWVl5gBLBwWrgTg9FYS+DueUOMToj/uQIcA+1UImlNisZOvHA2Mlp2EXhRUezVUCQDZthbfipllHFauoHk2kJNpPXtOnzoRVybqIC1MopD++Dex8wsHtOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ovBnGy4Q; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-368380828d6so471655f8f.1
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 04:54:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723118041; x=1723722841; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cWpv6IdB+ZSBfOKheCIDI4o/Rhh1iSvNP7j21IpVm2Y=;
+        b=ovBnGy4QfvxjOSGjItaR+QtNT+VMNsDk93owP/b/KxRxIklaImK2lzC62Gsa7PbK6j
+         SCugvA4h+3cuqFSRKCP6sSKSyijXm9FfArVQfGWdJaW0BWOm2yUMNhrl/wzJbX2Z7ajB
+         zd162fFirG9k/2nFj2fbOcAwPOXiLQZn+7bhJip1vEi5sBRkZ9XX8p6cgebhtjdkDjL1
+         AcMB4CHc2+hYfAAI/vnw43NpsvsUnuwxr6+hySR4WkaCaoi5EVMRY4dDYIRREywICYlS
+         Ozktk5qvP7Ghxe7s5Zjmig4Y7tzdYP58Vf3JbtDmt4SMBXMkgsNRWIWzX7+o9lEWbXVb
+         mLxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723118041; x=1723722841;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cWpv6IdB+ZSBfOKheCIDI4o/Rhh1iSvNP7j21IpVm2Y=;
+        b=mLGgnM/TivWbjkt6UH95beb+/pxZfNc4jQWsTMSeHj7T7N3WlqsO0/U6wjKh7qYgts
+         Vdk7ISXBUh4lO9svvuwv01kk/IuVSjtU7UlIw8f8mB3RMVGq/XVJTlYXAenEfITAycim
+         OISr3Jkot76lj9ne/mmF3IgCkVGd36XUkezspWd/0lY8KeWO0cN2WxFf6iDtTS1vB7Ce
+         hsJiRfp7o3Gmp5pcZG6ovFVFeypHKth+nC6qNlic7G6CFecNVxSxg6s0psipnyGXDF+K
+         BQULNbY8drS7F06aDMu4AZ0kmDinsEmAw/R0d/1a60HSy1INEPS9PyNICcKwNl6Kufw8
+         vl+Q==
+X-Gm-Message-State: AOJu0YwNPGSG+Ku7wV7bGJtfo7mhw7g+tuYJ/9UdXj1H6aay0Q56g4jV
+	C4kx69EVRaUdjM3sqAlZ87N38qZBTqEQyif7NlxhWd1QEHERB1qBmTbBgrb0SQE=
+X-Google-Smtp-Source: AGHT+IFbwV1ZgK3TfeFhHW45tmFI2J0yflhWdJBEw/KQZN0Y2AF+Ufz9gZ31TJyAL/7pee3t219e8g==
+X-Received: by 2002:a5d:4f11:0:b0:367:96a0:c4b7 with SMTP id ffacd0b85a97d-36d27582bf5mr1231300f8f.62.1723118035463;
+        Thu, 08 Aug 2024 04:53:55 -0700 (PDT)
+Received: from localhost ([213.235.133.109])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d2718bfb9sm1676883f8f.54.2024.08.08.04.53.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 04:53:54 -0700 (PDT)
+Date: Thu, 8 Aug 2024 13:53:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, donald.hunter@gmail.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH net-next v1 1/2] dpll: add Embedded SYNC feature for a pin
+Message-ID: <ZrSx0QRXUXB53UFr@nanopsycho.orion>
+References: <20240808112013.166621-1-arkadiusz.kubalewski@intel.com>
+ <20240808112013.166621-2-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|PH8PR12MB6819:EE_
-X-MS-Office365-Filtering-Correlation-Id: 79681a53-629a-40e3-0252-08dcb79fbacb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lOvpq3ZynVDgLUn3gcDBWbftqB9nY9sDDD5Mse7XOiyOd5ZvPTCQVLtTNU4h?=
- =?us-ascii?Q?f+d8fcZFfpzqJCR6ezCqLXA201RB0sayyDYCp4wG8vchRYkUrd4YEfLuyE4d?=
- =?us-ascii?Q?HM+xz8irjnhsryhA5FGr6mJHAjNO0pUkYyIyWgWxpp996UmbFEBBKbcDN6P0?=
- =?us-ascii?Q?rkYDcXQZ5u7avZSyxTGsakfzozHoNLS2Gqzut0urHmurus7X4szB5s+FwfX4?=
- =?us-ascii?Q?KQDsa9lFaK9a/DeLcLnRjl7Xxgj3fzGHS7R2DiY8rZUekFY4Xa2KDOglhR4p?=
- =?us-ascii?Q?MAAIXOt8WBakAjtBy7Qt/snWfXnzQSAq+lSZ2mWMKai5Vhrnae8qg/rEEhga?=
- =?us-ascii?Q?leaXHEbEKBK406H23GlkE8WXD/cM0CL09Kt5cvTSpE8ATBBa28y8E6RY2/NG?=
- =?us-ascii?Q?tIKefg5sSJU2iX9oWjfKX7/gPgTQJKx6ABJ/UsKKkaITASFqqy9blT0KuAiq?=
- =?us-ascii?Q?rse15iVb3tX5I1NZAcBDy3ySMRNYkxr+8YV++UU/hB9iBadZ2ubxQmVtoVNh?=
- =?us-ascii?Q?9PverY3DzlpwiugEH96egPVI5J/DIlQ1yhog2De1YSnB3tJuIHZ0GWIyAeV1?=
- =?us-ascii?Q?BS+dJtkoiTnMC98ACWAAqYVZvFEp7/R/w4AWKsRINu17hdH3XY7G89K0Kp83?=
- =?us-ascii?Q?tcm8rbdGIoUhfJHwsabJJVZhhmK9tfDGorvo/s2U4ay+4EbimutYEaeUE4gl?=
- =?us-ascii?Q?0CLx/NtbVhqu+7EjyzMIeTSQRTeZrM/zSfDaNgf0IZpbBUratdW2UAfvs0nq?=
- =?us-ascii?Q?lZZtXcJXKH1y75C6L1fMxBOuoFSpXkT5YPS7ir7YSQCeTVSi7HyAlpgZo7Wd?=
- =?us-ascii?Q?VyMzzBY3VNxXLhij9AzajyXv8cHxrCuwA37gUT1aNmPOOYrp+Jokb+QTiMeu?=
- =?us-ascii?Q?R3Fo0AQNzuNSmkvScc6UtqQK2AezaDPnMnI4KQWtpLJrIjzNxhVd8HbrFzf0?=
- =?us-ascii?Q?mdJ1z5Jgm6l3kaj7rxYJ5XH4eF9yCZk8kh6jmRdHQa+cOsqhwGFdKSitop5A?=
- =?us-ascii?Q?qDS0cx1Dckhwwdh31N1bNJFvswESkCIikH5WZKOaJUmmOS6XN4cNkcn9u49Q?=
- =?us-ascii?Q?KOcVSW66Px1vAuWNfEi5rFbFdBh98wdrMkDqRwiXME+b2QTVnrA+WdIBweK2?=
- =?us-ascii?Q?Zbk+V0Vec5S2qpXiGqg2B9fAld10LXSHkX0QcbbgPlfhtUykaMFtLSHzOukZ?=
- =?us-ascii?Q?Y0OlFyO4Ia207TndqfMIzbnEs4RDPJdUeSLR7UJtjQURWq268jmVZryrinzT?=
- =?us-ascii?Q?M9EL2H+LN4VaOp4NHbAzB+5KsDyHMScIcHKn+jmomqjI4TYpNScNV+Yf0ob1?=
- =?us-ascii?Q?Txvoam/39+Ar4IaQIXUYCUVfrdj41ERwyyPgKRw3ilhZ7w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xGqWjts3fOa3L8hiGRKOK7Tne7DCExDlFaySzmjrI/pwKbKYVWbHQpRE3oo9?=
- =?us-ascii?Q?k4qcdBWRVqkhdXk9nbh4enhE+YBldEOw6t3UABSbDGtyUwSkr8uqJZcBrkkG?=
- =?us-ascii?Q?upTL25fL3iOAVyEfVi5bHYn+SaC3d/8AQ8s9GNcxMpTJinztGsMTphAppSnf?=
- =?us-ascii?Q?OsePjueM5Tn/3MgloGe41yrMKmEtScLZjTSxtzN4fCsBCDC+ZojXUZ5R99wR?=
- =?us-ascii?Q?+sOj1rSMHKN+nJ6LhbCtn1lM+YLaeniJhEIsRys17okjZVBey5KVDa7gk6pY?=
- =?us-ascii?Q?eastcpgNTD3MDqUTYfKv7+GszPzStLq2DNJ+dyJqsGEQN5b6n4J/TUYSO1eo?=
- =?us-ascii?Q?yFIPpD2+6hbFh/UJBdkP5NCAmmrAlCpx9uO0UuSiRYmvg9JFKNqaqLv/t8zz?=
- =?us-ascii?Q?L3kmeYVZJHkAl2R9EKI2s3v5ZgkYOfAytF2HGOPxjG/HlVbbm5UCT/hGUvds?=
- =?us-ascii?Q?J6OarWLJvmH9AXlpw3VkyZGF0Z7lPmLmo9HlM9YZSBashOUnmgYnhPxL4v1A?=
- =?us-ascii?Q?euO3YYuGyEMAu52q/fGSyPy1cCZtQBXLnDCjIVOMwZ8/8A2vTJMQqO+HQzNN?=
- =?us-ascii?Q?igN5KblRcs8LDUSP4yot0eJoy5bX3T1VLxrsNXXznYk4K7k27PG0ugih7WP2?=
- =?us-ascii?Q?SVhKKkUwc97GEh0OSqR2/bBBnJX/D8nx7EqxZalZ9vvDraxZ3kfPTlDMSLK3?=
- =?us-ascii?Q?ay4+bE8ZfBGWi9voYfRpMFF0XIf1NnIA4oRROwS0wGp1KEaip88l514kDOAu?=
- =?us-ascii?Q?e2LxeEuvoXIqhviOS/eXFOXH4C2Cd5a5H4DxmKq+QAMQYONee873oXYLv0gm?=
- =?us-ascii?Q?SlzRPjPqrhVz/UFSWXUI1WZEp8nb5Fk49v/uHp37UFRWmsBhtzk4SrVlPmZX?=
- =?us-ascii?Q?7Zb+AK66wNQ2j5T3L0eHytOq0JM3x1iWCMtdi2RKLjt34Sx5ncGdRCVsb1d5?=
- =?us-ascii?Q?ktEGcGcCZoXnnKq5zitOPD40l9YCHZ5MEMOUBK/8ixknksyNBJK+4gIDwgkD?=
- =?us-ascii?Q?a1BRsGt3SbxSKRwxkjNs2GUH1awukIv1z9UswxwfQAQ1AXO9PcFSUjJHFgUj?=
- =?us-ascii?Q?X/0J8JmWlDnzxnycWI7yTUQ6UrQTi0hhE068y92B2Z10yjb1STosqQanZJ+W?=
- =?us-ascii?Q?f6Fe2ZRRWNIplK7rghCN8rm5DgGuuvNn36GuWBtHWVZuFwuSSglrpfX93XvJ?=
- =?us-ascii?Q?B8++ornPP/6PsR+L1Z+B1ZyOS2CpTrucAU1bsuY+4J2YWMJscbVqQHiw2+2v?=
- =?us-ascii?Q?0NeKDtqwna9eZzgzQWpWsu+HOX7Os1IeT+e/JWqiSc/sME60RvTtjVP4jwNd?=
- =?us-ascii?Q?lBDCCrVTsd11b8dbkA452lk4/rlQfe3AAqCpUC44Au+pYxrCg32OROtlPHM0?=
- =?us-ascii?Q?lSJ6ugSf7h9GhtYuWcRMoxb/sXOnMJpOoXN0w+mRjCLtuhMk2mT/W2tIggCv?=
- =?us-ascii?Q?doIsFpWJWiwvHDCzdEuA3rGYNofExeCsGcl8ZML7mKzp9KkqK5dYsmY6MmPm?=
- =?us-ascii?Q?QqlhElWEDU6DNhvHrq0VYDY578bqc2g3goB1UztGDInDAAJPHP88PT0eNBq/?=
- =?us-ascii?Q?XkEBXhqJbbPYTbcDkqfcJimi5edBHs1rWZPUcJ+E?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79681a53-629a-40e3-0252-08dcb79fbacb
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2024 11:46:24.4486
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HEk52IbIb5OKmafBViDDGLr+1CBA/tKrLMdZN8pb/VV7S+BTj099UEhdT5aiUwPc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6819
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808112013.166621-2-arkadiusz.kubalewski@intel.com>
 
-On Wed, Aug 07, 2024 at 10:44:21AM +0300, Oded Gabbay wrote:
-> Disconnecting the RPCs from the drivers and providing a generic interface will
-> allow to have a single user-space library which will be able to communicate
-> with the firmware for all the IPs in the device. In Habana's case, it was
-> mainly for monitoring and debugging purposes.
+Thu, Aug 08, 2024 at 01:20:12PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>Implement and document new pin attributes for providing Embedded SYNC
+>capabilities to the DPLL subsystem users through a netlink pin-get
+>do/dump messages. Allow the user to set Embedded SYNC frequency with
+>pin-set do netlink message.
+>
+>Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>---
+> Documentation/driver-api/dpll.rst     |  21 +++++
+> Documentation/netlink/specs/dpll.yaml |  41 +++++++++
+> drivers/dpll/dpll_netlink.c           | 127 ++++++++++++++++++++++++++
+> drivers/dpll/dpll_nl.c                |   5 +-
+> include/linux/dpll.h                  |  10 ++
+> include/uapi/linux/dpll.h             |  23 +++++
+> 6 files changed, 225 insertions(+), 2 deletions(-)
+>
+>diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
+>index ea8d16600e16..d7d091d268a1 100644
+>--- a/Documentation/driver-api/dpll.rst
+>+++ b/Documentation/driver-api/dpll.rst
+>@@ -214,6 +214,27 @@ offset values are fractional with 3-digit decimal places and shell be
+> divided with ``DPLL_PIN_PHASE_OFFSET_DIVIDER`` to get integer part and
+> modulo divided to get fractional part.
+> 
+>+Embedded SYNC
+>+=============
+>+
+>+Device may provide ability to use Embedded SYNC feature. It allows
+>+to embed additional SYNC signal into the base frequency of a pin - a one
+>+special pulse of base frequency signal every time SYNC signal pulse
+>+happens. The user can configure the frequency of Embedded SYNC.
+>+The Embedded SYNC capability is always related to a given base frequency
+>+and HW capabilities. The user is provided a range of embedded sync
+>+frequencies supported, depending on current base frequency configured for
+>+the pin.
+>+
+>+  ========================================= =================================
+>+  ``DPLL_A_PIN_E_SYNC_FREQUENCY``           current embedded SYNC frequency
+>+  ``DPLL_A_PIN_E_SYNC_FREQUENCY_SUPPORTED`` nest available embedded SYNC
+>+                                            frequency ranges
+>+    ``DPLL_A_PIN_FREQUENCY_MIN``            attr minimum value of frequency
+>+    ``DPLL_A_PIN_FREQUENCY_MAX``            attr maximum value of frequency
+>+  ``DPLL_A_PIN_E_SYNC_PULSE``               pulse type of embedded SYNC
+>+  ========================================= =================================
+>+
+> Configuration commands group
+> ============================
+> 
+>diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+>index 94132d30e0e0..0aabf6f1fc2f 100644
+>--- a/Documentation/netlink/specs/dpll.yaml
+>+++ b/Documentation/netlink/specs/dpll.yaml
+>@@ -210,6 +210,25 @@ definitions:
+>       integer part of a measured phase offset value.
+>       Value of (DPLL_A_PHASE_OFFSET % DPLL_PHASE_OFFSET_DIVIDER) is a
+>       fractional part of a measured phase offset value.
+>+  -
+>+    type: enum
+>+    name: pin-e-sync-pulse
+>+    doc: |
+>+      defines possible pulse length ratio between high and low state when
+>+      embedded sync signal occurs on base clock signal frequency
+>+    entries:
+>+      -
+>+        name: none
+>+        doc: embedded sync not enabled
+>+      -
+>+        name: 25-75
+>+        doc: when embedded sync signal occurs 25% of signal's period is in
+>+          high state, 75% of signal's period is in low state
+>+      -
+>+        name: 75-25
 
-Yeah, monitoring and debugging is definately a key use case.
- 
-> I do have one question about the rpc ioctl. Are you assuming that the rpc
-> is synchronous (we send a message to the firmware and block until we get the
-> reply)? If so, what happen if we have an async RPC implementation
-> inside the driver? How would you recommend to handle it?
+It is very odd to name enums like this.
+Why can't this be:
 
-Yes, this is all simplified so the ioctl system call is
-synchronous. mlx5 is async under the hood too, it just launches an
-async work and waits on a completion before returning from the system
-call.
+    name: e-sync-pulse-ratio
+    type: u32
+    doc: Embedded sync signal ratio. Value of 0 to 100. Defines the high
+    state percentage.
 
-Userspace could multi-thread it, and If people were really keen maybe
-there is some io_uring approach.
+?
 
-Thanks,
-Jason
+
+>+        doc: when embedded sync signal occurs 75% of signal's period is in
+>+          high state, 25% of signal's period is in low state
+>+    render-max: true
+> 
+> attribute-sets:
+>   -
+>@@ -345,6 +364,24 @@ attribute-sets:
+>           Value is in PPM (parts per million).
+>           This may be implemented for example for pin of type
+>           PIN_TYPE_SYNCE_ETH_PORT.
+>+      -
+>+        name: e-sync-frequency
+>+        type: u64
+>+        doc: |
+>+          Embedded Sync frequency. If provided a non-zero value, the pin is
+
+Why non-zero? Why the attr cannot be omitted instead?
+
+
+>+          configured with an embedded sync signal into its base frequency.
+>+      -
+>+        name: e-sync-frequency-supported
+>+        type: nest
+>+        nested-attributes: frequency-range
+>+        doc: |
+>+          If provided a pin is capable of enabling embedded sync frequency
+>+          into it's base frequency signal.
+>+      -
+>+        name: e-sync-pulse
+>+        type: u32
+>+        enum: pin-e-sync-pulse
+>+        doc: Embedded sync signal ratio.
+>   -
+>     name: pin-parent-device
+>     subset-of: pin
+>@@ -510,6 +547,9 @@ operations:
+>             - phase-adjust-max
+>             - phase-adjust
+>             - fractional-frequency-offset
+>+            - e-sync-frequency
+>+            - e-sync-frequency-supported
+>+            - e-sync-pulse
+> 
+>       dump:
+>         request:
+>@@ -536,6 +576,7 @@ operations:
+>             - parent-device
+>             - parent-pin
+>             - phase-adjust
+>+            - e-sync-frequency
+>     -
+>       name: pin-create-ntf
+>       doc: Notification about pin appearing
+>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+>index 98e6ad8528d3..5ae2c0adb98e 100644
+>--- a/drivers/dpll/dpll_netlink.c
+>+++ b/drivers/dpll/dpll_netlink.c
+>@@ -342,6 +342,50 @@ dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
+> 	return 0;
+> }
+> 
+>+static int
+>+dpll_msg_add_pin_esync(struct sk_buff *msg, struct dpll_pin *pin,
+
+This is "esync", attributes are "E_SYNC". Why can't they be named
+"ESYNC" too? Same comment to another "e_sync" names (vars, ops, etc).
+
+
+>+		       struct dpll_pin_ref *ref, struct netlink_ext_ack *extack)
+>+{
+>+	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>+	struct dpll_device *dpll = ref->dpll;
+>+	enum dpll_pin_e_sync_pulse pulse;
+>+	struct dpll_pin_frequency range;
+>+	struct nlattr *nest;
+>+	u64 esync;
+>+	int ret;
+>+
+>+	if (!ops->e_sync_get)
+>+		return 0;
+>+	ret = ops->e_sync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
+>+			      dpll_priv(dpll), &esync, &range, &pulse, extack);
+>+	if (ret == -EOPNOTSUPP)
+>+		return 0;
+>+	else if (ret)
+>+		return ret;
+>+	if (nla_put_64bit(msg, DPLL_A_PIN_E_SYNC_FREQUENCY, sizeof(esync),
+>+			  &esync, DPLL_A_PIN_PAD))
+>+		return -EMSGSIZE;
+>+	if (nla_put_u32(msg, DPLL_A_PIN_E_SYNC_PULSE, pulse))
+>+		return -EMSGSIZE;
+>+
+>+	nest = nla_nest_start(msg, DPLL_A_PIN_E_SYNC_FREQUENCY_SUPPORTED);
+>+	if (!nest)
+>+		return -EMSGSIZE;
+>+	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN, sizeof(range.min),
+>+			  &range.min, DPLL_A_PIN_PAD)) {
+>+		nla_nest_cancel(msg, nest);
+>+		return -EMSGSIZE;
+>+	}
+>+	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX, sizeof(range.max),
+>+			  &range.max, DPLL_A_PIN_PAD)) {
+
+Don't you want to have the MIN-MAX here multiple times. I mean, in
+theory, can the device support 2 fixed frequencies for example?
+Have it at least for UAPI so this is easily extendable.
+
+
+
+>+		nla_nest_cancel(msg, nest);
+>+		return -EMSGSIZE;
+>+	}
+>+	nla_nest_end(msg, nest);
+>+
+>+	return 0;
+>+}
+>+
+> static bool dpll_pin_is_freq_supported(struct dpll_pin *pin, u32 freq)
+> {
+> 	int fs;
+>@@ -481,6 +525,9 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+> 	if (ret)
+> 		return ret;
+> 	ret = dpll_msg_add_ffo(msg, pin, ref, extack);
+>+	if (ret)
+>+		return ret;
+>+	ret = dpll_msg_add_pin_esync(msg, pin, ref, extack);
+> 	if (ret)
+> 		return ret;
+> 	if (xa_empty(&pin->parent_refs))
+>@@ -738,6 +785,81 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
+> 	return ret;
+> }
+> 
+>+static int
+>+dpll_pin_e_sync_set(struct dpll_pin *pin, struct nlattr *a,
+>+		    struct netlink_ext_ack *extack)
+>+{
+>+	u64 esync = nla_get_u64(a), old_esync;
+
+"freq"/"old_freq". That aligns with the existing code.
+
+
+>+	struct dpll_pin_ref *ref, *failed;
+>+	enum dpll_pin_e_sync_pulse pulse;
+>+	struct dpll_pin_frequency range;
+>+	const struct dpll_pin_ops *ops;
+>+	struct dpll_device *dpll;
+>+	unsigned long i;
+>+	int ret;
+>+
+>+	xa_for_each(&pin->dpll_refs, i, ref) {
+>+		ops = dpll_pin_ops(ref);
+>+		if (!ops->e_sync_set ||
+
+No need for line break.
+
+
+>+		    !ops->e_sync_get) {
+>+			NL_SET_ERR_MSG(extack,
+>+				       "embedded sync feature is not supported by this device");
+>+			return -EOPNOTSUPP;
+>+		}
+>+	}
+>+	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
+>+	ops = dpll_pin_ops(ref);
+>+	dpll = ref->dpll;
+>+	ret = ops->e_sync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
+>+			      dpll_priv(dpll), &old_esync, &range, &pulse, extack);
+
+Line over 80cols? Didn't checkpatch warn you?
+
+
+>+	if (ret) {
+>+		NL_SET_ERR_MSG(extack, "unable to get current embedded sync frequency value");
+>+		return ret;
+>+	}
+>+	if (esync == old_esync)
+>+		return 0;
+>+	if (esync > range.max || esync < range.min) {
+>+		NL_SET_ERR_MSG_ATTR(extack, a,
+>+				    "requested embedded sync frequency value is not supported by this device");
+>+		return -EINVAL;
+>+	}
+>+
+>+	xa_for_each(&pin->dpll_refs, i, ref) {
+>+		void *pin_dpll_priv;
+>+
+>+		ops = dpll_pin_ops(ref);
+>+		dpll = ref->dpll;
+>+		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
+>+		ret = ops->e_sync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
+>+				      esync, extack);
+>+		if (ret) {
+>+			failed = ref;
+>+			NL_SET_ERR_MSG_FMT(extack,
+>+					   "embedded sync frequency set failed for dpll_id:%u",
+>+					   dpll->id);
+>+			goto rollback;
+>+		}
+>+	}
+>+	__dpll_pin_change_ntf(pin);
+>+
+>+	return 0;
+>+
+>+rollback:
+>+	xa_for_each(&pin->dpll_refs, i, ref) {
+>+		void *pin_dpll_priv;
+>+
+>+		if (ref == failed)
+>+			break;
+>+		ops = dpll_pin_ops(ref);
+>+		dpll = ref->dpll;
+>+		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
+>+		if (ops->e_sync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
+>+				    old_esync, extack))
+>+			NL_SET_ERR_MSG(extack, "set embedded sync frequency rollback failed");
+>+	}
+>+	return ret;
+>+}
+>+
+> static int
+> dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32 parent_idx,
+> 			  enum dpll_pin_state state,
+>@@ -1039,6 +1161,11 @@ dpll_pin_set_from_nlattr(struct dpll_pin *pin, struct genl_info *info)
+> 			if (ret)
+> 				return ret;
+> 			break;
+>+		case DPLL_A_PIN_E_SYNC_FREQUENCY:
+>+			ret = dpll_pin_e_sync_set(pin, a, info->extack);
+>+			if (ret)
+>+				return ret;
+>+			break;
+> 		}
+> 	}
+> 
+>diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
+>index 1e95f5397cfc..ba79a47f3a17 100644
+>--- a/drivers/dpll/dpll_nl.c
+>+++ b/drivers/dpll/dpll_nl.c
+>@@ -62,7 +62,7 @@ static const struct nla_policy dpll_pin_get_dump_nl_policy[DPLL_A_PIN_ID + 1] =
+> };
+> 
+> /* DPLL_CMD_PIN_SET - do */
+>-static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_PHASE_ADJUST + 1] = {
+>+static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_E_SYNC_FREQUENCY + 1] = {
+> 	[DPLL_A_PIN_ID] = { .type = NLA_U32, },
+> 	[DPLL_A_PIN_FREQUENCY] = { .type = NLA_U64, },
+> 	[DPLL_A_PIN_DIRECTION] = NLA_POLICY_RANGE(NLA_U32, 1, 2),
+>@@ -71,6 +71,7 @@ static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_PHASE_ADJUST +
+> 	[DPLL_A_PIN_PARENT_DEVICE] = NLA_POLICY_NESTED(dpll_pin_parent_device_nl_policy),
+> 	[DPLL_A_PIN_PARENT_PIN] = NLA_POLICY_NESTED(dpll_pin_parent_pin_nl_policy),
+> 	[DPLL_A_PIN_PHASE_ADJUST] = { .type = NLA_S32, },
+>+	[DPLL_A_PIN_E_SYNC_FREQUENCY] = { .type = NLA_U64, },
+> };
+> 
+> /* Ops table for dpll */
+>@@ -138,7 +139,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
+> 		.doit		= dpll_nl_pin_set_doit,
+> 		.post_doit	= dpll_pin_post_doit,
+> 		.policy		= dpll_pin_set_nl_policy,
+>-		.maxattr	= DPLL_A_PIN_PHASE_ADJUST,
+>+		.maxattr	= DPLL_A_PIN_E_SYNC_FREQUENCY,
+> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> 	},
+> };
+>diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+>index d275736230b3..137ab4bcb60e 100644
+>--- a/include/linux/dpll.h
+>+++ b/include/linux/dpll.h
+>@@ -15,6 +15,7 @@
+> 
+> struct dpll_device;
+> struct dpll_pin;
+>+struct dpll_pin_frequency;
+> 
+> struct dpll_device_ops {
+> 	int (*mode_get)(const struct dpll_device *dpll, void *dpll_priv,
+>@@ -83,6 +84,15 @@ struct dpll_pin_ops {
+> 	int (*ffo_get)(const struct dpll_pin *pin, void *pin_priv,
+> 		       const struct dpll_device *dpll, void *dpll_priv,
+> 		       s64 *ffo, struct netlink_ext_ack *extack);
+>+	int (*e_sync_set)(const struct dpll_pin *pin, void *pin_priv,
+>+			  const struct dpll_device *dpll, void *dpll_priv,
+>+			  u64 e_sync_freq, struct netlink_ext_ack *extack);
+>+	int (*e_sync_get)(const struct dpll_pin *pin, void *pin_priv,
+>+			  const struct dpll_device *dpll, void *dpll_priv,
+>+			  u64 *e_sync_freq,
+>+			  struct dpll_pin_frequency *e_sync_range,
+>+			  enum dpll_pin_e_sync_pulse *pulse,
+>+			  struct netlink_ext_ack *extack);
+> };
+> 
+> struct dpll_pin_frequency {
+>diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
+>index 0c13d7f1a1bc..2a80a6fb0d1d 100644
+>--- a/include/uapi/linux/dpll.h
+>+++ b/include/uapi/linux/dpll.h
+>@@ -169,6 +169,26 @@ enum dpll_pin_capabilities {
+> 
+> #define DPLL_PHASE_OFFSET_DIVIDER	1000
+> 
+>+/**
+>+ * enum dpll_pin_e_sync_pulse - defines possible pulse length ratio between
+>+ *   high and low state when embedded sync signal occurs on base clock signal
+>+ *   frequency
+>+ * @DPLL_PIN_E_SYNC_PULSE_NONE: embedded sync not enabled
+>+ * @DPLL_PIN_E_SYNC_PULSE_25_75: when embedded sync signal occurs 25% of
+>+ *   signal's period is in high state, 75% of signal's period is in low state
+>+ * @DPLL_PIN_E_SYNC_PULSE_75_25: when embedded sync signal occurs 75% of
+>+ *   signal's period is in high state, 25% of signal's period is in low state
+>+ */
+>+enum dpll_pin_e_sync_pulse {
+>+	DPLL_PIN_E_SYNC_PULSE_NONE,
+>+	DPLL_PIN_E_SYNC_PULSE_25_75,
+>+	DPLL_PIN_E_SYNC_PULSE_75_25,
+>+
+>+	/* private: */
+>+	__DPLL_PIN_E_SYNC_PULSE_MAX,
+>+	DPLL_PIN_E_SYNC_PULSE_MAX = (__DPLL_PIN_E_SYNC_PULSE_MAX - 1)
+>+};
+>+
+> enum dpll_a {
+> 	DPLL_A_ID = 1,
+> 	DPLL_A_MODULE_NAME,
+>@@ -210,6 +230,9 @@ enum dpll_a_pin {
+> 	DPLL_A_PIN_PHASE_ADJUST,
+> 	DPLL_A_PIN_PHASE_OFFSET,
+> 	DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET,
+>+	DPLL_A_PIN_E_SYNC_FREQUENCY,
+>+	DPLL_A_PIN_E_SYNC_FREQUENCY_SUPPORTED,
+>+	DPLL_A_PIN_E_SYNC_PULSE,
+> 
+> 	__DPLL_A_PIN_MAX,
+> 	DPLL_A_PIN_MAX = (__DPLL_A_PIN_MAX - 1)
+>-- 
+>2.38.1
+>
 
