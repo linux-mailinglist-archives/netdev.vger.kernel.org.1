@@ -1,134 +1,95 @@
-Return-Path: <netdev+bounces-117009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE6694C582
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:06:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10FFB94C428
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61211C21395
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:06:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C076A2872CD
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6858146A61;
-	Thu,  8 Aug 2024 20:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E0413F435;
+	Thu,  8 Aug 2024 18:20:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F347D9460
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 20:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E6412CDAE
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 18:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723147589; cv=none; b=UGRBmLVaHwsb2xXwuDbhnOWwmXPQdwCWINUOp+9BwkXYwzw9T2mQmRCDZ/i9W+51Z7rWQZp/zzW4dFQChj7NIIixrsvqF0+ZCi5aDWveN+9VU/imbAUqii1pSDjtlhvkkSBHSZT9JWEsRSNSrjsYujruaRvS9YnIyBVRYzc+xSc=
+	t=1723141205; cv=none; b=NzKDp3XWFNGWQu69JtDbeQsCoTVAbEaAs9rf6ME1GfpstZIgY20G9JcpEogxVc8QtcuXgSvKFN/TwyeiyN7pp9B3W7MsdftMxLaXnEu/kH7l/dyPOjwnwQREghB6H1VB1HNXkaj7D8hHymCLwEi5B3EjXt5V2WEmplHknDsdXk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723147589; c=relaxed/simple;
-	bh=GKV+kmuT7YJsGcFX+PR1U747oQhpo9uU91b2Y7acLAk=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=pl0LxuYJCQN3hhClrW8g8NkLIvvLceqM0LLocU06RCH3Fx3xeGqtO20sUq6tL3FPWyY9Xh5vbos5jkeELyIfxaMeyx7pEd23gggSrj0e4DYwp7gM30b3FPF60kup8bJYCMtPripQQj5nJoVQDZXmIpqq1RnsGpcDemTA0kT8Xmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 150327D064;
-	Thu,  8 Aug 2024 20:06:20 +0000 (UTC)
-References: <20240807211331.1081038-1-chopps@chopps.org>
- <ZrSTQnisAPkwlvWW@Antony2201.local>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Antony Antony <antony@phenome.org>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Florian
- Westphal <fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon
- Horman <horms@kernel.org>
-Subject: Re: [PATCH ipsec-next v9 00/17] Add IP-TFS mode to xfrm
-Date: Thu, 08 Aug 2024 10:22:25 -0400
-In-reply-to: <ZrSTQnisAPkwlvWW@Antony2201.local>
-Message-ID: <m21q2yok3o.fsf@ja-home.int.chopps.org>
+	s=arc-20240116; t=1723141205; c=relaxed/simple;
+	bh=A4csGmWCoPZ74aoudsl4h8T9HLs5pNqrw2WZK4uPKRU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Tf2JAvhAXYNcs0Drn/wpPaJ01SoV9cPrC9QX+FIV+8utHUclrdRmi4NjpLLJPVnHwT2MptMkObaQ1LkE4DW8AC43tvf7HkNlLVDjvny9erGAeXwdA2pfkxy/WKbvcm4ununyHx3PwYxYy/0h/mDqgco1qLqxl40mTSIQq3+qfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f8293cdb1so145837739f.2
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 11:20:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723141203; x=1723746003;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ncqslw7BK1CqqZmrGSWzwTBOiICY9xk/ffH8fZ5hP68=;
+        b=hBM+B6jYD/wkRpiK8q6O8z/t51gXtr4sqSHneXM/POJ4NCbDO8ORrrSzeMsB+ydvSY
+         u/m44gcwow9FMEZcjXPesuS42ukCpqHQyJB/O0U70D14gMSjEp2ntRmLjTP7opjHdh1k
+         crUsDDbp2CPOKOjiPk0IbwN4OBQCaI1C2HJre5cZR9lYltu6+4bA8K/kuKWLcSGVsrW9
+         du1ON9l7QFzqgcgMgYbjPmupX/ZQV4G/3cq4zDtBi4uveVfcImwSm0/zW+5hMilaMalK
+         BiQYXsntmAt4DS8sHUOVMVGhfGwrbNf5oQRD5j/YqM3gqVe9Ncit7WoGk5cUU6BMH+w1
+         WBnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWinVdoXpKa1ffFcGQmxiBd9vBfOXa16LEaVHuyh5ErRyTMxeKE/BbKMHUSk1PLum17g5z0USTp3S+6eZoE9j9MJP+YkFDE
+X-Gm-Message-State: AOJu0Yy/26+JFpw5d4FvStBDN1c6mVLmCpWqpXkp2t27DRBM1k9Ilmm3
+	xs8QkD5R4PqbpXri8HonaYyBxUn4TM8MbgpKkbWrpDMLcVp5kUAiM3YCirN8Dg9QA8HHbUbC5xG
+	4K72gbG0DP2wuxEo3wuEQ+XZn8GvjEZ0LNV2uUqQD1mFhm+w+J+s/xAk=
+X-Google-Smtp-Source: AGHT+IHbhNaK62W4K7+QUWq3BdqL/7ruRlRKk3wLISGUKGyTl1h6WiBzkoJhNDWZunJHnppnZq8wpHW5FFDkYjLuN+LN9lzK035j
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-Received: by 2002:a05:6602:3fd1:b0:803:85e8:c40b with SMTP id
+ ca18e2360f4ac-8225383303dmr7731539f.3.1723141202901; Thu, 08 Aug 2024
+ 11:20:02 -0700 (PDT)
+Date: Thu, 08 Aug 2024 11:20:02 -0700
+In-Reply-To: <0000000000004cc3030616474b1e@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004c081f061f3013d1@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] WARNING in __xdp_reg_mem_model
+From: syzbot <syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, d.dulov@aladdin.ru, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, lorenzo.bianconi@redhat.com, lorenzo@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	toke@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
---=-=-=
-Content-Type: text/plain; format=flowed
+syzbot suspects this issue was fixed by commit:
 
+commit 7e9f79428372c6eab92271390851be34ab26bfb4
+Author: Daniil Dulov <d.dulov@aladdin.ru>
+Date:   Mon Jun 24 08:07:47 2024 +0000
 
-Antony Antony <antony@phenome.org> writes:
+    xdp: Remove WARN() from __xdp_reg_mem_model()
 
-> Hi Chris,
->
-> On Wed, Aug 07, 2024 at 05:13:14PM -0400, Christian Hopps wrote:
->> * Summary of Changes:
-...
->> v8->v9 (8/7/2024)
->>   - factor common code from skbuff.c:__copy_skb_header into ___copy_skb_header
->>     and use in iptfs rather that copying any code.
->>   - change all BUG_ON to WARN_ON_ONCE
->>   - remove unwanted new NOSKB xfrm MIB error counter
->>   - remove unneeded copy or share choice function
->>   - ifdef CONFIG_IPV6 around IPv6 function
->
-> I noticed a build error with CONFIG_XFRM_IPTFS=m. This error also shows up
-> in in NetDev NIPA tester. However, it kernel builds with CONFIG_XFRM_IPTFS=y
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10df4a5d980000
+start commit:   f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=f534bd500d914e34b59e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ac600b180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1144b797180000
 
-Indeed. Added the missing EXPORT_SYMBOL_GPL(___copy_skb_header) now..
+If the result looks correct, please mark the issue as fixed by replying with:
 
+#syz fix: xdp: Remove WARN() from __xdp_reg_mem_model()
 
-> a@laya:~/git/linux (iptfs-patchset-v9-20240808)$ make
->   CALL    scripts/checksyscalls.sh
->   DESCEND objtool
->   INSTALL libsubcmd_headers
->   MODPOST Module.symvers
-> ERROR: modpost: "___copy_skb_header" [net/xfrm/xfrm_iptfs.ko] undefined!
-> make[2]: *** [scripts/Makefile.modpost:145: Module.symvers] Error 1
-> make[1]: *** [/home/a/git/linux/Makefile:1878: modpost] Error 2
-> make: *** [Makefile:224: __sub-make] Error 2
->
-> NIPA tester also noticed the build error.
-> https://netdev.bots.linux.dev/static/nipa/877576/13756764/build_clang/stderr
-> I wonder why the  kernel test robot hasn't caught this yet.
-
-It just hasn't gotten there yet. :)
-
-> Also note a few minor issues with the patches, specifically for the patch
-> ipsec-next,v9,14/17
-> https://netdev.bots.linux.dev/static/nipa/877576/13756763/build_clang/stderr
-
-I'll fix these, they are transient warnings based on how I split the patchset.
-
-Thanks,
-Chris.
-
-
->
-> -antony
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAma1JTsSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAlQbMP+wSbTpOlO/uomv6ooRyKzmc1vxhoeIty
-yp4S24aM3hY07W0y6Q29sI6aigd8jvJ6ND0kGBn0uoH8WBedhBS6oYzveobmhyH4
-TFCJQyudzF85rSVDXcepD7qhQsG0NDiSzm/MGt7rZohCO/oD6K4vGxY99XVFgPu3
-Sg44CoHZ0H6XtiGsGScbwmVwUmLf9EZomiH0Jbk3zrN1jUCkNuENPyhP+Qk8pXFv
-nhdCioyzhOwyTclrhlV7riR6iJGap0MsVH+nQVzQLkWhrQAKgwxaVTm7Y3ehjTe0
-ixbQTS1eoleFFcWZmZR4yxkd3dG+yfLtbl4wut/NLFh/AttM1/cUasjwyLAhuaG+
-HeDyxM85XBRC8GAuqiPqXWdT9TxUqZ+YoOZWMeODZ9FtwzL4pbSlWrKV5xjieOh2
-NoF2gKHpUrE+rQYyS0N5f5B2iIthtlPLLQBtj7AdsMGIcdBQYbpIf7HBxgS15GKe
-RmlO5di8YdnyT+qUQ1IbTcf2t0BOM9O6YfyBnJlctSEqxm/clC+V5/6mqIttmEkp
-MO5nTzIS4NPkHZb1MTpuFGB/PuJwxFi7oFJCLZH8rbGz0/hZ3gXnSI+CYw5o9WEA
-8jcRi584a1J1PqMHTsX0OrnS30+NBIHhABuXN0P/Fmu5HwNVtB7xdmtFBsVx+WEr
-RN/3SacJk5Rk
-=dX2d
------END PGP SIGNATURE-----
---=-=-=--
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
