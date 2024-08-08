@@ -1,498 +1,262 @@
-Return-Path: <netdev+bounces-116981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3324394C3CB
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:32:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A88C94C40C
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B53A11F230B3
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:32:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0E151F22E00
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96373192B96;
-	Thu,  8 Aug 2024 17:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F059413D8A2;
+	Thu,  8 Aug 2024 18:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="apqgQ2/F"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qSd5i5VD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6164192B70
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 17:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723138281; cv=none; b=EC0V0F07NN3CrhjKwPEJipIM5+aqg6ld99m/iqcqGloEqIA66eoJ4cpx1GoYE1aqIIYQF1FwcW62LDj7rfbB0dqPSgX7ZGCaJ8Rfxk+nXaDgN8tCKUnoXQBw4bdWg4KZcSPUMq9Q7TRnRUmxwwB6pye1k3Ha7dPVO+jBiWf2gWs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723138281; c=relaxed/simple;
-	bh=M+GkNOPjtItlejugLwODIvi+/YAgx0HnKjfKMdAJdCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SGYy5oQJ9eoxgVMVkB2sCv74cfbrx6yS3sw98xJ3NrvRS+h1CB+tT9UQnn2IF8lCXjOwqlke30guLIInCvK4GS1HhtIL7emrnUSNSrpqtC2rJyhH3uZx5aGMuLGaCPvQs8Z/1nk45leBLX4XETG0L7fDajRDnM6ouVAjM6C8BNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=apqgQ2/F; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723138280; x=1754674280;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=M+GkNOPjtItlejugLwODIvi+/YAgx0HnKjfKMdAJdCs=;
-  b=apqgQ2/Fho99F7KXZNUN6Ym0UaFKi/v77rEYtFBowi6JzpuPQX2s9JDW
-   0CY+DB5+3XimRhDw/5nZyqImdWrhzdv9m8eXmHAfFyk9ny6aHiBvs1bQp
-   AazKlvBanpaTQJcwEt2QU6Ewr+W9x9AgVNsV1yujp3TkKs+kctU4bhxFR
-   ACxLBlU7irB8AWKK3zpT6l5wolEUWBb4RlgjxgP8O9gQNt5sIQ9JzCVub
-   7Cp3uOQQisia5XTQi7XuZ3Do8CPRRKBPsKIrrscY4vsLQiCFcHPpm02vV
-   CCM/21swbBteaffnAVYN1UmCZNJqtx6t2t7lYk4/97BW8RFRUObFZwhm/
-   Q==;
-X-CSE-ConnectionGUID: 2nQdfiNSQGqOO4dKYfPNGQ==
-X-CSE-MsgGUID: ps5A+MtbRbiez5wgj+LtWA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="32675492"
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="32675492"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 10:31:17 -0700
-X-CSE-ConnectionGUID: z3cnRxTARVC4ZFw5qwY3vg==
-X-CSE-MsgGUID: D47OlzIdTgifGEZZFQR8QQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="61682491"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa005.fm.intel.com with ESMTP; 08 Aug 2024 10:31:16 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Piotr Raczynski <piotr.raczynski@intel.com>,
-	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	jiri@nvidia.com,
-	shayd@nvidia.com,
-	wojciech.drewek@intel.com,
-	horms@kernel.org,
-	sridhar.samudrala@intel.com,
-	mateusz.polchlopek@intel.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	michal.kubiak@intel.com,
-	pio.raczynski@gmail.com,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	maciej.fijalkowski@intel.com,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next v3 15/15] ice: allow to activate and deactivate subfunction
-Date: Thu,  8 Aug 2024 10:31:01 -0700
-Message-ID: <20240808173104.385094-16-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240808173104.385094-1-anthony.l.nguyen@intel.com>
-References: <20240808173104.385094-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2839033F7;
+	Thu,  8 Aug 2024 18:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723140252; cv=fail; b=c02T6PZsL5UOoaA6s9pz3OjL7tSXOtls6FvmaHx1eH6TjjWLYQ+yGNg50d9TiExttooAsCcIuNz57JIwFqXAcvcr6pcSxwwS9oSRLEbpFW187G142qvu4hEItOHYW35IiNu943bQvqXh4USQq1o9FFKbNd78qNFXq3IM9yrAjsc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723140252; c=relaxed/simple;
+	bh=jQ3fKatCzq+uPRe0HREy5tqQoAW7E+za+3pluq/xP5E=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=R4tG6rCEjR9zJZ8YBDx8DkGGML20MmZhYcydE1PoOUcf5Vv0MxgwqHrpikgnWRKrQAOPZfZE1go5JuYlNPK/Qe/dr7j3b50t1zcxfu6Edw+A+crFfZARQ7dmvZbRDO7GXvCUD8KvPSP4qfBSJu9Wni8zVL80h3fxOCfNLAjYHT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qSd5i5VD; arc=fail smtp.client-ip=40.107.92.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hLkHI31lpN8OwOXtntnI2xRNrRXgFYPB4p4AQMFfYPOs0muH/582XV22Q2S8dd7bElEo8CK8SCvj3ea9t0d9sVfHqXC8e0SZSwdgt9cAYFMY1kk1LwvbI/cRQ4eftPA+FZscJuogTUgNy/JkrksmEN/lHi0jW/+fgxo6L4/mh8ySKnyjmmJK+odLz/hem2x4MzcgdP8bVFTUDIGc77zJy/mHfGAcobj3nBbZ20bbVTW++hmIt5RxTW1s+Cbh0U436ENUyjQAPc3MpWra4+OIrFNhhxueZ/ujo+b6UoU6uQizp9g87PZjmTV5tdydfPio1pVjr4QN7Pe5Zc1zwv7vaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tdAofM7MDhUZ88cazV58UNzk4XAlj1fswhTBg2wBm7c=;
+ b=Y9HMPWb2L1e3/IZjLhKPRo1sbW6LCZUJjg2c8UilJx6Llg12ZRyj5IwpPFA5B4yo26MrZZcBUSxGBzX8maAb13jv5o/6G88wmaBAtPmfXGjYjBI1UFz77r10pgWIskJzz0M9VgS5WkFEoFRPlihVGgtkZ1vB5LZVBm65RV6G6N4SZAa2AewH5xKW1RFH5mpI1opb1AxbBfdjOGvgwOrDOQqrekPNtOC+uXRBAJpsdWwB1TttWIhfJ08FbTtOF1c2QV0FNAWX5ZLnzdaCJsejuqyXKceg/l6jdCJu8ilcLExmbhTBkhuNe07ulbwBRjyDHQg497smMfL0LUExex++vQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tdAofM7MDhUZ88cazV58UNzk4XAlj1fswhTBg2wBm7c=;
+ b=qSd5i5VDs6g72mzS+giJTYq/qzBp4KmjmHIkJai7S02JUvVDgcwMVEeqhjyQ9qT3mP9hFRngaIdLbEdVuQhfS2PzZ2QXkniX+R06r/m9ii8P+Rt0s0VSZ8OZ1uM5gzoQop1GIGtPirfDgqD4p/UbPtt7pvJMMmDamiDfvR4vT3aR6MbhDP9VIemC2u1HBRX1FfZJJDY33HVEsUkEb6hDJ7nI06oYYrBcfbxP/A8OTnkOOkVV9RB6DxGvDyYHcMfaOy3UWM9uqAdDWF0xOgNqLDmXi2l+DtO+JyViRLERXFdPjxn+KfYN+108I+ZXyOpUM8VFf+y9OlY6oNVTWwerng==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
+ by CY8PR12MB8068.namprd12.prod.outlook.com (2603:10b6:930:75::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Thu, 8 Aug
+ 2024 18:04:06 +0000
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4%7]) with mapi id 15.20.7849.008; Thu, 8 Aug 2024
+ 18:04:06 +0000
+Message-ID: <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+Date: Thu, 8 Aug 2024 20:04:01 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token
+ correctly
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com
+Cc: lingshan.zhu@intel.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240808082044.11356-1-jasowang@redhat.com>
+Content-Language: en-US
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <20240808082044.11356-1-jasowang@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0258.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e8::12) To CY8PR12MB8297.namprd12.prod.outlook.com
+ (2603:10b6:930:79::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|CY8PR12MB8068:EE_
+X-MS-Office365-Filtering-Correlation-Id: 466513d3-cba6-4943-e254-08dcb7d47e8d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?alMyVEpDc0tUdEtIdy9nRHR2em1nQ3p3ajRyaEVDK2lDTE4yOStob2VadXcw?=
+ =?utf-8?B?MXlEckpRWFljYjVBQlJkYUNzWkFER1cycnFSRTZvdjNmMTdoTzlJVnhBV1RD?=
+ =?utf-8?B?QzlTL3hlREoxRW1MUkZISXlYUFE0a0NqaXpCWXQxem9KUlNDRVBpaFQ2MEo2?=
+ =?utf-8?B?NDRGdnMyb0Vrbi9jWGNTZHBWL2JqT3FnUXlTTEM5NklwWTNEVkNFcy9nTGdP?=
+ =?utf-8?B?QUsrL3RabnIxTG14ZldDNnpvSnJoQjRNNDdEeDRvVk80K29qQnpxTkhyUzVo?=
+ =?utf-8?B?ME0vUzFrSzgxNXorZG8zQ1dWNXB3QnlhTlBHS0xlSllUYmdRVjd0MG16cFBh?=
+ =?utf-8?B?elIzSWpWRVJrNVpKSkRwYjdwMmF1cTRCV2NpWnZqU1dCblJydmNjdjAvQkJx?=
+ =?utf-8?B?S2JnQ1JpNnhaa1Z6eWQ0RXgxbU1GTDZBSWlnMHpXODlTRGo3ME5VcHRDdUJa?=
+ =?utf-8?B?L0NIblp2bUJ1TGdUL1FzeTdBSk50dXg0bmExK0ZpTEgzb2RQNzJycWtjTnFU?=
+ =?utf-8?B?R0Z0UkVSQnlCb0VLbU9lQmVKN3hLcnZRaW1uT3BYR0tjUys2aGlTM0c2YkNv?=
+ =?utf-8?B?ZEdPSDZBMk96NDB1ZXNENTc4RHdDUTFjNjl4V0JkVDZUMXRVd1kvQWdFZEdG?=
+ =?utf-8?B?amdMemxSbVdmdzNOdmFWSDlPTVUvMHlPSVk1TkFFbDRGOGxEazhVU3RaSjVy?=
+ =?utf-8?B?WlhQdzRLVjBUdzFDOVBNWVp0WDVrMzlKT2p2MlhZMzBHVEJlSnlSNVFCaGVL?=
+ =?utf-8?B?ZTFyWDR4VFhmcmJITkNYM3JPcU1BdlhkTG0xelFuZkJkKzlCdDh0OXU5S3Rp?=
+ =?utf-8?B?dEVZUCtmMzRhZFJrejZpa2NmOG9tLy9yOXlrcjBmZkJheTN5VEN3c2xTbVZi?=
+ =?utf-8?B?MXFUcTBtb3ZJaDY2cGtVK0J0cjZKRytyOFZacGxLbUUrbHhpZHgyT1FvMHFa?=
+ =?utf-8?B?cGpzVVoxb0lrcVVId3I4S0RNRlN6VEJGNDFhTWI1dHp2bUtFZHlsUEVTT1BW?=
+ =?utf-8?B?YmEydk9oV1owdHZQUy84ZVo4aWNCQ3kxSWgrbGszVDNSNVNVNFZFbHNiTk1E?=
+ =?utf-8?B?NStaN3lGMnJRc2hCMHFjOVpFeU1peXY0Tm5xcFVSSzRjR2o4aFhNVkpzZDQ1?=
+ =?utf-8?B?c1NOQmR1cFVURmxvY21odTV6SUErK1BPRzZkTnJCTUd1cjBkTEhOL0t5WjBk?=
+ =?utf-8?B?eVA0S1ovWUx2eVdHKzFIWjJ5eFY3OFhsd1Z1a1JoTUFzS2IxTmtNbkx0Nmg4?=
+ =?utf-8?B?ZkF1VmNTWkZDVUtjUkVCZWhzNFMzYWRhZk1NZzU4RWFXMlJGbnd1Y1F0b1U4?=
+ =?utf-8?B?UDR1aERuUkpxcVZnN21vc3ZlSzZ6eVc1d0oyaUVySEpIRnJQQmEzcWJHMVRW?=
+ =?utf-8?B?dSthWFQxeS92bU9lcDZ3all4YTJOdmxnRDlQZG5ydE40eHBLeHhxaUtEL1oy?=
+ =?utf-8?B?SllqeVV5bEpoR0VqczZNS3ZMOWxOYmd1NGszcC8yZGRoZjAzc0hMV3crZkdn?=
+ =?utf-8?B?Nlp3dUlxS0FMeU1vMndmb2k2aXdxTVZiSU9RdHRLUmYza0s2Vkk2V3BubUFq?=
+ =?utf-8?B?M3dQSnNwNkFoU0lPNHpqVTN5NVlwTmJNczZ1NmgrSzF4cllJdEFhN2NLd3N5?=
+ =?utf-8?B?YmtYMUhGYVVtbU9ZODhFVExKTUo2TGlRdHIxZ25kSUtSb2dqdGhtSFdiTjlK?=
+ =?utf-8?B?VEJYN1N2OCs4RW5ML0ZTVzdDTkI2WDBGcFUvZmVLbUhwMVJDNGpDWkJNa3lU?=
+ =?utf-8?B?bmJFc2RYZ25TZjQyK2dnWElpVlpsbkxidzY2M3pyYnkrbGRJMXg2UGt3VHpI?=
+ =?utf-8?B?dFZPNU9IM3E2b3I3Z1pmdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cGVXazJlc0hSTm55bExGQS9SeHpxYXNodTZVNXFYNHpwOVNNako2dE8ybkdz?=
+ =?utf-8?B?WkVZV1V0QXYrT3NEazFNWWtlNGprT20wT0wvZTcxdW8vcnZMY09Ba09rbTU2?=
+ =?utf-8?B?LzE4OTlwMXZaR24zdXo0Ymd6VDY4cFFKK0gxRDdReEM1MFZPMTlsSHo1UnJC?=
+ =?utf-8?B?ZEhJc0VkZGsyOUtteTA5WktNd3o4WjBTWkJtcThyY3RCM2FqS1JNWTJxdGMy?=
+ =?utf-8?B?Sjd4NEdUdG5XLzF4QWFPNTZDK21aSmQvR01OTy9JeGRjNTM3THkwNWc1Q0JU?=
+ =?utf-8?B?NmNBdjBXMFJXRkl3ZzlOV3IxTVppWndqTHBkTC9xNmx2bjJvZnRxQnBHNzNh?=
+ =?utf-8?B?b0pOTjkzQVpVUmpBRkVZSC9OemQ3bk40WkIvaXFkZWRRWkwyS2JhOXZtOFdG?=
+ =?utf-8?B?enZKdm1hdHZaU0ZSZUt3TzVnR3J5ZG0xUzlDZDYySSszT3lsZVFCSUp6WFJS?=
+ =?utf-8?B?VW9KNTdGSEpEUmpWSEE0QXpqMWNrb21kNjEwelFtVlJjdEJiODBmVHpreWhN?=
+ =?utf-8?B?SmszOS9NelhQa2d1QW1Cd29udVE3cTN1VmpyajltbVo0YkZlRzE0aXlpUGtG?=
+ =?utf-8?B?R1Zkb2dwRSt1dEFQcTdNUkZaMEhFS3pPelpPTUVDMk1VSlFEN0hwaTBmd281?=
+ =?utf-8?B?Nm11T2JWV0o3Q1NsZ1A5YlY5eUZBeUlxRjFnZ3B4WjYxaFVPVlRYMGhGMmNC?=
+ =?utf-8?B?MDNzN0l2NjdvTGlwanZNRWRINnhlWXJtcmd0M21BTzVxRzRJaWhTcjFPOGtL?=
+ =?utf-8?B?SnpWNXZzd28vYWdKS1RzVHJObi9UYTgwd01ieG5WTmVnTkZIcGNJSTRUNUQ0?=
+ =?utf-8?B?eDlEUFdGZEtnOWJWejgxblB4Z0hYaFlIRG9QYzVoZFZYUG5jbW5udlRUbTZ2?=
+ =?utf-8?B?b0dEMlFJK2Fycm5oNVJqUEJVZDd5NllQSWJ1YlZrRFo1cndqdnMxaWRXSHdM?=
+ =?utf-8?B?SkF5ckt3VzcwVWpXUk5wRHFwWEMwMGt3ZkxlRG9jajFzVFNneEJEMldSMGk0?=
+ =?utf-8?B?Q2M0V0tRbm9ZUysrT2JOY3hKZWRwaXU3dTVFWS8yR1ZERTFzdHlhbExUSGhh?=
+ =?utf-8?B?VFNNenlWWjFtYm43YytXQnFZZ3hadUJ4UkJzMzNOVUJSSlRsRXd2UHpHdk9W?=
+ =?utf-8?B?eGxSbzJxaEQ3RmNaVWFsVURWNzJNUFlnZEx5WFBoKzZrRnh4QlNqTldiWmI4?=
+ =?utf-8?B?ci8zSW1tYVozVkdKVDIreWtHWnkzQk9CalVMbjFPdTZrS3EzS0huakNrbFJk?=
+ =?utf-8?B?Vzc4N3cyc3ZmZlZYRlVJV0ZBL3YzYW5ReVdhTXdmaWRleUhMdjBQV1ZEbVZm?=
+ =?utf-8?B?ajNlV1NLQU1zMEwvb1AxRWlMcnZRZDAyZ1FNc3FUNHpUR0lLcmhya1lTUTRU?=
+ =?utf-8?B?L1BmOS9GMUVCMlE0bnBtL3lTbWlWbXhUWmwyMUpXY2lkZzNucWluNUNrNlVx?=
+ =?utf-8?B?Ui9PQjJUcnNrZkYyTS9CVjduajlyMmJCZEp3RExSbWtlWWpOSjZ1UDh3dVda?=
+ =?utf-8?B?M0RWeTh2WXF3cGIyN1NHZmtLNWZDMFBkeWZFTC9SYkN1WUFYMUQ4b1puL3Nj?=
+ =?utf-8?B?NTIreElIcDU3QXlRQmJaWVNhSEQ0alV3RDQ3Z0Z2VG1nVUdxRnQ4MktvMkVj?=
+ =?utf-8?B?VVpGNmlCQnJtQ0c2MTZXekpCZFk3dGE5RDFpVjlxdkc2cU81aGhnTzZldHI1?=
+ =?utf-8?B?S3hkTkxySjE5ZDdOcUlGWnJGUE1qZmlwMTdRdWpuamRQSk9XT3pOK1NmcUVR?=
+ =?utf-8?B?SlgwMHM2OVBYY3VNNFYzdFV2ZVJyMG9ERld3TElvSHBXU045R25JY08xWGdU?=
+ =?utf-8?B?WFNYdEJZNmVvQ0kwL09ENGlUSkF2dHR5MEU0R3lqdzhOb2ZlV3lEeDBkeGVM?=
+ =?utf-8?B?YTMyTTVoaUNDSnJOU3EzKzZsUTRQQ3E4dG0zNElRbU5UVmM3ZXhkbXB6QmVs?=
+ =?utf-8?B?YlFYbEpMVTVJVTRCblVubDQ5cXFabXFzOWNkZ0laelRkLy8yaVU3K01KOG5W?=
+ =?utf-8?B?NmVKVDBGRVdxSkhDVVlPOTliRFJjQXhtenNBaVdFMEJCTis3VnNtRE1CWG5k?=
+ =?utf-8?B?Tm55dU5SVEc3NUlxZEY0bmFmTVY3cDc1bWxMbm1FZlQzSnJ4dUo5RkNDbWFj?=
+ =?utf-8?Q?31BBQMrp8xpilaIpCE5tbxXHP?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 466513d3-cba6-4943-e254-08dcb7d47e8d
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2024 18:04:06.7469
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TwePpbGz4/1M5Dk68HrMHKT/yJwcxO9hwwvC4OJFCAfWXS/VR7vc/0PPIjS9TUIwtDg50FMhpAuyCOxWMehY4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8068
 
-From: Piotr Raczynski <piotr.raczynski@intel.com>
 
-Use previously implemented SF aux driver. It is probe during SF
-activation and remove after deactivation.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../ethernet/intel/ice/devlink/devlink_port.c | 176 ++++++++++++++++++
- .../ethernet/intel/ice/devlink/devlink_port.h |   7 +
- drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 103 ++++++++++
- drivers/net/ethernet/intel/ice/ice_sf_eth.h   |   3 +
- 4 files changed, 289 insertions(+)
+On 08.08.24 10:20, Jason Wang wrote:
+> We used to call irq_bypass_unregister_producer() in
+> vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
+> token pointer is still valid or not.
+> 
+> Actually, we use the eventfd_ctx as the token so the life cycle of the
+> token should be bound to the VHOST_SET_VRING_CALL instead of
+> vhost_vdpa_setup_vq_irq() which could be called by set_status().
+> 
+> Fixing this by setting up  irq bypass producer's token when handling
+> VHOST_SET_VRING_CALL and un-registering the producer before calling
+> vhost_vring_ioctl() to prevent a possible use after free as eventfd
+> could have been released in vhost_vring_ioctl().
+> 
+> Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Note for Dragos: Please check whether this fixes your issue. I
+> slightly test it with vp_vdpa in L2.
+> ---
+>  drivers/vhost/vdpa.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index e31ec9ebc4ce..388226a48bcc 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+>  	if (irq < 0)
+>  		return;
+>  
+> -	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+>  	if (!vq->call_ctx.ctx)
+>  		return;
+>  
+> -	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+>  	vq->call_ctx.producer.irq = irq;
+>  	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+>  	if (unlikely(ret))
+> @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>  			vq->last_avail_idx = vq_state.split.avail_index;
+>  		}
+>  		break;
+> +	case VHOST_SET_VRING_CALL:
+> +		if (vq->call_ctx.ctx) {
+> +			vhost_vdpa_unsetup_vq_irq(v, idx);
+> +			vq->call_ctx.producer.token = NULL;
+> +		}
+> +		break;
+>  	}
+>  
+>  	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+> @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>  			cb.callback = vhost_vdpa_virtqueue_cb;
+>  			cb.private = vq;
+>  			cb.trigger = vq->call_ctx.ctx;
+> +			vq->call_ctx.producer.token = vq->call_ctx.ctx;
+> +			vhost_vdpa_setup_vq_irq(v, idx);
+>  		} else {
+>  			cb.callback = NULL;
+>  			cb.private = NULL;
+>  			cb.trigger = NULL;
+>  		}
+>  		ops->set_vq_cb(vdpa, idx, &cb);
+> -		vhost_vdpa_setup_vq_irq(v, idx);
+>  		break;
+>  
+>  	case VHOST_SET_VRING_NUM:
+> @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>  	for (i = 0; i < nvqs; i++) {
+>  		vqs[i] = &v->vqs[i];
+>  		vqs[i]->handle_kick = handle_vq_kick;
+> +		vqs[i]->call_ctx.ctx = NULL;
+>  	}
+>  	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+>  		       vhost_vdpa_process_iotlb_msg);
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-index 4cfd90581d92..675a2b60892b 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-@@ -530,6 +530,48 @@ void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
- 	devl_port_unregister(&sf_dev->priv->devlink_port);
- }
- 
-+/**
-+ * ice_activate_dynamic_port - Activate a dynamic port
-+ * @dyn_port: dynamic port instance to activate
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activate the dynamic port based on its flavour.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_activate_dynamic_port(struct ice_dynamic_port *dyn_port,
-+			  struct netlink_ext_ack *extack)
-+{
-+	int err;
-+
-+	if (dyn_port->active)
-+		return 0;
-+
-+	err = ice_sf_eth_activate(dyn_port, extack);
-+	if (err)
-+		return err;
-+
-+	dyn_port->active = true;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_deactivate_dynamic_port - Deactivate a dynamic port
-+ * @dyn_port: dynamic port instance to deactivate
-+ *
-+ * Undo activation of a dynamic port.
-+ */
-+static void ice_deactivate_dynamic_port(struct ice_dynamic_port *dyn_port)
-+{
-+	if (!dyn_port->active)
-+		return;
-+
-+	ice_sf_eth_deactivate(dyn_port);
-+	dyn_port->active = false;
-+}
-+
- /**
-  * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
-  * @dyn_port: dynamic port instance to deallocate
-@@ -542,6 +584,8 @@ static void ice_dealloc_dynamic_port(struct ice_dynamic_port *dyn_port)
- 	struct devlink_port *devlink_port = &dyn_port->devlink_port;
- 	struct ice_pf *pf = dyn_port->pf;
- 
-+	ice_deactivate_dynamic_port(dyn_port);
-+
- 	xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
- 	ice_eswitch_detach_sf(pf, dyn_port);
- 	ice_vsi_free(dyn_port->vsi);
-@@ -629,8 +673,140 @@ ice_devlink_port_del(struct devlink *devlink, struct devlink_port *port,
- 	return 0;
- }
- 
-+/**
-+ * ice_devlink_port_fn_hw_addr_set - devlink handler for mac address set
-+ * @port: pointer to devlink port
-+ * @hw_addr: hw address to set
-+ * @hw_addr_len: hw address length
-+ * @extack: extack for reporting error messages
-+ *
-+ * Sets mac address for the port, verifies arguments and copies address
-+ * to the subfunction structure.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_hw_addr_set(struct devlink_port *port, const u8 *hw_addr,
-+				int hw_addr_len,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	if (dyn_port->attached) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Ethernet address can be change only in detached state");
-+		return -EBUSY;
-+	}
-+
-+	if (hw_addr_len != ETH_ALEN || !is_valid_ether_addr(hw_addr)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid ethernet address");
-+		return -EADDRNOTAVAIL;
-+	}
-+
-+	ether_addr_copy(dyn_port->hw_addr, hw_addr);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_hw_addr_get - devlink handler for mac address get
-+ * @port: pointer to devlink port
-+ * @hw_addr: hw address to set
-+ * @hw_addr_len: hw address length
-+ * @extack: extack for reporting error messages
-+ *
-+ * Returns mac address for the port.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_hw_addr_get(struct devlink_port *port, u8 *hw_addr,
-+				int *hw_addr_len,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	ether_addr_copy(hw_addr, dyn_port->hw_addr);
-+	*hw_addr_len = ETH_ALEN;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_state_set - devlink handler for port state set
-+ * @port: pointer to devlink port
-+ * @state: state to set
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activates or deactivates the port.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_state_set(struct devlink_port *port,
-+			      enum devlink_port_fn_state state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	switch (state) {
-+	case DEVLINK_PORT_FN_STATE_ACTIVE:
-+		return ice_activate_dynamic_port(dyn_port, extack);
-+
-+	case DEVLINK_PORT_FN_STATE_INACTIVE:
-+		ice_deactivate_dynamic_port(dyn_port);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_state_get - devlink handler for port state get
-+ * @port: pointer to devlink port
-+ * @state: admin configured state of the port
-+ * @opstate: current port operational state
-+ * @extack: extack for reporting error messages
-+ *
-+ * Gets port state.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_state_get(struct devlink_port *port,
-+			      enum devlink_port_fn_state *state,
-+			      enum devlink_port_fn_opstate *opstate,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	if (dyn_port->active)
-+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
-+	else
-+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
-+
-+	if (dyn_port->attached)
-+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
-+	else
-+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
-+
-+	return 0;
-+}
-+
- static const struct devlink_port_ops ice_devlink_port_sf_ops = {
- 	.port_del = ice_devlink_port_del,
-+	.port_fn_hw_addr_get = ice_devlink_port_fn_hw_addr_get,
-+	.port_fn_hw_addr_set = ice_devlink_port_fn_hw_addr_set,
-+	.port_fn_state_get = ice_devlink_port_fn_state_get,
-+	.port_fn_state_set = ice_devlink_port_fn_state_set,
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-index 479d2b976745..d60efc340945 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-@@ -11,22 +11,29 @@
-  * struct ice_dynamic_port - Track dynamically added devlink port instance
-  * @hw_addr: the HW address for this port
-  * @active: true if the port has been activated
-+ * @attached: true it the prot is attached
-  * @devlink_port: the associated devlink port structure
-  * @pf: pointer to the PF private structure
-  * @vsi: the VSI associated with this port
-  * @repr_id: the representor ID
-  * @sfnum: the subfunction ID
-+ * @sf_dev: pointer to the subfunction device
-  *
-  * An instance of a dynamically added devlink port. Each port flavour
-  */
- struct ice_dynamic_port {
- 	u8 hw_addr[ETH_ALEN];
- 	u8 active: 1;
-+	u8 attached: 1;
- 	struct devlink_port devlink_port;
- 	struct ice_pf *pf;
- 	struct ice_vsi *vsi;
- 	unsigned long repr_id;
- 	u32 sfnum;
-+	/* Flavour-specific implementation data */
-+	union {
-+		struct ice_sf_dev *sf_dev;
-+	};
- };
- 
- void ice_dealloc_all_dynamic_ports(struct ice_pf *pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index 9eb8993df25a..27a5baee7880 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -150,6 +150,7 @@ static int ice_sf_dev_probe(struct auxiliary_device *adev,
- 	devl_unlock(devlink);
- 
- 	devlink_register(devlink);
-+	dyn_port->attached = true;
- 
- 	return 0;
- 
-@@ -189,6 +190,8 @@ static void ice_sf_dev_remove(struct auxiliary_device *adev)
- 	devl_unlock(devlink);
- 	devlink_free(devlink);
- 	ice_vsi_decfg(vsi);
-+
-+	dyn_port->attached = false;
- }
- 
- static const struct auxiliary_device_id ice_sf_dev_id_table[] = {
-@@ -205,6 +208,8 @@ static struct auxiliary_driver ice_sf_driver = {
- 	.id_table = ice_sf_dev_id_table
- };
- 
-+static DEFINE_XARRAY_ALLOC1(ice_sf_aux_id);
-+
- /**
-  * ice_sf_driver_register - Register new auxiliary subfunction driver
-  *
-@@ -223,3 +228,101 @@ void ice_sf_driver_unregister(void)
- {
- 	auxiliary_driver_unregister(&ice_sf_driver);
- }
-+
-+/**
-+ * ice_sf_dev_release - Release device associated with auxiliary device
-+ * @device: pointer to the device
-+ *
-+ * Since most of the code for subfunction deactivation is handled in
-+ * the remove handler, here just free tracking resources.
-+ */
-+static void ice_sf_dev_release(struct device *device)
-+{
-+	struct auxiliary_device *adev = to_auxiliary_dev(device);
-+	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
-+
-+	xa_erase(&ice_sf_aux_id, adev->id);
-+	kfree(sf_dev);
-+}
-+
-+/**
-+ * ice_sf_eth_activate - Activate Ethernet subfunction port
-+ * @dyn_port: the dynamic port instance for this subfunction
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activate the dynamic port as an Ethernet subfunction. Setup the netdev
-+ * resources associated and initialize the auxiliary device.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+int
-+ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
-+		    struct netlink_ext_ack *extack)
-+{
-+	struct ice_pf *pf = dyn_port->pf;
-+	struct ice_sf_dev *sf_dev;
-+	struct pci_dev *pdev;
-+	int err;
-+	u32 id;
-+
-+	err = xa_alloc(&ice_sf_aux_id, &id, NULL, xa_limit_32b,
-+		       GFP_KERNEL);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Could not allocate SF ID");
-+		return err;
-+	}
-+
-+	sf_dev = kzalloc(sizeof(*sf_dev), GFP_KERNEL);
-+	if (!sf_dev) {
-+		err = -ENOMEM;
-+		NL_SET_ERR_MSG_MOD(extack, "Could not allocate SF memory");
-+		goto xa_erase;
-+	}
-+	pdev = pf->pdev;
-+
-+	sf_dev->dyn_port = dyn_port;
-+	sf_dev->adev.id = id;
-+	sf_dev->adev.name = "sf";
-+	sf_dev->adev.dev.release = ice_sf_dev_release;
-+	sf_dev->adev.dev.parent = &pdev->dev;
-+
-+	err = auxiliary_device_init(&sf_dev->adev);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to initialize SF device");
-+		goto sf_dev_free;
-+	}
-+
-+	err = auxiliary_device_add(&sf_dev->adev);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to add SF device");
-+		goto aux_dev_uninit;
-+	}
-+
-+	dyn_port->sf_dev = sf_dev;
-+
-+	return 0;
-+
-+aux_dev_uninit:
-+	auxiliary_device_uninit(&sf_dev->adev);
-+sf_dev_free:
-+	kfree(sf_dev);
-+xa_erase:
-+	xa_erase(&ice_sf_aux_id, id);
-+
-+	return err;
-+}
-+
-+/**
-+ * ice_sf_eth_deactivate - Deactivate Ethernet subfunction port
-+ * @dyn_port: the dynamic port instance for this subfunction
-+ *
-+ * Deactivate the Ethernet subfunction, removing its auxiliary device and the
-+ * associated resources.
-+ */
-+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port)
-+{
-+	struct ice_sf_dev *sf_dev = dyn_port->sf_dev;
-+
-+	auxiliary_device_delete(&sf_dev->adev);
-+	auxiliary_device_uninit(&sf_dev->adev);
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-index e972c50f96c9..c558cad0a183 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-@@ -27,4 +27,7 @@ ice_sf_dev *ice_adev_to_sf_dev(struct auxiliary_device *adev)
- int ice_sf_driver_register(void);
- void ice_sf_driver_unregister(void);
- 
-+int ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
-+			struct netlink_ext_ack *extack);
-+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port);
- #endif /* _ICE_SF_ETH_H_ */
--- 
-2.42.0
+No more crashes, but now getting a lot of:
+ vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) registration fails, ret =  -16
+
+... seems like the irq_bypass_unregister_producer() that was removed
+might still be needed somewhere?
+
+Thanks,
+Dragos
 
 
