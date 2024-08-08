@@ -1,73 +1,82 @@
-Return-Path: <netdev+bounces-116683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D7794B5B8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:00:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF73294B5BB
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E2C7B23182
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:00:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAFE31C2125A
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7713A339AB;
-	Thu,  8 Aug 2024 04:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A7F7F484;
+	Thu,  8 Aug 2024 04:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jd+6QFWF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqeT5Wvm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D386911C83
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A73B11C83;
+	Thu,  8 Aug 2024 04:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723089649; cv=none; b=B/mVOeR4ed0VqSR5xRYYPsBGzqLnvjzU7xGrgZ3AmYgfoxaazWi9v9pzYTdJKS6igWr6yoUDyZoStMFeBm/pm48tPgLJFtCaYMA9t32V4/P7mJLiOv2G4AjHMCI+XoeMUiZ0MAAwMiTQrqEaMFW5mP+k4+g6Sf5fOxBOyYhUJQ0=
+	t=1723089869; cv=none; b=pSNES5ZbUB+6s0Wmo/SVFbTiCyvXcYd1Bi5h2G0IZ94LHOe/y65BUkLFclZ2Lj/qgefZrD/aFKp5OKK96EteAI+eELpg8fRCav5RFiOOhO3+/zxWxg4d9x2vKrm4bCY7dP4H6HRwsP+JzYRrFD+RaCEw7wmMv/D2+dfVe9Kcpjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723089649; c=relaxed/simple;
-	bh=9rKz+Ww1+UQMsLhIA3xzyWpuPQy6eq4H7PHvSeEXErI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s6kh/2xoky/MroV7ewMAXVGq2VMBCIf3H/vtqku3p9LDqzcKR8gBrZfHDTvb3Uw09lx2rKebvyqUXTRMWS/lietdLnvjNeE2kVTJcsNiEUGFUtyUJf8hdSlMDN1CKiJInGsrRJ42ZlIiTENdAtNfzlG6EVJOiVYBPaTCGXqTnvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jd+6QFWF; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1723089869; c=relaxed/simple;
+	bh=HxsNmQeveDje+k7GJ5p0ExaAXkD5Uz24koDvUfEl56g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J3zHaCGIy/gFtrgjCqZucn3FlAdpe7q75ldu1d+WDq+ps5n0FA5XMpkQsJV7r243UNdCHsXMn5dk+YYJiLDadzm1+DFCHMfOF70bJsUTSyoSS2vjaUbAXmM4Cq4xNutItyMf9ZTQ0M10f5XAMtU3UwlDyH1uo96+XTC0oryaT4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqeT5Wvm; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70d1c655141so472865b3a.1;
+        Wed, 07 Aug 2024 21:04:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723089648; x=1754625648;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LHy5F8i77R5GzGkwx1y4d35b4giGid4OKNXhLaq/m+M=;
-  b=jd+6QFWFMzv2h3m0Cw+9Npuwd4EFnA9iI1xSqBSAb6K02E2BZ6dzZFJw
-   L+/oor/ffBId/I5Av4Tr8KRL6QszGYxl4IZnzyo4tnFjIz0lPZwW+Nl/m
-   GyolRYEqIcGzepzUSAxlkC1iiTtAziJxjwF7kitRR335q65v03qhob1j0
-   4=;
-X-IronPort-AV: E=Sophos;i="6.09,271,1716249600"; 
-   d="scan'208";a="442054679"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 04:00:42 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:46163]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.206:2525] with esmtp (Farcaster)
- id 881229a2-9f56-4305-b9f0-be391a277d60; Thu, 8 Aug 2024 04:00:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 881229a2-9f56-4305-b9f0-be391a277d60
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 04:00:39 +0000
-Received: from 88665a182662.ant.amazon.com (10.135.210.149) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 04:00:36 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Vineeth Karumanchi <vineeth.karumanchi@amd.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v1 net] net: macb: Use rcu_dereference() for idev->ifa_list in macb_suspend().
-Date: Wed, 7 Aug 2024 21:00:21 -0700
-Message-ID: <20240808040021.6971-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=gmail.com; s=20230601; t=1723089867; x=1723694667; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qB4AbGWugMyClxVBVAdAWXyEbSp0MuqOJuxSTPl9cMA=;
+        b=eqeT5WvmY+7F00UbbT00nxrL3GWHU+fgTxXIcmnKb9tcCnOiyv8ceayYseKVAznQ8A
+         O3qPFFfZO5RQh1zNLIKj7QoTW8bfcDJBXzL+ybvvu21oHY8aSfrbqKy/Zz2fFE/IOTS3
+         NTsjl2kdRgZVlRGfxCcxoQKJjvNUHP1ps3ldXXDih1/f5YRxKLFgIQfNrK8YvUJyZLuF
+         VkmHfXyCm7H7woBbuILhzZmrJyAJ3ZGFbqi04AGYxMuN6EuYhsM18x7qGM1SKWZjsi3D
+         bCJsk1UDMNR/2yQB1MXqRAFWGPkuM1kZzgkQEjv2y6q3m5FVfCz1fsnITEgEd5vX64FA
+         vNDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723089867; x=1723694667;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qB4AbGWugMyClxVBVAdAWXyEbSp0MuqOJuxSTPl9cMA=;
+        b=gUNnggHkjfX38jqTm6nDyYFIajaBM95+kSzx0ef5pNe+PDmZpeY+0JYWwxDXGs8eUR
+         GSBvjLU4uR52CtojdLAlxeCneK+Cg86IuE8SI7E/LqJ8m9cj8p8NwmCz6xDaUExTt57i
+         ecZNVSsBbWDVM2Tob9sC8r6xb9XqCaEzXivXBL2yBJD/xaunnVlYoiF+U21ssn3GV20P
+         iawFO7Zw6bxnNbyGUxFkFXG0m0ZmgkCZ+mILF/AvJf64R4EZ1Q2mLNuCQL8CdiPiRbYg
+         2NLQfH3ZUFpX6LFwxxg8hnynsXdYs0o1Uu7GbcpXHVEj6dVkANp/f4jaieOfgOKOLaeF
+         JlHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXiw3xv4EI+39jcWGxvoGGwoflKv3iVe76eN7KxgwgJTz15TQiI0Q9jDqNDUHQG0YNmE88gPdHMFHwJ9w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykqDs+KaD/g+aeP5cYAAg5LW68dJ8JacjOoWO35PxFlCo5Fndo
+	g0Wfx8UpuJSLdKw2TiwzqNhtqb1q2GSPLci3EwD+YgZLqeXyfyDgzzFn4uCQ
+X-Google-Smtp-Source: AGHT+IE9Ln7CAAMnFGaiJTlhxb+rKtE1cwgbtM0VGmLbzx+hc9LQk2kprlXX3MVoq/8wRBaDLvW5HA==
+X-Received: by 2002:a05:6a00:2d16:b0:706:6c38:31f3 with SMTP id d2e1a72fcca58-710cad6d366mr975637b3a.8.1723089867385;
+        Wed, 07 Aug 2024 21:04:27 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710cb20d602sm274767b3a.5.2024.08.07.21.04.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 21:04:26 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: u.kleine-koenig@pengutronix.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: moxart_ether: use devm in probe
+Date: Wed,  7 Aug 2024 21:03:54 -0700
+Message-ID: <20240808040425.5833-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,37 +84,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB004.ant.amazon.com (10.13.138.57) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-In macb_suspend(), idev->ifa_list is fetched with rcu_access_pointer()
-and later the pointer is dereferenced as ifa->ifa_local.
+alloc_etherdev and kmalloc_array are called first and destroyed last.
+Safe to use devm to remove frees.
 
-So, idev->ifa_list must be fetched with rcu_dereference().
-
-Fixes: 0cb8de39a776 ("net: macb: Add ARP support to WOL")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/moxa/moxart_ether.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 11665be3a22c..dcd3f54ed0cf 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5250,8 +5250,8 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	if (bp->wol & MACB_WOL_ENABLED) {
- 		/* Check for IP address in WOL ARP mode */
- 		idev = __in_dev_get_rcu(bp->dev);
--		if (idev && idev->ifa_list)
--			ifa = rcu_access_pointer(idev->ifa_list);
-+		if (idev)
-+			ifa = rcu_dereference(idev->ifa_list);
- 		if ((bp->wolopts & WAKE_ARP) && !ifa) {
- 			netdev_err(netdev, "IP address not assigned as required by WoL walk ARP\n");
- 			return -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/moxa/moxart_ether.c b/drivers/net/ethernet/moxa/moxart_ether.c
+index 96dc69e7141f..06c632c90494 100644
+--- a/drivers/net/ethernet/moxa/moxart_ether.c
++++ b/drivers/net/ethernet/moxa/moxart_ether.c
+@@ -81,9 +81,6 @@ static void moxart_mac_free_memory(struct net_device *ndev)
+ 		dma_free_coherent(&priv->pdev->dev,
+ 				  RX_REG_DESC_SIZE * RX_DESC_NUM,
+ 				  priv->rx_desc_base, priv->rx_base);
+-
+-	kfree(priv->tx_buf_base);
+-	kfree(priv->rx_buf_base);
+ }
+ 
+ static void moxart_mac_reset(struct net_device *ndev)
+@@ -461,15 +458,14 @@ static int moxart_mac_probe(struct platform_device *pdev)
+ 	unsigned int irq;
+ 	int ret;
+ 
+-	ndev = alloc_etherdev(sizeof(struct moxart_mac_priv_t));
++	ndev = devm_alloc_etherdev(p_dev, sizeof(struct moxart_mac_priv_t));
+ 	if (!ndev)
+ 		return -ENOMEM;
+ 
+ 	irq = irq_of_parse_and_map(node, 0);
+ 	if (irq <= 0) {
+ 		netdev_err(ndev, "irq_of_parse_and_map failed\n");
+-		ret = -EINVAL;
+-		goto irq_map_fail;
++		return -EINVAL;
+ 	}
+ 
+ 	priv = netdev_priv(ndev);
+@@ -511,15 +507,15 @@ static int moxart_mac_probe(struct platform_device *pdev)
+ 		goto init_fail;
+ 	}
+ 
+-	priv->tx_buf_base = kmalloc_array(priv->tx_buf_size, TX_DESC_NUM,
+-					  GFP_KERNEL);
++	priv->tx_buf_base = devm_kmalloc_array(p_dev, priv->tx_buf_size,
++					       TX_DESC_NUM, GFP_KERNEL);
+ 	if (!priv->tx_buf_base) {
+ 		ret = -ENOMEM;
+ 		goto init_fail;
+ 	}
+ 
+-	priv->rx_buf_base = kmalloc_array(priv->rx_buf_size, RX_DESC_NUM,
+-					  GFP_KERNEL);
++	priv->rx_buf_base = devm_kmalloc_array(p_dev, priv->rx_buf_size,
++					       RX_DESC_NUM, GFP_KERNEL);
+ 	if (!priv->rx_buf_base) {
+ 		ret = -ENOMEM;
+ 		goto init_fail;
+@@ -553,8 +549,6 @@ static int moxart_mac_probe(struct platform_device *pdev)
+ init_fail:
+ 	netdev_err(ndev, "init failed\n");
+ 	moxart_mac_free_memory(ndev);
+-irq_map_fail:
+-	free_netdev(ndev);
+ 	return ret;
+ }
+ 
+@@ -565,7 +559,6 @@ static void moxart_remove(struct platform_device *pdev)
+ 	unregister_netdev(ndev);
+ 	devm_free_irq(&pdev->dev, ndev->irq, ndev);
+ 	moxart_mac_free_memory(ndev);
+-	free_netdev(ndev);
+ }
+ 
+ static const struct of_device_id moxart_mac_match[] = {
 -- 
-2.30.2
+2.45.2
 
 
