@@ -1,90 +1,73 @@
-Return-Path: <netdev+bounces-116830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E4A94BD5E
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:26:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29EB94BD5C
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:25:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4C011C20D5B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:26:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3265BB23458
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 12:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FC218C93C;
-	Thu,  8 Aug 2024 12:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5ApKnDT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29EA18C937;
+	Thu,  8 Aug 2024 12:25:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B87818DF61;
-	Thu,  8 Aug 2024 12:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E2518C352;
+	Thu,  8 Aug 2024 12:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723119930; cv=none; b=kLqq7AMUaJh/Qi2g9f7I/dVZ5pygPjlJaO0StLeJ4+SqNPft4hZOx59hxwET77i+Bh9qvZbrAwiHzi8gd4ecZ/21c29fNhPIkmQcXpckq3wuX9dNWUfZ2FG+T+Z3WyM/mrI6g0KnOytLS1BuVDtS9YpxhLhT30edAqNChE8uL5w=
+	t=1723119927; cv=none; b=IrCoEZowTOSp9Nx5+09CTRpmkB02vV8Uj+lykfSPjatMC5ifb2kpRVByjKd7yj96EGaFEtpLVXFKoutwa2TQzb7xs0YyY13n/vLdeTjWGNLXiKwMwatjjh2GzYC3O4GNfapZG7S5zPxyfsuD43QZOqSXAAmQWAwiKhQsBbtAlnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723119930; c=relaxed/simple;
-	bh=jtalaf4i0vBrVvnWmgxU3qfha27p3Pcpv6SHl8PIUGQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V2gyf2WG71TSzljb/lqQ3TwVsWbXnQxP1vgAU/SWn4tlFy93qStg3Ar9qgpoPckYpx9yPmPfYEY20/ryy+pNxkuLHsnNRET8bVedY4jF8zGr4PWyDxC/HvRDHcWhcHZRWo8zYQ/aM2OUZS2ymjtGCH2fG6wQDzQChqr4fAbAvfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d5ApKnDT; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1723119927; c=relaxed/simple;
+	bh=cW9OfGPuYV97rht9Ak7z0CkdDfyErDEpb911lmEV3Kw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDsx8vP2wZFFUcrkHh6H3FTVIyxHAYFKPEzE7/sSvilgejKQVFLyNPyLqJJq+7LWSPVj7NLsJzqnx/AGQ6yPNxcWdJHKXiEtwkoLrbaVYTZR6aCZLvexacz8x7vim1jZP0gp5JGAAO5oiWsBba7E2Zlve9tra4bEDG2C6ctgSw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-70d19d768c2so681156b3a.3;
-        Thu, 08 Aug 2024 05:25:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723119928; x=1723724728; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SEXn+6uaDaibQ3LCSAfL1ofGJtzehJXz9fPnsXVCy5U=;
-        b=d5ApKnDT8OdSZqMKINK+T85dhzgQxW0QX+cfQo+mZTl6kUm7//6AeE2HeDMvI+sjZw
-         rwZ7I8R+15C+4D1DVyKcfPBKTZ+uZ1bbe341LrRgQ/iGmFukC1NRNEgzTTcn/MuZzwSi
-         xNVfXb8jig7rP1cqTFdliraRsmM0TaFHk6ujBjVaiYn7xpvyqlFMdQHYrFDzxLkGWQi8
-         0D/6qtwVMbwhfmOXI/94UMJsAJoqoRGEbzoj6kyaMrR3oq/NluSS0B0Gt9J5+PSDq32D
-         Rp5hcD7jv2HRadKOgWbAWF0VruaORH6UwuDqbdlvJ9G7943gcYXq+Ybetsrzfle6t4Rc
-         op3Q==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5a1c49632deso942287a12.2;
+        Thu, 08 Aug 2024 05:25:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723119928; x=1723724728;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SEXn+6uaDaibQ3LCSAfL1ofGJtzehJXz9fPnsXVCy5U=;
-        b=udor4NgH9hhYVZqf1JlxnuYcSBLq9hjSX8fSI9mJfJ7+fbUtYlEo035mvs/GKxidMY
-         WqYPOPSIi9+uuKFzYiygwE86CDfFBCXTR3wb1EW8jdZ746GwxzFNhFSGh+1iM+3bjsMz
-         FiP89SpJYIw6HZ9bSdveUZLlxib9wK2Gbp+BKw8JSeUWwelUH2b4zqgK07t4b1TlqLZM
-         8ma0X7uCFjhFdNtwnCfyEZGKeQZCQNqYHnQcMQFvEo3sCJNRp4i2CtcXDUmu87zFwUq8
-         I+OU/WEy44ODNKE0A6HfWmtnwIuzAUZeG0O2Mj/Adr1EnQT8oWJBh4DfKx8kcwymztGe
-         QKrA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVSWSpYc8xunFxmht2kMadOLw9Y8/spK3y4gsKWl6UPpzcD6bCZYT0iSGUAu2XQUH9CY32RSE8dxMFaMglD4nlLocXboPq8tvUne5taPfLg0qZCZeyLbaYyVKq7r+HNFR6kUDQqH/oQe3Brjo9kvU8g+XypDnxOa3mgBuZxL+an4yD9y7J
-X-Gm-Message-State: AOJu0YxgFWGuG4HHgiUJocxwQ7YCgIbdoZVI48EkGE3F34QZ+trnucGB
-	btA1GPhjkWl7TLM54WXBa0tm8e4QUbSxDD0ezmRA8QqtIHPXaCYQ
-X-Google-Smtp-Source: AGHT+IEFssPBy/dfrma+UX+DTVHqmYI5LRvhGTgwyO96rTwXS4qFoS47jS6PHtERr/iaieQ+YoKbxA==
-X-Received: by 2002:a05:6a20:f389:b0:1c3:b2b3:442d with SMTP id adf61e73a8af0-1c6fcf7b099mr1325792637.40.1723119927838;
-        Thu, 08 Aug 2024 05:25:27 -0700 (PDT)
-Received: from dev0.. ([49.43.168.245])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7bb819e782csm5530478a12.48.2024.08.08.05.25.23
+        d=1e100.net; s=20230601; t=1723119924; x=1723724724;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=15cBkzLbG6bDjzde0nepIYkE92TldIJ/ekzz5J06BOY=;
+        b=FopBoCzbaFfMFB0SeTpoCp/EDtBSbAayxb+Leg9kSn7ecOmDmn4xHTS5w/sj7CJ4X0
+         S8ir/ZR3ys4rR/3WH3fMqBARpYkAvbxKqYbDaez34RDUsbAYT5WhVBTTAhCyOBxraYqH
+         eZn/SZe10Croq3nHSa+Hs3IXhalBwPPd/VLeAtn1dIwZmG+WKRI8oTZjHxfyTV75Mfor
+         oTaxdiuXRNeDhTiiaNrNTC0myRujWwhhmSFOp33r8l4HuTtNVcJmboV87Cc0dy7fH66y
+         JPV+NWRgLkfl+w4lbud3dOOnTMx71ulN9dNor02P1cmFFaWpI2xX5C7At5hOU9eywyUN
+         GDmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTHI5xC6Ej+VCH2wOpRG/r1luLOFchpD3Qq+O++fmpzIfzEIrbV4+ZvbD3vPKbdYO1+2BBFrzPc6O03NS6sVN1OxUVi8np6WPPo2Nkd6sBzdhQmFmRaxLtYcwM5/CxM4kgsF5n
+X-Gm-Message-State: AOJu0YxtP8PPWsJaln5apPvqKE4zxBQB4Olql8AdmUwfZreSnvmkDBRT
+	K9iScIvHjB/9RCWY1lbyV5oQUJQ50H37YYK6UqmjVmTrtqPTwvad
+X-Google-Smtp-Source: AGHT+IGG382fHsKvFVTIXl84b1XkPVp7Rp2dxeoHhZpzEy1brL00pa8flwncBNBNOs9w5W/eGnv8Ww==
+X-Received: by 2002:a05:6402:1d49:b0:58c:eee0:4913 with SMTP id 4fb4d7f45d1cf-5bbb233ee34mr1440975a12.27.1723119923809;
+        Thu, 08 Aug 2024 05:25:23 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-011.fbsv.net. [2a03:2880:30ff:b::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bbb2bf95d9sm577341a12.10.2024.08.08.05.25.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 05:25:27 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: davem@davemloft.net,
+        Thu, 08 Aug 2024 05:25:23 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
+	pabeni@redhat.com
+Cc: thepacketgeek@gmail.com,
+	riel@surriel.com,
+	horms@kernel.org,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org,
-	javier.carrasco.cruz@gmail.com,
-	Abhinav Jain <jain.abhinav177@gmail.com>
-Subject: [PATCH v5 2/2] selftests: net: Add on/off checks for non-fixed features of interface
-Date: Thu,  8 Aug 2024 12:24:52 +0000
-Message-Id: <20240808122452.25683-3-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240808122452.25683-1-jain.abhinav177@gmail.com>
-References: <20240808122452.25683-1-jain.abhinav177@gmail.com>
+	linux-kernel@vger.kernel.org,
+	paulmck@kernel.org,
+	davej@codemonkey.org.uk
+Subject: [PATCH net-next v2 0/5] net: netconsole: Fix netconsole unsafe locking
+Date: Thu,  8 Aug 2024 05:25:06 -0700
+Message-ID: <20240808122518.498166-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,63 +76,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement on/off testing for all non-fixed features via while loop.
-Save the initial state so that it can be restored after on/off checks.
+Problem:
+=======
 
-Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
----
- tools/testing/selftests/net/netdevice.sh | 37 +++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+The current locking mechanism in netconsole is unsafe and suboptimal due
+to the following issues:
 
-diff --git a/tools/testing/selftests/net/netdevice.sh b/tools/testing/selftests/net/netdevice.sh
-index 0c32950fdd17..50f7b9d1163d 100755
---- a/tools/testing/selftests/net/netdevice.sh
-+++ b/tools/testing/selftests/net/netdevice.sh
-@@ -124,7 +124,42 @@ kci_netdev_ethtool()
- 		return 1
- 	fi
- 	echo "PASS: $netdev: ethtool list features"
--	#TODO for each non fixed features, try to turn them on/off
-+
-+	while read -r FEATURE VALUE FIXED; do
-+		[ "$FEATURE" != "Features" ] || continue # Skip "Features"
-+		[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-+		feature="${FEATURE%:*}"
-+
-+		initial_state=$(ethtool -k "$netdev" | grep "$feature:" \
-+			| awk '{print $2}')
-+		ethtool --offload "$netdev" "$feature" off
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Turned off feature: $feature"
-+		else
-+			echo "FAIL: $netdev: Failed to turn off feature:" \
-+				"$feature"
-+		fi
-+
-+		ethtool --offload "$netdev" "$feature" on
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Turned on feature: $feature"
-+		else
-+			echo "FAIL: $netdev: Failed to turn on feature:" \
-+				"$feature"
-+		fi
-+
-+		#restore the feature to its initial state
-+		ethtool --offload "$netdev" "$feature" "$initial_state"
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Restore feature $feature" \
-+				"to initial state $initial_state"
-+		else
-+			echo "FAIL: $netdev: Failed to restore feature" \
-+				"$feature to default $initial_state"
-+		fi
-+
-+	done < "$TMP_ETHTOOL_FEATURES"
-+
- 	rm "$TMP_ETHTOOL_FEATURES"
- 
- 	kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
+1) Lock Release and Reacquisition Mid-Loop:
+
+In netconsole_netdev_event(), the target_list_lock is released and
+reacquired within a loop, potentially causing collisions and cleaning up
+targets that are being enabled.
+
+	int netconsole_netdev_event()
+	{
+	...
+		spin_lock_irqsave(&target_list_lock, flags);
+		list_for_each_entry(nt, &target_list, list) {
+			spin_unlock_irqrestore(&target_list_lock, flags);
+			__netpoll_cleanup(&nt->np);
+			spin_lock_irqsave(&target_list_lock, flags);
+		}
+		spin_lock_irqsave(&target_list_lock, flags);
+	...
+	}
+
+2) Non-Atomic Cleanup Operations:
+
+In enabled_store(), the cleanup of structures is not atomic, risking
+cleanup of structures that are in the process of being enabled.
+
+	size_t enabled_store()
+	{
+	...
+		spin_lock_irqsave(&target_list_lock, flags);
+		nt->enabled = false;
+		spin_unlock_irqrestore(&target_list_lock, flags);
+		netpoll_cleanup(&nt->np);
+	...
+	}
+
+
+These issues stem from the following limitations in netconsole's locking
+design:
+
+1) write_{ext_}msg() functions:
+
+	a) Cannot sleep
+	b) Must iterate through targets and send messages to all enabled entries.
+	c) List iteration is protected by target_list_lock spinlock.
+
+2) Network event handling in netconsole_netdev_event():
+
+	a) Needs to sleep
+	b) Requires iteration over the target list (holding
+	   target_list_lock spinlock).
+	c) Some events necessitate netpoll struct cleanup, which *needs*
+	   to sleep.
+
+The target_list_lock needs to be used by non-sleepable functions while
+also protecting operations that may sleep, leading to the current unsafe
+design.
+
+
+Solution:
+========
+
+1) Dual Locking Mechanism:
+	- Retain current target_list_lock for non-sleepable use cases.
+	- Introduce target_cleanup_list_lock (mutex) for sleepable
+	  operations.
+
+2) Deferred Cleanup:
+	- Implement atomic, deferred cleanup of structures using the new
+	  mutex (target_cleanup_list_lock).
+	- Avoid the `goto` in the middle of the list_for_each_entry
+
+3) Separate Cleanup List:
+	- Create target_cleanup_list for deferred cleanup, protected by
+	  target_cleanup_list_lock.
+	- This allows cleanup() to sleep without affecting message
+	  transmission.
+	- When iterating over targets, move devices needing cleanup to
+	  target_cleanup_list.
+	- Handle cleanup under the target_cleanup_list_lock mutex.
+
+4) Make a clear locking hierarchy
+
+	- The target_cleanup_list_lock takes precedence over target_list_lock.
+
+	- Major Workflow Locking Sequences:
+		a) Network Event Affecting Netpoll (netconsole_netdev_event):
+			rtnl -> target_cleanup_list_lock -> target_list_lock
+
+		b) Message Writing (write_msg()):
+			console_lock -> target_list_lock
+
+		c) Configfs Target Enable/Disable (enabled_store()):
+			dynamic_netconsole_mutex -> target_cleanup_list_lock -> target_list_lock
+
+
+This hierarchy ensures consistent lock acquisition order across
+different operations, preventing deadlocks and maintaining proper
+synchronization. The target_cleanup_list_lock's higher priority allows
+for safe deferred cleanup operations without interfering with regular
+message transmission protected by target_list_lock.  Each workflow
+follows a specific locking sequence, ensuring that operations like
+network event handling, message writing, and target management are
+properly synchronized and do not conflict with each other.
+
+
+Changelog:
+
+v3:
+  * Move  netconsole_process_cleanups() function to inside
+    CONFIG_NETCONSOLE_DYNAMIC block, avoiding Werror=unused-function
+    (Jakub)
+
+v2:
+  * The selftest has been removed from the patchset because veth is now
+    IFF_DISABLE_NETPOLL. A new test will be sent separately.
+  * https://lore.kernel.org/all/20240807091657.4191542-1-leitao@debian.org/
+
+v1:
+  * https://lore.kernel.org/all/20240801161213.2707132-1-leitao@debian.org/
+
+Breno Leitao (5):
+  net: netpoll: extract core of netpoll_cleanup
+  net: netconsole: Correct mismatched return types
+  net: netconsole: Standardize variable naming
+  net: netconsole: Unify Function Return Paths
+  net: netconsole: Defer netpoll cleanup to avoid lock release during
+    list traversal
+
+ drivers/net/netconsole.c | 173 ++++++++++++++++++++++++---------------
+ include/linux/netpoll.h  |   1 +
+ net/core/netpoll.c       |  12 ++-
+ 3 files changed, 118 insertions(+), 68 deletions(-)
+
 -- 
-2.34.1
+2.43.5
 
 
