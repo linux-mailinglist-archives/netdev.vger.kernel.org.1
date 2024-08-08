@@ -1,118 +1,193 @@
-Return-Path: <netdev+bounces-116766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5640D94BA16
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:50:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1FE94BA18
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2A5CB22326
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:50:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B571F282944
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909C4189F48;
-	Thu,  8 Aug 2024 09:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CC5148856;
+	Thu,  8 Aug 2024 09:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="X9L6VYOo"
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="JvS9cP1p"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88D41494BB;
-	Thu,  8 Aug 2024 09:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E886146A93;
+	Thu,  8 Aug 2024 09:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723110582; cv=none; b=e1FPsPu6rkC+SHkkb6b2qmsnpD3pgKwFlVqAoHK3zK4LXSiW2MotHDyE7pkxEVipdzj7M9TnE0SNUoirdlz8EW9aLdHXogSxFbHqcpiLv08AgKzSDE9cCI6YZP4iS146lzBQwVm4EsBruMu9DCN7h5707oSPLf/rfGkr9fUSbpc=
+	t=1723110777; cv=none; b=kUVeoNbgTjw8GeKpeF9mshzyUhWdb0vJ2CYr4iX0VUyHavHPAqqWQsKq3Lkk/xhOgHCRF1HC7sAFKS9fN2v6nLpiTGfYvU8C5OtOl6K9c9jGO8lBfg2lAJnKgjpgr61a1IMWJvga4AGLzzCYKXIMTDbOT7Zys80HnHWMYG8gDRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723110582; c=relaxed/simple;
-	bh=5HH0jUt+vlEiSEtkkhsfiu8TgAtJzkrWtdL9zWUfeiM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hXhFMHZYJuP0rH9jou4eYBEI3QxEoIL5ZXC5NVrrduMk5Ht2sW+IhWGNH1isYlwhxvhiksb1lqkNqLUBBWNQAQfjvnjgqRrRwIFV4oSlhTNI6mdgzmMl3wzPCCDsVkkJzZQu6ih8mknmE2913dHz93X80Hu/ci/KBMPoMxOYCIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=X9L6VYOo; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id ABEFCA02FA;
-	Thu,  8 Aug 2024 11:49:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=HWgcu+nMnNfMlqErSxKS
-	w+bBbNvWeyDcFJmtJSZ09OM=; b=X9L6VYOoifxEl0w25j90b5+e0aZnnGBrWMeM
-	CssyWqVmzsy139dNo7l4zUHb+lkx9FM7rt/OLX36H91SXSsW+zAV5etCo0fEJbll
-	7eF4uN3NFcRWROTNFw9LAr3wmi3NutSiDlh0l920jNrU+Lt/Tnw7Xp/x/NEH++u5
-	RMBjjC+J++u2MFVSAZt9p1UBUlRaMEwefnRMK+IKIuydDpuA7eSh6aHnDZgxz/VZ
-	QGvnv/hUV6Kxr1eBzkclom7FQHogY559IJImZmOBLGSRV/3tNS8oJMhscvItgqD8
-	vzdOLSN7mMlTdHqewmqpeSwwls/sZBwwS+x/16AfUuce6NM7Hihs55PdfkgiHoD8
-	zNAsbwQt/3HMbU6VuY1EsDFIW/tWnLR+frm/C6v0qEYp7LJ7qlKikaDCo4lfSz+y
-	mV5G1tMdK/o3a4lZa5jLqEiZySWZfyiSdkBAKADSLdKc8HgXaRO/okrBJIwPGyao
-	9NMoMsKzuC62WCUJFvCGScrkeZYfV0vB8y5zhVzt8uQhVupWcA6v6a87Dko7/l0y
-	GXDR3aTuG+0d8hFoDC84oT8H/h/I3J7cplmv5PqnGBnacFhdpQ6ztP8FiETbU3le
-	D8ujiOp/yqmRU1kVXMFIjBJ7f52yeksHRmxYnzx9chs2RSvUXHiA0Rw6YbAslv2x
-	1j0hn2g=
-Message-ID: <449a855a-e3e2-4eed-b8bd-ce64d6f66788@prolan.hu>
-Date: Thu, 8 Aug 2024 11:49:29 +0200
+	s=arc-20240116; t=1723110777; c=relaxed/simple;
+	bh=JiG27XlHhofTe1mChVK0BV8ffCfklqbLPln0145Kfac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k3MixEO2BqcU8CjQMUk0Ree+6kdZpC2750ic0Ru8ijCKySseGtyv7+3l2eeIYtiY6OIm8ImU/pl6g9VNP3KNmzQANNsU7+bkRQrdtLL5rkqGEeNGfJVLFsZcfkJvyca9BSU/8vvwyOBpPfNP/jXYmD6X0kuV865byjuW9obVdaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=JvS9cP1p; arc=none smtp.client-ip=212.227.126.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1723110754; x=1723715554; i=christian@heusel.eu;
+	bh=famyl8XJTqAPO5pOt5QF1mBAP+X4U/NUWSH5Nk/ZfMA=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=JvS9cP1pTqVQP+8mHzsXKU4pQQv2jhH42/qZR+N2uvOUZYsc0Jpz8rSy5L+6GEqV
+	 UqjRKfY/o1TmuqJBEqtCLOHUqgJZ2H7KY8a+AdcUOisBgIAscuHQWq0/2zS/lZZxM
+	 7FdL4qtAVrPy/ysf+P8ndSNqs8kSSVqfnjTKLLzdB55vvqY1n1TmC/ih7T0lYDkmi
+	 VDiFhf0K2XCS3+e/Bxgd0EZ5Q6Sm18KCaNO3L/rliawTpzvWkDKWgulHZqYnc1HAu
+	 MpfC6WJoQHBPazhKl3/IKSN9ZnyMxHvcDPwgEdKXw6AuNhpYAcPkqf1Vfc9XylfpO
+	 ItSwyljUsSEX+BsIbA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([78.42.228.106]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1Mbj3e-1s4JlU1V4Y-00oYv7; Thu, 08 Aug 2024 11:52:34 +0200
+Date: Thu, 8 Aug 2024 11:52:32 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: avladu@cloudbasesolutions.com, willemdebruijn.kernel@gmail.com, 
+	alexander.duyck@gmail.com, arefev@swemel.ru, davem@davemloft.net, edumazet@google.com, 
+	jasowang@redhat.com, kuba@kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stable@vger.kernel.org, willemb@google.com
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
+Message-ID: <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+References: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
+ <20240805212829.527616-1-avladu@cloudbasesolutions.com>
+ <2024080703-unafraid-chastise-acf0@gregkh>
+ <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
+ <2024080857-contusion-womb-aae1@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH resubmit net 1/2] net: fec: Forward-declare
- `fec_ptp_read()`
-To: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-CC: Jakub Kicinski <kuba@kernel.org>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Frank Li
-	<Frank.li@nxp.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-References: <20240807082918.2558282-1-csokas.bence@prolan.hu>
- <1d87cbd1-846c-4a43-9dd3-2238670d650e@lunn.ch>
- <20240808094116.GG3006561@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <20240808094116.GG3006561@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2980D94854617767
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="li54u4dkbh7bt352"
+Content-Disposition: inline
+In-Reply-To: <2024080857-contusion-womb-aae1@gregkh>
+X-Provags-ID: V03:K1:iUYuPJNFKfM0gewmfK3BqdpWZEFF/3Ye0k36aNf1vDRrKGAJWlc
+ r3j9OK0OK3gcotmvOhun2bQeUwQdKRlYSgMDiiMCvHXR7FDQLeouwxzDP3KrTdZvWaayWEr
+ 6r8yqdgyEFQ0wjLugoMAwpky2Le2cRZwAWALrU7YnoM4uKbXYqcHRAZVSVrZFA1GyeLjqfP
+ X0XExmjQTP6Iuao3a/UXw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:LF+M/Z0/zlA=;WgICxuFbvmeVNbQ8jTiRbqwFFyH
+ 7ZVq6adl12Vv5fct1YPoNYDehop+yrWz8UvsBKftSPwj3CVQkAdf7FKnyY8XXbBKSIR31yoiW
+ 6Ha/XAylU289m+RIsaxEI5OvyblgUOD5n7WWnEiAErtL26J4qCalbaozXfQN60Yt7+pR0FvW2
+ gvS4/CWTk6Zg/MF2/j+fAVtz5Qp17QXA6tsiKCLgfuu5lRt5zH4XWn1tON+EoRLbWYYI2VrOj
+ pd5TJPgWf9C/ipWusf8k94HJeddK2iaZO1sZoGCE3SvwuHFv04khnACVNB6C4iIuS727GYPgu
+ A1iDz40MpC7rdzYNqDEvsitEZdA+iJUEjbRtHCUZn3ADJIsSf8M49OGZUA6iPU1xXdY7EE18d
+ MrrG+739A9hlDTJ7j3kaMLQvmuxGEW0ULMoHLlkRu+SQEra8oTDAWu1Lg2b8XJSo845jpe0Qu
+ Xc7LGcwdSKSg1m+tENeFX9o+EXzUU+TqxNc7OHyA2bdGX0AG41RALBeYGUbGiwBcx257cfFOY
+ 4UDquNXnGPnfqqckzVKXdpAZBLZm3kKQ8ldmV4+Aie0kYcuoH2zfGZm8tUM/39cQzKoq022GO
+ pf/ZLwpmSK6X6cLt3+XDG34HWtTAN5DPcElVg5etOmAcuZNKrQd5k8NKVSzdaEtwuO3YKtVZH
+ 5TpOkDnwOt6WrxCUjnL/bODqdd9m6LY4f0cFV+LL3zdZWgv0HBZ+elJ1QP9OCzoVIhxOjQFiR
+ mng6pKru1MmiSbSPGrw2KlomNbIwoRpNg==
 
-On 8/8/24 11:41, Simon Horman wrote:
-> On Wed, Aug 07, 2024 at 03:53:17PM +0200, Andrew Lunn wrote:
->> On Wed, Aug 07, 2024 at 10:29:17AM +0200, Csókás, Bence wrote:
->>> This function is used in `fec_ptp_enable_pps()` through
->>> struct cyclecounter read(). Forward declarations make
->>> it clearer, what's happening.
->>
->> In general, forward declarations are not liked. It is better to move
->> the code to before it is used.
->>
->> Since this is a minimal fix for stable, lets allow it. But please wait
->> for net to be merged into net-next, and submit a cleanup patch which
->> does move fec_ptp_read() earlier and remove the forward declaration.
-> 
-> That makes sense.
-> 
-> However, is this a fix?
-> It's not clear to me that it is.
 
-Well, it's not clear to me either what constitutes as a "fix" versus 
-"just a cleanup". But, whatever floats Andrew's boat...
+--li54u4dkbh7bt352
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> And if it is a pre-requisite for patch 2/2,
-> well that doesn't seem to be a fix.
+On 24/08/08 08:38AM, Greg KH wrote:
+> On Wed, Aug 07, 2024 at 08:34:48PM +0200, Christian Heusel wrote:
+> > On 24/08/07 04:12PM, Greg KH wrote:
+> > > On Mon, Aug 05, 2024 at 09:28:29PM +0000, avladu@cloudbasesolutions.c=
+om wrote:
+> > > > Hello,
+> > > >=20
+> > > > This patch needs to be backported to the stable 6.1.x and 6.64.x br=
+anches, as the initial patch https://github.com/torvalds/linux/commit/e269d=
+79c7d35aa3808b1f3c1737d63dab504ddc8 was backported a few days ago: https://=
+git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/include/lin=
+ux/virtio_net.h?h=3D3Dv6.1.103&id=3D3D5b1997487a3f3373b0f580c8a20b56c1b64b0=
+775
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/co=
+mmit/include/linux/virtio_net.h?h=3D3Dv6.6.44&id=3D3D90d41ebe0cd4635f641047=
+1efc1dd71b33e894cf
+> > >=20
+> > > Please provide a working backport, the change does not properly
+> > > cherry-pick.
+> > >=20
+> > > greg k-h
+> >=20
+> > Hey Greg, hey Sasha,
+> >=20
+> > this patch also needs backporting to the 6.6.y and 6.10.y series as the
+> > buggy commit was backported to to all three series.
+>=20
+> What buggy commit?
 
-It indeed is.
+The issue is that commit e269d79c7d35 ("net: missing check virtio")
+introduces a bug which is fixed by 89add40066f9 ("net: drop bad gso
+csum_start and offset in virtio_net_hdr") which it also carries a
+"Fixes:" tag for.
 
-> So in all, I'm somewhat confused.
-> And wonder if all changes can go via net-next.
+Therefore it would be good to also get 89add40066f9 backported.
 
-That's probably what will be happening.
+> And how was this tested, it does not apply cleanly to the trees for me
+> at all.
 
-Bence
+I have tested this with the procedure as described in [0]:
 
+    $ git switch linux-6.10.y
+    $ git cherry-pick -x 89add40066f9ed9abe5f7f886fe5789ff7e0c50e
+    Auto-merging net/ipv4/udp_offload.c
+    [linux-6.10.y fbc0d2bea065] net: drop bad gso csum_start and offset in =
+virtio_net_hdr
+     Author: Willem de Bruijn <willemb@google.com>
+     Date: Mon Jul 29 16:10:12 2024 -0400
+     3 files changed, 12 insertions(+), 11 deletions(-)
+
+This also works for linux-6.6.y, but not for linux-6.1.y, as it fails
+with a merge error there.
+
+The relevant commit is confirmed to fix the issue in the relevant Githu
+issue here[1]:
+
+    @marek22k commented
+    > They both fix the problem for me.
+
+> confused,
+
+Sorry for the confusion! I hope the above clears things up a little :)
+
+> greg k-h
+
+Cheers,
+Christian
+
+[0]: https://lore.kernel.org/all/2024060624-platinum-ladies-9214@gregkh/
+[1]: https://github.com/tailscale/tailscale/issues/13041#issuecomment-22723=
+26491
+
+--li54u4dkbh7bt352
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAma0lWAACgkQwEfU8yi1
+JYWAaw/+NFVovq+13ZhwFjXLmxlznD100ws6d9Py76NezO3nzoOkuYXsHyVZdCZc
+eEGSrwleqBOr1anPUC4Vds6F9gZ9GcqnIf5ZFv6atLehLuWwLEiLyuquVOIoABJB
+wEjvR1TdnHfFE5WWcKUjw865ianJ4/5n3HkYYgBSimPZuk3L6x37wvqmmnsQwC1E
+ek9bouXkbHxmRTVO8lMWDEDPJXgizBzWbjMNY5SzcPoKeza4fVF440KTbLVnuZA6
+7Ejeny7Bn63JFe538rIiV3tL1CazetcdxlbtBmYPMifpbifgmtbsNTjRaACRUorc
+oApan9rY5s19803CIG6UB/XJjBIrZNfNFkOhWQNAsgsIyz0VP1sNJpGWQzhZ8dEF
+2szbXZg/x2TSE0cBIBVuCbpQRf4muokx67ol5GfauoAt4kFi3YEC8Bo72AsIkPih
+PmY7//VZhtywYQiy84tBxXk6dFOQafJ56EcqhDTArPUFl0FySVO4cx0yLuscinMg
+Yxa9zanNBQ85nQZrhMBtaKkuV0xZUS6giYP+VcLh60FEXqGG/cTrvdHj9N6jn7MM
+YE92wkc5mZq8+VmSRKtcj/dBnuYBO/fB+7C/YxVFgntNsWBISb8X+iKU+dEQepPx
+NYJSWsrEH/TEO91S8H7QsCRhfuP2egUg/691c5toDy1t9K/Vid4=
+=8CVi
+-----END PGP SIGNATURE-----
+
+--li54u4dkbh7bt352--
 
