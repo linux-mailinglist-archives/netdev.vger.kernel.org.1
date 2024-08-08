@@ -1,117 +1,155 @@
-Return-Path: <netdev+bounces-116800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B2694BC31
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:23:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9499594BC46
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:28:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6F92844E6
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:23:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A61AB20B88
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F0718B495;
-	Thu,  8 Aug 2024 11:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGCJ4Fa2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3880818B469;
+	Thu,  8 Aug 2024 11:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0552B18B482
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 11:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73BD813D265
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 11:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723116167; cv=none; b=rf6Emw/W4gfhmB8u8JuEc5KDyNLKbn73QGkrIEUFY1Hd11mKrIxFg2zxra7bicr5s0HSQAXjl8+UK+aTYemO/didbaYP6Wm2GKpAlhzY6nc37mDsDaEbbYk3CnvkPNEiKMz3HmbuYsKUZlMvrJFXGZL0fxIhOL9494hP+GS/e7c=
+	t=1723116522; cv=none; b=kFFISXDiHg8USOomBYjvGb61q94AWCB+lOlmCBCob77DKxyjLeZrzYVvDIHRl4pxh/jsy7BhIlqqwTQQC/dBk5ehkv0uJaZ98pujrW26Eh4vCDY+7kM8zDcgzBerxVxts9p7vnAl5t2wx/73m8vDNyUr5+ZaBcesxrWE/Yg59Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723116167; c=relaxed/simple;
-	bh=ODsm5pH6Nv0sga8hExSMtpjmnYVYISkHWKdCxOCCGsI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=QNJa02Rin1Y1gP876xGlNIn1ZSXoG4w9H+3dEJE81AWs7t3kew0lGBtBXJLxPeJmicaQQQBtiOo3xv8BgNTLNHXm7Fx24mZ3YpilaQm8o5H6RHSbRB13DsS4P7j5CMOUFhzwH0QP5AArw+zGB1BWS+wyIx/l9LWZ/OKsGSCjM34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FGCJ4Fa2; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4266dc7591fso6190365e9.0
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 04:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723116164; x=1723720964; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lKUGP0PE9AD005oieGjmMPIIMJBw4vdLnTdJKeF/xA4=;
-        b=FGCJ4Fa2nMuXWIyNs2WSXRXArbEXEIrjCuRPYkXFmN/7cH3v8Y2dstRrsSfau4qOmO
-         yn1hURi6yb8seE1gGH9PB7VC2+2Rt9kFkOwp6gEBwCirN6/+dofvnPDks+X0IQ07DpNT
-         XX+/hSvggZf7gfBi8Uqd+1FBtW7HhVv5xT61XeChjz/HXTPD2PFFZtl3CNkXZXVCTWq0
-         naEa4JQbTnAMMZfOArih9sm0Md3I26kOK+4Ojvt56KEn0h7AG2v549GFhqP1HwbbJF78
-         KMJeovPdJ9EYNiHgT09eCF3osxzpYGMIVnLnFy9bBKCuJXuuWoO41wziwGi2cwAYz5xa
-         Vkfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723116164; x=1723720964;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lKUGP0PE9AD005oieGjmMPIIMJBw4vdLnTdJKeF/xA4=;
-        b=YdmulhF/4Dt9xTi2X347fiaK0vFUQ5/7/3VvEQT9ubhZFsVuWQ7/PN0wpWvGHwjEjw
-         //MspCWoTQ6RKq8nrn67zb4ggXfFVOVUeR7mZvilcu+MSzmpYOvytcDtzbf6ccP4BhSh
-         bodizZieubBECiiWZYuVITtWveR6ghMaTtUm/rC3GpdmrkMD8O7hPHsmB42Emr4HrvTi
-         3SxdK40lSwF3BLYP3+dYfiRpcLdaaX8nUtNdMBXaH9q3Vc8i+6xSaoC8ftIx/7LGakut
-         HchZSoqPTFWmbKv6wjxU4FtQbQLYmXpeTYpFTx27S1vuOWHesy2lH3UA0q3hc4U2ybSW
-         om7Q==
-X-Gm-Message-State: AOJu0YzocgFEbEy693G1q0eBIkte9yCwgtvzbzxCHcnvxlARQp8njNHT
-	yRVL7RcjxM4oFM3gdmvxLBmu3P0+L/+q/SJz4Ghm4ig4g9aSGyhQ
-X-Google-Smtp-Source: AGHT+IHH3A2sWUEWwtaKGPLUrp8oRJ3SBqJRDJ33joKAA/nHqvwX+YZkfNDh2wx+IpPKLqbyYaR/8Q==
-X-Received: by 2002:a05:600c:1914:b0:427:9a8f:9717 with SMTP id 5b1f17b1804b1-4290ae03407mr14960505e9.0.1723116163780;
-        Thu, 08 Aug 2024 04:22:43 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c746cf0sm18103695e9.19.2024.08.08.04.22.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Aug 2024 04:22:43 -0700 (PDT)
-Subject: Re: [PATCH net-next v3 02/12] eth: mvpp2: implement new RSS context
- API
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- michael.chan@broadcom.com, shuah@kernel.org, przemyslaw.kitszel@intel.com,
- ahmed.zaki@intel.com, andrew@lunn.ch, willemb@google.com,
- pavan.chebbi@broadcom.com, petrm@nvidia.com, gal@nvidia.com,
- jdamato@fastly.com, donald.hunter@gmail.com, marcin.s.wojtas@gmail.com,
- linux@armlinux.org.uk
-References: <20240806193317.1491822-1-kuba@kernel.org>
- <20240806193317.1491822-3-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <2ff9da37-8389-a82c-4890-1dbe92e60a7e@gmail.com>
-Date: Thu, 8 Aug 2024 12:22:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1723116522; c=relaxed/simple;
+	bh=Vvv9tdDeNnYnJT7/+PxzO7/Ny6jqVyjro2on756wRX8=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=dzck91VQnzM+IXuQBuA7ViblQ3XDP04daBJZZMCnpv+mkYYy/Mr9yP4wNU4ziyfzSRo9rpw23tpAzqR/vMG6vvQPaTS8S/JZyYz8reNvyCLfsQIp607ZljmW3gHEG5tyQxHG/VyJnzqC3Lr4gShu51IOA2z6pt4NB3OsKr3EI2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 27C197D064;
+	Thu,  8 Aug 2024 11:28:39 +0000 (UTC)
+References: <20240804203346.3654426-1-chopps@chopps.org>
+ <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
+ <ZrIJ0d6x3pTslQKn@gauss3.secunet.de>
+ <m2jzgsnm3l.fsf@ja-home.int.chopps.org> <ZrSPXqJlck_DCnTi@hog>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Christian Hopps <chopps@chopps.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, devel@linux-ipsec.org,
+ netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
+ larger than MTU user packets
+Date: Thu, 08 Aug 2024 07:23:34 -0400
+In-reply-to: <ZrSPXqJlck_DCnTi@hog>
+Message-ID: <m2ed6znti1.fsf@ja-home.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240806193317.1491822-3-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On 06/08/2024 20:33, Jakub Kicinski wrote:
-> Implement the separate create/modify/delete ops for RSS.
-> 
-> No problems with IDs - even tho RSS tables are per device
-> the driver already seems to allocate IDs linearly per port.
-> There's a translation table from per-port context ID
-> to device context ID.
-> 
-> mvpp2 doesn't have a key for the hash, it defaults to
-> an empty/previous indir table.
-> 
-> Note that there is no key at all, so we don't have to be
-> concerned with reporting the wrong one (which is addressed
-> by a patch later in the series).
-> 
-> Compile-tested only.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-Fwiw,
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+
+Sabrina Dubroca <sd@queasysnail.net> writes:
+
+> 2024-08-07, 15:40:14 -0400, Christian Hopps wrote:
+>>
+>> Steffen Klassert <steffen.klassert@secunet.com> writes:
+>>
+>> > On Mon, Aug 05, 2024 at 12:25:57AM +0200, Sabrina Dubroca wrote:
+>> > >
+>> > > > +/**
+>> > > > + * skb_copy_bits_seq - copy bits from a skb_seq_state to kernel buffer
+>> > > > + * @st: source skb_seq_state
+>> > > > + * @offset: offset in source
+>> > > > + * @to: destination buffer
+>> > > > + * @len: number of bytes to copy
+>> > > > + *
+>> > > > + * Copy @len bytes from @offset bytes into the source @st to the destination
+>> > > > + * buffer @to. `offset` should increase (or be unchanged) with each subsequent
+>> > > > + * call to this function. If offset needs to decrease from the previous use `st`
+>> > > > + * should be reset first.
+>> > > > + *
+>> > > > + * Return: 0 on success or a negative error code on failure
+>> > > > + */
+>> > > > +static int skb_copy_bits_seq(struct skb_seq_state *st, int offset, void *to,
+>> > > > +			     int len)
+>> > >
+>> > > Probably belongs in net/core/skbuff.c, although I'm really not
+>> > > convinced copying data around is the right way to implement the type
+>> > > of packet splitting IPTFS does (which sounds a bit like a kind of
+>> > > GSO).
+>> >
+>> > I tried to come up with a 'GSO like' variant of this when I did the
+>> > initial review last year at the IPsec workshop. But it turned out
+>> > that things will get even more complicated as they are now.
+>> > We did some performance tests and it was quite compareable to
+>> > tunnel mode, so for a first implementation I'd be ok with the
+>> > copy variant.
+>
+> Ok.
+>
+>> > > And there are helpers in net/core/skbuff.c (such as
+>> > > pskb_carve/pskb_extract) that seem to do similar things to what you
+>> > > need here, without as much data copying.
+>> >
+>> > In case we have helpers that will fit here, we should use them of
+>> > course.
+>>
+>> FWIW, The reason I didn't use pskb_extract() rather than the simple
+>> iptfs_copy_create_frag() is because pskb_extract uses skb_clone on
+>> the original skb then pskb_carve() to narrow the (copied) data
+>> pointers to a subset of the original. The new skb data is read-only
+>> which does not work for us.
+>>
+>> Each of these new skbs are IP-TFS tunnel packets and as such we need
+>> to push and write IPTFS+ESP+IP+Ethernet headers on them. In order to
+>> make pskb_extract()s skbs writable we would have to allocate new
+>> buffer space and copy the data turning them into a writeable skb
+>> buffer, and now we're doing something more complex and more cpu
+>> intensive to arrive back to what iptfs_copy_create_frag() did simply
+>> and straight-forwardly to begin with.
+>
+> That only requires the header to be writeable, not the full packet,
+> right? I doubt it would actually be more cpu/memory intensive.
+
+pskb_extract() function leaves `skb->head = skb->data` there is no room left to push headers that we need to push.
+
+FWIW, pskb_extract() is used in one place for TCP; it's not suited for IPTFS.
+
+Thanks,
+Chris.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAma0q+YSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlXQQQAIBiBRm8uaMezVlEoN9L6CdypgMNfH/V
+xSj4WneUwaEBK/Mmwp5lljPO+jCSJU/+iPHEnYXQ5KCTVOMYzuGTZZhr/I3usl/f
+wEXrj0maBiuk+uQMf7dvtcpqpyXyRCd08ZiV5R00MVDCqhWst2yYdnDGiTeBU6ff
+yiJbYQXBA/WrtfWPpvyXDdn/4qyYpdM+WGO/jtvO15POJrILnwID9csnm7ImeZfX
+kIXPCmvYH9XnQGdc+jqWBKF/1E5sPpm8NX/vYQaUAGIS79CZ/KsZ49lf+LUAPW8+
+9WFhsm46N8oVtQ1ELRNqbLssTDf4uyZKCM/b4dx7DZRWz6+poAkJuDvn/YTSVYDL
+OPzXY6gfzabiLs1rlNxEUOZe6ZdrqcReB0dUzHHOrCiFfLj2GoaVcSCmqG02RQqI
+kVA8AhLkI4NhkvqKlqCChPT8K0LsrQyr9mgw3HEj4ADIQJ8qmSqfjgHMTFF7X4fu
+yF5ZBPv9m6fZjxcfJ5TlpH9tk6RvZxf+xhew/XlJi7yHk9ZiQ08s/NWaiPGXMqVU
+/NmUQTXJJ6AnKlyZkd41qruUPJoQMAGGbDOCbRwF77PckdyCXwHWBy429TeaG8Cu
+Bhrp+pnT77RFVDzmR5pfcBR4rzvM/GdQV5ZMxaMlSIGBrg2V6Z0pvBeY6H4IHYhy
+zxVuAhtgVLfx
+=2TXs
+-----END PGP SIGNATURE-----
+--=-=-=--
 
