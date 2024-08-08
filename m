@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-116638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7998794B458
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 02:55:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6539994B45D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B04E1F233A4
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 00:55:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929471C21605
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F7010E9;
-	Thu,  8 Aug 2024 00:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="DSfjdoce"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F9D1854;
+	Thu,  8 Aug 2024 01:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC144A1E
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 00:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D8820ED;
+	Thu,  8 Aug 2024 01:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723078525; cv=none; b=ezFmGqgouDYmCM+t8O4ffw6rI+MFW858eYQ4mwbQWvdVGmbSP8Epp0UGXuHZlz7v9Th6afuBAbeS7EU3KSQB/yvQHnlNQvXA9Vy3yAVOPRLK3dcYVJzSdWyUvyZJz6uOWaOneppT9HX97sauFj9U9P6UPZHMgyhLqpDiQXyBhpI=
+	t=1723078824; cv=none; b=rBN67YAfrLhpm5H/VfQhfTiM9CKOX+/v6OldBLrTZake+63YrGt9C5+aHGeRWmVzVdiLhNTGgBbPnUMpun64pa0dZbNOOvq9wpdeNWwB5m6iMCvYdovzIzzjBUER7lUEtokr3Vd3jft9Jpv7Zx0RIIfOMtHyOPpOSyv6ZEZCSQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723078525; c=relaxed/simple;
-	bh=9oc+hcUt/FX/qxtebA4LB9ziVi4PozR6VE6uGf6V9Zk=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=N+XMXKDrFY/xfYVAFHqq3v2EVTo0k0hP39CFM20Gtfu711pN83rW7XXKQxWoNBViBTIB1g5DvuVImdzSg8gc+hxYHlMh91tA6ZHoM/viEqpo036QhQkv4gE4o+Ycct0j7u0bhmzua0kkimG4iFXl+No+S6WMk1ySYnLtW53PfBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=DSfjdoce; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 11B182C0301;
-	Thu,  8 Aug 2024 12:48:18 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1723078098;
-	bh=9oc+hcUt/FX/qxtebA4LB9ziVi4PozR6VE6uGf6V9Zk=;
-	h=Date:To:From:Subject:From;
-	b=DSfjdocekjsZ/kk5cZv78IjUpLX9y2GZcKrljin+C56tmzkT4TX+Hzof6mSjEHMbz
-	 EoLDPyLE1g9KzuA+jB1OdR4ptD+em8UhYJmTpofjRGiyW9j0lP0IZVPlcn+ZQaaw50
-	 pP6SLto6Y2/2MGlOv7WXsKxGcUpb+Vk/txVzDMwCb2HdyypcNvJ2myLEtdQoLXd1GN
-	 9SSfTKBt31sxBK0GyBSdIaBH+8Mnpw9ImleCcdoBDUY08UqWn7x5z2LYbvjDFFThic
-	 DZifTa4okqa2062k2zmcOwbZUM+26TB9BD++XJtFe80Sybd6X3O0pG0cPPf4QMCbdq
-	 0gBWMwIyJqAhA==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B66b415d10000>; Thu, 08 Aug 2024 12:48:17 +1200
-Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id DC84113EE41;
-	Thu,  8 Aug 2024 12:48:17 +1200 (NZST)
-Message-ID: <d5c526af-5062-42ed-9d92-f7fc97a5d4bd@alliedtelesis.co.nz>
-Date: Thu, 8 Aug 2024 12:48:17 +1200
+	s=arc-20240116; t=1723078824; c=relaxed/simple;
+	bh=bF4iE2NrtOb1BFE9Ocbi6spQhdhuNgVlEMMUuM2ML54=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=G0ObLN2OtajyNSQgVOAUuK1Zwkl75LctN9Yq2iLVYHDk+wSQSXo7Ha9gA0LiCP41oDekXNvPaT0W1dXYHj3O48ESIHCjpAVQRDKEoeuTh2E7IOnr6TT9aYJoOaTs9oaRCDxzlj1WfNFn3cSNIcTJLAkYqGiCImasGFisai/+wSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 90023d82552111efa216b1d71e6e1362-20240808
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_EXISTED, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF, CIE_UNKNOWN
+	GTI_FG_BS, GTI_C_CI, GTI_FG_IT, GTI_RG_INFO, GTI_C_BU
+	AMN_T1, AMN_GOOD, AMN_C_HH, AMN_C_TI, AMN_C_BU
+	ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:5488b766-34bc-473e-bb7b-dea250863492,IP:20,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:15
+X-CID-INFO: VERSION:1.1.38,REQID:5488b766-34bc-473e-bb7b-dea250863492,IP:20,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:15
+X-CID-META: VersionHash:82c5f88,CLOUDID:7f94e2ef7ffbb62d0b01094f1af5da4d,BulkI
+	D:240808084355KNDNP6G5,BulkQuantity:3,Recheck:0,SF:64|66|23|17|19|43|74|10
+	2,TC:nil,Content:0,EDM:-3,IP:-2,URL:1,File:nil,RT:nil,Bulk:40,QS:nil,BEC:n
+	il,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-UUID: 90023d82552111efa216b1d71e6e1362-20240808
+X-User: zhanghao1@kylinos.cn
+Received: from pve.sebastian [(118.250.2.77)] by mailgw.kylinos.cn
+	(envelope-from <zhanghao1@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 545650491; Thu, 08 Aug 2024 09:00:11 +0800
+From: zhanghao <zhanghao1@kylinos.cn>
+To: horms@kernel.org
+Cc: bongsu.jeon@samsung.com,
+	krzk@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com,
+	zhanghao1@kylinos.cn
+Subject: Re: Re: [PATCH] nfc: nci: Fix uninit-value in nci_rx_work()
+Date: Thu,  8 Aug 2024 08:59:17 +0800
+Message-Id: <20240808005917.15118-1-zhanghao1@kylinos.cn>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240804105716.GA2581863@kernel.org>
+References: <20240804105716.GA2581863@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Content-Language: en-US
-To: netdev <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Subject: understanding switchdev notifications
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=Gqbh+V1C c=1 sm=1 tr=0 ts=66b415d1 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=yoJbH4e0A30A:10 a=VwQbUJbxAAAA:8 a=rzgwEc8jZHYV5HFceJUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=aOckU8jMy-YA:10 a=pAl8zCnWZt0A:10 a=AjGcO6oz07-iQ99wixmX:22
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Transfer-Encoding: 8bit
 
-Hi,
-
-I'm trying to get to grips with how the switchdev notifications are=20
-supposed to be used when developing a switchdev driver.
-
-I have been reading through=20
-https://www.kernel.org/doc/html/latest/networking/switchdev.html which=20
-covers a few things but doesn't go into detail around the notifiers that=20
-one needs to implement for a new switchdev driver (which is probably=20
-very dependent on what the hardware is capable of).
-
-Specifically right now I'm looking at having a switch port join a vlan=20
-aware bridge. I have a configuration something like this
-
- =C2=A0=C2=A0=C2=A0 ip link add br0 type bridge vlan_filtering 1
- =C2=A0=C2=A0=C2=A0 ip link set sw1p5 master br0
- =C2=A0=C2=A0=C2=A0 ip link set sw1p1 master br0
- =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev br0 self
- =C2=A0=C2=A0=C2=A0 ip link add link br0 br0.2 type vlan id 2
- =C2=A0=C2=A0=C2=A0 ip addr add dev br0.2 192.168.2.1/24
- =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev lan5 pvid untagged
- =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev lan1
- =C2=A0=C2=A0=C2=A0 ip link set sw1p5 up
- =C2=A0=C2=A0=C2=A0 ip link set sw1p1 up
- =C2=A0=C2=A0=C2=A0 ip link set br0 up
- =C2=A0=C2=A0=C2=A0 ip link set br0.2 up
-
-Then I'm testing by sending a ping to a nonexistent host on the=20
-192.168.2.0/24 subnet and looking at the traffic with tcpdump on another=20
-device connected to sw1p5.
-
-I'm a bit confused about how I should be calling=20
-switchdev_bridge_port_offload(). It takes two netdevs (brport_dev and=20
-dev) but as far as I've been able to see all the callers end up passing=20
-the same netdev for both of these (some create a driver specific brport=20
-but this still ends up with brport->dev and dev being the same object).
-
-I've figured out that I need to set tx_fwd_offload=3Dtrue so that the=20
-bridge software only sends one packet to the hardware. That makes sense=20
-as a way of saying the my hardware can take care of sending the packet=20
-out the right ports.
-
-I do have a problem that what I get from the bridge has a vlan tag=20
-inserted (which makes sense in sw when the packet goes from br0.2 to=20
-br0). But I don't actually need it as the hardware will insert a tag for=20
-me if the port is setup for egress tagging. I can shuffle the Ethernet=20
-header up but I was wondering if there was a way of telling the bridge=20
-not to insert the tag?
-
-Finally I'm confused about the atomic_nb/atomic_nb parameters. Some=20
-drivers just pass NULL and others pass the same notifier blocks that=20
-they've already registered with=20
-register_switchdev_notifier()/register_switchdev_notifier(). If=20
-notifiers are registered why does switchdev_bridge_port_offload() take=20
-them as parameters?
-
-Thanks,
-Chris
-
-
+On 04/08/2024 12:57, Simon Horman wrote:
+> > On Sat, Aug 03, 2024 at 08:18:17PM +0800, zhanghao wrote:
+> >> Commit e624e6c3e777 ("nfc: Add a virtual nci device driver")
+> >> calls alloc_skb() with GFP_KERNEL as the argument flags.The
+> >> allocated heap memory was not initialized.This causes KMSAN
+> >> to detect an uninitialized value.
+> >>
+> >> Reported-by: syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com
+> >> Closes: https://syzkaller.appspot.com/bug?extid=3da70a0abd7f5765b6ea
+> > 
+> > Hi,
+> > 
+> > I wonder if the problem reported above is caused by accessing packet
+> > data which is past the end of what is copied in virtual_ncidev_write().
+> > I.e. count is unusually short and this is not being detected.
+> > 
+Yes, you're right.I debug the kernel and find that skb->data is " ".The 
+length is less than 2.Using nci_plen to access skb->data in nci_rx_work()
+triggers kmsan to detect access to uninitialized memory.
+ 
+I wonder if I can use skb->len to determine length in the
+nci_rx_work().I tested it and there was no problem.
+ 
+> >> Fixes: e624e6c3e777 ("nfc: Add a virtual nci device driver")
+> >> Link: https://lore.kernel.org/all/000000000000747dd6061a974686@google.com/T/
+> >> Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
+> >> ---
+> >>  drivers/nfc/virtual_ncidev.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+> >> index 6b89d596ba9a..ae1592db131e 100644
+> >> --- a/drivers/nfc/virtual_ncidev.c
+> >> +++ b/drivers/nfc/virtual_ncidev.c
+> >> @@ -117,7 +117,7 @@ static ssize_t virtual_ncidev_write(struct file *file,
+> >>  	struct virtual_nci_dev *vdev = file->private_data;
+> >>  	struct sk_buff *skb;
+> >>  
+> >> -	skb = alloc_skb(count, GFP_KERNEL);
+> >> +	skb = alloc_skb(count, GFP_KERNEL|__GFP_ZERO);
+> >>  	if (!skb)
+> >>  		return -ENOMEM;
+> > 
+> > I'm not sure this helps wrt initialising the memory as immediately below there
+> > is;
+> > 
+> > 	if (copy_from_user(skb_put(skb, count), buf, count)) {
+> > 		...
+> > 
+> > Which I assume will initialise count bytes of skb data.
+> 
+> Yeah, this looks like hiding the real issue.
+> 
+> Best regards,
+> Krzysztof
 
