@@ -1,177 +1,121 @@
-Return-Path: <netdev+bounces-117039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E594694C746
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:17:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6F494C75C
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB8FA1C2275E
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:17:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 659D91F23970
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D126715ECF7;
-	Thu,  8 Aug 2024 23:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B871D15FD04;
+	Thu,  8 Aug 2024 23:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsvZmzE6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="THPdx+Jr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42675145B3F;
-	Thu,  8 Aug 2024 23:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A964D15F3E6;
+	Thu,  8 Aug 2024 23:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723159035; cv=none; b=VQkb4cHNFKjHW2mjPeyO6+S0yK9LmzbtpjKjcbIURVsWtssAKgc8iqHfn2GY3I5/YewuzBTv0hvp5Vhiq3cpRl4B6WhiAsdIjiF4WEiw0R3l+WZbS3iaX82LQTJQf2PuwwkEJtlYL8mQ9Ckf8noh5FP1XGSEI90d7b/5ae1IsSE=
+	t=1723159733; cv=none; b=kDnHkaH4r9SjRF6nAST+WIBsd6OesWwBAaY6wWQjyzuzyoIHs+7j8Y2tq+M/rq0OadZWOD/VgT0eRvl9HVtm5MYy/1msv7/MnUNC+7iyTMAgyrhftivUNJxCh+mXSDY3d8mL7abO+/wOn/1Q5BsyK4Zn7yI2RhrPV3WD5D5pS4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723159035; c=relaxed/simple;
-	bh=oGZ+fBGsWn2MHHM/NCl28k4CugyRAdGQbp8r40/h/qM=;
+	s=arc-20240116; t=1723159733; c=relaxed/simple;
+	bh=7T6z9rkm3U/1nCTIfjEAJ/4vtOZ5BhHQxzLT9IJc17w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YQ7nyQ/eM0spjfEC6j71zZ0mTwj1i63IncGJmRHdDbWTM2FYU9PwVf/oQjVwBx5VFANbu5629SE1nFKvtJAd5wCYEoXf7iZYgKb4wx+XId8GbmKh+QQwKeSzw4dRWSeC1GHMFDCqeh/U1P27YgKaPzj4W14aOuVPdoHWgYfBWi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jsvZmzE6; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fee6435a34so13644475ad.0;
-        Thu, 08 Aug 2024 16:17:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723159033; x=1723763833; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fkIJwEGv5ERA4qnqV+owZl6TafPc0hnN549gs5sTWj8=;
-        b=jsvZmzE6NQYLjMzHpT5nub7rlEKFCAU3B/IxoxZyXoo3J0/uq0Z8Jic+NoK9v7jbtz
-         ViW07nTV1qOfaVfzoVBGnakjb+iIf5qYNJgkTtmkqwQQoxWpW4oRm0tUOv/+Z2Rafu+Z
-         nxcw6rISjEGsOSHcstig7FA3k5Xjk0YD1dVZdlrTYwugqQWKxKHRma5dAb3xbD2EYxWf
-         pABRgsuNkfAIuS1Wr7uIIngwm9J56uA4wsyhrh1z2AYfG0fE0NOIgm1uSW2xKIs5E535
-         4RQPfgZflLpUTw4ALDCEMvmiXQS15spXc63BcgdQbZP1Tk0y+AEoMm+sBVek3EAB5ApM
-         XRNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723159033; x=1723763833;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fkIJwEGv5ERA4qnqV+owZl6TafPc0hnN549gs5sTWj8=;
-        b=t5uNn3LzIHzeanefbs3Jr03ouWjvCSBfmtRxqpitgyfIu5Dr+n+3NiiGHC2ULn6XHv
-         VeNhe+1X+0CddxG9UkIcrEkN7pZFVzSa9fppbn/0KQRsAOpiNmxthjaJrduBGGBdzwlk
-         qrxf0KP2eYIBgnTz73clenvXkc6c1aP0cyxisDafonuy2633Wmjeee6iWWgRNPts6E41
-         lvxWawCbuBkz0oZjhmvu4b7innzCxux5g/YlPEGDH/kNzxgdOAZVt3DlcE45T3/nzoJE
-         zrp49MbyuKULucr6wsI7B6rMgbUQOjcBYfyuEdGsr8ylG1PD0xtn1oF73RCnqHTBEDvW
-         tVxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFGCRLCp5PG6LLcltopSvyNGhNtjffD3VGrG1uNuJLgTx9TxXusJ23Gm/81H+RKM9RYLlBOv4eCsUyw/fS+gYEHLYLuD75boJCfI8dhcuxm2rJGN1WAgCF5JqyCURsceD6qye+Yc/5gZKzqqHyazgAsH/DBb0Mky1Bq6Wh8SrG7au6ANQMVPeD9Zhr
-X-Gm-Message-State: AOJu0YxOdh3PenDAY+dAg2WiSlUV70X3LRf658Y6H3MyKdLRvX/zEODH
-	1G1u/6YNaGAUqzO/2hVkwmT6WwIswtiI7ypjOiw6PU8r+xULwzQo
-X-Google-Smtp-Source: AGHT+IGt9dfjgid3ag62XkwFWL28kPlGVKGAK1AsromM/qCkJ797VK52SiiGuJf5PhC3obEI0FXB+A==
-X-Received: by 2002:a17:903:2310:b0:1fd:5fa0:e996 with SMTP id d9443c01a7336-200952bf73dmr47823845ad.43.1723159033403;
-        Thu, 08 Aug 2024 16:17:13 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5905ff30sm129461785ad.156.2024.08.08.16.17.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 16:17:12 -0700 (PDT)
-Date: Thu, 8 Aug 2024 17:17:10 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
-	serge@hallyn.com, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 1/4] Landlock: Add abstract unix socket connect
- restriction
-Message-ID: <ZrVR9ni4qpFdF0iA@tahera-OptiPlex-5000>
-References: <cover.1722570749.git.fahimitahera@gmail.com>
- <e8da4d5311be78806515626a6bd4a16fe17ded04.1722570749.git.fahimitahera@gmail.com>
- <20240803.iefooCha4gae@digikod.net>
- <20240806.nookoChoh2Oh@digikod.net>
- <CAG48ez2ZYzB+GyDLAx7y2TobE=MLXWucQx0qjitfhPSDaaqjiA@mail.gmail.com>
- <20240807.mieloh8bi8Ae@digikod.net>
- <CAG48ez3_u5ZkVY31h4J6Shap9kEsgDiLxF+s10Aea52EkrDMJg@mail.gmail.com>
- <20240807.Be5aiChaf8ie@digikod.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNCBPv6b0JqDly/RoZu/RWXGIkbQ8gkrrqhqUTyssBJ0LPRqUBjlBWSsgayQwoZ3E7OSLa9oHmljqUv/sDe6kEjDg+v63DWcVPRGn0UGgPtUIZif5z6CFmOwCLrTX2Af6TNjNSAAHs4ciH9SJJsrFwJFCyWdr/dN4C2G97yUZLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=THPdx+Jr; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723159732; x=1754695732;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7T6z9rkm3U/1nCTIfjEAJ/4vtOZ5BhHQxzLT9IJc17w=;
+  b=THPdx+JrPdzp9TfCQWpFkPHUMpOqO8ckdmDYMMOryyCx6Rzy/QqQKthR
+   /g2TNsCdqgg+dk/fU3QtIXjcmUm92dDDntfEQje92b928P08Z5WLluUqg
+   ZOdhuW6AR55RQjAdAjSw5Ikgj33xNoI9qqZZnodycwDxlROoU9veIyR5T
+   4LruTFLf2grKkSbqQOho5YpSx8pEeOpfaUnwM9JU9n/MsklXJtzZzlPjq
+   EPdrBj9vVIumG3k1dhNVaVPKEYWCPq/Z6rPA5NIad7vcVb0e/HNdvEwLw
+   XcH8xrWzK0g1H5kFiJ+I7tsHdHNkycHTP8Z7CA4BxoOHTHg220YKZydUA
+   g==;
+X-CSE-ConnectionGUID: l41sCSFRTnWhKcb8GUV/bg==
+X-CSE-MsgGUID: heP67PfmRMSpRu+chhDp8g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="38825987"
+X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
+   d="scan'208";a="38825987"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 16:28:51 -0700
+X-CSE-ConnectionGUID: ymqTIQVcR/OjzQXhMSQm1A==
+X-CSE-MsgGUID: N+7qjUO6SA6E4bdt8nVHmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
+   d="scan'208";a="57616008"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 08 Aug 2024 16:28:48 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1scCYk-0006cU-1Y;
+	Thu, 08 Aug 2024 23:28:43 +0000
+Date: Fri, 9 Aug 2024 07:28:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: phy: dp83tg720: Add cable testing
+ support
+Message-ID: <202408090754.e4G2nq88-lkp@intel.com>
+References: <20240808130833.2083875-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240807.Be5aiChaf8ie@digikod.net>
+In-Reply-To: <20240808130833.2083875-3-o.rempel@pengutronix.de>
 
-On Wed, Aug 07, 2024 at 04:44:36PM +0200, Mickaël Salaün wrote:
-> On Wed, Aug 07, 2024 at 03:45:18PM +0200, Jann Horn wrote:
-> > On Wed, Aug 7, 2024 at 9:21 AM Mickaël Salaün <mic@digikod.net> wrote:
-> > > On Tue, Aug 06, 2024 at 10:46:43PM +0200, Jann Horn wrote:
-> > > > I think adding something like this change on top of your code would
-> > > > make it more concise (though this is entirely untested):
-> > > >
-> > > > --- /tmp/a      2024-08-06 22:37:33.800158308 +0200
-> > > > +++ /tmp/b      2024-08-06 22:44:49.539314039 +0200
-> > > > @@ -15,25 +15,12 @@
-> > > >           * client_layer must be a signed integer with greater capacity than
-> > > >           * client->num_layers to ensure the following loop stops.
-> > > >           */
-> > > >          BUILD_BUG_ON(sizeof(client_layer) > sizeof(client->num_layers));
-> > > >
-> > > > -        if (!server) {
-> > > > -                /*
-> > > > -                 * Walks client's parent domains and checks that none of these
-> > > > -                 * domains are scoped.
-> > > > -                 */
-> > > > -                for (; client_layer >= 0; client_layer--) {
-> > > > -                        if (landlock_get_scope_mask(client, client_layer) &
-> > > > -                            scope)
-> > > > -                                return true;
-> > > > -                }
-> > > > -                return false;
-> > > > -        }
-> > >
-> > > This loop is redundant with the following one, but it makes sure there
-> > > is no issue nor inconsistencies with the server or server_walker
-> > > pointers.  That's the only approach I found to make sure we don't go
-> > > through a path that could use an incorrect pointer, and makes the code
-> > > easy to review.
-> > 
-> > My view is that this is a duplication of logic for one particular
-> > special case - after all, you can also end up walking up to the same
-> > state (client_layer==-1, server_layer==-1, client_walker==NULL,
-> > server_walker==NULL) with the loop at the bottom.
-> 
-> Indeed
-> 
-> > 
-> > But I guess my preference for more concise code is kinda subjective -
-> > if you prefer the more verbose version, I'm fine with that too.
-> > 
-> > > > -
-> > > > -        server_layer = server->num_layers - 1;
-> > > > -        server_walker = server->hierarchy;
-> > > > +        server_layer = server ? (server->num_layers - 1) : -1;
-> > > > +        server_walker = server ? server->hierarchy : NULL;
-> > >
-> > > We would need to change the last loop to avoid a null pointer deref.
-> > 
-> > Why? The first loop would either exit or walk the client_walker up
-> > until client_layer is -1 and client_walker is NULL; the second loop
-> > wouldn't do anything because the walkers are at the same layer; the
-> > third loop's body wouldn't be executed because client_layer is -1.
-> 
-> Correct, I missed that client_layer would always be greater than
-> server_layer (-1).
-> 
-> Tahera, could you please take Jann's proposal?
-Done.
-We will have duplicate logic, but it would be easier to read and review.
-> 
-> > 
-> > The case where the server is not in any Landlock domain is just one
-> > subcase of the more general case "client and server do not have a
-> > common ancestor domain".
-> > 
-> > > >
-> > > >          /*
-> > > >           * Walks client's parent domains down to the same hierarchy level as
-> > > >           * the server's domain, and checks that none of these client's parent
-> > > >           * domains are scoped.
-> > > >
-> > 
+Hi Oleksij,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/phy-Add-Open-Alliance-helpers-for-the-PHY-framework/20240808-211730
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240808130833.2083875-3-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v2 3/3] net: phy: dp83tg720: Add cable testing support
+config: i386-buildonly-randconfig-001-20240809 (https://download.01.org/0day-ci/archive/20240809/202408090754.e4G2nq88-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240809/202408090754.e4G2nq88-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408090754.e4G2nq88-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/locking/test-ww_mutex.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-mgr-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-bridge-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-region-test.o
+>> ERROR: modpost: "oa_1000bt1_get_ethtool_cable_result_code" [drivers/net/phy/dp83tg720.ko] undefined!
+>> ERROR: modpost: "oa_1000bt1_get_tdr_distance" [drivers/net/phy/dp83tg720.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
