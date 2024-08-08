@@ -1,118 +1,155 @@
-Return-Path: <netdev+bounces-116873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E7094BE93
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:34:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA9F94BE97
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B804FB2398D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:34:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB6241F211EF
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0951218DF72;
-	Thu,  8 Aug 2024 13:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sELRpCqF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D05318DF7A;
+	Thu,  8 Aug 2024 13:35:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A06D18CBF9;
-	Thu,  8 Aug 2024 13:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F059218B482
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723124053; cv=none; b=qxWY8CDuYi6zrQDZauN1KUDSZywgkrnXEP2izNzBwffy+7DXrrX6YRjgYg7wL8NdqCJkxZbjPqd3OU/X8SiF1Xx5jopmJPpqnOXzXDjyxFRgposQc/Ke6NPu4EA+ClberLEprNuwEMRnhmeNOXz/t9tUh7xHzZrs+Dwo5AMyigg=
+	t=1723124118; cv=none; b=J7OOjc4bcn5SoMlpgYpngtnESyIY74mV9eVKWeO9UFdj+Tsh9Iu5wfaMgt023BE5nxsVtp67wuN7XoTqPGxohz3sO8coqrv6rClc0FObo6hbAStN31PHU0y5qVzF2vzPQ9HuE5+NKtLyKHriRo5FrSPI0ti13/4X7OoOucNKqP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723124053; c=relaxed/simple;
-	bh=dQPzyySCXLyZFd8NmQ9l/x6DDKkXjc5nUN1HzZcUkAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xu6myTe2Ph3TFCIS7M2ggojgVTNpcQfEVcBM/RoQI1SQ4ouarVb1SDeUKjelhFIMSH8CsA8J6jgyXwJW8l84awUSGmmpnhp2aegL3zc/K7G+1T1TwBg1PrLTmwbXj2nmpmqcIPRmLhmTEjI2pJrfPV/KGl9nFTNpAoUlmXo8MO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sELRpCqF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=PzlJ5mngJfIiAjkLx0ehprzUhkgfxcL0aVoE2kvi+1g=; b=sE
-	LRpCqFfWeTZY8l8TGI4Qid1RdFr7DHf/TzKQhGHQxy9h7BlCxXBOOVE1byUl4NG6FmDLGwjMahU6W
-	M9yg6wUjoBfkGJbPA7q025sEfl+VSvx+Xr7IkrCD7Sq0PyYcIJo5NN78KLbgP6BV8W/Jm2PHfJBxI
-	GpzZHMUDtuT9rEY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sc3H7-004I6m-2f; Thu, 08 Aug 2024 15:33:53 +0200
-Date: Thu, 8 Aug 2024 15:33:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Simon Horman <horms@kernel.org>
-Cc: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>,
-	Jakub Kicinski <kuba@kernel.org>, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Li <Frank.li@nxp.com>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH resubmit net 1/2] net: fec: Forward-declare
- `fec_ptp_read()`
-Message-ID: <30145adc-b1bc-46c8-beb2-80799f2f1608@lunn.ch>
-References: <20240807082918.2558282-1-csokas.bence@prolan.hu>
- <1d87cbd1-846c-4a43-9dd3-2238670d650e@lunn.ch>
- <20240808094116.GG3006561@kernel.org>
- <449a855a-e3e2-4eed-b8bd-ce64d6f66788@prolan.hu>
- <20240808113741.GH3006561@kernel.org>
+	s=arc-20240116; t=1723124118; c=relaxed/simple;
+	bh=q2C7Al+j5nn7Vv2yuSeoiu2IIjOA5vZNI0ZJyCBeuEI=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=NbTpbkkTdx/Pk4YK7EDFWlOExCLtNsV2si4wFrNoyKohYqPD90i7WOl73VR31JzCVOZtm6wU2vtYs4ZOr9oiX5K9PC6u56F5pKHIKv3KlaeqkPcz1w31g+p1lT9r92h52hZqKuE6DeA294kAVtmA04tNG7hpOt0iwOjWcYs+68c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from smtpclient.apple (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id B39C47D064;
+	Thu,  8 Aug 2024 13:35:15 +0000 (UTC)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240808113741.GH3006561@kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
+ larger than MTU user packets
+From: Christian Hopps <chopps@chopps.org>
+In-Reply-To: <ZrTH665G9b3P054t@hog>
+Date: Thu, 8 Aug 2024 09:35:04 -0400
+Cc: Christian Hopps <chopps@chopps.org>,
+ devel@linux-ipsec.org,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3BAC517C-C896-489F-A7E8-DE5046E38073@chopps.org>
+References: <20240804203346.3654426-1-chopps@chopps.org>
+ <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
+ <m2a5hr7iek.fsf@ja-home.int.chopps.org> <ZrHjByjZnnDgjvfo@hog>
+ <m2le1aouzf.fsf@ja-home.int.chopps.org> <ZrIDfN2uFpktGJYD@hog>
+ <m2a5hnnsw8.fsf@ja-home.int.chopps.org> <ZrTH665G9b3P054t@hog>
+To: Sabrina Dubroca <sd@queasysnail.net>
+X-Mailer: Apple Mail (2.3774.600.62)
 
-On Thu, Aug 08, 2024 at 12:37:41PM +0100, Simon Horman wrote:
-> On Thu, Aug 08, 2024 at 11:49:29AM +0200, Csókás Bence wrote:
-> > On 8/8/24 11:41, Simon Horman wrote:
-> > > On Wed, Aug 07, 2024 at 03:53:17PM +0200, Andrew Lunn wrote:
-> > > > On Wed, Aug 07, 2024 at 10:29:17AM +0200, Csókás, Bence wrote:
-> > > > > This function is used in `fec_ptp_enable_pps()` through
-> > > > > struct cyclecounter read(). Forward declarations make
-> > > > > it clearer, what's happening.
-> > > > 
-> > > > In general, forward declarations are not liked. It is better to move
-> > > > the code to before it is used.
-> > > > 
-> > > > Since this is a minimal fix for stable, lets allow it. But please wait
-> > > > for net to be merged into net-next, and submit a cleanup patch which
-> > > > does move fec_ptp_read() earlier and remove the forward declaration.
-> > > 
-> > > That makes sense.
-> > > 
-> > > However, is this a fix?
-> > > It's not clear to me that it is.
-> > 
-> > Well, it's not clear to me either what constitutes as a "fix" versus "just a
-> > cleanup". But, whatever floats Andrew's boat...
-> 
-> Let me state my rule of thumb: a fix addresses a user-visible bug.
-> 
-> > > And if it is a pre-requisite for patch 2/2,
-> > > well that doesn't seem to be a fix.
-> > 
-> > It indeed is.
-> > 
-> > > So in all, I'm somewhat confused.
-> > > And wonder if all changes can go via net-next.
-> > 
-> > That's probably what will be happening.
-> 
-> It does seem like the cleanest, and coincidently easiest, path.
 
-If it does not really fix anything, then net-next.
 
-   Andrew
+> On Aug 8, 2024, at 09:28, Sabrina Dubroca <sd@queasysnail.net> wrote:
+>=20
+> 2024-08-08, 07:30:13 -0400, Christian Hopps wrote:
+>>=20
+>> Sabrina Dubroca <sd@queasysnail.net> writes:
+>>=20
+>>> 2024-08-06, 04:54:53 -0400, Christian Hopps wrote:
+>>>>=20
+>>>> Sabrina Dubroca <sd@queasysnail.net> writes:
+>>>>=20
+>>>>> 2024-08-04, 22:33:05 -0400, Christian Hopps wrote:
+>>>>>>>> +/* 1) skb->head should be cache aligned.
+>>>>>>>> + * 2) when resv is for L2 headers (i.e., ethernet) we want the =
+cacheline to
+>>>>>>>> + * start -16 from data.
+>>>>>>>> + * 3) when resv is for L3+L2 headers IOW skb->data points at =
+the IPTFS payload
+>>>>>>>> + * we want data to be cache line aligned so all the pushed =
+headers will be in
+>>>>>>>> + * another cacheline.
+>>>>>>>> + */
+>>>>>>>> +#define XFRM_IPTFS_MIN_L3HEADROOM 128
+>>>>>>>> +#define XFRM_IPTFS_MIN_L2HEADROOM (64 + 16)
+>>>>>>>=20
+>>>>>>> How did you pick those values?
+>>>>>>=20
+>>>>>> That's what the comment is talking to. When reserving space for =
+L2 headers we
+>>>>>> pick 64 + 16 (a 2^(<=3D6) cacheline + 16 bytes so the the =
+cacheline should start
+>>>>>> -16 from where skb->data will point at.
+>>>>>=20
+>>>>> Hard-coding the x86 cacheline size is not a good idea. And what's =
+the
+>>>>> 16B for? You don't know that it's enough for the actual L2 =
+headers.
+>>>>=20
+>>>> I am not hard coding the x86 cacheline. I am picking 64 as the =
+largest cacheline that this is optimized for, it also works for smaller =
+cachelines.
+>>>=20
+>>> At least use SMP_CACHE_BYTES then?
+>>=20
+>> Right, I have changed this work with L1_CACHE_BYTES value.
+>>=20
+>>>> 16B is to allow for the incredibly common 14B L2 header to fit.
+>>>=20
+>>> Why not use skb->dev->needed_headroom, like a bunch of tunnels are
+>>> already doing? No guessing required. ethernet is the most common, =
+but
+>>> there's no reason to penalize other protocols when the information =
+is
+>>> available.
+>>=20
+>> We can't use `skb->dev->needed_headroom`, b/c `skb->dev` is not
+>> correct for the new packets. `skb->dev` is from the received IPTFS
+>> tunnel packet. The skb being created here are the inner user packets
+>> leaving the tunnel, so they have an L3 header (thus why we are only
+>> making room for L2 header). They are being handed to gro receive and
+>> still have to be routed to their correct destination interface/dev.
+>=20
+> You're talking about RX now. You're assuming the main use-case is an
+> IPsec GW that's going to send the decapped packets out on another
+> ethernet interface? (or at least, that's that's a use-case worth
+> optimizing for)
+>=20
+> What about TX? Is skb->dev->needed_headroom also incorrect there?
+>=20
+> Is iptfs_alloc_skb's l3resv argument equivalent to a RX/TX switch?
+
+Exactly right. When we are generating IPTFS tunnel packets we need to =
+add all the L3+l2 headers, and in that case we pass l3resv =3D true.
+
+Thanks,
+Chris.
+
+>=20
+>> 16 handles the general common case an ethernet device being the
+>> destination, if it's not correct after routing, nothing is broken,
+>> it just means that we may or may not achieve this maximal cache
+>> locality (but we still might e.g., if its destined to a GRE tunnel
+>> then we are looking at a bunch more headers so they and the existing
+>> L3 header will occupy 2 cachelines anyway). Again, this is a best
+>> effort thing.
+>=20
+> Ok.
+>=20
+> --=20
+> Sabrina
+
+
 
