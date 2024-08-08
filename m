@@ -1,155 +1,221 @@
-Return-Path: <netdev+bounces-116700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D052F94B63A
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:24:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E95F94B66B
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 880331F21BA7
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 05:24:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88D341F23718
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37108145B21;
-	Thu,  8 Aug 2024 05:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BF47A724;
+	Thu,  8 Aug 2024 06:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQZpZ19z"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U7PLOJXq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6501014F9EA
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 05:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723094652; cv=none; b=J+B0oRS9Ysy/2GaZuP07RJnGJXe5DStr/b30AhIbdxtiXvXpxY6oTkFlaEa7eJ4HV+KV3+tGmuqhjh5YCOm/UQ/ED0aoEzko+q5WX009mFrBwhjoLpzq6Dj/pyGvQb/mP7PydEUxta4fCPa4CDHqvz94CLfi7PFMxCI5467PiQQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723094652; c=relaxed/simple;
-	bh=iAAFSdBbW3gyvts12CR9n+czDvSbUBQLaIszXbkaVAc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aozBH255JphrNto+UutPK0QEOu9i0bRMelTUhKbpcaUgSA0MXsoMSLZyP97eoKGBR5Z5DOIbylZgultp9sxa6kF5nEtzq+SkazBsTAfsWL/6no7OIhnfFxoW2IAhJ9+4njU8uaed1OLq2x66sJ0XKwz49nLEFMnN1chbBnTbIMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQZpZ19z; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52efc60a6e6so704793e87.1
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 22:24:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723094648; x=1723699448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C12iZwSge7otyZfEgKE+Bmbrs1Mfe38hW/ndlSie0+Q=;
-        b=cQZpZ19zPo4bBEd4GET/W+vU76vfaW5EHlWCQNfNOtjxGhBV5fKPXurPOLSA6QO95W
-         pAYVADsxJA7egeyb6cwBC+pB2UZ+4gRw6PUBAEq+qQyQhB2pTtyx2sLKQP0xqZl39BVN
-         +sms/t79m3SWo/QHg6PozsfcNkA94j0SLtmZKWtrCfKInZzjTFNRoOpsVzUFLvdMBPZK
-         WGMHSIgaIsQnsuxTGb4z2XvJVuh7AsoZgjCHQ+gjmZgb73LQR3iWAlk0yBAcbACxpdSj
-         ggGrPkskg5zMGqLevQr3sOcf2GQ1XHt0irbMq87o+FyfgI9bMumvI7APHdemwJhbMu9z
-         /UMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723094648; x=1723699448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C12iZwSge7otyZfEgKE+Bmbrs1Mfe38hW/ndlSie0+Q=;
-        b=Lbn6n0h2YdYboZGN3yUp9HOr0GNp7MLlGxzDQl8+6m901q+zBhg234tjO9WBmk2VOE
-         uVMFzn/1O9mUm6tQTHTE+sRs1jk0mYVVPPQBz0zxFo5463zQ+hzyy9qL9qrsDE7hQcmc
-         8HZemt0XP8eczrN/LrxxLa2ZNIsrJbtfKUBIVxNUXXID0BbJN3fwDPc1SPw7DOCyBOho
-         /+36kt3IAZYGWL2xLlntMTaoUPc90PCe73leJTbu3zkfRuI8Q7ra6JZATuFULlkljGQ2
-         kcZe6XIFu04WkiXR6egkAN1xqr689iMK1w/m16R4/n0ZQ4OqvBJMb7W++rvHJl0zgMYc
-         1wKQ==
-X-Gm-Message-State: AOJu0YwMQtaeFK2oGiPu2rrahi7MGTLvViaZD8iA59t77PcdlyPU3f9Z
-	MTVJXKfVkdz1NrEJH/zbwDiGZvkrOJUOkOaUVawvahWGrw6ruRnEYVK2FNKsmR9TPaHlNfF5bJ1
-	1u7E9C4fwlBy8Y3a6Ec4pA5eJpO2iYoIrE2U=
-X-Google-Smtp-Source: AGHT+IGxUj1ttcR2Om8MQOnK9QVMwue/iJ8EzPhIgIxMzMQe4iC85OArGncfSBMC9Qj7s5Fn/651Wo5qRR85cphn728=
-X-Received: by 2002:a05:6512:e98:b0:52d:6663:5cbe with SMTP id
- 2adb3069b0e04-530e5811269mr459853e87.12.1723094648039; Wed, 07 Aug 2024
- 22:24:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44354623
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 06:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723096881; cv=fail; b=hwWV6Qp4g3n/a4MNg5ndPh3Mm1NvoUQCRz5tGeHD95ppcyDqXp37Zi65FAtNmBjBTSMtv9s1S0I/9IQ3Qx/mu0RD7Yub6slJO1l/0DTZMUNanEvqzT0EWXXRmhYBRKdC4JnbwQ6WDdeZpiO/TNAMyLCRXi2ff4JN5EJvlhLebNk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723096881; c=relaxed/simple;
+	bh=9LPkdBiljgPaTgHPBl/Yx7CFNV+tKPdld7ajsa1svi8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D7CChU9ack8qCgV0UEY+6M5I4jKMhBqz0PeXlYYNbqt8P5GbZ0cHr/mJUY7LXsr2eTqYJoTpLY40gR8Gi1W0uIy/AbMcYvcp1l32dnVueifm9nasrwqW2pkexMdz+ZXCxPOd3yc2uoQZIit+xsYIWoBznpTbJ/lmR/NS7ZK/QXg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U7PLOJXq; arc=fail smtp.client-ip=40.107.92.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Se4PHaPHPshtHfT72T/RVv+RKSlf+HTDc1Ut4xN8pOHJYGVkq9MSfCAgsVOJznR84COrkFcuI5mPPsql99JKNZRSOx4ktx6q0YDkYGOiqGQYJxLjXLXcn3WZzzyaWur65gcyvXYL9WAyAPuQ/S8qiZT+Kc8XSoAwMl+SYgKei/txcHJQ5pPes9Uimng9a4Z7+NaGjNHyPK02DA3i9BJ1+Qc1FsGgtDaezmAXAK+34fMogJJAqdnwxnfbdtEp3Q91U7XDAJRaUYIJ2ePNQEnYuJKka46m6iS2pITWM6bTzLN94x3EJChnSZPR6Q0kuTYSkvli3eep7iaHaPyGq9F3WA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e324TDgJ+KS/RVsLliF46AepV7JclSWvf+ZQM/K9dVQ=;
+ b=tjiJoWoPzaJxkQQrw6qZgcx5YgvgLAR0bMi/imAcPsiFVfg3JYt3C9SbyyQD8XK3H0ZBjtmMAv85TY3LNXrS1KidM44IikX/fb8TEAMMenSJYCHS9EZ4tp31Le1UXLJCExD31IyLDPtdspBMtoqAClJ06NTdMUQW6e1GQEYmUjxZYmMdH9cPqL8pZBCZ1teK30JqE3TMkqbUTySB7uBWyS2od9seUN0cREu4GCkY4MBR7cEC/KLijQnEiAOyJL9y/7LWBC4WFspHgusxRkgo+aEKzqbAO9uUHOsKyt9Lu4BwvJDk4TiS28ytluXLldRUxBQj/pX9obiABPmHDyihNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e324TDgJ+KS/RVsLliF46AepV7JclSWvf+ZQM/K9dVQ=;
+ b=U7PLOJXqlSFfoOd5yNfvDVbGmYBaU24ZyrTCBeC0WA8F46mV32dk+6Uma+utbGQ7rI6Sw9GH4Cd2WOfDkzu6EyOKRm1aTIbmBC+IQ3XUHnGCH8Q4o3dV+GwYdKaQcxxtp9Y120QfjkOayFAiHeQsgoH8Yx/h2elwag8uAgrBcchF+SeUvC2E5wIYnVDgCOATKKs6Cqh5SW68B2RpoWT0nNnYGko6garhfNC08pSS2UrMyKrAmmb2nc6qRcHZBn2ykb+PepjKiF5dwPzl3pjpQ42gkBdCi6wLK0C0nmnLQMBqXnJMBRFJLSZbXQm6qiNWmfLYAktuRspDLHWGLiifpw==
+Received: from CH0PR04CA0052.namprd04.prod.outlook.com (2603:10b6:610:77::27)
+ by PH8PR12MB6891.namprd12.prod.outlook.com (2603:10b6:510:1cb::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Thu, 8 Aug
+ 2024 06:01:15 +0000
+Received: from CH3PEPF00000015.namprd21.prod.outlook.com
+ (2603:10b6:610:77:cafe::47) by CH0PR04CA0052.outlook.office365.com
+ (2603:10b6:610:77::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13 via Frontend
+ Transport; Thu, 8 Aug 2024 06:01:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH3PEPF00000015.mail.protection.outlook.com (10.167.244.120) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7875.2 via Frontend Transport; Thu, 8 Aug 2024 06:01:14 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 7 Aug 2024
+ 23:01:03 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 7 Aug 2024 23:01:03 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 7 Aug 2024 23:01:01 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next V2 00/11] mlx5 misc patches 2024-08-08
+Date: Thu, 8 Aug 2024 08:59:16 +0300
+Message-ID: <20240808055927.2059700-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALttK1TYZURJo8AKtGQFcKKMvzssy3mF=iG9rODqvEiPw_qqpg@mail.gmail.com>
-In-Reply-To: <CALttK1TYZURJo8AKtGQFcKKMvzssy3mF=iG9rODqvEiPw_qqpg@mail.gmail.com>
-From: Duan Jiong <djduanjiong@gmail.com>
-Date: Thu, 8 Aug 2024 13:23:56 +0800
-Message-ID: <CALttK1QuYdki3pcd_kVe=feb-XKTSfgxyZCA18DrTBmYN3v9=Q@mail.gmail.com>
-Subject: Re: [PATCH] veth: Drop MTU check when forwarding packets
-To: "David S. Miller" <davem@davemloft.net>
-Cc: netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000015:EE_|PH8PR12MB6891:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13cb9256-c131-4b80-8484-08dcb76f82be
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Ro9X/Yt/yL99MXOtt8sQhYmQbeRyG55gL16gCgWXkwVcfrM0CY7iprGeOPqx?=
+ =?us-ascii?Q?FMmP25sUNHDHQuy6oYUm14b6nBYB8mdjE7+Od9MGC08E4fydeJOGq9uct0IH?=
+ =?us-ascii?Q?I3oFux1g30IfekOuM//JLt7qq2urS3P+j7zI/MTB6aMaimQXW9d50OLANBj2?=
+ =?us-ascii?Q?MM5qes9AxFYyQ+UGwfvx25VQTflBxV1c2SjEKbphj7OmzJ/jZPFW86faBZ3w?=
+ =?us-ascii?Q?5V1ptRyleWnZad1co1gtsi1G47ctqeKOItEPldGKAm3Vb7M4ffQHlfzjeEYp?=
+ =?us-ascii?Q?tRAf6PPlvH0qPDdyRBidJyKGHu/S42YSrOnNM2o4AXK51Hl5djDvlHSgoXGt?=
+ =?us-ascii?Q?+wyBzAwou1q1wrzEdSwleucyJ1bfq46bRTf+lO2yYvuwOZ/y9IVdvekpfIKJ?=
+ =?us-ascii?Q?Vzl2xcnADL6RysZMuDM5PMoHioy6cuQ5X+R3CFdXNFdnx9N1TQu86vAQL+3z?=
+ =?us-ascii?Q?tVc0HLM+C11HxOTlSN0t76vuF+w6rAFhcC+ly1VughRW+9nFrJ+MiCx2JO25?=
+ =?us-ascii?Q?HOfBQDWR3KiwFFkurINfpx348bqP377+b+RJ3+mPxtTlaH5E1PUFNXy3Z2S9?=
+ =?us-ascii?Q?UlqIxtbMtN8gPopyb27SXMwbrAWp83yz++fs/pGp6yfPcngC2oZpYj9xADYq?=
+ =?us-ascii?Q?ifAc96U7E5Y0N70GjJDPvEN5e/MSfZywF5XevpUBhG8lj2IaM1R+xRPhVk+R?=
+ =?us-ascii?Q?w7npMr66qwKqbxVC7NBgrfogAOb9X8IY0JQkr7b7C9l2WD3PrIrxUtXTKZoS?=
+ =?us-ascii?Q?N9NnyE+lmIj3XEJPkwH1jxP/BwcLwsLT1aLjvrq3aJ6xnrFj/BDeo5aJWcng?=
+ =?us-ascii?Q?ID1Z4G22uQUFaqoDyrIjUidPWs4qGmENVnaKEG1T9mVWKS6Ex+xsT79B9o6q?=
+ =?us-ascii?Q?ckneeIqORo7jT9Kj2BRwaECZzB/xPUKl1Fzqj86i9lw/asatG2qphnECFKOQ?=
+ =?us-ascii?Q?sB3vlWM7z12y1kZRUMQeEJISydyE7sERexs2jPGQl/cDz/dybWd70NJ7X70R?=
+ =?us-ascii?Q?yDufNerKl7Pz4nTlJffeDNtvN45UYiQc9udAR8Y2BKXyWTBTljSjSHfjsTR+?=
+ =?us-ascii?Q?A07E2Ir+bkgRz0oFNKGfPbXOvNaXgLTQOvaPM8OkVvJ/yD1fRlOpIFkWS0Op?=
+ =?us-ascii?Q?UhvxqZBxgXV3Iu3IarlIWNAK26PdmLYkN4qN287QoecQ7NE8IyBWNLB+NhRk?=
+ =?us-ascii?Q?JM896lRYRZU1Fnh4BdKuwlnWgzz+5ilj9k934rNx+ZNnYUutWSAvME4emDiB?=
+ =?us-ascii?Q?0JW67CVPri98VkVDro85fqZOab3YFr4D1sMWCy2Y04G+l9Buy/+1CFZmbt3b?=
+ =?us-ascii?Q?twz206ZYsdbQAjxWfdXP+5ZQSiYarCHtVj+OR+MZ24H7KBB0VtcXo0tFnvtN?=
+ =?us-ascii?Q?4Q8K7TTruonCsba57IXUQe5YsppdZXl/KSi8grgXXfAOeU2cGiZjws75Kmlf?=
+ =?us-ascii?Q?fDJAM37IW1QPV329R8M0TCuXEd6De87j?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2024 06:01:14.1294
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13cb9256-c131-4b80-8484-08dcb76f82be
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000015.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6891
 
-There's a problem with the patch formatting, so ignore it and send the
-v2 version later.
+Hi,
 
-Duan Jiong <djduanjiong@gmail.com> =E4=BA=8E2024=E5=B9=B48=E6=9C=888=E6=97=
-=A5=E5=91=A8=E5=9B=9B 12:32=E5=86=99=E9=81=93=EF=BC=9A
->
-> From dcf061830aba15b57819600b5db782981bab973a Mon Sep 17 00:00:00 2001
-> From: Duan Jiong <djduanjiong@gmail.com>
-> Date: Thu, 8 Aug 2024 12:23:01 +0800
-> Subject: [PATCH] veth: Drop MTU check when forwarding packets
->
-> When the mtu of the veth card is not the same at both ends, there is
-> no need to check the mtu when forwarding packets, and it should be a
-> permissible behavior to allow receiving packets with larger mtu than
-> your own.
->
-> Signed-off-by: Duan Jiong <djduanjiong@gmail.com>
-> ---
->  drivers/net/veth.c        | 2 +-
->  include/linux/netdevice.h | 1 +
->  net/core/dev.c            | 6 ++++++
->  3 files changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index 426e68a95067..f505fe2a55c1 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -317,7 +317,7 @@ static int veth_xdp_rx(struct veth_rq *rq, struct
-> sk_buff *skb)
->  static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
->                             struct veth_rq *rq, bool xdp)
->  {
-> -       return __dev_forward_skb(dev, skb) ?: xdp ?
-> +       return __dev_forward_skb_nomtu(dev, skb) ?: xdp ?
->                 veth_xdp_rx(rq, skb) :
->                 __netif_rx(skb);
->  }
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index d20c6c99eb88..8cee9b40e50e 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3943,6 +3943,7 @@ int bpf_xdp_link_attach(const union bpf_attr
-> *attr, struct bpf_prog *prog);
->  u8 dev_xdp_prog_count(struct net_device *dev);
->  u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
->
-> +int __dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb)=
-;
->  int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
->  int dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
->  int dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb);
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index e1bb6d7856d9..acd740f78b1c 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -2190,6 +2190,12 @@ static int __dev_forward_skb2(struct net_device
-> *dev, struct sk_buff *skb,
->         return ret;
->  }
->
-> +int __dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb)
-> +{
-> +       return __dev_forward_skb2(dev, skb, false);
-> +}
-> +EXPORT_SYMBOL_GPL(__dev_forward_skb_nomtu);
-> +
->  int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb)
->  {
->         return __dev_forward_skb2(dev, skb, true);
-> --
-> 2.38.1
+This patchset contains multiple enhancements from the team to the mlx5
+core and Eth drivers.
+
+Patch #1 by Chris bumps a defined value to permit more devices doing TC
+offloads.
+
+Patch #2 by Jianbo adds an IPsec fast-path optimization to replace the
+slow async handling.
+
+Patches #3 and #4 by Jianbo add TC offload support for complicated rules
+to overcome firmware limitation.
+
+Patch #5 by Gal unifies the access macro to advertised/supported link
+modes.
+
+Patches #6 to #9 by Gal adds extack messages in ethtool ops to replace
+prints to the kernel log.
+
+Patch #10 by Cosmin switches to using 'update' verb instead of 'replace'
+to better reflect the operation.
+
+Patch #11 by Cosmin exposes an update connection tracking operation to
+replace the assumed delete+add implementaiton.
+
+Series generated against:
+commit eec9de035410 ("Merge branch 'mlx5-ptm-cross-timestamping-support'")
+
+Regards,
+Tariq
+
+V2:
+- Address dead-code comment by Jakub on patch #6.
+
+Chris Mi (1):
+  net/mlx5: E-Switch, Increase max int port number for offload
+
+Cosmin Ratiu (2):
+  net/mlx5e: CT: 'update' rules instead of 'replace'
+  net/mlx5e: CT: Update connection tracking steering entries
+
+Gal Pressman (5):
+  net/mlx5e: Be consistent with bitmap handling of link modes
+  net/mlx5e: Use extack in set ringparams callback
+  net/mlx5e: Use extack in get coalesce callback
+  net/mlx5e: Use extack in set coalesce callback
+  net/mlx5e: Use extack in get module eeprom by page callback
+
+Jianbo Liu (3):
+  net/mlx5e: Enable remove flow for hard packet limit
+  net/mlx5e: TC, Offload rewrite and mirror on tunnel over ovs internal
+    port
+  net/mlx5e: TC, Offload rewrite and mirror to both internal and
+    external dests
+
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
+ .../ethernet/mellanox/mlx5/core/en/tc/ct_fs.h |   2 +
+ .../mellanox/mlx5/core/en/tc/ct_fs_dmfs.c     |  21 +++
+ .../mellanox/mlx5/core/en/tc/ct_fs_smfs.c     |  26 ++++
+ .../ethernet/mellanox/mlx5/core/en/tc_ct.c    |  46 +++----
+ .../ethernet/mellanox/mlx5/core/en/tc_priv.h  |   1 +
+ .../mlx5/core/en_accel/ipsec_offload.c        |   1 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  86 +++++++------
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   | 120 ++++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/en_tc.h   |   3 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     |   7 +
+ .../mellanox/mlx5/core/ipoib/ethtool.c        |   4 +-
+ 13 files changed, 253 insertions(+), 74 deletions(-)
+
+-- 
+2.44.0
+
 
