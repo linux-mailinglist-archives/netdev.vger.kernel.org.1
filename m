@@ -1,277 +1,180 @@
-Return-Path: <netdev+bounces-117034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE5DF94C72B
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:03:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E24294C731
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 721862858AE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:03:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12A4F1F23BB1
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D331615ECC5;
-	Thu,  8 Aug 2024 23:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E42C15EFB6;
+	Thu,  8 Aug 2024 23:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mup5G055"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RJVLQ2F6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1763415C124
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 23:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2125B157466
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 23:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723158227; cv=none; b=F2YpC1AkaVK25HEbbO996Pj74GfjFVuy/SW4CvfHscKqndOxCyCkaVFsu03Gm2Pp9GTT1jlB3LGpjrNThDjNJVRzs0rdKE2bwLEwj6lyK0Y0R03NjehZp3/jKnArrpNDUtiFkrclUArAShzM/Nyum8Q4G1R+V7pv0mCw+YzzZpA=
+	t=1723158468; cv=none; b=gGuhSRfOfFXs01hMTE95DO1YAn7a9B5o3DJ4TaqGKmQ3YCiCDdyper+93dAMbcmuVluXrPvmyGTEv+156NtuqgfMhPF/adMCn/EsRx2r1xGRGsehqy6BUvXOwIiXf5R3qSsTfMvoCthmMzZYd9fagFhPPQiCjKpbAdVriOo3zlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723158227; c=relaxed/simple;
-	bh=iBP+u9JbzgsDg0aj7FR+sU65Rp+zUgwKYa05Yl+inK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zln8PnxBJJ3NQo9ZcJJPTvO0596UKfDYsX1TNbBw9NVy+SEsCnLLUY+Bu10/A1tyiL5b5MCaqezMMufEV/1OjjmsukoNdvON+BxAvPzvQVpORFlYW18s66v6cq/LZDhyB5mCKbsNH4Qm0WjGVjBkSTnsTuLF8Lt0oivi7dC+tgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Mup5G055; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2cd5d6b2581so1217946a91.2
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 16:03:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1723158225; x=1723763025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Skx3GBh0EZ38qc6WcYlol/aA6cFrTOAY50sC1FrBmBA=;
-        b=Mup5G055qdG4QMWaN2QRWg5wUoqlkAZF/SqCBomj00qpaDac3ZT6FJUJouiLlVsnXq
-         yhI1IaGXiij2QVM9KGUSLfwVN5e+ETP7/uOCIchzxMsiF9TFfOubx/s6xq8zbVSXi9qv
-         Xfd6OuhGB4jeFT5Em+MoBXUhrMkg15oaKnKns=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723158225; x=1723763025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Skx3GBh0EZ38qc6WcYlol/aA6cFrTOAY50sC1FrBmBA=;
-        b=b5e7F9pOm/wYQCuHC2Ynk3fyZhRUmkdoKKw6LzFjCeeZmH/qNGX67rvL0QwcIYl0Ku
-         IpqIoYrG/uMv3jPqHJWYRbB/oPU8kZXRY/P0kXa9Sb/xRlk4jAQwMzzdD+WLZ2lhZRN6
-         FGPamEIOn2cF+DqRwYV0TgJcoN9aoJiFlX4ow3buvicHELd5iJcwbQsPqJjneIbPBozW
-         ufk7ZvxYDBI8iQ+tJUWpw1zahIV2044hVEE2Ar0Adpv5zJ2t7xJIWp7Fbgd1auTWuRm+
-         0qzOfaIdYgBwJyXdDqj+PStbm/H40Va4TvlL7Xq0hrUwXgndMykD9ecbQTZwAeRVnkm7
-         7LaA==
-X-Gm-Message-State: AOJu0YwMjYqojLpOxzOLlJbSNmFeSQhYgvV1U+U8ijE4lQ3HUava6yOG
-	d1nVkEiJRT/gnCU1SXYRnpkn/Ti9B3eRaS8ki97o+Ot3AJvnUR82nvDTwcW5ov2zTc4zte0Adj8
-	Rz1v0eUAoHU4T+Oxi+JAQnI7FRNUWWelabapt
-X-Google-Smtp-Source: AGHT+IEurs1ZraK16gLlx2+6o+2jGNgwZ+6lAL2/OitH1L7OF2fZ4tavR/6IquvNnXpvFpwc04B358Poa1eJ6aD7fXk=
-X-Received: by 2002:a17:90a:9c11:b0:2cf:c2df:67de with SMTP id
- 98e67ed59e1d1-2d1c33741bdmr3917540a91.9.1723158225194; Thu, 08 Aug 2024
- 16:03:45 -0700 (PDT)
+	s=arc-20240116; t=1723158468; c=relaxed/simple;
+	bh=bhXcunquBL+0cxQBjEayHnaMyaPypf41KcBs7iHOs1g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ppQO6MPJYotAPSrYhu+n1FgRf+ZFQWZA9NLQ7+iUq/a84SF4dPdklXqUCuY7LtOEHgI+PVqvvhtHdxP1p77qeUy87BY6pyBePNWv+G+2MHM3avjGumUbfpDmX2oiuOPPYTZ5t1PORcyeDJFNUi3bmgeqvYow/Rl56nBS8NiWC/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RJVLQ2F6; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 478AgTXW018279;
+	Thu, 8 Aug 2024 23:07:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=Ewh9dBUYD5muld04wk5BggR34Yj1suA07Na
+	TpGhvY+w=; b=RJVLQ2F6qTWWP896uHHjyoKf5SeQzbr3YedfdU90EhoRJoDskdB
+	tIR23DJ26jLf0hwF7+1nln1puOU6X00kymL7UHuOgaX9beUwQA8Z3bihWLbk/8fG
+	/56jebqA09truw61CVE9hb52pij7RJ2vTlJ17ZXUopTdP0qz4aW8GZRmn4fGwrj+
+	eNzYNVHVgfIkxPdNI+BjqwumoiNm7p1x3if8Qd4nm9FGzb/VLfqUzxC9hxsIF608
+	DL2bugDfMvM7OSAoGM4S4Q0U4xsAlfvv9cJQhtDEg+3kpUSVtNkGFlmLNseMb8Ky
+	Fan0UCm6c0Ln4e3LCQ6jgmvPaScOcrgjI3w==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40vvgm1sw7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 23:07:36 +0000 (GMT)
+Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 478N4L6e024381;
+	Thu, 8 Aug 2024 23:07:35 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 40vfkht7x1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 23:07:35 +0000
+Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 478N7Ymq027522;
+	Thu, 8 Aug 2024 23:07:34 GMT
+Received: from hu-devc-lv-u22-c.qualcomm.com (hu-subashab-lv.qualcomm.com [10.81.24.15])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 478N7YbU027521
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 23:07:34 +0000
+Received: by hu-devc-lv-u22-c.qualcomm.com (Postfix, from userid 212624)
+	id AF6D3657; Thu,  8 Aug 2024 16:07:34 -0700 (PDT)
+From: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+To: edumazet@google.com, soheil@google.com, ncardwell@google.com,
+        yyd@google.com, ycheng@google.com, davem@davemloft.net,
+        kuba@kernel.org, netdev@vger.kernel.org, dsahern@kernel.org,
+        pabeni@redhat.com
+Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>,
+        Sean Tranchetti <quic_stranche@quicinc.com>
+Subject: [PATCH net] tcp: Update window clamping condition
+Date: Thu,  8 Aug 2024 16:06:40 -0700
+Message-Id: <20240808230640.1384785-1-quic_subashab@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
- <oul3ymxlfwlqc3wikwyfix5e2c7hozwfsdwswkdtayxd2zzphz@mld3uobyw5pv>
- <CAMdnO-JKfi0hqaR5zrzzv6j-c6OhH-LTZT5WWBCFDOG_+ZxTeQ@mail.gmail.com> <2vvet4ai3uihb2skzyfiym2qh6g26knb7ymjp73eejoiywqnkm@2rxxv6zqvi33>
-In-Reply-To: <2vvet4ai3uihb2skzyfiym2qh6g26knb7ymjp73eejoiywqnkm@2rxxv6zqvi33>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Thu, 8 Aug 2024 16:03:34 -0700
-Message-ID: <CAMdnO-+PHMBsarskvzcTSHFeSdf9t2iN3EMcBYUGKdQJ28ctTg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/3] net: stmmac: Add PCI driver support for BCM8958x
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: N4guMgw5uIK8O9w90ZtbEppwdUKfR0_1
+X-Proofpoint-GUID: N4guMgw5uIK8O9w90ZtbEppwdUKfR0_1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-08_23,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 impostorscore=0 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 bulkscore=0
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408080165
 
-On Mon, Aug 5, 2024 at 3:43=E2=80=AFPM Serge Semin <fancer.lancer@gmail.com=
-> wrote:
->
-> On Fri, Aug 02, 2024 at 03:06:05PM -0700, Jitendra Vegiraju wrote:
-> > On Fri, Aug 2, 2024 at 3:02=E2=80=AFAM Serge Semin <fancer.lancer@gmail=
-.com> wrote:
-> > >
-> > > Hi Jitendra
-> > >
-> > > On Thu, Aug 01, 2024 at 08:18:19PM -0700, jitendra.vegiraju@broadcom.=
-com wrote:
-> > > > From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> > > >
-> > > > This patchset adds basic PCI ethernet device driver support for Bro=
-adcom
-> > > > BCM8958x Automotive Ethernet switch SoC devices.
-> > > >
-> > > > This SoC device has PCIe ethernet MAC attached to an integrated eth=
-ernet
-> > > > switch using XGMII interface. The PCIe ethernet controller is prese=
-nted to
-> > > > the Linux host as PCI network device.
-> > > >
-> > > > The following block diagram gives an overview of the application.
-> > > >              +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> > > >              |       Host CPU/Linux            |
-> > > >              +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> > > >                         || PCIe
-> > > >                         ||
-> > > >         +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> > > >         |           +--------------+               |
-> > > >         |           | PCIE Endpoint|               |
-> > > >         |           | Ethernet     |               |
-> > > >         |           | Controller   |               |
-> > > >         |           |   DMA        |               |
-> > > >         |           +--------------+               |
-> > > >         |           |   MAC        |   BCM8958X    |
-> > > >         |           +--------------+   SoC         |
-> > > >         |               || XGMII                   |
-> > > >         |               ||                         |
-> > > >         |           +--------------+               |
-> > > >         |           | Ethernet     |               |
-> > > >         |           | switch       |               |
-> > > >         |           +--------------+               |
-> > > >         |             || || || ||                  |
-> > > >         +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> > > >                       || || || || More external interfaces
-> > > >
-> > > > The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. Th=
-is
-> > > > driver uses common dwxgmac2 code where applicable.
-> > >
-> > > Thanks for submitting the series.
-> > >
-> > > I am curious how come Broadcom got to use an IP-core which hasn't
-> > > been even announced by Synopsys. AFAICS the most modern DW XGMAC
-> > > IP-core is of v3.xxa version:
-> > >
-> > > https://www.synopsys.com/dw/ipdir.php?ds=3Ddwc_ether_xgmac
-> > >
->
-> > I am not sure why the 4.00a IP-code is not announced for general
-> > availability yet.
-> > The Synopsis documentation for this IP mentions 3.xx IP as reference
-> > for this design and lists
-> > new features for 4.00a.
-> >
-> > > Are you sure that your device isn't equipped with some another DW MAC
-> > > IP-core, like DW 25G Ethernet MAC? (which BTW is equipped with a new
-> > > Hyper DMA engine with a capability to have up to 128/256 channels wit=
-h
-> > > likely indirect addressing.) Do I miss something?
-> > >
-> > Yes, I briefly mentioned the new DMA architecture in the commit log
-> > for patch 1/3.
-> > You are correct, the name for the new DMA engine is Hyper DMA. It
-> > probably started with some 3.xx IP-Core.
-> > This DW-MAC is capable of 25G, but this SOC is not using 25G support.
->
-> Then what you have is likely the DW 25GMAC since just DW XGMAC hasn't
-> been announced to have neither 25G speed nor the Hyper-DMA with the
-> virtualization channels capabilities. Meanwhile the former IP-core
-> does have these features:
-> https://www.synopsys.com/dw/ipdir.php?ds=3Ddwc_25g_ethernet_mac_ip
->
-> Alas I don't have the DW 25GMAC IP-core databook to say for sure, but
-> that's the only explanation of why you have the 0x40 Synopsys ID and
-> the IP-core version of v4.00a, and the 25G capability of the MAC.
->
-> Seeing Synopsys tends to re-use the CSRs mapping even across the major
-> IP-core releases it isn't that surprising that the DW XGMAC 3.xx
-> IP-core was referenced in the doc. (See the driver, DW XLGMAC is
-> almost fully compatible with the DW XGMAC CSRs mapping.)
->
-> Moreover the most DMA-capable device currently supported by the
-> STMMAC-driver is DW XGMAC/XLGMAC and it can't have more than 16
-> DMA-channels. That allows to directly map all the channels CSRs to the
-> system memory. But your case is different. The DW 25GMAC IP-core is
-> announced to support virtualization up to 128/256 channels, for which
-> the direct CSRs mapping could require 16-times more memory. That's
-> likely why the indirect addressing was implemented to access the
-> settings of all the possible channels. That's also implicitly proofs
-> that you have the DW 25GMAC IP-core.
-Hi Serge(y)
+This patch is based on the discussions between Neal Cardwell and
+Eric Dumazet in the link
+https://lore.kernel.org/netdev/20240726204105.1466841-1-quic_subashab@quicinc.com/
 
-Thanks for reviewing the patch series.
-Sorry for the delay in my response. We waited for a clarification on
-the IP version.
-Its confirmed that we got an early adapter version of 25GMAC IP-Core.
-Added more details in the context of other questions in Patch 1,2.
->
-> -Serge(y)
->
-> >
-> > > * I'll join the patch set review after the weekend, sometime on the
-> > > next week.
-> > >
-> > > -Serge(y)
-> > >
-> > > > Driver functionality specific to this MAC is implemented in dwxgmac=
-4.c.
-> > > > Management of integrated ethernet switch on this SoC is not handled=
- by
-> > > > the PCIe interface.
-> > > > This SoC device has PCIe ethernet MAC directly attached to an integ=
-rated
-> > > > ethernet switch using XGMII interface.
-> > > >
-> > > > v2->v3:
-> > > >    Addressed v2 comments from Andrew, Jakub, Russel and Simon.
-> > > >    Based on suggestion by Russel and Andrew, added software node to=
- create
-> > > >    phylink in fixed-link mode.
-> > > >    Moved dwxgmac4 specific functions to new files dwxgmac4.c and dw=
-xgmac4.h
-> > > >    in stmmac core module.
-> > > >    Reorganized the code to use the existing glue logic support for =
-xgmac in
-> > > >    hwif.c and override ops functions for dwxgmac4 specific function=
-s.
-> > > >    The patch is split into three parts.
-> > > >      Patch#1 Adds dma_ops for dwxgmac4 in stmmac core
-> > > >      Patch#2 Hooks in the hardware interface handling for dwxgmac4
-> > > >      Patch#3 Adds PCI driver for BCM8958x device
-> > > >
-> > > > v1->v2:
-> > > >    Minor fixes to address coding style issues.
-> > > >    Sent v2 too soon by mistake, without waiting for review comments=
-.
-> > > >    Received feedback on this version.
-> > > >    https://lore.kernel.org/netdev/20240511015924.41457-1-jitendra.v=
-egiraju@broadcom.com/
-> > > >
-> > > > v1:
-> > > >    https://lore.kernel.org/netdev/20240510000331.154486-1-jitendra.=
-vegiraju@broadcom.com/
-> > > >
-> > > > Jitendra Vegiraju (3):
-> > > >   Add basic dwxgmac4 support to stmmac core
-> > > >   Integrate dwxgmac4 into stmmac hwif handling
-> > > >   Add PCI driver support for BCM8958x
-> > > >
-> > > >  MAINTAINERS                                   |   8 +
-> > > >  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
-> > > >  drivers/net/ethernet/stmicro/stmmac/Makefile  |   3 +-
-> > > >  drivers/net/ethernet/stmicro/stmmac/common.h  |   4 +
-> > > >  .../net/ethernet/stmicro/stmmac/dwmac-brcm.c  | 517 ++++++++++++++=
-++++
-> > > >  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  31 ++
-> > > >  .../net/ethernet/stmicro/stmmac/dwxgmac4.c    | 142 +++++
-> > > >  .../net/ethernet/stmicro/stmmac/dwxgmac4.h    |  84 +++
-> > > >  drivers/net/ethernet/stmicro/stmmac/hwif.c    |  26 +-
-> > > >  drivers/net/ethernet/stmicro/stmmac/hwif.h    |   1 +
-> > > >  10 files changed, 825 insertions(+), 2 deletions(-)
-> > > >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.=
-c
-> > > >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.c
-> > > >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.h
-> > > >
-> > > > --
-> > > > 2.34.1
-> > > >
-> > > >
+It was correctly pointed out that tp->window_clamp would not be
+updated in cases where net.ipv4.tcp_moderate_rcvbuf=0 or if
+(copied <= tp->rcvq_space.space). While it is expected for most
+setups to leave the sysctl enabled, the latter condition may
+not end up hitting depending on the TCP receive queue size and
+the pattern of arriving data.
+
+The updated check should be hit only on initial MSS update from
+TCP_MIN_MSS to measured MSS value and subsequently if there was
+an update to a larger value.
+
+Fixes: 05f76b2d634e ("tcp: Adjust clamping window for applications specifying SO_RCVBUF")
+Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
+Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+---
+ net/ipv4/tcp_input.c | 28 ++++++++++++----------------
+ 1 file changed, 12 insertions(+), 16 deletions(-)
+
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e2b9583ed96a..e37488d3453f 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -238,9 +238,14 @@ static void tcp_measure_rcv_mss(struct sock *sk, const struct sk_buff *skb)
+ 		 */
+ 		if (unlikely(len != icsk->icsk_ack.rcv_mss)) {
+ 			u64 val = (u64)skb->len << TCP_RMEM_TO_WIN_SCALE;
++			u8 old_ratio = tcp_sk(sk)->scaling_ratio;
+ 
+ 			do_div(val, skb->truesize);
+ 			tcp_sk(sk)->scaling_ratio = val ? val : 1;
++
++			if (old_ratio != tcp_sk(sk)->scaling_ratio)
++				WRITE_ONCE(tcp_sk(sk)->window_clamp,
++					   tcp_win_from_space(sk, sk->sk_rcvbuf));
+ 		}
+ 		icsk->icsk_ack.rcv_mss = min_t(unsigned int, len,
+ 					       tcp_sk(sk)->advmss);
+@@ -754,7 +759,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
+ 	 * <prev RTT . ><current RTT .. ><next RTT .... >
+ 	 */
+ 
+-	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf)) {
++	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
++	    !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
+ 		u64 rcvwin, grow;
+ 		int rcvbuf;
+ 
+@@ -770,22 +776,12 @@ void tcp_rcv_space_adjust(struct sock *sk)
+ 
+ 		rcvbuf = min_t(u64, tcp_space_from_win(sk, rcvwin),
+ 			       READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
+-		if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
+-			if (rcvbuf > sk->sk_rcvbuf) {
+-				WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
+-
+-				/* Make the window clamp follow along.  */
+-				WRITE_ONCE(tp->window_clamp,
+-					   tcp_win_from_space(sk, rcvbuf));
+-			}
+-		} else {
+-			/* Make the window clamp follow along while being bounded
+-			 * by SO_RCVBUF.
+-			 */
+-			int clamp = tcp_win_from_space(sk, min(rcvbuf, sk->sk_rcvbuf));
++		if (rcvbuf > sk->sk_rcvbuf) {
++			WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
+ 
+-			if (clamp > tp->window_clamp)
+-				WRITE_ONCE(tp->window_clamp, clamp);
++			/* Make the window clamp follow along.  */
++			WRITE_ONCE(tp->window_clamp,
++				   tcp_win_from_space(sk, rcvbuf));
+ 		}
+ 	}
+ 	tp->rcvq_space.space = copied;
+-- 
+2.34.1
+
 
