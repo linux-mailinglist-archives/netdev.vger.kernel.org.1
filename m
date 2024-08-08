@@ -1,70 +1,55 @@
-Return-Path: <netdev+bounces-116926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362C894C198
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:39:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E591094C19E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3F011F21A43
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:39:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F433B25983
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1C418F2E2;
-	Thu,  8 Aug 2024 15:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8172918FC6E;
+	Thu,  8 Aug 2024 15:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lj/8g/8k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egEjUjGf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BECB18CC0C;
-	Thu,  8 Aug 2024 15:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF9618EFC4;
+	Thu,  8 Aug 2024 15:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723131558; cv=none; b=Nmi01a27uo8ZRzN59xtN/BZTcxxSRLneCgbHEUkVcbXeIODFbfqNuFW9M9HiWf3ho+o84lkTMtNBMQBE2vjQm0HuK/Nb5QLbMmEG5Nd9SArLz7NGbNR5rD/UgTh1X9WVNnW7PPTK+55rgV2hQIRVja4YN5QqcZd6GLluWYSHkyA=
+	t=1723131645; cv=none; b=l94r5ZA12Bclc9HlhdHn0YgZBFrHsVE/QLocN0kqqGUisyoqjYi5xWH6J08ldSmVwjJQrf+d+k2xTAGqHtoxlRYZeDyrwRHKpQAiWblrOR07EzljxNZQ1xKXq5rxhAtb/fW9KGKNgyAH3JxGJLB12NmIMLj+4fEOFnYZS4SDr64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723131558; c=relaxed/simple;
-	bh=5I3JqUjrHphfr+mgMH0UcCmQpv//wLFfvIUXXYzw/qM=;
+	s=arc-20240116; t=1723131645; c=relaxed/simple;
+	bh=XzRroisM2MzQRUaEBJjjKzBrHlzZ5AirjqQMKQISeBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ebU6cGbqrwhyD8DLtx683BkdxxYsXt+HR8H6Pivlo8SP5yKzk5Y1CSOaVdLPMge7ZdCUwMIrOc1AsRF96EGu1/k4sy6DHe+6lf1Rt0SWgdSGvUgKQTJmkjwlFKlOTPKySw29I+ujhcKuuvP0IWQJ8hwFrtJgt4S1Oi8xl9OFzEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lj/8g/8k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D3C0C32782;
-	Thu,  8 Aug 2024 15:39:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mzrgRELXKvlKiS5O3WsvXnPQhJ79gYGxpTPCRTb4Ly0SaxA6eXsZ1/eQErpMboL/NqeQnUjm3620xX7OXSVh+juDXXGx50YkCyNMGacRE72ZKHjlY92OUD5pdu9tuS6gTQAvs5IKLQJHHdIlP4Wq2WJemqe18g2xyWNGnTuxeuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egEjUjGf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 625A7C32782;
+	Thu,  8 Aug 2024 15:40:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723131558;
-	bh=5I3JqUjrHphfr+mgMH0UcCmQpv//wLFfvIUXXYzw/qM=;
+	s=k20201202; t=1723131644;
+	bh=XzRroisM2MzQRUaEBJjjKzBrHlzZ5AirjqQMKQISeBo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lj/8g/8k+VjlFe29O59/UVSZDJKTawhD6gWcmEMTvlGFB1GwQ8gfwWtSaVc8gdwHv
-	 QV+o3USbgnkId23gqVK3jns8giYIKyf+edjkSzmTh08u2RKSDvh7q7l2IF8wRwTX/a
-	 xOQa4kaf9tu15oIP2GVlOHzQ5vjI+GIT5UzHsMdRyiw2Y4VGwWhBHqd9hcHbnNGjxB
-	 MTRUW0Exd60dNbe1uKKZZWK/i6pyAHpQ4HxMlQMYesHdpzuGo3ijOj9AdMRO4x3NVm
-	 ICFB9cd5YNbrA5+wcaqyyxjQS6H+jkArprBJWmuPC0O+M4HYmGyBpAntoAeTLHGgMm
-	 xUf9+6udc8B1w==
-Date: Thu, 8 Aug 2024 08:39:16 -0700
+	b=egEjUjGf+8bqXvq5dN8q8vfZnFO5wWcHxW4sfyQEU+5XkpvxyY6qGWSb6R3jXk+Su
+	 0yJRJiWd3B8VIedhJ5Li9Y4qJep1fHZqHRw+IJf6zcIdFfL0K1BY4l4i5OY+jGM9tJ
+	 WwcN7Y0hz6uGkhbk0dAzEPug3Vcecjjh/48moXAfhUsR4UgeKaBl0FsMs6WIeH/7R/
+	 9/VzmxYZ9hm9QvpNEBffLJsJ8Wo3yJMq9O60StPnw8f+9Cw7FuaAu/EAQtxoieXsst
+	 zN5K0kKG/ExVaXczkCrj2dFmGBU0eTrxi656Q/IG6F4S0dFGsCakXfkwCD6dN7BR1u
+	 4/2ERFNNYuscw==
+Date: Thu, 8 Aug 2024 08:40:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Long Li <longli@microsoft.com>
-Cc: "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>, KY Srinivasan
- <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
- <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Simon Horman <horms@kernel.org>, Konstantin Taranov
- <kotaranov@microsoft.com>, Souradeep Chakrabarti
- <schakrabarti@linux.microsoft.com>, Erick Archer
- <erick.archer@outlook.com>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, "stable@vger.kernel.org"
- <stable@vger.kernel.org>
-Subject: Re: [PATCH v2 net] net: mana: Fix doorbell out of order violation
- and avoid unnecessary doorbell rings
-Message-ID: <20240808083916.212b9b64@kernel.org>
-In-Reply-To: <DM4PR21MB35367486106C04FA145495DCCEB92@DM4PR21MB3536.namprd21.prod.outlook.com>
-References: <1723072626-32221-1-git-send-email-longli@linuxonhyperv.com>
-	<20240808075504.660a5905@kernel.org>
-	<DM4PR21MB35367486106C04FA145495DCCEB92@DM4PR21MB3536.namprd21.prod.outlook.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, timur@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: qualcomm: emac: use devm for alloc_etherdev
+Message-ID: <20240808084043.0f1fce75@kernel.org>
+In-Reply-To: <20240808035800.5059-1-rosenp@gmail.com>
+References: <20240808035800.5059-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,11 +59,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 8 Aug 2024 15:33:55 +0000 Long Li wrote:
-> > no empty lines between trailers please  
+On Wed,  7 Aug 2024 20:57:51 -0700 Rosen Penev wrote:
+> Removes the need to free. It's safe as it is created first and destroyed
+> last.
 > 
-> I'm sending v3 to fix this.
+> Added return with dev_err_probe. Saves 1 line.
 
-I hope you don't mean you're sending it _now_, given:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+Again, do you have the HW to test this?
+Please don't go around "improving" old drivers which aren't broken.
+-- 
+pw-bot: cr
 
