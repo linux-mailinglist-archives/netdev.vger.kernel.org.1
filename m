@@ -1,116 +1,165 @@
-Return-Path: <netdev+bounces-116877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E75994BEDB
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:54:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9CF94BEF7
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF1AF2822BE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 665531C21FEF
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CE118E023;
-	Thu,  8 Aug 2024 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4OS2izXV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC97F18C909;
+	Thu,  8 Aug 2024 14:01:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7839118C33B;
-	Thu,  8 Aug 2024 13:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB68829AF
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723125257; cv=none; b=b5cJLVfU3ryjXvbAh0GWLXom4wFAmbcJoxwvKgrV4CA/3WeTxy2PqTWmYtcjyj/oAEsEKuD6cq2kdw2fgWIvYoN7wd2bqQ2UGTGZmMP3Dx+/4Ryt7WbKvSX2oE4LQKmVFwnwQEDLMT+K0zs+9f4BwRYl1dU+QnANCznKSILd/jo=
+	t=1723125718; cv=none; b=pCcAMzpMg7XYv5sgLab4pf+ibYAnMEhcjbBFLahs/IvPnXDyqdZ+jnk8QpmaWA3YRYXVhwbtD63zrk75Y1q8lDDDA8NJyT8MG335KF4AY2sCfTS0nnNYgKlRi+bKzyAWBVVGI06jlc2LfyVxXq2MRWqbWkIsd1GVJ+zjXLrmDS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723125257; c=relaxed/simple;
-	bh=GBv+W7DAAm8Buil6jNH7Qw4hgUZ1tJDOjBhJRBpxU84=;
+	s=arc-20240116; t=1723125718; c=relaxed/simple;
+	bh=pK8C2d/hFPmQtxaA7bYDGr6SmPP5uxagi3esRFMN2Wk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o7IH4gSiBbHx4uocG3rw+Lv6FyylXXRw+m6EP2772jPBxwquW/iLlydaH9qYdkZdPsZcvrk8nKycN3hpr/O89SuIcY5sFihkuhBywmxlt/MN/mAAVRP03TqtWQRwFoSlL82wuNG15gPzMUn0+yPPWUSRUY1Uj9DQiH8dCGayWn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4OS2izXV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=58zN4ftIxRNizhrHrvEhTFzHNJy4lJZ8+V2vqdEUlIQ=; b=4OS2izXVHrJYIiUEUbwfrHUQrq
-	/LS1cpO8mZGTk+ZgINWM4JhQzv8iTVnKDSkOl2Oh86hR6NZv65i6gvQOP1VObBP8bJq8IJbbQpWYd
-	RRdtAAOi4Z2lxKk2PCnvQOCaCbgbm+UnYrU4TJm7MdtomXBUfFCfeepQOhNgOZkJoOtQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sc3ag-004ICJ-Do; Thu, 08 Aug 2024 15:54:06 +0200
-Date: Thu, 8 Aug 2024 15:54:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	 In-Reply-To:Content-Type:Content-Disposition; b=JcfVF/bQ0/09LZs2wRScX7SaSP7jxKlhU4ERLfGGwzO0aPYsIyLxAYDJbkrZWT5kf1rm4TI9CSAFnZG/KqR341VfTY5JFtliFQ5ChtuowjCvWty5wIlKIT41Qwto7CHZLHV3Twvhc52rJFzRwViWmEOTGvjQXDKh0Iz1q9a8bL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-mrF9dL8OOCu9l0qX3ROsAA-1; Thu,
+ 08 Aug 2024 10:01:51 -0400
+X-MC-Unique: mrF9dL8OOCu9l0qX3ROsAA-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79A421955BCF;
+	Thu,  8 Aug 2024 14:01:49 +0000 (UTC)
+Received: from hog (unknown [10.39.192.51])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 57D7019560A3;
+	Thu,  8 Aug 2024 14:01:46 +0000 (UTC)
+Date: Thu, 8 Aug 2024 16:01:44 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the
- PHY framework
-Message-ID: <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
-References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
- <20240808130833.2083875-2-o.rempel@pengutronix.de>
+Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
+ larger than MTU user packets
+Message-ID: <ZrTPyM3V7JKca6SZ@hog>
+References: <20240804203346.3654426-1-chopps@chopps.org>
+ <20240804203346.3654426-11-chopps@chopps.org>
+ <Zq__9Z4ckXNdR-Ec@hog>
+ <m2a5hr7iek.fsf@ja-home.int.chopps.org>
+ <ZrHjByjZnnDgjvfo@hog>
+ <m2le1aouzf.fsf@ja-home.int.chopps.org>
+ <ZrIDfN2uFpktGJYD@hog>
+ <m2a5hnnsw8.fsf@ja-home.int.chopps.org>
+ <ZrTH665G9b3P054t@hog>
+ <3BAC517C-C896-489F-A7E8-DE5046E38073@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3BAC517C-C896-489F-A7E8-DE5046E38073@chopps.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20240808130833.2083875-2-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 08, 2024 at 03:08:32PM +0200, Oleksij Rempel wrote:
-> Introduce helper functions specific to Open Alliance diagnostics,
-> integrating them into the PHY framework. Currently, these helpers
-> are limited to 1000BaseT1 specific TDR functionality.
+2024-08-08, 09:35:04 -0400, Christian Hopps wrote:
+>=20
+>=20
+> > On Aug 8, 2024, at 09:28, Sabrina Dubroca <sd@queasysnail.net> wrote:
+> >=20
+> > 2024-08-08, 07:30:13 -0400, Christian Hopps wrote:
+> >>=20
+> >> Sabrina Dubroca <sd@queasysnail.net> writes:
+> >>=20
+> >>> 2024-08-06, 04:54:53 -0400, Christian Hopps wrote:
+> >>>>=20
+> >>>> Sabrina Dubroca <sd@queasysnail.net> writes:
+> >>>>=20
+> >>>>> 2024-08-04, 22:33:05 -0400, Christian Hopps wrote:
+> >>>>>>>> +/* 1) skb->head should be cache aligned.
+> >>>>>>>> + * 2) when resv is for L2 headers (i.e., ethernet) we want the =
+cacheline to
+> >>>>>>>> + * start -16 from data.
+> >>>>>>>> + * 3) when resv is for L3+L2 headers IOW skb->data points at th=
+e IPTFS payload
+> >>>>>>>> + * we want data to be cache line aligned so all the pushed head=
+ers will be in
+> >>>>>>>> + * another cacheline.
+> >>>>>>>> + */
+> >>>>>>>> +#define XFRM_IPTFS_MIN_L3HEADROOM 128
+> >>>>>>>> +#define XFRM_IPTFS_MIN_L2HEADROOM (64 + 16)
+> >>>>>>>=20
+> >>>>>>> How did you pick those values?
+> >>>>>>=20
+> >>>>>> That's what the comment is talking to. When reserving space for L2=
+ headers we
+> >>>>>> pick 64 + 16 (a 2^(<=3D6) cacheline + 16 bytes so the the cachelin=
+e should start
+> >>>>>> -16 from where skb->data will point at.
+> >>>>>=20
+> >>>>> Hard-coding the x86 cacheline size is not a good idea. And what's t=
+he
+> >>>>> 16B for? You don't know that it's enough for the actual L2 headers.
+> >>>>=20
+> >>>> I am not hard coding the x86 cacheline. I am picking 64 as the large=
+st cacheline that this is optimized for, it also works for smaller cachelin=
+es.
+> >>>=20
+> >>> At least use SMP_CACHE_BYTES then?
+> >>=20
+> >> Right, I have changed this work with L1_CACHE_BYTES value.
+> >>=20
+> >>>> 16B is to allow for the incredibly common 14B L2 header to fit.
+> >>>=20
+> >>> Why not use skb->dev->needed_headroom, like a bunch of tunnels are
+> >>> already doing? No guessing required. ethernet is the most common, but
+> >>> there's no reason to penalize other protocols when the information is
+> >>> available.
+> >>=20
+> >> We can't use `skb->dev->needed_headroom`, b/c `skb->dev` is not
+> >> correct for the new packets. `skb->dev` is from the received IPTFS
+> >> tunnel packet. The skb being created here are the inner user packets
+> >> leaving the tunnel, so they have an L3 header (thus why we are only
+> >> making room for L2 header). They are being handed to gro receive and
+> >> still have to be routed to their correct destination interface/dev.
+> >=20
+> > You're talking about RX now. You're assuming the main use-case is an
+> > IPsec GW that's going to send the decapped packets out on another
+> > ethernet interface? (or at least, that's that's a use-case worth
+> > optimizing for)
+> >=20
+> > What about TX? Is skb->dev->needed_headroom also incorrect there?
+> >=20
+> > Is iptfs_alloc_skb's l3resv argument equivalent to a RX/TX switch?
+>=20
+> Exactly right. When we are generating IPTFS tunnel packets we need
+> to add all the L3+l2 headers, and in that case we pass l3resv =3D
+> true.
 
-Thanks for generalising this code.
+Could you add a little comment alongside iptfs_alloc_skb? It would
+help make sense of the sizes you're choosing and how they fit the use
+of those skbs (something like "l3resv=3Dtrue is used on TX, because we
+need to reserve L2+L3 headers. On RX, we only need L2 headers because
+[reason why we need L2 headers].").
 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  drivers/net/phy/Makefile                |  2 +-
->  drivers/net/phy/open_alliance_helpers.c | 70 +++++++++++++++++++++++++
->  include/linux/open_alliance_helpers.h   | 47 +++++++++++++++++
+And if skb->dev->needed_headroom is correct in the TX case, I'd still
+prefer (skb->dev->needed_headroom + <some space for l3>) to a fixed 128.
 
-We don't have any PHY drivers outside of drivers/net/phy, and i don't
-see any reason why we should allow them anywhere else. So please
-consider moving the header file into that directory, rather than
-having it global.
+--=20
+Sabrina
 
->  ifdef CONFIG_MDIO_DEVICE
-> diff --git a/drivers/net/phy/open_alliance_helpers.c b/drivers/net/phy/open_alliance_helpers.c
-> new file mode 100644
-> index 0000000000000..eac1004c065ae
-> --- /dev/null
-> +++ b/drivers/net/phy/open_alliance_helpers.c
-> @@ -0,0 +1,70 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * open_alliance_helpers.c - OPEN Alliance specific PHY diagnostic helpers
-> + *
-> + * This file contains helper functions for implementing advanced diagnostic
-> + * features as specified by the OPEN Alliance for automotive Ethernet PHYs.
-> + * These helpers include functionality for Time Delay Reflection (TDR), dynamic
-> + * channel quality assessment, and other PHY diagnostics.
-> + *
-> + * For more information on the specifications, refer to the OPEN Alliance
-> + * documentation: https://opensig.org/automotive-ethernet-specifications/
-
-Please could you give a reference to the exact standard. I think this
-is "Advanced diagnostic features for 1000BASE-T1 automotive Ethernet
-PHYs TC12 - advanced PHY features" ?
-
-The standard seem open, so you could include a URL:
-
-https://opensig.org/wp-content/uploads/2024/03/Advanced_PHY_features_for_automotive_Ethernet_v2.0_fin.pdf
-
-	Andrew
 
