@@ -1,118 +1,131 @@
-Return-Path: <netdev+bounces-116879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410B494BF17
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:05:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09AD94BF1F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0046286D49
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:05:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E157A1C25A31
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46B518E050;
-	Thu,  8 Aug 2024 14:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD46618E74D;
+	Thu,  8 Aug 2024 14:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtrCXRAw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D6uE+mMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F02A63D
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656F118E740;
+	Thu,  8 Aug 2024 14:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723125913; cv=none; b=Xw0tPYrfNvDxDHGQBAU8hL1LB7F+2menWAOAb0uz9tWC2mMQjuY4L3cCFDYNp3kt8UQN4N3C5+7bUhSGP+WaAd7zhcS8sMR2yGh2/Sh1GvgAj+Aj5VKQ84F0d5I22SgV8QBjruvhcTYaO/t+QlDfR7m/iIihLr7adalHWoyuk18=
+	t=1723126065; cv=none; b=C1oR3diMD7map2E4IUsLkXHNYxiln5Z7/oDKxuSftjGEGcUMCNjusCHjE3WVfkMfcesVpiZiwJWpY1YKYwPic9HT+CR5T2bUIc6ulT1gjLuP8RlhAtf2vqSjmXEoxkvSkhihThwSY71zQSYPNtuy90dzzMnjCx4WnJ+BIpkgZAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723125913; c=relaxed/simple;
-	bh=LCdx5ycQgmEabKNLbBhfWFpkDr6rEAaDHXROwzdmL+U=;
+	s=arc-20240116; t=1723126065; c=relaxed/simple;
+	bh=2eFUcF4Ok8H/r5DzQ956VAy5kWMYpZXm6mNcox2QdPU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WMACJwGYU6Kaqhg3FPhy+N2gsXqtW8O7nZGoZFE6ktaY52q+6MplObtx4WYXQs4C1UbkqvSmBGr7x6AMJLOzb7BAarH6roVQGORnx42T4KiARdll3GOZLcwV/rgjXleiwHHC2LOm0DX2RtsbzRdBRqTSrHpDwCaopXf+10Az6jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtrCXRAw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99418C32782;
-	Thu,  8 Aug 2024 14:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723125913;
-	bh=LCdx5ycQgmEabKNLbBhfWFpkDr6rEAaDHXROwzdmL+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WtrCXRAw66YK6ZjDphkQjntXRLFxGS4xaERbVfVIGLaaYXv3pdLYy2+/Ew0fubDMD
-	 gKHJl54ak0PtiKI1o5sUyszoUfjGch0mzkb3zDTnOpWS+dZN1DtGAT6QzDr2VN5Ma4
-	 JRrBwgPXBJKAZGsucFO4LFfIiOa7qLgQulUTfnO6UYa8gUvBJZ3GwN9ZRnQ+tNnQlY
-	 ZuPmQymGrQ9NuFgpbd4mTMQegDOLDkaF+cRAbaRViA4YgBZ8cZ0egaqGGpvQ7LVHZQ
-	 6kIFBKg19ywjwDKQL+y2Shhfb58UMg5e4LzB9hLMHVeTZPPiL8qiXiWhTdh80zSRKT
-	 lzIDxk2Chf09Q==
-Date: Thu, 8 Aug 2024 07:05:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yonglong Liu <liuyonglong@huawei.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, <netdev@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
- avoid IOMMU crashes
-Message-ID: <20240808070511.0befbdde@kernel.org>
-In-Reply-To: <977c3d82-e2f0-4466-9100-7ea781e91ce1@huawei.com>
-References: <20240806151618.1373008-1-kuba@kernel.org>
-	<523894ab-2d38-415f-8306-c0d1abd911ec@huawei.com>
-	<20240807072908.1da91994@kernel.org>
-	<977c3d82-e2f0-4466-9100-7ea781e91ce1@huawei.com>
+	 MIME-Version:Content-Type; b=n3qkO6wNrqy4H9TtD0BtbAtJWxKLjBQ0BNCTAOqW9twIBESDZqvT64Ji2cqLGCXAc92qqRa4A+pNJbqyPUkSiJCAPn4SQENiWEmX6UPQCD+G3fFogKqSzeatoxJJldlTpgj1MTgRRt1lzeiTk2uMXDDg1PvwBKarrY6Z9oNJDzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D6uE+mMv; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CF814E0005;
+	Thu,  8 Aug 2024 14:07:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1723126060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kSHBR50la6iokVWygP7kM2FMcIflEjS6RBzmmxnEkQw=;
+	b=D6uE+mMvqw6FhVXuMMxS/wRCXEj95rNeYf2PE5mBLmG/2wWNrcjPIvN1OBHXC0TJSKbA1J
+	DTqOLD3CzBr3c2kcjAJSdw4gQ5kXZ/1eftc4QYDXcyG0lM/wQXfIREbNEdw6FZH0lEoXPp
+	kaq1mliaOqvtQgzBlXPN9r5/vM+XvcTdj/9sBCRommwRQq2W54tBIR3CQ0JCkhCOwOBlRB
+	hqEVCKArZitC2HnLPdD6KN5Y7D+CWwXFAIPkV3g/f7JZoODSB01zyVW8+SP5Kg5UUWW7iT
+	7dMdfE6LimW9RuptcqfsvYFl1pyts57y2OdsYVorSp/tCiT5rF/fSu9JBBTlHA==
+Date: Thu, 8 Aug 2024 16:07:37 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Simon Horman
+ <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v4 1/8] misc: Add support for LAN966x PCI device
+Message-ID: <20240808160737.4d8806ee@bootlin.com>
+In-Reply-To: <CAHp75Ve0SVSzM36srTY7DwqY5_T9Bkqa0_xyDC2RzU=D1nsTwg@mail.gmail.com>
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+	<20240805101725.93947-2-herve.codina@bootlin.com>
+	<CAHp75VdtFET87R9DZbz27vEeyv4K5bn7mxDCnBVdpFVJ=j6qtg@mail.gmail.com>
+	<20240807120956.30c8264e@bootlin.com>
+	<CAHp75Ve0SVSzM36srTY7DwqY5_T9Bkqa0_xyDC2RzU=D1nsTwg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Thu, 8 Aug 2024 20:52:52 +0800 Yonglong Liu wrote:
-> I hooks the netdev to the page pool, and run with this patch for a 
-> while, then get
+Hi Andy,
+
+On Thu, 8 Aug 2024 15:32:07 +0300
+Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+
+> On Wed, Aug 7, 2024 at 1:10 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> > On Mon, 5 Aug 2024 22:13:38 +0200
+> > Andy Shevchenko <andy.shevchenko@gmail.com> wrote:  
+> > > On Mon, Aug 5, 2024 at 12:19 PM Herve Codina <herve.codina@bootlin.com> wrote:  
 > 
-> the following messages, and the vf can not disable:
+> ...
+> 
+> > > > +       if (!pdev->irq)
+> > > > +               return ERR_PTR(-EOPNOTSUPP);  
+> > >
+> > > Before even trying to get it via APIs? (see below as well)
+> > > Also, when is it possible to have 0 here?  
+> >
+> > pdev->irq can be 0 if the PCI device did not request any IRQ
+> > (i.e. PCI_INTERRUPT_PIN in PCI config header is 0).  
+> 
+> > I use that to check whether or not INTx is supported.  
+> 
+> But why do you need that? What happens if you get a new device that
+> supports let's say MSI?
+> 
+> > Even if this code is present in the LAN966x PCI driver, it can be use as a
+> > starting point for other drivers and may be moved to a common part in the
+> > future.
+> >
+> > Do you think I should remove it ?  
+> 
+> I think pci_alloc_vectors() should be enough. Make it to be the first
+> call, if you think it's better.
+> 
 
-> [ 1950.137586] hns3 0000:7d:01.0 eno1v0: link up
-> [ 1950.137671] hns3 0000:7d:01.0 eno1v0: net open
-> [ 1950.147098] 8021q: adding VLAN 0 to HW filter on device eno1v0
-> [ 1974.287476] hns3 0000:7d:01.0 eno1v0: net stop
-> [ 1974.294359] hns3 0000:7d:01.0 eno1v0: link down
-> [ 1975.596916] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-> release stalling device unregister
-> [ 1976.744947] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-> release stalling device unregister
+Thanks for your answer.
 
-So.. the patch works? :) We may want to add this to get the info prints
-back:
+I will remove the pdev->irq check an rely pci_alloc_vectors().
+Not sure that I will move the call to the first call.
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 2abe6e919224..26bc1618de7c 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1021,11 +1021,12 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	/* Periodic warning for page pools the user can't see */
- 	netdev = READ_ONCE(pool->slow.netdev);
- 	if (time_after_eq(jiffies, pool->defer_warn) &&
--	    (!netdev || netdev == NET_PTR_POISON)) {
-+	    (!netdev || netdev == NET_PTR_POISON || netdev->pp_unreg_pending)) {
- 		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
- 
--		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
--			__func__, pool->user.id, inflight, sec);
-+		pr_warn("%s(): %s stalled pool shutdown: id %u, %d inflight %d sec (hold netdev: %d)\n",
-+			__func__, netdev ? netdev_name(netdev) : "",
-+			pool->user.id, inflight, sec, pool->defer_warn);
- 		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
- 	}
- 
-
-> I install drgn, but don't know how to find out the using pages, would 
-> you guide me on how to use it?
-
-You can use this sample as a starting point:
-
-https://github.com/osandov/drgn/blob/main/contrib/tcp_sock.py
-
-but if the pages are actually leaked (rather than sitting in a socket),
-you'll have to scan pages, not sockets. And figure out how they got leaked.
-Somehow...
+Best regards.
+Hervé
 
