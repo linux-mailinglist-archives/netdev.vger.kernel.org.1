@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-116958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE2C94C33E
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:01:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0068994C339
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17D8B1F23385
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:01:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28ED41C24F61
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED6C1922C1;
-	Thu,  8 Aug 2024 17:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE7D191F64;
+	Thu,  8 Aug 2024 17:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b="TGazH7mr"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b="eveb4Lpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o14.zoho.com (sender4-op-o14.zoho.com [136.143.188.14])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EAE18B471;
-	Thu,  8 Aug 2024 17:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0661917E2;
+	Thu,  8 Aug 2024 17:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723136439; cv=pass; b=VjkDm6lyicb71S3pEKsmZNcdLOBape1w9hyty1BLVcdbbT4YnA67KIrVKtzJDjKilQlNwG+Xn++De1LV4ecrZiCS7qLOE80ReZUcIRlUV6DiMJSdWQY4CjXNKPmQMUL0uniQG48S4d8s7nqeipcA+Ww7JcRYtdWRKt5+ONgQ4Tc=
+	t=1723136437; cv=pass; b=PZKynR+Vg2XzBvvGFfTY8TRpxA3vwDiDSgOccOKrMde0M9khASi0rfIaU2wHiKm6p6GmOGkKI6VPgF9qgVnFZwYN1T1jft95fhNdE/rOjopSEfRVduoO+2oxc0Rmx1dhi/L9UdN7mSeuRvfJCKkrrGVVslZ9qyjvDDCiPhF81Yw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723136439; c=relaxed/simple;
-	bh=ZJc6UZNNkrQszcl8lVcGVZCC2nUp6OHQph69oHVv5ro=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XUTJ0mhRwGkgRGzXL/mld6JTzcI2r7bP77PV7pQdGzzcG71hgGQzmINWoq0R7TaZuzCSpGVb5wCznMGVWuLOdmVXshHXQ246Hnb/amlH9wiphRnvXRgWCF3Hja0tOFmdvw3100FQVW7hbBQeUX+Q7JEEsTGhZU0HbQkkTotYc/4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b=TGazH7mr; arc=pass smtp.client-ip=136.143.188.14
+	s=arc-20240116; t=1723136437; c=relaxed/simple;
+	bh=GtLHY87Rr8nAvTSynA5iLHhjLpTu3N3ZrXPhfk3na7Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bN5/k0kgH3p6QmqggzPEU10s76aYI+EwG2zt8oTBbyg9jBMdxn1IUnidTffcM0axEGUwta96T38aITJG6zD0uSHo95iuHPddPXND3Sxhju/BPn+XM65ROE1h4nIBAc1kUWjPnyv8MUHndGM4mkPUpRrwuuf2ZbJ0n+XfL6fjNkM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b=eveb4Lpo; arc=pass smtp.client-ip=136.143.188.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Delivered-To: kernel@collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1723136400; cv=none; 
+ARC-Seal: i=1; a=rsa-sha256; t=1723136402; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=iufzSaCy1styaAcA1ACND9zvtAK5h50zw+7d/AHF1uHdSCZQh8419xBPItU0tFxPsWuGYGA8154598/0uXsGBVvo/nBp+wAF3EQUcUhArz94Vnj0ehA7Zv5EoZrE+74Twkhsc8rHS7owT8tSbYPE+FmG9hAAGir+qXcZ0mOvK0k=
+	b=cDx01yDh7lUs26ZMaFyFO9MsijiHmbGtfL+Hu0MyAIgnCzRPmB/Mr8lkVOUGaY6FNXbTCpSbAMDjrFtldxZh2Hkcqo7xLf4H65oJDCrmCBfHElMfTVywY9SqIhd6QHgzJMzpwhCOuV41T1SqsRAh7qH2YF3anL+iTeRMR6oJJco=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723136400; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=nrb729petfY91nzUq0Q3CuuVyGhgg3PoYngbWZak+YA=; 
-	b=oC5ki124tlmSTkczfqJDK0kfBeQ/ZpiYha40PYgfxXguZZpRteU3vUazp5ehtdKx0NkkzTaFJ+VrAEDpsqVjUuvuYRsAF+un+3BCwd1qcVaRqIYE0jxZmOJiinXWTZZ3MvcdhTT/dL4eUB5Y4z2YdM29ryI5hLqHokUIEoW5iMM=
+	t=1723136402; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Bb0Qp7PvjL/FavJnOuFCckFOcaryUTEY+obrN+nW6zg=; 
+	b=WZAyVt6nSaLfVdwD+/04pMV2pJEbvp0QOAkLHcspcG52yke2jDHcHOCpn/+EBf9NxKNznX03U8RM3a3fdcKKryLvQB6OXeFEiG7KOtA8NXLL4Is49gyb4nM+cTyZ4ZBauPrHkKymEmz2PXi7UoCsaA0D0O10jsIRQS/dn6JgWno=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=detlev.casanova@collabora.com;
 	dmarc=pass header.from=<detlev.casanova@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723136400;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723136402;
 	s=zohomail; d=collabora.com; i=detlev.casanova@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=nrb729petfY91nzUq0Q3CuuVyGhgg3PoYngbWZak+YA=;
-	b=TGazH7mrbZN/WSe2rKBwGJxBtwoy5NfjHrohQ/WRP0ibmbtLkBtaOLgKZx340r2F
-	JTftASJFEMHwKLhJoc+j7ENSzlfIYl8pSju3gZLCuahwQnHYx59vvnv3TW9/3LgKdqW
-	KxQrG+kabjyKqtK2wwWoPEB/vEaEkiLcW4UDizUQ=
-Received: by mx.zohomail.com with SMTPS id 1723136398929189.99879437516017;
-	Thu, 8 Aug 2024 09:59:58 -0700 (PDT)
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=Bb0Qp7PvjL/FavJnOuFCckFOcaryUTEY+obrN+nW6zg=;
+	b=eveb4LpoVVc7wtQEDXqdNqsdIVvxMtzHOjzx3u/UomyYii+BClAH5cArmVLosTjt
+	QNZMPGbydJQM9GdfUuA/oKWlmGAWe5ke8ZI4fu0i/CfkNZXcNCCutYxviVekrGLgsbm
+	ghpBbFSzIBdXtDAEMFo74YDQOSSbzV6tLs1SDPws=
+Received: by mx.zohomail.com with SMTPS id 1723136401248537.1302993822321;
+	Thu, 8 Aug 2024 10:00:01 -0700 (PDT)
 From: Detlev Casanova <detlev.casanova@collabora.com>
 To: linux-kernel@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -73,10 +74,12 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	kernel@collabora.com,
 	Detlev Casanova <detlev.casanova@collabora.com>
-Subject: [PATCH v2 0/2] Add GMAC support for rk3576
-Date: Thu,  8 Aug 2024 13:00:16 -0400
-Message-ID: <20240808170113.82775-1-detlev.casanova@collabora.com>
+Subject: [PATCH v2 1/2] dt-bindings: net: Add support for rk3576 dwmac
+Date: Thu,  8 Aug 2024 13:00:17 -0400
+Message-ID: <20240808170113.82775-2-detlev.casanova@collabora.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240808170113.82775-1-detlev.casanova@collabora.com>
+References: <20240808170113.82775-1-detlev.casanova@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,23 +89,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
 
-Add the necessary constants and functions to support the GMAC devices on
-the rk3576.
+Add a rockchip,rk3576-gmac compatible for supporting the 2 gmac
+devices on the rk3576.
 
-Changes since v1:
-- Add binding in net/snps,dwmac.yaml too
+Signed-off-by: Detlev Casanova <detlev.casanova@collabora.com>
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 2 ++
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml     | 1 +
+ 2 files changed, 3 insertions(+)
 
-David Wu (1):
-  ethernet: stmmac: dwmac-rk: Add GMAC support for RK3576
-
-Detlev Casanova (1):
-  dt-bindings: net: Add support for rk3576 dwmac
-
- .../bindings/net/rockchip-dwmac.yaml          |   2 +
- .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 156 ++++++++++++++++++
- 3 files changed, 159 insertions(+)
-
+diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+index 6bbe96e352509..f8a576611d6c1 100644
+--- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+@@ -25,6 +25,7 @@ select:
+           - rockchip,rk3368-gmac
+           - rockchip,rk3399-gmac
+           - rockchip,rk3568-gmac
++          - rockchip,rk3576-gmac
+           - rockchip,rk3588-gmac
+           - rockchip,rv1108-gmac
+           - rockchip,rv1126-gmac
+@@ -52,6 +53,7 @@ properties:
+       - items:
+           - enum:
+               - rockchip,rk3568-gmac
++              - rockchip,rk3576-gmac
+               - rockchip,rk3588-gmac
+               - rockchip,rv1126-gmac
+           - const: snps,dwmac-4.20a
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 3eb65e63fdaec..4e2ba1bf788c9 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -80,6 +80,7 @@ properties:
+         - rockchip,rk3328-gmac
+         - rockchip,rk3366-gmac
+         - rockchip,rk3368-gmac
++        - rockchip,rk3576-gmac
+         - rockchip,rk3588-gmac
+         - rockchip,rk3399-gmac
+         - rockchip,rv1108-gmac
 -- 
 2.46.0
 
