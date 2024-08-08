@@ -1,78 +1,72 @@
-Return-Path: <netdev+bounces-116641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96D794B481
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:12:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCF794B4A7
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 03:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B60281B01
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:12:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21A51C20CE3
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA8C4A33;
-	Thu,  8 Aug 2024 01:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B028C0B;
+	Thu,  8 Aug 2024 01:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOPlTJ4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78634A21
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 01:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0944579E1;
+	Thu,  8 Aug 2024 01:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723079523; cv=none; b=UuwJC3bFNtZAnkllfPsuYX6KVi1GK0DiwQGPKIjmETlxy51frQJgvyfQDx42FieGbVfzTPwBBmwISWyukKdN2A1BxsZh5JG7VpcRta4WJVpVVKxOHsmmI3JZiKJRXOE9/Ir53h0lroLxy/V25RZaSJUK6qrOgxhnKH3PuC+a1cM=
+	t=1723080518; cv=none; b=pPsPLuR/MKD/O9V5gwQwyLaVqrtMOY7VgKGwnl6x120IlE0e38p9DQ2duYtmZH3thEL7TolTknPjj2P5FZKFfH/qUEFg95v/Vm7Vq3UPqcX3rxrZEkY8fsIT9xan5Kpq8iKZmYUxhMIlYX57sH6r3Ys7R6HzQ507Sbl+5bLSueQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723079523; c=relaxed/simple;
-	bh=LlMYzfeeJE8EFlILMUvgPZ81lO5MaaBDL5MPag94n4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MB/h8oz9EZG6mngLZFcHVE6mStTXdVwpf5JYigzd4/mnzXwrP/8y2my0rUQv+DfISdDKg7tLmZkebAgLuZb7Bd5qHRO9TB6a/c+pt0n1THS06qYdlT0xb1C70AeCgRgWL0bWLdxQZpdgEAonXQbyyHWzZYPwpKPW/eeJckCtDuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WfTR111yvz1j6MR;
-	Thu,  8 Aug 2024 09:07:09 +0800 (CST)
-Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
-	by mail.maildlp.com (Postfix) with ESMTPS id AEA661400CB;
-	Thu,  8 Aug 2024 09:11:52 +0800 (CST)
-Received: from [10.67.121.184] (10.67.121.184) by
- kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 8 Aug 2024 09:11:52 +0800
-Message-ID: <6a7dba70-6179-4027-be70-65544f5bf912@huawei.com>
-Date: Thu, 8 Aug 2024 09:11:51 +0800
+	s=arc-20240116; t=1723080518; c=relaxed/simple;
+	bh=5RUxO6QCexIH/qQafb7rx0FQEMg4zHf33UeNT5058pI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=To7F5Lo/6SgXbsXdUBljWygUy4LdRky5q1OAABpNk/pKf16GLYfiH2Kwl2XVljmnO51wyDsxBowpZwvsYElQ2/x481TYX+5vX/xoH1CF8jgAhsJJmfblE1Yw4lZHspr+daFnfgRCqpdUJ9DA6bkZ3GwbvBznP4CBQog+ezE2oDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOPlTJ4X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BCC7C32781;
+	Thu,  8 Aug 2024 01:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723080517;
+	bh=5RUxO6QCexIH/qQafb7rx0FQEMg4zHf33UeNT5058pI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jOPlTJ4XwBPYF8VDJDmZVz6VqJQzHm7ou3QhaVOo7jHUFgiMi5pYQxFVh4hi1IJ2U
+	 a1LuvxU6Lz9BzjuchoHTdc85fBzStcih/vIE1h9aydvU6KTZs1xF6M0NSiU/yFIXld
+	 Mk8M+Soycub9DzM4XLphnbYkOqAG7IaWyPp8edWdvt4VMwz7vF/jMAOGnQs6bL38Tj
+	 FmxbIYM2BBoTlMfeivonvM3RqxSDWaLGUiGHYTtg9uhjEoNQRzHWhRQKjMtEgN6EU7
+	 4/h0cb3gD8YBcCMpGlV8TB7bUBUhVTmkChNa2OJDL20AdqKJQLdE9qCPGlohb4EkBY
+	 ZLY6fOkQrLwlQ==
+Date: Wed, 7 Aug 2024 18:28:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Abhinav Jain <jain.abhinav177@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ javier.carrasco.cruz@gmail.com
+Subject: Re: [PATCH v4 1/2] selftests: net: Create veth pair for testing in
+ networkless kernel
+Message-ID: <20240807182834.25b8df00@kernel.org>
+In-Reply-To: <20240807175717.7775-2-jain.abhinav177@gmail.com>
+References: <20240807175717.7775-1-jain.abhinav177@gmail.com>
+	<20240807175717.7775-2-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
- avoid IOMMU crashes
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin
-	<linyunsheng@huawei.com>
-References: <20240806151618.1373008-1-kuba@kernel.org>
- <e4b58020-4ff8-44bc-9779-54bc9e1bf593@huawei.com>
- <20240807072710.0e7934e1@kernel.org>
-From: Yonglong Liu <liuyonglong@huawei.com>
-In-Reply-To: <20240807072710.0e7934e1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemf200007.china.huawei.com (7.202.181.233)
 
+On Wed,  7 Aug 2024 17:57:16 +0000 Abhinav Jain wrote:
+> +	ip link add veth0 type peer name veth1
 
-On 2024/8/7 22:27, Jakub Kicinski wrote:
-> On Wed, 7 Aug 2024 15:03:06 +0800 Yonglong Liu wrote:
->> I tested this patch, have the same crash as I reported...
-> Which driver, this is only gonna work if the driver hooks the netdev
-> to the page pool. Which is still rare for drivers lacking community
-> involvement.
-hns3 driver, we didn't hooks the netdev to the page pool, will try this 
-later, thanks : )
+That's not the right syntax..
+-- 
+pw-bot: cr
 
