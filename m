@@ -1,137 +1,111 @@
-Return-Path: <netdev+bounces-116919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AA9194C169
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:31:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A5094C14F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A083D1F2B98B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:31:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB8A1C256BD
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BF8192B7E;
-	Thu,  8 Aug 2024 15:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7D0190481;
+	Thu,  8 Aug 2024 15:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KJxS3d8O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NH5UbwiJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F0F192B69;
-	Thu,  8 Aug 2024 15:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A7D18FDD2;
+	Thu,  8 Aug 2024 15:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723130938; cv=none; b=alperNG+tRkYY4pgs94/DOgI7lvvCMfV9VrbFP8PxCECdYqf9piFPou3cCJ8FkgkCzpGRkGRtNCdcuRY3Cn1TyVMMdTUOECDQX//NaBYSuOh57zb1pweDIfxvEfInQ888muLKGZIQjqY863Oef2MiBMt/4cgL6IoPiA5h45jVss=
+	t=1723130893; cv=none; b=C2cJ/kO/Cuuup+yQHG1k5AnOVZvFTeae9MfhzvenClGiJKlFirbXzEIGOhr0IEcDwhHGPyGZKOF3AONamV+0zgEsCeLB7V4XMEjIo53dhRck+LwBQaJ9/G9npDmN3XBg4GnX4wBsgPJ3812gp+4eu04F/qmiuBZ7SE0A7QfToxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723130938; c=relaxed/simple;
-	bh=1ByWN//vxwzQp1zeAY4VDNzEuKxwPun8DERkhqw2wZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sGShGCW271GPbf99xakyjsTuxpKBQmjSCImlGw+xlKKj5tk42wdavFQ1eTmKoAs4uH/tlUbloLWn8gBL5AUc79RCzRGsp4LHu7lZUCigl22AiBs8QjtW0tMe6IP95V5ed0Z0mzw65IuqwwJiHIm1gLQ2cgAYDutwFdyLcO3Q0Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KJxS3d8O; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723130937; x=1754666937;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1ByWN//vxwzQp1zeAY4VDNzEuKxwPun8DERkhqw2wZw=;
-  b=KJxS3d8OpltMu8pp6T0wCURCXCoSMqV3I8ox3RjyIJjJzKqmnqMHfn0e
-   D8qpZSFmuKBmlbYKwa4teuujN4QvQKaWrkUkFMVOll7/vxndCY60y3UXY
-   M3k61uyNg9XZg2fAN8jN9bp6WzEFUWHTLC8xYfjZoYGvX0txDCVrG+pVT
-   CAzbKtgieb9OE6SIkXCe9zRA9c5aMUr+Y4acZoXYVlY9pSPoYcaZOt9af
-   t6QMO5QHUje7nZ95KN9xThY/OywKRRhROwNldNJ1JO/rGX9f+jEpV50Cd
-   mz9/7HdF7ibZMshS2efthKRK8qlOY2SOlo9ut1HwUcf2wwojzBr7pG1dU
-   Q==;
-X-CSE-ConnectionGUID: +ZAaWVqTRieGtbcj3ycdlw==
-X-CSE-MsgGUID: moUrHLseTnGrH0wA+IeCXw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="25026019"
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="25026019"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 08:28:57 -0700
-X-CSE-ConnectionGUID: ZTvO872OQICTSM3RldUgWg==
-X-CSE-MsgGUID: /9/VbftkQseQ67sOnqDVrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="57162827"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa009.jf.intel.com with ESMTP; 08 Aug 2024 08:28:53 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1723130893; c=relaxed/simple;
+	bh=0uRnuvNXuYYOvZYAENADyANn3mrdqebJ+KvoYZLO/38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTXPr3JyhP5tcMOI1e6qawhkaSTif3SWmKbkXmHEzwBX3F7ZmXf4fkKoKRHiLaPowtyQ1CRabwXDv6gvRzxnBs7qb5+bjIXk1AlkHVJhR2ZLQXdce1sOzlQLkUadZrnC+rN15QKE8ulQXX25mL+P4+xrIInyOR5xGlGFFbu+HCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NH5UbwiJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DBBC4AF09;
+	Thu,  8 Aug 2024 15:28:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723130892;
+	bh=0uRnuvNXuYYOvZYAENADyANn3mrdqebJ+KvoYZLO/38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NH5UbwiJEVnv+xzM3zISyAdZbeXRXqdJSbiNOJj+OnpNN8JbQ+5seOwetuxFyZKd3
+	 OA4kdjKAniJSyl7Lzy/QYqS5HIUKh/YVzWhUdsV2hn+w6wC392KV+PoyTAxTFt1Os7
+	 VHCF6Ecn8q19rdcJif0Iwv7woP+Nrs4zqH06oI5f7ZbWipMRWDEDcsl+aQwHE8h081
+	 1zyFnaFVbxZPajfQRYpYfHiiBMxSfeO+l1RTuUni7J1ZbWtJzYlmcjbrsw7wPVDrFQ
+	 V12OqPty+tH+j0cW/oN+62fuHjTiYOiZclJtSK1tkegYMWsBJ/SpwoV0kMC46ZmxbJ
+	 krnVloKYki42Q==
+Date: Thu, 8 Aug 2024 16:28:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 6/6] net: netdev_features: remove NETIF_F_ALL_FCOE
-Date: Thu,  8 Aug 2024 17:27:57 +0200
-Message-ID: <20240808152757.2016725-7-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240808152757.2016725-1-aleksander.lobakin@intel.com>
-References: <20240808152757.2016725-1-aleksander.lobakin@intel.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] netfilter: nf_tables: Add __percpu annotation to *stats
+ pointer in nf_tables_updchain()
+Message-ID: <20240808152808.GB3075665@kernel.org>
+References: <20240806102808.804619-1-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806102808.804619-1-ubizjak@gmail.com>
 
-NETIF_F_ALL_FCOE is used only in vlan_dev.c, 2 times. Now that it's only
-2 bits, open-code it and remove the definition from netdev_features.h.
+On Tue, Aug 06, 2024 at 12:26:58PM +0200, Uros Bizjak wrote:
+> Compiling nf_tables_api.c results in several sparse warnings:
+> 
+> nf_tables_api.c:2740:23: warning: incorrect type in assignment (different address spaces)
+> nf_tables_api.c:2752:38: warning: incorrect type in assignment (different address spaces)
+> nf_tables_api.c:2798:21: warning: incorrect type in argument 1 (different address spaces)
+> 
+> Add __percpu annotation to *stats pointer to fix these warnings.
+> 
+> Found by GCC's named address space checks.
+> 
+> There were no changes in the resulting object files.
+> 
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  net/netfilter/nf_tables_api.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+> index 481ee78e77bc..805227131f10 100644
+> --- a/net/netfilter/nf_tables_api.c
+> +++ b/net/netfilter/nf_tables_api.c
+> @@ -2642,7 +2642,7 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
+>  	struct nft_table *table = ctx->table;
+>  	struct nft_chain *chain = ctx->chain;
+>  	struct nft_chain_hook hook = {};
+> -	struct nft_stats *stats = NULL;
+> +	struct nft_stats __percpu *stats = NULL;
+>  	struct nft_hook *h, *next;
+>  	struct nf_hook_ops *ops;
+>  	struct nft_trans *trans;
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/netdev_features.h | 2 --
- net/8021q/vlan_dev.c            | 5 +++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
+Thanks, I agree that users of this local variable expect it
+to be annotated as __percpu.
 
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 1e9c4da181af..e41cd8af2a72 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -205,8 +205,6 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
- #define NETIF_F_ALL_TSO 	(NETIF_F_TSO | NETIF_F_TSO6 | \
- 				 NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID)
- 
--#define NETIF_F_ALL_FCOE	(NETIF_F_FCOE_CRC | NETIF_F_FSO)
--
- /* List of features with software fallbacks. */
- #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
- 				 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 09b46b057ab2..458040e8a0e0 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -564,7 +564,7 @@ static int vlan_dev_init(struct net_device *dev)
- 			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE |
- 			   NETIF_F_GSO_ENCAP_ALL |
- 			   NETIF_F_HIGHDMA | NETIF_F_SCTP_CRC |
--			   NETIF_F_ALL_FCOE;
-+			   NETIF_F_FCOE_CRC | NETIF_F_FSO;
- 
- 	if (real_dev->vlan_features & NETIF_F_HW_MACSEC)
- 		dev->hw_features |= NETIF_F_HW_MACSEC;
-@@ -576,7 +576,8 @@ static int vlan_dev_init(struct net_device *dev)
- 	if (dev->features & NETIF_F_VLAN_FEATURES)
- 		netdev_warn(real_dev, "VLAN features are set incorrectly.  Q-in-Q configurations may not work correctly.\n");
- 
--	dev->vlan_features = real_dev->vlan_features & ~NETIF_F_ALL_FCOE;
-+	dev->vlan_features = real_dev->vlan_features &
-+			     ~(NETIF_F_FCOE_CRC | NETIF_F_FSO);
- 	dev->hw_enc_features = vlan_tnl_features(real_dev);
- 	dev->mpls_features = real_dev->mpls_features;
- 
--- 
-2.45.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
