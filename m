@@ -1,348 +1,214 @@
-Return-Path: <netdev+bounces-116990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B90794C47B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:36:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F9D94C50E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74C9B1C24E87
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:36:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7220D1F26823
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2960E155CBF;
-	Thu,  8 Aug 2024 18:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C5B155CBF;
+	Thu,  8 Aug 2024 19:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eokLMWVp"
+	dkim=pass (1024-bit key) header.d=jiaxyga.com header.i=@jiaxyga.com header.b="o5QM+14H";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jiaxyga.com header.i=@jiaxyga.com header.b="lcBb/ozh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from fallback25.i.mail.ru (fallback25.i.mail.ru [79.137.243.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF7B154BE0;
-	Thu,  8 Aug 2024 18:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3CF1552E7;
+	Thu,  8 Aug 2024 19:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.137.243.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723142170; cv=none; b=rmC/wNb3jJXITgFMJ3orqAWXteQoFvI0Y5zwAUKQG/U/Kudg8WQGi+taiW8XSXs/Hw5uSyKw+77yAw848I7VVxtKmO5D5YWv/NEzEf6QY9ux6L8g5gL45SVGdJGtXMsHR6Sp40sIBdf0iLzsxuPy7aJSBQxHcLWVzlha4+S2sWI=
+	t=1723143876; cv=none; b=hSDqtgrBDgEtPmbKdIktuSJGZXWq5zLkd8Il3ElGqDgbZc6VbxkdLi+OIxt4nls89pEfz5E+DCJehoTa49tR5xpjJvZWZA0QxIapX0xmEtcpQ9QGQHWGjaDV27ODdzScQfPUi++Tz/Rc1UfA8TL1rT8g4bo4X/P9iEsZvB2LSgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723142170; c=relaxed/simple;
-	bh=PtEcuzcQH7oOtPOk0H3vphmvzk65u2P1FZ9ZQ0O9u5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G0nIqkUPz+ChkBnAYj6d0kg9TEfsBpYac9fNq8/lLT7nikhKJwKlVryuXLR/H+0eDbuVVHd5PUQHaNuKjQ8ioLw5tG2gPaiRbZMdKNBp8/JaYYztcSepgLJe95GkmeqfTl8g8DTUekEYn2Z4FR6zYSBtsyYuaAS6mtvQG6LD61Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eokLMWVp; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723142169; x=1754678169;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PtEcuzcQH7oOtPOk0H3vphmvzk65u2P1FZ9ZQ0O9u5w=;
-  b=eokLMWVpLi01gWmdY6h/SkktVYi8YakkyRyuJtD7bzR7hg2wHNmCJd+I
-   N/NhTf5w4mEXQcyCG4TaJ9OA8ghw9nuKJSSwFG6ydesK3LIFVrr0tK6wL
-   G7mVPvbO+O+W6qEZHv0+dUx11w9fftKDI0jOPAZMviC4kyJ0Qhi4H7T1E
-   s7dmZjAmP36xl+pGqhKh9dz260sxDevdV8n12wiIB283X8aKJhT3f5nnL
-   fY3Awgc6bbqnYmpH06QIBBW4y2ctA30pWrpO+VhKmJCN0TzO+Lzt/UfKm
-   p7m55NEkx/9/EbYvZ1LzSp51G9KIww2J1HMR+9eTSxnVlrXH4hwI+oUdW
-   w==;
-X-CSE-ConnectionGUID: KPmKroyCR0SN7DYth/aCBg==
-X-CSE-MsgGUID: HP7D3UgKRGK1bHM69VzIiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="43807519"
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="43807519"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 11:36:07 -0700
-X-CSE-ConnectionGUID: WKqFnTgRRwypTbNHzU2eJA==
-X-CSE-MsgGUID: Epto+witQ0uVpGsF0f/5sA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="57279495"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 08 Aug 2024 11:36:05 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
+	s=arc-20240116; t=1723143876; c=relaxed/simple;
+	bh=1bA27vJfct4/ZdTpxVRfsBLIKnnki+SNEaazhbo2yhg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IDSMPMIp+1z8bbo0PH7eDVd7xdXtLAVBN1BR7sXA4qrDZUxH4wZS5uvdBGRNGsm6HQEdPUY9wCwWtuOEiBFZIc7/3E0h2hpFzOS2uvCRiQzzZttNos2FTQQf5vXecQeg+LnQgMfb8PICK7lOLUPGi/wrBn6nCRaCNI+XVxNQvMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jiaxyga.com; spf=pass smtp.mailfrom=jiaxyga.com; dkim=pass (1024-bit key) header.d=jiaxyga.com header.i=@jiaxyga.com header.b=o5QM+14H; dkim=pass (1024-bit key) header.d=jiaxyga.com header.i=@jiaxyga.com header.b=lcBb/ozh; arc=none smtp.client-ip=79.137.243.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jiaxyga.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jiaxyga.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=jiaxyga.com; s=mailru;
+	h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=Lh2rCIuCOAKI/jcrHZroMWO7ixcPv7pvY3XXpqaKsxE=;
+	t=1723143873;x=1723233873; 
+	b=o5QM+14HC+T1Yz3CKqp8GM3hGTuTqbClqb2m+3dsvNPgadMWyTbEaOK4yVGpDjf5KDoY2Zo94OHoH4AHnN5LbSIWBP1QqpTkv3lppGxHnnXIoOtUXCMlLnqLWxqEgNPiAO364fs6gJxcl5kR5KDw/FHy6nFRH2xw0+Jrbwy9PGg=;
+Received: from [10.12.4.14] (port=38178 helo=smtp39.i.mail.ru)
+	by fallback25.i.mail.ru with esmtp (envelope-from <danila@jiaxyga.com>)
+	id 1sc84b-003HoA-Nw; Thu, 08 Aug 2024 21:41:18 +0300
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=jiaxyga.com
+	; s=mailru; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:From:Sender:Reply-To:To:Cc:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive:X-Cloud-Ids:Disposition-Notification-To;
+	bh=Lh2rCIuCOAKI/jcrHZroMWO7ixcPv7pvY3XXpqaKsxE=; t=1723142477; x=1723232477; 
+	b=lcBb/ozhvQnxNyKWAc0gB0wTYxskwy2IegZPkrxdNd0ZAlF7iQHHh2HzLPu/xCP+1GeQcZnwk+f
+	TNExxj5XzmoiQl5wfgmlAcldUlvdNuTfAJVuX4XnXtJVHBsBDGvzTmefn/+kMRy+dYzGx2CPx9b9v
+	ednC7fS6lP+7LQCJMls=;
+Received: by smtp39.i.mail.ru with esmtpa (envelope-from <danila@jiaxyga.com>)
+	id 1sc84H-00000001fDW-1SFc; Thu, 08 Aug 2024 21:40:58 +0300
+From: Danila Tikhonov <danila@jiaxyga.com>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	andersson@kernel.org,
+	konradybcio@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
-	anthony.l.nguyen@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	kurt@linutronix.de,
-	sriram.yagnaraman@ericsson.com,
-	richardcochran@gmail.com,
-	benjamin.steinke@woks-audio.com,
-	bigeasy@linutronix.de,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net-next 4/4] igb: add AF_XDP zero-copy Tx support
-Date: Thu,  8 Aug 2024 11:35:54 -0700
-Message-ID: <20240808183556.386397-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240808183556.386397-1-anthony.l.nguyen@intel.com>
-References: <20240808183556.386397-1-anthony.l.nguyen@intel.com>
+	rafael@kernel.org,
+	viresh.kumar@linaro.org,
+	kees@kernel.org,
+	tony.luck@intel.com,
+	gpiccoli@igalia.com,
+	ulf.hansson@linaro.org,
+	andre.przywara@arm.com,
+	quic_rjendra@quicinc.com,
+	davidwronek@gmail.com,
+	neil.armstrong@linaro.org,
+	heiko.stuebner@cherry.de,
+	rafal@milecki.pl,
+	macromorgan@hotmail.com,
+	linus.walleij@linaro.org,
+	lpieralisi@kernel.org,
+	dmitry.baryshkov@linaro.org,
+	fekz115@gmail.com
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Danila Tikhonov <danila@jiaxyga.com>,
+	linux@mainlining.org
+Subject: [PATCH v2 00/11] Add Nothing Phone (1) support
+Date: Thu,  8 Aug 2024 21:40:14 +0300
+Message-ID: <20240808184048.63030-1-danila@jiaxyga.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Mailru-Src: smtp
+X-7564579A: B8F34718100C35BD
+X-77F55803: 4F1203BC0FB41BD9D9DED0FED0530B211039911335079E8F258F98C4CB741FF500894C459B0CD1B91F1110687159F35D3E60E583875EFAA44420F5B5A918D162B940E011F974308A47EEACAE9851930B
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7AC4684DF4EC4B256EA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F79006374F960C921106F05B8638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8EC912D4EE6DA802E9889FB57C2C458C2F9D3DD749E073ACACC7F00164DA146DAFE8445B8C89999728AA50765F79006370277CA7F994D7EF5389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC8D23BF7408B3F9022F6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA73AA81AA40904B5D9A18204E546F3947C62B3BD3CC35DA588040F9FF01DFDA4A84AD6D5ED66289B523666184CF4C3C14F6136E347CC761E07725E5C173C3A84C339F181656DDEE2D9BA3038C0950A5D36B5C8C57E37DE458B330BD67F2E7D9AF16D1867E19FE14079C09775C1D3CA48CF17B107DEF921CE791DD303D21008E298D5E8D9A59859A8B6D082881546D9349175ECD9A6C639B01B78DA827A17800CE77DCDFB3399A2F72843847C11F186F3C59DAA53EE0834AAEE
+X-C1DE0DAB: 0D63561A33F958A518F755E76AB32F625002B1117B3ED69661806E908B557BE8C89B063BDC7FAC35823CB91A9FED034534781492E4B8EEAD9CFA8CFAC159CE19C79554A2A72441328621D336A7BC284946AD531847A6065A17B107DEF921CE79BDAD6C7F3747799A
+X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CF4C02E8E32535FC7D39FF3947B3BEBA8E52C46179E97E803AA2262EBE4A850C234A7F0923522A066E5CC6C73BB6D1AD531133C4E0BFA99FFFA8EF8C92EF10C1889D477EB5E16070675218470B7D3CD69A02C26D483E81D6BE72B480F99247062FEE42F474E8A1C6FD34D382445848F2F3
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojbL9S8ysBdXhGn8bgsfX6KPd5MztBJujd
+X-Mailru-Sender: 9EB879F2C80682A09F26F806C7394981C177C75469266601F7A6B01B8567BB20B320891CAC49F3D3AF1D9581B9B2D6092C62728BC403A049225EC17F3711B6CF1A6F2E8989E84EC137BFB0221605B344978139F6FA5A77F05FEEDEB644C299C0ED14614B50AE0675
+X-Mras: Ok
+X-7564579A: 646B95376F6C166E
+X-77F55803: 6242723A09DB00B407A8A08320DA9DA2781ED034E45463FA69D8F21B1C5167D468F3CF0E9FE49B6992E62AFD1D37EAB88DE13ADEE192EA6865D6D0E49BADA7996FD3C250F0E42A18
+X-7FA49CB5: 0D63561A33F958A5C39B56C4475194AC904455D11C52D963A45029630CCC3C608941B15DA834481FA18204E546F3947CC2BF4D41862DDD6BF6B57BC7E64490618DEB871D839B7333395957E7521B51C2DFABB839C843B9C08941B15DA834481F8AA50765F7900637FD3BE98F9706FFBF389733CBF5DBD5E9B5C8C57E37DE458BD96E472CDF7238E0725E5C173C3A84C31A5DD7E4D586C71135872C767BF85DA2F004C90652538430E4A6367B16DE6309
+X-87b9d050: 1
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojnAZp9Q+n/0O5MxJJQveweQ==
+X-Mailru-MI: 8000000000000800
+X-Mras: Ok
 
-From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+This series of patches adds support for the Nothing Phone (1), identified
+as nothing,spacewar. The Nothing Phone (1) is built on the Qualcomm
+Snapdragon 778G+ (SM7325-AE, also known as yupik).
 
-Add support for AF_XDP zero-copy transmit path.
+SM7325 is identical to SC7280 just as SM7125 is identical to SC7180, so
+SM7325 devicetree imports SC7280 devicetree as a base.
 
-A new TX buffer type IGB_TYPE_XSK is introduced to indicate that the Tx
-frame was allocated from the xsk buff pool, so igb_clean_tx_ring and
-igb_clean_tx_irq can clean the buffers correctly based on type.
+All of these patches are essential for the integration of the Nothing
+Phone (1) into the kernel. The inclusion of SoC IDs is particularly
+important, as I encounter crash dumps if the device tree lacks msm and
+board id information.
 
-igb_xmit_zc performs the actual packet transmit when AF_XDP zero-copy is
-enabled. We share the TX ring between slow path, XDP and AF_XDP
-zero-copy, so we use the netdev queue lock to ensure mutual exclusion.
+Changes in v2:
+- Add Krzysztof's R-b tag (patches no. 1, 2, 10)
+- Add Dmitry's R-b tag (patches no. 3, 4, 8)
+- Document SM7325 as fallback to QCM6490 (patch no. 5)
+- Drop patch no. 6 from v1
+- Document PN553 NFC IC as fallback to nxp-nci-i2c (patch no. 6)
+- Add Krzysztof's A-b tag (patches no. 7, 9)
+- Switch nl.nothing.tech/nothing.tech in commit msg (patch no. 9)
+- Add fallback compatibility for NFC (patch no. 10)
+- Fix interrupt type for NFC (patch no. 10)
+Note: Rob's A-b tag (patch no. 5) was not added because the patch was
+fixed. Please look at it again.
+- Link to v1:
+https://lore.kernel.org/all/20240729201843.142918-1-danila@jiaxyga.com/
 
-Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-[Kurt: Set olinfo_status in igb_xmit_zc() so that frames are transmitted]
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igb/igb.h      |  2 +
- drivers/net/ethernet/intel/igb/igb_main.c | 56 +++++++++++++++++++----
- drivers/net/ethernet/intel/igb/igb_xsk.c  | 53 +++++++++++++++++++++
- 3 files changed, 102 insertions(+), 9 deletions(-)
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+To: Bjorn Andersson <andersson@kernel.org>
+To: Konrad Dybcio <konradybcio@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+To: Viresh Kumar <viresh.kumar@linaro.org>
+To: Kees Cook <kees@kernel.org>
+To: Tony Luck <tony.luck@intel.com>
+To: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>
+To: Rajendra Nayak <quic_rjendra@quicinc.com>
+To: David Wronek <davidwronek@gmail.com>
+To: Neil Armstrong <neil.armstrong@linaro.org>
+To: Heiko Stuebner <heiko.stuebner@cherry.de>
+To: "Rafał Miłecki" <rafal@milecki.pl>
+To: Chris Morgan <macromorgan@hotmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Eugene Lepshy <fekz115@gmail.com>
+Cc: devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-msm@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-pm@vger.kernel.org
+Cc: linux-hardening@vger.kernel.org
+Cc: linux@mainlining.org
+Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
 
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-index 4983a6ec718e..9ee18ac1ba47 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -257,6 +257,7 @@ enum igb_tx_flags {
- enum igb_tx_buf_type {
- 	IGB_TYPE_SKB = 0,
- 	IGB_TYPE_XDP,
-+	IGB_TYPE_XSK
- };
- 
- /* wrapper around a pointer to a socket buffer,
-@@ -836,6 +837,7 @@ int igb_xsk_pool_setup(struct igb_adapter *adapter,
- bool igb_alloc_rx_buffers_zc(struct igb_ring *rx_ring, u16 count);
- void igb_clean_rx_ring_zc(struct igb_ring *rx_ring);
- int igb_clean_rx_irq_zc(struct igb_q_vector *q_vector, const int budget);
-+bool igb_xmit_zc(struct igb_ring *tx_ring);
- int igb_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags);
- 
- #endif /* _IGB_H_ */
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 0b779b2ca9ea..1ebd67981978 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -2996,6 +2996,9 @@ static int igb_xdp_xmit(struct net_device *dev, int n,
- 	if (unlikely(!tx_ring))
- 		return -ENXIO;
- 
-+	if (unlikely(test_bit(IGB_RING_FLAG_TX_DISABLED, &tx_ring->flags)))
-+		return -ENXIO;
-+
- 	nq = txring_txq(tx_ring);
- 	__netif_tx_lock(nq, cpu);
- 
-@@ -4917,15 +4920,20 @@ void igb_clean_tx_ring(struct igb_ring *tx_ring)
- {
- 	u16 i = tx_ring->next_to_clean;
- 	struct igb_tx_buffer *tx_buffer = &tx_ring->tx_buffer_info[i];
-+	u32 xsk_frames = 0;
- 
- 	while (i != tx_ring->next_to_use) {
- 		union e1000_adv_tx_desc *eop_desc, *tx_desc;
- 
- 		/* Free all the Tx ring sk_buffs or xdp frames */
--		if (tx_buffer->type == IGB_TYPE_SKB)
-+		if (tx_buffer->type == IGB_TYPE_SKB) {
- 			dev_kfree_skb_any(tx_buffer->skb);
--		else
-+		} else if (tx_buffer->type == IGB_TYPE_XDP) {
- 			xdp_return_frame(tx_buffer->xdpf);
-+		} else if (tx_buffer->type == IGB_TYPE_XSK) {
-+			xsk_frames++;
-+			goto skip_for_xsk;
-+		}
- 
- 		/* unmap skb header data */
- 		dma_unmap_single(tx_ring->dev,
-@@ -4956,6 +4964,7 @@ void igb_clean_tx_ring(struct igb_ring *tx_ring)
- 					       DMA_TO_DEVICE);
- 		}
- 
-+skip_for_xsk:
- 		tx_buffer->next_to_watch = NULL;
- 
- 		/* move us one more past the eop_desc for start of next pkt */
-@@ -4970,6 +4979,9 @@ void igb_clean_tx_ring(struct igb_ring *tx_ring)
- 	/* reset BQL for queue */
- 	netdev_tx_reset_queue(txring_txq(tx_ring));
- 
-+	if (tx_ring->xsk_pool && xsk_frames)
-+		xsk_tx_completed(tx_ring->xsk_pool, xsk_frames);
-+
- 	/* reset next_to_use and next_to_clean */
- 	tx_ring->next_to_use = 0;
- 	tx_ring->next_to_clean = 0;
-@@ -6503,6 +6515,9 @@ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *skb,
- 		return NETDEV_TX_BUSY;
- 	}
- 
-+	if (unlikely(test_bit(IGB_RING_FLAG_TX_DISABLED, &tx_ring->flags)))
-+		return NETDEV_TX_BUSY;
-+
- 	/* record the location of the first descriptor for this packet */
- 	first = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
- 	first->type = IGB_TYPE_SKB;
-@@ -8263,13 +8278,17 @@ static int igb_poll(struct napi_struct *napi, int budget)
-  **/
- static bool igb_clean_tx_irq(struct igb_q_vector *q_vector, int napi_budget)
- {
--	struct igb_adapter *adapter = q_vector->adapter;
--	struct igb_ring *tx_ring = q_vector->tx.ring;
--	struct igb_tx_buffer *tx_buffer;
--	union e1000_adv_tx_desc *tx_desc;
- 	unsigned int total_bytes = 0, total_packets = 0;
-+	struct igb_adapter *adapter = q_vector->adapter;
- 	unsigned int budget = q_vector->tx.work_limit;
-+	struct igb_ring *tx_ring = q_vector->tx.ring;
- 	unsigned int i = tx_ring->next_to_clean;
-+	union e1000_adv_tx_desc *tx_desc;
-+	struct igb_tx_buffer *tx_buffer;
-+	int cpu = smp_processor_id();
-+	bool xsk_xmit_done = true;
-+	struct netdev_queue *nq;
-+	u32 xsk_frames = 0;
- 
- 	if (test_bit(__IGB_DOWN, &adapter->state))
- 		return true;
-@@ -8300,10 +8319,14 @@ static bool igb_clean_tx_irq(struct igb_q_vector *q_vector, int napi_budget)
- 		total_packets += tx_buffer->gso_segs;
- 
- 		/* free the skb */
--		if (tx_buffer->type == IGB_TYPE_SKB)
-+		if (tx_buffer->type == IGB_TYPE_SKB) {
- 			napi_consume_skb(tx_buffer->skb, napi_budget);
--		else
-+		} else if (tx_buffer->type == IGB_TYPE_XDP) {
- 			xdp_return_frame(tx_buffer->xdpf);
-+		} else if (tx_buffer->type == IGB_TYPE_XSK) {
-+			xsk_frames++;
-+			goto skip_for_xsk;
-+		}
- 
- 		/* unmap skb header data */
- 		dma_unmap_single(tx_ring->dev,
-@@ -8335,6 +8358,7 @@ static bool igb_clean_tx_irq(struct igb_q_vector *q_vector, int napi_budget)
- 			}
- 		}
- 
-+skip_for_xsk:
- 		/* move us one more past the eop_desc for start of next pkt */
- 		tx_buffer++;
- 		tx_desc++;
-@@ -8363,6 +8387,20 @@ static bool igb_clean_tx_irq(struct igb_q_vector *q_vector, int napi_budget)
- 	q_vector->tx.total_bytes += total_bytes;
- 	q_vector->tx.total_packets += total_packets;
- 
-+	if (tx_ring->xsk_pool) {
-+		if (xsk_frames)
-+			xsk_tx_completed(tx_ring->xsk_pool, xsk_frames);
-+		if (xsk_uses_need_wakeup(tx_ring->xsk_pool))
-+			xsk_set_tx_need_wakeup(tx_ring->xsk_pool);
-+
-+		nq = txring_txq(tx_ring);
-+		__netif_tx_lock(nq, cpu);
-+		/* Avoid transmit queue timeout since we share it with the slow path */
-+		txq_trans_cond_update(nq);
-+		xsk_xmit_done = igb_xmit_zc(tx_ring);
-+		__netif_tx_unlock(nq);
-+	}
-+
- 	if (test_bit(IGB_RING_FLAG_TX_DETECT_HANG, &tx_ring->flags)) {
- 		struct e1000_hw *hw = &adapter->hw;
- 
-@@ -8425,7 +8463,7 @@ static bool igb_clean_tx_irq(struct igb_q_vector *q_vector, int napi_budget)
- 		}
- 	}
- 
--	return !!budget;
-+	return !!budget && xsk_xmit_done;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/igb/igb_xsk.c b/drivers/net/ethernet/intel/igb/igb_xsk.c
-index 66cdc30e9b6e..4e530e1eb3c0 100644
---- a/drivers/net/ethernet/intel/igb/igb_xsk.c
-+++ b/drivers/net/ethernet/intel/igb/igb_xsk.c
-@@ -431,6 +431,59 @@ int igb_clean_rx_irq_zc(struct igb_q_vector *q_vector, const int budget)
- 	return failure ? budget : (int)total_packets;
- }
- 
-+bool igb_xmit_zc(struct igb_ring *tx_ring)
-+{
-+	unsigned int budget = igb_desc_unused(tx_ring);
-+	struct xsk_buff_pool *pool = tx_ring->xsk_pool;
-+	u32 cmd_type, olinfo_status, nb_pkts, i = 0;
-+	struct xdp_desc *descs = pool->tx_descs;
-+	union e1000_adv_tx_desc *tx_desc = NULL;
-+	struct igb_tx_buffer *tx_buffer_info;
-+	unsigned int total_bytes = 0;
-+	dma_addr_t dma;
-+
-+	nb_pkts = xsk_tx_peek_release_desc_batch(pool, budget);
-+	if (!nb_pkts)
-+		return true;
-+
-+	while (nb_pkts-- > 0) {
-+		dma = xsk_buff_raw_get_dma(pool, descs[i].addr);
-+		xsk_buff_raw_dma_sync_for_device(pool, dma, descs[i].len);
-+
-+		tx_buffer_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
-+		tx_buffer_info->bytecount = descs[i].len;
-+		tx_buffer_info->type = IGB_TYPE_XSK;
-+		tx_buffer_info->xdpf = NULL;
-+		tx_buffer_info->gso_segs = 1;
-+		tx_buffer_info->time_stamp = jiffies;
-+
-+		tx_desc = IGB_TX_DESC(tx_ring, tx_ring->next_to_use);
-+		tx_desc->read.buffer_addr = cpu_to_le64(dma);
-+
-+		/* put descriptor type bits */
-+		cmd_type = E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
-+			   E1000_ADVTXD_DCMD_IFCS;
-+		olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
-+
-+		cmd_type |= descs[i].len | IGB_TXD_DCMD;
-+		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
-+		tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
-+
-+		total_bytes += descs[i].len;
-+
-+		i++;
-+		tx_ring->next_to_use++;
-+		tx_buffer_info->next_to_watch = tx_desc;
-+		if (tx_ring->next_to_use == tx_ring->count)
-+			tx_ring->next_to_use = 0;
-+	}
-+
-+	netdev_tx_sent_queue(txring_txq(tx_ring), total_bytes);
-+	igb_xdp_ring_update_tail(tx_ring);
-+
-+	return nb_pkts < budget;
-+}
-+
- int igb_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
- {
- 	struct igb_adapter *adapter = netdev_priv(dev);
+Danila Tikhonov (9):
+  dt-bindings: arm: qcom,ids: Add IDs for SM7325 family
+  soc: qcom: socinfo: Add Soc IDs for SM7325 family
+  cpufreq: Add SM7325 to cpufreq-dt-platdev blocklist
+  soc: qcom: pd_mapper: Add SM7325 compatible
+  dt-bindings: soc: qcom: qcom,pmic-glink: Document SM7325 compatible
+  dt-bindings: nfc: nxp,nci: Document PN553 compatible
+  dt-bindings: arm: cpus: Add qcom kryo670 compatible
+  dt-bindings: vendor-prefixes: Add Nothing Technology Limited
+  dt-bindings: arm: qcom: Add SM7325 Nothing Phone 1
+
+Eugene Lepshy (2):
+  arm64: dts: qcom: Add SM7325 device tree
+  arm64: dts: qcom: sm7325: Add device-tree for Nothing Phone 1
+
+ .../devicetree/bindings/arm/cpus.yaml         |    1 +
+ .../devicetree/bindings/arm/qcom.yaml         |    6 +
+ .../devicetree/bindings/net/nfc/nxp,nci.yaml  |    1 +
+ .../bindings/soc/qcom/qcom,pmic-glink.yaml    |    5 +
+ .../devicetree/bindings/vendor-prefixes.yaml  |    2 +
+ arch/arm64/boot/dts/qcom/Makefile             |    1 +
+ .../boot/dts/qcom/sm7325-nothing-spacewar.dts | 1263 +++++++++++++++++
+ arch/arm64/boot/dts/qcom/sm7325.dtsi          |   17 +
+ drivers/cpufreq/cpufreq-dt-platdev.c          |    1 +
+ drivers/soc/qcom/qcom_pd_mapper.c             |    1 +
+ drivers/soc/qcom/socinfo.c                    |    2 +
+ include/dt-bindings/arm/qcom,ids.h            |    2 +
+ 12 files changed, 1302 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/qcom/sm7325-nothing-spacewar.dts
+ create mode 100644 arch/arm64/boot/dts/qcom/sm7325.dtsi
+
 -- 
-2.42.0
+2.45.2
 
 
