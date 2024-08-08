@@ -1,126 +1,197 @@
-Return-Path: <netdev+bounces-117008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A2494C562
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:38:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A742494C599
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B01031F25BEE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DEAB280E92
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FCC147C86;
-	Thu,  8 Aug 2024 19:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E5D156250;
+	Thu,  8 Aug 2024 20:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6vz2Wly"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYncLnNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC22C7E792
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 19:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B900B15534E;
+	Thu,  8 Aug 2024 20:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723145886; cv=none; b=PKJFwtBmZS2roBt8CFvjG712jsv3MLmNVKlNOyKBNusvLgv6lknO/NZAh55PB/FNGHXxmRUXyCAsGeiPrVhe9rkuDQJ73WkDjiWwp1Mozc/OS9wCBSJocr3TJm8Z/iHzmMYqs7ecHzoXxS1d3Z4Qi7Rv+p24fA6Koxe3D9pOncg=
+	t=1723148501; cv=none; b=Ixh3ma98N5dJsiAThw4Oj0TGdc+AqBGViJ2Vs7eu58o41fqeklyGeOma8boYV9n0KMm+LdoMxfcXKxp69tD/Fnke2A+iDaSWaRY7nxdmBiR65GXuZlCdD2BFIJdNpbgXRMysojLSslVAbqzrdYt3bcxQ8z7TLIVgrLm8FF0Yuao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723145886; c=relaxed/simple;
-	bh=WiSDBo+zc31BkiTZvbUXDX/NYOYzy4YBxamSw5bkE/o=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=pDNzYpb1I5OpFxp+0V5r2Zm7tQ/HGRiMinjhkanZYkPsf3JgbStPAJO9uISrfV/HYdFcTY5tR1kn8ohAPnY+XQGJT3X3r2fYR/YY+ca0BR94MqGoacffXSYLQFC59khHNf3seXlJFdEAGUZLzjw+LRhZb3MGNZ+MxnK7QnTKmOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6vz2Wly; arc=none smtp.client-ip=209.85.210.41
+	s=arc-20240116; t=1723148501; c=relaxed/simple;
+	bh=ulSh7AmtkBM9yddz7RYR8V3T1DjbU7clScPfSgShZY4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kbc17XqFhx4TgYP0ZC/Kuo+eoWi0fHzVw6SmrLnob//K/GvaODGitXxumWEwbt5uStF0f+3z8m2V9PVn6LHgBuuCGctBrnGavTW6kAtrJFn47qT9GZwxzl3oJl3SqWJF4EojAUJQQXeMLw/P8roCB4bpndgFLVE+dT3e+itoQss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYncLnNW; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-70949118d26so934175a34.0
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 12:38:04 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-690e9001e01so14162397b3.3;
+        Thu, 08 Aug 2024 13:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723145884; x=1723750684; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1723148498; x=1723753298; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WiSDBo+zc31BkiTZvbUXDX/NYOYzy4YBxamSw5bkE/o=;
-        b=A6vz2Wlycru8vnbdfRh9PjFhgXvLdlg8LfD+rfcfDtZWNNJSA9VZFMqKYgK2ntAIt8
-         plUZ2/ZQxIKEezVbv5n6/0h6kJNAOO/wLGvAEjQfsQZaiTZcxmxcfbg2XufWIZD10Rel
-         bzqAYD/fEMknOzGM9UX9WUfHG+VkiClBRila2XrUvlWiYYpy/ihvgV6wS9Oza0NJDpNz
-         C7ULVCl/gmYA48KGQT3EpwsQWdXrZcpnQSIV4hrzzHorce3EIAIAQzd5iYYVN0s91ydn
-         GRccBNhJ59aTXZqiytbxB3Zqa0u3UUpEYeqWrFS3LUc2daMel4tRinoyxxxJC71V5+IU
-         fqkA==
+        bh=v6xdS7bzEVOCuR9cOi9wKUV7nBc7NnnlRdFXvp48F9E=;
+        b=nYncLnNWbwXhg4CShQvk1jG9TmGN1h0D4ckG2gFkv02oDuMWfLqFADTpOg/fbmem1c
+         lrG8ucjfdvLfWz3Y0SZ5Flx+50zhTieenFfkD+73y1i8gjugeqUeVvhEID5p12xTNQ8N
+         qK7HrTQqqmzxVOdWN0vrCxGY+XzzU1fX725amDzdYgbHLRhfGUWfDouCMqighfQo+XI4
+         VFNis9rqzZJYqj+G+bne3+ymepBs+NgEyz3O7xsaK+rxjv2vHOhkpGJXdSQSvgvv84Dx
+         VlBshOlksgnO+OeXGzrhWiIJTzDngl8Jr2Z4wwXdMvmFtQ9yZDLMxHTSW8BsB/Exvlf2
+         4vEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723145884; x=1723750684;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WiSDBo+zc31BkiTZvbUXDX/NYOYzy4YBxamSw5bkE/o=;
-        b=ct88Rj2WUjRYi9t8V5t3yJ00cR8p3kIJEULth+7SzXiLObvaoazBIsKV2fDGm2xtuI
-         7PQstW4+gkixIy+/7i0vES3kL6s9PSf94OUr6PD6SElV2GassMyZiWybPkjGn5qiK1dU
-         RFexyJgxX+UYAOxhINP8n717iK1UPgpYfSveWPqClCNykM+MEFC0yIZ2yX4S1MxFSJHG
-         xeoMoJE/mu5p31k/jvFes/ukli0wILfJcokfxFVbBsp+u77Q5OPGFGzS0ILMQyHhLL0v
-         qJMCG9J8rTGrKUUk0IWvWmpNGYEeZ56YBqPvz2vNtxZlhoG8I+6JSqlW6V2917UEJpLF
-         e6TQ==
-X-Gm-Message-State: AOJu0YyikGU+u1JhbnWcxfsgHkp5N5tqAWs2e/tEV9nFhi7pi8y4E4Yx
-	Vjx0bUnGX2Wo7Vohro/sNe0b1HnURyIhxItf0U65vasBbwmAfj85PpQ2+Q==
-X-Google-Smtp-Source: AGHT+IGfDnHSOtSVheDB91DfRRV8SoeP9AKaf0/1UX0bdsOTaG/TVv0F/fUkUAOt38/ZAEVvJAm02w==
-X-Received: by 2002:a05:6830:3689:b0:704:470d:a470 with SMTP id 46e09a7af769-70b4fcadbf7mr3756128a34.28.1723145884010;
-        Thu, 08 Aug 2024 12:38:04 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-451c87d7f7dsm15526631cf.60.2024.08.08.12.38.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 12:38:03 -0700 (PDT)
-Date: Thu, 08 Aug 2024 15:38:02 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
- djduanjiong@gmail.com
-Cc: netdev@vger.kernel.org
-Message-ID: <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <87h6bvp5ha.fsf@toke.dk>
-References: <20240808070428.13643-1-djduanjiong@gmail.com>
- <87v80bpdv9.fsf@toke.dk>
- <CALttK1RsDvuhdroqo_eaJevARhekYLKnuk9t8TkM5Tg+iWfvDQ@mail.gmail.com>
- <87mslnpb5r.fsf@toke.dk>
- <00f872ac-4f59-4857-9c50-2d87ed860d4f@Spark>
- <87h6bvp5ha.fsf@toke.dk>
-Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
+        d=1e100.net; s=20230601; t=1723148498; x=1723753298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v6xdS7bzEVOCuR9cOi9wKUV7nBc7NnnlRdFXvp48F9E=;
+        b=cJcC6DuFsR/Pqa60K1do07JvST8fcUkTLKYjcPhcVsEUtGhnIC91g5ICgN5Rby9LAO
+         gxhLr/3nnN0aZbd5/D33YXriwgILedeJYGmleLtdbwAb3Jqhccim0ya7IkEPcxW97SaP
+         O1fVHELS9PqK+poDy2IZ6IK7RTUNEZUfiGpr53GcATe5n7wL5uE7/zO2CEuacX9OLB/P
+         RcdPXjOvs9AqKEvjjB5ESUCYUVDmahdzHRf6hQdSycds8HzanSsE6n8Op4+XMhye0tYB
+         bqK5zozevFY4gh+/3s9i62rldsAPLq1ItkaEq3mEV4LqstgGsPuawKEzwVdio+cznkE7
+         sCmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUC0gIugNJtppV5SrOEGtGIvcaCWameDZ7odFLMGMm6ZFbtLAtsbTvOKaEVXjL+Pdz8qzex/T21NzoHzidRuMPiHcB6S5a6T4BlUCSn
+X-Gm-Message-State: AOJu0Yz0weKx9xrB/gyQYnmR0aVHhtrqjvR/nzK5C3Sr9m/z2TuIysqo
+	kXvdoYxp7w6Hgc9UXYCGME0rmhV2TD+pLJNfycG6hg362yN/yKWqot4a8jZ7seEVe10UMT8Wpxw
+	Y7xTo10x/cfW/k8ey5qtPshWNklLssF7a
+X-Google-Smtp-Source: AGHT+IECnvIxIQ3ftZOgsj1eDP/P0RZPNJl5MIWsxIG4ZUOjkI7fzrnQb+wb0HqD1rw9kYxeppODNAiRLKkI1Bs5vOw=
+X-Received: by 2002:a05:690c:60ca:b0:64b:75d8:5002 with SMTP id
+ 00721157ae682-69bf7355798mr39263347b3.9.1723148498572; Thu, 08 Aug 2024
+ 13:21:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <20240808040425.5833-1-rosenp@gmail.com> <acb8e8cc-ebc1-4542-a880-8bb081e1a4c7@wanadoo.fr>
+In-Reply-To: <acb8e8cc-ebc1-4542-a880-8bb081e1a4c7@wanadoo.fr>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Thu, 8 Aug 2024 13:21:27 -0700
+Message-ID: <CAKxU2N9qEDyEQUgk33AEWA=gxYZ7EN4n9aosQ0=675QDdWjONg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: moxart_ether: use devm in probe
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: netdev@vger.kernel.org, u.kleine-koenig@pengutronix.de, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> djduanjiong@gmail.com writes:
-> =
-
-> > This is similar to a virtual machine that receives packets larger tha=
-n
-> > its own mtu, regardless of the mtu configured in the guest.=C2=A0=C2=A0=
-Or, to
-> > put it another way, what are the negative effects of this change?
-> =
-
-> Well, it's changing long-standing behaviour (the MTU check has been
-> there throughout the history of veth). Changing it will mean that
-> applications that set the MTU and rely on the fact that they will never=
-
-> receive packets higher than the MTU, will potentially break in
-> interesting ways.
-
-That this works is very veth specific, though?
-
-In general this max *transfer* unit configuration makes no assurances
-on the size of packets arriving. Though posted rx buffer size does,
-for which veth has no equivalent.
- =
-
-> You still haven't answered what's keeping you from setting the MTU
-> correctly on the veth devices you're using?
-
-Agreed that it has a risk, so some justification is in order. Similar
-to how commit 5f7d57280c19 (" bpf: Drop MTU check when doing TC-BPF
-redirect to ingress") addressed a specific need.
-
-
+On Thu, Aug 8, 2024 at 1:18=E2=80=AFAM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> Le 08/08/2024 =C3=A0 06:03, Rosen Penev a =C3=A9crit :
+> > alloc_etherdev and kmalloc_array are called first and destroyed last.
+> > Safe to use devm to remove frees.
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+>
+> Hi,
+>
+> using dmam_alloc_coherent() would go even one step further I think.
+> It would remove moxart_mac_free_memory() completely.
+>
+> Then IIUC, using devm_register_netdev() would keep things ordered and
+> moxart_remove() could also be removed completely.
+>
+> (by inspection only)
+Right and that's the issue. I don't have hardware to test this on.
+Limiting this to alloc_etherdev and kmalloc_array is safe as they are
+the last to go.
+>
+> CJ
+>
+>
+> >   drivers/net/ethernet/moxa/moxart_ether.c | 19 ++++++-------------
+> >   1 file changed, 6 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/moxa/moxart_ether.c b/drivers/net/eth=
+ernet/moxa/moxart_ether.c
+> > index 96dc69e7141f..06c632c90494 100644
+> > --- a/drivers/net/ethernet/moxa/moxart_ether.c
+> > +++ b/drivers/net/ethernet/moxa/moxart_ether.c
+> > @@ -81,9 +81,6 @@ static void moxart_mac_free_memory(struct net_device =
+*ndev)
+> >               dma_free_coherent(&priv->pdev->dev,
+> >                                 RX_REG_DESC_SIZE * RX_DESC_NUM,
+> >                                 priv->rx_desc_base, priv->rx_base);
+> > -
+> > -     kfree(priv->tx_buf_base);
+> > -     kfree(priv->rx_buf_base);
+> >   }
+> >
+> >   static void moxart_mac_reset(struct net_device *ndev)
+> > @@ -461,15 +458,14 @@ static int moxart_mac_probe(struct platform_devic=
+e *pdev)
+> >       unsigned int irq;
+> >       int ret;
+> >
+> > -     ndev =3D alloc_etherdev(sizeof(struct moxart_mac_priv_t));
+> > +     ndev =3D devm_alloc_etherdev(p_dev, sizeof(struct moxart_mac_priv=
+_t));
+> >       if (!ndev)
+> >               return -ENOMEM;
+> >
+> >       irq =3D irq_of_parse_and_map(node, 0);
+> >       if (irq <=3D 0) {
+> >               netdev_err(ndev, "irq_of_parse_and_map failed\n");
+> > -             ret =3D -EINVAL;
+> > -             goto irq_map_fail;
+> > +             return -EINVAL;
+> >       }
+> >
+> >       priv =3D netdev_priv(ndev);
+> > @@ -511,15 +507,15 @@ static int moxart_mac_probe(struct platform_devic=
+e *pdev)
+> >               goto init_fail;
+> >       }
+> >
+> > -     priv->tx_buf_base =3D kmalloc_array(priv->tx_buf_size, TX_DESC_NU=
+M,
+> > -                                       GFP_KERNEL);
+> > +     priv->tx_buf_base =3D devm_kmalloc_array(p_dev, priv->tx_buf_size=
+,
+> > +                                            TX_DESC_NUM, GFP_KERNEL);
+> >       if (!priv->tx_buf_base) {
+> >               ret =3D -ENOMEM;
+> >               goto init_fail;
+> >       }
+> >
+> > -     priv->rx_buf_base =3D kmalloc_array(priv->rx_buf_size, RX_DESC_NU=
+M,
+> > -                                       GFP_KERNEL);
+> > +     priv->rx_buf_base =3D devm_kmalloc_array(p_dev, priv->rx_buf_size=
+,
+> > +                                            RX_DESC_NUM, GFP_KERNEL);
+> >       if (!priv->rx_buf_base) {
+> >               ret =3D -ENOMEM;
+> >               goto init_fail;
+> > @@ -553,8 +549,6 @@ static int moxart_mac_probe(struct platform_device =
+*pdev)
+> >   init_fail:
+> >       netdev_err(ndev, "init failed\n");
+> >       moxart_mac_free_memory(ndev);
+> > -irq_map_fail:
+> > -     free_netdev(ndev);
+> >       return ret;
+> >   }
+> >
+> > @@ -565,7 +559,6 @@ static void moxart_remove(struct platform_device *p=
+dev)
+> >       unregister_netdev(ndev);
+> >       devm_free_irq(&pdev->dev, ndev->irq, ndev);
+> >       moxart_mac_free_memory(ndev);
+> > -     free_netdev(ndev);
+> >   }
+> >
+> >   static const struct of_device_id moxart_mac_match[] =3D {
+>
 
