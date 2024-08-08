@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-116906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE3994C06B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D96694C096
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F7B82875FF
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:59:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B350284FDD
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF62D18C93B;
-	Thu,  8 Aug 2024 14:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2871E18E056;
+	Thu,  8 Aug 2024 15:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYkPZ2nl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jDP+oR4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB7918C906
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F242B18C355;
+	Thu,  8 Aug 2024 15:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723129187; cv=none; b=L9iVPcuOC7/8ADPNuDAGrS4CLZuhHya6NBCmbjUTyXnlj91S6K9FJ2pCm79J0SnS3zAPMfG4XchJXtNQ1R1UhrXk1wsFem3LYDPsZ8W6X4CCRBlR5uWExo0ToOtFeI2vUsbFEB0PE2WfrfLqC/mc5Ehwr64obqVXnsWsgvwJgx0=
+	t=1723129856; cv=none; b=lXooYd3GOiqEFZGS+Nj4rmsytDZkKagroUVGaO3ZFZaXYgfj7/ioEQXa4LdyyBADUEHIB5ikKH7S9N+Etfh4+2VrExUb3+NafD2LLIb0PnYQ3dpnsaZjneLVqOnILSy3zb5wWWcgsVD6sIZcBKm/nWK2eSZPgehHjhW/XfNQb/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723129187; c=relaxed/simple;
-	bh=0Kk5LxWe0q+WDUIJ3nthuIoYttKENM2HgYwW+l8XooY=;
+	s=arc-20240116; t=1723129856; c=relaxed/simple;
+	bh=gUzCY93vOFCXuNB20coeGLxNXZ7HTb+v3XLDQ1zyD0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Owi+qagEFiD/8B4CPGhR2V7ogcLB9XT5lZ7ge9vF5eJscXcccp7BwOLYd0fX8vk+etmBFcTuNkVDh5iz5tBZ2slP+nytXBih+78tVhzynqhLSo0ANqL0v/m110J7m2FuvXt+6PhohoqBxxb11bluhFT36jsLsDpiiRlzCHSDht4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYkPZ2nl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD2DC32782;
-	Thu,  8 Aug 2024 14:59:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=M2IHoW+hpMVIpddg/6hM48Z85ec3eEm+BGm/IPg/GP0XQS9sdByEXLvkKXG5Wu9gjSs4oi6G2PhBhTRdztYTHKseun9kDg/EeBm3/XNS8ADdwk1IVpxdktK4CDDqFAuKhM/LS4lUkhyVb2VDTZ9JWthvTEpG+67AQunjaENSDwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jDP+oR4H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 146EAC32782;
+	Thu,  8 Aug 2024 15:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723129186;
-	bh=0Kk5LxWe0q+WDUIJ3nthuIoYttKENM2HgYwW+l8XooY=;
+	s=k20201202; t=1723129855;
+	bh=gUzCY93vOFCXuNB20coeGLxNXZ7HTb+v3XLDQ1zyD0o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IYkPZ2nll4zT2qKcJ71H01yWl9WJGjeiSGwFH835orklGXNtsxFRR+VEmOj2B+uLU
-	 sY8iDLghC4EDZ2bgzUPckEedCPhyrFrdGLcucFC7J1MTZpl2yIxwtA0z605GyT4qBh
-	 o36jqBCH2qGRiscID/ZFpsVT60/4mnkYA6Lj6FPC4EnXyOv5HYQgrdv+aIEZ8dpAL8
-	 pMztWiC+dHZqI0uc4RxGFYvQQbUvCIKhdZZaJQhV1yi9kgFMq+GDc/YKWQH/xgC8vN
-	 oagSIX8iOwhsiAylx/ZwdcgHjeXC8JPD6DPYVTqb6nhUwhRrEszV/3R6pabV59d8oT
-	 nxXjch1wyY3OA==
-Date: Thu, 8 Aug 2024 07:59:44 -0700
+	b=jDP+oR4Hk4WBzRLmur3ZpCci/KgVKT6NeFFEYaU6+20S8VO40N2SyRlck8k68c67U
+	 m3XC0WtST3dRyxvEcOI8irmt2bJciXfiKCLq9RDCe4ZDmpNEnXGs6+3NH6do+LY1A1
+	 5+BzX5SnvhSMvIBmaqVC+skwqocY606xOOeHc11WAbpbrpMCECmWeODhSMk+a0117B
+	 IzWNKhjD7ANbmPHuiEUkMRGZG8BypPTt/S0KwcCGD6fGML/DQqvOj6R3scdooZxozy
+	 4YwKQUeQg5795pU7xMO9XVNRrVg4Y/ci+j8O7xE8eFnQbpWHmBAkpc/BowV2utKMmP
+	 DzHVFSs/eem1w==
+Date: Thu, 8 Aug 2024 08:10:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Duan Jiong <djduanjiong@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH] veth: Drop MTU check when forwarding packets
-Message-ID: <20240808075944.0f9ea2e1@kernel.org>
-In-Reply-To: <CALttK1QuYdki3pcd_kVe=feb-XKTSfgxyZCA18DrTBmYN3v9=Q@mail.gmail.com>
-References: <CALttK1TYZURJo8AKtGQFcKKMvzssy3mF=iG9rODqvEiPw_qqpg@mail.gmail.com>
-	<CALttK1QuYdki3pcd_kVe=feb-XKTSfgxyZCA18DrTBmYN3v9=Q@mail.gmail.com>
+To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Shigeru Yoshida <syoshida@redhat.com>, Simon
+ Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4] net-sysfs: check device is present when showing
+ duplex
+Message-ID: <20240808081054.1291238d@kernel.org>
+In-Reply-To: <6c6b2fecaf381b25ec8d5ecc4e30ff2a186cad48.1722925756.git.jamie.bainbridge@gmail.com>
+References: <6c6b2fecaf381b25ec8d5ecc4e30ff2a186cad48.1722925756.git.jamie.bainbridge@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,11 +63,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 8 Aug 2024 13:23:56 +0800 Duan Jiong wrote:
-> There's a problem with the patch formatting, so ignore it and send the
-> v2 version later.
+On Tue,  6 Aug 2024 16:35:27 +1000 Jamie Bainbridge wrote:
+> A sysfs reader can race with a device reset or removal, attempting to
+> read device state when the device is not actually present.
 
-Kindly, please read the documentation before you send more patches:
+True, but..
 
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+> -	if (netif_running(netdev)) {
+> +	if (netif_running(netdev) && netif_device_present(netdev)) {
+>  		struct ethtool_link_ksettings cmd;
+>  
+>  		if (!__ethtool_get_link_ksettings(netdev, &cmd)) {
+
+..there are more callers of __ethtool_get_link_ksettings() and only 
+a fraction of them have something resembling a presence check in
+their path. Can we put the check inside __ethtool_get_link_ksettings()
+itself?
 
