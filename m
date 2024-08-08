@@ -1,115 +1,104 @@
-Return-Path: <netdev+bounces-116758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1915594B9C8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:37:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6430194B9DE
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C41481F22424
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:37:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB8A1C21E0D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42111494A6;
-	Thu,  8 Aug 2024 09:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HP8Kxm60"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022D5189909;
+	Thu,  8 Aug 2024 09:40:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF7742042;
-	Thu,  8 Aug 2024 09:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8F5183CCB;
+	Thu,  8 Aug 2024 09:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723109866; cv=none; b=gsCol8FPd0eixx90YDvrXZ86v5H/RTjwLgRhU1UuznXhZqHSHXHbOiLNVbGfgc5yHU1tsSvdb+mNxzWEeoxbGe3ay0g2rxYpZCvPA8AHS05ybC6lf2t4eDnz1SoLYVRJ+UErE+i0Mk7LywZc8c8iA7tdXs/X7GGJ7rt9PThFs/M=
+	t=1723110041; cv=none; b=shqu06kY3vCt+paEMybUeGJqE5bg3FgFVWeNEDG3ylhpw408MHeg47bUDovAYKauGyBlJBroTl0F+xQcaPbnJLSKmTfqUgJj189nYHPIqFgYht1xGfC7y49x2vJjzpAoAJcfURchGQZA1sO4a2dpE/mTsUduVObmMntp6IC4D9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723109866; c=relaxed/simple;
-	bh=S8NqB5edpUzquDamEYQKbeP3NbfzNxNHCg1WSoHn5Q8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KwDR31mQ9ds4MpGOnPyd1xHFIwgekCL/q1cRAV6qXHqfigJHS4Wd0qMG6RpiZxdbN5GBUBkk6cXdNrx2eO21xzsQyTEMq1mCpn3ivJYVI3v1Qr4qPhiI+lgPY7FfHhEYStGWLsbiJjpvIZFX8SUjNR6B1mxGUco3pE0Uup+mYDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HP8Kxm60; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3db19caec60so524702b6e.1;
-        Thu, 08 Aug 2024 02:37:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723109864; x=1723714664; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CoJAdfolSHrKUuk8Pizjh2lfVY8QKV5cVkq2MObhqU=;
-        b=HP8Kxm60boCpbusNGCr4ZpZ6tSkBd8kFX7tWgwCO2AFc5R/bJXIQMl37CHT/weXIhV
-         6jheOJ2tHg+d87udvl4jHa5UnbcyJso8aRO59mtyo4qLMXFFyxIyrTKegSZ0NWYmBGMR
-         muO/k4iUOcccsROGE7dqU3RsL17BYHOzWAh1HLWyE1UR01L87O6VGZhIhRWhfi+ybIZl
-         tBOD4qXsZUbPNLHQNhk0a57i8jOhl1t6bAGOzgMlEWBqUdA4boAw91ldx3mDkGjUjYt7
-         dA7FmveRvW21mjwLarjOsVWSoPj0acG8i6U44yrV2LKapf+AHqEkZto24qE+0MJDK2Wp
-         YyCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723109864; x=1723714664;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8CoJAdfolSHrKUuk8Pizjh2lfVY8QKV5cVkq2MObhqU=;
-        b=BW6WBBKbSd+/ki3qYxGUpP+JmFF38mvJ1jrIcM5VtrqaGV/vQbkElk9bq20sNX+5XL
-         XnRzpNMWnT2f3smzwjnQN49+76zoredRLckZH5B7gdsY7m/d6Dsd04fGWsCre7EdZHMd
-         e+c8sfWwPuEzyRGa2SMYMUUC4jKBtXyIam94+OLWpMbNsGuzjGZ9byL6OF2v+i9Wfack
-         5BB3SHjLcmLvWk61vams2lRC0pPnmDEy7qY2uvjBJnxTLZJKpZ8H+72k4NzismKLYBsX
-         WrV3Gef+bwA3eeicfPNiokn8AeCrxfo3h1CH5PygQWlfdTn2HZkbMWysvMqdWhuMjETR
-         q5Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWuPGQ1OYK0UEVaS+8X2Dc/n64On7g/cKRrmGSWeQvEUjJzC+Bpokxs2pzPisyLf+wbSssHLpkxuoGNjEl@vger.kernel.org, AJvYcCX0n1nQ08u+/PuoEjQiEymkxtiOgFWpgJ+lVOWsj1HYNNNfmEsQtWi/CflvJREp7IVpADLub2Z4/6yH@vger.kernel.org, AJvYcCXe16x9cH5IUVNQ/vQyPQrZqQR3QD1VtNnw4ubaOD2PasbCPd0QxGQcLc0fC1+mWfcXsA/DjQYS@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC+BATZHna4tKI6Zk9KwajkblXY7bGQo/oWbF9BWI1E8ejCYIs
-	WlJkwUOhL5DDGP2aLTkq9ndLbotIZqPJJ6EC2JkDK1l75rY6ARBvzmLB0B/QwFwT2y1zC/RBb9N
-	j4rUGnjID1NZ2I959pkiF6ObjerI=
-X-Google-Smtp-Source: AGHT+IGdkqjz0I7UQhYkeyj7wADwjGseQQpqsea+Rs79ImylNKFsV+YqnLZMBL6QBGdQQmyhzJKDWWmw7wlM/Dyl8f0=
-X-Received: by 2002:a05:6808:bd3:b0:3dc:299d:c4f9 with SMTP id
- 5614622812f47-3dc3b47869fmr1491407b6e.42.1723109864464; Thu, 08 Aug 2024
- 02:37:44 -0700 (PDT)
+	s=arc-20240116; t=1723110041; c=relaxed/simple;
+	bh=DnD+bf00OH0YLBL5a97bzqdxIHbvB01ieBaBHoYDaDs=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=pFu8wYsV8Ntca4BHtxbJm38wGLtw0BDcXW+tV2r5QTCB7D//MnfPD7J639UTi6F9LBgpVqUZb/aeRckgvSoLurJ1Lc2uCFr78T/DlFLCE+5cMVrySmJd/6dMVVw8jp2u88vVMk3P7FEplgKsZFNdn1muRgHSeIfNIuPkceu7F18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 400ec0cc556a11efa216b1d71e6e1362-20240808
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:934d2e13-3322-467b-8e92-d9d2f04e3270,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:d28ba388d435b4aa5ab101143f72f30a,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,URL:0
+	,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
+	NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 400ec0cc556a11efa216b1d71e6e1362-20240808
+Received: from node4.com.cn [(10.44.16.170)] by mailgw.kylinos.cn
+	(envelope-from <zhangxiangqian@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 358713568; Thu, 08 Aug 2024 17:40:30 +0800
+Received: from node4.com.cn (localhost [127.0.0.1])
+	by node4.com.cn (NSMail) with SMTP id F24EC16002084;
+	Thu,  8 Aug 2024 17:40:29 +0800 (CST)
+X-ns-mid: postfix-66B4928C-8721841160
+Received: from localhost.localdomain (unknown [172.25.83.26])
+	by node4.com.cn (NSMail) with ESMTPA id B59D116002084;
+	Thu,  8 Aug 2024 09:40:27 +0000 (UTC)
+From: zhangxiangqian <zhangxiangqian@kylinos.cn>
+To: oliver@neukum.org
+Cc: davem@davemloft.net,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhangxiangqian <zhangxiangqian@kylinos.cn>
+Subject: [PATCH] net: usb: cdc_ether: don't spew notifications
+Date: Thu,  8 Aug 2024 17:39:45 +0800
+Message-Id: <1723109985-11996-1-git-send-email-zhangxiangqian@kylinos.cn>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240806132606.1438953-1-vtpieter@gmail.com> <20240806132606.1438953-5-vtpieter@gmail.com>
- <adf5cdde46c829519c07cfe466923ecac1033451.camel@microchip.com>
-In-Reply-To: <adf5cdde46c829519c07cfe466923ecac1033451.camel@microchip.com>
-From: Pieter <vtpieter@gmail.com>
-Date: Thu, 8 Aug 2024 11:37:33 +0200
-Message-ID: <CAHvy4Aoo6ej11vYMG2jwe8VO6ZmWbO49zBHOLYmHvxmr2nF3PQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/5] net: dsa: microchip: add WoL support for
- KSZ87xx family
-To: Arun.Ramadoss@microchip.com
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	linux@armlinux.org.uk, conor+dt@kernel.org, Woojung.Huh@microchip.com, 
-	robh@kernel.org, krzk+dt@kernel.org, f.fainelli@gmail.com, kuba@kernel.org, 
-	UNGLinuxDriver@microchip.com, marex@denx.de, edumazet@google.com, 
-	pabeni@redhat.com, pieter.van.trappen@cern.ch, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-On Wed 7 Aug 2024 at 05:56, <Arun.Ramadoss@microchip.com> wrote:
->
-> Hi Pieter,
->
->
-> >
-> > +               if (ksz_is_ksz87xx(dev))
-> > +                       ksz_write8(dev, KSZ8795_REG_INT_EN,
-> > KSZ8795_INT_PME_MASK);
->
-> nitpick:
-> Do we need to rename register like KSZ87xx_REG_INT_EN since it is
-> common to other switches as well?
+The usbnet_link_change function is not called, if the link has not changed.
 
-Hi Arun, well it's all a bit confusing already I have to admit. There is a
-filename ksz8795.c that contains code for ksz88x3 and ksz87xx devices.
-Also the tag protocol is named DSA_TAG_PROTO_KSZ8795.
+...
+[16913.807393][ 3] cdc_ether 1-2:2.0 enx00e0995fd1ac: kevent 12 may have been dropped
+[16913.822266][ 2] cdc_ether 1-2:2.0 enx00e0995fd1ac: kevent 12 may have been dropped
+[16913.826296][ 2] cdc_ether 1-2:2.0 enx00e0995fd1ac: kevent 11 may have been dropped
+...
 
-Now it seems from function prefixes and ksz_common.h `is_ksz8`
-that in many places `ksz8795` should be replaced by `ksz8` instead.
-I don't it's up to me to make this kind of decisions so I went along with
-the existing naming convention as much as I could but indeed, this
-specific register I will rename to KSZ87xx_REG_INT_EN.
+kevent 11 is scheduled too frequently and may affect other event schedules.
 
-Thanks, Pieter
+Signed-off-by: zhangxiangqian <zhangxiangqian@kylinos.cn>
+---
+ drivers/net/usb/cdc_ether.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
+index 6d61052..a646923 100644
+--- a/drivers/net/usb/cdc_ether.c
++++ b/drivers/net/usb/cdc_ether.c
+@@ -418,7 +418,8 @@ void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
+ 	case USB_CDC_NOTIFY_NETWORK_CONNECTION:
+ 		netif_dbg(dev, timer, dev->net, "CDC: carrier %s\n",
+ 			  event->wValue ? "on" : "off");
+-		usbnet_link_change(dev, !!event->wValue, 0);
++		if (netif_carrier_ok(dev->net) != !!event->wValue)
++			usbnet_link_change(dev, !!event->wValue, 0);
+ 		break;
+ 	case USB_CDC_NOTIFY_SPEED_CHANGE:	/* tx/rx rates */
+ 		netif_dbg(dev, timer, dev->net, "CDC: speed change (len %d)\n",
+-- 
+2.7.4
+
 
