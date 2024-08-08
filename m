@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-116974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C0394C3C4
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:32:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F65294C3C7
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:32:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48B731F228A6
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9E871F210DF
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D077F1917EE;
-	Thu,  8 Aug 2024 17:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C78192B6B;
+	Thu,  8 Aug 2024 17:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YMirMUkM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BSq2jTIT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3812B191F9B
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 17:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37E71922E5
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 17:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723138277; cv=none; b=nGk9CTdi8jJFo80msCYsUQS5gPWdnYAA6yyNhlff/NwdK8sZsRsApkfd1ENKFkOA+mi3RT2k5+6GJvid/dW8p30YtCxgRakAm7nSwtDxYNMqJv9Q9Wi2cq14o/FJJsESfNgOnk+FswKdIxgFbzAqRSor9DpgxNEO+PG23yKqoI4=
+	t=1723138279; cv=none; b=HZ8XLw9S1usySbEk2yCt/OlbBQi3KvedxWWo28ETOwSrw3AnLQwOZpqJPzbc794ftSTcF8kEYSTRkQ7RW68aMkQbOt6b2pCvGgbkHghhYSllZhfqo0Ute88w72R+yGv7OIFTQ10QclWTcctGIbZKbMCGphVNwAxhkzg0Q+yhdME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723138277; c=relaxed/simple;
-	bh=WfNtwD6keXKCRe4ITugs3W/573UVYZ5rks1aEYnG6hA=;
+	s=arc-20240116; t=1723138279; c=relaxed/simple;
+	bh=g9mCwqh+CJ5G5wbBwv+GXtGW0PUDRYtDFrb7K8hqWqY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aaz0TGuuhSJw5DovaMbdWjWhaMgEtfJmZ+kFHkUlHK5APJDJ00AaQ5cqOjkz4rHcsr+I9Sl06zgQAXSJPx7E+x0uH7Tr6gt2ojZC3Fpvi2gmNmiNYzh4eYgUnL1fQm5bP9oZpfj6gtdAcTmWnedMFpc3HkmlAyXMHju9COAyaX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YMirMUkM; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=ryE6yhVIUY++ML0ebebtuJgh9ARl0Nf8TSfr7I0DH+hmF+LS73aS9fU2YMO7uKNmFWQX+6xRTFvzr1eAFOSzifiNTEArUkgrPif030shHQ5eLWOHWO5reAYMJvX4UnwjN+tlnULjmeOFmKi5YRWkwMX2Aodz4VpoJAtpULFjV44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BSq2jTIT; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723138277; x=1754674277;
+  t=1723138278; x=1754674278;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WfNtwD6keXKCRe4ITugs3W/573UVYZ5rks1aEYnG6hA=;
-  b=YMirMUkMRwn4TG3LoBBdQiE7LAs2c3BbFMavAAg+M+q+KJympERqhjz2
-   ktTiQA2RK3VK7it5fnnNn6uGvXJ318hqZ7n2u++avxo6JAQsCRvS6q9Rl
-   mnNCf5Vtt1N0kEgDsM7tfe+sS2RJfsGGuUbOCo5PI3fFeopUkA0QRwgrn
-   VHLc7l+RbEal2rWCOsf9ARUkXJ2YpPw1eZ3W6GOejheN87Sn3dOefO5Yd
-   aiwlUNvPmh9ut+I2QDBmeQ6Z7JZR5xtyXmte9StFf/DZj82+jrQbB6q6F
-   TuqczJ44PMHnLdiiOQdIJGQa/AiAc49D7Nh7qOYtTtVAudU9RQyftviVl
-   A==;
-X-CSE-ConnectionGUID: OUY8a8zgQeaHlz19ZzhOhw==
-X-CSE-MsgGUID: u4CmOuK+TAuacvP/POFSmA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="32675449"
+  bh=g9mCwqh+CJ5G5wbBwv+GXtGW0PUDRYtDFrb7K8hqWqY=;
+  b=BSq2jTITgwjvtfkJ4FHSKSwoNnpk9KP6Po3njRSJAsGF1Jhv0UXp6KIF
+   2LggWgrZ0+pWxeizFrtEhE7x3OprhW0aSCtpbUm8aJmjrZMseG5LIu4Q9
+   HWasVIIIfKkni/IyNtESOy0Y21c38n89JBLJyVhQ3z/sQjeFbUC0osuor
+   AXJO24TqQgB4EhlcLvOHOoJQz7sEyPTi4GR6avTmKrxfQwdOADHHLIDvA
+   6BVr2Jx0i7689xUNUrIRXBEE/liLAfK1sEbtNAVHKYByZBvdOsgM0UZpJ
+   CFJioDAUh+hD3K7rZtTUL2tGVEObO907MJzg9tQWyEF/tZW1ueg6vyp0M
+   g==;
+X-CSE-ConnectionGUID: 05wzrAVLQWO/yI1BqQLuVA==
+X-CSE-MsgGUID: iPDMZeDvQRajt3f500B3Gg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="32675457"
 X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="32675449"
+   d="scan'208";a="32675457"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 10:31:14 -0700
-X-CSE-ConnectionGUID: xyE77jFZR1KXvCwUOLewPA==
-X-CSE-MsgGUID: 8yBC5FH6SfaVvPAT/AP14w==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 10:31:15 -0700
+X-CSE-ConnectionGUID: Z3+8yRcMTyq/2qRxW5CCmw==
+X-CSE-MsgGUID: bHSKByFQQK+bSQdA4wb59Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="61682467"
+   d="scan'208";a="61682473"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa005.fm.intel.com with ESMTP; 08 Aug 2024 10:31:13 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 08 Aug 2024 10:31:14 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -79,9 +79,9 @@ Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	jacob.e.keller@intel.com,
 	maciej.fijalkowski@intel.com,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next v3 10/15] ice: don't set target VSI for subfunction
-Date: Thu,  8 Aug 2024 10:30:56 -0700
-Message-ID: <20240808173104.385094-11-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v3 11/15] ice: check if SF is ready in ethtool ops
+Date: Thu,  8 Aug 2024 10:30:57 -0700
+Message-ID: <20240808173104.385094-12-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240808173104.385094-1-anthony.l.nguyen@intel.com>
 References: <20240808173104.385094-1-anthony.l.nguyen@intel.com>
@@ -95,30 +95,101 @@ Content-Transfer-Encoding: 8bit
 
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Add check for subfunction before setting target VSI. It is needed for PF
-in switchdev mode but not for subfunction (even in switchdev mode).
+Now there is another type of port representor. Correct checking if
+parent device is ready to reflect also new PR type.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |  7 +++----
+ drivers/net/ethernet/intel/ice/ice_repr.c    | 12 ++++++++++++
+ drivers/net/ethernet/intel/ice/ice_repr.h    |  1 +
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 8d25b6981269..d327a397f670 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -2407,7 +2407,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
- 					ICE_TXD_CTX_QW1_CMD_S);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 8c990c976132..7b1f7725c0c8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -4414,7 +4414,7 @@ ice_repr_get_drvinfo(struct net_device *netdev,
+ {
+ 	struct ice_repr *repr = ice_netdev_to_repr(netdev);
  
- 	ice_tstamp(tx_ring, skb, first, &offload);
--	if (ice_is_switchdev_running(vsi->back))
-+	if (ice_is_switchdev_running(vsi->back) && vsi->type != ICE_VSI_SF)
- 		ice_eswitch_set_target_vsi(skb, &offload);
+-	if (ice_check_vf_ready_for_cfg(repr->vf))
++	if (repr->ops.ready(repr))
+ 		return;
  
- 	if (offload.cd_qw1 & ICE_TX_DESC_DTYPE_CTX) {
+ 	__ice_get_drvinfo(netdev, drvinfo, repr->src_vsi);
+@@ -4426,8 +4426,7 @@ ice_repr_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ 	struct ice_repr *repr = ice_netdev_to_repr(netdev);
+ 
+ 	/* for port representors only ETH_SS_STATS is supported */
+-	if (ice_check_vf_ready_for_cfg(repr->vf) ||
+-	    stringset != ETH_SS_STATS)
++	if (repr->ops.ready(repr) || stringset != ETH_SS_STATS)
+ 		return;
+ 
+ 	__ice_get_strings(netdev, stringset, data, repr->src_vsi);
+@@ -4440,7 +4439,7 @@ ice_repr_get_ethtool_stats(struct net_device *netdev,
+ {
+ 	struct ice_repr *repr = ice_netdev_to_repr(netdev);
+ 
+-	if (ice_check_vf_ready_for_cfg(repr->vf))
++	if (repr->ops.ready(repr))
+ 		return;
+ 
+ 	__ice_get_ethtool_stats(netdev, stats, data, repr->src_vsi);
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+index 5ea8b512c421..229831fe2cd2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.c
++++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+@@ -283,6 +283,16 @@ ice_repr_reg_netdev(struct net_device *netdev)
+ 	return register_netdev(netdev);
+ }
+ 
++static int ice_repr_ready_vf(struct ice_repr *repr)
++{
++	return !ice_check_vf_ready_for_cfg(repr->vf);
++}
++
++static int ice_repr_ready_sf(struct ice_repr *repr)
++{
++	return !repr->sf->active;
++}
++
+ /**
+  * ice_repr_destroy - remove representor from VF
+  * @repr: pointer to representor structure
+@@ -420,6 +430,7 @@ struct ice_repr *ice_repr_create_vf(struct ice_vf *vf)
+ 	repr->vf = vf;
+ 	repr->ops.add = ice_repr_add_vf;
+ 	repr->ops.rem = ice_repr_rem_vf;
++	repr->ops.ready = ice_repr_ready_vf;
+ 
+ 	ether_addr_copy(repr->parent_mac, vf->hw_lan_addr);
+ 
+@@ -466,6 +477,7 @@ struct ice_repr *ice_repr_create_sf(struct ice_dynamic_port *sf)
+ 	repr->sf = sf;
+ 	repr->ops.add = ice_repr_add_sf;
+ 	repr->ops.rem = ice_repr_rem_sf;
++	repr->ops.ready = ice_repr_ready_sf;
+ 
+ 	ether_addr_copy(repr->parent_mac, sf->hw_addr);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.h b/drivers/net/ethernet/intel/ice/ice_repr.h
+index ee28632e87b4..35bd93165e1e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.h
++++ b/drivers/net/ethernet/intel/ice/ice_repr.h
+@@ -36,6 +36,7 @@ struct ice_repr {
+ 	struct {
+ 		int (*add)(struct ice_repr *repr);
+ 		void (*rem)(struct ice_repr *repr);
++		int (*ready)(struct ice_repr *repr);
+ 	} ops;
+ };
+ 
 -- 
 2.42.0
 
