@@ -1,167 +1,229 @@
-Return-Path: <netdev+bounces-116908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E1294C0B6
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:15:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB57B94C112
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62B4FB26442
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:15:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D73B1F29C3B
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F0718FC73;
-	Thu,  8 Aug 2024 15:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B736B190052;
+	Thu,  8 Aug 2024 15:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2Q6BTRF"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="ERFQ86ou"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9406118FC6E
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BD018FC93
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723130053; cv=none; b=hm22sCYvAJD/wdEeEDVzZf9mYRCibf+5SIp7IQneHcQa+kfwoJLMURI0AryWtgvMWwgGNKUvMYfmZYMef9+QHypwf5awpTrhpl52eV/rsCFGKNCXT8erN7uRH2IhwrSIOJlUFwfISLShfoytjPCOBgO68STKEO1tdYqjTqB+qS4=
+	t=1723130660; cv=none; b=nQ51C8Zzv/3SlEFJCkWaJ8tgF1QUBfi2zu3tIbtYRbm4irsBPrmwxlnQTEN8JndmIOgkQRJg1T5XN8hphosWhuU6zUOrtxGHkw0RI0hKtayiU0RyLMwsrRlTVv2T774YKpVMdywkWmQSKFujTIwUQteCQcJDGGQ58o5eLBoZFAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723130053; c=relaxed/simple;
-	bh=QY/3LBekhwERApgsXZ4yA2jMOOM5zV0uFSHZErKfdYY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bsxWY0Bi6igFbffrIKm0eIvsRJ1WE9gNn+S+VKyfNacqf1bXS+z/szzKZ30L5sYDYvCpUkI259J47+T47+rEIxgHohec1y0SByPDxuQ8lZhfmTE/H1BWwqwFomaCochBZrcb2uBDV0pnmGVXwTD7UHD6xyvHX8uETIQ4VujDahw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2Q6BTRF; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5afa207b8bfso1125634a12.0
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 08:14:11 -0700 (PDT)
+	s=arc-20240116; t=1723130660; c=relaxed/simple;
+	bh=/FwBY7ZLw3tlVtJI5q4uhU83jgrSj98/jpIQWivVw68=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ILJQVoPBbwJh3U9+HKMEqsD5l0s+NlEXaftlkhyk+1ytBeFEMB/D8z1qtvO8pNWkLAeoSOI7qlJaHtifo5piUY/DsS1NF0D4VC8qJhTdKCPmU8DgPELVzR7RYqq2jZ37ySMjvv/NJGS3JfFqog2uzvx9++wKWipxL+U9d7xhcNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=ERFQ86ou; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 1B1909C53C0;
+	Thu,  8 Aug 2024 11:14:31 -0400 (EDT)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id LAhwhicIfrvB; Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 659119C53C1;
+	Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 659119C53C1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723130050; x=1723734850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QY/3LBekhwERApgsXZ4yA2jMOOM5zV0uFSHZErKfdYY=;
-        b=R2Q6BTRFd+UQLtJumT84dkn8eXZKQFP5EoD87P1CeZyEnd4KPbu8WnkSm7UtB/pwPN
-         LNBC42G1s6v4tDWH6lYLI8xV5BE3ENzGsemCAJm1ulDEGYfpD0TCTXkLs5ToSd8mWKgd
-         PKSuL60pEZPZuvgeXxoG1jiCLYKELSWzCk2jFWTNEqVTXhSfPoiTJlr2r9TvfXswBIjz
-         ecrS4i0nSyU6zLZTwIKWy4ZCViHlaenj30OAepSU5LlOKg/+R9s1763UhIriJbHC3kIY
-         az+1RRoAq9L6QoeXNvPbkwwCvNtG/6yAvWWZxc3tkZjFvfKplSmvswQ+LjJn50YSCRSq
-         STtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723130050; x=1723734850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QY/3LBekhwERApgsXZ4yA2jMOOM5zV0uFSHZErKfdYY=;
-        b=kjraFIMQ/SOCTdKuXrqDTPCe3PM9lYJ3n4wN+InIHOMH/PfDHG1KNuBQtmQLuvWL/D
-         OmN2WiBkaD0z/xJmJxQOZ367zGOK6SybC3CFsE1Z+x3QVwUmk0ulRMwx8Kh5K3AOwsCa
-         ZgV5mFANdvwoVH5YB94Ewb9MgKqKih8GE+uULXR6BoenxKEIwqiWS8ZUDka2UCze1wXP
-         BT5QBcjIDAg7QprT5zrhtPDBYnAEfYHswfZnGswyHtfv2F2k28OX90Nfk3ts5CiSnvir
-         HtbubTO3WvLNEAy/VJ9AMy9wHlCqHyjg6oYXiDQ1QMnon1qbMDdaqcvZ67U6XFi5SlmQ
-         fgAA==
-X-Gm-Message-State: AOJu0YwyZOb+4VUpTc6iX2ymwmSXWla951G0WUyWqji5fxWHSLZqw2ek
-	WTCfmRoWJKykqVqcbfA1f7iqQ2XqFWWe697EoiyImb2YsFJa0BM7CzUfgkRrIJUz69ObtEZe5Zj
-	jO8fdWW6S+S4ia0CxF+uhZaqDEt8=
-X-Google-Smtp-Source: AGHT+IEdpLQR3FAzNEOC/dQ4G9n/58bt3LItzFNZxoo5QdfV5loloVhKuntBTPkggGQIvtJqMM+p5TmJpo1Cwo1WZ8g=
-X-Received: by 2002:a05:6402:d08:b0:57d:72e:5b3a with SMTP id
- 4fb4d7f45d1cf-5bbb2341801mr1706396a12.33.1723130049468; Thu, 08 Aug 2024
- 08:14:09 -0700 (PDT)
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1723130070; bh=zVsgPi90M/Pt73vL/QH4PbHoVsdzx/aG5TBXet43/wQ=;
+	h=From:To:Date:Message-Id:MIME-Version;
+	b=ERFQ86oucMU7xczNVeQ57rxoajHPowAfdU3MSY/qzjDpPOnJscfUFoxuCnfl7/pc1
+	 OKOR+rU3ypqTdpXlmklEdxV+sSS83MFClHOtm1jnzEVsF2DJsbUkc07QHmR2pr9L7A
+	 cm1i62dLcJWF9gWofopaF9qXfAxCn9WPLA9zgvc1lSYl70PeIoO7HQDHEZRTsjwa57
+	 RPyYgMvTHb2N1GIO+T9aYgNAeFd5JHNpjFrwWZmvn2OMX+24pdzQvxW4xJk1lSIPuF
+	 GZ3THL3henKbEVscZhNtwhCJT+D+4k+mb+zAzJTkVHABkQc9vrkKUmaFa/uQKCV0sS
+	 mCjVCzGR8SAng==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id JRi4UprVAsVH; Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
+Received: from sfl-deribaucourt.rennes.sfl (80-15-101-118.ftth.fr.orangecustomers.net [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 084619C53C0;
+	Thu,  8 Aug 2024 11:14:28 -0400 (EDT)
+From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	kuba@kernel.org,
+	Tristram.Ha@microchip.com,
+	Arun.Ramadoss@microchip.com,
+	horms@kernel.org,
+	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Subject: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split half-duplex monitoring function
+Date: Thu,  8 Aug 2024 15:14:21 +0000
+Message-Id: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808051518.3580248-1-dw@davidwei.uk> <20240808051518.3580248-7-dw@davidwei.uk>
-In-Reply-To: <20240808051518.3580248-7-dw@davidwei.uk>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 9 Aug 2024 00:13:56 +0900
-Message-ID: <CAMArcTX_BDeFQv4OkOk6FLdaoEaS6VQyv6wijUPoQNPCy456zg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 6/6] bnxt_en: only set dev->queue_mgmt_ops if
- supported by FW
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Michael Chan <michael.chan@broadcom.com>, 
-	Somnath Kotur <somnath.kotur@broadcom.com>, Wojciech Drewek <wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 8, 2024 at 2:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-Hi David,
-Thank you so much for this work!
+In order to respect the 80 columns limit, split the half-duplex
+monitoring function in two.
 
-> The queue API calls bnxt_hwrm_vnic_update() to stop/start the flow of
-> packets, which can only properly flush the pipeline if FW indicates
-> support.
->
-> Add a macro BNXT_SUPPORTS_QUEUE_API that checks for the required flags
-> and only set queue_mgmt_ops if true.
->
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
-> drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 ++-
-> drivers/net/ethernet/broadcom/bnxt/bnxt.h | 3 +++
-> 2 files changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 7762fa3b646a..85d4fa8c73ae 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -15717,7 +15717,6 @@ static int bnxt_init_one(struct pci_dev *pdev, co=
-nst struct pci_device_id *ent)
-> dev->stat_ops =3D &bnxt_stat_ops;
-> dev->watchdog_timeo =3D BNXT_TX_TIMEOUT;
-> dev->ethtool_ops =3D &bnxt_ethtool_ops;
-> - dev->queue_mgmt_ops =3D &bnxt_queue_mgmt_ops;
-> pci_set_drvdata(pdev, dev);
->
-> rc =3D bnxt_alloc_hwrm_resources(bp);
-> @@ -15898,6 +15897,8 @@ static int bnxt_init_one(struct pci_dev *pdev, co=
-nst struct pci_device_id *ent)
->
-> if (BNXT_SUPPORTS_NTUPLE_VNIC(bp))
-> bp->rss_cap |=3D BNXT_RSS_CAP_MULTI_RSS_CTX;
-> + if (BNXT_SUPPORTS_QUEUE_API(bp))
-> + dev->queue_mgmt_ops =3D &bnxt_queue_mgmt_ops;
->
-> rc =3D register_netdev(dev);
-> if (rc)
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.h
-> index a2233b2d9329..62e637c5be31 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> @@ -2451,6 +2451,9 @@ struct bnxt {
-> #define BNXT_SUPPORTS_MULTI_RSS_CTX(bp) \
-> (BNXT_PF(bp) && BNXT_SUPPORTS_NTUPLE_VNIC(bp) && \
-> ((bp)->rss_cap & BNXT_RSS_CAP_MULTI_RSS_CTX))
-> +#define BNXT_SUPPORTS_QUEUE_API(bp) \
-> + (BNXT_PF(bp) && BNXT_SUPPORTS_NTUPLE_VNIC(bp) && \
-> + ((bp)->fw_cap & BNXT_FW_CAP_VNIC_RE_FLUSH))
->
-> u32 hwrm_spec_code;
-> u16 hwrm_cmd_seq;
-> --
-> 2.43.5
->
->
+This is just a styling change, no functional change.
 
-What Broadcom NICs support BNXT_SUPPORTS_QUEUE_API?
+Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
+airelinux.com>
 
-I have been testing the device memory TCP feature with bnxt_en driver
-and I'm using BCM57508, BCM57608, and BCM57412 NICs.
-(BCM57508's firmware is too old, but BCM57608's firmware is the
-latest, BCM57412 too).
-Currently, I can't test the device memory TCP feature because my NICs
-don't support BNXT_SUPPORTS_QUEUE_API.
-The BCM57608 only supports the BNXT_SUPPORTS_NTUPLE_VNIC, but does not
-support the BNXT_SUPPORTS_QUEUE_API.
-The BCM57412 doesn't support both of them.
-I think at least BCM57508 and BCM57608 should support this because
-it's the same or newer product line as BCM57504 as far as I know.
-Am I missing something?
+---
+v2:
+ - added line breaks after return statements
+ - removed Fixed-by: tag
+v1: https://lore.kernel.org/netdev/20240708084934.131175-1-enguerrand.de-=
+ribaucourt@savoirfairelinux.com/
+---
+ drivers/net/dsa/microchip/ksz9477.c | 91 +++++++++++++++++------------
+ 1 file changed, 54 insertions(+), 37 deletions(-)
 
-Thanks a lot!
-Taehee Yoo
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
+hip/ksz9477.c
+index 425e20daf1e9..1e2293aa00dc 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -427,54 +427,71 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int=
+ port, bool freeze)
+ 	mutex_unlock(&p->mib.cnt_mutex);
+ }
+=20
+-int ksz9477_errata_monitor(struct ksz_device *dev, int port,
+-			   u64 tx_late_col)
++static int ksz9477_half_duplex_monitor(struct ksz_device *dev, int port,
++				       u64 tx_late_col)
+ {
++	u8 lue_ctrl;
+ 	u32 pmavbc;
+-	u8 status;
+ 	u16 pqm;
+ 	int ret;
+=20
+-	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
++	/* Errata DS80000754 recommends monitoring potential faults in
++	 * half-duplex mode. The switch might not be able to communicate anymor=
+e
++	 * in these states. If you see this message, please read the
++	 * errata-sheet for more information:
++	 * https://ww1.microchip.com/downloads/aemDocuments/documents
++	 * /UNG/ProductDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
++	 * To workaround this issue, half-duplex mode should be avoided.
++	 * A software reset could be implemented to recover from this state.
++	 */
++	dev_warn_once(dev->dev,
++		      "Half-duplex detected on port %d, transmission halt may occur\n"=
+,
++		      port);
++	if (tx_late_col !=3D 0) {
++		/* Transmission halt with late collisions */
++		dev_crit_once(dev->dev,
++			      "TX late collisions detected, transmission may be halted on por=
+t %d\n",
++			      port);
++	}
++	ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &lue_ctrl);
+ 	if (ret)
+ 		return ret;
+-	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status) =3D=3D PORT_INTF_SPEED_NO=
+NE) &&
+-	    !(status & PORT_INTF_FULL_DUPLEX)) {
+-		/* Errata DS80000754 recommends monitoring potential faults in
+-		 * half-duplex mode. The switch might not be able to communicate anymo=
+re
+-		 * in these states.
+-		 * If you see this message, please read the errata-sheet for more info=
+rmation:
+-		 * https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Prod=
+uctDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
+-		 * To workaround this issue, half-duplex mode should be avoided.
+-		 * A software reset could be implemented to recover from this state.
+-		 */
+-		dev_warn_once(dev->dev,
+-			      "Half-duplex detected on port %d, transmission halt may occur\n=
+",
+-			      port);
+-		if (tx_late_col !=3D 0) {
+-			/* Transmission halt with late collisions */
+-			dev_crit_once(dev->dev,
+-				      "TX late collisions detected, transmission may be halted on po=
+rt %d\n",
+-				      port);
+-		}
+-		ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &status);
++	if (lue_ctrl & SW_VLAN_ENABLE) {
++		ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
+ 		if (ret)
+ 			return ret;
+-		if (status & SW_VLAN_ENABLE) {
+-			ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
+-			if (ret)
+-				return ret;
+-			ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
+-			if (ret)
+-				return ret;
+-			if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
+-			    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
+-				/* Transmission halt with Half-Duplex and VLAN */
+-				dev_crit_once(dev->dev,
+-					      "resources out of limits, transmission may be halted\n");
+-			}
++
++		ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
++		if (ret)
++			return ret;
++
++		if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
++		    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
++			/* Transmission halt with Half-Duplex and VLAN */
++			dev_crit_once(dev->dev,
++				      "resources out of limits, transmission may be halted\n");
+ 		}
+ 	}
++
++	return ret;
++}
++
++int ksz9477_errata_monitor(struct ksz_device *dev, int port,
++			   u64 tx_late_col)
++{
++	u8 status;
++	int ret;
++
++	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
++	if (ret)
++		return ret;
++
++	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status)
++	      =3D=3D PORT_INTF_SPEED_NONE) &&
++	    !(status & PORT_INTF_FULL_DUPLEX)) {
++		ret =3D ksz9477_half_duplex_monitor(dev, port, tx_late_col);
++	}
++
+ 	return ret;
+ }
+=20
+--=20
+2.34.1
+
 
