@@ -1,119 +1,217 @@
-Return-Path: <netdev+bounces-117027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316B794C65C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:38:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52A5294C663
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 23:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 618961C22203
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:38:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA307B2244B
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 21:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C1D15A862;
-	Thu,  8 Aug 2024 21:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNzZOTNc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FDC71465BA;
+	Thu,  8 Aug 2024 21:42:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641302F23;
-	Thu,  8 Aug 2024 21:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785A915B0FC
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 21:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723153122; cv=none; b=qPxR59M5Lz2Sk+dZqsPg7PAO8PQHDK/Js96kdsSqIHesFdryd92801In3duB3ZTc1Kt1sEh0U2KmYXjPSeIXewd8D5KBf9pW38gxRG1mdabE4t+9srvOQfDzlAtpaC7tgqx0vLrgPYNmAtVM5zmH/EA7XpTb4SHYB44yPsplfBk=
+	t=1723153371; cv=none; b=ILu89XRzGPMhJ9zcEaS1CjhyrElHHdMOngW2mymEmMiMvw++E4oB6lbg2xhhrl9V6hV9Dr+Z2mwsLu+SQ92H9lzQLz9J2uN0EI7V0/OzYNQ1nqs95KbjL23Tn56grZgygSNPoibBPdFQi4hWUiYO+e5Ihs7DQ8z9O0REzBfPjYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723153122; c=relaxed/simple;
-	bh=kOoVeCQRzz5AEUzNBWPxw4tJpCN8l/YGJXAKuoLdmy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MkuPssMTel0jrNepwOkBnYMP97RJpnnerkqK3nQDA2aKKVvK5zybkkUfehdgIQs/Jc/zmagX2bWTC8fDajYxsGwS0WV23GwVLD6HGV8eAYww9XZQlu6Gjc8SkqoWJzeyiZ3x0YV7e4PLMgqXsBE+hsKJ9T4jsHD6Vfq//a17BOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNzZOTNc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B38F0C32782;
-	Thu,  8 Aug 2024 21:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723153122;
-	bh=kOoVeCQRzz5AEUzNBWPxw4tJpCN8l/YGJXAKuoLdmy8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XNzZOTNca4FvaUnhia8RoUWo4GJJZV+LBzM3V6NhHnmk5Od6CQg4Nmfnpwo0dlsdj
-	 A2meofjwULYCPbuKaQlUjb6LKZbZCkE+9mJ9MIN7hGbzPsY4Cku03pCIcH8ShHS+3b
-	 39X4E51AKXEwldgRpeljVYgDTBbsPGTkKCHH4ieMYUnymQbU6y+Pa6v1bfusqv6wa7
-	 zDJHgVEx7JUOO7eMAgNJcCFNdDcBOkbmPvo2C57rPPxmVQobPCoWebcB6bzUaV4Qap
-	 vnj/aGHgnglb3g5I67NmtpF4aV0FSmcsvRZ6eEbSfqB1YZALowMnIvAWYcskiGN6jC
-	 6UnXuOlOQAVRg==
-Date: Thu, 8 Aug 2024 15:38:40 -0600
-From: Rob Herring <robh@kernel.org>
-To: Danila Tikhonov <danila@jiaxyga.com>
-Cc: krzk+dt@kernel.org, conor+dt@kernel.org, andersson@kernel.org,
-	konradybcio@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, rafael@kernel.org,
-	viresh.kumar@linaro.org, kees@kernel.org, tony.luck@intel.com,
-	gpiccoli@igalia.com, ulf.hansson@linaro.org, andre.przywara@arm.com,
-	quic_rjendra@quicinc.com, davidwronek@gmail.com,
-	neil.armstrong@linaro.org, heiko.stuebner@cherry.de,
-	rafal@milecki.pl, macromorgan@hotmail.com, linus.walleij@linaro.org,
-	lpieralisi@kernel.org, dmitry.baryshkov@linaro.org,
-	fekz115@gmail.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 08/11] arm64: dts: qcom: Add SM7325 device tree
-Message-ID: <20240808213840.GA2186890-robh@kernel.org>
-References: <20240808184048.63030-1-danila@jiaxyga.com>
- <20240808184048.63030-9-danila@jiaxyga.com>
+	s=arc-20240116; t=1723153371; c=relaxed/simple;
+	bh=tuT0u0AMfYCSTSh/I1baAP9AXjthsIPnqMsk9MVGhtM=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=nNJrQjLpZvdtNXTc04Yzh7Pm4QjAhGrWmB4TL/WRKcvKQP9QaJcVNuZd3dTW84qZ2OGG9bDcagVbfofZDOUvauR4wNkRWRQRd4jTAzk/hJW02N9W0iBoJ4Q+T2/H1Zhk86G4UtI73v1oVGF1frtrcgOOjBVJDR7TUP8RTBzOxUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from smtpclient.apple (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 6BC177D064;
+	Thu,  8 Aug 2024 21:42:48 +0000 (UTC)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240808184048.63030-9-danila@jiaxyga.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
+ larger than MTU user packets
+From: Christian Hopps <chopps@chopps.org>
+In-Reply-To: <ZrTPyM3V7JKca6SZ@hog>
+Date: Thu, 8 Aug 2024 17:42:37 -0400
+Cc: Christian Hopps <chopps@chopps.org>,
+ devel@linux-ipsec.org,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <75B597AE-43D8-4A41-AF3E-7169C696FEC6@chopps.org>
+References: <20240804203346.3654426-1-chopps@chopps.org>
+ <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
+ <m2a5hr7iek.fsf@ja-home.int.chopps.org> <ZrHjByjZnnDgjvfo@hog>
+ <m2le1aouzf.fsf@ja-home.int.chopps.org> <ZrIDfN2uFpktGJYD@hog>
+ <m2a5hnnsw8.fsf@ja-home.int.chopps.org> <ZrTH665G9b3P054t@hog>
+ <3BAC517C-C896-489F-A7E8-DE5046E38073@chopps.org> <ZrTPyM3V7JKca6SZ@hog>
+To: Sabrina Dubroca <sd@queasysnail.net>
+X-Mailer: Apple Mail (2.3774.600.62)
 
-On Thu, Aug 08, 2024 at 09:40:22PM +0300, Danila Tikhonov wrote:
-> From: Eugene Lepshy <fekz115@gmail.com>
-> 
-> The Snapdragon 778G (SM7325) / 778G+ (SM7325-AE) / 782G (SM7325-AF)
-> is software-wise very similar to the Snapdragon 7c+ Gen 3 (SC7280).
-> 
-> It uses the Kryo670.
-> 
-> Signed-off-by: Eugene Lepshy <fekz115@gmail.com>
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
-> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
->  arch/arm64/boot/dts/qcom/sm7325.dtsi | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->  create mode 100644 arch/arm64/boot/dts/qcom/sm7325.dtsi
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm7325.dtsi b/arch/arm64/boot/dts/qcom/sm7325.dtsi
-> new file mode 100644
-> index 000000000000..5b4574484412
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/qcom/sm7325.dtsi
-> @@ -0,0 +1,17 @@
-> +// SPDX-License-Identifier: BSD-3-Clause
-> +/*
-> + * Copyright (c) 2024, Eugene Lepshy <fekz115@gmail.com>
-> + * Copyright (c) 2024, Danila Tikhonov <danila@jiaxyga.com>
-> + */
-> +
-> +#include "sc7280.dtsi"
-> +
-> +/* SM7325 uses Kryo 670 */
-> +&CPU0 { compatible = "qcom,kryo670"; };
-> +&CPU1 { compatible = "qcom,kryo670"; };
-> +&CPU2 { compatible = "qcom,kryo670"; };
-> +&CPU3 { compatible = "qcom,kryo670"; };
-> +&CPU4 { compatible = "qcom,kryo670"; };
-> +&CPU5 { compatible = "qcom,kryo670"; };
-> +&CPU6 { compatible = "qcom,kryo670"; };
-> +&CPU7 { compatible = "qcom,kryo670"; };
 
-No PMU? Because PMUs are also a per CPU model compatible string.
 
-I fixed most QCom platforms recently.
+> On Aug 8, 2024, at 10:01, Sabrina Dubroca <sd@queasysnail.net> wrote:
+>=20
+> 2024-08-08, 09:35:04 -0400, Christian Hopps wrote:
+>>=20
+>>=20
+>>> On Aug 8, 2024, at 09:28, Sabrina Dubroca <sd@queasysnail.net> =
+wrote:
+>>>=20
+>>> 2024-08-08, 07:30:13 -0400, Christian Hopps wrote:
+>>>>=20
+>>>> Sabrina Dubroca <sd@queasysnail.net> writes:
+>>>>=20
+>>>>> 2024-08-06, 04:54:53 -0400, Christian Hopps wrote:
+>>>>>>=20
+>>>>>> Sabrina Dubroca <sd@queasysnail.net> writes:
+>>>>>>=20
+>>>>>>> 2024-08-04, 22:33:05 -0400, Christian Hopps wrote:
+>>>>>>>>>> +/* 1) skb->head should be cache aligned.
+>>>>>>>>>> + * 2) when resv is for L2 headers (i.e., ethernet) we want =
+the cacheline to
+>>>>>>>>>> + * start -16 from data.
+>>>>>>>>>> + * 3) when resv is for L3+L2 headers IOW skb->data points at =
+the IPTFS payload
+>>>>>>>>>> + * we want data to be cache line aligned so all the pushed =
+headers will be in
+>>>>>>>>>> + * another cacheline.
+>>>>>>>>>> + */
+>>>>>>>>>> +#define XFRM_IPTFS_MIN_L3HEADROOM 128
+>>>>>>>>>> +#define XFRM_IPTFS_MIN_L2HEADROOM (64 + 16)
+>>>>>>>>>=20
+>>>>>>>>> How did you pick those values?
+>>>>>>>>=20
+>>>>>>>> That's what the comment is talking to. When reserving space for =
+L2 headers we
+>>>>>>>> pick 64 + 16 (a 2^(<=3D6) cacheline + 16 bytes so the the =
+cacheline should start
+>>>>>>>> -16 from where skb->data will point at.
+>>>>>>>=20
+>>>>>>> Hard-coding the x86 cacheline size is not a good idea. And =
+what's the
+>>>>>>> 16B for? You don't know that it's enough for the actual L2 =
+headers.
+>>>>>>=20
+>>>>>> I am not hard coding the x86 cacheline. I am picking 64 as the =
+largest cacheline that this is optimized for, it also works for smaller =
+cachelines.
+>>>>>=20
+>>>>> At least use SMP_CACHE_BYTES then?
+>>>>=20
+>>>> Right, I have changed this work with L1_CACHE_BYTES value.
+>>>>=20
+>>>>>> 16B is to allow for the incredibly common 14B L2 header to fit.
+>>>>>=20
+>>>>> Why not use skb->dev->needed_headroom, like a bunch of tunnels are
+>>>>> already doing? No guessing required. ethernet is the most common, =
+but
+>>>>> there's no reason to penalize other protocols when the information =
+is
+>>>>> available.
+>>>>=20
+>>>> We can't use `skb->dev->needed_headroom`, b/c `skb->dev` is not
+>>>> correct for the new packets. `skb->dev` is from the received IPTFS
+>>>> tunnel packet. The skb being created here are the inner user =
+packets
+>>>> leaving the tunnel, so they have an L3 header (thus why we are only
+>>>> making room for L2 header). They are being handed to gro receive =
+and
+>>>> still have to be routed to their correct destination interface/dev.
+>>>=20
+>>> You're talking about RX now. You're assuming the main use-case is an
+>>> IPsec GW that's going to send the decapped packets out on another
+>>> ethernet interface? (or at least, that's that's a use-case worth
+>>> optimizing for)
+>>>=20
+>>> What about TX? Is skb->dev->needed_headroom also incorrect there?
+>>>=20
+>>> Is iptfs_alloc_skb's l3resv argument equivalent to a RX/TX switch?
+>>=20
+>> Exactly right. When we are generating IPTFS tunnel packets we need
+>> to add all the L3+l2 headers, and in that case we pass l3resv =3D
+>> true.
+>=20
+> Could you add a little comment alongside iptfs_alloc_skb? It would
+> help make sense of the sizes you're choosing and how they fit the use
+> of those skbs (something like "l3resv=3Dtrue is used on TX, because we
+> need to reserve L2+L3 headers. On RX, we only need L2 headers because
+> [reason why we need L2 headers].").
 
-Rob
+Sure.
+
+> And if skb->dev->needed_headroom is correct in the TX case, I'd still
+> prefer (skb->dev->needed_headroom + <some space for l3>) to a fixed =
+128.
+
+So dev->needed_headroom is defined as possible extra needed headroom.For =
+ethernet it is 12. It's not what we want.
+
+The actual MAC size value in this case is: dev->hard_header_len which is =
+14..
+
+(gdb) p st->root_skb
+$2 =3D (struct sk_buff *) 0xffff888012969a00
+(gdb) p (struct dst_entry *)$2->_skb_refdst
+$3 =3D (struct dst_entry *) 0xffff888012ef7180
+(gdb) p $3->deb
+$5 =3D (struct net_device *) 0xffff88800dca8000
+(gdb) p $5->needed_headroom
+$6 =3D 12
+(gdb) p $5->hard_header_len
+$7 =3D 14
+(gdb) p $5->min_header_len
+$8 =3D 14 '\016'
+
+We also have access to the IPTFS required header space by looking in the =
+tpl->dst...
+
+# L3 header space requirement for xfrm
+(gdb) p $3->header_len
+$4 =3D 40
+
+which in this case is 40 =3D=3D IP (20) + ESP (8) + GCM-IV (8) + IPTFS =
+(4)
+
+So what I think you're looking for is this:
+
+struct dst_entry *dst =3D skb_dst(tpl);
+
+resv =3D LL_RESERVED_SPACE(dst->dev) + dst->header_len;
+resv =3D L1_CACHE_ALIGN(resv);
+
+FWIW (not that much) this is 128 in the ethernet dev case :)
+
+# LL_RESERVED_SPACE()
+(gdb) p (14 + 12 + 16) & ~15
+$9 =3D 32
+
+# above + dst->header_len
+(gdb) p 40 + 32
+$10 =3D 72
+
+# aligned to L1_CACHE_BYTES
+(gdb) p (72 + 64) & ~63
+$12 =3D 128
+
+Thanks,
+Chris.
+
+>=20
+> --=20
+> Sabrina
+
+
 
