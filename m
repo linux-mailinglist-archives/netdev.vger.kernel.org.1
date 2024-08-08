@@ -1,135 +1,115 @@
-Return-Path: <netdev+bounces-116729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2C494B7BA
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:22:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F6594B7CC
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67F11C21D2D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:22:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9930228C81F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6438189BA1;
-	Thu,  8 Aug 2024 07:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fmu5rTyZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A4B18786F;
+	Thu,  8 Aug 2024 07:24:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44420189BAD
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 07:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3A97A724
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 07:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723101644; cv=none; b=M9BtCzBKOCKdC3qRFxB5OdS6fKngnmVziBXhBjJ/UucnpJoyyAkRW4tKLQA/T+8jddd4Hz6Lz5Oy/Tr2v1GZSYq2HkXgrqhN/Ef7e1CVrOETwJWdUtvOXEetnlGQAH/g1+mRBTxreNNbXa2oewdaAdgxE10tO0QENFnZ898q8eI=
+	t=1723101888; cv=none; b=EfqJMsmmXSre3rnpf6/iSy4gFpCXzOt5RBKwlWB07mJ8A30lV5PyE8+0402q2ct2VVie8XHxJoilU+yzK65gsufPnFfcIdV7FhDovOJNWqGibMV05lOgs+ejmFoBp0Q5GN8XjV8yHpKg723ie93ciIT+IxV45WqgTapTj9wKcWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723101644; c=relaxed/simple;
-	bh=a2QTM4YmmefzVNxyTiU8f/nPHpRT+z0Aq+zZodKDD3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gL/7Oh8GrgNzaNe6nZiqJ5C1NX6OzZ5evA7R+i7VpXMTZ8E56dDY6+CtOCJ6B4zXjGlFYa3jVqv/QvzeF/vMpJpMWg0BbY7pddO8Md0omYW5IT1bFY+EfzrVZ5ITsRboHUjtjIpGpa23nDOCQxbXUFZLdqRP8SB5CUc/UhmdySo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fmu5rTyZ; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723101643; x=1754637643;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=a2QTM4YmmefzVNxyTiU8f/nPHpRT+z0Aq+zZodKDD3A=;
-  b=Fmu5rTyZb6CXgw8R9kRvOX5Ps943vD97RVAWq9cyiVtJCD6nBqMhfXsq
-   vjgoKuIlf9177Fm50Ytn3+NKL8YCx6s/lM4Dj3By49ggmRs18ch//kVCE
-   BxBYXoEakMaKWRjw8MwWxl/4uJuntYXE7frB4T5TpPMmOOERVALFExvma
-   TMvUkEUVgzLBkoUYUZiJU4FdW/iJgK/4M2msOqI0oiIuQPGcPrWG83Msw
-   uNlDIESmS2RmoG9GLjiWy8ulre7JJnwlM9FYyK2pO+6hg6J7cFs0SowtP
-   UaOUo0w/1JzNN6akpdosQqlBqNBX6qMNny6VPwzB4eXzdOoKChq5sOAdn
-   w==;
-X-CSE-ConnectionGUID: wD9pIajDRoCcicK/vgUyqA==
-X-CSE-MsgGUID: aUMS5VZ9Qi6F3Rm2qV4VDw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21361390"
-X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
-   d="scan'208";a="21361390"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 00:20:43 -0700
-X-CSE-ConnectionGUID: DTJwXOX6T2GOc/cy3vn76w==
-X-CSE-MsgGUID: S8RDVoyyRFW1oE2VY44O8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
-   d="scan'208";a="57073518"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa008.fm.intel.com with ESMTP; 08 Aug 2024 00:20:40 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com,
-	sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com,
-	pio.raczynski@gmail.com,
-	konrad.knitter@intel.com,
-	marcin.szycik@intel.com,
-	wojciech.drewek@intel.com,
-	nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us
-Subject: [iwl-next v3 8/8] ice: init flow director before RDMA
-Date: Thu,  8 Aug 2024 09:20:16 +0200
-Message-ID: <20240808072016.10321-9-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
-References: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1723101888; c=relaxed/simple;
+	bh=8/g6Nhm0GzJ9zQc2zjMNsvUFQymgftA8MPCKewwX06U=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=NzymU+5zMR1ihHsok8LGZD8K/PUDQ/LnAIkxCFBUEM/Lmwq+ewIhXj+BCajguBnEvYXQG0zkJoZin4PG7SAE8in0L8iTmCcH+LYsDhZ/xA3b4cY9J63y/HS8fZUOowgBbRSuzVku4UzXBCPiDqosDMdFBDP6fdn9DK3UQTjKhhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp87t1723101850tqpeacff
+X-QQ-Originating-IP: OGrqM/Ol+496OQ0Na+uZbvgtt/HbQ8yvHj80NFEUAJU=
+Received: from smtpclient.apple ( [60.186.245.110])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 08 Aug 2024 15:24:08 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 17466223432688298513
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3814.100.5\))
+Subject: Re: [PATCH net] net: ngbe: Fix phy mode set to external phy
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <c98c7d2b-d159-4306-bd26-2999be45e1d0@lunn.ch>
+Date: Thu, 8 Aug 2024 15:23:58 +0800
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D0A7F7D6-38F9-4197-A1C4-3F484A8EC543@net-swift.com>
+References: <C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com>
+ <1e537389-7f4b-4918-9353-09f0e16af9f8@intel.com>
+ <4CF76B28-E242-47B2-B62C-4CB8EBE44E92@net-swift.com>
+ <c98c7d2b-d159-4306-bd26-2999be45e1d0@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3814.100.5)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-Flow director needs only one MSI-X. Load it before RDMA to save MSI-X
-for it.
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8f02b33adad1..2a3c6c29cccb 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5185,11 +5185,12 @@ int ice_load(struct ice_pf *pf)
- 
- 	ice_napi_add(vsi);
- 
-+	ice_init_features(pf);
-+
- 	err = ice_init_rdma(pf);
- 	if (err)
- 		goto err_init_rdma;
- 
--	ice_init_features(pf);
- 	ice_service_task_restart(pf);
- 
- 	clear_bit(ICE_DOWN, pf->state);
-@@ -5197,6 +5198,7 @@ int ice_load(struct ice_pf *pf)
- 	return 0;
- 
- err_init_rdma:
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- err_tc_indir_block_register:
- 	ice_unregister_netdev(vsi);
-@@ -5220,8 +5222,8 @@ void ice_unload(struct ice_pf *pf)
- 
- 	devl_assert_locked(priv_to_devlink(pf));
- 
--	ice_deinit_features(pf);
- 	ice_deinit_rdma(pf);
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- 	ice_unregister_netdev(vsi);
- 	ice_devlink_destroy_pf_port(pf);
--- 
-2.42.0
+> 2024=E5=B9=B48=E6=9C=887=E6=97=A5 20:58=EF=BC=8CAndrew Lunn =
+<andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Wed, Aug 07, 2024 at 01:42:06PM +0800, mengyuanlou@net-swift.com =
+wrote:
+>>=20
+>>=20
+>>> 2024=E5=B9=B48=E6=9C=886=E6=97=A5 19:13=EF=BC=8CPrzemek Kitszel =
+<przemyslaw.kitszel@intel.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>=20
+>>> On 8/6/24 10:25, Mengyuan Lou wrote:
+>>>> When use rgmmi to attach to external phy, set
+>>>> PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
+>>>> And it is does matter to internal phy.
+>>>=20
+>>> 107=E2=94=82  * @PHY_INTERFACE_MODE_RGMII: Reduced gigabit =
+media-independent interface
+>>> 108=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_ID: RGMII with Internal =
+RX+TX delay
+>>> 109=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_RXID: RGMII with Internal =
+RX delay
+>>> 110=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_TXID: RGMII with Internal =
+RX delay
+>>>=20
+>>> Your change effectively disables Internal Tx delay, but your commit
+>>> message does not tell about that. It also does not tell about why,
+>>> nor what is wrong in current behavior.
+>>>=20
+>>=20
+>> I will add it, when wangxun em Nics are used as a Mac to attach to =
+external phy.
+>> We should disable tx delay.
+>=20
+> Why should you disable TX delay?
+>=20
+> What is providing that delay? Something needs to add a 2ns delay. Does
+> the PCB have an extra long clock line?
+>=20
+
+Mac only has add the Tx delay=EF=BC=8Cand it can not be modified.
+
+So just disable TX delay in PHY.
+
+Mengyuan Lou=20
+
+>    Andrew
+
 
 
