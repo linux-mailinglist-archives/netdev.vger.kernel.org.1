@@ -1,215 +1,302 @@
-Return-Path: <netdev+bounces-116930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEDA894C1B8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:46:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DE694C1D2
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C9BFB25763
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 472F1289707
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA871552F5;
-	Thu,  8 Aug 2024 15:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6086C18FDD6;
+	Thu,  8 Aug 2024 15:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Rx/Yg8pp";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HLtefKZk"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lNs5drP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69BB1DA21
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723132011; cv=fail; b=H5Qvg29A334y1uSEdM56+fRWBic6OyNrFj144Dcv6WYLjTOof5pASEucKGQ51TNcIMbsmx+6qn3zX1DcWJo84YPlmYHPA4i3a1wgcgcQ44w2BpfEdRT+W8XWsJl1wKJ0jmYsNYPK3sxmH9VtO9jN1t+QL8CYB52BNYcgtuFlNUM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723132011; c=relaxed/simple;
-	bh=TgRbL1MzL9aUiDpj/sI7YVxa+YcSi+N9p0JHUbD0lRo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Zf6nFIGhVBv51TO0/E0ty7jCQL3GxL+nRIAoYBdM+aH3nHSqxGR5bNh2lhbUWdLUPbV6sFdasTxVQeBDpcqqCOvThnEI728xVHQyQ+5z9QW+scXAdnNXRyxes38nGiWTdJ2eJwNu3GdNo28lVC/+RLZK9gN5GelpIAhDUo1smWQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Rx/Yg8pp; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HLtefKZk; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723132008; x=1754668008;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=TgRbL1MzL9aUiDpj/sI7YVxa+YcSi+N9p0JHUbD0lRo=;
-  b=Rx/Yg8pp5P0c+PfledQ1brfANECfodP7wR+KuzPpz/TrNcL5ELuiPoN5
-   9p3GeTVTngH3RG1W8PlqXoMkEUuvYle8L/krNUHlVSgGGjOYcqaSeHlHM
-   BTGhdrJHfUilZslX80ibF/PLwIOuPoR45YhkBOxasuUxAIW135gkAfyhv
-   wOPUMuw4/jL8Dy+OcRUWy59RH2t31Fs3e2kRk3uoS9/Os5vIAW0t+3N0X
-   MLaYCpM5mLx2mAMQpWIIkI0s99eHUuwRvt+pSMArR8e+DUOBmKchRhKtC
-   Bc6o+GnHXXu/bpL81oZbF5zF7L3Dl77QzCVb5sgnjgjOBHzkXRlXhJDVG
-   A==;
-X-CSE-ConnectionGUID: /7NPunroTZiQLBHpSrnIrg==
-X-CSE-MsgGUID: 0N1WH9bqQxGsKfSldDiwPQ==
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="33152541"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Aug 2024 08:46:40 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 8 Aug 2024 08:46:30 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 8 Aug 2024 08:46:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wX+6dY+2YxAOjSPSwqKE0t39G9mTw6MzRq2WbcHCib6THfpYog9ZwB77f+dQUE/xrTFile9iLOlvUVWfrd+k5S+Fl1zcJKdlpHQhCgVnq4d660NxL4Bvxe1uYzue0yQz0IeA3Xw/P6xv3MRfmlL99A3T/hE/ztsdsGnQjdxdkyXyf47IRQoOs6BwQFy72K4zhx1Xg7EtNIh1xhAvak43oeVrqI4M3ChdeCO+tPQT2sZyVZJj+i5v+w7JVrHs2uD7pvYSG4fSMLlWu3gCK005gsU3s4FwysJ9kFnHTfxveMfD959/ivDNemEbrLMOV6xMtwUxSqVZcRWnCxCqThnVPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TgRbL1MzL9aUiDpj/sI7YVxa+YcSi+N9p0JHUbD0lRo=;
- b=Cb/cphKRiV/Bk0IyWsSqGFwl0ezMlPu7vh7oavz4ea00u7T6dU3vw7WbJYTtr21eYzTpX5xB2BxK0TOwrRdnaczsrivc5PpfPUVFWyDFO+riUZhzEaom3gGuY32orPDoXiDejJjJXMVtaxqdXkX7aXQZT7Fn/oWnknv/OHBo0vf33Rr5yAJ+psJE4c0TcuASFf0fWJj1UheCtOBFO9/9JEiMvU1Rw/TP8e+/ME83p5nC6qtD8O+9wYhQ56EzwqL5lGQnz50DAe+DRwMhoRoOcvgc0d6BGIqA4xs35IIEk83RugTpPENdMqPw61Y9rV/TS7KIInCYqHvvGQtCPGEoQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TgRbL1MzL9aUiDpj/sI7YVxa+YcSi+N9p0JHUbD0lRo=;
- b=HLtefKZkQ40NJ2nSoE2p63yJUpEO0ctJn8yVXoHTs3AJ0lTNYgmD1zrRABQVvfoT4f7Qx+36aPCBMZqsHqi5F97/nVKmgi4d35WnTJvBWYYUipCGIXfayzU1z6ZWcwY/Yr/M8IQsH950BS/Snv6nRmQBY7MGEyKUjB3isVDje8JyZ2MMe9+uHhQtGPNawBQYMQ7UdKPIx8IGt/pYcCB5RmspTGw0qch+v0BBmrkDoxk11rULmdI703ASECR2mPn8TtvHGtLR+Yd4Ko8EdlgByNm6AtwJhswj7GR+9mKtC2qlXGqeNiCE1xeGsCDT85Wm7330iUvggs4N/TSscPZoBA==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by CH3PR11MB7204.namprd11.prod.outlook.com (2603:10b6:610:146::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.29; Thu, 8 Aug
- 2024 15:46:26 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c%6]) with mapi id 15.20.7828.023; Thu, 8 Aug 2024
- 15:46:25 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <enguerrand.de-ribaucourt@savoirfairelinux.com>, <netdev@vger.kernel.org>
-CC: <Tristram.Ha@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
-	<hkallweit1@gmail.com>, <Woojung.Huh@microchip.com>, <kuba@kernel.org>,
-	<horms@kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split
- half-duplex monitoring function
-Thread-Topic: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split
- half-duplex monitoring function
-Thread-Index: AQHa6aW7r5mWP94f9EOD2QJDU2Vy1bIdgaeA
-Date: Thu, 8 Aug 2024 15:46:25 +0000
-Message-ID: <80730209b2e6a6288f0ce885c0ff3c04024c40a8.camel@microchip.com>
-References: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-In-Reply-To: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|CH3PR11MB7204:EE_
-x-ms-office365-filtering-correlation-id: 21c59107-7a3f-416b-c87f-08dcb7c142eb
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?aFJuTHoya1JuMDU0aEJ1V3RTTmNCaHZmWjdVTzloK3BtSlZ3SUM4b0FSZHJk?=
- =?utf-8?B?WTMvQ1VhdTlNUEpIdVhXRGRka1NXOFNVeVdKWFNBdVM3em0vSDRad1ozQXdS?=
- =?utf-8?B?V2hXOWNxZGV2SUlzMTJ3V0FtRE94YXpGVDkwSXdzcGo2TGdOUHpXMXFKZTJ0?=
- =?utf-8?B?LzJEMWtOTE1aeEl2c2xVNFJKRThhaVZOcDNwb1UzMTFrbWN4QnFGTlAvYkp0?=
- =?utf-8?B?M0NaQkQyVmV1bk1Wb2pKa0svYzBaTGltVFp2OFNSWkFpTDJMK0RMeVpSMjNr?=
- =?utf-8?B?TkpmZ29CVHRzWVllY1FQZ2ZGYnAvY2lGOEY2dnBEUWtVNmQvTmJKejBJNGtn?=
- =?utf-8?B?VjdzNk93cjZ1QUw3L1VNYjBlNWRUMm1adUhEaHhwRWhlLzIwVURCcG9rNlk3?=
- =?utf-8?B?ejFLNkx3MDNlNTVhVVpyWGR6U0xPZFp2aG0rWTgvZ09iL20ydTFPd2drYjFV?=
- =?utf-8?B?SjNOeFNJeXNKM2xQNDVIMGVCSmtQQUY4Z1NIb1JBRjErOThUbDFUNzZYWDdw?=
- =?utf-8?B?MDNZWlR5Qk9KUkpQWXBrODdLYmNsb2ZkcVExbDRPNGl1SnJsL3RGQlNkUjhr?=
- =?utf-8?B?L2czV1ZRV0FLMDMyNmVFRzBpaVFWc2hTanFUU0pQMVVuS0hiaktzanEwQjlS?=
- =?utf-8?B?dlhDUk1BZjQrU3l2QWEya3cyOXV2Rm9QK050cGVXbFNXUTNMckNIVFlaTXo4?=
- =?utf-8?B?d0Jsck8yWWhLNitLMFV6eHFGYXB6ZmJGUWRwRjNpSmtaM0k3Y09UOTVoZVFN?=
- =?utf-8?B?dWtMM29ZZ1J0bGRqaG1pRUphWHpsUWk4VHJ0ajRpMUwyZ2V6aU0wVDR2OUNW?=
- =?utf-8?B?MjI3bCtING5vZERPMXE1WG0xeVo0clVXNnlhUmN0WjBhTHkreGI3aDAyTjZK?=
- =?utf-8?B?ZzNJK0ZDclExOEtLdFJpb1V6T05vV29FQlNaMVdFU0JkS0JFcXY1N05qeldW?=
- =?utf-8?B?R3VuYkFyckxUN05scno1bHlLUVpmN3ZyVHdVWUhyNGpPSFgrTC84QTZzZCs0?=
- =?utf-8?B?OFUwTnRtN1FtOGJWS01raHorUGMxMlQ2YlB4cVV2UWVXNzhWSkdBNzhDSjhS?=
- =?utf-8?B?MGRZeGdqYU1SWVdrQ3VIVkpzMWk3SWd5cHpHaGR3b2tUelVhZmc5aHdEZkdv?=
- =?utf-8?B?WXFIUlVxZmxiT2czbnN0MWZISFRhQStFeXM3dXRaNm54Y2pXbHpvMGdubWxI?=
- =?utf-8?B?ZWZsWFJGQTJRZWRzSmk4Z3RaMnBNRm04N0NJNVRPaEQxWTdRUm9qQk5lSllk?=
- =?utf-8?B?MU5TMXpuUDVjYTlWZ2NjbVNERk5DSFlkS29mTFhONWZBVjNnZmo4VmMxLy9C?=
- =?utf-8?B?Y0U0RVVIbGtFNnZoTUxRMHgxTFlaMnlNS2luM2kzMjBLL2puRXQwWCtRWXhD?=
- =?utf-8?B?VWNrMU1taW9xWTFvVUhZTUdTWUVQeHlncjlRME9waTMxalZDZW1BOU1YNHhy?=
- =?utf-8?B?WUJOTlJJOVVTTU1Ud2VOSG43Y0VnVzE4c3FkVndOZUR5clFpNU5BUjJSUjJT?=
- =?utf-8?B?TDJudWg3aEUxTDd0aXkzVVp6YkdZcWczb1FTQTZWMTJmTTFsbjB2Wm5OL2dh?=
- =?utf-8?B?TXprc3ZLSFRpQ284dEVuTXlWRTNyMEhVZThDY2ZGelJ0SEQxTCtHdEJMUFRP?=
- =?utf-8?B?Tk01Qkh3NTArazNjelZVMzM2NVJKUjRoWk1LYWZDaEwvbW1WMFg3WUJsRXNz?=
- =?utf-8?B?NzlyS2lXZXp4dTVwU0doZENrbzloR3UrTnVISzJYL2Y3QmdyUEsrenVyaHRD?=
- =?utf-8?B?M0drdElXUG5TVVpWSFFkN0tXcjBJcnRMYnZBOGt6cDNlQ25MckdwbWFQSmhi?=
- =?utf-8?B?ZlFoMTNINWc1cDZPcmZxcWdlTEVOMUppTzBnUVh0bWpzQ2hCOERqbVhhSnBL?=
- =?utf-8?B?dkkydDE0YnpiQ1RKbEJXVVdpNVdSN28rSkkwSzVmMGxOT3c9PQ==?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TkxHdFJSWkZSMWFmVENRS005bmphK2Faeng3cDBVTWplWEYyT21mVGtkbzJU?=
- =?utf-8?B?UWxXK2JqWGduME9kWUdodDJhWFZCcktwb0ZzcTJnYzlza0dveTdFZzRnQytl?=
- =?utf-8?B?dmtkcXhkdlcwTzBtY2gxdTV3djZmUFlCYmNnak9WbE9CNkZrT3NvM20wMGp5?=
- =?utf-8?B?aTBuOUk3dTMzb1V3U3Z6RUNPbmhtREV6RHExWjJ1WGVzVDZhUmVBODk5alJP?=
- =?utf-8?B?MWFFTHRMdUdKR1VDS2xTcTFNSnd1ZC91aVpSYXBJRTc3Y2hPNzIxQXlVU0k4?=
- =?utf-8?B?RFkyZ1Rxalk5eUdzcGFWRmYzVDFGS0lyWWRqd1FoQkVaTFNuMmFzOWFQVmx1?=
- =?utf-8?B?NkxVU3FMU2RKUWhKcXZCRkZINHkvUXRCZnhudGU5TEFvRUR1aDJZdmNBTTNs?=
- =?utf-8?B?aTdEeHkxNUN5ZzArMjI5YTJoZDA4YjZ6NWtIOHVQR2gybDdlK0Frb3puTUp3?=
- =?utf-8?B?RFpCdkRJd2VvbFBCajkxQmQ1ZDVJSEUvelFDcHdIQlg0cHd4V3ZUeStzUmh2?=
- =?utf-8?B?aGcwVU84SFZhbVphRWM2QzQwamNhU0FJeUx2YlNhaDhIUjNEQlB0TlpwOFNI?=
- =?utf-8?B?T0FHU3praHpWZDFFTEhIWmFKaUhLQTZDT0R6czhERHlxYy9MQkhTMkk5clRm?=
- =?utf-8?B?Mm1CcEptRENtM3ozclkxUkVtdmlIZENQT1BUWDdpY2RPYTBScUMvb29tV3Ev?=
- =?utf-8?B?N1dONGh1VjZyek1aSUhjakMyYVlBK2thQy9OT0tLcjEwUnBUeDliWVNzN3Z6?=
- =?utf-8?B?bHpwaGZseTFtc0RxSFNleEZHMHo0YnlQd3ZuZWxPNkJlOStFTlNFeitRa2kx?=
- =?utf-8?B?Z2I4eXRVVmZjTzg2ZmRTbjRyN1Z5c2lzY3F0Z2JBZHdiNVhpYlhGY3R4ek1v?=
- =?utf-8?B?T2t4aWVwUkpaRUo5d1hPOGVKTnJzSGxaVzZXeG5NRlJOOEpUaUZ3dDBWSW9H?=
- =?utf-8?B?bWtEWTJlaFNsbHR0OGE5QTVBajY2QUhrc0FvTHVxd2FKazhBVEdqeFk1U0Zp?=
- =?utf-8?B?NTNtVnZ4WEpSTFhseTFxWXozRDUraE9hWEFValRnWXduVVJ3bWtHRUVON1lo?=
- =?utf-8?B?aDlKbys3UDBiR0oyRGM4SVd3anNSLzNHVS91Z1pkZ1h2cVU2R1JrMGd1WVF1?=
- =?utf-8?B?ZzVQcVI1L0FHUi9xVDFrSXBQRi9oMGJOeDJUUUJLaFk0UnhyVC93WkJoREwx?=
- =?utf-8?B?ZUg3QnRNb2pMZmtTa2hjaHhhUWlFNWEyVDdiQURURzN5ckQzb1E0b2FMbWNn?=
- =?utf-8?B?RzlhSElKbzFHb0U5Kzg3MjZhNjNoUjBnL3FNaStnUUVyZFY3RXZlNnNPVkFp?=
- =?utf-8?B?WDlJbGRsWFcwMGl3c0ZTZGhpcUlNSk9UdTFqWTZRcDRZWGMxR3lnSUpKZWlC?=
- =?utf-8?B?bWpzTWVjYkg5YkxiYVBaVEprb1FHTGc5Rmt0L1AyU01QSkJxTHZhRDBseWRu?=
- =?utf-8?B?dUxpUHg0STFpRmFFamd5VW1PcU5pUFVGU2JHcTBIdFlZOUh2R3hwRUxjMUg1?=
- =?utf-8?B?clpSS1hHaExLRTcrbHRmbGFITkFTcTNWMG5WNTdFdGhqSjJOWXJBeWdPUlRH?=
- =?utf-8?B?RzJvMWJvM01YNHBSV2NEUEFjL2JzOUdlb1dsVk5LYldhMmFEUFpRb21aWWw0?=
- =?utf-8?B?ZzFHSE9OOUhzU2o4d1RtOTYrbnB5WHN5T2ZmVEY0eHh0anl6S1NmSDV1OU1Y?=
- =?utf-8?B?MFBBVFYyVitHam5GTGxxYmxNY1Irang3UmVvUldpV0cwUzhUajd2Zjk4ajVa?=
- =?utf-8?B?R1FMUGZVYk45bVlsN2pjTllqbTN5VFZkTlFsb3BzcTNtRlVNVDBSZkc5S2E1?=
- =?utf-8?B?ZzRjYUVSWVFOTk9ranQ2aDNXcGVsaWhqLzJjdk90RjM5MUMvRURjaVhpdnJJ?=
- =?utf-8?B?VFUyTHJLbkpTTEk4WENxMFZOUm02cW9kNDJxL1Rpdkp2SWVNc0dXbEpOb0R0?=
- =?utf-8?B?Y3R4MC9DQXZGYTV5S05EN0NkTUdCTkpoVEhVQ3RiMzZqeUJDMUgzQ1NpRGJh?=
- =?utf-8?B?bjRTQjlTTnZFY3lERnVYZlN6QmZyQmZXelBtSitFS1FWS01BdSsxUGJTblpE?=
- =?utf-8?B?ZGMvYjZVMlI2Ty9hUmg5QkMyS1lkZlFLd2VhSHlwSE5jekg3OExNakNNdmt2?=
- =?utf-8?B?QVNZWGVmdnk5OEw1aXRFVVpKSXEzMWdlWEVpZmQ4OUJvNkxiUWJKY0UxK1pO?=
- =?utf-8?B?UGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A09C3A6E1093344A81788489E225AA76@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A6F18B475;
+	Thu,  8 Aug 2024 15:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723132131; cv=none; b=f9U4JKXxvAXI09tgl/iHZs4ahGw4yRCLmKbX9OsxaHjcy6G/n3B0+3Y2uoXRuf+LoL3/rC9CG2o4J9i7RCrE8RWZFsas2ZgddMUSnP47awsJNHGE5eykaRnp+qKfGL7fCqFhMC9SaBnqnoXAs9DyGgT+tUenke4Y7T4ECLZJWCU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723132131; c=relaxed/simple;
+	bh=8amnAIQvrAmtGLiSLYh5ew/M/mrExMmsWac507zvq1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RQMr8trD1q1HDdVr8yo2AFPsAKl9vRQYmFhY1pxuq4kaMKbwLzF9WxtjBFzC1UZegFWK2PFvSHkDSc/tT0IrGDj2ZNTixmy3mykcIbYx1ghUrz5KiE5AtNrgOmjIXTQKePI7lJ6uMq6AVWAoUUWLlq6oN638uACCb7Pv4B+kXgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lNs5drP3; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay7-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::227])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id F3346C00B9;
+	Thu,  8 Aug 2024 15:47:38 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPA id 5DF8B20002;
+	Thu,  8 Aug 2024 15:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1723132050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i4wABtpkSzc5tFb+lJXKOeY3r/pTQyr6215hlMiVe/E=;
+	b=lNs5drP3kU2uEgXOItXmEdki87IDpRCpol9zcLiWBOIe9hN/m1kap//X+1cV/8qCYoaUq7
+	SUJatnWjbwIDryzIzsDKqzi0oiptwit65qGDSE4Jbojf1OLfCnEfuczOikF+t6GA0JTIaj
+	FveWLEoV1oYreyOvejxbj8cWOZgyeQmKAqY/geBMoe8sx82dnwT8tTEknZf1XtrIu9Vf5f
+	tj8jOjMx8TK3iTO2vb1fMPTod29ok1cnuararGgsqfdezdwvgNSWpA6g1Ocf3mdrb9dcjZ
+	OEF2e3JXsVRxWohxX0xk1EnyzNaGefMGamD/CHnY218Mg7NuNmLdEQkEcnHNwA==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v5 0/8] Add support for the LAN966x PCI device using a DT overlay
+Date: Thu,  8 Aug 2024 17:46:49 +0200
+Message-ID: <20240808154658.247873-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21c59107-7a3f-416b-c87f-08dcb7c142eb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2024 15:46:25.8880
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wv5ecEStuDPPlGDwI6pjj7AhX2Uy7CUtXi7M+H8L6URcTDewYjfnxoHv5CeSRfS7fBWG2zdavPpFcyMnl5Dmiz9NM3ZLc/6iP5FLCJianqk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7204
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-T24gVGh1LCAyMDI0LTA4LTA4IGF0IDE1OjE0ICswMDAwLCBFbmd1ZXJyYW5kIGRlIFJpYmF1Y291
-cnQgd3JvdGU6DQo+IEVYVEVSTkFMIEVNQUlMOiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBh
-dHRhY2htZW50cyB1bmxlc3MgeW91DQo+IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQ0KPiANCj4g
-SW4gb3JkZXIgdG8gcmVzcGVjdCB0aGUgODAgY29sdW1ucyBsaW1pdCwgc3BsaXQgdGhlIGhhbGYt
-ZHVwbGV4DQo+IG1vbml0b3JpbmcgZnVuY3Rpb24gaW4gdHdvLg0KPiANCj4gVGhpcyBpcyBqdXN0
-IGEgc3R5bGluZyBjaGFuZ2UsIG5vIGZ1bmN0aW9uYWwgY2hhbmdlLg0KPiANCj4gU2lnbmVkLW9m
-Zi1ieTogRW5ndWVycmFuZCBkZSBSaWJhdWNvdXJ0IDwNCj4gZW5ndWVycmFuZC5kZS1yaWJhdWNv
-dXJ0QHNhdm9pcmZhaXJlbGludXguY29tPg0KDQpBY2tlZC1ieTogQXJ1biBSYW1hZG9zcyA8YXJ1
-bi5yYW1hZG9zc0BtaWNyb2NoaXAuY29tPg0KDQo=
+Hi,
+
+This series adds support for the LAN966x chip when used as a PCI
+device.
+
+For reference, the LAN996x chip is a System-on-chip that integrates an
+Ethernet switch and a number of other traditional hardware blocks such
+as a GPIO controller, I2C controllers, SPI controllers, etc. The
+LAN996x can be used in two different modes:
+
+- With Linux running on its Linux built-in ARM cores.
+  This mode is already supported by the upstream Linux kernel, with the
+  LAN996x described as a standard ARM Device Tree in
+  arch/arm/boot/dts/microchip/lan966x.dtsi. Thanks to this support,
+  all hardware blocks in the LAN996x already have drivers in the
+  upstream Linux kernel.
+
+- As a PCI device, thanks to its built-in PCI endpoint controller.
+  In this case, the LAN996x ARM cores are not used, but all peripherals
+  of the LAN996x can be accessed by the PCI host using memory-mapped
+  I/O through the PCI BARs.
+
+This series aims at supporting this second use-case. As all peripherals
+of the LAN996x already have drivers in the Linux kernel, our goal is to
+re-use them as-is to support this second use-case.
+
+Therefore, this patch series introduces a PCI driver that binds on the
+LAN996x PCI VID/PID, and when probed, instantiates all devices that are
+accessible through the PCI BAR. As the list and characteristics of such
+devices are non-discoverable, this PCI driver loads a Device Tree
+overlay that allows to teach the kernel about which devices are
+available, and allows to probe the relevant drivers in kernel, re-using
+all existing drivers with no change.
+
+This patch series for now adds a Device Tree overlay that describes an
+initial subset of the devices available over PCI in the LAN996x, and
+follow-up patch series will add support for more once this initial
+support has landed.
+
+In order to add this PCI driver, a number of preparation changes are
+needed:
+ - Patches 1, 2 introduce the LAN996x PCI driver itself, together with
+   its DT overlay and the related MAINTAINTER entry.
+
+ - Patches 3 to 8 allow the reset driver used for the LAN996x to be
+   built as a module. Indeed, in the case where Linux runs on the ARM
+   cores, it is common to have the reset driver built-in. However, when
+   the LAN996x is used as a PCI device, it makes sense that all its
+   drivers can be loaded as modules.
+
+Compare to the previous iteration:
+  https://lore.kernel.org/lkml/20240805101725.93947-1-herve.codina@bootlin.com/
+this v5 series mainly:
+  - Do improvements in LAN966x PCI driver
+  - Add some 'Reviewed-by'
+
+Best regards,
+Hervé
+
+Changes v4 -> v4
+  - Patch 1
+    Add missing include files and keep pci_ids.h.
+    Remove IRQ_RETVAL() usage.
+    Use __free().
+    Remove the pdev->irq check.
+    Avoid local variables in devm_pci_dev_remove_intr_ctrl() and
+    lan966x_pci_load_overlay().
+    Use dev_err_probe().
+    Sort header includes in alphabetical order in dtbs file.
+
+  - Patch 3
+    Fix a typo in commit log.
+    Simplify modification done in device_node_get_syscon().
+    Use devm_add_action_or_reset().
+
+  - Patches 4, 5, 6 and 8
+    Add 'Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>'
+
+Changes v3 -> v4
+  - Patch 1 and 2 (v3 patch 6 and 7)
+    Move the driver from drivers/mfd to drivers/misc.
+
+  - Patch 4 and 5 (v3 patch 2)
+    Rework reset driver dependencies and module building support.
+    Split v3 patch into two distinct patches:
+      - patch 4, as suggested by Geert, add a dependency on the
+        LAN966x PCI device
+      - patch 5, allows to build the reset controller driver as a module
+
+  - Other patches
+    Except reordering, no changes
+
+Changes v2 -> v3
+  - Patches 1 and 5
+    No changes
+
+  - Patch 6 (v2 patch 18)
+    Add a blank line in the commit log to split paragraphs
+    Remove unneeded header file inclusion
+    Use IRQ_RETVAL()
+    Remove blank line
+    Use dev_of_node()
+    Use pci_{set,get}_drvdata()
+    Remove unneeded pci_clear_master() call
+    Move { 0, } to { }
+    Remove the unneeded pci_dev member from the lan966x_pci structure
+    Use PCI_VENDOR_ID_EFAR instead of the hardcoded 0x1055 PCI Vendor ID
+    Add a comment related to the of_node check.
+
+  - Patch 7 (v2 patch 19)
+    No changes
+
+  Patches removed in v3
+    - Patches 6 and 7
+      Extracted and sent separately
+      https://lore.kernel.org/lkml/20240620120126.412323-1-herve.codina@bootlin.com/
+
+    - Patches 9
+      Already applied
+
+    - Patches 8, 10 to 12
+      Extracted, reworked and sent separately
+      https://lore.kernel.org/lkml/20240614173232.1184015-1-herve.codina@bootlin.com/
+
+    - Patches 13 to 14
+      Already applied
+
+Changes v1 -> v2
+  - Patch 1
+    Fix a typo in syscon.h (s/intline/inline/)
+
+  - Patches 2..5
+    No changes
+
+  - Patch 6
+    Improve the reset property description
+
+  - Patch 7
+    Fix a wrong reverse x-mass tree declaration
+
+  - Patch 8 removed (sent alone to net)
+    https://lore.kernel.org/lkml/20240513111853.58668-1-herve.codina@bootlin.com/
+
+  - Patch 8 (v1 patch 9)
+    Add 'Reviewed-by: Rob Herring (Arm) <robh@kernel.org>'
+
+  - Patch 9 (v1 patch 10)
+    Rephrase and ident parameters descriptions
+
+  - Patch 10 (v1 patch 11)
+    No changes
+
+  - Patch 11 (v1 patch 12)
+    Fix a missing ret value assignment before a goto in .probe()
+    Limit lines to 80 columns
+    Use indices in register offset definitions
+
+  - Patch 13 and 14 (new patches in v2)
+    Add new test cases for existing of_changeset_add_prop_*()
+
+  - Patch 15 (v1 patch 14)
+    No changes
+
+  - Patch 16 (new patches in v2)
+    Add tests for of_changeset_add_prop_bool()
+
+  - Patch 17 (v1 patch 15)
+    Update commit subject
+    Rewrap a paragraph in commit log
+
+  - Patch 18 (v1 patch 16)
+    Use PCI_IRQ_INTX instead of PCI_IRQ_LEGACY
+
+  - Patch 19 (v1 patch 17)
+    No changes
+
+Clément Léger (5):
+  mfd: syscon: Add reference counting and device managed support
+  reset: mchp: sparx5: Allow building as a module
+  reset: mchp: sparx5: Release syscon when not use anymore
+  reset: core: add get_device()/put_device on rcdev
+  reset: mchp: sparx5: set the dev member of the reset controller
+
+Herve Codina (3):
+  misc: Add support for LAN966x PCI device
+  MAINTAINERS: Add the Microchip LAN966x PCI driver entry
+  reset: mchp: sparx5: Add MCHP_LAN966X_PCI dependency
+
+ MAINTAINERS                            |   6 +
+ drivers/mfd/syscon.c                   | 138 ++++++++++++++--
+ drivers/misc/Kconfig                   |  24 +++
+ drivers/misc/Makefile                  |   3 +
+ drivers/misc/lan966x_pci.c             | 215 +++++++++++++++++++++++++
+ drivers/misc/lan966x_pci.dtso          | 167 +++++++++++++++++++
+ drivers/pci/quirks.c                   |   1 +
+ drivers/reset/Kconfig                  |   4 +-
+ drivers/reset/core.c                   |   2 +
+ drivers/reset/reset-microchip-sparx5.c |  11 +-
+ include/linux/mfd/syscon.h             |  16 ++
+ 11 files changed, 569 insertions(+), 18 deletions(-)
+ create mode 100644 drivers/misc/lan966x_pci.c
+ create mode 100644 drivers/misc/lan966x_pci.dtso
+
+-- 
+2.45.0
+
 
