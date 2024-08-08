@@ -1,143 +1,139 @@
-Return-Path: <netdev+bounces-116755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D767F94B9A8
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:27:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFBB94B9AB
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B4E4B20F59
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:27:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB3832844B0
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DDE146D55;
-	Thu,  8 Aug 2024 09:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B1D147C91;
+	Thu,  8 Aug 2024 09:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/G0irLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82957146A93
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 09:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD35C146D55;
+	Thu,  8 Aug 2024 09:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723109234; cv=none; b=NIXiJZMXQx3XY8Bt/eN35QeIyzCzsNPJkH+9uotJANKuuuCOLOhZT8PcNaxF68uAHJBqNAFp8bPXAEJ+WWt02/szcTefnCqszvrpuDGULt0gdGv9zFGW7uGpgP1pmMuH0P9Lyq//ctdNkY54ToHB7bNwsqbX4VKYgFOdNigmSWU=
+	t=1723109337; cv=none; b=R01GnZaIuIUdyVi69GFIKq8uCOkvRUmCd0kWGHS/Wrn1Y3t3M7eA4rc820EHosk0BiUpqrwbxaoMJuO9zHyoLnPbRumFKXfYaEI0W5O4e9Og1xfEC5cA6+4iETPrUHLqNadAbGhlMWQcE8MyVHHFS+oYoU10jATHLCqCMAFCEwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723109234; c=relaxed/simple;
-	bh=ofUY4fHIGHwdbuyxuBH2E8l/Uy3Hr0R9eHchYytkqEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=urlK+IgCYt7ExBku6tVCmf2b0DTUpXBrrb07uhk8ZuYtlvM8kw7OV3haBY2pLkVOLS4xLnbewoTxSE0PQgjF6qKYBrerjzW1P7lM4siXUf4zjWYLoEqbfUU0SJE9j5LavpYECq9N3hjlyDAR19TcsdBHb5Gy8K14Qt3Xy+qBv4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-208-vsmIdODnMQWKDx5fFfq-Vw-1; Thu,
- 08 Aug 2024 05:27:01 -0400
-X-MC-Unique: vsmIdODnMQWKDx5fFfq-Vw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 283ED1977006;
-	Thu,  8 Aug 2024 09:27:00 +0000 (UTC)
-Received: from hog (unknown [10.39.192.51])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F1BF71955F30;
-	Thu,  8 Aug 2024 09:26:56 +0000 (UTC)
-Date: Thu, 8 Aug 2024 11:26:54 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Christian Hopps <chopps@chopps.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, devel@linux-ipsec.org,
-	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Message-ID: <ZrSPXqJlck_DCnTi@hog>
-References: <20240804203346.3654426-1-chopps@chopps.org>
- <20240804203346.3654426-11-chopps@chopps.org>
- <Zq__9Z4ckXNdR-Ec@hog>
- <ZrIJ0d6x3pTslQKn@gauss3.secunet.de>
- <m2jzgsnm3l.fsf@ja-home.int.chopps.org>
+	s=arc-20240116; t=1723109337; c=relaxed/simple;
+	bh=ZSJC+ElrR0KuJIX8DXufJLcKD19TF5flBV8yJMH4etE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c0NPnUWlxr4R6TJo6gEo+8yNorvmyQSzIsdXEvLyVze6BM2uLIYborkfFvLVNLdOc8Q1aEbgT9Y31hEvsejzZZzGpvAXSNFKWTsj+2IyAENCPPY7kWTR3UKCfbISYwAXgzTsyd4ZXcq7GNIHv+Lr4g/oaOUwUuvnIgrMGNfv9Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/G0irLd; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3db1e4219f8so506553b6e.3;
+        Thu, 08 Aug 2024 02:28:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723109335; x=1723714135; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tTXttIbpKY7MN+ev3dcFwcWi8Hz7dGmwuXBqb7RF9P8=;
+        b=Y/G0irLdXZFVpsjgP2x9i4ATtt00lvyJHjUDAsG/pNd9IJBJcHewD+89ZE84474RVf
+         18Y13vQkPGYWRVtsR6WZ3z7hZ1LQqNoCSTXKcK8xCFC29ZVgU4gExCnt9Sxr0mFxxc/W
+         R2Xl3/HO87QWaYP6l1bFPpCTZG6+cl2WGVtOE+N8COqYjxQzmDiUD/JRemRy1BAbh0XR
+         IMa4lFpW0aE8F8AVJilFtDPP4JtvgEkrzMc+a7WicZAb1DKmbRFcaUB31dstR8Nuzmiv
+         TpBdrMigU2LJrapMcziEMyYJ7uAVKv4v2Wm/OQdvtGCuaTmdsIU8JdwlpzgYPZRUvNCK
+         dm/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723109335; x=1723714135;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tTXttIbpKY7MN+ev3dcFwcWi8Hz7dGmwuXBqb7RF9P8=;
+        b=vMdClLo+tPcI4VvqX9nwulbU7At4/nIGhcorj5VMxSMET7gkz21SDwmes/4vSdxanm
+         UDb9qqhhme8myIn3VF7gPWP7pXy2hBghJKO4hTiE6TO20q21Jz9ZykmhTmGw5FrliUtR
+         vb0gRLRsJO9louEvnWCcCUUo2umg4Zhbl1bRMQTv7oh2OAWgS2TDI9jEWN6wKDEztmX0
+         RtG3H5Gj3a8BS869eO5x5NIarnMmEbyRPR5xn4fURhI5kcpGfHbwucxTXfGK7yRD//Gc
+         yDlmX4wEfE6aULlRJLfjAd3fIA5ieYiAo0fFKPq/of57dKGJMhJ2kbZSusF7JdHBE0Rg
+         lAmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXP7MxkNemTE8RZ6b88w24w1a9IpVrzQwEikYdHh1KwTOU/VuD/jPPo1NbG/d11hhoFUSeA13cPz02QBfhxBwTZadx/QzHQ3UcgY0B3YP/XB2NFC9g8RXQN67CJmYCYLDol8V8mwfxIoP0OA6KANMFJ+WaxsWFWfiSDIpl+xRMgRw==
+X-Gm-Message-State: AOJu0YxffOhUjv1jmPaSp1FSSeHv5DsMngfNumVpMtRM1qunttGNU1KN
+	kTupV+45P+OJ93o4vJ53wFW745XwSh7gh1GYIeXdxcJ39WI6+LWFzql3QDOWA521sZ1EelPkpfl
+	hn3YvhAcca5Rc9CM0NSbDY4eRahrD0PtLfLo=
+X-Google-Smtp-Source: AGHT+IELeAEaCYCuwKauWQXUSejmhg8TXmGjaShYGhkXGpm2rHcwLDaVZ7fwoGSLtsnHtZeQXbuQLXpQClVNfU+Z0oY=
+X-Received: by 2002:a05:6808:16a0:b0:3dc:1b09:55c9 with SMTP id
+ 5614622812f47-3dc3b41d26cmr1592841b6e.12.1723109334667; Thu, 08 Aug 2024
+ 02:28:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <m2jzgsnm3l.fsf@ja-home.int.chopps.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+References: <20240806132606.1438953-1-vtpieter@gmail.com> <20240806132606.1438953-6-vtpieter@gmail.com>
+ <0ebe8136f9d088fc9968e5438af5640382c024ac.camel@microchip.com>
+In-Reply-To: <0ebe8136f9d088fc9968e5438af5640382c024ac.camel@microchip.com>
+From: Pieter <vtpieter@gmail.com>
+Date: Thu, 8 Aug 2024 11:28:43 +0200
+Message-ID: <CAHvy4AoSJb24ZX4QjFS7UJ2a1nXXnfu7v-7p6FNyC_jCwADA6Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/5] net: dsa: microchip: apply KSZ87xx family
+ fixes wrt datasheet
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	linux@armlinux.org.uk, conor+dt@kernel.org, Woojung.Huh@microchip.com, 
+	robh@kernel.org, krzk+dt@kernel.org, f.fainelli@gmail.com, kuba@kernel.org, 
+	UNGLinuxDriver@microchip.com, marex@denx.de, edumazet@google.com, 
+	pabeni@redhat.com, pieter.van.trappen@cern.ch, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-2024-08-07, 15:40:14 -0400, Christian Hopps wrote:
->=20
-> Steffen Klassert <steffen.klassert@secunet.com> writes:
->=20
-> > On Mon, Aug 05, 2024 at 12:25:57AM +0200, Sabrina Dubroca wrote:
-> > >=20
-> > > > +/**
-> > > > + * skb_copy_bits_seq - copy bits from a skb_seq_state to kernel bu=
-ffer
-> > > > + * @st: source skb_seq_state
-> > > > + * @offset: offset in source
-> > > > + * @to: destination buffer
-> > > > + * @len: number of bytes to copy
-> > > > + *
-> > > > + * Copy @len bytes from @offset bytes into the source @st to the d=
-estination
-> > > > + * buffer @to. `offset` should increase (or be unchanged) with eac=
-h subsequent
-> > > > + * call to this function. If offset needs to decrease from the pre=
-vious use `st`
-> > > > + * should be reset first.
-> > > > + *
-> > > > + * Return: 0 on success or a negative error code on failure
-> > > > + */
-> > > > +static int skb_copy_bits_seq(struct skb_seq_state *st, int offset,=
- void *to,
-> > > > +=09=09=09     int len)
-> > >=20
-> > > Probably belongs in net/core/skbuff.c, although I'm really not
-> > > convinced copying data around is the right way to implement the type
-> > > of packet splitting IPTFS does (which sounds a bit like a kind of
-> > > GSO).
-> >=20
-> > I tried to come up with a 'GSO like' variant of this when I did the
-> > initial review last year at the IPsec workshop. But it turned out
-> > that things will get even more complicated as they are now.
-> > We did some performance tests and it was quite compareable to
-> > tunnel mode, so for a first implementation I'd be ok with the
-> > copy variant.
+On Wed 7 Aug 2024 at 05:41, <Arun.Ramadoss@microchip.com> wrote:
+>
+> Hi Pieter,
+>
+> On Tue, 2024-08-06 at 15:25 +0200, vtpieter@gmail.com wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
+> >
+> > From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+> >
+> > The KSZ87xx switches have 32 entries and not 8. This fixes -ENOSPC
+> > errors from ksz8_add_sta_mac when configured as a bridge.
+> >
+> > Add a new ksz87xx_dev_ops structure to be able to use the
+> > ksz_r_mib_stat64 pointer for this family; this corrects a wrong
+> > mib->counters cast to ksz88xx_stats_raw. This fixes iproute2
+> > statistics.
+> >
+> > Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+> > ---
+> >
+> >  static void ksz9477_phylink_mac_link_up(struct phylink_config
+> > *config,
+> >                                         struct phy_device *phydev,
+> >                                         unsigned int mode,
+> > @@ -1262,12 +1297,12 @@ const struct ksz_chip_data ksz_switch_chips[]
+> > = {
+> >                 .dev_name = "KSZ8795",
+> >                 .num_vlans = 4096,
+> >                 .num_alus = 0,
+> > -               .num_statics = 8,
+> > +               .num_statics = 32,
+> >                 .cpu_ports = 0x10,      /* can be configured as cpu
+> > port */
+> >                 .port_cnt = 5,          /* total cpu and user ports
+> > */
+> >                 .num_tx_queues = 4,
+> >                 .num_ipms = 4,
+> > -               .ops = &ksz8_dev_ops,
+>
+> Why don't we rename ksz8_dev_ops also like KSZ88x3_dev_ops or
+> KSZ88xx_dev_ops, since it is now used only by KSZ8863 and KSZ8873
+> switches.
 
-Ok.
+Hi Arun, indeed that would make more sense. Will rename to
+ksz88x3_dev_ops, consistent with the ksz_is_* function names
+in ksz_common.h.
 
-> > > And there are helpers in net/core/skbuff.c (such as
-> > > pskb_carve/pskb_extract) that seem to do similar things to what you
-> > > need here, without as much data copying.
-> >=20
-> > In case we have helpers that will fit here, we should use them of
-> > course.
->=20
-> FWIW, The reason I didn't use pskb_extract() rather than the simple
-> iptfs_copy_create_frag() is because pskb_extract uses skb_clone on
-> the original skb then pskb_carve() to narrow the (copied) data
-> pointers to a subset of the original. The new skb data is read-only
-> which does not work for us.
->=20
-> Each of these new skbs are IP-TFS tunnel packets and as such we need
-> to push and write IPTFS+ESP+IP+Ethernet headers on them. In order to
-> make pskb_extract()s skbs writable we would have to allocate new
-> buffer space and copy the data turning them into a writeable skb
-> buffer, and now we're doing something more complex and more cpu
-> intensive to arrive back to what iptfs_copy_create_frag() did simply
-> and straight-forwardly to begin with.
-
-That only requires the header to be writeable, not the full packet,
-right? I doubt it would actually be more cpu/memory intensive.
-
---=20
-Sabrina
-
+Thanks, Pieter
 
