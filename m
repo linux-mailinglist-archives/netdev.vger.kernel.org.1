@@ -1,115 +1,198 @@
-Return-Path: <netdev+bounces-116690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE3B94B5F9
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:45:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED0B94B604
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B76AB21710
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:45:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBBD5283D17
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA38C2E400;
-	Thu,  8 Aug 2024 04:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D761A12DD88;
+	Thu,  8 Aug 2024 04:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EUzPzas7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wd8LIhoA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F91EBA3F
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEAB83A17
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723092330; cv=none; b=YywqqFfSgZPNqlh0TxA0swJ17lcdHGHKUku4SZOe2sIn6KEmOqtDHazDDF03hTihRmJday6cHVZf+x3crWzWgBo3o/d+JG7AZQbQwicmi0P7AnNhr8V9jeryVxFA3pSXfhLzQ5LgqVprbi0p6OEXVR3L3rIUHhlmDjmzveZ/SmA=
+	t=1723092857; cv=none; b=nuEZly7QUuCkbLqH9GV/jIz6jcUXqNvxAOrjFeMFIY7z6qlNbFVM+VUAkiijhEgT1Ao3z1qDU82/BH7i+xdDMcHjC/WaEwY68L9S02QptO8aZAfBoZRN5XMnZriK02hjWmtPZ1n7xnBWgPTbXt7kBAor6ySNZ0DL/FkhKKJ+ZXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723092330; c=relaxed/simple;
-	bh=tteIP/nQrSVflOrI7qFAg7RHiK3RF74Psvxbh5GXdrI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CWBkfSZGxuMl7wve8bRpS+p2s1Xsl78R7Ez41VoiBoXt5BP5Nq98AhpBiQK2FChqC31dIjugoegoK/BCBW0Nq7jw/Bb3dQEpbQMtHViVC5JDzRlUjoBjhwvrIHtkkCSinaTx1M+ZE7soJxEOLlZsL/+i8bFOKCIme2tpXt2C4uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EUzPzas7; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723092329; x=1754628329;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=veGOd6bM62X/hnwNsf2+7yOQByT67Ubh8iWpURtZ+cw=;
-  b=EUzPzas7A3v3vKRXx29otq5wDQybNXNE9lgozqyGkfAJLUAwnK65fn25
-   ess+9XgyvFyER6BACeIcazp5NFkk4P2pnzQIAi2yGrwIJYaVGSWgwXdPL
-   TnZKZCguUQMRWHUI0bU4POadVXcrfXGG6LGsr+pUMJ2owfUrb5c3MhivT
-   4=;
-X-IronPort-AV: E=Sophos;i="6.09,271,1716249600"; 
-   d="scan'208";a="319114421"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 04:45:27 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:50001]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.23:2525] with esmtp (Farcaster)
- id 3d91cd81-c5d1-4fd2-a50b-dd7406a8a140; Thu, 8 Aug 2024 04:45:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 3d91cd81-c5d1-4fd2-a50b-dd7406a8a140
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 04:45:26 +0000
-Received: from 88665a182662.ant.amazon.com (10.135.210.149) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 04:45:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <vineeth.karumanchi@amd.com>
-CC: <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <nicolas.ferre@microchip.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net] net: macb: Use rcu_dereference() for idev->ifa_list in macb_suspend().
-Date: Wed, 7 Aug 2024 21:45:15 -0700
-Message-ID: <20240808044516.12826-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <7a61eaff-3ea4-4eba-a11f-7c4caaef45dd@amd.com>
-References: <7a61eaff-3ea4-4eba-a11f-7c4caaef45dd@amd.com>
+	s=arc-20240116; t=1723092857; c=relaxed/simple;
+	bh=7YSzCk1x0lHqAwjDor8GeWE/OSdIDFIRLEbOD4s+Lvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LJgCb6FBo2TfVqzk0Rk+yPZUgiFerH61RgzASIXkkfIpW/O3tUqN4nsYT4M6pYJJo8IvNiCvOIE13azdTj+W8ZSATiJ24j9xIiq2zhg/RGDMempDtpanNyKOUrim4lsLGHWEspA69YpGg3qvrVd3EWc84ONn72Ahybsy/A9Vp+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wd8LIhoA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723092855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qGxD/J7yLslw467eIYb7KFvZb5Ntx0WCR07t6fDsHCo=;
+	b=Wd8LIhoAA05IUKik7LoO2U2favb25fMXkb+sAtSwphG0O5EkPxdhgqsFdY9tOqaFXBMCZl
+	hNGge4Xnt9wstxQqDViPhr+eDzDZTE5XB8K5VfBTVnLTsuW4//iNm5BjI5aeF/0bUy4SAo
+	MgUZn3qgh+RFonBrtw7rh/Vlf/NzooU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-hNpRSWJCO46RDWrUdtnEcQ-1; Thu, 08 Aug 2024 00:54:11 -0400
+X-MC-Unique: hNpRSWJCO46RDWrUdtnEcQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3688010b3bfso435317f8f.3
+        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 21:54:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723092850; x=1723697650;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qGxD/J7yLslw467eIYb7KFvZb5Ntx0WCR07t6fDsHCo=;
+        b=Ry5PAK07Kdq32l8cUZ0vcef7Pb1RthFoQcar96/nQy10V870VuT7jryB015eLRwWQM
+         9aGx1BrE4dihhTv1Ll2plo4AECxbjB6aJor7UzGT8ur11f0dJEvG0Wj857CAc3nZEozE
+         hM3ObMX0NiJGc8iHfl2NyQ2HJQjhteXpzM1oqWM0TiBfEtK7ZMqDZeviqi6WCiOB7Sne
+         xgab8AAgWOpH+UyTC6MTdibhdRpceSWkfypsBBI0uf7uAoNshano0Vs8W66eTVSGwEq9
+         wC4Q1xVOEdadvh0cyB8S78N9xsdj5MCcmgs6y1kbrzbZQyjeZ+c8iO9PR2bhOTWzKYm/
+         UYTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQhN64p2Emi8PfpEHdAcz1ouZyGy9N99zJHxnw8Y2hlETd7RGx/9TG1Vw7lwnLKIprCV0Af6SAcgYceTcdVFr/ue/K7koC
+X-Gm-Message-State: AOJu0YyF8FteoiDH9YBEYQTc5pB4BFNsK3YVWxzGR7W1YIuuMxlKCOT8
+	wJh7U7irqfc+QWpVSwtAAJPYpE2bIuQymxlHWGsTw0oS4jBlYL31Mtmtb+y6hfTsZ5zzGwYGv05
+	11KR5/hqzjmwu53J0+B6Rx8JFVznFLnLHBsORweanfeo66aA1DUkKfA==
+X-Received: by 2002:a5d:4f05:0:b0:368:3384:e9da with SMTP id ffacd0b85a97d-36d275ce9a7mr428245f8f.62.1723092850048;
+        Wed, 07 Aug 2024 21:54:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGxcuyBS6WGfohjX62xojVV6mMc4LlSUlv10jMb/ThanMzMeAKJEdX/KoyeeG9vRzfcx6bY1A==
+X-Received: by 2002:a5d:4f05:0:b0:368:3384:e9da with SMTP id ffacd0b85a97d-36d275ce9a7mr428232f8f.62.1723092849508;
+        Wed, 07 Aug 2024 21:54:09 -0700 (PDT)
+Received: from localhost (53.116.107.80.static.otenet.gr. [80.107.116.53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d2716befbsm594845f8f.27.2024.08.07.21.54.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 21:54:08 -0700 (PDT)
+Date: Thu, 8 Aug 2024 06:54:06 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	"toke@redhat.com" <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
+Subject: Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to GRO from
+ netif_receive_skb_list()
+Message-ID: <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+ <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+ <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-
-From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Date: Thu, 8 Aug 2024 09:53:42 +0530
-> Hi Kuniyuki,
-> 
-> On 08/08/24 9:30 am, Kuniyuki Iwashima wrote:
-> > In macb_suspend(), idev->ifa_list is fetched with rcu_access_pointer()
-> > and later the pointer is dereferenced as ifa->ifa_local.
-> > 
-> > So, idev->ifa_list must be fetched with rcu_dereference().
-> > 
-> 
-> Is there any functional breakage ?
-
-rcu_dereference() triggers lockdep splat if not called under
-rcu_read_lock().
-
-Also in include/linux/rcupdate.h:
-
-/**
- * rcu_access_pointer() - fetch RCU pointer with no dereferencing
-...
- * It is usually best to test the rcu_access_pointer() return value
- * directly in order to avoid accidental dereferences being introduced
- * by later inattentive changes.  In other words, assigning the
- * rcu_access_pointer() return value to a local variable results in an
- * accident waiting to happen.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BrzZC+NstxqLld0s"
+Content-Disposition: inline
+In-Reply-To: <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
 
 
-> I sent initial patch with rcu_dereference, but there is a review comment:
-> 
-> https://lore.kernel.org/netdev/a02fac3b21a97dc766d65c4ed2d080f1ed87e87e.camel@redhat.com/ 
+--BrzZC+NstxqLld0s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I guess the following ifa_local was missed then ?
+> Hi Alexander,
+>=20
+> On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
+> > cpumap has its own BH context based on kthread. It has a sane batch
+> > size of 8 frames per one cycle.
+> > GRO can be used on its own, adjust cpumap calls to the
+> > upper stack to use GRO API instead of netif_receive_skb_list() which
+> > processes skbs by batches, but doesn't involve GRO layer at all.
+> > It is most beneficial when a NIC which frame come from is XDP
+> > generic metadata-enabled, but in plenty of tests GRO performs better
+> > than listed receiving even given that it has to calculate full frame
+> > checksums on CPU.
+> > As GRO passes the skbs to the upper stack in the batches of
+> > @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
+> > device where the frame comes from, it is enough to disable GRO
+> > netdev feature on it to completely restore the original behaviour:
+> > untouched frames will be being bulked and passed to the upper stack
+> > by 8, as it was with netif_receive_skb_list().
+> >
+> > Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+> > ---
+> >  kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 38 insertions(+), 5 deletions(-)
+> >
+>=20
+> AFAICT the cpumap + GRO is a good standalone improvement. I think
+> cpumap is still missing this.
+>=20
+> I have a production use case for this now. We want to do some intelligent
+> RX steering and I think GRO would help over list-ified receive in some ca=
+ses.
+> We would prefer steer in HW (and thus get existing GRO support) but not a=
+ll
+> our NICs support it. So we need a software fallback.
+>=20
+> Are you still interested in merging the cpumap + GRO patches?
+
+Hi Daniel and Alex,
+
+Recently I worked on a PoC to add GRO support to cpumap codebase:
+- https://github.com/LorenzoBianconi/bpf-next/commit/a4b8264d5000ecf016da5a=
+2dd9ac302deaf38b3e
+  Here I added GRO support to cpumap through gro-cells.
+- https://github.com/LorenzoBianconi/bpf-next/commit/da6cb32a4674aa72401c74=
+14c9a8a0775ef41a55
+  Here I added GRO support to cpumap trough napi-threaded APIs (with a some
+  changes to them).
+
+Please note I have not run any performance tests so far, just verified it d=
+oes
+not crash (I was planning to resume this work soon). Please let me know if =
+it
+works for you.
+
+Regards,
+Lorenzo
+
+>=20
+> Thanks,
+> Daniel
+>=20
+
+--BrzZC+NstxqLld0s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZrRPagAKCRA6cBh0uS2t
+rK0FAQCwzPqU/L+8uGaMYta8IEEG8is+yCbIYKNDjVPfsabMBwD8DTd1Xi5dSpFL
+Lj2cZ9irZxRYcLz+GkmnAHDga5i2+Qk=
+=Oc7V
+-----END PGP SIGNATURE-----
+
+--BrzZC+NstxqLld0s--
+
 
