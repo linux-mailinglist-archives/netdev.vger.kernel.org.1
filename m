@@ -1,169 +1,214 @@
-Return-Path: <netdev+bounces-116687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624D394B5DA
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:17:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A4694B5E0
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B2B0282115
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:17:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695111F23A51
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A022450EE;
-	Thu,  8 Aug 2024 04:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A20D4653A;
+	Thu,  8 Aug 2024 04:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="TTRdXr8/"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Zf/2Nf/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2058.outbound.protection.outlook.com [40.107.100.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395CE9479;
-	Thu,  8 Aug 2024 04:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723090624; cv=none; b=Nq/z1HgdUYAAz6HXCPdy6+ZsNMCJy1vG0tXcY5PjJRGMd7szfS6K5R6KKvcZlf5ZQAczHh1yf8+HwDG6utjiievIKl31Tsvss6UtbiLzabE05pJyKc+YWLSCr6SQIbHnIQp8ciJ2dsG9luEK4t4fbQpczfkpuddi5FGCmV/1idU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723090624; c=relaxed/simple;
-	bh=0WNq99ZfluaYTPjXc7nR7wJqBcpbBEIkIYGyt86dLpw=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=HKvifwG/qzXU978+8+Bz7Q9hqsQf8jivTnti5zCpPFJCeqSRjcdlViBtTdAzaVoOGefIEj97wvMvA1ad6XNk/6tTM9wkgXBmq8XcMEsNHIPVYNjgcboP6melBnGyAx/0FDAfRoPP6OyaYrSMyD6rZe3LrcjyIZhZQhiR85qtwOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=TTRdXr8/; arc=none smtp.client-ip=108.61.200.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
-Received: from smtpclient.apple (unknown [199.33.119.15])
-	by kozue.soulik.info (Postfix) with ESMTPSA id 6B0232FE480;
-	Thu,  8 Aug 2024 13:17:34 +0900 (JST)
-DMARC-Filter: OpenDMARC Filter v1.4.2 kozue.soulik.info 6B0232FE480
-Authentication-Results: kozue.soulik.info; dmarc=fail (p=reject dis=none) header.from=soulik.info
-Authentication-Results: kozue.soulik.info; spf=fail smtp.mailfrom=soulik.info
-DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info 6B0232FE480
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
-	t=1723090654; bh=Mnh0ly5dKPF3Fv3lMn0gC47Yr+0psDOqag/mxp7ocS4=;
-	h=From:Subject:Date:References:Cc:In-Reply-To:To:From;
-	b=TTRdXr8/MM3EzFvktnfSRHB5fqvWfVKPp8Yv9CwOL1mK4rfCe9cCl5zxSchhToBGd
-	 0M6FaaGY5itao/iQFoVVStb/AHY3b68nNCbxlb1o1ePW/Vt4Ed19rCNGhRssrwtMS8
-	 QQRk7o+I3xSniL0vPzJp8OPvy7t308/78dJ8lzxw=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: ayaka <ayaka@soulik.info>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F079479
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723091039; cv=fail; b=Y+jyZyTbSptavNWjKG9C0nbm7bd6tRGVAmh3KgkBtH/u/0ZwucskntMNWefwac7gMHrZpEgT+9Wb5fFNw/UKpvSHvB40+vLsuf9Jm/scfF8vlPdEnQ27er1dmRxW6ClUplMF8P2XdycIObXebIjdNs8BEGtMsDxHApB+zCCJctg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723091039; c=relaxed/simple;
+	bh=AzqRCPQdFRI4C+aIXnBGAwz9o4shZ5oLYDD0m9PSsUY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GNaH301kuKctLGSu+0yu3SxHHkS4fWyvx7/7bbHJ6qliDeo8uB0lvVWuS0yecDIx9UchesfyzoZqB7SzPqOabsjgz9yIWRMlHsa/u4vfqNrNOV+aq1T91fDV/9R4qc2aVvSQxJdieY1CtaFnlGMmFOlfcv1FP8hU2Pg7aFVrLUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Zf/2Nf/Q; arc=fail smtp.client-ip=40.107.100.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=H2TMwzjpkMbwPYA7313qPbHwkm67FSdL3llvbKort3V61SxYVra1EiR/rxa/FFRIAvELn9iNO3kl6YSxilBeQy/JEcOF8/szvRSFia6AyCdpwUvzGljOX1jikPuAsDhxsd4JB9zBRH3HY3M/IHGlExxU0p6ZHhbxJLvjadJ/RXzDgNm4VIxotj9agmdAS96SL2iRKlWe49dezQUOj8E8wWJCblHnI4KN8lQLalz3ow9EAnH8dYY4jYjmvvInHty8bl4Dm2JdMrpaU6JTiepdEdF+BjU84VdMKGz0TW2LSeoUQg3FafUeFZGXIRTw4kRdNrbP+2EJJ3VC4sVXczCBzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X48L0Dad3tNek7DoT6vGe3nLKdEfHKnGio/DtmWhs0Y=;
+ b=qfvYEK04mRa1aLMdWyrdEn/sbSMv3J1muwuQUXuZ6nVaKrFDHGvyfK3IoLKl2wAPrbQ6jwprKbUaatqJbANx6tSJJ3El6H9VSOFjf8dJDKEWsT7xhFq4PHM20QvRg28D72yBFYExI0+fn/NGLjupReceRePNfBn1l9LKdk3Mn0bi6rK7h3Mb5Kc33s2EfwpupgDmkLDgmMuNekCYSrvV8owg2BDkEVfid5Se22Y4U4HPGCr/01oofHSfih+nJWlCSzUb7PvrDqxBTcETmJQNATJFbdMzSC58wtaHk3uB2+QR7AEvxaBak+LZNulPUX+U/IvHXwZtAo0FFy8nQyR6kA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X48L0Dad3tNek7DoT6vGe3nLKdEfHKnGio/DtmWhs0Y=;
+ b=Zf/2Nf/QzixWaMNvLv0l+lp/u35bnHUxuazX/Fx1z3uePzwehigjs3B8Cj/qbPpPTKkDhAtKSrJrU/w64T3SjwlJZCzb9djvpdjZTvUVfx97HrM4+uEd27FiSJWgN1B3KClhngar47m92AaibBw6IHe6ORrzbz10rZpDX+myhqc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
+ by DS0PR12MB8525.namprd12.prod.outlook.com (2603:10b6:8:159::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.14; Thu, 8 Aug
+ 2024 04:23:53 +0000
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::dd32:e9e3:564e:a527]) by BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::dd32:e9e3:564e:a527%5]) with mapi id 15.20.7828.023; Thu, 8 Aug 2024
+ 04:23:52 +0000
+Message-ID: <7a61eaff-3ea4-4eba-a11f-7c4caaef45dd@amd.com>
+Date: Thu, 8 Aug 2024 09:53:42 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net] net: macb: Use rcu_dereference() for
+ idev->ifa_list in macb_suspend().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20240808040021.6971-1-kuniyu@amazon.com>
+Content-Language: en-GB
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+In-Reply-To: <20240808040021.6971-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR02CA0009.apcprd02.prod.outlook.com
+ (2603:1096:3:17::21) To BL1PR12MB5946.namprd12.prod.outlook.com
+ (2603:10b6:208:399::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue index
-Date: Thu, 8 Aug 2024 12:16:46 +0800
-Message-Id: <6C9DA933-5EAA-4711-BF89-0B71834DA211@soulik.info>
-References: <CAF=yD-+2SnOzALmisVVBZAKNKrCMv07FdEDP1ov35APNMYOTew@mail.gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
-In-Reply-To: <CAF=yD-+2SnOzALmisVVBZAKNKrCMv07FdEDP1ov35APNMYOTew@mail.gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-X-Mailer: iPad Mail (21A351)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|DS0PR12MB8525:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a0c1e69-0f8b-43e8-55ab-08dcb761e8ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?amIrSlI0TGc0N3hVb2FhTUkvM0I3R0lPMnVzQUJOVjB1ZHcrY2ZoLzBjaFNt?=
+ =?utf-8?B?ditDSjBkc2RVcW9kZmpGVk85NU8rMHNMMjNERHJiQU0velNkY3JPNkpLU0Ro?=
+ =?utf-8?B?S0JtU21saWQzeTVmS053QmRDUGJCcEVKMWNwc1QrZGhaY2JXVmxtbjRSMTla?=
+ =?utf-8?B?bXIrcnpNQjc3V0lEVndDcGhHYmlrSk9PSjNHemc5ZkZEMDBQblVNR0VXdXNu?=
+ =?utf-8?B?ckEzZDdTaDF1Z1MvbWFVeGdBODBJQlV3R3hLQ3FrSmVXcGNEODBvK0wyM0xi?=
+ =?utf-8?B?MisxbEdadkZMNWtySHJhS3dEVVdOR3lUdzd4cy9XdndRN2E3SDBVb2VCeHgw?=
+ =?utf-8?B?M0Uxd0Qrb2piMVRFSjdodmd3UjJWMFIyNUhmU3Y5V29ocTQwYW9JNVgwZXVz?=
+ =?utf-8?B?Q0Z6K0FvZFNaaXZrT1hmeEp0SGxUZkZGaGlFSkErbjN6dnpzKzA3ZTBXdGNM?=
+ =?utf-8?B?SXpuT0VZV2ppNW13U0xLOXVPeEV3U1pMeDdtemg4UWhvdGZ2Z0NIRUVOSkJP?=
+ =?utf-8?B?TkV5QlNZSzhGdThVejRMa3lOejRUSzRRYzdjVTQycHNKSk50dkNnTUtMdGlq?=
+ =?utf-8?B?NE00ejB3clBZN0tkL05IMUQwdjN1aVd2Z2J5ODJ6TllLSktwQVc3WUYvWWo0?=
+ =?utf-8?B?ZVhsQ3JUbWZNamlPU2xaOUwxWUJ0MzMzWlF0VG9qV2toS1l1N09xdEM2RGE5?=
+ =?utf-8?B?L2IxQmYyRUFUT1E4UmhGNXg4M0ZyODRwdjdhcFVxT1A3bnc2TzF5VGZTSDNX?=
+ =?utf-8?B?eWlLY2JIczcrNktDczJvVENFL2VEZmNzckY3T1NpVDk4YWNYd1ZYTUwzOWZV?=
+ =?utf-8?B?aWVkbnZhWUVzSXRwYTNSZXBoUllhRk1NdnBlMkZJWkpnRlhzY20vUHg1UHFZ?=
+ =?utf-8?B?c0w2czlCajRHWXdySmJzTjdQT2ZlVmVGSmQ1OHdtQkJvQXJQY2t1VUVkRGtm?=
+ =?utf-8?B?YTB4cHl0WWRJN0VoU2lWemhGM3hpNlQ2WG93YjFlZzRVZ3hPcU5pVFo3ZHVz?=
+ =?utf-8?B?V2JUY2JGWVVqSFpqOGx0ZEN3OEMzZVNuN29CUmlEYWl2NEMxbXNOMVRiUDE1?=
+ =?utf-8?B?cjdVVlBkWElFa3J6WXI1aEU1em1iZTczUGtuR01NYnpid3hQUzR3elVwY2Jh?=
+ =?utf-8?B?OWNkY1hKT2I4dVI2cVkrMFR6RG5JTkltK1NDOVBIRDZMeFlGQVlTeXQwVEc2?=
+ =?utf-8?B?M3VSbVFid200OEF3djBZTFlycGp0Mmw3b2NMRE9CMkxMUzNzenZ3S0VLc1dD?=
+ =?utf-8?B?eU91clMrTENGUEY1ZWxrMjJoVXI4OENwbnNjMEhhU1BTaVlINHJocHkxSkhv?=
+ =?utf-8?B?dGRra1lkbzBVbnphMXB1dlBQWDRmMW10M0NKVmZuVm8xTEFsOWY1ZHo5STBn?=
+ =?utf-8?B?dm9OSnJDb1gvYUFyRnNIb05OYXM2S2EvbTZpN2JrQ05NV3l5YXIzcG0vdGVK?=
+ =?utf-8?B?aDI1L3V2V3JOMlFjK3N5T1o4OUZuUGp0bjN4ak9ONUVweEx0cERkdmdER1Zw?=
+ =?utf-8?B?OUlEZ0thQnAvbndPcjJaTVczRHVmMm5SQm53a0N6aWRCVm16Nnc3cng3U1U5?=
+ =?utf-8?B?RXRvM1h2ajZ2UWw1OUZQQjJLMmVuQ1YwdWpiQ21oU0ZiT1R0bktKTlUrNGRu?=
+ =?utf-8?B?bHo5S09sT0JBOVRWbEZLYVZjOXRpdE9ZT3VrSXhCTTJoWlJPdCtFSnFoRUxr?=
+ =?utf-8?B?U2dLQ3orOHFQTElBSnBZNXR6OUdtdXBHTXNlNTZxdjJJd1FzZUlCR1ZqZUwy?=
+ =?utf-8?Q?Qg/t04+heddCobKAuw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WDRGMVB5ZDJYUExFYUE3cXBUSWxnajNLdDdPVWpvWS8xcEdnajhtekRXLzNu?=
+ =?utf-8?B?RHFWS3RNaStQL2tEWXNScnZJaWxybWYyRTVKQjMweE55VmVEK3A1Y2hvYWxa?=
+ =?utf-8?B?RGxwZmFjWWpmYkRxRS8xZlIvSDBFOWJpcHN3K1BGVGVWOGZFSGx2ci9uNWRJ?=
+ =?utf-8?B?VHFwNmVaamswY0NvaU9sMWNvaitXZWxhSFpFNk9kTDA5MlYyTjF5MmhvMjRv?=
+ =?utf-8?B?MkpIdjg0NnNHZUgraFJXbGtrU0VXRHE0NnA4aXR3TG1oQkhiT2FlNmtnQURi?=
+ =?utf-8?B?UFRFZGFHRXFPcnlQZkMvODdWUWtVNWhocUVvWDZqWHhWWHVRSUlFTGdJYjdX?=
+ =?utf-8?B?N21LdlhucWd6L2RtVVdJK3JOakQ2dmlDajJ0ZDl4REd2RmI3NlFnQnk4ZHdM?=
+ =?utf-8?B?V2t6eE1CQkFZaDNadUxQL0FWclJuQVpSQVQyOWRHNkdTMXR3b3Z4bTBRb0dp?=
+ =?utf-8?B?endpTHNzOXFIVkh2Q2swcUZsLzUvVXJNd2M0dER3TlNRUjlmQXRYbEN2KzdX?=
+ =?utf-8?B?cDRFQmVrTE94LzZsb1hGbEhrWkRPNktvaVo4WXZBc3gvYU5Nc2ZHUDgwbm1K?=
+ =?utf-8?B?akRWaWNiejZhVDI5Y2JjUW0ydmc5bllxR2FRMk9LT2dMYXpTNUtrQThrWXhU?=
+ =?utf-8?B?SzM2OE5oclV5STZoWnVid29MQkhoL3hncEpzY0Q3NkJQTG5IVjQycFJSK3E5?=
+ =?utf-8?B?eThWNDJseE9IN2pNV0ovd1YzTFkzTnF1NXY4YVBLcUF6dG8wWHBMVmJuZ29u?=
+ =?utf-8?B?V0JnUUFwSVd2SUxFZ0NHZm50ZWJ3YzRWczBnc005dG5KQVJsRzlORnQ2dWNx?=
+ =?utf-8?B?SVRYOTZ2ZkZ2OGpqdU9oVkxhQ1c5aUdSS1Vtd21hc3g0SHRzZGJ0dXpLd3Ar?=
+ =?utf-8?B?QUwxcVdxQUZJTHVXTHNJV0lUd1VmZkJGWFlla25nbk9KRWp3L3BHVVc0clQw?=
+ =?utf-8?B?KzVWY3cwMlR6V1F6TFBTK0paOHZFbmtBVTNTMG5DMW4rV25BQ1RqWkJ0UjhF?=
+ =?utf-8?B?QU5GL1RkNDB2REtQSktWdnNmZnAxczU3ZFdlL3k4R3RheFhwRTYrb3NnaEdE?=
+ =?utf-8?B?TU5CdW5iQ2liWWdMVVVaVTZPaXZBZXB1NUVNOVlta1VabEV6M0JRUXdNbGN1?=
+ =?utf-8?B?OEgvYnhQbHdQMEhjM0dkeFBoR242RGdKU0FVNTdYWFpzQisvN1k2QzEvRUVT?=
+ =?utf-8?B?dy9VdG0ybU5ycGZ4T1ViQ2lvc1N5VUNCcmhKS1ZQTFhZaUJoZXdxaCtpaWhJ?=
+ =?utf-8?B?NHZvTjFHMzNLb1lsdWU0TFU0WHBFeXBqdnc5ZWo5d3ZvNlcwd3cydDBqT0dZ?=
+ =?utf-8?B?M2tmTVNQS3BFYWVtVTZvdnZNYndLSTZ1bjVRVFBZOGhkV3BWUmFYeGRWNkhp?=
+ =?utf-8?B?SkI3Mnh2c2J2aVVtSFErOCs5bnBCR1BEa1VTaUFnd2w1THBnYnZpL2UxN3Z2?=
+ =?utf-8?B?Yk9HZ2tjd2pOMGRlU0xtQVpINWIvUHU4emdreDllaWxROTJ3ZjJsYjVTeW5E?=
+ =?utf-8?B?NVRxT09vRmltanpuYUhWSStBUnU5ankrdW1sZ1dnK2ZxRVpuQ0lLMitHTUNH?=
+ =?utf-8?B?RDYxOHRJa1VocDZLakR5OEE1cjRYWnYzcUhsUk4xcHhtSklkVHJoeUwzTEsz?=
+ =?utf-8?B?dHJMWXFkZ2dPWjZXWnU4aWdOQnUya0pRaDF4Umt2SytISzJRemxVSGV2dHhh?=
+ =?utf-8?B?NU5DeU9pWmp3c1FaYm8vTmxncVd4RXB4VkdnM0ttZ3ArRThjVEtXUklEaUVr?=
+ =?utf-8?B?TitwclNCaVJtaHp4RXlGNHRYaUZyVEE4emZvMnRUa2pCTkdEUTgwOHBQS1h6?=
+ =?utf-8?B?N2k0NnFvRnNJQUtGeVA0azF5V0IxQ3d6cmpSYWx1OUdxSWpuQ2RNUHN6a1Nh?=
+ =?utf-8?B?MzVsU25sY1RqdlFEbkxRNTZSL2hQa3JQREhPN2tWQ2R3VzlwNWFNUkZaYS9D?=
+ =?utf-8?B?QnlNQjZaK3dLeFdnT2RYY1hodXVSdXYwMGlVSXdnSWVMdXordEg4dUZ2Zks3?=
+ =?utf-8?B?RUR6MEpjanU5aVEvaHpEN2kzTU1wUTFXTEJ1Z0JLaXQ4UnJuZldnVTJyVk9W?=
+ =?utf-8?B?dFBCUC9rNVg3Vjgrb3ZqRjZPTWtCUDZHa2hPTDBoYjhXOGxiWVR6UWV6Snhs?=
+ =?utf-8?Q?yWCKBwDSy6k61zwB5XLc+FXtm?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a0c1e69-0f8b-43e8-55ab-08dcb761e8ce
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2024 04:23:52.8235
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LyrYXS6Z8iv/7++ZwsGe9pa4tZS2xM0/waT8sI+HNRCdEc0vwaDbKfheb4sWI7WP
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8525
+
+Hi Kuniyuki,
+
+On 08/08/24 9:30 am, Kuniyuki Iwashima wrote:
+> In macb_suspend(), idev->ifa_list is fetched with rcu_access_pointer()
+> and later the pointer is dereferenced as ifa->ifa_local.
+> 
+> So, idev->ifa_list must be fetched with rcu_dereference().
+> 
+
+Is there any functional breakage ?
+
+I sent initial patch with rcu_dereference, but there is a review comment:
+
+https://lore.kernel.org/netdev/a02fac3b21a97dc766d65c4ed2d080f1ed87e87e.camel@redhat.com/ 
 
 
-Sent from my iPad
 
-> On Aug 8, 2024, at 11:13=E2=80=AFAM, Willem de Bruijn <willemdebruijn.kern=
-el@gmail.com> wrote:
->=20
-> =EF=BB=BF
->>=20
->>> In that case, a tc egress tc_bpf program may be able to do both.
->>> Again, by writing to __sk_buff queue_mapping. Instead of u32 +
->>> skbedit.
->>>=20
->>> See also
->>>=20
->>> "
->>> commit 74e31ca850c1cddeca03503171dd145b6ce293b6
->>> Author: Jesper Dangaard Brouer <brouer@redhat.com>
->>> Date:   Tue Feb 19 19:53:02 2019 +0100
->>>=20
->>>    bpf: add skb->queue_mapping write access from tc clsact
->>> "
->>>=20
->>> But I suppose you could prefer u32 + skbedit.
->>>=20
->>> Either way, the pertinent point is that you want to map some flow
->>> match to a specific queue id.
->>>=20
->>> This is straightforward if all queues are opened and none are closed.
->>> But it is not if queues can get detached and attached dynamically.
->>> Which I guess you encounter in practice?
->>>=20
->>> I'm actually not sure how the current `tfile->queue_index =3D
->>> tun->numqueues;` works in that case. As __tun_detach will do decrement
->>> `--tun->numqueues;`. So multiple tfiles could end up with the same
->>> queue_index. Unless dynamic detach + attach is not possible.
->>=20
->> It is expected to work, otherwise there should be a bug.
->>=20
->>> But it
->>> seems it is. Jason, if you're following, do you know this?
->>=20
->> __tun_detach() will move the last tfile in the tfiles[] array to the
->> current tfile->queue_index, and modify its queue_index:
->>=20
->>        rcu_assign_pointer(tun->tfiles[index],
->>                                   tun->tfiles[tun->numqueues - 1]);
->>        ntfile =3D rtnl_dereference(tun->tfiles[index]);
->>        ntfile->queue_index =3D index;
->>        rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
->>                                   NULL);
->>=20
->>        --tun->numqueues;
->>=20
->> tun_attach() will move the detached tfile to the end of the tfiles[]
->> array and enable it:
->>=20
->>=20
->>        tfile->queue_index =3D tun->numqueues;
->>        ....
->>        rcu_assign_pointer(tun->tfiles[tun->numqueues], tfile);
->>        tun->numqueues++;
->>=20
->=20
-> Ah right. Thanks. I had forgotten about that.
->=20
-> So I guess an application that owns all the queues could keep track of
-> the queue-id to FD mapping. But it is not trivial, nor defined ABI
-> behavior.
->=20
-> Querying the queue_id as in the proposed patch might not solve the
-> challenge, though. Since an FD's queue-id may change simply because
-Yes, when I asked about those eBPF thing, I thought I don=E2=80=99t need the=
- queue id in those ebpf. It turns out a misunderstanding.
-Do we all agree that no matter which filter or steering method we used here,=
- we need a method to query queue index assigned with a fd?
-> another queue was detached. So this would have to be queried on each
-> detach.
->=20
-Thank you Jason. That is why I mentioned I may need to submit another patch t=
-o bind the queue index with a flow.
+🙏 vineeth
 
-I think here is a good chance to discuss about this.
-I think from the design, the number of queue was a fixed number in those har=
-dware devices? Also for those remote processor type wireless device(I think t=
-hose are the modem devices).
-The way invoked with hash in every packet could consume lots of CPU times. A=
-nd it is not necessary to track every packet.
-Could I add another property in struct tun_file and steering program return w=
-anted value. Then it is application=E2=80=99s work to keep this new property=
- unique.
-> I suppose one underlying question is how important is the mapping of
-> flows to specific queue-id's? Is it a problem if the destination queue
-> for a flow changes mid-stream?
-Yes, it matters. Or why I want to use this feature. =46rom all the open sour=
-ce VPN I know, neither enabled this multiqueu feature nor create more than o=
-ne queue for it.
-And virtual machine would use the tap at the most time(they want to emulate a=
- real nic).
-So basically this multiple queue feature was kind of useless for the VPN usa=
-ge.
-If the filter can=E2=80=99t work atomically here, which would lead to unwant=
-ed packets transmitted to the wrong thread.=
+> Fixes: 0cb8de39a776 ("net: macb: Add ARP support to WOL")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>   drivers/net/ethernet/cadence/macb_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 11665be3a22c..dcd3f54ed0cf 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5250,8 +5250,8 @@ static int __maybe_unused macb_suspend(struct device *dev)
+>   	if (bp->wol & MACB_WOL_ENABLED) {
+>   		/* Check for IP address in WOL ARP mode */
+>   		idev = __in_dev_get_rcu(bp->dev);
+> -		if (idev && idev->ifa_list)
+> -			ifa = rcu_access_pointer(idev->ifa_list);
+> +		if (idev)
+> +			ifa = rcu_dereference(idev->ifa_list);
+>   		if ((bp->wolopts & WAKE_ARP) && !ifa) {
+>   			netdev_err(netdev, "IP address not assigned as required by WoL walk ARP\n");
+>   			return -EOPNOTSUPP;
 
