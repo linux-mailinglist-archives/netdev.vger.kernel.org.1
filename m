@@ -1,242 +1,142 @@
-Return-Path: <netdev+bounces-116931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A596F94C1BA
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:47:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16CEC94C1C2
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9AF61C22B8D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:47:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95651B2246E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53BB18E74A;
-	Thu,  8 Aug 2024 15:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67CC190067;
+	Thu,  8 Aug 2024 15:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="InzQ71Ud"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="V3S6EPii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35EA1552F5
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887F618C925;
+	Thu,  8 Aug 2024 15:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723132021; cv=none; b=GjI2nkOpSVetYY9voP5tuLGeRix9bEqjnAnHRE9wb9R5mB7W1XAG3RrOeflN/vfU0wgjy0CX2sfgtNmKBE2ZkegYmtmWPzgv/2r/08ltna3fg7wDri8TkGe4rgzcWNZy6JF6DYZexrYTZwip8hv6OuSrv06gXluyDBquBZMNoe0=
+	t=1723132064; cv=none; b=u9M/MHcUwYxjwqL/6TGPXEGLnOspI0TGdx4BY5lKaUWQcf+cQMTPzDQl89ML8TavxUBoNADiFLozdNjO/ZoO8UG7yZ0Z9x7ven6KrPmqwTKAzxnh1+kAtGrbrWPLn4b7J2SohfP8/mGQ6MqgFNu5Eg4eKmwk9cUD1U5mhUeqruc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723132021; c=relaxed/simple;
-	bh=KRzDxAn9RJpwk/tqZsp8jq+57KXYd5G7EshwjMGNWmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fk4YFGFt+9Fp/OzorCd0j9bIv4S5fpwEa5RpVtyysIBdzia9Y6QrNvhReYxHJx0AEghW2B/bbs3tXUz5hg0bXWBjji+ZWdCgabaTq1+ztAtbo4BUtPsML9Bu1exESVtDejrJvXEMkzONX0yb5115YKX/eNHxekkFxtsM8L/FJUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=InzQ71Ud; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7a9e25008aso138349866b.0
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 08:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723132018; x=1723736818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCeRekzLFEJrJabDQJ0cJLMedoMMEpBax/bjNXZ6/3U=;
-        b=InzQ71UdOqjtz7ueDLM96fHAW3LdgICpMmxxUhBwhnIMNAB1hPsv9JHIGsU7iE8Nvz
-         a7KOBnR7IJdxrfYsirPg76JdYY8sswlOGGR2nHah50zMWGH4WW96+0IqottOAIJwAas/
-         uKgvJO6Lu2YMkHrf8i60+LE/ZqWQoSV2KOd3U2C05DAWTADy6eJxpwAyJ8oDJ2LOXXy5
-         2Hnj7YzxADfZ7W8wUk1+N87AduG508EACiZJCpMfxtUkfwwg3aFA3xl2IQ4gA+G6GqNJ
-         9MuxmLlTwuhppW1YGMUtb61FxQ64dkiEGs8g+wKB9s91VbZUiiEIvJRxgGlBx6zoBG9d
-         mKCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723132018; x=1723736818;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PCeRekzLFEJrJabDQJ0cJLMedoMMEpBax/bjNXZ6/3U=;
-        b=BxtuO/dhDYsQ8mLpDGXt1ykVNsHQCfUHEg8lQD68bZ6h4ua1offbx+59XyigldWgTw
-         jqlj5Mj/jA56ruNgdx7XP3VEK4ySAFOjBP9JDJU636XhRQa9WPjJebuRaIYs6zkdP7D0
-         VJ+miCMcQQenS4J0+RN22a64vn40bA4bDspl2162IWZ8mSWXiu0QeuXWFxu7YN8R7KA/
-         n1W7IsaJcdyizdDEcm3Cam0xHYBm2V5cApU+Gms61p2lDxT9JCf0V2nPCPaqm3E9T1xr
-         Q+LjsHWcgXLR17bixUHdINp5pWMsjcJ0G1OlLoi18n81JMJlL/HkvaI7YOC1kkxYtd51
-         PAGw==
-X-Gm-Message-State: AOJu0YyKS5sNkV84YSrXHjahcjtgRUu8DAKbQGxhgy6llQn73oNwik2X
-	Atipazqpdo237bS479t0Ac0bEh/1WplOeNZdsUcaS72jL1hHsKfU9euIyyQ+9GM=
-X-Google-Smtp-Source: AGHT+IFahXkRcwGDkqHT+ox+Aw0u5vNDs9X2x46SevsSQ6ELzkieCAHfhpc+nmonFnJTbuurKx1UxQ==
-X-Received: by 2002:a17:906:6a04:b0:a7a:c106:364f with SMTP id a640c23a62f3a-a8090e3a702mr186924266b.43.1723132017762;
-        Thu, 08 Aug 2024 08:46:57 -0700 (PDT)
-Received: from localhost ([213.235.133.38])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9ec8ce3sm755599266b.216.2024.08.08.08.46.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 08:46:57 -0700 (PDT)
-Date: Thu, 8 Aug 2024 17:46:55 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v10 00/11] Introduce RVU representors
-Message-ID: <ZrTob59KQxzbcKhF@nanopsycho.orion>
-References: <20240805131815.7588-1-gakula@marvell.com>
+	s=arc-20240116; t=1723132064; c=relaxed/simple;
+	bh=l5FjrOQYITOyjVxkJZZpKt0ln/rAz+4YjTxwXZkgUv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dDO0WEFN0q8YPirrwJJpUPSQGC9K1KrFJyRIjueTDoNPbvwzlEK3IrVh+Iq2HzBRBbiD9FMoA6vywKOJKeaDH58ZbpCZCSWUlYSO8QCkSAAyIN1v5lsSTuGv6fFkrK4MjF3sZtyg6gJdokSNXhqlGhlzQZY64I94EuuLe6pfDzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=V3S6EPii; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 85E8820008;
+	Thu,  8 Aug 2024 15:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1723132061;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wQJa/uO3moMWBYvBHYzg1OLE26y6a/vVj3qon89DFNU=;
+	b=V3S6EPiiO7hU/lfn8GItH0QN2Fdt5nf+LNmqem3F3TMZAbIY2T5qQObXIbLsNPpyv023fn
+	UAFC7ezwmM5Gm6I/PjpsYwOijC3r/mUMyg5QA4/k+lcGXKydG/b4YjSGIZDNgx6k+VGhoO
+	uUb47YMFKF+0hFDRCjB4wphXKmkJF18m72HLKCyvxa3L8HaVyS3MZ/OJLGS9bH8314ddQW
+	cysoIFTXMbyL6vIZx1eLfTsf+rK0J3TlqqxBrVLpSejcewQgeu33tKolbremA6KzHuz+qA
+	y39A2JZovYEriiyS0PWB7cLrXMHm7K7NEXogFW+hWGdapQ6VPBVMVVzLZg5Dew==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>
+Subject: [PATCH v5 6/8] reset: mchp: sparx5: Release syscon when not use anymore
+Date: Thu,  8 Aug 2024 17:46:55 +0200
+Message-ID: <20240808154658.247873-7-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240808154658.247873-1-herve.codina@bootlin.com>
+References: <20240808154658.247873-1-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240805131815.7588-1-gakula@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Mon, Aug 05, 2024 at 03:18:04PM CEST, gakula@marvell.com wrote:
->This series adds representor support for each rvu devices.
->When switchdev mode is enabled, representor netdev is registered
->for each rvu device. In implementation of representor model, 
->one NIX HW LF with multiple SQ and RQ is reserved, where each
->RQ and SQ of the LF are mapped to a representor. A loopback channel
->is reserved to support packet path between representors and VFs.
->CN10K silicon supports 2 types of MACs, RPM and SDP. This
->patch set adds representor support for both RPM and SDP MAC
->interfaces.
->
->- Patch 1: Refactors and exports the shared service functions.
->- Patch 2: Implements basic representor driver.
->- Patch 3: Add devlink support to create representor netdevs that
->  can be used to manage VFs.
->- Patch 4: Implements basec netdev_ndo_ops.
->- Patch 5: Installs tcam rules to route packets between representor and
->	   VFs.
->- Patch 6: Enables fetching VF stats via representor interface
->- Patch 7: Adds support to sync link state between representors and VFs .
->- Patch 8: Enables configuring VF MTU via representor netdevs.
->- Patch 9: Add representors for sdp MAC.
->- Patch 10: Add devlink port support.
->
->
->Command to create PF/VF representor
->#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
->VF representors are created for each VF when switch mode is set switchdev on representor PCI device
->
->#devlink dev
->pci/0002:01:00.0
->pci/0002:02:00.0
->pci/0002:1c:00.0
+From: Clément Léger <clement.leger@bootlin.com>
 
-What are these 3 instances representing? How many PFs do you have? 3?
-How many physical ports you have?
+The sparx5 reset controller does not release syscon when it is not used
+anymore.
 
+This reset controller is used by the LAN966x PCI device driver.
+It can be removed from the system at runtime and needs to release its
+consumed syscon on removal.
 
->
->#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
->
-># ip link show
->	eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether 7e:58:2d:b6:97:51 brd ff:ff:ff:ff:ff:ff
+Use the newly introduced devm_syscon_regmap_lookup_by_phandle() in order
+to get the syscon and automatically release it on removal.
 
-What is this eth0? Why isn't it connected to any devlink port?
+Signed-off-by: Clément Léger <clement.leger@bootlin.com>
+Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+---
+ drivers/reset/reset-microchip-sparx5.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
->	r0p1v0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether 7e:5a:66:ea:fe:d6 brd ff:ff:ff:ff:ff:ff
->	r1p1v1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether de:29:be:10:9e:bf brd ff:ff:ff:ff:ff:ff
->	r2p1v2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether 4a:12:c7:a2:66:ad brd ff:ff:ff:ff:ff:ff
->	r3p1v3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether c2:b8:a8:0e:73:fd brd ff:ff:ff:ff:ff:ff
->
->
->~# devlink port
->pci/0002:1c:00.0/0: type eth netdev r0p1v0 flavour pcipf controller 0 pfnum 1 vfnum 0 external false splittable false
->pci/0002:1c:00.0/1: type eth netdev r1p1v1 flavour pcivf controller 0 pfnum 1 vfnum 1 external false splittable false
->pci/0002:1c:00.0/2: type eth netdev r2p1v2 flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
->pci/0002:1c:00.0/3: type eth netdev r3p1v3 flavour pcivf controller 0 pfnum 1 vfnum 3 external false splittable false
+diff --git a/drivers/reset/reset-microchip-sparx5.c b/drivers/reset/reset-microchip-sparx5.c
+index 69915c7b4941..c4fe65291a43 100644
+--- a/drivers/reset/reset-microchip-sparx5.c
++++ b/drivers/reset/reset-microchip-sparx5.c
+@@ -65,15 +65,11 @@ static const struct reset_control_ops sparx5_reset_ops = {
+ static int mchp_sparx5_map_syscon(struct platform_device *pdev, char *name,
+ 				  struct regmap **target)
+ {
+-	struct device_node *syscon_np;
++	struct device *dev = &pdev->dev;
+ 	struct regmap *regmap;
+ 	int err;
+ 
+-	syscon_np = of_parse_phandle(pdev->dev.of_node, name, 0);
+-	if (!syscon_np)
+-		return -ENODEV;
+-	regmap = syscon_node_to_regmap(syscon_np);
+-	of_node_put(syscon_np);
++	regmap = devm_syscon_regmap_lookup_by_phandle(dev, dev->of_node, name);
+ 	if (IS_ERR(regmap)) {
+ 		err = PTR_ERR(regmap);
+ 		dev_err(&pdev->dev, "No '%s' map: %d\n", name, err);
+-- 
+2.45.0
 
-You are missing physical port devlink instance here? Where is it?
-
-
->
->
->-----------
->v1-v2:
-> -Fixed build warnings.
-> -Address review comments provided by "Kalesh Anakkur Purayil".
->
->v2-v3:
-> - Used extack for error messages.
-> - As suggested reworked commit messages.
-> - Fixed sparse warning.
->
->v3-v4: 
-> - Patch 2 & 3: Fixed coccinelle reported warnings.
-> - Patch 10: Added devlink port support.
-
-
-When someone reviews your patchset at some version, you put him to cc
-list from that point. Why didn't you put me to cc list?
-
-
->
->v4-v5:
->  - Patch 3: Removed devm_* usage in rvu_rep_create()
->  - Patch 3: Fixed build warnings.
->
->v5-v6:
->  - Addressed review comments provided by "Simon Horman".
->  - Added review tag. 
->
->v6-v7:
->  - Rebased on top net-next branch.
->
->v7-v8:
->   - Implmented offload stats ndo.
->   - Added documentation.
->
->v8-v9:
->   - Updated the documentation.
->
->v9-v10:
->  - Fixed build warning w.r.t documentation.
->
->Geetha sowjanya (11):
->  octeontx2-pf: Refactoring RVU driver
->  octeontx2-pf: RVU representor driver
->  octeontx2-pf: Create representor netdev
->  octeontx2-pf: Add basic net_device_ops
->  octeontx2-af: Add packet path between representor and VF
->  octeontx2-pf: Get VF stats via representor
->  octeontx2-pf: Add support to sync link state between representor and
->    VFs
->  octeontx2-pf: Configure VF mtu via representor
->  octeontx2-pf: Add representors for sdp MAC
->  octeontx2-pf: Add devlink port support
->  octeontx2-pf: Implement offload stats ndo for representors
->
-> .../ethernet/marvell/octeontx2.rst            |  85 ++
-> .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
-> .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
-> .../ethernet/marvell/octeontx2/af/common.h    |   2 +
-> .../net/ethernet/marvell/octeontx2/af/mbox.h  |  74 ++
-> .../net/ethernet/marvell/octeontx2/af/npc.h   |   1 +
-> .../net/ethernet/marvell/octeontx2/af/rvu.c   |  11 +
-> .../net/ethernet/marvell/octeontx2/af/rvu.h   |  30 +-
-> .../marvell/octeontx2/af/rvu_debugfs.c        |  27 -
-> .../marvell/octeontx2/af/rvu_devlink.c        |   6 +
-> .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  81 +-
-> .../marvell/octeontx2/af/rvu_npc_fs.c         |   5 +
-> .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   4 +
-> .../ethernet/marvell/octeontx2/af/rvu_rep.c   | 464 +++++++++++
-> .../marvell/octeontx2/af/rvu_struct.h         |  26 +
-> .../marvell/octeontx2/af/rvu_switch.c         |  20 +-
-> .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
-> .../ethernet/marvell/octeontx2/nic/cn10k.c    |   4 +-
-> .../ethernet/marvell/octeontx2/nic/cn10k.h    |   2 +-
-> .../marvell/octeontx2/nic/otx2_common.c       |  58 +-
-> .../marvell/octeontx2/nic/otx2_common.h       |  84 +-
-> .../marvell/octeontx2/nic/otx2_devlink.c      |  49 ++
-> .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 305 +++++---
-> .../marvell/octeontx2/nic/otx2_txrx.c         |  38 +-
-> .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +-
-> .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  19 +-
-> .../net/ethernet/marvell/octeontx2/nic/rep.c  | 725 ++++++++++++++++++
-> .../net/ethernet/marvell/octeontx2/nic/rep.h  |  53 ++
-> 28 files changed, 1962 insertions(+), 227 deletions(-)
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->
->-- 
->2.25.1
->
->
 
