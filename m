@@ -1,229 +1,106 @@
-Return-Path: <netdev+bounces-116911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB57B94C112
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:26:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E8F194C0CE
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:17:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D73B1F29C3B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:26:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5474F1C21CF4
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B736B190052;
-	Thu,  8 Aug 2024 15:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDC518CC1F;
+	Thu,  8 Aug 2024 15:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="ERFQ86ou"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fghCr6m2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BD018FC93
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3005C8D1
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723130660; cv=none; b=nQ51C8Zzv/3SlEFJCkWaJ8tgF1QUBfi2zu3tIbtYRbm4irsBPrmwxlnQTEN8JndmIOgkQRJg1T5XN8hphosWhuU6zUOrtxGHkw0RI0hKtayiU0RyLMwsrRlTVv2T774YKpVMdywkWmQSKFujTIwUQteCQcJDGGQ58o5eLBoZFAo=
+	t=1723130233; cv=none; b=meE4N6cOj3HtGJQ1WzJOfDXia7A2Ce0ZsLmiPM6PmrpJUHcd9xlrYiI61VJ8t/XTlXS8oV32dB/rzcp8XpWEA2gF4QsDObTUosTUxONyidl4d6b/XzQ7A9Xwq8JY7S7EMq5+0Ng27CtmzdBOkqZIf/47YL56ORGsWkYwj/zsQbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723130660; c=relaxed/simple;
-	bh=/FwBY7ZLw3tlVtJI5q4uhU83jgrSj98/jpIQWivVw68=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ILJQVoPBbwJh3U9+HKMEqsD5l0s+NlEXaftlkhyk+1ytBeFEMB/D8z1qtvO8pNWkLAeoSOI7qlJaHtifo5piUY/DsS1NF0D4VC8qJhTdKCPmU8DgPELVzR7RYqq2jZ37ySMjvv/NJGS3JfFqog2uzvx9++wKWipxL+U9d7xhcNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=ERFQ86ou; arc=none smtp.client-ip=208.88.110.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 1B1909C53C0;
-	Thu,  8 Aug 2024 11:14:31 -0400 (EDT)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id LAhwhicIfrvB; Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 659119C53C1;
-	Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 659119C53C1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1723130070; bh=zVsgPi90M/Pt73vL/QH4PbHoVsdzx/aG5TBXet43/wQ=;
-	h=From:To:Date:Message-Id:MIME-Version;
-	b=ERFQ86oucMU7xczNVeQ57rxoajHPowAfdU3MSY/qzjDpPOnJscfUFoxuCnfl7/pc1
-	 OKOR+rU3ypqTdpXlmklEdxV+sSS83MFClHOtm1jnzEVsF2DJsbUkc07QHmR2pr9L7A
-	 cm1i62dLcJWF9gWofopaF9qXfAxCn9WPLA9zgvc1lSYl70PeIoO7HQDHEZRTsjwa57
-	 RPyYgMvTHb2N1GIO+T9aYgNAeFd5JHNpjFrwWZmvn2OMX+24pdzQvxW4xJk1lSIPuF
-	 GZ3THL3henKbEVscZhNtwhCJT+D+4k+mb+zAzJTkVHABkQc9vrkKUmaFa/uQKCV0sS
-	 mCjVCzGR8SAng==
-X-Virus-Scanned: amavis at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id JRi4UprVAsVH; Thu,  8 Aug 2024 11:14:30 -0400 (EDT)
-Received: from sfl-deribaucourt.rennes.sfl (80-15-101-118.ftth.fr.orangecustomers.net [80.15.101.118])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 084619C53C0;
-	Thu,  8 Aug 2024 11:14:28 -0400 (EDT)
-From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	kuba@kernel.org,
-	Tristram.Ha@microchip.com,
-	Arun.Ramadoss@microchip.com,
-	horms@kernel.org,
-	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Subject: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split half-duplex monitoring function
-Date: Thu,  8 Aug 2024 15:14:21 +0000
-Message-Id: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723130233; c=relaxed/simple;
+	bh=vV9w6HEWwk7t0+GoWgSF+eH67hrMU7LuFNtG3eLLxJQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WFJ6lbtMNm64SBur3114nOYLKqXuv0GEqxT68WWYAzb/dXSImKYxY9jFKlpBgM6J/wttyeVvp8AZkbWc+D0ZN7ArL9hg8dg9aNVAX+WIPZb1BPhkzWcFJuHJPl4eGpTPn/ElbkVZjX+kEbNVJm4sJ05nG9dyII4fn5A0YyQFOpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fghCr6m2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723130230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wdq6trebGNt7E0YMFXGWf2a0ZxVyJ2hGnRvJSAqzzTE=;
+	b=fghCr6m2e1Wt42XFRJm5qeF9oLsstGlEujOkyWR5hCbfK5zM65GTeJZfxscQrHsbXfwABS
+	4yyE6Y8Y6CSoyssCrLlHcpPS8JAqB1LMDKz+bJb6wCayItOVdCPSKKTn1XAvDHf+iYbRnk
+	2b06ilNWpEnialGNYgqdk6DZ0fakS7g=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-120-lsdEXsXPNUihbfJf9ZPKoQ-1; Thu,
+ 08 Aug 2024 11:17:07 -0400
+X-MC-Unique: lsdEXsXPNUihbfJf9ZPKoQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8B59195421D;
+	Thu,  8 Aug 2024 15:17:05 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.39.192.194])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84D6F300018D;
+	Thu,  8 Aug 2024 15:17:05 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id 12D6DA80E94; Thu,  8 Aug 2024 17:17:03 +0200 (CEST)
+Date: Thu, 8 Aug 2024 17:17:03 +0200
+From: Corinna Vinschen <vinschen@redhat.com>
+To: christopher.s.hall@intel.com
+Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
+	vinicius.gomes@intel.com, netdev@vger.kernel.org,
+	rodrigo.cadore@l-acoustics.com
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 5/5] igc: Add lock
+ preventing multiple simultaneous PTM transactions
+Message-ID: <ZrThb-Agj9IW-xZi@calimero.vinschen.de>
+Mail-Followup-To: christopher.s.hall@intel.com,
+	intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
+	vinicius.gomes@intel.com, netdev@vger.kernel.org,
+	rodrigo.cadore@l-acoustics.com
+References: <20240807003032.10300-1-christopher.s.hall@intel.com>
+ <20240807003032.10300-6-christopher.s.hall@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240807003032.10300-6-christopher.s.hall@intel.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-In order to respect the 80 columns limit, split the half-duplex
-monitoring function in two.
+Hi Christopher,
 
-This is just a styling change, no functional change.
+On Aug  6 17:30, christopher.s.hall@intel.com wrote:
+> From: Christopher S M Hall <christopher.s.hall@intel.com>
+> 
+> Add a mutex around the PTM transaction to prevent multiple transactors
+> 
+> Multiple processes try to initiate a PTM transaction, one or all may
+> fail. This can be reproduced by running two instances of the
+> following:
 
-Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
-airelinux.com>
+I saw a former version of the patch which additionally added a mutex
+lock/unlock in igc_ptp_reset() just before calling igc_ptm_trigger().
+Is it safe to skip that?  igc_ptp_reset() is called from igc_reset()
+which in turn is called from quite a few places.
 
----
-v2:
- - added line breaks after return statements
- - removed Fixed-by: tag
-v1: https://lore.kernel.org/netdev/20240708084934.131175-1-enguerrand.de-=
-ribaucourt@savoirfairelinux.com/
----
- drivers/net/dsa/microchip/ksz9477.c | 91 +++++++++++++++++------------
- 1 file changed, 54 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
-hip/ksz9477.c
-index 425e20daf1e9..1e2293aa00dc 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -427,54 +427,71 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int=
- port, bool freeze)
- 	mutex_unlock(&p->mib.cnt_mutex);
- }
-=20
--int ksz9477_errata_monitor(struct ksz_device *dev, int port,
--			   u64 tx_late_col)
-+static int ksz9477_half_duplex_monitor(struct ksz_device *dev, int port,
-+				       u64 tx_late_col)
- {
-+	u8 lue_ctrl;
- 	u32 pmavbc;
--	u8 status;
- 	u16 pqm;
- 	int ret;
-=20
--	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
-+	/* Errata DS80000754 recommends monitoring potential faults in
-+	 * half-duplex mode. The switch might not be able to communicate anymor=
-e
-+	 * in these states. If you see this message, please read the
-+	 * errata-sheet for more information:
-+	 * https://ww1.microchip.com/downloads/aemDocuments/documents
-+	 * /UNG/ProductDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
-+	 * To workaround this issue, half-duplex mode should be avoided.
-+	 * A software reset could be implemented to recover from this state.
-+	 */
-+	dev_warn_once(dev->dev,
-+		      "Half-duplex detected on port %d, transmission halt may occur\n"=
-,
-+		      port);
-+	if (tx_late_col !=3D 0) {
-+		/* Transmission halt with late collisions */
-+		dev_crit_once(dev->dev,
-+			      "TX late collisions detected, transmission may be halted on por=
-t %d\n",
-+			      port);
-+	}
-+	ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &lue_ctrl);
- 	if (ret)
- 		return ret;
--	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status) =3D=3D PORT_INTF_SPEED_NO=
-NE) &&
--	    !(status & PORT_INTF_FULL_DUPLEX)) {
--		/* Errata DS80000754 recommends monitoring potential faults in
--		 * half-duplex mode. The switch might not be able to communicate anymo=
-re
--		 * in these states.
--		 * If you see this message, please read the errata-sheet for more info=
-rmation:
--		 * https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Prod=
-uctDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
--		 * To workaround this issue, half-duplex mode should be avoided.
--		 * A software reset could be implemented to recover from this state.
--		 */
--		dev_warn_once(dev->dev,
--			      "Half-duplex detected on port %d, transmission halt may occur\n=
-",
--			      port);
--		if (tx_late_col !=3D 0) {
--			/* Transmission halt with late collisions */
--			dev_crit_once(dev->dev,
--				      "TX late collisions detected, transmission may be halted on po=
-rt %d\n",
--				      port);
--		}
--		ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &status);
-+	if (lue_ctrl & SW_VLAN_ENABLE) {
-+		ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
- 		if (ret)
- 			return ret;
--		if (status & SW_VLAN_ENABLE) {
--			ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
--			if (ret)
--				return ret;
--			ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
--			if (ret)
--				return ret;
--			if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
--			    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
--				/* Transmission halt with Half-Duplex and VLAN */
--				dev_crit_once(dev->dev,
--					      "resources out of limits, transmission may be halted\n");
--			}
-+
-+		ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
-+		if (ret)
-+			return ret;
-+
-+		if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
-+		    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
-+			/* Transmission halt with Half-Duplex and VLAN */
-+			dev_crit_once(dev->dev,
-+				      "resources out of limits, transmission may be halted\n");
- 		}
- 	}
-+
-+	return ret;
-+}
-+
-+int ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			   u64 tx_late_col)
-+{
-+	u8 status;
-+	int ret;
-+
-+	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
-+	if (ret)
-+		return ret;
-+
-+	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status)
-+	      =3D=3D PORT_INTF_SPEED_NONE) &&
-+	    !(status & PORT_INTF_FULL_DUPLEX)) {
-+		ret =3D ksz9477_half_duplex_monitor(dev, port, tx_late_col);
-+	}
-+
- 	return ret;
- }
-=20
---=20
-2.34.1
+Thanks,
+Corinna
 
 
