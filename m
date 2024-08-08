@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-116883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE2694BF81
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:17:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0388494BF84
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CA212887DD
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:17:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 338361C21F0C
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517BC148316;
-	Thu,  8 Aug 2024 14:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7121018CC05;
+	Thu,  8 Aug 2024 14:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9ENZUsr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tkH4tGtr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEA418C900
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D83D148316
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723126676; cv=none; b=S9o88bZKrS3YX8fYX+dLT/lNmXnZ9t1rq9AUdovHT9vM+TisRcLC5cGn/PKCU9ozsbZL00iiFwQNKgLdgeZhDsXLkJPldzCb68hg9Ld/p6ci3WFaG/BI4Xw9lIG17hghXBc9aCw9C6ZxApqNcMlifT5kYHe+G2U1sCoq4egbb/s=
+	t=1723126860; cv=none; b=Zwoi6u2TDr/LSHN0PGzQxSo6+kB0X1OtVmdUrudIHyMIuvusaf/SGcGby/DbSBPe+la9X1eyu+AASydK34YypAWL1/HpMbuzcc9Frhgf17I9FadWz7fZ0DQBKvSpgloFoy7hJC0zt+T6iybNE5w15WYu9rV88UBPdIIIEGr6Okg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723126676; c=relaxed/simple;
-	bh=QBRWwLqySkPlhf8Vh9dijT55sh8UZsvzzEjAHMSx5O0=;
+	s=arc-20240116; t=1723126860; c=relaxed/simple;
+	bh=FcGF36TBWHJtKexABNo42UKivkTYDrcajYqTkssd2os=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NpolhNLVsgUkAIsTv3ehaQmBLlXCps3SBKHCglgfvUp9saSeYHuS/HmhoMGixmaSocHswI2AjfV311ylvSRNdbGsh6eQ23+StclMvh68eDApeL0YJd/pQP+HBwYnDbhQxxHXKQsJdVdUys/IyquJUwlEDiD4DhqZyPtluNBMVqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9ENZUsr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429AAC32782;
-	Thu,  8 Aug 2024 14:17:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=FFKMIAuLd//phXqu1thQ3JJxvlo7SHai3QwXLTMuUedIrq91SlxfVFf6smDk2PINJiEqQyQkBRAxC5/E6dwh9E3LTReV5GWZXpGtvqu5gcnlxXo3GOQmh3qV44RLHg+IuDuY6D7pk1c+7N77jCjCzJDLQlWUHpSv/wvUE2pVxw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tkH4tGtr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82F8BC32782;
+	Thu,  8 Aug 2024 14:20:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723126675;
-	bh=QBRWwLqySkPlhf8Vh9dijT55sh8UZsvzzEjAHMSx5O0=;
+	s=k20201202; t=1723126859;
+	bh=FcGF36TBWHJtKexABNo42UKivkTYDrcajYqTkssd2os=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k9ENZUsrw+/2Jz7/B5znA0wsQAner39SkL4qXJ0pkIRW5qqogI3d/h3ot3Gl8lc4h
-	 jit/PMND8QfTinpvHRKxx11PdYco7D9H0q8rdbSY+EfUAwQ/kl0MWO4IFp1td3PLM4
-	 3lzcf/qNgNZUriPe/ENI7QafoH9FHbUqGy0iHhY+Q2Oiv46t8n2P/26hqz50hDTKID
-	 xJHU8MUeGbsi3FJvl9KudfDipbPGVSrXj/ucnC4oZXuD8yiQpSg58GhOIHTKBnOlvS
-	 c03IIjHPM53Az0bXg7opdrdyrAY8xiCBPb4Pe6TkrxU23k/ZP2Xpd8xHxeXpOwGJIa
-	 xDDUJDXXKX0kA==
-Date: Thu, 8 Aug 2024 07:17:54 -0700
+	b=tkH4tGtrgw5RaGeQkptrD91VOVZLp4ENUR1EtR7hoBkk9k6LFn9qI14ytWqc02Plf
+	 U1coNePPwvsfjtofN6lzev9kYTnefR5Va1UA2hlP0Absg0Qqdt4LRbgHtJoQRW3IDX
+	 BHhAdke8tuV1CGidbV/NEbOFcK94fmufe5VTJNUbibwa3McqMy07eUgDsR88flikst
+	 atso+vBkBUtirBiDyyEnmpKCe5p1xFNVG8z3ILP7JVo/NYnxjLAcuUPnib4/CraOjS
+	 v8oUb8kUbafIiVPjdNWKWmTswcFM/I5TsvoYtPzQrmEpD8qjZOGqzoQ9q6IZHyz1IG
+	 p4mSd/QyVDEPQ==
+Date: Thu, 8 Aug 2024 07:20:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Jiri Pirko
- <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>, John Fastabend
- <john.fastabend@gmail.com>, Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
-Message-ID: <20240808071754.72be6896@kernel.org>
-In-Reply-To: <20240808122042.GA3067851@kernel.org>
-References: <cover.1722357745.git.pabeni@redhat.com>
-	<75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
-	<29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
-	<20240731185511.672d15ae@kernel.org>
-	<20240805142253.GG2636630@kernel.org>
-	<20240805123655.50588fa7@kernel.org>
-	<20240806152158.GZ2636630@kernel.org>
-	<20240808122042.GA3067851@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-next 4/4] ice: combine cross
+ timestamp functions for E82x and E830
+Message-ID: <20240808072058.09215916@kernel.org>
+In-Reply-To: <52af8b88-8814-4861-aba0-4bc726c95740@intel.com>
+References: <20240725093932.54856-6-karol.kolacinski@intel.com>
+	<20240725093932.54856-10-karol.kolacinski@intel.com>
+	<ad94e165-ea7f-4216-b43d-b035c443a914@intel.com>
+	<IA0PR11MB838091A67C0AE3598BFCDF8D86BE2@IA0PR11MB8380.namprd11.prod.outlook.com>
+	<e54793ef-f81c-447a-8cdd-bed97df65f2e@intel.com>
+	<IA0PR11MB8380B6EC30AC39EAAC1F480986B82@IA0PR11MB8380.namprd11.prod.outlook.com>
+	<52af8b88-8814-4861-aba0-4bc726c95740@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,98 +69,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 8 Aug 2024 13:20:42 +0100 Simon Horman wrote:
-> Thanks again for the information.
+On Thu, 8 Aug 2024 15:00:52 +0200 Alexander Lobakin wrote:
+> > Technically, neither ART nor TSC are directly related to the PTP cross
+> > timestamp. It's just the implementation on Intel NICs, where those
+> > NICs use x86 ART to crosstimestamp.
+> > 
+> > For cross timestamp on ARM, it's also HW specific and depends on which
+> > timer the HW uses for timestamping. I'm not really sure what's the HW
+> > protocol in this case and if e.g. E830 can latch other timers than
+> > x86 ART in its ART_TIME registers.
+> > 
+> > get_device_system_crosststamp() supports multiple clock sources defined
+> > in enum clocksource_ids. Maybe instead of checking ART flag, the driver
+> > could get clocksources and if CSID_X86_ART is available, it would assign
+> > the pointer to crosststamp function, but I'm not convinced.  
 > 
-> I have now taken another look at this problem.
-> 
-> Firstly, my analysis is that the cause of the problem is a combination of
-> the way the patchset is constricted, and the way that the build tests (I
-> have focussed on build_allmodconfig_warn.sh [1]).
-> 
-> [1] https://github.com/linux-netdev/nipa/blob/main/tests/patch/build_allmodconfig_warn/build_allmodconfig.sh
-> 
-> What I believe happens is this: The patches 01/12 - 07/12 modify some
-> header files, adds a new Kconfig entry, and does a bunch of other normal
-> stuff. Each of those patches is tested in turn, and everything seems fine.
-> 
-> Then we get to patch 08/12. The key thing about this patch is that it
-> enables the CONFIG_NET_SHAPER Kconfig option, in the context of an
-> allmodconfig build. That in turn modifies the headers
-> include/linux/netdevice.h and net/core/dev.h (and net/Makefile). Not in the
-> in terms of their on-disk contents changing, but rather in the case of the
-> header files, in terms of preprocessor output. And this is, I believe,
-> where everything goes wrong.
+> I mean, I'm fine with the arch-specific definitions in the driver as
+> long as the netdev maintainers are fine. Or maybe they could propose
+> some generic solution.
 
-That's strange, make does not understand preprocessor, does it?
-Either file has been modified or it has not.
-I guess it doesn't matter, given your solution  
-
-> NIPA arrives at running build_allmodconfig_warn.sh for patch 08/12 with the tree
-> built for the previous patch, 07/12. It then:
-> 
-> * touches $output_dir/include/generated/utsrelease.h
-> * checks out HEAD~ (patch 07/12)
-> * prepares the kernel config
-> * builds kernel and records incumbent errors (49)
-> 
-> The thing to note here is that the tree has been little perturbed since build
-> tests were run for patch 07/12, and thus few files are rebuilt.
-> 
-> Moving on, simplifying things, the following then runs:
-> 
-> * touches $output_dir/include/generated/utsrelease.h
-> * checks out $HEAD (patch 08/12)
-> * prepares the kernel config
-> * builds kernel and records current errors (4219)
-> 
-> The key to understanding why the large delta between 49 and 4219 is
-> that vastly more files have been rebuilt. Because the preprocessor output
-> of netdevice.h and dev.h have changes since the last build, and those
-> headers are included, directly or indirectly, by a lot of files (and
-> compilation results in warnings for many of those files).
-> 
-> 
-> I was able to reproduce the result by running build_allmodconfig_warn.sh
-> over patch 07/12 and then 07/12 with FIRST_IN_SERIES=0.
-> 
-> I was able to get the desired result no new compiler warnings
-> by doing the same again, but with FIRST_IN_SERIES=1 for the
-> invocation of build_allmodconfig_warn.sh for 08/12.
-> 
-> I believe this is entirely due to a baseline rebuild being run due to the
-> FIRST_IN_SERIES=1 parameter. And, FWIIW, I believe the invocation of
-> build_allmodconfig_warn.sh for 07/12 ensures reproducibility.
-> 
-> My suggestion is that while we may consider reorganising the patch-set,
-> that is really only a work around. And it would be best to make the CI more
-> robust in the presence of such constructions.
-> 
-> It may be a bit heavy handed, but my tested solution is to invoke a
-> baseline rebuild if a Kconfig change is made. At the very last it does
-> address the problem at hand. (In precisely the same way as manually setting
-> FIRST_IN_SERIES=1.)
-> 
-> The patch implementing this for build_allmodconfig.sh which I tested is
-> below. If we want to go ahead with this approach then I expect it is best
-> to add it to other build tests too. But this seems to be a good point
-> to report my findings, so here we are.
-> 
-> --- build_allmodconfig.sh.orig  2024-08-08 07:30:56.599372164 +0000
-> +++ build_allmodconfig.sh       2024-08-08 09:58:22.692206313 +0000
-> @@ -34,8 +34,10 @@
->  echo "Tree base:"
->  git log -1 --pretty='%h ("%s")' HEAD~
-> 
-> -if [ x$FIRST_IN_SERIES == x0 ]; then
-> -    echo "Skip baseline build, not the first patch"
-> +if [ x$FIRST_IN_SERIES == x0 ] && \
-> +   ! git diff --name-only HEAD~ | grep -q -E "Kconfig$"
-> +then
-> +    echo "Skip baseline build, not the first patch and no Kconfig updates"
->  else
->      echo "Baseline building the tree"
-
-Excellent idea, let's try it! Could you send a PR to NIPA?
-Note that the code is copied 3 times for each flavor of building :(
+I don't like it either, FWIW, but it seems like this is what everyone
+is doing. Please do CC tglx / the time maintainers on the next version
+and net-next submission. I get the feeling they will wake up in a year
+telling us we did it all wrong, but hey, all we can do now is CC them..
 
