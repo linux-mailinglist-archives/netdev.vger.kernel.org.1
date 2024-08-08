@@ -1,187 +1,279 @@
-Return-Path: <netdev+bounces-116922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A44A394C182
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:34:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C64F494C18D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38ADA1F26CD2
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588A11F28A5F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3336018F2D3;
-	Thu,  8 Aug 2024 15:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED90518FDAB;
+	Thu,  8 Aug 2024 15:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="JuO7xU9c"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fykeXGLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022127.outbound.protection.outlook.com [40.93.195.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EA1148307;
-	Thu,  8 Aug 2024 15:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.127
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723131240; cv=fail; b=kjiKKpk+2GKQzx2eaBlUqxpfFaig20AFCu4V23z+0fyLQ1xYYua4/odwdDkjcNVVUT8JixEqvzYiSY0lOuTY7Epj+LyJPAXELOx7Y/CcBYr8NjtZ9dvJfnMMj9uicr1BXwksXCPZ7MVN3UOU/t3ekJeRC3enwRDHgW/Qvqg3VVc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723131240; c=relaxed/simple;
-	bh=kglMetnG8tZCTD+a7Mf4hZoS+wBov3VdC+MdGRdI8tA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FS04EwMD47nQKmkFODoxpSNswo2z/5oY9KRTdtG/c41THrYO6vDYU9rlSJ2jJGQXz0s/kzw1gnvK5TL8ox1DlmLZTVGE68TYlSLUAT9vtucIZdFp4Jj+pVvp9QHGkxscHpn7cVXHjD5oxQeg10ZmRTrdj4U8HG2kXkEWRgDEj1c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=JuO7xU9c; arc=fail smtp.client-ip=40.93.195.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wCi8JkpU0rgjsIBZ0VUoSG0bPsAVrnh6DY1b8kz1X1m5+ZyZkn1+YdqMChZnbpgln1zqw4+7s5pfNEzdsuQOqqHeFVV0R3KUuED+sSoWjQdF/IKgGrW/Gq2yolXQgr//oJlsKtS1hpIvBPJ9GsQlcB1Lf2gua6p32duZPON7Rftls2smZDC6vKi9m34OGLyWBL1pkuZcprA9A8sgSretg+yMzJ+jboozSWrejmci5a2hRHHV8FYUcrgz3CVF7CEX/tNyKmpRKnXduWNcTgKgcm5aDDWePZnih+csnjoyYtYl+fIPTIcrULyPwRfe2yEYrw7j5h56ccBG4Uc+cS4CsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BlPNHijtNGaJxBOjPqOBb4SxmtWXSFrLcg/sDeEyjdI=;
- b=e5nkfYIjGTUo+sAM6gHITjmcGU3DbRRacao3aBnA5CqwclkB2mXMqUVnLx8rJDkVeGk0uKLi6AWqZFsg+pArpme3GwwbS4bROJ5ag4IJdsSpQBn0O4c5ioOSeyRHYznQzW9+HRxAFQO5gZuxR1t5yUqz6Y4vcLP/oRjZAeJNJF1xYmklAlWjUtet53PzMxy+vH9aU/Lpt5iTBRUdftiim8rVru/TS6mVPhH9OW/J5jLqoPaHl5Uj5DuiT0z839HvngNUx9NBGd0LFoHJA3sVnr+CZ9GMVYNih2KIdmONGBbCHdYLZzpcUJy/xAAq3T8vzpOKpfSsaEKDh0dHhpwNwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BlPNHijtNGaJxBOjPqOBb4SxmtWXSFrLcg/sDeEyjdI=;
- b=JuO7xU9ckppp5a7rx8wlEsFzuNKGlEEbiP13hdMrIEx6gWZLvtZtq2iL+y/7muDgqmljhRYUldfhxFixYfst12khvmBPLbSVK0irTxeo5XEsEuoUJnZIECIKpCqwvJ0XLzXMmTGpnHE0YqWbFJzh89aSSKB/u+ktycs37sdW/LE=
-Received: from DM4PR21MB3536.namprd21.prod.outlook.com (2603:10b6:8:a4::5) by
- CY5PR21MB3614.namprd21.prod.outlook.com (2603:10b6:930:d::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7875.9; Thu, 8 Aug 2024 15:33:55 +0000
-Received: from DM4PR21MB3536.namprd21.prod.outlook.com
- ([fe80::d1ee:5aa2:44d0:dee3]) by DM4PR21MB3536.namprd21.prod.outlook.com
- ([fe80::d1ee:5aa2:44d0:dee3%4]) with mapi id 15.20.7875.007; Thu, 8 Aug 2024
- 15:33:55 +0000
-From: Long Li <longli@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, "longli@linuxonhyperv.com"
-	<longli@linuxonhyperv.com>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Simon Horman <horms@kernel.org>, Konstantin Taranov
-	<kotaranov@microsoft.com>, Souradeep Chakrabarti
-	<schakrabarti@linux.microsoft.com>, Erick Archer <erick.archer@outlook.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v2 net] net: mana: Fix doorbell out of order violation and
- avoid unnecessary doorbell rings
-Thread-Topic: [PATCH v2 net] net: mana: Fix doorbell out of order violation
- and avoid unnecessary doorbell rings
-Thread-Index: AQHa6R/zQgAE3/VEwkaNHXMnN1gZdbIdc6cAgAAKzJA=
-Date: Thu, 8 Aug 2024 15:33:55 +0000
-Message-ID:
- <DM4PR21MB35367486106C04FA145495DCCEB92@DM4PR21MB3536.namprd21.prod.outlook.com>
-References: <1723072626-32221-1-git-send-email-longli@linuxonhyperv.com>
- <20240808075504.660a5905@kernel.org>
-In-Reply-To: <20240808075504.660a5905@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=4e5991c6-702c-4bf6-92c7-a0fbe4c697e5;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-08-08T15:33:42Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR21MB3536:EE_|CY5PR21MB3614:EE_
-x-ms-office365-filtering-correlation-id: 12a819ab-e38f-4126-de77-08dcb7bf836c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?6RhEM0Nhjck6/Kj1KwysKnACLzaKNIrgU5iSq75yaXrvLgHJu3A851jW49v6?=
- =?us-ascii?Q?DGDr2M+KQqTS+6XmzyAYCZag3oFPMRfCf4GHz2XUrcf83Nz+I9lryp10sJyA?=
- =?us-ascii?Q?QBHGBxPN8qeQnOMwax8N/MpSbq31oAG71k205k4uNIr7xCvYlPsIf0fWb8ut?=
- =?us-ascii?Q?Ap3uDguhNsTSO8q0PYaZZHahEPscXqsYrsMA8CN+3OHmUjIFQt9Gig+zmn/1?=
- =?us-ascii?Q?rdEp6e2xlBzqDHSdIgX6U/v15wuRrcUOnwBAiDBbcuIifXWHSOOyT4llB6tp?=
- =?us-ascii?Q?E+n6+K4YmIFZ9i3cFpb7Hm+oBG72Bvl6gesjhdYj1tLYth5aCdUX4sdrEr1q?=
- =?us-ascii?Q?zMz0J+V/YC7ymPuwkap8BNZoc06ku6rP1uMQhoIep9DYLHsJCSa7ASaxVAOO?=
- =?us-ascii?Q?gFLT+W1jlgkQPQDRP0jQH8YPe3xLsJiUg4jS8deiV/znqDIm53tl67lBKGdX?=
- =?us-ascii?Q?UnUCJRsfV26cbCI3jSzK9ajqbpn1t+o7OQBiy/gWQ8BOoXzmtjddNWw886LB?=
- =?us-ascii?Q?h2xxLZg4gXb+ps+kQ53SHhAsodO7JIKTXRNvTrDIuO+9ct7B+6aWmeAqcuHJ?=
- =?us-ascii?Q?ASe8ek3odX7B2lovNIYK0M7IzCbuA1stYB3X38yF8m9BOqY/srr9xXRz3ElT?=
- =?us-ascii?Q?zNhJSAdGO+3W8KIYO4t6ZKhWLTCEG2/y3azjz9GFMjfMEFyQ7MOVMvuoSl1X?=
- =?us-ascii?Q?KP+B2D3xHDEF2JpKLyVr5IXUfIiMVBWqUPw9TYo3A+rTIDm4TWlOISLF4Myk?=
- =?us-ascii?Q?J09eynoh/lTLhU7enc1QF7iAiLUiu8qQgi7s0piLyG2cwjRHBYxW/J9PZ7Qq?=
- =?us-ascii?Q?8V0RjBHeGMhked6JotlV7gI3cbH5GMmEkKJVS7UJm6i4YV4Bit7uwEp3kXjd?=
- =?us-ascii?Q?HS0fFBYD+QT2JIzsi94f2Wsmc3xuEsfCFmvhyvdwI12HTgNa+qoI+vchJwbw?=
- =?us-ascii?Q?Mk48cFfLYuFNbu7ES0niQGEUK2Pl8eR3R1NHatGKbkbf0Dw+ZFZ/QWtOe1Lk?=
- =?us-ascii?Q?OkEV+NEe4h0ct0aJl1kATUHNJqQcW4om7jM2WHxAGeFwTgrKDXDvy1LuVqPR?=
- =?us-ascii?Q?CCLUEj2la4XLoISOOC3iqQa99itTN5ZuAOEjm52i3NW/PN5RWvQObG6T+Xeo?=
- =?us-ascii?Q?TV6CESa6dFU9AxYLrJ5XPQjFqQFFg28Ob7hdVuHvvEZzWbjoqjWKBDmfLxSj?=
- =?us-ascii?Q?O9ij5D9JtS9XZqkeJ+wQ7lWweOQ17rx0P7MCaFZSoRfuFXU6bA013i+oWzhU?=
- =?us-ascii?Q?s/MlLdEQ8JL3KagHgg+ZKekVdJHU6r1leT2W8mTAIpAxAVa1VKY3veMbrBXB?=
- =?us-ascii?Q?PlEW2fa/LyfiKAVNwh2v8Ml403UmUklIvhlacsdbgMAarzLUVmoCkbT79OWQ?=
- =?us-ascii?Q?MISRZ3BEPkVK+86fzUgg6ZHHo1c1DjjdWXC0h2VUyJZ/wHkUUQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR21MB3536.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?3DRUVSy1EjULPjFkal+psx2IsE2p9i6Jle6Hm5SqHFO5WUVZM9aLAOI9VlXG?=
- =?us-ascii?Q?o+uEPuVLtFuQCFjkNiXqH137dtU+osLSB7NyzsirfXbcnWrj1CMM1xwG5h6a?=
- =?us-ascii?Q?gUJd/1lwxgtC9vU82AHh2LUx5qMtArodceR/Ep0cBjNXozPNyzlkQHTOyrv0?=
- =?us-ascii?Q?KOnT8b0hK3otKOE2loB5FyHeHrNUDLLcO1+Io2HgvbEvLrN9CveWYMtKi3Rp?=
- =?us-ascii?Q?/gGbUxe6ZGZgNbrKGwDnJHEhuU2D7eU6J/PvmmW8w93zL454WqPvb7w9bAxp?=
- =?us-ascii?Q?YlwjQQT29dd5yj/T5QRiIiNC5BgNJ+3meTxq01wl2AEciBWw+SXu13OnaOoz?=
- =?us-ascii?Q?up2m4Yj3Xwvy5UE0KAbfUR85TydVLeYA5OGjQl4H+GLLA7WaTr2NSW/B3trS?=
- =?us-ascii?Q?Qw0lTVJ/YGXoAxt8uHR4AuyaL7WRZdABGXL1mOM0CFnEnCcG+YUSXein2GYx?=
- =?us-ascii?Q?2uAtPTw9inlCcmTBPcG6Rp8+fzdhi9NuqPHcig3glVPnv4XfVQwMi7fp7Vw4?=
- =?us-ascii?Q?pCcqoW2Ks/oBAZiDSmBct8u8IhkMMygGVbNpQbrUWepJtsPCyDaZrYV27lkO?=
- =?us-ascii?Q?QV9o3uD9gPq1bcIRoZmH3lhrLuI+06ZktljHyQd5JPB79DwjQMSY2bzVMCxw?=
- =?us-ascii?Q?DOczPtpz53foK0UdVEB6NI7vFkreq7pILB0YOVF05ALWfWnQg364CyaiQUaH?=
- =?us-ascii?Q?uZC8FRVnQJb3rpatVLMvt0puZAr9SQdj0ozr53d7IdfCbWeGcd1WKzaDrRp4?=
- =?us-ascii?Q?ZGl4WnTa9K428wVUSbmk02VFiPotAWBy5Lj+eCnpVwo5dQtIJ7UPwuMM+hge?=
- =?us-ascii?Q?ZWxU28zYmGVXVbZW+hl7M+OTvrbAft37aDE7OpZ85jZMRfptqEMYpc37s+so?=
- =?us-ascii?Q?FCaqmTAKU8KluJ+uleEvwjq/7Q9THaXHwQwzUIh+s2kQF8BjXToLhlGUOO8H?=
- =?us-ascii?Q?UwDG9Sj7ZGOo3uPOPOOuy7aDc5ANiHx+f4cSHvkBO8hjLpog4cBjbRvbvaz9?=
- =?us-ascii?Q?jbvGQLONnmnb/4i9jn4qUoAVLUAAdK4yrtPdcoCJ9VA8s4D8DzlpNGi8YsJh?=
- =?us-ascii?Q?BVNVPA2AdiCD3sLI29yKQuD2VxdyHKJA0I96oI69dvm+uvQghWQghodq1Kxi?=
- =?us-ascii?Q?44SBRBWMxonq3wluzgYmssYIUrTMuiqKOclHGWCfKkOysJNBrVjwDuNx7tXp?=
- =?us-ascii?Q?5VIyREEAL8JXlfwt1ffHno6mHvKnQMKAVGD6XYXqF33A/qw9sTdCpxBIVsm+?=
- =?us-ascii?Q?ZeChwP7TtEiaOquHltODlJu8hfN/DpsQT1vqbocYfIGhI4ZBlflGQmfrMqrh?=
- =?us-ascii?Q?9NVhLylZcUHoosk7nyzl6sE7OSGiGwuRSsKElCuoXtJHeJrr+OykrHUwSF6q?=
- =?us-ascii?Q?Y1ygm1uZwtXTJYk035aYy4vb6EKsS+xjDkQ6+po5U/ri9XSS/1HdJIEC48mh?=
- =?us-ascii?Q?jZdmXLpv8Y8V9+FRYTb7w9klCDwxhzYDSmf5Zt6LyfIpv9EXZHKw8/LDsUNJ?=
- =?us-ascii?Q?FX45QTH44imT69PhK8Jikva5z3R88YSfLSPU2q4IrwhflRaADa6dLzu2PXnG?=
- =?us-ascii?Q?tiJZsCsxxHpTO4FSYl/dldLsoorspbNlkTIZAcFL?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AEA18FC99
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 15:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723131281; cv=none; b=WgNZxxp79uOECQ7e20wtDEi7NOxseJFWHfZPToKhrKknm5R5/0z0NXHQz2vyuyOtHlGrCMyInqYDpenkj4DryZ6tV9BydgP3gtgdIpWoRmCFcBpjkWA7aW3QH3oq7/Nb4tJQ6RI7peTplk03E2HaKWRBhp2aa00IeF9ci7h8sUI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723131281; c=relaxed/simple;
+	bh=84RdeZSz4NQlCIpwyeGUuDPMKNfbQVs2otQDqHu/Pig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=un+gx2IfABhcId8j13wqSSwS0aNM6C3wgo96EuowOzrNDBgrxXaxCINaYf7xS3uvnSfIKRqIrd7QIBv/CgKTHYR2z3eU9Vaq6NviMu3AeYcZaVFi3GIyInWGxc7tUG5pnAsidXK83CyKhrYYzHKyRwygm5BxxskJxhWnQffi2W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fykeXGLc; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7abe5aa9d5so146460166b.1
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 08:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723131278; x=1723736078; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=deR2cTN5hN7kQ/Mmgkv7kVEs+fw9NCwiKQ9xQIlHe+o=;
+        b=fykeXGLcZ48LJYl4LDMphH/efqcdnMHHlG5nZQrInmOeaXNRlB/MPRw5VKUozKiz4i
+         VQbwPeO/L+s7wjuPnuYJDVknDtmiOK5kQbV8aNlvA/R4ZxpPpAn6U7bi+Vep8/6Ly99I
+         4ZDiIrG+waf1rnZZrT3JGTXLstqqsXFvkEfzNCy7ZYHNIQr5IUFcfeq5OrI0gMyvqL5A
+         U8ooFEzvnJOdqjVhg3t3OkXjxCT6BoRsW8bxw+CxbZXmPP+DO+efaveGI/+n+Wmcxoa7
+         J+iG7ntK/FsFmNINgJxOhaOjoywiwjTa0IofNRR1rSNNo85h9ZiTeuBfLIImVpb43c9D
+         bkzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723131278; x=1723736078;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=deR2cTN5hN7kQ/Mmgkv7kVEs+fw9NCwiKQ9xQIlHe+o=;
+        b=Jt2tatwW0oe5D+tsEiyk6+YNCTKtkB7UDE7HhSvXA/NMu8H1Lg184OzIMnJY2VpnEz
+         ZTDTscfaKGICaOscRnPDnlHtoMpdUL80NUWGeh3L+KbjpsIl2riSlNBFwW/c8gLI/O+2
+         6caOw1bOT+u3X/YW/DSzOp7FXxQjG7HDisjvd195KmTs/IMyY4d2esUooBui/X9b7k3O
+         RgbNff2c8uf3/HD3YTLROkSA650NEzYFW3pb565q7FcCV7vFy4Wi0LUe2F4Lee/u7Mkr
+         FQB+l14QGpA65lM4MVm137sJJ6zM2c4pciDLy/l7bxr7yVgTjUZ0nSZjLO8jG5/iAXyd
+         e3cA==
+X-Forwarded-Encrypted: i=1; AJvYcCXp6HlggpOb/U3Xo1903LLXQ6pIxUSUaiJKKdJzyeIlwXNtdnhlQMEwNKvt8bZrWw4nyibwOyH214KYabxztEX7vWKt9foU
+X-Gm-Message-State: AOJu0YycA1XizEZCDObnsljLXo0ooXXq0tz9pwBbPN42MIL7GJzAVACt
+	ZLA41duuuAZ5lpnLXl6kIghCezAoujtkoIMtKxzQ/hvcFEWAdJc/5J9flrGFdD8=
+X-Google-Smtp-Source: AGHT+IGmvRB1EJlB4iKqzT595KKSJ3AT7HSTYqgUCs5wTvQ1rP7yMg8+uON+zirQWeNbJkdPP9aaOw==
+X-Received: by 2002:a17:907:d2c5:b0:a77:c95e:9b1c with SMTP id a640c23a62f3a-a8090d7affdmr174071866b.27.1723131277656;
+        Thu, 08 Aug 2024 08:34:37 -0700 (PDT)
+Received: from localhost ([213.235.133.38])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c6603csm754521466b.97.2024.08.08.08.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 08:34:36 -0700 (PDT)
+Date: Thu, 8 Aug 2024 17:34:35 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
+	konrad.knitter@intel.com, marcin.szycik@intel.com,
+	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [iwl-next v3 1/8] ice: devlink PF MSI-X max and min parameter
+Message-ID: <ZrTli6UxMkzE31TH@nanopsycho.orion>
+References: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
+ <20240808072016.10321-2-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR21MB3536.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12a819ab-e38f-4126-de77-08dcb7bf836c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2024 15:33:55.1318
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: l/dyLrt4ZTugRHCM7k+Zlb8w8BI3aaP8AFnjnt7nI30bXCGNIihLfh/LFza/Mz9XoWA9RdiQZ9rv0BAzVQtoVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3614
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808072016.10321-2-michal.swiatkowski@linux.intel.com>
 
-> Subject: Re: [PATCH v2 net] net: mana: Fix doorbell out of order violatio=
-n and
-> avoid unnecessary doorbell rings
->=20
-> On Wed,  7 Aug 2024 16:17:06 -0700 longli@linuxonhyperv.com wrote:
-> > Cc: stable@vger.kernel.org
-> > Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
-> >
-> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
->=20
-> no empty lines between trailers please
+Thu, Aug 08, 2024 at 09:20:09AM CEST, michal.swiatkowski@linux.intel.com wrote:
+>Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+>range.
+>
+>Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>---
+> .../net/ethernet/intel/ice/devlink/devlink.c  | 56 ++++++++++++++++++-
+> drivers/net/ethernet/intel/ice/ice.h          |  8 +++
+> drivers/net/ethernet/intel/ice/ice_irq.c      | 14 ++++-
+> 3 files changed, 76 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>index 29a5f822cb8b..bdc22ea13e0f 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>@@ -1518,6 +1518,32 @@ static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
+> 	return 0;
+> }
+> 
+>+static int
+>+ice_devlink_msix_max_pf_validate(struct devlink *devlink, u32 id,
+>+				 union devlink_param_value val,
+>+				 struct netlink_ext_ack *extack)
+>+{
+>+	if (val.vu16 > ICE_MAX_MSIX) {
+>+		NL_SET_ERR_MSG_MOD(extack, "PF max MSI-X is too high");
 
-I'm sending v3 to fix this.
+No reason to have "PF" in the text. Also, no reason to have "max MSI-X".
+That is the name of the param.
+
+
+
+>+		return -EINVAL;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static int
+>+ice_devlink_msix_min_pf_validate(struct devlink *devlink, u32 id,
+>+				 union devlink_param_value val,
+>+				 struct netlink_ext_ack *extack)
+>+{
+>+	if (val.vu16 <= ICE_MIN_MSIX) {
+>+		NL_SET_ERR_MSG_MOD(extack, "PF min MSI-X is too low");
+
+Same comment as for max goes here.
+
+
+>+		return -EINVAL;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+> enum ice_param_id {
+> 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+> 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+>@@ -1535,6 +1561,15 @@ static const struct devlink_param ice_dvl_rdma_params[] = {
+> 			      ice_devlink_enable_iw_validate),
+> };
+> 
+>+static const struct devlink_param ice_dvl_msix_params[] = {
+>+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MAX,
+>+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>+			      NULL, NULL, ice_devlink_msix_max_pf_validate),
+>+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MIN,
+>+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>+			      NULL, NULL, ice_devlink_msix_min_pf_validate),
+>+};
+>+
+> static const struct devlink_param ice_dvl_sched_params[] = {
+> 	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+> 			     "tx_scheduling_layers",
+>@@ -1637,6 +1672,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
+> int ice_devlink_register_params(struct ice_pf *pf)
+> {
+> 	struct devlink *devlink = priv_to_devlink(pf);
+>+	union devlink_param_value value;
+> 	struct ice_hw *hw = &pf->hw;
+> 	int status;
+> 
+>@@ -1645,11 +1681,27 @@ int ice_devlink_register_params(struct ice_pf *pf)
+> 	if (status)
+> 		return status;
+> 
+>+	status = devl_params_register(devlink, ice_dvl_msix_params,
+>+				      ARRAY_SIZE(ice_dvl_msix_params));
+>+	if (status)
+>+		return status;
+>+
+> 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+> 		status = devl_params_register(devlink, ice_dvl_sched_params,
+> 					      ARRAY_SIZE(ice_dvl_sched_params));
+>+	if (status)
+>+		return status;
+> 
+>-	return status;
+>+	value.vu16 = pf->msix.max;
+>+	devl_param_driverinit_value_set(devlink,
+>+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+>+					value);
+>+	value.vu16 = pf->msix.min;
+>+	devl_param_driverinit_value_set(devlink,
+>+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+>+					value);
+>+
+>+	return 0;
+> }
+> 
+> void ice_devlink_unregister_params(struct ice_pf *pf)
+>@@ -1659,6 +1711,8 @@ void ice_devlink_unregister_params(struct ice_pf *pf)
+> 
+> 	devl_params_unregister(devlink, ice_dvl_rdma_params,
+> 			       ARRAY_SIZE(ice_dvl_rdma_params));
+>+	devl_params_unregister(devlink, ice_dvl_msix_params,
+>+			       ARRAY_SIZE(ice_dvl_msix_params));
+> 
+> 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+> 		devl_params_unregister(devlink, ice_dvl_sched_params,
+>diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+>index d6f80da30dec..a67456057c77 100644
+>--- a/drivers/net/ethernet/intel/ice/ice.h
+>+++ b/drivers/net/ethernet/intel/ice/ice.h
+>@@ -95,6 +95,7 @@
+> #define ICE_MIN_LAN_TXRX_MSIX	1
+> #define ICE_MIN_LAN_OICR_MSIX	1
+> #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
+>+#define ICE_MAX_MSIX		256
+> #define ICE_FDIR_MSIX		2
+> #define ICE_RDMA_NUM_AEQ_MSIX	4
+> #define ICE_MIN_RDMA_MSIX	2
+>@@ -545,6 +546,12 @@ struct ice_agg_node {
+> 	u8 valid;
+> };
+> 
+>+struct ice_pf_msix {
+>+	u16 cur;
+>+	u16 min;
+>+	u16 max;
+>+};
+>+
+> struct ice_pf {
+> 	struct pci_dev *pdev;
+> 	struct ice_adapter *adapter;
+>@@ -615,6 +622,7 @@ struct ice_pf {
+> 	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
+> 	u16 max_pf_txqs;	/* Total Tx queues PF wide */
+> 	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
+>+	struct ice_pf_msix msix;
+> 	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
+> 	u16 num_lan_tx;		/* num LAN Tx queues setup */
+> 	u16 num_lan_rx;		/* num LAN Rx queues setup */
+>diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+>index ad82ff7d1995..4e559fd6e49f 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_irq.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+>@@ -252,7 +252,19 @@ void ice_clear_interrupt_scheme(struct ice_pf *pf)
+> int ice_init_interrupt_scheme(struct ice_pf *pf)
+> {
+> 	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+>-	int vectors, max_vectors;
+>+	union devlink_param_value value;
+>+	int vectors, max_vectors, err;
+>+
+>+	/* load default PF MSI-X range */
+>+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
+>+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+>+					      &value);
+
+If err is not 0, you have a bug in the driver. Perhaps it a about the
+time to make this return void and add some WARN_ONs inside the function?
+
+
+>+	pf->msix.min = err ? ICE_MIN_MSIX : value.vu16;
+>+
+>+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
+>+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+>+					      &value);
+>+	pf->msix.max = err ? total_vectors / 2 : value.vu16;
+> 
+> 	vectors = ice_ena_msix_range(pf);
+> 
+>-- 
+>2.42.0
+>
 
