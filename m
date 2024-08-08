@@ -1,280 +1,264 @@
-Return-Path: <netdev+bounces-116957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ACCD94C33C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:01:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C950394C342
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 19:02:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1EE4B25818
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:01:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DBBF1F23089
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 17:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC951191F8A;
-	Thu,  8 Aug 2024 17:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2766190067;
+	Thu,  8 Aug 2024 17:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b="avIOnsiy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O8H9RLaE"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D243D1917ED;
-	Thu,  8 Aug 2024 17:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723136438; cv=pass; b=NaCftm9Ttr2pGC7yGNBjYQ6vX0uypIitf4vqQc7r8vGT2Y0Pl99XLq8ZOUd8NU8eT6VOZump5st04DK+Zoz+0Qn4GqBAcEgQXzD0WvyCLv6O76wI/FUfuOH33CnZwqzEj5nO8kGUxEn65HNatXD4ydxWsryj7Jxy7MsRAkOp3RI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723136438; c=relaxed/simple;
-	bh=zZeN9Ol19HOHosRc4lcMNNIP49ERoUO0hY/cOllfT2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WXwo5trFQhtcUcKTnpQHPJkIqPWEfBEVCIVHTxIyyDSNRIgu+y5uSL7E1WYM0zLzqUss1hWVMWMPl/eqqbXJFsXCvRCuKPayNAZmuWNWsB1HpHvP7Zuv21bciKC6rz61fPMnm+GWp3zD5WjHzP0glAURw0dMgFwZ50yFOe0jyKA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b=avIOnsiy; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Delivered-To: kernel@collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1723136404; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Y1khZaNYJOJehUcadi0Ebk8llRNdz2aWNnGf9ptu5/82RT1oGZ9O+/BsK4u02LRV6bTIQh6h34dQdtPeV/i5B0BKBKqo/6AnCIMTCr17hmGaN8ckUWI4AAwG+D1KjinV9q5iheONWvLnBjiJTR8iUZeoT48h5RbAjcdWxllTIqc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723136404; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=YC9mK9tDux9if1jjq44zZCozmGqOGn8PObz3o8/d74c=; 
-	b=EROUBlB518PboYi2PE+FYAmji+gApfEYuvQMBbHT75lk9Lh+o7QivfnGuiFXKeyEdFfC85/3JU2NQY+x6vW8sI92+NEXyDnLPd/dCTdOhfYCNrWBKSx460w3uaAThiz4dCMmrd08RiGJRmMNngHrgE7rmhQljJT7qgWKcm7/xas=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=detlev.casanova@collabora.com;
-	dmarc=pass header.from=<detlev.casanova@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723136404;
-	s=zohomail; d=collabora.com; i=detlev.casanova@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=YC9mK9tDux9if1jjq44zZCozmGqOGn8PObz3o8/d74c=;
-	b=avIOnsiyyS2G6W+aOBzZ+vXiF9nXKmi2a56EFAi/eV2V/XvE3PovSKUZ4TQNh77s
-	hMTV4V9iAaF2o5LM4SU6Ym2KE68TbVOlAKgXNAbQp7Z3X1JpxFRGwcig38BM/OXYG1a
-	eXQrfKr04N2oKMvTXsRTGw0t/uNAwRLBvWDdTRos=
-Received: by mx.zohomail.com with SMTPS id 1723136403611383.43297244538667;
-	Thu, 8 Aug 2024 10:00:03 -0700 (PDT)
-From: Detlev Casanova <detlev.casanova@collabora.com>
-To: linux-kernel@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	David Wu <david.wu@rock-chips.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9988018E740;
+	Thu,  8 Aug 2024 17:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723136509; cv=none; b=jRa0nIlBW362o9nQ4BTgZ0FCQLVAdVPviR2UbXf8pfoGeibzBJ2NFU302jMfy/MFFdlGV86FUh0wOmiM2teBUejeC2xy9mLW27KqLDSXkYJ4JO2EaE1OneSx6jSWAGuqK3tmcQ0mKEdosWsuUoeHz1MMSFHDNXlxKVVy1gHSgt8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723136509; c=relaxed/simple;
+	bh=+wBfE+kitxneWQlu3bzEy3GY/tPjoRmi4VJlsfIqxAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NL87gm4EwRtpm8Uzr4jWCbVoYu3K5F8AvzGV7NL+UV4Tf+7XReTlzRtKrXPqKa/RNv4F/y9vkz77o255NDOVZLsZD/B34D3B3Nn8dDPtyfuYCjZtV5YVsguV3GcruWXcT691MFbkWE6hiINpZ4Sw65+2T2RtybFSE8PubZvO6Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O8H9RLaE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03639C32782;
+	Thu,  8 Aug 2024 17:01:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723136509;
+	bh=+wBfE+kitxneWQlu3bzEy3GY/tPjoRmi4VJlsfIqxAM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O8H9RLaExZAb5KfgQ16wwIYFNRRdIRWwxmCe1rpYJAeCC+2MMcSA3UoZKV7O3SG+E
+	 LRak7IFCSi7eF9xYVpEkk+qCS2DVvUnStPij3pXl+xzGRaXxY4t2arQwENdwZSwWSf
+	 XwZ4SZM2ym550F6Vj2MXPj0ASny0hfbxt/fQLqX9vN92t+9Gvhh9x+PfI1A6zjMIvP
+	 xJKmXnhS82UVJkzlDwtYoFvv50qpqJzV/G1AlzX6SviQn0jhFjoIL31b2oIE0U4GWx
+	 R2dn/urJyIUdRuBTS+NdlbtDpEWja7GitZ28chG5UkoH+CB9zJLySPRHgFbc+Th4uu
+	 jPBhbtAH6jIiA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
 	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	kernel@collabora.com,
-	Detlev Casanova <detlev.casanova@collabora.com>
-Subject: [PATCH v2 2/2] ethernet: stmmac: dwmac-rk: Add GMAC support for RK3576
-Date: Thu,  8 Aug 2024 13:00:18 -0400
-Message-ID: <20240808170113.82775-3-detlev.casanova@collabora.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240808170113.82775-1-detlev.casanova@collabora.com>
-References: <20240808170113.82775-1-detlev.casanova@collabora.com>
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.11-rc3
+Date: Thu,  8 Aug 2024 10:01:48 -0700
+Message-ID: <20240808170148.3629934-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-From: David Wu <david.wu@rock-chips.com>
+Hi Linus!
 
-Add constants and callback functions for the dwmac on RK3576 soc.
+The following changes since commit 183d46ff422ef9f3d755b6808ef3faa6d009ba3a:
 
-Signed-off-by: David Wu <david.wu@rock-chips.com>
-[rebase, extracted bindings]
-Signed-off-by: Detlev Casanova <detlev.casanova@collabora.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 156 ++++++++++++++++++
- 1 file changed, 156 insertions(+)
+  Merge tag 'net-6.11-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-08-01 09:42:09 -0700)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 7ae04d8d291c8..e1fa8fc9f4012 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1116,6 +1116,161 @@ static const struct rk_gmac_ops rk3568_ops = {
- 	},
- };
- 
-+/* VCCIO0_1_3_IOC */
-+#define RK3576_VCCIO0_1_3_IOC_CON2		0X6408
-+#define RK3576_VCCIO0_1_3_IOC_CON3		0X640c
-+#define RK3576_VCCIO0_1_3_IOC_CON4		0X6410
-+#define RK3576_VCCIO0_1_3_IOC_CON5		0X6414
-+
-+#define RK3576_GMAC_RXCLK_DLY_ENABLE		GRF_BIT(15)
-+#define RK3576_GMAC_RXCLK_DLY_DISABLE		GRF_CLR_BIT(15)
-+#define RK3576_GMAC_TXCLK_DLY_ENABLE		GRF_BIT(7)
-+#define RK3576_GMAC_TXCLK_DLY_DISABLE		GRF_CLR_BIT(7)
-+
-+#define RK3576_GMAC_CLK_RX_DL_CFG(val)		HIWORD_UPDATE(val, 0x7F, 8)
-+#define RK3576_GMAC_CLK_TX_DL_CFG(val)		HIWORD_UPDATE(val, 0x7F, 0)
-+
-+/* SDGMAC_GRF */
-+#define RK3576_GRF_GMAC_CON0			0X0020
-+#define RK3576_GRF_GMAC_CON1			0X0024
-+
-+#define RK3576_GMAC_RMII_MODE			GRF_BIT(3)
-+#define RK3576_GMAC_RGMII_MODE			GRF_CLR_BIT(3)
-+
-+#define RK3576_GMAC_CLK_SELET_IO		GRF_BIT(7)
-+#define RK3576_GMAC_CLK_SELET_CRU		GRF_CLR_BIT(7)
-+
-+#define RK3576_GMAC_CLK_RMII_DIV2		GRF_BIT(5)
-+#define RK3576_GMAC_CLK_RMII_DIV20		GRF_CLR_BIT(5)
-+
-+#define RK3576_GMAC_CLK_RGMII_DIV1		\
-+			(GRF_CLR_BIT(6) | GRF_CLR_BIT(5))
-+#define RK3576_GMAC_CLK_RGMII_DIV5		\
-+			(GRF_BIT(6) | GRF_BIT(5))
-+#define RK3576_GMAC_CLK_RGMII_DIV50		\
-+			(GRF_BIT(6) | GRF_CLR_BIT(5))
-+
-+#define RK3576_GMAC_CLK_RMII_GATE		GRF_BIT(4)
-+#define RK3576_GMAC_CLK_RMII_NOGATE		GRF_CLR_BIT(4)
-+
-+static void rk3576_set_to_rgmii(struct rk_priv_data *bsp_priv,
-+				int tx_delay, int rx_delay)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int offset_con;
-+
-+	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
-+		dev_err(dev, "Missing rockchip,grf or rockchip,php_grf property\n");
-+		return;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, RK3576_GMAC_RGMII_MODE);
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_VCCIO0_1_3_IOC_CON4 :
-+					 RK3576_VCCIO0_1_3_IOC_CON2;
-+
-+	/* m0 && m1 delay enabled */
-+	regmap_write(bsp_priv->php_grf, offset_con,
-+		     DELAY_ENABLE(RK3576, tx_delay, rx_delay));
-+	regmap_write(bsp_priv->php_grf, offset_con + 0x4,
-+		     DELAY_ENABLE(RK3576, tx_delay, rx_delay));
-+
-+	/* m0 && m1 delay value */
-+	regmap_write(bsp_priv->php_grf, offset_con,
-+		     RK3576_GMAC_CLK_TX_DL_CFG(tx_delay) |
-+		     RK3576_GMAC_CLK_RX_DL_CFG(rx_delay));
-+	regmap_write(bsp_priv->php_grf, offset_con + 0x4,
-+		     RK3576_GMAC_CLK_TX_DL_CFG(tx_delay) |
-+		     RK3576_GMAC_CLK_RX_DL_CFG(rx_delay));
-+}
-+
-+static void rk3576_set_to_rmii(struct rk_priv_data *bsp_priv)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int offset_con;
-+
-+	if (IS_ERR(bsp_priv->php_grf)) {
-+		dev_err(dev, "%s: Missing rockchip,php_grf property\n", __func__);
-+		return;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, RK3576_GMAC_RMII_MODE);
-+}
-+
-+static void rk3576_set_gmac_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int val = 0, offset_con;
-+
-+	switch (speed) {
-+	case 10:
-+		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RMII_DIV20;
-+		else
-+			val = RK3576_GMAC_CLK_RGMII_DIV50;
-+		break;
-+	case 100:
-+		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RMII_DIV2;
-+		else
-+			val = RK3576_GMAC_CLK_RGMII_DIV5;
-+		break;
-+	case 1000:
-+		if (bsp_priv->phy_iface != PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RGMII_DIV1;
-+		else
-+			goto err;
-+		break;
-+	default:
-+		goto err;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, val);
-+
-+	return;
-+err:
-+	dev_err(dev, "unknown speed value for GMAC speed=%d", speed);
-+}
-+
-+static void rk3576_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
-+				       bool enable)
-+{
-+	unsigned int val = input ? RK3576_GMAC_CLK_SELET_IO :
-+				   RK3576_GMAC_CLK_SELET_CRU;
-+	unsigned int offset_con;
-+
-+	val |= enable ? RK3576_GMAC_CLK_RMII_NOGATE :
-+			RK3576_GMAC_CLK_RMII_GATE;
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, val);
-+}
-+
-+static const struct rk_gmac_ops rk3576_ops = {
-+	.set_to_rgmii = rk3576_set_to_rgmii,
-+	.set_to_rmii = rk3576_set_to_rmii,
-+	.set_rgmii_speed = rk3576_set_gmac_speed,
-+	.set_rmii_speed = rk3576_set_gmac_speed,
-+	.set_clock_selection = rk3576_set_clock_selection,
-+	.regs_valid = true,
-+	.regs = {
-+		0x2a220000, /* gmac0 */
-+		0x2a230000, /* gmac1 */
-+		0x0, /* sentinel */
-+	},
-+};
-+
- /* sys_grf */
- #define RK3588_GRF_GMAC_CON7			0X031c
- #define RK3588_GRF_GMAC_CON8			0X0320
-@@ -1908,6 +2063,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
- 	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
- 	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
- 	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
-+	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
- 	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
- 	{ .compatible = "rockchip,rv1108-gmac", .data = &rv1108_ops },
- 	{ .compatible = "rockchip,rv1126-gmac", .data = &rv1126_ops },
--- 
-2.46.0
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.11-rc3
+
+for you to fetch changes up to 2ff4ceb0309abb3cd1843189e99e4cc479ec5b92:
+
+  Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2024-08-08 09:02:25 -0700)
+
+----------------------------------------------------------------
+Including fixes from bluetooth.
+
+Current release - regressions:
+
+ - eth: bnxt_en: fix memory out-of-bounds in bnxt_fill_hw_rss_tbl()
+   on older chips
+
+Current release - new code bugs:
+
+ - ethtool: fix off-by-one error / kdoc contradicting the code
+   for max RSS context IDs
+
+ - Bluetooth: hci_qca:
+    - QCA6390: fix support on non-DT platforms
+    - QCA6390: don't call pwrseq_power_off() twice
+    - fix a NULL-pointer derefence at shutdown
+
+ - eth: ice: fix incorrect assigns of FEC counters
+
+Previous releases - regressions:
+
+ - mptcp: fix handling endpoints with both 'signal' and 'subflow'
+   flags set
+
+ - virtio-net: fix changing ring count when vq IRQ coalescing not
+   supported
+
+ - eth: gve: fix use of netif_carrier_ok() during reconfig / reset
+
+Previous releases - always broken:
+
+ - eth: idpf: fix bugs in queue re-allocation on reconfig / reset
+
+ - ethtool: fix context creation with no parameters
+
+Misc:
+
+ - linkwatch: use system_unbound_wq to ease RTNL contention
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alexander Lobakin (2):
+      idpf: fix memory leaks and crashes while performing a soft reset
+      idpf: fix UAFs when destroying the queues
+
+Anton Khirnov (1):
+      Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor
+
+Arnd Bergmann (1):
+      net: pse-pd: tps23881: include missing bitfield.h header
+
+Bartosz Golaszewski (3):
+      Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
+      Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
+      Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
+
+Csókás, Bence (1):
+      net: fec: Stop PPS on driver remove
+
+Daniele Palmas (1):
+      net: usb: qmi_wwan: fix memory leak for not ip packets
+
+David S. Miller (1):
+      Merge branch 'virtio-net-rq-coalescing' into main
+
+Dmitry Antipov (1):
+      Bluetooth: l2cap: always unlock channel in l2cap_conless_channel()
+
+Dmitry Safonov (1):
+      net/tcp: Disable TCP-AO static key after RCU grace period
+
+Edward Cree (1):
+      net: ethtool: fix off-by-one error in max RSS context IDs
+
+Eric Dumazet (1):
+      net: linkwatch: use system_unbound_wq
+
+Florian Fainelli (1):
+      net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities
+
+Gal Pressman (1):
+      ethtool: Fix context creation with no parameters
+
+Grzegorz Nitka (2):
+      ice: Fix reset handler
+      ice: Skip PTP HW writes during PTP reset procedure
+
+Heng Qi (2):
+      virtio-net: check feature before configuring the vq coalescing command
+      virtio-net: unbreak vq resizing when coalescing is not negotiated
+
+Jakub Kicinski (4):
+      Merge branch 'mptcp-fix-endpoints-with-signal-and-subflow-flags'
+      Merge branch 'idpf-fix-3-bugs-revealed-by-the-chapter-i'
+      Merge tag 'for-net-2024-08-07' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+
+James Chapman (1):
+      l2tp: fix lockdep splat
+
+Joe Hattori (1):
+      net: dsa: bcm_sf2: Fix a possible memory leak in bcm_sf2_mdio_register()
+
+Kuniyuki Iwashima (1):
+      sctp: Fix null-ptr-deref in reuseport_add_sock().
+
+Kyle Swenson (1):
+      net: pse-pd: tps23881: Fix the device ID check
+
+Martin Whitaker (1):
+      net: dsa: microchip: disable EEE for KSZ8567/KSZ9567/KSZ9896/KSZ9897.
+
+Mateusz Polchlopek (1):
+      ice: Fix incorrect assigns of FEC counts
+
+Matthieu Baerts (NGI0) (7):
+      mptcp: fully established after ADD_ADDR echo on MPJ
+      mptcp: pm: deny endp with signal + subflow + port
+      mptcp: pm: reduce indentation blocks
+      mptcp: pm: don't try to create sf if alloc failed
+      mptcp: pm: do not ignore 'subflow' if 'signal' flag is also set
+      selftests: mptcp: join: ability to invert ADD_ADDR check
+      selftests: mptcp: join: test both signal & subflow
+
+Michael Chan (1):
+      bnxt_en : Fix memory out-of-bounds in bnxt_fill_hw_rss_tbl()
+
+Michal Kubiak (1):
+      idpf: fix memleak in vport interrupt configuration
+
+Nikolay Aleksandrov (1):
+      net: bridge: mcast: wait for previous gc cycles when removing port
+
+Praveen Kaligineedi (1):
+      gve: Fix use of netif_carrier_ok()
+
+Russell King (Oracle) (1):
+      net: stmmac: dwmac4: fix PCS duplex mode decode
+
+Stephen Hemminger (1):
+      MAINTAINERS: update status of sky2 and skge drivers
+
+Tristram Ha (1):
+      net: dsa: microchip: Fix Wake-on-LAN check to not return an error
+
+ZHANG Yuntian (1):
+      net: usb: qmi_wwan: add MeiG Smart SRM825L
+
+Zhengchao Shao (1):
+      net/smc: add the max value of fallback reason count
+
+ MAINTAINERS                                        |  2 +-
+ drivers/bluetooth/hci_qca.c                        | 19 ++++----
+ drivers/net/dsa/bcm_sf2.c                          |  4 +-
+ drivers/net/dsa/microchip/ksz_common.c             | 16 +++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 13 ++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |  2 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c | 14 ++----
+ drivers/net/ethernet/freescale/fec_ptp.c           |  3 ++
+ drivers/net/ethernet/google/gve/gve_ethtool.c      |  2 +-
+ drivers/net/ethernet/google/gve/gve_main.c         | 12 ++---
+ drivers/net/ethernet/intel/ice/ice_ethtool.c       |  8 ++--
+ drivers/net/ethernet/intel/ice/ice_main.c          |  2 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c           |  4 ++
+ drivers/net/ethernet/intel/idpf/idpf_lib.c         | 48 +++++++++----------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        | 43 ++++-------------
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  2 -
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  2 +-
+ drivers/net/pse-pd/tps23881.c                      |  5 +-
+ drivers/net/usb/qmi_wwan.c                         |  2 +
+ drivers/net/virtio_net.c                           | 14 +++++-
+ include/linux/ethtool.h                            | 10 ++--
+ net/bluetooth/hci_sync.c                           | 14 ++++++
+ net/bluetooth/l2cap_core.c                         |  1 +
+ net/bridge/br_multicast.c                          |  4 +-
+ net/core/link_watch.c                              |  4 +-
+ net/ethtool/ioctl.c                                | 18 ++++---
+ net/ipv4/tcp_ao.c                                  | 43 ++++++++++++-----
+ net/l2tp/l2tp_core.c                               | 15 +++++-
+ net/mptcp/options.c                                |  3 +-
+ net/mptcp/pm_netlink.c                             | 47 +++++++++++-------
+ net/sctp/input.c                                   | 19 ++++----
+ net/smc/smc_stats.h                                |  2 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 55 ++++++++++++++++------
+ 33 files changed, 276 insertions(+), 176 deletions(-)
 
