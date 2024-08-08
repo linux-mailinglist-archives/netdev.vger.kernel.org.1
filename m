@@ -1,93 +1,166 @@
-Return-Path: <netdev+bounces-116882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEFC994BF70
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:16:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE2694BF81
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108F31C25F13
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:16:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CA212887DD
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A80C18EFEB;
-	Thu,  8 Aug 2024 14:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517BC148316;
+	Thu,  8 Aug 2024 14:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iB42YO84"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9ENZUsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4BA18DF6E;
-	Thu,  8 Aug 2024 14:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEA418C900
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723126313; cv=none; b=Pcq8uMSGsgGAMkOuXP6PQfFdIhJKIikasaS5s5yOUbYjB5T29uofmukHuiqO3HJAh+f3Rqkv4Z+BxTRJH1X7VTlOtnqgOzILbFQsFWkpGjtUuHbX9ScMG5zC17JXQFteowTRvqHapTkew9uuFa2x7ymFgzaoTd6sSq7AyWqaYqo=
+	t=1723126676; cv=none; b=S9o88bZKrS3YX8fYX+dLT/lNmXnZ9t1rq9AUdovHT9vM+TisRcLC5cGn/PKCU9ozsbZL00iiFwQNKgLdgeZhDsXLkJPldzCb68hg9Ld/p6ci3WFaG/BI4Xw9lIG17hghXBc9aCw9C6ZxApqNcMlifT5kYHe+G2U1sCoq4egbb/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723126313; c=relaxed/simple;
-	bh=vgXT7m8NH3XZxE/FG7b0Er74vsRoh+dJVgOe3aYqbL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hCbzcJP4PIjfBq1AOoAe/I+4pJXm6z1Kv6Ibxe1k3xp+PhhijQ+8s1SdR+dco8e0wAYrGZBgcUkOyUZ3/3dQ/bL085FADt9F4IZRye80NKKMAruMO330BIlFbPmSvAJtAOB3xZBqcTwmd9+dErMtu/BCCAW03292aIlBdGg2XPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iB42YO84; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vmM6B6En+4wgIlMqg7/+TTbOvDNuGuDEOy3rxQ01D1A=; b=iB42YO84SFBbC5y44z3qI9MDTP
-	VbI2K0KEbHvDRftgSugK2HxW845rFB9cGe20qmkv0lYaF8bADNtYp7jggUhyaHAePGJAJ60F2pdxr
-	FUkF14CUfSC7Z+O9K5LHWhdFmkwEB2sJYLSTQtTBhavhSfEPA4hMmeEw6QYYVyobTtXA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sc3rg-004IGv-6l; Thu, 08 Aug 2024 16:11:40 +0200
-Date: Thu, 8 Aug 2024 16:11:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Divya Koppera <Divya.Koppera@microchip.com>
-Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: microchip_t1: Adds support for
- LAN887x phy
-Message-ID: <e9fdc9f6-8c89-4c2a-ba38-d927d0a52d78@lunn.ch>
-References: <20240808145916.26006-1-Divya.Koppera@microchip.com>
+	s=arc-20240116; t=1723126676; c=relaxed/simple;
+	bh=QBRWwLqySkPlhf8Vh9dijT55sh8UZsvzzEjAHMSx5O0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NpolhNLVsgUkAIsTv3ehaQmBLlXCps3SBKHCglgfvUp9saSeYHuS/HmhoMGixmaSocHswI2AjfV311ylvSRNdbGsh6eQ23+StclMvh68eDApeL0YJd/pQP+HBwYnDbhQxxHXKQsJdVdUys/IyquJUwlEDiD4DhqZyPtluNBMVqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9ENZUsr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429AAC32782;
+	Thu,  8 Aug 2024 14:17:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723126675;
+	bh=QBRWwLqySkPlhf8Vh9dijT55sh8UZsvzzEjAHMSx5O0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k9ENZUsrw+/2Jz7/B5znA0wsQAner39SkL4qXJ0pkIRW5qqogI3d/h3ot3Gl8lc4h
+	 jit/PMND8QfTinpvHRKxx11PdYco7D9H0q8rdbSY+EfUAwQ/kl0MWO4IFp1td3PLM4
+	 3lzcf/qNgNZUriPe/ENI7QafoH9FHbUqGy0iHhY+Q2Oiv46t8n2P/26hqz50hDTKID
+	 xJHU8MUeGbsi3FJvl9KudfDipbPGVSrXj/ucnC4oZXuD8yiQpSg58GhOIHTKBnOlvS
+	 c03IIjHPM53Az0bXg7opdrdyrAY8xiCBPb4Pe6TkrxU23k/ZP2Xpd8xHxeXpOwGJIa
+	 xDDUJDXXKX0kA==
+Date: Thu, 8 Aug 2024 07:17:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Jiri Pirko
+ <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
+ Samudrala <sridhar.samudrala@intel.com>, John Fastabend
+ <john.fastabend@gmail.com>, Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
+Message-ID: <20240808071754.72be6896@kernel.org>
+In-Reply-To: <20240808122042.GA3067851@kernel.org>
+References: <cover.1722357745.git.pabeni@redhat.com>
+	<75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
+	<29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
+	<20240731185511.672d15ae@kernel.org>
+	<20240805142253.GG2636630@kernel.org>
+	<20240805123655.50588fa7@kernel.org>
+	<20240806152158.GZ2636630@kernel.org>
+	<20240808122042.GA3067851@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240808145916.26006-1-Divya.Koppera@microchip.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +	if (!IS_ENABLED(CONFIG_OF_MDIO)) {
-> +		/* Configure default behavior of led to link and activity for any
-> +		 * speed
-> +		 */
-> +		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND1,
-> +				     LAN887X_COMMON_LED3_LED2,
-> +				     LAN887X_COMMON_LED2_MODE_SEL_MASK,
-> +				     LAN887X_LED_LINK_ACT_ANY_SPEED);
+On Thu, 8 Aug 2024 13:20:42 +0100 Simon Horman wrote:
+> Thanks again for the information.
+> 
+> I have now taken another look at this problem.
+> 
+> Firstly, my analysis is that the cause of the problem is a combination of
+> the way the patchset is constricted, and the way that the build tests (I
+> have focussed on build_allmodconfig_warn.sh [1]).
+> 
+> [1] https://github.com/linux-netdev/nipa/blob/main/tests/patch/build_allmodconfig_warn/build_allmodconfig.sh
+> 
+> What I believe happens is this: The patches 01/12 - 07/12 modify some
+> header files, adds a new Kconfig entry, and does a bunch of other normal
+> stuff. Each of those patches is tested in turn, and everything seems fine.
+> 
+> Then we get to patch 08/12. The key thing about this patch is that it
+> enables the CONFIG_NET_SHAPER Kconfig option, in the context of an
+> allmodconfig build. That in turn modifies the headers
+> include/linux/netdevice.h and net/core/dev.h (and net/Makefile). Not in the
+> in terms of their on-disk contents changing, but rather in the case of the
+> header files, in terms of preprocessor output. And this is, I believe,
+> where everything goes wrong.
 
-This is unusual. What has OF_MDIO got to do with LEDs?
+That's strange, make does not understand preprocessor, does it?
+Either file has been modified or it has not.
+I guess it doesn't matter, given your solution  
 
-Since this is a new driver, you can default the LEDs to anything you
-want. You however cannot change the default once merged. Ideally you
-will follow up with some patches to add support for controlling the
-LEDs via /sys/class/leds.
+> NIPA arrives at running build_allmodconfig_warn.sh for patch 08/12 with the tree
+> built for the previous patch, 07/12. It then:
+> 
+> * touches $output_dir/include/generated/utsrelease.h
+> * checks out HEAD~ (patch 07/12)
+> * prepares the kernel config
+> * builds kernel and records incumbent errors (49)
+> 
+> The thing to note here is that the tree has been little perturbed since build
+> tests were run for patch 07/12, and thus few files are rebuilt.
+> 
+> Moving on, simplifying things, the following then runs:
+> 
+> * touches $output_dir/include/generated/utsrelease.h
+> * checks out $HEAD (patch 08/12)
+> * prepares the kernel config
+> * builds kernel and records current errors (4219)
+> 
+> The key to understanding why the large delta between 49 and 4219 is
+> that vastly more files have been rebuilt. Because the preprocessor output
+> of netdevice.h and dev.h have changes since the last build, and those
+> headers are included, directly or indirectly, by a lot of files (and
+> compilation results in warnings for many of those files).
+> 
+> 
+> I was able to reproduce the result by running build_allmodconfig_warn.sh
+> over patch 07/12 and then 07/12 with FIRST_IN_SERIES=0.
+> 
+> I was able to get the desired result no new compiler warnings
+> by doing the same again, but with FIRST_IN_SERIES=1 for the
+> invocation of build_allmodconfig_warn.sh for 08/12.
+> 
+> I believe this is entirely due to a baseline rebuild being run due to the
+> FIRST_IN_SERIES=1 parameter. And, FWIIW, I believe the invocation of
+> build_allmodconfig_warn.sh for 07/12 ensures reproducibility.
+> 
+> My suggestion is that while we may consider reorganising the patch-set,
+> that is really only a work around. And it would be best to make the CI more
+> robust in the presence of such constructions.
+> 
+> It may be a bit heavy handed, but my tested solution is to invoke a
+> baseline rebuild if a Kconfig change is made. At the very last it does
+> address the problem at hand. (In precisely the same way as manually setting
+> FIRST_IN_SERIES=1.)
+> 
+> The patch implementing this for build_allmodconfig.sh which I tested is
+> below. If we want to go ahead with this approach then I expect it is best
+> to add it to other build tests too. But this seems to be a good point
+> to report my findings, so here we are.
+> 
+> --- build_allmodconfig.sh.orig  2024-08-08 07:30:56.599372164 +0000
+> +++ build_allmodconfig.sh       2024-08-08 09:58:22.692206313 +0000
+> @@ -34,8 +34,10 @@
+>  echo "Tree base:"
+>  git log -1 --pretty='%h ("%s")' HEAD~
+> 
+> -if [ x$FIRST_IN_SERIES == x0 ]; then
+> -    echo "Skip baseline build, not the first patch"
+> +if [ x$FIRST_IN_SERIES == x0 ] && \
+> +   ! git diff --name-only HEAD~ | grep -q -E "Kconfig$"
+> +then
+> +    echo "Skip baseline build, not the first patch and no Kconfig updates"
+>  else
+>      echo "Baseline building the tree"
 
-> +static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
-> +{
-> +	for (int i = 0; i < ARRAY_SIZE(lan887x_hw_stats); i++) {
-> +		strscpy(data + i * ETH_GSTRING_LEN,
-> +			lan887x_hw_stats[i].string, ETH_GSTRING_LEN);
-> +	}
-
-There has been a general trend of replacing code like this with
-ethtool_puts().
-
-	Andrew
+Excellent idea, let's try it! Could you send a PR to NIPA?
+Note that the code is copied 3 times for each flavor of building :(
 
