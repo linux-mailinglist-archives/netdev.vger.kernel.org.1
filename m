@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-116739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 853E594B879
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:01:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EA294B863
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CC2D1F26963
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:01:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FCA283091
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 07:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF512189535;
-	Thu,  8 Aug 2024 08:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9458E188CD9;
+	Thu,  8 Aug 2024 07:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="sP2joL0F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gT9XD+Dt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF00E186289;
-	Thu,  8 Aug 2024 08:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672F312C475;
+	Thu,  8 Aug 2024 07:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723104066; cv=none; b=jaWjp6Rsfr0qNu5JotSIenobz2VfkXdpHFMqHGl0n0geAsT+BBbY8dfpuPbuwMg1ku9I/oT8dOlW7X0213d59CkkYrQ1QoUnReOaBam+0surArRAkE1HdUkAkw0EqY6C72VHUuyzD18/gcu6Irfw2A1CfhtNaY3dZiwTwhIIHeg=
+	t=1723103960; cv=none; b=jUn4DxgRgn5iz4yHOoDuAPf+JXtr+AsGh98dxWs2phY/Cszm8BlZLIbiNelQOuel10nDUR0ZffahpfjN9Y9Pgj3/OfUSArjZCtoqpThHiKfYXRT8/W5mbqIwlEqE7w9QleUQ8Np0OAYFGa9wvXJwW0+9vZ5V+r2tAG+4sJLoffs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723104066; c=relaxed/simple;
-	bh=RWh44ibT1OVXVkS6LOhCJHv00CcuvNPdegD/w3KXWug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Uj1ZditJrX9LhmMYrASNrvWo1UmmqRPY3rxuNqqseukICfeaGxLeNe3CjBErEyWhACDGhMJFXpTZfvP6zPy1n97BUCNPrfORkTAbMR1TjAt6kP0hB+qs39rY1jiw0xsjypOck7zQrlLoVXrbUmzmQvYBvJJGaYDzr0AgqixcQj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=sP2joL0F; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1723104058;
-	bh=RWh44ibT1OVXVkS6LOhCJHv00CcuvNPdegD/w3KXWug=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sP2joL0Fq8GhKMyYaxcHb9q2P9pmOFGuvSnf1Xsi41RdprY8zS8U3u927CeScJZDL
-	 optsYomQ9stB2MGKdzl0vAbIL/OlMyiBDt13gS9WiOUXRaVMM7e12kUREMP2YxPRqr
-	 ae8/FWD2wvv2pJ74NDWiRH5TS4z07wH6dh4ZN5RphIOkM+NhCYeU0lDjld++JOsFzN
-	 BTqHdDfiPeYmSAappR+ne5E8TbSWTq1XjWmQGr5PZ41QjlF1BrEjlvcLqf53HP9ONc
-	 aI4RmQ9CdxaM7NdvTVhIY+yw9VhMOnsDhC+o9jGGV2T+QyCnOwF153dHhhQOmVXj56
-	 IWgjQjLVilGMQ==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 1639C60078;
-	Thu,  8 Aug 2024 07:59:18 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id BECD0202330; Thu, 08 Aug 2024 07:59:09 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: bpf@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Tushar Vyavahare <tushar.vyavahare@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next] selftests/bpf: Avoid subtraction after htons() in ipip tests
-Date: Thu,  8 Aug 2024 07:59:02 +0000
-Message-ID: <20240808075906.1849564-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1723103960; c=relaxed/simple;
+	bh=gWg/r/1SvXDtl8mHhSTr6bVgnFi9se9px6nxtby4afo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=eaqfv/o9sdFfabChzKnFqHmN9HBdElWDMGTwaB6ctbKtIjA0efSV6sX6HJZZH/qX1nHCDq5h9Xu9vkg+iA9VEsBlctKwhIL1ru+Dk/3XMCyP1h5wuHeOkMu5x0Vse7l5pHW5o4zbOK1HlmJGxQVbSzuqEkZ9Drr9aYCz0d1UBzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gT9XD+Dt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 619B1C32782;
+	Thu,  8 Aug 2024 07:59:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723103959;
+	bh=gWg/r/1SvXDtl8mHhSTr6bVgnFi9se9px6nxtby4afo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=gT9XD+DtkP2sOGMCsCMBMBcBc2edggYdxMyfaVr2HosFjVU+PB2Z7x/+FLZ90NvwW
+	 ZMa1th8LDVyiZiR7PyoYOdB7F3swfuRUlwbCjKo/hW8e8YGlwaE87mV7bwAdleV8Qr
+	 0+yYXVZzA12yJAmlgqMsMg2mmR1UBVI3bMlFLox8ruXSCymBXcYTh1w1h40Tz9Moz9
+	 Pu5H2OmErH1JmiHa3PL9bLSKd6c4goEzlEsYtBtIqVhaQ8L6258Sv+gfNKo/SEFudW
+	 g4SdnfX7HA4EHUG5JIjknF/SD7oNj365o30yZ6PONVw86hVIZZl7f+kHnDMfFyGgCO
+	 hJVMJtMo1jDOw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
+Cc: =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, Michael Margolin <mrgolin@amazon.com>, 
+ Mustafa Ismail <mustafa.ismail@intel.com>, netdev@vger.kernel.org, 
+ Saeed Mahameed <saeedm@nvidia.com>, 
+ Selvin Xavier <selvin.xavier@broadcom.com>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, Tariq Toukan <tariqt@nvidia.com>, 
+ Tatyana Nikolova <tatyana.e.nikolova@intel.com>, 
+ Yishai Hadas <yishaih@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+In-Reply-To: <cover.1722512548.git.leon@kernel.org>
+References: <cover.1722512548.git.leon@kernel.org>
+Subject: Re: (subset) [PATCH rdma-next 0/8] Introducing Multi-Path DMA
+ Support for mlx5 RDMA Driver
+Message-Id: <172310395487.1779734.12051360068889087637.b4-ty@kernel.org>
+Date: Thu, 08 Aug 2024 10:59:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-37811
 
-On little-endian systems, doing subtraction after htons()
-leads to interesting results:
 
-Given:
-  MAGIC_BYTES = 123 = 0x007B aka. in big endian: 0x7B00 = 31488
-  sizeof(struct iphdr) = 20
+On Thu, 01 Aug 2024 15:05:09 +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> From Yishai,
+> 
+> Overview
+> --------
+> This patch series aims to enable multi-path DMA support, allowing an
+> mlx5 RDMA device to issue DMA commands through multiple paths. This
+> feature is critical for improving performance and reaching line rate
+> in certain environments where issuing PCI transactions over one path
+> may be significantly faster than over another. These differences can
+> arise from various PCI generations in the system or the specific system
+> topology.
+> 
+> [...]
 
-Before this patch:
-__bpf_constant_htons(MAGIC_BYTES) - sizeof(struct iphdr) = 0x7AEC
-0x7AEC = htons(0xEC7A) = htons(60538)
+Applied, thanks!
 
-So these were outer IP packets with a total length of 123 bytes,
-containing an inner IP packet with a total length of 60538 bytes.
+[2/8] RDMA/mlx5: Introduce the 'data direct' driver
+      https://git.kernel.org/rdma/rdma/c/281658bd04e7b9
+[3/8] RDMA/mlx5: Add the initialization flow to utilize the 'data direct' device
+      https://git.kernel.org/rdma/rdma/c/302b01afc28b1e
+[4/8] RDMA/umem: Add support for creating pinned DMABUF umem with a given dma device
+      https://git.kernel.org/rdma/rdma/c/b047ecbd7672d2
+[5/8] RDMA/umem: Introduce an option to revoke DMABUF umem
+      https://git.kernel.org/rdma/rdma/c/bc9be75e01373c
+[6/8] RDMA: Pass uverbs_attr_bundle as part of '.reg_user_mr_dmabuf' API
+      https://git.kernel.org/rdma/rdma/c/83f44068da564d
+[7/8] RDMA/mlx5: Add support for DMABUF MR registrations with Data-direct
+      https://git.kernel.org/rdma/rdma/c/19ae08911f8be1
+[8/8] RDMA/mlx5: Introduce GET_DATA_DIRECT_SYSFS_PATH ioctl
+      https://git.kernel.org/rdma/rdma/c/d222b19c595f63
 
-After this patch:
-__bpf_constant_htons(MAGIC_BYTES - sizeof(struct iphdr)) = htons(103)
-
-Now these packets are outer IP packets with a total length of 123 bytes,
-containing an inner IP packet with a total length of 103 bytes.
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
-I didn't target bpf and add a Fixes: e853ae776a58 ("selftests/bpf:
-support BPF_FLOW_DISSECTOR_F_STOP_AT_ENCAP"), since it only breaks
-when I change the BPF flow dissector to interact with tot_len.
-
- .../selftests/bpf/prog_tests/flow_dissector.c        | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/flow_dissector.c b/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-index 9e5f38739104..6b3078dd5645 100644
---- a/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-+++ b/tools/testing/selftests/bpf/prog_tests/flow_dissector.c
-@@ -378,8 +378,8 @@ struct test tests[] = {
- 			.iph_inner.ihl = 5,
- 			.iph_inner.protocol = IPPROTO_TCP,
- 			.iph_inner.tot_len =
--				__bpf_constant_htons(MAGIC_BYTES) -
--				sizeof(struct iphdr),
-+				__bpf_constant_htons(MAGIC_BYTES -
-+				sizeof(struct iphdr)),
- 			.tcp.doff = 5,
- 			.tcp.source = 80,
- 			.tcp.dest = 8080,
-@@ -407,8 +407,8 @@ struct test tests[] = {
- 			.iph_inner.ihl = 5,
- 			.iph_inner.protocol = IPPROTO_TCP,
- 			.iph_inner.tot_len =
--				__bpf_constant_htons(MAGIC_BYTES) -
--				sizeof(struct iphdr),
-+				__bpf_constant_htons(MAGIC_BYTES -
-+				sizeof(struct iphdr)),
- 			.tcp.doff = 5,
- 			.tcp.source = 80,
- 			.tcp.dest = 8080,
-@@ -436,8 +436,8 @@ struct test tests[] = {
- 			.iph_inner.ihl = 5,
- 			.iph_inner.protocol = IPPROTO_TCP,
- 			.iph_inner.tot_len =
--				__bpf_constant_htons(MAGIC_BYTES) -
--				sizeof(struct iphdr),
-+				__bpf_constant_htons(MAGIC_BYTES -
-+				sizeof(struct iphdr)),
- 			.tcp.doff = 5,
- 			.tcp.source = 99,
- 			.tcp.dest = 9090,
+Best regards,
 -- 
-2.45.2
+Leon Romanovsky <leon@kernel.org>
 
 
