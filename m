@@ -1,145 +1,142 @@
-Return-Path: <netdev+bounces-117002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF31B94C4D2
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:46:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC4A94C4DB
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 20:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 181661C20BFA
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:46:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84681B23F3D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 18:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B18E13774A;
-	Thu,  8 Aug 2024 18:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CEA142E6F;
+	Thu,  8 Aug 2024 18:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HOa996a6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMhvR5RT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DEE146D6F
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 18:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BF94A1E;
+	Thu,  8 Aug 2024 18:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723142707; cv=none; b=PbXMdbubfchiLNLlnxrIa79MHoYapyEmwmpKRBYHlU6CfqYSYeuqBv1KYtl+SWmWw4MBQCDD8+8yVdaVw4mjl5M5i15bHsTFDIHHW/GWdSEqO7B4SisZ/UdiTJaJi+HEGDcur/Gt7+OXi01HQyAprg4oD8G4XfnLr/NU8FPPtqk=
+	t=1723142933; cv=none; b=raQ6HQKllP/J7Vt1tbqs0gZdPkhyDuw07GknMYOfmZuEyAYiFP1wl2vR7mvC5KecKXod8qopYySkwpq3SS5aGv30wOmNTgjJXQoo602gYsLG/dvYKcxRQQQxB/qBkDWYMRPE+ibjGncZLn1JY6Wlw6LwWbkY2PDGywQJfuCfHS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723142707; c=relaxed/simple;
-	bh=S3jI97eXS4xdujSpqv7QnBeHMxczJyVODGS5bRHsHzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObAyeLfgaAYLooY7XqF6mXvIGUPNqtpdfF3thQSPKaQY3qrI50uURmduSes7RDhrKgtxnPhLfKvK9Nx2XHjiCBC7uCNA5LKIWQczWiWcEk1XKBkmLWQo+b3UfNDNMbCMKrdLReFwohxfRLjdE27MDi36FJLDHJkYosDDVLnk1nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HOa996a6; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723142705; x=1754678705;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S3jI97eXS4xdujSpqv7QnBeHMxczJyVODGS5bRHsHzA=;
-  b=HOa996a6lwvP955aXELof1ySbki70+ZPphxmmGdWJvtpPufGtfkENO63
-   uXyCXOdaZuuSS54FCMniKFGxWBARScDboMlgP3QNQvkwkikOi2gEeo4xl
-   hFL5+rOJRp9eUQFlHDWVR9e+BlKL7KvCIIrwa+ryK9iU0AvRYrt+XwPFo
-   sNV6GbtcWx2KtU0WdQK8svB64DmwIGR8J63b8+L50G49SASqDxLm58Tet
-   wrbSB0OoUMD3ECyT5CTFrJEfTdkOTiWckFcyAv1+aoUIug+AZV5Yfqkwu
-   v61ADXRtXP11snioOefCQ3Vsg1BvCry0xHLys/tyNm32IcfY9tQh0RMiL
-   A==;
-X-CSE-ConnectionGUID: lWPhoQGASIWee7svd+beIw==
-X-CSE-MsgGUID: CmkNG3HyS4OX6yJ0zMUGhg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="31964776"
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="31964776"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 11:45:05 -0700
-X-CSE-ConnectionGUID: udR9EZjrTzeVbeKBg4SoRw==
-X-CSE-MsgGUID: xfRe5Up4Sri8qMIACKliLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,273,1716274800"; 
-   d="scan'208";a="80548693"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 08 Aug 2024 11:45:03 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sc888-0006Q4-0I;
-	Thu, 08 Aug 2024 18:44:58 +0000
-Date: Fri, 9 Aug 2024 02:44:11 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@chopps.org>
-Subject: Re: [PATCH ipsec-next v9 11/17] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Message-ID: <202408090204.4R0W11cX-lkp@intel.com>
-References: <20240807211331.1081038-12-chopps@chopps.org>
+	s=arc-20240116; t=1723142933; c=relaxed/simple;
+	bh=/ehFHaaDMn0rzQxH1gATB74JG63gId7TneNI0Ylmf+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G4R+PnLJ78Ldeq64JoOIiF6ZQkACtnRDVRxW86BwS98En4HErQ/W/Wou1GvqFF7gyfiztWSWqRocmVBbUW8GGU1dvqcA8b6TuU9Hk+Ek0Qfh+cIaq12avhOonaesOWwehYTMwtnPYSxNjULpBlIrZqI5cyIf3nYJ4vOhHgpDuQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMhvR5RT; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e05e94a979eso1852511276.0;
+        Thu, 08 Aug 2024 11:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723142931; x=1723747731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/ehFHaaDMn0rzQxH1gATB74JG63gId7TneNI0Ylmf+A=;
+        b=YMhvR5RTNzxymIWgL7ZxJb+BRqpTrb5kfUkrNeFHNw8d/QE+VffHP1SmOSsvQ0E8JU
+         0lql5Teeu0DtPh0C+/n3ym0wAol0odK1+XWzjHDBpu5SwdlVe7tuDr1r3rVPbyBqeAez
+         NjFcyADKFowzMEgBty94XYg2ptypk7Rr8hxDhcBqbRcbvk8GoT1s88Vf3B99QNtX4KCj
+         +HBdQ89HUOFei+zymGbhXIGDxFVcZLwfHwd32ByYs1vqIIn9+yQRqTe+zF/+eYo75oHD
+         9B8DePyrYfiZV3j0MSph+1LqimotFwiprM+jcw3KpBwAapaCXO7Ph9nSJBsaVcYskty7
+         y2cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723142931; x=1723747731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/ehFHaaDMn0rzQxH1gATB74JG63gId7TneNI0Ylmf+A=;
+        b=Op2URbAkVKYoF5pO8qsWnqfNThoZmSYjFdCe3tRsK13rZSARGAaOK0l4HVByMC+tti
+         DKofvXZhbV1uXCPkg7AsMntaEXdTBAQhzXylPHapYQ+uFD9Iwre4p+HubvQJNAGavKha
+         RK9aUALLTGexhH68meVSIHJXjEZMg88WEYWNansESQL6MurexvoG7DoGVT4RLWEE31kE
+         hnA77YQK0eZRNp0+x4EjXziyRl2jufUlMjVUgF2EHjKg3a2UELy3L4VDlamvdfWYLGfD
+         lajwbTB3poElqgfGDFDNBcD8JK63b2YZ/l6H08U8gxJzF9oLMEwOYINceDkdKlNQ42xF
+         Wwhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEqGeOlv5rV+auhK260nbJXG438WfCMq6WkzRusdz/AkorpInSRIP9/aOkZnUg4jnFxlxQ0ZiOrFJQfjV7ynD4kb4r40FbpA1SU+9nrAsn8feAbfU7WaYlDireae1uxyb6IqBN
+X-Gm-Message-State: AOJu0Yw5ELHO/fxKmJ90tCCjahA43dpXs698uImKSBuBfMrLzPJsp3ty
+	RwJoVQWKc17EXuur7YMUqVJP1c1uXJlQ+D9DGhVfB5GP32fuJWHqYN32Qyc/FXSHitgXH9AM/wA
+	pyaPY6TVuJdcyh6P96QN/R/U5M2c=
+X-Google-Smtp-Source: AGHT+IFW1W8XU3tGNGYJodhTWxFp3JWvIfGQTKMaOKZXObePiPsAj++tbm+UuE2g930RM+PEfiymaMkzELPr4+685Qk=
+X-Received: by 2002:a05:6902:1894:b0:e0b:28f5:3ff7 with SMTP id
+ 3f1490d57ef6-e0e9f6f387emr2518589276.4.1723142931094; Thu, 08 Aug 2024
+ 11:48:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240807211331.1081038-12-chopps@chopps.org>
+References: <CAF=yD-+2SnOzALmisVVBZAKNKrCMv07FdEDP1ov35APNMYOTew@mail.gmail.com>
+ <6C9DA933-5EAA-4711-BF89-0B71834DA211@soulik.info>
+In-Reply-To: <6C9DA933-5EAA-4711-BF89-0B71834DA211@soulik.info>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 8 Aug 2024 14:48:13 -0400
+Message-ID: <CAF=yD-JVs3h1PUqHaJAOFGXQQz-c36v_tP4vOiHpfeRhKh-UpA@mail.gmail.com>
+Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue index
+To: ayaka <ayaka@soulik.info>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+> > So I guess an application that owns all the queues could keep track of
+> > the queue-id to FD mapping. But it is not trivial, nor defined ABI
+> > behavior.
+> >
+> > Querying the queue_id as in the proposed patch might not solve the
+> > challenge, though. Since an FD's queue-id may change simply because
+> Yes, when I asked about those eBPF thing, I thought I don=E2=80=99t need =
+the queue id in those ebpf. It turns out a misunderstanding.
+> Do we all agree that no matter which filter or steering method we used he=
+re, we need a method to query queue index assigned with a fd?
 
-kernel test robot noticed the following build errors:
+That depends how you intend to use it. And in particular how to work
+around the issue of IDs not being stable. Without solving that, it
+seems like an impractical and even dangerous -because easy to misuse-
+interface.
 
-[auto build test ERROR on klassert-ipsec-next/master]
-[also build test ERROR on netfilter-nf/main linus/master v6.11-rc2]
-[cannot apply to klassert-ipsec/master nf-next/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > another queue was detached. So this would have to be queried on each
+> > detach.
+> >
+> Thank you Jason. That is why I mentioned I may need to submit another pat=
+ch to bind the queue index with a flow.
+>
+> I think here is a good chance to discuss about this.
+> I think from the design, the number of queue was a fixed number in those =
+hardware devices? Also for those remote processor type wireless device(I th=
+ink those are the modem devices).
+> The way invoked with hash in every packet could consume lots of CPU times=
+. And it is not necessary to track every packet.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/net-refactor-common-skb-header-copy-code-for-re-use/20240808-073926
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20240807211331.1081038-12-chopps%40chopps.org
-patch subject: [PATCH ipsec-next v9 11/17] xfrm: iptfs: add fragmenting of larger than MTU user packets
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20240809/202408090204.4R0W11cX-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240809/202408090204.4R0W11cX-lkp@intel.com/reproduce)
+rxhash based steering is common. There needs to be a strong(er) reason
+to implement an alternative.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408090204.4R0W11cX-lkp@intel.com/
+> Could I add another property in struct tun_file and steering program retu=
+rn wanted value. Then it is application=E2=80=99s work to keep this new pro=
+perty unique.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+I don't entirely follow this suggestion?
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/locking/test-ww_mutex.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in fs/unicode/utf8data.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in fs/unicode/utf8-selftest.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in security/apparmor/apparmor_policy_unpack_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/find_bit_benchmark.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/cpumask_kunit.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_bitmap.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_objpool.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/imx/mxc-clk.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/imx/clk-imxrt1050.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/auxdisplay/hd44780_common.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/auxdisplay/line-display.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/ch341.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb_debug.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/mxuport.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/navman.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/qcaux.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb-serial-simple.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/symbolserial.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_simpleondemand.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_performance.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_powersave.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_userspace.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-hub.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-aspeed.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-gpio.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-ast-cf.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-scom.o
->> ERROR: modpost: "___copy_skb_header" [net/xfrm/xfrm_iptfs.ko] undefined!
+> > I suppose one underlying question is how important is the mapping of
+> > flows to specific queue-id's? Is it a problem if the destination queue
+> > for a flow changes mid-stream?
+> Yes, it matters. Or why I want to use this feature. From all the open sou=
+rce VPN I know, neither enabled this multiqueu feature nor create more than=
+ one queue for it.
+> And virtual machine would use the tap at the most time(they want to emula=
+te a real nic).
+> So basically this multiple queue feature was kind of useless for the VPN =
+usage.
+> If the filter can=E2=80=99t work atomically here, which would lead to unw=
+anted packets transmitted to the wrong thread.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+What exactly is the issue if a flow migrates from one queue to
+another? There may be some OOO arrival. But these configuration
+changes are rare events.
 
