@@ -1,133 +1,78 @@
-Return-Path: <netdev+bounces-116903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F6D94C04B
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:54:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFB194C04D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 16:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E3F928481C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:54:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D9C71C25576
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 14:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E40A18A6DB;
-	Thu,  8 Aug 2024 14:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9905618C925;
+	Thu,  8 Aug 2024 14:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LfbTfmjy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9ggPhsj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3943B674
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 14:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64189B674;
+	Thu,  8 Aug 2024 14:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723128879; cv=none; b=P+Ft1+iPKSy0crw9K/d1jlxeDNh7p4ZV9bsXPbWx2HnldioRPKlA435Y/l3SBN2OUsKVoa5XB3WDN0DO+s8D295M9tv9UiCWdbIwtYupvB6lMF3v71JgvsBSjTfx0UT6atbJHyjuRwCpoN62Whk3nKV70NtZOl5bp2C6/6za0Jo=
+	t=1723128906; cv=none; b=nWhyOntdLISmutJwg2BI0N6O6WSNhk+gzfwyczr0HvHzAhq4xPKWNeaE9lps6kjK9u/+Vmz6ef5Pg5DgJhiorp6v4XAU8lv19KgruXT+H/69bjzUhIUwovzqPO5bz06Txe86AV8sn5ttzwn5Ytr+hIZi96sFL0H/jeNGkbYCcFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723128879; c=relaxed/simple;
-	bh=0qVpnrrQ5V7Oba/idyBy4VNiEB/PEX7w0W9rmTe9SCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHLmf/egKDCRmd1VVfP0ek298m0b1VonCoNTMjf2CEXA+8ILna4EPDgdvi3nIrqIPPvSGa+Bx1CfJ8at586ZCPhWJjUW69rSOoq3KIrJLb7lKa7wO5u/el8thg4C1Qh1juJLZcxdhoGAvvN2xKk2YTXJltUKJNDubLP+rFBTJ38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LfbTfmjy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723128877;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E6VQurNupLMkE5+xs4FU6tjwM3iI7P4QQzeCwz5WnMw=;
-	b=LfbTfmjywVgGJUNO0D4NR6R7LVP16++7j/pyvwIX/PYh6YTpN3sGsgbzwBP2yqqh38mE6q
-	jsnjJ1lI2jm58talEXVXsFP2QZJTIoZDy63ojzrNpsrXgrVBMNJ9wyrMYXwLQvlrRaRrTj
-	a9FcWjEWC20okhkJVevbq8t9P1ouJxg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-J9hXCqd8Mf-C-AzaqRQL-g-1; Thu,
- 08 Aug 2024 10:54:33 -0400
-X-MC-Unique: J9hXCqd8Mf-C-AzaqRQL-g-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E06D1955F43;
-	Thu,  8 Aug 2024 14:54:32 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.192.194])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6CED19560A3;
-	Thu,  8 Aug 2024 14:54:30 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 310F0A80E94; Thu,  8 Aug 2024 16:54:28 +0200 (CEST)
-Date: Thu, 8 Aug 2024 16:54:28 +0200
-From: Corinna Vinschen <vinschen@redhat.com>
-To: christopher.s.hall@intel.com
-Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
-	vinicius.gomes@intel.com, netdev@vger.kernel.org,
-	rodrigo.cadore@l-acoustics.com
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 3/5] igc: Move ktime
- snapshot into PTM retry loop
-Message-ID: <ZrTcJGAMBBT2kClQ@calimero.vinschen.de>
-Mail-Followup-To: christopher.s.hall@intel.com,
-	intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
-	vinicius.gomes@intel.com, netdev@vger.kernel.org,
-	rodrigo.cadore@l-acoustics.com
-References: <20240807003032.10300-1-christopher.s.hall@intel.com>
- <20240807003032.10300-4-christopher.s.hall@intel.com>
+	s=arc-20240116; t=1723128906; c=relaxed/simple;
+	bh=9wj+Sw1FGnzP/7OJw4pkUts8rOKnpd8OWHW4ZPjweFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UgFpO+4mrdzr0AHIo1TqgBLH3RPIaF1DVmbSMAIHnvP6SHNP7LCZwDA+ovHITpPXr9Qsq/Q8VAHAwKT+rglJuyOhCHwXaURxcI/YEx69Ku18NY7WirmJlBSlWrtgvaKGmjXlEV1YrWAAD3WzZO4u89k0i+N2S00d+7xEsrhOzZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9ggPhsj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D63C32782;
+	Thu,  8 Aug 2024 14:55:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723128905;
+	bh=9wj+Sw1FGnzP/7OJw4pkUts8rOKnpd8OWHW4ZPjweFA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=E9ggPhsjjxGhFYrvyL35Cqxdz3a2aj6OT2cebRHYHe5e8iD3P1mfsuaOM/w5SS82V
+	 GQxdH2HDAT+nz6/UkhP5GbkbNCy1uhs3SkakapAuC7IGQNoR81/nxpHSR5nXbOZlwS
+	 b6Kp9ImIazIHdMpwdXIaUwO5vn0iGHsSAB4PJSnnfRiH/YRe2sxm81arjzUt5TfTqG
+	 L7Q2sqgxqAdyGXOrYbTnw+4qh/uyki0Wqy+6AL7yEVnw5saWGAOGNFm+WsJVaupjDk
+	 /+uv5XLI93oLGXjcSV7Ur+IP2DdqoTRQQhFYtYCkOJDNo3u0ixMeDE7/gR1RSDsp8D
+	 qZamv4PQ6jWzw==
+Date: Thu, 8 Aug 2024 07:55:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: longli@linuxonhyperv.com
+Cc: longli@microsoft.com, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shradha
+ Gupta <shradhagupta@linux.microsoft.com>, Simon Horman <horms@kernel.org>,
+ Konstantin Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
+ <schakrabarti@linux.microsoft.com>, Erick Archer
+ <erick.archer@outlook.com>, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: mana: Fix doorbell out of order violation
+ and avoid unnecessary doorbell rings
+Message-ID: <20240808075504.660a5905@kernel.org>
+In-Reply-To: <1723072626-32221-1-git-send-email-longli@linuxonhyperv.com>
+References: <1723072626-32221-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240807003032.10300-4-christopher.s.hall@intel.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Aug  6 17:30, christopher.s.hall@intel.com wrote:
-> From: Christopher S M Hall <christopher.s.hall@intel.com>
+On Wed,  7 Aug 2024 16:17:06 -0700 longli@linuxonhyperv.com wrote:
+> Cc: stable@vger.kernel.org
+> Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
 > 
-> Move ktime_get_snapshot() into the loop. If a retry does occur, a more
-> recent snapshot will result in a more accurate cross-timestamp.
-> 
-> Fixes: a90ec8483732 ("igc: Add support for PTP getcrosststamp()")
-> Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc_ptp.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> index 00cc80d8d164..fb885fcaa97c 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> @@ -1011,16 +1011,16 @@ static int igc_phc_get_syncdevicetime(ktime_t *device,
->  	int err, count = 100;
->  	ktime_t t1, t2_curr;
->  
-> -	/* Get a snapshot of system clocks to use as historic value. */
-> -	ktime_get_snapshot(&adapter->snapshot);
-> -
-> +	/* Doing this in a loop because in the event of a
-> +	 * badly timed (ha!) system clock adjustment, we may
-> +	 * get PTM errors from the PCI root, but these errors
-> +	 * are transitory. Repeating the process returns valid
-> +	 * data eventually.
-> +	 */
->  	do {
-> -		/* Doing this in a loop because in the event of a
-> -		 * badly timed (ha!) system clock adjustment, we may
-> -		 * get PTM errors from the PCI root, but these errors
-> -		 * are transitory. Repeating the process returns valid
-> -		 * data eventually.
-> -		 */
-> +		/* Get a snapshot of system clocks to use as historic value. */
-> +		ktime_get_snapshot(&adapter->snapshot);
-> +
->  		igc_ptm_trigger(hw);
->  
->  		err = readx_poll_timeout(rd32, IGC_PTM_STAT, stat,
-> -- 
-> 2.34.1
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-Reviewed-by: Corinna Vinschen <vinschen@redhat.com>
-
+no empty lines between trailers please
 
