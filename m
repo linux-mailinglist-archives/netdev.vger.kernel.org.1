@@ -1,142 +1,115 @@
-Return-Path: <netdev+bounces-116689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B933E94B5EE
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:33:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE3B94B5F9
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:45:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA391C20F7D
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:33:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B76AB21710
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C5442047;
-	Thu,  8 Aug 2024 04:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA38C2E400;
+	Thu,  8 Aug 2024 04:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8YUjVqu"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EUzPzas7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD35A33F7
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F91EBA3F
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723091586; cv=none; b=EwKGwrtnKd7ZY8EcLIuWEtbcymSLxbEYO2Racty0Bko6P3ekttx22KHFlFC9GVHYy9I52yW4DccbSpAh/s4NUVx8a74++Kb8cijuFa9fCOZq7KCvQJilaO9K+ivYDDkcGO02YHUJZdn8T5jP0ibhjUW3jA5mbwcxw9RR4TCkPrU=
+	t=1723092330; cv=none; b=YywqqFfSgZPNqlh0TxA0swJ17lcdHGHKUku4SZOe2sIn6KEmOqtDHazDDF03hTihRmJday6cHVZf+x3crWzWgBo3o/d+JG7AZQbQwicmi0P7AnNhr8V9jeryVxFA3pSXfhLzQ5LgqVprbi0p6OEXVR3L3rIUHhlmDjmzveZ/SmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723091586; c=relaxed/simple;
-	bh=QFAy697wAN7dsEJHmIU7tIJXf6pjK+aLxUfLMhIiPtE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=gV8TiY/02EE/re9jOwEwKaRm977rVevlSqtieq0udHs6icaWTus3mQn6BgdmdjNFTxNXrIFKTgnvJ5WVgtmUz3y9Pch6FtMO0Jztdx/plr0XbIFtGyUrJSctoS+FY7k8Qyxp+uiU3PYms6VoUcQKVymvrbQCOSySM43Ee5mkZ84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8YUjVqu; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so2479231a12.0
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 21:33:04 -0700 (PDT)
+	s=arc-20240116; t=1723092330; c=relaxed/simple;
+	bh=tteIP/nQrSVflOrI7qFAg7RHiK3RF74Psvxbh5GXdrI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CWBkfSZGxuMl7wve8bRpS+p2s1Xsl78R7Ez41VoiBoXt5BP5Nq98AhpBiQK2FChqC31dIjugoegoK/BCBW0Nq7jw/Bb3dQEpbQMtHViVC5JDzRlUjoBjhwvrIHtkkCSinaTx1M+ZE7soJxEOLlZsL/+i8bFOKCIme2tpXt2C4uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EUzPzas7; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723091583; x=1723696383; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oXwlvPW+PJG0QNHd9hZFCpw09AesEJRm/CzjDY1GnLw=;
-        b=H8YUjVqu3ghF04zlIaNoKvjUypJ5YyBDBpFjSPiQ+lLSKntNyuC1on4cUmfCZNJZkp
-         vOWBjLy255Kk52PmlthUA07hQ0NdCnR0IisPIDL3NgjQkcwPafn+sZ9a894sWHb903FZ
-         5FyfX/sP9ny9xaP8qUSx/H62MChYE8EyiimnIr/8gzdqwwtcCYFaPPuwqFX3cyvDPpfh
-         5ayRjTUNG6Wk11AVz/bSl52fmBXVkMR9KwVi/zsvad4CofXBKi9ixXM7ZkamnLYEYKnX
-         9kX91jDvR3gQUKaUk09+KGZdanXQ66KFIWq84OB2rxJo6sMtRQtlr3lZ7wjRG0+SD2DE
-         a9kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723091583; x=1723696383;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oXwlvPW+PJG0QNHd9hZFCpw09AesEJRm/CzjDY1GnLw=;
-        b=UfGIH9Yv1fCpHQCmB7J+ADGAa3HZF8rrGrHhy6Y7SaCii4YY93ARDFjamUFPNbwtZg
-         RVN/RiEEFEvBnOrHmfrY6/g1/y9pXtgwMcWIZ02lGqImm9hKwF+kiCJLyoeCCpD8wbDh
-         KZ6e46MX5gs+7mKg0snH6ItRd3Qx2RwxrKFdTqGIrr7dcfkrno04XDNPEZ+Mb0ZVH0qA
-         hywMZRH6JJ7EgC1bnSElHbFvY3j34wU9qsY33sGytmQE+ItEHotz1WjLja0HhXDoKeOF
-         g20/0v1Csxe5TkPdwSpjH0nrvGWv4rPSDymbyqaZGlpq2VnZBYn97TL3BfIHZujeyD+g
-         ywQA==
-X-Gm-Message-State: AOJu0YwiPJziWggDFYsKdN1q7ObmukiOgMLu+XRqRwkDb/GCKUnFEo/p
-	DhJfSCI80jBly9N8b2tMg9XG78be+T39IJs1bL5clzJP6qzDU6RrZdIHI4R3RPtNdjIOCSyInMM
-	rCGpVI46F+llzjYuwIj+54mePs/Az93aHGcQ=
-X-Google-Smtp-Source: AGHT+IHdFw/1eKNw5QlD6RfyREpqUB2orfOCdQbDZf3exM7eNalate9ydclM60JzPzZBRLUyni1f2u8xLuIYGsTAeEM=
-X-Received: by 2002:a17:907:7216:b0:a7a:be06:d8f1 with SMTP id
- a640c23a62f3a-a8092019ae6mr38771266b.25.1723091582736; Wed, 07 Aug 2024
- 21:33:02 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723092329; x=1754628329;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=veGOd6bM62X/hnwNsf2+7yOQByT67Ubh8iWpURtZ+cw=;
+  b=EUzPzas7A3v3vKRXx29otq5wDQybNXNE9lgozqyGkfAJLUAwnK65fn25
+   ess+9XgyvFyER6BACeIcazp5NFkk4P2pnzQIAi2yGrwIJYaVGSWgwXdPL
+   TnZKZCguUQMRWHUI0bU4POadVXcrfXGG6LGsr+pUMJ2owfUrb5c3MhivT
+   4=;
+X-IronPort-AV: E=Sophos;i="6.09,271,1716249600"; 
+   d="scan'208";a="319114421"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 04:45:27 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:50001]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.23:2525] with esmtp (Farcaster)
+ id 3d91cd81-c5d1-4fd2-a50b-dd7406a8a140; Thu, 8 Aug 2024 04:45:26 +0000 (UTC)
+X-Farcaster-Flow-ID: 3d91cd81-c5d1-4fd2-a50b-dd7406a8a140
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 8 Aug 2024 04:45:26 +0000
+Received: from 88665a182662.ant.amazon.com (10.135.210.149) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 8 Aug 2024 04:45:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <vineeth.karumanchi@amd.com>
+CC: <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <nicolas.ferre@microchip.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net] net: macb: Use rcu_dereference() for idev->ifa_list in macb_suspend().
+Date: Wed, 7 Aug 2024 21:45:15 -0700
+Message-ID: <20240808044516.12826-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <7a61eaff-3ea4-4eba-a11f-7c4caaef45dd@amd.com>
+References: <7a61eaff-3ea4-4eba-a11f-7c4caaef45dd@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Duan Jiong <djduanjiong@gmail.com>
-Date: Thu, 8 Aug 2024 12:32:51 +0800
-Message-ID: <CALttK1TYZURJo8AKtGQFcKKMvzssy3mF=iG9rODqvEiPw_qqpg@mail.gmail.com>
-Subject: [PATCH] veth: Drop MTU check when forwarding packets
-To: "David S. Miller" <davem@davemloft.net>
-Cc: netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From dcf061830aba15b57819600b5db782981bab973a Mon Sep 17 00:00:00 2001
-From: Duan Jiong <djduanjiong@gmail.com>
-Date: Thu, 8 Aug 2024 12:23:01 +0800
-Subject: [PATCH] veth: Drop MTU check when forwarding packets
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Date: Thu, 8 Aug 2024 09:53:42 +0530
+> Hi Kuniyuki,
+> 
+> On 08/08/24 9:30 am, Kuniyuki Iwashima wrote:
+> > In macb_suspend(), idev->ifa_list is fetched with rcu_access_pointer()
+> > and later the pointer is dereferenced as ifa->ifa_local.
+> > 
+> > So, idev->ifa_list must be fetched with rcu_dereference().
+> > 
+> 
+> Is there any functional breakage ?
 
-When the mtu of the veth card is not the same at both ends, there is
-no need to check the mtu when forwarding packets, and it should be a
-permissible behavior to allow receiving packets with larger mtu than
-your own.
+rcu_dereference() triggers lockdep splat if not called under
+rcu_read_lock().
 
-Signed-off-by: Duan Jiong <djduanjiong@gmail.com>
----
- drivers/net/veth.c        | 2 +-
- include/linux/netdevice.h | 1 +
- net/core/dev.c            | 6 ++++++
- 3 files changed, 8 insertions(+), 1 deletion(-)
+Also in include/linux/rcupdate.h:
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 426e68a95067..f505fe2a55c1 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -317,7 +317,7 @@ static int veth_xdp_rx(struct veth_rq *rq, struct
-sk_buff *skb)
- static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
-                            struct veth_rq *rq, bool xdp)
- {
--       return __dev_forward_skb(dev, skb) ?: xdp ?
-+       return __dev_forward_skb_nomtu(dev, skb) ?: xdp ?
-                veth_xdp_rx(rq, skb) :
-                __netif_rx(skb);
- }
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d20c6c99eb88..8cee9b40e50e 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3943,6 +3943,7 @@ int bpf_xdp_link_attach(const union bpf_attr
-*attr, struct bpf_prog *prog);
- u8 dev_xdp_prog_count(struct net_device *dev);
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
+/**
+ * rcu_access_pointer() - fetch RCU pointer with no dereferencing
+...
+ * It is usually best to test the rcu_access_pointer() return value
+ * directly in order to avoid accidental dereferences being introduced
+ * by later inattentive changes.  In other words, assigning the
+ * rcu_access_pointer() return value to a local variable results in an
+ * accident waiting to happen.
 
-+int __dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb);
- int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
- int dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
- int dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e1bb6d7856d9..acd740f78b1c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2190,6 +2190,12 @@ static int __dev_forward_skb2(struct net_device
-*dev, struct sk_buff *skb,
-        return ret;
- }
 
-+int __dev_forward_skb_nomtu(struct net_device *dev, struct sk_buff *skb)
-+{
-+       return __dev_forward_skb2(dev, skb, false);
-+}
-+EXPORT_SYMBOL_GPL(__dev_forward_skb_nomtu);
-+
- int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb)
- {
-        return __dev_forward_skb2(dev, skb, true);
--- 
-2.38.1
+> I sent initial patch with rcu_dereference, but there is a review comment:
+> 
+> https://lore.kernel.org/netdev/a02fac3b21a97dc766d65c4ed2d080f1ed87e87e.camel@redhat.com/ 
+
+I guess the following ifa_local was missed then ?
 
