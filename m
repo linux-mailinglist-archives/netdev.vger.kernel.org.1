@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-116865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C56C94BE39
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:09:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A135394BE34
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 15:08:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 932F11F23069
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:09:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 333D91F2622D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 13:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3CC18CC1E;
-	Thu,  8 Aug 2024 13:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE0A18CC01;
+	Thu,  8 Aug 2024 13:08:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F160A18E740
-	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE44EEA9
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 13:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723122537; cv=none; b=oUwq95bLMjJfPGQ91fSFrQ3ugAyJZJbS44VE2JXNqPYoT/1G8tPvdD32bPOphXFHTALPBYqHMVTQYf6wwmms/Mby5LLuZySggROHWNPUn6AzTh9hzghQaqh/8dhn4w36Kl4NKtCcjCeqKAYq7trg+j5wiFw1YpyCsRTt1Rc7nts=
+	t=1723122530; cv=none; b=Ix59gXsZxCLTrp9WwfxV9qY8UGmEvXSkK/dZtmcIHTtClohgqj4SmHfzWeL1OUmAB8XCPxLpflA1fk/yU6KGxJlgFpN7qeuNaD9Nz40AeDEvS6je4qymNfzWMKqsW/3hZi5ZG+J5Ts8o62WQ8yWxZoZZIncrQzEzFPtOTWomTGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723122537; c=relaxed/simple;
-	bh=4cuPfHmkBT4djvVCSyY2N1DhBrbDX6ir3eBO+8mPiK4=;
+	s=arc-20240116; t=1723122530; c=relaxed/simple;
+	bh=PKQ9lxWZQhmt2mIRtx4xqXWId90eIBNmwJdFoQAr2v4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gehzP/wi7wF//V4U+/hy4/hIjbTJ4hw86fXif2xL8vx0d/OAHUdHcmS1RZfZxyO/E82yNblyRxOQW/Hy1DKk9EQ4EWXQSfrYo80IqlZovKVimxPwapZXV7SLm56d7fgB8Hp6cacQK3duXe6gmGnl2ALWb464b/PE5aFnbmEUthU=
+	 MIME-Version; b=hPkDej3PiesBacoOd46DNl9PYqkUScuIvLjsyL51bLmTIX4Qv/4hQ/wxS1Chiu9PhUTF1eEGuSqGuDBcPk8KVGNyCNXr4BiG7OyBujEtWaRNUDnoDkdvHJS5qbT9zNf0etBUBGbRXwTdES8R9TTETTOWaw6oqxOVfoA99x+QH6U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sc2se-0000gE-4O; Thu, 08 Aug 2024 15:08:36 +0200
+	id 1sc2se-0000gG-4O; Thu, 08 Aug 2024 15:08:36 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sc2sc-005R24-P8; Thu, 08 Aug 2024 15:08:34 +0200
+	id 1sc2sc-005R25-Pw; Thu, 08 Aug 2024 15:08:34 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sc2sc-008k7Q-2G;
+	id 1sc2sc-008k7a-2K;
 	Thu, 08 Aug 2024 15:08:34 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -55,9 +55,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the PHY framework
-Date: Thu,  8 Aug 2024 15:08:32 +0200
-Message-Id: <20240808130833.2083875-2-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v2 3/3] net: phy: dp83tg720: Add cable testing support
+Date: Thu,  8 Aug 2024 15:08:33 +0200
+Message-Id: <20240808130833.2083875-3-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240808130833.2083875-1-o.rempel@pengutronix.de>
 References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
@@ -73,162 +73,230 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Introduce helper functions specific to Open Alliance diagnostics,
-integrating them into the PHY framework. Currently, these helpers
-are limited to 1000BaseT1 specific TDR functionality.
+Introduce cable testing support for the DP83TG720 PHY. This implementation
+is based on the "DP83TG720S-Q1: Configuring for Open Alliance Specification
+Compliance (Rev. B)" application note.
+
+The feature has been tested with cables of various lengths:
+- No cable: 1m till open reported.
+- 5 meter cable: reported properly.
+- 20 meter cable: reported as 19m.
+- 40 meter cable: reported as cable ok.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/phy/Makefile                |  2 +-
- drivers/net/phy/open_alliance_helpers.c | 70 +++++++++++++++++++++++++
- include/linux/open_alliance_helpers.h   | 47 +++++++++++++++++
- 3 files changed, 118 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/open_alliance_helpers.c
- create mode 100644 include/linux/open_alliance_helpers.h
+changes v2:
+- use open alliance specific helpers for the TDR results
 
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 202ed7f450da6..8a46a04af01a5 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -2,7 +2,7 @@
- # Makefile for Linux PHY drivers
- 
- libphy-y			:= phy.o phy-c45.o phy-core.o phy_device.o \
--				   linkmode.o
-+				   linkmode.o open_alliance_helpers.o
- mdio-bus-y			+= mdio_bus.o mdio_device.o
- 
- ifdef CONFIG_MDIO_DEVICE
-diff --git a/drivers/net/phy/open_alliance_helpers.c b/drivers/net/phy/open_alliance_helpers.c
-new file mode 100644
-index 0000000000000..eac1004c065ae
---- /dev/null
-+++ b/drivers/net/phy/open_alliance_helpers.c
-@@ -0,0 +1,70 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * open_alliance_helpers.c - OPEN Alliance specific PHY diagnostic helpers
-+ *
-+ * This file contains helper functions for implementing advanced diagnostic
-+ * features as specified by the OPEN Alliance for automotive Ethernet PHYs.
-+ * These helpers include functionality for Time Delay Reflection (TDR), dynamic
-+ * channel quality assessment, and other PHY diagnostics.
-+ *
-+ * For more information on the specifications, refer to the OPEN Alliance
-+ * documentation: https://opensig.org/automotive-ethernet-specifications/
-+ */
-+
+ drivers/net/phy/dp83tg720.c | 153 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 153 insertions(+)
+
+diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+index c706429b225a2..06542fce83c95 100644
+--- a/drivers/net/phy/dp83tg720.c
++++ b/drivers/net/phy/dp83tg720.c
+@@ -3,8 +3,10 @@
+  * Copyright (c) 2023 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
+  */
+ #include <linux/bitfield.h>
 +#include <linux/ethtool_netlink.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
 +#include <linux/open_alliance_helpers.h>
+ #include <linux/phy.h>
+
+ #define DP83TG720S_PHY_ID			0x2000a284
+@@ -14,6 +16,17 @@
+ #define DP83TG720S_STS_MII_INT			BIT(7)
+ #define DP83TG720S_LINK_STATUS			BIT(0)
+
++/* TDR Configuration Register (0x1E) */
++#define DP83TG720S_TDR_CFG			0x1e
++/* 1b = TDR start, 0b = No TDR */
++#define DP83TG720S_TDR_START			BIT(15)
++/* 1b = TDR auto on link down, 0b = Manual TDR start */
++#define DP83TG720S_CFG_TDR_AUTO_RUN		BIT(14)
++/* 1b = TDR done, 0b = TDR in progress */
++#define DP83TG720S_TDR_DONE			BIT(1)
++/* 1b = TDR fail, 0b = TDR success */
++#define DP83TG720S_TDR_FAIL			BIT(0)
++
+ #define DP83TG720S_PHY_RESET			0x1f
+ #define DP83TG720S_HW_RESET			BIT(15)
+
+@@ -22,18 +35,155 @@
+ /* Power Mode 0 is Normal mode */
+ #define DP83TG720S_LPS_CFG3_PWR_MODE_0		BIT(0)
+
++/* Open Aliance 1000BaseT1 compatible HDD.TDR Fault Status Register */
++#define DP83TG720S_TDR_FAULT_STATUS		0x30f
++
++/* Register 0x0301: TDR Configuration 2 */
++#define DP83TG720S_TDR_CFG2			0x301
++
++/* Register 0x0303: TDR Configuration 3 */
++#define DP83TG720S_TDR_CFG3			0x303
++
++/* Register 0x0304: TDR Configuration 4 */
++#define DP83TG720S_TDR_CFG4			0x304
++
++/* Register 0x0405: Unknown Register */
++#define DP83TG720S_UNKNOWN_0405			0x405
++
++/* Register 0x0576: TDR Master Link Down Control */
++#define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
++
+ #define DP83TG720S_RGMII_DELAY_CTRL		0x602
+ /* In RGMII mode, Enable or disable the internal delay for RXD */
+ #define DP83TG720S_RGMII_RX_CLK_SEL		BIT(1)
+ /* In RGMII mode, Enable or disable the internal delay for TXD */
+ #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
+
++/* Register 0x083F: Unknown Register */
++#define DP83TG720S_UNKNOWN_083F			0x83f
++
+ #define DP83TG720S_SQI_REG_1			0x871
+ #define DP83TG720S_SQI_OUT_WORST		GENMASK(7, 5)
+ #define DP83TG720S_SQI_OUT			GENMASK(3, 1)
+
+ #define DP83TG720_SQI_MAX			7
+
++/**
++ * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
++ * @phydev: Pointer to the phy_device structure.
++ *
++ * This sequence is based on the documented procedure for the DP83TG720 PHY.
++ *
++ * Returns: 0 on success, a negative error code on failure.
++ */
++static int dp83tg720_cable_test_start(struct phy_device *phydev)
++{
++	int ret;
++
++	/* Initialize the PHY to run the TDR test as described in the
++	 * "DP83TG720S-Q1: Configuring for Open Alliance Specification
++	 * Compliance (Rev. B)" application note.
++	 * Most of the registers are not documented. Some of register names
++	 * are guessed by comparing the register offsets with the DP83TD510E.
++	 */
++
++	/* Force master link down */
++	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
++			       DP83TG720S_TDR_MASTER_LINK_DOWN, 0x0400);
++	if (ret)
++		return ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG2,
++			    0xa008);
++	if (ret)
++		return ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG3,
++			    0x0928);
++	if (ret)
++		return ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG4,
++			    0x0004);
++	if (ret)
++		return ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_0405,
++			    0x6400);
++	if (ret)
++		return ret;
++
++	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_083F,
++			    0x3003);
++	if (ret)
++		return ret;
++
++	/* Start the TDR */
++	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG,
++			       DP83TG720S_TDR_START);
++	if (ret)
++		return ret;
++
++	return 0;
++}
 +
 +/**
-+ * oa_1000bt1_get_ethtool_cable_result_code - Convert TDR status to ethtool
-+ *					      result code
-+ * @reg_value: Value read from the TDR register
++ * dp83tg720_cable_test_get_status - Get the status of the cable test for the
++ *                                   DP83TG720 PHY.
++ * @phydev: Pointer to the phy_device structure.
++ * @finished: Pointer to a boolean that indicates whether the test is finished.
 + *
-+ * This function takes a register value from the HDD.TDR register and converts
-+ * the TDR status to the corresponding ethtool cable test result code.
++ * The function sets the @finished flag to true if the test is complete.
 + *
-+ * Return: The appropriate ethtool result code based on the TDR status
++ * Returns: 0 on success or a negative error code on failure.
 + */
-+int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value)
++static int dp83tg720_cable_test_get_status(struct phy_device *phydev,
++					   bool *finished)
 +{
-+	u8 tdr_status = (reg_value & OA_1000BT1_HDD_TDR_STATUS_MASK) >> 4;
-+	u8 dist_val = (reg_value & OA_1000BT1_HDD_TDR_DISTANCE_MASK) >> 8;
++	int ret, stat;
 +
-+	switch (tdr_status) {
-+	case OA_1000BT1_HDD_TDR_STATUS_CABLE_OK:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_OK;
-+	case OA_1000BT1_HDD_TDR_STATUS_OPEN:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
-+	case OA_1000BT1_HDD_TDR_STATUS_SHORT:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
-+	case OA_1000BT1_HDD_TDR_STATUS_NOISE:
-+		return ETHTOOL_A_CABLE_RESULT_CODE_NOISE;
-+	default:
-+		if (dist_val == OA_1000BT1_HDD_TDR_DISTANCE_RESOLUTION_NOT_POSSIBLE)
-+			return ETHTOOL_A_CABLE_RESULT_CODE_RESOLUTION_NOT_POSSIBLE;
-+		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
++	*finished = false;
++
++	/* Read the TDR status */
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG);
++	if (ret < 0)
++		return ret;
++
++	/* Check if the TDR test is done */
++	if (!(ret & DP83TG720S_TDR_DONE))
++		return 0;
++
++	/* Check for TDR test failure */
++	if (!(ret & DP83TG720S_TDR_FAIL)) {
++		int location;
++
++		/* Read fault status */
++		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
++				   DP83TG720S_TDR_FAULT_STATUS);
++		if (ret < 0)
++			return ret;
++
++		/* Get fault type */
++		stat = oa_1000bt1_get_ethtool_cable_result_code(ret);
++
++		/* Determine fault location */
++		location = oa_1000bt1_get_tdr_distance(ret);
++		if (location > 0)
++			ethnl_cable_test_fault_length(phydev,
++						      ETHTOOL_A_CABLE_PAIR_A,
++						      location);
++	} else {
++		/* Active link partner or other issues */
++		stat = ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
 +	}
++
++	*finished = true;
++
++	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A, stat);
++
++	return phy_init_hw(phydev);
 +}
 +
-+/**
-+ * oa_1000bt1_get_tdr_distance - Get distance to the main fault from TDR
-+ *				 register value
-+ * @reg_value: Value read from the TDR register
-+ *
-+ * This function takes a register value from the HDD.TDR register and extracts
-+ * the distance to the main fault detected by the TDR feature. The distance is
-+ * measured in centimeters and ranges from 0 to 3100 centimeters. If the
-+ * distance is not available (0x3f), the function returns -ERANGE.
-+ *
-+ * Return: The distance to the main fault in centimeters, or -ERANGE if the
-+ * resolution is not possible.
-+ */
-+int oa_1000bt1_get_tdr_distance(u16 reg_value)
-+{
-+	u8 dist_val = (reg_value & OA_1000BT1_HDD_TDR_DISTANCE_MASK) >> 8;
-+
-+	if (dist_val == OA_1000BT1_HDD_TDR_DISTANCE_RESOLUTION_NOT_POSSIBLE)
-+		return -ERANGE;
-+
-+	return dist_val * 100;
-+}
-+
-diff --git a/include/linux/open_alliance_helpers.h b/include/linux/open_alliance_helpers.h
-new file mode 100644
-index 0000000000000..8b7d97bc6f186
---- /dev/null
-+++ b/include/linux/open_alliance_helpers.h
-@@ -0,0 +1,47 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef OPEN_ALLIANCE_HELPERS_H
-+#define OPEN_ALLIANCE_HELPERS_H
-+
-+/*
-+ * These defines reflect the TDR (Time Delay Reflection) diagnostic feature
-+ * for 1000BASE-T1 automotive Ethernet PHYs as specified by the OPEN Alliance.
-+ *
-+ * The register values are part of the HDD.TDR register, which provides
-+ * information about the cable status and faults. The exact register offset
-+ * is device-specific and should be provided by the driver.
-+ */
-+#define OA_1000BT1_HDD_TDR_ACTIVATION_MASK		GENMASK(1, 0)
-+#define OA_1000BT1_HDD_TDR_ACTIVATION_OFF		1
-+#define OA_1000BT1_HDD_TDR_ACTIVATION_ON		2
-+
-+#define OA_1000BT1_HDD_TDR_STATUS_MASK			GENMASK(7, 4)
-+#define OA_1000BT1_HDD_TDR_STATUS_SHORT			3
-+#define OA_1000BT1_HDD_TDR_STATUS_OPEN			6
-+#define OA_1000BT1_HDD_TDR_STATUS_NOISE			5
-+#define OA_1000BT1_HDD_TDR_STATUS_CABLE_OK		7
-+#define OA_1000BT1_HDD_TDR_STATUS_TEST_IN_PROGRESS	8
-+#define OA_1000BT1_HDD_TDR_STATUS_TEST_NOT_POSSIBLE	13
-+
-+/*
-+ * OA_1000BT1_HDD_TDR_DISTANCE_MASK:
-+ * This mask is used to extract the distance to the first/main fault
-+ * detected by the TDR feature. Each bit represents an approximate distance
-+ * of 1 meter, ranging from 0 to 31 meters. The exact interpretation of the
-+ * bits may vary, but generally:
-+ * 000000 = no error
-+ * 000001 = error about 0-1m away
-+ * 000010 = error between 1-2m away
-+ * ...
-+ * 011111 = error about 30-31m away
-+ * 111111 = resolution not possible / out of distance
-+ */
-+#define OA_1000BT1_HDD_TDR_DISTANCE_MASK			GENMASK(13, 8)
-+#define OA_1000BT1_HDD_TDR_DISTANCE_NO_ERROR			0
-+#define OA_1000BT1_HDD_TDR_DISTANCE_RESOLUTION_NOT_POSSIBLE	0x3f
-+
-+int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value);
-+int oa_1000bt1_get_tdr_distance(u16 reg_value);
-+
-+#endif /* OPEN_ALLIANCE_HELPERS_H */
-+
--- 
+ static int dp83tg720_config_aneg(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -195,12 +345,15 @@ static struct phy_driver dp83tg720_driver[] = {
+ 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
+ 	.name		= "TI DP83TG720S",
+
++	.flags          = PHY_POLL_CABLE_TEST,
+ 	.config_aneg	= dp83tg720_config_aneg,
+ 	.read_status	= dp83tg720_read_status,
+ 	.get_features	= genphy_c45_pma_read_ext_abilities,
+ 	.config_init	= dp83tg720_config_init,
+ 	.get_sqi	= dp83tg720_get_sqi,
+ 	.get_sqi_max	= dp83tg720_get_sqi_max,
++	.cable_test_start = dp83tg720_cable_test_start,
++	.cable_test_get_status = dp83tg720_cable_test_get_status,
+
+ 	.suspend	= genphy_suspend,
+ 	.resume		= genphy_resume,
+--
 2.39.2
 
 
