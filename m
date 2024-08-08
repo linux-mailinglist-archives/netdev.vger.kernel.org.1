@@ -1,282 +1,191 @@
-Return-Path: <netdev+bounces-116749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C7394B958
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 10:54:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AFFF94B96E
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 11:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71BF91F21A7E
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 08:54:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F34C280F81
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 09:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3535189B84;
-	Thu,  8 Aug 2024 08:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7534189F31;
+	Thu,  8 Aug 2024 09:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NK8lQ3g2"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="WVv/plnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B1D146019;
-	Thu,  8 Aug 2024 08:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62DD189BAF
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 09:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723107238; cv=none; b=VIzTNjTBDLjd87R5sZbMcLNb2kq2wxzFvpB7RidJwW7CIviitYNP7RuzjyHbMYVaF7DcxqKqcfCRgjhyttjKPmlhdfjwbyM1vTKrLfNWhQIzoeZe3LpTLzeKaS+c4EYKqq3baGdC5bwQ86WsFM+fwmKyNGGDhaNb7Mcr06EQVLU=
+	t=1723107741; cv=none; b=KLI3IJdvKFfg7kOGjYvzzlaXvbixscvIYiUrKxfsOgL9rRGhXEgy36XqtjgTasftzJRsvZzcSXPxAtuDFThv9p0JziZWU43TYjQXR7jCFgGSji8ZAiM0ehIJkuk8dchWVMgnaAn2q9JMcA/hIdUs8WvgFlSwEwZbkTVsAcFQLKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723107238; c=relaxed/simple;
-	bh=gZrWnBAuUCvrkVq9DeGaE1/Xcu2JHw98lkPfGDe46xI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YsnH70h5ERzqinaNwtW0lR8NDaKcXQD6tY2qIx11BYpgYma4OkVQNEltA0rR9jY6R04y54J8bUsx7EoaBTiPN4+DydrAaF2MTdaVlL6oGu9+oMlR1ATpckpSFKAE3vAeV9LPyeLPJ5TTEOuFPQ8HM1emn7LZU5GJApkxv8i0klQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NK8lQ3g2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF68AC32782;
-	Thu,  8 Aug 2024 08:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723107238;
-	bh=gZrWnBAuUCvrkVq9DeGaE1/Xcu2JHw98lkPfGDe46xI=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=NK8lQ3g2ViF69knaHl8GC6+bqs8YR13WwZ8/+KSxPQgd2e181iZKxu+zW9sOASkcy
-	 g87WUunM7aJ634STyyfb4S91N+cbUvBj1eTbyhvSO1YFqtBYp59dyPXDGD8c3YjUDt
-	 52Mx7cro1uYMRDWOlvh8YuzIwybiFAF09S9etOn4C+NWcQWHE5ntt5TJBAV1+ujkDk
-	 WdjWzpouYX3CwVqQ6zqVoDxZpnFq9SFpnYh7xyOuloXf7dMksOwtADApY8wBSHXo9y
-	 wxBX2UyRDWhSqjoCYiJB0MKpuRFiecHTC5fq8naKrfQQBiGMGfeLY/AeTex9ZhBD+z
-	 UUVM9yq8BQWIA==
-Message-ID: <95b6f3afa55f607c4328b686144a9005f954dc80.camel@kernel.org>
-Subject: Re: [PATCH net-next] selftests: forwarding: lib.sh: ignore "Address
- not found"
-From: Geliang Tang <geliang@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,  Petr Machata
- <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>, Benjamin Poirier
- <bpoirier@nvidia.com>,  Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Geliang Tang <tanggeliang@kylinos.cn>,
- netdev@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Date: Thu, 08 Aug 2024 16:53:51 +0800
-In-Reply-To: <ZrMbbIrNpCISI63I@shredder.lan>
-References: 
-	<764585b6852537a93c6fba3260e311b79280267a.1722917654.git.tanggeliang@kylinos.cn>
-	 <ZrHTafNilRs6dx6E@shredder.mtl.com>
-	 <a22d9e0eb835e40000bc1955b57ae115ae44353c.camel@kernel.org>
-	 <ZrMbbIrNpCISI63I@shredder.lan>
-Autocrypt: addr=geliang@kernel.org; prefer-encrypt=mutual;
- keydata=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
- Px+2P2cKc7LXXedb/qQ3M
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1723107741; c=relaxed/simple;
+	bh=bnGiOxSOwjh3dJGsVAusbPN8XZQhfG8sws2vVz0sB80=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lo+s6Qwgv0BwvdUJ0Jd/IhfVDJJCv00kj3pqMeHd/q6jWZ/l5jSnnk7n+fhg4quJT7bamFJ8aBGVU5TRbcj4V4R2fRTqXl806L9b3VD6FVTPtQ+Ab8Q+25sQ2FGouAEyKlknthszUlyswvhj2FCXzA5IonMQaT0sHwW+xSCZ+8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=WVv/plnz; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id A1DB5871C7;
+	Thu,  8 Aug 2024 11:02:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1723107738;
+	bh=OwHINITQpXWrLBHbgg1n5P9gtsGurji9agq0l7UT9CA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WVv/plnzP7wAsJL5QJz+AHALjMT93jVsAUj1HyVoid8C5l+4NuBiaUnPDJLa/YrRC
+	 2nX6KiG/ykMpVCfLpZ+jLq9tIfMXlYbG1URIbh9orXG9bXH6u30uBKpPlHCRnwLN7K
+	 eSSCweDIxvWLQJU7FqlamZHyDhaMjEW6nVr11oAK8lISKcMEDtkSGnYkgid2UQRs4L
+	 0T/2Wm5YSaLRQ94+2Tzq3Pp4mcLY7Zy1yuBJpdzPrZ61i9EmzFF1WFTI8yKFvVz8lP
+	 kuEX5GaW2uC4a5oPMiqkvCrCimsqk2HXM69p1/mEfwDdL+t1MSDxnaePVMJeQ8k+5d
+	 cURocSVH1E0HQ==
+Date: Thu, 8 Aug 2024 11:02:16 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Martin Whitaker <foss@martin-whitaker.me.uk>
+Cc: netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+ Woojung.Huh@microchip.com, o.rempel@pengutronix.de,
+ Arun.Ramadoss@microchip.com, kuba@kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: disable EEE for
+ KSZ8567/KSZ9567/KSZ9896/KSZ9897.
+Message-ID: <20240808110216.20a1787c@wsk>
+In-Reply-To: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
+References: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/NAgs1bVU6+s.g+bFKien2NI";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Wed, 2024-08-07 at 09:59 +0300, Ido Schimmel wrote:
-> On Wed, Aug 07, 2024 at 12:08:15PM +0800, Geliang Tang wrote:
-> > On Tue, 2024-08-06 at 10:40 +0300, Ido Schimmel wrote:
-> > > On Tue, Aug 06, 2024 at 12:20:38PM +0800, Geliang Tang wrote:
-> > > > From: Geliang Tang <tanggeliang@kylinos.cn>
-> > > > 
-> > > > So many "Address not found" messages occur at the end of
-> > > > forwarding
-> > > > tests
-> > > > when using "ip address del" command for an invalid address:
-> > > 
-> > > Can you give an example of an invalid address that triggers this
-> > > message?
-> > > 
-> > > > 
-> > > > TEST: FDB limits interacting with FDB type
-> > > > local                   
-> > > > [ OK ]
-> > > > Error: ipv4: Address not found.
-> > > > 
-> > > > ... ...
-> > > > TEST: IGMPv3 S,G port entry automatic add to a *,G
-> > > > port            
-> > > > [ OK ]
-> > > > Error: ipv4: Address not found.
-> > > > Error: ipv6: address not found.
-> > > > 
-> > > > ... ...
-> > > > TEST: Isolated port
-> > > > flooding                                       
-> > > > [ OK ]
-> > > > Error: ipv4: Address not found.
-> > > > Error: ipv6: address not found.
-> > > > 
-> > > > ... ...
-> > > > TEST: Externally learned FDB entry - ageing &
-> > > > roaming              
-> > > > [ OK ]
-> > > > Error: ipv4: Address not found.
-> > > > Error: ipv6: address not found.
-> > > 
-> > > I'm unable to reproduce these with net-next and iproute2-next.
-> > > Please
-> > > debug this to understand the root cause or provide more details
-> > > on
-> > > how
-> > > to reproduce.
-> > 
-> > I did get these errors with the latest net-next and iproute2-next.
-> > For
-> > example, I got these errors of "bridge_mdb_port_down.sh":
-> > 
-> > $ sudo ./bridge_mdb_port_down.sh 
-> > TEST: MDB add/del entry to port with state down                  [
-> > OK ]
-> > Error: ipv4: Address not found.
-> > Error: ipv6: address not found.
-> > Error: ipv4: Address not found.
-> > Error: ipv6: address not found.
-> > 
-> > These errors occur when using h1_destroy() and h2_destroy() to
-> > delete
-> > the addresses of h1 (192.0.2.1, 2001:db8:1::1) and h2 (192.0.2.2,
-> > 2001:db8:1::2):
-> > 
-> > h1_destroy()
-> > {
-> >         simple_if_fini $h1 192.0.2.1/24 2001:db8:1::1/64
-> > }
-> > 
-> > h2_destroy()
-> > {
-> >         simple_if_fini $h2 192.0.2.2/24 2001:db8:1::2/64
-> > }
-> > 
-> > It seems that when invoking h1_destroy() and h2_destroy(), both h1
-> > and
-> > h2 no longer have IP addresses.
-> 
-> This is unexpected, I do see the addresses on my end. Maybe you have
-> some network manager that is deleting these addresses for some
-> reason?
-> 
-> Try tracing __inet_del_ifa() while running the tests:
-> 
-> # bpftrace -e 'k:__inet_del_ifa { @bla[comm] = count(); }'
-> Attaching 1 probe...
-> ^C
-> 
-> @bla[ip]: 2
+--Sig_/NAgs1bVU6+s.g+bFKien2NI
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-@bla[NetworkManager]: 2
+Hi Martin,
 
-Yes indeed, the addresses are deleted by NetworkManager. Does this mean
-that this test will be affected by the network environment in which it
-is running? Is it necessary to run this test in a new network
-namespace? If necessary, I can add it.
+> As noted in the device errata [1-8], EEE support is not fully
+> operational in the KSZ8567, KSZ9477, KSZ9567, KSZ9896, and KSZ9897
+> devices, causing link drops when connected to another device that
+> supports EEE. The patch series "net: add EEE support for KSZ9477
+> switch family" merged in commit 9b0bf4f77162 caused EEE support to be
+> enabled in these devices. A fix for this regression for the KSZ9477
+> alone was merged in commit 08c6d8bae48c2. This patch extends this fix
+> to the other affected devices.
+>=20
+> [1]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ8567R-Errata-DS80000752.pdf
+> [2]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ8567S-Errata-DS80000753.pdf
+> [3]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9477S-Errata-DS80000754.pdf
+> [4]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9567R-Errata-DS80000755.pdf
+> [5]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9567S-Errata-DS80000756.pdf
+> [6]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9896C-Errata-DS80000757.pdf
+> [7]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9897R-Errata-DS80000758.pdf
+> [8]
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/Errata/KSZ9897S-Errata-DS80000759.pdf
+>=20
+> Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") # for
+> KSZ8567/KSZ9567/KSZ9896/KSZ9897 Link:
+> https://lore.kernel.org/netdev/137ce1ee-0b68-4c96-a717-c8164b514eec@marti=
+n-whitaker.me.uk/
+> Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> b/drivers/net/dsa/microchip/ksz_common.c index
+> b074b4bb0629..cebc6eaa932b 100644 ---
+> a/drivers/net/dsa/microchip/ksz_common.c +++
+> b/drivers/net/dsa/microchip/ksz_common.c @@ -2578,7 +2578,11 @@
+> static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port) if
+> (!port) return MICREL_KSZ8_P1_ERRATA;
+>  		break;
+> +	case KSZ8567_CHIP_ID:
+>  	case KSZ9477_CHIP_ID:
+> +	case KSZ9567_CHIP_ID:
+> +	case KSZ9896_CHIP_ID:
+> +	case KSZ9897_CHIP_ID:
+>  		/* KSZ9477 Errata DS80000754C
+>  		 *
+>  		 * Module 4: Energy Efficient Ethernet (EEE) feature
+> select must @@ -2588,6 +2592,13 @@ static u32
+> ksz_get_phy_flags(struct dsa_switch *ds, int port)
+>  		 *   controls. If not disabled, the PHY ports can
+> auto-negotiate
+>  		 *   to enable EEE, and this feature can cause link
+> drops when
+>  		 *   linked to another device supporting EEE.
+> +		 *
+> +		 * The same item appears in the errata for the
+> KSZ9567, KSZ9896,
+> +		 * and KSZ9897.
+> +		 *
+> +		 * A similar item appears in the errata for the
+> KSZ8567, but
+> +		 * provides an alternative workaround. For now, use
+> the simple
+> +		 * workaround of disabling the EEE feature for this
+> device too. */
+>  		return MICREL_NO_EEE;
+>  	}
+> --
+> 2.41.1
 
-Thanks,
--Geliang
+Reviewed-by: Lukasz Majewski <lukma@denx.de>
 
-> 
-> > 
-> > I added "ifconfig" to show the addresses of h1 and h2 before
-> > invoking
-> > h1_destroy() and h2_destroy() like this:
-> > 
-> > '''
-> > @@ -105,7 +105,9 @@ cleanup()
-> >         pre_cleanup
-> >  
-> >         switch_destroy
-> > +       ifconfig $h1
-> >         h1_destroy
-> > +       ifconfig $h2
-> >         h2_destroy
-> >  
-> >         vrf_cleanup
-> > '''
-> > 
-> > And got these messages:
-> > 
-> > TEST: MDB add/del entry to port with state down                 [
-> > OK ]
-> > veth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
-> >         ether f2:ca:02:ee:05:19  txqueuelen 1000  (Ethernet)
-> >         RX packets 149  bytes 17355 (17.3 KB)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 81  bytes 9165 (9.1 KB)
-> >         TX errors 0  dropped 12 overruns 0  carrier 0  collisions 0
-> > 
-> > Error: ipv4: Address not found.
-> > Error: ipv6: address not found.
-> > veth3: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
-> >         ether 92:df:97:5c:98:7e  txqueuelen 1000  (Ethernet)
-> >         RX packets 67  bytes 6252 (6.2 KB)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 39  bytes 4997 (4.9 KB)
-> >         TX errors 0  dropped 56 overruns 0  carrier 0  collisions 0
-> > 
-> > Error: ipv4: Address not found.
-> > Error: ipv6: address not found.
-> > 
-> > -Geliang
-> > 
-> > > 
-> > > > 
-> > > > This patch gnores these messages and redirects them to
-> > > > /dev/null in
-> > > > __addr_add_del().
-> > > > 
-> > > > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> > > > ---
-> > > >  tools/testing/selftests/net/forwarding/lib.sh | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/tools/testing/selftests/net/forwarding/lib.sh
-> > > > b/tools/testing/selftests/net/forwarding/lib.sh
-> > > > index ff96bb7535ff..8670b6053cde 100644
-> > > > --- a/tools/testing/selftests/net/forwarding/lib.sh
-> > > > +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> > > > @@ -839,7 +839,7 @@ __addr_add_del()
-> > > >  	array=("${@}")
-> > > >  
-> > > >  	for addrstr in "${array[@]}"; do
-> > > > -		ip address $add_del $addrstr dev $if_name
-> > > > +		ip address $add_del $addrstr dev $if_name &>
-> > > > /dev/null
-> > > >  	done
-> > > >  }
-> > > >  
-> > > > -- 
-> > > > 2.43.0
-> > > > 
-> > 
 
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/NAgs1bVU6+s.g+bFKien2NI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAma0iZgACgkQAR8vZIA0
+zr3bMgf/adUqznKzeRcpubvqF1bJKhrfj+8mcdI9q3elr4WR467JkqnLGgIFp0Z0
+97NDH7ZzKQDRTSxl8hKOxL6OfOWV8zl+wQhUWDUeEa5qI6Uqc8MYwEGhz9AWQwe9
+7R7gMx35nG0lae0L/w6VM1oy3ZhfdcOPLvR3OyX/tFrlOjdGGjbTgF1k+8NYHD5g
+31YfWpStzfu/XqS34oGBSU1hCMbiVObHMLabSuMYArCrzD/Sw0V2BgOoq5tA+7mT
+uyTTOqO5RAhXTg3LyLn4wwWdGTaopgtzTJiZR9IkbkJRswFneHuUgVUarGfGL7dc
+2zC1sODUsbzB5/PpXdSki/N2qN/TxA==
+=KZT6
+-----END PGP SIGNATURE-----
+
+--Sig_/NAgs1bVU6+s.g+bFKien2NI--
 
