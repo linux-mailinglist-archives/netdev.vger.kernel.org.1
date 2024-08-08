@@ -1,61 +1,58 @@
-Return-Path: <netdev+bounces-117031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39D4894C6C0
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 00:08:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D04294C6C3
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 00:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF9CF285754
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:08:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 045CEB2117F
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 22:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7683215CD41;
-	Thu,  8 Aug 2024 22:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F59F15D5A6;
+	Thu,  8 Aug 2024 22:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTjUp6AH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IRtnXEKJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451C0146588;
-	Thu,  8 Aug 2024 22:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D4815820F;
+	Thu,  8 Aug 2024 22:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723154878; cv=none; b=nWDUjn/0xW9IiJ8YwjvBuMq5UVgIlpx4XSmAPIADZQLHRgjdK/cS1WvZfe6zODYBQHOQjSMrDsKrH0TTPtWQuf1Ywvlnsip6ENLnPf7u9G1S6oKNcUJfxHfVVnHgpK4hbKlTWs1K9YQfNFQOLUCkSW5+b2XRhQvdnUxrOTuUOAA=
+	t=1723154919; cv=none; b=rIOD4YoQgCBtiinLnIqktKiguXgn+ri9hi/6lJoraDFyz+Rc8POGR6BqSxyGVMM/Ui8qr7yeRvxu8k9DgLWIVGNmaarwc+LlSschafndRk2MYEDESkC2UcjOuwpUymkptHmxR9N9XwtDK7Yh7qN6bE6LuoFrc3TzPT26c9R0uCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723154878; c=relaxed/simple;
-	bh=ds56W2QCa96KdbDtVwJvSmZJnvmlqJ2m1jHbaFzN/RM=;
+	s=arc-20240116; t=1723154919; c=relaxed/simple;
+	bh=G7qcN4kRQFmbzj3pnQMjeYxmwTQfRLd1aXGvHZWLkOA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Cp6y6q85RhI/4jgsa1UyCombmNSblS43zMlSyOAPh8RYnlbsL/R2w8CuZqeLtwMBlxDGbZNQgPR1B6s5hgozn/NMqOy88Syhii7MZ71iI8TQ6aQs3jyNSxhNNcP9Fyn3PmDW8qQ7wsUOHt1hWjdFsEJ949WFm7lRckX5yof7X/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uTjUp6AH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3689C4AF09;
-	Thu,  8 Aug 2024 22:07:56 +0000 (UTC)
+	 Content-Disposition; b=cHug5wYKGtST0m25lOg6I93FanU5pHkE9D3evHklsy/jGHomFgcYOLAbA4de22uVt4bdIsG56X9/5h1UqWYaW9v+C2u5n6FpkG6UYH8W74yKl+TzgMaYflbz03CsfoI68qnZaI/9dWniMlACMB5Rk1Vyp2mkKw8KNT3f2Qb8/io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IRtnXEKJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBDDFC32782;
+	Thu,  8 Aug 2024 22:08:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723154878;
-	bh=ds56W2QCa96KdbDtVwJvSmZJnvmlqJ2m1jHbaFzN/RM=;
+	s=k20201202; t=1723154918;
+	bh=G7qcN4kRQFmbzj3pnQMjeYxmwTQfRLd1aXGvHZWLkOA=;
 	h=Date:From:To:Cc:Subject:From;
-	b=uTjUp6AH6vxBVIvod3TyBPzqjFIlgJyoqWA17WXB79ZV5CpCRHoSxy9py4p6hlvj9
-	 as7VhUD2wf2v0RhmDtYewFGNGf5kTvc+XNieNZKjc1MIdNyz8PE4ap4/rf6TlfO++b
-	 P2bYlq3kX8c0QG5T22Qy81R6Uf/nAt/oQ6OjYNRZYi2sglMZlPDrFxIWJ6ja3jC6TF
-	 c1rZN9Tu9imLHrNukqKuk+K0tSm4Sz/IHXA/LPkS14O6FDX4kID/EPJDH5N0rc9u/c
-	 cuU+ODse3shIXEX5Yn3/Frdb3SR1BHudLzUHlIcsyFSq3KL8Ha3fKSLH7tW44vAslI
-	 9SCWPh9bqqyEQ==
-Date: Thu, 8 Aug 2024 16:07:54 -0600
+	b=IRtnXEKJsZqjFPCHC/8osdYGhWIWrJR2RdS/a8cvSQvsV3dr/aMi41TZQp73bitrr
+	 nFwZJKSWTlZY5RuTnzi2KGG2e8MMOJjUFhx2HX+kqj0ey1y+0PJidwS56AlqJR2WPt
+	 kRV5GO8aqUrFMwscCXBNUv0HqSUY/WNe2QiOgcETwTMXS+7hd8FpE7yBSZH33zLSdZ
+	 +lt0WTB+zbzToMgV7nGnIe3z/p4OP0LnU+/NhYHKRJ2RS25ZGP1T+Kwp9ut9tWCpmf
+	 MlxzgRxrzSd+ZR5dv25pQVb9Rkyj3BTHbq81NjndkTo33L3OO2hm+VeCRynKOtRYZN
+	 Ei739ILUCgNxw==
+Date: Thu, 8 Aug 2024 16:08:35 -0600
 From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
+To: Louis Peens <louis.peens@corigine.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: oss-drivers@corigine.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] net/smc: Use static_assert() to check struct sizes
-Message-ID: <ZrVBuiqFHAORpFxE@cute>
+Subject: [PATCH][next] nfp: Use static_assert() to check struct sizes
+Message-ID: <ZrVB43Hen0H5WQFP@cute>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +62,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Commit 9748dbc9f265 ("net/smc: Avoid -Wflex-array-member-not-at-end
-warnings") introduced tagged `struct smc_clc_v2_extension_fixed` and
-`struct smc_clc_smcd_v2_extension_fixed`. We want to ensure that when
-new members need to be added to the flexible structures, they are
-always included within these tagged structs.
+Commit d88cabfd9abc ("nfp: Avoid -Wflex-array-member-not-at-end
+warnings") introduced tagged `struct nfp_dump_tl_hdr`. We want
+to ensure that when new members need to be added to the flexible
+structure, they are always included within this tagged struct.
 
 So, we use `static_assert()` to ensure that the memory layout for
 both the flexible structure and the tagged struct is the same after
@@ -77,31 +73,22 @@ any changes.
 
 Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- net/smc/smc_clc.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/netronome/nfp/nfp_net_debugdump.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-index 467effb50cd6..5625fda2960b 100644
---- a/net/smc/smc_clc.h
-+++ b/net/smc/smc_clc.h
-@@ -145,6 +145,8 @@ struct smc_clc_v2_extension {
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_debugdump.c b/drivers/net/ethernet/netronome/nfp/nfp_net_debugdump.c
+index 2dd37557185e..7276e44a21d0 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_debugdump.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_debugdump.c
+@@ -41,6 +41,8 @@ struct nfp_dump_tl {
  	);
- 	u8 user_eids[][SMC_MAX_EID_LEN];
+ 	char data[];
  };
-+static_assert(offsetof(struct smc_clc_v2_extension, user_eids) == sizeof(struct smc_clc_v2_extension_fixed),
++static_assert(offsetof(struct nfp_dump_tl, data) == sizeof(struct nfp_dump_tl_hdr),
 +	      "struct member likely outside of struct_group_tagged()");
  
- struct smc_clc_msg_proposal_prefix {	/* prefix part of clc proposal message*/
- 	__be32 outgoing_subnet;	/* subnet mask */
-@@ -169,6 +171,8 @@ struct smc_clc_smcd_v2_extension {
- 	);
- 	struct smc_clc_smcd_gid_chid gidchid[];
- };
-+static_assert(offsetof(struct smc_clc_smcd_v2_extension, gidchid) == sizeof(struct smc_clc_smcd_v2_extension_fixed),
-+	      "struct member likely outside of struct_group_tagged()");
- 
- struct smc_clc_msg_proposal {	/* clc proposal message sent by Linux */
- 	struct smc_clc_msg_hdr hdr;
+ /* NFP CPP parameters */
+ struct nfp_dumpspec_cpp_isl_id {
 -- 
 2.34.1
 
