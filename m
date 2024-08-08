@@ -1,172 +1,103 @@
-Return-Path: <netdev+bounces-116685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815F594B5C3
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:11:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C22D94B5C7
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 06:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38E5A1F23575
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:11:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4EC72818B9
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 04:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971A87F484;
-	Thu,  8 Aug 2024 04:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6sAmAq0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E02280C13;
+	Thu,  8 Aug 2024 04:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205F32E419;
-	Thu,  8 Aug 2024 04:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0024E2E419
+	for <netdev@vger.kernel.org>; Thu,  8 Aug 2024 04:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723090274; cv=none; b=P6yr3e8WPnlQYpSyN8auPIhDT06Xf30Kmq6hJqVxOARau78e2E2SD5paN0p9aKpSsXRrSliwvP/mva7T7T2Y+R1D7dLGOHDuLxRLDfhoCkKCOr9HuZb8YA57QEK1POl2/8h0WInBGwxgkRzUfHEWx8sBL4fEsGu6B06dOM+qEso=
+	t=1723090462; cv=none; b=MljZJ7620ILCSvx7Jn9iwuPI4es6QmTsTmplSeoxc+GXWfVhMHaggLTtH5gCQNdowxKj2MwYjjbdTTOXn0tnbY4gTtEx5BZ0ceiGK3IpI77vduDv1+luR/PCr5nfj/TccP6ScQdMqgdza6d/FqN1ZErWwEMmybHXv3wTuiNISUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723090274; c=relaxed/simple;
-	bh=g77BYHZuyQWUySSdMkKlIRORWX5DQEXVkxFlPBGewzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UY6pgnphSEIKztmObtUYSQFBW0xMXE1A9QBpOqluy6FLEUZLfuFo9cnmmrht48JhzVCh8p89YI/2bqrWcqOpfLpShK/8uWbjmeygmYLfIEZuQUJiOFZb2HdvZUxR22WyWCOVco9yw3qxN3dONL64AG1J4OM6zUMBdMllTFkTgIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6sAmAq0; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70d18d4b94cso444877b3a.2;
-        Wed, 07 Aug 2024 21:11:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723090272; x=1723695072; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nw80wNgwCOZs/0Sah8DGuFBIZj4cxP28UKSdbAt7aTM=;
-        b=J6sAmAq0qRDkNc0R7f0Zh3ntOgyM9JeWb9b/7PDpFqTqWXid9JP1CHtTouOzM5EbjG
-         T4XOegOm6a2RjlirFuqOdkHmtCJKFMos26JBzxzSEEbYh4KpHTH8OJ7KoMItpZcTGr4/
-         VgS/GxBAuUxYaF8jFy/66q9Y+2ae8gMY33JYdAdV//RS3ev7IukO9iKTlTOJP0DlV1H0
-         lN8iN/ludv5hZm80Nb9P48qebXMxC1x19Pht92fPFd24Odx5BDBeph2w9s07TUfbLHwT
-         uIZRorpk4ilOCppZQzu7ldOYSkEfAV+z5gJLRJACEbrqL1kplALJWzb+lXS+jM5Wsmkc
-         dq8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723090272; x=1723695072;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nw80wNgwCOZs/0Sah8DGuFBIZj4cxP28UKSdbAt7aTM=;
-        b=pv+zTixXe6J8RuV6wOyHri0jtkUPvWZAnIFSkgjAHLYNo2IoI9InWKUrLePvPZcxrL
-         12xUEO7LVI03pdrzC0L0rnHjSRL2FtyaHb4Drbu+c5f82Is7afLuuib1t+DOufg/soth
-         2s4h5zBzxxxOb+O19YlJ2lk1I12quQ+h5gtyGx9x1SmkIKhTosUr78vPTCXhqxsy23/i
-         8xeAVaW4pKanEV6olabDM4m5IMOqAU0djU1pM60u639iBSx0oGq6XIADDDGt35xC9qeu
-         w5y7iqiTPHJ/4Z1IPA24qcKxWjcsiM6Y5U9dUn159pGEh0O7TA7DXNHKTY0OKHxY7FW5
-         FQqA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/8ZZpWazml/Xrh+DmM0tViG/tpIn48AxLQA5/67hHjyhMdtSQ+AD6xjmJtFqImIcEZdVkNR2BjuoUjiq8fDel/1HGHb6ezKOXDLdY
-X-Gm-Message-State: AOJu0YyfgRxJDMCQ9Wt0M2LkqKtGb/BpanpaoBFB9RMZIKg3mK6/dpRi
-	B0z0oTHTWcsAidHRmlBde3tt7YV19RQy2EAxD1y5vR524ls9j5Yvh4vcFIOy
-X-Google-Smtp-Source: AGHT+IGTcAB6J6QaMmMT3mk3795KOh7FU7yH1hJPeO27BLyz6bv76XnXocRSDBwQAFD1qhMalczw4A==
-X-Received: by 2002:a05:6a20:7292:b0:1c2:956a:a909 with SMTP id adf61e73a8af0-1c6fcf18f56mr700742637.27.1723090271950;
-        Wed, 07 Aug 2024 21:11:11 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5927f40dsm114101505ad.229.2024.08.07.21.11.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 21:11:11 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: quic_jjohnson@quicinc.com,
-	horms@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: hplance: use devm in probe
-Date: Wed,  7 Aug 2024 21:10:55 -0700
-Message-ID: <20240808041109.6871-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1723090462; c=relaxed/simple;
+	bh=OG6cX3d/4bHZEqZtMQEllynmVc20w1bjA3kVyiNWtq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NsLP10wioKjF+jE7r8yZkqyz9JJ9JcROtv+m0w05t2wJM3EAfH5qLZrlGEYwjgNdzNr4k5TelO4C7o5HOfTgNDZsj80FfDFW1FSc4n6/sf29YBxGQ5PRIk5aD6Vmr91xJ05jPJD7mSRQ0p0BJZO/vd5rozvgfyohAlfJPlPQR2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbuXX-0005MW-CW; Thu, 08 Aug 2024 06:14:15 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbuXW-005LFT-NA; Thu, 08 Aug 2024 06:14:14 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbuXW-008jWJ-1z;
+	Thu, 08 Aug 2024 06:14:14 +0200
+Date: Thu, 8 Aug 2024 06:14:14 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Martin Whitaker <foss@martin-whitaker.me.uk>
+Cc: netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Woojung.Huh@microchip.com, lukma@denx.de,
+	Arun.Ramadoss@microchip.com, kuba@kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: disable EEE for
+ KSZ8567/KSZ9567/KSZ9896/KSZ9897.
+Message-ID: <ZrRGFsZI49jJ67tx@pengutronix.de>
+References: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Allows removal of the remove function as devm can handle the freeing of
-these resources.
+On Wed, Aug 07, 2024 at 09:52:09PM +0100, Martin Whitaker wrote:
+> As noted in the device errata [1-8], EEE support is not fully operational
+> in the KSZ8567, KSZ9477, KSZ9567, KSZ9896, and KSZ9897 devices, causing
+> link drops when connected to another device that supports EEE. The patch
+> series "net: add EEE support for KSZ9477 switch family" merged in commit
+> 9b0bf4f77162 caused EEE support to be enabled in these devices. A fix for
+> this regression for the KSZ9477 alone was merged in commit 08c6d8bae48c2.
+> This patch extends this fix to the other affected devices.
+> 
+> [1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ8567R-Errata-DS80000752.pdf
+> [2] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ8567S-Errata-DS80000753.pdf
+> [3] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
+> [4] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9567R-Errata-DS80000755.pdf
+> [5] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9567S-Errata-DS80000756.pdf
+> [6] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9896C-Errata-DS80000757.pdf
+> [7] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9897R-Errata-DS80000758.pdf
+> [8] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/KSZ9897S-Errata-DS80000759.pdf
+> 
+> Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") # for KSZ8567/KSZ9567/KSZ9896/KSZ9897
+> Link: https://lore.kernel.org/netdev/137ce1ee-0b68-4c96-a717-c8164b514eec@martin-whitaker.me.uk/
+> Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk>
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/amd/hplance.c | 33 +++++++-----------------------
- 1 file changed, 7 insertions(+), 26 deletions(-)
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-diff --git a/drivers/net/ethernet/amd/hplance.c b/drivers/net/ethernet/amd/hplance.c
-index df42294530cb..2ebf7cc9ab21 100644
---- a/drivers/net/ethernet/amd/hplance.c
-+++ b/drivers/net/ethernet/amd/hplance.c
-@@ -49,7 +49,6 @@ struct hplance_private {
-  */
- static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent);
- static void hplance_init(struct net_device *dev, struct dio_dev *d);
--static void hplance_remove_one(struct dio_dev *d);
- static void hplance_writerap(void *priv, unsigned short value);
- static void hplance_writerdp(void *priv, unsigned short value);
- static unsigned short hplance_readrdp(void *priv);
-@@ -65,7 +64,6 @@ static struct dio_driver hplance_driver = {
- 	.name      = "hplance",
- 	.id_table  = hplance_dio_tbl,
- 	.probe     = hplance_init_one,
--	.remove    = hplance_remove_one,
- };
- 
- static const struct net_device_ops hplance_netdev_ops = {
-@@ -84,21 +82,20 @@ static const struct net_device_ops hplance_netdev_ops = {
- static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent)
- {
- 	struct net_device *dev;
--	int err = -ENOMEM;
-+	int err;
- 
--	dev = alloc_etherdev(sizeof(struct hplance_private));
-+	dev = devm_alloc_etherdev(sizeof(&d->dev, struct hplance_private));
- 	if (!dev)
--		goto out;
-+		return -ENOMEM;
- 
--	err = -EBUSY;
--	if (!request_mem_region(dio_resource_start(d),
-+	if (!devm_request_mem_region(&d->dev, dio_resource_start(d),
- 				dio_resource_len(d), d->name))
--		goto out_free_netdev;
-+		return -EBUSY;
- 
- 	hplance_init(dev, d);
--	err = register_netdev(dev);
-+	err = devm_register_netdev(&d->dev, dev);
- 	if (err)
--		goto out_release_mem_region;
-+		return err;
- 
- 	dio_set_drvdata(d, dev);
- 
-@@ -106,22 +103,6 @@ static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent)
- 	       dev->name, d->name, d->scode, dev->dev_addr, d->ipl);
- 
- 	return 0;
--
-- out_release_mem_region:
--	release_mem_region(dio_resource_start(d), dio_resource_len(d));
-- out_free_netdev:
--	free_netdev(dev);
-- out:
--	return err;
--}
--
--static void hplance_remove_one(struct dio_dev *d)
--{
--	struct net_device *dev = dio_get_drvdata(d);
--
--	unregister_netdev(dev);
--	release_mem_region(dio_resource_start(d), dio_resource_len(d));
--	free_netdev(dev);
- }
- 
- /* Initialise a single lance board at the given DIO device */
 -- 
-2.45.2
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
