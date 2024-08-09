@@ -1,97 +1,159 @@
-Return-Path: <netdev+bounces-117148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9593794CDF3
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:01:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF3D94CE11
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B9EF1F2301F
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:01:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBED5284D40
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636DA19148D;
-	Fri,  9 Aug 2024 09:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0B31940BC;
+	Fri,  9 Aug 2024 09:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxrlU6WM"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Bwwo+WCK";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="o2ofEY+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B57F175D2C;
-	Fri,  9 Aug 2024 09:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723196996; cv=none; b=W5FvDdwB0MBzZFtGxVMdbWwlx5H0XQbYRn0dbIImPy1ODZRU9Rf8w7CVpPRM5lvyylthBndcYo9pTHIo9/h6QMXdF9ssoM3lAuuZj6GN4pAgDUh+Y3XPKM2q8UYhg40kpL4Gfx2IA/tWscXBZXRfYW/B3+SNbt6Uiw84dV4RpiY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723196996; c=relaxed/simple;
-	bh=km1bJkPPQGurldrwmYem5p7vDz5dgJsB7r0C5f9d1Tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HlPnbkDpGmRWmuXxkoS7yIW3VdtKfNXTgCeAKue9jQ+Bi2LOf5oFzclgSgboIjWiW8GOtLBu2jHOeVttiZl9APvEJ+/72LOfsM7eOEl7kScuwWlHpOJ5TZKMdlmhbxwL8W0BGedRce10lroHSPTT5UN1d2bOero2fH5p/wwtLLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxrlU6WM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03ECCC32782;
-	Fri,  9 Aug 2024 09:49:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723196995;
-	bh=km1bJkPPQGurldrwmYem5p7vDz5dgJsB7r0C5f9d1Tk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OxrlU6WMHEYz2Pz5cOJtAMv+PnUDWKPkTZK6CbbZlJ/Q7byyhkzqNnt5p8XUfI5lh
-	 UwPN3XYvFgRpl62UvqUFPXPYg/Rjmqf63vZjmYo8fK4g8MLRuZn/Z34SafSdKkEZXS
-	 zb78AODKXeEgw58BxRW7hBZYCKu57LXqSOqSvfB5/73wdkxdOawhgvy8oNjE14DXJs
-	 gewwpKHBZN8cOXbkxb5+SXfPXG9e9/Zr6lXSNIoQSUfzjvidEtt3Vmd9rnzBJne3XI
-	 F+nSpGFPu1nmTt7mlBVSAJh2rJ29PBhj+HUnTYLU7yc6iv6BXkpY5pI5dCaeLMli6x
-	 /FnFwtiEIs/JQ==
-Date: Fri, 9 Aug 2024 10:49:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: fs_enet: Fix warning due to wrong type
-Message-ID: <20240809094951.GI3075665@kernel.org>
-References: <ec67ea3a3bef7e58b8dc959f7c17d405af0d27e4.1723101144.git.christophe.leroy@csgroup.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21681940B0;
+	Fri,  9 Aug 2024 09:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723197480; cv=pass; b=bYtwsmxFC8TKaK9YJVdnnOS2yYRQaA9eIVKX8EbmuWmswQDScggIg6eua7PBE+azHXV16dBNbk8lMGvDkGiG17ElK/wIEFrSIaZw6zE+7BT1SiCwmOfJQushGR12XpaeWN1wol/JVe+hiwSfHq67psdjOc4lCZ7w0efDxgh5d28=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723197480; c=relaxed/simple;
+	bh=Xe+OAUVb0YFJIF+A8+YBN2gRFzDq6SrE2crXjLIltKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JhQifoAN9bN04gVssD1x/LXvZykqYHAlC7xaR6cuAwFCOCz0qlVG2IHgQc16ChZilE33c5QpQfYpVGkMILzmWBkhoxxs/jUkfpNP7PSyhpX+gH/6lw+XQqfI4IrzxtMAeQ/9szONs8xdIWZbtkLBGXseAFDTEH07epsVxVwcWk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Bwwo+WCK; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=o2ofEY+j; arc=pass smtp.client-ip=81.169.146.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1723197467; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=sOVWz2QymMSoe5vD+9p4VLE86h0YA7ZKRD7xdl/KHQOg24H1yhiviAOUZCl9a7oM57
+    wS0XBu9GQvLK4ieC3mAiR84Moo3A9zDuvfTmMH9KVmzQbV33QXGQyNXL+pHB6mxQeEv7
+    ykE5miIHJ6BjmapziewsXLmozU79/IVHC20/+4vsrcug1CIH1gm9HAieEUPLqFltAhBW
+    MbU1YqRbzNH8pme2/brgJDKnrDhCYdsxzh0kf/P3cETW/NL6VHwWBU0LaUosABgRHdpG
+    QyFCKKMCOGnPR/jfEsD7f9sso1QqJkzMHbE/dlbSqR5DULeutR069Nc+zS5RLkRbO0Lj
+    7eww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1723197467;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
+    b=rRgtElqYS2qPu5JLzd/d2VCXw0/B3Vwv9/gJr8cir99KUCLQjkFvyDuSq+NWFGauaX
+    Wk8PNlzIPvRfibwAaFoN+j5nwsUev290Nsl9nj+ujiqimTiCrg2lrJo+CBdj3BFP1a3k
+    nm9NQndchoy00QoXM53IEIv08fMs3nSSelkBeIxfzu7Vnen2hUxRlov70PL1vKEpn75h
+    GVOhbmq8+WG8fb0ACk6XIhrUANx9YM8xNsNxCrF2ExRdCFqeVMU75si+NBlP3tgj0Zou
+    ueoHr/fNkMmaNVg9gD0a2y2fWO+cp43okjwx/Ov7HbAOQmcFSofcfnM9TYUvfVc3oqqB
+    SZ8g==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1723197467;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
+    b=Bwwo+WCKBtfPf5H9iZYVCGHEDKjr4si+atWvDMFpkSooFfVkeCObsppecM9tfaD9sJ
+    HqriJNx52h2lm8C1rg4rtUqLGgNmDoaTQf3c3SmDsAiFn/kIYmDGvY+ZHlbLNJyvTnAZ
+    LPiiaWm9jvhKDM8SSo1Gn1vtpcrra5JNCqfHrUW7GNA2yerDZMF0/s/+bkSwq/SRFaWH
+    HnbbDkPk6MUxPViBvo4FnpE7ZlDH5EP/cL2wIEr8PMkBmBUCQyuX73NdpV8k7Eu81MnO
+    lVxaZFTiv7Xa8//t0DC+ZcqmfNFjUYtycQ6w6HHXj1XxTwDqtDCylheg8XMnP55EnH24
+    ZZjg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1723197467;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
+    b=o2ofEY+jQ36873X/dwp/wbAF8Jh6QvKdSXHJWvYnmSoGJOW9JVHB5V80oxiDZYyUpE
+    0+CKJAx7x+exo33WF0Cw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/vMMcFB+4xtv9aJ67XA=="
+Received: from [IPV6:2a00:6020:4a8e:5010::9f3]
+    by smtp.strato.de (RZmta 51.1.0 AUTH)
+    with ESMTPSA id K1860b0799vl3KA
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Fri, 9 Aug 2024 11:57:47 +0200 (CEST)
+Message-ID: <2bf44b8d-b286-4a94-8e1d-6c4e736a1d07@hartkopp.net>
+Date: Fri, 9 Aug 2024 11:57:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec67ea3a3bef7e58b8dc959f7c17d405af0d27e4.1723101144.git.christophe.leroy@csgroup.eu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] Net: bcm.c: Remove Subtree Instead of Entry
+To: David Hunter <david.hunter.linux@gmail.com>, mkl@pengutronix.de,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
+References: <20240808202658.5933-1-david.hunter.linux@gmail.com>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20240808202658.5933-1-david.hunter.linux@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 08, 2024 at 09:16:48AM +0200, Christophe Leroy wrote:
-> Building fs_enet on powerpc e500 leads to following warning:
-> 
->     CC      drivers/net/ethernet/freescale/fs_enet/mac-scc.o
->   In file included from ./include/linux/build_bug.h:5,
->                    from ./include/linux/container_of.h:5,
->                    from ./include/linux/list.h:5,
->                    from ./include/linux/module.h:12,
->                    from drivers/net/ethernet/freescale/fs_enet/mac-scc.c:15:
->   drivers/net/ethernet/freescale/fs_enet/mac-scc.c: In function 'allocate_bd':
->   ./include/linux/err.h:28:49: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
->      28 | #define IS_ERR_VALUE(x) unlikely((unsigned long)(void *)(x) >= (unsigned long)-MAX_ERRNO)
->         |                                                 ^
->   ./include/linux/compiler.h:77:45: note: in definition of macro 'unlikely'
->      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->         |                                             ^
->   drivers/net/ethernet/freescale/fs_enet/mac-scc.c:138:13: note: in expansion of macro 'IS_ERR_VALUE'
->     138 |         if (IS_ERR_VALUE(fep->ring_mem_addr))
->         |             ^~~~~~~~~~~~
-> 
-> This is due to fep->ring_mem_addr not being a pointer but a DMA
-> address which is 64 bits on that platform while pointers are
-> 32 bits as this is a 32 bits platform with wider physical bus.
-> 
-> However, using fep->ring_mem_addr is just wrong because
-> cpm_muram_alloc() returns an offset within the muram and not
-> a physical address directly. So use fpi->dpram_offset instead.
-> 
-> Fixes: 48257c4f168e ("Add fs_enet ethernet network driver, for several embedded platforms.")
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Hello David,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+many thanks for the patch and the description.
+
+Btw. the data structures of the elements inside that bcm proc dir should 
+have been removed at that point, so that the can-bcm dir should be empty.
+
+I'm not sure what happens to the open sockets that are (later) removed 
+in bcm_release() when we use remove_proc_subtree() as suggested. 
+Removing this warning probably does not heal the root cause of the issue.
+
+What did you do to trigger the warning? Did you work with network 
+namespaces or LXC/Docker and purged an entire namespace?
+
+Best regards,
+Oliver
+
+On 08.08.24 22:26, David Hunter wrote:
+> Fix a warning with bcm.c that is caused by removing an entry. If the
+> entry had a process as a child, a warning is generated:
+> 
+> remove_proc_entry: removing non-empty directory 'net/can-bcm'...
+> WARNING: CPU: 1 PID: 71 at fs/proc/generic.c:717 remove_proc_entry
+> Call Trace:
+> remove_proc_entry
+> canbcm_pernet_exit
+> ops_exit_list
+> 
+> Instead of simply removing the entry, remove the entire subdirectory.
+> The child process will still be removed, but without a warning occurring.
+> 
+> This patch was compiled and the code traced with gdb to see that the
+> tree  was removed. The code was run to see that the warning was removed.
+> In addition, the code was tested with the kselftest
+> net subsystem. No regressions were detected.
+> 
+> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+> ---
+>   net/can/bcm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/can/bcm.c b/net/can/bcm.c
+> index 27d5fcf0eac9..fea48fd793e5 100644
+> --- a/net/can/bcm.c
+> +++ b/net/can/bcm.c
+> @@ -1779,7 +1779,7 @@ static void canbcm_pernet_exit(struct net *net)
+>   #if IS_ENABLED(CONFIG_PROC_FS)
+>   	/* remove /proc/net/can-bcm directory */
+>   	if (net->can.bcmproc_dir)
+> -		remove_proc_entry("can-bcm", net->proc_net);
+> +		remove_proc_subtree("can-bcm", net->proc_net);
+>   #endif /* CONFIG_PROC_FS */
+>   }
+>   
 
