@@ -1,166 +1,110 @@
-Return-Path: <netdev+bounces-117243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D510194D410
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:59:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD3294D420
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 18:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DC2E1F226AC
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 15:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F4E01F221F8
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF5C198E88;
-	Fri,  9 Aug 2024 15:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E12198A0F;
+	Fri,  9 Aug 2024 16:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="iLn0KDAi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ge3/4AUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E90168B8;
-	Fri,  9 Aug 2024 15:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E598F194A4C;
+	Fri,  9 Aug 2024 16:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723219148; cv=none; b=azFfb5HIaS/ItbqEkGdARKgVjc8XIPflBsYwj2XxuqUoI/RpcQeYJdsGAqTleXhU3wDPu+LqEyl2mWNw99L/p+D1Bk7GFa0Wf4WZjfJ0w7dnI2XmsIlCbIgaLutapYN1N65qGnkTtujUnGjV48ZgmIu+6mWXcplX/0e60AcDrwg=
+	t=1723219441; cv=none; b=ObH7l6v/zCpPLKZ8vAf7E1Mbg+e8shgdiyi/D9J53O+QptZ5xtjal3faHTK5OHZKiWH+xYRqBbRUiynNWet6hitMOlHmF3MUhneeGevfzIL+Z0eql/rRS7YnIRWzYxbzaNLFWzhMIZFljkha6rOdvLjO7hLzwfGZP3urYfxkLUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723219148; c=relaxed/simple;
-	bh=o6tlLB78wZ53IZ6Aiama6z+t6jWgrwl2gdMt+4iGKog=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=UR05jeo0QNzZsHSHr/DvPIey7TIapXGcvcUv8Q2bRbQldzxOrFEpoG+v3aAdnteOrKmmZxm9t1es3718lyJB+nIKZuZ01qFWhtuveursAAuxY8PRfrrWZVoc3fkJZywanJ7O0FY1KOS4taEc7lx1JtYQNzOKLpoFeKoPDfSkOmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=iLn0KDAi; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id 9691B20B7165; Fri,  9 Aug 2024 08:59:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9691B20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1723219146;
-	bh=ZWU1aKJ8KRiWGgDAYXkoXRuaLAzAdO5nNSZSCU3reII=;
-	h=From:To:Cc:Subject:Date:Reply-To:From;
-	b=iLn0KDAiCG3Z+z90LfNifUUJETcleyju62zJA180vysZhMF36ojgUTWJ0noYXvQux
-	 BqOEDfEp44HKV4I0yNQRigA12XY2UWDzT+9tPQmKdhwpK+SvE2s6W7jLcIwOXnqUq7
-	 osE8uRi13yyWGCtK+4FjLnNS32LKIMI+coj8jV2M=
-From: longli@linuxonhyperv.com
-To: "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1723219441; c=relaxed/simple;
+	bh=3X4KnqOVvMgnV0xVVa+Fn5xLpXaLDEnmDWpiCsg0VZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iKamNwtfBgex270+/cLyyDLrdNcRcjdiKrf3xuYXQqBbVOlfZmMDXnrtBV7xaiM6GSHB8bGS2vs9fONzdUMy3HB7HMlxlYjejQAdwSHERhkBVO/0zNynca1CJEIKZRPB+4aFwEzvoW9wPzWM3cqrpuUtT1mTTGsP2ykzs60coxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ge3/4AUi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7FA7C32782;
+	Fri,  9 Aug 2024 16:03:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723219440;
+	bh=3X4KnqOVvMgnV0xVVa+Fn5xLpXaLDEnmDWpiCsg0VZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ge3/4AUi+b2X9uEi+mTizqxwaCD5rARF6blKYGvDdPpWTeLWDFIaOQFPcr7y7DI2O
+	 24yirXPxxE0vvi6VW1rd+TG3EGekAcefZMYr0sPMl8vsplQBg3YCRH+xzJkGXRFv9m
+	 4+GzkA39C21hvxnyM6w99WoEqTCmKvSigqer2t2Bk/oUqwiBCQdS7KMPASEUlHEGOG
+	 7C+O4x3oDuVV1K2dejYx0wNhmA11ks9EPfsb/VFq7qik8ckBqZzScC74ca+BS6XAas
+	 MmroD0WsxZ7+y8W/EyWNzCOdOhZqjpvp47+sOX0rio0lUroOeGhg1RtBBwHHszKe7I
+	 7eskg1ZUxjEeA==
+Date: Fri, 9 Aug 2024 17:03:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michael Nemanov <michael.nemanov@ti.com>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Long Li <longli@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 net] net: mana: Fix doorbell out of order violation and avoid unnecessary doorbell rings
-Date: Fri,  9 Aug 2024 08:58:58 -0700
-Message-Id: <1723219138-29887-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-Reply-To: longli@microsoft.com
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sabeeh Khan <sabeeh-khan@ti.com>
+Subject: Re: [PATCH v3 12/17] wifi: cc33xx: Add scan.c, scan.h
+Message-ID: <20240809160355.GD1951@kernel.org>
+References: <20240806170018.638585-1-michael.nemanov@ti.com>
+ <20240806170018.638585-13-michael.nemanov@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806170018.638585-13-michael.nemanov@ti.com>
 
-From: Long Li <longli@microsoft.com>
+On Tue, Aug 06, 2024 at 08:00:13PM +0300, Michael Nemanov wrote:
 
-After napi_complete_done() is called when NAPI is polling in the current
-process context, another NAPI may be scheduled and start running in
-softirq on another CPU and may ring the doorbell before the current CPU
-does. When combined with unnecessary rings when there is no need to arm
-the CQ, it triggers error paths in the hardware.
+...
 
-This patch fixes this by calling napi_complete_done() after doorbell
-rings. It limits the number of unnecessary rings when there is
-no need to arm. MANA hardware specifies that there must be one doorbell
-ring every 8 CQ wraparounds. This driver guarantees one doorbell ring as
-soon as the number of consumed CQEs exceeds 4 CQ wraparounds. In practical
-workloads, the 4 CQ wraparounds proves to be big enough that it rarely
-exceeds this limit before all the napi weight is consumed.
+> diff --git a/drivers/net/wireless/ti/cc33xx/scan.h b/drivers/net/wireless/ti/cc33xx/scan.h
 
-To implement this, add a per-CQ counter cq->work_done_since_doorbell,
-and make sure the CQ is armed as soon as passing 4 wraparounds of the CQ.
+...
 
-Cc: stable@vger.kernel.org
-Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Signed-off-by: Long Li <longli@microsoft.com>
----
-change in v2:
-Added more details to comments to explain the patch.
+> +/**
+> + * struct cc33xx_cmd_ssid_list - scan SSID list description
+> + *
+> + * @role_id:            roleID
+> + *
+> + * @num_of_ssids:       Number of SSID in the list. MAX 16 entries
 
-change in v3:
-Corrected typo. Removed extra empty lines between "Fixes" and "Reviewed-by".
+@num_of_ssids -> @n_ssids
 
- drivers/net/ethernet/microsoft/mana/mana_en.c | 24 ++++++++++++-------
- include/net/mana/mana.h                       |  1 +
- 2 files changed, 16 insertions(+), 9 deletions(-)
+> + *
+> + * @ssid_list:          SSIDs to scan for (active scan only)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d2f07e179e86..f83211f9e737 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1788,7 +1788,6 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
- static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
- {
- 	struct mana_cq *cq = context;
--	u8 arm_bit;
- 	int w;
- 
- 	WARN_ON_ONCE(cq->gdma_cq != gdma_queue);
-@@ -1799,16 +1798,23 @@ static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
- 		mana_poll_tx_cq(cq);
- 
- 	w = cq->work_done;
--
--	if (w < cq->budget &&
--	    napi_complete_done(&cq->napi, w)) {
--		arm_bit = SET_ARM_BIT;
--	} else {
--		arm_bit = 0;
-+	cq->work_done_since_doorbell += w;
-+
-+	if (w < cq->budget) {
-+		mana_gd_ring_cq(gdma_queue, SET_ARM_BIT);
-+		cq->work_done_since_doorbell = 0;
-+		napi_complete_done(&cq->napi, w);
-+	} else if (cq->work_done_since_doorbell >
-+		   cq->gdma_cq->queue_size / COMP_ENTRY_SIZE * 4) {
-+		/* MANA hardware requires at least one doorbell ring every 8
-+		 * wraparounds of CQ even if there is no need to arm the CQ.
-+		 * This driver rings the doorbell as soon as we have exceeded
-+		 * 4 wraparounds.
-+		 */
-+		mana_gd_ring_cq(gdma_queue, 0);
-+		cq->work_done_since_doorbell = 0;
- 	}
- 
--	mana_gd_ring_cq(gdma_queue, arm_bit);
--
- 	return w;
- }
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 6439fd8b437b..7caa334f4888 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -275,6 +275,7 @@ struct mana_cq {
- 	/* NAPI data */
- 	struct napi_struct napi;
- 	int work_done;
-+	int work_done_since_doorbell;
- 	int budget;
- };
- 
--- 
-2.17.1
+@ssid_list -> @ssids
 
+Please document all non-private fields,
+and annotate those that are private.
+
+There are a number of similar minor Kernel doc problems with this patch.
+Please consider using W=1 builds or ./scripts/kernel-doc -none
+(bonus points for -Wall) 
+
+> + */
+> +struct cc33xx_cmd_ssid_list {
+> +	struct cc33xx_cmd_header header;
+> +
+> +	u8 role_id;
+> +	u8 scan_type;
+> +	u8 n_ssids;
+> +	struct cc33xx_ssid ssids[SCHED_SCAN_MAX_SSIDS];
+> +	u8 padding;
+> +} __packed;
+
+...
 
