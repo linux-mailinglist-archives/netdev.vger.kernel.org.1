@@ -1,62 +1,87 @@
-Return-Path: <netdev+bounces-117051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3845E94C86A
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:15:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1012694C879
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713921C2203C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:15:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5E8B1C22162
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C5A16419;
-	Fri,  9 Aug 2024 02:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB5E175A1;
+	Fri,  9 Aug 2024 02:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eujbSvn6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKaWvUP+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371731401C;
-	Fri,  9 Aug 2024 02:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBCC11CA0;
+	Fri,  9 Aug 2024 02:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723169741; cv=none; b=HIufNbeSUK1hcufXDRH9phMvvg7MwSI/heFYcWkeNH+nW5TYvir+aqCluFmxrTaqvlSjyVTPHgvabkRFoDNAJUmhPY84uqhjr0GEnpYibkgYKAUt0NnhCqBJHmoUqTBcQlIMzkTG7QGTgG9AfcYLHsYr34vpVo5+DayOJNBCzSM=
+	t=1723170254; cv=none; b=rcavAV/HxHaRlMZB/K9gN27K+y8C8qql+R6MjoMeNcrwRNOnvKpy5/F4WqhGCYe+uCWm3dGvAIesC9YkpZfXzA0p/LLdNTzJjD4VLtExNv4nr9kT0XoR8sgW9p8IcvIFRPq3nW3/SHNiNhTSRxSLiVHb0mpnYwb3jsa9N5UrPAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723169741; c=relaxed/simple;
-	bh=nJuswpyVmo6EC4IpZyEB8KNszJ78dYeSsIYznjgXYsI=;
+	s=arc-20240116; t=1723170254; c=relaxed/simple;
+	bh=a4NH/DyOZYr+hQdPVdV/xn3d1kqB1GhzzrD+9MYKuho=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KyBF4dIKlfIN49KYGPA4arQkNBbQAN+vFZXGtzdcKtWZComP58atEjNUN7VGeH1zJM1wq/jFQRYjmKjJr7jNzmvpDYGyEO5IB/eWKg9t3rWv/NDpvYD3Z638nNTCm/79/MQHER9bZTyCEm0tbPHv7qZVpvPNDMPY0ehSTkgjyXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eujbSvn6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F5CC32782;
-	Fri,  9 Aug 2024 02:15:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dAQReQjed2MaNUAAQRcVm6y66OwGRzyymcG6Qb9zr9ZZFX4kE1TT1jAN9SqZZ2+42YHNMH3uT6XJ8ukEJ/sVR7sXLpx1LJxo7hfVX5MpfCHhttjrDm8OyRoaK5loHbvs9vo3NrDSSo55k/zFpEsnHLaKL0ss45CzrxgVgX4e9vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKaWvUP+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C56DC32782;
+	Fri,  9 Aug 2024 02:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723169740;
-	bh=nJuswpyVmo6EC4IpZyEB8KNszJ78dYeSsIYznjgXYsI=;
+	s=k20201202; t=1723170253;
+	bh=a4NH/DyOZYr+hQdPVdV/xn3d1kqB1GhzzrD+9MYKuho=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eujbSvn6/xFJA0eRi7aEOiDAtjKEngaauVXJ4EWIxSDo50iUkvkE/wEO2u3lpIpdJ
-	 Sk16nQfAvHFnf/D12uHrIXe6GgCAsTujXypo/JdPn7dPhJOG0kMan7ivYIZZJygbmS
-	 RIaR3bfnKsywLL6hdHHXEhqJQMw752KMmx43ajdsde1yzkfUiqoPfvRoA2D2OtZ8+T
-	 rHYnitLW0V4iz9fYwmcsyG4HlkHNTSDDy8F8AtWgC8DJ7xORoQKBlBUWjFdV9fHfpv
-	 srAgFBIWhZ4pgWnZnD+S4VVY6fCpeKPSFTGiM9VnT+DXVKmKTEFhW/mVzAQAuVAsTF
-	 mv9i94TxnV3eA==
-Date: Thu, 8 Aug 2024 19:15:39 -0700
+	b=vKaWvUP+gW8ZxGS17B65tL1nrDAvJqciL9lSUQksuPZ4Iy4KhEGJQGOpNkkXmO+kV
+	 pkdaDInHp2dgMHzollw10zS4gIySrBFG6IgrrwYHj8LsAscwBWBwWjLcNHYy5tTzNE
+	 KSKa+C7m9EwkOjuzA8zG5VWtu7bn8KHoTxxNt5UYMtqglx1DnjyChjgN286dWqm0WA
+	 rT4bNmb9sUeUr0tdrbHNHwMsbmKPhEiAz7/jK5pb3Y5hSQ728/DeRHxDA8I+BOaR8Y
+	 khTAMu7d9Hv788u9Zd01H6xUkCZfx7Afr0wMZbiiN0Z1P7b+nVi/ftr6us3vFG5KWz
+	 4W9X6eOb829Uw==
+Date: Thu, 8 Aug 2024 19:24:10 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Potnuri Bharat Teja
- <bharat@chelsio.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] cxgb4: Avoid -Wflex-array-member-not-at-end
- warning
-Message-ID: <20240808191539.615733ab@kernel.org>
-In-Reply-To: <111cc058-a681-4aec-ace4-cd6bc19699f7@embeddedor.com>
-References: <ZrD8vpfiYugd0cPQ@cute>
-	<20240807200522.2caba2dc@kernel.org>
-	<111cc058-a681-4aec-ace4-cd6bc19699f7@embeddedor.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
+ Zhang <kaiyuanz@google.com>
+Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
+ memory provider
+Message-ID: <20240808192410.37a49724@kernel.org>
+In-Reply-To: <CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+References: <20240805212536.2172174-1-almasrymina@google.com>
+	<20240805212536.2172174-8-almasrymina@google.com>
+	<20240806135924.5bb65ec7@kernel.org>
+	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,41 +91,62 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 8 Aug 2024 12:41:32 -0600 Gustavo A. R. Silva wrote:
-> >>   .../chelsio/cxgb4/cxgb4_tc_u32_parse.h        |  2 +-
-> >>   include/uapi/linux/pkt_cls.h                  | 23 +++++++++++--------  
-> > 
-> > Took me a minute to realize you're changing uAPI.
-> > Please fix the subject.  
+On Thu, 8 Aug 2024 16:36:24 -0400 Mina Almasry wrote:
+> > How do you know that the driver:
+> >  - supports net_iov at all (let's not make implicit assumptions based
+> >    on presence of queue API);
+> >  - supports net_iov in current configuration (eg header-data split is
+> >    enabled)
+> >  - supports net_iov for _this_ pool (all drivers must have separate
+> >    buffer pools for headers and data for this to work, some will use
+> >    page pool for both)
+> >
+> > What comes to mind is adding an "I can gobble up net_iovs from this
+> > pool" flag in page pool params (the struct that comes from the driver),  
 > 
-> What would be a preferred subject?
+> This already sorta exists in the current iteration, although maybe in
+> an implicit way. As written, drivers need to set params.queue,
+> otherwise core will not attempt to grab the mp information from
+> params.queue. A driver can set params.queue for its data pages pool
+> and not set it for the headers pool. AFAICT that deals with all 3
+> issues you present above.
+> 
+> The awkward part is if params.queue starts getting used for other
+> reasons rather than passing mp configuration, but as of today that's
+> not the case so I didn't add the secondary flag. If you want a second
+> flag to be added preemptively, I can do that, no problem. Can you
+> confirm params.queue is not good enough?
 
-The point is that include/uapi/linux/pkt_cls.h is the more important
-change.
+I'd prefer a flag. The setting queue in a param struct is not a good
+API for conveying that the page pool is for netmem payloads only.
 
-net/sched, based on:
+> > and then on the installation path we can check if after queue reset
+> > the refcount of the binding has increased. If it did - driver has
+> > created a pool as we expected, otherwise - fail, something must be off.
+> > Maybe that's a bit hacky?  
+> 
+> What's missing is for core to check at binding time that the driver
+> supports net_iov. I had relied on the implicit presence of the
+> queue-API.
+> 
+> What you're proposing works, but AFAICT it's quite hacky, yes. I
+> basically need to ASSERT_RTNL in net_devmem_binding_get() to ensure
+> nothing can increment the refcount while the binding is happening so
+> that the refcount check is valid.
 
-git log --oneline -- include/uapi/linux/pkt_cls.h
+True. Shooting from the hip, but we could walk the page pools of the
+netdev and find the one that has the right mp installed, and matches
+queue? The page pools are on a list hooked up to the netdev, trivial
+to walk.
 
-11036bd7a0b3 net/sched: cls_flower: rework TCA_FLOWER_KEY_ENC_FLAGS usage
-bfda5a63137b net/sched: flower: define new tunnel flags
-6e5c85c003e4 net/sched: flower: refactor control flag definitions
-1d17568e74de net/sched: cls_flower: add support for matching tunnel control flags
-6dd514f48110 pfcp: always set pfcp metadata
-82b2545ed9a4 net/sched: Remove uapi support for tcindex classifier
-41bc3e8fc1f7 net/sched: Remove uapi support for rsvp classifier
-ba24ea129126 net/sched: Retire ipt action
-35b1b1fd9638 Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-4c13eda757e3 tc: flower: support for SPI
-4d50e50045aa net: flower: fix stack-out-of-bounds in fl_set_key_cfm()
-7cfffd5fed3e net: flower: add support for matching cfm fields
-1a432018c0cd net/sched: flower: Allow matching on layer 2 miss
-8b189ea08c33 net/sched: flower: Add L2TPv3 filter
-f86d1fbbe785 Merge tag 'net-next-6.0' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
-5008750eff5d net/sched: flower: Add PPPoE filter
-94dfc73e7cf4 treewide: uapi: Replace zero-length arrays with flexible-array members
-b40003128226 net/sched: flower: Add number of vlan tags filter
-e3acda7ade0a net/sched: Allow flower to match on GTP options
+> I think a less hacky approach is to add a function to the queue-API
+> like ndo_queue_supported_features(), which lets the driver declare
+> that it supports net_iov at a given rx queue. However I'm open to both
+> approaches. What do you prefer?
 
-You can throw in uAPI somewhere in the subject, too
+I kinda like trying to query the page pools more, because it's both
+fewer driver changes, and it actually validates that the driver did 
+the right thing based on outcomes. Driver callback may have bugs.
+
+If you prefer strongly - fine, but hm.
 
