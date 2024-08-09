@@ -1,117 +1,103 @@
-Return-Path: <netdev+bounces-117143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E8694CDB3
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 11:53:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D73E94CDDB
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 11:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E0F3284D7C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 09:53:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 802241C22046
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 09:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBB51991DC;
-	Fri,  9 Aug 2024 09:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B762719E7F5;
+	Fri,  9 Aug 2024 09:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmhE7PPL"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="R7NN4EqN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387311991D9
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 09:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64FA19DFAB;
+	Fri,  9 Aug 2024 09:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723196840; cv=none; b=eMhCD/QcHJWHT2K8WO2l3pBBLsPFR7+4imjxtb7secW6kqus80JQQegQ+hH8bCavH2hwxjoZVm4PHswQF6RzbLbHJV817nH0E5MC34E3D6ehnt0YSCJoksjVG5dW0daByZ9wrkXz/A9VpjekFN/7rQd6MWShT+MNQAkIMrEq7tE=
+	t=1723196892; cv=none; b=WlPYG01xw1uxtuZXCfE3jnSiILMy/uNA4qP7JjwC0KDf1H77nTixPyFojRBv60ZVOZJoVzk1rEfP4g7obxHFEqWnYJqNLb5QQ3YHCF5l08WNnca1y/HidKvE2QraJSM+sDlYK9ANCD570td+7+94UuNX128Z1LX0OnwqZ/hD0X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723196840; c=relaxed/simple;
-	bh=BdYw+LHFjtkUvwFB2WBbiwlWiYYIE3knhdZr8o3sUtQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TPyghmxXGE7ewoT+t8rqq/YqXe2P6z8bIv2UYr4UZDc9AmQYVVbA9GeoAKIl2RV1twM+W3FBbJSl7jwV8gV0ZjNLhPPpkL1gKfGzxH1s7Vvhq0UQM1llbSgh7h/HYhFHJW91P3nANeNEitCpv2rZ/KO7MhzeLsp9koS5oN7xano=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmhE7PPL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A00B3C32782;
-	Fri,  9 Aug 2024 09:47:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723196839;
-	bh=BdYw+LHFjtkUvwFB2WBbiwlWiYYIE3knhdZr8o3sUtQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=XmhE7PPL5QMJYJ7Pxb1ZbOte92YXi45daezweCRTRcbCUpK0xx/wV8WLlsuZZ+ko3
-	 ze1QQdJHBwpPPgnldaIUdF9aGWRN9MZuhU6ysV6VPrdQ/e193xoD7ZE6BPt1xSqExZ
-	 y2OnPBCPU644uyoLl43Xuofg058dnLzmaaqXgD//t8hsFFT8Pi+JDq0wJUhw9blWiD
-	 evkARekTn9Mg5/D8rHhxEAN8mOg1dLDhjF7iHhZE/G/zldDd25M8OQNHz16hYy/Pdi
-	 0jUu+p5egvaPmKwdyFA0xILXqS1ZUSrSizHZxwqU6jsn+i7I5IJAx/rRZMjt2ZDQ1b
-	 Wy9I0afP0grhg==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4722C14ADA25; Fri, 09 Aug 2024 11:47:17 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, djduanjiong@gmail.com
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
-In-Reply-To: <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
-References: <20240808070428.13643-1-djduanjiong@gmail.com>
- <87v80bpdv9.fsf@toke.dk>
- <CALttK1RsDvuhdroqo_eaJevARhekYLKnuk9t8TkM5Tg+iWfvDQ@mail.gmail.com>
- <87mslnpb5r.fsf@toke.dk> <00f872ac-4f59-4857-9c50-2d87ed860d4f@Spark>
- <87h6bvp5ha.fsf@toke.dk>
- <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 09 Aug 2024 11:47:17 +0200
-Message-ID: <87seveownu.fsf@toke.dk>
+	s=arc-20240116; t=1723196892; c=relaxed/simple;
+	bh=uh6uFWyNmasNfPLGK8ArmG30O++3FMJ+4nCjlFuMvEo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pju7q5ZN5b6voVkfCjskiqYhiI/oBthirQT2w/F6zGY7pkzxMpPGgky50kKqQGvrbH6TRK6opQ6bYX7KHMDztAqqR1f2WS91rVgD0POONX/mryIAShJu39OrvoZDvrNvZhiIvnTbUvyMibMeJZ/7lBqLE7jY5Cyk7by8ORs/QuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=R7NN4EqN; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 35CE42222A;
+	Fri,  9 Aug 2024 11:48:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1723196889;
+	bh=0RTNAZMPTQo7Iajey5tnC1QQ83FapbsZWYcXMRrN5ig=; h=From:To:Subject;
+	b=R7NN4EqN60qttA5Fb1af4LxuV8tX6nx1SPCojMRpqMtgB6nbK4KCi7nf2BdqySD5b
+	 MqjbXAzu6FvToQu5I3lBAMJw+BvkDn7QpF8oMVuLe6B5Pe2A9MrRWu394KLyeYrZ0j
+	 1qNpNM/BeqPCfSWS4P4roVWmue6PHTTeIn4FXyMbcNGTuYpdg97//60kSmsGuK9Wyk
+	 lwqTE9b8lqN4LWZcJ4lqmnCikWZRn0lZG1bmLmR5Z4r6PFdZILzqK8dH1NnjF5E2R9
+	 cfx+4GDQcTT3/9YIM5jeDonOZmCllusl6o9u5V2jxeh/BF02P6Tcype+pwNbMKx8Cg
+	 GibhG1DoQzw/w==
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Linux Team <linux-imx@nxp.com>
+Cc: Francesco Dolcini <francesco.dolcini@toradex.com>,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net-next v3 0/3] net: fec: add PPS channel configuration
+Date: Fri,  9 Aug 2024 11:48:01 +0200
+Message-Id: <20240809094804.391441-1-francesco@dolcini.it>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
+From: Francesco Dolcini <francesco.dolcini@toradex.com>
 
-> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> djduanjiong@gmail.com writes:
->>=20
->> > This is similar to a virtual machine that receives packets larger than
->> > its own mtu, regardless of the mtu configured in the guest.=C2=A0=C2=
-=A0Or, to
->> > put it another way, what are the negative effects of this change?
->>=20
->> Well, it's changing long-standing behaviour (the MTU check has been
->> there throughout the history of veth). Changing it will mean that
->> applications that set the MTU and rely on the fact that they will never
->> receive packets higher than the MTU, will potentially break in
->> interesting ways.
->
-> That this works is very veth specific, though?
->
-> In general this max *transfer* unit configuration makes no assurances
-> on the size of packets arriving. Though posted rx buffer size does,
-> for which veth has no equivalent.
+Make the FEC Ethernet PPS channel configurable from device tree.
 
-Well, in practice we do use the MTU to limit the RX size as well. See
-for instance the limit on MTU sizes if an XDP program without
-multibuffer support is loaded. And I don't think having an asymmetric
-MTU setting on a physical point-to-point Ethernet link generally works
-either. So in that sense it does make sense that veth has this
-limitation, given that it's basically emulating an ethernet wire.
+v3 to just add the missing "net-next" subject prefix, sorry about the spam, it
+seems like friday morning plus the mid of august heat wave is badly affecting
+myself ...
 
-I do see your point that a virtual device doesn't really *have* to
-respect MTU, though. So if we were implementing a new driver this
-argument would be a lot easier to make. In fact, AFAICT the newer netkit
-driver doesn't check the MTU setting before forwarding, so there's
-already some inconsistency there.
+v2: https://lore.kernel.org/all/20240809091844.387824-1-francesco@dolcini.it/
+v1: https://lore.kernel.org/all/20240807144349.297342-1-francesco@dolcini.it/
 
->> You still haven't answered what's keeping you from setting the MTU
->> correctly on the veth devices you're using?
->
-> Agreed that it has a risk, so some justification is in order. Similar
-> to how commit 5f7d57280c19 (" bpf: Drop MTU check when doing TC-BPF
-> redirect to ingress") addressed a specific need.
+Francesco Dolcini (3):
+  dt-bindings: net: fec: add pps channel property
+  net: fec: refactor PPS channel configuration
+  net: fec: make PPS channel configurable
 
-Exactly :)
+ Documentation/devicetree/bindings/net/fsl,fec.yaml |  7 +++++++
+ drivers/net/ethernet/freescale/fec_ptp.c           | 11 ++++++-----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
-And cf the above, using netkit may be an alternative that doesn't carry
-this risk (assuming that's compatible with the use case).
+-- 
+2.39.2
 
--Toke
 
