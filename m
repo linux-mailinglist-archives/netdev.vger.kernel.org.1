@@ -1,112 +1,145 @@
-Return-Path: <netdev+bounces-117229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6035F94D2C1
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:58:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF8A94D2C9
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DDAA280E8E
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC69281EC9
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A290195809;
-	Fri,  9 Aug 2024 14:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E32198A19;
+	Fri,  9 Aug 2024 14:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfVhjyED"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="T02tbz0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FAD1922CD
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 14:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474D1197A93;
+	Fri,  9 Aug 2024 14:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723215486; cv=none; b=g+DQC2pou24SAdAFulZpzKWaBvPtqwJV5U47T1fnSeT/LPMbX5WXN7IrO5rT+LZESAAG2L+rJ69wvWX4BMvmB0dDmNJ3rd6OB4bWiMWdEZc7YcdM2kQ6u0Rgl/d/UBimtKQY2aMfo6SuE4/wWqI7ZxGd/ziYZ/M5zXnd8xUtFZQ=
+	t=1723215571; cv=none; b=rvjH2xHJ6rKwascpPQgMoQ34lQ+UTsTQV3VEQiJY6VR4pkAOZ5isyxK2epiWvVvCN3MUATAh9FSdhmw/a4XWNB/QfJtO1yjgDZ4vFvwyT7mu5KnhsDd4G1AWn9U4n/PCz7ECiopALi4jSNrdoxDrbgCPHX3pyv7L06tb7SQrzQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723215486; c=relaxed/simple;
-	bh=D5+tgFrJS5WL80xFEcHggbuk0m5jwSlZII1VQushVOU=;
+	s=arc-20240116; t=1723215571; c=relaxed/simple;
+	bh=uVLPqw+UvO4d3vl0+as7B8+tUGMM0+jq+RxNrUtEyYU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i5qibSaqev0ZOoTDNFu93EZ7cCmO5eJqAMUVjr6NZEn/A7l+h+H54vtYz2cY5fAPXxjjIa+eo68qUz7wBvmdoCW6CQPOIEoYY3DpYA/N/mGUFpasRKkx6RP7vPzL2Es89VWsIUo2tWAeCFbfBypUpxuAwlk2h8R4SP4Jl28XLJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfVhjyED; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF40C32782;
-	Fri,  9 Aug 2024 14:58:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723215485;
-	bh=D5+tgFrJS5WL80xFEcHggbuk0m5jwSlZII1VQushVOU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZfVhjyEDMDl8s0j263lYplhvDGKNb7CYxsPpVYbDKV09pqdlwskzpC6zTqUnsxGOX
-	 gN0J3MfMI/QqbZECgytSUEH5bGUg7cGhjun9ezyAG0lNb+WkIhHtdM9b/urCKAujKS
-	 ZL/d7KUPFedepCEahZK4o3mE+SwifRddI8jUlI4sXpV8UTaxdhfvVfdQ7wxRWiwJF9
-	 4sZCd+N1175bcbR+y0ZEJM9MeJiypGO6lydlbYktKAnKg1Nqp5TCG+fjo4EebRdTQ1
-	 brTB562u541HArxNKnURhczxlEcaNC+nyp4veY0BxMVjhfOJajtxovJ1GLx8i0SNy8
-	 kvQ5C/xsEyMuw==
-Date: Fri, 9 Aug 2024 15:56:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, michael.chan@broadcom.com, shuah@kernel.org,
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	ahmed.zaki@intel.com, andrew@lunn.ch, willemb@google.com,
-	pavan.chebbi@broadcom.com, petrm@nvidia.com, gal@nvidia.com,
-	jdamato@fastly.com, donald.hunter@gmail.com,
-	marcin.s.wojtas@gmail.com, linux@armlinux.org.uk
-Subject: Re: [PATCH net-next v4 02/12] eth: mvpp2: implement new RSS context
- API
-Message-ID: <20240809145629.GA1951@kernel.org>
-References: <20240809031827.2373341-1-kuba@kernel.org>
- <20240809031827.2373341-3-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=apoyqj451ztM36WqrNWIK+1et021rWz5KE3y51ikA/DxFtzOvoFHaR8lKCYIzR4NCpWzovGC2pZKKc/lxX8vQFEUER3yR7MHwNo5e4us7ci9O2gQazNtMzKyiGRMGf2ZG2T+sezVmKoz5OnDIdDTf80FOkqd6/653SdyIABEgx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=T02tbz0n; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723215559; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=SHoLjYIreNAqMZT4TTmTcVAbo6cppGaJNj2SfOV7+po=;
+	b=T02tbz0nS8Umz47R8o9elNywBpBVyVnfbSPQTwXcBHDo6GwgtfR85Q2QY7LMjZ/XE1Sp8gIifeRv80ukKq68a8e67zLXEv0pnFBPA5Nnp0F5LmaWfUb3wWPFkTHCUUeDgLfUGSR7aG3mxiHOdyJoRw74x4G/8oegStNC2jLs5j8=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WCQNTjO_1723215557)
+          by smtp.aliyun-inc.com;
+          Fri, 09 Aug 2024 22:59:18 +0800
+Date: Fri, 9 Aug 2024 22:59:17 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Liu Jian <liujian56@huawei.com>, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Cc: jgg@ziepe.ca, leon@kernel.org, zyjzyj2000@gmail.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next 2/4] net/smc: use ib_device_get_netdev() helper
+ to get netdev info
+Message-ID: <20240809145917.GB103152@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20240809083148.1989912-1-liujian56@huawei.com>
+ <20240809083148.1989912-3-liujian56@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240809031827.2373341-3-kuba@kernel.org>
+In-Reply-To: <20240809083148.1989912-3-liujian56@huawei.com>
 
-On Thu, Aug 08, 2024 at 08:18:17PM -0700, Jakub Kicinski wrote:
-> Implement the separate create/modify/delete ops for RSS.
+On 2024-08-09 16:31:46, Liu Jian wrote:
+>Currently, in the SMC protocol, network devices are obtained by calling
+>ib_device_ops.get_netdev(). But for some drivers, this callback function
+>is not implemented separately. Therefore, here I modified to use
+>ib_device_get_netdev() to get net_device.
+>
+>For rdma devices that do not implement ib_device_ops.get_netdev(), one of
+>the issues addressed is as follows:
+>before:
+>smcr device
+>Net-Dev         IB-Dev   IB-P  IB-State  Type        Crit  #Links  PNET-ID
+>                rxee        1    ACTIVE  0               No       0
+>
+>after:
+>smcr device
+>Net-Dev         IB-Dev   IB-P  IB-State  Type        Crit  #Links  PNET-ID
+>enp1s0f1        rxee        1    ACTIVE  0               No       0
+>
+>Signed-off-by: Liu Jian <liujian56@huawei.com>
+>---
+> net/smc/smc_ib.c   | 8 +++-----
+> net/smc/smc_pnet.c | 6 +-----
+> 2 files changed, 4 insertions(+), 10 deletions(-)
+>
+>diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+>index 9297dc20bfe2..382351ac9434 100644
+>--- a/net/smc/smc_ib.c
+>+++ b/net/smc/smc_ib.c
+>@@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
+> 	struct ib_device *ibdev = smcibdev->ibdev;
+> 	struct net_device *ndev;
 > 
-> No problems with IDs - even tho RSS tables are per device
-> the driver already seems to allocate IDs linearly per port.
-> There's a translation table from per-port context ID
-> to device context ID.
+>-	if (!ibdev->ops.get_netdev)
+>-		return;
+>-	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
+>+	ndev = ib_device_get_netdev(ibdev, port + 1);
+> 	if (ndev) {
+> 		smcibdev->ndev_ifidx[port] = ndev->ifindex;
+> 		dev_put(ndev);
+>@@ -921,9 +919,9 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
+> 		port_cnt = smcibdev->ibdev->phys_port_cnt;
+> 		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
+> 			libdev = smcibdev->ibdev;
+>-			if (!libdev->ops.get_netdev)
+>+			lndev = ib_device_get_netdev(libdev, i + 1);
+>+			if (!lndev)
+> 				continue;
+>-			lndev = libdev->ops.get_netdev(libdev, i + 1);
+> 			dev_put(lndev);
+> 			if (lndev != ndev)
+> 				continue;
+>diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+>index 2adb92b8c469..a55a697a48de 100644
+>--- a/net/smc/smc_pnet.c
+>+++ b/net/smc/smc_pnet.c
+>@@ -1055,11 +1055,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
+> 			continue;
 > 
-> mvpp2 doesn't have a key for the hash, it defaults to
-> an empty/previous indir table.
-> 
-> Note that there is no key at all, so we don't have to be
-> concerned with reporting the wrong one (which is addressed
-> by a patch later in the series).
-> 
-> Compile-tested only.
-> 
-> Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v4:
->  - adjust to meaning of max_context_id from net
+> 		for (i = 1; i <= SMC_MAX_PORTS; i++) {
+>-			if (!rdma_is_port_valid(ibdev->ibdev, i))
+>-				continue;
 
-Hi Jakub,
+Why remove this check ?
 
-Should rxfh_max_num_contexts be used instead?
-
-I'm seeing:
-
-  CC [M]  .../mvpp2_main.o
-.../mvpp2_main.c:5794:10: error: ‘const struct ethtool_ops’ has no member named ‘rxfh_max_context_id’; did you mean ‘rxfh_max_num_contexts’?
- 5794 |         .rxfh_max_context_id    = MVPP22_N_RSS_TABLES,
-      |          ^~~~~~~~~~~~~~~~~~~
-      |          rxfh_max_num_contexts
+Best regard,
+Dust
 
 
-Which seems to make sense in the context of:
-
-- net: ethtool: fix off-by-one error in max RSS context IDs
-  https://git.kernel.org/netdev/net-next/c/b54de55990b0
-
-...
+>-			if (!ibdev->ibdev->ops.get_netdev)
+>-				continue;
+>-			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
+>+			ndev = ib_device_get_netdev(ibdev->ibdev, i);
+> 			if (!ndev)
+> 				continue;
+> 			dev_put(ndev);
+>-- 
+>2.34.1
+>
 
