@@ -1,140 +1,125 @@
-Return-Path: <netdev+bounces-117152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AF394CE2C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:04:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A0A94CE68
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C7F1F255DA
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:04:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A97B283140
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCE51922E3;
-	Fri,  9 Aug 2024 10:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342A718C906;
+	Fri,  9 Aug 2024 10:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUoONnBX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luUztuZJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3654191F9E;
-	Fri,  9 Aug 2024 10:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A54F17BBF;
+	Fri,  9 Aug 2024 10:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723197757; cv=none; b=mLiFqRelywh7a96iGaHUkoM15d8ZKAdSUmX/SpaN7W26WbkgkesT2stdGF/9SRmfiDgLi+gbXCJLFPv8RqTuxkothrkYWkKN+hZVvzM9av3y97BShFpViUxGof0TOvlj82VcgtpCi4S/Q1+UqU6SQ1m7snBGzJpU73S3jfyc54k=
+	t=1723198577; cv=none; b=QY4A94h2GbZM1F+eWLv1egQcXCH7wWaVemJfr+LuteslNkXELLtP31XIosbIQUyzKHkj9cH5OlGP/e1w7ovpRmBbtxEMi5YoG95bicMfWDXam7LruWmu1JSiproBSIDWI6fWbSDM8pMUfPKJju6+TNvPVW15aKY1B9UtASwXZ60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723197757; c=relaxed/simple;
-	bh=Gg6GNVZac8M0fXSanieB/ShknDd6zMF0dQYilGAgcns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d2iWMUcJhOPlvUsvc9Mqmt1uFvmOmzuqOqK0AXCKlj7sr1KYpJk8li6lKexJs71YsE0NaMfHtGL75CMNRkr2DU9sNr9SgDBBr2evAa3oIKosSNU7Hvl/p8qanLK6glH18fsWWOb1pgGr9YH0rJ4yJNUHPRTPkA+vtxj1nokmH8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUoONnBX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BCBC32782;
-	Fri,  9 Aug 2024 10:02:30 +0000 (UTC)
+	s=arc-20240116; t=1723198577; c=relaxed/simple;
+	bh=/4yHL3Ff4I9Wn8sXPTVtpcTghEGf/AxD7mHtkI/OQ3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GpUGArLIuDrGF1U1BvvEVbXpFoEc+DHJ2KSWm8felH7fTHJK2gI3eDLLVjWnvp59aczvqAk234u7UwnEK4MCuJYrypyDOtxnE4l6JMcByDq9KW4bqHlLVj+777y272/18khnZl8Mc68BuROrnqTGiqPrfNrcaqAwWF6KnKHHW9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luUztuZJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9417AC32782;
+	Fri,  9 Aug 2024 10:16:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723197756;
-	bh=Gg6GNVZac8M0fXSanieB/ShknDd6zMF0dQYilGAgcns=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GUoONnBX01q1eTQN5cQcbzN085bC+FZ14Wit95I4McXPw08lryC1W2l5A03EeNGXS
-	 66MkwW0pbEcUau4s7QQZIZTH4nj+K7yh6UvrmuPstdNc2rmkhf6CkZbCEZDnH72lcd
-	 bY7cN5/FCoDHE3JBUIY3gHszE60p0hBjWMufmzWsGCCO9tVHcqZ9+f/SwRM7638spq
-	 F6rDA6I/c2sDuqMYYXjSDYZmpZh/7hRvj0O03A8goY8zn7cA580Q2Ugta25A4X6wWQ
-	 rx4OzXqSBR6S/vbILgS7SuD4+NBLbou6OuDXPcvqt5byYWmF/gJEePOIQ2mupRErLr
-	 SGsm1F+LZIadw==
-Message-ID: <38b31e5b-57a6-44ab-a5ca-8f890bed6074@kernel.org>
-Date: Fri, 9 Aug 2024 12:02:29 +0200
+	s=k20201202; t=1723198576;
+	bh=/4yHL3Ff4I9Wn8sXPTVtpcTghEGf/AxD7mHtkI/OQ3o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=luUztuZJa9RA4bGErPWjmMzxsmrns1HYkDToPYOq5QtSsL5x8i7IxEBREP54bF9/v
+	 DX0CWKoR8NyYSrbxOr6aZnPUKyHqFO3XZK05tC3QBMQt6CyPk87zFFzizDn3T1cpz2
+	 dxdsj66AdNwf0C2U6qB2CKwDqTnW7LLjCvk1Df1lXUA3UGAzz4T6bXUl2Sl+hqHeKk
+	 /cp/yysCsfc4A0Ct9jz5ZzMOwDVQaRcDJipLqDIbVeDMX6hMdIFTXqCzz5eWAErOdA
+	 Sm7R7A0f+U1MrDM7uFQZNhOv/9AC4fhrKpRDwgtdCGxja7WUPfsQxMIJkYhk8oQlGM
+	 L39lABwggcqeA==
+Date: Fri, 9 Aug 2024 11:16:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Foster Snowhill <forst@pen.gy>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Georgi Valkov <gvalkov@gmail.com>, Oliver Neukum <oneukum@suse.com>,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] usbnet: ipheth: remove extraneous rx URB
+ length check
+Message-ID: <20240809101612.GJ3075665@kernel.org>
+References: <20240806172809.675044-1-forst@pen.gy>
+ <20240806172809.675044-2-forst@pen.gy>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to
- GRO from netif_receive_skb_list()
-To: Daniel Xu <dxu@dxuuu.xyz>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-Cc: Alexander Lobakin <alexandr.lobakin@intel.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, "toke@redhat.com"
- <toke@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- John Fastabend <john.fastabend@gmail.com>, Yajun Deng
- <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net,
- Stanislav Fomichev <sdf@google.com>, kernel-team <kernel-team@cloudflare.com>
-References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
- <20220628194812.1453059-33-alexandr.lobakin@intel.com>
- <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
- <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
- <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
- <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806172809.675044-2-forst@pen.gy>
 
-
-On 08/08/2024 22.52, Daniel Xu wrote:
+On Tue, Aug 06, 2024 at 07:28:06PM +0200, Foster Snowhill wrote:
+> Rx URB length was already checked in ipheth_rcvbulk_callback_legacy()
+> and ipheth_rcvbulk_callback_ncm(), depending on the current mode.
+> The check in ipheth_rcvbulk_callback() was thus mostly a duplicate.
 > 
-> On Thu, Aug 8, 2024, at 7:57 AM, Alexander Lobakin wrote:
->>
-[...]
->> The only concern for having GRO in cpumap without metadata from the NIC
->> descriptor was that when the checksum status is missing, GRO calculates
->> the checksum on CPU, which is not really fast.
->> But I remember sometimes GRO was faster despite that.
- >
-> Good to know, thanks. IIUC some kind of XDP hint support landed already?
+> The only place in ipheth_rcvbulk_callback() where we care about the URB
+> length is for the initial control frame. These frames are always 4 bytes
+> long. This has been checked as far back as iOS 4.2.1 on iPhone 3G.
 > 
+> Remove the extraneous URB length check. For control frames, check for
+> the specific 4-byte length instead.
 
-The XDP-hints ended-up being called 'XDP RX metadata' in kernel docs[1],
-which makes it difficult to talk about without talking past each-other.
-The TX side only got implemented for AF_XDP.
+Hi Foster,
 
-  [1] https://www.kernel.org/doc/html/latest/networking/xdp-rx-metadata.html
-  [2] https://www.kernel.org/doc/html/latest/networking/xsk-tx-metadata.html
+I am slightly concerned what happens if a frame that does not match the
+slightly stricter check in this patch, is now passed to
+dev->rcvbulk_callback().
 
-What landed 'XDP RX metadata'[1] is that we (via kfunc calls)  get
-access to reading hardware RX offloads/hints directly from the
-RX-descriptor. This implies a limitation that we only have access to
-this data in the running XDP-program as the RX-descriptor is short lived.
+I see that observations have been made that this does not happen.  But is
+there no was to inject malicious packets, or for something to malfunction?
 
-Thus, we need to store the RX-descriptor information somewhere, to make
-it available to 'cpumap' on the remote CPU. After failing to standardize
-formatting XDP metadata area. My "new" opinion is that we should simply
-extend struct xdp_frame with the fields needed for SKB creation.  Then
-we can create some kfunc helpers that allow XDP-prog stores this info.
-
-
-> My use case could also use HW RSS hash to avoid a rehash in XDP prog.
-> And HW RX timestamp to not break SO_TIMESTAMPING. These two
-> are on one of my TODO lists. But I can’t get to them for at least
-> a few weeks. So free to take it if you’d like.
-
-The kfuncs you need should be available:
-
-  HW RSS hash = bpf_xdp_metadata_rx_hash()
-  HW RX timestamp = bpf_xdp_metadata_rx_timestamp()
-
-We just need to implement storing the information, such that it is
-available to CPUMAP, and make it generic such that it also works for
-veth when getting a XDP redirected xdp_frame.
-
-Hoping someone can works on this soon,
---Jesper
-
-
-
+> 
+> Signed-off-by: Foster Snowhill <forst@pen.gy>
+> Tested-by: Georgi Valkov <gvalkov@gmail.com>
+> ---
+>  drivers/net/usb/ipheth.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+> index 6eeef10edada..017255615508 100644
+> --- a/drivers/net/usb/ipheth.c
+> +++ b/drivers/net/usb/ipheth.c
+> @@ -286,11 +286,6 @@ static void ipheth_rcvbulk_callback(struct urb *urb)
+>  		return;
+>  	}
+>  
+> -	if (urb->actual_length <= IPHETH_IP_ALIGN) {
+> -		dev->net->stats.rx_length_errors++;
+> -		return;
+> -	}
+> -
+>  	/* RX URBs starting with 0x00 0x01 do not encapsulate Ethernet frames,
+>  	 * but rather are control frames. Their purpose is not documented, and
+>  	 * they don't affect driver functionality, okay to drop them.
+> @@ -298,7 +293,8 @@ static void ipheth_rcvbulk_callback(struct urb *urb)
+>  	 * URB received from the bulk IN endpoint.
+>  	 */
+>  	if (unlikely
+> -		(((char *)urb->transfer_buffer)[0] == 0 &&
+> +		(urb->actual_length == 4 &&
+> +		 ((char *)urb->transfer_buffer)[0] == 0 &&
+>  		 ((char *)urb->transfer_buffer)[1] == 1))
+>  		goto rx_submit;
+>  
+> -- 
+> 2.45.1
+> 
+> 
 
