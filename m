@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-117286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B239C94D777
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 21:39:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 482C794D779
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 21:40:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F6E52820ED
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:39:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3306280C92
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A2B16C440;
-	Fri,  9 Aug 2024 19:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A6416D4F7;
+	Fri,  9 Aug 2024 19:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d0D00T90"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+4X1BZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4DF15A876;
-	Fri,  9 Aug 2024 19:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA643160883;
+	Fri,  9 Aug 2024 19:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723232312; cv=none; b=JadENE6t6eZLfEPHWMREV4w/Q4lagiTFBN1UWSFFlVV5aX8s4/RA0H8zs4NsdV2U80JAfSDBRkqI8xXERRbtE63zJgTYuDIYhKjpmSpW1XeePTNaU/clycfaWNkT3Vpt467jU/b930aGBDnD8OO8IE+h0nyCeaF/S30fFf1/qZ8=
+	t=1723232314; cv=none; b=EOLs8l5yR7eaJTwINSbLy16x2JV3FFV8HukhHRVN59fcm1H22RBc927U9c9QIyeLvMQPoj/F65tn8IdRgP1jMYqQsSYdmDZfmqwzBsJ6vKqwCAW4jc6FdR6beCUfCPYtEruVZZ44w5ji82slDzJ8iFDGHL3Xw8zzVwHgFZs6TnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723232312; c=relaxed/simple;
-	bh=hGiIHFCuDlCJorymIuZvjwbZr8IRQttMj5OJQ1BJn5w=;
+	s=arc-20240116; t=1723232314; c=relaxed/simple;
+	bh=MUIgI0Og4nEqKaqgSG8ih/xROp2NjP1rKYFpIp8+vC4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XOr3nk56YqJ5tI5I4oukukUJ75Vd6sJt8Zq5IL2r5mb2LP/edACwmaOcnIa+Ajntru6kBF+AdEJW7KrqtnxYZ441KqEeVP+n9E05N2y9dQtwqsJeIGd2sQKPastuH1lP6fWMIGgEaWyuiaBpT0PZSoCSBboiOdclqPG2iEXAx5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d0D00T90; arc=none smtp.client-ip=209.85.208.182
+	 MIME-Version; b=NKP6F+01MbzcnkMM95Cl2Jhb4Z/PzHgVFMOvLW8s/t/Qo8q7c7XURmChH4b5E/Rz/Ku/IzO4Xl61g45IJZgYaLBpHpKrYMTtRuBSAhm0kK33+Z0JGCfvKwhft5eUN6d/8ziBNLu7qkL7egBAAZcDou1pI0GHYH0CVJPBad1hU/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+4X1BZj; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ef2c56da6cso26121621fa.1;
-        Fri, 09 Aug 2024 12:38:30 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f149845d81so27353331fa.0;
+        Fri, 09 Aug 2024 12:38:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723232309; x=1723837109; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723232310; x=1723837110; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H5XnvSJGfWoNnd9xB3nkKhARJnXMCYFlCktgU13i1x4=;
-        b=d0D00T90VOrAMdAMRMepbhyTLRzL6oCfcxDHp4eEybK6BuLbfVXTfZ5oYUhD/IhlHt
-         0UREOMqclcMdE2nC/2p69ChijhI0pdkqGFwGrGpg5BFS2Q5c2RMZqTOH+NYtFbXdIGbP
-         4a6wP+k9YZO/Li8ggWYQx9j1r02gDc+7qCJk9V6JV0x0x7FYfKKqOtE76AmCVNXrhglg
-         3XntiPQwRw0HG3oln2DEwcBTwvZpuApVkvZUT5bDRFFWk+Z0+pUstTtNWhzN+rJbv9u0
-         RaNzD0S9QoND9ah1J3vehUw3mE87gw5OGvQ3CKeCtmdkfH52Ndm+Vbp8PrAIgAr9sqjO
-         QY0w==
+        bh=ToeSXl+vM3WNVB6qyUTcA+LVhXh+7FU6kYmOVQ0FknE=;
+        b=W+4X1BZjRD5N40dHcTk6OtWfk4gUM/2Cf0aaMuc23YsX5alPo071xWUP87PB9dhBvF
+         gSlMIqzo1mtwasMtM9qOlMNLasgcobQnqpB+QHKR9/qOsKKBmF1qIQaNxxTvGT+wIRfn
+         P7AdkwlY/w8LAQW9VwZyVuEe7A2DNSGKBwt3Fcv/E+eUwH/E1geh8/PPfcmqPS3g8ov2
+         nz0LtNmBCW83HJLWRO7vU49N+Pl4tlcq2ujJplaxtfQz/FkvmAbve4QKcYFYpA8VXOeI
+         y6k9maFJ/ov/z/PmGs2Ec/1XYwvNCIL1kbtIrigPnBtEanQ55MQO5nqWGHoxJ/Igu/k0
+         8lsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723232309; x=1723837109;
+        d=1e100.net; s=20230601; t=1723232310; x=1723837110;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=H5XnvSJGfWoNnd9xB3nkKhARJnXMCYFlCktgU13i1x4=;
-        b=Qh68esdnLbO6g5Rghno9vNcfafiCWQ05gQ3d1vrMn8wW+eqcowXdUqGTmze1VvAs0g
-         yFAlo/vEcw1ChHKpXVCkdAJ7a2kWNi7pqFtIy2kQJGIBYZHmlKl2J8Z+RPkWkxZGG+Gx
-         bvwMXVh5tiDi8mg8E+2d/76wtrlLhxEZsZlHtSIgZtaisQWO+YHx8casCaZnVG8W3C9L
-         mFgcMyqOPTbt8yk1gcHaqq1oqdDZFrn91/BHMUJLsa8f6xDhZy9Hd8KoAa1JA3kv23kO
-         xG8C/NUToIzwO0ivktwLLeirDmLICtdtH2+T3x4KYY3oEQc3p5y+wKBmGYi0qF4iWJ6N
-         /JuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUse0a+cbR779CAZ66eaGc487Ia1S+NYar6H8KvL5XNj6VRbYPYHKan4eZ2qNMok8CfaapLdO55+AnnfwOKqxUae9CgWufF3jbfJs9j
-X-Gm-Message-State: AOJu0Yz8aIfAl6iPdz98O15/4QjGDrjAkkeuMncP/rRGo/vqo8VgMrc0
-	4CIyoJy3NOt1JiXRAnMQz9pyfsGiRwBm/KCHjnZmfHt6D5xiJPdr7J9KKQdM
-X-Google-Smtp-Source: AGHT+IEbfdTEnzonydMkAgqLF47kdXiqOOeuXt9NdeU0/+leTu/2jcCLUvll/fXH2SpAEININDq9Dw==
-X-Received: by 2002:a2e:9e89:0:b0:2ef:2e1c:79b5 with SMTP id 38308e7fff4ca-2f1a6c5aa3cmr16934361fa.14.1723232308518;
-        Fri, 09 Aug 2024 12:38:28 -0700 (PDT)
+        bh=ToeSXl+vM3WNVB6qyUTcA+LVhXh+7FU6kYmOVQ0FknE=;
+        b=IMLybKEKM82VWcab4i+7QRK8gGLk5iprXCxZOAV3v5XII6YucBARLChr6yRUAoErq+
+         TGlBsFO32B+Dlm0VJGa/EEavBHTZwELaWGei4jAl8mxnCcHh99XdcQ8Nz3eVtWx3vYar
+         ZdhFoI7bl9/X8VGZjSuAn2fyvi5JB48Twy/4HPxDVnOIyTGVoUOe3mHLt4BVoCL/gwEc
+         sn7+ER/R+yo7sffsuUrBk+35qCgD6F/e/F+wXvxXVPSmvXV9mZoXcYuJWwO3cvy3Ziuf
+         xXYGJZuhuKWwfOGTSahCLew7H3ruGqDrBhIPW5FQl8teRI4ZkV9TXofJyg8J8qoL8YL2
+         dWeg==
+X-Forwarded-Encrypted: i=1; AJvYcCUiVit/gbege71V7BDVMv40QsTBwkp3NG1PbrFtQXBiYf2q8GLb6D5gBFEVlEwhoASWkeC3dP0ZBsKaB3UeyK0rdEI3pWC/Z38kJ13B
+X-Gm-Message-State: AOJu0Yxf2xU4zx4thP3sCOv2Z9u3kQl+lLG7B5tyy84myQHVxPPp06/4
+	/afELqMkp7UdurzmJlUITIrYZWPBQdPd2O9UZaL6X0m/UV9Tew/DYnMpMrpm
+X-Google-Smtp-Source: AGHT+IFoUoqtHP3+J0aLZSfxAPkik547Kb93xmKUBljA7YDmwMP6PtBGU17Q0i0IW3CqK+UCuHDisQ==
+X-Received: by 2002:a2e:f1a:0:b0:2ef:2c87:3bd7 with SMTP id 38308e7fff4ca-2f1a6ce6ea0mr17738631fa.37.1723232310129;
+        Fri, 09 Aug 2024 12:38:30 -0700 (PDT)
 Received: from WBEC325.dom.lan ([2001:470:608f:0:8a4a:2fa4:7fd1:3010])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f291df4987sm451311fa.50.2024.08.09.12.38.27
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f291df4987sm451311fa.50.2024.08.09.12.38.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 12:38:28 -0700 (PDT)
+        Fri, 09 Aug 2024 12:38:29 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Pawel Dembicki <paweldembicki@gmail.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -82,9 +81,9 @@ Cc: Pawel Dembicki <paweldembicki@gmail.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 4/5] net: dsa: vsc73xx: allow phy resetting
-Date: Fri,  9 Aug 2024 21:38:05 +0200
-Message-Id: <20240809193807.2221897-5-paweldembicki@gmail.com>
+Subject: [PATCH net v3 5/5] net: phy: vitesse: repair vsc73xx autonegotiation
+Date: Fri,  9 Aug 2024 21:38:06 +0200
+Message-Id: <20240809193807.2221897-6-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240809193807.2221897-1-paweldembicki@gmail.com>
 References: <20240809193807.2221897-1-paweldembicki@gmail.com>
@@ -96,30 +95,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Resetting the VSC73xx PHY was problematic because the MDIO bus, without
-a busy check, read and wrote incorrect register values.
-
-My investigation indicates that resetting the PHY only triggers changes
-in configuration. However, improper register values written earlier
-were only exposed after a soft reset.
-
-The reset itself wasn't the issue; rather, the problem stemmed from
-incorrect read and write operations.
-
-A 'soft_reset' can now proceed normally. There are no reasons to keep
-the VSC73xx from being reset.
-
-This commit removes the reset blockade in the 'vsc73xx_phy_write'
-function.
+When the vsc73xx mdio bus work properly, the generic autonegotiation
+configuration works well.
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 ---
 v3:
-  - resend only
+  - removed MDI-X with disabled autoneg feature (it will goes to
+    net-next in future)
 v2:
-  - improved commit description
+  - resend only
 
 This patch came from net-next series[0].
 Changes since net-next:
@@ -127,31 +113,62 @@ Changes since net-next:
 
 [0] https://patchwork.kernel.org/project/netdevbpf/patch/20240729210615.279952-6-paweldembicki@gmail.com/
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ drivers/net/phy/vitesse.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index a789b2da9b7d..e3f95d2cc2c1 100644
---- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-+++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -598,17 +598,6 @@ static int vsc73xx_phy_write(struct dsa_switch *ds, int phy, int regnum,
- 	if (ret)
- 		return ret;
+diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
+index 897b979ec03c..3b5fcaf0dd36 100644
+--- a/drivers/net/phy/vitesse.c
++++ b/drivers/net/phy/vitesse.c
+@@ -237,16 +237,6 @@ static int vsc739x_config_init(struct phy_device *phydev)
+ 	return 0;
+ }
  
--	/* It was found through tedious experiments that this router
--	 * chip really hates to have it's PHYs reset. They
--	 * never recover if that happens: autonegotiation stops
--	 * working after a reset. Just filter out this command.
--	 * (Resetting the whole chip is OK.)
+-static int vsc73xx_config_aneg(struct phy_device *phydev)
+-{
+-	/* The VSC73xx switches does not like to be instructed to
+-	 * do autonegotiation in any way, it prefers that you just go
+-	 * with the power-on/reset defaults. Writing some registers will
+-	 * just make autonegotiation permanently fail.
 -	 */
--	if (regnum == 0 && (val & BIT(15))) {
--		dev_info(vsc->dev, "reset PHY - disallowed\n");
--		return 0;
--	}
+-	return 0;
+-}
 -
- 	cmd = (phy << 21) | (regnum << 16) | val;
- 	ret = vsc73xx_write(vsc, VSC73XX_BLOCK_MII, 0, 1, cmd);
- 	if (ret)
+ /* This adds a skew for both TX and RX clocks, so the skew should only be
+  * applied to "rgmii-id" interfaces. It may not work as expected
+  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces.
+@@ -444,7 +434,6 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc738x_config_init,
+-	.config_aneg    = vsc73xx_config_aneg,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ }, {
+@@ -453,7 +442,6 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc738x_config_init,
+-	.config_aneg    = vsc73xx_config_aneg,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ }, {
+@@ -462,7 +450,6 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc739x_config_init,
+-	.config_aneg    = vsc73xx_config_aneg,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ }, {
+@@ -471,7 +458,6 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc739x_config_init,
+-	.config_aneg    = vsc73xx_config_aneg,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ }, {
 -- 
 2.34.1
 
