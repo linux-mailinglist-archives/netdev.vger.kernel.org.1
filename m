@@ -1,535 +1,106 @@
-Return-Path: <netdev+bounces-117042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC8694C7B2
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:41:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D19F94C7B7
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E1DE28449F
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 00:41:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1355C1F25682
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 00:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D0533C0;
-	Fri,  9 Aug 2024 00:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9620B2907;
+	Fri,  9 Aug 2024 00:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="S2VbC1vL"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hBh9GhVx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBBB2CA9
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 00:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60C42581;
+	Fri,  9 Aug 2024 00:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723164111; cv=none; b=sy6qB3ZZ/lKE+Qbg2S+GJXG5xzButFPiPKFJvu7GmfQ2bWlU5RfTz7JpphheL6Ki8sWa+dtY4fCkR81wrqdEidsMrFcEmd5kzLygSdC4op7tpomsxt950aCNaj5EBC7n3KLdZ/2Y9ANlAfRNLHhj4Z0uPJzXddon2q5JXbbJaSo=
+	t=1723164225; cv=none; b=r73HTHSlz3SjbFZwl1VpDWGKDz9MMpSp83fv3VxnqgejFdnbk+DB3J1Ev5kY2NlacJTx0xlnIDnw/jAzBz5WTBLhRIXThkNhu4irYOwQwh/rI+kVAmEMLfAiyERg2VvuYfjN9PLICumVRC6r5eJeunAIJ3Pq3Kl9AM9KNCZLP50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723164111; c=relaxed/simple;
-	bh=GQDtyFxbcT5opJFl/Tjm0pOLa5VZsa9X10OeilH5Aoo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T583eWwcfeYwX/3kgIJcHHIYQ2AL0zl3nFKUcQzVMVEXcpirQKOsdGENvOnpddQkvCIFxOv3i/0+ZakUo+letvbHGQJxN3e1Vo6YwTUhRNBmvuIjDLYouXVDDAlmcBBB7ApUWEMueQad4LoGoSguBBeUEsxh+Rc/6GO7yZRzOck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=S2VbC1vL; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2cf98ba0559so1226529a91.2
-        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 17:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1723164109; x=1723768909; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vMa+HgXfbcLv1j8ZNDvKHW/MCvB4vKbczTkeRynl0Iw=;
-        b=S2VbC1vLpqf3SAlwQGBbR2eknQ7MNVZTqPo4GC1eMHgNC6JYBVtm661UkX8JsFh44v
-         2pXarkv8VUIXn/scj+tjLnZwiZVuoX/l3x/I1OBVxkAhc4kbV8JtfqZ+0OrpwbWGXCjO
-         7pqLKarIvLj95qHitGxRDOU3KwIfvenehfU5w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723164109; x=1723768909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vMa+HgXfbcLv1j8ZNDvKHW/MCvB4vKbczTkeRynl0Iw=;
-        b=xRI4DoPJSLIQ2ISpO2LiqNssddDh6stuiW/97I85kVkeHmdiJwF721Ju30O5WG720l
-         /PqvS1bVvxPMV4Bv1cQXU7pe0GrCkft6/q0fs1G7fbEaS9NsGe/52ASXNdBrfs0Fzti0
-         mbMD9sqn6RvAZhK2A5m9K/NN/N6mS/rOv++G3NLpf2uDRHyIjG8ZphbVqrFWlp9fRYR4
-         fA+YG36S3B32TgwRVzkO5Lf75x1opV6j24sHahdy+0yDAPaPG6ZMJzbrfszpHX6G46dk
-         rkSghcuxvtdC2aVDIQzv+83bubxEvSD/Iej8FGSfdByzgxIoq+Sl9wyAtHu5vBZmBElT
-         GXWA==
-X-Gm-Message-State: AOJu0YxvdfmjoEdXMO0vRuUZ2XZ1hp1EkrLe7hzPdfhr10eZ6lKQb/bu
-	ZhvwHptN3e0z9ktmNyZ1WiDElubAHlClePg7diEd3IsbzKuhF0Z/Zq+xs0C+4mmb8mb93jPgVxf
-	XE+6hyoQndzu3UBzDOlOcQ7kPSfTnExcxDkdW
-X-Google-Smtp-Source: AGHT+IHDbG9x+0Jp/p0afFemnFW+1v8MKmJHtRMu3N3tUN9zsm9NiSnsrUxrY0wlQIsl6oDLzBJaona3owLelsjrLwI=
-X-Received: by 2002:a17:90b:1a89:b0:2c9:9f50:3f9d with SMTP id
- 98e67ed59e1d1-2d1c3372906mr4030172a91.5.1723164109132; Thu, 08 Aug 2024
- 17:41:49 -0700 (PDT)
+	s=arc-20240116; t=1723164225; c=relaxed/simple;
+	bh=QBUgzL2iucKl1TnT6FfATwz95F4EDBQ7+96Hm7lyJUw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VlrsinV2N+PUbIM48e5/Z8nDeMWjG736Vfyhv5aVrBi5gOzi/1VukMS84weUuFcuAZyE7D6lnhYkaoytBOGDGUoxYGYgZurpRYlF9pf6r4ePOSuQ9LvuZWq5/pUq/ecXmmqlDXQosnJUWN3tb1rT2x8ug6rMeczeR3BJI2BtOYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hBh9GhVx; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723164223; x=1754700223;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QBUgzL2iucKl1TnT6FfATwz95F4EDBQ7+96Hm7lyJUw=;
+  b=hBh9GhVxKU9L03RJD3R5HioOanoj4k/hMNQRUi2eb7CHjj7KhuWzRUsg
+   Vhr7QYh81cNEIMRZ32EtNyVEk6yUpmBMhrBnRHSXzUkcvPcLdnY7t0kf0
+   /8lBmxWNSeo3wOa9rOKg4jeSWij6pT362K1id43Pmuo0kVoLRbz4ZaBFk
+   B0f/cFYixxc1m+J2gSy8AEab50W5+/YGVXIsl8Mlvqze4wYdD2Rdjddc0
+   8daLYu2ClpL/fjodujQGWQduir4DFBRcod3zXMpCuCXSFONLa7sSiBNXG
+   fOhlumJQcHYQa8lnXomdquHrRZN4ixW1BVgwxk5OtlY//7vIU36Dohkhn
+   A==;
+X-CSE-ConnectionGUID: +8j0qFodS5iV1GC4lWtiSA==
+X-CSE-MsgGUID: jw+k7P0ST9irEpusffZIVw==
+X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
+   d="scan'208";a="30947688"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Aug 2024 17:43:41 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 8 Aug 2024 17:43:11 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 8 Aug 2024 17:43:10 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<devicetree@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
+CC: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
+Subject: [PATCH net-next v2 0/2] net: dsa: microchip: Add KSZ8895/KSZ8864 switch support
+Date: Thu, 8 Aug 2024 17:43:08 -0700
+Message-ID: <20240809004310.239242-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
- <20240802031822.1862030-2-jitendra.vegiraju@broadcom.com> <zlbtbzch6reo656d72it5h2s7p5bnwhexire36v3w63mazidta@cqyiza4k562t>
-In-Reply-To: <zlbtbzch6reo656d72it5h2s7p5bnwhexire36v3w63mazidta@cqyiza4k562t>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Thu, 8 Aug 2024 17:41:37 -0700
-Message-ID: <CAMdnO-K49gp3GtM5EjBsBzcLNJJn60jXo-Kxn-zKn25MjVeZaQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] net: stmmac: Add basic dwxgmac4 support
- to stmmac core
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Resending the message since my earlier email turned-in to HTML because of a=
-n
-attempt to draw asciiart.
-On Tue, Aug 6, 2024 at 2:56=E2=80=AFPM Serge Semin <fancer.lancer@gmail.com=
-> wrote:
->
-> On Thu, Aug 01, 2024 at 08:18:20PM -0700, jitendra.vegiraju@broadcom.com =
-wrote:
-> > From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> >
-> > Adds support for DWC_xgmac version 4.00a in stmmac core module.
-> > This version adds enhancements to DMA architecture for virtualization
-> > scalability. This is realized by decoupling physical DMA channels (PDMA=
-)
-> > from Virtual DMA channels (VDMA). The  VDMAs are software abastractions
-> > that map to PDMAs for frame transmission and reception.
-> >
-> > The virtualization enhancements are currently not being used and hence
-> > a fixed mapping of VDMA to PDMA is configured in the init functions.
-> > Because of the new init functions, a new instance of struct stmmac_dma_=
-ops
-> > dwxgmac400_dma_ops is added.
-> > Most of the other dma operation functions in existing dwxgamc2_dma.c fi=
-le
-> > can be reused.
->
-> As we figured out (didn't we?) that it's actually the DW 25GMAC, then
-> it should be taken into account across the entire series.
->
-Yes, indeed its 25GMAC IP.
-We got confirmation that we used an early adopter version of the 25GMAC IP.
-The 25GMAC always come with HDMA DMA engine.
-The synopsis revision id is 4.xx and device id is 0x55.
-> >
-> > Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
-> >  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  31 ++++
-> >  .../net/ethernet/stmicro/stmmac/dwxgmac4.c    | 142 ++++++++++++++++++
-> >  .../net/ethernet/stmicro/stmmac/dwxgmac4.h    |  84 +++++++++++
-> >  4 files changed, 258 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.c
-> >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.h
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net=
-/ethernet/stmicro/stmmac/Makefile
-> > index c2f0e91f6bf8..2f637612513d 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> > @@ -6,7 +6,7 @@ stmmac-objs:=3D stmmac_main.o stmmac_ethtool.o stmmac_m=
-dio.o ring_mode.o        \
-> >             mmc_core.o stmmac_hwtstamp.o stmmac_ptp.o dwmac4_descs.o  \
-> >             dwmac4_dma.o dwmac4_lib.o dwmac4_core.o dwmac5.o hwif.o \
-> >             stmmac_tc.o dwxgmac2_core.o dwxgmac2_dma.o dwxgmac2_descs.o=
- \
-> > -           stmmac_xdp.o stmmac_est.o \
->
-> > +           stmmac_xdp.o stmmac_est.o dwxgmac4.o \
->
-> dw25gmac.o?
-We will rename all applicable reference to 25mac as you suggest for
-the entire patch series.
+From: Tristram Ha <tristram.ha@microchip.com>
 
->
-> >             $(stmmac-y)
-> >
-> >  stmmac-$(CONFIG_STMMAC_SELFTESTS) +=3D stmmac_selftests.o
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drive=
-rs/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > index dd2ab6185c40..c15f5247aaa8 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > @@ -7,6 +7,7 @@
-> >  #include <linux/iopoll.h>
-> >  #include "stmmac.h"
-> >  #include "dwxgmac2.h"
->
-> > +#include "dwxgmac4.h"
->
-> "dw25gmac.h"?
->
-> >
-> >  static int dwxgmac2_dma_reset(void __iomem *ioaddr)
-> >  {
-> > @@ -641,3 +642,33 @@ const struct stmmac_dma_ops dwxgmac210_dma_ops =3D=
- {
-> >       .enable_sph =3D dwxgmac2_enable_sph,
-> >       .enable_tbs =3D dwxgmac2_enable_tbs,
-> >  };
-> > +
->
-> > +const struct stmmac_dma_ops dwxgmac400_dma_ops =3D {
->
-> dw25gmac_dma_ops?
->
-> > +     .reset =3D dwxgmac2_dma_reset,
->
-> > +     .init =3D dwxgmac4_dma_init,
-> > +     .init_chan =3D dwxgmac2_dma_init_chan,
-> > +     .init_rx_chan =3D dwxgmac4_dma_init_rx_chan,
-> > +     .init_tx_chan =3D dwxgmac4_dma_init_tx_chan,
->
-> dw25gmac_dma_init, dw25gmac_dma_init_rx_chan, dw25gmac_dma_init_tx_chan?
->
-> > +     .axi =3D dwxgmac2_dma_axi,
-> > +     .dump_regs =3D dwxgmac2_dma_dump_regs,
-> > +     .dma_rx_mode =3D dwxgmac2_dma_rx_mode,
-> > +     .dma_tx_mode =3D dwxgmac2_dma_tx_mode,
-> > +     .enable_dma_irq =3D dwxgmac2_enable_dma_irq,
-> > +     .disable_dma_irq =3D dwxgmac2_disable_dma_irq,
-> > +     .start_tx =3D dwxgmac2_dma_start_tx,
-> > +     .stop_tx =3D dwxgmac2_dma_stop_tx,
-> > +     .start_rx =3D dwxgmac2_dma_start_rx,
-> > +     .stop_rx =3D dwxgmac2_dma_stop_rx,
-> > +     .dma_interrupt =3D dwxgmac2_dma_interrupt,
-> > +     .get_hw_feature =3D dwxgmac2_get_hw_feature,
-> > +     .rx_watchdog =3D dwxgmac2_rx_watchdog,
-> > +     .set_rx_ring_len =3D dwxgmac2_set_rx_ring_len,
-> > +     .set_tx_ring_len =3D dwxgmac2_set_tx_ring_len,
-> > +     .set_rx_tail_ptr =3D dwxgmac2_set_rx_tail_ptr,
-> > +     .set_tx_tail_ptr =3D dwxgmac2_set_tx_tail_ptr,
-> > +     .enable_tso =3D dwxgmac2_enable_tso,
-> > +     .qmode =3D dwxgmac2_qmode,
-> > +     .set_bfsize =3D dwxgmac2_set_bfsize,
-> > +     .enable_sph =3D dwxgmac2_enable_sph,
-> > +     .enable_tbs =3D dwxgmac2_enable_tbs,
-> > +};
->
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac4.c b/drivers/n=
-et/ethernet/stmicro/stmmac/dwxgmac4.c
-> > new file mode 100644
-> > index 000000000000..9c8748122dc6
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac4.c
->
-> dw25gmac.c?
->
-> > @@ -0,0 +1,142 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (c) 2024 Broadcom Corporation
-> > + */
-> > +#include "dwxgmac2.h"
->
-> > +#include "dwxgmac4.h"
->
-> dw25gmac.h?
->
-> > +
-> > +static int rd_dma_ch_ind(void __iomem *ioaddr, u8 mode, u32 channel)
-> > +{
-> > +     u32 reg_val =3D 0;
-> > +     u32 val =3D 0;
-> > +
-> > +     reg_val |=3D mode << XGMAC4_MSEL_SHIFT & XGMAC4_MODE_SELECT;
-> > +     reg_val |=3D channel << XGMAC4_AOFF_SHIFT & XGMAC4_ADDR_OFFSET;
-> > +     reg_val |=3D XGMAC4_CMD_TYPE | XGMAC4_OB;
-> > +     writel(reg_val, ioaddr + XGMAC4_DMA_CH_IND_CONTROL);
-> > +     val =3D readl(ioaddr + XGMAC4_DMA_CH_IND_DATA);
-> > +     return val;
-> > +}
-> > +
-> > +static void wr_dma_ch_ind(void __iomem *ioaddr, u8 mode, u32 channel, =
-u32 val)
-> > +{
-> > +     u32 reg_val =3D 0;
-> > +
-> > +     writel(val, ioaddr + XGMAC4_DMA_CH_IND_DATA);
-> > +     reg_val |=3D mode << XGMAC4_MSEL_SHIFT & XGMAC4_MODE_SELECT;
-> > +     reg_val |=3D channel << XGMAC4_AOFF_SHIFT & XGMAC4_ADDR_OFFSET;
-> > +     reg_val |=3D XGMAC_OB;
-> > +     writel(reg_val, ioaddr + XGMAC4_DMA_CH_IND_CONTROL);
-> > +}
-> > +
->
-> > +static void xgmac4_tp2tc_map(void __iomem *ioaddr, u8 pdma_ch, u32 tc_=
-num)
-> > +{
-> > +     u32 val =3D 0;
-> > +
-> > +     val =3D rd_dma_ch_ind(ioaddr, MODE_TXEXTCFG, pdma_ch);
-> > +     val &=3D ~XGMAC4_TP2TCMP;
-> > +     val |=3D tc_num << XGMAC4_TP2TCMP_SHIFT & XGMAC4_TP2TCMP;
-> > +     wr_dma_ch_ind(ioaddr, MODE_TXEXTCFG, pdma_ch, val);
-> > +}
-> > +
-> > +static void xgmac4_rp2tc_map(void __iomem *ioaddr, u8 pdma_ch, u32 tc_=
-num)
-> > +{
-> > +     u32 val =3D 0;
-> > +
-> > +     val =3D rd_dma_ch_ind(ioaddr, MODE_RXEXTCFG, pdma_ch);
-> > +     val &=3D ~XGMAC4_RP2TCMP;
-> > +     val |=3D tc_num << XGMAC4_RP2TCMP_SHIFT & XGMAC4_RP2TCMP;
-> > +     wr_dma_ch_ind(ioaddr, MODE_RXEXTCFG, pdma_ch, val);
-> > +}
->
-> What does "tc" stand for? Traffic control? If it's a kind of queue
-> then what about implementing the stmmac_ops::map_mtl_to_dma interface
-> method?
->
-TC stands for "traffic class".
-The VDMA to PDMA mapping within HDMA has traffic classification block betwe=
-en
-the two blocks to allow control over DMA resource utilization.
-VDMA -- TC --- PDMA
-Tx VDMAs and RX VDMAs are mapped onto a TC based on TD2TCMP and RD2TCMP.
-Multiple VDMAs can be mapped to the same TC.
-TCs are further mapped onto PDMAs based on TP2TCMP and RP2TCMP fields
-> > +
-> > +void dwxgmac4_dma_init(void __iomem *ioaddr,
-> > +                    struct stmmac_dma_cfg *dma_cfg, int atds)
-> > +{
-> > +     u32 value;
-> > +     u32 i;
-> > +
-> > +     value =3D readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > +
-> > +     if (dma_cfg->aal)
-> > +             value |=3D XGMAC_AAL;
-> > +
-> > +     if (dma_cfg->eame)
-> > +             value |=3D XGMAC_EAME;
-> > +
-> > +     writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > +
-> > +     for (i =3D 0; i < VDMA_TOTAL_CH_COUNT; i++) {
->
-> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i);
-> > +             value &=3D ~XGMAC4_TXDCSZ;
-> > +             value |=3D 0x3;
-> > +             value &=3D ~XGMAC4_TDPS;
-> > +             value |=3D (3 << XGMAC4_TDPS_SHIFT) & XGMAC4_TDPS;
-> > +             wr_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i, value);
-> > +
-> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i);
-> > +             value &=3D ~XGMAC4_RXDCSZ;
-> > +             value |=3D 0x3;
-> > +             value &=3D ~XGMAC4_RDPS;
-> > +             value |=3D (3 << XGMAC4_RDPS_SHIFT) & XGMAC4_RDPS;
-> > +             wr_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i, value);
->
-> I know that the TDPS/RDPS means Tx/Rx Descriptor Pre-fetch threshold
-> Size. What does the TXDCSZ/RXDCSZ config mean?
->
-> Most importantly why are these parameters hardcoded to 3? It
-> doesn't seem right.
->
-TXDCSZ/RXDCSZ are descriptor cache sizes.
-I missed defining macros for valid values, for example 3 indicates 256 byte=
-s.
-Will fix it in the next update.
+This series of patches is to add KSZ8895/KSZ8864 switch support to the
+KSZ DSA driver.
 
-> > +     }
-> > +
->
-> > +     for (i =3D 0; i < PDMA_TX_CH_COUNT; i++) {
-> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i);
-> > +             value &=3D ~(XGMAC4_TXPBL | XGMAC4_TPBLX8_MODE);
-> > +             if (dma_cfg->pblx8)
-> > +                     value |=3D XGMAC4_TPBLX8_MODE;
-> > +             value |=3D (dma_cfg->pbl << XGMAC4_TXPBL_SHIFT) & XGMAC4_=
-TXPBL;
-> > +             wr_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i, value);
-> > +             xgmac4_tp2tc_map(ioaddr, i, i);
-> > +     }
-> > +
-> > +     for (i =3D 0; i < PDMA_RX_CH_COUNT; i++) {
-> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i);
-> > +             value &=3D ~(XGMAC4_RXPBL | XGMAC4_RPBLX8_MODE);
-> > +             if (dma_cfg->pblx8)
-> > +                     value |=3D XGMAC4_RPBLX8_MODE;
-> > +             value |=3D (dma_cfg->pbl << XGMAC4_RXPBL_SHIFT) & XGMAC4_=
-RXPBL;
-> > +             wr_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i, value);
-> > +             if (i < PDMA_MAX_TC_COUNT)
-> > +                     xgmac4_rp2tc_map(ioaddr, i, i);
-> > +             else
-> > +                     xgmac4_rp2tc_map(ioaddr, i, PDMA_MAX_TC_COUNT - 1=
-);
-> > +     }
->
-> Shouldn't these initialization be done on the per-channel basis only
-> for only activated queues
-> plat_stmmacenet_data::{rx_queues_to_use,tx_queues_to_use} (the STMMAC
-> driver one-on-one maps queues and DMA-channels if no custom mapping
-> was specified)?
->
-These are VDMA to PDMA mappings internal HDMA.
-Even though it provides flexibility, a default any to any configuration is =
-used.
+v2
+- Add maintainers for devicetree
 
-> > +}
-> > +
-> > +void dwxgmac4_dma_init_tx_chan(struct stmmac_priv *priv,
-> > +                            void __iomem *ioaddr,
-> > +                            struct stmmac_dma_cfg *dma_cfg,
-> > +                            dma_addr_t dma_addr, u32 chan)
-> > +{
-> > +     u32 value;
-> > +
-> > +     value =3D readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
-> > +     value &=3D ~XGMAC4_TVDMA2TCMP;
-> > +     value |=3D (chan << XGMAC4_TVDMA2TCMP_SHIFT) & XGMAC4_TVDMA2TCMP;
-> > +     writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
-> > +
-> > +     writel(upper_32_bits(dma_addr),
-> > +            ioaddr + XGMAC_DMA_CH_TxDESC_HADDR(chan));
-> > +     writel(lower_32_bits(dma_addr),
-> > +            ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
-> > +}
-> > +
-> > +void dwxgmac4_dma_init_rx_chan(struct stmmac_priv *priv,
-> > +                            void __iomem *ioaddr,
-> > +                            struct stmmac_dma_cfg *dma_cfg,
-> > +                            dma_addr_t dma_addr, u32 chan)
-> > +{
-> > +     u32 value;
-> > +
-> > +     value =3D readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
-> > +     value &=3D ~XGMAC4_RVDMA2TCMP;
-> > +     value |=3D (chan << XGMAC4_RVDMA2TCMP_SHIFT) & XGMAC4_RVDMA2TCMP;
-> > +     writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
-> > +
-> > +     writel(upper_32_bits(dma_addr),
-> > +            ioaddr + XGMAC_DMA_CH_RxDESC_HADDR(chan));
-> > +     writel(lower_32_bits(dma_addr),
-> > +            ioaddr + XGMAC_DMA_CH_RxDESC_LADDR(chan));
-> > +}
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac4.h b/drivers/n=
-et/ethernet/stmicro/stmmac/dwxgmac4.h
-> > new file mode 100644
-> > index 000000000000..0ce1856b0b34
-> > --- /dev/null
->
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac4.h
->
-> dw25gmac.h?
-Will rename all applicable references to 25gmac.
->
-> > @@ -0,0 +1,84 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/* Copyright (c) 2024 Broadcom Corporation
-> > + * XGMAC4 definitions.
-> > + */
-> > +#ifndef __STMMAC_DWXGMAC4_H__
-> > +#define __STMMAC_DWXGMAC4_H__
-> > +
-> > +/* DMA Indirect Registers*/
->
-> > +#define XGMAC4_DMA_CH_IND_CONTROL    0X00003080
->
-> XXVGMAC_*?
->
-Thanks, Will use this prefix.
+Tristram Ha (2):
+  dt-bindings: net: dsa: microchip: Add KSZ8895/KSZ8864 switch support
+  net: dsa: microchip: Add KSZ8895/KSZ8864 switch support
 
-> > +#define XGMAC4_MODE_SELECT           GENMASK(27, 24)
-> > +#define XGMAC4_MSEL_SHIFT            24
-> > +enum dma_ch_ind_modes {
-> > +     MODE_TXEXTCFG    =3D 0x0,   /* Tx Extended Config */
-> > +     MODE_RXEXTCFG    =3D 0x1,   /* Rx Extended Config */
-> > +     MODE_TXDBGSTS    =3D 0x2,   /* Tx Debug Status */
-> > +     MODE_RXDBGSTS    =3D 0x3,   /* Rx Debug Status */
-> > +     MODE_TXDESCCTRL  =3D 0x4,   /* Tx Descriptor control */
-> > +     MODE_RXDESCCTRL  =3D 0x5,   /* Rx Descriptor control */
-> > +};
-> > +
-> > +#define XGMAC4_ADDR_OFFSET           GENMASK(14, 8)
-> > +#define XGMAC4_AOFF_SHIFT            8
-> > +#define XGMAC4_AUTO_INCR             GENMASK(5, 4)
-> > +#define XGMAC4_AUTO_SHIFT            4
-> > +#define XGMAC4_CMD_TYPE                      BIT(1)
-> > +#define XGMAC4_OB                    BIT(0)
-> > +#define XGMAC4_DMA_CH_IND_DATA               0X00003084
-> > +
-> > +/* TX Config definitions */
-> > +#define XGMAC4_TXPBL                 GENMASK(29, 24)
-> > +#define XGMAC4_TXPBL_SHIFT           24
-> > +#define XGMAC4_TPBLX8_MODE           BIT(19)
-> > +#define XGMAC4_TP2TCMP                       GENMASK(18, 16)
-> > +#define XGMAC4_TP2TCMP_SHIFT         16
-> > +#define XGMAC4_ORRQ                  GENMASK(13, 8)
-> > +/* RX Config definitions */
-> > +#define XGMAC4_RXPBL                 GENMASK(29, 24)
-> > +#define XGMAC4_RXPBL_SHIFT           24
-> > +#define XGMAC4_RPBLX8_MODE           BIT(19)
-> > +#define XGMAC4_RP2TCMP                       GENMASK(18, 16)
-> > +#define XGMAC4_RP2TCMP_SHIFT         16
-> > +#define XGMAC4_OWRQ                  GENMASK(13, 8)
-> > +/* Tx Descriptor control */
-> > +#define XGMAC4_TXDCSZ                        GENMASK(2, 0)
-> > +#define XGMAC4_TDPS                  GENMASK(5, 3)
-> > +#define XGMAC4_TDPS_SHIFT            3
-> > +/* Rx Descriptor control */
-> > +#define XGMAC4_RXDCSZ                        GENMASK(2, 0)
-> > +#define XGMAC4_RDPS                  GENMASK(5, 3)
-> > +#define XGMAC4_RDPS_SHIFT            3
-> > +
-> > +/* DWCXG_DMA_CH(#i) Registers*/
-> > +#define XGMAC4_DSL                   GENMASK(20, 18)
-> > +#define XGMAC4_MSS                   GENMASK(13, 0)
-> > +#define XGMAC4_TFSEL                 GENMASK(30, 29)
-> > +#define XGMAC4_TQOS                  GENMASK(27, 24)
-> > +#define XGMAC4_IPBL                  BIT(15)
-> > +#define XGMAC4_TVDMA2TCMP            GENMASK(6, 4)
-> > +#define XGMAC4_TVDMA2TCMP_SHIFT              4
-> > +#define XGMAC4_RPF                   BIT(31)
-> > +#define XGMAC4_RVDMA2TCMP            GENMASK(30, 28)
-> > +#define XGMAC4_RVDMA2TCMP_SHIFT              28
-> > +#define XGMAC4_RQOS                  GENMASK(27, 24)
-> > +
->
-> > +/* PDMA Channel count */
-> > +#define PDMA_TX_CH_COUNT             8
-> > +#define PDMA_RX_CH_COUNT             10
-> > +#define PDMA_MAX_TC_COUNT            8
-> > +
-> > +/* VDMA channel count */
-> > +#define VDMA_TOTAL_CH_COUNT          32
->
-> These seems like the vendor-specific constant. What are the actual DW
-> 25GMAC constraints?
->
-These are the limits for this device.
-We can read these limits from hardware, I will fix it in the next patch.
+ .../bindings/net/dsa/microchip,ksz.yaml       |   2 +
+ drivers/net/dsa/microchip/ksz8795.c           |  16 ++-
+ drivers/net/dsa/microchip/ksz_common.c        | 130 +++++++++++++++++-
+ drivers/net/dsa/microchip/ksz_common.h        |  20 ++-
+ drivers/net/dsa/microchip/ksz_spi.c           |  15 +-
+ include/linux/platform_data/microchip-ksz.h   |   2 +
+ 6 files changed, 172 insertions(+), 13 deletions(-)
 
-> -Serge(y)
->
-> > +
-> > +void dwxgmac4_dma_init(void __iomem *ioaddr,
-> > +                    struct stmmac_dma_cfg *dma_cfg, int atds);
-> > +
-> > +void dwxgmac4_dma_init_tx_chan(struct stmmac_priv *priv,
-> > +                            void __iomem *ioaddr,
-> > +                            struct stmmac_dma_cfg *dma_cfg,
-> > +                            dma_addr_t dma_addr, u32 chan);
-> > +void dwxgmac4_dma_init_rx_chan(struct stmmac_priv *priv,
-> > +                            void __iomem *ioaddr,
-> > +                            struct stmmac_dma_cfg *dma_cfg,
-> > +                            dma_addr_t dma_addr, u32 chan);
-> > +#endif /* __STMMAC_DWXGMAC4_H__ */
-> > --
-> > 2.34.1
-> >
-> >
+-- 
+2.34.1
+
 
