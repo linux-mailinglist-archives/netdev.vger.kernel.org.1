@@ -1,236 +1,154 @@
-Return-Path: <netdev+bounces-117154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C4A94CE92
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:25:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2868994CED8
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936C11C21336
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2D7E2817C7
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910321922EB;
-	Fri,  9 Aug 2024 10:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3CB01922E2;
+	Fri,  9 Aug 2024 10:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fAQ4yKGm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8hGWVLt"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2055.outbound.protection.outlook.com [40.107.244.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6366B1922E9;
-	Fri,  9 Aug 2024 10:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723199137; cv=fail; b=Gk/O3Ii4g7nyC7v//tIS3vFS7Tyclt2/p2HdOWlGJHWa7PF/9W/M1RIGvGpqwTkJcWWxecjjsa/PtoBR8CFNc4ow686VlYtbORtdKrt0Ydyz23Ns6zAxM1S2dEzvE/vhPSsa/TfdfK6GZyH3W2M8C/DieObtqFNRAOm9FZ9I6zQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723199137; c=relaxed/simple;
-	bh=98s369Q5tcfFULNj2wykdKHrehq5bBhslAiq0dOGKrU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iv8UN/x+VK20YLPdR5t9CqHgm9W/4NATuI+xpiARHJzViDkEjsd4+fymyjGF7egqN++9YLF1WP9GmCAfFeDPU/dqm0DuTXjbuz8WPkGoz0jsSYnQfJ4wBUHZOeDLyGCvHXg5fXuK9lNcUyq1z1OhZtWqn/Hug3UEaAFqa7GTk8w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fAQ4yKGm; arc=fail smtp.client-ip=40.107.244.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Qt/TVzCnqF5UVdRBBruEq6v6Ibb74yXlUeDYh9KVa3ql6lwk1pYndfg5EZmSGwaq/BKk+UH+gSDjmKMvcRvLMDM7sQHy3dBfwP4ASdOUIxJNoMU9uIuRAtwOsBNbvXZ0Ef2yKwJMs/laUmbeBuKYRpSxa5UEaRH+2Um3vx36x/x6PQ+p5tGCVO425vObRtTI9JKC5PMcL03Wb2y0Lip8I/xHE533g9ierGOJ/wBJMiyu2uIyHk2AEvFfsC+HwxiJ2bh1IzVZ/vIGtpIgiRa0K8p8Tca9OBgBAkdO7BzDVNIz2LDId9AEPPJhH8eNXqYjDjTDCtVbjEnmmykIprhEFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=75wzFhM6Ab2ZmF9wjEmXH6NOMRLQbueHqLR2ASJSlAg=;
- b=emoMvrgywyAGUeS2N116UMpHXh3LbynB1PEs2dQZD3uZ+hmSsP6hVjJsD0mUrzSyAAasHrNAmNUCCybuaQED+uJJzJEJOIYUs+zMY+90UD0ryC/+q13VrJqeAejPHj/gGgQjM8TTaDT2bWwsPlx2d0BNm/92CVYUkw+Xpv3SysiKtm6YTzyGQlTbebhbE8h34W/9HmIBDe34qNKPgtk8SErtFyGxlbmBofKeFJx7347YV8wr5GEekz1gGUepeRNW1Xl8g3e8RfUujCdkPVB0EeJn+YLHnL85i6N9gJ90IlcFe5Gj4ZVIDsgXf4zznhDpGVqOfk6Wb04h2gC+wnxe7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=amd.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=75wzFhM6Ab2ZmF9wjEmXH6NOMRLQbueHqLR2ASJSlAg=;
- b=fAQ4yKGm1KhHnNfxRrpacj83ccAEc+ZO6qA0O5X8Xjq/8GE7CJPb7ThCuzJ2RQZ4OghfIMwLoyWi3B0yq3o1FiJx1B821VYlZMfn+b8mkHNhlN+LI1vCRws4/FcLOEO2oYGCTvRHUbJ7u1AoacZCCwnfrpfPECAGp91ULodBx3BpY47UnZ8GXR0yJuXsVc2LfuRk/9Dghdkd0zYfACrksLdwPUK66F717DJIiUUsS33lpYgTcyOO3iLevqly28IsA9OH8BegnHLscfiwZWsNNkLMHOD5HvkTz5n0AlHIaCWMyby7hh1KoYe46bzo27KPon2DxA1BygdtGfn+Ej7CHg==
-Received: from CH2PR10CA0024.namprd10.prod.outlook.com (2603:10b6:610:4c::34)
- by DS0PR12MB7897.namprd12.prod.outlook.com (2603:10b6:8:146::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.24; Fri, 9 Aug
- 2024 10:25:22 +0000
-Received: from CH3PEPF00000013.namprd21.prod.outlook.com
- (2603:10b6:610:4c:cafe::6c) by CH2PR10CA0024.outlook.office365.com
- (2603:10b6:610:4c::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.15 via Frontend
- Transport; Fri, 9 Aug 2024 10:25:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CH3PEPF00000013.mail.protection.outlook.com (10.167.244.118) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7875.2 via Frontend Transport; Fri, 9 Aug 2024 10:25:22 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 9 Aug 2024
- 03:25:18 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 9 Aug 2024 03:25:17 -0700
-Received: from localhost (10.127.8.11) by mail.nvidia.com (10.126.190.182)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Fri, 9 Aug
- 2024 03:25:14 -0700
-Date: Fri, 9 Aug 2024 13:25:14 +0300
-From: Zhi Wang <zhiw@nvidia.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: Dave Jiang <dave.jiang@intel.com>, <alejandro.lucero-palau@amd.com>,
-	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
-	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <richard.hughes@amd.com>,
-	<targupta@nvidia.com>
-Subject: Re: [PATCH v2 04/15] cxl: add capabilities field to cxl_dev_state
-Message-ID: <20240809132514.00003229.zhiw@nvidia.com>
-In-Reply-To: <7dbcdb5d-3734-8e32-afdc-72d898126a0c@amd.com>
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
-	<20240715172835.24757-5-alejandro.lucero-palau@amd.com>
-	<e3ea1b1a-8439-40c6-99bf-4151ecf4d04f@intel.com>
-	<7dbcdb5d-3734-8e32-afdc-72d898126a0c@amd.com>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C7B191F9F;
+	Fri,  9 Aug 2024 10:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723200152; cv=none; b=aoKFeGuajCSzUKXgF86cLzg9TJlLd5yOZahOzTdhbILm27gVzNThT6pmZSf3fbyNDYv5+FVR2tU7KUMmq9YVQ3YYBgx1ZK0GR+cUYWlDSZGR9qTVSxQcD+K+dJLQz++6hJCM2KqZz0n4+rkeDtRDhtyJYFzGwuRvcDu/bg5GsFA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723200152; c=relaxed/simple;
+	bh=11CLd4cGwaxpswtpwYC+4Bpe63IW3HXui40C8jjPo2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dBzCa2JDnqNAKC6jY0sy6AIh1bbXM6I1BnJQMqQTFxMuepOl3oFdTxqKug86vUPlKYVXkl7xndDSLQvdCVlxNgfPR3yBpbaWAYu/JwYZhDFTTEm89qovHGnyB6gJ+4Qd99e72XeIvCgCOsljsrF4dmOuWvfepq0GqIYz9zfYCbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8hGWVLt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C85FC32782;
+	Fri,  9 Aug 2024 10:42:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723200150;
+	bh=11CLd4cGwaxpswtpwYC+4Bpe63IW3HXui40C8jjPo2Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=u8hGWVLtF44gEM1x3rtsi1K3fgwIRwhbrZzL1bheYoi/PeNfcEs3NJNOqhtF3Zr2m
+	 7UYMECLDn4S0r9o5X0g4J3olyJqxyUTqetLMNfo4aZJnMiotMPETVNGw7FT9oAEARy
+	 Q9J57sJW2tlZyVPuOJhc7iOihz3hV2zmKpgYoQ3Q8tBkvdoYatJyWmhwj00qMQCipK
+	 7qDCc9WBOnD1fZs7wKdaCyj74+TdanIx/LMpM53WRG/EWtNiKGbaHlB9KkQb+ECyyq
+	 ewDn8W3XMPHlKoQ5qzjhRKaK0blfTd/j9UXlWLf5Q8MTieVEzrn40xYqlZXi/6jx8N
+	 ooMN5jTihRWxw==
+Message-ID: <c78f98ff-df44-475f-bb1c-5c33f816ee11@kernel.org>
+Date: Fri, 9 Aug 2024 12:42:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH] mptcp: correct MPTCP_SUBFLOW_ATTR_SSN_OFFSET reserved
+ size
+Content-Language: en-GB
+To: Eugene Syromiatnikov <esyr@redhat.com>, mptcp@lists.linux.dev
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Davide Caratti <dcaratti@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240809094321.GA8122@asgard.redhat.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240809094321.GA8122@asgard.redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000013:EE_|DS0PR12MB7897:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ffa2959-8e98-4798-881a-08dcb85d936c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HztcADhob1uGiAyJrlx82+hZodWE+SbUB6fmmP5qpHuYvrfNVJLJ8PgUAwYc?=
- =?us-ascii?Q?Y2VxkkcwUkPWS710aifnlAFGNFtANH/HN/kw5zSI2bzqHxEfa3fott9Q0tkf?=
- =?us-ascii?Q?PTcH5pnWn63ozkeBJEGcRN8vcQTYu1N7LEzvmJnLZ5EZPms+gIMtNw+AhVaI?=
- =?us-ascii?Q?Y9mq5DXC2b8SZaHDpX6l5JKvkftRvkSw9g9czT9GQ8+PFORcajB/tFxDcK9Z?=
- =?us-ascii?Q?610cFVynteXzYFj/imZ7AHWOBzRrEkkF4saBs80kjL9mYPsnzaOTvcJyRYeb?=
- =?us-ascii?Q?SX0wpxnkRMmlnIoxh6DNwALMHMG5fWYH9rGjSNJyzOr3JGyxJg+I6wOXpES1?=
- =?us-ascii?Q?o2kjkVGmKXHT91YSWa6t+RXK85GarLW9OvzMwyBL8qV/TBQcCErzH3NCl0WL?=
- =?us-ascii?Q?E6ds7KcjKVuUYkeUBRCOjmfVMtuhjh1BhVIeG7Tj0WDtyTq11YpMNrrKWniH?=
- =?us-ascii?Q?He9MIQ0Yaev0hq5JaI9ZRxdO+66iEw7hgQAGwocdKkYQzcwQlYA2/6IlDCYF?=
- =?us-ascii?Q?6D0V2Sa69Z4VxBFRpQe6PwgjuE77fkQ+6ac2ruiraBqjkFcT/FWC7FgyHzAk?=
- =?us-ascii?Q?4+bwMwC3fe+1DctucR8Zw16qCl7Bl2HXSpJ6FdbWsIgb1z1oAPTwGyqSpJMJ?=
- =?us-ascii?Q?a9/Ahe+S0YQ9z3htLPRVhcLgmhQbW8XDprvKHkekAVcGblV0aRWKgqY/A151?=
- =?us-ascii?Q?lC/hG2L6ha9swz6HQskYBXAuylT0wIxs1dPEIoZBItnV813zFV47U7NoIZqZ?=
- =?us-ascii?Q?OjUsBEPYZoPiM1a4sMOzPUAPuqUiv6jguJfYFlGZvTyPcXn//QJdBcd/kftA?=
- =?us-ascii?Q?xtGDQpzA9CP/QAmZwdEySCS7kGPJN9fXIPVDWqhPhh9tGnFlJOdyd555RcXy?=
- =?us-ascii?Q?1gQ5IvaV5elBLsk849hw4aigdc/PUhrgyisA6bocyY+uOdxo9Qu29K41I1sp?=
- =?us-ascii?Q?bHNmdpe8hcgMcHk8Qq57jxki66MXYSAGO8isBCCiEetmIFzDPtCUYek1x+wx?=
- =?us-ascii?Q?xBtYU1aiuqbL0SaR/MMvzhel1Kid/XQwadhoQVXFTEk5oGyPu8MGDGxVRF0j?=
- =?us-ascii?Q?MaDGFO3QW6xTbemWtZ09eHVFbch7O9binhFzASlQyaShVBfOlbsQBcysAr16?=
- =?us-ascii?Q?T1VIhYpBEaar30BsVwSi/DwzueEvSwNU3nTwfbVJzP4ktISkrT9hF8rioeVA?=
- =?us-ascii?Q?oQcGiG5IM/ENljR2TN8aBtip+AFms2eqNBau6B/zrzv1+tOM2geMUO/wxSdc?=
- =?us-ascii?Q?1egaOQq6Tv4Uh4bJSyD08jZXkuIwrT9h7+Q/JZKTulsG2L6P/NRNzGpWoobL?=
- =?us-ascii?Q?cm9FqNVWrHZ+hk2zijAlvjk/60cEhLEk2s7snYrhU6AS79ARWTLpMYaPPGMa?=
- =?us-ascii?Q?/VR6MddYM5gIGX1mhMOnD1LmbViI08VMltQ8s/lTSGuzGQlz6K7iBXfn9OT6?=
- =?us-ascii?Q?WJy/iujVqtkknyfS4EmJMVm2pWXcgSXz?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2024 10:25:22.3194
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ffa2959-8e98-4798-881a-08dcb85d936c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000013.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7897
 
-On Tue, 23 Jul 2024 14:43:24 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
+Hi Eugene,
 
-> 
-> On 7/19/24 20:01, Dave Jiang wrote:
-> >
-> >>   
-> >> -static int cxl_probe_regs(struct cxl_register_map *map)
-> >> +static int cxl_probe_regs(struct cxl_register_map *map, uint8_t
-> >> caps) {
-> >>   	struct cxl_component_reg_map *comp_map;
-> >>   	struct cxl_device_reg_map *dev_map;
-> >> @@ -437,11 +437,12 @@ static int cxl_probe_regs(struct
-> >> cxl_register_map *map) case CXL_REGLOC_RBI_MEMDEV:
-> >>   		dev_map = &map->device_map;
-> >>   		cxl_probe_device_regs(host, base, dev_map);
-> >> -		if (!dev_map->status.valid ||
-> >> !dev_map->mbox.valid ||
-> >> +		if (!dev_map->status.valid ||
-> >> +		    ((caps & CXL_DRIVER_CAP_MBOX) &&
-> >> !dev_map->mbox.valid) || !dev_map->memdev.valid) {
-> >>   			dev_err(host, "registers not found:
-> >> %s%s%s\n", !dev_map->status.valid ? "status " : "",
-> >> -				!dev_map->mbox.valid ? "mbox " :
-> >> "",
-> >> +				((caps & CXL_DRIVER_CAP_MBOX) &&
-> >> !dev_map->mbox.valid) ? "mbox " : "",
-> > According to the r3.1 8.2.8.2.1, the device status registers and
-> > the primary mailbox registers are both mandatory if regloc id=3
-> > block is found. So if the type2 device does not implement a mailbox
-> > then it shouldn't be calling cxl_pci_setup_regs(pdev,
-> > CXL_REGLOC_RBI_MEMDEV, &map) to begin with from the driver init
-> > right? If the type2 device defines a regblock with id=3 but without
-> > a mailbox, then isn't that a spec violation?
-> >
-> > DJ
-> 
-> 
-> Right. The code needs to support the possibility of a Type2 having a 
-> mailbox, and if it is not supported, the rest of the dvsec regs 
-> initialization needs to be performed. This is not what the code does 
-> now, so I'll fix this.
-> 
-> 
-> A wider explanation is, for the RFC I used a test driver based on
-> QEMU emulating a Type2 which had a CXL Device Register Interface
-> defined (03h) but not a CXL Device Capability with id 2 for the
-> primary mailbox register, breaking the spec as you spotted.
-> 
-> 
+On 09/08/2024 11:43, Eugene Syromiatnikov wrote:
+> ssn_offset field is u32 and is placed into the netlink response with
+> nla_put_u32(), but only 2 bytes are reserved for the attribute payload
+> in subflow_get_info_size() (even though it makes no difference in the end,
+> as it is aligned up to 4 bytes).  Supply the correct argument to the relevant
+> nla_total_size() call to make it less confusing.
 
-Because SFC driver uses (the 8.2.8.5.1.1 Memory Device Status
-Register) to determine if the memory media is ready or not (in PATCH 6).
-That register should be in a regloc id=3 block.
+Good catch, thank you for sharing this patch!
 
-According to the spec paste above, the device that has regloc block
-id=3 needs to have device status and mailbox.
+The modification in the code and the description look good to me!
 
-Curious, does the SFC device have to implement the mailbox in this case
-for spec compliance?
 
-Previously, I always think that "CXL Memory Device" == "CXL Type-3
-device" in the CXL spec.
+Please note that when you submit a patch to the Netdev mailing list, the
+subject should have the 'PATCH net' prefix (or net-next) as mentioned in
+the Netdev doc:
 
-Now I am little bit confused if a type-2 device that supports cxl.mem
-== "CXL Memory Device" mentioned in the spec.
+  https://docs.kernel.org/process/maintainer-netdev.html
 
-If the answer == Y, then having regloc id ==3 and mailbox turn
-mandatory for a type-2 device that support cxl.mem for the spec
-compliance.
+> Fixes: 5147dfb5083204d6 ("mptcp: allow dumping subflow context to userspace")
 
-If the answer == N, then a type-2 device can use approaches other than
-Memory Device Status Register to determine the readiness of the memory?
+Checkpatch is complaining about this line, because the commit ID should
+have 12 chars:
 
-ZW
 
-> Thanks.
-> 
-> 
+https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
+
+Note that checkpatch.pl also points out the fact that the lines in the
+commit description should have max 75 chars -- ideally 72 -- which is
+not the case above with the line ending with 'relevant'.
+
+Do you mind sending a v2 with these small fixes, so your patch can be
+directly applied in the net tree, please?
+
+(Do not forget to wait 24h between two versions as mentioned in the doc)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
