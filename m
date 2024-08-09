@@ -1,152 +1,168 @@
-Return-Path: <netdev+bounces-117052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1012694C879
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:24:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBAA094C892
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5E8B1C22162
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:24:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4545C1F22608
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB5E175A1;
-	Fri,  9 Aug 2024 02:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E9A175A1;
+	Fri,  9 Aug 2024 02:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKaWvUP+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XF8Ge7QD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBCC11CA0;
-	Fri,  9 Aug 2024 02:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2D017557
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 02:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723170254; cv=none; b=rcavAV/HxHaRlMZB/K9gN27K+y8C8qql+R6MjoMeNcrwRNOnvKpy5/F4WqhGCYe+uCWm3dGvAIesC9YkpZfXzA0p/LLdNTzJjD4VLtExNv4nr9kT0XoR8sgW9p8IcvIFRPq3nW3/SHNiNhTSRxSLiVHb0mpnYwb3jsa9N5UrPAQ=
+	t=1723170679; cv=none; b=MJnDokQ6VWd2eFncwUo2ZE5qm1jP8C0wcaHK8pl4yphGVYVbdl2yMhmndsh+oWjhpCId9F1sXwaEDawpI2/vrTiQVgYJltB2hyfd1+VjCwPByInTV00I88Q+coH/qrjEnO1uGzngB4yqu4iRNWDshGnkJeInuCCSa1O64dgIUls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723170254; c=relaxed/simple;
-	bh=a4NH/DyOZYr+hQdPVdV/xn3d1kqB1GhzzrD+9MYKuho=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dAQReQjed2MaNUAAQRcVm6y66OwGRzyymcG6Qb9zr9ZZFX4kE1TT1jAN9SqZZ2+42YHNMH3uT6XJ8ukEJ/sVR7sXLpx1LJxo7hfVX5MpfCHhttjrDm8OyRoaK5loHbvs9vo3NrDSSo55k/zFpEsnHLaKL0ss45CzrxgVgX4e9vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKaWvUP+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C56DC32782;
-	Fri,  9 Aug 2024 02:24:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723170253;
-	bh=a4NH/DyOZYr+hQdPVdV/xn3d1kqB1GhzzrD+9MYKuho=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vKaWvUP+gW8ZxGS17B65tL1nrDAvJqciL9lSUQksuPZ4Iy4KhEGJQGOpNkkXmO+kV
-	 pkdaDInHp2dgMHzollw10zS4gIySrBFG6IgrrwYHj8LsAscwBWBwWjLcNHYy5tTzNE
-	 KSKa+C7m9EwkOjuzA8zG5VWtu7bn8KHoTxxNt5UYMtqglx1DnjyChjgN286dWqm0WA
-	 rT4bNmb9sUeUr0tdrbHNHwMsbmKPhEiAz7/jK5pb3Y5hSQ728/DeRHxDA8I+BOaR8Y
-	 khTAMu7d9Hv788u9Zd01H6xUkCZfx7Afr0wMZbiiN0Z1P7b+nVi/ftr6us3vFG5KWz
-	 4W9X6eOb829Uw==
-Date: Thu, 8 Aug 2024 19:24:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
- Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
- Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
- memory provider
-Message-ID: <20240808192410.37a49724@kernel.org>
-In-Reply-To: <CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
-References: <20240805212536.2172174-1-almasrymina@google.com>
-	<20240805212536.2172174-8-almasrymina@google.com>
-	<20240806135924.5bb65ec7@kernel.org>
-	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+	s=arc-20240116; t=1723170679; c=relaxed/simple;
+	bh=Fvoq0Hzc8tDQ1UkYcOg8Nsf6+yE3VEFzB7vf+ne+fsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ruBzw3vj9BJWZoRv7glK0ZDhJBF1xVY3RUuvSDKmQvGpSGJE/cSxbBUYomvYxT2IpepVC2EXlWl6ZXRT/NQ7FHiEqbjYvGUi94CZMssOLIWbsfxj4zGrwdXogwDAFvN6Kt5dk53ser5sZn563qTycaeKOUmJsvyDeCbzj+ffn0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XF8Ge7QD; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fdd6d81812so16749235ad.1
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 19:31:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723170678; x=1723775478; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KkqFCuMJpxnSlr/LT5nHX7pkRQEunW8MBFErzToSuIE=;
+        b=XF8Ge7QD/fIrAbcLQbScQRuVcZM2qDz0EDpWDQZMCevRZLfx7enP/noy1xuViBKdou
+         f1PH2q0qhaVh4TxtoKUSUld4o1kzbWfLHL/VrF1pdcs/20/DVnkTrWkQh47HUAHm5NUR
+         Uz46zZ4IeuRmED7Fo/qMD/zbbDaMJpe2HXhxd4bnKdQyUfFoXIIIdOYE8247A5aLH+6w
+         VaK3ztp+LkB0WNN/0lkaSnCRRc1P2zGH8pTd0+O8OViE3lwNhTI7BmAUHnHIf5tiiN1E
+         B6PIYK5iqfDh1B6oqmW2fa0ovKRhxa2/fha5fZHlW+C0SMiWp/W7dvyXElqQps3nPriN
+         hSHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723170678; x=1723775478;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KkqFCuMJpxnSlr/LT5nHX7pkRQEunW8MBFErzToSuIE=;
+        b=Pw4ALMKtdi7+PkAzuNF5Eu2y8Eg5v78kCuXNlbfxF8yPC+Hwv3BOhxwUuGqJ/J5ZDL
+         L635KvUCruOogCWq/OKpbcBd1Z7H5xdK1R7vYu/VmTbDpF9frjenTSUmsXkkUtd4MOZj
+         +JHaO8X61h02+59h8EBI3OLPCvVGA645wTIXQHp6t2S3gws2uDt81xLzQdf1e0UpseJA
+         IDBFqcsNhxzRTiHtsw4bIDdhMAQ9vMcz9fPw//0ibg288o0a8L1nzmSLdGmnHBV21Ny9
+         qdZaiR1Xvkob1EmvQFkRSejJ5ro7DlHqDuptJWfCIZreGvhjmqHr/OgcOWboHqslnlpz
+         47Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXjaG5yDaknTc8M0q7J6KvorXeQcRto9yHhYXSYnqhzJJyLW4dDDu69HWiVQtBI4frjgfcCz//EnPhzAqfv9qqSi3MRlQVf
+X-Gm-Message-State: AOJu0YywmMqYPhBPldjWiJZRqs7TT4BeSWXlhXUbOnDHC/Ck0exrKjy/
+	Iuq/zdnHt3Eh1e60Rj9XfkLguY6RPuRkDx+3RlwctdaKFiTUTg4o
+X-Google-Smtp-Source: AGHT+IFe2kDNOyVpTqsw5nL4E35JzuAWxidSKlNXkVjFPrcyPoIEzUl/1p03EP2ZpgIjO14tEj1nsA==
+X-Received: by 2002:a17:902:f68a:b0:1fd:69e0:a8e5 with SMTP id d9443c01a7336-200ae59ba60mr403885ad.41.1723170677450;
+        Thu, 08 Aug 2024 19:31:17 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f5a473sm132489345ad.106.2024.08.08.19.31.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 19:31:17 -0700 (PDT)
+Date: Fri, 9 Aug 2024 10:31:11 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	"andy@greyhouse.net" <andy@greyhouse.net>,
+	Gal Pressman <gal@nvidia.com>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net V3 3/3] bonding: change ipsec_lock from spin lock to
+ mutex
+Message-ID: <ZrV_b9IfYXwSm3pm@Laptop-X1>
+References: <20240805050357.2004888-1-tariqt@nvidia.com>
+ <20240805050357.2004888-4-tariqt@nvidia.com>
+ <ZrSRKR-KK5l56XUd@Laptop-X1>
+ <0ed0935e51c244086529a43aa6ccf599e5b3bc52.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0ed0935e51c244086529a43aa6ccf599e5b3bc52.camel@nvidia.com>
 
-On Thu, 8 Aug 2024 16:36:24 -0400 Mina Almasry wrote:
-> > How do you know that the driver:
-> >  - supports net_iov at all (let's not make implicit assumptions based
-> >    on presence of queue API);
-> >  - supports net_iov in current configuration (eg header-data split is
-> >    enabled)
-> >  - supports net_iov for _this_ pool (all drivers must have separate
-> >    buffer pools for headers and data for this to work, some will use
-> >    page pool for both)
-> >
-> > What comes to mind is adding an "I can gobble up net_iovs from this
-> > pool" flag in page pool params (the struct that comes from the driver),  
+On Thu, Aug 08, 2024 at 10:05:26AM +0000, Jianbo Liu wrote:
+> On Thu, 2024-08-08 at 17:34 +0800, Hangbin Liu wrote:
+> > On Mon, Aug 05, 2024 at 08:03:57AM +0300, Tariq Toukan wrote:
+> > >  drivers/net/bonding/bond_main.c | 75 +++++++++++++++++------------
+> > > ----
+> > >  include/net/bonding.h           |  2 +-
+> > >  2 files changed, 40 insertions(+), 37 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/bonding/bond_main.c
+> > > b/drivers/net/bonding/bond_main.c
+> > > index e550b1c08fdb..56764f1c39b8 100644
+> > > --- a/drivers/net/bonding/bond_main.c
+> > > +++ b/drivers/net/bonding/bond_main.c
+> > > @@ -481,35 +476,43 @@ static void bond_ipsec_add_sa_all(struct
+> > > bonding *bond)
+> > >         struct bond_ipsec *ipsec;
+> > >         struct slave *slave;
+> > >  
+> > > -       rcu_read_lock();
+> > > -       slave = rcu_dereference(bond->curr_active_slave);
+> > > -       if (!slave)
+> > > -               goto out;
+> > > +       slave = rtnl_dereference(bond->curr_active_slave);
+> > > +       real_dev = slave ? slave->dev : NULL;
+> > > +       if (!real_dev)
+> > > +               return;
+> > >  
+> > > -       real_dev = slave->dev;
+> > > +       mutex_lock(&bond->ipsec_lock);
+> > >         if (!real_dev->xfrmdev_ops ||
+> > >             !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+> > >             netif_is_bond_master(real_dev)) {
+> > > -               spin_lock_bh(&bond->ipsec_lock);
+> > >                 if (!list_empty(&bond->ipsec_list))
+> > >                         slave_warn(bond_dev, real_dev,
+> > >                                    "%s: no slave
+> > > xdo_dev_state_add\n",
+> > >                                    __func__);
+> > > -               spin_unlock_bh(&bond->ipsec_lock);
+> > >                 goto out;
+> > >         }
+> > >  
+> > > -       spin_lock_bh(&bond->ipsec_lock);
+> > >         list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> > > +               struct net_device *dev = ipsec->xs->xso.real_dev;
+> > > +
+> > > +               /* If new state is added before ipsec_lock acquired
+> > > */
+> > > +               if (dev) {
+> > > +                       if (dev == real_dev)
+> > > +                               continue;
+> > Hi Jianbo,
+> > 
+> > Why we skip the deleting here if dev == real_dev? What if the state
 > 
-> This already sorta exists in the current iteration, although maybe in
-> an implicit way. As written, drivers need to set params.queue,
-> otherwise core will not attempt to grab the mp information from
-> params.queue. A driver can set params.queue for its data pages pool
-> and not set it for the headers pool. AFAICT that deals with all 3
-> issues you present above.
+> Here the bond active slave is updated. If dev == real_dev, the state
+> (should be newly added) is offloaded to new active, so no need to
+> delete and add back again.  
 > 
-> The awkward part is if params.queue starts getting used for other
-> reasons rather than passing mp configuration, but as of today that's
-> not the case so I didn't add the secondary flag. If you want a second
-> flag to be added preemptively, I can do that, no problem. Can you
-> confirm params.queue is not good enough?
-
-I'd prefer a flag. The setting queue in a param struct is not a good
-API for conveying that the page pool is for netmem payloads only.
-
-> > and then on the installation path we can check if after queue reset
-> > the refcount of the binding has increased. If it did - driver has
-> > created a pool as we expected, otherwise - fail, something must be off.
-> > Maybe that's a bit hacky?  
+> > is added again on the same slave? From the previous logic it looks we
 > 
-> What's missing is for core to check at binding time that the driver
-> supports net_iov. I had relied on the implicit presence of the
-> queue-API.
-> 
-> What you're proposing works, but AFAICT it's quite hacky, yes. I
-> basically need to ASSERT_RTNL in net_devmem_binding_get() to ensure
-> nothing can increment the refcount while the binding is happening so
-> that the refcount check is valid.
+> Why is it added to the same slave? It's not the active one.
 
-True. Shooting from the hip, but we could walk the page pools of the
-netdev and find the one that has the right mp installed, and matches
-queue? The page pools are on a list hooked up to the netdev, trivial
-to walk.
+OK, I got what you mean now. Thanks for the explaination.
 
-> I think a less hacky approach is to add a function to the queue-API
-> like ndo_queue_supported_features(), which lets the driver declare
-> that it supports net_iov at a given rx queue. However I'm open to both
-> approaches. What do you prefer?
-
-I kinda like trying to query the page pools more, because it's both
-fewer driver changes, and it actually validates that the driver did 
-the right thing based on outcomes. Driver callback may have bugs.
-
-If you prefer strongly - fine, but hm.
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
