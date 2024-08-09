@@ -1,154 +1,299 @@
-Return-Path: <netdev+bounces-117155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2868994CED8
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:42:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D18A294CEF4
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:52:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2D7E2817C7
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:42:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007D41C211ED
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3CB01922E2;
-	Fri,  9 Aug 2024 10:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D241922CB;
+	Fri,  9 Aug 2024 10:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8hGWVLt"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gmPiavFI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C7B191F9F;
-	Fri,  9 Aug 2024 10:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA2815ECE2
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 10:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723200152; cv=none; b=aoKFeGuajCSzUKXgF86cLzg9TJlLd5yOZahOzTdhbILm27gVzNThT6pmZSf3fbyNDYv5+FVR2tU7KUMmq9YVQ3YYBgx1ZK0GR+cUYWlDSZGR9qTVSxQcD+K+dJLQz++6hJCM2KqZz0n4+rkeDtRDhtyJYFzGwuRvcDu/bg5GsFA=
+	t=1723200726; cv=none; b=sfeJ2y3aIWBd0QXIG7j37PgtHNwz7e2ux9Sh5+8/v9ETovJ3a2NrRfsFO9KIi6iVT9G85hD1WqQL85vuFjzcrI8IkhngNcUP4Ob8QOjrlJDVARh4RBRSvE6hvw+38meSeMXAgkSBOogvq+CHt1oYsIMXami43igpvSCRwCNq2zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723200152; c=relaxed/simple;
-	bh=11CLd4cGwaxpswtpwYC+4Bpe63IW3HXui40C8jjPo2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dBzCa2JDnqNAKC6jY0sy6AIh1bbXM6I1BnJQMqQTFxMuepOl3oFdTxqKug86vUPlKYVXkl7xndDSLQvdCVlxNgfPR3yBpbaWAYu/JwYZhDFTTEm89qovHGnyB6gJ+4Qd99e72XeIvCgCOsljsrF4dmOuWvfepq0GqIYz9zfYCbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8hGWVLt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C85FC32782;
-	Fri,  9 Aug 2024 10:42:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723200150;
-	bh=11CLd4cGwaxpswtpwYC+4Bpe63IW3HXui40C8jjPo2Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=u8hGWVLtF44gEM1x3rtsi1K3fgwIRwhbrZzL1bheYoi/PeNfcEs3NJNOqhtF3Zr2m
-	 7UYMECLDn4S0r9o5X0g4J3olyJqxyUTqetLMNfo4aZJnMiotMPETVNGw7FT9oAEARy
-	 Q9J57sJW2tlZyVPuOJhc7iOihz3hV2zmKpgYoQ3Q8tBkvdoYatJyWmhwj00qMQCipK
-	 7qDCc9WBOnD1fZs7wKdaCyj74+TdanIx/LMpM53WRG/EWtNiKGbaHlB9KkQb+ECyyq
-	 ewDn8W3XMPHlKoQ5qzjhRKaK0blfTd/j9UXlWLf5Q8MTieVEzrn40xYqlZXi/6jx8N
-	 ooMN5jTihRWxw==
-Message-ID: <c78f98ff-df44-475f-bb1c-5c33f816ee11@kernel.org>
-Date: Fri, 9 Aug 2024 12:42:19 +0200
+	s=arc-20240116; t=1723200726; c=relaxed/simple;
+	bh=I0nPBPAjVC52kgirtIRM5M3/OzAepwjSjuInOAa/yYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qWgUfAJ+Di8xukhqnn+a85qFzKHbLottKnum7xwgV6L4TnQ5JH1HJRE/zzhbd8t4IMRun6is5/qu5ZZbJXIwwTkLGpQWYFQ73VSjcYyuC5jJAbdwLMHbutAb+IQjsi94A2Btnw4pdDtXQdzaQOa3nbJGCNxr+HmdIIEaTKECHC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gmPiavFI; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ef27bfd15bso20887111fa.2
+        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 03:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723200721; x=1723805521; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pTgmTKZ4H9V3mCycartQDNFcC4ZnqwSMFSBOFb0czr4=;
+        b=gmPiavFIBUBOL63QA7TzXA/+DWKT3asVnNQbb2xCXGmLR18l8GuWUQ9REmsmOB2iIy
+         Xh/9ittfRMHs3bCP9m5Tk2maP+ztlHEYIq4oT8dJNyspwicWhJabKVbGjBBVCfKkvUuS
+         Wu5hig/iik63h+vyHjhgE6GUGN5nSJJ6fsOCpfmiXi8Nx7eNF4qPnFIPSxX4u1+dA75n
+         8/c0FNXr76R9J/tnXapK/NA4gZh2cLOVqOnD7BVNKTXscx7VnjqgqXUS8vNo3tBbfRET
+         jBHDjZI/SnprI5VyTwvWvc4Je2kxYzPvVWl3+VIg5fy68w2FVCw367mF2oCX0ijfQ21W
+         Hvvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723200721; x=1723805521;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pTgmTKZ4H9V3mCycartQDNFcC4ZnqwSMFSBOFb0czr4=;
+        b=BGCMbOZOfcjXqP0keEECYWvzkrTyFIC9vc7mJvSSW6tocvdZBnoROtubHGPJn+YkCm
+         UzapBd2CJ1PJt8i8GGdwnR9kXUZaGMUR/GwgKbu0grgesg58k9nlcRT9Oh9eCOlS3eyU
+         3hqTpik+59sjM+nrvSbZ3z5RyOWL8hBLJx6jkm1n3uu/TGsTMBhnt9bBV34cbTfE7d50
+         WOLcntYYUqhORMr6ECstDHS0pusGfxeWD1JncE6KctXMAFM2ObC0MpN5uH6pO4kJGIis
+         Ga0b1mMynLhJwrN0KgbQ73gl7aUhAW3m3m/A83RrVrAhKsxlALD+iiu/Ugrm2bVbu0L7
+         puLA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+pxR8HcxzXPKT0hr7NjVbjvWvIKnO9J3AYjcVBCnDeZK1zAJiPp0qTqsPj5WNw6YLtxYahPR55zrEV3hof94L1zLAZkNu
+X-Gm-Message-State: AOJu0YzYWdtl1ULsOfdXjBa1wQoZbM4EwPsAQ8PB70ywvo2e+jZ9QcES
+	ovr6Pt2iOLpacY6JlAoEfOOa04Qi6g+ErmPNEALA4e8k2ysYoA2ptTDPAj0gfkJAX+89hie/Yy6
+	7
+X-Google-Smtp-Source: AGHT+IGunqE4/d7MOq1p34WRYbFJhymcmxwgUqpVn+Yz5KYTfqG/SGwi3RJgpp76MhN0IuC9McaK8Q==
+X-Received: by 2002:a2e:9906:0:b0:2ef:2e0e:c888 with SMTP id 38308e7fff4ca-2f1a6d6b775mr8454391fa.48.1723200720346;
+        Fri, 09 Aug 2024 03:52:00 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429059cbfaesm116279405e9.42.2024.08.09.03.51.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 03:51:59 -0700 (PDT)
+Date: Fri, 9 Aug 2024 12:51:58 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
+	konrad.knitter@intel.com, marcin.szycik@intel.com,
+	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [iwl-next v3 1/8] ice: devlink PF MSI-X max and min parameter
+Message-ID: <ZrX0znOhHFzafIuB@nanopsycho.orion>
+References: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
+ <20240808072016.10321-2-michal.swiatkowski@linux.intel.com>
+ <ZrTli6UxMkzE31TH@nanopsycho.orion>
+ <ZrWlfhs6x6hrVhH+@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH] mptcp: correct MPTCP_SUBFLOW_ATTR_SSN_OFFSET reserved
- size
-Content-Language: en-GB
-To: Eugene Syromiatnikov <esyr@redhat.com>, mptcp@lists.linux.dev
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Davide Caratti <dcaratti@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240809094321.GA8122@asgard.redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240809094321.GA8122@asgard.redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZrWlfhs6x6hrVhH+@mev-dev.igk.intel.com>
 
-Hi Eugene,
+Fri, Aug 09, 2024 at 07:13:34AM CEST, michal.swiatkowski@linux.intel.com wrote:
+>On Thu, Aug 08, 2024 at 05:34:35PM +0200, Jiri Pirko wrote:
+>> Thu, Aug 08, 2024 at 09:20:09AM CEST, michal.swiatkowski@linux.intel.com wrote:
+>> >Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+>> >range.
+>> >
+>> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> >---
+>> > .../net/ethernet/intel/ice/devlink/devlink.c  | 56 ++++++++++++++++++-
+>> > drivers/net/ethernet/intel/ice/ice.h          |  8 +++
+>> > drivers/net/ethernet/intel/ice/ice_irq.c      | 14 ++++-
+>> > 3 files changed, 76 insertions(+), 2 deletions(-)
+>> >
+>> >diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>> >index 29a5f822cb8b..bdc22ea13e0f 100644
+>> >--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>> >+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>> >@@ -1518,6 +1518,32 @@ static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
+>> > 	return 0;
+>> > }
+>> > 
+>> >+static int
+>> >+ice_devlink_msix_max_pf_validate(struct devlink *devlink, u32 id,
+>> >+				 union devlink_param_value val,
+>> >+				 struct netlink_ext_ack *extack)
+>> >+{
+>> >+	if (val.vu16 > ICE_MAX_MSIX) {
+>> >+		NL_SET_ERR_MSG_MOD(extack, "PF max MSI-X is too high");
+>> 
+>> No reason to have "PF" in the text. Also, no reason to have "max MSI-X".
+>> That is the name of the param.
+>> 
+>
+>Ok, will change both, thanks.
+>
+>> 
+>> 
+>> >+		return -EINVAL;
+>> >+	}
+>> >+
+>> >+	return 0;
+>> >+}
+>> >+
+>> >+static int
+>> >+ice_devlink_msix_min_pf_validate(struct devlink *devlink, u32 id,
+>> >+				 union devlink_param_value val,
+>> >+				 struct netlink_ext_ack *extack)
+>> >+{
+>> >+	if (val.vu16 <= ICE_MIN_MSIX) {
+>> >+		NL_SET_ERR_MSG_MOD(extack, "PF min MSI-X is too low");
+>> 
+>> Same comment as for max goes here.
+>> 
+>> 
+>> >+		return -EINVAL;
+>> >+	}
+>> >+
+>> >+	return 0;
+>> >+}
+>> >+
+>> > enum ice_param_id {
+>> > 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+>> > 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+>> >@@ -1535,6 +1561,15 @@ static const struct devlink_param ice_dvl_rdma_params[] = {
+>> > 			      ice_devlink_enable_iw_validate),
+>> > };
+>> > 
+>> >+static const struct devlink_param ice_dvl_msix_params[] = {
+>> >+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MAX,
+>> >+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>> >+			      NULL, NULL, ice_devlink_msix_max_pf_validate),
+>> >+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MIN,
+>> >+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>> >+			      NULL, NULL, ice_devlink_msix_min_pf_validate),
+>> >+};
+>> >+
+>> > static const struct devlink_param ice_dvl_sched_params[] = {
+>> > 	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+>> > 			     "tx_scheduling_layers",
+>> >@@ -1637,6 +1672,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
+>> > int ice_devlink_register_params(struct ice_pf *pf)
+>> > {
+>> > 	struct devlink *devlink = priv_to_devlink(pf);
+>> >+	union devlink_param_value value;
+>> > 	struct ice_hw *hw = &pf->hw;
+>> > 	int status;
+>> > 
+>> >@@ -1645,11 +1681,27 @@ int ice_devlink_register_params(struct ice_pf *pf)
+>> > 	if (status)
+>> > 		return status;
+>> > 
+>> >+	status = devl_params_register(devlink, ice_dvl_msix_params,
+>> >+				      ARRAY_SIZE(ice_dvl_msix_params));
+>> >+	if (status)
+>> >+		return status;
+>> >+
+>> > 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+>> > 		status = devl_params_register(devlink, ice_dvl_sched_params,
+>> > 					      ARRAY_SIZE(ice_dvl_sched_params));
+>> >+	if (status)
+>> >+		return status;
+>> > 
+>> >-	return status;
+>> >+	value.vu16 = pf->msix.max;
+>> >+	devl_param_driverinit_value_set(devlink,
+>> >+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+>> >+					value);
+>> >+	value.vu16 = pf->msix.min;
+>> >+	devl_param_driverinit_value_set(devlink,
+>> >+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+>> >+					value);
+>> >+
+>> >+	return 0;
+>> > }
+>> > 
+>> > void ice_devlink_unregister_params(struct ice_pf *pf)
+>> >@@ -1659,6 +1711,8 @@ void ice_devlink_unregister_params(struct ice_pf *pf)
+>> > 
+>> > 	devl_params_unregister(devlink, ice_dvl_rdma_params,
+>> > 			       ARRAY_SIZE(ice_dvl_rdma_params));
+>> >+	devl_params_unregister(devlink, ice_dvl_msix_params,
+>> >+			       ARRAY_SIZE(ice_dvl_msix_params));
+>> > 
+>> > 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+>> > 		devl_params_unregister(devlink, ice_dvl_sched_params,
+>> >diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+>> >index d6f80da30dec..a67456057c77 100644
+>> >--- a/drivers/net/ethernet/intel/ice/ice.h
+>> >+++ b/drivers/net/ethernet/intel/ice/ice.h
+>> >@@ -95,6 +95,7 @@
+>> > #define ICE_MIN_LAN_TXRX_MSIX	1
+>> > #define ICE_MIN_LAN_OICR_MSIX	1
+>> > #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
+>> >+#define ICE_MAX_MSIX		256
+>> > #define ICE_FDIR_MSIX		2
+>> > #define ICE_RDMA_NUM_AEQ_MSIX	4
+>> > #define ICE_MIN_RDMA_MSIX	2
+>> >@@ -545,6 +546,12 @@ struct ice_agg_node {
+>> > 	u8 valid;
+>> > };
+>> > 
+>> >+struct ice_pf_msix {
+>> >+	u16 cur;
+>> >+	u16 min;
+>> >+	u16 max;
+>> >+};
+>> >+
+>> > struct ice_pf {
+>> > 	struct pci_dev *pdev;
+>> > 	struct ice_adapter *adapter;
+>> >@@ -615,6 +622,7 @@ struct ice_pf {
+>> > 	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
+>> > 	u16 max_pf_txqs;	/* Total Tx queues PF wide */
+>> > 	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
+>> >+	struct ice_pf_msix msix;
+>> > 	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
+>> > 	u16 num_lan_tx;		/* num LAN Tx queues setup */
+>> > 	u16 num_lan_rx;		/* num LAN Rx queues setup */
+>> >diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+>> >index ad82ff7d1995..4e559fd6e49f 100644
+>> >--- a/drivers/net/ethernet/intel/ice/ice_irq.c
+>> >+++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+>> >@@ -252,7 +252,19 @@ void ice_clear_interrupt_scheme(struct ice_pf *pf)
+>> > int ice_init_interrupt_scheme(struct ice_pf *pf)
+>> > {
+>> > 	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+>> >-	int vectors, max_vectors;
+>> >+	union devlink_param_value value;
+>> >+	int vectors, max_vectors, err;
+>> >+
+>> >+	/* load default PF MSI-X range */
+>> >+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
+>> >+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+>> >+					      &value);
+>> 
+>> If err is not 0, you have a bug in the driver. Perhaps it a about the
+>> time to make this return void and add some WARN_ONs inside the function?
+>> 
+>
+>err is not 0 when this param isn't found (not registered yet). It is a
+>case when driver is probing, I want to have here default values and
+>register it later. Instead of checking if it is probe context or reload
+>context I am checking if param already exists. The param doesn't exist in
+>probe, but exists in reload.
 
-On 09/08/2024 11:43, Eugene Syromiatnikov wrote:
-> ssn_offset field is u32 and is placed into the netlink response with
-> nla_put_u32(), but only 2 bytes are reserved for the attribute payload
-> in subflow_get_info_size() (even though it makes no difference in the end,
-> as it is aligned up to 4 bytes).  Supply the correct argument to the relevant
-> nla_total_size() call to make it less confusing.
-
-Good catch, thank you for sharing this patch!
-
-The modification in the code and the description look good to me!
+No, you have to make sure that you are using these values after they are
+set. Please fix.
 
 
-Please note that when you submit a patch to the Netdev mailing list, the
-subject should have the 'PATCH net' prefix (or net-next) as mentioned in
-the Netdev doc:
-
-  https://docs.kernel.org/process/maintainer-netdev.html
-
-> Fixes: 5147dfb5083204d6 ("mptcp: allow dumping subflow context to userspace")
-
-Checkpatch is complaining about this line, because the commit ID should
-have 12 chars:
-
-
-https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-
-Note that checkpatch.pl also points out the fact that the lines in the
-commit description should have max 75 chars -- ideally 72 -- which is
-not the case above with the line ending with 'relevant'.
-
-Do you mind sending a v2 with these small fixes, so your patch can be
-directly applied in the net tree, please?
-
-(Do not forget to wait 24h between two versions as mentioned in the doc)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+>
+>> 
+>> >+	pf->msix.min = err ? ICE_MIN_MSIX : value.vu16;
+>> >+
+>> >+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
+>> >+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+>> >+					      &value);
+>> >+	pf->msix.max = err ? total_vectors / 2 : value.vu16;
+>> > 
+>> > 	vectors = ice_ena_msix_range(pf);
+>> > 
+>> >-- 
+>> >2.42.0
+>> >
 
