@@ -1,692 +1,460 @@
-Return-Path: <netdev+bounces-117268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C94494D58C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:37:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F73394D592
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A7791C2153A
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:37:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1971B20D99
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA0F8288F;
-	Fri,  9 Aug 2024 17:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C8D6F066;
+	Fri,  9 Aug 2024 17:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lmVeD1yg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJm8yzM+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEE57E0E4
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54171131182
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723225006; cv=none; b=iJRbzO9KzapFVAcLpYwe5VcEsVtR2wAHsUPqpB4IfRaefwHQRhqrE3+ladJCycLkfIUAKtr3KZht8Fr7ZcJdX4y+SGm7QQ/iCMmISUb/Z5yZCUCEFNLwX2RKZ9YXu0fcNdNBLtOmkz5qRFuEewTPXtAOs+zMT6VGaeOSvv48IQI=
+	t=1723225236; cv=none; b=NnLFWqAOLtA+3w+dgIVdKRjWNnvk7CCxyYVNqkMMjlE/NmYFIaPeDhVIoNrQ5aHdAGCuXHqWNzYRqKAFcs9f8S9ojUovmPOjXu5qikNoed73blvJ+59LNG6+37TW15Wy8JvH9isfy+esiGWgNPErZRXbsAoSEVRynwvC95CTcz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723225006; c=relaxed/simple;
-	bh=JyqsJ1rM2Es9gqPPoT/cgdS5ybGYcE5OKUOHwdYESyI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JE6uvhuQ/VdZaXhD3vOgsGAWkDMhc7tweAjAMeh/7teFRTZSW/7so/IBpMh6Invj2GChs4qel39jS7tVE4s5wZqpUTfQpup+AmZc5prKV2lKkrGBmAZuwLZL26MB8wWKq0uaC6/w5kq7vWGzg2Vk5NzWTI8vCGI5R5AEy/TGgSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lmVeD1yg; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723225004; x=1754761004;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JyqsJ1rM2Es9gqPPoT/cgdS5ybGYcE5OKUOHwdYESyI=;
-  b=lmVeD1ygvTRs4WQ4zWPc+RvDpNkoy8BRYOUDFS9RJzIgDMKbTrT1ZAtx
-   tPMRN+U/czHQzPpyId8UJrNk8fjWiLFzlRc+DZUyjJar05EUl0aRsdgi0
-   +yKlyDK84n6y1IZz6TRrwEq8IZTpS3CPnBQXy7qgEcmHRMdiPXdd4yEuF
-   +PiAtYa9cdWkc2GuGLVSGkzWBjAzed/LARQ3zrN/ZHH9mBX14dTEvAbWL
-   kCC2G31xmefjOO524MjNlf/wJFPybFITT/qZwD1ukGRCGxZwnaaD0dpDr
-   fLQwr+PCz+4itVj7+ha2Fui1qPFJh7fiYhiGZUYeDIkrAAziTz2WonXjL
-   Q==;
-X-CSE-ConnectionGUID: OjSNO4JqRjOo5JZBueD9cg==
-X-CSE-MsgGUID: C+sCEVxSRJ2g9to5Fcuwfg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11159"; a="21551343"
-X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
-   d="scan'208";a="21551343"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 10:36:33 -0700
-X-CSE-ConnectionGUID: 9XYLY6XdQ4ydckbKeAHmXQ==
-X-CSE-MsgGUID: VQYytYB9QIWnu10l1PZYlA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
-   d="scan'208";a="57589216"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Aug 2024 10:36:33 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
-	anthony.l.nguyen@intel.com,
-	madhu.chittim@intel.com,
-	horms@kernel.org,
-	hkelam@marvell.com,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 13/13] iavf: add support for offloading tc U32 cls filters
-Date: Fri,  9 Aug 2024 10:36:12 -0700
-Message-ID: <20240809173615.2031516-14-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240809173615.2031516-1-anthony.l.nguyen@intel.com>
-References: <20240809173615.2031516-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1723225236; c=relaxed/simple;
+	bh=4VP1vutM/OJI4pt2tx2nqxTxjeoOgQqdeg5ADaPV620=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cAAuG4DqRn24yNu4wxi3zw/wNFv6XG0FZ5+7Unaeutno32ENeO3MECfRNeFQ7OJDM61h4DYflEkUhGlNTU2Er14uVeFEUw9mtSFtT87Z16NdLvT+NuKPCI7cvLyHmrZQyHN3sp/VSiI76N5c+0UtVJ4jMg7DmjIg42oNx2xgf3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IJm8yzM+; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-530e062217eso3031329e87.1
+        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 10:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723225232; x=1723830032; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uIWoXs1RF+kNZo0skwxoX3aBVnJVLfCaMiTGNyGdoZ4=;
+        b=IJm8yzM+YLmmPAqe9JxIPRVzr1pKqNiZWoVY6BxrXUMxaoUx8u1LAAmg2j9Z+Fwlf/
+         85zYoc4wQ1jHjIwPiyCfQB6CRo3x8DTP7rsg/y7+V8qtXnzQeJi6erDXVMoUnUCmeIw9
+         jc7u5tI4Nz8h/e631VNPyT1A4XErwJgB4jxyNlq/GD8uWYw25n8/KoSf+A7Mc5Oqkn02
+         3lHoqMPBqqRfwGKo+G9HrCvUTujznHA18gIuaUdBqOmaPbzqyVJcJhGKZjb18rSDrowU
+         x9Tv1MGdR28UO+A1KpXnneJKLqlbFqrhQZze+5mX2T1+xtdDu9otG8vno0JJxbqRel23
+         6kaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723225232; x=1723830032;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uIWoXs1RF+kNZo0skwxoX3aBVnJVLfCaMiTGNyGdoZ4=;
+        b=QdyCuWFM6oP3PLUAPn3GkKjZUzxYV3bJVGJ5EKt++BchiIVOWnGKJphr6YeeDCAZK7
+         OfbG2SapRJx+u6CT3DV4qMd7SAapIGGEn5bOsX16OqDVdzVpO0Lds2oeHbdNZXTznKMA
+         Wma0rMewS1LNlB2qqfqqZ542dVI2AnfIQ2sBikJX8769y3vYwOcfGzibLv47aT+039Ko
+         dLq93hSii+OI5FD8UMHkumN7o9rPIf1QXCXJUalMZXCBtWw0mZkidqrovewpGVaJZy/6
+         A1pXfX3v1bRw77NgyEux0iNgHyDXyPH7tSGU+DPDX7WadIlh+NgaJDRXBu1IkFwTWk8+
+         ffQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWU0Ahujzq3NTg4knHFgw2bwG3calsbYnDfctV5EWlo13boiTZld7ue1DfMnH3sA8Qq4+zFSR0Pl8ysQ6ovFgSgUwbLFi0U
+X-Gm-Message-State: AOJu0YzIJiExvH78qfGkKThmdpE5TaD6Sa4fmb5bw7yGEwwRbuI7LBk8
+	I6tkOl+tIu9T2ttoQdSgYw3rH8gKtUW3QtNgLcm70gNeHe5Je/XQ
+X-Google-Smtp-Source: AGHT+IFo33H/CSiJeQiDb9G080cL4TnmbWFxlaair8SmU524OMlC2zLK6+RujuRjt8tnAlo4YTmhLA==
+X-Received: by 2002:a05:6512:b02:b0:52c:adc4:137c with SMTP id 2adb3069b0e04-530ee984de9mr1632646e87.20.1723225231956;
+        Fri, 09 Aug 2024 10:40:31 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530de465949sm1048912e87.202.2024.08.09.10.40.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 10:40:31 -0700 (PDT)
+Date: Fri, 9 Aug 2024 20:40:28 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, diasyzhang@tencent.com, 
+	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk, 
+	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
+	si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v17 00/14] stmmac: Add Loongson platform support
+Message-ID: <ffvkxtyrv5xx3cwwmm3mbvkufjmgrxnjkiyyumkqyuhzxbovsj@tqsoscqgzmzq>
+References: <cover.1723014611.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1723014611.git.siyanteng@loongson.cn>
 
-From: Ahmed Zaki <ahmed.zaki@intel.com>
+Hi Yanteng
 
-Add support for offloading cls U32 filters. Only "skbedit queue_mapping"
-and "drop" actions are supported. Also, only "ip" and "802_3" tc
-protocols are allowed. The PF must advertise the VIRTCHNL_VF_OFFLOAD_TC_U32
-capability flag.
+On Wed, Aug 07, 2024 at 09:45:27PM +0800, Yanteng Si wrote:
+> v17:
+> * As Serge's comments:
+>     Add return 0 for _dt_config().
+>     Get back the conditional MSI-clear method execution.
 
-Since the filters will be enabled via the FD stage at the PF, a new type
-of FDIR filters is added and the existing list and state machine are used.
+Thank you very much for your patience in such a long review and firm
+determination to bring the series to the final goal. From my point of
+view the patch set is ready to be merged in.
 
-The new filters can be used to configure flow directors based on raw
-(binary) pattern in the rx packet.
+I've got it tested on my relatively standard DW GMAC v3.73a
+controller. No immediate problems or impacts on the interface
+performance have been spotted. So for the entire series:
 
-Examples:
+Tested-by: Serge Semin <fancer.lancer@gmail.com>
 
-0. # tc qdisc add dev enp175s0v0  ingress
+-Serge(y)
 
-1. Redirect UDP from src IP 192.168.2.1 to queue 12:
-
-    # tc filter add dev <dev> protocol ip ingress u32 \
-	match u32 0x45000000 0xff000000 at 0  \
-	match u32 0x00110000 0x00ff0000 at 8  \
-	match u32 0xC0A80201 0xffffffff at 12 \
-	match u32 0x00000000 0x00000000 at 24 \
-	action skbedit queue_mapping 12 skip_sw
-
-2. Drop all ICMP:
-
-    # tc filter add dev <dev> protocol ip ingress u32 \
-	match u32 0x45000000 0xff000000 at 0  \
-	match u32 0x00010000 0x00ff0000 at 8  \
-	match u32 0x00000000 0x00000000 at 24 \
-	action drop skip_sw
-
-3. Redirect ICMP traffic from MAC 3c:fd:fe:a5:47:e0 to queue 7
-   (note proto: 802_3):
-
-   # tc filter add dev <dev> protocol 802_3 ingress u32 \
-	match u32 0x00003CFD 0x0000ffff at 4   \
-	match u32 0xFEA547E0 0xffffffff at 8   \
-	match u32 0x08004500 0xffffff00 at 12  \
-	match u32 0x00000001 0x000000ff at 20  \
-	match u32 0x0000 0x0000 at 40          \
-	action skbedit queue_mapping 7 skip_sw
-
-Notes on matches:
-1 - All intermediate fields that are needed to parse the correct PTYPE
-    must be provided (in e.g. 3: Ethernet Type 0x0800 in MAC, IP version
-    and IP length: 0x45 and protocol: 0x01 (ICMP)).
-2 - The last match must provide an offset that guarantees all required
-    headers are accounted for, even if the last header is not matched.
-    For example, in #2, the last match is 4 bytes at offset 24 starting
-    from IP header, so the total is 14 (MAC) + 24 + 4 = 42, which is the
-    sum of MAC+IP+ICMP headers.
-
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h        |  27 ++-
- .../net/ethernet/intel/iavf/iavf_ethtool.c    |   9 +-
- drivers/net/ethernet/intel/iavf/iavf_fdir.c   |  29 +++-
- drivers/net/ethernet/intel/iavf/iavf_fdir.h   |  10 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 160 +++++++++++++++++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  25 ++-
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |   4 +
- include/linux/avf/virtchnl.h                  |   1 +
- 8 files changed, 238 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index dfed22baebf8..48cd1d06761c 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -33,6 +33,7 @@
- #include <net/udp.h>
- #include <net/tc_act/tc_gact.h>
- #include <net/tc_act/tc_mirred.h>
-+#include <net/tc_act/tc_skbedit.h>
- 
- #include "iavf_type.h"
- #include <linux/avf/virtchnl.h>
-@@ -393,6 +394,8 @@ struct iavf_adapter {
- 			     VIRTCHNL_VF_OFFLOAD_VLAN_V2)
- #define CRC_OFFLOAD_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
- 				 VIRTCHNL_VF_OFFLOAD_CRC)
-+#define TC_U32_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
-+			    VIRTCHNL_VF_OFFLOAD_TC_U32)
- #define VLAN_V2_FILTERING_ALLOWED(_a) \
- 	(VLAN_V2_ALLOWED((_a)) && \
- 	 ((_a)->vlan_v2_caps.filtering.filtering_support.outer || \
-@@ -437,6 +440,7 @@ struct iavf_adapter {
- 
- #define IAVF_MAX_FDIR_FILTERS 128	/* max allowed Flow Director filters */
- 	u16 fdir_active_fltr;
-+	u16 raw_fdir_active_fltr;
- 	struct list_head fdir_list_head;
- 	spinlock_t fdir_fltr_lock;	/* protect the Flow Director filter list */
- 
-@@ -447,7 +451,28 @@ struct iavf_adapter {
- /* Must be called with fdir_fltr_lock lock held */
- static inline bool iavf_fdir_max_reached(struct iavf_adapter *adapter)
- {
--	return adapter->fdir_active_fltr >= IAVF_MAX_FDIR_FILTERS;
-+	return adapter->fdir_active_fltr + adapter->raw_fdir_active_fltr >=
-+			IAVF_MAX_FDIR_FILTERS;
-+}
-+
-+static inline void
-+iavf_inc_fdir_active_fltr(struct iavf_adapter *adapter,
-+			  struct iavf_fdir_fltr *fltr)
-+{
-+	if (iavf_is_raw_fdir(fltr))
-+		adapter->raw_fdir_active_fltr++;
-+	else
-+		adapter->fdir_active_fltr++;
-+}
-+
-+static inline void
-+iavf_dec_fdir_active_fltr(struct iavf_adapter *adapter,
-+			  struct iavf_fdir_fltr *fltr)
-+{
-+	if (iavf_is_raw_fdir(fltr))
-+		adapter->raw_fdir_active_fltr--;
-+	else
-+		adapter->fdir_active_fltr--;
- }
- 
- /* Ethtool Private Flags */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 7ab445eeee18..74a1e9fe1821 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -927,7 +927,7 @@ iavf_get_ethtool_fdir_entry(struct iavf_adapter *adapter,
- 
- 	spin_lock_bh(&adapter->fdir_fltr_lock);
- 
--	rule = iavf_find_fdir_fltr(adapter, fsp->location);
-+	rule = iavf_find_fdir_fltr(adapter, false, fsp->location);
- 	if (!rule) {
- 		ret = -EINVAL;
- 		goto release_lock;
-@@ -1072,6 +1072,9 @@ iavf_get_fdir_fltr_ids(struct iavf_adapter *adapter, struct ethtool_rxnfc *cmd,
- 	spin_lock_bh(&adapter->fdir_fltr_lock);
- 
- 	list_for_each_entry(fltr, &adapter->fdir_list_head, list) {
-+		if (iavf_is_raw_fdir(fltr))
-+			continue;
-+
- 		if (cnt == cmd->rule_cnt) {
- 			val = -EMSGSIZE;
- 			goto release_lock;
-@@ -1263,7 +1266,7 @@ static int iavf_add_fdir_ethtool(struct iavf_adapter *adapter, struct ethtool_rx
- 		return -EINVAL;
- 
- 	spin_lock_bh(&adapter->fdir_fltr_lock);
--	if (iavf_find_fdir_fltr(adapter, fsp->location)) {
-+	if (iavf_find_fdir_fltr(adapter, false, fsp->location)) {
- 		dev_err(&adapter->pdev->dev, "Failed to add Flow Director filter, it already exists\n");
- 		spin_unlock_bh(&adapter->fdir_fltr_lock);
- 		return -EEXIST;
-@@ -1307,7 +1310,7 @@ static int iavf_del_fdir_ethtool(struct iavf_adapter *adapter, struct ethtool_rx
- 	if (!(adapter->flags & IAVF_FLAG_FDIR_ENABLED))
- 		return -EOPNOTSUPP;
- 
--	return iavf_fdir_del_fltr(adapter, fsp->location);
-+	return iavf_fdir_del_fltr(adapter, false, fsp->location);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_fdir.c b/drivers/net/ethernet/intel/iavf/iavf_fdir.c
-index 1e1daf71dfa0..a1b3b44cc14a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_fdir.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_fdir.c
-@@ -796,6 +796,9 @@ bool iavf_fdir_is_dup_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *
- 
- 	spin_lock_bh(&adapter->fdir_fltr_lock);
- 	list_for_each_entry(tmp, &adapter->fdir_list_head, list) {
-+		if (iavf_is_raw_fdir(fltr))
-+			continue;
-+
- 		if (tmp->flow_type != fltr->flow_type)
- 			continue;
- 
-@@ -817,18 +820,21 @@ bool iavf_fdir_is_dup_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *
- /**
-  * iavf_find_fdir_fltr - find FDIR filter
-  * @adapter: pointer to the VF adapter structure
-- * @loc: location to find.
-+ * @is_raw: filter type, is raw (tc u32) or not (ethtool)
-+ * @data: data to ID the filter, type dependent
-  *
-  * Returns: pointer to Flow Director filter if found or NULL. Lock must be held.
-  */
- struct iavf_fdir_fltr *iavf_find_fdir_fltr(struct iavf_adapter *adapter,
--					   u32 loc)
-+					   bool is_raw, u32 data)
- {
- 	struct iavf_fdir_fltr *rule;
- 
--	list_for_each_entry(rule, &adapter->fdir_list_head, list)
--		if (rule->loc == loc)
-+	list_for_each_entry(rule, &adapter->fdir_list_head, list) {
-+		if ((is_raw && rule->cls_u32_handle == data) ||
-+		    (!is_raw && rule->loc == data))
- 			return rule;
-+	}
- 
- 	return NULL;
- }
-@@ -855,6 +861,9 @@ int iavf_fdir_add_fltr(struct iavf_adapter *adapter,
- 	}
- 
- 	list_for_each_entry(rule, &adapter->fdir_list_head, list) {
-+		if (iavf_is_raw_fdir(fltr))
-+			break;
-+
- 		if (rule->loc >= fltr->loc)
- 			break;
- 		parent = rule;
-@@ -864,7 +873,8 @@ int iavf_fdir_add_fltr(struct iavf_adapter *adapter,
- 		list_add(&fltr->list, &parent->list);
- 	else
- 		list_add(&fltr->list, &adapter->fdir_list_head);
--	adapter->fdir_active_fltr++;
-+
-+	iavf_inc_fdir_active_fltr(adapter, fltr);
- 
- 	if (adapter->link_up)
- 		fltr->state = IAVF_FDIR_FLTR_ADD_REQUEST;
-@@ -881,25 +891,26 @@ int iavf_fdir_add_fltr(struct iavf_adapter *adapter,
- /**
-  * iavf_fdir_del_fltr - delete a flow director filter from the list
-  * @adapter: pointer to the VF adapter structure
-- * @loc: location to delete.
-+ * @is_raw: filter type, is raw (tc u32) or not (ethtool)
-+ * @data: data to ID the filter, type dependent
-  *
-  * Return: 0 on success or negative errno on failure.
-  */
--int iavf_fdir_del_fltr(struct iavf_adapter *adapter, u32 loc)
-+int iavf_fdir_del_fltr(struct iavf_adapter *adapter, bool is_raw, u32 data)
- {
- 	struct iavf_fdir_fltr *fltr = NULL;
- 	int err = 0;
- 
- 	spin_lock_bh(&adapter->fdir_fltr_lock);
--	fltr = iavf_find_fdir_fltr(adapter, loc);
-+	fltr = iavf_find_fdir_fltr(adapter, is_raw, data);
- 
- 	if (fltr) {
- 		if (fltr->state == IAVF_FDIR_FLTR_ACTIVE) {
- 			fltr->state = IAVF_FDIR_FLTR_DEL_REQUEST;
- 		} else if (fltr->state == IAVF_FDIR_FLTR_INACTIVE) {
- 			list_del(&fltr->list);
-+			iavf_dec_fdir_active_fltr(adapter, fltr);
- 			kfree(fltr);
--			adapter->fdir_active_fltr--;
- 			fltr = NULL;
- 		} else {
- 			err = -EBUSY;
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_fdir.h b/drivers/net/ethernet/intel/iavf/iavf_fdir.h
-index 5c85eb25fa2a..e84a5351162f 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_fdir.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_fdir.h
-@@ -117,12 +117,18 @@ struct iavf_fdir_fltr {
- 
- 	u32 flow_id;
- 
-+	u32 cls_u32_handle; /* for FDIR added via tc u32 */
- 	u32 loc;	/* Rule location inside the flow table */
- 	u32 q_index;
- 
- 	struct virtchnl_fdir_add vc_add_msg;
- };
- 
-+static inline bool iavf_is_raw_fdir(struct iavf_fdir_fltr *fltr)
-+{
-+	return !fltr->vc_add_msg.rule_cfg.proto_hdrs.count;
-+}
-+
- int iavf_validate_fdir_fltr_masks(struct iavf_adapter *adapter,
- 				  struct iavf_fdir_fltr *fltr);
- int iavf_fill_fdir_add_msg(struct iavf_adapter *adapter, struct iavf_fdir_fltr *fltr);
-@@ -130,7 +136,7 @@ void iavf_print_fdir_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *f
- bool iavf_fdir_is_dup_fltr(struct iavf_adapter *adapter, struct iavf_fdir_fltr *fltr);
- int iavf_fdir_add_fltr(struct iavf_adapter *adapter,
- 		       struct iavf_fdir_fltr *fltr);
--int iavf_fdir_del_fltr(struct iavf_adapter *adapter, u32 loc);
-+int iavf_fdir_del_fltr(struct iavf_adapter *adapter, bool is_raw, u32 data);
- struct iavf_fdir_fltr *iavf_find_fdir_fltr(struct iavf_adapter *adapter,
--					   u32 loc);
-+					   bool is_raw, u32 data);
- #endif /* _IAVF_FDIR_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index ff11bafb3b4f..e635a6af5ec2 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -4013,7 +4013,7 @@ static int iavf_delete_clsflower(struct iavf_adapter *adapter,
- 
- /**
-  * iavf_setup_tc_cls_flower - flower classifier offloads
-- * @adapter: board private structure
-+ * @adapter: pointer to iavf adapter structure
-  * @cls_flower: pointer to flow_cls_offload struct with flow info
-  */
- static int iavf_setup_tc_cls_flower(struct iavf_adapter *adapter,
-@@ -4031,6 +4031,154 @@ static int iavf_setup_tc_cls_flower(struct iavf_adapter *adapter,
- 	}
- }
- 
-+/**
-+ * iavf_add_cls_u32 - Add U32 classifier offloads
-+ * @adapter: pointer to iavf adapter structure
-+ * @cls_u32: pointer to tc_cls_u32_offload struct with flow info
-+ *
-+ * Return: 0 on success or negative errno on failure.
-+ */
-+static int iavf_add_cls_u32(struct iavf_adapter *adapter,
-+			    struct tc_cls_u32_offload *cls_u32)
-+{
-+	struct netlink_ext_ack *extack = cls_u32->common.extack;
-+	struct virtchnl_fdir_rule *rule_cfg;
-+	struct virtchnl_filter_action *vact;
-+	struct virtchnl_proto_hdrs *hdrs;
-+	struct ethhdr *spec_h, *mask_h;
-+	const struct tc_action *act;
-+	struct iavf_fdir_fltr *fltr;
-+	struct tcf_exts *exts;
-+	unsigned int q_index;
-+	int i, status = 0;
-+	int off_base = 0;
-+
-+	if (cls_u32->knode.link_handle) {
-+		NL_SET_ERR_MSG_MOD(extack, "Linking not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	fltr = kzalloc(sizeof(*fltr), GFP_KERNEL);
-+	if (!fltr)
-+		return -ENOMEM;
-+
-+	rule_cfg = &fltr->vc_add_msg.rule_cfg;
-+	hdrs = &rule_cfg->proto_hdrs;
-+	hdrs->count = 0;
-+
-+	/* The parser lib at the PF expects the packet starting with MAC hdr */
-+	switch (ntohs(cls_u32->common.protocol)) {
-+	case ETH_P_802_3:
-+		break;
-+	case ETH_P_IP:
-+		spec_h = (struct ethhdr *)hdrs->raw.spec;
-+		mask_h = (struct ethhdr *)hdrs->raw.mask;
-+		spec_h->h_proto = htons(ETH_P_IP);
-+		mask_h->h_proto = 0xFFFF;
-+		off_base += ETH_HLEN;
-+		break;
-+	default:
-+		NL_SET_ERR_MSG_MOD(extack, "Only 802_3 and ip filter protocols are supported");
-+		status = -EOPNOTSUPP;
-+		goto free_alloc;
-+	}
-+
-+	for (i = 0; i < cls_u32->knode.sel->nkeys; i++) {
-+		__be32 val, mask;
-+		int off;
-+
-+		off = off_base + cls_u32->knode.sel->keys[i].off;
-+		val = cls_u32->knode.sel->keys[i].val;
-+		mask = cls_u32->knode.sel->keys[i].mask;
-+
-+		if (off >= sizeof(hdrs->raw.spec)) {
-+			NL_SET_ERR_MSG_MOD(extack, "Input exceeds maximum allowed.");
-+			status = -EINVAL;
-+			goto free_alloc;
-+		}
-+
-+		memcpy(&hdrs->raw.spec[off], &val, sizeof(val));
-+		memcpy(&hdrs->raw.mask[off], &mask, sizeof(mask));
-+		hdrs->raw.pkt_len = off + sizeof(val);
-+	}
-+
-+	/* Only one action is allowed */
-+	rule_cfg->action_set.count = 1;
-+	vact = &rule_cfg->action_set.actions[0];
-+	exts = cls_u32->knode.exts;
-+
-+	tcf_exts_for_each_action(i, act, exts) {
-+		/* FDIR queue */
-+		if (is_tcf_skbedit_rx_queue_mapping(act)) {
-+			q_index = tcf_skbedit_rx_queue_mapping(act);
-+			if (q_index >= adapter->num_active_queues) {
-+				status = -EINVAL;
-+				goto free_alloc;
-+			}
-+
-+			vact->type = VIRTCHNL_ACTION_QUEUE;
-+			vact->act_conf.queue.index = q_index;
-+			break;
-+		}
-+
-+		/* Drop */
-+		if (is_tcf_gact_shot(act)) {
-+			vact->type = VIRTCHNL_ACTION_DROP;
-+			break;
-+		}
-+
-+		/* Unsupported action */
-+		NL_SET_ERR_MSG_MOD(extack, "Unsupported action.");
-+		status = -EOPNOTSUPP;
-+		goto free_alloc;
-+	}
-+
-+	fltr->vc_add_msg.vsi_id = adapter->vsi.id;
-+	fltr->cls_u32_handle = cls_u32->knode.handle;
-+	return iavf_fdir_add_fltr(adapter, fltr);
-+
-+free_alloc:
-+	kfree(fltr);
-+	return status;
-+}
-+
-+/**
-+ * iavf_del_cls_u32 - Delete U32 classifier offloads
-+ * @adapter: pointer to iavf adapter structure
-+ * @cls_u32: pointer to tc_cls_u32_offload struct with flow info
-+ *
-+ * Return: 0 on success or negative errno on failure.
-+ */
-+static int iavf_del_cls_u32(struct iavf_adapter *adapter,
-+			    struct tc_cls_u32_offload *cls_u32)
-+{
-+	return iavf_fdir_del_fltr(adapter, true, cls_u32->knode.handle);
-+}
-+
-+/**
-+ * iavf_setup_tc_cls_u32 - U32 filter offloads
-+ * @adapter: pointer to iavf adapter structure
-+ * @cls_u32: pointer to tc_cls_u32_offload struct with flow info
-+ *
-+ * Return: 0 on success or negative errno on failure.
-+ */
-+static int iavf_setup_tc_cls_u32(struct iavf_adapter *adapter,
-+				 struct tc_cls_u32_offload *cls_u32)
-+{
-+	if (!TC_U32_SUPPORT(adapter) || !FDIR_FLTR_SUPPORT(adapter))
-+		return -EOPNOTSUPP;
-+
-+	switch (cls_u32->command) {
-+	case TC_CLSU32_NEW_KNODE:
-+	case TC_CLSU32_REPLACE_KNODE:
-+		return iavf_add_cls_u32(adapter, cls_u32);
-+	case TC_CLSU32_DELETE_KNODE:
-+		return iavf_del_cls_u32(adapter, cls_u32);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- /**
-  * iavf_setup_tc_block_cb - block callback for tc
-  * @type: type of offload
-@@ -4050,6 +4198,8 @@ static int iavf_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
- 	switch (type) {
- 	case TC_SETUP_CLSFLOWER:
- 		return iavf_setup_tc_cls_flower(cb_priv, type_data);
-+	case TC_SETUP_CLSU32:
-+		return iavf_setup_tc_cls_u32(cb_priv, type_data);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -4332,8 +4482,8 @@ static void iavf_disable_fdir(struct iavf_adapter *adapter)
- 		    fdir->state == IAVF_FDIR_FLTR_INACTIVE) {
- 			/* Delete filters not registered in PF */
- 			list_del(&fdir->list);
-+			iavf_dec_fdir_active_fltr(adapter, fdir);
- 			kfree(fdir);
--			adapter->fdir_active_fltr--;
- 		} else if (fdir->state == IAVF_FDIR_FLTR_ADD_PENDING ||
- 			   fdir->state == IAVF_FDIR_FLTR_DIS_REQUEST ||
- 			   fdir->state == IAVF_FDIR_FLTR_ACTIVE) {
-@@ -4843,9 +4993,11 @@ int iavf_process_config(struct iavf_adapter *adapter)
- 	/* get HW VLAN features that can be toggled */
- 	hw_vlan_features = iavf_get_netdev_vlan_hw_features(adapter);
- 
--	/* Enable cloud filter if ADQ is supported */
--	if (vfres->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_ADQ)
-+	/* Enable HW TC offload if ADQ or tc U32 is supported */
-+	if (vfres->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_ADQ ||
-+	    TC_U32_SUPPORT(adapter))
- 		hw_features |= NETIF_F_HW_TC;
-+
- 	if (vfres->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_USO)
- 		hw_features |= NETIF_F_GSO_UDP_L4;
- 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 1e543f6a7c30..7e810b65380c 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -142,6 +142,7 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_WB_ON_ITR |
- 	       VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2 |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP |
-+	       VIRTCHNL_VF_OFFLOAD_TC_U32 |
- 	       VIRTCHNL_VF_OFFLOAD_VLAN_V2 |
- 	       VIRTCHNL_VF_OFFLOAD_CRC |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM |
-@@ -1961,8 +1962,8 @@ static void iavf_activate_fdir_filters(struct iavf_adapter *adapter)
- 			 * list on PF is already cleared after a reset
- 			 */
- 			list_del(&f->list);
-+			iavf_dec_fdir_active_fltr(adapter, f);
- 			kfree(f);
--			adapter->fdir_active_fltr--;
- 		}
- 	}
- 	spin_unlock_bh(&adapter->fdir_fltr_lock);
-@@ -2135,8 +2136,8 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 						dev_err(&adapter->pdev->dev,
- 							"%s\n", msg);
- 					list_del(&fdir->list);
-+					iavf_dec_fdir_active_fltr(adapter, fdir);
- 					kfree(fdir);
--					adapter->fdir_active_fltr--;
- 				}
- 			}
- 			spin_unlock_bh(&adapter->fdir_fltr_lock);
-@@ -2451,8 +2452,12 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 					 list) {
- 			if (fdir->state == IAVF_FDIR_FLTR_ADD_PENDING) {
- 				if (add_fltr->status == VIRTCHNL_FDIR_SUCCESS) {
--					dev_info(&adapter->pdev->dev, "Flow Director filter with location %u is added\n",
--						 fdir->loc);
-+					if (!iavf_is_raw_fdir(fdir))
-+						dev_info(&adapter->pdev->dev, "Flow Director filter with location %u is added\n",
-+							 fdir->loc);
-+					else
-+						dev_info(&adapter->pdev->dev, "Flow Director filter (raw) for TC handle %x is added\n",
-+							 TC_U32_USERHTID(fdir->cls_u32_handle));
- 					fdir->state = IAVF_FDIR_FLTR_ACTIVE;
- 					fdir->flow_id = add_fltr->flow_id;
- 				} else {
-@@ -2460,8 +2465,8 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 						 add_fltr->status);
- 					iavf_print_fdir_fltr(adapter, fdir);
- 					list_del(&fdir->list);
-+					iavf_dec_fdir_active_fltr(adapter, fdir);
- 					kfree(fdir);
--					adapter->fdir_active_fltr--;
- 				}
- 			}
- 		}
-@@ -2479,11 +2484,15 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 				if (del_fltr->status == VIRTCHNL_FDIR_SUCCESS ||
- 				    del_fltr->status ==
- 				    VIRTCHNL_FDIR_FAILURE_RULE_NONEXIST) {
--					dev_info(&adapter->pdev->dev, "Flow Director filter with location %u is deleted\n",
--						 fdir->loc);
-+					if (!iavf_is_raw_fdir(fdir))
-+						dev_info(&adapter->pdev->dev, "Flow Director filter with location %u is deleted\n",
-+							 fdir->loc);
-+					else
-+						dev_info(&adapter->pdev->dev, "Flow Director filter (raw) for TC handle %x is deleted\n",
-+							 TC_U32_USERHTID(fdir->cls_u32_handle));
- 					list_del(&fdir->list);
-+					iavf_dec_fdir_active_fltr(adapter, fdir);
- 					kfree(fdir);
--					adapter->fdir_active_fltr--;
- 				} else {
- 					fdir->state = IAVF_FDIR_FLTR_ACTIVE;
- 					dev_info(&adapter->pdev->dev, "Failed to delete Flow Director filter with status: %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index 1c6ce0c4ed4e..59f62306b9cb 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -461,6 +461,10 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
- 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_FDIR_PF)
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_FDIR_PF;
- 
-+	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_TC_U32 &&
-+	    vfres->vf_cap_flags & VIRTCHNL_VF_OFFLOAD_FDIR_PF)
-+		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_TC_U32;
-+
- 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2)
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2;
- 
-diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
-index 4f78a65e33dc..f41395264dca 100644
---- a/include/linux/avf/virtchnl.h
-+++ b/include/linux/avf/virtchnl.h
-@@ -247,6 +247,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(16, virtchnl_vsi_resource);
- /* used to negotiate communicating link speeds in Mbps */
- #define VIRTCHNL_VF_CAP_ADV_LINK_SPEED		BIT(7)
- #define  VIRTCHNL_VF_OFFLOAD_CRC		BIT(10)
-+#define VIRTCHNL_VF_OFFLOAD_TC_U32		BIT(11)
- #define VIRTCHNL_VF_OFFLOAD_VLAN_V2		BIT(15)
- #define VIRTCHNL_VF_OFFLOAD_VLAN		BIT(16)
- #define VIRTCHNL_VF_OFFLOAD_RX_POLLING		BIT(17)
--- 
-2.42.0
-
+> 
+> v16:
+> * As Serge's comments:
+>    Move the of_node_put(plat->mdio_node) call to the DT-config/clear methods.
+>    Drop 'else if'.
+> * Modify the commit message of 7/14. (LS2K CPU -> LS2K SOC)
+> 
+> V15:
+> * Drop return that will not be executed.
+> * Move pdev from patch 12 to patch 13 to pass W=1 builds.
+> 
+> RFC v15:
+> * As Serge's comments:
+>    Extend the commit message.(patch 7 and patch 11)
+>    Add fixes tag for patch 8.
+>    Add loongson_dwmac_dt_clear() patch.
+>    Modify loongson_dwmac_msi_config().
+>    ...
+> * Pick Huacai's Acked-by tag.
+> * Pick Serge's Reviewed-by tag.
+> * I have already contacted the author(ZhangQing) of the module,
+>   so I copied her valid email: diasyzhang@tencent.com.
+> 
+> Note: 
+> I replied to the comments on v14 last Sunday, but all of Loongson's
+> email servers failed to deliver. The network administrator told me
+> today that he has fixed the problem and re-delivered all the failed
+> emails, but I did not see them on the mailing list. I hope they will
+> not suddenly appear in everyone's mailbox one day. I apologize for
+> this. (The email content mainly agrees with Serge's suggestion.)
+> 
+> v14:
+> 
+> Because Loongson GMAC can be also found with the 8-channels AV feature
+> enabled, we'll need to reconsider the patches logic and thus the
+> commit logs too. As Serge's comments and Russell's comments:
+> [PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+> [PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
+> [PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
+> [PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
+> [PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+> [PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
+> [PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+> +-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+>     in the loongson_gmac_data() method.
+> [PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+> [PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+> [PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
+> +-> Make sure the setup() method is called after the pci_enable_device()
+>     invocation.
+> [PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+> +-> Introduce the loongson_dwmac_dt_config() method here instead of
+>     doing that in a separate patch.
+> +-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
+>     the pdev->irq field and make sure it is valid.
+> [PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
+> +-> Drop the patch as Russell's comments, At the same time, he provided another
+>     better repair suggestion, and I decided to send it separately after the
+>     patch set was merged. See:
+>     <https://lore.kernel.org/netdev/ZoW1fNqV3PxEobFx@shell.armlinux.org.uk/>
+> [PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+> +-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
+>     support" patch, but which adds the support of the Loongson GMAC with the
+>     8-channels AV-feature available.
+> +-> loongson_dwmac_intx_config() shall be dropped due to the
+>     loongson_dwmac_acpi_config() method added in the PATCH 11/15.
+> +-> Make sure loongson_data::loongson_id is initialized before the
+>     stmmac_pci_info::setup() is called.
+> +-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
+>     fields initialization to the loongson_gmac_data() method.
+> +-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
+>     Loongson MAC has been detected.
+> +-> Move everything GNET-specific to the next patch.
+> [PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
+> +-> Everything Loonsgson GNET-specific is supposed to be added in the
+>     framework of this patch:
+>     + PCI_DEVICE_ID_LOONGSON_GNET macro
+>     + loongson_gnet_fix_speed() method
+>     + loongson_gnet_data() method
+>     + loongson_gnet_pci_info data
+>     + The GNET-specific part of the loongson_dwmac_setup() method.
+>     + ...
+> [PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
+> 
+> Other's:
+> Pick Serge's Reviewed-by tag.
+> 
+> v13:
+> 
+> * Sorry, we have clarified some things in the past 10 days. I did not
+>  give you a clear reply to the following questions in v12, so I need
+>  to reply again:
+> 
+>  1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
+>     channels, so we have to reconsider the initialization of
+>     tx/rx_queues_to_use into probe();
+> 
+>  2. In v12, we disagreed on the loongson_dwmac_msi_config method, but I changed
+>     it based on Serge's comments(If I understand correctly):
+> 	if (dev_of_node(&pdev->dev)) {
+> 		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+> 	}
+> 
+> 	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
+> 		ret = loongson_dwmac_msi_config(pdev, plat, &res);
+> 	} else {
+> 		ret = loongson_dwmac_intx_config(pdev, plat, &res);
+> 	}
+> 
+>  3. Our priv->dma_cap.pcs is false, so let's use PHY_INTERFACE_MODE_NA;
+> 
+>  4. Our GMAC does not support Delay, so let's use PHY_INTERFACE_MODE_RGMII_ID,
+>     the current dts is wrong, a fix patch will be sent to the LoongArch list
+>     later.
+> 
+> Others:
+> * Re-split a part of the patch (it seems we do this with every version);
+> * Copied Serge's comments into the commit message of patch;
+> * Fixed the stmmac_dma_operation_mode() method;
+> * Changed some code comments.
+> 
+> v12:
+> * The biggest change is the re-splitting of patches.
+> * Add a "gmac_version" in loongson_data, then we only
+>   read it once in the _probe().
+> * Drop Serge's patch.
+> * Rebase to the latest code state.
+> * Fixed the gnet commit message.
+> 
+> v11:
+> * Break loongson_phylink_get_caps(), fix bad logic.
+> * Remove a unnecessary ";".
+> * Remove some unnecessary "{}".
+> * add a blank.
+> * Move the code of fix _force_1000 to patch 6/6.
+> 
+> The main changes occur in these two functions:
+> loongson_dwmac_probe();
+> loongson_dwmac_setup();
+> 
+> v10:
+> As Andrew's comment:
+> * Add a #define for the 0x37.
+> * Add a #define for Port Select.
+> 
+> others:
+> * Pick Serge's patch, This patch resulted from the process
+>   of reviewing our patch set.
+> * Based on Serge's patch, modify our loongson_phylink_get_caps().
+> * Drop patch 3/6, we need mac_interface.
+> * Adjusted the code layout of gnet patch.
+> * Corrected several errata in commit message.
+> * Move DISABLE_FORCE flag to loongson_gnet_data().
+> 
+> v9:
+> We have not provided a detailed list of equipment for a long time,
+> and I apologize for this. During this period, I have collected some
+> information and now present it to you, hoping to alleviate the pressure
+> of review.
+> 
+> 1. IP core
+> We now have two types of IP cores, one is 0x37, similar to dwmac1000;
+> The other is 0x10.  Compared to 0x37, we split several DMA registers
+> from one to two, and it is not worth adding a new entry for this.
+> According to Serge's comment, we made these devices work by overwriting
+> priv->synopsys_id = 0x37 and mac->dma = <LS_dma_ops>.
+> 
+> 1.1.  Some more detailed information
+> The number of DMA channels for 0x37 is 1; The number of DMA channels
+> for 0x10 is 8.  Except for channel 0, otherchannels do not support
+> sending hardware checksums. Supported AV features are Qav, Qat, and Qas,
+> and the rest are consistent with 3.73.
+> 
+> 2. DEVICE
+> We have two types of devices,
+> one is GMAC, which only has a MAC chip inside and needs an external PHY
+> chip;
+> the other is GNET, which integrates both MAC and PHY chips inside.
+> 
+> 2.1.  Some more detailed information
+> GMAC device: LS7A1000, LS2K1000, these devices do not support any pause
+> mode.
+> gnet device: LS7A2000, LS2K2000, the chip connection between the mac and
+>              phy of these devices is not normal and requires two rounds of
+>              negotiation; LS7A2000 does not support half-duplex and
+> multi-channel;
+>              to enable multi-channel on LS2K2000, you need to turn off
+> hardware checksum.
+> **Note**: Only the LS2K2000's IP core is 0x10, while the IP cores of other
+> devices are 0x37.
+> 
+> 3. TABLE
+> 
+> device    type    pci_id    ip_core
+> ls7a1000  gmac    7a03      0x35/0x37
+> ls2k1000  gmac    7a03      0x35/0x37
+> ls7a2000  gnet    7a13      0x37
+> ls2k2000  gnet    7a13      0x10
+> -----------------------------------------------
+> Changes:
+> 
+> * passed the CI
+>   <https://github.com/linux-netdev/nipa/blob/main/tests/patch/checkpatch
+>   /checkpatch.sh>
+> * reverse xmas tree order.
+> * Silence build warning.
+> * Re-split the patch.
+> * Add more detailed commit message.
+> * Add more code comment.
+> * Reduce modification of generic code.
+> * using the GNET-specific prefix.
+> * define a new macro for the GNET MAC.
+> * Use an easier way to overwrite mac.
+> * Removed some useless printk.
+> 
+> 
+> v8:
+> * The biggest change is according to Serge's comment in the previous
+>   edition:
+>    Seeing the patch in the current state would overcomplicate the generic
+>    code and the only functions you need to update are
+>    dwmac_dma_interrupt()
+>    dwmac1000_dma_init_channel()
+>    you can have these methods re-defined with all the Loongson GNET
+>    specifics in the low-level platform driver (dwmac-loongson.c). After
+>    that you can just override the mac_device_info.dma pointer with a
+>    fixed stmmac_dma_ops descriptor. Here is what should be done for that:
+> 
+>    1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+>    useful for your GNET device. Second in general it's a correct
+>    implementation of the normal DW GMAC v3.x multi-channels feature and
+>    will be useful for the DW GMACs with that feature enabled.
+> 
+>    2. Create the Loongson GNET-specific
+>    stmmac_dma_ops.dma_interrupt()
+>    stmmac_dma_ops.init_chan()
+>    methods in the dwmac-loongson.c driver. Don't forget to move all the
+>    Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+> 
+>    3. Create a Loongson GNET-specific platform setup method with the next
+>    semantics:
+>       + allocate stmmac_dma_ops instance and initialize it with
+>         dwmac1000_dma_ops.
+>       + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+>         the pointers to the methods defined in 2.
+>       + allocate mac_device_info instance and initialize the
+>         mac_device_info.dma field with a pointer to the new
+>         stmmac_dma_ops instance.
+>       + call dwmac1000_setup() or initialize mac_device_info in a way
+>         it's done in dwmac1000_setup() (the later might be better so you
+>         wouldn't need to export the dwmac1000_setup() function).
+>       + override stmmac_priv.synopsys_id with a correct value.
+> 
+>    4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+>    method created in 3.
+> 
+> * Others:
+>   Re-split the patch.
+>   Passed checkpatch.pl test.
+> 
+> v7:
+> * Refer to andrew's suggestion:
+>   - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
+> 
+> * Others:
+>   - Using --subject-prefix="PATCH net-next vN" to indicate that the
+>     patches are for the networking tree.
+>   - Rebase to the latest networking tree:
+>     <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
+> 
+> 
+> v6:
+> 
+> * Refer to Serge's suggestion:
+>   - Add new platform feature flag:
+>     include/linux/stmmac.h:
+>     +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+> 
+>   - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+>      drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+>      +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
+>      #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+>      ...
+> 
+>   - Drop all of redundant changes that don't require the
+>     prototypes being converted to accepting the stmmac_priv
+>     pointer.
+> 
+> * Refer to andrew's suggestion:
+>   - Drop white space changes.
+>   - break patch up into lots of smaller parts.
+>      Some small patches have been put into another series as a preparation
+>      see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+>      
+>      *note* : This series of patches relies on the three small patches above.
+> * others
+>   - Drop irq_flags changes.
+>   - Changed patch order.
+> 
+> 
+> v4 -> v5:
+> 
+> * Remove an ugly and useless patch (fix channel number).
+> * Remove the non-standard dma64 driver code, and also remove
+>   the HWIF entries, since the associated custom callbacks no
+>   longer exist.
+> * Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+>   support the multi-DMA-channels controller setup.
+> 
+> See:
+> v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+> v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+> v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+> v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+> 
+> Yanteng Si (14):
+>   net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+>   net: stmmac: Add multi-channel support
+>   net: stmmac: Export dwmac1000_dma_ops
+>   net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size
+>     init
+>   net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+>   net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device
+>     identification
+>   net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+>   net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+>   net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+>   net: stmmac: dwmac-loongson: Introduce PCI device info data
+>   net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+>   net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+>   net: stmmac: dwmac-loongson: Add Loongson GNET support
+>   net: stmmac: dwmac-loongson: Add loongson module author
+> 
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 597 +++++++++++++++---
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   4 +-
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  35 +-
+>  .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  27 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  30 +-
+>  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  19 +-
+>  include/linux/stmmac.h                        |   1 +
+>  12 files changed, 605 insertions(+), 120 deletions(-)
+> 
+> -- 
+> 2.31.4
+> 
 
