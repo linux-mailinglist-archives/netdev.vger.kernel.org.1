@@ -1,113 +1,121 @@
-Return-Path: <netdev+bounces-117087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEA694C98C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:18:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAD794C991
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:19:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79410B235F4
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:18:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04DF91F23C21
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C70166318;
-	Fri,  9 Aug 2024 05:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B160516B75D;
+	Fri,  9 Aug 2024 05:19:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC2A18E25
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 05:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDFC166318
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 05:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723180701; cv=none; b=OHKvxPH4N9PuiwYRvXNb5G+PEUWqXgmVtEL7p1QzPDg2XQsmMSgR+WO/jqw4Becs0rvySfn1KVXAvaaFKkYEgA/e5Kbm7pq39CrowkKWYaiIUvfH4HTQZHswuQ4DYK1+d1uxaUWJS+7q96DLcN03+kiyIwQQkAx8CJqngjF0SDk=
+	t=1723180768; cv=none; b=ryf7ryUzaBpuJHYz9rj9tnAg3zDJKtByhq0AOy1z/r+0Z2WL2FYwuQBBvM6RRnFW5wl2Ph3j0lZDiMw+fM9iGXU4lixGfTYyxgnwR7TlEGB5hMPih3ao/6mpykFLroZ9f7mRgWy6exT/lmocNzqSmoAB8O+LLqv2WeSRo5XFDus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723180701; c=relaxed/simple;
-	bh=JBMg47OQTO2usEseBnYz78pjPbkR6k1Og9xsXbbeIBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXXuV7Rxi+LSubsxpZJS8kzYIm+4TTQnuH6a+pwGg/TbIUUQyEoHPZHncxpCGft1qDAyM03syQdnxWlXsJUX/t0G4Ez5d7YbDNMdIN2Byd8eaADZcqblvkzEDtr1+aIYl2Sow/da0zIGiWl1rIkR5Cq8NdbHgUzoJ0ug2cgHcBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1scI0e-0003CM-CZ; Fri, 09 Aug 2024 07:17:52 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1scI0c-005aez-B5; Fri, 09 Aug 2024 07:17:50 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1scI0c-00AhSk-0j;
-	Fri, 09 Aug 2024 07:17:50 +0200
-Date: Fri, 9 Aug 2024 07:17:50 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the
- PHY framework
-Message-ID: <ZrWmfqtYICzaj-HY@pengutronix.de>
-References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
- <20240808130833.2083875-2-o.rempel@pengutronix.de>
- <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
+	s=arc-20240116; t=1723180768; c=relaxed/simple;
+	bh=WmtGRW23E6H25mY78wpEEdecv8Cvo6e0yeRhQTIWOm4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nZQ9c0+IBpIgMPAO6rle4JLPQu0mDK5TAP9NaBtzuPzgycpKnf3QijDB/BCc94RJHUk6ArhQPecOLUHyXt1/AisfWw/9puFbefPQHLuGTjx7bBHHIlAhSbHdpkF2h02RYabEM/sUlN1m7Vpc10gUSGYIvTJgQt4fCWjpUaJnhg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.3] (ip5f5af7c9.dynamic.kabel-deutschland.de [95.90.247.201])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7F13261E64862;
+	Fri,  9 Aug 2024 07:18:41 +0200 (CEST)
+Message-ID: <08fbb337-d2f1-47a7-871e-3890b34a782f@molgen.mpg.de>
+Date: Fri, 9 Aug 2024 07:18:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next v3 1/8] ice: devlink PF MSI-X max and
+ min parameter
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Jiri Pirko <jiri@resnulli.us>
+Cc: wojciech.drewek@intel.com, marcin.szycik@intel.com,
+ netdev@vger.kernel.org, konrad.knitter@intel.com,
+ pawel.chmielewski@intel.com, intel-wired-lan@lists.osuosl.org,
+ nex.sw.ncis.nat.hpm.dev@intel.com, pio.raczynski@gmail.com,
+ sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
+ przemyslaw.kitszel@intel.com
+References: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
+ <20240808072016.10321-2-michal.swiatkowski@linux.intel.com>
+ <ZrTli6UxMkzE31TH@nanopsycho.orion> <ZrWlfhs6x6hrVhH+@mev-dev.igk.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <ZrWlfhs6x6hrVhH+@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Aug 08, 2024 at 03:54:06PM +0200, Andrew Lunn wrote:
+Dear Michal,
 
-> Please could you give a reference to the exact standard. I think this
-> is "Advanced diagnostic features for 1000BASE-T1 automotive Ethernet
-> PHYs TC12 - advanced PHY features" ?
+
+Thank you for your patch.
+
+Am 09.08.24 um 07:13 schrieb Michal Swiatkowski:
+> On Thu, Aug 08, 2024 at 05:34:35PM +0200, Jiri Pirko wrote:
+>> Thu, Aug 08, 2024 at 09:20:09AM CEST, michal.swiatkowski@linux.intel.com wrote:
+>>> Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+>>> range.
+>>>
+>>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>>> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>>> ---
+>>> .../net/ethernet/intel/ice/devlink/devlink.c  | 56 ++++++++++++++++++-
+>>> drivers/net/ethernet/intel/ice/ice.h          |  8 +++
+>>> drivers/net/ethernet/intel/ice/ice_irq.c      | 14 ++++-
+>>> 3 files changed, 76 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>>> index 29a5f822cb8b..bdc22ea13e0f 100644
+>>> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>>> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>>> @@ -1518,6 +1518,32 @@ static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
+>>> 	return 0;
+>>> }
+>>>
+>>> +static int
+>>> +ice_devlink_msix_max_pf_validate(struct devlink *devlink, u32 id,
+>>> +				 union devlink_param_value val,
+>>> +				 struct netlink_ext_ack *extack)
+>>> +{
+>>> +	if (val.vu16 > ICE_MAX_MSIX) {
+>>> +		NL_SET_ERR_MSG_MOD(extack, "PF max MSI-X is too high");
+>>
+>> No reason to have "PF" in the text. Also, no reason to have "max MSI-X".
+>> That is the name of the param.
 > 
-> The standard seem open, so you could include a URL:
-> 
-> https://opensig.org/wp-content/uploads/2024/03/Advanced_PHY_features_for_automotive_Ethernet_v2.0_fin.pdf
+> Ok, will change both, thanks.
 
-I already started to implement other diagnostic features supported by the
-TI DP83TG720 PHY. For example following can be implemented too:
-6.3 Link quality – start-up time and link losses (LQ)
-6.3.1 Link training time (LTT)
-6.3.2 Local receiver time (LRT)
-6.3.3 Remote receiver time (RRT)
-6.3.4 Link Failures and Losses (LFL)
-6.3.5 Communication ready status (COM)
-6.4 Polarity Detection and Correction (POL)
-6.4.1 Polarity Detection (DET)
-6.4.2 Polarity Correction (COR)
+Maybe also print both values in the error message?
 
-What is the best way to proceed with them? Export them over phy-statistics
-interface or extending the netlink interface?
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+[…]
+
+
+Kind regards,
+
+Paul
 
