@@ -1,130 +1,353 @@
-Return-Path: <netdev+bounces-117184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881A394D021
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:28:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2632E94D035
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 362881F2217B
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:28:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43C081C20F98
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DEB19408B;
-	Fri,  9 Aug 2024 12:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DtwvmRGi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66909194120;
+	Fri,  9 Aug 2024 12:29:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3633A1DFF5
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 12:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F4419308F;
+	Fri,  9 Aug 2024 12:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723206508; cv=none; b=YGrLzF69YeDJYsrxpacPnb2DyTdH6NfVXY6Vvx8jW/3V0n+TMpju7V/csHs9OrvnNeX8YrTmSOkh7qpmQqtcKfdfUK6OwZHKyRNcgb46ahaFyjTkFxhbj6X0Nk+bRBxQggR91wrmS/R0k2y3yxEdMUqd5MGdpklZO9Cc2k16pCA=
+	t=1723206585; cv=none; b=T0pMWJk5NTK3+jLt8eqKBixNK21zCCItsULWbqQFDEVNd8/RxRxePktEOkXrb/cxUhL09dXh+/L7qf+CJmtm68bXi1xYpQWkTqxt3faxnWxj9Jl5gmSgz0oLwYj6aMfiAbVFr5tYw9Tsp2gWkrq6+lmZuPMjOaRf7w9iN4g9rGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723206508; c=relaxed/simple;
-	bh=5BP+4KDV491eS2hTDPWl3HuFqonvue6QF2vMAsmE4yY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oNYls8QeNvYWEnrgr83f+AuaUQJKxYsjg8tf724zdNwqp5OE8i/9XzXqD8HfvzzMgsANYWK/qNmBn24Ldvpl/It/GVPf1hXLA8p3B5CGOcrZUDw5Ki8xlAglw1EjpQV3sS7ELAAZ4Li3cxRu0KVK9p4Mlnls0LB7cp7oJDUZdBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DtwvmRGi; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5a3b866ebc9so2360811a12.3
-        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 05:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723206505; x=1723811305; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5AZK4QEEzfr3VuQ9dg4uACWvhzBvDHYYGEqO0otKoi4=;
-        b=DtwvmRGi44GbEiZQjn8zrgDJVAJR2+UWxcG9QLe0ASXRp6RHcq4J62y9ELlKh889CY
-         Z89OJoy4yUzYbONhaysKarYd/pGI352dlP27+y7tAEOJylwoT1aYufy3hbfTAPlks1iP
-         iIZyvTio0by0A3edYCHyOA77c93BhbJ1kpJYX/ijVRAxvpACSlPxp/l5CWI6S0siwgLO
-         YuNN+jWHxorhHCiXas9XqZzAkDD8KtmpV3XV8OvievOCrjQve9Kuk98TpTPVTgooE3+Y
-         DpL1aQl8596NbBo8jsYvnNn0DdnkGWIzMmseZsow9jYJ+lkW8ViL9NeFOK72cyT7RaVJ
-         at5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723206505; x=1723811305;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5AZK4QEEzfr3VuQ9dg4uACWvhzBvDHYYGEqO0otKoi4=;
-        b=SIC1zoZgA3RbBxYMCw2UF0nJawj/wjHJim4obUhdAPhsCrTvnrA6itsUhS7XWPVV0Q
-         VibLx5/OOr/QY0EZIYbTOJBTTjkjl6PTKwwzu8m5EU3i6sGjIZtSQ0JNjT+UyiJj+7PL
-         yzfeL5/rtYUw28mRZL2mb62albtiC7TnT2LuU/dn3cC/+1hvXThZUtmyuxUhBzQoLSvl
-         0sbzjbJnKZGBQ9nK8NcG3EOjfrNr8dV8ET1wLrf9X+tkdSnvBpNViWoG+MYfI2zkfyDq
-         dg5KldS8ix/MgZbwZfDbvaagZz6r+IkGSxeGYvzqEw31uAB9NZqoC1aQ4OkDoaSELv9z
-         076A==
-X-Forwarded-Encrypted: i=1; AJvYcCVjQhl0TKn6AA4Fe7K3poENsONxbtSAj/VSCN0xB3OQ/gFSzyQss9dKMohJoUOjRD+oLd2a7HX7UEQh0z7MR8Qmgi+OYpF6
-X-Gm-Message-State: AOJu0YwtASL23AmtTmkJYTwOBnpAsIGO7Jv6KRyjbdiTK8g2e0emca3j
-	Tpdn0IUeVJBJyUiVsw4BKj9rw2AgiO7mDxYDZkVuYxR/0QRsSH1WoRygodzjjhQ=
-X-Google-Smtp-Source: AGHT+IFdxwfMOb+uW5xKCVPLH9JUrE4SNICMJefKUZ7G5xbhHBIaa/0KrZwOPjgt/ENPK7SHJZvrnw==
-X-Received: by 2002:a05:6402:909:b0:5a3:64dc:33a5 with SMTP id 4fb4d7f45d1cf-5bd0a568955mr1076316a12.17.1723206505396;
-        Fri, 09 Aug 2024 05:28:25 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bbb2bf8e78sm1478959a12.3.2024.08.09.05.28.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 05:28:24 -0700 (PDT)
-Date: Fri, 9 Aug 2024 15:28:19 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Chas Williams <3chas3@gmail.com>
-Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net-XXX] atm: idt77252: prevent use after free in dequeue_rx()
-Message-ID: <cd0308ff-fda4-405f-9854-6a3a75680da2@stanley.mountain>
+	s=arc-20240116; t=1723206585; c=relaxed/simple;
+	bh=EQZV8zMwMevv2ClA5uQqma5i5T6+kcOtDBi8AaF1GUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=CaD8tyS4gfH6dE64rqldxzZbqgkt4aG7x349FbrL0Uj4bqD5lNILmyeEPRt5Nhd5WmWrRFJ4Hf/q7TVYPcvfD1ILYb5czSkS74iZbZNDReurkA6rJsqWRzJEqE7b6t1P12qPqZUk3q1jPhnMG5QyyId8DPCGpwUXQRnqogjYv1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WgNWZ4mMnz1T6t6;
+	Fri,  9 Aug 2024 20:29:14 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E4DEB140121;
+	Fri,  9 Aug 2024 20:29:37 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 9 Aug 2024 20:29:37 +0800
+Message-ID: <f7b5fde1-b98e-4e6a-af8a-27cc7b7df21e@huawei.com>
+Date: Fri, 9 Aug 2024 20:29:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 01/14] mm: page_frag: add a test module for
+ page_frag
+To: Muhammad Usama Anjum <Usama.Anjum@collabora.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Shuah
+ Khan <shuah@kernel.org>, <linux-mm@kvack.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+ <20240808123714.462740-2-linyunsheng@huawei.com>
+ <0ec39cb0-5213-4468-8e61-2fc349531ae3@collabora.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <0ec39cb0-5213-4468-8e61-2fc349531ae3@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-We can't dereference "skb" after calling vcc->push() because the skb
-is released.
+On 2024/8/9 19:08, Muhammad Usama Anjum wrote:
+> On 8/8/24 5:37 PM, Yunsheng Lin wrote:
+>> The testing is done by ensuring that the fragment allocated
+>> from a frag_frag_cache instance is pushed into a ptr_ring
+>> instance in a kthread binded to a specified cpu, and a kthread
+>> binded to a specified cpu will pop the fragment from the
+>> ptr_ring and free the fragment.
+>>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> ---
+>>  tools/testing/selftests/mm/Makefile           |   2 +
+>>  tools/testing/selftests/mm/page_frag/Makefile |  18 ++
+>>  .../selftests/mm/page_frag/page_frag_test.c   | 170 ++++++++++++++++++
+> Why are you adding a test module in kselftests? Have you considered
+> adding Kunit instead? Kunit is more suited to test kernel's internal
+> APIs which aren't exposed to userspace.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/atm/idt77252.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+The main intent is to do performance impact of changing related to
+page_frag, which is very much performance sensitive, so I am guessing
+Kunit is not a right choice here if I am understanding it correctly.
 
-diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
-index e7f713cd70d3..a876024d8a05 100644
---- a/drivers/atm/idt77252.c
-+++ b/drivers/atm/idt77252.c
-@@ -1118,8 +1118,8 @@ dequeue_rx(struct idt77252_dev *card, struct rsq_entry *rsqe)
- 	rpp->len += skb->len;
- 
- 	if (stat & SAR_RSQE_EPDU) {
-+		unsigned int len, truesize;
- 		unsigned char *l1l2;
--		unsigned int len;
- 
- 		l1l2 = (unsigned char *) ((unsigned long) skb->data + skb->len - 6);
- 
-@@ -1189,14 +1189,15 @@ dequeue_rx(struct idt77252_dev *card, struct rsq_entry *rsqe)
- 		ATM_SKB(skb)->vcc = vcc;
- 		__net_timestamp(skb);
- 
-+		truesize = skb->truesize;
- 		vcc->push(vcc, skb);
- 		atomic_inc(&vcc->stats->rx);
- 
--		if (skb->truesize > SAR_FB_SIZE_3)
-+		if (truesize > SAR_FB_SIZE_3)
- 			add_rx_skb(card, 3, SAR_FB_SIZE_3, 1);
--		else if (skb->truesize > SAR_FB_SIZE_2)
-+		else if (truesize > SAR_FB_SIZE_2)
- 			add_rx_skb(card, 2, SAR_FB_SIZE_2, 1);
--		else if (skb->truesize > SAR_FB_SIZE_1)
-+		else if (truesize > SAR_FB_SIZE_1)
- 			add_rx_skb(card, 1, SAR_FB_SIZE_1, 1);
- 		else
- 			add_rx_skb(card, 0, SAR_FB_SIZE_0, 1);
--- 
-2.43.0
+> 
+>>  tools/testing/selftests/mm/run_vmtests.sh     |   9 +-
+>>  4 files changed, 198 insertions(+), 1 deletion(-)
+>>  create mode 100644 tools/testing/selftests/mm/page_frag/Makefile
+>>  create mode 100644 tools/testing/selftests/mm/page_frag/page_frag_test.c
+>>
+>> diff --git a/tools/testing/selftests/mm/Makefile b/tools/testing/selftests/mm/Makefile
+>> index 901e0d07765b..e91ed29378fc 100644
+>> --- a/tools/testing/selftests/mm/Makefile
+>> +++ b/tools/testing/selftests/mm/Makefile
+>> @@ -36,6 +36,8 @@ MAKEFLAGS += --no-builtin-rules
+>>  CFLAGS = -Wall -I $(top_srcdir) $(EXTRA_CFLAGS) $(KHDR_INCLUDES) $(TOOLS_INCLUDES)
+>>  LDLIBS = -lrt -lpthread -lm
+>>  
+>> +TEST_GEN_MODS_DIR := page_frag
+>> +
+>>  TEST_GEN_FILES = cow
+>>  TEST_GEN_FILES += compaction_test
+>>  TEST_GEN_FILES += gup_longterm
+>> diff --git a/tools/testing/selftests/mm/page_frag/Makefile b/tools/testing/selftests/mm/page_frag/Makefile
+>> new file mode 100644
+>> index 000000000000..58dda74d50a3
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/mm/page_frag/Makefile
+>> @@ -0,0 +1,18 @@
+>> +PAGE_FRAG_TEST_DIR := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+>> +KDIR ?= $(abspath $(PAGE_FRAG_TEST_DIR)/../../../../..)
+>> +
+>> +ifeq ($(V),1)
+>> +Q =
+>> +else
+>> +Q = @
+>> +endif
+>> +
+>> +MODULES = page_frag_test.ko
+>> +
+>> +obj-m += page_frag_test.o
+>> +
+>> +all:
+>> +	+$(Q)make -C $(KDIR) M=$(PAGE_FRAG_TEST_DIR) modules
+>> +
+>> +clean:
+>> +	+$(Q)make -C $(KDIR) M=$(PAGE_FRAG_TEST_DIR) clean
+>> diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+>> new file mode 100644
+>> index 000000000000..0e803db1ad79
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+>> @@ -0,0 +1,170 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +/*
+>> + * Test module for page_frag cache
+>> + *
+>> + * Copyright: linyunsheng@huawei.com
+>> + */
+>> +
+>> +#include <linux/mm.h>
+>> +#include <linux/module.h>
+>> +#include <linux/cpumask.h>
+>> +#include <linux/completion.h>
+>> +#include <linux/ptr_ring.h>
+>> +#include <linux/kthread.h>
+>> +
+>> +static struct ptr_ring ptr_ring;
+>> +static int nr_objs = 512;
+>> +static atomic_t nthreads;
+>> +static struct completion wait;
+>> +static struct page_frag_cache test_frag;
+>> +
+>> +static int nr_test = 5120000;
+>> +module_param(nr_test, int, 0);
+>> +MODULE_PARM_DESC(nr_test, "number of iterations to test");
+>> +
+>> +static bool test_align;
+>> +module_param(test_align, bool, 0);
+>> +MODULE_PARM_DESC(test_align, "use align API for testing");
+>> +
+>> +static int test_alloc_len = 2048;
+>> +module_param(test_alloc_len, int, 0);
+>> +MODULE_PARM_DESC(test_alloc_len, "alloc len for testing");
+>> +
+>> +static int test_push_cpu;
+>> +module_param(test_push_cpu, int, 0);
+>> +MODULE_PARM_DESC(test_push_cpu, "test cpu for pushing fragment");
+>> +
+>> +static int test_pop_cpu;
+>> +module_param(test_pop_cpu, int, 0);
+>> +MODULE_PARM_DESC(test_pop_cpu, "test cpu for popping fragment");
+>> +
+>> +static int page_frag_pop_thread(void *arg)
+>> +{
+>> +	struct ptr_ring *ring = arg;
+>> +	int nr = nr_test;
+>> +
+>> +	pr_info("page_frag pop test thread begins on cpu %d\n",
+>> +		smp_processor_id());
+>> +
+>> +	while (nr > 0) {
+>> +		void *obj = __ptr_ring_consume(ring);
+>> +
+>> +		if (obj) {
+>> +			nr--;
+>> +			page_frag_free(obj);
+>> +		} else {
+>> +			cond_resched();
+>> +		}
+>> +	}
+>> +
+>> +	if (atomic_dec_and_test(&nthreads))
+>> +		complete(&wait);
+>> +
+>> +	pr_info("page_frag pop test thread exits on cpu %d\n",
+>> +		smp_processor_id());
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int page_frag_push_thread(void *arg)
+>> +{
+>> +	struct ptr_ring *ring = arg;
+>> +	int nr = nr_test;
+>> +
+>> +	pr_info("page_frag push test thread begins on cpu %d\n",
+>> +		smp_processor_id());
+>> +
+>> +	while (nr > 0) {
+>> +		void *va;
+>> +		int ret;
+>> +
+>> +		if (test_align) {
+>> +			va = page_frag_alloc_align(&test_frag, test_alloc_len,
+>> +						   GFP_KERNEL, SMP_CACHE_BYTES);
+>> +
+>> +			WARN_ONCE((unsigned long)va & (SMP_CACHE_BYTES - 1),
+>> +				  "unaligned va returned\n");
+>> +		} else {
+>> +			va = page_frag_alloc(&test_frag, test_alloc_len, GFP_KERNEL);
+>> +		}
+>> +
+>> +		if (!va)
+>> +			continue;
+>> +
+>> +		ret = __ptr_ring_produce(ring, va);
+>> +		if (ret) {
+>> +			page_frag_free(va);
+>> +			cond_resched();
+>> +		} else {
+>> +			nr--;
+>> +		}
+>> +	}
+>> +
+>> +	pr_info("page_frag push test thread exits on cpu %d\n",
+>> +		smp_processor_id());
+>> +
+>> +	if (atomic_dec_and_test(&nthreads))
+>> +		complete(&wait);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int __init page_frag_test_init(void)
+>> +{
+>> +	struct task_struct *tsk_push, *tsk_pop;
+>> +	ktime_t start;
+>> +	u64 duration;
+>> +	int ret;
+>> +
+>> +	test_frag.va = NULL;
+>> +	atomic_set(&nthreads, 2);
+>> +	init_completion(&wait);
+>> +
+>> +	if (test_alloc_len > PAGE_SIZE || test_alloc_len <= 0 ||
+>> +	    !cpu_active(test_push_cpu) || !cpu_active(test_pop_cpu))
+>> +		return -EINVAL;
+>> +
+>> +	ret = ptr_ring_init(&ptr_ring, nr_objs, GFP_KERNEL);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	tsk_push = kthread_create_on_cpu(page_frag_push_thread, &ptr_ring,
+>> +					 test_push_cpu, "page_frag_push");
+>> +	if (IS_ERR(tsk_push))
+>> +		return PTR_ERR(tsk_push);
+>> +
+>> +	tsk_pop = kthread_create_on_cpu(page_frag_pop_thread, &ptr_ring,
+>> +					test_pop_cpu, "page_frag_pop");
+>> +	if (IS_ERR(tsk_pop)) {
+>> +		kthread_stop(tsk_push);
+>> +		return PTR_ERR(tsk_pop);
+>> +	}
+>> +
+>> +	start = ktime_get();
+>> +	wake_up_process(tsk_push);
+>> +	wake_up_process(tsk_pop);
+>> +
+>> +	pr_info("waiting for test to complete\n");
+>> +	wait_for_completion(&wait);
+>> +
+>> +	duration = (u64)ktime_us_delta(ktime_get(), start);
+>> +	pr_info("%d of iterations for %s testing took: %lluus\n", nr_test,
+>> +		test_align ? "aligned" : "non-aligned", duration);
+>> +
+>> +	ptr_ring_cleanup(&ptr_ring, NULL);
+>> +	page_frag_cache_drain(&test_frag);
+>> +
+>> +	return -EAGAIN;
+>> +}
+>> +
+>> +static void __exit page_frag_test_exit(void)
+>> +{
+>> +}
+>> +
+>> +module_init(page_frag_test_init);
+>> +module_exit(page_frag_test_exit);
+>> +
+>> +MODULE_LICENSE("GPL");
+>> +MODULE_AUTHOR("Yunsheng Lin <linyunsheng@huawei.com>");
+>> +MODULE_DESCRIPTION("Test module for page_frag");
+>> diff --git a/tools/testing/selftests/mm/run_vmtests.sh b/tools/testing/selftests/mm/run_vmtests.sh
+>> index 03ac4f2e1cce..3636d984b786 100755
+>> --- a/tools/testing/selftests/mm/run_vmtests.sh
+>> +++ b/tools/testing/selftests/mm/run_vmtests.sh
+>> @@ -75,6 +75,8 @@ separated by spaces:
+>>  	read-only VMAs
+>>  - mdwe
+>>  	test prctl(PR_SET_MDWE, ...)
+>> +- page_frag
+>> +	test handling of page fragment allocation and freeing
+>>  
+>>  example: ./run_vmtests.sh -t "hmm mmap ksm"
+>>  EOF
+>> @@ -231,7 +233,8 @@ run_test() {
+>>  		("$@" 2>&1) | tap_prefix
+>>  		local ret=${PIPESTATUS[0]}
+>>  		count_total=$(( count_total + 1 ))
+>> -		if [ $ret -eq 0 ]; then
+>> +		# page_frag_test.ko returns 11(EAGAIN) when insmod'ing to avoid rmmod
+>> +		if [ $ret -eq 0 ] | [ $ret -eq 11 -a ${CATEGORY} == "page_frag" ]; then
+>>  			count_pass=$(( count_pass + 1 ))
+>>  			echo "[PASS]" | tap_prefix
+>>  			echo "ok ${count_total} ${test}" | tap_output
+>> @@ -453,6 +456,10 @@ CATEGORY="mkdirty" run_test ./mkdirty
+>>  
+>>  CATEGORY="mdwe" run_test ./mdwe_test
+>>  
+>> +CATEGORY="page_frag" run_test insmod ./page_frag/page_frag_test.ko
+>> +
+>> +CATEGORY="page_frag" run_test insmod ./page_frag/page_frag_test.ko test_alloc_len=12 test_align=1
+>> +
+> You are loading the test module. How will we verify if the test passed
+> or failed? There must be a way to mark the test passed or failed after
 
+I am not sure that matter that much for page_frag_test module as it
+already return -EAGAIN for normal case as mentioned in:
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20240731124505.2903877-2-linyunsheng@huawei.com/#25960885
+
+> running it. You can definitely parse the dmesg to get results. But it
+> would be complex to do it. KUnit is way to go as all such tools are
+> already present there.
 
