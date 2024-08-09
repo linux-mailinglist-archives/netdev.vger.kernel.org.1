@@ -1,73 +1,71 @@
-Return-Path: <netdev+bounces-117324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9DD94D952
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:55:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B12C94D953
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42825B21A4F
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:55:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C941C20C9C
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5465B16D4D6;
-	Fri,  9 Aug 2024 23:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3181716D4FA;
+	Fri,  9 Aug 2024 23:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PI8b2B1r"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uLkdQN0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83B016B381
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E71616D4FB
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723247739; cv=none; b=clwBHOeJeNqA8KJpgvZfkthxxdqh76opT1bZSY9orfXZBAGLs0FK7+xlyrf9iDdntM5Xv/H9ApTX9MOVWeUTlvTL+oYrXn6sWkLrik2kY0OYjxnCN6ganRFpSj6xdwuvP/msfjYHRBfm2XOUzAclHVVWLcKvUbQ5wwmUvlZ/EnU=
+	t=1723247764; cv=none; b=I6yDVAaGPfb3F0+62i04tiu36RYy0MqG3nyG0rRCChc5kHL70z91RXzeOJc+xNsavqIX404eNViHzmNgjnc70BHWSQGIQtl+LqqAcPEjQKT0y7PIYaRsChY157bNuRp7HFpIsJF+Ii8C0faqEd7z5LXHrDd8fDBfS44EXy/pjSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723247739; c=relaxed/simple;
-	bh=GuS0yFhxPQXy+ME1cyTBPYnTSSvm9aIkUUr0rMECVW0=;
+	s=arc-20240116; t=1723247764; c=relaxed/simple;
+	bh=5WdufGY5aAUlFDNyCF4nwcDqk8SRbOsJDESG0eGJTVI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+zHncYj8wjRwUeykYRVdp+A5s/AoOBDE1wc6RIp3xIe/CBOFg0tn1myinwpyBfKoogXdUrm0yvy1IG1ZO6jlRFQNepBv8pSnHvnjN7C/EFPhmt7MCBdaAy/KlE5qAq5/v0RAZwj0CG0xkTiGGeGNwwRsJatmRe3E4qGYPWtrDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PI8b2B1r; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=FTEoW0+TY1U2SSo0haquVlqOW7BlCrQSkY7VDxm8ym50keFOWCYaM9xI9SaJ78oOQdjNgb4WrtPZkbOOKz/cFsQbOTXnJ4p1NcjK3ZpS9yHIsaPjPi+MPY/ej/TbA407/vQ1NcksPoEdsqYQiFBzy5aCkl2YQqzKBojlJFu52fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uLkdQN0J; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723247738; x=1754783738;
+  t=1723247763; x=1754783763;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ycHMY+zdhO4Vj9Dizb3zkIWvaHW7Rh/A1UQcuQ5lSno=;
-  b=PI8b2B1rsOv9RMuVMKtJ6xgbM2cfZW1D9iNJgpQVeu13YsB3HgMSwuLb
-   aUxQcJGfENTGe9c1WhqAfXW67PbYMengDkuOwhqnkVVN0SysxOWtsrvio
-   7sYAMDf/yPCrEwh8g6v/ytpsNtcKZ/2psWiZm1GLvS5T1mb/pLzlGer+y
-   Q=;
+  bh=nZ5oQlmFDPhL7qojrnZLQOI/0NrEB6zGvvH7SY/Qq/A=;
+  b=uLkdQN0JCJJ5wopRQ0VwkyGmYMkBQVuJdIJZ44vfuTeipsFikYxRtoL1
+   HzncEnOmqX16tkJW7OQ8Ba9qKBrc1qhBZBFBWlqwQdrDTfbtWHX2sLuud
+   F/I1ery+/loN1lY+lRxaeEdneSWukbzPqq4YfuoVOn+jBSsay/mpBm19E
+   g=;
 X-IronPort-AV: E=Sophos;i="6.09,277,1716249600"; 
-   d="scan'208";a="18103379"
+   d="scan'208";a="420427493"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 23:55:34 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:53265]
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 23:56:00 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:23563]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.16:2525] with esmtp (Farcaster)
- id 0e648992-f3bf-4dd7-b4ca-accc58bbfaff; Fri, 9 Aug 2024 23:55:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 0e648992-f3bf-4dd7-b4ca-accc58bbfaff
+ id c03be7dd-b1ee-4000-9c9f-54bcd2718c08; Fri, 9 Aug 2024 23:55:57 +0000 (UTC)
+X-Farcaster-Flow-ID: c03be7dd-b1ee-4000-9c9f-54bcd2718c08
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:55:33 +0000
+ Fri, 9 Aug 2024 23:55:57 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:55:30 +0000
+ Fri, 9 Aug 2024 23:55:54 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Manish Chopra
-	<manishc@marvell.com>, Rahul Verma <rahulv@marvell.com>,
-	<PGR-Linux-NIC-Dev@marvell.com>
-Subject: [PATCH v1 net-next 3/5] ipv4: Remove redundant !ifa->ifa_dev check.
-Date: Fri, 9 Aug 2024 16:54:04 -0700
-Message-ID: <20240809235406.50187-4-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 4/5] ipv4: Initialise ifa->hash in inet_alloc_ifa().
+Date: Fri, 9 Aug 2024 16:54:05 -0700
+Message-ID: <20240809235406.50187-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240809235406.50187-1-kuniyu@amazon.com>
 References: <20240809235406.50187-1-kuniyu@amazon.com>
@@ -79,75 +77,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
+X-ClientProxiedBy: EX19D039UWA001.ant.amazon.com (10.13.139.110) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Now, ifa_dev is only set in inet_alloc_ifa() and never
-NULL after ifa gets visible.
+Whenever ifa is allocated, we call INIT_HLIST_NODE(&ifa->hash).
 
-Let's remove the unneeded NULL check for ifa->ifa_dev.
+Let's move it to inet_alloc_ifa().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-CC: Manish Chopra <manishc@marvell.com>
-CC: Rahul Verma <rahulv@marvell.com>
-CC: PGR-Linux-NIC-Dev@marvell.com
----
- drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c | 5 ++---
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c     | 2 +-
- net/ipv4/devinet.c                                   | 3 +--
- 3 files changed, 4 insertions(+), 6 deletions(-)
+ net/ipv4/devinet.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c b/drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c
-index ed24d6af7487..9cff0a8ffb2c 100644
---- a/drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c
-+++ b/drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c
-@@ -3185,8 +3185,7 @@ netxen_list_config_ip(struct netxen_adapter *adapter,
- 	struct list_head *head;
- 	bool ret = false;
- 
--	dev = ifa->ifa_dev ? ifa->ifa_dev->dev : NULL;
--
-+	dev = ifa->ifa_dev->dev;
- 	if (dev == NULL)
- 		goto out;
- 
-@@ -3379,7 +3378,7 @@ netxen_inetaddr_event(struct notifier_block *this,
- 	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
- 	unsigned long ip_event;
- 
--	dev = ifa->ifa_dev ? ifa->ifa_dev->dev : NULL;
-+	dev = ifa->ifa_dev->dev;
- 	ip_event = (event == NETDEV_UP) ? NX_IP_UP : NX_IP_DOWN;
- recheck:
- 	if (dev == NULL)
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-index 90df4a0909fa..b3588a1ebc25 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
-@@ -4146,7 +4146,7 @@ qlcnic_inetaddr_event(struct notifier_block *this,
- 
- 	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
- 
--	dev = ifa->ifa_dev ? ifa->ifa_dev->dev : NULL;
-+	dev = ifa->ifa_dev->dev;
- 
- recheck:
- 	if (dev == NULL)
 diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 9f4add07e67d..baf036bfad76 100644
+index baf036bfad76..b5d2a9fd46c7 100644
 --- a/net/ipv4/devinet.c
 +++ b/net/ipv4/devinet.c
-@@ -234,8 +234,7 @@ static void inet_rcu_free_ifa(struct rcu_head *head)
- {
- 	struct in_ifaddr *ifa = container_of(head, struct in_ifaddr, rcu_head);
+@@ -227,6 +227,8 @@ static struct in_ifaddr *inet_alloc_ifa(struct in_device *in_dev)
+ 	in_dev_hold(in_dev);
+ 	ifa->ifa_dev = in_dev;
  
--	if (ifa->ifa_dev)
--		in_dev_put(ifa->ifa_dev);
-+	in_dev_put(ifa->ifa_dev);
- 	kfree(ifa);
++	INIT_HLIST_NODE(&ifa->hash);
++
+ 	return ifa;
  }
  
+@@ -889,7 +891,6 @@ static struct in_ifaddr *rtm_to_ifaddr(struct net *net, struct nlmsghdr *nlh,
+ 	if (!tb[IFA_ADDRESS])
+ 		tb[IFA_ADDRESS] = tb[IFA_LOCAL];
+ 
+-	INIT_HLIST_NODE(&ifa->hash);
+ 	ifa->ifa_prefixlen = ifm->ifa_prefixlen;
+ 	ifa->ifa_mask = inet_make_mask(ifm->ifa_prefixlen);
+ 	ifa->ifa_flags = tb[IFA_FLAGS] ? nla_get_u32(tb[IFA_FLAGS]) :
+@@ -1186,7 +1187,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
+ 			ifa = inet_alloc_ifa(in_dev);
+ 			if (!ifa)
+ 				break;
+-			INIT_HLIST_NODE(&ifa->hash);
++
+ 			if (colon)
+ 				memcpy(ifa->ifa_label, ifr->ifr_name, IFNAMSIZ);
+ 			else
+@@ -1588,7 +1589,6 @@ static int inetdev_event(struct notifier_block *this, unsigned long event,
+ 			struct in_ifaddr *ifa = inet_alloc_ifa(in_dev);
+ 
+ 			if (ifa) {
+-				INIT_HLIST_NODE(&ifa->hash);
+ 				ifa->ifa_local =
+ 				  ifa->ifa_address = htonl(INADDR_LOOPBACK);
+ 				ifa->ifa_prefixlen = 8;
 -- 
 2.30.2
 
