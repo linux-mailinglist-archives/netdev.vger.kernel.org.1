@@ -1,208 +1,279 @@
-Return-Path: <netdev+bounces-117192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500DD94D075
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:46:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A5294D078
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08170283CC0
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:46:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 444DFB20DD8
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E25194A40;
-	Fri,  9 Aug 2024 12:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFED197531;
+	Fri,  9 Aug 2024 12:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B43jrcsz"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="mlFAfdfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A4B19412C
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 12:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDEF1946B5;
+	Fri,  9 Aug 2024 12:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723207543; cv=none; b=PVnmqokKyUzae7AsK2Xc4eIi0aD0J2KZ2musbCFN9lWSXp5QVIobRA5sJsl+zXghqCd7SLD+nOczcwNmQADbWmtyXa/IoXYvz/9uM4Mbco1Fw2H+fFbTzcRpx0Gtjxz6sF8R83jHf2uGE+SZphS9yEYqPFcETuRym7DVLYI8JBI=
+	t=1723207546; cv=none; b=rhrwcie6F0I/f4+W/WIxJC/1tON53+QQ+CqS5FBDJfOfRQV0mC6gcbtgodDHX5b7liFDNgRPuweU5taN9qp4ZCc3fpXYN4hQqOfE8RUV99hFuR0Vbdm36dSFoIEgIVpReS7gTF3lZtqFF/WFGCZhoo78RdnZp9Wtx0LMhv6+ZrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723207543; c=relaxed/simple;
-	bh=OHsMxJbHlfzLzzFLnyU1QGANT9Y8RpTv5K2L8dxIoSE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PP9q3DgcFYRWbbkhGL5xcQaiym4vew6sipvZgPBtx4X/nK6bBTQmQdaFq/8Zvo0pJcvJQgRECQfwTcSZLOLVgW/m10mQZZRviG8rmk4PvNEhdkSEk73aX+Wm6NUGV0BR0jAlu3KcDBDA9+MWS1i5RwfkoFx+CE/V4evBVStySpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B43jrcsz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723207540;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bDR1PreyBYXGgczYYRhC/utTNT8xvL5WwhzEE5DaLg4=;
-	b=B43jrcszpK6BbHxOWX7rcgHl+4uMh4DJMbSJfevfjq+sUwriDX59nPEqjOyPnvNF7drNnR
-	cVDXGH4stz6mClkiKBROmTVT3ZQvK4tZBfsXdODAf9jN4VF3o4IbiyLslOraoazGtkIjOf
-	o6i3HwWEQIyGefJduELBu0+MOLEQ8ok=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-68-BazqmvJRNFewppFxcXewaQ-1; Fri, 09 Aug 2024 08:45:39 -0400
-X-MC-Unique: BazqmvJRNFewppFxcXewaQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4281ca9f4dbso15546635e9.0
-        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 05:45:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723207538; x=1723812338;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDR1PreyBYXGgczYYRhC/utTNT8xvL5WwhzEE5DaLg4=;
-        b=h0XyzbN6RFJjI/bMS74rJbqcak2DsUIEymeBHwww9iKcS/d/NPby/B0E5QhFs1U5Yg
-         Yq87IgnILXIIqMbG3fKWvcTZTu3TqgqJ3P5tYuRQWeDJo/MFzwmiF7Hadzs7NpS1wzy1
-         bAXnJHRsh2tdTlRGLfh9ov0/A5Kn5Mo7Pdqg8rvHoQmRk6iSLQmvt5nGRjXM0HjuUHm5
-         FqObJ3CoLwJOAUqGZ77qdPsOMYBhwF8kwFPUiMgLtDn4Q5i8bwvA+5dASxoAxVWVU2oy
-         r6RcOwixtRldY40RtT4VNUpIb2r5VhwZSNsl0Dtep/lEAYpToFduSCfoj9eS0pv2QFvy
-         9i7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWE1uw8BxDMJBgAvB4QtWvXe27kH6hV/hBF/KF2al0Wq3Pp6jFim/iXmcXNiQPwr02qAnbqV5ascwGdkIFPWT4X6WybyQKB
-X-Gm-Message-State: AOJu0Ywo9yeIPA2k46LfDgb18V8Xtx/Zn3PbOgWdWhNGVzn7SBaGwVbl
-	1jYVFUY6uMV3OqkLrbMIH547spNeokCjrcwY0eEC2v1MbdpJa5+0UHQqdT0CusC0k2ozFqiOFAC
-	Wv0AuunmxbWaNP2Z0DckqvxLWz30ghF7ulE8nQF5h3KAKRznWZKpOcQ==
-X-Received: by 2002:a05:600c:4e91:b0:428:1799:35e3 with SMTP id 5b1f17b1804b1-429c3a28d5dmr10716115e9.21.1723207537738;
-        Fri, 09 Aug 2024 05:45:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEiZUexO1DxZTYudFFvKsUA1By+NJF96m1YQZNLJ7cfOIryu3poJzd7dWE4i1OcJvheN6NR3g==
-X-Received: by 2002:a05:600c:4e91:b0:428:1799:35e3 with SMTP id 5b1f17b1804b1-429c3a28d5dmr10715775e9.21.1723207537234;
-        Fri, 09 Aug 2024 05:45:37 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429059cd2b3sm126267855e9.44.2024.08.09.05.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 05:45:36 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 240EF14ADA65; Fri, 09 Aug 2024 14:45:33 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Daniel Xu <dxu@dxuuu.xyz>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Alexander Lobakin
- <alexandr.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Larysa Zaremba <larysa.zaremba@intel.com>, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, John Fastabend <john.fastabend@gmail.com>,
- Yajun Deng <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
-Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch
- to GRO from netif_receive_skb_list()
-In-Reply-To: <99662019-7e9b-410d-99fe-a85d04af215c@intel.com>
-References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
- <20220628194812.1453059-33-alexandr.lobakin@intel.com>
- <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
- <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
- <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
- <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
- <99662019-7e9b-410d-99fe-a85d04af215c@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 09 Aug 2024 14:45:33 +0200
-Message-ID: <875xs9q2z6.fsf@toke.dk>
+	s=arc-20240116; t=1723207546; c=relaxed/simple;
+	bh=Trcqj4P9tk1i1V9qr1YFG4yl53DMu6W2JO1hq+qEC5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LrFh8vnxNnXHebiYdPEYdkE09mZFJBzjzq5sEkJQL+oOsUFWOhePCFa+w4r62ZX0KiXW/AwSCGN3y5bGzRS6FpHqzbY3AtCuS893hSW7IvtUlbFVEEgQaK1JHLHIXRvS3/wl56lA2Y2TcKVDtNmSHwBAKyR6iQYvKX7y5AwegLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=mlFAfdfh; arc=none smtp.client-ip=185.125.25.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WgNtX5XJxzT3d;
+	Fri,  9 Aug 2024 14:45:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1723207540;
+	bh=20glFXAeQ4aDIox+dfGLIPtIyZEgMytK3bDO6kau5xM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mlFAfdfhxjNPQIMbRpN7tgGvUM+YZM/d15b2H9+8dQFYr5nZp5QMm/iPwkird+NxJ
+	 Xj37u98f2wumczOBFZTw+UAfESl5iWFiVwc6PUJ4lrGA9iYfxUchZFm10xUmcxESwB
+	 Jy1ehp3U82//kDQmZfTpi9y6iYDY1xrjtzGZ1whE=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WgNtX0rjKzd3G;
+	Fri,  9 Aug 2024 14:45:40 +0200 (CEST)
+Date: Fri, 9 Aug 2024 14:45:35 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Jann Horn <jannh@google.com>
+Cc: Tahera Fahimi <fahimitahera@gmail.com>, outreachy@lists.linux.dev, 
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] Landlock: Add signal control
+Message-ID: <20240809.Ieng6cheumo9@digikod.net>
+References: <49557e48c1904d2966b8aa563215d2e1733dad95.1722966592.git.fahimitahera@gmail.com>
+ <CAG48ez3o9fmqz5FkFh3YoJs_jMdtDq=Jjj-qMj7v=CxFROq+Ew@mail.gmail.com>
+ <CAG48ez1jufy8iwP=+DDY662veqBdv9VbMxJ69Ohwt8Tns9afOw@mail.gmail.com>
+ <20240807.Yee4al2lahCo@digikod.net>
+ <ZrQE+d2b/FWxIPoA@tahera-OptiPlex-5000>
+ <CAG48ez1q80onUxoDrFFvGmoWzOhjRaXzYpu+e8kNAHzPADvAAg@mail.gmail.com>
+ <20240808.kaiyaeZoo1ha@digikod.net>
+ <CAG48ez34C2pv7qugcYHeZgp5P=hOLyk4p5RRgKwhU5OA4Dcnuw@mail.gmail.com>
+ <20240809.eejeekoo4Quo@digikod.net>
+ <20240809.soh6aeCeeRiu@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240809.soh6aeCeeRiu@digikod.net>
+X-Infomaniak-Routing: alpha
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+On Fri, Aug 09, 2024 at 02:40:17PM +0200, Mickaël Salaün wrote:
+> On Fri, Aug 09, 2024 at 12:59:48PM +0200, Mickaël Salaün wrote:
+> > On Thu, Aug 08, 2024 at 04:42:23PM +0200, Jann Horn wrote:
+> > > On Thu, Aug 8, 2024 at 4:09 PM Mickaël Salaün <mic@digikod.net> wrote:
+> > > > On Thu, Aug 08, 2024 at 03:10:54AM +0200, Jann Horn wrote:
+> > > > > On Thu, Aug 8, 2024 at 1:36 AM Tahera Fahimi <fahimitahera@gmail.com> wrote:
+> > > > > > On Wed, Aug 07, 2024 at 08:16:47PM +0200, Mickaël Salaün wrote:
+> > > > > > > On Tue, Aug 06, 2024 at 11:55:27PM +0200, Jann Horn wrote:
+> > > > > > > > On Tue, Aug 6, 2024 at 8:56 PM Jann Horn <jannh@google.com> wrote:
+> > > > > > > > > On Tue, Aug 6, 2024 at 8:11 PM Tahera Fahimi <fahimitahera@gmail.com> wrote:
+> > > > > > > > > > Currently, a sandbox process is not restricted to send a signal
+> > > > > > > > > > (e.g. SIGKILL) to a process outside of the sandbox environment.
+> > > > > > > > > > Ability to sending a signal for a sandboxed process should be
+> > > > > > > > > > scoped the same way abstract unix sockets are scoped. Therefore,
+> > > > > > > > > > we extend "scoped" field in a ruleset with
+> > > > > > > > > > "LANDLOCK_SCOPED_SIGNAL" to specify that a ruleset will deny
+> > > > > > > > > > sending any signal from within a sandbox process to its
+> > > > > > > > > > parent(i.e. any parent sandbox or non-sandboxed procsses).
+> > > > > > > > [...]
+> > > > > > > > > > +       if (is_scoped)
+> > > > > > > > > > +               return 0;
+> > > > > > > > > > +
+> > > > > > > > > > +       return -EPERM;
+> > > > > > > > > > +}
+> > > > > > > > > > +
+> > > > > > > > > > +static int hook_file_send_sigiotask(struct task_struct *tsk,
+> > > > > > > > > > +                                   struct fown_struct *fown, int signum)
+> > > > > > >
+> > > > > > > I was wondering if we should handle this case, but I guess it makes
+> > > > > > > sense to have a consistent policy for all kind of user-triggerable
+> > > > > > > signals.
+> > > > > > >
+> > > > > > > > > > +{
+> > > > > > > > > > +       bool is_scoped;
+> > > > > > > > > > +       const struct landlock_ruleset *dom, *target_dom;
+> > > > > > > > > > +       struct task_struct *result = get_pid_task(fown->pid, fown->pid_type);
+> > > > > > > > >
+> > > > > > > > > I'm not an expert on how the fowner stuff works, but I think this will
+> > > > > > > > > probably give you "result = NULL" if the file owner PID has already
+> > > > > > > > > exited, and then the following landlock_get_task_domain() would
+> > > > > > > > > probably crash? But I'm not entirely sure about how this works.
+> > > > > > > > >
+> > > > > > > > > I think the intended way to use this hook would be to instead use the
+> > > > > > > > > "file_set_fowner" hook to record the owning domain (though the setup
+> > > > > > > > > for that is going to be kind of a pain...), see the Smack and SELinux
+> > > > > > > > > definitions of that hook. Or alternatively maybe it would be even
+> > > > > > > > > nicer to change the fown_struct to record a cred* instead of a uid and
+> > > > > > > > > euid and then use the domain from those credentials for this hook...
+> > > > > > > > > I'm not sure which of those would be easier.
+> > > > > > > >
+> > > > > > > > (For what it's worth, I think the first option would probably be
+> > > > > > > > easier to implement and ship for now, since you can basically copy
+> > > > > > > > what Smack and SELinux are already doing in their implementations of
+> > > > > > > > these hooks. I think the second option would theoretically result in
+> > > > > > > > nicer code, but it might require a bit more work, and you'd have to
+> > > > > > > > include the maintainers of the file locking code in the review of such
+> > > > > > > > refactoring and have them approve those changes. So if you want to get
+> > > > > > > > this patchset into the kernel quickly, the first option might be
+> > > > > > > > better for now?)
+> > > > > > > >
+> > > > > > >
+> > > > > > > I agree, let's extend landlock_file_security with a new "fown" pointer
+> > > > > > > to a Landlock domain. We'll need to call landlock_get_ruleset() in
+> > > > > > > hook_file_send_sigiotask(), and landlock_put_ruleset() in a new
+> > > > > > > hook_file_free_security().
+> > > > > > I think we should add a new hook (hook_file_set_owner()) to initialize
+> > > > > > the "fown" pointer and call landlock_get_ruleset() in that?
+> > > > >
+> > > > > Yeah. Initialize the pointer in the file_set_fowner hook, and read the
+> > > > > pointer in the file_send_sigiotask hook.
+> > > > >
+> > > > > Note that in the file_set_fowner hook, you'll probably need to use
+> > > > > both landlock_get_ruleset() (to take a reference on the ruleset you're
+> > > > > storing in the fown pointer) and landlock_put_ruleset() (to drop the
+> > > > > reference to the ruleset that the fown pointer was pointing to
+> > > > > before). And you'll need to use some kind of lock to protect the fown
+> > > > > pointer - either by adding an appropriate lock next to your fown
+> > > > > pointer or by using some appropriate existing lock in "struct file".
+> > > > > Probably it's cleanest to have your own lock for this? (This lock will
+> > > > > have to be something like a spinlock, not a mutex, since you need to
+> > > > > be able to acquire it in the file_set_fowner hook, which runs inside
+> > > > > an RCU read-side critical section, where sleeping is forbidden -
+> > > > > acquiring a mutex can sleep and therefore is forbidden in this
+> > > > > context, acquiring a spinlock can't sleep.)
+> > > >
+> > > > Yes, I think this should work for file_set_fowner:
+> > > >
+> > > > struct landlock_ruleset *prev_dom, *new_dom;
+> > > >
+> > > > new_dom = landlock_get_current_domain();
+> > > > landlock_get_ruleset(new_dom);
+> > > >
+> > > > /* Cf. f_modown() */
+> > > > write_lock_irq(&filp->f_owner.lock);
+> > > > prev_dom = rcu_replace_pointer(&landlock_file(file)->fown_domain,
+> > > >         new_dom, lockdep_is_held(&filp->f_owner.lock));
+> > > > write_unlock_irq(&filp->f_owner.lock);
+> > > >
+> > > > landlock_put_ruleset_rcu(prev_dom);
+> > > >
+> > > >
+> > > > With landlock_put_ruleset_rcu() define with this:
+> > > >
+> > > > diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+> > > > index a93bdbf52fff..897116205520 100644
+> > > > --- a/security/landlock/ruleset.c
+> > > > +++ b/security/landlock/ruleset.c
+> > > > @@ -524,6 +524,20 @@ void landlock_put_ruleset_deferred(struct landlock_ruleset *const ruleset)
+> > > >         }
+> > > >  }
+> > > >
+> > > > +static void free_ruleset_rcu(struct rcu_head *const head)
+> > > > +{
+> > > > +       struct landlock_ruleset *ruleset;
+> > > > +
+> > > > +       ruleset = container_of(head, struct landlock_ruleset, rcu);
+> > > > +       free_ruleset(ruleset);
+> > > > +}
+> > > 
+> > > free_ruleset() can block but RCU callbacks aren't allowed to block,
+> > > that's why landlock_put_ruleset_deferred() exists.
+> > 
+> > Yes, but landlock_put_ruleset_deferred() doesn't wait for RCU read-side
+> > critical sections.
+> > 
+> > > 
+> > > > +
+> > > > +void landlock_put_ruleset_rcu(struct landlock_ruleset *const ruleset)
+> > > > +{
+> > > > +       if (ruleset && refcount_dec_and_test(&ruleset->usage))
+> > > > +               call_rcu(&ruleset->rcu, free_ruleset_rcu);
+> > > > +}
+> > > 
+> > > No, this pattern of combining refcounting and RCU doesn't work.
+> > > 
+> > > One legal pattern is:
+> > > *The entire object* is subject to RCU; any refcount decrement that
+> > > drops the refcount to 0 does call_rcu().
+> > > (This is the usual RCU refcounting pattern in the kernel.)
+> > > 
+> > > Another legal pattern is:
+> > > One particular *reference* is subject to RCU; when dropping this
+> > > reference, *the refcount decrement is delayed with call_rcu()*.
+> > > (This is basically the RCU pattern used for stuff like the reference
+> > > from "struct pid" to "struct task_struct".)
+> > > 
+> > > But you can't use call_rcu() depending on whether the last dropped
+> > > reference happened to be a reference that required RCU; what if the
+> > > refcount is 2, then you first call landlock_put_ruleset_rcu() which
+> > > decrements the refcount to 1, and immediately afterwards you call
+> > > landlock_put_ruleset() which drops the refcount to 0 and frees the
+> > > object without waiting for an RCU grace period? Like so:
+> > > 
+> > > thread A         thread B
+> > > ========         ========
+> > > rcu_read_lock()
+> > > ruleset = rcu_dereference(...->fown_domain)
+> > >                  ruleset = rcu_replace_pointer(...->fown_domain, new_dom, ...)
+> > >                  landlock_put_ruleset_rcu(ruleset)
+> > >                  landlock_put_ruleset(ruleset)
+> > >                    free_ruleset(ruleset)
+> > >                      kfree(ruleset)
+> > > access ruleset [UAF]
+> > > rcu_read_unlock()
+> > 
+> > Indeed
+> > 
+> > > 
+> > > So if you want to use RCU lifetime for this, I think you'll have to
+> > > turn landlock_put_ruleset() and landlock_put_ruleset_deferred() into
+> > > one common function that always, when reaching refcount 0, schedules
+> > > an RCU callback which then schedules a work_struct which then does
+> > > free_ruleset().
+> > > 
+> > > I think that would be a little ugly, and it would look nicer to just
+> > > use normal locking in the file_send_sigiotask hook?
+> > 
+> > I don't see how we can do that without delaying the free_ruleset() call
+> > to after the RCU read-side critical section in f_setown().
+> > 
+> > What about calling refcount_dec_and_test() in free_ruleset_rcu()?  That
+> > would almost always queue this call but it looks safe.
+> 
+> That's the second pattern you pointed out just above.  Because we should
+> only use the related struct rcu_head for this call site (which is
+> protected with f_owner.lock), we should make that explicit with a
+> "_fown" suffix for the function (landlock_put_ruleset_rcu_fown) and the
+> ruleset's field (rcu_fown).
 
-> From: Daniel Xu <dxu@dxuuu.xyz>
-> Date: Thu, 08 Aug 2024 16:52:51 -0400
->
->> Hi,
->> 
->> On Thu, Aug 8, 2024, at 7:57 AM, Alexander Lobakin wrote:
->>> From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
->>> Date: Thu, 8 Aug 2024 06:54:06 +0200
->>>
->>>>> Hi Alexander,
->>>>>
->>>>> On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
->>>>>> cpumap has its own BH context based on kthread. It has a sane batch
->>>>>> size of 8 frames per one cycle.
->>>>>> GRO can be used on its own, adjust cpumap calls to the
->>>>>> upper stack to use GRO API instead of netif_receive_skb_list() which
->>>>>> processes skbs by batches, but doesn't involve GRO layer at all.
->>>>>> It is most beneficial when a NIC which frame come from is XDP
->>>>>> generic metadata-enabled, but in plenty of tests GRO performs better
->>>>>> than listed receiving even given that it has to calculate full frame
->>>>>> checksums on CPU.
->>>>>> As GRO passes the skbs to the upper stack in the batches of
->>>>>> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
->>>>>> device where the frame comes from, it is enough to disable GRO
->>>>>> netdev feature on it to completely restore the original behaviour:
->>>>>> untouched frames will be being bulked and passed to the upper stack
->>>>>> by 8, as it was with netif_receive_skb_list().
->>>>>>
->>>>>> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
->>>>>> ---
->>>>>>  kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->>>>>>  1 file changed, 38 insertions(+), 5 deletions(-)
->>>>>>
->>>>>
->>>>> AFAICT the cpumap + GRO is a good standalone improvement. I think
->>>>> cpumap is still missing this.
->>>
->>> The only concern for having GRO in cpumap without metadata from the NIC
->>> descriptor was that when the checksum status is missing, GRO calculates
->>> the checksum on CPU, which is not really fast.
->>> But I remember sometimes GRO was faster despite that.
->> 
->> Good to know, thanks. IIUC some kind of XDP hint support landed already?
->> 
->> My use case could also use HW RSS hash to avoid a rehash in XDP prog.
->
-> Unfortunately, for now it's impossible to get HW metadata such as RSS
-> hash and checksum status in cpumap. They're implemented via kfuncs
-> specific to a particular netdevice and this info is available only when
-> running XDP prog.
->
-> But I think one solution could be:
->
-> 1. We create some generic structure for cpumap, like
->
-> struct cpumap_meta {
-> 	u32 magic;
-> 	u32 hash;
-> }
->
-> 2. We add such check in the cpumap code
->
-> 	if (xdpf->metalen == sizeof(struct cpumap_meta) &&
-> 	    <here we check magic>)
-> 		skb->hash = meta->hash;
->
-> 3. In XDP prog, you call Rx hints kfuncs when they're available, obtain
-> RSS hash and then put it in the struct cpumap_meta as XDP frame metadata.
+Hmm, this is not enough because this function site could still be called
+with the same ruleset several time, which could lead to memory leak and
+potential rcu_head pointers inconsistencies...
 
-Yes, except don't make this cpumap-specific, make it generic for kernel
-consumption of the metadata. That way it doesn't even have to be stored
-in the xdp metadata area, it can be anywhere we want (and hence not
-subject to ABI issues), and we can use it for skb creation after
-redirect in other places than cpumap as well (say, on veth devices).
-
-So it'll be:
-
-struct kernel_meta {
-	u32 hash;
-	u32 timestamp;
-        ...etc
-}
-
-and a kfunc:
-
-void store_xdp_kernel_meta(struct kernel meta *meta);
-
-which the XDP program can call to populate the metadata area.
-
--Toke
-
+> 
+> > 
+> > An alternative might be to call synchronize_rcu() in free_ruleset(), but
+> > it's a big ugly too.
+> > 
+> > BTW, I don't understand why neither SELinux nor Smack use (explicit)
+> > atomic operations nor lock.  And it looks weird that
+> > security_file_set_fowner() isn't called by f_modown() with the same
+> > locking to avoid races.
 
