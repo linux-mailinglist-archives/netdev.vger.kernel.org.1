@@ -1,143 +1,96 @@
-Return-Path: <netdev+bounces-117090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A21D94C9AE
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:40:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3765D94C9B1
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:42:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565081C21CFA
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:40:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A08A6B217AE
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5325C16C6AA;
-	Fri,  9 Aug 2024 05:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7515C16C6A4;
+	Fri,  9 Aug 2024 05:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQMkHS0q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFYL3E8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D3B12E7E;
-	Fri,  9 Aug 2024 05:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F05612E7E;
+	Fri,  9 Aug 2024 05:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723182004; cv=none; b=R+2eiCgBKnGzc7xHQvc55leDgGVnFI/eZQWLttktBs9loo2VYrGktpxxPW2V2UlllggnZHY12zK49Y67mQqrojuk95764LNG4BA2GHwBHSPHSRZUx2iRlwvxXOH6qXfu/67Zxj1Kao2unIyTs5W3xcbdZX5uZAk3gS8oJAJcSMw=
+	t=1723182142; cv=none; b=RbPmNvUJ77Da06/8bI4G8JUEFLF5Ccl8Z+F6Cf1BfcHOhMSQSb6b8KX+xM0jV/R2rEShkaTKpp8RZtzrNh/YMUrxVcngniWIs8bCVUYxrpM5sS9XW1YtF+EinI4CXkwCm9L3rtEZFaERznaMGZReB3lo2DBGRjQbKIKuEabvZfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723182004; c=relaxed/simple;
-	bh=sY7MfAVIdMCdUi8FmSbX5HChtoeg+GqsRxp77iNKTvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SQKKsnl/sS8LhvsDFz6kefbkScLuWdniCn3ir3+4kTBIwyzWvhkMNfpSaSsWGq+6zQ3Q4+OYN6Rv4GdZbnLj74PHLhP1KhDoR+upBR6lq+dRi9hB5JE4JR9O6GaQHF7hlyNFzlJy9VLM8eXNu3r21iVv0PDzlLJhGnOhsICYyxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQMkHS0q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69919C32782;
-	Fri,  9 Aug 2024 05:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723182003;
-	bh=sY7MfAVIdMCdUi8FmSbX5HChtoeg+GqsRxp77iNKTvg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iQMkHS0qQE3IpfFodDwhIOL5Tyww24ni4ckBbUHXEnvLIOc1ityAhZu46tDR5HwbF
-	 hFlVKUPrGIHLjpgd3f8ft5N+2S5BUOLaL5GoHhEXhrwoIas3LwOfu0oWVMpxMMtrfk
-	 bqymJKCKKDgwnN57du6un1nlQc/KUB6mz85KYs1CM63lAPrhDESalqacoqfffIgS/I
-	 zhZK7QZXTFOMOAZlzP39LOp06VmF+aumLRaexr47y+Y/YRYAH82pz+//5c899MCWlv
-	 L4bfmb7jz3z9cJ56o47QA1EJDgld3LfYmRZzstM6lLyi6DMcmuLCPujoTn29Fgh2Lc
-	 1LLuOCj6t+yDg==
-Message-ID: <493466e6-d83b-4d91-93a5-233d6da1fdd8@kernel.org>
-Date: Fri, 9 Aug 2024 07:39:53 +0200
+	s=arc-20240116; t=1723182142; c=relaxed/simple;
+	bh=y71pVoZKTdKKHdxGfKfSxKEi+h6PYacutsiEOdrN9Fg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=fS/3gcEB+UxvlxIsAfMOJfhDXH8b5ByH7CYd6JDiUQRk7/KORwjxCatIHj7ydUGmUV4GS0ZMUmA3vx8VnIwemdeGCP814yngXJgmPi26Cz1+riliujc4xVgVom8uUAqKAgQH3mXOwjXrZjYK2UUmK01B/Ho38ULx6ucqvAL7EaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JFYL3E8D; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7a92098ec97so1321845a12.2;
+        Thu, 08 Aug 2024 22:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723182140; x=1723786940; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=y71pVoZKTdKKHdxGfKfSxKEi+h6PYacutsiEOdrN9Fg=;
+        b=JFYL3E8DRm5Mpu5bDqAP9Y0/GL9prI3tg0TJV6vMLVdrFj3j8nyIXrNyJLtesuhTYf
+         8Z/ox00e9tXDbBZOTUOMDVK/3hEtpXxit1L2ydk4ja4ljzkfhHVRdYHXBTDL7VtMuZlc
+         Y/uXGMoCme3wDmWbuE0ZZHe+xheJ8ZiAnaCL/cCgRBaQwDoZdgPM+cG24WYq74lVmcI0
+         Vf6dtspEBb9jiW7nqlampXHD3NdTa/QJe2Vy2sSCDukgRcOnnBESxuaTUbCITvMlyOxO
+         ncF0Wo+3zMz4vnHFgzmQexexBykky8vroASRg3yfdi0dVHbW/wFnsaXSqo5H5SQ0etqT
+         QGWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723182140; x=1723786940;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y71pVoZKTdKKHdxGfKfSxKEi+h6PYacutsiEOdrN9Fg=;
+        b=KozdhKD5U/bJeBiC/Ezw1EJ0Dcwrk+rK03MBc7Uiyw7f2KrQo0lYdFtySUhehWx5hz
+         JCEo2u73FEJzgAbzdQL8M1yRuTi4tS6tvb75UUumb0KB7L1FHWtpbUTkchJIeKjsBoEB
+         N4waQq0DNGwVmWpLUmrntJh9jQORdviEiRdjwh0Sc9OHGzZ79wURWdr1s7C0zDaCAOfd
+         7UZw/LEmj3t4s22ZzEnanmeI37JGYRnWDGL4c067y3yg0Fa7Y69iN8T5FPDultZ4pmYb
+         EfqOMgQRwcGZXyn2jlRjS2jCkkkXbqbBw3+4OnyJIfqHvobVuxHE7xL41DRaAn2QmmHX
+         /BtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrEf16YXnquE3n7EQtALmIOJeekhr1Ogf+OQumj8+RBaFpxBJfU62wCZPMgJjbrW9MNjNp5JhrFG0WQ4CgGpvcU2SR4BVzWqivMd7vK4xQ71SyIr+peDoSInm8swZFgkHF4bt8
+X-Gm-Message-State: AOJu0YyhllLwlIRshc+Wa6oBsGpgwmf4P68ELkUNH3ZRzLPykK1PV8r7
+	s/o5zfu3TwLtAn3rJxLF5+ip7EO9Sk7waMWJC3BC9seo4Sp68+6Cr4IKjPdGrUInEhucHe5Ukj0
+	Snpn7l0XM+bAoJakPrwPE9g7K4Yw=
+X-Google-Smtp-Source: AGHT+IFIFF9mIsinZE9JHaj/JIl9r1ax+khm2LOD0ZgkOgZeK8ldLrm7kM9Xp9bIH9SLAAXyWuPQfr/zvUiCWajG1oE=
+X-Received: by 2002:a05:6a20:c78c:b0:1c2:8e96:f767 with SMTP id
+ adf61e73a8af0-1c89ff8080amr742333637.31.1723182140072; Thu, 08 Aug 2024
+ 22:42:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/11] dt-bindings: nfc: nxp,nci: Document PN553
- compatible
-To: Danila Tikhonov <danila@jiaxyga.com>, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, andersson@kernel.org,
- konradybcio@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, rafael@kernel.org,
- viresh.kumar@linaro.org, kees@kernel.org, tony.luck@intel.com,
- gpiccoli@igalia.com, ulf.hansson@linaro.org, andre.przywara@arm.com,
- quic_rjendra@quicinc.com, davidwronek@gmail.com, neil.armstrong@linaro.org,
- heiko.stuebner@cherry.de, rafal@milecki.pl, macromorgan@hotmail.com,
- linus.walleij@linaro.org, lpieralisi@kernel.org,
- dmitry.baryshkov@linaro.org, fekz115@gmail.com
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20240808184048.63030-1-danila@jiaxyga.com>
- <20240808184048.63030-7-danila@jiaxyga.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240808184048.63030-7-danila@jiaxyga.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Daiwei Li <daiweili@gmail.com>
+Date: Thu, 8 Aug 2024 22:42:08 -0700
+Message-ID: <CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [iwl-net v2 2/2] igb: Fix missing time sync events
+To: vinicius.gomes@intel.com
+Cc: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com, 
+	intel-wired-lan@lists.osuosl.org, jeffrey.t.kirsher@intel.com, 
+	jesse.brandeburg@intel.com, kuba@kernel.org, kurt@linutronix.de, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, sasha.neftin@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 08/08/2024 20:40, Danila Tikhonov wrote:
-> The PN553 is another NFC chip from NXP, document the compatible in the
-> bindings.
-> 
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
-> ---
->  Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml b/Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml
-> index 6924aff0b2c5..364b36151180 100644
-> --- a/Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml
-> +++ b/Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml
-> @@ -17,6 +17,7 @@ properties:
->            - enum:
->                - nxp,nq310
->                - nxp,pn547
-> +              - nxp,pn553
+Hi,
 
-Keep the list ordered.
+It appears this change breaks PTP on the 82580 controller, as ptp4l reports:
 
-Best regards,
-Krzysztof
+> timed out while polling for tx timestamp increasing tx_timestamp_timeout or
+> increasing kworker priority may correct this issue, but a driver bug likely
+> causes it
 
+The 82580 controller has a hardware bug in which reading TSICR doesn't clear
+it. See this thread
+https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/ where the
+bug was confirmed by an Intel employee. Any chance we could add back the ack
+for 82580 specifically? Thanks!
 
