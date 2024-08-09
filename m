@@ -1,152 +1,149 @@
-Return-Path: <netdev+bounces-117081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B8E94C965
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 06:50:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35AC94C967
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 06:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24A09280F4A
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:50:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26215B21D24
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 04:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FC413FD83;
-	Fri,  9 Aug 2024 04:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6170516631C;
+	Fri,  9 Aug 2024 04:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDIm4SHO"
+	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="VKA84KU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7804028E7;
-	Fri,  9 Aug 2024 04:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76CE747F;
+	Fri,  9 Aug 2024 04:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723179001; cv=none; b=r3RSRRTiaa+nBcOAKRV6c8JNNMbSB49gqI3y0UubUDtMvsgy9k3DhqQvOS+IA+PzcecX7ux4kkeELnFrq2sBtgUplaKl793MkgqDRFs2hz9lwiZvpVNkzE3GUXLPfP/Ym7Te/EWdziUOLcYK2SEYDrT9tXJ6p7cyg2qHTFaYIh0=
+	t=1723179047; cv=none; b=Dh0ak833NVKcvJaGgJoPNn+ExZW+xW0U461ElMgw9LJc2rm1QKLfe5zq7qpp4l1uwxrGoOdqni2AU9ZbXDYLp+rxaKWMpURVu8LZUOfQ9gFQxF2HOQzVB8/ieYFoYzHg694aT2GDp+6D2htiZYSy0WOe7dEV9HVtN+oGmnTwUvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723179001; c=relaxed/simple;
-	bh=plwmUpl8bbS91vzk20FYUxmwUFHawlLmqhzKX1LyIBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z7R0kD8j2L/tUd14jRG6w1IMJfn+Yf20VMQ3m/x76pxgVV+d/CfUcdsXG5THjdbMj2+rtYIx/RJFXBqIVxGLtgLpCQEHFudF4L73Am9l2lNSkJy32xxzhz3KYTs0I9z3zniUy2KiiD/3nygebukkSHZswXxPN1hSfz4h9csEGjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nDIm4SHO; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fc66fc35f2so19796275ad.0;
-        Thu, 08 Aug 2024 21:50:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723178999; x=1723783799; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bewvnTyD59cSSKz2S43f2fBbzIQwjQdp89CE4Jnh0U=;
-        b=nDIm4SHOl6z0sQIOBaxZx37BC4Owsc38V7ZTvj8htF/rW04wG6BOzY3YcPQEFqEPYJ
-         LT871jlMy1MNQklVcBk4z9ZzLtw86YT/ipEmmJzwDpZ/sBGjAMN9oRkCeRvlYrP3KGFe
-         tEAwq+6DvvDO4tF2I7NhdQgEg4VomzZnRUXl3zVlEb1jSCnyyXYxoweExbwnbqmad3fj
-         JvF6jNxCn0ATPBCieCkugwbw5Z7cmewzF62i4iFrju+U2WtlLQ+anGUZ1N34T/YJe/QI
-         vRDUwViHEH43bv3ZmHDeV49Ja8l23yWP3SSpGOzn1R7Ok5g58rg1zvG5l5Q9kPmYMRfX
-         W5Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723178999; x=1723783799;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3bewvnTyD59cSSKz2S43f2fBbzIQwjQdp89CE4Jnh0U=;
-        b=YGQ41+iRDi+2BO9ZRSK4h4nduoSYXih+Cil6M8VakWQP21Cxqm8k4Tk/gDquzGPoQD
-         9OZMuKZqSfjYkYi4htwgO8mJGuFy9b6Y0AmXTVOEI4AMIOb4ZDx1bAGYgZP/5bED9dYM
-         pqfUGESRt7ZR0loDvIGLgo/D/XxueqqHYMvIaTVwgqmi6iH6l5Lkc1LTyxckr82Tm6w4
-         IsTOcBL2AKP/LDhkTvLHna6gh+O+2UGqS6RtOsidZr1h608vgypvINOOcNY7pxffz/7j
-         dig21yY0XKY6dTCpDOrQr3peaRGlpxTZjatfVv6dhKiJMCsh0hCKvMLUmpeSNi1MkivV
-         4Feg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhpxwGdvWv6q2EevDFJmm32GGqz7Bk7K6I01hK+n/HgL09jQxx1Z0MdXHy8VXypa44kkveJ1KBhNKvD4w3Ww0esG4V3Vq2dhvfbfrh
-X-Gm-Message-State: AOJu0Yxfs8Ex5SWM8hE5Kl2MKQlHt4u81eTBg7EGC80NJrK5Ip1SsJam
-	F82RCYTJ7bWcIwdQ7OtV0/lJJ6AmHxSAI9iJMFdNoM5zcqeSAw2suzUkmNPF
-X-Google-Smtp-Source: AGHT+IGJvie0hk3CWW8qAkoiIY+htMJZpmdHHAIPLpg/0gRuX8tasDufdC3ShDyQSVHNI0zs2VDcZA==
-X-Received: by 2002:a17:903:1c7:b0:200:869c:960d with SMTP id d9443c01a7336-200967f6570mr56021335ad.3.1723178999508;
-        Thu, 08 Aug 2024 21:49:59 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f29e0dsm133139285ad.38.2024.08.08.21.49.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 21:49:59 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: cai.huoqing@linux.dev,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: hinic: use ethtool_sprintf/puts
-Date: Thu,  8 Aug 2024 21:49:51 -0700
-Message-ID: <20240809044957.4534-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1723179047; c=relaxed/simple;
+	bh=bugJFlr5qOdWb5nm42v3w20M4o7unIcV2116RZSa5VE=;
+	h=Content-Type:From:Mime-Version:Subject:Message-Id:Date:Cc:To; b=XKeacRuYyOXDad9MKGFaGvT241hvQ5OF4I7QtMdfu/n8vIfuAHpxznQSHu8E+1Xgf2ey6O5DoFMSaXQ2Af/SUlo3qZRLYD8sxpGTsqfMHYM0Y7AYnWernSnyDgafKdqPaKc1in+B9aEWCSrZCLk3NR0HvMErGm6a+fOzJd/3NEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=VKA84KU1; arc=none smtp.client-ip=108.61.200.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
+Received: from smtpclient.apple (unknown [199.33.119.15])
+	by kozue.soulik.info (Postfix) with ESMTPSA id ADEA92FE4ED;
+	Fri,  9 Aug 2024 13:51:20 +0900 (JST)
+DMARC-Filter: OpenDMARC Filter v1.4.2 kozue.soulik.info ADEA92FE4ED
+Authentication-Results: kozue.soulik.info; dmarc=fail (p=reject dis=none) header.from=soulik.info
+Authentication-Results: kozue.soulik.info; spf=fail smtp.mailfrom=soulik.info
+DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info ADEA92FE4ED
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
+	t=1723179080; bh=krt+Vl+YkrzxJSaYFZHjanrtZYNGcVulMlBUawPyqr0=;
+	h=From:Subject:Date:Cc:To:From;
+	b=VKA84KU1RPhqlITCXQjQvYxgZmGEtZWAa90qPkc90AY/IwNKI1ePLh+A6/9kRxVaX
+	 DdaPwj/muVS6bm9O1h2IjVrd4GI+ap4XA87bjZjWbkT6rn1lkHbSsSrjGNWnq/i2nq
+	 ruMDSkOALdAsucxCy6GW7zI0VknH00DgJe24MAQc=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: ayaka <ayaka@soulik.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (1.0)
+Subject: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue index
+Message-Id: <638F310E-3FDA-4388-9950-1F3A56C6DEFB@soulik.info>
+Date: Fri, 9 Aug 2024 12:50:31 +0800
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+X-Mailer: iPad Mail (21A351)
 
-Simpler and avoids manual pointer addition.
+=EF=BB=BF
+Sent from my iPad
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../net/ethernet/huawei/hinic/hinic_ethtool.c | 33 ++++++-------------
- 1 file changed, 10 insertions(+), 23 deletions(-)
+> On Aug 9, 2024, at 2:49=E2=80=AFAM, Willem de Bruijn <willemdebruijn.kerne=
+l@gmail.com> wrote:
+>=20
+> =EF=BB=BF
+>>> So I guess an application that owns all the queues could keep track of
+>>> the queue-id to FD mapping. But it is not trivial, nor defined ABI
+>>> behavior.
+>>> Querying the queue_id as in the proposed patch might not solve the
+>>> challenge, though. Since an FD's queue-id may change simply because
+>> Yes, when I asked about those eBPF thing, I thought I don=E2=80=99t need t=
+he queue id in those ebpf. It turns out a misunderstanding.
+>> Do we all agree that no matter which filter or steering method we used he=
+re, we need a method to query queue index assigned with a fd?
+>=20
+> That depends how you intend to use it. And in particular how to work
+> around the issue of IDs not being stable. Without solving that, it
+> seems like an impractical and even dangerous -because easy to misuse-
+> interface.
+First of all, I need to figure out when the steering action happens.
+When I use multiq qdisc with skbedit, does it happens after the net_device_o=
+ps->ndo_select_queue() ?
+If it did, that will still generate unused rxhash and txhash and flow tracki=
+ng. It sounds a big overhead.
+Is it the same path for tc-bpf solution ?
 
-diff --git a/drivers/net/ethernet/huawei/hinic/hinic_ethtool.c b/drivers/net/ethernet/huawei/hinic/hinic_ethtool.c
-index 0304f03d4093..c559dd4291d3 100644
---- a/drivers/net/ethernet/huawei/hinic/hinic_ethtool.c
-+++ b/drivers/net/ethernet/huawei/hinic/hinic_ethtool.c
-@@ -1471,7 +1471,6 @@ static void hinic_get_strings(struct net_device *netdev,
- 			      u32 stringset, u8 *data)
- {
- 	struct hinic_dev *nic_dev = netdev_priv(netdev);
--	char *p = (char *)data;
- 	u16 i, j;
- 
- 	switch (stringset) {
-@@ -1479,31 +1478,19 @@ static void hinic_get_strings(struct net_device *netdev,
- 		memcpy(data, *hinic_test_strings, sizeof(hinic_test_strings));
- 		return;
- 	case ETH_SS_STATS:
--		for (i = 0; i < ARRAY_SIZE(hinic_function_stats); i++) {
--			memcpy(p, hinic_function_stats[i].name,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+		for (i = 0; i < ARRAY_SIZE(hinic_function_stats); i++)
-+			ethtool_puts(&data, hinic_function_stats[i].name);
- 
--		for (i = 0; i < ARRAY_SIZE(hinic_port_stats); i++) {
--			memcpy(p, hinic_port_stats[i].name,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+		for (i = 0; i < ARRAY_SIZE(hinic_port_stats); i++)
-+			ethtool_puts(&data, hinic_port_stats[i].name);
- 
--		for (i = 0; i < nic_dev->num_qps; i++) {
--			for (j = 0; j < ARRAY_SIZE(hinic_tx_queue_stats); j++) {
--				sprintf(p, hinic_tx_queue_stats[j].name, i);
--				p += ETH_GSTRING_LEN;
--			}
--		}
-+		for (i = 0; i < nic_dev->num_qps; i++)
-+			for (j = 0; j < ARRAY_SIZE(hinic_tx_queue_stats); j++)
-+				ethtool_sprintf(&data, hinic_tx_queue_stats[j].name, i);
- 
--		for (i = 0; i < nic_dev->num_qps; i++) {
--			for (j = 0; j < ARRAY_SIZE(hinic_rx_queue_stats); j++) {
--				sprintf(p, hinic_rx_queue_stats[j].name, i);
--				p += ETH_GSTRING_LEN;
--			}
--		}
-+		for (i = 0; i < nic_dev->num_qps; i++)
-+			for (j = 0; j < ARRAY_SIZE(hinic_rx_queue_stats); j++)
-+				ethtool_sprintf(&data, hinic_rx_queue_stats[j].name, i);
- 
- 		return;
- 	default:
--- 
-2.46.0
+I would reply with my concern about violating IDs in your last question.
+>>> another queue was detached. So this would have to be queried on each
+>>> detach.
+>> Thank you Jason. That is why I mentioned I may need to submit another pat=
+ch to bind the queue index with a flow.
+>> I think here is a good chance to discuss about this.
+>> I think from the design, the number of queue was a fixed number in those h=
+ardware devices? Also for those remote processor type wireless device(I thin=
+k those are the modem devices).
+>> The way invoked with hash in every packet could consume lots of CPU times=
+. And it is not necessary to track every packet.
+>=20
+> rxhash based steering is common. There needs to be a strong(er) reason
+> to implement an alternative.
+I have a few questions about this hash steering, which didn=E2=80=99t reques=
+t any future filter invoked:
+1. If a flow happens before wrote to the tun, how to filter it?
+2. Does such a hash operation happen to every packet passing through?
+3. Is rxhash based on the flow tracking record in the tun driver?
+Those CPU overhead may demolish the benefit of the multiple queues and filte=
+rs in the kernel solution.
+Also the flow tracking has a limited to 4096 or 1024, for a IPv4 /24 subnet,=
+ if everyone opened 16 websites, are we run out of memory before some entrie=
+s expired?
 
+I want to  seek there is a modern way to implement VPN in Linux after so man=
+y features has been introduced to Linux. So far, I don=E2=80=99t find a prop=
+er way to make any advantage here than other platforms.
+>> Could I add another property in struct tun_file and steering program retu=
+rn wanted value. Then it is application=E2=80=99s work to keep this new prop=
+erty unique.
+>=20
+> I don't entirely follow this suggestion?
+>=20
+>>> I suppose one underlying question is how important is the mapping of
+>>> flows to specific queue-id's? Is it a problem if the destination queue
+>>> for a flow changes mid-stream?
+>> Yes, it matters. Or why I want to use this feature. =46rom all the open s=
+ource VPN I know, neither enabled this multiqueu feature nor create more tha=
+n one queue for it.
+>> And virtual machine would use the tap at the most time(they want to emula=
+te a real nic).
+>> So basically this multiple queue feature was kind of useless for the VPN u=
+sage.
+>> If the filter can=E2=80=99t work atomically here, which would lead to unw=
+anted packets transmitted to the wrong thread.
+>=20
+> What exactly is the issue if a flow migrates from one queue to
+> another? There may be some OOO arrival. But these configuration
+> changes are rare events.
+I don=E2=80=99t know what the OOO means here.
+If a flow would migrate from its supposed queue to another, that was against=
+ the pretension to use the multiple queues here.
+A queue presents a VPN node here. It means it would leak one=E2=80=99s data t=
+o the other.
+Also those data could be just garbage fragments costs bandwidth sending to a=
+ peer that can=E2=80=99t handle it.=
 
