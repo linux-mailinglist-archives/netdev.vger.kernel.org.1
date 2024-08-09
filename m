@@ -1,153 +1,113 @@
-Return-Path: <netdev+bounces-117315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2530794D90A
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:14:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BE0094D933
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BED101F21B8A
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:14:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABE71B2326C
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C2316CD33;
-	Fri,  9 Aug 2024 23:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A19A16D4D2;
+	Fri,  9 Aug 2024 23:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WSxbGuI1";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cLAZqqZr";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WSxbGuI1";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cLAZqqZr"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="WYxWSqBE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627C9168490
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DE116D9AD;
+	Fri,  9 Aug 2024 23:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723245265; cv=none; b=WRRXCeKwdyXSlznpZ6cfDlo7qVHE13Ssc8bgPt/qed8OtSaBYfX5zkOk3pWtRAfb9hAUOD2+1LPDqFFk37DLotmocyBKONhfjD5zqV/8ak4xdwMRjHmdeymQIkv5m6S+YuD/fR2Mdult/xiB7dQORDz4l1aYR8h1jGUdnqRMlkA=
+	t=1723246726; cv=none; b=I7G4M9zC1djar6cAxeJrmuFRuPkyDtLQz7/ioZnk97xNKlYa8yd9k4M3UCqsVFiqKyedgGnpx1tGB8JoJgqwhbGZI5jET2qNYl2FMwCb0dCXbeKRBoIUQVr7UBpc0NWPyvIpSAnE4rJ5HpGERye7g/fFFZrTL/mFyPYmlafza7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723245265; c=relaxed/simple;
-	bh=LrjG9reQp3HclaMoPJpFXKdIfMfc7DjCQFofpsuoJqE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NY85L6VQRbtGE111rGyAvPBE15CntREUJB4prrwm0iV0/M21+6Q2u1bUYxJ1IKeguLXnlB2irgHi069d0gg5gYi18/rjdfrMB/GzQHhKF6AeAs7tQ6jMPtQ7Or5BVZmWwehUtMOGpWIVa7Q8EoBwRXRLTC7KXar0BsIx3HPyMLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WSxbGuI1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cLAZqqZr; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WSxbGuI1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cLAZqqZr; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.200.14])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AB8122206A
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:14:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1723245261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=XzLfRnKlsDXfYjpJSNFKIyyIjUKJidA2RNRClC6xTL4=;
-	b=WSxbGuI1p8sQed5FLjtWG17cKulbDta1WBJWfA14j9PazGFgVsPGYvmmzoz9QHR003fNWO
-	WuhkdI78sj2Blqf/+KoDWNTICY8FDfEMXXwbGJxBEFm0gcqROsQPTfW7x2VGEed0ASfubO
-	4PksPqK0+SDD1NyCdLW7t7lTJSsE1z0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1723245261;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=XzLfRnKlsDXfYjpJSNFKIyyIjUKJidA2RNRClC6xTL4=;
-	b=cLAZqqZrg9792zfqobj1XsdO/gohwPl5qNyhBRbOcIrQiKieoY92xYimUifoaqceO+Y4Rm
-	OGiGgFMpMR/oJXAA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1723245261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=XzLfRnKlsDXfYjpJSNFKIyyIjUKJidA2RNRClC6xTL4=;
-	b=WSxbGuI1p8sQed5FLjtWG17cKulbDta1WBJWfA14j9PazGFgVsPGYvmmzoz9QHR003fNWO
-	WuhkdI78sj2Blqf/+KoDWNTICY8FDfEMXXwbGJxBEFm0gcqROsQPTfW7x2VGEed0ASfubO
-	4PksPqK0+SDD1NyCdLW7t7lTJSsE1z0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1723245261;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=XzLfRnKlsDXfYjpJSNFKIyyIjUKJidA2RNRClC6xTL4=;
-	b=cLAZqqZrg9792zfqobj1XsdO/gohwPl5qNyhBRbOcIrQiKieoY92xYimUifoaqceO+Y4Rm
-	OGiGgFMpMR/oJXAA==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 8FF012012C; Sat, 10 Aug 2024 01:14:21 +0200 (CEST)
-Date: Sat, 10 Aug 2024 01:14:21 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: netdev@vger.kernel.org
-Subject: ethtool 6.10 released
-Message-ID: <ssn37ocuhjyx3k5xoq53uvb3voo2qxnwvuwgephb4cc5lbw5ei@5fkqwsfdzlcu>
+	s=arc-20240116; t=1723246726; c=relaxed/simple;
+	bh=sFpHsawR4TOzmRP0Xi0QwZ/vnyE8lg6cCheuRS5jROE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KzxnqvCvxtuyhU7WrnlGBrbgVAErCV06Izphm0tGvg18VOXbEyn29jtm54X+yCwRTIdWL1FN6pYdBSjYgiB7gLBXZ0I73UxRMKMdJaHajbUGiLcneWV99ser0HSPG2JIJohDDdupfAEh9+seMCyLwxQc/6v35yGLGiZlX+B88rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=WYxWSqBE; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723246724; x=1754782724;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sFpHsawR4TOzmRP0Xi0QwZ/vnyE8lg6cCheuRS5jROE=;
+  b=WYxWSqBEgmOHac+9fzLy1fdhyBAwFjgmLGUr5UyOobOYncAao3smzzBx
+   LQOWggwiN2TKqw2XpTg0dIIWAqSCtLtcbE1fTh2UeA3On9DDlbHVYa6b1
+   bzr3IelXWz1WCLcxNLbWwhApAvfBGUcUGsIOgofB7pLM9xCQEq5uk4Ea1
+   Z7ki1kQHWGL7YGZa32mTbELEDCP9utnwR0YnEOHRHWC/N5aT3weuMQt7q
+   pjazSvToz5P6dzM2lONkaGyRT1yGUcdNtZcTilo1pJMAMsuZ1irrA8KHw
+   OinIsHo6B36/H8rEQZOeHa2qVO89D/GxwRKACDA+KDlwhFDp4EQ9CS5nY
+   g==;
+X-CSE-ConnectionGUID: zHerXwjfR2qUoEM/PnTZ/A==
+X-CSE-MsgGUID: DlxhWON7Sqm4jXNiNKaQ+g==
+X-IronPort-AV: E=Sophos;i="6.09,277,1716274800"; 
+   d="scan'208";a="30988808"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Aug 2024 16:38:42 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 9 Aug 2024 16:38:40 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 9 Aug 2024 16:38:40 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<devicetree@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Marek Vasut <marex@denx.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
+Subject: [PATCH net-next 0/4] net: dsa: microchip: add SGMII port support to KSZ9477 switch
+Date: Fri, 9 Aug 2024 16:38:36 -0700
+Message-ID: <20240809233840.59953-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6dfhsvx2cnjvlfxj"
-Content-Disposition: inline
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.90 / 50.00];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.981];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_COUNT_ONE(0.00)[1];
-	RCPT_COUNT_ONE(0.00)[1];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -2.90
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+From: Tristram Ha <tristram.ha@microchip.com>
 
---6dfhsvx2cnjvlfxj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This series of patches is to add SGMII port support to KSZ9477 switch.
 
-Hello,
+As the SGMII module has its own interrupt for link indication the common
+code needs to be prepared to allow KSZ9477 to handle other interrupts
+that are not passed to other drivers such as PHY.
 
-ethtool 6.10 has been released.
+The SGMII port is simulated as having a regular PHY as there is not much
+to do with that port except reporting link on/off and connecting speed.
 
-Home page: https://www.kernel.org/pub/software/network/ethtool/
-Download link:
-https://www.kernel.org/pub/software/network/ethtool/ethtool-6.10.tar.xz
+Tristram Ha (4):
+  dt-bindings: net: dsa: microchip: add SGMII port support to KSZ9477
+    switch
+  net: dsa: microchip: support global switch interrupt in KSZ DSA driver
+  net: dsa: microchip: handle most interrupts in KSZ9477/KSZ9893 switch
+    families
+  net: dsa: microchip: add SGMII port support to KSZ9477 switch
 
-Release notes:
-	* Feature: suport for PoE in PSE (--show-pse and --set-pse)
-	* Feature: add statistics support to tsinfo (-T)
-	* Feature: add JSON output to base command (no option)
-	* Feature: add JSON output to EEE info (--show-eee)
-	* Fix: qsfp: better handling on page 03h read failure (-m)
-	* Fix: handle zero arguments for module eeprom dump (-m)
-	* Fix: check for missing arguments in do_srxfh() (-X)
-	* Misc: compiler warnings in "make check"
-	* Misc: more descriptive error when JSON output is not available
+ .../bindings/net/dsa/microchip,ksz.yaml       |  12 +
+ drivers/net/dsa/microchip/ksz9477.c           | 404 +++++++++++++++++-
+ drivers/net/dsa/microchip/ksz9477.h           |   6 +-
+ drivers/net/dsa/microchip/ksz9477_reg.h       |  10 +-
+ drivers/net/dsa/microchip/ksz_common.c        |  45 +-
+ drivers/net/dsa/microchip/ksz_common.h        |  11 +-
+ 6 files changed, 477 insertions(+), 11 deletions(-)
 
-Michal
+-- 
+2.34.1
 
---6dfhsvx2cnjvlfxj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAma2osgACgkQ538sG/LR
-dpWFzgf8COZQgjHaJXW0m4ciX1FsUuRB0twFrzl75zALO0vb6WfbHTuxuhFDSdHc
-77qaf31deF91qaL4bIQ6051MzfY1XLuoMe03tThL1srr4eFN9z6TX+JNSupmVCsP
-keisq02LTUrfkG42zgMAzo9Pq4WE6T9K/Y7OD0qYGX1Qugc14XllQ7AQaBzE66p1
-EgD6PN68DNy3p7NYM+5TAimbSUStUF3aM6hw3t3oCHFXUun5WpLGJi7FVDeUgvDH
-Jy+K3a42pikYQGnTzZ/vMvvN94+2RHy3+pBvX1WcI9e7xejBfXqxATzntH3IPPZm
-KHAa2kU7ZlQypQxb0yDZVMAfao+X9Q==
-=iG4h
------END PGP SIGNATURE-----
-
---6dfhsvx2cnjvlfxj--
 
