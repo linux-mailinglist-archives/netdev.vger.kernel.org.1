@@ -1,283 +1,113 @@
-Return-Path: <netdev+bounces-117086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB27894C986
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFEA694C98C
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42E10B22C1C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:15:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79410B235F4
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D77816B74D;
-	Fri,  9 Aug 2024 05:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YpcEEJXq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C70166318;
+	Fri,  9 Aug 2024 05:18:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0F018E25
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 05:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC2A18E25
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 05:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723180520; cv=none; b=rtxZ0p/Zzbl7+Yh7qqrkHI4qmgbZM8evkA35zb44fL8NfOq8JdQHY3CczRaYbRI2YG3YDqS5SEyf13i4JyR4XIYjojsHaOZbjbhYcjdd8lRkgsyw3B9jOfXn+Jxypz2g7pwqgY+ULDMTh5nZfiAvMWi5Jb1cBWsgg3YMG/xqGYc=
+	t=1723180701; cv=none; b=OHKvxPH4N9PuiwYRvXNb5G+PEUWqXgmVtEL7p1QzPDg2XQsmMSgR+WO/jqw4Becs0rvySfn1KVXAvaaFKkYEgA/e5Kbm7pq39CrowkKWYaiIUvfH4HTQZHswuQ4DYK1+d1uxaUWJS+7q96DLcN03+kiyIwQQkAx8CJqngjF0SDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723180520; c=relaxed/simple;
-	bh=Lz8qQfjRWT4yd7bZBAL0DYM2L36abTRyWpTIosR9qsw=;
+	s=arc-20240116; t=1723180701; c=relaxed/simple;
+	bh=JBMg47OQTO2usEseBnYz78pjPbkR6k1Og9xsXbbeIBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxEQJHQfovNVAMoMSHkWqK+DHGIta29zRgwEICcdUsBLSfTyaeehKMEYw3W52WChr4Xknq/y9k9tsNJxPPhsz9N9g6xRV7boEXDTgeHr4JKLBzlE47+MPwI2TtpF1AHu68hXB2YRAeMRvkyceihFSayirFtsID6yhb3dPNlL99A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YpcEEJXq; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723180518; x=1754716518;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Lz8qQfjRWT4yd7bZBAL0DYM2L36abTRyWpTIosR9qsw=;
-  b=YpcEEJXqvGYUctQG5Pn7llNZGQszhyT+kdwfIBGiMXwiNLiTX8qf/eKI
-   cA5/mypiwx0qsRpc7KU/FadwNSKoz9h52J4cWitEFhqo+U+drLIMIWf3c
-   JW86SaKGQWDYN5csYEIF02d/yVzxxrGa8I1jhFkSES/IufKldxSAa24Vf
-   eVit1iiCHoAjozBlF1u+doyQGaqW85udVJQSxZDvvhqTmE7lDxhymPpEd
-   OGjGPIRzuPSGI/6dvWPBO+fRKbomDiyELsU7LDDgrgcBGRwC3CUJt+IY1
-   ZK0HlUNZ5wH5nDhzoyNbKSR3QVIYvz537n9r7cvP2Cwtya/cqHuzSzNBh
-   w==;
-X-CSE-ConnectionGUID: MrXCrLJEQWGHSuk7STASKw==
-X-CSE-MsgGUID: tLKlvDmETsKSVQaI7x29MA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="21492338"
-X-IronPort-AV: E=Sophos;i="6.09,275,1716274800"; 
-   d="scan'208";a="21492338"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 22:15:17 -0700
-X-CSE-ConnectionGUID: jAQKXdlkS9WEe1atLEcwug==
-X-CSE-MsgGUID: D60Qt2KaSRylvLe1usIxlA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,275,1716274800"; 
-   d="scan'208";a="88329368"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 22:15:15 -0700
-Date: Fri, 9 Aug 2024 07:13:34 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
-	konrad.knitter@intel.com, marcin.szycik@intel.com,
-	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [iwl-next v3 1/8] ice: devlink PF MSI-X max and min parameter
-Message-ID: <ZrWlfhs6x6hrVhH+@mev-dev.igk.intel.com>
-References: <20240808072016.10321-1-michal.swiatkowski@linux.intel.com>
- <20240808072016.10321-2-michal.swiatkowski@linux.intel.com>
- <ZrTli6UxMkzE31TH@nanopsycho.orion>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXXuV7Rxi+LSubsxpZJS8kzYIm+4TTQnuH6a+pwGg/TbIUUQyEoHPZHncxpCGft1qDAyM03syQdnxWlXsJUX/t0G4Ez5d7YbDNMdIN2Byd8eaADZcqblvkzEDtr1+aIYl2Sow/da0zIGiWl1rIkR5Cq8NdbHgUzoJ0ug2cgHcBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1scI0e-0003CM-CZ; Fri, 09 Aug 2024 07:17:52 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1scI0c-005aez-B5; Fri, 09 Aug 2024 07:17:50 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1scI0c-00AhSk-0j;
+	Fri, 09 Aug 2024 07:17:50 +0200
+Date: Fri, 9 Aug 2024 07:17:50 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the
+ PHY framework
+Message-ID: <ZrWmfqtYICzaj-HY@pengutronix.de>
+References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
+ <20240808130833.2083875-2-o.rempel@pengutronix.de>
+ <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZrTli6UxMkzE31TH@nanopsycho.orion>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Aug 08, 2024 at 05:34:35PM +0200, Jiri Pirko wrote:
-> Thu, Aug 08, 2024 at 09:20:09AM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >Use generic devlink PF MSI-X parameter to allow user to change MSI-X
-> >range.
-> >
-> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> >---
-> > .../net/ethernet/intel/ice/devlink/devlink.c  | 56 ++++++++++++++++++-
-> > drivers/net/ethernet/intel/ice/ice.h          |  8 +++
-> > drivers/net/ethernet/intel/ice/ice_irq.c      | 14 ++++-
-> > 3 files changed, 76 insertions(+), 2 deletions(-)
-> >
-> >diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> >index 29a5f822cb8b..bdc22ea13e0f 100644
-> >--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> >+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> >@@ -1518,6 +1518,32 @@ static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
-> > 	return 0;
-> > }
-> > 
-> >+static int
-> >+ice_devlink_msix_max_pf_validate(struct devlink *devlink, u32 id,
-> >+				 union devlink_param_value val,
-> >+				 struct netlink_ext_ack *extack)
-> >+{
-> >+	if (val.vu16 > ICE_MAX_MSIX) {
-> >+		NL_SET_ERR_MSG_MOD(extack, "PF max MSI-X is too high");
-> 
-> No reason to have "PF" in the text. Also, no reason to have "max MSI-X".
-> That is the name of the param.
-> 
+On Thu, Aug 08, 2024 at 03:54:06PM +0200, Andrew Lunn wrote:
 
-Ok, will change both, thanks.
+> Please could you give a reference to the exact standard. I think this
+> is "Advanced diagnostic features for 1000BASE-T1 automotive Ethernet
+> PHYs TC12 - advanced PHY features" ?
+> 
+> The standard seem open, so you could include a URL:
+> 
+> https://opensig.org/wp-content/uploads/2024/03/Advanced_PHY_features_for_automotive_Ethernet_v2.0_fin.pdf
 
-> 
-> 
-> >+		return -EINVAL;
-> >+	}
-> >+
-> >+	return 0;
-> >+}
-> >+
-> >+static int
-> >+ice_devlink_msix_min_pf_validate(struct devlink *devlink, u32 id,
-> >+				 union devlink_param_value val,
-> >+				 struct netlink_ext_ack *extack)
-> >+{
-> >+	if (val.vu16 <= ICE_MIN_MSIX) {
-> >+		NL_SET_ERR_MSG_MOD(extack, "PF min MSI-X is too low");
-> 
-> Same comment as for max goes here.
-> 
-> 
-> >+		return -EINVAL;
-> >+	}
-> >+
-> >+	return 0;
-> >+}
-> >+
-> > enum ice_param_id {
-> > 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
-> > 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
-> >@@ -1535,6 +1561,15 @@ static const struct devlink_param ice_dvl_rdma_params[] = {
-> > 			      ice_devlink_enable_iw_validate),
-> > };
-> > 
-> >+static const struct devlink_param ice_dvl_msix_params[] = {
-> >+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MAX,
-> >+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-> >+			      NULL, NULL, ice_devlink_msix_max_pf_validate),
-> >+	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MIN,
-> >+			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-> >+			      NULL, NULL, ice_devlink_msix_min_pf_validate),
-> >+};
-> >+
-> > static const struct devlink_param ice_dvl_sched_params[] = {
-> > 	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
-> > 			     "tx_scheduling_layers",
-> >@@ -1637,6 +1672,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
-> > int ice_devlink_register_params(struct ice_pf *pf)
-> > {
-> > 	struct devlink *devlink = priv_to_devlink(pf);
-> >+	union devlink_param_value value;
-> > 	struct ice_hw *hw = &pf->hw;
-> > 	int status;
-> > 
-> >@@ -1645,11 +1681,27 @@ int ice_devlink_register_params(struct ice_pf *pf)
-> > 	if (status)
-> > 		return status;
-> > 
-> >+	status = devl_params_register(devlink, ice_dvl_msix_params,
-> >+				      ARRAY_SIZE(ice_dvl_msix_params));
-> >+	if (status)
-> >+		return status;
-> >+
-> > 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
-> > 		status = devl_params_register(devlink, ice_dvl_sched_params,
-> > 					      ARRAY_SIZE(ice_dvl_sched_params));
-> >+	if (status)
-> >+		return status;
-> > 
-> >-	return status;
-> >+	value.vu16 = pf->msix.max;
-> >+	devl_param_driverinit_value_set(devlink,
-> >+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
-> >+					value);
-> >+	value.vu16 = pf->msix.min;
-> >+	devl_param_driverinit_value_set(devlink,
-> >+					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
-> >+					value);
-> >+
-> >+	return 0;
-> > }
-> > 
-> > void ice_devlink_unregister_params(struct ice_pf *pf)
-> >@@ -1659,6 +1711,8 @@ void ice_devlink_unregister_params(struct ice_pf *pf)
-> > 
-> > 	devl_params_unregister(devlink, ice_dvl_rdma_params,
-> > 			       ARRAY_SIZE(ice_dvl_rdma_params));
-> >+	devl_params_unregister(devlink, ice_dvl_msix_params,
-> >+			       ARRAY_SIZE(ice_dvl_msix_params));
-> > 
-> > 	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
-> > 		devl_params_unregister(devlink, ice_dvl_sched_params,
-> >diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> >index d6f80da30dec..a67456057c77 100644
-> >--- a/drivers/net/ethernet/intel/ice/ice.h
-> >+++ b/drivers/net/ethernet/intel/ice/ice.h
-> >@@ -95,6 +95,7 @@
-> > #define ICE_MIN_LAN_TXRX_MSIX	1
-> > #define ICE_MIN_LAN_OICR_MSIX	1
-> > #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
-> >+#define ICE_MAX_MSIX		256
-> > #define ICE_FDIR_MSIX		2
-> > #define ICE_RDMA_NUM_AEQ_MSIX	4
-> > #define ICE_MIN_RDMA_MSIX	2
-> >@@ -545,6 +546,12 @@ struct ice_agg_node {
-> > 	u8 valid;
-> > };
-> > 
-> >+struct ice_pf_msix {
-> >+	u16 cur;
-> >+	u16 min;
-> >+	u16 max;
-> >+};
-> >+
-> > struct ice_pf {
-> > 	struct pci_dev *pdev;
-> > 	struct ice_adapter *adapter;
-> >@@ -615,6 +622,7 @@ struct ice_pf {
-> > 	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
-> > 	u16 max_pf_txqs;	/* Total Tx queues PF wide */
-> > 	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
-> >+	struct ice_pf_msix msix;
-> > 	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
-> > 	u16 num_lan_tx;		/* num LAN Tx queues setup */
-> > 	u16 num_lan_rx;		/* num LAN Rx queues setup */
-> >diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
-> >index ad82ff7d1995..4e559fd6e49f 100644
-> >--- a/drivers/net/ethernet/intel/ice/ice_irq.c
-> >+++ b/drivers/net/ethernet/intel/ice/ice_irq.c
-> >@@ -252,7 +252,19 @@ void ice_clear_interrupt_scheme(struct ice_pf *pf)
-> > int ice_init_interrupt_scheme(struct ice_pf *pf)
-> > {
-> > 	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
-> >-	int vectors, max_vectors;
-> >+	union devlink_param_value value;
-> >+	int vectors, max_vectors, err;
-> >+
-> >+	/* load default PF MSI-X range */
-> >+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
-> >+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
-> >+					      &value);
-> 
-> If err is not 0, you have a bug in the driver. Perhaps it a about the
-> time to make this return void and add some WARN_ONs inside the function?
-> 
+I already started to implement other diagnostic features supported by the
+TI DP83TG720 PHY. For example following can be implemented too:
+6.3 Link quality – start-up time and link losses (LQ)
+6.3.1 Link training time (LTT)
+6.3.2 Local receiver time (LRT)
+6.3.3 Remote receiver time (RRT)
+6.3.4 Link Failures and Losses (LFL)
+6.3.5 Communication ready status (COM)
+6.4 Polarity Detection and Correction (POL)
+6.4.1 Polarity Detection (DET)
+6.4.2 Polarity Correction (COR)
 
-err is not 0 when this param isn't found (not registered yet). It is a
-case when driver is probing, I want to have here default values and
-register it later. Instead of checking if it is probe context or reload
-context I am checking if param already exists. The param doesn't exist in
-probe, but exists in reload.
+What is the best way to proceed with them? Export them over phy-statistics
+interface or extending the netlink interface?
 
-> 
-> >+	pf->msix.min = err ? ICE_MIN_MSIX : value.vu16;
-> >+
-> >+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
-> >+					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
-> >+					      &value);
-> >+	pf->msix.max = err ? total_vectors / 2 : value.vu16;
-> > 
-> > 	vectors = ice_ena_msix_range(pf);
-> > 
-> >-- 
-> >2.42.0
-> >
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
