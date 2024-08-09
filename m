@@ -1,108 +1,89 @@
-Return-Path: <netdev+bounces-117223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F81E94D268
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:45:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F7494D1CD
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98A81B222A8
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:45:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA1CE1C2118D
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C64919754A;
-	Fri,  9 Aug 2024 14:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581E519580A;
+	Fri,  9 Aug 2024 14:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGjJA6Uq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DxTWhrd8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B067C1DFE1;
-	Fri,  9 Aug 2024 14:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D589D174EE4;
+	Fri,  9 Aug 2024 14:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723214695; cv=none; b=dapfbfIY9sb+m9ziqAmXtNqC+p7TYB61yzeDVCjTFj0H8s9sYR+4SqkIYoUxnFGNZt4pXTuxWOhPk5eZQfZ+3PhC5VtVDm2GRjtb+MBCUs4LPa71eA8AjmyM7USBX4uyTDnbc1hCmLFvNlEf/k7WSeSu9SMflswQiUCH1UoPm/8=
+	t=1723212470; cv=none; b=LPDb9UfIUJrXnejeVpL4axPeATgw+C/RxKy1DqUDdtvFO5K8oCpsMlhNd7qA9U7KHPbiLrp4bWX5qqckOrcxouM6/hhgQfXVgdUOljAOGgdSnJhoxPeXGutZgn17EQCrMOfz57LVgv0WB235B3dr0kl5rgsvM9fT7hP87FzdpJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723214695; c=relaxed/simple;
-	bh=KeCOkdeMj7jfUARfg+0sT1kcD7hB7YWqxUDtJt3Nkw0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=fr+EFaZiM9/m9Vwdf79e8NoLl6eLOZZkquLvFyJQdI+40p3P+OSOiYwFrgvez4U4gnuSjRdLHnVK0yqZvt7xFP1SHfpeTvoZ81Ax8d5tIZEA54RGrUlMl2qwxGb+7sRqggFebcC4rUKTY+RgKyXNh0nbkWSVQ4Snn329KoNdxTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGjJA6Uq; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-368526b1333so1925208f8f.1;
-        Fri, 09 Aug 2024 07:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723214692; x=1723819492; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/dMGgv1RCO9tIGQHpojzXRCbF3RQKlUcFcpP+8JAmc0=;
-        b=EGjJA6Uq6pr9on6J0Bf65x1X1Q9PPjufTYO5jW+BYb68pr1LYthL88wKetL4+Nwh12
-         V4QfbV18vIEHiXdsRxKvyhP8d+AC8f6Tn8teF99LhG4JUrP7rMVgwN5I5/2f5pt9qPOU
-         fJlRiuGF5lLIdDvl5EujQ1O8uz9ZQ3IT3J0lEn+owUX5V/D1BOORxOSWRCjZoGKExmjW
-         xaGYw5pvSCxHWwEWmXTGFw5OnVPcKIQH9JqEzf7fvWlVv4gFPgvz5aTqxU85NDcnn0xo
-         Q2yB1B08/1F8kIQzWruzKv19A38v+rrDXu5SkZQ455wwji1I+EnV1Po7bn8rS/uxzD6x
-         A7yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723214692; x=1723819492;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/dMGgv1RCO9tIGQHpojzXRCbF3RQKlUcFcpP+8JAmc0=;
-        b=YLrW21bL4AwukRQ7buJGY7NvRO/6ANc9SLGXj7C1m8rBFGNAFmugXm/P8PK4KHqv1T
-         QBCFUAUSrWlrdBFw2zE6Ad1PKSP9W9V5PUYc1sbJ0m0eQr3LBmAyVTm5ikjPt5N7cm6u
-         5xUKThOJ97HBDRonL7+yCUF+Uvwqr8S7iXGt4ZLPw8MV1ZdALXhZBjpT1PHd5NNRQ2XN
-         Wj1ulZPVmt/0sSq+fqdmtnX2kuXs6mDWC0nMJBoRNlQ/bHex3g8FLd42+NYMx9eQX0nX
-         R9s7PXOz0bAAF4SKVJTc8AC+5K4GRzUcBhGMswJvrQJR3fvKx3oYqtN/rdbLe7UFlOHf
-         2IEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXvlJ/GHsIJpA2OydJjn/peywB889BMUq9vhLk0ybO19o4kgE+zTJ+PBIf+zCsvXDmno7+jhidh5KuiTkgEZOHUB++MrMEdRyarxKdrMf9iFuJUMTEBLeSjuYlZlq9ZOWgk2YcElpdQ
-X-Gm-Message-State: AOJu0Yw01h0Xj5rpgKrBmUtqnETYM2BvIwKN5qin2L1k3hYbD+LYyOBb
-	eBHH1zG3iIAqLjgv2EZP1mKSf9N5smj+49CdcqFe/pMstUf7uS5u
-X-Google-Smtp-Source: AGHT+IGLJEeEpwsCiH7unqDJWHo9SYYYVGhxV1yRTrgqx1iRL9g/yNyfLvjK7s1a+VAILfZ9OlehiQ==
-X-Received: by 2002:a5d:66d1:0:b0:367:8fee:4434 with SMTP id ffacd0b85a97d-36d68d9de50mr1398005f8f.16.1723214691722;
-        Fri, 09 Aug 2024 07:44:51 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:f01e:f03a:11db:ad8e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27208c81sm5558167f8f.73.2024.08.09.07.44.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 07:44:51 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik
- <kadlec@netfilter.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  netfilter-devel@vger.kernel.org,
-  netdev@vger.kernel.org,  donald.hunter@redhat.com
-Subject: Re: [PATCH nf v1] netfilter: nfnetlink: Initialise extack before
- use in ACKs
-In-Reply-To: <20240809090238.GF3075665@kernel.org> (Simon Horman's message of
-	"Fri, 9 Aug 2024 10:02:38 +0100")
-Date: Fri, 09 Aug 2024 12:15:55 +0100
-Message-ID: <m25xsaq74k.fsf@gmail.com>
-References: <20240806154324.40764-1-donald.hunter@gmail.com>
-	<20240809090238.GF3075665@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1723212470; c=relaxed/simple;
+	bh=zD7h3HcvCWWIIf6aYLP1APhfS/6dRb7y9zsTZS2srzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZT2I59v5pkeUCHOcVkHHkStmuxc4TWM2zYDNMh57MPbgb6vpUxQY0N40RSlrmr8JBgrunq4xnVuAVxi9Ug0GPLH8tZAc/0lvvQpBIN8Y+/34aWy6KhFmZpTn6zA83fH1BUK6uQxukB5HmpfZkBBjdJOWEe4t5ttqQRHiUb91VMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DxTWhrd8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ZSK0gaAnl4gyzygkdHSHTkwq9hcA+qPNT/OCFaD2XEs=; b=Dx
+	TWhrd8Xv/qraGB327AeRXqRXNg1bXzVMJxQALXC5igncAL7qK5ti+I6g66UoRjhexA7IvlTAkJvtO
+	pE+MdcXY6fNxsNG8xNDLf7vxr+TgDSUgjUmlCWvag+fk8mnnLLgUfTgnuJw33puLGqHytmLuyi06r
+	JTgWl7oUXm3X+aY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1scQHM-004NqI-Gz; Fri, 09 Aug 2024 16:07:40 +0200
+Date: Fri, 9 Aug 2024 16:07:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dqfext@gmail.com" <dqfext@gmail.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>
+Subject: Re: [PATCH net-next v10 00/13] net: phy: mediatek: Introduce
+ mtk-phy-lib and add 2.5Gphy support
+Message-ID: <9d1e9cf8-8cd5-4ec6-ba1e-d55ed5e1afa5@lunn.ch>
+References: <20240701105417.19941-1-SkyLake.Huang@mediatek.com>
+ <0935426d09f3bf83b119e8f6bf498479a62845c0.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0935426d09f3bf83b119e8f6bf498479a62845c0.camel@mediatek.com>
 
-Simon Horman <horms@kernel.org> writes:
+On Fri, Aug 09, 2024 at 10:58:02AM +0000, SkyLake Huang (黃啟澤) wrote:
+> Gentle ping.
 
-> On Tue, Aug 06, 2024 at 04:43:24PM +0100, Donald Hunter wrote:
->> Add missing extack initialisation when ACKing BATCH_BEGIN and BATCH_END.
->> 
->> Fixes: bf2ac490d28c ("netfilter: nfnetlink: Handle ACK flags for batch messages")
->> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
->
-> Hi Donald,
->
-> I see two other places that extack is used in nfnetlink_rcv_batch().
-> Is it safe to leave them as-is?
+Hi Daniel
 
-There is a memset at the start of the main while loop that zeroes extack
-for those two cases.
+What is your take on this patchset? Are you happy to give Reviewed-by:
+for them?
+
+    Andrew
 
