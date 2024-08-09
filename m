@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-117062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A3C94C8C5
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:18:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B9E694C8C6
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 05:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 149CE1F26280
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 03:18:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDFAD1C222D7
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 03:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1551F17BD6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C48182A0;
 	Fri,  9 Aug 2024 03:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rrTpdiQr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NHQc+7Lo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F682FB2
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 03:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20121805A
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 03:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723173511; cv=none; b=iqihPtVy3P6sViH1cNSKupP2/aM+qdGeRuUkZ223VU49PfZ4Eo8FU6esH9fevbQDg9TbT/Q/AAuJqTdd+Tj6+1J66zDuOF1+vTyO3UnrM3cGfbLNjBlXRlXiUQVxXaMuPGCxQSl9R4RGTE5muPYGgoQZIajH61hQD/tBqEMqhgU=
+	t=1723173511; cv=none; b=XJ8bXXKM9SO3GQ0tO2B8aiejHV7e1zvuWPBIsXQo7ceOPzDwabTmkU5mgQM/LDbu3/wW84fNdz/0QpwrfYsb+rJX6eDQuRi9LgY8oOwAcjkdN/Uol+fYl+7h77CkUw5j0/G6w1VhSByc7aSQPiw+/6ju24MmDZKrEptv4SkvbRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723173511; c=relaxed/simple;
-	bh=RuiudRBah5fWK6QbSCyPbPELHjSGQT+qvgMP+8o6IHI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qqsp9q4XRTLTT2kITp2cN37O4l2vuFn/1x/bq3QXj7MlstgIYMNp3bvvazUt9IHOnRMMImCtRFumTeyPlmJz+mRYYEWm/8vWdH5nUUTQjdFlE2VQxu3aeng5SGH2NtNJNzMWPpD/CJvEwJLP5saTsORrNeNnB7XgMjMcNWoMTgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rrTpdiQr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97168C32782;
-	Fri,  9 Aug 2024 03:18:29 +0000 (UTC)
+	bh=h7m3rBOCSELPXgRkrDIeZOBFnuVvnQIIL3oW3PCTAiE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FPH9g2Kl3SjS8qpj8qaj+QViZ2rrObM999X3w6CIFPicpyv1dOhEg/eA6zW/NPeLbkSzKzvHGnmJlXPDzCi+nDPNZC2iD0ti4SitEWtbgC/ZXsSrvRbIt8WUDkEf2+2v5N306oBfHWSrNCp8g2F3u4+Rb+0x2nXdyTvWQ4VE4QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NHQc+7Lo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E42C4AF0C;
+	Fri,  9 Aug 2024 03:18:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723173510;
-	bh=RuiudRBah5fWK6QbSCyPbPELHjSGQT+qvgMP+8o6IHI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rrTpdiQrQrWVDbSWpItWPQgILTNIoGbIdk8/l02EAQ/+44SoAF+S+cd13+RT2eHSC
-	 S8pHBjTnkvgGL6pAon6oIeb7gUFmVnrARSgH/mcMyo0eYD0ywFN0JPLdx7fWFG1owx
-	 m9dE4rwXk9TU1fO8owaf2UzpFCIPzxrPdq1JFsn3tX+StCpcsba+qe8h8wVfxYjpJA
-	 RHZguJyFQvH2oUkoP2jWfFVEAerHWFHBTw8CfFIXHeUyPiz2OigcPmDiVDs3m2dc/f
-	 flUvz/Rv9DTf6ILaxERuauehQKz8ug0LjCGQ//Pz5w2BqzJmxw3cCH7CBbV1Ix9m7y
-	 i4jcHTFAGx0rQ==
+	s=k20201202; t=1723173511;
+	bh=h7m3rBOCSELPXgRkrDIeZOBFnuVvnQIIL3oW3PCTAiE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NHQc+7Lol0zb487qGdvFzp3FXXPYSk77Vdub79b6v/004n7HbZHDYbqGy6vKMF1WN
+	 hj45wzlkberTPGmNdKn3b33E8Ls/eh8ReFRup/ITy5WG7IG9LXDtlUl3sQl+g9GIRX
+	 ytFdEu9P9meXRxAMYPbJqkku+fjO69D2iSZC1jLL2yg9ha6MexO1R8dpdu2LQr1wE8
+	 c4MBiuaGIMkQM7OpaPCcR47d9gdF1Qu6UNQ/wvjzDdAha21lCJO+sZq/TqU6Sfv/K/
+	 CfL+0LUD/7Vg3lQIvA7SYle+gre13k3j9Uqm10eRoicOlBwFC84iUdgGKtp2nupl5e
+	 Hv4QMjGkQsXMg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,10 +59,12 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v4 00/12] ethtool: rss: driver tweaks and netlink context dumps
-Date: Thu,  8 Aug 2024 20:18:15 -0700
-Message-ID: <20240809031827.2373341-1-kuba@kernel.org>
+Subject: [PATCH net-next v4 01/12] selftests: drv-net: rss_ctx: add identifier to traffic comments
+Date: Thu,  8 Aug 2024 20:18:16 -0700
+Message-ID: <20240809031827.2373341-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240809031827.2373341-1-kuba@kernel.org>
+References: <20240809031827.2373341-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,106 +73,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series is a semi-related collection of RSS patches.
-Main point is supporting dumping RSS contexts via ethtool netlink.
-At present additional RSS contexts can be queried one by one, and
-assuming user know the right IDs. This series uses the XArray
-added by Ed to provide netlink dump support for ETHTOOL_GET_RSS.
+Include the "name" of the context in the comment for traffic
+checks. Makes it easier to reason about which context failed
+when we loop over 32 contexts (it may matter if we failed in
+first vs last, for example).
 
-Patch 1 is a trivial selftest debug patch.
-Patch 2 coverts mvpp2 for no real reason other than that I had
-	a grand plan of converting all drivers at some stage.
-Patch 3 removes a now moot check from mlx5 so that all tests
-	can pass.
-Patch 4 and 5 make a bit used for context support optional,
-	for easier grepping of drivers which need converting
-	if nothing else.
-Patch 6 OTOH adds a new cap bit; some devices don't support
-	using a different key per context and currently act
-	in surprising ways.
-Patch 7 and 8 update the RSS netlink code to use XArray.
-Patch 9 and 10 add support for dumping contexts.
-Patch 11 and 12 are small adjustments to spec and a new test.
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Reviewed-by: Joe Damato <jdamato@fastly.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/testing/selftests/drivers/net/hw/rss_ctx.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-I'm getting distracted with other work, so probably won't have
-the time soon to complete next steps, but things which are missing
-are (and some of these may be bad ideas):
-
- - better discovery
-
-   Some sort of API to tell the user who many contexts the device
-   can create. Upper bound, devices often share contexts between
-   ports etc. so it's hard to tell exactly and upfront number of
-   contexts for a netdev. But order of magnitude (4 vs 10s) may
-   be enough for container management system to know whether to bother.
-
- - create/modify/delete via netlink
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index 011508ca604b..1da6b214f4fe 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@ -90,10 +90,10 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+     ksft_ge(directed, 20000, f"traffic on {name}: " + str(cnts))
+     if params.get('noise'):
+         ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
+-                "traffic on other queues:" + str(cnts))
++                f"traffic on other queues ({name})':" + str(cnts))
+     if params.get('empty'):
+         ksft_eq(sum(cnts[i] for i in params['empty']), 0,
+-                "traffic on inactive queues: " + str(cnts))
++                f"traffic on inactive queues ({name}): " + str(cnts))
  
-   The only question here is how to handle all the tricky IOCTL
-   legacy. "No change" maps trivially to attribute not present.
-   "reset" (indir_size = 0) probably needs to be a new NLA_FLAG?
-
- - better table size handling
-
-   The current API assumes the LUT has fixed size, which isn't
-   true for modern devices. We should have better APIs for the
-   drivers to resize the tables, and in user facing API -
-   the ability to specify pattern and min size rather than
-   exact table expected (sort of like ethtool CLI already does).
-
- - recounted / socket-bound contexts
-
-   Support for contexts which get "cleaned up" when their parent
-   netlink socket gets closed. The major catch is that ntuple
-   filters (which we don't currently track) depend on the context,
-   so we need auto-removal for both.
-
-v4:
- - adjust to the meaning of max context from net
-v3: https://lore.kernel.org/20240806193317.1491822-1-kuba@kernel.org
- - quite a few code comments and commit message changes
- - mvpp2: fix interpretation of max_context_id (I'll take care of
-   the net -> net-next merge as needed)
- - filter by ifindex in the selftest
-v2: https://lore.kernel.org/20240803042624.970352-1-kuba@kernel.org
- - fix bugs and build in mvpp2
-v1: https://lore.kernel.org/20240802001801.565176-1-kuba@kernel.org
-
-Jakub Kicinski (12):
-  selftests: drv-net: rss_ctx: add identifier to traffic comments
-  eth: mvpp2: implement new RSS context API
-  eth: mlx5: allow disabling queues when RSS contexts exist
-  ethtool: make ethtool_ops::cap_rss_ctx_supported optional
-  eth: remove .cap_rss_ctx_supported from updated drivers
-  ethtool: rss: don't report key if device doesn't support it
-  ethtool: rss: move the device op invocation out of rss_prepare_data()
-  ethtool: rss: report info about additional contexts from XArray
-  ethtool: rss: support dumping RSS contexts
-  ethtool: rss: support skipping contexts during dump
-  netlink: specs: decode indirection table as u32 array
-  selftests: drv-net: rss_ctx: test dumping RSS contexts
-
- Documentation/netlink/specs/ethtool.yaml      |  14 +-
- Documentation/networking/ethtool-netlink.rst  |  12 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |   1 +
- .../net/ethernet/marvell/mvpp2/mvpp2_cls.c    |  18 +-
- .../net/ethernet/marvell/mvpp2/mvpp2_cls.h    |   2 +-
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 103 +++++---
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  13 +-
- drivers/net/ethernet/sfc/ef100_ethtool.c      |   2 +-
- drivers/net/ethernet/sfc/ethtool.c            |   2 +-
- include/linux/ethtool.h                       |   7 +-
- include/uapi/linux/ethtool_netlink.h          |   1 +
- net/ethtool/ioctl.c                           |  31 ++-
- net/ethtool/netlink.c                         |   2 +
- net/ethtool/netlink.h                         |   4 +-
- net/ethtool/rss.c                             | 233 ++++++++++++++++--
- .../selftests/drivers/net/hw/rss_ctx.py       |  80 +++++-
- tools/testing/selftests/net/lib/py/ksft.py    |   6 +
- 18 files changed, 442 insertions(+), 91 deletions(-)
-
+ 
+ def test_rss_key_indir(cfg):
 -- 
 2.46.0
 
