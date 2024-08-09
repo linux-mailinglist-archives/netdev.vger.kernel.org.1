@@ -1,252 +1,371 @@
-Return-Path: <netdev+bounces-117252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B67B94D556
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:23:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68AD94D565
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:26:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78D02B20C38
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:23:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55963282A0E
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19067495E5;
-	Fri,  9 Aug 2024 17:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72315A0FE;
+	Fri,  9 Aug 2024 17:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jv1qewTm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9s6zwuZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A53E61FD8;
-	Fri,  9 Aug 2024 17:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E6B49630
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723224203; cv=none; b=MHICQOYM1b4DfuooSHq1goofCAN8COneY1KSJVj0Bz7RkcacnKP39mTKbHs5XSa0pGpWPNOTfJe4km7e/i6C1WLvVXzofNnbz6G9sSpIYso+9HWhD7SlmdfQFwr9LkeMV7eSiyM/T1e+JH2rpTTKwt0LC1KEfM30xRfw7Ea6V30=
+	t=1723224386; cv=none; b=mPVfCrWfeu0PHxJGHz2XYJPksKk1/JBTyIAzvm1yJ8/DvIvYScp+WLJrwBhci9KjdLhthKgPVTyJNBmvGQ9O2dcS9tTlgoUxJ/6+m2LrEjOgbP1H185Zfu08mC2BRVytMNHe9apvz/LNSNYCVdCRAs/pVyNlIsL7IU37nOsJYvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723224203; c=relaxed/simple;
-	bh=0PZo/Ac9ke36wG6AVSpgHrTHheHjhZfH3xagdecugsg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BUbSD+VKgP+yUXR7dlLEJLG7mR3Pl94IbcnEUFIlUlb0f3AUCDUgOebntton7J2kpzo1EQRMWGdwScbMbEoRhkFABF9edn63FWK/tHONIbo0YpgIvFzYB7muccOdcve7AYq8+PKdYNHL0w1Og6KBfLHOqueMDUGuUWSiQ9Qzm2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jv1qewTm; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1723224386; c=relaxed/simple;
+	bh=X7jQrtYU4p6jWU1OATu5ycSVJmSWsSVr7l4f1kIbgEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PvehW2YVZIv94yGVzQRDJP5fGOnSQhaGlFmf4fUHikT8JmHa1uauYumtlkCmYD8Om8kSFlGRp9jlECDKMojYK2bz/a1By7ANp3IjwKSI5E6+MKgjD1GMk6MOi3QWwDM71vtmpcx2y2UxUeMpuszUonCwrPWkROO+jvSdVdpotlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b9s6zwuZ; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2caff99b1c9so1927374a91.3;
-        Fri, 09 Aug 2024 10:23:21 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f032cb782dso25251931fa.3
+        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 10:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723224200; x=1723829000; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E4nf2vVsE4rNUghEnE6rx77U4NSKcuKPAo9x1pxrGbo=;
-        b=jv1qewTmpmPgxMvEDzSH1CBdK07PWwrGOxnzORqGIigBvrarMwPkMevUO1mWizxphm
-         TA4jVXmE0tyVrgFP4xEMUPg5c8gJgRq61aY1ttVffFZGsWZeCO5oM1rlzwdGUmlbLyLz
-         OVp73wgIy7Odh2UfLpwUSefi5Kek3Ic4nxo6BsXQyRSNC7xlMg0tYJHZ1fIWrEg8QHrv
-         aR0TbQxZEQu1xC7sJYQ28HtRI0EMf4UBMvcpHfM0P6SNQjmtK1iytNGU1ISh/damRgVC
-         /62/HrzyiH/d2cN6PM/+XyT9tLZFxSPAa9RbNGTf/SBN9vt7m9S4g+XTXP/lQSOtrVG+
-         uYeA==
+        d=gmail.com; s=20230601; t=1723224383; x=1723829183; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M+DWHbJc3q3xN7YpLx3AV/TFq9hhXUNIjl+KMRzCUxM=;
+        b=b9s6zwuZVn+nn9Fxen9PXsl23y/pCyS1XrnYULmL2M5tGeJrPYi52Ejm0zsE39R8O6
+         UUsOtQliqJeS/F2UE0PaANdsRYY/j2y5ADadiBLeGHVUVlg/M+nVG7+dJMOl1KSIeCAN
+         BHRkGM9JmLEbY0Z0RInf8/n2qfYW9qqfXA3cfBb2gMbaijiXVUe0jgwiEf47WCdf1F90
+         MjJypRlgiUR747TwWPrwlA5JYCp73zIHUDtkJZVeam8aKy20zSs1Dz9P3QwreOqDJJEu
+         csJ9ukFaNEGyxmMQempfdUxVG95dy8hcRVl+zIapk6U42aMcY3Dre/xKhUITlXw84WSA
+         5rVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723224200; x=1723829000;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E4nf2vVsE4rNUghEnE6rx77U4NSKcuKPAo9x1pxrGbo=;
-        b=TRvaFUe3P5edMVQ1MvEknu6qPvIUcKkUSaKxB/8vQhxvdQ1syPwIuU7ZAlkYbmF4DI
-         9bkFY3VI0/pi5irNJA3R59uoQavxmIWEMkElrEOUbVoaBfsITizh4KtHzpKjM/VIn3wC
-         vYj4dQ+awPiK5nJwaVxo/CNupHzSUGeO6uaVxBkGtg8g/3PdUR0b7t0Z68tTtEkame+/
-         5pLkIG7DQLtAeLC0CyvoG6hGQeNusy2OMsrm8BRUuB3XjF9DGcLbKyD+dRM+eB9qPRAs
-         M97uDGSMHNYM1+6ltFDaxLQnpkSLyAIYUFC9uzhCajVYATouuz8IA7nEIN8712ZUGLWU
-         p3Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCV70eiijf6W1sjI6/MFVhzOo4sv3o39eR0l80TdpyW0Axsa1M+yvTBToi6xMBFRI1RGuchbQp4/YOvDOXvQZ7/9eYtI0wm4wx6eyiaALKTWCRrSi3iRJ7F94Yu2o2QOGCyLQoBzkYUZJabGyW/uYlDy8TZ2JFihWG+oeBgadDF7WzZTP0+QfuYqjT/K9ze2KtMVHTD3dJspsQFxnFbw8+rFxPLOr3kyvho=
-X-Gm-Message-State: AOJu0Yx9TQ6zOypQ488WpjEkJKe9ugMU3eJfx1DRi9f+X+NvVi8HLyTR
-	hzabhWEjfY88FcZo4sRCsRDRxNDqJ8PcPOcm7lo2bKiydYpjrPZZtsT5GHp7QaWTjs6+xtfIeCC
-	dH+/aB0g7iOY9TKPSXXMxaWRjvPl9Fw==
-X-Google-Smtp-Source: AGHT+IEpnb6/gaAmxrz4Xp5pn0+3G4YQxfp9iu1mxL9WijR0M987FyzWp5uOkoCxw99MaeryCykCUqfcrz831oW7wsA=
-X-Received: by 2002:a17:90a:b113:b0:2cd:b915:c80b with SMTP id
- 98e67ed59e1d1-2d1e8082b97mr2434499a91.27.1723224200505; Fri, 09 Aug 2024
- 10:23:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723224383; x=1723829183;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M+DWHbJc3q3xN7YpLx3AV/TFq9hhXUNIjl+KMRzCUxM=;
+        b=pLh5peVww03viR6ytC3uAf5rpwLlF1C6lAoic4CUBRCki1QV1d+SZvRwhNGSHn6Og9
+         KQfrUkm3NzRMaW5Vssl/hbp312JJqno1QwaSruh8kCKkeNdesv0sxpcX1E0B6RiSkMSc
+         pywXB4XHLYk2QADwTFw3XyLDM6Hi4WxQpd96FRD9b+qkzc4JMF93sMOUZyAaplajwa4I
+         ntXq55pQyD8MO7vKsffgstLsyS9yCICDMni9PYwb5KXg01+cTwP1r4xk0mAtE8p+jHS6
+         rY6AtLnFlQVgRAFd6fszO/KK1wsrN4sTnWzVHmXyuNmC+S7CAM3DiNHhah6DJ5S0ZCEU
+         fGCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsA+J+SXZ8vDqVV4j5tinWgVkV6Z4KHUDKwomptNwE53e3nfYRdc7qQcXmO7Nzj2RPjn6b77ih/eQ0h1OVwOI340UUgYVB
+X-Gm-Message-State: AOJu0YwQwFLLx5cHkiqLVqIU8v/+UZowlp3682wnU8IT/k5emsS7rGjV
+	SZJPSmj1uObyQ/EYlcm4u5TtK5RbevcLM1XC+UR6E1AIGOe/VdFe
+X-Google-Smtp-Source: AGHT+IFOjELm8goV/f6xaEta9Nysjln0XNrger5mZCTmrYC1qfJPCNzxDgGFmW9GFkU9RBdLArbG4A==
+X-Received: by 2002:a2e:bd86:0:b0:2ef:1b64:531b with SMTP id 38308e7fff4ca-2f1a6d65e08mr22915941fa.42.1723224382348;
+        Fri, 09 Aug 2024 10:26:22 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f292068295sm74621fa.133.2024.08.09.10.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 10:26:21 -0700 (PDT)
+Date: Fri, 9 Aug 2024 20:26:19 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, diasyzhang@tencent.com, 
+	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk, 
+	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
+	si.yanteng@linux.dev, Huacai Chen <chenhuacai@loongson.cn>
+Subject: Re: [PATCH net-next v17 11/14] net: stmmac: dwmac-loongson: Add
+ DT-less GMAC PCI-device support
+Message-ID: <hrnq2ipnep65lx2ao4mfkyi4yy73d2w46jgevf536moqdi4jlo@moxi4zamjxws>
+References: <cover.1723014611.git.siyanteng@loongson.cn>
+ <b13292f1bb64e335663d5929c81369da88fa2c13.1723014611.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
- <20240807-fehlschlag-entfiel-f03a6df0e735@brauner> <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
- <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
- <CAEf4Bzauw1tD4UsyhX1PmRs_Y1MzfPqsoRUf40cmNuu7SJKi9w@mail.gmail.com> <CAADnVQ+55NKkEaAsjGh52=VsSgr9G-qvjBCPmaPrTxiN6eCZOw@mail.gmail.com>
-In-Reply-To: <CAADnVQ+55NKkEaAsjGh52=VsSgr9G-qvjBCPmaPrTxiN6eCZOw@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 9 Aug 2024 10:23:08 -0700
-Message-ID: <CAEf4BzYLQhO_UwaQLfpwoiQMvb0-wLQM6Yr7v-5CYLvoa8qzkA@mail.gmail.com>
-Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
- single ldimm64 insn into helper
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>, viro@kernel.org, bpf <bpf@vger.kernel.org>, 
-	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, Amir Goldstein <amir73il@gmail.com>, 
-	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, kvm@vger.kernel.org, 
-	Network Development <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b13292f1bb64e335663d5929c81369da88fa2c13.1723014611.git.siyanteng@loongson.cn>
 
-On Thu, Aug 8, 2024 at 6:23=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Aug 8, 2024 at 1:35=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Thu, Aug 8, 2024 at 9:51=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Wed, Aug 7, 2024 at 8:31=E2=80=AFAM Andrii Nakryiko
-> > > <andrii.nakryiko@gmail.com> wrote:
-> > > >
-> > > > On Wed, Aug 7, 2024 at 3:30=E2=80=AFAM Christian Brauner <brauner@k=
-ernel.org> wrote:
-> > > > >
-> > > > > On Tue, Aug 06, 2024 at 03:32:20PM GMT, Andrii Nakryiko wrote:
-> > > > > > On Mon, Jul 29, 2024 at 10:20=E2=80=AFPM <viro@kernel.org> wrot=
-e:
-> > > > > > >
-> > > > > > > From: Al Viro <viro@zeniv.linux.org.uk>
-> > > > > > >
-> > > > > > > Equivalent transformation.  For one thing, it's easier to fol=
-low that way.
-> > > > > > > For another, that simplifies the control flow in the vicinity=
- of struct fd
-> > > > > > > handling in there, which will allow a switch to CLASS(fd) and=
- make the
-> > > > > > > thing much easier to verify wrt leaks.
-> > > > > > >
-> > > > > > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> > > > > > > ---
-> > > > > > >  kernel/bpf/verifier.c | 342 +++++++++++++++++++++-----------=
-----------
-> > > > > > >  1 file changed, 172 insertions(+), 170 deletions(-)
-> > > > > > >
-> > > > > >
-> > > > > > This looks unnecessarily intrusive. I think it's best to extrac=
-t the
-> > > > > > logic of fetching and adding bpf_map by fd into a helper and th=
-at way
-> > > > > > contain fdget + fdput logic nicely. Something like below, which=
- I can
-> > > > > > send to bpf-next.
-> > > > > >
-> > > > > > commit b5eec08241cc0263e560551de91eda73ccc5987d
-> > > > > > Author: Andrii Nakryiko <andrii@kernel.org>
-> > > > > > Date:   Tue Aug 6 14:31:34 2024 -0700
-> > > > > >
-> > > > > >     bpf: factor out fetching bpf_map from FD and adding it to u=
-sed_maps list
-> > > > > >
-> > > > > >     Factor out the logic to extract bpf_map instances from FD e=
-mbedded in
-> > > > > >     bpf_insns, adding it to the list of used_maps (unless it's =
-already
-> > > > > >     there, in which case we just reuse map's index). This simpl=
-ifies the
-> > > > > >     logic in resolve_pseudo_ldimm64(), especially around `struc=
-t fd`
-> > > > > >     handling, as all that is now neatly contained in the helper=
- and doesn't
-> > > > > >     leak into a dozen error handling paths.
-> > > > > >
-> > > > > >     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > > > > >
-> > > > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > > > > index df3be12096cf..14e4ef687a59 100644
-> > > > > > --- a/kernel/bpf/verifier.c
-> > > > > > +++ b/kernel/bpf/verifier.c
-> > > > > > @@ -18865,6 +18865,58 @@ static bool bpf_map_is_cgroup_storage(=
-struct
-> > > > > > bpf_map *map)
-> > > > > >          map->map_type =3D=3D BPF_MAP_TYPE_PERCPU_CGROUP_STORAG=
-E);
-> > > > > >  }
-> > > > > >
-> > > > > > +/* Add map behind fd to used maps list, if it's not already th=
-ere, and return
-> > > > > > + * its index. Also set *reused to true if this map was already=
- in the list of
-> > > > > > + * used maps.
-> > > > > > + * Returns <0 on error, or >=3D 0 index, on success.
-> > > > > > + */
-> > > > > > +static int add_used_map_from_fd(struct bpf_verifier_env *env, =
-int fd,
-> > > > > > bool *reused)
-> > > > > > +{
-> > > > > > +    struct fd f =3D fdget(fd);
-> > > > >
-> > > > > Use CLASS(fd, f)(fd) and you can avoid all that fdput() stuff.
-> > > >
-> > > > That was the point of Al's next patch in the series, so I didn't wa=
-nt
-> > > > to do it in this one that just refactored the logic of adding maps.
-> > > > But I can fold that in and send it to bpf-next.
-> > >
-> > > +1.
-> > >
-> > > The bpf changes look ok and Andrii's approach is easier to grasp.
-> > > It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
-> > > so it goes through bpf CI and our other testing.
-> > >
-> > > bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
-> > > and fderr, so pretty much independent from other patches.
-> >
-> > Ok, so CLASS(fd, f) won't work just yet because of peculiar
-> > __bpf_map_get() contract: if it gets valid struct fd but it doesn't
-> > contain a valid struct bpf_map, then __bpf_map_get() does fdput()
-> > internally. In all other cases the caller has to do fdput() and
-> > returned struct bpf_map's refcount has to be bumped by the caller
-> > (__bpf_map_get() doesn't do that, I guess that's why it's
-> > double-underscored).
-> >
-> > I think the reason it was done was just a convenience to not have to
-> > get/put bpf_map for temporary uses (and instead rely on file's
-> > reference keeping bpf_map alive), plus we have bpf_map_inc() and
-> > bpf_map_inc_uref() variants, so in some cases we need to bump just
-> > refcount, and in some both user and normal refcounts.
-> >
-> > So can't use CLASS(fd, ...) without some more clean up.
-> >
-> > Alexei, how about changing __bpf_map_get(struct fd f) to
-> > __bpf_map_get_from_fd(int ufd), doing fdget/fdput internally, and
-> > always returning bpf_map with (normal) refcount bumped (if successful,
-> > of course). We can then split bpf_map_inc_with_uref() into just
-> > bpf_map_inc() and bpf_map_inc_uref(), and callers will be able to do
-> > extra uref-only increment, if necessary.
-> >
-> > I can do that as a pre-patch, there are about 15 callers, so not too
-> > much work to clean this up. Let me know.
->
-> Yeah. Let's kill __bpf_map_get(struct fd ..) altogether.
-> This logic was added in 2014.
-> fdget() had to be first and fdput() last to make sure
-> the map won't disappear while sys_bpf command is running.
-> All of the places can use bpf_map_get(), bpf_map_put() pair
-> and rely on map->refcnt, but...
->
-> - it's atomic64_inc(&map->refcnt); The cost is probably
-> in the noise compared to all the work that map sys_bpf commands do.
->
+On Wed, Aug 07, 2024 at 09:48:05PM +0800, Yanteng Si wrote:
+> The Loongson GMAC driver currently supports the network controllers
+> installed on the LS2K1000 SoC and LS7A1000 chipset, for which the GMAC
+> devices are required to be defined in the platform device tree source.
+> But Loongson machines may have UEFI (implies ACPI) or PMON/UBOOT
+> (implies FDT) as the system bootloaders. In order to have both system
+> configurations support let's extend the driver functionality with the
+> case of having the Loongson GMAC probed on the PCI bus with no device
+> tree node defined for it. That requires to make the device DT-node
+> optional, to rely on the IRQ line detected by the PCI core and to
+> have the MDIO bus ID calculated using the PCIe Domain+BDF numbers.
+> 
+> In order to have the device probe() and remove() methods less
+> complicated let's move the DT- and ACPI-specific code to the
+> respective sub-functions.
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Acked-by: Huacai Chen <chenhuacai@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 
-agreed, not too worried about this
+No more comments from my side. Thanks.
 
-> - It also opens new fuzzing opportunity to do some map operation
-> in one thread and close(map_fd) in the other, so map->usercnt can
-> drop to zero and map_release_uref() cleanup can start while
-> the other thread is still busy doing something like map_update_elem().
-> It can be mitigated by doing bpf_map_get_with_uref(), but two
-> atomic64_inc() is kinda too much.
->
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-yep, with_uref() is an overkill for most cases. I'd rather fix any
-such bugs, if we have them.
+-Serge(y)
 
-> So let's remove __bpf_map_get() and replace all users with bpf_map_get(),
-> but we may need to revisit that later.
-
-Ok, I will probably send something next week.
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 165 +++++++++++-------
+>  1 file changed, 102 insertions(+), 63 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 10b49bea8e3c..c0740a41025b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -12,11 +12,15 @@
+>  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>  
+>  struct stmmac_pci_info {
+> -	int (*setup)(struct plat_stmmacenet_data *plat);
+> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>  };
+>  
+> -static void loongson_default_data(struct plat_stmmacenet_data *plat)
+> +static void loongson_default_data(struct pci_dev *pdev,
+> +				  struct plat_stmmacenet_data *plat)
+>  {
+> +	/* Get bus_id, this can be overwritten later */
+> +	plat->bus_id = pci_dev_id(pdev);
+> +
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>  	plat->has_gmac = 1;
+>  	plat->force_sf_dma_mode = 1;
+> @@ -49,9 +53,10 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>  	plat->dma_cfg->pblx8 = true;
+>  }
+>  
+> -static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+> +static int loongson_gmac_data(struct pci_dev *pdev,
+> +			      struct plat_stmmacenet_data *plat)
+>  {
+> -	loongson_default_data(plat);
+> +	loongson_default_data(pdev, plat);
+>  
+>  	plat->tx_queues_to_use = 1;
+>  	plat->rx_queues_to_use = 1;
+> @@ -65,20 +70,85 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+>  	.setup = loongson_gmac_data,
+>  };
+>  
+> +static int loongson_dwmac_dt_config(struct pci_dev *pdev,
+> +				    struct plat_stmmacenet_data *plat,
+> +				    struct stmmac_resources *res)
+> +{
+> +	struct device_node *np = dev_of_node(&pdev->dev);
+> +	int ret;
+> +
+> +	plat->mdio_node = of_get_child_by_name(np, "mdio");
+> +	if (plat->mdio_node) {
+> +		dev_info(&pdev->dev, "Found MDIO subnode\n");
+> +		plat->mdio_bus_data->needs_reset = true;
+> +	}
+> +
+> +	ret = of_alias_get_id(np, "ethernet");
+> +	if (ret >= 0)
+> +		plat->bus_id = ret;
+> +
+> +	res->irq = of_irq_get_byname(np, "macirq");
+> +	if (res->irq < 0) {
+> +		dev_err(&pdev->dev, "IRQ macirq not found\n");
+> +		ret = -ENODEV;
+> +		goto err_put_node;
+> +	}
+> +
+> +	res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> +	if (res->wol_irq < 0) {
+> +		dev_info(&pdev->dev,
+> +			 "IRQ eth_wake_irq not found, using macirq\n");
+> +		res->wol_irq = res->irq;
+> +	}
+> +
+> +	res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> +	if (res->lpi_irq < 0) {
+> +		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> +		ret = -ENODEV;
+> +		goto err_put_node;
+> +	}
+> +
+> +	ret = device_get_phy_mode(&pdev->dev);
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "phy_mode not found\n");
+> +		ret = -ENODEV;
+> +		goto err_put_node;
+> +	}
+> +
+> +	plat->phy_interface = ret;
+> +
+> +	return 0;
+> +
+> +err_put_node:
+> +	of_node_put(plat->mdio_node);
+> +
+> +	return ret;
+> +}
+> +
+> +static void loongson_dwmac_dt_clear(struct pci_dev *pdev,
+> +				    struct plat_stmmacenet_data *plat)
+> +{
+> +	of_node_put(plat->mdio_node);
+> +}
+> +
+> +static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
+> +				      struct plat_stmmacenet_data *plat,
+> +				      struct stmmac_resources *res)
+> +{
+> +	if (!pdev->irq)
+> +		return -EINVAL;
+> +
+> +	res->irq = pdev->irq;
+> +
+> +	return 0;
+> +}
+> +
+>  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct plat_stmmacenet_data *plat;
+>  	struct stmmac_pci_info *info;
+>  	struct stmmac_resources res;
+> -	struct device_node *np;
+> -	int ret, i, phy_mode;
+> -
+> -	np = dev_of_node(&pdev->dev);
+> -
+> -	if (!np) {
+> -		pr_info("dwmac_loongson_pci: No OF node\n");
+> -		return -ENODEV;
+> -	}
+> +	int ret, i;
+>  
+>  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+>  	if (!plat)
+> @@ -90,25 +160,19 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  	if (!plat->mdio_bus_data)
+>  		return -ENOMEM;
+>  
+> -	plat->mdio_node = of_get_child_by_name(np, "mdio");
+> -	if (plat->mdio_node) {
+> -		dev_info(&pdev->dev, "Found MDIO subnode\n");
+> -		plat->mdio_bus_data->needs_reset = true;
+> -	}
+> -
+>  	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+> -	if (!plat->dma_cfg) {
+> -		ret = -ENOMEM;
+> -		goto err_put_node;
+> -	}
+> +	if (!plat->dma_cfg)
+> +		return -ENOMEM;
+>  
+>  	/* Enable pci device */
+>  	ret = pci_enable_device(pdev);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "%s: ERROR: failed to enable device\n", __func__);
+> -		goto err_put_node;
+> +		return ret;
+>  	}
+>  
+> +	pci_set_master(pdev);
+> +
+>  	/* Get the base address of device */
+>  	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>  		if (pci_resource_len(pdev, i) == 0)
+> @@ -119,59 +183,32 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  		break;
+>  	}
+>  
+> -	plat->bus_id = of_alias_get_id(np, "ethernet");
+> -	if (plat->bus_id < 0)
+> -		plat->bus_id = pci_dev_id(pdev);
+> -
+> -	phy_mode = device_get_phy_mode(&pdev->dev);
+> -	if (phy_mode < 0) {
+> -		dev_err(&pdev->dev, "phy_mode not found\n");
+> -		ret = phy_mode;
+> -		goto err_disable_device;
+> -	}
+> -
+> -	plat->phy_interface = phy_mode;
+> -
+> -	pci_set_master(pdev);
+> -
+>  	memset(&res, 0, sizeof(res));
+>  	res.addr = pcim_iomap_table(pdev)[0];
+>  
+>  	info = (struct stmmac_pci_info *)id->driver_data;
+> -	ret = info->setup(plat);
+> +	ret = info->setup(pdev, plat);
+>  	if (ret)
+>  		goto err_disable_device;
+>  
+> -	res.irq = of_irq_get_byname(np, "macirq");
+> -	if (res.irq < 0) {
+> -		dev_err(&pdev->dev, "IRQ macirq not found\n");
+> -		ret = -ENODEV;
+> -		goto err_disable_device;
+> -	}
+> -
+> -	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> -	if (res.wol_irq < 0) {
+> -		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
+> -		res.wol_irq = res.irq;
+> -	}
+> -
+> -	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> -	if (res.lpi_irq < 0) {
+> -		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> -		ret = -ENODEV;
+> +	if (dev_of_node(&pdev->dev))
+> +		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+> +	else
+> +		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
+> +	if (ret)
+>  		goto err_disable_device;
+> -	}
+>  
+>  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>  	if (ret)
+> -		goto err_disable_device;
+> +		goto err_plat_clear;
+>  
+> -	return ret;
+> +	return 0;
+>  
+> +err_plat_clear:
+> +	if (dev_of_node(&pdev->dev))
+> +		loongson_dwmac_dt_clear(pdev, plat);
+>  err_disable_device:
+>  	pci_disable_device(pdev);
+> -err_put_node:
+> -	of_node_put(plat->mdio_node);
+>  	return ret;
+>  }
+>  
+> @@ -181,9 +218,11 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+>  	struct stmmac_priv *priv = netdev_priv(ndev);
+>  	int i;
+>  
+> -	of_node_put(priv->plat->mdio_node);
+>  	stmmac_dvr_remove(&pdev->dev);
+>  
+> +	if (dev_of_node(&pdev->dev))
+> +		loongson_dwmac_dt_clear(pdev, priv->plat);
+> +
+>  	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>  		if (pci_resource_len(pdev, i) == 0)
+>  			continue;
+> -- 
+> 2.31.4
+> 
 
