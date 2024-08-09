@@ -1,126 +1,121 @@
-Return-Path: <netdev+bounces-117109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A6394CBCD
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:00:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F7694CC07
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70789B20D5B
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 08:00:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0A71B22263
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 08:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA1016CD2E;
-	Fri,  9 Aug 2024 08:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D7818CC18;
+	Fri,  9 Aug 2024 08:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjqg/bFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3742BC8D1
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 08:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3BB18CC16
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 08:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723190410; cv=none; b=TKowFDsC0AzY+0wli5FzPiVWauUz0lnvjJZcXhwHXEteSnCI8upVa4yZJXnBXATqjGfBCqzkhoZjUNg8RvhP3jX47wLRbqjzp8NuqEutqZCDamZTP+15U5dkjTePNdx+lOomCRLqaoXCbROo0sFht2Vsn8Hx2oJzQBQB4qEFLog=
+	t=1723191545; cv=none; b=mupqmG1WWULZbAngx6JdogEePTY4duBMeL+nsxAcutNT/e40bKHdlRK5oL7LYeooZFfrTmwHyYqhrhCZXD4h1CHvLOykZe82eT9w+rg1DZ7aKLS53VM5QAcoelGiWabEPr85nuk59k65YN8bYVPyoxijdpan1xHAUoIHkX+UVVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723190410; c=relaxed/simple;
-	bh=RoPdvsYEFl36YioiyL3Yrz2txiM5pG4P5zpSgwteBAc=;
+	s=arc-20240116; t=1723191545; c=relaxed/simple;
+	bh=LjEBP4qpYozvlNKkWCn6zPNPgha4HeIP/6WAWotjQ2I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLens2MSdGMpj68WeyPA6Rq6+LGR4SFB5Mm+oekJzjBrN23SgJMjoWi8kmYoAbpw2MTlGMP/XBhJW7mw7gvPtyQNW2IfzLhtvBEhDhXdcV4CCFTyjc0ThYii1VW4k+cICJO7BwQb0eUkNjb6e1l09guRfo9d2uxbOaEGG0+GiUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [46.222.110.9] (port=3150 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1scKXR-007jcX-Qk; Fri, 09 Aug 2024 09:59:56 +0200
-Date: Fri, 9 Aug 2024 09:59:51 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Harald Welte <laforge@gnumonks.org>
-Subject: Re: [PATCH net] gtp: pull network headers in gtp_dev_xmit()
-Message-ID: <ZrXMd2H6tcanSsWN@calendula>
-References: <20240808132455.3413916-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tGdpb+9qST5U5pEvxCIrJG2tG2tpOZkeRoTBC07ahCSNp2jnmpzoKva+ke0sXJ7guGiGLNBtskdmYvEdSJgnjQJSiXpBKd9LS/cXzPuLmbCdqtjExKVyCfD7ASGyCKT+wE0QFuBkGwD7c11C3eBmBveYDQ/1QHKrg9WGsoWj7EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjqg/bFU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F9D6C32782;
+	Fri,  9 Aug 2024 08:19:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723191544;
+	bh=LjEBP4qpYozvlNKkWCn6zPNPgha4HeIP/6WAWotjQ2I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pjqg/bFUcBvdVyM6Vay9cu2UKgCVzn4Lm5FWXgoHguFFNdWLnz3AkEisaaQAEjjsX
+	 AFok0A1RTiwPrTkApkmG2cFN/0vtpo7OCow2hXp/MGJgQICgZ4ui66s6CmtYcO9Pa9
+	 Vev1d8wdqr2lRmUUM4f686SgFf17AivSpXwMRUdWuafSk4fyEtyAAgsHABmDP164J5
+	 g8ozkP3r9QUQAtf8HvysWfu0dsy5037M8QysZqnvflztbQ67g5iVHrHqAYDFwfUr+o
+	 UVdasqbXs/8Ekdh6qj2swaF6ICMq9sv4MGCyBoDAcxNE5a4vYHy2WKTepHz8UkieRa
+	 YG6DP6UFWzfbA==
+Date: Fri, 9 Aug 2024 09:19:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+	tparkin@katalix.com
+Subject: Re: [PATCH net-next 0/9] l2tp: misc improvements
+Message-ID: <20240809081901.GE3075665@kernel.org>
+References: <cover.1722856576.git.jchapman@katalix.com>
+ <20240806144038.GV2636630@kernel.org>
+ <bb820af8-6079-cd7f-4466-9c9a9851155e@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240808132455.3413916-1-edumazet@google.com>
-X-Spam-Score: -1.7 (-)
+In-Reply-To: <bb820af8-6079-cd7f-4466-9c9a9851155e@katalix.com>
 
-On Thu, Aug 08, 2024 at 01:24:55PM +0000, Eric Dumazet wrote:
-> syzbot/KMSAN reported use of uninit-value in get_dev_xmit() [1]
+On Tue, Aug 06, 2024 at 04:53:24PM +0100, James Chapman wrote:
+> On 06/08/2024 15:40, Simon Horman wrote:
+> > On Mon, Aug 05, 2024 at 12:35:24PM +0100, James Chapman wrote:
+> > > This series makes several improvements to l2tp:
+> > > 
+> > >   * update documentation to be consistent with recent l2tp changes.
+> > >   * move l2tp_ip socket tables to per-net data.
+> > >   * fix handling of hash key collisions in l2tp_v3_session_get
+> > >   * implement and use get-next APIs for management and procfs/debugfs.
+> > >   * improve l2tp refcount helpers.
+> > >   * use per-cpu dev->tstats in l2tpeth devices.
+> > >   * fix a lockdep splat.
+> > >   * fix a race between l2tp_pre_exit_net and pppol2tp_release.
+> > > 
+> > > James Chapman (9):
+> > >    documentation/networking: update l2tp docs
+> > >    l2tp: move l2tp_ip and l2tp_ip6 data to pernet
+> > >    l2tp: fix handling of hash key collisions in l2tp_v3_session_get
+> > >    l2tp: add tunnel/session get_next helpers
+> > >    l2tp: use get_next APIs for management requests and procfs/debugfs
+> > >    l2tp: improve tunnel/session refcount helpers
+> > >    l2tp: l2tp_eth: use per-cpu counters from dev->tstats
+> > >    l2tp: fix lockdep splat
+> > >    l2tp: flush workqueue before draining it
+> > 
+> > Hi James,
+> > 
+> > I notice that some of these patches are described as fixes and have Fixes
+> > tags. As such they seem appropriate for, a separate, smaller series,
+> > targeted at net.
+> > 
+> > ...
 > 
-> We must make sure the IPv4 or Ipv6 header is pulled in skb->head
-> before accessing fields in them.
+> Hi Simon,
 > 
-> Use pskb_inet_may_pull() to fix this issue.
+> Thanks for reviewing.
 > 
-> [1]
-> BUG: KMSAN: uninit-value in ipv6_pdp_find drivers/net/gtp.c:220 [inline]
->  BUG: KMSAN: uninit-value in gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
->  BUG: KMSAN: uninit-value in gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
->   ipv6_pdp_find drivers/net/gtp.c:220 [inline]
->   gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
->   gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
->   __netdev_start_xmit include/linux/netdevice.h:4913 [inline]
->   netdev_start_xmit include/linux/netdevice.h:4922 [inline]
->   xmit_one net/core/dev.c:3580 [inline]
->   dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3596
->   __dev_queue_xmit+0x358c/0x5610 net/core/dev.c:4423
->   dev_queue_xmit include/linux/netdevice.h:3105 [inline]
->   packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
->   packet_snd net/packet/af_packet.c:3145 [inline]
->   packet_sendmsg+0x90e3/0xa3a0 net/packet/af_packet.c:3177
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg+0x30f/0x380 net/socket.c:745
->   __sys_sendto+0x685/0x830 net/socket.c:2204
->   __do_sys_sendto net/socket.c:2216 [inline]
->   __se_sys_sendto net/socket.c:2212 [inline]
->   __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
->   x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Uninit was created at:
->   slab_post_alloc_hook mm/slub.c:3994 [inline]
->   slab_alloc_node mm/slub.c:4037 [inline]
->   kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
->   kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
->   __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
->   alloc_skb include/linux/skbuff.h:1320 [inline]
->   alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6526
->   sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2815
->   packet_alloc_skb net/packet/af_packet.c:2994 [inline]
->   packet_snd net/packet/af_packet.c:3088 [inline]
->   packet_sendmsg+0x749c/0xa3a0 net/packet/af_packet.c:3177
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg+0x30f/0x380 net/socket.c:745
->   __sys_sendto+0x685/0x830 net/socket.c:2204
->   __do_sys_sendto net/socket.c:2216 [inline]
->   __se_sys_sendto net/socket.c:2212 [inline]
->   __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
->   x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> CPU: 0 UID: 0 PID: 7115 Comm: syz.1.515 Not tainted 6.11.0-rc1-syzkaller-00043-g94ede2a3e913 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-> 
-> Fixes: 999cb275c807 ("gtp: add IPv6 support")
-> Fixes: 459aa660eb1d ("gtp: add initial driver for datapath of GPRS Tunneling Protocol (GTP-U)")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Patch 3 changes code which already differs in the net-next and net trees. If
+> it is applied to net, I think commit 24256415d1869 ("l2tp: prevent possible
+> tunnel refcount underflow") is also suitable for net. I see now that I
+> haven't used the Fixes tag consistently. tbh, I think both commits address
+> possible issues in a rare use case so aren't necessary for net. But if you
+> or others think otherwise, I'll respin for net.
 
-Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Thanks, and sorry for my slow response.
 
-Thanks.
+In principle I think it is fine to push changes to net-next, without Fixes
+tags, that are marginal wrt being fixes.
+
+> 
+> I'll respin patch 8 targetted at net.
+> 
+> Patch 9 addresses changes code that isn't yet in the net tree. I'll remove
+> the Fixes tag in v2.
+> 
+> 
 
