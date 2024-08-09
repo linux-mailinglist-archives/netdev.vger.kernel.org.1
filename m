@@ -1,216 +1,322 @@
-Return-Path: <netdev+bounces-117247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2DDD94D4AC
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 18:27:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A0894D4CE
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 18:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B0A2816F1
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:27:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 532E8B232EA
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745FA17ADE8;
-	Fri,  9 Aug 2024 16:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA102942A;
+	Fri,  9 Aug 2024 16:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ILf5RWwl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2040.outbound.protection.outlook.com [40.107.101.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C3A182B3
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 16:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723220841; cv=none; b=lsrVArsCUVwev6m50vtz/4xzNnp9/x4tckc+p7GP4i+CPiT0NJuP+truBSCbFv2VnsQmDoya0od/HC27Gpc9snFVsouMHa2ZoN9J60hRzQLaFYWJrGBsPbLa3SfiPla50rRR+Fg/X4cFokWpqfSP6JB/rPQGo89ojoFeJBqmK4M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723220841; c=relaxed/simple;
-	bh=KmT9S6YnjdLEKW1Btglbp6RJ7wlkQVh3zDswSu2nS0M=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QFg9y1d8ouWOivZZl8QmwIq14Uf3169qqWeOOn8Kw6eNrDyneoCO9rHMiLQJOgyNokZ71al4niLvJBDP8y0nsMROga03T/zTm/uyNtk/X5bHNpxfGmYD7JBDT4NAv1azYoF3dNOiMT2BeRXRdSRcETOSP3pFPj3WjqY9jDq8omI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-8223aed78e2so270044139f.0
-        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 09:27:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723220839; x=1723825639;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8IoWvVemz5fRuzPVv+MJCIjU8SsZaaUaeY1frfcjMFQ=;
-        b=GBUmbdKLuiTT3VBs9pJBGa/6uLuZ+XIYwzsi58sETJD3zC3eYWM2vu0N7UzEQJPV5e
-         wchMJy6Y/rmIL5F0dSVtkbvxY8LVJAgNDRd1TuLL2tKnsW1xmLllPVpAoQsiNRZ9kbNe
-         lSeZ2G+ioqcHBftkeoSSdIrFyGg2VqS7dSchI3RCt7atI/gqAoU+sCPP10+hVFmGBay2
-         zf3HvaXTX74X4+PkoHbdBUReynIQ06JbMdIq45u36oQVGHXvPi3aS6GF7mHw3q3KHvFZ
-         PHRtxTK/MRNNAvuHOH/WlcxZU+pJr+TKLuhnNQamZv1qtJcv32QDmH3MTG+EHk574prC
-         a66w==
-X-Forwarded-Encrypted: i=1; AJvYcCV2cDkVd18CH5Sgblsr3ebzsyaqKo5p8Db60Cb7mvg1GYviAnnc9yz2TjIdoP/Re9SUFDY5EniFt88wr+5oP1rMsh9HGMlH
-X-Gm-Message-State: AOJu0Yxp9z8NHTPm884g08R6bv399XTo6OVEqFpfvvEEBVB2H2dpeVA0
-	97JBdbg8uBNms6HfiaxYpO/ytxTUnn1MuW0k5Ky/jIUV2wnPVH0A2Y5ZGmribvYBF1259au1+CL
-	FEuNyfCESUg/bfbuf6UeAxXuwRzq4ZYLYEa9nzMRELC7c18eeiT2Ll7o=
-X-Google-Smtp-Source: AGHT+IEYPB0NcLXMa8rZp5vk5+VX7bqLAv2iGd98rafYrCk99iBVDa/r7lQb6Wz/oPTUODYIbP4PyAhPUr/VcZ6kZANB8tIckK79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9E41C28E;
+	Fri,  9 Aug 2024 16:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723221399; cv=fail; b=INBOB03hv1+xDMTzUSq805iWZLBsRpTtWB5uVwUhyJR0wRLtMfWA1WTCTr+e5wC3uDpebyOFshxYFNu0NxgzOkwpIe7/JeKNDLOIYUvpWOzbLu0aJZbJnR6u8OVQBUC9lThmDT4B+uJvMQVPRcjFD6shZ7HcF2hNhiefi7if1uI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723221399; c=relaxed/simple;
+	bh=6R26f2Y37xADlWg8J+9H3qO+MOcaVS7T/rLb5fZyU3Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tNEuaTV+4sdOIb1OMPN+fTjQpQOEQiiiRn87jyDBUSEAOWEDI24SMscMtX3+rjSxh4ovXTwPnV+wR5HbHzKbAka6Vq1FrVs4H8hcbfYuJunnCPbIcn/v/9dGQ96U6Gx6Nb2SR7BmzHM0NB0QZ1Iacky0ck3b4hB5XSFPfGWJJno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ILf5RWwl; arc=fail smtp.client-ip=40.107.101.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=idma1l7RFWujq62BaE7qK3RLZjZmq+h6lpcUPIConsVjQzNjSQ8gubsg2n9UJj8AylyzomDiye4hFTJEFrdXiCOhNQUXqff5Z5IAAI2d7UHR1XRaMiCiomQRolBqKarxLACt5n9Bh0Jn6KKK/9/uInKIYKdaD6A5YDE5RdsJhVeNHbrXwO92NyW2aXr8F7Kv7LXEPgp6pzwa99CUyaosIIukTqEiwkTzd4W22P2JOUxTJ6DzPTuanKR3qN1pTzE+V8QN9rWgWVU+oR12Vx5lKk9+8lwsdsmTB2hlHguSz7C7lH7crVaUekq5fiNtQ/PiZ5hy2ZEdHtmzAC3XWit7xQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=THUavuF80f5ilmwjf+Ubi+AkdDLr64VnbylAgAZSlLc=;
+ b=T6BnDkCrhCZ45hpbec+zPgbniOPPDvTTfNpUJHUZBGU+k6cgg1KpVMcDfFykQveAFWnqTDxdjwKEGgkvIx+CrnZeTjqqZ9mdFDCeNfJ1OSEmXunG+t8+MpXCdzXqCz1nuSnorRL1U3cfQxJfR+9p3Fzw+ubaznvOiuRWWg+3+UaI5sn7YGE/FhvKW5Xjj3V0NLkyUpRIWybuDHZJjDzYSKXaflGcHcLSD7f4PBSrjZUwUM/YzNj59ZVlyBMmI9mIzSoOS8ttD06nruL0NnS87znPnwFP0lYDC4zkaZV14hl4JEx2BRu3H2tTMfXVgHlYaVuDD4sNJkL3+n3Hhj7wKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=THUavuF80f5ilmwjf+Ubi+AkdDLr64VnbylAgAZSlLc=;
+ b=ILf5RWwlaB2eJ/Vpj/QZdfiGz6vsGvsO0usaIvq9X+1ZtqQZQZTG/uRWdU2tsdPFI0gnF35Od7Ak156ZE6oHAN+1BTBgxErCe2+M//eZKrPuikRBLeVMmaCIuhL8xq9iqkM1tkOZFCURC66QfTASBRf9FK9OeFwi922lXwjdWauONpoFbwGiSjwnQVxXyju1hnKLDzz5YV7jmSqPA6m0i97+T0d48+8ltEQM5mehC/ORKHt5Q9yar/2HFF0WSa/sjQl2a0XCq7b778zJZlks94mhpHzE7s51ewQCxIRw+cUVzEUNCA4VxZtm2EiyQg/oydMF6GPvqfbTTCX8Gg4igQ==
+Received: from CH2PR03CA0019.namprd03.prod.outlook.com (2603:10b6:610:59::29)
+ by DM4PR12MB6181.namprd12.prod.outlook.com (2603:10b6:8:a9::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.17; Fri, 9 Aug
+ 2024 16:36:34 +0000
+Received: from CH1PEPF0000A348.namprd04.prod.outlook.com
+ (2603:10b6:610:59:cafe::c0) by CH2PR03CA0019.outlook.office365.com
+ (2603:10b6:610:59::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.31 via Frontend
+ Transport; Fri, 9 Aug 2024 16:36:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH1PEPF0000A348.mail.protection.outlook.com (10.167.244.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Fri, 9 Aug 2024 16:36:33 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 9 Aug 2024
+ 09:36:18 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 9 Aug 2024
+ 09:36:18 -0700
+Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Fri, 9 Aug
+ 2024 09:36:16 -0700
+From: David Thompson <davthompson@nvidia.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <leon@kernel.org>, <yuehaibing@huawei.com>,
+	<andriy.shevchenko@linux.intel.com>, <u.kleine-koenig@pengutronix.de>
+CC: <asmaa@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, David Thompson <davthompson@nvidia.com>
+Subject: [PATCH net v1] mlxbf_gige: disable RX filters until RX path initialized
+Date: Fri, 9 Aug 2024 12:36:12 -0400
+Message-ID: <20240809163612.12852-1-davthompson@nvidia.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a86:b0:381:c14:70cf with SMTP id
- e9e14a558f8ab-39b7484a7famr1619015ab.1.1723220839017; Fri, 09 Aug 2024
- 09:27:19 -0700 (PDT)
-Date: Fri, 09 Aug 2024 09:27:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fabef5061f429db7@google.com>
-Subject: [syzbot] [net?] [s390?] general protection fault in smc_diag_dump_proto
-From: syzbot <syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, guwen@linux.alibaba.com, jaka@linux.ibm.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A348:EE_|DM4PR12MB6181:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbbb5177-9657-4a19-1ba1-08dcb8916e30
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hmrlHXYte/9G7EaXL0rJbHamrkD0xDJIIsbK8GND4msbKEuhJdFA31B/4N1l?=
+ =?us-ascii?Q?x0lUE4CSIdegqDsRnK1mRx/jQfa3M93oTCqDKyudEh+EcwZAvnD+DNv1f3wD?=
+ =?us-ascii?Q?jLuuw/hx1bkn5Qzqf7U5hhUP3hQ5I8A/25ujPDUduxyoALSztyO6kImc0S4A?=
+ =?us-ascii?Q?A6kADLOgEc0d6TL8vohDjmtXzayhmaiYq+qRLlMeEZopOIc5Bnf+o3ovVuFX?=
+ =?us-ascii?Q?NF7IH/wbGGgk184Jyj08yasC2Np2jxHEezFAj9R5SUglTAWswYW2joDMo+Xj?=
+ =?us-ascii?Q?8bfcIAxyG3W/1eRbLSkA5lgCWDQ8/dBYeOrZJPoz6b9oYinaJGJtoedIdJwa?=
+ =?us-ascii?Q?8FH8lL+UFFiPkV8O/ZRElHlkXmW8tMfbxPJA6kLWuAuu+XL0tReCf3A+PB2i?=
+ =?us-ascii?Q?fFvkhhTV8J/ixl+04hXugUEa6ezuoMVBQ1J+AikmMpbi+JIjnp/XkMu4P5iE?=
+ =?us-ascii?Q?z09nHnl88GSjNPUDQBBgdX0IMxxi0GOtUinJekmstnwhnda0xznP5CJlo+xw?=
+ =?us-ascii?Q?neW5Ve4gowtCw21gm2lSIGZIwtT/fTr9F6zVUp7o6b+RMC8NeRp+r41WwWyz?=
+ =?us-ascii?Q?LV9eTL3pEAiUel6pFTbE0hj2pvcYPSxYmVCoOObLB2eOD0ooIYWx/zsViOjG?=
+ =?us-ascii?Q?dG+nkrirIcC14HZrO+7tMMHpG33rS9XKhbtuFgCtArfOa0ADd6O5+GDw3OJ/?=
+ =?us-ascii?Q?sluibfCyQ16CNxtLDZ6BLcih7pDfGAnHIEMMtQnsShvhCt8n3uSwOQAOIHUS?=
+ =?us-ascii?Q?1D+gWoeQf+Mr5A6YkLpLL3Wc10V3MRRTNsWwDE8BxMcmjNeN5xdCsq5bxs+x?=
+ =?us-ascii?Q?1SbXqyMCZuSU+JkiP+EHkLtQu28aQqPq8NuurMjVVHVvxoH1RFkdLIk9e3Pl?=
+ =?us-ascii?Q?wH2tCCZ2RyDP95lHbKSb0goafVtyp4LY9zCCIMdw4c5GvLZT/Eu3iwiyvcIo?=
+ =?us-ascii?Q?rm8VRdP1sf8/1YHgKqNtkfdxgJwtXgMjojtsOUYul1dGRQ979s3R7R2grDmZ?=
+ =?us-ascii?Q?pq31nJQXwMvxd20KIgmwd6dm4Qw7Y52S2h9wPnnfyKF2oBgfRG8ilWY2gpGm?=
+ =?us-ascii?Q?qk3AO79VQMFDMQlOyfv9fefVMsJv+4jx/QpIAJu9EwR5BOoFgdOrnS1zZpVl?=
+ =?us-ascii?Q?dUH4huFQ5+YfVTITrDhmnX0dbErRMmDmatKJaURBCLisqSatBtxu0uug4nGD?=
+ =?us-ascii?Q?5EWAjxMAher8ZpfkNr3ccuEkZz/vdrBm7Fa425dzCLCfb8bq82ktwdIGnySG?=
+ =?us-ascii?Q?2eHYgoO8QN1/mdGyV+Rlhde6YSQIhHWAo+OqF8d/YG0ViOJgMcL4qIBptpR2?=
+ =?us-ascii?Q?D1RnDmcKUKoIyvZbm4bQvoCuh1d3lsth8cChda7RXoTd5oPBdT1mBhOnIkjq?=
+ =?us-ascii?Q?NAebr5KC27rLK4/SW2sC5IkFGb2C5JXRNf42ODp0la7Y+jytwr8m7djpOHtH?=
+ =?us-ascii?Q?3H0hhzPlaeq4cja+j7CvqZzHtr9uikPj?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2024 16:36:33.6776
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbbb5177-9657-4a19-1ba1-08dcb8916e30
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A348.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6181
 
-Hello,
+A recent change to the driver exposed a bug where the MAC RX
+filters (unicast MAC, broadcast MAC, and multicast MAC) are
+configured and enabled before the RX path is fully initialized.
+The result of this bug is that after the PHY is started packets
+that match these MAC RX filters start to flow into the RX FIFO.
+And then, after rx_init() is completed, these packets will go
+into the driver RX ring as well. If enough packets are received
+to fill the RX ring (default size is 128 packets) before the call
+to request_irq() completes, the driver RX function becomes stuck.
 
-syzbot found the following issue on:
+This bug is intermittent but is most likely to be seen where the
+oob_net0 interface is connected to a busy network with lots of
+broadcast and multicast traffic.
 
-HEAD commit:    d7e78951a8b8 Merge tag 'net-6.11-rc0' of git://git.kernel...
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=173cfd3d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a6f4e2cb79bdcd45
-dashboard link: https://syzkaller.appspot.com/bug?extid=f69bfae0a4eb29976e44
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15900a9d980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1008b645980000
+All the MAC RX filters must be disabled until the RX path is ready,
+i.e. all initialization is done and all the IRQs are installed.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6b22bae2c3c1/disk-d7e78951.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/37db35e4bb64/vmlinux-d7e78951.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3e489cf2c28e/bzImage-d7e78951.xz
-
-Bisection is inconclusive: the first bad commit could be any of:
-
-5bcd9a0a5995 wifi: brcm80211: remove unused structs
-f29dcae96ec8 Merge tag 'rtw-next-2024-06-04' of https://github.com/pkshih/rtw
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17196f19980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 PID: 6338 Comm: syz-executor175 Not tainted 6.10.0-syzkaller-09703-gd7e78951a8b8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
-RIP: 0010:__smc_diag_dump net/smc/smc_diag.c:89 [inline]
-RIP: 0010:smc_diag_dump_proto+0x709/0x3270 net/smc/smc_diag.c:217
-Code: 08 48 89 df e8 f8 0d 9d f6 48 8b 44 24 28 4c 8d 68 14 48 8b 1b 48 83 c3 0e 48 89 d8 48 c1 e8 03 49 bf 00 00 00 00 00 fc ff df <42> 0f b6 04 38 84 c0 0f 85 46 1b 00 00 0f b7 1b 66 c1 c3 08 4c 89
-RSP: 0018:ffffc90009d56b00 EFLAGS: 00010203
-RAX: 0000000000000001 RBX: 000000000000000e RCX: ffff88807c439e00
-RDX: 0000000000000000 RSI: 0000000080000001 RDI: 0000000000000000
-RBP: ffffc90009d56f90 R08: ffffffff8990c562 R09: 1ffff11005a1084b
-R10: dffffc0000000000 R11: ffffed1005a1084c R12: 1ffff11005a108e0
-R13: ffff88801f600014 R14: ffff88802d084200 R15: dffffc0000000000
-FS:  00007f92fcb0b6c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f92fcb0bd58 CR3: 000000002290e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- smc_diag_dump+0x59/0xa0 net/smc/smc_diag.c:236
- netlink_dump+0x647/0xd80 net/netlink/af_netlink.c:2325
- __netlink_dump_start+0x59f/0x780 net/netlink/af_netlink.c:2440
- netlink_dump_start include/linux/netlink.h:339 [inline]
- smc_diag_handler_dump+0x1ab/0x250 net/smc/smc_diag.c:251
- sock_diag_rcv_msg+0x3dc/0x5f0
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f0/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- sock_sendmsg+0x134/0x200 net/socket.c:768
- splice_to_socket+0xa13/0x10b0 fs/splice.c:889
- do_splice_from fs/splice.c:941 [inline]
- do_splice+0xd77/0x1900 fs/splice.c:1354
- __do_splice fs/splice.c:1436 [inline]
- __do_sys_splice fs/splice.c:1652 [inline]
- __se_sys_splice+0x331/0x4a0 fs/splice.c:1634
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f92fcb924d9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f92fcb0b218 EFLAGS: 00000246 ORIG_RAX: 0000000000000113
-RAX: ffffffffffffffda RBX: 00007f92fcb0b6c0 RCX: 00007f92fcb924d9
-RDX: 0000000000000005 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f92fcc1c348 R08: 0000000080000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f92fcc1c340
-R13: 00007f92fcbe9074 R14: 00007ffd7bd61c20 R15: 00007ffd7bd61d08
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:smc_diag_msg_common_fill net/smc/smc_diag.c:44 [inline]
-RIP: 0010:__smc_diag_dump net/smc/smc_diag.c:89 [inline]
-RIP: 0010:smc_diag_dump_proto+0x709/0x3270 net/smc/smc_diag.c:217
-Code: 08 48 89 df e8 f8 0d 9d f6 48 8b 44 24 28 4c 8d 68 14 48 8b 1b 48 83 c3 0e 48 89 d8 48 c1 e8 03 49 bf 00 00 00 00 00 fc ff df <42> 0f b6 04 38 84 c0 0f 85 46 1b 00 00 0f b7 1b 66 c1 c3 08 4c 89
-RSP: 0018:ffffc90009d56b00 EFLAGS: 00010203
-RAX: 0000000000000001 RBX: 000000000000000e RCX: ffff88807c439e00
-RDX: 0000000000000000 RSI: 0000000080000001 RDI: 0000000000000000
-RBP: ffffc90009d56f90 R08: ffffffff8990c562 R09: 1ffff11005a1084b
-R10: dffffc0000000000 R11: ffffed1005a1084c R12: 1ffff11005a108e0
-R13: ffff88801f600014 R14: ffff88802d084200 R15: dffffc0000000000
-FS:  00007f92fcb0b6c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f92fcb0bd58 CR3: 000000002290e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	08 48 89             	or     %cl,-0x77(%rax)
-   3:	df e8                	fucomip %st(0),%st
-   5:	f8                   	clc
-   6:	0d 9d f6 48 8b       	or     $0x8b48f69d,%eax
-   b:	44 24 28             	rex.R and $0x28,%al
-   e:	4c 8d 68 14          	lea    0x14(%rax),%r13
-  12:	48 8b 1b             	mov    (%rbx),%rbx
-  15:	48 83 c3 0e          	add    $0xe,%rbx
-  19:	48 89 d8             	mov    %rbx,%rax
-  1c:	48 c1 e8 03          	shr    $0x3,%rax
-  20:	49 bf 00 00 00 00 00 	movabs $0xdffffc0000000000,%r15
-  27:	fc ff df
-* 2a:	42 0f b6 04 38       	movzbl (%rax,%r15,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 46 1b 00 00    	jne    0x1b7d
-  37:	0f b7 1b             	movzwl (%rbx),%ebx
-  3a:	66 c1 c3 08          	rol    $0x8,%bx
-  3e:	4c                   	rex.WR
-  3f:	89                   	.byte 0x89
-
-
+Fixes: f7442a634ac0 ("mlxbf_gige: call request_irq() after NAPI initialized")
+Reviewed-by: Asmaa Mnebhi <asmaa@nvidia.com>
+Signed-off-by: David Thompson <davthompson@nvidia.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige.h |  8 +++
+ .../mellanox/mlxbf_gige/mlxbf_gige_main.c     | 10 ++++
+ .../mellanox/mlxbf_gige/mlxbf_gige_regs.h     |  2 +
+ .../mellanox/mlxbf_gige/mlxbf_gige_rx.c       | 50 ++++++++++++++++---
+ 4 files changed, 64 insertions(+), 6 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige.h b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige.h
+index bc94e75a7aeb..e7777700ee18 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige.h
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige.h
+@@ -40,6 +40,7 @@
+  */
+ #define MLXBF_GIGE_BCAST_MAC_FILTER_IDX 0
+ #define MLXBF_GIGE_LOCAL_MAC_FILTER_IDX 1
++#define MLXBF_GIGE_MAX_FILTER_IDX       3
+ 
+ /* Define for broadcast MAC literal */
+ #define BCAST_MAC_ADDR 0xFFFFFFFFFFFF
+@@ -175,6 +176,13 @@ enum mlxbf_gige_res {
+ int mlxbf_gige_mdio_probe(struct platform_device *pdev,
+ 			  struct mlxbf_gige *priv);
+ void mlxbf_gige_mdio_remove(struct mlxbf_gige *priv);
++
++void mlxbf_gige_enable_multicast_rx(struct mlxbf_gige *priv);
++void mlxbf_gige_disable_multicast_rx(struct mlxbf_gige *priv);
++void mlxbf_gige_enable_mac_rx_filter(struct mlxbf_gige *priv,
++				     unsigned int index);
++void mlxbf_gige_disable_mac_rx_filter(struct mlxbf_gige *priv,
++				      unsigned int index);
+ void mlxbf_gige_set_mac_rx_filter(struct mlxbf_gige *priv,
+ 				  unsigned int index, u64 dmac);
+ void mlxbf_gige_get_mac_rx_filter(struct mlxbf_gige *priv,
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+index b157f0f1c5a8..385a56ac7348 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+@@ -168,6 +168,10 @@ static int mlxbf_gige_open(struct net_device *netdev)
+ 	if (err)
+ 		goto napi_deinit;
+ 
++	mlxbf_gige_enable_mac_rx_filter(priv, MLXBF_GIGE_BCAST_MAC_FILTER_IDX);
++	mlxbf_gige_enable_mac_rx_filter(priv, MLXBF_GIGE_LOCAL_MAC_FILTER_IDX);
++	mlxbf_gige_enable_multicast_rx(priv);
++
+ 	/* Set bits in INT_EN that we care about */
+ 	int_en = MLXBF_GIGE_INT_EN_HW_ACCESS_ERROR |
+ 		 MLXBF_GIGE_INT_EN_TX_CHECKSUM_INPUTS |
+@@ -379,6 +383,7 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 	void __iomem *plu_base;
+ 	void __iomem *base;
+ 	int addr, phy_irq;
++	unsigned int i;
+ 	int err;
+ 
+ 	base = devm_platform_ioremap_resource(pdev, MLXBF_GIGE_RES_MAC);
+@@ -423,6 +428,11 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 	priv->rx_q_entries = MLXBF_GIGE_DEFAULT_RXQ_SZ;
+ 	priv->tx_q_entries = MLXBF_GIGE_DEFAULT_TXQ_SZ;
+ 
++	for (i = 0; i <= MLXBF_GIGE_MAX_FILTER_IDX; i++)
++		mlxbf_gige_disable_mac_rx_filter(priv, i);
++	mlxbf_gige_disable_multicast_rx(priv);
++	mlxbf_gige_disable_promisc(priv);
++
+ 	/* Write initial MAC address to hardware */
+ 	mlxbf_gige_initial_mac(priv);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
+index 98a8681c21b9..4d14cb13fd64 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
+@@ -62,6 +62,8 @@
+ #define MLXBF_GIGE_TX_STATUS_DATA_FIFO_FULL           BIT(1)
+ #define MLXBF_GIGE_RX_MAC_FILTER_DMAC_RANGE_START     0x0520
+ #define MLXBF_GIGE_RX_MAC_FILTER_DMAC_RANGE_END       0x0528
++#define MLXBF_GIGE_RX_MAC_FILTER_GENERAL              0x0530
++#define MLXBF_GIGE_RX_MAC_FILTER_EN_MULTICAST         BIT(1)
+ #define MLXBF_GIGE_RX_MAC_FILTER_COUNT_DISC           0x0540
+ #define MLXBF_GIGE_RX_MAC_FILTER_COUNT_DISC_EN        BIT(0)
+ #define MLXBF_GIGE_RX_MAC_FILTER_COUNT_PASS           0x0548
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
+index 699984358493..eb62620b63c7 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
+@@ -11,15 +11,31 @@
+ #include "mlxbf_gige.h"
+ #include "mlxbf_gige_regs.h"
+ 
+-void mlxbf_gige_set_mac_rx_filter(struct mlxbf_gige *priv,
+-				  unsigned int index, u64 dmac)
++void mlxbf_gige_enable_multicast_rx(struct mlxbf_gige *priv)
+ {
+ 	void __iomem *base = priv->base;
+-	u64 control;
++	u64 data;
+ 
+-	/* Write destination MAC to specified MAC RX filter */
+-	writeq(dmac, base + MLXBF_GIGE_RX_MAC_FILTER +
+-	       (index * MLXBF_GIGE_RX_MAC_FILTER_STRIDE));
++	data = readq(base + MLXBF_GIGE_RX_MAC_FILTER_GENERAL);
++	data |= MLXBF_GIGE_RX_MAC_FILTER_EN_MULTICAST;
++	writeq(data, base + MLXBF_GIGE_RX_MAC_FILTER_GENERAL);
++}
++
++void mlxbf_gige_disable_multicast_rx(struct mlxbf_gige *priv)
++{
++	void __iomem *base = priv->base;
++	u64 data;
++
++	data = readq(base + MLXBF_GIGE_RX_MAC_FILTER_GENERAL);
++	data &= ~MLXBF_GIGE_RX_MAC_FILTER_EN_MULTICAST;
++	writeq(data, base + MLXBF_GIGE_RX_MAC_FILTER_GENERAL);
++}
++
++void mlxbf_gige_enable_mac_rx_filter(struct mlxbf_gige *priv,
++				     unsigned int index)
++{
++	void __iomem *base = priv->base;
++	u64 control;
+ 
+ 	/* Enable MAC receive filter mask for specified index */
+ 	control = readq(base + MLXBF_GIGE_CONTROL);
+@@ -27,6 +43,28 @@ void mlxbf_gige_set_mac_rx_filter(struct mlxbf_gige *priv,
+ 	writeq(control, base + MLXBF_GIGE_CONTROL);
+ }
+ 
++void mlxbf_gige_disable_mac_rx_filter(struct mlxbf_gige *priv,
++				      unsigned int index)
++{
++	void __iomem *base = priv->base;
++	u64 control;
++
++	/* Disable MAC receive filter mask for specified index */
++	control = readq(base + MLXBF_GIGE_CONTROL);
++	control &= ~(MLXBF_GIGE_CONTROL_EN_SPECIFIC_MAC << index);
++	writeq(control, base + MLXBF_GIGE_CONTROL);
++}
++
++void mlxbf_gige_set_mac_rx_filter(struct mlxbf_gige *priv,
++				  unsigned int index, u64 dmac)
++{
++	void __iomem *base = priv->base;
++
++	/* Write destination MAC to specified MAC RX filter */
++	writeq(dmac, base + MLXBF_GIGE_RX_MAC_FILTER +
++	       (index * MLXBF_GIGE_RX_MAC_FILTER_STRIDE));
++}
++
+ void mlxbf_gige_get_mac_rx_filter(struct mlxbf_gige *priv,
+ 				  unsigned int index, u64 *dmac)
+ {
+-- 
+2.30.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
