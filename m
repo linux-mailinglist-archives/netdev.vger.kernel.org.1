@@ -1,104 +1,49 @@
-Return-Path: <netdev+bounces-117108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6D594CBBD
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 09:56:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A6394CBCD
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96C4E1F21E0F
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:56:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70789B20D5B
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 08:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8056218C931;
-	Fri,  9 Aug 2024 07:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWy7JWX6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA1016CD2E;
+	Fri,  9 Aug 2024 08:00:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013EA1552EB;
-	Fri,  9 Aug 2024 07:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3742BC8D1
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 08:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723190188; cv=none; b=q/icM8tm/GJw5AQmaxamY0zCZ+d7puypdEBlXsVnmGXFm3qgU5ZumjLFz44PqwyjmMTts65fVHiepjd5mgB4OvprVL9Xbqg6UGtfnychHv6wEotwSsI5FGXuHlKrGb3dxBSoT3pDDzqkrkXajJuGpWY8Rev4RoEnA81aK3mRo3w=
+	t=1723190410; cv=none; b=TKowFDsC0AzY+0wli5FzPiVWauUz0lnvjJZcXhwHXEteSnCI8upVa4yZJXnBXATqjGfBCqzkhoZjUNg8RvhP3jX47wLRbqjzp8NuqEutqZCDamZTP+15U5dkjTePNdx+lOomCRLqaoXCbROo0sFht2Vsn8Hx2oJzQBQB4qEFLog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723190188; c=relaxed/simple;
-	bh=WciictBvnZZognJdSB//Vkpj36Vtrbm418N+k4gXKM8=;
+	s=arc-20240116; t=1723190410; c=relaxed/simple;
+	bh=RoPdvsYEFl36YioiyL3Yrz2txiM5pG4P5zpSgwteBAc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lue6vbwtS3HJzRZ4DDuQJNKtEil0h6h4lG6IFkP1B5hZIGG8ikUOuuF5Kcihcvq2LJABgU2zkSn7SqbHzVyIsJVSGrB0gMVkoRhgO4qxg5JpAJ98rXp/4ZTYvfg+2Q4hTsM6NO+bTCsHgTb5IFuX9QdMpXBrbmjngJBHjJfFHqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWy7JWX6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952AFC4AF0D;
-	Fri,  9 Aug 2024 07:56:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723190187;
-	bh=WciictBvnZZognJdSB//Vkpj36Vtrbm418N+k4gXKM8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iWy7JWX63DlQVy2d0mNGhQfP+E5wTH7yt+zLcJ0XE+/2H7ya+xPuYTTvng2lSdR0P
-	 fY3FcxC8uU8GMeAkyI60nvRDENoJPGv+KO8RJqpQagYElLNKgByK/OFTroSX355YCs
-	 LkPyVbDTwM5NLcPamf6V9UY8mS/5OHdlCJ1Bf0Wrzy8CzH4nnoBsnommLbSLYVYa0S
-	 vit/eTqSx1gLR+UhLsyyqz5moCQu5XrPJ2lKHYZlMNpbvAKOB2UKpjpb3hjS9c0GG8
-	 efszcgVI6ngSguWbXJ9ztgvoCk8mZPBFojeGqb+x30Hdvr6lK6GLQBG40LF/KOtnNT
-	 rWCJ8B29HDgmg==
-Date: Fri, 9 Aug 2024 08:56:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Willem de Bruijn <willemb@google.com>, linux-alpha@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bagas Sanjaya <bagasdotme@gmail.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Helge Deller <deller@gmx.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"James E. J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Matt Turner <mattst88@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Shailend Chand <shailend@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Shuah Khan <shuah@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v17 03/14] netdev: support binding dma-buf to
- netdevice
-Message-ID: <20240809075615.GD3075665@kernel.org>
-References: <20240730022623.98909-4-almasrymina@google.com>
- <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
- <CAHS8izPxfCv1VMFBK1FahGTjVmUSSfrabgY5y6V+XtaszoHQ4w@mail.gmail.com>
- <9aad36fe-cd4c-4ce5-b4d8-6c8619d10c46@web.de>
- <66b2198686b91_3206cf29453@willemb.c.googlers.com.notmuch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLens2MSdGMpj68WeyPA6Rq6+LGR4SFB5Mm+oekJzjBrN23SgJMjoWi8kmYoAbpw2MTlGMP/XBhJW7mw7gvPtyQNW2IfzLhtvBEhDhXdcV4CCFTyjc0ThYii1VW4k+cICJO7BwQb0eUkNjb6e1l09guRfo9d2uxbOaEGG0+GiUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [46.222.110.9] (port=3150 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1scKXR-007jcX-Qk; Fri, 09 Aug 2024 09:59:56 +0200
+Date: Fri, 9 Aug 2024 09:59:51 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Harald Welte <laforge@gnumonks.org>
+Subject: Re: [PATCH net] gtp: pull network headers in gtp_dev_xmit()
+Message-ID: <ZrXMd2H6tcanSsWN@calendula>
+References: <20240808132455.3413916-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,47 +52,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <66b2198686b91_3206cf29453@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240808132455.3413916-1-edumazet@google.com>
+X-Spam-Score: -1.7 (-)
 
-On Tue, Aug 06, 2024 at 08:39:34AM -0400, Willem de Bruijn wrote:
-> Markus Elfring wrote:
-> > >> …
-> > >>> +++ b/include/net/devmem.h
-> > >>> @@ -0,0 +1,115 @@
-> > >> …
-> > >>> +#ifndef _NET_DEVMEM_H
-> > >>> +#define _NET_DEVMEM_H
-> > >> …
-> > >>
-> > >> I suggest to omit leading underscores from such identifiers.
-> > >> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier
-> > >>
-> > >
-> > > I was gonna apply this change, but I ack'd existing files and I find
-> > > that all of them include leading underscores, including some very
-> > > recently added files like net/core/page_pool_priv.h.
-> > >
-> > > I would prefer to stick to existing conventions if that's OK, unless
-> > > there is widespread agreement to the contrary.
-> > 
-> > Under which circumstances would you become interested to reduce development risks
-> > also according to undefined behaviour?
-> > https://wiki.sei.cmu.edu/confluence/display/c/CC.+Undefined+Behavior#CC.UndefinedBehavior-ub_106
+On Thu, Aug 08, 2024 at 01:24:55PM +0000, Eric Dumazet wrote:
+> syzbot/KMSAN reported use of uninit-value in get_dev_xmit() [1]
 > 
-> This series is following established practice in kernel networking.
+> We must make sure the IPv4 or Ipv6 header is pulled in skb->head
+> before accessing fields in them.
 > 
-> If that conflicts with a C standard, then perhaps that needs to be
-> resolved project wide.
+> Use pskb_inet_may_pull() to fix this issue.
 > 
-> Forcing an individual feature to diverge just brings inconsistency.
-> That said, this appears to be inconsistent already.
+> [1]
+> BUG: KMSAN: uninit-value in ipv6_pdp_find drivers/net/gtp.c:220 [inline]
+>  BUG: KMSAN: uninit-value in gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
+>  BUG: KMSAN: uninit-value in gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
+>   ipv6_pdp_find drivers/net/gtp.c:220 [inline]
+>   gtp_build_skb_ip6 drivers/net/gtp.c:1229 [inline]
+>   gtp_dev_xmit+0x1424/0x2540 drivers/net/gtp.c:1281
+>   __netdev_start_xmit include/linux/netdevice.h:4913 [inline]
+>   netdev_start_xmit include/linux/netdevice.h:4922 [inline]
+>   xmit_one net/core/dev.c:3580 [inline]
+>   dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3596
+>   __dev_queue_xmit+0x358c/0x5610 net/core/dev.c:4423
+>   dev_queue_xmit include/linux/netdevice.h:3105 [inline]
+>   packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+>   packet_snd net/packet/af_packet.c:3145 [inline]
+>   packet_sendmsg+0x90e3/0xa3a0 net/packet/af_packet.c:3177
+>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>   __sock_sendmsg+0x30f/0x380 net/socket.c:745
+>   __sys_sendto+0x685/0x830 net/socket.c:2204
+>   __do_sys_sendto net/socket.c:2216 [inline]
+>   __se_sys_sendto net/socket.c:2212 [inline]
+>   __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
+>   x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
 > 
-> Main question is whether this is worth respinning a series already at
-> v17 with no more fundamental feedback.
+> Uninit was created at:
+>   slab_post_alloc_hook mm/slub.c:3994 [inline]
+>   slab_alloc_node mm/slub.c:4037 [inline]
+>   kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
+>   kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
+>   __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
+>   alloc_skb include/linux/skbuff.h:1320 [inline]
+>   alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6526
+>   sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2815
+>   packet_alloc_skb net/packet/af_packet.c:2994 [inline]
+>   packet_snd net/packet/af_packet.c:3088 [inline]
+>   packet_sendmsg+0x749c/0xa3a0 net/packet/af_packet.c:3177
+>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>   __sock_sendmsg+0x30f/0x380 net/socket.c:745
+>   __sys_sendto+0x685/0x830 net/socket.c:2204
+>   __do_sys_sendto net/socket.c:2216 [inline]
+>   __se_sys_sendto net/socket.c:2212 [inline]
+>   __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
+>   x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> CPU: 0 UID: 0 PID: 7115 Comm: syz.1.515 Not tainted 6.11.0-rc1-syzkaller-00043-g94ede2a3e913 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+> 
+> Fixes: 999cb275c807 ("gtp: add IPv6 support")
+> Fixes: 459aa660eb1d ("gtp: add initial driver for datapath of GPRS Tunneling Protocol (GTP-U)")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-No, from my point of view, it is not.
+Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
-This really is a trivial and somewhat subjective mater.
-I don't think it should hold up a substantial piece of work.
+Thanks.
 
