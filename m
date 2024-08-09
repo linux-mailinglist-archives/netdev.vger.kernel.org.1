@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-117257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 157FE94D580
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:36:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6497694D582
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A98F1C214FA
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:36:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BB9C282B65
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352D183CA1;
-	Fri,  9 Aug 2024 17:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D4A143C7E;
+	Fri,  9 Aug 2024 17:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CvHtdBOV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jHf+V5O5"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AFE7581F
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752EA7D405
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723224997; cv=none; b=WxKxpl51tWB1a0CL6P1P92y/9vM/Kg6NFFrE0tSzI0uS1xYtkDg+6gvMw27w192aZINH0q8PgEJpmDRGQF7Uk21xg8LSxNrn86dHVbRjtfiYQypH4aglE96eblsiCdQHH4P2DPfWyzH/ABEmsHnL1utGrhnMbzcoGLRvadrE24Y=
+	t=1723224998; cv=none; b=KitU6B9UmojhVBuRV7MPhZzgZB1CFo62W1RVlVfbB0mrKSXecvv7sbc1uKEn+xDBbb3cGaZZ8oX+ZX+tgfX1iTGhqpb9ugWcGErl9tpZ86/zI9GKMzjFW8YHcBfJNGjF5LyrFCjdEFL0RjC3iCRVsOGtYZKzZTa+ayPtm4j3iFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723224997; c=relaxed/simple;
-	bh=hLiJO8NAHo4R4rDsWf/y5mNAPjHc2XMf0n6HyxnOBU4=;
+	s=arc-20240116; t=1723224998; c=relaxed/simple;
+	bh=KQHJ2SgNY64HGwyqSaa4nSLlYVYOHnD/TPPAnpF+oyg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SD5M7GdMKfUYeqSR3QC0fIG+P6+PG1uJmfWV/9rn2E+n3TpkrXuD8s2Pr8uIdb1AemKlNHPYn44FSS337rM0UdsqHVirrsQI11WWWvwcnmCdMNpRz4Unw4B9uoleo7ldrA0M3jiJcYVk2zFogjHmD5F08H9V60KwBoTCSiYpuPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CvHtdBOV; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=DIx4AHD06t4g/Fwjlto7cyylChXTEFd6+MoZWDxuXOGU9t9Y68URfGJ0z2pEpYAQI05gbMWTxzU70ZrB6TQfU+Vsa+aOyqpC4Zp9/Kphkh5s+LtSSMPPLoEfSX5QUXJixVDOZd1lzKp+tEgALq19kpJdG0lOsuLBzPE/kt5E2iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jHf+V5O5; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723224995; x=1754760995;
+  t=1723224996; x=1754760996;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hLiJO8NAHo4R4rDsWf/y5mNAPjHc2XMf0n6HyxnOBU4=;
-  b=CvHtdBOVghbQXiy2rQ6Qzj9qHBNCCOx/b7sCw7s/OB6A0KjK7+vXiQvn
-   iJv0hLhLfRETUJEplZzVQI0u7Kl0ox38Zq2XH/18B4TTbf83W8vEMF8he
-   UKrXiW9Um9utCcqHytsjLAE65fgD3OGiALpk/GXqKTm6oYHW7L+AwoUHl
-   SNczEHGcLkgVApUzpuSc1QHHpfnVum9iRZwZq30XnrQD+DaiVW9e/DdGh
-   MrrrmXa/A2T2aD4ExN5ZiiX+M6dr/8QB0lSXKnXFY37gF2jy4zSAJEw5l
-   nXDaR59yYCmrxoKe+Y7WCvgJ0F/9wKB1mo7yPGq9VQ12vAfwfkAjr6TB7
-   Q==;
-X-CSE-ConnectionGUID: sWbrzpY6RAyevXhpW8iHNQ==
-X-CSE-MsgGUID: agk7OBldRRmhA8/nFoYIeg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11159"; a="21551261"
+  bh=KQHJ2SgNY64HGwyqSaa4nSLlYVYOHnD/TPPAnpF+oyg=;
+  b=jHf+V5O5E7EfM7FwUhUHo4FJHZfHxJLzlycXm4izXWMAnGWgmalPwJ9e
+   r9dOhNSWZjZ30xCG1FXqtIlC8tpR+pTeLFAQP5z6FXWBHIT0ViIGfiOit
+   QkQmIO6w/b0qE3T8jR2xuJ6CPgfqaPM3lcsyVoaDFWUVnCFqaENZCXtjY
+   FU/rDdlPU9Zjhj5rSP15Jk+4eMiwXGo8nVDpZTGhqxPbFvH2lACYs9VWy
+   ElVnzYRrQLEqqxxTg7A21niX6bq+gDkLTpD1QLAbHwSyDqlDEIDBOtJgg
+   fJnjT+mapRHo3GpxmTvyhbp0ZNlrC5JI3ssw1YtiE4scdT9Kwh8orhcIC
+   g==;
+X-CSE-ConnectionGUID: QOFBqzHnSXuFM/sJen4/dg==
+X-CSE-MsgGUID: /TlkKhm0QNuOhgy8EoAWkA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11159"; a="21551269"
 X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
-   d="scan'208";a="21551261"
+   d="scan'208";a="21551269"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
   by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 10:36:29 -0700
-X-CSE-ConnectionGUID: 77gKZ9WBQMOZeQ4J9Anfrg==
-X-CSE-MsgGUID: V7IbU6IcT92WDjB2pOYgkQ==
+X-CSE-ConnectionGUID: uKqeOvrKQ7ufEuXi9DlEsQ==
+X-CSE-MsgGUID: LMB5CXw7Q1qUFz5aUBT96A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
-   d="scan'208";a="57589165"
+   d="scan'208";a="57589172"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Aug 2024 10:36:28 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 09 Aug 2024 10:36:29 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -70,12 +70,14 @@ Cc: Junfeng Guo <junfeng.guo@intel.com>,
 	madhu.chittim@intel.com,
 	horms@kernel.org,
 	hkelam@marvell.com,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Marcin Szycik <marcin.szycik@linux.intel.com>,
 	Qi Zhang <qi.z.zhang@intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 03/13] ice: add debugging functions for the parser sections
-Date: Fri,  9 Aug 2024 10:36:02 -0700
-Message-ID: <20240809173615.2031516-4-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 04/13] ice: add parser internal helper functions
+Date: Fri,  9 Aug 2024 10:36:03 -0700
+Message-ID: <20240809173615.2031516-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240809173615.2031516-1-anthony.l.nguyen@intel.com>
 References: <20240809173615.2031516-1-anthony.l.nguyen@intel.com>
@@ -89,8 +91,29 @@ Content-Transfer-Encoding: 8bit
 
 From: Junfeng Guo <junfeng.guo@intel.com>
 
-Add debug for all parser sections.
+Add the following internal helper functions:
 
+- ice_bst_tcam_match():
+  to perform ternary match on boost TCAM.
+
+- ice_pg_cam_match():
+  to perform parse graph key match in cam table.
+
+- ice_pg_nm_cam_match():
+  to perform parse graph key no match in cam table.
+
+- ice_ptype_mk_tcam_match():
+  to perform ptype markers match in tcam table.
+
+- ice_flg_redirect():
+  to redirect parser flags to packet flags.
+
+- ice_xlt_kb_flag_get():
+  to aggregate 64 bit packet flag into 16 bit key builder flags.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
 Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
@@ -98,634 +121,365 @@ Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_parser.c | 470 ++++++++++++++++++++
- 1 file changed, 470 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_parser.c | 208 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h |  51 +++--
+ 2 files changed, 244 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
-index 5fdc87034fc6..23ba1a36742e 100644
+index 23ba1a36742e..f44310e94150 100644
 --- a/drivers/net/ethernet/intel/ice/ice_parser.c
 +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-@@ -129,6 +129,100 @@ ice_parser_create_table(struct ice_hw *hw, u32 sect_type,
+@@ -957,6 +957,109 @@ static struct ice_pg_nm_cam_item *ice_pg_nm_sp_cam_table_get(struct ice_hw *hw)
+ 				       ice_pg_nm_sp_cam_parse_item, false);
  }
  
- /*** ICE_SID_RXPARSER_IMEM section ***/
-+static void ice_imem_bst_bm_dump(struct ice_hw *hw, struct ice_bst_main *bm)
++static bool __ice_pg_cam_match(struct ice_pg_cam_item *item,
++			       struct ice_pg_cam_key *key)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "boost main:\n");
-+	dev_info(dev, "\talu0 = %d\n", bm->alu0);
-+	dev_info(dev, "\talu1 = %d\n", bm->alu1);
-+	dev_info(dev, "\talu2 = %d\n", bm->alu2);
-+	dev_info(dev, "\tpg = %d\n", bm->pg);
++	return (item->key.valid &&
++		!memcmp(&item->key.val, &key->val, sizeof(key->val)));
 +}
 +
-+static void ice_imem_bst_kb_dump(struct ice_hw *hw,
-+				 struct ice_bst_keybuilder *kb)
++static bool __ice_pg_nm_cam_match(struct ice_pg_nm_cam_item *item,
++				  struct ice_pg_cam_key *key)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "boost key builder:\n");
-+	dev_info(dev, "\tpriority = %d\n", kb->prio);
-+	dev_info(dev, "\ttsr_ctrl = %d\n", kb->tsr_ctrl);
-+}
-+
-+static void ice_imem_np_kb_dump(struct ice_hw *hw,
-+				struct ice_np_keybuilder *kb)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "next proto key builder:\n");
-+	dev_info(dev, "\topc = %d\n", kb->opc);
-+	dev_info(dev, "\tstart_or_reg0 = %d\n", kb->start_reg0);
-+	dev_info(dev, "\tlen_or_reg1 = %d\n", kb->len_reg1);
-+}
-+
-+static void ice_imem_pg_kb_dump(struct ice_hw *hw,
-+				struct ice_pg_keybuilder *kb)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "parse graph key builder:\n");
-+	dev_info(dev, "\tflag0_ena = %d\n", kb->flag0_ena);
-+	dev_info(dev, "\tflag1_ena = %d\n", kb->flag1_ena);
-+	dev_info(dev, "\tflag2_ena = %d\n", kb->flag2_ena);
-+	dev_info(dev, "\tflag3_ena = %d\n", kb->flag3_ena);
-+	dev_info(dev, "\tflag0_idx = %d\n", kb->flag0_idx);
-+	dev_info(dev, "\tflag1_idx = %d\n", kb->flag1_idx);
-+	dev_info(dev, "\tflag2_idx = %d\n", kb->flag2_idx);
-+	dev_info(dev, "\tflag3_idx = %d\n", kb->flag3_idx);
-+	dev_info(dev, "\talu_reg_idx = %d\n", kb->alu_reg_idx);
-+}
-+
-+static void ice_imem_alu_dump(struct ice_hw *hw,
-+			      struct ice_alu *alu, int index)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "alu%d:\n", index);
-+	dev_info(dev, "\topc = %d\n", alu->opc);
-+	dev_info(dev, "\tsrc_start = %d\n", alu->src_start);
-+	dev_info(dev, "\tsrc_len = %d\n", alu->src_len);
-+	dev_info(dev, "\tshift_xlate_sel = %d\n", alu->shift_xlate_sel);
-+	dev_info(dev, "\tshift_xlate_key = %d\n", alu->shift_xlate_key);
-+	dev_info(dev, "\tsrc_reg_id = %d\n", alu->src_reg_id);
-+	dev_info(dev, "\tdst_reg_id = %d\n", alu->dst_reg_id);
-+	dev_info(dev, "\tinc0 = %d\n", alu->inc0);
-+	dev_info(dev, "\tinc1 = %d\n", alu->inc1);
-+	dev_info(dev, "\tproto_offset_opc = %d\n", alu->proto_offset_opc);
-+	dev_info(dev, "\tproto_offset = %d\n", alu->proto_offset);
-+	dev_info(dev, "\tbranch_addr = %d\n", alu->branch_addr);
-+	dev_info(dev, "\timm = %d\n", alu->imm);
-+	dev_info(dev, "\tdst_start = %d\n", alu->dst_start);
-+	dev_info(dev, "\tdst_len = %d\n", alu->dst_len);
-+	dev_info(dev, "\tflags_extr_imm = %d\n", alu->flags_extr_imm);
-+	dev_info(dev, "\tflags_start_imm= %d\n", alu->flags_start_imm);
++	return (item->key.valid &&
++		!memcmp(&item->key.val, &key->val, sizeof(item->key.val)));
 +}
 +
 +/**
-+ * ice_imem_dump - dump an imem item info
-+ * @hw: pointer to the hardware structure
-+ * @item: imem item to dump
++ * ice_pg_cam_match - search parse graph cam table by key
++ * @table: parse graph cam table to search
++ * @size: cam table size
++ * @key: search key
++ *
++ * Return: a pointer to the matching PG CAM item or NULL.
 + */
-+static void ice_imem_dump(struct ice_hw *hw, struct ice_imem_item *item)
++struct ice_pg_cam_item *ice_pg_cam_match(struct ice_pg_cam_item *table,
++					 int size, struct ice_pg_cam_key *key)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
++	int i;
 +
-+	dev_info(dev, "index = %d\n", item->idx);
-+	ice_imem_bst_bm_dump(hw, &item->b_m);
-+	ice_imem_bst_kb_dump(hw, &item->b_kb);
-+	dev_info(dev, "pg priority = %d\n", item->pg_prio);
-+	ice_imem_np_kb_dump(hw, &item->np_kb);
-+	ice_imem_pg_kb_dump(hw, &item->pg_kb);
-+	ice_imem_alu_dump(hw, &item->alu0, 0);
-+	ice_imem_alu_dump(hw, &item->alu1, 1);
-+	ice_imem_alu_dump(hw, &item->alu2, 2);
-+}
++	for (i = 0; i < size; i++) {
++		struct ice_pg_cam_item *item = &table[i];
 +
- #define ICE_IM_BM_ALU0		BIT(0)
- #define ICE_IM_BM_ALU1		BIT(1)
- #define ICE_IM_BM_ALU2		BIT(2)
-@@ -328,6 +422,9 @@ static void ice_imem_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 	ice_imem_alu_init(&ii->alu2,
- 			  &buf[ICE_IMEM_ALU2_IDD],
- 			  ICE_IMEM_ALU2_OFF);
++		if (__ice_pg_cam_match(item, key))
++			return item;
++	}
 +
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_imem_dump(hw, ii);
- }
- 
- /**
-@@ -345,6 +442,50 @@ static struct ice_imem_item *ice_imem_table_get(struct ice_hw *hw)
- }
- 
- /*** ICE_SID_RXPARSER_METADATA_INIT section ***/
-+/**
-+ * ice_metainit_dump - dump an metainit item info
-+ * @hw: pointer to the hardware structure
-+ * @item: metainit item to dump
-+ */
-+static void ice_metainit_dump(struct ice_hw *hw, struct ice_metainit_item *item)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "index = %d\n", item->idx);
-+
-+	dev_info(dev, "tsr = %d\n", item->tsr);
-+	dev_info(dev, "ho = %d\n", item->ho);
-+	dev_info(dev, "pc = %d\n", item->pc);
-+	dev_info(dev, "pg_rn = %d\n", item->pg_rn);
-+	dev_info(dev, "cd = %d\n", item->cd);
-+
-+	dev_info(dev, "gpr_a_ctrl = %d\n", item->gpr_a_ctrl);
-+	dev_info(dev, "gpr_a_data_mdid = %d\n", item->gpr_a_data_mdid);
-+	dev_info(dev, "gpr_a_data_start = %d\n", item->gpr_a_data_start);
-+	dev_info(dev, "gpr_a_data_len = %d\n", item->gpr_a_data_len);
-+	dev_info(dev, "gpr_a_id = %d\n", item->gpr_a_id);
-+
-+	dev_info(dev, "gpr_b_ctrl = %d\n", item->gpr_b_ctrl);
-+	dev_info(dev, "gpr_b_data_mdid = %d\n", item->gpr_b_data_mdid);
-+	dev_info(dev, "gpr_b_data_start = %d\n", item->gpr_b_data_start);
-+	dev_info(dev, "gpr_b_data_len = %d\n", item->gpr_b_data_len);
-+	dev_info(dev, "gpr_b_id = %d\n", item->gpr_b_id);
-+
-+	dev_info(dev, "gpr_c_ctrl = %d\n", item->gpr_c_ctrl);
-+	dev_info(dev, "gpr_c_data_mdid = %d\n", item->gpr_c_data_mdid);
-+	dev_info(dev, "gpr_c_data_start = %d\n", item->gpr_c_data_start);
-+	dev_info(dev, "gpr_c_data_len = %d\n", item->gpr_c_data_len);
-+	dev_info(dev, "gpr_c_id = %d\n", item->gpr_c_id);
-+
-+	dev_info(dev, "gpr_d_ctrl = %d\n", item->gpr_d_ctrl);
-+	dev_info(dev, "gpr_d_data_mdid = %d\n", item->gpr_d_data_mdid);
-+	dev_info(dev, "gpr_d_data_start = %d\n", item->gpr_d_data_start);
-+	dev_info(dev, "gpr_d_data_len = %d\n", item->gpr_d_data_len);
-+	dev_info(dev, "gpr_d_id = %d\n", item->gpr_d_id);
-+
-+	dev_info(dev, "flags = 0x%llx\n", (unsigned long long)(item->flags));
-+}
-+
- #define ICE_MI_TSR		GENMASK_ULL(7, 0)
- #define ICE_MI_HO		GENMASK_ULL(16, 8)
- #define ICE_MI_PC		GENMASK_ULL(24, 17)
-@@ -437,6 +578,9 @@ static void ice_metainit_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 	d64 = *((u64 *)&buf[ICE_MI_FLAG_IDD]) >> ICE_MI_FLAG_OFF;
- 
- 	mi->flags		= FIELD_GET(ICE_MI_FLAG, d64);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_metainit_dump(hw, mi);
- }
- 
- /**
-@@ -456,6 +600,80 @@ static struct ice_metainit_item *ice_metainit_table_get(struct ice_hw *hw)
- /*** ICE_SID_RXPARSER_CAM, ICE_SID_RXPARSER_PG_SPILL,
-  *    ICE_SID_RXPARSER_NOMATCH_CAM and ICE_SID_RXPARSER_NOMATCH_CAM
-  *    sections ***/
-+static void ice_pg_cam_key_dump(struct ice_hw *hw, struct ice_pg_cam_key *key)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "key:\n");
-+	dev_info(dev, "\tvalid = %d\n", key->valid);
-+	dev_info(dev, "\tnode_id = %d\n", key->node_id);
-+	dev_info(dev, "\tflag0 = %d\n", key->flag0);
-+	dev_info(dev, "\tflag1 = %d\n", key->flag1);
-+	dev_info(dev, "\tflag2 = %d\n", key->flag2);
-+	dev_info(dev, "\tflag3 = %d\n", key->flag3);
-+	dev_info(dev, "\tboost_idx = %d\n", key->boost_idx);
-+	dev_info(dev, "\talu_reg = 0x%04x\n", key->alu_reg);
-+	dev_info(dev, "\tnext_proto = 0x%08x\n", key->next_proto);
-+}
-+
-+static void ice_pg_nm_cam_key_dump(struct ice_hw *hw,
-+				   struct ice_pg_nm_cam_key *key)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "key:\n");
-+	dev_info(dev, "\tvalid = %d\n", key->valid);
-+	dev_info(dev, "\tnode_id = %d\n", key->node_id);
-+	dev_info(dev, "\tflag0 = %d\n", key->flag0);
-+	dev_info(dev, "\tflag1 = %d\n", key->flag1);
-+	dev_info(dev, "\tflag2 = %d\n", key->flag2);
-+	dev_info(dev, "\tflag3 = %d\n", key->flag3);
-+	dev_info(dev, "\tboost_idx = %d\n", key->boost_idx);
-+	dev_info(dev, "\talu_reg = 0x%04x\n", key->alu_reg);
-+}
-+
-+static void ice_pg_cam_action_dump(struct ice_hw *hw,
-+				   struct ice_pg_cam_action *action)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "action:\n");
-+	dev_info(dev, "\tnext_node = %d\n", action->next_node);
-+	dev_info(dev, "\tnext_pc = %d\n", action->next_pc);
-+	dev_info(dev, "\tis_pg = %d\n", action->is_pg);
-+	dev_info(dev, "\tproto_id = %d\n", action->proto_id);
-+	dev_info(dev, "\tis_mg = %d\n", action->is_mg);
-+	dev_info(dev, "\tmarker_id = %d\n", action->marker_id);
-+	dev_info(dev, "\tis_last_round = %d\n", action->is_last_round);
-+	dev_info(dev, "\tho_polarity = %d\n", action->ho_polarity);
-+	dev_info(dev, "\tho_inc = %d\n", action->ho_inc);
++	return NULL;
 +}
 +
 +/**
-+ * ice_pg_cam_dump - dump an parse graph cam info
-+ * @hw: pointer to the hardware structure
-+ * @item: parse graph cam to dump
++ * ice_pg_nm_cam_match - search parse graph no match cam table by key
++ * @table: parse graph no match cam table to search
++ * @size: cam table size
++ * @key: search key
++ *
++ * Return: a pointer to the matching PG No Match CAM item or NULL.
 + */
-+static void ice_pg_cam_dump(struct ice_hw *hw, struct ice_pg_cam_item *item)
++struct ice_pg_nm_cam_item *
++ice_pg_nm_cam_match(struct ice_pg_nm_cam_item *table, int size,
++		    struct ice_pg_cam_key *key)
 +{
-+	dev_info(ice_hw_to_dev(hw), "index = %d\n", item->idx);
-+	ice_pg_cam_key_dump(hw, &item->key);
-+	ice_pg_cam_action_dump(hw, &item->action);
++	int i;
++
++	for (i = 0; i < size; i++) {
++		struct ice_pg_nm_cam_item *item = &table[i];
++
++		if (__ice_pg_nm_cam_match(item, key))
++			return item;
++	}
++
++	return NULL;
 +}
 +
-+/**
-+ * ice_pg_nm_cam_dump - dump an parse graph no match cam info
-+ * @hw: pointer to the hardware structure
-+ * @item: parse graph no match cam to dump
++/*** Ternary match ***/
++/* Perform a ternary match on a 1-byte pattern (@pat) given @key and @key_inv
++ * Rules (per bit):
++ *     Key == 0 and Key_inv == 0 : Never match (Don't care)
++ *     Key == 0 and Key_inv == 1 : Match on bit == 1
++ *     Key == 1 and Key_inv == 0 : Match on bit == 0
++ *     Key == 1 and Key_inv == 1 : Always match (Don't care)
++ *
++ * Return: true if all bits match, false otherwise.
 + */
-+static void ice_pg_nm_cam_dump(struct ice_hw *hw,
-+			       struct ice_pg_nm_cam_item *item)
++static bool ice_ternary_match_byte(u8 key, u8 key_inv, u8 pat)
 +{
-+	dev_info(ice_hw_to_dev(hw), "index = %d\n", item->idx);
-+	ice_pg_nm_cam_key_dump(hw, &item->key);
-+	ice_pg_cam_action_dump(hw, &item->action);
++	u8 bit_key, bit_key_inv, bit_pat;
++	int i;
++
++	for (i = 0; i < BITS_PER_BYTE; i++) {
++		bit_key = key & BIT(i);
++		bit_key_inv = key_inv & BIT(i);
++		bit_pat = pat & BIT(i);
++
++		if (bit_key != 0 && bit_key_inv != 0)
++			continue;
++
++		if ((bit_key == 0 && bit_key_inv == 0) || bit_key == bit_pat)
++			return false;
++	}
++
++	return true;
 +}
 +
- #define ICE_PGCA_NN	GENMASK_ULL(10, 0)
- #define ICE_PGCA_NPC	GENMASK_ULL(18, 11)
- #define ICE_PGCA_IPG	BIT_ULL(19)
-@@ -584,6 +802,9 @@ static void ice_pg_cam_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 
- 	d64 = *((u64 *)&buf[ICE_PG_CAM_ACT_IDD]) >> ICE_PG_CAM_ACT_OFF;
- 	ice_pg_cam_action_init(&ci->action, d64);
++static bool ice_ternary_match(const u8 *key, const u8 *key_inv,
++			      const u8 *pat, int len)
++{
++	int i;
 +
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_pg_cam_dump(hw, ci);
- }
- 
- #define ICE_PG_SP_CAM_KEY_S	56
-@@ -610,6 +831,9 @@ static void ice_pg_sp_cam_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 	ice_pg_cam_action_init(&ci->action, d64);
- 
- 	ice_pg_cam_key_init(&ci->key, &buf[ICE_PG_SP_CAM_KEY_IDD]);
++	for (i = 0; i < len; i++)
++		if (!ice_ternary_match_byte(key[i], key_inv[i], pat[i]))
++			return false;
 +
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_pg_cam_dump(hw, ci);
- }
- 
- #define ICE_PG_NM_CAM_ACT_S	41
-@@ -638,6 +862,9 @@ static void ice_pg_nm_cam_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 
- 	d64 = *((u64 *)&buf[ICE_PG_NM_CAM_ACT_IDD]) >> ICE_PG_NM_CAM_ACT_OFF;
- 	ice_pg_cam_action_init(&ci->action, d64);
++	return true;
++}
 +
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_pg_nm_cam_dump(hw, ci);
- }
- 
- #define ICE_PG_NM_SP_CAM_ACT_S		56
-@@ -669,6 +896,9 @@ static void ice_pg_nm_sp_cam_parse_item(struct ice_hw *hw, u16 idx,
- 	d64 = *((u64 *)&buf[ICE_PG_NM_SP_CAM_ACT_IDD]) >>
- 		ICE_PG_NM_SP_CAM_ACT_OFF;
- 	ice_pg_nm_cam_key_init(&ci->key, d64);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_pg_nm_cam_dump(hw, ci);
- }
- 
- /**
-@@ -728,6 +958,99 @@ static struct ice_pg_nm_cam_item *ice_pg_nm_sp_cam_table_get(struct ice_hw *hw)
- }
- 
  /*** ICE_SID_RXPARSER_BOOST_TCAM and ICE_SID_LBL_RXPARSER_TMEM sections ***/
-+static void ice_bst_np_kb_dump(struct ice_hw *hw, struct ice_np_keybuilder *kb)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "next proto key builder:\n");
-+	dev_info(dev, "\topc = %d\n", kb->opc);
-+	dev_info(dev, "\tstart_reg0 = %d\n", kb->start_reg0);
-+	dev_info(dev, "\tlen_reg1 = %d\n", kb->len_reg1);
-+}
-+
-+static void ice_bst_pg_kb_dump(struct ice_hw *hw, struct ice_pg_keybuilder *kb)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "parse graph key builder:\n");
-+	dev_info(dev, "\tflag0_ena = %d\n", kb->flag0_ena);
-+	dev_info(dev, "\tflag1_ena = %d\n", kb->flag1_ena);
-+	dev_info(dev, "\tflag2_ena = %d\n", kb->flag2_ena);
-+	dev_info(dev, "\tflag3_ena = %d\n", kb->flag3_ena);
-+	dev_info(dev, "\tflag0_idx = %d\n", kb->flag0_idx);
-+	dev_info(dev, "\tflag1_idx = %d\n", kb->flag1_idx);
-+	dev_info(dev, "\tflag2_idx = %d\n", kb->flag2_idx);
-+	dev_info(dev, "\tflag3_idx = %d\n", kb->flag3_idx);
-+	dev_info(dev, "\talu_reg_idx = %d\n", kb->alu_reg_idx);
-+}
-+
-+static void ice_bst_alu_dump(struct ice_hw *hw, struct ice_alu *alu, int idx)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "alu%d:\n", idx);
-+	dev_info(dev, "\topc = %d\n", alu->opc);
-+	dev_info(dev, "\tsrc_start = %d\n", alu->src_start);
-+	dev_info(dev, "\tsrc_len = %d\n", alu->src_len);
-+	dev_info(dev, "\tshift_xlate_sel = %d\n", alu->shift_xlate_sel);
-+	dev_info(dev, "\tshift_xlate_key = %d\n", alu->shift_xlate_key);
-+	dev_info(dev, "\tsrc_reg_id = %d\n", alu->src_reg_id);
-+	dev_info(dev, "\tdst_reg_id = %d\n", alu->dst_reg_id);
-+	dev_info(dev, "\tinc0 = %d\n", alu->inc0);
-+	dev_info(dev, "\tinc1 = %d\n", alu->inc1);
-+	dev_info(dev, "\tproto_offset_opc = %d\n", alu->proto_offset_opc);
-+	dev_info(dev, "\tproto_offset = %d\n", alu->proto_offset);
-+	dev_info(dev, "\tbranch_addr = %d\n", alu->branch_addr);
-+	dev_info(dev, "\timm = %d\n", alu->imm);
-+	dev_info(dev, "\tdst_start = %d\n", alu->dst_start);
-+	dev_info(dev, "\tdst_len = %d\n", alu->dst_len);
-+	dev_info(dev, "\tflags_extr_imm = %d\n", alu->flags_extr_imm);
-+	dev_info(dev, "\tflags_start_imm= %d\n", alu->flags_start_imm);
-+}
-+
+ static void ice_bst_np_kb_dump(struct ice_hw *hw, struct ice_np_keybuilder *kb)
+ {
+@@ -1259,6 +1362,31 @@ static struct ice_lbl_item *ice_bst_lbl_table_get(struct ice_hw *hw)
+ 				       ice_parse_lbl_item, true);
+ }
+ 
 +/**
-+ * ice_bst_tcam_dump - dump a boost tcam info
-+ * @hw: pointer to the hardware structure
-+ * @item: boost tcam to dump
++ * ice_bst_tcam_match - match a pattern on the boost tcam table
++ * @tcam_table: boost tcam table to search
++ * @pat: pattern to match
++ *
++ * Return: a pointer to the matching Boost TCAM item or NULL.
 + */
-+static void ice_bst_tcam_dump(struct ice_hw *hw, struct ice_bst_tcam_item *item)
++struct ice_bst_tcam_item *
++ice_bst_tcam_match(struct ice_bst_tcam_item *tcam_table, u8 *pat)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
 +	int i;
 +
-+	dev_info(dev, "addr = %d\n", item->addr);
++	for (i = 0; i < ICE_BST_TCAM_TABLE_SIZE; i++) {
++		struct ice_bst_tcam_item *item = &tcam_table[i];
 +
-+	dev_info(dev, "key    : ");
-+	for (i = 0; i < ICE_BST_TCAM_KEY_SIZE; i++)
-+		dev_info(dev, "%02x ", item->key[i]);
++		if (item->hit_idx_grp == 0)
++			continue;
++		if (ice_ternary_match(item->key, item->key_inv, pat,
++				      ICE_BST_TCAM_KEY_SIZE))
++			return item;
++	}
 +
-+	dev_info(dev, "\n");
-+
-+	dev_info(dev, "key_inv: ");
-+	for (i = 0; i < ICE_BST_TCAM_KEY_SIZE; i++)
-+		dev_info(dev, "%02x ", item->key_inv[i]);
-+
-+	dev_info(dev, "\n");
-+
-+	dev_info(dev, "hit_idx_grp = %d\n", item->hit_idx_grp);
-+	dev_info(dev, "pg_prio = %d\n", item->pg_prio);
-+
-+	ice_bst_np_kb_dump(hw, &item->np_kb);
-+	ice_bst_pg_kb_dump(hw, &item->pg_kb);
-+
-+	ice_bst_alu_dump(hw, &item->alu0, ICE_ALU0_IDX);
-+	ice_bst_alu_dump(hw, &item->alu1, ICE_ALU1_IDX);
-+	ice_bst_alu_dump(hw, &item->alu2, ICE_ALU2_IDX);
++	return NULL;
 +}
 +
-+static void ice_lbl_dump(struct ice_hw *hw, struct ice_lbl_item *item)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "index = %u\n", item->idx);
-+	dev_info(dev, "label = %s\n", item->label);
-+}
-+
- #define ICE_BST_ALU_OPC		GENMASK_ULL(5, 0)
- #define ICE_BST_ALU_SS		GENMASK_ULL(13, 6)
- #define ICE_BST_ALU_SL		GENMASK_ULL(18, 14)
-@@ -894,6 +1217,9 @@ static void ice_bst_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 	ice_bst_alu_init(&ti->alu0, &buf[ICE_BT_ALU0_IDD], ICE_BT_ALU0_OFF);
- 	ice_bst_alu_init(&ti->alu1, &buf[ICE_BT_ALU1_IDD], ICE_BT_ALU1_OFF);
- 	ice_bst_alu_init(&ti->alu2, &buf[ICE_BT_ALU2_IDD], ICE_BT_ALU2_OFF);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_bst_tcam_dump(hw, ti);
- }
- 
- /**
-@@ -914,6 +1240,9 @@ static void ice_parse_lbl_item(struct ice_hw *hw, u16 idx, void *item,
- 			       void *data, int size)
- {
- 	memcpy(item, data, size);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_lbl_dump(hw, (struct ice_lbl_item *)item);
- }
- 
- /**
-@@ -931,10 +1260,41 @@ static struct ice_lbl_item *ice_bst_lbl_table_get(struct ice_hw *hw)
- }
- 
  /*** ICE_SID_RXPARSER_MARKER_PTYPE section ***/
+ /**
+  * ice_ptype_mk_tcam_dump - dump an ptype marker tcam info
+@@ -1312,6 +1440,30 @@ struct ice_ptype_mk_tcam_item *ice_ptype_mk_tcam_table_get(struct ice_hw *hw)
+ 				       ice_parse_ptype_mk_tcam_item, true);
+ }
+ 
 +/**
-+ * ice_ptype_mk_tcam_dump - dump an ptype marker tcam info
-+ * @hw: pointer to the hardware structure
-+ * @item: ptype marker tcam to dump
++ * ice_ptype_mk_tcam_match - match a pattern on a ptype marker tcam table
++ * @table: ptype marker tcam table to search
++ * @pat: pattern to match
++ * @len: length of the pattern
++ *
++ * Return: a pointer to the matching Marker PType item or NULL.
 + */
-+static void ice_ptype_mk_tcam_dump(struct ice_hw *hw,
-+				   struct ice_ptype_mk_tcam_item *item)
++struct ice_ptype_mk_tcam_item *
++ice_ptype_mk_tcam_match(struct ice_ptype_mk_tcam_item *table,
++			u8 *pat, int len)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
 +	int i;
 +
-+	dev_info(dev, "address = %d\n", item->address);
-+	dev_info(dev, "ptype = %d\n", item->ptype);
++	for (i = 0; i < ICE_PTYPE_MK_TCAM_TABLE_SIZE; i++) {
++		struct ice_ptype_mk_tcam_item *item = &table[i];
 +
-+	dev_info(dev, "key    :");
-+	for (i = 0; i < ICE_PTYPE_MK_TCAM_KEY_SIZE; i++)
-+		dev_info(dev, "%02x ", item->key[i]);
++		if (ice_ternary_match(item->key, item->key_inv, pat, len))
++			return item;
++	}
 +
-+	dev_info(dev, "\n");
-+
-+	dev_info(dev, "key_inv:");
-+	for (i = 0; i < ICE_PTYPE_MK_TCAM_KEY_SIZE; i++)
-+		dev_info(dev, "%02x ", item->key_inv[i]);
-+
-+	dev_info(dev, "\n");
++	return NULL;
 +}
 +
- static void ice_parse_ptype_mk_tcam_item(struct ice_hw *hw, u16 idx,
- 					 void *item, void *data, int size)
- {
- 	memcpy(item, data, size);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_ptype_mk_tcam_dump(hw,
-+				       (struct ice_ptype_mk_tcam_item *)item);
- }
- 
- /**
-@@ -953,6 +1313,25 @@ struct ice_ptype_mk_tcam_item *ice_ptype_mk_tcam_table_get(struct ice_hw *hw)
- }
- 
  /*** ICE_SID_RXPARSER_MARKER_GRP section ***/
+ /**
+  * ice_mk_grp_dump - dump an marker group item info
+@@ -1504,6 +1656,31 @@ static struct ice_flg_rd_item *ice_flg_rd_table_get(struct ice_hw *hw)
+ 				       ice_flg_rd_parse_item, false);
+ }
+ 
 +/**
-+ * ice_mk_grp_dump - dump an marker group item info
-+ * @hw: pointer to the hardware structure
-+ * @item: marker group item to dump
++ * ice_flg_redirect - redirect a parser flag to packet flag
++ * @table: flag redirect table
++ * @psr_flg: parser flag to redirect
++ *
++ * Return: flag or 0 if @psr_flag = 0.
 + */
-+static void ice_mk_grp_dump(struct ice_hw *hw, struct ice_mk_grp_item *item)
++u64 ice_flg_redirect(struct ice_flg_rd_item *table, u64 psr_flg)
 +{
-+	struct device *dev = ice_hw_to_dev(hw);
++	u64 flg = 0;
 +	int i;
 +
-+	dev_info(dev, "index = %d\n", item->idx);
++	for (i = 0; i < ICE_FLG_RDT_SIZE; i++) {
++		struct ice_flg_rd_item *item = &table[i];
 +
-+	dev_info(dev, "markers: ");
-+	for (i = 0; i < ICE_MK_COUNT_PER_GRP; i++)
-+		dev_info(dev, "%d ", item->markers[i]);
++		if (!item->expose)
++			continue;
 +
-+	dev_info(dev, "\n");
++		if (psr_flg & BIT(item->intr_flg_id))
++			flg |= BIT(i);
++	}
++
++	return flg;
 +}
 +
- static void ice_mk_grp_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 				  void *data, int __maybe_unused size)
- {
-@@ -964,6 +1343,9 @@ static void ice_mk_grp_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 
- 	for (i = 0; i < ICE_MK_COUNT_PER_GRP; i++)
- 		grp->markers[i] = buf[i];
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_mk_grp_dump(hw, grp);
- }
- 
- /**
-@@ -981,6 +1363,33 @@ static struct ice_mk_grp_item *ice_mk_grp_table_get(struct ice_hw *hw)
- }
- 
- /*** ICE_SID_RXPARSER_PROTO_GRP section ***/
-+static void ice_proto_off_dump(struct ice_hw *hw,
-+			       struct ice_proto_off *po, int idx)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "proto %d\n", idx);
-+	dev_info(dev, "\tpolarity = %d\n", po->polarity);
-+	dev_info(dev, "\tproto_id = %d\n", po->proto_id);
-+	dev_info(dev, "\toffset = %d\n", po->offset);
-+}
-+
-+/**
-+ * ice_proto_grp_dump - dump a proto group item info
-+ * @hw: pointer to the hardware structure
-+ * @item: proto group item to dump
-+ */
-+static void ice_proto_grp_dump(struct ice_hw *hw,
-+			       struct ice_proto_grp_item *item)
-+{
-+	int i;
-+
-+	dev_info(ice_hw_to_dev(hw), "index = %d\n", item->idx);
-+
-+	for (i = 0; i < ICE_PROTO_COUNT_PER_GRP; i++)
-+		ice_proto_off_dump(hw, &item->po[i], i);
-+}
-+
- #define ICE_PO_POL	BIT(0)
- #define ICE_PO_PID	GENMASK(8, 1)
- #define ICE_PO_OFF	GENMASK(21, 12)
-@@ -1022,6 +1431,9 @@ static void ice_proto_grp_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 		d32 = *((u32 *)&buf[idd]) >> off;
- 		ice_proto_off_parse(&grp->po[i], d32);
- 	}
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_proto_grp_dump(hw, grp);
- }
- 
- /**
-@@ -1039,6 +1451,20 @@ static struct ice_proto_grp_item *ice_proto_grp_table_get(struct ice_hw *hw)
- }
- 
- /*** ICE_SID_RXPARSER_FLAG_REDIR section ***/
-+/**
-+ * ice_flg_rd_dump - dump a flag redirect item info
-+ * @hw: pointer to the hardware structure
-+ * @item: flag redirect item to dump
-+ */
-+static void ice_flg_rd_dump(struct ice_hw *hw, struct ice_flg_rd_item *item)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+
-+	dev_info(dev, "index = %d\n", item->idx);
-+	dev_info(dev, "expose = %d\n", item->expose);
-+	dev_info(dev, "intr_flg_id = %d\n", item->intr_flg_id);
-+}
-+
- #define ICE_FRT_EXPO	BIT(0)
- #define ICE_FRT_IFID	GENMASK(6, 1)
- 
-@@ -1059,6 +1485,9 @@ static void ice_flg_rd_parse_item(struct ice_hw *hw, u16 idx, void *item,
- 	rdi->idx = idx;
- 	rdi->expose = FIELD_GET(ICE_FRT_EXPO, d8);
- 	rdi->intr_flg_id = FIELD_GET(ICE_FRT_IFID, d8);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_flg_rd_dump(hw, rdi);
- }
- 
- /**
-@@ -1078,6 +1507,44 @@ static struct ice_flg_rd_item *ice_flg_rd_table_get(struct ice_hw *hw)
  /*** ICE_SID_XLT_KEY_BUILDER_SW, ICE_SID_XLT_KEY_BUILDER_ACL,
   * ICE_SID_XLT_KEY_BUILDER_FD and ICE_SID_XLT_KEY_BUILDER_RSS
   * sections ***/
-+static void ice_xlt_kb_entry_dump(struct ice_hw *hw,
-+				  struct ice_xlt_kb_entry *entry, int idx)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+	int i;
-+
-+	dev_info(dev, "key builder entry %d\n", idx);
-+	dev_info(dev, "\txlt1_ad_sel = %d\n", entry->xlt1_ad_sel);
-+	dev_info(dev, "\txlt2_ad_sel = %d\n", entry->xlt2_ad_sel);
-+
-+	for (i = 0; i < ICE_XLT_KB_FLAG0_14_CNT; i++)
-+		dev_info(dev, "\tflg%d_sel = %d\n", i, entry->flg0_14_sel[i]);
-+
-+	dev_info(dev, "\txlt1_md_sel = %d\n", entry->xlt1_md_sel);
-+	dev_info(dev, "\txlt2_md_sel = %d\n", entry->xlt2_md_sel);
-+}
-+
-+/**
-+ * ice_xlt_kb_dump - dump a xlt key build info
-+ * @hw: pointer to the hardware structure
-+ * @kb: key build to dump
-+ */
-+static void ice_xlt_kb_dump(struct ice_hw *hw, struct ice_xlt_kb *kb)
-+{
-+	struct device *dev = ice_hw_to_dev(hw);
-+	int i;
-+
-+	dev_info(dev, "xlt1_pm = %d\n", kb->xlt1_pm);
-+	dev_info(dev, "xlt2_pm = %d\n", kb->xlt2_pm);
-+	dev_info(dev, "prof_id_pm = %d\n", kb->prof_id_pm);
-+	dev_info(dev, "flag15 lo = 0x%08x\n", (u32)kb->flag15);
-+	dev_info(dev, "flag15 hi = 0x%08x\n",
-+		 (u32)(kb->flag15 >> (sizeof(u32) * BITS_PER_BYTE)));
-+
-+	for (i = 0; i < ICE_XLT_KB_TBL_CNT; i++)
-+		ice_xlt_kb_entry_dump(hw, &kb->entries[i], i);
-+}
-+
- #define ICE_XLT_KB_X1AS_S	32	/* offset for the 1st 64-bits field */
- #define ICE_XLT_KB_X1AS_IDD	(ICE_XLT_KB_X1AS_S / BITS_PER_BYTE)
- #define ICE_XLT_KB_X1AS_OFF	(ICE_XLT_KB_X1AS_S % BITS_PER_BYTE)
-@@ -1194,6 +1661,9 @@ static void ice_parse_kb_data(struct ice_hw *hw, struct ice_xlt_kb *kb,
- 		ice_kb_entry_init(&kb->entries[i],
- 				  &buf[ICE_XLT_KB_TBL_OFF +
- 				       i * ICE_XLT_KB_TBL_ENTRY_SIZE]);
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_xlt_kb_dump(hw, kb);
+@@ -1737,6 +1914,37 @@ static struct ice_xlt_kb *ice_xlt_kb_get_rss(struct ice_hw *hw)
+ 	return ice_xlt_kb_get(hw, ICE_SID_XLT_KEY_BUILDER_RSS);
  }
  
- static struct ice_xlt_kb *ice_xlt_kb_get(struct ice_hw *hw, u32 sect_type)
++#define ICE_XLT_KB_MASK		GENMASK_ULL(5, 0)
++
++/**
++ * ice_xlt_kb_flag_get - aggregate 64 bits packet flag into 16 bits xlt flag
++ * @kb: xlt key build
++ * @pkt_flag: 64 bits packet flag
++ *
++ * Return: XLT flag or 0 if @pkt_flag = 0.
++ */
++u16 ice_xlt_kb_flag_get(struct ice_xlt_kb *kb, u64 pkt_flag)
++{
++	struct ice_xlt_kb_entry *entry = &kb->entries[0];
++	u16 flag = 0;
++	int i;
++
++	/* check flag 15 */
++	if (kb->flag15 & pkt_flag)
++		flag = BIT(ICE_XLT_KB_FLAG0_14_CNT);
++
++	/* check flag 0 - 14 */
++	for (i = 0; i < ICE_XLT_KB_FLAG0_14_CNT; i++) {
++		/* only check first entry */
++		u16 idx = entry->flg0_14_sel[i] & ICE_XLT_KB_MASK;
++
++		if (pkt_flag & BIT(idx))
++			flag |= (u16)BIT(i);
++	}
++
++	return flag;
++}
++
+ /*** Parser API ***/
+ /**
+  * ice_parser_create - create a parser instance
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.h b/drivers/net/ethernet/intel/ice/ice_parser.h
+index 6e8054d59644..1d2453890d8e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_parser.h
++++ b/drivers/net/ethernet/intel/ice/ice_parser.h
+@@ -197,25 +197,29 @@ struct ice_metainit_item {
+ 
+ struct ice_pg_cam_key {
+ 	bool valid;
+-	u16 node_id;	/* Node ID of protocol in parse graph */
+-	bool flag0;
+-	bool flag1;
+-	bool flag2;
+-	bool flag3;
+-	u8 boost_idx;	/* Boost TCAM match index */
+-	u16 alu_reg;
+-	u32 next_proto;	/* next Protocol value */
++	struct_group_attr(val, __packed,
++		u16 node_id;	/* Node ID of protocol in parse graph */
++		bool flag0;
++		bool flag1;
++		bool flag2;
++		bool flag3;
++		u8 boost_idx;	/* Boost TCAM match index */
++		u16 alu_reg;
++		u32 next_proto;	/* next Protocol value (must be last) */
++	);
+ };
+ 
+ struct ice_pg_nm_cam_key {
+ 	bool valid;
+-	u16 node_id;
+-	bool flag0;
+-	bool flag1;
+-	bool flag2;
+-	bool flag3;
+-	u8 boost_idx;
+-	u16 alu_reg;
++	struct_group_attr(val, __packed,
++		u16 node_id;
++		bool flag0;
++		bool flag1;
++		bool flag2;
++		bool flag3;
++		u8 boost_idx;
++		u16 alu_reg;
++	);
+ };
+ 
+ struct ice_pg_cam_action {
+@@ -244,6 +248,12 @@ struct ice_pg_nm_cam_item {
+ 	struct ice_pg_cam_action action;
+ };
+ 
++struct ice_pg_cam_item *ice_pg_cam_match(struct ice_pg_cam_item *table,
++					 int size, struct ice_pg_cam_key *key);
++struct ice_pg_nm_cam_item *
++ice_pg_nm_cam_match(struct ice_pg_nm_cam_item *table, int size,
++		    struct ice_pg_cam_key *key);
++
+ /*** ICE_SID_RXPARSER_BOOST_TCAM and ICE_SID_LBL_RXPARSER_TMEM sections ***/
+ #define ICE_BST_TCAM_TABLE_SIZE		256
+ #define ICE_BST_TCAM_KEY_SIZE		20
+@@ -269,6 +279,9 @@ struct ice_lbl_item {
+ 	char label[ICE_LBL_LEN];
+ };
+ 
++struct ice_bst_tcam_item *
++ice_bst_tcam_match(struct ice_bst_tcam_item *tcam_table, u8 *pat);
++
+ /*** ICE_SID_RXPARSER_MARKER_PTYPE section ***/
+ #define ICE_PTYPE_MK_TCAM_TABLE_SIZE	1024
+ #define ICE_PTYPE_MK_TCAM_KEY_SIZE	10
+@@ -280,6 +293,9 @@ struct ice_ptype_mk_tcam_item {
+ 	u8 key_inv[ICE_PTYPE_MK_TCAM_KEY_SIZE];
+ } __packed;
+ 
++struct ice_ptype_mk_tcam_item *
++ice_ptype_mk_tcam_match(struct ice_ptype_mk_tcam_item *table,
++			u8 *pat, int len);
+ /*** ICE_SID_RXPARSER_MARKER_GRP section ***/
+ #define ICE_MK_GRP_TABLE_SIZE		128
+ #define ICE_MK_COUNT_PER_GRP		8
+@@ -308,6 +324,7 @@ struct ice_proto_grp_item {
+ 
+ /*** ICE_SID_RXPARSER_FLAG_REDIR section ***/
+ #define ICE_FLG_RD_TABLE_SIZE	64
++#define ICE_FLG_RDT_SIZE	64
+ 
+ /* Flags Redirection item */
+ struct ice_flg_rd_item {
+@@ -316,6 +333,8 @@ struct ice_flg_rd_item {
+ 	u8 intr_flg_id;	/* Internal Flag ID */
+ };
+ 
++u64 ice_flg_redirect(struct ice_flg_rd_item *table, u64 psr_flg);
++
+ /*** ICE_SID_XLT_KEY_BUILDER_SW, ICE_SID_XLT_KEY_BUILDER_ACL,
+  * ICE_SID_XLT_KEY_BUILDER_FD and ICE_SID_XLT_KEY_BUILDER_RSS
+  * sections ***/
+@@ -341,6 +360,8 @@ struct ice_xlt_kb {
+ 	struct ice_xlt_kb_entry entries[ICE_XLT_KB_TBL_CNT];
+ };
+ 
++u16 ice_xlt_kb_flag_get(struct ice_xlt_kb *kb, u64 pkt_flag);
++
+ /*** Parser API ***/
+ struct ice_parser {
+ 	struct ice_hw *hw; /* pointer to the hardware structure */
 -- 
 2.42.0
 
