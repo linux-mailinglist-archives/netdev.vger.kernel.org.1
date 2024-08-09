@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-117151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B6AE94CE26
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:04:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AF394CE2C
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FDDC284CCB
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:04:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C7F1F255DA
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032B119148D;
-	Fri,  9 Aug 2024 10:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCE51922E3;
+	Fri,  9 Aug 2024 10:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qeY0k0eh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUoONnBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF9116D307;
-	Fri,  9 Aug 2024 10:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3654191F9E;
+	Fri,  9 Aug 2024 10:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723197728; cv=none; b=tHKksowGJINnbqnddx3KqW4t/D7ryBaC4uYpTE1spAuumjn0Y7/GdT/V/8IFHpd9IibwcgwmsHecZJseOWlmxbi9uVMi17+mf5cOSZvdX6OeuIyI/Hjj1kyzIJdY6ljjTFMShFFnn4mjDjFb91/41fPmdUxCrVgCetzLw1AnqJE=
+	t=1723197757; cv=none; b=mLiFqRelywh7a96iGaHUkoM15d8ZKAdSUmX/SpaN7W26WbkgkesT2stdGF/9SRmfiDgLi+gbXCJLFPv8RqTuxkothrkYWkKN+hZVvzM9av3y97BShFpViUxGof0TOvlj82VcgtpCi4S/Q1+UqU6SQ1m7snBGzJpU73S3jfyc54k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723197728; c=relaxed/simple;
-	bh=Kbxtk/rTG8xh8pLqLXt5XVBapXThRW3mletxNrIST94=;
+	s=arc-20240116; t=1723197757; c=relaxed/simple;
+	bh=Gg6GNVZac8M0fXSanieB/ShknDd6zMF0dQYilGAgcns=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FKyJMwbpIt8N1iPQCTYUi4Un5i5fRyCrBN7bBMYG1delEpHccev0FxmjTPbrG8NtxSvofwgsOwyFqbwTK6o8uY8XNaikeXRCO6/IDhb3Y9vwZx3kvajJg9qRpSPKZ5FUvzVhFZl4cOYaBuTZV236XGWXCdsSssu5nLni4byyKUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qeY0k0eh; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723197717; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=BdKgcvydGioWnK8L6t2a5AjgNvCBYWhkiDknLVnvalI=;
-	b=qeY0k0eh/QJvQI8LB++hPZM2yiapQpnzss3PovAxoNwFAWe+KoXnUNCXBW91bxyExx7B8baqZXRt3Ay1LancFjH5wrU7uWvjQ4oO8GFYXt8bOJrqyNXJug4IMkX3AXB/3y+Dx3HVFvGReS5WseTtH7f1J1l8x5pfIfKcTCG7lBY=
-Received: from 30.221.129.232(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCPmSH9_1723197714)
-          by smtp.aliyun-inc.com;
-          Fri, 09 Aug 2024 18:01:56 +0800
-Message-ID: <c0a1aade-a6ee-482a-bc6e-da07a4c69cff@linux.alibaba.com>
-Date: Fri, 9 Aug 2024 18:01:54 +0800
+	 In-Reply-To:Content-Type; b=d2iWMUcJhOPlvUsvc9Mqmt1uFvmOmzuqOqK0AXCKlj7sr1KYpJk8li6lKexJs71YsE0NaMfHtGL75CMNRkr2DU9sNr9SgDBBr2evAa3oIKosSNU7Hvl/p8qanLK6glH18fsWWOb1pgGr9YH0rJ4yJNUHPRTPkA+vtxj1nokmH8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUoONnBX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BCBC32782;
+	Fri,  9 Aug 2024 10:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723197756;
+	bh=Gg6GNVZac8M0fXSanieB/ShknDd6zMF0dQYilGAgcns=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GUoONnBX01q1eTQN5cQcbzN085bC+FZ14Wit95I4McXPw08lryC1W2l5A03EeNGXS
+	 66MkwW0pbEcUau4s7QQZIZTH4nj+K7yh6UvrmuPstdNc2rmkhf6CkZbCEZDnH72lcd
+	 bY7cN5/FCoDHE3JBUIY3gHszE60p0hBjWMufmzWsGCCO9tVHcqZ9+f/SwRM7638spq
+	 F6rDA6I/c2sDuqMYYXjSDYZmpZh/7hRvj0O03A8goY8zn7cA580Q2Ugta25A4X6wWQ
+	 rx4OzXqSBR6S/vbILgS7SuD4+NBLbou6OuDXPcvqt5byYWmF/gJEePOIQ2mupRErLr
+	 SGsm1F+LZIadw==
+Message-ID: <38b31e5b-57a6-44ab-a5ca-8f890bed6074@kernel.org>
+Date: Fri, 9 Aug 2024 12:02:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,73 +50,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/4] net/smc: fix one NULL pointer dereference in
- smc_ib_is_sg_need_sync()
-To: Liu Jian <liujian56@huawei.com>, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Cc: jgg@ziepe.ca, leon@kernel.org, zyjzyj2000@gmail.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-References: <20240809083148.1989912-1-liujian56@huawei.com>
- <20240809083148.1989912-4-liujian56@huawei.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20240809083148.1989912-4-liujian56@huawei.com>
+Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to
+ GRO from netif_receive_skb_list()
+To: Daniel Xu <dxu@dxuuu.xyz>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Cc: Alexander Lobakin <alexandr.lobakin@intel.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, "toke@redhat.com"
+ <toke@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ John Fastabend <john.fastabend@gmail.com>, Yajun Deng
+ <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net,
+ Stanislav Fomichev <sdf@google.com>, kernel-team <kernel-team@cloudflare.com>
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+ <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+ <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
+ <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
+ <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
+ <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
-
-On 2024/8/9 16:31, Liu Jian wrote:
-> BUG: kernel NULL pointer dereference, address: 0000000000000238
-> PGD 0 P4D 0
-> Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 3 PID: 289 Comm: kworker/3:1 Kdump: loaded Tainted: G           OE
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> Workqueue: smc_hs_wq smc_listen_work [smc]
-> RIP: 0010:dma_need_sync+0x5/0x60
-> ...
-> Call Trace:
->   <TASK>
->   ? dma_need_sync+0x5/0x60
->   ? smc_ib_is_sg_need_sync+0x61/0xf0 [smc]
->   smcr_buf_map_link+0x24a/0x380 [smc]
->   __smc_buf_create+0x483/0xb10 [smc]
->   smc_buf_create+0x21/0xe0 [smc]
->   smc_listen_work+0xf11/0x14f0 [smc]
->   ? smc_tcp_listen_work+0x364/0x520 [smc]
->   process_one_work+0x18d/0x3f0
->   worker_thread+0x304/0x440
->   kthread+0xe4/0x110
->   ret_from_fork+0x47/0x70
->   ret_from_fork_asm+0x1a/0x30
->   </TASK>
+On 08/08/2024 22.52, Daniel Xu wrote:
 > 
-> If the software RoCE device is used, ibdev->dma_device is a null pointer.
-> As a result, the problem occurs. Null pointer detection is added to
-> prevent problems.
+> On Thu, Aug 8, 2024, at 7:57 AM, Alexander Lobakin wrote:
+>>
+[...]
+>> The only concern for having GRO in cpumap without metadata from the NIC
+>> descriptor was that when the checksum status is missing, GRO calculates
+>> the checksum on CPU, which is not really fast.
+>> But I remember sometimes GRO was faster despite that.
+ >
+> Good to know, thanks. IIUC some kind of XDP hint support landed already?
 > 
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
-> ---
->   net/smc/smc_ib.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 382351ac9434..059822cc3fde 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -748,6 +748,8 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
->   		    buf_slot->sgt[lnk->link_idx].nents, i) {
->   		if (!sg_dma_len(sg))
->   			break;
-> +		if (!lnk->smcibdev->ibdev->dma_device)
-> +			break;
 
-LGTM.
+The XDP-hints ended-up being called 'XDP RX metadata' in kernel docs[1],
+which makes it difficult to talk about without talking past each-other.
+The TX side only got implemented for AF_XDP.
 
-Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+  [1] https://www.kernel.org/doc/html/latest/networking/xdp-rx-metadata.html
+  [2] https://www.kernel.org/doc/html/latest/networking/xsk-tx-metadata.html
 
->   		if (dma_need_sync(lnk->smcibdev->ibdev->dma_device,
->   				  sg_dma_address(sg))) {
->   			ret = true;
+What landed 'XDP RX metadata'[1] is that we (via kfunc calls)  get
+access to reading hardware RX offloads/hints directly from the
+RX-descriptor. This implies a limitation that we only have access to
+this data in the running XDP-program as the RX-descriptor is short lived.
+
+Thus, we need to store the RX-descriptor information somewhere, to make
+it available to 'cpumap' on the remote CPU. After failing to standardize
+formatting XDP metadata area. My "new" opinion is that we should simply
+extend struct xdp_frame with the fields needed for SKB creation.  Then
+we can create some kfunc helpers that allow XDP-prog stores this info.
+
+
+> My use case could also use HW RSS hash to avoid a rehash in XDP prog.
+> And HW RX timestamp to not break SO_TIMESTAMPING. These two
+> are on one of my TODO lists. But I can’t get to them for at least
+> a few weeks. So free to take it if you’d like.
+
+The kfuncs you need should be available:
+
+  HW RSS hash = bpf_xdp_metadata_rx_hash()
+  HW RX timestamp = bpf_xdp_metadata_rx_timestamp()
+
+We just need to implement storing the information, such that it is
+available to CPUMAP, and make it generic such that it also works for
+veth when getting a XDP redirected xdp_frame.
+
+Hoping someone can works on this soon,
+--Jesper
+
+
+
 
