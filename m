@@ -1,187 +1,159 @@
-Return-Path: <netdev+bounces-117272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8F794D5AE
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:54:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CCC94D5E5
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFD29281C13
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AA471C21401
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CC213D512;
-	Fri,  9 Aug 2024 17:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA31014B94A;
+	Fri,  9 Aug 2024 17:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXnV+S6E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y0zgXt6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCFB1CA94;
-	Fri,  9 Aug 2024 17:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25BD14883B;
+	Fri,  9 Aug 2024 17:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723226061; cv=none; b=hh3QuE9NmJGYdIN8B+HjhhfOAA59x/GFU1kDDOae8KPoXa6KYN+GstwgaO5VgMcd6LqKF2+BNRGcZZUX+chdZbIfzi4Cw241pFFRRIccDjTtKkOMrkQlJHruwhPGrkQ7GzBZARPV8mEApMmPFsRDKETkpJiCIw77rg4rHWvbXJY=
+	t=1723226151; cv=none; b=SAi7QS65P9h8Rw0iTymyukR91gvBJkoHAZ2ApGNpvGoZZCmstfz7zYHeuX5mwazRtWPEujZfi6NqHqEx01sBBJ6aJQCdZzzIOgcbU6txIsOrxzevQnBmkwdwT07uawA6oMf9LXJK5KyHrFCAEa51UU0Gq8U2JStnxEYVO2XL324=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723226061; c=relaxed/simple;
-	bh=w9dwPrdglNjb4CJuuomMjEb9PTsCXrE6sDFhrWPwxbI=;
+	s=arc-20240116; t=1723226151; c=relaxed/simple;
+	bh=lZ+RBQBmLrdgxulilt9piDrRQT9wvO+NFi9nGvNqpJo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOKwKi+iutcS8YAhYFJPLAGjvsABfcZ+cMXp64uOw53jC0Hw6q9duV60w6u7V4zQT6qHcMMlHl2mpkuXYP/CnYFtmev8fw4SiMYbhMpEepjRvMVG5U0U3RM16yUI99VVB1kiE54oZqA5dZRKoKm88XmrV0tDA5RFR90TFIc/hJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXnV+S6E; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1fc569440e1so21670365ad.3;
-        Fri, 09 Aug 2024 10:54:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723226059; x=1723830859; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i79kJL7es86O5bR3t8PxNT/TfJeYLRkUdgp0cZ8YJDQ=;
-        b=HXnV+S6EW6Hv4B2VTlkxbFrPTbJF5HcrFJAFzYwCm2sOQuVkIPdMhIkD/UqzDAju96
-         tRX21ZhWigu7p78DN3gpQLeJUjf7mwPuyqobpInl8e35XFTe7QfAPhzoor6huYccemE9
-         dXOFIIFEcsLd/amI6q1heHgbQbNDU1awY4dvc7inW3eowB+G8j8xwI1TfI6wgeeUGowK
-         fxHXFWXhvitiQ1HfwEju5VHrrF/DPC3K7ytSfUZQRooY65UPcmEXJ0LYwZ65s9OSWGHk
-         NC+K2hifqqWP91u+HLNpQR4CLzVbIByY3bBBLP8pVBp+IwNKIlpfZDCDOY0fkFk86o5w
-         cKUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723226059; x=1723830859;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i79kJL7es86O5bR3t8PxNT/TfJeYLRkUdgp0cZ8YJDQ=;
-        b=e4Cj93V3FQ4DmfOPcwQfrcpqPvFnSKmXY3MpsEg8C64lk20lFOZVLIeVsfjceH6iYs
-         lTaS3WnlXj1ndWTS6mie1jDqGcIhvuRy95f7LinskpReXvWow80Iw9MDhL68KGquPb76
-         BYnuOnQuP/DYTPtE9uHWJP6zKl0n/hpFansOiLVPmgusnquLW8ZdgC3f+xHqGSKd/cNL
-         SAHMiWLo2JKslpn2vjFe9asfE5IMlNMDoIrplCSuDFbcGtkFJOaU63Fu5dZJVvqqieKh
-         OzflKltsoXMHfVDEf4XyQtC8zQcmpt7YNxcV3gFb44FYxLw7O9SMuxtZW5mNp1Z3l9Gs
-         g2YA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGarJA/qCvhunQfAxX4MJsOUict2xOPXiQxn1ARjvK1APvcWMaShlPexKeFtgjDyZJfdgYhVTa2xJRaSziBl/fJLdcQnVUf/he8jl8hRhAlAHRrhw9Tr+WFYdiKblVjj6Pt8jfApXU/QHIrJ7/EAUhXlHBPfWXTC3yR3OBFFhyp0YZzbAd4l0nGQ6X
-X-Gm-Message-State: AOJu0YweE/d+zQKGY/ApWKBJHZUStdEvFdf5aYk3F/AAyWFIvv9iDNAS
-	c83CwhovPXjyBNOLJjZBmDasFquJyCNjwxSr9zdmdU+OBm/SRXMO
-X-Google-Smtp-Source: AGHT+IF6TgRVbkkS/8fWCgztwP8ah68LpZDibl4Zah5cJzKVfLC4DTZHFu319cogK1EsbydUK/ROvw==
-X-Received: by 2002:a17:902:d2ce:b0:1fd:9d0c:9996 with SMTP id d9443c01a7336-200ae589d28mr29785955ad.35.1723226059245;
-        Fri, 09 Aug 2024 10:54:19 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bba3ffc7sm300555ad.244.2024.08.09.10.54.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 10:54:18 -0700 (PDT)
-Date: Fri, 9 Aug 2024 11:54:16 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
-	serge@hallyn.com, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 1/4] Landlock: Add abstract unix socket connect
- restriction
-Message-ID: <ZrZXyGLYSMnpMBfS@tahera-OptiPlex-5000>
-References: <cover.1722570749.git.fahimitahera@gmail.com>
- <e8da4d5311be78806515626a6bd4a16fe17ded04.1722570749.git.fahimitahera@gmail.com>
- <20240803.iefooCha4gae@digikod.net>
- <20240806.nookoChoh2Oh@digikod.net>
- <CAG48ez2ZYzB+GyDLAx7y2TobE=MLXWucQx0qjitfhPSDaaqjiA@mail.gmail.com>
- <20240807.mieloh8bi8Ae@digikod.net>
- <CAG48ez3_u5ZkVY31h4J6Shap9kEsgDiLxF+s10Aea52EkrDMJg@mail.gmail.com>
- <20240807.Be5aiChaf8ie@digikod.net>
- <ZrVR9ni4qpFdF0iA@tahera-OptiPlex-5000>
- <20240809.gooHaid7mo1b@digikod.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aX4X4yJVi8pYhOoO1rvpis75aXuvuzsxzgGwAABdf+3VCN/iYM7FPK2OMCYNkbQofNt/gYe2C65cMSAq9k3xulefJDv8KMUERXqQ9qDUvlR8P1B4NWkOKEixI+/r2Khkfkj4lh92KCOGSJpRT74Kz77h5lkzh3dkdvusjldaXVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y0zgXt6m; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723226150; x=1754762150;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lZ+RBQBmLrdgxulilt9piDrRQT9wvO+NFi9nGvNqpJo=;
+  b=Y0zgXt6mMU8VDNrlecEoB6dvgoK6sTchsqnsCE5glirwNeQUsdkqrnn7
+   o6ASiU4USq9TW3zFUC9XBy/C3LpZUHfYiR2ZHNPAR6nCzq0gTw3BRY24J
+   W8IRcUo/2kd41+LZT9o8ldMVzg0tnVfynRigfUwFF+e5XcnZZv7zDTECm
+   tNl2Asyu5n3ZNEv+u+kY2VbWjCBgEER0PRJb8ogAO5dPh9fqxb7YSWPBp
+   JDdVfhUegH4vHikR25F02fThnoxDSGhv7P4ADvrRt6XmHMOSs8FQDVE31
+   aJ/xk4FSN+RQ8YTymV9IUNBiMfZ0KmyqZmgreJKo6E9dUR590cctPbreH
+   w==;
+X-CSE-ConnectionGUID: 5fN3ESOoRsScA9M5AFq3fA==
+X-CSE-MsgGUID: tlw0MfFgSPWZJ3i1k6CK1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11159"; a="21268498"
+X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
+   d="scan'208";a="21268498"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 10:55:49 -0700
+X-CSE-ConnectionGUID: NiZaaY8zTdOet7QTygHTvg==
+X-CSE-MsgGUID: Ohk5d/AqS1GSWL9/wy713g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
+   d="scan'208";a="88278913"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 09 Aug 2024 10:55:46 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1scTq3-000981-2R;
+	Fri, 09 Aug 2024 17:55:43 +0000
+Date: Sat, 10 Aug 2024 01:55:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/3] net: phy: dp83tg720: Add cable testing
+ support
+Message-ID: <202408100138.gwg3Yuur-lkp@intel.com>
+References: <20240809072440.3477125-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240809.gooHaid7mo1b@digikod.net>
+In-Reply-To: <20240809072440.3477125-3-o.rempel@pengutronix.de>
 
-On Fri, Aug 09, 2024 at 10:49:17AM +0200, Mickaël Salaün wrote:
-> On Thu, Aug 08, 2024 at 05:17:10PM -0600, Tahera Fahimi wrote:
-> > On Wed, Aug 07, 2024 at 04:44:36PM +0200, Mickaël Salaün wrote:
-> > > On Wed, Aug 07, 2024 at 03:45:18PM +0200, Jann Horn wrote:
-> > > > On Wed, Aug 7, 2024 at 9:21 AM Mickaël Salaün <mic@digikod.net> wrote:
-> > > > > On Tue, Aug 06, 2024 at 10:46:43PM +0200, Jann Horn wrote:
-> > > > > > I think adding something like this change on top of your code would
-> > > > > > make it more concise (though this is entirely untested):
-> > > > > >
-> > > > > > --- /tmp/a      2024-08-06 22:37:33.800158308 +0200
-> > > > > > +++ /tmp/b      2024-08-06 22:44:49.539314039 +0200
-> > > > > > @@ -15,25 +15,12 @@
-> > > > > >           * client_layer must be a signed integer with greater capacity than
-> > > > > >           * client->num_layers to ensure the following loop stops.
-> > > > > >           */
-> > > > > >          BUILD_BUG_ON(sizeof(client_layer) > sizeof(client->num_layers));
-> > > > > >
-> > > > > > -        if (!server) {
-> > > > > > -                /*
-> > > > > > -                 * Walks client's parent domains and checks that none of these
-> > > > > > -                 * domains are scoped.
-> > > > > > -                 */
-> > > > > > -                for (; client_layer >= 0; client_layer--) {
-> > > > > > -                        if (landlock_get_scope_mask(client, client_layer) &
-> > > > > > -                            scope)
-> > > > > > -                                return true;
-> > > > > > -                }
-> > > > > > -                return false;
-> > > > > > -        }
-> > > > >
-> > > > > This loop is redundant with the following one, but it makes sure there
-> > > > > is no issue nor inconsistencies with the server or server_walker
-> > > > > pointers.  That's the only approach I found to make sure we don't go
-> > > > > through a path that could use an incorrect pointer, and makes the code
-> > > > > easy to review.
-> > > > 
-> > > > My view is that this is a duplication of logic for one particular
-> > > > special case - after all, you can also end up walking up to the same
-> > > > state (client_layer==-1, server_layer==-1, client_walker==NULL,
-> > > > server_walker==NULL) with the loop at the bottom.
-> > > 
-> > > Indeed
-> > > 
-> > > > 
-> > > > But I guess my preference for more concise code is kinda subjective -
-> > > > if you prefer the more verbose version, I'm fine with that too.
-> > > > 
-> > > > > > -
-> > > > > > -        server_layer = server->num_layers - 1;
-> > > > > > -        server_walker = server->hierarchy;
-> > > > > > +        server_layer = server ? (server->num_layers - 1) : -1;
-> > > > > > +        server_walker = server ? server->hierarchy : NULL;
-> > > > >
-> > > > > We would need to change the last loop to avoid a null pointer deref.
-> > > > 
-> > > > Why? The first loop would either exit or walk the client_walker up
-> > > > until client_layer is -1 and client_walker is NULL; the second loop
-> > > > wouldn't do anything because the walkers are at the same layer; the
-> > > > third loop's body wouldn't be executed because client_layer is -1.
-> > > 
-> > > Correct, I missed that client_layer would always be greater than
-> > > server_layer (-1).
-> > > 
-> > > Tahera, could you please take Jann's proposal?
-> > Done.
-> > We will have duplicate logic, but it would be easier to read and review.
-> 
-> With Jann's proposal we don't have duplicate logic.
-Still the first two for loops apply the same logic for client and server
-domains, but I totally understand that it is much easier to review and
-understand.
-> > > 
-> > > > 
-> > > > The case where the server is not in any Landlock domain is just one
-> > > > subcase of the more general case "client and server do not have a
-> > > > common ancestor domain".
-> > > > 
-> > > > > >
-> > > > > >          /*
-> > > > > >           * Walks client's parent domains down to the same hierarchy level as
-> > > > > >           * the server's domain, and checks that none of these client's parent
-> > > > > >           * domains are scoped.
-> > > > > >
-> > > > 
-> > 
+Hi Oleksij,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/phy-Add-Open-Alliance-helpers-for-the-PHY-framework/20240809-172119
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240809072440.3477125-3-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v3 3/3] net: phy: dp83tg720: Add cable testing support
+config: i386-buildonly-randconfig-004-20240809 (https://download.01.org/0day-ci/archive/20240810/202408100138.gwg3Yuur-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240810/202408100138.gwg3Yuur-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408100138.gwg3Yuur-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/phy/open_alliance_helpers.c:34:18: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      34 |         u8 tdr_status = FIELD_GET(OA_1000BT1_HDD_TDR_STATUS_MASK, reg_value);
+         |                         ^
+   drivers/net/phy/open_alliance_helpers.c:69:16: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      69 |         u8 dist_val = FIELD_GET(OA_1000BT1_HDD_TDR_DISTANCE_MASK, reg_value);
+         |                       ^
+   2 errors generated.
+
+
+vim +/FIELD_GET +34 drivers/net/phy/open_alliance_helpers.c
+
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  21  
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  22  /**
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  23   * oa_1000bt1_get_ethtool_cable_result_code - Convert TDR status to ethtool
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  24   *					      result code
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  25   * @reg_value: Value read from the TDR register
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  26   *
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  27   * This function takes a register value from the HDD.TDR register and converts
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  28   * the TDR status to the corresponding ethtool cable test result code.
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  29   *
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  30   * Return: The appropriate ethtool result code based on the TDR status
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  31   */
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  32  int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value)
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  33  {
+f4eee3aa678aeb Oleksij Rempel 2024-08-09 @34  	u8 tdr_status = FIELD_GET(OA_1000BT1_HDD_TDR_STATUS_MASK, reg_value);
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  35  	u8 dist_val = FIELD_GET(OA_1000BT1_HDD_TDR_DISTANCE_MASK, reg_value);
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  36  
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  37  	switch (tdr_status) {
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  38  	case OA_1000BT1_HDD_TDR_STATUS_CABLE_OK:
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  39  		return ETHTOOL_A_CABLE_RESULT_CODE_OK;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  40  	case OA_1000BT1_HDD_TDR_STATUS_OPEN:
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  41  		return ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  42  	case OA_1000BT1_HDD_TDR_STATUS_SHORT:
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  43  		return ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  44  	case OA_1000BT1_HDD_TDR_STATUS_NOISE:
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  45  		return ETHTOOL_A_CABLE_RESULT_CODE_NOISE;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  46  	default:
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  47  		if (dist_val == OA_1000BT1_HDD_TDR_DISTANCE_RESOLUTION_NOT_POSSIBLE)
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  48  			return ETHTOOL_A_CABLE_RESULT_CODE_RESOLUTION_NOT_POSSIBLE;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  49  		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  50  	}
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  51  }
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  52  EXPORT_SYMBOL_GPL(oa_1000bt1_get_ethtool_cable_result_code);
+f4eee3aa678aeb Oleksij Rempel 2024-08-09  53  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
