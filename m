@@ -1,122 +1,153 @@
-Return-Path: <netdev+bounces-117107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5150494CB8E
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 09:41:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB6D594CBBD
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 09:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F046D1F24B2A
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:41:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96C4E1F21E0F
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 07:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A4017C223;
-	Fri,  9 Aug 2024 07:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8056218C931;
+	Fri,  9 Aug 2024 07:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWy7JWX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAB017BB13;
-	Fri,  9 Aug 2024 07:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013EA1552EB;
+	Fri,  9 Aug 2024 07:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723189278; cv=none; b=EWpB5QVhBSvHqo7tXVtF1t6e3nlDVMbjnVEu68gnu6at2bdNCFLyQfD0sg7xGV9P05hCMABu28rwpLjpK+6iq+p7VNUVOtNCh1fjvm85fIR+olDbkVZtxhySbtk40zgsUHC3rOzkMTOwsWnKW1ZCa/1pgwguXKefrpvR8Ru0Ivc=
+	t=1723190188; cv=none; b=q/icM8tm/GJw5AQmaxamY0zCZ+d7puypdEBlXsVnmGXFm3qgU5ZumjLFz44PqwyjmMTts65fVHiepjd5mgB4OvprVL9Xbqg6UGtfnychHv6wEotwSsI5FGXuHlKrGb3dxBSoT3pDDzqkrkXajJuGpWY8Rev4RoEnA81aK3mRo3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723189278; c=relaxed/simple;
-	bh=bMxXANLcXIR0EKqEWjwf6YFOMOM4Qw2kkWArm9aKOX4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cOh3GrPIBKCSS7znlmgTtQmgoL5qSELUa13UbAcbvSinpM87Ac2I5KkoJlUuWH7GpQ9KmA2BWvxpBZIKAy5z+XJAagNnmvjRY+4VJazryxafJ/lj2k8qdq5LOWAi8/2DY0wzGYXel2YVgFvnxJBsoedAePfPzO4wtQePnxjlwwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (217.23.186.16) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Aug
- 2024 10:40:54 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Roman Smirnov <r.smirnov@omp.ru>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Karina
- Yankevich <k.yankevich@omp.ru>, <lvc-project@linuxtesting.org>
-Subject: [PATCH] netfilter: nfnetlink_log: remove unnecessary check in __build_packet_message()
-Date: Fri, 9 Aug 2024 10:40:35 +0300
-Message-ID: <20240809074035.11078-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1723190188; c=relaxed/simple;
+	bh=WciictBvnZZognJdSB//Vkpj36Vtrbm418N+k4gXKM8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lue6vbwtS3HJzRZ4DDuQJNKtEil0h6h4lG6IFkP1B5hZIGG8ikUOuuF5Kcihcvq2LJABgU2zkSn7SqbHzVyIsJVSGrB0gMVkoRhgO4qxg5JpAJ98rXp/4ZTYvfg+2Q4hTsM6NO+bTCsHgTb5IFuX9QdMpXBrbmjngJBHjJfFHqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWy7JWX6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952AFC4AF0D;
+	Fri,  9 Aug 2024 07:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723190187;
+	bh=WciictBvnZZognJdSB//Vkpj36Vtrbm418N+k4gXKM8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iWy7JWX63DlQVy2d0mNGhQfP+E5wTH7yt+zLcJ0XE+/2H7ya+xPuYTTvng2lSdR0P
+	 fY3FcxC8uU8GMeAkyI60nvRDENoJPGv+KO8RJqpQagYElLNKgByK/OFTroSX355YCs
+	 LkPyVbDTwM5NLcPamf6V9UY8mS/5OHdlCJ1Bf0Wrzy8CzH4nnoBsnommLbSLYVYa0S
+	 vit/eTqSx1gLR+UhLsyyqz5moCQu5XrPJ2lKHYZlMNpbvAKOB2UKpjpb3hjS9c0GG8
+	 efszcgVI6ngSguWbXJ9ztgvoCk8mZPBFojeGqb+x30Hdvr6lK6GLQBG40LF/KOtnNT
+	 rWCJ8B29HDgmg==
+Date: Fri, 9 Aug 2024 08:56:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>,
+	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Willem de Bruijn <willemb@google.com>, linux-alpha@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bagas Sanjaya <bagasdotme@gmail.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Helge Deller <deller@gmx.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"James E. J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Matt Turner <mattst88@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Shailend Chand <shailend@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Shuah Khan <shuah@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Taehee Yoo <ap420073@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>
+Subject: Re: [PATCH net-next v17 03/14] netdev: support binding dma-buf to
+ netdevice
+Message-ID: <20240809075615.GD3075665@kernel.org>
+References: <20240730022623.98909-4-almasrymina@google.com>
+ <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
+ <CAHS8izPxfCv1VMFBK1FahGTjVmUSSfrabgY5y6V+XtaszoHQ4w@mail.gmail.com>
+ <9aad36fe-cd4c-4ce5-b4d8-6c8619d10c46@web.de>
+ <66b2198686b91_3206cf29453@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 08/09/2024 07:24:41
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 186955 [Aug 09 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 24 0.3.24
- 186c4d603b899ccfd4883d230c53f273b80e467f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.186.16 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.186.16
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/09/2024 07:29:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 8/9/2024 5:00:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+In-Reply-To: <66b2198686b91_3206cf29453@willemb.c.googlers.com.notmuch>
 
-skb->dev is always non-NULL, the check is unnecessary.
+On Tue, Aug 06, 2024 at 08:39:34AM -0400, Willem de Bruijn wrote:
+> Markus Elfring wrote:
+> > >> …
+> > >>> +++ b/include/net/devmem.h
+> > >>> @@ -0,0 +1,115 @@
+> > >> …
+> > >>> +#ifndef _NET_DEVMEM_H
+> > >>> +#define _NET_DEVMEM_H
+> > >> …
+> > >>
+> > >> I suggest to omit leading underscores from such identifiers.
+> > >> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier
+> > >>
+> > >
+> > > I was gonna apply this change, but I ack'd existing files and I find
+> > > that all of them include leading underscores, including some very
+> > > recently added files like net/core/page_pool_priv.h.
+> > >
+> > > I would prefer to stick to existing conventions if that's OK, unless
+> > > there is widespread agreement to the contrary.
+> > 
+> > Under which circumstances would you become interested to reduce development risks
+> > also according to undefined behaviour?
+> > https://wiki.sei.cmu.edu/confluence/display/c/CC.+Undefined+Behavior#CC.UndefinedBehavior-ub_106
+> 
+> This series is following established practice in kernel networking.
+> 
+> If that conflicts with a C standard, then perhaps that needs to be
+> resolved project wide.
+> 
+> Forcing an individual feature to diverge just brings inconsistency.
+> That said, this appears to be inconsistent already.
+> 
+> Main question is whether this is worth respinning a series already at
+> v17 with no more fundamental feedback.
 
-Remove it.
+No, from my point of view, it is not.
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
-
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
- net/netfilter/nfnetlink_log.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/netfilter/nfnetlink_log.c b/net/netfilter/nfnetlink_log.c
-index 134e05d31061..ee04a52eaf33 100644
---- a/net/netfilter/nfnetlink_log.c
-+++ b/net/netfilter/nfnetlink_log.c
-@@ -566,8 +566,7 @@ __build_packet_message(struct nfnl_log_net *log,
- 	    nla_put_be32(inst->skb, NFULA_MARK, htonl(skb->mark)))
- 		goto nla_put_failure;
- 
--	if (indev && skb->dev &&
--	    skb_mac_header_was_set(skb) &&
-+	if (indev && skb_mac_header_was_set(skb) &&
- 	    skb_mac_header_len(skb) != 0) {
- 		struct nfulnl_msg_packet_hw phw;
- 		int len;
--- 
-2.43.0
-
+This really is a trivial and somewhat subjective mater.
+I don't think it should hold up a substantial piece of work.
 
