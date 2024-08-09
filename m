@@ -1,102 +1,102 @@
-Return-Path: <netdev+bounces-117298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309C394D800
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 22:23:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D69294D808
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 22:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5785283396
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 20:23:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81D81F219F5
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 20:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B63015ECD2;
-	Fri,  9 Aug 2024 20:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB63160860;
+	Fri,  9 Aug 2024 20:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VSCy9ql5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IhkIq164"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996EC33D1;
-	Fri,  9 Aug 2024 20:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6CB33D1;
+	Fri,  9 Aug 2024 20:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723234985; cv=none; b=RAGNPxh0IaiWPurGTSnkFcSZChzls3UPrgrJ9Gpg4pSHn4ASxfp44osTjL9Z5wtVze40Dr1btl6bAWuVyDIZuuD8cyvv4lvby+gvDKxsm7scNS2pnjHVgrzfcdFPpZjpnWj7fCjcDst+V+3yU4YxrrttWmHzRGGX5KBkb94eKXE=
+	t=1723235125; cv=none; b=VPHZwSUbSfhn6cqBZpa0/CNgCVotZiLXy/TvFEWfcSm+fCmXoNZ2kZxGaq2ln07zaAr6mKEoOkO/kyTc1X8ey9O6GWYuIShVQ/DHQ1MR63M8CU2RtEOvePpD1ynSzHW/LLwZwqiEzbnrTAmDH8Ul2Qx1n4krRRpehQCuV6BI1H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723234985; c=relaxed/simple;
-	bh=SGdE+e5vii25VpavXbLGyCEpV8mXQD+JqsD7M3i7j8o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FFB6bFo1ZmtxwXPmTWPc+BHqiUt9CLgMSszaxxX/fKGJ/dnUpBLTzAdLO4oHBt4+EwRhHykynHz0ca+JIyyy8XqIfIDkjCr/qgcbQPDmDWOXGy38QmU50Xilg2fuzBcWWcyPuOFs1Jkqj1yxZ7uNU2ebrDoApT5aOovdIDLVc1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VSCy9ql5; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723234983; x=1754770983;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zUeaPEMbAwsBz9fFLJRiAzOBSEZsFMQr1EZcxbWRRq0=;
-  b=VSCy9ql5OnQriNZQ19xqkqV6xgtXbUdqJekYUfnZjxyfiStMVnsHxj3u
-   g2czAOgACFAMhh/vCTwdL4D9Gx4qy4vMxESQpri1GGhGULtj5DS2mRg/F
-   h3NsNk80yWM1Jh1XIA536nP2PReH0mygO5ShdAouxmZyM8UyVutUCQArj
-   M=;
-X-IronPort-AV: E=Sophos;i="6.09,277,1716249600"; 
-   d="scan'208";a="113920681"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 20:23:01 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:45062]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.195:2525] with esmtp (Farcaster)
- id a3ffb0ee-4f38-4521-91fd-3a8fa119e9f5; Fri, 9 Aug 2024 20:23:01 +0000 (UTC)
-X-Farcaster-Flow-ID: a3ffb0ee-4f38-4521-91fd-3a8fa119e9f5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 20:23:00 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 20:22:57 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <socketcan@hartkopp.net>
-CC: <davem@davemloft.net>, <david.hunter.linux@gmail.com>,
-	<edumazet@google.com>, <javier.carrasco.cruz@gmail.com>, <kuba@kernel.org>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<mkl@pengutronix.de>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<skhan@linuxfoundation.org>, <kuniyu@amazon.com>
-Subject: Re: [PATCH 1/1] Net: bcm.c: Remove Subtree Instead of Entry
-Date: Fri, 9 Aug 2024 13:22:49 -0700
-Message-ID: <20240809202249.16183-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <2bf44b8d-b286-4a94-8e1d-6c4e736a1d07@hartkopp.net>
-References: <2bf44b8d-b286-4a94-8e1d-6c4e736a1d07@hartkopp.net>
+	s=arc-20240116; t=1723235125; c=relaxed/simple;
+	bh=McNVXp3LoZaVmqb1YpE0NscgQUM6eBi1PCWQqxjCkU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iBQ6LNf1mCe6PI/d78UcN25hXF700t9WELwze3/iWykDf/kLBc3e9tp7UIwRv5nEyMo1xRpLr2iA+PWt4QKOqCSJQq60B8e0GI0ziybTfHNjwTVRNW1p4BydtMB3Nx8YnfT8lJXI2C0xj4h+qLWnTLfG347icfyWRHA+KKP8Pts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IhkIq164; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+schTQf5j96nlsICJifEdmP7l92zlexNKlgDIVIPHcg=; b=IhkIq1646ATrXJgIt9QNpjXl8q
+	qK/iSgh2HPM/WkIKC3hmvSfv0IJjEn6SeV3MhKz+pivmOxrB3rs6zdOUxjN5VDgHasuUNEIg1pQLY
+	kBQSpgK+moDlfC+qC4CoKUQB2wQMlg6bmxNaQyDGMCK0++3JfjVlQQxez7Rt1JiYbq6A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1scWAf-004PdU-Km; Fri, 09 Aug 2024 22:25:09 +0200
+Date: Fri, 9 Aug 2024 22:25:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tan En De <endeneer@gmail.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	linux-kernel@vger.kernel.org, leyfoon.tan@starfivetech.com,
+	Tan En De <ende.tan@starfivetech.com>
+Subject: Re: [net,1/1] net: stmmac: Set OWN bit last in dwmac4_set_rx_owner()
+Message-ID: <06297829-0bf7-4a06-baaf-e32c39888947@lunn.ch>
+References: <20240809144229.1370-1-ende.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240809144229.1370-1-ende.tan@starfivetech.com>
 
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-Date: Fri, 9 Aug 2024 11:57:41 +0200
-> Hello David,
-> 
-> many thanks for the patch and the description.
-> 
-> Btw. the data structures of the elements inside that bcm proc dir should 
-> have been removed at that point, so that the can-bcm dir should be empty.
-> 
-> I'm not sure what happens to the open sockets that are (later) removed 
-> in bcm_release() when we use remove_proc_subtree() as suggested. 
-> Removing this warning probably does not heal the root cause of the issue.
+On Fri, Aug 09, 2024 at 10:42:29PM +0800, Tan En De wrote:
+> Ensure that all other bits in the RDES3 descriptor are configured before
+> transferring ownership of the descriptor to DMA via the OWN bit.
 
-I posted a patch to fix bcm's proc entry leak few weeks ago, and this might
-be related.
-https://lore.kernel.org/netdev/20240722192842.37421-1-kuniyu@amazon.com/
+Are you seeing things going wrong with real hardware, or is this just
+code review? If this is a real problem, please add a description of
+what the user would see.
 
-Oliver, could you take this patch to can tree ?
+Does this need to be backported in stable?
+
+https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+
+If it does, you should add a Fixes: tag and 'Cc: stable@vger.kernel.org'
+
+This will also decide which tree you need to base the patch on:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
+
+>  static void dwmac4_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
+>  {
+> -	p->des3 |= cpu_to_le32(RDES3_OWN | RDES3_BUFFER1_VALID_ADDR);
+> +	p->des3 |= cpu_to_le32(RDES3_BUFFER1_VALID_ADDR);
+>  
+>  	if (!disable_rx_ic)
+>  		p->des3 |= cpu_to_le32(RDES3_INT_ON_COMPLETION_EN);
+> +
+> +	dma_wmb();
+> +	p->des3 |= cpu_to_le32(RDES3_OWN);
+
+Is the problem here that RDES3_INT_ON_COMPLETION_EN is added after the
+RDES3_OWN above has hit the hardware, so it gets ignored?
+
+It seems like it would be better to calculate the value in a local
+variable, and then assign to p->des3 once.
+
+	  Andrew
 
