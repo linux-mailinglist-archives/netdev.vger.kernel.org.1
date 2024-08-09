@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-117096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9070694CA0C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 08:06:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9854894CA37
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 08:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39911288C3E
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 06:06:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A77BB2579D
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 06:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CA816C86B;
-	Fri,  9 Aug 2024 06:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DE216D315;
+	Fri,  9 Aug 2024 06:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FmJiM9Nx"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C34184
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 06:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DD717C98;
+	Fri,  9 Aug 2024 06:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723183577; cv=none; b=q8T5QgxYupG/nKYsOuYl6veKpYfaic7AcckEASo4QvRlQU+6X1r5zEwgRA8vytPRedBcXk4NrvuqnfaQhhiXlemsh3zkr1pWaDC+vPmTg24/i7hWGS2ZU8NYmNRR+nXEjpGsGoBXho64+DUpkacuZVOfZW6/7GMjtBcfSsbLo+c=
+	t=1723183865; cv=none; b=KtigcuEz8E+gPWzp9tcpxUhNNHT18HpQeZEBKu1nYpzZkSx8B2z+Sw7qX/o9z2Dn/9Yxy1/7kekH6dBDwB5xP8PCXh+r/aiPxRAtIYvTFF/9cT5W8/zWUUWDY6wNAAo9x8JFQHD8K2Dv/aN8i0HDoLR1oPwZHbgMXYms190ZkJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723183577; c=relaxed/simple;
-	bh=8SZtBr63RxcZZoD//IN+qTlK1ZM/mAIjtdlQQVvoAvU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XRSjVXOSDRhIaZuYC/v1/WQzRtZHOu4Ymz939uf8PUIoDzrvpCYAI1Qe1Ob4X7XwdRUIwZTe5HAEAechFUi9k+e2lHlbfNURq+la/NrwOF6trboQjOcgz5O4JUj2dfvfH7iItSZjToZ29Jc5as2sFn1hEnSEezJjfTPrLemnJHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WgCvy1cMdz1j6P0;
-	Fri,  9 Aug 2024 14:01:18 +0800 (CST)
-Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
-	by mail.maildlp.com (Postfix) with ESMTPS id 585CA140159;
-	Fri,  9 Aug 2024 14:06:03 +0800 (CST)
-Received: from [10.67.121.184] (10.67.121.184) by
- kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 9 Aug 2024 14:06:02 +0800
-Message-ID: <758b4d47-c980-4f66-b4a4-949c3fc4b040@huawei.com>
-Date: Fri, 9 Aug 2024 14:06:02 +0800
+	s=arc-20240116; t=1723183865; c=relaxed/simple;
+	bh=khFgQn+Lk4DWU3gaXvjqX4VWxA08RDqdBq4fmN6gLHI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n2s384QRx6ZKmlNBlf0egObT7zNCu2tQZk4jHiOq37xaRwI5ldLrYyH5KpW+g/Mfkb/svRKrMed7L7tqU7Dry0vCDbqYoM/oBwEivZKS+etyuofm24hrEr6i/bJDHHmS0szmzmy3R6FibYd6v9pboZTMkC/etjMGqNGfncunMmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FmJiM9Nx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8563C32782;
+	Fri,  9 Aug 2024 06:10:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723183864;
+	bh=khFgQn+Lk4DWU3gaXvjqX4VWxA08RDqdBq4fmN6gLHI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FmJiM9Nx7XSHzvpYa93Lc2Z2Ysv6sV8cSHMGTG+wNavyLMUT5Dn9gOhwsd/DPG1RR
+	 rLVVV+2vcosCYsoo3Vec7isA/T5udWEatW2cRnKSSlicIIEIvfy/wmn+N70PnB33iX
+	 oslqD4IOmbDlF3f0jnuX8vvx5xRIysH0PjT+oX+wK5Jpqt+Ml8832FULyMzmvxrQT5
+	 LLhPzdi09vvydZkmDYgYDERDmErg2xgxW6uHRnpp3T5mlxKtov+bWb7UvYm1SHYTk1
+	 mQXeNNTV069W5r7owtVUFqtxNvWQeqXRXiOmSBVKn0GDZgJRacDcl1ifermrt5Jmqg
+	 Qr/Gg01w19C6A==
+Message-ID: <b88ddaed-4f7c-4a1a-8f52-43a2acc4ca82@kernel.org>
+Date: Fri, 9 Aug 2024 08:10:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,173 +50,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
- avoid IOMMU crashes
+Subject: Re: [PATCH v2 05/11] dt-bindings: soc: qcom: qcom,pmic-glink:
+ Document SM7325 compatible
+To: Danila Tikhonov <danila@jiaxyga.com>, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, andersson@kernel.org,
+ konradybcio@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, rafael@kernel.org,
+ viresh.kumar@linaro.org, kees@kernel.org, tony.luck@intel.com,
+ gpiccoli@igalia.com, ulf.hansson@linaro.org, andre.przywara@arm.com,
+ quic_rjendra@quicinc.com, davidwronek@gmail.com, neil.armstrong@linaro.org,
+ heiko.stuebner@cherry.de, rafal@milecki.pl, macromorgan@hotmail.com,
+ linus.walleij@linaro.org, lpieralisi@kernel.org,
+ dmitry.baryshkov@linaro.org, fekz115@gmail.com
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20240808184048.63030-1-danila@jiaxyga.com>
+ <20240808184048.63030-6-danila@jiaxyga.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Yunsheng Lin <linyunsheng@huawei.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>
-References: <20240806151618.1373008-1-kuba@kernel.org>
- <523894ab-2d38-415f-8306-c0d1abd911ec@huawei.com>
- <20240807072908.1da91994@kernel.org>
- <977c3d82-e2f0-4466-9100-7ea781e91ce1@huawei.com>
- <20240808070511.0befbdde@kernel.org>
-From: Yonglong Liu <liuyonglong@huawei.com>
-In-Reply-To: <20240808070511.0befbdde@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemf200007.china.huawei.com (7.202.181.233)
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240808184048.63030-6-danila@jiaxyga.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 08/08/2024 20:40, Danila Tikhonov wrote:
+> The SM7325 is the closest SoC to the QCM6490 and is also identical
+> to the SC7280. The SM7325 also requires both UCSI_NO_PARTNER_PDOS &
+> UCSI_DELAY_DEVICE_PDOS quirks.
+> 
+> Document the PMIC GLINK firmware interface on the SM7325 Platform
+> by using the QCM6490 bindings as fallback.
+> 
+> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
+> ---
+>  .../devicetree/bindings/soc/qcom/qcom,pmic-glink.yaml        | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
 
 
-On 2024/8/8 22:05, Jakub Kicinski wrote:
-> On Thu, 8 Aug 2024 20:52:52 +0800 Yonglong Liu wrote:
->> I hooks the netdev to the page pool, and run with this patch for a
->> while, then get
->>
->> the following messages, and the vf can not disable:
->> [ 1950.137586] hns3 0000:7d:01.0 eno1v0: link up
->> [ 1950.137671] hns3 0000:7d:01.0 eno1v0: net open
->> [ 1950.147098] 8021q: adding VLAN 0 to HW filter on device eno1v0
->> [ 1974.287476] hns3 0000:7d:01.0 eno1v0: net stop
->> [ 1974.294359] hns3 0000:7d:01.0 eno1v0: link down
->> [ 1975.596916] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool
->> release stalling device unregister
->> [ 1976.744947] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool
->> release stalling device unregister
-> So.. the patch works? :) We may want to add this to get the info prints
-> back:
->
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 2abe6e919224..26bc1618de7c 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -1021,11 +1021,12 @@ static void page_pool_release_retry(struct work_struct *wq)
->   	/* Periodic warning for page pools the user can't see */
->   	netdev = READ_ONCE(pool->slow.netdev);
->   	if (time_after_eq(jiffies, pool->defer_warn) &&
-> -	    (!netdev || netdev == NET_PTR_POISON)) {
-> +	    (!netdev || netdev == NET_PTR_POISON || netdev->pp_unreg_pending)) {
->   		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
->   
-> -		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
-> -			__func__, pool->user.id, inflight, sec);
-> +		pr_warn("%s(): %s stalled pool shutdown: id %u, %d inflight %d sec (hold netdev: %d)\n",
-> +			__func__, netdev ? netdev_name(netdev) : "",
-> +			pool->user.id, inflight, sec, pool->defer_warn);
->   		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
->   	}
->   
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Here is the log:
-
-[ 1018.059215] hns3 0000:7d:01.0 eno1v0: net stop
-[ 1018.066095] hns3 0000:7d:01.0 eno1v0: link down
-[ 1019.340845] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1020.492848] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1021.648849] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1022.796850] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1023.980837] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1025.132850] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1026.284851] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1027.500853] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1028.364855] unregister_netdevice: waiting for eno1v0 to become free. 
-Usage count = 2
-[ 1028.652851] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1029.808845] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-[ 1030.956843] hns3 0000:7d:01.0 eno1v0 (unregistered): page pool 
-release stalling device unregister
-
-...
-
-[ 1078.476854] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 60 sec (hold netdev: 194039)
-
-...
-
-[ 1138.892838] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 120 sec (hold netdev: 209147)
-
-...
-
-[ 1199.308841] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 181 sec (hold netdev: 224251)
-
-...
-
-[ 1199.308841] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 181 sec (hold netdev: 224251)
-
-...
-
-[ 1259.724849] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 241 sec (hold netdev: 239355)
-
-...
-
-[ 7603.436840] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 6585 sec (hold netdev: 1825283)
-[ 7663.852858] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 6645 sec (hold netdev: 1840387)
-[ 7724.272853] hns3 0000:7d:01.0: page_pool_release_retry(): eno1v0 
-stalled pool shutdown: id 553, 82 inflight 6706 sec (hold netdev: 1855491)
-
-
-And also have the follow INFO (last time I forgot this):
-
-[ 1211.213006] INFO: task systemd-journal:1598 blocked for more than 120 
-seconds.
-[ 1211.220217]       Not tainted 6.10.0-rc4+ #1
-[ 1211.224480] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
-disables this message.
-[ 1211.232284] task:systemd-journal state:D stack:0     pid:1598 
-tgid:1598  ppid:1      flags:0x00000801
-[ 1211.241568] Call trace:
-[ 1211.244005]  __switch_to+0xec/0x138
-[ 1211.247509]  __schedule+0x2f4/0x10e0
-[ 1211.251080]  schedule+0x3c/0x148
-[ 1211.254308]  schedule_preempt_disabled+0x2c/0x50
-[ 1211.258927]  __mutex_lock.constprop.0+0x2b0/0x618
-[ 1211.263625]  __mutex_lock_slowpath+0x1c/0x30
-[ 1211.267888]  mutex_lock+0x40/0x58
-[ 1211.271203]  uevent_show+0x90/0x140
-[ 1211.274687]  dev_attr_show+0x28/0x80
-[ 1211.278265]  sysfs_kf_seq_show+0xb4/0x138
-[ 1211.282277]  kernfs_seq_show+0x34/0x48
-[ 1211.286029]  seq_read_iter+0x1bc/0x4b8
-[ 1211.289780]  kernfs_fop_read_iter+0x148/0x1c8
-[ 1211.294128]  vfs_read+0x25c/0x308
-[ 1211.297443]  ksys_read+0x70/0x108
-[ 1211.300745]  __arm64_sys_read+0x24/0x38
-[ 1211.304581]  invoke_syscall+0x50/0x128
-[ 1211.308331]  el0_svc_common.constprop.0+0xc8/0xf0
-[ 1211.313023]  do_el0_svc+0x24/0x38
-[ 1211.316326]  el0_svc+0x38/0x100
-[ 1211.319470]  el0t_64_sync_handler+0xc0/0xc8
-[ 1211.323647]  el0t_64_sync+0x1a4/0x1a8
-
->> I install drgn, but don't know how to find out the using pages, would
->> you guide me on how to use it?
-> You can use this sample as a starting point:
->
-> https://github.com/osandov/drgn/blob/main/contrib/tcp_sock.py
->
-> but if the pages are actually leaked (rather than sitting in a socket),
-> you'll have to scan pages, not sockets. And figure out how they got leaked.
-> Somehow...
-
-Thanks : )
+Best regards,
+Krzysztof
 
 
