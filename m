@@ -1,605 +1,187 @@
-Return-Path: <netdev+bounces-117271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FA794D5A0
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:51:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8F794D5AE
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC1D28198C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:51:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFD29281C13
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB20131E38;
-	Fri,  9 Aug 2024 17:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CC213D512;
+	Fri,  9 Aug 2024 17:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="dyDuqlVm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXnV+S6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010056.outbound.protection.outlook.com [52.101.69.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F1217557;
-	Fri,  9 Aug 2024 17:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723225895; cv=fail; b=fktOp5vyB9tC3vt+3ipjilGvMQ8A3FbTDRRrUST8Gwny8bz4qfi3BxGnTjt5KL6JuemQ71lKCVHaGw4lvKym0pjAjl9qo2fjoldPjWPrA9rhkn6+OgqDSw8JRTgUFmB3CAHSikpiFlw/tBEN1RfWHQL4RDpgOgsV+6QB0fKI9HE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723225895; c=relaxed/simple;
-	bh=AzYNprX6QKGDqVV2TvMZHJHiZjCr34y71/xq4PFych4=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=SpKqvhL3dMd5gc8/M4B8mne4/iJaaK9ZAs8kYHa8M/ZfSTBorZJS4rXXR4hXA4nIiiXe6O1JObPDDFRvKsml8i70rxJiomNDkLf9e5xJtsVwDRQHt2L3DEiPDnYeDGTPOInSuCb3vymwKxEESxBboj2+rW2ezlK/NrN+C9cOOp4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=dyDuqlVm; arc=fail smtp.client-ip=52.101.69.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fyL20g2RINjNIi04qwVQwq8iOZgc+LP4GK6zItj4PqoHUA8pRz68WPhLjVApE5vcwsHRcWYctaBxS37QoDjtbgYcW2DRbBk5y5Qi3XcLEwtM9pVW2Hn/4cby8n21s5OHG2wha5gKDAd7jziXKNWqMSjRwRaOhx/YfgkYrHWbhUQGUIvtv0o0owspsSCAs/3dH7ms9uD4npspIeT8dcUFWyYVsokVdOutZkyErZ7Tmk8e6O5B5jnDXc6jCyetc9I0lJfSbdw+I6Yj+0CYf3ui7fp4fLy4378tO/QcZFZyWu1CA502q6TwVJwWpjlUwIdSEQI7Xk8XdmpA4qMFB1AzNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2CTVRmxbByW2YRbrohBxDwhpt7SeRR15knglV8wjIpc=;
- b=RB/KwfJ1dmmJk6pLIL/FxaN8jjou0SY94gHw6gJzKq+zpjwqINANo+muPajdwekmbQbtnz7gOns7uDlEjl2AACKFFSCl2Nrv9D5LpYyc2M4RnLMSStz0DJ9TXVXMj8Lxkp2PotC/HeWakRPmNPYQKgnubm3sLxNoQdmH5f7FWaluK5O8oPEN8VsKjs+HwViy3QIBlmv0htNoLAoMczv58MzfxANpQRAHWp3cJDmTuEFxjQFo2r3eRu0CimMDzhYKEquhmDTEFYQwbHfHbLpiOlbV6SL3Ot+p5S4haCXZpzcfviClYmFR3+5WHbG9TxIbsP+LFvliX/lLUkBJAReggQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2CTVRmxbByW2YRbrohBxDwhpt7SeRR15knglV8wjIpc=;
- b=dyDuqlVm5zaTaDwTGEowOpeAthsoD8ZnGi5dG9Cg3Cv3/f4en0PePBg4SeOOCeBYsdSbFw8KxBRx9+u1H/CYaskM7lmAz8mDE0mdbXvSNZzQ0YfLv05VnSuOYEQpUjjsJiGf707zh6tR1qxH6eFHhtgJeafeQK9sMxjf4f0iXHQQL0jfqPeltuG5jWQx7TpS0QBa7RSk1MTfmLeb4YJGnKDdcoM3ulAF0qGM9TWYVjbI/nM7VvYd7B+HPLwWqbI3gn1M9OVWwnGsxJ9H/BOfyKF/IPrmSW4aBvzkasMMxpIuDq4DyO2+2KFlCnwQcw90RYEVefBZdf2WhTkdGqEofQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by AM9PR04MB8398.eurprd04.prod.outlook.com (2603:10a6:20b:3b7::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.15; Fri, 9 Aug
- 2024 17:51:28 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.7828.023; Fri, 9 Aug 2024
- 17:51:28 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list),
-	linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC DRIVERS),
-	linux-arm-kernel@lists.infradead.org (moderated list:FREESCALE SOC DRIVERS)
-Cc: imx@lists.linux.dev
-Subject: [PATCH 1/1] dt-bindings: soc: fsl: cpm_qe: convert network.txt to yaml
-Date: Fri,  9 Aug 2024 13:51:07 -0400
-Message-Id: <20240809175113.3470393-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0165.namprd03.prod.outlook.com
- (2603:10b6:a03:338::20) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCFB1CA94;
+	Fri,  9 Aug 2024 17:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723226061; cv=none; b=hh3QuE9NmJGYdIN8B+HjhhfOAA59x/GFU1kDDOae8KPoXa6KYN+GstwgaO5VgMcd6LqKF2+BNRGcZZUX+chdZbIfzi4Cw241pFFRRIccDjTtKkOMrkQlJHruwhPGrkQ7GzBZARPV8mEApMmPFsRDKETkpJiCIw77rg4rHWvbXJY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723226061; c=relaxed/simple;
+	bh=w9dwPrdglNjb4CJuuomMjEb9PTsCXrE6sDFhrWPwxbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cOKwKi+iutcS8YAhYFJPLAGjvsABfcZ+cMXp64uOw53jC0Hw6q9duV60w6u7V4zQT6qHcMMlHl2mpkuXYP/CnYFtmev8fw4SiMYbhMpEepjRvMVG5U0U3RM16yUI99VVB1kiE54oZqA5dZRKoKm88XmrV0tDA5RFR90TFIc/hJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXnV+S6E; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1fc569440e1so21670365ad.3;
+        Fri, 09 Aug 2024 10:54:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723226059; x=1723830859; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=i79kJL7es86O5bR3t8PxNT/TfJeYLRkUdgp0cZ8YJDQ=;
+        b=HXnV+S6EW6Hv4B2VTlkxbFrPTbJF5HcrFJAFzYwCm2sOQuVkIPdMhIkD/UqzDAju96
+         tRX21ZhWigu7p78DN3gpQLeJUjf7mwPuyqobpInl8e35XFTe7QfAPhzoor6huYccemE9
+         dXOFIIFEcsLd/amI6q1heHgbQbNDU1awY4dvc7inW3eowB+G8j8xwI1TfI6wgeeUGowK
+         fxHXFWXhvitiQ1HfwEju5VHrrF/DPC3K7ytSfUZQRooY65UPcmEXJ0LYwZ65s9OSWGHk
+         NC+K2hifqqWP91u+HLNpQR4CLzVbIByY3bBBLP8pVBp+IwNKIlpfZDCDOY0fkFk86o5w
+         cKUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723226059; x=1723830859;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i79kJL7es86O5bR3t8PxNT/TfJeYLRkUdgp0cZ8YJDQ=;
+        b=e4Cj93V3FQ4DmfOPcwQfrcpqPvFnSKmXY3MpsEg8C64lk20lFOZVLIeVsfjceH6iYs
+         lTaS3WnlXj1ndWTS6mie1jDqGcIhvuRy95f7LinskpReXvWow80Iw9MDhL68KGquPb76
+         BYnuOnQuP/DYTPtE9uHWJP6zKl0n/hpFansOiLVPmgusnquLW8ZdgC3f+xHqGSKd/cNL
+         SAHMiWLo2JKslpn2vjFe9asfE5IMlNMDoIrplCSuDFbcGtkFJOaU63Fu5dZJVvqqieKh
+         OzflKltsoXMHfVDEf4XyQtC8zQcmpt7YNxcV3gFb44FYxLw7O9SMuxtZW5mNp1Z3l9Gs
+         g2YA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGarJA/qCvhunQfAxX4MJsOUict2xOPXiQxn1ARjvK1APvcWMaShlPexKeFtgjDyZJfdgYhVTa2xJRaSziBl/fJLdcQnVUf/he8jl8hRhAlAHRrhw9Tr+WFYdiKblVjj6Pt8jfApXU/QHIrJ7/EAUhXlHBPfWXTC3yR3OBFFhyp0YZzbAd4l0nGQ6X
+X-Gm-Message-State: AOJu0YweE/d+zQKGY/ApWKBJHZUStdEvFdf5aYk3F/AAyWFIvv9iDNAS
+	c83CwhovPXjyBNOLJjZBmDasFquJyCNjwxSr9zdmdU+OBm/SRXMO
+X-Google-Smtp-Source: AGHT+IF6TgRVbkkS/8fWCgztwP8ah68LpZDibl4Zah5cJzKVfLC4DTZHFu319cogK1EsbydUK/ROvw==
+X-Received: by 2002:a17:902:d2ce:b0:1fd:9d0c:9996 with SMTP id d9443c01a7336-200ae589d28mr29785955ad.35.1723226059245;
+        Fri, 09 Aug 2024 10:54:19 -0700 (PDT)
+Received: from tahera-OptiPlex-5000 ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bba3ffc7sm300555ad.244.2024.08.09.10.54.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 10:54:18 -0700 (PDT)
+Date: Fri, 9 Aug 2024 11:54:16 -0600
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
+	serge@hallyn.com, linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v8 1/4] Landlock: Add abstract unix socket connect
+ restriction
+Message-ID: <ZrZXyGLYSMnpMBfS@tahera-OptiPlex-5000>
+References: <cover.1722570749.git.fahimitahera@gmail.com>
+ <e8da4d5311be78806515626a6bd4a16fe17ded04.1722570749.git.fahimitahera@gmail.com>
+ <20240803.iefooCha4gae@digikod.net>
+ <20240806.nookoChoh2Oh@digikod.net>
+ <CAG48ez2ZYzB+GyDLAx7y2TobE=MLXWucQx0qjitfhPSDaaqjiA@mail.gmail.com>
+ <20240807.mieloh8bi8Ae@digikod.net>
+ <CAG48ez3_u5ZkVY31h4J6Shap9kEsgDiLxF+s10Aea52EkrDMJg@mail.gmail.com>
+ <20240807.Be5aiChaf8ie@digikod.net>
+ <ZrVR9ni4qpFdF0iA@tahera-OptiPlex-5000>
+ <20240809.gooHaid7mo1b@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AM9PR04MB8398:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56dc0c10-2122-49e6-7bd0-08dcb89be53e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|52116014|1800799024|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dMhbCim6LMVFSvjfuq1cwNmA5UEXMEZP+IqUmgzCAVQAfDjueqr4t5xNcSpW?=
- =?us-ascii?Q?90iOR5dGuyepMUflUy+CZyaXnto5/WvRx8+HyYRLd/dxo1WcvEAURFYfIETH?=
- =?us-ascii?Q?LZq/ZD7Qq2SLOjITqwQe0DGLtidgvxfVTtvaKd6t91elqNiOwUkPdx7dktI2?=
- =?us-ascii?Q?1bIPLqNVzT/PyNqVce4Ui+bpdKDKD4D3fv+RexEx+c3vTu8JYKmEhMz+OkW9?=
- =?us-ascii?Q?6jeM/CK84dZRFLx9rBEifOg6SDorKSxAJm2BJFeN+/2TvR06tqgUzKt053vb?=
- =?us-ascii?Q?u52PE2pGckHdbezWE1HBjD3t3lG2s9Zxy0/NdrjP+XPwoPg308aEurWOGpuf?=
- =?us-ascii?Q?GYyGv/rh4d2Hnut3G82XjqN6/vE48HsnXrKUN7mh+1VLRv2JiD2LXpEYHeoM?=
- =?us-ascii?Q?8C4gUO+nCkeMs58bjHp6vSFBqE2S3zU5uJEY6dHNuf5c7mnfXWNk2iqilMFw?=
- =?us-ascii?Q?BB/kTiYVAIcnShGRDR7KkpTB2prILTV2mujzzmaZyFQYLIrOhc3yzBNQrd5F?=
- =?us-ascii?Q?CnH8aQLzfps7rI0/pvGNZVCslOywDH4OvIruqqfNobKPIn9afUzAFmp5N8Ru?=
- =?us-ascii?Q?+pcIU3JAaqwZxuqaXkK/4ociWjsbEuH/UPWKY3Se+gepYbAKYpw+CifQpn/z?=
- =?us-ascii?Q?XDv+Nhq0FDSQLipLrVQ9CRUf7QlKsAibp1Da/BwCYMfzgTD7TnQfMunjfyuR?=
- =?us-ascii?Q?GHvztIVtFLTEr4ASaq3yohoet8f9eJsPTS0a8NcBnAnKw4/AnIeEUffstLNk?=
- =?us-ascii?Q?SuERvb9SZ7lQFzq/gc2pXLVecO1Wf/LAKO7V62i/YQnfC90VN9DdhiEdDGpL?=
- =?us-ascii?Q?WfhdU5GGLPXlXjIgIPc6/1rYbptTEiH+Oi4TydPgrwtMxs2dkwPpez6+fVmS?=
- =?us-ascii?Q?fYsy8zLFKlGBTgWVmaLZFGXOpeTSWIG1sCVcVQOF2GfchGV+3na5mOENHqVn?=
- =?us-ascii?Q?B06HJdhiWQxx7d7BPf94ihLyyoCPGed6bnBYO/Qp1LP51ZpePGhP7gL2/w/4?=
- =?us-ascii?Q?/J3cAE2ErU3XNqwEouxbdbdAJrJexj4qE3lfO1pAkfZTESntCyTds9ZipYdA?=
- =?us-ascii?Q?NBGnsySUOeteTcYkvH5Zxa7waBSVyjzS/HD2Mor2YjARJZE00QCNZYOga15q?=
- =?us-ascii?Q?feG3EyXMWXmpD9zV/MRN0j+3J0UqXYAFusSoE+KPswS2DlOXEhXXAMIcT4rj?=
- =?us-ascii?Q?bsB51snazFmTAk9ZT7BwG7Ghgz6crAq560DOEDfd3tXg7XGQ5rn+/uNvyKe+?=
- =?us-ascii?Q?1ffRjEaoOCeorwKPbtZ/p65aZbzXMXpDGPeGge3yJmjV66q94WRc3WPQMZP3?=
- =?us-ascii?Q?+TSpLqRQTVI78zr5dwymLZGELUwqDR3UitXU4s+wK0npg9LiXzxFv8ehTMQp?=
- =?us-ascii?Q?M4BoPmo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(52116014)(1800799024)(921020)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fNg/7PLtaPxOWi9M1lf7G8NDtACYkattK2x2VNevJt/xg3qxLWvYQjoJWeYn?=
- =?us-ascii?Q?oXxZALrGe6uKTEbv8EwPf2XWnGwloDp6Sv9PPDIM9UbXxe+iF68KVb+aWZW5?=
- =?us-ascii?Q?OzHz0udfyHJOb0wYloiCNLtC10ZZRHUXCLrBvMBoocE65ci1wIuc/WSrpjLL?=
- =?us-ascii?Q?78/aht/W8aF093ItDq9hB+ka6/XBEBo0ETsmprBS/5Cbhg1ToH7S381HKVY8?=
- =?us-ascii?Q?KpaRsbTWXCzb6xv/pob+iA148Wu4lL5zuHXCWd7+gi4ZxA9+khumKwjIiouq?=
- =?us-ascii?Q?w7OiIR2Lnrvz6prKkQQmeOfK8SDM4rJ/9NSHd3RljHEC8S1V7Ohy1Zue+Aws?=
- =?us-ascii?Q?9EwiKtnRNfI9MxIWmYxNnjhJHjjOBn9KfOLep2IsYmuVdy4oW9m1ITpnvWbY?=
- =?us-ascii?Q?V4wE40uo5rhImxDby6qFkxDI7goTfXcMnPlqKGNgFJtFnFMwmhplDpxtqTph?=
- =?us-ascii?Q?k9QAkmK7SA+T3h4XYWMlAB/C6KlDYWxaQ6VLWdVZUbHLwkTN5odi/HOgVtkO?=
- =?us-ascii?Q?4vUbs+2rP+e30nbsSPl8VUI6cmNU9VY+fqpCwHCN218ssOTU30p3HiKeH69A?=
- =?us-ascii?Q?E5bQcpQ7Lbnfphigqy8GQmXRtdKQUMl8UyaEKvpG4Z+7vdmcIBh1yV391cu1?=
- =?us-ascii?Q?M8V/psC+I4uESKXvMgSD5a8HwuqfxdtxL4+hfi9WuqzTQNyxB9dnHs4xQYSu?=
- =?us-ascii?Q?gSSYJGJwdWbHH1WV5nYIitqS6HCQTbtrLaxBvoC1Ro1rDFQ9Eg90TzPZf2wN?=
- =?us-ascii?Q?nvxgWY+JPAYjmoO/gYbLWEXv44KDSLbJCMfexmEwhfyEeOImNObaatr6zckn?=
- =?us-ascii?Q?bjNmqp0OLxKatIrJD3XjRXaq163cuhIFlm3Tz3COzMrmt6CT9VjlC1bWFL+D?=
- =?us-ascii?Q?94ZVPtrTvqQIGOLAjfJFDxqo1FEPHTkvQUgVGJlrTlOLj8sUl5wGg2fbT6Du?=
- =?us-ascii?Q?nB34BgSV9hOEflqbM+brpDpvypYCEABep2fMsqxKtIYuIxUgu57pE02IB2fl?=
- =?us-ascii?Q?Punmf4Kr1Tj9oAyKrSQvBCxKnSZzMANGDutZO32Nu1I9o7qKmN5ay72MqjMm?=
- =?us-ascii?Q?dHbB7JOJqN1+7GIqSmEU0t2xeiFYpa2X212swK1nqy5QtwgL7+JSyUNwATLA?=
- =?us-ascii?Q?gMsECpxljiTHDC32D/W8aGS3md1WkE+G+UzsWqRF3fhT9RIklLivx5MCCuk6?=
- =?us-ascii?Q?WiwihidBrQ+xJ0nFRN4pkKj5y4mdaMV7MddP+y+RLqB40mtntzacP7JUmdaK?=
- =?us-ascii?Q?gN7bZXUPJIeFGyqQ6slIpPy9dCOJRpA1iToJJ0Iq+H4WZqvYVGqCfoRvj05G?=
- =?us-ascii?Q?iu1m3n3n5TbMd+CLbufhJ2YGy6z+lU3y46VuWnNvX0trEZIDHa4kCT/qXrSr?=
- =?us-ascii?Q?cQV5YfW5JN0Y8z3cdt6W9OsaUdn+q0lve7w5yu6wY9htaXTXn1q+C2TGFwnL?=
- =?us-ascii?Q?nEg6S3ROivWY+Kxwe/82vQ5nBRtPhjU4DPIhr39VYQi1wPaS2Moe7DzktLek?=
- =?us-ascii?Q?Wsw/KV2oSzfvRhrYoSdDG+fcYyCzal+fdftN5woU9wGjws2f5+NIoN1mQTN/?=
- =?us-ascii?Q?h+3KmQgFSHvIJxtVdYCbgcJXn7oyCRcXPh5UmUcu?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56dc0c10-2122-49e6-7bd0-08dcb89be53e
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2024 17:51:28.7816
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aTvI6yCCdjui9xYuNenKdIfvh2V/JvE4Dyrts6p2Oqfq7qNy21CWRzB/bvkG1AQNUx0vV9bMRpSvUVzxCkhS5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8398
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240809.gooHaid7mo1b@digikod.net>
 
-Convert binding doc newwork.txt to yaml format.
-
-HDLC part:
-- Convert to "fsl,ucc-hdlc.yaml".
-- Add missed reg and interrupt property.
-- Update example to pass build.
-
-ethernet part:
-- Convert to net/fsl,cpm-enet.yaml
-- Add 0x in example, which should be hex value
-- Add ref to ethernet-controller.yaml
-
-mdio part:
-- Convert to net/fsl,cpm-mdio.yaml
-- Add 0x in example, which should be hex value
-- Add ref to mdio.yaml
-
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
-This one is quite old. The detail informaiton is limited.
----
- .../devicetree/bindings/net/fsl,cpm-enet.yaml |  59 ++++++++
- .../devicetree/bindings/net/fsl,cpm-mdio.yaml |  55 +++++++
- .../bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml | 140 ++++++++++++++++++
- .../bindings/soc/fsl/cpm_qe/network.txt       | 130 ----------------
- 4 files changed, 254 insertions(+), 130 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
- create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
- create mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
- delete mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
-
-diff --git a/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml b/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
-new file mode 100644
-index 0000000000000..da836477e8bad
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
-@@ -0,0 +1,59 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/fsl,cpm-enet.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Network for cpm enet
-+
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - enum:
-+          - fsl,cpm1-scc-enet
-+          - fsl,cpm2-scc-enet
-+          - fsl,cpm1-fec-enet
-+          - fsl,cpm2-fcc-enet
-+          - fsl,qe-enet
-+      - items:
-+          - enum:
-+              - fsl,mpc8272-fcc-enet
-+          - const: fsl,cpm2-fcc-enet
-+
-+  reg:
-+    minItems: 1
-+    maxItems: 3
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  fsl,cpm-command:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: cpm command
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    ethernet@11300 {
-+        compatible = "fsl,mpc8272-fcc-enet",
-+                     "fsl,cpm2-fcc-enet";
-+        reg = <0x11300 0x20 0x8400 0x100 0x11390 1>;
-+        local-mac-address = [ 00 00 00 00 00 00 ];
-+        interrupts = <20 8>;
-+        interrupt-parent = <&pic>;
-+        phy-handle = <&phy0>;
-+        fsl,cpm-command = <0x12000300>;
-+    };
-+
-diff --git a/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml b/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
-new file mode 100644
-index 0000000000000..b1791a3c490e2
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
-@@ -0,0 +1,55 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/fsl,cpm-mdio.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Freescale CPM MDIO Device
-+
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - enum:
-+          - fsl,pq1-fec-mdio
-+          - fsl,cpm2-mdio-bitbang
-+      - items:
-+          - const: fsl,mpc8272ads-mdio-bitbang
-+          - const: fsl,mpc8272-mdio-bitbang
-+          - const: fsl,cpm2-mdio-bitbang
-+
-+  reg:
-+    maxItems: 1
-+
-+  fsl,mdio-pin:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: pin of port C controlling mdio data
-+
-+  fsl,mdc-pin:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: pin of port C controlling mdio clock
-+
-+required:
-+  - compatible
-+  - reg
-+
-+allOf:
-+  - $ref: mdio.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio@10d40 {
-+        compatible = "fsl,mpc8272ads-mdio-bitbang",
-+                     "fsl,mpc8272-mdio-bitbang",
-+                     "fsl,cpm2-mdio-bitbang";
-+        reg = <0x10d40 0x14>;
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+        fsl,mdio-pin = <12>;
-+        fsl,mdc-pin = <13>;
-+    };
-+
-diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
-new file mode 100644
-index 0000000000000..64ffbf75dd9d2
---- /dev/null
-+++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
-@@ -0,0 +1,140 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: High-Level Data Link Control(HDLC)
-+
-+description: HDLC part in Universal communication controllers (UCCs)
-+
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
-+
-+properties:
-+  compatible:
-+    const: fsl,ucc-hdlc
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  cell-index:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+  rx-clock-name:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    oneOf:
-+      - pattern: "^brg([0-9]|1[0-6])$"
-+      - pattern: "^clk([0-9]|1[0-9]|2[0-4])$"
-+
-+  tx-clock-name:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    oneOf:
-+      - pattern: "^brg([0-9]|1[0-6])$"
-+      - pattern: "^clk([0-9]|1[0-9]|2[0-4])$"
-+
-+  fsl,tdm-interface:
-+    $ref: /schemas/types.yaml#/definitions/flag
-+    description: Specify that hdlc is based on tdm-interface
-+
-+  fsl,rx-sync-clock:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    description: rx-sync
-+    enum:
-+      - none
-+      - rsync_pin
-+      - brg9
-+      - brg10
-+      - brg11
-+      - brg13
-+      - brg14
-+      - brg15
-+
-+  fsl,tx-sync-clock:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    description: tx-sync
-+    enum:
-+      - none
-+      - tsync_pin
-+      - brg9
-+      - brg10
-+      - brg11
-+      - brg13
-+      - brg14
-+      - brg15
-+
-+  fsl,tdm-framer-type:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    description: required for tdm interface
-+    enum: [e1, t1]
-+
-+  fsl,tdm-id:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: number of TDM ID
-+
-+  fsl,tx-timeslot-mask:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      required for tdm interface.
-+      time slot mask for TDM operation. Indicates which time
-+      slots used for transmitting and receiving.
-+
-+  fsl,rx-timeslot-mask:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      required for tdm interface.
-+      time slot mask for TDM operation. Indicates which time
-+      slots used for transmitting and receiving.
-+
-+  fsl,siram-entry-id:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      required for tdm interface
-+      Must be 0,2,4...64. the number of TDM entry.
-+
-+  fsl,tdm-internal-loopback:
-+    $ref: /schemas/types.yaml#/definitions/flag
-+    description:
-+      optional for tdm interface
-+      Internal loopback connecting on TDM layer.
-+
-+  fsl,hmask:
-+    $ref: /schemas/types.yaml#/definitions/uint16
-+    description: |
-+      HDLC address recognition. Set to zero to disable
-+      address filtering of packets:
-+      fsl,hmask = /bits/ 16 <0x0000>;
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    communication@2000 {
-+        compatible = "fsl,ucc-hdlc";
-+        reg = <0x2000 0x200>;
-+        rx-clock-name = "clk8";
-+        tx-clock-name = "clk9";
-+        fsl,rx-sync-clock = "rsync_pin";
-+        fsl,tx-sync-clock = "tsync_pin";
-+        fsl,tx-timeslot-mask = <0xfffffffe>;
-+        fsl,rx-timeslot-mask = <0xfffffffe>;
-+        fsl,tdm-framer-type = "e1";
-+        fsl,tdm-id = <0>;
-+        fsl,siram-entry-id = <0>;
-+        fsl,tdm-interface;
-+    };
-+
-+  - |
-+    communication@2000 {
-+        compatible = "fsl,ucc-hdlc";
-+        reg = <0x2000 0x200>;
-+        rx-clock-name = "brg1";
-+        tx-clock-name = "brg1";
-+    };
-diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
-deleted file mode 100644
-index 6d2dd8a31482a..0000000000000
---- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
-+++ /dev/null
-@@ -1,130 +0,0 @@
--* Network
--
--Currently defined compatibles:
--- fsl,cpm1-scc-enet
--- fsl,cpm2-scc-enet
--- fsl,cpm1-fec-enet
--- fsl,cpm2-fcc-enet (third resource is GFEMR)
--- fsl,qe-enet
--
--Example:
--
--	ethernet@11300 {
--		compatible = "fsl,mpc8272-fcc-enet",
--			     "fsl,cpm2-fcc-enet";
--		reg = <11300 20 8400 100 11390 1>;
--		local-mac-address = [ 00 00 00 00 00 00 ];
--		interrupts = <20 8>;
--		interrupt-parent = <&PIC>;
--		phy-handle = <&PHY0>;
--		fsl,cpm-command = <12000300>;
--	};
--
--* MDIO
--
--Currently defined compatibles:
--fsl,pq1-fec-mdio (reg is same as first resource of FEC device)
--fsl,cpm2-mdio-bitbang (reg is port C registers)
--
--Properties for fsl,cpm2-mdio-bitbang:
--fsl,mdio-pin : pin of port C controlling mdio data
--fsl,mdc-pin : pin of port C controlling mdio clock
--
--Example:
--	mdio@10d40 {
--		compatible = "fsl,mpc8272ads-mdio-bitbang",
--			     "fsl,mpc8272-mdio-bitbang",
--			     "fsl,cpm2-mdio-bitbang";
--		reg = <10d40 14>;
--		#address-cells = <1>;
--		#size-cells = <0>;
--		fsl,mdio-pin = <12>;
--		fsl,mdc-pin = <13>;
--	};
--
--* HDLC
--
--Currently defined compatibles:
--- fsl,ucc-hdlc
--
--Properties for fsl,ucc-hdlc:
--- rx-clock-name
--- tx-clock-name
--	Usage: required
--	Value type: <string>
--	Definition : Must be "brg1"-"brg16" for internal clock source,
--		     Must be "clk1"-"clk24" for external clock source.
--
--- fsl,tdm-interface
--	Usage: optional
--	Value type: <empty>
--	Definition : Specify that hdlc is based on tdm-interface
--
--The property below is dependent on fsl,tdm-interface:
--- fsl,rx-sync-clock
--	Usage: required
--	Value type: <string>
--	Definition : Must be "none", "rsync_pin", "brg9-11" and "brg13-15".
--
--- fsl,tx-sync-clock
--	Usage: required
--	Value type: <string>
--	Definition : Must be "none", "tsync_pin", "brg9-11" and "brg13-15".
--
--- fsl,tdm-framer-type
--	Usage: required for tdm interface
--	Value type: <string>
--	Definition : "e1" or "t1".Now e1 and t1 are used, other framer types
--		     are not supported.
--
--- fsl,tdm-id
--	Usage: required for tdm interface
--	Value type: <u32>
--	Definition : number of TDM ID
--
--- fsl,tx-timeslot-mask
--- fsl,rx-timeslot-mask
--	Usage: required for tdm interface
--	Value type: <u32>
--	Definition : time slot mask for TDM operation. Indicates which time
--		     slots used for transmitting and receiving.
--
--- fsl,siram-entry-id
--	Usage: required for tdm interface
--	Value type: <u32>
--	Definition : Must be 0,2,4...64. the number of TDM entry.
--
--- fsl,tdm-internal-loopback
--	usage: optional for tdm interface
--	value type: <empty>
--	Definition : Internal loopback connecting on TDM layer.
--- fsl,hmask
--	usage: optional
--	Value type: <u16>
--	Definition: HDLC address recognition. Set to zero to disable
--		    address filtering of packets:
--		    fsl,hmask = /bits/ 16 <0x0000>;
--
--Example for tdm interface:
--
--	ucc@2000 {
--		compatible = "fsl,ucc-hdlc";
--		rx-clock-name = "clk8";
--		tx-clock-name = "clk9";
--		fsl,rx-sync-clock = "rsync_pin";
--		fsl,tx-sync-clock = "tsync_pin";
--		fsl,tx-timeslot-mask = <0xfffffffe>;
--		fsl,rx-timeslot-mask = <0xfffffffe>;
--		fsl,tdm-framer-type = "e1";
--		fsl,tdm-id = <0>;
--		fsl,siram-entry-id = <0>;
--		fsl,tdm-interface;
--	};
--
--Example for hdlc without tdm interface:
--
--	ucc@2000 {
--		compatible = "fsl,ucc-hdlc";
--		rx-clock-name = "brg1";
--		tx-clock-name = "brg1";
--	};
--- 
-2.34.1
-
+On Fri, Aug 09, 2024 at 10:49:17AM +0200, Mickaël Salaün wrote:
+> On Thu, Aug 08, 2024 at 05:17:10PM -0600, Tahera Fahimi wrote:
+> > On Wed, Aug 07, 2024 at 04:44:36PM +0200, Mickaël Salaün wrote:
+> > > On Wed, Aug 07, 2024 at 03:45:18PM +0200, Jann Horn wrote:
+> > > > On Wed, Aug 7, 2024 at 9:21 AM Mickaël Salaün <mic@digikod.net> wrote:
+> > > > > On Tue, Aug 06, 2024 at 10:46:43PM +0200, Jann Horn wrote:
+> > > > > > I think adding something like this change on top of your code would
+> > > > > > make it more concise (though this is entirely untested):
+> > > > > >
+> > > > > > --- /tmp/a      2024-08-06 22:37:33.800158308 +0200
+> > > > > > +++ /tmp/b      2024-08-06 22:44:49.539314039 +0200
+> > > > > > @@ -15,25 +15,12 @@
+> > > > > >           * client_layer must be a signed integer with greater capacity than
+> > > > > >           * client->num_layers to ensure the following loop stops.
+> > > > > >           */
+> > > > > >          BUILD_BUG_ON(sizeof(client_layer) > sizeof(client->num_layers));
+> > > > > >
+> > > > > > -        if (!server) {
+> > > > > > -                /*
+> > > > > > -                 * Walks client's parent domains and checks that none of these
+> > > > > > -                 * domains are scoped.
+> > > > > > -                 */
+> > > > > > -                for (; client_layer >= 0; client_layer--) {
+> > > > > > -                        if (landlock_get_scope_mask(client, client_layer) &
+> > > > > > -                            scope)
+> > > > > > -                                return true;
+> > > > > > -                }
+> > > > > > -                return false;
+> > > > > > -        }
+> > > > >
+> > > > > This loop is redundant with the following one, but it makes sure there
+> > > > > is no issue nor inconsistencies with the server or server_walker
+> > > > > pointers.  That's the only approach I found to make sure we don't go
+> > > > > through a path that could use an incorrect pointer, and makes the code
+> > > > > easy to review.
+> > > > 
+> > > > My view is that this is a duplication of logic for one particular
+> > > > special case - after all, you can also end up walking up to the same
+> > > > state (client_layer==-1, server_layer==-1, client_walker==NULL,
+> > > > server_walker==NULL) with the loop at the bottom.
+> > > 
+> > > Indeed
+> > > 
+> > > > 
+> > > > But I guess my preference for more concise code is kinda subjective -
+> > > > if you prefer the more verbose version, I'm fine with that too.
+> > > > 
+> > > > > > -
+> > > > > > -        server_layer = server->num_layers - 1;
+> > > > > > -        server_walker = server->hierarchy;
+> > > > > > +        server_layer = server ? (server->num_layers - 1) : -1;
+> > > > > > +        server_walker = server ? server->hierarchy : NULL;
+> > > > >
+> > > > > We would need to change the last loop to avoid a null pointer deref.
+> > > > 
+> > > > Why? The first loop would either exit or walk the client_walker up
+> > > > until client_layer is -1 and client_walker is NULL; the second loop
+> > > > wouldn't do anything because the walkers are at the same layer; the
+> > > > third loop's body wouldn't be executed because client_layer is -1.
+> > > 
+> > > Correct, I missed that client_layer would always be greater than
+> > > server_layer (-1).
+> > > 
+> > > Tahera, could you please take Jann's proposal?
+> > Done.
+> > We will have duplicate logic, but it would be easier to read and review.
+> 
+> With Jann's proposal we don't have duplicate logic.
+Still the first two for loops apply the same logic for client and server
+domains, but I totally understand that it is much easier to review and
+understand.
+> > > 
+> > > > 
+> > > > The case where the server is not in any Landlock domain is just one
+> > > > subcase of the more general case "client and server do not have a
+> > > > common ancestor domain".
+> > > > 
+> > > > > >
+> > > > > >          /*
+> > > > > >           * Walks client's parent domains down to the same hierarchy level as
+> > > > > >           * the server's domain, and checks that none of these client's parent
+> > > > > >           * domains are scoped.
+> > > > > >
+> > > > 
+> > 
 
