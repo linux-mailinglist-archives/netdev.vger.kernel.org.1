@@ -1,146 +1,172 @@
-Return-Path: <netdev+bounces-117254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34B6E94D570
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:30:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBB494D57F
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8E8228113B
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E4BD282C31
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 17:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7312C46425;
-	Fri,  9 Aug 2024 17:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EB47B3E1;
+	Fri,  9 Aug 2024 17:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FW+PEUqX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OyBrr5l3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9223B40BF5
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F9373452
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 17:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723224657; cv=none; b=muDF7pcY+CKYi8u538g6DyNH2MOH/lVEm4uVgfhE4y6+GecCehg5fvBInI4NK2ijUS7GsSuMqjf23HKSIJJYNl+/8euvwAH7eMEr+MV+WICB76mLO0tDMG3dXm560qyrJJPB96riihFL36Zhs3o9Ho2lmZLHm4OhhaELWoCk1Zo=
+	t=1723224996; cv=none; b=QXEbcmoTxW1go4fUe1gyyw1uokOu2RCcTDUXedYgTjwChwNqtvq6AWbM3kkkVbe5kf6OHdHhZBryEQbimlH/Y9IgwH3gQFHCJV9qiTBeQxiTmpzKtKTR/8f8+mhhjdLNOWcTJPLyEiPFl/yCENtvZHC87yz6LOqENgpMt+9oEb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723224657; c=relaxed/simple;
-	bh=CnuP8ni8Bc0XWlxFePBU/ipVDHHqIun1i0eSh9F7k7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eBpH92iOEm7BQsmG0DhwmHVjm+2/DIp6C5HUPzXPP1GBtHYJZbxMF3jDeVexhbflofxhH88Poj7eUsXmIR4UIwW3aus1VW6Vlu1MBbeeFa685aNR5IdrpUHS4mR9I0j/0zUQUwHPrsZFKQSQH06Gt/uZdv3eU0mT0MLtBkVvSTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FW+PEUqX; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52f04b3cb33so4953135e87.0
-        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 10:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723224653; x=1723829453; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3ylTrz3zH6PY5u6oGX4HWCn+x25MB2qeKCXrefV5HE=;
-        b=FW+PEUqX8lc9Wmt+G4CqOGeZb+DmPacXOir2aJMDKL6E6uogR+31NXhtvN3CfEJH3J
-         mIdPDN4tchF5FzZyqImq68aKY/02j5hkstxqT9gIHWsXTT1KuQ62RgO0aneMmvJAjFfJ
-         AYY8t2KqrC9LvS50KbREsIKukURUUNyY9Xty2iNvBo7TQiTY4vEFr3U+xv8OjSNH2Tz/
-         UWlA48h/5jzzzDHvyDjhW6TI/M7oBuQ9J/Mn4udISuDvxyXY8/Rb/pYiG6Rkyrf8IJVV
-         7pOlkLOSWiCb2TyxIGz0Ht9CuycZQBJMBwDsRkXkG8cMo9FNvF6eqWOAWoiAurxpJ4XP
-         rEcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723224653; x=1723829453;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O3ylTrz3zH6PY5u6oGX4HWCn+x25MB2qeKCXrefV5HE=;
-        b=Un2eDjquPZPz45HpbnO6c70L+3jL0bO9N07VJg+9xPh5LdaTR6HAj2HNkDgwTu4w1K
-         ZMd3gO+779aH6HNQcTdldr1n08evc3NJNj8piuAHoPK1921hOBDLqd0kW+/ZrBCGed5C
-         6iicpBQrtdES2chdTaG4h3h/iNdjyIsZXemxqtCq534XxSHPggB/p353O4rGrUt2LjYw
-         dJaSy8WyJVgag9kH8Zt8Lx+OZLQbVUST+8hSkWkMdMGaNb+dLW2XgAjdn74/iIf8P7EI
-         aCTbtRdqQqcYwnQGovCzx3KNsGaRGtwd4zGKZH5/KlymdItRrDkYhyKZ6mUy8kSv2sHM
-         /VFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUinqc65rA0ZgCETETZAK4jlDHoyqqNG/WVPYC1ijTuCUsylXPrmeNwyjc47VnW8y+jbUmXIggGBEf/BM1pmPJIVkzhhWQc
-X-Gm-Message-State: AOJu0YzJNzCcKi9e65Sa7CxdVAE2l1/8O3H+bHtxXDw+3arhNTB24ioI
-	/59eZK+NzhaSEfucdIsYiAi6eKnjYEkcD23YXNhwm95xlql2T2cJ6xC1uAnn
-X-Google-Smtp-Source: AGHT+IGjHntCp7Az8ook58Hiy7r04T75o108B1WLnRGlk1RYAmmp0iNUoKPvJm8HxrfF3TyS36/5AA==
-X-Received: by 2002:a05:6512:2243:b0:52c:d5ac:d42 with SMTP id 2adb3069b0e04-530ee975b16mr2097063e87.9.1723224653180;
-        Fri, 09 Aug 2024 10:30:53 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530de3f27ccsm1043549e87.69.2024.08.09.10.30.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 10:30:52 -0700 (PDT)
-Date: Fri, 9 Aug 2024 20:30:49 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, diasyzhang@tencent.com, 
-	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk, 
-	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
-	si.yanteng@linux.dev, Huacai Chen <chenhuacai@loongson.cn>
-Subject: Re: [PATCH net-next v17 12/14] net: stmmac: dwmac-loongson: Add
- Loongson Multi-channels GMAC support
-Message-ID: <5fjet4giqcdsum4cm532y5lqcrplezfwjrcsysvl6vraja4iwp@xckha7yszkzd>
-References: <cover.1723014611.git.siyanteng@loongson.cn>
- <40ae44179d56adb72d67a8b95cabcb0da0da3a9f.1723014611.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1723224996; c=relaxed/simple;
+	bh=Yiuc2KtuMk2IqGG6J/pHdWmb8AXM38ENsoKr5iAk44c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LMws/4dPZOgbDAbI1nVW0ZiMEZOSAbCU0OB+YlMYqYBiN19bZCnZjUnY/UerN5pS1x+TBP3C5L8Drnvt2/XFO1fMxhEZrT45ZZbuCFHrrXwIBhPD1kbTsunI1f+FZ44+dilq2pElCFwWmDKlVcBGGjNoAg0VxnuYgEq7r3bxsxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OyBrr5l3; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723224995; x=1754760995;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Yiuc2KtuMk2IqGG6J/pHdWmb8AXM38ENsoKr5iAk44c=;
+  b=OyBrr5l3HVYwfsjqXAWVCDVG0A9t/3iw27R3hATfLRKIZlmhkzR1Nnie
+   5Qi3qVxCmTREZ/w1E6WFIoENhC29hlQwanoqIwUE2gf6Lr24cWDcehydy
+   UgG6FV21WK22cg8OORePUrhX352semAEmUQtnbS2YZskIVlgVbqp4JK0s
+   /UqXNhh16N74KbNoJ0SxEmaGd2HirvbWxYrd7dIQy2nyhuBsH1QN4uDKi
+   SoW57aunAzPFcGq4UnpVJYEEqXrvQ0yxWdKTxYJbO5dzUdCwSdd5k4bMS
+   /SO8x3bbHbK8oMAt2CrAzNVzF2n5/ckrLXb06085NSATmdEeskuqOEASH
+   w==;
+X-CSE-ConnectionGUID: dVwOzq4iQ5OqrjtJReMyxQ==
+X-CSE-MsgGUID: i+k+nEPKRHKbI60NwCGSOw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11159"; a="21551242"
+X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
+   d="scan'208";a="21551242"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 10:36:28 -0700
+X-CSE-ConnectionGUID: yfCHjnYkRbmuAngXNFNnbg==
+X-CSE-MsgGUID: nQK9uFD3RemrZm76sK44fg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,276,1716274800"; 
+   d="scan'208";a="57589147"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa009.fm.intel.com with ESMTP; 09 Aug 2024 10:36:27 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	ahmed.zaki@intel.com,
+	madhu.chittim@intel.com,
+	horms@kernel.org,
+	hkelam@marvell.com
+Subject: [PATCH net-next 00/13][pull request] ice: iavf: add support for TC U32 filters on VFs
+Date: Fri,  9 Aug 2024 10:35:59 -0700
+Message-ID: <20240809173615.2031516-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40ae44179d56adb72d67a8b95cabcb0da0da3a9f.1723014611.git.siyanteng@loongson.cn>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 07, 2024 at 09:48:54PM +0800, Yanteng Si wrote:
-> The Loongson DWMAC driver currently supports the Loongson GMAC
-> devices (based on the DW GMAC v3.50a/v3.73a IP-core) installed to the
-> LS2K1000 SoC and LS7A1000 chipset. But recently a new generation
-> LS2K2000 SoC was released with the new version of the Loongson GMAC
-> synthesized in. The new controller is based on the DW GMAC v3.73a
-> IP-core with the AV-feature enabled, which implies the multi
-> DMA-channels support. The multi DMA-channels feature has the next
-> vendor-specific peculiarities:
-> 
-> 1. Split up Tx and Rx DMA IRQ status/mask bits:
->        Name              Tx          Rx
->   DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
->   DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
->   DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
->   DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
->   DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
-> 2. Custom Synopsys ID hardwired into the GMAC_VERSION.SNPSVER register
-> field. It's 0x10 while it should have been 0x37 in accordance with
-> the actual DW GMAC IP-core version.
-> 3. There are eight DMA-channels available meanwhile the Synopsys DW
-> GMAC IP-core supports up to three DMA-channels.
-> 4. It's possible to have each DMA-channel IRQ independently delivered.
-> The MSI IRQs must be utilized for that.
-> 
-> Thus in order to have the multi-channels Loongson GMAC controllers
-> supported let's modify the Loongson DWMAC driver in accordance with
-> all the peculiarities described above:
-> 
-> 1. Create the multi-channels Loongson GMAC-specific
->    stmmac_dma_ops::dma_interrupt()
->    stmmac_dma_ops::init_chan()
->    callbacks due to the non-standard DMA IRQ CSR flags layout.
-> 2. Create the Loongson DWMAC-specific platform setup() method
-> which gets to initialize the DMA-ops with the dwmac1000_dma_ops
-> instance and overrides the callbacks described in 1. The method also
-> overrides the custom Synopsys ID with the real one in order to have
-> the rest of the HW-specific callbacks correctly detected by the driver
-> core.
-> 3. Make sure the platform setup() method enables the flow control and
-> duplex modes supported by the controller.
-> 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Acked-by: Huacai Chen <chenhuacai@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Ahmed Zaki says:
 
-Looking good now. Thanks.
+The Intel Ethernet 800 Series is designed with a pipeline that has
+an on-chip programmable capability called Dynamic Device Personalization
+(DDP). A DDP package is loaded by the driver during probe time. The DDP
+package programs functionality in both the parser and switching blocks in
+the pipeline, allowing dynamic support for new and existing protocols.
+Once the pipeline is configured, the driver can identify the protocol and
+apply any HW action in different stages, for example, direct packets to
+desired hardware queues (flow director), queue groups or drop.
 
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+Patches 1-8 introduce a DDP package parser API that enables different
+pipeline stages in the driver to learn the HW parser capabilities from 
+the DDP package that is downloaded to HW. The parser library takes raw
+packet patterns and masks (in binary) indicating the packet protocol fields
+to be matched and generates the final HW profiles that can be applied at
+the required stage. With this API, raw flow filtering for FDIR or RSS
+could be done on new protocols or headers without any driver or Kernel
+updates (only need to update the DDP package). These patches were submitted
+before [1] but were not accepted mainly due to lack of a user.
 
--Serge(y)
+Patches 9-11 extend the virtchnl support to allow the VF to request raw
+flow director filters. Upon receiving the raw FDIR filter request, the PF
+driver allocates and runs a parser lib instance and generates the hardware
+profile definitions required to program the FDIR stage. These were also
+submitted before [2].
 
-> ...
+Finally, patches 12 and 13 add TC U32 filter support to the iavf driver.
+Using the parser API, the ice driver runs the raw patterns sent by the
+user and then adds a new profile to the FDIR stage associated with the VF's
+VSI. Refer to examples in patch 13 commit message.
+
+[1]: https://lore.kernel.org/netdev/20230904021455.3944605-1-junfeng.guo@intel.com/
+[2]: https://lore.kernel.org/intel-wired-lan/20230818064703.154183-1-junfeng.guo@intel.com/
+---
+iwl: https://lore.kernel.org/intel-wired-lan/20240725220810.12748-1-ahmed.zaki@intel.com/
+
+The following are changes since commit 600a91931057bfec0afd665759c5574ed137cbea:
+  Merge branch 'selftest-rds'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+
+Ahmed Zaki (2):
+  iavf: refactor add/del FDIR filters
+  iavf: add support for offloading tc U32 cls filters
+
+Junfeng Guo (11):
+  ice: add parser create and destroy skeleton
+  ice: parse and init various DDP parser sections
+  ice: add debugging functions for the parser sections
+  ice: add parser internal helper functions
+  ice: add parser execution main loop
+  ice: support turning on/off the parser's double vlan mode
+  ice: add UDP tunnels support to the parser
+  ice: add API for parser profile initialization
+  virtchnl: support raw packet in protocol header
+  ice: add method to disable FDIR SWAP option
+  ice: enable FDIR filters from raw binary patterns for VFs
+
+ drivers/net/ethernet/intel/iavf/iavf.h        |   30 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   59 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   89 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.h   |   13 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  160 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   25 +-
+ drivers/net/ethernet/intel/ice/Makefile       |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |    1 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   13 +
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   99 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    7 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  109 +-
+ drivers/net/ethernet/intel/ice/ice_flow.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 2430 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   |  540 ++++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    |  861 ++++++
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |    4 +
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  403 ++-
+ include/linux/avf/virtchnl.h                  |   13 +-
+ 22 files changed, 4792 insertions(+), 90 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
+
+-- 
+2.42.0
+
 
