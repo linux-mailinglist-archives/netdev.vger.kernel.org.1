@@ -1,98 +1,130 @@
-Return-Path: <netdev+bounces-117182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B5C94D010
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:21:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 881A394D021
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 629FBB24319
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:21:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 362881F2217B
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D29C194082;
-	Fri,  9 Aug 2024 12:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DEB19408B;
+	Fri,  9 Aug 2024 12:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KM7VoSNe"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DtwvmRGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE4819309C;
-	Fri,  9 Aug 2024 12:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3633A1DFF5
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 12:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723206035; cv=none; b=Fs5kREJBCR7JSCqqDubaxPPvYdVEHWCFAmrSe1wtTKAuxx49ZsQ49+6oNWtNffv+GMAm3cC1TehQHamCtl+R5DeffGU+qVjQfJu2kyivA2Byuh7unQ1ha4xbwPobnXSWN02UZmxPJ+vsIVypnvyqrFkG+C21fLJPuvokWm2ebko=
+	t=1723206508; cv=none; b=YGrLzF69YeDJYsrxpacPnb2DyTdH6NfVXY6Vvx8jW/3V0n+TMpju7V/csHs9OrvnNeX8YrTmSOkh7qpmQqtcKfdfUK6OwZHKyRNcgb46ahaFyjTkFxhbj6X0Nk+bRBxQggR91wrmS/R0k2y3yxEdMUqd5MGdpklZO9Cc2k16pCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723206035; c=relaxed/simple;
-	bh=dfOvVXlaKNfGf0eYSd+F9fO3GVkdWOJRDP7fYXcTKLo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ElfLfPck7087KPdFza1awK8c7wBWbCFGVqj3O48x87rLN2v3WrOr66RJKOg4207evZRrVtXFZjKb7NsnKlNmtm4ojd2BO33bP73FcOcjLej/wmfQnnDkFNqrbVeJUe323XUpbkKOz4hMzQpjO3QDLLPEFGw2HGclj9aZ0LBizig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KM7VoSNe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504ECC32782;
-	Fri,  9 Aug 2024 12:20:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723206035;
-	bh=dfOvVXlaKNfGf0eYSd+F9fO3GVkdWOJRDP7fYXcTKLo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KM7VoSNeGMBgluuaCPcc8tSG6UXyK9Ysg+W7e8eeISg96Uk5DN7a/wlHegW7IrjuY
-	 5M9fVqy5amUOOz1LCwNxoBq8gLuQEIrX3+u416Iq5M1k3xouE+7OwCT4XWvDTr4l5w
-	 ZZ0kEbNzqumpBWaJWCAuWEv2fi5M1dyGhFp/WioVtYXYDgDC9aFR+25O5dqLU9yiTp
-	 pG2Mc9EOge8tE6Zoypb6qb1r6IvbFssT2m144KnykC0sDPbWLReOd9UrNchfPhThzb
-	 2VtHIDLLaUR6r3e3szo1s39y8fh2WhZLMn5nW8qH9fBkwFUQUUyaWgHSIVdAZ5EYQx
-	 Bk2MpdPApnU8g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E38382333D;
-	Fri,  9 Aug 2024 12:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723206508; c=relaxed/simple;
+	bh=5BP+4KDV491eS2hTDPWl3HuFqonvue6QF2vMAsmE4yY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=oNYls8QeNvYWEnrgr83f+AuaUQJKxYsjg8tf724zdNwqp5OE8i/9XzXqD8HfvzzMgsANYWK/qNmBn24Ldvpl/It/GVPf1hXLA8p3B5CGOcrZUDw5Ki8xlAglw1EjpQV3sS7ELAAZ4Li3cxRu0KVK9p4Mlnls0LB7cp7oJDUZdBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DtwvmRGi; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5a3b866ebc9so2360811a12.3
+        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 05:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723206505; x=1723811305; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5AZK4QEEzfr3VuQ9dg4uACWvhzBvDHYYGEqO0otKoi4=;
+        b=DtwvmRGi44GbEiZQjn8zrgDJVAJR2+UWxcG9QLe0ASXRp6RHcq4J62y9ELlKh889CY
+         Z89OJoy4yUzYbONhaysKarYd/pGI352dlP27+y7tAEOJylwoT1aYufy3hbfTAPlks1iP
+         iIZyvTio0by0A3edYCHyOA77c93BhbJ1kpJYX/ijVRAxvpACSlPxp/l5CWI6S0siwgLO
+         YuNN+jWHxorhHCiXas9XqZzAkDD8KtmpV3XV8OvievOCrjQve9Kuk98TpTPVTgooE3+Y
+         DpL1aQl8596NbBo8jsYvnNn0DdnkGWIzMmseZsow9jYJ+lkW8ViL9NeFOK72cyT7RaVJ
+         at5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723206505; x=1723811305;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5AZK4QEEzfr3VuQ9dg4uACWvhzBvDHYYGEqO0otKoi4=;
+        b=SIC1zoZgA3RbBxYMCw2UF0nJawj/wjHJim4obUhdAPhsCrTvnrA6itsUhS7XWPVV0Q
+         VibLx5/OOr/QY0EZIYbTOJBTTjkjl6PTKwwzu8m5EU3i6sGjIZtSQ0JNjT+UyiJj+7PL
+         yzfeL5/rtYUw28mRZL2mb62albtiC7TnT2LuU/dn3cC/+1hvXThZUtmyuxUhBzQoLSvl
+         0sbzjbJnKZGBQ9nK8NcG3EOjfrNr8dV8ET1wLrf9X+tkdSnvBpNViWoG+MYfI2zkfyDq
+         dg5KldS8ix/MgZbwZfDbvaagZz6r+IkGSxeGYvzqEw31uAB9NZqoC1aQ4OkDoaSELv9z
+         076A==
+X-Forwarded-Encrypted: i=1; AJvYcCVjQhl0TKn6AA4Fe7K3poENsONxbtSAj/VSCN0xB3OQ/gFSzyQss9dKMohJoUOjRD+oLd2a7HX7UEQh0z7MR8Qmgi+OYpF6
+X-Gm-Message-State: AOJu0YwtASL23AmtTmkJYTwOBnpAsIGO7Jv6KRyjbdiTK8g2e0emca3j
+	Tpdn0IUeVJBJyUiVsw4BKj9rw2AgiO7mDxYDZkVuYxR/0QRsSH1WoRygodzjjhQ=
+X-Google-Smtp-Source: AGHT+IFdxwfMOb+uW5xKCVPLH9JUrE4SNICMJefKUZ7G5xbhHBIaa/0KrZwOPjgt/ENPK7SHJZvrnw==
+X-Received: by 2002:a05:6402:909:b0:5a3:64dc:33a5 with SMTP id 4fb4d7f45d1cf-5bd0a568955mr1076316a12.17.1723206505396;
+        Fri, 09 Aug 2024 05:28:25 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bbb2bf8e78sm1478959a12.3.2024.08.09.05.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 05:28:24 -0700 (PDT)
+Date: Fri, 9 Aug 2024 15:28:19 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Chas Williams <3chas3@gmail.com>
+Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-XXX] atm: idt77252: prevent use after free in dequeue_rx()
+Message-ID: <cd0308ff-fda4-405f-9854-6a3a75680da2@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] selftests: rds selftest
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172320603426.3771951.12747958365841454041.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Aug 2024 12:20:34 +0000
-References: <20240806153809.282716-1-allison.henderson@oracle.com>
-In-Reply-To: <20240806153809.282716-1-allison.henderson@oracle.com>
-To: Allison Henderson <allison.henderson@oracle.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, oberpar@linux.ibm.com,
- chuck.lever@oracle.com, vegard.nossum@oracle.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Hello:
+We can't dereference "skb" after calling vcc->push() because the skb
+is released.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/atm/idt77252.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-On Tue,  6 Aug 2024 08:38:06 -0700 you wrote:
-> From: Allison Henderson <allison.henderson@oracle.com>
-> 
-> Hi All,
-> 
-> This series is a new selftest that Vegard, Chuck and myself have been
-> working on to provide some test coverage for rds.  I've modified the
-> scripts to include the feedback from the last version, but let me know
-> if there's anything missed.  Questions and comments appreciated.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/3] .gitignore: add .gcda files
-    https://git.kernel.org/netdev/net-next/c/a0f6e5e9f1f8
-  - [net-next,v2,2/3] net: rds: add option for GCOV profiling
-    https://git.kernel.org/netdev/net-next/c/bc75dcc3cea7
-  - [net-next,v2,3/3] selftests: rds: add testing infrastructure
-    https://git.kernel.org/netdev/net-next/c/3ade6ce1255e
-
-You are awesome, thank you!
+diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
+index e7f713cd70d3..a876024d8a05 100644
+--- a/drivers/atm/idt77252.c
++++ b/drivers/atm/idt77252.c
+@@ -1118,8 +1118,8 @@ dequeue_rx(struct idt77252_dev *card, struct rsq_entry *rsqe)
+ 	rpp->len += skb->len;
+ 
+ 	if (stat & SAR_RSQE_EPDU) {
++		unsigned int len, truesize;
+ 		unsigned char *l1l2;
+-		unsigned int len;
+ 
+ 		l1l2 = (unsigned char *) ((unsigned long) skb->data + skb->len - 6);
+ 
+@@ -1189,14 +1189,15 @@ dequeue_rx(struct idt77252_dev *card, struct rsq_entry *rsqe)
+ 		ATM_SKB(skb)->vcc = vcc;
+ 		__net_timestamp(skb);
+ 
++		truesize = skb->truesize;
+ 		vcc->push(vcc, skb);
+ 		atomic_inc(&vcc->stats->rx);
+ 
+-		if (skb->truesize > SAR_FB_SIZE_3)
++		if (truesize > SAR_FB_SIZE_3)
+ 			add_rx_skb(card, 3, SAR_FB_SIZE_3, 1);
+-		else if (skb->truesize > SAR_FB_SIZE_2)
++		else if (truesize > SAR_FB_SIZE_2)
+ 			add_rx_skb(card, 2, SAR_FB_SIZE_2, 1);
+-		else if (skb->truesize > SAR_FB_SIZE_1)
++		else if (truesize > SAR_FB_SIZE_1)
+ 			add_rx_skb(card, 1, SAR_FB_SIZE_1, 1);
+ 		else
+ 			add_rx_skb(card, 0, SAR_FB_SIZE_0, 1);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
