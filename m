@@ -1,87 +1,46 @@
-Return-Path: <netdev+bounces-117149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF3D94CE11
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:03:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6AE94CE26
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 12:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBED5284D40
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:03:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FDDC284CCB
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 10:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0B31940BC;
-	Fri,  9 Aug 2024 09:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032B119148D;
+	Fri,  9 Aug 2024 10:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Bwwo+WCK";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="o2ofEY+j"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qeY0k0eh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21681940B0;
-	Fri,  9 Aug 2024 09:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723197480; cv=pass; b=bYtwsmxFC8TKaK9YJVdnnOS2yYRQaA9eIVKX8EbmuWmswQDScggIg6eua7PBE+azHXV16dBNbk8lMGvDkGiG17ElK/wIEFrSIaZw6zE+7BT1SiCwmOfJQushGR12XpaeWN1wol/JVe+hiwSfHq67psdjOc4lCZ7w0efDxgh5d28=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723197480; c=relaxed/simple;
-	bh=Xe+OAUVb0YFJIF+A8+YBN2gRFzDq6SrE2crXjLIltKY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF9116D307;
+	Fri,  9 Aug 2024 10:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723197728; cv=none; b=tHKksowGJINnbqnddx3KqW4t/D7ryBaC4uYpTE1spAuumjn0Y7/GdT/V/8IFHpd9IibwcgwmsHecZJseOWlmxbi9uVMi17+mf5cOSZvdX6OeuIyI/Hjj1kyzIJdY6ljjTFMShFFnn4mjDjFb91/41fPmdUxCrVgCetzLw1AnqJE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723197728; c=relaxed/simple;
+	bh=Kbxtk/rTG8xh8pLqLXt5XVBapXThRW3mletxNrIST94=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JhQifoAN9bN04gVssD1x/LXvZykqYHAlC7xaR6cuAwFCOCz0qlVG2IHgQc16ChZilE33c5QpQfYpVGkMILzmWBkhoxxs/jUkfpNP7PSyhpX+gH/6lw+XQqfI4IrzxtMAeQ/9szONs8xdIWZbtkLBGXseAFDTEH07epsVxVwcWk4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Bwwo+WCK; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=o2ofEY+j; arc=pass smtp.client-ip=81.169.146.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1723197467; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=sOVWz2QymMSoe5vD+9p4VLE86h0YA7ZKRD7xdl/KHQOg24H1yhiviAOUZCl9a7oM57
-    wS0XBu9GQvLK4ieC3mAiR84Moo3A9zDuvfTmMH9KVmzQbV33QXGQyNXL+pHB6mxQeEv7
-    ykE5miIHJ6BjmapziewsXLmozU79/IVHC20/+4vsrcug1CIH1gm9HAieEUPLqFltAhBW
-    MbU1YqRbzNH8pme2/brgJDKnrDhCYdsxzh0kf/P3cETW/NL6VHwWBU0LaUosABgRHdpG
-    QyFCKKMCOGnPR/jfEsD7f9sso1QqJkzMHbE/dlbSqR5DULeutR069Nc+zS5RLkRbO0Lj
-    7eww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1723197467;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
-    b=rRgtElqYS2qPu5JLzd/d2VCXw0/B3Vwv9/gJr8cir99KUCLQjkFvyDuSq+NWFGauaX
-    Wk8PNlzIPvRfibwAaFoN+j5nwsUev290Nsl9nj+ujiqimTiCrg2lrJo+CBdj3BFP1a3k
-    nm9NQndchoy00QoXM53IEIv08fMs3nSSelkBeIxfzu7Vnen2hUxRlov70PL1vKEpn75h
-    GVOhbmq8+WG8fb0ACk6XIhrUANx9YM8xNsNxCrF2ExRdCFqeVMU75si+NBlP3tgj0Zou
-    ueoHr/fNkMmaNVg9gD0a2y2fWO+cp43okjwx/Ov7HbAOQmcFSofcfnM9TYUvfVc3oqqB
-    SZ8g==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1723197467;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
-    b=Bwwo+WCKBtfPf5H9iZYVCGHEDKjr4si+atWvDMFpkSooFfVkeCObsppecM9tfaD9sJ
-    HqriJNx52h2lm8C1rg4rtUqLGgNmDoaTQf3c3SmDsAiFn/kIYmDGvY+ZHlbLNJyvTnAZ
-    LPiiaWm9jvhKDM8SSo1Gn1vtpcrra5JNCqfHrUW7GNA2yerDZMF0/s/+bkSwq/SRFaWH
-    HnbbDkPk6MUxPViBvo4FnpE7ZlDH5EP/cL2wIEr8PMkBmBUCQyuX73NdpV8k7Eu81MnO
-    lVxaZFTiv7Xa8//t0DC+ZcqmfNFjUYtycQ6w6HHXj1XxTwDqtDCylheg8XMnP55EnH24
-    ZZjg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1723197467;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=QEUSNXrqpbgI+XXA6QcuDSUYsyphVepWdKIB51JsmDA=;
-    b=o2ofEY+jQ36873X/dwp/wbAF8Jh6QvKdSXHJWvYnmSoGJOW9JVHB5V80oxiDZYyUpE
-    0+CKJAx7x+exo33WF0Cw==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/vMMcFB+4xtv9aJ67XA=="
-Received: from [IPV6:2a00:6020:4a8e:5010::9f3]
-    by smtp.strato.de (RZmta 51.1.0 AUTH)
-    with ESMTPSA id K1860b0799vl3KA
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 9 Aug 2024 11:57:47 +0200 (CEST)
-Message-ID: <2bf44b8d-b286-4a94-8e1d-6c4e736a1d07@hartkopp.net>
-Date: Fri, 9 Aug 2024 11:57:41 +0200
+	 In-Reply-To:Content-Type; b=FKyJMwbpIt8N1iPQCTYUi4Un5i5fRyCrBN7bBMYG1delEpHccev0FxmjTPbrG8NtxSvofwgsOwyFqbwTK6o8uY8XNaikeXRCO6/IDhb3Y9vwZx3kvajJg9qRpSPKZ5FUvzVhFZl4cOYaBuTZV236XGWXCdsSssu5nLni4byyKUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qeY0k0eh; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723197717; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=BdKgcvydGioWnK8L6t2a5AjgNvCBYWhkiDknLVnvalI=;
+	b=qeY0k0eh/QJvQI8LB++hPZM2yiapQpnzss3PovAxoNwFAWe+KoXnUNCXBW91bxyExx7B8baqZXRt3Ay1LancFjH5wrU7uWvjQ4oO8GFYXt8bOJrqyNXJug4IMkX3AXB/3y+Dx3HVFvGReS5WseTtH7f1J1l8x5pfIfKcTCG7lBY=
+Received: from 30.221.129.232(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCPmSH9_1723197714)
+          by smtp.aliyun-inc.com;
+          Fri, 09 Aug 2024 18:01:56 +0800
+Message-ID: <c0a1aade-a6ee-482a-bc6e-da07a4c69cff@linux.alibaba.com>
+Date: Fri, 9 Aug 2024 18:01:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,71 +48,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] Net: bcm.c: Remove Subtree Instead of Entry
-To: David Hunter <david.hunter.linux@gmail.com>, mkl@pengutronix.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-References: <20240808202658.5933-1-david.hunter.linux@gmail.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20240808202658.5933-1-david.hunter.linux@gmail.com>
+Subject: Re: [PATCH net-next 3/4] net/smc: fix one NULL pointer dereference in
+ smc_ib_is_sg_need_sync()
+To: Liu Jian <liujian56@huawei.com>, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Cc: jgg@ziepe.ca, leon@kernel.org, zyjzyj2000@gmail.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+References: <20240809083148.1989912-1-liujian56@huawei.com>
+ <20240809083148.1989912-4-liujian56@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240809083148.1989912-4-liujian56@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello David,
 
-many thanks for the patch and the description.
 
-Btw. the data structures of the elements inside that bcm proc dir should 
-have been removed at that point, so that the can-bcm dir should be empty.
-
-I'm not sure what happens to the open sockets that are (later) removed 
-in bcm_release() when we use remove_proc_subtree() as suggested. 
-Removing this warning probably does not heal the root cause of the issue.
-
-What did you do to trigger the warning? Did you work with network 
-namespaces or LXC/Docker and purged an entire namespace?
-
-Best regards,
-Oliver
-
-On 08.08.24 22:26, David Hunter wrote:
-> Fix a warning with bcm.c that is caused by removing an entry. If the
-> entry had a process as a child, a warning is generated:
-> 
-> remove_proc_entry: removing non-empty directory 'net/can-bcm'...
-> WARNING: CPU: 1 PID: 71 at fs/proc/generic.c:717 remove_proc_entry
+On 2024/8/9 16:31, Liu Jian wrote:
+> BUG: kernel NULL pointer dereference, address: 0000000000000238
+> PGD 0 P4D 0
+> Oops: 0000 [#1] PREEMPT SMP PTI
+> CPU: 3 PID: 289 Comm: kworker/3:1 Kdump: loaded Tainted: G           OE
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> Workqueue: smc_hs_wq smc_listen_work [smc]
+> RIP: 0010:dma_need_sync+0x5/0x60
+> ...
 > Call Trace:
-> remove_proc_entry
-> canbcm_pernet_exit
-> ops_exit_list
+>   <TASK>
+>   ? dma_need_sync+0x5/0x60
+>   ? smc_ib_is_sg_need_sync+0x61/0xf0 [smc]
+>   smcr_buf_map_link+0x24a/0x380 [smc]
+>   __smc_buf_create+0x483/0xb10 [smc]
+>   smc_buf_create+0x21/0xe0 [smc]
+>   smc_listen_work+0xf11/0x14f0 [smc]
+>   ? smc_tcp_listen_work+0x364/0x520 [smc]
+>   process_one_work+0x18d/0x3f0
+>   worker_thread+0x304/0x440
+>   kthread+0xe4/0x110
+>   ret_from_fork+0x47/0x70
+>   ret_from_fork_asm+0x1a/0x30
+>   </TASK>
 > 
-> Instead of simply removing the entry, remove the entire subdirectory.
-> The child process will still be removed, but without a warning occurring.
+> If the software RoCE device is used, ibdev->dma_device is a null pointer.
+> As a result, the problem occurs. Null pointer detection is added to
+> prevent problems.
 > 
-> This patch was compiled and the code traced with gdb to see that the
-> tree  was removed. The code was run to see that the warning was removed.
-> In addition, the code was tested with the kselftest
-> net subsystem. No regressions were detected.
-> 
-> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
 > ---
->   net/can/bcm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   net/smc/smc_ib.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/net/can/bcm.c b/net/can/bcm.c
-> index 27d5fcf0eac9..fea48fd793e5 100644
-> --- a/net/can/bcm.c
-> +++ b/net/can/bcm.c
-> @@ -1779,7 +1779,7 @@ static void canbcm_pernet_exit(struct net *net)
->   #if IS_ENABLED(CONFIG_PROC_FS)
->   	/* remove /proc/net/can-bcm directory */
->   	if (net->can.bcmproc_dir)
-> -		remove_proc_entry("can-bcm", net->proc_net);
-> +		remove_proc_subtree("can-bcm", net->proc_net);
->   #endif /* CONFIG_PROC_FS */
->   }
->   
+> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> index 382351ac9434..059822cc3fde 100644
+> --- a/net/smc/smc_ib.c
+> +++ b/net/smc/smc_ib.c
+> @@ -748,6 +748,8 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
+>   		    buf_slot->sgt[lnk->link_idx].nents, i) {
+>   		if (!sg_dma_len(sg))
+>   			break;
+> +		if (!lnk->smcibdev->ibdev->dma_device)
+> +			break;
+
+LGTM.
+
+Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+
+>   		if (dma_need_sync(lnk->smcibdev->ibdev->dma_device,
+>   				  sg_dma_address(sg))) {
+>   			ret = true;
 
