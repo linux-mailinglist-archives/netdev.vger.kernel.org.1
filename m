@@ -1,112 +1,108 @@
-Return-Path: <netdev+bounces-117210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B02394D1BB
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:01:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F81E94D268
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00BB5B20B4B
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:01:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98A81B222A8
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3428F1922F5;
-	Fri,  9 Aug 2024 14:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C64919754A;
+	Fri,  9 Aug 2024 14:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xSyUs0dB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGjJA6Uq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2EA1D551;
-	Fri,  9 Aug 2024 14:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B067C1DFE1;
+	Fri,  9 Aug 2024 14:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723212069; cv=none; b=Do/DE/6lmrPOL4LkqSYUEuvrOvEQpuq7xasuRuR0zZfNxm/V9fuY9MPuGUO5MlW7LFoRB4p/RkIs9G5dJ8tpnzli62P9fz0dNK3UHotRpFrneFWKK8dZON6o4P9dfGtQ/7tnUahEOVc2yPI6IdK7hmzx59nsupv86W7COsSpNEQ=
+	t=1723214695; cv=none; b=dapfbfIY9sb+m9ziqAmXtNqC+p7TYB61yzeDVCjTFj0H8s9sYR+4SqkIYoUxnFGNZt4pXTuxWOhPk5eZQfZ+3PhC5VtVDm2GRjtb+MBCUs4LPa71eA8AjmyM7USBX4uyTDnbc1hCmLFvNlEf/k7WSeSu9SMflswQiUCH1UoPm/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723212069; c=relaxed/simple;
-	bh=wOBtner8hi1K5hkgNsMPMhY123WSzOtLtLL/HsSyKuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ed3CsRmkX8O3LyOs3EUNj8dpXJcQOj/echh21VFq5vANhX2BiSIF8Crx3R768kWae5DGrzKw6nUmkBw3ADvDrrtXcasGUasnoW2NVNNILf+2SosKS7m0ICjvFx4xsG5wSKOpdznGcsfkUN1wc23VEAyhD1KmNn7Bw2+QdRCntvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xSyUs0dB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=MzghURwGNLdztqm2bXnd89oEb6Aby1XcEnDVCDSneaI=; b=xS
-	yUs0dB42NB9mokFGZ7CTSPapz+5wlI/gS4bDwB9Oe9omiFY7GnWemfhKeOAXb+LoY4Znv07jeRLJC
-	uTg/wkJHgjr0eglQbYOxgTsFTKGYUhoaIx3zSNSISgkqHkZ4jW1HLvjWv0IIjY+gfgC+BAKwOEvNf
-	ydrycuTX5RtbKZo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1scQAn-004Nmy-U2; Fri, 09 Aug 2024 16:00:53 +0200
-Date: Fri, 9 Aug 2024 16:00:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] phy: Add Open Alliance helpers for the
- PHY framework
-Message-ID: <5d62cf99-c025-42f1-99db-f1f872d1650a@lunn.ch>
-References: <20240808130833.2083875-1-o.rempel@pengutronix.de>
- <20240808130833.2083875-2-o.rempel@pengutronix.de>
- <eab136c5-ef49-4d4e-860c-c56840747199@lunn.ch>
- <ZrWmfqtYICzaj-HY@pengutronix.de>
+	s=arc-20240116; t=1723214695; c=relaxed/simple;
+	bh=KeCOkdeMj7jfUARfg+0sT1kcD7hB7YWqxUDtJt3Nkw0=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=fr+EFaZiM9/m9Vwdf79e8NoLl6eLOZZkquLvFyJQdI+40p3P+OSOiYwFrgvez4U4gnuSjRdLHnVK0yqZvt7xFP1SHfpeTvoZ81Ax8d5tIZEA54RGrUlMl2qwxGb+7sRqggFebcC4rUKTY+RgKyXNh0nbkWSVQ4Snn329KoNdxTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGjJA6Uq; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-368526b1333so1925208f8f.1;
+        Fri, 09 Aug 2024 07:44:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723214692; x=1723819492; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/dMGgv1RCO9tIGQHpojzXRCbF3RQKlUcFcpP+8JAmc0=;
+        b=EGjJA6Uq6pr9on6J0Bf65x1X1Q9PPjufTYO5jW+BYb68pr1LYthL88wKetL4+Nwh12
+         V4QfbV18vIEHiXdsRxKvyhP8d+AC8f6Tn8teF99LhG4JUrP7rMVgwN5I5/2f5pt9qPOU
+         fJlRiuGF5lLIdDvl5EujQ1O8uz9ZQ3IT3J0lEn+owUX5V/D1BOORxOSWRCjZoGKExmjW
+         xaGYw5pvSCxHWwEWmXTGFw5OnVPcKIQH9JqEzf7fvWlVv4gFPgvz5aTqxU85NDcnn0xo
+         Q2yB1B08/1F8kIQzWruzKv19A38v+rrDXu5SkZQ455wwji1I+EnV1Po7bn8rS/uxzD6x
+         A7yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723214692; x=1723819492;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/dMGgv1RCO9tIGQHpojzXRCbF3RQKlUcFcpP+8JAmc0=;
+        b=YLrW21bL4AwukRQ7buJGY7NvRO/6ANc9SLGXj7C1m8rBFGNAFmugXm/P8PK4KHqv1T
+         QBCFUAUSrWlrdBFw2zE6Ad1PKSP9W9V5PUYc1sbJ0m0eQr3LBmAyVTm5ikjPt5N7cm6u
+         5xUKThOJ97HBDRonL7+yCUF+Uvwqr8S7iXGt4ZLPw8MV1ZdALXhZBjpT1PHd5NNRQ2XN
+         Wj1ulZPVmt/0sSq+fqdmtnX2kuXs6mDWC0nMJBoRNlQ/bHex3g8FLd42+NYMx9eQX0nX
+         R9s7PXOz0bAAF4SKVJTc8AC+5K4GRzUcBhGMswJvrQJR3fvKx3oYqtN/rdbLe7UFlOHf
+         2IEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvlJ/GHsIJpA2OydJjn/peywB889BMUq9vhLk0ybO19o4kgE+zTJ+PBIf+zCsvXDmno7+jhidh5KuiTkgEZOHUB++MrMEdRyarxKdrMf9iFuJUMTEBLeSjuYlZlq9ZOWgk2YcElpdQ
+X-Gm-Message-State: AOJu0Yw01h0Xj5rpgKrBmUtqnETYM2BvIwKN5qin2L1k3hYbD+LYyOBb
+	eBHH1zG3iIAqLjgv2EZP1mKSf9N5smj+49CdcqFe/pMstUf7uS5u
+X-Google-Smtp-Source: AGHT+IGLJEeEpwsCiH7unqDJWHo9SYYYVGhxV1yRTrgqx1iRL9g/yNyfLvjK7s1a+VAILfZ9OlehiQ==
+X-Received: by 2002:a5d:66d1:0:b0:367:8fee:4434 with SMTP id ffacd0b85a97d-36d68d9de50mr1398005f8f.16.1723214691722;
+        Fri, 09 Aug 2024 07:44:51 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:f01e:f03a:11db:ad8e])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27208c81sm5558167f8f.73.2024.08.09.07.44.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 07:44:51 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik
+ <kadlec@netfilter.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  netfilter-devel@vger.kernel.org,
+  netdev@vger.kernel.org,  donald.hunter@redhat.com
+Subject: Re: [PATCH nf v1] netfilter: nfnetlink: Initialise extack before
+ use in ACKs
+In-Reply-To: <20240809090238.GF3075665@kernel.org> (Simon Horman's message of
+	"Fri, 9 Aug 2024 10:02:38 +0100")
+Date: Fri, 09 Aug 2024 12:15:55 +0100
+Message-ID: <m25xsaq74k.fsf@gmail.com>
+References: <20240806154324.40764-1-donald.hunter@gmail.com>
+	<20240809090238.GF3075665@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZrWmfqtYICzaj-HY@pengutronix.de>
+Content-Type: text/plain
 
-On Fri, Aug 09, 2024 at 07:17:50AM +0200, Oleksij Rempel wrote:
-> On Thu, Aug 08, 2024 at 03:54:06PM +0200, Andrew Lunn wrote:
-> 
-> > Please could you give a reference to the exact standard. I think this
-> > is "Advanced diagnostic features for 1000BASE-T1 automotive Ethernet
-> > PHYs TC12 - advanced PHY features" ?
-> > 
-> > The standard seem open, so you could include a URL:
-> > 
-> > https://opensig.org/wp-content/uploads/2024/03/Advanced_PHY_features_for_automotive_Ethernet_v2.0_fin.pdf
-> 
-> I already started to implement other diagnostic features supported by the
-> TI DP83TG720 PHY. For example following can be implemented too:
-> 6.3 Link quality – start-up time and link losses (LQ)
-> 6.3.1 Link training time (LTT)
-> 6.3.2 Local receiver time (LRT)
-> 6.3.3 Remote receiver time (RRT)
+Simon Horman <horms@kernel.org> writes:
 
-These three are the time it takes for some action. Not really a
-statistic in the normal netdev sense, since it does not count up. But
-they are kind of statistics, so it is probably not abusing statistics
-too much, so maybe O.K.
+> On Tue, Aug 06, 2024 at 04:43:24PM +0100, Donald Hunter wrote:
+>> Add missing extack initialisation when ACKing BATCH_BEGIN and BATCH_END.
+>> 
+>> Fixes: bf2ac490d28c ("netfilter: nfnetlink: Handle ACK flags for batch messages")
+>> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+>
+> Hi Donald,
+>
+> I see two other places that extack is used in nfnetlink_rcv_batch().
+> Is it safe to leave them as-is?
 
-> 6.3.4 Link Failures and Losses (LFL)
-
-This is a count, so does fit statistics. 
-
-> 6.3.5 Communication ready status (COM)
-
-Similar to the BMSR link bit. Do it add anything useful?
-
-> 6.4 Polarity Detection and Correction (POL)
-> 6.4.1 Polarity Detection (DET)
-> 6.4.2 Polarity Correction (COR)
-
-Could these be mapped to ETH_TP_MDI* ? 
-
-      Andrew
+There is a memset at the start of the main while loop that zeroes extack
+for those two cases.
 
