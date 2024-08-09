@@ -1,466 +1,239 @@
-Return-Path: <netdev+bounces-117045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C8094C7BE
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 02:44:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36B7F94C7F3
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 03:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F7FE287BCA
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 00:44:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA0101F22002
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 01:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1179DDD2;
-	Fri,  9 Aug 2024 00:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A588BFC;
+	Fri,  9 Aug 2024 01:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="veiCY/jm"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B+q5sEgz"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D8C3D6D;
-	Fri,  9 Aug 2024 00:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBC279F5
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 01:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723164227; cv=none; b=CdeZunoINzqooQ8HeNr1y+xu0n9IbdvGtLocKv8dj0HqSqV9nOpyAwTQr5y/XEi7OykDKQ/CHmK3XHedrWHzpC0Ih6lCMUXVcsCrAAygsxC61B3PHT/VEfdQCQlseiD2/22ca9WI61Em+QpcHJDoICPSKN5UJkhYI5Mhd10GygY=
+	t=1723166281; cv=none; b=LpF3YY1jLSbx3gizY9SOSpSMl2cMfEI8aEzEkoqdJRsRuIyCxov5eyuRJvTCdwh0Ggpe/GHbEAJx6dHzyv6KUKHDjufcvGyKcLnU7tJoR36s275Vhhr+VoH33rvW0/d4q8XcxXeTddaDQgd6zCRKHiVZHS13c1cKpvxio9xiYoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723164227; c=relaxed/simple;
-	bh=y3H0JRDBFcVQDW3l3zuPU+Q5Mmwp7oZzz8JkUDu+pCU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X5cQQWvsBunOxc2XufktfnbXIK5PairlavDi0MN0iYgVMCYBRs/qF8IKLcBz0vTKNhpwwOFvygIF6A1x4uzplIXZpLgw6n+cHYrCDmVJtbILzppkyjDhbBzNqmicYk/4w1rX58i1kdigrPr8vgcr0XOoNtF+AQNu8lYb3qrHxj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=veiCY/jm; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723164225; x=1754700225;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=y3H0JRDBFcVQDW3l3zuPU+Q5Mmwp7oZzz8JkUDu+pCU=;
-  b=veiCY/jm0uQse9XVWZhkUxLE/GxnY9GHHQtyohDmnMFqSgSWO703383H
-   6K7Q4GqvVduSAM+0dDEeF1CRTWnvOzQyybZh474Ti9DGKcinwcAurbqr+
-   UBVulomNZt54Ub+IU6DJb1l6cetCNvizu89TyPbcNFDWEGV/bsXp6vmk1
-   mK9l0w/BENABtmV3rYUO2osJrtqUREwW3ywD4RymBRKZLg6qyNh+aqqxY
-   MXVNhUeDiRbowauyjYXg+wrsrIzZPdgA2qxejVS4mTvr/aZk4Lw8GseP2
-   IIQAxWfvw5Vk2Jj9l/MoIXVxDe3d4JRTPhcclA466Flooi6GRuz7w4Xza
-   Q==;
-X-CSE-ConnectionGUID: +8j0qFodS5iV1GC4lWtiSA==
-X-CSE-MsgGUID: pxiiSbv1ToSzPDdIis/fhQ==
-X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
-   d="scan'208";a="30947695"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Aug 2024 17:43:42 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 8 Aug 2024 17:43:12 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 8 Aug 2024 17:43:11 -0700
-From: <Tristram.Ha@microchip.com>
-To: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<devicetree@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
-	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
-CC: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
-Subject: [PATCH net-next v2 2/2] net: dsa: microchip: Add KSZ8895/KSZ8864 switch support
-Date: Thu, 8 Aug 2024 17:43:10 -0700
-Message-ID: <20240809004310.239242-3-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240809004310.239242-1-Tristram.Ha@microchip.com>
-References: <20240809004310.239242-1-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1723166281; c=relaxed/simple;
+	bh=fFC+qYwoV2Q72npaQGdXSkqHHWNAjvlZJl/XYpdPq08=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QZkaha1X2SfwAKR/qBxs+oq9VDhtaZN7vpYMVNOMQxZ2xQR1bvwbLW08Pyw5P86rXuDnFBASZlGq3S/132Z9jwDzoiThLaojNy4i7cpz2pSGImWJFJymMo0UWTQQTXO7FDAco9JXfW4s7x5AInaGWVIW1Nxvs+a6alvtIooQ8Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=B+q5sEgz; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2caff99b1c9so1343019a91.3
+        for <netdev@vger.kernel.org>; Thu, 08 Aug 2024 18:17:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1723166278; x=1723771078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oYjZjdBTBIdPAqpSrjlxhCk8adkJQbZPHoFFyYw0PrE=;
+        b=B+q5sEgzUqkrFX3PC5naZwNMR5+LfMcEgycGqNuBA6VW3awhLBw0MrW5auUbfi9E61
+         cLblYZub+r38TvzIz7Uz+Futsy1sEbFZ3FtfyhXqxb+xWxYvI+KXjpu+on6RNVDlNgau
+         If2W9lMUiTTC2A6Tv2Gu7acrWAviS2x3XfG/Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723166278; x=1723771078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oYjZjdBTBIdPAqpSrjlxhCk8adkJQbZPHoFFyYw0PrE=;
+        b=Ow3LLfVCdGt4Cn58Y7Wsaab5ZFjxMwAvhI42tidlN6v0ePXNcL+BqxRzAMhGwhWUrD
+         ya9v5+tUrc9L+tlQUFuVj/m7pdUYd1Tzjl8y69YXCh5nPkLxd8wEJd7urh/ZJ07Ca2sw
+         c3EBwqb3Yt2Z9mfSxS/pUhx8D5axnqurDMM+m3i6XQdcugZGqoQCK8Q9HYh1PNd0zI+Z
+         DCuR2JGLpZzeINsJzjzjL0h8P/XEA9gEIqpKolsYUpcYEQvQagZTAByNx2xEPAfrC4cM
+         s+Wvl/RhwkOCvipHvpnA6R/bDVGD9y/cB2cd7c3SqQgQsn6ZYiSdH9RUFPIQvyMONoQB
+         rjFg==
+X-Gm-Message-State: AOJu0Ywu679K1Qr/s1RQ+r19lYL74ka5ylziY4YB9cXtPiBHyHoSyD2d
+	82f2bhYvzckA/1nECnaPdVQVbee+llIbbIz80Gv1eoMbzW6/1lHXvqiY6nbybDTtyXW7zjQM8Mj
+	f4lzPkBEvZMJfUGCfgrJW1bcivLg828M8dieV
+X-Google-Smtp-Source: AGHT+IGNeU+mZ526KJrVKkT/3A9XbhnFswO1iznJt7mrN23m/4oIDjcjgcAyOQgmchZLh8UGBltbebeLSCY6/iXwh8A=
+X-Received: by 2002:a17:90a:2c01:b0:2c9:9c25:757b with SMTP id
+ 98e67ed59e1d1-2d1c34707a0mr4459915a91.39.1723166278248; Thu, 08 Aug 2024
+ 18:17:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
+ <20240802031822.1862030-3-jitendra.vegiraju@broadcom.com> <o4dgczjefqjek3iqw2y3ca7pwolj5e6otjyuinpuvkwcli5xei@dzehe7xde44x>
+In-Reply-To: <o4dgczjefqjek3iqw2y3ca7pwolj5e6otjyuinpuvkwcli5xei@dzehe7xde44x>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Thu, 8 Aug 2024 18:17:47 -0700
+Message-ID: <CAMdnO-JUkMvoB8yiJqDFLnmCvchsTdBvf0G+Rtcov6YTdh_BVQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Integrate dwxgmac4 into
+ stmmac hwif handling
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Tristram Ha <tristram.ha@microchip.com>
+Hi Serge
+On Tue, Aug 6, 2024 at 3:14=E2=80=AFPM Serge Semin <fancer.lancer@gmail.com=
+> wrote:
+>
+> On Thu, Aug 01, 2024 at 08:18:21PM -0700, jitendra.vegiraju@broadcom.com =
+wrote:
+> > From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> >
+> > Integrate dwxgmac4 support into stmmac hardware interface handling.
+> > A dwxgmac4 is an xgmac device and hence it inherits properties from
+> > existing stmmac_hw table entry.
+> > The quirks handling facility is used to update dma_ops field to
+> > point to dwxgmac400_dma_ops when the user version field matches.
+> >
+> > Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/common.h |  4 +++
+> >  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 26 +++++++++++++++++++-
+> >  drivers/net/ethernet/stmicro/stmmac/hwif.h   |  1 +
+> >  3 files changed, 30 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net=
+/ethernet/stmicro/stmmac/common.h
+> > index cd36ff4da68c..9bf278e11704 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > @@ -37,11 +37,15 @@
+> >  #define DWXGMAC_CORE_2_10    0x21
+> >  #define DWXGMAC_CORE_2_20    0x22
+> >  #define DWXLGMAC_CORE_2_00   0x20
+>
+> > +#define DWXGMAC_CORE_4_00    0x40
+>
+> DW25GMAC_CORE_4_00?
+Will do.
+>
+> >
+> >  /* Device ID */
+> >  #define DWXGMAC_ID           0x76
+>
+> What is the device ID in your case? Does it match to DWXGMAC_ID?
+The early adopter 25MAC IP core used on this has 0x76.
+But, synopsis confirmed the 25GMAC is assigned with value 0x55.
+Will define DW25MAC_ID 0x55 and use it for 25GMAC hw_if entry.
+However, we would like to get a suggestion for dealing with this early
+adopter device_id number.
+Can we add override mechanism by defining device_id in stmmac_priv
+structure and let the hardware specific setup function in the glue
+driver update the device_id to 0x55 function?
 
-KSZ8895/KSZ8864 is a switch family between KSZ8863/73 and KSZ8795, so it
-shares some registers and functions in those switches already
-implemented in the KSZ DSA driver.
-
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
----
- drivers/net/dsa/microchip/ksz8795.c         |  16 ++-
- drivers/net/dsa/microchip/ksz_common.c      | 130 +++++++++++++++++++-
- drivers/net/dsa/microchip/ksz_common.h      |  20 ++-
- drivers/net/dsa/microchip/ksz_spi.c         |  15 ++-
- include/linux/platform_data/microchip-ksz.h |   2 +
- 5 files changed, 170 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index d27b9c36d73f..ac5da38bab36 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -121,6 +121,8 @@ int ksz8_change_mtu(struct ksz_device *dev, int port, int mtu)
- 	case KSZ8765_CHIP_ID:
- 		return ksz8795_change_mtu(dev, frame_size);
- 	case KSZ8830_CHIP_ID:
-+	case KSZ8895_CHIP_ID:
-+	case KSZ8864_CHIP_ID:
- 		return ksz8863_change_mtu(dev, frame_size);
- 	}
- 
-@@ -317,7 +319,7 @@ static void ksz8863_r_mib_pkt(struct ksz_device *dev, int port, u16 addr,
- void ksz8_r_mib_pkt(struct ksz_device *dev, int port, u16 addr,
- 		    u64 *dropped, u64 *cnt)
- {
--	if (ksz_is_ksz88x3(dev))
-+	if (ksz_is_ksz88x3(dev) || ksz_is_8895_family(dev))
- 		ksz8863_r_mib_pkt(dev, port, addr, dropped, cnt);
- 	else
- 		ksz8795_r_mib_pkt(dev, port, addr, dropped, cnt);
-@@ -325,7 +327,7 @@ void ksz8_r_mib_pkt(struct ksz_device *dev, int port, u16 addr,
- 
- void ksz8_freeze_mib(struct ksz_device *dev, int port, bool freeze)
- {
--	if (ksz_is_ksz88x3(dev))
-+	if (ksz_is_ksz88x3(dev) || ksz_is_8895_family(dev))
- 		return;
- 
- 	/* enable the port for flush/freeze function */
-@@ -343,7 +345,8 @@ void ksz8_port_init_cnt(struct ksz_device *dev, int port)
- 	struct ksz_port_mib *mib = &dev->ports[port].mib;
- 	u64 *dropped;
- 
--	if (!ksz_is_ksz88x3(dev)) {
-+	/* For KSZ8795 family. */
-+	if (ksz_is_ksz87xx(dev)) {
- 		/* flush all enabled port MIB counters */
- 		ksz_cfg(dev, REG_SW_CTRL_6, BIT(port), true);
- 		ksz_cfg(dev, REG_SW_CTRL_6, SW_MIB_COUNTER_FLUSH, true);
-@@ -542,11 +545,11 @@ static int ksz8_r_sta_mac_table(struct ksz_device *dev, u16 addr,
- 			shifts[STATIC_MAC_FWD_PORTS];
- 	alu->is_override = (data_hi & masks[STATIC_MAC_TABLE_OVERRIDE]) ? 1 : 0;
- 
--	/* KSZ8795 family switches have STATIC_MAC_TABLE_USE_FID and
-+	/* KSZ8795/KSZ8895 family switches have STATIC_MAC_TABLE_USE_FID and
- 	 * STATIC_MAC_TABLE_FID definitions off by 1 when doing read on the
- 	 * static MAC table compared to doing write.
- 	 */
--	if (ksz_is_ksz87xx(dev))
-+	if (!ksz_is_ksz88x3(dev))
- 		data_hi >>= 1;
- 	alu->is_static = true;
- 	alu->is_use_fid = (data_hi & masks[STATIC_MAC_TABLE_USE_FID]) ? 1 : 0;
-@@ -1617,7 +1620,8 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
- 	for (i = 0; i < dev->phy_port_cnt; i++) {
- 		p = &dev->ports[i];
- 
--		if (!ksz_is_ksz88x3(dev)) {
-+		/* For KSZ8795 family. */
-+		if (ksz_is_ksz87xx(dev)) {
- 			ksz_pread8(dev, i, regs[P_REMOTE_STATUS], &remote);
- 			if (remote & KSZ8_PORT_FIBER_MODE)
- 				p->fiber = 1;
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 1491099528be..8751578b7e38 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2,7 +2,7 @@
- /*
-  * Microchip switch driver main logic
-  *
-- * Copyright (C) 2017-2019 Microchip Technology Inc.
-+ * Copyright (C) 2017-2024 Microchip Technology Inc.
-  */
- 
- #include <linux/delay.h>
-@@ -477,6 +477,61 @@ static const u8 ksz8795_shifts[] = {
- 	[DYNAMIC_MAC_SRC_PORT]		= 24,
- };
- 
-+static const u16 ksz8895_regs[] = {
-+	[REG_SW_MAC_ADDR]		= 0x68,
-+	[REG_IND_CTRL_0]		= 0x6E,
-+	[REG_IND_DATA_8]		= 0x70,
-+	[REG_IND_DATA_CHECK]		= 0x72,
-+	[REG_IND_DATA_HI]		= 0x71,
-+	[REG_IND_DATA_LO]		= 0x75,
-+	[REG_IND_MIB_CHECK]		= 0x75,
-+	[P_FORCE_CTRL]			= 0x0C,
-+	[P_LINK_STATUS]			= 0x0E,
-+	[P_LOCAL_CTRL]			= 0x0C,
-+	[P_NEG_RESTART_CTRL]		= 0x0D,
-+	[P_REMOTE_STATUS]		= 0x0E,
-+	[P_SPEED_STATUS]		= 0x09,
-+	[S_TAIL_TAG_CTRL]		= 0x0C,
-+	[P_STP_CTRL]			= 0x02,
-+	[S_START_CTRL]			= 0x01,
-+	[S_BROADCAST_CTRL]		= 0x06,
-+	[S_MULTICAST_CTRL]		= 0x04,
-+};
-+
-+static const u32 ksz8895_masks[] = {
-+	[PORT_802_1P_REMAPPING]		= BIT(7),
-+	[SW_TAIL_TAG_ENABLE]		= BIT(1),
-+	[MIB_COUNTER_OVERFLOW]		= BIT(7),
-+	[MIB_COUNTER_VALID]		= BIT(6),
-+	[VLAN_TABLE_FID]		= GENMASK(6, 0),
-+	[VLAN_TABLE_MEMBERSHIP]		= GENMASK(11, 7),
-+	[VLAN_TABLE_VALID]		= BIT(12),
-+	[STATIC_MAC_TABLE_VALID]	= BIT(21),
-+	[STATIC_MAC_TABLE_USE_FID]	= BIT(23),
-+	[STATIC_MAC_TABLE_FID]		= GENMASK(30, 24),
-+	[STATIC_MAC_TABLE_OVERRIDE]	= BIT(22),
-+	[STATIC_MAC_TABLE_FWD_PORTS]	= GENMASK(20, 16),
-+	[DYNAMIC_MAC_TABLE_ENTRIES_H]	= GENMASK(6, 0),
-+	[DYNAMIC_MAC_TABLE_MAC_EMPTY]	= BIT(7),
-+	[DYNAMIC_MAC_TABLE_NOT_READY]	= BIT(7),
-+	[DYNAMIC_MAC_TABLE_ENTRIES]	= GENMASK(31, 29),
-+	[DYNAMIC_MAC_TABLE_FID]		= GENMASK(22, 16),
-+	[DYNAMIC_MAC_TABLE_SRC_PORT]	= GENMASK(26, 24),
-+	[DYNAMIC_MAC_TABLE_TIMESTAMP]	= GENMASK(28, 27),
-+};
-+
-+static const u8 ksz8895_shifts[] = {
-+	[VLAN_TABLE_MEMBERSHIP_S]	= 7,
-+	[VLAN_TABLE]			= 13,
-+	[STATIC_MAC_FWD_PORTS]		= 16,
-+	[STATIC_MAC_FID]		= 24,
-+	[DYNAMIC_MAC_ENTRIES_H]		= 3,
-+	[DYNAMIC_MAC_ENTRIES]		= 29,
-+	[DYNAMIC_MAC_FID]		= 16,
-+	[DYNAMIC_MAC_TIMESTAMP]		= 27,
-+	[DYNAMIC_MAC_SRC_PORT]		= 24,
-+};
-+
- static const u16 ksz8863_regs[] = {
- 	[REG_SW_MAC_ADDR]		= 0x70,
- 	[REG_IND_CTRL_0]		= 0x79,
-@@ -1343,6 +1398,61 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.internal_phy = {true, true, true, true, false},
- 	},
- 
-+	[KSZ8895] = {
-+		.chip_id = KSZ8895_CHIP_ID,
-+		.dev_name = "KSZ8895",
-+		.num_vlans = 4096,
-+		.num_alus = 0,
-+		.num_statics = 32,
-+		.cpu_ports = 0x10,	/* can be configured as cpu port */
-+		.port_cnt = 5,		/* total cpu and user ports */
-+		.num_tx_queues = 4,
-+		.num_ipms = 4,
-+		.ops = &ksz8_dev_ops,
-+		.phylink_mac_ops = &ksz8_phylink_mac_ops,
-+		.mib_names = ksz88xx_mib_names,
-+		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
-+		.reg_mib_cnt = MIB_COUNTER_NUM,
-+		.regs = ksz8895_regs,
-+		.masks = ksz8895_masks,
-+		.shifts = ksz8895_shifts,
-+		.supports_mii = {false, false, false, false, true},
-+		.supports_rmii = {false, false, false, false, true},
-+		.internal_phy = {true, true, true, true, false},
-+	},
-+
-+	[KSZ8864] = {
-+		/* WARNING
-+		 * =======
-+		 * KSZ8864 is similar to KSZ8895, except the first port
-+		 * does not exist.
-+		 *           external  cpu
-+		 * KSZ8864   1,2,3      4
-+		 * KSZ8895   0,1,2,3    4
-+		 * port_cnt is configured as 5, even though it is 4
-+		 */
-+		.chip_id = KSZ8864_CHIP_ID,
-+		.dev_name = "KSZ8864",
-+		.num_vlans = 4096,
-+		.num_alus = 0,
-+		.num_statics = 32,
-+		.cpu_ports = 0x10,	/* can be configured as cpu port */
-+		.port_cnt = 5,		/* total cpu and user ports */
-+		.num_tx_queues = 4,
-+		.num_ipms = 4,
-+		.ops = &ksz8_dev_ops,
-+		.phylink_mac_ops = &ksz8_phylink_mac_ops,
-+		.mib_names = ksz88xx_mib_names,
-+		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
-+		.reg_mib_cnt = MIB_COUNTER_NUM,
-+		.regs = ksz8895_regs,
-+		.masks = ksz8895_masks,
-+		.shifts = ksz8895_shifts,
-+		.supports_mii = {false, false, false, false, true},
-+		.supports_rmii = {false, false, false, false, true},
-+		.internal_phy = {false, true, true, true, false},
-+	},
-+
- 	[KSZ8830] = {
- 		.chip_id = KSZ8830_CHIP_ID,
- 		.dev_name = "KSZ8863/KSZ8873",
-@@ -2893,9 +3003,7 @@ static enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
- 	struct ksz_device *dev = ds->priv;
- 	enum dsa_tag_protocol proto = DSA_TAG_PROTO_NONE;
- 
--	if (dev->chip_id == KSZ8795_CHIP_ID ||
--	    dev->chip_id == KSZ8794_CHIP_ID ||
--	    dev->chip_id == KSZ8765_CHIP_ID)
-+	if (ksz_is_ksz87xx(dev) || ksz_is_8895_family(dev))
- 		proto = DSA_TAG_PROTO_KSZ8795;
- 
- 	if (dev->chip_id == KSZ8830_CHIP_ID ||
-@@ -3011,6 +3119,8 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
- 	case KSZ8765_CHIP_ID:
- 		return KSZ8795_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
- 	case KSZ8830_CHIP_ID:
-+	case KSZ8895_CHIP_ID:
-+	case KSZ8864_CHIP_ID:
- 		return KSZ8863_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
- 	case KSZ8563_CHIP_ID:
- 	case KSZ8567_CHIP_ID:
-@@ -3368,6 +3478,18 @@ static int ksz_switch_detect(struct ksz_device *dev)
- 		else
- 			return -ENODEV;
- 		break;
-+	case KSZ8895_FAMILY_ID:
-+		if (id2 == KSZ8895_CHIP_ID_95 ||
-+		    id2 == KSZ8895_CHIP_ID_95R)
-+			dev->chip_id = KSZ8895_CHIP_ID;
-+		else
-+			return -ENODEV;
-+		ret = ksz_read8(dev, REG_KSZ8864_CHIP_ID, &id4);
-+		if (ret)
-+			return ret;
-+		if (id4 & SW_KSZ8864)
-+			dev->chip_id = KSZ8864_CHIP_ID;
-+		break;
- 	default:
- 		ret = ksz_read32(dev, REG_CHIP_ID0, &id32);
- 		if (ret)
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 5f0a628b9849..ad8723233a33 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /* Microchip switch driver common header
-  *
-- * Copyright (C) 2017-2019 Microchip Technology Inc.
-+ * Copyright (C) 2017-2024 Microchip Technology Inc.
-  */
- 
- #ifndef __KSZ_COMMON_H
-@@ -199,6 +199,8 @@ enum ksz_model {
- 	KSZ8795,
- 	KSZ8794,
- 	KSZ8765,
-+	KSZ8895,
-+	KSZ8864,
- 	KSZ8830,
- 	KSZ9477,
- 	KSZ9896,
-@@ -624,9 +626,16 @@ static inline bool ksz_is_ksz88x3(struct ksz_device *dev)
- 	return dev->chip_id == KSZ8830_CHIP_ID;
- }
- 
-+static inline bool ksz_is_8895_family(struct ksz_device *dev)
-+{
-+	return dev->chip_id == KSZ8895_CHIP_ID ||
-+	       dev->chip_id == KSZ8864_CHIP_ID;
-+}
-+
- static inline bool is_ksz8(struct ksz_device *dev)
- {
--	return ksz_is_ksz87xx(dev) || ksz_is_ksz88x3(dev);
-+	return ksz_is_ksz87xx(dev) || ksz_is_ksz88x3(dev) ||
-+	       ksz_is_8895_family(dev);
- }
- 
- static inline int is_lan937x(struct ksz_device *dev)
-@@ -655,6 +664,7 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- #define SW_FAMILY_ID_M			GENMASK(15, 8)
- #define KSZ87_FAMILY_ID			0x87
- #define KSZ88_FAMILY_ID			0x88
-+#define KSZ8895_FAMILY_ID		0x95
- 
- #define KSZ8_PORT_STATUS_0		0x08
- #define KSZ8_PORT_FIBER_MODE		BIT(7)
-@@ -663,6 +673,12 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- #define KSZ87_CHIP_ID_94		0x6
- #define KSZ87_CHIP_ID_95		0x9
- #define KSZ88_CHIP_ID_63		0x3
-+#define KSZ8895_CHIP_ID_95		0x4
-+#define KSZ8895_CHIP_ID_95R		0x6
-+
-+/* KSZ8895 specific register */
-+#define REG_KSZ8864_CHIP_ID		0xFE
-+#define SW_KSZ8864			BIT(7)
- 
- #define SW_REV_ID_M			GENMASK(7, 4)
- 
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 8e8d83213b04..11d27df710fd 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -2,7 +2,7 @@
- /*
-  * Microchip ksz series register access through SPI
-  *
-- * Copyright (C) 2017 Microchip Technology Inc.
-+ * Copyright (C) 2017-2024 Microchip Technology Inc.
-  *	Tristram Ha <Tristram.Ha@microchip.com>
-  */
- 
-@@ -60,6 +60,9 @@ static int ksz_spi_probe(struct spi_device *spi)
- 		 chip->chip_id == KSZ8794_CHIP_ID ||
- 		 chip->chip_id == KSZ8765_CHIP_ID)
- 		regmap_config = ksz8795_regmap_config;
-+	else if (chip->chip_id == KSZ8895_CHIP_ID ||
-+		 chip->chip_id == KSZ8864_CHIP_ID)
-+		regmap_config = ksz8863_regmap_config;
- 	else
- 		regmap_config = ksz9477_regmap_config;
- 
-@@ -132,6 +135,14 @@ static const struct of_device_id ksz_dt_ids[] = {
- 		.compatible = "microchip,ksz8795",
- 		.data = &ksz_switch_chips[KSZ8795]
- 	},
-+	{
-+		.compatible = "microchip,ksz8895",
-+		.data = &ksz_switch_chips[KSZ8895]
-+	},
-+	{
-+		.compatible = "microchip,ksz8864",
-+		.data = &ksz_switch_chips[KSZ8864]
-+	},
- 	{
- 		.compatible = "microchip,ksz8863",
- 		.data = &ksz_switch_chips[KSZ8830]
-@@ -200,6 +211,8 @@ static const struct spi_device_id ksz_spi_ids[] = {
- 	{ "ksz8765" },
- 	{ "ksz8794" },
- 	{ "ksz8795" },
-+	{ "ksz8895" },
-+	{ "ksz8864" },
- 	{ "ksz8863" },
- 	{ "ksz8873" },
- 	{ "ksz9477" },
-diff --git a/include/linux/platform_data/microchip-ksz.h b/include/linux/platform_data/microchip-ksz.h
-index 8c659db4da6b..4b366b17391d 100644
---- a/include/linux/platform_data/microchip-ksz.h
-+++ b/include/linux/platform_data/microchip-ksz.h
-@@ -27,6 +27,8 @@ enum ksz_chip_id {
- 	KSZ8795_CHIP_ID = 0x8795,
- 	KSZ8794_CHIP_ID = 0x8794,
- 	KSZ8765_CHIP_ID = 0x8765,
-+	KSZ8895_CHIP_ID = 0x8895,
-+	KSZ8864_CHIP_ID = 0x8864,
- 	KSZ8830_CHIP_ID = 0x8830,
- 	KSZ9477_CHIP_ID = 0x00947700,
- 	KSZ9896_CHIP_ID = 0x00989600,
--- 
-2.34.1
-
+>
+> >  #define DWXLGMAC_ID          0x27
+> >
+> > +/* User Version */
+> > +#define DWXGMAC_USER_VER_X22 0x22
+> > +
+> >  #define STMMAC_CHAN0 0       /* Always supported and default for all c=
+hips */
+> >
+> >  /* TX and RX Descriptor Length, these need to be power of two.
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/e=
+thernet/stmicro/stmmac/hwif.c
+> > index 29367105df54..713cb5aa2c3e 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> > @@ -36,6 +36,18 @@ static u32 stmmac_get_dev_id(struct stmmac_priv *pri=
+v, u32 id_reg)
+> >       return (reg & GENMASK(15, 8)) >> 8;
+> >  }
+> >
+>
+> > +static u32 stmmac_get_user_version(struct stmmac_priv *priv, u32 id_re=
+g)
+> > +{
+> > +     u32 reg =3D readl(priv->ioaddr + id_reg);
+> > +
+> > +     if (!reg) {
+> > +             dev_info(priv->device, "User Version not available\n");
+> > +             return 0x0;
+> > +     }
+> > +
+> > +     return (reg & GENMASK(23, 16)) >> 16;
+> > +}
+> > +
+>
+> The User Version is purely a vendor-specific stuff defined on the
+> IP-core synthesis stage. Moreover I don't see you'll need it anyway.
+>
+Yes, we don't need this function with the 25GMAC entry.
+> >  static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
+> >  {
+> >       struct mac_device_info *mac =3D priv->hw;
+> > @@ -82,6 +94,18 @@ static int stmmac_dwmac4_quirks(struct stmmac_priv *=
+priv)
+> >       return 0;
+> >  }
+> >
+>
+> > +static int stmmac_dwxgmac_quirks(struct stmmac_priv *priv)
+> > +{
+> > +     struct mac_device_info *mac =3D priv->hw;
+> > +     u32 user_ver;
+> > +
+> > +     user_ver =3D stmmac_get_user_version(priv, GMAC4_VERSION);
+> > +     if (priv->synopsys_id =3D=3D DWXGMAC_CORE_4_00 &&
+> > +         user_ver =3D=3D DWXGMAC_USER_VER_X22)
+> > +             mac->dma =3D &dwxgmac400_dma_ops;
+> > +     return 0;
+> > +}
+> > +
+Will remove this function.
+> >  static int stmmac_dwxlgmac_quirks(struct stmmac_priv *priv)
+> >  {
+> >       priv->hw->xlgmac =3D true;
+> > @@ -256,7 +280,7 @@ static const struct stmmac_hwif_entry {
+> >               .mmc =3D &dwxgmac_mmc_ops,
+> >               .est =3D &dwmac510_est_ops,
+> >               .setup =3D dwxgmac2_setup,
+> > -             .quirks =3D NULL,
+> > +             .quirks =3D stmmac_dwxgmac_quirks,
+>
+> Why? You can just introduce a new stmmac_hw[] entry with the DW
+> 25GMAC-specific stmmac_dma_ops instance specified.
+>
+Will do.
+> -Serge(y)
+>
+> >       }, {
+> >               .gmac =3D false,
+> >               .gmac4 =3D false,
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/e=
+thernet/stmicro/stmmac/hwif.h
+> > index e53c32362774..6213c496385c 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > @@ -683,6 +683,7 @@ extern const struct stmmac_desc_ops dwxgmac210_desc=
+_ops;
+> >  extern const struct stmmac_mmc_ops dwmac_mmc_ops;
+> >  extern const struct stmmac_mmc_ops dwxgmac_mmc_ops;
+> >  extern const struct stmmac_est_ops dwmac510_est_ops;
+> > +extern const struct stmmac_dma_ops dwxgmac400_dma_ops;
+> >
+> >  #define GMAC_VERSION         0x00000020      /* GMAC CORE Version */
+> >  #define GMAC4_VERSION                0x00000110      /* GMAC4+ CORE Ve=
+rsion */
+> > --
+> > 2.34.1
+> >
+> >
 
