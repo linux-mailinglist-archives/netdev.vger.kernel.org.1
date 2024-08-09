@@ -1,385 +1,149 @@
-Return-Path: <netdev+bounces-117279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E467B94D71C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 21:17:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131EB94D726
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 21:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AEB028344F
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:17:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E7FF1F2523B
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 19:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A51315FA8A;
-	Fri,  9 Aug 2024 19:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3259615EFA4;
+	Fri,  9 Aug 2024 19:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U25OXcX1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZa6LtrD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C88182B3;
-	Fri,  9 Aug 2024 19:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E49156228;
+	Fri,  9 Aug 2024 19:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723231033; cv=none; b=HN3LIOW1jDPipxwyD8EwAiF0hNhlFgYK/4CxsWkYExDYIdjaM5R6jCAAtAmKdymfHIDc0rmJ3fJxiQ6AHkKZFlvYBJHw+G/otP8tQbi8Q4tRvJwTRvjrO9bdpUnHFfnokLHxcNCw38BA36+ONESgkGfg29GM1UjgZuh7ngWt4bw=
+	t=1723231319; cv=none; b=mNOAOsS2JOcvwf5l1lpb+AZICOt1/brWB8dz+0fGVZh1fuS45qCJ056QIU22G9Ans3YET1QC3Z98ZdwN4LkSMGmUFQywQanGiuS1uzgtNghWZklhgRr5RJQzcwcb2Bv7csl2tvsfAJiCHKJELhzX8rX7aZefRoNHAI1csD9Xsus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723231033; c=relaxed/simple;
-	bh=XmL5ncs3p6X8rgr9i2cov2GYQnkuex67uQt9cHDKhfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=JA48dSeSOZAVoH5WjJToa5L8mrWqI2zPyTd97Xvo3RNraDa83zVGfHY4yQsB4QUg/Shu84meBbLWg/+VtAlhY7dfV7maGR3VReVwrl3eSNDhWu9vIv3GjMWYShB1yRrQ3G57S58nikptJX8hK4xgwd8lUrXdV+OaBawjeP3Kz3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U25OXcX1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952A4C32782;
-	Fri,  9 Aug 2024 19:17:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723231032;
-	bh=XmL5ncs3p6X8rgr9i2cov2GYQnkuex67uQt9cHDKhfs=;
-	h=Date:From:To:Cc:Subject:From;
-	b=U25OXcX1QIHYgFDdyQWE//lrB98SXdM6pP2FUzHGA9r/Yey7/IMmScfO75IppX2rz
-	 /lcsYFavSgW+AWhLXEMmZ4tehDCIofU5PwR327R2VCFUFNszALI9UFhCaNG9oGfhvZ
-	 mZcJzOFsQqoBqQ25BD2V1FVjrCqCr6GZwfXIf95bWdfkRPb7ykUi8U7BJgCz/8jTg1
-	 UA9u0lzwdTQLCdKSLM2XGG7jBTecf9pK73lRYl2h/X29ghIxHBAh73l2e04GJJnAlh
-	 0R97nnNCgtK1hollwazKSpHoAqWclhx/L/OmUUnXB0s9UxigzT3h9X9sKAQamj+wRP
-	 1e5UIROKl6z/g==
-Date: Fri, 9 Aug 2024 13:17:09 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
+	s=arc-20240116; t=1723231319; c=relaxed/simple;
+	bh=t0e0a6LXI6LeDS1IfT6HENQbOl9eDddwRUJQCJMyh3o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lf9w0Z8X1uK3CgFnM5KUlY1usJ+LNzlyHctmZmxqRVaX+76Nj+dezCew6t7yIsCjpmsxWGw6gqa0JmGeF+g/QQS6CPYuFaUX92jcMIYKVgU7wTc+yRDZmeXEhSR7fdaKhbLauojK4e3nqg77JNCk4U5TtqGGVlE/Hsjmg+Tjg30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZa6LtrD; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eeb1ba040aso32733561fa.1;
+        Fri, 09 Aug 2024 12:21:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723231315; x=1723836115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3zQR5I5Z9YI9eBNAvBlhP8v0AMty41l/RawM3riRFrM=;
+        b=mZa6LtrDxr5bhxobUTTM12pz+GFx5SWu4n+QVatZXAEODrisKoC/WZlhC5q3tgmOIT
+         cKHMXR9zbE55cG/i2VCUvNc1sMrq4pCvy0kkBfETwul2cpLrxiFKhUAUdtTbdYhpUPao
+         knu+SVqFaA/yJR5VcnAlXxOLMeg12h7wG8jSOa4RW6iVyt38GhVmedQAhsIOEawJMEzl
+         yYYwHMMwuJWYaCfnMagEhHG6BVZLPItHa237I9obzKVOI23Of+G/DnVwPRI+HDqXmF0g
+         8DfE9Y817w92DUgqYVa8uQZHpVZRDc/so8rkkGbPlzrDFfaOGxZLIgk2sVhQAF/YJc28
+         mS7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723231315; x=1723836115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3zQR5I5Z9YI9eBNAvBlhP8v0AMty41l/RawM3riRFrM=;
+        b=Gvl6OD3xICf8o/ndZBQzfppJPMdbNpyllYO19KLVk/Dcw35+NFC2EtueqedE/msmHl
+         vIu2O8M8+WXNZL7/+3aw+Or+mPyzu0SJA4J716/eIq3g4TvkcwchU+1Gb1Sbv7eZLGBy
+         IxtmOYL/VenntcI+OGMEK7iUI3x3XrEuJeOeEBRK/w5X4sl1nqG5bcaU91zEwduRDXDu
+         b4TDJYSG8yHKgkV2kcQEl3DnTfGl7hVJcZT6YWxIn930cx+qs/qZfnxNUJ1XHdrGgLul
+         PiSSVWHu7G1JiZYGfytawf3XVL7ollRds2pNLdG8TrV+1iKo1EIJgSDPQk+CWf38bEG/
+         OS9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVRbHpRkbuTHQhiseLfLeiSJ8Kfpxf/022ttxlfZveHzTggkw+HvPYyns2aIRoSzLx0ee+iIRSeM+v7ZRFQNKPcP+ZGqooHv6tCTAB8YQLnVeQyVFsRgd3d/4I6BV6OMWa1Jk0U
+X-Gm-Message-State: AOJu0YzHqipAE3fv2TluMV+augnjD1e4SiefQvjA5vSd4CTVWs6/bJC1
+	cJmYnQqf+y8hH8op4Vjc+JzLfNVawt/QNCYMU2cJ5U+9XeF6PWpt
+X-Google-Smtp-Source: AGHT+IFZsdAmeqUUT6dg+xSHUP03KteOOKTe2JhiKfH0J1W1ciDN8u2ABk4LKTPDoact9/vXoMGhSg==
+X-Received: by 2002:a2e:9dc5:0:b0:2ef:21e5:1f01 with SMTP id 38308e7fff4ca-2f1a6d1da0dmr19326411fa.20.1723231314255;
+        Fri, 09 Aug 2024 12:21:54 -0700 (PDT)
+Received: from localhost ([109.197.207.99])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f291ddbbb0sm435501fa.8.2024.08.09.12.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Aug 2024 12:21:53 -0700 (PDT)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe CAVALLARO <peppe.cavallaro@st.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
 	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] wifi: iwlwifi: mvm: Use __counted_by() and avoid
- -Wfamnae warnings
-Message-ID: <ZrZrNfUZtUIqvbUI@cute>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: stmmac: Fix false "invalid port speed" warning
+Date: Fri,  9 Aug 2024 22:21:39 +0300
+Message-ID: <20240809192150.32756-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+If the internal SGMII/TBI/RTBI PCS is available in a DW GMAC or DW QoS Eth
+instance and there is no "snps,ps-speed" property specified (or the
+plat_stmmacenet_data::mac_port_sel_speed field is left zero), then the
+next warning will be printed to the system log:
 
-So, use the `DEFINE_FLEX()` helper for multiple on-stack definitions
-of flexible structures where the size of their flexible-array members
-are known at compile-time, and refactor the rest of the code,
-accordingly.
+> [  294.611899] stmmaceth 1f060000.ethernet: invalid port speed
 
-In order to allow for the use of `DEFINE_FLEX()`, a couple of
-structures were annotated with the `__counted_by()` attribute.
+By the original intention the "snps,ps-speed" property was supposed to be
+utilized on the platforms with the MAC2MAC link setup to fix the link
+speed with the specified value. But since it's possible to have a device
+with the DW *MAC with the SGMII/TBI/RTBI interface attached to a PHY, then
+the property is actually optional (which is also confirmed by the DW MAC
+DT-bindings). Thus it's absolutely normal to have the
+plat_stmmacenet_data::mac_port_sel_speed field zero initialized indicating
+that there is no need in the MAC-speed fixing and the denoted warning is
+false.
 
-With these changes, fix the following warnings:
-drivers/net/wireless/intel/iwlwifi/mvm/d3.c:124:52: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2053:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2148:43: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2211:43: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+Fix the warning by permitting the plat_stmmacenet_data::mac_port_sel_speed
+field to have the zero value in case if the internal PCS is available.
 
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Fixes: 02e57b9d7c8c ("drivers: net: stmmac: add port selection programming")
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+
 ---
- .../net/wireless/intel/iwlwifi/fw/api/sta.h   |   2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/d3.c   | 126 ++++++++----------
- drivers/net/wireless/intel/iwlwifi/mvm/sta.c  |   2 +-
- include/net/mac80211.h                        |   2 +-
- 4 files changed, 61 insertions(+), 71 deletions(-)
 
-diff --git a/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h b/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-index d7f8a276b683..fe6bd34fefa3 100644
---- a/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-+++ b/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-@@ -479,7 +479,7 @@ struct iwl_mvm_wep_key_cmd {
- 	u8 decryption_type;
- 	u8 flags;
- 	u8 reserved;
--	struct iwl_mvm_wep_key wep_key[];
-+	struct iwl_mvm_wep_key wep_key[] __counted_by(num_keys);
- } __packed; /* SEC_CURR_WEP_KEY_CMD_API_S_VER_2 */
- 
- /**
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-index b4d650583ac2..b19579dd8de3 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-@@ -120,19 +120,15 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
- 	switch (key->cipher) {
- 	case WLAN_CIPHER_SUITE_WEP40:
- 	case WLAN_CIPHER_SUITE_WEP104: { /* hack it for now */
--		struct {
--			struct iwl_mvm_wep_key_cmd wep_key_cmd;
--			struct iwl_mvm_wep_key wep_key;
--		} __packed wkc = {
--			.wep_key_cmd.mac_id_n_color =
--				cpu_to_le32(FW_CMD_ID_AND_COLOR(mvmvif->id,
--								mvmvif->color)),
--			.wep_key_cmd.num_keys = 1,
--			/* firmware sets STA_KEY_FLG_WEP_13BYTES */
--			.wep_key_cmd.decryption_type = STA_KEY_FLG_WEP,
--			.wep_key.key_index = key->keyidx,
--			.wep_key.key_size = key->keylen,
--		};
-+		DEFINE_FLEX(struct iwl_mvm_wep_key_cmd, wkc, wep_key, num_keys, 1);
-+
-+		wkc->mac_id_n_color =
-+			cpu_to_le32(FW_CMD_ID_AND_COLOR(mvmvif->id,
-+							mvmvif->color));
-+		/* firmware sets STA_KEY_FLG_WEP_13BYTES */
-+		wkc->decryption_type = STA_KEY_FLG_WEP;
-+		wkc->wep_key[0].key_index = key->keyidx;
-+		wkc->wep_key[0].key_size = key->keylen;
- 
- 		/*
- 		 * This will fail -- the key functions don't set support
-@@ -142,18 +138,18 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
- 		if (key->flags & IEEE80211_KEY_FLAG_PAIRWISE)
- 			break;
- 
--		memcpy(&wkc.wep_key.key[3], key->key, key->keylen);
-+		memcpy(&wkc->wep_key[0].key[3], key->key, key->keylen);
- 		if (key->keyidx == mvmvif->tx_key_idx) {
- 			/* TX key must be at offset 0 */
--			wkc.wep_key.key_offset = 0;
-+			wkc->wep_key[0].key_offset = 0;
- 		} else {
- 			/* others start at 1 */
- 			data->wep_key_idx++;
--			wkc.wep_key.key_offset = data->wep_key_idx;
-+			wkc->wep_key[0].key_offset = data->wep_key_idx;
+Note this fix will get to be mainly actual after the next patch is merged
+in:
+https://lore.kernel.org/netdev/E1sauuS-000tvz-6E@rmk-PC.armlinux.org.uk/
+
+Cc: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Andrew Halaney <ahalaney@redhat.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index f3a1b179aaea..fb63df1b99c0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3422,7 +3422,7 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+ 		if ((speed == SPEED_10) || (speed == SPEED_100) ||
+ 		    (speed == SPEED_1000)) {
+ 			priv->hw->ps = speed;
+-		} else {
++		} else if (speed) {
+ 			dev_warn(priv->device, "invalid port speed\n");
+ 			priv->hw->ps = 0;
  		}
- 
- 		mutex_lock(&mvm->mutex);
--		ret = iwl_mvm_send_cmd_pdu(mvm, WEP_KEY, 0, sizeof(wkc), &wkc);
-+		ret = iwl_mvm_send_cmd_pdu(mvm, WEP_KEY, 0, __struct_size(wkc), wkc);
- 		data->error = ret != 0;
- 
- 		mvm->ptk_ivlen = key->iv_len;
-@@ -2049,10 +2045,8 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
- 		struct iwl_wowlan_mlo_gtk *mlo_key = &status->mlo_keys[i];
- 		struct ieee80211_key_conf *key, *old_key;
- 		struct ieee80211_key_seq seq;
--		struct {
--			struct ieee80211_key_conf conf;
--			u8 key[32];
--		} conf = {};
-+		DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
-+			    WOWLAN_KEY_MAX_SIZE);
- 		u16 flags = le16_to_cpu(mlo_key->flags);
- 		int j, link_id, key_id, key_type;
- 
-@@ -2069,40 +2063,40 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
- 			    key_type >= WOWLAN_MLO_GTK_KEY_NUM_TYPES))
- 			continue;
- 
--		conf.conf.cipher = old_keys->cipher[link_id][key_type];
-+		conf->cipher = old_keys->cipher[link_id][key_type];
- 		/* WARN_ON? */
--		if (!conf.conf.cipher)
-+		if (!conf->cipher)
- 			continue;
- 
--		conf.conf.keylen = 0;
--		switch (conf.conf.cipher) {
-+		conf->keylen = 0;
-+		switch (conf->cipher) {
- 		case WLAN_CIPHER_SUITE_CCMP:
- 		case WLAN_CIPHER_SUITE_GCMP:
--			conf.conf.keylen = WLAN_KEY_LEN_CCMP;
-+			conf->keylen = WLAN_KEY_LEN_CCMP;
- 			break;
- 		case WLAN_CIPHER_SUITE_GCMP_256:
--			conf.conf.keylen = WLAN_KEY_LEN_GCMP_256;
-+			conf->keylen = WLAN_KEY_LEN_GCMP_256;
- 			break;
- 		case WLAN_CIPHER_SUITE_BIP_GMAC_128:
--			conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_128;
-+			conf->keylen = WLAN_KEY_LEN_BIP_GMAC_128;
- 			break;
- 		case WLAN_CIPHER_SUITE_BIP_GMAC_256:
--			conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_256;
-+			conf->keylen = WLAN_KEY_LEN_BIP_GMAC_256;
- 			break;
- 		case WLAN_CIPHER_SUITE_AES_CMAC:
--			conf.conf.keylen = WLAN_KEY_LEN_AES_CMAC;
-+			conf->keylen = WLAN_KEY_LEN_AES_CMAC;
- 			break;
- 		case WLAN_CIPHER_SUITE_BIP_CMAC_256:
--			conf.conf.keylen = WLAN_KEY_LEN_BIP_CMAC_256;
-+			conf->keylen = WLAN_KEY_LEN_BIP_CMAC_256;
- 			break;
- 		}
- 
--		if (WARN_ON(!conf.conf.keylen ||
--			    conf.conf.keylen > sizeof(conf.key)))
-+		if (WARN_ON(!conf->keylen ||
-+			    conf->keylen > WOWLAN_KEY_MAX_SIZE))
- 			continue;
- 
--		memcpy(conf.conf.key, mlo_key->key, conf.conf.keylen);
--		conf.conf.keyidx = key_id;
-+		memcpy(conf->key, mlo_key->key, conf->keylen);
-+		conf->keyidx = key_id;
- 
- 		old_key = old_keys->key[link_id][key_id];
- 		if (old_key) {
-@@ -2114,7 +2108,7 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
- 
- 		IWL_DEBUG_WOWLAN(mvm, "Add MLO key id %d, link id %d\n",
- 				 key_id, link_id);
--		key = ieee80211_gtk_rekey_add(vif, &conf.conf, link_id);
-+		key = ieee80211_gtk_rekey_add(vif, conf, link_id);
- 		if (WARN_ON(IS_ERR(key))) {
- 			ret = false;
- 			goto out;
-@@ -2144,30 +2138,28 @@ static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
- {
- 	int i, j;
- 	struct ieee80211_key_conf *key;
--	struct {
--		struct ieee80211_key_conf conf;
--		u8 key[32];
--	} conf = {
--		.conf.cipher = gtk_cipher,
--	};
-+	DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
-+		    WOWLAN_KEY_MAX_SIZE);
- 	int link_id = vif->active_links ? __ffs(vif->active_links) : -1;
- 
-+	conf->cipher = gtk_cipher;
-+
- 	BUILD_BUG_ON(WLAN_KEY_LEN_CCMP != WLAN_KEY_LEN_GCMP);
--	BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_CCMP);
--	BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_GCMP_256);
--	BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_TKIP);
--	BUILD_BUG_ON(sizeof(conf.key) < sizeof(status->gtk[0].key));
-+	BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_CCMP);
-+	BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_GCMP_256);
-+	BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_TKIP);
-+	BUILD_BUG_ON(conf->keylen < sizeof(status->gtk[0].key));
- 
- 	switch (gtk_cipher) {
- 	case WLAN_CIPHER_SUITE_CCMP:
- 	case WLAN_CIPHER_SUITE_GCMP:
--		conf.conf.keylen = WLAN_KEY_LEN_CCMP;
-+		conf->keylen = WLAN_KEY_LEN_CCMP;
- 		break;
- 	case WLAN_CIPHER_SUITE_GCMP_256:
--		conf.conf.keylen = WLAN_KEY_LEN_GCMP_256;
-+		conf->keylen = WLAN_KEY_LEN_GCMP_256;
- 		break;
- 	case WLAN_CIPHER_SUITE_TKIP:
--		conf.conf.keylen = WLAN_KEY_LEN_TKIP;
-+		conf->keylen = WLAN_KEY_LEN_TKIP;
- 		break;
- 	default:
- 		WARN_ON(1);
-@@ -2177,14 +2169,14 @@ static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
- 		if (!status->gtk[i].len)
- 			continue;
- 
--		conf.conf.keyidx = status->gtk[i].id;
-+		conf->keyidx = status->gtk[i].id;
- 		IWL_DEBUG_WOWLAN(mvm,
- 				 "Received from FW GTK cipher %d, key index %d\n",
--				 conf.conf.cipher, conf.conf.keyidx);
--		memcpy(conf.conf.key, status->gtk[i].key,
-+				 conf->cipher, conf->keyidx);
-+		memcpy(conf->key, status->gtk[i].key,
- 		       sizeof(status->gtk[i].key));
- 
--		key = ieee80211_gtk_rekey_add(vif, &conf.conf, link_id);
-+		key = ieee80211_gtk_rekey_add(vif, conf, link_id);
- 		if (IS_ERR(key))
- 			return false;
- 
-@@ -2207,41 +2199,39 @@ iwl_mvm_d3_igtk_bigtk_rekey_add(struct iwl_wowlan_status_data *status,
- 				struct iwl_multicast_key_data *key_data)
- {
- 	struct ieee80211_key_conf *key_config;
--	struct {
--		struct ieee80211_key_conf conf;
--		u8 key[WOWLAN_KEY_MAX_SIZE];
--	} conf = {
--		.conf.cipher = cipher,
--		.conf.keyidx = key_data->id,
--	};
-+	DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
-+		    WOWLAN_KEY_MAX_SIZE);
- 	struct ieee80211_key_seq seq;
- 	int link_id = vif->active_links ? __ffs(vif->active_links) : -1;
- 
-+	conf->cipher = cipher;
-+	conf->keyidx = key_data->id;
-+
- 	if (!key_data->len)
- 		return true;
- 
--	iwl_mvm_d3_set_igtk_bigtk_ipn(key_data, &seq, conf.conf.cipher);
-+	iwl_mvm_d3_set_igtk_bigtk_ipn(key_data, &seq, conf->cipher);
- 
- 	switch (cipher) {
- 	case WLAN_CIPHER_SUITE_BIP_GMAC_128:
--		conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_128;
-+		conf->keylen = WLAN_KEY_LEN_BIP_GMAC_128;
- 		break;
- 	case WLAN_CIPHER_SUITE_BIP_GMAC_256:
--		conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_256;
-+		conf->keylen = WLAN_KEY_LEN_BIP_GMAC_256;
- 		break;
- 	case WLAN_CIPHER_SUITE_AES_CMAC:
--		conf.conf.keylen = WLAN_KEY_LEN_AES_CMAC;
-+		conf->keylen = WLAN_KEY_LEN_AES_CMAC;
- 		break;
- 	case WLAN_CIPHER_SUITE_BIP_CMAC_256:
--		conf.conf.keylen = WLAN_KEY_LEN_BIP_CMAC_256;
-+		conf->keylen = WLAN_KEY_LEN_BIP_CMAC_256;
- 		break;
- 	default:
- 		WARN_ON(1);
- 	}
--	BUILD_BUG_ON(sizeof(conf.key) < sizeof(key_data->key));
--	memcpy(conf.conf.key, key_data->key, conf.conf.keylen);
-+	BUILD_BUG_ON(WOWLAN_KEY_MAX_SIZE < sizeof(key_data->key));
-+	memcpy(conf->key, key_data->key, conf->keylen);
- 
--	key_config = ieee80211_gtk_rekey_add(vif, &conf.conf, link_id);
-+	key_config = ieee80211_gtk_rekey_add(vif, conf, link_id);
- 	if (IS_ERR(key_config))
- 		return false;
- 	ieee80211_set_key_rx_seq(key_config, 0, &seq);
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/sta.c b/drivers/net/wireless/intel/iwlwifi/mvm/sta.c
-index 15e64d94d6ea..7e550d880584 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/sta.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/sta.c
-@@ -4350,8 +4350,8 @@ int iwl_mvm_add_pasn_sta(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
- 		goto out;
- 
- 	keyconf->cipher = cipher;
--	memcpy(keyconf->key, key, key_len);
- 	keyconf->keylen = key_len;
-+	memcpy(keyconf->key, key, keyconf->key_len);
- 	keyconf->flags = IEEE80211_KEY_FLAG_PAIRWISE;
- 
- 	if (mld) {
-diff --git a/include/net/mac80211.h b/include/net/mac80211.h
-index 0a04eaf5343c..d3f6056daf8a 100644
---- a/include/net/mac80211.h
-+++ b/include/net/mac80211.h
-@@ -2222,7 +2222,7 @@ struct ieee80211_key_conf {
- 	u16 flags;
- 	s8 link_id;
- 	u8 keylen;
--	u8 key[];
-+	u8 key[] __counted_by(keylen);
- };
- 
- #define IEEE80211_MAX_PN_LEN	16
 -- 
-2.34.1
+2.43.0
 
 
