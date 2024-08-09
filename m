@@ -1,106 +1,115 @@
-Return-Path: <netdev+bounces-117295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A4E894D7EA
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 22:12:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56FE794D7F8
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 22:21:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81AEB1F231ED
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 20:12:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75C051C22540
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 20:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2468C168491;
-	Fri,  9 Aug 2024 20:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="37MF4qDC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A82154C14;
+	Fri,  9 Aug 2024 20:21:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832FB16631D;
-	Fri,  9 Aug 2024 20:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C327233D1;
+	Fri,  9 Aug 2024 20:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723234355; cv=none; b=VKAsqsDAOAKhJDfx7AjmFl1i+1+tkq34c5gZWzNGzN7P4z2EGH0OUHWJjZL8Wl+Slp+BV0DT562TxcF62msMOjOscJoxOUWJTFnlKwMGI/S97UuutAgTpQyN6QkRSSdCw6jE6MQ+PRLxa70TjuCjNPIb/YxzKCNS6Vq2nKPk9s4=
+	t=1723234864; cv=none; b=oYHkAV5miihQrpjgEwBZGhVeQz5lSWj/4DpHsTh7HBHyrYLcPchF4BtT/LOMdCEl7VaMc1CKK6DChia8EGb4T1dXrkIIKTZj1QPd8xHpfA5XerlzY9OBYKdR7KRgjHf/MRfXcvsDeqmkcENehrc6CRL3fT/mEpWVaHSH1Vd98t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723234355; c=relaxed/simple;
-	bh=yxz/9Z8hbk/AFx//nlh592Y/HtFW2+wYEcSWLagWHYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QxuW56c636w/MZGVj0viWkP47RQrapjej1x4z0tA5wDYrYJm+D4e+nM4tWtOsxhRp89CPLEeod6nB9/tRAI8Q4l9qXt9aYlY/NC4b74brXWlyffxb+c/UI97bvyV+1NxMl9KlZ3hFjOKBCtNXQZKJHQr3igArQNuqPc12vne3iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=37MF4qDC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=Z5QS2qEeOwVyIpPcCh3cLZBVfiJJzs6EipXGvtlfdxQ=; b=37
-	MF4qDC1Pige+qK5wnT6Q0ZZ8VnI0zkzlzR/NagidfQAazneybO4/jJeaee2cjlCjtIiGlEfBMszqV
-	xCkBlwe6iKmJYyJJlGOpzOewLZo31j98RuykJb3eI7tQiadGedLv1wGqzZtnnedsW5cU7Ul0YS3Xh
-	IJLuhwfoQIY4f1Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1scVy6-004PWk-1c; Fri, 09 Aug 2024 22:12:10 +0200
-Date: Fri, 9 Aug 2024 22:12:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
-	linux@armlinux.org.uk, horms@kernel.org,
-	florian.fainelli@broadcom.com
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add PCI driver support for
- BCM8958x
-Message-ID: <5ff4a297-bafd-4b33-aae1-5a983f49119a@lunn.ch>
-References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
- <20240802031822.1862030-4-jitendra.vegiraju@broadcom.com>
- <c2e2f11a-89d8-42fa-a655-972a4ab372da@lunn.ch>
- <CAMdnO-JBznFpExduwCAm929N73Z_p4S4_nzRaowL9SzseqC6LA@mail.gmail.com>
- <de5b4d42-c81d-4687-b244-073142e2967b@lunn.ch>
- <CAMdnO-+_2Fy=uNgGevtnL8PGPvKyWXPvYaxOJwKcUZj+nnfqYg@mail.gmail.com>
+	s=arc-20240116; t=1723234864; c=relaxed/simple;
+	bh=9pjaJVblH+a3wOhm0a2g/cjkxPhurbm/9byvAbPg0EE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gBx2mHuIAPt//GYLxpR8TUBD6i6jSYQBmabIH4+qIqJTsKVJH7IeZ7GsgcYNgyd77BeMd/LrXn0s52ZwN+he7+DSQ6Pgaf2Sc1i2hvWHpzFxQQnas5XZ4EsWd5Miw3hqp1y7eM3hGXI0jpf2uGeAY4IymaMOeGg1gir6KDAhNEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.86.72) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Aug
+ 2024 23:20:46 +0300
+Subject: Re: [PATCH] netfilter: nfnetlink_log: remove unnecessary check in
+ __build_packet_message()
+To: Roman Smirnov <r.smirnov@omp.ru>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Karina Yankevich
+	<k.yankevich@omp.ru>, <lvc-project@linuxtesting.org>
+References: <20240809074035.11078-1-r.smirnov@omp.ru>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <1d68bf3e-9d71-25fd-826b-250bf9160bda@omp.ru>
+Date: Fri, 9 Aug 2024 23:20:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMdnO-+_2Fy=uNgGevtnL8PGPvKyWXPvYaxOJwKcUZj+nnfqYg@mail.gmail.com>
+In-Reply-To: <20240809074035.11078-1-r.smirnov@omp.ru>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 08/09/2024 20:03:51
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 186981 [Aug 09 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 24 0.3.24
+ 186c4d603b899ccfd4883d230c53f273b80e467f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.72 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.72 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.72
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/09/2024 20:08:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 8/9/2024 6:31:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, Aug 08, 2024 at 06:54:51PM -0700, Jitendra Vegiraju wrote:
-> On Tue, Aug 6, 2024 at 4:15 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Mon, Aug 05, 2024 at 05:56:43PM -0700, Jitendra Vegiraju wrote:
-> > > On Fri, Aug 2, 2024 at 4:08 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > > >
-> > > > > Management of integrated ethernet switch on this SoC is not handled by
-> > > > > the PCIe interface.
-> > > >
-> > > > MDIO? SPI? I2C?
-> > > >
-> > > The device uses SPI interface. The switch has internal ARM M7 for
-> > > controller firmware.
-> >
-> > Will there be a DSA driver sometime soon talking over SPI to the
-> > firmware?
-> >
-> Hi Andrew,
+On 8/9/24 10:40 AM, Roman Smirnov wrote:
 
-So the switch will be left in dumb switch everything to every port
-mode? Or it will be totally autonomous using the in build firmware?
+> skb->dev is always non-NULL, the check is unnecessary.
+> 
+> Remove it.
 
-What you cannot expect is we allow you to manage the switch from Linux
-using something other than an in kernel driver, probably DSA or pure
-switchdev.
+   Mhm, I don't think we need that in a separate paragraph...
 
-	Andrew
+> Found by Linux Verification Center (linuxtesting.org) with Svace.
+> 
+> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+[...]
+
+MBR, Sergey
 
