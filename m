@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-117321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E973E94D94E
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:54:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55D494D94F
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A6F2815F0
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61F761F20F5D
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF75016C872;
-	Fri,  9 Aug 2024 23:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3758416D4D6;
+	Fri,  9 Aug 2024 23:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="O991TokH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="p/vIaenx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5EA1684BB
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEB216D336
+	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723247665; cv=none; b=Cui647z+sVD75vgG+z3lQ07WMDA8Iv43vxySyjQiub6xqB9Li2HeZtWpCszmIx+vt4uhkPww90mfUni5qtCd+qoKZAMvMTbmYdsyDiApDSsyJwXEAQc5efXJQSLyKKtqxkv8Qvbt7ymkI/C6sDgogh4tP/B0INR921yOGbrele4=
+	t=1723247691; cv=none; b=cFBiWYaxLv1zNYwYTXetUPnvfUHUtGoa+pP+COKBJ04WY6YQROvGlMR5HkzkaXUXRYrD7GE8Z2YB2XS4ARyFTjC+DnKawDL7qe96l6ttX2MP6z9vWb+XpNA8sTsfmv8VfDhJN7QcGozxb7jyXsQ2VazD7YcMgZGgdqWPwcPt8XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723247665; c=relaxed/simple;
-	bh=+OtvW9lF7JP2Hxlfg1iQObw0eCNuFm0KYYGl8xG5m5o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VX35GLfsxuSg4Ovy00FWrr5bTLT5ctUp5QIAYwAx/UzcYkPnN0IGLfdMmvPB+xLNdBlXR0sAzjMz/uN9UCQN1kX9eW/H9vLWCONrbP4KqClkA38iw6BDdtsU1YHp05BaKd6Rw4LXgTJ6HDrgHAvbXYAdISbNNmWcoINoOYAZw0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=O991TokH; arc=none smtp.client-ip=52.95.49.90
+	s=arc-20240116; t=1723247691; c=relaxed/simple;
+	bh=1am5c+uZfzGwYEUCK6w+DhpL0oasHEbvIb7d9LHrvns=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rFzPFtayrb7pTNO848Ov4L98A62L4V/NU38Uci0IoTUGjbD9YAEoj1UQDv5wdNQ7CyeJetH1j55jk+dqyY3B5mdRFLu7QaEdncel/zYxmrNFAYnZ2yzUx1iNztDWRuQM751FfFu1sDiuCEkT3r3AnLmq0cgnf1fly7nwCMo1vbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=p/vIaenx; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723247664; x=1754783664;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wHpO89d5mdsDG6n3tokFYT0/Itf9zVPIjc3GXpSb/fQ=;
-  b=O991TokHlaM8pBmFuJIGXfVC9YSpAxEY0lzzzg4woQpI3kyGab8PGH7K
-   ytmXE4U4dD4VLW2ZAZMz344r2KM5VnMqa4x2i+hGQFoniBUaxP/NhrpXN
-   Xpe7mEqe/gndudKgLxYdkGmMIS1o56XBb6o0rdvh5jEgCOMAW53wt+mGd
+  t=1723247690; x=1754783690;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AeLWdRYJBFdywWu/54/JpExV5I5i449GABvBohOlQp8=;
+  b=p/vIaenxiw75dDP9YZraiXKvXPKJrlMydz9AfY7LFfHycBeIAaaDDL9M
+   rGKmb4kFTXXkDhkJ5fe6KzlBOfPqoPKpz/G1en40h1bhasJFWwkmrD8il
+   7lLbqucEjP5MVThg5q1LC1e074svy15ELaoWKBhrhF7HDSD06p9LFSB/i
    k=;
 X-IronPort-AV: E=Sophos;i="6.09,277,1716249600"; 
-   d="scan'208";a="426094026"
+   d="scan'208";a="673101580"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 23:54:21 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:47245]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.82:2525] with esmtp (Farcaster)
- id 0d9e5ad8-15d6-4a86-ba23-6cb45f62b42a; Fri, 9 Aug 2024 23:54:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 0d9e5ad8-15d6-4a86-ba23-6cb45f62b42a
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 23:54:46 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:12005]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.16:2525] with esmtp (Farcaster)
+ id 96101a8a-c94c-4df8-ab0a-bbc8a836c315; Fri, 9 Aug 2024 23:54:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 96101a8a-c94c-4df8-ab0a-bbc8a836c315
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:54:20 +0000
+ Fri, 9 Aug 2024 23:54:44 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:54:17 +0000
+ Fri, 9 Aug 2024 23:54:41 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 0/5] ip: Random cleanup for devinet.c
-Date: Fri, 9 Aug 2024 16:54:01 -0700
-Message-ID: <20240809235406.50187-1-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 1/5] ipv4: Check !in_dev earlier for ioctl(SIOCSIFADDR).
+Date: Fri, 9 Aug 2024 16:54:02 -0700
+Message-ID: <20240809235406.50187-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240809235406.50187-1-kuniyu@amazon.com>
+References: <20240809235406.50187-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,27 +77,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB001.ant.amazon.com (10.13.139.148) To
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-patch 1 ~ 3 remove defensive !ifa->ifa_dev tests.
-patch 4 & 5 deduplicate common code.
+dev->ip_ptr could be NULL if we set an invalid MTU.
 
+Even then, if we issue ioctl(SIOCSIFADDR) for a new IPv4 address,
+devinet_ioctl() allocates struct in_ifaddr and fails later in
+inet_set_ifa() because in_dev is NULL.
 
-Kuniyuki Iwashima (5):
-  ipv4: Check !in_dev earlier for ioctl(SIOCSIFADDR).
-  ipv4: Set ifa->ifa_dev in inet_alloc_ifa().
-  ipv4: Remove redundant !ifa->ifa_dev check.
-  ipv4: Initialise ifa->hash in inet_alloc_ifa().
-  ip: Move INFINITY_LIFE_TIME to addrconf.h.
+Let's move the check earlier.
 
- .../ethernet/qlogic/netxen/netxen_nic_main.c  |  5 +-
- .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |  2 +-
- include/net/addrconf.h                        |  4 +-
- net/ipv4/devinet.c                            | 47 +++++++++----------
- net/ipv6/addrconf.c                           |  2 -
- 5 files changed, 27 insertions(+), 33 deletions(-)
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/ipv4/devinet.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index d96f3e452fef..ddab15116454 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -574,10 +574,6 @@ static int inet_set_ifa(struct net_device *dev, struct in_ifaddr *ifa)
+ 
+ 	ASSERT_RTNL();
+ 
+-	if (!in_dev) {
+-		inet_free_ifa(ifa);
+-		return -ENOBUFS;
+-	}
+ 	ipv4_devconf_setall(in_dev);
+ 	neigh_parms_data_state_setall(in_dev->arp_parms);
+ 	if (ifa->ifa_dev != in_dev) {
+@@ -1184,6 +1180,8 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
+ 
+ 		if (!ifa) {
+ 			ret = -ENOBUFS;
++			if (!in_dev)
++				break;
+ 			ifa = inet_alloc_ifa();
+ 			if (!ifa)
+ 				break;
 -- 
 2.30.2
 
