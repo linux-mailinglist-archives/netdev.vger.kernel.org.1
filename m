@@ -1,139 +1,109 @@
-Return-Path: <netdev+bounces-117224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12CB94D27C
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:49:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B494D27F
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 16:49:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E22411C213E1
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:49:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A82281B40
+	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 14:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13AC193090;
-	Fri,  9 Aug 2024 14:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF58A19754A;
+	Fri,  9 Aug 2024 14:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnzKiw/O"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="Vld4p26j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28193195980;
-	Fri,  9 Aug 2024 14:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D84195809;
+	Fri,  9 Aug 2024 14:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723214953; cv=none; b=saEiiYC8I3GAmcy9YcoRH2L1hpwwp07X/cooRZu4janHyzvpcDc43AAeJi+a7iO/MeN0J1h0USbq0/99liFLX1gTi5XTu8LINbWUiUYtyysk/NJ/J4HOvSjzp1npqpAYr+7rb18Zbwkr9d/+aqipu/q2mTeiB9PFQ0ZVm0nBfCk=
+	t=1723214964; cv=none; b=SmBBFZYAsddq1/0nqJV+A1eiwVqzAKSdqMO2uVztpwhfL5HHXgWMN5XzWR0Qd/Zo4uTLYus5fk7r1b8foQGwYEvVPptJmDNwiAgTYb4Yi+JXvTt/fPML+3GCbWxrXLQOTqteBrU06bZrTURG0DWG7AMF5evmScNQTUviRNP2l+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723214953; c=relaxed/simple;
-	bh=vn7LfbjPhATnOujxqUmZwluZtBU3qLpvzFawLfUqrU8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gbYCrUd1vm1D3vmCx5FAw701yFoKjpRM7DDbRl2Wm4dwl0JhKD9uCYJeZWiDVqpy4DLE26LGq0O3tWdybMSXSu6xqSecbADqnhcFddwlAwn3zq0GVNos2Rz44otQtPtxWLiOA6E3esbfswkeMOBwHfimcaiAeynIzdDMQvTOjP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PnzKiw/O; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f0271b0ae9so21790151fa.1;
-        Fri, 09 Aug 2024 07:49:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723214950; x=1723819750; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CE9WjafHbNcAarbfWw+lBM4t01a9uasEkOO/YQedVzY=;
-        b=PnzKiw/OmjXq0pmmGKSfnsmAyhbtppB6mE/dYO0QJt0LMfI6Wf9xZBKSweoQvp8wJU
-         u8WSaYiYdHFQWFyoWWdv6RMXME9ugyLM9p4w83rjvnA86fCFo074IEPrRl9ZQTUwKGO8
-         piSKp/UikOwM9lbagexOWOqP8GPojamTF9eFZwaDZ/4i4wLfn4Y6fPdn2FooZYmRkFNI
-         vIOXuovUaCKrJCXaQz4x20ohLo7kM1VvwkMaqvLyWtsWc2onzBETXj2QKs+ecRU8cINS
-         ghfzzCowFExbxCI7LKFysIWaxSZ5rcJZFFnHX/r5YKwkfAOOiL2c0i4BTb62rfJFhvor
-         BDBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723214950; x=1723819750;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CE9WjafHbNcAarbfWw+lBM4t01a9uasEkOO/YQedVzY=;
-        b=jNFfZSUpsIH7y6SVAavX4iTTjqzSeWcfaP6TcemWfTAGXI8PyB9Hpl8ophXKZPPSN7
-         ZqTDhHGjcjXKsNhhsCXx45iq0ynpJdueomEAYHLSqWF7xlAa4sOrfubHZWagABUwbzX+
-         kFvJTJmNrzdV7WaXRM5s/P2743WIHtYynMkCig2H1mITZoJ/UbAwTirRRj3B/GZqEstn
-         wzm/tgiE1kGU3lHbO8f2c3Ya9fBxveuNIj9WbVS33/hE/f8mm73OEZnxAfYc1sALBd7h
-         d5WvBmA0+hfaYGpD1IMh2WbNvp7qD0aojmyV+vVi02vN9BMUihHs/Jdd/QP4XjyKfbyM
-         4pVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCA3IcJgzOKwxrsb3fLOwJcgdBgTpKBTOWxZoY+yGNhDGAOVJfCc35HzedwPxSSk3ssM8DltOs7/6HnYS8K3nJ7oGHrsXY3rUCJrSqK2TPfkdoblpQDPzcF0CVrnDrZLgJvN2fgGlu
-X-Gm-Message-State: AOJu0YyeE9tj2KepMEa5FdNDTJv867TJzBIGvAPWfcj18AjlHC5h8p35
-	RFRxJ8sACIuI9MhkNJshJaLre1jjMy3r+aencLsWjMch8fp372koikl8hMYa7eDKcVPc3yedp8N
-	OzN0Jkz/lqIu22KJEjq+aGqOqAADxIimu
-X-Google-Smtp-Source: AGHT+IFZqhLtje5XgnpiqTXNnHVHcvu6hqbGLwt4IP16T8g3vt4Ks5rc+0NKr3pTRE679D+NKxLwoSyJ1e+mflcZxpI=
-X-Received: by 2002:a05:651c:551:b0:2ef:2c86:4d45 with SMTP id
- 38308e7fff4ca-2f1a6d1d224mr14931431fa.27.1723214949602; Fri, 09 Aug 2024
- 07:49:09 -0700 (PDT)
+	s=arc-20240116; t=1723214964; c=relaxed/simple;
+	bh=22tE3bcxOV4XQUyxYBM8SclBMeZRi8d9Ee40iy2gYwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxsI+UZ9Z8bYrWEv3bcB6bbkCNd5X4q9UpbVSqBr0+knDonN2pqVy6OukRbICwbJZ4rAyEAaS+y7KIt+OOwfSYvnYuT/p2oR6QzqvGEYNlMIdJlHvevzGu8feSwKmbcpobf7N6r56zmFIMtWEWcoSsyuDVaqQgdV45V5uhpP9tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=Vld4p26j; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 2CD7C1F8BD;
+	Fri,  9 Aug 2024 16:49:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1723214959;
+	bh=vqTV2il+IVohltGgzCzW6B4mCGXHGDpJVmefQp88URU=; h=From:To:Subject;
+	b=Vld4p26j0w6i6/Wg3NX21IYkJ+teBsKRvXvoXaYpJv5mTvAmKOIF4tIBvUx4Z10ec
+	 N8NfuGQGrkHEuk4ajEUc7NYzOZ14RibmCjvj12eV6PjtDsublnI2cwO48jBYp10E3D
+	 NMl/Gm5Ew1cfzu+hr7FPxRz+OrzrhxWoy+TnZLDSnwyjtR9dFi7+yt6mBENywxsh4+
+	 lBQCpzo4rk7Gca84OthJp1GfoRLuWL3uqJFz/8vU3YUnur86x/UaLnyCZ1SXzj4REr
+	 +D6+d42NChiQoEQSB1TLuxUFCzQsthr0uCJpUfjv8mGnwNeef/5kL6s5ozCh9CoEoL
+	 FSI/NreBAG3gA==
+Date: Fri, 9 Aug 2024 16:49:14 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Conor Dooley <conor@kernel.org>
+Cc: Francesco Dolcini <francesco@dolcini.it>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Linux Team <linux-imx@nxp.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: fec: add pps channel
+ property
+Message-ID: <20240809144914.GA418297@francesco-nb>
+References: <20240809094804.391441-1-francesco@dolcini.it>
+ <20240809094804.391441-2-francesco@dolcini.it>
+ <20240809-bunt-undercook-3bb1b5da084f@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240807210103.142483-1-luiz.dentz@gmail.com> <172308842863.2761812.8638817331652488290.git-patchwork-notify@kernel.org>
-In-Reply-To: <172308842863.2761812.8638817331652488290.git-patchwork-notify@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Aug 2024 10:48:56 -0400
-Message-ID: <CABBYNZ+ERf+EzzbWSz3nt2Qo2yudktM_wiV5n3PRajaOnEmU=A@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2024-07-26
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240809-bunt-undercook-3bb1b5da084f@spud>
 
-Hi Jakub,
+On Fri, Aug 09, 2024 at 03:27:39PM +0100, Conor Dooley wrote:
+> On Fri, Aug 09, 2024 at 11:48:02AM +0200, Francesco Dolcini wrote:
+> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
+> > 
+> > Add fsl,pps-channel property to specify to which timer instance the PPS
+> > channel is connected to.
+> 
+> In the driver patch you say "depending on the soc ... might be routed to
+> different timer instances", why is a soc-specific compatible
+> insufficient to determine which timer instance is in use?
+> I think I know what you mean, but I'm not 100%.
+> 
+> That said, the explanation in the driver patch is better than the one
+> here, so a commit message improvement is required.
 
-On Wed, Aug 7, 2024 at 11:40=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.org=
-> wrote:
->
-> Hello:
->
-> This pull request was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
->
-> On Wed,  7 Aug 2024 17:01:03 -0400 you wrote:
-> > The following changes since commit 1ca645a2f74a4290527ae27130c8611391b0=
-7dbf:
-> >
-> >   net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:35:08 -0700=
-)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git=
- tags/for-net-2024-08-07
-> >
-> > [...]
->
-> Here is the summary with links:
->   - pull request: bluetooth 2024-07-26
->     https://git.kernel.org/netdev/net/c/b928e7d19dfd
->
-> You are awesome, thank you!
+This was clarified by NXP during the discussion on this series [1] and the
+commit messages were not amended to take this new information into
+account, my fault.
 
-Im trying to rebase on top of net-next but Im getting the following error:
+I would propose something like this here:
 
-In file included from arch/x86/entry/vdso/vgetrandom.c:7:
-arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c: In function
-=E2=80=98memcpy_and_zero_src=E2=80=99:
-arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:18:17: error:
-implicit declaration of function =E2=80=98__put_unaligned_t=E2=80=99; did y=
-ou mean
-=E2=80=98__put_unaligned_le24=E2=80=99? [-Wimplicit-function-declaration]
+```
+Add fsl,pps-channel property to select where to connect the PPS
+signal. This depends on the internal SoC routing and on the board, for
+example on the i.MX8 SoC it can be connected to an external pin (using
+channel 1) or to internal eDMA as DMA request (channel 0).
+```
 
-I tried to google it but got no results, perhaps there is something
-wrong with my .config, it used to work just fine but it seems
-something had changed.
+Francesco
 
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
-
-
---=20
-Luiz Augusto von Dentz
+[1] https://lore.kernel.org/all/ZrPYOWA3FESx197L@lizhi-Precision-Tower-5810/
 
