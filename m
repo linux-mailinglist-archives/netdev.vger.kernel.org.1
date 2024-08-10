@@ -1,92 +1,169 @@
-Return-Path: <netdev+bounces-117349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102C094DAA3
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 06:19:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFE994DAAD
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 06:22:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DBB9B2236E
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 04:19:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD822B21405
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 04:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821C813A24E;
-	Sat, 10 Aug 2024 04:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k96D8T4F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB1613B7A6;
+	Sat, 10 Aug 2024 04:22:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A7612F5A5;
-	Sat, 10 Aug 2024 04:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F3D1311A7;
+	Sat, 10 Aug 2024 04:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723263553; cv=none; b=JKBp0ziwGTmSHGTQOrojVqzcW/AxNvxelFgf7Lkla3ly/NiaQj1GF8hRvGMT9wUrBkFz/eAxAJb8ECZrZ3GVFukYbrKHzEACIbxLJFfTLoUlbMWk1lgK56FNbiKySqGOG77BL2m4+pkgKRc/IAgqRX2ZL9LpoIbQmD9GWXBQ7ts=
+	t=1723263749; cv=none; b=J5gR17cQZ2x1Z3xeqycpUskEnxpRQovm52ZI9TJDI4F9ire530ljNowdV9UHen5khJMM/L5vyKFQzGHsXwtiRBItOW5spOjIbykLoQQ5AHPALel2wgctNdR8+UGK6yV3Jg+PbTOs/RVK4h1i/F2mysQqSpiL2+6JXolEnZvFrTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723263553; c=relaxed/simple;
-	bh=dQzfxZAD3qNzYbumf4DNUxhUH2jPoo74d3tLNMZfBBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WhWtCdvfLul5f9tq4yHhAVqqOUVqBZl+6LfiBUrnUmmMHNAckfA6cLhGq9Cwh6K/BGvfwXZlA+MOHEe0hLsJirAtQjXEqyF4eQruOI5R4VLJJUnp6naooUZvhw805JokYbmMU3vXTIV6InguMk2QTmA4VRcsuMbK0XE2HX/lqzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k96D8T4F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6494BC32781;
-	Sat, 10 Aug 2024 04:19:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723263552;
-	bh=dQzfxZAD3qNzYbumf4DNUxhUH2jPoo74d3tLNMZfBBA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k96D8T4FRlJwFE1+CiUXtN9cpuzlL+gsWKrNIB6M6B5g0/y8Y0jZe3cxM64oFCtnF
-	 zYwfMKLAje1XCsEEq3ti6wDqx+udqAxZmVwjnK8Y3F8IZTwZwtXlU3t3Grl+IPXBiZ
-	 oTDXMcHVfEGqmhl63kIZKJCWFkwedrBmfHSi84+cTSLxuD2xqPuNeJoWiYRnlmErJH
-	 2Lh3jMxnxuqyeKM7mfl7dpOHZNxYsvmU7QhMK6GUGHMHVD8t65KXvKCM7WxA0jZmAV
-	 Xut/XJZh1gnQiouxZbdv+6yOpRl4LUf2PXXbmd5vKHtmy3k0mfGMlqC2q6bhqDobcW
-	 g4+KhJ3b39lYw==
-Date: Fri, 9 Aug 2024 21:19:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com,
- javier.carrasco.cruz@gmail.com, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- shuah@kernel.org, skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 1/2] selftests: net: Create veth pair for testing in
- networkless kernel
-Message-ID: <20240809211911.1445c965@kernel.org>
-In-Reply-To: <20240809165326.382044-1-jain.abhinav177@gmail.com>
-References: <20240808092309.2a811cf4@kernel.org>
-	<20240809165326.382044-1-jain.abhinav177@gmail.com>
+	s=arc-20240116; t=1723263749; c=relaxed/simple;
+	bh=J1ERLZ5Ep/u8vGLI7GqYlRKh9GNoDHm9yqpby3UpK/s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K5x4mLX7M2Yi3uST0y7sB/RYgnEhOirJcylPyyC3NDorXLId79H4E1mcJUdHja9m7LP+2F3KW3WmhjS4vf8UyL6xWvSU1gjAlidaCuFP6pn7ohwyuBU+zD3V+cy2wsB32MXCg3iSH3UpAPqEwrSqfCVB4EPv5ERe3YGADL3lrE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.3] (ip5f5af7d5.dynamic.kabel-deutschland.de [95.90.247.213])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B600A61E5FE05;
+	Sat, 10 Aug 2024 06:21:18 +0200 (CEST)
+Message-ID: <c0782e49-dc5b-4c04-8122-46e81ab98c23@molgen.mpg.de>
+Date: Sat, 10 Aug 2024 06:21:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] igb: Fix not clearing
+ TimeSync interrupts for 82580
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, sasha.neftin@intel.com,
+ netdev@vger.kernel.org, richardcochran@gmail.com, kurt@linutronix.de,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ daiweili@gmail.com, anthony.l.nguyen@intel.com,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20240810002302.2054816-1-vinicius.gomes@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240810002302.2054816-1-vinicius.gomes@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Fri,  9 Aug 2024 16:53:26 +0000 Abhinav Jain wrote:
-> On Thu, 8 Aug 2024 09:23:09 -0700, Jakub Kicinski wrote:
-> > A number of checks now return SKIP because veth doesn't support all
-> > ethtool APIs.
-> >
-> > In netdev selftests we try to make sure SKIP is only used when test
-> > cannot be performed because of limitations of the environment.
-> > For example some tool is not installed, kernel doesn't have a config.
-> > Something that the person running the test is able to fix by fixing
-> > how the test is run.
-> >
-> > Running this test on veth will always SKIP, nothing CI system can do.
-> > Please make the test use the keyword XFAIL instead of SKIP when
-> > functionality is not supported by the underlying driver.  
+Dear Vinicius,
+
+
+Thank you for the patch.
+
+
+Am 10.08.24 um 02:23 schrieb Vinicius Costa Gomes:
+> It was reported that 82580 NICs have a hardware bug that makes it
+> necessary to write into the TSICR (TimeSync Interrupt Cause) register
+> to clear it.
+
+Were you able to verify that report by checking against some errata? Is 
+Intel aware of the problem?
+
+> Add a conditional so only for 82580 we write into the TSICR register,
+> so we don't risk losing events for other models.
 > 
-> Ack, understood. I will do that, one clarification though.
-> Currently, the tests are using either PASS or FAIL and no SKIP. Based on
-> the above suggestion, it seems that I have replace FAIL with XFAIL for all
-> the tests that fail due to functionality not being supported by the
-> underlying driver.
+> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
+> 
+> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
+> Reported-by: Daiwei Li <daiweili@gmail.com>
+> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> ---
+> 
+> @Daiwei Li, I don't have a 82580 handy, please confirm that the patch
+> fixes the issue you are having.
 
-Right, sorry for lack of clarity.
+Please also add a description of the test case, and maybe the PCI vendor 
+and device code of your network device.
 
-Our CI doesn't fully trust the exit codes, so even though the test
-exits with zero the CI parses the output and finds the "SKIP: ..."
-lines. You need to replace those "SKIP"s in the output with "XFAIL".
+>   drivers/net/ethernet/intel/igb/igb_main.c | 27 ++++++++++++++++++-----
+>   1 file changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 11be39f435f3..edb34f67ae03 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -6960,31 +6960,48 @@ static void igb_extts(struct igb_adapter *adapter, int tsintr_tt)
+>   static void igb_tsync_interrupt(struct igb_adapter *adapter)
+>   {
+>   	struct e1000_hw *hw = &adapter->hw;
+> -	u32 tsicr = rd32(E1000_TSICR);
+> +	u32 ack = 0, tsicr = rd32(E1000_TSICR);
+>   	struct ptp_clock_event event;
+>   
+>   	if (tsicr & TSINTR_SYS_WRAP) {
+>   		event.type = PTP_CLOCK_PPS;
+>   		if (adapter->ptp_caps.pps)
+>   			ptp_clock_event(adapter->ptp_clock, &event);
+> +		ack |= TSINTR_SYS_WRAP;
+>   	}
+>   
+>   	if (tsicr & E1000_TSICR_TXTS) {
+>   		/* retrieve hardware timestamp */
+>   		schedule_work(&adapter->ptp_tx_work);
+> +		ack |= E1000_TSICR_TXTS;
+>   	}
+>   
+> -	if (tsicr & TSINTR_TT0)
+> +	if (tsicr & TSINTR_TT0) {
+>   		igb_perout(adapter, 0);
+> +		ack |= TSINTR_TT0;
+> +	}
+>   
+> -	if (tsicr & TSINTR_TT1)
+> +	if (tsicr & TSINTR_TT1) {
+>   		igb_perout(adapter, 1);
+> +		ack |= TSINTR_TT1;
+> +	}
+>   
+> -	if (tsicr & TSINTR_AUTT0)
+> +	if (tsicr & TSINTR_AUTT0) {
+>   		igb_extts(adapter, 0);
+> +		ack |= TSINTR_AUTT0;
+> +	}
+>   
+> -	if (tsicr & TSINTR_AUTT1)
+> +	if (tsicr & TSINTR_AUTT1) {
+>   		igb_extts(adapter, 1);
+> +		ack |= TSINTR_AUTT1;
+> +	}
+> +
+> +	if (hw->mac.type == e1000_82580) {
+> +		/* 82580 has a hardware bug that requires a explicit
+
+a*n*
+
+> +		 * write to clear the TimeSync interrupt cause.
+> +		 */
+> +		wr32(E1000_TSICR, ack);
+> +	}
+
+Is there a nicer way to write this, so `ack` is only assigned in case 
+for the 82580?
+
+>   }
+>   
+>   static irqreturn_t igb_msix_other(int irq, void *data)
+
+
+Kind regards,
+
+Paul
 
