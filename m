@@ -1,223 +1,234 @@
-Return-Path: <netdev+bounces-117388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A0D94DB23
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 08:50:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CF894DB47
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 10:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38E3F1F21D81
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 06:50:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E5F71F21D34
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 08:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880D33B298;
-	Sat, 10 Aug 2024 06:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A7514AD2D;
+	Sat, 10 Aug 2024 08:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SWeCdthO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JBLGu17y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A15F21A0B
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 06:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA18F495E5
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 08:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723272646; cv=none; b=MNuQFQ4jQ4B2MjZe0OJZCE4DjBJ+Xc7Viaqs6j3b2LG89bOS1w/WcWcSElEoJ/e+CetjCv/Cj1WvqnIMMfNVKUEwasOh5RvK8BZxiygmk4VuIqF6DrCela6+y1m6TisUcMYaQKsXiQRdtbHZybb30EZzJTDARkigAwviyZclVLg=
+	t=1723276848; cv=none; b=mpwEks0P9GYTX2iVL8uCJQ6Q7Nhk1CugPvVNbBRAwxcK0bMu/a55B+GTWo77l5lmsqdgVORR2877euUT6u42IznZdt/dcmROXK1He80j92DEQJ41ZTooFdr4xvvi1DkZQKUCCDOcxKSZ27IpQDGP0U/xLNxKe230XCxjt6oij5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723272646; c=relaxed/simple;
-	bh=Re4YjhOKm8w5csaYL4/2Tmvx4D6XBt5LteF6PKmHq1Y=;
+	s=arc-20240116; t=1723276848; c=relaxed/simple;
+	bh=FxumrIDW6qoxo9gfQ9R1lcQJdhBiVgoBIKMyeVQ2eZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uiI552MVba2XulmpPe8/mRtVTFAA5DojaaiPmfs9rjevqVlZwJIhGSkN7YdXDLQf4radhBPJagIOIdFE/jkEVmUJVIF1Kup2ddjG+8e6yrxXDZ9B46vuHjeFq/TQWOmf2sSsgXWyBnanwApRp2vx9QRZyzhlxWBZHotMvi2yAYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=SWeCdthO; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-427fc97a88cso20296985e9.0
-        for <netdev@vger.kernel.org>; Fri, 09 Aug 2024 23:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723272642; x=1723877442; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5fMlMfDLr6O083pckRnoiQKMidwxOyaTt5tjvNFEG4=;
-        b=SWeCdthOd0iTxdKoKN77NU9qV/JqAbn2lslIrTC2JV6I+EYjGzmk0bruDFVsrgMqjn
-         aF89FkWAsaF8Px35S4bt5vbNA0crPPCav5yrM/0yamab2Y3q/z+bU/2UEy31q/YbrtzU
-         KpnOFhO3wpmvc07bxuWzHz6PCSXPm+I/QRgMY6B6Yw15S8sbechQMUeEMyw/RWZL6dS1
-         nerL0sNcnAgOBUv1r3RjHiOI/ITvc97MCOWhJLzTXkxnWZBQT2XjDRbjeSmk5pbT74IL
-         wYk3M//sYrThrIjQ8WphkxtJqxzHW7nHO2Y9sIlId3UmC4a/EK+2WE1pVaZCK8H0tJTQ
-         Gf7A==
+	 Content-Type:Content-Disposition:In-Reply-To; b=c5WA1t6pFVRptY0GY6fG3vTNhvGdqC+68Ft+Cku1RuczunLREwVsOCp41208rju50JzkJQqrY1G0zCe+858lUEfYiiiQ9h8qrXdXoyt1Qze0+aEVmSwtPdMYUmQdID7mdEBUKmsy17jmQnEWB5nTDJ8f5hUeOQuhy27pDTTtrL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JBLGu17y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723276845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cxaBsOWYXbQjl952d0wR8HU0oXx4pPetERcANE2n4pw=;
+	b=JBLGu17y9ofecNJCfnMNBNIC/ao+cQfV/7MNBaNk8Ca9qN+pj+9ua9QEbMeLM2REQlCIL9
+	2J0c5xqo4ATFodZaoqCe+yTkWI6AyrRoZlL7TFW6pK+VYqA4vDjUlE0iLZvCNSE28HlJ/J
+	w02XSAuHRQEROcyk6wSl/nJgHTtNNJI=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-225-d-UZrteJPQ6syx15xjw1mg-1; Sat, 10 Aug 2024 04:00:42 -0400
+X-MC-Unique: d-UZrteJPQ6syx15xjw1mg-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2ef23a67c5bso26596711fa.3
+        for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 01:00:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723272642; x=1723877442;
+        d=1e100.net; s=20230601; t=1723276841; x=1723881641;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V5fMlMfDLr6O083pckRnoiQKMidwxOyaTt5tjvNFEG4=;
-        b=MUNBeLvrNq4NwnO23BA/UbaYmedjyxijwr7XfxYpjGqnyruOf3jMcCry4CcttxoqWf
-         Na7JawBjLBH9rpCJZXHnMUu+MRDp2wTYQleX6vtLQt4uM4eTc7LssX5vuXhxaXKCM2VQ
-         fYkCPmX7GpznXXcOyBnIG8xEse7OctD1fmC0voYHkCOKWNU7cgSdsGGNNpti50PG6rtH
-         eKdn1oXkdYnkspgI2+UUGUYyRb2h/ap42rpUR3aiW8bojil7VpyTlG7RaSTk+M9vHmn7
-         74nvfGMcRJaEY0V2iqXKf8pm9MuT842s1y0Xv4VGE2wQH5c615uEJ638ZEyrn+Oj3Lr1
-         3C6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUvmQAh4KYZa9ZChIhJX7FgSxDIiVtHhhdZfq6bBR2HCI+emunQ5rhnZlwS4fDGbcbvuJTOzPqbtx4qANQoX/jBTS5/cFnK
-X-Gm-Message-State: AOJu0Yz9nIu4hrnh1Hb3l8MoxJvYi/HzDVzzLtEgfSfwDfe8gjzVVqbi
-	jSIioaduwChPs8LD0m9m+L4TX4FIXPbquMuBP8zeypyeeqC+y4eYgNnN/I9tNwM=
-X-Google-Smtp-Source: AGHT+IHMfb3/KxvzgtZsnnJ5uK+W8ONQ7bFgGPGv4Dy9oG5YqaZVWGflzMCztokvP8E49+i0zI4Wlg==
-X-Received: by 2002:a05:600c:468b:b0:426:55a3:71af with SMTP id 5b1f17b1804b1-429c3a5b3c1mr24023625e9.33.1723272641985;
-        Fri, 09 Aug 2024 23:50:41 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429c7736b05sm17645255e9.29.2024.08.09.23.50.40
+        bh=cxaBsOWYXbQjl952d0wR8HU0oXx4pPetERcANE2n4pw=;
+        b=p7GtvQFS2WAQ0FJNENZlXIZt2QEBOXkSJSSZTsrseWMkiJLtubv3WfguUMXpIoDopR
+         WTUTDUD5dGU2XQq4nB7Sm+oiOynNKDg2bz98PaQunTn9Py1dZ1/B4P/CeV6EybAm4Hti
+         cLhTSqMBCjd9cP5BDoyzo7EhyjyE80uSB7SLiHd7qnn8riMHu68VVsh1nx6FHSItNBjg
+         LVHCS5S3/rTe7iBZpQjGMAENkIi/SKl3qMFVvTbT1HM6PRGnF5mWwPLYKRaNHOyxItb1
+         lHfpew9zkMrWz5BTknizQIuT0wDUOOgNpEq2kPhEA5h4TDZ5kPMdfDW0eS28+nrX9qPm
+         xDGw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKwIodtSbBhOts5YEC8Xkq/AYULhsP6C9cDKGkmWs4+AY3Zvce+ABA2r5VtQ2x9mQ+jpS7CB1sRzLE/GCKEw1obau3mmYd
+X-Gm-Message-State: AOJu0YzRL+lF+cYV1O5Dj9TPipK5V5ftacdG6mGrxrc+Hx9qUgJXr0vb
+	l8xfZ5IJwbMhLl3XAO3CoxnbgF6zc/jSVaV6FKz1lftl6r7P+FFUq/dn4tkh/vnlcFHHgCEiXJD
+	x5zOu54lEgkA45l+yt1cb2Mf/N0VKgkfBqan/VfbVkDdKa4lLTTF47w==
+X-Received: by 2002:a2e:be9d:0:b0:2f0:20cd:35fc with SMTP id 38308e7fff4ca-2f1a6c4cf01mr33426821fa.7.1723276840547;
+        Sat, 10 Aug 2024 01:00:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHm7k8IUz5d3cudToCANSXgZtSllkVKwZwQhLwKqQ43m1YO/m1NdkmZJerxkfQZ0JUye0k27A==
+X-Received: by 2002:a2e:be9d:0:b0:2f0:20cd:35fc with SMTP id 38308e7fff4ca-2f1a6c4cf01mr33426271fa.7.1723276839630;
+        Sat, 10 Aug 2024 01:00:39 -0700 (PDT)
+Received: from localhost (53.116.107.80.static.otenet.gr. [80.107.116.53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429c7736b05sm19723545e9.29.2024.08.10.01.00.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 23:50:41 -0700 (PDT)
-Date: Sat, 10 Aug 2024 08:50:38 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	netdev@vger.kernel.org, Piotr Raczynski <piotr.raczynski@intel.com>,
-	jiri@nvidia.com, shayd@nvidia.com, wojciech.drewek@intel.com,
-	horms@kernel.org, sridhar.samudrala@intel.com,
-	mateusz.polchlopek@intel.com, kalesh-anakkur.purayil@broadcom.com,
-	michal.kubiak@intel.com, pio.raczynski@gmail.com,
-	przemyslaw.kitszel@intel.com, jacob.e.keller@intel.com,
-	maciej.fijalkowski@intel.com,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net-next v3 03/15] ice: add basic devlink subfunctions
- support
-Message-ID: <ZrcNvu6cXqQ-ybZu@nanopsycho.orion>
-References: <20240808173104.385094-1-anthony.l.nguyen@intel.com>
- <20240808173104.385094-4-anthony.l.nguyen@intel.com>
- <ZrX6jM6yedDNYfNv@nanopsycho.orion>
- <ZrYB2kEieNCIuof1@mev-dev.igk.intel.com>
+        Sat, 10 Aug 2024 01:00:39 -0700 (PDT)
+Date: Sat, 10 Aug 2024 10:00:36 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Daniel Xu <dxu@dxuuu.xyz>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	"toke@redhat.com" <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
+Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch
+ to GRO from netif_receive_skb_list()
+Message-ID: <ZrceJNrf2EkCD4Av@lore-rh-laptop>
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+ <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+ <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
+ <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
+ <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3tjfGVd/eoZK+rGd"
+Content-Disposition: inline
+In-Reply-To: <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
+
+
+--3tjfGVd/eoZK+rGd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrYB2kEieNCIuof1@mev-dev.igk.intel.com>
+Content-Transfer-Encoding: quoted-printable
 
-Fri, Aug 09, 2024 at 01:47:38PM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Fri, Aug 09, 2024 at 01:16:28PM +0200, Jiri Pirko wrote:
->> Thu, Aug 08, 2024 at 07:30:49PM CEST, anthony.l.nguyen@intel.com wrote:
->> >From: Piotr Raczynski <piotr.raczynski@intel.com>
->> >
->> 
->> [...]
->> 
->> >+static int
->> >+ice_devlink_port_new_check_attr(struct ice_pf *pf,
->> >+				const struct devlink_port_new_attrs *new_attr,
->> >+				struct netlink_ext_ack *extack)
->> >+{
->> >+	if (new_attr->flavour != DEVLINK_PORT_FLAVOUR_PCI_SF) {
->> >+		NL_SET_ERR_MSG_MOD(extack, "Flavour other than pcisf is not supported");
->> >+		return -EOPNOTSUPP;
->> >+	}
->> >+
->> >+	if (new_attr->controller_valid) {
->> >+		NL_SET_ERR_MSG_MOD(extack, "Setting controller is not supported");
->> >+		return -EOPNOTSUPP;
->> >+	}
->> >+
->> >+	if (new_attr->port_index_valid) {
->> >+		NL_SET_ERR_MSG_MOD(extack, "Port index is invalid");
->> 
->> Nope, it is actually valid, but your driver does not support that.
->> Please fix the message.
->>
->
->Ok
->
->> 
->> >+		return -EOPNOTSUPP;
->> >+	}
->> >+
->> >+	if (new_attr->pfnum != pf->hw.bus.func) {
->> 
->> hw.bus.func, hmm. How about if you pass-through the PF to VM, can't the
->> func be anything? Will this still make sense? I don't think so. If you
->> get the PF number like this in the rest of the driver, you need to fix
->> this.
->>
->
->I can change it to our internal value. I wonder if it will be better. If
->I understand correctly, now:
->PF0 - xx.xx.0; PF1 - xx.xx.1
->
->I am doing pass-through PF1
->PF0 (on host) - xx.xx.0
->
->PF1 (on VM) - xx.xx.0 (there is one PF on VM, so for me it is more
->intuitive to have func 0)
->
->after I change:
->PF0 - xx.xx.0; PF1 - xx.xx.1
->
->pass-through PF1
->PF0 (on host) - xx.xx.0
->
->PF1 (on VM) - xx.xx.0, but user will have to use 1 as pf num
->
->Correct me if I am wrong.
+On Aug 08, Alexander Lobakin wrote:
+> From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+> Date: Thu, 8 Aug 2024 06:54:06 +0200
+>=20
+> >> Hi Alexander,
+> >>
+> >> On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
+> >>> cpumap has its own BH context based on kthread. It has a sane batch
+> >>> size of 8 frames per one cycle.
+> >>> GRO can be used on its own, adjust cpumap calls to the
+> >>> upper stack to use GRO API instead of netif_receive_skb_list() which
+> >>> processes skbs by batches, but doesn't involve GRO layer at all.
+> >>> It is most beneficial when a NIC which frame come from is XDP
+> >>> generic metadata-enabled, but in plenty of tests GRO performs better
+> >>> than listed receiving even given that it has to calculate full frame
+> >>> checksums on CPU.
+> >>> As GRO passes the skbs to the upper stack in the batches of
+> >>> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
+> >>> device where the frame comes from, it is enough to disable GRO
+> >>> netdev feature on it to completely restore the original behaviour:
+> >>> untouched frames will be being bulked and passed to the upper stack
+> >>> by 8, as it was with netif_receive_skb_list().
+> >>>
+> >>> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+> >>> ---
+> >>>  kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+> >>>  1 file changed, 38 insertions(+), 5 deletions(-)
+> >>>
+> >>
+> >> AFAICT the cpumap + GRO is a good standalone improvement. I think
+> >> cpumap is still missing this.
+>=20
+> The only concern for having GRO in cpumap without metadata from the NIC
+> descriptor was that when the checksum status is missing, GRO calculates
+> the checksum on CPU, which is not really fast.
+> But I remember sometimes GRO was faster despite that.
 
-Did you try this? I mean, you can check that easily with vng:
-vng --qemu-opts="-device vfio-pci,host=5e:01.0,addr=01.04"
+For the moment we could test it with UDP traffic with checksum disabled.
 
-Then in the VM you see:
-0000:00:01.4
+Regards,
+Lorenzo
 
-Then, by your code, the pf number is 4, isn't it?
+>=20
+> >>
+> >> I have a production use case for this now. We want to do some intellig=
+ent
+> >> RX steering and I think GRO would help over list-ified receive in some=
+ cases.
+> >> We would prefer steer in HW (and thus get existing GRO support) but no=
+t all
+> >> our NICs support it. So we need a software fallback.
+> >>
+> >> Are you still interested in merging the cpumap + GRO patches?
+>=20
+> For sure I can revive this part. I was planning to get back to this
+> branch and pick patches which were not related to XDP hints and send
+> them separately.
+>=20
+> >=20
+> > Hi Daniel and Alex,
+> >=20
+> > Recently I worked on a PoC to add GRO support to cpumap codebase:
+> > - https://github.com/LorenzoBianconi/bpf-next/commit/a4b8264d5000ecf016=
+da5a2dd9ac302deaf38b3e
+> >   Here I added GRO support to cpumap through gro-cells.
+> > - https://github.com/LorenzoBianconi/bpf-next/commit/da6cb32a4674aa7240=
+1c7414c9a8a0775ef41a55
+> >   Here I added GRO support to cpumap trough napi-threaded APIs (with a =
+some
+> >   changes to them).
+>=20
+> Hmm, when I was testing it, adding a whole NAPI to cpumap was sorta
+> overkill, that's why I separated GRO structure from &napi_struct.
+>=20
+> Let me maybe find some free time, I would then test all 3 solutions
+> (mine, gro_cells, threaded NAPI) and pick/send the best?
+>=20
+> >=20
+> > Please note I have not run any performance tests so far, just verified =
+it does
+> > not crash (I was planning to resume this work soon). Please let me know=
+ if it
+> > works for you.
+> >=20
+> > Regards,
+> > Lorenzo
+> >=20
+> >>
+> >> Thanks,
+> >> Daniel
+>=20
+> Thanks,
+> Olek
+>=20
 
-What am I missing?
+--3tjfGVd/eoZK+rGd
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZrceIQAKCRA6cBh0uS2t
+rAuOAP9lAP+wUtI4DT03vstan8oVHlFYyfbFpQ5S9GXv19t6iQD+Oq31gcfUQN93
+0x2SbfWudVdpE9DvTKzXi6mE/f29ZAc=
+=6Wya
+-----END PGP SIGNATURE-----
 
->
->> 
->> 
->> >+		NL_SET_ERR_MSG_MOD(extack, "Incorrect pfnum supplied");
->> >+		return -EINVAL;
->> >+	}
->> >+
->> >+	if (!pci_msix_can_alloc_dyn(pf->pdev)) {
->> >+		NL_SET_ERR_MSG_MOD(extack, "Dynamic MSIX-X interrupt allocation is not supported");
->> >+		return -EOPNOTSUPP;
->> >+	}
->> >+
->> >+	return 0;
->> >+}
->> 
->> [...]
->> 
->> 
->> >+int ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port)
->> >+{
->> >+	struct devlink_port_attrs attrs = {};
->> >+	struct devlink_port *devlink_port;
->> >+	struct devlink *devlink;
->> >+	struct ice_vsi *vsi;
->> >+	struct ice_pf *pf;
->> >+
->> >+	vsi = dyn_port->vsi;
->> >+	pf = dyn_port->pf;
->> >+
->> >+	devlink_port = &dyn_port->devlink_port;
->> >+
->> >+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_SF;
->> >+	attrs.pci_sf.pf = pf->hw.bus.func;
->> 
->> Same here.
->> 
->> 
->> >+	attrs.pci_sf.sf = dyn_port->sfnum;
->> >+
->> >+	devlink_port_attrs_set(devlink_port, &attrs);
->> >+	devlink = priv_to_devlink(pf);
->> >+
->> >+	return devl_port_register_with_ops(devlink, devlink_port, vsi->idx,
->> >+					   &ice_devlink_port_sf_ops);
->> >+}
->> >+
->> 
->> [...]
+--3tjfGVd/eoZK+rGd--
+
 
