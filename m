@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-117361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5120294DADD
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:21:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1B494DADE
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD794B218DA
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:21:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF20D2825AC
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AD513D2BE;
-	Sat, 10 Aug 2024 05:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550F913D600;
+	Sat, 10 Aug 2024 05:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GuzdKR9Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZoYVoJWi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A361113C9A1
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3139B13C9A1
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723267238; cv=none; b=AQ3At8wRqPJa235/fnoihUoYVxqV/9L8sQhQYIWItmIDX4HaR+BIa7RkCLD6TUIb/QI7PMZx12Kmw8paTWKEgajOElC22PUiwoY+yQcxegMO81zyoBuE6u3FgL4QZYPzX+Isbdz8guifoFkHk5nkGR5h0nBCNTFiIJJBv9qBsjU=
+	t=1723267240; cv=none; b=LR7LF+VCNrYTG+RZ14PYwRNnzhQ0O7hJ3pHzJmWMp3W+e5f3+2evergJQCU9giy2wl76EpGUnNk/EOAGAgxoyUQzEVUijKmM8dRC9Dar9yx3cnV/PFyENsOhT03omKnG412a/ZMIzZZHBQ/vNBu8Mi/917oL0D77x5bTY2/MKuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723267238; c=relaxed/simple;
-	bh=g8F/jwSiC5x3pdw8eN4+qm7w1ZzEM7A91at7rK1/d4o=;
+	s=arc-20240116; t=1723267240; c=relaxed/simple;
+	bh=puwIa4nVkRVKi2u9ARmaPfkTA7St0Z6ZQ1vCDz3UN84=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cr0u91fHhEpBxVuO4j4jzzmBZu09Fo92UIEjNzxlNTozfg3EA/LgEEjfWFBHFjez/1Tn2POdqfn++kTYVH/EaX8qFYBg1wwx9dDETEHSv4CXNPvP177ZDYaxR+XlkwltbdMe6lDaabZ/MkbO0SWAwPBLw4XyH5BTx2S4OmOD+LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GuzdKR9Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4443CC32786;
-	Sat, 10 Aug 2024 05:20:38 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HijntSS8pmhxQQnWVY8777pqVTO7S+tnemD1ziDdUXY2Urioq4x8GmnTuQ16wPwazUdc+0Wbt1vu1bHmNWLTSXOw9POHubzJ0c92j8Yv1RImidvMV7BCmTHmiYI8LspSno8vxe+OS8TeWMk6Mg4QaBl2M6lfB8qLgi2kspgOnsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZoYVoJWi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C506AC32781;
+	Sat, 10 Aug 2024 05:20:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723267238;
-	bh=g8F/jwSiC5x3pdw8eN4+qm7w1ZzEM7A91at7rK1/d4o=;
+	s=k20201202; t=1723267239;
+	bh=puwIa4nVkRVKi2u9ARmaPfkTA7St0Z6ZQ1vCDz3UN84=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GuzdKR9YSr4uac1ztWRiOXfaL2rnHAJ+h7OXh/P31IG1TJMVy6D13/m+UuSTlcCMZ
-	 3e2oe523OeLIlIFFcJN++F0BVf0pC6F+bKe6Pm9m/SK5uCvLzQYPQB6AYl7FByoIKG
-	 XO/luoSoSGacywG42rS6fb8o/WuUe3RAQjyy/y7eq6sCiwE6D5jxtSQSwsD7t7XA83
-	 r+xOrfpQE2/p6fPzkEZ2Vr/2r8vjfCZvcY1u1ZK3pzrw5KkpxOoHLOdOHpbc6YYxdE
-	 2ZtrDIAX3w+xl5ENBNF+6WWrw+vi8svGgrbR08po68jmdRoxzy9g9vushbySPuwWwh
-	 t3kbCv0hYfO7w==
+	b=ZoYVoJWispnllPNWF1DECUfSmksnq6+wfvBhukKlLxO9I0GJOiUy8yDLWOxCpDSgM
+	 kuIC+sa79VG1RbitZ/MLjL60s+SGDMg3FpC+7/YWw7f9VyYNq+0k+JqjEIoYt76efY
+	 LjgL7yD5rq2YZoRXiORO+M81NP4Pk2AqjtMhz4wwmj8WYgvHUdUY+bXKkQlDl1vo3T
+	 8GZyX50fR82aPwvqLg1p7cyjHcEbD9gXEb7qVtMmkmpXYJfJQtKMND5PW8mwI4JOol
+	 c17kkjgAGhHfMEg6Qr88eyRrR0mNScDTGdTTMoC3ziEyZjPUofnnCLJNRW6hBsO4xG
+	 NIPLUbWtTfcaA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7B382333F;
-	Sat, 10 Aug 2024 05:20:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEBB382333F;
+	Sat, 10 Aug 2024 05:20:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,34 +52,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: ag71xx: use phylink_mii_ioctl
+Subject: Re: [PATCH net-next V2 00/11] mlx5 misc patches 2024-08-08
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172326723699.4145426.17559628094126761112.git-patchwork-notify@kernel.org>
-Date: Sat, 10 Aug 2024 05:20:36 +0000
-References: <20240807215834.33980-1-rosenp@gmail.com>
-In-Reply-To: <20240807215834.33980-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org
+ <172326723848.4145426.6103022727049548125.git-patchwork-notify@kernel.org>
+Date: Sat, 10 Aug 2024 05:20:38 +0000
+References: <20240808055927.2059700-1-tariqt@nvidia.com>
+In-Reply-To: <20240808055927.2059700-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  7 Aug 2024 14:58:27 -0700 you wrote:
-> f1294617d2f38bd2b9f6cce516b0326858b61182 removed the custom function for
-> ndo_eth_ioctl and used the standard phy_do_ioctl which calls
-> phy_mii_ioctl. However since then, this driver was ported to phylink
-> where it makes more sense to call phylink_mii_ioctl.
+On Thu, 8 Aug 2024 08:59:16 +0300 you wrote:
+> Hi,
 > 
-> Bring back custom function that calls phylink_mii_ioctl.
+> This patchset contains multiple enhancements from the team to the mlx5
+> core and Eth drivers.
+> 
+> Patch #1 by Chris bumps a defined value to permit more devices doing TC
+> offloads.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: ag71xx: use phylink_mii_ioctl
-    https://git.kernel.org/netdev/net-next/c/1862923bf6ae
+  - [net-next,V2,01/11] net/mlx5: E-Switch, Increase max int port number for offload
+    https://git.kernel.org/netdev/net-next/c/6e20d538fb1d
+  - [net-next,V2,02/11] net/mlx5e: Enable remove flow for hard packet limit
+    https://git.kernel.org/netdev/net-next/c/88c46f6103e2
+  - [net-next,V2,03/11] net/mlx5e: TC, Offload rewrite and mirror on tunnel over ovs internal port
+    https://git.kernel.org/netdev/net-next/c/16bb8c613379
+  - [net-next,V2,04/11] net/mlx5e: TC, Offload rewrite and mirror to both internal and external dests
+    https://git.kernel.org/netdev/net-next/c/b11bde56246e
+  - [net-next,V2,05/11] net/mlx5e: Be consistent with bitmap handling of link modes
+    https://git.kernel.org/netdev/net-next/c/4384bcff035e
+  - [net-next,V2,06/11] net/mlx5e: Use extack in set ringparams callback
+    https://git.kernel.org/netdev/net-next/c/ab666b5287e8
+  - [net-next,V2,07/11] net/mlx5e: Use extack in get coalesce callback
+    https://git.kernel.org/netdev/net-next/c/29a943d71d23
+  - [net-next,V2,08/11] net/mlx5e: Use extack in set coalesce callback
+    https://git.kernel.org/netdev/net-next/c/9c4298b466b1
+  - [net-next,V2,09/11] net/mlx5e: Use extack in get module eeprom by page callback
+    https://git.kernel.org/netdev/net-next/c/b5100b72da68
+  - [net-next,V2,10/11] net/mlx5e: CT: 'update' rules instead of 'replace'
+    https://git.kernel.org/netdev/net-next/c/486aeb2db55b
+  - [net-next,V2,11/11] net/mlx5e: CT: Update connection tracking steering entries
+    https://git.kernel.org/netdev/net-next/c/6b5662b75960
 
 You are awesome, thank you!
 -- 
