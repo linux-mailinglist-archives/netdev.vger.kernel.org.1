@@ -1,80 +1,101 @@
-Return-Path: <netdev+bounces-117366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6A494DAE6
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:28:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D44694DAE9
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 224A6281560
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80CC21C20AB6
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E30A13C81B;
-	Sat, 10 Aug 2024 05:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57566381D5;
+	Sat, 10 Aug 2024 05:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDxIMJTT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tgJEz0O6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BE21CD37;
-	Sat, 10 Aug 2024 05:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337ABEC2
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723267677; cv=none; b=CU1Th26p4FYl+rlub7ihbAwxCiNhH893vGVz/dmvAibx42gLtIE2zAbJBAp63nMXT9IscwOr8Mm3stqBWh0El9m+3CWNxFkExpAHsUbZkVlzuAa8aQrY0PeiyqrmNUhUQmAehEP9waiDAEclDeOcUTR9KF5Y/fUwHBXiVR/b8HY=
+	t=1723267837; cv=none; b=KPZPoue1DEu62cgNyUhlFyqBqw6CW2lUN0clzUSvwP2c9RJd9cljMVKBvznxRqQUaGgLxcrrFvpBgVpdQB1ZNr3bg4fIoUGBZQLCU+CDl2q4v2OsOCBMgOxSPbRyMJPn57FGS/gHqi1ZwvBiY8OzJrkcIvxNm/ikTG9KnaZj1Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723267677; c=relaxed/simple;
-	bh=ZRyDFNQw4PzqYPlRuv+Xp4nfbpJTGDpyUfszoxFzitY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cq9EdDX9vmfFiPtDhFhFWrtOw5+bp2VpnRjujnDBNwlpe9pXpPT3B2XuiHmZx6pmDhPuiWi1BTaDdVa3APcPL+y8omckLOH6HCNS1410meUPitnL2AEiB4OxzTLaZ64ai2zW+pPuvBkkla7O7XUQHXrvZaCxsZALBswWrJkJfMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDxIMJTT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FA98C32781;
-	Sat, 10 Aug 2024 05:27:56 +0000 (UTC)
+	s=arc-20240116; t=1723267837; c=relaxed/simple;
+	bh=wl+AAjeDmEO/wnAmYPdFRDa7nx2ufEA7rePBOPHd/G0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I03xw9i/7bwqjKMI9YnULq++yG2WSTmUHkMxScFmrGQyJgla3STQ43sHfdgS9qu5VsDt81NYDO6/teUCvMP896tkYXc3eDqcngk5bzLn1FEYGtU19EJcMN99HCS7LUI1v3exC/3wCFi6GallSr/8IDbuRC6pAQTSaJwlO5IR2ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tgJEz0O6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B911C32781;
+	Sat, 10 Aug 2024 05:30:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723267676;
-	bh=ZRyDFNQw4PzqYPlRuv+Xp4nfbpJTGDpyUfszoxFzitY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XDxIMJTTPpde2Fqclki+uzj44wOmbBB6aUt/MgqqFDCdf3isnnq8dPp3sMKciCzFb
-	 FZZ+K/DWH4rce0GQCAkyN1zZd02DmM9w7WhqboSYNhrQ2kqEy5wiPZbf+hmvtYRKj3
-	 P/z9sHyc/7S2mMiQk549D2eKF7tEsn0VPyKk+qnEYJsVo4yCyp8Xh89g9XV3W0zsRv
-	 JtsVH2wquK7gCHzOvSIIJwXfdTLMMve0lvv/y4QiR7nKfWgBSTFU/5Nuxd910tTBAm
-	 Ma5veOLyTmHDivQdKXH0IA50HInLwNMbyIoIXbiotSPWrIniY4tEVhoSgS1rVWYinJ
-	 BqSy4KQvChZ+Q==
-Date: Fri, 9 Aug 2024 22:27:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
- <dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
- <andrew@lunn.ch>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/6] netdevice: convert private flags >
- BIT(31) to bitfields
-Message-ID: <20240809222755.28acd840@kernel.org>
-In-Reply-To: <20240808152757.2016725-2-aleksander.lobakin@intel.com>
-References: <20240808152757.2016725-1-aleksander.lobakin@intel.com>
-	<20240808152757.2016725-2-aleksander.lobakin@intel.com>
+	s=k20201202; t=1723267837;
+	bh=wl+AAjeDmEO/wnAmYPdFRDa7nx2ufEA7rePBOPHd/G0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tgJEz0O6xYR8XN8SYBCUokVIzXPfC8LwfIC2nOvonLwsotyTdoKBhVQJKRs60ADx9
+	 pAnHHgt6//aycxcM7Qc8WtyvUF4wapaxr6e4OoqoZtvAxxQRSLh4/Uv9fzQu25Ot3d
+	 R0Y2qUKx1p4+xZd9ENSKBEAD1t+SgdA5S/aqgS/0ogWpeOdJD18ko8QaYUtdSzAZ3n
+	 02pwgT7aFoi35XyuLgeSwsA0Jfadlc6+wPmhhdkBeZQM5SXTLLM+qStdCbGpOb5FXR
+	 6cm1/T8ZM7G+DcYehr4ZmLKfVINnjlu2KidNK8O6a2w1Fl/m6hzAadLNiXZ+IcFQqM
+	 5g/pMGLwizFRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FEC382333F;
+	Sat, 10 Aug 2024 05:30:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] mlx5 misc fixes 2024-08-08
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172326783601.4146810.4423118138880091263.git-patchwork-notify@kernel.org>
+Date: Sat, 10 Aug 2024 05:30:36 +0000
+References: <20240808144107.2095424-1-tariqt@nvidia.com>
+In-Reply-To: <20240808144107.2095424-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
-On Thu,  8 Aug 2024 17:27:52 +0200 Alexander Lobakin wrote:
-> + *	@priv_flags_fast: both hotpath private flags as bits and as bitfield
-> + *			booleans combined, only to assert cacheline placement
-> + *	@priv_flags:	flags invisible to userspace defined as bits, see
-> + *			enum netdev_priv_flags for the definitions
+Hello:
 
-The kdoc scripts says:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-include/linux/netdevice.h:2392: warning: Excess struct member 'priv_flags_fast' description in 'net_device'
+On Thu, 8 Aug 2024 17:41:01 +0300 you wrote:
+> Hi,
+> 
+> This patchset provides misc bug fixes from the team to the mlx5 core and
+> Eth drivers.
+> 
+> Series generated against:
+> commit b928e7d19dfd ("Merge tag 'for-net-2024-08-07' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth")
+> 
+> [...]
 
-I thought you sent a kernel-doc patch during previous cycle to fix this,
-or was that for something else?
+Here is the summary with links:
+  - [net,1/5] net/mlx5: SD, Do not query MPIR register if no sd_group
+    https://git.kernel.org/netdev/net/c/c31fe2b5095d
+  - [net,2/5] net/mlx5e: SHAMPO, Increase timeout to improve latency
+    https://git.kernel.org/netdev/net/c/ab6013a59b4d
+  - [net,3/5] net/mlx5e: Take state lock during tx timeout reporter
+    https://git.kernel.org/netdev/net/c/e6b5afd30b99
+  - [net,4/5] net/mlx5e: Correctly report errors for ethtool rx flows
+    https://git.kernel.org/netdev/net/c/cbc796be1779
+  - [net,5/5] net/mlx5e: Fix queue stats access to non-existing channels splat
+    https://git.kernel.org/netdev/net/c/0b4a4534d083
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
