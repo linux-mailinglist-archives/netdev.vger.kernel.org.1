@@ -1,108 +1,144 @@
-Return-Path: <netdev+bounces-117427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650D694DDD3
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 19:52:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C39D094DDD7
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 19:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CBFB281DB2
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 17:52:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6C8281D51
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 17:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F29916A39E;
-	Sat, 10 Aug 2024 17:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A67D16A92E;
+	Sat, 10 Aug 2024 17:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="efTnpbBm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lnczJst0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F492F2A;
-	Sat, 10 Aug 2024 17:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1765C15F41D;
+	Sat, 10 Aug 2024 17:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723312365; cv=none; b=le+SJ5BOYjByikN0oPSjI245yxFPjGiR2Jd4hZykW6Cnn54DqPApLR+WndH0eNKKuuXzLGCOR63tiEQ9yTehUdTcaZNd/oQewXIm7wVGD71ExtplDV11y4a5FBpf6d9yOZedKNUcWc0uF0Mo0167OkZBuwFmvfMuICGy2eQsxKA=
+	t=1723312519; cv=none; b=TaurzAUBhN0aSqC/FNsMNs9puxqrZ222Y5/sk0pRPRqEWRlrAf94vvIL50ocwGPC9jAmDgVb/H+lq/gR9jgX5ybnULE4L+FjhDWcgrF4is2oNjc9Xbncvckn+4lDJWsjWrZr3FLpK+aRcLQY4u/6eQP9ooNq4t9lcwmiLYMgfd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723312365; c=relaxed/simple;
-	bh=e0tv6nXJ4LZUZTv86V7MXxbuh1jk3Kt97an99b1krl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GgOTZo8X6P+y/2wjXvlKyyLc42ff+EnG3haFDfaCbUm3nkU1EZSNVfqyflkUyn0pPmc6QV9GBurfEn6k6KQQw/TJalEYh1kaHrNGK8cQQmMFQeHbmBLRDe87puTgxWot21y2ajXFmSU7KRSkMxLv3zvVFjzB+utTzm8q6SZU54Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=efTnpbBm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KJ+BuvHmxUUAXP706pMY7LJcQOTVsjZY8A7lywoxdvw=; b=efTnpbBmbSjOThI0JdLHqBFqMS
-	8PDs23XyPeWR9IByBjxnGqMLQltv1CHlV19rIXTVScdCoiPtHn/1rdL3D7rbPaHQyLseGMQuQmbqo
-	oRw7SawWIfV/ByNpnFFBcqVc6Z2uOE0g7eEvW2gFR499OFJN320r1g1ql+rE26L0m3eQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1scqGX-004SPL-9Q; Sat, 10 Aug 2024 19:52:33 +0200
-Date: Sat, 10 Aug 2024 19:52:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek Vasut <marex@denx.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/4] net: dsa: microchip: add SGMII port support
- to KSZ9477 switch
-Message-ID: <2f59b854-c1d4-4007-bc6e-4c8e88eda940@lunn.ch>
-References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
- <20240809233840.59953-5-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1723312519; c=relaxed/simple;
+	bh=tdaviMc2TG3WkTjS6C7+l204PFwlWjyYpWMbyuQCMIM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Adrtnynks+zNzgh8vyMESycwe7/zr6LZSh59Pv5k8pftzB4RBSqqt8936BpxpP1am8vZZ9hxyHdJglyt5rzRzQYf5zcd/titPWrzq+C5hfesjN1BqnEPOJbRI8UoBww1NdYoIYMjAwgG5WeCgvDpy1ORve7+wyxTnsDTpL5wtLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lnczJst0; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70d23caf8ddso2807431b3a.0;
+        Sat, 10 Aug 2024 10:55:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723312517; x=1723917317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cuMWPq3zFnrRfqIZyBDjzbfpHEka0Q64/eSHWhAQ05E=;
+        b=lnczJst0etgqCzT4e6Cr2l1jdJOTSQYa3XEAQYnS7GVV21uPeqjpCxjG3PhCWGlYJk
+         P/VAHSdzTpvQJze42IP2wowVNeJt/MtnIVeGo3oF3O0LdlDxGTx5OJeZ5NmOFjLo+pTF
+         iSD9bozjXTkFBiUSbYZW+MR5V6gCdGbCi1iaB84/CkQ44/vBP730juVGIPmCJ0Uwx2Ih
+         srcrQsGaFRmbV5pGU5F/EBlGeU2hroM03yPnISF4pkwDyj2ObbbLt2xroQILxIrs10JG
+         PbZamYnyUIJ4sLxjmk5LGLQQSe2yG9IP/PPqB8G0auoX+RjxB10Lq/7AaxaVihfBeJ1T
+         s5eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723312517; x=1723917317;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cuMWPq3zFnrRfqIZyBDjzbfpHEka0Q64/eSHWhAQ05E=;
+        b=NJKpZ/47ED8wZgHkcoS8xNflqJG0cJFNTbrAev2Zy0RIsf0Jg+S0R7HRXVUjl5EAms
+         o89JBTZYniWVIYFff5nmyFkJk37dYWFFOwGPvns7WM8ApWay54sIomGWBKi/n2OBAbYf
+         Jf9p4OJCWbBSm+SfN5PMJDn08BC8Sla5fYsKrSneCvFi3rn9UBUVxXUXUIwqmM3JoCxF
+         IHLMUod9CyVQoYaK1qPaTlYMNDtnZWay2QT5ym3j8mrgdmoTsrCn1YD7lOoNdMo6Qr1T
+         GVKBtCZAgT7lCNJBtLh/0sQr2uT0Y1JMr19RhAETlpypSZzW1bO/kgwrG2PTUEQibbS0
+         wiDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpZ3HjkJkHKmrdJnab/dZxUdKSoOg/zBxq3EPIQZP/n9WNhPfaUO3iIOUczmmvqWy2KankazEPl2Hb8/6lhzchRlC+ECcXZ/RgRSiGg9hbMtmpDd90dHMIsNLv1oqzgHf5G5+x+rTYpsYo0CGvrOu/e7JBxI/EnaykQkM3g27qvAKKIXq7
+X-Gm-Message-State: AOJu0Yyg9zsIpJT9B3jp7IFrxLMsTE5bpoZfLVx3BRbrL/lWLN4SfkXy
+	PrJVnLsW7ztwTrt4CeoD02Qgm5aS+rc9cEF+h4FYmPdv3MvnHmtRWR3y+lAW
+X-Google-Smtp-Source: AGHT+IHkec/yLGTRhkhmkBsz89ZalfED3kUVTPgt9AJXwwhzlR+HuPlHN6rMVXvOeKw0lqa/C4IFoQ==
+X-Received: by 2002:a05:6a21:b8b:b0:1c4:818c:299d with SMTP id adf61e73a8af0-1c89fbbe138mr6716274637.11.1723312517242;
+        Sat, 10 Aug 2024 10:55:17 -0700 (PDT)
+Received: from dev0.. ([49.43.168.43])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c3dbe12ff2sm1568868a12.33.2024.08.10.10.55.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Aug 2024 10:55:16 -0700 (PDT)
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	jain.abhinav177@gmail.com,
+	javier.carrasco.cruz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 1/2] selftests: net: Create veth pair for testing in networkless kernel
+Date: Sat, 10 Aug 2024 17:55:09 +0000
+Message-Id: <20240810175509.404094-1-jain.abhinav177@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240809211911.1445c965@kernel.org>
+References: <20240809211911.1445c965@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240809233840.59953-5-Tristram.Ha@microchip.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 09, 2024 at 04:38:40PM -0700, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
-> 
-> The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
-> connect, 1 for 1000BaseT SFP, and 2 for 10/100/1000 SFP.
-> 
-> SFP is typically used so the default is 1.  The driver can detect
-> 10/100/1000 SFP and change the mode to 2.  For direct connect this mode
-> has to be explicitly set to 0 as driver cannot detect that
-> configuration.
-> 
-> The SGMII module can only report basic link status of the SFP, so it is
-> simulated as a regular internal PHY.
-> 
-> Since the regular PHY in the switch uses interrupt instead of polling the
-> driver has to handle the SGMII interrupt indicating link on/off.
-> 
-> One issue for the 1000BaseT SFP is there is no link down interrupt, so
-> the driver has to use polling to detect link down when the link is up.
-> 
-> Recent change in the DSA operation can setup the port before the PHY
-> interrupt handling function is registered.  As the SGMII interrupt can
-> be triggered after port setup there is extra code in the interrupt
-> processing to handle this situation.  Otherwise a kernel fault can be
-> triggered.
-> 
-> Note the SGMII interrupt cannot be masked in hardware.  Also the module
-> is not reset when the switch is reset.  It is important to reset the
-> module properly to make sure the interrupt is not triggered prematurely.
+On Fri, 9 Aug 2024 21:19:11 -0700, Jakub Kicinski wrote:
 
-Why not model this as a PCS? Russell has been converting all PCS like
-things in DSA into try PCS drivers. So i suspect Russell will not like
-this code, and would prefer a PCS driver.
+> > On Thu, 8 Aug 2024 09:23:09 -0700, Jakub Kicinski wrote:
+> > > A number of checks now return SKIP because veth doesn't support all
+> > > ethtool APIs.
+> > >
+> > > In netdev selftests we try to make sure SKIP is only used when test
+> > > cannot be performed because of limitations of the environment.
+> > > For example some tool is not installed, kernel doesn't have a config.
+> > > Something that the person running the test is able to fix by fixing
+> > > how the test is run.
+> > >
+> > > Running this test on veth will always SKIP, nothing CI system can do.
+> > > Please make the test use the keyword XFAIL instead of SKIP when
+> > > functionality is not supported by the underlying driver.  
+> > 
+> > Ack, understood. I will do that, one clarification though.
+> > Currently, the tests are using either PASS or FAIL and no SKIP. Based on
+> > the above suggestion, it seems that I have replace FAIL with XFAIL for all
+> > the tests that fail due to functionality not being supported by the
+> > underlying driver.
+>
+> Right, sorry for lack of clarity.
+>
+> Our CI doesn't fully trust the exit codes, so even though the test
+> exits with zero the CI parses the output and finds the "SKIP: ..."
+> lines. You need to replace those "SKIP"s in the output with "XFAIL".
 
-	Andrew
+I re-tested and found that currently only two APIs are tested, "dump" and
+"stats". For veth pair, the only test that fails currently with a SKIP is
+the dump operation.
+
+```
+# Cannot get register dump: Operation not supported
+# SKIP: veth1: ethtool dump not supported
+```
+
+This is present in kci_netdev_ethtool_test function, please confirm if this
+is the one that I need to change to XFAIL. The logic to incorporate
+the failure exit code for dump operation (74) is already in place.
+
+```
+kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
+```
+
+I just need to change the SKIP in this function to XFAIL. In case, if you
+were referring to any other tests that are failing (features on/off),
+please let me know. Thank you for prompt feedbacks, really appreciated.
 
