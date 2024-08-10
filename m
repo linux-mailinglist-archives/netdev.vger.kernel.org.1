@@ -1,144 +1,114 @@
-Return-Path: <netdev+bounces-117326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1A794D954
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 01:56:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D09B94D95E
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 02:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB6D1C20A30
-	for <lists+netdev@lfdr.de>; Fri,  9 Aug 2024 23:56:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1796283309
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 00:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5535216D9AE;
-	Fri,  9 Aug 2024 23:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FB9DF49;
+	Sat, 10 Aug 2024 00:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eYT1YY0/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMHOAiaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7DF16D336
-	for <netdev@vger.kernel.org>; Fri,  9 Aug 2024 23:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A03D441F;
+	Sat, 10 Aug 2024 00:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723247786; cv=none; b=s2ArBd5Vr4YUxA7UCo9JQ/xTbNUDqlabaxFlnu+HoAF+oUug/BxfZfZp8VLlYw614vZ017U2ot2Q+5oMb/IxrTtqNPEI1aCssGv0jScw7lQHfyC5A/EUmIO1RZ2pGFsMUnxtVMU8UFspjiwj/1WTJtMRMriImHY87ottWnEJZ5c=
+	t=1723249223; cv=none; b=IsULPL/fEcL1VsyWXfHAp526GAXp5+FJ/efQ6FciDxaYeJ54wSlOSN2kg4h8HL8xmDd7HzZzkg6YaJCZdUZZbNfLQb0XTt962Br52WB31I/HgMMvgUzDPM4IiUT7o0UemHMUnmWJ+4Mh2Uub9S0/+yx6oMt06qe/yuIFcYj3648=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723247786; c=relaxed/simple;
-	bh=bpuyTRT77VWyVVGOz0OjW+SMwVd0ftiwTB8b/jiHsDw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b2mDxrRKrpCaWBIYvnEK/lKuwZv8UVN6RvimMgSYyusB05ZIdrt86o0cmwXx5+i5LkfV0gG8YUNQvvV5E0lkbWZFerNZ/9LVmkwuVanEYnfPO0LVcu3/ijIVK2LiCgKgJ/KOfSYGL2F8jUU70zhWuWw1bSnJU7tuY1etJB4h+2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eYT1YY0/; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723247784; x=1754783784;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3EFPPYa5I/R32csNNDxGn12aoB4Umg23VRmVdp+4veI=;
-  b=eYT1YY0/HYeNyRarmOZE5XYfCsHc/2E4PUfEWRhltzIcDF+9HcmT9Beh
-   z2WUiiajHG+NzshMsuNfmKnABN4WFCSDxf+9rX8mvH+pSN8INpihMa1KJ
-   GujTGy2DaWq7/aa2j/R5LDwRDd8IPf/ERotn7Ov03RDB8g0S0IQla/Im0
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.09,277,1716249600"; 
-   d="scan'208";a="114210950"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2024 23:56:23 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:6709]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.111:2525] with esmtp (Farcaster)
- id 51cbbbfb-5bc8-4123-8091-9c3048f737d7; Fri, 9 Aug 2024 23:56:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 51cbbbfb-5bc8-4123-8091-9c3048f737d7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:56:21 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 9 Aug 2024 23:56:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 5/5] ip: Move INFINITY_LIFE_TIME to addrconf.h.
-Date: Fri, 9 Aug 2024 16:54:06 -0700
-Message-ID: <20240809235406.50187-6-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240809235406.50187-1-kuniyu@amazon.com>
-References: <20240809235406.50187-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1723249223; c=relaxed/simple;
+	bh=QO3u2CGmjXPMln6wADcUqf90kgfAOUK87AMIW5V9i4Y=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=ij/QW7x1Mnsgm+QAx039s37DTX8VPwt/eRUCN2/6/qZoiXT2f9OVj2tYKbR9xSMJNE4qavrs6jsdwb2k9tv6R7fueS/+UWqTUcUMgoSjrGE3ecdPfjrGG7o6Q23Diwz2eNHWWD6bQGHF8B3z/GWzGUHGUo7y3lbhqhbRZQSAIiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMHOAiaW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A46CAC32782;
+	Sat, 10 Aug 2024 00:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723249222;
+	bh=QO3u2CGmjXPMln6wADcUqf90kgfAOUK87AMIW5V9i4Y=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=uMHOAiaWm0jvw3WTfHVgmMTLu6fMqoM8lXDpSoiD8u1Moiva1r0soIMfeht8TkOIo
+	 CMIeOIoUVyhkY4S8+vHqlbZ+GTJikJpmyEbkeOxqjBB14KWcK7aXSl1pz5rMLHJd2a
+	 cV7cdyv1CgvxlIOv78sd7dqnqEh3kH/GABbIJged5GD1BSK1aHepIso04DEgWJQSKn
+	 sn1woWoiJR0saSm5zYGZkNMKTzpC6HsoV0x6L+WmV0BWTn9FJEb1q8XbhEphSQ+ARi
+	 /V0ozJlSUCqG506ijhsUYoGifvhObFCFb+qhspwhIMmXN1qYQH3zlWfWIs0dvI17st
+	 YSImK2t2+oDNw==
+Date: Fri, 09 Aug 2024 18:20:21 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Tristram.Ha@microchip.com
+Cc: Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, 
+ UNGLinuxDriver@microchip.com, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Vladimir Oltean <olteanv@gmail.com>, devicetree@vger.kernel.org, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Jakub Kicinski <kuba@kernel.org>, Marek Vasut <marex@denx.de>, 
+ Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org, 
+ Conor Dooley <conor+dt@kernel.org>
+In-Reply-To: <20240809233840.59953-2-Tristram.Ha@microchip.com>
+References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
+ <20240809233840.59953-2-Tristram.Ha@microchip.com>
+Message-Id: <172324922165.2057557.834820350130126130.robh@kernel.org>
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: microchip: add
+ SGMII port support to KSZ9477 switch
 
-INFINITY_LIFE_TIME is the common value used in IPv4 and IPv6 but defined
-in both .c files.
 
-Also, 0xffffffff used in addrconf_timeout_fixup() is INFINITY_LIFE_TIME.
+On Fri, 09 Aug 2024 16:38:37 -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
+> 
+> The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
+> connect, 1 for 1000BaseT SFP, and 2 for 10/100/1000 SFP.
+> 
+> SFP is typically used so the default is 1.  The driver can detect
+> 10/100/1000 SFP and change the mode to 2.  For direct connect this mode
+> has to be explicitly set to 0 as driver cannot detect that
+> configuration.
+> 
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> ---
+>  .../devicetree/bindings/net/dsa/microchip,ksz.yaml   | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
 
-Let's move INFINITY_LIFE_TIME's definition to addrconf.h
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/addrconf.h | 4 +++-
- net/ipv4/devinet.c     | 2 --
- net/ipv6/addrconf.c    | 2 --
- 3 files changed, 3 insertions(+), 5 deletions(-)
+yamllint warnings/errors:
 
-diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-index b18e81f0c9e1..c8ed31828db3 100644
---- a/include/net/addrconf.h
-+++ b/include/net/addrconf.h
-@@ -187,10 +187,12 @@ static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
- 	return 0;
- }
- 
-+#define INFINITY_LIFE_TIME 0xFFFFFFFF
-+
- static inline unsigned long addrconf_timeout_fixup(u32 timeout,
- 						   unsigned int unit)
- {
--	if (timeout == 0xffffffff)
-+	if (timeout == INFINITY_LIFE_TIME)
- 		return ~0UL;
- 
- 	/*
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index b5d2a9fd46c7..61be85154dd1 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -703,8 +703,6 @@ static int inet_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	return err;
- }
- 
--#define INFINITY_LIFE_TIME	0xFFFFFFFF
--
- static void check_lifetime(struct work_struct *work)
- {
- 	unsigned long now, next, next_sec, next_sched;
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index c87d008aefa4..04ee75af2f6b 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -92,8 +92,6 @@
- #include <linux/export.h>
- #include <linux/ioam6.h>
- 
--#define	INFINITY_LIFE_TIME	0xFFFFFFFF
--
- #define IPV6_MAX_STRLEN \
- 	sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")
- 
--- 
-2.30.2
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/microchip,ksz.example.dtb: switch@0: Unevaluated properties are not allowed ('sgmii-mode' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/dsa/microchip,ksz.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240809233840.59953-2-Tristram.Ha@microchip.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
