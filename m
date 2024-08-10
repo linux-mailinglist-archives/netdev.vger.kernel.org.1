@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-117358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B4AF94DAD7
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:10:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A276E94DADA
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 998A8B22214
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:10:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC161C20FFB
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA55013C836;
-	Sat, 10 Aug 2024 05:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FEA43ACB;
+	Sat, 10 Aug 2024 05:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aM0kj+O/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouNVjOF3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CE613C81B
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A72F15C0;
+	Sat, 10 Aug 2024 05:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723266638; cv=none; b=eBMBNWc4/qLbKL/f8Fn7sGB5M99Hj3+RePCQXIoslSv1V/dTWQMCdpAuOchzASj3huyXmyC74dXj7csLuOWgKfwx725cEOYTtXEAbzK5XLWeHkJR/oD4aP6SZoufyupN1NzRDYPwZRKuPyvPqsUTYKDrb27yNyHuETU09YO0jxs=
+	t=1723267235; cv=none; b=f3whW5SBxB0KXRo+cgdf0ks5w63H/o2Km5/QYynb05F/k38sJWdvBO0jmkVYdsCOXzfj8vLcFtwK2imWVURRycSUAO4Ls1kYROYqQ54kxCC8SZl2QqM7gUnHlzNYjQg6n37juH6ANKCR+3nSy8NhCpoG6xNbwwiqko4XXJBa0II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723266638; c=relaxed/simple;
-	bh=nQKDiudB9fAHm9bT5dgNMu4QzcGhpmnFUU4MZA2xaIA=;
+	s=arc-20240116; t=1723267235; c=relaxed/simple;
+	bh=4t9MZ/peOgftmugUsMu11XbhTMGWMCiZrCe7d4ROebA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LXT3sSRA1KOboH/Y8u9eZY22zIDg65MvCiVVy9l/rnREvE8amwLEWiLG/Zfiz9AGJR4eOaD4EcT3KVZQgPqUUgqlsUB+B/yCmllE+x6QuVPuVK0ae0wYGpyZ5BqCIwC5yH86BXpp+odttfbDlY4bmfcAw3iAnYCf0j6ZnBEd6J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aM0kj+O/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16AEEC32786;
-	Sat, 10 Aug 2024 05:10:38 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OFeULKmXSlWFy4MYtg2LjPQ0VnXB4RKl0Lq1hG3Lp9nmozrAknfiMyFAnypmdw1wdcX2kblHWgK8NPdrh0Uc+j8guN1eAe8x0quXpO+B80y1h2NPNw6ZC8CbQvi9o3rc+pvmQuqQ1xmgW0yuD677UsfM7GKDXwQDaB/b+9eDaPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouNVjOF3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C05EC32786;
+	Sat, 10 Aug 2024 05:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723266638;
-	bh=nQKDiudB9fAHm9bT5dgNMu4QzcGhpmnFUU4MZA2xaIA=;
+	s=k20201202; t=1723267235;
+	bh=4t9MZ/peOgftmugUsMu11XbhTMGWMCiZrCe7d4ROebA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aM0kj+O/AjmyPAxPYWs7Huu1WnbAS+Qgq+CKHnOh5vOQKTo/AsgdzlBbFtbwRxLqu
-	 AvBWyIMWE2N4LeBNy6vzA3kQXjfdrEXbiQKecRORPz8TirKBYcfs6BEeQedvF9VDYK
-	 vFMHRrpHWkq+7wliefaztIkDc/GpNqKvkeI3+fWFTUm+EmaZlSDxbRIb1oq4lyctwy
-	 51dUqbilr82vy5M/QaIqE5ejXZIN5LQzJZDnirbBf0dFcFxhb73g6NW5qU1H9cCori
-	 +LaeffWFSlYp8EPLjj9kVEiyjicmRakuYN7Bodrrh9OwX/GwzHztGI2TJKpYFYcbXf
-	 WJblPk4yU2dKw==
+	b=ouNVjOF3erXM5y/j1KtrT+AjiNF2rgm52PrCeWL4Z0vCEZvYoPwjENSsRNoc7Qs88
+	 o9tKO3uuW06GRjk78pftn7CRfye3ajrbkFePA4Zu5nk/Ivpjn5lMxXsU2P0FPDdzHW
+	 ieCsRe5Qk4R2UF6UANR+sEslCfhkxJPss80u1aGFzpZxBRuEUKwCOawuaZEWyXmIeV
+	 sk8VTXIpM+s6DepOM42YnbWumooEj96Kv+t4OzgYIacCYg/MAm9y6YPlnz+E0Q33P0
+	 yqYqk+HdnyUnxl4AC4XHrCnjdxf2FFhyOyP4RJ1i/vQ1Ur6kIPH0Y29iUuC6NBSSBB
+	 PzsERrn8S7Arg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C88382333F;
-	Sat, 10 Aug 2024 05:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7124C382333F;
+	Sat, 10 Aug 2024 05:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4 0/3] Don't take HW USO path when packets can't be
- checksummed by device
+Subject: Re: [PATCH net] net: fs_enet: Fix warning due to wrong type
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172326663699.4144110.16861317918539744046.git-patchwork-notify@kernel.org>
-Date: Sat, 10 Aug 2024 05:10:36 +0000
-References: <20240808-udp-gso-egress-from-tunnel-v4-0-f5c5b4149ab9@cloudflare.com>
-In-Reply-To: <20240808-udp-gso-egress-from-tunnel-v4-0-f5c5b4149ab9@cloudflare.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
- kernel-team@cloudflare.com,
- syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com, willemb@google.com
+ <172326723426.4145426.15655037908010047292.git-patchwork-notify@kernel.org>
+Date: Sat, 10 Aug 2024 05:20:34 +0000
+References: <ec67ea3a3bef7e58b8dc959f7c17d405af0d27e4.1723101144.git.christophe.leroy@csgroup.eu>
+In-Reply-To: <ec67ea3a3bef7e58b8dc959f7c17d405af0d27e4.1723101144.git.christophe.leroy@csgroup.eu>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: pantelis.antoniou@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 08 Aug 2024 11:56:20 +0200 you wrote:
-> This series addresses a recent regression report from syzbot [1].
+On Thu,  8 Aug 2024 09:16:48 +0200 you wrote:
+> Building fs_enet on powerpc e500 leads to following warning:
 > 
-> After enabling UDP_SEGMENT for egress devices which don't support checksum
-> offload [2], we need to tighten down the checks which let packets take the
-> HW USO path.
-> 
-> The fix consists of two parts:
+>     CC      drivers/net/ethernet/freescale/fs_enet/mac-scc.o
+>   In file included from ./include/linux/build_bug.h:5,
+>                    from ./include/linux/container_of.h:5,
+>                    from ./include/linux/list.h:5,
+>                    from ./include/linux/module.h:12,
+>                    from drivers/net/ethernet/freescale/fs_enet/mac-scc.c:15:
+>   drivers/net/ethernet/freescale/fs_enet/mac-scc.c: In function 'allocate_bd':
+>   ./include/linux/err.h:28:49: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+>      28 | #define IS_ERR_VALUE(x) unlikely((unsigned long)(void *)(x) >= (unsigned long)-MAX_ERRNO)
+>         |                                                 ^
+>   ./include/linux/compiler.h:77:45: note: in definition of macro 'unlikely'
+>      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+>         |                                             ^
+>   drivers/net/ethernet/freescale/fs_enet/mac-scc.c:138:13: note: in expansion of macro 'IS_ERR_VALUE'
+>     138 |         if (IS_ERR_VALUE(fep->ring_mem_addr))
+>         |             ^~~~~~~~~~~~
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v4,1/3] net: Make USO depend on CSUM offload
-    https://git.kernel.org/netdev/net/c/2b2bc3bab158
-  - [net,v4,2/3] udp: Fall back to software USO if IPv6 extension headers are present
-    https://git.kernel.org/netdev/net/c/30b03f2a0592
-  - [net,v4,3/3] selftests/net: Add coverage for UDP GSO with IPv6 extension headers
-    https://git.kernel.org/netdev/net/c/1d2c46c1bc56
+  - [net] net: fs_enet: Fix warning due to wrong type
+    https://git.kernel.org/netdev/net-next/c/c146f3d19114
 
 You are awesome, thank you!
 -- 
