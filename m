@@ -1,133 +1,213 @@
-Return-Path: <netdev+bounces-117391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CD394DB64
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 10:18:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C302D94DB82
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 10:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 170271F22045
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 08:18:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA64281FF7
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 08:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC8114AD03;
-	Sat, 10 Aug 2024 08:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sk80tMFd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E1514B961;
+	Sat, 10 Aug 2024 08:42:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FEC83CA1
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 08:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B906514AD02
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 08:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723277935; cv=none; b=tGzBa7rKxeKYUOsqp9Zi74pd6HYRpFuAml9PbzkRs/JpV9X0Ag4478IIMccns+ao2rQDotDXrAAQiUlJ3UeQ1bcuIAA3B5+2EB9A++i6QplkLP7fzQJGdw0N1hzeKbqhPGSzlDj12f5Q/0q8OzMHefrzSk32xkAqanMzZAQOoNs=
+	t=1723279341; cv=none; b=ntGy/cFvS37xo4WbvKPzlXuYu80BpmHK5I8U200160i2wiFZ5JSG4GA0Ov4Cx0nbb8x3nbMidJvIeJBaMDLiZmfXvJtWmfmFsYjswibaF7CofcZNr1fwaB5lLD4ogzDoZ5xY/kEFqVdRn/QPncHuJxkAGppgKQY1K4Mmi7v4uh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723277935; c=relaxed/simple;
-	bh=ulVYvznxTRZMqqILWZs03OP5L+uvnM9aJD2LtFQDyuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ea/KFRs6p6gnLLS31vu2B6z0uroilZX4ZUZ7Vrmat+2B+mr3tttiDIEMxVtPJezLRRJAHqSWZSjDbqKOk1TvIg+E4IgNu99HxSYGRawD3kc9YVcC5/jXAQQ/Dm2RraJx14r56Kj3kq1cT7Ya4Djytcf1ZNPEINFE9vhTI4Ih+js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sk80tMFd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2288EC32781;
-	Sat, 10 Aug 2024 08:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723277935;
-	bh=ulVYvznxTRZMqqILWZs03OP5L+uvnM9aJD2LtFQDyuY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sk80tMFdm9VLZR8AO2ikkMzgGUchySmfw28rQqPj3yrmog6HZ6ETQGV57BtKa74zl
-	 FmkrV6D1dZcb1GAuMac/vLbm1V8vJoCEZfOjuV3IpJIHNolq4XmaOci+ig0vP8XbHB
-	 qHvqDmutQ/iOUC5OUk6C+NvL+XBF+pSm2nV8582r7BYsKIAv285s9S1Bdt2hBdQlFV
-	 wqVMUoe7VPwX5e1g5qBvmiGFHSMKk7tDuwTrVUvT+hFKo0sDuXo5PAdPC6DReh9TZF
-	 Tp82wK1H+YNLnUgimhLaKbg7BLQG7xjRWPrcP+4zr7XqJJMcsPv3SM1VdbSboylFpF
-	 r4NMkcyFfZRjw==
-Date: Sat, 10 Aug 2024 09:18:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v5 iwl-next 2/6] ice: Use FIELD_PREP for timestamp values
-Message-ID: <20240810081851.GE1951@kernel.org>
-References: <20240808125825.560093-8-karol.kolacinski@intel.com>
- <20240808125825.560093-10-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1723279341; c=relaxed/simple;
+	bh=yQEbVHn6BaKMCt0IVCu3suh1Y+atI0rmkyG9pZIs4PM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=saPxgKFFhf+PInULRkt3CpsdSXC6mivvw3nZRadUNE+Rb0dRMh6JAo2U51FZKQR263UJ83fD4UgT5JHsbF90vesOd7idqnP60H5u5kmshqlN5fJkHQsdop/CTpW/KBmd4BmYueg2PyG7mJVQMgajWX1tyiKloPdHOu1xNmQWYrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39ad7e6b4deso35295625ab.2
+        for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 01:42:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723279339; x=1723884139;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wbcGf+ZscPGswmn1AVRKuI6rDAL+SV2cKXetUeYdang=;
+        b=RSJzAk1L/p7WkmMSbeGtpEo1n1ubxffzk/AGt2r2aRubc+Kfjso2hqe+HNeFJ7yM1v
+         0ng++EkY9cB94KIDAmt6/qrPeZDgSQlSGrj5sS2Zj0v9VLv9Y1iGB7g37WK3xCjL9m32
+         oX/mHfwN4bbVKiFnvM15qwfzzR1w3RMtfpez+ogaLAZOO3xlT5rlfyZeVA3B2xJ0l7qe
+         2+HSCJqZT9CIB2du6/UlNZRjjJqITOfsRtDI8ibib/4BVgAlf8ebwGm1xBQTc6KDJ7jL
+         6nAHs1/c15CiVPY/XZ+osaOMXsrj70mclJpnIVaXbZB6fOvcYD5Mz7EV2AoZ1AAWMiPd
+         Zr3w==
+X-Forwarded-Encrypted: i=1; AJvYcCU43czFg9xoUFAYoErAgJy92K5DdXxcOiOn/mrwI1KAohgO/A/iuHWlLT4zd3DQjYDSerAWdik5kFUnP9DCj5ww6PF0lrLk
+X-Gm-Message-State: AOJu0YxydCn+kT5+XgmGW4XcgH+yZXPRm0RODHVr45P2MmUZjf7EkhsR
+	R4o9kanWNwQsg6ls51hBnhB248C7T/z68WerLld4zIUxApR3/SeDLcIF15UdleLpNdRKyvV+Snk
+	FFY47LaOqfJStFZt+23BSNlZ+pxX7N9RwrMskgq08+GBN+gA2OqYW54I=
+X-Google-Smtp-Source: AGHT+IF6nOx97wMoZLJrKo88WJeuHpchdPI9KzP5X+aTL6qZPqUHzN3Uaipw/gIl2ZDGD+Nk9btllFUgTdWIW705hYTAmlWgjSQ2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240808125825.560093-10-karol.kolacinski@intel.com>
+X-Received: by 2002:a92:c562:0:b0:381:24e:7a8c with SMTP id
+ e9e14a558f8ab-39b7a474c66mr2146205ab.1.1723279338904; Sat, 10 Aug 2024
+ 01:42:18 -0700 (PDT)
+Date: Sat, 10 Aug 2024 01:42:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d830f0061f503c6a@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in skb_trim (2)
+From: syzbot <syzbot+98afa303be379af6cdb2@syzkaller.appspotmail.com>
+To: kvalo@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, toke@toke.dk
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Aug 08, 2024 at 02:57:44PM +0200, Karol Kolacinski wrote:
-> Instead of using shifts and casts, use FIELD_PREP after reading 40b
-> timestamp values.
-> 
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  6 ++++--
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 13 +++++--------
->  2 files changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index 00c6483dbffc..d1b87838986d 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -1520,7 +1520,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
->  	 * lower 8 bits in the low register, and the upper 32 bits in the high
->  	 * register.
->  	 */
-> -	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
-> +	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
-> +		  FIELD_PREP(PHY_40B_LOW_M, lo);
->  
->  	return 0;
->  }
-> @@ -4952,7 +4953,8 @@ ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
->  	/* For E810 devices, the timestamp is reported with the lower 32 bits
->  	 * in the low register, and the upper 8 bits in the high register.
->  	 */
-> -	*tstamp = ((u64)hi) << TS_HIGH_S | ((u64)lo & TS_LOW_M);
-> +	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-> +		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
->  
->  	return 0;
->  }
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> index 8a28155b206f..df94230d820f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> @@ -673,15 +673,12 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
->  /* Source timer incval macros */
->  #define INCVAL_HIGH_M			0xFF
->  
-> -/* Timestamp block macros */
-> +/* PHY 40b registers macros */
-> +#define PHY_EXT_40B_LOW_M		GENMASK(31, 0)
-> +#define PHY_EXT_40B_HIGH_M		GENMASK_ULL(39, 32)
-> +#define PHY_40B_LOW_M			GENMASK(7, 0)
-> +#define PHY_40B_HIGH_M			GENMASK_ULL(39, 8)
->  #define TS_VALID			BIT(0)
-> -#define TS_LOW_M			0xFFFFFFFF
-> -#define TS_HIGH_M			0xFF
-> -#define TS_HIGH_S			32
-> -
-> -#define TS_PHY_LOW_M			0xFF
-> -#define TS_PHY_HIGH_M			0xFFFFFFFF
+Hello,
 
-I think it it would be best to defer removing (at least)
-TS_PHY_LOW_M and TS_PHY_HIGH_M until the following patch,
-as they are still in use until then.
+syzbot found the following issue on:
 
-As is, this patch results in build failures.
+HEAD commit:    b446a2dae984 Merge tag 'linux_kselftest-fixes-6.11-rc3' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13eb467d980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=305509ad8eb5f9b8
+dashboard link: https://syzkaller.appspot.com/bug?extid=98afa303be379af6cdb2
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-> -#define TS_PHY_HIGH_S			8
->  
->  #define BYTES_PER_IDX_ADDR_L_U		8
->  #define BYTES_PER_IDX_ADDR_L		4
-> -- 
-> 2.45.2
-> 
-> 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/49d96e53e1c4/disk-b446a2da.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f05350d128a7/vmlinux-b446a2da.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/805c7d86a2db/bzImage-b446a2da.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+98afa303be379af6cdb2@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in skb_trim+0x13a/0x190 net/core/skbuff.c:2673
+ skb_trim+0x13a/0x190 net/core/skbuff.c:2673
+ ath9k_hif_usb_reg_in_cb+0x582/0x970 drivers/net/wireless/ath/ath9k/hif_usb.c:758
+ __usb_hcd_giveback_urb+0x572/0x840 drivers/usb/core/hcd.c:1650
+ usb_hcd_giveback_urb+0x157/0x720 drivers/usb/core/hcd.c:1734
+ dummy_timer+0xd3f/0x6aa0 drivers/usb/gadget/udc/dummy_hcd.c:1987
+ __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
+ __hrtimer_run_queues+0x564/0xe40 kernel/time/hrtimer.c:1753
+ hrtimer_interrupt+0x3ab/0x1490 kernel/time/hrtimer.c:1815
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+ __sysvec_apic_timer_interrupt+0xa6/0x3a0 arch/x86/kernel/apic/apic.c:1049
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x7e/0x90 arch/x86/kernel/apic/apic.c:1043
+ asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
+ __nr_to_section include/linux/mmzone.h:1862 [inline]
+ __pfn_to_section include/linux/mmzone.h:1970 [inline]
+ pfn_valid include/linux/mmzone.h:2023 [inline]
+ kmsan_virt_addr_valid arch/x86/include/asm/kmsan.h:94 [inline]
+ virt_to_page_or_null+0x7a/0x150 mm/kmsan/shadow.c:75
+ kmsan_get_metadata+0x13e/0x1c0 mm/kmsan/shadow.c:141
+ kmsan_get_shadow_origin_ptr+0x38/0xb0 mm/kmsan/shadow.c:97
+ get_shadow_origin_ptr mm/kmsan/instrumentation.c:38 [inline]
+ __msan_metadata_ptr_for_load_4+0x24/0x40 mm/kmsan/instrumentation.c:93
+ stack_trace_consume_entry+0x16f/0x1e0 kernel/stacktrace.c:94
+ arch_stack_walk+0x1ca/0x2d0 arch/x86/kernel/stacktrace.c:27
+ stack_trace_save+0xaa/0xe0 kernel/stacktrace.c:122
+ kmsan_save_stack_with_flags mm/kmsan/core.c:73 [inline]
+ kmsan_internal_poison_memory+0x49/0x90 mm/kmsan/core.c:57
+ kmsan_slab_alloc+0xdf/0x160 mm/kmsan/hooks.c:66
+ slab_post_alloc_hook mm/slub.c:3994 [inline]
+ slab_alloc_node mm/slub.c:4037 [inline]
+ __do_kmalloc_node mm/slub.c:4157 [inline]
+ __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4177
+ kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:605
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
+ alloc_skb include/linux/skbuff.h:1320 [inline]
+ nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:748 [inline]
+ nsim_dev_trap_report drivers/net/netdevsim/dev.c:805 [inline]
+ nsim_dev_trap_report_work+0x3f5/0x1230 drivers/net/netdevsim/dev.c:850
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3312
+ worker_thread+0xea5/0x1520 kernel/workqueue.c:3390
+ kthread+0x3dd/0x540 kernel/kthread.c:389
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was created at:
+ __alloc_pages_noprof+0x9d6/0xe70 mm/page_alloc.c:4723
+ __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+ alloc_slab_page mm/slub.c:2321 [inline]
+ allocate_slab+0x203/0x1220 mm/slub.c:2484
+ new_slab mm/slub.c:2537 [inline]
+ ___slab_alloc+0x12ef/0x35e0 mm/slub.c:3723
+ __slab_alloc mm/slub.c:3813 [inline]
+ __slab_alloc_node mm/slub.c:3866 [inline]
+ slab_alloc_node mm/slub.c:4025 [inline]
+ kmem_cache_alloc_noprof+0x57a/0xb20 mm/slub.c:4044
+ skb_clone+0x303/0x550 net/core/skbuff.c:2071
+ deliver_clone net/bridge/br_forward.c:125 [inline]
+ maybe_deliver+0x3ad/0x590 net/bridge/br_forward.c:190
+ br_flood+0x574/0xbd0 net/bridge/br_forward.c:236
+ br_dev_xmit+0x1bfa/0x1f10
+ __netdev_start_xmit include/linux/netdevice.h:4913 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4922 [inline]
+ xmit_one net/core/dev.c:3580 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3596
+ __dev_queue_xmit+0x358c/0x5610 net/core/dev.c:4423
+ dev_queue_xmit include/linux/netdevice.h:3105 [inline]
+ neigh_resolve_output+0x9ca/0xae0 net/core/neighbour.c:1565
+ neigh_output include/net/neighbour.h:542 [inline]
+ ip6_finish_output2+0x233e/0x2ba0 net/ipv6/ip6_output.c:137
+ __ip6_finish_output net/ipv6/ip6_output.c:211 [inline]
+ ip6_finish_output+0xbb8/0x14b0 net/ipv6/ip6_output.c:222
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip6_output+0x356/0x620 net/ipv6/ip6_output.c:243
+ dst_output include/net/dst.h:450 [inline]
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ndisc_send_skb+0xb9f/0x14c0 net/ipv6/ndisc.c:511
+ ndisc_send_rs+0x97b/0xae0 net/ipv6/ndisc.c:721
+ addrconf_rs_timer+0x488/0x6f0 net/ipv6/addrconf.c:4040
+ call_timer_fn+0x49/0x580 kernel/time/timer.c:1792
+ expire_timers kernel/time/timer.c:1843 [inline]
+ __run_timers kernel/time/timer.c:2417 [inline]
+ __run_timer_base+0x84e/0xe90 kernel/time/timer.c:2428
+ run_timer_base kernel/time/timer.c:2437 [inline]
+ run_timer_softirq+0x3a/0x70 kernel/time/timer.c:2447
+ handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0x68/0x120 kernel/softirq.c:637
+ irq_exit_rcu+0x12/0x20 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1043
+ asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
+
+CPU: 1 UID: 0 PID: 5253 Comm: kworker/1:6 Not tainted 6.11.0-rc2-syzkaller-00004-gb446a2dae984 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: events nsim_dev_trap_report_work
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
