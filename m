@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-117405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E9C94DC9B
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 13:48:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E73D894DC9F
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 13:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B5C3281CA1
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 11:48:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F802B20D85
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 11:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B606157E78;
-	Sat, 10 Aug 2024 11:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CB0158526;
+	Sat, 10 Aug 2024 11:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFzEiQdF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ex48/d/c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E0D14A605;
-	Sat, 10 Aug 2024 11:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794291E86E;
+	Sat, 10 Aug 2024 11:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723290527; cv=none; b=eRhqMwemLn6A6AlU8QPPgKpOYWP1DqCR85JtMfeXjMOnZzXOeYUS4p3gT+DinrxuiZIsKB0Op6RUwLXQmmxtkEPE0rXdyPhg0T22xOpnB8IFoFootxEAFQFnfacvvNQ+4H5A1jaMuPP1Ar7afItaYYKaNZUGxGzze4HilkJ30zY=
+	t=1723290735; cv=none; b=RYaPMI1c3ek9rKSG+joYMx9OGHPfCfU9t7/L5dwc7LZzNwTAhtIBODzmf9VgOkKX7O6J8xLKlo53X+ft52B3hN141Li9vqEg16tAfLFdBrpYaiRcfUxQ9i9y7cD4d/9iZ5mLr4cc5f6QMBe1FRMyA03o6ZfzbzH4KNwkh/aib3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723290527; c=relaxed/simple;
-	bh=+gQagVOH33t4iXoGb7ewDTWbXg1QaLtSbPStzP4utvc=;
+	s=arc-20240116; t=1723290735; c=relaxed/simple;
+	bh=DhrLnFvKHwOjN4NJb0CGA55P0fs2j6maIAprfsF40B4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t/3+a+bD9W2NjB0acy3zSvtKsNG20h6rHO5Oa/vdLV8R98D91aYaovPv4AA7pIebL5BaA72bm/kQrYjS+udohiM9pJNG/3NdBzVIA5HgNb57s2OjLKur9YYdDdEd6h8gGz7rgxIsO78FA7APQdas9L3SRGg2EfGuQ3Q+hcbLIXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFzEiQdF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 023A0C32781;
-	Sat, 10 Aug 2024 11:48:40 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=RSHJc0Ed1Y0clGr5fSIg84eMjBgD+5mrWjB+ZU3RHeJG6t+iWGJ9qG1T1Hxg/RXRozywghPiVTsAmmp565C76TK6zQVHAje8pBipH5GG8EvE2wu8NpLW9HSb01HdvFiCiAupu8FafzT+N+F6sc5XPTBZDytiT+Kyoj+BaxAaEwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ex48/d/c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1BD0C32781;
+	Sat, 10 Aug 2024 11:52:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723290526;
-	bh=+gQagVOH33t4iXoGb7ewDTWbXg1QaLtSbPStzP4utvc=;
+	s=k20201202; t=1723290735;
+	bh=DhrLnFvKHwOjN4NJb0CGA55P0fs2j6maIAprfsF40B4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TFzEiQdFZo5RWdneIn9xZB30877FTcgwh+cFd5MPj7Q9fSHGdMfpuR3wHJSLg46z8
-	 lYetKmh6+QdhCEPzaNaoHBHK40C8NrigxKaT7LxI5+IOy7wRmBJzwNv/8Q6NqugBXR
-	 wADXu7IFrpCRNBLQiZblBpFN4NGvMC7MbRrajJAZOZygElraz7LiHqETblce/ywvvP
-	 ch+IEo2glZUoJYusit9zCZu0EabnknJnPRXY7iQXerJ+snG2fdFruHmM6RsjF8pxMR
-	 ATWHpeU9ZtKRU8fQ+IeOX8nH5pwHM9qhYq0VJWS2DahXU8z0l1OsLD5Zhzus5HawLh
-	 jmOAX4ui9hxew==
-Message-ID: <6f28c65f-c91f-4210-934f-7479c9a6f719@kernel.org>
-Date: Sat, 10 Aug 2024 13:48:38 +0200
+	b=ex48/d/cdSa0MfVtpzizxJihtjD3MHd4z+S52r0VIBWbSbyBi6VV0HqpWvw9AVcgU
+	 bPHj2iK8xX/7aK7A+8wvcCNS63ipUA/QDgkEQwlWuY2sclJwmCUJprz3Lsl4Q1XCjy
+	 a6dcyvHKIDSSTIcNWpz1HxQtLH4sYfHvzNYEpw3XgE4BRG+V6cOddDbkZjzWwHYxYp
+	 OC+LWsdk+1ARSlitVZc9upTbBkqRyGeK3KhItklRlUdWFD4GJs0yqgQvQSaRxECEbF
+	 6FUOF4gjrLY78itnJczZ65aBwRXmja9tnOqElMGjNwiRj2VFGXK7zIg5kPVThvoUfV
+	 9h6LALfG4iKwg==
+Message-ID: <221d19e0-41de-4522-95fa-1adf9024b0e0@kernel.org>
+Date: Sat, 10 Aug 2024 13:52:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,19 +50,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: microchip: add SGMII
- port support to KSZ9477 switch
+Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: dsa: microchip: Add
+ KSZ8895/KSZ8864 switch support
 To: Tristram.Ha@microchip.com, Woojung Huh <woojung.huh@microchip.com>,
  UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org,
  Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Marek Vasut <marex@denx.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
- <20240809233840.59953-2-Tristram.Ha@microchip.com>
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240809212142.3575-1-Tristram.Ha@microchip.com>
+ <20240809212142.3575-2-Tristram.Ha@microchip.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -108,59 +109,27 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240809233840.59953-2-Tristram.Ha@microchip.com>
+In-Reply-To: <20240809212142.3575-2-Tristram.Ha@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/08/2024 01:38, Tristram.Ha@microchip.com wrote:
+On 09/08/2024 23:21, Tristram.Ha@microchip.com wrote:
 > From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
-> connect, 1 for 1000BaseT SFP, and 2 for 10/100/1000 SFP.
-
-Binding should say it, not commit msg. But aren't you duplicating
-something like phy-connection-type?
-	
+> KSZ8895/KSZ8864 is a switch family developed before KSZ8795 and after
+> KSZ8863, so it shares some registers and functions in those switches.
+> KSZ8895 has 5 ports and so is more similar to KSZ8795.
 > 
-> SFP is typically used so the default is 1.  The driver can detect
-> 10/100/1000 SFP and change the mode to 2.  For direct connect this mode
-> has to be explicitly set to 0 as driver cannot detect that
-> configuration.
+> KSZ8864 is a 4-port version of KSZ8895.  The first port is removed
+> while port 5 remains as a host port.
 > 
 > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 > ---
->  .../devicetree/bindings/net/dsa/microchip,ksz.yaml   | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> index 52acc15ebcbf..b4a9746556bf 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> @@ -71,6 +71,13 @@ properties:
->      enum: [2000, 4000, 8000, 12000, 16000, 20000, 24000, 28000]
->      default: 8000
->  
-> +  microchip,sgmii-mode:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description:
-> +      SGMII mode to use for the SGMII port
-> +    enum: [0, 1, 2]
-> +    default: 1
-> +
->    interrupts:
->      maxItems: 1
->  
-> @@ -137,6 +144,7 @@ examples:
->              compatible = "microchip,ksz9477";
->              reg = <0>;
->              reset-gpios = <&gpio5 0 GPIO_ACTIVE_LOW>;
-> +            sgmii-mode = <1>;
+>  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
 
-It does not look like you tested the bindings, at least after quick
-look. Please run `make dt_binding_check` (see
-Documentation/devicetree/bindings/writing-schema.rst for instructions).
-Maybe you need to update your dtschema and yamllint.
-
+Considering your earlier and later submissions were not tested, was this
+one? Did you test it before sending?
 
 Best regards,
 Krzysztof
