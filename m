@@ -1,97 +1,123 @@
-Return-Path: <netdev+bounces-117395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7374094DBDB
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 11:12:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3142594DBE6
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 11:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3531E2802A1
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 09:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD6BF1F21D4F
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 09:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764CE14D451;
-	Sat, 10 Aug 2024 09:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99E414C58C;
+	Sat, 10 Aug 2024 09:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdF6L63C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oiqi1YA4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 432F921A0B;
-	Sat, 10 Aug 2024 09:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F31E4436E;
+	Sat, 10 Aug 2024 09:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723281159; cv=none; b=H+rOxpCNBWDwqp+kutE58wV4THcj7KDGdlDIVhhxze/fb+5VuQzWe0tAsgVoI5qx+5nKpPsvLU7oVOYrITOqgHe//NBC40TlZ1bXhu8vkXtauvsN6oh+RIwXuBdMTxonVqIpzMUeGFXiEQWkd2Gke3nVybLV4j7/8v531b4DMkg=
+	t=1723281428; cv=none; b=tWbCskYNUwEnUKqu4F09fAXrIC3Vtdv8jQYn+qGYsYKkiaHXmgBswxLrueAhd4aA+8CBMZmNWM6z/k7X/dfLMSlnz/1qiMeoc7paZ5Kj58o7NarVAskZCvwvo2Abcu2dqmNymYkoyaYYtZ3UAVOocnppwBq0cU6Ytl8Wfup9rs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723281159; c=relaxed/simple;
-	bh=kETDzJtIbLOwXD4/xpys9fj3UYY1y3oAW9d2FSUpE4g=;
+	s=arc-20240116; t=1723281428; c=relaxed/simple;
+	bh=zb4bAQPkC8PuI8iRT17mPKYwOYBQem3QeLvrxpTiEH4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KIjs//CoQ3jrY8yH9ov3LJQCCLohmkEX2vGKhCQTPOtVfL+7ffKFLh+k78+TKW4Upc1f9Lw0qPEg6NT4KTVGmNJ1XmGJ12gKrBa5mpyVaH8nHTRuAmWDXrwpngb9mvkpTHnevpNtVYzGrsIEqvsI5pi+ZKZz91VStjVs4Wji93E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdF6L63C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F1BC32781;
-	Sat, 10 Aug 2024 09:12:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=a/2INPId1tybvweKLfPvmXz9L3nYWGwot6WcUINlSZCrraCBAwSb4BX75ftoVm3SQG/PI1bExE+b4N//VCgybodoXK1LOPys8g4f4zjknqNF4X0OeyX9g1sPTHes3jDhb5d4/8gjdVSBqnTN89DKjdlk7sj6mfLlFpfLKvEhP2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oiqi1YA4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB139C32781;
+	Sat, 10 Aug 2024 09:17:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723281158;
-	bh=kETDzJtIbLOwXD4/xpys9fj3UYY1y3oAW9d2FSUpE4g=;
+	s=k20201202; t=1723281428;
+	bh=zb4bAQPkC8PuI8iRT17mPKYwOYBQem3QeLvrxpTiEH4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WdF6L63Cw8AtBFWqe5oIQYYv6quo0TPehC3NbXH/V3peL9ZcV58r0kSkmgU8Fhe5x
-	 y8P+eO+Q15fIUMYk7hHtpdpFt9muxosR5NpZFtlRaeIzZqoMEW5+FOROUVtr2202w2
-	 y6bJ3XGA0jVBluVOBtWp+VpXgpWSaqzGbD+puWsgVIrvGkhNxXJOaTruv2PSj5lou/
-	 Gnt0nK0iIuDEImIuyueArWHXBmTENVgWPfp9sJjF/9jnM8Y08CIVaIBMmTQbdWRGeq
-	 ODqt83kqB5K5Q6kulcFfs2r5kfzDZ4fHzrG+3ZD35+8emeFQ6hvnlaihLOkrRB8o05
-	 VQgeh4xmphE2w==
-Date: Sat, 10 Aug 2024 05:12:37 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	daniel@iogearbox.net, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	akpm@linux-foundation.org, brauner@kernel.org, oleg@redhat.com,
-	kees@kernel.org, tandersen@netflix.com, mjguzik@gmail.com,
-	willy@infradead.org, kent.overstreet@linux.dev,
-	zhangpeng.00@bytedance.com, linmiaohe@huawei.com, hca@linux.ibm.com,
-	jiri@resnulli.us, lorenzo@kernel.org, yan@cloudflare.com,
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.10 10/27] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <ZrcvBQh53BKoSinL@sashalap>
-References: <20240728005329.1723272-1-sashal@kernel.org>
- <20240728005329.1723272-10-sashal@kernel.org>
- <20240729080014.2bfcd176@kernel.org>
+	b=Oiqi1YA4ZgNRWmOpHCOBWeHgy3LzYP5gWGnHlWVvFn0ZEKtMIdQ6+YGJ2A38JzEgq
+	 9Oo5aofLeP+A2OBgb2PGtnjzGc7/ts/0oszaEAba+/RwKfEcBpaWRk9d5HLqUDnc5B
+	 cpjL0lw8DMBdvuuZSfxtVF4qu+4AipMwdqCrvVCHPb1JlqRYm9JMTyxQNfcvwOe4n5
+	 Cft8ouLSki2/L6FZS/DTD613X48gbeBms6hkNeX3wqzIrIjPHy9u/9jo16Difkoqa6
+	 ZRHl6qkq7D5iM2eo/vGMMdS71s4i5SWU+IEmIV0/nB9UuCvJ8yx297YpnWsgXMmxKq
+	 dIBOq5VaW3snw==
+Date: Sat, 10 Aug 2024 10:17:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Gui-Dong Han <hanguidong02@outlook.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com, stable@vger.kernel.org
+Subject: Re: [PATCH] ice: Fix improper handling of refcount in
+ ice_dpll_init_rclk_pins()
+Message-ID: <20240810091703.GG1951@kernel.org>
+References: <SY8P300MB0460FB85729319189B40576FC0BA2@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240729080014.2bfcd176@kernel.org>
+In-Reply-To: <SY8P300MB0460FB85729319189B40576FC0BA2@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
 
-On Mon, Jul 29, 2024 at 08:00:14AM -0700, Jakub Kicinski wrote:
->On Sat, 27 Jul 2024 20:52:53 -0400 Sasha Levin wrote:
->> Subject: [PATCH AUTOSEL 6.10 10/27] net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
->
->no no no, let's drop this one, it's not a fix, and there's a ton
->of fallout
+On Fri, Aug 09, 2024 at 01:02:15PM +0800, Gui-Dong Han wrote:
+> This patch addresses a reference count handling issue in the
+> ice_dpll_init_rclk_pins() function. The function calls ice_dpll_get_pins(),
+> which increments the reference count of the relevant resources. However,
+> if the condition WARN_ON((!vsi || !vsi->netdev)) is met, the function
+> currently returns an error without properly releasing the resources
+> acquired by ice_dpll_get_pins(), leading to a reference count leak.
+> 
+> To resolve this, the patch introduces a goto unregister_pins; statement
+> when the condition is met, ensuring that the resources are correctly
+> released and the reference count is decremented before returning the error.
+> This change prevents potential memory leaks and ensures proper resource
+>  management within the function.
+> 
+> This bug was identified by an experimental static analysis tool developed
+> by our team. The tool specializes in analyzing reference count operations
+> and detecting potential issues where resources are not properly managed.
+> In this case, the tool flagged the missing release operation as a
+> potential problem, which led to the development of this patch.
+> 
+> Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Gui-Dong Han <hanguidong02@outlook.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_dpll.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> index e92be6f130a3..f3f204cae093 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> @@ -1641,8 +1641,10 @@ ice_dpll_init_rclk_pins(struct ice_pf *pf, struct ice_dpll_pin *pin,
+>  		if (ret)
+>  			goto unregister_pins;
+>  	}
+> -	if (WARN_ON((!vsi || !vsi->netdev)))
+> -		return -EINVAL;
+> +	if (WARN_ON((!vsi || !vsi->netdev))) {
+> +		ret = -EINVAL;
+> +		goto unregister_pins;
+> +	}
 
-Ack, will do. Thanks!
+Hi,
 
--- 
-Thanks,
-Sasha
+I wonder if it would make sense to move the check to the
+top of the function. It seems to be more of a verification
+of state at the time the function is run than anything else.
+
+Doing so would avoid the need to handle unwind in this case.
+
+>  	dpll_netdev_pin_set(vsi->netdev, pf->dplls.rclk.pin);
+>  
+>  	return 0;
+> -- 
+> 2.25.1
+> 
+> 
 
