@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-117378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CF594DAF7
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:42:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B9194DAF8
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:42:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C20C3B20F0A
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:42:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839F41C20E71
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D1F13D50A;
-	Sat, 10 Aug 2024 05:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909F413D624;
+	Sat, 10 Aug 2024 05:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOL2XVwR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fKexde97"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325B313D2BC
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D92813D619
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723268492; cv=none; b=ZUI2DjKpSFR7GNRCYOf9HRAIE+a983pF9o7QYyEhUsljff8k1c3g06fdTswhnKN9+AquupEMxOyTLa/2YytINX49tyBax3iUNy1bV1ebxr8YyI9StKI7cdAdogeG9DkJSehdEa7/UPF/UVxK+Ii3A5w51oIb5ajBA6hbcGyE6H4=
+	t=1723268493; cv=none; b=gKfEnK5N934c8iZiKDzhXQ9RvVMNBSP/ZN/QfpGFp9vB4hYR1XDYQp4vsulPojDiiqXVsAuakiHoNtHM+0t9OX9aGjldnBD7IyCOsyyFP6SsSDErSWzyP9mkV5gliQCJUWYnScqAgP6Yq1C4ICw+rSVFtxj8psUsaZhiYXUsXRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723268492; c=relaxed/simple;
-	bh=/PiUOW0PTU2RAGAXxarF0bTMgVa8BPy+8uYTYEjCk0w=;
+	s=arc-20240116; t=1723268493; c=relaxed/simple;
+	bh=pSOWwb/NcdhwdHCZvWze8Cm/jHPpakBJe+i9qVQm+qw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KkWwR/kReim+bhvqZlDEEo0C1m+68yLmvbs0w+sgeogS8HMbqLiBRISb9n28pj/G+gf1RFE7NMjAbDpz1BDQRJIZWjqALryzurSIZ05biMzUSFn4dS3EyBrUXTwA6cdGJ7/JQhHeTgSZqEUd15laiIYMmzlI5ks10uFucrq2BdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOL2XVwR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67308C32786;
-	Sat, 10 Aug 2024 05:41:31 +0000 (UTC)
+	 MIME-Version; b=NKYvAal3XW/DRbGPMwsS7QEJgWv3Egdytnj5AAsQz7buXvvnO2njocW6IqczAC+v6QYI3ksSpHOWzwrbQGhCmQtM4hKVIc0CB4Z7tVTQ03tkXrpjaoF/24vIs+VDnDy9clWZYtdm9X8yU2LVg4Xqm0RVXehESqn9jU2BZ5A/xMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fKexde97; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C4B6C4AF13;
+	Sat, 10 Aug 2024 05:41:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723268492;
-	bh=/PiUOW0PTU2RAGAXxarF0bTMgVa8BPy+8uYTYEjCk0w=;
+	bh=pSOWwb/NcdhwdHCZvWze8Cm/jHPpakBJe+i9qVQm+qw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MOL2XVwRVoVHTmW9laRwnQl4tb4S1k//9shpeMeyncf91cbX6x6wKTVhg4ZNr/nW/
-	 3MvMiZvlaIT6BNtAbbmqyBHRaLUs63dx66kk7H0hl5ypONsaZLBOwB2QYrC3dIeDkS
-	 S6fD6kvLaxu6cLouMV4dhHhReu0pwSE3hteSHq4LZ8kJmv1kja0/aauny3+8aBzxK+
-	 VKJkvOiEQrb3OHES3jb/nolOF3XK+oE5O8N1C8nqzodAPCv1mSH1meERVXPu7GJf24
-	 qPP1EatOFnVvq+fSHLAYI4l/dDyfrxwxwq+DVDaExTAHa3ME+mFwuevbjETtqFtPsZ
-	 iAI56/KLBTfmQ==
+	b=fKexde97Ia3eXlYv78UJmIdvMgeC3jsbpgbOQJFq17ZJyDVsPz1upvsUn2A8AiABQ
+	 p85i07aIu/v3GIs6t4uxPn1NY+B4ureJItr8cVhkpbahl2msZcZKrNPrWBlr2707vM
+	 DvXc+i+Tt1cgnk7TuWtYvHSRwxD1g3NeND0Zu/wOORwEeOIQwk952v5GmtIiCNbME/
+	 aggFykP32sz1pzTV/dz1vg6WPjpNfMg8QnmM9M0avJVyaW7nzVhljIf1eWK9SxKqzB
+	 4k+KSU+N8gEV2S/NgJX1Au42963Y/IFtcXMVj4n+bvrwvMY+geneGHcBWnjVHBr0Px
+	 NoBXzQcVNrErA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v5 10/12] ethtool: rss: support skipping contexts during dump
-Date: Fri,  9 Aug 2024 22:37:26 -0700
-Message-ID: <20240810053728.2757709-11-kuba@kernel.org>
+Subject: [PATCH net-next v5 11/12] netlink: specs: decode indirection table as u32 array
+Date: Fri,  9 Aug 2024 22:37:27 -0700
+Message-ID: <20240810053728.2757709-12-kuba@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240810053728.2757709-1-kuba@kernel.org>
 References: <20240810053728.2757709-1-kuba@kernel.org>
@@ -73,146 +73,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Applications may want to deal with dynamic RSS contexts only.
-So dumping context 0 will be counter-productive for them.
-Support starting the dump from a given context ID.
+Indirection table is dumped as a raw u32 array, decode it.
+It's tempting to decode hash key, too, but it is an actual
+bitstream, so leave it be for now.
 
-Alternative would be to implement a dump flag to skip just
-context 0, not sure which is better...
-
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/ethtool.yaml     |  4 ++++
- Documentation/networking/ethtool-netlink.rst | 12 ++++++++++--
- include/uapi/linux/ethtool_netlink.h         |  1 +
- net/ethtool/netlink.h                        |  2 +-
- net/ethtool/rss.c                            | 12 +++++++++++-
- 5 files changed, 27 insertions(+), 4 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index cf69eedae51d..4c2334c213b0 100644
+index 4c2334c213b0..1bbeaba5c644 100644
 --- a/Documentation/netlink/specs/ethtool.yaml
 +++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1028,6 +1028,9 @@ doc: Partial family for Ethtool Netlink.
+@@ -1022,6 +1022,7 @@ doc: Partial family for Ethtool Netlink.
        -
-         name: input_xfrm
-         type: u32
-+      -
-+        name: start-context
-+        type: u32
-   -
-     name: plca
-     attributes:
-@@ -1766,6 +1769,7 @@ doc: Partial family for Ethtool Netlink.
-         request:
-           attributes:
-             - header
-+            - start-context
-         reply: *rss-reply
-     -
-       name: plca-get-cfg
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index d5f246aceb9f..82c5542c80ce 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1866,10 +1866,18 @@ RSS context of an interface similar to ``ETHTOOL_GRSSH`` ioctl request.
- 
- Request contents:
- 
--=====================================  ======  ==========================
-+=====================================  ======  ============================
-   ``ETHTOOL_A_RSS_HEADER``             nested  request header
-   ``ETHTOOL_A_RSS_CONTEXT``            u32     context number
--=====================================  ======  ==========================
-+  ``ETHTOOL_A_RSS_START_CONTEXT``      u32     start context number (dumps)
-+=====================================  ======  ============================
-+
-+``ETHTOOL_A_RSS_CONTEXT`` specifies which RSS context number to query,
-+if not set context 0 (the main context) is queried. Dumps can be filtered
-+by device (only listing contexts of a given netdev). Filtering single
-+context number is not supported but ``ETHTOOL_A_RSS_START_CONTEXT``
-+can be used to start dumping context from the given number (primarily
-+used to ignore context 0s and only dump additional contexts).
- 
- Kernel response contents:
- 
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index 6d5bdcc67631..93c57525a975 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -965,6 +965,7 @@ enum {
- 	ETHTOOL_A_RSS_INDIR,		/* binary */
- 	ETHTOOL_A_RSS_HKEY,		/* binary */
- 	ETHTOOL_A_RSS_INPUT_XFRM,	/* u32 */
-+	ETHTOOL_A_RSS_START_CONTEXT,	/* u32 */
- 
- 	__ETHTOOL_A_RSS_CNT,
- 	ETHTOOL_A_RSS_MAX = (__ETHTOOL_A_RSS_CNT - 1),
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 919371383b23..236c189fc968 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -449,7 +449,7 @@ extern const struct nla_policy ethnl_module_get_policy[ETHTOOL_A_MODULE_HEADER +
- extern const struct nla_policy ethnl_module_set_policy[ETHTOOL_A_MODULE_POWER_MODE_POLICY + 1];
- extern const struct nla_policy ethnl_pse_get_policy[ETHTOOL_A_PSE_HEADER + 1];
- extern const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1];
--extern const struct nla_policy ethnl_rss_get_policy[ETHTOOL_A_RSS_CONTEXT + 1];
-+extern const struct nla_policy ethnl_rss_get_policy[ETHTOOL_A_RSS_START_CONTEXT + 1];
- extern const struct nla_policy ethnl_plca_get_cfg_policy[ETHTOOL_A_PLCA_HEADER + 1];
- extern const struct nla_policy ethnl_plca_set_cfg_policy[ETHTOOL_A_PLCA_MAX + 1];
- extern const struct nla_policy ethnl_plca_get_status_policy[ETHTOOL_A_PLCA_HEADER + 1];
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 2865720ff583..e07386275e14 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -28,6 +28,7 @@ struct rss_reply_data {
- const struct nla_policy ethnl_rss_get_policy[] = {
- 	[ETHTOOL_A_RSS_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
- 	[ETHTOOL_A_RSS_CONTEXT] = { .type = NLA_U32 },
-+	[ETHTOOL_A_RSS_START_CONTEXT] = { .type = NLA_U32 },
- };
- 
- static int
-@@ -38,6 +39,10 @@ rss_parse_request(struct ethnl_req_info *req_info, struct nlattr **tb,
- 
- 	if (tb[ETHTOOL_A_RSS_CONTEXT])
- 		request->rss_context = nla_get_u32(tb[ETHTOOL_A_RSS_CONTEXT]);
-+	if (tb[ETHTOOL_A_RSS_START_CONTEXT]) {
-+		NL_SET_BAD_ATTR(extack, tb[ETHTOOL_A_RSS_START_CONTEXT]);
-+		return -EINVAL;
-+	}
- 
- 	return 0;
- }
-@@ -214,6 +219,7 @@ struct rss_nl_dump_ctx {
- 
- 	/* User wants to only dump contexts from given ifindex */
- 	unsigned int		match_ifindex;
-+	unsigned int		start_ctx;
- };
- 
- static struct rss_nl_dump_ctx *rss_dump_ctx(struct netlink_callback *cb)
-@@ -236,6 +242,10 @@ int ethnl_rss_dump_start(struct netlink_callback *cb)
- 		NL_SET_BAD_ATTR(info->extack, tb[ETHTOOL_A_RSS_CONTEXT]);
- 		return -EINVAL;
- 	}
-+	if (tb[ETHTOOL_A_RSS_START_CONTEXT]) {
-+		ctx->start_ctx = nla_get_u32(tb[ETHTOOL_A_RSS_START_CONTEXT]);
-+		ctx->ctx_idx = ctx->start_ctx;
-+	}
- 
- 	ret = ethnl_parse_header_dev_get(&req_info,
- 					 tb[ETHTOOL_A_RSS_HEADER],
-@@ -317,7 +327,7 @@ rss_dump_one_dev(struct sk_buff *skb, struct netlink_callback *cb,
- 		if (ret)
- 			return ret;
- 	}
--	ctx->ctx_idx = 0;
-+	ctx->ctx_idx = ctx->start_ctx;
- 
- 	return 0;
- }
+         name: indir
+         type: binary
++        sub-type: u32
+       -
+         name: hkey
+         type: binary
 -- 
 2.46.0
 
