@@ -1,197 +1,231 @@
-Return-Path: <netdev+bounces-117435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D297D94DEE2
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 23:56:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46C394DF30
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 00:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E177B21D6B
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 21:56:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61D9D281F69
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 22:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6009A141987;
-	Sat, 10 Aug 2024 21:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1F913DDA2;
+	Sat, 10 Aug 2024 22:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="gIHDBQH7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ykxd/Zca"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2066.outbound.protection.outlook.com [40.107.20.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6173AC2B;
-	Sat, 10 Aug 2024 21:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723327008; cv=fail; b=kd03adZH5oy5Tt5eX6Llr6qE1ttbk+jwYl5vGqWwt3r+WpM9VOZLjuIrW/r9Iqx1QVs5uu5Ir31y235g/H6z2cDI646/JWVurAXzDPPKdULqsihSsI/pWG9qkgkl4d5CqJGwdj2fVGweTFH4h9xpBI44Q1QaRNrXbRKKZpzOAy8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723327008; c=relaxed/simple;
-	bh=iiFm1FIJk5c/b0UERTzvlZuSiLghqXRgDiio23U/ffg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TLJpoGwLTV9pVSpJs69jhqA50B4KarO2EA3lMGJkPegq21dXxccxK3z/PJoNlugImVV9iXPW3Qwe9xkVGiRV6aWnI6NdzPEa7HV3IXw+9sx1444sAjUYW0DEaBKODgBCCd9G17RIrXZwiBooi+7QfoSAe0hPHY2nW/Rzqs6tNcU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gIHDBQH7; arc=fail smtp.client-ip=40.107.20.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fbDWO0ssZPi4Uw55k29ceDRCzbPOe9tzczBdvkR5tVxMdpms6/2T88oByTCu3Uf8nbcryOY8peC1k5hUc5+fFuwijge+P/G6bK58x/uyWHHirUjVhOgWpFtmlIqEOTBLQaYtfsaDcxwJMuhIUoHJ5Dkj7jH2Z8MG903y06mzc2b+6p1D/LONUq6oJR4VZIQEI5V1E+5RgcwfpmkLOprmMOPtugI6K7+EJiyG18/7riPAfF5nqXlCL4oJ0AvxEIhAdVLbtIDMZHVeaTugm/Qz1xPZ3a8gcXozgVVSquC/IKsKe9C4UOINlqAo9uy1s54xMvxOEyAy/69CQ5wVN8PoFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LWJRTQaLh26fXTpzoHm1UZ+ax5uYT656qVb6iad0Dic=;
- b=XzfarsneRkgtTV4f6qWUlXMkb8gD97EDGr/B3Ft1BrTrzngbUITqIhuK2dXUtvxacBB8GMKzegtHL1V96Jvmk4XD5gUsmTclnaDuaoYk3iGZLBA491x9zvNGU4UutCiDUTSdcZm9Ier7dCd5caHmQFnnWbTNQFdOYe3ASeyl3jR525rtLkHTn6nQyDcJX8dDT/xtELUmug+sHHMj5NMqQLytUsniHEfcrSr+Fs7szIQ0vtpxuD9AuDbzKce0XxkdLxGISpNNoaMbvHXYke+UBCXs0BnME/SiEckwI9Eeei20gm8bbctTvZIv6E+Ejv3aM8crIpPP1RlfMiBes2oFcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LWJRTQaLh26fXTpzoHm1UZ+ax5uYT656qVb6iad0Dic=;
- b=gIHDBQH7ykE4BgxsrK5SbWXWeDtlwSseSkL5Z6TLnsGfjv7OZKeBeGoeSewIptQo03NdOwjsGCkz0sNpUH5/3YC2u3yAHrHdcCFOOWIWE8lCk/vjA5Ki26WBZnZ13s/XpGitMx8CRLtuBAD426rOEJpRAOwrEsV59iTbiICQS+UG+tT8O6nvA8do7bzfgU0sJtI7u1nE2tGcyflfo5cMz8f5OQfMnz4t67t4+I3r1vPV+sDjzvQ5O2Q0QYJCdHES1KGthLq9ZxvuAe3PPcq/BdVZ9GcDhMc/9y3i4gFV+w+rhlHiAloOxmmpIueNjBWqEkQa5/H8v+2B2c9ZTU6o4A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by VI2PR04MB10857.eurprd04.prod.outlook.com (2603:10a6:800:271::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13; Sat, 10 Aug
- 2024 21:56:41 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.7849.015; Sat, 10 Aug 2024
- 21:56:41 +0000
-Date: Sat, 10 Aug 2024 17:56:32 -0400
-From: Frank Li <Frank.li@nxp.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: add missed
- property phys
-Message-ID: <ZrfiEGWNb48t9HZz@lizhi-Precision-Tower-5810>
-References: <20240809200654.3503346-1-Frank.Li@nxp.com>
- <01fb45b3-c77a-4dd6-9423-ba1fa5521e4e@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01fb45b3-c77a-4dd6-9423-ba1fa5521e4e@kernel.org>
-X-ClientProxiedBy: BYAPR11CA0090.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::31) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B5313210F
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 22:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723329239; cv=none; b=gpyd0x4ZiZlHqGSicL+0hJi0lgp8Qmebpnjz6XOf4K7z3z7mE6fziV9LORbfN6HDtT5NVLD8qXUpB35JRjAUp1X/XFJOO3Bd4Mdp77OehfcEsWyD/G++E5fWm1+sC7MhIb1hSbjzdS+p0w5odN2gLqZMvTpAI9Y0tzjN70qSqa8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723329239; c=relaxed/simple;
+	bh=XezRatnM+6hw7oRSk116g9OpbO0b65RPQsItLBn8coQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=SEy/OMZLQPzbWKlzBGej/HfCksheWlhkLvRAAzOz+0Kdz2R4Zx7Lvaavq8T1/MT4Q2duAdO+21Zk1Si/5S16KS3OgZPG18ZNP4E4RANtJEuhb1nzxlQsvgqE6+6XbwEmfg4SzKccVaPv2Kef3tsCBk//6xfWy/LcIV5HPK8gar4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ykxd/Zca; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-37636c3872bso14129215ab.3
+        for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 15:33:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723329237; x=1723934037; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=588YmN6AQ76s60NCV51w6ZYydzqK6hGBSAcyY5ZCpT8=;
+        b=Ykxd/Zcaw6TOQtjb5VNBSVX5jWPs4/OSAZSD4fqq3a1j5FVe8Yp4lbg0YXiYTRqebs
+         86xFQHtMloypQ9tA4bThuFh4Hdo+yQNDYoe+Gix9l1TSEdiQAdTscenPtFUsLSZyp5oJ
+         iteYd9rMfo6bgrxnsB+VJyz5Ac84Wihu6+fZZzxMFC9XIL3kdDKY5jYxqETkfnN66p+5
+         0J0J7sl4Es4KH5e7QEfN1WY/xoCk26b8H+jVQafPWFEj7t/x7XAJqjdrUMA1ZRpGNNjH
+         EyXcnVPz0nqOppdt1QpksS6KJAh7bvMpyq8FcUSfHeulH6mVVLA5FBw53jQ1pfVOTgWO
+         Rsag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723329237; x=1723934037;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=588YmN6AQ76s60NCV51w6ZYydzqK6hGBSAcyY5ZCpT8=;
+        b=vfnmwF4u7JPRRGQAoWvgPP7oMH6mXvr8d7XyjlepnBmk1449kSVn0Sm8hBiM+j8V0S
+         1IhMyKAo/IXU905uLwuNQDGPgyeu8W/2shJaDHEVUbI4y+bWVuxeHhk1jaP0Un0JnoA+
+         5ghSbkcrtmATKZKGBLM6JxonXyZNqNtZWVaZ8FYUfVHp3lD6i2knWGsOR3VaLTYNDhod
+         uAp9pKPoYr1Pchmgerl+p6dDIMXX6Jcm4qJYDIJda2aYB/7EyrfhcBqe/hF9TKHxkC6A
+         QRjxZHHZEKbb8TfSzBonL04QoYw0BNeH7kDVXDEODH7mLCHg4veaIDEpPF9/PProrEOD
+         LRKw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3BQtUj4ok1iip6HwaWzgwWXNdL1D21AvnIP37K2Wa0zifJwc5C6oHQUk6RJlZqlHVvFjXmObdJLVf4OK5GGkI0fp0c4gv
+X-Gm-Message-State: AOJu0YzJ/Kmh2T7i5nAf39phmcWQgF8dgOqnh6QLECg1eKjitR3akjXn
+	fjWmCVGhQJi/K0ZnmNNv7MjOmbE7oAmlAv2x4AcEJWb0kUUtEa+b
+X-Google-Smtp-Source: AGHT+IH/cvJttBn6YbEUk5HobxrKwzJYdMRXpFujirw/sjHh4NMCyMscXLV0xaGLGUt0st0IvxhmAA==
+X-Received: by 2002:a05:6e02:144c:b0:399:ed4:6e9e with SMTP id e9e14a558f8ab-39b7a44966bmr62822215ab.17.1723329237095;
+        Sat, 10 Aug 2024 15:33:57 -0700 (PDT)
+Received: from jshao-Precision-Tower-3620.tail18e7e.ts.net ([129.93.161.236])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ca76a01364sm761526173.95.2024.08.10.15.33.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Aug 2024 15:33:56 -0700 (PDT)
+From: Mingrui Zhang <mrzhang97@gmail.com>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	netdev@vger.kernel.org
+Cc: Mingrui Zhang <mrzhang97@gmail.com>,
+	Lisong Xu <xu@unl.edu>
+Subject: [PATCH net] tcp_cubic fix to achieve at least the same throughput as Reno
+Date: Sat, 10 Aug 2024 17:31:30 -0500
+Message-Id: <20240810223130.379146-1-mrzhang97@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI2PR04MB10857:EE_
-X-MS-Office365-Filtering-Correlation-Id: 05a30c7e-31cf-4aaa-c8b3-08dcb987510e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|7416014|1800799024|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?o71fI90VhdaGkkLsQ3IB6+X7/PKNpO5uA5sB/5xU1lR+lfp72xGqmnDUICPQ?=
- =?us-ascii?Q?2gIjRDs0yN9pJakhgheQOfRtO43iZAd371wdH1PL9GJP9oqlpG7Lpd6J1GGY?=
- =?us-ascii?Q?XAGGgpQfpd2q+TgF+JZqsWYmnziJ5kc6IlIkxynBNXEQB4vVabmU8lxyvUml?=
- =?us-ascii?Q?C77Pv8UyiaDhSUbJC8/KK1CpnLQiC3Jl0WFBAANRFXp1UJ/kY2lEXPYn7nU2?=
- =?us-ascii?Q?Afj4D89D4swd5a9B9YX4Xy6lb5qWS+ZbpAlXf4xyLFLmgZUdvBCm7inI2Z9d?=
- =?us-ascii?Q?lm7D5QSSydLWKYhrKW4uROCS2dyqprmtSl8M4EFIomMn+KUqJg417CFYTtNe?=
- =?us-ascii?Q?Ol/it6zLnTWn7Gp+ZFCjpnjhzNG4CjO1F7BRk/5+B9qlCyX0A+MA0Yo1tBTk?=
- =?us-ascii?Q?vPMDvOMt+Mt7nk3nxAU3wc0+bFaXd6t91IiEMjQ8PPIFjThn2MuOVrLX57k+?=
- =?us-ascii?Q?jyd4fADQZw4ItS0mU2fr3zltmMI85Cn5dujmrJI0t+D2ZfoabIt8FmlnNwef?=
- =?us-ascii?Q?E9e5e5yPZ9mKPkYwaKXBYqkTxaW+eDP4/q97M4OUwZLB4dT4u1XGyflLTg1S?=
- =?us-ascii?Q?wfjMAa8vcrIqZc7o3tx/wyqBxJK6icbCtgmkRJ8IFdcpaONgcb4+daAWBorF?=
- =?us-ascii?Q?HU8E78Onk9C1ogA0RVF0Go00YxmcnKrr2T7MumB5YEtjDx/wqWGDHntMBj4r?=
- =?us-ascii?Q?iwoiMGOKucbKVEqeZj/GT5S18xTPM6PgN5B2DTP3NdENkEYSOaolc9YOxNe0?=
- =?us-ascii?Q?Y6OujSU7vHdavwou2hctHRodJZGJOdib6VLi1A6oKm1D+bFlU9q6Ty8S4ExA?=
- =?us-ascii?Q?fAv52ULnQqoqTkFWHsjpjXm5S/pXf7uf6jOFFpPAYtm/zwdNSrCrBnIMMUTe?=
- =?us-ascii?Q?dcX3jNp46klJE6XnaHPDYnUb9EyXWwuPeu+3rynOHDD4kU5vDVwPPsBzKeug?=
- =?us-ascii?Q?1jqAWjGuADYC45Mm/cC2j4n6XajQkFl6cuFSEnSaEMQ9OAAF1rQRFpcFbBR4?=
- =?us-ascii?Q?cQzGnRFngPmC8LZeP8q66OiuSBCY7OOAvKuZMyj0/1gY6BC+b9RlrOLvFPfc?=
- =?us-ascii?Q?RzjphTj/ZHwJ868KOTWjHUxdD4w7WsdnmiWwzbpOGsRIpgF/aiRwhyccH3mP?=
- =?us-ascii?Q?5bdxUHAw5P5BHc6VZl6uRwbviVBzwhj9BgaftvQPY/40h4WLk2nvEc+GLLFA?=
- =?us-ascii?Q?gHj9g3l8f5aCmeiTu4GDL6vRyDJuC52okFAzFkOBWY5kGjOO/kG539+LnZmu?=
- =?us-ascii?Q?AaMkQJJjDd8LpV/5s95vjdeWge+OvJPjQPEcUrvpY7+X5V79uOAsQbb29uYn?=
- =?us-ascii?Q?25qIf4H7XPCQlKVluR9N9ALKNSO5P7W+dLmlla+lyjmZS7e3lPlS/9b7l1aQ?=
- =?us-ascii?Q?pTETbLRaSsN9HchqFJGzV8/80O4cOtYx6jWE1jo//MZI+OTfhw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(7416014)(1800799024)(376014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?OH4wehAhKMl4U7Yp6WwUqPpEbeeDoJmYwX+f8V7zCsXEKUbO6+pQEkx2rYaO?=
- =?us-ascii?Q?Pgz2DrD256LJRZ5/cxA2whnjwgGdxDYHHNWIRr1cqg725Y7/x1uT20WFiKbg?=
- =?us-ascii?Q?sO4FDSTnzy9SV4xyJ/ELTol346FiKtZ2A8rmiU+K8Kpelvf9YwI6NQ4Vp1yC?=
- =?us-ascii?Q?llpSYGG74nyFe4oTdjsUzt6mRKSt5tsFgyTxHNXb/BWERlpgsgknczhQ/Axo?=
- =?us-ascii?Q?iu49wGwW3oNNcqdNEwud5WmnPP8gwuEzm2eCUDhE868W/AjNQCBKD+gJfkaY?=
- =?us-ascii?Q?TYdMnDSqLjh0fnf7zXEYpk3FGlYnipOdEJVuq5KVM1Dnf+RREbxs5lGHus7j?=
- =?us-ascii?Q?8GsWlIP64a3/uF0PuRWnp+fGRriVp3xOPfy+RFHbheZqROk/9tK3KJ7gh7Ir?=
- =?us-ascii?Q?q0c4imzMeEEfetBCln8oMWkWVLHsahicmA5vvO+F6ugazSVVwFIy9zftVrA2?=
- =?us-ascii?Q?zrVPRdv9wGro+UTj8AHw4MwZbID//acRcsyMhHa5prBxY7DlbHlnPnRoaxX9?=
- =?us-ascii?Q?1OI6pkdcIYCv5Zt+NbppE8j20YDpj3IFNBo8sWbhX1tZ2Y57TQdizZzVmyMP?=
- =?us-ascii?Q?pPDAUXH5wEcwNXhIUNhwsxiGr9pTBJWKhkZb/adictiwhkPT5gZ9AHrEn/pW?=
- =?us-ascii?Q?8EOWqLRlzA2Hp8Q2ItYrDEHIjcI5VwvIHn+N3pwUSMEFXBxIfVCNi5IpjR+0?=
- =?us-ascii?Q?TZ/4jjF1y7hNNx/r1IdAq4/ojqzm9+ZNr185xFWyJadbuQ95wQrs2Md1NqTz?=
- =?us-ascii?Q?v0boYRD96cvjTUn7qesKROSLWcAjbz3NvycMxH5WzyHdcAojo9onrof6G664?=
- =?us-ascii?Q?fYYes8iaTplAcF53ez3lAO3H93I4yMVzcxkhjKYxFKA37MPfT/nWtfgRLsno?=
- =?us-ascii?Q?iNd5ShqNCtUTFUqSUCvwuCOU5lJ/5gktGjpjuYuDHQlgNC4sf090k94LVqwL?=
- =?us-ascii?Q?MB2GBV+eXXNxYx+klIJsdM9yMzXm1a8j7MsrpPkrJo9vRITG7EolnXgTioN5?=
- =?us-ascii?Q?ZQnNnNeeQwWWj5yPmpVQvF0OuWaqIHX/+wr8yxkENHS69F1ytbCgMxMdI8NO?=
- =?us-ascii?Q?G0uBDWhYp0n1LGlhoer17gVZAHtW9qXmdhEs5rbwDNIeXn+/6KrHaRrDQWie?=
- =?us-ascii?Q?/p1jxJXCPL4Ln8Wn7CSz2hinjhspbvLOOotljdV6ZE20+m0vnUAn/qAVZL6U?=
- =?us-ascii?Q?wieIzt54DwoophEtHe/3zmDAoOA0vhUhRGJbsrJEj5JI0cSW4FZ29V9Kv8uW?=
- =?us-ascii?Q?kfIgRthIUpLNq0qipZ5IBjU0gvXhh/hbeEBiipB3YvjYLlIgyb32/dQ1ZN4v?=
- =?us-ascii?Q?wcu0FLnzZcu8wcLn9p4/kVGrngs2dQ8AW8/EnN1QOOz0ZwIYDFRfa+rhSO4z?=
- =?us-ascii?Q?oa1vtOeKUTVeXxAaBwTm4yTcC/wuySDEex1kle9cF/vPPL3UIJmmEsXfrkPg?=
- =?us-ascii?Q?T+97NLAbh3eXN32SlgXBBf6szcPoHqJirE440wQDMC8/CZVodCnLs18xoInB?=
- =?us-ascii?Q?gjFFputtIoi7hfvv0FlB5NWrIwgpqQm19oWyLvzYkbzBimAWDcpZ3UOSOqdJ?=
- =?us-ascii?Q?cANsBIfCulASrioGVygwUeSxRf02VBb7vAF/tK/+?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05a30c7e-31cf-4aaa-c8b3-08dcb987510e
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2024 21:56:41.4213
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nbgHFQEEfAwlFS8oMWnGJ78Mi0CdEMQXwaV3fTDaLpqtkjkQ8MunYBoswPKF9a8HpU1NJGeqZ6BwnmLoR+3xdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10857
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 10, 2024 at 01:46:25PM +0200, Krzysztof Kozlowski wrote:
-> On 09/08/2024 22:06, Frank Li wrote:
-> > Add missed property phys, which indicate how connect to serdes phy.
-> > Fix below warning:
-> > arch/arm64/boot/dts/freescale/fsl-lx2160a-honeycomb.dtb: fsl-mc@80c000000: dpmacs:ethernet@7: Unevaluated properties are not allowed ('phys' was unexpected)
-> >
-> > Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> > ---
-> >  Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml b/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
-> > index 6538e0ce90b28..25d657be6956f 100644
-> > --- a/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
-> > @@ -38,6 +38,10 @@ properties:
-> >
-> >    managed: true
-> >
-> > +  phys:
-> > +    description: A reference to the SerDes lane(s)
->
-> This is not the same phy as phy-handle points to?
+This patch fixes some CUBIC bugs so that  "CUBIC achieves at least
+the same throughput as Reno in small-BDP networks"
+[RFC 9438: https://www.rfc-editor.org/rfc/rfc9438.html]
 
-I go through source code and dts, it is not the same. phys connect to chip
-internal serdas phys. phy-handle points to external ethernet phy, which is
-connected by mdio bus generally.
+It consists of three bug fixes, all changing function bictcp_update()
+of tcp_cubic.c, which controls how fast CUBIC increases its
+congestion window size snd_cwnd.
 
-Frank
->
-> Best regards,
-> Krzysztof
->
+Bug fix 1:
+ 	ca->ack_cnt += acked;	/* count the number of ACKed packets */
+ 
+ 	if (ca->last_cwnd == cwnd &&
+-	    (s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
++	    (s32)(tcp_jiffies32 - ca->last_time) <= min(HZ / 32, usecs_to_jiffies(ca->delay_min)))
+ 		return;
+ 
+ 	/* The CUBIC function can update ca->cnt at most once per jiffy.
+
+The original code bypasses bictcp_update() under certain conditions
+to reduce the CPU overhead. Intuitively, when last_cwnd==cwnd,
+bictcp_update() is executed 32 times per second. As a result, 
+it is possible that bictcp_update() is not executed for several 
+RTTs when RTT is short (specifically < 1/32 second = 31 ms and 
+last_cwnd==cwnd which may happen in small-BDP networks), 
+thus leading to low throughput in these RTTs.
+
+The patched code executes bictcp_update() 32 times per second
+if RTT > 31 ms or every RTT if RTT < 31 ms, when last_cwnd==cwnd.
+
+Bug fix 2:
+ 	if (tcp_friendliness) {
+ 		u32 scale = beta_scale;
+ 
+-		delta = (cwnd * scale) >> 3;
++		if (cwnd < ca->bic_origin_point)
++			delta = (cwnd * scale) >> 3;
++		else
++			delta = cwnd;
+ 		while (ca->ack_cnt > delta) {		/* update tcp cwnd */
+ 			ca->ack_cnt -= delta;
+ 			ca->tcp_cwnd++;
+ 		}
+
+The original code follows RFC 8312 (obsoleted CUBIC RFC).
+
+The patched code follows RFC 9438 (new CUBIC RFC).
+
+"Once _W_est_ has grown to reach the _cwnd_ at the time of most
+recently setting _ssthresh_ -- that is, _W_est_ >= _cwnd_prior_ --
+the sender SHOULD set α__cubic_ to 1 to ensure that it can achieve
+the same congestion window increment rate as Reno, which uses AIMD
+(1,0.5)."
+
+Bug fix 3:
+-		if (ca->tcp_cwnd > cwnd) {	/* if bic is slower than tcp */
+-			delta = ca->tcp_cwnd - cwnd;
++		u32 tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
++
++		if (tcp_cwnd_next_rtt > cwnd) {  /* if bic is slower than tcp */
++			delta = tcp_cwnd_next_rtt - cwnd;
+ 			max_cnt = cwnd / delta;
+ 			if (ca->cnt > max_cnt)
+ 				ca->cnt = max_cnt;
+ 
+The original code estimates RENO snd_cwnd using the estimated 
+RENO snd_cwnd at the current time (i.e., tcp_cwnd).
+
+The patched code estimates RENO snd_cwnd using the estimated 
+RENO snd_cwnd after one RTT (i.e., tcp_cwnd_next_rtt), 
+because ca->cnt is used to increase snd_cwnd for the next RTT.
+
+Experiments:
+
+Below are Mininet experiments to demonstrate the performance difference
+between the original CUBIC and patched CUBIC.
+
+Network: link capacity = 100Mbps, RTT = 4ms
+
+TCP flows: one RENO and one CUBIC. initial cwnd = 10 packets.
+The first data packet of each flow is lost
+
+snd_cwnd of RENO and original CUBIC flows
+
+https://github.com/zmrui/tcp_cubic_fix/blob/main/reno_and_cubic.jpg
+
+snd_cwnd of RENO and patched CUBIC (with bug fixes 1, 2, and 3) flows.
+
+https://github.com/zmrui/tcp_cubic_fix/blob/main/reno_and_cubic_fixb1b2b3.jpg
+
+The result of patched CUBIC with different combinations of
+bug fixes 1, 2, and 3 can be found at the following link,
+where you can also find more experiment results.
+
+https://github.com/zmrui/tcp_cubic_fix
+
+
+Thanks
+Mingrui, and Lisong
+
+Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
+Signed-off-by: Lisong Xu <xu@unl.edu>
+---
+ net/ipv4/tcp_cubic.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+index 5dbed91c6178..2b5723194bfa 100644
+--- a/net/ipv4/tcp_cubic.c
++++ b/net/ipv4/tcp_cubic.c
+@@ -219,7 +219,7 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
+ 	ca->ack_cnt += acked;	/* count the number of ACKed packets */
+ 
+ 	if (ca->last_cwnd == cwnd &&
+-	    (s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
++	    (s32)(tcp_jiffies32 - ca->last_time) <= min(HZ / 32, usecs_to_jiffies(ca->delay_min)))
+ 		return;
+ 
+ 	/* The CUBIC function can update ca->cnt at most once per jiffy.
+@@ -301,14 +301,19 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
+ 	if (tcp_friendliness) {
+ 		u32 scale = beta_scale;
+ 
+-		delta = (cwnd * scale) >> 3;
++		if (cwnd < ca->bic_origin_point)
++			delta = (cwnd * scale) >> 3;
++		else
++			delta = cwnd;
+ 		while (ca->ack_cnt > delta) {		/* update tcp cwnd */
+ 			ca->ack_cnt -= delta;
+ 			ca->tcp_cwnd++;
+ 		}
+ 
+-		if (ca->tcp_cwnd > cwnd) {	/* if bic is slower than tcp */
+-			delta = ca->tcp_cwnd - cwnd;
++		u32 tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
++
++		if (tcp_cwnd_next_rtt > cwnd) {  /* if bic is slower than tcp */
++			delta = tcp_cwnd_next_rtt - cwnd;
+ 			max_cnt = cwnd / delta;
+ 			if (ca->cnt > max_cnt)
+ 				ca->cnt = max_cnt;
+-- 
+2.34.1
+
 
