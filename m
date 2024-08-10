@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-117372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C763E94DAF1
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:41:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A0894DAF2
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 07:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA981F21C9B
-	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:41:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EB53B215C3
+	for <lists+netdev@lfdr.de>; Sat, 10 Aug 2024 05:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDDC13B590;
-	Sat, 10 Aug 2024 05:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319A813C672;
+	Sat, 10 Aug 2024 05:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtsTtNRZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CUeSwqQ3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A34A13A253
-	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4F913BC0B
+	for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 05:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723268487; cv=none; b=u0CsfheNkIp4YL4J48STx0u/DTTdE5oT4rOweB0IjAqDunwm8W8B+F23SdIvPv3iG6ZD6X7vhBP3s+rkYidMHJ4Ai1Lygcur93IhyT5JquBPWcpwr9zQ67amHH8izdYtrZlRs1tvctxkKF6oVVoF0uJ/+xu1Xjj89RDTJl1PM9U=
+	t=1723268488; cv=none; b=L4BxNNMRjeW9xMpS3iV3pL6E7NR3J5As3GKQvvj5XWBz8+mz9RauI5bGmbONEd2/UZq50gCsbJ4gRonXWYEg8rj0Zl65xEa+vx2owoajfHDpizxod6c81RJqyqQMd2UKkCSIcYwTtIH08pxXUp5+6VtFTVdPT9gLDe3/Uay3sw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723268487; c=relaxed/simple;
-	bh=ZnBtdeyp11brBkiQM7OLPU1kLJToVDZ0f/Vv2YsCG84=;
+	s=arc-20240116; t=1723268488; c=relaxed/simple;
+	bh=PavcYLDEPFVndeodLW/ZVWWbX5SVKLZCKmjP6iibtak=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o9tzLeb8rsupeSGBPP85zOmYPS1sSwiLMCE2F9wDngb/zFCZ2Nr0O48+x3nnZk8Ddak3wf90QRZwra6w9SpaQ9qYT1lhJrlxFx6EOyGYWM8MRTwuQBX0X6n24Pw/RZi37rijK2Xpxi7Ltu5bB3HysdEwFaLbifusRK40tpofXrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtsTtNRZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B728C32786;
-	Sat, 10 Aug 2024 05:41:26 +0000 (UTC)
+	 MIME-Version; b=EluRySSgZBhNbZkTlUtcFqR0NQM193Gw9r8Zvour9so+i8yz5A+hELPQ0oAPv5/BKjwpY7CZHZ15dSj5JjFyezG3muRT3TNIkHaVqAtSMzXabXShYmqKHlcR63/9VP/uR9WtI16bmIUcWh/MXfp7SXBgQsdY1ZAB4dky+xNLFGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUeSwqQ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 346AAC4AF0E;
+	Sat, 10 Aug 2024 05:41:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723268487;
-	bh=ZnBtdeyp11brBkiQM7OLPU1kLJToVDZ0f/Vv2YsCG84=;
+	bh=PavcYLDEPFVndeodLW/ZVWWbX5SVKLZCKmjP6iibtak=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BtsTtNRZnbyvWbhg76UqLlbIcyCiIZHlDASnJ/Qr0ZV9A/hkQqLMh/ssC1Bax/QZa
-	 7kFBcm3DyJ6Qu+nr1dfXfp/eyTCrn99GItpyQXGktUJ0d+dl7iKpl0zBR30q/Fk1Zc
-	 3wbrWj7JC+0hsKyt+PXhpFQrwvdRDKR4qmzbP1ceZaPLXYYICK2M2tXG5jfGQzZ3Aw
-	 jwmu0oB/zKf0w0BJRGD9vY2yp0jCXq2u/kZsB+0ZlMNVasMKDvS0vTZfGlAlMU0cG1
-	 LpKIbO0OiJ3H6y9YQx4oCPCtFu8lgTFXbCiEXssA0Re071GdVmIB7ai0WY6ScfW6DK
-	 hgNDhmJdMGIsA==
+	b=CUeSwqQ3xOEOi6g82UFYOK8YT8ibJ4GI51QRmk9tCPCBrm8zIY2ZpkWoh+RI6TZ80
+	 40sJ1aZv/wAWD0TtbEuhc+pheAfYjnsy3obTm/gOIgVjvktml5cmF2bPyfD8cSiJbF
+	 Kk4ASCdzjl0FS2q6vfSPWquhO5wbmM4Qh7IjSUiRM/g3jwnfh06DWv6auTacczOgxG
+	 9MDdH1Tmtd6LWGRfQi1jzErbT8EPzsTvYhl5m74ccrsQnYFiR6c96ZM/vohdQINzEf
+	 qt5femz60HDPyUDy15k93VbeEan9DLmK9auTogXBDxpPmmTbGi7FW7N9uuGK/XG9FJ
+	 tCUiP4zHX11Xw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v5 04/12] ethtool: make ethtool_ops::cap_rss_ctx_supported optional
-Date: Fri,  9 Aug 2024 22:37:20 -0700
-Message-ID: <20240810053728.2757709-5-kuba@kernel.org>
+Subject: [PATCH net-next v5 05/12] eth: remove .cap_rss_ctx_supported from updated drivers
+Date: Fri,  9 Aug 2024 22:37:21 -0700
+Message-ID: <20240810053728.2757709-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240810053728.2757709-1-kuba@kernel.org>
 References: <20240810053728.2757709-1-kuba@kernel.org>
@@ -73,79 +73,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cap_rss_ctx_supported was created because the API for creating
-and configuring additional contexts is mux'ed with the normal
-RSS API. Presence of ops does not imply driver can actually
-support rss_context != 0 (in fact drivers mostly ignore that
-field). cap_rss_ctx_supported lets core check that the driver
-is context-aware before calling it.
-
-Now that we have .create_rxfh_context, there is no such
-ambiguity. We can depend on presence of the op.
-Make setting the bit optional.
+Remove .cap_rss_ctx_supported from drivers which moved to the new API.
+This makes it easy to grep for drivers which still need to be converted.
 
 Reviewed-by: Gal Pressman <gal@nvidia.com>
 Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/ethtool.h | 3 ++-
- net/ethtool/ioctl.c     | 6 ++++--
- net/ethtool/rss.c       | 3 ++-
- 3 files changed, 8 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 1 -
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c   | 1 -
+ drivers/net/ethernet/sfc/ef100_ethtool.c          | 1 -
+ drivers/net/ethernet/sfc/ethtool.c                | 1 -
+ 4 files changed, 4 deletions(-)
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 989c94eddb2b..a149485904d8 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -727,7 +727,8 @@ struct kernel_ethtool_ts_info {
-  * @cap_link_lanes_supported: indicates if the driver supports lanes
-  *	parameter.
-  * @cap_rss_ctx_supported: indicates if the driver supports RSS
-- *	contexts.
-+ *	contexts via legacy API, drivers implementing @create_rxfh_context
-+ *	do not have to set this bit.
-  * @cap_rss_sym_xor_supported: indicates if the driver supports symmetric-xor
-  *	RSS.
-  * @rxfh_indir_space: max size of RSS indirection tables, if indirection table
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index ba8630eb02ef..1698b73812ce 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1227,7 +1227,8 @@ static noinline_for_stack int ethtool_get_rxfh(struct net_device *dev,
- 	if (rxfh.rsvd8[0] || rxfh.rsvd8[1] || rxfh.rsvd32)
- 		return -EINVAL;
- 	/* Most drivers don't handle rss_context, check it's 0 as well */
--	if (rxfh.rss_context && !ops->cap_rss_ctx_supported)
-+	if (rxfh.rss_context && !(ops->cap_rss_ctx_supported ||
-+				  ops->create_rxfh_context))
- 		return -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 9dadc89378f0..44076e4ebf1a 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -5289,7 +5289,6 @@ void bnxt_ethtool_free(struct bnxt *bp)
  
- 	rxfh.indir_size = rxfh_dev.indir_size;
-@@ -1357,7 +1358,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	if (rxfh.rsvd8[0] || rxfh.rsvd8[1] || rxfh.rsvd32)
- 		return -EINVAL;
- 	/* Most drivers don't handle rss_context, check it's 0 as well */
--	if (rxfh.rss_context && !ops->cap_rss_ctx_supported)
-+	if (rxfh.rss_context && !(ops->cap_rss_ctx_supported ||
-+				  ops->create_rxfh_context))
- 		return -EOPNOTSUPP;
- 	/* Check input data transformation capabilities */
- 	if (rxfh.input_xfrm && rxfh.input_xfrm != RXH_XFRM_SYM_XOR &&
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 5c4c4505ab9a..a06bdac8b8a2 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -60,7 +60,8 @@ rss_prepare_data(const struct ethnl_req_info *req_base,
- 		return -EOPNOTSUPP;
+ const struct ethtool_ops bnxt_ethtool_ops = {
+ 	.cap_link_lanes_supported	= 1,
+-	.cap_rss_ctx_supported		= 1,
+ 	.rxfh_max_num_contexts		= BNXT_MAX_ETH_RSS_CTX + 1,
+ 	.rxfh_indir_space		= BNXT_MAX_RSS_TABLE_ENTRIES_P5,
+ 	.rxfh_priv_size			= sizeof(struct bnxt_rss_ctx),
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index 1d472316e7a7..303427599c1c 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -5791,7 +5791,6 @@ static const struct net_device_ops mvpp2_netdev_ops = {
+ };
  
- 	/* Some drivers don't handle rss_context */
--	if (request->rss_context && !ops->cap_rss_ctx_supported)
-+	if (request->rss_context && !(ops->cap_rss_ctx_supported ||
-+				      ops->create_rxfh_context))
- 		return -EOPNOTSUPP;
+ static const struct ethtool_ops mvpp2_eth_tool_ops = {
+-	.cap_rss_ctx_supported	= true,
+ 	.rxfh_max_num_contexts	= MVPP22_N_RSS_TABLES,
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+diff --git a/drivers/net/ethernet/sfc/ef100_ethtool.c b/drivers/net/ethernet/sfc/ef100_ethtool.c
+index 896ffca4aee2..746b5314acb5 100644
+--- a/drivers/net/ethernet/sfc/ef100_ethtool.c
++++ b/drivers/net/ethernet/sfc/ef100_ethtool.c
+@@ -37,7 +37,6 @@ ef100_ethtool_get_ringparam(struct net_device *net_dev,
+ /*	Ethtool options available
+  */
+ const struct ethtool_ops ef100_ethtool_ops = {
+-	.cap_rss_ctx_supported	= true,
+ 	.get_drvinfo		= efx_ethtool_get_drvinfo,
+ 	.get_msglevel		= efx_ethtool_get_msglevel,
+ 	.set_msglevel		= efx_ethtool_set_msglevel,
+diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
+index 7c887160e2ef..15245720c949 100644
+--- a/drivers/net/ethernet/sfc/ethtool.c
++++ b/drivers/net/ethernet/sfc/ethtool.c
+@@ -240,7 +240,6 @@ static int efx_ethtool_get_ts_info(struct net_device *net_dev,
+ }
  
- 	ret = ethnl_ops_begin(dev);
+ const struct ethtool_ops efx_ethtool_ops = {
+-	.cap_rss_ctx_supported	= true,
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_USECS_IRQ |
+ 				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
 -- 
 2.46.0
 
