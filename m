@@ -1,106 +1,109 @@
-Return-Path: <netdev+bounces-117464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA35994E0A4
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 11:22:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE2194E0C1
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 12:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 224021C20E34
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 09:22:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F6651F212CD
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 10:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4522C1A5;
-	Sun, 11 Aug 2024 09:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2FF36B0D;
+	Sun, 11 Aug 2024 10:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hgwmgS1e"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NABZWumV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E5E2C181;
-	Sun, 11 Aug 2024 09:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BEE20B20
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 10:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723368126; cv=none; b=RgdizhkRVyNjKRZi0WtNO0mXZpkFNXCbXHyEyCQeFwHg234pGNPz+B3dAskZmJt0jv9BYr8iMzCPsnEuQI1LCE2YgVsMvaHr8KuqIkzP+arYXaDpOISOgYPDst+A/fqDxOkpvFDDpyE3LkAqQOiXDarWyLuNSVLaKzmTYlJp990=
+	t=1723370848; cv=none; b=uvZarZVCBlBZnVtMjDG/Bdky272j3ukr3+IFIyh3xAAbBg0sCf4tONWZcTNKWwB6t1gwKN2z/dpC3k4ypiIvZ5FJrU9hm8Q6YZgEjorKj68z+Tb2y2UtQbDEiI6VHEE+E3sXEWO53SnGcDRInizuw9PR4cUSvvQvUpDA2uw8Woo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723368126; c=relaxed/simple;
-	bh=mCXxfb/Q2cP9YWcyvn1Ulh2h6OB4Wm1NDDaTQ0uKdEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VumOhkyHEK6bdAbjHfzajy9L76BKLNc/jSC24uGYDxRqFa+Tlg1CzPOe85xd018Ca70L8faaRUtuTWCSXHc0P/jwpzg062vtng2q41Xu817hWYUAGZ2IEOJC4XLUpyHlRAJoqezv0bIaelh2ge54S65xO7CaYbyLeZZj+StOfHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hgwmgS1e; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=k0pYg++oOJhJgzgPtuk5bbLwQataKDqN3jQf2XgdyXw=; b=hgwmgS1e/6pvGQA0dClJlQzoMK
-	CAQ4ojL0LtXP+w8lSxEiL2DIP4Vorz4kiBjnLsw2rX/IHhuElws/V99ubt1GF8Eb5L8+r/cZnKekN
-	/mwR5wfPbaSoS7wPgKx+axTWRCewI683mSHhOMxf6XksNY6I0kSLmrWXzzn8ZfVbSqmp8gS1d609J
-	c/y2QeuKHu2wwQV0RgQgjfBsuEp9DA8gMRM04iL518JKJKFIsSrg/X08WgldtIBH425OIXNKx4EvW
-	IJ2aZqnlX9kevTgsey78cFhypqqjpP1GaCHimLh5CqCvNuNxTTX+dkQAVT7xfPV23Eb97qxVeNl6u
-	VeiGO1yg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40012)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sd4lh-0000je-1I;
-	Sun, 11 Aug 2024 10:21:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sd4lk-0007sY-Ns; Sun, 11 Aug 2024 10:21:44 +0100
-Date: Sun, 11 Aug 2024 10:21:44 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/3] phy: Add Open Alliance helpers for the
- PHY framework
-Message-ID: <ZriCqClUc/Yd0uMK@shell.armlinux.org.uk>
-References: <20240811052005.1013512-1-o.rempel@pengutronix.de>
- <20240811052005.1013512-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1723370848; c=relaxed/simple;
+	bh=AmIkyvERHyRBcadYpjsrVYndrSDRsxhEufdTM57Aih0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k4jhr8xVCDlnE0QgDawslxyywMZwTCaV8sh/oOcA8DmExbIItKMTs5K3FLOmQqNo6DUxBFkSg1dn6XeFCTqd9CLAUcDQPhnSfG71FQs/tdlUeMGkvxOMKfnfAQ6RiSm0U+S3QWpuGreQImN7ALHOi0MS/PI4vr/DVmhKNQiW4+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NABZWumV; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723370847; x=1754906847;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rWLr2a6OT4Cv/pyPswoeLkD96HkiwyUbSDipcU9nLho=;
+  b=NABZWumVuyZ6LP6CTE9EC+U1SOpM41OAEiH3cgTCO3wZ42EyaG6TJl8n
+   wmZVHSxH6zgHs6Attlr88fGldiBGqJK/hs2BtYUxZgg3mjcYpG1XA6CxX
+   UpcNpICUmMZOECxDWIYfKRXC6Eh/WE9IZZwlWPXE0zsKz4BzQ6ylwcmHz
+   s=;
+X-IronPort-AV: E=Sophos;i="6.09,281,1716249600"; 
+   d="scan'208";a="319923471"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2024 10:07:25 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:16880]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.195:2525] with esmtp (Farcaster)
+ id 093a78e2-574f-44e9-b9cf-974605060857; Sun, 11 Aug 2024 10:07:24 +0000 (UTC)
+X-Farcaster-Flow-ID: 093a78e2-574f-44e9-b9cf-974605060857
+Received: from EX19D010UWB003.ant.amazon.com (10.13.138.81) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sun, 11 Aug 2024 10:07:23 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D010UWB003.ant.amazon.com (10.13.138.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sun, 11 Aug 2024 10:07:23 +0000
+Received: from HFA15-G9FV5D3.amazon.com (10.85.143.179) by
+ mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP Server id
+ 15.2.1258.34 via Frontend Transport; Sun, 11 Aug 2024 10:07:17 +0000
+From: David Arinzon <darinzon@amazon.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
+	<alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
+	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, Ron Beider
+	<rbeider@amazon.com>, Igor Chauskin <igorch@amazon.com>
+Subject: [PATCH v1 net-next 0/2] ENA driver metrics changes
+Date: Sun, 11 Aug 2024 13:07:09 +0300
+Message-ID: <20240811100711.12921-1-darinzon@amazon.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240811052005.1013512-2-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Sun, Aug 11, 2024 at 07:20:04AM +0200, Oleksij Rempel wrote:
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index 202ed7f450da6..e93dfec881c5d 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -23,6 +23,7 @@ obj-$(CONFIG_MDIO_DEVRES)	+= mdio_devres.o
->  libphy-$(CONFIG_SWPHY)		+= swphy.o
->  libphy-$(CONFIG_LED_TRIGGER_PHY)	+= phy_led_triggers.o
->  
-> +obj-$(CONFIG_OPEN_ALLIANCE_HELPERS) += open_alliance_helpers.o
+This patchset contains an introduction of new metrics
+available to ENA users.
 
-I was thinking more
-libphy-$(CONFIG_OPEN_ALLIANCE_HELPERS) += open_alliance_helpers.o
+David Arinzon (2):
+  net: ena: Add ENA Express metrics support
+  net: ena: Extend customer metrics reporting support
 
-rather than a potentially separate module.
-
-If it is going to end up a separate module, then it needs its own
-MODULE_LICENSE, MODULE_DESCRIPTION, etc.
-
-*** please note that I probably will only be occasionally responsive
-*** for an unknown period of time due to recent eye surgery making
-*** reading quite difficult.
+ .../device_drivers/ethernet/amazon/ena.rst    |   5 +
+ .../net/ethernet/amazon/ena/ena_admin_defs.h  |  72 ++++++++
+ drivers/net/ethernet/amazon/ena/ena_com.c     | 173 +++++++++++++++---
+ drivers/net/ethernet/amazon/ena/ena_com.h     |  68 +++++++
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c | 162 +++++++++++++---
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |  27 ++-
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |   2 +-
+ 7 files changed, 441 insertions(+), 68 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.40.1
+
 
