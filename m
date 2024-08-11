@@ -1,92 +1,103 @@
-Return-Path: <netdev+bounces-117462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BCC94E085
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 10:31:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A46694E096
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 10:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D62C3B20FDE
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 08:31:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5DAE1F21419
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 08:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A171F61C;
-	Sun, 11 Aug 2024 08:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D4B28DCB;
+	Sun, 11 Aug 2024 08:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQ8Ywb2i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7ew8lgn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A304A22EE8;
-	Sun, 11 Aug 2024 08:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704891CAB3
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 08:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723365098; cv=none; b=Za/ZWDfjcHJ6OMBrXtFSXdR1COuhXtQFqzf/acRsUyzcDFONnQ4q3dVKgp6HvDa0GDlbOgwgDWfLPtrFIHt2MYDIVJZv4aGYH/Ls46NgY5Um+IfktejwJAk0Y8m3pn3u6NLdaccrlIg4I/7nXxlKb9cM9194k0Voc9V00KHzY4U=
+	t=1723366616; cv=none; b=DFelI9W1zvmBwONke4s4HGJm1s/NUYnYQBxDLvoEe0c9joJLkKdLXAVBPF+hI6i8/dMQo6Mc+ZxKLRUAHzRCkQ3X4Ai8smpGVSPWdCltO02qTFO4ZCa1NfnDukcOy/nJYA61WEVnKD9NSsa2iKMsAdnjXT+Qda+eOFlp9ZRecp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723365098; c=relaxed/simple;
-	bh=kzajr3Hjnuc15lf2t6XaLhgE+cZOuYOk7G1o9maXKSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=itBvyHYU3rs1UmXz6hGNIBzmwnSQ8QcGmQHiu2ec4SB7DtjjhBsTgdPFV7I1ALmKPhcDE72LYUeA/Bc4WemmzsOEls+1OrMadmeoxHl4ys4PA3SpyOw+rVwZqlK6KeTLifsx8Xkafa+BLHosa9+vUac79c0fekr0saDRNMubvEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQ8Ywb2i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59000C4AF0C;
-	Sun, 11 Aug 2024 08:31:37 +0000 (UTC)
+	s=arc-20240116; t=1723366616; c=relaxed/simple;
+	bh=W84gLqiCE9VS6xNfchhRQmqgpUv7AmgL7LwhjXEkAr0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HLb8lAwShPqawpq01yk313LwPyV9apG+49jFi6WBAE0lFWtrmL4VyTiECwrA/kznTf3p1z+Uech9im92LVac1ku5K8lQYBBKxwbgwjyxQr/P0tsmrswlMi4dqGzPIHX/KKJ0TU8aVU4jZ0TIGbtfOwbB7sczhj4MzKcpjn6rnII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7ew8lgn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A03C32786;
+	Sun, 11 Aug 2024 08:56:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723365098;
-	bh=kzajr3Hjnuc15lf2t6XaLhgE+cZOuYOk7G1o9maXKSI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DQ8Ywb2iYilEVn1XF3RZRLwtNBhN8pXek14ssYNNWdbjK+RYnbfhTn9uFHG0nB1La
-	 ix1nw61dETixYmC7r0RRMb9oOvQZMFnoG0j3N8eiSdbeUKZpr1qHJm9PbpTxC6POo4
-	 FHvF1Bcx9UbK6qvQ269SEtoBNRynRfo5j/7LRFD39uOhLiOPJx3j4LATYpyrASNhnm
-	 HDc9278UKI3UqqwhMmQw6D+rWHMDuvkggRXmmWW+tmAYz8EhcllNKDrM10aCjg20R5
-	 pzssrl5MTaRQ0WRraph49wI+lbZ3qwKRvMWOAk6dubbZgDkBe5gun42IMDqZBR8AS/
-	 /FtZZ60VQ7CqA==
-Date: Sun, 11 Aug 2024 11:31:33 +0300
+	s=k20201202; t=1723366615;
+	bh=W84gLqiCE9VS6xNfchhRQmqgpUv7AmgL7LwhjXEkAr0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=S7ew8lgnceHEEM9nB1YV6M/aMOfhI1GYpO55UMZVQZUWMZi6g3bv2nSHhkrpXjkbk
+	 SbOxVh4s484rWRs6OKerIy6kaqT8IhRRT8Npni3biRo3EoA1jpAP8eWFD1mK0+Fc3x
+	 UnSutcED8qeo/1oJQhQTW0erbyra6C9cKltRBD2Si2aFOQefCml2i7ZMK4v9PcVWZF
+	 mDIYUvGCx+MI8KP3Xw2q2be2iZ9iVFW7w5PRgQZt7yTLxQ/SigQ5+HEXAbDtShs2PW
+	 iVZWwMuxkIiDK2zYu9/1bORj7ChBs6a+izjxJ0xD36ydGMZWpLJ3pG7mNYUH9guuJW
+	 gigwSuoB8Jurg==
 From: Leon Romanovsky <leon@kernel.org>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Liu Jian <liujian56@huawei.com>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, jgg@ziepe.ca,
-	zyjzyj2000@gmail.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-	alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next 4/4] RDMA/rxe: Set queue pair cur_qp_state when
- being queried
-Message-ID: <20240811083133.GA5925@unreal>
-References: <20240809083148.1989912-1-liujian56@huawei.com>
- <20240809083148.1989912-5-liujian56@huawei.com>
- <72029ea9-f550-470e-9e5d-42e95ca4592e@linux.dev>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Patrisious Haddad <phaddad@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH xfrm-next] xfrm: Remove documentation WARN_ON to limit return values for offloaded SA
+Date: Sun, 11 Aug 2024 11:56:42 +0300
+Message-ID: <e81448c34721aaf49faa904a5ffc2a18b598b3d0.1723366546.git.leon@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <72029ea9-f550-470e-9e5d-42e95ca4592e@linux.dev>
 
-On Fri, Aug 09, 2024 at 07:06:34PM +0800, Zhu Yanjun wrote:
-> 在 2024/8/9 16:31, Liu Jian 写道:
-> > Same with commit e375b9c92985 ("RDMA/cxgb4: Set queue pair state when
-> >   being queried"). The API for ib_query_qp requires the driver to set
-> > cur_qp_state on return, add the missing set.
-> > 
-> 
-> Add the following?
-> Cc: stable@vger.kernel.org
+From: Patrisious Haddad <phaddad@nvidia.com>
 
-There is no need to add stable tag for RXE driver. Distros are not
-supporting this driver, which is used for development and not for
-production.
+The original idea to put WARN_ON() on return value from driver code was
+to make sure that packet offload doesn't have silent fallback to
+SW implementation, like crypto offload has.
 
-Thanks
+In reality, this is not needed as all *swan implementations followed
+this request and used explicit configuration style to make sure that
+"users will get what they ask".
+So instead of forcing drivers to make sure that even their internal flows
+don't return -EOPNOTSUPP, let's remove this WARN_ON.
 
-> 
-> > Fixes: 8700e3e7c485 ("Soft RoCE driver")
-> > Signed-off-by: Liu Jian <liujian56@huawei.com>
-> > ---
-> >   drivers/infiniband/sw/rxe/rxe_verbs.c | 2 ++
-> >   1 file changed, 2 insertions(+)
+Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ net/xfrm/xfrm_device.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 9a44d363ba62..f123b7c9ec82 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -328,12 +328,8 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+ 		/* User explicitly requested packet offload mode and configured
+ 		 * policy in addition to the XFRM state. So be civil to users,
+ 		 * and return an error instead of taking fallback path.
+-		 *
+-		 * This WARN_ON() can be seen as a documentation for driver
+-		 * authors to do not return -EOPNOTSUPP in packet offload mode.
+ 		 */
+-		WARN_ON(err == -EOPNOTSUPP && is_packet_offload);
+-		if (err != -EOPNOTSUPP || is_packet_offload) {
++		if ((err != -EOPNOTSUPP && !is_packet_offload) || is_packet_offload) {
+ 			NL_SET_ERR_MSG_WEAK(extack, "Device failed to offload this state");
+ 			return err;
+ 		}
+-- 
+2.46.0
+
 
