@@ -1,186 +1,129 @@
-Return-Path: <netdev+bounces-117544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED1E94E3C9
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 01:08:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C58A94E3D2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 01:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFE331F21E44
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 23:08:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 112A3281387
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 23:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6244315C150;
-	Sun, 11 Aug 2024 23:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5FF15F41F;
+	Sun, 11 Aug 2024 23:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PtLwW0YZ"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ah6n414O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7978017552;
-	Sun, 11 Aug 2024 23:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E994E4C7E
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 23:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723417733; cv=none; b=lf/qCIhs6kWFLhknvsfKZmuAHCeaB81wkFSC5i96ZxuiCjA5T/WKdAdz/HpNbYSoy/yETLnpkpr8RCNYeG6agKah4aq7lCL8OgPa4m9Xbv1x+OtRRA+2A/+R6QRL4KDelm/9TZ0lOYLysu3TLwCtbOI2rlCHN6sfWmX8yw1p1kU=
+	t=1723418757; cv=none; b=HvqFBntS7eHHZxJp3uB/btheHrVcfMxoVPGhCcX+oK7f8OPfCYhzaGHivyUx7XRnH+VB6tMnno5rCg5CiP9uAcI/9yAD+xJkaZTPVjplJqfm74i1iKmf4Uamko0ysPuJiFzCnxKFe9skvxQYlcUT0a4vPi4IzD9jptzxQYS730M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723417733; c=relaxed/simple;
-	bh=0REntvbk7YA+x6Mvm6ig6nyK1u+1PLyMwNtu+Vfy7k4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dU0iXUP9Fzhm9nsRB5hPkiUq8ZXI6MazJwBVuo8pcfOhE6Wt08QWWlER/6b40mv7ClsvY7UoOIMJa+WP5EsUrQ0dHl0jJ0nD7XmjX7pHoYHRFFzJMdlWdboO1SdOdph2tpVytQTdDsEDS5GonxQ1dGFYtYJGwZysMdkvy5nP3dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PtLwW0YZ; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1723418757; c=relaxed/simple;
+	bh=21uNYBL79526K87et3nISNBIXjuieKYVGFCVBi8v0ZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nW7OjunU5WuWYlGgp1tnorWOHLRwnJQUAAhs98/rLmhW8QtOxuXrEtOlytS8cI0IDIs5DKI0Gjy8g+tOJRSLXHKeK+pbL05HIZ3ZYo5/A1Ap6/WL6KUC0Ys1/1X8G3oFYR2Aez2yBOxph+Ztyq7mNp+la0YV0ByMDVLi+csxaGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ah6n414O; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7b594936e9bso2650940a12.1
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723417731; x=1754953731;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nIStNuRi5PJ9VVQEuUt99WthBIbZjQP2FeObzJxenCs=;
-  b=PtLwW0YZHKXcstuv3hmvqAzxqmtAELl2zpyFRWTS1jOI0/23h6Csu2Gp
-   MpJldzZzzempSHPNM6pcwUXhJcPB/AI90SFfm0zUavnEPsmC0077yRfZF
-   EvSc4VPCATXZ/cbAQ4/d1uVuQUm6bF+HjyUnFjaM9UKoBHfzG+r07PxZk
-   k=;
-X-IronPort-AV: E=Sophos;i="6.09,282,1716249600"; 
-   d="scan'208";a="673276507"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2024 23:08:48 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:15515]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.82:2525] with esmtp (Farcaster)
- id e17aebec-1828-46fc-a979-bab6c22caaca; Sun, 11 Aug 2024 23:08:47 +0000 (UTC)
-X-Farcaster-Flow-ID: e17aebec-1828-46fc-a979-bab6c22caaca
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sun, 11 Aug 2024 23:08:47 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sun, 11 Aug 2024 23:08:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<fw@strlen.de>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
-Date: Sun, 11 Aug 2024 16:08:36 -0700
-Message-ID: <20240811230836.95914-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240811230029.95258-1-kuniyu@amazon.com>
-References: <20240811230029.95258-1-kuniyu@amazon.com>
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1723418754; x=1724023554; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=21uNYBL79526K87et3nISNBIXjuieKYVGFCVBi8v0ZM=;
+        b=ah6n414O/KIWk2pzQe4vX3aU5VT65Rlo3ic56sCwEq/sNeEkzp3Fcy6Dw5h52xZmT5
+         8oXuN0zG9EBlakA5+uSnppWu0J3LvUJNQdWjv6nPLHAQvR9FfcRZIo9rjlo1eazRSTH4
+         1AknNE6mT69WXM6wwgSXAUSyEYZQeUcRxF6Ii5SmTjvOoHgcFg2zmrS9QpSKLfCVxzn4
+         +DcToapHZXkAB74StWeeEMLUG59Fl3B8oV+LHtsF8okUSuzFv/RdiKYMnr6MC+9eeQTm
+         IyoT7JsjPPAi5i6eoZNr3mWU5wIN4SR10hxJGrNslyRJEn5YA64/ty7JiVff/LUf/ELT
+         kXyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723418754; x=1724023554;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=21uNYBL79526K87et3nISNBIXjuieKYVGFCVBi8v0ZM=;
+        b=W894oRSwLfEDwr9CfLyazKatOH/HYdBwX9rGD9D9ZuXQh+4CkCBld89L/FG2KVb5I2
+         shS8jZPNv4ts2hVsCRrK0pdmPeyYLz0HE1Tw/6/T3ixtgjVIZs5xY/JO95oG1foQzqL/
+         iUpp3MqPODg6UjPh+IaMg2nWO4x4ESr3JDrFvU97wAzCSypGwR8LxHSzAepM8wNyvk4O
+         tmkQGvkFULdjJ1wuXqJ5xI4kenMG7fI8TJaWH9iFtDrbe6vkz57js4mnB/08tse+sb80
+         khmtMUNWlJcWvajqG8sKGSNJJRsAqLTstIIuHLkYhRRQ67Aq2x/6hFgjCH08+hPRgHuE
+         sI2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWjWYctnwBX8azMbX4trrstQr6PuVkXjzbKdrHd5HIBp+X48xBQD6B6knOdPcUPQBOH7ysEgZlck41ui8L8ORBDE0ZA4kOm
+X-Gm-Message-State: AOJu0YzJI5b1FHyU+Nxd7zrK2fGyXXPz3l/Cs2dRa8RwkE/OswHXv7py
+	WSwI99e7XlJ/isTn+CwJzOuB0MzJXt4z7ljFImF7Rh/ryHY/Ma7mxkr8t7SJmEk=
+X-Google-Smtp-Source: AGHT+IHaIB9HGl+ah2LAWk9f+yhb2Giy+NGy0Htf3qWc/M+ZQyZMZFJRABOn6uaX33Y2AawbungXgg==
+X-Received: by 2002:a05:6a21:151a:b0:1c4:8da5:219a with SMTP id adf61e73a8af0-1c89fe720damr9520617637.8.1723418754129;
+        Sun, 11 Aug 2024 16:25:54 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb9fed06sm26680995ad.186.2024.08.11.16.25.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Aug 2024 16:25:53 -0700 (PDT)
+Date: Sun, 11 Aug 2024 16:25:52 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Stefan =?UTF-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 0/2] iproute2: ss: clarify build warnings when building
+ with libbpf 0.5.0
+Message-ID: <20240811162552.75adee22@hermes.local>
+In-Reply-To: <20240811223135.1173783-1-stefan.maetje@esd.eu>
+References: <20240811223135.1173783-1-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Sun, 11 Aug 2024 16:00:29 -0700
-> From: Florian Westphal <fw@strlen.de>
-> Date: Sun, 11 Aug 2024 18:28:50 +0200
-> > Florian Westphal <fw@strlen.de> wrote:
-> > > https://syzkaller.appspot.com/x/log.txt?x=117f3182980000
-> > > 
-> > > ... shows at two cores racing:
-> > > 
-> > > [ 3127.234402][ T1396] CPU: 3 PID: 1396 Comm: syz-executor.3 Not
-> > > and
-> > > [ 3127.257864][   T13] CPU: 1 PID: 13 Comm: kworker/u32:1 Not tainted 6.9.0-syzkalle (netns cleanup net).
-> > > 
-> > > 
-> > > first splat backtrace shows invocation of tcp_sk_exit_batch() from
-> > > netns error unwinding code.
-> > > 
-> > > Second one lacks backtrace, but its also in tcp_sk_exit_batch(),
-> > 
-> > ... which doesn't work.  Does this look like a plausible
-> > theory/exlanation?
-> 
-> Yes!  The problem here is that inet_twsk_purge() operates on twsk
-> not in net_exit_list, but I think such a check is overkill and we
-> can work around it in another way.
-> 
-> 
-> > 
-> > Given:
-> > 1 exiting netns, has >= 1 tw sk.
-> > 1 (unrelated) netns that failed in setup_net
-> > 
-> > ... we run into following race:
-> > 
-> > exiting netns, from cleanup wq, calls tcp_sk_exit_batch(), which calls
-> > inet_twsk_purge(&tcp_hashinfo).
-> > 
-> > At same time, from error unwinding code, we also call tcp_sk_exit_batch().
-> > 
-> > Both threads walk tcp_hashinfo ehash buckets.
-> > 
-> > From work queue (normal netns exit path), we hit
-> > 
-> > 303                         if (state == TCP_TIME_WAIT) {
-> > 304                                 inet_twsk_deschedule_put(inet_twsk(sk));
-> > 
-> > Because both threads operate on tcp_hashinfo, the unrelated
-> > struct net (exiting net) is also visible to error-unwinding thread.
-> > 
-> > So, error unwinding code will call
-> > 
-> > 303                         if (state == TCP_TIME_WAIT) {
-> > 304                                 inet_twsk_deschedule_put(inet_twsk(sk));
-> > 
-> > for the same tw sk and both threads do
-> > 
-> > 218 void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
-> > 219 {
-> > 220         if (del_timer_sync(&tw->tw_timer))
-> > 221                 inet_twsk_kill(tw);
-> > 
-> > Error unwind path cancel timer, calls inet_twsk_kill, while
-> > work queue sees timer as already shut-down so it ends up
-> > returning to tcp_sk_exit_batch(), where it will WARN here:
-> > 
-> >   WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
-> > 
-> > ... because the supposedly-last tw_refcount decrement did not drop
-> > it down to 0.
-> > 
-> > Meanwhile, error unwiding thread calls refcount_dec() on
-> > tw_refcount, which now drops down to 0 instead of 1, which
-> > provides another warn splat.
-> > 
-> > I'll ponder on ways to fix this tomorrow unless someone
-> > else already has better theory/solution.
-> 
-> We need to sync two inet_twsk_kill(), so maybe give up one
-> if twsk is not hashed ?
-> 
-> ---8<---
-> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-> index 337390ba85b4..51889567274b 100644
-> --- a/net/ipv4/inet_timewait_sock.c
-> +++ b/net/ipv4/inet_timewait_sock.c
-> @@ -52,7 +52,10 @@ static void inet_twsk_kill(struct inet_timewait_sock *tw)
->  	struct inet_bind_hashbucket *bhead, *bhead2;
->  
->  	spin_lock(lock);
-> -	sk_nulls_del_node_init_rcu((struct sock *)tw);
-> +	if (!sk_nulls_del_node_init_rcu((struct sock *)tw)) {
-> +		spin_unlock(lock);
-> +		return false;
+On Mon, 12 Aug 2024 00:31:33 +0200
+Stefan M=C3=A4tje <stefan.maetje@esd.eu> wrote:
 
-forgot to remove false, just return :)
+> Hi,
+> when building current iproute2 source on Ubuntu 22.04 with libbpf0
+> 0.5.0 installed, I stumbled over the warning "libbpf version 0.5 or=20
+> later is required, ...". This prompted me to look closer having the
+> version 0.5.0 installed which should suppress this warning.
+> The warning lured me into the impression that building without
+> warning should be possible using libbpf 0.5.0.
 
+Why is using new iproute2 on 2 year old distro going to add
+anything here? Especially when BPF has under gone breaking API changes
+over the recent past.
 
-> +	}
->  	spin_unlock(lock);
->  
->  	/* Disassociate with bind bucket. */
-> ---8<---
+>=20
+> I found out that this warning came from ss.c where a conditional
+> compile path depends on LIBBPF_MAJOR_VERSION and LIBBPF_MINOR_VERSION.
+> Newer libbpf versions define these in libbpf_version.h but the library
+> version 0.5.0 and earlier on Ubuntu and Debian don't package this header.
+> The version 0.7.0 on Debian packages the header libbpf_version.h.
+>=20
+> Therefore these defines were undefined during the build and prompted
+> the output of the warning message. I derived these version defines
+> from the library version in the configure script and provided them
+> via CFLAGS. This is the first patch.
+>=20
+> Now building ss.c against the libbpf 0.5.0 with ENABLE_BPF_SKSTORAGE_SUPP=
+ORT
+> enabled, triggered compilation errors. The function btf_dump__new is
+> used there with a calling convention that was introduced with libbpf
+> version 0.6.0. Therefore ENABLE_BPF_SKSTORAGE_SUPPORT shall only be
+> enabled for libbpf versions >=3D 0.6.0.
+
+Might be better just to drop support for old libbpf and also
+the legacy mode. Having multiple versions means there is more code
+that doesn't get covered by tests.
+
+Also, configure shell script is getting to be so messy, it is time for a re=
+do.
+Maybe give up on make and go to meson?
 
