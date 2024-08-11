@@ -1,59 +1,52 @@
-Return-Path: <netdev+bounces-117508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526B694E23E
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:23:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DCA294E240
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:29:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DDD7281375
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697051C20927
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9FC14F9DD;
-	Sun, 11 Aug 2024 16:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qYIqQARZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4741514E2;
+	Sun, 11 Aug 2024 16:29:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9310C8E9;
-	Sun, 11 Aug 2024 16:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D909C8E9;
+	Sun, 11 Aug 2024 16:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723393409; cv=none; b=tQePmURuCXZYz7JzeClvvjdTpdCxOpyvThd8QzeryETsaTTseA4EstIxxKc9E1SAXRZTiPSgv1Aasmg3O0Ba0F4sVgxaYPkbY4B2Omcvv2pDaFPxw39xcMWnHTbHxvS9oDGlIc6yBcmy8tbM+TCM804aByi/BJAYdSWhQu/MX3w=
+	t=1723393742; cv=none; b=U4aIh1AIq7dp+JXp2pEBX7cOhELeVriMeHEAf8435lYEb0coMB56Yum79NLZ76N96fWiL+Dg0+q1aYoVgoZGZxh9Xf4nIJb3hpMQhlk22XoG4QT6aOn/6KZ4gxuZuGo5MFWCo8ZLLJ6CGgxLy/AzFBYQx6vMGIpZ2PN/im9lwic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723393409; c=relaxed/simple;
-	bh=mbMaQXcJ9pxMH9v+8fhSKC86hP2bA8HqHAsgOeWpPD4=;
+	s=arc-20240116; t=1723393742; c=relaxed/simple;
+	bh=KNUu75mJOq6wqZt3/F2bH3NqQbOYJZhS6W32Vz204vg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SaBEz0M2GO7eU46yCxaACoPxOPlnB9Jrz+ciR7OEzBbjodm43cjSjIug/Vu4wVtkP/Pc0q9aIE9FymZelGsz57Omwooghzo3Fq2gdPNLr/PHIm/EyMs8kokqvljPkrLldTUx3Bqha84yrxY8nYUfjo0MreRTXi0DddMKR54yqZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qYIqQARZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GwBmTO0fSXXHVUDt3kRYniEUVYID6vswgGU37C59G7Q=; b=qYIqQARZdWNIZQXOZprawbam4m
-	nPXfS7ZRUTL26aMSjYYoutHqfwEhvigha/7MxkF7w/5zkU1mBugTkUwWN9nVxpyXBs7xHkOy5O5fB
-	sU/Y3BaJ2yAG9OlLn0GgSqyXsSDMI9C7bUr9G/Po8Ht8AzhLNLGa2oBbmLAbIjSmSweU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdBLf-004Vfw-Ny; Sun, 11 Aug 2024 18:23:15 +0200
-Date: Sun, 11 Aug 2024 18:23:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, michal.simek@amd.com,
-	ariane.keller@tik.ee.ethz.ch, daniel@iogearbox.net,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, git@amd.com
-Subject: Re: [PATCH net v2] net: axienet: Fix register defines comment
- description
-Message-ID: <2dce7918-d65e-4341-bd1f-6e649e100475@lunn.ch>
-References: <1723184769-3558498-1-git-send-email-radhey.shyam.pandey@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=spOW0v116CvJIqFGoZaSxnPPiM8klvz/ha/SmN/qKI8Z/sErWmda056aZw7kiypuVdlAf/gGSkvxsmbZneLDOBSdDvB5/KKweI5LD2ligLL75u0A1AkVg5nTu6K8slBhXok9ombVit65fT03sg3gRIjsuaI7OMGdscPLbKNyW+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sdBR4-00063D-Ll; Sun, 11 Aug 2024 18:28:50 +0200
+Date: Sun, 11 Aug 2024 18:28:50 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
+Message-ID: <20240811162850.GE13736@breakpoint.cc>
+References: <0000000000003a5292061f5e4e19@google.com>
+ <20240811022903.49188-1-kuniyu@amazon.com>
+ <20240811132411.GB13736@breakpoint.cc>
+ <20240811145443.GD13736@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,17 +55,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1723184769-3558498-1-git-send-email-radhey.shyam.pandey@amd.com>
+In-Reply-To: <20240811145443.GD13736@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Aug 09, 2024 at 11:56:09AM +0530, Radhey Shyam Pandey wrote:
-> In axiethernet header fix register defines comment description to be
-> inline with IP documentation. It updates MAC configuration register,
-> MDIO configuration register and frame filter control description.
+Florian Westphal <fw@strlen.de> wrote:
+> https://syzkaller.appspot.com/x/log.txt?x=117f3182980000
 > 
-> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
-> Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+> ... shows at two cores racing:
+> 
+> [ 3127.234402][ T1396] CPU: 3 PID: 1396 Comm: syz-executor.3 Not
+> and
+> [ 3127.257864][   T13] CPU: 1 PID: 13 Comm: kworker/u32:1 Not tainted 6.9.0-syzkalle (netns cleanup net).
+> 
+> 
+> first splat backtrace shows invocation of tcp_sk_exit_batch() from
+> netns error unwinding code.
+> 
+> Second one lacks backtrace, but its also in tcp_sk_exit_batch(),
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+... which doesn't work.  Does this look like a plausible
+theory/exlanation?
 
-    Andrew
+Given:
+1 exiting netns, has >= 1 tw sk.
+1 (unrelated) netns that failed in setup_net
+
+... we run into following race:
+
+exiting netns, from cleanup wq, calls tcp_sk_exit_batch(), which calls
+inet_twsk_purge(&tcp_hashinfo).
+
+At same time, from error unwinding code, we also call tcp_sk_exit_batch().
+
+Both threads walk tcp_hashinfo ehash buckets.
+
+From work queue (normal netns exit path), we hit
+
+303                         if (state == TCP_TIME_WAIT) {
+304                                 inet_twsk_deschedule_put(inet_twsk(sk));
+
+Because both threads operate on tcp_hashinfo, the unrelated
+struct net (exiting net) is also visible to error-unwinding thread.
+
+So, error unwinding code will call
+
+303                         if (state == TCP_TIME_WAIT) {
+304                                 inet_twsk_deschedule_put(inet_twsk(sk));
+
+for the same tw sk and both threads do
+
+218 void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
+219 {
+220         if (del_timer_sync(&tw->tw_timer))
+221                 inet_twsk_kill(tw);
+
+Error unwind path cancel timer, calls inet_twsk_kill, while
+work queue sees timer as already shut-down so it ends up
+returning to tcp_sk_exit_batch(), where it will WARN here:
+
+  WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
+
+... because the supposedly-last tw_refcount decrement did not drop
+it down to 0.
+
+Meanwhile, error unwiding thread calls refcount_dec() on
+tw_refcount, which now drops down to 0 instead of 1, which
+provides another warn splat.
+
+I'll ponder on ways to fix this tomorrow unless someone
+else already has better theory/solution.
 
