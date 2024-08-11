@@ -1,155 +1,115 @@
-Return-Path: <netdev+bounces-117478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B54894E150
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:09:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2177A94E169
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:24:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FFA51C20C02
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 13:09:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2C4CB20F8A
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 13:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CDF1465A8;
-	Sun, 11 Aug 2024 13:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49752148841;
+	Sun, 11 Aug 2024 13:24:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-220.mail.aliyun.com (out28-220.mail.aliyun.com [115.124.28.220])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDF1145A12;
-	Sun, 11 Aug 2024 13:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627BA148838;
+	Sun, 11 Aug 2024 13:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723381775; cv=none; b=dymUDRaPgLQjvaoG51tSKJaUFCDAnozUPI5IyJaRE4R+nc2gu8MD+oi1tN/LQECyNuTb+DeOiKg0dUYmN3CmEpCuNvKku7N8Dm/+I2JaSsbs4dH5TFj2ZLWgIAVx8IGbJlFcpETeeLWqaqvgnxmJKFphpz4bu4Wf8DoK17aHnSE=
+	t=1723382663; cv=none; b=mrGzcZ+/wMMgg43q1HdjlmBGsTAFQC/oDWo/NEKEt72E9Lew4p3CeOcaf57y1WVOQ7DSzX7GTEqiM2+sb2DFLWUMVuSxqPT8+NV7HQSy0Ukhgx7cM8FvOhx7XDHdDpYfTrhi5k67uNLPhk8TA5ABzi2eRhJZ3VZ3pPWY2W7luCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723381775; c=relaxed/simple;
-	bh=CwSzN2T6LANVllh1CufNDmu9zUGYFb619dg2U/od1bw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LgRAWJ6zrFLS/v8KxhGRFFizqIMsFln/s4vAloo4YR13NcTMPO34teyHzsHXnxSnNVMz9e7GwIdQEQIQxLN+7+nbYirTOr6LrBOcv/P5z0f2bPBiUOFpsUtw64OZjFjnPaLxa36k8ikUTOjScjY9aDphDQPFCbtbWrd3dl6FNOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 192.168.208.130(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.YoAuuBe_1723381760)
-          by smtp.aliyun-inc.com;
-          Sun, 11 Aug 2024 21:09:21 +0800
-Message-ID: <b18c7f09-dd57-4b30-a8ff-fa6136d613ed@motor-comm.com>
-Date: Sun, 11 Aug 2024 06:09:19 -0700
+	s=arc-20240116; t=1723382663; c=relaxed/simple;
+	bh=Po5/mFOf0/VTScGzn6+mtQuzX/UGKG4Vw71o8feai/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rywU/UX41czih6GDcckmzd8V/ZFUrY8ApPPhpGarGLxLhvRrtUhWvtT4No2Hc8JrY9v0WjDADAkprOkU2aF//Z6ePQ738n4dX+iTtqlx6KvfYq6TcoYga5yLrKNwXTHCTyKvI8M0jnEveUpnNpp2VniP8n65bvsc52yMJbRDZuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sd8YN-0004rw-GL; Sun, 11 Aug 2024 15:24:11 +0200
+Date: Sun, 11 Aug 2024 15:24:11 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
+Message-ID: <20240811132411.GB13736@breakpoint.cc>
+References: <0000000000003a5292061f5e4e19@google.com>
+ <20240811022903.49188-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: motorcomm: Add chip mode cfg
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- linux@armlinux.org.uk, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, yuanlai.cui@motor-comm.com,
- hua.sun@motor-comm.com, xiaoyong.li@motor-comm.com,
- suting.hu@motor-comm.com, jie.han@motor-comm.com
-References: <20240727092009.1108640-1-Frank.Sae@motor-comm.com>
- <ac84b12f-ae91-4a2f-a5f7-88febd13911c@kernel.org>
- <f18fa949-b217-4373-82c4-7981872446b4@motor-comm.com>
- <e9d9c67d-e113-4a10-bd18-0d013fe7ea92@lunn.ch>
-Content-Language: en-US
-From: "Frank.Sae" <Frank.Sae@motor-comm.com>
-In-Reply-To: <e9d9c67d-e113-4a10-bd18-0d013fe7ea92@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240811022903.49188-1-kuniyu@amazon.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> From: syzbot <syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com>
+> Date: Sat, 10 Aug 2024 18:29:20 -0700
+> > Hello,
+> > 
+> > syzbot found the following issue on:
+> > 
+> > HEAD commit:    33e02dc69afb Merge tag 'sound-6.10-rc1' of git://git.kerne..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=117f3182980000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=25544a2faf4bae65
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=8ea26396ff85d23a8929
+> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > 
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> > 
+> > Downloadable assets:
+> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-33e02dc6.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/573c88ac3233/vmlinux-33e02dc6.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/760a52b9a00a/bzImage-33e02dc6.xz
+> > 
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
+> > 
+> > ------------[ cut here ]------------
+> > refcount_t: decrement hit 0; leaking memory.
+> > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
+> 
+> Eric, this is the weird report I was talking about at netdevconf :)
+> 
+> It seems refcount_dec(&tw->tw_dr->tw_refcount) is somehow done earlier
+> than refcount_inc().
+> 
+> I started to see the same splat at a very low rate after consuming
+> commit b334b924c9b7 ("net: tcp/dccp: prepare for tw_timer un-pinning").
 
-On 8/1/24 06:14, Andrew Lunn wrote:
-> On Thu, Aug 01, 2024 at 02:49:12AM -0700, Frank.Sae wrote:
->> On 7/27/24 02:25, Krzysztof Kozlowski wrote:
->>
->>      On 27/07/2024 11:20, Frank.Sae wrote:
->>
->>           The motorcomm phy (yt8821) supports the ability to
->>           config the chip mode of serdes.
->>           The yt8821 serdes could be set to AUTO_BX2500_SGMII or
->>           FORCE_BX2500.
->>           In AUTO_BX2500_SGMII mode, SerDes
->>           speed is determined by UTP, if UTP link up
->>           at 2.5GBASE-T, SerDes will work as
->>           2500BASE-X, if UTP link up at
->>           1000BASE-T/100BASE-Tx/10BASE-T, SerDes will work
->>           as SGMII.
->>           In FORCE_BX2500, SerDes always works
->>           as 2500BASE-X.
->>
->>      Very weird wrapping.
->>
->>      Please wrap commit message according to Linux coding style / submission
->>      process (neither too early nor over the limit):
->>      https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
->>
->>
->>          Signed-off-by: Frank.Sae <Frank.Sae@motor-comm.com>
->>
->>      Didn't you copy user-name as you name?
->>
->> sorry, not understand your mean.
->>
->>          ---
->>           .../bindings/net/motorcomm,yt8xxx.yaml          | 17 +++++++++++++++++
->>           1 file changed, 17 insertions(+)
->>
->>      Also, your threading is completely broken. Use git send-email or b4.
->>
->> sorry, not understand your mean of threading broken. the patch used git
->> send-email.
-> Your indentation of replies it also very odd!
->
->>          +      0: AUTO_BX2500_SGMII
->>          +      1: FORCE_BX2500
->>          +      In AUTO_BX2500_SGMII mode, serdes speed is determined by UTP,
->>          +      if UTP link up at 2.5GBASE-T, serdes will work as 2500BASE-X,
->>          +      if UTP link up at 1000BASE-T/100BASE-Tx/10BASE-T, serdes will
->>          +      work as SGMII.
->>          +      In FORCE_BX2500 mode, serdes always works as 2500BASE-X.
->>
->>
->>      Explain why this is even needed and why "auto" is not correct in all
->>      cases. In commit msg or property description.
->>
->> yt8821 phy does not support strapping to config the serdes mode, so config the
->> serdes mode by dts instead.
-> Strapping does not matter. You can set it on probe.
->
->> even if auto 2500base-x serdes mode is default mode after phy hard reset, and
->> auto as default must be make sense, but from most our customers's feedback,
->> force 2500base-x serdes mode is used in project usually to adapt to mac's serdes
->> settings. for customer's convenience and use simplicity, force 2500base-x serdes
->> mode selected as default here.
->   
-> If you are using phylink correctly, the customer should never
-> know. Both the MAC and the PHY enumerate the capabilities and phylink
-> will tell you what mode to change to.
->
-> I still think this property should be removed, default to auto, and
-> let phylink tell you if something else should be used.
+I think I see why.
 
-The property motorcomm,chip-mode will be removed in next patch. found that
-phy-mode property in dts can be used to configure the serdes mode. when
-phy-mode is set to 2500base-x, the serdes is refered as always in
-2500base-x, when phy-mode is set to sgmii, the serdes is refered as in
-2500base-x or sgmii according to media speed.
+The reported splat is without this above commit.
+But from backtrace we entered here:
 
->>          +    $ref: /schemas/types.yaml#/definitions/uint8
->>
->>      Make it a string, not uint8.
->>
->>
->> why do you suggest string, the property value(uint8) will be wrote to phy
->> register.
-> Device tree is not a list of values to poke into registers. It is a
-> textual description of the hardware. The driver probably needs to
-> apply conversions to get register values. e.g. delay are in ns,
-> voltages are in millivolts, but register typically don't use such
-> units.
->
-> 	Andrew
+                if (net->ipv4.tcp_death_row.hashinfo->pernet) {
+                        /* Even if tw_refcount == 1, we must clean up kernel reqsk */
+                        inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo);
+                } else if (!purged_once) {
+-------------->         inet_twsk_purge(&tcp_hashinfo);  // THIS
+                        purged_once = true;
+
+> The commit a bit deferred refcount_inc(tw_refcount) after the hash dance,
+> so twsk is now visible before tw_dr->tw_refcount is incremented.
+> 
+> I came up with the diff below but was suspecting a bug in another place,
+> possibly QEMU, so I haven't posted the diff officially.
+> 
+> refcount_inc() was actually deferred, but it's still under an ehash lock,
+
+but different struct inet_hashinfo, so the locks don't help :/
 
