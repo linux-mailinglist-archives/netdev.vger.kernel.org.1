@@ -1,160 +1,279 @@
-Return-Path: <netdev+bounces-117454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4F194E025
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 07:43:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B47794E033
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 08:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817081C20BCA
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 05:43:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5211F216FA
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 06:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2F518E20;
-	Sun, 11 Aug 2024 05:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIS22I9e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5488A1A702;
+	Sun, 11 Aug 2024 06:01:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448CF11CAB;
-	Sun, 11 Aug 2024 05:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F415291E
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 06:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723355009; cv=none; b=odH8EUC5jcDXe9bN1TnCq+Tch8U9oqc2adYgCJM5CTJA2p04j74teK+tm333GXKGyqOE+zbpHac22BKbr0h9w2MFug0GiFvauZCLzGaHwYTXhpipJDw3xjKJ8G8rPvmv0dlt7iZr7hSwDqJbAQuB0NWR2+KpH2TDvcN7q5kxrFc=
+	t=1723356081; cv=none; b=syjohGbj96O3mk7h9zLlTDz2uEhSpvjbQTndp/SqSdxVxvELhO74KmsDNk9hEwOkMnuOtFD6tfwqf7RzMHvtKjmiFsa9i0RtYiukfmpKWzDATRY2qKMrGTwwL26X3dOESkIWZki/3pqxV2IBcDNBqv8T9B0cy64kjGx3Pb1JcFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723355009; c=relaxed/simple;
-	bh=6tis8Onk4vKI11B/pr3JpmguCMVU9HAlccL79Vr1kJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O2sfe4jaAuAG/8n1hehB+p4WT5n1E+COc8fE/k+E07tHNOl8+hVsoRXQhxjBkWRQkZhm3Pv/g8Uh/cY4sWS19K7/Wv6mXpGyTy8QUwALUlqNuWlWDQC3OkyrDWzaWEj2YMz4Y0vSIE30smJJGda3uT4nzePU2W/QH3mgUXdob68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIS22I9e; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-39aeccc6377so12491365ab.1;
-        Sat, 10 Aug 2024 22:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723355007; x=1723959807; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fegtz1E7mDaSdzG9wq3lbuilj1QmL6UN/2jOlbF5VCw=;
-        b=VIS22I9ev3f2AaWvzK8JKoXkhJ1vag0Nd442d2dZnpZUAMb7q/tB61MUHBEzZGgROk
-         z4ln0qfMHM+6joqZYWfWFJYm/8+PdOBWF+LuyAQuJK1YV7Dc6Es/pBw1tWUJG1pHafwI
-         A01SiNnEOIDlvm5sgZbxdqWLTdQc0KcYPKkT9lE1rWg5fAvc/wGbMHf8Blk+PPaNZ2iw
-         DnHIi5NjvqgL1ZF83kBEUyOnzy5dNjaOAqchbcL+3dm+Q5DeCmLsmCG5p9MAasEx8dyu
-         KlzRkl/hnjn/zKQ8C0CGn6Ksta4Hpm78Jf3/LPqiB3bL+VUe34kvtq7eLxgb3PH7o//S
-         d0Dg==
+	s=arc-20240116; t=1723356081; c=relaxed/simple;
+	bh=OUzTIG+Fl3PrbPCXeIsMCI8osZxo7JHQCkYvA6qdWUY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ridFpkXN57LRC1jyiz0sC95BfEXS2YYoRx4sqlBEnka4t1DC5SeyGSfoNBb/kJDK/4NPpPZzgYGWzzNef3es8exrfBG9jcUaqBEdruFVTZMaGR6MUgxn5nZYbGokdZQHD4y/ZI3zCUeaDDxQLKtMcAq/NUPuAXUF4BNrZ0moeO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39b3a9f9f5bso39636675ab.1
+        for <netdev@vger.kernel.org>; Sat, 10 Aug 2024 23:01:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723355007; x=1723959807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fegtz1E7mDaSdzG9wq3lbuilj1QmL6UN/2jOlbF5VCw=;
-        b=Jid4CZ6dK3Df0fBHlve/sHpcT+dMQZsnSbdWwGC4AZdAig8cdcK2H6OMdoFeDL9m+4
-         xQWrXFJ0gN/6U4zpBCFnZLSXmPGLBZenwRnaZS584ftHySOTXaMSUiw8/jAg6Qrkk2yF
-         V0t5eWL2V9imlav+46GgSntwJXqwDobH4v0zkIs7t7eLtXChnc0TWPA1Nr8h03M1fzwY
-         fGd69SSlcZlpjYhtpyFFkxfvnBIvGNa0OrcDFGn9dRQ0MFXUp/SHq93xKYLjAI1wKoZV
-         u7SqvlC4aNuGQE8osCRMCl+1gv73jH/yKA6blT6sO+MHT6SW4uhJOZKy4tqG7Jz7ONhS
-         KWdw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHjcFbb2p2cMWDPWZKwqqYpl9mBD2bOEeW7PR2SxLHcIJ3PjM6UdKdMxibns+QuBypntzT33K2r7MFcSL92s+EdfVI6eJEEC9pw7w49G0jMOIeIdIOhtZqlqvTl5lPWSDkrat2
-X-Gm-Message-State: AOJu0Ywe2Nwcbky/q/dHFtGLZ4MgNF3Mhk2gHIawJ+NoTQUAttp3+7Na
-	EbEf73YgUO3RuWBBWJ9mygdgAAzruDBfaQFj1S6oc/z8MLf6SC1TtGZrdi8EKOO3nl2vTBsfoSQ
-	gMj1sfJ20ER1qcCoBJsmD7iVCfHI=
-X-Google-Smtp-Source: AGHT+IHWQUBxgrASvNC6A9bWXO4CsyE76eLvd5MWDiATYZjXYvrjUz+yGdlBDgOTsrfvedZzSm3oyw5PwfGfug9TTfg=
-X-Received: by 2002:a05:6e02:138d:b0:397:98d7:5180 with SMTP id
- e9e14a558f8ab-39b6c1187d3mr89700155ab.0.1723355007148; Sat, 10 Aug 2024
- 22:43:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723356078; x=1723960878;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9vsBRnhg3SOv3kE+B7z/Y+oRRX8zoCKH4iOcoSYS3Sg=;
+        b=g+ZM/RiH01NeYNX7zULCz/IJEtXP2TgbWoBg0c0S7rbFpct0NlBMMZTbcmvsnWtoeu
+         dqwyDFR7xs/gFQ0VHOSm8rVSMhru2UQQJacE2m/crEJwa5riq1CWaCQQ7cQnvd8KXbuG
+         E8OhzZQ/ZQ2KneQ2FaFA4tVU1A78kmLuo/LR8O4gnWO+QOc8U0a4PtYXZPjtkfJlHlLA
+         dFbEt3zBOtMv2mP4wp03bs6TSxwhZ1acBsJxPX/PBP2SIp8k7S++pDansJT5KnUKSqXK
+         ukiCnYTmqgxUYUaTaAvKywdJNAt27cE+UGx8YNWEYPZplKMixSUbzQD9sSX4JLZ7K0ng
+         TWGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoxI6wOa0hxgC15onqnmXCYamsCzEtrq2K7+Kcd8cZ5VS26GULK1TjyVmPohqGmE3YQMFDFVtxJKh+Qx/Zirl1C/6jCXRh
+X-Gm-Message-State: AOJu0YzP4c1spci3OkNG0yHcTP3TmIXolEGQLEsAb9rIbDmiHVF9rCXO
+	2hDKLf8qEtjhugb9+PEbq5RInUlIwO1E3Ic5/xOdiHo3m5dTBsY+YJgIu3a+xD5oBhU8fpwg1jd
+	cdaJqckSmH+m3Q/UeMEzsOw/oWMGmVtuvPHcxd1WvFzagMQ0gf2dIdVw=
+X-Google-Smtp-Source: AGHT+IE+kG9M3DKTCK6qoePs8ZDlrvby4lkA1q3uYiy1yRK+7XiBYi0mkLuryO6JYeHjIHfd7ZO24NXzLBDWADyP3vB1AI8vyohS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000003a5292061f5e4e19@google.com> <20240811022903.49188-1-kuniyu@amazon.com>
-In-Reply-To: <20240811022903.49188-1-kuniyu@amazon.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 11 Aug 2024 13:42:51 +0800
-Message-ID: <CAL+tcoBC4mB6Has_uX=DB9=BrRMmgfjCEFj+J-oPzLS25w6btQ@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+X-Received: by 2002:a05:6e02:18ce:b0:39a:ea7d:2a9a with SMTP id
+ e9e14a558f8ab-39b8709167fmr4857235ab.6.1723356078625; Sat, 10 Aug 2024
+ 23:01:18 -0700 (PDT)
+Date: Sat, 10 Aug 2024 23:01:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e364c9061f621a56@google.com>
+Subject: [syzbot] [rdma?] possible deadlock in sock_set_reuseaddr
+From: syzbot <syzbot+af5682e4f50cd6bce838@syzkaller.appspotmail.com>
+To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
 	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hello Kuniyuki,
+Hello,
 
-On Sun, Aug 11, 2024 at 10:35=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: syzbot <syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com>
-> Date: Sat, 10 Aug 2024 18:29:20 -0700
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    33e02dc69afb Merge tag 'sound-6.10-rc1' of git://git.ke=
-rne..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D117f3182980=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D25544a2faf4=
-bae65
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D8ea26396ff85d=
-23a8929
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for=
- Debian) 2.40
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > Downloadable assets:
-> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets=
-/7bc7510fe41f/non_bootable_disk-33e02dc6.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/573c88ac3233/vmli=
-nux-33e02dc6.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/760a52b9a00a=
-/bzImage-33e02dc6.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the co=
-mmit:
-> > Reported-by: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
-> >
-> > ------------[ cut here ]------------
-> > refcount_t: decrement hit 0; leaking memory.
-> > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0=
-x1ed/0x210 lib/refcount.c:31
->
-> Eric, this is the weird report I was talking about at netdevconf :)
->
-> It seems refcount_dec(&tw->tw_dr->tw_refcount) is somehow done earlier
-> than refcount_inc().
->
-> I started to see the same splat at a very low rate after consuming
-> commit b334b924c9b7 ("net: tcp/dccp: prepare for tw_timer un-pinning").
->
-> The commit a bit deferred refcount_inc(tw_refcount) after the hash dance,
-> so twsk is now visible before tw_dr->tw_refcount is incremented.
->
-> I came up with the diff below but was suspecting a bug in another place,
-> possibly QEMU, so I haven't posted the diff officially.
->
-> refcount_inc() was actually deferred, but it's still under an ehash lock,
-> and inet_twsk_deschedule_put() must be serialised with the same ehash
-> lock.  Even inet_twsk_kill() performs the ehash lock dance before calling
-> refcount_dec().
->
-> So, it should be impossible that refcount_inc() is not visible after doub=
-le
-> lock/unlock and before refcount_dec(), so this report looks bogus to me :=
-S
+syzbot found the following issue on:
 
-In normal cases, I agree with this, since inc/dec are all protected
-under the spin lock. There is no way we can decrement it if we don't
-increment it first.
+HEAD commit:    d4560686726f Merge tag 'for_linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1621ea83980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=505ed4a1dd93463a
+dashboard link: https://syzkaller.appspot.com/bug?extid=af5682e4f50cd6bce838
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Thanks,
-Jason
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-d4560686.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3304e311b45d/vmlinux-d4560686.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c5fa8d141fd4/bzImage-d4560686.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+af5682e4f50cd6bce838@syzkaller.appspotmail.com
+
+ip6gretap0 speed is unknown, defaulting to 1000
+ip6gretap0 speed is unknown, defaulting to 1000
+iwpm_register_pid: Unable to send a nlmsg (client = 2)
+======================================================
+WARNING: possible circular locking dependency detected
+6.11.0-rc2-syzkaller-00013-gd4560686726f #0 Not tainted
+------------------------------------------------------
+syz.0.201/6238 is trying to acquire lock:
+ffff888024153658 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1607 [inline]
+ffff888024153658 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sock_set_reuseaddr+0x17/0x60 net/core/sock.c:782
+
+but task is already holding lock:
+ffffffff8f68af68 (lock#8){+.+.}-{3:3}, at: cma_add_one+0x674/0xdd0 drivers/infiniband/core/cma.c:5354
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (lock#8){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
+       cma_init+0x1d/0x150 drivers/infiniband/core/cma.c:5438
+       do_one_initcall+0x128/0x700 init/main.c:1267
+       do_initcall_level init/main.c:1329 [inline]
+       do_initcalls init/main.c:1345 [inline]
+       do_basic_setup init/main.c:1364 [inline]
+       kernel_init_freeable+0x69d/0xca0 init/main.c:1578
+       kernel_init+0x1c/0x2b0 init/main.c:1467
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+-> #1 (rtnl_mutex){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
+       smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1853
+       __smc_connect+0x44d/0x4830 net/smc/af_smc.c:1522
+       smc_connect+0x2fc/0x760 net/smc/af_smc.c:1702
+       __sys_connect_file+0x15f/0x1a0 net/socket.c:2061
+       __sys_connect+0x149/0x170 net/socket.c:2078
+       __do_sys_connect net/socket.c:2088 [inline]
+       __se_sys_connect net/socket.c:2085 [inline]
+       __x64_sys_connect+0x72/0xb0 net/socket.c:2085
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (sk_lock-AF_INET6){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3133 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
+       validate_chain kernel/locking/lockdep.c:3868 [inline]
+       __lock_acquire+0x24ed/0x3cb0 kernel/locking/lockdep.c:5142
+       lock_acquire kernel/locking/lockdep.c:5759 [inline]
+       lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
+       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
+       lock_sock include/net/sock.h:1607 [inline]
+       sock_set_reuseaddr+0x17/0x60 net/core/sock.c:782
+       siw_create_listen+0x1ab/0x11f0 drivers/infiniband/sw/siw/siw_cm.c:1776
+       iw_cm_listen+0x16a/0x1f0 drivers/infiniband/core/iwcm.c:585
+       cma_iw_listen drivers/infiniband/core/cma.c:2668 [inline]
+       rdma_listen+0x7ef/0xe20 drivers/infiniband/core/cma.c:3953
+       cma_listen_on_dev+0x4dc/0x810 drivers/infiniband/core/cma.c:2727
+       cma_add_one+0x78b/0xdd0 drivers/infiniband/core/cma.c:5357
+       add_client_context+0x3dd/0x590 drivers/infiniband/core/device.c:727
+       enable_device_and_get+0x1d5/0x3f0 drivers/infiniband/core/device.c:1338
+       ib_register_device drivers/infiniband/core/device.c:1426 [inline]
+       ib_register_device+0x880/0xbf0 drivers/infiniband/core/device.c:1372
+       siw_device_register drivers/infiniband/sw/siw/siw_main.c:72 [inline]
+       siw_newlink drivers/infiniband/sw/siw/siw_main.c:489 [inline]
+       siw_newlink+0xc13/0xe90 drivers/infiniband/sw/siw/siw_main.c:465
+       nldev_newlink+0x392/0x660 drivers/infiniband/core/nldev.c:1794
+       rdma_nl_rcv_msg+0x388/0x6e0 drivers/infiniband/core/netlink.c:195
+       rdma_nl_rcv_skb.constprop.0.isra.0+0x2e6/0x450 drivers/infiniband/core/netlink.c:239
+       netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+       netlink_unicast+0x544/0x830 net/netlink/af_netlink.c:1357
+       netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+       sock_sendmsg_nosec net/socket.c:730 [inline]
+       __sock_sendmsg net/socket.c:745 [inline]
+       ____sys_sendmsg+0xab5/0xc90 net/socket.c:2597
+       ___sys_sendmsg+0x135/0x1e0 net/socket.c:2651
+       __sys_sendmsg+0x117/0x1f0 net/socket.c:2680
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_INET6 --> rtnl_mutex --> lock#8
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(lock#8);
+                               lock(rtnl_mutex);
+                               lock(lock#8);
+  lock(sk_lock-AF_INET6);
+
+ *** DEADLOCK ***
+
+6 locks held by syz.0.201/6238:
+ #0: ffffffff9522c4d8 (&rdma_nl_types[idx].sem){.+.+}-{3:3}, at: rdma_nl_rcv_msg+0x16a/0x6e0 drivers/infiniband/core/netlink.c:164
+ #1: ffffffff8f672c90 (link_ops_rwsem){++++}-{3:3}, at: nldev_newlink+0x2d7/0x660 drivers/infiniband/core/nldev.c:1784
+ #2: ffffffff8f65f3f0 (devices_rwsem){++++}-{3:3}, at: enable_device_and_get+0x104/0x3f0 drivers/infiniband/core/device.c:1328
+ #3: ffffffff8f65f2b0 (clients_rwsem){++++}-{3:3}, at: enable_device_and_get+0x163/0x3f0 drivers/infiniband/core/device.c:1336
+ #4: ffff8880474285d0 (&device->client_data_rwsem){++++}-{3:3}, at: add_client_context+0x3a9/0x590 drivers/infiniband/core/device.c:725
+ #5: ffffffff8f68af68 (lock#8){+.+.}-{3:3}, at: cma_add_one+0x674/0xdd0 drivers/infiniband/core/cma.c:5354
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 6238 Comm: syz.0.201 Not tainted 6.11.0-rc2-syzkaller-00013-gd4560686726f #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
+ check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2186
+ check_prev_add kernel/locking/lockdep.c:3133 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3252 [inline]
+ validate_chain kernel/locking/lockdep.c:3868 [inline]
+ __lock_acquire+0x24ed/0x3cb0 kernel/locking/lockdep.c:5142
+ lock_acquire kernel/locking/lockdep.c:5759 [inline]
+ lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
+ lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
+ lock_sock include/net/sock.h:1607 [inline]
+ sock_set_reuseaddr+0x17/0x60 net/core/sock.c:782
+ siw_create_listen+0x1ab/0x11f0 drivers/infiniband/sw/siw/siw_cm.c:1776
+ iw_cm_listen+0x16a/0x1f0 drivers/infiniband/core/iwcm.c:585
+ cma_iw_listen drivers/infiniband/core/cma.c:2668 [inline]
+ rdma_listen+0x7ef/0xe20 drivers/infiniband/core/cma.c:3953
+ cma_listen_on_dev+0x4dc/0x810 drivers/infiniband/core/cma.c:2727
+ cma_add_one+0x78b/0xdd0 drivers/infiniband/core/cma.c:5357
+ add_client_context+0x3dd/0x590 drivers/infiniband/core/device.c:727
+ enable_device_and_get+0x1d5/0x3f0 drivers/infiniband/core/device.c:1338
+ ib_register_device drivers/infiniband/core/device.c:1426 [inline]
+ ib_register_device+0x880/0xbf0 drivers/infiniband/core/device.c:1372
+ siw_device_register drivers/infiniband/sw/siw/siw_main.c:72 [inline]
+ siw_newlink drivers/infiniband/sw/siw/siw_main.c:489 [inline]
+ siw_newlink+0xc13/0xe90 drivers/infiniband/sw/siw/siw_main.c:465
+ nldev_newlink+0x392/0x660 drivers/infiniband/core/nldev.c:1794
+ rdma_nl_rcv_msg+0x388/0x6e0 drivers/infiniband/core/netlink.c:195
+ rdma_nl_rcv_skb.constprop.0.isra.0+0x2e6/0x450 drivers/infiniband/core/netlink.c:239
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x544/0x830 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0xab5/0xc90 net/socket.c:2597
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2651
+ __sys_sendmsg+0x117/0x1f0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f83257779f9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f83264f5038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8325906058 RCX: 00007f83257779f9
+RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000008
+RBP: 00007f83257e58ee R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f8325906058 R15: 00007ffc662de808
+ </TASK>
+infiniband syz2: RDMA CMA: cma_listen_on_dev, error -98
+ip6gretap0 speed is unknown, defaulting to 1000
+ip6gretap0 speed is unknown, defaulting to 1000
+ip6gretap0 speed is unknown, defaulting to 1000
+ip6gretap0 speed is unknown, defaulting to 1000
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
