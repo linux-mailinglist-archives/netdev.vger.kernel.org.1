@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-117511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FCF94E24E
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:36:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F313D94E255
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A17AFB212FE
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:36:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8982810A0
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14201547C9;
-	Sun, 11 Aug 2024 16:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983361537DB;
+	Sun, 11 Aug 2024 16:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="tDUEH0xL"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="gBK3QFi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C091537BE
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA9714A4CC
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723394150; cv=none; b=NKjjRjo4hbEAjlJVqYPeJXa5PlM/vEGqesN4ncRTk5YHIjtfGg69VbBc9BmCOrw+sVyJ/QNU7EsWRCK8c775vd9RlO9efPGNbDLBRBSsloXDDvgF6itmmbWeiYzj/igukBBvbC350/2XTJxFWehHxcKh5W1Em43LJ89E19+vQ8g=
+	t=1723394708; cv=none; b=bWiE4CYCV26greBid4iuL6DpyQx3BjaXJUfJXzRgbWnoPxrIaUB2wnQYLMSWReQYfXA43s1CVP+9WPJSiUy6mwBf9v8LHTfiWU1YWU+8InCQTCFy4ZE78T2xFx6mBnIarE4SfXB+iKpfEBBcbONfnI1wVZN7q+2+vB05opibN6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723394150; c=relaxed/simple;
-	bh=K5Q/qDF/vB6+ByYhK825OFd9KkAdy/IKMEmoUGikr0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mpCKY9WWRk/viFE53HDvR009T3N9gAtz7v3uLGvpSYBgtnLp/VhCi6/5cMf92I+FC9xlKo+cCAbEJ+0zFq/RRlw1GrbCRGpCh8Mxv7HonZmI5dfAPMXk/px9gscbKKTQbCCaBofrl8USZ6M2XfeX85cN7MxY0UDCsB3cP4ZVXfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=tDUEH0xL; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1723394708; c=relaxed/simple;
+	bh=DWIPkrbuaRp0xl07Fuq519gwbuX+C4OO6dmju4iB2oY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLkjhmDzoOBErI2ZsxRyyhdTdHWJEe8z+11BHXry0ZwQCx4ZP9kz1HZi0v6MAB3LjxcyDXR/e86rQ+O2wSFDuiUeGUlTzcXOm4BamuFxevgusVOt4EjrNKDjIEixA/SO4tgKR1OPGp9c6NOKStjWlgC2YJWBtP+16eGoYQ5DiPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=gBK3QFi4; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-200aa78d35aso12214645ad.3
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 09:35:48 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7b80afeb099so2195921a12.2
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 09:45:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1723394148; x=1723998948; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cOW17F1DngMKq69xDq/s1xLe0Y0ak/ddlcdurf/5tdU=;
-        b=tDUEH0xLxn9f0/3RWw9OdAt74otavLEdTLAF5wvVgNZu0vOAbb+Kzj6ZTKBv/mM605
-         J2zcOmRbFxBPDEPdgC6S5oJ3h5SNbEpAj2iZjN1bhKRgx5iEBpkkopZ65GS8FJPl0TG3
-         tEJ1PJ7EYr5AfMsYSkEceiBPez0vxi1ZnUa6X9wRCbev6k+3EU9Cg7BuvE0rKSqr5VfJ
-         oKiueIq8o7MmJcXqyB9fIGL4JKhgCpBehEN88aq4BW4GgC9mESFrqa+eMBshmDPLD5t7
-         FeQMf5rW0CwVpe5MEzXJ1dFK3hD5Bp/r5TAfeU1/PYt8XLI/IMdYhDva68Fd5DdHtQKW
-         mBig==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1723394706; x=1723999506; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SPTP0gdyR7xKR6JEwEzAPEMoTHhOvNnDKjEEtsG1NrY=;
+        b=gBK3QFi4FuTvZbXDRhV2x82kYUxmA8md3DKix3VVPkvZYKUEFcEKDHYzHbkaB9CjK1
+         gKMZmIx8WXkx0mfkCey2zbg+y53tf59FwTjPmqKl469MJSJHcSYk3UnOZG0obM0+Ba29
+         7EBcGXIPxY1JmN2zz9PMjKzAg0Vm6FIsTVht3A9piDTlsPGs/nz9S3otOSd6DEJSRxvK
+         7SILDi9utOPv2Ieao+vR1md8FdUcOYRK8jZXZEazUnCgnEHe3sG3TXLdn+t9J6sPKRYb
+         eFi+/KcBYkLTqpBx3o8aeMWy/1UzA31RFCBBQRE8znHbYP0rlq+kND4MZDwOaupT8xYo
+         Cvvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723394148; x=1723998948;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cOW17F1DngMKq69xDq/s1xLe0Y0ak/ddlcdurf/5tdU=;
-        b=EEw6XjtOzTbyxz1f77sasUzwye/umoUF8t4ogOiFuvVm0jC88HNLyvGilQewgm21Nr
-         V5rL3Dk4CvDd3e4xVsWwlsKXnhSJ0lYPYIKJACPX9kQGYaZwOL0XI8BmaeejVpdRgCxT
-         G7osIsGBxMHVJLez566tgX6gwM6/qtNGPEKzhzPpyi1Nze5++PWQSa7tipg89RgB9pTO
-         /YZY/2/gJlZ3c7QWaxAFoZHeYr6Xubn6aH8zFI5CJ6RGMwoA1wYGvVJIY9fhc52AcixW
-         CbD0h9imEQXuszfK2ux7xqaVV/yLf9MLyqCNsSI4ZabvQfk8DUQl/xCpW+v9VUt6vwtE
-         jhig==
-X-Gm-Message-State: AOJu0Yzz7v4V3j2wGy8kNUkDsDa9oDMH48zbpZYsUc/h35FwPD0JZ+wf
-	QH2U3Bx6+caKzagOswI+p5JQbUo0Vz5ZNjliPNHziVQMUBtlt/I243zNfwlfF/0=
-X-Google-Smtp-Source: AGHT+IFy8yZ+jcFLLtmABoCZG0iyhtcd/HZKT+0AhPQvJBZ32jsdoAVMl03eqiyCKhplcbUjQH2kbA==
-X-Received: by 2002:a17:902:f691:b0:1fd:9c2d:2f27 with SMTP id d9443c01a7336-200ae597567mr49833975ad.24.1723394147752;
-        Sun, 11 Aug 2024 09:35:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723394706; x=1723999506;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SPTP0gdyR7xKR6JEwEzAPEMoTHhOvNnDKjEEtsG1NrY=;
+        b=KJdqD0cCovJAW3A6aVIEDDSSCmCZa0e3t0VuXM2iaHNjUvTmCW+uih3CrqKU9TouI5
+         uMIDKrsOglrg0N8CM2DcZaHNvSeGKPEcv7nhGpD5SN2rBCTdCzkFK68u9/CFkxNNp4T2
+         tS0dOe2BTLMeNaZ6HNqhYoU0+2sBDlrAjZHUCw0icVUqDdpOJbbsZUsFjJJURAmlfHHk
+         9nZ4egtTUiaeHEi0A4YGKl557YfNAabHYuGqwK14rmw6hI81vEX3HX6Y4m/gXjejD242
+         +cIi7EsgVJ0B5FVwAWRbDGAIzaHBrMLCfINBcxJYdiJ25gpujBNqwXQKc2Nci/4KDaYs
+         l4PA==
+X-Gm-Message-State: AOJu0YwDUYw92GTO9AP243V8eFjmENRSlJQP3l/qTGI3JTETB4n8wW1c
+	NJItREYvPKDIweaJFazrn5TxbM8emrrnASgYmrd1B+SPUtrzmwPE4A+epNuQsUFffepLZr7AKCH
+	D
+X-Google-Smtp-Source: AGHT+IE3BTzbuul8QDZLZoAdVlLXR3fMOrKjAToErVeiyQ0zftJobrztuZ82FsgWCBEM3nwnYuPlZw==
+X-Received: by 2002:a17:90b:390f:b0:2c9:9b16:e004 with SMTP id 98e67ed59e1d1-2d1e80799d2mr4804120a91.43.1723394705917;
+        Sun, 11 Aug 2024 09:45:05 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb7eeebbsm24468355ad.2.2024.08.11.09.35.47
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d1c9dc8997sm6545252a91.50.2024.08.11.09.45.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 09:35:47 -0700 (PDT)
-Date: Sun, 11 Aug 2024 09:35:45 -0700
+        Sun, 11 Aug 2024 09:45:05 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: =?UTF-8?B?TMawxqFuZyBWaeG7h3QgSG/DoG5n?= <tcm4095@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2] tc-cake: document 'ingress'
-Message-ID: <20240811093546.52c88499@hermes.local>
-In-Reply-To: <20240811142756.12225-2-tcm4095@gmail.com>
-References: <20240811142756.12225-2-tcm4095@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	leonro@nvidia.com
+Subject: [PATCH iproute] man/ip-xfrm: fix dangling quote
+Date: Sun, 11 Aug 2024 09:44:46 -0700
+Message-ID: <20240811164455.5984-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, 11 Aug 2024 21:26:17 +0700
-L=C6=B0=C6=A1ng Vi=E1=BB=87t Ho=C3=A0ng <tcm4095@gmail.com> wrote:
+The man page had a dangling quote character in the usage.
 
->  .SH OTHER PARAMETERS
-> +.B ingress
-> +.br
-> +	Indicates that CAKE is running in ingress mode (i.e. running on the dow=
-nlink
-> +of a connection). This changes the shaper to also count dropped packets =
-as data
-> +transferred, as these will have already traversed the link before CAKE c=
-an
-> +choose what to do with them.
-> +
-> +	In addition, the AQM will be tuned to always keep at least two packets
-> +queued per flow. The reason for this is that retransmits are more expens=
-ive in
-> +ingress mode, since dropped packets have to traverse the link again; thu=
-s,
-> +keeping a minimum number of packets queued will improve throughput in ca=
-ses
-> +where the number of active flows are so large that they saturate the lin=
-k even
-> +at their minimum window size.
-> +
-> +.PP
+Fixes: bdd19b1edec4 ("xfrm: prepare state offload logic to set mode")
+Cc: leonro@nvidia.com
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ man/man8/ip-xfrm.8 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hadn't looked at the man page for CAKE in detail before, but it appears
-to be trying to pre-format lots of stuff rather than using man format (nrof=
-f)
-like other man pages.
+diff --git a/man/man8/ip-xfrm.8 b/man/man8/ip-xfrm.8
+index 960779dd..3efd6172 100644
+--- a/man/man8/ip-xfrm.8
++++ b/man/man8/ip-xfrm.8
+@@ -71,7 +71,7 @@ ip-xfrm \- transform configuration
+ .RB "[ " offload
+ .RB "[ " crypto | packet " ]"
+ .RB dev
+-.IR DEV "
++.I DEV
+ .RB dir
+ .IR DIR " ]"
+ .RB "[ " tfcpad
+-- 
+2.43.0
 
-For example: indenting the start of the paragraph in nroff source is odd
-and unnecessary.
 
