@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-117527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F9094E2BA
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 20:50:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E2C94E2C3
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 21:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E378B20E71
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:50:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744342817DF
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 19:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0C914B96A;
-	Sun, 11 Aug 2024 18:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4392414F9F4;
+	Sun, 11 Aug 2024 19:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTnupB4/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrYOPBjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3025C2837F;
-	Sun, 11 Aug 2024 18:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EA91F945;
+	Sun, 11 Aug 2024 19:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723402212; cv=none; b=WGwQrKkdkikxkrc68qx3feJYjALWCdCM1jYt8qIkWZEFwGrdTqvxvH67U0aMNdOVzvJv74pcKWuX25sVzElTzANkqUf06BXZHkpOjylYwGjzp5mDEjsw0z90VDb6RTBoFQUg3uJG8oEs6QU3sNqUdStgzGau9OY/DHUH5Wspnjo=
+	t=1723405046; cv=none; b=E8zTlzShB+DGbrTzOQNqpPkyE4U6t3leGPf74oPyFPZ4uJkcQKAiEjcfdd1bbttm6g2+mJHfUra/eVbspi/nsrIVbv5wyw+7TZgrShOQItG4k90BduwfyhEKwwzJbOPDKixvUWjnaQ38eHAxGS8KnnVrGyLrgnXNcPNQGyJwioQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723402212; c=relaxed/simple;
-	bh=b5JVz5Tpar0c5FAXwXBzPwG6rJWMlMlb4vO/RI7Hoko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gr1UD4G5+5cuKRa9Tmtd4wJ+AKbq96X1Jd/5gFr2h3JMXKJ2NzHXXaWYOHp0yK8To/FTvF/GMhmNBMM0AZsLpbdEyOhsklb2Ra35yRWhUTS5an8PbNBIzwWezspdaKzpC/JtyR/+A8utLP1Odfm//3qlq6HlHkVmYUdIYC1UXLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OTnupB4/; arc=none smtp.client-ip=209.85.221.47
+	s=arc-20240116; t=1723405046; c=relaxed/simple;
+	bh=ikmiCCPOlqRkEb6DUx1eUYL3/MPw3G/PtfYjQ9vhX8U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KNtDRd4rzowo9mixQqp/qT/ahpiUOChuGz9nT5VxPqImrAFLKLGylQtuTrHUmLl4hIioPEHP0y+8IVH30Rc+SeERSnu9NeNtLlmCNSI8YkGMA5WSntz5XAx6Iwkz6JLhjVcgZ5L+5FzEoel4yIwXxNL/8EMJFHo1tfj66H4cLvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrYOPBjq; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3684bea9728so2209257f8f.3;
-        Sun, 11 Aug 2024 11:50:10 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70d2b921cd1so3455614b3a.1;
+        Sun, 11 Aug 2024 12:37:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723402209; x=1724007009; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723405043; x=1724009843; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+q3yH2GVKTI88q3BAmiWkMTGDbrf/3EozEWfMZeP1ec=;
-        b=OTnupB4/wDUUsj9n/KSjyJYVm2Vac1GecVtFeQ7hocAW7a0AkPy4+K7DqJ7r8QcCPq
-         ZHvNVWExMKtf1tslPk+P4ML00NRdgTR4AyrZCa5rBw40S+g7JX0D0D4F2VVdxMtdLNhC
-         p1jJ232f7mIqZgc9cC4TQaDJ0BXuAKy8P3ZU0p1E4kIH2lAEDiLM+A7sJVWILJ8MSXLc
-         sL2ngsySvqlEb7F5GPBmrm/kE/TjLguAhUJb4USYn4hIhejq8R2nn7sp0snhldmRYtZk
-         tcX1m0pd2hhn+RttTKFuSxLlS3ggpLKTMZQZnobDlprF2Kk7ExLiTAKi/b0cYv2xfrg1
-         evIw==
+        bh=FT4xeysPtgZnEED7ZNSpLO1Roz20Xrz/qSgj/gG8LH4=;
+        b=lrYOPBjqvCjAMxCn5IZ+8gHsfm9niYnWyB4CORocjJiU5Nu+GtzW3PFFvFe6WFcpVZ
+         oVNkt0XeElHdIJ9eLDuMEHi0trw9MDWvB/WWf9w4fN+c9DdiW4MpS6uud9DpyQS2Kp+g
+         A8YI4VBBWy0aZV8VmhZo2dBoy/dD89IsdtS0bSXzd+G47j/U1gs8tFkcwO9TTX2udiAL
+         oVgtVeilC8jbLh+NGYJgOlqnbCIn3qjhU4gP0sPbiJDADpMN6E4toO0IVVtnX57lGx2v
+         9NZoMG+Mvgan7wRC0+Sx0AvdJBH70QnszuDNPAMgfb5e6NyAWTv7ty8q/MBR1U+m4lHI
+         lbKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723402209; x=1724007009;
+        d=1e100.net; s=20230601; t=1723405043; x=1724009843;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+q3yH2GVKTI88q3BAmiWkMTGDbrf/3EozEWfMZeP1ec=;
-        b=kTyumkCutmstSMOtBu/gi/jFmTglPltCHpeURCvAm/nUe9y30g0AgRMn9DRknRGHYN
-         tQ1Hf5GUBc6sQ8cCT1jMtjg/Q9lRs7zP/Sge774dpj//acOswfc/eooMMq+/VehMPV78
-         Q0GOpM8q5cn1E4OfhIGZElD87D8vmVbjNyHfXG4jdTFq7voFMcwOv7lY1Yfl6QggbV3+
-         DPHRjuL2/V2JsffakaDTHPf360woY+Pp2RjheAxGDnX+hMBIptvsggO2MssDq0LAyzY8
-         qLV7qYHJWjJxvfavlcb3CnH3eqLKbEOTenoQUtVvO+QmvTnRk+So9olnaX7h/cPvNgea
-         bE3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhmIQ/fx/jGR4z2GNozBu4eWKCtFhZLRnxU3sjm2VcLEPYhreith8zm8u6R0nKKSh9Bsv8p3QXCLp7ojHpTKvGm2FfIzYJOeSFTVmHuDlXv7/8OpmnQm0aJK57LCaGuvnu3SM9
-X-Gm-Message-State: AOJu0YzP5DQITwrIcsYbsbypWf50qIpGgcnM0R2gE8HwPWx44SmZUItg
-	zNLZloOvkMfAjDGA6st0avAhUgoR2t4IhuVSHr23/4WnKMV6+5be
-X-Google-Smtp-Source: AGHT+IH9FjXsU3WtmkAc/rzXtJFMjqHYnqwh8bqjz1y9HWu7myVmeb6vI9Hl9TlvZKwTXMnYMroIbQ==
-X-Received: by 2002:a5d:60c5:0:b0:360:7c4b:58c3 with SMTP id ffacd0b85a97d-36d603555f9mr5650727f8f.54.1723402208958;
-        Sun, 11 Aug 2024 11:50:08 -0700 (PDT)
-Received: from yifee.lan ([176.230.105.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51ea8dsm5539929f8f.87.2024.08.11.11.50.07
+        bh=FT4xeysPtgZnEED7ZNSpLO1Roz20Xrz/qSgj/gG8LH4=;
+        b=OsElUovaqwAikmC2quqEuzavHqaDuZbAz0xSos3E6PI1q6pvTocJi92FlYa7ZGNfrL
+         m4p8y7jZnhbS7JxLL5eOnNLn1beadRsq6sHR2lGHs1xTh/UnNTRzUqwUdyqGWbaNgAU8
+         UiwDHLD4eeJbEaDKg8ItvW+DLWQ993HbX6gCyBEgKMiz/VLiWuymHycH/DrkKvZgqLzC
+         wFpe2/RDgs7PH6/RDYNXRQItCmmXESocWVyDhIj7lhC1CxNpCkJGGrAOps6c2D+dZNwU
+         rhRg8xrqcZpu6nyBvS8nHkxHyykjMg7vyj4XvF5M3m67+IWGwLURlwJfNbddTT0+R8dK
+         vGkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8hIFT9KrWS+u4uRvpyX2o3tHkoNkp0unAFjBitdzMs5SHBfGFfrImPCbOlbfIw1uxQ1rL3xXasMRCTCioonW09K68NAkSuSwph8c3XmqMo6ui/ohrSEis6YTfGAcrGX7nm5nqr3R4bOFjIQqF8fT9orsq09oDnAsH1eYUTgqgyA==
+X-Gm-Message-State: AOJu0YyUPlP4tVMrYZkI3vxoG21rWETCGx/qt/xKJkLN9hraHvfbysnu
+	dPMO9s+BRydIWhSCvO+UQWnK+ANjj1KOoLYA4xZ44hLRx/Xrlxhp
+X-Google-Smtp-Source: AGHT+IH6q7CgRJyf1EjyGEzPBy1TOPudwIDMCx/3t0n1OAzxptirUSj6B0BDWeUKJD5hWul1RvfnKA==
+X-Received: by 2002:a05:6a21:3a45:b0:1be:c6a5:5e74 with SMTP id adf61e73a8af0-1c89ff22057mr11146417637.21.1723405043063;
+        Sun, 11 Aug 2024 12:37:23 -0700 (PDT)
+Received: from dev0.. ([2405:201:6803:30b3:6c2e:a6d:389a:e911])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e5872b1csm2689564b3a.40.2024.08.11.12.37.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 11:50:08 -0700 (PDT)
-From: Elad Yifee <eladwf@gmail.com>
-To: 
-Cc: eladwf@gmail.com,
-	daniel@makrotopia.org,
-	Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Chen Lin <chen45464546@163.com>,
+        Sun, 11 Aug 2024 12:37:22 -0700 (PDT)
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+To: idryomov@gmail.com,
+	xiubli@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ceph-devel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: ethernet: mtk_eth_soc: fix memory leak in LRO rings release
-Date: Sun, 11 Aug 2024 21:49:45 +0300
-Message-ID: <20240811184949.2799-1-eladwf@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	linux-kernel@vger.kernel.org
+Cc: skhan@linuxfoundation.org,
+	javier.carrasco.cruz@gmail.com,
+	Abhinav Jain <jain.abhinav177@gmail.com>
+Subject: [PATCH net] libceph: Make the input const as per the TODO
+Date: Mon, 12 Aug 2024 01:06:45 +0530
+Message-Id: <20240811193645.1082042-1-jain.abhinav177@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,61 +90,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For LRO we allocate more than one page, yet 'skb_free_frag' is used
-to free the buffer, which only frees a single page.
-Fix it by using 'free_pages' instead.
+Modify arguments to const in ceph_crypto_key_decode().
+Modify ceph_key_preparse() in accordance with the changes.
 
-Fixes: 2f2c0d2919a1 ("net: ethernet: mtk_eth_soc: fix misuse of mem alloc interface netdev[napi]_alloc_frag")
- 
-Signed-off-by: Elad Yifee <eladwf@gmail.com>
+Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
 ---
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/ceph/crypto.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 16ca427cf4c3..bac6d0c48d21 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1762,8 +1762,10 @@ static void mtk_rx_put_buff(struct mtk_rx_ring *ring, void *data, bool napi)
- 	if (ring->page_pool)
- 		page_pool_put_full_page(ring->page_pool,
- 					virt_to_head_page(data), napi);
--	else
-+	else if (ring->frag_size <= PAGE_SIZE)
- 		skb_free_frag(data);
-+	else
-+		free_pages(data, get_order(mtk_max_frag_size(ring->frag_size)));
+diff --git a/net/ceph/crypto.c b/net/ceph/crypto.c
+index 051d22c0e4ad..cfd485d6d3c5 100644
+--- a/net/ceph/crypto.c
++++ b/net/ceph/crypto.c
+@@ -86,7 +86,7 @@ int ceph_crypto_key_encode(struct ceph_crypto_key *key, void **p, void *end)
+ 	return 0;
  }
  
- static int mtk_xdp_frame_map(struct mtk_eth *eth, struct net_device *dev,
-@@ -2132,7 +2134,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 				ring->buf_size, DMA_FROM_DEVICE);
- 			if (unlikely(dma_mapping_error(eth->dma_dev,
- 						       dma_addr))) {
--				skb_free_frag(new_data);
-+				mtk_rx_put_buff(ring, new_data, true);
- 				netdev->stats.rx_dropped++;
- 				goto release_desc;
- 			}
-@@ -2146,7 +2148,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 			skb = build_skb(data, ring->frag_size);
- 			if (unlikely(!skb)) {
- 				netdev->stats.rx_dropped++;
--				skb_free_frag(data);
-+				mtk_rx_put_buff(ring, data, true);
- 				goto skip_rx;
- 			}
+-int ceph_crypto_key_decode(struct ceph_crypto_key *key, void **p, void *end)
++int ceph_crypto_key_decode(struct ceph_crypto_key *key, const void **p, const void *end)
+ {
+ 	int ret;
  
-@@ -2691,7 +2693,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 				ring->buf_size, DMA_FROM_DEVICE);
- 			if (unlikely(dma_mapping_error(eth->dma_dev,
- 						       dma_addr))) {
--				skb_free_frag(data);
-+				mtk_rx_put_buff(ring, data, false);
- 				return -ENOMEM;
- 			}
- 		}
+@@ -300,7 +300,7 @@ static int ceph_key_preparse(struct key_preparsed_payload *prep)
+ 	struct ceph_crypto_key *ckey;
+ 	size_t datalen = prep->datalen;
+ 	int ret;
+-	void *p;
++	const void *p;
+ 
+ 	ret = -EINVAL;
+ 	if (datalen <= 0 || datalen > 32767 || !prep->data)
+@@ -311,9 +311,8 @@ static int ceph_key_preparse(struct key_preparsed_payload *prep)
+ 	if (!ckey)
+ 		goto err;
+ 
+-	/* TODO ceph_crypto_key_decode should really take const input */
+-	p = (void *)prep->data;
+-	ret = ceph_crypto_key_decode(ckey, &p, (char*)prep->data+datalen);
++	p = prep->data;
++	ret = ceph_crypto_key_decode(ckey, &p, (const char *)prep->data + datalen);
+ 	if (ret < 0)
+ 		goto err_ckey;
+ 
 -- 
-2.45.2
+2.34.1
 
 
