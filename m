@@ -1,63 +1,51 @@
-Return-Path: <netdev+bounces-117487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C5594E1B3
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:41:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2055694E1B7
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38F341C20D1F
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 14:41:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E568CB20E30
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 14:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C36E1494DF;
-	Sun, 11 Aug 2024 14:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2JtRZCQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8981798C;
+	Sun, 11 Aug 2024 14:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3BA1CAAF;
-	Sun, 11 Aug 2024 14:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51851DA22;
+	Sun, 11 Aug 2024 14:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723387312; cv=none; b=HwPvGG+0XDnCoqRLrXoFKWwQ6ruyL8qgrngEIEs9bYTdSCW0uvSjLOjhjznwXjn8spLUm5HF7ejffQHx6SChcJ4aTRFhvekc1Nv4RwLQLCLSP9nmyJN0qaHBwYUAWXYgW+4FMBvlnv11gGhIrtPHYMOx9hujLulcIFLxLgvJeAs=
+	t=1723388095; cv=none; b=g3wvR5n3y7T1wnzet3kzg4dPSyI+o0v4TImYrJg+CYsAo+Dfi63j1dX0Wc7dgqKgitq02Xg/IRHCt9HaOj3fn/thfzCcsh4G/qSElMQOpmP3muHUws2Eboi/sTwLZi3GKSirC/vzcX8J230HUf5avNrNZP51Ws05OlqifU3M4kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723387312; c=relaxed/simple;
-	bh=e9DgOEq6OLvmcRv/CH6wRxKEHV8xntvIpbRaCP8T9Pg=;
+	s=arc-20240116; t=1723388095; c=relaxed/simple;
+	bh=zpNMteEMTs0lxqMYFV36vnyd4fQM3LiBFf4xu8Vtp4Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ClgsFk9brj2ywi0mfBDgAkLJgpsXXTGQKsoFVz8C7RMLik3AulpYMLevEB81K96l4svkt3svj7YjZTOZ0onj6flirHWf+QJQbRgc1Nn7+1LKrPaawnN4mEWkCHBedbnmlAe4ooU9J5RQVv7NKCs9dP6YRSkin1eqs29F/eyLIqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2JtRZCQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD0DC32786;
-	Sun, 11 Aug 2024 14:41:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723387311;
-	bh=e9DgOEq6OLvmcRv/CH6wRxKEHV8xntvIpbRaCP8T9Pg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u2JtRZCQUiBO8aEG94JtdjaLJL1ab3qWYNwtnmPDDaR1GVWCLpZUIuLzm2qf9LpsQ
-	 QtHuo/VuhFaH2bn7DNb9dAWd7z/cmi26koZ5LJPCsvnjKMJGhzudAt67ADkRhXFfAe
-	 nBRWsMyD2ZPzeOPEBp4XoMn6rcTkVIXwfvLFrT0aFlE2MrwZg+5+Wfjm5mt0oKnSDx
-	 F1y89gru3HUTcDbHsVNfLGaMALb9/zmYZg1IvH5PNoNsb4S5tvoD4SPYjrx5tfTOTp
-	 K24kZh2ELuvrd0Rcv/aaJMzD1rNJu0I/K/g1CJR3LUdDR3kONDxIEFTYPmH4LxCL8R
-	 +3ZwF5RI5uL5w==
-Date: Sun, 11 Aug 2024 15:41:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
- configuration
-Message-ID: <20240811144147.GL1951@kernel.org>
-References: <20240809082146.3496481-1-o.rempel@pengutronix.de>
- <20240810095129.GH1951@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WDBfA0jANkDL0+8PVMHU5nwIhrebTRrB0f/a0/9SQMYTvT6zMIy593soqJ1tNYrulBH5hbdBsCgE7oUpJjrmBQps0NhBt+mZ73QCGnr9AWbb3aZsE7Jv4bwcr/mYT5yVz6qqJQ1eVx/Sy94cDmOHrVBLJ1tnci14P2stjVP7vBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sd9xz-0005Ri-4Z; Sun, 11 Aug 2024 16:54:43 +0200
+Date: Sun, 11 Aug 2024 16:54:43 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
+Message-ID: <20240811145443.GD13736@breakpoint.cc>
+References: <0000000000003a5292061f5e4e19@google.com>
+ <20240811022903.49188-1-kuniyu@amazon.com>
+ <20240811132411.GB13736@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +54,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240810095129.GH1951@kernel.org>
+In-Reply-To: <20240811132411.GB13736@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Sat, Aug 10, 2024 at 10:51:29AM +0100, Simon Horman wrote:
-> On Fri, Aug 09, 2024 at 10:21:46AM +0200, Oleksij Rempel wrote:
-> > Rename 'pins1' to 'pins' in the qspi_bk1_pins_a node to correct the
-> > subnode name. The incorrect name caused the configuration to be
-> > applied to the wrong subnode, resulting in QSPI not working properly.
+Florian Westphal <fw@strlen.de> wrote:
+> > I came up with the diff below but was suspecting a bug in another place,
+> > possibly QEMU, so I haven't posted the diff officially.
 > > 
-> > To avoid this kind of regression, all references to pin configuration
-> > nodes are now referenced directly using the format &{label/subnode}.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > refcount_inc() was actually deferred, but it's still under an ehash lock,
 > 
-> Pass
+> but different struct inet_hashinfo, so the locks don't help :/
 
-Sorry about the noise here. This was supposed to be a note to myself, that
-I am not planning to review this.  It doesn't imply anything about the
-patch.
+No, fallback is fine: pernet tw_refcount, init_net ehash lock array. so
+they same buckets should serialize on same ehash lock.
+
+https://syzkaller.appspot.com/x/log.txt?x=117f3182980000
+
+... shows at two cores racing:
+
+[ 3127.234402][ T1396] CPU: 3 PID: 1396 Comm: syz-executor.3 Not
+and
+[ 3127.257864][   T13] CPU: 1 PID: 13 Comm: kworker/u32:1 Not tainted 6.9.0-syzkalle (netns cleanup net).
+
+
+first splat backtrace shows invocation of tcp_sk_exit_batch() from
+netns error unwinding code.
+
+Second one lacks backtrace, but its also in tcp_sk_exit_batch(),
+likely walking init_net tcp_hashinfo.
+
+The warn of second core is:
+WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
+
+Looks like somehow netns cleanup work queue skipped at least one tw sk,
+hitting above splat.
+
+Then, first core did refcount_dec() on tw_refcount, which produces
+dec-to-0 warn (which makes sense if "supposedly final" decrement was
+already done.
 
