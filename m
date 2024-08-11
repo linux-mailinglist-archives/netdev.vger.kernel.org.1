@@ -1,127 +1,113 @@
-Return-Path: <netdev+bounces-117474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359B894E114
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 14:25:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C58C794E13F
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 14:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E52142816CD
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 12:25:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0499C1C20970
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 12:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02874C618;
-	Sun, 11 Aug 2024 12:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9A64E1C8;
+	Sun, 11 Aug 2024 12:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sOoLxf9a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEDyNt4B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD25F4FB;
-	Sun, 11 Aug 2024 12:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1875322626
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 12:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723379111; cv=none; b=SuuvRBGaV/7tcGosEuiDteeNyszOkpwQyY91YDkBSqbVZVFyPbwavOqZDITJkddWmXIivD7c0X3SDp34KSGbRicUz+7Y8q/Xj2zgpZJ9HaeH9lfwzBpgPsVqJwQoedJi7O52FZSDtHCFEqS9UoYFwk6PiKsCQ8Di3Teitu+FwA0=
+	t=1723380058; cv=none; b=uoF2dztfKcPL+jI8kIfs9mIRGwnHgH4Xf6d85iicBur5eZAOpT4cwss0ApqLJXUoFXf9uBRfWfgn8lH9VG3xtZn5Jgf4ToKE5rqTIHY6gHte3Sc7/G9ZSs6ADdAeTmTVh4Ww2mR6hSdKPwvCdwuupVcnp2+Kt0wvR4TYfcw8W7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723379111; c=relaxed/simple;
-	bh=erjEHPtFXhbfMLYRyoCCFcuFatjdm1wBVOhxqyBqGAs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TrKb7ETWCprNnsXhlR3jT6oYeeS8HmESU1VrpPa0peod1ly9jM3dArs94/FtcZkFGuN7GoqzzJn6wpOMYdca1zLOtw47eyVzU7Llfsb0k5OggVpba3VEa/vkEJ4Lh15o9edvnQ0CI5bfYdd5wxpjGvSTPOga5kKbCvIwjQ9UhR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sOoLxf9a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAFBC32786;
-	Sun, 11 Aug 2024 12:25:07 +0000 (UTC)
+	s=arc-20240116; t=1723380058; c=relaxed/simple;
+	bh=wvq4i2bN9NIEMLQPvBYduxp/8pXdw9FsYlZfKXNeN08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WwHgPqIicgnXk46i0mj88UqY9ZLlOfhwR+d/URZyX7HCHWWTb/TxN/EQeYcP1pXXotf1jYYxmGGwsSALlH/RKjGIwtBbC78DzqUJpJrJsEEPuhA2GKY7WhZelpqCS1qqzYweSeKFuESsRn/9Jget4Var+n1rXXVze3Oiwif/grU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEDyNt4B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1FCAC32786;
+	Sun, 11 Aug 2024 12:40:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723379111;
-	bh=erjEHPtFXhbfMLYRyoCCFcuFatjdm1wBVOhxqyBqGAs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sOoLxf9aMktjZ18QmuF08IBKQdL2fxToKQbSPA9BMLDcv8faN960AsTVKjKYTyqnf
-	 Sb8sDt6/Rn/aviRMrjBrHlgHEZUdF/RfM379Mm7YCn40W1BmDH69M+DvgXfJWSPqOB
-	 fR709/DYUwrviWtxdiVxNFrEc+iRWGLD5+zw6OHHXVRPx0tfAux3Wig0sIHd09HbFM
-	 q+0dcQjC+7nEuqsFXH+402QGO0AwlvwZOYZicgdA/sreVL18M0Rh+TNnD3l6Yyca4p
-	 gHupD0SlrRHxgqjP9lUrUL393lun3zRq/epLUn2xFWb/cBRhPUUx0N25Ze0DVbD1dO
-	 2IistkdFYwdbg==
-Message-ID: <e5d5018d-842f-40ec-a33e-5b093aef4a69@kernel.org>
-Date: Sun, 11 Aug 2024 14:25:05 +0200
+	s=k20201202; t=1723380057;
+	bh=wvq4i2bN9NIEMLQPvBYduxp/8pXdw9FsYlZfKXNeN08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UEDyNt4B4Qm7QIVhNEvojpO4BnESMM93/xAwjFSCmrfn9Kfn4VNDGMdixB4hjE74w
+	 IhseDByOaInxO8BXF4Z0H7rI7tkrLoGfbhzSCVyO2UH74z8xK2FZFTTXJXCmTJOBjV
+	 bfpXbkIkRhZgUMksf9zyl1aqoCELNWH5vccXb+35kzQ5zIn2v5RVVdLMlpNW7eNlFp
+	 yzUXlqmjHZHPpE5bEKN7bTfxAXxvRls/UF5W3OyExMHpxRHEVxW0sl+EHa9mSAMaC3
+	 uo+rQy5ahj2xlFcvc616hmgIrwpELQdGE35asAN+l/bTsu4cFHYXir4R1pSuYw7Ja3
+	 Mx8LnZplrmA3w==
+Date: Sun, 11 Aug 2024 13:40:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
+Message-ID: <20240811124053.GI1951@kernel.org>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
+ <29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
+ <20240731185511.672d15ae@kernel.org>
+ <20240805142253.GG2636630@kernel.org>
+ <20240805123655.50588fa7@kernel.org>
+ <20240806152158.GZ2636630@kernel.org>
+ <20240808122042.GA3067851@kernel.org>
+ <20240808071754.72be6896@kernel.org>
+ <20240808143443.GI3006561@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: add missed
- property phys
-To: Frank Li <Frank.Li@nxp.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Ioana Ciornei <ioana.ciornei@nxp.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Cc: imx@lists.linux.dev
-References: <20240809200654.3503346-1-Frank.Li@nxp.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240809200654.3503346-1-Frank.Li@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808143443.GI3006561@kernel.org>
 
-On 09/08/2024 22:06, Frank Li wrote:
-> Add missed property phys, which indicate how connect to serdes phy.
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/fsl-lx2160a-honeycomb.dtb: fsl-mc@80c000000: dpmacs:ethernet@7: Unevaluated properties are not allowed ('phys' was unexpected)
+On Thu, Aug 08, 2024 at 03:34:43PM +0100, Simon Horman wrote:
+> On Thu, Aug 08, 2024 at 07:17:54AM -0700, Jakub Kicinski wrote:
+> > On Thu, 8 Aug 2024 13:20:42 +0100 Simon Horman wrote:
+
+...
+
+> > > It may be a bit heavy handed, but my tested solution is to invoke a
+> > > baseline rebuild if a Kconfig change is made. At the very last it does
+> > > address the problem at hand. (In precisely the same way as manually setting
+> > > FIRST_IN_SERIES=1.)
+> > > 
+> > > The patch implementing this for build_allmodconfig.sh which I tested is
+> > > below. If we want to go ahead with this approach then I expect it is best
+> > > to add it to other build tests too. But this seems to be a good point
+> > > to report my findings, so here we are.
+> > > 
+> > > --- build_allmodconfig.sh.orig  2024-08-08 07:30:56.599372164 +0000
+> > > +++ build_allmodconfig.sh       2024-08-08 09:58:22.692206313 +0000
+> > > @@ -34,8 +34,10 @@
+> > >  echo "Tree base:"
+> > >  git log -1 --pretty='%h ("%s")' HEAD~
+> > > 
+> > > -if [ x$FIRST_IN_SERIES == x0 ]; then
+> > > -    echo "Skip baseline build, not the first patch"
+> > > +if [ x$FIRST_IN_SERIES == x0 ] && \
+> > > +   ! git diff --name-only HEAD~ | grep -q -E "Kconfig$"
+> > > +then
+> > > +    echo "Skip baseline build, not the first patch and no Kconfig updates"
+> > >  else
+> > >      echo "Baseline building the tree"
+> > 
+> > Excellent idea, let's try it! Could you send a PR to NIPA?
 > 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
+> Yes, can do.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
-
+For reference, the PR is here:
+https://github.com/linux-netdev/nipa/pull/35
 
