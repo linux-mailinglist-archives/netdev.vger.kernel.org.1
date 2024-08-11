@@ -1,95 +1,94 @@
-Return-Path: <netdev+bounces-117505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0AC294E238
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:14:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6790B94E23C
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:21:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 609D41F2136C
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:14:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9BA1C20884
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B702A14F9DD;
-	Sun, 11 Aug 2024 16:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B040E446AF;
+	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B5NVfOT7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lcs3Sfhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4956C1494AF
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0A0C8E9
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723392840; cv=none; b=pv3xLOQ8+51XBNapO90/9O0LRtVtRR+Jl7GvCyDbICsRp3PFD8ueqBDu0yYUNImF0wE2Sgm1PThioqdrOJ8WxtMWhKws4bJHEyO9TelJyPTL6rGpwh7viUjU/nr7raGylbbXdGUNjGYrHmtZl04JLjxwYJwqMulbWQ/adU+zhDY=
+	t=1723393309; cv=none; b=dWSvlTIoJ4qRrtIyyxKAtpqoP0GCKcSuBW982jwriKQHggAXptYMgnfrYJhVkTZ4L7W9dCKOxmb9sqAttWoeaAnK9qsxKxSPHwHZxoVJTqemmgasDj5OAOENsAnSXKTUI9ODMz5kJt0LPfIv/mfIW/iPxm5peQEZqPdN151uRiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723392840; c=relaxed/simple;
-	bh=AkyVHTbcrU5bI6gtBD/MD3p4SjVEkuzcw9umO54GrcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6yCS/ZD1+HekP13OafSG6PEUkQOrFyS6HKlVKrRIu4lyKf/hsQiycyBSkleXRI884ZB0fS6m1Bxf0xEgySPuQVDMqBZPOdfkYZaQXnH7Gy1Gue3DKengGAIOGV7pEg0pBZ+M2J7rfB4/MhZwD7F0edYloQk0ze/llsScP8e5qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B5NVfOT7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JcIaPzAoUWoiWjk9sXSznBOEK529EY8v2GXQL+vcOsw=; b=B5NVfOT7TdnAGQAO7qQRqRJBzl
-	qtCfvYuB4pCTXol9z2gezHGPyr7yxJA8PYCYVqs4KvswqQUMtjheyP/76fmEGN6WtNb8gAXUzG14l
-	QRTqIFP29NqmobGrT5XlXFWEmyPKDW1UwiDAzKHnBCgqRhduZUaDjGOTPzxoWkVfYZ5s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdBCa-004Vd1-Ge; Sun, 11 Aug 2024 18:13:52 +0200
-Date: Sun, 11 Aug 2024 18:13:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 2/2] net: phylib: do not disable autoneg for
- fixed speeds >= 1G
-Message-ID: <e8b4ae1d-de5b-4f6e-a94c-0e0e3a4bd643@lunn.ch>
-References: <ZrSutHAqb6uLfmHh@shell.armlinux.org.uk>
- <E1sc1WE-002Fuk-6Z@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1723393309; c=relaxed/simple;
+	bh=wrs78BZfEL2QOGTHcdaLIqCPvyyS7b2fP5G4GXvEDsk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lwnda3S6QmxyYQAXnIwN03SKceUGOHEsmnldfHMY/nOuzv5pof2a8g6WndWAATrMuwvRCiARrmlGyrn/rfsbJ8gzC/IV3QQUF2ien3D8W6JDJgXYhwU1eGu3Xnc97O5APzz2qvF59VPXCgqNg27YzM9Gypk2rUCLN3j8fESzLJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lcs3Sfhi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D0BC32786;
+	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723393309;
+	bh=wrs78BZfEL2QOGTHcdaLIqCPvyyS7b2fP5G4GXvEDsk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lcs3SfhivbvicPvrFLSvajix+n3IIkanNU2TuHYtAmBAoJAJrcrP7ErQ4aZn9+giW
+	 GMj4yXe63bknXdWEk5LXFY0FI6ZAcPwXoYxBZKrYLRHTe5JEzqLuPTN6oiVoXIOwau
+	 JHnrY1RoxQxwtbrZraWIEC4xNVdqBc+mPPWLyPsqx2Yin6n6ggHIeienN6Hs7cOB6l
+	 NAWaJTrisQ55qvSTDC8LJRT1KnDuubZlVyuCWIvRriMCMOaMQx3nhbGiYL6aCCn9Os
+	 73P0r+5zWND3aHwpjvZgLe2XSqNvvMKEuWBxsfbh6iw/NXLRcMvcklyRcnJ+FZ9erG
+	 zaDIxKNbXVCnQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C393823358;
+	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1sc1WE-002Fuk-6Z@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split half-duplex
+ monitoring function
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172339330781.220939.6785517478852733441.git-patchwork-notify@kernel.org>
+Date: Sun, 11 Aug 2024 16:21:47 +0000
+References: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+In-Reply-To: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, kuba@kernel.org, Tristram.Ha@microchip.com,
+ Arun.Ramadoss@microchip.com, horms@kernel.org
 
-On Thu, Aug 08, 2024 at 12:41:22PM +0100, Russell King (Oracle) wrote:
-> We have an increasing number of drivers that are forcing
-> auto-negotiation to be enabled for speeds of 1G or faster.
-> 
-> It would appear that auto-negotiation is mandatory for speeds above
-> 100M. In 802.3, Annex 40C's state diagrams seems to imply that
-> mr_autoneg_enable (BMCR AN ENABLE) doesn't affect whether or not the
-> AN state machines work for 1000base-T, and some PHY datasheets (e.g.
-> Marvell Alaska) state that disabling mr_autoneg_enable leaves AN
-> enabled but forced to 1G full duplex.
-> 
-> Other PHY datasheets imply that BMCR AN ENABLE should not be cleared
-> for >= 1G.
-> 
-> Thus, this should be handled in phylib rather than in each driver.
-> 
-> Rather than erroring out, arrange to implement the Marvell Alaska
-> solution but in software for all PHYs: generate an appropriate
-> single-speed advertisement for the requested speed, and keep AN
-> enabled to the PHY driver. However, to avoid userspace API breakage,
-> continue to report to userspace that we have AN disabled.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hello:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-    Andrew
+On Thu,  8 Aug 2024 15:14:21 +0000 you wrote:
+> In order to respect the 80 columns limit, split the half-duplex
+> monitoring function in two.
+> 
+> This is just a styling change, no functional change.
+> 
+> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net-next] net: dsa: microchip: ksz9477: split half-duplex monitoring function
+    https://git.kernel.org/netdev/net-next/c/c4e82c025b3f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
