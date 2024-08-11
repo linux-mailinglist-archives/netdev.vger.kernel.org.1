@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-117517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1080994E283
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 20:17:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A38F94E288
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 20:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2511C2091E
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:17:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C46280CA9
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B36D15689B;
-	Sun, 11 Aug 2024 18:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD3158554;
+	Sun, 11 Aug 2024 18:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ptP6Q0uf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t6uwhrTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D57A14D6FE
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 18:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D56B1547EF
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 18:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723400242; cv=none; b=Uh5ctOu++D0u+yIHlAQAlJ57JuJvDSMJ0oecjQwlePL6uFwUJkAJl254EwplOwBnoek8/MjTKD05Tfifh6bfeVc2RTc88mSYYllBmiO6QmQFfkXelojV0w8b1kcR5UX5UTaL2ji3gOR2z+OrcEJxaxKOS6X9MxVVNidyZcXNijE=
+	t=1723400244; cv=none; b=iXZDvtXI/4Xl3vrrfqpJk5QSQu3jBj22I2tDuXnQH380nLFfFi9UpU9J91GxVVpnoT0KU/4s2Rlby4YCIxQ4uIoK0XbQ7gTSzp+eN0gVw9FrM7jIjDl0Kh1YocKMcJIWa8lmZBd2ERaq6t65FMb4Mhp+MtqfD6BQRwDx/TdtlAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723400242; c=relaxed/simple;
-	bh=QEqX6jTyd8mtDAP045rVWWxtAM7yNW08id9PkOM91fs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OcdHvjWK60d4Fv2JEEHx6gEEvczB50Lxz8dnJ1/NM4T2vnTKnP083rFMkIvlto/b/zn4Rm3bOmoOtxcTw27XVe/7ljQ4RZmif+XACwSmypx854CgQQ8SvP0SJZ0wK4M4AGxo21TseqiWYnwFGw6P5VRRNaOZBEd4aGtdptJSBms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ptP6Q0uf; arc=none smtp.client-ip=209.85.208.177
+	s=arc-20240116; t=1723400244; c=relaxed/simple;
+	bh=o1Pg+WYSU+1aP3K7rSMBYgVoWMnaQYMrTTQy4scWqrU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=DqctghJpIH1ZuAsDXu4JWZSn7Hpllpmy49FFASWJI2ra2I5cjXxmTLOBdQJLc/ODjwZmaB3ymgalAjBiXD4wqDw/3el5XnBzP8/BOni7o7lE4O/i/+lgghgC/2Pu9HeWU5Ytoj1tsavx2kIbv8Tmo26GJznzKeT5WffM3MoeXOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=t6uwhrTD; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f149845d81so41498021fa.0
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 11:17:20 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-530e22878cfso3313880e87.2
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 11:17:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723400239; x=1724005039; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YwPrNBUvnU4mbdftoy187GtvdUrZHe6TFCVGlwNgbXc=;
-        b=ptP6Q0ufMV5KBIVvEhoH+3oFFr9H7V05gPH/7T43vjvu8l+NXSvqZ545W9wS8Xb19D
-         yydqgsX1YqvELQLEJPlOYeIxdHNp3tnkjEpRaJibiHK3eA6g3QYletkD3CRENB+dTQXb
-         YPxYXSmnK3LIKhIuwxTLZUlwRjaPILd+K/xHJNiSfDM2bYgfSnNXdjUpn9O26RSER5cO
-         ABsEzMiiMMZTN1RmJbXJtrnkVzQoYpXEdS9M4JqX4RumZFLaMk5DsGjoTS2pJbGLM2hk
-         pOt6NFMjJKISN2xPWI3if6porTl56zz3IySmoiI1o/AY0BHwxAllQhiuaREBFQda3I9N
-         AKVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723400239; x=1724005039;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1723400240; x=1724005040; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YwPrNBUvnU4mbdftoy187GtvdUrZHe6TFCVGlwNgbXc=;
-        b=e5tN6AVzhNZtd1TQs8gBxj7qtFqMcgZYzE0i6CZEcVw/2fr6hDxYUffSFfoQO2Qojx
-         W3KXq4dKGosQodhrSdL/gIuduGczUhFt3IwVmpJRhX5z6nWarr8JSdKs/tFLubzQuIlN
-         bm4+bH7XCBlWLyWlmgkSHdxXZZ9Xo00YUXnGiySczUXewW1bct8cjpgCDCiH46oZNO6g
-         uXUkCT3NOaVV8XApwsrhzyTFrBgH6LBl+F7sLWEfpvWD6f7X3upnJ8gb3qjoLiLbSNGP
-         6dHl9XvGehGHsv8Jew2MJYodurghoOa/iZuOqau3tY+vcxGqoKGo7MuoGv4/nev7bNrq
-         c8TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ1lH8xitJh9XRx3Ni8jnMtr6eFN9YVMdKXROOO7ThbrWLlPiGUQUyhANSTXCN89VJ6uAGEqxoV1+GfeW6Q8A/po5Yo9k6
-X-Gm-Message-State: AOJu0Yy7xPhDWmun8TrtcHOY7wbF421PzRQsc4KBcQhJGTWCyN11XX1N
-	2FfckgJx57eThN0+JnwDjUyG1wZyFi9Fw8zMw9btPmwkzSu8Co04Ox44wfv6OPo=
-X-Google-Smtp-Source: AGHT+IGL8dYrPpIhxDmqwnFdq5fwLCKAJWl59JNXZWtvR62sQOT8VXO5t1ROG/0yftq11lxeIELW0Q==
-X-Received: by 2002:a2e:88c2:0:b0:2f1:5c89:c875 with SMTP id 38308e7fff4ca-2f1a6c687d4mr43015351fa.26.1723400238328;
-        Sun, 11 Aug 2024 11:17:18 -0700 (PDT)
+        bh=IeggRLrefKS4NRHp55eXF+21fQVTmgaEKucAb/25uG8=;
+        b=t6uwhrTDMO8gHNCvxlFhlwTPxa84Jcj37DpHSFLojyQUwGD/HCrJKzKWCHgtudxopP
+         q4Jfso+0IkCSZk8V6QWcrxKG2ctwu99R5rhWzNIWkmS7q/ezXW/k+v1w5ozs2XAaqb7z
+         oHpZWjKp37vI/wboffofJpeEtQDfDPxQMpoTM4x4Ss1C8lq0mRwCA/l3TfM+wy3wbL7L
+         RQ7XeqnKi9oWJvvzBfTgYZYwg24uydJEDywFBrMd648B7CMwkl+uMQpBtJ0OBd+KwWjk
+         El8tQpzM2WCfX5DhpbI1kMLOyYRN38MEXPbYtCP63P7jmvCQz+TU38AEd6QTMoV4+ntV
+         Sz0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723400240; x=1724005040;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IeggRLrefKS4NRHp55eXF+21fQVTmgaEKucAb/25uG8=;
+        b=hsLHYoCmQPhSDO1OQfoFqDHB46cY/GxRMZ2vBg+gAy2iuTUNp6kb9MEE+qbcpjlUha
+         eUnaLHZwN0V/Lz6l/tiAgSREhI/tGGpvfNT1Tyx3i5Q87XMtjbLWfqOlS2xhZylMP4NJ
+         EkE2D0BV3YagaRlU1Xs3/DcvICktG3S9Vjb6h8psEKpoupR/9RZLUyb/stWGOHzSoqtq
+         ag9umgKZPu248VFPIGQxXaNb8cyp1pTDp7I4naqGzF17VINKIlg7Y2M7u3QTdHpjLQkp
+         nhShUA5DP1f/mV/Zp79Dw7YSD33ufjdYNiKo3e/f0Zg/PU/xK5I5Z9n8+n9N/Dx4SOm7
+         u6vA==
+X-Forwarded-Encrypted: i=1; AJvYcCXV5uIZtkeVXUElrJ0u7B4TOLIraWuPfdn3DO3AFhEZ/fOumFtEipUmebGkX9KPwyg/+1/GnJKB3UgLFrCI3uXuITRoGrA8
+X-Gm-Message-State: AOJu0YwIIfTGlo/64WnnkqSDaVOsS0DnqZmuCCNTAh496C8MPz2d529s
+	p4x2ftIy4Q4T9cCU5rrIPlQMq5XULFkPo8LAhHlMTGjeroYubP+3b5z2I+DEisY=
+X-Google-Smtp-Source: AGHT+IGo96lPHtsUXjiRmEnFORtSb+OG6u30XA7cbQkXT2T8/BFuRGLG4MYUDVs7QheieToXGlwKTg==
+X-Received: by 2002:a05:6512:110d:b0:52e:f2a6:8e1a with SMTP id 2adb3069b0e04-530ee9d0b5bmr5672768e87.29.1723400240286;
+        Sun, 11 Aug 2024 11:17:20 -0700 (PDT)
 Received: from [127.0.1.1] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd1a6032c1sm1610593a12.92.2024.08.11.11.17.16
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd1a6032c1sm1610593a12.92.2024.08.11.11.17.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 11:17:17 -0700 (PDT)
+        Sun, 11 Aug 2024 11:17:19 -0700 (PDT)
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 0/6] dt-bindings: add serial-peripheral-props.yaml
-Date: Sun, 11 Aug 2024 20:17:03 +0200
-Message-Id: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
+Date: Sun, 11 Aug 2024 20:17:04 +0200
+Subject: [PATCH 1/6] dt-bindings: serial: add missing
+ "additionalProperties" on child nodes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,9 +79,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAB8AuWYC/x2NQQqAMAwEvyI5G2iLYPUr4kFt1IDUkogI4t+tn
- nbnMLs3KAmTQlvcIHSy8h4z2LKAaR3iQsghMzjjKuOtxXDgyDFwXBQ/d9gw5UgryVdlT4qVbcj
- P3pOrDeSlJDTz9b90/fO8b4n4MnUAAAA=
+Message-Id: <20240811-dt-bindings-serial-peripheral-props-v1-1-1dba258b7492@linaro.org>
+References: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
+In-Reply-To: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
 To: Rob Herring <robh@kernel.org>, 
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
  Jiri Slaby <jirislaby@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -98,73 +100,52 @@ Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-sound@vger.kernel.org, 
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2242;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1057;
  i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=QEqX6jTyd8mtDAP045rVWWxtAM7yNW08id9PkOM91fs=;
- b=kA0DAAoBwTdm5oaLg9cByyZiAGa5ACKhowuFQWEQGWLBZ65ihEcm7sWDm5sILJ0QDnLhNFcNn
- okCMwQAAQoAHRYhBN3SYig9ERsjO264qME3ZuaGi4PXBQJmuQAiAAoJEME3ZuaGi4PXOQQP/Rf3
- 0FQ0xAoCgS7Rg5Leu6TCRvJx00s5hvLY/OatLg1j6RJ09EPW4CjZCHUkNAsii1fmw6D36YOIxGn
- yANtN0FjOqIRKi86b/M/Ew+30nEv9+heFkhedxy5+qeKfgB37PVf4e1xJ+YzAjp+GEcCioB4akh
- qF0Q71VKHz8pCuK+0r18ceZ4ltmTvUWDlRPz/U0gIsv/ey/X+AeDwLUJH+/3OurVOzt/l759wH+
- k9vny+3L2RAnKnYCJ78J9h9cZHns7SCJzjLYXahWfyKIHWAhkKq9n1dw4YcBuTBIvMRy5zDRFNx
- YrhPRKGeCtFT3dwngVMuRLm7pzBWJ49NPLnT3oh3olQ+xyW6lx8fSyMRPBbM11cam2MlRbLfQe2
- Ckj4G2tML2zwirNyyxMFh/runDKcakRCwTmx/+1ixutFkxKWHisMKz8hYuR6Tfi/g3PBvYzxhqo
- //11FD/jMibRLb2pdBuj8ZnU4En6gKb4zn3UkXR0d0+dozzXGe6MUwGRrepM2nMAJCsc/ss4G1U
- 9nzaAN5EC7bfkVBiTUswgxlr6FLmQCfdZfRP7spBixaxXYXmTc3CHC3oajHfeaTzBIEJhKG4hbH
- QdW7lvHeGcMv43NdDPCaitsgL9WiDAevkhH90YumKd9T+i528h/dtRnT8NFyoZ5LBM2snf73M4y
- 2qY7d
+ bh=o1Pg+WYSU+1aP3K7rSMBYgVoWMnaQYMrTTQy4scWqrU=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmuQAnOXoFWzTi2CdjfGUgn4ZzAkWR4980rKV/3
+ sazBXuxtKyJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZrkAJwAKCRDBN2bmhouD
+ 17SED/4rdw923+Og8fvQ6box0oI2553Pq0Sy01E56fmyMW37SSXn72uzCc9LccCaq9xWSZsUpHa
+ fGKKaRzDCArQZlxv+37ArKnHQZudrzWpvF5hU+PvVS0BwhaFdmcnay3X8u4D7HjbtY1zPl74MYE
+ 1vRbFIUvuomlKIgnkGtyqnS/qxhaKBSQhoo7QSy/c+1c7fYcBV1TWDfcN62O0mLPjfxxV2N3wMS
+ IQsPCaUDtnDA4QxaORdzjUMrOVv0EsSdrlpn3cQBzG8GMyXM1bl9h5B5RU2lEa7dbiB1CdzuP5e
+ Db1y2CN4fVQ77UFUoNz+YIfkmAKYkzLm6wcYRz9kxPiWu/ES6e0LhDOJl0EOQsixs4Yb3SF5oou
+ MMemYJSH84VgCdaiQZNh/HpJq7awc5PDpD9NAxYNMvFE/UqWL70OGKBNNhuNRHtCQs96M2ibMNi
+ IlmSDrBR6KXRWEnQJ8QJKXLoY0NL8wMR65VencMz1CZ5uV3N4PWs/UW0iPRJ4HTHYKn3HyJtsJb
+ uY8ebPIDItug1xo4oUts4fmciO/Q4JKhli8C6ouFJvAfD2Fzc4RmphNm1Rc7jLwhUGtNfW4dbX7
+ IVTs0ibDN/ne8F1QHDvrBcwq/2d+TGFLdn6+20WnjvTwRKkHqlDRnIQrtUXpaRkrPQLKlA8kXpn
+ meevMgUeFiHveug==
 X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
  fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-Hi,
+All nodes need an explicit additionalProperties or unevaluatedProperties
+unless a $ref has one that's false.  Add missing additionalProperties
+for serial-attached devices.
 
-Add serial-peripheral-props.yaml for devices being connected over
-serial/UART.
-
-Maybe the schema should be rather called serial-common-props.yaml? Or
-serial-device-common-props.yaml?
-
-Dependencies/merging - Devicetree tree?
-=======================================
-Entire patchset should be taken via one tree, preferably Rob's
-Devicetree because of context/hunk dependencies and dependency on
-introduced serial-peripheral-props.yaml file.
-
-Best regards,
-Krzysztof
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 ---
-Krzysztof Kozlowski (6):
-      dt-bindings: serial: add missing "additionalProperties" on child nodes
-      dt-bindings: serial: add common properties schema for UART children
-      dt-bindings: bluetooth: move Bluetooth bindings to dedicated directory
-      dt-bindings: gnss: reference serial-peripheral-props.yaml
-      dt-bindings: bluetooth: reference serial-peripheral-props.yaml
-      ASoC: dt-bindings: serial-midi: reference serial-peripheral-props.yaml
 
- .../devicetree/bindings/gnss/brcm,bcm4751.yaml     |  1 +
- .../devicetree/bindings/gnss/gnss-common.yaml      |  5 ---
- .../devicetree/bindings/gnss/mediatek.yaml         |  1 +
- .../devicetree/bindings/gnss/sirfstar.yaml         |  1 +
- .../devicetree/bindings/gnss/u-blox,neo-6m.yaml    |  1 +
- .../brcm,bluetooth.yaml}                           | 33 +++++++++--------
- .../marvell,88w8897.yaml}                          |  6 ++--
- .../mediatek,bluetooth.txt}                        |  0
- .../nokia,h4p-bluetooth.txt}                       |  0
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  4 +--
- .../realtek,bluetooth.yaml}                        |  5 ++-
- .../bindings/net/{ => bluetooth}/ti,bluetooth.yaml |  5 ++-
- .../bindings/serial/serial-peripheral-props.yaml   | 41 ++++++++++++++++++++++
- .../devicetree/bindings/serial/serial.yaml         | 24 ++-----------
- .../devicetree/bindings/sound/serial-midi.yaml     |  3 ++
- MAINTAINERS                                        |  2 +-
- 16 files changed, 80 insertions(+), 52 deletions(-)
+This patch should probably go via Rob's Devicetree tree.
+The context of the next patch depends on this one.
 ---
-base-commit: 8626c4826dd708e05ba457c44493d575d75d375c
-change-id: 20240811-dt-bindings-serial-peripheral-props-419e8f88e270
+ Documentation/devicetree/bindings/serial/serial.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards,
+diff --git a/Documentation/devicetree/bindings/serial/serial.yaml b/Documentation/devicetree/bindings/serial/serial.yaml
+index ffc9198ae214..40e05dd37826 100644
+--- a/Documentation/devicetree/bindings/serial/serial.yaml
++++ b/Documentation/devicetree/bindings/serial/serial.yaml
+@@ -92,6 +92,7 @@ patternProperties:
+     if:
+       type: object
+     then:
++      additionalProperties: true
+       description:
+         Serial attached devices shall be a child node of the host UART device
+         the slave device is attached to. It is expected that the attached
+
 -- 
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+2.43.0
 
 
