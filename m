@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-117479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2177A94E169
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:24:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A48394E170
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2C4CB20F8A
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 13:24:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0AE4B20CF4
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 13:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49752148841;
-	Sun, 11 Aug 2024 13:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6820C1487D1;
+	Sun, 11 Aug 2024 13:32:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627BA148838;
-	Sun, 11 Aug 2024 13:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9A218E20;
+	Sun, 11 Aug 2024 13:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723382663; cv=none; b=mrGzcZ+/wMMgg43q1HdjlmBGsTAFQC/oDWo/NEKEt72E9Lew4p3CeOcaf57y1WVOQ7DSzX7GTEqiM2+sb2DFLWUMVuSxqPT8+NV7HQSy0Ukhgx7cM8FvOhx7XDHdDpYfTrhi5k67uNLPhk8TA5ABzi2eRhJZ3VZ3pPWY2W7luCc=
+	t=1723383130; cv=none; b=PdfkJ4dsJO84xcflpLpDiQYovkWyC2eMf6JUf6/eTGddw3x+cXEY8Z+eBqobF5hwCRCkdr1tNQBc26o5TZUI6QKTEtF/tmsW7WKZy9rvWPxSUgtMv2eouxh9yEY43zNSerprNYdLO64/qD2JfnIvdf8IGulRHmt5WdPvVVoxLLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723382663; c=relaxed/simple;
-	bh=Po5/mFOf0/VTScGzn6+mtQuzX/UGKG4Vw71o8feai/U=;
+	s=arc-20240116; t=1723383130; c=relaxed/simple;
+	bh=HmhKGxLZVnsHuXqn+T90mUmZO+I594yP+om+pM24GNM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rywU/UX41czih6GDcckmzd8V/ZFUrY8ApPPhpGarGLxLhvRrtUhWvtT4No2Hc8JrY9v0WjDADAkprOkU2aF//Z6ePQ738n4dX+iTtqlx6KvfYq6TcoYga5yLrKNwXTHCTyKvI8M0jnEveUpnNpp2VniP8n65bvsc52yMJbRDZuA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=fswppbbrDU4LMu0WbNhBCVilUJO/up3i5JjxGZjoBrq1y3V/5pQWyMrAVbVwgeY+GHFAqTuVNTcke0V6HyqqHMaF91VsA+qHTMfpYi9m9YimPdNCTld7RReFuyCv0tVUwI9E/LtSptZu0uDI8QrMwT1blWtcvALpu7K0yTEsQIk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
 	(envelope-from <fw@strlen.de>)
-	id 1sd8YN-0004rw-GL; Sun, 11 Aug 2024 15:24:11 +0200
-Date: Sun, 11 Aug 2024 15:24:11 +0200
+	id 1sd8fw-0004vc-5n; Sun, 11 Aug 2024 15:32:00 +0200
+Date: Sun, 11 Aug 2024 15:32:00 +0200
 From: Florian Westphal <fw@strlen.de>
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
@@ -41,7 +41,7 @@ Cc: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
 	netdev@vger.kernel.org, pabeni@redhat.com,
 	syzkaller-bugs@googlegroups.com
 Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
-Message-ID: <20240811132411.GB13736@breakpoint.cc>
+Message-ID: <20240811133200.GC13736@breakpoint.cc>
 References: <0000000000003a5292061f5e4e19@google.com>
  <20240811022903.49188-1-kuniyu@amazon.com>
 Precedence: bulk
@@ -91,25 +91,12 @@ Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
 > I started to see the same splat at a very low rate after consuming
 > commit b334b924c9b7 ("net: tcp/dccp: prepare for tw_timer un-pinning").
 
-I think I see why.
+Could you share a splat you saw?
 
-The reported splat is without this above commit.
-But from backtrace we entered here:
+Was it also for the fallback tcp_hashinfo and/or from error
+unwindinding after a ops->init() failure on netns creation?
 
-                if (net->ipv4.tcp_death_row.hashinfo->pernet) {
-                        /* Even if tw_refcount == 1, we must clean up kernel reqsk */
-                        inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo);
-                } else if (!purged_once) {
--------------->         inet_twsk_purge(&tcp_hashinfo);  // THIS
-                        purged_once = true;
-
-> The commit a bit deferred refcount_inc(tw_refcount) after the hash dance,
-> so twsk is now visible before tw_dr->tw_refcount is incremented.
-> 
-> I came up with the diff below but was suspecting a bug in another place,
-> possibly QEMU, so I haven't posted the diff officially.
-> 
-> refcount_inc() was actually deferred, but it's still under an ehash lock,
-
-but different struct inet_hashinfo, so the locks don't help :/
+I don't think it makes sense following this specific report given
+b334b924c9b7 made changes in this area, but a post-b334b924c9b7
+would be more relevant I think.
 
