@@ -1,94 +1,87 @@
-Return-Path: <netdev+bounces-117506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6790B94E23C
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:21:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9079794E23D
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9BA1C20884
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:21:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50F3B28112C
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B040E446AF;
-	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA7A14B950;
+	Sun, 11 Aug 2024 16:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lcs3Sfhi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CqLOOs0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0A0C8E9
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FB8C8E9
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723393309; cv=none; b=dWSvlTIoJ4qRrtIyyxKAtpqoP0GCKcSuBW982jwriKQHggAXptYMgnfrYJhVkTZ4L7W9dCKOxmb9sqAttWoeaAnK9qsxKxSPHwHZxoVJTqemmgasDj5OAOENsAnSXKTUI9ODMz5kJt0LPfIv/mfIW/iPxm5peQEZqPdN151uRiw=
+	t=1723393326; cv=none; b=sY5EJm8Tz2OzJ5596ZeOchy4XqF6qAwSKW07AgvYg57EbKF5QAqyLSsK3znjuWQVBeNUm9QgzKqFHM3SY4/uaB3KpaXUHkEnGJZRARBjfv59YTNCjjrRfvKLLC6SquMYo5e7vYnw7wzulaCQMvjsEJoipzpOSP2Re+AKD6heniU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723393309; c=relaxed/simple;
-	bh=wrs78BZfEL2QOGTHcdaLIqCPvyyS7b2fP5G4GXvEDsk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lwnda3S6QmxyYQAXnIwN03SKceUGOHEsmnldfHMY/nOuzv5pof2a8g6WndWAATrMuwvRCiARrmlGyrn/rfsbJ8gzC/IV3QQUF2ien3D8W6JDJgXYhwU1eGu3Xnc97O5APzz2qvF59VPXCgqNg27YzM9Gypk2rUCLN3j8fESzLJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lcs3Sfhi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D0BC32786;
-	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723393309;
-	bh=wrs78BZfEL2QOGTHcdaLIqCPvyyS7b2fP5G4GXvEDsk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lcs3SfhivbvicPvrFLSvajix+n3IIkanNU2TuHYtAmBAoJAJrcrP7ErQ4aZn9+giW
-	 GMj4yXe63bknXdWEk5LXFY0FI6ZAcPwXoYxBZKrYLRHTe5JEzqLuPTN6oiVoXIOwau
-	 JHnrY1RoxQxwtbrZraWIEC4xNVdqBc+mPPWLyPsqx2Yin6n6ggHIeienN6Hs7cOB6l
-	 NAWaJTrisQ55qvSTDC8LJRT1KnDuubZlVyuCWIvRriMCMOaMQx3nhbGiYL6aCCn9Os
-	 73P0r+5zWND3aHwpjvZgLe2XSqNvvMKEuWBxsfbh6iw/NXLRcMvcklyRcnJ+FZ9erG
-	 zaDIxKNbXVCnQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C393823358;
-	Sun, 11 Aug 2024 16:21:49 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723393326; c=relaxed/simple;
+	bh=BVPqU00/FL0CJ+/6ekr1FAxLTOVi744gvqcFgpIy7e4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g+SsUF5NMtw5a+QLUcxZ71UaSQq2NmQ4hLgeBzC3ZMtqjXBayUxoEtHhO4HxBK/uyVfY7iN+gKopj3oM4qiZoDoNypg65J7aDIA6w5tag61eWvSk5nWW2CielQYg2z3SjF2y/RFn2tPuLEbBZ1UYfeQG6G4QKFe4ohA1scTzWPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CqLOOs0Q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8wG9AYa+8Ux4yfE0QiQnPT8Atv0QDOt+Qzb/1c9XJiY=; b=CqLOOs0Q/Ive7N3wD8G6DcIGuO
+	sU+4nmVJPzJHNa+IU9yXoictnC6rYSmTYJVlH4kG70WQiz2ddAUWymAQxANNUmmkzvI88YmpLxAIm
+	Hu8xKKvivmbxsBQwsv+FIpwnrXk5jMg7yNyAKbP8MBe4oqium638EalJ5NtF/FH3l54s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdBKV-004Vf7-4C; Sun, 11 Aug 2024 18:22:03 +0200
+Date: Sun, 11 Aug 2024 18:22:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	kuba@kernel.org, Tristram.Ha@microchip.com,
+	Arun.Ramadoss@microchip.com, horms@kernel.org
+Subject: Re: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split
+ half-duplex monitoring function
+Message-ID: <51ca6e1e-b3db-4a05-9da9-1ff5493a53f1@lunn.ch>
+References: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net: dsa: microchip: ksz9477: split half-duplex
- monitoring function
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172339330781.220939.6785517478852733441.git-patchwork-notify@kernel.org>
-Date: Sun, 11 Aug 2024 16:21:47 +0000
-References: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20240808151421.636937-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, kuba@kernel.org, Tristram.Ha@microchip.com,
- Arun.Ramadoss@microchip.com, horms@kernel.org
 
-Hello:
+> -	ret = ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
+> +	/* Errata DS80000754 recommends monitoring potential faults in
+> +	 * half-duplex mode. The switch might not be able to communicate anymore
+> +	 * in these states. If you see this message, please read the
+> +	 * errata-sheet for more information:
+> +	 * https://ww1.microchip.com/downloads/aemDocuments/documents
+> +	 * /UNG/ProductDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+The 80 character rule is not sacrosanct. We allow strings which will
+appear in the log to be longer than 80 because they are hard to grep
+for otherwise. The 80 character limit is really about keeping the
+indentation level low, encouraging lots of small functions which do
+one thing, and does it well. This is exactly what you are doing here,
+taking a big function and splitting it up into smaller functions with
+less indentation. I see a URL as something which should not be split
+like this, it should be allowed to be longer than 80 characters,
+because i want it to be easy to copy/paste into a web browser.
 
-On Thu,  8 Aug 2024 15:14:21 +0000 you wrote:
-> In order to respect the 80 columns limit, split the half-duplex
-> monitoring function in two.
-> 
-> This is just a styling change, no functional change.
-> 
-> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-> 
-> [...]
+With that fixed, please add a Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Here is the summary with links:
-  - [v2,net-next] net: dsa: microchip: ksz9477: split half-duplex monitoring function
-    https://git.kernel.org/netdev/net-next/c/c4e82c025b3f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
