@@ -1,168 +1,128 @@
-Return-Path: <netdev+bounces-117524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C63994E2AF
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 20:33:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0841F94E2B2
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 20:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E08A28137B
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:33:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6B111F21150
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F86314A0A8;
-	Sun, 11 Aug 2024 18:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A611537DD;
+	Sun, 11 Aug 2024 18:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbYirMcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88CB10979;
-	Sun, 11 Aug 2024 18:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E5014B95B
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 18:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723401204; cv=none; b=Eg/C8gjHQIIDp8VHy5CZVVIoxw1Nu7F8kxoQS3f4Sv15igLx64RSvdpmaBF9wpoC9i+0tnemPjErMGy0vYfeUV/lszjqJqhuGKo3gj7QIoTB6zv681LbUnkX5DfWqy6PW+INJ6YRVfFgrgCi4Fcm3V1/fz3H10E2+ZBpUq308HA=
+	t=1723401382; cv=none; b=lP8fDiusdRORGjuaU/Usj9QNKcN1gyZX/llxMp0KPU6GJ+xXEfq9R6fEowaRJT3494XV4b107vVhwA0CtmUiLXfpWxROS1Zn0McI3MbeQc0TQo123xKhg8z3YGG6G1yjq4x4bTSOr00T02mO1hWWHaPWKydvh+QdL6Xwh6D5bI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723401204; c=relaxed/simple;
-	bh=FzgK3duK3L43dOKLwhC92aHwZTobswcT9RtcNbyPS4c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QE5Ql5wYLDf9ohFQgRP9qczJMGsXbGO/IUEzTZAWScp0GwUzxPkRlFKlDKS0rg3CELeH2OKOG8hZIgybJw9E7vz95yWUOwSsxjJSj2Tb7H3c01PHu2mttoEEdXRUgoQDvdQkbAFCZte4jX8FkQrvJD9RiAEARznPN05uqfL6cDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	s=arc-20240116; t=1723401382; c=relaxed/simple;
+	bh=3NI/r7oDE/ePFOSSutH7Dqef9lZ4yw2LghjhazweMK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AEObCb3Qlx/pIAGFeMT6Sr4r5u8EyFpaq0N6Me02uPdi7W8cAfQBkOF109VaPjwoalkA4FjKbce3bC5S2FR3HSGSAmuq2AjwvkCpAjj11BipsiR7VWJBFQ2+K5ZDXJbirgEJmV0/24GBbILwdoe9cgXX0iRmUUKbJmtaUARwJqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XbYirMcD; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4281e715904so4674765e9.0;
-        Sun, 11 Aug 2024 11:33:22 -0700 (PDT)
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3dd16257b87so165091b6e.2
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 11:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723401379; x=1724006179; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y8FAkeLc9Xm9DTTRbc+ZegI5K2jgJPmd7i1hDZR0q/U=;
+        b=XbYirMcDY5dP9hDyG5Ey44tRuPKMi8b0gSeoo7vT0MhcdY+WmAZwkv7aJzuibppx4E
+         hEQV6zbAv0SnIQi9PpFDCZ2J5IosEj979FRVS0E76xLRuOq1ScroVDP1QotaDD7G48W+
+         a/qE0hMtzy+vTUlS8zJfocVe2D2Yi95jF/QnzsWWDtjgeB196x1CqbZ7mpThpffOMKXc
+         Fi22a6duG1I3tSFG7NrsBlaEdnAHoNUJr3wNZl5yaCOAqNp/PaMo7vQTEgxtOXxmEdOI
+         mu+LflLvs1fIJoVY7JoJbSMn9Qt/fvSx9sIo/U6OBZoch8cHrUScEckfk40gjhb8kYhy
+         3weQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723401201; x=1724006001;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tKHI+xdnlGN0j5kXphEMa/ln6onBMQQZ2ulnnXQyTGc=;
-        b=m5hJBonPYCBl8mfmedUTK1IAMhwFc/bsDqArp6cixQeC6XYbxUEgdHnN5mUXZK/4Qc
-         lLlooCahiuj37R3T0xVuGjTAcvgYSMWk2zvSHcIHDFUaN9dQdrQHfgt/vBDBWuysaEWP
-         A0XPJts3WkrTaEXiklHbts/W7RFSsSmX1FIQVubDcdQpjEBCvw1lsnhwcMVnbboIXGDT
-         rVy1K2InUDdhTx3HCZdgXgv6wOqdUbkyxHLfYlpN1Yy74BFeKHnCvBmoJKSfRi3iR9qs
-         KCa3xERetb1oT5K34Zik+/B2AJjlyLVhPfucQ0H5ayUfn+a+ikkH0hX1y7aNu8Vo4163
-         WNeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWGAXpIrvXV+Qd7KyJA5HdZDwq9WJqiUbr8CieJdkFWXgR2PRptC2gamaYuqlKtNMORXUj3vowHlX/FeQ8Q47aVx4PlScyYuxUkti0K4LTZ4oZzj2amh08XPCNL2LeXmyS1CrlZEFX1JwT/UU2Vq2vBrHVpW+n9TNRv9D2V8in
-X-Gm-Message-State: AOJu0Yz1anl7KLkrgc1iCmtIgGfL9rhZ7srhDuCZIK2BKBnlH1v2CVPQ
-	Y7ScvSn2djSh28Aqz1/UxUxxlE+lwajGUoWVli3fAr9rT4SCM2pu
-X-Google-Smtp-Source: AGHT+IEZRBUqIqST0bJ7neA5K6D61aBV6XJpWfKGa/lGOhAvUUfJ74XbrVYL20+uSQpqK1lGgj//Bg==
-X-Received: by 2002:a05:6000:1868:b0:366:e4b4:c055 with SMTP id ffacd0b85a97d-36d6035504dmr3389835f8f.7.1723401200667;
-        Sun, 11 Aug 2024 11:33:20 -0700 (PDT)
-Received: from [10.100.102.74] ([95.35.173.109])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ebd3100sm5356118f8f.95.2024.08.11.11.33.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Aug 2024 11:33:20 -0700 (PDT)
-Message-ID: <a11a0502-4174-48d3-a8ad-8584fd304fe1@grimberg.me>
-Date: Sun, 11 Aug 2024 21:33:17 +0300
+        d=1e100.net; s=20230601; t=1723401379; x=1724006179;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y8FAkeLc9Xm9DTTRbc+ZegI5K2jgJPmd7i1hDZR0q/U=;
+        b=i28BEnXYcOf7Kh5IV+sryNCDL6whweOc9u64YLfKFINxLT3NkOtsZnTkocsaevGfU/
+         y+KpRPbpDI3s0I/2rWxlM7/7CUbL6+tzN2bM8tP44gB6cEBxXuy3Mk6sJZqo93EmBpte
+         VyV2NfokCzQK7ar6CE7iobJGqCwfqELwIq4HWY9jev+wW3+5xztw2xyuWIdm+2PB3kE2
+         uEps302xGLbG+u40lGLnzPgjzsiJlC2LkV+IRkZp5Q42PYovYg2d968CJtU11gPfgKr6
+         BNWua0NwWpt1RKpq71yPztYtFfwHaY3VAoFOfxHu8e70xo1aG0XzkXnp8pFRALRnjgSO
+         K/bQ==
+X-Gm-Message-State: AOJu0YwpxngbHvYb6pK3jIpyUeuxCA0hB4VLQFv6LvtGKOr1/4yUtyJP
+	+jORyNYt9/qy0Uo9nC/c9O4Wl2CRQw2q2kqTjfeUyXR0TysCo1ae
+X-Google-Smtp-Source: AGHT+IHD/RCxPbAXodWAVIW+qMN7cE30scGyquAXI4KKqix86VrQby44m/e2HmBoFnV9DtZizV6p+Q==
+X-Received: by 2002:a05:6808:3a15:b0:3d9:de1e:c24c with SMTP id 5614622812f47-3dc41665a78mr11131068b6e.3.1723401379609;
+        Sun, 11 Aug 2024 11:36:19 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:8ec7:dbc7:9efe:94d5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bba3f374sm25107065ad.259.2024.08.11.11.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Aug 2024 11:36:18 -0700 (PDT)
+Date: Sun, 11 Aug 2024 11:36:17 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+	tparkin@katalix.com, horms@kernel.org
+Subject: Re: [PATCH v2 net-next 6/9] l2tp: use get_next APIs for management
+ requests and procfs/debugfs
+Message-ID: <ZrkEofKqANg/9sTB@pop-os.localdomain>
+References: <cover.1723011569.git.jchapman@katalix.com>
+ <0ed95752e184f213260e84b4ff3ee4f4bedeed9e.1723011569.git.jchapman@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug report] NFS patch breaks TLS device-offloaded TX zerocopy
-To: Tariq Toukan <ttoukan.linux@gmail.com>, Christoph Hellwig <hch@lst.de>,
- Anna Schumaker <Anna.Schumaker@Netapp.com>,
- Trond Myklebust <trondmy@kernel.org>, linux-nfs@vger.kernel.org,
- Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Maxim Mikityanskiy <maxtram95@gmail.com>, David Howells
- <dhowells@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Mina Almasry <almasrymina@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Networking <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-References: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com>
- <77fb3db5-7a59-4879-b9c2-d3408fcf67e8@grimberg.me>
- <4f42fac4-2a4e-426a-be86-1f4bb79987b4@gmail.com>
- <3e08421f-91ac-4bd1-9886-3d5ecf9afa04@grimberg.me>
- <8683155c-79ad-4090-9aff-fc8d765b096b@gmail.com>
- <65a77bbb-b7dc-40d8-b09f-c0cf0cb01271@gmail.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <65a77bbb-b7dc-40d8-b09f-c0cf0cb01271@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0ed95752e184f213260e84b4ff3ee4f4bedeed9e.1723011569.git.jchapman@katalix.com>
 
+On Wed, Aug 07, 2024 at 07:54:49AM +0100, James Chapman wrote:
+> diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
+> index cc464982a7d9..0fabacffc3f3 100644
+> --- a/net/l2tp/l2tp_core.h
+> +++ b/net/l2tp/l2tp_core.h
+> @@ -219,14 +219,12 @@ void l2tp_session_dec_refcount(struct l2tp_session *session);
+>   * the caller must ensure that the reference is dropped appropriately.
+>   */
+>  struct l2tp_tunnel *l2tp_tunnel_get(const struct net *net, u32 tunnel_id);
+> -struct l2tp_tunnel *l2tp_tunnel_get_nth(const struct net *net, int nth);
+>  struct l2tp_tunnel *l2tp_tunnel_get_next(const struct net *net, unsigned long *key);
+>  
+>  struct l2tp_session *l2tp_v3_session_get(const struct net *net, struct sock *sk, u32 session_id);
+>  struct l2tp_session *l2tp_v2_session_get(const struct net *net, u16 tunnel_id, u16 session_id);
+>  struct l2tp_session *l2tp_session_get(const struct net *net, struct sock *sk, int pver,
+>  				      u32 tunnel_id, u32 session_id);
+> -struct l2tp_session *l2tp_session_get_nth(struct l2tp_tunnel *tunnel, int nth);
+>  struct l2tp_session *l2tp_session_get_next(const struct net *net, struct sock *sk, int pver,
+>  					   u32 tunnel_id, unsigned long *key);
+>  struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
+> diff --git a/net/l2tp/l2tp_debugfs.c b/net/l2tp/l2tp_debugfs.c
+> index 8755ae521154..b2134b57ed18 100644
+> --- a/net/l2tp/l2tp_debugfs.c
+> +++ b/net/l2tp/l2tp_debugfs.c
+> @@ -34,8 +34,8 @@ static struct dentry *rootdir;
+>  struct l2tp_dfs_seq_data {
+>  	struct net	*net;
+>  	netns_tracker	ns_tracker;
+> -	int tunnel_idx;			/* current tunnel */
+> -	int session_idx;		/* index of session within current tunnel */
+> +	unsigned long tkey;		/* lookup key of current tunnel */
+> +	unsigned long skey;		/* lookup key of current session */
 
+Any reason to change the type from int to unsigned long?
 
+Asking because tunnel ID remains to be 32bit unsigned int as a part of
+UAPI.
 
-On 11/08/2024 14:21, Tariq Toukan wrote:
->
->
-> On 06/08/2024 13:07, Tariq Toukan wrote:
->>
->>
->> On 06/08/2024 11:09, Sagi Grimberg wrote:
->>>
->>>
->>>
->>> On 06/08/2024 7:43, Tariq Toukan wrote:
->>>>
->>>>
->>>> On 05/08/2024 14:43, Sagi Grimberg wrote:
->>>>>
->>>>>
->>>>>
->>>>> On 05/08/2024 13:40, Tariq Toukan wrote:
->>>>>> Hi,
->>>>>>
->>>>>> A recent patch [1] to 'fs' broke the TX TLS device-offloaded flow 
->>>>>> starting from v6.11-rc1.
->>>>>>
->>>>>> The kernel crashes. Different runs result in different kernel 
->>>>>> traces.
->>>>>> See below [2].
->>>>>> All of them disappear once patch [1] is reverted.
->>>>>>
->>>>>> The issues appears only with "sendfile on and zerocopy on".
->>>>>> We couldn't repro with "sendfile off", or with "sendfile on and 
->>>>>> zerocopy off".
->>>>>>
->>>>>> The repro test is as simple as a repeated client/server 
->>>>>> communication (wrk/nginx), with sendfile on and zc on, and with 
->>>>>> "tls-hw-tx-offload: on".
->>>>>>
->>>>>> $ for i in `seq 10`; do wrk -b::2:2:2:3 -t10 -c100 -d15 --timeout 
->>>>>> 5s https://[::2:2:2:2]:20448/16000b.img; done
->>>>>>
->>>>>> We can provide more details if needed, to help with the analysis 
->>>>>> and debug.
->>>>>
->>>>> Does tls sw (i.e. no offload) also break?
->>>>>
->>>>
->>>> No it doesn't.
->>>> Only the "sendfile with ZC" flow of the TX device-offloaded TLS.
->>>
->>
->> Adding Maxim Mikityanskiy, he might have some insights.
->>
->>> Not familiar with the TLS offload code, are there any assumptions on 
->>> PAGE_SIZE contig buffers? Or assumptions on individual
->>> page references/lifetime?
->>>
->>> The sporadic panics you reported look like a result of memory 
->>> corruption or use-after-free conditions.
->
-> You can find the original patch that implements it here:
-> c1318b39c7d3 tls: Add opt-in zerocopy mode of sendfile()
->
-> In this flow (sendfile + ZC), page is shared for kernel and userspace, 
-> and the extra copy is skipped.
->
-> There were a few code changes in this area since the feature was 
-> introduced.
-> Adding relevant ppl, including David Howells <dhowells@redhat.com>, 
-> who removed the sendpage() routine and added MSG_SPLICE_PAGES support 
-> to tls_device.
-
-Tariq,
-
-Can you explain where in your test is NFS used? Is the nginx server runs 
-on an NFS mount?
+Thanks.
 
