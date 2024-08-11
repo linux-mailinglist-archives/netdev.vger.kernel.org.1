@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-117515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B2594E27B
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 19:54:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491A794E27D
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 19:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB812B20E25
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 17:54:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237631C208A7
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 17:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7C614A0AE;
-	Sun, 11 Aug 2024 17:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2175D14B097;
+	Sun, 11 Aug 2024 17:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/4gu/O5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+TxMG/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD6B146592
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 17:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7AE28FC
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 17:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723398855; cv=none; b=ZuIkhIcnGAsQ6PKdobId3nRw4fPfeAEVYUXO0aRrc6GnjMVxsIfpyclGhfFt9o67ruX50l6y9uGyI8awY5gozJsUCeUGvWHqjVV6KNVJTMDm59dk0qpygjlV5gLWAZaGN6+2Za4JIPFvC+St/ZL50/1v7fZXgHOCc9cbOBpmgv4=
+	t=1723399046; cv=none; b=NIUpU39MNzJxUaz1yjKUeDybA7X5zCCkBAZxN8yt/sAKNZVIEe+4VUKQOgDq4Vz/nv3b+WhPfhgWsdOJ/7hmP4VO2e5sEJgzfTuGDNvJmfpVzfvJZec14i8m6WfYsVEc4Ud63J+KRTIgjMs7Qfo5DEOazcplOQMzFWImhEvFbSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723398855; c=relaxed/simple;
-	bh=GNLKVMX9SBhwqGQTVjxbKhEA2uvS457NOqqpXArCIHw=;
+	s=arc-20240116; t=1723399046; c=relaxed/simple;
+	bh=umr0sNtpHKBBwH4G+x1qdqGhky6alTpohH2FdlnVDAA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GIisrvihWPEvCUOnDLaeGUhnLtaLNF7ti+RlX2F2V1KLrFCiOTPO13+9xUgWqUH+j8OD4tKKj9BSFaJO6q7PGEE0HIDxgUhQWQ9910rfnTUAkk3ixEzZE6z51ySt5o5VY9gThFWRTxVa0dX9lqGR3nxgp030aIX2vSHe6mGGxAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/4gu/O5; arc=none smtp.client-ip=209.85.167.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=AYJkU27EqvHMnh9SJh5RDphRD0xf9TpPcrbl8LFxlVNa4XyGHWQ+s8q0joKYXPUqdnwiUO+GsFzvwhJeNJuEgTkPBTjQNlEJtC6V0a7zaQEvVGxV53zxUmI3EuSDwaUrm1k9T9er6XNL6Zin8rT2T2lIw90cM1gYQ8v52EV9Gak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a+TxMG/+; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3db130a872fso2723233b6e.2
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 10:54:14 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fd78c165eeso28760205ad.2
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 10:57:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723398853; x=1724003653; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723399044; x=1724003844; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GrngI5gu/Obpw2lz8P7hRsmTrqlMYT43neDjlNvayjo=;
-        b=c/4gu/O5+djyS1JZHP7CaJYQ7/sFpT1EV0KtnVIbIWI4kPnvqntXU1dDUhGu2od8Rs
-         au0vZZY/fpa/9KnnJ8WRGnQVGp0zAoc4FcKPDPJBuGiSrRT9LzQEqxhR0tHkS9mIqQHH
-         21qS8zaAAEyQzP29e5k3ZhnDSs5P/4YCx5r/t8w4Rr3yisXCeMkmlbogFeckqo7n8lKA
-         eybGIhKCgDIl3T+vEfMcMr5Kic2Y0t6YBBze+5qRJJTiVuQbGzHXQ67q+eHU/rTg5Uxt
-         MrMkV829RMsNHzkmvt6btr79ukUYq1b9+9r9T6sM9BUp1RkfK8QQ1465HSDdlNbR4wln
-         8RJQ==
+        bh=mmIOT3RGjohKgqwIouc8ZUvGmcOc7wwSjlRkZiX7GhU=;
+        b=a+TxMG/+cyUhqmt+1Nw7XiEVBydRJHMheVX7cyziRdwP0WDbugssfeuo+ltf/pf9Kq
+         F15+p0W2WVpFvaRR7+BpohEcKPrbpz8hPi6gDizfiZeD9TiYV/TPuOX+frUUi/+5wbr0
+         HeevBwOqoDJqLhKRAogloJkeaulhf4o+GUvyeehX4XlgpBGF68LiKBWdHYOZShxYEZ/c
+         KwbOUNsAZvoKUOa8Fp+bLjdiYpkgdEi5VZiEWdl6mzOZvtQ5Uovzh6qWbPvGYsHjRkwj
+         1uAvzoQaymevmvcPQYMw32b3t9krhAeoek7AR0/btWkZtBl4DYSDTOED6CF+oyCVcc2U
+         NdMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723398853; x=1724003653;
+        d=1e100.net; s=20230601; t=1723399044; x=1724003844;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GrngI5gu/Obpw2lz8P7hRsmTrqlMYT43neDjlNvayjo=;
-        b=QVB+R9yhqtcU96AODKUUjBm5PLgZL48xteQU+ICp6DSJI8U6fKnFD7JXsX+ZONfKiV
-         SQIbLMpp/0b5XlT/0xvlblDDW7OipnD3+lo0J2nqhNsZuCurkQE7dMb0ksjcV8JW7Kl8
-         bT+bLNXQKcYsKnfN4j6oINFWj7CZvM0R4OjkEhKRrZT5NJIyCMfgfx0PbcA3iDckY/rb
-         guQkUAE8pPmkkXmjGcku6lRX5+A6tFDXi9x6BGp7n1KotfCQxHK97gbbKWoyiYuzWyW8
-         +Z3s2BOHta5xpBaUUg6i761LNIz0R3eLqCe71DaeQQ3lmp9YTkqn+qr5ycXMQmG4F4F8
-         Zs4Q==
-X-Gm-Message-State: AOJu0YzGE6ktuZZ46BIMh+ZgZyJPgte4EUSV2hzXaXkcAe7FgWgaS4kS
-	TqC3vxftHcydQVHBid0QLs02QZMMkBHJcC4W41RYTkzyVjdJZMN7
-X-Google-Smtp-Source: AGHT+IG904uVJ5dsNZJBSEfdPllXxJEk0GDrhgb3DoIRtgp9qFrajxeEV46HdeTKHKI2NvWvvvA62g==
-X-Received: by 2002:a05:6808:3a1a:b0:3d9:33d0:cc4b with SMTP id 5614622812f47-3dc415e42cdmr11986217b6e.0.1723398853575;
-        Sun, 11 Aug 2024 10:54:13 -0700 (PDT)
+        bh=mmIOT3RGjohKgqwIouc8ZUvGmcOc7wwSjlRkZiX7GhU=;
+        b=Aw+aFvZZisIybdQ8AsPX++/PSUmbeUxMz9Mq+nIoq/xlkOXFqiYvuw0qGLGTfZJiXh
+         dqGKcuEsQDm3QmSVBmT1/vHp1bw0YEsOrkGZg4dPTU5o2D5UUm4NS2YgIZWHwoRELjm6
+         P9W0lLGOexeXQliRXWqcWehOuo5UBi/xwXOL/IX0ttPSphTy6ySfH+BMnMAqQ/Xgkvt1
+         qM7nDCFiur5DkM9dw7cew+ZynQKmuwbJfla5DczcFnATvk2aaKA2hTbqxsPb7juiNv8M
+         W+EgKSvvZrzRnUlSH7jxYY6u95xZxCB3Gh54J5fCyf7ROc9cAhZakTMvTrmKwmPEnkGj
+         74NA==
+X-Gm-Message-State: AOJu0Yw++idvHN9tmMxy/sGy5xQOGeTgdfL6v+VG62f8wAojwbNN7oiO
+	8ALtm7+z8JMzHA6r7I9w/pDEDIfxo4zT4IpHYIYDrSgS7C4apeqH
+X-Google-Smtp-Source: AGHT+IEKmmgbCinkaYqs+KbSO0cLDDIimv5mo6/JVPvpw5qR7u2nfxM41G23eWhKWUPvRUKhlAJlNg==
+X-Received: by 2002:a17:902:db04:b0:1fd:9420:1073 with SMTP id d9443c01a7336-200ae5cfb80mr107326125ad.43.1723399043819;
+        Sun, 11 Aug 2024 10:57:23 -0700 (PDT)
 Received: from localhost ([2601:647:6881:9060:8ec7:dbc7:9efe:94d5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb9b2d6bsm25032395ad.177.2024.08.11.10.54.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb9b47b3sm24930665ad.138.2024.08.11.10.57.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 10:54:12 -0700 (PDT)
-Date: Sun, 11 Aug 2024 10:54:11 -0700
+        Sun, 11 Aug 2024 10:57:23 -0700 (PDT)
+Date: Sun, 11 Aug 2024 10:57:22 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: James Chapman <jchapman@katalix.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
-	tparkin@katalix.com, horms@kernel.org,
-	syzbot+0e85b10481d2f5478053@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 net-next 9/9] l2tp: flush workqueue before draining it
-Message-ID: <Zrj6w89B7so74jRU@pop-os.localdomain>
-References: <cover.1723011569.git.jchapman@katalix.com>
- <2bdc4b63a4caea153f614c1f041f2ac3492044ed.1723011569.git.jchapman@katalix.com>
+	tparkin@katalix.com,
+	syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com,
+	gnault@redhat.com, cong.wang@bytedance.com
+Subject: Re: [PATCH net] l2tp: fix lockdep splat
+Message-ID: <Zrj7ggOFooYu0hHE@pop-os.localdomain>
+References: <20240806160626.1248317-1-jchapman@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,33 +84,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2bdc4b63a4caea153f614c1f041f2ac3492044ed.1723011569.git.jchapman@katalix.com>
+In-Reply-To: <20240806160626.1248317-1-jchapman@katalix.com>
 
-On Wed, Aug 07, 2024 at 07:54:52AM +0100, James Chapman wrote:
-> syzbot exposes a race where a net used by l2tp is removed while an
-> existing pppol2tp socket is closed. In l2tp_pre_exit_net, l2tp queues
-> TUNNEL_DELETE work items to close each tunnel in the net. When these
-> are run, new SESSION_DELETE work items are queued to delete each
-> session in the tunnel. This all happens in drain_workqueue. However,
-> drain_workqueue allows only new work items if they are queued by other
-> work items which are already in the queue. If pppol2tp_release runs
-> after drain_workqueue has started, it may queue a SESSION_DELETE work
-> item, which results in the warning below in drain_workqueue.
-> 
-> Address this by flushing the workqueue before drain_workqueue such
-> that all queued TUNNEL_DELETE work items run before drain_workqueue is
-> started. This will queue SESSION_DELETE work items for each session in
-> the tunnel, hence pppol2tp_release or other API requests won't queue
-> SESSION_DELETE requests once drain_workqueue is started.
-> 
+On Tue, Aug 06, 2024 at 05:06:26PM +0100, James Chapman wrote:
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index c80ab3f26084..2e86f520f799 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -86,6 +86,11 @@
+>  /* Default trace flags */
+>  #define L2TP_DEFAULT_DEBUG_FLAGS	0
+>  
+> +#define L2TP_DEPTH_NESTING		2
+> +#if L2TP_DEPTH_NESTING == SINGLE_DEPTH_NESTING
+> +#error "L2TP requires its own lockdep subclass"
+> +#endif
 
-I am not convinced here.
+This looks a bit over-engineering.
 
-1) There is a __flush_workqueue() inside drain_workqueue() too. Why
-calling it again?
-
-2) What prevents new work items be queued right between your
-__flush_workqueue() and drain_workqueue()?
+Why not just #define L2TP_DEPTH_NESTING SINGLE_DEPTH_NESTING+1?
 
 Thanks.
 
