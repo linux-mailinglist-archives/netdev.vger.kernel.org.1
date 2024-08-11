@@ -1,155 +1,122 @@
-Return-Path: <netdev+bounces-117484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AAED94E18A
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:59:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2265494E1A7
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FEFA1C20E00
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 13:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5597C1C208F8
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 14:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B8E1494B2;
-	Sun, 11 Aug 2024 13:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244C01494AF;
+	Sun, 11 Aug 2024 14:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j98xGak1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-146.mail.aliyun.com (out28-146.mail.aliyun.com [115.124.28.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0893B2AD18;
-	Sun, 11 Aug 2024 13:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98247433B5
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 14:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723384751; cv=none; b=RiKRRSUVaPaGURPKJ7K2gqXeOBZ5uaQOcS8X7Ro1dJVGVaifmU1XKc7681sLgjIGZ91y5owmUEhjEi+JC1egVVUhErDnU6+ONp9X2qVSfPfsO2VFibpc4eS2ZSMOppLjwQpJoMfmAofheOaP9CqNQBq6FtU/OtD9GiEGBw+0mLw=
+	t=1723386550; cv=none; b=nzhTP/pX7GNwbDdGHCBaCun1WWvgVpvNd4yATur7AI6ldc/gCSvGXH1uMHvfQQSMBtEofifPYxaKY2e8eRVI+0NwKHoWSd6ym/Xo6PM3lPklgdYbhBgfLGZVydlC1v9P4BOTyMgxaJhsuHre2WFAyOUGks6cxv4fahMmBblOnWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723384751; c=relaxed/simple;
-	bh=JaKh76HgcEnPVMiqBrySbQttBOagdFZCdBEh2QYS3PU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XaS5f/koRzYMFSo4Mg8gJHDZxzPzE7+szBl5Jk9EYw0mwatHPOmnZ6AHJg/Jamz5+pLgUd6yh5IeVLvXrdxsBfO7H2cxZZmWUBCi1i+XX53kBZv6cbwz3M1hD9JAszhENiIMWh4ALOBh6Ux/BheHPye73qBo3I1L1FTr4hPyTwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 192.168.208.130(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.YoCuORw_1723384734)
-          by smtp.aliyun-inc.com;
-          Sun, 11 Aug 2024 21:58:55 +0800
-Message-ID: <c44be0f3-7850-4038-bffb-942a85e3c7d0@motor-comm.com>
-Date: Sun, 11 Aug 2024 06:58:54 -0700
+	s=arc-20240116; t=1723386550; c=relaxed/simple;
+	bh=JbMq1rZaxV68HLLM0tE/W7piEBitSV5zC7Dqhiy/BwQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WmdNCGKO9u/sI/ApakPyzuNRx2Bd/wPMuSxr2xqcKGSGN5ujvuHfVNQPXWnkzHQWXzFE3qyX/j3qnDSz+aVXgqEdH+Wl3424+fmA0GjmXt5JOto4vP/JdPfvnlOBRn8Qzvt15PsoFCoIaBuJSYBV2E1XHJP+oBjkXTT43SoSp94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j98xGak1; arc=none smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-261112c303bso2796174fac.1
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 07:29:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723386547; x=1723991347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aEFhPMn3vbOQ8RJYO2JwTuZ4PB2Z0I27kZFssi0BDGk=;
+        b=j98xGak1vZXqLdDmqTXY1m/C2EfviRNEAIeDql2fTH8SOqnt9g1a/Em/WUbY3VC4Ih
+         duK8V0sIUM8G6CeVqT2Nfi6SV96FA5aQx87+knWcC2eZFTcuiXw/J4NrZQbXTlZcwlIA
+         Wvh6Lm9gjIZuTRz04fqaPUrH6rPgh5x/UCmtu7Pu7+N6lHwhQd0wt7U36UQ6mxw6ZuJz
+         tO+phF7MZbqYNTr4aexnmC4fMZQIdK8hcEnMOXHmPH5m0FQdE/RShei1Mmrnd19j1YI+
+         mLFaQw+GsLSfFlBfUuia8bkyVvFlYIifrlu3yNKUabPLHgSG1bn3RiZFPAMlfjr5QSVH
+         NMEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723386547; x=1723991347;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aEFhPMn3vbOQ8RJYO2JwTuZ4PB2Z0I27kZFssi0BDGk=;
+        b=feTs0vbQFsR5WYQXcSX+uj2lnvkaZwtCWYbSjekz7UK0BA9RM27rC9otL7TSp3BSUD
+         bwA8w8BmQv3zANFu3R8JGJVjCaSM+dhdOdkD8PcipvtDawllytXyODgRe+cbiuIIkx4P
+         Zu5zo7R4dUEY41j7lEwb5QXdgSpma1XpzYLrPoecywRRBI7TNb8MLEUf8TqNRJztBN+l
+         0O09Z7eIRL31FJGmn5y7JYSuxqOnSwS2yd1hwGL8tW3kGi6fDSUx2LpvrjOHoWugfP1+
+         O0rm0Oz8xLvgccLBeo3MVZYmRfFtjZa0EBEDCHhbD/wc+I5OTtn0c0RIgXuzjbuCRZwD
+         e5Ug==
+X-Gm-Message-State: AOJu0Yyfz0m+YzDPeCMRYziBH0xyWQzWnx0+Yy1nkzkOi4Dl9Q1HGjAg
+	vWkoVQRLc787hPxZ7RNGsQS8UKBpiXFoBW9tmdvsJ5+Tt1ssGjD9
+X-Google-Smtp-Source: AGHT+IH8qphYN9m0dSBUCr6dU37vrfaxk6Cj5DOcA7l5eR/68fuVib7G9W7o55VWnuEbdx27bWhSZA==
+X-Received: by 2002:a05:6870:9346:b0:260:fc49:3e96 with SMTP id 586e51a60fabf-26c62ffbff7mr9369822fac.46.1723386547481;
+        Sun, 11 Aug 2024 07:29:07 -0700 (PDT)
+Received: from laptop.. ([2402:800:62d4:b1ff:d239:57ff:fee4:71e5])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58735eesm2474684b3a.24.2024.08.11.07.29.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Aug 2024 07:29:07 -0700 (PDT)
+From: =?UTF-8?q?L=C6=B0=C6=A1ng=20Vi=E1=BB=87t=20Ho=C3=A0ng?= <tcm4095@gmail.com>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org,
+	=?UTF-8?q?L=C6=B0=C6=A1ng=20Vi=E1=BB=87t=20Ho=C3=A0ng?= <tcm4095@gmail.com>
+Subject: [PATCH iproute2] tc-cake: document 'ingress'
+Date: Sun, 11 Aug 2024 21:26:17 +0700
+Message-ID: <20240811142756.12225-2-tcm4095@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: phy: Add driver for Motorcomm yt8821 2.5G
- ethernet phy
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
- xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com, jie.han@motor-comm.com
-References: <20240727092031.1108690-1-Frank.Sae@motor-comm.com>
- <Zqd/6u5b7z1bCFaT@shell.armlinux.org.uk>
-Content-Language: en-US
-From: "Frank.Sae" <Frank.Sae@motor-comm.com>
-In-Reply-To: <Zqd/6u5b7z1bCFaT@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Linux kernel commit 7298de9cd7255a783ba ("sch_cake: Add ingress mode") added
+an ingress mode for CAKE, which can be enabled with the 'ingress' parameter.
+Document the changes in CAKE's behavior when ingress mode is enabled.
 
-On 7/29/24 04:41, Russell King (Oracle) wrote:
-> On Sat, Jul 27, 2024 at 02:20:31AM -0700, Frank.Sae wrote:
->> +/**
->> + * yt8821_config_init() - phy initializatioin
->> + * @phydev: a pointer to a &struct phy_device
->> + *
->> + * returns 0 or negative errno code
->> + */
->> +static int yt8821_config_init(struct phy_device *phydev)
->> +{
->> +	struct yt8821_priv *priv = phydev->priv;
->> +	int ret, val;
->> +
->> +	phydev->irq = PHY_POLL;
->> +
->> +	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
->> +	if (priv->chip_mode == YT8821_CHIP_MODE_AUTO_BX2500_SGMII) {
->> +		ret = ytphy_modify_ext_with_lock(phydev,
->> +						 YT8521_CHIP_CONFIG_REG,
->> +						 YT8521_CCR_MODE_SEL_MASK,
->> +						 FIELD_PREP(YT8521_CCR_MODE_SEL_MASK, 0));
->> +		if (ret < 0)
->> +			return ret;
->> +
->> +		__assign_bit(PHY_INTERFACE_MODE_2500BASEX,
->> +			     phydev->possible_interfaces,
->> +			     true);
->> +		__assign_bit(PHY_INTERFACE_MODE_SGMII,
->> +			     phydev->possible_interfaces,
->> +			     true);
-> Before each and every call to .config_init, phydev->possible_interfaces
-> will be cleared. So, please use __set_bit() here.
->
->> +static int yt8821_read_status(struct phy_device *phydev)
->> +{
->> +	struct yt8821_priv *priv = phydev->priv;
->> +	int old_page;
->> +	int ret = 0;
->> +	int link;
->> +	int val;
->> +
->> +	if (phydev->autoneg == AUTONEG_ENABLE) {
->> +		int lpadv = phy_read_mmd(phydev,
->> +					 MDIO_MMD_AN, MDIO_AN_10GBT_STAT);
->> +
->> +		if (lpadv < 0)
->> +			return lpadv;
->> +
->> +		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
->> +						  lpadv);
->> +	}
->> +
->> +	ret = ytphy_write_ext_with_lock(phydev,
->> +					YT8521_REG_SPACE_SELECT_REG,
->> +					YT8521_RSSR_UTP_SPACE);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	ret = genphy_read_status(phydev);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	old_page = phy_select_page(phydev, YT8521_RSSR_UTP_SPACE);
->> +	if (old_page < 0)
->> +		goto err_restore_page;
->> +
->> +	val = __phy_read(phydev, YTPHY_SPECIFIC_STATUS_REG);
->> +	if (val < 0) {
->> +		ret = val;
->> +		goto err_restore_page;
->> +	}
->> +
->> +	link = val & YTPHY_SSR_LINK;
-> What link status is this reporting? For interface switching to work,
-> phydev->link must _only_ indicate whether the _media_ side interface
-> is up or down. It must _not_ include the status of the MAC facing
-> interface from the PHY.
->
-> Why? The interface configuration of the MAC is only performed when
-> the _media_ link comes up, denoted by phydev->link becoming true.
-> If the MAC interface configuration mismatches the PHY interface
-> configuration, then the MAC facing interface of the PHY will
-> remain down, and if phydev->link is forced to false, then the link
-> will never come up.
->
-> So, I hope that this isn't testing the MAC facing interface status
-> of the PHY!
->
-MAC facing interface will be switched according to phy interface. when phy
-media side state is link down, the mac facing interface will not be
-configured, this refers to Marvell10g.c(mv3310_update_interface) and
-Realtek.c(rtl822xb_update_interface).
+Signed-off-by: Lương Việt Hoàng <tcm4095@gmail.com>
+---
+ man/man8/tc-cake.8 | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/man/man8/tc-cake.8 b/man/man8/tc-cake.8
+index ced9ac78..6d77d7d2 100644
+--- a/man/man8/tc-cake.8
++++ b/man/man8/tc-cake.8
+@@ -541,6 +541,21 @@ This can be used to set policies in a firewall script that will override CAKE's
+ built-in tin selection.
+ 
+ .SH OTHER PARAMETERS
++.B ingress
++.br
++	Indicates that CAKE is running in ingress mode (i.e. running on the downlink
++of a connection). This changes the shaper to also count dropped packets as data
++transferred, as these will have already traversed the link before CAKE can
++choose what to do with them.
++
++	In addition, the AQM will be tuned to always keep at least two packets
++queued per flow. The reason for this is that retransmits are more expensive in
++ingress mode, since dropped packets have to traverse the link again; thus,
++keeping a minimum number of packets queued will improve throughput in cases
++where the number of active flows are so large that they saturate the link even
++at their minimum window size.
++
++.PP
+ .B memlimit
+ LIMIT
+ .br
+-- 
+2.45.2
 
 
