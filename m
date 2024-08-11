@@ -1,320 +1,160 @@
-Return-Path: <netdev+bounces-117453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2874B94E01B
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 07:21:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4F194E025
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 07:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A34B31F21582
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 05:21:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817081C20BCA
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 05:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196042D047;
-	Sun, 11 Aug 2024 05:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2F518E20;
+	Sun, 11 Aug 2024 05:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIS22I9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135052C1A5
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 05:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448CF11CAB;
+	Sun, 11 Aug 2024 05:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723353640; cv=none; b=HkMB5hr2uqrePZ7M43d+hrY/H4GWqNdtEyI/4K/vdByMvviephGH7VRwmhtyqNh126mLH6hF3g/lB8ozRVvWtS8ifs7Bglx8/2UPfKeSxRzOEM5sCrSmAyWiFS3O44Uwup+DnuEGKH6axXU1Hsd7P9mOrFJNt5L+cK0m2APpeuY=
+	t=1723355009; cv=none; b=odH8EUC5jcDXe9bN1TnCq+Tch8U9oqc2adYgCJM5CTJA2p04j74teK+tm333GXKGyqOE+zbpHac22BKbr0h9w2MFug0GiFvauZCLzGaHwYTXhpipJDw3xjKJ8G8rPvmv0dlt7iZr7hSwDqJbAQuB0NWR2+KpH2TDvcN7q5kxrFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723353640; c=relaxed/simple;
-	bh=vlbkNoYP2j5e0GPK16xqyatdla3pugrJU/oYKYwjJSo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J7ZJSRxaFH3v0Qos9j3GsR1Muq91VHLyzJODqgeFSPRdDicrUkcLZ55OgcA+uWzTOzCb2SocTCULqShWRlRf52OSvx/IIwVZEyRpVpoxBAWGiBiIj4adWt5QUZ3bgf1IsJPp8PK/TIOfEl9f8CTUzLMT7b3nwBw0oCgdroiRRWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sd0zw-0005xe-It; Sun, 11 Aug 2024 07:20:08 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sd0zu-0063X4-PV; Sun, 11 Aug 2024 07:20:06 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sd0zu-004Fff-2L;
-	Sun, 11 Aug 2024 07:20:06 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v4 3/3] net: phy: dp83tg720: Add cable testing support
-Date: Sun, 11 Aug 2024 07:20:05 +0200
-Message-Id: <20240811052005.1013512-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240811052005.1013512-1-o.rempel@pengutronix.de>
-References: <20240811052005.1013512-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1723355009; c=relaxed/simple;
+	bh=6tis8Onk4vKI11B/pr3JpmguCMVU9HAlccL79Vr1kJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O2sfe4jaAuAG/8n1hehB+p4WT5n1E+COc8fE/k+E07tHNOl8+hVsoRXQhxjBkWRQkZhm3Pv/g8Uh/cY4sWS19K7/Wv6mXpGyTy8QUwALUlqNuWlWDQC3OkyrDWzaWEj2YMz4Y0vSIE30smJJGda3uT4nzePU2W/QH3mgUXdob68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIS22I9e; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-39aeccc6377so12491365ab.1;
+        Sat, 10 Aug 2024 22:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723355007; x=1723959807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fegtz1E7mDaSdzG9wq3lbuilj1QmL6UN/2jOlbF5VCw=;
+        b=VIS22I9ev3f2AaWvzK8JKoXkhJ1vag0Nd442d2dZnpZUAMb7q/tB61MUHBEzZGgROk
+         z4ln0qfMHM+6joqZYWfWFJYm/8+PdOBWF+LuyAQuJK1YV7Dc6Es/pBw1tWUJG1pHafwI
+         A01SiNnEOIDlvm5sgZbxdqWLTdQc0KcYPKkT9lE1rWg5fAvc/wGbMHf8Blk+PPaNZ2iw
+         DnHIi5NjvqgL1ZF83kBEUyOnzy5dNjaOAqchbcL+3dm+Q5DeCmLsmCG5p9MAasEx8dyu
+         KlzRkl/hnjn/zKQ8C0CGn6Ksta4Hpm78Jf3/LPqiB3bL+VUe34kvtq7eLxgb3PH7o//S
+         d0Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723355007; x=1723959807;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fegtz1E7mDaSdzG9wq3lbuilj1QmL6UN/2jOlbF5VCw=;
+        b=Jid4CZ6dK3Df0fBHlve/sHpcT+dMQZsnSbdWwGC4AZdAig8cdcK2H6OMdoFeDL9m+4
+         xQWrXFJ0gN/6U4zpBCFnZLSXmPGLBZenwRnaZS584ftHySOTXaMSUiw8/jAg6Qrkk2yF
+         V0t5eWL2V9imlav+46GgSntwJXqwDobH4v0zkIs7t7eLtXChnc0TWPA1Nr8h03M1fzwY
+         fGd69SSlcZlpjYhtpyFFkxfvnBIvGNa0OrcDFGn9dRQ0MFXUp/SHq93xKYLjAI1wKoZV
+         u7SqvlC4aNuGQE8osCRMCl+1gv73jH/yKA6blT6sO+MHT6SW4uhJOZKy4tqG7Jz7ONhS
+         KWdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHjcFbb2p2cMWDPWZKwqqYpl9mBD2bOEeW7PR2SxLHcIJ3PjM6UdKdMxibns+QuBypntzT33K2r7MFcSL92s+EdfVI6eJEEC9pw7w49G0jMOIeIdIOhtZqlqvTl5lPWSDkrat2
+X-Gm-Message-State: AOJu0Ywe2Nwcbky/q/dHFtGLZ4MgNF3Mhk2gHIawJ+NoTQUAttp3+7Na
+	EbEf73YgUO3RuWBBWJ9mygdgAAzruDBfaQFj1S6oc/z8MLf6SC1TtGZrdi8EKOO3nl2vTBsfoSQ
+	gMj1sfJ20ER1qcCoBJsmD7iVCfHI=
+X-Google-Smtp-Source: AGHT+IHWQUBxgrASvNC6A9bWXO4CsyE76eLvd5MWDiATYZjXYvrjUz+yGdlBDgOTsrfvedZzSm3oyw5PwfGfug9TTfg=
+X-Received: by 2002:a05:6e02:138d:b0:397:98d7:5180 with SMTP id
+ e9e14a558f8ab-39b6c1187d3mr89700155ab.0.1723355007148; Sat, 10 Aug 2024
+ 22:43:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <0000000000003a5292061f5e4e19@google.com> <20240811022903.49188-1-kuniyu@amazon.com>
+In-Reply-To: <20240811022903.49188-1-kuniyu@amazon.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 11 Aug 2024 13:42:51 +0800
+Message-ID: <CAL+tcoBC4mB6Has_uX=DB9=BrRMmgfjCEFj+J-oPzLS25w6btQ@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com, davem@davemloft.net, 
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce cable testing support for the DP83TG720 PHY. This implementation
-is based on the "DP83TG720S-Q1: Configuring for Open Alliance Specification
-Compliance (Rev. B)" application note.
+Hello Kuniyuki,
 
-The feature has been tested with cables of various lengths:
-- No cable: 1m till open reported.
-- 5 meter cable: reported properly.
-- 20 meter cable: reported as 19m.
-- 40 meter cable: reported as cable ok.
+On Sun, Aug 11, 2024 at 10:35=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> From: syzbot <syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com>
+> Date: Sat, 10 Aug 2024 18:29:20 -0700
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    33e02dc69afb Merge tag 'sound-6.10-rc1' of git://git.ke=
+rne..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D117f3182980=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D25544a2faf4=
+bae65
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D8ea26396ff85d=
+23a8929
+> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for=
+ Debian) 2.40
+> >
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> >
+> > Downloadable assets:
+> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets=
+/7bc7510fe41f/non_bootable_disk-33e02dc6.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/573c88ac3233/vmli=
+nux-33e02dc6.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/760a52b9a00a=
+/bzImage-33e02dc6.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the co=
+mmit:
+> > Reported-by: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
+> >
+> > ------------[ cut here ]------------
+> > refcount_t: decrement hit 0; leaking memory.
+> > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0=
+x1ed/0x210 lib/refcount.c:31
+>
+> Eric, this is the weird report I was talking about at netdevconf :)
+>
+> It seems refcount_dec(&tw->tw_dr->tw_refcount) is somehow done earlier
+> than refcount_inc().
+>
+> I started to see the same splat at a very low rate after consuming
+> commit b334b924c9b7 ("net: tcp/dccp: prepare for tw_timer un-pinning").
+>
+> The commit a bit deferred refcount_inc(tw_refcount) after the hash dance,
+> so twsk is now visible before tw_dr->tw_refcount is incremented.
+>
+> I came up with the diff below but was suspecting a bug in another place,
+> possibly QEMU, so I haven't posted the diff officially.
+>
+> refcount_inc() was actually deferred, but it's still under an ehash lock,
+> and inet_twsk_deschedule_put() must be serialised with the same ehash
+> lock.  Even inet_twsk_kill() performs the ehash lock dance before calling
+> refcount_dec().
+>
+> So, it should be impossible that refcount_inc() is not visible after doub=
+le
+> lock/unlock and before refcount_dec(), so this report looks bogus to me :=
+S
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v3:
-- select OPEN_ALLIANCE_HELPERS
-changes v2:
-- use open alliance specific helpers for the TDR results
----
- drivers/net/phy/Kconfig     |   1 +
- drivers/net/phy/dp83tg720.c | 154 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 155 insertions(+)
+In normal cases, I agree with this, since inc/dec are all protected
+under the spin lock. There is no way we can decrement it if we don't
+increment it first.
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 874422e530ff0..f530fcd092fe4 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -417,6 +417,7 @@ config DP83TD510_PHY
- 
- config DP83TG720_PHY
- 	tristate "Texas Instruments DP83TG720 Ethernet 1000Base-T1 PHY"
-+	select OPEN_ALLIANCE_HELPERS
- 	help
- 	  The DP83TG720S-Q1 is an automotive Ethernet physical layer
- 	  transceiver compliant with IEEE 802.3bp and Open Alliance
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index c706429b225a2..0ef4d7dba0656 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -3,10 +3,13 @@
-  * Copyright (c) 2023 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
-  */
- #include <linux/bitfield.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/phy.h>
- 
-+#include "open_alliance_helpers.h"
-+
- #define DP83TG720S_PHY_ID			0x2000a284
- 
- /* MDIO_MMD_VEND2 registers */
-@@ -14,6 +17,17 @@
- #define DP83TG720S_STS_MII_INT			BIT(7)
- #define DP83TG720S_LINK_STATUS			BIT(0)
- 
-+/* TDR Configuration Register (0x1E) */
-+#define DP83TG720S_TDR_CFG			0x1e
-+/* 1b = TDR start, 0b = No TDR */
-+#define DP83TG720S_TDR_START			BIT(15)
-+/* 1b = TDR auto on link down, 0b = Manual TDR start */
-+#define DP83TG720S_CFG_TDR_AUTO_RUN		BIT(14)
-+/* 1b = TDR done, 0b = TDR in progress */
-+#define DP83TG720S_TDR_DONE			BIT(1)
-+/* 1b = TDR fail, 0b = TDR success */
-+#define DP83TG720S_TDR_FAIL			BIT(0)
-+
- #define DP83TG720S_PHY_RESET			0x1f
- #define DP83TG720S_HW_RESET			BIT(15)
- 
-@@ -22,18 +36,155 @@
- /* Power Mode 0 is Normal mode */
- #define DP83TG720S_LPS_CFG3_PWR_MODE_0		BIT(0)
- 
-+/* Open Aliance 1000BaseT1 compatible HDD.TDR Fault Status Register */
-+#define DP83TG720S_TDR_FAULT_STATUS		0x30f
-+
-+/* Register 0x0301: TDR Configuration 2 */
-+#define DP83TG720S_TDR_CFG2			0x301
-+
-+/* Register 0x0303: TDR Configuration 3 */
-+#define DP83TG720S_TDR_CFG3			0x303
-+
-+/* Register 0x0304: TDR Configuration 4 */
-+#define DP83TG720S_TDR_CFG4			0x304
-+
-+/* Register 0x0405: Unknown Register */
-+#define DP83TG720S_UNKNOWN_0405			0x405
-+
-+/* Register 0x0576: TDR Master Link Down Control */
-+#define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
-+
- #define DP83TG720S_RGMII_DELAY_CTRL		0x602
- /* In RGMII mode, Enable or disable the internal delay for RXD */
- #define DP83TG720S_RGMII_RX_CLK_SEL		BIT(1)
- /* In RGMII mode, Enable or disable the internal delay for TXD */
- #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
- 
-+/* Register 0x083F: Unknown Register */
-+#define DP83TG720S_UNKNOWN_083F			0x83f
-+
- #define DP83TG720S_SQI_REG_1			0x871
- #define DP83TG720S_SQI_OUT_WORST		GENMASK(7, 5)
- #define DP83TG720S_SQI_OUT			GENMASK(3, 1)
- 
- #define DP83TG720_SQI_MAX			7
- 
-+/**
-+ * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This sequence is based on the documented procedure for the DP83TG720 PHY.
-+ *
-+ * Returns: 0 on success, a negative error code on failure.
-+ */
-+static int dp83tg720_cable_test_start(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Initialize the PHY to run the TDR test as described in the
-+	 * "DP83TG720S-Q1: Configuring for Open Alliance Specification
-+	 * Compliance (Rev. B)" application note.
-+	 * Most of the registers are not documented. Some of register names
-+	 * are guessed by comparing the register offsets with the DP83TD510E.
-+	 */
-+
-+	/* Force master link down */
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
-+			       DP83TG720S_TDR_MASTER_LINK_DOWN, 0x0400);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG2,
-+			    0xa008);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG3,
-+			    0x0928);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG4,
-+			    0x0004);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_0405,
-+			    0x6400);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_083F,
-+			    0x3003);
-+	if (ret)
-+		return ret;
-+
-+	/* Start the TDR */
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG,
-+			       DP83TG720S_TDR_START);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+/**
-+ * dp83tg720_cable_test_get_status - Get the status of the cable test for the
-+ *                                   DP83TG720 PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ * @finished: Pointer to a boolean that indicates whether the test is finished.
-+ *
-+ * The function sets the @finished flag to true if the test is complete.
-+ *
-+ * Returns: 0 on success or a negative error code on failure.
-+ */
-+static int dp83tg720_cable_test_get_status(struct phy_device *phydev,
-+					   bool *finished)
-+{
-+	int ret, stat;
-+
-+	*finished = false;
-+
-+	/* Read the TDR status */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Check if the TDR test is done */
-+	if (!(ret & DP83TG720S_TDR_DONE))
-+		return 0;
-+
-+	/* Check for TDR test failure */
-+	if (!(ret & DP83TG720S_TDR_FAIL)) {
-+		int location;
-+
-+		/* Read fault status */
-+		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+				   DP83TG720S_TDR_FAULT_STATUS);
-+		if (ret < 0)
-+			return ret;
-+
-+		/* Get fault type */
-+		stat = oa_1000bt1_get_ethtool_cable_result_code(ret);
-+
-+		/* Determine fault location */
-+		location = oa_1000bt1_get_tdr_distance(ret);
-+		if (location > 0)
-+			ethnl_cable_test_fault_length(phydev,
-+						      ETHTOOL_A_CABLE_PAIR_A,
-+						      location);
-+	} else {
-+		/* Active link partner or other issues */
-+		stat = ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
-+	}
-+
-+	*finished = true;
-+
-+	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A, stat);
-+
-+	return phy_init_hw(phydev);
-+}
-+
- static int dp83tg720_config_aneg(struct phy_device *phydev)
- {
- 	int ret;
-@@ -195,12 +346,15 @@ static struct phy_driver dp83tg720_driver[] = {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
- 	.name		= "TI DP83TG720S",
- 
-+	.flags          = PHY_POLL_CABLE_TEST,
- 	.config_aneg	= dp83tg720_config_aneg,
- 	.read_status	= dp83tg720_read_status,
- 	.get_features	= genphy_c45_pma_read_ext_abilities,
- 	.config_init	= dp83tg720_config_init,
- 	.get_sqi	= dp83tg720_get_sqi,
- 	.get_sqi_max	= dp83tg720_get_sqi_max,
-+	.cable_test_start = dp83tg720_cable_test_start,
-+	.cable_test_get_status = dp83tg720_cable_test_get_status,
- 
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--- 
-2.39.2
-
+Thanks,
+Jason
 
