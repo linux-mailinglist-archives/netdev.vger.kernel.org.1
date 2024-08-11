@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-117501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF34F94E225
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:09:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95ABE94E22A
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:11:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 890701F21316
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:09:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 515A42812EC
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E28E15099A;
-	Sun, 11 Aug 2024 16:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A18414F9F4;
+	Sun, 11 Aug 2024 16:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eYUjJahw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lur7aODh"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3B37F6;
-	Sun, 11 Aug 2024 16:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8473D14A624
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723392560; cv=none; b=dWAZTTJs1BPOEXCdm6oILpcykgFHwPUCxNtuTc0jteYltt2KKzW/OeQcVxu4SH91DYyz+YObOYthCYo8SXeeS3IsAIhLBWx7FkAp+DJqyX6cL+oNuQAYXcjDvCFdRwy+RuJrBxdVYhjZ4xk37l0rt3v+GfTy3J/nxTXnsvnHzwg=
+	t=1723392697; cv=none; b=miphcoRp1lLl/TMUc6JJzJDDfmB16bnMQcnzt2cA4E7ayC7J0xSNriQ2YUDO/sn98BvLVBGOuGU2N72ib+thSBiXB1AMQogWa9TZjhfz2yABD4y+sawmp5R2+MGe6A+bjo+rtY/po/XNEoClSzB1aD77w+csusc79ByQeUUm8R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723392560; c=relaxed/simple;
-	bh=hCAQ116x3Hmbd/LpKND63YA31xscxw+DNNFO/YfTueA=;
+	s=arc-20240116; t=1723392697; c=relaxed/simple;
+	bh=ENqMDsZJ2LF9PCWUkTfYgRdmqEOfmcPyuAmT6IDmid8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UO3v3k2OVhHemJK8CnxCLacYVScFRvWTKFqTVenDY4qz0e7sNMyaJe0s1DIcuXrAwKd0r4DotdbO/GY4WBt+iU1E7N+AzeGH9t1shDYRP2EqdWurlCYzNWPWP0hMhUxGEnHMvyflfv0Xm2eDKXzkWLVnk/A23I0JzcTy4FBHaj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eYUjJahw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=rt/6p9de5lE650OodfoAkdvIwYkiG1O1a23imDc5xlPz5v74+SftVB4XaOEWJ1o9ZFNGNHx/snI2IYhvBBFjY0m1CrEGbZ6ANEwiLnlr0kpKGd+ZGrx1jp0mNQFEQABjg2w+5PtH1kjL47XWF6cg9OopVJW5ppLgyHrpSVdmg+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lur7aODh; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,35 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PwlmP6m6ZlNuFnU37bFwXCVDeuLJQZU+NcyVICh6+ow=; b=eYUjJahwQDeitAGD0vzz0MHY3r
-	f5Yfja5/PVYr2tT+Js9bm7R9vN7nCSIh7c5BUzJvl9ow4rFvPTwW9wXIX1sxje9USu3Oedm3UHi2o
-	BSSUW1qk6um00lglDiXpzzjLH+x/mEFCFHBwlACU6of1Y6eUlhczxvGv91aKrnijAWOs=;
+	bh=7Od3zlEbHgdbfOlNf0rebb4sP85fQG1XfX+jJiTZVv4=; b=lur7aODhIPvHLy/NpmkuQHGZws
+	lzYbhCdY5pknGmDNjLW8Q16L8fihTKWKn70kNONXiGvgZf2J2PmVBDefEgaYLbV6dYPczVOMMiGpq
+	C2zXRpUKlx9C3eqVQHouAeKqwt427ih3kAVs6166KE/8BrpzgVpIhGNfBjZJBvPacHoA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sdB7v-004VZQ-4B; Sun, 11 Aug 2024 18:09:03 +0200
-Date: Sun, 11 Aug 2024 18:09:03 +0200
+	id 1sdBAG-004VbD-IH; Sun, 11 Aug 2024 18:11:28 +0200
+Date: Sun, 11 Aug 2024 18:11:28 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, masahiroy@kernel.org,
-	alexanderduyck@fb.com, krzk+dt@kernel.org, robh@kernel.org,
-	rdunlap@infradead.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
-	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch,
-	linux@bigler.io
-Subject: Re: [PATCH net-next v5 13/14] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Message-ID: <0451de33-3256-4c6b-a6ac-ca99b946fb15@lunn.ch>
-References: <20240730040906.53779-1-Parthiban.Veerasooran@microchip.com>
- <20240730040906.53779-14-Parthiban.Veerasooran@microchip.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 1/2] net: mii: constify advertising mask
+Message-ID: <98e93acd-983c-4af1-a928-f02a6d8a9650@lunn.ch>
+References: <ZrSutHAqb6uLfmHh@shell.armlinux.org.uk>
+ <E1sc1W9-002Fud-23@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,30 +62,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240730040906.53779-14-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <E1sc1W9-002Fud-23@rmk-PC.armlinux.org.uk>
 
-On Tue, Jul 30, 2024 at 09:39:05AM +0530, Parthiban Veerasooran wrote:
-> The LAN8650/1 is designed to conform to the OPEN Alliance 10BASE-T1x
-> MAC-PHY Serial Interface specification, Version 1.1. The IEEE Clause 4
-> MAC integration provides the low pin count standard SPI interface to any
-> microcontroller therefore providing Ethernet functionality without
-> requiring MAC integration within the microcontroller. The LAN8650/1
-> operates as an SPI client supporting SCLK clock rates up to a maximum of
-> 25 MHz. This SPI interface supports the transfer of both data (Ethernet
-> frames) and control (register access).
+On Thu, Aug 08, 2024 at 12:41:17PM +0100, Russell King (Oracle) wrote:
+> Constify the advertising mask to linkmode functions that only read from
+> the advertising mask.
 > 
-> By default, the chunk data payload is 64 bytes in size. The Ethernet
-> Media Access Controller (MAC) module implements a 10 Mbps half duplex
-> Ethernet MAC, compatible with the IEEE 802.3 standard. 10BASE-T1S
-> physical layer transceiver integrated is into the LAN8650/1. The PHY and
-> MAC are connected via an internal Media Independent Interface (MII).
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I see there are some fixes needed for Multicast, but otherwise this
-looks O.K.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Please send a new version with the fixes, and then i think we are
-ready for this to be merged.
-
-	Andrew
-
+    Andrew
 
