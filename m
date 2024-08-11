@@ -1,103 +1,106 @@
-Return-Path: <netdev+bounces-117463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A46694E096
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 10:57:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA35994E0A4
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 11:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5DAE1F21419
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 08:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 224021C20E34
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 09:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D4B28DCB;
-	Sun, 11 Aug 2024 08:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4522C1A5;
+	Sun, 11 Aug 2024 09:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7ew8lgn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hgwmgS1e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704891CAB3
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 08:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E5E2C181;
+	Sun, 11 Aug 2024 09:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723366616; cv=none; b=DFelI9W1zvmBwONke4s4HGJm1s/NUYnYQBxDLvoEe0c9joJLkKdLXAVBPF+hI6i8/dMQo6Mc+ZxKLRUAHzRCkQ3X4Ai8smpGVSPWdCltO02qTFO4ZCa1NfnDukcOy/nJYA61WEVnKD9NSsa2iKMsAdnjXT+Qda+eOFlp9ZRecp0=
+	t=1723368126; cv=none; b=RgdizhkRVyNjKRZi0WtNO0mXZpkFNXCbXHyEyCQeFwHg234pGNPz+B3dAskZmJt0jv9BYr8iMzCPsnEuQI1LCE2YgVsMvaHr8KuqIkzP+arYXaDpOISOgYPDst+A/fqDxOkpvFDDpyE3LkAqQOiXDarWyLuNSVLaKzmTYlJp990=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723366616; c=relaxed/simple;
-	bh=W84gLqiCE9VS6xNfchhRQmqgpUv7AmgL7LwhjXEkAr0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HLb8lAwShPqawpq01yk313LwPyV9apG+49jFi6WBAE0lFWtrmL4VyTiECwrA/kznTf3p1z+Uech9im92LVac1ku5K8lQYBBKxwbgwjyxQr/P0tsmrswlMi4dqGzPIHX/KKJ0TU8aVU4jZ0TIGbtfOwbB7sczhj4MzKcpjn6rnII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7ew8lgn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A03C32786;
-	Sun, 11 Aug 2024 08:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723366615;
-	bh=W84gLqiCE9VS6xNfchhRQmqgpUv7AmgL7LwhjXEkAr0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=S7ew8lgnceHEEM9nB1YV6M/aMOfhI1GYpO55UMZVQZUWMZi6g3bv2nSHhkrpXjkbk
-	 SbOxVh4s484rWRs6OKerIy6kaqT8IhRRT8Npni3biRo3EoA1jpAP8eWFD1mK0+Fc3x
-	 UnSutcED8qeo/1oJQhQTW0erbyra6C9cKltRBD2Si2aFOQefCml2i7ZMK4v9PcVWZF
-	 mDIYUvGCx+MI8KP3Xw2q2be2iZ9iVFW7w5PRgQZt7yTLxQ/SigQ5+HEXAbDtShs2PW
-	 iVZWwMuxkIiDK2zYu9/1bORj7ChBs6a+izjxJ0xD36ydGMZWpLJ3pG7mNYUH9guuJW
-	 gigwSuoB8Jurg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Patrisious Haddad <phaddad@nvidia.com>,
+	s=arc-20240116; t=1723368126; c=relaxed/simple;
+	bh=mCXxfb/Q2cP9YWcyvn1Ulh2h6OB4Wm1NDDaTQ0uKdEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VumOhkyHEK6bdAbjHfzajy9L76BKLNc/jSC24uGYDxRqFa+Tlg1CzPOe85xd018Ca70L8faaRUtuTWCSXHc0P/jwpzg062vtng2q41Xu817hWYUAGZ2IEOJC4XLUpyHlRAJoqezv0bIaelh2ge54S65xO7CaYbyLeZZj+StOfHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hgwmgS1e; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=k0pYg++oOJhJgzgPtuk5bbLwQataKDqN3jQf2XgdyXw=; b=hgwmgS1e/6pvGQA0dClJlQzoMK
+	CAQ4ojL0LtXP+w8lSxEiL2DIP4Vorz4kiBjnLsw2rX/IHhuElws/V99ubt1GF8Eb5L8+r/cZnKekN
+	/mwR5wfPbaSoS7wPgKx+axTWRCewI683mSHhOMxf6XksNY6I0kSLmrWXzzn8ZfVbSqmp8gS1d609J
+	c/y2QeuKHu2wwQV0RgQgjfBsuEp9DA8gMRM04iL518JKJKFIsSrg/X08WgldtIBH425OIXNKx4EvW
+	IJ2aZqnlX9kevTgsey78cFhypqqjpP1GaCHimLh5CqCvNuNxTTX+dkQAVT7xfPV23Eb97qxVeNl6u
+	VeiGO1yg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40012)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sd4lh-0000je-1I;
+	Sun, 11 Aug 2024 10:21:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sd4lk-0007sY-Ns; Sun, 11 Aug 2024 10:21:44 +0100
+Date: Sun, 11 Aug 2024 10:21:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH xfrm-next] xfrm: Remove documentation WARN_ON to limit return values for offloaded SA
-Date: Sun, 11 Aug 2024 11:56:42 +0300
-Message-ID: <e81448c34721aaf49faa904a5ffc2a18b598b3d0.1723366546.git.leon@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/3] phy: Add Open Alliance helpers for the
+ PHY framework
+Message-ID: <ZriCqClUc/Yd0uMK@shell.armlinux.org.uk>
+References: <20240811052005.1013512-1-o.rempel@pengutronix.de>
+ <20240811052005.1013512-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240811052005.1013512-2-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+On Sun, Aug 11, 2024 at 07:20:04AM +0200, Oleksij Rempel wrote:
+> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+> index 202ed7f450da6..e93dfec881c5d 100644
+> --- a/drivers/net/phy/Makefile
+> +++ b/drivers/net/phy/Makefile
+> @@ -23,6 +23,7 @@ obj-$(CONFIG_MDIO_DEVRES)	+= mdio_devres.o
+>  libphy-$(CONFIG_SWPHY)		+= swphy.o
+>  libphy-$(CONFIG_LED_TRIGGER_PHY)	+= phy_led_triggers.o
+>  
+> +obj-$(CONFIG_OPEN_ALLIANCE_HELPERS) += open_alliance_helpers.o
 
-The original idea to put WARN_ON() on return value from driver code was
-to make sure that packet offload doesn't have silent fallback to
-SW implementation, like crypto offload has.
+I was thinking more
+libphy-$(CONFIG_OPEN_ALLIANCE_HELPERS) += open_alliance_helpers.o
 
-In reality, this is not needed as all *swan implementations followed
-this request and used explicit configuration style to make sure that
-"users will get what they ask".
-So instead of forcing drivers to make sure that even their internal flows
-don't return -EOPNOTSUPP, let's remove this WARN_ON.
+rather than a potentially separate module.
 
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- net/xfrm/xfrm_device.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+If it is going to end up a separate module, then it needs its own
+MODULE_LICENSE, MODULE_DESCRIPTION, etc.
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 9a44d363ba62..f123b7c9ec82 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -328,12 +328,8 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
- 		/* User explicitly requested packet offload mode and configured
- 		 * policy in addition to the XFRM state. So be civil to users,
- 		 * and return an error instead of taking fallback path.
--		 *
--		 * This WARN_ON() can be seen as a documentation for driver
--		 * authors to do not return -EOPNOTSUPP in packet offload mode.
- 		 */
--		WARN_ON(err == -EOPNOTSUPP && is_packet_offload);
--		if (err != -EOPNOTSUPP || is_packet_offload) {
-+		if ((err != -EOPNOTSUPP && !is_packet_offload) || is_packet_offload) {
- 			NL_SET_ERR_MSG_WEAK(extack, "Device failed to offload this state");
- 			return err;
- 		}
+*** please note that I probably will only be occasionally responsive
+*** for an unknown period of time due to recent eye surgery making
+*** reading quite difficult.
+
 -- 
-2.46.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
