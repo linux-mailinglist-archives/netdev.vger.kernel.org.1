@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-117512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F313D94E255
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:45:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A8C94E256
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 18:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8982810A0
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:45:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D831C20918
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 16:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983361537DB;
-	Sun, 11 Aug 2024 16:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB731537DB;
+	Sun, 11 Aug 2024 16:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="gBK3QFi4"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vFp97ioO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA9714A4CC
-	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CDD17552
+	for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 16:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723394708; cv=none; b=bWiE4CYCV26greBid4iuL6DpyQx3BjaXJUfJXzRgbWnoPxrIaUB2wnQYLMSWReQYfXA43s1CVP+9WPJSiUy6mwBf9v8LHTfiWU1YWU+8InCQTCFy4ZE78T2xFx6mBnIarE4SfXB+iKpfEBBcbONfnI1wVZN7q+2+vB05opibN6k=
+	t=1723395313; cv=none; b=b5/KH2aNmrY7bXbpgt+SBsvCSUNyTSPJyr38+2CRL+CchRZn2aGJ1zkOK9VjHRgUHE8ACWxwPnSH2hnloo6c0ckiUG2m8CSKRVXRWQRgvb/1S8trbmC5knE6QrOsX8qMTpNLnMMRovYCQIh/BcmWcyUqAIFmDITFEO9PuVHLPnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723394708; c=relaxed/simple;
-	bh=DWIPkrbuaRp0xl07Fuq519gwbuX+C4OO6dmju4iB2oY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLkjhmDzoOBErI2ZsxRyyhdTdHWJEe8z+11BHXry0ZwQCx4ZP9kz1HZi0v6MAB3LjxcyDXR/e86rQ+O2wSFDuiUeGUlTzcXOm4BamuFxevgusVOt4EjrNKDjIEixA/SO4tgKR1OPGp9c6NOKStjWlgC2YJWBtP+16eGoYQ5DiPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=gBK3QFi4; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1723395313; c=relaxed/simple;
+	bh=gpDVLqtVtGtsMEghmW/Ps6M4S8n0/VOMG87fkRJYB2Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=De1bYyYUC6SMLs7EdwE/ixk9CWNA2mUVwtSzacS24OA85fbur7AfR0QEo7N21/iUM1TPVurXcaZBfoEmQec48koWBt6y5s0PpX142EtJAWYBMc14e09n7p0asFujZh//s6fraXh7/x/6nJUXbUSVSIqLP3zdzkauq8YY5QMbsag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vFp97ioO; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7b80afeb099so2195921a12.2
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 09:45:06 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70d2b921cd1so3381385b3a.1
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 09:55:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1723394706; x=1723999506; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1723395311; x=1724000111; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SPTP0gdyR7xKR6JEwEzAPEMoTHhOvNnDKjEEtsG1NrY=;
-        b=gBK3QFi4FuTvZbXDRhV2x82kYUxmA8md3DKix3VVPkvZYKUEFcEKDHYzHbkaB9CjK1
-         gKMZmIx8WXkx0mfkCey2zbg+y53tf59FwTjPmqKl469MJSJHcSYk3UnOZG0obM0+Ba29
-         7EBcGXIPxY1JmN2zz9PMjKzAg0Vm6FIsTVht3A9piDTlsPGs/nz9S3otOSd6DEJSRxvK
-         7SILDi9utOPv2Ieao+vR1md8FdUcOYRK8jZXZEazUnCgnEHe3sG3TXLdn+t9J6sPKRYb
-         eFi+/KcBYkLTqpBx3o8aeMWy/1UzA31RFCBBQRE8znHbYP0rlq+kND4MZDwOaupT8xYo
-         Cvvw==
+        bh=8gPb3fWluRf96j/RzI4M1rebGfclpZ2gSoUOj2ePA6g=;
+        b=vFp97ioOwQIpmueKRSHJ6hsgMGDfghRzmf03kruxmniL5aD18HyvhxOJPaZSz9jiPS
+         AhaO/hvIHMHuAcY7+8BWkMupDnm6Q+yEHFIri7mXLaDXWb/lKMHS+jMScm+U8xLbtmY3
+         dP+X1t/hzrThuZLTDnImxqRHePROYN1QJS/mPwgm5P5N9EbzgwPb6RFYuMM9pzMOWKaR
+         789mxcuZnSB+5ZUI9aWdymOnJilsmj0se/1rIEj5Uq7e9puQJMUH7Yrhn88Vog8xEM+t
+         OQIfKRK0tuZ3zQmbJ3GaMdJk1QK+dpDeLNeLvDPRrYgXhDdS45hiCbYuj0cHuxpjqNf9
+         W3eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723394706; x=1723999506;
+        d=1e100.net; s=20230601; t=1723395311; x=1724000111;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SPTP0gdyR7xKR6JEwEzAPEMoTHhOvNnDKjEEtsG1NrY=;
-        b=KJdqD0cCovJAW3A6aVIEDDSSCmCZa0e3t0VuXM2iaHNjUvTmCW+uih3CrqKU9TouI5
-         uMIDKrsOglrg0N8CM2DcZaHNvSeGKPEcv7nhGpD5SN2rBCTdCzkFK68u9/CFkxNNp4T2
-         tS0dOe2BTLMeNaZ6HNqhYoU0+2sBDlrAjZHUCw0icVUqDdpOJbbsZUsFjJJURAmlfHHk
-         9nZ4egtTUiaeHEi0A4YGKl557YfNAabHYuGqwK14rmw6hI81vEX3HX6Y4m/gXjejD242
-         +cIi7EsgVJ0B5FVwAWRbDGAIzaHBrMLCfINBcxJYdiJ25gpujBNqwXQKc2Nci/4KDaYs
-         l4PA==
-X-Gm-Message-State: AOJu0YwDUYw92GTO9AP243V8eFjmENRSlJQP3l/qTGI3JTETB4n8wW1c
-	NJItREYvPKDIweaJFazrn5TxbM8emrrnASgYmrd1B+SPUtrzmwPE4A+epNuQsUFffepLZr7AKCH
-	D
-X-Google-Smtp-Source: AGHT+IE3BTzbuul8QDZLZoAdVlLXR3fMOrKjAToErVeiyQ0zftJobrztuZ82FsgWCBEM3nwnYuPlZw==
-X-Received: by 2002:a17:90b:390f:b0:2c9:9b16:e004 with SMTP id 98e67ed59e1d1-2d1e80799d2mr4804120a91.43.1723394705917;
-        Sun, 11 Aug 2024 09:45:05 -0700 (PDT)
+        bh=8gPb3fWluRf96j/RzI4M1rebGfclpZ2gSoUOj2ePA6g=;
+        b=CJK/ea5OwVoEjhodVQo7M3/dzlrq4JPSCgKf9rgDD01PXi3xJXCTeG+0NuIxKqkUHR
+         jQpph9TycKQrQvH1aJh3PLn/lkPAEyl+Yl21yT+km4BCzLlChRqd3STtSGvHrSx9pQXi
+         UtKgMoqjfayuOMjOD2PUSPTIAXMHMbeWQ+kCCvgJl5e1hmwSf50Epvw5LusaX+gQ06zh
+         FphMUaui4esNm9ngZPVTc7E7ILvMhIflaWRPPKLfd5fNAvzNBFqf72rZUKcf/Xj5sCMm
+         fWImt3SSYFAfdIZF6QCQCWEc/sLaa7a73kdBIYFjrHmrrzElYLh7GBKGWOFlCvXIAkt4
+         /bjQ==
+X-Gm-Message-State: AOJu0Yx8y5WwPW6Z2LBnm01jt055f0dWr9rhiWPZv80aIwFInLUoExEU
+	Cx5e6y3PnkHMS75s6UkHu/bjbT7rpmyl/DNQW7ybQuevxmsnWRQx1wHZp58Y5aFvyzsqueDsKi/
+	4
+X-Google-Smtp-Source: AGHT+IGqz/z0sOk8gnSvgZF/dYkO9Yv63IOqdthjNB9GSQ5kQ+11gGepgkRKG9EaMGVReHqaXvzoSw==
+X-Received: by 2002:a05:6a21:1193:b0:1c3:a63a:cee3 with SMTP id adf61e73a8af0-1c89ff2128dmr9972091637.13.1723395311073;
+        Sun, 11 Aug 2024 09:55:11 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d1c9dc8997sm6545252a91.50.2024.08.11.09.45.05
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e5a89e22sm2655315b3a.170.2024.08.11.09.55.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 09:45:05 -0700 (PDT)
+        Sun, 11 Aug 2024 09:55:10 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	leonro@nvidia.com
-Subject: [PATCH iproute] man/ip-xfrm: fix dangling quote
-Date: Sun, 11 Aug 2024 09:44:46 -0700
-Message-ID: <20240811164455.5984-1-stephen@networkplumber.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute] man/tc-codel: cleanup man page
+Date: Sun, 11 Aug 2024 09:54:44 -0700
+Message-ID: <20240811165501.7807-1-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -81,28 +80,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The man page had a dangling quote character in the usage.
+Instead of pre-formatted bullet list, use the man macros.
+Make sure same sentence format is used in all options.
 
-Fixes: bdd19b1edec4 ("xfrm: prepare state offload logic to set mode")
-Cc: leonro@nvidia.com
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- man/man8/ip-xfrm.8 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ man/man8/tc-codel.8 | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/man/man8/ip-xfrm.8 b/man/man8/ip-xfrm.8
-index 960779dd..3efd6172 100644
---- a/man/man8/ip-xfrm.8
-+++ b/man/man8/ip-xfrm.8
-@@ -71,7 +71,7 @@ ip-xfrm \- transform configuration
- .RB "[ " offload
- .RB "[ " crypto | packet " ]"
- .RB dev
--.IR DEV "
-+.I DEV
- .RB dir
- .IR DIR " ]"
- .RB "[ " tfcpad
+diff --git a/man/man8/tc-codel.8 b/man/man8/tc-codel.8
+index e538e940..7bf08667 100644
+--- a/man/man8/tc-codel.8
++++ b/man/man8/tc-codel.8
+@@ -22,12 +22,17 @@ CoDel (pronounced "coddle") is an adaptive "no-knobs" active queue management
+ algorithm (AQM) scheme that was developed to address the shortcomings of
+ RED and its variants. It was developed with the following goals
+ in mind:
+- o It should be parameterless.
+- o It should keep delays low while permitting bursts of traffic.
+- o It should control delay.
+- o It should adapt dynamically to changing link rates with no impact on
++.IP * 4
++It should be parameterless.
++.IP *
++It should keep delays low while permitting bursts of traffic.
++.IP *
++It should control delay.
++.IP *
++It should adapt dynamically to changing link rates with no impact on
+ utilization.
+- o It should be simple and efficient and should scale from simple to
++.IP *
++It should be simple and efficient and should scale from simple to
+ complex routers.
+ 
+ .SH ALGORITHM
+@@ -57,7 +62,7 @@ Additional details can be found in the paper cited below.
+ 
+ .SH PARAMETERS
+ .SS limit
+-hard limit on the real queue size. When this limit is reached, incoming packets
++is the hard limit on the real queue size. When this limit is reached, incoming packets
+ are dropped. If the value is lowered, packets are dropped so that the new limit is
+ met. Default is 1000 packets.
+ 
+@@ -113,7 +118,7 @@ interval 30.0ms ecn
+ .BR tc-red (8)
+ 
+ .SH SOURCES
+-o   Kathleen Nichols and Van Jacobson, "Controlling Queue Delay", ACM Queue,
++Kathleen Nichols and Van Jacobson, "Controlling Queue Delay", ACM Queue,
+ http://queue.acm.org/detail.cfm?id=2209336
+ 
+ .SH AUTHORS
 -- 
 2.43.0
 
