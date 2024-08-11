@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-117492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E1294E1E3
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 17:35:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD6694E1E8
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 17:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339DE2815A5
-	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:35:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB791C20DB1
+	for <lists+netdev@lfdr.de>; Sun, 11 Aug 2024 15:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0745614B09F;
-	Sun, 11 Aug 2024 15:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4B814B948;
+	Sun, 11 Aug 2024 15:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x3ebpXPL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F8ts+x+C"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B7113634C;
-	Sun, 11 Aug 2024 15:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AA113634C;
+	Sun, 11 Aug 2024 15:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723390545; cv=none; b=LlI1GW54whFkyDjJsYpuiR/nLO07Uu58AzTJDw4Ga9mi8TD9CBd2sPAlAXAhojy14vDtxRfhfrMg2PzagOQEhcH1ZwOmf7TZfxB8tbOAGVEJr0HTYWxUxzH/scTdXHzfUMEGZMbYIG7XR2TJGzIkn/tl2txsl151Rk6KMHrB03k=
+	t=1723390678; cv=none; b=PHFxll41R5qG/daWE5Cc2FOeGTY7mF7f8r5xT8Ds/yFsAzWnLC8npUvPlLroOzxW1KiiMVuadSZY39aufdf5OSjvETZVKNQ5WHrNE004rW0gWRRVV9U0HMpsl2VTuiDla9Npl3SPy7R3ujEfp9LcM4hpe4KVIccye2IvE5f2jkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723390545; c=relaxed/simple;
-	bh=qm6Y2wyAQoSeicTEMlMTqk4ky1oNRaACjaPH3282UNs=;
+	s=arc-20240116; t=1723390678; c=relaxed/simple;
+	bh=ts4phOiODwYcBVxhPj7XQhH8DwkGBT50gka7WWipaLM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o0dVbh9w4SLBHandY8Ir2WwXcMUmEvcqQjqvuqTv2WQz9zIkPocEQOhLx2KJl22eGPlkv2wBooLkgS8tMcBTPOIT3QbkP5A/vAY7cdyXlqPHs4paSBd48ExFlRQfpbyaQFkQMmrT3Fwg3q+yrHh9mc3kfjYS9citk6k9PRlNxnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x3ebpXPL; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=erxVIW8gbshO4Eff987pvtKpEbZ/6eQJW/I1i0Hb7Fu7YZAeXkbxCxvTHH/FthiFfb2PvIIEpRfJlSPa0fLJMHy/ybqawVQN31IJztRtapunsFHwO+5tk8twZCQgm2THZsJ1wDzu+vNzN82Y9ak36Bwf5WmDNcpvO0F5CAenp2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F8ts+x+C; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Bs6XpnLlW7Gjksj2L+h+eEvprEyms6epqWL+BfH10hU=; b=x3ebpXPLPTwZ3DilDZEiLL7kmt
-	zLJcD+9u2KqIZMt+QaC7y5lENhgF+VH50kFiOqJTaC2dCi3uBPeKnf3agS5Q3OpSFbagqGoiVMVXz
-	RNH2XcLwqkNMzgpS4lCZuhtZ/4oMVSHh+bkddXwKAzoevoBMmreXC+Dv4UU+zuP2VKNU=;
+	bh=QaoF6Pxe07CoCbtMqlSdaHuobGu7TQGjfXel/HnobjQ=; b=F8ts+x+C5UExSt66Qlzm7Z2wpg
+	XeaifMMhElTW78rujLHmszKQ+Bd9hmek8tlOvY3qv008rA8KgLA+MFyXOgLTsy5MGmROZksOSbjrc
+	0ueJL8Ahm4uiGUAydIiAGAeNtv29HnDwRrTVT2OJSK1xAzMk7KW0qIRcBXXvjVF/hnIs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sdAbM-004VNt-PH; Sun, 11 Aug 2024 17:35:24 +0200
-Date: Sun, 11 Aug 2024 17:35:24 +0200
+	id 1sdAdY-004VPW-1b; Sun, 11 Aug 2024 17:37:40 +0200
+Date: Sun, 11 Aug 2024 17:37:40 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -60,11 +60,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
 	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch,
 	linux@bigler.io
-Subject: Re: [PATCH net-next v5 01/14] Documentation: networking: add OPEN
- Alliance 10BASE-T1x MAC-PHY serial interface
-Message-ID: <76b99d25-2d58-4c30-90af-cd57ad377dff@lunn.ch>
+Subject: Re: [PATCH net-next v5 03/14] net: ethernet: oa_tc6: implement
+ register read operation
+Message-ID: <817aa1a7-9f19-48a1-9402-1c95225bed3e@lunn.ch>
 References: <20240730040906.53779-1-Parthiban.Veerasooran@microchip.com>
- <20240730040906.53779-2-Parthiban.Veerasooran@microchip.com>
+ <20240730040906.53779-4-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,33 +73,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240730040906.53779-2-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <20240730040906.53779-4-Parthiban.Veerasooran@microchip.com>
 
-On Tue, Jul 30, 2024 at 09:38:53AM +0530, Parthiban Veerasooran wrote:
-> The IEEE 802.3cg project defines two 10 Mbit/s PHYs operating over a
-> single pair of conductors. The 10BASE-T1L (Clause 146) is a long reach
-> PHY supporting full duplex point-to-point operation over 1 km of single
-> balanced pair of conductors. The 10BASE-T1S (Clause 147) is a short reach
-> PHY supporting full / half duplex point-to-point operation over 15 m of
-> single balanced pair of conductors, or half duplex multidrop bus
-> operation over 25 m of single balanced pair of conductors.
+On Tue, Jul 30, 2024 at 09:38:55AM +0530, Parthiban Veerasooran wrote:
+> Implement register read operation according to the control communication
+> specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+> document. Control read commands are used by the SPI host to read
+> registers within the MAC-PHY. Each control read commands are composed of
+> a 32 bits control command header.
 > 
-> Furthermore, the IEEE 802.3cg project defines the new Physical Layer
-> Collision Avoidance (PLCA) Reconciliation Sublayer (Clause 148) meant to
-> provide improved determinism to the CSMA/CD media access method. PLCA
-> works in conjunction with the 10BASE-T1S PHY operating in multidrop mode.
-> 
-> The aforementioned PHYs are intended to cover the low-speed / low-cost
-> applications in industrial and automotive environment. The large number
-> of pins (16) required by the MII interface, which is specified by the
-> IEEE 802.3 in Clause 22, is one of the major cost factors that need to be
-> addressed to fulfil this objective.
-> 
-> The MAC-PHY solution integrates an IEEE Clause 4 MAC and a 10BASE-T1x PHY
-> exposing a low pin count Serial Peripheral Interface (SPI) to the host
-> microcontroller. This also enables the addition of Ethernet functionality
-> to existing low-end microcontrollers which do not integrate a MAC
-> controller.
+> The MAC-PHY ignores all data from the SPI host following the control
+> header for the remainder of the control read command. Control read
+> commands can read either a single register or multiple consecutive
+> registers. When multiple consecutive registers are read, the address is
+> automatically post-incremented by the MAC-PHY. Reading any unimplemented
+> or undefined registers shall return zero.
 > 
 > Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 
