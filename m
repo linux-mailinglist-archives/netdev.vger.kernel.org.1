@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-117666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE6394EB7C
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:54:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCE5294EB87
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A61FF1F221A2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:54:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ED4FB222F2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65797175D4D;
-	Mon, 12 Aug 2024 10:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8248A170A31;
+	Mon, 12 Aug 2024 10:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b="hJvJb5VL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFczgtmU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-ztdg06021101.me.com (mr85p00im-ztdg06021101.me.com [17.58.23.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C60171E68
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 10:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEB1170A0A;
+	Mon, 12 Aug 2024 10:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723460016; cv=none; b=XvKSKkS0Tl1+4a7cKVyozh5+LWiNduDG44oBVWgRwvdPuWb0JlTPQ/Y9FCPixrBf2gDisZEA0GzigRnhtLswGGDx8/cYQexewQmiGuhchcZcRl2WiBgZyrhNw7XNWPyqmW3uUsYCNgwR2ThEjbebGabk0VKarvKY6WQTmqzp4ag=
+	t=1723460135; cv=none; b=eNh1wmdWdmGl2TXLRfLhBjATcv10gaSNmkFZzipY8gme81iZtiD8W1f9XphScNisqttBB2GaOPPOcjWJE4qFKJJCr6tnDrBHmGkby1ggDzwrrEGjTluUrZ9Di/ymGRDnkkScLMdgKSzp/4HP1PUMriTXgsr8EEvry/1Qz3a12iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723460016; c=relaxed/simple;
-	bh=wR0wsa1jxS7NM44yOEX1X5C5LxaVXsSDx8V1Khp/xis=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fzr80g4KunrlNK04yd78y4zobhHh9lJwdZZhAAu21VGho4aWLmOrArzmIbp7YUVobEyHuubwK3w5uyEQJkDgYsEgR5GtmBKNa8sfRA9N/ZcTGDULpPr3j39zI2g0kDqDYyhnw6QipQAUEy71Ja/YhvoWlbWg6UuTkchd75Jbtx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me; spf=pass smtp.mailfrom=kuroa.me; dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b=hJvJb5VL; arc=none smtp.client-ip=17.58.23.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuroa.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuroa.me; s=sig1;
-	t=1723460014; bh=GoxGXjQ77EFakMA8R6yb540PeO4gE9C9xjuD5Qd8lqs=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=hJvJb5VLFcL8KLG/53kuUBMKfK6vX5YbdqkTz78qGVpk5VdksNwBK9vsxo5c9jVGU
-	 Bvrk87J4imTPZtHFpZBqRrfskGVsj2Ns7uw+hmLzdV1+ulLl2/M63OKF+QG78EnZX9
-	 KkFqCEPmpb8anO/CF4e8o5EWCrFOj3RW2rN+TdB3mbvHUefR6pu1WuX222mwsxCAev
-	 IjH66P5q8LpjjoC5NTY1oQ/mMU7wJWD4akJXv5Nsz3+KoeLZlkINFcmwHMb8svTABd
-	 cJLVmHJEHYpkZ6RnEY+jdpgzxV9DxrN8m0qvc4ePvWZGiRElcx3URDMnqoA88caWvn
-	 LNr7UFSWe2FwQ==
-Received: from tora.kuroa.me (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06021101.me.com (Postfix) with ESMTPSA id DB7B0801BB;
-	Mon, 12 Aug 2024 10:53:30 +0000 (UTC)
-From: Xueming Feng <kuro@kuroa.me>
-To: "David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Xueming Feng <kuro@kuroa.me>
-Subject: [PATCH net,v2] tcp: fix forever orphan socket caused by tcp_abort
-Date: Mon, 12 Aug 2024 18:53:15 +0800
-Message-Id: <20240812105315.440718-1-kuro@kuroa.me>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1723460135; c=relaxed/simple;
+	bh=9Gjh8wrH7LLHsrpmI1U+ZYZ/g/67UkGmtuDBq9at/5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LcZfGSbxXurspQ5WTnyQ1nWevkJIVhJX8cU4PbMkQn5H3/n6cOoGyXT6y0LUVEkvwh3dTyO/FBJmzgkceriUnqKDb9Kue8Txueu+8Q54fmxiLgYVWePD81c60nsglOb1cBmN5y+RMwjNNVWpME/J2DwKsnT+xGkALZIkiufore0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFczgtmU; arc=none smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5d5c7f23f22so2432796eaf.0;
+        Mon, 12 Aug 2024 03:55:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723460133; x=1724064933; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=NPaRmh24QV5ReZsiiXuFKq2S39iqLXRWYwV4MINhh0g=;
+        b=QFczgtmUO0wUsrHi3t4uPRJIYtjYLD912Ri4c+ni91SfTWWPu5AlZ9KF7IR9hTyDlm
+         AgdBCUXZa5EMHxcH0wzcadhbABoor9l69umph8j+YvQEPnLdBaQyCAeDd0OyPZzJfp90
+         HRC9qXl1xOPKxZkRGmDvR2rivhPYD5tqwMBCFbF2zGNpA6zMZKcJIQe1Q2V/tHuOkSpL
+         AxucVcPkehJrgWxmWZXVk8Cj7oLy3XBV9vQowB5mZ/XycwLlmuzUvIxKMsYE/UGoKFa0
+         004yOT3FK0zMD4f2GDRFGLj9jZrEwXhuj4NTfsjg4XpaQD1KHwwL+jRsKCscwcxrL9J9
+         ROeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723460133; x=1724064933;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NPaRmh24QV5ReZsiiXuFKq2S39iqLXRWYwV4MINhh0g=;
+        b=Snk6SwkcrjuFbeue/MibVQEIZ4gs8gjpNf0olFg4WjK9SEDQ5YqpMoma6RXBKVSKi+
+         Rro5zdrXvMqcp4cxEp7LCEA/VDXXoGbj2sTw0FaHF6PoDUGJk03S+2cK7sQjxR7hX3hV
+         zvOQTdVQDpeJYXCv6bVfdME6mnvVWWCFIFKne0vvmUd2qJmDSFwnvV2VJIwqz8iYvbnl
+         h8tZxBcVtLgHrg7g2Khw7K2AmFLCdKICLOlrK0+02KbrlNktp1ZuvjcT8+MZo0vdnHqJ
+         D5Q9N7eM3mzPf0Gyf2goeloeE7l2Zf5oM6LeAbu1pS4QRDOp1Nw5YBkq6OkJDSJtEK3M
+         9g4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWeBbAJa4ZqzOV/1fRr2xPxCUxIOx304VsL4T8+CugHXwK1rT8igE/59WvCMKmOwXThTm4fiDwI0K2+xwqwi2+RP9/djyb6ydcS+eDY1P0ZLC6IgJvFrCyBVCEVGbp2C+nGGX0LE3rJX2rwV0Hnl5jimu7ozRf08fXvgdk5tMEgwg==
+X-Gm-Message-State: AOJu0Yxe3OkwE7Z/0VlO1bDtZ+Llbmf1xjkaftK6/FP5YYvnPumsjoJO
+	9Z0HaMRHlfbQ8C8NGi8UysEGRZOgarnSbCFlv46XiKIXXiSxutrkorNfwiyJQiuTXpjyyfCz9jf
+	K2UGRma7TBhGIEb4IHXxgeeyOVBc=
+X-Google-Smtp-Source: AGHT+IHiSMX3J6K0nI+hNnKPWUmqIsJ0s8DFVtdCGHHR49eP9W5PwH3rX+befgLK9IE9xf0ht3t4nlcSbeueqkPJgt4=
+X-Received: by 2002:a05:6820:1b94:b0:5d6:10e1:9523 with SMTP id
+ 006d021491bc7-5d867dc089emr9011875eaf.3.1723460133056; Mon, 12 Aug 2024
+ 03:55:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: W97_O99Ato-ThPpzNUZ4uxAn40X89SYN
-X-Proofpoint-ORIG-GUID: W97_O99Ato-ThPpzNUZ4uxAn40X89SYN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-12_02,2024-08-07_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=748
- phishscore=0 malwarescore=0 spamscore=0 adultscore=0 clxscore=1030
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408120082
+References: <20240812084945.578993-1-vtpieter@gmail.com> <20240812084945.578993-6-vtpieter@gmail.com>
+ <e93d13b451a263470e93706faa3afbfe2b5cd57b.camel@microchip.com>
+In-Reply-To: <e93d13b451a263470e93706faa3afbfe2b5cd57b.camel@microchip.com>
+From: Pieter <vtpieter@gmail.com>
+Date: Mon, 12 Aug 2024 12:55:21 +0200
+Message-ID: <CAHvy4Aq8G2vLzFCCRRQV5kCD4jp8oYW+c=m_foyHXKoeiCod5A@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 5/5] net: dsa: microchip: apply KSZ87xx family
+ fixes wrt datasheet
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	linux@armlinux.org.uk, conor+dt@kernel.org, Woojung.Huh@microchip.com, 
+	robh@kernel.org, krzk+dt@kernel.org, f.fainelli@gmail.com, kuba@kernel.org, 
+	UNGLinuxDriver@microchip.com, marex@denx.de, edumazet@google.com, 
+	pabeni@redhat.com, pieter.van.trappen@cern.ch, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-We have some problem closing zero-window fin-wait-1 tcp sockets in our 
-environment. This patch come from the investigation.
+Hi Arun,
 
-Previously tcp_abort only sends out reset and calls tcp_done when the 
-socket is not SOCK_DEAD, aka orphan. For orphan socket, it will only 
-purging the write queue, but not close the socket and left it to the 
-timer.
+> @@ -141,7 +141,7 @@ static struct sk_buff *ksz8795_rcv(struct sk_buff
+> > *skb, struct net_device *dev)
+> >  {
+> >         u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+> >
+> > -       return ksz_common_rcv(skb, dev, tag[0] & 7,
+> > KSZ_EGRESS_TAG_LEN);
+> > +       return ksz_common_rcv(skb, dev, tag[0] & 3,
+> > KSZ_EGRESS_TAG_LEN);
+> >  }
+>
+> This change can be separate patch. since it is not related to
+> ksz87xx_dev_ops structure. Is it a fix or just good to have one. If it
+> is a fix then it should be point to net tree.
+>
 
-While purging the write queue, tp->packets_out and sk->sk_write_queue 
-is cleared along the way. However tcp_retransmit_timer have early 
-return based on !tp->packets_out and tcp_probe_timer have early 
-return based on !sk->sk_write_queue.
+It's a fix wrt to datasheet but in reality I can see from tests with
+a KSZ8794 that bit 2 is always 0 so the bug doesn't manifest itself.
 
-This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched 
-and socket not being killed by the timers, converting a zero-windowed
-orphan into a forever orphan.
-
-This patch removes the SOCK_DEAD check in tcp_abort, making it send 
-reset to peer and close the socket accordingly. Preventing the 
-timer-less orphan from happening.
-
-According to Lorenzo's email in the v1 thread, the check was there to
-prevent force-closing the same socket twice. That situation is handled
-by testing for TCP_CLOSE inside lock, and returning -ENOENT if it is
-already closed.
-
-The -ENOENT code comes from the associate patch Lorenzo made for 
-iproute2-ss; link attached below.
-
-Link: https://patchwork.ozlabs.org/project/netdev/patch/1450773094-7978-3-git-send-email-lorenzo@google.com/
-Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
-Signed-off-by: Xueming Feng <kuro@kuroa.me>
----
- net/ipv4/tcp.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e03a342c9162..831a18dc7aa6 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4637,6 +4637,13 @@ int tcp_abort(struct sock *sk, int err)
- 		/* Don't race with userspace socket closes such as tcp_close. */
- 		lock_sock(sk);
- 
-+	/* Avoid closing the same socket twice. */
-+	if (sk->sk_state == TCP_CLOSE) {
-+		if (!has_current_bpf_ctx())
-+			release_sock(sk);
-+		return -ENOENT;
-+	}
-+
- 	if (sk->sk_state == TCP_LISTEN) {
- 		tcp_set_state(sk, TCP_CLOSE);
- 		inet_csk_listen_stop(sk);
-@@ -4646,16 +4653,13 @@ int tcp_abort(struct sock *sk, int err)
- 	local_bh_disable();
- 	bh_lock_sock(sk);
- 
--	if (!sock_flag(sk, SOCK_DEAD)) {
--		if (tcp_need_reset(sk->sk_state))
--			tcp_send_active_reset(sk, GFP_ATOMIC,
--					      SK_RST_REASON_NOT_SPECIFIED);
--		tcp_done_with_error(sk, err);
--	}
-+	if (tcp_need_reset(sk->sk_state))
-+		tcp_send_active_reset(sk, GFP_ATOMIC,
-+				      SK_RST_REASON_NOT_SPECIFIED);
-+	tcp_done_with_error(sk, err);
- 
- 	bh_unlock_sock(sk);
- 	local_bh_enable();
--	tcp_write_queue_purge(sk);
- 	if (!has_current_bpf_ctx())
- 		release_sock(sk);
- 	return 0;
--- 
+Please advise, keep it in net-next or make a separate patch for the
+net tree?
 
