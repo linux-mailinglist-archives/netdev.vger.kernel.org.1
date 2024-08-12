@@ -1,89 +1,113 @@
-Return-Path: <netdev+bounces-117857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208E794F8FA
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:31:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F7B94F8FE
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:36:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79576B21F2F
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:31:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12927B21D66
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230CB16D33F;
-	Mon, 12 Aug 2024 21:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B358D19412F;
+	Mon, 12 Aug 2024 21:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhO4ZQCa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJp7xeNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C631581EB
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 21:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AA554759;
+	Mon, 12 Aug 2024 21:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723498255; cv=none; b=DMXtoEGYn1jvUaNp8RfXun+fDWCjGclK34IByl9plCoooz6eB3S89JvF24iZOLhmRq4azNzaoTPkitOL7PBf7qj8X46B9cT15Euxexphb4l9gi0k6FagiaqAD8I8yOFUoEtpZ6FRkCkPrJ0fZ7efzfh0Wu38+18XyzTe4wGMh+Y=
+	t=1723498558; cv=none; b=MRsle7qjuf+rFfjVapTtNLRU8uOgsEGm54ZpqmA+HFtNYcnLdMXln4Vnco8ssmHsdhzsejNayH+nBJWbBj1YKQti4MGsj782nABjFiHzfJOYXmfK7HdIYj31acJkNirdS1f32Q7w+zuoghQxbXbTUnSAQc9fLoL3lMYT/fdWubA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723498255; c=relaxed/simple;
-	bh=Rc6Ozq9p3l1CRe6JW/NxQgYa7+T7C6XQWBz3aP1cVew=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JzTIcFFWbhCwrofuo9dKHnPROy8KEGJndHcoDqT6190LIFALQ9tfzgLCtCr2O0cMRnkRPFcsSJ5hbqd2MAP2OHh142iuIp4HmUliKCd8hHNTmB7NsBxjKE9tj/uJS2gvUt6IiBFRiSh9nMxysPgT1VuamimwyUSquvqcXv4ypHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhO4ZQCa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7010DC4AF0D;
-	Mon, 12 Aug 2024 21:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723498254;
-	bh=Rc6Ozq9p3l1CRe6JW/NxQgYa7+T7C6XQWBz3aP1cVew=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FhO4ZQCalpgDXfFZSgShsZVTNsr+PLY1zAPWiYsaFTRXWOry/GFpoNNPY9ozsLOfw
-	 oVCHFLNMpD/6JT1ycImS/dUtFpLaomM+1DHWXKsO4qPgRPFo9aZHujVCilFArsecO4
-	 tZ8yxGYWwStxvbZkFPA6nXMgfS2blprrOUmY0q7ozfq/F93aiBgr3M3XCqoTCr5Q8f
-	 tOX/Zk29j/MvBR9Vq44xAuOjbPAG401tNyR8O87XbLPNlF1F/BbUn+ESV3QCPsyQ9l
-	 gIaHpO9mNuSUtHPw4yOSI9VdtqJctfa3TZgC/1xDvlpDGH50GS+a9LY8DZQSM5wBlF
-	 7C0/cUh/yFafw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF4D382332D;
-	Mon, 12 Aug 2024 21:30:54 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723498558; c=relaxed/simple;
+	bh=oiZO958/g3pd92ag8eOblYST6tGatkKx7ddT1zWe6FQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RE1P6jXX0QqHPp4Icaymj7tzJWL23YBKpX6K0Ew1/bUYhGR3bPBKs91DqQk7DB8tuO9om00eX0qXXV2V+vpVqYeJBHyJB1xwEL5trY8V7IVIGYp7+15zmAL4VCfbhLN4l+4FMcR7nlGy+2hFi4jfCk5hfokdOM8icH6pviWwnoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OJp7xeNI; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e0bf677e0feso5059088276.1;
+        Mon, 12 Aug 2024 14:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723498556; x=1724103356; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0zCOHIkKa9MOs4it64LjArTuPJu/6oyaZeNfL7hns58=;
+        b=OJp7xeNIHhGA1ZDyOIzcsaat0NTT10MIDTVnAsKuc/s0+CMHg5R9pkeSr78UXsxm8s
+         54Lnt3cvC8TlNADIiSKnVQETCbg7k/wQvwTpFEfBmcoF26ZdtX/DxnNH8IKlz/BpQakM
+         HwFsB/uwXLK93ccPqp4eo8wKdURJnZQ7esA8bWxxcBe/T6UJqjZ4Qxpnfbf8sAtgLqcU
+         cjIp3L92jiut1HRmiWCO0uhA5xXR90vGMQtSB7naxyM9J50ApHHLKofNH7rDLONHqbYE
+         ONr8kIYWcgHXr9C3D53RY5fIdyvYsRZ+SRjf+FQDO7U45Kvuk5/2ONmSAhNeoifO45zR
+         FsHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723498556; x=1724103356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0zCOHIkKa9MOs4it64LjArTuPJu/6oyaZeNfL7hns58=;
+        b=sw+XyH2lw9FC/TipQ8vCiHXAPwHb0RY+yj+muijV2yF1jK54K/wqZr/jSxJPdDepkU
+         oLH6OKcdJDo/L99p2Q9oWTsaw13/Mfdb2VOvU2rdW394woswiEjNESD4RJDEcvA/unKX
+         +dt1tTDXhbds3YgJwQCQLJ3XV2KzhCegS+FbjFxyNs342cU2lvbXba21OKvgrmMmobOz
+         rm80rN7D0wccrREfepHXsD77dY7F4aL+kA0wDklQ++DjkPpVKvfSyA1lw0VrpAAV+IqJ
+         3V1gQZ7JTWfH/BbXMLf9K+DmtdHlALCJDHYD1O4C+5NlnxC+C9ow9rN50Mv36u0oLSqf
+         LhEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvEb5MjOJn1X6E2SnvXgQsH0bXM93kaL/4yHGAicDFG07SArXcbpoebCKBL73kl33Nzo/2cOBmmKo+hyU1lH4IzjsfLAoNb/Xu5UmA
+X-Gm-Message-State: AOJu0YydywqIlr21wzy7yHm1WY9LW2THiot5RDaIsN6tAddChhr9/7Ry
+	Ewm+wCLhA62qCIVCe3JcohbgKfV20DxCLgzVrWf4hcbVcN3KIUZtZuIRi42eIWvr6ha1DdcZwvn
+	s8UrHWuBU4AQG7Hr0p9nktpo2/c0=
+X-Google-Smtp-Source: AGHT+IGZg2RafmXivgjBbCMFkIfGdPJ8YZKp7cPwYB/Cn0z9Bv3a0oQ0yF0T+2EoDqVEt4aWUHo+7u+ZncBU4VNxEd0=
+X-Received: by 2002:a05:6902:1688:b0:e03:6085:33e9 with SMTP id
+ 3f1490d57ef6-e113ce6fe08mr1752190276.2.1723498556062; Mon, 12 Aug 2024
+ 14:35:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute] man/tc-codel: cleanup man page
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172349825349.1144807.6389584109889129985.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Aug 2024 21:30:53 +0000
-References: <20240811165501.7807-1-stephen@networkplumber.org>
-In-Reply-To: <20240811165501.7807-1-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
+References: <20240812190700.14270-1-rosenp@gmail.com> <20240812190700.14270-3-rosenp@gmail.com>
+ <ae818694-e697-41cc-a731-73cd50dd7d99@lunn.ch>
+In-Reply-To: <ae818694-e697-41cc-a731-73cd50dd7d99@lunn.ch>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Mon, 12 Aug 2024 14:35:45 -0700
+Message-ID: <CAKxU2N9p4DrbREqHuagmVS=evjK48SWE5NM3RbD5zF6D-H93kA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: ag71xx: use devm for of_mdiobus_register
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk, 
+	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Sun, 11 Aug 2024 09:54:44 -0700 you wrote:
-> Instead of pre-formatted bullet list, use the man macros.
-> Make sure same sentence format is used in all options.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+On Mon, Aug 12, 2024 at 2:28=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Mon, Aug 12, 2024 at 12:06:52PM -0700, Rosen Penev wrote:
+> > Allows removing ag71xx_mdio_remove.
+> >
+> > Removed local mii_bus variable and assign struct members directly.
+> > Easier to reason about.
+>
+> This mixes up two different things, making the patch harder to
+> review. Ideally you want lots of little patches, each doing one thing,
+> and being obviously correct.
+>
+> Is ag->mii_bus actually used anywhere, outside of ag71xx_mdio_probe()?
+> Often swapping to devm_ means the driver does not need to keep hold of
+> the resources. So i actually think you can remove ag->mii_bus. This
+> might of been more obvious if you had first swapped to
+> devm_of_mdiobus_register() without the other changes mixed in.
+not sure I follow. mdiobus_unregister would need to be called in
+remove without devm. That would need a private mii_bus of some kind.
+So with devm this is unneeded?
+>
+>     Andrew
+>
 > ---
->  man/man8/tc-codel.8 | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-
-Here is the summary with links:
-  - [iproute] man/tc-codel: cleanup man page
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=6e4c3ffb8227
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> pw-bot: cr
 
