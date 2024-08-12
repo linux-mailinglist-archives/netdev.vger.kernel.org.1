@@ -1,83 +1,95 @@
-Return-Path: <netdev+bounces-117709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F4894EDEF
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:19:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B9D94EDF4
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247B81C217CF
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:19:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA971C21BCE
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186DE17BB38;
-	Mon, 12 Aug 2024 13:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3D117B4FF;
+	Mon, 12 Aug 2024 13:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PKyggy+8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRRxEH5d"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CF01D699;
-	Mon, 12 Aug 2024 13:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA34D1D699;
+	Mon, 12 Aug 2024 13:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723468780; cv=none; b=gw3FRpjcJwAkPqExKhgBiJj3aGr+hYlRZVOFDcct5rOkF2FdA0l60latPV5iYUiX81t+YGVjXFK+Voiy2e3luA71qLB8BuD/YsSyhWohdfHy6lZUGoxJ6p3AHrie0qViWCFO/uxdlP3h3NPiidIpWjyEeSYCCyt0oFzefUgDspw=
+	t=1723468827; cv=none; b=nNtKVCBcVmxWDonb0dwHRVY2OO0WpltCc5djiJnq1H3xhi/PTupsyMYW/FTP+c7AgmZsw/+PgpIEdhSfdivStcvwT2urDhQXxgLRgUhxawwRk8+zn2c4iaCsBFtsPd9Z1ZsMz/JALLunrh/1zzUHM7aEGgEKZgvP5+pwCO2tBXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723468780; c=relaxed/simple;
-	bh=tAYfad6m/QeYh9wozED8pIbFdS8uv/7ktFfHPVd044k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IS9+QD/oYCv/H6HPyx1I1Nt0k+zSGZwGkJrH4j1WjomZhTh8+XyjZyX68xF1YjlwfudMhFiui6wv4FSo+gIa/lPXTwPfzjcWzyDuQe+VpcJBikA6mXPxQhQchnjuXHZgmDYhQL08lfUJtiE4wB28A4Ei+woekc9Hoh2LmdYAwnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PKyggy+8; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=QtzF86IieQVZ4A3zDxLwj+KhIu3XfMiZ65Q7/sKZtkU=; b=PKyggy+8sSN9+J+Ar2V75ZlCd7
-	RnYjItWwTid5ou3LVSEXYYedsgt9wRjnGSI7LppwGYsOkZk272wVukB1iDseGxBEuouilBlESCQFO
-	ntXsQZ+MdpWcHCkSjxNUgG2MYqs0mAZLx/Dfp7iACbnhT4NDGMZiJvkVrazNMjrPl810lWVwD/1PA
-	hAw5tqDGs7xqdWMH9NOsOWfc0Dmyr3KGWb3GuRXtkL21QN35s10Rg++rkPVXIHBh0xrtIPkgQdMg0
-	Rpd3dFhyGRKpsQwqPo4MmlMmC+sKRgnJ4ElFwYd0KH8eULJRL0tklONUnsH9JWPRh1h96tOap0S+l
-	ydN9dwew==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sdUxT-00000000O9f-3sC7;
-	Mon, 12 Aug 2024 13:19:35 +0000
-Date: Mon, 12 Aug 2024 06:19:35 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 4/5] eventpoll: Trigger napi_busy_loop, if
- prefer_busy_poll is set
-Message-ID: <ZroL54bAzdR-Vr4d@infradead.org>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <20240812125717.413108-5-jdamato@fastly.com>
+	s=arc-20240116; t=1723468827; c=relaxed/simple;
+	bh=Y9rNj4VgWST9LHQuXoXSSHBNGwGl6tL0CsD6uHMMwXg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cs6zxcjs0CERPVzwGw4zifbH6WnhX7aqgwjD6YPjh7CF/KhltIGfNzPZIx+M6oWe95LunGie5FSEE6Vr3k9uXFjWLXhV5Vo8BDD1TbA5zFe36qw3nnTNVZgW+SDBzS060KTtz5IcIZNCbVxdIk1ohji8n17jRLPYuv/6UBVZDS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRRxEH5d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B687C4AF09;
+	Mon, 12 Aug 2024 13:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723468827;
+	bh=Y9rNj4VgWST9LHQuXoXSSHBNGwGl6tL0CsD6uHMMwXg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VRRxEH5dYuZUxrFr5ib3ZZB1KFJv9trPJwNPiubDsWkvVSqdrLFWIpToUCIyfN96K
+	 Te2KFxVpmDGTk2DpxHGoFstVG5rSYcGvBmdY7mXWFHEkOHHluDrR6iR2E73a5pXosk
+	 gy4zXm90dCE9HNRKiKz6niqYTZOqGipuS2M2G4o+U6uk+67sH9s4wLj58nyMvJ9cf+
+	 EXgC/FEMiCOewO+zExa2VdeL7umv7d6T96fbEu0Lvl59qZoE2wjq0LKbx0pSnDZRTp
+	 Zg4wp05M1tz5vEaWlWKO0xmFbUV9dc1YvoulCw4NZUXnpNkZiL4iCCAM55+CCNWwbg
+	 Fybv5tAD+ArkQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C04382332D;
+	Mon, 12 Aug 2024 13:20:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812125717.413108-5-jdamato@fastly.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: ethernet: mtk_wed: fix use-after-free panic in
+ mtk_wed_setup_tc_block_cb()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172346882628.1022466.3636636409697645083.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Aug 2024 13:20:26 +0000
+References: <tencent_7962673263816B802001C50C5EE77D0DF405@qq.com>
+In-Reply-To: <tencent_7962673263816B802001C50C5EE77D0DF405@qq.com>
+To: None <everything411@qq.com>
+Cc: nbd@nbd.name, netdev@vger.kernel.org, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 
-On Mon, Aug 12, 2024 at 12:57:07PM +0000, Joe Damato wrote:
-> From: Martin Karsten <mkarsten@uwaterloo.ca>
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sat, 10 Aug 2024 13:26:51 +0800 you wrote:
+> From: Zheng Zhang <everything411@qq.com>
 > 
-> Setting prefer_busy_poll now leads to an effectively nonblocking
-> iteration though napi_busy_loop, even when busy_poll_usecs is 0.
+> When there are multiple ap interfaces on one band and with WED on,
+> turning the interface down will cause a kernel panic on MT798X.
+> 
+> Previously, cb_priv was freed in mtk_wed_setup_tc_block() without
+> marking NULL,and mtk_wed_setup_tc_block_cb() didn't check the value, too.
+> 
+> [...]
 
-Hardcoding calls to the networking code from VFS code seems like
-a bad idea.   Not that I disagree with the concept of disabling
-interrupts during busy polling, but this needs a proper abstraction
-through file_operations.
+Here is the summary with links:
+  - net: ethernet: mtk_wed: fix use-after-free panic in mtk_wed_setup_tc_block_cb()
+    https://git.kernel.org/netdev/net/c/db1b4bedb9b9
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
