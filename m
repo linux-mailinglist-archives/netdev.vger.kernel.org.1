@@ -1,95 +1,158 @@
-Return-Path: <netdev+bounces-117576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E1D94E5E6
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 06:53:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE69E94E634
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 080051F22323
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 04:53:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA9F1C21056
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 05:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4678F14A0B8;
-	Mon, 12 Aug 2024 04:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C5214D2A4;
+	Mon, 12 Aug 2024 05:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yj2qClw6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CE5139CFE
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 04:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567743C0B;
+	Mon, 12 Aug 2024 05:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723438385; cv=none; b=nzadwMZXmfn00JuNW3B5k3Gb6JRKMwXT6MRBwF7U+zJ7B8PagfDjEgchzyFE0pg4nYibgupOHLW8PS/Z7BrLXOgb4wGAWRO47+7Ow4Gi5ti6cnpT/N+Qjjw34IjIjUHRBfbtrYbNkVsiyD3oDb/H6MGCL48/d5ZTDdkeJvREyPk=
+	t=1723441316; cv=none; b=B8x2NovQ0R+INgz8rR2pEhQh3Z+RkOsGKJjDbw5RLnyO4h+uaOD7RVsIgblTKUvxHRwcTUKMnw6zOzKErlg+aH+bvN8+gWIWk0ycrErCHC8MNccJ+FORh/yzcFon+Azlu0GYGjqux5p56SW/YnFbpFwvWaxl4/4l9chV6QPkfzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723438385; c=relaxed/simple;
-	bh=wbPL9xTIQV0fKwjKstFY4ij6hqeFTYyO59yYSlmm7kE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=D7486nK4IkowlxG7KFiAfOhzyF1AVpfHzF39hONziQeLaJnieu4i55TiEGxHL34EadU2r1SEljnc41gF22bgnd7my9/SkUkTtcd7+03vlN1u5wN6GaD5T79GmY9UO2appOWBlswmLLh/EztprqX+hefezbRaELBp07RP0pI+Di4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-81f81da0972so556499939f.1
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 21:53:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723438383; x=1724043183;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DCIUv5W1hQZANZ1PEvV4VxKZP1pSyOaOOcCYK3C1sQI=;
-        b=KC+OtWw3n8U6Mo9/nEOApNRo0WIts2vdfmouUWyC6RobOeuByqbt4v8SFsvwIajE5D
-         EX7eo77uwvTpmfpGFFmGxFvUXL0D3KOXYZkHv71+ne6I5U5ra3bPdPfVQ/MnaCqZYggj
-         ddtJVSvKGlfFRc/WiLHZo10OUKN94odqk5qsVmDmomZuCaxZpfergZFcMNuzRMRQke7/
-         twKOZmzU9Jht5D7RZwsT2oD7YsX6tQkrrALJg/jNn3kH7hFpCN28h7b1VE94OPx5Z2w4
-         LLaQKRzAzEVcDn659n4yTFTEW0iLhzq9iaWMbG7GFY4AsACCQJLA6aLQfZzBYbcvotZw
-         pQow==
-X-Forwarded-Encrypted: i=1; AJvYcCXLomDY97PtOG3qIilA28H1Q4OjhBlyUSKDkvZwd7idmEhF+5u53o0YnXZ5MUOsna58bOxqGeYpRwRB/Tf1x12wf+5x2NWe
-X-Gm-Message-State: AOJu0YzAwnQ3QcYJUQfnHRMq+MfH2RT6wepc14ZcdLuutj3nvOOYSjFg
-	+/2Z/155xs/8CMXJ8zka+EEOzLHlWjywSFTJOHjOV/QZjCIlRWrZQeBDJDEYueb2LPEkVvlhFxf
-	+ecYUCUuo22R47RGQxAhfuKjpN5yKglc8t67/vxlFcAlNt1xMrmiMu9w=
-X-Google-Smtp-Source: AGHT+IHYd+OnzWf3WONlYUINKA2XYz4D597wPU1q1yxE0VsRcZoM2LIA3Gz9v5hY/DdXx/pnUZRWQH+QReSO0PWFGZ2UzuXHaJcN
+	s=arc-20240116; t=1723441316; c=relaxed/simple;
+	bh=Iacvar3iFBxePydCl7Gqh1UgF1fVeJOOc1Bb7GnvNFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gXKeNnCvHs/qhsOIp1tUQvOlDTUwhD+KcXp5azv6REEbezk0BT2xy5atRHrj/T+OUXz+Oc8X61C6sDYh5zL6P/2r8+8aIA4jXAzrnRMfbmEaX0pWoX/XIoKTZUtutHPoMpl5hieWrmHI2qTvCj6ySxq3jlXsupD/kdgdEW/dMco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yj2qClw6; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47C5fTrh033207;
+	Mon, 12 Aug 2024 00:41:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1723441289;
+	bh=fX2sT+fujKXhtcrZbhOSpfai/+GnliWHwU6DT8LKr/E=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=yj2qClw6EiDOrOvgyUDTHQJ1KbI7qcMay7ksiUN9l6Cqks9UV4jmxr1PNonGPvbCg
+	 VFNAxXjaOMJOqpSRg58uJ/csVDl9A7fDE/G4ykyZpPr2fR5UwlxB8D6ghNsW9E+hel
+	 hUy5taLf/zS+UxFZbbDQYV8Z3IwOTkXQUdCPUsO0=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47C5fT9F006353
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 12 Aug 2024 00:41:29 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 12
+ Aug 2024 00:41:28 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 12 Aug 2024 00:41:28 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47C5fLb8086750;
+	Mon, 12 Aug 2024 00:41:22 -0500
+Message-ID: <3397a020-195c-4ca3-a524-520171db794b@ti.com>
+Date: Mon, 12 Aug 2024 11:11:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:640d:b0:806:bf73:1167 with SMTP id
- ca18e2360f4ac-8225ee96f73mr27822739f.3.1723438382830; Sun, 11 Aug 2024
- 21:53:02 -0700 (PDT)
-Date: Sun, 11 Aug 2024 21:53:02 -0700
-In-Reply-To: <00000000000061c0a106183499ec@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000099eca4061f754420@google.com>
-Subject: Re: [syzbot] [wireguard?] WARNING in kthread_unpark (2)
-From: syzbot <syzbot+943d34fa3cf2191e3068@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, 
-	gregkh@linuxfoundation.org, hdanton@sina.com, jason@zx2c4.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	oneukum@suse.com, pabeni@redhat.com, stern@rowland.harvard.edu, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, tj@kernel.org, 
-	wireguard@lists.zx2c4.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/6] net: ti: icss-iep: Move icss_iep structure
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Javier Carrasco
+	<javier.carrasco.cruz@gmail.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Jacob
+ Keller <jacob.e.keller@intel.com>,
+        Simon Horman <horms@kernel.org>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20240808110800.1281716-1-danishanwar@ti.com>
+ <20240808110800.1281716-6-danishanwar@ti.com>
+ <6eb3c922-a8c6-4df4-a9ee-ba879e323385@stanley.mountain>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <6eb3c922-a8c6-4df4-a9ee-ba879e323385@stanley.mountain>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-syzbot has bisected this issue to:
+Hi Dan,
 
-commit b3e40fc85735b787ce65909619fcd173107113c2
-Author: Oliver Neukum <oneukum@suse.com>
-Date:   Thu May 2 11:51:40 2024 +0000
+On 10/08/24 1:40 am, Dan Carpenter wrote:
+> On Thu, Aug 08, 2024 at 04:37:59PM +0530, MD Danish Anwar wrote:
+>> -	struct ptp_clock *ptp_clock;
+>> -	struct mutex ptp_clk_mutex;	/* PHC access serializer */
+>> -	u32 def_inc;
+>> -	s16 slow_cmp_inc;
+> 
+> [ cut ]
+> 
+>> +	struct ptp_clock *ptp_clock;
+>> +	struct mutex ptp_clk_mutex;	/* PHC access serializer */
+>> +	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
+>         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> The patch adds this new struct member.  When you're moving code around, please
+> just move the code.  Don't fix checkpatch warnings or do any other cleanups.
+> 
 
-    USB: usb_parse_endpoint: ignore reserved bits
+My bad. I didn't notice this new struct member was introduced. I will
+take care of it.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11ca267d980000
-start commit:   dc1c8034e31b minmax: simplify min()/max()/clamp() implemen..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13ca267d980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ca267d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2258b49cd9b339fa
-dashboard link: https://syzkaller.appspot.com/bug?extid=943d34fa3cf2191e3068
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1022b573980000
+Also apart from doing the code movement, this patch also does the
+following change. Instead of hardcoding the value 4, the patch uses
+emac->iep->def_inc. Since the iep->def_inc is now accessible from
+drivers/net/ethernet/ti/icssg/icssg_prueth.c
 
-Reported-by: syzbot+943d34fa3cf2191e3068@syzkaller.appspotmail.com
-Fixes: b3e40fc85735 ("USB: usb_parse_endpoint: ignore reserved bits")
+@@ -384,7 +384,8 @@ static void prueth_iep_settime(void *clockops_data,
+u64 ns)
+ 	sc_desc.cyclecounter0_set = cyclecount & GENMASK(31, 0);
+ 	sc_desc.cyclecounter1_set = (cyclecount & GENMASK(63, 32)) >> 32;
+ 	sc_desc.iepcount_set = ns % cycletime;
+-	sc_desc.CMP0_current = cycletime - 4; //Count from 0 to (cycle time)-4
++	/* Count from 0 to (cycle time) - emac->iep->def_inc */
++	sc_desc.CMP0_current = cycletime - emac->iep->def_inc;
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+ 	memcpy_toio(sc_descp, &sc_desc, sizeof(sc_desc));
+
+
+Should I keep the above change as it is or should I split it into a
+separate patch and make this patch strictly for code movement. I kept
+the above change as part of this patch because it is related with the
+code movement. Moving the iep structure from icss_iep.c to icss_iep.h
+makes it accessible to icssg_prueth.c so I thought keeping them together
+will be a better idea.
+
+Please let me know if this is okay.
+
+>> +	u32 def_inc;
+>> +	s16 slow_cmp_inc;
+>> +	u32 slow_cmp_count;
+> 
+> regards,
+> dan carpenter
+
+-- 
+Thanks and Regards,
+Danish
 
