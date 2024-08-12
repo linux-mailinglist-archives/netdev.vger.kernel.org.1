@@ -1,161 +1,215 @@
-Return-Path: <netdev+bounces-117596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D65194E71E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:48:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1810494E724
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF0DD2830CE
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 06:48:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CAF2B239DA
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 06:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BA81514ED;
-	Mon, 12 Aug 2024 06:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7BE152790;
+	Mon, 12 Aug 2024 06:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yYQeI79b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bc2i8VZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D62E14F138
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 06:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE1014F9E1
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 06:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723445330; cv=none; b=onqrgoMpTWT+I1nwIXMRbfDYZM7aJT15gjuE6k1TKvTMfcxlHPXJ7gWhKif7QDrFtWDxxJuyOn6y6PLlCNgGAjgS9kxmcsssGIqpha5T4oeLB0xHY5A+NsU0M10Vm6bSCYuh0GRqr9ybhFHhREZ1lBTyX8e7MPWMxzlinVK7knk=
+	t=1723445420; cv=none; b=CbJa7fAggJqK0BhICqLzP5YXUcDU5ZV4Xde7rovNPCrcd4Uw3mIsXaRtNVFWb2+U7dhc0XsIopbilSZOkxTqj312q8zg6iUObYIpuqWJSjK6doScL0hlPlTwyEDjV6byO9g5bv45QBZJqXLnwkCVXw4MEsIXfvDMMv8plIusTQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723445330; c=relaxed/simple;
-	bh=dNX4pv0bFcGKYSiBvf6FyvfFPE83R0SaRt9P5rQTGKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XSM50WnVmHpMvlmp5qKHCeILcfw8Mso5kAzz/2PM2ged3YSPlMUGMYXR55aQmixlkXqbDtwg2PgvAraV3SrMt7b48NXt5lazM0RVQLRCC8UXjG6KecblcaWmlMn9a8K0VzrtZ7PcxGtS1wGeQF6gVOH+DNgC/LfD88BvK9cUQhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yYQeI79b; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7ab63a388bso130851966b.1
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 23:48:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723445327; x=1724050127; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPaDsB4mgKNtTycoeHnN1LPcfwBltjPwwAHmSUlQ7GM=;
-        b=yYQeI79bVfPRuAzv1WyuMFrQO9+1/NWbmxvXov5IBWe+yQjQPmCqJbbiSKtDPvaIUu
-         yHvP346oAW3kD7/DJSv+a353DKNaK9+he6tSwKDzdEFQYdMdQ5Q+atCmsNxKgLZ8Y15L
-         tlwFBs09VU+zeZEOLAh3eHMuL1ZcxKWHC0DUJy1YIkXBt3hFaWB3CCdbXWwprTcN9WEb
-         49GXAP1yJ7tbWTnO6F5pCug6I9e/9MZ/RwkF1RCoDnlylH5AXoISGF8oQURMzQs1vNk8
-         /jtyeWof7IqijqJ+l8SsyEG5iIdTUMXL0yt8+ilW+XHFBDcGmA2blYlIcnsrvXBz3gec
-         /Y6Q==
+	s=arc-20240116; t=1723445420; c=relaxed/simple;
+	bh=W0eY8Xq3o3fHaz8bN7dG7yytV8UUgXdPUr5ycR0qiCc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VpT3/WERheYpGEgza68WInHA97Mk1JYMxVxJZhDIz0orJQQGYw1FvJOzATjPfeHM6Chl+fNYYAIYI1pj0lu29dKXP+lgvcdqskTOK8tmwlIRlsRbWjMe4x3/73pwziGUudYbQjWC8lkI7TYRmzfzOmgjsmMJm0n88rORQcITljE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bc2i8VZT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723445417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gD7Wwk8kOu+4mm0l1d/x7a1qMGGKB1sRxp0z9/NXgwQ=;
+	b=bc2i8VZTzWTSNYzgJsdsARXrC3aXeMSqeq4rM6XM/44pUdzor5LOHRngETERrFvSXf4w/f
+	3Sm59XI3SHTs6oAXGsXoeAzly4IeABQPWTaCTVU3IQ8rSTtfEUe9BEb7hbaNkitZpNhgOb
+	5EXnXCOm2ifJlSjsH7lIO0wPrA5Ck48=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-hIaVft-FMYCU9ke5RIwgHg-1; Mon, 12 Aug 2024 02:50:09 -0400
+X-MC-Unique: hIaVft-FMYCU9ke5RIwgHg-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2cfe41af75eso5516200a91.2
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 23:50:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723445327; x=1724050127;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XPaDsB4mgKNtTycoeHnN1LPcfwBltjPwwAHmSUlQ7GM=;
-        b=Artnp9muAXpbX/EJp0XWlIBBcO5loGw3XeJ/196ujloH5jZ2IVeLxX2q/MNcM6EV3p
-         mYGwglH8fEzrQhu1He5q6GnmtR6jwcnE9hQ/Myd3LVD2BWgcxYYO7Zb+cFpsYZ0PPTO4
-         N/Bmag7VWSfhtpvMW77wcxEgDvDfC6SmKPuWnu2ZwMoWIdaHBKlXUz8Gb6UG13wlkqHd
-         wp3nV9evqhISkd37tuQXG3frmlc+wRH2zV03sJiyyFXaq3UzcQTNlORYDAmgrYixwnbY
-         rpAiqWW16bWaulQ9P3Hh+XzeGHe+5NSnYcYhQ3Wp6qmf69T4pIXPckSsiOJnVxqDJCCc
-         LK7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXRzGbn3Me2/AKjHMs6JYHH5SSwUhMV7SkFun0XsPlFz2jyhzTpmF/Db3Wo48vwbnhPtwLKkGd2cdpa8LjDAn6YQY8xZpp2
-X-Gm-Message-State: AOJu0Yw4c2yViV3GAnDT+UahnSvgzdHmRpyBZf7YfaAEp6RgxGbPQ9ew
-	V7KwNd0Q5WPyWjVzd1FKjIVsg9j4tlKGHx0qVXNHfuG8NNYUAzReCnjbYD/xjKw=
-X-Google-Smtp-Source: AGHT+IG/hs6hri9F4rxByDFsrSBLvCmLFxDpiqpwrHt7cc+98+r7zdjaPv6vGfE3xIllakw/1bm6BQ==
-X-Received: by 2002:a05:6402:2711:b0:5a1:a08a:e08 with SMTP id 4fb4d7f45d1cf-5bd0a53a598mr8325229a12.11.1723445327342;
-        Sun, 11 Aug 2024 23:48:47 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80bb11b5e6sm204485466b.95.2024.08.11.23.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 23:48:46 -0700 (PDT)
-Date: Mon, 12 Aug 2024 09:48:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next 5/6] net: ti: icss-iep: Move icss_iep structure
-Message-ID: <7a65afda-814b-4ff3-9f12-f07efc97b234@stanley.mountain>
-References: <20240808110800.1281716-1-danishanwar@ti.com>
- <20240808110800.1281716-6-danishanwar@ti.com>
- <6eb3c922-a8c6-4df4-a9ee-ba879e323385@stanley.mountain>
- <3397a020-195c-4ca3-a524-520171db794b@ti.com>
+        d=1e100.net; s=20230601; t=1723445408; x=1724050208;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gD7Wwk8kOu+4mm0l1d/x7a1qMGGKB1sRxp0z9/NXgwQ=;
+        b=nz5H5MUW++AvLagx48dhYcbbUdipIGrq/N9NLk2sxTvi/Q7wgo5oA4yH9Y5XbfZ5DV
+         Ie6B/zZbR2Bguuypf8xk+O8fn87GgeVFuKePa+kKd2cl3pDGSO1J93gmwXDPYoysnIT9
+         SU4B2AA+opgByWmJVqRNYbBw8qS4fbq+quXBhURPj1PqjEuFY0DTmQcmcMpa10j1SXPa
+         BrSiRKyeq2hYiBEL5PW5McxoV3qMl6ow4eKb3aJsVGEb4FPxfIH5eS5ERsjgAicnKcwZ
+         5kqyJjFDO+wWkRHr/iX+b3N0URoot/lGydtDlwhVfPl4t2AoqsZKwZUtUX7d2RdQVB3P
+         JZAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXxwRHAXffLXiLDKGmS8Coduu9+UDdv15iZJGU+1TzjYAf2T6x2eSQM8Qh6bMvOkU2KGbPRQ1WEU9QwuaXXNeEqb4tu8JzU
+X-Gm-Message-State: AOJu0YwxQR542NSenfavItZnvKkV+pkgEHWWR0fVCQCTEOPL11VS9ss1
+	6XfEP/rCr2SR634irkJnUR3bkfEJMJ+UtJTP8sq0bdShV47nqUHeoW4Rb2M2EiEycs6n7TVxh/a
+	9cozjdKO4+V2qKSBstlZXIWjK2EZRBm6whNic5IfrYJQ0d6N5s+gtRjoHJDZyPIKlBgcdQS4ecj
+	TpVI2DyxCsBRP++O7n6dJ/h63qXVdB
+X-Received: by 2002:a17:90b:207:b0:2c8:6308:ad78 with SMTP id 98e67ed59e1d1-2d1e80535d9mr10033992a91.34.1723445408336;
+        Sun, 11 Aug 2024 23:50:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLGdwLYNX0VkuJKSx7I3Z1IUqAOr4ykW1cwWLQquNN9Af/9UdiPhu4hOno89xx+1HV9TCUE70bE5DOF3ax+PY=
+X-Received: by 2002:a17:90b:207:b0:2c8:6308:ad78 with SMTP id
+ 98e67ed59e1d1-2d1e80535d9mr10033967a91.34.1723445407662; Sun, 11 Aug 2024
+ 23:50:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3397a020-195c-4ca3-a524-520171db794b@ti.com>
+References: <20240808082044.11356-1-jasowang@redhat.com> <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+ <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
+In-Reply-To: <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 12 Aug 2024 14:49:56 +0800
+Message-ID: <CACGkMEvAVM+KLpq7=+m8q1Wajs_FSSfftRGE+HN16OrFhqX=ow@mail.gmail.com>
+Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token correctly
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 12, 2024 at 11:11:21AM +0530, MD Danish Anwar wrote:
-> Hi Dan,
-> 
-> On 10/08/24 1:40 am, Dan Carpenter wrote:
-> > On Thu, Aug 08, 2024 at 04:37:59PM +0530, MD Danish Anwar wrote:
-> >> -	struct ptp_clock *ptp_clock;
-> >> -	struct mutex ptp_clk_mutex;	/* PHC access serializer */
-> >> -	u32 def_inc;
-> >> -	s16 slow_cmp_inc;
-> > 
-> > [ cut ]
-> > 
-> >> +	struct ptp_clock *ptp_clock;
-> >> +	struct mutex ptp_clk_mutex;	/* PHC access serializer */
-> >> +	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
-> >         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > 
-> > The patch adds this new struct member.  When you're moving code around, please
-> > just move the code.  Don't fix checkpatch warnings or do any other cleanups.
-> > 
-> 
-> My bad. I didn't notice this new struct member was introduced. I will
-> take care of it.
-> 
-> Also apart from doing the code movement, this patch also does the
-> following change. Instead of hardcoding the value 4, the patch uses
-> emac->iep->def_inc. Since the iep->def_inc is now accessible from
-> drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> 
-> @@ -384,7 +384,8 @@ static void prueth_iep_settime(void *clockops_data,
-> u64 ns)
->  	sc_desc.cyclecounter0_set = cyclecount & GENMASK(31, 0);
->  	sc_desc.cyclecounter1_set = (cyclecount & GENMASK(63, 32)) >> 32;
->  	sc_desc.iepcount_set = ns % cycletime;
-> -	sc_desc.CMP0_current = cycletime - 4; //Count from 0 to (cycle time)-4
-> +	/* Count from 0 to (cycle time) - emac->iep->def_inc */
-> +	sc_desc.CMP0_current = cycletime - emac->iep->def_inc;
-> 
->  	memcpy_toio(sc_descp, &sc_desc, sizeof(sc_desc));
-> 
-> 
-> Should I keep the above change as it is or should I split it into a
-> separate patch and make this patch strictly for code movement. I kept
-> the above change as part of this patch because it is related with the
-> code movement. Moving the iep structure from icss_iep.c to icss_iep.h
-> makes it accessible to icssg_prueth.c so I thought keeping them together
-> will be a better idea.
-> 
-> Please let me know if this is okay.
-> 
+On Mon, Aug 12, 2024 at 1:47=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Fri, Aug 9, 2024 at 2:04=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+> >
+> >
+> >
+> > On 08.08.24 10:20, Jason Wang wrote:
+> > > We used to call irq_bypass_unregister_producer() in
+> > > vhost_vdpa_setup_vq_irq() which is problematic as we don't know if th=
+e
+> > > token pointer is still valid or not.
+> > >
+> > > Actually, we use the eventfd_ctx as the token so the life cycle of th=
+e
+> > > token should be bound to the VHOST_SET_VRING_CALL instead of
+> > > vhost_vdpa_setup_vq_irq() which could be called by set_status().
+> > >
+> > > Fixing this by setting up  irq bypass producer's token when handling
+> > > VHOST_SET_VRING_CALL and un-registering the producer before calling
+> > > vhost_vring_ioctl() to prevent a possible use after free as eventfd
+> > > could have been released in vhost_vring_ioctl().
+> > >
+> > > Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_v=
+dpa")
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > ---
+> > > Note for Dragos: Please check whether this fixes your issue. I
+> > > slightly test it with vp_vdpa in L2.
+> > > ---
+> > >  drivers/vhost/vdpa.c | 12 +++++++++---
+> > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > index e31ec9ebc4ce..388226a48bcc 100644
+> > > --- a/drivers/vhost/vdpa.c
+> > > +++ b/drivers/vhost/vdpa.c
+> > > @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost=
+_vdpa *v, u16 qid)
+> > >       if (irq < 0)
+> > >               return;
+> > >
+> > > -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> > >       if (!vq->call_ctx.ctx)
+> > >               return;
+> > >
+> > > -     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
+> > >       vq->call_ctx.producer.irq =3D irq;
+> > >       ret =3D irq_bypass_register_producer(&vq->call_ctx.producer);
+> > >       if (unlikely(ret))
+> > > @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_=
+vdpa *v, unsigned int cmd,
+> > >                       vq->last_avail_idx =3D vq_state.split.avail_ind=
+ex;
+> > >               }
+> > >               break;
+> > > +     case VHOST_SET_VRING_CALL:
+> > > +             if (vq->call_ctx.ctx) {
+> > > +                     vhost_vdpa_unsetup_vq_irq(v, idx);
+> > > +                     vq->call_ctx.producer.token =3D NULL;
+> > > +             }
+> > > +             break;
+> > >       }
+> > >
+> > >       r =3D vhost_vring_ioctl(&v->vdev, cmd, argp);
+> > > @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost=
+_vdpa *v, unsigned int cmd,
+> > >                       cb.callback =3D vhost_vdpa_virtqueue_cb;
+> > >                       cb.private =3D vq;
+> > >                       cb.trigger =3D vq->call_ctx.ctx;
+> > > +                     vq->call_ctx.producer.token =3D vq->call_ctx.ct=
+x;
+> > > +                     vhost_vdpa_setup_vq_irq(v, idx);
+> > >               } else {
+> > >                       cb.callback =3D NULL;
+> > >                       cb.private =3D NULL;
+> > >                       cb.trigger =3D NULL;
+> > >               }
+> > >               ops->set_vq_cb(vdpa, idx, &cb);
+> > > -             vhost_vdpa_setup_vq_irq(v, idx);
+> > >               break;
+> > >
+> > >       case VHOST_SET_VRING_NUM:
+> > > @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode,=
+ struct file *filep)
+> > >       for (i =3D 0; i < nvqs; i++) {
+> > >               vqs[i] =3D &v->vqs[i];
+> > >               vqs[i]->handle_kick =3D handle_vq_kick;
+> > > +             vqs[i]->call_ctx.ctx =3D NULL;
+> > >       }
+> > >       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+> > >                      vhost_vdpa_process_iotlb_msg);
+> >
+> > No more crashes, but now getting a lot of:
+> >  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) regis=
+tration fails, ret =3D  -16
+> >
+> > ... seems like the irq_bypass_unregister_producer() that was removed
+> > might still be needed somewhere?
+>
+> Probably, but I didn't see this when testing vp_vdpa.
+>
+> When did you meet those warnings? Is it during the boot or migration?
 
-Huh, I saw that the comment had changed but I assumed that was because
-checkpatch had complained.  I didn't notice that the 4 changed to
-emac->iep->def_inc.  That's the kind of change that we do really want to notice.
+Btw, it would be helpful to check if mlx5_get_vq_irq() works
+correctly. I believe it should return an error if the virtqueue
+interrupt is not allocated. After a glance at the code, it seems not
+straightforward to me.
 
-Yep.  Please, could you split that out into a separate patch.
+Thanks
 
-regards,
-dan carpenter
+>
+> Thanks
+>
+> >
+> > Thanks,
+> > Dragos
+> >
+> >
 
 
