@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-117685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A7FA94ECFF
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C20494ED00
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 642AC1C21761
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:30:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EAEC1C21793
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1D317A593;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7594D17ADE5;
 	Mon, 12 Aug 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcjCkHiT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBQJV8AK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35E9EEBA;
-	Mon, 12 Aug 2024 12:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F3B17A5B5;
+	Mon, 12 Aug 2024 12:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723465827; cv=none; b=kr33TBA93vXnPPton0i85zEddzQZj63DEZGxeVVBdAr2FfKweJQssgiMr7Zy0EOm+O+7M8hCV7p7eozAM7h5+R1DhsgVVTzNvT3oAvBJtlxcvBHqApo/HFBMQcdP1fkI5ep/DGps3wnSZLsapeDcwMk1kB1wYBosom0E/jQ4bBY=
+	t=1723465828; cv=none; b=Vsp2Ar+9IBiVjAndNBgOVm76xJY9Qim4mCTnLd2S9+q12UJqRLxgpnV4+lFqejXskNCG4hTsTwG0aetfcaWCTpaYKrcQsun9vNweJYfNN5qN4LUgJ/GNMg7PotkYfqz5wQOrpIT1IbBsclH8SSd1+/OZh0YJEO5wij/kNiZip1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723465827; c=relaxed/simple;
-	bh=aZC77bUCThC7AT/7z+u7TDuWH+xpFQ7I4SjrJ8HZm6c=;
+	s=arc-20240116; t=1723465828; c=relaxed/simple;
+	bh=daslIMI9OAMAvqRfkYqd0A4uF/CVa60AExTLNpeFK9U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gY1HlO39gnEij3Dn72Fe03I/Awlijmv70xVOsihkW1ig70gku8u0Cklt//uEOETPK260CIAuL82BKY7v1f5jr2qLk7F+L0BzVKpPm9Rxc8tGDwt7+rHXt4CPkhBpY3Dbv/WVh82rFPaHk0LwgT7xQ4Hov6QpyNBJRcy2oEbQm+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcjCkHiT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 451BBC32782;
-	Mon, 12 Aug 2024 12:30:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ub7uX0geD8JwyP9Z/Tvu65YgOHkC1uGgwZAQBRxCz3FPsbHmKRctK+u8APlxTDKUWeIgyqMgILcY+TYSHBOkdkaY87jzUvgrRSj9tyLSRTu2+6Zi1uTx21BS1IENrVwmsp7hVDZkbeeZUjYadYsTAgXoUBsiKpiJqbwNyq/HON0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBQJV8AK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D7CC4AF0E;
+	Mon, 12 Aug 2024 12:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723465826;
-	bh=aZC77bUCThC7AT/7z+u7TDuWH+xpFQ7I4SjrJ8HZm6c=;
+	s=k20201202; t=1723465827;
+	bh=daslIMI9OAMAvqRfkYqd0A4uF/CVa60AExTLNpeFK9U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hcjCkHiTyge7efh9j5xmiZXD7TdwXRiZHZgdY4Wdja/2nN7GHUHANqiizJ+pVPuMx
-	 8TcxQa+gnBH5zc6IOdoJHQE+wEwzLHN+bNElUfyysFIcqR6MEiXt7BRkPZ41B0JxiH
-	 YkbztLcR414E20axvrYt6fyZoG0XXo4L9kvMwu/UslVa6AUTl/V8Y7C5x9TD0mP53Y
-	 S+xdT5/8DTxDdrq34AF93ZbnGDNkvhdfovHUN+FpeIOjQ1kPP3WecruKvbfj1oH8Tb
-	 cWIEI2DQeXRNqh+HTUWTs6QIUtkCGPWDl5Lyf+8NswPSUitYX8pJnn2P7HHhkFQZxH
-	 NlRdQEXiXl2jg==
+	b=cBQJV8AK+rCicBDSwVUri/rjC57zlg2FU2Hx8gttFSiZbrsEfD6tB+v46ULi98a3B
+	 Auq5FZWFhsp3F6szggHozl+fNZoELFMCQshx11bfFB/4Z6UW6zVolneZIUCqASx/ko
+	 BO6NJAwQH+KYkIYx5HaVAiSXuCaEQHJ3zCnaO1Fwl0MLOehK1YsxytUJLy2VEc1Cvd
+	 /oQxRpGpUlYeMbR4oIZQEgF6JHaqms6XbkwXP2eTrSbJmgp/Xux5Jnz2+xYtt1maJq
+	 D2FinY154EiDJjXsVkPjO4oQKB2x+208zpGPye8lOCKgOYxEUmi+Do6RXxe13cT0L5
+	 jnEUbQ+z6E06w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CF4382332D;
-	Mon, 12 Aug 2024 12:30:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC8CC382332D;
+	Mon, 12 Aug 2024 12:30:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: add missed property
- phys
+Subject: Re: [PATCH net] net: mana: Fix RX buf alloc_size alignment and atomic op
+ panic
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172346582526.1009420.14303851329355513128.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Aug 2024 12:30:25 +0000
-References: <20240809200654.3503346-1-Frank.Li@nxp.com>
-In-Reply-To: <20240809200654.3503346-1-Frank.Li@nxp.com>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- ioana.ciornei@nxp.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
+ <172346582650.1009420.18122025004130803028.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Aug 2024 12:30:26 +0000
+References: <1723237284-7262-1-git-send-email-haiyangz@microsoft.com>
+In-Reply-To: <1723237284-7262-1-git-send-email-haiyangz@microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, decui@microsoft.com,
+ stephen@networkplumber.org, kys@microsoft.com, paulros@microsoft.com,
+ olaf@aepfle.de, vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, ssengar@linux.microsoft.com,
+ linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  9 Aug 2024 16:06:53 -0400 you wrote:
-> Add missed property phys, which indicate how connect to serdes phy.
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/fsl-lx2160a-honeycomb.dtb: fsl-mc@80c000000: dpmacs:ethernet@7: Unevaluated properties are not allowed ('phys' was unexpected)
+On Fri,  9 Aug 2024 14:01:24 -0700 you wrote:
+> The MANA driver's RX buffer alloc_size is passed into napi_build_skb() to
+> create SKB. skb_shinfo(skb) is located at the end of skb, and its alignment
+> is affected by the alloc_size passed into napi_build_skb(). The size needs
+> to be aligned properly for better performance and atomic operations.
+> Otherwise, on ARM64 CPU, for certain MTU settings like 4000, atomic
+> operations may panic on the skb_shinfo(skb)->dataref due to alignment fault.
 > 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml | 4 ++++
->  1 file changed, 4 insertions(+)
+> [...]
 
 Here is the summary with links:
-  - [1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: add missed property phys
-    https://git.kernel.org/netdev/net/c/c25504a0ba36
+  - [net] net: mana: Fix RX buf alloc_size alignment and atomic op panic
+    https://git.kernel.org/netdev/net/c/32316f676b4e
 
 You are awesome, thank you!
 -- 
