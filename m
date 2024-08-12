@@ -1,84 +1,127 @@
-Return-Path: <netdev+bounces-117875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F293E94FA76
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:53:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D76DA94FA7F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:57:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EA711F2214A
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:53:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F58DB2152B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABC719AA58;
-	Mon, 12 Aug 2024 23:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E49519AA43;
+	Mon, 12 Aug 2024 23:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yu7jc8ms"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9841C18C92D
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 23:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DC91804F;
+	Mon, 12 Aug 2024 23:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723506790; cv=none; b=BltKFeW6OJeFSjhyUrb3hcof9QZMJVw52z810rDTcm6i7Zq6EMkMfEusuY5lnmnYiKDWoIp9V84kdlcFUcnzLIltb41d7adHbk+RYVqV3d/1cShgkjMmJUNBj6waCLbRjx8xTYE7GAhB/iW81kk83pGId57gq5Tfvtd+8E3Wy4A=
+	t=1723507032; cv=none; b=VXDGJ1080Bpq1HoMeJX0aDMLMvh2OEyrLEJPYi6G7+3onaI5edMxkDxIXu+Dl9umfkk9Pp3IeHdSEhpFJG/XteAxQhJ8yy77bl8jtnBuj0RMA3KfpbRO4HfGncf3wHnS1EYCavjkPG/4cw8lolTW6wPXlL3Wz7c8aZF6uyRGuQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723506790; c=relaxed/simple;
-	bh=BXKwlw0rdebqAvXH/cbeEYtpFnuMlwJOnYZJFWvQIiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/tl7+NoDQNf8a9faTFsKzHLDUhSJ8uCBxC50Tmt9sxPS4kOB5gu2i4guAJyjPeY0OPBcl4FSR8rpi2ZhjRbX+qFeRyyFlaE76dLgG7Tt7LDr/I3CNETcGOHTwG4BrC4ohL4LPZuhgD8EBZ3xIJvjYgX5mu8NnO1yN+HAMXdXvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sdeqR-0002a0-R2; Tue, 13 Aug 2024 01:52:59 +0200
-Date: Tue, 13 Aug 2024 01:52:59 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com,
-	kerneljasonxing@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] tcp: prevent concurrent execution of
- tcp_sk_exit_batch
-Message-ID: <20240812235259.GA6030@breakpoint.cc>
-References: <20240812222857.29837-1-fw@strlen.de>
- <20240812232842.92219-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1723507032; c=relaxed/simple;
+	bh=Jr9ZiAeKQT2m5eKlEJkFL1K/dVRLIXlbe8RR0cKjDv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XjNnPzye6aB/mJ1Dq+ppTkpeu4jB2DGvY7et1ZbsP2zXYk/8LibtFoCw9xWUf3OjOD6r40yGAB5JD4aWEyPjmwhqZwYBn/ya8+BsyILCKkbg8BV5nXp9pgoCKuxfG8OjrQBQ06JL3qhYuFnAcGOIKC3RbxCa5B7foEl7R9FYl8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yu7jc8ms; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2500C4AF0E;
+	Mon, 12 Aug 2024 23:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723507031;
+	bh=Jr9ZiAeKQT2m5eKlEJkFL1K/dVRLIXlbe8RR0cKjDv0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yu7jc8msljkFCiQiwDF8/zfbezYJqanad92vT7bLx1dIuUShflvBssxWFPxEF/6Tn
+	 Y6qZR26h6davxDADewPqVrDbdDczF8Qcfmj7XUmuNBVgamCljt10Aq6S9lIkNZrlTC
+	 DI1MmuAnHiAfpgm3qDz7e1Bxg9pWMNEsq3xGTfFREDalBFadkOa+tffRzqkA0tT8uP
+	 fY9gXJLt3AIpZK7oFuq6X15n6MRFUxghZeDdZK64myodmq9N2bG7na/OJa4W3FBwc+
+	 VjF7d55qI3ua0l1zhG9f4oRBuranyt4ci5N38sYz5rLuG4RyFeUjSKg0qqpUAjLWuY
+	 q9MRn2l+gjx0g==
+Date: Mon, 12 Aug 2024 16:57:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
+ Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Steffen
+ Klassert <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, David Wei <dw@davidwei.uk>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend
+ Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
+ memory provider
+Message-ID: <20240812165708.33234ed6@kernel.org>
+In-Reply-To: <a6747b29-ed79-49d4-9ffe-b62074db1e09@gmail.com>
+References: <20240805212536.2172174-1-almasrymina@google.com>
+	<20240805212536.2172174-8-almasrymina@google.com>
+	<20240806135924.5bb65ec7@kernel.org>
+	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+	<20240808192410.37a49724@kernel.org>
+	<CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
+	<fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com>
+	<20240809205236.77c959b0@kernel.org>
+	<CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
+	<48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
+	<20240812105732.5d2845e4@kernel.org>
+	<CAHS8izPb51gvEHGHeQwWTs4YmimLLamau1c4j=Z4KGM8ZJrx5g@mail.gmail.com>
+	<a6747b29-ed79-49d4-9ffe-b62074db1e09@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812232842.92219-1-kuniyu@amazon.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > ... because refcount_dec() of tw_refcount unexpectedly dropped to 0.
+On Mon, 12 Aug 2024 20:10:39 +0100 Pavel Begunkov wrote:
+> > 1. Drivers need to be able to say "I support unreadable netmem".
+> > Failure to report unreadable netmem support should cause the netlink
+> > API to fail when the user tries to bind dmabuf/io uring memory.
 > > 
-> > This doesn't seem like an actual bug (no tw sockets got lost and I don't
-> > see a use-after-free) but as erroneous trigger of debug check.
+> > 2. Drivers need to be able to say "I want a header pool (with readable
+> > netmem)" or "I want a data pool (potentially with unreadable netmem)".
+> > 
+> > Pavel is suggesting implementing both of these in 2 different flags.
+> > 
+> > Jakub is suggesting implementing both with 1 flag which says "I can
+> > support unreadable netmem for this pool" , and guarding against #1
+> > with a refcount check to detect if a dmabuf pool should have been
+> > created but wasn't.  
 > 
-> I guess the reason you don't move the check back to tcp_sk_exit() is
+> That would be iffy IIUC, but I think Jakub just explicitly said
+> that the refcount trick was just for debugging purposes and not
+> for gauging errors like "providers are not supported by the driver".
+> 
+> "Yup, the refcount (now: check of the page pool list) was meant
+> as a WARN_ONCE() to catch bad drivers."
 
-No, it would not work. .exit runs before .exit_batch, we'd splat.
-
-Before e9bd0cca09d1 ordering doesn't matter because
-refcount_dec_and_test is used consistently, so it was not relevant
-if the 0-transition occured from .exit or later via inet_twsk_kill.
-
-> to catch a potential issue explained in solution 4 in the link, right ?
-
-Yes, it would help to catch such issue wrt. twsk lifetime.
-Having the WARN ensures no twsk can escape .exit_batch completion.
-
-E.g. if twsk destructors in the future refer to some other
-object that has to be released before netns pointers become invalid
-or something like that.
-
-Does that make sense?  Otherwise I'm open to alternative approaches.
-Or we can wait until syzbot finds a reproducer, I don't think its
-a real/urgent bug.
+Sorry, insufficient caffeine level in the morning.
+We can't WARN_ONCE(), indeed.
 
