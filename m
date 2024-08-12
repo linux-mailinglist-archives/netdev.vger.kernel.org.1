@@ -1,98 +1,88 @@
-Return-Path: <netdev+bounces-117739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 996A594F0ED
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:57:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF4394F0EF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF25D1C21C61
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:57:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AE9E282063
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90452184527;
-	Mon, 12 Aug 2024 14:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B3C18455D;
+	Mon, 12 Aug 2024 14:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Tjk6O2X8"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="I5kQnO0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FF0184525
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 14:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974A118454A
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 14:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723474625; cv=none; b=tL2Dq5oV7G9uvqKDbilkf5SANGACV8A0rvGIUbhauYZ4pi5lrf9kHZCE/qU6qm9H0GUoDqUBvI+hZIy9SUEVDImD+tUxEnWm7o1nDyTdj7V2wS1Qy6ee+9EE8EhAVC7wIn3RWfQmfFXnHTGoUAMVXsAnIbEqUAWInchgd9vORwM=
+	t=1723474629; cv=none; b=YYAymTV0LovHKeAph2RiaZTJIuOorlxNFFfTm2jLLTf8M7dXEivwUROGHs4zzNExNMhg9p/ZUOGT9F5Aah8jLjBmkBl64mcQGHWLy7hJNI2SVLlfxVYO3Q1XrZN8KfeF/n/rSi3arz9ThHjQucr+97YEz+jQIuatk1mUDBFa6Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723474625; c=relaxed/simple;
-	bh=KJqL5zu9Q2uuyWVsb+d8hcfiEvb8G8r2FNAu5KmAn/8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hQIlf3sla7m3hsxWRCoMP4ODtItfMKlW+RCFMMkrxMsgzcBb853r0J4SBMgsMVAkDrvZaobrsWQT/jnU2SrAfZHEHBJwZCKSRhVlOT51pelQ69n5BAgKcE3dOuMQdovf56ezB3lukb3xU2SRT1oe2C+2i0f49Uy0RgqKgGx4IB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Tjk6O2X8; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1723474629; c=relaxed/simple;
+	bh=OtbThwHzrLrDJ6N9iYZP2xMzyRCuIQDSqBSKqkos4uU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=StGVDrqCk5/FkuRHOvf1tnhcNlydsROqLVhmLXBK6Wi2XJnyT/PVecVz3EPlYzUbCOSOfU9rFb1p/TY8Zmo6LGeEDlnE8dx9yjzUKr1wTYBi2lhRNOZjj5MPMMiFdDQNUH6FgoCigV562EPWaggcSkeMxFIk+nsCgJVRx0i/2Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=I5kQnO0q; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fd90c2fc68so29860065ad.1
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:57:03 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7a0b2924e52so2129039a12.2
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:57:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723474623; x=1724079423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1oQV2bJ7RyME6CPZaiU3hjsvPi2H4xpFqeFRdoKurPw=;
-        b=Tjk6O2X8FcRSxy07BfdCvvt2rTEHhLk8YhYNgw9GKLQaqdyz4+4Elg3y5ksPplf68k
-         HfSQquHMQ4ucX/qKlWp8oI1Fzidg6B8d20ZQK6zvCg3xuUsG9kogHhAWNyYlTP6W3jul
-         ELiYtravxXpRkH3UkyWNvTs9kGoL1v/hVlrJU=
+        d=fastly.com; s=google; t=1723474626; x=1724079426; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P2QGcPk3A8tZFSKtHIPQmg9Fxaym0vKQef3yjN2SS5E=;
+        b=I5kQnO0q9t1WdsqNw/jMjMOnGt+ttsRx1yfVW7JzuJo11gtOrC2c3cOIHotcaGff3g
+         b/8oTXvXWdn/lpaJPZlsOTU5x6vR0mUbyrjoxfFCCxgTt6ZZt1bSihBZ+htbwPLdFjzD
+         eX5GZ8m1i8dkaixV+gK998sudjnB58IFdP73w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723474623; x=1724079423;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1oQV2bJ7RyME6CPZaiU3hjsvPi2H4xpFqeFRdoKurPw=;
-        b=SQRyrYGIca1qQ5h2QSQUf5HJ3pZXI4OU45wavNFDxRZp9NTobPIBVizjsu7caKZq6M
-         2XXdgjsN6wW1cOg88xuHpMzg3/cTd2iugrPAqGlluFSq/CWFrcozE5LvPXM0iQEC8i23
-         SqAEP6m6M59iYCppGmXe48p32OqhHbiv/1pdFK6mhutpzBmuQ5SzJglBN+zCm2P7SdSd
-         N6DrDLoaClHTwMhRDu6b1QwkR5WBcEGKNMaAdPBCDNO3zhfn6qZzANEycnP5mtrz6w+J
-         7V2kQwKu9v3UAbJBtsPhh8vMJeMxe4DnK9q8euk6B1eUrKDTlQ9EwjlHlE0fgGfwq8CQ
-         mz2A==
-X-Gm-Message-State: AOJu0YxmdZz9eRvDmSeKB6Rnwzfkoanu6WEaJJjz/8jGlkEaaqlysqrT
-	I1wRXVABG8h0tG0cRtkd7Bdb84y0Z1EZ+1faq4dBWT5yGZTCFiV7TZ2iReKNJ2qoEydkN/u80bG
-	HJqw+sxuDNgtGIhsX6G1sChCZjE5diLkTT6Ef4kMI/3YagEMxYOSUaCTGijVpqE/WAiqcEFDYkN
-	7lXClu2sOBG4PVxQ4a+/Upw6wuH0qmVUwFPgxPfQ==
-X-Google-Smtp-Source: AGHT+IHVlPXrDe+TvrQA2bE5/cgeIJbEgDv2n8mDRrGm9y6zRLuQHx0uDj0ZT+JiDZ119RROBsPRCQ==
-X-Received: by 2002:a17:902:e5d0:b0:1fd:aac9:a712 with SMTP id d9443c01a7336-201ca153eecmr5873945ad.37.1723474622800;
-        Mon, 12 Aug 2024 07:57:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723474626; x=1724079426;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P2QGcPk3A8tZFSKtHIPQmg9Fxaym0vKQef3yjN2SS5E=;
+        b=AXOP7fSa3TanciCkw+buRWRBDnebQecFerrxnD4hmA+vdGStLO83mg6/sdda42MULn
+         dbaJ1AFYxpBP494muwyGbmnzyFRK+vZlY9hRhDy8Cr0zIstMy85dPrJVDEvuLtG6VxXB
+         mF04PFCPbNz0Xb4yMurlNmr4KvcMUgmDd1FOGLHoY5TQQP6+eFNYnkUKreWPsFB1vD0D
+         nd8cSc1A58jqmlrIrC/kN20e9F+/+a5guzMLQrOUJ4SWlZ257dmWuMhl2t7umyw4KnQV
+         K20mOe18n7BxXmImtv+/0Zg2Kb5F/Rpot6xFWDtm1SQ0YGUVmgY7yHVy8r0ihwYClSxW
+         I73w==
+X-Gm-Message-State: AOJu0YwnBlEoD6dZG3ptBKaTeqm2ABhdWzl3jNijbQqUFnqXN42vaSGK
+	gRM6Ix/Lk5+q3ZTVTcTqMJsq86kq6XBVt7clzB5RYJGG9Uej6szZ0uijJvpMJLtPlU+zZRwaVx6
+	aKonTY0LEKRmS4HcEVw7gZnsjXWvBolL4oFN+Cjibm+8A9OQaE5b4HgQG2INYhJZb5WtwLpIoiA
+	os3yCNtyE90m2BM/4cFQweEzZrvL5e6RFkMnwqRw==
+X-Google-Smtp-Source: AGHT+IH/Va6oFceymPtFVikZ4XT7EW9N4zXQhzcHxdCn7/yQShCgpfo1zip9Na9QsbzCb+pTwYHNwg==
+X-Received: by 2002:a17:902:ec91:b0:1fd:9c2d:2f1b with SMTP id d9443c01a7336-201ca1cb0d8mr5835315ad.52.1723474626441;
+        Mon, 12 Aug 2024 07:57:06 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb8fd835sm39006955ad.89.2024.08.12.07.57.01
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb8fd835sm39006955ad.89.2024.08.12.07.57.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 07:57:02 -0700 (PDT)
+        Mon, 12 Aug 2024 07:57:06 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: Joe Damato <jdamato@fastly.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
 	Jakub Kicinski <kuba@kernel.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Leon Romanovsky <leon@kernel.org>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver),
-	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
+	Jiri Pirko <jiri@resnulli.us>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-Subject: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
-Date: Mon, 12 Aug 2024 14:56:21 +0000
-Message-Id: <20240812145633.52911-1-jdamato@fastly.com>
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC net-next 1/6] netdevice: Add napi_affinity_no_change
+Date: Mon, 12 Aug 2024 14:56:22 +0000
+Message-Id: <20240812145633.52911-2-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240812145633.52911-1-jdamato@fastly.com>
+References: <20240812145633.52911-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,60 +91,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Greetings:
+Several drivers have their own, very similar, implementations of
+determining if IRQ affinity has changed. Create napi_affinity_no_change
+to centralize this logic in the core.
 
-Several drivers make a check in their napi poll functions to determine
-if the CPU affinity of the IRQ has changed. If it has, the napi poll
-function returns a value less than the budget to force polling mode to
-be disabled, so that it can be rescheduled on the correct CPU next time
-the softirq is raised.
+This will be used in following commits for various drivers to eliminate
+duplicated code.
 
-This code is repeated in at least 5 drivers that I found, but there
-might be more I missed (please let me know and I'll fix them). IMHO,
-it'd be nice to fix this in existing drivers and avoid future drivers
-repeating the same pattern.
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ include/linux/netdevice.h |  8 ++++++++
+ net/core/dev.c            | 14 ++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-FWIW, it's possible that patch 4, 5, and 6 could be separated into
-"fixes" for the type mismatches and then, separaately, new code, but
-that seemed like a lot of noise for the list and maybe unnecessary.
-
-If I should first send fixes for 4, 5, and 6 and then send this cleanup
-series after, let me know and I'll do that.
-
-Sending as an RFC because:
-  - I wanted to see if this cleanup was desirable overall, and
-  - If so, do I need to send fixes for 4-6 first?
-
-Thanks,
-Joe
-
-Joe Damato (6):
-  netdevice: Add napi_affinity_no_change
-  mlx5: Use napi_affinity_no_change
-  gve: Use napi_affinity_no_change
-  i40e: Use napi_affinity_no_change
-  iavf: Use napi_affinity_no_change
-  mlx4: Use napi_affinity_no_change
-
- drivers/net/ethernet/google/gve/gve_main.c        | 14 +-------------
- drivers/net/ethernet/intel/i40e/i40e.h            |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_main.c       |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.c       |  4 +---
- drivers/net/ethernet/intel/iavf/iavf.h            |  1 +
- drivers/net/ethernet/intel/iavf/iavf_main.c       |  4 +++-
- drivers/net/ethernet/intel/iavf/iavf_txrx.c       |  4 +---
- drivers/net/ethernet/mellanox/mlx4/en_cq.c        |  6 ++++--
- drivers/net/ethernet/mellanox/mlx4/en_rx.c        |  6 +-----
- drivers/net/ethernet/mellanox/mlx4/eq.c           |  2 +-
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h      |  1 +
- drivers/net/ethernet/mellanox/mlx5/core/en.h      |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c |  9 +--------
- include/linux/mlx4/device.h                       |  2 +-
- include/linux/netdevice.h                         |  8 ++++++++
- net/core/dev.c                                    | 14 ++++++++++++++
- 17 files changed, 42 insertions(+), 41 deletions(-)
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0ef3eaa23f4b..dc714a04b90a 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -464,6 +464,14 @@ enum rx_handler_result {
+ typedef enum rx_handler_result rx_handler_result_t;
+ typedef rx_handler_result_t rx_handler_func_t(struct sk_buff **pskb);
+ 
++/**
++ * napi_affinity_no_change - determine if CPU affinity changed
++ * @irq: the IRQ whose affinity may have changed
++ *
++ * Return true if the CPU affinity has NOT changed, false otherwise.
++ */
++bool napi_affinity_no_change(unsigned int irq);
++
+ void __napi_schedule(struct napi_struct *n);
+ void __napi_schedule_irqoff(struct napi_struct *n);
+ 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 751d9b70e6ad..9c56ad49490c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -89,6 +89,7 @@
+ #include <linux/errno.h>
+ #include <linux/interrupt.h>
+ #include <linux/if_ether.h>
++#include <linux/irq.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
+@@ -6210,6 +6211,19 @@ void __napi_schedule_irqoff(struct napi_struct *n)
+ }
+ EXPORT_SYMBOL(__napi_schedule_irqoff);
+ 
++bool napi_affinity_no_change(unsigned int irq)
++{
++	int cpu_curr = smp_processor_id();
++	const struct cpumask *aff_mask;
++
++	aff_mask = irq_get_effective_affinity_mask(irq);
++	if (unlikely(!aff_mask))
++		return true;
++
++	return cpumask_test_cpu(cpu_curr, aff_mask);
++}
++EXPORT_SYMBOL(napi_affinity_no_change);
++
+ bool napi_complete_done(struct napi_struct *n, int work_done)
+ {
+ 	unsigned long flags, val, new, timeout = 0;
 -- 
 2.25.1
 
