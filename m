@@ -1,143 +1,142 @@
-Return-Path: <netdev+bounces-117772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B69694F1FA
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:46:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D414494F21B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F3D11C2104C
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:46:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA5F1F22B8D
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62F418453F;
-	Mon, 12 Aug 2024 15:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6AC186E48;
+	Mon, 12 Aug 2024 15:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I634mkqA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+vP+3sR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EFE8121B;
-	Mon, 12 Aug 2024 15:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4381862BB;
+	Mon, 12 Aug 2024 15:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723477576; cv=none; b=I/rqBXFil67Sa7OhsgsdebJ7W2ORij3SYYhuXOD5bDpbb4SMTZzj1oz6WMvsNo2muNW/ClEH6Jpvz65Ogw6AbZSGUUVzoE9zfhp9ZOQyiH4jRIhu0+DAD7YVl6fsQwPPEF4lBrqXXfMFdYXE9aGKCK1pt7SNkeHxzO04v0S9qAw=
+	t=1723477819; cv=none; b=Ha/XoDXky1Hv6VQWohDvE/bKz/e2lUa4Qx3wTqh26KpngrpikOlse5nkUDpbU8x44q15HqcFphQJkCXTE57fFWLLErXzKciB67kF6t6E2lW+0oGWmX+1QZnG46buQYKc+vkDfx1Kq+Rph1wmnrOUNcUfkzB8qOD3Ok0IMBt826E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723477576; c=relaxed/simple;
-	bh=DwYE6Bmx7uhFD7kcz285rszG6J9msUkHy2Ihq5kfFB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SAxb3AsEv+vlMrkAxapn2ai/1BGAXwLuVXkRVY5obzmlw9w7SrTG0jI7W5xCSIpj5GzQkV42wwaVA4SShlUHuN8wk0oOS9XQpb74Ncxotl5d5XHteba1Pn2QQX7NH9HUjARaIMmP/EqQsvKKyRAKYHfvcCIU15qI6Cg79scPplo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I634mkqA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3636CC32782;
-	Mon, 12 Aug 2024 15:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723477576;
-	bh=DwYE6Bmx7uhFD7kcz285rszG6J9msUkHy2Ihq5kfFB4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I634mkqAbuwa0uiIMCJMDwieeIecfWaaTruG9/IhjuQeadcEWFyDmKOEopbqYVDXs
-	 Ph3X0NgZ1Qpr5oCNlCWH96Px8VkHeXF8NCDAHhPDrVFsUc3m++kAr35wX6h12QmABs
-	 rYijPaPntWcYvvZSdZ2YLy+8QNwNAosL29KKiBMULxUTHkvskuM+kz3D+gCXi73YtH
-	 yJQFAjxZOZteycYIlguXCDFOOcT6vYC3SUMU/xbiT8jXNVLpwxekFNEtKZrDfjU7h5
-	 eXszQDNZbwlop9hKrsXPiuis/5lkMwUblnEUrqOZ3PXYekXLukBzGJrbjznMSktm/B
-	 A5Ruul+AlSjJQ==
-Date: Mon, 12 Aug 2024 16:46:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: idryomov@gmail.com, xiubli@redhat.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH net v2] libceph: Make the arguments const as per the TODO
-Message-ID: <20240812154610.GC21855@kernel.org>
-References: <20240811205509.1089027-1-jain.abhinav177@gmail.com>
+	s=arc-20240116; t=1723477819; c=relaxed/simple;
+	bh=tPzxt4/H777G16ixqqD15EZUv69PJ912iUNnIRA/11s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nW4Sbq8JGFGORaHRoyD7E1ntxeBLZQsAgDZmgY7hf/fCZtsk2bcQgyvW4oyBeQF+GkiAwVRfP9T2mOieoBVzL+11brmNYYHGOiuKENt78scRmISD4OFXzk+2XVR4zL+EcM90cvQuIaRF3CN0rYZtUkurmex4LSBhu9+roD8XTGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+vP+3sR; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-396cc82f6d7so15172735ab.0;
+        Mon, 12 Aug 2024 08:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723477817; x=1724082617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uUbs+IDJtGINX8Ssllhw/FR35ZOMUwTrv0DIBDR8E18=;
+        b=O+vP+3sR2NVfOxkJYGsduLEzaD7h7nchzXkS7Nuogr5r9GjTju//mLj51b0A3aVlU1
+         PeUWTpsJoRipylvpZ+yjI0SF1XF39DDm8UgYW5YCXwKsww3617HJ+nQzab1kA8f9QQlh
+         op8FCbkgyesZ00SVjhb2RckQJPyp7GlgnRWuXZcM7+CZVABI+KrLd6vra+rn7xErB/Px
+         fEiVQ/nTuFsSD9jaRUN846BkF92fc2sNRaQ3RYkqIYG4CPMgZ0cUCsMTlPUR2teDMOSt
+         CN1mNz2GT5eMniTaQGH30iq0CxSmavifO/sFtrBXiNaliEKC/8WGgDPgFXNA9PWtDIbN
+         WFGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723477817; x=1724082617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uUbs+IDJtGINX8Ssllhw/FR35ZOMUwTrv0DIBDR8E18=;
+        b=LObyrjGgRWcgwuqAenfmy1gKcog0bacrtJpn/VSe0iiMsxEvjzWEbR2hQpiD5aY1QL
+         /DoNOG3XkDoXTHWz4mf5MBb/IpS2DVDlEDHWFyzvHrfu2UjfjW2RMpuyWLkqScR1sgTR
+         gQQu6OSIlJDDjl/of6rCpS52xAy3LZX5HtRF44zVk7K2EnR9IWn9SNK7Qma/jCOcF+hS
+         KcYnmVn9Q4TehKh74riTrd9XrfHMn9djkpU2vP4Fv/KHhMMUH7I2V41ldgDQj50f6mMY
+         o2E3ztfYEgTH/BgljCefrMaB3h62DjRj12s/Ic6a4gxDFOGLtkTVPyA4epcchjy034ro
+         TVfg==
+X-Forwarded-Encrypted: i=1; AJvYcCViVcYs1Qco54IcnL9l7xKMtTzsvGWhVDcRm2IQ+gWM16XRSemuDy5FPoOxuHrk6ww3hAQpagBClCdh7z6Zb+CntGV0fuVz1gz2p5CgiksvgDxASHAbPp3wW8+7tr+5aAB9oohu
+X-Gm-Message-State: AOJu0YzUI2P0hElQ+OfS/gGsE8dYF/HBfw+2tSpD2dwUFWI1omEI947M
+	SdgiqhCRjzBLOqrPr7GHCyQIG8OH2TWa1FnbZ7X+RlHN2C4M3iO+JUKHRYU903+RB12UXfsTTjg
+	PED/418Vm0cNTrjsWUFtf1hPIQG8=
+X-Google-Smtp-Source: AGHT+IEbHhOOHCDcOxlsI+o5NptePUQh/p/xxNKlbMH2+CUpecqtOvnc5voB4cbT3qclyBxjWK8e+jVZZMw1D0PO/NI=
+X-Received: by 2002:a05:6e02:1605:b0:39b:3a29:b860 with SMTP id
+ e9e14a558f8ab-39c48db507emr436365ab.4.1723477817128; Mon, 12 Aug 2024
+ 08:50:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240811205509.1089027-1-jain.abhinav177@gmail.com>
+References: <20240811230029.95258-1-kuniyu@amazon.com> <20240811230836.95914-1-kuniyu@amazon.com>
+ <20240812140104.GA21559@breakpoint.cc> <CAL+tcoCyq4Xra97sEhxGQBB8PVtKa5qGj0wW7wM=a9tu-fOumw@mail.gmail.com>
+ <20240812150338.GA25936@breakpoint.cc>
+In-Reply-To: <20240812150338.GA25936@breakpoint.cc>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 12 Aug 2024 23:49:40 +0800
+Message-ID: <CAL+tcoD+8A+eJ2M2mgTw0HSaNEa7YDvakO3Q_CFNn-eeUmVzHQ@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
+To: Florian Westphal <fw@strlen.de>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 12, 2024 at 02:25:09AM +0530, Abhinav Jain wrote:
-> net/ceph/crypto.c:
-> Modify arguments to const in ceph_crypto_key_decode().
-> Modify ceph_key_preparse() and ceph_crypto_key_unarmor()
-> in accordance with the changes.
-> 
-> net/ceph/crypto.h:
-> Add changes in the prototype of ceph_crypto_key_decode().
-> 
-> net/ceph/auth_x.c:
-> Modify the arguments to function ceph_crypto_key_decode()
-> being called in the function process_one_ticket().
+On Mon, Aug 12, 2024 at 11:03=E2=80=AFPM Florian Westphal <fw@strlen.de> wr=
+ote:
+>
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > > I don't see how this helps, we need to wait until 'stolen' twsk
+> > > has gone through inet_twsk_kill() and decremented tw_refcount.
+> > > Obviously It would be a bit simpler if we had a reliable reproducer :=
+-)
+> >
+> > Allow me to say something irrelevant to this bug report.
+> >
+> > Do you think that Kuniyuki's patch can solve the race between two
+> > 'killers' calling inet_twsk_deschedule_put()->inet_twsk_kill()
+> > concurrently at two cores, say, inet_twsk_purge() and tcp_abort()?
+>
+> I don't think its possible, tcp_abort() calls inet_twsk_deschedule_put,
+> which does:
+>
+>         if (timer_shutdown_sync(&tw->tw_timer))
+>                 inet_twsk_kill(tw);
+>
+> So I don't see how two concurrent callers, working on same tw address,
+> would both be able to shut down the timer.
+>
+> One will shut it down and calls inet_twsk_kill(), other will wait until
+> the callback has completed, but it doesn't call inet_twsk_kill().
 
-Hi,
+Oh, thanks. Since timer_shutdown_sync() can be used as a lock, there
+is indeed no way to call inet_twsk_kill() concurrently.
 
-I think that the subject and patch description need to be reworked.
-We can see easily enough from the code what is being done.
-But why?
+>
+> > It at least does help avoid decrementing tw_refcount twice in the
+> > above case if I understand correctly.
+>
+> I don't think the refcount is decremented twice.
+>
+> Problem is one thread is already at the 'final' decrement of
+>  WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount=
+));
+>
+> in tcp_sk_exit_batch(), while other thread has not yet called
+> refcount_dec() on it (inet_twsk_kill still executing).
+>
+> So we get two splats, refcount_dec_and_test() returns 1 not expected 0
+> and refcount_dec() coming right afterwards from other task observes the
+> transition to 0, while it should have dropped down to 1.
 
-> 
-> v1:
-> lore.kernel.org/all/20240811193645.1082042-1-jain.abhinav177@gmail.com
-> 
-> Changes since v1:
->  - Incorrect changes made in v1 fixed.
->  - Found the other files where the change needed to be made.
-> 
-> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+I see.
 
-Please take some time before posting the next revision of this patch.
-
-Please do run checkpatch.pl --strict --codespell
-and, within reason, correct the issues it flags.
-
-Please make sure that allmodconfig builds compile.
-At least on x86_64.
-
-...
-
-> diff --git a/net/ceph/crypto.c b/net/ceph/crypto.c
-
-...
-
-> @@ -123,7 +124,7 @@ int ceph_crypto_key_unarmor(struct ceph_crypto_key *key, const char *inkey)
->  	}
->  
->  	p = buf;
-> -	ret = ceph_crypto_key_decode(key, &p, p + blen);
-> +	ret = ceph_crypto_key_decode(key, &p, (const void *)((const char *)p + blen));
-
-It is usually not necessary to implicitly cast a pointer to (void *).
-Also, while it mat address a compiler warning, it's not claear to me how
-this is related to the const change that is the subject of this patch.
-
->  	kfree(buf);
->  	if (ret)
->  		return ret;
-
-...
-
-> @@ -311,9 +312,9 @@ static int ceph_key_preparse(struct key_preparsed_payload *prep)
->  	if (!ckey)
->  		goto err;
->  
-> -	/* TODO ceph_crypto_key_decode should really take const input */
-> -	p = (void *)prep->data;
-> -	ret = ceph_crypto_key_decode(ckey, &p, (char*)prep->data+datalen);
-> +	p = prep->data;
-> +	ret = ceph_crypto_key_decode(ckey, &p, \
-> +			(const void *)((const char *)prep->data + datalen));
-
-I don't think you need the cast to void * here either.
-
->  	if (ret < 0)
->  		goto err_ckey;
->  
-
-...
+Thanks,
+Jason
 
