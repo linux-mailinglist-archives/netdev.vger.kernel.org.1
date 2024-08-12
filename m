@@ -1,115 +1,90 @@
-Return-Path: <netdev+bounces-117770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C02D94F1DB
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:34:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 408B694F1E7
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCD6A281A0E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:34:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E010E1F21A3D
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4F6183CC1;
-	Mon, 12 Aug 2024 15:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5263183CD9;
+	Mon, 12 Aug 2024 15:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Zn2KlEgi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSUV/drT"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971AD13C914;
-	Mon, 12 Aug 2024 15:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF5C183CD4
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 15:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723476883; cv=none; b=gr9AMX9yTK59EyCw4OuL+H++WhjuM5QyHwEAE5Pr5qvwMOrteinJS/JnZJ5L3Om0/3i+ozfIiZt12Vgaj89/ypYQkeomSnAoZ6c4u2oB5SFJ60xLqS8OMDwq6VZSmZBLDhgtt8ZkkQhkriGAbzdeqfZHFdJcQOP/zbDsLVjPTnE=
+	t=1723477320; cv=none; b=g4JlQVB2BVaIPWGr0ST1o+UYaeem8xVySigMqu0YfjaNx12S529J7QpbXmbSKkyKcQT7em4Hg0NHg40tb2lqJiHtNX6rc3AmsjKMQfIfoCMDf5RIgJzwhk/wixa4EGhiH5DAeCAegCL6hJl7/Bvxi8mNL5ICzEw9a4FO+JSjpNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723476883; c=relaxed/simple;
-	bh=GdRefraexQNdWKxyYPz4UXpyl9StrQkwP48gyf3nT2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IEAUCTo0wqYl7Cn0xoCp5NBTmmggNqg1pwRDzWZu/cSNMjUQprvAe70VnZ1k0GaQdER6c9My/1q14UkDv5aOqmW/tr54l04+9L3Ow6re0583WOXimVWJpOyACMPhqQsjWFeqMqVJqRoEbEMFxVgyHVPrzTiohIy17A+ZsOrQyvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Zn2KlEgi; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gGHzFMjmZk1AAjU1QZUzq53YABEAbGGJ5Sn+eE0aAGU=; b=Zn2KlEgiXXkitrGKJ8TSUG+lvt
-	u/upJHso76UhUguoaO1TT3/UXYbAjTx/kEdjpvm9J4rMqMNsdBWUMHrtTRwpgjW5Xv0GVCMepdpVl
-	8KArTJaFysFVNiC+mrJZ/IfU6FFHDyBTjqsX2TkLw66rkhWH7zQVTo9XHRI+LkUvpGjw=;
-Received: from p54ae95e7.dip0.t-ipconnect.de ([84.174.149.231] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1sdX3l-00GTwy-1h;
-	Mon, 12 Aug 2024 17:34:13 +0200
-Message-ID: <b3f2ac81-93e5-4143-a3fe-a5ff1159aaec@nbd.name>
-Date: Mon, 12 Aug 2024 17:34:12 +0200
+	s=arc-20240116; t=1723477320; c=relaxed/simple;
+	bh=soxcSyPy20MVM8nbavBnK3ZZooeFuzD9+DZor+Z4jVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W5E01eHZP9+kiG0ObYF/N7kRUbt5h7F9mDzIzDysWeSlLlgEgFIdAPrHe0E5d0n2/Rdq6hLZmEAJZ77UzQ3qqnw427GI8IvCXyd5bGXSfngph1lU+h9eMQVDzmnhIOzawnVRaneLyYwB8NnPPCsgr7B2ohlP38U2bZG3wYFHmO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSUV/drT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C68C32782;
+	Mon, 12 Aug 2024 15:41:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723477320;
+	bh=soxcSyPy20MVM8nbavBnK3ZZooeFuzD9+DZor+Z4jVM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eSUV/drTkcACKJPetIkMZlC3vkXWsZXwOjNT0yU5DXKzmLpBwGOe7G3O87HlplULF
+	 01bF06GlSPIRm3Rsw8yxS4RkIOzrUt85y23W1qADQaMUmBkiO7YutYQ8gA2lLmDgM+
+	 RD3k87/tbsmKPpiREAVCVSbbr48hRXmM7bjzaIIkaeRlczeGRArm2jYSa+43lIac1H
+	 4uv8v8tm+1MqFfRtZTSWIIhRPEKjPFzYj71IMS7x0lN3D46WnRnbtJX0qdb4UFJ5C/
+	 +rVGdi8PGSb702EhYgKrfeMNO9wUEi5p/93keRxFUui1DK8upVwbfnC4fIM2FAEeT7
+	 2EGNIrmb90t+A==
+Date: Mon, 12 Aug 2024 08:41:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Kyle Swenson <kyle.swenson@est.tech>, "o.rempel@pengutronix.de"
+ <o.rempel@pengutronix.de>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "thomas.petazzoni@bootlin.com"
+ <thomas.petazzoni@bootlin.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] net: pse-pd: tps23881: Fix the device ID
+ check
+Message-ID: <20240812084159.79e5baf3@kernel.org>
+In-Reply-To: <20240810234556.4e3e9442@kmaincent-XPS-13-7390>
+References: <20240731154152.4020668-1-kyle.swenson@est.tech>
+	<20240810234556.4e3e9442@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix memory leak in LRO
- rings release
-To: Elad Yifee <eladwf@gmail.com>
-Cc: daniel@makrotopia.org, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Chen Lin <chen45464546@163.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240812152126.14598-1-eladwf@gmail.com>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <20240812152126.14598-1-eladwf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 12.08.24 17:21, Elad Yifee wrote:
-> For LRO we allocate more than one page, yet 'skb_free_frag' is used
-> to free the buffer, which only frees a single page.
-> Fix it by using 'free_pages' instead.
+On Sat, 10 Aug 2024 23:45:56 +0200 Kory Maincent wrote:
+> > The DEVID register contains two pieces of information: the device ID in
+> > the upper nibble, and the silicon revision number in the lower nibble.
+> > The driver should work fine with any silicon revision, so let's mask
+> > that out in the device ID check.
+> > 
+> > Fixes: 20e6d190ffe1 ("net: pse-pd: Add TI TPS23881 PSE controller driver")
+> > Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>  
 > 
-> Fixes: 2f2c0d2919a1 ("net: ethernet: mtk_eth_soc: fix misuse of mem alloc interface netdev[napi]_alloc_frag")
-> Signed-off-by: Elad Yifee <eladwf@gmail.com>
+> Hello Kyle,
+> 
+> In net subsystem when you send a fix you should use net prefix instead
+> of net-next. Jakub, does Kyle have to send a new patch or can you deal with
+> it?
+> 
+> Thanks for your fix!
+> 
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Are you sure about this change? From what I can see, the LRO buffer is 
-(or at least should be) allocated as a compound page. Because of that, 
-skb_free_frag should work on it. If it doesn't, wouldn't we run into the 
-same issue when the network stack frees received packets?
-
-- Felix
-
+Ah, I'm pretty sure I already applied this. kernel.org infra has been
+quite unreliable lately. Commit 89108cb5c285 ("net: pse-pd: tps23881:
+Fix the device ID check"), indeed in net.
 
