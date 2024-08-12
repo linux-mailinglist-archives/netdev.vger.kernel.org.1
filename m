@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-117688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A3294ED0E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:31:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D595594ED27
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93725282D29
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:31:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67E531F22213
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1DD17A594;
-	Mon, 12 Aug 2024 12:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBE617B428;
+	Mon, 12 Aug 2024 12:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RrgLxgN0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XechQ9Mo"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0DD178CE7
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 12:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7701369AE;
+	Mon, 12 Aug 2024 12:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723465889; cv=none; b=bGa7i9tPqtlpIBq+qqZHgtivjL6fv+YlMZcoHYDhh3pwkJAq3TLewsaY6J/CkhcFgLPpu/5rUt3j8L8miyvYydG+pqA54HVFGUvJDi8YaD32RJNf+Q1qHSyP8/eqZerh49+lqvbohbzYCIwUgKImagxoGHZBLw5mrhuQf2av7Ko=
+	t=1723466279; cv=none; b=hDfnZ1UsAPOPZWg4iBAC3qzGSVwZGGQEQr2CD6BngqTSchbgfQtRUUDWUj1q3W0qqwIqQYBJmuyNQFg0cy/EHbqUfNvWX+Fm8bBmINuSmucKw4HlR0uipCLTtLin+qolXa80r1zRQjlnngzNSnaSmbnphPegxpNFxg3PGWZfvDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723465889; c=relaxed/simple;
-	bh=8NTe93kqcwHHqti0IU2af3LlmwUehNMknLq/0ypmLYg=;
+	s=arc-20240116; t=1723466279; c=relaxed/simple;
+	bh=ll7rKCvIK5FinevpBDDYACR2NNSA00n20xpIFJ7Pggs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BVL5peAbGjby+pKvTNrfr1aiD2PbJ+S09yik+rmFl4xz5RjhShG+I+pGxJSMXpkOUzwAAzX8Rttw+pScxdYymtkF70+3jkn9cmlCW990Qj6c/NEeEQX2SzXfxiiI+jDzdIZASvHxl0Mx2In6sIAca+zORk9bUpk5saeM1hzWJM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RrgLxgN0; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=MuJhw7TxGzND5XqCeKuQgDDah1BOdHdOGOTqOLDH9JcY/15COm6ouXAgJ/PbkvDIfbOmrkbkvr8ztQBHLrmtm+PWZ5sgziR7ynRKYbrS3T3E0Mp+sdSDnlk3IqSTM7wNYhkrJq67ZrvlchqsqzefiHlxCN0fOjHTJ6LgZp55uqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XechQ9Mo; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,34 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eIm67ftMucS8bkO6GSK0z/e/jMB6EDZfHBlQej9UMoU=; b=RrgLxgN0B2vw/dAp6ftH8raxyv
-	d4b6Du20tdK4Lm/a/S+8zGm/enhJuL7IwgiylPrf4A417AId4E0hd6QS/PZttKL9NTFSFusUekYWV
-	Lzo9g7WgOT+1oQWyoKyFwHW2Wl7n9EnFgjFOmdcBlWfTlSfiJK7bn3VayAFvmGNoGKww=;
+	bh=MlyCx97Vj5xKVHsPK8EMQ/utmeFGM8vhocj6gX7aGmg=; b=XechQ9MoG36ki92DOiEHmm2J6i
+	PXYlL/7crx2dgDAhR7MMIRwEvvCq2+QzUH0rXL19L9UiUzFc/iaVipyStlVVwhicpgJTZAw5h5mUa
+	JB+1vvoiQ33V78qQkQwz5M8suny87XZZlVcKrj5ogzenWSsaqOr+K9tcnfz+fa9gcC1Q=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sdUCq-004Zhj-7K; Mon, 12 Aug 2024 14:31:24 +0200
-Date: Mon, 12 Aug 2024 14:31:24 +0200
+	id 1sdUIq-004Zkw-4k; Mon, 12 Aug 2024 14:37:36 +0200
+Date: Mon, 12 Aug 2024 14:37:36 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	kuba@kernel.org, Tristram.Ha@microchip.com,
-	Arun.Ramadoss@microchip.com, horms@kernel.org
-Subject: Re: [PATCH v3 net-next] net: dsa: microchip: ksz9477: split
- half-duplex monitoring function
-Message-ID: <036a0488-678f-4a66-be57-c2dffb0ab1bd@lunn.ch>
-References: <20240812080212.26558-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 1/3] ipv6: Add
+ ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+Message-ID: <827bbb8a-2d5b-44a4-81a2-258c7713ef59@lunn.ch>
+References: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
+ <20240812-ipv6_addr-helpers-v1-1-aab5d1f35c40@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,21 +72,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240812080212.26558-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+In-Reply-To: <20240812-ipv6_addr-helpers-v1-1-aab5d1f35c40@kernel.org>
 
-On Mon, Aug 12, 2024 at 08:02:13AM +0000, Enguerrand de Ribaucourt wrote:
-> In order to respect the 80 columns limit, split the half-duplex
-> monitoring function in two.
-> 
-> This is just a styling change, no functional change.
-> 
-> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+On Mon, Aug 12, 2024 at 01:11:55PM +0100, Simon Horman wrote:
+> Add helper to convert an ipv6 addr, expressed as an array
+> of words, from cpy to big-endian byte order.
 
-I think davem merged v2 just before i commented.
+Hi Simon
 
-It would be nice if you sent a followup patch which unwraps the URL.
+Is cpy supposed to be cpu?
 
-	Andrew
+Otherwise, please add: Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
