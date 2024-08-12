@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-117654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0144D94EB0F
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:31:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B391E94EB14
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B511C21050
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:31:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7645A2827F4
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD6516F910;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67FA3170A1C;
 	Mon, 12 Aug 2024 10:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="XFqyWpx/"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RS5o+YYH"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5AA170A0B;
-	Mon, 12 Aug 2024 10:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9136A16F0FE;
+	Mon, 12 Aug 2024 10:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723458567; cv=none; b=TcSaDrAoxOsD2g8BXLI4b6NogPqsAoux3XgiFfAnpddBP+772BjodIdhuZLBy6AmF78wz11e4FieK3qVj+dfI2KHgG55tUBaUEu4r/Y8Vgikjj5DdkTBFXMTK/xW218lw0tLFls/tVdxPJJl7DophPEeGu+Vk4ZjXltAplqsvRs=
+	t=1723458567; cv=none; b=Bq6pyKYzBfysL1kh4lFiyi3VUUMORlrtD0GPoVH/QlhXpPgLOXaGILPP8LnVd5IyxWjBIy3GM4AXbFbL/yWWTEWHv6PpHNXJOLr6UPnR0Sy04MOKIMSypJ5saG3j8nZlNEJJzCOOaHZnXLaxwJ5UkGGjrBS1wxy+a9k2m83KhvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723458567; c=relaxed/simple;
-	bh=BxdorhblgPWbU6BHCTW3OKJNmsiqeQW8jQzd2lkD8Wc=;
+	bh=fHNrU+a7gojkjruhSaEoSvNti4RUM1ny2YgI/4nxe68=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rblh2IX7oPlmslBr5lFw9A1pzZq8qwsa1kth3C6TdRTBiXw6lxIhVaCAg/i1gA44KUBwxKmTqmnv5hFVIREQEWipShYVRBm+GHbyBzA7/GbFpOICjWPXpk0PBLzF9eg9o9gzhaS2R5dTTXCDeFcwRUsotpNTNYMrbGHbBZiepro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=XFqyWpx/; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=d+w2dymh1Rp6bYa9yNMlSlSMKuuNu0i5yqyHC9DPWxt+3rYpJbCLsNYyyIgKAkwgxQ0cVNTEbo6IwIJB2TZu0ZD3szHcPtkCFuT/DP1jCJXiR0HM++HojqEMMCZGuWl3vglQ6G3inUqZQ27voWAlji98FFLpu4FtJYFyveb2gUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RS5o+YYH; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1723458565; x=1754994565;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BxdorhblgPWbU6BHCTW3OKJNmsiqeQW8jQzd2lkD8Wc=;
-  b=XFqyWpx/VRVtLLjy0WvqlmgIzzVMlkg+R+toE/V3TABpEBZ1q9IouX4c
-   aCvPQHj5v59r7mtftmya/Fu7H3bdK/XGTLueh95DZLnh0N1sSnEnoWdU7
-   +5cRffMfBH7uoyu2Nr3GMF3/pXUiHk12YWgeEEAK4OYMs5hFUtBsJr46k
-   /+c8umCfRga9l4I4MZQ0Jn7BGY+jFiJ9J9MV85TfzEue8PtNOXVoXl/+b
-   F+T1r5qH04pbGpzfr1ZRSeWNWrqh9q2ki1qEoAHJBArAcZmmjtw3f2ZCd
-   6/u4C6VpFXSHXyPDQDiNlZ8j90OdSpa9ctzSPNHHbUzKofrP0d1QYHbZk
-   w==;
+  bh=fHNrU+a7gojkjruhSaEoSvNti4RUM1ny2YgI/4nxe68=;
+  b=RS5o+YYHoawRqYFIz/vxih4z7xQpg3Q38hRNNdpTLwLBbA8p+xtacM/m
+   HDtGdcuTDQE7+szgPf7RzNIk0p8oTG8hmVX6lvh3f+2KBK+tTFj2AP4Al
+   cCkp1BkdJbX5W8jEWOg3K0OsMeHwkWwUSrEwcNF/3XnOYVMuejDprmhd6
+   hcsFXUGFMVszPfALedKwBenCv7DGoifUKbSySR/6wiMBHRC6ewCsNhq60
+   sYB2Q3z4sDvOrXqwiu52MTi3gtR+Juf4WD6fDThFmC0Qi5T9s42/og8tH
+   feiZTxlxkrZHD20N2Ys6MSyGhj96M3do6DuxLNZ8GHL06NX8lH6+Ufcun
+   Q==;
 X-CSE-ConnectionGUID: OEhsVMApSRmU8ygydq7igg==
-X-CSE-MsgGUID: KuZs0nuuRwWKC3UEmpL43w==
+X-CSE-MsgGUID: 7rgUsN7pSxKX0a7gGctFQw==
 X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="30336596"
+   d="scan'208";a="30336599"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 03:29:22 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 03:29:23 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 12 Aug 2024 03:28:52 -0700
+ 15.1.2507.35; Mon, 12 Aug 2024 03:29:03 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 03:28:42 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 03:28:52 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -76,9 +76,9 @@ CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v6 11/14] net: ethernet: oa_tc6: implement mac-phy interrupt
-Date: Mon, 12 Aug 2024 15:56:08 +0530
-Message-ID: <20240812102611.489550-12-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v6 12/14] net: ethernet: oa_tc6: add helper function to enable zero align rx frame
+Date: Mon, 12 Aug 2024 15:56:09 +0530
+Message-ID: <20240812102611.489550-13-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812102611.489550-1-Parthiban.Veerasooran@microchip.com>
 References: <20240812102611.489550-1-Parthiban.Veerasooran@microchip.com>
@@ -91,124 +91,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-The MAC-PHY interrupt is asserted when the following conditions are met.
-
-Receive chunks available - This interrupt is asserted when the previous
-data footer had no receive data chunks available and once the receive
-data chunks become available for reading. On reception of the first data
-header this interrupt will be deasserted.
-
-Transmit chunk credits available - This interrupt is asserted when the
-previous data footer indicated no transmit credits available and once the
-transmit credits become available for transmitting transmit data chunks.
-On reception of the first data header this interrupt will be deasserted.
-
-Extended status event - This interrupt is asserted when the previous data
-footer indicated no extended status and once the extended event become
-available. In this case the host should read status #0 register to know
-the corresponding error/event. On reception of the first data header this
-interrupt will be deasserted.
+Zero align receive frame feature can be enabled to align all receive
+ethernet frames data to start at the beginning of any receive data chunk
+payload with a start word offset (SWO) of zero. Receive frames may begin
+anywhere within the receive data chunk payload when this feature is not
+enabled.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/ethernet/oa_tc6.c | 53 +++++++++++++++++++++++++++++++++--
- 1 file changed, 51 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/oa_tc6.c | 24 ++++++++++++++++++++++++
+ include/linux/oa_tc6.h        |  1 +
+ 2 files changed, 25 insertions(+)
 
 diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index fa1f9e74ceb8..b55a3347f58f 100644
+index b55a3347f58f..fbf9d9ad4175 100644
 --- a/drivers/net/ethernet/oa_tc6.c
 +++ b/drivers/net/ethernet/oa_tc6.c
-@@ -127,6 +127,7 @@ struct oa_tc6 {
- 	u16 tx_credits;
- 	u8 rx_chunks_available;
- 	bool rx_buf_overflow;
-+	bool int_flag;
- };
+@@ -23,6 +23,7 @@
+ /* Configuration Register #0 */
+ #define OA_TC6_REG_CONFIG0			0x0004
+ #define CONFIG0_SYNC				BIT(15)
++#define CONFIG0_ZARFE_ENABLE			BIT(12)
  
- enum oa_tc6_header_type {
-@@ -1064,6 +1065,14 @@ static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
- 
- 		spi_len = oa_tc6_prepare_spi_tx_buf_for_rx_chunks(tc6, spi_len);
- 
-+		if (tc6->int_flag) {
-+			tc6->int_flag = false;
-+			if (spi_len == 0) {
-+				oa_tc6_add_empty_chunks_to_spi_buf(tc6, 1);
-+				spi_len = OA_TC6_CHUNK_SIZE;
-+			}
-+		}
-+
- 		if (spi_len == 0)
- 			break;
- 
-@@ -1099,8 +1108,10 @@ static int oa_tc6_spi_thread_handler(void *data)
- 	int ret;
- 
- 	while (likely(!kthread_should_stop())) {
--		/* This kthread will be waken up if there is a tx skb */
--		wait_event_interruptible(tc6->spi_wq,
-+		/* This kthread will be waken up if there is a tx skb or mac-phy
-+		 * interrupt to perform spi transfer with tx chunks.
-+		 */
-+		wait_event_interruptible(tc6->spi_wq, tc6->int_flag ||
- 					 !skb_queue_empty(&tc6->tx_skb_q) ||
- 					 kthread_should_stop());
- 
-@@ -1135,6 +1146,24 @@ static int oa_tc6_update_buffer_status_from_register(struct oa_tc6 *tc6)
- 	return 0;
+ /* Status Register #0 */
+ #define OA_TC6_REG_STATUS0			0x0008
+@@ -1164,6 +1165,29 @@ static irqreturn_t oa_tc6_macphy_isr(int irq, void *data)
+ 	return IRQ_HANDLED;
  }
  
-+static irqreturn_t oa_tc6_macphy_isr(int irq, void *data)
++/**
++ * oa_tc6_zero_align_receive_frame_enable - function to enable zero align
++ * receive frame feature.
++ * @tc6: oa_tc6 struct.
++ *
++ * Return: 0 on success otherwise failed.
++ */
++int oa_tc6_zero_align_receive_frame_enable(struct oa_tc6 *tc6)
 +{
-+	struct oa_tc6 *tc6 = data;
++	u32 regval;
++	int ret;
 +
-+	/* MAC-PHY interrupt can occur for the following reasons.
-+	 * - availability of tx credits if it was 0 before and not reported in
-+	 *   the previous rx footer.
-+	 * - availability of rx chunks if it was 0 before and not reported in
-+	 *   the previous rx footer.
-+	 * - extended status event not reported in the previous rx footer.
-+	 */
-+	tc6->int_flag = true;
-+	/* Wake spi kthread to perform spi transfer */
-+	wake_up_interruptible(&tc6->spi_wq);
++	ret = oa_tc6_read_register(tc6, OA_TC6_REG_CONFIG0, &regval);
++	if (ret)
++		return ret;
 +
-+	return IRQ_HANDLED;
++	/* Set Zero-Align Receive Frame Enable */
++	regval |= CONFIG0_ZARFE_ENABLE;
++
++	return oa_tc6_write_register(tc6, OA_TC6_REG_CONFIG0, regval);
 +}
++EXPORT_SYMBOL_GPL(oa_tc6_zero_align_receive_frame_enable);
 +
  /**
   * oa_tc6_start_xmit - function for sending the tx skb which consists ethernet
   * frame.
-@@ -1263,8 +1292,28 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
- 
- 	sched_set_fifo(tc6->spi_thread);
- 
-+	ret = devm_request_irq(&tc6->spi->dev, tc6->spi->irq, oa_tc6_macphy_isr,
-+			       IRQF_TRIGGER_FALLING, dev_name(&tc6->spi->dev),
-+			       tc6);
-+	if (ret) {
-+		dev_err(&tc6->spi->dev, "Failed to request macphy isr %d\n",
-+			ret);
-+		goto kthread_stop;
-+	}
-+
-+	/* oa_tc6_sw_reset_macphy() function resets and clears the MAC-PHY reset
-+	 * complete status. IRQ is also asserted on reset completion and it is
-+	 * remain asserted until MAC-PHY receives a data chunk. So performing an
-+	 * empty data chunk transmission will deassert the IRQ. Refer section
-+	 * 7.7 and 9.2.8.8 in the OPEN Alliance specification for more details.
-+	 */
-+	tc6->int_flag = true;
-+	wake_up_interruptible(&tc6->spi_wq);
-+
- 	return tc6;
- 
-+kthread_stop:
-+	kthread_stop(tc6->spi_thread);
- phy_exit:
- 	oa_tc6_phy_exit(tc6);
- 	return NULL;
+diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
+index 5c7811ac9cbe..15f58e3c56c7 100644
+--- a/include/linux/oa_tc6.h
++++ b/include/linux/oa_tc6.h
+@@ -21,3 +21,4 @@ int oa_tc6_read_register(struct oa_tc6 *tc6, u32 address, u32 *value);
+ int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
+ 			  u8 length);
+ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb);
++int oa_tc6_zero_align_receive_frame_enable(struct oa_tc6 *tc6);
 -- 
 2.34.1
 
