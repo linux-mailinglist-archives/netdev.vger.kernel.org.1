@@ -1,151 +1,164 @@
-Return-Path: <netdev+bounces-117802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79DE594F60F
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:49:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0120494F62C
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3127D28214B
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:49:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E930B22459
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FBC1891AB;
-	Mon, 12 Aug 2024 17:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552951898E6;
+	Mon, 12 Aug 2024 17:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="iiF5iGRm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9pSXQbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C14F18732C
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 17:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE913A3F2;
+	Mon, 12 Aug 2024 17:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723484964; cv=none; b=PclO2A+/MqiMlEPI7HuVpfWkNT9OsU2U1ylHyFcPvP3sMPxbjVPkudOtX7N9tdDmP4MDyYAEf1qrbYIFQpQ78mRbBowSXeK1HTH3Fyl1vOocb8f50iYN/UZnoro5jz/pKOQGKQBkfEs99WSIQA9fGNDxAkZGGF1yycQnPAuYKZk=
+	t=1723485456; cv=none; b=LBhpTtMbWfM2vQeCTBAWP9/lwHB2GxkSFngMO70cJnRmmTabkwCR6B5jG/6dFSJ3nlZU5L8FnNuMBEU9cDYZBROWjxf9tIsc+QHmQ5+Ucwj9vaqKBevzTPyZ+3hjzLt079lfERf2fTJEkWkD8e9Q1YHd1ACXr5eYdnitT6HBKoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723484964; c=relaxed/simple;
-	bh=xJQAO73DqYcpcrpzJhRms2PChIKKquV3jxP/QxepmOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=itXAhrvTqJbepxEuhGHmh92Ruq9GR4Bx4NYRRU3P5OZof7K2mODBoYzgLtrnHDVtuw3KICq6VK1MHE5pGWDrZKm9rYMDY3Z90x0Ti20W8c9PLvZTGoRuElfmt+/gaGB2/qg5n1uTO2cTv94mXhL2cIHOpytVd5/nNu5/4+C8CIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=iiF5iGRm; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2eeb1ba0468so58509161fa.0
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 10:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723484960; x=1724089760; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HsI/85POvh5vnBnJl/Ml+X2MbaaQJCBmp/2HiWmFvVc=;
-        b=iiF5iGRm+xjNYB05LFMinOGVbkuG+f8p1MAbrYrAO5KaiE3ByaO/JtckqgjOSftpvj
-         Yzxguj2w7raY32efEEJRCkYOiATpK8DqQs75CPbxVfjdVN5Vi0kl0MfSXrkyYusEjbwT
-         nRJ6wlyQzu7lRlCGjrcGTR24vE+iIBzvHwwyY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723484960; x=1724089760;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HsI/85POvh5vnBnJl/Ml+X2MbaaQJCBmp/2HiWmFvVc=;
-        b=i4J2Ml7ATPLZm8WiOOGdE5dz0qs9HltHtdC6aSHKhmqwmewy44o12stOHzhADmGBNG
-         Ggc5Nt/xC5MAuOmfi/gRXiub93kVe3UFRHDB2C1zwBeAMHBZbr2tnyNjQO2nSBO5cDjW
-         g3jOV90Co8vkCpSvI223aLq8RRx16QeNud34vFeA6W2Y6HczgPFHAaB6w1+IaS4HYQLn
-         64mTRL/aoG3egTTPkdyQWc9rj0J0gOHaqt8DkrOJ6gVHxDaDoMFg9cznCOHQAz1GnV0S
-         t2GbpPxznHL1+fkXJLEHgayatrs5J5/cpeyWndBuSqFBy4GUlC52caS/jxTbP2kS9R5C
-         A1ow==
-X-Forwarded-Encrypted: i=1; AJvYcCVQNccRLg7Wv/2hjWPPSBRtEWS4npX7pjaiZRha6mYY71kIwKbNr1+Ab+DzMLqXWsAsAShMKj2cZ6Mp/j6z6aDfrjiIoUo7
-X-Gm-Message-State: AOJu0Yxf27/oV5zp6AiLO4bAo1eOIConP1g4wW3kxZX+wLOfyhzfwgY9
-	XR7l9cugHYjy8YXMFDKQuxBTB95h3+3AfIAGeYZ+j3+K6iMNQxruu/Kw/0fDaec=
-X-Google-Smtp-Source: AGHT+IHgUZXFjwqJh/Us+96cJZXvkGbwq6boy3DczVlFRyIDhGV6ztmvUfcpiRsijYp2iY9FkY3/Xw==
-X-Received: by 2002:a05:651c:2227:b0:2ee:7a3e:4721 with SMTP id 38308e7fff4ca-2f2b717968fmr7861821fa.39.1723484960099;
-        Mon, 12 Aug 2024 10:49:20 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4f0a7111sm8167034f8f.117.2024.08.12.10.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 10:49:19 -0700 (PDT)
-Date: Mon, 12 Aug 2024 18:49:18 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 4/5] eventpoll: Trigger napi_busy_loop, if
- prefer_busy_poll is set
-Message-ID: <ZrpLHogt9IyzNxXk@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <20240812125717.413108-5-jdamato@fastly.com>
- <ZroL54bAzdR-Vr4d@infradead.org>
- <Zro1onXfGkKoIRbY@casper.infradead.org>
+	s=arc-20240116; t=1723485456; c=relaxed/simple;
+	bh=PjEd0BdogsUTaZfCUMRZ31Ra4P2TNDube5tSGJ9f9sw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MloUkPoBGISIjK0uzF5sGypuqpOgnLmJKvGEYPxG7r3O+Yyzvt9nO3F3IfA1DmfB1LZnnfV2AkQ/cyT9F4blXzmQh8LplYDgUphOqchY4/684dZP101Eho8QCcO4oktwK4H5E7CZnzdJjPEiBLX/hS4TaJgsx1+Dmdwyb9BipeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9pSXQbI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E1DC32782;
+	Mon, 12 Aug 2024 17:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723485455;
+	bh=PjEd0BdogsUTaZfCUMRZ31Ra4P2TNDube5tSGJ9f9sw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G9pSXQbIwNKKdmOVG04ccy/1dIHLraWQ0G+g5z/MctkmVUUUXo81tnVQfF1RR+c1J
+	 Cvxt8qGSPA8JqYgFK4Wsisbb0RFx5KEJ2r00aZDsq7jtURbAetSPgcZbzv7tLhq3In
+	 X8cW65UhPResK30p4YVjVef/gIBciCKXIICBbwOv+MOkXOxEPR0kGDviaLOmGrQHjv
+	 1kVsTsVsho3L4Id+uxmWhHD1b/Ou3noRjVmbmLBl93blSGZxY3SAluidKUwiBL8YOv
+	 TqI1IrR/S8Qznu2rcbJ2YiWkSSF8CbSPSyNf8gpJaBr19k4+X1N8VCNVUteNnwEgHU
+	 0shtOIic2eEhw==
+Date: Mon, 12 Aug 2024 10:57:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
+ Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Steffen
+ Klassert <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, David Wei <dw@davidwei.uk>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend
+ Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
+ memory provider
+Message-ID: <20240812105732.5d2845e4@kernel.org>
+In-Reply-To: <48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
+References: <20240805212536.2172174-1-almasrymina@google.com>
+	<20240805212536.2172174-8-almasrymina@google.com>
+	<20240806135924.5bb65ec7@kernel.org>
+	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+	<20240808192410.37a49724@kernel.org>
+	<CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
+	<fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com>
+	<20240809205236.77c959b0@kernel.org>
+	<CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
+	<48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zro1onXfGkKoIRbY@casper.infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 12, 2024 at 05:17:38PM +0100, Matthew Wilcox wrote:
-> On Mon, Aug 12, 2024 at 06:19:35AM -0700, Christoph Hellwig wrote:
-> > On Mon, Aug 12, 2024 at 12:57:07PM +0000, Joe Damato wrote:
-> > > From: Martin Karsten <mkarsten@uwaterloo.ca>
-> > > 
-> > > Setting prefer_busy_poll now leads to an effectively nonblocking
-> > > iteration though napi_busy_loop, even when busy_poll_usecs is 0.
-> > 
-> > Hardcoding calls to the networking code from VFS code seems like
-> > a bad idea.   Not that I disagree with the concept of disabling
-> > interrupts during busy polling, but this needs a proper abstraction
-> > through file_operations.
+On Sun, 11 Aug 2024 22:51:13 +0100 Pavel Begunkov wrote:
+> > I think we're talking about 2 slightly different flags, AFAIU.>
+> > Pavel and I are suggesting the driver reports "I support memory
+> > providers" directly to core (via the queue-api or what not), and we
+> > check that flag directly in netdev_rx_queue_restart(), and fail
+> > immediately if the support is not there.  
 > 
-> I don't understand what's going on with this patch set.  Is it just
-> working around badly designed hardware?  NVMe is specified in a way that
-> lets it be completely interruptless if the host is keeping up with the
-> incoming completions from the device (ie the device will interrupt if a
-> completion has been posted for N microseconds without being acknowledged).
-> I assumed this was how network devices worked too, but I didn't check.
+> I might've misread Jakub, but yes, I believe it's different. It'd
+> communicate about support for providers to upper layers, so we can
+> fail even before attempting to allocate a new queue and init a
+> page pool.
 
-Thanks for taking a look. I'd kindly point you back to the cover
-letter [1], which describes the purpose of the patch set in greater
-detail.
+Got it. Since allocating memory happens before stopping traffic
+I think it's acceptable to stick to a single flag.
 
-At a high level: the networking stack has a mechanism for deferring
-interrupts that was introduced in commit 6f8b12d661d0 ("net: napi:
-add hard irqs deferral feature") and expanded upon in 7fd3253a7de6
-("net: Introduce preferred busy-polling"). We are expanding the
-existing mechanisms further so that when applications are busy
-polling, IRQs are totally disabled.
+> > Jakub is suggesting a page_pool_params flag which lets the driver
+> > report "I support memory providers". If the driver doesn't support it
+> > but core is trying to configure that, then the page_pool_create will
+> > fail, which will cause the queue API operation
+> > (ndo_queue_alloc_mem_alloc) to fail, which causes
+> > netdev_rx_queue_restart() to fail.  
+> 
+> And I'm not against this way either if we explicitly get an error
+> back instead of trying to figure it out post-factum like by
+> checking the references and possibly reverting the allocation.
+> Maybe that's where I was confused, and that refcount thing was
+> suggested as a WARN_ONCE?
 
-While traditional NAPI does prevent IRQs from being re-enabled, it
-runs in softIRQ context and only retrieves the available data at the
-time NAPI poll runs. The kernel's pre-existing busy polling however,
-lets the application drive packet processing (instead of NAPI). Busy
-polling when used in combination with various options allowed user
-applications to defer IRQs, but as we show in our cover letter it is
-extremely difficult to pick the correct values for all traffic cases
-at all times.
+Yup, the refcount (now: check of the page pool list) was meant
+as a WARN_ONCE() to catch bad drivers.
 
-We are introducing an extension of the existing mechanism to allow
-epoll-based busy poll applications to run more efficiently by
-keeping IRQs disabled throughout the duration of successful busy
-poll iterations.
+> FWIW, I think it warrants two flags. The first saying that the
+> driver supports providers at all:
+> 
+> page_pool_init() {
+> 	if (rxq->mp_params)
+> 		if (!(flags & PP_PROVIDERS_SUPPORTED))
+> 			goto fail;
+> }
+> 
+> And the second telling whether the driver wants to install
+> providers for this particular page pool, so if there is a
+> separate pool for headers we can set it with plain old kernel
+> pages.
 
-- Joe
+The implementation of the queue API should be resilient against
+failures in alloc, and not being MP capable is just a form of 
+alloc failure. I don't see the upside of double-flag. 
 
-[1]: https://lore.kernel.org/netdev/20240812125717.413108-1-jdamato@fastly.com/
+> payload_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED);
+> header_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED |
+>                                      PP_IGNORE_PROVIDERS);
+
+Also don't see the upside of the explicit "non-capable" flag,
+but I haven't thought of that. Is there any use?
+
+One important note. The flag should not be tied to memory providers
+but rather to netmem, IOW unreadable memory. MP is an internal detail,
+the important fact from the driver-facing API perspective is that the
+driver doesn't need struct pages.
+
+> (or invert the flag). That's assuming page_pool_params::queue is
+> a generic thing and we don't want to draw equivalence between
+> it and memory providers.
 
