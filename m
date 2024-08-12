@@ -1,149 +1,131 @@
-Return-Path: <netdev+bounces-117851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8818894F8D8
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:17:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EABA94F8DB
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90D731C222C1
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:17:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D131E1C21939
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E16318E029;
-	Mon, 12 Aug 2024 21:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3017187345;
+	Mon, 12 Aug 2024 21:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KA2rGYeV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4Zuf6WT7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9358518E051;
-	Mon, 12 Aug 2024 21:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383061581EB;
+	Mon, 12 Aug 2024 21:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723497439; cv=none; b=Yq36lP4A/Pw24b1IlJUYF/K4tT4d51f+kEPUwxCYM65RoR/JmO0/437Q9oBqfRx2oyOP7EoavxxvppiXLvvN6z0WiqOBcG6haMmgN//0CZtT2Bhg5IXTkwPMR/PjNBegnZ4DnbA5HQxy2r3YJR1VJCAjfxJWlKsRYhle9prKFvA=
+	t=1723497493; cv=none; b=up0Get+70Yvjjh9J8G+eto0qagd8O0HdGJKDBLnXpmzm8JGS1RVA76K/Y+E6y/ZGNYUf86O0Cfl7SGdiFX5wxtQ2jyjDpwhSKTYu/pHWRUq3GpO8uFF6Nh9wGFZOa7JtIPnx+Eufy6cKBoO9zHKr3hCf8wCNxmUHdLrJ9+1FfHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723497439; c=relaxed/simple;
-	bh=qXbSKVYOp703lMou18LJTMv2aROXl0o6Emm6S2Z6gGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VVvN0RtJHC21h0Z2g7cHs0dSYLmUeDQ7mIAJzPWDizjLxPh/oQL3B+XTJJfEsv2Eruk3DEvgWQUpD6RvH/Up5QcC+SX98lmbkw1EWut75D8IgcDPPYKgRUDHeDY4xKsqU+GxG8Y6pfCMKar6MVg22Ko3/ar6DMhaAWNeUiohJ6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KA2rGYeV; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2cb4c584029so3724777a91.3;
-        Mon, 12 Aug 2024 14:17:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723497435; x=1724102235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mbl+io8W3Adu1FtPTdkK2PsqHbTxT5/nTBxDfEamSyE=;
-        b=KA2rGYeVBeUi2DUNbUyowfVniwqlxXMa6ZARdWkly7SI1UB2CP1EE9fV01bX6MhFV+
-         68x1RTua9my5uhV9/eapkQY3ytN9XC09KP+cIO5TNXzLfDHPkN2nNUsxDmhAfSb+PRby
-         nunSz3Cxr223fh/YMix14Pq42EDQqTp9avagha9q1Y9fRUcVYoxeZul/EcBhNaSU/imF
-         VczXAWb/W6T/cCYIzimpvU+mKc34STyVuykiCWB6NkOQvCxNmYXIxtmC1Gl7aLJiVCtQ
-         QrcInu7Fk4qQU9POsEfcz7lzRxMQ9iyrVgeGM884kzu5EIpY3WkHVLDK53HiXNK3mCE3
-         yQNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723497435; x=1724102235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mbl+io8W3Adu1FtPTdkK2PsqHbTxT5/nTBxDfEamSyE=;
-        b=S4J+HIFuPlpKM3/qOJ5pRguxm7Y+QhEcmntx8iKCTHmSrzEa7xY61QrAO1kyv7+txB
-         pPpuWQBnnhFHRG4XQMdKYGM0YdQCr424n1r+SgaAcXuYqgomp42xc0veIe4CEAPQUHPK
-         lWrlAv57CtCoKv0+Guap1dKUleo4+RpT4ikD3xHbUXsAcez66QgHpoGqWstY6seB39aA
-         uD1ITsOPWDrD/AsDZFjnLPzVRT08rup5I+T1KeT9NlkG3uVx/qTCLAwfhTS73kv/TIl3
-         tL1aIA3ic2SZBVGD2KVgFeofiu9o62ZxM6Rb5sLfwtqQkd15eYJXu0+/ZihQjyVXVuFn
-         uHdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLN66pOdKy5gldfJqeihhCYW4RFCuOxLQLhJT78/G1w/uUD9BJvokhahTtOF49GXgoUDzlvoamN11860KHTbK4dZQnGcWyVvLL0VlIjZz/L7xxX4pYVPraGM3bCoTLATSlp+3xU5ivwnLv3v2UCx6pdWECE1pZyT+OzeXP
-X-Gm-Message-State: AOJu0YxW8F0DY5b/TUq/u5qVwUWLWZcgQ9vcmLRA1njbO0ZxXuddzHw5
-	jda2jE1URhf605sUf03qZQLYfEit1gB6XRYUfBeJgTloaAfQLyWQ1c2UFSzrkcMJrSudqBFo958
-	23kvEbDP1kKICYKtIz5Co8pHG2jOFO5Ad
-X-Google-Smtp-Source: AGHT+IG3CVt68kJspR9GvCKA/xZmRRKzjF+T+3kadzBnLfyhDLuLrJsJ70pnEZ7CQMKx1u16s+51vVeEjlh3+8vvgfU=
-X-Received: by 2002:a17:90b:895:b0:2c9:6f5e:f5c1 with SMTP id
- 98e67ed59e1d1-2d39250829fmr1755380a91.10.1723497434765; Mon, 12 Aug 2024
- 14:17:14 -0700 (PDT)
+	s=arc-20240116; t=1723497493; c=relaxed/simple;
+	bh=Du4MiFQct/T4oHZU6i8VcTUZQaIyjAgoUyHYcIGg4So=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nklxT+rSMPgy0MWdU7dX/Pha9XXGf5Z2RGX8JjJqKX5Uh3P/H67uLeI2DkPK8adFndsRWPFFjfxgARcjTSaB5Gwz5CNatKz7MJc5+hy1CGJ/9eb8UMF1KSD1LBhGR6/AmdZtoqW5FujCPoJ7EP7QRZDkYJhzwphcFaceU3mQsm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4Zuf6WT7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0k2o1lposRITkYe4FXhTi3MePKdAOecr3M+KCZT0m7k=; b=4Zuf6WT7kbhR99JVQDmUfX8Wir
+	yBhzeYonw0jF+RI3pDDUj4ggsdf3vIn3yw8LiU7QBXmZMT6tRGXJT52bZM4P3yUiCR1vDQCJAKj05
+	50GlhHmefUUYJynFc7oUahmyJWGmVTB4oVU9HAsGCKiDf+mRpICNPVAjCgrrW1v4mkJY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdcQV-004caG-KC; Mon, 12 Aug 2024 23:18:03 +0200
+Date: Mon, 12 Aug 2024 23:18:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 2/2] net: xilinx: axienet: Add statistics
+ support
+Message-ID: <70d817a8-5ee4-4ce2-883a-9e95f15f2855@lunn.ch>
+References: <20240812174118.3560730-1-sean.anderson@linux.dev>
+ <20240812174118.3560730-3-sean.anderson@linux.dev>
+ <e78256f2-9ad6-49e1-9cd5-02a28c92d2fc@lunn.ch>
+ <f1837494-7411-463f-b9f6-fbdd09217423@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812004503.43206-1-danieltimlee@gmail.com>
-In-Reply-To: <20240812004503.43206-1-danieltimlee@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 12 Aug 2024 14:17:02 -0700
-Message-ID: <CAEf4BzZsZYNx_mV0_0RrWvQS+Y7ixvtzv3SmTTQkOveeZeot+w@mail.gmail.com>
-Subject: Re: [bpf-next 0/3] samples/bpf: Remove obsolete tracing-related tests
-To: "Daniel T. Lee" <danieltimlee@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Yipeng Zou <zouyipeng@huawei.com>, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1837494-7411-463f-b9f6-fbdd09217423@linux.dev>
 
-On Sun, Aug 11, 2024 at 5:45=E2=80=AFPM Daniel T. Lee <danieltimlee@gmail.c=
-om> wrote:
->
-> The BPF tracing infrastructure has undergone significant evolution,
-> leading to the introduction of more robust and efficient APIs.
-> However, some of the existing tests in the samples/bpf directory have
-> not kept pace with these developments. These outdated tests not only
-> create confusion among users but also increase maintenance overhead.
->
-> For starter, this patchset focuses on cleaning up outdated 'tracing'
-> related tests within the BPF testing framework. The goal is to
-> modernize and streamline selftests by removing obsolete tests and
-> migrating necessaries to more appropriate locations.
->
-> Daniel T. Lee (3):
->   selftests/bpf: migrate tracepoint overhead test to prog_tests
->   selftests/bpf: add rename tracepoint bench test
->   samples/bpf: remove obsolete tracing related tests
->
+On Mon, Aug 12, 2024 at 04:25:16PM -0400, Sean Anderson wrote:
+> On 8/12/24 16:22, Andrew Lunn wrote:
+> >>  static int __axienet_device_reset(struct axienet_local *lp)
+> >>  {
+> >>  	u32 value;
+> >>  	int ret;
+> >>  
+> >> +	/* Save statistics counters in case they will be reset */
+> >> +	guard(mutex)(&lp->stats_lock);
+> >> +	if (lp->features & XAE_FEATURE_STATS)
+> >> +		axienet_stats_update(lp, true);
+> > 
+> > My understanding of guard() is that the mutex is held until the
+> > function completes. That is much longer than you need. A
+> > scoped_guard() would be better here, and it makes it clear when the
+> > mutex will be released.
+> 
+> We have to hold it until...
+> 
+> >> +
+> >>  	/* Reset Axi DMA. This would reset Axi Ethernet core as well. The reset
+> >>  	 * process of Axi DMA takes a while to complete as all pending
+> >>  	 * commands/transfers will be flushed or completed during this
+> >> @@ -551,6 +595,23 @@ static int __axienet_device_reset(struct axienet_local *lp)
+> >>  		return ret;
+> >>  	}
+> >>  
+> >> +	/* Update statistics counters with new values */
+> >> +	if (lp->features & XAE_FEATURE_STATS) {
+> >> +		enum temac_stat stat;
+> >> +
+> >> +		write_seqcount_begin(&lp->hw_stats_seqcount);
+> >> +		lp->reset_in_progress = false;
+> >> +		for (stat = 0; stat < STAT_COUNT; stat++) {
+> >> +			u32 counter =
+> >> +				axienet_ior(lp, XAE_STATS_OFFSET + stat * 8);
+> >> +
+> >> +			lp->hw_stat_base[stat] +=
+> >> +				lp->hw_last_counter[stat] - counter;
+> >> +			lp->hw_last_counter[stat] = counter;
+> >> +		}
+> >> +		write_seqcount_end(&lp->hw_stats_seqcount);
+> 
+> ...here
+> 
+> Which is effectively the whole function. The main reason why I used guard() was to
+> simplify the error return cases.
 
-We already have tracepoint-specific benchmark (see
-benchs/bench_trigger.c), try `./bench trig-tp` (it will pretty recent
-kernel due to reliance on bpf_modify_return_test_tp() kfunc).
+This is why i personally don't like guard. It is not clear you
+intended the mutex to be held so long, and that this code actually
+requires it. An explicit mutex_unlock() here would make your
+intentions clear, or a scoped_guard. I can see guard avoiding some
+error path bugs, but i suspect it will introduce other problems when
+refactoring code and having to make guesses about what actually needs
+the mutex.
 
-So maybe instead of adding code to selftests, let's just remove it
-from both samples/bpf and prog_tests' test_overhead? Either way
-test_overhead isn't very representative anymore, given big chunk of
-its overhead is in write() syscall?
-
->  samples/bpf/Makefile                          |  12 -
->  samples/bpf/test_overhead_kprobe.bpf.c        |  41 ----
->  samples/bpf/test_overhead_raw_tp.bpf.c        |  17 --
->  samples/bpf/test_overhead_tp.bpf.c            |  23 --
->  samples/bpf/test_overhead_user.c              | 225 ------------------
->  samples/bpf/test_override_return.sh           |  16 --
->  samples/bpf/test_probe_write_user.bpf.c       |  52 ----
->  samples/bpf/test_probe_write_user_user.c      | 108 ---------
->  samples/bpf/tracex7.bpf.c                     |  15 --
->  samples/bpf/tracex7_user.c                    |  56 -----
->  tools/testing/selftests/bpf/bench.c           |   2 +
->  .../selftests/bpf/benchs/bench_rename.c       |  16 ++
->  .../selftests/bpf/benchs/run_bench_rename.sh  |   2 +-
->  .../selftests/bpf/prog_tests/test_overhead.c  |  14 +-
->  .../selftests/bpf/progs/test_overhead.c       |  11 +-
->  15 files changed, 39 insertions(+), 571 deletions(-)
->  delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
->  delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
->  delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
->  delete mode 100644 samples/bpf/test_overhead_user.c
->  delete mode 100755 samples/bpf/test_override_return.sh
->  delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
->  delete mode 100644 samples/bpf/test_probe_write_user_user.c
->  delete mode 100644 samples/bpf/tracex7.bpf.c
->  delete mode 100644 samples/bpf/tracex7_user.c
->
-> --
-> 2.43.0
->
+	    Andrew
 
