@@ -1,192 +1,109 @@
-Return-Path: <netdev+bounces-117805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3829D94F634
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:59:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216C794F637
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:00:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE2FF280E50
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 399C31C2123C
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F35F18953E;
-	Mon, 12 Aug 2024 17:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C12186E5B;
+	Mon, 12 Aug 2024 18:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VLSX5kkP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMwCygGg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42613189529;
-	Mon, 12 Aug 2024 17:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C5D17967F
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 18:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723485552; cv=none; b=sUO/ONMEmwL5FpP7K2hzPPxzDRzbKV15qs6L/yNwIGsxRyF9VyFeHFRSauaMB0v6PdsT+hv7MXxgJ7Ic6FFYG5afhOb3zs9rDyXMzdFLPEifJZMtOrAO9Ha2aBfw9EKnahg6TRwr8lGfmJNn//HibWrSdqdNCkW11Vkn2rvH/es=
+	t=1723485607; cv=none; b=l7ka6xkoffFJqxHDlx81EOpyLwewmS+gLw4My8fKpaV+DSnhd3y/L6XRHJPrGCgXjy6zf8gqZGyP3j7bZKhxZKi1tYsNkQbXJY98zIMuVsZe/i+E8UK6hCv2EzQot8E4EVpg1jfXGJa3aA5SQQpvkaPMIqJHY5qhUUtbivFbzMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723485552; c=relaxed/simple;
-	bh=89tBf3JaxrUSUgE4DeBjSLiEkLK6rYWE9SbgQJLHxL8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CMNeUTJBjUkwFtyCuq0N4GnpmyvxL69xM9T5h/PSI9bvTy/8xmuHetbZqK3KUaQx+GV8op6ooaCy4VIbiqkp3UqyKar4eTCaj0U8UnL1ci6da7X4wWHkyThB6RWrw+rpq3pLQjJ6qZMiZo5ebDQZg/87JRN9l3hd7Eab7MmM9W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VLSX5kkP; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723485550; x=1755021550;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=89tBf3JaxrUSUgE4DeBjSLiEkLK6rYWE9SbgQJLHxL8=;
-  b=VLSX5kkPr4lOWgLGPvQvheoA6kuC8IfB9WlP1QyV/9mbu5vaWS3TK/0R
-   h7P5mQGFMZ7NQ39QnVBMNCq4HWUeP/VxYE9U5KfB12whMbxHM64EgTd/k
-   CX1L9ZiukekvG6+dYv9V0OK/d3eUIvKurDliAM/iCn0KxbYk0ZnXSYQif
-   WO5wTf12Q4ievu1d8YyCijqyOC6ED95nTwTnE3pp/bqTX1KgE3PyfhV/K
-   3ZMw7zwK5S026llJ0auPbFkBxX79CR2srqpeB9ETrxgGqam6TkAAS3vNH
-   Eg9pcsE+ilAuVFAjLTlFIPpj73gZ6QHVCHk3LhrvkVy9U9dVC28MM38yt
-   w==;
-X-CSE-ConnectionGUID: s88eXRiOTDaQReyJ95e6tQ==
-X-CSE-MsgGUID: VxyrW8bhQJCy823or3+FGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="32232751"
-X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="32232751"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 10:59:09 -0700
-X-CSE-ConnectionGUID: lqmqNyJRTvaXvQIVJUa3Qg==
-X-CSE-MsgGUID: VMuQJ5CiTWq71zcqj1hqfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="63201380"
-Received: from unknown (HELO vcostago-mobl3) ([10.241.225.92])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 10:59:09 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Daiwei Li <daiweili@gmail.com>, Richard Cochran <richardcochran@gmail.com>
-Cc: intel-wired-lan@lists.osuosl.org, sasha.neftin@intel.com,
- kurt@linutronix.de, anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-net v1] igb: Fix not clearing TimeSync interrupts
- for 82580
-In-Reply-To: <CAN0jFd1CpPtid7TGJcgzajRXQ5oxYN1LjLjLwK7HjQ1piuZ_XQ@mail.gmail.com>
-References: <20240810002302.2054816-1-vinicius.gomes@intel.com>
- <Zrb0wdmIsksG38Uc@hoboy.vegasvil.org>
- <CAN0jFd1CpPtid7TGJcgzajRXQ5oxYN1LjLjLwK7HjQ1piuZ_XQ@mail.gmail.com>
-Date: Mon, 12 Aug 2024 10:59:08 -0700
-Message-ID: <87sev9wrkj.fsf@intel.com>
+	s=arc-20240116; t=1723485607; c=relaxed/simple;
+	bh=JCLX+2HqprCl83qA8NqSiTIpdIcgxmWdP9iI4/RjSbY=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=PYuWwNVhajsLe5r9ac0lNbjhEcek5YnCKmL9y7Rg34pMy6+wKRHReK/lK0pxFwJrf+bGN7BjJ3akmu0e1wKr9avzRcNb8TrwdDjv3/W22SL7fLfwJh4SI/W4W/EnqRKEpTMaJkVQafzzRAEebxXZdF7tPbqIWOq2PT3NKKroVfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMwCygGg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C3AFC32782;
+	Mon, 12 Aug 2024 18:00:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723485606;
+	bh=JCLX+2HqprCl83qA8NqSiTIpdIcgxmWdP9iI4/RjSbY=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=RMwCygGgwKyFY0dBwk62rHnicvEBUbhAE8jgKK8UynokIRoJHDtUTVUbs3svZfQ8a
+	 1lseAvHpyQ7+6ZhvJnT+efkXauh1o3ZoPLTZ0uRbpaXNCybI0AglgcHJg62f+aNYOH
+	 qmp0K3pEqGEmolMb9jnJDcc4XtdH5r8g8h9pv4+HZusk8eUJa5Wl4y3/j+sYK/SRsv
+	 9dOILJO3S3V2Yl2lbMJqdDi/E9QaQuB8MEGUBnkiLoo6Z0m7JQgLx1NSaptRC8ij+y
+	 5oZmF8wNOB873T0TDOpoa9xWpDIm3wRSYRhiSmJb7BAquMuDzrPG7OKjV5oGLIkLP2
+	 MUumMVuq4Wgwg==
+Received: from phl-compute-05.internal (phl-compute-05.nyi.internal [10.202.2.45])
+	by mailfauth.nyi.internal (Postfix) with ESMTP id 7EE0B120006B;
+	Mon, 12 Aug 2024 14:00:05 -0400 (EDT)
+Received: from wimap26 ([10.202.2.86])
+  by phl-compute-05.internal (MEProxy); Mon, 12 Aug 2024 14:00:05 -0400
+X-ME-Sender: <xms:pU26ZveTsBfaxY1kCK4PYzBlvaFHVPrGu95XyJ7JEcBEZo13KMyeMA>
+    <xme:pU26ZlMGyZzuOPkuOiEwIQsxS52VxsGHASFvWU_X8r8vwT0S6hEtS4Wyh4tSkFNvC
+    SUAnXeuBQeVgv-iBPo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddttddguddulecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
+    tdenucfhrhhomhepfdfnvghonhcutfhomhgrnhhovhhskhihfdcuoehlvghonheskhgvrh
+    hnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpeejvefflefgledvgfevvdetleehhfdv
+    ffehgeffkeevleeiveefjeetieelueeuvdenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehlvghonhdomhgvshhmthhprghuthhhphgvrhhsohhn
+    rghlihhthidquddvfedtheefleekgedqvdejjeeljeejvdekqdhlvghonheppehkvghrnh
+    gvlhdrohhrgheslhgvohhnrdhnuhdpnhgspghrtghpthhtohepvddpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepshhtvghphhgvnhesnhgvthifohhrkhhplhhumhgsvghrrd
+    horhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:pU26ZoibKiMHA4K14U5zmxeO1XKn6IUqz5g3hyiK3vU5O-i00nn8IA>
+    <xmx:pU26Zg_VI9fUqh9iXlpvYbsGlUL5WGG9IJNxubWwLl2gPXXTQ19-Cw>
+    <xmx:pU26Zrv1xHPVeYskNlK9sq8DKHhHA7ijgF6_EZeQf8SPg4ZQ-sRKug>
+    <xmx:pU26ZvE-7XKHWASALINHuvOVxxO0vwg0397T_KzeOJrkYFtz9wi9CQ>
+    <xmx:pU26ZiPkWYxrO8bfJmGz8BcF-h7wWZJDqnL3ML0gsqN_eQyIexWdKWWE>
+Feedback-ID: i927946fb:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 389CE19C008E; Mon, 12 Aug 2024 14:00:05 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Date: Mon, 12 Aug 2024 20:59:47 +0300
+From: "Leon Romanovsky" <leon@kernel.org>
+To: "Stephen Hemminger" <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Message-Id: <1a9a1995-f49d-4b1f-93e6-0ba750228464@app.fastmail.com>
+In-Reply-To: <20240812075910.180a1f4e@hermes.local>
+References: <20240811164455.5984-1-stephen@networkplumber.org>
+ <20240812073320.GA12060@unreal> <20240812075910.180a1f4e@hermes.local>
+Subject: Re: [PATCH iproute] man/ip-xfrm: fix dangling quote
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi,
 
-Daiwei Li <daiweili@gmail.com> writes:
 
->> @Daiwei Li, I don't have a 82580 handy, please confirm that the patch
-> fixes the issue you are having.
+On Mon, Aug 12, 2024, at 17:59, Stephen Hemminger wrote:
+> On Mon, 12 Aug 2024 10:33:20 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
 >
-> Thank you for the patch! I can confirm it fixes my issue. Below I offer a
-> patch that also works in response to Paul's feedback.
+>> On Sun, Aug 11, 2024 at 09:44:46AM -0700, Stephen Hemminger wrote:
+>> > The man page had a dangling quote character in the usage.  
+>> 
+>> I run "man -l man/man8/ip-xfrm.8" before and after that patch and I
+>> don't see any difference. Can you please provide more details?
+>> 
+>> Thanks
 >
+> It is more because Emacs auto-colorizing of man page
+> gets confused by the single quote character.
 
-Your patch looks better than mine. I would suggest for you to go ahead
-and propose yours for inclusion.
-
->> Please also add a description of the test case
->
-> I am running ptp4l to serve PTP to a client device attached to the NIC.
-> To test, I am rebuilding igb.ko and reloading it.
-> Without this patch, I see repeatedly in the output of ptp4l:
->
->> timed out while polling for tx timestamp increasing tx_timestamp_timeout=
- or
->> increasing kworker priority may correct this issue, but a driver bug lik=
-ely
->> causes it
->
-> as well as my client device failing to sync time.
->
->> and maybe the PCI vendor and device code of your network device.
->
-> % lspci -nn | grep Network
-> 17:00.0 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
-> Network Connection [8086:150e] (rev 01)
-> 17:00.1 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
-> Network Connection [8086:150e] (rev 01)
-> 17:00.2 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
-> Network Connection [8086:150e] (rev 01)
-> 17:00.3 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
-> Network Connection [8086:150e] (rev 01)
->
->> Bug, or was it a feature?
->
-> According to https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@in=
-tel.com/
-> it was a bug. It looks like the datasheet was not updated to
-> acknowledge this bug:
-> https://www.intel.com/content/www/us/en/content-details/333167/intel-8258=
-0-eb-82580-db-gbe-controller-datasheet.html
-> (section 8.17.28.1).
->
->> Is there a nicer way to write this, so `ack` is only assigned in case
->> for the 82580?
->
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c
-> b/drivers/net/ethernet/intel/igb/igb_main.c
-> index ada42ba63549..87ec1258e22a 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -6986,6 +6986,10 @@ static void igb_tsync_interrupt(struct
-> igb_adapter *adapter)
->         struct e1000_hw *hw =3D &adapter->hw;
->         u32 tsicr =3D rd32(E1000_TSICR);
->         struct ptp_clock_event event;
-> +       const u32 mask =3D (TSINTR_SYS_WRAP | E1000_TSICR_TXTS |
-> +                          TSINTR_TT0 | TSINTR_TT1 |
-> +                          TSINTR_AUTT0 | TSINTR_AUTT1);
-> +
->
->         if (tsicr & TSINTR_SYS_WRAP) {
->                 event.type =3D PTP_CLOCK_PPS;
-> @@ -7009,6 +7013,13 @@ static void igb_tsync_interrupt(struct
-> igb_adapter *adapter)
->
->         if (tsicr & TSINTR_AUTT1)
->                 igb_extts(adapter, 1);
-> +
-> +       if (hw->mac.type =3D=3D e1000_82580) {
-> +               /* 82580 has a hardware bug that requires a explicit
-> +                * write to clear the TimeSync interrupt cause.
-> +                */
-> +               wr32(E1000_TSICR, tsicr & mask);
-
-Yeah, I should have thought about that, that writing '1' into an
-interrupr that is cleared should be fine.
-
-> +       }
->  }
-> On Fri, Aug 9, 2024 at 10:04=E2=80=AFPM Richard Cochran
-> <richardcochran@gmail.com> wrote:
->>
->> On Fri, Aug 09, 2024 at 05:23:02PM -0700, Vinicius Costa Gomes wrote:
->> > It was reported that 82580 NICs have a hardware bug that makes it
->> > necessary to write into the TSICR (TimeSync Interrupt Cause) register
->> > to clear it.
->>
->> Bug, or was it a feature?
->>
->> Or IOW, maybe i210 changed the semantics of the TSICR?
->>
->> And what about the 82576?
->>
->> Thanks,
->> Richard
-
---=20
-Vinicius
+Ok, thanks 
 
