@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-117819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E09B94F73E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:07:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A03FA94F740
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A9E1C222AF
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:07:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 578E41F221A5
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05CA194083;
-	Mon, 12 Aug 2024 19:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14BE1946C1;
+	Mon, 12 Aug 2024 19:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOzhq+OC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hi/Z3Gi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBDB192B67;
-	Mon, 12 Aug 2024 19:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FECC193084;
+	Mon, 12 Aug 2024 19:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723489628; cv=none; b=GQgH8Jm51jWPA0QccsTZcnesEjb+OILzHwc73XUnsivXvQXCOLOP3kyLuhvyaLvvEjrJM/0s3cR1asXF5lY6zIhJfW1bAu0y8SooEGL2pQ/XbVou1396a8pmCVUVqN9sHrgaT6UeJ7e/JRJDebU+9dx+hIdus2uiU79FTBVujiU=
+	t=1723489629; cv=none; b=jJI6QZks+3fi2g7uko40qxR8NF3fxdI6s40Wr+TOMnCwgLiPEvyfeKbu0EJnz9QytFOmrKyku/cyR+vjoMJ7w4QYbJA9I82ejS2RIVU/+Ytsrv7lwN1rHScLRfdS1Zm2u+QcKH0jUhXQ2Dtq6sK/2nQa15fpgPcwM0Xc+ATdwD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723489628; c=relaxed/simple;
-	bh=zfODU3mDdGdpVPY0iCNi4MxdBz8LE3/Hr5mTb6CeEQg=;
+	s=arc-20240116; t=1723489629; c=relaxed/simple;
+	bh=pRmkRoYFgiZLudNyo3/6lDIChkGxS6Z7skThQCnsJrQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gbk9JC7+DPKx89lF2bl9WxxpemFPfp978EQsgElGpb62SCYLkKRqjp4cEp3hTOHz3fSwIDX3CxCIxeik1Y48ROrctQwTHmQc785zY/dFbjGJSUQm5/vqz8g0bacE4SFZUQk1xMxpsj4Yk9h8g+huGqJTilLlJP4oBhLkDV0iRcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOzhq+OC; arc=none smtp.client-ip=209.85.160.52
+	 MIME-Version; b=dwO0vHAtckuivztdRgkfF729twTIF8KHtCC0LH4xC2Jz36CIqnwx2+UY8INB8dKIKwE8DhxJWLNjEMh051vGerbXzIpbVFiSyIPQ8K/X6L6pSV26riXC4hxCmYnDzBGDGZum/Vl4U2CRymJoXtXW/8OSb2uEf2qKPucX81kcF4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hi/Z3Gi7; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-264545214efso2524285fac.3;
-        Mon, 12 Aug 2024 12:07:06 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70d162eef54so3340759b3a.3;
+        Mon, 12 Aug 2024 12:07:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723489626; x=1724094426; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723489627; x=1724094427; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yj9mzoTnQYXMxulrcjw7kaOxhiBLAe/Ye/1tmJvg1ng=;
-        b=WOzhq+OCqlYQdxHdwimBMtSQtCE+6yvDznbD3F80cchMvo+x5WfwtId2x5FZz5g2C5
-         YLBIYkzeC0Bhg/oaDX/d0MZPrjdVpgOYQVkNzA3ixWFEGPG3vVVR1B2xSvr18zn5fOIq
-         NzSPOoJHXYhzcR639BJftQPvkJorPP1ygT6p2VFjpF+KSrfataeAmcg8fHSJWORYVpEY
-         WjjfPsH0lEHN1xdtqdV1GjKhyM9m3k8htLcPjWrJPs1pEWh2uyURDXSKeoyzK1XEqs5S
-         0MrSnjmIVMFVOeLWOgDQYsgLcV72waoZSMCddu7Mp4L4wkYmTdBEkRos86w11CMqN7b1
-         yazQ==
+        bh=l8rtduMWyL2CM0wvkXH66IK8dzqk0Z3EWzXwEhI6VvU=;
+        b=hi/Z3Gi7mjJ9r3fPNgPI4cy7FpneqJjHZzAa0rvh/mCnmZ6fyQzEVyTK78NT3AIrjC
+         BiNW+rfCzyRT7InwTaoWCp1Qhy7ii8BYayw6cYvh92s2HQumxMxV6qNTQ7nXr+LHloSN
+         CqAQbXI3cJ8GC7ISYbANJnDHXyJcWmyX03479t8MxyfHDZnEqL84Bxo/OXWZXVatt57V
+         E/lcM4D4WN9oMHtNJ5MVkBNzdsa5rPTNe73zblIoOrr34DLZZXiDZ4dSRnpsDtb+yDPb
+         ttau1E/66I6s6BBq54QviSIrdBrQpgKWS0gR4kFXfXDDaJ5sE56RWLcAGvW09qoqMW1Y
+         AWow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723489626; x=1724094426;
+        d=1e100.net; s=20230601; t=1723489627; x=1724094427;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yj9mzoTnQYXMxulrcjw7kaOxhiBLAe/Ye/1tmJvg1ng=;
-        b=ox7L/qhvVqt2p9lHAzYNgeW6jy1fzqqjUKW2zdtl7q7S5ou2z1+BE4LxfdZmfDLf1i
-         Urn8GnuPVuc6V1I3TIkvFRBmrYy/o71MVdjXJTDNG7mFsgjpRjh3RGxeSMG9IDhIkea3
-         0/vXgKElbS7h9076sLE/t60LmEQO7QGYP5stKII3m9/odqkEHx7+DyPEUCyb2KqgEMve
-         xHdu/iDcfsjQ8rjvwRLqx/1MXpYxedQ2eqKz/UN3gWAHc/xu/603c2XPDjFx7Z/9fgk4
-         XHgAf3GcmpfuacwwVkpHjAlLKJFzf7lwrhpAJ0Rsrl0pS4lG5QT50lacqAXethOVFqIY
-         60Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOeVs11X2Wg2OaV5b/Iz7ffaS4NzjKDxtnxKsroglhrQQtJPtU8dy8rBdYg4deAYwtrIhLdS09OK3o5dU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvsanzvBjPLusZIUpjsR38HIrGh9Rk4KrHOiPRvYQqYBDSidiu
-	8U+c1+aDgddnrfx+nnjZ2D9PLLQlvimsR+CX+3Ac9he4YT53YXBPg9v6+SZT
-X-Google-Smtp-Source: AGHT+IFVmDzCrCmIlez6F2Q/gU3878rGaJhvGqvkvK7Fa7+LkgJ7Ybyn/DwfjYIdjmeSp3D9mALOvw==
-X-Received: by 2002:a05:6871:3316:b0:263:3b45:b7dd with SMTP id 586e51a60fabf-26fcb61d7a7mr1261789fac.1.1723489625979;
-        Mon, 12 Aug 2024 12:07:05 -0700 (PDT)
+        bh=l8rtduMWyL2CM0wvkXH66IK8dzqk0Z3EWzXwEhI6VvU=;
+        b=OhcryNG9Np73dQgJ+BtrBgeEAhQSLJ8AXhxU3kHfSz/LB/if+9lkIsV0HVLW3WKNQd
+         Tzw7XLGGkiFNBwz64iEuiCgbslysut627+Gm83gWX2R7omOOpBx9YPqsPUih9WrOGVDz
+         4Dg6Ol4Wup5tVH6ygaCxvsk0OYNOTnPpjdX+eoNJ3Ftd8ipeSXWwBagVDCKjZkz3gZZo
+         H6NHSWWEJkISzYOjTNl7CjJHwSujKKUvUHNujkj8muon1MzHa3Oy1Ivbw2kgL1d4jvXH
+         PqxHJb9cRbqFcUFQ4EqxyJprZrL4EXxqXsn8cjcmrjucBcu2zOZCATkPRDhYfSc2vPvB
+         7ATQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIqB06sQ/cYXRP9k3XfxsdMIH9GwXjzkMZR8XNcx7MvyZNDewRiyIwP5cUp4XPLvl96GOV0OEPxHcZ4rmxHC3CVAg7kxh17xeiVbWJ
+X-Gm-Message-State: AOJu0YzzgTjlB3z2zPZg+41jwUW81H27LVb3Ncx2/xaTVz2FQytrmbM3
+	sM1jhvoT/tEmbzgs6qrn4NGV1hDjSHL3ZJmXVf3UA5/5OCvnkzsoEd2mvBSq
+X-Google-Smtp-Source: AGHT+IEkSnfY39aCo5vUc90gn+FltfsrMK1jvA/EtEA3PEqS4ZuR1VfAkCKEbGa8b2Icl4tqiurs0g==
+X-Received: by 2002:a05:6a00:17a5:b0:70b:3175:1f4f with SMTP id d2e1a72fcca58-7125516e5b9mr1419957b3a.16.1723489627186;
+        Mon, 12 Aug 2024 12:07:07 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a7facsm4334495b3a.59.2024.08.12.12.07.04
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a7facsm4334495b3a.59.2024.08.12.12.07.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 12:07:05 -0700 (PDT)
+        Mon, 12 Aug 2024 12:07:06 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -76,9 +76,9 @@ Cc: davem@davemloft.net,
 	linux@armlinux.org.uk,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de
-Subject: [PATCH net-next 2/3] net: ag71xx: use devm for of_mdiobus_register
-Date: Mon, 12 Aug 2024 12:06:52 -0700
-Message-ID: <20240812190700.14270-3-rosenp@gmail.com>
+Subject: [PATCH net-next 3/3] net: ag71xx: use devm for register_netdev
+Date: Mon, 12 Aug 2024 12:06:53 -0700
+Message-ID: <20240812190700.14270-4-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240812190700.14270-1-rosenp@gmail.com>
 References: <20240812190700.14270-1-rosenp@gmail.com>
@@ -90,128 +90,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allows removing ag71xx_mdio_remove.
+Allows completely removing the remove function. Nothing is being done
+manually now.
 
-Removed local mii_bus variable and assign struct members directly.
-Easier to reason about.
+Tested on TP-LINK Archer C7v2.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/atheros/ag71xx.c | 39 ++++++++-------------------
- 1 file changed, 11 insertions(+), 28 deletions(-)
+ drivers/net/ethernet/atheros/ag71xx.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
 diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index c22ebd3c1f46..1bc882fc1388 100644
+index 1bc882fc1388..43f0e2cf987f 100644
 --- a/drivers/net/ethernet/atheros/ag71xx.c
 +++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -684,12 +684,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- {
- 	struct device *dev = &ag->pdev->dev;
- 	struct net_device *ndev = ag->ndev;
--	static struct mii_bus *mii_bus;
- 	struct device_node *np, *mnp;
- 	int err;
- 
- 	np = dev->of_node;
--	ag->mii_bus = NULL;
- 
- 	ag->clk_mdio = devm_clk_get_enabled(dev, "mdio");
- 	if (IS_ERR(ag->clk_mdio)) {
-@@ -703,7 +701,7 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+@@ -1923,7 +1923,7 @@ static int ag71xx_probe(struct platform_device *pdev)
  		return err;
  	}
  
--	mii_bus = devm_mdiobus_alloc(dev);
-+	ag->mii_bus = devm_mdiobus_alloc(dev);
- 	if (!mii_bus)
- 		return -ENOMEM;
- 
-@@ -713,13 +711,13 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 		return PTR_ERR(ag->mdio_reset);
- 	}
- 
--	mii_bus->name = "ag71xx_mdio";
--	mii_bus->read = ag71xx_mdio_mii_read;
--	mii_bus->write = ag71xx_mdio_mii_write;
--	mii_bus->reset = ag71xx_mdio_reset;
--	mii_bus->priv = ag;
--	mii_bus->parent = dev;
--	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "%s.%d", np->name, ag->mac_idx);
-+	ag->mii_bus->name = "ag71xx_mdio";
-+	ag->mii_bus->read = ag71xx_mdio_mii_read;
-+	ag->mii_bus->write = ag71xx_mdio_mii_write;
-+	ag->mii_bus->reset = ag71xx_mdio_reset;
-+	ag->mii_bus->priv = ag;
-+	ag->mii_bus->parent = dev;
-+	snprintf(ag->mii_bus->id, MII_BUS_ID_SIZE, "%s.%d", np->name, ag->mac_idx);
- 
- 	if (!IS_ERR(ag->mdio_reset)) {
- 		reset_control_assert(ag->mdio_reset);
-@@ -729,22 +727,14 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 	}
- 
- 	mnp = of_get_child_by_name(np, "mdio");
--	err = of_mdiobus_register(mii_bus, mnp);
-+	err = devm_of_mdiobus_register(ag->mii_bus, mnp);
- 	of_node_put(mnp);
- 	if (err)
- 		return err;
- 
--	ag->mii_bus = mii_bus;
--
- 	return 0;
- }
- 
--static void ag71xx_mdio_remove(struct ag71xx *ag)
--{
--	if (ag->mii_bus)
--		mdiobus_unregister(ag->mii_bus);
--}
--
- static void ag71xx_hw_stop(struct ag71xx *ag)
- {
- 	/* disable all interrupts and stop the rx/tx engine */
-@@ -1930,14 +1920,14 @@ static int ag71xx_probe(struct platform_device *pdev)
- 	err = ag71xx_phylink_setup(ag);
- 	if (err) {
- 		netif_err(ag, probe, ndev, "failed to setup phylink (%d)\n", err);
--		goto err_mdio_remove;
-+		return err;
- 	}
- 
- 	err = register_netdev(ndev);
+-	err = register_netdev(ndev);
++	err = devm_register_netdev(ndev);
  	if (err) {
  		netif_err(ag, probe, ndev, "unable to register net device\n");
  		platform_set_drvdata(pdev, NULL);
--		goto err_mdio_remove;
-+		return err;
- 	}
- 
- 	netif_info(ag, probe, ndev, "Atheros AG71xx at 0x%08lx, irq %d, mode:%s\n",
-@@ -1945,23 +1935,16 @@ static int ag71xx_probe(struct platform_device *pdev)
- 		   phy_modes(ag->phy_if_mode));
- 
+@@ -1937,17 +1937,6 @@ static int ag71xx_probe(struct platform_device *pdev)
  	return 0;
+ }
+ 
+-static void ag71xx_remove(struct platform_device *pdev)
+-{
+-	struct net_device *ndev = platform_get_drvdata(pdev);
 -
--err_mdio_remove:
--	ag71xx_mdio_remove(ag);
--	return err;
- }
+-	if (!ndev)
+-		return;
+-
+-	unregister_netdev(ndev);
+-	platform_set_drvdata(pdev, NULL);
+-}
+-
+ static const u32 ar71xx_fifo_ar7100[] = {
+ 	0x0fff0000, 0x00001fff, 0x00780fff,
+ };
+@@ -2032,7 +2021,6 @@ static const struct of_device_id ag71xx_match[] = {
  
- static void ag71xx_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
--	struct ag71xx *ag;
- 
- 	if (!ndev)
- 		return;
- 
--	ag = netdev_priv(ndev);
- 	unregister_netdev(ndev);
--	ag71xx_mdio_remove(ag);
- 	platform_set_drvdata(pdev, NULL);
- }
- 
+ static struct platform_driver ag71xx_driver = {
+ 	.probe		= ag71xx_probe,
+-	.remove_new	= ag71xx_remove,
+ 	.driver = {
+ 		.name	= "ag71xx",
+ 		.of_match_table = ag71xx_match,
 -- 
 2.46.0
 
