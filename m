@@ -1,88 +1,131 @@
-Return-Path: <netdev+bounces-117834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0E694F7F8
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:12:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346DB94F7FF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476781C21B01
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:12:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4E5F283F4E
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508B1193062;
-	Mon, 12 Aug 2024 20:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4906519306C;
+	Mon, 12 Aug 2024 20:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zjpHMDcG"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KTShQkic"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F295B61FFC;
-	Mon, 12 Aug 2024 20:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BA3186E5C;
+	Mon, 12 Aug 2024 20:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723493521; cv=none; b=djhbGKOgWY0jjhZRWWi4JbpXtp3IAJvzE9tvmpcywe0d5GsBWU/ueBG3edWQo92X0KFGv4cY2IZpUTqXSgJuE4LWrfrcv17pWk5yAJxmCKv6/oqFrmrte19tCL+eUzer8Nk2TYV+tO7o7ScvDjbffHfleRqNdzxc/nq+UwKVK5M=
+	t=1723493609; cv=none; b=GWPnufTpBuHOrOsZ07k6B1zAipDW2gaLKR5/s2ETxU42M0OOvCcjp3NCphQRC2QXN4E+j8sr4Y3RFIhy2u0IWEO+xj02OBlqNDVm4fSOZYB3pAtdKCaY01/BsoEHYuSILe4fjobO07d7dkCgABASqVK7DeKOWFHiCI3Fj/tWFI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723493521; c=relaxed/simple;
-	bh=vYmPssGqOqy/ZSQEltkvYmFKGbzhf8ZDF8/bOM42FSY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=euuPo5X4fzI0/Ngv1hhxWUCtLxwyCmbSLZ3s46dSbXNYxCngwefWutNBjRkeVcGKWbfJzW+GgZ7Mmolj8MT9iA25nFkRkOqEPdYtx2WWqpohZHLCAuh/7d6pvCXMmfMq2bpeArVLGaUBpNnqWkcFekVwq0hqnLj4+5/0OMDx1X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zjpHMDcG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VGMy3306yIbpFHFkAhMbZO0uaYSmXAMxfy0U/jGaKGw=; b=zjpHMDcGe+zuafgEtDE/2t/RyR
-	koaZAdWeREuSWyVeaY2dDINXIHcdCkFrdG5LRJcl4jIrnAzsjP8xwGqatkM8aDqvz1ag16ThcE823
-	dYHlpc7ZO/KYn5OPFX7IzcHJjTnTLfqSVRAygaas9QPXJD5bk4n6WenZhEl7UY+NJQxw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdbOE-004c97-0Q; Mon, 12 Aug 2024 22:11:38 +0200
-Date: Mon, 12 Aug 2024 22:11:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 1/2] net: xilinx: axienet: Report RxRject as
- rx_dropped
-Message-ID: <1a884b22-f73b-43af-9c1e-bb383936620a@lunn.ch>
-References: <20240812174118.3560730-1-sean.anderson@linux.dev>
- <20240812174118.3560730-2-sean.anderson@linux.dev>
+	s=arc-20240116; t=1723493609; c=relaxed/simple;
+	bh=ryRIWMCMOIf7AI2hLWpZSWxhpmfeK5FKuJP+6ERD7J0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YouDx+PsxkPJvah9t9Ba4o1NXw2pFVsE9t7/Ln26Vs+0Jbhl++H5EHyGdaGSJ/WobQozrOgxCyMlPI1x82GuEsCRbQ7fMI6iQCvZFl3qqeja0MAyOCH7XY0FreptdN40y8EkanASsbZIuEaj+j+pQ6SLTvzxzMKlWOwAJVgwSRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KTShQkic; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723493607; x=1755029607;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=s3dYEvupaKjUrQXVsYWre/xbQJlOysr0E/ytP1MYS+c=;
+  b=KTShQkiczXDiKDPS/O6rcqArViTJyZ0NerWWDbZFLcAeAXByDkIgQy0T
+   3FmNOxmLB13a8jKduOpHtLGchszyl3R6lu2+9P31TPNxv+BBisqbiHSJ/
+   eU8BShc2OmNfxOB0QNdLC2TBgli0CYjwtye52JyeDtCC7TCrLbw4CBNVV
+   4=;
+X-IronPort-AV: E=Sophos;i="6.09,284,1716249600"; 
+   d="scan'208";a="224908182"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 20:13:25 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:54559]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.82:2525] with esmtp (Farcaster)
+ id 50319a02-cdfd-4706-a685-282106658347; Mon, 12 Aug 2024 20:13:24 +0000 (UTC)
+X-Farcaster-Flow-ID: 50319a02-cdfd-4706-a685-282106658347
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 12 Aug 2024 20:13:24 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.139.164) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 12 Aug 2024 20:13:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jain.abhinav177@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>,
+	<javier.carrasco.cruz@gmail.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>,
+	<skhan@linuxfoundation.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net v2] selftest: af_unix: Fix kselftest compilation warnings
+Date: Mon, 12 Aug 2024 13:13:06 -0700
+Message-ID: <20240812201306.70769-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240812191122.1092806-1-jain.abhinav177@gmail.com>
+References: <20240812191122.1092806-1-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812174118.3560730-2-sean.anderson@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Aug 12, 2024 at 01:41:17PM -0400, Sean Anderson wrote:
-> The Receive Frame Rejected interrupt is asserted whenever there was a
-> receive error (bad FCS, bad length, etc.) or whenever the frame was
-> dropped due to a mismatched address. So this is really a combination of
-> rx_otherhost_dropped, rx_length_errors, rx_frame_errors, and
-> rx_crc_errors. Mismatched addresses are common and aren't really errors
-> at all (much like how fragments are normal on half-duplex links). To
-> avoid confusion, report these events as rx_dropped. This better
-> reflects what's going on: the packet was received by the MAC but dropped
-> before being processed.
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+Date: Tue, 13 Aug 2024 00:41:22 +0530
+> Change the parameter expected_buf from (const void *) to (const char *)
+> in the function __recvpair() as per the feedback in v1.
+> Add Fixes tag as per feedback in v1.
 > 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> This change fixes the below warnings during test compilation:
+> 
+> ```
+> In file included from msg_oob.c:14:
+> msg_oob.c: In function ‘__recvpair’:
+> 
+> ../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument
+> of type ‘char *’,but argument 6 has type ‘const void *’ [-Wformat=]
+> 
+> ../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
+> msg_oob.c:235:17: note: in expansion of macro ‘TH_LOG’
+> 
+> ../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument
+> of type ‘char *’,but argument 6 has type ‘const void *’ [-Wformat=]
+> 
+> ../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
+> msg_oob.c:259:25: note: in expansion of macro ‘TH_LOG’
+> ```
+> 
+> v1:
+> lore.kernel.org/netdev/20240810134037.669765-1-jain.abhinav177@gmail.com
+> 
+> Fixes: d098d77232c3 ("selftest: af_unix: Add msg_oob.c.")
+> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+No need to respin, but a minor comment below for the future patches.
 
-    Andrew
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+> ---
+
+You can put changelog between revisions after "---" so that it will
+disappear during merge.
+
+And, it would be easy to jump to v1 if it has https:// .
+
+Here's a nice example:
+
+https://docs.kernel.org/process/maintainer-netdev.html#changes-requested
+
+Thanks!
 
