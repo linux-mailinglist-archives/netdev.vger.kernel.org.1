@@ -1,104 +1,171 @@
-Return-Path: <netdev+bounces-117783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A71194F517
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:40:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF30C94F522
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31AEE1F21B47
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CD842816B8
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6669C16D9B8;
-	Mon, 12 Aug 2024 16:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE261187328;
+	Mon, 12 Aug 2024 16:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nOnX5TlN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGn2GEoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B3D15C127
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 16:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB8F183CCC;
+	Mon, 12 Aug 2024 16:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723480828; cv=none; b=CbeNE1ngnkX+JqEPFm/ngoPDHjov06pQ/0CKBEi3UTEL2ILkuFDsrq3gCMkWkS38e9g5a6sh670ZEHBtFWTpeVpcSxeJJMit/4fcDq7hRW9MdYaRKyeqPKPHf4Tb6VZckL3wTgE5FTON8iEwIj7yghzhXinEq+DI/KmRQrXUPLs=
+	t=1723481096; cv=none; b=iwivcKSaJiy5n/11d/EBZTI0D9gglP6xv43qdQXQ4ktOiwyG6jt31FzVPxvYethQuWON8NAGHXrOBCpE5GqhRhEtDC01g9MiOgMxSnj+a3KganayPYg0S6Kny6nMv2MEciaaCvVRDV+dkA9N4JyHSBK5GD/ItrJi6QRuzdXmQf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723480828; c=relaxed/simple;
-	bh=SGek9QlRAF+/hJAjl8ub6fs3BS8o78fLtzb6s0haEsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fy/KR6Yt/BM5Rdmi7f9y2i4s3QVngxcO4ZTRGedFNHSbStRC3QQcx9SN9kQLHP/E3t5SoamNhT9trm3EHVaEgQTnI4LNQZ7Zn+z53qOLQEepzhjbWk7eCPTG94qMzmFw4AsFolpCMhNXbDeUQ20RupgN/XhDmKk61tQWdeT2e48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nOnX5TlN; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3685a564bafso2091219f8f.3
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 09:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723480825; x=1724085625; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M/WxfHz/b6gcyEcd5GVbgkSfTi1vjOrSZQLMndw7bqQ=;
-        b=nOnX5TlNtm1I5tkKX8h3cw4xldK9m2JnBJE+5iEkN0KgyiZFaOiYaDkUpJuBGHTymA
-         5xc9y2mt6h6S0Ql/dPWCRbd/GOGmPqTKfKachoqNKLVrbNNNLwNeKFTYmrIRfVGRRuES
-         bl8fB0VaD30V2Yz5sBLkHOgMQrOpZ9SN904hyjzwQf4pbqCNjr6uIw5eANulHPud13XY
-         ajM6lrQCd+XWj3z2Va2dTG9Zakn1rPQh0IPl1/uxaOFu3VeOkW4jVxe+PPrXoWVyXcnh
-         KvS118qr8twbnXpehFaYcakyNSvVd/sOpn3ddOTrtECNf4TUZmiyl0CD2ZLJi28n7wES
-         lnkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723480825; x=1724085625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M/WxfHz/b6gcyEcd5GVbgkSfTi1vjOrSZQLMndw7bqQ=;
-        b=lWgMlJK8Wn+uUbXgV7aI2J8pVN09mX7clcXctgrY0nRSArhEoYKPqw+5AvM2FaL/8h
-         YdArkVemk36kzA+jjEnPnTChPBK8QkRFNHTq8ATqdMR5ysJhWVim4E/Rc3+cg2SbwdG2
-         tucXQ8Q9pqqPz6pwDyKQlBJYv7dzfRnuCVoqgHqrBxRl3+PdGrK5mkXr5gnGkezNoMHg
-         ri+eO2f1CUxqg4afvgpuvk/K/KoN4gePG2RZxRphYxN/f2jlkM6ffra5uT5pQ8ltAkad
-         GqNnl4alca1V1VZLV2Q1f2h+LF5zLKaW87bClBhrUc55lq1ERyxf03nPmJDqw+FRaJCZ
-         UpUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEtkxTppshr67YE0eUjUgwxxNGL6jy+F/HoBOvZpfZ6VplMInc0ARLY0pophWD3d+id5qNj5lhhhC3JFZ5p8HWsYmv7hAj
-X-Gm-Message-State: AOJu0YxHh2Cgnh7cIOWO3QSSftyHSNZxUH91eAWyu/PNkje8ltJtSe1r
-	IhwVB8k/uqJl1qlI3Kq06tug3BjlkksMxWB/2u0VCqQJHZAucmmFSbitu73TI1Fc5uOtaQoVWV3
-	TFWjRiY2SWlEQ4cw5VEw/ty+4fytSSP52rZK5
-X-Google-Smtp-Source: AGHT+IEy7y1vJZ6e8BGSxa/NkdPr9/FJbx87bLlNeiwxwVBFC9BMxSRQVRqCNFT6jzGzQYx+FnR2dfSQD9WhLCVU3tg=
-X-Received: by 2002:a05:6000:45:b0:368:6f30:ddf1 with SMTP id
- ffacd0b85a97d-3716cd2ac73mr608345f8f.59.1723480824808; Mon, 12 Aug 2024
- 09:40:24 -0700 (PDT)
+	s=arc-20240116; t=1723481096; c=relaxed/simple;
+	bh=2KKDirWRCLyFGNIflIjMwFeB3i+VBV6GbkGbJa2X+XU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pVpkWNtO3oJMqZtkHdHlkTQf6MzE6AhmWnoGuF+KdDmzb0WaWHyuzXsceAGoiWzDhyQmcrileYXFkTImyshAb3T4Dxq/TZU6otq0foqlWzKsKvRCpZtS3wBOY5ZLbzwiwL/3YRa0nXjdwYLeVZtKzpIOtG3YqSHT3M+P0G5c4hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGn2GEoG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2668C32782;
+	Mon, 12 Aug 2024 16:44:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723481096;
+	bh=2KKDirWRCLyFGNIflIjMwFeB3i+VBV6GbkGbJa2X+XU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lGn2GEoG5+mMZA6QMhnL2IR7dBH0NUBSZi3bg+1jeuINBMa6I86ttRzuUWko8B+Ll
+	 mIBTWIBpP1GxeiRHtRa8MqbcdmJQJrJD5Y1CCfYNl5sS/6Q4EZy2lHrzjUZDbSTyhz
+	 arzrSO/R0NDL2spChAAeh9tgWu2C9E5sgzkCgKBLrBESuJ4CZ0MMKvP8pqvVpuezYV
+	 pfxrNcR45pOCKjpHlRxEIfURxNTEpKsAYNIFMgtf8RS9sGndg4q01D+j3Qex/8B2zY
+	 j7Poiq8lGTJ4kAMQmB6WAq7glpxS4JErniRdU5pGrb6CqLcT7XoFuMmm1M0YWa2fSP
+	 iAXbQTOf1PZqw==
+Date: Mon, 12 Aug 2024 17:44:50 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"open list:ETHERNET PHY LIBRARY" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH 1/1] dt-bindings: net: mdio: Add negative patten match
+ for child node
+Message-ID: <20240812-unmoving-viscosity-5f03dfd87f1f@spud>
+References: <20240812031114.3798487-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808205530.726871-1-pkaligineedi@google.com> <20240809222226.42673806@kernel.org>
-In-Reply-To: <20240809222226.42673806@kernel.org>
-From: Ziwei Xiao <ziweixiao@google.com>
-Date: Mon, 12 Aug 2024 09:40:13 -0700
-Message-ID: <CAG-FcCMT+bdJg+R7rY309GbwhLTXefd3EMh07TH9yp1mz-Kt+g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/2] gve: Add RSS config support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, willemb@google.com, 
-	jeroendb@google.com, shailend@google.com, hramamurthy@google.com, 
-	jfraker@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="kH+ai/ND89N9wHWS"
+Content-Disposition: inline
+In-Reply-To: <20240812031114.3798487-1-Frank.Li@nxp.com>
+
+
+--kH+ai/ND89N9wHWS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 9, 2024 at 10:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu,  8 Aug 2024 13:55:28 -0700 Praveen Kaligineedi wrote:
-> > From: Ziwei Xiao <ziweixiao@google.com>
-> >
-> > These two patches are used to add RSS config support in GVE driver
-> > between the device and ethtool.
->
-> Code looks good, thanks!
->
-> Unfortunately the series didn't get into patchwork.
-> Could you repost?
-Should we add any changes to resend the patches such as changing the
-version number or add a RESEND tag in the subject line, or if it's
-okay to just send the original patch series? Thank you!
+On Sun, Aug 11, 2024 at 11:11:14PM -0400, Frank Li wrote:
+> mdio.yaml wrong parser mdio controller's address instead phy's address wh=
+en
+> mdio-mux exist.
+>=20
+> For example:
+> mdio-mux-emi1@54 {
+> 	compatible =3D "mdio-mux-mmioreg", "mdio-mux";
+>=20
+>         mdio@20 {
+> 		reg =3D <0x20>;
+> 		       ^^^ This is mdio controller register
+>=20
+> 		ethernet-phy@2 {
+> 			reg =3D <0x2>;
+>                               ^^^ This phy's address
+> 		};
+> 	};
+> };
+
+I don't understand MDIO well enough to know the answer - does this
+actually solve the problem? It seems to me that the problem is that
+mdio.yaml is applied to the mdio-mux node because it matches the pattern
+"^mdio(@.*)?" that applies the binding based on node-names. If the
+properties in mdio.yaml do not apply to mdio muxes, then the binding
+should not be applied and the patch here is only treating a symptom
+rather than the actual problem.
+
+=46rom a quick check, I don't see any of the mdio-mux-mmioreg nodes using
+the properties from mdio.yaml, so should the binding be applied to them
+at all?
+
+Cheers,
+Conor.
+
+
+FWIW, adding a $ after the ? in the pattern I linked would stop the
+binding being applied to the mdio-mux nodes, but if something like that
+were done, all mdio nodes would need to be checked to ensure they match
+the new pattern...
+
+
+>=20
+> Only phy's address is limited to 31 because MDIO bus defination.
+>=20
+> But CHECK_DTBS report below warning:
+>=20
+> arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dtb: mdio-mux-emi1@54:
+> 	mdio@20:reg:0:0: 32 is greater than the maximum of 31
+>=20
+> The reason is that "mdio@20" match "patternProperties: '@[0-9a-f]+$'" in
+> mdio.yaml.
+>=20
+> Change to '^(?!mdio@).*@[0-9a-f]+$' to avoid match parent's mdio
+> controller's address.
+>=20
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/mdio.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/mdio.yaml b/Documentat=
+ion/devicetree/bindings/net/mdio.yaml
+> index a266ade918ca7..a7def3eb4674d 100644
+> --- a/Documentation/devicetree/bindings/net/mdio.yaml
+> +++ b/Documentation/devicetree/bindings/net/mdio.yaml
+> @@ -59,7 +59,7 @@ properties:
+>      type: boolean
+> =20
+>  patternProperties:
+> -  '@[0-9a-f]+$':
+> +  '^(?!mdio@).*@[0-9a-f]+$':
+>      type: object
+> =20
+>      properties:
+> --=20
+> 2.34.1
+>=20
+
+--kH+ai/ND89N9wHWS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZro8AgAKCRB4tDGHoIJi
+0mPgAP901yLmgljlIK02ytzDSbo3W7Tr4fIWkLT+81cA1NMr3QD+KIz3cHhvDZ3I
+JllrKy8z3fObL8klZ02PBpDvChhibQI=
+=nO2U
+-----END PGP SIGNATURE-----
+
+--kH+ai/ND89N9wHWS--
 
