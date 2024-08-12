@@ -1,83 +1,166 @@
-Return-Path: <netdev+bounces-117731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E9494EF3D
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:13:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E709E94EF4E
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47C061F226EC
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16FC41C202D5
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8018A17DE10;
-	Mon, 12 Aug 2024 14:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B85717C7CE;
+	Mon, 12 Aug 2024 14:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieRbve6g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h92mLzSG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565CD33C5;
-	Mon, 12 Aug 2024 14:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCEA4D8D1;
+	Mon, 12 Aug 2024 14:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723472012; cv=none; b=rY/zvISpoYB2Kpstj7YVgcyDPcmVhLBwupjhjwkh9vZX9U/652szBdrrbJrL4q8XvFcu+TF6yIWx7I+1JbHzCoTcRS8eZBczWgM9/9p0J0DP652OSFbBAi/Nj1vhW5e+qgKHVFJh3RTJlL2fUPY1S1KbmRrHq4Nv/PL+8U6Y72g=
+	t=1723472144; cv=none; b=bGkf9kjg5EvVfQE8JFaK+RYV71A9ZMWRyYNOAWi9+21r23DmckTKAm9QRiWEfYhTKhGD/fz6U3MyohvUzPinmSM7WVUbpaGQAcs29OZsk+eJzjLo6d8xpgzAPJ2TAOOeB3fToRhsnjG2OUTWruhbS/3hUYlN6q+rVsWopasxkcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723472012; c=relaxed/simple;
-	bh=TC/QMOkYIMtEI0vpiVXPXJAu6ENEaOjWl87P5kFwUvE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VBbzJFb+33xvKJc0mxtSrG7JT/nSoNBEonAKxCOrLp/RXcznkPeEdBkBBReeEibPH385t2Rh3mb7SOZPlEJXJgb/fubQkiua5VqzKCMDKw2F3QeOPm0989toCXFIKcKJLoKIDAkxauPveK6wYt9A6rr5jQRDp4jgM/cFOtNxK4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ieRbve6g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D5F1C4AF09;
-	Mon, 12 Aug 2024 14:13:31 +0000 (UTC)
+	s=arc-20240116; t=1723472144; c=relaxed/simple;
+	bh=BGRlCIKuiTa0XsHIzgvyQx8GF3ZnAv0GUuP0rAeXyCU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=coiSBMqoQyzBmIq5pOYpXiHeQKpHMgbnXb/dufDsfSFOVsg4bhJGRbvO961ymSSXnXwGrhFW+lXQuGVDmTSKxy3AgdCBz0O8HHLZupUQ9LEgqkneHOXQoBz0sGUvZuEqFVNOuHQTLNTs2CWIZnsJytb8vomHVAIq1CLcrJxdAYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h92mLzSG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E281FC32782;
+	Mon, 12 Aug 2024 14:15:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723472011;
-	bh=TC/QMOkYIMtEI0vpiVXPXJAu6ENEaOjWl87P5kFwUvE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ieRbve6gGbPfvJArfpSKs1Vx00YBFsMuODaQWTRIVvInmuyZ0ULOtXt3eG1GtVArh
-	 A7l77oEztGSzFI7vQQIX+5Y3il1EeVDnPI4yVsEb0QBQ80QULCa6tsDWce46XVSyYr
-	 v3bid7zD5EKbTo2Gg9EMsdObJXsgDBIz8+ZSZ2h5E+qGUL2Ixjoy656s3q5Rx+e2fT
-	 0BT58b8uP8QTk+Tsy0LlZxdKpiKsaL0fKzZk9shjfa9N4MLLZ2AQtpWTKDLKPA94st
-	 xurEDyuHPRQBJWfmXFhSHOb0DIfWOCCAkHas+zQbmjZ3JULQXZKWPb/uKt/X2fZJei
-	 yoV3ghAroVVCA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1723472143;
+	bh=BGRlCIKuiTa0XsHIzgvyQx8GF3ZnAv0GUuP0rAeXyCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h92mLzSGxYNshbdDjnHt4dZzxeI4oQDUywM7ziZFFk66puOjtqnEM+7k/VomXLjWW
+	 cfMLqMBvuZdWU12nWRhbrUJzXv+uPPuIwHZOP9rZYzB3+xI5yLf2vNgUbfzqXq7xNR
+	 Xb9V7k6bZGYZNUdxkShOGLhhVVwYxFkjcOjeFNwxhQcClrf00dkHUK/IxeiKNUUIp2
+	 BuIxmopuQDjVsgk+zHAbz54nqRscAWpvCZjCYyk7IV76H06RgfIzjCwg289/7mgGRs
+	 F/LIYoDOL5i9Q683+C0OLNP3rFM1xpGOM6TSdyhCi7aOlZsekQguaEEOcFJCxFRYGN
+	 rNOYryGQ5hpPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdVnd-0032l0-9D;
-	Mon, 12 Aug 2024 15:13:29 +0100
+	id 1sdVpl-0032oI-Rk;
+	Mon, 12 Aug 2024 15:15:42 +0100
+Date: Mon, 12 Aug 2024 15:15:41 +0100
+Message-ID: <864j7p25f6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Breno Leitao <leitao@debian.org>,
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org,
 	Sunil Goutham <sgoutham@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] net: thunder_bgx: Fix netdev structure allocation
-Date: Mon, 12 Aug 2024 15:13:22 +0100
-Message-Id: <20240812141322.1742918-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org,
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next v2] net: thunderx: Unembed netdev structure
+In-Reply-To: <20240626173503.87636-1-leitao@debian.org>
+References: <20240626173503.87636-1-leitao@debian.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, leitao@debian.org, sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+X-SA-Exim-Rcpt-To: leitao@debian.org, kuba@kernel.org, sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Commit 94833addfaba ("net: thunderx: Unembed netdev structure") had
-a go at dynamically allocating the netdev structures for the thunderx_bgx
-driver.  This change results in my ThunderX box catching fire (to be fair,
-it is what it does best).
+On Wed, 26 Jun 2024 18:35:02 +0100,
+Breno Leitao <leitao@debian.org> wrote:
+> 
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
+> 
+> Un-embed the net_devices from struct lmac by converting them
+> into pointers, and allocating them dynamically. Use the leverage
+> alloc_netdev() to allocate the net_device object at
+> bgx_lmac_enable().
+> 
+> The free of the device occurs at bgx_lmac_disable().
+> 
+>  Do not free_netdevice() if bgx_lmac_enable() fails after lmac->netdev
+> is allocated, since bgx_lmac_disable() is called if bgx_lmac_enable()
+> fails, and lmac->netdev will be freed there (similarly to lmac->dmacs).
+> 
+> Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+> Changelog:
+> 
+> v2:
+> 	* Fixed a wrong dereference in netdev_priv (Jakub)
+> 
+>  .../net/ethernet/cavium/thunder/thunder_bgx.c | 21 +++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
 
-The issues with this change are that:
+This patch causes my ThunderX box to explode badly:
+
+[   10.022118] thunder_bgx, ver 1.0
+[   10.022594] libata version 3.00 loaded.
+[   10.023226] mdio_thunder 0000:01:01.3: Added bus at 87e005003800
+[   10.023757] mdio_thunder 0000:01:01.3: Added bus at 87e005003880
+[   10.035431] thunder_bgx 0000:01:10.0: BGX0 QLM mode: XFI
+[   10.045225] Unable to handle kernel NULL pointer dereference at virtual address 00000000000005e8
+[   10.069901] Mem abort info:
+[   10.085236]   ESR = 0x0000000096000044
+[   10.109767]   EC = 0x25: DABT (current EL), IL = 32 bits
+[   10.145191]   SET = 0, FnV = 0
+[   10.148272]   EA = 0, S1PTW = 0
+[   10.151422]   FSC = 0x04: level 0 translation fault
+[   10.156309] Data abort info:
+[   10.159196]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
+[   10.164689]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
+[   10.169752]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[   10.175076] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000111b43000
+[   10.181533] [00000000000005e8] pgd=0000000000000000, p4d=0000000000000000
+[   10.188328] Internal error: Oops: 0000000096000044 [#1] PREEMPT SMP
+[   10.194585] Modules linked in: libahci(E) nvme(E) nvme_core(E) t10_pi(E) mdio_thunder(E) thunder_bgx(E+) libata(E) mdio_devres(E) crc64_rocksoft(E) scsi_mod(E) igb(E+) thunder_xcv(E) mdio_cavium(E) crc64(E) i2c_algo_bit(E) gpio_keys(E) usbhid(E) scsi_common(E) of_mdio(E) fixed_phy(E) fwnode_mdio(E) i2c_thunderx(E) libphy(E)
+[   10.223291] CPU: 0 PID: 341 Comm: kworker/0:4 Tainted: G            E      6.10.0-rc5-01073-g94833addfaba #3309
+[   10.233368] Hardware name: GIGABYTE MT30-GS0/MT30-GS0, BIOS F02 08/06/2019
+[   10.240231] Workqueue: events work_for_cpu_fn
+[   10.244588] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   10.251540] pc : bgx_probe+0x44c/0x640 [thunder_bgx]
+[   10.256502] lr : bgx_probe+0x410/0x640 [thunder_bgx]
+[   10.261460] sp : ffff800084dd3c80
+[   10.264876] x29: ffff800084dd3c80 x28: 0000000000000000 x27: ffff000ff6772a70
+[   10.272006] x26: ffff00010cb02480 x25: 0000000000000000 x24: ffff80007a325700
+[   10.279136] x23: ffff00010c0e60c8 x22: ffff80008100a3d8 x21: ffff000ff6772a88
+[   10.286266] x20: ffff00010c0e6000 x19: ffff00010cb02480 x18: ffffffffffffffff
+[   10.293396] x17: 000000004b2d2331 x16: 00000000b606f3da x15: 0000000000000006
+[   10.300526] x14: 0000000000000000 x13: 3030383330303530 x12: 3065373820746120
+[   10.307656] x11: 7375622064656464 x10: ffff800081e158e8 x9 : ffff800080aa9a30
+[   10.314786] x8 : 0101010101010101 x7 : 0000000000000000 x6 : ffff00010c0e60c8
+[   10.321916] x5 : ffff800084dd3cf8 x4 : 0000000000000000 x3 : 0000000000000000
+[   10.329046] x2 : 0000000000000000 x1 : ffff80007a3296d0 x0 : ffff000ff6772a70
+[   10.336176] Call trace:
+[   10.338613]  bgx_probe+0x44c/0x640 [thunder_bgx]
+[   10.343225]  local_pci_probe+0x48/0xb8
+[   10.346966]  work_for_cpu_fn+0x24/0x40
+[   10.350706]  process_one_work+0x170/0x400
+[   10.354707]  worker_thread+0x26c/0x388
+[   10.358446]  kthread+0xfc/0x110
+[   10.361580]  ret_from_fork+0x10/0x20
+[   10.365150] Code: 52800004 52800003 d2800002 f9401f47 (f902f4e6) 
+[   10.371232] ---[ end trace 0000000000000000 ]---
+
+and I've confirmed that reverting this patch on top of -rc3 restores
+normal behaviour.
+
+There are two issues with this change:
 
 - bgx_lmac_enable() is called *after* bgx_acpi_register_phy() and
   bgx_init_of_phy(), both expecting netdev to be a valid pointer.
@@ -86,95 +169,14 @@ The issues with this change are that:
   attached to a given BGX instance, and thus needs netdev for each of
   them to have been allocated.
 
-There is a few things to be said about how the driver mixes LMAC and
-BGX states which leads to this sorry state, but that's beside the point.
+I have posted a potential fix at [1].
 
-To address this, go back to a situation where all netdev structures
-are allocated before the driver starts relying on them, and move the
-freeing of these structures to driver removal. Someone brave enough
-can always go and restructure the driver if they want.
+Thanks,
 
-Fixes: 94833addfaba ("net: thunderx: Unembed netdev structure")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>
-Cc: Sunil Goutham <sgoutham@marvell.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
- .../net/ethernet/cavium/thunder/thunder_bgx.c | 30 +++++++++++++------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+	M.
 
-diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-index a40c266c37f2..608cc6af5af1 100644
---- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-+++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-@@ -1054,18 +1054,12 @@ static int phy_interface_mode(u8 lmac_type)
- 
- static int bgx_lmac_enable(struct bgx *bgx, u8 lmacid)
- {
--	struct lmac *lmac, **priv;
-+	struct lmac *lmac;
- 	u64 cfg;
- 
- 	lmac = &bgx->lmac[lmacid];
- 	lmac->bgx = bgx;
- 
--	lmac->netdev = alloc_netdev_dummy(sizeof(struct lmac *));
--	if (!lmac->netdev)
--		return -ENOMEM;
--	priv = netdev_priv(lmac->netdev);
--	*priv = lmac;
--
- 	if ((lmac->lmac_type == BGX_MODE_SGMII) ||
- 	    (lmac->lmac_type == BGX_MODE_QSGMII) ||
- 	    (lmac->lmac_type == BGX_MODE_RGMII)) {
-@@ -1191,7 +1185,6 @@ static void bgx_lmac_disable(struct bgx *bgx, u8 lmacid)
- 	    (lmac->lmac_type != BGX_MODE_10G_KR) && lmac->phydev)
- 		phy_disconnect(lmac->phydev);
- 
--	free_netdev(lmac->netdev);
- 	lmac->phydev = NULL;
- }
- 
-@@ -1653,6 +1646,23 @@ static int bgx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	bgx_get_qlm_mode(bgx);
- 
-+	for (lmac = 0; lmac < bgx->lmac_count; lmac++) {
-+		struct lmac *lmacp, **priv;
-+
-+		lmacp = &bgx->lmac[lmac];
-+		lmacp->netdev = alloc_netdev_dummy(sizeof(struct lmac *));
-+
-+		if (!lmacp->netdev) {
-+			for (int i = 0; i < lmac; i++)
-+				free_netdev(bgx->lmac[i].netdev);
-+			err = -ENOMEM;
-+			goto err_enable;
-+		}
-+
-+		priv = netdev_priv(lmacp->netdev);
-+		*priv = lmacp;
-+	}
-+
- 	err = bgx_init_phy(bgx);
- 	if (err)
- 		goto err_enable;
-@@ -1692,8 +1702,10 @@ static void bgx_remove(struct pci_dev *pdev)
- 	u8 lmac;
- 
- 	/* Disable all LMACs */
--	for (lmac = 0; lmac < bgx->lmac_count; lmac++)
-+	for (lmac = 0; lmac < bgx->lmac_count; lmac++) {
- 		bgx_lmac_disable(bgx, lmac);
-+		free_netdev(bgx->lmac[lmac].netdev);
-+	}
- 
- 	pci_free_irq(pdev, GMPX_GMI_TX_INT, bgx);
- 
+[1] https://lore.kernel.org/r/20240812141322.1742918-1-maz@kernel.org
+
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
 
