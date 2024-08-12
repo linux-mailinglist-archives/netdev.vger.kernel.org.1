@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-117855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2CB294F8F6
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D3F394F8F9
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A20E283386
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:28:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 381DF283B0F
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAB4194A49;
-	Mon, 12 Aug 2024 21:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EB014EC59;
+	Mon, 12 Aug 2024 21:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FnJav7uR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfxpM+Ow"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8C1187553;
-	Mon, 12 Aug 2024 21:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEF554759
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 21:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723498090; cv=none; b=PJHl4wK4th26fkpAONvfBcdqAvJJgakSAX6DuL9bKXdEx64FYfK14RqeEeSdlyaJkrnFB3C/sUTJKSI/mMzLRw6iwZkG8WDeR4ehehpNe+eMc/9ktriTnOEidyuS1B0lPJxAYRgb9oMwpbTEO3tlvP+oMsooktrFNoTPFNr4FSI=
+	t=1723498254; cv=none; b=H1OEyeuVMxqyzIuij1trMM5HcN/rXzROv/h+V2aY+0rCcdwd4F5TbmDD2fJ0DRmVcGlDtJo+UBxFvvEMSzkAx0YWe8i17v6AdhLYOtcFyZD1XyIZP6pNoMjqYuJ1KS620GxUE/ipertLbwsLWfV23D9Vo0cokFQ0XSDh8BWbv0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723498090; c=relaxed/simple;
-	bh=2anLmvgLygGK2sB+arUEGgY58D4B5bZI7k9IAL1zuCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gr2BNPpdwGDoFzuvjRYYvFsjlJ/va32dil/Ufuxqp0HitHV2zMwrtG5KOgzadfbonL0QGWB5Rrq4HOW1qZbeqyivGt5xF42gVV0cR2JwBhMZQPfUdjAolqw8uKyVGW7jm3G2XDyZtvUHGsO6qsfsrBCBsVDxPgWzkPHDvA7wmFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FnJav7uR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=a5dWnVcDL2y4UgdW2kUaINeQrbP4oE/rFx2jeLTa9Ao=; b=FnJav7uRWxxcGxJsxLHACfuSad
-	mhfreWbPHaNYsf8DDF0np7YKUKMJ+aUTKYmqH3aFvCowXKs1ZEt3ZESf5EBdsU9ikr4Dc9imUppEL
-	EIKYisYfpovkSa3pzzUIG6fY/6xdyGxN7y/IIENEzw8nzjTYaGY4SkHu4d2lhgB3b7lc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdca7-004ceV-UR; Mon, 12 Aug 2024 23:27:59 +0200
-Date: Mon, 12 Aug 2024 23:27:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de
-Subject: Re: [PATCH net-next 2/3] net: ag71xx: use devm for
- of_mdiobus_register
-Message-ID: <ae818694-e697-41cc-a731-73cd50dd7d99@lunn.ch>
-References: <20240812190700.14270-1-rosenp@gmail.com>
- <20240812190700.14270-3-rosenp@gmail.com>
+	s=arc-20240116; t=1723498254; c=relaxed/simple;
+	bh=bail6VLDd5MGn5dPaD0cau2CnlFEwTwmcJ6TZ3zMRZo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UzNpHyIVfRgvcBcB4HOGI6q47nfgqxL6Y2sCErjGffYzKhmHJ52t2vPkd4ytQPci6c2VzPjyAs3Xy3sV+tEPRY3SgXkADu3z3/lpZ+cEMf/YZKmnhxDlsNlp78zVjEQzXj7WuoJ8rj3pBahVFt+eB2qLPrMDBlrN3d1pQYMY1zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfxpM+Ow; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31058C32782;
+	Mon, 12 Aug 2024 21:30:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723498254;
+	bh=bail6VLDd5MGn5dPaD0cau2CnlFEwTwmcJ6TZ3zMRZo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VfxpM+OwKNEdZya5Pte3xQx0RjuIsDGIbVSMfQE7Nn6eoYPB7ydomX7C7xXZDHd3O
+	 6JThk3Aa/S58+oEVyLkcC8PqPjdEZxqebvF2VzHFKluGdHzV+Fu7Hd2KBYxNp4XHdL
+	 fvFK/afmbXnFFEm4cnFvlS/gqkkUs2/j6T2e2hPkbOMno5YZ9aUuMpC7eY132o8AJp
+	 TdmkQzjfEU1o6C6hnK1ltzbLbA/W6dn/tUthdChcpHym5QPKbGaBquHgsz1Q1RJLkh
+	 TGd6NuKPGQJq2P3uaY97HHCYDB36DgFePEkz8/0PRdR0VVyuH/vP6BUDUfm8+6FLGS
+	 rFwehFipsGRiA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E37382332D;
+	Mon, 12 Aug 2024 21:30:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812190700.14270-3-rosenp@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute] man/ip-xfrm: fix dangling quote
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172349825227.1144807.709460668728268649.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Aug 2024 21:30:52 +0000
+References: <20240811164455.5984-1-stephen@networkplumber.org>
+In-Reply-To: <20240811164455.5984-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, leonro@nvidia.com
 
-On Mon, Aug 12, 2024 at 12:06:52PM -0700, Rosen Penev wrote:
-> Allows removing ag71xx_mdio_remove.
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Sun, 11 Aug 2024 09:44:46 -0700 you wrote:
+> The man page had a dangling quote character in the usage.
 > 
-> Removed local mii_bus variable and assign struct members directly.
-> Easier to reason about.
+> Fixes: bdd19b1edec4 ("xfrm: prepare state offload logic to set mode")
+> Cc: leonro@nvidia.com
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  man/man8/ip-xfrm.8 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This mixes up two different things, making the patch harder to
-review. Ideally you want lots of little patches, each doing one thing,
-and being obviously correct. 
+Here is the summary with links:
+  - [iproute] man/ip-xfrm: fix dangling quote
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=6d632bbcda73
 
-Is ag->mii_bus actually used anywhere, outside of ag71xx_mdio_probe()?
-Often swapping to devm_ means the driver does not need to keep hold of
-the resources. So i actually think you can remove ag->mii_bus. This
-might of been more obvious if you had first swapped to
-devm_of_mdiobus_register() without the other changes mixed in.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    Andrew
 
----
-pw-bot: cr
 
