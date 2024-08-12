@@ -1,113 +1,79 @@
-Return-Path: <netdev+bounces-117667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE5294EB87
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:56:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB0094EB91
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:06:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ED4FB222F2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8F4428150A
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8248A170A31;
-	Mon, 12 Aug 2024 10:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFczgtmU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0618170A3F;
+	Mon, 12 Aug 2024 11:06:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEB1170A0A;
-	Mon, 12 Aug 2024 10:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C94380;
+	Mon, 12 Aug 2024 11:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723460135; cv=none; b=eNh1wmdWdmGl2TXLRfLhBjATcv10gaSNmkFZzipY8gme81iZtiD8W1f9XphScNisqttBB2GaOPPOcjWJE4qFKJJCr6tnDrBHmGkby1ggDzwrrEGjTluUrZ9Di/ymGRDnkkScLMdgKSzp/4HP1PUMriTXgsr8EEvry/1Qz3a12iM=
+	t=1723460767; cv=none; b=eISUsstyaJ9OwB1BpFjWbGLT73k1GNU7S8wJbCEBiU7m14tjUmyiENkFSBH0PhyS7cNi8aA8j4loiF9e78g8QgZkDHTVa8ZYdBAsAGe7BDNfW9wHbeYSz9Z7PkPNSNdg7gjpPPazQOYAaoetpMtjWlk9KfURg9s4gnQIXn97/xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723460135; c=relaxed/simple;
-	bh=9Gjh8wrH7LLHsrpmI1U+ZYZ/g/67UkGmtuDBq9at/5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LcZfGSbxXurspQ5WTnyQ1nWevkJIVhJX8cU4PbMkQn5H3/n6cOoGyXT6y0LUVEkvwh3dTyO/FBJmzgkceriUnqKDb9Kue8Txueu+8Q54fmxiLgYVWePD81c60nsglOb1cBmN5y+RMwjNNVWpME/J2DwKsnT+xGkALZIkiufore0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFczgtmU; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5d5c7f23f22so2432796eaf.0;
-        Mon, 12 Aug 2024 03:55:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723460133; x=1724064933; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NPaRmh24QV5ReZsiiXuFKq2S39iqLXRWYwV4MINhh0g=;
-        b=QFczgtmUO0wUsrHi3t4uPRJIYtjYLD912Ri4c+ni91SfTWWPu5AlZ9KF7IR9hTyDlm
-         AgdBCUXZa5EMHxcH0wzcadhbABoor9l69umph8j+YvQEPnLdBaQyCAeDd0OyPZzJfp90
-         HRC9qXl1xOPKxZkRGmDvR2rivhPYD5tqwMBCFbF2zGNpA6zMZKcJIQe1Q2V/tHuOkSpL
-         AxucVcPkehJrgWxmWZXVk8Cj7oLy3XBV9vQowB5mZ/XycwLlmuzUvIxKMsYE/UGoKFa0
-         004yOT3FK0zMD4f2GDRFGLj9jZrEwXhuj4NTfsjg4XpaQD1KHwwL+jRsKCscwcxrL9J9
-         ROeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723460133; x=1724064933;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NPaRmh24QV5ReZsiiXuFKq2S39iqLXRWYwV4MINhh0g=;
-        b=Snk6SwkcrjuFbeue/MibVQEIZ4gs8gjpNf0olFg4WjK9SEDQ5YqpMoma6RXBKVSKi+
-         Rro5zdrXvMqcp4cxEp7LCEA/VDXXoGbj2sTw0FaHF6PoDUGJk03S+2cK7sQjxR7hX3hV
-         zvOQTdVQDpeJYXCv6bVfdME6mnvVWWCFIFKne0vvmUd2qJmDSFwnvV2VJIwqz8iYvbnl
-         h8tZxBcVtLgHrg7g2Khw7K2AmFLCdKICLOlrK0+02KbrlNktp1ZuvjcT8+MZo0vdnHqJ
-         D5Q9N7eM3mzPf0Gyf2goeloeE7l2Zf5oM6LeAbu1pS4QRDOp1Nw5YBkq6OkJDSJtEK3M
-         9g4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWeBbAJa4ZqzOV/1fRr2xPxCUxIOx304VsL4T8+CugHXwK1rT8igE/59WvCMKmOwXThTm4fiDwI0K2+xwqwi2+RP9/djyb6ydcS+eDY1P0ZLC6IgJvFrCyBVCEVGbp2C+nGGX0LE3rJX2rwV0Hnl5jimu7ozRf08fXvgdk5tMEgwg==
-X-Gm-Message-State: AOJu0Yxe3OkwE7Z/0VlO1bDtZ+Llbmf1xjkaftK6/FP5YYvnPumsjoJO
-	9Z0HaMRHlfbQ8C8NGi8UysEGRZOgarnSbCFlv46XiKIXXiSxutrkorNfwiyJQiuTXpjyyfCz9jf
-	K2UGRma7TBhGIEb4IHXxgeeyOVBc=
-X-Google-Smtp-Source: AGHT+IHiSMX3J6K0nI+hNnKPWUmqIsJ0s8DFVtdCGHHR49eP9W5PwH3rX+befgLK9IE9xf0ht3t4nlcSbeueqkPJgt4=
-X-Received: by 2002:a05:6820:1b94:b0:5d6:10e1:9523 with SMTP id
- 006d021491bc7-5d867dc089emr9011875eaf.3.1723460133056; Mon, 12 Aug 2024
- 03:55:33 -0700 (PDT)
+	s=arc-20240116; t=1723460767; c=relaxed/simple;
+	bh=5msWubFUrC7JH/hdT6tuEQlfTvrJRBDt3jfOM4r1dPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oA6sc7SJCX9WuxYLP2Y51ylstbrdB7hI+MswpH0d9bfyEqjKMVtaqSsjEOEhDApDzunSssipn3PntcDda78fdYOYtO6mCiIep/2tiNlknX/GZMFqVVwkzfDPUs+XxvB8rPt+dbrmmLyqfHyeb4BKYLUSuTFlL2MbpNk4rp9Sn6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 74AC768AA6; Mon, 12 Aug 2024 13:06:00 +0200 (CEST)
+Date: Mon, 12 Aug 2024 13:06:00 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>, Tariq Toukan <ttoukan.linux@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Anna Schumaker <Anna.Schumaker@Netapp.com>,
+	Trond Myklebust <trondmy@kernel.org>, linux-nfs@vger.kernel.org,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Maxim Mikityanskiy <maxtram95@gmail.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Networking <netdev@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [Bug report] NFS patch breaks TLS device-offloaded TX zerocopy
+Message-ID: <20240812110600.GB14300@lst.de>
+References: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com> <77fb3db5-7a59-4879-b9c2-d3408fcf67e8@grimberg.me> <4f42fac4-2a4e-426a-be86-1f4bb79987b4@gmail.com> <3e08421f-91ac-4bd1-9886-3d5ecf9afa04@grimberg.me> <8683155c-79ad-4090-9aff-fc8d765b096b@gmail.com> <20240812090215.GA5497@lst.de> <06a66824-cc2e-4f6d-8776-c2bd415c06f9@grimberg.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812084945.578993-1-vtpieter@gmail.com> <20240812084945.578993-6-vtpieter@gmail.com>
- <e93d13b451a263470e93706faa3afbfe2b5cd57b.camel@microchip.com>
-In-Reply-To: <e93d13b451a263470e93706faa3afbfe2b5cd57b.camel@microchip.com>
-From: Pieter <vtpieter@gmail.com>
-Date: Mon, 12 Aug 2024 12:55:21 +0200
-Message-ID: <CAHvy4Aq8G2vLzFCCRRQV5kCD4jp8oYW+c=m_foyHXKoeiCod5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 5/5] net: dsa: microchip: apply KSZ87xx family
- fixes wrt datasheet
-To: Arun.Ramadoss@microchip.com
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	linux@armlinux.org.uk, conor+dt@kernel.org, Woojung.Huh@microchip.com, 
-	robh@kernel.org, krzk+dt@kernel.org, f.fainelli@gmail.com, kuba@kernel.org, 
-	UNGLinuxDriver@microchip.com, marex@denx.de, edumazet@google.com, 
-	pabeni@redhat.com, pieter.van.trappen@cern.ch, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <06a66824-cc2e-4f6d-8776-c2bd415c06f9@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hi Arun,
-
-> @@ -141,7 +141,7 @@ static struct sk_buff *ksz8795_rcv(struct sk_buff
-> > *skb, struct net_device *dev)
-> >  {
-> >         u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
-> >
-> > -       return ksz_common_rcv(skb, dev, tag[0] & 7,
-> > KSZ_EGRESS_TAG_LEN);
-> > +       return ksz_common_rcv(skb, dev, tag[0] & 3,
-> > KSZ_EGRESS_TAG_LEN);
-> >  }
+On Mon, Aug 12, 2024 at 12:13:51PM +0300, Sagi Grimberg wrote:
 >
-> This change can be separate patch. since it is not related to
-> ksz87xx_dev_ops structure. Is it a fix or just good to have one. If it
-> is a fix then it should be point to net tree.
 >
+>
+> On 12/08/2024 12:02, Christoph Hellwig wrote:
+>> On Tue, Aug 06, 2024 at 01:07:47PM +0300, Tariq Toukan wrote:
+>>> Adding Maxim Mikityanskiy, he might have some insights.
+>> I think the important part to find out is if the in-kernel TLS API
+>> has a limitation to PAGE_SIZE buffer segments, or not.
+>
+> I don't see why it should. Also note that sw tls does not suffer from
+> this. Maybe Jakub can add more light here in case something was missed?
 
-It's a fix wrt to datasheet but in reality I can see from tests with
-a KSZ8794 that bit 2 is always 0 so the bug doesn't manifest itself.
-
-Please advise, keep it in net-next or make a separate patch for the
-net tree?
+I don't see why it should either, but instead of assuming we should
+make it clear what the assumptions are before going further.
 
