@@ -1,320 +1,94 @@
-Return-Path: <netdev+bounces-117603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA34C94E7DE
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:32:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A85794E7E2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36FA01F23D6D
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:32:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB3F9B215FF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7E21586CB;
-	Mon, 12 Aug 2024 07:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BF114F138;
+	Mon, 12 Aug 2024 07:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BG8ElC2Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEAD16A94F
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62212136328
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723447877; cv=none; b=TKGoK/qw+NP5ECs9cWjFOaTbgXP1hb6Rj63AhvJCZXY0jk3lZzFq2GRvSqrNj4APcTlWPJLynY5V0NMmClCusavkBUGv6ik8Vwkh6tWh3tx5gPK0qyIQzZAgVOcdo7nhi1tuu+L4BWqL/k3a3fYcuc1jymxEby24eNsx6fgr1Fk=
+	t=1723448004; cv=none; b=mjb73kv2ke8T7SRDKMGROV2H5wYg4VJdrSoZ2xM0byY3y1x4BfQ2wMyljKYWjAZNZABhAZy4Vy8mHwemYrNvPa0VAkc3BLJjyQ7sFzs6wTmuODpdNq5AciQFURI5FZgTcHiSQyOp6xvKa5FGPv4PNIfVRh9Dfa0L1nPqQTj1HBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723447877; c=relaxed/simple;
-	bh=vlbkNoYP2j5e0GPK16xqyatdla3pugrJU/oYKYwjJSo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KEMRmVHvnoSOQ4srNAT73hZmhTC1+OrXOU5vEQp5plN0sT5KUxK6R04KuqIyuMS3lcfeMK0ITrGr+xdGlbltuaR4CltCtIJBkYXnVjSnCAd5UZZOMVwE/s7TUIGSnkF33KIwK07PFzTA4gTmuyzGvjHQLeDx03v0xT/9/PbXKz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sdPVx-0003wx-EO; Mon, 12 Aug 2024 09:30:49 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sdPVv-006J0f-L5; Mon, 12 Aug 2024 09:30:47 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sdPVv-007FeS-1t;
-	Mon, 12 Aug 2024 09:30:47 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v5 3/3] net: phy: dp83tg720: Add cable testing support
-Date: Mon, 12 Aug 2024 09:30:46 +0200
-Message-Id: <20240812073046.1728288-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240812073046.1728288-1-o.rempel@pengutronix.de>
-References: <20240812073046.1728288-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1723448004; c=relaxed/simple;
+	bh=Kb6aYdGXYBie73PgQFQL4UaNW82u/uD1GS76tQrlfWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2H7DrNlQfGp+4xMBwUj/QFPsMNMU+Ws0rZ1M3dfOywykwgfpCR9dsBnzkDB0YQJPgq3VP91ay2eoOxqFBSNM2AGsKD4/49logGLQ4uP8FF+VwMAC4OdDBVBtxjprGVMh5Li6j9SWFGECBYdl6WGBPbnLvwtylKBCknb7ud/Aog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BG8ElC2Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D5D3C32782;
+	Mon, 12 Aug 2024 07:33:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723448003;
+	bh=Kb6aYdGXYBie73PgQFQL4UaNW82u/uD1GS76tQrlfWc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BG8ElC2YkVrvK+mLb+08gsgWD7dSjVGWY0JcvMva0xtDuctDz7zG1LviCXbKtABF+
+	 qy3rGQEDrgb6LFUHlsCUtC+scc12/lpP/OtOCv+qQ7fyxycLExfo8gzqQCcCMznFUq
+	 Ie1BYvgL9JNS+NaSl0FQ/KnQd/4CLS/kDLuJpMLUzpjDp96R10fuF195R37x/dfAyM
+	 GM8G4ubpeOlxUDcVbk7RChVuCU/oz0jirDVTDvvbpBohtSlcuuZyT70+0s5Z0GsPma
+	 +jDdEEFwNWvNICU5RKiwsp6IIQ1VoZYqDIFKHQYrQ/ERBDeO6ASaMGx7yLs6eBU0nr
+	 Bp3R9bjuQ7dag==
+Date: Mon, 12 Aug 2024 10:33:20 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute] man/ip-xfrm: fix dangling quote
+Message-ID: <20240812073320.GA12060@unreal>
+References: <20240811164455.5984-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240811164455.5984-1-stephen@networkplumber.org>
 
-Introduce cable testing support for the DP83TG720 PHY. This implementation
-is based on the "DP83TG720S-Q1: Configuring for Open Alliance Specification
-Compliance (Rev. B)" application note.
+On Sun, Aug 11, 2024 at 09:44:46AM -0700, Stephen Hemminger wrote:
+> The man page had a dangling quote character in the usage.
 
-The feature has been tested with cables of various lengths:
-- No cable: 1m till open reported.
-- 5 meter cable: reported properly.
-- 20 meter cable: reported as 19m.
-- 40 meter cable: reported as cable ok.
+I run "man -l man/man8/ip-xfrm.8" before and after that patch and I
+don't see any difference. Can you please provide more details?
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v3:
-- select OPEN_ALLIANCE_HELPERS
-changes v2:
-- use open alliance specific helpers for the TDR results
----
- drivers/net/phy/Kconfig     |   1 +
- drivers/net/phy/dp83tg720.c | 154 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 155 insertions(+)
+Thanks
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 874422e530ff0..f530fcd092fe4 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -417,6 +417,7 @@ config DP83TD510_PHY
- 
- config DP83TG720_PHY
- 	tristate "Texas Instruments DP83TG720 Ethernet 1000Base-T1 PHY"
-+	select OPEN_ALLIANCE_HELPERS
- 	help
- 	  The DP83TG720S-Q1 is an automotive Ethernet physical layer
- 	  transceiver compliant with IEEE 802.3bp and Open Alliance
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index c706429b225a2..0ef4d7dba0656 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -3,10 +3,13 @@
-  * Copyright (c) 2023 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
-  */
- #include <linux/bitfield.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/phy.h>
- 
-+#include "open_alliance_helpers.h"
-+
- #define DP83TG720S_PHY_ID			0x2000a284
- 
- /* MDIO_MMD_VEND2 registers */
-@@ -14,6 +17,17 @@
- #define DP83TG720S_STS_MII_INT			BIT(7)
- #define DP83TG720S_LINK_STATUS			BIT(0)
- 
-+/* TDR Configuration Register (0x1E) */
-+#define DP83TG720S_TDR_CFG			0x1e
-+/* 1b = TDR start, 0b = No TDR */
-+#define DP83TG720S_TDR_START			BIT(15)
-+/* 1b = TDR auto on link down, 0b = Manual TDR start */
-+#define DP83TG720S_CFG_TDR_AUTO_RUN		BIT(14)
-+/* 1b = TDR done, 0b = TDR in progress */
-+#define DP83TG720S_TDR_DONE			BIT(1)
-+/* 1b = TDR fail, 0b = TDR success */
-+#define DP83TG720S_TDR_FAIL			BIT(0)
-+
- #define DP83TG720S_PHY_RESET			0x1f
- #define DP83TG720S_HW_RESET			BIT(15)
- 
-@@ -22,18 +36,155 @@
- /* Power Mode 0 is Normal mode */
- #define DP83TG720S_LPS_CFG3_PWR_MODE_0		BIT(0)
- 
-+/* Open Aliance 1000BaseT1 compatible HDD.TDR Fault Status Register */
-+#define DP83TG720S_TDR_FAULT_STATUS		0x30f
-+
-+/* Register 0x0301: TDR Configuration 2 */
-+#define DP83TG720S_TDR_CFG2			0x301
-+
-+/* Register 0x0303: TDR Configuration 3 */
-+#define DP83TG720S_TDR_CFG3			0x303
-+
-+/* Register 0x0304: TDR Configuration 4 */
-+#define DP83TG720S_TDR_CFG4			0x304
-+
-+/* Register 0x0405: Unknown Register */
-+#define DP83TG720S_UNKNOWN_0405			0x405
-+
-+/* Register 0x0576: TDR Master Link Down Control */
-+#define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
-+
- #define DP83TG720S_RGMII_DELAY_CTRL		0x602
- /* In RGMII mode, Enable or disable the internal delay for RXD */
- #define DP83TG720S_RGMII_RX_CLK_SEL		BIT(1)
- /* In RGMII mode, Enable or disable the internal delay for TXD */
- #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
- 
-+/* Register 0x083F: Unknown Register */
-+#define DP83TG720S_UNKNOWN_083F			0x83f
-+
- #define DP83TG720S_SQI_REG_1			0x871
- #define DP83TG720S_SQI_OUT_WORST		GENMASK(7, 5)
- #define DP83TG720S_SQI_OUT			GENMASK(3, 1)
- 
- #define DP83TG720_SQI_MAX			7
- 
-+/**
-+ * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This sequence is based on the documented procedure for the DP83TG720 PHY.
-+ *
-+ * Returns: 0 on success, a negative error code on failure.
-+ */
-+static int dp83tg720_cable_test_start(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Initialize the PHY to run the TDR test as described in the
-+	 * "DP83TG720S-Q1: Configuring for Open Alliance Specification
-+	 * Compliance (Rev. B)" application note.
-+	 * Most of the registers are not documented. Some of register names
-+	 * are guessed by comparing the register offsets with the DP83TD510E.
-+	 */
-+
-+	/* Force master link down */
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
-+			       DP83TG720S_TDR_MASTER_LINK_DOWN, 0x0400);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG2,
-+			    0xa008);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG3,
-+			    0x0928);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG4,
-+			    0x0004);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_0405,
-+			    0x6400);
-+	if (ret)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_UNKNOWN_083F,
-+			    0x3003);
-+	if (ret)
-+		return ret;
-+
-+	/* Start the TDR */
-+	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG,
-+			       DP83TG720S_TDR_START);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+/**
-+ * dp83tg720_cable_test_get_status - Get the status of the cable test for the
-+ *                                   DP83TG720 PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ * @finished: Pointer to a boolean that indicates whether the test is finished.
-+ *
-+ * The function sets the @finished flag to true if the test is complete.
-+ *
-+ * Returns: 0 on success or a negative error code on failure.
-+ */
-+static int dp83tg720_cable_test_get_status(struct phy_device *phydev,
-+					   bool *finished)
-+{
-+	int ret, stat;
-+
-+	*finished = false;
-+
-+	/* Read the TDR status */
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_TDR_CFG);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Check if the TDR test is done */
-+	if (!(ret & DP83TG720S_TDR_DONE))
-+		return 0;
-+
-+	/* Check for TDR test failure */
-+	if (!(ret & DP83TG720S_TDR_FAIL)) {
-+		int location;
-+
-+		/* Read fault status */
-+		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+				   DP83TG720S_TDR_FAULT_STATUS);
-+		if (ret < 0)
-+			return ret;
-+
-+		/* Get fault type */
-+		stat = oa_1000bt1_get_ethtool_cable_result_code(ret);
-+
-+		/* Determine fault location */
-+		location = oa_1000bt1_get_tdr_distance(ret);
-+		if (location > 0)
-+			ethnl_cable_test_fault_length(phydev,
-+						      ETHTOOL_A_CABLE_PAIR_A,
-+						      location);
-+	} else {
-+		/* Active link partner or other issues */
-+		stat = ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
-+	}
-+
-+	*finished = true;
-+
-+	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A, stat);
-+
-+	return phy_init_hw(phydev);
-+}
-+
- static int dp83tg720_config_aneg(struct phy_device *phydev)
- {
- 	int ret;
-@@ -195,12 +346,15 @@ static struct phy_driver dp83tg720_driver[] = {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
- 	.name		= "TI DP83TG720S",
- 
-+	.flags          = PHY_POLL_CABLE_TEST,
- 	.config_aneg	= dp83tg720_config_aneg,
- 	.read_status	= dp83tg720_read_status,
- 	.get_features	= genphy_c45_pma_read_ext_abilities,
- 	.config_init	= dp83tg720_config_init,
- 	.get_sqi	= dp83tg720_get_sqi,
- 	.get_sqi_max	= dp83tg720_get_sqi_max,
-+	.cable_test_start = dp83tg720_cable_test_start,
-+	.cable_test_get_status = dp83tg720_cable_test_get_status,
- 
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--- 
-2.39.2
-
+> 
+> Fixes: bdd19b1edec4 ("xfrm: prepare state offload logic to set mode")
+> Cc: leonro@nvidia.com
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  man/man8/ip-xfrm.8 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/man/man8/ip-xfrm.8 b/man/man8/ip-xfrm.8
+> index 960779dd..3efd6172 100644
+> --- a/man/man8/ip-xfrm.8
+> +++ b/man/man8/ip-xfrm.8
+> @@ -71,7 +71,7 @@ ip-xfrm \- transform configuration
+>  .RB "[ " offload
+>  .RB "[ " crypto | packet " ]"
+>  .RB dev
+> -.IR DEV "
+> +.I DEV
+>  .RB dir
+>  .IR DIR " ]"
+>  .RB "[ " tfcpad
+> -- 
+> 2.43.0
+> 
+> 
 
