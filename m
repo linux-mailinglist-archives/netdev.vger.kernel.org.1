@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-117740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDF4394F0EF
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:57:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA09194F0F2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AE9E282063
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7748280EE9
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B3C18455D;
-	Mon, 12 Aug 2024 14:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86A5186E33;
+	Mon, 12 Aug 2024 14:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="I5kQnO0q"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jFX0zuWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974A118454A
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 14:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572B818455F
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 14:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723474629; cv=none; b=YYAymTV0LovHKeAph2RiaZTJIuOorlxNFFfTm2jLLTf8M7dXEivwUROGHs4zzNExNMhg9p/ZUOGT9F5Aah8jLjBmkBl64mcQGHWLy7hJNI2SVLlfxVYO3Q1XrZN8KfeF/n/rSi3arz9ThHjQucr+97YEz+jQIuatk1mUDBFa6Ho=
+	t=1723474630; cv=none; b=mSk+Az4fkl2lTbJ5fLz50GlWaJWEyjTSPjvQal3ysYmR42cVtuXr4h+SGyL4gsUEXCoxb4+D/xwvni6ycxyhCvhOgOnmSimM1lRCxDnYUiBHjY0crhIeQK9wddJEzn6nIz2553wIWgZRg1u1qYB8zmke2xvMGY5br/ArQxNuE+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723474629; c=relaxed/simple;
-	bh=OtbThwHzrLrDJ6N9iYZP2xMzyRCuIQDSqBSKqkos4uU=;
+	s=arc-20240116; t=1723474630; c=relaxed/simple;
+	bh=qttIpi4HRsWevPJvdgv7JnCbSSNPmNcCGu3sxRJxwIQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=StGVDrqCk5/FkuRHOvf1tnhcNlydsROqLVhmLXBK6Wi2XJnyT/PVecVz3EPlYzUbCOSOfU9rFb1p/TY8Zmo6LGeEDlnE8dx9yjzUKr1wTYBi2lhRNOZjj5MPMMiFdDQNUH6FgoCigV562EPWaggcSkeMxFIk+nsCgJVRx0i/2Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=I5kQnO0q; arc=none smtp.client-ip=209.85.215.174
+	 MIME-Version; b=hLLNkMhUNOCN6TKqdNJHi2HvpmjA8QrURQG/Ri6Ukt2/q57gON/BEi8TZN5XelgQecHOjzAB1+qN2QAqoi5PU3/7Z9zlSoBenpXC/O5mHzgCW+TAltmuvc4bQtyjgK27PtG7zbdZMN6lrmwmi/hctG9QtYQQCzrwHbLd7/Dmxk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jFX0zuWg; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7a0b2924e52so2129039a12.2
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:57:07 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7105043330aso3573446b3a.0
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 07:57:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723474626; x=1724079426; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1723474628; x=1724079428; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P2QGcPk3A8tZFSKtHIPQmg9Fxaym0vKQef3yjN2SS5E=;
-        b=I5kQnO0q9t1WdsqNw/jMjMOnGt+ttsRx1yfVW7JzuJo11gtOrC2c3cOIHotcaGff3g
-         b/8oTXvXWdn/lpaJPZlsOTU5x6vR0mUbyrjoxfFCCxgTt6ZZt1bSihBZ+htbwPLdFjzD
-         eX5GZ8m1i8dkaixV+gK998sudjnB58IFdP73w=
+        bh=krsVPmGJ7mUpHzCKNJF3hcG8Is07gdPgaERGEpodORE=;
+        b=jFX0zuWgifE0wxa+qx0p21VDtTATsMsRg2biF4fCKZWSZcCXaV72F8/iyjB9AWyHyb
+         bx4g3+K1HEunDLIIxjU+wrhXchD6KFpHs4cLG7TjNm7JsU6ctO2gCyL14FQowBc8OH0V
+         U28Lhvuuo018y03Anf55v/9zAUCFGWIcrniZo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723474626; x=1724079426;
+        d=1e100.net; s=20230601; t=1723474628; x=1724079428;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=P2QGcPk3A8tZFSKtHIPQmg9Fxaym0vKQef3yjN2SS5E=;
-        b=AXOP7fSa3TanciCkw+buRWRBDnebQecFerrxnD4hmA+vdGStLO83mg6/sdda42MULn
-         dbaJ1AFYxpBP494muwyGbmnzyFRK+vZlY9hRhDy8Cr0zIstMy85dPrJVDEvuLtG6VxXB
-         mF04PFCPbNz0Xb4yMurlNmr4KvcMUgmDd1FOGLHoY5TQQP6+eFNYnkUKreWPsFB1vD0D
-         nd8cSc1A58jqmlrIrC/kN20e9F+/+a5guzMLQrOUJ4SWlZ257dmWuMhl2t7umyw4KnQV
-         K20mOe18n7BxXmImtv+/0Zg2Kb5F/Rpot6xFWDtm1SQ0YGUVmgY7yHVy8r0ihwYClSxW
-         I73w==
-X-Gm-Message-State: AOJu0YwnBlEoD6dZG3ptBKaTeqm2ABhdWzl3jNijbQqUFnqXN42vaSGK
-	gRM6Ix/Lk5+q3ZTVTcTqMJsq86kq6XBVt7clzB5RYJGG9Uej6szZ0uijJvpMJLtPlU+zZRwaVx6
-	aKonTY0LEKRmS4HcEVw7gZnsjXWvBolL4oFN+Cjibm+8A9OQaE5b4HgQG2INYhJZb5WtwLpIoiA
-	os3yCNtyE90m2BM/4cFQweEzZrvL5e6RFkMnwqRw==
-X-Google-Smtp-Source: AGHT+IH/Va6oFceymPtFVikZ4XT7EW9N4zXQhzcHxdCn7/yQShCgpfo1zip9Na9QsbzCb+pTwYHNwg==
-X-Received: by 2002:a17:902:ec91:b0:1fd:9c2d:2f1b with SMTP id d9443c01a7336-201ca1cb0d8mr5835315ad.52.1723474626441;
-        Mon, 12 Aug 2024 07:57:06 -0700 (PDT)
+        bh=krsVPmGJ7mUpHzCKNJF3hcG8Is07gdPgaERGEpodORE=;
+        b=UoaG0i11glTR5ozk7Q1Fj2f9QuEtKa2ExIVlSU/x0zA5cw+zZR85HVeoiPdyQSNlsH
+         e/7Hwg/ybCtCV+tVjvv6sQINVcYTGuKsNnoM9yCK3uJ4KS9R/gBq0PItwZqU2fvXEmnC
+         B/q2I0ipXTczbZWpyJT/8NkkxTCq/Ky52DPA4hMPTrJX4hGm0k4vpVd+FoWjnPCY6qmw
+         +LA5HZPWL2kvn/Faog9FQnYkR3+/9aEC5FiU+Vm9XgyfBtstI6jMCEM3AGeCMPcvqEXh
+         1qIVFUpAeFHrliR/qHYP0aQEuWMjawmx7HZI/IKfLmeKmsozNAVkL6FQ+5DcAmKx8qTE
+         vtzg==
+X-Gm-Message-State: AOJu0Yz82EmcaKS+0gEm5UTLJF6tQ7OV7wEkRFLVC/ke1GicN9qJhAEW
+	32cs3rix8zLkIBsJhUyLxA2NALZV+zCnMUqBKkgMYTESiUM1xG51zpMDva+tUGMgMCxmAnzJJ0U
+	mHk19P6ecG/TFBCgI9Su4Cq02dpJhpUvAnTq/ClcDgw5nhVYmZh/BrlTMCCJeSGpFqTsCNS/oCZ
+	AOmqmdIuW1J5H1ub+91AvQUWXhLqlja6vR8yTuow==
+X-Google-Smtp-Source: AGHT+IGI1VKC/hH97K8mVlaBVtWBUX28eQCqGKnY+VncEcLp2Gvi+LfAg0ooVhF0BwcGRliS31Rfvw==
+X-Received: by 2002:a17:902:d4cd:b0:1fa:449:1dd6 with SMTP id d9443c01a7336-201ca1c77edmr6127215ad.48.1723474628092;
+        Mon, 12 Aug 2024 07:57:08 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb8fd835sm39006955ad.89.2024.08.12.07.57.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb8fd835sm39006955ad.89.2024.08.12.07.57.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 07:57:06 -0700 (PDT)
+        Mon, 12 Aug 2024 07:57:07 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: Joe Damato <jdamato@fastly.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net-next 1/6] netdevice: Add napi_affinity_no_change
-Date: Mon, 12 Aug 2024 14:56:22 +0000
-Message-Id: <20240812145633.52911-2-jdamato@fastly.com>
+Subject: [RFC net-next 2/6] mlx5: Use napi_affinity_no_change
+Date: Mon, 12 Aug 2024 14:56:23 +0000
+Message-Id: <20240812145633.52911-3-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240812145633.52911-1-jdamato@fastly.com>
 References: <20240812145633.52911-1-jdamato@fastly.com>
@@ -91,70 +91,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several drivers have their own, very similar, implementations of
-determining if IRQ affinity has changed. Create napi_affinity_no_change
-to centralize this logic in the core.
-
-This will be used in following commits for various drivers to eliminate
-duplicated code.
+Use napi_affinity_no_change instead of mlx5's internal implementation,
+simplifying and centralizing the logic.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
- include/linux/netdevice.h |  8 ++++++++
- net/core/dev.c            | 14 ++++++++++++++
- 2 files changed, 22 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h      | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c | 9 +--------
+ 3 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 0ef3eaa23f4b..dc714a04b90a 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -464,6 +464,14 @@ enum rx_handler_result {
- typedef enum rx_handler_result rx_handler_result_t;
- typedef rx_handler_result_t rx_handler_func_t(struct sk_buff **pskb);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 7832f6b6c8a8..c288e3f45a06 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -767,7 +767,7 @@ struct mlx5e_channel {
+ 	spinlock_t                 async_icosq_lock;
  
-+/**
-+ * napi_affinity_no_change - determine if CPU affinity changed
-+ * @irq: the IRQ whose affinity may have changed
-+ *
-+ * Return true if the CPU affinity has NOT changed, false otherwise.
-+ */
-+bool napi_affinity_no_change(unsigned int irq);
-+
- void __napi_schedule(struct napi_struct *n);
- void __napi_schedule_irqoff(struct napi_struct *n);
+ 	/* data path - accessed per napi poll */
+-	const struct cpumask	  *aff_mask;
++	unsigned int		  irq;
+ 	struct mlx5e_ch_stats     *stats;
  
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 751d9b70e6ad..9c56ad49490c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -89,6 +89,7 @@
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/if_ether.h>
-+#include <linux/irq.h>
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
- #include <linux/ethtool.h>
-@@ -6210,6 +6211,19 @@ void __napi_schedule_irqoff(struct napi_struct *n)
- }
- EXPORT_SYMBOL(__napi_schedule_irqoff);
+ 	/* control */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 6f686fabed44..7b217aafbdfd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -2684,8 +2684,8 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	c->mkey_be  = cpu_to_be32(mdev->mlx5e_res.hw_objs.mkey);
+ 	c->num_tc   = mlx5e_get_dcb_num_tc(params);
+ 	c->xdp      = !!params->xdp_prog;
++	c->irq      = irq;
+ 	c->stats    = &priv->channel_stats[ix]->ch;
+-	c->aff_mask = irq_get_effective_affinity_mask(irq);
+ 	c->lag_port = mlx5e_enumerate_lag_port(mdev, ix);
  
-+bool napi_affinity_no_change(unsigned int irq)
-+{
-+	int cpu_curr = smp_processor_id();
-+	const struct cpumask *aff_mask;
-+
-+	aff_mask = irq_get_effective_affinity_mask(irq);
-+	if (unlikely(!aff_mask))
-+		return true;
-+
-+	return cpumask_test_cpu(cpu_curr, aff_mask);
-+}
-+EXPORT_SYMBOL(napi_affinity_no_change);
-+
- bool napi_complete_done(struct napi_struct *n, int work_done)
+ 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
+index 5873fde65c2e..ee453d019c3b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
+@@ -39,13 +39,6 @@
+ #include "en/xsk/tx.h"
+ #include "en_accel/ktls_txrx.h"
+ 
+-static inline bool mlx5e_channel_no_affinity_change(struct mlx5e_channel *c)
+-{
+-	int current_cpu = smp_processor_id();
+-
+-	return cpumask_test_cpu(current_cpu, c->aff_mask);
+-}
+-
+ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
  {
- 	unsigned long flags, val, new, timeout = 0;
+ 	struct mlx5e_sq_stats *stats = sq->stats;
+@@ -201,7 +194,7 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
+ 	busy |= busy_xsk;
+ 
+ 	if (busy) {
+-		if (likely(mlx5e_channel_no_affinity_change(c))) {
++		if (likely(napi_affinity_no_change(c->irq))) {
+ 			work_done = budget;
+ 			goto out;
+ 		}
 -- 
 2.25.1
 
