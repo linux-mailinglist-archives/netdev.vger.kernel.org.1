@@ -1,164 +1,192 @@
-Return-Path: <netdev+bounces-117804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0120494F62C
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:57:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3829D94F634
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E930B22459
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:57:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE2FF280E50
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552951898E6;
-	Mon, 12 Aug 2024 17:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F35F18953E;
+	Mon, 12 Aug 2024 17:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9pSXQbI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VLSX5kkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE913A3F2;
-	Mon, 12 Aug 2024 17:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42613189529;
+	Mon, 12 Aug 2024 17:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723485456; cv=none; b=LBhpTtMbWfM2vQeCTBAWP9/lwHB2GxkSFngMO70cJnRmmTabkwCR6B5jG/6dFSJ3nlZU5L8FnNuMBEU9cDYZBROWjxf9tIsc+QHmQ5+Ucwj9vaqKBevzTPyZ+3hjzLt079lfERf2fTJEkWkD8e9Q1YHd1ACXr5eYdnitT6HBKoI=
+	t=1723485552; cv=none; b=sUO/ONMEmwL5FpP7K2hzPPxzDRzbKV15qs6L/yNwIGsxRyF9VyFeHFRSauaMB0v6PdsT+hv7MXxgJ7Ic6FFYG5afhOb3zs9rDyXMzdFLPEifJZMtOrAO9Ha2aBfw9EKnahg6TRwr8lGfmJNn//HibWrSdqdNCkW11Vkn2rvH/es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723485456; c=relaxed/simple;
-	bh=PjEd0BdogsUTaZfCUMRZ31Ra4P2TNDube5tSGJ9f9sw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MloUkPoBGISIjK0uzF5sGypuqpOgnLmJKvGEYPxG7r3O+Yyzvt9nO3F3IfA1DmfB1LZnnfV2AkQ/cyT9F4blXzmQh8LplYDgUphOqchY4/684dZP101Eho8QCcO4oktwK4H5E7CZnzdJjPEiBLX/hS4TaJgsx1+Dmdwyb9BipeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9pSXQbI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E1DC32782;
-	Mon, 12 Aug 2024 17:57:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723485455;
-	bh=PjEd0BdogsUTaZfCUMRZ31Ra4P2TNDube5tSGJ9f9sw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G9pSXQbIwNKKdmOVG04ccy/1dIHLraWQ0G+g5z/MctkmVUUUXo81tnVQfF1RR+c1J
-	 Cvxt8qGSPA8JqYgFK4Wsisbb0RFx5KEJ2r00aZDsq7jtURbAetSPgcZbzv7tLhq3In
-	 X8cW65UhPResK30p4YVjVef/gIBciCKXIICBbwOv+MOkXOxEPR0kGDviaLOmGrQHjv
-	 1kVsTsVsho3L4Id+uxmWhHD1b/Ou3noRjVmbmLBl93blSGZxY3SAluidKUwiBL8YOv
-	 TqI1IrR/S8Qznu2rcbJ2YiWkSSF8CbSPSyNf8gpJaBr19k4+X1N8VCNVUteNnwEgHU
-	 0shtOIic2eEhw==
-Date: Mon, 12 Aug 2024 10:57:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
- Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Steffen
- Klassert <steffen.klassert@secunet.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, David Wei <dw@davidwei.uk>, Jason
- Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend
- Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
- memory provider
-Message-ID: <20240812105732.5d2845e4@kernel.org>
-In-Reply-To: <48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
-References: <20240805212536.2172174-1-almasrymina@google.com>
-	<20240805212536.2172174-8-almasrymina@google.com>
-	<20240806135924.5bb65ec7@kernel.org>
-	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
-	<20240808192410.37a49724@kernel.org>
-	<CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
-	<fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com>
-	<20240809205236.77c959b0@kernel.org>
-	<CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
-	<48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
+	s=arc-20240116; t=1723485552; c=relaxed/simple;
+	bh=89tBf3JaxrUSUgE4DeBjSLiEkLK6rYWE9SbgQJLHxL8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CMNeUTJBjUkwFtyCuq0N4GnpmyvxL69xM9T5h/PSI9bvTy/8xmuHetbZqK3KUaQx+GV8op6ooaCy4VIbiqkp3UqyKar4eTCaj0U8UnL1ci6da7X4wWHkyThB6RWrw+rpq3pLQjJ6qZMiZo5ebDQZg/87JRN9l3hd7Eab7MmM9W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VLSX5kkP; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723485550; x=1755021550;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=89tBf3JaxrUSUgE4DeBjSLiEkLK6rYWE9SbgQJLHxL8=;
+  b=VLSX5kkPr4lOWgLGPvQvheoA6kuC8IfB9WlP1QyV/9mbu5vaWS3TK/0R
+   h7P5mQGFMZ7NQ39QnVBMNCq4HWUeP/VxYE9U5KfB12whMbxHM64EgTd/k
+   CX1L9ZiukekvG6+dYv9V0OK/d3eUIvKurDliAM/iCn0KxbYk0ZnXSYQif
+   WO5wTf12Q4ievu1d8YyCijqyOC6ED95nTwTnE3pp/bqTX1KgE3PyfhV/K
+   3ZMw7zwK5S026llJ0auPbFkBxX79CR2srqpeB9ETrxgGqam6TkAAS3vNH
+   Eg9pcsE+ilAuVFAjLTlFIPpj73gZ6QHVCHk3LhrvkVy9U9dVC28MM38yt
+   w==;
+X-CSE-ConnectionGUID: s88eXRiOTDaQReyJ95e6tQ==
+X-CSE-MsgGUID: VxyrW8bhQJCy823or3+FGw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="32232751"
+X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
+   d="scan'208";a="32232751"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 10:59:09 -0700
+X-CSE-ConnectionGUID: lqmqNyJRTvaXvQIVJUa3Qg==
+X-CSE-MsgGUID: VMuQJ5CiTWq71zcqj1hqfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
+   d="scan'208";a="63201380"
+Received: from unknown (HELO vcostago-mobl3) ([10.241.225.92])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 10:59:09 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Daiwei Li <daiweili@gmail.com>, Richard Cochran <richardcochran@gmail.com>
+Cc: intel-wired-lan@lists.osuosl.org, sasha.neftin@intel.com,
+ kurt@linutronix.de, anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-net v1] igb: Fix not clearing TimeSync interrupts
+ for 82580
+In-Reply-To: <CAN0jFd1CpPtid7TGJcgzajRXQ5oxYN1LjLjLwK7HjQ1piuZ_XQ@mail.gmail.com>
+References: <20240810002302.2054816-1-vinicius.gomes@intel.com>
+ <Zrb0wdmIsksG38Uc@hoboy.vegasvil.org>
+ <CAN0jFd1CpPtid7TGJcgzajRXQ5oxYN1LjLjLwK7HjQ1piuZ_XQ@mail.gmail.com>
+Date: Mon, 12 Aug 2024 10:59:08 -0700
+Message-ID: <87sev9wrkj.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 11 Aug 2024 22:51:13 +0100 Pavel Begunkov wrote:
-> > I think we're talking about 2 slightly different flags, AFAIU.>
-> > Pavel and I are suggesting the driver reports "I support memory
-> > providers" directly to core (via the queue-api or what not), and we
-> > check that flag directly in netdev_rx_queue_restart(), and fail
-> > immediately if the support is not there.  
-> 
-> I might've misread Jakub, but yes, I believe it's different. It'd
-> communicate about support for providers to upper layers, so we can
-> fail even before attempting to allocate a new queue and init a
-> page pool.
+Hi,
 
-Got it. Since allocating memory happens before stopping traffic
-I think it's acceptable to stick to a single flag.
+Daiwei Li <daiweili@gmail.com> writes:
 
-> > Jakub is suggesting a page_pool_params flag which lets the driver
-> > report "I support memory providers". If the driver doesn't support it
-> > but core is trying to configure that, then the page_pool_create will
-> > fail, which will cause the queue API operation
-> > (ndo_queue_alloc_mem_alloc) to fail, which causes
-> > netdev_rx_queue_restart() to fail.  
-> 
-> And I'm not against this way either if we explicitly get an error
-> back instead of trying to figure it out post-factum like by
-> checking the references and possibly reverting the allocation.
-> Maybe that's where I was confused, and that refcount thing was
-> suggested as a WARN_ONCE?
+>> @Daiwei Li, I don't have a 82580 handy, please confirm that the patch
+> fixes the issue you are having.
+>
+> Thank you for the patch! I can confirm it fixes my issue. Below I offer a
+> patch that also works in response to Paul's feedback.
+>
 
-Yup, the refcount (now: check of the page pool list) was meant
-as a WARN_ONCE() to catch bad drivers.
+Your patch looks better than mine. I would suggest for you to go ahead
+and propose yours for inclusion.
 
-> FWIW, I think it warrants two flags. The first saying that the
-> driver supports providers at all:
-> 
-> page_pool_init() {
-> 	if (rxq->mp_params)
-> 		if (!(flags & PP_PROVIDERS_SUPPORTED))
-> 			goto fail;
-> }
-> 
-> And the second telling whether the driver wants to install
-> providers for this particular page pool, so if there is a
-> separate pool for headers we can set it with plain old kernel
-> pages.
+>> Please also add a description of the test case
+>
+> I am running ptp4l to serve PTP to a client device attached to the NIC.
+> To test, I am rebuilding igb.ko and reloading it.
+> Without this patch, I see repeatedly in the output of ptp4l:
+>
+>> timed out while polling for tx timestamp increasing tx_timestamp_timeout=
+ or
+>> increasing kworker priority may correct this issue, but a driver bug lik=
+ely
+>> causes it
+>
+> as well as my client device failing to sync time.
+>
+>> and maybe the PCI vendor and device code of your network device.
+>
+> % lspci -nn | grep Network
+> 17:00.0 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
+> Network Connection [8086:150e] (rev 01)
+> 17:00.1 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
+> Network Connection [8086:150e] (rev 01)
+> 17:00.2 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
+> Network Connection [8086:150e] (rev 01)
+> 17:00.3 Ethernet controller [0200]: Intel Corporation 82580 Gigabit
+> Network Connection [8086:150e] (rev 01)
+>
+>> Bug, or was it a feature?
+>
+> According to https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@in=
+tel.com/
+> it was a bug. It looks like the datasheet was not updated to
+> acknowledge this bug:
+> https://www.intel.com/content/www/us/en/content-details/333167/intel-8258=
+0-eb-82580-db-gbe-controller-datasheet.html
+> (section 8.17.28.1).
+>
+>> Is there a nicer way to write this, so `ack` is only assigned in case
+>> for the 82580?
+>
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c
+> b/drivers/net/ethernet/intel/igb/igb_main.c
+> index ada42ba63549..87ec1258e22a 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -6986,6 +6986,10 @@ static void igb_tsync_interrupt(struct
+> igb_adapter *adapter)
+>         struct e1000_hw *hw =3D &adapter->hw;
+>         u32 tsicr =3D rd32(E1000_TSICR);
+>         struct ptp_clock_event event;
+> +       const u32 mask =3D (TSINTR_SYS_WRAP | E1000_TSICR_TXTS |
+> +                          TSINTR_TT0 | TSINTR_TT1 |
+> +                          TSINTR_AUTT0 | TSINTR_AUTT1);
+> +
+>
+>         if (tsicr & TSINTR_SYS_WRAP) {
+>                 event.type =3D PTP_CLOCK_PPS;
+> @@ -7009,6 +7013,13 @@ static void igb_tsync_interrupt(struct
+> igb_adapter *adapter)
+>
+>         if (tsicr & TSINTR_AUTT1)
+>                 igb_extts(adapter, 1);
+> +
+> +       if (hw->mac.type =3D=3D e1000_82580) {
+> +               /* 82580 has a hardware bug that requires a explicit
+> +                * write to clear the TimeSync interrupt cause.
+> +                */
+> +               wr32(E1000_TSICR, tsicr & mask);
 
-The implementation of the queue API should be resilient against
-failures in alloc, and not being MP capable is just a form of 
-alloc failure. I don't see the upside of double-flag. 
+Yeah, I should have thought about that, that writing '1' into an
+interrupr that is cleared should be fine.
 
-> payload_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED);
-> header_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED |
->                                      PP_IGNORE_PROVIDERS);
+> +       }
+>  }
+> On Fri, Aug 9, 2024 at 10:04=E2=80=AFPM Richard Cochran
+> <richardcochran@gmail.com> wrote:
+>>
+>> On Fri, Aug 09, 2024 at 05:23:02PM -0700, Vinicius Costa Gomes wrote:
+>> > It was reported that 82580 NICs have a hardware bug that makes it
+>> > necessary to write into the TSICR (TimeSync Interrupt Cause) register
+>> > to clear it.
+>>
+>> Bug, or was it a feature?
+>>
+>> Or IOW, maybe i210 changed the semantics of the TSICR?
+>>
+>> And what about the 82576?
+>>
+>> Thanks,
+>> Richard
 
-Also don't see the upside of the explicit "non-capable" flag,
-but I haven't thought of that. Is there any use?
-
-One important note. The flag should not be tied to memory providers
-but rather to netmem, IOW unreadable memory. MP is an internal detail,
-the important fact from the driver-facing API perspective is that the
-driver doesn't need struct pages.
-
-> (or invert the flag). That's assuming page_pool_params::queue is
-> a generic thing and we don't want to draw equivalence between
-> it and memory providers.
+--=20
+Vinicius
 
