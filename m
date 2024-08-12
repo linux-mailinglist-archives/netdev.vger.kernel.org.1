@@ -1,149 +1,234 @@
-Return-Path: <netdev+bounces-117605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA09B94E805
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:44:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E94694E82B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18E6A1C21BFE
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:44:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D41282674
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD47E15CD78;
-	Mon, 12 Aug 2024 07:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623A614D28F;
+	Mon, 12 Aug 2024 08:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V44oqUz8"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="m1oYkBjy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF40B1474D3;
-	Mon, 12 Aug 2024 07:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69D355896
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 08:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723448614; cv=none; b=M6rDVdJy5zNPfpzT7JpeUPh+wmUkd0WvMvG5/lvT4WhAM/8GlLm/0mpgif0x5jlTA+xxOGYI+5D+zN1A/mnel87y6zOQwJkNXHfiZ6uiWi930JIFACYYrpMDn8q0KLdMlsraQc3Pz41fFqXjL6xamUx3HN0bqGsixff7K4FbQkc=
+	t=1723449776; cv=none; b=VF/JKthmHOVWEUnpvemizeNZiBWcsOCnCVwi3/0eq8ktshT0OtS3TwxMPJJ5vJb8Sy9fe4xMocH64KAYJgLhtqs/moKPdRF/16HTQswXkjNgaaJCHtVhngPabIslbpIqWx2q75CF4/gc7gzE6d3MrPvh4l0oIYdOq+/COOdDp0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723448614; c=relaxed/simple;
-	bh=Bl3cBAer8sBVl4IHK1bCv7eJJiByh3fjQJ5m6NjjIxI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e6eOIc5KiCk1EDLwqOtFUF7MgPi0zHO0EPADP/jfgq+18/TarZtAjoSptIILT/Ls6gP+TZFRWvyWTevqw0zM+7xyVJQw3qHh1Jkssbopj0F49hNwZu+kNp4vQZ5OIJH4UtHFmr3/m+Hd1e7WBnRX5WIl+xYdqvx8ybR6K/rd+oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V44oqUz8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 891CBC32782;
-	Mon, 12 Aug 2024 07:43:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723448614;
-	bh=Bl3cBAer8sBVl4IHK1bCv7eJJiByh3fjQJ5m6NjjIxI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V44oqUz8m4qlMIOzG5CPIdF6U3Q3MFNyPdYMqdsQPvOmeoY3JLStu35jisivDUBz2
-	 +RE9GWJYykDxYMJZXfDyCSgTwnjsCFXYnDq9eE0gu2oWINldme4hcJ/Ue2n2vnRPhZ
-	 bCpNc2F5MlCaKgAgJ0KkKeObkAVdHckPoV9QFUgqBcqhp15dSB8+P/2FgESzsJnY31
-	 a1JkPZ/V0Jp/mxr8wMroQW3jQ7paoPdw5GrZ9FMVC8b5EORKLaQsx9wQxIsfX4/WJ/
-	 7SWFo50cP+1x9BTZx1Y/ddHOfksIre7dgTL/jJIw82zrufOaVLmD6z4KeI8zzl/TCT
-	 586NAZ3MUpGQA==
-Message-ID: <df52ac23-5eee-4d17-9e74-237cf49fe4d7@kernel.org>
-Date: Mon, 12 Aug 2024 09:43:29 +0200
+	s=arc-20240116; t=1723449776; c=relaxed/simple;
+	bh=ZcsmFZTv7pEr+UvQDjqCyUmEAgbHMpgJcT8lWQsz9r0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k+41Qng5DnV0MdNM3X5aW0NLIlZkrrpMiN2Itj+qeYeiPzM0JSZoaksdj/BJlq7PXHp8WlLCGHezgA9yOQVKO5SzoAzW2003ohVdMwplcqLpLCMrsR9OdbhAbZrTLUZ1aoadyuXGZCB9vUKwp4jtX62JcHh5gSKOk9ZalgUqGpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=m1oYkBjy; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 2C5EC9C56BD;
+	Mon, 12 Aug 2024 04:02:45 -0400 (EDT)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id TLTZlj57Waqc; Mon, 12 Aug 2024 04:02:42 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id D3A2C9C5F1F;
+	Mon, 12 Aug 2024 04:02:42 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com D3A2C9C5F1F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1723449762; bh=nUY78wg0wPOyUqBpekydQWZAWR7zeDAoThrx/D+A2rY=;
+	h=From:To:Date:Message-Id:MIME-Version;
+	b=m1oYkBjy1HSMLJNoe13m2zkzJKZ3BJkktRFoFb+KTv6dtIcydm8dKWKG2J3LbECAB
+	 K9P+ad6ohQL7Sr56JoxoBV3F0JzuV6jLky5EvR1Nw9cQszozpxsSI4FQXXSEUORFdR
+	 SsjmnqDm+iv9qILxm0R7UEVqp6eqXTaZRUUdNeJL6a+1+Jg2xwJ6FdUYAaul8QklUO
+	 x6ZZvYRoq03n4tUiKkZzZVZWcTMXJ3Hhgl91bwLjCam5tgpv0gkLwb2rjsfmaFU+lf
+	 QZelL36/SouTvOQLp8fSJl+u8jkcYSHxjuoacDi1WSY3uPbYjFyT1OWINTyKIZd3kn
+	 mj7c8PUlyP62A==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 2rT9iZWAgDWc; Mon, 12 Aug 2024 04:02:42 -0400 (EDT)
+Received: from sfl-deribaucourt.rennes.sfl (80-15-101-118.ftth.fr.orangecustomers.net [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 413849C56BD;
+	Mon, 12 Aug 2024 04:02:41 -0400 (EDT)
+From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	kuba@kernel.org,
+	Tristram.Ha@microchip.com,
+	Arun.Ramadoss@microchip.com,
+	horms@kernel.org,
+	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Subject: [PATCH v3 net-next] net: dsa: microchip: ksz9477: split half-duplex monitoring function
+Date: Mon, 12 Aug 2024 08:02:13 +0000
+Message-Id: <20240812080212.26558-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v2] mptcp: correct MPTCP_SUBFLOW_ATTR_SSN_OFFSET
- reserved size
-Content-Language: en-GB
-To: Eugene Syromiatnikov <esyr@redhat.com>, mptcp@lists.linux.dev
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Davide Caratti <dcaratti@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240812065024.GA19719@asgard.redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240812065024.GA19719@asgard.redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eugene, Network maintainers,
+In order to respect the 80 columns limit, split the half-duplex
+monitoring function in two.
 
-On 12/08/2024 08:51, Eugene Syromiatnikov wrote:
-> ssn_offset field is u32 and is placed into the netlink response with
-> nla_put_u32(), but only 2 bytes are reserved for the attribute payload
-> in subflow_get_info_size() (even though it makes no difference
-> in the end, as it is aligned up to 4 bytes).  Supply the correct
-> argument to the relevant nla_total_size() call to make it less
-> confusing.
-> 
-> Fixes: 5147dfb50832 ("mptcp: allow dumping subflow context to userspace")
-> Signed-off-by: Eugene Syromiatnikov <esyr@redhat.com>
-> ---
-> v2:
->   - Added prefix to the patch subject
->   - Fixed commit message formatting (line width, "Fixes:" commit hash
->     prefix size)
+This is just a styling change, no functional change.
 
-Thank you for the v2!
+Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
+airelinux.com>
+Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+v3:
+ - keep URL on one line
+v2: https://lore.kernel.org/netdev/20240808151421.636937-1-enguerrand.de-=
+ribaucourt@savoirfairelinux.com/
+ - added line breaks after return statements
+ - removed Fixed-by: tag
+v1: https://lore.kernel.org/netdev/20240708084934.131175-1-enguerrand.de-=
+ribaucourt@savoirfairelinux.com/
+---
+ drivers/net/dsa/microchip/ksz9477.c | 90 +++++++++++++++++------------
+ 1 file changed, 53 insertions(+), 37 deletions(-)
 
-The patch looks good to me:
-
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-Because it is a fix, I think it is a candidate for -net, not net-next.
-
-@Network maintainers: is it OK for you to apply this v2 in "net", not
-"net-next"? Or is it easier for you to have a v3 with a different prefix?
-
-(No conflicts to apply this patch on -net, the code didn't change for 4
-years.)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
+hip/ksz9477.c
+index 425e20daf1e9..755de092b2c2 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -427,54 +427,70 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int=
+ port, bool freeze)
+ 	mutex_unlock(&p->mib.cnt_mutex);
+ }
+=20
+-int ksz9477_errata_monitor(struct ksz_device *dev, int port,
+-			   u64 tx_late_col)
++static int ksz9477_half_duplex_monitor(struct ksz_device *dev, int port,
++				       u64 tx_late_col)
+ {
++	u8 lue_ctrl;
+ 	u32 pmavbc;
+-	u8 status;
+ 	u16 pqm;
+ 	int ret;
+=20
+-	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
++	/* Errata DS80000754 recommends monitoring potential faults in
++	 * half-duplex mode. The switch might not be able to communicate anymor=
+e
++	 * in these states. If you see this message, please read the
++	 * errata-sheet for more information:
++	 * https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Produ=
+ctDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
++	 * To workaround this issue, half-duplex mode should be avoided.
++	 * A software reset could be implemented to recover from this state.
++	 */
++	dev_warn_once(dev->dev,
++		      "Half-duplex detected on port %d, transmission halt may occur\n"=
+,
++		      port);
++	if (tx_late_col !=3D 0) {
++		/* Transmission halt with late collisions */
++		dev_crit_once(dev->dev,
++			      "TX late collisions detected, transmission may be halted on por=
+t %d\n",
++			      port);
++	}
++	ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &lue_ctrl);
+ 	if (ret)
+ 		return ret;
+-	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status) =3D=3D PORT_INTF_SPEED_NO=
+NE) &&
+-	    !(status & PORT_INTF_FULL_DUPLEX)) {
+-		/* Errata DS80000754 recommends monitoring potential faults in
+-		 * half-duplex mode. The switch might not be able to communicate anymo=
+re
+-		 * in these states.
+-		 * If you see this message, please read the errata-sheet for more info=
+rmation:
+-		 * https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Prod=
+uctDocuments/Errata/KSZ9477S-Errata-DS80000754.pdf
+-		 * To workaround this issue, half-duplex mode should be avoided.
+-		 * A software reset could be implemented to recover from this state.
+-		 */
+-		dev_warn_once(dev->dev,
+-			      "Half-duplex detected on port %d, transmission halt may occur\n=
+",
+-			      port);
+-		if (tx_late_col !=3D 0) {
+-			/* Transmission halt with late collisions */
+-			dev_crit_once(dev->dev,
+-				      "TX late collisions detected, transmission may be halted on po=
+rt %d\n",
+-				      port);
+-		}
+-		ret =3D ksz_read8(dev, REG_SW_LUE_CTRL_0, &status);
++	if (lue_ctrl & SW_VLAN_ENABLE) {
++		ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
+ 		if (ret)
+ 			return ret;
+-		if (status & SW_VLAN_ENABLE) {
+-			ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
+-			if (ret)
+-				return ret;
+-			ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
+-			if (ret)
+-				return ret;
+-			if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
+-			    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
+-				/* Transmission halt with Half-Duplex and VLAN */
+-				dev_crit_once(dev->dev,
+-					      "resources out of limits, transmission may be halted\n");
+-			}
++
++		ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
++		if (ret)
++			return ret;
++
++		if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
++		    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
++			/* Transmission halt with Half-Duplex and VLAN */
++			dev_crit_once(dev->dev,
++				      "resources out of limits, transmission may be halted\n");
+ 		}
+ 	}
++
++	return ret;
++}
++
++int ksz9477_errata_monitor(struct ksz_device *dev, int port,
++			   u64 tx_late_col)
++{
++	u8 status;
++	int ret;
++
++	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
++	if (ret)
++		return ret;
++
++	if (!(FIELD_GET(PORT_INTF_SPEED_MASK, status)
++	      =3D=3D PORT_INTF_SPEED_NONE) &&
++	    !(status & PORT_INTF_FULL_DUPLEX)) {
++		ret =3D ksz9477_half_duplex_monitor(dev, port, tx_late_col);
++	}
++
+ 	return ret;
+ }
+=20
+--=20
+2.34.1
 
 
