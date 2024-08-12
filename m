@@ -1,182 +1,154 @@
-Return-Path: <netdev+bounces-117732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E709E94EF4E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:15:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0584A94EF62
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16FC41C202D5
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:15:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6AC7283A24
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B85717C7CE;
-	Mon, 12 Aug 2024 14:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971E417DE2D;
+	Mon, 12 Aug 2024 14:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h92mLzSG"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Jgbil5AK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YoVpxfTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow3-smtp.messagingengine.com (flow3-smtp.messagingengine.com [103.168.172.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCEA4D8D1;
-	Mon, 12 Aug 2024 14:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A423F16B38D;
+	Mon, 12 Aug 2024 14:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723472144; cv=none; b=bGkf9kjg5EvVfQE8JFaK+RYV71A9ZMWRyYNOAWi9+21r23DmckTKAm9QRiWEfYhTKhGD/fz6U3MyohvUzPinmSM7WVUbpaGQAcs29OZsk+eJzjLo6d8xpgzAPJ2TAOOeB3fToRhsnjG2OUTWruhbS/3hUYlN6q+rVsWopasxkcE=
+	t=1723472406; cv=none; b=GAdZe57T8+RTc4//imnP3/eDA8OVUXDwA1faspArni69w7BzaGGNJG6O58QSrWnGOSTKyekla4GOZePr6FHHTlFaYwdLZxemAyByd+oimmY7PTCWyqyKwIJq1hVXsHNOVg7x+Ny7qnTgaFUMnvt2AM6pdX7eYYBoLwp+ERx2/Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723472144; c=relaxed/simple;
-	bh=BGRlCIKuiTa0XsHIzgvyQx8GF3ZnAv0GUuP0rAeXyCU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=coiSBMqoQyzBmIq5pOYpXiHeQKpHMgbnXb/dufDsfSFOVsg4bhJGRbvO961ymSSXnXwGrhFW+lXQuGVDmTSKxy3AgdCBz0O8HHLZupUQ9LEgqkneHOXQoBz0sGUvZuEqFVNOuHQTLNTs2CWIZnsJytb8vomHVAIq1CLcrJxdAYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h92mLzSG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E281FC32782;
-	Mon, 12 Aug 2024 14:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723472143;
-	bh=BGRlCIKuiTa0XsHIzgvyQx8GF3ZnAv0GUuP0rAeXyCU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h92mLzSGxYNshbdDjnHt4dZzxeI4oQDUywM7ziZFFk66puOjtqnEM+7k/VomXLjWW
-	 cfMLqMBvuZdWU12nWRhbrUJzXv+uPPuIwHZOP9rZYzB3+xI5yLf2vNgUbfzqXq7xNR
-	 Xb9V7k6bZGYZNUdxkShOGLhhVVwYxFkjcOjeFNwxhQcClrf00dkHUK/IxeiKNUUIp2
-	 BuIxmopuQDjVsgk+zHAbz54nqRscAWpvCZjCYyk7IV76H06RgfIzjCwg289/7mgGRs
-	 F/LIYoDOL5i9Q683+C0OLNP3rFM1xpGOM6TSdyhCi7aOlZsekQguaEEOcFJCxFRYGN
-	 rNOYryGQ5hpPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdVpl-0032oI-Rk;
-	Mon, 12 Aug 2024 15:15:42 +0100
-Date: Mon, 12 Aug 2024 15:15:41 +0100
-Message-ID: <864j7p25f6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org,
-	Sunil Goutham <sgoutham@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	horms@kernel.org,
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next v2] net: thunderx: Unembed netdev structure
-In-Reply-To: <20240626173503.87636-1-leitao@debian.org>
-References: <20240626173503.87636-1-leitao@debian.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1723472406; c=relaxed/simple;
+	bh=cVkHBiwDL71VAbFCe3luGFmIFIgP7wC1OfFcmy9JLoo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VQ3G8h9Rj0GlGZUU943AVidmspsCuEBYAgnaq1/k4Pd4k3LV3k7Te2mztcJU+cbqeu2JOuygfXFCNffLt4NCfT00k988pi04ixVmqQjCTuX75kG4DOZj907WKTot66d3qZkxGWXjnf1ydQUxCBSxflYoPoBNdB3dHsRchLzxqjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=Jgbil5AK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YoVpxfTN; arc=none smtp.client-ip=103.168.172.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from phl-compute-01.internal (phl-compute-01.nyi.internal [10.202.2.41])
+	by mailflow.nyi.internal (Postfix) with ESMTP id A9969200DE8;
+	Mon, 12 Aug 2024 10:20:03 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 12 Aug 2024 10:20:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1723472403; x=1723479603; bh=uCDj2ND5nE
+	8inw/UhtR4NteFMYiUan8kp+SXKAFbsaQ=; b=Jgbil5AKeanZIvWttmxLqpKCsG
+	cesbBek8ICenp01vbRpzfnsqvCEeqYZDrJFOGmG4pyUGj8ycXV278ntTSqpCYfj+
+	CT8mV9XiUNoZJXSI2E0gI5eWrDDMPq3amAq6JVPK99glkO718BJvjEtqdwLV8/d0
+	aXX0nAulrrgPlE1uWsdyJyXFrHieiEnRfE96SJRQhvhxUPcKbPyosTyJe6BnQniF
+	uBfkae4CprmvGdqvRNUslYuZzWV8KN0sSPuEJZOaOdLRUg8sX/Btn33nk1si8JWu
+	BwaqA9R1Rp8yYoK6gZOIv1rVHIY2N82u2NWrDBs+siwcqSxL9Yg7mh5gh67g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1723472403; x=1723479603; bh=uCDj2ND5nE8inw/UhtR4NteFMYiU
+	an8kp+SXKAFbsaQ=; b=YoVpxfTN+n/d3TpfgC2wVhmVD01+o/XbiBE+IjP5hfZU
+	LawS8HVlgD9HbX6Y0ZVfYbgMdSpuh6jqcuDIe2nArfz8tR+jM4q+oGkLdB6MaFHV
+	PaYFhq4TEN/Ge6nm+xerlm6USso7J/EdCiOB2kq9KpgAfI2O16tNEWjNbTqM0Gr6
+	ZNubXp7L65W9gsuDjWi9Ww32m2JiWP0MXmpdfMrwXfYjXaX6m2iXQRXqsVcLSXup
+	WbSkBzFWq8h0JtI2n9s2jnsutu8TDCTffV+yJEgMSJyUkG6wrs+8IU+4IWEmx1hK
+	JRlz2B773b4Hwub2EfGGht4DduJvUVHWsVS/KI9hcQ==
+X-ME-Sender: <xms:Exq6ZgCsslAOYbRYLyk4RFsaAA_5noMhx7QlvMfy9lP9IQ25BicfMQ>
+    <xme:Exq6ZihYkboEyO7RB17bKCXc-PCd42161nfETWrJP6i8aNPgUjuLZW4gzzfislGzz
+    PWhHiFgXBQKsg>
+X-ME-Received: <xmr:Exq6ZjnRVvHGeGII-0PWSXqBeaCWn2mSC6OPVh-An03T6IlwKYokAQ7YI7hQYfp5HExQxU65BTHV1WBjMErQfDRJQEkyLcIwXue_Wg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddttddgjeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepifhrvghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrf
+    grthhtvghrnhepjeetueehteekuefhleehkeffffeiffeftedtieegkedviefggfefueff
+    kefgueffnecuffhomhgrihhnpehmshhgihgurdhlihhnkhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomhdp
+    nhgspghrtghpthhtohepvdegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrlh
+    gvkhhsrghnuggvrhdrlhhosggrkhhinhesihhnthgvlhdrtghomhdprhgtphhtthhopehs
+    thgrsghlvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgrlh
+    drkhhusghirghksehinhhtvghlrdgtohhmpdhrtghpthhtohepphgrvhgrnhdrkhhumhgr
+    rhdrlhhinhhgrgesihhnthgvlhdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehkrhhishhhnhgvihhlrdhkrdhsihhnghhhsehinhht
+    vghlrdgtohhmpdhrtghpthhtoheprghnthhhohhnhidrlhdrnhhguhihvghnsehinhhtvg
+    hlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehnvgigrdhsfidrnhgtihhsrdhoshguthdrihhtphdruhhpshhtrhgvrghmihhnghesih
+    hnthgvlhdrtghomh
+X-ME-Proxy: <xmx:Exq6Zmy3X1VnAW_1lPaiJxzKQ-UP_SiNDCExMkCxvjtafQVM-Qy8qw>
+    <xmx:Exq6ZlTlX1TOeDFFsO7iMjQYzkLxbH5blhS932bNWzcR7C63qMuzsg>
+    <xmx:Exq6Zha5NNeI5JszU0ddiZ7Bn4EaEDipsqK9z6bmGCyRTyUw-8Qx5w>
+    <xmx:Exq6ZuQjoiZOpsLnOrJtUKKcC-WEM0Y4MdPzuEJTiKai0QmqdSNnUw>
+    <xmx:Exq6ZhLc_69r2TVkE3UXEtNW4rS_XWSYOgbz5EkrZbJJQNQRneNUUaEP>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 12 Aug 2024 10:20:02 -0400 (EDT)
+Date: Mon, 12 Aug 2024 16:20:00 +0200
+From: Greg KH <greg@kroah.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: stable@vger.kernel.org, Michal Kubiak <michal.kubiak@intel.com>,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Krishneil Singh <krishneil.k.singh@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6.10.y] idpf: fix memleak in vport interrupt configuration
+Message-ID: <2024081251-eggshell-down-d665@gregkh>
+References: <20240812134455.2298021-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leitao@debian.org, kuba@kernel.org, sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812134455.2298021-1-aleksander.lobakin@intel.com>
 
-On Wed, 26 Jun 2024 18:35:02 +0100,
-Breno Leitao <leitao@debian.org> wrote:
+On Mon, Aug 12, 2024 at 03:44:55PM +0200, Alexander Lobakin wrote:
+> From: Michal Kubiak <michal.kubiak@intel.com>
 > 
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
+> commit 3cc88e8405b8d55e0ff035e31971aadd6baee2b6 upstream.
 > 
-> Un-embed the net_devices from struct lmac by converting them
-> into pointers, and allocating them dynamically. Use the leverage
-> alloc_netdev() to allocate the net_device object at
-> bgx_lmac_enable().
+> The initialization of vport interrupt consists of two functions:
+>  1) idpf_vport_intr_init() where a generic configuration is done
+>  2) idpf_vport_intr_req_irq() where the irq for each q_vector is
+>    requested.
 > 
-> The free of the device occurs at bgx_lmac_disable().
+> The first function used to create a base name for each interrupt using
+> "kasprintf()" call. Unfortunately, although that call allocated memory
+> for a text buffer, that memory was never released.
 > 
->  Do not free_netdevice() if bgx_lmac_enable() fails after lmac->netdev
-> is allocated, since bgx_lmac_disable() is called if bgx_lmac_enable()
-> fails, and lmac->netdev will be freed there (similarly to lmac->dmacs).
+> Fix this by removing creating the interrupt base name in 1).
+> Instead, always create a full interrupt name in the function 2), because
+> there is no need to create a base name separately, considering that the
+> function 2) is never called out of idpf_vport_intr_init() context.
 > 
-> Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
+> Cc: stable@vger.kernel.org # 6.7
+> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+> Reviewed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Link: https://patch.msgid.link/20240806220923.3359860-3-anthony.l.nguyen@intel.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> Changelog:
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 19 ++++++++-----------
+>  1 file changed, 8 insertions(+), 11 deletions(-)
 > 
-> v2:
-> 	* Fixed a wrong dereference in netdev_priv (Jakub)
-> 
->  .../net/ethernet/cavium/thunder/thunder_bgx.c | 21 +++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
 
-This patch causes my ThunderX box to explode badly:
+Now queued up, thanks.
 
-[   10.022118] thunder_bgx, ver 1.0
-[   10.022594] libata version 3.00 loaded.
-[   10.023226] mdio_thunder 0000:01:01.3: Added bus at 87e005003800
-[   10.023757] mdio_thunder 0000:01:01.3: Added bus at 87e005003880
-[   10.035431] thunder_bgx 0000:01:10.0: BGX0 QLM mode: XFI
-[   10.045225] Unable to handle kernel NULL pointer dereference at virtual address 00000000000005e8
-[   10.069901] Mem abort info:
-[   10.085236]   ESR = 0x0000000096000044
-[   10.109767]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   10.145191]   SET = 0, FnV = 0
-[   10.148272]   EA = 0, S1PTW = 0
-[   10.151422]   FSC = 0x04: level 0 translation fault
-[   10.156309] Data abort info:
-[   10.159196]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-[   10.164689]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[   10.169752]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[   10.175076] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000111b43000
-[   10.181533] [00000000000005e8] pgd=0000000000000000, p4d=0000000000000000
-[   10.188328] Internal error: Oops: 0000000096000044 [#1] PREEMPT SMP
-[   10.194585] Modules linked in: libahci(E) nvme(E) nvme_core(E) t10_pi(E) mdio_thunder(E) thunder_bgx(E+) libata(E) mdio_devres(E) crc64_rocksoft(E) scsi_mod(E) igb(E+) thunder_xcv(E) mdio_cavium(E) crc64(E) i2c_algo_bit(E) gpio_keys(E) usbhid(E) scsi_common(E) of_mdio(E) fixed_phy(E) fwnode_mdio(E) i2c_thunderx(E) libphy(E)
-[   10.223291] CPU: 0 PID: 341 Comm: kworker/0:4 Tainted: G            E      6.10.0-rc5-01073-g94833addfaba #3309
-[   10.233368] Hardware name: GIGABYTE MT30-GS0/MT30-GS0, BIOS F02 08/06/2019
-[   10.240231] Workqueue: events work_for_cpu_fn
-[   10.244588] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   10.251540] pc : bgx_probe+0x44c/0x640 [thunder_bgx]
-[   10.256502] lr : bgx_probe+0x410/0x640 [thunder_bgx]
-[   10.261460] sp : ffff800084dd3c80
-[   10.264876] x29: ffff800084dd3c80 x28: 0000000000000000 x27: ffff000ff6772a70
-[   10.272006] x26: ffff00010cb02480 x25: 0000000000000000 x24: ffff80007a325700
-[   10.279136] x23: ffff00010c0e60c8 x22: ffff80008100a3d8 x21: ffff000ff6772a88
-[   10.286266] x20: ffff00010c0e6000 x19: ffff00010cb02480 x18: ffffffffffffffff
-[   10.293396] x17: 000000004b2d2331 x16: 00000000b606f3da x15: 0000000000000006
-[   10.300526] x14: 0000000000000000 x13: 3030383330303530 x12: 3065373820746120
-[   10.307656] x11: 7375622064656464 x10: ffff800081e158e8 x9 : ffff800080aa9a30
-[   10.314786] x8 : 0101010101010101 x7 : 0000000000000000 x6 : ffff00010c0e60c8
-[   10.321916] x5 : ffff800084dd3cf8 x4 : 0000000000000000 x3 : 0000000000000000
-[   10.329046] x2 : 0000000000000000 x1 : ffff80007a3296d0 x0 : ffff000ff6772a70
-[   10.336176] Call trace:
-[   10.338613]  bgx_probe+0x44c/0x640 [thunder_bgx]
-[   10.343225]  local_pci_probe+0x48/0xb8
-[   10.346966]  work_for_cpu_fn+0x24/0x40
-[   10.350706]  process_one_work+0x170/0x400
-[   10.354707]  worker_thread+0x26c/0x388
-[   10.358446]  kthread+0xfc/0x110
-[   10.361580]  ret_from_fork+0x10/0x20
-[   10.365150] Code: 52800004 52800003 d2800002 f9401f47 (f902f4e6) 
-[   10.371232] ---[ end trace 0000000000000000 ]---
-
-and I've confirmed that reverting this patch on top of -rc3 restores
-normal behaviour.
-
-There are two issues with this change:
-
-- bgx_lmac_enable() is called *after* bgx_acpi_register_phy() and
-  bgx_init_of_phy(), both expecting netdev to be a valid pointer.
-
-- bgx_init_of_phy() populates the MAC addresses for *all* LMACs
-  attached to a given BGX instance, and thus needs netdev for each of
-  them to have been allocated.
-
-I have posted a potential fix at [1].
-
-Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/r/20240812141322.1742918-1-maz@kernel.org
-
--- 
-Without deviation from the norm, progress is not possible.
+greg k-h
 
