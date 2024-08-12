@@ -1,128 +1,171 @@
-Return-Path: <netdev+bounces-117609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAA094E854
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:14:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F88794E875
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BC0E1C209DA
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:14:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E2581F21FD2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888031474D3;
-	Mon, 12 Aug 2024 08:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662FB16BE02;
+	Mon, 12 Aug 2024 08:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="swmuNEHl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ogw8llGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5AE4D8D1
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 08:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925CC16B3B7;
+	Mon, 12 Aug 2024 08:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723450491; cv=none; b=Mj2eFWlUfB1sjw8aGNVR+boZKsey2EIMDQnblTIUrQKmlTK8x856D4QD6U77fVabwXti5AlS8Dcnuzsmk1QzqJ2EdcwxRzrV1u1ULc0JYjC9Iq5J2hIah25LxlDECnSHcWfViE9m6nY9V5x8AIoHbXYbf9DyZywpe4tdL17FLSI=
+	t=1723450997; cv=none; b=ucc46X6rEowY1POn4eRcedBwgKaAEGhjWtGgAi1Ms8hDfUD5pZW7mRHEW6Ufrb4UJ/MpLIFGF2CklsrQ1RVGHT8KTX/0RJgNW79IzqeRlqhqQ/lvsKdRFsavdhGyT60FLY+H62sEsapnL5jhDRdkC/p+PWch1t0e6lkC51oeNPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723450491; c=relaxed/simple;
-	bh=0DVxX2nhRCf7YWnC4ho0dzf4AHaV4sX4yPCXiKOOuDA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=ZknxfydwczPCOlNez+HHRhwnRDrXhyVYGSE7nBcOEdvUzlhYYdvlz08HkOLaLa1ejAWogPmsQsNmNNDrcViOuW26EGbQZAxzE2odVhHEYCPtjl8+/5f/23cq+nHyExlOiYpB40AmcN+1d1G202/35iUNAbxu7x7cV/zEgE7ZOUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=swmuNEHl; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [IPV6:2a02:8010:6359:1:e533:7058:72ab:8493] (unknown [IPv6:2a02:8010:6359:1:e533:7058:72ab:8493])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id C90D27D51B;
-	Mon, 12 Aug 2024 09:14:42 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1723450482; bh=0DVxX2nhRCf7YWnC4ho0dzf4AHaV4sX4yPCXiKOOuDA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<6730f50c-929d-aaed-0282-60eb321f8679@katalix.com>|
-	 Date:=20Mon,=2012=20Aug=202024=2009:14:42=20+0100|MIME-Version:=20
-	 1.0|To:=20Cong=20Wang=20<xiyou.wangcong@gmail.com>|Cc:=20netdev@vg
-	 er.kernel.org,=20davem@davemloft.net,=20edumazet@google.com,=0D=0A
-	 =20kuba@kernel.org,=20pabeni@redhat.com,=20dsahern@kernel.org,=20t
-	 parkin@katalix.com,=0D=0A=20horms@kernel.org|References:=20<cover.
-	 1723011569.git.jchapman@katalix.com>=0D=0A=20<0ed95752e184f213260e
-	 84b4ff3ee4f4bedeed9e.1723011569.git.jchapman@katalix.com>=0D=0A=20
-	 <ZrkEofKqANg/9sTB@pop-os.localdomain>|From:=20James=20Chapman=20<j
-	 chapman@katalix.com>|Subject:=20Re:=20[PATCH=20v2=20net-next=206/9
-	 ]=20l2tp:=20use=20get_next=20APIs=20for=20management=0D=0A=20reque
-	 sts=20and=20procfs/debugfs|In-Reply-To:=20<ZrkEofKqANg/9sTB@pop-os
-	 .localdomain>;
-	b=swmuNEHlzYf38qmtXvXqO9UzapXKXDXKfWKCTXYQmxbEiZmGl4HWvNMZ7Eye5zJEm
-	 wElebG2EXU4Ka/SjPRMMb/YSkE1brEUnLkBKfCy6ybJ0LqdvYoU9ncR9x2T9TufvlY
-	 LH4NuutN++oNBFvuhW2hyzNeRLY0qEFixtdCOdrCSFq41zyeytL5vWPhUElb6B1KKy
-	 mWm4o2rKS7h5i5jgnMGygnD6O8WtKG+iWH8PWmAzXludqeypKdz7hJ71M7eYtN1moI
-	 vecQRX9DA669OgeAgHumM0jVW/3FRr6JpXCfXJ3Al3VDLT9ORNMwow3Wl2c+Pdg3/i
-	 HykQeVd8eGKPA==
-Message-ID: <6730f50c-929d-aaed-0282-60eb321f8679@katalix.com>
-Date: Mon, 12 Aug 2024 09:14:42 +0100
+	s=arc-20240116; t=1723450997; c=relaxed/simple;
+	bh=7V/LcjxHai5IZGt9D/pz1Iuf1LhK5rh5vii8+emDDk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=apb7B53qf+bULhKSIL3IaSCcAZuAp7vnGX3DDYBU8pMiKm4TOvVg8bF9tSdTwfSArgqmGBrDYapWSIDgKHg/wIShvl0zEMB8s3iONFn5nHgHuwNwHoDe23z8wn9V8XTd5nxwuY+xxAhXTBLQtrwLtpCHinEmgtqK7iS+gVakpuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ogw8llGF; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42816ca797fso29842865e9.2;
+        Mon, 12 Aug 2024 01:23:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723450994; x=1724055794; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rBwWNO9iayreLx98+XZuJ20vJFaxD9sssPnU6v8Prpo=;
+        b=Ogw8llGFh9Pmtb/F4EuJcf8Ac2bTSxHaR66pPSwonoSDcDde4F2b4LIDr6yvSZYuto
+         PQvk1DLa0bwH3Az2l19CJ9zRd1nfgFNUaOPDuUo2QbXf4KS/oeKxy1mY0gV4gBOESYGH
+         UZzV1jVk7KT1A3QwI/NXtbb8dftW4f3po7KrmBNPp4XX/k/E3dn6HU1sXi3hVX+20ekB
+         TmAoxj+tXegRHpq55ZSnJT9xTCAUq22Tx8mAsqTqhh0exsP+Wg80RrK5B/OUtyJMBORI
+         fixC1lQUGrs04v3g2JAnjJvL+TyByzsVFG0QIlr4M+fwQdIPYQnerYqfXtoxAGxrFsYJ
+         hH7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723450994; x=1724055794;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rBwWNO9iayreLx98+XZuJ20vJFaxD9sssPnU6v8Prpo=;
+        b=Ro5fMUVoTv8cwok4ugHHlAweTQ11PQkNrZ1XfEqOZ+3gzB7joqB8sCUjCWzy3pEUdC
+         ZSwlHzXI60jen/fzvaKHMEqmfEJr/EmUpoLrG4vTeN8Xp6ngjaT6DUV4LDGJBWIaXxaI
+         Pc9kXv3xh9waQm58lYRtam51dEqTotvPvwVluxo2UXKd60xJFNalZamKcanFG0bAnAnF
+         krp3Y4eNBzFKIarZdT9LD6uw4jCrNTCANb/ES8z5MK87t5RWXh6nLizdKB+liwUQMAe8
+         jo8cAgdAKczzVaXo5I8W2sY2nuN7SMOVA2D3B/MMKAxGQq7QKeAvlc5Mn6wccpcpaVzt
+         tQEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjH8jxeoFrnybpPTOrsQesKs2mRxHZUCspN5Vnn1IJXnL6q6L1PmgwqqrNZcHjJtGhBS6zAvmCes4nO+6OVW1uHXlZZ8WLf9sxU9oGDyLRDSX0Zl0CI3/OLI7t7vZPsu8v7dz5iy2n+RHicYLapbFt8WB6iki6XTKicGGVC6/xMw==
+X-Gm-Message-State: AOJu0YxU/GcFBZuzj0tpb1tL88E/4fzRPCMqouxX46JTTVZPGFybiUlF
+	NkAKteRUzyfKfcsRnQlwvE8rKydzNPbd/Le0gErf29zzWHNIdckq
+X-Google-Smtp-Source: AGHT+IGxLFFMuY6S+LaXEdo9PeyyCTui7wn3DnbZbtoZnAuiC4L9PAYYmEV6X4Oxm/lRc7G2HrZiqw==
+X-Received: by 2002:a05:600c:46c5:b0:427:9a8f:9717 with SMTP id 5b1f17b1804b1-429c39c4341mr67067125e9.0.1723450993541;
+        Mon, 12 Aug 2024 01:23:13 -0700 (PDT)
+Received: from macminim1.retailmedia.com ([2a01:e0a:b14:c1f0:617b:c61e:d65f:861e])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-429c7737c64sm92979055e9.31.2024.08.12.01.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 01:23:12 -0700 (PDT)
+From: Erwan Velu <erwanaliasr1@gmail.com>
+X-Google-Original-From: Erwan Velu <e.velu@criteo.com>
+To: 
+Cc: Erwan Velu <e.velu@criteo.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net/mlx5: Use cpumask_local_spread() instead of custom code
+Date: Mon, 12 Aug 2024 10:22:42 +0200
+Message-ID: <20240812082244.22810-1-e.velu@criteo.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com,
- horms@kernel.org
-References: <cover.1723011569.git.jchapman@katalix.com>
- <0ed95752e184f213260e84b4ff3ee4f4bedeed9e.1723011569.git.jchapman@katalix.com>
- <ZrkEofKqANg/9sTB@pop-os.localdomain>
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: [PATCH v2 net-next 6/9] l2tp: use get_next APIs for management
- requests and procfs/debugfs
-In-Reply-To: <ZrkEofKqANg/9sTB@pop-os.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/08/2024 19:36, Cong Wang wrote:
-> On Wed, Aug 07, 2024 at 07:54:49AM +0100, James Chapman wrote:
->> diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
->> index cc464982a7d9..0fabacffc3f3 100644
->> --- a/net/l2tp/l2tp_core.h
->> +++ b/net/l2tp/l2tp_core.h
->> @@ -219,14 +219,12 @@ void l2tp_session_dec_refcount(struct l2tp_session *session);
->>    * the caller must ensure that the reference is dropped appropriately.
->>    */
->>   struct l2tp_tunnel *l2tp_tunnel_get(const struct net *net, u32 tunnel_id);
->> -struct l2tp_tunnel *l2tp_tunnel_get_nth(const struct net *net, int nth);
->>   struct l2tp_tunnel *l2tp_tunnel_get_next(const struct net *net, unsigned long *key);
->>   
->>   struct l2tp_session *l2tp_v3_session_get(const struct net *net, struct sock *sk, u32 session_id);
->>   struct l2tp_session *l2tp_v2_session_get(const struct net *net, u16 tunnel_id, u16 session_id);
->>   struct l2tp_session *l2tp_session_get(const struct net *net, struct sock *sk, int pver,
->>   				      u32 tunnel_id, u32 session_id);
->> -struct l2tp_session *l2tp_session_get_nth(struct l2tp_tunnel *tunnel, int nth);
->>   struct l2tp_session *l2tp_session_get_next(const struct net *net, struct sock *sk, int pver,
->>   					   u32 tunnel_id, unsigned long *key);
->>   struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
->> diff --git a/net/l2tp/l2tp_debugfs.c b/net/l2tp/l2tp_debugfs.c
->> index 8755ae521154..b2134b57ed18 100644
->> --- a/net/l2tp/l2tp_debugfs.c
->> +++ b/net/l2tp/l2tp_debugfs.c
->> @@ -34,8 +34,8 @@ static struct dentry *rootdir;
->>   struct l2tp_dfs_seq_data {
->>   	struct net	*net;
->>   	netns_tracker	ns_tracker;
->> -	int tunnel_idx;			/* current tunnel */
->> -	int session_idx;		/* index of session within current tunnel */
->> +	unsigned long tkey;		/* lookup key of current tunnel */
->> +	unsigned long skey;		/* lookup key of current session */
-> 
-> Any reason to change the type from int to unsigned long?
-> 
-> Asking because tunnel ID remains to be 32bit unsigned int as a part of
-> UAPI.
-> 
-> Thanks.
+Commit 2acda57736de ("net/mlx5e: Improve remote NUMA preferences used for the IRQ affinity hints")
+removed the usage of cpumask_local_spread().
 
-It's used as the key in and potentially modified by idr_get_next_ul calls.
+The issue explained in this commit was fixed by
+commit 406d394abfcd ("cpumask: improve on cpumask_local_spread() locality").
+
+Since this commit, mlx5_cpumask_default_spread() is having the same
+behavior as cpumask_local_spread().
+
+This commit is about :
+- removing the specific logic and use cpumask_local_spread() instead
+- passing mlx5_core_dev as argument to more flexibility
+
+mlx5_cpumask_default_spread() is kept as it could be useful for some
+future specific quirks.
+
+Signed-off-by: Erwan Velu <e.velu@criteo.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 27 +++-----------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index cb7e7e4104af..f15ecaef1331 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -835,28 +835,9 @@ static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
+ 	mlx5_irq_release_vector(irq);
+ }
+ 
+-static int mlx5_cpumask_default_spread(int numa_node, int index)
++static int mlx5_cpumask_default_spread(struct mlx5_core_dev *dev, int index)
+ {
+-	const struct cpumask *prev = cpu_none_mask;
+-	const struct cpumask *mask;
+-	int found_cpu = 0;
+-	int i = 0;
+-	int cpu;
+-
+-	rcu_read_lock();
+-	for_each_numa_hop_mask(mask, numa_node) {
+-		for_each_cpu_andnot(cpu, mask, prev) {
+-			if (i++ == index) {
+-				found_cpu = cpu;
+-				goto spread_done;
+-			}
+-		}
+-		prev = mask;
+-	}
+-
+-spread_done:
+-	rcu_read_unlock();
+-	return found_cpu;
++	return cpumask_local_spread(index, dev->priv.numa_node);
+ }
+ 
+ static struct cpu_rmap *mlx5_eq_table_get_pci_rmap(struct mlx5_core_dev *dev)
+@@ -880,7 +861,7 @@ static int comp_irq_request_pci(struct mlx5_core_dev *dev, u16 vecidx)
+ 	int cpu;
+ 
+ 	rmap = mlx5_eq_table_get_pci_rmap(dev);
+-	cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vecidx);
++	cpu = mlx5_cpumask_default_spread(dev, vecidx);
+ 	irq = mlx5_irq_request_vector(dev, cpu, vecidx, &rmap);
+ 	if (IS_ERR(irq))
+ 		return PTR_ERR(irq);
+@@ -1145,7 +1126,7 @@ int mlx5_comp_vector_get_cpu(struct mlx5_core_dev *dev, int vector)
+ 	if (mask)
+ 		cpu = cpumask_first(mask);
+ 	else
+-		cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vector);
++		cpu = mlx5_cpumask_default_spread(dev, vector);
+ 
+ 	return cpu;
+ }
+-- 
+2.46.0
 
 
