@@ -1,101 +1,74 @@
-Return-Path: <netdev+bounces-117618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C0B94E900
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:55:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC22294E91E
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 340E91F23314
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:55:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48E87B21A53
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E9E16BE34;
-	Mon, 12 Aug 2024 08:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E1D16B750;
+	Mon, 12 Aug 2024 09:02:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D46153810
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 08:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E4C1514C1;
+	Mon, 12 Aug 2024 09:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723452929; cv=none; b=djxDz9EZ4jBphN1m6QKCP7ICvt+I9pHcsWUYIkIZFwRHXa/FRvA4zHFqkCkRxUCzbBfQGZ0ujZL2obVAPntIzHGoXdnThWpaWyBNImTd5nB9rZDf9p6lunkOCZri/nBx/n0VNlNSKpUVo+3NyMQxVb1I1xh2gcYkaOix3apIuWo=
+	t=1723453342; cv=none; b=LZMRFoVAgdJqB/iSVGZUPFAn92aZgUoBja21kEWGJEO5p4mdgRO8+Ho2n3afBXxlwThnR0Z2IHKovS8gOLrLH27w5pz2yn47ve1ajCsix1Rkz4VAXl8kcCyBNCnAaq4XmSRFBAqC6YDLxpOrsFshdXFdpvYrZG7O25sm6k9Zc0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723452929; c=relaxed/simple;
-	bh=kgvDoZldC8A2lDTTaRB9c/1Frjxt8QtjkW/XS07NIik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p8tA1XYLVfOcjO5AqGkR1/Hn6/pddJcZx2AzX5mZTsmlCK+G/lfDYQL63O4ByyTEtaSyOTFAD1N30U2PVHIaxZU0Wz9RgQg8c5XvE2QgXKgZYNBwRoDV6g7w+78Y+b6a1AbJUNY3Xfuegi59rQX9ebR06CKSY556Hl0fEuFqRZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sdQpg-00012I-VG; Mon, 12 Aug 2024 10:55:17 +0200
-Message-ID: <11fcfb45-3356-4460-a80d-6d110dd4bfb2@pengutronix.de>
-Date: Mon, 12 Aug 2024 10:55:15 +0200
+	s=arc-20240116; t=1723453342; c=relaxed/simple;
+	bh=BFO105tEEmXbtHTUoioswKPlKS/k/Zfx//loGsJXejY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SsldSt+n609HuUtuuXTSn+uQjJPdrQvCXRMio3R8KBr4SWXjO29+cyRu1L+41kyOzyUixBp34Z1kWfYiiuHUwSFZgB73GNoIzmiN7xENV5kcK7d065sVHNk1RhqbRhHq0b7JuGHrrmSPkTE+/UDV0/y8DbYCHfgUR1Xm1vKVa0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4DB30227A88; Mon, 12 Aug 2024 11:02:16 +0200 (CEST)
+Date: Mon, 12 Aug 2024 11:02:15 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
+	Anna Schumaker <Anna.Schumaker@Netapp.com>,
+	Trond Myklebust <trondmy@kernel.org>, linux-nfs@vger.kernel.org,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxim Mikityanskiy <maxtram95@gmail.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Networking <netdev@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [Bug report] NFS patch breaks TLS device-offloaded TX zerocopy
+Message-ID: <20240812090215.GA5497@lst.de>
+References: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com> <77fb3db5-7a59-4879-b9c2-d3408fcf67e8@grimberg.me> <4f42fac4-2a4e-426a-be86-1f4bb79987b4@gmail.com> <3e08421f-91ac-4bd1-9886-3d5ecf9afa04@grimberg.me> <8683155c-79ad-4090-9aff-fc8d765b096b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
- configuration
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20240809082146.3496481-1-o.rempel@pengutronix.de>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20240809082146.3496481-1-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8683155c-79ad-4090-9aff-fc8d765b096b@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hi,
+On Tue, Aug 06, 2024 at 01:07:47PM +0300, Tariq Toukan wrote:
+> Adding Maxim Mikityanskiy, he might have some insights.
 
-On 09.08.24 10:21, Oleksij Rempel wrote:
-> Rename 'pins1' to 'pins' in the qspi_bk1_pins_a node to correct the
-> subnode name. The incorrect name caused the configuration to be
-> applied to the wrong subnode, resulting in QSPI not working properly.
-> 
-> To avoid this kind of regression, all references to pin configuration
-> nodes are now referenced directly using the format &{label/subnode}.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+I think the important part to find out is if the in-kernel TLS API
+has a limitation to PAGE_SIZE buffer segments, or not.  If it does
+we need to disable large folios for the in-kernel consumers of the
+API, which is easy (but annoying) for NFS that trigger this, but quite
+painful for NVMe.  Or the API is supposed to handle it and just this
+one offload gets it wrong, in which case we need to fix it.
 
-Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-
-> +&{sdmmc1_b4_pins_a/pins2} {
-> +	/delete-property/ bias-disable;
-
-Nit: a heads-up in the commit message would've been appropriate.
-Same goes for driver-push-pull, which disappeared, because it was
-redundant.
-
-> +	bias-pull-up;
->  };
-
-
-Cheers,
-Ahmad
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
