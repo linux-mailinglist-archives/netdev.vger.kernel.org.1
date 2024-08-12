@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-117764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1064394F1B9
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:31:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F25AC94F1BC
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBD64282170
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:31:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73EF61F246C6
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E8818754D;
-	Mon, 12 Aug 2024 15:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DC1184558;
+	Mon, 12 Aug 2024 15:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PUWIAAcA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgMn7bdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07020187339;
-	Mon, 12 Aug 2024 15:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4C618756D;
+	Mon, 12 Aug 2024 15:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723476648; cv=none; b=XEc0CsmrsNI9CPLeoFGV18baMWJ8ZwebZkMN5t9+7CaV+dAQebxR/bJjmhKTKmKoARfjUS87K74IeCP+uK28bJPt85v48FYznjTvp2mdsh5mYGaGaFuJ6dB3QFF+RSLvoN9NK/NL4xMVzJLrJpZ7cxmbGmEH4mLGqpPevldkHgQ=
+	t=1723476650; cv=none; b=L/uxF7M6oi8M8jiiHfjmQ87mSeckJVSNwcPy9mc/cbMopM4leGVNg0ILoeU7CmvMTzOeo3HMy8A+Wg9zSAotKy7WlzD+sTFhYDduFfkGfFGZeZS6Ep7G3urJ7fy5LVRw/oYC2oW2x8lz4FXqDj5/IUG+/Inu8gITT0PmhxJ73Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723476648; c=relaxed/simple;
-	bh=aoGG5sVhLE9ME+bAQqIWjm3N0qUkcvEkfW51zHhShbA=;
+	s=arc-20240116; t=1723476650; c=relaxed/simple;
+	bh=YN4VF9eogqlyEemrlDUeUUfXNQS8CprZhceY24IX5uc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TOPEDlNTcrzsGi+YpH/ripFD9lzBvxf92+j0dIuZyU5HAjDrN+nq63KPMBA11vbVDVyNj5fMiT1rcCoTH8fojC76nSdX9Aa8l3ej3sA7ZKHHdhpjCuF2q7AKcP5/Opm1J2AqJDcA9TNtofT26VHMhvkZHQY9M2q3yw+H3k/YI+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PUWIAAcA; arc=none smtp.client-ip=209.85.208.52
+	 MIME-Version; b=g2Tmc9b4CZAno5/jzN3BCNvZs3Sr1/O1qng31GeOZLP/NVgz++KyGoZE7QHJ6winUr0yoaCdgiEepJnvbDk3bsyfWTDsKbJe/tg8OWJfC9nEIYrC7v0vcjk9UgJrDtC0jm8JbutpCUlvlq9Nv6qEzDNkk90ea2xxTuyigTta+54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgMn7bdZ; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5b3fff87e6bso5016556a12.0;
-        Mon, 12 Aug 2024 08:30:45 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5b01af9b0c9so4681328a12.3;
+        Mon, 12 Aug 2024 08:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723476644; x=1724081444; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723476647; x=1724081447; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q0dC3mF4X+wKSKxy8Scoq+dO1j2v1I2jrAKLTICnCSQ=;
-        b=PUWIAAcAFQNu91REBHJXO72QDWP4lP5L0IGl1c2QmiHn1JlJsVWCJMsXBS+TRH4UpT
-         AZyNlhOqBgijbzeq19KrpIJB0MCW9sPRl/JhW4XmkbLdWvPYmvTtpqlHokbc7uK7JiqN
-         qgNAc4fhqtZty1qFtUubnx0UhXYnXDWk+CZ3HJOkYrXvUd9VdOjOBaegfE0NMRfX+pX2
-         /Hg9b2ZWdsxE73ZIka9fnbGcEoClflIVXilgDLIl57fCtMOaFjbkvicBSP99mYAA/9PV
-         UGfhvIIa4SMfdz7/Ot5hx9spEk20dG/25Fcl6QHbSI0S9M63/6NoHp8tCIUp5M1rc+vH
-         1YpA==
+        bh=BLmRpZ1aG/lzex3h1BqdyLB+WcZHwCjcjuUeIyDowBA=;
+        b=MgMn7bdZpqjEE9Ln3DTgqapiObVfaRhhwF0VGxUXAxgrAi5B/XYzzyGHgihgRkJUMh
+         qIxYKsROMhXq7C8rjrYV0GK+R0WY1oUgtEPaR3ddGaB2nYQspC2jMUxM1VwL0cNm5XsZ
+         N8HrRPkd+k9oD0guFfNCo3GfTWbb0T/4DNp0C83oWkg8y6sGOt26PSlnPlbXg/o7RRqP
+         qNKYJk8z7vkl03+PwKWMkwr7Au+SW2n5q7rmQ2k3jVZ/lqkQde4sWeob6nuXT86Ue/aO
+         bCgIPE0DEYwUMY4kmwMve8ayCd/6F5ACw1OjnDsY7KDor/TxlgOEJeAc4jcez5jMWHzr
+         MB+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723476644; x=1724081444;
+        d=1e100.net; s=20230601; t=1723476647; x=1724081447;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Q0dC3mF4X+wKSKxy8Scoq+dO1j2v1I2jrAKLTICnCSQ=;
-        b=ky/ATqGwv+ehdDynwruJIXZoPdYzZcQFK1wXGCJYDgSn6D6RVcCRq26cJNr/ZTsmkA
-         H4FEJvxa2x3YAd90+U5k6CqulsYlLx/uupO7KpSe/WiKQdcoulBQOuIQC+GrtkItWeNz
-         8I5Rzu/IfTQBoTzRXu65RiwJTXxn/WIaWGOKIwkc0LtEVtk78ffGx5FH8E0EtX0UbFl2
-         pRwQ/RG1QapKgePr/mof6orm2i7rGHyp7uY8YbD7Nmx3E2A7Jthahfe8vTzRtvGeWVME
-         +1u0xKzIjt/hw3Kn+qZvAq4/30k09weQHofaT1K7cIM2YdxolRj+LGvjATOPCGAd3PYi
-         IU1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXFAVrwP6PrrXpHI++URTEgr0gdMs3NFmmyKQfyoZKd1Xax3G0Zp+h7BnRU+5nt0L5Vvs0HDKtygLFry9fDocRqmzwYc9oJsKkXdwZpOemm3S9vlFjwYuLXSX5PkWPO8cyZcDpGKeD7nxUxIAuL2MnoHDVaPhpQZqr1usDUpPsyhw==
-X-Gm-Message-State: AOJu0Yy3YPw1NJm9juYjSyqoh/KlFaIbWrKvTHjcNlPLXhdbSfYsQLFH
-	tNNGO7OK8CEp9v02HefuDYaHRASmIrTOTBjw6RSi4wmBZ6hE7Ig8CKegUCPlVzz/dg==
-X-Google-Smtp-Source: AGHT+IGc7Ax6Rx/zx7X/Z5EkMCe3vExcPsgjvqIe734zHii7qlFLAVkadO98nekw6OtHVqAmpi/Grg==
-X-Received: by 2002:a05:6402:d06:b0:5a2:2654:7fd1 with SMTP id 4fb4d7f45d1cf-5bd44c78c9bmr398115a12.36.1723476644075;
-        Mon, 12 Aug 2024 08:30:44 -0700 (PDT)
+        bh=BLmRpZ1aG/lzex3h1BqdyLB+WcZHwCjcjuUeIyDowBA=;
+        b=D3AbvfjBQu9foLMZzCU3LW2rYJGtPwLcPScM+UHuAW3zKdj234gk2qMwB27xIlHkYZ
+         SoZMK+Pg/sMe9u+29t3IoPbdFT9ysQRZPsno87TYUBGtNO68KwO1LhX+y1Wq5o7UuF3V
+         dhvwKmGzYylTBVadX7JAsGo3DaTT3ElgizAsHBmlyJpJzpTwPw7w+0cgUKOu2xFpX2o/
+         8jTTwBSQrxxFfyR1IWcoOKN7PTnGwU5UwHJ87vDgwx/QJSY5RtCEnMS7QSTbMCxug68v
+         BgK0QQ9/LDb0FYq2M0ZPP9H6HQJl18xbXbTApNOMI+5eaBgDchefLwtWVIfnsI3bh+yd
+         /vFg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGyhTUwIHc9RvAOqukpQYtqdqcAw804pSN8qWDJZyqDtgALTrfIUHhycg/NpDCFQ4h6lVZd2q2RY1fvWzZRY7vXVZQXgiCDIpbRzDoFPCwOrKQhLNIzWcZHDEUp2MfuWpmuR1rZtTIOcXPsLrYEjP/nlXct+TGSfgpu/541RGgpg==
+X-Gm-Message-State: AOJu0YzBwxHAyotQgJA0gTcdxcTZs3+IRcGthGWrmH8qYdddqCNdsOfL
+	JUdP78Y9K2Oqo3xCLOXf6SLm+SxQbLkD4Thotx2gGsWpvk+F/fej
+X-Google-Smtp-Source: AGHT+IEnTXS7AVSc649zDQ+487fyDcpGFVy2Df4beudLFabvjF2dpgvjXDR8HEvOKyWMW9xzs5UYHg==
+X-Received: by 2002:a05:6402:3587:b0:5bb:9ae0:4a46 with SMTP id 4fb4d7f45d1cf-5bd44c0cff8mr579891a12.5.1723476646900;
+        Mon, 12 Aug 2024 08:30:46 -0700 (PDT)
 Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd196a666fsm2192535a12.46.2024.08.12.08.30.43
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd196a666fsm2192535a12.46.2024.08.12.08.30.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 08:30:43 -0700 (PDT)
+        Mon, 12 Aug 2024 08:30:46 -0700 (PDT)
 From: vtpieter@gmail.com
 To: Woojung Huh <woojung.huh@microchip.com>,
 	UNGLinuxDriver@microchip.com,
@@ -86,11 +86,10 @@ Cc: Woojung Huh <Woojung.Huh@microchip.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Subject: [PATCH net-next v5 4/6] net: dsa: microchip: add WoL support for KSZ87xx family
-Date: Mon, 12 Aug 2024 17:29:55 +0200
-Message-ID: <20240812153015.653044-5-vtpieter@gmail.com>
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Subject: [PATCH net-next v5 5/6] net: dsa: microchip: fix KSZ87xx family structure wrt the datasheet
+Date: Mon, 12 Aug 2024 17:29:56 +0200
+Message-ID: <20240812153015.653044-6-vtpieter@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240812153015.653044-1-vtpieter@gmail.com>
 References: <20240812153015.653044-1-vtpieter@gmail.com>
@@ -104,294 +103,130 @@ Content-Transfer-Encoding: 8bit
 
 From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-Add WoL support for KSZ87xx family of switches. This code was tested
-with a KSZ8794 chip.
+The KSZ87xx switches have 32 static MAC address table entries and not
+8. This fixes -ENOSPC non-critical errors from ksz8_add_sta_mac when
+configured as a bridge.
 
-Implement ksz_common usage of the new device-tree property
-'microchip,pme-active-high'.
-
-Make use of the now generalized ksz_common WoL functions, adding an
-additional interrupt register write for KSZ87xx. Add helper functions
-to convert from PME (port) read/writes to indirect register
-read/writes in the dedicated ksz8795 sources.  Add initial
-configuration during (port) setup as per KSZ9477.
+Add a new ksz87xx_dev_ops structure to be able to use the
+ksz_r_mib_stat64 pointer for this family; this corrects a wrong
+mib->counters cast to ksz88xx_stats_raw. This fixes iproute2
+statistics. Rename ksz8_dev_ops structure to ksz88x3_dev_ops, in line
+with ksz_is_* naming conventions from ksz_common.h.
 
 Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
 ---
- drivers/net/dsa/microchip/ksz8.h       |  3 +
- drivers/net/dsa/microchip/ksz8795.c    | 94 +++++++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz_common.c | 24 +++++--
- drivers/net/dsa/microchip/ksz_common.h |  6 +-
- 4 files changed, 119 insertions(+), 8 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c | 51 ++++++++++++++++++++++----
+ 1 file changed, 43 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz8.h b/drivers/net/dsa/microchip/ksz8.h
-index ae43077e76c3..e1c79ff97123 100644
---- a/drivers/net/dsa/microchip/ksz8.h
-+++ b/drivers/net/dsa/microchip/ksz8.h
-@@ -54,6 +54,9 @@ int ksz8_reset_switch(struct ksz_device *dev);
- int ksz8_switch_init(struct ksz_device *dev);
- void ksz8_switch_exit(struct ksz_device *dev);
- int ksz8_change_mtu(struct ksz_device *dev, int port, int mtu);
-+int ksz8_pme_write8(struct ksz_device *dev, u32 reg, u8 value);
-+int ksz8_pme_pread8(struct ksz_device *dev, int port, int offset, u8 *data);
-+int ksz8_pme_pwrite8(struct ksz_device *dev, int port, int offset, u8 data);
- void ksz8_phylink_mac_link_up(struct phylink_config *config,
- 			      struct phy_device *phydev, unsigned int mode,
- 			      phy_interface_t interface, int speed, int duplex,
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index d27b9c36d73f..a01079297a8c 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -38,6 +38,20 @@ static void ksz_port_cfg(struct ksz_device *dev, int port, int offset, u8 bits,
- 			   bits, set ? bits : 0);
- }
- 
-+/**
-+ * ksz8_ind_write8 - EEE/ACL/PME indirect register write
-+ * @dev: The device structure.
-+ * @table: Function & table select, register 110.
-+ * @addr: Indirect access control, register 111.
-+ * @data: The data to be written.
-+ *
-+ * This function performs an indirect register write for EEE, ACL or
-+ * PME switch functionalities. Both 8-bit registers 110 and 111 are
-+ * written at once with ksz_write16, using the serial multiple write
-+ * functionality.
-+ *
-+ * Return: 0 on success, or an error code on failure.
-+ */
- static int ksz8_ind_write8(struct ksz_device *dev, u8 table, u16 addr, u8 data)
- {
- 	const u16 *regs;
-@@ -58,6 +72,59 @@ static int ksz8_ind_write8(struct ksz_device *dev, u8 table, u16 addr, u8 data)
- 	return ret;
- }
- 
-+/**
-+ * ksz8_ind_read8 - EEE/ACL/PME indirect register read
-+ * @dev: The device structure.
-+ * @table: Function & table select, register 110.
-+ * @addr: Indirect access control, register 111.
-+ * @val: The value read.
-+ *
-+ * This function performs an indirect register read for EEE, ACL or
-+ * PME switch functionalities. Both 8-bit registers 110 and 111 are
-+ * written at once with ksz_write16, using the serial multiple write
-+ * functionality.
-+ *
-+ * Return: 0 on success, or an error code on failure.
-+ */
-+static int ksz8_ind_read8(struct ksz_device *dev, u8 table, u16 addr, u8 *val)
-+{
-+	const u16 *regs;
-+	u16 ctrl_addr;
-+	int ret = 0;
-+
-+	regs = dev->info->regs;
-+
-+	mutex_lock(&dev->alu_mutex);
-+
-+	ctrl_addr = IND_ACC_TABLE(table | TABLE_READ) | addr;
-+	ret = ksz_write16(dev, regs[REG_IND_CTRL_0], ctrl_addr);
-+	if (!ret)
-+		ret = ksz_read8(dev, regs[REG_IND_BYTE], val);
-+
-+	mutex_unlock(&dev->alu_mutex);
-+
-+	return ret;
-+}
-+
-+int ksz8_pme_write8(struct ksz_device *dev, u32 reg, u8 value)
-+{
-+	return ksz8_ind_write8(dev, (u8)(reg >> 8), (u8)(reg), value);
-+}
-+
-+int ksz8_pme_pread8(struct ksz_device *dev, int port, int offset, u8 *data)
-+{
-+	u8 table = (u8)(offset >> 8 | (port + 1));
-+
-+	return ksz8_ind_read8(dev, table, (u8)(offset), data);
-+}
-+
-+int ksz8_pme_pwrite8(struct ksz_device *dev, int port, int offset, u8 data)
-+{
-+	u8 table = (u8)(offset >> 8 | (port + 1));
-+
-+	return ksz8_ind_write8(dev, table, (u8)(offset), data);
-+}
-+
- int ksz8_reset_switch(struct ksz_device *dev)
- {
- 	if (ksz_is_ksz88x3(dev)) {
-@@ -1545,6 +1612,7 @@ static void ksz8795_cpu_interface_select(struct ksz_device *dev, int port)
- 
- void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- {
-+	const u16 *regs = dev->info->regs;
- 	struct dsa_switch *ds = dev->ds;
- 	const u32 *masks;
- 	int queues;
-@@ -1575,6 +1643,13 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 		member = BIT(dsa_upstream_port(ds, port));
- 
- 	ksz8_cfg_port_member(dev, port, member);
-+
-+	/* Disable all WoL options by default. Otherwise
-+	 * ksz_switch_macaddr_get/put logic will not work properly.
-+	 * CPU port 4 has no WoL functionality.
-+	 */
-+	if (ksz_is_ksz87xx(dev) && !cpu_port)
-+		ksz8_pme_pwrite8(dev, port, regs[REG_PORT_PME_CTRL], 0);
- }
- 
- static void ksz88x3_config_rmii_clk(struct ksz_device *dev)
-@@ -1790,7 +1865,8 @@ int ksz8_enable_stp_addr(struct ksz_device *dev)
- int ksz8_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
--	int i;
-+	const u16 *regs = dev->info->regs;
-+	int i, ret = 0;
- 
- 	ds->mtu_enforcement_ingress = true;
- 
-@@ -1829,7 +1905,21 @@ int ksz8_setup(struct dsa_switch *ds)
- 	for (i = 0; i < (dev->info->num_vlans / 4); i++)
- 		ksz8_r_vlan_entries(dev, i);
- 
--	return ksz8_handle_global_errata(ds);
-+	/* Make sure PME (WoL) is not enabled. If requested, it will
-+	 * be enabled by ksz_wol_pre_shutdown(). Otherwise, some PMICs
-+	 * do not like PME events changes before shutdown. PME only
-+	 * available on KSZ87xx family.
-+	 */
-+	if (ksz_is_ksz87xx(dev)) {
-+		ret = ksz8_pme_write8(dev, regs[REG_SW_PME_CTRL], 0);
-+		if (!ret)
-+			ret = ksz_rmw8(dev, REG_INT_ENABLE, INT_PME, 0);
-+	}
-+
-+	if (!ret)
-+		return ksz8_handle_global_errata(ds);
-+	else
-+		return ret;
- }
- 
- void ksz8_get_caps(struct ksz_device *dev, int port,
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index e2a9a652c41a..3f3230d181d8 100644
+index 3f3230d181d8..cd3991792b69 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -307,6 +307,9 @@ static const struct ksz_dev_ops ksz8_dev_ops = {
- 	.init = ksz8_switch_init,
- 	.exit = ksz8_switch_exit,
- 	.change_mtu = ksz8_change_mtu,
+@@ -277,7 +277,7 @@ static const struct phylink_mac_ops ksz8_phylink_mac_ops = {
+ 	.mac_link_up	= ksz8_phylink_mac_link_up,
+ };
+ 
+-static const struct ksz_dev_ops ksz8_dev_ops = {
++static const struct ksz_dev_ops ksz88x3_dev_ops = {
+ 	.setup = ksz8_setup,
+ 	.get_port_addr = ksz8_get_port_addr,
+ 	.cfg_port_member = ksz8_cfg_port_member,
+@@ -312,6 +312,41 @@ static const struct ksz_dev_ops ksz8_dev_ops = {
+ 	.pme_pwrite8 = ksz8_pme_pwrite8,
+ };
+ 
++static const struct ksz_dev_ops ksz87xx_dev_ops = {
++	.setup = ksz8_setup,
++	.get_port_addr = ksz8_get_port_addr,
++	.cfg_port_member = ksz8_cfg_port_member,
++	.flush_dyn_mac_table = ksz8_flush_dyn_mac_table,
++	.port_setup = ksz8_port_setup,
++	.r_phy = ksz8_r_phy,
++	.w_phy = ksz8_w_phy,
++	.r_mib_cnt = ksz8_r_mib_cnt,
++	.r_mib_pkt = ksz8_r_mib_pkt,
++	.r_mib_stat64 = ksz_r_mib_stats64,
++	.freeze_mib = ksz8_freeze_mib,
++	.port_init_cnt = ksz8_port_init_cnt,
++	.fdb_dump = ksz8_fdb_dump,
++	.fdb_add = ksz8_fdb_add,
++	.fdb_del = ksz8_fdb_del,
++	.mdb_add = ksz8_mdb_add,
++	.mdb_del = ksz8_mdb_del,
++	.vlan_filtering = ksz8_port_vlan_filtering,
++	.vlan_add = ksz8_port_vlan_add,
++	.vlan_del = ksz8_port_vlan_del,
++	.mirror_add = ksz8_port_mirror_add,
++	.mirror_del = ksz8_port_mirror_del,
++	.get_caps = ksz8_get_caps,
++	.config_cpu_port = ksz8_config_cpu_port,
++	.enable_stp_addr = ksz8_enable_stp_addr,
++	.reset = ksz8_reset_switch,
++	.init = ksz8_switch_init,
++	.exit = ksz8_switch_exit,
++	.change_mtu = ksz8_change_mtu,
 +	.pme_write8 = ksz8_pme_write8,
 +	.pme_pread8 = ksz8_pme_pread8,
 +	.pme_pwrite8 = ksz8_pme_pwrite8,
- };
- 
- static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
-@@ -423,6 +426,9 @@ static const u16 ksz8795_regs[] = {
- 	[S_MULTICAST_CTRL]		= 0x04,
- 	[P_XMII_CTRL_0]			= 0x06,
- 	[P_XMII_CTRL_1]			= 0x06,
-+	[REG_SW_PME_CTRL]		= 0x8003,
-+	[REG_PORT_PME_STATUS]		= 0x8003,
-+	[REG_PORT_PME_CTRL]		= 0x8007,
- };
- 
- static const u32 ksz8795_masks[] = {
-@@ -3800,7 +3806,7 @@ static void ksz_get_wol(struct dsa_switch *ds, int port,
- 	u8 pme_ctrl;
- 	int ret;
- 
--	if (!is_ksz9477(dev))
-+	if (!is_ksz9477(dev) && !ksz_is_ksz87xx(dev))
- 		return;
- 
- 	if (!dev->wakeup_source)
-@@ -3853,7 +3859,7 @@ static int ksz_set_wol(struct dsa_switch *ds, int port,
- 	if (wol->wolopts & ~(WAKE_PHY | WAKE_MAGIC))
- 		return -EINVAL;
- 
--	if (!is_ksz9477(dev))
-+	if (!is_ksz9477(dev) && !ksz_is_ksz87xx(dev))
- 		return -EOPNOTSUPP;
- 
- 	if (!dev->wakeup_source)
-@@ -3919,12 +3925,13 @@ static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
- {
- 	const struct ksz_dev_ops *ops = dev->dev_ops;
- 	const u16 *regs = dev->info->regs;
-+	u8 pme_pin_en = PME_ENABLE;
- 	struct dsa_port *dp;
- 	int ret;
- 
- 	*wol_enabled = false;
- 
--	if (!is_ksz9477(dev))
-+	if (!is_ksz9477(dev) && !ksz_is_ksz87xx(dev))
- 		return;
- 
- 	if (!dev->wakeup_source)
-@@ -3945,8 +3952,13 @@ static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
- 	}
- 
- 	/* Now we are save to enable PME pin. */
--	if (*wol_enabled)
--		ops->pme_write8(dev, regs[REG_SW_PME_CTRL], PME_ENABLE);
-+	if (*wol_enabled) {
-+		if (dev->pme_active_high)
-+			pme_pin_en |= PME_POLARITY;
-+		ops->pme_write8(dev, regs[REG_SW_PME_CTRL], pme_pin_en);
-+		if (ksz_is_ksz87xx(dev))
-+			ksz_write8(dev, KSZ87XX_REG_INT_EN, KSZ87XX_INT_PME_MASK);
-+	}
- }
- 
- static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
-@@ -4661,6 +4673,8 @@ int ksz_switch_register(struct ksz_device *dev)
- 
- 		dev->wakeup_source = of_property_read_bool(dev->dev->of_node,
- 							   "wakeup-source");
-+		dev->pme_active_high = of_property_read_bool(dev->dev->of_node,
-+							     "microchip,pme-active-high");
- 	}
- 
- 	ret = dsa_register_switch(dev->ds);
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index c60c218afa64..8094d90d6ca4 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -174,6 +174,7 @@ struct ksz_device {
- 	bool synclko_125;
- 	bool synclko_disable;
- 	bool wakeup_source;
-+	bool pme_active_high;
- 
- 	struct vlan_table *vlan_cache;
- 
-@@ -704,7 +705,7 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- #define P_MII_MAC_MODE			BIT(2)
- #define P_MII_SEL_M			0x3
- 
--/* KSZ9477, KSZ8795 Wake-on-LAN (WoL) masks */
-+/* KSZ9477, KSZ87xx Wake-on-LAN (WoL) masks */
- #define PME_WOL_MAGICPKT		BIT(2)
- #define PME_WOL_LINKUP			BIT(1)
- #define PME_WOL_ENERGY			BIT(0)
-@@ -712,6 +713,9 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- #define PME_ENABLE			BIT(1)
- #define PME_POLARITY			BIT(0)
- 
-+#define KSZ87XX_REG_INT_EN		0x7D
-+#define KSZ87XX_INT_PME_MASK		BIT(4)
++};
 +
- /* Interrupt */
- #define REG_SW_PORT_INT_STATUS__1	0x001B
- #define REG_SW_PORT_INT_MASK__1		0x001F
+ static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
+ 					struct phy_device *phydev,
+ 					unsigned int mode,
+@@ -1262,12 +1297,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.dev_name = "KSZ8795",
+ 		.num_vlans = 4096,
+ 		.num_alus = 0,
+-		.num_statics = 8,
++		.num_statics = 32,
+ 		.cpu_ports = 0x10,	/* can be configured as cpu port */
+ 		.port_cnt = 5,		/* total cpu and user ports */
+ 		.num_tx_queues = 4,
+ 		.num_ipms = 4,
+-		.ops = &ksz8_dev_ops,
++		.ops = &ksz87xx_dev_ops,
+ 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
+ 		.ksz87xx_eee_link_erratum = true,
+ 		.mib_names = ksz9477_mib_names,
+@@ -1303,12 +1338,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.dev_name = "KSZ8794",
+ 		.num_vlans = 4096,
+ 		.num_alus = 0,
+-		.num_statics = 8,
++		.num_statics = 32,
+ 		.cpu_ports = 0x10,	/* can be configured as cpu port */
+ 		.port_cnt = 5,		/* total cpu and user ports */
+ 		.num_tx_queues = 4,
+ 		.num_ipms = 4,
+-		.ops = &ksz8_dev_ops,
++		.ops = &ksz87xx_dev_ops,
+ 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
+ 		.ksz87xx_eee_link_erratum = true,
+ 		.mib_names = ksz9477_mib_names,
+@@ -1330,12 +1365,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.dev_name = "KSZ8765",
+ 		.num_vlans = 4096,
+ 		.num_alus = 0,
+-		.num_statics = 8,
++		.num_statics = 32,
+ 		.cpu_ports = 0x10,	/* can be configured as cpu port */
+ 		.port_cnt = 5,		/* total cpu and user ports */
+ 		.num_tx_queues = 4,
+ 		.num_ipms = 4,
+-		.ops = &ksz8_dev_ops,
++		.ops = &ksz87xx_dev_ops,
+ 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
+ 		.ksz87xx_eee_link_erratum = true,
+ 		.mib_names = ksz9477_mib_names,
+@@ -1362,7 +1397,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.port_cnt = 3,
+ 		.num_tx_queues = 4,
+ 		.num_ipms = 4,
+-		.ops = &ksz8_dev_ops,
++		.ops = &ksz88x3_dev_ops,
+ 		.phylink_mac_ops = &ksz8830_phylink_mac_ops,
+ 		.mib_names = ksz88xx_mib_names,
+ 		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
 -- 
 2.43.0
 
