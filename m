@@ -1,257 +1,317 @@
-Return-Path: <netdev+bounces-117698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155AF94ED6D
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:55:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 697B294ED73
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 430BCB21971
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:55:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B89BDB21D0D
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C037A17B50B;
-	Mon, 12 Aug 2024 12:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787C817BB11;
+	Mon, 12 Aug 2024 12:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fg8IZBPZ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="eDOE7PYF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249BC53370;
-	Mon, 12 Aug 2024 12:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723467303; cv=fail; b=lqfVEwSDZNMZtcgSCFji0KRY3R510MkkzhadT3QSyAVZcDYznfVNMAxrapxcrn8w8vzt24+rE43e2OXWcETPvMWXGLLzZ3fZVYSSXJOaSex+K8VCi8NGiHEVCqgnGzoBpa6+J4yYyWH+xmJyfXZmZMwmJhnCjfddbUJI3r2VX/8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723467303; c=relaxed/simple;
-	bh=AsUVXDqetKPOnouRkhgOBXjYWiQWWWqkyvQ1GDnAJMQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=p71Bm5YFa+m2TWDj3JXb9JnDMwgL0YtVVJibhqf8pb5vywRvNY78EfRBykI9W89fR5DjvXigOoeVc3hqqQCN6jfd3GSYOePqWRJK5JVEFi3KFH8SmF/ZUPhmfFMfW3H12Zn9q4xdrnTJithQPPSUAIUIWcdTpPOCprhIHzP0lzU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fg8IZBPZ; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723467302; x=1755003302;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=AsUVXDqetKPOnouRkhgOBXjYWiQWWWqkyvQ1GDnAJMQ=;
-  b=Fg8IZBPZBhECurcdFCZPjoNPYnBGWB0bDObWalBRKhi/aHVDO2xyv+6u
-   aVXpwdTcdqUw9vChX7BvxfnRoby2bEgkA5yUcAOzLn2gizjhb7ZuWzLWn
-   QQvhkZn+xSsoz+fVGITx+YmQLZKudax2ova6KZGDIJu4V/rM+ASFdo6s+
-   cpT3Auh5CNUBxC5SLgaaoxASsJof/vKZMtb+SmE8W45hyorkM9jTaRlDU
-   b1NtemYFHT7Zylie0ZirQ7P2z+PvPl1tcqBgwymMvxm2nTNoeLY07MOJy
-   6swJzejUDZQOWaBdo7GDztty1Ic25WvuQwEJwTrwB3aEW2fNH1HeIxyQL
-   A==;
-X-CSE-ConnectionGUID: yxUohtLZSHivXK4wOA2buA==
-X-CSE-MsgGUID: faKZDfqORO+WdTICziYnpA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="21138615"
-X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="21138615"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 05:55:01 -0700
-X-CSE-ConnectionGUID: TEudxyW2RNaiQXfmQHuNTg==
-X-CSE-MsgGUID: o9ZQtk+wQsidEO3enkP8OA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="58960645"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Aug 2024 05:55:02 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 12 Aug 2024 05:55:00 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 12 Aug 2024 05:55:00 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 12 Aug 2024 05:55:00 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 12 Aug 2024 05:55:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=s0Je9KCc2G6aT1AFTpCxXpd1xxvys9lSp21Kuy+a4h0H2OkRNx9+C4IvYvBM/rIIBWK9QoLpZSXNCDaDZNkH9KdrpADzZY3cSElsNdJ5Gs0DLdfOq8yK5Tt4SQtSRNBFNv3b9xTwFDEkLrx7lTSe6YAUXQVJT4ZlBJhXwLDIY4/H2iohgam26ICRVO9b9sZUyeBB8kEqfvEWauuycmLxD5v/TMsuts0VhZRIsfI6Lv9OZxIqa6/0nZ+PUvWQDCqWgirIfgKENPpOsDdo+snyLG+Vre/Q0yvV1NyUla/ynE8jHjO7eCcP4VaaN9q5hKeW6zDkSYxl+8UtjZH6oJWa0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iYGFMGUorWlZ7huQ80jX6L1kfEY3vhxOl2TEkk/wD4k=;
- b=HWseNH0oty8KlclehD2mhlr8Zc00mdpRpY1UPWWbyWq8yuq2O/WTiknP9nvk9WIfYyvAucR58OTHmHwTiwT4TNxQS5PoIvRlKz8/+ZERYLTDFoevgAKxXZbTchHOuaqhClp2D9+UjpH8Td42TbMqlCXFJalsNEJeZeBF7E163bMOBFML3JsPXqKHVyc0iKIu8O5s+G/1NkWt14B+zBG7EbOAsbHQsVQJHDekTyn4wtM34d5oBdmikFwWj0srCYn1X/GwimJWDRYNz+2JmGXW+J9wbmumYx+0JekY8U2THXlwZBjq2HdULDno4dHVO+kDzAvskMt0IbKIsIwj56nC+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA0PR11MB4527.namprd11.prod.outlook.com (2603:10b6:806:72::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.30; Mon, 12 Aug
- 2024 12:54:57 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7828.023; Mon, 12 Aug 2024
- 12:54:57 +0000
-Message-ID: <f057f74b-07fa-433d-b906-011186eb86a7@intel.com>
-Date: Mon, 12 Aug 2024 14:54:47 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] cxl/region: Prevent device_find_child() from
- modifying caller's match data
-To: Zijun Hu <zijun_hu@icloud.com>, Dan Williams <dan.j.williams@intel.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-	<linux1394-devel@lists.sourceforge.net>, <netdev@vger.kernel.org>, Zijun Hu
-	<quic_zijuhu@quicinc.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>, Dave Jiang
-	<dave.jiang@intel.com>, Alison Schofield <alison.schofield@intel.com>, Vishal
- Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, Takashi
- Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
- <20240811-const_dfc_prepare-v1-3-d67cc416b3d3@quicinc.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240811-const_dfc_prepare-v1-3-d67cc416b3d3@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0012.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::10) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9BD17B51B
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 12:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723467457; cv=none; b=Xei7KSW/ysS1Ggdo9fJPm3J+gLUMEuqr8RUxA90zguXvTFEP2HgIkXhKgzLwuAqxWTGB8uf8TvHUW4G3GRI/SiB95QwKGY1ILitvejN/6uYFl7e0xV08R8/7Z0u7m5FIHdNMDZRGmA1TOme43DlbyXSyw55gbe1aQbwixGWA8lk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723467457; c=relaxed/simple;
+	bh=MDz9dC9gTYTAHSjLLL5G1NfvdG2IhmR0AoliL3khWdk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=vApSb1HOGrc63DodoGACuSwyh2iqNk5yU5/uEQ7toEK9wba79BVvySbppWhspjdwyTmwwZ5sKSVqlg5g9pZtqJ9NK3AGFQY11UiRHdlIPj29V8DV3A8cG/PUBi7Yd+wbQIL3e4fc5J6RQL+Ru3dNzwJ8EBB4hxTozkI7/W7g+yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=eDOE7PYF; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7c3d8f260easo1108879a12.1
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 05:57:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1723467455; x=1724072255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=im8KpEyQEI7OiPKCxOhe/2kt2a2ybz6CAYmO/N9YxlY=;
+        b=eDOE7PYF++iKG+WFFkeln8xVanXac53cYySST2wxBzCYypDtlIqBuD5N9jzBmhOPR1
+         qckv4TRko0sXsCf7XcJf0a/aS+qLrtZpD1q41/WKV6FqBGUf9KbRBl8ImfTVj6ZrBFAT
+         wTE2heMXNt0oR34X+Dt0SqpVPPYtOuOcafIy4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723467455; x=1724072255;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=im8KpEyQEI7OiPKCxOhe/2kt2a2ybz6CAYmO/N9YxlY=;
+        b=MrYi3kuzDh5KdK6qudrWnCdaoc5r8ZcAHTB7XM+729icFL9lODNevrSotEK5fCdmaG
+         nCbCLxN57SMagetK+B+IcawC9W8vIb7nIHRIaRyHuAnMqsZJg/xZnmHjP05ZExJESztV
+         302u+dqJBcibHHrrRfSEjkNjKLTKrntK48ghdGJoNfPmbsvVNx8vbSK9ULXAd18VGMIB
+         5t5Apwc5Ir3tqJ0slywRSQ3Lc11gFf5jZB64hIWfUEgipaxN5TZIa/Gs2J76C8p+6Jfp
+         jy7sZIgJqNbbCQYCnbDg/AgDAh4WDssMM8uYZrS5w4PgKU4omN1uGihDEjd7z8l3MCEX
+         QsaA==
+X-Gm-Message-State: AOJu0YytW/GL7PD0a0CEOFG1nIfjQg7CD6Bi1ljGJDNzeWwTyZv55sUx
+	D2yY0SK83tKBzEaYYUBhRGOFVVOSjqugJRei2h/BiIn4zrRgC2r7hBkbp0BqS1WZ5DeKxPBG/uU
+	YdiASmQvDbHOgjqPbcrLZq7//IOoRfFsvWMIUEUpz5Tr+oBUuHY8Y4x9QMTwOmx9iESshGrOf0b
+	pqUkTKJx3LKqpscG0g7bVkbkrm02sI+upbWwpohA==
+X-Google-Smtp-Source: AGHT+IGyKNoPKnsUeLXXVDODRMpADXy/RxJU7/g4zFWJav9Nc3d0UvLs50qUxM4lU6dtVDXTJ6HJ7g==
+X-Received: by 2002:a17:90a:6b44:b0:2cb:5112:740 with SMTP id 98e67ed59e1d1-2d39262351cmr101548a91.26.1723467454465;
+        Mon, 12 Aug 2024 05:57:34 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d1c9ca6fafsm8183368a91.34.2024.08.12.05.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 05:57:33 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: mkarsten@uwaterloo.ca,
+	amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
+	sdf@fomichev.me,
+	Joe Damato <jdamato@fastly.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and infrastructure)),
+	linux-kernel@vger.kernel.org (open list),
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+Date: Mon, 12 Aug 2024 12:57:03 +0000
+Message-Id: <20240812125717.413108-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA0PR11MB4527:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0877e59-b019-4a83-8d06-08dcbacdf7d3
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ck5JVkJQd2NSL0FwbDlraER3WUFtZ2JDbTJOMFFDUDhVQ0ZYN3gzT2owWGdJ?=
- =?utf-8?B?Y01LWU9ucHY2UmJlNXhnMTNmWStTZVpEeWRhUXhhdUlFOWtTUjhPOUx4Vzlk?=
- =?utf-8?B?Ris2a0hvbFdHV2lmaWp3ekdqdW9MWVFXSDVHTTdLK1NlaGQveU1xVFRzd1F3?=
- =?utf-8?B?cUtVNEJpTXN1U3gxWU9mVTlDWUJSOTdabVRuTnB3ZU9DUlphMTZUYjE4R21L?=
- =?utf-8?B?MnlLKzNXVGtwKzBIcHVweE0rcXlTZloySWJmYVZMc3lUMWl5VzVDSStPZnMz?=
- =?utf-8?B?OGdYVXdMTWhFNGNqUncybFpMaE5kUlhQNXNBb2RyY0VocFRaakFpVndhbWx0?=
- =?utf-8?B?NUdNV0hOTUdDcEx2a2xPREFJU245OUtrZTRuL3JFWEZscjNvaUhabTl6QnYz?=
- =?utf-8?B?eU9MNCtnWkRJdVFlQUxEK1ZiQVFkMGdMMC93UnlBWmlVQzVZcnhKcHJWQ0JL?=
- =?utf-8?B?QVJMSVdhSlgxdDFXdHBWZEw5TkY1bnFGWmNqR2hRdm8xVjRKOU9LT0lHdHhj?=
- =?utf-8?B?OEJPbDEvQ2hXdFdvZVdkTmRyOVQyeXJtVFB2blg4Umo3eExHNUJyemVyM2Nz?=
- =?utf-8?B?MGZmOG1yNzhhdWpXdkNMOERMQ2tPckVEbmFkcGp5a28xTmNrRmlRTVRjZUZT?=
- =?utf-8?B?TEZGUG9NanIyU2g4VXgydmluaXYwWXVxbm03TGFKbStiMTJwQ0dxek5LN3JP?=
- =?utf-8?B?UGYySUZ2ZVdHNDU2MVBVWHhaaUQrN3JLVmRTTkR4NDRVZjdzT0YrdE8wdk5s?=
- =?utf-8?B?NThJUjB6SkdONy9oZDROQW92T2I5aUM0YlcyTFI3dHBiYUUwMGFSazhEK2Iw?=
- =?utf-8?B?UU5CT0NOSldKWDF0aXI4WU9wTjlST3ZTZXVRaTNsVjQ2d2Vncm4zekw4bFY5?=
- =?utf-8?B?MG04U1RwYjFxNE9UOEErSU5NMTMxQk00ZVdmaFhncHNNT1k0elluejNUNm9G?=
- =?utf-8?B?Y2JoWXJ3SXFXOWV0R3l5R3k0V0VFMlY0d2cvb0hHVmpEZGRVR1NHTzFxQVRW?=
- =?utf-8?B?Ynk2azRzOTQvOXp2YmtMeTlOckRQUHFmZkhKTWJmTy84U3IvczVxL1d4enlr?=
- =?utf-8?B?VzVvK2ZtOGFvMUs3RndiVi83Wk9YOG5yYjNMQzZQZktDU1BpT1ZRQXVsM3JF?=
- =?utf-8?B?N0cxcnlFRVowdHU0UW01MkNONXl0ejBpbXVmSUMyUEJsVk94dWI5MEg2T2M1?=
- =?utf-8?B?UjdTb0JySytkeTNSSjRKV2hzUDh1dVRHMDRHYmxGUWZ1Mjk4ZDh5aXRkenV2?=
- =?utf-8?B?ckRCendEL2FqdEsvUW1vV2M1SVBwdWE0WGwzNEFjaVphMVR6eUN4U0VPWlQ0?=
- =?utf-8?B?VEJWVWRQMVQzQ3NNTVRJaEt5WGhkTGgxeGtHUmxCS2h5dzBCTU5jYytPaHZB?=
- =?utf-8?B?VHNSeFpVT3ZYeDlHbkxJdjNyVXpldnpBeHRiUXV2WU1KZExZNytleHExVXhV?=
- =?utf-8?B?RTR3c3FrNmdnSWRqNmxUVkVJMFN6MW5Td1RtSWh0U3IvYjlNOTZKeTVnR3JT?=
- =?utf-8?B?cG9pZ0NNU21XRmdUZFFEaGdoUTMzN2NXbjhCMHhCeldwMzEwV1NUS1VDMytO?=
- =?utf-8?B?THpBTExiTnBzNjd2NStiQ0RjN0Z5STZDK1lEdlVuWm1vS2VFN2oyNkN2eFc4?=
- =?utf-8?B?alFybnQ1Q1ltd0hVL2g5S0xoTmg5RDN6clNwL1MvT2Z2VzJNWXVveHUzcHVh?=
- =?utf-8?B?a0Q4YjJON3hMLy9ML2QwQ0VrRXVleFJZQmFTRjhsVlV1UmFTbVcwYTdaYno4?=
- =?utf-8?B?TGE0cExvbnBicEpDSWdYUXR5Zyt4bllEay9pZEhSTXBNWVd5MWNxZlA4bnU0?=
- =?utf-8?B?OEhpenV4RnQrbWEyVm8rUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjdBeFFreU5KTDZkc1hnb05qQnEzZUVoNmR0eEV6LzBhY0NEVE9QeU9uVnYy?=
- =?utf-8?B?ajNrUkdEYlFyZ0NoYk50YzhpTlVQc3l5Q0h1UzdsdGphTU1DaU0zejFvNGJJ?=
- =?utf-8?B?ZW93WFV0bkFnSVdldWhKbE1JeVkrZ1NKblFhN2lxU2g4NCtuNUVkOVhxSXlC?=
- =?utf-8?B?bXMxbWtlYUt5bmNST2NPUXFVdjVxY01zVTZhczJXZDF0ZXc1OVFYb0ZPTEdW?=
- =?utf-8?B?RkJScE9jSSswK214dHJyODQ2L2k0TFRYMGh3bFNhSkNUWGl3MDg2WDZvTG51?=
- =?utf-8?B?MWVJWkR4c2ZnUStCbjVYWURrcEZVRTFJWVJsL2d4K0lUYzZJZXBIZGdTQVg3?=
- =?utf-8?B?M2JaZ2wyb2phcGRKQWx6NXAzdjR2ZE9PM3Q1YlQ2MEZWSEgwcHdXb25rZXd6?=
- =?utf-8?B?KzZFbURnbEJwZ1VxK1M0aDVreVRBR2p0NU5sQ1FsNTNtYVpsZ0xJeW0zT09o?=
- =?utf-8?B?R1dDVHJkVERuVm1HRDcyYnRHTzNoajZST2ZqOVE4NjdIOUY4cWwvdjRBSTMy?=
- =?utf-8?B?ckR0QzBxNkFLRVJ1VE4zOFRJM0c1MUNMckRJOENxbkl2OVJEdEtUbGNMMFEw?=
- =?utf-8?B?dHl5TEJEOS84NDF2eVBkTW9sL2NyaWNockhBaGdwMkdldGw3cnRzNnNmZlNF?=
- =?utf-8?B?QmpXSTBoT09XUW5wTk5Ub3J5RnVVeXVyaFAxOTB2RGgwVlNjak1TQXRTSEti?=
- =?utf-8?B?bWlWL0xtVTRjSkhTTzJaZ0VYRWJ3M0padEJOd0pFUnBmZ0xJdHlhVmRnYjRK?=
- =?utf-8?B?UUdCY21VS2ZKSlBLSGUydm1OaE44aVFOMGRkWTNCdWFhbTkvUm1aRTUveExV?=
- =?utf-8?B?S3N4M2xnT2gxTEF6cHhxaWwxVTBkSXkyVXRQeEZkY2NzY2hCQTF2dEs1dDBD?=
- =?utf-8?B?eGViSEhrMEFNMHZWM1NHVzgwNjUrSTRERVJKb1NsTzRGaTVVZC9GQjN0RDh6?=
- =?utf-8?B?R3ByT0llaVVWZDQ1MkpqaDUvU2c4akRJQVFiSmdvSEFXV2s1dzRKRWYyRnh3?=
- =?utf-8?B?c1Frdm9vOE5IQjdsUE1tZ3pKbjgvSVJZUWpmbmNLN1FNZlhvOTVUU3lKazN6?=
- =?utf-8?B?QUNncjlCZlFNQkdwcmZDQnozWVNKSTZZWTk0ZzQzdU9NNGNZZ2YrQjFNOFY1?=
- =?utf-8?B?NFpuQXIvYTlEK3h4T2xLRFlDMWN3UWMxUEJDcEJBWTJMbk8vckxEV2JoczY2?=
- =?utf-8?B?bnlHekRlYmR4TUg1Z2dZSVFLdnNVdDcyWmdGSG0vclV5RVc3WURiWE9LMmRt?=
- =?utf-8?B?QkxMc0pUSUw5bkRTMXdzYnJEbnN0dXJXZnR6K1ZFQ2huOHV1RTc4c2hHR2ll?=
- =?utf-8?B?M0NhUCtTSzNVY3VvbThQdFdVOGsrZVZDYWZuVTJ5WERKRDdLYXZidUw5b2hP?=
- =?utf-8?B?ZXZub2I1MmJ0L0dJRjJPdGxuVkpPb2laU20wWm1neGlLWC9CSUZNeWttWXEw?=
- =?utf-8?B?QzFoNHV1ZlhuTWdlUkxILzc2SE9mK0t4ekJZVWhEUE1KaXZsSG4rMi81dnc5?=
- =?utf-8?B?eElqQkIvbXNiUVhjSllVVFBvOWhjeGN5V2phYmZBOU9rQkRQL0hNSkxXNjNH?=
- =?utf-8?B?RG9Kclo4aU1NRTZkdlFVUnNsNFJEMFJMMzVPdm5OYWNKa2NyZ1NHakpTaEla?=
- =?utf-8?B?SzQydUdZWVQxSGxPY3RMZ0tHWlpjRjNNQW5waVRPdC9zSldjZ1Y2ZXUvK3Bh?=
- =?utf-8?B?UUowcDV3RFJ5c09uSlV2b3pPai8xeDVnc1QwY3NqVDU3NWxrUlc0QkNQU1VX?=
- =?utf-8?B?SVB6T2pVOEhuditld1lNUEUzandSQ0JNNXlCM1dzTGsvZFZNMjhyTFdhWjlp?=
- =?utf-8?B?cHg3djQycmZSYmZFRlVDQlFpUWp4ZmJveTJ1ZUdtR245TDl5WDY4UHFCOUR5?=
- =?utf-8?B?SWM4cUdUQlNpY0FxSnZrbWM1aklQaTV5dURnMTZaK0V4T1dRMTVsWUdoK2Zy?=
- =?utf-8?B?R1M0eVhwRms2SXZxaDRWNlgxYW5UWGphTWlOYy9Bdkt5TmxQTStJcnpTVHpD?=
- =?utf-8?B?bEZqMUlocUc1Z1MyeHFnT09oNHA1VkNEeFpLbUUzKzhzcEJ6MDhCdzZVTVk3?=
- =?utf-8?B?R1RDcDRYN3EwUEFJUm1nYnlmRjZuRERhQ3lVZlFQMkcydk9uN2txdHliSHov?=
- =?utf-8?B?a0xNQWNucnF2dW45K054MU5vUjhyazV6b3JRbEJITHBOVEdmSEVaRGFWelNX?=
- =?utf-8?B?QWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0877e59-b019-4a83-8d06-08dcbacdf7d3
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 12:54:57.0560
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gMawLN6EyTgx56melGgU1SrCdZ6C2YUVIE0tHBzs6BMz9dDCKCdv4f6a4YyfWGjFer4+XEDa0hL2TZ/GGnxaVnikT46qdkhJZx2fG9ptKmw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4527
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 8/11/24 02:18, Zijun Hu wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> It does not make sense for match_free_decoder() as device_find_child()'s
-> match function to modify caller's match data, 
+Greetings:
 
-match_free_decoder() is just doing that, treating caller's match data as
-a piece of memory to store their int.
-(So it is hard to tell it does not make sense "for [it] ... to").
+Martin Karsten (CC'd) and I have been collaborating on some ideas about
+ways of reducing tail latency when using epoll-based busy poll and we'd
+love to get feedback from the list on the code in this series. This is
+the idea I mentioned at netdev conf, for those who were there. Barring
+any major issues, we hope to submit this officially shortly after RFC.
 
-> fixed by using
-> constify_device_find_child_helper() instead of device_find_child().
+The basic idea for suspending IRQs in this manner was described in an
+earlier paper presented at Sigmetrics 2024 [1].
 
-I don't like the constify... name, I would go with something like
-device_find_child_mut() or similar.
+Previously, commit 18e2bf0edf4d ("eventpoll: Add epoll ioctl for
+epoll_params") introduced the ability to enable or disable preferred
+busy poll mode on a specific epoll context using an ioctl
+(EPIOCSPARAMS).
 
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->   drivers/cxl/core/region.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 21ad5f242875..266231d69dff 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -849,7 +849,8 @@ cxl_region_find_decoder(struct cxl_port *port,
->   		dev = device_find_child(&port->dev, &cxlr->params,
->   					match_auto_decoder);
->   	else
-> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
-> +		dev = constify_device_find_child_helper(&port->dev, &id,
-> +							match_free_decoder);
->   	if (!dev)
->   		return NULL;
->   	/*
-> 
+This series extends preferred busy poll mode by adding a sysfs parameter,
+irq_suspend_timeout, which when used in combination with preferred busy
+poll suspends device IRQs up to irq_suspend_timeout nanoseconds.
 
+Important call outs:
+  - Enabling per epoll-context preferred busy poll will now effectively
+    lead to a nonblocking iteration through napi_busy_loop, even when
+    busy_poll_usecs is 0. See patch 4.
+
+  - Patches apply cleanly on net-next commit c4e82c025b3f ("net: dsa:
+    microchip: ksz9477: split half-duplex monitoring function"),  but
+    may need to be respun if/when commit b4988e3bd1f0 ("eventpoll: Annotate
+    data-race of busy_poll_usecs") picked up by the vfs folks makes its way
+    into net-next.
+
+  - In the future, time permitting, I hope to enable support for
+    napi_defer_hard_irqs, gro_flush_timeout (introduced in commit
+    6f8b12d661d0 ("net: napi: add hard irqs deferral feature")), and
+    irq_suspend_timeout (introduced in this series) on a per-NAPI basis
+    (presumably via netdev-genl).
+
+~ Description of the changes
+
+The overall idea is that IRQ suspension is introduced via a sysfs
+parameter which controls the maximum time that IRQs can be suspended.
+
+Here's how it is intended to work:
+  - An administrator sets the existing sysfs parameters for
+    defer_hard_irqs and gro_flush_timeout to enable IRQ deferral.
+
+  - An administrator sets the new sysfs parameter irq_suspend_timeout
+    to a larger value than gro-timeout to enable IRQ suspension.
+
+  - The user application issues the existing epoll ioctl to set the
+    prefer_busy_poll flag on the epoll context.
+
+  - The user application then calls epoll_wait to busy poll for network
+    events, as it normally would.
+
+  - If epoll_wait returns events to userland, IRQ are suspended for the
+    duration of irq_suspend_timeout.
+
+  - If epoll_wait finds no events and the thread is about to go to
+    sleep, IRQ handling using gro_flush_timeout and defer_hard_irqs is
+    resumed.
+
+As long as epoll_wait is retrieving events, IRQs (and softirq
+processing) for the NAPI being polled remain disabled. Unless IRQ
+suspension is continued by subsequent calls to epoll_wait, it
+automatically times out after the irq_suspend_timeout timer expires.
+
+When network traffic reduces, eventually a busy poll loop in the kernel
+will retrieve no data. When this occurs, regular deferral using
+gro_flush_timeout for the polled NAPI is immediately re-enabled. Regular
+deferral is also immediately re-enabled when the epoll context is
+destroyed.
+
+~ Benchmark configs & descriptions
+
+These changes were benchmarked with memcached [2] using the
+benchmarking tool mutilate [3].
+
+To facilitate benchmarking, a small patch [4] was applied to
+memcached 1.6.29 (the latest memcached release as of this RFC) to allow
+setting per-epoll context preferred busy poll and other settings
+via environment variables.
+
+Multiple scenarios were benchmarked as described below
+and the scripts used for producing these results can be found on
+github [5].
+
+(note: all scenarios use NAPI-based traffic splitting via SO_INCOMING_ID
+by passing -N to memcached):
+
+  - base: Other than NAPI-based traffic splitting, no other options are
+    enabled.
+  - busy:
+    - set defer_hard_irqs to 100
+    - set gro_flush_timeout to 200,000
+    - enable busy poll via the existing ioctl (busy_poll_usecs = 64,
+      busy_poll_budget = 64, prefer_busy_poll = true)
+  - deferX:
+    - set defer_hard_irqs to 100
+    - set gro_flush_timeout to X,000
+  - suspendX:
+    - set defer_hard_irqs to 100
+    - set gro_flush_timeout to X,000
+    - set irq_suspend_timeout to 20,000,000
+    - enable busy poll via the existing ioctl (busy_poll_usecs = 0,
+      busy_poll_budget = 64, prefer_busy_poll = true)
+
+~ Benchmark results
+
+Tested on:
+
+Single socket AMD EPYC 7662 64-Core Processor
+Hyperthreading disabled
+4 NUMA Zones (NPS=4)
+16 CPUs per NUMA zone (64 cores total)
+2 x Dual port 100gbps Mellanox Technologies ConnectX-5 Ex EN NIC
+
+The test machine is configured such that a single interface has 8 RX
+queues. The queues' IRQs and memcached are pinned to CPUs that are
+NUMA-local to the interface which is under test. memcached binds to the
+ipv4 address on the configured interface.
+
+The NIC's interrupts coalescing configuration are left at boot-time
+defaults.
+
+The overall takeaway from the results below is that the new mechanism
+(suspend20, see below) results in reduced 99th percentile latency and
+increased QPS in the MAX QPS case (compared to the other cases), and
+reduced latency in the lower QPS cases for comparable CPU usage to the
+base case (and less CPU than the busy case).
+
+base
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  199982     109     225     385      30
+  400K  400054     138     262     676      44
+  600K  599968     165     396     737      64
+  800K  800002     353    1136    2098      83
+ 1000K  964960    3202    5556    7003      98
+   MAX  957274    4255    5526    6843     100
+
+busy
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  199936     101     239     287      57
+  400K  399795      81     230     302      83
+  600K  599797      65     169     264      95
+  800K  799789      67     145     221      99
+ 1000K 1000135      97     186     287     100
+   MAX 1079228    3752    7481   12634      98
+
+defer20
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  200052      60     130     156      28
+  400K  399797      67     140     176      49
+  600K  600049      94     189     483      68
+  800K  800106     246     959    2201      88
+ 1000K  857377    4377    5674    5830     100
+   MAX  974672    4162    5454    5815     100
+
+defer200
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  200029     165     258     316      18
+  400K  399978     183     280     340      32
+  600K  599818     205     310     367      46
+  800K  799869     265     439     829      73
+ 1000K  995961    2307    5163    7027      98
+   MAX 1050680    3837    5020    5596     100
+
+suspend20
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  199968      58     128     161      31
+  400K  400191      61     135     175      51
+  600K  599872      67     142     196      66
+  800K  800050      78     153     220      82
+ 1000K  999638     101     194     292      91
+   MAX 1144308    3596    3961    4155     100
+
+suspend200
+  load     qps  avglat  95%lat  99%lat     cpu
+  200K  199973     149     251     313      20
+  400K  399957     154     270     331      35
+  600K  599878     157     284     351      51
+  800K  800091     158     293     359      65
+ 1000K 1000399     173     311     393      85
+   MAX 1128033    3636    4210    4381     100
+
+Thanks,
+Martin and Joe
+
+[1]: https://doi.org/10.1145/3626780
+[2]: https://github.com/memcached/memcached/blob/master/doc/napi_ids.txt
+[3]: https://github.com/leverich/mutilate
+[4]: https://raw.githubusercontent.com/martinkarsten/irqsuspend/main/patches/memcached.patch
+[5]: https://github.com/martinkarsten/irqsuspend
+
+Thanks,
+Martin and Joe
+
+Martin Karsten (5):
+  net: Add sysfs parameter irq_suspend_timeout
+  net: Suspend softirq when prefer_busy_poll is set
+  net: Add control functions for irq suspension
+  eventpoll: Trigger napi_busy_loop, if prefer_busy_poll is set
+  eventpoll: Control irq suspension for prefer_busy_poll
+
+ Documentation/networking/napi.rst |  3 ++
+ fs/eventpoll.c                    | 26 +++++++++++++--
+ include/linux/netdevice.h         |  2 ++
+ include/net/busy_poll.h           |  3 ++
+ net/core/dev.c                    | 55 +++++++++++++++++++++++++++----
+ net/core/net-sysfs.c              | 18 ++++++++++
+ 6 files changed, 98 insertions(+), 9 deletions(-)
+
+--
+2.25.1
 
