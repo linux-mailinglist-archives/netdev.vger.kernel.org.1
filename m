@@ -1,238 +1,104 @@
-Return-Path: <netdev+bounces-117816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5916D94F71C
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:04:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE5B94F737
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4FF81F21ADE
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:04:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412AB1C20F5C
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7713A18F2C5;
-	Mon, 12 Aug 2024 19:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B371917DA;
+	Mon, 12 Aug 2024 19:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmdO2TXz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBS6IPgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6D418E022;
-	Mon, 12 Aug 2024 19:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E342B1917CE;
+	Mon, 12 Aug 2024 19:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723489457; cv=none; b=mKO/fNk+17tH4rTTxdJ4ThlU+N6YJtiDcdf87K+8XOpADm5e6EXYyeUM6CxxWSQdDKjan2HVQuAAMfgEuE+sozGzRqNcPXKkPxAzC5WZNoNNxPnvfb62PLM9NWFKbku510hE3+TvZyPAVKWjLqpSjka2is0a5uRSymvBZxY3dsY=
+	t=1723489625; cv=none; b=fLlsBjkyojt+OAqe2zEtzkieu++0lK0i+uvPAu1TMypEw1gWJDPk+eq4eFW/BBErRdzpJkGQTLtBv25qwtOKGQDGIWduemk3ud9VyqCB5oEoyuJzYSt05ulZepzlsiBgbwqutsC2nOxK7msOSLD1W1TOuCsqxwWSvPVkeBgzM7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723489457; c=relaxed/simple;
-	bh=ekVc0hNv9qR690ll/HYdObdq5mKMtN/AdT4pvFL27XQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kCC0ZsW4Jv2uk1VolRu+CWrJfjXJNVPEy+yLDdklJ5IokygYXe/JEwpwYzHlVgWU8lmiRnyBfwKV3udFe2QWXoDy3TBBiK+beL0/iCELXvzDoChJ0DigeaW96HlhoDewxEzrvdwHkCeIEJuAxWmChIH6sb7wqBd2EtJ4xiPUaKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmdO2TXz; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1723489625; c=relaxed/simple;
+	bh=rJ+QuycrY1hJ9dMQrHVutnZn7hr1KoDa3nJRnl5fAo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BgbBmv8LmHk/Qlm1IJDhpWv94+fkFSJg5tepXxZPBzCzfjtYuGPjTw2T+V5tmKOz8rN3bpqHM3Hsw4kR9FjiWaScS7l4wu1pDVzutYGWRadsJHLzvPSsuqGFPfyknBazXj75kot+J4bc7d2V4xG/ftCLXbXpT05VztHOLZWrQQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBS6IPgT; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-428e3129851so34728275e9.3;
-        Mon, 12 Aug 2024 12:04:15 -0700 (PDT)
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-81f905eb19cso235425239f.3;
+        Mon, 12 Aug 2024 12:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723489454; x=1724094254; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=brVgXhkOlvihiylM1OGt4+AX9JCjvFnxaMYs3eS1Yzg=;
-        b=ZmdO2TXz1jW+hW2Hwy2ZmoiWVXyuJBCYXi+a/DzDU6Ni7Q2an1dm+sjiepEUkDL4Ol
-         1Mr/xNj2ePJvAO6Gin3jNlVZ75D6qsOzHS4IABM4+cihKwvwawHpHpCBfxqmD5tfn+Ab
-         j9uhMU3w2H9SGH4hZVl6T156o8DrwxRxTgm3UszhL8wYQ7+WvpVByLvXfYHzEky/dOEd
-         N71XcPNE580QZeGoNgF7lsjTIobxHtI2/+5eUgDPpnC2aKUj/AHwDt4cY1qY4boZKraX
-         aW2282PWdPtWK2pQzIybgsP5Wvg6gFhPHcKV7wQ9ELQ6wpORaJb5NClyJf41R76gOHFF
-         r1cQ==
+        d=gmail.com; s=20230601; t=1723489623; x=1724094423; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ujEXrLD6iO+Ri/Pr2XRp4rd1UPKLMSXQeTMeA9+ZOL8=;
+        b=KBS6IPgT5oXcxzDBJB9n6dMkMYaZZ6qY3VA8eJuz5pmb0KfFIK59rL3vYpH1QFLTpx
+         3YvWZ4C46YUOJkDdb2iC1QRE8b+5qYfduaXLpldlH+gJPy7KAEBrAeFYTQm+VA4sFe1G
+         wluwwLgOCoYC/nYwlwkLSF+cC+9RAV7yMx+YlybSoG1pbshKj+Z9yZzyrG3HRmrygEEK
+         bxdgfTqNl2ZpHQ8XCQML9xWRBPAkPpRIcJE4OQnSYVyqnaA/Rxo5kKZ/EQQj3H+RAw6A
+         kp/1xZaFs6Xp55esR8vUl9xYyRVk+QqOW33zupQfFHLthFHLipLUV4IQVl1Ai96HQugV
+         vvVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723489454; x=1724094254;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=brVgXhkOlvihiylM1OGt4+AX9JCjvFnxaMYs3eS1Yzg=;
-        b=m1Te3ToO2hLcCcrzjPHVKip7rqAKNU0CN5n7Z+YocgtCCC1l3i6TATsKN5DBSYPmtw
-         Slsd4+g4wMmPDqtvlbRzGsUdeiW/g8tlDQbrvloPHHEyrK3DNwARP/Yy5ZcAVXf0YJRi
-         4z2Be30n9vUJ0BjNPPaAlsR9MzBegfkA01lnoTvAOxT1/tP99c5FRzpNc3dRzG8LrNo4
-         OMxcErbuCKSt9KrTOLiT0imRNROk/o6coEvk4V/kBQkesH7VqqZtLbsNj8wiPQinzHYS
-         UodtgOyaFLH3170CCpuv5w0/GMtkQq3qsf5esuKH9FQqxF2j9vqEAjOGhk1pQGEwEdyV
-         LE9w==
-X-Forwarded-Encrypted: i=1; AJvYcCX236Vp62H2wlRw1qvpV4p/ifAEy9hjYn0R1OciBBlyunFISk8Y33CCR8nVWuUmyuECCVD3UEdlYWZMKE6JOR3Jv4ZkvPexWouulidziRBGpPa1z4WPl+GptcF8AKeVrEuo4sv9hoOncotRR9ezaMoJ6MEFYPz31w4RCGxYWRVkzWtLnEqCFi1ivFUt9+Euly2qhpcm/a3bK+G1LAh2oVDgV8HJbmpMZgS1tmkKyoCfjcG+mb/f+tOajK3Od8ILz/whi7O09+3/EHfCbYMYd2t8Em9kfSZ3m8VrJbk5uMmDs9x6FtXgFjv8EaGD8AVXg6LDAhcOBpnU2ObSE+6adMq5UlnLEOwjghT/HfotsGst2lKGOEmcSPVZNpfm7UZm8MSwS3rxXYjgVt4PCuOskYktOpmGErAvGGworUKD/2BuvCUfIRQbhj2GrvEfA1bqmQvEqelD1V0H59KIoXYFJiPyQ3cOj2tQjngEArPxo9HK+kGy9wZka395GII2bNdHQeDr/D2tig==
-X-Gm-Message-State: AOJu0YywYvIbJRbJlgrX0Ps+suJCod5T9NT+G+sIAZgdhQsK+vZa+ChA
-	+0z316SwM7XC9ctSuieq+cnMBtuX7Ai/ND8duVO9jFwT72MFvg5Q
-X-Google-Smtp-Source: AGHT+IE8NitdTNHZwd36bF/y7l5NM1Z0CvlWv76a53+AHV7l7aFN8rRP6hTmGYaWZKbXiL82aNMP0g==
-X-Received: by 2002:a05:600c:4ed2:b0:429:a3e:c785 with SMTP id 5b1f17b1804b1-429d481e867mr9523795e9.21.1723489453434;
-        Mon, 12 Aug 2024 12:04:13 -0700 (PDT)
-Received: from [192.168.42.116] ([85.255.232.227])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429c750ec0bsm111660895e9.15.2024.08.12.12.04.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Aug 2024 12:04:13 -0700 (PDT)
-Message-ID: <71260e3c-dee4-4bf0-b257-cdabd8cff3f1@gmail.com>
-Date: Mon, 12 Aug 2024 20:04:41 +0100
+        d=1e100.net; s=20230601; t=1723489623; x=1724094423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ujEXrLD6iO+Ri/Pr2XRp4rd1UPKLMSXQeTMeA9+ZOL8=;
+        b=KjWaN4e+Ucv9z1kiXhIXA/BflE0PJ4lE6kjPDDc5LAsoYVz3gKHLTgttPU/DkfSyWI
+         8ZCbaUWqVOv64xf+/+UTsRK49V+ZKhaszp7iM9ZcbWI1/q5ld21oxzuqxuR73SZQCRDX
+         c7p5BHGNTaMTlgvVrtLGsmEuJLGvgCNzColOXzDtBM5i3oqz1x1p9qw6/RaGOAD2oExP
+         WAlvWqlPvcQJi7T+7dME57GD0+g5dro9+1llICEfjvCQ4wJDftv0Y6vbBn/ougG5gvlE
+         rpLQndhz4Dd6BmdTnVkbTFclsLgK8rDppjfgMPUNiMUsQTLZCp/yM2PkrCnA144J/wPh
+         oipg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeUt/4ORikqFNS2v/KmBa08H+kKZ9BTDxmdLabZZllSNB5AtIlffnpO1kikScFuykGcSXsxULtq6LXMvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNzQApuAxtdpK48yRem1nDzLiw1zreLSrzoauJ7lsGXWGDPZDQ
+	S32mqj+TnMOzpBn8NlGNbdrhIe8dknoFRFPyj0GZ+R+thHyUZht5HDigL67G
+X-Google-Smtp-Source: AGHT+IEx7Z7SjEKvdw98nSK4KbvEUlwgObEAPEWnt/ec6q+UmiwZQJX9Oar3vuAj/iQWHponnIPdcQ==
+X-Received: by 2002:a05:6e02:180b:b0:399:4535:b66e with SMTP id e9e14a558f8ab-39c47837ed8mr15009825ab.9.1723489622883;
+        Mon, 12 Aug 2024 12:07:02 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a7facsm4334495b3a.59.2024.08.12.12.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 12:07:02 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org,
+	o.rempel@pengutronix.de
+Subject: [PATCH net-next 0/3] use more devm
+Date: Mon, 12 Aug 2024 12:06:50 -0700
+Message-ID: <20240812190700.14270-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem memory
- provider
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240805212536.2172174-1-almasrymina@google.com>
- <20240805212536.2172174-8-almasrymina@google.com>
- <20240806135924.5bb65ec7@kernel.org>
- <CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
- <20240808192410.37a49724@kernel.org>
- <CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
- <fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com>
- <20240809205236.77c959b0@kernel.org>
- <CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
- <48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
- <20240812105732.5d2845e4@kernel.org>
- <7e2ffe62-032a-4c5e-953b-b7117ab076be@gmail.com>
-Content-Language: en-US
-In-Reply-To: <7e2ffe62-032a-4c5e-953b-b7117ab076be@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 8/12/24 19:57, Pavel Begunkov wrote:
-> On 8/12/24 18:57, Jakub Kicinski wrote:
->> On Sun, 11 Aug 2024 22:51:13 +0100 Pavel Begunkov wrote:
->>>> I think we're talking about 2 slightly different flags, AFAIU.>
->>>> Pavel and I are suggesting the driver reports "I support memory
->>>> providers" directly to core (via the queue-api or what not), and we
->>>> check that flag directly in netdev_rx_queue_restart(), and fail
->>>> immediately if the support is not there.
->>>
->>> I might've misread Jakub, but yes, I believe it's different. It'd
->>> communicate about support for providers to upper layers, so we can
->>> fail even before attempting to allocate a new queue and init a
->>> page pool.
->>
->> Got it. Since allocating memory happens before stopping traffic
->> I think it's acceptable to stick to a single flag.
-> 
-> I agree, it's an failure case of init path, shouldn't be
-> a problem.
-> 
-> 
->>>> Jakub is suggesting a page_pool_params flag which lets the driver
->>>> report "I support memory providers". If the driver doesn't support it
->>>> but core is trying to configure that, then the page_pool_create will
->>>> fail, which will cause the queue API operation
->>>> (ndo_queue_alloc_mem_alloc) to fail, which causes
->>>> netdev_rx_queue_restart() to fail.
->>>
->>> And I'm not against this way either if we explicitly get an error
->>> back instead of trying to figure it out post-factum like by
->>> checking the references and possibly reverting the allocation.
->>> Maybe that's where I was confused, and that refcount thing was
->>> suggested as a WARN_ONCE?
->>
->> Yup, the refcount (now: check of the page pool list) was meant
->> as a WARN_ONCE() to catch bad drivers.
->>
->>> FWIW, I think it warrants two flags. The first saying that the
->>> driver supports providers at all:
->>>
->>> page_pool_init() {
->>>     if (rxq->mp_params)
->>>         if (!(flags & PP_PROVIDERS_SUPPORTED))
->>>             goto fail;
->>> }
->>>
->>> And the second telling whether the driver wants to install
->>> providers for this particular page pool, so if there is a
->>> separate pool for headers we can set it with plain old kernel
->>> pages.
->>
->> The implementation of the queue API should be resilient against
->> failures in alloc, and not being MP capable is just a form of
->> alloc failure. I don't see the upside of double-flag.
->>
->>> payload_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED);
->>> header_pool = page_pool_create(rqx, PP_PROVIDERS_SUPPORTED |
->>>                                       PP_IGNORE_PROVIDERS);
->>
->> Also don't see the upside of the explicit "non-capable" flag,
->> but I haven't thought of that. Is there any use?
+Some of these were introduced after the driver got introduced. In any
+case, using more devm allows removal of the remove function and overall
+simplifies the code. All of these were tested on a TP-LINK Archer C7v2.
 
-Or maybe I don't get what you're asking, I explained
-why to have that "PP_IGNORE_PROVIDERS" on top of the flag
-saying that it's supported.
+Rosen Penev (3):
+  net: ag71xx: use devm_clk_get_enabled
+  net: ag71xx: use devm for of_mdiobus_register
+  net: ag71xx: use devm for register_netdev
 
-Which "non-capable" flag you have in mind? A page pool create
-flag or one facing upper layers like devmem tcp?
-
-
-> Considering that we pass a mp to page pool indirectly via
-> a queue
-> 
-> rxq->mp_param = devmemtcp;
-> ... // later
-> pp_params.queue = rxq;
-> page_pool_create(pp_params);
-> 
-> How can we create a separate header pool without mp and let
-> the other data pool be initialized with mp? We can make
-> sure pp_params.queue is NULL, but API isn't sound, I think
-> the plans are to reuse the queue argument for some other
-> purposes.
-> 
-> param_tmp = rxq->mp_param;
-> rxq->mp_param = NULL;
-> page_pool_create(pp_params);
-> rxq->mp_param = param_tmp;
-> 
-> Temporarily erasing mp_param is another option, but I think
-> by far the simplest is another flag.
-> 
->> One important note. The flag should not be tied to memory providers
->> but rather to netmem, IOW unreadable memory. MP is an internal detail,
->> the important fact from the driver-facing API perspective is that the
->> driver doesn't need struct pages.
-> 
-> Sure, didn't want to go into describing how these are not
-> the same thing. Naming should reflect it, and if we expect
-> providers that don't produce net_iov, we might want to have
-> a flag in mp_param or so.
-> 
+ drivers/net/ethernet/atheros/ag71xx.c | 84 ++++++---------------------
+ 1 file changed, 19 insertions(+), 65 deletions(-)
 
 -- 
-Pavel Begunkov
+2.46.0
+
 
