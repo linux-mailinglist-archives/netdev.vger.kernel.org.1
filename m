@@ -1,158 +1,117 @@
-Return-Path: <netdev+bounces-117837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA19D94F821
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:21:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B0FF94F825
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D69F6B20B6A
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:20:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E8AE1F22481
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3CD193069;
-	Mon, 12 Aug 2024 20:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595C6193069;
+	Mon, 12 Aug 2024 20:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rva8snpV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464C1191F80;
-	Mon, 12 Aug 2024 20:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6B186E30;
+	Mon, 12 Aug 2024 20:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723494052; cv=none; b=YRUTuU+iXtkQsT4YuhGalLNrI39yIlHfbjId4kaZZfI/5yyUykVzUZ+orXWufN0TrqhVGk5sJdggarSJohbRdEvop97kAVVCT6DWUygFUjR4V88/MgrKa0EfbGdxzKWIxZzc0RrToFbuVsNA7Ci6pf/J19uCJWheV8r8ZDOcLGQ=
+	t=1723494151; cv=none; b=Qo6AKAx5TWuXj6gQS66cV5m5RAKs8p6oxUPfZM9gb7EswSwFKaSEh24d+RM3xjrrauN6jks/qUvFYLk4xy+HYOb8Ed+rA4idBIfVusxfjAU3LlZO7LTdM5zbUzPGOCnx94l81mKX6eALcS2bwA9d4E0yA8ZiMbgyWNHbIzuhrRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723494052; c=relaxed/simple;
-	bh=kInFWNpWiwM+iiF50l6b901Z5qcRDLx5S8leRBXplFw=;
+	s=arc-20240116; t=1723494151; c=relaxed/simple;
+	bh=otiKvNXT1TZyEdmB0RL7gA55pIcWsw+RG+ac53fD7HA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRAc27u2Tng2E8niHn8NbsonDmNGKqxdcjQMlXnQ9FUhm0QHPEovaQkoB6bC2B2m4Yj5OwrCoQ58y5sV43m9GkHN1pKHYoeT2sL/rJ/N0n5F9neBT8W5al4hTHRrUOhYHYUa5LSedxZ+H0pbh4GxM6doFs1ZfQFlIy0ABavWeyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fc52394c92so44077845ad.1;
-        Mon, 12 Aug 2024 13:20:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723494050; x=1724098850;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ktYSPZAgGje2ea+VDHWGA24RZOqecMJEdUlJC7G5nVI=;
-        b=qTjgKMIaF/YtcSqRdvvlfwOFsC8Z0b3LRiCaZnwrzln/xyT024w9JbU/uWWVDB36hk
-         DPJ3lPYJ8FvPAx/F0/urzv2uL22+8d3cbEm1emyOXJgouqd9qtuPexBvVkmqPJ3qegOv
-         ejXfHLj4vK+C/z3bGeTPo6pm5f8AcoNjFVh5NepkWiEjFh8+rdrVkVnqdJm/NlEqyr72
-         nk4KpEmVkS35h1JjKi+5tG7W8g543xzn7rkVi2pz+eexqm0k3BmFqPKKVRm1xbujvr/K
-         /RpiVwRhxbYaV63BvUAhAdkrK8a9221iUFiVK9R/VifTMmaL6Xdo3PdaMlS5egjBBTzh
-         /rsw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5wlJrwDPuY1G3TOAt0dTf+Us5OpBM9FFciGQ4I7LxCXvvTyD9H4lw/60ciiyKCbC87PN6WT531ksE+NPNfM+m/QDiWYFChq6eYh8sPkjgog2DzD3+xRI+w4ekmutO/EC7wXKx8vFbkou7dA==
-X-Gm-Message-State: AOJu0Yzm88y/N7WdONDSRHiJT+ZjHca/CNh04J0a33EnrxzkflsLo4Ob
-	B/87R2UrS/iIbZgkyOuiN8IiaVoVbqz25KJ8iq9/cpoCv6TSlEc=
-X-Google-Smtp-Source: AGHT+IE/1pxRmNn4lGz7smnMnw64zQr4fbBrZhmlAusRlv6NQ4ab6SeK2qAMh+mu7f1m/myArraxUw==
-X-Received: by 2002:a17:902:e88d:b0:1fc:6c23:8a3b with SMTP id d9443c01a7336-201ca13dabbmr19909705ad.17.1723494050386;
-        Mon, 12 Aug 2024 13:20:50 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1bba6bsm796875ad.225.2024.08.12.13.20.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 13:20:50 -0700 (PDT)
-Date: Mon, 12 Aug 2024 13:20:49 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 5/5] eventpoll: Control irq suspension for
- prefer_busy_poll
-Message-ID: <ZrpuodWa6cKh0sPk@mini-arch>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <20240812125717.413108-6-jdamato@fastly.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDvQhc0wdHqyAbPYTXfTLupCN/AinPlwUVPKgJ6Ga6C/iBo8zm7ATUtGeOND6u1A7YVmUfgo4bpchYYXpfKA+GDx3+lpMxnzAx57Wke1gGr6N9s0JdxgOvfDSLEI0nEQyaq4RzVgJk7Malzo8iIZ3dvOZ++yayRTM7/y6N1FpbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rva8snpV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=O8IRnInZINo2pPnJLcokAejXz1Yw9TmlkcZMR1b30CQ=; b=rva8snpVqAC7jLEmtyGHq4uq0f
+	IROPI9rNsyjsFp8tVkymzucocvOhB4IhY6n9ZOa5966yNt+ybbrdhytvaNzEkDZ9g2or7wu/xNUE8
+	X0tFUjaR6hb/hgmiDZYJTnLdcyxJ3x9MoTLH2icl07nHJbq4pip900JawcxN7GbQr0Ao=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdbYa-004cCs-B5; Mon, 12 Aug 2024 22:22:20 +0200
+Date: Mon, 12 Aug 2024 22:22:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 2/2] net: xilinx: axienet: Add statistics
+ support
+Message-ID: <e78256f2-9ad6-49e1-9cd5-02a28c92d2fc@lunn.ch>
+References: <20240812174118.3560730-1-sean.anderson@linux.dev>
+ <20240812174118.3560730-3-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240812125717.413108-6-jdamato@fastly.com>
+In-Reply-To: <20240812174118.3560730-3-sean.anderson@linux.dev>
 
-On 08/12, Joe Damato wrote:
-> From: Martin Karsten <mkarsten@uwaterloo.ca>
-> 
-> When events are reported to userland and prefer_busy_poll is set, irqs are
-> temporarily suspended using napi_suspend_irqs.
-> 
-> If no events are found and ep_poll would go to sleep, irq suspension is
-> cancelled using napi_resume_irqs.
-> 
-> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Co-developed-by: Joe Damato <jdamato@fastly.com>
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Tested-by: Joe Damato <jdamato@fastly.com>
-> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> ---
->  fs/eventpoll.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-> index cc47f72005ed..d74b5b9c1f51 100644
-> --- a/fs/eventpoll.c
-> +++ b/fs/eventpoll.c
-> @@ -457,6 +457,8 @@ static bool ep_busy_loop(struct eventpoll *ep, int nonblock)
->  		 * it back in when we have moved a socket with a valid NAPI
->  		 * ID onto the ready list.
->  		 */
-> +		if (prefer_busy_poll)
-> +			napi_resume_irqs(napi_id);
->  		ep->napi_id = 0;
->  		return false;
->  	}
-> @@ -540,6 +542,14 @@ static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
->  	}
->  }
->  
-> +static void ep_suspend_napi_irqs(struct eventpoll *ep)
-> +{
-> +	unsigned int napi_id = READ_ONCE(ep->napi_id);
-> +
-> +	if (napi_id >= MIN_NAPI_ID && READ_ONCE(ep->prefer_busy_poll))
-> +		napi_suspend_irqs(napi_id);
-> +}
-> +
->  #else
->  
->  static inline bool ep_busy_loop(struct eventpoll *ep, int nonblock)
-> @@ -557,6 +567,10 @@ static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
->  	return -EOPNOTSUPP;
->  }
->  
-> +static void ep_suspend_napi_irqs(struct eventpoll *ep)
-> +{
-> +}
-> +
->  #endif /* CONFIG_NET_RX_BUSY_POLL */
->  
->  /*
-> @@ -788,6 +802,10 @@ static bool ep_refcount_dec_and_test(struct eventpoll *ep)
->  
->  static void ep_free(struct eventpoll *ep)
+>  static int __axienet_device_reset(struct axienet_local *lp)
 >  {
-> +	unsigned int napi_id = READ_ONCE(ep->napi_id);
-> +
-> +	if (napi_id >= MIN_NAPI_ID && READ_ONCE(ep->prefer_busy_poll))
-> +		napi_resume_irqs(napi_id);
->  	mutex_destroy(&ep->mtx);
->  	free_uid(ep->user);
->  	wakeup_source_unregister(ep->ws);
-> @@ -2005,8 +2023,10 @@ static int ep_poll(struct eventpoll *ep, struct epoll_event __user *events,
->  			 * trying again in search of more luck.
->  			 */
->  			res = ep_send_events(ep, events, maxevents);
-> -			if (res)
-> +			if (res) {
-> +				ep_suspend_napi_irqs(ep);
+>  	u32 value;
+>  	int ret;
+>  
+> +	/* Save statistics counters in case they will be reset */
+> +	guard(mutex)(&lp->stats_lock);
+> +	if (lp->features & XAE_FEATURE_STATS)
+> +		axienet_stats_update(lp, true);
 
-Aren't we already doing defer in the busy_poll_stop? (or in napi_poll
-when it's complete/done). Why do we need another rearming here?
+My understanding of guard() is that the mutex is held until the
+function completes. That is much longer than you need. A
+scoped_guard() would be better here, and it makes it clear when the
+mutex will be released.
+
+> +
+>  	/* Reset Axi DMA. This would reset Axi Ethernet core as well. The reset
+>  	 * process of Axi DMA takes a while to complete as all pending
+>  	 * commands/transfers will be flushed or completed during this
+> @@ -551,6 +595,23 @@ static int __axienet_device_reset(struct axienet_local *lp)
+>  		return ret;
+>  	}
+>  
+> +	/* Update statistics counters with new values */
+> +	if (lp->features & XAE_FEATURE_STATS) {
+> +		enum temac_stat stat;
+> +
+> +		write_seqcount_begin(&lp->hw_stats_seqcount);
+> +		lp->reset_in_progress = false;
+> +		for (stat = 0; stat < STAT_COUNT; stat++) {
+> +			u32 counter =
+> +				axienet_ior(lp, XAE_STATS_OFFSET + stat * 8);
+> +
+> +			lp->hw_stat_base[stat] +=
+> +				lp->hw_last_counter[stat] - counter;
+> +			lp->hw_last_counter[stat] = counter;
+> +		}
+> +		write_seqcount_end(&lp->hw_stats_seqcount);
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+
+	Andrew
 
