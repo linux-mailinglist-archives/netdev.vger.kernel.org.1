@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-117644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331DC94EAD3
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:27:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21D494EAE9
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:29:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2FAE1F22726
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:27:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D671C2168E
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963ED16FF4E;
-	Mon, 12 Aug 2024 10:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF3716F27D;
+	Mon, 12 Aug 2024 10:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0Cur3ivc"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qnqeS1on"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C18516F0E0;
-	Mon, 12 Aug 2024 10:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC81B16F0E6;
+	Mon, 12 Aug 2024 10:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723458458; cv=none; b=tFTsN2EgPSYmQsCl8wgXpxbrUKiORRmaukXtjPBxuxT5OwNm1L+cUAXvo5BgY/dwJvNloDuikOcrnG5sQZUHBCqBhMCgOW3KLLZFCCVSQKC/B5aBOHKAbq7x5+N9tNRGXpffaivuLxTKksmW1OeV6XIakbpzUtMBg+lTi0WIABQ=
+	t=1723458499; cv=none; b=kSH8b5KT+qYipofyFEOvAYfDxVpqixZZUHQcdpb/k+dDHcmIFxB3hHttWVCQyidaX5j8OtM1IGivNYiBeUjo4msF8IbDRMpp8Kb7Rs9yLA4S9WSHIAu0jQwVRaQPKrdscYh30JyqAk93KIXOIsPwQmfTvFaiF9xBi0AYDpD1OeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723458458; c=relaxed/simple;
-	bh=5Ze3ak7szOHjF+pnjdFZp69ShAxNT7Poi5W3RGkCbyY=;
+	s=arc-20240116; t=1723458499; c=relaxed/simple;
+	bh=S7FYudartPoRxv7ei2GeIG0dTCpBW7Lavt39Fq1e7lM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IH/ZYDuRRkgmQ4QaV3gtoyoQQN+VpaRspfQBxxnpgLUvEAKcEPEKxHS+7kRYkn3ON2x1yA4gvbgSgC5stHlinIKr1PB87OUU0UJDYzwmhKGNqkER6pbi0gaxnpZ4ydtYvF84aV//tp6kqN/L0xbt5dx4pB/0n5r8hdvLU72A0fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0Cur3ivc; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=KgDZ6FsO6lhh4vMWMrryG+Yp8svEAlOOckTtN0EPA9G5XJTDJxhc4t/tVqFBIem4+5lK0eZKcUW5bTbK3J8rC1FwbXljJ/zo/SEC6xWV19lKM4wdeuHPexB8o0xPyG3XXPaAKc8Dw5iVgpNoZffIc9qdAvKSCFNspyqUbc0RHEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qnqeS1on; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723458456; x=1754994456;
+  t=1723458498; x=1754994498;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5Ze3ak7szOHjF+pnjdFZp69ShAxNT7Poi5W3RGkCbyY=;
-  b=0Cur3ivcVHcJh3IVeF7ePx7F8PEza1ZBjnCCXb9JmCU1kbuemibMlOrv
-   4J9hZuwpKLwCUzIeHbQG3UcENrBXlC2axXDX/1yQe2GODjvecxelW1mKm
-   bgFEqELQrLIVRtjU+5GIdAEUXqJbA6pLTEKDR8OFYGk6kzWIlyD7MsiCU
-   3sIs5uQVDCk9yJWcfjLJxFNK7Ksxov2upYtKXavv7P+AF482dyZErgZ6H
-   vcQYeubxE127sMeB94duoNk/qrlnpGuMhaUYfViLgVDui0Ellll3j7Rev
-   xrm52S9Ug9EFKFXzcAOxQZaBCw5RJOuXGyeKbdF7Exo/nwVDLBfi3QSDI
+  bh=S7FYudartPoRxv7ei2GeIG0dTCpBW7Lavt39Fq1e7lM=;
+  b=qnqeS1ondYDXBr/I6BOdVGuoghK6/p5WZZlC9MGqVE8hiTnOvyZVk7it
+   vFiNI7W43LjkkkhERp6Y6jiVubDRD1DsxrLXqZI/1OvXUVtKrYBcCFo+m
+   2QWffp4ZnB0j7U4JjDCJ7CBrqcxWRNrvB5tmEs/O2kMK7qHkM9FDb0WjU
+   AReHGgFfM2GaKwdoPOQsDxykvgQ+6RjBkwyvAsLcoAIHJLtlXsTWHQnal
+   YpbKeY1gijXdxjS3M0yUf8xZ3zFxusjXWNwupQPeg+czkKWcMvrb+RpwI
+   ewKu/JBl+2RaErnTccUUViBYRXBhIEibIdk6Bt/doYn9nyNzjAWXZpLci
    A==;
-X-CSE-ConnectionGUID: zWFibJHwSP6a7fyx9OM5wg==
-X-CSE-MsgGUID: XrEdU4pYRnCm1xONG3+a1A==
+X-CSE-ConnectionGUID: ZjMJuuqES0Ofju9lOCftlw==
+X-CSE-MsgGUID: KVRKrz9sQI+/Egv8r43Rog==
 X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="33281582"
+   d="scan'208";a="30377791"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 03:27:33 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 03:28:17 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 12 Aug 2024 03:27:25 -0700
+ 15.1.2507.35; Mon, 12 Aug 2024 03:27:35 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 03:27:13 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 03:27:25 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -76,9 +76,9 @@ CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v6 03/14] net: ethernet: oa_tc6: implement register read operation
-Date: Mon, 12 Aug 2024 15:56:00 +0530
-Message-ID: <20240812102611.489550-4-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v6 04/14] net: ethernet: oa_tc6: implement software reset
+Date: Mon, 12 Aug 2024 15:56:01 +0530
+Message-ID: <20240812102611.489550-5-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812102611.489550-1-Parthiban.Veerasooran@microchip.com>
 References: <20240812102611.489550-1-Parthiban.Veerasooran@microchip.com>
@@ -91,154 +91,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Implement register read operation according to the control communication
-specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface
-document. Control read commands are used by the SPI host to read
-registers within the MAC-PHY. Each control read commands are composed of
-a 32 bits control command header.
-
-The MAC-PHY ignores all data from the SPI host following the control
-header for the remainder of the control read command. Control read
-commands can read either a single register or multiple consecutive
-registers. When multiple consecutive registers are read, the address is
-automatically post-incremented by the MAC-PHY. Reading any unimplemented
-or undefined registers shall return zero.
+Reset complete bit is set when the MAC-PHY reset completes and ready for
+configuration. Additionally reset complete bit in the STS0 register has
+to be written by one upon reset complete to clear the interrupt.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/ethernet/oa_tc6.c | 84 ++++++++++++++++++++++++++++++++++-
- include/linux/oa_tc6.h        |  3 ++
- 2 files changed, 85 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/oa_tc6.c | 56 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 24e9fd92d717..72bab9234436 100644
+index 72bab9234436..f774ed397213 100644
 --- a/drivers/net/ethernet/oa_tc6.c
 +++ b/drivers/net/ethernet/oa_tc6.c
-@@ -38,6 +38,7 @@ enum oa_tc6_header_type {
- };
+@@ -6,8 +6,18 @@
+  */
  
- enum oa_tc6_register_op {
-+	OA_TC6_CTRL_REG_READ = 0,
- 	OA_TC6_CTRL_REG_WRITE = 1,
- };
+ #include <linux/bitfield.h>
++#include <linux/iopoll.h>
+ #include <linux/oa_tc6.h>
  
-@@ -113,7 +114,8 @@ static void oa_tc6_prepare_ctrl_spi_buf(struct oa_tc6 *tc6, u32 address,
++/* OPEN Alliance TC6 registers */
++/* Reset Control and Status Register */
++#define OA_TC6_REG_RESET			0x0003
++#define RESET_SWRESET				BIT(0)	/* Software Reset */
++
++/* Status Register #0 */
++#define OA_TC6_REG_STATUS0			0x0008
++#define STATUS0_RESETC				BIT(6)	/* Reset Complete */
++
+ /* Control command header */
+ #define OA_TC6_CTRL_HEADER_DATA_NOT_CTRL	BIT(31)
+ #define OA_TC6_CTRL_HEADER_WRITE_NOT_READ	BIT(29)
+@@ -24,6 +34,8 @@
+ 						(OA_TC6_CTRL_MAX_REGISTERS *\
+ 						OA_TC6_CTRL_REG_VALUE_SIZE) +\
+ 						OA_TC6_CTRL_IGNORED_SIZE)
++#define STATUS0_RESETC_POLL_DELAY		1000
++#define STATUS0_RESETC_POLL_TIMEOUT		1000000
  
- 	*tx_buf = oa_tc6_prepare_ctrl_header(address, length, reg_op);
- 
--	oa_tc6_update_ctrl_write_data(tc6, value, length);
-+	if (reg_op == OA_TC6_CTRL_REG_WRITE)
-+		oa_tc6_update_ctrl_write_data(tc6, value, length);
+ /* Internal structure for MAC-PHY drivers */
+ struct oa_tc6 {
+@@ -279,6 +291,42 @@ int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, u32 value)
  }
+ EXPORT_SYMBOL_GPL(oa_tc6_write_register);
  
- static int oa_tc6_check_ctrl_write_reply(struct oa_tc6 *tc6, u8 size)
-@@ -132,6 +134,30 @@ static int oa_tc6_check_ctrl_write_reply(struct oa_tc6 *tc6, u8 size)
- 	return 0;
- }
- 
-+static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
++static int oa_tc6_read_status0(struct oa_tc6 *tc6)
 +{
-+	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
-+	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
++	u32 regval;
++	int ret;
 +
-+	/* The echoed control read header must match with the one that was
-+	 * transmitted.
-+	 */
-+	if (*tx_buf != *rx_buf)
-+		return -EPROTO;
++	ret = oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &regval);
++	if (ret) {
++		dev_err(&tc6->spi->dev, "STATUS0 register read failed: %d\n",
++			ret);
++		return 0;
++	}
 +
-+	return 0;
++	return regval;
 +}
 +
-+static void oa_tc6_copy_ctrl_read_data(struct oa_tc6 *tc6, u32 value[],
-+				       u8 length)
++static int oa_tc6_sw_reset_macphy(struct oa_tc6 *tc6)
 +{
-+	__be32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE +
-+			 OA_TC6_CTRL_HEADER_SIZE;
++	u32 regval = RESET_SWRESET;
++	int ret;
 +
-+	for (int i = 0; i < length; i++)
-+		value[i] = be32_to_cpu(*rx_buf++);
-+}
-+
- static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
- 			       u8 length, enum oa_tc6_register_op reg_op)
- {
-@@ -152,8 +178,62 @@ static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
- 	}
- 
- 	/* Check echoed/received control write command reply for errors */
--	return oa_tc6_check_ctrl_write_reply(tc6, size);
-+	if (reg_op == OA_TC6_CTRL_REG_WRITE)
-+		return oa_tc6_check_ctrl_write_reply(tc6, size);
-+
-+	/* Check echoed/received control read command reply for errors */
-+	ret = oa_tc6_check_ctrl_read_reply(tc6, size);
++	ret = oa_tc6_write_register(tc6, OA_TC6_REG_RESET, regval);
 +	if (ret)
 +		return ret;
 +
-+	oa_tc6_copy_ctrl_read_data(tc6, value, length);
++	/* Poll for soft reset complete for every 1ms until 1s timeout */
++	ret = readx_poll_timeout(oa_tc6_read_status0, tc6, regval,
++				 regval & STATUS0_RESETC,
++				 STATUS0_RESETC_POLL_DELAY,
++				 STATUS0_RESETC_POLL_TIMEOUT);
++	if (ret)
++		return -ENODEV;
 +
-+	return 0;
++	/* Clear the reset complete status */
++	return oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
 +}
 +
-+/**
-+ * oa_tc6_read_registers - function for reading multiple consecutive registers.
-+ * @tc6: oa_tc6 struct.
-+ * @address: address of the first register to be read in the MAC-PHY.
-+ * @value: values to be read from the starting register address @address.
-+ * @length: number of consecutive registers to be read from @address.
-+ *
-+ * Maximum of 128 consecutive registers can be read starting at @address.
-+ *
-+ * Return: 0 on success otherwise failed.
-+ */
-+int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
-+			  u8 length)
-+{
+ /**
+  * oa_tc6_init - allocates and initializes oa_tc6 structure.
+  * @spi: device with which data will be exchanged.
+@@ -289,6 +337,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_write_register);
+ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+ {
+ 	struct oa_tc6 *tc6;
 +	int ret;
-+
-+	if (!length || length > OA_TC6_CTRL_MAX_REGISTERS) {
-+		dev_err(&tc6->spi->dev, "Invalid register length parameter\n");
-+		return -EINVAL;
+ 
+ 	tc6 = devm_kzalloc(&spi->dev, sizeof(*tc6), GFP_KERNEL);
+ 	if (!tc6)
+@@ -313,6 +362,13 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+ 	if (!tc6->spi_ctrl_rx_buf)
+ 		return NULL;
+ 
++	ret = oa_tc6_sw_reset_macphy(tc6);
++	if (ret) {
++		dev_err(&tc6->spi->dev,
++			"MAC-PHY software reset failed: %d\n", ret);
++		return NULL;
 +	}
 +
-+	mutex_lock(&tc6->spi_ctrl_lock);
-+	ret = oa_tc6_perform_ctrl(tc6, address, value, length,
-+				  OA_TC6_CTRL_REG_READ);
-+	mutex_unlock(&tc6->spi_ctrl_lock);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(oa_tc6_read_registers);
-+
-+/**
-+ * oa_tc6_read_register - function for reading a MAC-PHY register.
-+ * @tc6: oa_tc6 struct.
-+ * @address: register address of the MAC-PHY to be read.
-+ * @value: value read from the @address register address of the MAC-PHY.
-+ *
-+ * Return: 0 on success otherwise failed.
-+ */
-+int oa_tc6_read_register(struct oa_tc6 *tc6, u32 address, u32 *value)
-+{
-+	return oa_tc6_read_registers(tc6, address, value, 1);
+ 	return tc6;
  }
-+EXPORT_SYMBOL_GPL(oa_tc6_read_register);
- 
- /**
-  * oa_tc6_write_registers - function for writing multiple consecutive registers.
-diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
-index 99c490f1c8a8..85aeecf87306 100644
---- a/include/linux/oa_tc6.h
-+++ b/include/linux/oa_tc6.h
-@@ -15,3 +15,6 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi);
- int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, u32 value);
- int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
- 			   u8 length);
-+int oa_tc6_read_register(struct oa_tc6 *tc6, u32 address, u32 *value);
-+int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
-+			  u8 length);
+ EXPORT_SYMBOL_GPL(oa_tc6_init);
 -- 
 2.34.1
 
