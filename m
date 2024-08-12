@@ -1,154 +1,136 @@
-Return-Path: <netdev+bounces-117870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF6394FA22
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:04:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163BE94F999
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 00:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 457E01F2655E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:04:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F26DB21AE7
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BF719ADA3;
-	Mon, 12 Aug 2024 23:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4E7197A9F;
+	Mon, 12 Aug 2024 22:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCWayVPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0573C199EB0
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 23:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4889A15C12D;
+	Mon, 12 Aug 2024 22:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723503844; cv=none; b=HYtQWWCbayvksGqya/tt22OffkOdtiIymSCgpRy+//BZQM2YSVtPGopLI1FxJxlFwtKyLEG/VaS0UaYn7+xon/kknmtSofBcYdg4v5RAZuL0Flsg4n4whs3H30AAD0jKJdvBd7995EoTj4oTLuFvNec8NSefKIE2OkqhErBOaYo=
+	t=1723502173; cv=none; b=Vqw84QGyajrc9DoPraH2izJBby5tcIbDyil55c8t7Z75H0OnYdI0rDmy5r5TyhsG3Vz826IX/SWVGS7k0ifCXxg2iMAFLLuPeOac0pybZPTJk3zqJ/ky0vsBpeq1e4raBz3GwUtz9wwrH8CaegFSfJvVUJ8R3M2g8EigQ907/KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723503844; c=relaxed/simple;
-	bh=CyU+hxzdcwPR469j6Uc+0jebeFeHl5UcJgnEKUdSkPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J3qrGsg0tYa/WCAjwyde9TENGOTHAg3I8Zk/FCCwQRO8jDnsLXLgHB6kSoyH4YY5RlUla5N37XhqslWeU+gh1ijg70/OEQa3qA1k9pc1tzd9YOiQLxVP13Qr/Wg3kmpreIox7vJRd6ld/skNLxQgay0EPnmNREcv0XlOMK2uqYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1sde4z-0002AI-Kd; Tue, 13 Aug 2024 01:03:57 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1723502173; c=relaxed/simple;
+	bh=rzEu9vnbnIjIArl/dZGbz/iYFuW8wv8IQbmNNkByJOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c/0gOgZWLSQpo/DVJ4ZQqvTNYr5EPHjOXcY3FIHzMaH9fFOaC6IMxG7NB+VeeKKllj3zj6uCA1YQ+TXJitNVvDiY8csSMvND3iB2cKVC7dBXHgQbJD/XxESmUalGUyIDxRsAiYjwYEDa+QMAJu4N0AN96HH+ENWb9LPKDPemoY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCWayVPY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCEB1C4AF0E;
+	Mon, 12 Aug 2024 22:36:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723502173;
+	bh=rzEu9vnbnIjIArl/dZGbz/iYFuW8wv8IQbmNNkByJOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QCWayVPYAFFOxPgIuL7KbbBc+c4s7P0DSvgpHYUGqn9E8BT8xIJ8KSlZaAkn9yxc8
+	 1YqPJjwyRZQd4Q47X845FPxSTvqmVCQHnwZ/pj+rFA7ppxy6owYrrroRe/odAa55zD
+	 szNI3HQzNDeLWYwni/gNyltxIPxmCbdFqity1vXEFLroh1zibOks6h2v33b3rUW7FL
+	 GveB90cB59fVRJbsIuvmE2BTiIIpXfx4vmDKepzNkXWLl7sTQMfVFKg02aDRBeb1/A
+	 2zmX9TlWTjcVHxc4ea45+/UtgfFLdaG0bICcV76C5TqkG5503BzZYVR0Pc765X9bDu
+	 SJ4+rtqTebIJQ==
+Date: Mon, 12 Aug 2024 16:36:11 -0600
+From: Rob Herring <robh@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
-Subject: [PATCH net] tcp: prevent concurrent execution of tcp_sk_exit_batch
-Date: Tue, 13 Aug 2024 00:28:25 +0200
-Message-ID: <20240812222857.29837-1-fw@strlen.de>
-X-Mailer: git-send-email 2.44.2
-In-Reply-To: <20240812200039.69366-1-kuniyu@amazon.com>
-References: <20240812200039.69366-1-kuniyu@amazon.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"open list:ETHERNET PHY LIBRARY" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH 1/1] dt-bindings: net: mdio: Add negative patten match
+ for child node
+Message-ID: <20240812223611.GA2346223-robh@kernel.org>
+References: <20240812031114.3798487-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812031114.3798487-1-Frank.Li@nxp.com>
 
-Its possible that two threads call tcp_sk_exit_batch() concurrently,
-once from the cleanup_net workqueue, once from a task that failed to clone
-a new netns.  In the latter case, error unwinding calls the exit handlers
-in reverse order for the 'failed' netns.
+On Sun, Aug 11, 2024 at 11:11:14PM -0400, Frank Li wrote:
+> mdio.yaml wrong parser mdio controller's address instead phy's address when
+> mdio-mux exist.
+> 
+> For example:
+> mdio-mux-emi1@54 {
+> 	compatible = "mdio-mux-mmioreg", "mdio-mux";
+> 
+>         mdio@20 {
+> 		reg = <0x20>;
+> 		       ^^^ This is mdio controller register
+> 
+> 		ethernet-phy@2 {
+> 			reg = <0x2>;
+>                               ^^^ This phy's address
+> 		};
+> 	};
+> };
+> 
+> Only phy's address is limited to 31 because MDIO bus defination.
+> 
+> But CHECK_DTBS report below warning:
+> 
+> arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dtb: mdio-mux-emi1@54:
+> 	mdio@20:reg:0:0: 32 is greater than the maximum of 31
+> 
+> The reason is that "mdio@20" match "patternProperties: '@[0-9a-f]+$'" in
+> mdio.yaml.
+> 
+> Change to '^(?!mdio@).*@[0-9a-f]+$' to avoid match parent's mdio
+> controller's address.
+> 
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/mdio.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mdio.yaml b/Documentation/devicetree/bindings/net/mdio.yaml
+> index a266ade918ca7..a7def3eb4674d 100644
+> --- a/Documentation/devicetree/bindings/net/mdio.yaml
+> +++ b/Documentation/devicetree/bindings/net/mdio.yaml
+> @@ -59,7 +59,7 @@ properties:
+>      type: boolean
+>  
+>  patternProperties:
+> -  '@[0-9a-f]+$':
+> +  '^(?!mdio@).*@[0-9a-f]+$':
 
-tcp_sk_exit_batch() calls tcp_twsk_purge().
-Problem is that since commit b099ce2602d8 ("net: Batch inet_twsk_purge"),
-this function picks up twsk in any dying netns, not just the one passed
-in via exit_batch list.
+This is at the wrong spot. The problem is up a level where the $nodename 
+matched mdio-mux-emi1@54.
 
-This means that the error unwind of setup_net() can "steal" and destroy
-timewait sockets belonging to the exiting netns.
+I think what we want for the $nodename pattern is:
 
-This allows the netns exit worker to proceed to call
+'^mdio(-(bus|external))?(@.+|-([0-9]+))$'
 
-WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
+There's lots of pinctrl nodes named 'mdio...' we need to avoid and we 
+aren't currently.
 
-without the expected 1 -> 0 transition, which then splats.
+I'd prefer not to support 'mdio-external', but there's already 1 
+documented case. I think the only node name fix we'd need with this is 
+'mdio-gpio' which should be just 'mdio' or 'mdio-N' like all other 
+bitbanged implementations.
 
-At same time, error unwind path that is also running inet_twsk_purge()
-will splat as well:
-
-WARNING: .. at lib/refcount.c:31 refcount_warn_saturate+0x1ed/0x210
-...
- refcount_dec include/linux/refcount.h:351 [inline]
- inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
- inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221
- inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
- tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
- ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
- setup_net+0x714/0xb40 net/core/net_namespace.c:375
- copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
- create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
-
-... because refcount_dec() of tw_refcount unexpectedly dropped to 0.
-
-This doesn't seem like an actual bug (no tw sockets got lost and I don't
-see a use-after-free) but as erroneous trigger of debug check.
-
-Add a mutex to force strict ordering: the task that calls tcp_twsk_purge()
-blocks other task from doing final _dec_and_test before mutex-owner has
-removed all tw sockets of dying netns.
-
-Fixes: e9bd0cca09d1 ("tcp: Don't allocate tcp_death_row outside of struct netns_ipv4.")
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>
-Reported-by: syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/0000000000003a5292061f5e4e19@google.com/
-Link: https://lore.kernel.org/netdev/20240812140104.GA21559@breakpoint.cc/
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/ipv4/tcp_ipv4.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index fd17f25ff288..a4e510846905 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -97,6 +97,8 @@ static DEFINE_PER_CPU(struct sock_bh_locked, ipv4_tcp_sk) = {
- 	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
- };
- 
-+static DEFINE_MUTEX(tcp_exit_batch_mutex);
-+
- static u32 tcp_v4_init_seq(const struct sk_buff *skb)
- {
- 	return secure_tcp_seq(ip_hdr(skb)->daddr,
-@@ -3514,6 +3516,16 @@ static void __net_exit tcp_sk_exit_batch(struct list_head *net_exit_list)
- {
- 	struct net *net;
- 
-+	/* make sure concurrent calls to tcp_sk_exit_batch from net_cleanup_work
-+	 * and failed setup_net error unwinding path are serialized.
-+	 *
-+	 * tcp_twsk_purge() handles twsk in any dead netns, not just those in
-+	 * net_exit_list, the thread that dismantles a particular twsk must
-+	 * do so without other thread progressing to refcount_dec_and_test() of
-+	 * tcp_death_row.tw_refcount.
-+	 */
-+	mutex_lock(&tcp_exit_batch_mutex);
-+
- 	tcp_twsk_purge(net_exit_list);
- 
- 	list_for_each_entry(net, net_exit_list, exit_list) {
-@@ -3521,6 +3533,8 @@ static void __net_exit tcp_sk_exit_batch(struct list_head *net_exit_list)
- 		WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
- 		tcp_fastopen_ctx_destroy(net);
- 	}
-+
-+	mutex_unlock(&tcp_exit_batch_mutex);
- }
- 
- static struct pernet_operations __net_initdata tcp_sk_ops = {
--- 
-2.44.2
-
+Rob
 
