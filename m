@@ -1,79 +1,74 @@
-Return-Path: <netdev+bounces-117717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADDF94EE9E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A1894EEA6
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591BAB2489D
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:47:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C57861C20D92
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A3417C7BB;
-	Mon, 12 Aug 2024 13:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9700717C22A;
+	Mon, 12 Aug 2024 13:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ly77zGC+"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="BTxCXn+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7F417A92F;
-	Mon, 12 Aug 2024 13:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F5B1791ED;
+	Mon, 12 Aug 2024 13:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723470384; cv=none; b=rB7algCKk/3ul4B7LBIGzOpLcusq3SzmkR6tE3WczgGIvi74GU4Gy/+YKS5OrJC6CoeB44ZgvJoZVCVUhPLzOlGJOuuSqhBONHmSOiwtc7HryhgyEBM7TYG7uVmBQbZzH/SH1S7HZNxbVPsAngIiErxnGtYb5BDJmpg0ntDmhvs=
+	t=1723470535; cv=none; b=jSLo9zTA31qDFKDInWCCyARaKFdNIO8b6D9MgBfeDqrhyrf4z/+VVmWgbXKv+8Qj/DsCdgwRrsd1KFCjOSB5PDGdawlt9lk/Y8dTHlkym6p60ZfRcngoN4vuCnnAP9VwKUTZxUBNUHhJgIBJ8rvjPVF2zftaj3ut3l9sQp7fk1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723470384; c=relaxed/simple;
-	bh=RZbrLVmBjMhLipuy8GpOq0fJf7VHPNsfLcYAn3sksuw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iKmiQBKCbmEhl2m838ZFGz60E/ePxSJFVGHsRHG2qeb4UAe5OjPY6uzNfPcswcAXiWT2d3E24sNkymFJnbE1+2SJx4E4jdYrF9+Eqk6hlReKOlgqq0PjYXZyqYX6W4MeQZEsHOvkaxLfO+1Froa3t+BPsJSPf5DB/rujVkSPgs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ly77zGC+; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1723470535; c=relaxed/simple;
+	bh=+64lpl9Zme+TwrhpCf7gGQM+HSnpkckpxzi1k/2x48M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JCc1Dow5HNeYphE3aDsVn9jCCoL0YPGVtu3X+BcripEgy7Lhu1I8/LPnoNwZuAsm6H0gAVb5T35qBn08DDlCGDmkavmIOafw7ZbWltu6N6EirumlDo262ImTHOEvRDObnVnRDuKSP0Fj+eM7cvCIMaCXhNaFLrWbQvIebEXzJwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=BTxCXn+L; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723470383; x=1755006383;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723470533; x=1755006533;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=RZbrLVmBjMhLipuy8GpOq0fJf7VHPNsfLcYAn3sksuw=;
-  b=ly77zGC+PpB1BDZk5pA8dPu1QuOL+0D/007ajuIPfs881kWYH8uECe3l
-   g322wj6OjvhNQvEc4a+DWu3enhrvNtDm7qXbsNcjNjQcWMcLnaHx4TY5Y
-   9jUJswIbMUBL/HS4cJ7b3xnshAHhHQBhTCQuhOcniAGBsvmUdyFeLFCbV
-   6RxFCnCk4YwtnTIxzZh/h+7m9sv673UT9kQjeA/rNi9oJjrLu+n7jcT3b
-   5828vku3hDlVtqUUjmJTonEZ7lFrI2iuwwzx/90YMQt1N2S3gp/7/USGL
-   d+Nm5D4xvWCDTZm/064pSkTm9Vcz3MQ2xMCi7MOBADFL0kv/vv5Szl/s/
-   g==;
-X-CSE-ConnectionGUID: HB4buidXSeqmwNpL73jPUw==
-X-CSE-MsgGUID: EUN+m+JoSkC9OOwio8n1Nw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="21439215"
+  bh=+64lpl9Zme+TwrhpCf7gGQM+HSnpkckpxzi1k/2x48M=;
+  b=BTxCXn+LxyxDd7Nx5ECayxMIuxmO8fXbED4hdnqxXNobJfp7R7fViH+7
+   KPr+QQvYgIw9cciDWgeN7q/XjABNPUjE8LptUyUdcGcXJP2Hp6Z3WvGuI
+   8n2f5EqZhzQO8TblxeKwRMEm3oi9i3AGkDJW70f4o0SCrsq0Wh/LonmRp
+   WKfXBtmuP7C0NtzUHTqsZqEyWX1XQm2SsZJGkDyK/WFYHn4E5cVcLpq6D
+   V9vOpPVIoHKQvBlrbHCc0GM1ZqZHe5P9C37HPz57VIzcfjtYcCdIbEj4v
+   NC8ZjWA6Lcy2CUBpD4vOPm2bqCXV7KbDlhGuMNTm/jIALs67xEXGlZCDT
+   Q==;
+X-CSE-ConnectionGUID: tv2ynTUsSICLbryrEjW5ew==
+X-CSE-MsgGUID: 7pg7LWoPQLe40vGstk8e4w==
 X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="21439215"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 06:46:22 -0700
-X-CSE-ConnectionGUID: 8glDbEsrSvKWCJ8T2p/bRQ==
-X-CSE-MsgGUID: hWsnEHY6T0ShmeznxdUgsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="62404963"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Aug 2024 06:46:18 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: stable@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Krishneil Singh <krishneil.k.singh@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6.10.y] idpf: fix memleak in vport interrupt configuration
-Date: Mon, 12 Aug 2024 15:44:55 +0200
-Message-ID: <20240812134455.2298021-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.46.0
+   d="scan'208";a="30386629"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 06:48:52 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 12 Aug 2024 06:48:44 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 06:48:39 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ramon.nordin.rodriguez@ferroamp.se>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next 0/7] microchip_t1s: Update on Microchip 10BASE-T1S PHY driver
+Date: Mon, 12 Aug 2024 19:18:09 +0530
+Message-ID: <20240812134816.380688-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,95 +76,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Michal Kubiak <michal.kubiak@intel.com>
+This patch series contain the below updates,
 
-commit 3cc88e8405b8d55e0ff035e31971aadd6baee2b6 upstream.
+v1:
+- Restructured lan865x_write_cfg_params() and lan865x_read_cfg_params()
+  functions arguments to more generic.
+- Updated new/improved initial settings of LAN865X Rev.B0 from latest
+  AN1760.
+- Added support for LAN865X Rev.B1 from latest AN1760.
+- Moved LAN867X reset handling to a new function for flexibility.
+- Added support for LAN867X Rev.C1/C2 from latest AN1699.
+- Disabled/enabled collision detection based on PLCA setting.
 
-The initialization of vport interrupt consists of two functions:
- 1) idpf_vport_intr_init() where a generic configuration is done
- 2) idpf_vport_intr_req_irq() where the irq for each q_vector is
-   requested.
+Parthiban Veerasooran (7):
+  net: phy: microchip_t1s: restructure cfg read/write functions
+    arguments
+  net: phy: microchip_t1s: update new initial settings for LAN865X
+    Rev.B0
+  net: phy: microchip_t1s: add support for Microchip's LAN865X Rev.B1
+  net: phy: microchip_t1s: move LAN867X reset handling to a new function
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C1
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C2
+  net: phy: microchip_t1s: configure collision detection based on PLCA
+    mode
 
-The first function used to create a base name for each interrupt using
-"kasprintf()" call. Unfortunately, although that call allocated memory
-for a text buffer, that memory was never released.
+ drivers/net/phy/Kconfig         |   4 +-
+ drivers/net/phy/microchip_t1s.c | 299 +++++++++++++++++++++++++-------
+ 2 files changed, 239 insertions(+), 64 deletions(-)
 
-Fix this by removing creating the interrupt base name in 1).
-Instead, always create a full interrupt name in the function 2), because
-there is no need to create a base name separately, considering that the
-function 2) is never called out of idpf_vport_intr_init() context.
 
-Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
-Cc: stable@vger.kernel.org # 6.7
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-Link: https://patch.msgid.link/20240806220923.3359860-3-anthony.l.nguyen@intel.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index b023704bbbda..ed68c7baefa3 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3636,13 +3636,15 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
- /**
-  * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
-  * @vport: main vport structure
-- * @basename: name for the vector
-  */
--static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
-+static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
- {
- 	struct idpf_adapter *adapter = vport->adapter;
-+	const char *drv_name, *if_name, *vec_name;
- 	int vector, err, irq_num, vidx;
--	const char *vec_name;
-+
-+	drv_name = dev_driver_string(&adapter->pdev->dev);
-+	if_name = netdev_name(vport->netdev);
- 
- 	for (vector = 0; vector < vport->num_q_vectors; vector++) {
- 		struct idpf_q_vector *q_vector = &vport->q_vectors[vector];
-@@ -3659,8 +3661,8 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
- 		else
- 			continue;
- 
--		q_vector->name = kasprintf(GFP_KERNEL, "%s-%s-%d",
--					   basename, vec_name, vidx);
-+		q_vector->name = kasprintf(GFP_KERNEL, "%s-%s-%s-%d", drv_name,
-+					   if_name, vec_name, vidx);
- 
- 		err = request_irq(irq_num, idpf_vport_intr_clean_queues, 0,
- 				  q_vector->name, q_vector);
-@@ -4170,7 +4172,6 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
-  */
- int idpf_vport_intr_init(struct idpf_vport *vport)
- {
--	char *int_name;
- 	int err;
- 
- 	err = idpf_vport_intr_init_vec_idx(vport);
-@@ -4184,11 +4185,7 @@ int idpf_vport_intr_init(struct idpf_vport *vport)
- 	if (err)
- 		goto unroll_vectors_alloc;
- 
--	int_name = kasprintf(GFP_KERNEL, "%s-%s",
--			     dev_driver_string(&vport->adapter->pdev->dev),
--			     vport->netdev->name);
--
--	err = idpf_vport_intr_req_irq(vport, int_name);
-+	err = idpf_vport_intr_req_irq(vport);
- 	if (err)
- 		goto unroll_vectors_alloc;
- 
+base-commit: ceb627435b00fe3bcee5957aeb3e5282a1f06eb6
 -- 
-2.46.0
+2.34.1
 
 
