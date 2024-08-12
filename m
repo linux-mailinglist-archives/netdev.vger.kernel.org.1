@@ -1,200 +1,145 @@
-Return-Path: <netdev+bounces-117578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF84694E643
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:47:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AA894E649
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E4391F2254B
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 05:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2FBD1C21447
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 05:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AB114E2D7;
-	Mon, 12 Aug 2024 05:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F3214D6FC;
+	Mon, 12 Aug 2024 05:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMGHvAXB"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="NGHtsoAk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC5B14E2C1
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 05:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC84E1411C8;
+	Mon, 12 Aug 2024 05:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723441647; cv=none; b=rFNJvgnGzRfdyf9AkWiXB0NCLsTbAcbYtTMlYn9HQjnh+eyAByFOAWZ5BJPQeHn1kYn8vU8s38RW2zYt1p74TleaDoHLkwQ1e7Piuh4Q1wjs9yIU3bDwfItyy6eY5y4OlvT4yye0kckIRiu/vVNJAtKIOiwl+AZ1AfzQX5S3mHY=
+	t=1723441893; cv=none; b=UcJCvPNB60S+YDqkLfqsA3rWb7DXWy4mECdyoEb/RawRYs2NIkWHWAIfj5BCFIVypJQCpCSWJzOZ0A0O4GZCa64fULpPZnvP5b3sK7tx7Iu8gLtpfaBVq9+zPrgVUi4hKdmXkbfSBeQvZPJ3pIswUOf9R1gCd//VOvJ25b6xmAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723441647; c=relaxed/simple;
-	bh=Uw8yb612ZKPbURrgt/Fv4sgrL3dUlccka3seY1ans64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VZvQuiA0SzE1+nTIIWr8r6XfzbJA8V9fmEKb2udb8DOaeBWEIkc3UlXyLk11ql5fuh9CAHmgDfbCO7ZYztAVUZfQzxli/ygXvObiyGpK/k8BWXkit9+UxbBDchw61jUrkpHEDsDaQ0Oy0jvZ03GbJjXXIqG2ehcP+4dmsMxTEZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EMGHvAXB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723441644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H5CsJWNFYLKrhPjV5w6+3TXZvOdH+ndcySRvBH2M9eo=;
-	b=EMGHvAXBNu7hOT9aZv7WG2auUbqOf69O0YplC4Ao8wfwNxLbDZQfT3ys7lpHpuQBO07bQQ
-	lPkmPbraTAzpkyzHNiHqa1C+FyEjje24enXdIcuUTIJ+vU6VZxVWV4R5GN/l1FgYvii/yY
-	an4Nt/tQSrFxxiDQEK2w63OMIhAhDKk=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-378-G0lNrugqMD-L0XcMB8n7jQ-1; Mon, 12 Aug 2024 01:47:22 -0400
-X-MC-Unique: G0lNrugqMD-L0XcMB8n7jQ-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2cb576921b6so4825387a91.1
-        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 22:47:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723441641; x=1724046441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H5CsJWNFYLKrhPjV5w6+3TXZvOdH+ndcySRvBH2M9eo=;
-        b=pHeJaQUFbzzbDE06iCVCrqx0DLMCk5a885GQ51xWKFWqnFqmYuk3Q+EcEaFUjKIsif
-         O/5x1yONQgAOkY/OgyoN/OL9y2yeiG/60sGbXw8AjnVYgazqQPTu4UTBP1uMMsbzSIc3
-         o8++BaLX9FUVM11CGuutTlqyjKPeVYdL+AYmrLEKQ3C4IJRN4z06yhYaF3SnqpedjIVc
-         O+h6b2k2m8Vlk3ZKBXc8J6QlgrjYQ5LK2JV2TVjXHa5KRlb2SzPvpP9RJ3L3kwnJ54mc
-         npY78Nwy98dvdhM9acr8jjngXX90Unx9o7M6Y578Dk/WetgF64YDlhFCKvdH7IV2Nf7H
-         WP5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXAz5SQbFnYATv++Tmy4scyW+2Jvsg/DhkaetUKDRUzWOfIPr8ag0zDn94mbxOAUkgdltU/Va4DnIBxTg2uCxCiaaQlmH9O
-X-Gm-Message-State: AOJu0YxODr2YPDtttV9BefCRmM3lw3197oE/Q2GrF18jgUNJ1Q3sbywF
-	BsQoGml9j9jgySvg6Q5IpzGlaDAgtsPGqHO5sSHG+DnTgg0AEkKSoRhOoUPi9+TjxOKBIINqmlX
-	oD8LnbKbwzMFQ5jDjO/Vh3Sa1XCdPJc9ebs8ulHbgr1tuTUh14bsbav3MB9s0/r0QUGwRY99tNe
-	RmnVJOo0EaYY9rKZLmnwrwIKcnv4ng
-X-Received: by 2002:a17:90b:4a01:b0:2c8:53be:fa21 with SMTP id 98e67ed59e1d1-2d1e80512c7mr9791790a91.34.1723441641645;
-        Sun, 11 Aug 2024 22:47:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGcQ+XQNc52+i7y7nv+eFycOjVns25ofqhkZcSaAIAiL54PDiPb1KE6nRmNAupkKLE5WiXOivV/pbuxkhY+hnM=
-X-Received: by 2002:a17:90b:4a01:b0:2c8:53be:fa21 with SMTP id
- 98e67ed59e1d1-2d1e80512c7mr9791777a91.34.1723441641179; Sun, 11 Aug 2024
- 22:47:21 -0700 (PDT)
+	s=arc-20240116; t=1723441893; c=relaxed/simple;
+	bh=5aJVH7Jn/vxS1JdnXEPulZCKKW80Js9R+aWunwrcqzs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bnzdbfK8FxapO/tif9g0+si1zfOyIbJceXkB1+cN0F4qMwMFMwj7TaWzUDfRWIk7Iyz6YS2Kbt4Pbe2OrIS6y16ddqOyDHv4FgClmh1SWzqR3cN8WoE/DuBPLg2C7y7YzvCimRqEeRp99HgMoCcHY7tnCh2bd/77hmeFoJwxBNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=NGHtsoAk; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47C5p5EY052993;
+	Mon, 12 Aug 2024 00:51:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1723441865;
+	bh=ZaFDlrTmZWUH5tuDn+gHntc4hv0oJDrngbUk7wLXlb0=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=NGHtsoAkhNkcBeLgQCQHK46Sx2WoYVfaLskPChYnVSQgrqUhvDjQWHut892dQepK6
+	 VdfgkxdgTVNDkjy3aTA7cbkukussrjAIiQR0xvRfD3FPpKAIPKfTGPL8PwdKImu+qq
+	 nU3QSgjCJok4Bp4cewhtWyeXK1qw2rd22+0O2XOs=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47C5p51t011171
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 12 Aug 2024 00:51:05 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 12
+ Aug 2024 00:51:04 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 12 Aug 2024 00:51:04 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47C5ounr099300;
+	Mon, 12 Aug 2024 00:50:57 -0500
+Message-ID: <39ed6b90-aab6-452d-a39b-815498a00519@ti.com>
+Date: Mon, 12 Aug 2024 11:20:56 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808082044.11356-1-jasowang@redhat.com> <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
-In-Reply-To: <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 12 Aug 2024 13:47:10 +0800
-Message-ID: <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
-Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token correctly
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/6] dt-bindings: soc: ti: pruss: Add documentation for
+ PA_STATS support
+To: Nishanth Menon <nm@ti.com>, Roger Quadros <rogerq@kernel.org>
+CC: Suman Anna <s-anna@ti.com>, Sai Krishna <saikrishnag@marvell.com>,
+        Jan
+ Kiszka <jan.kiszka@siemens.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Kory Maincent <kory.maincent@bootlin.com>,
+        Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Santosh
+ Shilimkar <ssantosh@kernel.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Tero
+ Kristo <kristo@kernel.org>,
+        <srk@ti.com>, Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+References: <20240729113226.2905928-1-danishanwar@ti.com>
+ <20240729113226.2905928-2-danishanwar@ti.com>
+ <b6196edc-4e14-41e9-826e-7b58f9753ef5@kernel.org>
+ <20240806150341.evrprkjp3hb6d74p@mockup>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20240806150341.evrprkjp3hb6d74p@mockup>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Fri, Aug 9, 2024 at 2:04=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
->
->
->
-> On 08.08.24 10:20, Jason Wang wrote:
-> > We used to call irq_bypass_unregister_producer() in
-> > vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
-> > token pointer is still valid or not.
-> >
-> > Actually, we use the eventfd_ctx as the token so the life cycle of the
-> > token should be bound to the VHOST_SET_VRING_CALL instead of
-> > vhost_vdpa_setup_vq_irq() which could be called by set_status().
-> >
-> > Fixing this by setting up  irq bypass producer's token when handling
-> > VHOST_SET_VRING_CALL and un-registering the producer before calling
-> > vhost_vring_ioctl() to prevent a possible use after free as eventfd
-> > could have been released in vhost_vring_ioctl().
-> >
-> > Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdp=
-a")
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> > Note for Dragos: Please check whether this fixes your issue. I
-> > slightly test it with vp_vdpa in L2.
-> > ---
-> >  drivers/vhost/vdpa.c | 12 +++++++++---
-> >  1 file changed, 9 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index e31ec9ebc4ce..388226a48bcc 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_v=
-dpa *v, u16 qid)
-> >       if (irq < 0)
-> >               return;
-> >
-> > -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
-> >       if (!vq->call_ctx.ctx)
-> >               return;
-> >
-> > -     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
-> >       vq->call_ctx.producer.irq =3D irq;
-> >       ret =3D irq_bypass_register_producer(&vq->call_ctx.producer);
-> >       if (unlikely(ret))
-> > @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vd=
-pa *v, unsigned int cmd,
-> >                       vq->last_avail_idx =3D vq_state.split.avail_index=
-;
-> >               }
-> >               break;
-> > +     case VHOST_SET_VRING_CALL:
-> > +             if (vq->call_ctx.ctx) {
-> > +                     vhost_vdpa_unsetup_vq_irq(v, idx);
-> > +                     vq->call_ctx.producer.token =3D NULL;
-> > +             }
-> > +             break;
-> >       }
-> >
-> >       r =3D vhost_vring_ioctl(&v->vdev, cmd, argp);
-> > @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_v=
-dpa *v, unsigned int cmd,
-> >                       cb.callback =3D vhost_vdpa_virtqueue_cb;
-> >                       cb.private =3D vq;
-> >                       cb.trigger =3D vq->call_ctx.ctx;
-> > +                     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
-> > +                     vhost_vdpa_setup_vq_irq(v, idx);
-> >               } else {
-> >                       cb.callback =3D NULL;
-> >                       cb.private =3D NULL;
-> >                       cb.trigger =3D NULL;
-> >               }
-> >               ops->set_vq_cb(vdpa, idx, &cb);
-> > -             vhost_vdpa_setup_vq_irq(v, idx);
-> >               break;
-> >
-> >       case VHOST_SET_VRING_NUM:
-> > @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, s=
-truct file *filep)
-> >       for (i =3D 0; i < nvqs; i++) {
-> >               vqs[i] =3D &v->vqs[i];
-> >               vqs[i]->handle_kick =3D handle_vq_kick;
-> > +             vqs[i]->call_ctx.ctx =3D NULL;
-> >       }
-> >       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
-> >                      vhost_vdpa_process_iotlb_msg);
->
-> No more crashes, but now getting a lot of:
->  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) registr=
-ation fails, ret =3D  -16
->
-> ... seems like the irq_bypass_unregister_producer() that was removed
-> might still be needed somewhere?
 
-Probably, but I didn't see this when testing vp_vdpa.
 
-When did you meet those warnings? Is it during the boot or migration?
+On 06/08/24 8:33 pm, Nishanth Menon wrote:
+> On 09:42-20240805, Roger Quadros wrote:
+>>
+>>
+>> On 29/07/2024 14:32, MD Danish Anwar wrote:
+>>> Add documentation for pa-stats node which is syscon regmap for
+>>> PA_STATS registers. This will be used to dump statistics maintained by
+>>> ICSSG firmware.
+>>>
+>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>
+>> Reviewed-by: tags should come after Author's Signed-off-by:
+>>
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>
+>> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+> 
+> If the net maintainers are OK, they could potentially take the binding
+> patch along with the driver mods corresponding to this - I am a bit
+> unsure of picking up a binding if the driver implementation is heading
+> the wrong way.
+> 
 
-Thanks
+Hi Jakub, Paolo, David, Andrew,
 
->
-> Thanks,
-> Dragos
->
->
+Will it be okay to pick this binding patch to net-next tree. Nishant is
+suggesting since the driver changes are done in drivers/net/ the binding
+can be picked by net maintainers.
 
+Please let us know if it will be okay to take this binding to net-next.
+I can post a new series with just the binding and the driver patch to
+net-next if needed.
+
+-- 
+Thanks and Regards,
+Danish
 
