@@ -1,158 +1,200 @@
-Return-Path: <netdev+bounces-117577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE69E94E634
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:42:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF84694E643
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA9F1C21056
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 05:41:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E4391F2254B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 05:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C5214D2A4;
-	Mon, 12 Aug 2024 05:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AB114E2D7;
+	Mon, 12 Aug 2024 05:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yj2qClw6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMGHvAXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567743C0B;
-	Mon, 12 Aug 2024 05:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC5B14E2C1
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 05:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723441316; cv=none; b=B8x2NovQ0R+INgz8rR2pEhQh3Z+RkOsGKJjDbw5RLnyO4h+uaOD7RVsIgblTKUvxHRwcTUKMnw6zOzKErlg+aH+bvN8+gWIWk0ycrErCHC8MNccJ+FORh/yzcFon+Azlu0GYGjqux5p56SW/YnFbpFwvWaxl4/4l9chV6QPkfzo=
+	t=1723441647; cv=none; b=rFNJvgnGzRfdyf9AkWiXB0NCLsTbAcbYtTMlYn9HQjnh+eyAByFOAWZ5BJPQeHn1kYn8vU8s38RW2zYt1p74TleaDoHLkwQ1e7Piuh4Q1wjs9yIU3bDwfItyy6eY5y4OlvT4yye0kckIRiu/vVNJAtKIOiwl+AZ1AfzQX5S3mHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723441316; c=relaxed/simple;
-	bh=Iacvar3iFBxePydCl7Gqh1UgF1fVeJOOc1Bb7GnvNFg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gXKeNnCvHs/qhsOIp1tUQvOlDTUwhD+KcXp5azv6REEbezk0BT2xy5atRHrj/T+OUXz+Oc8X61C6sDYh5zL6P/2r8+8aIA4jXAzrnRMfbmEaX0pWoX/XIoKTZUtutHPoMpl5hieWrmHI2qTvCj6ySxq3jlXsupD/kdgdEW/dMco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yj2qClw6; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47C5fTrh033207;
-	Mon, 12 Aug 2024 00:41:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1723441289;
-	bh=fX2sT+fujKXhtcrZbhOSpfai/+GnliWHwU6DT8LKr/E=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=yj2qClw6EiDOrOvgyUDTHQJ1KbI7qcMay7ksiUN9l6Cqks9UV4jmxr1PNonGPvbCg
-	 VFNAxXjaOMJOqpSRg58uJ/csVDl9A7fDE/G4ykyZpPr2fR5UwlxB8D6ghNsW9E+hel
-	 hUy5taLf/zS+UxFZbbDQYV8Z3IwOTkXQUdCPUsO0=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47C5fT9F006353
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 12 Aug 2024 00:41:29 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 12
- Aug 2024 00:41:28 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 12 Aug 2024 00:41:28 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47C5fLb8086750;
-	Mon, 12 Aug 2024 00:41:22 -0500
-Message-ID: <3397a020-195c-4ca3-a524-520171db794b@ti.com>
-Date: Mon, 12 Aug 2024 11:11:21 +0530
+	s=arc-20240116; t=1723441647; c=relaxed/simple;
+	bh=Uw8yb612ZKPbURrgt/Fv4sgrL3dUlccka3seY1ans64=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VZvQuiA0SzE1+nTIIWr8r6XfzbJA8V9fmEKb2udb8DOaeBWEIkc3UlXyLk11ql5fuh9CAHmgDfbCO7ZYztAVUZfQzxli/ygXvObiyGpK/k8BWXkit9+UxbBDchw61jUrkpHEDsDaQ0Oy0jvZ03GbJjXXIqG2ehcP+4dmsMxTEZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EMGHvAXB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723441644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H5CsJWNFYLKrhPjV5w6+3TXZvOdH+ndcySRvBH2M9eo=;
+	b=EMGHvAXBNu7hOT9aZv7WG2auUbqOf69O0YplC4Ao8wfwNxLbDZQfT3ys7lpHpuQBO07bQQ
+	lPkmPbraTAzpkyzHNiHqa1C+FyEjje24enXdIcuUTIJ+vU6VZxVWV4R5GN/l1FgYvii/yY
+	an4Nt/tQSrFxxiDQEK2w63OMIhAhDKk=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-378-G0lNrugqMD-L0XcMB8n7jQ-1; Mon, 12 Aug 2024 01:47:22 -0400
+X-MC-Unique: G0lNrugqMD-L0XcMB8n7jQ-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2cb576921b6so4825387a91.1
+        for <netdev@vger.kernel.org>; Sun, 11 Aug 2024 22:47:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723441641; x=1724046441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H5CsJWNFYLKrhPjV5w6+3TXZvOdH+ndcySRvBH2M9eo=;
+        b=pHeJaQUFbzzbDE06iCVCrqx0DLMCk5a885GQ51xWKFWqnFqmYuk3Q+EcEaFUjKIsif
+         O/5x1yONQgAOkY/OgyoN/OL9y2yeiG/60sGbXw8AjnVYgazqQPTu4UTBP1uMMsbzSIc3
+         o8++BaLX9FUVM11CGuutTlqyjKPeVYdL+AYmrLEKQ3C4IJRN4z06yhYaF3SnqpedjIVc
+         O+h6b2k2m8Vlk3ZKBXc8J6QlgrjYQ5LK2JV2TVjXHa5KRlb2SzPvpP9RJ3L3kwnJ54mc
+         npY78Nwy98dvdhM9acr8jjngXX90Unx9o7M6Y578Dk/WetgF64YDlhFCKvdH7IV2Nf7H
+         WP5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXAz5SQbFnYATv++Tmy4scyW+2Jvsg/DhkaetUKDRUzWOfIPr8ag0zDn94mbxOAUkgdltU/Va4DnIBxTg2uCxCiaaQlmH9O
+X-Gm-Message-State: AOJu0YxODr2YPDtttV9BefCRmM3lw3197oE/Q2GrF18jgUNJ1Q3sbywF
+	BsQoGml9j9jgySvg6Q5IpzGlaDAgtsPGqHO5sSHG+DnTgg0AEkKSoRhOoUPi9+TjxOKBIINqmlX
+	oD8LnbKbwzMFQ5jDjO/Vh3Sa1XCdPJc9ebs8ulHbgr1tuTUh14bsbav3MB9s0/r0QUGwRY99tNe
+	RmnVJOo0EaYY9rKZLmnwrwIKcnv4ng
+X-Received: by 2002:a17:90b:4a01:b0:2c8:53be:fa21 with SMTP id 98e67ed59e1d1-2d1e80512c7mr9791790a91.34.1723441641645;
+        Sun, 11 Aug 2024 22:47:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGcQ+XQNc52+i7y7nv+eFycOjVns25ofqhkZcSaAIAiL54PDiPb1KE6nRmNAupkKLE5WiXOivV/pbuxkhY+hnM=
+X-Received: by 2002:a17:90b:4a01:b0:2c8:53be:fa21 with SMTP id
+ 98e67ed59e1d1-2d1e80512c7mr9791777a91.34.1723441641179; Sun, 11 Aug 2024
+ 22:47:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/6] net: ti: icss-iep: Move icss_iep structure
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Javier Carrasco
-	<javier.carrasco.cruz@gmail.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>,
-        Jacob
- Keller <jacob.e.keller@intel.com>,
-        Simon Horman <horms@kernel.org>,
-        Richard
- Cochran <richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros <rogerq@kernel.org>
-References: <20240808110800.1281716-1-danishanwar@ti.com>
- <20240808110800.1281716-6-danishanwar@ti.com>
- <6eb3c922-a8c6-4df4-a9ee-ba879e323385@stanley.mountain>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <6eb3c922-a8c6-4df4-a9ee-ba879e323385@stanley.mountain>
+References: <20240808082044.11356-1-jasowang@redhat.com> <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+In-Reply-To: <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 12 Aug 2024 13:47:10 +0800
+Message-ID: <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
+Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token correctly
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: quoted-printable
 
-Hi Dan,
+On Fri, Aug 9, 2024 at 2:04=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com>=
+ wrote:
+>
+>
+>
+> On 08.08.24 10:20, Jason Wang wrote:
+> > We used to call irq_bypass_unregister_producer() in
+> > vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
+> > token pointer is still valid or not.
+> >
+> > Actually, we use the eventfd_ctx as the token so the life cycle of the
+> > token should be bound to the VHOST_SET_VRING_CALL instead of
+> > vhost_vdpa_setup_vq_irq() which could be called by set_status().
+> >
+> > Fixing this by setting up  irq bypass producer's token when handling
+> > VHOST_SET_VRING_CALL and un-registering the producer before calling
+> > vhost_vring_ioctl() to prevent a possible use after free as eventfd
+> > could have been released in vhost_vring_ioctl().
+> >
+> > Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdp=
+a")
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> > Note for Dragos: Please check whether this fixes your issue. I
+> > slightly test it with vp_vdpa in L2.
+> > ---
+> >  drivers/vhost/vdpa.c | 12 +++++++++---
+> >  1 file changed, 9 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > index e31ec9ebc4ce..388226a48bcc 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_v=
+dpa *v, u16 qid)
+> >       if (irq < 0)
+> >               return;
+> >
+> > -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> >       if (!vq->call_ctx.ctx)
+> >               return;
+> >
+> > -     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
+> >       vq->call_ctx.producer.irq =3D irq;
+> >       ret =3D irq_bypass_register_producer(&vq->call_ctx.producer);
+> >       if (unlikely(ret))
+> > @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vd=
+pa *v, unsigned int cmd,
+> >                       vq->last_avail_idx =3D vq_state.split.avail_index=
+;
+> >               }
+> >               break;
+> > +     case VHOST_SET_VRING_CALL:
+> > +             if (vq->call_ctx.ctx) {
+> > +                     vhost_vdpa_unsetup_vq_irq(v, idx);
+> > +                     vq->call_ctx.producer.token =3D NULL;
+> > +             }
+> > +             break;
+> >       }
+> >
+> >       r =3D vhost_vring_ioctl(&v->vdev, cmd, argp);
+> > @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_v=
+dpa *v, unsigned int cmd,
+> >                       cb.callback =3D vhost_vdpa_virtqueue_cb;
+> >                       cb.private =3D vq;
+> >                       cb.trigger =3D vq->call_ctx.ctx;
+> > +                     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
+> > +                     vhost_vdpa_setup_vq_irq(v, idx);
+> >               } else {
+> >                       cb.callback =3D NULL;
+> >                       cb.private =3D NULL;
+> >                       cb.trigger =3D NULL;
+> >               }
+> >               ops->set_vq_cb(vdpa, idx, &cb);
+> > -             vhost_vdpa_setup_vq_irq(v, idx);
+> >               break;
+> >
+> >       case VHOST_SET_VRING_NUM:
+> > @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, s=
+truct file *filep)
+> >       for (i =3D 0; i < nvqs; i++) {
+> >               vqs[i] =3D &v->vqs[i];
+> >               vqs[i]->handle_kick =3D handle_vq_kick;
+> > +             vqs[i]->call_ctx.ctx =3D NULL;
+> >       }
+> >       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+> >                      vhost_vdpa_process_iotlb_msg);
+>
+> No more crashes, but now getting a lot of:
+>  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) registr=
+ation fails, ret =3D  -16
+>
+> ... seems like the irq_bypass_unregister_producer() that was removed
+> might still be needed somewhere?
 
-On 10/08/24 1:40 am, Dan Carpenter wrote:
-> On Thu, Aug 08, 2024 at 04:37:59PM +0530, MD Danish Anwar wrote:
->> -	struct ptp_clock *ptp_clock;
->> -	struct mutex ptp_clk_mutex;	/* PHC access serializer */
->> -	u32 def_inc;
->> -	s16 slow_cmp_inc;
-> 
-> [ cut ]
-> 
->> +	struct ptp_clock *ptp_clock;
->> +	struct mutex ptp_clk_mutex;	/* PHC access serializer */
->> +	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
->         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> The patch adds this new struct member.  When you're moving code around, please
-> just move the code.  Don't fix checkpatch warnings or do any other cleanups.
-> 
+Probably, but I didn't see this when testing vp_vdpa.
 
-My bad. I didn't notice this new struct member was introduced. I will
-take care of it.
+When did you meet those warnings? Is it during the boot or migration?
 
-Also apart from doing the code movement, this patch also does the
-following change. Instead of hardcoding the value 4, the patch uses
-emac->iep->def_inc. Since the iep->def_inc is now accessible from
-drivers/net/ethernet/ti/icssg/icssg_prueth.c
+Thanks
 
-@@ -384,7 +384,8 @@ static void prueth_iep_settime(void *clockops_data,
-u64 ns)
- 	sc_desc.cyclecounter0_set = cyclecount & GENMASK(31, 0);
- 	sc_desc.cyclecounter1_set = (cyclecount & GENMASK(63, 32)) >> 32;
- 	sc_desc.iepcount_set = ns % cycletime;
--	sc_desc.CMP0_current = cycletime - 4; //Count from 0 to (cycle time)-4
-+	/* Count from 0 to (cycle time) - emac->iep->def_inc */
-+	sc_desc.CMP0_current = cycletime - emac->iep->def_inc;
+>
+> Thanks,
+> Dragos
+>
+>
 
- 	memcpy_toio(sc_descp, &sc_desc, sizeof(sc_desc));
-
-
-Should I keep the above change as it is or should I split it into a
-separate patch and make this patch strictly for code movement. I kept
-the above change as part of this patch because it is related with the
-code movement. Moving the iep structure from icss_iep.c to icss_iep.h
-makes it accessible to icssg_prueth.c so I thought keeping them together
-will be a better idea.
-
-Please let me know if this is okay.
-
->> +	u32 def_inc;
->> +	s16 slow_cmp_inc;
->> +	u32 slow_cmp_count;
-> 
-> regards,
-> dan carpenter
-
--- 
-Thanks and Regards,
-Danish
 
