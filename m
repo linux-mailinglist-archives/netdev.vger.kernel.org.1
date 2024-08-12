@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-117762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D03894F1B3
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:31:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96EB94F1B5
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB571F23DA1
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:31:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9477028108B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D31E183CCD;
-	Mon, 12 Aug 2024 15:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9787218732B;
+	Mon, 12 Aug 2024 15:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/lMyIeo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1WH5Dmt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2612DF9E8;
-	Mon, 12 Aug 2024 15:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64292186E5A;
+	Mon, 12 Aug 2024 15:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723476638; cv=none; b=M9Z3Z5PJmge0ZIRJ0wBLfBk24NFgYv/f+UciRON34b7GejVY5DXCKOToFAEzU5mmPutinJyX6gsfDuvO1qZ+D99eHvulcz4PGquBVdq/y/OV4CXryilOQAv12xyfKJa4JmcNjjqadeM3Jl9SE2g7bSbF6ajdiSxMtC+MF1JARFA=
+	t=1723476643; cv=none; b=qJqr1dqEK4fs9ji6t9k9M3J/5KCi9+uJm20p2h//h6BCy938dSxCiJIhKih5ETmTd/ywiOxomMm9ymFCKD11sXKK2E61XkS33F5yA/uTNUZvNEbTWhqp9EdVe4CCxrJGZ2hjoZ1vpoiX3WYEyshK6J/la6UyH1+IEWUArFHZHo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723476638; c=relaxed/simple;
-	bh=cI6omaOq9q4KhDAhVFNb9BhAcM5gxFkHis/LHpaLAfM=;
+	s=arc-20240116; t=1723476643; c=relaxed/simple;
+	bh=yVbLiwXp3y3vlxhRVcrg1Am12yF0nslL3Naf9OUa0cg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ERArR7iju30qh/cNhIkq7DzquLgqpAbz5XlDYLO3E/4Y3zEIr6HFMCgCEID1s0hh18FU7nEsxfn0T+tZU5rwqImsYZN5Hh2jGGOM8V7lIt/tvszzQbHe0zgpCAETrKsPKMett6rAX5wosVAXuI5i9byfTNDQPptMcGWPLnYFgr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/lMyIeo; arc=none smtp.client-ip=209.85.208.41
+	 MIME-Version; b=stXA5nohpxj8cfFl18Fi7ZsczS4WuX74sFTlnkjCt7OQfspf5A8a9bluA+e6pP2Pf/DN9DafmLN3LE3StJckPFN175K3bV0jW9HiViejPVbdwic0pDFiwdA8F265C9h6FdFf3aKdmqMp0JZa6zv/fL57sgZQQMP3J1e9iQAMskA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1WH5Dmt; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a6135eso593955a12.0;
-        Mon, 12 Aug 2024 08:30:35 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5a108354819so5832466a12.0;
+        Mon, 12 Aug 2024 08:30:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723476634; x=1724081434; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723476640; x=1724081440; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QtypSQS+aXP13D2w8C4F/ewwCPIeElIJUsVeuF/Dd8g=;
-        b=c/lMyIeoTmZzm/5IqZ3FV/jckrU89H5SNu2tPO28SfI8NfE9OQdULohC9K8afdItOx
-         yY0VaCav5MnULGX/mvjTWmIuJEKbdudGzlC/d13lyENwyRSQOzlMrpZGlT/KsYJ215OG
-         CdEo4tm2pr/rO8lO6qPF2LTrv1hV43gNNgx6M34cmf3V/ZkGDyZm9ztga4MATu5VwZd5
-         IlWvCNLj+8neAd6KsLGiPgfDJeLKuCakO1//38WcWNGO+xqllohd/4inL2zAe8lPg/ZQ
-         EVgj7qq1GHZ/E7ANDXJxYjpZsLLltrUrioiyj8MIbrom4Y207FTCpbMmE9oU70/t8Wy3
-         /MUw==
+        bh=WAqVEaOgKR65yWeYLOQFhIc3DZnyI4OyFbvhtsEiZV0=;
+        b=e1WH5DmtR/tTLa1vMxILZi69xwf65UmaQnpMaEOoew+TRJ3TeSvR2DgvsoY7m8Lwst
+         4YRvoF+JRCCfFlTVnay4sSk8aMXc8R0TB5dDeERIhk9QyPzWXcAHqcWT8qPeJ7ADW3pU
+         ih+oWS8GEu/wXlmvYfqv1S70wvk3m32n0O85RAU697tyoZHYVR3LBOwTzQdye+IXAkKu
+         A8++pQqRxXYeo6UeOX6pgMnUNCWp0YDMzf8KzNsy94K0fxJdXC23K64p9R9uER6K2zMp
+         eMR6zobAYMNn9lQs+UIak1n6PkVaFOeITKnbzO0G+bESrtAGfyFIXOBIjuETsTpZ+wey
+         IKzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723476634; x=1724081434;
+        d=1e100.net; s=20230601; t=1723476640; x=1724081440;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QtypSQS+aXP13D2w8C4F/ewwCPIeElIJUsVeuF/Dd8g=;
-        b=gYG3JS54OHVdG9qdya9XDqz7D/Y7R525zBYinUwXAjryO1D92R0gPvE/sYDuFEbz+F
-         vjNKd2C22Xsh6HCAoYZsb4D//FDaUATK9dPb9BkGnjJAKZG/4/eOgakTVeuy/7jwoLZF
-         KKxFsfHyGtZjLySzzGtI+lT7yXuK2j2yCY8AxbmGKb05dqUtb2EOson3Y1ojtYRJe7Vb
-         6Q+D4zbov5tjTU6FG2QCs2Aaypc2XVEuOH6S4PKJCTpBUArhDIcBj2VHjd9gHED+0cGL
-         FrMREdMiqOfRptE6nScf4Rhv/Gg8EMUJqZrcfwsqSsBpCS8dPJFfGi4iFtg0TJP+xg2V
-         L+QA==
-X-Forwarded-Encrypted: i=1; AJvYcCXKvK9xg1bkPra6UCxJio6KNX6viViB4iHZg/au7v4VZpo/0ATrF5Mdn/0kh4FchC6B7e53ejibATlkZKm4LbFI7MF7TWCHtb56aGlXI66R3hKALvOLCUcQ5z5MYLTV3hO3JOVVpqCjr5giTfQqkCPhNdGDOZ0kjIHHB0C/9RA7Dw==
-X-Gm-Message-State: AOJu0YwPNWfZ9WT2p4LVC9ERljD/mGwYJ7JuMXobiSK2Yuj4DsrE4x+W
-	jIdt+WRoONGkwIRFD2Nz2HDT1RvxrpMRa9nh4uN4d7sXnLVobSLb
-X-Google-Smtp-Source: AGHT+IHyD+FvepXnBme4we9jXhH9UK7n/D7hUhPpwA0rrdvImrsZrxpsYlRtJZJTD0fVMCueiZCmKw==
-X-Received: by 2002:a05:6402:190e:b0:58b:bb69:763e with SMTP id 4fb4d7f45d1cf-5bd4619735amr20848a12.7.1723476634228;
-        Mon, 12 Aug 2024 08:30:34 -0700 (PDT)
+        bh=WAqVEaOgKR65yWeYLOQFhIc3DZnyI4OyFbvhtsEiZV0=;
+        b=ZCI09gOlQgKZlvWkjFAgfwIIe0ibZtwQs9qvhry63FV4dVC7EUv+7fWs1ewOlRWk7F
+         gYxQYjT2m5S3qikDsMi9oqG9XAfEDmUXefcsXv6m/h/TAA+SP8pQT+CVXTRndju2nfaC
+         76nVEpy/aFj3dyLAT87MCvQDWzx1f6cUISx3qZzMib6twq94d6J52F2fjJQawRIJZBOz
+         6YPsHDwG/TosMx9y4XPwImW6IwgDM5YJOI8RF8bFlF7qgR84s07924lNFqEJpVVZJ6oA
+         Gsmy1OthgF3lWPnIurBsY9JaXD7HkNSAa6QzrJUR6a+Oib70+Q9CgAqJ35CZbAqW2tKq
+         v35A==
+X-Forwarded-Encrypted: i=1; AJvYcCXOPzT1HHtxr7giwStC/AZnUj39rV5+IcGKqaTJQCcX8exoZHKOb7aMy2E2/SUGbeUADy+dgAjVJ6Tsw0uOFOdjqh/ahoPug88G7tDmMdROT9T6FKx+xOwcw7wXSFYlHFm/p3M2B1mpGrJDJ5UfhUTE+V1It8vXzlzmxxoTGtYc2g==
+X-Gm-Message-State: AOJu0YxaXbQp+/3EeWF3utGBBavU8r0PoGzCJwL8l91MaNTMXOFAEmB1
+	pKZZDEMG9EHqKwv8s+1/Gj1GcYUFkadAdAN1D+QTz/uKLDZ+4xy9
+X-Google-Smtp-Source: AGHT+IFivwePYSVFwsULnxCMfRnNxBtqQnZzhk8ZLskbtMCj4iwdknsY5kTsql6wS3Enm+qJ/hXmOg==
+X-Received: by 2002:a05:6402:320b:b0:5a1:e92b:acb5 with SMTP id 4fb4d7f45d1cf-5bd44c295d8mr523413a12.11.1723476639206;
+        Mon, 12 Aug 2024 08:30:39 -0700 (PDT)
 Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd196a666fsm2192535a12.46.2024.08.12.08.30.33
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd196a666fsm2192535a12.46.2024.08.12.08.30.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 08:30:33 -0700 (PDT)
+        Mon, 12 Aug 2024 08:30:38 -0700 (PDT)
 From: vtpieter@gmail.com
 To: Woojung Huh <woojung.huh@microchip.com>,
 	UNGLinuxDriver@microchip.com,
@@ -80,16 +80,17 @@ To: Woojung Huh <woojung.huh@microchip.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Marek Vasut <marex@denx.de>
+	Marek Vasut <marex@denx.de>,
+	Russell King <linux@armlinux.org.uk>
 Cc: Woojung Huh <Woojung.Huh@microchip.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
 	Arun Ramadoss <arun.ramadoss@microchip.com>
-Subject: [PATCH net-next v5 2/6] net: dsa: microchip: move KSZ9477 WoL functions to ksz_common
-Date: Mon, 12 Aug 2024 17:29:53 +0200
-Message-ID: <20240812153015.653044-3-vtpieter@gmail.com>
+Subject: [PATCH net-next v5 3/6] net: dsa: microchip: generalize KSZ9477 WoL functions at ksz_common
+Date: Mon, 12 Aug 2024 17:29:54 +0200
+Message-ID: <20240812153015.653044-4-vtpieter@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240812153015.653044-1-vtpieter@gmail.com>
 References: <20240812153015.653044-1-vtpieter@gmail.com>
@@ -103,493 +104,413 @@ Content-Transfer-Encoding: 8bit
 
 From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-Move KSZ9477 WoL functions to ksz_common, in preparation for adding
-KSZ87xx family support.
+Generalize KSZ9477 WoL functions at ksz_common. Move dedicated registers
+and generic masks to existing structures & defines for that purpose.
+
+Introduction of PME (port) read/write helper functions, which happen
+to be the generic read/write for KSZ9477 but not for the incoming
+KSZ87xx patch.
 
 Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
 ---
- drivers/net/dsa/microchip/ksz9477.c     | 181 ------------------------
- drivers/net/dsa/microchip/ksz9477.h     |   5 -
- drivers/net/dsa/microchip/ksz9477_reg.h |  12 --
- drivers/net/dsa/microchip/ksz_common.c  | 181 ++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h  |  19 +++
- 5 files changed, 200 insertions(+), 198 deletions(-)
+ drivers/net/dsa/microchip/ksz9477.c    |  16 ++--
+ drivers/net/dsa/microchip/ksz_common.c | 113 +++++++++++++------------
+ drivers/net/dsa/microchip/ksz_common.h |  30 +++----
+ 3 files changed, 81 insertions(+), 78 deletions(-)
 
 diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 1e2293aa00dc..4defa7c03176 100644
+index 4defa7c03176..741b4f2dd8d2 100644
 --- a/drivers/net/dsa/microchip/ksz9477.c
 +++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -56,187 +56,6 @@ int ksz9477_change_mtu(struct ksz_device *dev, int port, int mtu)
- 				  REG_SW_MTU_MASK, frame_size);
+@@ -1024,6 +1024,7 @@ void ksz9477_port_queue_split(struct ksz_device *dev, int port)
+ 
+ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ {
++	const u16 *regs = dev->info->regs;
+ 	struct dsa_switch *ds = dev->ds;
+ 	u16 data16;
+ 	u8 member;
+@@ -1068,12 +1069,12 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ 	ksz9477_port_acl_init(dev, port);
+ 
+ 	/* clear pending wake flags */
+-	ksz9477_handle_wake_reason(dev, port);
++	ksz_handle_wake_reason(dev, port);
+ 
+ 	/* Disable all WoL options by default. Otherwise
+ 	 * ksz_switch_macaddr_get/put logic will not work properly.
+ 	 */
+-	ksz_pwrite8(dev, port, REG_PORT_PME_CTRL, 0);
++	ksz_pwrite8(dev, port, regs[REG_PORT_PME_CTRL], 0);
  }
  
--/**
-- * ksz9477_handle_wake_reason - Handle wake reason on a specified port.
-- * @dev: The device structure.
-- * @port: The port number.
-- *
-- * This function reads the PME (Power Management Event) status register of a
-- * specified port to determine the wake reason. If there is no wake event, it
-- * returns early. Otherwise, it logs the wake reason which could be due to a
-- * "Magic Packet", "Link Up", or "Energy Detect" event. The PME status register
-- * is then cleared to acknowledge the handling of the wake event.
-- *
-- * Return: 0 on success, or an error code on failure.
-- */
--static int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
+ void ksz9477_config_cpu_port(struct dsa_switch *ds)
+@@ -1170,6 +1171,7 @@ int ksz9477_enable_stp_addr(struct ksz_device *dev)
+ int ksz9477_setup(struct dsa_switch *ds)
+ {
+ 	struct ksz_device *dev = ds->priv;
++	const u16 *regs = dev->info->regs;
+ 	int ret = 0;
+ 
+ 	ds->mtu_enforcement_ingress = true;
+@@ -1200,13 +1202,11 @@ int ksz9477_setup(struct dsa_switch *ds)
+ 	/* enable global MIB counter freeze function */
+ 	ksz_cfg(dev, REG_SW_MAC_CTRL_6, SW_MIB_COUNTER_FREEZE, true);
+ 
+-	/* Make sure PME (WoL) is not enabled. If requested, it will be
+-	 * enabled by ksz9477_wol_pre_shutdown(). Otherwise, some PMICs do not
+-	 * like PME events changes before shutdown.
++	/* Make sure PME (WoL) is not enabled. If requested, it will
++	 * be enabled by ksz_wol_pre_shutdown(). Otherwise, some PMICs
++	 * do not like PME events changes before shutdown.
+ 	 */
+-	ksz_write8(dev, REG_SW_PME_CTRL, 0);
+-
+-	return 0;
++	return ksz_write8(dev, regs[REG_SW_PME_CTRL], 0);
+ }
+ 
+ u32 ksz9477_get_port_addr(int port, int offset)
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 7afe958d0e21..e2a9a652c41a 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -348,9 +348,9 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
+ 	.mdb_add = ksz9477_mdb_add,
+ 	.mdb_del = ksz9477_mdb_del,
+ 	.change_mtu = ksz9477_change_mtu,
+-	.get_wol = ksz9477_get_wol,
+-	.set_wol = ksz9477_set_wol,
+-	.wol_pre_shutdown = ksz9477_wol_pre_shutdown,
++	.pme_write8 = ksz_write8,
++	.pme_pread8 = ksz_pread8,
++	.pme_pwrite8 = ksz_pwrite8,
+ 	.config_cpu_port = ksz9477_config_cpu_port,
+ 	.tc_cbs_set_cinc = ksz9477_tc_cbs_set_cinc,
+ 	.enable_stp_addr = ksz9477_enable_stp_addr,
+@@ -539,6 +539,9 @@ static const u16 ksz9477_regs[] = {
+ 	[S_MULTICAST_CTRL]		= 0x0331,
+ 	[P_XMII_CTRL_0]			= 0x0300,
+ 	[P_XMII_CTRL_1]			= 0x0301,
++	[REG_SW_PME_CTRL]		= 0x0006,
++	[REG_PORT_PME_STATUS]		= 0x0013,
++	[REG_PORT_PME_CTRL]		= 0x0017,
+ };
+ 
+ static const u32 ksz9477_masks[] = {
+@@ -3742,17 +3745,8 @@ static int ksz_setup_tc(struct dsa_switch *ds, int port,
+ 	}
+ }
+ 
+-static void ksz_get_wol(struct dsa_switch *ds, int port,
+-			struct ethtool_wolinfo *wol)
 -{
--	u8 pme_status;
--	int ret;
+-	struct ksz_device *dev = ds->priv;
 -
--	ret = ksz_pread8(dev, port, REG_PORT_PME_STATUS, &pme_status);
--	if (ret)
--		return ret;
--
--	if (!pme_status)
--		return 0;
--
--	dev_dbg(dev->dev, "Wake event on port %d due to:%s%s%s\n", port,
--		pme_status & PME_WOL_MAGICPKT ? " \"Magic Packet\"" : "",
--		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
--		pme_status & PME_WOL_ENERGY ? " \"Energy detect\"" : "");
--
--	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
+-	if (dev->dev_ops->get_wol)
+-		dev->dev_ops->get_wol(dev, port, wol);
 -}
 -
--/**
+ /**
+- * ksz9477_handle_wake_reason - Handle wake reason on a specified port.
++ * ksz_handle_wake_reason - Handle wake reason on a specified port.
+  * @dev: The device structure.
+  * @port: The port number.
+  *
+@@ -3764,12 +3758,15 @@ static void ksz_get_wol(struct dsa_switch *ds, int port,
+  *
+  * Return: 0 on success, or an error code on failure.
+  */
+-int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
++int ksz_handle_wake_reason(struct ksz_device *dev, int port)
+ {
++	const struct ksz_dev_ops *ops = dev->dev_ops;
++	const u16 *regs = dev->info->regs;
+ 	u8 pme_status;
+ 	int ret;
+ 
+-	ret = ksz_pread8(dev, port, REG_PORT_PME_STATUS, &pme_status);
++	ret = ops->pme_pread8(dev, port, regs[REG_PORT_PME_STATUS],
++			      &pme_status);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -3781,25 +3778,31 @@ int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
+ 		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
+ 		pme_status & PME_WOL_ENERGY ? " \"Energy detect\"" : "");
+ 
+-	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
++	return ops->pme_pwrite8(dev, port, regs[REG_PORT_PME_STATUS],
++				pme_status);
+ }
+ 
+ /**
 - * ksz9477_get_wol - Get Wake-on-LAN settings for a specified port.
 - * @dev: The device structure.
-- * @port: The port number.
-- * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-- *
++ * ksz_get_wol - Get Wake-on-LAN settings for a specified port.
++ * @ds: The dsa_switch structure.
+  * @port: The port number.
+  * @wol: Pointer to ethtool Wake-on-LAN settings structure.
+  *
 - * This function checks the PME Pin Control Register to see if  PME Pin Output
 - * Enable is set, indicating PME is enabled. If enabled, it sets the supported
 - * and active WoL flags.
-- */
++ * This function checks the device PME wakeup_source flag and chip_id.
++ * If enabled and supported, it sets the supported and active WoL
++ * flags.
+  */
 -void ksz9477_get_wol(struct ksz_device *dev, int port,
 -		     struct ethtool_wolinfo *wol)
--{
--	u8 pme_ctrl;
--	int ret;
--
--	if (!dev->wakeup_source)
--		return;
--
--	wol->supported = WAKE_PHY;
--
--	/* Check if the current MAC address on this port can be set
--	 * as global for WAKE_MAGIC support. The result may vary
--	 * dynamically based on other ports configurations.
--	 */
--	if (ksz_is_port_mac_global_usable(dev->ds, port))
--		wol->supported |= WAKE_MAGIC;
--
++static void ksz_get_wol(struct dsa_switch *ds, int port,
++			struct ethtool_wolinfo *wol)
+ {
++	struct ksz_device *dev = ds->priv;
++	const u16 *regs = dev->info->regs;
+ 	u8 pme_ctrl;
+ 	int ret;
+ 
++	if (!is_ksz9477(dev))
++		return;
++
+ 	if (!dev->wakeup_source)
+ 		return;
+ 
+@@ -3812,7 +3815,8 @@ void ksz9477_get_wol(struct ksz_device *dev, int port,
+ 	if (ksz_is_port_mac_global_usable(dev->ds, port))
+ 		wol->supported |= WAKE_MAGIC;
+ 
 -	ret = ksz_pread8(dev, port, REG_PORT_PME_CTRL, &pme_ctrl);
--	if (ret)
--		return;
++	ret = dev->dev_ops->pme_pread8(dev, port, regs[REG_PORT_PME_CTRL],
++				       &pme_ctrl);
+ 	if (ret)
+ 		return;
+ 
+@@ -3822,35 +3826,26 @@ void ksz9477_get_wol(struct ksz_device *dev, int port,
+ 		wol->wolopts |= WAKE_PHY;
+ }
+ 
+-static int ksz_set_wol(struct dsa_switch *ds, int port,
+-		       struct ethtool_wolinfo *wol)
+-{
+-	struct ksz_device *dev = ds->priv;
 -
--	if (pme_ctrl & PME_WOL_MAGICPKT)
--		wol->wolopts |= WAKE_MAGIC;
--	if (pme_ctrl & (PME_WOL_LINKUP | PME_WOL_ENERGY))
--		wol->wolopts |= WAKE_PHY;
+-	if (dev->dev_ops->set_wol)
+-		return dev->dev_ops->set_wol(dev, port, wol);
+-
+-	return -EOPNOTSUPP;
 -}
 -
--/**
+ /**
 - * ksz9477_set_wol - Set Wake-on-LAN settings for a specified port.
 - * @dev: The device structure.
-- * @port: The port number.
-- * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-- *
++ * ksz_set_wol - Set Wake-on-LAN settings for a specified port.
++ * @ds: The dsa_switch structure.
+  * @port: The port number.
+  * @wol: Pointer to ethtool Wake-on-LAN settings structure.
+  *
 - * This function configures Wake-on-LAN (WoL) settings for a specified port.
 - * It validates the provided WoL options, checks if PME is enabled via the
 - * switch's PME Pin Control Register, clears any previous wake reasons,
 - * and sets the Magic Packet flag in the port's PME control register if
-- * specified.
-- *
-- * Return: 0 on success, or other error codes on failure.
-- */
++ * This function configures Wake-on-LAN (WoL) settings for a specified
++ * port. It validates the provided WoL options, checks if PME is
++ * enabled and supported, clears any previous wake reasons, and sets
++ * the Magic Packet flag in the port's PME control register if
+  * specified.
+  *
+  * Return: 0 on success, or other error codes on failure.
+  */
 -int ksz9477_set_wol(struct ksz_device *dev, int port,
 -		    struct ethtool_wolinfo *wol)
--{
--	u8 pme_ctrl = 0, pme_ctrl_old = 0;
--	bool magic_switched_off;
--	bool magic_switched_on;
--	int ret;
--
--	if (wol->wolopts & ~(WAKE_PHY | WAKE_MAGIC))
--		return -EINVAL;
--
--	if (!dev->wakeup_source)
--		return -EOPNOTSUPP;
--
++static int ksz_set_wol(struct dsa_switch *ds, int port,
++		       struct ethtool_wolinfo *wol)
+ {
+ 	u8 pme_ctrl = 0, pme_ctrl_old = 0;
++	struct ksz_device *dev = ds->priv;
++	const u16 *regs = dev->info->regs;
+ 	bool magic_switched_off;
+ 	bool magic_switched_on;
+ 	int ret;
+@@ -3858,10 +3853,13 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ 	if (wol->wolopts & ~(WAKE_PHY | WAKE_MAGIC))
+ 		return -EINVAL;
+ 
++	if (!is_ksz9477(dev))
++		return -EOPNOTSUPP;
++
+ 	if (!dev->wakeup_source)
+ 		return -EOPNOTSUPP;
+ 
 -	ret = ksz9477_handle_wake_reason(dev, port);
--	if (ret)
--		return ret;
--
--	if (wol->wolopts & WAKE_MAGIC)
--		pme_ctrl |= PME_WOL_MAGICPKT;
--	if (wol->wolopts & WAKE_PHY)
--		pme_ctrl |= PME_WOL_LINKUP | PME_WOL_ENERGY;
--
++	ret = ksz_handle_wake_reason(dev, port);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -3870,7 +3868,8 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ 	if (wol->wolopts & WAKE_PHY)
+ 		pme_ctrl |= PME_WOL_LINKUP | PME_WOL_ENERGY;
+ 
 -	ret = ksz_pread8(dev, port, REG_PORT_PME_CTRL, &pme_ctrl_old);
--	if (ret)
--		return ret;
--
--	if (pme_ctrl_old == pme_ctrl)
--		return 0;
--
--	magic_switched_off = (pme_ctrl_old & PME_WOL_MAGICPKT) &&
--			    !(pme_ctrl & PME_WOL_MAGICPKT);
--	magic_switched_on = !(pme_ctrl_old & PME_WOL_MAGICPKT) &&
--			    (pme_ctrl & PME_WOL_MAGICPKT);
--
--	/* To keep reference count of MAC address, we should do this
--	 * operation only on change of WOL settings.
--	 */
--	if (magic_switched_on) {
--		ret = ksz_switch_macaddr_get(dev->ds, port, NULL);
--		if (ret)
--			return ret;
--	} else if (magic_switched_off) {
--		ksz_switch_macaddr_put(dev->ds);
--	}
--
++	ret = dev->dev_ops->pme_pread8(dev, port, regs[REG_PORT_PME_CTRL],
++				       &pme_ctrl_old);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -3893,7 +3892,8 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ 		ksz_switch_macaddr_put(dev->ds);
+ 	}
+ 
 -	ret = ksz_pwrite8(dev, port, REG_PORT_PME_CTRL, pme_ctrl);
--	if (ret) {
--		if (magic_switched_on)
--			ksz_switch_macaddr_put(dev->ds);
--		return ret;
--	}
--
--	return 0;
--}
--
--/**
++	ret = dev->dev_ops->pme_pwrite8(dev, port, regs[REG_PORT_PME_CTRL],
++					pme_ctrl);
+ 	if (ret) {
+ 		if (magic_switched_on)
+ 			ksz_switch_macaddr_put(dev->ds);
+@@ -3904,8 +3904,8 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ }
+ 
+ /**
 - * ksz9477_wol_pre_shutdown - Prepares the switch device for shutdown while
 - *                            considering Wake-on-LAN (WoL) settings.
-- * @dev: The switch device structure.
-- * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
-- *               enabled on any port.
-- *
-- * This function prepares the switch device for a safe shutdown while taking
-- * into account the Wake-on-LAN (WoL) settings on the user ports. It updates
-- * the wol_enabled flag accordingly to reflect whether WoL is active on any
-- * port.
-- */
++ * ksz_wol_pre_shutdown - Prepares the switch device for shutdown while
++ *                        considering Wake-on-LAN (WoL) settings.
+  * @dev: The switch device structure.
+  * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
+  *               enabled on any port.
+@@ -3915,32 +3915,38 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+  * the wol_enabled flag accordingly to reflect whether WoL is active on any
+  * port.
+  */
 -void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
--{
--	struct dsa_port *dp;
--	int ret;
--
--	*wol_enabled = false;
--
--	if (!dev->wakeup_source)
--		return;
--
--	dsa_switch_for_each_user_port(dp, dev->ds) {
--		u8 pme_ctrl = 0;
--
--		ret = ksz_pread8(dev, dp->index, REG_PORT_PME_CTRL, &pme_ctrl);
--		if (!ret && pme_ctrl)
--			*wol_enabled = true;
--
--		/* make sure there are no pending wake events which would
--		 * prevent the device from going to sleep/shutdown.
--		 */
--		ksz9477_handle_wake_reason(dev, dp->index);
--	}
--
--	/* Now we are save to enable PME pin. */
--	if (*wol_enabled)
--		ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
--}
--
- static int ksz9477_wait_vlan_ctrl_ready(struct ksz_device *dev)
++static void ksz_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
  {
- 	unsigned int val;
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
-index 239a281da10b..d2166b0d881e 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -60,11 +60,6 @@ void ksz9477_switch_exit(struct ksz_device *dev);
- void ksz9477_port_queue_split(struct ksz_device *dev, int port);
- void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr);
- void ksz9477_hsr_leave(struct dsa_switch *ds, int port, struct net_device *hsr);
++	const struct ksz_dev_ops *ops = dev->dev_ops;
++	const u16 *regs = dev->info->regs;
+ 	struct dsa_port *dp;
+ 	int ret;
+ 
+ 	*wol_enabled = false;
+ 
++	if (!is_ksz9477(dev))
++		return;
++
+ 	if (!dev->wakeup_source)
+ 		return;
+ 
+ 	dsa_switch_for_each_user_port(dp, dev->ds) {
+ 		u8 pme_ctrl = 0;
+ 
+-		ret = ksz_pread8(dev, dp->index, REG_PORT_PME_CTRL, &pme_ctrl);
++		ret = ops->pme_pread8(dev, dp->index,
++				      regs[REG_PORT_PME_CTRL], &pme_ctrl);
+ 		if (!ret && pme_ctrl)
+ 			*wol_enabled = true;
+ 
+ 		/* make sure there are no pending wake events which would
+ 		 * prevent the device from going to sleep/shutdown.
+ 		 */
+-		ksz9477_handle_wake_reason(dev, dp->index);
++		ksz_handle_wake_reason(dev, dp->index);
+ 	}
+ 
+ 	/* Now we are save to enable PME pin. */
+ 	if (*wol_enabled)
+-		ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
++		ops->pme_write8(dev, regs[REG_SW_PME_CTRL], PME_ENABLE);
+ }
+ 
+ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
+@@ -4253,8 +4259,7 @@ void ksz_switch_shutdown(struct ksz_device *dev)
+ {
+ 	bool wol_enabled = false;
+ 
+-	if (dev->dev_ops->wol_pre_shutdown)
+-		dev->dev_ops->wol_pre_shutdown(dev, &wol_enabled);
++	ksz_wol_pre_shutdown(dev, &wol_enabled);
+ 
+ 	if (dev->dev_ops->reset && !wol_enabled)
+ 		dev->dev_ops->reset(dev);
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index e35caca96f89..c60c218afa64 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -235,6 +235,9 @@ enum ksz_regs {
+ 	S_MULTICAST_CTRL,
+ 	P_XMII_CTRL_0,
+ 	P_XMII_CTRL_1,
++	REG_SW_PME_CTRL,
++	REG_PORT_PME_STATUS,
++	REG_PORT_PME_CTRL,
+ };
+ 
+ enum ksz_masks {
+@@ -354,6 +357,11 @@ struct ksz_dev_ops {
+ 	void (*get_caps)(struct ksz_device *dev, int port,
+ 			 struct phylink_config *config);
+ 	int (*change_mtu)(struct ksz_device *dev, int port, int mtu);
++	int (*pme_write8)(struct ksz_device *dev, u32 reg, u8 value);
++	int (*pme_pread8)(struct ksz_device *dev, int port, int offset,
++			  u8 *data);
++	int (*pme_pwrite8)(struct ksz_device *dev, int port, int offset,
++			   u8 data);
+ 	void (*freeze_mib)(struct ksz_device *dev, int port, bool freeze);
+ 	void (*port_init_cnt)(struct ksz_device *dev, int port);
+ 	void (*phylink_mac_link_up)(struct ksz_device *dev, int port,
+@@ -363,11 +371,6 @@ struct ksz_dev_ops {
+ 				    int duplex, bool tx_pause, bool rx_pause);
+ 	void (*setup_rgmii_delay)(struct ksz_device *dev, int port);
+ 	int (*tc_cbs_set_cinc)(struct ksz_device *dev, int port, u32 val);
+-	void (*get_wol)(struct ksz_device *dev, int port,
+-			struct ethtool_wolinfo *wol);
+-	int (*set_wol)(struct ksz_device *dev, int port,
+-		       struct ethtool_wolinfo *wol);
+-	void (*wol_pre_shutdown)(struct ksz_device *dev, bool *wol_enabled);
+ 	void (*config_cpu_port)(struct dsa_switch *ds);
+ 	int (*enable_stp_addr)(struct ksz_device *dev);
+ 	int (*reset)(struct ksz_device *dev);
+@@ -391,12 +394,7 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
+ 			   struct netlink_ext_ack *extack);
+ void ksz_switch_macaddr_put(struct dsa_switch *ds);
+ void ksz_switch_shutdown(struct ksz_device *dev);
+-int ksz9477_handle_wake_reason(struct ksz_device *dev, int port);
 -void ksz9477_get_wol(struct ksz_device *dev, int port,
 -		     struct ethtool_wolinfo *wol);
 -int ksz9477_set_wol(struct ksz_device *dev, int port,
 -		    struct ethtool_wolinfo *wol);
 -void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled);
- 
- int ksz9477_port_acl_init(struct ksz_device *dev, int port);
- void ksz9477_port_acl_free(struct ksz_device *dev, int port);
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/microchip/ksz9477_reg.h
-index d5354c600ea1..04235c22bf40 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -38,11 +38,6 @@
- #define SWITCH_REVISION_S		4
- #define SWITCH_RESET			0x01
- 
--#define REG_SW_PME_CTRL			0x0006
--
--#define PME_ENABLE			BIT(1)
--#define PME_POLARITY			BIT(0)
--
- #define REG_GLOBAL_OPTIONS		0x000F
- 
- #define SW_GIGABIT_ABLE			BIT(6)
-@@ -807,13 +802,6 @@
- #define REG_PORT_AVB_SR_1_TYPE		0x0008
- #define REG_PORT_AVB_SR_2_TYPE		0x000A
- 
--#define REG_PORT_PME_STATUS		0x0013
--#define REG_PORT_PME_CTRL		0x0017
--
--#define PME_WOL_MAGICPKT		BIT(2)
--#define PME_WOL_LINKUP			BIT(1)
--#define PME_WOL_ENERGY			BIT(0)
--
- #define REG_PORT_INT_STATUS		0x001B
- #define REG_PORT_INT_MASK		0x001F
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 1491099528be..7afe958d0e21 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -3751,6 +3751,77 @@ static void ksz_get_wol(struct dsa_switch *ds, int port,
- 		dev->dev_ops->get_wol(dev, port, wol);
- }
- 
-+/**
-+ * ksz9477_handle_wake_reason - Handle wake reason on a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ *
-+ * This function reads the PME (Power Management Event) status register of a
-+ * specified port to determine the wake reason. If there is no wake event, it
-+ * returns early. Otherwise, it logs the wake reason which could be due to a
-+ * "Magic Packet", "Link Up", or "Energy Detect" event. The PME status register
-+ * is then cleared to acknowledge the handling of the wake event.
-+ *
-+ * Return: 0 on success, or an error code on failure.
-+ */
-+int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
-+{
-+	u8 pme_status;
-+	int ret;
-+
-+	ret = ksz_pread8(dev, port, REG_PORT_PME_STATUS, &pme_status);
-+	if (ret)
-+		return ret;
-+
-+	if (!pme_status)
-+		return 0;
-+
-+	dev_dbg(dev->dev, "Wake event on port %d due to:%s%s%s\n", port,
-+		pme_status & PME_WOL_MAGICPKT ? " \"Magic Packet\"" : "",
-+		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
-+		pme_status & PME_WOL_ENERGY ? " \"Energy detect\"" : "");
-+
-+	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
-+}
-+
-+/**
-+ * ksz9477_get_wol - Get Wake-on-LAN settings for a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-+ *
-+ * This function checks the PME Pin Control Register to see if  PME Pin Output
-+ * Enable is set, indicating PME is enabled. If enabled, it sets the supported
-+ * and active WoL flags.
-+ */
-+void ksz9477_get_wol(struct ksz_device *dev, int port,
-+		     struct ethtool_wolinfo *wol)
-+{
-+	u8 pme_ctrl;
-+	int ret;
-+
-+	if (!dev->wakeup_source)
-+		return;
-+
-+	wol->supported = WAKE_PHY;
-+
-+	/* Check if the current MAC address on this port can be set
-+	 * as global for WAKE_MAGIC support. The result may vary
-+	 * dynamically based on other ports configurations.
-+	 */
-+	if (ksz_is_port_mac_global_usable(dev->ds, port))
-+		wol->supported |= WAKE_MAGIC;
-+
-+	ret = ksz_pread8(dev, port, REG_PORT_PME_CTRL, &pme_ctrl);
-+	if (ret)
-+		return;
-+
-+	if (pme_ctrl & PME_WOL_MAGICPKT)
-+		wol->wolopts |= WAKE_MAGIC;
-+	if (pme_ctrl & (PME_WOL_LINKUP | PME_WOL_ENERGY))
-+		wol->wolopts |= WAKE_PHY;
-+}
-+
- static int ksz_set_wol(struct dsa_switch *ds, int port,
- 		       struct ethtool_wolinfo *wol)
- {
-@@ -3762,6 +3833,116 @@ static int ksz_set_wol(struct dsa_switch *ds, int port,
- 	return -EOPNOTSUPP;
- }
- 
-+/**
-+ * ksz9477_set_wol - Set Wake-on-LAN settings for a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-+ *
-+ * This function configures Wake-on-LAN (WoL) settings for a specified port.
-+ * It validates the provided WoL options, checks if PME is enabled via the
-+ * switch's PME Pin Control Register, clears any previous wake reasons,
-+ * and sets the Magic Packet flag in the port's PME control register if
-+ * specified.
-+ *
-+ * Return: 0 on success, or other error codes on failure.
-+ */
-+int ksz9477_set_wol(struct ksz_device *dev, int port,
-+		    struct ethtool_wolinfo *wol)
-+{
-+	u8 pme_ctrl = 0, pme_ctrl_old = 0;
-+	bool magic_switched_off;
-+	bool magic_switched_on;
-+	int ret;
-+
-+	if (wol->wolopts & ~(WAKE_PHY | WAKE_MAGIC))
-+		return -EINVAL;
-+
-+	if (!dev->wakeup_source)
-+		return -EOPNOTSUPP;
-+
-+	ret = ksz9477_handle_wake_reason(dev, port);
-+	if (ret)
-+		return ret;
-+
-+	if (wol->wolopts & WAKE_MAGIC)
-+		pme_ctrl |= PME_WOL_MAGICPKT;
-+	if (wol->wolopts & WAKE_PHY)
-+		pme_ctrl |= PME_WOL_LINKUP | PME_WOL_ENERGY;
-+
-+	ret = ksz_pread8(dev, port, REG_PORT_PME_CTRL, &pme_ctrl_old);
-+	if (ret)
-+		return ret;
-+
-+	if (pme_ctrl_old == pme_ctrl)
-+		return 0;
-+
-+	magic_switched_off = (pme_ctrl_old & PME_WOL_MAGICPKT) &&
-+			    !(pme_ctrl & PME_WOL_MAGICPKT);
-+	magic_switched_on = !(pme_ctrl_old & PME_WOL_MAGICPKT) &&
-+			    (pme_ctrl & PME_WOL_MAGICPKT);
-+
-+	/* To keep reference count of MAC address, we should do this
-+	 * operation only on change of WOL settings.
-+	 */
-+	if (magic_switched_on) {
-+		ret = ksz_switch_macaddr_get(dev->ds, port, NULL);
-+		if (ret)
-+			return ret;
-+	} else if (magic_switched_off) {
-+		ksz_switch_macaddr_put(dev->ds);
-+	}
-+
-+	ret = ksz_pwrite8(dev, port, REG_PORT_PME_CTRL, pme_ctrl);
-+	if (ret) {
-+		if (magic_switched_on)
-+			ksz_switch_macaddr_put(dev->ds);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ksz9477_wol_pre_shutdown - Prepares the switch device for shutdown while
-+ *                            considering Wake-on-LAN (WoL) settings.
-+ * @dev: The switch device structure.
-+ * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
-+ *               enabled on any port.
-+ *
-+ * This function prepares the switch device for a safe shutdown while taking
-+ * into account the Wake-on-LAN (WoL) settings on the user ports. It updates
-+ * the wol_enabled flag accordingly to reflect whether WoL is active on any
-+ * port.
-+ */
-+void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
-+{
-+	struct dsa_port *dp;
-+	int ret;
-+
-+	*wol_enabled = false;
-+
-+	if (!dev->wakeup_source)
-+		return;
-+
-+	dsa_switch_for_each_user_port(dp, dev->ds) {
-+		u8 pme_ctrl = 0;
-+
-+		ret = ksz_pread8(dev, dp->index, REG_PORT_PME_CTRL, &pme_ctrl);
-+		if (!ret && pme_ctrl)
-+			*wol_enabled = true;
-+
-+		/* make sure there are no pending wake events which would
-+		 * prevent the device from going to sleep/shutdown.
-+		 */
-+		ksz9477_handle_wake_reason(dev, dp->index);
-+	}
-+
-+	/* Now we are save to enable PME pin. */
-+	if (*wol_enabled)
-+		ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
-+}
-+
- static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
- 				    const unsigned char *addr)
- {
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 5f0a628b9849..e35caca96f89 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -391,6 +391,12 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
- 			   struct netlink_ext_ack *extack);
- void ksz_switch_macaddr_put(struct dsa_switch *ds);
- void ksz_switch_shutdown(struct ksz_device *dev);
-+int ksz9477_handle_wake_reason(struct ksz_device *dev, int port);
-+void ksz9477_get_wol(struct ksz_device *dev, int port,
-+		     struct ethtool_wolinfo *wol);
-+int ksz9477_set_wol(struct ksz_device *dev, int port,
-+		    struct ethtool_wolinfo *wol);
-+void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled);
++int ksz_handle_wake_reason(struct ksz_device *dev, int port);
  
  /* Common register access functions */
  static inline struct regmap *ksz_regmap_8(struct ksz_device *dev)
-@@ -695,6 +701,19 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- #define P_MII_MAC_MODE			BIT(2)
+@@ -635,6 +633,11 @@ static inline bool is_ksz8(struct ksz_device *dev)
+ 	return ksz_is_ksz87xx(dev) || ksz_is_ksz88x3(dev);
+ }
+ 
++static inline bool is_ksz9477(struct ksz_device *dev)
++{
++	return dev->chip_id == KSZ9477_CHIP_ID;
++}
++
+ static inline int is_lan937x(struct ksz_device *dev)
+ {
+ 	return dev->chip_id == LAN9370_CHIP_ID ||
+@@ -702,15 +705,10 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
  #define P_MII_SEL_M			0x3
  
-+/* KSZ9477, KSZ8795 Wake-on-LAN (WoL) masks */
-+#define REG_PORT_PME_STATUS		0x0013
-+#define REG_PORT_PME_CTRL		0x0017
-+
-+#define PME_WOL_MAGICPKT		BIT(2)
-+#define PME_WOL_LINKUP			BIT(1)
-+#define PME_WOL_ENERGY			BIT(0)
-+
-+#define REG_SW_PME_CTRL			0x0006
-+
-+#define PME_ENABLE			BIT(1)
-+#define PME_POLARITY			BIT(0)
-+
- /* Interrupt */
- #define REG_SW_PORT_INT_STATUS__1	0x001B
- #define REG_SW_PORT_INT_MASK__1		0x001F
+ /* KSZ9477, KSZ8795 Wake-on-LAN (WoL) masks */
+-#define REG_PORT_PME_STATUS		0x0013
+-#define REG_PORT_PME_CTRL		0x0017
+-
+ #define PME_WOL_MAGICPKT		BIT(2)
+ #define PME_WOL_LINKUP			BIT(1)
+ #define PME_WOL_ENERGY			BIT(0)
+ 
+-#define REG_SW_PME_CTRL			0x0006
+-
+ #define PME_ENABLE			BIT(1)
+ #define PME_POLARITY			BIT(0)
+ 
 -- 
 2.43.0
 
