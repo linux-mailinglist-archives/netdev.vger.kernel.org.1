@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-117720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE34194EEAB
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:49:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD4F94EEB1
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844912818D2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:49:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DECA2B22FB2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C0417BB18;
-	Mon, 12 Aug 2024 13:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB5918130D;
+	Mon, 12 Aug 2024 13:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="d36eJxHX"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bySGq+Bk"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06A753370;
-	Mon, 12 Aug 2024 13:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F7B17CA03;
+	Mon, 12 Aug 2024 13:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723470560; cv=none; b=jq8mwMV3wF4hLhLmgJoFp0JWx85zFp6SvqiC2nv1hFPaFBim+Z69OiYexoVjwA4WthE1JVtOuyBH2X/IKuk0w5niHd2BK9p/VVs2sufp19uuMjySWHSfoUljPwABLCoG72FFVaThXa7Swj0hbUkFWsWmMuoPH07+fUbiYTLtwvg=
+	t=1723470562; cv=none; b=KD4DGAMD51yssxkOK07Q2aPGC2Vx9ycgnLQVEG/pmttfq1TivDAzcvRUEDS/9ZT62jNQWMsxEArZDTrAupK05U+B9KW7UqnwOXy+X/mU7y3vXCtX8d72QKa+jZ3UBdFVxFeWgydqepkgY0r00d4iliTwwbs7g6yvknzpBwRT5Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723470560; c=relaxed/simple;
-	bh=S6hoDiubSjQshP/GCpTgkSBiOC9sYhgRGEWeFje//MI=;
+	s=arc-20240116; t=1723470562; c=relaxed/simple;
+	bh=tOUANnEFpl3H68hQRgKU8vbAucntHBRRrjm04G2x0ps=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=twYY+CxIiP24T2Wjb4fx4siWFKQkrNTvCrXzoUWyNe65dUOE9CaKa9sWwPQeshk/gzHDU8imlAwOWkTS8Y6xBC1x3BadlTog/12ElPBJAm4WQhJv3+JzjX2zztdfB+O4py1PujMZylCayL+v1OEa3L5SmNU4ryPGws1KMQ991A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=d36eJxHX; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=EcvD+XluBgnJ4ckrhttaMUPAf49QkozDCPhAxlEyMOiqqmtqUW1tBkooLtYo0MeBubswlDva8yUX9+VneZITiSjTAGffNA/qD5QycFJtXlh6NqpnsehRtH+LwXp5Tp0sqszNTb6AW54CAJVvRm0JHnDZ8mw115dOaB5qKj9nya4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bySGq+Bk; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723470558; x=1755006558;
+  t=1723470560; x=1755006560;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=S6hoDiubSjQshP/GCpTgkSBiOC9sYhgRGEWeFje//MI=;
-  b=d36eJxHX1XBVujfiG8CDM0dCKp6N83bb+4lj+r6QfL9QoAEXOAtxLHlc
-   q9GA4f6MEjJC7cc8XzfZifWJKD1dnoETLU5m1IiDM+SOMO4Oe5yY1SuA6
-   UvK+l2/Nq9KJdCccChK1Kbq3Mnppv6X7M38h+PBDFI1ZIqngLHbxky/Mi
-   AffqDVU6MFveG6qoxy4IH8IMbZl/wAGVyFgx/QtgUFXqeM01V1e9LiDIQ
-   RgY7kmlckB9ydScdiBKpZondPSucDXWgllKaes1kp3AmC0IlC89vlPlaM
-   BRoXs6bnLkB62S9Mpfkkq9i0k4mNxj8QnSQcMT6z6xo8Xq7TwwBm3RKLV
-   g==;
-X-CSE-ConnectionGUID: kPkSNNkqRiKssk122yqRMw==
-X-CSE-MsgGUID: +cN3otFkQYe3CpLDrgoVsQ==
+  bh=tOUANnEFpl3H68hQRgKU8vbAucntHBRRrjm04G2x0ps=;
+  b=bySGq+Bk2pW7ET3V5xwQojN5LRvWnP5j2ZKakUqh3hpiL9e9DqRjlLuA
+   +1c5IWJuAt4ZuktaSXLuCw5eynGHBRxC28EIgn8fJJeJoSAgkU5YXtsPS
+   Lrev+56erKl0yeB5ksfGWmz8XIG7y6P9MdywkF8HZFKFTof2q4hN2A42W
+   yVn2lA8LDP7iFiDey8GbHOln2++ELAIm/37Xfjh2onvYIAqL2XQRnOy42
+   de13QVJ/YtaY/W3VnZUNXYelFoOiinUDzStu84cXKkH7jZhTxHQnMkptQ
+   1g2t41VQH1GhLhs+9Q6x4rwvwXsUFC74BGHe1OW3dgsflZHIdGtIa6HDZ
+   Q==;
+X-CSE-ConnectionGUID: yI+1XPNJS2+OYumvWzLkww==
+X-CSE-MsgGUID: WmqDsjmCQY6sR4bZtVyDtA==
 X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
-   d="scan'208";a="31049500"
+   d="scan'208";a="31049515"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 06:49:16 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Aug 2024 06:49:18 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 12 Aug 2024 06:48:58 -0700
+ 15.1.2507.35; Mon, 12 Aug 2024 06:49:03 -0700
 Received: from che-ll-i17164.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 06:48:54 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Aug 2024 06:48:59 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -66,9 +66,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next 3/7] net: phy: microchip_t1s: add support for Microchip's LAN865X Rev.B1
-Date: Mon, 12 Aug 2024 19:18:12 +0530
-Message-ID: <20240812134816.380688-4-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next 4/7] net: phy: microchip_t1s: move LAN867X reset handling to a new function
+Date: Mon, 12 Aug 2024 19:18:13 +0530
+Message-ID: <20240812134816.380688-5-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812134816.380688-1-Parthiban.Veerasooran@microchip.com>
 References: <20240812134816.380688-1-Parthiban.Veerasooran@microchip.com>
@@ -81,229 +81,46 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch adds support for LAN8650/1 Rev.B1. As per the latest
-configuration note AN1760 released (Revision F (DS60001760G - June 2024))
-for Rev.B0 is also applicable for Rev.B1. Refer hardware revisions list
-in the latest AN1760.
-https://www.microchip.com/en-us/application-notes/an1760
+This patch moves LAN867X reset handling code to a new function called
+lan867x_check_reset_complete() which will be useful for the next patch
+which also uses the same code to handle the reset functionality.
 
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/phy/Kconfig         |  4 +--
- drivers/net/phy/microchip_t1s.c | 62 ++++++++++++++++-----------------
- 2 files changed, 33 insertions(+), 33 deletions(-)
+ drivers/net/phy/microchip_t1s.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 7fddc8306d82..68db15d52355 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -282,8 +282,8 @@ config MICREL_PHY
- config MICROCHIP_T1S_PHY
- 	tristate "Microchip 10BASE-T1S Ethernet PHYs"
- 	help
--	  Currently supports the LAN8670/1/2 Rev.B1 and LAN8650/1 Rev.B0 Internal
--	  PHYs.
-+	  Currently supports the LAN8670/1/2 Rev.B1 and LAN8650/1 Rev.B0/B1
-+	  Internal PHYs.
- 
- config MICROCHIP_PHY
- 	tristate "Microchip PHYs"
 diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index 51ff97ffad0e..187540ae95c0 100644
+index 187540ae95c0..d0af02a25d01 100644
 --- a/drivers/net/phy/microchip_t1s.c
 +++ b/drivers/net/phy/microchip_t1s.c
-@@ -4,7 +4,7 @@
-  *
-  * Support: Microchip Phys:
-  *  lan8670/1/2 Rev.B1
-- *  lan8650/1 Rev.B0 Internal PHYs
-+ *  lan8650/1 Rev.B0/B1 Internal PHYs
-  */
- 
- #include <linux/kernel.h>
-@@ -12,7 +12,8 @@
- #include <linux/phy.h>
- 
- #define PHY_ID_LAN867X_REVB1 0x0007C162
--#define PHY_ID_LAN865X_REVB0 0x0007C1B3
-+/* Both Rev.B0 and B1 clause 22 PHYID's are same due to B1 chip limitation */
-+#define PHY_ID_LAN865X_REVB 0x0007C1B3
- 
- #define LAN867X_REG_STS2 0x0019
- 
-@@ -59,12 +60,12 @@ static const u16 lan867x_revb1_fixup_masks[12] = {
- 	0x0600, 0x7F00, 0x2000, 0xFFFF,
- };
- 
--/* LAN865x Rev.B0 configuration parameters from AN1760
-+/* LAN865x Rev.B0/B1 configuration parameters from AN1760
-  * As per the Configuration Application Note AN1760 published in the below link,
-  * https://www.microchip.com/en-us/application-notes/an1760
-  * Revision F (DS60001760G - June 2024)
-  */
--static const u32 lan865x_revb0_fixup_registers[17] = {
-+static const u32 lan865x_revb_fixup_registers[17] = {
- 	0x00D0, 0x00E0, 0x00E9, 0x00F5,
- 	0x00F4, 0x00F8, 0x00F9, 0x0081,
- 	0x0091, 0x0043, 0x0044, 0x0045,
-@@ -72,7 +73,7 @@ static const u32 lan865x_revb0_fixup_registers[17] = {
- 	0x0050,
- };
- 
--static const u16 lan865x_revb0_fixup_values[17] = {
-+static const u16 lan865x_revb_fixup_values[17] = {
- 	0x3F31, 0xC000, 0x9E50, 0x1CF8,
- 	0xC020, 0xB900, 0x4E53, 0x0080,
- 	0x9660, 0x00FF, 0xFFFF, 0x0000,
-@@ -80,23 +81,23 @@ static const u16 lan865x_revb0_fixup_values[17] = {
- 	0x0002,
- };
- 
--static const u16 lan865x_revb0_fixup_cfg_regs[2] = {
-+static const u16 lan865x_revb_fixup_cfg_regs[2] = {
- 	0x0084, 0x008A,
- };
- 
--static const u32 lan865x_revb0_sqi_fixup_regs[12] = {
-+static const u32 lan865x_revb_sqi_fixup_regs[12] = {
- 	0x00B0, 0x00B1, 0x00B2, 0x00B3,
- 	0x00B4, 0x00B5, 0x00B6, 0x00B7,
- 	0x00B8, 0x00B9, 0x00BA, 0x00BB,
- };
- 
--static const u16 lan865x_revb0_sqi_fixup_values[12] = {
-+static const u16 lan865x_revb_sqi_fixup_values[12] = {
- 	0x0103, 0x0910, 0x1D26, 0x002A,
- 	0x0103, 0x070D, 0x1720, 0x0027,
- 	0x0509, 0x0E13, 0x1C25, 0x002B,
- };
- 
--static const u16 lan865x_revb0_sqi_fixup_cfg_regs[3] = {
-+static const u16 lan865x_revb_sqi_fixup_cfg_regs[3] = {
- 	0x00AD, 0x00AE, 0x00AF,
- };
- 
-@@ -108,7 +109,7 @@ static const u16 lan865x_revb0_sqi_fixup_cfg_regs[3] = {
-  *
-  * 0x4 refers to memory map selector 4, which maps to MDIO_MMD_VEND2
-  */
--static int lan865x_revb0_indirect_read(struct phy_device *phydev, u16 addr)
-+static int lan865x_revb_indirect_read(struct phy_device *phydev, u16 addr)
- {
- 	int ret;
- 
-@@ -134,7 +135,7 @@ static int lan865x_generate_cfg_offsets(struct phy_device *phydev, s8 offsets[])
- 	int ret;
- 
- 	for (int i = 0; i < ARRAY_SIZE(fixup_regs); i++) {
--		ret = lan865x_revb0_indirect_read(phydev, fixup_regs[i]);
-+		ret = lan865x_revb_indirect_read(phydev, fixup_regs[i]);
- 		if (ret < 0)
- 			return ret;
- 
-@@ -183,11 +184,11 @@ static int lan865x_write_cfg_params(struct phy_device *phydev,
- 
- static int lan865x_setup_cfgparam(struct phy_device *phydev, s8 offsets[])
- {
--	u16 cfg_results[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
--	u16 cfg_params[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
-+	u16 cfg_results[ARRAY_SIZE(lan865x_revb_fixup_cfg_regs)];
-+	u16 cfg_params[ARRAY_SIZE(lan865x_revb_fixup_cfg_regs)];
- 	int ret;
- 
--	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
-+	ret = lan865x_read_cfg_params(phydev, lan865x_revb_fixup_cfg_regs,
- 				      cfg_params, ARRAY_SIZE(cfg_params));
- 	if (ret)
- 		return ret;
-@@ -197,17 +198,17 @@ static int lan865x_setup_cfgparam(struct phy_device *phydev, s8 offsets[])
- 			 0x03;
- 	cfg_results[1] = FIELD_PREP(GENMASK(15, 10), (40 + offsets[1]) & 0x3F);
- 
--	return lan865x_write_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
-+	return lan865x_write_cfg_params(phydev, lan865x_revb_fixup_cfg_regs,
- 					cfg_results, ARRAY_SIZE(cfg_results));
+@@ -265,7 +265,7 @@ static int lan865x_revb_config_init(struct phy_device *phydev)
+ 	return 0;
  }
  
- static int lan865x_setup_sqi_cfgparam(struct phy_device *phydev, s8 offsets[])
+-static int lan867x_revb1_config_init(struct phy_device *phydev)
++static int lan867x_check_reset_complete(struct phy_device *phydev)
  {
--	u16 cfg_results[ARRAY_SIZE(lan865x_revb0_sqi_fixup_cfg_regs)];
--	u16 cfg_params[ARRAY_SIZE(lan865x_revb0_sqi_fixup_cfg_regs)];
-+	u16 cfg_results[ARRAY_SIZE(lan865x_revb_sqi_fixup_cfg_regs)];
-+	u16 cfg_params[ARRAY_SIZE(lan865x_revb_sqi_fixup_cfg_regs)];
- 	int ret;
+ 	int err;
  
--	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_sqi_fixup_cfg_regs,
-+	ret = lan865x_read_cfg_params(phydev, lan865x_revb_sqi_fixup_cfg_regs,
- 				      cfg_params, ARRAY_SIZE(cfg_params));
- 	if (ret)
- 		return ret;
-@@ -219,12 +220,11 @@ static int lan865x_setup_sqi_cfgparam(struct phy_device *phydev, s8 offsets[])
- 	cfg_results[2] = FIELD_PREP(GENMASK(15, 8), (17 + offsets[0]) & 0x3F) |
- 			 ((22 + offsets[0]) & 0x3F);
- 
--	return lan865x_write_cfg_params(phydev,
--					lan865x_revb0_sqi_fixup_cfg_regs,
-+	return lan865x_write_cfg_params(phydev, lan865x_revb_sqi_fixup_cfg_regs,
- 					cfg_results, ARRAY_SIZE(cfg_results));
- }
- 
--static int lan865x_revb0_config_init(struct phy_device *phydev)
-+static int lan865x_revb_config_init(struct phy_device *phydev)
- {
- 	s8 offsets[2];
- 	int ret;
-@@ -236,10 +236,10 @@ static int lan865x_revb0_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
--	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_fixup_registers); i++) {
-+	for (int i = 0; i < ARRAY_SIZE(lan865x_revb_fixup_registers); i++) {
- 		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
--				    lan865x_revb0_fixup_registers[i],
--				    lan865x_revb0_fixup_values[i]);
-+				    lan865x_revb_fixup_registers[i],
-+				    lan865x_revb_fixup_values[i]);
- 		if (ret)
- 			return ret;
- 
-@@ -254,10 +254,10 @@ static int lan865x_revb0_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
--	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_sqi_fixup_regs); i++) {
-+	for (int i = 0; i < ARRAY_SIZE(lan865x_revb_sqi_fixup_regs); i++) {
- 		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
--				    lan865x_revb0_sqi_fixup_regs[i],
--				    lan865x_revb0_sqi_fixup_values[i]);
-+				    lan865x_revb_sqi_fixup_regs[i],
-+				    lan865x_revb_sqi_fixup_values[i]);
- 		if (ret)
- 			return ret;
+@@ -287,6 +287,17 @@ static int lan867x_revb1_config_init(struct phy_device *phydev)
+ 		}
  	}
-@@ -332,10 +332,10 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		.get_plca_status    = genphy_c45_plca_get_status,
- 	},
- 	{
--		PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB0),
--		.name               = "LAN865X Rev.B0 Internal Phy",
-+		PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB),
-+		.name               = "LAN865X Rev.B0/B1 Internal Phy",
- 		.features           = PHY_BASIC_T1S_P2MP_FEATURES,
--		.config_init        = lan865x_revb0_config_init,
-+		.config_init        = lan865x_revb_config_init,
- 		.read_status        = lan86xx_read_status,
- 		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
- 		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
-@@ -347,7 +347,7 @@ module_phy_driver(microchip_t1s_driver);
  
- static struct mdio_device_id __maybe_unused tbl[] = {
- 	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVB1) },
--	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB0) },
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB) },
- 	{ }
- };
- 
++	return 0;
++}
++
++static int lan867x_revb1_config_init(struct phy_device *phydev)
++{
++	int err;
++
++	err = lan867x_check_reset_complete(phydev);
++	if (err)
++		return err;
++
+ 	/* Reference to AN1699
+ 	 * https://ww1.microchip.com/downloads/aemDocuments/documents/AIS/ProductDocuments/SupportingCollateral/AN-LAN8670-1-2-config-60001699.pdf
+ 	 * AN1699 says Read, Modify, Write, but the Write is not required if the
 -- 
 2.34.1
 
