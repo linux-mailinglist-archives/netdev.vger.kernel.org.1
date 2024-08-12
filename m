@@ -1,73 +1,79 @@
-Return-Path: <netdev+bounces-117598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E0E94E72B
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 08:51:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD6D94E778
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A6B71C2121A
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 06:51:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 647171C2172B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 07:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96EB14F9E1;
-	Mon, 12 Aug 2024 06:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEA015F41F;
+	Mon, 12 Aug 2024 07:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EEZz87ec"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ku3Fu/yG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBE614B952
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 06:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9690B1509BF;
+	Mon, 12 Aug 2024 07:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723445499; cv=none; b=mpTd536LQ38jj5dG4x3gMncIpYpFyd8q7czuoLo0I2AchUCZyH/gim+rF04misw4Fp0viWc8/notCv9pqteHh2rmIi+W6rLLCcd1NOJqOhsu9426RG6GTvbPsDcb1uraJCvfBvD6hSjSGD9lr1WKi/q1JLEekUar1A8sZDYROI0=
+	t=1723446614; cv=none; b=qr8ZkVSWePXv4LCmIP0XAsJKuCEUGB1VC30pzdKuFi9gB+gZYrwa0z87CSkODviuQ2VZIJvkJWb3toetG5lSVRe9G+8IeJ2dhV24cxEKN4fqemgJdUuRilBm5Yaoy237fDF+4Nd+BPGwF7u7kBgvnyGxbYQEljgvVlN84ji6iCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723445499; c=relaxed/simple;
-	bh=NfP47b8rhgr998pR0MP4dgFPvijX8qMvLBCsegVfSKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=i3GLDhy8yCoGPhS+rO33KqbyEFUxPN+T8S4DiEVNCB5Bts02Vgfv2ai4fjZGFVncFq4M0d925Txr8G+eOVgMaGkjzFqG5YWizCvzUFraQjyLuVfcOHj4HQLsOmJ0O7Uli0qm1vsM9KGgvY3cMHuHh8ZPfOXSvZ/GIs5GreweJxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EEZz87ec; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723445497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=1JSqOjQOoZJPvMdrAEuSnMSUbbXI2WZ76CPXqjhdTnI=;
-	b=EEZz87ecc1Fdog14h2xshr+V1EQ7G6uyhClUHDBsR/ulNUxfZJBNPGnwA5aaXNAmvE+TSf
-	ORPKbJ/DQY7MlK8ctVSbp7USiPnb71/1S16x78WWyGK9d2FRWMoADLxBykZKN+ix8kCWML
-	dHzQ85j9ggZckBlt/6QMLNlR//n4g3s=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-KAUrqsgHOtKwJHkJ29eYFg-1; Mon,
- 12 Aug 2024 02:51:34 -0400
-X-MC-Unique: KAUrqsgHOtKwJHkJ29eYFg-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5871218EB226;
-	Mon, 12 Aug 2024 06:51:32 +0000 (UTC)
-Received: from asgard.redhat.com (unknown [10.45.242.9])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25188197703E;
-	Mon, 12 Aug 2024 06:51:27 +0000 (UTC)
-Date: Mon, 12 Aug 2024 08:51:23 +0200
-From: Eugene Syromiatnikov <esyr@redhat.com>
-To: mptcp@lists.linux.dev
-Cc: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Davide Caratti <dcaratti@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] mptcp: correct MPTCP_SUBFLOW_ATTR_SSN_OFFSET
- reserved size
-Message-ID: <20240812065024.GA19719@asgard.redhat.com>
+	s=arc-20240116; t=1723446614; c=relaxed/simple;
+	bh=UZFRD8D4N0lHM4LeVB279uikQiM2J27PBBWBYhoHXUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuIKU6u3CDCRqnw/l8mpRZ6/hdEzU3RvxgaqTuuFHUdUgUkdy/7xrJYOtSFG3ikKemFgguQI99ZAJQUMrzX6Met7yBCUpFsb5L1t7M2ip6HB/7NQvATvCkCd0R9PieQThIW+sL1+6zB/6nhpWjfkz+9wXch8kkv+Id4e3hOa7jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ku3Fu/yG; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723446611; x=1754982611;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UZFRD8D4N0lHM4LeVB279uikQiM2J27PBBWBYhoHXUc=;
+  b=ku3Fu/yGNhhzYT3AMRrFzkiLL0RzsYdzcMgqNT6BpLrT+CV6a6Ld0o54
+   hjvNxlWvAjA2n+bl284JI4SK06lUb/AsbPLP+MnmkfrgvQJO1bZXRGrS+
+   8ogncLocxxk+Y8ymNnsVw1OWHrUAYcbVwz826vYMAuo1314mjsVA1ubRQ
+   zOoj4UilmJrMcrbo8BX0okSYgqX/YGDe6Q01msZnFKB+X4Og/RlrrPyLh
+   Lg9mRtvkItedsncNVFAfymERdBlv5HaK9RIegFU5sMawtcsvyGxIoKrid
+   kTlhmh0lcj+aEL99Ke00Y3iK6xCml2HzVQzHbICzOGTacvOW/2OrA/vTX
+   g==;
+X-CSE-ConnectionGUID: wioEYvoGSvW8PIxo4rZoQQ==
+X-CSE-MsgGUID: FHFwFtvdRm6fpJgTxNv2xQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11161"; a="21710564"
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="21710564"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 00:10:10 -0700
+X-CSE-ConnectionGUID: y4ayYwMtQXmgDvxULXYVTw==
+X-CSE-MsgGUID: DdOnmdFyQ++ma4hzvd5N7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="57822857"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 12 Aug 2024 00:10:07 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sdPBt-000BTk-1d;
+	Mon, 12 Aug 2024 07:10:05 +0000
+Date: Mon, 12 Aug 2024 15:09:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Abhinav Jain <jain.abhinav177@gmail.com>, idryomov@gmail.com,
+	xiubli@redhat.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ceph-devel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, skhan@linuxfoundation.org,
+	javier.carrasco.cruz@gmail.com,
+	Abhinav Jain <jain.abhinav177@gmail.com>
+Subject: Re: [PATCH net v2] libceph: Make the arguments const as per the TODO
+Message-ID: <202408121452.qS7GNcws-lkp@intel.com>
+References: <20240811205509.1089027-1-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,42 +82,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <20240811205509.1089027-1-jain.abhinav177@gmail.com>
 
-ssn_offset field is u32 and is placed into the netlink response with
-nla_put_u32(), but only 2 bytes are reserved for the attribute payload
-in subflow_get_info_size() (even though it makes no difference
-in the end, as it is aligned up to 4 bytes).  Supply the correct
-argument to the relevant nla_total_size() call to make it less
-confusing.
+Hi Abhinav,
 
-Fixes: 5147dfb50832 ("mptcp: allow dumping subflow context to userspace")
-Signed-off-by: Eugene Syromiatnikov <esyr@redhat.com>
----
-v2:
-  - Added prefix to the patch subject
-  - Fixed commit message formatting (line width, "Fixes:" commit hash
-    prefix size)
-v1: https://lore.kernel.org/mptcp/20240809094321.GA8122@asgard.redhat.com/
----
- net/mptcp/diag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/net/mptcp/diag.c b/net/mptcp/diag.c
-index 3ae46b545d2c..2d3efb405437 100644
---- a/net/mptcp/diag.c
-+++ b/net/mptcp/diag.c
-@@ -94,7 +94,7 @@ static size_t subflow_get_info_size(const struct sock *sk)
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ */
- 		nla_total_size_64bit(8) +	/* MPTCP_SUBFLOW_ATTR_MAP_SEQ */
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_MAP_SFSEQ */
--		nla_total_size(2) +	/* MPTCP_SUBFLOW_ATTR_SSN_OFFSET */
-+		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_SSN_OFFSET */
- 		nla_total_size(2) +	/* MPTCP_SUBFLOW_ATTR_MAP_DATALEN */
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_FLAGS */
- 		nla_total_size(1) +	/* MPTCP_SUBFLOW_ATTR_ID_REM */
+[auto build test ERROR on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Abhinav-Jain/libceph-Make-the-arguments-const-as-per-the-TODO/20240812-045647
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240811205509.1089027-1-jain.abhinav177%40gmail.com
+patch subject: [PATCH net v2] libceph: Make the arguments const as per the TODO
+config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20240812/202408121452.qS7GNcws-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240812/202408121452.qS7GNcws-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408121452.qS7GNcws-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/array_size.h:5,
+                    from include/linux/string.h:6,
+                    from include/linux/ceph/ceph_debug.h:7,
+                    from net/ceph/crypto.c:3:
+   net/ceph/crypto.c: In function 'ceph_crypto_key_decode':
+>> net/ceph/crypto.c:93:26: error: passing argument 1 of 'ceph_has_room' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      93 |         ceph_decode_need(p, end, 2*sizeof(u16) + sizeof(key->created), bad);
+         |                          ^
+         |                          |
+         |                          const void **
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/ceph/crypto.c:93:9: note: in expansion of macro 'ceph_decode_need'
+      93 |         ceph_decode_need(p, end, 2*sizeof(u16) + sizeof(key->created), bad);
+         |         ^~~~~~~~~~~~~~~~
+   In file included from net/ceph/crypto.c:16:
+   include/linux/ceph/decode.h:52:41: note: expected 'void **' but argument is of type 'const void **'
+      52 | static inline bool ceph_has_room(void **p, void *end, size_t n)
+         |                                  ~~~~~~~^
+   net/ceph/crypto.c:93:29: warning: passing argument 2 of 'ceph_has_room' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+      93 |         ceph_decode_need(p, end, 2*sizeof(u16) + sizeof(key->created), bad);
+         |                             ^~~
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/ceph/crypto.c:93:9: note: in expansion of macro 'ceph_decode_need'
+      93 |         ceph_decode_need(p, end, 2*sizeof(u16) + sizeof(key->created), bad);
+         |         ^~~~~~~~~~~~~~~~
+   include/linux/ceph/decode.h:52:50: note: expected 'void *' but argument is of type 'const void *'
+      52 | static inline bool ceph_has_room(void **p, void *end, size_t n)
+         |                                            ~~~~~~^~~
+>> net/ceph/crypto.c:94:36: error: passing argument 1 of 'ceph_decode_16' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      94 |         key->type = ceph_decode_16(p);
+         |                                    ^
+         |                                    |
+         |                                    const void **
+   include/linux/ceph/decode.h:31:41: note: expected 'void **' but argument is of type 'const void **'
+      31 | static inline u16 ceph_decode_16(void **p)
+         |                                  ~~~~~~~^
+>> net/ceph/crypto.c:95:26: error: passing argument 1 of 'ceph_decode_copy' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      95 |         ceph_decode_copy(p, &key->created, sizeof(key->created));
+         |                          ^
+         |                          |
+         |                          const void **
+   include/linux/ceph/decode.h:43:44: note: expected 'void **' but argument is of type 'const void **'
+      43 | static inline void ceph_decode_copy(void **p, void *pv, size_t n)
+         |                                     ~~~~~~~^
+   net/ceph/crypto.c:96:35: error: passing argument 1 of 'ceph_decode_16' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      96 |         key->len = ceph_decode_16(p);
+         |                                   ^
+         |                                   |
+         |                                   const void **
+   include/linux/ceph/decode.h:31:41: note: expected 'void **' but argument is of type 'const void **'
+      31 | static inline u16 ceph_decode_16(void **p)
+         |                                  ~~~~~~~^
+   net/ceph/crypto.c:97:26: error: passing argument 1 of 'ceph_has_room' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      97 |         ceph_decode_need(p, end, key->len, bad);
+         |                          ^
+         |                          |
+         |                          const void **
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/ceph/crypto.c:97:9: note: in expansion of macro 'ceph_decode_need'
+      97 |         ceph_decode_need(p, end, key->len, bad);
+         |         ^~~~~~~~~~~~~~~~
+   include/linux/ceph/decode.h:52:41: note: expected 'void **' but argument is of type 'const void **'
+      52 | static inline bool ceph_has_room(void **p, void *end, size_t n)
+         |                                  ~~~~~~~^
+   net/ceph/crypto.c:97:29: warning: passing argument 2 of 'ceph_has_room' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+      97 |         ceph_decode_need(p, end, key->len, bad);
+         |                             ^~~
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/ceph/crypto.c:97:9: note: in expansion of macro 'ceph_decode_need'
+      97 |         ceph_decode_need(p, end, key->len, bad);
+         |         ^~~~~~~~~~~~~~~~
+   include/linux/ceph/decode.h:52:50: note: expected 'void *' but argument is of type 'const void *'
+      52 | static inline bool ceph_has_room(void **p, void *end, size_t n)
+         |                                            ~~~~~~^~~
+   net/ceph/crypto.c:98:31: warning: passing argument 2 of 'set_secret' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+      98 |         ret = set_secret(key, *p);
+         |                               ^~
+   net/ceph/crypto.c:23:58: note: expected 'void *' but argument is of type 'const void *'
+      23 | static int set_secret(struct ceph_crypto_key *key, void *buf)
+         |                                                    ~~~~~~^~~
+   net/ceph/crypto.c:99:26: warning: passing argument 1 of 'memzero_explicit' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+      99 |         memzero_explicit(*p, key->len);
+         |                          ^~
+   include/linux/string.h:356:43: note: expected 'void *' but argument is of type 'const void *'
+     356 | static inline void memzero_explicit(void *s, size_t count)
+         |                                     ~~~~~~^
+   during RTL pass: mach
+   net/ceph/crypto.c: In function 'ceph_crypto_key_unarmor':
+   net/ceph/crypto.c:134:1: internal compiler error: in arc_ifcvt, at config/arc/arc.cc:9703
+     134 | }
+         | ^
+   0x5b78c1 arc_ifcvt
+   	/tmp/build-crosstools-gcc-13.2.0-binutils-2.41/gcc/gcc-13.2.0/gcc/config/arc/arc.cc:9703
+   0xe431b4 arc_reorg
+   	/tmp/build-crosstools-gcc-13.2.0-binutils-2.41/gcc/gcc-13.2.0/gcc/config/arc/arc.cc:8552
+   0xaed299 execute
+   	/tmp/build-crosstools-gcc-13.2.0-binutils-2.41/gcc/gcc-13.2.0/gcc/reorg.cc:3927
+   Please submit a full bug report, with preprocessed source (by using -freport-bug).
+   Please include the complete backtrace with any bug report.
+   See <https://gcc.gnu.org/bugs/> for instructions.
+
+
+vim +/ceph_has_room +93 net/ceph/crypto.c
+
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02   88  
+19c7b44529ef1b net/ceph/crypto.c Abhinav Jain 2024-08-12   89  int ceph_crypto_key_decode(struct ceph_crypto_key *key, const void **p, const void *end)
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02   90  {
+7af3ea189a9a13 net/ceph/crypto.c Ilya Dryomov 2016-12-02   91  	int ret;
+7af3ea189a9a13 net/ceph/crypto.c Ilya Dryomov 2016-12-02   92  
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  @93  	ceph_decode_need(p, end, 2*sizeof(u16) + sizeof(key->created), bad);
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  @94  	key->type = ceph_decode_16(p);
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  @95  	ceph_decode_copy(p, &key->created, sizeof(key->created));
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02   96  	key->len = ceph_decode_16(p);
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02   97  	ceph_decode_need(p, end, key->len, bad);
+7af3ea189a9a13 net/ceph/crypto.c Ilya Dryomov 2016-12-02   98  	ret = set_secret(key, *p);
+10f42b3e648377 net/ceph/crypto.c Ilya Dryomov 2020-12-22   99  	memzero_explicit(*p, key->len);
+7af3ea189a9a13 net/ceph/crypto.c Ilya Dryomov 2016-12-02  100  	*p += key->len;
+7af3ea189a9a13 net/ceph/crypto.c Ilya Dryomov 2016-12-02  101  	return ret;
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  102  
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  103  bad:
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  104  	dout("failed to decode crypto key\n");
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  105  	return -EINVAL;
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  106  }
+8b6e4f2d8b21c2 fs/ceph/crypto.c  Sage Weil    2010-02-02  107  
+
 -- 
-2.28.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
