@@ -1,170 +1,121 @@
-Return-Path: <netdev+bounces-117831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B7794F7E2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:06:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027A394F7E5
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:06:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0B21F217C9
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:06:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1478283D0A
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBC0198E79;
-	Mon, 12 Aug 2024 20:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CECD1194143;
+	Mon, 12 Aug 2024 20:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lIMEF2ay"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/B89nmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417F9198850
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 20:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588EF190079;
+	Mon, 12 Aug 2024 20:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723493105; cv=none; b=naODNMBTFb+P3v7tyk5K0mcxLqZz7tiTX2U1TsIUn919ohCCt6fZ6EP7me8jwFmz7E8nsJ1kcOe8JH3uP19M1q1SS1/52QOn83in7aOHAQnmJACZgm9779/Ofi1aJQB4fI1efvbYpuTQ8tIt0TgPofGMhdBib0FdO8k+hcYwtj0=
+	t=1723493134; cv=none; b=R90nkxIftYCck3s7l+Ohc0pTRVOuxc+63WAUmErZ9A4bKfx69UMTryWdzDH2TfQyUPfCDyNrgvZKWFyQaI1a/BWsvJBlnnjhMN8CA5icSZmZBoduAFPM8KCJ+Km08C6c+h6cW+iB3ZmJbMrVbsGkhfN80Teo+do5/wbOVyVPogY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723493105; c=relaxed/simple;
-	bh=G8eZAduRD9IowRvQD8AWD7LQkLpctrHFO7RY59fa778=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MR8QrgK8oPZ3jljLh/yUWD6H4cB5Wt08NDdjNei7kulYa3kaa5nm7P0wlj0vahRHBLcw2l4jSw0T+tbe6tQexqJUOY1bmMfa6DdCghOdT30lpIxhAEXPqBYkyTE/MGD7r8NGIc+GN0TxEuceWLHD7MPbpsWHHBOdJrMrmUpUhhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lIMEF2ay; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723493101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gz6kqBszY+cseMf7LyOPT5w873d07nAeofNso5US4fw=;
-	b=lIMEF2ayO7W2cR/Lxrhhj9s8kZlnYgs1QD5e+qUPU5IuLIeUw/r5oOA4RFYJPJa5ll3sYg
-	4hWTZ/12ZwIxGpE4YGdA7LSh4FxP0JCKamxcyO+qUzAcUse1IW9ScUFVZYJvSPqaAkc0Wm
-	pm2cU6LiM7GtN+BF4+aAhYBlwVuATPY=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Michal Simek <michal.simek@amd.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Ariane Keller <ariane.keller@tik.ee.ethz.ch>,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net-next 4/4] net: xilinx: axienet: Support IFF_ALLMULTI
-Date: Mon, 12 Aug 2024 16:04:37 -0400
-Message-Id: <20240812200437.3581990-5-sean.anderson@linux.dev>
-In-Reply-To: <20240812200437.3581990-1-sean.anderson@linux.dev>
-References: <20240812200437.3581990-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1723493134; c=relaxed/simple;
+	bh=VVu+KZSQsorUfB0SZirPjH/lXsE4flsSEaW8bF6PkNw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yyj7V4ZW+dTvIB8v9YavMDkB0yo//IuCAuAUaCgGNQqNV7RGK9xKbcNT3p+Dbg2zn69NwFEWJNqsIN2i4ecIrb/qN1X0AH60l1IGK9FNYxG97829ZlD4J7bI9olHrpJcUHqQg8pN8wiFp1eWP55ojOnJhzwoIA6mSjogZm/XCHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/B89nmS; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2cd34c8c588so3145122a91.0;
+        Mon, 12 Aug 2024 13:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723493131; x=1724097931; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VVu+KZSQsorUfB0SZirPjH/lXsE4flsSEaW8bF6PkNw=;
+        b=U/B89nmSiK245IxUnGrIbJEy/gYzutwZWzegSqpLBDRWyI+7nVSq4sYytl/hFeUpsY
+         23C61q3J/Frdc8+xuRewLMoqFWrT0A7C9ZHTm9vt1YAtLm1zsmtAQwlKsuHtTmz9xMLL
+         B/G1pqoqAc+Xxrx9z/EqiLN0VvtM3QUXKVeOhoLglLEu91UdU4/ziov3HoYd+sz8oQrn
+         pV0tziNG9ryXkKhStIIOfS/e9nufX2EVhj8Pr6jIUKqun4NMj8hYo6Sx1w2fLhBf/1MR
+         B8NKJdMyE7m+G6O6Q61ul6VH2DGDCqgGwyH1DGLm/AhznBXxga/YdauC9dTDl/8/fBQs
+         hYiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723493131; x=1724097931;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VVu+KZSQsorUfB0SZirPjH/lXsE4flsSEaW8bF6PkNw=;
+        b=QZUijWcOrx68Cl30jG+8rUSNpf4ZsIknianaBS+ygtpSJmx+WZXba1edKwSk//MsNy
+         vPyCnWTC6VSxU2VETGphBeLv5wcLtqCgfH82spI+BpyDg4tiKW7+QaJ9Oywqfu8Tj+XB
+         weaptQsTutJiNgxSuuS1VsGQqIcd2Xs/k5hmZiM9ZuPBynioNO2sq8IEmsGqkYmiywHl
+         GeFF6temiapzy3x02AqxYXXpw6BrryphkYsOEJWKTamBKDR6CdJ5KYIaNvq2cGDOeCi8
+         pHpesM4s1kv7PyHBBDYO2YwmUo+GcLmgnzGmXwz7NrkACNbrI1ThX/ySqsDAN+HATwFW
+         0fbg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8rpQkdDCmqh4YSSdOohTOvnUjflyP5d2HJeRfitpJ+R8MXwQUuQ9swvYftcdfNaj8sV5ZkurHM9yLe7ssXjkOL44/bJXfsGQwOI1p+DjqDFVBTlHhgrzjn6h92A/xKdf0DMM7yK4eenZewA8BwmtjCWN5qb+J6F7Ie19MuS/VCgvGKWxo2bjOnl+Lz+iorVTfQ4u2Bpy55cXnHbyvRc14lv93FivAlIk=
+X-Gm-Message-State: AOJu0YyvL30+rz8Ge1vgcvwll9Q21hGWpHAcUKFmiDm5yW1fLq8x9aKH
+	bc7D1ICoTBt2s9oFUxT8KUcjZTvZ2Re66mB3JDXSnZGZrMyuf16WWpx4NImGFPGNb8FvR7y0DtR
+	xJRmlFzZgWkl3qFzeY8UvMxkf3B2ina/q
+X-Google-Smtp-Source: AGHT+IHz+aAA83Gm+taaLfYraLEur6TUFDXGJd8A/3O3VjbNsRj7u2VfGxSpn4DmYnPJwdOzH/t3d0GqStcPj6jZJbM=
+X-Received: by 2002:a17:90b:4f8b:b0:2c9:81c6:b0eb with SMTP id
+ 98e67ed59e1d1-2d3924d607fmr1490575a91.5.1723493131549; Mon, 12 Aug 2024
+ 13:05:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
+ <20240807-fehlschlag-entfiel-f03a6df0e735@brauner> <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
+ <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com> <20240810032952.GB13701@ZenIV>
+In-Reply-To: <20240810032952.GB13701@ZenIV>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 12 Aug 2024 13:05:19 -0700
+Message-ID: <CAEf4Bzb=yJKSByBktNXQDd8rqWPNCU9EWziqQhFBnCVuTGKCdg@mail.gmail.com>
+Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
+ single ldimm64 insn into helper
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Christian Brauner <brauner@kernel.org>, viro@kernel.org, 
+	bpf <bpf@vger.kernel.org>, Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, 
+	Amir Goldstein <amir73il@gmail.com>, 
+	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, kvm@vger.kernel.org, 
+	Network Development <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for IFF_ALLMULTI by configuring a single filter to match the
-multicast address bit. This allows us to keep promiscuous mode disabled,
-even when we have more than four multicast addresses. An even better
-solution would be to "pack" addresses into the available CAM registers,
-but that can wait for a future series.
+On Fri, Aug 9, 2024 at 8:29=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> wr=
+ote:
+>
+> On Thu, Aug 08, 2024 at 09:51:34AM -0700, Alexei Starovoitov wrote:
+>
+> > The bpf changes look ok and Andrii's approach is easier to grasp.
+> > It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
+> > so it goes through bpf CI and our other testing.
+> >
+> > bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
+> > and fderr, so pretty much independent from other patches.
+>
+> Representation change and switch to accessors do matter, though.
+> OTOH, I can put just those into never-rebased branch (basically,
+> "introduce fd_file(), convert all accessors to it" +
+> "struct fd representation change" + possibly "add struct fd constructors,
+> get rid of __to_fd()", for completeness sake), so you could pull it.
+> Otherwise you'll get textual conflicts on all those f.file vs. fd_file(f)=
+...
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
----
+Yep, makes sense. Let's do that, we can merge that branch into
+bpf-next/master and I will follow up with my changes on top of that.
 
- drivers/net/ethernet/xilinx/xilinx_axienet.h  |  2 ++
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 34 +++++++++++--------
- 2 files changed, 22 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index 03fef656478e..d1b68a040f5a 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -173,6 +173,8 @@
- #define XAE_FFE_OFFSET		0x0000070C /* Frame Filter Enable */
- #define XAE_AF0_OFFSET		0x00000710 /* Address Filter 0 */
- #define XAE_AF1_OFFSET		0x00000714 /* Address Filter 1 */
-+#define XAE_AM0_OFFSET		0x00000750 /* Frame Filter Mask Value Bytes 3-0 */
-+#define XAE_AM1_OFFSET		0x00000754 /* Frame Filter Mask Value Bytes 7-4 */
- 
- #define XAE_TX_VLAN_DATA_OFFSET 0x00004000 /* TX VLAN data table address */
- #define XAE_RX_VLAN_DATA_OFFSET 0x00008000 /* RX VLAN data table address */
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 9bcad515f156..c420bc753750 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -437,18 +437,27 @@ static void axienet_set_multicast_list(struct net_device *ndev)
- 	u32 reg, af0reg, af1reg;
- 	struct axienet_local *lp = netdev_priv(ndev);
- 
--	if (ndev->flags & (IFF_ALLMULTI | IFF_PROMISC) ||
--	    netdev_mc_count(ndev) > XAE_MULTICAST_CAM_TABLE_NUM) {
--		reg = axienet_ior(lp, XAE_FMI_OFFSET);
-+	reg = axienet_ior(lp, XAE_FMI_OFFSET);
-+	reg &= ~XAE_FMI_PM_MASK;
-+	if (ndev->flags & IFF_PROMISC)
- 		reg |= XAE_FMI_PM_MASK;
-+	else
-+		reg &= ~XAE_FMI_PM_MASK;
-+	axienet_iow(lp, XAE_FMI_OFFSET, reg);
-+
-+	if (ndev->flags & IFF_ALLMULTI ||
-+	    netdev_mc_count(ndev) > XAE_MULTICAST_CAM_TABLE_NUM) {
-+		reg &= 0xFFFFFF00;
- 		axienet_iow(lp, XAE_FMI_OFFSET, reg);
-+		axienet_iow(lp, XAE_AF0_OFFSET, 1); /* Multicast bit */
-+		axienet_iow(lp, XAE_AF1_OFFSET, 0);
-+		axienet_iow(lp, XAE_AM0_OFFSET, 1); /* ditto */
-+		axienet_iow(lp, XAE_AM1_OFFSET, 0);
-+		axienet_iow(lp, XAE_FFE_OFFSET, 1);
-+		i = 1;
- 	} else if (!netdev_mc_empty(ndev)) {
- 		struct netdev_hw_addr *ha;
- 
--		reg = axienet_ior(lp, XAE_FMI_OFFSET);
--		reg &= ~XAE_FMI_PM_MASK;
--		axienet_iow(lp, XAE_FMI_OFFSET, reg);
--
- 		netdev_for_each_mc_addr(ha, ndev) {
- 			if (i >= XAE_MULTICAST_CAM_TABLE_NUM)
- 				break;
-@@ -461,24 +470,21 @@ static void axienet_set_multicast_list(struct net_device *ndev)
- 			af1reg = (ha->addr[4]);
- 			af1reg |= (ha->addr[5] << 8);
- 
--			reg = axienet_ior(lp, XAE_FMI_OFFSET) & 0xFFFFFF00;
-+			reg &= 0xFFFFFF00;
- 			reg |= i;
- 
- 			axienet_iow(lp, XAE_FMI_OFFSET, reg);
- 			axienet_iow(lp, XAE_AF0_OFFSET, af0reg);
- 			axienet_iow(lp, XAE_AF1_OFFSET, af1reg);
-+			axienet_iow(lp, XAE_AM0_OFFSET, 0xffffffff);
-+			axienet_iow(lp, XAE_AM1_OFFSET, 0x0000ffff);
- 			axienet_iow(lp, XAE_FFE_OFFSET, 1);
- 			i++;
- 		}
--	} else {
--		reg = axienet_ior(lp, XAE_FMI_OFFSET);
--		reg &= ~XAE_FMI_PM_MASK;
--
--		axienet_iow(lp, XAE_FMI_OFFSET, reg);
- 	}
- 
- 	for (; i < XAE_MULTICAST_CAM_TABLE_NUM; i++) {
--		reg = axienet_ior(lp, XAE_FMI_OFFSET) & 0xFFFFFF00;
-+		reg &= 0xFFFFFF00;
- 		reg |= i;
- 		axienet_iow(lp, XAE_FMI_OFFSET, reg);
- 		axienet_iow(lp, XAE_FFE_OFFSET, 0);
--- 
-2.35.1.1320.gc452695387.dirty
-
+Let's just drop the do_one_ldimm64() extraction, and keep fdput(f)
+logic, plus add fd_file() accessor changes. I'll then add a switch to
+CLASS(fd) after a bit more BPF-specific clean ups. This code is pretty
+sensitive, so I'd rather have all the non-trivial refactoring done
+separately. Thanks!
 
