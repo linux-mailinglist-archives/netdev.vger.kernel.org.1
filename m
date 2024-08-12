@@ -1,216 +1,144 @@
-Return-Path: <netdev+bounces-117548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646BA94E3F7
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 02:36:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0826694E3FF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 02:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDFCD1F21755
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 00:36:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86098281DBB
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 00:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729F82914;
-	Mon, 12 Aug 2024 00:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C944A1C;
+	Mon, 12 Aug 2024 00:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FILCkmb8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkc9zTKa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFDF1114;
-	Mon, 12 Aug 2024 00:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D9117F7;
+	Mon, 12 Aug 2024 00:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723423012; cv=none; b=jEzd6DFFnk3Jeu8piCUvuXhTHUdi20vyl0EsfftzFcouzP88Jmh03CczoGAWiiVgSgs0mogM/5uXW9Z0I2WW7Bc0mISV8vBUgDHVHpGmZuBSAJc8yIQ37PFGNtHqZtZIx5CEVhkMWAK41I6ALMAtOx8T25oIYXbMw7k3EG2Pw4s=
+	t=1723423512; cv=none; b=QlgverSUUajn/Gz05x+8blZG05EUcB61x7tdfCXnorfTuVX4abSNZv+hcfVMoK9K/dT3OvaQ0oqzXsVOITkUG49GXNdSSc9JhHsU4UNGTDNL5hI9+UX9VRAR5Xm6jkljwxR1mbpcbqz0H5mP73rzWpWaWe5LXdBdjCkLS1bQIV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723423012; c=relaxed/simple;
-	bh=QX6TK3wzCtrwq4wqmNmuJxL8rDfVOCb6B4sv/ZhITm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d1eiyIHwyc/s3p8C+Zm2+txTZi5XPx/b5/XjIEX1IkPjwwhVHG+2i80aZTgtKhn3tewLqUMNYkj6nzlZmDogeZAr450n8/E3JKdlb/x1qCwFqUUMtfZoqW+WY1v6Pp5uL0GLl3orMaDp7RWz4AcD9XwI1TNxZT2n8P2kL2zEnYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FILCkmb8; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1723423512; c=relaxed/simple;
+	bh=e3qAwc0Aeu+mbFp/b/SF9cNN82FTnQEczLmN96Zd+6s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SgasuRpvM/TN6Hfs/BenFsrcMK0eklnjPK4pcL0ri/t8cQmCCarGbZu2y7HdrfAcvhKRB9DqM5+Whl/gVBcZZrZUGVazZY0zVbKpiy1pdfcQ6NPsdXrzABsRrv+2OHmJJn8YxKbzXMYMUeL9GYYjAKPUZGPHDv0X6hQoL6Qo3zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkc9zTKa; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-39b3f65b387so16454695ab.1;
-        Sun, 11 Aug 2024 17:36:50 -0700 (PDT)
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-709428a9469so2516912a34.3;
+        Sun, 11 Aug 2024 17:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723423010; x=1724027810; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NkOoBf1TBypbLgtDJdNsxwUYIdHaPJyZTk4KjhZphlI=;
-        b=FILCkmb8TtkRQm4sJTYPCYWbRts6YnHhuPz7lAfVQeWmiinrb+ArRX0X5bhodfhnIl
-         KiztvYD0j9W7ogqZz5fCN9JEdRotHL+DdQ370oJVrQLekw/gfIQEZbGR7LhwblW61yMD
-         YcyiUSJlkNCnMsxoOq7knglLAvhwY49Lz+fSf9MgvPJ1NFbxdRCUE211toBQS2B1ovwT
-         X2ETsQMLERxbNKKX8hNqZ7hbzrrVm4nt9eMKbhNzDtj5vZZ/O9zbp4ZMJ7DG7+9E2M4y
-         uJoEKJZD3zWzts3oaC87NChgervTiBz+Gw+xzpaZbb4LKcQFejWTFitVeFmQ3QKBa+44
-         VSMA==
+        d=gmail.com; s=20230601; t=1723423510; x=1724028310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3aMFoIwNR0Edj/iivZ/M+kTHJdTXmIm3MXh1tRQRaLw=;
+        b=hkc9zTKa9TnjN2/BVyEV2ylVQrMQpyZVn1CESZ5xjgVZKgwKkhnO1zVLlnD7OE9KVM
+         rZx2YfSshxNAXvzIic0IykIvMLd3hTmNL6MgnB5LxfrqoXi9Lo0B2cBZW1sOXCNKsSyt
+         6BtE3odqeREXz1UI0AMPkaC7AROnGeLGkkNkcNt1/XV7zdoM8Nptv47cimXJ9Jnf6PL3
+         1WoNdo05UpgcMx4D31DlBrgt88KgqQV+5jF7k7c+M0gM4+7bk0bUwXbOk8G7vvUOLs8x
+         I1CZ0f7bINUSp/Ms1lJgiWZJ2J0woVvAPCugo2bc04qW9KSwBRFMHNIV9rpdyNn+eLT2
+         oZPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723423010; x=1724027810;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NkOoBf1TBypbLgtDJdNsxwUYIdHaPJyZTk4KjhZphlI=;
-        b=ZcfAOjwXN637ycqSj2pKa3RTXSCg46rGTpwL8M7f1CN40L+DBe9cXoypEarFUTuePU
-         rAlsyvBrgEhcoVEYj8uUmF/0e436UD3pWoTgOeBD07iuqUpgtLgH4Ce/G77bBoLb7Baj
-         QFltUjop6ZJGiRE4dIaKYe0RFaOFQmYn6TuwJTo71id2we6OvOYJbeDor3E1UJaquywe
-         uZskTnLPFVVCZGTH9ISHgmISpIm5ZiQWgaIbHh9aC3O5yi0EfF4B6uCndYmJJGo/m3G5
-         GgzJtKLf/TJFHlhXrEzEnoimpTe/GRM9sO17vaJZCVafXByp74yorMar8MEOrnEI8oZm
-         ezLA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1UbupRDGHIAoixkpiKA3r6SgWgBCTlIru6nJjKcb+90T60AhnCFnVnGVn6vE8+gc+ZRQLmbxnBV6hoYru+tjD/Om/+tyhyXEXSiU08aVV4a0v6+NQg+GSRJrnVSpEM+pTnT/q
-X-Gm-Message-State: AOJu0YxIWO0e9emHMn5mt7JUZqjQSNnwvMkixk80O/Ebl2ZrMg0oph2c
-	iCcveNBQ9ZilKZziLzf7mFZ04i0VFPMfmdkDwsS+/gO5CP3OY3T4QhFbN98xRyfb8xaLETzsSd+
-	dOMFnO0HBggdkN2hdGZr1cVxwQUSMu0pV
-X-Google-Smtp-Source: AGHT+IEtgurMCetoMTmGAT4Mx29Mntgb7T9XQnHkXclDvkiAy8FfUGhAVgTOxe1nrG/JQFApWNNRdGga4osX4ujw9rs=
-X-Received: by 2002:a05:6e02:4b0:b0:39a:eabf:c28a with SMTP id
- e9e14a558f8ab-39b7a4726b4mr88135485ab.20.1723423009933; Sun, 11 Aug 2024
- 17:36:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723423510; x=1724028310;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3aMFoIwNR0Edj/iivZ/M+kTHJdTXmIm3MXh1tRQRaLw=;
+        b=TmMmMvHCaqcNcxOa0qc6k818/Pgl/Jh19sdmEu00G7Ewr4NGrjra29oO4oRo6njOFf
+         gj0ionX+gqhYcvdI2bjRatKdLyjhgO5kjmIUXd3VhWhrOzt86A3BUsldMJzYP7YbBRBw
+         kqJ3KIQJ1MBQPYI6TpSDWJfYYr6JvZVVLh0gb13tSpjdOQHsjWp4S5ren61LMShuPdlr
+         tTCL4xfoLJa0TZuRoDIJzfwTWW0ZvYhH9sNDPBn4h0NuS0AStwmljdN+wDzqjguWiJ58
+         qVgLTUXPqC+F1j6d25+NLf60YEOg17+ItPCweyEMBzaKuHcJOwX4qYIpT3qgubazfAR0
+         j/xA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrYhjAR9qGhrHNtUV1olICNrlhhhLt+q4tAUMjUrgSx4HRzob8bNaltQBvAfqD/gP0fXBbLFutFEZeKiqXWFdW@vger.kernel.org, AJvYcCWUzbu9HdtxI1JmDDsGJinOdvUiu998acxptvrUhPcSmLwBnaNHgFt35N6QS33EkEIw4Vs=@vger.kernel.org, AJvYcCX7iGC5HmlgdtdA9HSQG7m9hDlSjszqmZtSoP9utLEot1K5Sp85lBVu+ZSbd0zek1oVnzFAJeNm@vger.kernel.org
+X-Gm-Message-State: AOJu0YydeQFLbcYnLrVSEhrGEKywncqxTzCt10uMck+eqhxtTR2WwaJ2
+	ygtFHzuZ88gNwtELKpxFnIiLVjkiJoE/wPLk57V616ZoPAVUca4=
+X-Google-Smtp-Source: AGHT+IFbcPfZngKB0iIBqbqfAFXPEfEhza5xNhDnMzBqASZHCreomPYUhbCvpBAIsrNMLeBOCSLT5Q==
+X-Received: by 2002:a05:6358:7202:b0:1aa:bc42:eb01 with SMTP id e5c5f4694b2df-1b176f47141mr1117891055d.7.1723423510331;
+        Sun, 11 Aug 2024 17:45:10 -0700 (PDT)
+Received: from vagrant.. ([114.71.48.94])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58ade4fsm2891966b3a.51.2024.08.11.17.45.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Aug 2024 17:45:09 -0700 (PDT)
+From: "Daniel T. Lee" <danieltimlee@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Yipeng Zou <zouyipeng@huawei.com>,
+	linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [bpf-next 0/3] samples/bpf: Remove obsolete tracing-related tests
+Date: Mon, 12 Aug 2024 00:45:00 +0000
+Message-ID: <20240812004503.43206-1-danieltimlee@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240811230029.95258-1-kuniyu@amazon.com> <20240811230836.95914-1-kuniyu@amazon.com>
-In-Reply-To: <20240811230836.95914-1-kuniyu@amazon.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 12 Aug 2024 08:36:13 +0800
-Message-ID: <CAL+tcoBqfC=Gg8=AVEFC1APWXq8mFtXBmu+6jt=MnsVYWc6cig@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, fw@strlen.de, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 12, 2024 at 7:09=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date: Sun, 11 Aug 2024 16:00:29 -0700
-> > From: Florian Westphal <fw@strlen.de>
-> > Date: Sun, 11 Aug 2024 18:28:50 +0200
-> > > Florian Westphal <fw@strlen.de> wrote:
-> > > > https://syzkaller.appspot.com/x/log.txt?x=3D117f3182980000
-> > > >
-> > > > ... shows at two cores racing:
-> > > >
-> > > > [ 3127.234402][ T1396] CPU: 3 PID: 1396 Comm: syz-executor.3 Not
-> > > > and
-> > > > [ 3127.257864][   T13] CPU: 1 PID: 13 Comm: kworker/u32:1 Not taint=
-ed 6.9.0-syzkalle (netns cleanup net).
-> > > >
-> > > >
-> > > > first splat backtrace shows invocation of tcp_sk_exit_batch() from
-> > > > netns error unwinding code.
-> > > >
-> > > > Second one lacks backtrace, but its also in tcp_sk_exit_batch(),
-> > >
-> > > ... which doesn't work.  Does this look like a plausible
-> > > theory/exlanation?
-> >
-> > Yes!  The problem here is that inet_twsk_purge() operates on twsk
-> > not in net_exit_list, but I think such a check is overkill and we
-> > can work around it in another way.
-> >
-> >
-> > >
-> > > Given:
-> > > 1 exiting netns, has >=3D 1 tw sk.
-> > > 1 (unrelated) netns that failed in setup_net
-> > >
-> > > ... we run into following race:
-> > >
-> > > exiting netns, from cleanup wq, calls tcp_sk_exit_batch(), which call=
-s
-> > > inet_twsk_purge(&tcp_hashinfo).
-> > >
-> > > At same time, from error unwinding code, we also call tcp_sk_exit_bat=
-ch().
-> > >
-> > > Both threads walk tcp_hashinfo ehash buckets.
-> > >
-> > > From work queue (normal netns exit path), we hit
-> > >
-> > > 303                         if (state =3D=3D TCP_TIME_WAIT) {
-> > > 304                                 inet_twsk_deschedule_put(inet_tws=
-k(sk));
-> > >
-> > > Because both threads operate on tcp_hashinfo, the unrelated
-> > > struct net (exiting net) is also visible to error-unwinding thread.
-> > >
-> > > So, error unwinding code will call
-> > >
-> > > 303                         if (state =3D=3D TCP_TIME_WAIT) {
-> > > 304                                 inet_twsk_deschedule_put(inet_tws=
-k(sk));
-> > >
-> > > for the same tw sk and both threads do
-> > >
-> > > 218 void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
-> > > 219 {
-> > > 220         if (del_timer_sync(&tw->tw_timer))
-> > > 221                 inet_twsk_kill(tw);
-> > >
-> > > Error unwind path cancel timer, calls inet_twsk_kill, while
-> > > work queue sees timer as already shut-down so it ends up
-> > > returning to tcp_sk_exit_batch(), where it will WARN here:
-> > >
-> > >   WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_ref=
-count));
-> > >
-> > > ... because the supposedly-last tw_refcount decrement did not drop
-> > > it down to 0.
-> > >
-> > > Meanwhile, error unwiding thread calls refcount_dec() on
-> > > tw_refcount, which now drops down to 0 instead of 1, which
-> > > provides another warn splat.
+The BPF tracing infrastructure has undergone significant evolution,
+leading to the introduction of more robust and efficient APIs.
+However, some of the existing tests in the samples/bpf directory have
+not kept pace with these developments. These outdated tests not only
+create confusion among users but also increase maintenance overhead.
 
-Right, last night I should have thought of it. I noticed that two
-'killers' may access the inet_twsk_kill() concurrently (during that
-time, I paid attention to the tcp_abort() which can cause such an
-issue), but I easily let it go :(
+For starter, this patchset focuses on cleaning up outdated 'tracing'
+related tests within the BPF testing framework. The goal is to
+modernize and streamline selftests by removing obsolete tests and
+migrating necessaries to more appropriate locations.
 
-Thanks for the detailed explanation:)
+Daniel T. Lee (3):
+  selftests/bpf: migrate tracepoint overhead test to prog_tests
+  selftests/bpf: add rename tracepoint bench test
+  samples/bpf: remove obsolete tracing related tests
 
-> > >
-> > > I'll ponder on ways to fix this tomorrow unless someone
-> > > else already has better theory/solution.
-> >
-> > We need to sync two inet_twsk_kill(), so maybe give up one
-> > if twsk is not hashed ?
-> >
-> > ---8<---
-> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_soc=
-k.c
-> > index 337390ba85b4..51889567274b 100644
-> > --- a/net/ipv4/inet_timewait_sock.c
-> > +++ b/net/ipv4/inet_timewait_sock.c
-> > @@ -52,7 +52,10 @@ static void inet_twsk_kill(struct inet_timewait_sock=
- *tw)
-> >       struct inet_bind_hashbucket *bhead, *bhead2;
-> >
-> >       spin_lock(lock);
-> > -     sk_nulls_del_node_init_rcu((struct sock *)tw);
-> > +     if (!sk_nulls_del_node_init_rcu((struct sock *)tw)) {
-> > +             spin_unlock(lock);
-> > +             return false;
->
-> forgot to remove false, just return :)
+ samples/bpf/Makefile                          |  12 -
+ samples/bpf/test_overhead_kprobe.bpf.c        |  41 ----
+ samples/bpf/test_overhead_raw_tp.bpf.c        |  17 --
+ samples/bpf/test_overhead_tp.bpf.c            |  23 --
+ samples/bpf/test_overhead_user.c              | 225 ------------------
+ samples/bpf/test_override_return.sh           |  16 --
+ samples/bpf/test_probe_write_user.bpf.c       |  52 ----
+ samples/bpf/test_probe_write_user_user.c      | 108 ---------
+ samples/bpf/tracex7.bpf.c                     |  15 --
+ samples/bpf/tracex7_user.c                    |  56 -----
+ tools/testing/selftests/bpf/bench.c           |   2 +
+ .../selftests/bpf/benchs/bench_rename.c       |  16 ++
+ .../selftests/bpf/benchs/run_bench_rename.sh  |   2 +-
+ .../selftests/bpf/prog_tests/test_overhead.c  |  14 +-
+ .../selftests/bpf/progs/test_overhead.c       |  11 +-
+ 15 files changed, 39 insertions(+), 571 deletions(-)
+ delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
+ delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
+ delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
+ delete mode 100644 samples/bpf/test_overhead_user.c
+ delete mode 100755 samples/bpf/test_override_return.sh
+ delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
+ delete mode 100644 samples/bpf/test_probe_write_user_user.c
+ delete mode 100644 samples/bpf/tracex7.bpf.c
+ delete mode 100644 samples/bpf/tracex7_user.c
 
-It does make sense to me !
+-- 
+2.43.0
 
-Thanks,
-Jason
-
->
->
-> > +     }
-> >       spin_unlock(lock);
-> >
-> >       /* Disassociate with bind bucket. */
-> > ---8<---
->
 
