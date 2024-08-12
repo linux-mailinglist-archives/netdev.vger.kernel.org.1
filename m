@@ -1,102 +1,88 @@
-Return-Path: <netdev+bounces-117833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1058F94F7EE
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:07:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B0E694F7F8
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:12:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0BB5283EC2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:07:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476781C21B01
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0886819755E;
-	Mon, 12 Aug 2024 20:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508B1193062;
+	Mon, 12 Aug 2024 20:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnlWM/Jk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zjpHMDcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929F11953B9;
-	Mon, 12 Aug 2024 20:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F295B61FFC;
+	Mon, 12 Aug 2024 20:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723493191; cv=none; b=fcSlo6JrYH9MLIS2Y8gpYpX0K9n1ptVolTFj4txCo9u7ijajNtt+cUQW70nqG2DGT6hszpc4+Q4ozafNEguq5NwGfOyFVKybN4jzBZeVIJbon1RRwj6jlURyX/Wit2tMgYgSFjrMQH0Ai2Sr0S925dgQXsEv9VdYDXFyYnpCSKk=
+	t=1723493521; cv=none; b=djhbGKOgWY0jjhZRWWi4JbpXtp3IAJvzE9tvmpcywe0d5GsBWU/ueBG3edWQo92X0KFGv4cY2IZpUTqXSgJuE4LWrfrcv17pWk5yAJxmCKv6/oqFrmrte19tCL+eUzer8Nk2TYV+tO7o7ScvDjbffHfleRqNdzxc/nq+UwKVK5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723493191; c=relaxed/simple;
-	bh=YsL1C655win8Uvf7tw+7VbikqZnhSC3xRrRZZ+RmAGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dw49QrsVXJiTv2OLtl6I7gAvhLl4jhZ1drA8/KMzqoTnaXkyjoz1cx6Xte4KGhiByMteAR7fFWZuyYeKPtOZ6Wdt281VRp0vAxn9jbwCrNlZ9vWW4sH+2leTK+2wTLzbDPGsnN0o9IQJsDjy3uwiamAeTfO1wtIiPgFXszyfojs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnlWM/Jk; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2cb5789297eso3125616a91.3;
-        Mon, 12 Aug 2024 13:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723493190; x=1724097990; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dpOEroGtysYF4ielafugNiaUnt54QpoeMG73y+fLisk=;
-        b=fnlWM/JkZEXIJfcMZXkvt/77h805czG1WgN/Y4BcGwHSaRgwcTdprarHOXCq9knBNH
-         umiMzQuoFV7PBS7uzesdWf+MXDqBzEHaH0eQHHOLfAAjNIjvyTVD0A6M3k8f5n497QtV
-         8/Fp1aSFcRWzEDOxXR9uV+OOIbC/LMm4OAmbyzypEj/n8xjqxXg/S93SNChHUdn/C4V0
-         AzrZ2GVqb9L1P9DmVBFrfnyZNKsGVdXnuLVOO1hZgtoGb/WMbBWxH/sMccWFypheDfVA
-         vKy9AEy1PFrEtYfg9n9IY+Saf0qxWLWQTr642HAwvE7PURoGmxQr76uO8aDk+diyYCsf
-         ai5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723493190; x=1724097990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dpOEroGtysYF4ielafugNiaUnt54QpoeMG73y+fLisk=;
-        b=OAIq/eXOTbneP+g4w7mzs9doEV0c+vKekgQma9qy93HUDehtyQUHwDlT2bN0mwbTxz
-         RJNJLO9y4hx0KMKadXxWrs54CeEAjejmBlJA6kzqI5gK51IJ7/De5/IviCPCBTizXAhP
-         F5qgQoZKrAiZ+pM3gGk5pLFOjfi9DPTuFPbui3E9Fte4vABUyNDuKxmxnvrHSxai8kie
-         TnqjsqxEFN3LWU5jdgvbD8trW9W+wmsjeYOtQEPCb1o+X+nrl8O1aw3hOWsjxe2Tyytg
-         NwIhgqElAj5rT6Vu56p49ZH7lFVQFSLE24iU9VIq65+jRl5+hamWddug1suy9w7m3XZP
-         WwBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUB5x4noJddlFkM7D8WE7qqtKWBq9Dk/7knQTHsfKO6x0s/IXbSpU9M+uTkMV8qZbpX2J4OIHnEDcLiTljEzwjbY2vzPyKk8sTZ3FBsmtSIbNm6uETQamE5efgemiJ5lTx2Y3KfSFDYQT5hb4SEVZlZfv1vxqijdJTboD1E34Wlkp2M+L8R49wKVsxwYNwtdHikHnuf+/Rh8DQJ65W6tUrIPGVO3eAlSAg=
-X-Gm-Message-State: AOJu0YzehjenyvlLCkoq6ZAbvgyAMLfy/IxXwSH+yXyjcAfRZy/G9i5i
-	VXsOPdRqgBGYvOppdsldJVIeS6RR5KI6cZbYJ8K3ZWznNFiyQ5pvbNWM9Uqj2OkduR/1E9coIjk
-	VzItct6KEsaIcUlebJPs+GW9g/GI=
-X-Google-Smtp-Source: AGHT+IElPb2EaTXK/MBk35WwyrKLUOG1Ydv8xeHRyMsqe2bfhQXzbIVKz1s7TXLnA6y6XoLOJpoxQtvntqfBMRcK1VE=
-X-Received: by 2002:a17:90b:230b:b0:2c9:69cc:3a6a with SMTP id
- 98e67ed59e1d1-2d3924d6069mr1539107a91.3.1723493190015; Mon, 12 Aug 2024
- 13:06:30 -0700 (PDT)
+	s=arc-20240116; t=1723493521; c=relaxed/simple;
+	bh=vYmPssGqOqy/ZSQEltkvYmFKGbzhf8ZDF8/bOM42FSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=euuPo5X4fzI0/Ngv1hhxWUCtLxwyCmbSLZ3s46dSbXNYxCngwefWutNBjRkeVcGKWbfJzW+GgZ7Mmolj8MT9iA25nFkRkOqEPdYtx2WWqpohZHLCAuh/7d6pvCXMmfMq2bpeArVLGaUBpNnqWkcFekVwq0hqnLj4+5/0OMDx1X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zjpHMDcG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VGMy3306yIbpFHFkAhMbZO0uaYSmXAMxfy0U/jGaKGw=; b=zjpHMDcGe+zuafgEtDE/2t/RyR
+	koaZAdWeREuSWyVeaY2dDINXIHcdCkFrdG5LRJcl4jIrnAzsjP8xwGqatkM8aDqvz1ag16ThcE823
+	dYHlpc7ZO/KYn5OPFX7IzcHJjTnTLfqSVRAygaas9QPXJD5bk4n6WenZhEl7UY+NJQxw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdbOE-004c97-0Q; Mon, 12 Aug 2024 22:11:38 +0200
+Date: Mon, 12 Aug 2024 22:11:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 1/2] net: xilinx: axienet: Report RxRject as
+ rx_dropped
+Message-ID: <1a884b22-f73b-43af-9c1e-bb383936620a@lunn.ch>
+References: <20240812174118.3560730-1-sean.anderson@linux.dev>
+ <20240812174118.3560730-2-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-35-viro@kernel.org> <CAEf4BzasSXFx5edPknxVnmk+o6oAyOU0h_Tg_yHVaJcaJfpPOQ@mail.gmail.com>
- <20240810034644.GC13701@ZenIV>
-In-Reply-To: <20240810034644.GC13701@ZenIV>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 12 Aug 2024 13:06:17 -0700
-Message-ID: <CAEf4BzYGF1aur6W9PDzN3MFoDmVNDQ6G5k0=gv-04m6ZpeK3Jg@mail.gmail.com>
-Subject: Re: [PATCH 35/39] convert bpf_token_create()
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com, 
-	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, torvalds@linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812174118.3560730-2-sean.anderson@linux.dev>
 
-On Fri, Aug 9, 2024 at 8:46=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> wr=
-ote:
->
-> On Tue, Aug 06, 2024 at 03:42:56PM -0700, Andrii Nakryiko wrote:
->
-> > By constify you mean something like below?
->
-> Yep.  Should go through LSM folks, probably, and once it's in
-> those path_get() and path_put() around the call can go to hell,
-> along with 'path' itself (we can use file->f_path instead).
+On Mon, Aug 12, 2024 at 01:41:17PM -0400, Sean Anderson wrote:
+> The Receive Frame Rejected interrupt is asserted whenever there was a
+> receive error (bad FCS, bad length, etc.) or whenever the frame was
+> dropped due to a mismatched address. So this is really a combination of
+> rx_otherhost_dropped, rx_length_errors, rx_frame_errors, and
+> rx_crc_errors. Mismatched addresses are common and aren't really errors
+> at all (much like how fragments are normal on half-duplex links). To
+> avoid confusion, report these events as rx_dropped. This better
+> reflects what's going on: the packet was received by the MAC but dropped
+> before being processed.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 
-Ok, cool. Let's then do that branch you proposed, and I can send
-everything on top of it, removing path_get()+path_put() you add here.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
