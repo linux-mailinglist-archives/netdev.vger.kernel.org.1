@@ -1,297 +1,273 @@
-Return-Path: <netdev+bounces-117713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD0B94EE02
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:22:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70C594EDFD
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:21:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4008CB2317E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:22:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DA71C21BD4
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893C917C9FC;
-	Mon, 12 Aug 2024 13:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzk+jSTS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE2D17C20E;
+	Mon, 12 Aug 2024 13:21:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BF117C7B9;
-	Mon, 12 Aug 2024 13:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECB517BB3D;
+	Mon, 12 Aug 2024 13:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723468897; cv=none; b=r/HBUeCAp5vftPLq/hobU60mdjybaAlpPI/IGzGRK1VcJym2ysiW2EaiiPvtBsYqWjP07uB19JNK/1HQ9nindPmYYhgropFIhedlw0+4jjK19byEFV2YMGoLZq6p/T0ZR80ZLt61Sh+p5pixQ6LCu3n2Qxm28N/xGKbpAm3neV8=
+	t=1723468894; cv=none; b=oO7wGjbCciK1/aQ+BebkxGAtb0+t7LWTN5uDnMQzx2pqFQ4QU1tFROi1UCC0nXy2r6QWdis5EINXdjYUatVeiiq1oQAMJEwnsimZh5IVSGESY8IQLiudE3NV4VwJxyXmmk5cClIdJ6PSJfzLE56w9iVmQ8i8rGM71tXwLEciCRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723468897; c=relaxed/simple;
-	bh=9tDCZscCvY5hEFTSTcbkZLdNaN18qRijSaHg1zfRqS4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mwx96wMUOkmPaQZurzYMEP7DR1Gh8vtw6S93OscNV6MOq/26bWETX4u+QyvN1+YIdaaCjoR5DZ1Bi6OeN5bq8uV95xzDP02LuoAwFr6ofrH7Z7eNbId0ywa0Ws134MhJT4q1joDDHOaT9U/wnIfiIsQ2ni2VLuoxptamA8jBcdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzk+jSTS; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-70968db52d0so4516144a34.3;
-        Mon, 12 Aug 2024 06:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723468895; x=1724073695; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ntaXkWZopfKg+6j7rnXEQlGZAwKedjmgSjz6FEutgS8=;
-        b=Jzk+jSTSf2RXGpLuQWXDI/X2DTn+EbgwoqZZC/4TNIr8r8uRNqAxQ9HTpWVrV0dwIe
-         G06XpqMRqVau7ztMRu3e4ibnQ9cRO8LQAxESLQYqQvdnuqZOY46h9CFJ0Aaq6v4kq54u
-         ZVcM3OkfKLbAykmsnL6gUSHPm+FiVbog7Bkh8ulgpj6XFQYw/gBdROr96n/KXbVSIZJW
-         qhvL8prpw9w4+X1dGhhVUASi7yP+c0ApvU4e15rx5GqL9SxW2aoldikIGQBD2+yG5vFj
-         24doDWU9LFHnqlOGM9LdrU9OWYc1CfTJi5qamBMSn425Geo9vUR8AjQPKAwTb0l87RKc
-         6izg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723468895; x=1724073695;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ntaXkWZopfKg+6j7rnXEQlGZAwKedjmgSjz6FEutgS8=;
-        b=tde+Wg/BvBTUhlA4Z8twGtUd2HkESaejNCl1aOS3JakC4zmrgsc18HwZoTlgIpfkdA
-         A+NsB9H7zPj0MCl26OReJ/qmu6K7i4BZG2bcF935I93NvIVlYmGgejn7e+kPt6Fza96B
-         s8VmhQshaPjwE8MrCNUSnz37dmVmpFO4jCaWjxNMKyVSXhvWWfP1C6sawOFYSgpqT0KQ
-         Rc1fcVQvXo17UjJ0PfyCba45ZvOP3RZlfprkj5kHnYEKfVrw4GJJA4rdRrVPsRRDhsns
-         W4/48hs0hizqbgf5m8yOGTk99k9agRqwUN7oartROcqOBQJW587kDzCyhwtdcXmACC+o
-         6NUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUT74V1Y2Jl/zCNcVvtC6K6BNk5z/ZdRjyxmc3OnsT1B11Gydl5970mH7eRn1inZ8IrREnEZMyiolcEG28qi50xfV0LBHml5VpU/0T8Zxnx5R9VPjwRKeiFkBN4YbnywzrmNMqk4kXmddg3Nice11usy1n0T60ZCglM/oSomnPSqrFLDrsEmLIY4Cr1jR6v5TD4hWIsq4Z2PypUThD5QwFku+ljtCEt1jvr53VONvg5iIxw1ox6vVTpIBdp8Uy4cpBBqvqdD6o3uJJrYcOhENc0k5LC1jSVgJ7PRHCYU888DHbIglZNxwRjodgKu6kAQZaxvrU8hg==
-X-Gm-Message-State: AOJu0YzG/H7Lec1IpDcL9hiXjsA38UG2zWIlRrHqNKTxsuNhpkRkgisz
-	9bTNxc63ubNNudgNw6Vj64s1aMaNRrGfOIqbKvenqtm5Tqp7osSrCmX6ivk3GaKsVB4C4igtUdM
-	WAr/X4a9V2ZYdNNkVlDXuboLoIYk=
-X-Google-Smtp-Source: AGHT+IGVQve+llYsp0AugSRGeMMoIczqwy8oRpZMYGNh2sJDxIw1ZBHkds1sjMf3hXZlB+uLcjMVRoLPG20nTXUm0IM=
-X-Received: by 2002:a05:6830:34a6:b0:703:651b:382f with SMTP id
- 46e09a7af769-70c9387ae3fmr240831a34.3.1723468894738; Mon, 12 Aug 2024
- 06:21:34 -0700 (PDT)
+	s=arc-20240116; t=1723468894; c=relaxed/simple;
+	bh=nELmBUuP7NtMv0h6+VzLfrRVT5C86LvicW6YXx1SDaI=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MuIDa0BIZjsJlDa2ofb9JvBNntgXYOvPrF1icxFEniynVrVYYLv+Sx8pfZHDrY5VneO2VXKhqKrdNVrIsQ60ADy7v2RCGPKO4Qd38+ZRzuKMAD3NE+3pAlpYMVI0c0P6Pm1oSIIlRt0cQDvzJwoMjPeRxtJEuR+AW5ip1iU2m58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WjFRC4jPlzQpf0;
+	Mon, 12 Aug 2024 21:16:55 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id EBCAC180102;
+	Mon, 12 Aug 2024 21:21:27 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 12 Aug 2024 21:21:26 +0800
+Message-ID: <88382c22-a45b-4cd6-8313-4db1350d8e7c@huawei.com>
+Date: Mon, 12 Aug 2024 21:21:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812022933.69850-1-laoar.shao@gmail.com> <20240812022933.69850-2-laoar.shao@gmail.com>
- <qztvfvesnxkaol6n3ucf5ovp2ssq4hzxceaedgfexieggzj6zh@pyd5f43pccyh>
-In-Reply-To: <qztvfvesnxkaol6n3ucf5ovp2ssq4hzxceaedgfexieggzj6zh@pyd5f43pccyh>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Mon, 12 Aug 2024 21:20:57 +0800
-Message-ID: <CALOAHbA5MVVhSAm-atWxigaceWBDo4h5ucRv09onnMYFVWsOzQ@mail.gmail.com>
-Subject: Re: [PATCH v6 1/9] Get rid of __get_task_comm()
-To: Alejandro Colomar <alx@kernel.org>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org, 
-	catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Kees Cook <keescook@chromium.org>, Matus Jokay <matus.jokay@stuba.sk>, 
-	"Serge E. Hallyn" <serge@hallyn.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, "David S. Miller" <davem@davemloft.net>, David
+ Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Felix Fietkau
+	<nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
+	<Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Yisen Zhuang
+	<yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+Subject: Re: [PATCH net-next 3/3] net: hns3: Use
+ ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+To: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+References: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
+ <20240812-ipv6_addr-helpers-v1-3-aab5d1f35c40@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20240812-ipv6_addr-helpers-v1-3-aab5d1f35c40@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-On Mon, Aug 12, 2024 at 4:05=E2=80=AFPM Alejandro Colomar <alx@kernel.org> =
-wrote:
->
-> Hi Yafang,
->
-> On Mon, Aug 12, 2024 at 10:29:25AM GMT, Yafang Shao wrote:
-> > We want to eliminate the use of __get_task_comm() for the following
-> > reasons:
-> >
-> > - The task_lock() is unnecessary
-> >   Quoted from Linus [0]:
-> >   : Since user space can randomly change their names anyway, using lock=
-ing
-> >   : was always wrong for readers (for writers it probably does make sen=
-se
-> >   : to have some lock - although practically speaking nobody cares ther=
-e
-> >   : either, but at least for a writer some kind of race could have
-> >   : long-term mixed results
-> >
-> > - The BUILD_BUG_ON() doesn't add any value
-> >   The only requirement is to ensure that the destination buffer is a va=
-lid
-> >   array.
-> >
-> > - Zeroing is not necessary in current use cases
-> >   To avoid confusion, we should remove it. Moreover, not zeroing could
-> >   potentially make it easier to uncover bugs. If the caller needs a
-> >   zero-padded task name, it should be explicitly handled at the call si=
-te.
-> >
-> > Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> > Link: https://lore.kernel.org/all/CAHk-=3DwivfrF0_zvf+oj6=3D=3DSh=3D-np=
-JooP8chLPEfaFV0oNYTTBA@mail.gmail.com [0]
-> > Link: https://lore.kernel.org/all/CAHk-=3DwhWtUC-AjmGJveAETKOMeMFSTwKwu=
-99v7+b6AyHMmaDFA@mail.gmail.com/
-> > Suggested-by: Alejandro Colomar <alx@kernel.org>
-> > Link: https://lore.kernel.org/all/2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueurf=
-bosf5wdo65dk4@srb3hsk72zwq
-> > Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > Cc: Christian Brauner <brauner@kernel.org>
-> > Cc: Jan Kara <jack@suse.cz>
-> > Cc: Eric Biederman <ebiederm@xmission.com>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-> > Cc: Matus Jokay <matus.jokay@stuba.sk>
-> > Cc: Alejandro Colomar <alx@kernel.org>
-> > Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> > ---
-> >  fs/exec.c             | 10 ----------
-> >  fs/proc/array.c       |  2 +-
-> >  include/linux/sched.h | 31 +++++++++++++++++++++++++------
-> >  kernel/kthread.c      |  2 +-
-> >  4 files changed, 27 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/fs/exec.c b/fs/exec.c
-> > index a47d0e4c54f6..2e468ddd203a 100644
-> > --- a/fs/exec.c
-> > +++ b/fs/exec.c
-> > @@ -1264,16 +1264,6 @@ static int unshare_sighand(struct task_struct *m=
-e)
-> >       return 0;
-> >  }
-> >
-> > -char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *=
-tsk)
-> > -{
-> > -     task_lock(tsk);
-> > -     /* Always NUL terminated and zero-padded */
-> > -     strscpy_pad(buf, tsk->comm, buf_size);
->
-> This comment is correct (see other comments below).
->
-> (Except that pedantically, I'd write it as NUL-terminated with a hyphen,
->  just like zero-padded.)
->
-> > -     task_unlock(tsk);
-> > -     return buf;
-> > -}
-> > -EXPORT_SYMBOL_GPL(__get_task_comm);
-> > -
-> >  /*
-> >   * These functions flushes out all traces of the currently running exe=
-cutable
-> >   * so that a new one can be started
-> > diff --git a/fs/proc/array.c b/fs/proc/array.c
-> > index 34a47fb0c57f..55ed3510d2bb 100644
-> > --- a/fs/proc/array.c
-> > +++ b/fs/proc/array.c
-> > @@ -109,7 +109,7 @@ void proc_task_name(struct seq_file *m, struct task=
-_struct *p, bool escape)
-> >       else if (p->flags & PF_KTHREAD)
-> >               get_kthread_comm(tcomm, sizeof(tcomm), p);
-> >       else
-> > -             __get_task_comm(tcomm, sizeof(tcomm), p);
-> > +             get_task_comm(tcomm, p);
->
-> LGTM.  (This would have been good even if not removing the helper.)
->
-> >
-> >       if (escape)
-> >               seq_escape_str(m, tcomm, ESCAPE_SPACE | ESCAPE_SPECIAL, "=
-\n\\");
-> > diff --git a/include/linux/sched.h b/include/linux/sched.h
-> > index 33dd8d9d2b85..e0e26edbda61 100644
-> > --- a/include/linux/sched.h
-> > +++ b/include/linux/sched.h
-> > @@ -1096,9 +1096,11 @@ struct task_struct {
-> >       /*
-> >        * executable name, excluding path.
-> >        *
-> > -      * - normally initialized setup_new_exec()
-> > -      * - access it with [gs]et_task_comm()
-> > -      * - lock it with task_lock()
-> > +      * - normally initialized begin_new_exec()
-> > +      * - set it with set_task_comm()
-> > +      *   - strscpy_pad() to ensure it is always NUL-terminated
->
-> The comment above is inmprecise.
-> It should say either
-> "strscpy() to ensure it is always NUL-terminated", or
-> "strscpy_pad() to ensure it is NUL-terminated and zero-padded".
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
 
-will change it.
-
+on 2024/8/12 20:11, Simon Horman wrote:
+> Use new ipv6_addr_cpu_to_be32 and ipv6_addr_be32_to_cpu helper,
+> and IPV6_ADDR_WORDS. This is arguably slightly nicer.
 >
-> > +      *   - task_lock() to ensure the operation is atomic and the name=
- is
-> > +      *     fully updated.
-> >        */
-> >       char                            comm[TASK_COMM_LEN];
-> >
-> > @@ -1912,10 +1914,27 @@ static inline void set_task_comm(struct task_st=
-ruct *tsk, const char *from)
-> >       __set_task_comm(tsk, from, false);
-> >  }
-> >
-> > -extern char *__get_task_comm(char *to, size_t len, struct task_struct =
-*tsk);
-> > +/*
-> > + * - Why not use task_lock()?
-> > + *   User space can randomly change their names anyway, so locking for=
- readers
-> > + *   doesn't make sense. For writers, locking is probably necessary, a=
-s a race
-> > + *   condition could lead to long-term mixed results.
-> > + *   The strscpy_pad() in __set_task_comm() can ensure that the task c=
-omm is
-> > + *   always NUL-terminated.
+> No functional change intended.
+> Compile tested only.
 >
-> This comment has the same imprecission that I noted above.
-
-will change it.
-
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Link: https://lore.kernel.org/netdev/c7684349-535c-45a4-9a74-d47479a50020@lunn.ch/
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 79 +++++++++++-----------
+>   .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |  8 ++-
+>   2 files changed, 44 insertions(+), 43 deletions(-)
 >
-> > Therefore the race condition between reader and
-> > + *   writer is not an issue.
-> > + *
-> > + * - Why not use strscpy_pad()?
-> > + *   While strscpy_pad() prevents writing garbage past the NUL termina=
-tor, which
-> > + *   is useful when using the task name as a key in a hash map, most u=
-se cases
-> > + *   don't require this. Zero-padding might confuse users if it=E2=80=
-=99s unnecessary,
-> > + *   and not zeroing might even make it easier to expose bugs. If you =
-need a
-> > + *   zero-padded task name, please handle that explicitly at the call =
-site.
-> > + *
-> > + * - ARRAY_SIZE() can help ensure that @buf is indeed an array.
-> > + */
-> >  #define get_task_comm(buf, tsk) ({                   \
-> > -     BUILD_BUG_ON(sizeof(buf) !=3D TASK_COMM_LEN);     \
-> > -     __get_task_comm(buf, sizeof(buf), tsk);         \
-> > +     strscpy(buf, (tsk)->comm, ARRAY_SIZE(buf));     \
-> > +     buf;                                            \
-> >  })
-> >
-> >  #ifdef CONFIG_SMP
-> > diff --git a/kernel/kthread.c b/kernel/kthread.c
-> > index f7be976ff88a..7d001d033cf9 100644
-> > --- a/kernel/kthread.c
-> > +++ b/kernel/kthread.c
-> > @@ -101,7 +101,7 @@ void get_kthread_comm(char *buf, size_t buf_size, s=
-truct task_struct *tsk)
-> >       struct kthread *kthread =3D to_kthread(tsk);
-> >
-> >       if (!kthread || !kthread->full_name) {
-> > -             __get_task_comm(buf, buf_size, tsk);
-> > +             strscpy(buf, tsk->comm, buf_size);
-> >               return;
-> >       }
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index 82574ce0194f..ce629cbc5d01 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -13,8 +13,9 @@
+>   #include <linux/platform_device.h>
+>   #include <linux/if_vlan.h>
+>   #include <linux/crash_dump.h>
+> -#include <net/ipv6.h>
+> +
+>   #include <net/rtnetlink.h>
+> +
+>   #include "hclge_cmd.h"
+>   #include "hclge_dcb.h"
+>   #include "hclge_main.h"
+> @@ -6278,15 +6279,15 @@ static void hclge_fd_get_ip4_tuple(struct ethtool_rx_flow_spec *fs,
+>   static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
+>   				      struct hclge_fd_rule *rule, u8 ip_proto)
+>   {
+> -	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.tcp_ip6_spec.ip6src,
+> -			  IPV6_SIZE);
+> -	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.tcp_ip6_spec.ip6src,
+> -			  IPV6_SIZE);
+> +	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
+> +			      fs->h_u.tcp_ip6_spec.ip6src);
+> +	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
+> +			      fs->m_u.tcp_ip6_spec.ip6src);
+>   
+> -	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.tcp_ip6_spec.ip6dst,
+> -			  IPV6_SIZE);
+> -	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.tcp_ip6_spec.ip6dst,
+> -			  IPV6_SIZE);
+> +	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
+> +			      fs->h_u.tcp_ip6_spec.ip6dst);
+> +	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
+> +			      fs->m_u.tcp_ip6_spec.ip6dst);
+>   
+>   	rule->tuples.src_port = be16_to_cpu(fs->h_u.tcp_ip6_spec.psrc);
+>   	rule->tuples_mask.src_port = be16_to_cpu(fs->m_u.tcp_ip6_spec.psrc);
+> @@ -6307,15 +6308,15 @@ static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
+>   static void hclge_fd_get_ip6_tuple(struct ethtool_rx_flow_spec *fs,
+>   				   struct hclge_fd_rule *rule)
+>   {
+> -	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.usr_ip6_spec.ip6src,
+> -			  IPV6_SIZE);
+> -	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.usr_ip6_spec.ip6src,
+> -			  IPV6_SIZE);
+> +	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
+> +			      fs->h_u.usr_ip6_spec.ip6src);
+> +	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
+> +			      fs->m_u.usr_ip6_spec.ip6src);
+>   
+> -	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.usr_ip6_spec.ip6dst,
+> -			  IPV6_SIZE);
+> -	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.usr_ip6_spec.ip6dst,
+> -			  IPV6_SIZE);
+> +	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
+> +			      fs->h_u.usr_ip6_spec.ip6dst);
+> +	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
+> +			      fs->m_u.usr_ip6_spec.ip6dst);
+>   
+>   	rule->tuples.ip_proto = fs->h_u.usr_ip6_spec.l4_proto;
+>   	rule->tuples_mask.ip_proto = fs->m_u.usr_ip6_spec.l4_proto;
+> @@ -6744,21 +6745,19 @@ static void hclge_fd_get_tcpip6_info(struct hclge_fd_rule *rule,
+>   				     struct ethtool_tcpip6_spec *spec,
+>   				     struct ethtool_tcpip6_spec *spec_mask)
+>   {
+> -	cpu_to_be32_array(spec->ip6src,
+> -			  rule->tuples.src_ip, IPV6_SIZE);
+> -	cpu_to_be32_array(spec->ip6dst,
+> -			  rule->tuples.dst_ip, IPV6_SIZE);
+> +	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
+> +	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
+>   	if (rule->unused_tuple & BIT(INNER_SRC_IP))
+>   		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
+>   	else
+> -		cpu_to_be32_array(spec_mask->ip6src, rule->tuples_mask.src_ip,
+> -				  IPV6_SIZE);
+> +		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
+> +				      rule->tuples_mask.src_ip);
+>   
+>   	if (rule->unused_tuple & BIT(INNER_DST_IP))
+>   		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
+>   	else
+> -		cpu_to_be32_array(spec_mask->ip6dst, rule->tuples_mask.dst_ip,
+> -				  IPV6_SIZE);
+> +		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
+> +				      rule->tuples_mask.dst_ip);
+>   
+>   	spec->tclass = rule->tuples.ip_tos;
+>   	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
+> @@ -6777,19 +6776,19 @@ static void hclge_fd_get_ip6_info(struct hclge_fd_rule *rule,
+>   				  struct ethtool_usrip6_spec *spec,
+>   				  struct ethtool_usrip6_spec *spec_mask)
+>   {
+> -	cpu_to_be32_array(spec->ip6src, rule->tuples.src_ip, IPV6_SIZE);
+> -	cpu_to_be32_array(spec->ip6dst, rule->tuples.dst_ip, IPV6_SIZE);
+> +	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
+> +	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
+>   	if (rule->unused_tuple & BIT(INNER_SRC_IP))
+>   		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
+>   	else
+> -		cpu_to_be32_array(spec_mask->ip6src,
+> -				  rule->tuples_mask.src_ip, IPV6_SIZE);
+> +		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
+> +				      rule->tuples_mask.src_ip);
+>   
+>   	if (rule->unused_tuple & BIT(INNER_DST_IP))
+>   		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
+>   	else
+> -		cpu_to_be32_array(spec_mask->ip6dst,
+> -				  rule->tuples_mask.dst_ip, IPV6_SIZE);
+> +		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
+> +				      rule->tuples_mask.dst_ip);
+>   
+>   	spec->tclass = rule->tuples.ip_tos;
+>   	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
+> @@ -7007,7 +7006,7 @@ static void hclge_fd_get_flow_tuples(const struct flow_keys *fkeys,
+>   	} else {
+>   		int i;
+>   
+> -		for (i = 0; i < IPV6_SIZE; i++) {
+> +		for (i = 0; i < IPV6_ADDR_WORDS; i++) {
+>   			tuples->src_ip[i] = be32_to_cpu(flow_ip6_src[i]);
+>   			tuples->dst_ip[i] = be32_to_cpu(flow_ip6_dst[i]);
+>   		}
+> @@ -7262,14 +7261,14 @@ static int hclge_get_cls_key_ip(const struct flow_rule *flow,
+>   		struct flow_match_ipv6_addrs match;
+>   
+>   		flow_rule_match_ipv6_addrs(flow, &match);
+> -		be32_to_cpu_array(rule->tuples.src_ip, match.key->src.s6_addr32,
+> -				  IPV6_SIZE);
+> -		be32_to_cpu_array(rule->tuples_mask.src_ip,
+> -				  match.mask->src.s6_addr32, IPV6_SIZE);
+> -		be32_to_cpu_array(rule->tuples.dst_ip, match.key->dst.s6_addr32,
+> -				  IPV6_SIZE);
+> -		be32_to_cpu_array(rule->tuples_mask.dst_ip,
+> -				  match.mask->dst.s6_addr32, IPV6_SIZE);
+> +		ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
+> +				      match.key->src.s6_addr32);
+> +		ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
+> +				      match.mask->src.s6_addr32);
+> +		ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
+> +				      match.key->dst.s6_addr32);
+> +		ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
+> +				      match.mask->dst.s6_addr32);
+>   	} else {
+>   		rule->unused_tuple |= BIT(INNER_SRC_IP);
+>   		rule->unused_tuple |= BIT(INNER_DST_IP);
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> index b5178b0f88b3..b9fc719880bb 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> @@ -8,7 +8,9 @@
+>   #include <linux/phy.h>
+>   #include <linux/if_vlan.h>
+>   #include <linux/kfifo.h>
+> +
+>   #include <net/devlink.h>
+> +#include <net/ipv6.h>
+>   
+>   #include "hclge_cmd.h"
+>   #include "hclge_ptp.h"
+> @@ -718,15 +720,15 @@ struct hclge_fd_cfg {
+>   };
+>   
+>   #define IPV4_INDEX	3
+> -#define IPV6_SIZE	4
+> +
+>   struct hclge_fd_rule_tuples {
+>   	u8 src_mac[ETH_ALEN];
+>   	u8 dst_mac[ETH_ALEN];
+>   	/* Be compatible for ip address of both ipv4 and ipv6.
+>   	 * For ipv4 address, we store it in src/dst_ip[3].
+>   	 */
+> -	u32 src_ip[IPV6_SIZE];
+> -	u32 dst_ip[IPV6_SIZE];
+> +	u32 src_ip[IPV6_ADDR_WORDS];
+> +	u32 dst_ip[IPV6_ADDR_WORDS];
+>   	u16 src_port;
+>   	u16 dst_port;
+>   	u16 vlan_tag1;
 >
-> Other than that, LGTM.
-
-Thanks for your review.
-
---=20
-Regards
-Yafang
 
