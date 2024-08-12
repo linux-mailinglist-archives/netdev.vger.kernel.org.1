@@ -1,152 +1,120 @@
-Return-Path: <netdev+bounces-117776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD9D94F24E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:03:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C94594F263
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:05:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688001C211C6
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:03:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECB3E281C26
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EE8183CBF;
-	Mon, 12 Aug 2024 16:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8707187323;
+	Mon, 12 Aug 2024 16:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBayekE7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCt89cgk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24BF1EA8D
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 16:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72953186295;
+	Mon, 12 Aug 2024 16:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723478636; cv=none; b=I18/PHnpoza/UBanNB4O2hacfm2hc6Drp8n5toMpTKxpyRQbQMASka9fAaOpK9yTxLKIfWp4vDgmuWkBbSd7oqImYWdyVuug9kL7lh91ZgjFxvMTnQP9U70H08Y8+Cr6ON251AyITUjgz236OUXvDCvX07Tx/sLSGIDhgwtgLjQ=
+	t=1723478747; cv=none; b=TWy3n1RZiRTT9GsFSNh0maPjfJ0cY25FlsxRLadh89qfAcvFjSJUkre0kGUJxKwMif+ZRw7smU9VW3J3+NO4O1hOEJu3dF1OAQEDmwUlxn3GDqkhIEhl2dndNrE332frL8TUUK73X8+pDKshKsBsJStv9UqSnrjdUCPiszsC8c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723478636; c=relaxed/simple;
-	bh=qdag4ETUFa6IAOkeFe1cSO3N/plwOt0/QREk+/vo7QE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dDs5cA7JRUfDQFbKpv1Cv88K+rg+TKria6BV2eok1WZ0qIjg+LDCDHeNXSprxJ+RLyRe7UOIxKX26mSLBxO9Tr96pdl1Y/VlVVNVXsDjxKNhVBRU4riuckCIhNZ+qOSQXxGtoGfONGh7EdukxWiWqbuSHXQTEb/VxhtAG1T+6ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jBayekE7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723478633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8xYqwIo3WQVe5IYKTevNTP/BE8HoOmYcz/hBcpV1If8=;
-	b=jBayekE7shpZ2Xl6zKQ2D34KzWhFJLc3JvwMd54fbGr3cmLhTyJL6BMP5nI4/5XV/OIG2T
-	cEdigoFu/WYcp77izHqsKNFMD7/4oN/fCZwZodu3SvUKHNiUq5VA3MXtzVNtK3aEvWie44
-	kzjUvkxpQ40i5Kfy4WspRORrGVNAq0s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-GEk6QViONlqH4VSUJ27pjQ-1; Mon, 12 Aug 2024 12:03:50 -0400
-X-MC-Unique: GEk6QViONlqH4VSUJ27pjQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4267378f538so8784925e9.1
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 09:03:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723478627; x=1724083427;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8xYqwIo3WQVe5IYKTevNTP/BE8HoOmYcz/hBcpV1If8=;
-        b=AarCxztvDKq+Su0Wh74AsKT87UA6DvFNywooSnOBXQeAh4fTz70zcDkts40FzRt3c+
-         ADnRK0srWjVHM74VATY63NrwgwoblpS8AaP1QTMZx5gbO90NSE/t/IN6612zROjm12F8
-         SnED1M/n6ZYON6nnoEbbFyoGJXKf6/MhMh3PPBsB3mmkh51gzHylBjUFPNHvIMUUGi3d
-         aKLQiwbPeRmvnntrifCTkJ8htiKHSMkJwQmd6chqcuWolttttpuIl6kGBaL/N/hY+o3m
-         8Lxy+jqGTuuY9xOPRS1XVlwr2kf3qAKepSgFREWJjZ/oVS+6/n8n2cZ61bNRp5QAhRvN
-         tfPA==
-X-Gm-Message-State: AOJu0Yw+neNr+fv59RB5zTL7arGLWuBaOiG4U3/Hlgi+OYG0mYN9q0Jk
-	rzX9IEX/HkXztMIisPOK0dFhnWKr2zd5bfZLJDIOaugacYBsDB3HlT6vB46ZzfQ1L2TEzVACSqk
-	V/NEUBugno08FE7jLw91Yv/5h/OpvIio3v6tzMVOv9GPb/NVxGiNvyg==
-X-Received: by 2002:a5d:6d0e:0:b0:360:8490:74d with SMTP id ffacd0b85a97d-3716cd46258mr398947f8f.5.1723478627362;
-        Mon, 12 Aug 2024 09:03:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IElZqi74HTZ/smiQbo/FiSZ1r8hz1FEQ3fJs2GrvwZvTvkGqSvQXjKnWzbKLavVEK5hnEb6Uw==
-X-Received: by 2002:a5d:6d0e:0:b0:360:8490:74d with SMTP id ffacd0b85a97d-3716cd46258mr398925f8f.5.1723478626854;
-        Mon, 12 Aug 2024 09:03:46 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:170c:dd10::f71? ([2a0d:3344:170c:dd10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4d1dc98fsm7870952f8f.65.2024.08.12.09.03.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Aug 2024 09:03:46 -0700 (PDT)
-Message-ID: <c5d0169a-ab1e-4431-a626-8b11cd7d9a9c@redhat.com>
-Date: Mon, 12 Aug 2024 18:03:44 +0200
+	s=arc-20240116; t=1723478747; c=relaxed/simple;
+	bh=frzS/aHm5VA9TIrOS8VWHyLLQx6PC/h1Pbt6Q1VlcEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcXASHDQb6CpGntSEj/NmTH0vKqZ8qkZseSyWG4hR6Pdq5Wo3XAMVQD/SpgkxzrhpQ6maAFb3nX74f/dww/5T4yJsqMXRM5cafXhBgxTI40H5EA6XyYTI3CPYgBfPeF30/mIphNpO3NqxZy4j2hZGvRrxrJfEY8XHF0w+/Jft/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCt89cgk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 211C3C4AF0D;
+	Mon, 12 Aug 2024 16:05:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723478747;
+	bh=frzS/aHm5VA9TIrOS8VWHyLLQx6PC/h1Pbt6Q1VlcEQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fCt89cgkcUtxbLSoQ0CdTdSdiR1I6LG08Ri65kjhxXhaLmiDckoTreTX17Q8NWM3S
+	 DKFNgbRwQAvrJdPmzYzVXEFsmwNWBqpKpVNIKimbjl3HgXIpXHnmh2wHPJiT4EzMQj
+	 GbuNr8nLCZ1/hNBAGf39TDY6FutgGVbKUl78QX7JpvzUZb/ex8zQ6NZsIWm8Xo+Nck
+	 ywO4zkw9Gt65D6F1yT4fZ9x81FgCmkCr/VMMlu7Nf5LoccvEj3mRQlYBAnndXwWEOK
+	 hG1DgomQT5RU+3hXHIStbHkOhb0IfBu1cqKoFfrix5pm/w6uFGTpkwltxzvCLufKt4
+	 O9xwbbtTG5Elg==
+Date: Mon, 12 Aug 2024 17:05:40 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Johan Hovold <johan@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Daniel Kaehn <kaehndan@gmail.com>,
+	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 0/6] dt-bindings: add serial-peripheral-props.yaml
+Message-ID: <20240812-borax-coming-c1d36272eab4@spud>
+References: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
-To: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
- <29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
- <20240731185511.672d15ae@kernel.org> <20240805142253.GG2636630@kernel.org>
- <20240805123655.50588fa7@kernel.org> <20240806152158.GZ2636630@kernel.org>
- <20240808122042.GA3067851@kernel.org> <20240808071754.72be6896@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240808071754.72be6896@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="t2c4tmW/pTswK+f0"
+Content-Disposition: inline
+In-Reply-To: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
 
-On 8/8/24 16:17, Jakub Kicinski wrote:
-> On Thu, 8 Aug 2024 13:20:42 +0100 Simon Horman wrote:
->> Thanks again for the information.
->>
->> I have now taken another look at this problem.
->>
->> Firstly, my analysis is that the cause of the problem is a combination of
->> the way the patchset is constricted, and the way that the build tests (I
->> have focussed on build_allmodconfig_warn.sh [1]).
->>
->> [1] https://github.com/linux-netdev/nipa/blob/main/tests/patch/build_allmodconfig_warn/build_allmodconfig.sh
->>
->> What I believe happens is this: The patches 01/12 - 07/12 modify some
->> header files, adds a new Kconfig entry, and does a bunch of other normal
->> stuff. Each of those patches is tested in turn, and everything seems fine.
->>
->> Then we get to patch 08/12. The key thing about this patch is that it
->> enables the CONFIG_NET_SHAPER Kconfig option, in the context of an
->> allmodconfig build. That in turn modifies the headers
->> include/linux/netdevice.h and net/core/dev.h (and net/Makefile). Not in the
->> in terms of their on-disk contents changing, but rather in the case of the
->> header files, in terms of preprocessor output. And this is, I believe,
->> where everything goes wrong.
-> 
-> That's strange, make does not understand preprocessor, does it?
 
-AFICS kbuild creates a file for each enabled knob under include/config/.
-Then, for each kernel object target, it creates a .cmd file including 
-the list of all dependencies. Such list comprises all the included files 
-_and_ the relevant, mentioned "knob" file under include/config/
+--t2c4tmW/pTswK+f0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-scripts/basic/fixdep is responsible for including the "knob files" in 
-the dependency list.
+On Sun, Aug 11, 2024 at 08:17:03PM +0200, Krzysztof Kozlowski wrote:
+> Hi,
+>=20
+> Add serial-peripheral-props.yaml for devices being connected over
+> serial/UART.
+>=20
+> Maybe the schema should be rather called serial-common-props.yaml? Or
+> serial-device-common-props.yaml?
+>=20
+> Dependencies/merging - Devicetree tree?
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Entire patchset should be taken via one tree, preferably Rob's
+> Devicetree because of context/hunk dependencies and dependency on
+> introduced serial-peripheral-props.yaml file.
 
-To test the above:
+The whole idea seems reasonable to me, but I question whether it is
+worth tagging it if Rob's gonna be the one applying it.
 
-   make drivers/net/ethernet/intel/ice/ice_main.o
-   touch include/config/NET_SHAPER
-   make V=2 drivers/net/ethernet/intel/ice/ice_main.o
-   CALL    scripts/checksyscalls.sh - due to target is PHONY
-   DESCEND objtool
-   INSTALL libsubcmd_headers
-   CC      drivers/net/ethernet/intel/ice/ice_main.o - due to: 
-include/config/NET_SHAPER
-Cheers,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-Paolo
+--t2c4tmW/pTswK+f0
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZroy0wAKCRB4tDGHoIJi
+0gZwAPsHEotRe8E8aoh94BQjbYy7hCdbThvD/gmgsp1hB7+4XwD+IRh/n/brLbFT
+vFkmgJw6itiKcyKJAzQ0mdJN5iux5QM=
+=1pSD
+-----END PGP SIGNATURE-----
+
+--t2c4tmW/pTswK+f0--
 
