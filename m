@@ -1,140 +1,605 @@
-Return-Path: <netdev+bounces-117788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27CFF94F546
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:50:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1383894F54A
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D30D0280EBA
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:50:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75C8DB25E56
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA02187348;
-	Mon, 12 Aug 2024 16:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ADC18733E;
+	Mon, 12 Aug 2024 16:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CPlXJfn7"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iBfHpl+i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011021.outbound.protection.outlook.com [52.101.70.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3143B2B9B5
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 16:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723481414; cv=none; b=Of+We6FM+UeYxsejZmlPA3BZxe2zq9Yw0a5QRUOGNHPipMQdkN35HOBSFNvm5JZVoxhl1vODZNqTA/E8TghqzSw6BeAevOeGms01dhfOuwm9hm2L6Sub13ZSA2Dc3jNDzldEI/AgQerXwtzL3cqbGV0OVFOM2Rn7qbKU+n1rkCs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723481414; c=relaxed/simple;
-	bh=JStRV2KodetBXluz6l5TxUPL7qVKr4QrOvAXLTSJfI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=laOPNmoaVC+XnmSOwsiTY2ouF1pNJqXa7c4ovbTKpwG4ZnKottoikqH0RUp0+aaf0VqGx5PNx8rGpjRJjMArhdmK/H5T5H8+8Wsmnl9WvSIHb8su/bUYclJzQar8A1prSsnVgr3ZhqOVMMqN2Vtxv39xtMjfln4KU0Ri9hRHwzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CPlXJfn7; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-429c4a4c6a8so21588565e9.0
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 09:50:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723481410; x=1724086210; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fp8xX+FXjb3rqeoPjDRkNuEhp9boglIYB3297SKcqNk=;
-        b=CPlXJfn7EFlTMc8CHepU/iKgPiF6HwPOwT6gZyzw0WF+yeRYiO4D5R0gKZYemOZr/b
-         nLzoy2F1a41jdNt4vjdJPYflcQ8ZvG1HIlTHStiIa/5LV/pJ4UxwHKonw2pIadGDFLEm
-         Qoi7GfdwUoAx9qNAbafMVJwX6L+kS/E+mYga6eUhLzmq1mcJnt0lDwA53Idg5JQ9qoNI
-         uf/PUCgS6mwmz6qPmknxgUi3rY1A5Ow/R2iMmLNvurXZx3xRVO24EEayu1sQYhplAKjY
-         Gc1qXU4yNB/9pUvm8jq2bvQHp19IA2m+9xJtX1TVDIf3IAbTLdJcW45HkhOIxPJ7Afz2
-         /dDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723481410; x=1724086210;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fp8xX+FXjb3rqeoPjDRkNuEhp9boglIYB3297SKcqNk=;
-        b=Re/R1vDiQDcvZfoVUwhctG0ijk1WeXphbwQFVxRPudGpmOltRZMqFDEWbXyCLdpqqY
-         oygASaE02PLs168fcKiDd3CxiZ6P1QzorrKY5N+TPOBODB/C1mOVCSIEa8wZJtdVgwhu
-         L6DNF5BVJubfp2YCmp6uIWkQYROr5Fci0iA4j/J1MyNeC9ditGflhhlhFMb/fdkF0Pl1
-         n+hrH8mlBQFpaAr5plusTuCoC5UWVhaHlBkrLq1XfLWq9d581fPmL+fk1OpIV7G8rHIv
-         E/8Wm6Fbe3qEbsR4VDMbq4Qi5vhxphgcrOVllzlWAuTEOG56q0kWcAXb+TvfAtWq0eVA
-         uryw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyAe3dbhBs4orEfPHvUrryq1ntN+qv2rVTCRj+Mh+tT72FILvE1VG0V8oz6/m8ScozM2MVYw/q46QcJAq7Com4Gbct9aTd
-X-Gm-Message-State: AOJu0YzORQMcKXu65dzdfH8dVBEj/xrA5bzWrwHjSl2GP9RN3kaxt7My
-	vrh6kimewzupO8qX43ba2pCcU05ZUWs8Mvikiv07RsXMD09gOZ9PTPtXhMOUxj8=
-X-Google-Smtp-Source: AGHT+IEI8II0zjNASn27I9fMm0e9cD6S3h+RK97HXuwvblBt8meMa6cF2FdHklxVfp9Z1OGFn9Xvaw==
-X-Received: by 2002:adf:eccb:0:b0:369:b5cc:58b1 with SMTP id ffacd0b85a97d-3716ccf5ec6mr570530f8f.18.1723481410299;
-        Mon, 12 Aug 2024 09:50:10 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51ec2asm7994854f8f.67.2024.08.12.09.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 09:50:09 -0700 (PDT)
-Date: Mon, 12 Aug 2024 18:50:06 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <Zro9PhW7SmveJ2mv@nanopsycho.orion>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
- <ZquJWp8GxSCmuipW@nanopsycho.orion>
- <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
- <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
- <74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
- <ZrHLj0e4_FaNjzPL@nanopsycho.orion>
- <f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
- <20240812082544.277b594d@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AA34317C;
+	Mon, 12 Aug 2024 16:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723481468; cv=fail; b=N4TPGiOpO5ikHHUiA5St4ARF6OOFaRpi2U4F8LOANID6eq5JfhU8VRluKKxcVKeoblzQ8bIuEkK8JHVPIMT5MFF5Z63n8rAbWlR0P7cfgPYqO1x1r5aaskfnsZgMxCq9Qa+ppYlzArYDIfPAOue0U6uqFF8MwgQVkVk5V7mO5PA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723481468; c=relaxed/simple;
+	bh=AzYNprX6QKGDqVV2TvMZHJHiZjCr34y71/xq4PFych4=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=kFBMDRWCV8bWtj44iAZgkLayYvo7Vzx5Xp2sbjAH13MGpr90tkA8nHTq/DP+tctE38LwWRqL0ibd4jcBhZdUZgCzcZXOhINK8+DbfkdMU5Yw699ClyiSI7CUUCjrh5f0g1eu8oIMijOEatUdlee/T/M6jDpPHzSlYn6G3PIkWRw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iBfHpl+i; arc=fail smtp.client-ip=52.101.70.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BYvuqW0hqLga4FjtzPm7M/etdxhnFNntV2CdEmnyyno/eEHv9O5/fWYz+pYPtj/MDud8C0Ft3IFxetvpKXVcGMKqF9Voynty/2WBSn0hocP2F5EKDEr9UApsdaBnlviJV2Mta9lqNokWim6Ba1lAHk18m+27CQsmauUTPHsqYkKvMtZj+EUVCsd6nc2717NCo6D7G8RRYwJNl1EXII4JceWVSMQoXx10xAu1nx1TmN7Ps/HR90K94HaSxMSHFKarAm3nGuj88B5/Ecb6G/AWj9WyKTkk6+gVqhLlw2xHsmczTVWAJQJk2aqCX6FgvY8MV2kFrEECugnRIqwKZxqaAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2CTVRmxbByW2YRbrohBxDwhpt7SeRR15knglV8wjIpc=;
+ b=Mm34YfkgQdwIg5P+PxENrvYyG34iR7b1Q4senruNnqlgrTNJnAQqlX4yGX8ZA96kyz9Fwfy3oTcJR2ra8urpxFyww8DIO5tABgU555BFmfr7JSpJBx5k9sEvup9vPzJAeWjOTP5/d4jYutEX22A9WWmJBc0uppqSU6rbbzhS26WP0ARsmckPg4atNyZK4ROOB/InOxXk08FuFulcLOjke4sp9XIZDtIj2TmkW5L2QuMGeTGcmYG82WAcXSiCFBGoV3e9UJz7eXP3xdFJTdGvcZKYbqvpWkXNqPAO7WC7B2qql1J6VAbTPDC/cCKaq5F/zaquRdukcJNgwsBHu3ehZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2CTVRmxbByW2YRbrohBxDwhpt7SeRR15knglV8wjIpc=;
+ b=iBfHpl+izZOKXLw87J+2k6n++I5wqD5BsCmjmCiVl8TS9tl2qzkSkKan/NxSSryd1F3JgOtsXMORZwhD2MemnJ1ESL9UTmmyl8tDgnsCdF6ln+qpv9fMpDbRWsNiC7cp9LprVyhIJb14mI8JeswEqd15slIwBPaTLffQRs9qneUQ1ZkwHXRvGJx2CPjcGw0RhXVRIZjmtrfCS2YNYmuAurcKBYblyVSIqQoK/tg72CvA8osVdF8VWPthtK5FDTuEhUdMxpZkc1vayIE3D1JmPAXO5P9PDgoyLm/oerLg1sh9ydw9SdFfAoqygfu1yLOP0iIr0wfgVa6Lz19Wrf5lKQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by AS5PR04MB9825.eurprd04.prod.outlook.com (2603:10a6:20b:672::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Mon, 12 Aug
+ 2024 16:51:00 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%3]) with mapi id 15.20.7849.019; Mon, 12 Aug 2024
+ 16:51:00 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list),
+	linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC DRIVERS),
+	linux-arm-kernel@lists.infradead.org (moderated list:FREESCALE SOC DRIVERS)
+Cc: imx@lists.linux.dev
+Subject: [PATCH 1/1] dt-bindings: soc: fsl: cpm_qe: convert network.txt to yaml
+Date: Mon, 12 Aug 2024 12:50:35 -0400
+Message-Id: <20240812165041.3815525-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0017.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c0::22) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812082544.277b594d@kernel.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AS5PR04MB9825:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6247cb31-8d62-4005-5bad-08dcbaeef1b5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hdt1DKQhqAOZDiwLyORJ+HygN4eNslI8hYVNk2U6IpkXuwPqus78OiF0EJiS?=
+ =?us-ascii?Q?qUEhlt9MiZk12HxZ7A5wRoA4McqrP2iw6+RrCy9WjMe+KBW/wdxHy04z+KHI?=
+ =?us-ascii?Q?qKH0MTDxpblRMClFrAU9+HtcuUsYap09s2peRl7YLhsdFRLMBsAse7A/mrsl?=
+ =?us-ascii?Q?BeG/FrRrAP/iO3pm6/Qes0JDv9roKuT5xtJGyDGkTc/n76gYgIXAGVtlEhmp?=
+ =?us-ascii?Q?98t2FWcIILnbV7FafucUTFRT0PYCMQbPHofLuLaY57wfMfUbcmBLLDqhdu3H?=
+ =?us-ascii?Q?m8lPvUmOHQH1bq99/T9dKhR8q36uCYxMZYFOvzDMYOwwHdo8GZCWIW5LSIHF?=
+ =?us-ascii?Q?FUNtMvRhTQnraNxHv3LeXhMeduVkhA6hfUXMSf8YvEErc8f3Ups0P8k6TnQ9?=
+ =?us-ascii?Q?mCcFOfDA5Rw0l+GFTxMbJp9tE1Lc2XtSowhdvyhGsY3ThD5BlMnU7ECC8Hyw?=
+ =?us-ascii?Q?C1sv0wu//Os0UfZUeg0wAvzRSz0DHbo6uWq150gkQqjZyzd4vNqy3ggkuy8W?=
+ =?us-ascii?Q?hkvVtTvZrQgq3jcouUEctQjciXiNvQ94zRN+1QagpKqLGbDrM64pspUUdSir?=
+ =?us-ascii?Q?PUxicI2Z5vu2NlOiQ72BqOz+rgJfH5PX3/ebHBXMPYuAVF1eBVaefpJTmvSP?=
+ =?us-ascii?Q?jZEgXcJZUEeVdSIXpxy62UJZtA8XbgriB2T1hLSQV/yo9T/2tsFQWaYR2iDs?=
+ =?us-ascii?Q?SCT3IasnyEqeYbd2zVycLgiieIkkDKRq07S0t8Y8ab211DYbFlVdHwTKdS0V?=
+ =?us-ascii?Q?kCBy6zcAAodbB5JP+Z3rLBDgKgKjOLUbW6HjBYYZOZZSNPtP7ratigW7EXIG?=
+ =?us-ascii?Q?LP/ZJxQK6imS3mRvoGRzkMSjYLBsVWfcm9QMAlQHoeTioQddznI6zEoyMg7R?=
+ =?us-ascii?Q?tpGwlxYvjn0AqOYWyqbu6hVM8kO8lRPOhhI1zKRN6rVWhQ8tGqhPfz9ygLc+?=
+ =?us-ascii?Q?fcT4tWszbWGYCddd8V2g/Mfrw+5zKR0vi6E7zrGS9sg5BVL35WKBRuig6MF4?=
+ =?us-ascii?Q?gYO2lvEM8mpnVRS1kl799+hSpwcC0328t8yjx5KnN7VAALFJnflkldaaFL82?=
+ =?us-ascii?Q?iDQNgxgU/2iMCrNn3xuIbrbI/zQr1eu2hiuhPXID53V4Z0PyJGAfKKDDB7FN?=
+ =?us-ascii?Q?QyPHptBmgJW/3ZIey1fkAelEeWhsyDVi+nyvWSg+/I6lMO8htkiujKV+HE4s?=
+ =?us-ascii?Q?GBMiWCCr7rz+uduiQrJWizgrbrAr6cst1B9vetM+BEv41Ma7+NTBu6k+1vJD?=
+ =?us-ascii?Q?0ALZ7EH0eFEQXuLaPxhDv3rrN3PHqxXzkMVDzDeEtzvhwXiYtRXCiARL7zlC?=
+ =?us-ascii?Q?cg3HgfAyvq4tTWDA2KRPXfF4x47jmFAp9MO5ZQHMFWNBYhOpMrzsaA6qRt8x?=
+ =?us-ascii?Q?hYO3cGc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dFmEXmg7lKfSU8keG4zTcTkL1gvZzz7R26sgfUT4vmStGCm0M2griaqOs1iq?=
+ =?us-ascii?Q?gvygMqFh28i8CvF8IDH5Guhw8zty/LCkhs/LVrPf4qO7B0mUOVS8bS29XO8v?=
+ =?us-ascii?Q?W7xRNz/PrpnBewHIJO4dh2JFfscZ/YHq5BgxdU2jQwmIzWZXWgvGJd5AfRrw?=
+ =?us-ascii?Q?7KP1yYHYvJk4cvHHr4mfrfjplm+WGQYrtKMQ3dVVUuzvIJ3ceXzeZOHRD7qI?=
+ =?us-ascii?Q?o4WIghtXKJCp1JCtJdo/8VASp+p6TRK7k8f0ORTa4gRRA82KycaURjtaV26L?=
+ =?us-ascii?Q?gGvz1GU9jURlsZBTSADoQIXatPG56hGYuv60ozqJB+gC0wooVwUB78+xijAF?=
+ =?us-ascii?Q?DETUjfPOOdf54osvsCZAbrxT7h+9dRQokIAGU1He0c5oiNy1X2qFFlibwyMp?=
+ =?us-ascii?Q?aXTWcwlMdmfye5mKOodixUpKAM+lepdfdD4e0c4VECGQG76NbmvsR+Ddf335?=
+ =?us-ascii?Q?hgODLj7x/SOKw5FqdpW4mVqL7w8/ccjikn4UnBb7Ku7mN24iX4TAhJlo0mPq?=
+ =?us-ascii?Q?6FUF71hiGTM17E7uGSuo2K5VeYwUg/LijRxpo8emXmzIKwWVU7Ys3DHPjttn?=
+ =?us-ascii?Q?qV/XYuhX+HhTghCl5DpbXawqtjfK+I5yepE467Xlj9FcrmCyKh+c62MoKpHc?=
+ =?us-ascii?Q?m3HrK1t8Kndnk1cMdcqEeJyC8RCvhK1mgHjIf1I3Pl3rbGPeATcENQJLYOI0?=
+ =?us-ascii?Q?+V6R7Xm2A8wctLprc+5YivCU4pf+9uLcOBBQ/eLAygyL8Igzb3IWRnFalTC/?=
+ =?us-ascii?Q?NzCQ77TVCsK4C85rm19RkSuoBLythKA6zpan/BpZpmsbmVRJlFPMUTZGF7ec?=
+ =?us-ascii?Q?c78SKAv+KxQwaqAXAEFnnaqcU7AiRyxiLynhyU2ORIWr2pXZumRkPnI8uerq?=
+ =?us-ascii?Q?lP7Eb6ANPRJ7KWeWVR6S4ZCYfGc1fmt1DNFCnKp39YBHRyGjHrOtQrRUrLii?=
+ =?us-ascii?Q?QCmjgI7khz4qREYyw1naxWwoMqknVDKSJStbrqobWTGtUQyq78dsliFelr9d?=
+ =?us-ascii?Q?8UlZt3TAkriSZV79Ek7xhePeGZlSCB4j/SBRn91FdwFuX4mLp7reIFUK1MfM?=
+ =?us-ascii?Q?+nfQ1amSt2affMyDFN9arulG3jnxjR2sPhtpNlZvhESuXTE+k5MB+t398zjM?=
+ =?us-ascii?Q?BNKthyZ3Qkb5EuEWN7VjDaZUcTxJJgibJT/gqXusClY/ymTPAgQ8d9vIusmI?=
+ =?us-ascii?Q?hecNvWQM8gbHf3BsfT7gIH6wX6Ky5EmeHCIP5ffAtXSN4u0TUq0Q1DLyGy4q?=
+ =?us-ascii?Q?eoIwFIf/6Y1VKvtA0CoyknxFdnKAqNV1dJ5NK8bPE4H10OQOta/kmd83LKV+?=
+ =?us-ascii?Q?l/wATZXGX7ejGFBM3VrDYTx3dPzyBe4POM3H6tKMqb+V/i20k4/KFTuhx+vf?=
+ =?us-ascii?Q?v7DpCEn/YvNZqnBHoaQUPKsstxxOsOgJHI4AYffq1dcGQaXn7yua7cFeZs8k?=
+ =?us-ascii?Q?6DBGhjKUQYYw/SoV2fTnd10zrjM0dcBVLl1PSbbXip6yhOJLpHtRpezS/iBb?=
+ =?us-ascii?Q?M8xJrhy9amS/0G0MMn9Otv4K4BbPCIS035uCBtnzQGc0MF7MEUqD/l7Cp2ky?=
+ =?us-ascii?Q?gBNMk47zSTB6dETSne8=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6247cb31-8d62-4005-5bad-08dcbaeef1b5
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 16:51:00.2278
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bqnrg0CEvHO6CEnMFi0bvFOcQNsdHfATaaaReA+LiJ7j1o6ZbYVu7rqExOfLYgYg6F7DO0cnmMfoyIKSXh7M2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9825
 
-Mon, Aug 12, 2024 at 05:25:44PM CEST, kuba@kernel.org wrote:
->On Mon, 12 Aug 2024 16:58:33 +0200 Paolo Abeni wrote:
->> > It's a tree, so perhaps just stick with tree terminology, everyone is
->> > used to that. Makes sense? One way or another, this needs to be
->> > properly described in docs, all terminology. That would make things more
->> > clear, I believe.  
->> 
->> @Jakub, would you be ok with:
->> 
->> 'inputs' ->  'leaves'
->> 'output' -> 'node'
->> ?
->
->I think the confusion is primarily about the parent / child.
->input and output should be very clear, IMO.
+Convert binding doc newwork.txt to yaml format.
 
-For me, "inputs" and "output" in this context sounds very odd. It should
-be children and parent, isn't it. Confused...
+HDLC part:
+- Convert to "fsl,ucc-hdlc.yaml".
+- Add missed reg and interrupt property.
+- Update example to pass build.
 
+ethernet part:
+- Convert to net/fsl,cpm-enet.yaml
+- Add 0x in example, which should be hex value
+- Add ref to ethernet-controller.yaml
 
->
->> Also while at it, I think renaming the 'group()' operation as 
->> 'node_set()' could be clearer (or at least less unclear), WDYT?
->
->No idea how we arrived at node_set(), and how it can possibly 
+mdio part:
+- Convert to net/fsl,cpm-mdio.yaml
+- Add 0x in example, which should be hex value
+- Add ref to mdio.yaml
 
-subtree_set() ?
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+---
+This one is quite old. The detail informaiton is limited.
+---
+ .../devicetree/bindings/net/fsl,cpm-enet.yaml |  59 ++++++++
+ .../devicetree/bindings/net/fsl,cpm-mdio.yaml |  55 +++++++
+ .../bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml | 140 ++++++++++++++++++
+ .../bindings/soc/fsl/cpm_qe/network.txt       | 130 ----------------
+ 4 files changed, 254 insertions(+), 130 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
+ create mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
 
+diff --git a/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml b/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
+new file mode 100644
+index 0000000000000..da836477e8bad
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
+@@ -0,0 +1,59 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/fsl,cpm-enet.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Network for cpm enet
++
++maintainers:
++  - Frank Li <Frank.Li@nxp.com>
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++          - fsl,cpm1-scc-enet
++          - fsl,cpm2-scc-enet
++          - fsl,cpm1-fec-enet
++          - fsl,cpm2-fcc-enet
++          - fsl,qe-enet
++      - items:
++          - enum:
++              - fsl,mpc8272-fcc-enet
++          - const: fsl,cpm2-fcc-enet
++
++  reg:
++    minItems: 1
++    maxItems: 3
++
++  interrupts:
++    maxItems: 1
++
++  fsl,cpm-command:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: cpm command
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++allOf:
++  - $ref: ethernet-controller.yaml
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    ethernet@11300 {
++        compatible = "fsl,mpc8272-fcc-enet",
++                     "fsl,cpm2-fcc-enet";
++        reg = <0x11300 0x20 0x8400 0x100 0x11390 1>;
++        local-mac-address = [ 00 00 00 00 00 00 ];
++        interrupts = <20 8>;
++        interrupt-parent = <&pic>;
++        phy-handle = <&phy0>;
++        fsl,cpm-command = <0x12000300>;
++    };
++
+diff --git a/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml b/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
+new file mode 100644
+index 0000000000000..b1791a3c490e2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
+@@ -0,0 +1,55 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/fsl,cpm-mdio.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale CPM MDIO Device
++
++maintainers:
++  - Frank Li <Frank.Li@nxp.com>
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++          - fsl,pq1-fec-mdio
++          - fsl,cpm2-mdio-bitbang
++      - items:
++          - const: fsl,mpc8272ads-mdio-bitbang
++          - const: fsl,mpc8272-mdio-bitbang
++          - const: fsl,cpm2-mdio-bitbang
++
++  reg:
++    maxItems: 1
++
++  fsl,mdio-pin:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: pin of port C controlling mdio data
++
++  fsl,mdc-pin:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: pin of port C controlling mdio clock
++
++required:
++  - compatible
++  - reg
++
++allOf:
++  - $ref: mdio.yaml#
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio@10d40 {
++        compatible = "fsl,mpc8272ads-mdio-bitbang",
++                     "fsl,mpc8272-mdio-bitbang",
++                     "fsl,cpm2-mdio-bitbang";
++        reg = <0x10d40 0x14>;
++        #address-cells = <1>;
++        #size-cells = <0>;
++        fsl,mdio-pin = <12>;
++        fsl,mdc-pin = <13>;
++    };
++
+diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
+new file mode 100644
+index 0000000000000..64ffbf75dd9d2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
+@@ -0,0 +1,140 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: High-Level Data Link Control(HDLC)
++
++description: HDLC part in Universal communication controllers (UCCs)
++
++maintainers:
++  - Frank Li <Frank.Li@nxp.com>
++
++properties:
++  compatible:
++    const: fsl,ucc-hdlc
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  cell-index:
++    $ref: /schemas/types.yaml#/definitions/uint32
++
++  rx-clock-name:
++    $ref: /schemas/types.yaml#/definitions/string
++    oneOf:
++      - pattern: "^brg([0-9]|1[0-6])$"
++      - pattern: "^clk([0-9]|1[0-9]|2[0-4])$"
++
++  tx-clock-name:
++    $ref: /schemas/types.yaml#/definitions/string
++    oneOf:
++      - pattern: "^brg([0-9]|1[0-6])$"
++      - pattern: "^clk([0-9]|1[0-9]|2[0-4])$"
++
++  fsl,tdm-interface:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description: Specify that hdlc is based on tdm-interface
++
++  fsl,rx-sync-clock:
++    $ref: /schemas/types.yaml#/definitions/string
++    description: rx-sync
++    enum:
++      - none
++      - rsync_pin
++      - brg9
++      - brg10
++      - brg11
++      - brg13
++      - brg14
++      - brg15
++
++  fsl,tx-sync-clock:
++    $ref: /schemas/types.yaml#/definitions/string
++    description: tx-sync
++    enum:
++      - none
++      - tsync_pin
++      - brg9
++      - brg10
++      - brg11
++      - brg13
++      - brg14
++      - brg15
++
++  fsl,tdm-framer-type:
++    $ref: /schemas/types.yaml#/definitions/string
++    description: required for tdm interface
++    enum: [e1, t1]
++
++  fsl,tdm-id:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: number of TDM ID
++
++  fsl,tx-timeslot-mask:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      required for tdm interface.
++      time slot mask for TDM operation. Indicates which time
++      slots used for transmitting and receiving.
++
++  fsl,rx-timeslot-mask:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      required for tdm interface.
++      time slot mask for TDM operation. Indicates which time
++      slots used for transmitting and receiving.
++
++  fsl,siram-entry-id:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      required for tdm interface
++      Must be 0,2,4...64. the number of TDM entry.
++
++  fsl,tdm-internal-loopback:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      optional for tdm interface
++      Internal loopback connecting on TDM layer.
++
++  fsl,hmask:
++    $ref: /schemas/types.yaml#/definitions/uint16
++    description: |
++      HDLC address recognition. Set to zero to disable
++      address filtering of packets:
++      fsl,hmask = /bits/ 16 <0x0000>;
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    communication@2000 {
++        compatible = "fsl,ucc-hdlc";
++        reg = <0x2000 0x200>;
++        rx-clock-name = "clk8";
++        tx-clock-name = "clk9";
++        fsl,rx-sync-clock = "rsync_pin";
++        fsl,tx-sync-clock = "tsync_pin";
++        fsl,tx-timeslot-mask = <0xfffffffe>;
++        fsl,rx-timeslot-mask = <0xfffffffe>;
++        fsl,tdm-framer-type = "e1";
++        fsl,tdm-id = <0>;
++        fsl,siram-entry-id = <0>;
++        fsl,tdm-interface;
++    };
++
++  - |
++    communication@2000 {
++        compatible = "fsl,ucc-hdlc";
++        reg = <0x2000 0x200>;
++        rx-clock-name = "brg1";
++        tx-clock-name = "brg1";
++    };
+diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
+deleted file mode 100644
+index 6d2dd8a31482a..0000000000000
+--- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
++++ /dev/null
+@@ -1,130 +0,0 @@
+-* Network
+-
+-Currently defined compatibles:
+-- fsl,cpm1-scc-enet
+-- fsl,cpm2-scc-enet
+-- fsl,cpm1-fec-enet
+-- fsl,cpm2-fcc-enet (third resource is GFEMR)
+-- fsl,qe-enet
+-
+-Example:
+-
+-	ethernet@11300 {
+-		compatible = "fsl,mpc8272-fcc-enet",
+-			     "fsl,cpm2-fcc-enet";
+-		reg = <11300 20 8400 100 11390 1>;
+-		local-mac-address = [ 00 00 00 00 00 00 ];
+-		interrupts = <20 8>;
+-		interrupt-parent = <&PIC>;
+-		phy-handle = <&PHY0>;
+-		fsl,cpm-command = <12000300>;
+-	};
+-
+-* MDIO
+-
+-Currently defined compatibles:
+-fsl,pq1-fec-mdio (reg is same as first resource of FEC device)
+-fsl,cpm2-mdio-bitbang (reg is port C registers)
+-
+-Properties for fsl,cpm2-mdio-bitbang:
+-fsl,mdio-pin : pin of port C controlling mdio data
+-fsl,mdc-pin : pin of port C controlling mdio clock
+-
+-Example:
+-	mdio@10d40 {
+-		compatible = "fsl,mpc8272ads-mdio-bitbang",
+-			     "fsl,mpc8272-mdio-bitbang",
+-			     "fsl,cpm2-mdio-bitbang";
+-		reg = <10d40 14>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		fsl,mdio-pin = <12>;
+-		fsl,mdc-pin = <13>;
+-	};
+-
+-* HDLC
+-
+-Currently defined compatibles:
+-- fsl,ucc-hdlc
+-
+-Properties for fsl,ucc-hdlc:
+-- rx-clock-name
+-- tx-clock-name
+-	Usage: required
+-	Value type: <string>
+-	Definition : Must be "brg1"-"brg16" for internal clock source,
+-		     Must be "clk1"-"clk24" for external clock source.
+-
+-- fsl,tdm-interface
+-	Usage: optional
+-	Value type: <empty>
+-	Definition : Specify that hdlc is based on tdm-interface
+-
+-The property below is dependent on fsl,tdm-interface:
+-- fsl,rx-sync-clock
+-	Usage: required
+-	Value type: <string>
+-	Definition : Must be "none", "rsync_pin", "brg9-11" and "brg13-15".
+-
+-- fsl,tx-sync-clock
+-	Usage: required
+-	Value type: <string>
+-	Definition : Must be "none", "tsync_pin", "brg9-11" and "brg13-15".
+-
+-- fsl,tdm-framer-type
+-	Usage: required for tdm interface
+-	Value type: <string>
+-	Definition : "e1" or "t1".Now e1 and t1 are used, other framer types
+-		     are not supported.
+-
+-- fsl,tdm-id
+-	Usage: required for tdm interface
+-	Value type: <u32>
+-	Definition : number of TDM ID
+-
+-- fsl,tx-timeslot-mask
+-- fsl,rx-timeslot-mask
+-	Usage: required for tdm interface
+-	Value type: <u32>
+-	Definition : time slot mask for TDM operation. Indicates which time
+-		     slots used for transmitting and receiving.
+-
+-- fsl,siram-entry-id
+-	Usage: required for tdm interface
+-	Value type: <u32>
+-	Definition : Must be 0,2,4...64. the number of TDM entry.
+-
+-- fsl,tdm-internal-loopback
+-	usage: optional for tdm interface
+-	value type: <empty>
+-	Definition : Internal loopback connecting on TDM layer.
+-- fsl,hmask
+-	usage: optional
+-	Value type: <u16>
+-	Definition: HDLC address recognition. Set to zero to disable
+-		    address filtering of packets:
+-		    fsl,hmask = /bits/ 16 <0x0000>;
+-
+-Example for tdm interface:
+-
+-	ucc@2000 {
+-		compatible = "fsl,ucc-hdlc";
+-		rx-clock-name = "clk8";
+-		tx-clock-name = "clk9";
+-		fsl,rx-sync-clock = "rsync_pin";
+-		fsl,tx-sync-clock = "tsync_pin";
+-		fsl,tx-timeslot-mask = <0xfffffffe>;
+-		fsl,rx-timeslot-mask = <0xfffffffe>;
+-		fsl,tdm-framer-type = "e1";
+-		fsl,tdm-id = <0>;
+-		fsl,siram-entry-id = <0>;
+-		fsl,tdm-interface;
+-	};
+-
+-Example for hdlc without tdm interface:
+-
+-	ucc@2000 {
+-		compatible = "fsl,ucc-hdlc";
+-		rx-clock-name = "brg1";
+-		tx-clock-name = "brg1";
+-	};
+-- 
+2.34.1
 
->represent a grouping operation.
->The operations is grouping inputs and creating a scheduler node.
->
->> Note: I think it's would be more user-friendly to keep a single 
->> delete/get/dump operation for 'nodes' and leaves.
->
->Are you implying that nodes and leaves are different types of objects?
->Aren't leaves nodes without any inputs?
-
-Agree. Same op would be nice for both.
 
