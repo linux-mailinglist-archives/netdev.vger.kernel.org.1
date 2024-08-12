@@ -1,117 +1,143 @@
-Return-Path: <netdev+bounces-117838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0FF94F825
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:22:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8347F94F829
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E8AE1F22481
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E930281252
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595C6193069;
-	Mon, 12 Aug 2024 20:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rva8snpV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D9119307E;
+	Mon, 12 Aug 2024 20:23:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6B186E30;
-	Mon, 12 Aug 2024 20:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109F5186E30;
+	Mon, 12 Aug 2024 20:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723494151; cv=none; b=Qo6AKAx5TWuXj6gQS66cV5m5RAKs8p6oxUPfZM9gb7EswSwFKaSEh24d+RM3xjrrauN6jks/qUvFYLk4xy+HYOb8Ed+rA4idBIfVusxfjAU3LlZO7LTdM5zbUzPGOCnx94l81mKX6eALcS2bwA9d4E0yA8ZiMbgyWNHbIzuhrRQ=
+	t=1723494210; cv=none; b=Y3n5ek6T0d/3V83vABgHJ7RbK2lrQLOmuCu10z6R5l4lxZCpUxN9SW96wX3LoTiEEZQtH6OtPZXtwiW0pSFeBGmXrTPvK1XOnk6oY9bSWZP7zaeybS/2P7EbOQEuqbeX6yMJkVb2MxQR3Nsjo6kY40kmwafYGJFtzSssEqhu3hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723494151; c=relaxed/simple;
-	bh=otiKvNXT1TZyEdmB0RL7gA55pIcWsw+RG+ac53fD7HA=;
+	s=arc-20240116; t=1723494210; c=relaxed/simple;
+	bh=xcyXqGp/vIPm25gwoTB8fN3iLEkpf3lzBI9z6lRi3ls=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rDvQhc0wdHqyAbPYTXfTLupCN/AinPlwUVPKgJ6Ga6C/iBo8zm7ATUtGeOND6u1A7YVmUfgo4bpchYYXpfKA+GDx3+lpMxnzAx57Wke1gGr6N9s0JdxgOvfDSLEI0nEQyaq4RzVgJk7Malzo8iIZ3dvOZ++yayRTM7/y6N1FpbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rva8snpV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=O8IRnInZINo2pPnJLcokAejXz1Yw9TmlkcZMR1b30CQ=; b=rva8snpVqAC7jLEmtyGHq4uq0f
-	IROPI9rNsyjsFp8tVkymzucocvOhB4IhY6n9ZOa5966yNt+ybbrdhytvaNzEkDZ9g2or7wu/xNUE8
-	X0tFUjaR6hb/hgmiDZYJTnLdcyxJ3x9MoTLH2icl07nHJbq4pip900JawcxN7GbQr0Ao=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdbYa-004cCs-B5; Mon, 12 Aug 2024 22:22:20 +0200
-Date: Mon, 12 Aug 2024 22:22:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 2/2] net: xilinx: axienet: Add statistics
- support
-Message-ID: <e78256f2-9ad6-49e1-9cd5-02a28c92d2fc@lunn.ch>
-References: <20240812174118.3560730-1-sean.anderson@linux.dev>
- <20240812174118.3560730-3-sean.anderson@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jtXIitnOTMo5ZZNBgaJA23XHwLUESWyzDqy+FuvcdABSWKTy9gQCpLQVOQe2Z7xjnMSihAAJ35iJP3/ZCdhfeG+hHCC0pX+3wf5bKKB/YAlbbtScOOFWVeLhIBV4n89qDjxeMcfWaRFIYMBBOr3INihL18+my77vlmpiLcyOgTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fd6ed7688cso41238905ad.3;
+        Mon, 12 Aug 2024 13:23:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723494208; x=1724099008;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7pREe9g6ybdZ+2HTF9XCEyGKYgxlP5j2neTstGZLyss=;
+        b=nnRZnYXnGmNbIinNIlkVi9E0XVPnrLpQGqvFxu4FFonbs3PVcw5xWWPkSWLDCtjf+d
+         OW5MkUni1Jm5aFM2viCKcAHGtFvkWOUmaWVQS4wukqGBYTHbbju9mswYKoqrFT/2K7iM
+         VCft+h1FvacWmII3CYI5KMeTT2d7hVHiOckritS+M6sgPamwcNX2vGdpZgHxPXq4MZi0
+         oMBu7xuiDWni8mmUOk3Wt1Ev5yEpcZLEzz0l4Ble5ye6OpEc8yjgA+QeWNPwRpgP7t2Z
+         yjFSgU9YrCl/VvSuTpPcivUFGXUIK5yst6cOIPFnqrfheCI98BA7bpqGbzbSZArnLabh
+         o93g==
+X-Forwarded-Encrypted: i=1; AJvYcCV3NsGG9ZuGpENjQDZIoT6l5oF/yURrpu5cwg4jePeDsv3MxMPp6kLLjpT6qdAQlTKVcX2HesMoCHykVc4oU54/5ao4SOjgV1sPSHeQ
+X-Gm-Message-State: AOJu0Yy1XjdkqUavkEa25zp6Z2JYNo6Yl7UGW0ourHDzwhmgGGj2ihMV
+	V1+lW/ToOAWy8a7NDtk9hqVsKTRMkLa5nRcQNqJn7wzQ9nim9CM=
+X-Google-Smtp-Source: AGHT+IFnjyk/sUKXIY4GZBM6SjohiGVLx0AHHXAV1CjTPxshYNK0r8Tqxafx2HBUJziuPQ3y/YBdDg==
+X-Received: by 2002:a17:902:f64a:b0:1fd:6529:7447 with SMTP id d9443c01a7336-201ca143f34mr13460875ad.29.1723494208115;
+        Mon, 12 Aug 2024 13:23:28 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1c9b92sm802795ad.277.2024.08.12.13.23.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 13:23:27 -0700 (PDT)
+Date: Mon, 12 Aug 2024 13:23:27 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next 1/6] netdevice: Add napi_affinity_no_change
+Message-ID: <ZrpvP_QSYkJM9Mqw@mini-arch>
+References: <20240812145633.52911-1-jdamato@fastly.com>
+ <20240812145633.52911-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240812174118.3560730-3-sean.anderson@linux.dev>
+In-Reply-To: <20240812145633.52911-2-jdamato@fastly.com>
 
->  static int __axienet_device_reset(struct axienet_local *lp)
->  {
->  	u32 value;
->  	int ret;
+On 08/12, Joe Damato wrote:
+> Several drivers have their own, very similar, implementations of
+> determining if IRQ affinity has changed. Create napi_affinity_no_change
+> to centralize this logic in the core.
+> 
+> This will be used in following commits for various drivers to eliminate
+> duplicated code.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>  include/linux/netdevice.h |  8 ++++++++
+>  net/core/dev.c            | 14 ++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 0ef3eaa23f4b..dc714a04b90a 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -464,6 +464,14 @@ enum rx_handler_result {
+>  typedef enum rx_handler_result rx_handler_result_t;
+>  typedef rx_handler_result_t rx_handler_func_t(struct sk_buff **pskb);
 >  
-> +	/* Save statistics counters in case they will be reset */
-> +	guard(mutex)(&lp->stats_lock);
-> +	if (lp->features & XAE_FEATURE_STATS)
-> +		axienet_stats_update(lp, true);
-
-My understanding of guard() is that the mutex is held until the
-function completes. That is much longer than you need. A
-scoped_guard() would be better here, and it makes it clear when the
-mutex will be released.
-
+> +/**
+> + * napi_affinity_no_change - determine if CPU affinity changed
+> + * @irq: the IRQ whose affinity may have changed
+> + *
+> + * Return true if the CPU affinity has NOT changed, false otherwise.
+> + */
+> +bool napi_affinity_no_change(unsigned int irq);
 > +
->  	/* Reset Axi DMA. This would reset Axi Ethernet core as well. The reset
->  	 * process of Axi DMA takes a while to complete as all pending
->  	 * commands/transfers will be flushed or completed during this
-> @@ -551,6 +595,23 @@ static int __axienet_device_reset(struct axienet_local *lp)
->  		return ret;
->  	}
+>  void __napi_schedule(struct napi_struct *n);
+>  void __napi_schedule_irqoff(struct napi_struct *n);
 >  
-> +	/* Update statistics counters with new values */
-> +	if (lp->features & XAE_FEATURE_STATS) {
-> +		enum temac_stat stat;
-> +
-> +		write_seqcount_begin(&lp->hw_stats_seqcount);
-> +		lp->reset_in_progress = false;
-> +		for (stat = 0; stat < STAT_COUNT; stat++) {
-> +			u32 counter =
-> +				axienet_ior(lp, XAE_STATS_OFFSET + stat * 8);
-> +
-> +			lp->hw_stat_base[stat] +=
-> +				lp->hw_last_counter[stat] - counter;
-> +			lp->hw_last_counter[stat] = counter;
-> +		}
-> +		write_seqcount_end(&lp->hw_stats_seqcount);
-> +	}
-> +
->  	return 0;
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 751d9b70e6ad..9c56ad49490c 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -89,6 +89,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/if_ether.h>
+> +#include <linux/irq.h>
+>  #include <linux/netdevice.h>
+>  #include <linux/etherdevice.h>
+>  #include <linux/ethtool.h>
+> @@ -6210,6 +6211,19 @@ void __napi_schedule_irqoff(struct napi_struct *n)
 >  }
+>  EXPORT_SYMBOL(__napi_schedule_irqoff);
 >  
+> +bool napi_affinity_no_change(unsigned int irq)
+> +{
+> +	int cpu_curr = smp_processor_id();
+> +	const struct cpumask *aff_mask;
+> +
 
-	Andrew
+[..]
+
+> +	aff_mask = irq_get_effective_affinity_mask(irq);
+
+Most drivers don't seem to call this on every napi_poll (and
+cache the aff_mask somewhere instead). Should we try to keep this
+out of the past path as well?
 
