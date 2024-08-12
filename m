@@ -1,126 +1,132 @@
-Return-Path: <netdev+bounces-117621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2734594E949
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:07:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1143294E96A
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32AB1F243D1
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:07:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 439B71C213F8
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 09:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B132A16C84D;
-	Mon, 12 Aug 2024 09:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8EE16C852;
+	Mon, 12 Aug 2024 09:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TG0bjKo8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpKmYotQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F6516B39A;
-	Mon, 12 Aug 2024 09:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C31A1586CD
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 09:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723453635; cv=none; b=rysmBTklhlZN10FeBGge8k4k0U+K5WH/QpeIDdKXvcO+7M3c/amC9iRuzr4cIh/MpscBzNoC4zbC15FfXNg55rUoINdwGXhM6mrcDbtU+51TEjX3bSVQGLtyLP067pWIXVDQ5t6aRv5dL/fZ4PyZFpw+VjxTXjvXfVjbweJgbo8=
+	t=1723453910; cv=none; b=WlTt2cnbhQwy809TkvOlI29//bFiG4Itps40aauUVJ1bO/cRwgG5DtZfHQhrEU8TGRsu0SwjRfzqzpH3fcoj89a8CzgK+FEJVBbVpRb/sHs1oUG5RWeVcEK+PCDczgftp1IWGp5DiRAYcDNP/lFo+CNp/CGhIgACqq0mIR+lTEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723453635; c=relaxed/simple;
-	bh=3xzkQpRdJW5ritYBA77n0R4J9VBAnnrxCxLGCtkyTSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E2ce0SEpFwnm9OOwnBusRJIrPeXkvPCmbwea4ndjvlg50zjsr3tt5Jvzvateu0xM/Zh9ul1AkXubX3EhXmQUpqOlstCpUbi7H7SwAmgMiJk52XpVO2KPhD3043XoE12E8XjpnQ/cm7x280SYVlE+vjaoBHak6KwHNF1TfMy3+ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TG0bjKo8; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1723453910; c=relaxed/simple;
+	bh=bzZY8eUtnqlBbKQu453uN5L9lIeKBY2OifFcuBR7kJQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YT+toalAu2J++HMlBLZ4JDpxzo34YNsL7k9j1x2zd/prBVfrqOrfGbRJyRKj5fSZU2OBABeBco9SN7XwKrWojgThanzQ/ysMeZLUZwS8+r6r698ENK2lqYXl4vVLkGjLEc/xEazrT9FqIN4s2Ek/HdPwFWyIucbWQMejlh74OKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HpKmYotQ; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7aa086b077so357725166b.0;
-        Mon, 12 Aug 2024 02:07:13 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7a975fb47eso459810166b.3
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 02:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723453632; x=1724058432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xu5ei+WeKMB1ugZ/0HFgyqZDv7eZM8KwgWsYvwxkaj8=;
-        b=TG0bjKo8h/+oo5uY27GBKO4rQM6pjSITl+M9n93ywGa6a/cDkrk4knsGFXECr+j/0O
-         InicVA8rpYzn6F9yspm+anM8W9efcraG6DtqZKAwSZz9bbvrDuxdBUafzGygMu7pTXBB
-         93esEQYCIVORivh26u0LU46HTndedm44UW3JGmEBhnIKfNdR+dEnbGvStBm1Tkrw6LOF
-         nEWZZLZDJ3hg7VyGJi0b9PHB+vJMp85nKwLRP5pQuxXRNrUFblE3KLWI6ACJ7ld0jcDY
-         tiSIKzFzPlwfBBtVy8xkU+IDNvssmYXarw9xUKAnL7RhS5TIrMyKSLSsATKkchS8J2Jn
-         /KpA==
+        d=gmail.com; s=20230601; t=1723453907; x=1724058707; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bzZY8eUtnqlBbKQu453uN5L9lIeKBY2OifFcuBR7kJQ=;
+        b=HpKmYotQwqo7q7mP4eBq7s0/fmZJxvl7nZP6lTsfcxxl/U0N8PemNp515LIIpqjI/c
+         zBoBznARvcYHwNVyCAu2cnSOKm/PShJlwnm1XWDrkhO/NNC/IFEuOZp0zuE0upT+WwJq
+         ofvzbScWzhlu7qJnj7excqxdrBOEW58rqhDP8gXYXtPbtpY3TPaprTjkgKhWTb7QUkm+
+         RUuDn29h+Kmd8UQsjOyD+o1cBtPKPe2kZgIbT77haALd8j8WcOofAqLJnB4PhdRQcBpt
+         M+NMbFAF+tbU10T8XVBgGk4pPAT0cE/FqZi37y+BNaq553MUprWjM+I2YJd2Mc5WIfyL
+         /DsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723453632; x=1724058432;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1723453907; x=1724058707;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xu5ei+WeKMB1ugZ/0HFgyqZDv7eZM8KwgWsYvwxkaj8=;
-        b=HYD09YfoHxiLKhUbH3Tgzs5hpSaNBPLtGrM8FvNDXbslQLIlyxcPTS4aL7DaDGC3g5
-         zfUTmVDcc9cg74Vy3aarIddP2OaCzB5BGkSX76H0XTNz/5aOTqlcfWw11o1u9IKVoTlL
-         EehQjQGYQEijfZenEkG1BkLqoskGRvtXV6R52bTuHILfq38BOUPvAUUYAcKnmEZVaGTg
-         ZFV2RJnnzJQRbcLAiRLflY63iiWTy2tg0YjwegfoK3VsjfJqZnJE3UM0dGRG2K3VWveJ
-         J3J72knc4Xe8BLcnxCYqES3iAZ3up6twCaJMa5EBL16MgL6Lsa08DrM+PNftRugxdn7j
-         mMpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV8IEO2bl0Qlf/FauKaSZrOR8M6i9h5JJzPIDR3m99K0BEN1cy22Wa8G03Bbevu70gjj+/vVzq2wJrg44Td5mL9Kep5VV3AI1LOvdA/F6HwiTw6okZ/2b5cBYaYZBusNskt2JYV
-X-Gm-Message-State: AOJu0YyoMYbd3yegydr3I2oaJbYGJPyWX45Ygfq9PFDi//PC5ldjaPpL
-	BRUqgkZdDelw/yPj3DZBHMRNuK6IU23mGtn1EYCTxY2oUrifk/NP
-X-Google-Smtp-Source: AGHT+IFtyfr93btSOunBPQWY4ea21EnjGnxGFf0hrJY8KdZM0n2j0FjBHM3/y++llhXsiXZLRbbFCw==
-X-Received: by 2002:a17:906:d25a:b0:a7a:9a78:4b5a with SMTP id a640c23a62f3a-a80aa6600f1mr599087866b.52.1723453631959;
-        Mon, 12 Aug 2024 02:07:11 -0700 (PDT)
-Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80bb21314esm212265166b.152.2024.08.12.02.07.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 02:07:11 -0700 (PDT)
-From: vtpieter@gmail.com
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/1] net: macb: increase max_mtu for oversized frames
-Date: Mon, 12 Aug 2024 11:06:55 +0200
-Message-ID: <20240812090657.583821-1-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=bzZY8eUtnqlBbKQu453uN5L9lIeKBY2OifFcuBR7kJQ=;
+        b=kUkRUgZn+5+jUAItgB1CJbT/Q/s3L+QBU/3S22pQH4VaTb+YF796JaBSp2swqPZ0ri
+         /F5UvKF4zKP4u8TX9rPjuuJmARWkrW5NEh+eVh2eHqIUoW3/10Ge4WilSziybES6UWlS
+         jrYDah7owp1q1HrnYFI4qRCBiM0a7SlM5mxe0elMIGSr3TWpwUA25LYk16Szm9RBr6so
+         U1FcMZvhHx3JGHdlIdTCavNqUP1OvnDmfQ2Egvr+VgKK5ljnn7xS8AMD0mXUwgIN4dck
+         AuqGgb4K8Glh2H/TJUWhriR5NVV4m442EG6xAeU0VyneF5OYpwRMStPnsc85lkRiGIP5
+         uIdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNEVm186SauoHIZiqSd8HIxV0Bsi6bjGp4CStOXw/I+g7Ezb/R8Y+Zh2oAVf6NrVJ+uMDz9rCHd5I7fSetVH4kUKPDaQKW
+X-Gm-Message-State: AOJu0YzwDpRzT7UF3dhSPioSrHV2JtNQ1nbUGYalE1hiwDeP4i6dUjpN
+	lKuMjQCQZSW64ozQ3J7+NBZSMKttPbZWQRuVE7R/uk8INd165Qse7OnLLl/tNF4a7lC7L7m9ZN9
+	J1zkHylI6fLJiQikxsK5fr+LWawI=
+X-Google-Smtp-Source: AGHT+IEvtemmznDYp7BrTXZ6iEKkkCmOm7w1L1kNyYhkm95bCUImTPCn9287prvJzKkiFhGfDg+wyOxkn8AgkhK3swo=
+X-Received: by 2002:a17:907:f1a4:b0:a7a:a4be:2f99 with SMTP id
+ a640c23a62f3a-a80aa59ad15mr631317066b.22.1723453906677; Mon, 12 Aug 2024
+ 02:11:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240808070428.13643-1-djduanjiong@gmail.com> <87v80bpdv9.fsf@toke.dk>
+ <CALttK1RsDvuhdroqo_eaJevARhekYLKnuk9t8TkM5Tg+iWfvDQ@mail.gmail.com>
+ <87mslnpb5r.fsf@toke.dk> <00f872ac-4f59-4857-9c50-2d87ed860d4f@Spark>
+ <87h6bvp5ha.fsf@toke.dk> <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
+ <87seveownu.fsf@toke.dk>
+In-Reply-To: <87seveownu.fsf@toke.dk>
+From: Duan Jiong <djduanjiong@gmail.com>
+Date: Mon, 12 Aug 2024 17:11:35 +0800
+Message-ID: <CALttK1Qe-25JNwOmrhuVv3bbEZ=7-SNJgq_X+gB9e4BfzLLnXA@mail.gmail.com>
+Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Sorry for responding to the email so late.
 
-Increase max_mtu from 1500 to 1518 bytes when not configured for jumbo
-frames. Use 1536 as a starting point as documented in macb.h for
-oversized (big) frames, which is the configuration applied in case
-jumbo frames capability is not configured; ref. macb_main.c.
+>
+> I do see your point that a virtual device doesn't really *have* to
+> respect MTU, though. So if we were implementing a new driver this
+> argument would be a lot easier to make. In fact, AFAICT the newer netkit
+> driver doesn't check the MTU setting before forwarding, so there's
+> already some inconsistency there.
+>
+> >> You still haven't answered what's keeping you from setting the MTU
+> >> correctly on the veth devices you're using?
+> >
 
-Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
----
- drivers/net/ethernet/cadence/macb_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+vm1(mtu 1600)---ovs---ipsec vpn1(mtu 1500)---ipsec vpn2(mtu
+1500)---ovs---vm2(mtu 1600)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 95e8742dce1d..c46fce4a9175 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5119,12 +5119,12 @@ static int macb_probe(struct platform_device *pdev)
- 		goto err_out_free_netdev;
- 	}
- 
--	/* MTU range: 68 - 1500 or 10240 */
-+	/* MTU range: 68 - 1518 or 10240 */
- 	dev->min_mtu = GEM_MTU_MIN_SIZE;
- 	if ((bp->caps & MACB_CAPS_JUMBO) && bp->jumbo_max_len)
- 		dev->max_mtu = bp->jumbo_max_len - ETH_HLEN - ETH_FCS_LEN;
- 	else
--		dev->max_mtu = ETH_DATA_LEN;
-+		dev->max_mtu = 1536 - ETH_HLEN - ETH_FCS_LEN;
- 
- 	if (bp->caps & MACB_CAPS_BD_RD_PREFETCH) {
- 		val = GEM_BFEXT(RXBD_RDBUFF, gem_readl(bp, DCFG10));
+My scenario is that two vms are communicating via ipsec vpn gateway,
+the two vpn gateways
+are interconnected via public network, the vpn gateway has only one
+NIC, single arm mode.
+vpn gateway mtu will be 1500 in general, but the packets sent by the
+vm's to the vpn gateway
+may be more than 1500, and at this time, if implemented according to
+the existing veth
+driver, the packets sent by the vm's will be discarded. If allowed to
+receive large packets,
+the vpn gateway can actually accept large packets then esp encapsulate
+them and then fragment
+so that in the end it doesn't affect the connectivity of the network.
 
-base-commit: c4e82c025b3f2561823b4ba7c5f112a2005f442b
--- 
-2.43.0
+> > Agreed that it has a risk, so some justification is in order. Similar
+> > to how commit 5f7d57280c19 (" bpf: Drop MTU check when doing TC-BPF
+> > redirect to ingress") addressed a specific need.
+>
+> Exactly :)
+>
+> And cf the above, using netkit may be an alternative that doesn't carry
+> this risk (assuming that's compatible with the use case).
+>
+> -Toke
 
+
+I can see how there could be a potential risk here, can we consider
+adding a switchable option
+to control this behavior?
 
