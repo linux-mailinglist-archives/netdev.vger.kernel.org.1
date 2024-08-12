@@ -1,175 +1,214 @@
-Return-Path: <netdev+bounces-117795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA0794F5A3
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:11:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4967A94F5BC
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 19:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 698E01F21D8E
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:11:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D99A1C210F4
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 17:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D175B187845;
-	Mon, 12 Aug 2024 17:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0158518784F;
+	Mon, 12 Aug 2024 17:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="crHiI3oK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUfn5mlP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426151804F;
-	Mon, 12 Aug 2024 17:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BDC16D4DF
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 17:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723482658; cv=none; b=ezJLKN6EppKrolXPOk9LjSkAbMBzDGwISBs+buYEGcZ/YvcqlGjRzuTcstlS3LCaaU26LKjXvOXoqYvDsMe3VUaU6OlsnMcCGRG1PW/TMzRkO6S0HAzPCKREkRZQ3LigyLxX+r9LbzTrU4CD3o8GcDZx2FnzzUlnFVODwt4Vvio=
+	t=1723483077; cv=none; b=Z6an3DgRP2SF8H5JbFsnl4194vL7BG+QF66GiKQZ5UBe6x4r0JyWmRgZFWUFvzq0TZaHVF21GOTe4+dUzfPolBl+BxvuROL2GM3oTNDLrgTW95qTmLHOUmDC1+bkec2ku9yR7T58lmo4U3vmon4X8tPbo7Fz+ceOQmDka3lx0vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723482658; c=relaxed/simple;
-	bh=rsXNiVZEMLxYlpUNFpH7EKzqHYn6sLglPcCzTO6pebc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=W0ehnDBE1IqOCINwiTWN/nVpBxAoSKpbzA9+wdxApuotUUe476CliJXua1ZvDj9Zkyni2oX6plBMPyfdjKadkC6vVR2GA/V82a5vzMnyVDviIlY+c5RSDPzK22RGXcQaOlvW31ExzVVGUF7ejRMifGT+VpdtKCcN9t+ix/JPlqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=crHiI3oK; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1723483077; c=relaxed/simple;
+	bh=VD9pVw3g4qeIhGkgRO8wH9PHeZe69I6fReE5cil8Q0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kc4e/I2WsvtZse9KyijMqaFfqbrSWgmh283SPLjD1IJzkKy/atpU4esuh55nTofm2trNo17ZIiwlWJvQsHFzDgSe7XqguTnF5ySXUYx6iIpX9EZq3ZNmJcx5aC2t5bkTokhbt2WYAiZ1HdrtDHJzCOTFiaR3UyCMvlCAiYa8a24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUfn5mlP; arc=none smtp.client-ip=209.85.210.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-45007373217so46604561cf.0;
-        Mon, 12 Aug 2024 10:10:57 -0700 (PDT)
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7093705c708so4467425a34.1
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 10:17:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723482656; x=1724087456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5GmlbQLiHR38r1gA1FeIC/Lbp6kj8sG7wzB37JoxXC8=;
-        b=crHiI3oKvxkOk9CMJMw1MTBhlLMYMXskOkNXfS1jqFMHFdXRZIwjZl4V6rEz8Or9EL
-         L3kqnf6SheUMPe7KkPCVcvQ/j+3s+ggmOsK8ZEGupHoZR0hUa/Gl9Ubsb+tiyox59G01
-         Dfs6KZLA8UlBXTNGmPd+Ccp7Jjm4ZOhqxrNqTp+JMJmDyiMILinze7xx7a8r0CRBsirP
-         xTQbs4zp3IGH/RGTO9uOiGdXYc8DiDGQ1hanVCx6Hq18mY2k5LsshfLCGcqos7/h3Ir2
-         Lbwfo7dqLZEwuI600sMHaUUnYzz5uESXuQCDgA+WH/UUhMa7WwFU9E0TQWtrs6PB7on1
-         VDSA==
+        d=gmail.com; s=20230601; t=1723483075; x=1724087875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1tTD4zyQSoNiv2tsnqpH5QUHzb4nJIdV/QAQHbYYqU=;
+        b=EUfn5mlPlJe/fnvw9XYTqCvkWlReAMJUpqDZk9Q5f19o6lusikG9sCYtDSrQJEiO+U
+         3EzgP8P7YTr/TSCbPB21fP4S3hde5fpurMpry5CuD+lUc/XIOCRqGdI+ghRB7v88f6//
+         UHTiF5ovZ44tYpuy3CO3cmljvYY3XPf64OgPhF3DGXUcUBqFbzQOI6r5eDz+ieFvSFRP
+         uompiu8+5uXKK6bYmY/FL3Pexxf1T4ybqsquotEmXWfkwXe+nunTIlV6DDo8QEsqDDeT
+         z21LwmypuYsEBhEwhriHDPJ/amgjV85z1YMKNEAmVW57j57aH1q44yIZOnZd6AjhOBo0
+         al0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723482656; x=1724087456;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5GmlbQLiHR38r1gA1FeIC/Lbp6kj8sG7wzB37JoxXC8=;
-        b=Ha2sEjZWflkzZ1gfT71VwuSpixT6EkiettMifWytq9iH5KhxSkhbNeLcEe1ic1j207
-         caNi9gyt0T8FijlC/W/dZDS6Kd/FJciItf5xdzRIXYvC8QjBNNYwVrVGoXk9PHVDaUuU
-         CKx2GmaGSkS9TuUHNfwBd/eJAFU62Z3/R2O8v4wTPykpJX1xlLGRScXOkmm6FFR9QYb2
-         gcTHrDHeLQjhFLJWiNFUYncslFrDQIMCQULA5XQPg3/Okc4y/JmCfHyC4EIaC9105XUI
-         +V5Kj7yJR/xGrhWF8cO9QPzAZBuLUVc6eslNXGFlPO3J5o4+vRTSKeCuIR+gRgMimZn1
-         JM5w==
-X-Forwarded-Encrypted: i=1; AJvYcCX3vLTn3UXHznLPjbOTT++iFmYijKq3HPyoGmt/635AHlVTXmk3hlCNi33D5alWvVdixWo9qBKjkamaknTu+Mo5yFIwPDaN0Di4356+B+MwljQo50I+z2UpcJaMiL6+dBAdWVIQ
-X-Gm-Message-State: AOJu0YzSEdktHCbju9Bv75rTwpc5pR5tbJSa0YoF9F157xU8dQjhURsP
-	ECWHdc9BuHUs7H8eXHBD3r5zAjb79lR45d91y8MfvchR1UtDhdSk
-X-Google-Smtp-Source: AGHT+IFLcYDav0KVXMN2KfEHyhEXk3F31X4SDAF5U3UE9px7N1cCuNLgoAAoBeZCOyO3l5iMHbR5Rg==
-X-Received: by 2002:ac8:6887:0:b0:446:59db:9184 with SMTP id d75a77b69052e-4534cb4fd53mr4799531cf.22.1723482655960;
-        Mon, 12 Aug 2024 10:10:55 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4531c26dc23sm24810601cf.75.2024.08.12.10.10.55
+        d=1e100.net; s=20230601; t=1723483075; x=1724087875;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h1tTD4zyQSoNiv2tsnqpH5QUHzb4nJIdV/QAQHbYYqU=;
+        b=PChQdyal6LEtzfS2yDFL+ggnoTO0JYWYU8iU9k1m9ibx4PuhU29l5Be5aWFgV9SkC8
+         mvfwV/jlwFdm3FyCu5E6FkbN8XegMaTurqw0AO/XlBCnwLsfLx9IdZ2daGhOtncYggKu
+         G2sHwkFoK45X5M2/SQICkvYhrg2Wgwa9OOrGEsB62f5SrNgVXLbxfVglbXK5UmjxCT2M
+         McCHAQFz/Wgmu6eIRlCQOkSaG8Vliez2qD9AuzqWVPjv62bsxxkIoO2esfu2ND4W/cwm
+         utyMkNLwVFYEF7/EIjWjW5i3nzqIXBjbIPW9NRp+EbkqLyg4Yn8nsATvUq97/gaiJOUo
+         2okw==
+X-Gm-Message-State: AOJu0YyVOUjZlUYr43+fw1+tRtxEtT9vsB4GRkJ+v7U9KZyI/TyEYn7J
+	ygGmk6PVzCAmS/wxrKl9Fhj7K/es2PW6u2gcMr0IbyJWRJahwAkPrqjWGw==
+X-Google-Smtp-Source: AGHT+IHw7XsVsG6b2Vt/9qL9IZCMezbbNTK6eeS+FglWt3nv5WJl+MfRKz5Rg9jdp8fmRi/knmiiCA==
+X-Received: by 2002:a05:6830:8d2:b0:709:3ea3:e2d1 with SMTP id 46e09a7af769-70c93948ce1mr1332028a34.27.1723483075214;
+        Mon, 12 Aug 2024 10:17:55 -0700 (PDT)
+Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bd82e2f51fsm26532696d6.76.2024.08.12.10.17.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 10:10:55 -0700 (PDT)
-Date: Mon, 12 Aug 2024 13:10:54 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Wang <jasowang@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: ayaka <ayaka@soulik.info>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <66ba421ee77f4_48f70294e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CACGkMEsw-B5b-Kkx=wfW=obMuj-Si3GPyr_efSeCoZj+FozWmA@mail.gmail.com>
-References: <CAF=yD-JVs3h1PUqHaJAOFGXQQz-c36v_tP4vOiHpfeRhKh-UpA@mail.gmail.com>
- <9C79659E-2CB1-4959-B35C-9D397DF6F399@soulik.info>
- <66b62df442a85_3bec1229461@willemb.c.googlers.com.notmuch>
- <CACGkMEsw-B5b-Kkx=wfW=obMuj-Si3GPyr_efSeCoZj+FozWmA@mail.gmail.com>
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
- index
+        Mon, 12 Aug 2024 10:17:54 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org,
+	ovs-dev@openvswitch.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCHv2 net-next] openvswitch: switch to per-action label counting in conntrack
+Date: Mon, 12 Aug 2024 13:17:53 -0400
+Message-ID: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jason Wang wrote:
-> On Fri, Aug 9, 2024 at 10:55=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > ayaka wrote:
-> > >
-> > > Sent from my iPad
-> >
-> > Try to avoid ^^^
-> >
-> =
+Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-action
+label counting"), we should also switch to per-action label counting
+in openvswitch conntrack, as Florian suggested.
 
-> [...]
-> =
+The difference is that nf_connlabels_get() is called unconditionally
+when creating an ct action in ovs_ct_copy_action(). As with these
+flows:
 
-> > > 2. Does such a hash operation happen to every packet passing throug=
-h?
-> >
-> > For packets with a local socket, the computation is cached in the
-> > socket.
-> >
-> > For these tunnel packets, see tun_automq_select_queue. Specifically,
-> > the call to __skb_get_hash_symmetric.
-> >
-> > I'm actually not entirely sure why tun has this, rather than defer
-> > to netdev_pick_tx, which call skb_tx_hash.
-> =
+  table=0,ip,actions=ct(commit,table=1)
+  table=1,ip,actions=ct(commit,exec(set_field:0xac->ct_label),table=2)
 
-> Not sure I get the question, but it needs to use a consistent hash to
-> match the flows stored before.
+it needs to make sure the label ext is created in the 1st flow before
+the ct is committed in ovs_ct_commit(). Otherwise, the warning in
+nf_ct_ext_add() when creating the label ext in the 2nd flow will
+be triggered:
 
-This is a bit tangential to Randy's original thread, but I would like
-to understand this part a bit better, if you don't mind.
+   WARN_ON(nf_ct_is_confirmed(ct));
 
-Tun automq calls __skb_get_hash_symmetric instead of the
-non-symmetrical skb_get_hash of netdev_pick_tx. That makes sense.
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
+---
+ net/openvswitch/conntrack.c | 30 ++++++++++++------------------
+ net/openvswitch/datapath.h  |  3 ---
+ 2 files changed, 12 insertions(+), 21 deletions(-)
 
-Also, netdev_pick_tx tries other things first, like XPS.
-
-Why does automq have to be stateful, keeping a table. Rather than
-always computing symmetrical_hash % reciprocal_scale(txq, numqueues)
-directly, as is does when the flow is not found?
-
-Just curious, thanks.
-
-> >
-> > > 3. Is rxhash based on the flow tracking record in the tun driver?
-> > > Those CPU overhead may demolish the benefit of the multiple queues =
-and filters in the kernel solution.
-> >
-> > Keyword is "may". Avoid premature optimization in favor of data.
-> >
-> > > Also the flow tracking has a limited to 4096 or 1024, for a IPv4 /2=
-4 subnet, if everyone opened 16 websites, are we run out of memory before=
- some entries expired?
-> > >
-> > > I want to  seek there is a modern way to implement VPN in Linux aft=
-er so many features has been introduced to Linux. So far, I don=E2=80=99t=
- find a proper way to make any advantage here than other platforms.
-> =
-
-> I think I need to understand how we could define "modern" here.
-> =
-
-> Btw, I vaguely remember there are some new vpn projects that try to
-> use vhost-net to accelerate.
-> =
-
-> E.g https://gitlab.com/openconnect/openconnect
-> =
-
-> Thanks
-> =
-
-
+diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+index 8eb1d644b741..a3da5ee34f92 100644
+--- a/net/openvswitch/conntrack.c
++++ b/net/openvswitch/conntrack.c
+@@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_attr attr)
+ 	    attr == OVS_KEY_ATTR_CT_MARK)
+ 		return true;
+ 	if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+-	    attr == OVS_KEY_ATTR_CT_LABELS) {
+-		struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+-
+-		return ovs_net->xt_label;
+-	}
++	    attr == OVS_KEY_ATTR_CT_LABELS)
++		return true;
+ 
+ 	return false;
+ }
+@@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		       const struct sw_flow_key *key,
+ 		       struct sw_flow_actions **sfa,  bool log)
+ {
++	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+ 	struct ovs_conntrack_info ct_info;
+ 	const char *helper = NULL;
+ 	u16 family;
+@@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		return -ENOMEM;
+ 	}
+ 
++	if (nf_connlabels_get(net, n_bits - 1)) {
++		nf_ct_tmpl_free(ct_info.ct);
++		OVS_NLERR(log, "Failed to set connlabel length");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (ct_info.timeout[0]) {
+ 		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+ 				      ct_info.timeout))
+@@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ovs_conntrack_info *ct_info)
+ 	if (ct_info->ct) {
+ 		if (ct_info->timeout[0])
+ 			nf_ct_destroy_timeout(ct_info->ct);
++		nf_connlabels_put(nf_ct_net(ct_info->ct));
+ 		nf_ct_tmpl_free(ct_info->ct);
+ 	}
+ }
+@@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_family __ro_after_init = {
+ 
+ int ovs_ct_init(struct net *net)
+ {
+-	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
++#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+ 
+-	if (nf_connlabels_get(net, n_bits - 1)) {
+-		ovs_net->xt_label = false;
+-		OVS_NLERR(true, "Failed to set connlabel length");
+-	} else {
+-		ovs_net->xt_label = true;
+-	}
+-
+-#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	return ovs_ct_limit_init(net, ovs_net);
+ #else
+ 	return 0;
+@@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
+ 
+ void ovs_ct_exit(struct net *net)
+ {
++#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+ 
+-#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	ovs_ct_limit_exit(net, ovs_net);
+ #endif
+-
+-	if (ovs_net->xt_label)
+-		nf_connlabels_put(net);
+ }
+diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+index 9ca6231ea647..365b9bb7f546 100644
+--- a/net/openvswitch/datapath.h
++++ b/net/openvswitch/datapath.h
+@@ -160,9 +160,6 @@ struct ovs_net {
+ #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_ct_limit_info *ct_limit_info;
+ #endif
+-
+-	/* Module reference for configuring conntrack. */
+-	bool xt_label;
+ };
+ 
+ /**
+-- 
+2.43.0
 
 
