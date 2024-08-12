@@ -1,246 +1,192 @@
-Return-Path: <netdev+bounces-117728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1809194EF17
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FA394EF27
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 213D11C20F10
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:02:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D0471C207BF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D81717D35C;
-	Mon, 12 Aug 2024 14:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3F617D35C;
+	Mon, 12 Aug 2024 14:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oD48RtjR"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2042.outbound.protection.outlook.com [40.107.100.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC5A153810;
-	Mon, 12 Aug 2024 14:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723471281; cv=none; b=Mw19rC5yFr3BbCT8mchanL5ukAE03GiCkSBDHzz7IJD+OipkYQEqL+DB/RHrcEqvdmZ3tkrC7c6MWTUCSpKeoc0WQsoPT97CP52+ehev0EpeSHyvNEbqT6k5huzPIrVZcxQ6Ig+tKeKI2eXXWSIWP7lSlZliJEv1+0IQxqILHoY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723471281; c=relaxed/simple;
-	bh=mpLhmrGYopsSfsytZdBUu4egDA/RQl8rbpcuFkVpmzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TbVQ2Gx6tX8jPrl8c8YAc/EzY/KshtESBQm3ghypwFGhEhCvsTpVBHvxTafqEFLGs7BFsiSeR7VigvUxOmOAQPDdZ+Ha+X/MfSQWjA+g8sBdq2KzxftQtOnwWF71ivWNHteaEvK3xHp4B3lJBxItUAuumaRkTCF6mTjWm++At6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sdVbc-0006Fc-6i; Mon, 12 Aug 2024 16:01:04 +0200
-Date: Mon, 12 Aug 2024 16:01:04 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	fw@strlen.de, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzbot+8ea26396ff85d23a8929@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING: refcount bug in inet_twsk_kill
-Message-ID: <20240812140104.GA21559@breakpoint.cc>
-References: <20240811230029.95258-1-kuniyu@amazon.com>
- <20240811230836.95914-1-kuniyu@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CAF17D35B;
+	Mon, 12 Aug 2024 14:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723471764; cv=fail; b=eON1hhyY+PGs+eSfG8CpfE5cul/yyQ313dN6yykMeh1SYlwyQwU8fvQ4XJRqf1uu+YRzZXUVx0vX/2uKxkbmpKZLiBbwvrsv3rtNJwBEp7PTqdOn95UY5QeGKGYLGPEkv1vfY0stcx4srJerBvqmzGsD3ZstvCUiGvFE4yF9CYc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723471764; c=relaxed/simple;
+	bh=SMVA/3hrSSMyudeXp7cJDNVybpF2Rs8QT+rGlwN0sGE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ChcprBr/nwfjmyBP++L9y3lpngKBSjr3nkVae6e+49Rm4qWxoI/ajQOdkf84Ent1Q2gDTtIu+ZzC+UgkDoacSBakxOAkxe1ERZRY6pB4t+Td626pY59WwxfM2+VIqP11esC08rEoR1LmXrN9/TuXe3m7BMUlrAr4O0ZLiE5Av40=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oD48RtjR; arc=fail smtp.client-ip=40.107.100.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZAxGzC/InzKB6vvVZrXbCUaJE08A00J1nticjIxOX5hUDmWJ0iNP3mhHZ+/DtfT7ujQe3lz1qjTeBC3WI9ZJWoCt8vsooolLpaKeGq6VoZx+XMa7W4Al8EZfQc1wUnDOAUQVAje1A1Mz/n+ygZWRxTqLzaLgHN0woZqWslSt4yd8Dbgh/3IJE+s3qv3QV6kDMqY2/eFAQ43ljwbSXoY3uMzzDFtsQlRF5PihrO6zYt4a7mu6UGYDfw9i7bfwH3QqOZ5JQAuFI2GlxkstQz3l/QWN3P53n1OboCXRT6CCN85DW6DsV0KBecSAxrmuCzVQoalHWHrhs7HqNeu3x+iqZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Oe0yHi+kiDwJQwHjMZwjchEL66WwT9nssvFZSb014vc=;
+ b=pjOHxUsYUrWJ2iyJqZzlrSpy7DEwHajhsI6z18HxcFOmvI33FPARZwWg6PjBTkdauv7R+bJV1dsaQPcLWLTxg+/F9JaQ2pm/2AVuDBhz5IhMW3z6ZRpoQyWZ0zR9lj7JxwCagj1QGzLFOX/ZeGC7G6F6TBS4f8JPv6q8FGKP7zZMosQ/ZB9Hr3b4QtjXBfccuWCUZ7AKx5Q7/0txdbsxvcT0M+dgSzPAL3m1gM1Xkp2Gb8RgptdeeFHVkM7L58UuWMVvlXTgzds/GSCvHtqkNQ1i1RX9m+EgNT/HhKPnZlJ+mkIDHyYnHAMDvka3d7WiWMBtSWbTRE51eT/rmhv22A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Oe0yHi+kiDwJQwHjMZwjchEL66WwT9nssvFZSb014vc=;
+ b=oD48RtjRiS3AUE3J/JVeCEhKB2FahZjdsFMFpwWoh+jL+lc4Bor9pGXWBRROgNobLQ3vbFNVbCa8qbyAIindBMWL6BjEzxnZuGoS5fBC35LmnG07fT3NjpJxF1VLaX75xGigbXc34VL15Hao+Z7On9HQfCYCdUlOcOdSAr4LdOHSvlrQfr76tEqohKXOwJAc/nLr2zYYbOS0kpLA9no6sfS7WaYXg9JTcc3jNIBfafagboww6b+OqE3hmjaHOMqYFYVIeFS4e/BaehqC2OeH4ML0SaFFwish1abzwdGY/KmCichSpiy5dojZK5f00MNsBbvwzRJ6mRl2+Y2Cbb8rDA==
+Received: from CH2PR10CA0013.namprd10.prod.outlook.com (2603:10b6:610:4c::23)
+ by CH0PR12MB8488.namprd12.prod.outlook.com (2603:10b6:610:18d::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Mon, 12 Aug
+ 2024 14:09:18 +0000
+Received: from DS3PEPF0000C37B.namprd04.prod.outlook.com
+ (2603:10b6:610:4c:cafe::82) by CH2PR10CA0013.outlook.office365.com
+ (2603:10b6:610:4c::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20 via Frontend
+ Transport; Mon, 12 Aug 2024 14:09:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF0000C37B.mail.protection.outlook.com (10.167.23.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Mon, 12 Aug 2024 14:09:18 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 12 Aug
+ 2024 07:08:55 -0700
+Received: from dev-r-vrt-156.mtr.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 12 Aug 2024 07:08:52 -0700
+From: Danielle Ratson <danieller@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <idosch@nvidia.com>, <petrm@nvidia.com>,
+	<linux-kernel@vger.kernel.org>, <vmykhaliuk@nvidia.com>,
+	<danieller@nvidia.com>
+Subject: [PATCH net] net: ethtool: Allow write mechanism of LPL and both LPL and EPL
+Date: Mon, 12 Aug 2024 17:08:24 +0300
+Message-ID: <20240812140824.3718826-1-danieller@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240811230836.95914-1-kuniyu@amazon.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37B:EE_|CH0PR12MB8488:EE_
+X-MS-Office365-Filtering-Correlation-Id: 854f8f0d-0c1e-4c4d-6018-08dcbad85b41
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?usMJQQo/hTuUIG/CQgNUkrYU9rORFHAfIjApQqFBXQo0te7TyPuFLnJCEptI?=
+ =?us-ascii?Q?LBZSSdejAYjLa86POqDqqB1Xa3sW0UzDlQ21mO+xbeUfPGUA03l3YkoDPFwQ?=
+ =?us-ascii?Q?4zq1fxyblNIuYmB/5tfzgNkwtFvGhSc19ncHLwW23BkLZVE8qIx3q2ty25Og?=
+ =?us-ascii?Q?dszU9nnhTFQoWLsSE1Id2bNEDVNmnXKtILatyGYtccj4V69SsbsRBPRx6wpO?=
+ =?us-ascii?Q?gHbmYf7m3k1DH4nbCYGxhtlALu4b6pohyjH5TmK91WAafmZnK6wPDOpW5DeP?=
+ =?us-ascii?Q?4yOC/gi1s995gd2zSD95MtRbkaZM8MBlbvkaVlH1TXVIKWA/EPu0w+M6EzEO?=
+ =?us-ascii?Q?3CovMWbnVw6DVR7qy5C2lHKEDbQB+zHxiCDvA8vCbR+6zpQFjFTZmElEdy+Z?=
+ =?us-ascii?Q?+uNjFNx+IZx17g3xUy7KjRLZxFBdzpuALWhOwYUyIQKocOT6bM0wypmK7LeN?=
+ =?us-ascii?Q?NBP3O3aIuhUguvbsEKwRL2OLedWARRZOcQ7aS6R6CTbTpL5JKs8eJJKvJac+?=
+ =?us-ascii?Q?Tfm4nm2mc5/P9h9Bu5V12fV7NBoNWbj7GzTJHhOAuT1euCoW4xhuZkwkf4Lp?=
+ =?us-ascii?Q?O4nW3pcI32ufQp22/7a4S8cjpNpmijKO+RkCgwLjanav37Cw0Aki0eZpoVQE?=
+ =?us-ascii?Q?KJKCsEDjGSxGQm1dZtoFdSETisvbBWPCS8n8VGy4JxOF/socNOf0hJkBeAEw?=
+ =?us-ascii?Q?Z3y8ZCGT8ZW9gL6OJzaBShdEh5l1zmSa2tH0J8DHF9ueIXc+hZTh24i65p/K?=
+ =?us-ascii?Q?qNc61XrPn3VCa+tzz4t3vlhpJrnVchZUTVPLFmDjXenEqr1rq9OOSkmCzkdw?=
+ =?us-ascii?Q?KLG51FFUhFWRd5CM7/xpFd/dKLHBsRGwxpG/S012UoDCKouGnmdgpqJ+f2yS?=
+ =?us-ascii?Q?ml6kfVMRoTy/1R5QfLqvRah3uY5zVDNOzxcOuUCgtZiBR5srCi3Kx7cUk/NF?=
+ =?us-ascii?Q?fv+Hh48URecTEhekEGMuoZCkfiMLIEq/C9wiDKhsE04T1o7tA1PQiFh1CHTg?=
+ =?us-ascii?Q?oVX23eJco+NJMfVxUe93RM5PQxR51fr3tmHmDzLXOaZlLiulbgoJemNZr4GM?=
+ =?us-ascii?Q?Ctaw4qJYeJEMC/rvZIY1teHOtJAVGMDSPaqrqC2f1ll2sFRpDrphMZYxT4Eq?=
+ =?us-ascii?Q?HDWkjG69Q7tLIJE2wXQXtWRORMRF6InNQkSwDoGPIZG7phuXLLJ7Px1lTWBO?=
+ =?us-ascii?Q?r9mf6eI/aqH2AfSLg1J56Vp9AWebXEUOakzc6uvt0zz3PWtFoo532LeNnHeT?=
+ =?us-ascii?Q?q7dJTCuJF1bl/tkS1e8+dqrTo+u7pdAhA0kRauaKpu9GVCvy/O6yBMsi6vpj?=
+ =?us-ascii?Q?7Zz/83tre7UH3HFKYFh/csNjcRGoxO/2rg8kgOZTHzjdDUbdKFXVODUYDPHY?=
+ =?us-ascii?Q?GS6PLPWtXtazGJfqaaZIclROZcWoOsvJJOES93XBrHqzVjSx/aSs5VeEaRX0?=
+ =?us-ascii?Q?3IyvBm345YFef4DwYQpmyrVVdIbQGM9S?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 14:09:18.4449
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 854f8f0d-0c1e-4c4d-6018-08dcbad85b41
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8488
 
-Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date: Sun, 11 Aug 2024 16:00:29 -0700
-> > From: Florian Westphal <fw@strlen.de>
-> > Date: Sun, 11 Aug 2024 18:28:50 +0200
-> > > Florian Westphal <fw@strlen.de> wrote:
-> > > > https://syzkaller.appspot.com/x/log.txt?x=117f3182980000
-> > > > 
-> > > > ... shows at two cores racing:
-> > > > 
-> > > > [ 3127.234402][ T1396] CPU: 3 PID: 1396 Comm: syz-executor.3 Not
-> > > > and
-> > > > [ 3127.257864][   T13] CPU: 1 PID: 13 Comm: kworker/u32:1 Not tainted 6.9.0-syzkalle (netns cleanup net).
-> > > > 
-> > > > 
-> > > > first splat backtrace shows invocation of tcp_sk_exit_batch() from
-> > > > netns error unwinding code.
-> > > > 
-> > > > Second one lacks backtrace, but its also in tcp_sk_exit_batch(),
-> > > 
-> > > ... which doesn't work.  Does this look like a plausible
-> > > theory/exlanation?
-> > 
-> > Yes!  The problem here is that inet_twsk_purge() operates on twsk
-> > not in net_exit_list, but I think such a check is overkill and we
-> > can work around it in another way.
+CMIS 5.2 standard section 9.4.2 defines four types of firmware update
+supported mechanism: None, only LPL, only EPL, both LPL and EPL.
 
-I'm not so sure.  Once 'other' inet_twsk_purge() found the twsk and
-called inet_twsk_kill(), 'our' task has to wait for that to complete.
+Currently, only LPL (Local Payload) type of write firmware block is
+supported. However, if the module supports both LPL and EPL the flashing
+process wrongly fails for no supporting LPL.
 
-We need to force proper ordering so that all twsk found
+Fix that, by allowing the write mechanism to be LPL or both LPL and
+EPL.
 
-static void __net_exit tcp_sk_exit_batch(struct list_head *net_exit_list)
-{
-        struct net *net;
+Fixes: c4f78134d45c ("ethtool: cmis_fw_update: add a layer for supporting firmware update using CDB")
+Reported-by: Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>
+Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+---
+ net/ethtool/cmis_fw_update.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-/*HERE*/tcp_twsk_purge(net_exit_list);
+diff --git a/net/ethtool/cmis_fw_update.c b/net/ethtool/cmis_fw_update.c
+index ae4b4b28a601..655ff5224ffa 100644
+--- a/net/ethtool/cmis_fw_update.c
++++ b/net/ethtool/cmis_fw_update.c
+@@ -35,7 +35,10 @@ struct cmis_cdb_fw_mng_features_rpl {
+ 	__be16	resv7;
+ };
+ 
+-#define CMIS_CDB_FW_WRITE_MECHANISM_LPL	0x01
++enum cmis_cdb_fw_write_mechanism {
++	CMIS_CDB_FW_WRITE_MECHANISM_LPL		= 0x01,
++	CMIS_CDB_FW_WRITE_MECHANISM_BOTH	= 0x11,
++};
+ 
+ static int
+ cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
+@@ -64,7 +67,8 @@ cmis_fw_update_fw_mng_features_get(struct ethtool_cmis_cdb *cdb,
+ 	}
+ 
+ 	rpl = (struct cmis_cdb_fw_mng_features_rpl *)args.req.payload;
+-	if (!(rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_LPL)) {
++	if (!(rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_LPL ||
++	      rpl->write_mechanism == CMIS_CDB_FW_WRITE_MECHANISM_BOTH)) {
+ 		ethnl_module_fw_flash_ntf_err(dev, ntf_params,
+ 					      "Write LPL is not supported",
+ 					      NULL);
+-- 
+2.45.0
 
-        list_for_each_entry(net, net_exit_list, exit_list) {
-                inet_pernet_hashinfo_free(net->ipv4.tcp_death_row.hashinfo);
-
-.... have gone through inet_twsk_kill() so tw_refcount managed to
-drop back to 1 before doing
-                WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
-.
-
-> > We need to sync two inet_twsk_kill(), so maybe give up one
-> > if twsk is not hashed ?
-
-Not sure, afaiu only one thread enters inet_twsk_kill()
-(the one that manages to deactivate the timer).
-
-> > ---8<---
-> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-> > index 337390ba85b4..51889567274b 100644
-> > --- a/net/ipv4/inet_timewait_sock.c
-> > +++ b/net/ipv4/inet_timewait_sock.c
-> > @@ -52,7 +52,10 @@ static void inet_twsk_kill(struct inet_timewait_sock *tw)
-> >  	struct inet_bind_hashbucket *bhead, *bhead2;
-> >  
-> >  	spin_lock(lock);
-> > -	sk_nulls_del_node_init_rcu((struct sock *)tw);
-> > +	if (!sk_nulls_del_node_init_rcu((struct sock *)tw)) {
-> > +		spin_unlock(lock);
-> > +		return false;
-> 
-> forgot to remove false, just return :)
-
-I don't see how this helps, we need to wait until 'stolen' twsk
-has gone through inet_twsk_kill() and decremented tw_refcount.
-Obviously It would be a bit simpler if we had a reliable reproducer :-)
-
-Possible solutions I came up with so far:
-
-1) revert b099ce2602d8 ("net: Batch inet_twsk_purge").
-
-This commit replaced a net_eq(twsk_net(tw) ... with a check for
-dead netns (ns.count == 0),
-
-Downside: We need to remove the purged_once trick that calls
-inet_twsk_purge(&tcp_hashinfo) only once per exiting batch in
-tcp_twsk_purge() as well.
-
-As per b099ce2602d8 changelog, likely increases netns dismantle times.
-
-Upside: simpler code, so this is my preferred solution.
-
-No concurrent runoff anymore, by time tcp_twsk_purge() returns it has
-called refcount_dec(->tw_refcount) for every twsk in the exiting netns
-list, without other task stealing twsks owned by exiting netns.
-
-Solution 2: change tcp_sk_exit_batch like this:
-
-   tcp_twsk_purge(net_exit_list);
-
-+  list_for_each_entry(net, net_exit_list, exit_list) {
-+      while (refcount_read(&net->ipv4.tcp_death_row.tw_refcount) > 1)
-+         schedule();
-+
-+  }
-
-    list_for_each_entry(net, net_exit_list, exit_list) {
-       inet_pernet_hashinfo_free(net->ipv4.tcp_death_row.hashinfo);
-       WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
-
-This synchronizes two concurrent tcp_sk_exit_batch() calls via
-existing refcount; if netns setup error unwinding ran off with one of
-'our' twsk, it will wait until other task has completed the refcount decrement.
-
-I don't expect it to increase netns dismantle times, else we'd have seen
-the WARN_ON_ONCE splat frequently.
-
-Solution 3:
-
-Similar to 2), but via mutex_lock/unlock pair:
-
-static void __net_exit tcp_sk_exit_batch(struct list_head *net_exit_list)
-{
-        struct net *net;
-
-	mutex_lock(&tcp_exit_batch_mutex);
-
-        tcp_twsk_purge(net_exit_list);
-
-        list_for_each_entry(net, net_exit_list, exit_list) {
-                inet_pernet_hashinfo_free(net->ipv4.tcp_death_row.hashinfo);
-                WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
-                tcp_fastopen_ctx_destroy(net);
-        }
-	mutex_unlock(&tcp_exit_batch_mutex);
-}
-
-Solution 4:
-
-I have doubts wrt. tcp_twsk_purge() interaction with tw timer firing at
-the 'wrong' time.  This is independent "problem", I might be
-imagining things here.
-
-Consider:
-313 void inet_twsk_purge(struct inet_hashinfo *hashinfo)
-314 {
-[..]
-321         for (slot = 0; slot <= ehash_mask; slot++, head++) {
-
-tw sk timer fires on other cpu, inet_twsk_kill() does:
-
-56         spin_lock(lock);
-57         sk_nulls_del_node_init_rcu((struct sock *)tw);
-58         spin_unlock(lock);
-
-... then other cpu gets preempted.
-inet_twsk_purge() resumes and hits empty chain head:
-
-322                 if (hlist_nulls_empty(&head->chain))
-323                         continue;
-
-so we don't(can't) wait for the timer to run to completion.
-
-If this sounds plausible to you, this gives us solution 4:
-
-Restart inet_twsk_purge() loop until tw_dr->tw_refcount) has
-dropped down to 1.
-
-Alternatively (still assuming the above race is real), sk_nulls_del_node_init_rcu
-needs to be moved down:
-
- 48 static void inet_twsk_kill(struct inet_timewait_sock *tw)
-...
- 58     /* Disassociate with bind bucket. */
-...
- 68     spin_unlock(&bhead->lock);
-
- 70     refcount_dec(&tw->tw_dr->tw_refcount);
-
- +      spin_lock(lock);
- +      sk_nulls_del_node_init_rcu((struct sock *)tw);
- +      spin_unlock(lock);
-71      inet_twsk_put(tw);
-72 }
-
-... so concurrent purge() call will find us
-the node list (and then wait on timer_shutdown_sync())
-until other cpu executing the timer is done.
-
-If twsk was unlinked from table already before
-inet_twsk_purge() had chance to find it sk, then in worst
-case call to tcp_twsk_destructor() is missing, but I don't
-see any ordering requirements that need us to wait for this.
 
