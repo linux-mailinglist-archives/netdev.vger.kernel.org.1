@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-117846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEE794F8AB
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:59:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3779394F8B5
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DF781C22343
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:59:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA021B20EF1
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E310197A6E;
-	Mon, 12 Aug 2024 20:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBB716BE0D;
+	Mon, 12 Aug 2024 21:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="REOfW6ms"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XkQTPTtX"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C643136349;
-	Mon, 12 Aug 2024 20:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F8016BE0C;
+	Mon, 12 Aug 2024 21:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723496334; cv=none; b=QBhgg5lNLf3VVTyLwuWyNoNhIqh90tyMAK+ntLQ6Sw9oWymNvbKroB1yOfBiCcuSMk3IOQNZ0O+3s5HjDm2WLGFkH4bX8M5vJQU9jmRi1tcrYrBWHED6ktX0ZxDWpg6wYaBPgRU8t+y/njrrsg4XvLPGO3nfviNQSNx66E8Udow=
+	t=1723496634; cv=none; b=nZWzQiK2qI135Lk1HF+W28NTImnO6RTVPAPWf0LuflxlZzdegZyqT5QiX7pUGW+u5q7lysGIgERm1j2hoMTi7ttxfgJQwtK7Zm3dj8ei9lwmWiFb1p5fOFWRylmRb6x+nU/owmc1wZoxGntYrW/k64QZlhTdAbtKQvRKHqPP+OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723496334; c=relaxed/simple;
-	bh=vz+39rjKUM9q403si214Cohvqxo4sz177rPScX+K2V0=;
+	s=arc-20240116; t=1723496634; c=relaxed/simple;
+	bh=4H1Ysc5LqfnsrhAXsVm6DmlRNAZD3o2T7rofR8TvXFg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PAzpgYzbD3THE4kZWBlEUd3U5IEfuZu/u5hquR5aO8EOP7fRwP5nfJijgSDmwGZ59vK6WqG5JiJPbh2MT30dhNzda3ChGRNedxpCv/hMOq1FyjDsinp8xIMdJbqiojL+x3p+U1NxpusFWvpTJdyXSNmOayYmP29ZF4dmO7mAdS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=REOfW6ms; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=mwpUGnjmGzTlbqbHs6IXksdiiw4SKwScyduNyll6iKyMD9NEDq8qj/4vMBYtp8JdPmDXWumKlG//RgMWZmNlJjflqXmn6G8CbfqT/QapWL/y61RTVB201KnOunRdtKwdXQ0wmWsecjMIzJ5OmhLfxGG4pdAoKoxuFLFNkOQq988=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XkQTPTtX; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=GvB+Z09Tk6MAdTET7p9iKM8bkuIPaBr8WJ3nZCC5ECA=; b=RE
-	OfW6ms+Vmwjb8LbL1OuWf2o52EBz3tw0Xdll7MnUXdXXSdZlDpnwDvwpREJqOgnrB2ODj7J+fLwcD
-	sbMiQhOWFrzADiFib2ihwKyyYHbkj0Qm2UBeq3/QcaGtoo/+K2hfnC18zhJU4FnzrgFR8kIK7BYyn
-	l/jT5uTXL7d/lMU=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=q5cMPBUHbooxWEGZnv7SZcmMFJ0mj2NafP7388hWDp0=; b=XkQTPTtXEgrHwvnDOGvEf8LaFB
+	lrXnL90X4Oo3xsISqWKKn/CDypY0/9db2fpizaEpd5TWrbd0yG8IGi6g1puvlbJljsJkCJdxircuG
+	lj5iDU1ZjgDdTXGUqwtgjuLxNogq3knv4oQzpaffNc/I07NY/4NpWojQB+SF9pgKOZp8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sdc7u-004cPT-Ar; Mon, 12 Aug 2024 22:58:50 +0200
-Date: Mon, 12 Aug 2024 22:58:50 +0200
+	id 1sdcCd-004cUA-8r; Mon, 12 Aug 2024 23:03:43 +0200
+Date: Mon, 12 Aug 2024 23:03:43 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?B?Q3Pza+FzLA==?= Bence <csokas.bence@prolan.hu>
-Cc: imx@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v3 net-next 2/2] net: fec: Remove duplicated code
-Message-ID: <6e0f958f-b48e-4933-914e-cdf66f353ee9@lunn.ch>
-References: <20240812094713.2883476-1-csokas.bence@prolan.hu>
- <20240812094713.2883476-2-csokas.bence@prolan.hu>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	vburru@marvell.com, sedara@marvell.com, srasheed@marvell.com,
+	sburla@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: octeon_ep_vf: use ethtool_sprintf/puts
+Message-ID: <f06cab9a-853f-4ccf-ae4d-40e0e897ea60@lunn.ch>
+References: <20240809044738.4347-1-rosenp@gmail.com>
+ <20240812124224.GA7679@kernel.org>
+ <CAKxU2N-m7SSTxuWQUuMH6E8FnF0RXGUMPepA=DunoZsvzJ-ahg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240812094713.2883476-2-csokas.bence@prolan.hu>
+In-Reply-To: <CAKxU2N-m7SSTxuWQUuMH6E8FnF0RXGUMPepA=DunoZsvzJ-ahg@mail.gmail.com>
 
-On Mon, Aug 12, 2024 at 11:47:15AM +0200, Csókás, Bence wrote:
-> `fec_ptp_pps_perout()` reimplements logic already
-> in `fec_ptp_read()`. Replace with function call.
-> 
-> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+> > 2. You have posed a number of similar patches.
+> >    To aid review it would be best to group these, say in batches of
+> >    no more than 10.
+> I plan to do a treewide commit with a coccinelle script but would like
+> to manually fix the problematic ones before doing so. Having said that
+> I still need to figure out how to do a cover letter...
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+git format-patch --cover-letter HEAD~42
 
-    Andrew
+I also find `b4 prep` good for managing patchsets, and it will produce
+a cover letter by default if there is more than one patch in the set:
+
+https://b4.docs.kernel.org/en/latest/contributor/prep.html
+
+	Andrew
 
