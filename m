@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-117682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E4D94EC82
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:12:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D48E94EC84
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:13:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E73FB226E6
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:12:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7842B2291C
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF9117A58B;
-	Mon, 12 Aug 2024 12:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27DA17A5A0;
+	Mon, 12 Aug 2024 12:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cexxqQju"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbLGeEEl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FFF179972;
-	Mon, 12 Aug 2024 12:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD2817994F;
+	Mon, 12 Aug 2024 12:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723464740; cv=none; b=ZtNk04oKJn3Rjc67bIgLQsni8xgdE59gpAPODMG33Id6loZMW+l6mpdKJ4nwHaXuK6ciclis/xwgej+9efkOsaiMpl1GvDIHtdbglrnPp0Z8xI3rAHbUk7Apyh/QViKKkhOfkpYjsnjnnX7lA+m0ux/NkJq/OSxFyenY3BLAVZM=
+	t=1723464745; cv=none; b=oUbLdMrR7UeU/BNVRm+4gLBTKojz9w133QIdU2T/LMzOglJSCicRbBzPMOPTSIuOYZt39fiLI3P1KgCmK6LwhdvBCGHMQd8y1W8ayoYAYPrK+TChSxk6jEShaCHAnXUI3srcXWWVCEl4LLsiPt5IMK1tVGACq3bai0wF8AYre1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723464740; c=relaxed/simple;
-	bh=bGBpAcRlW6U5yNAPSRT6k29XYKekF8aJKXCyeHD3JIg=;
+	s=arc-20240116; t=1723464745; c=relaxed/simple;
+	bh=n+x2KrWbCW9k9T/8jLtkdwC88tN87BOU+rSOFAPkX+A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=blFyunIu9LXN5iNJqDQKDb9xBGW3O0hKl7yhvbv9X5QDFX1Hr0/Bu/2nJ8rTTuWJqGCn6+MdEjdB5LkUf81jG1q6aZe9YFYdgdlxXuksj+iLJK4zUQQFGSKBP4vZweCpLfmWC3oigNyNMxYO0IcUm5wgLgXgCQMU8zE1booShok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cexxqQju; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 765E6C4AF0E;
-	Mon, 12 Aug 2024 12:12:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uCr0CuUptH36L7rVsI1jRWYY2h7OtfoQlWthrnY2PCWDFFEte8llB4/geHAYBv8hveU/SRIKqkPX858GSujQdqr5f3RudggW2eBx5myuo//CxUX0RSgZEdM7rNM9nA5WDH5S78c2MiBuF22T1mIv47bqtzcr80LeOiUfTuh+zqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbLGeEEl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16980C4AF0D;
+	Mon, 12 Aug 2024 12:12:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723464739;
-	bh=bGBpAcRlW6U5yNAPSRT6k29XYKekF8aJKXCyeHD3JIg=;
+	s=k20201202; t=1723464744;
+	bh=n+x2KrWbCW9k9T/8jLtkdwC88tN87BOU+rSOFAPkX+A=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=cexxqQjuanzHsUkplitxbwJ1UTUMuMlG/ni00qIt4GDnY3k5PnjCfULXlHn7XV0D5
-	 jn57cXnEuw9JPDx4ZSfbsNgkIdB9Pg45YbJxkMFegQTkn9yRtr567enPR2CYHVpV4o
-	 /NzkMTFf1sDYazpiIMfzBzOjszvOrLOuZgpEh2s/js0nmR3fFgqgwh8QvEeWiR/Ubq
-	 xDd6E0jW1J+Puhsf/NLfG6eU6JFFYhwjxeypvkX4INfwlFN2aoW6T8dYQFMC9ccbuC
-	 wihV6XkyQvCmcaqcrV0NXgq7jbSK7HOsUkDMJkdeEpoowfZ4VzPac7wokyrn/FPLWb
-	 l1vakZt79zdfQ==
+	b=IbLGeEEluTllEtfRh8J3WsTg8HAQsv3BfKqNFwT07D3gaccTp95jCpI+J/btUw80J
+	 SPm7RxHFVho7RZXfEHLQWoipKWCfwaPUWTmmBZGKPMP5+9JbXF3Xaq3Xn9GBRfybwQ
+	 6hMnKXl02ISuoQKJm/2h2UZWNoRlvIx49qIooSVnFgjI93iG/rwtg4oter2syyXUam
+	 lIf6Qap/xh5+CQhgD0EVIW77GXFmENeAKLJYzFQQw5JTpWc2enw+6pspKuQpk3d+Vn
+	 F08wDhISzI2zkxuto4APvzVpAzUxVFJqLsuu3l17KuswtMgsUhCA/CreqvipSxSppj
+	 mBhMPjTFK1ZoA==
 From: Simon Horman <horms@kernel.org>
-Date: Mon, 12 Aug 2024 13:11:56 +0100
-Subject: [PATCH net-next 2/3] net: ethernet: mtk_eth_soc: Use
+Date: Mon, 12 Aug 2024 13:11:57 +0100
+Subject: [PATCH net-next 3/3] net: hns3: Use
  ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240812-ipv6_addr-helpers-v1-2-aab5d1f35c40@kernel.org>
+Message-Id: <20240812-ipv6_addr-helpers-v1-3-aab5d1f35c40@kernel.org>
 References: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
 In-Reply-To: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>
@@ -70,8 +70,8 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 X-Mailer: b4 0.14.0
 
-Use ipv6_addr_cpu_to_be32 and ipv6_addr_be32_to_cpu helpers to convert
-address, rather than open coding the conversion.
+Use new ipv6_addr_cpu_to_be32 and ipv6_addr_be32_to_cpu helper,
+and IPV6_ADDR_WORDS. This is arguably slightly nicer.
 
 No functional change intended.
 Compile tested only.
@@ -80,80 +80,192 @@ Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Link: https://lore.kernel.org/netdev/c7684349-535c-45a4-9a74-d47479a50020@lunn.ch/
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/mediatek/mtk_ppe.c         | 10 +++++-----
- drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c |  9 +++++----
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 79 +++++++++++-----------
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |  8 ++-
+ 2 files changed, 44 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.c b/drivers/net/ethernet/mediatek/mtk_ppe.c
-index 0acee405a749..ada852adc5f7 100644
---- a/drivers/net/ethernet/mediatek/mtk_ppe.c
-+++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
-@@ -8,8 +8,11 @@
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index 82574ce0194f..ce629cbc5d01 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -13,8 +13,9 @@
  #include <linux/platform_device.h>
- #include <linux/if_ether.h>
  #include <linux/if_vlan.h>
+ #include <linux/crash_dump.h>
+-#include <net/ipv6.h>
 +
- #include <net/dst_metadata.h>
- #include <net/dsa.h>
-+#include <net/ipv6.h>
+ #include <net/rtnetlink.h>
 +
- #include "mtk_eth_soc.h"
- #include "mtk_ppe.h"
- #include "mtk_ppe_regs.h"
-@@ -338,7 +341,6 @@ int mtk_foe_entry_set_ipv6_tuple(struct mtk_eth *eth,
+ #include "hclge_cmd.h"
+ #include "hclge_dcb.h"
+ #include "hclge_main.h"
+@@ -6278,15 +6279,15 @@ static void hclge_fd_get_ip4_tuple(struct ethtool_rx_flow_spec *fs,
+ static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
+ 				      struct hclge_fd_rule *rule, u8 ip_proto)
  {
- 	int type = mtk_get_ib1_pkt_type(eth, entry->ib1);
- 	u32 *src, *dest;
--	int i;
+-	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.tcp_ip6_spec.ip6src,
+-			  IPV6_SIZE);
+-	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.tcp_ip6_spec.ip6src,
+-			  IPV6_SIZE);
++	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
++			      fs->h_u.tcp_ip6_spec.ip6src);
++	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
++			      fs->m_u.tcp_ip6_spec.ip6src);
  
- 	switch (type) {
- 	case MTK_PPE_PKT_TYPE_IPV4_DSLITE:
-@@ -359,10 +361,8 @@ int mtk_foe_entry_set_ipv6_tuple(struct mtk_eth *eth,
- 		return -EINVAL;
- 	}
+-	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.tcp_ip6_spec.ip6dst,
+-			  IPV6_SIZE);
+-	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.tcp_ip6_spec.ip6dst,
+-			  IPV6_SIZE);
++	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
++			      fs->h_u.tcp_ip6_spec.ip6dst);
++	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
++			      fs->m_u.tcp_ip6_spec.ip6dst);
  
--	for (i = 0; i < 4; i++)
--		src[i] = be32_to_cpu(src_addr[i]);
--	for (i = 0; i < 4; i++)
--		dest[i] = be32_to_cpu(dest_addr[i]);
-+	ipv6_addr_be32_to_cpu(src, src_addr);
-+	ipv6_addr_be32_to_cpu(dest, dest_addr);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c b/drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c
-index 1a97feca77f2..570ebf91f693 100644
---- a/drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c
-+++ b/drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c
-@@ -3,6 +3,9 @@
- 
- #include <linux/kernel.h>
- #include <linux/debugfs.h>
-+
-+#include <net/ipv6.h>
-+
- #include "mtk_eth_soc.h"
- 
- struct mtk_flow_addr_info
-@@ -47,16 +50,14 @@ static const char *mtk_foe_pkt_type_str(int type)
- static void
- mtk_print_addr(struct seq_file *m, u32 *addr, bool ipv6)
+ 	rule->tuples.src_port = be16_to_cpu(fs->h_u.tcp_ip6_spec.psrc);
+ 	rule->tuples_mask.src_port = be16_to_cpu(fs->m_u.tcp_ip6_spec.psrc);
+@@ -6307,15 +6308,15 @@ static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
+ static void hclge_fd_get_ip6_tuple(struct ethtool_rx_flow_spec *fs,
+ 				   struct hclge_fd_rule *rule)
  {
--	__be32 n_addr[4];
--	int i;
-+	__be32 n_addr[IPV6_ADDR_WORDS];
+-	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.usr_ip6_spec.ip6src,
+-			  IPV6_SIZE);
+-	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.usr_ip6_spec.ip6src,
+-			  IPV6_SIZE);
++	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
++			      fs->h_u.usr_ip6_spec.ip6src);
++	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
++			      fs->m_u.usr_ip6_spec.ip6src);
  
- 	if (!ipv6) {
- 		seq_printf(m, "%pI4h", addr);
- 		return;
- 	}
+-	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.usr_ip6_spec.ip6dst,
+-			  IPV6_SIZE);
+-	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.usr_ip6_spec.ip6dst,
+-			  IPV6_SIZE);
++	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
++			      fs->h_u.usr_ip6_spec.ip6dst);
++	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
++			      fs->m_u.usr_ip6_spec.ip6dst);
  
--	for (i = 0; i < ARRAY_SIZE(n_addr); i++)
--		n_addr[i] = htonl(addr[i]);
-+	ipv6_addr_cpu_to_be32(n_addr, addr);
- 	seq_printf(m, "%pI6", n_addr);
- }
+ 	rule->tuples.ip_proto = fs->h_u.usr_ip6_spec.l4_proto;
+ 	rule->tuples_mask.ip_proto = fs->m_u.usr_ip6_spec.l4_proto;
+@@ -6744,21 +6745,19 @@ static void hclge_fd_get_tcpip6_info(struct hclge_fd_rule *rule,
+ 				     struct ethtool_tcpip6_spec *spec,
+ 				     struct ethtool_tcpip6_spec *spec_mask)
+ {
+-	cpu_to_be32_array(spec->ip6src,
+-			  rule->tuples.src_ip, IPV6_SIZE);
+-	cpu_to_be32_array(spec->ip6dst,
+-			  rule->tuples.dst_ip, IPV6_SIZE);
++	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
++	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
+ 	if (rule->unused_tuple & BIT(INNER_SRC_IP))
+ 		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
+ 	else
+-		cpu_to_be32_array(spec_mask->ip6src, rule->tuples_mask.src_ip,
+-				  IPV6_SIZE);
++		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
++				      rule->tuples_mask.src_ip);
  
+ 	if (rule->unused_tuple & BIT(INNER_DST_IP))
+ 		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
+ 	else
+-		cpu_to_be32_array(spec_mask->ip6dst, rule->tuples_mask.dst_ip,
+-				  IPV6_SIZE);
++		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
++				      rule->tuples_mask.dst_ip);
+ 
+ 	spec->tclass = rule->tuples.ip_tos;
+ 	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
+@@ -6777,19 +6776,19 @@ static void hclge_fd_get_ip6_info(struct hclge_fd_rule *rule,
+ 				  struct ethtool_usrip6_spec *spec,
+ 				  struct ethtool_usrip6_spec *spec_mask)
+ {
+-	cpu_to_be32_array(spec->ip6src, rule->tuples.src_ip, IPV6_SIZE);
+-	cpu_to_be32_array(spec->ip6dst, rule->tuples.dst_ip, IPV6_SIZE);
++	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
++	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
+ 	if (rule->unused_tuple & BIT(INNER_SRC_IP))
+ 		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
+ 	else
+-		cpu_to_be32_array(spec_mask->ip6src,
+-				  rule->tuples_mask.src_ip, IPV6_SIZE);
++		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
++				      rule->tuples_mask.src_ip);
+ 
+ 	if (rule->unused_tuple & BIT(INNER_DST_IP))
+ 		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
+ 	else
+-		cpu_to_be32_array(spec_mask->ip6dst,
+-				  rule->tuples_mask.dst_ip, IPV6_SIZE);
++		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
++				      rule->tuples_mask.dst_ip);
+ 
+ 	spec->tclass = rule->tuples.ip_tos;
+ 	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
+@@ -7007,7 +7006,7 @@ static void hclge_fd_get_flow_tuples(const struct flow_keys *fkeys,
+ 	} else {
+ 		int i;
+ 
+-		for (i = 0; i < IPV6_SIZE; i++) {
++		for (i = 0; i < IPV6_ADDR_WORDS; i++) {
+ 			tuples->src_ip[i] = be32_to_cpu(flow_ip6_src[i]);
+ 			tuples->dst_ip[i] = be32_to_cpu(flow_ip6_dst[i]);
+ 		}
+@@ -7262,14 +7261,14 @@ static int hclge_get_cls_key_ip(const struct flow_rule *flow,
+ 		struct flow_match_ipv6_addrs match;
+ 
+ 		flow_rule_match_ipv6_addrs(flow, &match);
+-		be32_to_cpu_array(rule->tuples.src_ip, match.key->src.s6_addr32,
+-				  IPV6_SIZE);
+-		be32_to_cpu_array(rule->tuples_mask.src_ip,
+-				  match.mask->src.s6_addr32, IPV6_SIZE);
+-		be32_to_cpu_array(rule->tuples.dst_ip, match.key->dst.s6_addr32,
+-				  IPV6_SIZE);
+-		be32_to_cpu_array(rule->tuples_mask.dst_ip,
+-				  match.mask->dst.s6_addr32, IPV6_SIZE);
++		ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
++				      match.key->src.s6_addr32);
++		ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
++				      match.mask->src.s6_addr32);
++		ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
++				      match.key->dst.s6_addr32);
++		ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
++				      match.mask->dst.s6_addr32);
+ 	} else {
+ 		rule->unused_tuple |= BIT(INNER_SRC_IP);
+ 		rule->unused_tuple |= BIT(INNER_DST_IP);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+index b5178b0f88b3..b9fc719880bb 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+@@ -8,7 +8,9 @@
+ #include <linux/phy.h>
+ #include <linux/if_vlan.h>
+ #include <linux/kfifo.h>
++
+ #include <net/devlink.h>
++#include <net/ipv6.h>
+ 
+ #include "hclge_cmd.h"
+ #include "hclge_ptp.h"
+@@ -718,15 +720,15 @@ struct hclge_fd_cfg {
+ };
+ 
+ #define IPV4_INDEX	3
+-#define IPV6_SIZE	4
++
+ struct hclge_fd_rule_tuples {
+ 	u8 src_mac[ETH_ALEN];
+ 	u8 dst_mac[ETH_ALEN];
+ 	/* Be compatible for ip address of both ipv4 and ipv6.
+ 	 * For ipv4 address, we store it in src/dst_ip[3].
+ 	 */
+-	u32 src_ip[IPV6_SIZE];
+-	u32 dst_ip[IPV6_SIZE];
++	u32 src_ip[IPV6_ADDR_WORDS];
++	u32 dst_ip[IPV6_ADDR_WORDS];
+ 	u16 src_port;
+ 	u16 dst_port;
+ 	u16 vlan_tag1;
 
 -- 
 2.43.0
