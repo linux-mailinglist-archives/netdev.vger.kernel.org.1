@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-117864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5025594F986
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 00:21:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D2794F987
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 00:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5B021F22AE1
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:21:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D0CB1C21805
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 22:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACD0197A7E;
-	Mon, 12 Aug 2024 22:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D16B1953B9;
+	Mon, 12 Aug 2024 22:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dh0nkoM1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K9LsJ2DY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547C114A4DF
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8063414A4DF
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723501271; cv=none; b=NaMYrTLArlHjQKHWD9Llz/IkFOudHDieZlY4KRf64kPGk0ul7X+pSPwv5B1uDN2NkOwubAuAb9zmvMERJozuzAGPjVqrU9qK7PgSzxMKBjpJfATb+oWqVuqwYYyAbatrMgVAGMjZ+MYgX+xne84jCcZzs8tU3335ihtZh9Il/EY=
+	t=1723501276; cv=none; b=qkbSIlJpCotIYh16x6NNYHxU30DOUm1brr4jVx0+Ll9IqPfDIaAYa96KEp/nmhrGcOfflP6c0HX0DB52g0PAkwAaTek/bAhn4/uqLzDgj6P5rmT4/WW7Rpy37yaQiNwnx5zP4owlYm7urMQNPPw9z2sDSkcf+Wqc5ziEsxMf3WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723501271; c=relaxed/simple;
-	bh=dgjwV5zlV23JklHcX0bEVbu5QwINvAvwGtHUlusLedk=;
+	s=arc-20240116; t=1723501276; c=relaxed/simple;
+	bh=6gQoeLNdUmoGRP2RC7VFDBqGizozUQetaLuO7SFW658=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yeow1i4HQIGMLlRMT9i8EieBqkwUHRN9mNitvCvVw50G2YfT/sC9K2KpafkShgltee+pgIEVa5ZZIj9Vd2qmA8nkLa/Tj9eknSKbNiQR4V5mqrEs3BOOa9o+MrohtU+AdFsyv0MnCQI1gPIS5JcbfpE+sbNGe8w+p8OdxscBidw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dh0nkoM1; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=geY+bWGkZw6LWGk/my9ZF2bNodWkfjntmAIkUBfd1rAxvJG9H5qTeuj/kRJEf7uQkvyZor8DNlElIkTGUePsipBcVmnP9G/J72yxqRGDsFAyxVEhnUw8rTYvjIzhwhZExcFJtb33Qji9tF7eLh+aVvPYwdrxZrsrQKyYxDGZ5fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K9LsJ2DY; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-666010fb35cso76372327b3.0
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 15:21:09 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0e6c47daf7so9139187276.3
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 15:21:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723501268; x=1724106068; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723501273; x=1724106073; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1XAcsw1x953Wat59Xf2NEMXIYr0sReqdtvGGiRYfL0=;
-        b=Dh0nkoM1Qppxl+wYp+yELceb/QOT+ZG7XKqwskoQK97ndK8DwByXG5efbtEMMzkqWm
-         1Wj3xBuixpV54wQMXy/v0zyCHykgtXD+DICQCrz9/ZMYrydVEvn+u9uuelwPBHL50maW
-         OG/ljew6Xbr2ro2B+26ht61PENen7dpXC1OaZVYIw0a2DM5mN3dU/ih7bA0JmxpWI3Wm
-         baPxX8H6rUqF5kkQFNCJP/DGHWZvOef7SZLD0V+j80BZGh1lYG7yjIz9yL4noS9d4M72
-         BqDnlpt6pe8aB0k5haS7urkHoVbllpxEw9uOFod+9orNuOlZFrwoz+B+hl0Bh49um6ZJ
-         Um8Q==
+        bh=WlRslA5uJqM6VInbXgpLNgto9m04oXjvnbFi7K7mJCk=;
+        b=K9LsJ2DYcsFaqxgJm5KXHlEkOlcOsKIMQhepOfDtN26+i63z2U/IObxznmyl1shEZv
+         8YrQEGlbxpYgc+v+2+4Rano0aQPoz12l6mYK20/I8PD8vGlGAk2ukKWh4O3dJePWGk8g
+         zVuDpo6uLHe6ENbRNqE2RlO+0C6eL/WfevIpjmK8MGUp9/uW1sgc+kWB3dH0MTr43U30
+         ORujsnTGqDGKTMvYGUubIjLWKyWf4WSPqZ+kTOnT7KSEWUg77gzetpxhgXRowELq7Qs+
+         4TjfEfOox3x4tjhnaIsXePa2vQH4/EyPbzTLUnyYVykDMQywebwN0i0Sk6yzVlGk46aY
+         0PbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723501268; x=1724106068;
+        d=1e100.net; s=20230601; t=1723501273; x=1724106073;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1XAcsw1x953Wat59Xf2NEMXIYr0sReqdtvGGiRYfL0=;
-        b=IfgqEMxVNKpjTZQ2wwdjiJwB0XgRlG8LIiHlAmL0Fjr/xgBx9D5/SHaGNXdODk+CxT
-         JCkuBmO324TokvBFQbGNhc0ZC3kIdU4ROsUjcI6unNNUbOfDZOs+DeqRQkQLEdcPU4qz
-         RsxeLIJs2wmPiWTVKAhHqsySCiWoU6vtwDqWfVekH4AomJiQStetOQ2UgkVvOMemth49
-         J5sJVKMB+PUOsw6+snU2rvu7Ge3bNFOUBCUAcvj+8gBUMRZQ2E8G/3Q+tbu/ehyxDsLY
-         7TDNVtXLUsWrk6MlbirsygYZGZ8hOJzMMmvGCOfYXzIGaudAM/YdaIW4L6fu2huYJEJW
-         78WA==
-X-Gm-Message-State: AOJu0Yx7rgx0K3aMXBpOm5EfHsvCpphGtmg8Ok0Ozvu9q3+N9UeAH/Bz
-	7Zh/j+r5QMpRIzZBZF5F2KLs/WrRqiCKL5lUkOKnOWrFYy0Khft91PBgRbral7ngOhoQ0Vq0HLx
-	bDvpxwcqv0mDwr8sm2LDbn80NKwMhDbbQUgHdhfs6tjkZIwzSF2R6XQaAsRzLenR4XNGLO1SITx
-	LNZpv8LqcdVnIkQQdp2zQQCLTCgngDE+ZZJ5DrKOQWKur+LqmyQd3VZ+kmpByNjsQ3
-X-Google-Smtp-Source: AGHT+IF2Tlm5r6vRWo+WIZva+lEOyOrtgo08rZXSbAqOrNQqq8ihvUfvk43qKmtp08Cv/z5o3UmlRypCSDeT5L3OuuM=
+        bh=WlRslA5uJqM6VInbXgpLNgto9m04oXjvnbFi7K7mJCk=;
+        b=U0bUMXKMcPlgfGu6NdMA2dFdLrjOy1/1Td6iP0XoV6BbKg/7Bz2Z6RdG8RpwvIDRxq
+         5QogBZd1xy4yqb1vJFTlV2BPSID2lgUXt/HeffFpayt2+/1vv+XKYDm1vwN1OH9sJ6lj
+         ADbQ7eMoXsv5a+NBCbpllsVOmf/Wl/niL8WeJL6BHOmY8eZUvOvzEfrYIq9esWy6oPFL
+         9feJEpylXM86tmkVQ2M5dUm5VB745HsPu20qJM2CGxKGjAIvMdMGHQHlc4wVnmh46Ltn
+         XpYlpAK+HoCpvnMxfO+EtGhJyUtfEXS8s5IX4ep3rvRIjhrlvhHgQEn5DXMl8xjhLQ74
+         OSmw==
+X-Gm-Message-State: AOJu0YwlLFSb1lBS1OZeS215+y3Bu31YVa+8iljFth43qNXyyZE/GgtZ
+	ynkInzrC51VbI+tt8uJimygVkpJgm9StNFaWEeeOj2zF8BVqhzr5LlHptwvN1ztQieVXVe5mmaF
+	jCg9w5hXZg5n4EoecXMzJLiUaLo/QezmJxrVnCy1xR/NFw/wHu8BXOLre6h3ZStnhQE9O26tD8n
+	z6a+Zg0/yPrk+AOEIDLxE5JQhORppjRstomr10+NpppOLFvBMHlnL1bujvLrwMxxSt
+X-Google-Smtp-Source: AGHT+IH9QktVubgMS5ZWyueDnxigUgebpiEaEQz6VKXaWpSvy8uvEMxPhhqz435aj9Xo97tSVAR7KaIKkcZz2/AakUo=
 X-Received: from pkaligineedi.sea.corp.google.com ([2620:15c:11c:202:8c4a:afa1:7322:951c])
- (user=pkaligineedi job=sendgmr) by 2002:a0d:ed07:0:b0:6a9:5953:a652 with SMTP
- id 00721157ae682-6a9e77555c6mr254017b3.4.1723501267870; Mon, 12 Aug 2024
- 15:21:07 -0700 (PDT)
-Date: Mon, 12 Aug 2024 15:20:12 -0700
+ (user=pkaligineedi job=sendgmr) by 2002:a25:6fc5:0:b0:e0b:ab63:b9c7 with SMTP
+ id 3f1490d57ef6-e113cf5e921mr2387276.7.1723501272620; Mon, 12 Aug 2024
+ 15:21:12 -0700 (PDT)
+Date: Mon, 12 Aug 2024 15:20:13 -0700
 In-Reply-To: <20240812222013.1503584-1-pkaligineedi@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240812222013.1503584-1-pkaligineedi@google.com>
 X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240812222013.1503584-2-pkaligineedi@google.com>
-Subject: [PATCH net-next v3 1/2] gve: Add RSS device option
+Message-ID: <20240812222013.1503584-3-pkaligineedi@google.com>
+Subject: [PATCH net-next v3 2/2] gve: Add RSS adminq commands and ethtool support
 From: Praveen Kaligineedi <pkaligineedi@google.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
@@ -84,12 +84,14 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Ziwei Xiao <ziweixiao@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Ziwei Xiao <ziweixiao@google.com>
+From: Jeroen de Borst <jeroendb@google.com>
 
-Add a device option to inform the driver about the hash key size and
-hash table size used by the device. This information will be stored and
-made available for RSS ethtool operations.
+Introduce adminq commands to configure and retrieve RSS settings from
+the device. Implement corresponding ethtool ops for user-level
+management.
 
+Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
 Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
 Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
 Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
@@ -97,191 +99,367 @@ Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
 Changes in v2:
-	- Unify the RSS argument order in related functions(Jakub Kicinski)
+	- Update the GVE's get/set_rxfh functions to send the
+	  ethtool_rxfh_param directly to related adminq functions so
+	  that it can avoid the extra copy between ethtool and the
+	  local gve_rss_config struct(Jakub Kicinski)
+	- Remove the struct gve_rss_config that becomes unused
+	- Add a comment in the gve_adminq_configure_rss function to
+	  describe the device expections for the configure_rss adminq
+	  command
 
- drivers/net/ethernet/google/gve/gve.h        |  3 ++
- drivers/net/ethernet/google/gve/gve_adminq.c | 36 ++++++++++++++++++--
- drivers/net/ethernet/google/gve/gve_adminq.h | 15 +++++++-
- 3 files changed, 51 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h         |   2 +
+ drivers/net/ethernet/google/gve/gve_adminq.c  | 146 ++++++++++++++++++
+ drivers/net/ethernet/google/gve/gve_adminq.h  |  44 ++++++
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  44 +++++-
+ 4 files changed, 235 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 84ac004d3953..6c21f3c53619 100644
+index 6c21f3c53619..09a85ed59143 100644
 --- a/drivers/net/ethernet/google/gve/gve.h
 +++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -831,6 +831,9 @@ struct gve_priv {
- 	u32 num_flow_rules;
+@@ -784,6 +784,8 @@ struct gve_priv {
+ 	u32 adminq_verify_driver_compatibility_cnt;
+ 	u32 adminq_query_flow_rules_cnt;
+ 	u32 adminq_cfg_flow_rule_cnt;
++	u32 adminq_cfg_rss_cnt;
++	u32 adminq_query_rss_cnt;
  
- 	struct gve_flow_rules_cache flow_rules_cache;
-+
-+	u16 rss_key_size;
-+	u16 rss_lut_size;
- };
- 
- enum gve_service_task_flags_bit {
+ 	/* Global stats */
+ 	u32 interface_up_cnt; /* count of times interface turned up since last reset */
 diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index c5bbc1b7524e..b5c801d2f8b5 100644
+index b5c801d2f8b5..e44e8b139633 100644
 --- a/drivers/net/ethernet/google/gve/gve_adminq.c
 +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -45,6 +45,7 @@ void gve_parse_device_option(struct gve_priv *priv,
- 			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
- 			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
- 			     struct gve_device_option_flow_steering **dev_op_flow_steering,
-+			     struct gve_device_option_rss_config **dev_op_rss_config,
- 			     struct gve_device_option_modify_ring **dev_op_modify_ring)
- {
- 	u32 req_feat_mask = be32_to_cpu(option->required_features_mask);
-@@ -207,6 +208,23 @@ void gve_parse_device_option(struct gve_priv *priv,
- 				 "Flow Steering");
- 		*dev_op_flow_steering = (void *)(option + 1);
+@@ -309,6 +309,8 @@ int gve_adminq_alloc(struct device *dev, struct gve_priv *priv)
+ 	priv->adminq_get_ptype_map_cnt = 0;
+ 	priv->adminq_query_flow_rules_cnt = 0;
+ 	priv->adminq_cfg_flow_rule_cnt = 0;
++	priv->adminq_cfg_rss_cnt = 0;
++	priv->adminq_query_rss_cnt = 0;
+ 
+ 	/* Setup Admin queue with the device */
+ 	if (priv->pdev->revision < 0x1) {
+@@ -554,6 +556,12 @@ static int gve_adminq_issue_cmd(struct gve_priv *priv,
+ 	case GVE_ADMINQ_CONFIGURE_FLOW_RULE:
+ 		priv->adminq_cfg_flow_rule_cnt++;
  		break;
-+	case GVE_DEV_OPT_ID_RSS_CONFIG:
-+		if (option_length < sizeof(**dev_op_rss_config) ||
-+		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG) {
-+			dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERROR_FMT,
-+				 "RSS config",
-+				 (int)sizeof(**dev_op_rss_config),
-+				 GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG,
-+				 option_length, req_feat_mask);
-+			break;
-+		}
-+
-+		if (option_length > sizeof(**dev_op_rss_config))
-+			dev_warn(&priv->pdev->dev,
-+				 GVE_DEVICE_OPTION_TOO_BIG_FMT,
-+				 "RSS config");
-+		*dev_op_rss_config = (void *)(option + 1);
++	case GVE_ADMINQ_CONFIGURE_RSS:
++		priv->adminq_cfg_rss_cnt++;
++		break;
++	case GVE_ADMINQ_QUERY_RSS:
++		priv->adminq_query_rss_cnt++;
 +		break;
  	default:
- 		/* If we don't recognize the option just continue
- 		 * without doing anything.
-@@ -227,6 +245,7 @@ gve_process_device_options(struct gve_priv *priv,
- 			   struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
- 			   struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
- 			   struct gve_device_option_flow_steering **dev_op_flow_steering,
-+			   struct gve_device_option_rss_config **dev_op_rss_config,
- 			   struct gve_device_option_modify_ring **dev_op_modify_ring)
- {
- 	const int num_options = be16_to_cpu(descriptor->num_device_options);
-@@ -249,7 +268,8 @@ gve_process_device_options(struct gve_priv *priv,
- 					dev_op_gqi_rda, dev_op_gqi_qpl,
- 					dev_op_dqo_rda, dev_op_jumbo_frames,
- 					dev_op_dqo_qpl, dev_op_buffer_sizes,
--					dev_op_flow_steering, dev_op_modify_ring);
-+					dev_op_flow_steering, dev_op_rss_config,
-+					dev_op_modify_ring);
- 		dev_opt = next_opt;
+ 		dev_err(&priv->pdev->dev, "unknown AQ command opcode %d\n", opcode);
  	}
- 
-@@ -867,6 +887,8 @@ static void gve_enable_supported_features(struct gve_priv *priv,
- 					  *dev_op_buffer_sizes,
- 					  const struct gve_device_option_flow_steering
- 					  *dev_op_flow_steering,
-+					  const struct gve_device_option_rss_config
-+					  *dev_op_rss_config,
- 					  const struct gve_device_option_modify_ring
- 					  *dev_op_modify_ring)
- {
-@@ -931,6 +953,14 @@ static void gve_enable_supported_features(struct gve_priv *priv,
- 				 priv->max_flow_rules);
- 		}
- 	}
-+
-+	if (dev_op_rss_config &&
-+	    (supported_features_mask & GVE_SUP_RSS_CONFIG_MASK)) {
-+		priv->rss_key_size =
-+			be16_to_cpu(dev_op_rss_config->hash_key_size);
-+		priv->rss_lut_size =
-+			be16_to_cpu(dev_op_rss_config->hash_lut_size);
-+	}
+@@ -1280,6 +1288,81 @@ int gve_adminq_reset_flow_rules(struct gve_priv *priv)
+ 	return gve_adminq_configure_flow_rule(priv, &flow_rule_cmd);
  }
  
- int gve_adminq_describe_device(struct gve_priv *priv)
-@@ -939,6 +969,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 	struct gve_device_option_buffer_sizes *dev_op_buffer_sizes = NULL;
- 	struct gve_device_option_jumbo_frames *dev_op_jumbo_frames = NULL;
- 	struct gve_device_option_modify_ring *dev_op_modify_ring = NULL;
-+	struct gve_device_option_rss_config *dev_op_rss_config = NULL;
- 	struct gve_device_option_gqi_rda *dev_op_gqi_rda = NULL;
- 	struct gve_device_option_gqi_qpl *dev_op_gqi_qpl = NULL;
- 	struct gve_device_option_dqo_rda *dev_op_dqo_rda = NULL;
-@@ -973,6 +1004,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 					 &dev_op_jumbo_frames, &dev_op_dqo_qpl,
- 					 &dev_op_buffer_sizes,
- 					 &dev_op_flow_steering,
-+					 &dev_op_rss_config,
- 					 &dev_op_modify_ring);
- 	if (err)
- 		goto free_device_descriptor;
-@@ -1035,7 +1067,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 	gve_enable_supported_features(priv, supported_features_mask,
- 				      dev_op_jumbo_frames, dev_op_dqo_qpl,
- 				      dev_op_buffer_sizes, dev_op_flow_steering,
--				      dev_op_modify_ring);
-+				      dev_op_rss_config, dev_op_modify_ring);
- 
- free_device_descriptor:
++int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *rxfh)
++{
++	dma_addr_t lut_bus = 0, key_bus = 0;
++	u16 key_size = 0, lut_size = 0;
++	union gve_adminq_command cmd;
++	__be32 *lut = NULL;
++	u8 hash_alg = 0;
++	u8 *key = NULL;
++	int err = 0;
++	u16 i;
++
++	switch (rxfh->hfunc) {
++	case ETH_RSS_HASH_NO_CHANGE:
++		break;
++	case ETH_RSS_HASH_TOP:
++		hash_alg = ETH_RSS_HASH_TOP;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	if (rxfh->indir) {
++		lut_size = priv->rss_lut_size;
++		lut = dma_alloc_coherent(&priv->pdev->dev,
++					 lut_size * sizeof(*lut),
++					 &lut_bus, GFP_KERNEL);
++		if (!lut)
++			return -ENOMEM;
++
++		for (i = 0; i < priv->rss_lut_size; i++)
++			lut[i] = cpu_to_be32(rxfh->indir[i]);
++	}
++
++	if (rxfh->key) {
++		key_size = priv->rss_key_size;
++		key = dma_alloc_coherent(&priv->pdev->dev,
++					 key_size, &key_bus, GFP_KERNEL);
++		if (!key) {
++			err = -ENOMEM;
++			goto out;
++		}
++
++		memcpy(key, rxfh->key, key_size);
++	}
++
++	/* Zero-valued fields in the cmd.configure_rss instruct the device to
++	 * not update those fields.
++	 */
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.opcode = cpu_to_be32(GVE_ADMINQ_CONFIGURE_RSS);
++	cmd.configure_rss = (struct gve_adminq_configure_rss) {
++		.hash_types = cpu_to_be16(BIT(GVE_RSS_HASH_TCPV4) |
++					  BIT(GVE_RSS_HASH_UDPV4) |
++					  BIT(GVE_RSS_HASH_TCPV6) |
++					  BIT(GVE_RSS_HASH_UDPV6)),
++		.hash_alg = hash_alg,
++		.hash_key_size = cpu_to_be16(key_size),
++		.hash_lut_size = cpu_to_be16(lut_size),
++		.hash_key_addr = cpu_to_be64(key_bus),
++		.hash_lut_addr = cpu_to_be64(lut_bus),
++	};
++
++	err = gve_adminq_execute_cmd(priv, &cmd);
++
++out:
++	if (lut)
++		dma_free_coherent(&priv->pdev->dev,
++				  lut_size * sizeof(*lut),
++				  lut, lut_bus);
++	if (key)
++		dma_free_coherent(&priv->pdev->dev,
++				  key_size, key, key_bus);
++	return err;
++}
++
+ /* In the dma memory that the driver allocated for the device to query the flow rules, the device
+  * will first write it with a struct of gve_query_flow_rules_descriptor. Next to it, the device
+  * will write an array of rules or rule ids with the count that specified in the descriptor.
+@@ -1357,3 +1440,66 @@ int gve_adminq_query_flow_rules(struct gve_priv *priv, u16 query_opcode, u32 sta
  	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
+ 	return err;
+ }
++
++static int gve_adminq_process_rss_query(struct gve_priv *priv,
++					struct gve_query_rss_descriptor *descriptor,
++					struct ethtool_rxfh_param *rxfh)
++{
++	u32 total_memory_length;
++	u16 hash_lut_length;
++	void *rss_info_addr;
++	__be32 *lut;
++	u16 i;
++
++	total_memory_length = be32_to_cpu(descriptor->total_length);
++	hash_lut_length = priv->rss_lut_size * sizeof(*rxfh->indir);
++
++	if (sizeof(*descriptor) + priv->rss_key_size + hash_lut_length != total_memory_length) {
++		dev_err(&priv->dev->dev,
++			"rss query desc from device has invalid length parameter.\n");
++		return -EINVAL;
++	}
++
++	rxfh->hfunc = descriptor->hash_alg;
++
++	rss_info_addr = (void *)(descriptor + 1);
++	if (rxfh->key)
++		memcpy(rxfh->key, rss_info_addr, priv->rss_key_size);
++
++	rss_info_addr += priv->rss_key_size;
++	lut = (__be32 *)rss_info_addr;
++	if (rxfh->indir) {
++		for (i = 0; i < priv->rss_lut_size; i++)
++			rxfh->indir[i] = be32_to_cpu(lut[i]);
++	}
++
++	return 0;
++}
++
++int gve_adminq_query_rss_config(struct gve_priv *priv, struct ethtool_rxfh_param *rxfh)
++{
++	struct gve_query_rss_descriptor *descriptor;
++	union gve_adminq_command cmd;
++	dma_addr_t descriptor_bus;
++	int err = 0;
++
++	descriptor = dma_pool_alloc(priv->adminq_pool, GFP_KERNEL, &descriptor_bus);
++	if (!descriptor)
++		return -ENOMEM;
++
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.opcode = cpu_to_be32(GVE_ADMINQ_QUERY_RSS);
++	cmd.query_rss = (struct gve_adminq_query_rss) {
++		.available_length = cpu_to_be64(GVE_ADMINQ_BUFFER_SIZE),
++		.rss_descriptor_addr = cpu_to_be64(descriptor_bus),
++	};
++	err = gve_adminq_execute_cmd(priv, &cmd);
++	if (err)
++		goto out;
++
++	err = gve_adminq_process_rss_query(priv, descriptor, rxfh);
++
++out:
++	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
++	return err;
++}
 diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index ed1370c9b197..7d9ef9a12fef 100644
+index 7d9ef9a12fef..863683de9694 100644
 --- a/drivers/net/ethernet/google/gve/gve_adminq.h
 +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -164,6 +164,14 @@ struct gve_device_option_flow_steering {
+@@ -20,12 +20,14 @@ enum gve_adminq_opcodes {
+ 	GVE_ADMINQ_DESTROY_TX_QUEUE		= 0x7,
+ 	GVE_ADMINQ_DESTROY_RX_QUEUE		= 0x8,
+ 	GVE_ADMINQ_DECONFIGURE_DEVICE_RESOURCES	= 0x9,
++	GVE_ADMINQ_CONFIGURE_RSS		= 0xA,
+ 	GVE_ADMINQ_SET_DRIVER_PARAMETER		= 0xB,
+ 	GVE_ADMINQ_REPORT_STATS			= 0xC,
+ 	GVE_ADMINQ_REPORT_LINK_SPEED		= 0xD,
+ 	GVE_ADMINQ_GET_PTYPE_MAP		= 0xE,
+ 	GVE_ADMINQ_VERIFY_DRIVER_COMPATIBILITY	= 0xF,
+ 	GVE_ADMINQ_QUERY_FLOW_RULES		= 0x10,
++	GVE_ADMINQ_QUERY_RSS			= 0x12,
  
- static_assert(sizeof(struct gve_device_option_flow_steering) == 12);
+ 	/* For commands that are larger than 56 bytes */
+ 	GVE_ADMINQ_EXTENDED_COMMAND		= 0xFF,
+@@ -522,6 +524,44 @@ struct gve_adminq_query_flow_rules {
  
-+struct gve_device_option_rss_config {
-+	__be32 supported_features_mask;
-+	__be16 hash_key_size;
-+	__be16 hash_lut_size;
+ static_assert(sizeof(struct gve_adminq_query_flow_rules) == 24);
+ 
++enum gve_rss_hash_type {
++	GVE_RSS_HASH_IPV4,
++	GVE_RSS_HASH_TCPV4,
++	GVE_RSS_HASH_IPV6,
++	GVE_RSS_HASH_IPV6_EX,
++	GVE_RSS_HASH_TCPV6,
++	GVE_RSS_HASH_TCPV6_EX,
++	GVE_RSS_HASH_UDPV4,
++	GVE_RSS_HASH_UDPV6,
++	GVE_RSS_HASH_UDPV6_EX,
 +};
 +
-+static_assert(sizeof(struct gve_device_option_rss_config) == 8);
++struct gve_adminq_configure_rss {
++	__be16 hash_types;
++	u8 hash_alg;
++	u8 reserved;
++	__be16 hash_key_size;
++	__be16 hash_lut_size;
++	__be64 hash_key_addr;
++	__be64 hash_lut_addr;
++};
 +
- /* Terminology:
-  *
-  * RDA - Raw DMA Addressing - Buffers associated with SKBs are directly DMA
-@@ -182,6 +190,7 @@ enum gve_dev_opt_id {
- 	GVE_DEV_OPT_ID_JUMBO_FRAMES		= 0x8,
- 	GVE_DEV_OPT_ID_BUFFER_SIZES		= 0xa,
- 	GVE_DEV_OPT_ID_FLOW_STEERING		= 0xb,
-+	GVE_DEV_OPT_ID_RSS_CONFIG		= 0xe,
++static_assert(sizeof(struct gve_adminq_configure_rss) == 24);
++
++struct gve_query_rss_descriptor {
++	__be32 total_length;
++	__be16 hash_types;
++	u8 hash_alg;
++	u8 reserved;
++};
++
++struct gve_adminq_query_rss {
++	__be64 available_length;
++	__be64 rss_descriptor_addr;
++};
++
++static_assert(sizeof(struct gve_adminq_query_rss) == 16);
++
+ union gve_adminq_command {
+ 	struct {
+ 		__be32 opcode;
+@@ -543,6 +583,8 @@ union gve_adminq_command {
+ 			struct gve_adminq_verify_driver_compatibility
+ 						verify_driver_compatibility;
+ 			struct gve_adminq_query_flow_rules query_flow_rules;
++			struct gve_adminq_configure_rss configure_rss;
++			struct gve_adminq_query_rss query_rss;
+ 			struct gve_adminq_extended_command extended_command;
+ 		};
+ 	};
+@@ -581,6 +623,8 @@ int gve_adminq_add_flow_rule(struct gve_priv *priv, struct gve_adminq_flow_rule
+ int gve_adminq_del_flow_rule(struct gve_priv *priv, u32 loc);
+ int gve_adminq_reset_flow_rules(struct gve_priv *priv);
+ int gve_adminq_query_flow_rules(struct gve_priv *priv, u16 query_opcode, u32 starting_loc);
++int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *rxfh);
++int gve_adminq_query_rss_config(struct gve_priv *priv, struct ethtool_rxfh_param *rxfh);
+ 
+ struct gve_ptype_lut;
+ int gve_adminq_get_ptype_map_dqo(struct gve_priv *priv,
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index 5a8b490ab3ad..bdfc6e77b2af 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -75,7 +75,8 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
+ 	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
+ 	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
+ 	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt",
+-	"adminq_query_flow_rules", "adminq_cfg_flow_rule",
++	"adminq_query_flow_rules", "adminq_cfg_flow_rule", "adminq_cfg_rss_cnt",
++	"adminq_query_rss_cnt",
  };
  
- enum gve_dev_opt_req_feat_mask {
-@@ -194,6 +203,7 @@ enum gve_dev_opt_req_feat_mask {
- 	GVE_DEV_OPT_REQ_FEAT_MASK_BUFFER_SIZES		= 0x0,
- 	GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING		= 0x0,
- 	GVE_DEV_OPT_REQ_FEAT_MASK_FLOW_STEERING		= 0x0,
-+	GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG		= 0x0,
- };
+ static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
+@@ -453,6 +454,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 	data[i++] = priv->adminq_get_ptype_map_cnt;
+ 	data[i++] = priv->adminq_query_flow_rules_cnt;
+ 	data[i++] = priv->adminq_cfg_flow_rule_cnt;
++	data[i++] = priv->adminq_cfg_rss_cnt;
++	data[i++] = priv->adminq_query_rss_cnt;
+ }
  
- enum gve_sup_feature_mask {
-@@ -201,6 +211,7 @@ enum gve_sup_feature_mask {
- 	GVE_SUP_JUMBO_FRAMES_MASK	= 1 << 2,
- 	GVE_SUP_BUFFER_SIZES_MASK	= 1 << 4,
- 	GVE_SUP_FLOW_STEERING_MASK	= 1 << 5,
-+	GVE_SUP_RSS_CONFIG_MASK		= 1 << 7,
- };
+ static void gve_get_channels(struct net_device *netdev,
+@@ -838,6 +841,41 @@ static int gve_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd, u
+ 	return err;
+ }
  
- #define GVE_DEV_OPT_LEN_GQI_RAW_ADDRESSING 0x0
-@@ -214,6 +225,7 @@ enum gve_driver_capbility {
- 	gve_driver_capability_dqo_rda = 3,
- 	gve_driver_capability_alt_miss_compl = 4,
- 	gve_driver_capability_flexible_buffer_size = 5,
-+	gve_driver_capability_flexible_rss_size = 6,
- };
- 
- #define GVE_CAP1(a) BIT((int)a)
-@@ -226,7 +238,8 @@ enum gve_driver_capbility {
- 	 GVE_CAP1(gve_driver_capability_gqi_rda) | \
- 	 GVE_CAP1(gve_driver_capability_dqo_rda) | \
- 	 GVE_CAP1(gve_driver_capability_alt_miss_compl) | \
--	 GVE_CAP1(gve_driver_capability_flexible_buffer_size))
-+	 GVE_CAP1(gve_driver_capability_flexible_buffer_size) | \
-+	 GVE_CAP1(gve_driver_capability_flexible_rss_size))
- 
- #define GVE_DRIVER_CAPABILITY_FLAGS2 0x0
- #define GVE_DRIVER_CAPABILITY_FLAGS3 0x0
++static u32 gve_get_rxfh_key_size(struct net_device *netdev)
++{
++	struct gve_priv *priv = netdev_priv(netdev);
++
++	return priv->rss_key_size;
++}
++
++static u32 gve_get_rxfh_indir_size(struct net_device *netdev)
++{
++	struct gve_priv *priv = netdev_priv(netdev);
++
++	return priv->rss_lut_size;
++}
++
++static int gve_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
++{
++	struct gve_priv *priv = netdev_priv(netdev);
++
++	if (!priv->rss_key_size || !priv->rss_lut_size)
++		return -EOPNOTSUPP;
++
++	return gve_adminq_query_rss_config(priv, rxfh);
++}
++
++static int gve_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
++			struct netlink_ext_ack *extack)
++{
++	struct gve_priv *priv = netdev_priv(netdev);
++
++	if (!priv->rss_key_size || !priv->rss_lut_size)
++		return -EOPNOTSUPP;
++
++	return gve_adminq_configure_rss(priv, rxfh);
++}
++
+ const struct ethtool_ops gve_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
+ 	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+@@ -851,6 +889,10 @@ const struct ethtool_ops gve_ethtool_ops = {
+ 	.get_channels = gve_get_channels,
+ 	.set_rxnfc = gve_set_rxnfc,
+ 	.get_rxnfc = gve_get_rxnfc,
++	.get_rxfh_indir_size = gve_get_rxfh_indir_size,
++	.get_rxfh_key_size = gve_get_rxfh_key_size,
++	.get_rxfh = gve_get_rxfh,
++	.set_rxfh = gve_set_rxfh,
+ 	.get_link = ethtool_op_get_link,
+ 	.get_coalesce = gve_get_coalesce,
+ 	.set_coalesce = gve_set_coalesce,
 -- 
 2.46.0.76.ge559c4bf1a-goog
 
