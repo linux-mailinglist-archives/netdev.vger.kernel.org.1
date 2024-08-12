@@ -1,137 +1,152 @@
-Return-Path: <netdev+bounces-117809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A06694F699
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:23:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BD894F6C2
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 20:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF8FC283607
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:23:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 530D71C21078
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC27D189B89;
-	Mon, 12 Aug 2024 18:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFEF18A6DA;
+	Mon, 12 Aug 2024 18:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zVjfZuEM"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UVgKhE5Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6594918951F
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 18:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444902B9B7
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 18:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723487019; cv=none; b=tPN6UzJo9JcXCvUO0NGsqSFLGagmwh3CHRrE/VfRA7YADGxNmLfBdl7NmMuHBMByMYOo9YwjpRw5L8l+B2OYuUkAIVMOZVZTBbvkXlvJFqLP7YUmJMTarY0AzudRAocADGtpQQ49pVvWen6NpQ/GQ2FFlEh9OGbN+PD9dfwzXJ4=
+	t=1723487741; cv=none; b=P+O6YfjGh/LZDqzj89xSjoKx5vT0yPfl0LX/sso0ySXvkIBX0xM7prnoKQEtSP+N/HOBDl9ied5PtFfjaD0lQLy2lWLvhH/7I9nZGeA/MS/abl6rb3XyvtFswjT0cRyRftkPBNIhVF2lK6a3Q9dyqmtuj/uivCDb2clI8eNQITw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723487019; c=relaxed/simple;
-	bh=E8TJrl6ilE2qmP4D4MYiqE244QFe9WbODfwmw98I7Eo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pz3ptc+sW6f9bcY9A3T9GycVW1FWvs+kjIhLDnH9cJrlLLJFlnfeHbcBrFGRTYk875xzH899fj+hjT4KvL6W8s0LMEzux8+8URE89hS+yVL5k9xE4jmXqQ/evcXZUmlNg2zBK4TaBb9/+aeaVZoavuccAViLGHGOn7ETO7jdme4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zVjfZuEM; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-688777c95c4so110786257b3.1
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 11:23:38 -0700 (PDT)
+	s=arc-20240116; t=1723487741; c=relaxed/simple;
+	bh=EZHOZeq7aRbERcraRMbfK5qLzPvmPGVphL5FlfBZe6M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O87JP6MTLDj/+t5GAEclk126J+f7+DzXt4bybu9lHoChO3DDTnNvfDiNtm281i+L4Yl2cjTwp10C++trImvsiTEWhgCod7hrWO1OfIQfEcq444Pr2D51+0g0XXNyZtbcBT7JtKXFXq7KVqiION+kDuxLyZmAGy3j7xJPPLB/43Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UVgKhE5Z; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723487017; x=1724091817; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZoGtt4kpfu4tzIWdzrnHODHULn34eTW/oMY9gk5DDkQ=;
-        b=zVjfZuEMNs9zDvZc+KguCXxM1C9Dv6FpndwgoBfshdrl+wZoDgIBQ7lRo/9Q+lY38b
-         fSZiZSGz9zW4wf8fY/f8rL+CbJgFTj+2nx9WozD+4x5D/B6SI5brzYXw6RwVHai4p57J
-         DMg/wcjk0HDdJm07ne/3oa1AeTg5X7QA1VOzWP9FdxmjrC7einpSl9+lSLCwLPir80tO
-         YhS85pVd6c+sIl2ikeV4DQR8heRtCuQi4LY6J6bl3/88YD0Gt5FTU5w7ciDBPKv0u51C
-         TmauVQk3ojK0/Cd30Jky1w08Tj2/lfLdG5IhWs225cGMl7cedmsp2UMH+z/aHVXGf6Y5
-         4S8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723487017; x=1724091817;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZoGtt4kpfu4tzIWdzrnHODHULn34eTW/oMY9gk5DDkQ=;
-        b=Fme0YYZ6qo22Ft6YiPeFr6gK8LLFcJ+Vl8CibpedRD/dx3OLO8/ApHfupk9v58HXCO
-         zBZEi19yX2o9rrIVPmpQQZBkS81d9o0cTirCN3Wcxu6iSdCkc/eTGZMjUJ5lYRguPXc1
-         iYAITlpfswBJ7/v7p8NphFh5jBEjiOakNMFIK/2WYg2s+pPIex2Fe/yHcxzxaReaAn8s
-         ZOmjUQrwBIaefCJ1rtYUujFEigFgjEA6Bu2NxiatdEVYNbBg+6ovm6NJJGt1XtosBoOb
-         1VGEXK6K65Ue7B2a5YTxWRPYnd/dMTMwouk5llfCUeaSKVwE39EIhIxfSd4K6RDCqZYW
-         rz7w==
-X-Gm-Message-State: AOJu0YxHJ0l1MR+sZmCWNQlwjgH/PXwN1Dt8RLdTXJkLw6rbuvM/63uU
-	6OARdMLW8VAOD05ux5HtCcMpOqpfYIeHynkrTDuC/cz7GqCp+Jxgh/D35FBSWhfaaWpX3EoFDTm
-	gvZElJSSEv6hLoQnjUQByFLvQwuuWsiBCUICJi7CtZVvY9DgFBGsA8JPPcrmvvvI7ZAjXruddYm
-	iz54Vdcgr5BRC/gSedS/wdtSoW+C5MNOqt
-X-Google-Smtp-Source: AGHT+IFPvG5FSfM0dHTYH67+xCZziBQqtulNLlG5gbOwJppP7A7f4g9Vh/8zPppGRQuV5wfM27/jl9fxORU=
-X-Received: from wangfe.mtv.corp.google.com ([2a00:79e0:2e35:7:84ff:7613:4ab4:c176])
- (user=wangfe job=sendgmr) by 2002:a81:690b:0:b0:62f:f535:f41 with SMTP id
- 00721157ae682-6a97695ba85mr411707b3.9.1723487017134; Mon, 12 Aug 2024
- 11:23:37 -0700 (PDT)
-Date: Mon, 12 Aug 2024 11:23:17 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723487740; x=1755023740;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6My18yAKs6dv3mZs1AxuvAKMoBg2Tr7mDqjabktt/Rg=;
+  b=UVgKhE5ZtZrtmhk5Dvg8HwYVki7dV/Ky6BDrIUaPEEZy/DAjOUnIz2uS
+   5Hp2kpisCF0QdCSoYMSaLKMK14fBUnVqIVLzSKLbE77cH5J+toq2+j3H9
+   uqsr9+7G37WRFoUq5VhY1k64ObW0/vk12L7vqmM0mD3bvYY4AYRZAidAV
+   0=;
+X-IronPort-AV: E=Sophos;i="6.09,283,1716249600"; 
+   d="scan'208";a="361878720"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 18:35:33 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:10596]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.23:2525] with esmtp (Farcaster)
+ id 2a6d73e2-09df-473a-8f88-ad468be74a01; Mon, 12 Aug 2024 18:35:30 +0000 (UTC)
+X-Farcaster-Flow-ID: 2a6d73e2-09df-473a-8f88-ad468be74a01
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 12 Aug 2024 18:35:30 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.139.164) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 12 Aug 2024 18:35:27 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <vineeth.karumanchi@amd.com>
+CC: <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <nicolas.ferre@microchip.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net] net: macb: Use rcu_dereference() for idev->ifa_list in macb_suspend().
+Date: Mon, 12 Aug 2024 11:35:19 -0700
+Message-ID: <20240812183519.57314-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <733568cc-0a7d-4fc5-a251-2032fb484a4d@amd.com>
+References: <733568cc-0a7d-4fc5-a251-2032fb484a4d@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240812182317.1962756-1-wangfe@google.com>
-Subject: [PATCH] xfrm: add SA information to the offloaded packet
-From: Feng Wang <wangfe@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com
-Cc: wangfe@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: wangfe <wangfe@google.com>
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Date: Mon, 12 Aug 2024 14:41:40 +0530
+> On 08/08/24 10:15 am, Kuniyuki Iwashima wrote:
+> > From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+> > Date: Thu, 8 Aug 2024 09:53:42 +0530
+> >> Hi Kuniyuki,
+> >>
+> >> On 08/08/24 9:30 am, Kuniyuki Iwashima wrote:
+> >>> In macb_suspend(), idev->ifa_list is fetched with rcu_access_pointer()
+> >>> and later the pointer is dereferenced as ifa->ifa_local.
+> >>>
+> >>> So, idev->ifa_list must be fetched with rcu_dereference().
+> >>>
+> >>
+> >> Is there any functional breakage ?
+> > 
+> > rcu_dereference() triggers lockdep splat if not called under
+> > rcu_read_lock().
+> > 
+> > Also in include/linux/rcupdate.h:
+> > 
+> > /**
+> >   * rcu_access_pointer() - fetch RCU pointer with no dereferencing
+> > ...
+> >   * It is usually best to test the rcu_access_pointer() return value
+> >   * directly in order to avoid accidental dereferences being introduced
+> >   * by later inattentive changes.  In other words, assigning the
+> >   * rcu_access_pointer() return value to a local variable results in an
+> >   * accident waiting to happen.
+> > 
+> > 
+> >> I sent initial patch with rcu_dereference, but there is a review comment:
+> >>
+> >> https://lore.kernel.org/netdev/a02fac3b21a97dc766d65c4ed2d080f1ed87e87e.camel@redhat.com/
+> > 
+> > I guess the following ifa_local was missed then ?
+> 
+> I am ok to use rcu_dereference(), just curios why the check 
+> idev->ifa_list was removed ?
 
-In packet offload mode, append Security Association (SA) information
-to each packet, replicating the crypto offload implementation.
-The XFRM_XMIT flag is set to enable packet to be returned immediately
-from the validate_xmit_xfrm function, thus aligning with the existing
-code path for packet offload mode.
+"if (idev->ifa_list)" could fetch an invalid pointer due to lack of
+READ_ONCE(), it's not a big problem, but neither we should write it as
 
-Signed-off-by: wangfe <wangfe@google.com>
----
- net/xfrm/xfrm_output.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+  if (rcu_assign_pointer(idev->ifa_list))
+    ifa = rcu_dereference(idev->ifa_list)
 
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index e5722c95b8bb..a12588e7b060 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -706,6 +706,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 	struct xfrm_state *x = skb_dst(skb)->xfrm;
- 	int family;
- 	int err;
-+	struct xfrm_offload *xo;
-+	struct sec_path *sp;
- 
- 	family = (x->xso.type != XFRM_DEV_OFFLOAD_PACKET) ? x->outer_mode.family
- 		: skb_dst(skb)->ops->family;
-@@ -728,6 +730,25 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 			kfree_skb(skb);
- 			return -EHOSTUNREACH;
- 		}
-+		sp = secpath_set(skb);
-+		if (!sp) {
-+			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+			kfree_skb(skb);
-+			return -ENOMEM;
-+		}
-+
-+		sp->olen++;
-+		sp->xvec[sp->len++] = x;
-+		xfrm_state_hold(x);
-+
-+		xo = xfrm_offload(skb);
-+		if (!xo) {
-+			secpath_reset(skb);
-+			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+			kfree_skb(skb);
-+			return -EINVAL;
-+		}
-+		xo->flags |= XFRM_XMIT;
- 
- 		return xfrm_output_resume(sk, skb, 0);
- 	}
--- 
-2.46.0.rc2.264.g509ed76dc8-goog
+because rcu_dereference()ed ifa is not guaranteed as the same value
+(non-NULL) with rcu_assign_pointer(), so we need the following check
+anyway:
 
+  if (!ifa)
+
+Basically, we can't use rcu_assign_pointer() with rcu_dereference().
+
+list_first_or_null_rcu() is a nice example:
+
+  include/linux/rculist.h
+  /*
+   * Where are list_empty_rcu() and list_first_entry_rcu()?
+   *
+   * They do not exist because they would lead to subtle race conditions:
+   *
+   * if (!list_empty_rcu(mylist)) {
+   *	struct foo *bar = list_first_entry_rcu(mylist, struct foo, list_member);
+   *	do_something(bar);
+   * }
+   *
+   * The list might be non-empty when list_empty_rcu() checks it, but it
+   * might have become empty by the time that list_first_entry_rcu() rereads
+   * the ->next pointer, which would result in a SEGV.
 
