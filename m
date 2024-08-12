@@ -1,92 +1,103 @@
-Return-Path: <netdev+bounces-117664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE25894EB74
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:48:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F3D94EB76
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FF521F222FC
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:48:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5CDE1F222FF
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 10:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12CE170828;
-	Mon, 12 Aug 2024 10:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4925170854;
+	Mon, 12 Aug 2024 10:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NxDwqN5i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxfNMwh3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3764016E89B
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 10:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44F716E866;
+	Mon, 12 Aug 2024 10:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723459731; cv=none; b=uJ+3LmZleI/Ja953YHVrbPjXYfpk2Uy2vy7fMp8gsPdgd2SsuYn4KkNz2TDF+3K0xZR929rBA+u64QThLDGj3zYuRkgeRSyUpivtbuTAY3xKmM45S3eACUddfy78NiYdG2gqzZ6XcyT1fGeLdhhsfSwuvoYhe9UFgiFTpbBnCJU=
+	t=1723459829; cv=none; b=O7X+b4bM5TeEU/4gt+Z4A1E9DpBU7r2TXQaYzb6wAr0ARL57lkLrfH/gb71l88AzDHt5LchBBrD351DIuF9DvRmjkSP9SLQxNq6SBuDuqJ7upXwUqMEIjFOCeAGPg4eRbDGbN7ze9ZDBjhTxTnlMGtsOakk/F2igCzqgg6tPtm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723459731; c=relaxed/simple;
-	bh=eV7lAGb1MJFY+mLPUB4VhgIv6+y05aN3SubrltMv1N8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QVJvHi/1UEs5A9E5SkThj3xhAZNWoyLqRAw7M7IxqLtpeEMTePCLfRVnJv7Tz8N8PkMfg4kVMEN/s4Uyw7NUjCxofb9jgno0r8xLVlyWn9d9MivAHG/VuIBepFpC7Gabz0aVSk6qaHbAb2TQPfH/93VjTtvop4ihbMtxvubLg7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NxDwqN5i; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723459730; x=1754995730;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eV7lAGb1MJFY+mLPUB4VhgIv6+y05aN3SubrltMv1N8=;
-  b=NxDwqN5ijr6C44d7DDesPvO0uVexFhdYTuVFeCuIpvNyDiO2rAptgV11
-   FMbjgN7ufy8NjVEs3wei1I/wBuHfaR2qgRuuDGAsgzzhH0A3ShUn4XWHl
-   0Mzv8NBA01cWPzYkKVQzCFMFDcqSo0xwjJmhMwXlQ+CmRq3RKNCnGj1S2
-   bkjisvoxJkFSPzXsvxd0b183Lkegr+CXaAWwB07A0SkawSZZmTSoHvYmX
-   Q6Ksjd+mcEITKrWSdItw3Toj/B0R9ajIKFnqmlMmrBsiB3P2JG5UAUDVx
-   0EYkhle58NKqKYztXJG9lVGsf2Ew2nEQ+KAoq+jXzmoWFj2fqGEXM552h
-   A==;
-X-CSE-ConnectionGUID: HROYXJRIQOK0Vtu3Bf0K0A==
-X-CSE-MsgGUID: sXQbDWc6Q/yNUG1pZBPsjQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11161"; a="32139992"
-X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="32139992"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 03:48:49 -0700
-X-CSE-ConnectionGUID: ojUYh2FvR8GuB4xGEcEyNQ==
-X-CSE-MsgGUID: gTU7XxZ7T/aTr3+DzBSdzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="58789297"
-Received: from dosuchow-mobl2.ger.corp.intel.com (HELO [10.245.130.66]) ([10.245.130.66])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 03:48:48 -0700
-Message-ID: <d7df5610-5e8d-45d9-a17f-52463ca3ba3e@linux.intel.com>
-Date: Mon, 12 Aug 2024 12:48:43 +0200
+	s=arc-20240116; t=1723459829; c=relaxed/simple;
+	bh=chTj+jP0wy6W9bqLQZo870rZ+nHwTloxyw7wRsodaew=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NLwLcetRA8Rz7Ofe50/jcJdQzVSlb76ivZJKZ2KCo5K7Bf7wgKmXkt4l+0Z1REPI7yL3FftE/ffZ3+e7XEYBSyBmUDFrUNV5YqBpcM+zXXlmdDHLsK0K1WfFQBfJU4j7S/aRAQTnqC1KZUgGtl+B8jQX8IH6XI3iupaEf2m7aCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxfNMwh3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38CB7C4AF0E;
+	Mon, 12 Aug 2024 10:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723459829;
+	bh=chTj+jP0wy6W9bqLQZo870rZ+nHwTloxyw7wRsodaew=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DxfNMwh3KMl3qdu1FaHbJ4hbNqh0gdB2AQGzx1ZKbFpe0ruHkR8aicFrMW9qlTVWB
+	 oDGS0DM/8emM4XeKOj9MGmxb2J8bx9ZAjhj6I9Nu/luIhTZdVf6u1LIXtkp2sXlsn7
+	 QvEpr080xSbK7LbHW8A5kR5x7HIQ2QvJYBadTA94fX2Um+b54iV4syHOS1r2llPwv9
+	 9/tdyzqswgXf24Fh3pRafOoCp9k2IygAxRhYXneeENcs9W5cF05EvEKCjAA3hXkYHZ
+	 BgRWNWT2fYRBM3yfPjgCzDOSWZCT6Cp9zKMqkCFhHuWQDW9Mm5EQ5iSkqMHG6W9Hi4
+	 mR7ng6FPodbNQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DCF382332D;
+	Mon, 12 Aug 2024 10:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] ice: Add netif_device_attach/detach into PF reset
- flow
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Igor Bagnucki <igor.bagnucki@intel.com>
-References: <20240812102210.61548-1-dawid.osuchowski@linux.intel.com>
-Content-Language: pl
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <20240812102210.61548-1-dawid.osuchowski@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/5] net: dsa: vsc73xx: fix MDIO bus access and PHY
+ operations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172345982827.985786.6202904232752741486.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Aug 2024 10:50:28 +0000
+References: <20240809193807.2221897-1-paweldembicki@gmail.com>
+In-Reply-To: <20240809193807.2221897-1-paweldembicki@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ linus.walleij@linaro.org, linux-kernel@vger.kernel.org
 
-On 12.08.2024 12:22, Dawid Osuchowski wrote:
-> Ethtool callbacks can be executed while reset is in progress and try to
-> access deleted resources, e.g. getting coalesce settings can result in a
-> NULL pointer dereference seen below.
+Hello:
 
-Please disregard this submission, I have been made aware of additional 
-issues in internal review and will send new version with the changes.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
---Dawid
+On Fri,  9 Aug 2024 21:38:01 +0200 you wrote:
+> This series are extracted patches from net-next series [0].
+> 
+> The VSC73xx driver has issues with PHY configuration. This patch series
+> fixes most of them.
+> 
+> The first patch synchronizes the register configuration routine with the
+> datasheet recommendations.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/5] net: dsa: vsc73xx: fix port MAC configuration in full duplex mode
+    https://git.kernel.org/netdev/net/c/63796bc2e97c
+  - [net,v3,2/5] net: dsa: vsc73xx: pass value in phy_write operation
+    https://git.kernel.org/netdev/net/c/5b9eebc2c7a5
+  - [net,v3,3/5] net: dsa: vsc73xx: check busy flag in MDIO operations
+    https://git.kernel.org/netdev/net/c/fa63c6434b6f
+  - [net,v3,4/5] net: dsa: vsc73xx: allow phy resetting
+    https://git.kernel.org/netdev/net/c/9f9a72654622
+  - [net,v3,5/5] net: phy: vitesse: repair vsc73xx autonegotiation
+    https://git.kernel.org/netdev/net/c/de7a670f8def
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
