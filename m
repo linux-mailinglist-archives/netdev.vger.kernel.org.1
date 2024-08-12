@@ -1,273 +1,263 @@
-Return-Path: <netdev+bounces-117683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D48E94EC84
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:13:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3472294ECE1
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 14:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7842B2291C
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9911D280C2B
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 12:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27DA17A5A0;
-	Mon, 12 Aug 2024 12:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC834176FBD;
+	Mon, 12 Aug 2024 12:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbLGeEEl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lengj0sn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD2817994F;
-	Mon, 12 Aug 2024 12:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723464745; cv=none; b=oUbLdMrR7UeU/BNVRm+4gLBTKojz9w133QIdU2T/LMzOglJSCicRbBzPMOPTSIuOYZt39fiLI3P1KgCmK6LwhdvBCGHMQd8y1W8ayoYAYPrK+TChSxk6jEShaCHAnXUI3srcXWWVCEl4LLsiPt5IMK1tVGACq3bai0wF8AYre1s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723464745; c=relaxed/simple;
-	bh=n+x2KrWbCW9k9T/8jLtkdwC88tN87BOU+rSOFAPkX+A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uCr0CuUptH36L7rVsI1jRWYY2h7OtfoQlWthrnY2PCWDFFEte8llB4/geHAYBv8hveU/SRIKqkPX858GSujQdqr5f3RudggW2eBx5myuo//CxUX0RSgZEdM7rNM9nA5WDH5S78c2MiBuF22T1mIv47bqtzcr80LeOiUfTuh+zqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbLGeEEl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16980C4AF0D;
-	Mon, 12 Aug 2024 12:12:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723464744;
-	bh=n+x2KrWbCW9k9T/8jLtkdwC88tN87BOU+rSOFAPkX+A=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IbLGeEEluTllEtfRh8J3WsTg8HAQsv3BfKqNFwT07D3gaccTp95jCpI+J/btUw80J
-	 SPm7RxHFVho7RZXfEHLQWoipKWCfwaPUWTmmBZGKPMP5+9JbXF3Xaq3Xn9GBRfybwQ
-	 6hMnKXl02ISuoQKJm/2h2UZWNoRlvIx49qIooSVnFgjI93iG/rwtg4oter2syyXUam
-	 lIf6Qap/xh5+CQhgD0EVIW77GXFmENeAKLJYzFQQw5JTpWc2enw+6pspKuQpk3d+Vn
-	 F08wDhISzI2zkxuto4APvzVpAzUxVFJqLsuu3l17KuswtMgsUhCA/CreqvipSxSppj
-	 mBhMPjTFK1ZoA==
-From: Simon Horman <horms@kernel.org>
-Date: Mon, 12 Aug 2024 13:11:57 +0100
-Subject: [PATCH net-next 3/3] net: hns3: Use
- ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2981E488
+	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 12:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723465415; cv=fail; b=uhzahUd9fXG1GZb0TS9acZmv8R+JvPQlnDaAHSKwQfDNpRhX9cqaCiy+37K5Pouv6s01g0w3Um8sbvRz4xIGQX/MnSewEikG5/mT9AsqCv2x7c6/e3MVqQN7ykSVnMKseQRQf0d3awgsgAjfhFB3xOnhi8kuahjrkPj+uWHQSdE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723465415; c=relaxed/simple;
+	bh=e83Rh/5th3Izv4RxRz8egti4HbHoN+EWgkVhmLADihg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TUv41X6gyDHKVEZbOWE3AiPycO3Doc1prjO2rSiQ6omEX2sxlN32UwgqPTRf9ttDBOpfML4tp3PH1YQztju3FRlLkkf0nrlR+HzjdkF9oSym7iXTtnQHPhKkIH9QfmAEVAkWdCAhLDbXvzN80mr4VHhbo2wMQGvsXuX6jQIqx3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lengj0sn; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723465414; x=1755001414;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=e83Rh/5th3Izv4RxRz8egti4HbHoN+EWgkVhmLADihg=;
+  b=lengj0snnquFdOZkmOAT1l0DzH9y0w2o/xBRfDNvCccw+GdKeorRjx7X
+   tw/Q6Kb0zp1TqNLKCGCCSyUPj6BJv/Q9tHCSgBYmrJmjGF1DYm4QY63iz
+   HR7JQ/fE9LJIpY5wSfeLdTlk6zCKDI2fCBJTIx1sRK9BrBDyYItww+wBA
+   qHDQiWXwBTqn1ZFMYGsXRnbc1+zhaJAXbRJBt4+d2YB46voLK7MJFkJc7
+   2fqTr7632vF9bQpUPxzUOAhIX766plEElIP0BqOsJEJqW/2YRcURbNeEw
+   ZA9bx4V5a0rysaEMZHjQLO/WWDbrDPZ2axc4fDh5AR/LM5D5Bb1LPcUFr
+   w==;
+X-CSE-ConnectionGUID: f4sZGS3qSHS1odGVc4DncQ==
+X-CSE-MsgGUID: oVV6VDbpQT+zv47an4Z6bg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="21717692"
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="21717692"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 05:23:33 -0700
+X-CSE-ConnectionGUID: HEB4qCKdRhatG63wmJVkNg==
+X-CSE-MsgGUID: WjQFsNPrQXeRLPJKNQmncw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="57895554"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Aug 2024 05:23:33 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 12 Aug 2024 05:23:32 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 12 Aug 2024 05:23:32 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.176)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 12 Aug 2024 05:23:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GItfyE6M5wZxxSVPy+3E1+3ph2y5Qa8h/e36j28EdgnS/Tqpidt+tci6y6qnLfHqSpqTksW6L4yt5l9oYaNRDqjot+lMUI+Iltng7KneMlMiARXgY4YlD+Vqi32L6KojAPsqgU9SZRRFtw+6+g/QEMe4UNXuQVIr2y9ce8oERoSY1ZmFqRTYVy3xtXg/PMlJN5i8kq/SxWNJvmW7qM9FS6XGdmOSR6abdttFijrIV/CNR6ZRvvTcsiGjHLifSy97xdIvCAZ07yBSY1fAfdAEvtroU1hQ+eq6Bag57vj2N8JDloNKSXQJDRBToR9xEJH36gzCv29ObyNwSnC+4GDJbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fh8+8YVzmPv74XgWHA7rb1TffZGMxala39AoS7khLmE=;
+ b=ApUVCmC9bFmXJFNy2p0k6h2/qeGb5GY69jGk3AHQwADJowenHMoUUuKtQkmWiKoEhOhPLb8jtb3fYA3I227XVEXH0cn4YrSmU57OHqTKtf258PcHAM7DKUG4WZ2CEHELQSjNND0muTKHqKW0A3G2AsYtuSk02eMoEW4dNsBgyiyFsR07S5bgbiDegqm1DNLFVxk2ATO7UXaiXDjIH7a4lAL7PutpiVDwMMoMLQLdBG4Uk2zIwsv20+H7ISCfalyDQVfKCnrpnPlZUxCEAfOpyNx7AmVtrSqeYfNBQLmnB9UbzU/bH0+zZf2sB7ohGC4eHZzzPbOap9X+R1S5cRBG9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.28; Mon, 12 Aug
+ 2024 12:23:24 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7828.031; Mon, 12 Aug 2024
+ 12:23:24 +0000
+Message-ID: <1c5768a8-7d19-4101-ab62-dadd1ed8eb60@intel.com>
+Date: Mon, 12 Aug 2024 14:23:17 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v8 06/14] iavf: add initial
+ framework for registering PTP clock
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, Wojciech Drewek <wojciech.drewek@intel.com>, "Sai
+ Krishna" <saikrishnag@marvell.com>, Simon Horman <horms@kernel.org>, "Ahmed
+ Zaki" <ahmed.zaki@intel.com>
+References: <20240730091509.18846-1-mateusz.polchlopek@intel.com>
+ <20240730091509.18846-7-mateusz.polchlopek@intel.com>
+ <390393c3-b4ee-473a-8055-813130876e71@intel.com>
+ <ed34373b-1afe-487c-bb35-3a62e4cfe4f9@intel.com>
+ <e562774d-162a-4b42-b286-28a1feb77b62@intel.com>
+ <7495a81b-0367-4883-9e6b-e4487ef378be@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <7495a81b-0367-4883-9e6b-e4487ef378be@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BE1P281CA0362.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:82::8) To LV8PR11MB8722.namprd11.prod.outlook.com
+ (2603:10b6:408:207::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240812-ipv6_addr-helpers-v1-3-aab5d1f35c40@kernel.org>
-References: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
-In-Reply-To: <20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Yisen Zhuang <yisen.zhuang@huawei.com>, 
- Salil Mehta <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-X-Mailer: b4 0.14.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH0PR11MB8086:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a6c63a7-8035-4475-df16-08dcbac98f42
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R2VEeFRXM2JHVzlIZGZvS0lRYTJwUnRqVnFkdnUvaC94OUZuL2pqaDZiT3p3?=
+ =?utf-8?B?NjBwQ202bk9RRk5HWXZwaHZiajJGZ3RrTlFmejRJamE5Q1RQQVVZZzQraEo5?=
+ =?utf-8?B?YnhxTE9sc2JQTmxYMW1iTURWUE1lT0djYjA5Z0pEVFpPeURvalNtRkllS1lC?=
+ =?utf-8?B?T3ZXK2xOQWRtak9aUUNsN0dKSkV5dXRhNEpiZ1FZQUJ5SngrVUxtN1VKaDZ5?=
+ =?utf-8?B?TXZXZUpkT2xMWU5OOHB2enREVGszK1FFNkNvWVJGQ2dhOWJZa2tBMS9CTVFu?=
+ =?utf-8?B?TGR1YnF1ZTlvaVB5M05DK1NRNEJ6VUlGTGhQQUJaSjFib0hHd3hDYXJzRkE2?=
+ =?utf-8?B?WlFYczhpdkRYR2tVN3VwdDVEa1dUQ3c1UDR4YWhKZTBiSVlURUl1L1NYQTk2?=
+ =?utf-8?B?aW0zOUp6SzViT0dtRkxrMW1yWTRKYTg3cDk2a1NYRkoyak1MbUEzcGU0Y3VR?=
+ =?utf-8?B?Z2tRV0JyTFNRSVpGUmtuN2p2d1RHTGU0d2Q5WGFKdkIwWWNlMFlQN2d5SFhC?=
+ =?utf-8?B?WkZIU2V6MkllK2d2UlZKaDZQS1Z6WHI2VEczeVRBUTJNSWlrWENheXArcGZT?=
+ =?utf-8?B?V2JuUHdILzN4dm4wc1FzazZMNTllUkhiZjliZ2xUOUhEYTQzRmRldjZXQmZ0?=
+ =?utf-8?B?eEFNVnplakVuR2dWdUtUQnFBcWY1ZUp4ZXF1ZDBZelQvTythMGJVZ01xTExx?=
+ =?utf-8?B?Nkx2Nnd4NE5RT3V1bzNONTFWVFpOeExuZnBmcGNHaS8zY3cxLzA5UmRXZEQx?=
+ =?utf-8?B?ZE1RRzZERWcxQURnbkZWS3kwL2k0aVZITVN0bnRhMmk0cDg5d2w5bzFyckdS?=
+ =?utf-8?B?TTR3VTh6djBNL1V3QzJNeUdsVzhiWjZlczFiVzRkbmNSSkxBaGpvL3BPSW1V?=
+ =?utf-8?B?c0JYWThiU0NhK2hzSGZuTmFtSUlCK2FLamtyMzRoQVhRV3hyUHp4UXFTa1Nu?=
+ =?utf-8?B?cWcvcjlvT0svZXZKT05zQldSV1c5Tm9FVWRtaFBLZE8xQXFIUm5UUUdvYjFt?=
+ =?utf-8?B?WUw5ZDJmbXhVVDkvYWZkU3puNW1raWdPaE9NUHNqdTFYQTgva0FybnlsSVpW?=
+ =?utf-8?B?cmxNWnROeW0vcjc1TEhYTk51NjBPNTN3b3FmdWV0OEJQVVhSdzhEVlJid0Qz?=
+ =?utf-8?B?Sml6ZkZjOTFzOGxzK3AvUW1UMjhvbTVvTDRJdXd1bmRwa2FRR0hxcm95S1J0?=
+ =?utf-8?B?WEVEaVJVUXdldUFEcmUvcHNoV3Y5cXVpUzQ5WTFxTkRURm1kUE81ZjAraGJu?=
+ =?utf-8?B?M3kxa3NIT2dEWFY3eE11L2wyN3pDcTlkck02UElaeVBxZVFJL1VvaUVHRGhi?=
+ =?utf-8?B?ZE5hU21QZll6cDRiTmc1S3d1Y1duVVo0NUN5RXBibU15NzR2RExjMC9lR0Zx?=
+ =?utf-8?B?NWI3RkhnYnZHVEF5U29rVVhhZVlFTmZ6YzFYRlBldmhVN1BWNitHK1pjWkUy?=
+ =?utf-8?B?cTRwVXovOU9OZEdiRGZOSlFqR0tObXJGdW9JRnZRVzY3dlF0Q3RnUENuU09G?=
+ =?utf-8?B?NkNnTDNMWTRZSVhNVkx5VGtpZ3hEZ2lUQTZrZmVGYUhqMUVSaU1rWks3WXVO?=
+ =?utf-8?B?bllFSzh0bGEzYjRqYm01TGkrWHF0QzhTU0wzNVB1aVVUMXU3d1JLMEN6c1VJ?=
+ =?utf-8?B?Z01HYWdFQzRFbjJlUEN0bjVScnNPSklPeVFWYVZ5aHFqYjZkTllSdThZaU5U?=
+ =?utf-8?B?OUJ4Mm85S3FqcXBVRTd3Tm5VN3lOWTU3bklhVjdIdy9MakwwSG1JejB1Y05H?=
+ =?utf-8?B?UVVBQTdQdmsxS2VJWERZeVdsUERvOTdWNkhmS1NmSUM0RmkwUFdlb0VSUi9J?=
+ =?utf-8?B?VGpuNGMwR21ZZkx1bVo4dz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K0VScVNaSVVQZFZvcEFiUEY2MkZodi9DS2R4VEYyajhPb2xPZTl6NFA2MjdT?=
+ =?utf-8?B?YkZrM1Y5bW1mcmV0anNuN0tybHlUOUpMTE13cm5ETkhYTlhFQk1GR0xPUklW?=
+ =?utf-8?B?SGhJeEgweE52cWp0cnQrcjYxNjMrR1lCWnBIVS9YWUVaZHd6WlFRWW9FeFB4?=
+ =?utf-8?B?N1A2cW1pVVhuUFhzT0VSTWN4cnpTZGVPbWdZYm5mRW1HcXFkOFRkVUpjSkZ0?=
+ =?utf-8?B?MDA4bWRVSlNYVEFCclA2NEhDb3pKR2hKdy9GQzdjcVFYbFhSRUhXcjRoTkdH?=
+ =?utf-8?B?a3hJM1RpbklvNE5FNUZoR095bXViczM1M25GbFM2R042ZEhqMHJKeHVPQ0NN?=
+ =?utf-8?B?Wlo0N1FoODVOZVBFWm9IVjN0UXQvbjFKV2tyeE40VXlBaGNIb3hjN3ZCM1Rz?=
+ =?utf-8?B?VmIwd3BnQkV1NjlXU3lxWFczM1p4aDNHdHNTSmxDdERaSS9pUWFBeHBvMEJu?=
+ =?utf-8?B?c1BnMU5UMzRzSmJDRjJGeUhVNUdJUDdJVGxGTkZubDNtMFlabUxSd2U3M2po?=
+ =?utf-8?B?Sk44UUVsQUtIOGt5cGlldGtBVVgzMEtncm9URVFEb1R5d2pNbXpLYzRpTG53?=
+ =?utf-8?B?czZxT0N5Mlg4c1VBV0xIZkpOOFUxc20vY3ZGL0lGRnlSNmVod3hOZ2ZNOGNt?=
+ =?utf-8?B?L0RVVk5QTzN0WktkNy9XdElkSkdkWEg3L2l0TGlFaUhHc3lPbjBNWGk2cTN4?=
+ =?utf-8?B?ZHFhWjRjdGJOK3hscFo5aEI2RldWNGd1N0FxYzFkMlIvYjM2UER4aFYzUXY1?=
+ =?utf-8?B?OTRjVUFDdDN3cFZicVpmbjNsT1lXNVdUSEVYOVpPRmVZR1FaWi9lakU3bTl2?=
+ =?utf-8?B?elYxWXJjazV4aE9DT250aENQVTY3ZzdUMXYwSXUvWldiVGk4bkVZSWNpTDBp?=
+ =?utf-8?B?cm5XcGNMSFBlb1ViQ3IyNXNRV0JmQVFuZHFGcEdFRmI0Nk5pd3ZQVTNQWXBi?=
+ =?utf-8?B?bElIK2U5V1JBUHZaVGNkd3dSTmI5L0tXQ1ZjaGRhR1U1VTVQeWc2MVFqNW44?=
+ =?utf-8?B?M1lDbFFpTXFqOTFDWXRWVjdzdFRabVd4UEJXbHVBT0k2dC9qUXpRdEV3bU0z?=
+ =?utf-8?B?eTN1eFhKU1hrb0tVUVN1cEtCVkUrWk0vOTdYay84N2pGTTMvak80SU1DWlRS?=
+ =?utf-8?B?bkVNNndadWswU3d1bkZlRm84T2hmTlV2dTl6bUc1bVdpZm5JcnhHRnBHTjN1?=
+ =?utf-8?B?VlFQK005N0pCOTV4UXZha2NQTGluSG5wOTllSnpkQk02Q25JcURtYzZ6UGtW?=
+ =?utf-8?B?VDlKMFNGZDc3UEd4VkdhZHh2NkJyU3dMbzNtRWdQTkFvNzlKa01NZldZK2Yy?=
+ =?utf-8?B?ZWJ2MnBiSlIwdDhpUFZ5NmE1VlpwMW1xQ0xhUUZkUm1iS1V6dm0vWmp5UHZu?=
+ =?utf-8?B?ZGlPT29GdEpZMm0zeUZjVmRlclZVeVBzZ051bGQvWFJDelJ5T3ZyOEJ0R2JT?=
+ =?utf-8?B?eG96Q0pwc05GRmltZnRVd3B3Q1NYeU5xSm9rNktVMTUyWWNKUkd4NTMwVk9i?=
+ =?utf-8?B?TWZzNk4yd2NPaUs1M2IwazcrMFpSa213Q0hNblVrZWYzdWUyRHdkY29WRUxh?=
+ =?utf-8?B?VHlNSXBxUlBlSlFscFZ3QlVRckdmclk1QlQ2WjU2enAvdis4S1B1YUlJc1lL?=
+ =?utf-8?B?eFE4R1NzSnh1dHVza1VkWnVMbVJicll6TE1EaFZIaGZNNXpnR1V2SWtpdFI3?=
+ =?utf-8?B?emcvSW5SQ3VXdmNQVVVHTGpNYUthVEExTGhROCtIOGlKSjJDbmU2WXdiRzFV?=
+ =?utf-8?B?SWZSOE1QUVlzOFN4bkdiSkk0bytWbU5ReUlVbHIzOHllMG12MDlZRkpkL05q?=
+ =?utf-8?B?dC9CalVhYTBwbm9KNDFFckg2UW1iSFZBWmRxTjU0ZDF5cXZHWUp5QmlwcHdK?=
+ =?utf-8?B?alkybnpYanNJekNQdjBzREdLbUJkdTFhNVF0NE1XOHdyZ3hlRC9JZUtSLzlo?=
+ =?utf-8?B?NG92MWxaWEkzRW5wSkRVaUJjQkkxRmNub0VJN1UxNm5kYTZnRFpLUWhmUTVs?=
+ =?utf-8?B?Rjc2NUJGdVV5d1UxRlZwbzhOYjVGVG9BRkV4UjYxK2xjc1pBVXl1NkVjdWRk?=
+ =?utf-8?B?YmZKdkRITDZaZldxRzdSMHJIZmhyM3dWYnlOTlFEdlpaOVFyOFl5bldFWnky?=
+ =?utf-8?B?SVI2RDBMUUJyMHoxejlrSEg0QStWTE9UQ3F3Q0pWajVURkJTdFNSemhTaS85?=
+ =?utf-8?B?Z2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a6c63a7-8035-4475-df16-08dcbac98f42
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR11MB8722.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 12:23:24.6622
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VkaiyV0sQx7uZQI+B/uJZS8xDvMQPppXMGPKvOWIgo+IpBs8Z433XeMZV9kOseiplQKQq4PxZxHtdrJ4l+5AcZTsw31H75BhVyzy2CgRKBI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8086
+X-OriginatorOrg: intel.com
 
-Use new ipv6_addr_cpu_to_be32 and ipv6_addr_be32_to_cpu helper,
-and IPV6_ADDR_WORDS. This is arguably slightly nicer.
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Date: Mon, 12 Aug 2024 12:01:34 +0200
 
-No functional change intended.
-Compile tested only.
+> 
+> 
+> On 8/8/2024 2:24 PM, Alexander Lobakin wrote:
+>> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>> Date: Thu, 8 Aug 2024 13:04:29 +0200
+>>
+>>>
+>>>
+>>> On 7/30/2024 3:40 PM, Alexander Lobakin wrote:
+>>>> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>>>> Date: Tue, 30 Jul 2024 05:15:01 -0400
+>>
+>> [...]
+>>
+>>>>> +bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap)
+>>>>> +{
+>>>>> +    if (!PTP_ALLOWED(adapter))
+>>>>> +        return false;
+>>>>> +
+>>>>> +    /* Only return true if every bit in cap is set in hw_caps.caps */
+>>>>> +    return (adapter->ptp.hw_caps.caps & cap) == cap;
+>>>>
+>>>> Aren't these parenthesis redundant?
+>>>>
+>>>
+>>> I think they are not. They wrap bit operation and also I checked it
+>>> with checkpatch script and it doesn't complain about reduntant
+>>> parenthesis.
+>>
+>> If the object code doesn't change when compiling without them, there are
+>> no compiler complains etc, then they are :D checkpatch doesn't always
+>> catch things, but I don't remember whether the compiler won't complain
+>> or change the object code / logic. Could you please check?
+>>
+>> Thanks,
+>> Olek
+> 
+> Okay, good point. I checked that and they are not redundant. If I remove
+> them then compiler complains and object code changes so - parenthesis
+> stay with us :D
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://lore.kernel.org/netdev/c7684349-535c-45a4-9a74-d47479a50020@lunn.ch/
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 79 +++++++++++-----------
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |  8 ++-
- 2 files changed, 44 insertions(+), 43 deletions(-)
+Nice, thanks for checking! It's always better and faster to just check
+and make sure.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 82574ce0194f..ce629cbc5d01 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -13,8 +13,9 @@
- #include <linux/platform_device.h>
- #include <linux/if_vlan.h>
- #include <linux/crash_dump.h>
--#include <net/ipv6.h>
-+
- #include <net/rtnetlink.h>
-+
- #include "hclge_cmd.h"
- #include "hclge_dcb.h"
- #include "hclge_main.h"
-@@ -6278,15 +6279,15 @@ static void hclge_fd_get_ip4_tuple(struct ethtool_rx_flow_spec *fs,
- static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
- 				      struct hclge_fd_rule *rule, u8 ip_proto)
- {
--	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.tcp_ip6_spec.ip6src,
--			  IPV6_SIZE);
--	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.tcp_ip6_spec.ip6src,
--			  IPV6_SIZE);
-+	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
-+			      fs->h_u.tcp_ip6_spec.ip6src);
-+	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
-+			      fs->m_u.tcp_ip6_spec.ip6src);
- 
--	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.tcp_ip6_spec.ip6dst,
--			  IPV6_SIZE);
--	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.tcp_ip6_spec.ip6dst,
--			  IPV6_SIZE);
-+	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
-+			      fs->h_u.tcp_ip6_spec.ip6dst);
-+	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
-+			      fs->m_u.tcp_ip6_spec.ip6dst);
- 
- 	rule->tuples.src_port = be16_to_cpu(fs->h_u.tcp_ip6_spec.psrc);
- 	rule->tuples_mask.src_port = be16_to_cpu(fs->m_u.tcp_ip6_spec.psrc);
-@@ -6307,15 +6308,15 @@ static void hclge_fd_get_tcpip6_tuple(struct ethtool_rx_flow_spec *fs,
- static void hclge_fd_get_ip6_tuple(struct ethtool_rx_flow_spec *fs,
- 				   struct hclge_fd_rule *rule)
- {
--	be32_to_cpu_array(rule->tuples.src_ip, fs->h_u.usr_ip6_spec.ip6src,
--			  IPV6_SIZE);
--	be32_to_cpu_array(rule->tuples_mask.src_ip, fs->m_u.usr_ip6_spec.ip6src,
--			  IPV6_SIZE);
-+	ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
-+			      fs->h_u.usr_ip6_spec.ip6src);
-+	ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
-+			      fs->m_u.usr_ip6_spec.ip6src);
- 
--	be32_to_cpu_array(rule->tuples.dst_ip, fs->h_u.usr_ip6_spec.ip6dst,
--			  IPV6_SIZE);
--	be32_to_cpu_array(rule->tuples_mask.dst_ip, fs->m_u.usr_ip6_spec.ip6dst,
--			  IPV6_SIZE);
-+	ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
-+			      fs->h_u.usr_ip6_spec.ip6dst);
-+	ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
-+			      fs->m_u.usr_ip6_spec.ip6dst);
- 
- 	rule->tuples.ip_proto = fs->h_u.usr_ip6_spec.l4_proto;
- 	rule->tuples_mask.ip_proto = fs->m_u.usr_ip6_spec.l4_proto;
-@@ -6744,21 +6745,19 @@ static void hclge_fd_get_tcpip6_info(struct hclge_fd_rule *rule,
- 				     struct ethtool_tcpip6_spec *spec,
- 				     struct ethtool_tcpip6_spec *spec_mask)
- {
--	cpu_to_be32_array(spec->ip6src,
--			  rule->tuples.src_ip, IPV6_SIZE);
--	cpu_to_be32_array(spec->ip6dst,
--			  rule->tuples.dst_ip, IPV6_SIZE);
-+	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
-+	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
- 	if (rule->unused_tuple & BIT(INNER_SRC_IP))
- 		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
- 	else
--		cpu_to_be32_array(spec_mask->ip6src, rule->tuples_mask.src_ip,
--				  IPV6_SIZE);
-+		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
-+				      rule->tuples_mask.src_ip);
- 
- 	if (rule->unused_tuple & BIT(INNER_DST_IP))
- 		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
- 	else
--		cpu_to_be32_array(spec_mask->ip6dst, rule->tuples_mask.dst_ip,
--				  IPV6_SIZE);
-+		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
-+				      rule->tuples_mask.dst_ip);
- 
- 	spec->tclass = rule->tuples.ip_tos;
- 	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
-@@ -6777,19 +6776,19 @@ static void hclge_fd_get_ip6_info(struct hclge_fd_rule *rule,
- 				  struct ethtool_usrip6_spec *spec,
- 				  struct ethtool_usrip6_spec *spec_mask)
- {
--	cpu_to_be32_array(spec->ip6src, rule->tuples.src_ip, IPV6_SIZE);
--	cpu_to_be32_array(spec->ip6dst, rule->tuples.dst_ip, IPV6_SIZE);
-+	ipv6_addr_cpu_to_be32(spec->ip6src, rule->tuples.src_ip);
-+	ipv6_addr_cpu_to_be32(spec->ip6dst, rule->tuples.dst_ip);
- 	if (rule->unused_tuple & BIT(INNER_SRC_IP))
- 		memset(spec_mask->ip6src, 0, sizeof(spec_mask->ip6src));
- 	else
--		cpu_to_be32_array(spec_mask->ip6src,
--				  rule->tuples_mask.src_ip, IPV6_SIZE);
-+		ipv6_addr_cpu_to_be32(spec_mask->ip6src,
-+				      rule->tuples_mask.src_ip);
- 
- 	if (rule->unused_tuple & BIT(INNER_DST_IP))
- 		memset(spec_mask->ip6dst, 0, sizeof(spec_mask->ip6dst));
- 	else
--		cpu_to_be32_array(spec_mask->ip6dst,
--				  rule->tuples_mask.dst_ip, IPV6_SIZE);
-+		ipv6_addr_cpu_to_be32(spec_mask->ip6dst,
-+				      rule->tuples_mask.dst_ip);
- 
- 	spec->tclass = rule->tuples.ip_tos;
- 	spec_mask->tclass = rule->unused_tuple & BIT(INNER_IP_TOS) ?
-@@ -7007,7 +7006,7 @@ static void hclge_fd_get_flow_tuples(const struct flow_keys *fkeys,
- 	} else {
- 		int i;
- 
--		for (i = 0; i < IPV6_SIZE; i++) {
-+		for (i = 0; i < IPV6_ADDR_WORDS; i++) {
- 			tuples->src_ip[i] = be32_to_cpu(flow_ip6_src[i]);
- 			tuples->dst_ip[i] = be32_to_cpu(flow_ip6_dst[i]);
- 		}
-@@ -7262,14 +7261,14 @@ static int hclge_get_cls_key_ip(const struct flow_rule *flow,
- 		struct flow_match_ipv6_addrs match;
- 
- 		flow_rule_match_ipv6_addrs(flow, &match);
--		be32_to_cpu_array(rule->tuples.src_ip, match.key->src.s6_addr32,
--				  IPV6_SIZE);
--		be32_to_cpu_array(rule->tuples_mask.src_ip,
--				  match.mask->src.s6_addr32, IPV6_SIZE);
--		be32_to_cpu_array(rule->tuples.dst_ip, match.key->dst.s6_addr32,
--				  IPV6_SIZE);
--		be32_to_cpu_array(rule->tuples_mask.dst_ip,
--				  match.mask->dst.s6_addr32, IPV6_SIZE);
-+		ipv6_addr_be32_to_cpu(rule->tuples.src_ip,
-+				      match.key->src.s6_addr32);
-+		ipv6_addr_be32_to_cpu(rule->tuples_mask.src_ip,
-+				      match.mask->src.s6_addr32);
-+		ipv6_addr_be32_to_cpu(rule->tuples.dst_ip,
-+				      match.key->dst.s6_addr32);
-+		ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
-+				      match.mask->dst.s6_addr32);
- 	} else {
- 		rule->unused_tuple |= BIT(INNER_SRC_IP);
- 		rule->unused_tuple |= BIT(INNER_DST_IP);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index b5178b0f88b3..b9fc719880bb 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -8,7 +8,9 @@
- #include <linux/phy.h>
- #include <linux/if_vlan.h>
- #include <linux/kfifo.h>
-+
- #include <net/devlink.h>
-+#include <net/ipv6.h>
- 
- #include "hclge_cmd.h"
- #include "hclge_ptp.h"
-@@ -718,15 +720,15 @@ struct hclge_fd_cfg {
- };
- 
- #define IPV4_INDEX	3
--#define IPV6_SIZE	4
-+
- struct hclge_fd_rule_tuples {
- 	u8 src_mac[ETH_ALEN];
- 	u8 dst_mac[ETH_ALEN];
- 	/* Be compatible for ip address of both ipv4 and ipv6.
- 	 * For ipv4 address, we store it in src/dst_ip[3].
- 	 */
--	u32 src_ip[IPV6_SIZE];
--	u32 dst_ip[IPV6_SIZE];
-+	u32 src_ip[IPV6_ADDR_WORDS];
-+	u32 dst_ip[IPV6_ADDR_WORDS];
- 	u16 src_port;
- 	u16 dst_port;
- 	u16 vlan_tag1;
+> 
+> thanks
 
--- 
-2.43.0
-
+Olek
 
