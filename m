@@ -1,95 +1,120 @@
-Return-Path: <netdev+bounces-117781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D624794F408
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:25:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CB594F4A6
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 18:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D01E1F21682
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:25:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37696B258A6
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 16:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C8F187324;
-	Mon, 12 Aug 2024 16:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9182B187332;
+	Mon, 12 Aug 2024 16:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8fGgjQe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2FvkcNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB6F186E34;
-	Mon, 12 Aug 2024 16:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04E215C127;
+	Mon, 12 Aug 2024 16:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723479911; cv=none; b=ErloE8vEpgw2/Szb8PgrR49zB4wEMXN98O9h/RbhfAjy2l8vCqH/9atVpt5ZAxe2UPxvernO2SpRABo8rahIWer4fL49Y+kdZgI6t8vX1CkCzSpRfh4TR/VHAhYyIQxXGsDM3hf4s4GVUTziQUay8mvQ4EMx9TfV/qFTUfejQws=
+	t=1723480374; cv=none; b=nwQWBnVryqxZOxGREKlT6Wh3SQPq26ATwg3W9ga1N2F7VjyHw8+ERHiw6Q1LKfHJhN/+8AuX73KBdYmYGD+XY1xndugEAyWTamtxXglUcDIaejo+ThLJbqEuAXS+g3p5xxEggaALvBifCmr7PvbOSppnLWY6COb2Foj6KMUvNYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723479911; c=relaxed/simple;
-	bh=0N3l/THIj+g6e1lTf7tTyw4XJWS6sD5AsYtZ4TQRfM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnW24AwV31iBhadDbnRawATnXaW6+d+yBYDepDp8d9rp0JsspD6Ijnc+fxHbXLnMtqlQo0F3Fy+0XsKeD0SlfHpsDoggvdws3JEgrWJD5prmKxIE1q5xU0TF8/eTZHUGH7Ihs22u2ZO0KqaakPD6+p9mYp/6lIb3J80g5bAjFmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8fGgjQe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A128C32782;
-	Mon, 12 Aug 2024 16:25:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723479910;
-	bh=0N3l/THIj+g6e1lTf7tTyw4XJWS6sD5AsYtZ4TQRfM8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g8fGgjQe19NkhVu0IpwASmCKW4QUDop7BzG9NNidxNBLPMvxqNwjQh6z9SmPfVtpX
-	 3Hp0bykbfI9BrxZBUj3tfeImiAp6c/REhbE/EXX5Cfz+y+z2H/eCN2VNQITJ5RUthe
-	 kcuqGYZTGjIiSxwzsrg8MZjaaV4khWRNY0xft6DvtejsoarfCFp/b0TOzZgxM5cOc8
-	 OEWG3Xhl57aseoCPALfuwBKeCBJIxwCc7lvatc/JPYpeTPthE6ZyV5VO+73/lb44/X
-	 fH1R4lnnU0GINGjp/+hpix3QN9HeVFxRqmpT2zBtFbCQDtMOpvzWXaOVZkwjOLUbQF
-	 OezQiUYm2o//g==
-Date: Mon, 12 Aug 2024 17:25:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Breno Leitao <leitao@debian.org>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: thunder_bgx: Fix netdev structure allocation
-Message-ID: <20240812162505.GC44433@kernel.org>
-References: <20240812141322.1742918-1-maz@kernel.org>
+	s=arc-20240116; t=1723480374; c=relaxed/simple;
+	bh=ymOFvrgOOD6ziq0VdD7c2aBE1giSS+9DVVT2WxCFpqI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OP7BII1V2BgeBqQ48gcQw2tkPzStACaqmPxhnWc/kl8cs9kGwDAuZxWhKeALt2xV59MXMkSYIfOFo5Xwf8Ie2VkxMzpDGb9iyluxEPIXnlVSKCGVzJJj7uXgZrdL5Cc9hEcFQ7v0LFnhdmBza1iu2ZTrIXpeIdvGu3p1c7esXYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2FvkcNz; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-36bd70f6522so2486644f8f.1;
+        Mon, 12 Aug 2024 09:32:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723480371; x=1724085171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ymOFvrgOOD6ziq0VdD7c2aBE1giSS+9DVVT2WxCFpqI=;
+        b=R2FvkcNzKMKJr4QsK1kFIHVbwhlDWfMD5lRVmc05bCCZ78+3+wKdIlupCjmVrZY1zW
+         djAnRpuImy1kaMPSYun+YBlEFuwWFjXdri/dYnBjSROW5k1YIrvIsyezAt3/BPIlS0co
+         8m7+zTbUay4gH5xAjDBTJbEzdn8QN+0v7fSHdvRzHbKOGpKA4AYR8wuHsFz+U49FxIxJ
+         ykxLlnoacx/ADMs/He8TKG749B/bZ6VzjrIKQFrGM26FBqMwM+qkjezPng2LKFqjoPXr
+         b/LQiyrfIW2ch+AJ5PY42TQvNY9z5Z+L34L/e4gxrbdqJ3JyoVkXn4rhfVfxtHKP0typ
+         CImQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723480371; x=1724085171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ymOFvrgOOD6ziq0VdD7c2aBE1giSS+9DVVT2WxCFpqI=;
+        b=QKZ10T05H0vXhk2GiUB9zj+DWuArhcRo0xMl2ho4bYezFKbAgk/20EOPHQer0AIEZp
+         5dZ5NfS50BCgAmroXmWJzteh7buvhDxEJbWOe6hwG/mf6Q3VA8mKbZ6xyHAKNHKy7OPA
+         IGv0yDYkAK/r0epL6Ant9GKBP0ssYUKbLbRt9jc1w9NjbtJrA4IQeQLqTCVwCBRr8DSW
+         KwwDYRWc3w3ZSBzvsboX76/vO6Hs6tNUbY+WztFBpNvQiYdlXi8ILpXHn9Ww/31HF3vU
+         ArugiTyhWuE1wrtsjGfzB67wZZ84AT8XMl9ZHUk1trthlRspb4U8+1whCj3/T4GZwdj7
+         XAZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzYLaU17FCQARAgHwy3Xq9kxyYOqF2tbc7jCuHY+km2dPC1AXTpG3LcrkyfrkXyryvSRIetyfMPyK2JRw=@vger.kernel.org, AJvYcCXvV0ycRF8gp+KDP/LR1rOu9PsWizDpd/lR65sogxdh/sPE98osy5hfInPaEXmUREVTmvrhRpkX@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7QTpDMytLG18gZUGJOYoghuxzlIwnR7qgJOS8lw8yl4SxUKdC
+	BtuF3l8Tjpe8U/dpatBTfQDoJHpXPFRyOKQxKH7KZpUAlQlfT4T123aj/9SquAijUcCzCEgg2B9
+	9Iwo1Om/DSzOWTTqpdieMX1o5UKs=
+X-Google-Smtp-Source: AGHT+IGju9Iel2Z2uj3B86jeJimno2vj6Gt/AdBLAsIHf1cnvOVKmade9JDnpfNOG5dqOfP4r5mCRvmtOMZpUu13BVU=
+X-Received: by 2002:adf:e003:0:b0:368:665a:4c64 with SMTP id
+ ffacd0b85a97d-3716ccd8e82mr764686f8f.5.1723480370956; Mon, 12 Aug 2024
+ 09:32:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812141322.1742918-1-maz@kernel.org>
+References: <20240812152126.14598-1-eladwf@gmail.com> <b3f2ac81-93e5-4143-a3fe-a5ff1159aaec@nbd.name>
+In-Reply-To: <b3f2ac81-93e5-4143-a3fe-a5ff1159aaec@nbd.name>
+From: Elad Yifee <eladwf@gmail.com>
+Date: Mon, 12 Aug 2024 19:32:40 +0300
+Message-ID: <CA+SN3spFyFx-RiRPs0apTojKpC7A0geAs_JyqEWHC4z8UVrT+A@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix memory leak in LRO
+ rings release
+To: Felix Fietkau <nbd@nbd.name>
+Cc: daniel@makrotopia.org, Sean Wang <sean.wang@mediatek.com>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Chen Lin <chen45464546@163.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 12, 2024 at 03:13:22PM +0100, Marc Zyngier wrote:
-> Commit 94833addfaba ("net: thunderx: Unembed netdev structure") had
-> a go at dynamically allocating the netdev structures for the thunderx_bgx
-> driver.  This change results in my ThunderX box catching fire (to be fair,
-> it is what it does best).
-
-(I saw that :)
-
-> The issues with this change are that:
-> 
-> - bgx_lmac_enable() is called *after* bgx_acpi_register_phy() and
->   bgx_init_of_phy(), both expecting netdev to be a valid pointer.
-> 
-> - bgx_init_of_phy() populates the MAC addresses for *all* LMACs
->   attached to a given BGX instance, and thus needs netdev for each of
->   them to have been allocated.
-> 
-> There is a few things to be said about how the driver mixes LMAC and
-> BGX states which leads to this sorry state, but that's beside the point.
-> 
-> To address this, go back to a situation where all netdev structures
-> are allocated before the driver starts relying on them, and move the
-> freeing of these structures to driver removal. Someone brave enough
-> can always go and restructure the driver if they want.
-> 
-> Fixes: 94833addfaba ("net: thunderx: Unembed netdev structure")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Mon, Aug 12, 2024 at 6:34=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote:
+>
+> On 12.08.24 17:21, Elad Yifee wrote:
+> > For LRO we allocate more than one page, yet 'skb_free_frag' is used
+> > to free the buffer, which only frees a single page.
+> > Fix it by using 'free_pages' instead.
+> >
+> > Fixes: 2f2c0d2919a1 ("net: ethernet: mtk_eth_soc: fix misuse of mem all=
+oc interface netdev[napi]_alloc_frag")
+> > Signed-off-by: Elad Yifee <eladwf@gmail.com>
+>
+> Are you sure about this change? From what I can see, the LRO buffer is
+> (or at least should be) allocated as a compound page. Because of that,
+> skb_free_frag should work on it. If it doesn't, wouldn't we run into the
+> same issue when the network stack frees received packets?
+>
+> - Felix
+>
+Hey Felix,
+I encountered this problem while testing the HWLRO operation on NETSYS3,
+but it was part of a series of changes, so you=E2=80=99re right, with GFP_C=
+OMP
+it shouldn=E2=80=99t be a problem. I automatically assumed it was a necessa=
+ry
+fix.
+Sorry for the mess, I'll continue testing HWLRO and resubmit this
+patch if I still find it necessary.
 
