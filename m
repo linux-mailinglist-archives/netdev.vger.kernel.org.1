@@ -1,75 +1,86 @@
-Return-Path: <netdev+bounces-117854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A69AD94F8F2
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2CB294F8F6
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 23:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D35281411
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:25:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A20E283386
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 21:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EEA19415D;
-	Mon, 12 Aug 2024 21:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAB4194A49;
+	Mon, 12 Aug 2024 21:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuRxgifO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FnJav7uR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BD818E022;
-	Mon, 12 Aug 2024 21:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8C1187553;
+	Mon, 12 Aug 2024 21:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723497949; cv=none; b=lVfOogDh8z+1ntCpOK+LgTqexaxC3NMZ9+S0L9yX8OHzMAgdCceGZfaQrHJBGD0q+TiuYHlwAFd6K/eOitQj+syMQeM3IrIzw4su6GGPZYIvclVPrMzoOLXty6j2N3N+lNxykQjAwidnY7VkveCezA9eXdjFmm0k9mcFNUFdv+o=
+	t=1723498090; cv=none; b=PJHl4wK4th26fkpAONvfBcdqAvJJgakSAX6DuL9bKXdEx64FYfK14RqeEeSdlyaJkrnFB3C/sUTJKSI/mMzLRw6iwZkG8WDeR4ehehpNe+eMc/9ktriTnOEidyuS1B0lPJxAYRgb9oMwpbTEO3tlvP+oMsooktrFNoTPFNr4FSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723497949; c=relaxed/simple;
-	bh=rexy9WaQivYqfca+PSQ3sVR2zFfBAUQ1jd1nluQT6Ow=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pjH+5TWb4Qv3XiDJt3odZQoHmCBF28hd8W5TqSmTpj0gWc2bC2dbNLefxOEYOkxs1E7Qi73IrFPHarpOKEJD2v4RJ1dh2gxy3m8cvMoZQlT9HgnmUlnP6yhji+nd0BJBANIMs7T547zjAdeS93jgrwf/b+iBszxUfoxkx2z6/hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuRxgifO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D64FC32782;
-	Mon, 12 Aug 2024 21:25:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723497949;
-	bh=rexy9WaQivYqfca+PSQ3sVR2zFfBAUQ1jd1nluQT6Ow=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FuRxgifOjQRM3G5TvBXagL1MdqFA64iuHzAS7Jvw0l9N7koqMdfDJrUWjaCY7aJe7
-	 af0ejeHaKn/8Hk7+01ZOvJ0Czx5oj87RHHRvR9iJUx/+YqoQSM9qCvl307MKCVNjY+
-	 8RAz4HLe3CS66ezfEhlYkEFLf6GTdPtIBtBjdVw56eP8OXuC3gAGrkyDKPwSP5fvMD
-	 ZqP72kT6hsoe+oFU4SBcs+sluehzIOaANe0xXRkAjpshmA4yPUdtHPb5fOfSlrkOZc
-	 2tZLHuo3HQIg/YmlVK4yU2mmG35PMyXWok/kQgREMHVX4hTx74DAqJydAyz2P0Rajd
-	 Ewde6fJ0xmF/w==
-Date: Mon, 12 Aug 2024 14:25:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Eugene Syromiatnikov <esyr@redhat.com>, mptcp@lists.linux.dev, Mat
- Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Davide Caratti <dcaratti@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] mptcp: correct
- MPTCP_SUBFLOW_ATTR_SSN_OFFSET reserved size
-Message-ID: <20240812142547.7c048af7@kernel.org>
-In-Reply-To: <df52ac23-5eee-4d17-9e74-237cf49fe4d7@kernel.org>
-References: <20240812065024.GA19719@asgard.redhat.com>
-	<df52ac23-5eee-4d17-9e74-237cf49fe4d7@kernel.org>
+	s=arc-20240116; t=1723498090; c=relaxed/simple;
+	bh=2anLmvgLygGK2sB+arUEGgY58D4B5bZI7k9IAL1zuCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gr2BNPpdwGDoFzuvjRYYvFsjlJ/va32dil/Ufuxqp0HitHV2zMwrtG5KOgzadfbonL0QGWB5Rrq4HOW1qZbeqyivGt5xF42gVV0cR2JwBhMZQPfUdjAolqw8uKyVGW7jm3G2XDyZtvUHGsO6qsfsrBCBsVDxPgWzkPHDvA7wmFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FnJav7uR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=a5dWnVcDL2y4UgdW2kUaINeQrbP4oE/rFx2jeLTa9Ao=; b=FnJav7uRWxxcGxJsxLHACfuSad
+	mhfreWbPHaNYsf8DDF0np7YKUKMJ+aUTKYmqH3aFvCowXKs1ZEt3ZESf5EBdsU9ikr4Dc9imUppEL
+	EIKYisYfpovkSa3pzzUIG6fY/6xdyGxN7y/IIENEzw8nzjTYaGY4SkHu4d2lhgB3b7lc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdca7-004ceV-UR; Mon, 12 Aug 2024 23:27:59 +0200
+Date: Mon, 12 Aug 2024 23:27:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de
+Subject: Re: [PATCH net-next 2/3] net: ag71xx: use devm for
+ of_mdiobus_register
+Message-ID: <ae818694-e697-41cc-a731-73cd50dd7d99@lunn.ch>
+References: <20240812190700.14270-1-rosenp@gmail.com>
+ <20240812190700.14270-3-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812190700.14270-3-rosenp@gmail.com>
 
-On Mon, 12 Aug 2024 09:43:29 +0200 Matthieu Baerts wrote:
-> @Network maintainers: is it OK for you to apply this v2 in "net", not
-> "net-next"? Or is it easier for you to have a v3 with a different prefix?
+On Mon, Aug 12, 2024 at 12:06:52PM -0700, Rosen Penev wrote:
+> Allows removing ag71xx_mdio_remove.
 > 
-> (No conflicts to apply this patch on -net, the code didn't change for 4
-> years.)
+> Removed local mii_bus variable and assign struct members directly.
+> Easier to reason about.
 
-Looks trivial, should be safe to cross-apply, no need for v3.
+This mixes up two different things, making the patch harder to
+review. Ideally you want lots of little patches, each doing one thing,
+and being obviously correct. 
+
+Is ag->mii_bus actually used anywhere, outside of ag71xx_mdio_probe()?
+Often swapping to devm_ means the driver does not need to keep hold of
+the resources. So i actually think you can remove ag->mii_bus. This
+might of been more obvious if you had first swapped to
+devm_of_mdiobus_register() without the other changes mixed in.
+
+    Andrew
+
+---
+pw-bot: cr
 
