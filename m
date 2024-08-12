@@ -1,113 +1,175 @@
-Return-Path: <netdev+bounces-117715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7266C94EE27
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:31:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DADDF94EE9E
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 15:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CA1F1F22D8D
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:31:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591BAB2489D
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7957917C21C;
-	Mon, 12 Aug 2024 13:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A3417C7BB;
+	Mon, 12 Aug 2024 13:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ly77zGC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08B2170A31
-	for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 13:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7F417A92F;
+	Mon, 12 Aug 2024 13:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723469473; cv=none; b=AC5MHipLzdNsLPwhE7J8zBBNVqINkWPkIkysCVSuIXXFk3BtQvHOlR2NsZ7sDsLiQhwj1C+hjCYNvHFmixHhLJKoV87iC9La6TRzz/9WGYopFuZFQWaOnjV37kpYM5Inlw9XJTBV8ir8gOmNe+MEdHt94WhNlZXctpFjJA8CcwM=
+	t=1723470384; cv=none; b=rB7algCKk/3ul4B7LBIGzOpLcusq3SzmkR6tE3WczgGIvi74GU4Gy/+YKS5OrJC6CoeB44ZgvJoZVCVUhPLzOlGJOuuSqhBONHmSOiwtc7HryhgyEBM7TYG7uVmBQbZzH/SH1S7HZNxbVPsAngIiErxnGtYb5BDJmpg0ntDmhvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723469473; c=relaxed/simple;
-	bh=4MSDwiezBX10BpCrtnTOXjYawS7qUs3kgNVU0jPxGOw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=JITjo4cHZ2wkuWn3dHOdY/XLsTqlUmR4Dy78AAYfyV4sIrWm7926xdH2zZ38FWv7igiTfh++mVR6LCYx1tfkPIDXOBpGnfx3KR0U5XKMy2PAPpZb+FoPe98iD8nUBHkRqINpKQ7TS8II5a7F+cyUMzXNvsMPycqWSRD5O0FLcEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-824c925d120so16638239f.3
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 06:31:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723469471; x=1724074271;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/2MDDwxPus6L9nBZUy+Tw4tNy6gY2TGHmSnbh9IyXkQ=;
-        b=rVGvgz4Li1C4ulMrD0CD7AHY88RCUIaH2EEhnZ1XCNI4M3kd7xDe+xxydalnATJMBI
-         vYGoAkKoUGfqikp40xlWgZead1X7TQ1VaxiDeskciJLYUMFfcr41sqXJXfBiZoRI39hI
-         trH0rhnxQTrSWhZ1DswDIACJGgIhPpFgvnd/UFm1UwSKBDQNuTz9UsA8tZwSltoWxkfO
-         PtjR7q9tsro0G8mioQlCDzxO0L/UkGwaZN51YTTAn2hRVsXV1Tp5B/0neJFJxq9Gu1ko
-         JIeo+/tN/eRHN5A9OWX9MOUszk2s5weohTxJeJk9PVKoNVkfoixronxGY/cYL+4kBFby
-         uofA==
-X-Forwarded-Encrypted: i=1; AJvYcCVN6yw9ipJ+Oc89pgObXFVayDTXsIysGzEnjw9Iysmo11Jk71pZttZrBXTPoMbudEhopgPGLu6BQMnPLMGy13FPZfXmNkVn
-X-Gm-Message-State: AOJu0YxWn1tx5pLk4F32LQO/zk0Ok4nnWKpFK031yFGcOo3e3+JHfM0y
-	KLLLun6YMhffUk0l0qXA3kArpFhrpWxcpvKlSQGRKwNXPxvZ6bL4iQHIB/+czVCq4MkWrPqiATS
-	1hZ0Os2hj66Np4FKiXMUC716mqqC6hiXrdYtDJG+icB8CV4nhu6jZlD0=
-X-Google-Smtp-Source: AGHT+IED46H0i7+ooNgDxGsNBK5R2Bs4IMtUVYkHrx0D+KRy4Eo2VtW9NkIdkiwfJMYpasCVhJoidMhTngYiRwwiCA1DqzyHSnoJ
+	s=arc-20240116; t=1723470384; c=relaxed/simple;
+	bh=RZbrLVmBjMhLipuy8GpOq0fJf7VHPNsfLcYAn3sksuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iKmiQBKCbmEhl2m838ZFGz60E/ePxSJFVGHsRHG2qeb4UAe5OjPY6uzNfPcswcAXiWT2d3E24sNkymFJnbE1+2SJx4E4jdYrF9+Eqk6hlReKOlgqq0PjYXZyqYX6W4MeQZEsHOvkaxLfO+1Froa3t+BPsJSPf5DB/rujVkSPgs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ly77zGC+; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723470383; x=1755006383;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RZbrLVmBjMhLipuy8GpOq0fJf7VHPNsfLcYAn3sksuw=;
+  b=ly77zGC+PpB1BDZk5pA8dPu1QuOL+0D/007ajuIPfs881kWYH8uECe3l
+   g322wj6OjvhNQvEc4a+DWu3enhrvNtDm7qXbsNcjNjQcWMcLnaHx4TY5Y
+   9jUJswIbMUBL/HS4cJ7b3xnshAHhHQBhTCQuhOcniAGBsvmUdyFeLFCbV
+   6RxFCnCk4YwtnTIxzZh/h+7m9sv673UT9kQjeA/rNi9oJjrLu+n7jcT3b
+   5828vku3hDlVtqUUjmJTonEZ7lFrI2iuwwzx/90YMQt1N2S3gp/7/USGL
+   d+Nm5D4xvWCDTZm/064pSkTm9Vcz3MQ2xMCi7MOBADFL0kv/vv5Szl/s/
+   g==;
+X-CSE-ConnectionGUID: HB4buidXSeqmwNpL73jPUw==
+X-CSE-MsgGUID: EUN+m+JoSkC9OOwio8n1Nw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="21439215"
+X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
+   d="scan'208";a="21439215"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 06:46:22 -0700
+X-CSE-ConnectionGUID: 8glDbEsrSvKWCJ8T2p/bRQ==
+X-CSE-MsgGUID: hWsnEHY6T0ShmeznxdUgsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,283,1716274800"; 
+   d="scan'208";a="62404963"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa003.fm.intel.com with ESMTP; 12 Aug 2024 06:46:18 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: stable@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Krishneil Singh <krishneil.k.singh@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.10.y] idpf: fix memleak in vport interrupt configuration
+Date: Mon, 12 Aug 2024 15:44:55 +0200
+Message-ID: <20240812134455.2298021-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:410b:b0:4c0:8165:c395 with SMTP id
- 8926c6da1cb9f-4ca9f7d4fc8mr4665173.3.1723469471016; Mon, 12 Aug 2024 06:31:11
- -0700 (PDT)
-Date: Mon, 12 Aug 2024 06:31:10 -0700
-In-Reply-To: <87ttfpx3z6.fsf@toke.dk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000099fa6e061f7c815c@google.com>
-Subject: Re: [syzbot] [wireless?] KMSAN: uninit-value in skb_trim (2)
-From: syzbot <syzbot+98afa303be379af6cdb2@syzkaller.appspotmail.com>
-To: toke@toke.dk
-Cc: kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, toke@toke.dk
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> syzbot <syzbot+98afa303be379af6cdb2@syzkaller.appspotmail.com> writes:
->
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    b446a2dae984 Merge tag 'linux_kselftest-fixes-6.11-rc3' of..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=13eb467d980000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=305509ad8eb5f9b8
->> dashboard link: https://syzkaller.appspot.com/bug?extid=98afa303be379af6cdb2
->> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->>
->> Unfortunately, I don't have any reproducer for this issue yet.
->>
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/49d96e53e1c4/disk-b446a2da.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/f05350d128a7/vmlinux-b446a2da.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/805c7d86a2db/bzImage-b446a2da.xz
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+98afa303be379af6cdb2@syzkaller.appspotmail.com
->
-> #syz test
+From: Michal Kubiak <michal.kubiak@intel.com>
 
-This crash does not have a reproducer. I cannot test it.
+commit 3cc88e8405b8d55e0ff035e31971aadd6baee2b6 upstream.
 
->
-> diff --git a/drivers/net/wireless/ath/ath9k/hif_usb.c b/drivers/net/wireless/ath/ath9k/hif_usb.c
-> index 0c7841f95228..f77cb743ca06 100644
-> --- a/drivers/net/wireless/ath/ath9k/hif_usb.c
-> +++ b/drivers/net/wireless/ath/ath9k/hif_usb.c
-> @@ -755,7 +755,7 @@ static void ath9k_hif_usb_reg_in_cb(struct urb *urb)
->                 goto free_skb;
->         default:
->                 skb_reset_tail_pointer(skb);
-> -               skb_trim(skb, 0);
-> +               __skb_trim(skb, 0);
->  
->                 goto resubmit;
->         }
+The initialization of vport interrupt consists of two functions:
+ 1) idpf_vport_intr_init() where a generic configuration is done
+ 2) idpf_vport_intr_req_irq() where the irq for each q_vector is
+   requested.
+
+The first function used to create a base name for each interrupt using
+"kasprintf()" call. Unfortunately, although that call allocated memory
+for a text buffer, that memory was never released.
+
+Fix this by removing creating the interrupt base name in 1).
+Instead, always create a full interrupt name in the function 2), because
+there is no need to create a base name separately, considering that the
+function 2) is never called out of idpf_vport_intr_init() context.
+
+Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
+Cc: stable@vger.kernel.org # 6.7
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+Reviewed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Link: https://patch.msgid.link/20240806220923.3359860-3-anthony.l.nguyen@intel.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index b023704bbbda..ed68c7baefa3 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3636,13 +3636,15 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+ /**
+  * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
+  * @vport: main vport structure
+- * @basename: name for the vector
+  */
+-static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
++static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
+ {
+ 	struct idpf_adapter *adapter = vport->adapter;
++	const char *drv_name, *if_name, *vec_name;
+ 	int vector, err, irq_num, vidx;
+-	const char *vec_name;
++
++	drv_name = dev_driver_string(&adapter->pdev->dev);
++	if_name = netdev_name(vport->netdev);
+ 
+ 	for (vector = 0; vector < vport->num_q_vectors; vector++) {
+ 		struct idpf_q_vector *q_vector = &vport->q_vectors[vector];
+@@ -3659,8 +3661,8 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
+ 		else
+ 			continue;
+ 
+-		q_vector->name = kasprintf(GFP_KERNEL, "%s-%s-%d",
+-					   basename, vec_name, vidx);
++		q_vector->name = kasprintf(GFP_KERNEL, "%s-%s-%s-%d", drv_name,
++					   if_name, vec_name, vidx);
+ 
+ 		err = request_irq(irq_num, idpf_vport_intr_clean_queues, 0,
+ 				  q_vector->name, q_vector);
+@@ -4170,7 +4172,6 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
+  */
+ int idpf_vport_intr_init(struct idpf_vport *vport)
+ {
+-	char *int_name;
+ 	int err;
+ 
+ 	err = idpf_vport_intr_init_vec_idx(vport);
+@@ -4184,11 +4185,7 @@ int idpf_vport_intr_init(struct idpf_vport *vport)
+ 	if (err)
+ 		goto unroll_vectors_alloc;
+ 
+-	int_name = kasprintf(GFP_KERNEL, "%s-%s",
+-			     dev_driver_string(&vport->adapter->pdev->dev),
+-			     vport->netdev->name);
+-
+-	err = idpf_vport_intr_req_irq(vport, int_name);
++	err = idpf_vport_intr_req_irq(vport);
+ 	if (err)
+ 		goto unroll_vectors_alloc;
+ 
+-- 
+2.46.0
+
 
