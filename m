@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-117671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD3994EBA7
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:16:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CAE94EBB3
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 13:22:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41F821C21474
-	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:16:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 034AC2824AE
+	for <lists+netdev@lfdr.de>; Mon, 12 Aug 2024 11:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4B7170A0F;
-	Mon, 12 Aug 2024 11:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBFF172BD6;
+	Mon, 12 Aug 2024 11:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2V3vR1Dh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h6/HK8rr"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2088.outbound.protection.outlook.com [40.107.95.88])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2063.outbound.protection.outlook.com [40.107.236.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE64C43AA1;
-	Mon, 12 Aug 2024 11:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1413A43AA1;
+	Mon, 12 Aug 2024 11:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723461394; cv=fail; b=AAYRd8VXwYCTwSs1Xo5lHR9DfhnyuNb1pm0LCa5ifkKSdkJyKwUQ2B2JlVZHJv8P9SH1dKh9Z40eXuOx04RKM9tWQPYG1b/r5G0sKANbqzM/M4UK/MBqfEGkyPDw5FR3ep0g9IF/O/8ahrvmDPokhEQmgGJOMgLmVPMqT3L+fy8=
+	t=1723461724; cv=fail; b=FmE42UH3b3YVVrenZESqygD6N4p+E3ila4xvJqRp+6NY9Ft9wCNbr6Es7oOi0Pngv+16at9UvXhtEHZrQvfK/Z4cLoJynF6U8ljH1yRD8ggtxoILEnqlRZqHvxSATDc5leyQRVErEAEjMLcMY8KLqEsxUZjdcoQK8znL7MPcKmQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723461394; c=relaxed/simple;
-	bh=2f0Ik++UW/waBAR6etK4ES8bsi1AlnnIwM0AOkWzXjw=;
+	s=arc-20240116; t=1723461724; c=relaxed/simple;
+	bh=x+XmdB3laKfSMJMuT9AHlKEPKodiwoS7Iz8IX4PPjvY=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pmQcx/Xnp+dFAMjCJ4aUYFgn2tmpiPqHkOj9ZBoolbf4KB6Oz4YM9BmehOAlUhnvO/ypz/3tqwy4V1x5rNXsaS9HTHayzMWtUyiIDIdCgg1KtTt81o8m6OOT4s8ouSsgqPfSaqUmBj78T/CA63zAmu6yhQuQoGp0lWdaaDsYy7Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2V3vR1Dh; arc=fail smtp.client-ip=40.107.95.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	 Content-Type:MIME-Version; b=SHFccCHr29CvwuNZ6XHSvpCSi+lCRkkkJHFX4U49RnINjeaiqS/G2dQitqc+mHm6IUM/2Oag8QF+ZQuu2KnvdGD0p/QLTXMYGxwgMYNXgV8rRY4gagUI033ewA5HqNmDzsSLnvzWom+po7IL+NJcSulY9kbfZrhjXdxkRAAN4Ys=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h6/HK8rr; arc=fail smtp.client-ip=40.107.236.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YraSKzuK1hhR8+Wl6eH+sjxtK9kIXU6+ZjeDnFcNpaR2Fx2YncXbJicp5OxbrDwdgThvOIPd+vZBoHEXwC8JguU1YHflpHRgHwLhzXXYuv2hKZmReFZtCLZ+s87Nzr/O7eyJatRDA3G/SMEn6Q2OmGGK36xWrzw2a3OKxh0KFYGC6XJQKjzNSggoVfl5lAHxYoCwrBsPRYPHfEfn7YM4pdJgFa/BpGsLu/a6ArGNmJWCMkftDJiyXTLOIC2IefyqN7mwXY1RPq+0X+xV1lZsTnZN7my4G5VHpQ71GDEZZhxbreDfwE3SE07xgg0Jwhpcoh6ioQ3jagLzPBAAoM28HQ==
+ b=hmi5GmYF7yfBdz2Wm5Bnt/Hye5GHXmHi3JFtmOoVxLLnJmmEz63xow1xm2RXsTGvtrn0BRiNUTfwKu7EVEpXtNviS8Ti1Gc3ThnWTtP7wu0LSgemjfEUnNNZf2JoND9x0oDzS+Wii1Oa2uIorZZO28MbrA0QB0PBAbvbbtGOaMjsM0JU92M0Wlgnk4UR3bGkAJyXMkaCxviw/Lz26/xGzI4qyQpI4Qrljca9uHuiTHpWatFN3x/UhfxMZgiV2+FUUvFXn21rnEH2zaVBM7QsUD5SlcEPKgweylzWBwpcXct9r9SGYnrWpsctLW6cII08aMhUFpxe5OTUn80Y/m47hw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Csn3no3mtwSJKcqKvnufQIkSiOsPtUzRbjdkkni7zQw=;
- b=j4gri6I+tghD6aPb6YxfZUNUjnRi2s8P2e7liOl79bRrYHqHq7zSf+A1+1ymCs7ncuXCd4d2gCUhY3rRUOQ91pAh0JzRZd2hu5SpVqpB3DxXVwwMx9ExhNm8H9O0pJRENug/RfP4G2aglKvEFWHjfOvCzV5NKX3FYQ+Z7FofJmKL+RaaKm26qUohkEGqF9Fj9gsI3kNHEJzoz3Az7q3kBZ0idjVDrkIOIrQNJrxShzULqJQYt/F1neYFNlQrwU1fIAFuNotrIm1xZ0bVW4Q1BGihF6GMRRmobhBE7oGqce+f4hZgOr91VgBf8lcadLwqzttyGJ+ypU9UOVvlePMBeQ==
+ bh=yL3D89ky7ULOfO2Qjcu+KYRcTVVdH47jsYBD/rH2q/I=;
+ b=JmA+K/7wFuvGGTec3UNLtqAK8eAu6M7osSRL4ns+xiNX3Uv8toZUa/pk9ooTf45ZiinlXYtGU5XEl5puS02HKmEvC/8DNDMdDJIz8mZ9QGAd4KrfFoelds/KhRok+lCVCZ6b7Pe90bsOSi5iBYc7CNiQVSG3Dsr0ha2BTRw1ehiCoF4ol3Y2q5gg1+7S8fN/h+vQxsleCnee6iXh1MuBjLCGLW+zqSDKV8LUnGecvEkB/FmV0PalMK17/4al3aMmbxGz6LFh1VJc4PGx4TYadAX+5X+hfg0KNSXk4etkkdpLZUvXcAmf/G2LSWpQ08i+JL9s5yTSO12zudtmSFTiEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Csn3no3mtwSJKcqKvnufQIkSiOsPtUzRbjdkkni7zQw=;
- b=2V3vR1DhzSDA8WCKOCcFEJ+yuqGhITzi88EUVA7q6/+MX44Bay7i6J0fUAwKcFNsmsICaq+8lF+slUQfvDUCtbRCe5jJM9uOSvqUKcTZmnCjWk+MeWMS0SJ8LlW2hBy0xcb4HCBT0zkuOrVBcXthgLgJ+ri1zLHAag/rOHpRjxk=
+ bh=yL3D89ky7ULOfO2Qjcu+KYRcTVVdH47jsYBD/rH2q/I=;
+ b=h6/HK8rr0A9hIHSW4rRS/GMhmz1k30LK36H8aOsmsRGW5R0CB2hpF9lnvP6vZMBm2cll2RTvZTYHZVFoEl1MsgyKZT2oyggh+cyXHvsD1J+pn6tyfTSJKQiroNEIRElWd/PCEAxjsLxGa33x5e4fCyAy1JaBERYnbX6U+Ike1nXEVFah+6I/rEhF6NFhqZMHUuANPFfNFemP2kHOcVXlwPuVax/4ymQpK5CYwaxdV5Q1FIR3kYdJIiTu0H6O4RvV6r2e76y6TZa+TuZw93bUaF9RCOxiPVgNgfiHCKO45qmiK5fOlpPBcHph6W4KEmlGRKnmzBBDNkeXeHhI8NPz8A==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by CH3PR12MB7739.namprd12.prod.outlook.com (2603:10b6:610:151::22) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
+ by PH7PR12MB5595.namprd12.prod.outlook.com (2603:10b6:510:135::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Mon, 12 Aug
- 2024 11:16:23 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7849.019; Mon, 12 Aug 2024
- 11:16:23 +0000
-Message-ID: <508e796c-64f1-f90a-3860-827eaab2c672@amd.com>
-Date: Mon, 12 Aug 2024 12:16:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 01/15] cxl: add type2 device basic support
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Mon, 12 Aug
+ 2024 11:21:58 +0000
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4%4]) with mapi id 15.20.7849.019; Mon, 12 Aug 2024
+ 11:21:58 +0000
+Message-ID: <ede5a20f-0314-4281-9100-89a265ff6411@nvidia.com>
+Date: Mon, 12 Aug 2024 13:21:54 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token
+ correctly
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240808082044.11356-1-jasowang@redhat.com>
+ <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+ <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
+ <CACGkMEvAVM+KLpq7=+m8q1Wajs_FSSfftRGE+HN16OrFhqX=ow@mail.gmail.com>
 Content-Language: en-US
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, richard.hughes@amd.com
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
- <20240715172835.24757-2-alejandro.lucero-palau@amd.com>
- <20240804181045.000009dc@Huawei.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20240804181045.000009dc@Huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0165.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b3::6) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <CACGkMEvAVM+KLpq7=+m8q1Wajs_FSSfftRGE+HN16OrFhqX=ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR5P281CA0024.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f1::16) To CY8PR12MB8297.namprd12.prod.outlook.com
+ (2603:10b6:930:79::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,282 +85,216 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CH3PR12MB7739:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5bf934d-dd70-407f-e7be-08dcbac03300
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|PH7PR12MB5595:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e54a3d1-af2c-4bbb-e09d-08dcbac0fadc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?alQ1cUNVenJZU3UvdGs3OGRCdkFqZFBFSFpsdWNlSkJvZVNLb3lWTFgvWkdO?=
- =?utf-8?B?Q2M4R2pJamRtNk9nVm5MMGxKT2Z3ZTQrN2hwazZmMmZiZmJwMFovQ0p4dUt5?=
- =?utf-8?B?YmZpUE45ZUhlcUJ3MW9Lem1sdmM5T2M3OVYzbGVDRFJxMVVjMFVWaDRHazc5?=
- =?utf-8?B?SXZHZ2dQdEJnK05nV0hUTkFSTWdLSnpEUlI0eHpCMEpNSUV6V2VxR0NhUHgy?=
- =?utf-8?B?UEZkWnVjeld0UlhKWWxwdzFNVmJNWmEwS0crTmh0em5Mdk42R0VZbU5oMnVm?=
- =?utf-8?B?akVzTDVIR0s5MkVOWk8wc25mWVVwYVVCQjlDVHJwdzVBTjN2d2RjemsvbmpG?=
- =?utf-8?B?ZWhuTDUxS1g0OHJpV2lwTExTUXR2Y1V6U3RWWHpaSUFHaGJZbnVSRFlIK1RF?=
- =?utf-8?B?VjArSjA3bTRmSGZwa1grcnlwL3hLZm9KOWRkMDFXcjZCdno4ZzBZUDMyRnhE?=
- =?utf-8?B?dE8vLzJBRWhXQjlUemMvajJjc0NBQnlyem5rY2M0S0VtYm9NcmRFSEx0cWdt?=
- =?utf-8?B?dGRZNGs3S204Ym4xak5XZDRjb3dUOEp4WmkzdXdTZ213S1JXalBxZEZwdkdH?=
- =?utf-8?B?Q2Q5Rk15QnI2cHFmdlFZWjE3Qll2WnJKOTlERkpaa0ZtVXRYZUZBNDNFZnNJ?=
- =?utf-8?B?WjJnME1IckVwbG5wOWdPUVMyajJPbk5NSHRoMzhmbGp3UERGZ1BEVGNaZW5H?=
- =?utf-8?B?a0dRaUVJcmg4VlI3UnQxQ3Z5VFJTL2hSUUoraXR3WmxTTzk3c2pBRHo3QlEz?=
- =?utf-8?B?d1djY25GWlYxc0R4N3phYnZkcDVNcEtPcmN5TFozYlRBMStncFI4cFpNWkwx?=
- =?utf-8?B?OWFDR0pHTCtPbE9LQ2MrK3ByNHArUG1SODVkSWJWeFczU2hWWWh0dEtueGdQ?=
- =?utf-8?B?QW44MERPZzVvdkx2a0RzMktZT3p3U2NVRnFzTkdLK2lpa3pXL2FCL0RaSVdl?=
- =?utf-8?B?RTUwYkcrS1RqeUVQdmw5WUdBT0hCd3A1R3QwZ3V3STQrckx1aUhkcUp0RXp1?=
- =?utf-8?B?NTlSclZ3L1BabnY3WHdUZnZoNk9jclY3c3pwREJxdW1BMm02bEsya3NQMXVs?=
- =?utf-8?B?QzBtZ3lCa2EvTkpJTFFTaEUwNklOMGllSjlPa2JIL3JWelFPb0FUSGt3Z092?=
- =?utf-8?B?ckF1Wk5hTVd5R296Q3JKdG1VbFdhdUo1WmhMdjRHT1BlaEhMc2VHM0l6SUhS?=
- =?utf-8?B?S1ZQa0JISmd5NWNvV3A1NE8rUEt2V0lnWlNNUVhBcGxDUEUzRXBYL0Rua0Qr?=
- =?utf-8?B?TVgrQWIwTWJJMWNVYnZZVytKU2JIVkFjWDBITW5kVVpib3FnTFQ2dCtncjhs?=
- =?utf-8?B?VW5hY1V2RFdkYm5ZM01OK0w5cTA4bEFobkk0c25TUUhCajhUYXN6dHVZQ0M2?=
- =?utf-8?B?dDRZcmZUaVZGVHJwOVNsZ0RKRWlidjQ1cGZQQUdTU0VWeG1uWThOakhXa21k?=
- =?utf-8?B?bDIrU0srR05aZnF5UWtDUlg3Z3czMmVaQU5HdFVNdi9vMWVWZC96MTJNYzNu?=
- =?utf-8?B?WVROWUN6TzVpMGZNcWFmZVd5ZER3UTk4Z1MzZitXeHpsKzF6ald6NStpQkw2?=
- =?utf-8?B?c082bG1FS1ZWYTlaWFMrd1RaVHRESTVGV3prVTBMbXliOHQxL3R0Qm1DVUI0?=
- =?utf-8?B?Tit2dlhDOHFzVnM0SWY3QlUzbENvTTg1ckRTQ3lncm9CMXdraCs3RlR6THZ5?=
- =?utf-8?B?clgyOU5aZ1pnU0xqajloWWtSaVZqQ3ZBck5SOW4zRmVNOWVyQzBGZVVlRTdX?=
- =?utf-8?Q?kmwF+aZpjdU9j0zXxs=3D?=
+	=?utf-8?B?RmFHNFJHdnc2OFpJUVlDcDdSbmp3dnd3UVRGSUwrT0U3cWlNNDVQRGpzVmZS?=
+ =?utf-8?B?YWtSbTNuazlyRWxqam9UTkVHMlBTZDFMbG1oVnRwc0hnWm4vVEdpYlNRdVY3?=
+ =?utf-8?B?TDd5TnNZbkFvY2owN01qa212ZUxDLzF0QkZvSGg4NE9XbkNsSG9TYml1V3g4?=
+ =?utf-8?B?czRXZ3k1NENUTTJQc2ZydGtzaVc5bGVOV29zRURrLzFNYXZIbkVxTVRQMFJH?=
+ =?utf-8?B?NlFZN0UzR2hvb3N1T28xWlBtWS8vRjI2ck5JcWNIc0NlWms0V0VnZE9NeHF2?=
+ =?utf-8?B?ckl5dFowUUgvK2hlU21Za3dlUHVqQ040SU43L1kwejQ0aVlLcjE3ZjBKMUNq?=
+ =?utf-8?B?YWRMaUtrTmJIVjZxcWJ1OGI4N0NpbU12a2FGY2FLQTZkc3pybjUvZ2t2Y2Q3?=
+ =?utf-8?B?ZWY3cnh5MzVtMlo3UjNsOW1hREg4cHBLK3lwSm1neWZzcGFHUDUxZGNEenZS?=
+ =?utf-8?B?VVBTM2hCamZaOFlkWVdDNVNWZ0ZYNjNaM2dyMk9aRkNTZm9EQ3VJUVlKa2xV?=
+ =?utf-8?B?a0dOVzNqSTVjUU52QTBvaGFVL3labVdsVjgyNERHczVnU3ZwL1h4U3hWWFBD?=
+ =?utf-8?B?NUdRaXhpMzVmMVZHRXBwV0grTjd6WE8zcEhlREhXWDJQOHltVXVqdXBhaGZv?=
+ =?utf-8?B?bkhzS0xpV0xuMUFHV3REN2pNd3ZjcUJIbmFUZ3dTY1FQM2VIbFVjS2tSdGhY?=
+ =?utf-8?B?MWNqLzRFTVlaeW5lVC9ZK0dBNGJseExFZ25TVFBOY08yd3VIV2lSQS9yWDUy?=
+ =?utf-8?B?UW5INVhzanVoL0Z0QXZGWU9DRmw3NHhSeEVycjhkUUs5YS9vdGdTbkR1QjEy?=
+ =?utf-8?B?MDJRdmxxaXRFaVhFL054Z0w4ZzU5OEVIa1RkbDBhQXVlZmJ2dlJWTVhNTEZY?=
+ =?utf-8?B?UFJSNitjNFIxaGllTC9POTlvUmtUYnI4RlhOZXZTeklmTnAxSm1CSktoZmZk?=
+ =?utf-8?B?VWJhcTlFczkwVnoveHpkU2g0QkhzZnZSTlpLdmFFUlh4SE9YUFRoU3J0OUl2?=
+ =?utf-8?B?WXh2VWJIdmVyVDM4Sk1OTm01MVhvb1ZxVkNuTXc0dlVraVljNnB5d3J1eVAz?=
+ =?utf-8?B?U0RkSnRESEtxREZ0akF6WTZma01MYmU0RWI2bmU0SEcxQmZja1JzM3JJdHll?=
+ =?utf-8?B?UnNIei9OYjNRYVF6djR3cGp1S1diMndabWJra3Q0VkxlYWk1bSs2Rm9nRUd0?=
+ =?utf-8?B?K1N3NnhRR2RCL29sMW5tRzcwUmthdzI1OE1SUnBuTG5hNzROeTE4R0lUQVJC?=
+ =?utf-8?B?c1JrZ2hhRXpHaEZ4NmVNTGRVRkVIZFQrdUJDZTBKVXJDNlZGdXpva0VRR3lO?=
+ =?utf-8?B?RkFRUEJnYjhlSytHQmZKeVlpMlhtQXZEQlpjVTFEZDJzUmNyQm5tc0k1VXlU?=
+ =?utf-8?B?RXpzQ0lmOFNpamx5aFBPejYvWEhtbjVKcEJyWG85RXBIRHNWbGF2bU9Mb2No?=
+ =?utf-8?B?b3BSU0pvOWZkdWNpTzVzNHZBSFNjUjBpMkZpQjREQnRJTTNrd016a1gxK2Fa?=
+ =?utf-8?B?ZHdLU3YrbkF2N1Q4NlA3OGxMcWhBMjRrZzZNYXdSekdYNjFQRU96RUhOclhp?=
+ =?utf-8?B?OWxIeHJVUlNKNE5pcE5JT0tFeElIam1RVzVBbFdVNUNTZzF5YmRYa1RzSWxY?=
+ =?utf-8?B?ZUprUUVJWlUvRGZVZ1gxbGRlMkpReGlyLzNSRDZMVWpYSXN2WnVHcFhkd0ZP?=
+ =?utf-8?B?amZtbUVDSXVNRWRQRSszV2hzNE5hbDVjRCswaVcxRC9qcWt4RDBOOXVEZmEy?=
+ =?utf-8?B?WFVVREpxVnlyVk9VblRiVStXN0xWNTkzditOanlRSnQ3a2RoaEVaLzMvek95?=
+ =?utf-8?B?V1k3TkRndXUySzYyeEZOZz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WEw5WHArWGdWeFJkeXNTWTI2V3dnRTVTbG1Pa09oajBzYUplVVAranFKdy84?=
- =?utf-8?B?UlNrSUFyRytqYWlMVU05Q1l4NmRDL0NCZUtiUVRhcEJLUWFCZDRLeVVjemxp?=
- =?utf-8?B?SHU1SndrYjVjZHE4NEJDUE1mWktSejZHUDFXVVhNVHFJaTl1ZWJ4bGFrcmdh?=
- =?utf-8?B?V3BTeXBxSnRJVTRGOWN4cFZZMmZUMk93V0FydmRMTjVuMnZRSXRVdnp1TnVT?=
- =?utf-8?B?U1pneGhaUnlVZ0RGc01wTWdXbDJlZDREeVc5Tmc2c0F6SEdkZUJYWFlIT3Bn?=
- =?utf-8?B?OU1uK1p3Y3dVY3JxRVMwWXcyWkR0bXZ2YWxUSUwzMW5SZnpFbXZSb1VmR3k1?=
- =?utf-8?B?b2ZSVUQ5bmdXa0w5M2pyL01SdEhIVm94cDI2T25LMDlqSSt1aG1sTjRsMkpR?=
- =?utf-8?B?M2NFMWliNWpGVkoxL0N5L1AxdUNEZkp5c2pkdU9aYmtVOGJ5RUNTM3VoVENX?=
- =?utf-8?B?Ui9EeHIvSlRjTTY5K20yQWdjZGgvV29RdDlUWk8zWUpHaENJTU00eDJ4N0Fh?=
- =?utf-8?B?MWdESWwzcmNUZjJDM24xbi9PVEQ0Mmg4dGNrazNFNmh3a3M3WEhaWUlZNGRi?=
- =?utf-8?B?NmZ4RnRGbkhoM1R4c0JHUHhrRk9oeVFqTTJFcmwxVDlPNVFPR01KQm1YbkZ6?=
- =?utf-8?B?M0pzdWx5WDFPMTlGVjUxVHd1aUlvdTB1RmxaSWRtdElFd2dFQ2VYcmhkbTl5?=
- =?utf-8?B?V2w1SU9XS1F0cFhWYTBwVy9ySHdJTWxVckxtNDcvQUZvTFlBTXMrNFFNSTV0?=
- =?utf-8?B?VS9EMmV4SG8wY2d2aEp2OWs4Sk5jYkRoanhobFpySHpuK0x1N3FwV3dhVTRU?=
- =?utf-8?B?SS9Kb0Q4WnVnZWNWb280YTFYZUVzVjZQYnZGaUswelBFZG9OWkV5bUZmbThy?=
- =?utf-8?B?R2JaZTRWOHRZb2JaTDVoMVo3ZTIvdW44Q1VKZWJYRllKNW05dWJrTG5UNEZX?=
- =?utf-8?B?eE51VzZOOGl5QkNqT21xWURValdQbWh0eEdEUzhYOW1vVWtIbHhERzdWUmd0?=
- =?utf-8?B?bHJCZkdLeDRTNVl0UEllUGIwQ2VMRkxxUnlrd09OZFgyQ3hBOUVBNVdHRFVr?=
- =?utf-8?B?ZjFFcHJ6WEh3bXQ0eVUzUUJJRjYwY3pBbkpNelluMXRuK3lJeC9heDJJQlhl?=
- =?utf-8?B?OXpIWVE5T2YvYWdjR0kxd3o5YWdncUtHWjRqWm54elpRVTRrOGpBc3lURjVW?=
- =?utf-8?B?LzBDN1MrT1FqY3Q1QU1qaFB3VWM4UUUwbkd6eTZuMzhDYWd5UFJoZDNnS0hY?=
- =?utf-8?B?Z3dNek41K0tBNWIzemorczFOTW16UlZXOGZuVytqeEtkU3IyRmVXMFdaNDI0?=
- =?utf-8?B?MEFXSGVCS1UrZWdTK25KOE93ZXB3Q29Xa1RKN1pXdDNqUUE1ZFJQYmlyWk9R?=
- =?utf-8?B?THJRN1ZsaFg5SjlqSDlmd2orSzVUeUN0bE8wUmR2eElGcEIrN3ZTeEEyQUIx?=
- =?utf-8?B?RlVLM082MHdDS1BxSlpzRnRhc3E5TEFqbnhTLzdycUpTcTFxcm9zNDFLeGtu?=
- =?utf-8?B?WEIreEI0VldnbXhXbGFKZHpJcUllN3ozM2lveHBRcThDeXN3TW1ObDhEYS84?=
- =?utf-8?B?bDZCZnViUUJWNzNNdlZZekFxYkJheWlsR0tYSUErbzB5MTg4WU03cEhOL2NU?=
- =?utf-8?B?dTU1MFg4S3U2WDJMN291elRYejBxblVFazZVdk93SFRTbmY3Y0NMMVBPaWpR?=
- =?utf-8?B?bGc4eVJmS1lTVWo0RytJNEpmVnlTWjN1Vmg2YjQzZUpHQUJsck0wRTVzNWhG?=
- =?utf-8?B?NEdEenZOS1hScncxSWtZOTBYaVFtdis3VnRGak9rcm03ZkpLUVhIVlhmU0ts?=
- =?utf-8?B?U3MxOEpwSnpiVjhmOVVuZEFFdEZLWmlpWkp1L2MwbG1YQUtoTU9hQTFwWUdY?=
- =?utf-8?B?SkVIOTU4OGc0ZVF3QUU3QXU1cDZUWlB2VUl5blJ2VzAyMjY4cGo4aTRRUzFy?=
- =?utf-8?B?eVlXdTZEYjFQcFliSHRpTi9qdjRhNGZTQ0s4RTVRSzc4clJsdkQ2aGY4WEdZ?=
- =?utf-8?B?Tmt6SUlqY3QrTTVvWE9zTDBvbDR5TGNMaER0c1Q0Tm9WREFiSndvY0R3cC9J?=
- =?utf-8?B?ZjdsZWdvb212b0JOanhMenhodW5zd3RRbUZGdlV1aG8wYXV3MDRveWt2aUJS?=
- =?utf-8?Q?m4zRLwasFTcv+HfKrC37pMnLI?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5bf934d-dd70-407f-e7be-08dcbac03300
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+	=?utf-8?B?eWRBdVk3Mm92SU81UlUxcWhwSVZoUkRCN3BYM2w2RCs3S253UFRrbW9ONmFP?=
+ =?utf-8?B?OHpKSkpJMVd2bDRsSXJ5cEJXWFJ1eWJTTXFHNlBHNHowNVRDSTlWcGlCODdD?=
+ =?utf-8?B?bmsxQjZGc2ZiQ0dpS1JpUEI0T0dCN2x5Y2tSL0NWdzZ1K1NGUDZKUWx0S3RP?=
+ =?utf-8?B?N3N4VUJveVBha1hKN2NTem15QlJQSkROREFaSUZvZ0NuUGZZZHV5bmkzbWk4?=
+ =?utf-8?B?U3pBTW5ZVWZxTTk0VTQ0S21nZWFuMXZJbnlNZFAyTzB3S0VHYTJWRHhaSHYv?=
+ =?utf-8?B?d3pobmE5MllYMDBQd1VxL2c5MytZblI1Wi9MU0RHSjZaa2ZvR0ZvV3hqbWxt?=
+ =?utf-8?B?ZXQrMnZCYStqVG14OWlEOUs0VWd5WFExcXIvbVFGWXd2WEhRTTdKdFdSdWZq?=
+ =?utf-8?B?Qmk5UkdXbHM0UERORnhjQjhyaUVZbnBTWTYyWE5RaEJXRkhlc2h5TmRGYnI3?=
+ =?utf-8?B?Z1VkNks4c0pXYTd2L003ODFnSG00RnVwK0taTThmS3Bob1VMR3o4eS9veVBi?=
+ =?utf-8?B?ejh6TmVhb254dHZrbForSEZZSGxLZGp2K3Z0NW5jQTJsTldwUzFaSkpmRkJJ?=
+ =?utf-8?B?NUtDaCtsWFYzZ0tHMFE1bGRmMXZBMnFNbHBKMDRQSm1IdHpVbi9tZkxWcXJx?=
+ =?utf-8?B?dCswbngwWGsvVDhiSk5iQXZuWWt2VzlJM05WNGEyVjFUeUN5YmtOU2huekh2?=
+ =?utf-8?B?WUxhK2l1aUl4NFJ3OUpIV29GWGVLaW9ZOVpJRjRWVVpJSU1EdENJM042U3Br?=
+ =?utf-8?B?S2lmcjdoVWFWNkNWS3djWnd5TVBWSG56ZExDQytKbTM3NmlkU2ZpTTNSSGN1?=
+ =?utf-8?B?RkRRcG5vTnBiYWVWdU5xYldzOWRaR3haTnZ6Z2tzZUI0VFBOb2RjZDlUalpN?=
+ =?utf-8?B?bUY3cXQwZk4yclRTeWV5Z2ErcVI5WXpaZVg0Z0xORjllbktrM0Z2WkFlUmxQ?=
+ =?utf-8?B?OVRkSnFHbFM3dTB4K2VKMTF0R2N1THd6c1VIRy9oaXhmcWtiSXI2Q2pnWTdX?=
+ =?utf-8?B?TzJOMk1rT2JxSDczcjVab01YVWMxTnBKditabHNmZ0tVa1VmRlIrMUNkUjkv?=
+ =?utf-8?B?cmpnN1VBTkZ4WlVFZUg0NXBkMDg1WjFaTk5wdXV5bWhxWFFFN0dXQUdzcWI4?=
+ =?utf-8?B?SG95UmRPZnkwekpnNUV6VG91c1BCWGgyTllNOTZOYVlwc2d0NFhsWUN4aFRl?=
+ =?utf-8?B?ajdMMXBsaTBYKzFHRFZ4SWJKS2dpd1AvQlozQnBCSXUwaHFReFpXVkovTm5w?=
+ =?utf-8?B?V0RzT2VVRnpSVWw0QXIvYkJCRkNzRXpGUjZ1TWtZRHIyUHdGRUhEUGdBT056?=
+ =?utf-8?B?S3hQWkt3dmJaSmtZM3Z4bUVteE43YkZMeWpJaFU5YWxpeTVuZWVIeEdRc2Qz?=
+ =?utf-8?B?UUlVa0UrZlhsSUFtV3pIM25NcS9nWERVQ2lucEtlWFFCMEZ6TnUxUVZLdFBm?=
+ =?utf-8?B?S0xSaHQ4ZnFUMWd3eVM3aEYrQ1F4MElKajY2NlFZSzVPNFA2aVE4MXl4ZGpx?=
+ =?utf-8?B?WmdBdVlQOFN6Rlg4bUVCYlIvNmRYVjg1NjloNURCbXJmUlQrQkxuYWl1OFVR?=
+ =?utf-8?B?dWVhMGNqa1d4QW1ETHFzMnkwRkZ0Z2RIZWZMMlQ3V0Z3Mk5qclJTOEtZbmth?=
+ =?utf-8?B?VlhzcUVMTVYxZ2N2dmRKVjBIOG5rNGl0UDVhZWNyVjNTd2tPOG9KS0dNZEFK?=
+ =?utf-8?B?WXgyTEFGZ1FMMEZ5Umw4V2FZdlhjS0NlZGVGY3B6V0JyU3FST0prZFpTcnAr?=
+ =?utf-8?B?eVlqajRwTG94aXltMTlQVzFYeHBQeDcrdzhlZlBzcXdQTDRSdE8reHhtTVFi?=
+ =?utf-8?B?L1VpdEhVRzIxUGFTeVQvNHJxTjZZSkhyY2pjZTc3Q0UwTmU3NmtBeU4wNy9u?=
+ =?utf-8?B?bGRLdzlvNUFPWnVTVi93ZkJVRVRva2hPeDhKRE1WWHVzWWF2R09Gb1dUaW9L?=
+ =?utf-8?B?WSt6cnp1YzJ4U3lnV3BsZEtTSEJsbmdtd3U2a0twdFpkZ0dkU253eGRYOFlq?=
+ =?utf-8?B?N3VWWi8vbGZjMTV2R2JkeUx5RkZ5TnMrcWlMNVczczVhd3UwRm9pSmd2VC8z?=
+ =?utf-8?B?OFZrR3JNem9pZ2hmNjUxMHF1SlZBYVhnRDRWL0x4Q2xxM0wzSXRRL0E1NnNG?=
+ =?utf-8?Q?trkxjOGh/bq/j1cc+QBA/apX+?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e54a3d1-af2c-4bbb-e09d-08dcbac0fadc
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 11:16:23.5797
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 11:21:58.6979
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 153HTUIc7N6qLfklQIL/Hz21z3iH7di7m77pqF1WyEnIMFu/MSNs0lBk/rSd5MaANd5ZXvsQQtvI69nBMaZCow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7739
+X-MS-Exchange-CrossTenant-UserPrincipalName: CDPA+NZUEi/cXHqDz8TnOio1bdtYgcT+Qk9VYsjBdj0acgkKtlBiVJ8sS289mSuxANEQLZ8eDClkEzCIS1Joeg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5595
 
 
-On 8/4/24 18:10, Jonathan Cameron wrote:
-> On Mon, 15 Jul 2024 18:28:21 +0100
-> <alejandro.lucero-palau@amd.com> wrote:
->
->> From: Alejandro Lucero <alucerop@amd.com>
+
+On 12.08.24 08:49, Jason Wang wrote:
+> On Mon, Aug 12, 2024 at 1:47 PM Jason Wang <jasowang@redhat.com> wrote:
 >>
->> Differientiate Type3, aka memory expanders, from Type2, aka device
->> accelerators, with a new function for initializing cxl_dev_state.
+>> On Fri, Aug 9, 2024 at 2:04 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+>>>
+>>>
+>>>
+>>> On 08.08.24 10:20, Jason Wang wrote:
+>>>> We used to call irq_bypass_unregister_producer() in
+>>>> vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
+>>>> token pointer is still valid or not.
+>>>>
+>>>> Actually, we use the eventfd_ctx as the token so the life cycle of the
+>>>> token should be bound to the VHOST_SET_VRING_CALL instead of
+>>>> vhost_vdpa_setup_vq_irq() which could be called by set_status().
+>>>>
+>>>> Fixing this by setting up  irq bypass producer's token when handling
+>>>> VHOST_SET_VRING_CALL and un-registering the producer before calling
+>>>> vhost_vring_ioctl() to prevent a possible use after free as eventfd
+>>>> could have been released in vhost_vring_ioctl().
+>>>>
+>>>> Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
+>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>>> ---
+>>>> Note for Dragos: Please check whether this fixes your issue. I
+>>>> slightly test it with vp_vdpa in L2.
+>>>> ---
+>>>>  drivers/vhost/vdpa.c | 12 +++++++++---
+>>>>  1 file changed, 9 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>>>> index e31ec9ebc4ce..388226a48bcc 100644
+>>>> --- a/drivers/vhost/vdpa.c
+>>>> +++ b/drivers/vhost/vdpa.c
+>>>> @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+>>>>       if (irq < 0)
+>>>>               return;
+>>>>
+>>>> -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
+>>>>       if (!vq->call_ctx.ctx)
+>>>>               return;
+>>>>
+>>>> -     vq->call_ctx.producer.token = vq->call_ctx.ctx;
+>>>>       vq->call_ctx.producer.irq = irq;
+>>>>       ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+>>>>       if (unlikely(ret))
+>>>> @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>>>>                       vq->last_avail_idx = vq_state.split.avail_index;
+>>>>               }
+>>>>               break;
+>>>> +     case VHOST_SET_VRING_CALL:
+>>>> +             if (vq->call_ctx.ctx) {
+>>>> +                     vhost_vdpa_unsetup_vq_irq(v, idx);
+>>>> +                     vq->call_ctx.producer.token = NULL;
+>>>> +             }
+>>>> +             break;
+>>>>       }
+>>>>
+>>>>       r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+>>>> @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>>>>                       cb.callback = vhost_vdpa_virtqueue_cb;
+>>>>                       cb.private = vq;
+>>>>                       cb.trigger = vq->call_ctx.ctx;
+>>>> +                     vq->call_ctx.producer.token = vq->call_ctx.ctx;
+>>>> +                     vhost_vdpa_setup_vq_irq(v, idx);
+>>>>               } else {
+>>>>                       cb.callback = NULL;
+>>>>                       cb.private = NULL;
+>>>>                       cb.trigger = NULL;
+>>>>               }
+>>>>               ops->set_vq_cb(vdpa, idx, &cb);
+>>>> -             vhost_vdpa_setup_vq_irq(v, idx);
+>>>>               break;
+>>>>
+>>>>       case VHOST_SET_VRING_NUM:
+>>>> @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>>>>       for (i = 0; i < nvqs; i++) {
+>>>>               vqs[i] = &v->vqs[i];
+>>>>               vqs[i]->handle_kick = handle_vq_kick;
+>>>> +             vqs[i]->call_ctx.ctx = NULL;
+>>>>       }
+>>>>       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+>>>>                      vhost_vdpa_process_iotlb_msg);
+>>>
+>>> No more crashes, but now getting a lot of:
+>>>  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) registration fails, ret =  -16
+>>>
+>>> ... seems like the irq_bypass_unregister_producer() that was removed
+>>> might still be needed somewhere?
 >>
->> Create opaque struct to be used by accelerators relying on new access
->> functions in following patches.
+My statement above was not quite correct. The error comes from the
+VQ irq being registered twice:
+
+1) VHOST_SET_VRING_CALL ioctl gets called for vq 0. VQ irq is unregistered
+   (vhost_vdpa_unsetup_vq_irq() and re-registered (vhost_vdpa_setup_vq_irq())
+   successfully. So far so good.
+
+2) set status !DRIVER_OK -> DRIVER_OK happens. VQ irq setup is done
+   once again (vhost_vdpa_setup_vq_irq()). As the producer unregister
+   was removed in this patch, the register will complain because the producer
+   token already exists.
+
+
+>> Probably, but I didn't see this when testing vp_vdpa.
 >>
->> Add SFC ethernet network driver as the client.
->>
->> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m52543f85d0e41ff7b3063fdb9caa7e845b446d0e
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
->
+>> When did you meet those warnings? Is it during the boot or migration?
+During boot, on the first 2 VQs only (so before the QPs are resized).
+Traffic does work though when the VM is booted.
 
->> +
->> +void cxl_accel_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec)
->> +{
->> +	cxlds->cxl_dvsec = dvsec;
-> Nothing to do with accel. If these make sense promote to cxl
-> core and a linux/cxl/ header.  Also we may want the type3 driver to
-> switch to them long term. If nothing else, making that handle the
-> cxl_dev_state as more opaque will show up what is still directly
-> accessed and may need to be wrapped up for a future accelerator driver
-> to use.
->
-
-I will change the function name then, but not sure I follow the comment 
-about more opaque ...
+> 
+> Btw, it would be helpful to check if mlx5_get_vq_irq() works
+> correctly. I believe it should return an error if the virtqueue
+> interrupt is not allocated. After a glance at the code, it seems not
+> straightforward to me.
+> 
+I think we're good on that front:
+mlx5_get_vq_irq() returns EOPNOTSUPP if the vq irq is not allocated.
 
 
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_accel_set_dvsec, CXL);
->> +
->> +void cxl_accel_set_serial(struct cxl_dev_state *cxlds, u64 serial)
->> +{
->> +	cxlds->serial= serial;
-> Run checkpatch over this series before v3 with --strict and fix the
-> warnings. Probably would have spotted missing space before =
->
-> Sure it's a series that is kind of RFC ish at the moment but clean
-> code means you don't get nitpickers like me pointing this stuff out!
->
-
-Sure. Thanks.
-
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_accel_set_serial, CXL);
->> +
->> +void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
->> +			    enum accel_resource type)
->> +{
->> +	switch (type) {
->> +	case CXL_ACCEL_RES_DPA:
->> +		cxlds->dpa_res = res;
->> +		return;
->> +	case CXL_ACCEL_RES_RAM:
->> +		cxlds->ram_res = res;
->> +		return;
->> +	case CXL_ACCEL_RES_PMEM:
->> +		cxlds->pmem_res = res;
->> +		return;
->> +	default:
->> +		dev_err(cxlds->dev, "unkown resource type (%u)\n", type);
-> typo. Plus I'd let this return an error as we may well have more types
-> in future and not handle them all.
->
-
-OK.
-
-
->>   	pci_dbg(efx->pci_dev, "shutdown successful\n");
->>   
->>   	efx_fini_devlink_and_unlock(efx);
->> @@ -1109,6 +1111,8 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
->>   	if (rc)
->>   		goto fail2;
->>   
->> +	efx_cxl_init(efx);
->> +
-> As below, have an error code. This is not something we want to fail
-> and have the driver carry on.
-
-
-As you have seen in another patch when CXL initialization is taken into 
-account, the driver can keep going if this fails.
-
-Those pci_warn/err inside CXL core should be enough.
-
-
->>   	rc = efx_pci_probe_post_io(efx);
->>   	if (rc) {
->>   		/* On failure, retry once immediately.
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> new file mode 100644
->> index 000000000000..4554dd7cca76
->> --- /dev/null
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -0,0 +1,53 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/****************************************************************************
->> + * Driver for AMD network controllers and boards
->> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
->> + *
->> + * This program is free software; you can redistribute it and/or modify it
->> + * under the terms of the GNU General Public License version 2 as published
->> + * by the Free Software Foundation, incorporated herein by reference.
->> + */
->> +
->> +
->> +#include <linux/pci.h>
->> +#include <linux/cxl_accel_mem.h>
->> +#include <linux/cxl_accel_pci.h>
->> +
->> +#include "net_driver.h"
->> +#include "efx_cxl.h"
->> +
->> +#define EFX_CTPIO_BUFFER_SIZE	(1024*1024*256)
->> +
->> +void efx_cxl_init(struct efx_nic *efx)
->> +{
->> +	struct pci_dev *pci_dev = efx->pci_dev;
->> +	struct efx_cxl *cxl = efx->cxl;
->> +	struct resource res;
->> +	u16 dvsec;
->> +
->> +	dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
->> +					  CXL_DVSEC_PCIE_DEVICE);
->> +
->> +	if (!dvsec)
->> +		return;
->> +
->> +	pci_info(pci_dev, "CXL CXL_DVSEC_PCIE_DEVICE capability found");
-> pci_dbg();
-
-
-Right.
-
-
->
->> diff --git a/include/linux/cxl_accel_pci.h b/include/linux/cxl_accel_pci.h
->> new file mode 100644
->> index 000000000000..c337ae8797e6
->> --- /dev/null
->> +++ b/include/linux/cxl_accel_pci.h
->> @@ -0,0 +1,23 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/* Copyright(c) 2024 Advanced Micro Devices, Inc. */
->> +
->> +#ifndef __CXL_ACCEL_PCI_H
->> +#define __CXL_ACCEL_PCI_H
->> +
->> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
->> +#define CXL_DVSEC_PCIE_DEVICE					0
->> +#define   CXL_DVSEC_CAP_OFFSET		0xA
->> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
->> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
->> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
->> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
->> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + (i * 0x10))
->> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + (i * 0x10))
->> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
->> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
->> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
->> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + (i * 0x10))
->> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + (i * 0x10))
->> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
-> As I think Dave suggested, pull any defs you need to linux/cxl/pci.h or whatever
-> makes sense and make the exiting code look for them there.
->
-> Ideally do that in a patch that does nothing else as simple
-> moves are easier to review quickly than ones mixed with real changes.
-
-
-I'll do.
-
-
-Thanks
-
-
->
->
->> +
->> +#endif
+Thanks,
+Dragos
 
