@@ -1,194 +1,192 @@
-Return-Path: <netdev+bounces-117970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E22D9501E1
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7BE950214
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 326361C21EE0
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA421C2125A
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FED189BB5;
-	Tue, 13 Aug 2024 10:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2667818F2FB;
+	Tue, 13 Aug 2024 10:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="czzEor0u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjecUxnj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D4419470
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917CF1607B9;
+	Tue, 13 Aug 2024 10:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543352; cv=none; b=SC6LeQCEQCEGRAV81zakJegnmY3ocZTPYIoEJ4r9Wc20p+WE3Mpud/ZB1CJcw7f6etLS9RTmocZ4qT6w+b3a7Po0mVEmJNY7epgMM17+ZGLiYsVLCoqWlZ27DA2KfBVdMpusAN1vAuFLFFWXYcbna78sjqncBKx77XRsgR6GPXA=
+	t=1723543653; cv=none; b=ehseLTND3p31jKRgmia0jbpkfJ00A2e0Yk20an5D4rH12M+FhBJ0p75AuVIyxTjCgqylbr+O9fetQ49BU9jsSGMX9pH+9hvlEHDgQQrNquvem2U2KVX1M9zxhSJXyPphS+nfHH5ZfAU950pgKoyieE6iLdZC1CONzokMyuqQZRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543352; c=relaxed/simple;
-	bh=yCuEHSruau3ols3pRDwQdUM75FmNDJH2gWAfUQrOLLE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Eho86f508Z+qhShjLhWzYAfYk14BVfQaXuTdlmMz6lqh2QXoVtHTbefrt/P/Jw4N888objB6KAyrm0eUD0ymJxxccY9dhO9hQmrbFBToGqM1WqzSZ1ZsnDJUvD30D6FnX9GONIbPmPPeBLowb7+KYekYdXKmTpcQGt2zYLPVARE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=czzEor0u; arc=none smtp.client-ip=212.227.126.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
+	s=arc-20240116; t=1723543653; c=relaxed/simple;
+	bh=1eu+OAMQ6xZiu0tesWEH67lOPbE8XFXCuJ4t02Bf6HQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TeeS/+98adYaGCL6w3KlMaNRNMaGTtZnQuFdA7QQdi9SbBrSQfonB1+7nIhWpY32N7y6HXOoJY5g+2zlwuWAaPNEl4wVs7zO1BfbDuaEp1yyjvh/7qMDIoj4+UmeF4h7Pxt1gDAh0TCCyxUg49nJWDM20EiyjGMWMKjy64TaclE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cjecUxnj; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-81fd520fee5so213608439f.2;
+        Tue, 13 Aug 2024 03:07:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=martin-whitaker.me.uk; s=s1-ionos; t=1723543335; x=1724148135;
-	i=foss@martin-whitaker.me.uk;
-	bh=HDtT6KbLJOYvicw8BUtswCd2mwUqzyI5HQdSEBZSfJ8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:Subject:To:
-	 Cc:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=czzEor0uG8iFI/Swx8IURE637csU5NncyoQZ7OP0Clhz7ipytu5nAp5JTVIESVmc
-	 z9fO7qc8LjkbXxBV9eFR/Mh6t0kKBqh8OdherOkl+B6/+nGI7oIh6/lKx3hllmeio
-	 VkW6ocKKMSXf3YhWDtTSpB515HVPQgDLo95qFOhKG52h1uBx6AxIqKt1Xh6WOYx/Z
-	 Qwhj2bhdfEZ7g5GiBtlC0ufwwnERCkibhJwWI59+Qun0oyx5yr5ee3uFlmxf74Rpj
-	 OKAxt0LV72LNo3RFOfxCOwpr1sPW/0HIp39A2mSzsoWqKkVaHqYpKn91QyHlDgabf
-	 YWuBiu6n5Y784oF2rg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from [192.168.1.14] ([194.120.133.17]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1MxHLs-1sFpQU3cgi-00r9CS; Tue, 13 Aug 2024 12:02:14 +0200
-Message-ID: <7aae307a-35ca-4209-a850-7b2749d40f90@martin-whitaker.me.uk>
-Date: Tue, 13 Aug 2024 11:04:59 +0100
+        d=gmail.com; s=20230601; t=1723543650; x=1724148450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNaC4gcNrucQanmjIjqSI/sdAQVUCMeBxqt8+FHM7JQ=;
+        b=cjecUxnjNZt+Pz1xrlUXGm6L73KVAI6Ar6pHzmnESCaPNBUybbrNUOPensCSVkjqVJ
+         TIXeRR1qJBvmrU9zlaX3mFzk2UqyTUhbvqiZUHcl+pls583aS+ImYN/mSOpfvxZqPGk0
+         s5B6eS+aVIyj3bYh0jNjijXVEIZsd3ikqoKlCEw8nNKP1trGB5h1temyEbGPavBG0PcJ
+         VkxzRqzAtB4ZmqqabnGJ762sfUrAHFjwihc5hOP+hQWlxP2TAecjgxS6W+IeAwGAhX+u
+         z7PjdROQGBAl/2OzEPj8yOGdtmnjDz4nwaOV+qHuIcdgKWTCavlCZ+LV0fPL5G7WrnLS
+         M68g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723543650; x=1724148450;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HNaC4gcNrucQanmjIjqSI/sdAQVUCMeBxqt8+FHM7JQ=;
+        b=mq0hvoufX3QlsMwlqzyHV8AvYd1fVmIYVNhvW2jOJXOe5kL7oqxoGXnOrHeJqt/Mum
+         ZJcEsj9SSWlwJAJdihrznAmZ80nIFVMdVU677+nm9NkFJ8SqZdrNDkK+3E2LEb/HinA2
+         +yqNFpOS0Vlcs7oEVxoU6EFZxemBXtcf9fG+V3E2pjx4tRrP2yVSi6spzv9oUDjNh5X1
+         E61Tkttk5j5nki84GN6T8DOacN4IXPV3Ykk80c3KUvzhedGoxeu3fPNReSdLlpXoq4Mi
+         0yItPCA9fq4qLeiYGf7XnfsUBKyNjVYsjJwRxIQfFKGoUqxNrm1eBR2Z6if3Q9i5MCd7
+         HikQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWesVSeuOYVlXJ4fZnspDCLEvH26j8fyLJmbpn4aXcLlPQraash1Gx7i+JbqGZV+96Zdxn3VYpmzkJZVA==@vger.kernel.org, AJvYcCWj+l7K1jyZMphQuK62C5gH1mcJlOdyUFE9NDg/ohRH2JEk3P4dRK2qVnZ7zgmU877v6vgdDyMoqAoevEk=@vger.kernel.org, AJvYcCXnoUQGyA8C2qW4FlSq8ew1YyRbyr4AEU9C2/ixU3j0VYbTHG9+c1scOc5RF+CBYoJyi3CdXjwB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQC/gjuMGjgRB46Vdra2qOGF+PEgP9qag5rhVQeKjlMvNboLWL
+	t/LaT9H5N77FDBtNltxd7UBNCAds9SQZVDAXURK/1GXpSMfXHEFX
+X-Google-Smtp-Source: AGHT+IFuRf8XiyHGr8EVtAVRsl76P28vTT/K2BFEBcnSp+Mbwf1NCN054HtXjv3fNwJmP/8N/BbElw==
+X-Received: by 2002:a05:6e02:1fc3:b0:39b:324a:d381 with SMTP id e9e14a558f8ab-39c477d0a88mr34253135ab.2.1723543650455;
+        Tue, 13 Aug 2024 03:07:30 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a866csm5357505b3a.48.2024.08.13.03.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 03:07:30 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	gbayer@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Tue, 13 Aug 2024 19:07:22 +0900
+Message-Id: <20240813100722.181250-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Martin Whitaker <foss@martin-whitaker.me.uk>
-Subject: net: dsa: microchip: issues when using PTP between KSZ9567 devices
-To: netdev@vger.kernel.org
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, ceggers@arri.de,
- arun.ramadoss@microchip.com
-Content-Language: en-GB
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:M3isctBkdpr9Y3h4Kzttulp8BA5XsSFuyRr7PkJs3LEsfiHcHe+
- ezfqVuccO7ARZtyTAthIsac2OupQjqhA/XeQvYojDRvhGw70+wPbS8eF5Nuw2O3pslqGXnY
- XvyTI2m1m6MI/7ueUbSmhKeofdxfT63oPyOwdObiVa+hhwZh5dZ5MlqjT6MYz8+dILKNbEJ
- QUe04VyRTvdNMKSQ/cqFw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DOp64zMO6Pw=;MKaBScPWrvcvdxPf01SqLOyiwcE
- FPhpm9eTHXlfPMIkvsx6aqafabRIUA+rfLtefab9jDk35NLOz1AjN0a5vQy2QcE27tsAZUvJu
- YyzcEbhDVn0v5bPxzL0IDRoa2KBK1QGtlGiAIWl4M0xUqN0INtEVaVNid14HbUlPqkGZoWwL+
- Q2hfQXSfnJBXip9VFw0Jnu7tqUPdAQcx7D4kv9TylmLDJy2YufsBollkBetAtJPW/GOgoItf3
- rtOYEpkXLiYWGyaXaEQ+OOnZVn8KeHJOpayp10E937Zeu9Vau9QovrdAdzT+CAdCP6cgmEUzn
- WM6TaYhM8r38JewlR2jN1DQEKhVDK6eODh5KslaEd57xKDJd94MPbE/RBiFpKAhv7SfHlj++t
- wHTC/B88RPbOrsQeQ72tWGDnPq7QqRHdkJgXpVgpNaYjjbdc+ISOi7HAeADHkE+y83empvpRH
- xEyWkA3g9/ACu9awGET8Ezzhjou0IW5FeZCR9RxRjxUED0SOUVhwtHKKQwUBZYZw8ry0aRIle
- zgqHyZ31ShuYlJ1gMDxo2gVDLQfdiaEaYzHxZWUzvJ0HtZvuLEd2HSF1X+JkBHDmy0EKO+Gcq
- KzP2hkHzJ3+glWuFgDWNb/64EL00RIMcBw03SCdB3xCCRwF1adpSP8FktwXbnjmCgi9CWqHT5
- 0GoW2AYzTicu1nwxoQsOZ7v4zYvEcSlZOkcu+dxbL4dzHvSFEMV97Ty6H3rvJavXUoXY9JjCc
- gT3h5Cn/HX0geKr1z0bdSkhN4kypYvL9w==
+Content-Transfer-Encoding: 8bit
 
-Three issues. The first two look like hardware bugs. The third is a
-driver bug.
+Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
+copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
 
-I have an embedded processor board running Linux that incorporates a
-KSZ9567 ethernet switch. The first port of the switch is used as a WAN
-port. The second and third ports are used as two LAN ports. The aim is
-to daisy-chain multiple boards via the LAN ports and synchronise their
-clocks using PTP, with one board acting as the PTP grand master.
-Currently I am testing this with only two boards and one active LAN
-connection. My basic linuxptp configuration is
+In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
+point to the same address, when smc_create_clcsk() stores the newly
+created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
+into clcsock. This causes NULL pointer dereference and various other
+memory corruptions.
 
-   [global]
-   gmCapable               1
-   network_transport       L2
-   delay_mechanism         P2P
-   time_stamping           p2p1step
+To solve this, we need to add a smc6_sock structure for ipv6_pinfo_offset
+initialization and modify the smc_sock structure.
 
-   [lan1]
+Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
+Tested-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
+Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ net/smc/smc.h      | 19 ++++++++++---------
+ net/smc/smc_inet.c | 24 +++++++++++++++---------
+ 2 files changed, 25 insertions(+), 18 deletions(-)
 
-   [lan2]
-
-
-Issue 1
-=2D------
-PTP messages sent to address 01:80:C2:00:00:0E are not being received.
-tshark displays the messages on the transmitting device, but not on the
-receiving device. I don't know how close to the wire tshark gets in the
-DSA architecture, but this suggests that the hardware is filtering the
-messages.
-
-I can work around this issue by adding
-
-   p2p_dst_mac            01:1B:19:00:00:00
-
-to the linuxptp configuration.
-
-
-Issue 2
-=2D------
-The source port ID field in the peer delay request messages is being
-modified. linuxptp sets it to 1 for the first port it uses (lan1 in my
-example) and 2 for the second port (lan2). tshark shows these IDs on the
-transmitting device, but on the receiving device shows the IDs have been
-changed to the switch physical port number (so 2 and 3 in my case).
-Again this suggests the hardware is changing the IDs on the fly. This
-only happens for peer delay request messages - the other PTP messages
-retain the linuxptp source port IDs.
-
-I have checked that the "Enable IEEE 802.1AS Mode" bit is being set in
-the KSZ9567 "Global PTP Message Config 1" register. According to the
-datasheet
-
-   When this mode is enabled, it modifies the IEEE 1588
-   mode behavior. Primarily it causes all PTP messages to
-   be forwarded to the host port, and the switch will not
-   modify PTP message headers.
-
-so if the hardware is responsible, both this and issue 1 look to be
-device bugs.
-
-I am currently working round this issue by patching linuxptp to use the
-physical port numbers as the source port IDs. I can't think of a general
-solution to this issue.
-
-Issue 3
-=2D------
-When performing the port_hwtstamp_set operation, ptp_schedule_worker()
-will be called if hardware timestamoing is enabled on any of the ports.
-When using multiple ports for PTP, port_hwtstamp_set is executed for
-each port. When called for the first time ptp_schedule_worker() returns
-0. On subsequent calls it returns 1, indicating the worker is already
-scheduled. Currently the ksz_ptp module treats 1 as an error and fails
-to complete the port_hwtstamp_set operation, thus leaving the
-timestamping configuration for those ports unchanged.
-
-(note that the documentation of ptp_schedule_worker refers you to
-kthread_queue_delayed_work rather than documenting the return values,
-but kthread_queue_delayed_work returns a bool, not an int)
-
-I fixed this issue by
-
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c
-b/drivers/net/dsa/microchip/ksz_ptp.c
-index 4e22a695a64c..7ef5fac69657 100644
-=2D-- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -266,7 +266,6 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
-         struct ksz_port *prt;
-         struct dsa_port *dp;
-         bool tag_en =3D false;
--       int ret;
-
-         dsa_switch_for_each_user_port(dp, dev->ds) {
-                 prt =3D &dev->ports[dp->index];
-@@ -277,9 +276,7 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
-         }
-
-         if (tag_en) {
--               ret =3D ptp_schedule_worker(ptp_data->clock, 0);
--               if (ret)
--                       return ret;
-+               ptp_schedule_worker(ptp_data->clock, 0);
-         } else {
-                 ptp_cancel_worker_sync(ptp_data->clock);
-         }
-
-CC'ing the authors of the ksz_ptp module as well as the ksz9477 driver
-maintainers.
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 34b781e463c4..f4d9338b5ed5 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -284,15 +284,6 @@ struct smc_connection {
+ 
+ struct smc_sock {				/* smc sock container */
+ 	struct sock		sk;
+-	struct socket		*clcsock;	/* internal tcp socket */
+-	void			(*clcsk_state_change)(struct sock *sk);
+-						/* original stat_change fct. */
+-	void			(*clcsk_data_ready)(struct sock *sk);
+-						/* original data_ready fct. */
+-	void			(*clcsk_write_space)(struct sock *sk);
+-						/* original write_space fct. */
+-	void			(*clcsk_error_report)(struct sock *sk);
+-						/* original error_report fct. */
+ 	struct smc_connection	conn;		/* smc connection */
+ 	struct smc_sock		*listen_smc;	/* listen parent */
+ 	struct work_struct	connect_work;	/* handle non-blocking connect*/
+@@ -325,6 +316,16 @@ struct smc_sock {				/* smc sock container */
+ 						/* protects clcsock of a listen
+ 						 * socket
+ 						 * */
++	struct socket		*clcsock;	/* internal tcp socket */
++	void			(*clcsk_state_change)(struct sock *sk);
++						/* original stat_change fct. */
++	void			(*clcsk_data_ready)(struct sock *sk);
++						/* original data_ready fct. */
++	void			(*clcsk_write_space)(struct sock *sk);
++						/* original write_space fct. */
++	void			(*clcsk_error_report)(struct sock *sk);
++						/* original error_report fct. */
++
+ };
+ 
+ #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+index bece346dd8e9..25f34fd65e8d 100644
+--- a/net/smc/smc_inet.c
++++ b/net/smc/smc_inet.c
+@@ -60,16 +60,22 @@ static struct inet_protosw smc_inet_protosw = {
+ };
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
++struct smc6_sock {
++	struct smc_sock smc;
++	struct ipv6_pinfo np;
++};
++
+ static struct proto smc_inet6_prot = {
+-	.name		= "INET6_SMC",
+-	.owner		= THIS_MODULE,
+-	.init		= smc_inet_init_sock,
+-	.hash		= smc_hash_sk,
+-	.unhash		= smc_unhash_sk,
+-	.release_cb	= smc_release_cb,
+-	.obj_size	= sizeof(struct smc_sock),
+-	.h.smc_hash	= &smc_v6_hashinfo,
+-	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
++	.name				= "INET6_SMC",
++	.owner				= THIS_MODULE,
++	.init				= smc_inet_init_sock,
++	.hash				= smc_hash_sk,
++	.unhash				= smc_unhash_sk,
++	.release_cb			= smc_release_cb,
++	.obj_size			= sizeof(struct smc6_sock),
++	.h.smc_hash			= &smc_v6_hashinfo,
++	.slab_flags			= SLAB_TYPESAFE_BY_RCU,
++	.ipv6_pinfo_offset		= offsetof(struct smc6_sock, np),
+ };
+ 
+ static const struct proto_ops smc_inet6_stream_ops = {
+--
 
