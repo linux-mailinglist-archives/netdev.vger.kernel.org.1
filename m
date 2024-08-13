@@ -1,111 +1,120 @@
-Return-Path: <netdev+bounces-118058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6399506AD
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:37:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08279506C4
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D69F1F230A8
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:37:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E362289D8F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3AB19D068;
-	Tue, 13 Aug 2024 13:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DF719B5BB;
+	Tue, 13 Aug 2024 13:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtXwyBtc"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E8019B59C;
-	Tue, 13 Aug 2024 13:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE30D60EC4;
+	Tue, 13 Aug 2024 13:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723556248; cv=none; b=POWqfN9Q1nAYcKEAhrGQiXuhy7TDQ3dLVn3H3r4Co2LvIwJI9G2x3BiXtDnA+RUVZMCaaz4ItOWYlv1NdwuiGxYKV16FcHBATus3UaR8tikdyVz3bTbMnFpu1bhGew5TDw8iaNK9avudbw0uBsSIQ7ODqbUQWt0aVgzodE5zD24=
+	t=1723556389; cv=none; b=WiRNMg9A6w2C9OdBnfJJOLKTU01BXdDG0tJWyTq0RnW4jzsxYPSMvkpE71b1iSrSZbe6QF5xKst6ObxdlUvHHjtjGuCo/AxQ8z6MLAu+ll3glv/L8kQ2LyJH1gbBPhJizN1F0UOFcXfVHhxz1jb6eBx7Ilvaj5CQStoPQSSobsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723556248; c=relaxed/simple;
-	bh=y4m0NGdxLvMzaZXv2Iq9+4JUPWPQslslsChnNMIA9QY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TrqsnWsGQ6VyGisSYPiPrKu1Ns2maDK9/wZZpvrNvODyn21FJoBqmsiVi+ZpLBsJFgXXWdjCSgQUUU5FNUQe1hmSYBGNZkq0bgBrphl9MlRm+A7OU1TxpKtJTeCkuIUHUUM30WhNeh3rK8eG4T34sfZKHzBJbYBFQGzSdVKSGRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.09,285,1716217200"; 
-   d="scan'208";a="219472721"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 13 Aug 2024 22:37:18 +0900
-Received: from [10.226.93.14] (unknown [10.226.93.14])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id E3B4240062D6;
-	Tue, 13 Aug 2024 22:37:14 +0900 (JST)
-Message-ID: <ce098866-4619-4570-9a82-5b2399d52d31@bp.renesas.com>
-Date: Tue, 13 Aug 2024 14:37:13 +0100
+	s=arc-20240116; t=1723556389; c=relaxed/simple;
+	bh=JiW2g111/T9vwg7V0O7d5Da9gYPfoiBmqdXrIR1zkBk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hvMdLx3sAQFVq+2HHstY1aQ7q5pAeCEYwCg6bgZ458YJ4ieE7NR8uLG1zUlyCehVaIUzCKgjx62jPMPb+K8tOc+rG6yqYdgCwUqXK6VG0rTxTNSQQSgFMCdkTWDT+nkM7mB6eSQPDQr5kYsfcgxvSFTXrHElMNLgAvm8XP85ThY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtXwyBtc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3C0BC4AF09;
+	Tue, 13 Aug 2024 13:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723556388;
+	bh=JiW2g111/T9vwg7V0O7d5Da9gYPfoiBmqdXrIR1zkBk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=CtXwyBtcQmclsv9nEWsuu9fWoRpeALgeMKF3XTOwLR0DPm11eO7eo7wd6RivlwAAo
+	 RWmiJ7FNnck6Z5N1zdtbmZoPtoG32dIoOtt6AWoHBS22Win4/QyWyoSTiMWVXQGKTz
+	 2e3ftaV/EaHa6Bpsr6L8kOkL65dQCcv8pJho3I4JUYS1aaVz+jYtsHk+CZAUodEmU3
+	 HyAn1PFowIMUG46kjyERJGlmaXvI1mGOM6DpAgZXKKjvIM6x9L9SijW1LJrwaU8YJ/
+	 nzWnDt+de2JXzFWGZJOdBxET/x0WhfN1BR6G/TXduWfLbPWjYBNmhXkU9mTPYWRGql
+	 BccoFIPm9weFQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Tue, 13 Aug 2024 15:39:34 +0200
+Subject: [PATCH net] selftests: net: lib: kill PIDs before del netns
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 1/2] net: ravb: Fix maximum MTU for GbEth devices
-Content-Language: en-GB
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-2-paul.barker.ct@bp.renesas.com>
- <e61ce8b4-fb9a-8b4f-23e1-7cfd6dd1040d@omp.ru>
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <e61ce8b4-fb9a-8b4f-23e1-7cfd6dd1040d@omp.ru>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240813-upstream-net-20240813-selftests-net-lib-kill-v1-1-27b689b248b8@kernel.org>
+X-B4-Tracking: v=1; b=H4sIABViu2YC/z2NywqDMBBFf0Vm3QGfrfZXpIu03rSDMUomFUH89
+ wYXXZ7D5dydFEGgdM92ClhFZfYJiktGr4/xb7AMianMyzpvi4q/i8YAM7FH5L9VOBuhUU/t5Mm
+ jOMf21l1rU5mmtaCUXAKsbOddT2lJj+P4AUP8F1KDAAAA
+To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Hangbin Liu <liuhangbin@gmail.com>, Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1427; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=JiW2g111/T9vwg7V0O7d5Da9gYPfoiBmqdXrIR1zkBk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmu2Ih2tgE3mKo82PooAHQqtAlS0SutfN+iLo+P
+ bd/L7QH6tKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZrtiIQAKCRD2t4JPQmmg
+ c9lZD/9pH0LZLwr1ok0Jgepa9D2tQqV6P+qgeuOxnAnxA8j4inoPl5PUxLdLI1H3nKECS9WgFSZ
+ yXsDwhtCQHKOzFfKrueNnTZSxJQJ5mHpMorxxPuhun6buI75wZXdIKEqCGekKq1GeCmaqv4+28u
+ vW6mLWbQ0sjH2fpkN6KpWiQCgEmnM55iiS9AKWJF16XIkJMm7wzqwYqmoOAEFtqBrpPa6D6ikli
+ 90eKHxe7apSl1upOIXCNKI7bmPC/h6Ugr1cz81Bi/ieq5ApS6zmbQEGNHS5yh2jugWxPTp7Btc0
+ x2jVqw0N0THPhmJBrA54S6dxspohY7f9MmSn6dYbu2zFbGDdcI5fHprscZRvMzgDqa/XeMjTKTb
+ NYh/TsaWK0QVcqYuGtuXMjl+6Kj79Ll1+aPTGlPKlriXi0o/1Tns2yAVI1M1nqXQmpGM6eJlMMJ
+ FLOGAU9m7S58OTd3LLb4AG19rrm5jtviQZkTe2UbQfssDfYT90jWz56bqGE0JcuxmbNb6qWUzD0
+ UBeNJAbpVqCymjIZEsQL+jDXvRiTknCFovhYyqC00qZwrjfXKTaEbPL0GttFX4mK/zsBrVPLdvY
+ +hbE5Tc9jatIMeJgO+jXjHCGUz9iBy7oKklJQ7B952H26nvac0d+rQ3HlhemfIM5Rx8Q7m3u4FS
+ Iy3cpdO1gW3IvrQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On 17/06/2024 20:38, Sergey Shtylyov wrote:
-> On 6/15/24 1:30 PM, Paul Barker wrote:
-> 
->> The datasheets for all SoCs using the GbEth IP specify a maximum
->> transmission frame size of 1.5 kByte. I've confirmed through internal
->> discussions that support for 1522 byte frames has been validated, which
->> allows us to support the default MTU of 1500 bytes after reserving space
->> for the Ethernet header, frame checksums and an optional VLAN tag.
->>
->> Fixes: 2e95e08ac009 ("ravb: Add rx_max_buf_size to struct ravb_hw_info")
->> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-> [...]
-> 
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index c1546b916e4e..02cbf850bd85 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2664,6 +2664,7 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
->>  	.net_features = NETIF_F_RXCSUM,
->>  	.stats_len = ARRAY_SIZE(ravb_gstrings_stats),
->>  	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
->> +	.tx_max_frame_size = SZ_2K,
-> 
->    The R-Car gen3 manual says 2047... Typo? :-)
+When deleting netns, it is possible to still have some tasks running,
+e.g. background tasks like tcpdump running in the background, not
+stopped because the test has been interrupted.
 
-Apologies for the late response.
+Before deleting the netns, it is then safer to kill all attached PIDs,
+if any. That should reduce some noises after the end of some tests, and
+help with the debugging of some issues. That's why this modification is
+seen as a "fix".
 
-The maximum MTU is currently based on rx_max_frame_size which is SZ_2K
-for the R-Car gen3 devices. So this should be addressed in two commits:
+Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
+Acked-by: Mat Martineau <martineau@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+ tools/testing/selftests/net/lib.sh | 1 +
+ 1 file changed, 1 insertion(+)
 
-* This commit to address the GbEth MTU, leaving the R-Car gen3 MTU
-  incorrect.
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index d0219032f773..8ee4489238ca 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -146,6 +146,7 @@ cleanup_ns()
+ 
+ 	for ns in "$@"; do
+ 		[ -z "${ns}" ] && continue
++		ip netns pids "${ns}" 2> /dev/null | xargs -r kill || true
+ 		ip netns delete "${ns}" &> /dev/null || true
+ 		if ! busywait $BUSYWAIT_TIMEOUT ip netns list \| grep -vq "^$ns$" &> /dev/null; then
+ 			echo "Warn: Failed to remove namespace $ns"
 
-* A second commit to address the R-Car gen3 MTU.
+---
+base-commit: 58a63729c957621f1990c3494c702711188ca347
+change-id: 20240813-upstream-net-20240813-selftests-net-lib-kill-f7964a3a58fe
 
-Unfortunately I have no test environment where I can properly
-investigate jumbo packet behaviour with a R-Car gen3 boards so I
-recommend the second commit is sent by someone who can test it fully.
-
-Thanks,
-
+Best regards,
 -- 
-Paul Barker
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
