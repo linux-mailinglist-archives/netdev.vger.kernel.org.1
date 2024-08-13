@@ -1,396 +1,150 @@
-Return-Path: <netdev+bounces-118245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B304D9510A1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:33:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 734E19510B8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D50C61C20E6B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955111C218AE
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5891AC44F;
-	Tue, 13 Aug 2024 23:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0A31AC444;
+	Tue, 13 Aug 2024 23:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QzmQQl2g"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XSqFmyZ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2042.outbound.protection.outlook.com [40.107.244.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D104198E78
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 23:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723591976; cv=none; b=rc4ZS0x02/iYwGXzyb46XX+cjatycdc7dj00/dAX8MngfPMNVlCHBD0xgqPhIcKKK7E4v3NH5LxKnHa/yHlhZxZp9i8lsqzxG/jEAzp/mEcg2ZTXrYbpcfNaIGfBimN1RjeL8rwQumuA0g50c1FBu/4DKidrQSpxirGfaUkmHno=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723591976; c=relaxed/simple;
-	bh=qRzKqTnUFYFZMO87/XmBCeuiDiFz0pf9bjswxn5jQak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CtVMJYhIi4ybxGGYqmj1XY3zTak6e67Ag6WfYWYZ7HE30bLO7EP609xXmUfOa2+6DyPK7b1dVH9VS+35PmCVlC+h2L+MJbJj6guXYYWrIJOOvrYQFxG30f7+kSpviSvAG6+G5Lk/gupkw/4m7nczKe3XhqM9UWiBr3WIWWaHUbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QzmQQl2g; arc=none smtp.client-ip=209.85.215.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-7bb75419123so4085820a12.3
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 16:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1723591973; x=1724196773; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAOs/0xIclPNgef8mjiCwphqIRBJxolwj+ut1KAkjhU=;
-        b=QzmQQl2gOnOkZo+7CYHwv0odBUCOTPDTTcM8wnv3m6qI5V8923ui0/3uyVOps1JZy4
-         pR3+W6GaT2K+WdhqjwqIHr3A8Vxd16CCo5X8votxry0VePghw+XZBKFs5X6huLBV+F5M
-         acc26RGazVElj/iP2zoFvhZyCRLR4514rnSRbvau5/yCEnwoc/zAN/QN19RoiZC3WnWL
-         r5hpRA+2diLqbUm032SH4fqTJuAzVJOJkqESPxzhwDvTLaTJPUuevKzOkqBUos/xbZYN
-         OHLzIbNc2RJk4tmhN5nprYe0j8JHXvDaAU9lUewLP6twQZtYts73idPnemW1BWziIl5p
-         TBAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723591973; x=1724196773;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hAOs/0xIclPNgef8mjiCwphqIRBJxolwj+ut1KAkjhU=;
-        b=qM/zDh+zxBp54PGiuNIQzod5UWFuNg+y6KHr0ITxXf6NkQP5OEDclePhtq78YLdPLN
-         o+TG/5ciRQw7MJ9o7zDuoaqm53qirslG/lGO6kYmnky2LN8K4eqLlRkHNYKv0wRIBawL
-         kBDSSjK2XQZV8EjrSESyiJZsa+bo8ov3QLlSGNOIAux4XPMghVAmxXnxRVZvH5122uFt
-         Wcj2Yz3WmKkdkTdLeyPHIZTzuGlYIP/G5qC4+B6R0HZRZYNUfEdYNbyWu4/07HvRbE/s
-         rSh+3bhkhS1vCv5/X2zhN1HEP85SqlmgJ8vOOPCTzhkVqQZidxOJwTt9qceoPk/Gprqj
-         iufg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcWMFouGjiukrYI/r9N1Pn1oF3828v1cH3aLwhesQ40cLODNmUfFMHcWzPQWB8+6z49Eu1zOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDG/GtoDQcq/y8SBwfHmXV057B0TO44Z5IkK1pH/0y3V59I/Nz
-	ZM7qzMIfJtY47dmzgWmBFgdgDWHxigRJSTRUYloK5yWC+/ocaU0vUwJYyomOBvLa5IGwa9P2UJb
-	UeQu8lFDggP4SDtVnkbWikzQArfFu+2ai6j4yJmjWOoAKa8Cv
-X-Google-Smtp-Source: AGHT+IG2JxsAI9q4hYaDiVS1k439q1FR8mnCk3ezbEPjuo4/ZcUUZlgBDTgGLPzGMcmdXNYSB5/6G7Aivuyz
-X-Received: by 2002:a17:90b:e06:b0:2c9:a3ca:cc8b with SMTP id 98e67ed59e1d1-2d3aa87ea28mr1260888a91.0.1723591972668;
-        Tue, 13 Aug 2024 16:32:52 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-2d3ac7ca349sm18291a91.4.2024.08.13.16.32.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 16:32:52 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id B79233402D7;
-	Tue, 13 Aug 2024 17:32:51 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id B0F88E40C6E; Tue, 13 Aug 2024 17:32:51 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Ben Segall <bsegall@google.com>,
-	Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rcu@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] softirq: remove parameter from action callback
-Date: Tue, 13 Aug 2024 17:31:58 -0600
-Message-ID: <20240813233202.2836511-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9971AC420
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 23:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723592501; cv=fail; b=rVGTZ+RF1rSggvmK52MkZXF8BdW/37eqY+Cv+Cc6usSBHwa2fpqUpokmCfouUuuYZDefbyNn+V1ZLvmBiV69++LijqSZ+/2MJ0gScDungR81VVwGeaMAfzkwTb2lpDE81Q+LaYlzvV8CZi1sQnJQYG9QOcFWcWBvHPFPEvrsmFY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723592501; c=relaxed/simple;
+	bh=llBGp/lF0ox9pMyAvFZhwXA83Tx2SN/qDK3ZG2a/vUc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ctFIkr9+SD87uNA/D1Fm06LLsG7ZUYDwgxrt0jQBYGKiNu6sADivev69nSMuKkF9m3aJFJmCZKMVUh6PkjoAPeq2OEIjN30x4HOO4qxbOt8qh166G5bgwLUDnTTVhHL2zNzyt5PZd8GP4/jCllx7iJd12WPVgNjLJotMefjon8s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XSqFmyZ8; arc=fail smtp.client-ip=40.107.244.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GdBjGLW0gODGZahQwHPuW5qCRgmp4iagjH+3eiGRmIZuF0IJPbCE60WBXyeb5Z/hr369VcDq/39O6hBUJ3X1fJyJa0oDdTkoutx/zjpuhkRhC1l/shJG7hA94+lB/tJfrIKkBUTAAuND/keeN4SBylxK3LptAZp39VA5KxnC7E5KTQnEYhT2UlE3Up6wp+MtKJuM2ohhMu9hlxCZGLzlmbYaFIzdgPfcuoxf3u5Mw0VFRzbcpqOLLc/lY0LscTpU+o168DGIoe/xsKC2O7aNln9myxjNjMQKaqbuZ+s/UYLGqEo3MdvsBR8Np6ChfEcIROhmwnGCVVGWWnvRRk2mWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E8D21hTdp7Z2XdNXCOVqrfrMiX9/nD7P8QZS0DA3vc4=;
+ b=qx1HtjlMOuEUEwc42Ds7QNSS3zRAziAmI+vRm1tUkOoZZW/SlsM2WsClnP/4G4PY9kAlfKIkX17mc2c4woN9GL3pU1UTkBsg0z7eX1Rl7xbC+r8Ty/n8htFkfg9N9kJmSBkmqjiASkutFPxamLkdzU0b/6d2BjDWv5QsYyRGjn3RoEPanQgYr6HDl6XQfd0LP0Z15QJZt93wfNH01/8F+Z94RFcuntdzbnDGFsloqvfK7VGMHANosQbhhRNzcfz+XRmupeKncp5M6yLGYW6lJByG2skt0RYhGu0vIlT1K8eNjmTgynHefrpqU5wMLVBR4EcyzcmMzTucorFMiCEsiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E8D21hTdp7Z2XdNXCOVqrfrMiX9/nD7P8QZS0DA3vc4=;
+ b=XSqFmyZ8cnBM5X5Ixof9GZVImJDrOgAIo6XNlaclM//OEcYU9HU2Vy5l5q7XQoHgD9xA8/YQZ1L4Xwz5RW2T+Yoc5u7eYenuXX34GPZMfS+FZ19UtO/i7xipLOhzBKMRHVeLEtKFc6Plx0A+xISv+VtJyQ+7G5c9S1v1oJR405I=
+Received: from MW4P220CA0020.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::25)
+ by DM4PR12MB6543.namprd12.prod.outlook.com (2603:10b6:8:8c::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.22; Tue, 13 Aug 2024 23:41:36 +0000
+Received: from SJ1PEPF00001CE9.namprd03.prod.outlook.com
+ (2603:10b6:303:115:cafe::20) by MW4P220CA0020.outlook.office365.com
+ (2603:10b6:303:115::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13 via Frontend
+ Transport; Tue, 13 Aug 2024 23:41:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SJ1PEPF00001CE9.mail.protection.outlook.com (10.167.242.25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7828.19 via Frontend Transport; Tue, 13 Aug 2024 23:41:36 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 13 Aug
+ 2024 18:41:34 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>
+CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
+Subject: [PATCH net 0/2] ionic: Small fixes
+Date: Tue, 13 Aug 2024 16:41:20 -0700
+Message-ID: <20240813234122.53083-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE9:EE_|DM4PR12MB6543:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4fa4621b-f837-4e6d-ff93-08dcbbf17889
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Fpd8iIWCCLEHLbs/ALfMRrQv/E29WtjJNGPvsR/pF7waTYBVQSgrRGvFVk7t?=
+ =?us-ascii?Q?234H4s2hV543EnpIg/U/x3kFqi+OyLq7S3DMYLUVZZb7JF1hwcVkxpB9hLNr?=
+ =?us-ascii?Q?GP9wWqTzFxnpCNdvH0AcgNMcsjxbn2yrMstEl20PAomRiWCwZTUbHXApV50S?=
+ =?us-ascii?Q?kti4UoyAcpxHQW44pMBwi9XLH7XfiYpP16UnDTuWNjzPXddF5mo9R7jUVsIH?=
+ =?us-ascii?Q?b/ih3BKNftrUlIMvt+gAfhiM39nYCO924KyjmusVNq9/kD8WUeUeenDIX7sv?=
+ =?us-ascii?Q?BOp1UgTw18P+Y+vz2fUnf/svMPxPZsfLcn6paw7jsho1BWhbsM6w3GX1v+Zg?=
+ =?us-ascii?Q?lauJSUm01G8Wjfu1s9W0VbG2kv92ckYEqAQnQ/Mlunf2+t1VlBcxQFDet9bw?=
+ =?us-ascii?Q?IUqrlJI4mf1AaFl75nytfoIeDSaFEvntQ+Sca/7ebFpEKysBlVXYZkRFqTls?=
+ =?us-ascii?Q?UaP11TIdA7Gx7+rkY5AWquDIIAQYNbe1QT45xEwPx9zEAjPv6CgInVJ0UqwC?=
+ =?us-ascii?Q?Ro68D4/omZizFaosAHEYfv2fjIAuPi+s7ZVfN7QFh/5U0qADPOXWhtkXFssi?=
+ =?us-ascii?Q?aRJ3RdyuWXqT1q745vU23Z6kWV5f1QXTcZhOW73bAPidzWAohFMDqUDA1lkN?=
+ =?us-ascii?Q?ctUCSFOlXqAgz1awmfOPJj9TaNniDLfANy2tkZux/KUfpUI67CrjPIfc76c4?=
+ =?us-ascii?Q?pdq6/CE7eO5dDH07jrk2twXQ40wQU5uCe0vvmTDRAGDOBhnCSBnDq76pjwOk?=
+ =?us-ascii?Q?6wQ6w0Ef1adEAsLk0lMbz8SXxbhf+NMSpAoD3ZQ0ZJvBvlPcd6bgH+oTS49O?=
+ =?us-ascii?Q?xatauITgtRfOuEKSjNrXs6Jx+oTFi68uvFdgw2mZf2rEikJUa6VhIGGe6yMO?=
+ =?us-ascii?Q?QPmC5ckVfSonkYy5s23Tv+rWKmNpkIFx3ijnvL1fqSt/S1cy4gkbwPIfbQYh?=
+ =?us-ascii?Q?/4YE9tGZlm4009Tsu4gXpSMrE93Hoiqo7YBqIa+qs25pC9n51hYljhB7zce8?=
+ =?us-ascii?Q?9VVwnYes/a79GK1oaCQmPnukcZZjW5lnMQs6Pc3O/3h3JJa0uJOabClBnN5O?=
+ =?us-ascii?Q?skRiCkdG8dNkf03VBjH+PasdvznAPn5SKRqTnOguZry17UiCDZ5fgsMJKzku?=
+ =?us-ascii?Q?pqLg86U9FcSqmiuu4zguTSuL71E+n2yz5nIDJFQOaSrwM7XxhWimJnoABzV2?=
+ =?us-ascii?Q?hon7Hf/HYA0nTjj0BWyBSbOkJ4mAmNJcVUnp9YsoBv3F7iUjxMUdhLbjpKTd?=
+ =?us-ascii?Q?LNNmj0tW6u+OqdPnOOtsTR3nUDeqxgAkq4CHp0gCenGvJO0RWuBqhBEXmIht?=
+ =?us-ascii?Q?LEB55Nn0Uw2HCiy2WSj26UzLbXWmnwzEhSzaykOB+K0Np0Qyd1m8jbY+O62z?=
+ =?us-ascii?Q?0w6pjOHh0nd87SjMF4iO/FJbGyuhH+Nc3lFp8+cbRs0wyuqh6w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2024 23:41:36.0933
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fa4621b-f837-4e6d-ff93-08dcbbf17889
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6543
 
-When softirq actions are called, they are passed a pointer to the
-entry in the softirq_vec table containing the action's function pointer.
-This pointer isn't very useful, as the action callback already knows
-what function it is. And since each callback handles a specific softirq,
-the callback also knows which softirq number is running.
+Fixes for the ionic driver related to the case where napi budget
+is 0 and also a fix for possible tx_timeout.
 
-No softirq action callbacks actually use this parameter,
-so remove it from the function pointer signature.
-This clarifies that softirq actions are global routines
-and makes it slightly cheaper to call them.
+Brett Creeley (2):
+  ionic: Fix napi case where budget == 0
+  ionic: Prevent tx_timeout due to frequent doorbell ringing
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- block/blk-mq.c            |  2 +-
- include/linux/interrupt.h |  4 ++--
- kernel/rcu/tiny.c         |  2 +-
- kernel/rcu/tree.c         |  2 +-
- kernel/sched/fair.c       |  2 +-
- kernel/softirq.c          | 15 +++++++--------
- kernel/time/hrtimer.c     |  2 +-
- kernel/time/timer.c       |  2 +-
- lib/irq_poll.c            |  2 +-
- net/core/dev.c            |  4 ++--
- 10 files changed, 18 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_dev.h  | 2 +-
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c  | 2 +-
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 3 ---
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e3c3c0c21b55..aa28157b1aaf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1126,11 +1126,11 @@ static void blk_complete_reqs(struct llist_head *list)
- 
- 	llist_for_each_entry_safe(rq, next, entry, ipi_list)
- 		rq->q->mq_ops->complete(rq);
- }
- 
--static __latent_entropy void blk_done_softirq(struct softirq_action *h)
-+static __latent_entropy void blk_done_softirq(void)
- {
- 	blk_complete_reqs(this_cpu_ptr(&blk_cpu_done));
- }
- 
- static int blk_softirq_cpu_dead(unsigned int cpu)
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index 3f30c88e0b4c..694de61e0b38 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -592,11 +592,11 @@ extern const char * const softirq_to_name[NR_SOFTIRQS];
-  * asm/hardirq.h to get better cache usage.  KAO
-  */
- 
- struct softirq_action
- {
--	void	(*action)(struct softirq_action *);
-+	void	(*action)(void);
- };
- 
- asmlinkage void do_softirq(void);
- asmlinkage void __do_softirq(void);
- 
-@@ -607,11 +607,11 @@ static inline void do_softirq_post_smp_call_flush(unsigned int unused)
- {
- 	do_softirq();
- }
- #endif
- 
--extern void open_softirq(int nr, void (*action)(struct softirq_action *));
-+extern void open_softirq(int nr, void (*action)(void));
- extern void softirq_init(void);
- extern void __raise_softirq_irqoff(unsigned int nr);
- 
- extern void raise_softirq_irqoff(unsigned int nr);
- extern void raise_softirq(unsigned int nr);
-diff --git a/kernel/rcu/tiny.c b/kernel/rcu/tiny.c
-index 4402d6f5f857..b3b3ce34df63 100644
---- a/kernel/rcu/tiny.c
-+++ b/kernel/rcu/tiny.c
-@@ -103,11 +103,11 @@ static inline bool rcu_reclaim_tiny(struct rcu_head *head)
- 	rcu_lock_release(&rcu_callback_map);
- 	return false;
- }
- 
- /* Invoke the RCU callbacks whose grace period has elapsed.  */
--static __latent_entropy void rcu_process_callbacks(struct softirq_action *unused)
-+static __latent_entropy void rcu_process_callbacks(void)
- {
- 	struct rcu_head *next, *list;
- 	unsigned long flags;
- 
- 	/* Move the ready-to-invoke callbacks to a local list. */
-diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-index e641cc681901..93bd665637c0 100644
---- a/kernel/rcu/tree.c
-+++ b/kernel/rcu/tree.c
-@@ -2853,11 +2853,11 @@ static __latent_entropy void rcu_core(void)
- 	// If strict GPs, schedule an RCU reader in a clean environment.
- 	if (IS_ENABLED(CONFIG_RCU_STRICT_GRACE_PERIOD))
- 		queue_work_on(rdp->cpu, rcu_gp_wq, &rdp->strict_work);
- }
- 
--static void rcu_core_si(struct softirq_action *h)
-+static void rcu_core_si(void)
- {
- 	rcu_core();
- }
- 
- static void rcu_wake_cond(struct task_struct *t, int status)
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 9057584ec06d..8dc9385f6da4 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -12481,11 +12481,11 @@ static int sched_balance_newidle(struct rq *this_rq, struct rq_flags *rf)
-  * - directly from the local scheduler_tick() for periodic load balancing
-  *
-  * - indirectly from a remote scheduler_tick() for NOHZ idle balancing
-  *   through the SMP cross-call nohz_csd_func()
-  */
--static __latent_entropy void sched_balance_softirq(struct softirq_action *h)
-+static __latent_entropy void sched_balance_softirq(void)
- {
- 	struct rq *this_rq = this_rq();
- 	enum cpu_idle_type idle = this_rq->idle_balance;
- 	/*
- 	 * If this CPU has a pending NOHZ_BALANCE_KICK, then do the
-diff --git a/kernel/softirq.c b/kernel/softirq.c
-index 02582017759a..d082e7840f88 100644
---- a/kernel/softirq.c
-+++ b/kernel/softirq.c
-@@ -549,11 +549,11 @@ static void handle_softirqs(bool ksirqd)
- 		prev_count = preempt_count();
- 
- 		kstat_incr_softirqs_this_cpu(vec_nr);
- 
- 		trace_softirq_entry(vec_nr);
--		h->action(h);
-+		h->action();
- 		trace_softirq_exit(vec_nr);
- 		if (unlikely(prev_count != preempt_count())) {
- 			pr_err("huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n",
- 			       vec_nr, softirq_to_name[vec_nr], h->action,
- 			       prev_count, preempt_count());
-@@ -698,11 +698,11 @@ void __raise_softirq_irqoff(unsigned int nr)
- 	lockdep_assert_irqs_disabled();
- 	trace_softirq_raise(nr);
- 	or_softirq_pending(1UL << nr);
- }
- 
--void open_softirq(int nr, void (*action)(struct softirq_action *))
-+void open_softirq(int nr, void (*action)(void))
- {
- 	softirq_vec[nr].action = action;
- }
- 
- /*
-@@ -758,12 +758,11 @@ static bool tasklet_clear_sched(struct tasklet_struct *t)
- 		  t->use_callback ? (void *)t->callback : (void *)t->func);
- 
- 	return false;
- }
- 
--static void tasklet_action_common(struct softirq_action *a,
--				  struct tasklet_head *tl_head,
-+static void tasklet_action_common(struct tasklet_head *tl_head,
- 				  unsigned int softirq_nr)
- {
- 	struct tasklet_struct *list;
- 
- 	local_irq_disable();
-@@ -803,20 +802,20 @@ static void tasklet_action_common(struct softirq_action *a,
- 		__raise_softirq_irqoff(softirq_nr);
- 		local_irq_enable();
- 	}
- }
- 
--static __latent_entropy void tasklet_action(struct softirq_action *a)
-+static __latent_entropy void tasklet_action(void)
- {
- 	workqueue_softirq_action(false);
--	tasklet_action_common(a, this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
-+	tasklet_action_common(this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
- }
- 
--static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
-+static __latent_entropy void tasklet_hi_action(void)
- {
- 	workqueue_softirq_action(true);
--	tasklet_action_common(a, this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
-+	tasklet_action_common(this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
- }
- 
- void tasklet_setup(struct tasklet_struct *t,
- 		   void (*callback)(struct tasklet_struct *))
- {
-diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index b8ee320208d4..836157e09e25 100644
---- a/kernel/time/hrtimer.c
-+++ b/kernel/time/hrtimer.c
-@@ -1755,11 +1755,11 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
- 				hrtimer_sync_wait_running(cpu_base, flags);
- 		}
- 	}
- }
- 
--static __latent_entropy void hrtimer_run_softirq(struct softirq_action *h)
-+static __latent_entropy void hrtimer_run_softirq(void)
- {
- 	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
- 	unsigned long flags;
- 	ktime_t now;
- 
-diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index 64b0d8a0aa0f..760bbeb1f331 100644
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -2438,11 +2438,11 @@ static void run_timer_base(int index)
- }
- 
- /*
-  * This function runs timers and the timer-tq in bottom half context.
-  */
--static __latent_entropy void run_timer_softirq(struct softirq_action *h)
-+static __latent_entropy void run_timer_softirq(void)
- {
- 	run_timer_base(BASE_LOCAL);
- 	if (IS_ENABLED(CONFIG_NO_HZ_COMMON)) {
- 		run_timer_base(BASE_GLOBAL);
- 		run_timer_base(BASE_DEF);
-diff --git a/lib/irq_poll.c b/lib/irq_poll.c
-index 2d5329a42105..08b242bbdbdf 100644
---- a/lib/irq_poll.c
-+++ b/lib/irq_poll.c
-@@ -73,11 +73,11 @@ void irq_poll_complete(struct irq_poll *iop)
- 	__irq_poll_complete(iop);
- 	local_irq_restore(flags);
- }
- EXPORT_SYMBOL(irq_poll_complete);
- 
--static void __latent_entropy irq_poll_softirq(struct softirq_action *h)
-+static void __latent_entropy irq_poll_softirq(void)
- {
- 	struct list_head *list = this_cpu_ptr(&blk_cpu_iopoll);
- 	int rearm = 0, budget = irq_poll_budget;
- 	unsigned long start_time = jiffies;
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 751d9b70e6ad..3ac02b0ca29e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5246,11 +5246,11 @@ int netif_rx(struct sk_buff *skb)
- 		local_bh_enable();
- 	return ret;
- }
- EXPORT_SYMBOL(netif_rx);
- 
--static __latent_entropy void net_tx_action(struct softirq_action *h)
-+static __latent_entropy void net_tx_action(void)
- {
- 	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
- 
- 	if (sd->completion_queue) {
- 		struct sk_buff *clist;
-@@ -6919,11 +6919,11 @@ static int napi_threaded_poll(void *data)
- 		napi_threaded_poll_loop(napi);
- 
- 	return 0;
- }
- 
--static __latent_entropy void net_rx_action(struct softirq_action *h)
-+static __latent_entropy void net_rx_action(void)
- {
- 	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
- 	unsigned long time_limit = jiffies +
- 		usecs_to_jiffies(READ_ONCE(net_hotdata.netdev_budget_usecs));
- 	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
 -- 
-2.45.2
+2.17.1
 
 
