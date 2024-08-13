@@ -1,92 +1,107 @@
-Return-Path: <netdev+bounces-117888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EFD94FAE8
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 03:00:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D5C994FB1C
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 03:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F7171C21115
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4902A1F22BA1
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C68E6FC5;
-	Tue, 13 Aug 2024 01:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A75B6FCC;
+	Tue, 13 Aug 2024 01:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dmcva77r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNC79f9S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A496FB9
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 01:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E78C1173F;
+	Tue, 13 Aug 2024 01:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723510836; cv=none; b=TMZFmf9vvQ4Cl7ldYYgrjmo0rgVEUd03MDdpPm0WR8NKLWbgkDdcKDzy8k1gAQgZwOlwYEKJpqUsNMuLn/IeCwkMnausmvLU1ImE9+wiFGyinkz6nfM6xfe47EHCUQmMCtIBQ86A9y5/0FD+6Wy7GGM0cs5rq2+MnrGB3SiFblw=
+	t=1723512790; cv=none; b=lCGe7l/eZi8c9QVkULbL1dEv9Uk4e4tV+cgsZM3X3yp9/YNyNoAeVibrQY3HS2cGHe5gMa1MupM58OhlGtLPw50LVY8bQWM+6r2BkN7p5KYQJU3LwnU7MciG4FBqNaYObKYq0MEOyCFVAg6yA6ibX8JYT4BjJhp1KlWAMRZLrKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723510836; c=relaxed/simple;
-	bh=dHMvEqAqg9wv21ihjZnoZlOhMrEyA5/lwKGaRnUacgw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U97lrAHoxv1X3s169O7b1kmjDBPYmZDfeRdWLQ2t9Y3Tc0zcGin7pazERpfCF2RpSqLKhfq1UJYSzZth2al6RETrrGMwyJprPI8AHme8nFIA9I3X5gC+YtndaXSkMQAb+rjR7nEFIXMzI5WIT9Oq/haBZJsxb8O/OQjWg19q+Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dmcva77r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38506C4AF0E;
-	Tue, 13 Aug 2024 01:00:36 +0000 (UTC)
+	s=arc-20240116; t=1723512790; c=relaxed/simple;
+	bh=QnIqOdRlXgAHdeoAf7GYTXyIHrTOC2FQsadg/IU5oao=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cyJfrCjT7rIfXdKIZWfCTBCOkGn10fwN9OyuzbP5DAWEXyQuwDUG/MNCz/eTjD3WXR7DSk9RWalylyJDWg94O7tUlxE5NjjN/5F1myRGvJ6U5mDEhuYE7ZdZ9qw3znUNKTiMJ3wbl4U2ZfdUZKrUsFXKX7qra/n6HebOHZeZP/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNC79f9S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB440C4AF0D;
+	Tue, 13 Aug 2024 01:33:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723510836;
-	bh=dHMvEqAqg9wv21ihjZnoZlOhMrEyA5/lwKGaRnUacgw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Dmcva77rFoIcCaybSI1XmXj4icIFRCxxDvXZXxRL0StoVpqolWGGZRJGpjKkKQjTM
-	 DRu4I4tMdXBPbdcBIUHBz7AbyB1QilMKaykqeuV/0c/YVTmyrqebBxttuTMOp7hDcM
-	 LU5Tww8zNVjqkfmEtaWlZB1FJQ4ZKFfAjhPrs/JSURC5eSORyiZjed4Jxxc3pZi9oO
-	 wAG3noXo+wzvRTjiMmmIXwhO0PEEbSmCw5eh1M/glgZzhLnucVx179QD+S8Z+Ssdju
-	 XBjq4xIt6ThwqDwL7VdEMUS9ZwayMpjIdgYsCEIvOksXQzkXxSv7rvJAt+e+xfc6uO
-	 5UKGgo9EaM/3Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F06382332D;
-	Tue, 13 Aug 2024 01:00:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1723512789;
+	bh=QnIqOdRlXgAHdeoAf7GYTXyIHrTOC2FQsadg/IU5oao=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JNC79f9SFF/uTToB2JU5w06EhaOeyvBP1g+a/QkZXX2U0zndkfsnqanPW1WnIOy7N
+	 pWjeXgr+S1MQ1I2CxuyT7h4MVKYWy1XkQIyYFkZbLcJgjVem9BBNE7hApxsUbyIW4D
+	 fotFmXmg0jMSQV3xTFvwDxwOFsCOEnqk9fKzDnjzuLhLmJD4drMzpg4SNxPqOtaq9x
+	 PZss4uxEzxQPR/zqAs/apU3pqdkhPMTQHUSv/Tq03DI6AXO6eqzVAC3/c/42rgWpzp
+	 G/FolFxrX4CGGBzSNe23OLdLUnyqEKQcDD61xkxxfO0bajuAd7AxN3WQT8yyd31864
+	 EH8vANEWrqFmA==
+Date: Mon, 12 Aug 2024 18:33:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Daniel Xu <dxu@dxuuu.xyz>, Lorenzo Bianconi
+ <lorenzo.bianconi@redhat.com>, Alexander Lobakin
+ <alexandr.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Larysa Zaremba <larysa.zaremba@intel.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+ "toke@redhat.com" <toke@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "Jesse Brandeburg"
+ <jesse.brandeburg@intel.com>, John Fastabend <john.fastabend@gmail.com>,
+ Yajun Deng <yajun.deng@linux.dev>, "Willem de Bruijn" <willemb@google.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <xdp-hints@xdp-project.net>
+Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch
+ to GRO from netif_receive_skb_list()
+Message-ID: <20240812183307.0b6fbd60@kernel.org>
+In-Reply-To: <99662019-7e9b-410d-99fe-a85d04af215c@intel.com>
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+	<20220628194812.1453059-33-alexandr.lobakin@intel.com>
+	<cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
+	<ZrRPbtKk7RMXHfhH@lore-rh-laptop>
+	<54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
+	<308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
+	<99662019-7e9b-410d-99fe-a85d04af215c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv6: eliminate ndisc_ops_is_useropt()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172351083512.1180801.3336772662367211099.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Aug 2024 01:00:35 +0000
-References: <20240730003010.156977-1-maze@google.com>
-In-Reply-To: <20240730003010.156977-1-maze@google.com>
-To: =?utf-8?q?Maciej_=C5=BBenczykowski_=3Cmaze=40google=2Ecom=3E?=@codeaurora.org
-Cc: zenczykowski@gmail.com, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- yoshfuji@linux-ipv6.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Jul 2024 17:30:10 -0700 you wrote:
-> as it doesn't seem to offer anything of value.
+On Fri, 9 Aug 2024 14:20:25 +0200 Alexander Lobakin wrote:
+> But I think one solution could be:
 > 
-> There's only 1 trivial user:
->   int lowpan_ndisc_is_useropt(u8 nd_opt_type) {
->     return nd_opt_type == ND_OPT_6CO;
->   }
+> 1. We create some generic structure for cpumap, like
 > 
-> [...]
+> struct cpumap_meta {
+> 	u32 magic;
+> 	u32 hash;
+> }
+> 
+> 2. We add such check in the cpumap code
+> 
+> 	if (xdpf->metalen == sizeof(struct cpumap_meta) &&
+> 	    <here we check magic>)
+> 		skb->hash = meta->hash;
+> 
+> 3. In XDP prog, you call Rx hints kfuncs when they're available, obtain
+> RSS hash and then put it in the struct cpumap_meta as XDP frame metadata.
 
-Here is the summary with links:
-  - [net-next] ipv6: eliminate ndisc_ops_is_useropt()
-    https://git.kernel.org/netdev/net-next/c/246ef40670b7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I wonder what the overhead of skb metadata allocation is in practice.
+With Eric's "return skb to the CPU of origin" we can feed the lockless
+skb cache one the right CPU, and also feed the lockless page pool
+cache. I wonder if batched RFS wouldn't be faster than the XDP thing
+that requires all the groundwork.
 
