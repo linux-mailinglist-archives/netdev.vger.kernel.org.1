@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-118032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274169505C5
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:58:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B13559505B1
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13B64B27E68
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:57:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E38311C20D71
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDE719CCFC;
-	Tue, 13 Aug 2024 12:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8018119ADA3;
+	Tue, 13 Aug 2024 12:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="WnjhTiWo"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="pmj3izJ7"
 X-Original-To: netdev@vger.kernel.org
 Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A5319B580
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 12:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B8819AD8D
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 12:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723553782; cv=pass; b=HEVRAxc4l2sMKS004C8T3BqA1Bm/l66A7JBgvGhaRZULJT2ORy7gPShDwBUDywMofHUJiiYCAKaSX/FejE8gc88SkbDdKqlnhRhKy1CTsFEhosOr1u4QCiudkIamyJ3kNDCE2S9DIk0W0QldkQmYPYwyLIUH6jWAoFJJx3FmX0w=
+	t=1723553787; cv=pass; b=QdjUmK6HB0rS3ymtYbSlLP7nkrhhSMjDwXUqZIG/H1uY7M/bkaT6YrFyHpXhpuXUa19va5U1sEQoFOGfOuamWO4qCZ+cXeu0GduzjSCkiJy18vfkFZSmUorF9azefc8sAyn2d/KiJesBs6nf12PZJCyT41DFFus5WVAzCsi/XaY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723553782; c=relaxed/simple;
-	bh=csLIXwhzVMKXxdpYpS2z2tH4FIquiExDW33a5MAsjlk=;
+	s=arc-20240116; t=1723553787; c=relaxed/simple;
+	bh=dRKKVpf7HNPCUgSlJykr6sV1dSg68HuKwGhQyF/66tg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eLPYP/LoWJqd6uK3wMmxD8ONGw0yVW8E/TDCCZHyCH0g+946WveXDgFqFllL4A2YNlua30cjUMYuvMfV85FxA+OjLo8wjD6B5+YN2wBsKUADlsUaRe6qhVa/xBgxOJMPMlaee2rQK+gK3ilmctQ59Bj4xEJMO8yIWJp6qug5tHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=WnjhTiWo; arc=pass smtp.client-ip=136.143.188.54
+	 MIME-Version; b=RngAadTwCnV2eAOXTLSlCEYY/om4NJb2HIscBHDF0V7foWBWGLSc1h7jJ/kn6eptSWCLCDfUQKchxz5D27Ht/lFiZXkICkdqkxloIzw+7bOhz0fRTh0P3WnaIlFmH5yyJI3gRr5oVi/i5Kn/2PzDOhQ702UaMVoWYF1OCyK8tLE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=pmj3izJ7; arc=pass smtp.client-ip=136.143.188.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
 Delivered-To: maciek@machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1723553774; cv=none; 
+ARC-Seal: i=1; a=rsa-sha256; t=1723553777; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=GM6Ga5kUKy2MIaQMV++lyPuVVJQCHH3citrF6WXZWGTyJoRxkSZ+OLuJE4MfAcpk/hdamp7ehG60nv4SaWtc0yg9TkdU48PJpTs0yqDM0aQnrJWfzwpjmdWSPu8HyRObEliG0l1MiINF9gyfRneazKfRF5OdqHOj53T03PBomgc=
+	b=NhSn3oVXwo3IUXMhGk7Tw+xDSKnItdyeRn1ZRnNdKOxdplZ1P0kMvov8CxGm50zt5rI6A8nJTC2RoRJLlSnkTb6j7TCnFHNyQuIq7x3zzXYF9nkbxRYt7Oqf3C6+oZZsKtiPnmewcPlMzDKGN3VNzRQyLUCbOE1cy/HorwiJchs=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723553774; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=vMibIEdDAvusM9BkQQAIy/PeiFmeVAawxS4pM2gWLDA=; 
-	b=Hm1e3tC4BRXWIHXElhRxm5Y7hen7B1rckec0qlutuCkIf5wcRgndotag5YNe5KauSjdA0m834PMKJ4q7Q+joI6ynGBbALL2NJd1HpZk1IR+F17dB4k6KF2qS/q4UQ5X1g7RAceXP5LGIoUeMhKjRdRXtvRu8c1L1y+z6d3Uz4+4=
+	t=1723553777; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=5KzrrdkmMb5M8nz9an5gcqE+De9mYbddjo+yWqmV+7w=; 
+	b=dTfRRCJdtMiE1NenJxtmiEHoGUugWjro/rUImZCllJCzjY7x4Q4x+nYnn3KS5K5DtdUdG1VsJ/1m6jXQRWpsXmxs2lCkm7ppVk9yMe+9lWfYc2S25tAY8hkC08BZAJDk34wfLPlwQQEzjaRmwsteoqCzcdB37rWI759vL7cuJAk=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=machnikowski.net;
 	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
 	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723553774;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723553777;
 	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
 	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Reply-To;
-	bh=vMibIEdDAvusM9BkQQAIy/PeiFmeVAawxS4pM2gWLDA=;
-	b=WnjhTiWo6UXXrokND5khgeY0cpSrDr+xmSp/dQTGVj+3FAqltYGlt/RiCIP40qHJ
-	6x4DNmX0nvwcG3z2t2pEGifILKHOhxkE/C+gp/obJLZsoMWuLzRJtaPUkAym6CIvF/r
-	hDhITF4Bc5FWnzPxGSsQIMq1yx3k2U9HYItandcXGzufCWObce+C4ykU7Aa6aCO7dX8
-	PPdeCI33Q2654wBbpVoDy0WVc1UgIxF4dtL/78SJ+umBuunVo8hHUQgcEISKH+I0rc8
-	rb618h5gJZSIIkzwQR8XvQKFfMLxQ0OViTtBLEb/pPcpeaUEmQffwdWMwdchS+oJwQb
-	HXSisM6eWQ==
-Received: by mx.zohomail.com with SMTPS id 1723553773143674.3065954727515;
-	Tue, 13 Aug 2024 05:56:13 -0700 (PDT)
+	bh=5KzrrdkmMb5M8nz9an5gcqE+De9mYbddjo+yWqmV+7w=;
+	b=pmj3izJ77kBfH68tbG94UL16akNz6BV2h07xdpJr/wbowncGFFv2uGC8bTif1IjR
+	0dQSOMJTVPSOqmtaBlRnO52EeWDv9QHnwb+fITagDtFCFcPwP7vK+VOrQknaRa8+Uq+
+	8r71h4aNXZqYwZD/uXX2vXJrY8wba3ay/3dwLG2XgNevo6GHYABFn2DpY8kyeHaynja
+	suypLKagEuAqFBW2PtXgSe5jjAaFJeoATpYuAWhm0Fuuow3DvtF3NbNx3Lva3+fJ6u3
+	E1h/3gPSpW3tGOox/JMciFpISXOvTwegUDcCFRa+c7pL2+ikxMytaBVoMOZVjqmrV8K
+	olMYFGMQUQ==
+Received: by mx.zohomail.com with SMTPS id 17235537763111005.0319638378652;
+	Tue, 13 Aug 2024 05:56:16 -0700 (PDT)
 From: Maciek Machnikowski <maciek@machnikowski.net>
 To: maciek@machnikowski.net
 Cc: netdev@vger.kernel.org,
@@ -63,9 +63,9 @@ Cc: netdev@vger.kernel.org,
 	vadfed@meta.com,
 	darinzon@amazon.com,
 	kuba@kernel.org
-Subject: [RFC 2/3] ptp: Implement support for esterror in ptp_mock
-Date: Tue, 13 Aug 2024 12:56:01 +0000
-Message-Id: <20240813125602.155827-3-maciek@machnikowski.net>
+Subject: [RFC 3/3] ptp: Add setting esterror and reading timex structure
+Date: Tue, 13 Aug 2024 12:56:02 +0000
+Message-Id: <20240813125602.155827-4-maciek@machnikowski.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240813125602.155827-1-maciek@machnikowski.net>
 References: <20240813125602.155827-1-maciek@machnikowski.net>
@@ -78,73 +78,114 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
 
-Implement basic example of handling the esterror using
-getesterror/setesterror functions of the ptp_clock_info
+Implement setting the esterror using clock_adjtime for ptp clocks
+and reading the clock setting using timex structure and
+clock_adjtime
 
 Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
 ---
- drivers/ptp/ptp_mock.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ tools/testing/selftests/ptp/testptp.c | 39 +++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/ptp/ptp_mock.c b/drivers/ptp/ptp_mock.c
-index e7b459c846a2..1786da790f82 100644
---- a/drivers/ptp/ptp_mock.c
-+++ b/drivers/ptp/ptp_mock.c
-@@ -35,10 +35,13 @@
+diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
+index 011252fe238c..38405803b881 100644
+--- a/tools/testing/selftests/ptp/testptp.c
++++ b/tools/testing/selftests/ptp/testptp.c
+@@ -117,6 +117,7 @@ static void usage(char *progname)
+ {
+ 	fprintf(stderr,
+ 		"usage: %s [options]\n"
++		" -a val     adjust the estimated error by 'val' ns\n"
+ 		" -c         query the ptp clock's capabilities\n"
+ 		" -d name    device to open\n"
+ 		" -e val     read 'val' external time stamp events\n"
+@@ -140,6 +141,7 @@ static void usage(char *progname)
+ 		" -H val     set output phase to 'val' nanoseconds (requires -p)\n"
+ 		" -w val     set output pulse width to 'val' nanoseconds (requires -p)\n"
+ 		" -P val     enable or disable (val=1|0) the system clock PPS\n"
++		" -r         read clock info in the  timex structure using clock_adjtime\n"
+ 		" -s         set the ptp clock time from the system time\n"
+ 		" -S         set the system time from the ptp clock time\n"
+ 		" -t val     shift the ptp clock time by 'val' seconds\n"
+@@ -175,12 +177,14 @@ int main(int argc, char *argv[])
+ 	int adjns = 0;
+ 	int adjphase = 0;
+ 	int capabilities = 0;
++	long esterror = 0;
+ 	int extts = 0;
+ 	int flagtest = 0;
+ 	int gettime = 0;
+ 	int index = 0;
+ 	int list_pins = 0;
+ 	int pct_offset = 0;
++	int readclk = 0;
+ 	int getextended = 0;
+ 	int getcross = 0;
+ 	int n_samples = 0;
+@@ -198,8 +202,11 @@ int main(int argc, char *argv[])
  
- struct mock_phc {
- 	struct ptp_clock_info info;
-+	struct timespec64 sys_ts;
-+	struct timespec64 hw_ts;
- 	struct ptp_clock *clock;
- 	struct timecounter tc;
- 	struct cyclecounter cc;
- 	spinlock_t lock;
-+	long esterror;
- };
+ 	progname = strrchr(argv[0], '/');
+ 	progname = progname ? 1+progname : argv[0];
+-	while (EOF != (c = getopt(argc, argv, "cd:e:f:F:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xz"))) {
++	while (EOF != (c = getopt(argc, argv, "a:cd:e:f:F:ghH:i:k:lL:n:o:p:P:rsSt:T:w:x:Xz"))) {
+ 		switch (c) {
++		case 'a':
++			esterror = atoi(optarg);
++			break;
+ 		case 'c':
+ 			capabilities = 1;
+ 			break;
+@@ -250,6 +257,9 @@ int main(int argc, char *argv[])
+ 		case 'P':
+ 			pps = atoi(optarg);
+ 			break;
++		case 'r':
++			readclk = 1;
++			break;
+ 		case 's':
+ 			settime = 1;
+ 			break;
+@@ -290,7 +300,6 @@ int main(int argc, char *argv[])
+ 			return -1;
+ 		}
+ 	}
+-
+ 	fd = open(device, O_RDWR);
+ 	if (fd < 0) {
+ 		fprintf(stderr, "opening %s: %s\n", device, strerror(errno));
+@@ -621,6 +630,32 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
  
- static u64 mock_phc_cc_read(const struct cyclecounter *cc)
-@@ -100,6 +103,31 @@ static int mock_phc_gettime64(struct ptp_clock_info *info, struct timespec64 *ts
++	if (esterror) {
++		memset(&tx, 0, sizeof(tx));
++		tx.modes = ADJ_ESTERROR;
++		tx.esterror = esterror;
++		if (clock_adjtime(clkid, &tx))
++			perror("clock_adjtime");
++		else
++			puts("esterror adjustment okay");
++	}
++
++	if (readclk) {
++		struct timex clk_info = {0};
++
++		memset(&tx, 0, sizeof(tx));
++		if (clock_adjtime(clkid, &tx)) {
++			perror("clock_adjtime");
++		} else {
++			printf("clock_adjtime:\n"
++			       "\tstatus %d,\n"
++			       "\toffset %ld,\n"
++			       "\tfreq %ld,\n"
++			       "\testerror %ld\n",
++			       tx.status, tx.offset, tx.freq, tx.esterror);
++		}
++	}
++
+ 	close(fd);
  	return 0;
  }
- 
-+static int mock_phc_getesterror(struct ptp_clock_info *info, long *esterror,
-+				struct timespec64 *hw_ts, struct timespec64 *sys_ts)
-+{
-+	struct mock_phc *phc = info_to_phc(info);
-+
-+	*esterror = phc->esterror;
-+	if (hw_ts)
-+		*hw_ts = phc->hw_ts;
-+	if (sys_ts)
-+		*sys_ts = phc->sys_ts;
-+
-+	return 0;
-+}
-+
-+static int mock_phc_setesterror(struct ptp_clock_info *info, long esterror)
-+{
-+	struct mock_phc *phc = info_to_phc(info);
-+
-+	phc->esterror = esterror;
-+	phc->hw_ts = ns_to_timespec64(timecounter_read(&phc->tc));
-+	phc->sys_ts = ns_to_timespec64(ktime_get_raw_ns());
-+
-+	return 0;
-+}
-+
- static long mock_phc_refresh(struct ptp_clock_info *info)
- {
- 	struct timespec64 ts;
-@@ -134,6 +162,8 @@ struct mock_phc *mock_phc_create(struct device *dev)
- 		.adjtime	= mock_phc_adjtime,
- 		.gettime64	= mock_phc_gettime64,
- 		.settime64	= mock_phc_settime64,
-+		.getesterror	= mock_phc_getesterror,
-+		.setesterror	= mock_phc_setesterror,
- 		.do_aux_work	= mock_phc_refresh,
- 	};
- 
 -- 
 2.34.1
 
