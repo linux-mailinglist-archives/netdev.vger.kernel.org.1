@@ -1,299 +1,160 @@
-Return-Path: <netdev+bounces-117917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342DC94FCEF
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:40:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA7F94FD47
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D929B228B9
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:40:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0D681F21B4C
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 05:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEEF1CF9A;
-	Tue, 13 Aug 2024 04:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FC92374C;
+	Tue, 13 Aug 2024 05:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CZWsV7+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1768210EC
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 04:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05A814A82
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 05:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723523847; cv=none; b=SeAMg+dS1yDyvlGIbLg5lGH/OLae1hakDVsgiB0pAdCZjJKUmwnjXtbtRzcfNXOGmtp3QgwtCnsjbe+mWu/Vv7KvxRK+Ev0N4t9h4jyu/m7hS2ysZciXWL+iMCKvOELKIkYJzYGDmLkwnnKNMnObjfXlq62s4NLXNgqrooCln9M=
+	t=1723527535; cv=none; b=Hbc/g0GdB2y7wjN2zr1c9n0K968Jq0zRfG+iNaC0xRymn9KSaOHY0ftuJ4Qcp5W/TR5yW9Zm+GVkf/RuATnejHrcf0ZRF+oEgK2YmR2YRzXTktFCMX1rGM2Jx/3Dac4y1MGzuMr2ixrvuNmIcUCI1khDSKqJ5vgvfCZ4t6QwalU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723523847; c=relaxed/simple;
-	bh=9XQ+l8dVBD+WczosP8bbD5GOhPeI+bJoLGJ5Mc4wNuU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TyC3ken7cPxI9Rbmsmn6Mt2FGDKrlHwOotIR61hWBUbu89EPVh7Ghz9R5aDiiimLocZ3X+UBjlIkwkidObsopQqDZNUB42+wY2u25CYR9+hdtAQ1y+Vtnro5s7nJfe8pHx/NHrLTQTxhfClurODCTMr63z5MWdQ7uwlJ1eMOZtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f95058fb9so693293539f.0
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 21:37:25 -0700 (PDT)
+	s=arc-20240116; t=1723527535; c=relaxed/simple;
+	bh=4S7WM7RybjiTPLle/bWEVEs4rbk05HHoUl3uV2tpW8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0FofFv4HaYLBKE5n6WIP+7dpd6PNP23MLSO3OTONa6GTQhZ8JL7/thjtemrWeIss8EGE8o8F4+gWXWiAaYmQcRpfeKrnWr1Ar6fwo/epnqNR/3yNrkQZhsxo+rJt0+b7D4Fe5NoWhAZMpOTbm/8CdYHin0BxRu1xhD3sbz5g80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CZWsV7+V; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-429c4a4c6a8so25299315e9.0
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:38:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723527531; x=1724132331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7PnScSw7uJC5Aim3AFPCq508Jec7s6BJ/aiCOYhCdJo=;
+        b=CZWsV7+Vpu5L6okX7MIu52qw56AddMmtKBnoh5RkDOEorDN6iPCTnDQC5P0tTTWKDC
+         2ANniQDJF83Tv52OlI2vIqjFkRZCkF0pFHS+uHVJtl51npahiVXjHFs0UqHPffBC0SZe
+         t7CRMD7Ndtpza1jplMTom+IGrG1vvfRcyeFw9WIkYhIQ4Vua0oXJYo6e4ovLtXZoh0GB
+         pcX3jX+qz97MhQ4H+xYixG2v618wrpwTeaNwcrKIdaRphqUIEvYxZdGTlp8yymcb0aNu
+         KcjwqcclRFXVbs8+09+d3aRUYO0Thyq3ibrged+to3m9DA/eDRoX4TJOv4hVAw3BH9yf
+         8Yjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723523845; x=1724128645;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gWOAZ5lE73P5PioQsL145/zO+FEe7lzDRGwAr3nTRd8=;
-        b=W0Z1bdMH24kpQH+kFJp6RANowj2yZSHN/+J9LspRUWNZUEOrW0KrPR0SZJzjhAAwHN
-         Thgqq4xuzZZ58N7BUxalCupbCZ3F/9KcGReAdhKCQI+4DSxep5Yt3yEdkZi/ratm48qN
-         BZ0iWWsMOpTKY26vlPhPc2qwn4+EIrB2b/Q2JPaU8H3BmBlMhLyJOkrY6fObctpFFNYN
-         bh02bnOxEAvZZ4wOKlAamHONcqMVtEysFDlVI7J7UfFx0UfSkMUbsxLBr7MY0ny2xDXt
-         4LRB62lkTsHkuKTIT+KIrABhhLoPboP29S3nzioTpzmFGJBU8sv21p8r2/69u6qtV0mZ
-         RKyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVlzLJd1zrDFsgmjwv3cufXrofxTBYqoXhaIq1uxu0rJ5iff0pa40qSPROXd1YYvb+0vLiEDODFSlZJW3CRY4TVghubyUr
-X-Gm-Message-State: AOJu0YwCwnVoJr2VX9kDfFGGXnIVpUuAqWYNyeL/CURkcLZX94fke0nb
-	OefKnp/ngX64J/wPfAxRdggWhOot0xd2czfRwjn19qR4Ak9j4U8cuJrIDMLe0ezdqYQ+7o5Hud+
-	Ka+7y+b0pRU6j1TO8BazFhoL4pl8I7mv2kDQ++hrk+oOKIndkaYXtPjs=
-X-Google-Smtp-Source: AGHT+IH8KRxJRZg7KG7BonMWzd6BDWeqhrduwCL5gkimhh/jYyo+dxzjDlGnO1s7JT0t1gLxk/ApcrnqqzjQsibkDk2ex1FKBg8A
+        d=1e100.net; s=20230601; t=1723527531; x=1724132331;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7PnScSw7uJC5Aim3AFPCq508Jec7s6BJ/aiCOYhCdJo=;
+        b=VqhMotLMoMlwp+hOdwNBH3EH421AmrCHBqfA5Ip0cHKF48MxJbQnx67xBSHTLBpKtD
+         17HoUKI5UL/GhZ1I1H6ga6qOppPdVcKmz7j/pVJwxPhpJAQ4iHmadZuFw0qisfnyMWB+
+         qEZ6hhkKzzz72/AEE4a4Wl0IGARPgT8i3PSNX88Nur5DNSx9EIa71n+eTZ8w8lHOEVdQ
+         TGelL3vpN3deFnkILOd8jjg3aXTufI16/gN3EmhLu8BY18qoiwCOoA42DXlTBqQNriUU
+         hVkektfwFKQNw+Sy/q4S1O/99d1ZJOYZ+Fkhb2eE940/QW8EcCRDs9WNm535wEkvph/p
+         qZKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHyr72ChhJ67L+PHFVfGW9qR0c/0Fwu57RHa7EoSMWqfe6rrEfAmxUSHrDj6sbxC+xAfea7GA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKg8SD0eN2JaxBySkWtNPtGIrfHPUkF7HZZGWSqyJ/N79Qk6Cf
+	eOUIHpUjZat8HCWnEcEIRAna3i2rNK2W5Jjt5WCr+lhcJCYA5+D7sw1lxssFhQc=
+X-Google-Smtp-Source: AGHT+IEYKBlRPX9bVKp8cRXDSRgCz2eMMxWkFhQ2MW3khxllq0ePcf6gQsDNpa40p6T/snlsK+dxyg==
+X-Received: by 2002:a05:600c:450d:b0:428:640:c1b1 with SMTP id 5b1f17b1804b1-429d481a198mr17583735e9.17.1723527530566;
+        Mon, 12 Aug 2024 22:38:50 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ebd372fsm9117700f8f.108.2024.08.12.22.38.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 22:38:50 -0700 (PDT)
+Date: Tue, 13 Aug 2024 07:38:46 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
+Message-ID: <ZrrxZnsTRw2WPEsU@nanopsycho.orion>
+References: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+ <ZquJWp8GxSCmuipW@nanopsycho.orion>
+ <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
+ <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
+ <74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
+ <ZrHLj0e4_FaNjzPL@nanopsycho.orion>
+ <f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
+ <20240812082544.277b594d@kernel.org>
+ <Zro9PhW7SmveJ2mv@nanopsycho.orion>
+ <20240812104221.22bc0cca@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:861a:b0:4c0:9a05:44c4 with SMTP id
- 8926c6da1cb9f-4ca9f43494amr147312173.0.1723523844761; Mon, 12 Aug 2024
- 21:37:24 -0700 (PDT)
-Date: Mon, 12 Aug 2024 21:37:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000877f44061f892ace@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in ath9k_hif_usb_firmware_cb (3)
-From: syzbot <syzbot+e9b1ff41aa6a7ebf9640@syzkaller.appspotmail.com>
-To: kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, toke@toke.dk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812104221.22bc0cca@kernel.org>
 
-Hello,
+Mon, Aug 12, 2024 at 07:42:21PM CEST, kuba@kernel.org wrote:
+>On Mon, 12 Aug 2024 18:50:06 +0200 Jiri Pirko wrote:
+>> Mon, Aug 12, 2024 at 05:25:44PM CEST, kuba@kernel.org wrote:
+>> >I think the confusion is primarily about the parent / child.
+>> >input and output should be very clear, IMO.  
+>> 
+>> For me, "inputs" and "output" in this context sounds very odd. It should
+>> be children and parent, isn't it. Confused...
+>
+>Parent / child is completely confusing. Let's not.
+>
+>User will classify traffic based on 'leaf' attributes.
+>Therefore in my mind traffic enters the tree at the "leaves", 
+>and travels towards the root (whether or not that's how HW 
+>evaluates the hierarchy).
+>
+>This is opposite to how trees as an data structure are normally
+>traversed. Hence I find the tree analogy to be imperfect.
 
-syzbot found the following issue on:
-
-HEAD commit:    eb5e56d14912 Merge tag 'platform-drivers-x86-v6.11-2' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=137edff9980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e8a2eef9745ade09
-dashboard link: https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a6552acb8476/disk-eb5e56d1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5c0963cd33df/vmlinux-eb5e56d1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7ba7283f6380/bzImage-eb5e56d1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e9b1ff41aa6a7ebf9640@syzkaller.appspotmail.com
-
-INFO: task kworker/0:7:5284 blocked for more than 143 seconds.
-      Not tainted 6.11.0-rc2-syzkaller-00011-geb5e56d14912 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/0:7     state:D stack:13232 pid:5284  tgid:5284  ppid:2      flags:0x00004000
-Workqueue: events request_firmware_work_func
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5188 [inline]
- __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
- __schedule_loop kernel/sched/core.c:6606 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6621
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- device_lock include/linux/device.h:1009 [inline]
- ath9k_hif_usb_firmware_fail drivers/net/wireless/ath/ath9k/hif_usb.c:1163 [inline]
- ath9k_hif_usb_firmware_cb+0x34a/0x4b0 drivers/net/wireless/ath/ath9k/hif_usb.c:1296
- request_firmware_work_func+0x1a4/0x280 drivers/base/firmware_loader/main.c:1167
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task udevd:2711 blocked for more than 144 seconds.
-      Not tainted 6.11.0-rc2-syzkaller-00011-geb5e56d14912 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:udevd           state:D stack:24864 pid:2711  tgid:2711  ppid:4679   flags:0x00000002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5188 [inline]
- __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
- __schedule_loop kernel/sched/core.c:6606 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6621
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- device_lock include/linux/device.h:1009 [inline]
- uevent_show+0x17d/0x340 drivers/base/core.c:2743
- dev_attr_show+0x55/0xc0 drivers/base/core.c:2437
- sysfs_kf_seq_show+0x331/0x4c0 fs/sysfs/file.c:59
- seq_read_iter+0x445/0xd60 fs/seq_file.c:230
- new_sync_read fs/read_write.c:395 [inline]
- vfs_read+0x9bd/0xbc0 fs/read_write.c:476
- ksys_read+0x1a0/0x2c0 fs/read_write.c:619
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa861574b6a
-RSP: 002b:00007ffd4a139b78 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-RAX: ffffffffffffffda RBX: 00005608f0417730 RCX: 00007fa861574b6a
-RDX: 0000000000001000 RSI: 00005608f0434930 RDI: 0000000000000008
-RBP: 00005608f0417730 R08: 0000000000000008 R09: 0000000000000020
-R10: 000000000000010f R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000003fff R14: 00007ffd4a13a058 R15: 000000000000000a
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/30:
- #0: ffffffff8e9382a0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:326 [inline]
- #0: ffffffff8e9382a0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #0: ffffffff8e9382a0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6620
-2 locks held by getty/4986:
- #0: ffff88802b1460a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc900034b32f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6ac/0x1e00 drivers/tty/n_tty.c:2211
-3 locks held by kworker/0:7/5284:
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
- #1: ffffc90004097d00 ((work_completion)(&fw_work->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
- #1: ffffc90004097d00 ((work_completion)(&fw_work->work)){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
- #2: ffff888023f4b190 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1009 [inline]
- #2: ffff888023f4b190 (&dev->mutex){....}-{3:3}, at: ath9k_hif_usb_firmware_fail drivers/net/wireless/ath/ath9k/hif_usb.c:1163 [inline]
- #2: ffff888023f4b190 (&dev->mutex){....}-{3:3}, at: ath9k_hif_usb_firmware_cb+0x34a/0x4b0 drivers/net/wireless/ath/ath9k/hif_usb.c:1296
-3 locks held by kworker/u8:12/7485:
- #0: ffff88802ad75948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
- #0: ffff88802ad75948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
- #1: ffffc900035a7d00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
- #1: ffffc900035a7d00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
- #2: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+0xd0/0x16f0 net/ipv6/addrconf.c:4194
-3 locks held by kworker/1:5/14520:
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
- #1: ffffc90003db7d00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
- #1: ffffc90003db7d00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
- #2: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:276
-3 locks held by kworker/0:0/22216:
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
- #0: ffff888015880948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
- #1: ffffc90003977d00 ((work_completion)(&(&devlink->rwork)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
- #1: ffffc90003977d00 ((work_completion)(&(&devlink->rwork)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
- #2: ffffffff8e93d678 (rcu_state.exp_mutex){+.+.}-{3:3}, at: exp_funnel_lock kernel/rcu/tree_exp.h:328 [inline]
- #2: ffffffff8e93d678 (rcu_state.exp_mutex){+.+.}-{3:3}, at: synchronize_rcu_expedited+0x451/0x830 kernel/rcu/tree_exp.h:958
-5 locks held by kworker/1:4/1612:
-1 lock held by syz.1.6316/1883:
-4 locks held by udevd/2711:
- #0: ffff888074214e80 (&p->lock){+.+.}-{3:3}, at: seq_read_iter+0xb7/0xd60 fs/seq_file.c:182
- #1: ffff88802cf7a088 (&of->mutex#2){+.+.}-{3:3}, at: kernfs_seq_start+0x53/0x3b0 fs/kernfs/file.c:154
- #2: ffff88805dac6878 (kn->active#5){++++}-{0:0}, at: kernfs_seq_start+0x72/0x3b0 fs/kernfs/file.c:155
- #3: ffff888056d20190 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1009 [inline]
- #3: ffff888056d20190 (&dev->mutex){....}-{3:3}, at: uevent_show+0x17d/0x340 drivers/base/core.c:2743
-3 locks held by syz-executor/4016:
- #0: ffff88805bc68d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
- #0: ffff88805bc68d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_unregister_dev+0x203/0x510 net/bluetooth/hci_core.c:2692
- #1: ffff88805bc68078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x572/0x11a0 net/bluetooth/hci_sync.c:5131
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1977 [inline]
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xa6/0x240 net/bluetooth/hci_conn.c:2592
-3 locks held by syz-executor/4137:
- #0: ffff88805b408d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
- #0: ffff88805b408d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_unregister_dev+0x203/0x510 net/bluetooth/hci_core.c:2692
- #1: ffff88805b408078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x572/0x11a0 net/bluetooth/hci_sync.c:5131
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1977 [inline]
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xa6/0x240 net/bluetooth/hci_conn.c:2592
-3 locks held by syz-executor/4253:
- #0: ffff88806a4bcd80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
- #0: ffff88806a4bcd80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_unregister_dev+0x203/0x510 net/bluetooth/hci_core.c:2692
- #1: ffff88806a4bc078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x572/0x11a0 net/bluetooth/hci_sync.c:5131
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1977 [inline]
- #2: ffffffff8fdecfa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xa6/0x240 net/bluetooth/hci_conn.c:2592
-1 lock held by syz.2.6861/4431:
- #0: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
- #0: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x1b0 drivers/net/tun.c:3510
-1 lock held by syz.0.6862/4436:
- #0: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
- #0: ffffffff8fc81688 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x1b0 drivers/net/tun.c:3510
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.11.0-rc2-syzkaller-00011-geb5e56d14912 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
- watchdog+0xfee/0x1030 kernel/hung_task.c:379
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 7493 Comm: kworker/u8:17 Not tainted 6.11.0-rc2-syzkaller-00011-geb5e56d14912 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:unwind_next_frame+0x8ea/0x2a00 arch/x86/kernel/unwind_orc.c:517
-Code: fd 04 0f 84 6c 01 00 00 83 fd 05 0f 85 ff 02 00 00 e8 ca 56 52 00 48 8b 44 24 58 42 80 3c 28 00 74 08 48 89 df e8 46 90 b9 00 <48> 8b 33 48 8b 54 24 18 48 8d 5a 01 48 89 d0 48 c1 e8 03 42 0f b6
-RSP: 0018:ffffc90003ab7308 EFLAGS: 00000246
-RAX: 1ffff92000756e83 RBX: ffffc90003ab7418 RCX: ffff88804523da00
-RDX: 0000000000000000 RSI: ffffffff8e7a3d60 RDI: 0000000000000005
-RBP: 0000000000000005 R08: 0000000000000005 R09: ffffffff81411f0e
-R10: 0000000000000008 R11: ffff88804523da00 R12: ffffffff9030505c
-R13: dffffc0000000000 R14: ffffc90003ab7430 R15: 1ffff92000756e7c
-FS:  0000000000000000(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056487295a131 CR3: 000000000e734000 CR4: 00000000003506f0
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2252 [inline]
- slab_free mm/slub.c:4473 [inline]
- kfree+0x149/0x360 mm/slub.c:4594
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1580 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x1b1e/0x2d70 net/mac80211/ibss.c:1606
- ieee80211_iface_process_skb net/mac80211/iface.c:1588 [inline]
- ieee80211_iface_work+0x8a5/0xf20 net/mac80211/iface.c:1642
- cfg80211_wiphy_work+0x2db/0x490 net/wireless/core.c:440
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Normally? Tree as a datastructure could be traversed freely, why it
+can't? In this case, it is traversed from leaf to root. It's still a
+tree. Why the tree analogy is imperfect. From what I see, it fits 100%.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>But yes, root and leaf are definitely better than parent / child.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Node has 0-n children and 0-1 parents. In case it has 0 children, it's a
+leaf, in case it has 0 parents, it's a root.
+This is the common tree terminology, isn't it?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>
+>> >> Also while at it, I think renaming the 'group()' operation as 
+>> >> 'node_set()' could be clearer (or at least less unclear), WDYT?  
+>> >
+>> >No idea how we arrived at node_set(), and how it can possibly   
+>> 
+>> subtree_set() ?
+>
+>The operation is grouping inputs and creating a scheduler node.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Creating a node inside a tree, isn't it? Therefore subtree.
 
-If you want to undo deduplication, reply with:
-#syz undup
+But it could be unified to node_set() as Paolo suggested. That would
+work for any node, including leaf, tree, non-existent internal node.
+
+
+>
+>> >represent a grouping operation.
+>> >The operations is grouping inputs and creating a scheduler node.
+>> >  
+>> >> Note: I think it's would be more user-friendly to keep a single 
+>> >> delete/get/dump operation for 'nodes' and leaves.  
+>> >
+>> >Are you implying that nodes and leaves are different types of objects?
+>> >Aren't leaves nodes without any inputs?  
+>> 
+>> Agree. Same op would be nice for both.
 
