@@ -1,148 +1,248 @@
-Return-Path: <netdev+bounces-117956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A20950100
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:12:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2EE950127
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E37051F2411A
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:12:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C35581C20BDC
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F3118953E;
-	Tue, 13 Aug 2024 09:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC7216D33F;
+	Tue, 13 Aug 2024 09:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="BQi6AnwT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0JKsO9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A68217BB19
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 09:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADBB210E7;
+	Tue, 13 Aug 2024 09:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723540274; cv=none; b=cANLtodKe/4TkXQRjE5o9zh2aZQTTDoHckVutEUF+HMrvwxR2GmMYn88gnr38yLoY2bS6RBLVT3qJuH8+BCFt7HVaDCaeuk9NNtZoFtoS09ozPqovXYakaxqpVVGj64StQE5cxOKvxla9xGXXDA9l8uBDagyXHo+wULiKcCNNyc=
+	t=1723541187; cv=none; b=YzpexKCNpkJZnuteJSM5p24c1OyU9Mjpsqi0f6BPEnx1eyEl0ookvKvatpr3Iizc+G5QRCPn05kPAIh02ULgkS9SwUTwqEh3gFR/i4vSgvPuqBPmCBSqypDHI3yKhy3Bu4xB9WCFqthSbKnLbEg4jtuUCY3d24OqEZdQnnKarGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723540274; c=relaxed/simple;
-	bh=hf38bQZuWM3dp+pnlJL9eh4Uv0Yip7KWObG1Cg7zjLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1ZRTzNwq0F9rc4lk412098ZztU2LQI+UDvpdv+ZwUjwN6RQalYQez3C4zzFFwWYE+nf22YWCJYuieeLAlNTcPUM6Wjt1Ir6e5n3x8X3ZifxequdvVSVhCvfBxa7WL+fwfIbnV54nIr0HnYF4Bup8Kf40hCEnbUcXRrV2L6XMGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=BQi6AnwT; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-530c2e5f4feso5336965e87.0
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 02:11:12 -0700 (PDT)
+	s=arc-20240116; t=1723541187; c=relaxed/simple;
+	bh=dI9eMxqkvuN5fgrBjTMkpsf4qPtUf3dQ4BQfGxByJqA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d1ZaY9nyeX+5Zi+VlLByfXCVCuoTK/XgNeRYHHoFO90k2nf/0uHKk3vXc3Z3dhYfEsPWnoMKKUZh7SB/PEu5PqsPtIMu2Z84o2fkCkZ9Pp20mCY4aqnNf9dO3fYXF+sEBXTzE6Hufi/DwhNYo9Rdg8n/IRP9gSlfhDb3mJRovsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0JKsO9l; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fd65aaac27so42649135ad.1;
+        Tue, 13 Aug 2024 02:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723540271; x=1724145071; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KJFdYK5G5aYcfJcV8ZQsQv/iO29PbtuZR/QhPd3XK64=;
-        b=BQi6AnwTBkpXynqeaxIhGlTq9pEB+90HIF7G1QvxVmZdNXQ9xN+a7FRYWpVMjjX3yV
-         W/lBhalqiJMILdURjwBbZgNnufqSp+gZJEJYAI8sbXV/wngDOdZJ+K0lhm/clyl9v4Rr
-         cvGN74/d0yUlokXehzVHKRd7n+e3Q9t/SmmKs=
+        d=gmail.com; s=20230601; t=1723541185; x=1724145985; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WF+7ShMevVjnLSswFEKMXpgWA9irpFniO0B1JndM7Dk=;
+        b=E0JKsO9lthRVCKfXHJArhY2Nf4if700GnVqN9nQgsO4BCVkRxY2xGWu0tBaral8V2G
+         Im7rboDMZQssVGdZAq07jwOl4pL6SjIfYysvRKVXFaMpVyrwiNcBzH7CMDR2BDfW/xq+
+         Y/+xp9/a9108g3vGSPAdGY2xOGfo7VHEzB6UwH61Ye4IXuOeYn8fKdPJCsc9JP7+YOSE
+         U5mbWgLZfAwHtIwXbDlXFpXu2C7EeKJ7HkCfAWqtl2Tqtt1s6oOc/VGBaxIxue21QPxN
+         GZrJLaq7jwC617pbSRy8zLUvfGb+uMm+0D2ncNuJyd8pRDrev7RRI27SFhV6LjP0DR2b
+         daVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723540271; x=1724145071;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KJFdYK5G5aYcfJcV8ZQsQv/iO29PbtuZR/QhPd3XK64=;
-        b=b31qjBHqq8TK9gLBfdcZQDL5XaHPs3MmhiHV25r/+9WxRmCKOG7VmMwU1Guh2TStuN
-         eZLQeJADnp9ZqJIyS/2VhoEsjmcK4f6wxwLFOrdVgNcXSy6KKNwikAgSSvTXU2b2u1Ef
-         dVpAe0VVHGCoocgdBxIZR5JPZ4/z/yONsKe42uNncdyqU8xCxbC3sXUpSccwKRd9ORE0
-         c5Ej2AhbOXAWSoI19NF8gdxojuDBHdqAs/ZF88INS8yvMsEX9Li0sNIkHc7Tm4p29ZY3
-         i6BHGEfn994xV2yGzaGoXt1ulC2v6Q2IcYCokxm7kdaEiTDAWqRFY9g8v/RzY+pTMBz+
-         Iywg==
-X-Gm-Message-State: AOJu0YxDyHlHNH4F0BCZwnHkxRng62ekUyqhgzAk55dvHrXSsqpFtYbG
-	Tns05QTH4MJC20QjA2UNKT7Q5IeqIWH0N6/6TR02fM+w93PFdx4oUjM7nxuB7Rc=
-X-Google-Smtp-Source: AGHT+IGRBSscIpDOgFZkQD6PeQTFPL4bgN+hns3by8V7H3bQAYSZz5q4pbgfNyoVXlI+t2vwiNIQyw==
-X-Received: by 2002:a05:6512:b86:b0:52e:f950:31e9 with SMTP id 2adb3069b0e04-5321364b9b1mr1803856e87.4.1723540271014;
-        Tue, 13 Aug 2024 02:11:11 -0700 (PDT)
-Received: from LQ3V64L9R2.home ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37172483bd9sm1004993f8f.0.2024.08.13.02.11.10
+        d=1e100.net; s=20230601; t=1723541185; x=1724145985;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WF+7ShMevVjnLSswFEKMXpgWA9irpFniO0B1JndM7Dk=;
+        b=vuQSr/8kRL1/9iEWj9bdQvcjwjAA2YWluEvO870omhg7YgUYGS8/pNLsMldBE5SdK0
+         qofobK8ZidOPYq9EhNwxaHmUYzzV3P53ntOuDvgWw5UvhF/NPEpQOKjNAPBC0cyD5nl5
+         ODWiCJ9CxX4o8Qmd8C/b08//E6bLoyTA8dtHJsbWqVJAohReblLrfBILOtjTcT8IsHOC
+         fTD8Nw8JvmDg2bA4crtUwUQNV7+xzOaI2o7figVyPHX8TrppYVkDrWwzy9zibve7jgQU
+         YccTq/kqyhfVZZojBfxe3qE7y1AAMVZxdurS+yNnTqpTy2OWN7DqLMuMAxG1v6GkVq91
+         TlAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBeRfYd6hZwDBuSyRzw/JIq/+6eX8Tj8Yq3KVInd+I9sXodJFEjxfbY4fhVbk4YlaZnfUJI6psQbo2Ppqd4TJBNH9IcBaQ6rEK/WHUgcu7P7OSYtaVypc4An4N8tFXO7MAIkyHw5ukkR8BspmzkrTwd5q4P+/nolUwGITvX6NLJA==
+X-Gm-Message-State: AOJu0Yy1HpqEycVwoKuJBvgHeLgW5XS3FWcXRKf1U2ZQ57WtmNIiw+F3
+	c9VmDl2mBDUwQ/hPlD6Y61u2OhR/fjKsnKYn4FBO8nPwnak5Zrxr
+X-Google-Smtp-Source: AGHT+IHzQx9qTRKvbnSNhCG6N3qO/bYcsHC4+S3u/dwFTMIxQvUlAeXDAvANiHp9b6drGQAT2iNkBQ==
+X-Received: by 2002:a17:902:ea08:b0:1ff:39d7:a1c4 with SMTP id d9443c01a7336-201cbc72244mr37246165ad.25.1723541184357;
+        Tue, 13 Aug 2024 02:26:24 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd147eb9sm9567675ad.90.2024.08.13.02.26.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 02:11:10 -0700 (PDT)
-Date: Tue, 13 Aug 2024 10:11:09 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 1/6] netdevice: Add napi_affinity_no_change
-Message-ID: <ZrsjLS8wRcYL3HxQ@LQ3V64L9R2.home>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240812145633.52911-1-jdamato@fastly.com>
- <20240812145633.52911-2-jdamato@fastly.com>
- <ZrpvP_QSYkJM9Mqw@mini-arch>
- <Zrp50DnNfbOJoKr7@LQ3V64L9R2.home>
- <ZrqOekK43_YyMHmR@mini-arch>
+        Tue, 13 Aug 2024 02:26:23 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: gbayer@linux.ibm.com
+Cc: aha310510@gmail.com,
+	alibuda@linux.alibaba.com,
+	davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	tonylu@linux.alibaba.com,
+	wenjia@linux.ibm.com
+Subject: Re: [PATCH net] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Tue, 13 Aug 2024 18:26:17 +0900
+Message-Id: <20240813092617.175390-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <9102add11cb13e94d3d798290e7d08145e8a6af9.camel@linux.ibm.com>
+References: <9102add11cb13e94d3d798290e7d08145e8a6af9.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrqOekK43_YyMHmR@mini-arch>
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 12, 2024 at 03:36:42PM -0700, Stanislav Fomichev wrote:
-> On 08/12, Joe Damato wrote:
-> > On Mon, Aug 12, 2024 at 01:23:27PM -0700, Stanislav Fomichev wrote:
-> > > On 08/12, Joe Damato wrote:
-> > > > Several drivers have their own, very similar, implementations of
-> > > > determining if IRQ affinity has changed. Create napi_affinity_no_change
-> > > > to centralize this logic in the core.
-> > > > 
-> > > > This will be used in following commits for various drivers to eliminate
-> > > > duplicated code.
-> > > > 
+>
+> On Sun, 2024-08-11 at 02:22 +0900, Jeongjun Park wrote:
+> > Since smc_inet6_prot does not initialize ipv6_pinfo_offset,
+> > inet6_create() copies an incorrect address value, sk + 0 (offset), to
+> > inet_sk(sk)->pinet6.
+> >
+> > In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock
+> > practically point to the same address, when smc_create_clcsk() stores
+> > the newly created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6
+> > is corrupted into clcsock. This causes NULL pointer dereference and
+> > various other memory corruptions.
+> >
+> > To solve this, we need to add a smc6_sock structure for
+> > ipv6_pinfo_offset initialization and modify the smc_sock structure.
+>
+> I can not argue substantially with that... There's very little IPv6
+> testing that I'm aware of. But do you really need to move that much
+> code around and change whitespace for you fix?
 
-[...]
+My intention was to add spaces to align the code to the length of the code 
+added to smc_inet6_prot, but I think I accidentally added a tab character. 
+Sorry for the confusion. I'll send you the v2 patch right away.
 
-> > > > +bool napi_affinity_no_change(unsigned int irq)
-> > > > +{
-> > > > +	int cpu_curr = smp_processor_id();
-> > > > +	const struct cpumask *aff_mask;
-> > > > +
-> > > 
-> > > [..]
-> > > 
-> > > > +	aff_mask = irq_get_effective_affinity_mask(irq);
-> > > 
-> > > Most drivers don't seem to call this on every napi_poll (and
-> > > cache the aff_mask somewhere instead). Should we try to keep this
-> > > out of the past path as well?
-> > 
-> > Hm, I see what you mean. It looks like only gve calls it on every
-> > poll, while the others use a cached value.
-> > 
-> > Maybe a better solution is to:
-> >   1. Have the helper take the cached affinity mask from the driver
-> >      and return true/false.
-> >   2. Update gve to cache the mask (like the other 4 are doing).
-> 
-> SG! GVE is definitely the outlier here.
+> [--- snip ---]
+>
+>
+> > Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> > ---
+> >  net/smc/smc.h      | 19 ++++++++++---------
+> >  net/smc/smc_inet.c | 24 +++++++++++++++---------
+> >  2 files changed, 25 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/net/smc/smc.h b/net/smc/smc.h
+> > index 34b781e463c4..f4d9338b5ed5 100644
+> > --- a/net/smc/smc.h
+> > +++ b/net/smc/smc.h
+> > @@ -284,15 +284,6 @@ struct smc_connection {
+> >  
+> >  struct smc_sock {                            /* smc sock
+> > container */
+> >       struct sock             sk;
+> > -     struct socket           *clcsock;       /* internal tcp
+> > socket */
+> > -     void                    (*clcsk_state_change)(struct sock
+> > *sk);
+> > -                                             /* original
+> > stat_change fct. */
+> > -     void                    (*clcsk_data_ready)(struct sock
+> > *sk);
+> > -                                             /* original
+> > data_ready fct. */
+> > -     void                    (*clcsk_write_space)(struct sock
+> > *sk);
+> > -                                             /* original
+> > write_space fct. */
+> > -     void                    (*clcsk_error_report)(struct sock
+> > *sk);
+> > -                                             /* original
+> > error_report fct. */
+> >       struct smc_connection   conn;           /* smc connection */
+> >       struct smc_sock         *listen_smc;    /* listen
+> > parent */
+> >       struct work_struct      connect_work;   /* handle non-
+> > blocking connect*/
+> > @@ -325,6 +316,16 @@ struct smc_sock {                                /*
+> > smc sock container */
+> >                                               /* protects clcsock
+> > of a listen
+> >                                                * socket
+> >                                                * */
+> > +     struct socket           *clcsock;       /* internal tcp
+> > socket */
+> > +     void                    (*clcsk_state_change)(struct sock
+> > *sk);
+> > +                                             /* original
+> > stat_change fct. */
+> > +     void                    (*clcsk_data_ready)(struct sock
+> > *sk);
+> > +                                             /* original
+> > data_ready fct. */
+> > +     void                    (*clcsk_write_space)(struct sock
+> > *sk);
+> > +                                             /* original
+> > write_space fct. */
+> > +     void                    (*clcsk_error_report)(struct sock
+> > *sk);
+> > +                                             /* original
+> > error_report fct. */
+> > +
+> >  };
+> >  
+> >  #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+> > diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+> > index bece346dd8e9..3c54faef6042 100644
+> > --- a/net/smc/smc_inet.c
+> > +++ b/net/smc/smc_inet.c
+> > @@ -60,16 +60,22 @@ static struct inet_protosw smc_inet_protosw = {
+> >  };
+> >  
+> >  #if IS_ENABLED(CONFIG_IPV6)
+> > +struct smc6_sock {
+> > +     struct smc_sock smc;
+> > +     struct ipv6_pinfo np;
+> > +};
+> > +
+> >  static struct proto smc_inet6_prot = {
+> > -     .name           = "INET6_SMC",
+> > -     .owner          = THIS_MODULE,
+> > -     .init           = smc_inet_init_sock,
+> > -     .hash           = smc_hash_sk,
+> > -     .unhash         = smc_unhash_sk,
+> > -     .release_cb     = smc_release_cb,
+> > -     .obj_size       = sizeof(struct smc_sock),
+> > -     .h.smc_hash     = &smc_v6_hashinfo,
+> > -     .slab_flags     = SLAB_TYPESAFE_BY_RCU,
+> > +     .name                  = "INET6_SMC",
+> > +     .owner                 = THIS_MODULE,
+> > +     .init                  = smc_inet_init_sock,
+> > +     .hash                  = smc_hash_sk,
+> > +     .unhash                = smc_unhash_sk,
+> > +     .release_cb            = smc_release_cb,
+> > +     .obj_size              = sizeof(struct smc6_sock),
+> > +     .h.smc_hash            = &smc_v6_hashinfo,
+> > +     .slab_flags            = SLAB_TYPESAFE_BY_RCU,
+> > +     .ipv6_pinfo_offset = offsetof(struct smc6_sock, np),
+>
+> The line above together with the definition of struct smc6_sock seem to
+> be the only changes relevant to fixing the issue, IMHO.
 
-OK, I'll hack on that for rfcv2 and see what it looks like. Thanks
-for the suggestion.
+However, modifying the smc_sock structure is absolutely necessary. This is
+because smc_sk(sk)->clcsock and inet_sk(sk)->pinet6 point to the same
+address in the current smc_sock structure definition, so when
+smc_create_clcsk() is called from inet6_create(), the already initialized
+inet_sk(sk)->pinet6 will be overwritten by clcsock.
 
-Hopefully the maintainers (or other folks) will chime in on whether
-or not I should submit fixes for patches 4 - 6 for the type mismatch
-stuff first or just handle it all together.
+>
+> >  };
+> >  
+> >  static const struct proto_ops smc_inet6_stream_ops = {
+> > --
+> >
+>
+> Thanks, Gerd
+
+Regards,
+Jeongjun Park
 
