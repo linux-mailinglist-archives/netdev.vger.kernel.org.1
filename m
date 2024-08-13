@@ -1,108 +1,136 @@
-Return-Path: <netdev+bounces-118134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37EC7950B03
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:02:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88EE4950B08
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CCC01C24C7E
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:02:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C31C1C24D19
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760AB1A2574;
-	Tue, 13 Aug 2024 17:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E862557A;
+	Tue, 13 Aug 2024 17:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="d2bAUEHO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RX3Bw5v9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEDF1A3BAF
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 17:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E3E200AE
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 17:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723568492; cv=none; b=Wchtzlw8ycsYpc52TLTGNbkI86NR/a8zze9f9veeFlSI4i4o0dWb8p6j1T+9bWH3kkjIaUP0EByNGb8JnIfNxnwA3JPgq5NQCXTPcsUcDHXen81aYVH8r3UWCG0VfHydaHoQSDuLG+SgpM/C7nFeDYVUjS6NzkAJ+vmbfsbfYdo=
+	t=1723568568; cv=none; b=PVxi6c9uGI3PJaEVuumTIrZuI6hcF2WJRZnyyKEenH5523vDi1MPi6zeANrLPPBWCBM/WiztBxQ7eytlkP1v0rZhZd0ciIAl15aZyNfr5yTaI+Sg6QYuXO3ce6tjVwI3BIG+GJiz5Ca5YIjHAh4D9tvq3Z0sflrBk/i5zfyjYqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723568492; c=relaxed/simple;
-	bh=G0xHtieRz82X9XvMST6+iP4u052mi5E+47dz2cU1OQg=;
+	s=arc-20240116; t=1723568568; c=relaxed/simple;
+	bh=K8nanJw/e2/tNohnrnQ0v9r0WYh2lUZMsDeWLpJN7HM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SBKOdh1FXRaZhikTpZ3YRx0iRiMgMXbZqkfkhgmDbBd9AgSrYCUyrMbnp8ct78jZzFnO5EuvNHDzq3u0ozHPDbayMlEt+eWi1yGWSPVHN/x2hWjce9uLgOxyXC86DwxzVbEAPZ51hcXe+KvZpBd6GF+OTa5E20wvKkQvXpFTK0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=d2bAUEHO; arc=none smtp.client-ip=209.85.208.43
+	 To:Cc:Content-Type; b=jdwRLqPxhk3ItwiGCuFzO6bsL5LbgY6EYLF4pMqYM6VYD/Xv8vBKhh7QGzYRVQEI7RzhpGftduQtHX4B0Z2pyqtAz1Q3CDe8rsOuSTr+LR4yDFQEHT+uyjSUCDKbgEj7xECKFygBzudN3tdHyKy86Coi/kPv0Ke+FTQRC32aC4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RX3Bw5v9; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a1f9bc80e3so2535551a12.2
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:01:30 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5af6a1afa7bso6653234a12.1
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:02:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1723568489; x=1724173289; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1723568565; x=1724173365; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0xHtieRz82X9XvMST6+iP4u052mi5E+47dz2cU1OQg=;
-        b=d2bAUEHOKGEEA4t64JWoEUejhJ4Ywiy1Yg4QfwKAbPiCwRXprpndo8w74V6tlpE/Qi
-         MhKdUt4iEYh1S1uwOv6caiJWA+Gw7b2xgQM0/lNzGGWSDptxEUZWLZrPM2qOBrKF6N8C
-         wCUqEomSK3/bIDxm0D36+LefpwSsySvV+xUeI=
+        bh=Xnr+16NjO9gz7nOf2vkfnnCZs9ZFOHBiBtUyKZahsWY=;
+        b=RX3Bw5v9JQa6DkRQrcXfWhFh6xG7BI0Fep9wCnXNbOJzO0uDmvah7SF3OxVQJQPq6X
+         XFZs0XtZ6ihxT6Bkj/0NOefB7p3I0oq2xMLHwMRmIXS8TBV1K8k4HBPGKTofZRPpy+LD
+         YXyid+wMEHvAKcLzpYiHxkFUnvge4Lx/wZxjI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723568489; x=1724173289;
+        d=1e100.net; s=20230601; t=1723568565; x=1724173365;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=G0xHtieRz82X9XvMST6+iP4u052mi5E+47dz2cU1OQg=;
-        b=OIBhkiehbtDnQnJlvfdUmJ0JV3U37jl+bxKc7gUWc5YlPpuWjC1sqePb6SmBWrjUa0
-         BWCEpBCzLk5or2fxX7XgWHWS2rjQZ5d8fUux69wYqxW9JGaQwUqJDKzCwMuq2lg6Cl8F
-         SOh1IUFs3tOwao50igveemet/DzG5QZzUxCSmKBk0K9nxOC1i5XA7BIIDbV8ReMFu0kV
-         Jf/J+xUIxlNIWgPrsdk9eUeYrs9mRc2p6ME8uPLEjxW2KyhnTjd9GIxZi4eDWMi0n/Y7
-         adsuyQdLO94SwC0Ih+JuhOpECvz/F9SZhPG4SvvmcUUDh++gAliBFJjgTmm6N7bYpCpu
-         mKOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXvtgYXVCG/oTVwGgLc2diR6Vfx6eT2XZhsTHneKpXtKBoV3go3PohHSDgXGj6LSONS/+4SOq+SGbxthy57r6XCoo0yy7+4
-X-Gm-Message-State: AOJu0YxU31Gn+RMH8X+eO6KZMXdUX4kMOkYob0dEy94jrZS7G1Uin3ig
-	/9tPbqPhFjTZFE/jw3TRocH4x+KXkmuUv7esqyTDaoOmWOS06wx1v8AouWS5yrCQzDwf6+R7sXR
-	GdDziiXTpZvln7fP1cNncpgH/wAMLptBgRr+q
-X-Google-Smtp-Source: AGHT+IFyO1vFBna4zVne4NDoapn1rPO1jRooU+Oy/pz2YXkDTtxZo9CwU+zg0oju+pr2mpeYrzZub5zuu+QK9rRPDfE=
-X-Received: by 2002:a05:6402:2188:b0:5a1:5692:b5f9 with SMTP id
- 4fb4d7f45d1cf-5bea1cb427emr121837a12.38.1723568488715; Tue, 13 Aug 2024
- 10:01:28 -0700 (PDT)
+        bh=Xnr+16NjO9gz7nOf2vkfnnCZs9ZFOHBiBtUyKZahsWY=;
+        b=Os/4GR3BA+D8WmTM65GpGgJStWdSRA0/fI5Tj+xK+TEAKlV2++EiQPK9XRb5U9ZhUF
+         6B1w+JemJDnqY7ivbZz/FZNLa1GwVuhZBF18/mh6g0siTIo9oF45ddSLpcaA8xiWEIsL
+         R+0F2o6e+8BAgm6h9PbIQ5EFztjYYiaPACUhUpS6Kxteg/xK4tzGXzbCO0pNUlr+Jcpy
+         4ReJKbBXYJbiiHjhpo5ip5Y42tofHhe2g+yuG0oTbT6aDPPVRzunwi0+Mc1XoMA51Yu7
+         x2gaRXUnHTJJg8GeBli0cIoyDwvA+XiQfKKLRXNQ564LtBUDMXqC5LFh2+iNLfSf+VGq
+         v1dw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCPfUdu89s9sx1tsz1Mv9Ki/PAE0V9JNTDgEeuVQqFVcJ/GBIPnmwbuSha68qLA/QqQaScXubgDDgprbASdFjtjNb3cIdq
+X-Gm-Message-State: AOJu0Yzet+u4lD0KzssRc40KYn2bp2IRcdV+uk3WEVfbrcY8EmObO1by
+	FfABV/+uRR497+UOb8GqhSQNtpDeABI/NWJmV+R4QyMHI6X4uifllx303eymUUKNRhkNLwMXiit
+	7YUSJP+f9piPGrLPpdlb3o+ODg0dsTn/LVPgv
+X-Google-Smtp-Source: AGHT+IEUMHnLcX4HwxNxG01jQPJ5SURvsoe9LLbpjxN/t1ry+fpUzMgiRQQql7/aUceuviouNY6LC4cvssabh2gD+D8=
+X-Received: by 2002:a05:6402:2089:b0:57c:9da5:fc09 with SMTP id
+ 4fb4d7f45d1cf-5bea1cac32emr107778a12.23.1723568564729; Tue, 13 Aug 2024
+ 10:02:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240813-bnxt-str-v2-0-872050a157e7@kernel.org> <20240813-bnxt-str-v2-1-872050a157e7@kernel.org>
-In-Reply-To: <20240813-bnxt-str-v2-1-872050a157e7@kernel.org>
+References: <20240813-bnxt-str-v2-0-872050a157e7@kernel.org> <20240813-bnxt-str-v2-2-872050a157e7@kernel.org>
+In-Reply-To: <20240813-bnxt-str-v2-2-872050a157e7@kernel.org>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 13 Aug 2024 10:01:17 -0700
-Message-ID: <CACKFLi=TiVoeiG5zmxLCUn6hWf4OCLehybo2YdNKG2uCoYBNHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] bnxt_en: Extend maximum length of version
- string by 1 byte
+Date: Tue, 13 Aug 2024 10:02:33 -0700
+Message-ID: <CACKFLinr9B6iPYhYbPi1uxGSgQ64YTg7zQZhGV6SdpzOkgMgug@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] bnxt_en: avoid truncation of per rx run
+ debugfs filename
 To: Simon Horman <horms@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Pavan Chebbi <pavan.chebbi@broadcom.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
 	netdev@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008d313b061f938f4f"
+	boundary="000000000000145cea061f9394c6"
 
---0000000000008d313b061f938f4f
+--000000000000145cea061f9394c6
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Aug 13, 2024 at 7:33=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
 te:
 >
-> This corrects an out-by-one error in the maximum length of the package
-> version string. The size argument of snprintf includes space for the
-> trailing '\0' byte, so there is no need to allow extra space for it by
-> reducing the value of the size argument by 1.
+> Although it seems unlikely in practice - there would need to be
+> rx ring indexes greater than 10^10 - it is theoretically possible
+> for the filename of per rx ring debugfs files to be truncated.
 >
-> Found by inspection.
-> Compile tested only.
+> This is because although a 16 byte buffer is provided, the length
+> of the filename is restricted to 10 bytes. Remove this restriction
+> and allow the entire buffer to be used.
+>
+> Also reduce the buffer to 12 bytes, which is sufficient.
+>
+> Given that the range of rx ring indexes likely much smaller than the
+> maximum range of a 32-bit signed integer, a smaller buffer could be
+> used, with some further changes.  But this change seems simple, robust,
+> and has minimal stack overhead.
+>
+> Flagged by gcc-14:
+>
+>   .../bnxt_debugfs.c: In function 'bnxt_debug_dev_init':
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c:69:30: warning: '%d' =
+directive output may be truncated writing between 1 and 11 bytes into a reg=
+ion of size 10 [-Wformat-truncation=3D]
+>      69 |         snprintf(qname, 10, "%d", ring_idx);
+>         |                              ^~
+>   In function 'debugfs_dim_ring_init',
+>       inlined from 'bnxt_debug_dev_init' at .../bnxt_debugfs.c:87:4:
+>   .../bnxt_debugfs.c:69:29: note: directive argument in the range [-21474=
+83643, 2147483646]
+>      69 |         snprintf(qname, 10, "%d", ring_idx);
+>         |                             ^~~~
+>   .../bnxt_debugfs.c:69:9: note: 'snprintf' output between 2 and 12 bytes=
+ into a destination of size 10
+>      69 |         snprintf(qname, 10, "%d", ring_idx);
+>         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Compile tested only
 >
 > Signed-off-by: Simon Horman <horms@kernel.org>
 
 Thanks.
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
---0000000000008d313b061f938f4f
+--000000000000145cea061f9394c6
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -173,14 +201,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEII3EKD3aP0STs5pXajbZCeaHOrWDf4OZ
-ynw+jdr5Otb9MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDgx
-MzE3MDEyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAZQatLDld+MUIv1xxxc89gLLAixa4ms
+voRL9nR49HKZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDgx
+MzE3MDI0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBNivm2Zk6k61CB2UhmllroHEYQBCLORxKdshunueaSa1DsjSj8
-7+e2syA1egveDcKVnDOCEgP5l4mYXgdoFu/ZNU5WUyM9MCpd4k49jNE5xByZj0nWVAGFmMb22O78
-PSS7WncXagojv5VAPdMqRKR9PotIpTrwOKQFXJ/V8O1N7cfDLpCGmBi1sIp2kDXouCgu/cpC/RuJ
-QhEUVBLLoaTDO0Nf1JRH9QpVOzUbrBhXXHqSjEeGjIqfOOBia5/NwYwN671xPq/qR5erlpHiQBGM
-/4QK6c/omeJBCLHhZVeHhrh4gjyk+PO7k5+pj2P1Ofkd3asVy97rP3S28VV+kxMZ
---0000000000008d313b061f938f4f--
+ATANBgkqhkiG9w0BAQEFAASCAQCe7zFqPjXDw5br5IQIZArUqC3AZwarkuTkBGU4bl5vQvQPqNxo
+Vmfh4+SZO50kWSOzoJv5ZWQ/N7Sevt5ArARShhImBrjsIpv2Ju8ZbG/ttn5O34Ot1NIb5551y0ov
+b1lQag/6Er890B0BcQ6m0dqwufOMhvjJZK7REhQSnM0YQovhG9fFzKrO5M7zbTcXMfp+O7gsVFGb
+weYAxDJSq1YvZ8gPFibeAHs+yAfp71F39CkoV3OWHukuX7egPZwu2K4r6VRgppb5IM0e/t5vzIzL
+DXvnc7Fnvv7V2OcWBJTq2CwlQCA/UwRmGTd0FA8zAJVW9zqcArjJTRXaK2nlpTL9
+--000000000000145cea061f9394c6--
 
