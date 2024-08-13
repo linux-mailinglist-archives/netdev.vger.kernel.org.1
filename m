@@ -1,113 +1,170 @@
-Return-Path: <netdev+bounces-117953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D307B950079
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:54:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A22DB9500B6
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124D11C22CAD
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:54:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A1D1C210C1
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4276B17C21C;
-	Tue, 13 Aug 2024 08:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8956E17BB35;
+	Tue, 13 Aug 2024 09:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uY3Czher"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5AC13C9CB
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 08:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3922217C7C2
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 09:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723539264; cv=none; b=e4zaxrGtVyA/oksR4LuKX5pGtK00vW1UQkYMYoKXxShtXjwxpECe3kixH//ge48VH2GP2cqebUH5IepA+J18hmH1yOETpb/7PbQWsyyk8MFt+F8kSStIzoaqfqnbFGa0eejhBGIOL3c56n+MrB47qtOCaOis+UvBgqJsJ/EaaGs=
+	t=1723539828; cv=none; b=FKNHy0obgJ6LzvjmMfOPa7kF07YFZQ4PpaC1KvmN43BDfNosag55tSU6KDropFaaL3A5LR2aEWdX9GCq5+hM8pDKdhDeV6N+KfPkhh4Z2K9xvkncrKGy2044mONnqq4ezyFlr5ANhptBJaXGInF2T5FddjzEHb7i2fDRHa78Lig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723539264; c=relaxed/simple;
-	bh=k0shcI/BoAeYWt+T0ifvIPuvkga1yLWLrKbiwGgzjG4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TF1BpFXmQgrNAGEs8TYFsU0GpjPr6AHZjafrJ1f4swIwO2uA4uO5/jobHJgz+NEO381IArkprndPV7O0sJaGt4cCXz9Fp5tj4Wm4bb26OZIHR0hvApM1rrZ5Fq/YPFyFcOJ8AWtlZXCbrUxHk+zk5i9c0OUYRVdVQbe1TLhOgoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-397e0efded3so78738155ab.2
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 01:54:22 -0700 (PDT)
+	s=arc-20240116; t=1723539828; c=relaxed/simple;
+	bh=OFLmnkChNt3TrBDQB3OchS9v9nydUBdhsCvm9Qr0paQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dlFj7juiTT/6hHoCRVN7TkSV3ue5t3+9BOQyfS36ylRkhEkOEnp7bC0Rqq9eQKfYQ4B/638+W8kNc66gKWIKUs1AmHPXuEyUE+QXBsKrrwxHnDO74CuS2PQmdmYZzI1opiVGWn5aHmPhwHgixTY+v6O38FZz2B2r+iTWNuAJFIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uY3Czher; arc=none smtp.client-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-495d1a6db75so1485584137.1
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 02:03:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723539825; x=1724144625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MqfnVnhHsKTNIdZ3g99elQ8N0kSquMZj93pvaOSIp0U=;
+        b=uY3CzherVSUXaUL2L45nDDjUe851uSDwoUak+sWbM5SLZgqZu0RzWakWib6600bcM3
+         nkpN48NnEKFdKHNu45FDUJ+iB/gabNPMokNHB4mnqALGdAwZ3ybYGg6whRFoVc9NBxZW
+         U1SkhkP4aChDRMPRkgx8vXA+ZlnLtATO+602voSTI274QqM7RicCA6o3qPCI+mW0gOB9
+         y+K0HPR/eBxpYqeHyFh6JP/dbTfsAN//pojGBDgYuWYY8y4FA/tPQh+K1e2yh39e3RSp
+         NiRMGNuOEyiuVZmbB7CHeVf5LcFuLYiHjUtvhEDA4gf4pNEQxoUNr8DV9kVgMMw88MOS
+         ZbOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723539261; x=1724144061;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gy8PBSrZR3R5gVjezhebrzxpwUbu8usFV9+V+9UvaII=;
-        b=uiPf9CN/mcvXV69fZLm/LYSBFtrbRCr1Za8Q7iMBJSgtHuhFPpNKLwJjDcGOMgJ6Fs
-         WeVrI+tErqS9xMfUlK2RhKA0S/Y9PmXs77L7sHkpalKCAVq9VYeQ+0gH7r16OqGhhctE
-         pCc8FkWYHjydOjRz6i4vzV2Ga07yuw8jcqXsca8WnPIREHRAJSiATohTMJ48zhH/DlLw
-         cV6XGRg0jNvmOWdxaACrkkGzAgoiJ29lneKbsC4p13k8MFzRTtcNtCx0ygnrFzwITrzv
-         hwjrtaCZGLygRT6SYBNt3XljjTKHvdMdO3LZRsmPXP+g+XoFrd00F9G+lXBL+eRkdpfa
-         5pHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9mnL5tQ80RPg1cMjkAgzJ/E0/1m7jeZAXvWkWB9eRm3UWF7uZzczCBOgQ2wZNGTG78xQkVlhD1mfjLWsL9ayCOrBM5R7c
-X-Gm-Message-State: AOJu0Ywpyl3bsurZE4YeuuC2StYpISSBgI/rTpCebxaaWtsWi5tfI8ji
-	1ixxFRPbk3KaKhjWM7sN+NpiHbgzb4b8IRb2+sXUkW4U1bXwXqtzHsJFKXpIwj3U5wCg+ijK3Ch
-	Am+OjfcC6ItSj17WhPaoSEd5WechePoC9cz8CQ5I8YOUiYzzOwrAyxnE=
-X-Google-Smtp-Source: AGHT+IGC4oUj0T374enusPKUw9DiaTHoaPvUs+S7hma00bub2ycNW/nt3Wrs3H3YfsEUmcTHSxlqHFTv/jVoNyJjdtKqmiOOG9YO
+        d=1e100.net; s=20230601; t=1723539825; x=1724144625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MqfnVnhHsKTNIdZ3g99elQ8N0kSquMZj93pvaOSIp0U=;
+        b=rbuOP5f9PPIDF9jRDSwRormmb0am8QJb4NUMV8aWMZ/B36r56asdAQZYJkeRarKMV3
+         d65436KyKtigr1q9sKCuI9b2T4EEDdO8PghPOXLAi4RPeyxr5u3wSvROH9euib/QCdM4
+         xK9GCeKJnVI0GIbIjMUxvn9QeK6lLl4/tuNxKezAcg/LzJHGauz9OnoqZ4iiusaj/XdR
+         gpL951soGlwAkIFLTDi36KEJkM+ezwPDH6N4650SQ/UiDkI04pjHOGVjHilTryNjDOuB
+         Lp+UTfI74YU/zAQ/56C5cMf3N8xjtu9SzTZEIQD8cemx+LSop0lmGCAYTGYvdCF2+T1r
+         TvoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWt3mf41k2nX2dGhawYBdp8heDFYSUIQ92wT/Jo4kgSZpND2NJXv+SmM4UoVhXTMNC4ewYdfTcKc+NmuUb3OVK3y7lPiWBn
+X-Gm-Message-State: AOJu0YygLBHjQ0RVsHRS1TqnAk7pFpjwqnacdcdD7CMZi7RQhbQIxfXG
+	/tRbIdV8FK+IF2ty2+ohSM+WcOxgSCW+Stxpt6XWXpCw+sMVYDRP/zRD34H6WkbwaV409Gj6mzd
+	vpLJ1/PAMkyKPTLxFeQ+IzW0fIqY+ybvM+yB6
+X-Google-Smtp-Source: AGHT+IEDjVBWF1MtU621r7c9KTxxkpXecwmSkiD37eYz3ttGuDqjz8Aa65UHLyu0qffTTOccInI+PGwQjjCKHuK8rFw=
+X-Received: by 2002:a05:6102:3e94:b0:48f:a858:2b52 with SMTP id
+ ada2fe7eead31-49743b56abemr3993740137.29.1723539824928; Tue, 13 Aug 2024
+ 02:03:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a4e:b0:374:9a34:a16 with SMTP id
- e9e14a558f8ab-39c4791694emr2049445ab.5.1723539261571; Tue, 13 Aug 2024
- 01:54:21 -0700 (PDT)
-Date: Tue, 13 Aug 2024 01:54:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007154d7061f8cc1c8@google.com>
-Subject: [syzbot] Monthly wireless report (Aug 2024)
-From: syzbot <syzbot+list8aab4226317d7ca90415@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20240805212536.2172174-1-almasrymina@google.com>
+ <20240805212536.2172174-8-almasrymina@google.com> <20240806135924.5bb65ec7@kernel.org>
+ <CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+ <20240808192410.37a49724@kernel.org> <CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
+ <fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com> <20240809205236.77c959b0@kernel.org>
+ <CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
+ <48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com> <20240812105732.5d2845e4@kernel.org>
+ <7e2ffe62-032a-4c5e-953b-b7117ab076be@gmail.com> <71260e3c-dee4-4bf0-b257-cdabd8cff3f1@gmail.com>
+ <20240812171548.509ca539@kernel.org> <CAHS8izPyGwe_i4eNemW+A+MgMVHqJ0fdp=+-ju2ynqgc0mb_Ow@mail.gmail.com>
+In-Reply-To: <CAHS8izPyGwe_i4eNemW+A+MgMVHqJ0fdp=+-ju2ynqgc0mb_Ow@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 13 Aug 2024 05:03:33 -0400
+Message-ID: <CAHS8izM=d9pe0V3BWAY_gguNGymdc4DSFAz0DWyCMoGX6QVhDw@mail.gmail.com>
+Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem memory provider
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello wireless maintainers/developers,
+On Tue, Aug 13, 2024 at 4:39=E2=80=AFAM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> On Mon, Aug 12, 2024 at 8:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > BTW, Mina, the core should probably also check that XDP isn't installed
+> > before / while the netmem is bound to a queue.
+>
+> Sorry if noob question, but what is the proper check for this? I tried
+> adding this to net_devmem_bind_dmabuf_to_queue():
+>
+> if (xdp_rxq_info_is_reg(&rxq->xdp_rxq))
+>                  return -EEXIST;
+>
+> But quickly found out that in  netif_alloc_rx_queues() we initialize
+> all the rxq->xdp_rxq to state REGISTERED regardless whether xdp is
+> installed or not, so this check actually fails.
+>
+> Worthy of note is that GVE holds an instance of xdp_rxq_info in
+> gve_rx_ring, and seems to use that for its xdp information, not the
+> one that hangs off of netdev_rx_queue in core.
+>
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+To elaborate further, in order to disable binding dmabuf and XDP on
+the same rx queue for GVE, AFAIT the check would need to be inside of
+GVE. Inside of GVE I'd check if gve_priv->xdp_prog is installed, and
+check if the gve_rx_ring->xdp_info is registered. If so, then the rx
+queue is XDP enabled, and should not be bound to dmabuf. I think that
+would work.
 
-During the period, 5 new issues were detected and 1 were fixed.
-In total, 34 issues are still open and 140 have been fixed so far.
+At the moment I can't think of a check inside of core that would be
+compatible with GVE, but above you clearly are specifically asking for
+a check in core. Any pointers to what you have in mind would be
+appreciated here, but I'll try to take a deeper look.
 
-Some of the still happening issues:
+> Additionally, my understanding of XDP is limited, but why do we want
+> to disable it? My understanding is that XDP is a kernel bypass that
+> hands the data directly to userspace. In theory at least there should
+> be no issue binding dmabuf to a queue, then getting the data in the
+> queue via an XDP program instead of via TCP sockets or io uring. Is
+> there some fundamental reason why dmabuf and XDP are incompatible?
+>
+> --
+> Thanks,
+> Mina
 
-Ref  Crashes Repro Title
-<1>  23665   Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<2>  5497    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<3>  1109    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<4>  748     Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<5>  580     Yes   WARNING in ath6kl_bmi_get_target_info (2)
-                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
-<6>  214     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
-                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
-<7>  125     No    INFO: task hung in rfkill_global_led_trigger_worker (3)
-                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
-<8>  103     Yes   WARNING in ieee80211_free_ack_frame (2)
-                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-<9>  60      No    INFO: task hung in wiphy_unregister (2)
-                   https://syzkaller.appspot.com/bug?extid=abba31ed4fc4178349e9
-<10> 44      Yes   WARNING in minstrel_ht_update_caps
-                   https://syzkaller.appspot.com/bug?extid=d805aca692aded25f888
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+--=20
+Thanks,
+Mina
 
