@@ -1,195 +1,260 @@
-Return-Path: <netdev+bounces-118111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD8A9508C0
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:18:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAF69508C8
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:19:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64B3B284B52
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:18:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E622E1F2220F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665BB1A0712;
-	Tue, 13 Aug 2024 15:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F3D1A0B04;
+	Tue, 13 Aug 2024 15:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7og9PxR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kP/NkGyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64741A08A1
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9625E1A0722;
+	Tue, 13 Aug 2024 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723562240; cv=none; b=CkXTKFUaSA1Z4jxWIQC2oqfX6Bf0hS7SgPNTAnzd+zd5o6EjHhT+Vd/wPPHu+DtZXxMpJ+ipIijIoCHmkFh9KNLJhlMS7/RoANQF/UC1izvvUN6RVd76ygAo3zcRgwZz6WlG6UXVW96Mt97QquHRouDSBvVj9VW5XW6N9KrLBa4=
+	t=1723562289; cv=none; b=ryBIN1DTFDhVlGRE4+D8D0KCcuJ9qUsTg0pTEdFtF63cekp34B7LSA83hFCgH/0FOiv8FuRF2NZ/T9brtFNBL/Qu3PejZirNVcl67OYByFm2/fRH3nIDxykiNCDUMB6Kr//JZUhJBSdCpX82vMmioB6drxLRyMOo1zlQIyhsudg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723562240; c=relaxed/simple;
-	bh=Bq6znnGat20Ad00SAWKp+fWfe1BjcDK3uZZaqoSE3k4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gCB7a2dt0DJZWZZA4FuO1UpI3XCrAo9B1J8dz3YTZHgeCfhn1IENpJ0RAvmcgFEgCBTBivaNBuvPbxuc5ALwvl7oFf5imQI9HEq8tuy7mCS/feH6DELJ6wLLSIqHm6/TmV0Dbpp8OkUHQSU28KLMTy9JgJjdtzJ4leNOf3bLwIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a7og9PxR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723562237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZjcQvteijPS8JjH5ua+iZS3LbCVa2x8U59/CQKyXUQ=;
-	b=a7og9PxRzdDs11rVcw2Mf5G0gQopeecOmFFVSlytkvA8YO1uCnu9PSpKNUwPqCQ2qQ4l++
-	xYE6cFgSkCCJ3HTLr602XklJIUKJm7U/5J9hLsYhN25FZto960gYmo7xSCcjXzuPsYL60m
-	BREbUArBhGCe/019WLTedldH8uAUXmM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-5BSL57wQO3WRaIkjnwZD4g-1; Tue, 13 Aug 2024 11:17:16 -0400
-X-MC-Unique: 5BSL57wQO3WRaIkjnwZD4g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280b24ec7bso10436205e9.3
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 08:17:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723562235; x=1724167035;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XZjcQvteijPS8JjH5ua+iZS3LbCVa2x8U59/CQKyXUQ=;
-        b=bh5SoAFVOKm+mrrR2JUnKUWaXOUuzJVA92NJ93tcfiFBykggHkxp3levGMEY4CyKw+
-         D08WfYJuheNrRMjsrbdzeARDu2LPptp3B08bjKQCwc+T+ntJP9Ac3Mw66zz+NuouzGgv
-         eukExNSvSB0Gos0/oknmJglpgOHcPSJfds9AgvZ3xFV2r3kjmi/0B/Zpg/obqpXlskgi
-         mfi5tx97RfGdTIROLsy/VKn0nlYGj+cmtO67SwYumTDXkyb1yRZLgzmdYqPbWs40aTwP
-         /L+R/F7rEYmiaeND+AhL3E+PJfmbc1j/4jwgLhiVlGcc1fy6vqH5D5gnp2NysMhHA4QT
-         IeZQ==
-X-Gm-Message-State: AOJu0YyFVImuOVSYw78gMCrVZrTkKRqScCZ52zawMilSxBkbrUdSjsoI
-	EEmU2ngBtGWD+S2+HHtx9fogsdG6vSUTmCSSH4ShgyScdx0TuVZkfzBfrtxJKuVctKFfWGy0brx
-	4+ozwtL1ADeEovKIrYS1wDcyZSFF6m5EurCau1meQuMfaYIgtUJGEMg==
-X-Received: by 2002:a5d:584e:0:b0:368:4c5:b69 with SMTP id ffacd0b85a97d-3716fcaa1e4mr1073008f8f.10.1723562234821;
-        Tue, 13 Aug 2024 08:17:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEE2T68L2nxUWhQu9yYSxkdgAPsPtlEJvz5tPSnoSOmRWT9hKefJFFDLo3dOLOTtQchjUDqSQ==
-X-Received: by 2002:a5d:584e:0:b0:368:4c5:b69 with SMTP id ffacd0b85a97d-3716fcaa1e4mr1072992f8f.10.1723562234264;
-        Tue, 13 Aug 2024 08:17:14 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1708:9110::f71? ([2a0d:3344:1708:9110::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51eb10sm10589557f8f.84.2024.08.13.08.17.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Aug 2024 08:17:13 -0700 (PDT)
-Message-ID: <b75dfc17-303a-4b91-bd16-5580feefe177@redhat.com>
-Date: Tue, 13 Aug 2024 17:17:12 +0200
+	s=arc-20240116; t=1723562289; c=relaxed/simple;
+	bh=bDQtUiyRqgXSrfcO2IpA6p2hoMfDdxPBCSaGfTJ8BA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FxH5VeJ7frVsBdJKA6mSaLEE5b8YQqdWmxmdhftIFWfwF6Wu3ThOZcHnCCdChiixfBNh7yx8ByiP3NedqXb6sOhfThFPnhU130Hoebf9wjrR+ZPwpqe0ujGUbLo97EmsAnjxGvIJvk5MmWt1rdGHaAxk0aiyYQMzXBKsL1WSPCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kP/NkGyj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dYqXKTE0pJmqsYJ3Ya6dkUmsddYDJwkWesi3gUrybOY=; b=kP/NkGyjtatFYvMgGblUbH53N5
+	jSyscBcKbPqpIcDRMVd80u+koQXNzG1iact6gDC1JhX0yjPpr0iBS0uSrICsF2KTKXYdkvZmYMyXT
+	S+Jtna8IsWgpgtHnfzgdkK7QGoMQg6vdnw24XygR2DL1yxAKFKhzsjDoJq2zrw7a05Fc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sdtHV-004h7O-EP; Tue, 13 Aug 2024 17:17:53 +0200
+Date: Tue, 13 Aug 2024 17:17:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v2 4/7] net: ti: icssg-prueth: Add support for
+ HSR frame forward offload
+Message-ID: <082f81fc-c9ad-40d7-8172-440765350b48@lunn.ch>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-5-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <7ed5d9b312ccda58c3400c7ba78bca8e5f8ea853.1722357745.git.pabeni@redhat.com>
- <ZquQyd6OTh8Hytql@nanopsycho.orion>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ZquQyd6OTh8Hytql@nanopsycho.orion>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240813074233.2473876-5-danishanwar@ti.com>
 
-On 8/1/24 15:42, Jiri Pirko wrote:
-> Tue, Jul 30, 2024 at 10:39:46PM CEST, pabeni@redhat.com wrote:
->> +/**
->> + * net_shaper_make_handle - creates an unique shaper identifier
->> + * @scope: the shaper scope
->> + * @id: the shaper id number
->> + *
->> + * Return: an unique identifier for the shaper
->> + *
->> + * Combines the specified arguments to create an unique identifier for
->> + * the shaper. The @id argument semantic depends on the
->> + * specified scope.
->> + * For @NET_SHAPER_SCOPE_QUEUE_GROUP, @id is the queue group id
->> + * For @NET_SHAPER_SCOPE_QUEUE, @id is the queue number.
->> + * For @NET_SHAPER_SCOPE_VF, @id is virtual function number.
->> + */
->> +static inline u32 net_shaper_make_handle(enum net_shaper_scope scope,
->> +					 int id)
->> +{
->> +	return FIELD_PREP(NET_SHAPER_SCOPE_MASK, scope) |
->> +		FIELD_PREP(NET_SHAPER_ID_MASK, id);
+On Tue, Aug 13, 2024 at 01:12:30PM +0530, MD Danish Anwar wrote:
+> Add support for offloading HSR port-to-port frame forward to hardware.
+> When the slave interfaces are added to the HSR interface, the PRU cores
+> will be stopped and ICSSG HSR firmwares will be loaded to them.
 > 
-> Perhaps some scopes may find only part of u32 as limitting for id in
-> the future? I find it elegant to have it in single u32 though. u64 may
-> be nicer (I know, xarray) :)
+> Similarly, when HSR interface is deleted, the PRU cores will be stopped
+> and dual EMAC firmware will be loaded to them.
 
-With this code the id limit is 2^26 for each scope. The most capable H/W 
-I'm aware of supports at most 64K shapers, overall. Are you aware of any 
-specific constraint we need to address?
+Maybe a dumb question, because i don't know HSR....
 
-[...]
->> int net_shaper_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
->> {
->> -	return -EOPNOTSUPP;
->> +	struct net_shaper_info *shaper;
->> +	struct net_device *dev;
->> +	struct sk_buff *msg;
->> +	u32 handle;
->> +	int ret;
->> +
->> +	ret = fetch_dev(info, &dev);
-> 
-> This is quite net_device centric. Devlink rate shaper should be
-> eventually visible throught this api as well, won't they? How do you
-> imagine that?
+Can you have one interface in a HSR network, another interface in a
+non-HSR network, and bridge packets between the two worlds? Do you
+want the HSR firmware, the Switchdev firmware, or Dual EMAC and do the
+bridge in software?
 
-I'm unsure we are on the same page. Do you foresee this to replace and 
-obsoleted the existing devlink rate API? It was not our so far.
+>  void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
+>  {
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> index dae52a83a378..2f485318c940 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> @@ -455,7 +455,7 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
+>  	struct icssg_flow_cfg __iomem *flow_cfg;
+>  	int ret;
+>  
+> -	if (prueth->is_switch_mode)
+> +	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
+>  		icssg_init_switch_mode(prueth);
 
-> Could we have various types of binding? Something like:
-> 
-> NET_SHAPER_A_BINDING nest
->    NET_SHAPER_A_BINDING_IFINDEX u32
-> 
-> or:
-> NET_SHAPER_A_BINDING nest
->    NET_SHAPER_A_BINDING_DEVLINK_PORT nest
->      DEVLINK_ATTR_BUS_NAME string
->      DEVLINK_ATTR_DEV_NAME string
->      DEVLINK_ATTR_PORT_INDEX u32
-> 
-> ?
+Maybe icssg_init_switch_mode() needs renaming if it is used for more
+than switch mode? There are other functions which might need
+generalising.
 
-Somewhat related, the current get()/dump() operations currently don't 
-return the shaper ifindex. I guess we can include 'scope' and 'id' under 
-NET_SHAPER_A_BINDING and replace the existing handle attribute with it.
+> +#define NETIF_PRUETH_HSR_OFFLOAD	NETIF_F_HW_HSR_FWD
+> +
+>  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
+>  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
+>  
+> @@ -118,6 +121,19 @@ static irqreturn_t prueth_tx_ts_irq(int irq, void *dev_id)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static struct icssg_firmwares icssg_hsr_firmwares[] = {
+> +	{
+> +		.pru = "ti-pruss/am65x-sr2-pru0-pruhsr-fw.elf",
+> +		.rtu = "ti-pruss/am65x-sr2-rtu0-pruhsr-fw.elf",
+> +		.txpru = "ti-pruss/am65x-sr2-txpru0-pruhsr-fw.elf",
+> +	},
+> +	{
+> +		.pru = "ti-pruss/am65x-sr2-pru1-pruhsr-fw.elf",
+> +		.rtu = "ti-pruss/am65x-sr2-rtu1-pruhsr-fw.elf",
+> +		.txpru = "ti-pruss/am65x-sr2-txpru1-pruhsr-fw.elf",
+> +	}
+> +};
+> +
+>  static struct icssg_firmwares icssg_switch_firmwares[] = {
+>  	{
+>  		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
+> @@ -152,6 +168,8 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
+>  
+>  	if (prueth->is_switch_mode)
+>  		firmwares = icssg_switch_firmwares;
+> +	else if (prueth->is_hsr_offload_mode)
+> +		firmwares = icssg_hsr_firmwares;
 
-It should cover eventual future devlink extensions and provide all the 
-relevant info for get/dump sake.
+Documentation/networking/netdev-features.rst
 
->> +
->> static int __init shaper_init(void)
-> 
-> 
-> 
-> fetch_dev
-> fill_handle
-> parse_handle
-> sc_lookup
-> __sc_container
-> dev_shaper_flush
-> shaper_init
-> 
-> 
-> Could you perhaps maintain net_shaper_ prefix for all of there?
+* hsr-fwd-offload
 
-Most of the helpers are static and should never be visible outside this 
-compilation unit, so I did not bother with a prefix, I'll add it in the 
-next revision.
+This should be set for devices which forward HSR (High-availability Seamless
+Redundancy) frames from one port to another in hardware.
 
-Thanks,
+To me, this suggests if the flag is not set, you should keep in dual
+EMACS or switchdev mode and perform HSR in software.
 
-Paolo
+> +static int emac_ndo_set_features(struct net_device *ndev,
+> +				 netdev_features_t features)
+> +{
+> +	netdev_features_t hsr_feature_present = ndev->features & NETIF_PRUETH_HSR_OFFLOAD;
+> +	netdev_features_t hsr_feature_wanted = features & NETIF_PRUETH_HSR_OFFLOAD;
 
+I would not add the _PRUETH_ alias. There is nothing _PRUETH_ specific
+here, its just plain HSR offload.
+
+> +static int prueth_hsr_port_link(struct net_device *ndev)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +	struct prueth_emac *emac0;
+> +	struct prueth_emac *emac1;
+> +
+> +	emac0 = prueth->emac[PRUETH_MAC0];
+> +	emac1 = prueth->emac[PRUETH_MAC1];
+> +
+> +	if (prueth->is_switch_mode) {
+> +		dev_err(prueth->dev, "Switching from bridge to HSR mode not allowed\n");
+> +		return -EINVAL;
+
+I think you want EOPNOTSUPP, so that it is performed in software, not
+offloaded to hardware. And this is not an error condition, it is just
+a limitation of your hardware/firmware.
+
+> +	prueth->hsr_members |= BIT(emac->port_id);
+> +	if (!prueth->is_switch_mode && !prueth->is_hsr_offload_mode) {
+> +		if (prueth->hsr_members & BIT(PRUETH_PORT_MII0) &&
+> +		    prueth->hsr_members & BIT(PRUETH_PORT_MII1)) {
+> +			if (!(emac0->ndev->features & NETIF_PRUETH_HSR_OFFLOAD) &&
+> +			    !(emac1->ndev->features & NETIF_PRUETH_HSR_OFFLOAD)) {
+> +				dev_err(prueth->dev, "Enable HSR offload on both interfaces\n");
+> +				return -EINVAL;
+
+Again, EOPNOTSUPP, so it falls back to software, and no dev_err().
+
+> +			}
+> +			prueth->is_hsr_offload_mode = true;
+> +			prueth->default_vlan = 1;
+> +			emac0->port_vlan = prueth->default_vlan;
+> +			emac1->port_vlan = prueth->default_vlan;
+> +			icssg_change_mode(prueth);
+> +			dev_err(prueth->dev, "Enabling HSR offload mode\n");
+
+This is not an error condition. dev_dbg().
+
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void prueth_hsr_port_unlink(struct net_device *ndev)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +	struct prueth_emac *emac0;
+> +	struct prueth_emac *emac1;
+> +
+> +	emac0 = prueth->emac[PRUETH_MAC0];
+> +	emac1 = prueth->emac[PRUETH_MAC1];
+> +
+> +	prueth->hsr_members &= ~BIT(emac->port_id);
+> +	if (prueth->is_hsr_offload_mode) {
+> +		prueth->is_hsr_offload_mode = false;
+> +		emac0->port_vlan = 0;
+> +		emac1->port_vlan = 0;
+> +		prueth->hsr_dev = NULL;
+> +		prueth_emac_restart(prueth);
+> +		dev_info(prueth->dev, "Enabling Dual EMAC mode\n");
+
+dev_dbg().
+
+> +	}
+> +}
+> +
+>  /* netdev notifier */
+>  static int prueth_netdevice_event(struct notifier_block *unused,
+>  				  unsigned long event, void *ptr)
+> @@ -1047,6 +1141,8 @@ static int prueth_netdevice_event(struct notifier_block *unused,
+>  	struct netlink_ext_ack *extack = netdev_notifier_info_to_extack(ptr);
+>  	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
+>  	struct netdev_notifier_changeupper_info *info;
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+>  	int ret = NOTIFY_DONE;
+>  
+>  	if (ndev->netdev_ops != &emac_netdev_ops)
+> @@ -1056,6 +1152,26 @@ static int prueth_netdevice_event(struct notifier_block *unused,
+>  	case NETDEV_CHANGEUPPER:
+>  		info = ptr;
+>  
+> +		if ((ndev->features & NETIF_PRUETH_HSR_OFFLOAD) &&
+> +		    is_hsr_master(info->upper_dev)) {
+> +			if (info->linking) {
+> +				if (!prueth->hsr_dev) {
+> +					prueth->hsr_dev = info->upper_dev;
+> +
+> +					icssg_class_set_host_mac_addr(prueth->miig_rt,
+> +								      prueth->hsr_dev->dev_addr);
+> +				} else {
+> +					if (prueth->hsr_dev != info->upper_dev) {
+> +						dev_err(prueth->dev, "Both interfaces must be linked to same upper device\n");
+
+dev_dbg()
+
+	Andrew
 
