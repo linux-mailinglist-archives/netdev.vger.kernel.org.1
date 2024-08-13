@@ -1,131 +1,195 @@
-Return-Path: <netdev+bounces-118110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC38B9508A9
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:14:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD8A9508C0
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB60B1C22BB4
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64B3B284B52
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87AEA19FA6B;
-	Tue, 13 Aug 2024 15:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665BB1A0712;
+	Tue, 13 Aug 2024 15:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DB9IDQ1A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7og9PxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC98C19E831;
-	Tue, 13 Aug 2024 15:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64741A08A1
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723562036; cv=none; b=a4Eg7zlnMTjWshNBbSULp9S+vCjEPdp6quni1GH48l+9MP8vQTmL6vJ38UzFqaRyNvvLC2bR6WOhbHrgbjcsWWZT87z8FJVjZnne49WEglOXc/DkvQp4VMACKUvL2lQFhG+FeZ4TKT6fbDPkVOBn0JfAxM6kmUd3pptk6qeoZYc=
+	t=1723562240; cv=none; b=CkXTKFUaSA1Z4jxWIQC2oqfX6Bf0hS7SgPNTAnzd+zd5o6EjHhT+Vd/wPPHu+DtZXxMpJ+ipIijIoCHmkFh9KNLJhlMS7/RoANQF/UC1izvvUN6RVd76ygAo3zcRgwZz6WlG6UXVW96Mt97QquHRouDSBvVj9VW5XW6N9KrLBa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723562036; c=relaxed/simple;
-	bh=V40vtNjwzGLNCCt68Yz73rtKAj1di36sAeB6peUqnPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQWtMyeFUnYbvnyEtieEjbhg01WSyAJDWjdfMfRbIFmtqu9AB+zf3l3vFfWs3yPCZ1YSdaPj5zAuGkjAwF2nCKB/uEpm8AEZM/S80kHbd9RIDU7MyCoxh6B1n6+LlAYKcuMzVe9nKy+Bnbg+2v959koXIpnI+CSI1pjkONh/6HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DB9IDQ1A; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-03.internal (phl-compute-03.nyi.internal [10.202.2.43])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 828951151ADA;
-	Tue, 13 Aug 2024 11:13:53 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Tue, 13 Aug 2024 11:13:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1723562033; x=1723648433; bh=TTJo0dwlhYuw65a/8dXX89xJMsBi
-	5E/g7VpWhakXTAw=; b=DB9IDQ1AKHuSDtrMc338xQnd5fiRIQe8PSgxMMWfFGKA
-	m/ur+iYp8iPTvWmSt6mAWU2t9maLpz71gRDhZjVuRTiXWScqSnjcxlbgkVwEtQ3h
-	hjp7vD6WH9oAfale31o1EMYf+QU15cm3LPYz1YRLdccxSnZIQ8XYXnNEA84jqQka
-	8igIc3pi/JJJkxD5NiqyrVlV3VlMq2uPB+omTt2v6Brcvg9SW69dyGWO1Oom4jU3
-	0s/jZ5EZS0HLbhd+5o8WHrnAuZnVjgzgX+tsIN+lDq/kW9B64uaPlGcpTcVgRcJI
-	UtNEpUuRo3eiAmAR502itrGXjm5LzqQn5C1chK83Fw==
-X-ME-Sender: <xms:MHi7ZiAJKirRQQM4cKUO85dFkmnuX8hlgcHZiFry2vsOt7IZUKjUGQ>
-    <xme:MHi7Zsi-jilgvn-IDdpN-AaCKJsL8ckca9X_4Zsom6kKUR0Xvm87fAsw4YAAwsFLv
-    HWxlKTUxK_ZPCc>
-X-ME-Received: <xmr:MHi7ZllD7zi45hwJd9ExcxNa0xeJ-IQvqdncvWCNLD6nIAiw7Z8Ne3O0_RKVafwK8COPWvucID3JDwRz_9BJ7oH4ofsGiA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtvddgkeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
-    hrgheqnecuggftrfgrthhtvghrnhepffetvddtieduteduleffveelgfehkeetudevveev
-    leehheekkedtjeeifeeuffeunecuffhomhgrihhnpehnvghtfhhilhhtvghrrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhs
-    tghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmth
-    hpohhuthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    ghhufigvnheslhhinhhugidrrghlihgsrggsrgdrtghomhdprhgtphhtthhopeifvghnjh
-    hirgeslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehjrghkrgeslhhinhhugidr
-    ihgsmhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghlihgsuhgurgeslhhinh
-    hugidrrghlihgsrggsrgdrtghomhdprhgtphhtthhopehtohhnhihluheslhhinhhugidr
-    rghlihgsrggsrgdrtghomh
-X-ME-Proxy: <xmx:MHi7ZgwPUb3rJCDNg3bB1De9qNdZRXzrx6bmXqpJOmZ37WqRLyzpEA>
-    <xmx:MHi7ZnT0W_IKseXJ9vRUBfmk9KuCGtJilEiqQ8OzYMdBNw72n1UwQQ>
-    <xmx:MHi7ZrbpnUK7Z10vVFDDEi6usa683qdfLYMlFszHzI9GOjKR2O5sNw>
-    <xmx:MHi7ZgSYm_fb1bgzv6i9lIwky86TtKYkiaw0o1KVxhHTLcCM6sKE6w>
-    <xmx:MXi7ZmKhLR4sSGm_0gP343jLYhkXzLtntEW3l1RTiFvn_3ifPwjPWTFD>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 13 Aug 2024 11:13:51 -0400 (EDT)
-Date: Tue, 13 Aug 2024 18:13:48 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com,
-	jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	danieller@nvidia.com
-Subject: Re: [PATCH net-next v2 1/2] net/smc: introduce statistics for
- allocated ringbufs of link group
-Message-ID: <Zrt4LGFh7kMwGczb@shredder.mtl.com>
-References: <20240807075939.57882-1-guwen@linux.alibaba.com>
- <20240807075939.57882-2-guwen@linux.alibaba.com>
- <20240812174144.1a6c2c7a@kernel.org>
- <b3e8c9b9-f708-4906-b010-b76d38db1fb1@linux.alibaba.com>
- <20240813074042.14e20842@kernel.org>
+	s=arc-20240116; t=1723562240; c=relaxed/simple;
+	bh=Bq6znnGat20Ad00SAWKp+fWfe1BjcDK3uZZaqoSE3k4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gCB7a2dt0DJZWZZA4FuO1UpI3XCrAo9B1J8dz3YTZHgeCfhn1IENpJ0RAvmcgFEgCBTBivaNBuvPbxuc5ALwvl7oFf5imQI9HEq8tuy7mCS/feH6DELJ6wLLSIqHm6/TmV0Dbpp8OkUHQSU28KLMTy9JgJjdtzJ4leNOf3bLwIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a7og9PxR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723562237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XZjcQvteijPS8JjH5ua+iZS3LbCVa2x8U59/CQKyXUQ=;
+	b=a7og9PxRzdDs11rVcw2Mf5G0gQopeecOmFFVSlytkvA8YO1uCnu9PSpKNUwPqCQ2qQ4l++
+	xYE6cFgSkCCJ3HTLr602XklJIUKJm7U/5J9hLsYhN25FZto960gYmo7xSCcjXzuPsYL60m
+	BREbUArBhGCe/019WLTedldH8uAUXmM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-5BSL57wQO3WRaIkjnwZD4g-1; Tue, 13 Aug 2024 11:17:16 -0400
+X-MC-Unique: 5BSL57wQO3WRaIkjnwZD4g-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280b24ec7bso10436205e9.3
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 08:17:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723562235; x=1724167035;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XZjcQvteijPS8JjH5ua+iZS3LbCVa2x8U59/CQKyXUQ=;
+        b=bh5SoAFVOKm+mrrR2JUnKUWaXOUuzJVA92NJ93tcfiFBykggHkxp3levGMEY4CyKw+
+         D08WfYJuheNrRMjsrbdzeARDu2LPptp3B08bjKQCwc+T+ntJP9Ac3Mw66zz+NuouzGgv
+         eukExNSvSB0Gos0/oknmJglpgOHcPSJfds9AgvZ3xFV2r3kjmi/0B/Zpg/obqpXlskgi
+         mfi5tx97RfGdTIROLsy/VKn0nlYGj+cmtO67SwYumTDXkyb1yRZLgzmdYqPbWs40aTwP
+         /L+R/F7rEYmiaeND+AhL3E+PJfmbc1j/4jwgLhiVlGcc1fy6vqH5D5gnp2NysMhHA4QT
+         IeZQ==
+X-Gm-Message-State: AOJu0YyFVImuOVSYw78gMCrVZrTkKRqScCZ52zawMilSxBkbrUdSjsoI
+	EEmU2ngBtGWD+S2+HHtx9fogsdG6vSUTmCSSH4ShgyScdx0TuVZkfzBfrtxJKuVctKFfWGy0brx
+	4+ozwtL1ADeEovKIrYS1wDcyZSFF6m5EurCau1meQuMfaYIgtUJGEMg==
+X-Received: by 2002:a5d:584e:0:b0:368:4c5:b69 with SMTP id ffacd0b85a97d-3716fcaa1e4mr1073008f8f.10.1723562234821;
+        Tue, 13 Aug 2024 08:17:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEE2T68L2nxUWhQu9yYSxkdgAPsPtlEJvz5tPSnoSOmRWT9hKefJFFDLo3dOLOTtQchjUDqSQ==
+X-Received: by 2002:a5d:584e:0:b0:368:4c5:b69 with SMTP id ffacd0b85a97d-3716fcaa1e4mr1072992f8f.10.1723562234264;
+        Tue, 13 Aug 2024 08:17:14 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1708:9110::f71? ([2a0d:3344:1708:9110::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51eb10sm10589557f8f.84.2024.08.13.08.17.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 08:17:13 -0700 (PDT)
+Message-ID: <b75dfc17-303a-4b91-bd16-5580feefe177@redhat.com>
+Date: Tue, 13 Aug 2024 17:17:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813074042.14e20842@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <7ed5d9b312ccda58c3400c7ba78bca8e5f8ea853.1722357745.git.pabeni@redhat.com>
+ <ZquQyd6OTh8Hytql@nanopsycho.orion>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZquQyd6OTh8Hytql@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 07:40:42AM -0700, Jakub Kicinski wrote:
-> On Tue, 13 Aug 2024 17:55:17 +0800 Wen Gu wrote:
-> > On 2024/8/13 08:41, Jakub Kicinski wrote:
-> > > On Wed,  7 Aug 2024 15:59:38 +0800 Wen Gu wrote:  
-> > >> +	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_R_SNDBUF_ALLOC,
-> > >> +			      lgr->alloc_sndbufs, SMC_NLA_LGR_R_PAD))  
-> > > 
-> > > nla_put_uint()  
-> > 
-> > Hi, Jakub. Thank you for reminder.
-> > 
-> > I read the commit log and learned the advantages of this helper.
-> > But it seems that the support for corresponding user-space helpers
-> > hasn't kept up yet, e.g. can't find a helper like nla_get_uint in
-> > latest libnl.
+On 8/1/24 15:42, Jiri Pirko wrote:
+> Tue, Jul 30, 2024 at 10:39:46PM CEST, pabeni@redhat.com wrote:
+>> +/**
+>> + * net_shaper_make_handle - creates an unique shaper identifier
+>> + * @scope: the shaper scope
+>> + * @id: the shaper id number
+>> + *
+>> + * Return: an unique identifier for the shaper
+>> + *
+>> + * Combines the specified arguments to create an unique identifier for
+>> + * the shaper. The @id argument semantic depends on the
+>> + * specified scope.
+>> + * For @NET_SHAPER_SCOPE_QUEUE_GROUP, @id is the queue group id
+>> + * For @NET_SHAPER_SCOPE_QUEUE, @id is the queue number.
+>> + * For @NET_SHAPER_SCOPE_VF, @id is virtual function number.
+>> + */
+>> +static inline u32 net_shaper_make_handle(enum net_shaper_scope scope,
+>> +					 int id)
+>> +{
+>> +	return FIELD_PREP(NET_SHAPER_SCOPE_MASK, scope) |
+>> +		FIELD_PREP(NET_SHAPER_ID_MASK, id);
 > 
-> Add it, then.
+> Perhaps some scopes may find only part of u32 as limitting for id in
+> the future? I find it elegant to have it in single u32 though. u64 may
+> be nicer (I know, xarray) :)
 
-Danielle added one to libmnl:
+With this code the id limit is 2^26 for each scope. The most capable H/W 
+I'm aware of supports at most 64K shapers, overall. Are you aware of any 
+specific constraint we need to address?
 
-https://git.netfilter.org/libmnl/commit/?id=102942be401a99943b2c68981b238dadfa788f2d
+[...]
+>> int net_shaper_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
+>> {
+>> -	return -EOPNOTSUPP;
+>> +	struct net_shaper_info *shaper;
+>> +	struct net_device *dev;
+>> +	struct sk_buff *msg;
+>> +	u32 handle;
+>> +	int ret;
+>> +
+>> +	ret = fetch_dev(info, &dev);
+> 
+> This is quite net_device centric. Devlink rate shaper should be
+> eventually visible throught this api as well, won't they? How do you
+> imagine that?
 
-Intention is to use it in ethtool once it appears in a released version
-of libmnl.
+I'm unsure we are on the same page. Do you foresee this to replace and 
+obsoleted the existing devlink rate API? It was not our so far.
+
+> Could we have various types of binding? Something like:
+> 
+> NET_SHAPER_A_BINDING nest
+>    NET_SHAPER_A_BINDING_IFINDEX u32
+> 
+> or:
+> NET_SHAPER_A_BINDING nest
+>    NET_SHAPER_A_BINDING_DEVLINK_PORT nest
+>      DEVLINK_ATTR_BUS_NAME string
+>      DEVLINK_ATTR_DEV_NAME string
+>      DEVLINK_ATTR_PORT_INDEX u32
+> 
+> ?
+
+Somewhat related, the current get()/dump() operations currently don't 
+return the shaper ifindex. I guess we can include 'scope' and 'id' under 
+NET_SHAPER_A_BINDING and replace the existing handle attribute with it.
+
+It should cover eventual future devlink extensions and provide all the 
+relevant info for get/dump sake.
+
+>> +
+>> static int __init shaper_init(void)
+> 
+> 
+> 
+> fetch_dev
+> fill_handle
+> parse_handle
+> sc_lookup
+> __sc_container
+> dev_shaper_flush
+> shaper_init
+> 
+> 
+> Could you perhaps maintain net_shaper_ prefix for all of there?
+
+Most of the helpers are static and should never be visible outside this 
+compilation unit, so I did not bother with a prefix, I'll add it in the 
+next revision.
+
+Thanks,
+
+Paolo
+
 
