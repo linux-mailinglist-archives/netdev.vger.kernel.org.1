@@ -1,107 +1,102 @@
-Return-Path: <netdev+bounces-118143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005D4950BC8
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:57:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA75F950C00
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 20:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33A891C22460
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:57:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76F32284DC9
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CB61A38C7;
-	Tue, 13 Aug 2024 17:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7F11A2C1E;
+	Tue, 13 Aug 2024 18:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNpmF0Yn"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ez2XRh9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4908C1A2C1E
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 17:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4988D19E7E3;
+	Tue, 13 Aug 2024 18:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723571866; cv=none; b=tzySBR7I9Cx8FH2vG6cFXKOfANNtfaPKykvF3EXRouNJsoXwuuoFPJgx6rsSH/YvxAvcBHCS9o01Yzs0QoUk28Fc8CQGV20XTWdkLm09gKu1yMkqjKcTBIzMLoQ/zcItYvUXDfts3Ui7wa86jucX2szPmr+3fdzIzaJTktgbeJQ=
+	t=1723572806; cv=none; b=sXRyZCDiwBZNOiXVyKeAbnRDisKC28WM6lZVnSGQsMDnPu1TbosQVtsKny5d9GNf9IADzyQjEmzy9TXxnT2WL6Y1GsepG0+VOHCBWqWnV5ZLj9TbQSUn9I0zGoOVN+mCie8GiVbf+jUm625ZQsc3AfRlXNi5AWj9eq7SNqS5x00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723571866; c=relaxed/simple;
-	bh=SHz1GKFFgb9AaiVx3Pq25pOufSuR0vzRzZy14EXzgo8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gFQkkkB4kpE7kqZxpTCKUXc/vztvnfda+Xqm2Db8NBxVt4CM4FeRpc56NXSmTjaD74YSata7+lePgS5oiBOt8OwHPkEPzocCNJCoslQkTpzto4HCf4tq8b+gTLDovQIAn+BblSvAH8BDROC/4vZB10j3B8tSGK0BiZwVveuM4pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BNpmF0Yn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723571863;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ASoLU8Zhiy9oUF//nHih1NhwKLKsqjXxIcqWYEvihZM=;
-	b=BNpmF0YnY02UajItPmHuJJDvwWUqjhhGP+N/ksz/l5JCNlZbpSjf+c85mkULHjBtbG8xTT
-	7J7xzTQsQcJlbYpwTi40FOm8iklxDkHUM2zYRWUalejy5oFBu615+S33q1a7u05Y6hpdRg
-	CkUNDSDG6B8B0ySJdvQ32pQeScXin6o=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-OzjRpjuXO3G3RXWHoR6AaQ-1; Tue,
- 13 Aug 2024 13:57:39 -0400
-X-MC-Unique: OzjRpjuXO3G3RXWHoR6AaQ-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0CD2B1955F3D;
-	Tue, 13 Aug 2024 17:57:37 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.32.254])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A72719773E6;
-	Tue, 13 Aug 2024 17:57:33 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>,  dev@openvswitch.org,
-  ovs-dev@openvswitch.org,  davem@davemloft.net,  kuba@kernel.org,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Pravin B
- Shelar <pshelar@ovn.org>,  Ilya Maximets <i.maximets@ovn.org>,  Florian
- Westphal <fw@strlen.de>
-Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
- counting in conntrack
-In-Reply-To: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
-	(Xin Long's message of "Mon, 12 Aug 2024 13:17:53 -0400")
-References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
-Date: Tue, 13 Aug 2024 13:57:31 -0400
-Message-ID: <f7t34n8cnlg.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1723572806; c=relaxed/simple;
+	bh=O3dtulhhM/axpHe4p5tksCGx3TlnoxRnwsGM1/zuj8g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LWK65GvXYFEeRiGyjwE4uWC8i12KrpUP1sNLvvULyvqh9LsqrXg9QJKOcRc8B5oRcJUJfuA99w0XdkfgOLrDp3fNQ8Oodlmk2Pgs59eUhfcEBAjFdYIejoAxlrnW1+OETxHC8bv34c5KJuLFZ7dSTw4zCRkA94+yTF6BLM7k4r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ez2XRh9g; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723572804; x=1755108804;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=O3dtulhhM/axpHe4p5tksCGx3TlnoxRnwsGM1/zuj8g=;
+  b=ez2XRh9gnkpe/mh9hEqX0ipoaq6W3286T1rVIdW7J0rx3tfQAKlIzySA
+   P7K+AowOPyeg21B2J7sb/lrSdHIAGaBSQnN5VrJlePCYNehxOIAp1zs7u
+   CdJ1Yyhfj68m68jVCMmEb7YIcrRY1+g0aiaxmzqO2Natwv3KNDbSdQ4pX
+   I6YqpZmtxQo8UXiOiwMM0uRyvAQILhPs9KgzoXgW4VfzD/zy7WXjErXcY
+   3U6PYOn7DEZMl5r0M2YpjWKD/qr3lOdzxBnCUHXfXYGHtXVMkLSusTrWy
+   lnvD4VcY/+GTSvMb0Ojidf/4q4DV8hGoAIhPMS093gTujPHhjp7MCjHia
+   w==;
+X-CSE-ConnectionGUID: EsYhHSPxTQafGavfWkHnvA==
+X-CSE-MsgGUID: cRLdwuB9TMKfqr89dWjcWw==
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="31118404"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Aug 2024 11:13:17 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Aug 2024 11:12:55 -0700
+Received: from HYD-DK-UNGSW08.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 13 Aug 2024 11:12:51 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next v2 0/2] Adds support for lan887x phy
+Date: Tue, 13 Aug 2024 23:45:13 +0530
+Message-ID: <20240813181515.863208-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Xin Long <lucien.xin@gmail.com> writes:
+Adds support for lan887x phy and accept autoneg configuration in
+phy driver only when feature is enabled in supported list.
 
-> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-action
-> label counting"), we should also switch to per-action label counting
-> in openvswitch conntrack, as Florian suggested.
->
-> The difference is that nf_connlabels_get() is called unconditionally
-> when creating an ct action in ovs_ct_copy_action(). As with these
-> flows:
->
->   table=0,ip,actions=ct(commit,table=1)
->   table=1,ip,actions=ct(commit,exec(set_field:0xac->ct_label),table=2)
->
-> it needs to make sure the label ext is created in the 1st flow before
-> the ct is committed in ovs_ct_commit(). Otherwise, the warning in
-> nf_ct_ext_add() when creating the label ext in the 2nd flow will
-> be triggered:
->
->    WARN_ON(nf_ct_is_confirmed(ct));
->
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
+v1 -> v2
+Addresed below review comments
+- Added phy library support to check supported list when autoneg is
+  enabled
+- Removed autoneg enabled check in lan887x phy.
+- Removed of_mdio macro for LED initialization.
+- Removed clearing pause frames support from supported list.
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+Divya Koppera (2):
+  net: phy: Add phy library support to check supported list when autoneg
+is enabled
+  net: phy: microchip_t1: Adds support for lan887x phy
+
+ drivers/net/phy/microchip_t1.c | 577 ++++++++++++++++++++++++++++++++-
+ drivers/net/phy/phy.c          |   5 +-
+ 2 files changed, 580 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
 
 
