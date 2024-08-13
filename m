@@ -1,119 +1,114 @@
-Return-Path: <netdev+bounces-117986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC529502C4
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:45:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A529502C9
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABD91F23760
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:45:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2B79286D0F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF96E1991DC;
-	Tue, 13 Aug 2024 10:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lQEtOPgk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A80197A61;
+	Tue, 13 Aug 2024 10:46:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3028E19A288
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5511B368;
+	Tue, 13 Aug 2024 10:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723545945; cv=none; b=BIxv2pd13NhQ6hENz56cRovtfpG4cRX/g289toG0roIU50NdaUfNfduLPaKWhbhxFIm5b+mQxe31E/b7fmGvPJgDGRek7EKiKaZv+TfYBJYukNhhuR27ebdwF7mTh5jk/RBRoXdIf76dX/uBC00h6FmN53JFmfBEQ/InMVu2rUU=
+	t=1723545982; cv=none; b=CKIp5NFMv2p/L4Q7us/P4mi6NF9llm9QxNq39eSug9t8y6i0AUCHTcVKoU4dKjalX5Y1PA1e13SD/njFCobRl8cTOpekJR+3cLdYyeNMQzySqGbGulcdn6VJkBn54a/KbSHlqZp34coIeMlRQkoCBRz0ITe92v6+EoU9O2hw0PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723545945; c=relaxed/simple;
-	bh=dSSrvIrzaSFBD6AM5pRevzia/lDzCE40W+TUXd90I1g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2U6usiICVHarLBlBjSA/Jykjmmpm0Cj+mWpj+mrC4mK+JIcFPOrxrHcHSWplGi4VQoxy5YZQbnGR+1zmLArEXwL6Kv0N1VKiBf7m9xmjOOagJtpr+w4WRe37N1STI1pugtEsxmtcooCWyaAGQakU1P4E0lMbseP6+q2rCy0P1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lQEtOPgk; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9TGP6013756;
-	Tue, 13 Aug 2024 03:45:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=upz99kQhapywIbZ7C5DtFIt9y
-	u0TUW14BfQwSPm5riY=; b=lQEtOPgkGkI6jI/WWFkV1RllFqG/UtMvu22PnJS8p
-	YG/CSKL3hy083z/F3yF4EdY/9k1PrqUzWLXCqlOVd5px6Op3AR5Y7BYZc244aEJw
-	s9Gp3MoEfSQX1WXxTFfvKWSgH4VwVpTkIE1lAnviWzCO1bOQxix47Rr+3o6F5Hz1
-	9/6S6ALUnnvpQBX28/Frm7PVr3f/DBRNczr7UV2mvKGX3MTWHsRjwc5YY7jeBPR8
-	oHLVfQyuL4YPj6RSNTUuLYchdc9CkQYzx+pH/uJDRo/po6hG/LNq+4vsuCeLBJds
-	nweiYhqbJZsvWbHb+6+NJgopQM2LHxXvyPU/xvO5r2nAw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4104w6g6gx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 03:45:36 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 13 Aug 2024 03:45:35 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 13 Aug 2024 03:45:35 -0700
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 6BA933F7060;
-	Tue, 13 Aug 2024 03:45:31 -0700 (PDT)
-Date: Tue, 13 Aug 2024 16:15:30 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Praveen Kaligineedi <pkaligineedi@google.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <willemb@google.com>,
-        <jeroendb@google.com>, <shailend@google.com>, <hramamurthy@google.com>,
-        <jfraker@google.com>, Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [PATCH net-next v3 2/2] gve: Add RSS adminq commands and ethtool
- support
-Message-ID: <Zrs5SspHV06zP4cK@test-OptiPlex-Tower-Plus-7010>
-References: <20240812222013.1503584-1-pkaligineedi@google.com>
- <20240812222013.1503584-3-pkaligineedi@google.com>
+	s=arc-20240116; t=1723545982; c=relaxed/simple;
+	bh=/fjXahSEjF9ZhlV6L3LaHMKecBdvEBPMXHpQdm2U2cA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LBZrMCnh7CNooZotXuirRUPF53+EkwDJOnIaAdlvGTpiPOQNMfn+9MmSat3+i73TOFfKadjvz3d9Jq5IeG0hcrAheHl9S4ozDULuM66T36z5JeJy86IKCBuHM1n7wP4VDcjcWV6nGtw8txJLxIDkR/8ikUb/B45UXb+1OBAAJm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a77ec5d3b0dso581346266b.0;
+        Tue, 13 Aug 2024 03:46:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723545979; x=1724150779;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EaRqNknoiXIxBgYUXTCTJlYjmV6mokfwA1oMnDDM/HA=;
+        b=niYtyPj+sTHt88R2K9tau2cy3xqKNsFZLanL+LRDknhe9iBU8i1Ew2HGaw9AOGieIW
+         dDApjyObDOmCeuoFwQOTFttjYDcqrSZ1v2OeKEzmZk6DkO6OtDkTDHFmPF4RmO7C9eJa
+         HIRa4BbIIPQsJypsYCDN0Ezq2ZBK/RrakROqYP8qVxHCXOan3gd1DbecwH92BxylWulo
+         6TfhO1RJ2/Py3Zih5gkT9VP33STKJuSBx2/wkNGBA752Tr+ldb6f0G3aXipwG4tWv5bi
+         AbOpXLv21+RcxxpjNRRXxjIjfFDFl8bHQwH8jkDgjq7NSHAk3kElhTSrOIRv8Zf8oiHv
+         Q4+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXvp63pjBKRUAv1Lkb/DbLSMZzVO7kd5EMThqT6wNrARXE6So1kmNK03SNhlUgRkc00FrhY7roKkN995WjAQxokVTJOk/eTPSefBDRwcyFuth6/m454GLERtKfMXuCI0GUZBSFBQLBBnJf/ejPTP//Ri3Bd9ea28zU34WayL3fIreuikVAr
+X-Gm-Message-State: AOJu0YzmHSWgHWbF5d8aezfgnENdNJ6DZoET71tdeJ8nAp6Hhnv0dcFe
+	dUf7f/nr6INF85keMup9z0UcPCL5WKkZSlFyMqcd6cnEWFMKwqJ7vTlKfQ==
+X-Google-Smtp-Source: AGHT+IHDTiyEw8hKE9wVP2vCQm1qA4pO92wamZ6Y1mgtvqkgOHxFimnP6vee5n3w6zJbOY3sUnEVUQ==
+X-Received: by 2002:a17:906:db03:b0:a7a:a7b8:adb1 with SMTP id a640c23a62f3a-a80ed258a71mr203720766b.36.1723545978473;
+        Tue, 13 Aug 2024 03:46:18 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3f47b4asm59489166b.36.2024.08.13.03.46.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 03:46:17 -0700 (PDT)
+Date: Tue, 13 Aug 2024 03:46:15 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: netconsole: Constify struct
+ config_item_type
+Message-ID: <Zrs5dyMWT5u8qXNV@gmail.com>
+References: <9c205b2b4bdb09fc9e9d2cb2f2936ec053da1b1b.1723325900.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240812222013.1503584-3-pkaligineedi@google.com>
-X-Proofpoint-GUID: LN4cTF62J6RcpIjqBIUyN4HmJsgbZKOT
-X-Proofpoint-ORIG-GUID: LN4cTF62J6RcpIjqBIUyN4HmJsgbZKOT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
+In-Reply-To: <9c205b2b4bdb09fc9e9d2cb2f2936ec053da1b1b.1723325900.git.christophe.jaillet@wanadoo.fr>
 
-On 2024-08-13 at 03:50:13, Praveen Kaligineedi (pkaligineedi@google.com) wrote:
-> From: Jeroen de Borst <jeroendb@google.com>
+Hello Christophe,
+
+On Sat, Aug 10, 2024 at 11:39:04PM +0200, Christophe JAILLET wrote:
+> 'struct config_item_type' is not modified in this driver.
 > 
-> Introduce adminq commands to configure and retrieve RSS settings from
-> the device. Implement corresponding ethtool ops for user-level
-> management.
+> This structure is only used with config_group_init_type_name() which takes
+> a const struct config_item_type* as a 3rd argument.
 > 
-> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
-> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> ---
-> Changes in v2:
-> 	- Update the GVE's get/set_rxfh functions to send the
-> 	  ethtool_rxfh_param directly to related adminq functions so
-> 	  that it can avoid the extra copy between ethtool and the
-> 	  local gve_rss_config struct(Jakub Kicinski)
-> 	- Remove the struct gve_rss_config that becomes unused
-> 	- Add a comment in the gve_adminq_configure_rss function to
-> 	  describe the device expections for the configure_rss adminq
-> 	  command
+> This also makes things consistent with 'netconsole_target_type' witch is
+> already const.
 > 
->  drivers/net/ethernet/google/gve/gve.h         |   2 +
->  drivers/net/ethernet/google/gve/gve_adminq.c  | 146 ++++++++++++++++++
->  drivers/net/ethernet/google/gve/gve_adminq.h  |  44 ++++++
->  drivers/net/ethernet/google/gve/gve_ethtool.c |  44 +++++-
->  4 files changed, 235 insertions(+), 1 deletion(-)
->
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+> Constifying this structure moves some data to a read-only section, so
+> increase overall security, especially when the structure holds some
+> function pointers.
+> 
+> On a x86_64, with allmodconfig:
+> Before:
+> ======
+>    text	   data	    bss	    dec	    hex	filename
+>   33007	   3952	   1312	  38271	   957f	drivers/net/netconsole.o
+> 
+> After:
+> =====
+>    text	   data	    bss	    dec	    hex	filename
+>   33071	   3888	   1312	  38271	   957f	drivers/net/netconsole.o
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+
+Reviewed-by: Breno Leitao <leitao@debian.org>
+
+> Compile tested-only.
+
+I've tested it using a selftime I am creating, and it is all good.
+
+Thanks for the patch!
+--breno
 
