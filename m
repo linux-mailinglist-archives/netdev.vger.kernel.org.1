@@ -1,102 +1,157 @@
-Return-Path: <netdev+bounces-118107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECD995088F
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:10:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06B99508A0
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:11:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60DE28189B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:10:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED1D1C21E47
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FA219EED6;
-	Tue, 13 Aug 2024 15:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B4C19FA94;
+	Tue, 13 Aug 2024 15:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJZIyLvG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nNMBJq2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B0A19EEA4
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A541E4A4;
+	Tue, 13 Aug 2024 15:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723561813; cv=none; b=Adm0UTykv18c0OyW/PoflZBViYBoHdhOexH3KNZwyhjwGDbZ5K9Zv7pieljhjxdIzBICIxtZylKhDLzeKjGH1nPlLJqdbwwZko6OXl1iOhxe130F3oyhOodssjL1X+2xik1EqoxfcU2poHii0n58enbXyPIlyimiw1hy8BewOis=
+	t=1723561904; cv=none; b=bSs/BDLodsnmROARarXRl7b2WA5if3V82R6bqfkO4gAGCqI8efOCFn0lTOyBtgEe3lbOc5U2bn64/dgWpBlCBjfYqmwvUg5WSxJfAFQ7s3N1S/EC4VoDndcrg2kEJoOuMDC4D0IVjXaefF+tF3dxi4sEfaTXfxOou5HXpVwYMXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723561813; c=relaxed/simple;
-	bh=X9WteY5MCq4YehuCh+HYelcA6FD6+zFPhB40n31DI1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=scGscOsxJM07twtSNCOd7KIUJbYeqLjNNsif3Hk2PaoMxyMqFcV581SsfWpOEkuMKv6zgHD9b8QlIgKiVQXMOmF9nb0haOTop4pejgeWvV2QYx0+uPquBfdwZCIN8M00OcZTNpq5x+/c3n1TMTweOt9g3sZLxO3CNAQ2fRoLnaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJZIyLvG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E48FC4AF0B;
-	Tue, 13 Aug 2024 15:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723561812;
-	bh=X9WteY5MCq4YehuCh+HYelcA6FD6+zFPhB40n31DI1U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IJZIyLvGNpu9Iri8Xv29k+B11cROuOKA4r/XgTgfzy3UWAfE3EPDfEcKqxGZqNDMD
-	 PRp0V20IeBW1QqK7RPtH0E6bPvtyi8Qam24eYcnwgf/n0ER7KYruk0q8RaKvxXPL4a
-	 bnJeZHeBKrZx6tRPmz/GIHKP6I5/29J3DDczRfu4Iu37X+vsxdi65ziD8cCnUH3v9H
-	 9ZUGNCgxogPKw1lNIgr9T9Nu214YQjQkDWr215MGs2qcZDB8IsCqSIpa5m0vK/UlmM
-	 FNxvsfNXIDsELnD20FvukrvoFsUaUiuAOhAwWRVAOQoSRyQDKAbA7uvFUKqMB/XQzR
-	 zzXQ/4klmbBfA==
-Date: Tue, 13 Aug 2024 08:10:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Arinzon, David" <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
- Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
- "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
- "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
- <nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
- <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
- "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
- <ndagan@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar"
- <itzko@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
- "Beider, Ron" <rbeider@amazon.com>, "Chauskin, Igor" <igorch@amazon.com>
-Subject: Re: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
- reporting support
-Message-ID: <20240813081010.02742f87@kernel.org>
-In-Reply-To: <9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
-	<20240812185852.46940666@kernel.org>
-	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
+	s=arc-20240116; t=1723561904; c=relaxed/simple;
+	bh=raOwBnqYH5LhsUp41vZu/c8ShXCLiujerZ2BM0PTRAM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gyF/tUJlVellLUTuLKwuP4MnG5ro6DG0klr2PeDfL12cw2glg6kxsUrvysoOmlAsITq4FnHteRqj8Hh6mI03v5c1VNZun8RtqS59SNrwd+ZnalKx4meM8CRhVlpZkcWClRkmeIzT0W3Q5sNbkPhpAA7aIIot2YCSA8KVZO9H0F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nNMBJq2H; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3683f56b9bdso3739149f8f.1;
+        Tue, 13 Aug 2024 08:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723561901; x=1724166701; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4nC9j0rwXAV42mfe1JGwEatxbihzY0JrdD7+bccVpsE=;
+        b=nNMBJq2HqcvSHxtrXDlLxKwbvoTgYvObAxOF3a+Y36vrSY+WKZ7SDxvIrvA05NeMM+
+         UiXPxRirj2u/K1XrPj3nAKM3k1ZFc3xj13WkQgoyjLJcc+qeylB80UBq5eN8CoA2/JH2
+         vqn4ln8JbJ5I/9y1744aJUfAYJudv7f/+47sjZnYF81e3dn73YmUJ6YkCPBYCzSu6ndM
+         iMTkoUEOr5w44folNbMCENz2Nal5NZzAU7IFxh1BkhvfUlDr2h/QgueObo8aqfqvhlYo
+         ayKfx0ILPfJFNNfBI/btMeNzwAy8NYDjScc2uG3KBuT3P5SGb2kluDzPFzNLv/fTVmMD
+         4lyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723561901; x=1724166701;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4nC9j0rwXAV42mfe1JGwEatxbihzY0JrdD7+bccVpsE=;
+        b=drzPNEED6abwnvjvm3+GPcDdQkY6D/dglNXJ6+oPAXAwA+PcKj95TtOrPLInMEHLbY
+         d+2+1atHKAn/LZvwB881QoM5uMttZ8QHzDNRojFc3jarKJBRanX8UFsQuNKf0BUjFl9N
+         Iw1xeNbInkKI4P6HHbA252MetG1Hx1G0/xZsBNdsHLjpu5bdScqL9oo0FtNfTNL2wxtg
+         ktRJsYJblLm0TTVqtOk6t3YMGI64+MGXqdZ1uu5DbeG6DfEmILtvGbaz0E8ytMEgAw/4
+         ef8cR5puJlkza2LcOsGdrVy7O3LO5jDulNwabhppFR54dls53oDG62CZBjQXVJ8dZLX1
+         6Eaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXK1n54joW/ZvATScEK3cKCrV5UJEj703V5qLU1czEg9ZL1131cXTEOfy5RHk0f8iuuu8J/Zw5fw3Z0JsPIIRrYB6BSj3gF5qSw7vu4h4YB8G+F2pVeodjrFKUi0nd0QrhiXpXgtdtVY2DNu11f/9yjtZglXMxzyYCM
+X-Gm-Message-State: AOJu0YwTRkQVjuAySABeUXul/w1+4rU9ePp83ie17OpRDGmbJ7eJfVlZ
+	CpsKPqOG4UDJ7JYWCWbkMznrnTqhIxku3+8NzKXb/V3jI8QBQvPTq4wfLzvQY0Qexyt/7XK3Qb/
+	wjosXJ6E34gba7HYM6R2ePf7ijD4=
+X-Google-Smtp-Source: AGHT+IEiRdefQPqd/dPcUdZDhMBU+XuPSqJx3UZGGW6A7Tj9UdJ3g2ZF6n39rYUPDVgFQ3fwnLBKaSyoF92wFN4g+fE=
+X-Received: by 2002:a5d:47c2:0:b0:368:303b:8fe7 with SMTP id
+ ffacd0b85a97d-3716ccd8341mr2763330f8f.7.1723561900405; Tue, 13 Aug 2024
+ 08:11:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240808123714.462740-1-linyunsheng@huawei.com> <4aba9fae-563d-4a4e-8336-44e24551d9f9@huawei.com>
+In-Reply-To: <4aba9fae-563d-4a4e-8336-44e24551d9f9@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 13 Aug 2024 08:11:03 -0700
+Message-ID: <CAKgT0UezjgRX9QUWkee_p8KVQQa1va12k2CaGJeOYrr5LGg4YQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 00/14] Replace page_frag with page_frag_cache
+ for sk_page_frag()
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, bpf@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 13 Aug 2024 11:29:50 +0000 Arinzon, David wrote:
-> I will note that this patch modifies the infrastructure/logic in
-> which these stats are retrieved to allow expandability and
-> flexibility of the interface between the driver and the device
-> (written in the commit message). The top five (0 - 4) are already
-> part of the upstream code and the last one (5) is added in this patch.
+On Tue, Aug 13, 2024 at 4:30=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/8/8 20:37, Yunsheng Lin wrote:
+>
+> ...
+>
+> >
+> > CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >
+> > 1. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei=
+.com/
+> >
+> > Change log:
+> > V13:
+> >    1. Move page_frag_test from mm/ to tools/testing/selftest/mm
+> >    2. Use ptr_ring to replace ptr_pool for page_frag_test.c
+> >    3. Retest based on the new testing ko, which shows a big different
+> >       result than using ptr_pool.
+>
+> Hi, Davem & Jakub & Paolo
+>     It seems the state of this patchset is changed to 'Deferred' in the
+> patchwork, as the info regarding the state in 'Documentation/process/
+> maintainer-netdev.rst':
+>
+> Deferred           patch needs to be reposted later, usually due to depen=
+dency
+>                    or because it was posted for a closed tree
+>
+> Obviously it was not the a closed tree reason here, I guess it was the de=
+pendency
+> reason casuing the 'Deferred' here? I am not sure if I understand what so=
+rt of
+> dependency this patchset is running into? It would be good to mention wha=
+t need
+> to be done avoid the kind of dependency too.
+>
+>
+> Hi, Alexander
+>     The v13 mainly address your comments about the page_fage_test module.
+> It seems the your main comment about this patchset is about the new API
+> naming now, and it seems there was no feedback in previous version for
+> about a week:
+>
+> https://lore.kernel.org/all/ca6be29e-ab53-4673-9624-90d41616a154@huawei.c=
+om/
+>
+> If there is still disagreement about the new API naming or other things, =
+it
+> would be good to continue the discussion, so that we can have better
+> understanding of each other's main concern and better idea might come up =
+too,
+> like the discussion about new layout for 'struct page_frag_cache' and the
+> new refactoring in patch 8.
 
-That's not clear at all from the one sentence in the commit message.
-Please don't assume that the reviewers are familiar with your driver.
+Sorry for not getting to this sooner. I have been travelling for the
+last week and a half. I just got home on Sunday and I am suffering
+from a pretty bad bout of jet lag as I am overcoming a 12.5 hour time
+change. The earliest I can probably get to this for review would be
+tomorrow morning (8/14 in the AM PDT) as my calendar has me fully
+booked with meetings most of today.
 
-> The statistics discussed here and are exposed by ENA are not on a
-> queue level but on an interface level, therefore, I am not sure that
-> the ones pointed out by you would be a good fit for us.
+Thanks,
 
-The API in question is queue-capable, but it also supports reporting
-the stats for the overall device, without per-queue breakdown (via
-the "get_base_stats" callback).
-
-> But in any case, would it be possible from your point of view to
-> progress in two paths, one would be this patchset with the addition
-> of the new metric and another would be to explore whether there are
-> such stats on an interface level that can be exposed?
-
-Adding a callback and filling in two stats is not a large ask.
-Just do it, please.
+- Alex
 
