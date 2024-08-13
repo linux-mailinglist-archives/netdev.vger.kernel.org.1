@@ -1,170 +1,107 @@
-Return-Path: <netdev+bounces-117991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EAF1950313
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:57:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E999502FE
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185C01F21DA4
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:57:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ABF41F21BFE
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CB619AD4F;
-	Tue, 13 Aug 2024 10:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2854419B3C3;
+	Tue, 13 Aug 2024 10:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Et9rKDfQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsCSw3y3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FA819AA58;
-	Tue, 13 Aug 2024 10:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D7C19ADB9;
+	Tue, 13 Aug 2024 10:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723546567; cv=none; b=iPUKsvNjFqwztL593TVs2XGwyxVP7ZIXL8iBVPagBmEtbEZdRm7UanL7AmEpcDerXgoAvvKY28HNSTUvlqWbHdM92P/fWlZNKcgS6QfKLRSeGOp26+ahMTgy597C8Lj6UDmOlMS0U8XaYhl+EEd450ABf9+jAXAhN3Ewbmu7dEo=
+	t=1723546330; cv=none; b=mBGW8wQyM8fePxBJlA/haH84NBmQET0STasTDShlHNEcI3c+v+adTIldvQjtUJWSfjqPUX1YTve62F7qb+ASy9cQ97MBGotbPwVMJNOrxU8xVXUXSVdEAFxTViQRqFMiCsb4cIaIRtZ5ckfk2eNok/iy3PRWgYTA8qRhAZmJVqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723546567; c=relaxed/simple;
-	bh=KSgLvCgukm7SuRr8aIh2efSvJWw2ykWte/os8g56hB0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JencHeUbqOka9xQ12cTEaQqxVpMLkCrLqdA3R6Ky1J2Lpfz11bTKKsGHrbowa68OJSSrNqSfZzyKVCUo12sspfmwGqX3N0FIYCrBHmiB/MmoN0Ffg/lAjtOR01AHGzGK21jBWgM48LA/d0GXZ0U38XYeCp/n3CG3/CPt3i48WOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Et9rKDfQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9abWb031286;
-	Tue, 13 Aug 2024 10:50:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	WhlZuS6gpJmDBfj7tUVk06rz347a2fbx1nf1hh7blm4=; b=Et9rKDfQSSidGydp
-	cuoi0XNprRrzTHf+Jczq4U1SRuoncOaYZMD9Pak6MyQblYfqwv+0bA9wgq5jTlaK
-	swWwUsZMvlps3EUVx02KLf9701hH6dFpnEeQ5A7rM/IjMeznH8lyUdCWV+FXLZ/i
-	bQ3uLVdZWd4tI64Z2v8jYs4257v4WHqoBLSRwEIgjYRMlRHtQb2Ue8FUxrutXuAu
-	KmjOXFu7uejJ4kQJfzioyWpHPpTHmZMTEhKkWugatAkjZTcWO5sDy+oued2ZW/q1
-	YQRwUe8OwYahzI0Fq4ENwvaJx9iCbiUNkU5HA2DrDNVmZjwT8bDE2vMShn7fGVTh
-	RTL+nA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40x15e79fp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 10:50:25 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47DAoBqU013789
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 10:50:11 GMT
-Received: from [10.253.34.30] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 13 Aug
- 2024 03:50:07 -0700
-Message-ID: <3f7e9969-5285-4dba-b16e-65c6b10ee89a@quicinc.com>
-Date: Tue, 13 Aug 2024 18:50:04 +0800
+	s=arc-20240116; t=1723546330; c=relaxed/simple;
+	bh=19P1yH4b64Ikkc4SmfeEMqvZKraUG3cSFt25H0eCWL0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aZ1h+w+9rO01wjweN3fRdbNRWlqIqC1FmvaYyLuJ5OmZ9/LFuIrrrzytW89srEXY+bVDEyz7CRRQIOn8sFHEtweChKdnWFI/nYRC3tlUuMXsjEtI6UYGzpnKxaVQB3700fW8UMVINeSno9H+czGAoaL4jvOzulu3QGxncRkncAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NsCSw3y3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24046C4AF09;
+	Tue, 13 Aug 2024 10:52:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723546329;
+	bh=19P1yH4b64Ikkc4SmfeEMqvZKraUG3cSFt25H0eCWL0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NsCSw3y3lVYRZKrIkJAurcwjEwJSjcecqGPWp2dm2IyZN1NA8s9ETcCsa3elW34GA
+	 S7ZKO6PAswIa/CJAylNNNsG2Ot/+sQ75+YkEgELJm6pdd4pQ6fmZ7oJESAo6xcdR2+
+	 rnQOJhiez6xtHLtBYvLOzbTklMUJE13wyztuVtGvwvU6zf1NhNYb57ks3rEMs+Awic
+	 KnsaA4Rztvw7XJ3ltUD0Bu9j6YCeinuqRXkrZ5z3AAPdhbaNaQ9/kBe8Zyzij8m2VO
+	 ScgJX7kclPQnBrkaNP00aqOMUdHPwVMbEMJbDOLdsSYaq8gTI2oxKYBLGP80VVXwyp
+	 aKTBRZwAI58/Q==
+Date: Tue, 13 Aug 2024 11:52:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de
+Subject: Re: [PATCH net-next 2/3] net: ag71xx: use devm for
+ of_mdiobus_register
+Message-ID: <20240813105204.GB5183@kernel.org>
+References: <20240812190700.14270-1-rosenp@gmail.com>
+ <20240812190700.14270-3-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] driver core: Introduce an API
- constify_device_find_child_helper()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zijun Hu
-	<zijun_hu@icloud.com>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>,
-        Davidlohr Bueso
-	<dave@stgolabs.net>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Dave
- Jiang <dave.jiang@intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan
- Williams <dan.j.williams@intel.com>,
-        Takashi Sakamoto
-	<o-takashi@sakamocchi.jp>,
-        Timur Tabi <timur@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
-        <netdev@vger.kernel.org>
-References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
- <20240811-const_dfc_prepare-v1-2-d67cc416b3d3@quicinc.com>
- <2024081314-marbling-clasp-442a@gregkh>
-Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <2024081314-marbling-clasp-442a@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: BwLEZ1fydPE7qZsoyL-lqd11wCChzbl4
-X-Proofpoint-ORIG-GUID: BwLEZ1fydPE7qZsoyL-lqd11wCChzbl4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- phishscore=0 suspectscore=0 priorityscore=1501 mlxlogscore=999
- clxscore=1015 spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408130078
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812190700.14270-3-rosenp@gmail.com>
 
-On 8/13/2024 5:45 PM, Greg Kroah-Hartman wrote:
-> On Sun, Aug 11, 2024 at 08:18:08AM +0800, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>
->> Introduce constify_device_find_child_helper() to replace existing
->> device_find_child()'s usages whose match functions will modify
->> caller's match data.
+On Mon, Aug 12, 2024 at 12:06:52PM -0700, Rosen Penev wrote:
+> Allows removing ag71xx_mdio_remove.
 > 
-> Ick, that's not a good name, it should be "noun_verb" with the subsystem being on the prefix always.
+> Removed local mii_bus variable and assign struct members directly.
+> Easier to reason about.
 > 
-okay, got it.
-
-is it okay to use device_find_child_mut() suggested by Przemek Kitszel ?
-
-> But why is this even needed?  Device pointers are NOT const for the
-> obvious reason that they can be changed by loads of different things.
-> Trying to force them to be const is going to be hard, if not impossible.
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  drivers/net/ethernet/atheros/ag71xx.c | 39 ++++++++-------------------
+>  1 file changed, 11 insertions(+), 28 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+> index c22ebd3c1f46..1bc882fc1388 100644
+> --- a/drivers/net/ethernet/atheros/ag71xx.c
+> +++ b/drivers/net/ethernet/atheros/ag71xx.c
+> @@ -684,12 +684,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+>  {
+>  	struct device *dev = &ag->pdev->dev;
+>  	struct net_device *ndev = ag->ndev;
+> -	static struct mii_bus *mii_bus;
+>  	struct device_node *np, *mnp;
+>  	int err;
+>  
+>  	np = dev->of_node;
+> -	ag->mii_bus = NULL;
+>  
+>  	ag->clk_mdio = devm_clk_get_enabled(dev, "mdio");
+>  	if (IS_ERR(ag->clk_mdio)) {
+> @@ -703,7 +701,7 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+>  		return err;
+>  	}
+>  
+> -	mii_bus = devm_mdiobus_alloc(dev);
+> +	ag->mii_bus = devm_mdiobus_alloc(dev);
+>  	if (!mii_bus)
 
-[PATCH 3/5] have more discussion about these questions with below link:
-https://lore.kernel.org/all/8b8ce122-f16b-4207-b03b-f74b15756ae7@icloud.com/
+Above mii_bus is removed, but here it is used.
 
+>  		return -ENOMEM;
+>  
 
-The ultimate goal is to make device_find_child() have below prototype:
-
-struct device *device_find_child(struct device *dev, const void *data,
-		int (*match)(struct device *dev, const void *data));
-
-Why ?
-
-(1) It does not make sense, also does not need to, for such device
-finding operation to modify caller's match data which is mainly
-used for comparison.
-
-(2) It will make the API's match function parameter have the same
-signature as all other APIs (bus|class|driver)_find_device().
-
-
-My idea is that:
-use device_find_child() for READ only accessing caller's match data.
-
-use below API if need to Modify caller's data as
-constify_device_find_child_helper() does.
-int device_for_each_child(struct device *dev, void *data,
-                    int (*fn)(struct device *dev, void *data));
-
-So the The ultimate goal is to protect caller's *match data* @*data  NOT
-device @*dev.
-
-> thanks,
-> 
-> greg k-h
-
+...
 
