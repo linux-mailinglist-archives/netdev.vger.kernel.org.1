@@ -1,116 +1,99 @@
-Return-Path: <netdev+bounces-118002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D36795039A
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:30:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDEBD95039E
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47CFB284BD2
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B8101C226D3
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBB8186E33;
-	Tue, 13 Aug 2024 11:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31211990A6;
+	Tue, 13 Aug 2024 11:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOCT/6Ks"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD643190470;
-	Tue, 13 Aug 2024 11:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA85518B480;
+	Tue, 13 Aug 2024 11:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723548611; cv=none; b=h8evIHU6J7XIIyEAZEYxP9oURsftFDiW+8g+2Y8MGJK+JuDxJmh12aHCGQ4+WMf1d8gIDtjZTZdn38GThYxs8ntomF9SR9f6WHxJFnY5PTvXsOCbkK/a2MJ4GX7o0Nv3uqChYWNzgVe71k+lXXssePELoiqnFv3iV7YKkRURbc0=
+	t=1723548630; cv=none; b=OJ7feyqhrIAuwkZAB0cVOvAi8VJ+FiFR08CZwRDqYftLJEDAlpICBiDhtKifFfVjp2Qvk5fxdl3f2+M6gohbfjm4SHsLLLM4e9sExrb4dG7S248GvPTIM0QUk40K23bBuKnSRwsbUnOA9r3bLIAbRCPajk0BCdS2bJu/qBzRAwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723548611; c=relaxed/simple;
-	bh=r/2AEoj8adaNFww4tePMwm3iY8aha/Lh2iH3JiqZq9E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KdIVcxPRdD/kRCuNBXIgo9cJXf/cv0MZKztFovjiEQYAMWn0byLdYPLVHRk54KezV6UognvM78658heW4Nu0SDIKWQ3y7b10c9/tcnfHP1AgybbIkSLzgT0klYeazyQX9GJ+aAIZSShZr6WnKIhS222ExHc/asq+2bYmosvY960=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Wjq0x5k9pz1T78J;
-	Tue, 13 Aug 2024 19:29:37 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id A8EAE180087;
-	Tue, 13 Aug 2024 19:30:05 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 13 Aug 2024 19:30:05 +0800
-Message-ID: <4aba9fae-563d-4a4e-8336-44e24551d9f9@huawei.com>
-Date: Tue, 13 Aug 2024 19:30:05 +0800
+	s=arc-20240116; t=1723548630; c=relaxed/simple;
+	bh=kiwXUxfjx4OtcKC14SZI8xUFCU5QGPX4eXEN8CbXRLM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sShtepDCZRwFfuBZ0rmg1akSWDaMsw0J9jjFZhJYEB2qTteieBBeu1AP1a/Fg5V/xbAKthCALi1npdWnBa3+McaKs4afDvyKily+28coPyNZUiAk3Vc5/aJa8/FP7VzCkjNLpDcj1TSBwtKrRwOTjOhT6Fbl3L6yJaf/m3ps1t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOCT/6Ks; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C097C4AF0B;
+	Tue, 13 Aug 2024 11:30:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723548630;
+	bh=kiwXUxfjx4OtcKC14SZI8xUFCU5QGPX4eXEN8CbXRLM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HOCT/6Ks9SESeseIvikOwerpDR78YS4ROZoV5WqO9XHA9EokNr5d3KulKwHsxH9Vm
+	 +lIwOH4EXJkWrf+/cmvX6AX2jhSiOdHyFtxIhtTjGxLxx/CHYhCPLesXAMmh7ucSmg
+	 gAZmQt7mDq6wbgHQDvtGGfhyQS3bXxrouzAsn5uE/G/dKD5EfQIixWoUDsKucnupEp
+	 0JLll8NdhvHt6P+8nyURKE5n9Qc9DbH/xtBpYT5vVjYk8Ys9fakAj1q97Hy8w1MEjO
+	 3gkVR+z+iXhQQBTr9RlOzQcj9ip7YOiAkqP5153xDUJ3Rb+QC/xbOiqgLD7FECOA49
+	 qv3Z8t3nAEMAA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EB83823327;
+	Tue, 13 Aug 2024 11:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 00/14] Replace page_frag with page_frag_cache
- for sk_page_frag()
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>, Alexander
- Duyck <alexander.duyck@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20240808123714.462740-1-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net] net: mana: Fix doorbell out of order violation and
+ avoid unnecessary doorbell rings
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172354862926.1604273.6519840713233454447.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Aug 2024 11:30:29 +0000
+References: <1723219138-29887-1-git-send-email-longli@linuxonhyperv.com>
+In-Reply-To: <1723219138-29887-1-git-send-email-longli@linuxonhyperv.com>
+To: Long Li <longli@linuxonhyperv.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shradhagupta@linux.microsoft.com,
+ horms@kernel.org, kotaranov@microsoft.com, schakrabarti@linux.microsoft.com,
+ erick.archer@outlook.com, paulros@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ longli@microsoft.com, stable@vger.kernel.org
 
-On 2024/8/8 20:37, Yunsheng Lin wrote:
+Hello:
 
-...
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
+On Fri,  9 Aug 2024 08:58:58 -0700 you wrote:
+> From: Long Li <longli@microsoft.com>
 > 
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> After napi_complete_done() is called when NAPI is polling in the current
+> process context, another NAPI may be scheduled and start running in
+> softirq on another CPU and may ring the doorbell before the current CPU
+> does. When combined with unnecessary rings when there is no need to arm
+> the CQ, it triggers error paths in the hardware.
 > 
-> 1. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
-> 
-> Change log:
-> V13:
->    1. Move page_frag_test from mm/ to tools/testing/selftest/mm
->    2. Use ptr_ring to replace ptr_pool for page_frag_test.c
->    3. Retest based on the new testing ko, which shows a big different
->       result than using ptr_pool.
+> [...]
 
-Hi, Davem & Jakub & Paolo
-    It seems the state of this patchset is changed to 'Deferred' in the
-patchwork, as the info regarding the state in 'Documentation/process/
-maintainer-netdev.rst':
+Here is the summary with links:
+  - [v3,net] net: mana: Fix doorbell out of order violation and avoid unnecessary doorbell rings
+    https://git.kernel.org/netdev/net/c/58a63729c957
 
-Deferred           patch needs to be reposted later, usually due to dependency
-                   or because it was posted for a closed tree
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Obviously it was not the a closed tree reason here, I guess it was the dependency
-reason casuing the 'Deferred' here? I am not sure if I understand what sort of
-dependency this patchset is running into? It would be good to mention what need
-to be done avoid the kind of dependency too.
-
-
-Hi, Alexander
-    The v13 mainly address your comments about the page_fage_test module.
-It seems the your main comment about this patchset is about the new API
-naming now, and it seems there was no feedback in previous version for
-about a week:
-
-https://lore.kernel.org/all/ca6be29e-ab53-4673-9624-90d41616a154@huawei.com/
-
-If there is still disagreement about the new API naming or other things, it
-would be good to continue the discussion, so that we can have better
-understanding of each other's main concern and better idea might come up too,
-like the discussion about new layout for 'struct page_frag_cache' and the
-new refactoring in patch 8.
-
-> 
 
 
