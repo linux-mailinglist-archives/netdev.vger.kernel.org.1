@@ -1,256 +1,196 @@
-Return-Path: <netdev+bounces-118022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA19950445
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:57:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D198C95044A
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D2081F21BD7
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:57:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01F811C20F6D
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EA9199244;
-	Tue, 13 Aug 2024 11:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B353E1991D2;
+	Tue, 13 Aug 2024 11:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A4/6p/O3"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="glg2xvLK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6KH5SUKc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jAzaYaXr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4+MRS/Cv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB6E194A6B
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3A01991AA;
+	Tue, 13 Aug 2024 11:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723550260; cv=none; b=Cn2dj1XILCZM1syot36i6PuVoQFsRMUTnEYaFTWBYoOaNAWI65EW6Q8vs7W3tYQOZaaKpqAkSioi7pU+KH0vOoNiGIvSZ7+PsFJD3zdfqHnSbNjNH2rJXoGV/7dmb4CVj80g/4R6xVdmqQSlBbAtUTItNbfaH/UHHWgxYG+L6ew=
+	t=1723550363; cv=none; b=l5bA+N4U6KHHOeYN7qCwiVu8j2TI7sYa5ra25SlzVAxgv7mh1ugCx7sfY4QjnOFT3dzTLDKttn6Jz0vaIK2vKspX6QkkqZ5v5fCk9z1beMLMOU5C6Cu51ouk1bx4q3oE6ms2XOJwMqgkfHXUrcKtdW7uqxyt1UOc2OoEJZb9K7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723550260; c=relaxed/simple;
-	bh=hpCWpHjKhZFIJtA8gW87bhIjf/SJHDylr8Z2rSUZJbA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RE6w47tiqYLf/AxCk+5zi7scnnlHh5TX5e+6V+ZgUtFtZa+EIMRgP8ADUM1708k1vWi9pAOEHlkuYFh9v2lstAvmlrIY1J+yDaXov3+Kl9j7EG9z03IXNN7y99RDv0FjP8vwJwBF9uaPu1SrDxBj8OQpY9j+NDRVaEj2FA48WaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A4/6p/O3; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fd640a6454so40846185ad.3
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 04:57:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1723550258; x=1724155058; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXj6YrMtJ0gWFTWAL5SUSyJeDfI3jpHl1jV8Ck1Ub5w=;
-        b=A4/6p/O3k3S40EBMdVIoV15KHLntcRn6nog21Tgv4Lf/OvAmymNDMsQiA87kiuPx16
-         iJMeEleI0Zuf5WfeFMYz6K7Zs3sXfmbIOmWoV90QKh6WqFLa4qqKW11FfLIEzjah9Vko
-         92COAwABO2ndTJrmUHlZlsmFq/dwYqzeLWeho=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723550258; x=1724155058;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TXj6YrMtJ0gWFTWAL5SUSyJeDfI3jpHl1jV8Ck1Ub5w=;
-        b=nfkLu3oe9KikefTdHyio4LA7RxrgSWo1Wz72zoo2/S6SSivOtaWmJTfvCvmm3XZpB4
-         y9FQTvTjetMEYCeSkzZTg9+VoLgqef9FxkzxzmBNKjAwtYHV0M9QCfG1t4CBm4j71/mF
-         RR8IUS5q8Sba92BrUkcyEz3vMMDwUZBcH72X2x6rtAT1QkhQ9Y/i1UtjlkNdEyNy+2qg
-         eo31mn3NAAatqxcuIb/jCtuYW9+Zi8UD2BU6O2TSXO06c8CBeLpKJa3wVavwj/tld+YU
-         6TmyLhrUdVnpfk59rWkDud9hBSpgSJJ3t7XxOHBPjRtB2zFAhjcwgsMhgio2B6i5TRwP
-         gZiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7waJNTnujRCqVK/QaT8J6oQa4TEIR2RSugZEeJQJbcA/JBXutJCXmUegCTf4AU5trbne3x2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmC+JyexwUHbRKYm4Pi1MH7IxReMMn+z/luCWWqfNppVWZih7D
-	q/ngDyOa9c3RdUCbIdeT4V3Xoz8LMg51UUXBQR9gjBcQIjdmB52cJYo9IKaZSw==
-X-Google-Smtp-Source: AGHT+IFf7r4+eaG8ovXNz7tpTkFz5zRThgMupBmEqRawhnukS/bBcfpuDdGfM7AGPHQVhuvowwJO2w==
-X-Received: by 2002:a17:903:2345:b0:1fb:3b61:45aa with SMTP id d9443c01a7336-201ca1c0803mr35625745ad.40.1723550257889;
-        Tue, 13 Aug 2024 04:57:37 -0700 (PDT)
-Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd132895sm12031645ad.9.2024.08.13.04.57.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Aug 2024 04:57:37 -0700 (PDT)
-Message-ID: <721da64c-42ec-4be6-8ad3-e2685a84823a@broadcom.com>
-Date: Tue, 13 Aug 2024 13:57:28 +0200
+	s=arc-20240116; t=1723550363; c=relaxed/simple;
+	bh=YKUhh138MKddwNXT//mlPFhV2bsCE5QjxVJU7COwIY8=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=lxtETotCVtLFt38ncO6U9OsNXD3fT7WElLRz2kQH6mH/PR7MWLRNslqkeyuVS81cQPcp9GRY0rvidiSOo7BTVS/Y/kMV5xfXZGrcuMufyCqJvg8n7gX+//UCsSj7ERqs40PqUzqlElAkzLV4VGF6FTKWIi3grApssHAoF1Gua8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=glg2xvLK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6KH5SUKc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jAzaYaXr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4+MRS/Cv; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0E5B61F74B;
+	Tue, 13 Aug 2024 11:59:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723550360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YzbTbyzS1OF3r8pmcPB9/80dU+RKX4grDiTjBdUyQoA=;
+	b=glg2xvLKG3Ua7x17igx/wtY2TI4C7bGHdmxZI4DPCcXZ/3ZZiMKBqNRndE+TZvmbLXe0Y6
+	NCao+bov+ExiVcN3wrB+aPzCNJSB36uoyYh8buk4ADwT0/w09HPv3hjmUZJ8d0QHLo4OMP
+	4Ae/REaBvr1sPFP4hE7nL10itF3dBf4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723550360;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YzbTbyzS1OF3r8pmcPB9/80dU+RKX4grDiTjBdUyQoA=;
+	b=6KH5SUKcqKESay3+iZU8pXy8ydknSahCk4X2ljFFsfqLjKDsC5BDoNaGxUv9krBns4GoeE
+	Hi/24/XrRwsaNkDw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jAzaYaXr;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="4+MRS/Cv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723550359; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YzbTbyzS1OF3r8pmcPB9/80dU+RKX4grDiTjBdUyQoA=;
+	b=jAzaYaXrK73U7/2T4pEbWEZ84MvnEhdRNsWNzrXsxzUWKWEuEkskfu713Rd8lZQVOAokg+
+	Vzs2RI9rPEXprF+FnYOBiu32Qh/LkbcQrkhrxnNNhUtH8vTBAcbSfVfG3m2hP8B0uA/4En
+	L9tnQaiNoY6s8oEMLdX3daSXkf3Z0ko=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723550359;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=YzbTbyzS1OF3r8pmcPB9/80dU+RKX4grDiTjBdUyQoA=;
+	b=4+MRS/CvIjo/f5HeOgh288b69m0PRnR09v8bMKsDi7MUlENjjyYREY63GOYYlCcRVomFDO
+	dygbrCMcVulHsMAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EDA4F13ABD;
+	Tue, 13 Aug 2024 11:59:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id McDWOZZKu2YWdwAAD6G6ig
+	(envelope-from <tbogendoerfer@suse.de>); Tue, 13 Aug 2024 11:59:18 +0000
+From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ip6_tunnel: Fix broken GRO
+Date: Tue, 13 Aug 2024 13:59:10 +0200
+Message-Id: <20240813115910.87101-1-tbogendoerfer@suse.de>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 4/5] wifi: brcmfmac: Add optional lpo clock enable
- support
-To: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org,
- krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
- minipli@grsecurity.net, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com,
- Sai Krishna <saikrishnag@marvell.com>
-References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
- <20240813082007.2625841-5-jacobe.zang@wesion.com>
-Content-Language: en-US
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <20240813082007.2625841-5-jacobe.zang@wesion.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -5.01
+X-Rspamd-Queue-Id: 0E5B61F74B
+X-Spamd-Result: default: False [-5.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-On 8/13/2024 10:20 AM, Jacobe Zang wrote:
-> WiFi modules often require 32kHz clock to function. Add support to
-> enable the clock to PCIe driver and move "brcm,bcm4329-fmac" check
-> to the top of brcmf_of_probe. Change function prototypes from void
-> to int and add appropriate errno's for return values that will be
-> send to bus when error occurred.
+GRO code checks for matching layer 2 headers to see, if packet belongs
+to the same flow and because ip6 tunnel set dev->hard_header_len
+this check fails in cases, where it shouldn't. To fix this don't
+set hard_header_len, but use needed_headroom like ipv4/ip_tunnel.c
+does.
 
-I was going to say it looks good to me, but....
+Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+---
+ net/ipv6/ip6_tunnel.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-> Co-developed-by: Ondrej Jirman <megi@xff.cz>
-> Signed-off-by: Ondrej Jirman <megi@xff.cz>
-> Co-developed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> ---
->   .../broadcom/brcm80211/brcmfmac/bcmsdh.c      |  4 +-
->   .../broadcom/brcm80211/brcmfmac/common.c      |  3 +-
->   .../wireless/broadcom/brcm80211/brcmfmac/of.c | 53 +++++++++++--------
->   .../wireless/broadcom/brcm80211/brcmfmac/of.h |  9 ++--
->   .../broadcom/brcm80211/brcmfmac/pcie.c        |  3 ++
->   .../broadcom/brcm80211/brcmfmac/sdio.c        | 22 +++++---
->   .../broadcom/brcm80211/brcmfmac/usb.c         |  3 ++
->   7 files changed, 61 insertions(+), 36 deletions(-)
-
-[...]
-
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> index e406e11481a62..f19dc7355e0e8 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-
-[...]
-
-> @@ -113,33 +118,39 @@ void brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
->   		of_node_put(root);
->   	}
->   
-> -	if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac"))
-> -		return;
-> -
->   	err = brcmf_of_get_country_codes(dev, settings);
->   	if (err)
->   		brcmf_err("failed to get OF country code map (err=%d)\n", err);
->   
->   	of_get_mac_address(np, settings->mac);
->   
-> -	if (bus_type != BRCMF_BUSTYPE_SDIO)
-> -		return;
-> +	if (bus_type == BRCMF_BUSTYPE_SDIO) {
-
-Don't like the fact that this now has an extra indentation level and it 
-offers no extra benefit. Just keep the original if-statement and return 
-0. Consequently the LPO clock code should move just before the if-statement.
-
-> +		if (of_property_read_u32(np, "brcm,drive-strength", &val) == 0)
-> +			sdio->drive_strength = val;
->   
-> -	if (of_property_read_u32(np, "brcm,drive-strength", &val) == 0)
-> -		sdio->drive_strength = val;
-> +		/* make sure there are interrupts defined in the node */
-> +		if (!of_property_present(np, "interrupts"))
-> +			return 0;
->   
-> -	/* make sure there are interrupts defined in the node */
-> -	if (!of_property_present(np, "interrupts"))
-> -		return;
-> +		irq = irq_of_parse_and_map(np, 0);
-> +		if (!irq) {
-> +			brcmf_err("interrupt could not be mapped\n");
-> +			return 0;
-> +		}
-> +		irqf = irqd_get_trigger_type(irq_get_irq_data(irq));
-> +
-> +		sdio->oob_irq_supported = true;
-> +		sdio->oob_irq_nr = irq;
-> +		sdio->oob_irq_flags = irqf;
-> +	}
->   
-> -	irq = irq_of_parse_and_map(np, 0);
-> -	if (!irq) {
-> -		brcmf_err("interrupt could not be mapped\n");
-> -		return;
-> +	clk = devm_clk_get_optional_enabled(dev, "lpo");
-> +	if (!IS_ERR_OR_NULL(clk)) {
-> +		brcmf_dbg(INFO, "enabling 32kHz clock\n");
-> +		return clk_set_rate(clk, 32768);
-> +	} else {
-> +		return PTR_ERR_OR_ZERO(clk);
->   	}
-
-Change this to:
-
- > +	clk = devm_clk_get_optional_enabled(dev, "lpo");
- > +	if (IS_ERR_OR_NULL(clk)) {
- > +		return PTR_ERR_OR_ZERO(clk);
- > +	}
- > +	brcmf_dbg(INFO, "enabling 32kHz clock\n");
- > +	clk_set_rate(clk, 32768);
-
-As said above this should be moved before the if-statement:
-
- > -	if (bus_type != BRCMF_BUSTYPE_SDIO)
- > -		return 0;
-
-> -	irqf = irqd_get_trigger_type(irq_get_irq_data(irq));
->   
-> -	sdio->oob_irq_supported = true;
-> -	sdio->oob_irq_nr = irq;
-> -	sdio->oob_irq_flags = irqf;
-> +	return 0;
->   }
-
-[...]
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 9dee0c127955..dcbc668906c6 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -1507,7 +1507,8 @@ static void ip6_tnl_link_config(struct ip6_tnl *t)
+ 			tdev = __dev_get_by_index(t->net, p->link);
+ 
+ 		if (tdev) {
+-			dev->hard_header_len = tdev->hard_header_len + t_hlen;
++			dev->needed_headroom = tdev->hard_header_len +
++				tdev->needed_headroom + t_hlen;
+ 			mtu = min_t(unsigned int, tdev->mtu, IP6_MAX_MTU);
+ 
+ 			mtu = mtu - t_hlen;
+@@ -1731,6 +1732,7 @@ ip6_tnl_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
+ int ip6_tnl_change_mtu(struct net_device *dev, int new_mtu)
+ {
+ 	struct ip6_tnl *tnl = netdev_priv(dev);
++	int t_hlen = tnl->hlen + sizeof(struct ipv6hdr);
+ 
+ 	if (tnl->parms.proto == IPPROTO_IPV6) {
+ 		if (new_mtu < IPV6_MIN_MTU)
+@@ -1740,10 +1742,10 @@ int ip6_tnl_change_mtu(struct net_device *dev, int new_mtu)
+ 			return -EINVAL;
+ 	}
+ 	if (tnl->parms.proto == IPPROTO_IPV6 || tnl->parms.proto == 0) {
+-		if (new_mtu > IP6_MAX_MTU - dev->hard_header_len)
++		if (new_mtu > IP6_MAX_MTU - dev->hard_header_len - t_hlen)
+ 			return -EINVAL;
+ 	} else {
+-		if (new_mtu > IP_MAX_MTU - dev->hard_header_len)
++		if (new_mtu > IP_MAX_MTU - dev->hard_header_len - t_hlen)
+ 			return -EINVAL;
+ 	}
+ 	WRITE_ONCE(dev->mtu, new_mtu);
+@@ -1887,12 +1889,11 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
+ 	t_hlen = t->hlen + sizeof(struct ipv6hdr);
+ 
+ 	dev->type = ARPHRD_TUNNEL6;
+-	dev->hard_header_len = LL_MAX_HEADER + t_hlen;
+ 	dev->mtu = ETH_DATA_LEN - t_hlen;
+ 	if (!(t->parms.flags & IP6_TNL_F_IGN_ENCAP_LIMIT))
+ 		dev->mtu -= 8;
+ 	dev->min_mtu = ETH_MIN_MTU;
+-	dev->max_mtu = IP6_MAX_MTU - dev->hard_header_len;
++	dev->max_mtu = IP6_MAX_MTU - dev->hard_header_len - t_hlen;
+ 
+ 	netdev_hold(dev, &t->dev_tracker, GFP_KERNEL);
+ 	netdev_lockdep_set_classes(dev);
+-- 
+2.35.3
 
 
