@@ -1,77 +1,85 @@
-Return-Path: <netdev+bounces-118221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08260950FA7
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:23:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4857D950FA8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:23:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDBE72815FD
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 22:22:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697AD1C20DD9
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 22:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66491AAE25;
-	Tue, 13 Aug 2024 22:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76E71AB512;
+	Tue, 13 Aug 2024 22:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XO9GxeIq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NtZl6HD+"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF4756766
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE231AAE10
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723587776; cv=none; b=ECRKHROKTkX0dt/P0COKvM9fXHPW04EuzrhbHUnCNfHmwOC0U9YpTKO8Ly76OiLiYYywMA07dBYLbyT+FL3Wz0MWPwc+CCbWnQKejPPyo57Q8WViFGWheDSIKwuBuqdrT8R7+dsb9HtoBDdX4FTQnHmfvDgwaa3tZQ4MLh/mjR0=
+	t=1723587777; cv=none; b=F9x7iui1zldUyBpYij6PUd0GQC49sXtmt4oOEjt0rOp7OrEhZyV/Fhx/P+UCrBHyBEKV6qRv7e1bTNa1/wB+kgFVj4tKbBj1Ws7P30BWJIj9p082yz1Cdd8AAjeO8XoInFk/+sb/Z7qVLCdJpenuqjSQH/iTmx7MQCrGEt86w2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723587776; c=relaxed/simple;
-	bh=phMzR7+ioTz7l6JEkFB0TBB0P6PGSnLn8ZtKR2/AdIM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWdodMK/2GnJjN8vplAb+Z6nEo9hPzjlpDRKVgQl0XN3bKjd2sfeiUQ3rAbYzK0xD3KV5vjBuJiyAzNGfDTHNThZbf2qBknhsZbCVCPTfJIEWLXUKAopJ9IVyfKEVroPtwpd+RaeKY6wnF89+Hqea58GEifKcJdNoZNwi6s+Xw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XO9GxeIq; arc=none smtp.client-ip=192.198.163.8
+	s=arc-20240116; t=1723587777; c=relaxed/simple;
+	bh=6TAdpQz6PFfeYz4b9vjrb+jwoaa3+l5JaXG5oN52HTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uZq8sIXcJjs4BbwhmAVLaG7/7uq989AB+uWu1QXbb/Ckz80fvkLt3znZRQrWvgVNayVOZTIFIaZXaH+rfLcjbc+OUBEV6kH5d0bXC7XQCb73FjFHMkcWgcYbh8KWqAki47rNVWkQc52eV0WtZqNe0QrTvhWzZKR4Kgkfub8ZzU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NtZl6HD+; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723587775; x=1755123775;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=phMzR7+ioTz7l6JEkFB0TBB0P6PGSnLn8ZtKR2/AdIM=;
-  b=XO9GxeIqHstLaULXMDFXg0x8Y9WEvcMweJdI5+IZ3WUpd63TFv7F05O/
-   L1BOkQPcq5iNZogKqxQ+9/pHqUUmMTcjtHv38YHZGURrmJcRGtzQmizOa
-   ZcNjdBM6+G6bH9sqV5nBviFiSsHu2cb6LbYRzHEVpzK+y58Vlf2iBS+ig
-   t3F2wNU8nPY80ZJcrDbB8KAR79c9GMKXedV1cD56hAxYH4RG4wL4r9cR5
-   /mKfwznaLe+OSCVy1nzQ4tkpZTMl+Ud/zpOtjTrBaEcCpiJXuUC9/FBov
-   HRS6ycxSFjI4sAqsYJF5m3YS4JD9UvBZinxB0zHCjy37jeh3UzkCPd62J
-   g==;
-X-CSE-ConnectionGUID: tYtpNc8PQhS5eC7air8b6w==
-X-CSE-MsgGUID: yb2SKxgqRQGTXeYxkaV3JQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="39287068"
+  t=1723587776; x=1755123776;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6TAdpQz6PFfeYz4b9vjrb+jwoaa3+l5JaXG5oN52HTE=;
+  b=NtZl6HD+T95WcJdHipdiHK6tOnESY/GzCGRQukmeeTJo/LfaQKgYxZD2
+   91jXd82ATxsVpV7Xhs6ctIlwydR5SB4+f2H7wrwHTt+CksmCsQXbvdVwX
+   S0numAp0lKGNGRX7eF7yt3tLlXwxW4TqtDfXkmfG0n6rdylN1nKu6k+8/
+   6hS14lNy+TUr7DYgrHi8Eh9/6T4nIi2usGI8yGxd08r/aIes9iJ8DLx89
+   MbXkAqcMPng7gqcIVCcBkFTkSPC/kBYm9sMJVTZkMISESiGrz9uVrIb1h
+   0hZcjopKsrcIrBMppL2eiSqA1gJIheVWS7QkhDQsQ3AMc2aEvdVLbwnCC
+   w==;
+X-CSE-ConnectionGUID: F7/oHgKTSiaIzmK6xvo5wA==
+X-CSE-MsgGUID: uWBDxZshS+SisRG1AOEsPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="39287072"
 X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
-   d="scan'208";a="39287068"
+   d="scan'208";a="39287072"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 15:22:54 -0700
-X-CSE-ConnectionGUID: M6ufxz/fTHeEqw+XbCAEvw==
-X-CSE-MsgGUID: C+ySxeGiR5mccNtznEg9LA==
+X-CSE-ConnectionGUID: 4fSM2LicTWqStpmUAx8bGQ==
+X-CSE-MsgGUID: 3jzEkLz5TmGlBymLnPL1Qg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
-   d="scan'208";a="59381046"
+   d="scan'208";a="59381048"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa007.jf.intel.com with ESMTP; 13 Aug 2024 15:22:53 -0700
+  by orviesa007.jf.intel.com with ESMTP; 13 Aug 2024 15:22:54 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Junfeng Guo <junfeng.guo@intel.com>,
+	anthony.l.nguyen@intel.com,
 	ahmed.zaki@intel.com,
 	madhu.chittim@intel.com,
 	horms@kernel.org,
-	hkelam@marvell.com
-Subject: [PATCH net-next v2 00/13][pull request] ice: iavf: add support for TC U32 filters on VFs
-Date: Tue, 13 Aug 2024 15:22:35 -0700
-Message-ID: <20240813222249.3708070-1-anthony.l.nguyen@intel.com>
+	hkelam@marvell.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Qi Zhang <qi.z.zhang@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: [PATCH net-next v2 01/13] ice: add parser create and destroy skeleton
+Date: Tue, 13 Aug 2024 15:22:36 -0700
+Message-ID: <20240813222249.3708070-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20240813222249.3708070-1-anthony.l.nguyen@intel.com>
+References: <20240813222249.3708070-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,98 +88,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Ahmed Zaki says:
+From: Junfeng Guo <junfeng.guo@intel.com>
 
-The Intel Ethernet 800 Series is designed with a pipeline that has
-an on-chip programmable capability called Dynamic Device Personalization
-(DDP). A DDP package is loaded by the driver during probe time. The DDP
-package programs functionality in both the parser and switching blocks in
-the pipeline, allowing dynamic support for new and existing protocols.
-Once the pipeline is configured, the driver can identify the protocol and
-apply any HW action in different stages, for example, direct packets to
-desired hardware queues (flow director), queue groups or drop.
+Add new parser module which can parse a packet in binary and generate
+information like ptype, protocol/offset pairs and flags which can be later
+used to feed the FXP profile creation directly.
 
-Patches 1-8 introduce a DDP package parser API that enables different
-pipeline stages in the driver to learn the HW parser capabilities from 
-the DDP package that is downloaded to HW. The parser library takes raw
-packet patterns and masks (in binary) indicating the packet protocol fields
-to be matched and generates the final HW profiles that can be applied at
-the required stage. With this API, raw flow filtering for FDIR or RSS
-could be done on new protocols or headers without any driver or Kernel
-updates (only need to update the DDP package). These patches were submitted
-before [1] but were not accepted mainly due to lack of a user.
+Add skeleton of the create and destroy APIs:
+ice_parser_create()
+ice_parser_destroy()
 
-Patches 9-11 extend the virtchnl support to allow the VF to request raw
-flow director filters. Upon receiving the raw FDIR filter request, the PF
-driver allocates and runs a parser lib instance and generates the hardware
-profile definitions required to program the FDIR stage. These were also
-submitted before [2].
-
-Finally, patches 12 and 13 add TC U32 filter support to the iavf driver.
-Using the parser API, the ice driver runs the raw patterns sent by the
-user and then adds a new profile to the FDIR stage associated with the VF's
-VSI. Refer to examples in patch 13 commit message.
-
-[1]: https://lore.kernel.org/netdev/20230904021455.3944605-1-junfeng.guo@intel.com/
-[2]: https://lore.kernel.org/intel-wired-lan/20230818064703.154183-1-junfeng.guo@intel.com/
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
+Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-v2:
-- Resolve incorrect type warning
-- Add kdoc short description to ice_nearest_proto_id()
-
-v1: https://lore.kernel.org/netdev/20240809173615.2031516-1-anthony.l.nguyen@intel.com/
-
-iwl: https://lore.kernel.org/intel-wired-lan/20240725220810.12748-1-ahmed.zaki@intel.com/
-
-The following are changes since commit dd1bf9f9df156b43e5122f90d97ac3f59a1a5621:
-  net: hinic: use ethtool_sprintf/puts
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
-
-Ahmed Zaki (2):
-  iavf: refactor add/del FDIR filters
-  iavf: add support for offloading tc U32 cls filters
-
-Junfeng Guo (11):
-  ice: add parser create and destroy skeleton
-  ice: parse and init various DDP parser sections
-  ice: add debugging functions for the parser sections
-  ice: add parser internal helper functions
-  ice: add parser execution main loop
-  ice: support turning on/off the parser's double vlan mode
-  ice: add UDP tunnels support to the parser
-  ice: add API for parser profile initialization
-  virtchnl: support raw packet in protocol header
-  ice: add method to disable FDIR SWAP option
-  ice: enable FDIR filters from raw binary patterns for VFs
-
- drivers/net/ethernet/intel/iavf/iavf.h        |   30 +
- .../net/ethernet/intel/iavf/iavf_ethtool.c    |   59 +-
- drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   89 +-
- drivers/net/ethernet/intel/iavf/iavf_fdir.h   |   13 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c   |  160 +-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   25 +-
- drivers/net/ethernet/intel/ice/Makefile       |    2 +
- drivers/net/ethernet/intel/ice/ice_common.h   |    1 +
- drivers/net/ethernet/intel/ice/ice_ddp.c      |   10 +-
- drivers/net/ethernet/intel/ice/ice_ddp.h      |   13 +
- .../net/ethernet/intel/ice/ice_flex_pipe.c    |   99 +-
- .../net/ethernet/intel/ice/ice_flex_pipe.h    |    7 +-
- drivers/net/ethernet/intel/ice/ice_flow.c     |  109 +-
- drivers/net/ethernet/intel/ice/ice_flow.h     |    5 +
- drivers/net/ethernet/intel/ice/ice_parser.c   | 2430 +++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_parser.h   |  540 ++++
- .../net/ethernet/intel/ice/ice_parser_rt.c    |  861 ++++++
- drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |    4 +
- .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  403 ++-
- include/linux/avf/virtchnl.h                  |   13 +-
- 22 files changed, 4792 insertions(+), 90 deletions(-)
+ drivers/net/ethernet/intel/ice/Makefile     |  1 +
+ drivers/net/ethernet/intel/ice/ice_common.h |  1 +
+ drivers/net/ethernet/intel/ice/ice_parser.c | 32 +++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h | 13 +++++++++
+ 4 files changed, 47 insertions(+)
  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
 
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 03500e28ac99..23fa3f7f36ef 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -28,6 +28,7 @@ ice-y := ice_main.o	\
+ 	 ice_vlan_mode.o \
+ 	 ice_flex_pipe.o \
+ 	 ice_flow.o	\
++	 ice_parser.o    \
+ 	 ice_idc.o	\
+ 	 devlink/devlink.o	\
+ 	 devlink/devlink_port.o \
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 66f29bac783a..27208a60cece 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -10,6 +10,7 @@
+ #include "ice_type.h"
+ #include "ice_nvm.h"
+ #include "ice_flex_pipe.h"
++#include "ice_parser.h"
+ #include <linux/avf/virtchnl.h>
+ #include "ice_switch.h"
+ #include "ice_fdir.h"
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
+new file mode 100644
+index 000000000000..6c50164efae0
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_parser.c
+@@ -0,0 +1,32 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2024 Intel Corporation */
++
++#include "ice_common.h"
++
++/**
++ * ice_parser_create - create a parser instance
++ * @hw: pointer to the hardware structure
++ *
++ * Return: a pointer to the allocated parser instance or ERR_PTR
++ * in case of error.
++ */
++struct ice_parser *ice_parser_create(struct ice_hw *hw)
++{
++	struct ice_parser *p;
++
++	p = kzalloc(sizeof(*p), GFP_KERNEL);
++	if (!p)
++		return ERR_PTR(-ENOMEM);
++
++	p->hw = hw;
++	return p;
++}
++
++/**
++ * ice_parser_destroy - destroy a parser instance
++ * @psr: pointer to a parser instance
++ */
++void ice_parser_destroy(struct ice_parser *psr)
++{
++	kfree(psr);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.h b/drivers/net/ethernet/intel/ice/ice_parser.h
+new file mode 100644
+index 000000000000..09ed380eee32
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_parser.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2024 Intel Corporation */
++
++#ifndef _ICE_PARSER_H_
++#define _ICE_PARSER_H_
++
++struct ice_parser {
++	struct ice_hw *hw; /* pointer to the hardware structure */
++};
++
++struct ice_parser *ice_parser_create(struct ice_hw *hw);
++void ice_parser_destroy(struct ice_parser *psr);
++#endif /* _ICE_PARSER_H_ */
 -- 
 2.42.0
 
