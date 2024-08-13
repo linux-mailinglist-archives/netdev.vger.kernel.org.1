@@ -1,281 +1,269 @@
-Return-Path: <netdev+bounces-117981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF54C950276
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC4A95027D
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC65B1C20B5F
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:28:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A273C1C20A97
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811C2189B92;
-	Tue, 13 Aug 2024 10:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2711898E6;
+	Tue, 13 Aug 2024 10:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mZnobyK0"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SqNplxsL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F3C208AD;
-	Tue, 13 Aug 2024 10:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723544909; cv=fail; b=uVC0hy4dLngFWok8VPc+xiEZaVWqnU7smwAjAQCJMD0ujx5WhKferz4Vg1LcbPM8n1XzmFL0tKhGo6dPs1uS4qiDnXOj5CLalFlDQ6t1HxpNyuNW/VAORlAvmltFB7yxwqg+PvxG97RLLCrHma5hhla6ngYY51j3AfcZupUHSpE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723544909; c=relaxed/simple;
-	bh=rOaVhLu6jx/xf63yiqv4q+7roBS1es8zxDUAVMVaOG4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=PQGVLkQM4U22fgcoMJjzfPSJI8RxljkJ5ooAEGfAAutuXI8dma+sGTZZiAtx1PfngqmB2w2idhpNp6z0kjXfOAk26Zk6kFR8ECDKSpNEybzXwF3t0rmzP+ss6LKTaanX3sGBrjMioCii8x6ZEH8URz+tpkRO+jgDBVHnknXTyYI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mZnobyK0; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723544907; x=1755080907;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=rOaVhLu6jx/xf63yiqv4q+7roBS1es8zxDUAVMVaOG4=;
-  b=mZnobyK01uyduUj0zS9Y1Rg2DT5n59j47dXidI+qlftTU1q8MjYCmtdP
-   VSVngZlFVVKRGGLhS/KMPj+PauuieOR8FsfVT3LLNGyHSW324qH5LIyfn
-   trsB0dm+EtLNB2FdRWDDAKybAEr1auhLBq9QZi9S5yS3YOkCGIMjq6akh
-   /o2z3rYU7UwxV01zBDzyHJiOoUDPqxmvlDd/Nc2d/vjxbN5OLCzQ1LEXs
-   dbq8wU6oio6K7kHzHtqqCezo3jlwPrtr4M9IgeuxFg3eMlmQpsSVrbWyV
-   u/tIj1FqBC1dJiSo1ZZtJZWwA0hPC5nFyMwrL+kaCrNNlJd3xRRw5UNGl
-   A==;
-X-CSE-ConnectionGUID: hO/Swy1URrabkQDbfEkgIw==
-X-CSE-MsgGUID: FpV095adRz2jf/bdlHawhA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="21842267"
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="21842267"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 03:28:26 -0700
-X-CSE-ConnectionGUID: o+Fj4fYJQ0uxYYfM+coLYw==
-X-CSE-MsgGUID: pqEBwaPeT1OoIaZsiggtrA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="58927574"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Aug 2024 03:28:26 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 13 Aug 2024 03:28:25 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 13 Aug 2024 03:28:25 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D0E42AB9
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723545073; cv=none; b=bmsV3EHCn1NKcIHEgUvafvgxVl5t5/Ns+k/SQhgBE48r7qcab1alfk3FzeEe+eFQ7tYSvUbv/9a2SGJ0FgI9VvWsblAXIvehyuZfcv1e4tdbLqyScg11EKDvFRCt8hIlBBsJdxTX/ygWpwIOQtm4i1Ged25mCn7r+U4zrORbh3U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723545073; c=relaxed/simple;
+	bh=Qemy//FKBAOaddDCdfMrlr9kRUC4yXU0upqAkPghsKY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dmdRj5FSRROGznPYU5AYtWc+VSKnLtObW+DArjVttAxLjZL2mTH7M/AlqIcqqFAbxPZ2LUqAaIGoiRmSXZUKXaJCiP826cpQqsyOpQJIXZFWPQTG4o2ZJKqs30uzeU37/mDwK+NDrxyz9eGD48b9GwOkx1vEy5gbkv9cgI/KE1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SqNplxsL; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9SJ8S005863;
+	Tue, 13 Aug 2024 03:31:00 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=II9nA/T/OCR7vUWsar7cg39Az
+	PisJqlMX1AJ4T49eAw=; b=SqNplxsLelrgU8tGGR6HjwRpDJ9iLvGQHIisB4ypW
+	C6/NvNdMr5N+UVjRbG1+kTdu+l9TcHs+IdA2BMDRVMeljMnTSABCB/Yl4dVrVyWQ
+	tRiTzxcLc+x+cXRJnI4agADCTu2T0bDVqvqsjSDNlxLEa+tEOdUYqrnmB7YHQBZc
+	FcOVEATedj8Udein0NbvhzYWf5DK2GV0L+/7yw5jg4AaCdC+FfMQ1pfpYNnhVix0
+	S9XfNUSjY9MELktG3wZHOJ9nc3p5So/f+LVP8nb/6PT9+NwQwMNN9EKP48CeiScc
+	1IZjOb2ayi4ihVHy0evO3Khd7YR9FX8n088/kG6kpyjkw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4100cjh1g0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 03:31:00 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 13 Aug 2024 03:28:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U/kDpSwPX27wp29GY1iTtSICEUr5dSqw0Y7WrvjPypdvh+VTS2ZGjwuJLWWvolgU2orzqIxAXcwhjPINXLBnGkScFOUlB40kD8oDSFlKCY0Utpf7sQEcxyFGtvmNYjux37OQTc/t+pqxNdrotM8s6j7MCpFwZjwkh+A8aQHUrQJKXG8Yx4rYEVpUk4mkNzrna0oGyB4YWsdDqgn/+dWtGP5prO22z86IDvWn4UFFhTWijFwJnvlkmhJDE7Qh6glMf6t1I30lxbG2IYpeJIk/z0Am8JW/9F1Zfp4VkmL1fi8DyFCd7JFlKuPLurgJl7ZbAlM93bOne3J8RxzsTsXsFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xaHsXaDWXqrg1kbR8sDxp6Vi7KY0TWb0sw/BRMD+VlI=;
- b=tEuWC88M+83T+k779D3xtr7Hhg3zgMOlPlk7gqSCrKBjTaEAqCQRPhao2UNnrT3qP+BagY5Y46gkVH+8knbzVL6Nq4QcdH8AozEGdjl40zeZnrxG4Gbqd5w/wt8qN1uPttnjQCMEYQseiAFKi3fumzV6tyvkH2vRHA2tlb4v2Av2GtCsAhgwlUnEKwrVib53Dj/dxrL1rH1ZR66zst53HaZawgIzG/LuCK1wBgmQ67lu+QZE68nLQrOiQh/AQyeEoX1p6HJOtXyuu1/BqAhZ3A43lVNPf7CyWzQ5h4SwziPsi4K53Z7pqdEn6zXUeR03lhHiNtoR1bkkvyIFCYrzCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- MN2PR11MB4581.namprd11.prod.outlook.com (2603:10b6:208:26c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Tue, 13 Aug
- 2024 10:28:23 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.7828.023; Tue, 13 Aug 2024
- 10:28:22 +0000
-Date: Tue, 13 Aug 2024 12:28:15 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Jacob
- Keller" <jacob.e.keller@intel.com>, Eric Dumazet <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<magnus.karlsson@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>, Amritha Nambiar
-	<amritha.nambiar@intel.com>
-Subject: Re: [PATCH iwl-net v2 5/6] ice: remove ICE_CFG_BUSY locking from
- AF_XDP code
-Message-ID: <Zrs1P/2ZtVsKhd+6@boxer>
-References: <20240724164840.2536605-1-larysa.zaremba@intel.com>
- <20240724164840.2536605-6-larysa.zaremba@intel.com>
- <ZroIF3eSlQuAk9Zx@boxer>
- <ZroxWcFbhF2KSKeb@lzaremba-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZroxWcFbhF2KSKeb@lzaremba-mobl.ger.corp.intel.com>
-X-ClientProxiedBy: MI2P293CA0010.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::20) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+ 15.2.1544.4; Tue, 13 Aug 2024 03:30:59 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 13 Aug 2024 03:30:59 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 72ADD3F704B;
+	Tue, 13 Aug 2024 03:30:55 -0700 (PDT)
+Date: Tue, 13 Aug 2024 16:00:54 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <willemb@google.com>,
+        <jeroendb@google.com>, <shailend@google.com>, <hramamurthy@google.com>,
+        <jfraker@google.com>, Ziwei Xiao <ziweixiao@google.com>
+Subject: Re: [PATCH net-next v3 1/2] gve: Add RSS device option
+Message-ID: <Zrs13uJmpA2eD3Yb@test-OptiPlex-Tower-Plus-7010>
+References: <20240812222013.1503584-1-pkaligineedi@google.com>
+ <20240812222013.1503584-2-pkaligineedi@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MN2PR11MB4581:EE_
-X-MS-Office365-Filtering-Correlation-Id: e1024039-330f-47fe-cdf3-08dcbb82a878
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Fv58LCrPLYLdF+vvV9aLO4ld2S8mnBbusUlVI8eJXwvqfwUbGMRdrXP+Ejr4?=
- =?us-ascii?Q?XsIkS3fZZxqB+bIAv0gkuaLIcMWiiM8SQ00SlHR7gfOEybu6I44IFR3v+Vnc?=
- =?us-ascii?Q?8BmADjW2edzljEoKHSVl3qqH9HuQ56sPXYXZJi1qEWoT2c5Ysg/S5K008sxm?=
- =?us-ascii?Q?uRNsrq8GMa675f8a/IzKrCG8szGmbO2R6tYncjT5oC9cY4vd8SV7oSELPrpQ?=
- =?us-ascii?Q?1LjfRdJg383fE+aMCHGL9cckQkoxbBxJgf17ySBtn6JhkCVs5SHlXdX0eMAn?=
- =?us-ascii?Q?+PJK3+sfkX+kLX2xAmLLhmaTnRMq7k4dFPIcM7xZ7sXhGTAjC8Y48qEBuF0w?=
- =?us-ascii?Q?6/2Hm6qVALyM9u/GmmZm7v+ekOLZn81mAkoMpZSxLrkxQGfm9sjfkXVL6aGf?=
- =?us-ascii?Q?2dlYRgunbQne0o9YQnOl8vrJ23pCZOe9dNr+964msfNVVDrI4JHZqlipxqK9?=
- =?us-ascii?Q?Jl2jPiluq0ZKzZ3TWff1+AfSTckGprg6xNcw31FTP+L7EHXnHKbUXzSXFyRQ?=
- =?us-ascii?Q?cTQbsGKq9zEkmm/w/6E0F9gfetx7r7yMjaYb5caaovDMhwq2gCjovBTSH2L8?=
- =?us-ascii?Q?QBzEQszkYdopdZW6CKsVvZcpaViyN0OiwIi+1WG0ru6Bupm2U0eNMI3uhaJe?=
- =?us-ascii?Q?C3WJjHs0LPclZ5fJPyl4EK3iq4zBGn6r6V3yLkGulmKMxSjlK0eo50dhcEvA?=
- =?us-ascii?Q?YNvD8FIJH3Bm8vtcCMGyRf0kDx5bgAQPy74BUXIrhmubJC1nKjMXnPPprIQi?=
- =?us-ascii?Q?xsGVI0Lq/nuuGN1fj2/4jA56zLpYrsJ354MlMO63QygJI6ASu9ImZ6qteeXD?=
- =?us-ascii?Q?6wlfax5AsmgWLPnJt+VRUI/MEUCHHk1RLbaRysJSySAAWpXxs+oQCIuQ7wIM?=
- =?us-ascii?Q?actBDdRIHb9jPUtjuLt+z/oQPaYVqUa1ceUiXLivbBUC4oao4nD6INIc5hgj?=
- =?us-ascii?Q?NgomEA1xYhKFreDJepfPeAamOOxL5kzQzN8n0VPJczDlbxT6W2FcMgTi7G4k?=
- =?us-ascii?Q?4HRCnmiMEy++Dmp2Q8oJe3ikGzW59KcJ7ML3poYxpMPx04fsQ/6dX/8suYOh?=
- =?us-ascii?Q?rWJcP9fKaHdVMcvop2WavQoRsxvBVyHEWBKjtPviPWTKh2twvSb9MhB5OzSm?=
- =?us-ascii?Q?km34BXV5A6VJmE4P+H+7wDE8uCtaSUYP6tyJ5D5SUP6CruMnWyK6LW3zVOEX?=
- =?us-ascii?Q?Su/BIlQm09RVcNvBbnOT/5WigYJPRzkvKeTDVi1DPK1k07iRwCyoROMzzjn7?=
- =?us-ascii?Q?J6oiukZA6NH86EjgnyF1RDy8IhpZjZ+dxoEEZZwVjy0gZ2lbZ8zZ9TbzqOmm?=
- =?us-ascii?Q?IgJPBuTOKEeflQ/mR9AsbdD+?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MWd8tWcUe6JrKyCzZubmf+NKsw8tbHqTB5FVq0xoSyKJ/hga+pGdYL/j9xci?=
- =?us-ascii?Q?JJKOd/B/9QEpNwiH6p3bkxRvBtzd2dPcdBMtujrVqRrY3qPodf0nCQQK2CFm?=
- =?us-ascii?Q?b5K0odOvpixwnSin2qRKTwB6yi3Z3XiT60ut7ndOE3buk8SmERxuw8/D3ANg?=
- =?us-ascii?Q?1PIvhzgAZdU5rkSlo0O2siJQE8STS6Nn13TaflroSqdnJdQfSot7ZFpaKORI?=
- =?us-ascii?Q?r9tN1HpZ08Un3yuvKaoOj2BMrSAwWcya6IjLNJxdxTjsEN96CaaCP9cW82ry?=
- =?us-ascii?Q?ZoKK8NjPqS9wRU7jc7AfDHzgnCEzAZP04YjMBGf+pXeEsA/HZ/t2ElxHFary?=
- =?us-ascii?Q?s5XClfseEBdVwyTJ3YfDZNq82qa2yyo+SNXNFXEvR9SPeB61KYl00ZwdYSMD?=
- =?us-ascii?Q?wMJsjFGJKt0k1kjBST1n/orfCh41ia6l9N10FiR1F3AfMBUCrdPY2OKaEdWV?=
- =?us-ascii?Q?vLBexKhoJm5bgZnhJn0dpy7MdZNz3i61k36mh7Gfo8nyz06I2hb+tsSBT4eh?=
- =?us-ascii?Q?5sReGsQ4gUZfBQY4WW+D0wKDN12QLBL/flXI0hT/aXf6an9WGTYihlYwn2WE?=
- =?us-ascii?Q?I/aR0oldZnRvAkvvTzVdpbtXYj68f0YEf6/OmeP3rpfZtd7q7VmdJqEXJA0X?=
- =?us-ascii?Q?Gwh3kG25vIMvjXf9BITGJ3bjT5pirPbvhueFEC4xC02xyxKDd0KIRCIZIF/h?=
- =?us-ascii?Q?vlQ940AOokAf4+DD4ioWPEKUwhTRGrBGQR1ra3MGxOAeJKpCGlA8Tvagy6hQ?=
- =?us-ascii?Q?GYLGHsxZMsUg5RS1Gaylo/wLFQs/CcrboiNu3zeHyt57SbIuXcTqdV9Zyxpl?=
- =?us-ascii?Q?KeM0t/I1OpZ4cNMUn5ZlTr51H3vDteUoM57YJw/6XCi5JZ9eFkS7yWBAzqRh?=
- =?us-ascii?Q?goCtWAaDlveYrCgm7MRZnx+I3EIZdTMUVvh93nuPpAJqokRMzGcXUyQsfEba?=
- =?us-ascii?Q?ku9sKi9PPjbiew+OMHBQwJNyXL3TVDjgV6Uqb/afiKvNfHNnqRkj8DVA4Tvb?=
- =?us-ascii?Q?EAhzZRe4MzeDuSr59Rvfdlm1aaKzyozSB6vSKCLEQt56xPEbsNWM1au/3o8a?=
- =?us-ascii?Q?2JalouJZLRWK6eEmTSDNyxLlTXjpBo7UvstQjgMAiOinaFZAQwYscA+16XzS?=
- =?us-ascii?Q?VdsMA2Br158GcDhkaNWPTDEkF20MuPIX1Hv5gLPOcsIrB/DGzuYNJ0kqnHsY?=
- =?us-ascii?Q?OKkLT6i+2OLmlmuJXDV0ednZSvZchiHvt5/hZKmxhhBncHYeB216wXy91yID?=
- =?us-ascii?Q?QuJprD/WdiqNkOczKsJG7NZ0QqtudY5gTk1sCvICSkw0fvw/diu6CZh8oLkn?=
- =?us-ascii?Q?4AbwFPBwzBgsFUsEz1Uh29rTmRFLXZ/y8iTdYNw4HSJ4vn/gPHJzVe5nJ5ER?=
- =?us-ascii?Q?ZPDjj8w2J9XhMnJ86CyDwBTPgRa/OZJh2C1T50sY2410xPvLGaAjg5YYezhl?=
- =?us-ascii?Q?Rj0J1XTWpe1emkqU7FLb0j/beHiVD0kiUbxI+5mTY1mTQpka+E/bDY/+QWf5?=
- =?us-ascii?Q?9IMiG3KlqkbHjurAGI2PDABZoJgK8+KmNvthhLgdfidC0myo5yxZsaPiXjzj?=
- =?us-ascii?Q?9boqJSWaKIgKi5WJK7Z2++myZAkHqRBOmv9/mSCXGS+QfxdMKbcaLPviul0Y?=
- =?us-ascii?Q?5Q=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1024039-330f-47fe-cdf3-08dcbb82a878
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2024 10:28:22.7458
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cz9i8GSJcEeTJeLfxzYzM+L9fBmgXFG3B7hhe/hZ2eFp9ZYHHvlYNOegduzX4OykelHMrT8DNmpM7aGccFUMUckgjKAKFaoRIMGf/8Kb2z0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4581
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240812222013.1503584-2-pkaligineedi@google.com>
+X-Proofpoint-ORIG-GUID: 2e3l2Ozkg9slSW-eZg96ypABoQF65BuJ
+X-Proofpoint-GUID: 2e3l2Ozkg9slSW-eZg96ypABoQF65BuJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
 
-On Mon, Aug 12, 2024 at 05:59:21PM +0200, Larysa Zaremba wrote:
-> On Mon, Aug 12, 2024 at 03:03:19PM +0200, Maciej Fijalkowski wrote:
-> > On Wed, Jul 24, 2024 at 06:48:36PM +0200, Larysa Zaremba wrote:
-> > > Locking used in ice_qp_ena() and ice_qp_dis() does pretty much nothing,
-> > > because ICE_CFG_BUSY is a state flag that is supposed to be set in a PF
-> > > state, not VSI one. Therefore it does not protect the queue pair from
-> > > e.g. reset.
-> > > 
-> > > Despite being useless, it still can deadlock the unfortunate functions that
-> > > have fell into the same ICE_CFG_BUSY-VSI trap. This happens if ice_qp_ena
-> > > returns an error.
-> > > 
-> > > Remove ICE_CFG_BUSY locking from ice_qp_dis() and ice_qp_ena().
-> > 
-> > Why not just check the pf->state ?
+On 2024-08-13 at 03:50:12, Praveen Kaligineedi (pkaligineedi@google.com) wrote:
+> From: Ziwei Xiao <ziweixiao@google.com>
 > 
-> I would just cite Jakub: "you lose lockdep and all other infra normal mutex 
-> would give you." [0]
+> Add a device option to inform the driver about the hash key size and
+> hash table size used by the device. This information will be stored and
+> made available for RSS ethtool operations.
+> 
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+> Changes in v2:
+> 	- Unify the RSS argument order in related functions(Jakub Kicinski)
+> 
+>  drivers/net/ethernet/google/gve/gve.h        |  3 ++
+>  drivers/net/ethernet/google/gve/gve_adminq.c | 36 ++++++++++++++++++--
+>  drivers/net/ethernet/google/gve/gve_adminq.h | 15 +++++++-
+>  3 files changed, 51 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+> index 84ac004d3953..6c21f3c53619 100644
+> --- a/drivers/net/ethernet/google/gve/gve.h
+> +++ b/drivers/net/ethernet/google/gve/gve.h
+> @@ -831,6 +831,9 @@ struct gve_priv {
+>  	u32 num_flow_rules;
+>  
+>  	struct gve_flow_rules_cache flow_rules_cache;
+> +
+> +	u16 rss_key_size;
+> +	u16 rss_lut_size;
+>  };
+>  
+>  enum gve_service_task_flags_bit {
+> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+> index c5bbc1b7524e..b5c801d2f8b5 100644
+> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
+> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+> @@ -45,6 +45,7 @@ void gve_parse_device_option(struct gve_priv *priv,
+>  			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
+>  			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
+>  			     struct gve_device_option_flow_steering **dev_op_flow_steering,
+> +			     struct gve_device_option_rss_config **dev_op_rss_config,
+>  			     struct gve_device_option_modify_ring **dev_op_modify_ring)
+>  {
+>  	u32 req_feat_mask = be32_to_cpu(option->required_features_mask);
+> @@ -207,6 +208,23 @@ void gve_parse_device_option(struct gve_priv *priv,
+>  				 "Flow Steering");
+>  		*dev_op_flow_steering = (void *)(option + 1);
+>  		break;
+> +	case GVE_DEV_OPT_ID_RSS_CONFIG:
+> +		if (option_length < sizeof(**dev_op_rss_config) ||
+> +		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG) {
+> +			dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERROR_FMT,
+> +				 "RSS config",
+> +				 (int)sizeof(**dev_op_rss_config),
+> +				 GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG,
+> +				 option_length, req_feat_mask);
+> +			break;
+> +		}
+> +
+> +		if (option_length > sizeof(**dev_op_rss_config))
+> +			dev_warn(&priv->pdev->dev,
+> +				 GVE_DEVICE_OPTION_TOO_BIG_FMT,
+> +				 "RSS config");
+> +		*dev_op_rss_config = (void *)(option + 1);
+> +		break;
+>  	default:
+>  		/* If we don't recognize the option just continue
+>  		 * without doing anything.
+> @@ -227,6 +245,7 @@ gve_process_device_options(struct gve_priv *priv,
+>  			   struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
+>  			   struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
+>  			   struct gve_device_option_flow_steering **dev_op_flow_steering,
+> +			   struct gve_device_option_rss_config **dev_op_rss_config,
+>  			   struct gve_device_option_modify_ring **dev_op_modify_ring)
+>  {
+>  	const int num_options = be16_to_cpu(descriptor->num_device_options);
+> @@ -249,7 +268,8 @@ gve_process_device_options(struct gve_priv *priv,
+>  					dev_op_gqi_rda, dev_op_gqi_qpl,
+>  					dev_op_dqo_rda, dev_op_jumbo_frames,
+>  					dev_op_dqo_qpl, dev_op_buffer_sizes,
+> -					dev_op_flow_steering, dev_op_modify_ring);
+> +					dev_op_flow_steering, dev_op_rss_config,
+> +					dev_op_modify_ring);
+>  		dev_opt = next_opt;
+>  	}
+>  
+> @@ -867,6 +887,8 @@ static void gve_enable_supported_features(struct gve_priv *priv,
+>  					  *dev_op_buffer_sizes,
+>  					  const struct gve_device_option_flow_steering
+>  					  *dev_op_flow_steering,
+> +					  const struct gve_device_option_rss_config
+> +					  *dev_op_rss_config,
+>  					  const struct gve_device_option_modify_ring
+>  					  *dev_op_modify_ring)
+>  {
+> @@ -931,6 +953,14 @@ static void gve_enable_supported_features(struct gve_priv *priv,
+>  				 priv->max_flow_rules);
+>  		}
+>  	}
+> +
+> +	if (dev_op_rss_config &&
+> +	    (supported_features_mask & GVE_SUP_RSS_CONFIG_MASK)) {
+> +		priv->rss_key_size =
+> +			be16_to_cpu(dev_op_rss_config->hash_key_size);
+> +		priv->rss_lut_size =
+> +			be16_to_cpu(dev_op_rss_config->hash_lut_size);
+> +	}
+>  }
+>  
+>  int gve_adminq_describe_device(struct gve_priv *priv)
+> @@ -939,6 +969,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+>  	struct gve_device_option_buffer_sizes *dev_op_buffer_sizes = NULL;
+>  	struct gve_device_option_jumbo_frames *dev_op_jumbo_frames = NULL;
+>  	struct gve_device_option_modify_ring *dev_op_modify_ring = NULL;
+> +	struct gve_device_option_rss_config *dev_op_rss_config = NULL;
+>  	struct gve_device_option_gqi_rda *dev_op_gqi_rda = NULL;
+>  	struct gve_device_option_gqi_qpl *dev_op_gqi_qpl = NULL;
+>  	struct gve_device_option_dqo_rda *dev_op_dqo_rda = NULL;
+> @@ -973,6 +1004,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+>  					 &dev_op_jumbo_frames, &dev_op_dqo_qpl,
+>  					 &dev_op_buffer_sizes,
+>  					 &dev_op_flow_steering,
+> +					 &dev_op_rss_config,
+>  					 &dev_op_modify_ring);
+>  	if (err)
+>  		goto free_device_descriptor;
+> @@ -1035,7 +1067,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+>  	gve_enable_supported_features(priv, supported_features_mask,
+>  				      dev_op_jumbo_frames, dev_op_dqo_qpl,
+>  				      dev_op_buffer_sizes, dev_op_flow_steering,
+> -				      dev_op_modify_ring);
+> +				      dev_op_rss_config, dev_op_modify_ring);
+>  
+>  free_device_descriptor:
+>  	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
+> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
+> index ed1370c9b197..7d9ef9a12fef 100644
+> --- a/drivers/net/ethernet/google/gve/gve_adminq.h
+> +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
+> @@ -164,6 +164,14 @@ struct gve_device_option_flow_steering {
+>  
+>  static_assert(sizeof(struct gve_device_option_flow_steering) == 12);
+>  
+> +struct gve_device_option_rss_config {
+> +	__be32 supported_features_mask;
+> +	__be16 hash_key_size;
+> +	__be16 hash_lut_size;
+> +};
+> +
+> +static_assert(sizeof(struct gve_device_option_rss_config) == 8);
+> +
+>  /* Terminology:
+>   *
+>   * RDA - Raw DMA Addressing - Buffers associated with SKBs are directly DMA
+> @@ -182,6 +190,7 @@ enum gve_dev_opt_id {
+>  	GVE_DEV_OPT_ID_JUMBO_FRAMES		= 0x8,
+>  	GVE_DEV_OPT_ID_BUFFER_SIZES		= 0xa,
+>  	GVE_DEV_OPT_ID_FLOW_STEERING		= 0xb,
+> +	GVE_DEV_OPT_ID_RSS_CONFIG		= 0xe,
+>  };
+>  
+>  enum gve_dev_opt_req_feat_mask {
+> @@ -194,6 +203,7 @@ enum gve_dev_opt_req_feat_mask {
+>  	GVE_DEV_OPT_REQ_FEAT_MASK_BUFFER_SIZES		= 0x0,
+>  	GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING		= 0x0,
+>  	GVE_DEV_OPT_REQ_FEAT_MASK_FLOW_STEERING		= 0x0,
+> +	GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG		= 0x0,
+>  };
+>  
+>  enum gve_sup_feature_mask {
+> @@ -201,6 +211,7 @@ enum gve_sup_feature_mask {
+>  	GVE_SUP_JUMBO_FRAMES_MASK	= 1 << 2,
+>  	GVE_SUP_BUFFER_SIZES_MASK	= 1 << 4,
+>  	GVE_SUP_FLOW_STEERING_MASK	= 1 << 5,
+> +	GVE_SUP_RSS_CONFIG_MASK		= 1 << 7,
+Use BIT()
 
-I was not sure why you're bringing up mutex here but I missed 2nd patch
-somehow :) let me start from the beginning.
-
-> 
-> [0] https://lore.kernel.org/netdev/20240612140935.54981c49@kernel.org/
-> 
-> > And address other broken callsites?
-> 
-> Because the current state of sychronization does not allow me to assume this 
-> would fix anything and testing all the places would be out of scope for theese 
-> series.
-> 
-> With Dawid's patch [1], a mutex for XDP and miscellaneous changes from these 
-> series I think we would probably come pretty close being able to get rid of 
-> ICE_CFG_BUSY at least when locking software resources.
-> 
-> [1] 
-> https://lore.kernel.org/netdev/20240812125009.62635-1-dawid.osuchowski@linux.intel.com/
-> 
-> > > 
-> > > Fixes: 2d4238f55697 ("ice: Add support for AF_XDP")
-> > > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > > ---
-> > >  drivers/net/ethernet/intel/ice/ice_xsk.c | 9 ---------
-> > >  1 file changed, 9 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > > index 5dd50a2866cc..d23fd4ea9129 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > > @@ -163,7 +163,6 @@ static int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
-> > >  	struct ice_q_vector *q_vector;
-> > >  	struct ice_tx_ring *tx_ring;
-> > >  	struct ice_rx_ring *rx_ring;
-> > > -	int timeout = 50;
-> > >  	int err;
-> > >  
-> > >  	if (q_idx >= vsi->num_rxq || q_idx >= vsi->num_txq)
-> > > @@ -173,13 +172,6 @@ static int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
-> > >  	rx_ring = vsi->rx_rings[q_idx];
-> > >  	q_vector = rx_ring->q_vector;
-> > >  
-> > > -	while (test_and_set_bit(ICE_CFG_BUSY, vsi->state)) {
-> > > -		timeout--;
-> > > -		if (!timeout)
-> > > -			return -EBUSY;
-> > > -		usleep_range(1000, 2000);
-> > > -	}
-> > > -
-> > >  	ice_qvec_dis_irq(vsi, rx_ring, q_vector);
-> > >  	ice_qvec_toggle_napi(vsi, q_vector, false);
-> > >  
-> > > @@ -250,7 +242,6 @@ static int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
-> > >  	ice_qvec_ena_irq(vsi, q_vector);
-> > >  
-> > >  	netif_tx_start_queue(netdev_get_tx_queue(vsi->netdev, q_idx));
-> > > -	clear_bit(ICE_CFG_BUSY, vsi->state);
-> > >  
-> > >  	return 0;
-> > >  }
-> > > -- 
-> > > 2.43.0
-> > > 
+Thanks,
+Hariprasad k
+>  };
 
