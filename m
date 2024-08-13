@@ -1,220 +1,396 @@
-Return-Path: <netdev+bounces-118244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CA4951058
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:15:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B304D9510A1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:33:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7122F2834AA
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:15:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D50C61C20E6B
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF681A0AE0;
-	Tue, 13 Aug 2024 23:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5891AC44F;
+	Tue, 13 Aug 2024 23:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TYm2v0fd";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0TfH9/zi"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QzmQQl2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD38B153BF6;
-	Tue, 13 Aug 2024 23:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723590933; cv=fail; b=vAeMj/e5TBDqGhRULACM5TOC7lKXIhpfqd0zKG9dr+yE2/oQ2woUDUjPGDC5zigA9mvPr0SsV33TXpYYnCrbJoEl6/Hq34bMxkoomJlSTfzxNz50MJcU4+JINF54csRX68inMy5JrytcHuZc1ee7YDsj76tfZjDUZdSuCyo5v3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723590933; c=relaxed/simple;
-	bh=ojDaqsnO7LvK6AD0zcQb1+aZSLO1QC/2jvWWMOC/eog=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=riQWzRlHUf9zQ0+w2tBXZ+XHWparMA5e6IKN/ch/tw+YjGCCfYwm10FGXS1Us1pLG6lPe2WNzju+qfULCy/5lMY2bKxGyxrO4VI7JfZHhtIn56eXGUzWz6wWiaTKqrwJB42PPa2RO6HELyZeRNjcfx85MoQUh6kjri357qVKfRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TYm2v0fd; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0TfH9/zi; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723590932; x=1755126932;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ojDaqsnO7LvK6AD0zcQb1+aZSLO1QC/2jvWWMOC/eog=;
-  b=TYm2v0fdL6tpGldy4kwfi7dR1z4NBBIi7T5aElncRO6hkket3b/01c7O
-   ymsIkFD9VHgzYCiaaPa/KFH6ow1L2mZR12Tgdh5vHG9V0Hochup4QmYCr
-   iiMtEXYxmxJAYEdhNUrko8NB1gel05/jkJaLBPRwXhT037Q86qyAWR7PB
-   Sb85uWZyFe3Wjer4pUeEcX9rXChsUjjUTJ7Y495ZireFSXhn0MvTWnm/O
-   r0EBDKmzWp9rcEzah3aeXrbGfw8RoaUF5IND1M4s3L3KgsgGemB2p9KeY
-   jq+XYdc50ZodzqMahaUPF81dAUOMLMeYd4iGo0zH8oF5PIi0kpiK+vUip
-   g==;
-X-CSE-ConnectionGUID: T7e6xKG6Sca0RzVP9MhHhw==
-X-CSE-MsgGUID: XZCTIZoTQLWRrAPZPDBjLA==
-X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
-   d="scan'208";a="30463090"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Aug 2024 16:15:30 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 13 Aug 2024 16:14:53 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 13 Aug 2024 16:14:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f52d8Fv0nVd9KkDIqtVlgCaexzjkCWbGLc4veAvLGgNYoeeQF1L/kgfD483SB1veqRDBWyhiIoCJbpAAaCmQ5i52Qn0/EZUOVz+0Fwb6iSSTpx0CwIVIXYJdrJJW5vwgf9d/Q5jQMsClZ40gSSBBanDyk7kSJxAbXrhLEitYg4qG8AWWzyz77vCtcek4kwyZHRXyaPNUGzJlrnjAmfdmfshUpRZt9JbJf54DaRwgWCrnc95t1XsfGgbvhav7D5H0/wxfQKHLiZn+wmXlD//bijUbPNGnhGPwosrVOM7/3PHiIopuOZGzXjh/xuhlNYW6Wfp5d92r6uUIi0OMfssxRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ojDaqsnO7LvK6AD0zcQb1+aZSLO1QC/2jvWWMOC/eog=;
- b=X+jRLksQL1k8liPBkhEm7bAUeRrzhWASJAHJPhuncdWcJhdqd/FM+yIkatxQlhMLj51XddQ+QdsQ40YnA1rVb1pH+s/yNgA7BE5f/J1qoW+lDZXD8LK4aYiOCVvrZHejH4/bhh3RpfWUcLMCG7+yzsJ401lljHfrff0VzLtkagpfOgLPBI6k1xAE9x8GUjg8gJsyPcMBK2Z9JJwhFIAm4t9RbQvkthSyITWjStCsNcMXXNpno+Q6ixuPOpYwf1l/7+ZlbLHiMwemV5zPKDI7IC3M7PTQkOW8WM3HLAseM+EV/z3CSzzTrwHawBt4/iDjBZqudalhgLGP8h89yK8yWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ojDaqsnO7LvK6AD0zcQb1+aZSLO1QC/2jvWWMOC/eog=;
- b=0TfH9/ziJsHGs0wLERBy+KSa+FIfXbTP5G5P3Ue4lG7S5/w7KD55s4+HEscHssuIFmRJR39ZQEqRJr50JTyj+3y1It04v9EOicAcPuNKLVfnYUCRtzjIV1c2yTZ/BxWcVYf45jRh0ciFLaQnq4vkxCRzR727gQA6JeFHSz3A+F8d0OW6Hu6PvsHkenuVHUEOFPf/Y4cbowLBOgFgl+ipL9bVrRUIRpKfHGvf3l7GUZeFwyXVu7E2GJ+jnYNWIN8ajWwfl123Kis3ne1v4v2f9VseuybPyM+rQo0xZwA2PkqIIvP2hym3dSfMdT9tfWFKv0NyViebY41ewh08mN1CBw==
-Received: from BYAPR11MB3558.namprd11.prod.outlook.com (2603:10b6:a03:b3::11)
- by MN2PR11MB4680.namprd11.prod.outlook.com (2603:10b6:208:26d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.29; Tue, 13 Aug
- 2024 23:14:49 +0000
-Received: from BYAPR11MB3558.namprd11.prod.outlook.com
- ([fe80::c03a:b12:f801:d3f6]) by BYAPR11MB3558.namprd11.prod.outlook.com
- ([fe80::c03a:b12:f801:d3f6%7]) with mapi id 15.20.7828.023; Tue, 13 Aug 2024
- 23:14:49 +0000
-From: <Tristram.Ha@microchip.com>
-To: <krzk@kernel.org>, <robh@kernel.org>
-CC: <o.rempel@pengutronix.de>, <davem@davemloft.net>, <olteanv@gmail.com>,
-	<f.fainelli@gmail.com>, <andrew@lunn.ch>, <devicetree@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <Woojung.Huh@microchip.com>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <marex@denx.de>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v3 1/2] dt-bindings: net: dsa: microchip: Add
- KSZ8895/KSZ8864 switch support
-Thread-Topic: [PATCH net-next v3 1/2] dt-bindings: net: dsa: microchip: Add
- KSZ8895/KSZ8864 switch support
-Thread-Index: AQHa6qIxh+siJpmuGEuKW9dXlMMvabIgYi6AgAV0pBA=
-Date: Tue, 13 Aug 2024 23:14:49 +0000
-Message-ID: <BYAPR11MB3558AFA61335D75C0E1D7CB6EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
-References: <20240809212142.3575-1-Tristram.Ha@microchip.com>
- <20240809212142.3575-2-Tristram.Ha@microchip.com>
- <221d19e0-41de-4522-95fa-1adf9024b0e0@kernel.org>
-In-Reply-To: <221d19e0-41de-4522-95fa-1adf9024b0e0@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR11MB3558:EE_|MN2PR11MB4680:EE_
-x-ms-office365-filtering-correlation-id: 6500f710-3740-4d2e-be4b-08dcbbedbaff
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3558.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?QWpSWHJNSVd3MUNlTWFacUxoTnh5K1Q0NmZIN3ZNQWVJcFkvczViT2tPak1I?=
- =?utf-8?B?UVNpZE9PNXFwQ1NVOFJScUdsZ1RSY1F4S1dkY1YwNGJXZy9LQVRoTXY3bHRT?=
- =?utf-8?B?ZlN2dHhBTVF3cHVUMXpvWGFNN1pIU3lzanljd09OWnJQVUtkYzcyQjJGV29Z?=
- =?utf-8?B?SXp6VmtLcHBXamVNWXUxdnBMZTdzUzI3cmZUL3BSTmxhZzlYcFBSVFE0SUEw?=
- =?utf-8?B?ZGpOb1hQaU5haFdxTzQ2Ti9NaCtWcUhBMExqdnRhckttUFgweXU3MWsvTXMy?=
- =?utf-8?B?RFgzWlpPUEtJS1hwaWVkU2p3RW4yVitiUXhaQ1VwVW9lMnBUekV5RVJoU2ta?=
- =?utf-8?B?dDF3MFpWUjg4SW5ZUTN5VVpJaTQzQ3BvTnlXVi9MVWFqaFU2ZEFUa1B5Yjll?=
- =?utf-8?B?WW9MMWhaMVdsUkNZQUd1UG42bU8zcTk2ZHRQNmV6bXJPMk02ZHR0VzBRUjha?=
- =?utf-8?B?bmRmWi91SVZXbklPNlJCRWRqK25GdEtXUUdBMTlxd0ZKalliQ1lqeU0rR3hu?=
- =?utf-8?B?eDNKU05IbzJQV3Q5cXJDS3krNE00ancwZ3dsRUZpV005MDc0YUpReVNMSFha?=
- =?utf-8?B?L3lEdGFINjVTdm9sb1pSQ2thb04zRmRhSjc2L1liWjB5UzRvZ1J0bjJES2xH?=
- =?utf-8?B?dVR1Y3IvZndYek9sQy9Zeit4eFRpZytjOEpzR1JHNnZoSWhaL0NJNUpDWDU1?=
- =?utf-8?B?MWJlUjREM04zQU9iYnRqc2twOGdUQlFKMmZEclNGTS9aK2pTNGp3bktLa0Jo?=
- =?utf-8?B?QjBUVGVvbzZHeXJrbE5xT0d5OTY2QXdTV3dkdjdCS2x0MFFBNzVmSlBaTjJh?=
- =?utf-8?B?dEQxeWtvcTNaRVlNL0ZhUmpNRG0rZ0cvbzh1VEUzV3hITzViL0RwS0FEc2o1?=
- =?utf-8?B?M2JEMDV1UlpzTDR6YlJvdXk2RGtmbmlnZkRBSE9DSHZQVCs3dFFyd1NERXJJ?=
- =?utf-8?B?VFU4M0kvTXQyZ0ZuWk92clB1UlhJQW1wNmFqQzdEYVdMNlh1aHdIaFdTVWl4?=
- =?utf-8?B?QVdvRWNyRW9BdzRlQ01vd0M3QnJyNnNuYVNRTk1SYkYwTEJtdzZPdGtNTTNl?=
- =?utf-8?B?SDlnV3VPUk5ndDZVV3ZEY2ZDSU1TRlBHK1JzcDJRK01jTWh6MElDclJTZTJH?=
- =?utf-8?B?V1BUVzhkd3ZmSFl2K2k4OXZRcm9mSjEzR2F2Q29DQlpuVnFwaU5QQjBqNjJX?=
- =?utf-8?B?TStxTUJTcGVuQ3hWNkhQL3FYMkhHOW5QQ1N6Y1FyVWl6TGdSVDBSb2RTc3VH?=
- =?utf-8?B?elp4Si9oRGs5Njd1SVE5QXJaT1V1VUZWaGw3VTdXUHNWMFZxOGVBYlRCdUM0?=
- =?utf-8?B?dWdNUHF5YnZ6UGxuYmRHdXZSV1R2K0NxMHBrWkxuNW15UVU1UHUyQ3V6WlIw?=
- =?utf-8?B?cWV4NzVXM1o3bVNsL2FaUVZheUZmN0k4ZXluTjVuckZQcVZmejY5RlRabjNQ?=
- =?utf-8?B?L0pmQ0k1eW16N3dkYXYxRDRocnVQb2dabHY4UFNGZ2xUQTBrcSsxYmVmVUd3?=
- =?utf-8?B?K29jcmNDM1hxaFFrRFpQRktROUR3VDNHSEJIQTR6TVkvTmcxYmxaRUFHTGdr?=
- =?utf-8?B?Slg3cjA5bHpieXJwbEF2SnN2MmtsQTkrMjZkY1U0WHJLUXlUNWh5YnUwNHZn?=
- =?utf-8?B?SUh4UW0yQk9IdzdhNXB2OGMwN2RqUFd5c0d5TmxFNTBxaXB5cGR1ZTQ3V2Q2?=
- =?utf-8?B?RjA4S0ZUdnByQ2NrUFllWGRQVG4ySU8rZks0VTVBOG9lOS9xVXV6WTBuckly?=
- =?utf-8?B?Q2xyTk01V2M1UndDQkZ4TjdBeC9DT0h6ZnFndlBveDJYS2ZPLzk5V2V2VEJT?=
- =?utf-8?B?VTR5K2xGYThRQzlvUGp2cnlXVmhOQ2xYeU1IRU9MQTRuMnpLSWp5dGtSbmlH?=
- =?utf-8?B?aUlQUWFqUmUrZ1RkcytIcnRtamFseml4cWk4U05JV3gvSlE9PQ==?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZlZWcVdjS2kvZlQzTE1waGovRVVpL3J5WElIU0IwUGFmYlpBQ1VGeVZIV3ZP?=
- =?utf-8?B?NGFJVWtndVFOUjdERE5UQ0hRa0ZlRXhZUnlEVlkrYllaUXZPdzZTTGtqTktm?=
- =?utf-8?B?cFpNaGozaGtwTTd1N28yYjMyM25BSGlRNUhWQnByc1l2L0RielZNM2VPb0JT?=
- =?utf-8?B?ZGFOaEpoZGFOUE1yaE1paFRmVlkzM2RDcGgzaXA1VlcwYUFHYk5GNERPYnpU?=
- =?utf-8?B?RnBMWEpvZDN2a0xJZFJ2S0hlelJRMXVUbzBKa1JsS05XSHdyeUZvbkRXQXlk?=
- =?utf-8?B?bXk4L3grYmhxUWloQzYrWHdETWFuTUhZdlFlcmNveHpVWDlYcjh3RjhRc25V?=
- =?utf-8?B?cFVOYUg4OG50R0N5bWx5WFZ1MEpLZ2YxSDd4UGEyREh1TzhHeFpDSDUrbFc2?=
- =?utf-8?B?SS8vZkpFMkJmSEdzSHYvbW5DMlQ1OXkvbjJDa1ZQdzBmYWN6WHJsaG1mTnlX?=
- =?utf-8?B?amVOWi94TkI4NmRwTU5XTnpMempDWHN2RWdiNG9uakQvV1E0VlZOREQxL2lT?=
- =?utf-8?B?UmhrVFZYdFRBbHhMejBka050QStadnR2SGNidkwxZ1dxRGhxN05DZWV3S1Ju?=
- =?utf-8?B?ZmRnRDNPNXVhbnJwQloybHZLWVExUXQxcWVJclFmL0VpWnR1OEhPbGRqNWdO?=
- =?utf-8?B?eG4rWGE0RE05eEQvYW1vTWJWbVJLc0hKMERzY0JsVUdzMVpPOEhzUmd4R2p4?=
- =?utf-8?B?VlhkSTNZeFhDSHlWOFFUVWtIdW9hb2xtbHN6dk5JUlRXcUsvbUthc3JqYVRz?=
- =?utf-8?B?TldQTkUyMWZHNWZibThTbUw5SGpVOXZVaUNFRlpITjVRRDVDSUZQRS91OTU1?=
- =?utf-8?B?QlRWRmQ0eUtyLzZmcGIyN2tYNVZFZGRRT3A1QXJqZ3ZMVkVYQWlBTVJWR25O?=
- =?utf-8?B?OERpRHNkbTRtWU9UWU5KS2c5QXhadDNQWmd1MVBzTWNPaWtodXZGZnMwV2Fa?=
- =?utf-8?B?aG1PNHRnaEJ4N2NWZ2JjNDJWaHdqaDJ0ZGtNQnBiM05IVEc0OGxkbG9tNDRE?=
- =?utf-8?B?KzRpUzFJVGNvTHZ3TlA1eTdjUHluYzBVV256RWVaSUowODdSa2hQTlpsN3Q0?=
- =?utf-8?B?RU11VVpDKzJGMm50bEMvbjl6QTNQZllMU3lsZDFSU0tBL0d5dHp5U2ZKeklk?=
- =?utf-8?B?OWc0cTAxOWR1N1FMOHNqNGpPd1MzQi9QOHNsM2hHdHJzVEhxbkEwekJWVW1Y?=
- =?utf-8?B?L3NvYkI4WHV3ZkNqdTJjV2xXR3JBZUpaZ1FmZFh1WFRZb2QrWUNVWEVLVGhp?=
- =?utf-8?B?NHdrRm53WXY4NHdGelpIR1QwbE9GMTh6bzFMaTdFZGxPUHhQSTZDMjNIenht?=
- =?utf-8?B?R3lCZmFUb2RKYlpMK0JyVkI1bTRBc1V5QUJNcEUwY1VvcXJWTDV1YVJSc1Bt?=
- =?utf-8?B?eWFNbTFLb2xlT2EyT3BKZVZaOXNvRnl5RkFQaXdZQ2lsbnBnQ3A0NXk2YkxN?=
- =?utf-8?B?U3d0cWJENnY5ZkREZGsycWZGOVJKWHFaVC9rcVFISUxsazFJRG94aVkrekdn?=
- =?utf-8?B?dVI2bkRzMWZ2b0RkYno0cit1VGx6a01ZSTJqWDg1QzZ5WEROYXY1QjdTUFE1?=
- =?utf-8?B?UEhqQVUvQXAxaitWbi9ROWlUalpnTEJTZDlLK3MzWEJvL0h6NUx3QjF1R2hW?=
- =?utf-8?B?YklSbWlJc0s4UUtPV3grNkN5d043QU1lQkEyeXBEYUVlc3Q3YitJMmpWaS9p?=
- =?utf-8?B?OVJEMTVoWnpSZnNXd29uYlBNOFpkRHVYT1RvckM3NjJaTUNEYXdra2RsdURv?=
- =?utf-8?B?V2lFcXZwdzlGcFYyNWo3YUtrdWNTdDhLenRFLzczSkorVXROWW1Gb0oxMnlC?=
- =?utf-8?B?a3ZQSkZtaUtKbk4vUGNEbDN3WkNZakRmZzM5dDBEWmhVcmcrem1CWXMzT3I5?=
- =?utf-8?B?Q1lDa0lvRHFQVTJkbVdYd1Zxd0MxYlc1MGRYUU9HLzVHeGJIc0poT0xCL294?=
- =?utf-8?B?UEV1eHI3eFNiVXdpY3VZdFlvajJ0eGlFT3N6SGdlY3E0a05xeFh0ZUIxTzNi?=
- =?utf-8?B?MDhUQW5RUGhHK1lzaUFQWnAwank1S1dvLy9tRVBXSDR2QTZuQm9tMklTaThY?=
- =?utf-8?B?WE94a0xVZURSVEVCUTN3U2d0YU1aY1AzdCs4U2pjWFg4UjRHL0JMdlYyOFl1?=
- =?utf-8?Q?LxQ55SbCijEgy84cemacSiEww?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D104198E78
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 23:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723591976; cv=none; b=rc4ZS0x02/iYwGXzyb46XX+cjatycdc7dj00/dAX8MngfPMNVlCHBD0xgqPhIcKKK7E4v3NH5LxKnHa/yHlhZxZp9i8lsqzxG/jEAzp/mEcg2ZTXrYbpcfNaIGfBimN1RjeL8rwQumuA0g50c1FBu/4DKidrQSpxirGfaUkmHno=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723591976; c=relaxed/simple;
+	bh=qRzKqTnUFYFZMO87/XmBCeuiDiFz0pf9bjswxn5jQak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CtVMJYhIi4ybxGGYqmj1XY3zTak6e67Ag6WfYWYZ7HE30bLO7EP609xXmUfOa2+6DyPK7b1dVH9VS+35PmCVlC+h2L+MJbJj6guXYYWrIJOOvrYQFxG30f7+kSpviSvAG6+G5Lk/gupkw/4m7nczKe3XhqM9UWiBr3WIWWaHUbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QzmQQl2g; arc=none smtp.client-ip=209.85.215.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-7bb75419123so4085820a12.3
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 16:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1723591973; x=1724196773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hAOs/0xIclPNgef8mjiCwphqIRBJxolwj+ut1KAkjhU=;
+        b=QzmQQl2gOnOkZo+7CYHwv0odBUCOTPDTTcM8wnv3m6qI5V8923ui0/3uyVOps1JZy4
+         pR3+W6GaT2K+WdhqjwqIHr3A8Vxd16CCo5X8votxry0VePghw+XZBKFs5X6huLBV+F5M
+         acc26RGazVElj/iP2zoFvhZyCRLR4514rnSRbvau5/yCEnwoc/zAN/QN19RoiZC3WnWL
+         r5hpRA+2diLqbUm032SH4fqTJuAzVJOJkqESPxzhwDvTLaTJPUuevKzOkqBUos/xbZYN
+         OHLzIbNc2RJk4tmhN5nprYe0j8JHXvDaAU9lUewLP6twQZtYts73idPnemW1BWziIl5p
+         TBAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723591973; x=1724196773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hAOs/0xIclPNgef8mjiCwphqIRBJxolwj+ut1KAkjhU=;
+        b=qM/zDh+zxBp54PGiuNIQzod5UWFuNg+y6KHr0ITxXf6NkQP5OEDclePhtq78YLdPLN
+         o+TG/5ciRQw7MJ9o7zDuoaqm53qirslG/lGO6kYmnky2LN8K4eqLlRkHNYKv0wRIBawL
+         kBDSSjK2XQZV8EjrSESyiJZsa+bo8ov3QLlSGNOIAux4XPMghVAmxXnxRVZvH5122uFt
+         Wcj2Yz3WmKkdkTdLeyPHIZTzuGlYIP/G5qC4+B6R0HZRZYNUfEdYNbyWu4/07HvRbE/s
+         rSh+3bhkhS1vCv5/X2zhN1HEP85SqlmgJ8vOOPCTzhkVqQZidxOJwTt9qceoPk/Gprqj
+         iufg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcWMFouGjiukrYI/r9N1Pn1oF3828v1cH3aLwhesQ40cLODNmUfFMHcWzPQWB8+6z49Eu1zOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDG/GtoDQcq/y8SBwfHmXV057B0TO44Z5IkK1pH/0y3V59I/Nz
+	ZM7qzMIfJtY47dmzgWmBFgdgDWHxigRJSTRUYloK5yWC+/ocaU0vUwJYyomOBvLa5IGwa9P2UJb
+	UeQu8lFDggP4SDtVnkbWikzQArfFu+2ai6j4yJmjWOoAKa8Cv
+X-Google-Smtp-Source: AGHT+IG2JxsAI9q4hYaDiVS1k439q1FR8mnCk3ezbEPjuo4/ZcUUZlgBDTgGLPzGMcmdXNYSB5/6G7Aivuyz
+X-Received: by 2002:a17:90b:e06:b0:2c9:a3ca:cc8b with SMTP id 98e67ed59e1d1-2d3aa87ea28mr1260888a91.0.1723591972668;
+        Tue, 13 Aug 2024 16:32:52 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-2d3ac7ca349sm18291a91.4.2024.08.13.16.32.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 16:32:52 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id B79233402D7;
+	Tue, 13 Aug 2024 17:32:51 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id B0F88E40C6E; Tue, 13 Aug 2024 17:32:51 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>,
+	Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] softirq: remove parameter from action callback
+Date: Tue, 13 Aug 2024 17:31:58 -0600
+Message-ID: <20240813233202.2836511-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3558.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6500f710-3740-4d2e-be4b-08dcbbedbaff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2024 23:14:49.8175
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: N50fEguanhOOqPzONTOWCxAwTBteiRhZE47Tn1gybDItXFNCJ0uf8QTooO42bB5NAaG2asWwgwnoF3Gmws26DrNNUE/QRRYwDePkrYIxjpM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4680
+Content-Transfer-Encoding: 8bit
 
-PiA+IEZyb206IFRyaXN0cmFtIEhhIDx0cmlzdHJhbS5oYUBtaWNyb2NoaXAuY29tPg0KPiA+DQo+
-ID4gS1NaODg5NS9LU1o4ODY0IGlzIGEgc3dpdGNoIGZhbWlseSBkZXZlbG9wZWQgYmVmb3JlIEtT
-Wjg3OTUgYW5kIGFmdGVyDQo+ID4gS1NaODg2Mywgc28gaXQgc2hhcmVzIHNvbWUgcmVnaXN0ZXJz
-IGFuZCBmdW5jdGlvbnMgaW4gdGhvc2Ugc3dpdGNoZXMuDQo+ID4gS1NaODg5NSBoYXMgNSBwb3J0
-cyBhbmQgc28gaXMgbW9yZSBzaW1pbGFyIHRvIEtTWjg3OTUuDQo+ID4NCj4gPiBLU1o4ODY0IGlz
-IGEgNC1wb3J0IHZlcnNpb24gb2YgS1NaODg5NS4gIFRoZSBmaXJzdCBwb3J0IGlzIHJlbW92ZWQN
-Cj4gPiB3aGlsZSBwb3J0IDUgcmVtYWlucyBhcyBhIGhvc3QgcG9ydC4NCj4gPg0KPiA+IFNpZ25l
-ZC1vZmYtYnk6IFRyaXN0cmFtIEhhIDx0cmlzdHJhbS5oYUBtaWNyb2NoaXAuY29tPg0KPiA+IC0t
-LQ0KPiA+ICBEb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2RzYS9taWNyb2No
-aXAsa3N6LnlhbWwgfCAyICsrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykN
-Cj4gDQo+IENvbnNpZGVyaW5nIHlvdXIgZWFybGllciBhbmQgbGF0ZXIgc3VibWlzc2lvbnMgd2Vy
-ZSBub3QgdGVzdGVkLCB3YXMgdGhpcw0KPiBvbmU/IERpZCB5b3UgdGVzdCBpdCBiZWZvcmUgc2Vu
-ZGluZz8NCg0KVGhpcyBvbmUgcGFzc2VkIHRoZSBkdF9iaW5kaW5nX2NoZWNrLg0KDQo=
+When softirq actions are called, they are passed a pointer to the
+entry in the softirq_vec table containing the action's function pointer.
+This pointer isn't very useful, as the action callback already knows
+what function it is. And since each callback handles a specific softirq,
+the callback also knows which softirq number is running.
+
+No softirq action callbacks actually use this parameter,
+so remove it from the function pointer signature.
+This clarifies that softirq actions are global routines
+and makes it slightly cheaper to call them.
+
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ block/blk-mq.c            |  2 +-
+ include/linux/interrupt.h |  4 ++--
+ kernel/rcu/tiny.c         |  2 +-
+ kernel/rcu/tree.c         |  2 +-
+ kernel/sched/fair.c       |  2 +-
+ kernel/softirq.c          | 15 +++++++--------
+ kernel/time/hrtimer.c     |  2 +-
+ kernel/time/timer.c       |  2 +-
+ lib/irq_poll.c            |  2 +-
+ net/core/dev.c            |  4 ++--
+ 10 files changed, 18 insertions(+), 19 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3c3c0c21b55..aa28157b1aaf 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1126,11 +1126,11 @@ static void blk_complete_reqs(struct llist_head *list)
+ 
+ 	llist_for_each_entry_safe(rq, next, entry, ipi_list)
+ 		rq->q->mq_ops->complete(rq);
+ }
+ 
+-static __latent_entropy void blk_done_softirq(struct softirq_action *h)
++static __latent_entropy void blk_done_softirq(void)
+ {
+ 	blk_complete_reqs(this_cpu_ptr(&blk_cpu_done));
+ }
+ 
+ static int blk_softirq_cpu_dead(unsigned int cpu)
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 3f30c88e0b4c..694de61e0b38 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -592,11 +592,11 @@ extern const char * const softirq_to_name[NR_SOFTIRQS];
+  * asm/hardirq.h to get better cache usage.  KAO
+  */
+ 
+ struct softirq_action
+ {
+-	void	(*action)(struct softirq_action *);
++	void	(*action)(void);
+ };
+ 
+ asmlinkage void do_softirq(void);
+ asmlinkage void __do_softirq(void);
+ 
+@@ -607,11 +607,11 @@ static inline void do_softirq_post_smp_call_flush(unsigned int unused)
+ {
+ 	do_softirq();
+ }
+ #endif
+ 
+-extern void open_softirq(int nr, void (*action)(struct softirq_action *));
++extern void open_softirq(int nr, void (*action)(void));
+ extern void softirq_init(void);
+ extern void __raise_softirq_irqoff(unsigned int nr);
+ 
+ extern void raise_softirq_irqoff(unsigned int nr);
+ extern void raise_softirq(unsigned int nr);
+diff --git a/kernel/rcu/tiny.c b/kernel/rcu/tiny.c
+index 4402d6f5f857..b3b3ce34df63 100644
+--- a/kernel/rcu/tiny.c
++++ b/kernel/rcu/tiny.c
+@@ -103,11 +103,11 @@ static inline bool rcu_reclaim_tiny(struct rcu_head *head)
+ 	rcu_lock_release(&rcu_callback_map);
+ 	return false;
+ }
+ 
+ /* Invoke the RCU callbacks whose grace period has elapsed.  */
+-static __latent_entropy void rcu_process_callbacks(struct softirq_action *unused)
++static __latent_entropy void rcu_process_callbacks(void)
+ {
+ 	struct rcu_head *next, *list;
+ 	unsigned long flags;
+ 
+ 	/* Move the ready-to-invoke callbacks to a local list. */
+diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+index e641cc681901..93bd665637c0 100644
+--- a/kernel/rcu/tree.c
++++ b/kernel/rcu/tree.c
+@@ -2853,11 +2853,11 @@ static __latent_entropy void rcu_core(void)
+ 	// If strict GPs, schedule an RCU reader in a clean environment.
+ 	if (IS_ENABLED(CONFIG_RCU_STRICT_GRACE_PERIOD))
+ 		queue_work_on(rdp->cpu, rcu_gp_wq, &rdp->strict_work);
+ }
+ 
+-static void rcu_core_si(struct softirq_action *h)
++static void rcu_core_si(void)
+ {
+ 	rcu_core();
+ }
+ 
+ static void rcu_wake_cond(struct task_struct *t, int status)
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 9057584ec06d..8dc9385f6da4 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -12481,11 +12481,11 @@ static int sched_balance_newidle(struct rq *this_rq, struct rq_flags *rf)
+  * - directly from the local scheduler_tick() for periodic load balancing
+  *
+  * - indirectly from a remote scheduler_tick() for NOHZ idle balancing
+  *   through the SMP cross-call nohz_csd_func()
+  */
+-static __latent_entropy void sched_balance_softirq(struct softirq_action *h)
++static __latent_entropy void sched_balance_softirq(void)
+ {
+ 	struct rq *this_rq = this_rq();
+ 	enum cpu_idle_type idle = this_rq->idle_balance;
+ 	/*
+ 	 * If this CPU has a pending NOHZ_BALANCE_KICK, then do the
+diff --git a/kernel/softirq.c b/kernel/softirq.c
+index 02582017759a..d082e7840f88 100644
+--- a/kernel/softirq.c
++++ b/kernel/softirq.c
+@@ -549,11 +549,11 @@ static void handle_softirqs(bool ksirqd)
+ 		prev_count = preempt_count();
+ 
+ 		kstat_incr_softirqs_this_cpu(vec_nr);
+ 
+ 		trace_softirq_entry(vec_nr);
+-		h->action(h);
++		h->action();
+ 		trace_softirq_exit(vec_nr);
+ 		if (unlikely(prev_count != preempt_count())) {
+ 			pr_err("huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n",
+ 			       vec_nr, softirq_to_name[vec_nr], h->action,
+ 			       prev_count, preempt_count());
+@@ -698,11 +698,11 @@ void __raise_softirq_irqoff(unsigned int nr)
+ 	lockdep_assert_irqs_disabled();
+ 	trace_softirq_raise(nr);
+ 	or_softirq_pending(1UL << nr);
+ }
+ 
+-void open_softirq(int nr, void (*action)(struct softirq_action *))
++void open_softirq(int nr, void (*action)(void))
+ {
+ 	softirq_vec[nr].action = action;
+ }
+ 
+ /*
+@@ -758,12 +758,11 @@ static bool tasklet_clear_sched(struct tasklet_struct *t)
+ 		  t->use_callback ? (void *)t->callback : (void *)t->func);
+ 
+ 	return false;
+ }
+ 
+-static void tasklet_action_common(struct softirq_action *a,
+-				  struct tasklet_head *tl_head,
++static void tasklet_action_common(struct tasklet_head *tl_head,
+ 				  unsigned int softirq_nr)
+ {
+ 	struct tasklet_struct *list;
+ 
+ 	local_irq_disable();
+@@ -803,20 +802,20 @@ static void tasklet_action_common(struct softirq_action *a,
+ 		__raise_softirq_irqoff(softirq_nr);
+ 		local_irq_enable();
+ 	}
+ }
+ 
+-static __latent_entropy void tasklet_action(struct softirq_action *a)
++static __latent_entropy void tasklet_action(void)
+ {
+ 	workqueue_softirq_action(false);
+-	tasklet_action_common(a, this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
++	tasklet_action_common(this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
+ }
+ 
+-static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
++static __latent_entropy void tasklet_hi_action(void)
+ {
+ 	workqueue_softirq_action(true);
+-	tasklet_action_common(a, this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
++	tasklet_action_common(this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
+ }
+ 
+ void tasklet_setup(struct tasklet_struct *t,
+ 		   void (*callback)(struct tasklet_struct *))
+ {
+diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
+index b8ee320208d4..836157e09e25 100644
+--- a/kernel/time/hrtimer.c
++++ b/kernel/time/hrtimer.c
+@@ -1755,11 +1755,11 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
+ 				hrtimer_sync_wait_running(cpu_base, flags);
+ 		}
+ 	}
+ }
+ 
+-static __latent_entropy void hrtimer_run_softirq(struct softirq_action *h)
++static __latent_entropy void hrtimer_run_softirq(void)
+ {
+ 	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
+ 	unsigned long flags;
+ 	ktime_t now;
+ 
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index 64b0d8a0aa0f..760bbeb1f331 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -2438,11 +2438,11 @@ static void run_timer_base(int index)
+ }
+ 
+ /*
+  * This function runs timers and the timer-tq in bottom half context.
+  */
+-static __latent_entropy void run_timer_softirq(struct softirq_action *h)
++static __latent_entropy void run_timer_softirq(void)
+ {
+ 	run_timer_base(BASE_LOCAL);
+ 	if (IS_ENABLED(CONFIG_NO_HZ_COMMON)) {
+ 		run_timer_base(BASE_GLOBAL);
+ 		run_timer_base(BASE_DEF);
+diff --git a/lib/irq_poll.c b/lib/irq_poll.c
+index 2d5329a42105..08b242bbdbdf 100644
+--- a/lib/irq_poll.c
++++ b/lib/irq_poll.c
+@@ -73,11 +73,11 @@ void irq_poll_complete(struct irq_poll *iop)
+ 	__irq_poll_complete(iop);
+ 	local_irq_restore(flags);
+ }
+ EXPORT_SYMBOL(irq_poll_complete);
+ 
+-static void __latent_entropy irq_poll_softirq(struct softirq_action *h)
++static void __latent_entropy irq_poll_softirq(void)
+ {
+ 	struct list_head *list = this_cpu_ptr(&blk_cpu_iopoll);
+ 	int rearm = 0, budget = irq_poll_budget;
+ 	unsigned long start_time = jiffies;
+ 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 751d9b70e6ad..3ac02b0ca29e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5246,11 +5246,11 @@ int netif_rx(struct sk_buff *skb)
+ 		local_bh_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL(netif_rx);
+ 
+-static __latent_entropy void net_tx_action(struct softirq_action *h)
++static __latent_entropy void net_tx_action(void)
+ {
+ 	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+ 
+ 	if (sd->completion_queue) {
+ 		struct sk_buff *clist;
+@@ -6919,11 +6919,11 @@ static int napi_threaded_poll(void *data)
+ 		napi_threaded_poll_loop(napi);
+ 
+ 	return 0;
+ }
+ 
+-static __latent_entropy void net_rx_action(struct softirq_action *h)
++static __latent_entropy void net_rx_action(void)
+ {
+ 	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+ 	unsigned long time_limit = jiffies +
+ 		usecs_to_jiffies(READ_ONCE(net_hotdata.netdev_budget_usecs));
+ 	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+-- 
+2.45.2
+
 
