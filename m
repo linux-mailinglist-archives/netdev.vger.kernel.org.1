@@ -1,91 +1,170 @@
-Return-Path: <netdev+bounces-117989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB46D9502D2
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:48:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAF1950313
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:57:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77A13286E00
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185C01F21DA4
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74595193094;
-	Tue, 13 Aug 2024 10:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CB619AD4F;
+	Tue, 13 Aug 2024 10:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bHMJSm1z"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Et9rKDfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461D776025;
-	Tue, 13 Aug 2024 10:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FA819AA58;
+	Tue, 13 Aug 2024 10:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723546111; cv=none; b=jdfYZyqaLGU/3MO/mtKn3tiGUQ8JV36w+pj+oFi5QLuxBXB41nJEVA/YiVcgsTo6/nrW+CsNVv6B24I8GwtrykQjkMSAIThB511mMBegj1QnMc7ekyIUJhPs5tx2IxVs9tlxqKlECVRVkEdBUCKJ0wtiXcBRfubIkHdHBacFycU=
+	t=1723546567; cv=none; b=iPUKsvNjFqwztL593TVs2XGwyxVP7ZIXL8iBVPagBmEtbEZdRm7UanL7AmEpcDerXgoAvvKY28HNSTUvlqWbHdM92P/fWlZNKcgS6QfKLRSeGOp26+ahMTgy597C8Lj6UDmOlMS0U8XaYhl+EEd450ABf9+jAXAhN3Ewbmu7dEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723546111; c=relaxed/simple;
-	bh=xSKWN1O6/DzG5D1crCsxvlcTo70Zzn+xL9TqroUdSqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Is29AXDPe9lTOhS980LCuLgoN9p/4Fgul+Nx06fy+weJQoWsJY4nscQzDByn0ZApOMtRuDDYaL72QLGMn5lWeRnwJivYIGTfsNsng5k9/2tnKMVyP02Bw/IYE4/ypSUEXZgqMvOvInqbl3JuSp6cav0cBJITPz1ndpCZFa8u3I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bHMJSm1z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 513DDC4AF09;
-	Tue, 13 Aug 2024 10:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1723546110;
-	bh=xSKWN1O6/DzG5D1crCsxvlcTo70Zzn+xL9TqroUdSqY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bHMJSm1zhpf9pSiOwoVzSksc5OMm15FJzxB1VW75skwsQLhnfNrOFjiQnsCqUgGWe
-	 YDmnbZ58BKSe/jj6t6f8Y2/OoGfL1+v9dD/NT3Ud1Kc6EX35axRWbCL9Acfc2nrXjm
-	 YDRlwQ6eHEgrog9E4zHBrYCP8/ZUelN7X/B9R7as=
-Date: Tue, 13 Aug 2024 12:48:27 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Vincenzo Mezzela <vincenzo.mezzela@gmail.com>
-Cc: johannes@sipsolutions.net, sashal@kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	javier.carrasco.cruz@gmail.com, skhan@linuxfoundation.org,
-	stable@vger.kernel.org, Johannes Berg <johannes.berg@intel.com>,
-	syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-Subject: Re: [PATCH v5.15 RESEND] wifi: mac80211: check basic rates validity
-Message-ID: <2024081321-scanner-blunt-e1da@gregkh>
-References: <20240810095432.89063-1-vincenzo.mezzela@gmail.com>
+	s=arc-20240116; t=1723546567; c=relaxed/simple;
+	bh=KSgLvCgukm7SuRr8aIh2efSvJWw2ykWte/os8g56hB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JencHeUbqOka9xQ12cTEaQqxVpMLkCrLqdA3R6Ky1J2Lpfz11bTKKsGHrbowa68OJSSrNqSfZzyKVCUo12sspfmwGqX3N0FIYCrBHmiB/MmoN0Ffg/lAjtOR01AHGzGK21jBWgM48LA/d0GXZ0U38XYeCp/n3CG3/CPt3i48WOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Et9rKDfQ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9abWb031286;
+	Tue, 13 Aug 2024 10:50:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	WhlZuS6gpJmDBfj7tUVk06rz347a2fbx1nf1hh7blm4=; b=Et9rKDfQSSidGydp
+	cuoi0XNprRrzTHf+Jczq4U1SRuoncOaYZMD9Pak6MyQblYfqwv+0bA9wgq5jTlaK
+	swWwUsZMvlps3EUVx02KLf9701hH6dFpnEeQ5A7rM/IjMeznH8lyUdCWV+FXLZ/i
+	bQ3uLVdZWd4tI64Z2v8jYs4257v4WHqoBLSRwEIgjYRMlRHtQb2Ue8FUxrutXuAu
+	KmjOXFu7uejJ4kQJfzioyWpHPpTHmZMTEhKkWugatAkjZTcWO5sDy+oued2ZW/q1
+	YQRwUe8OwYahzI0Fq4ENwvaJx9iCbiUNkU5HA2DrDNVmZjwT8bDE2vMShn7fGVTh
+	RTL+nA==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40x15e79fp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 10:50:25 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47DAoBqU013789
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 10:50:11 GMT
+Received: from [10.253.34.30] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 13 Aug
+ 2024 03:50:07 -0700
+Message-ID: <3f7e9969-5285-4dba-b16e-65c6b10ee89a@quicinc.com>
+Date: Tue, 13 Aug 2024 18:50:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240810095432.89063-1-vincenzo.mezzela@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] driver core: Introduce an API
+ constify_device_find_child_helper()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Zijun Hu
+	<zijun_hu@icloud.com>
+CC: "Rafael J. Wysocki" <rafael@kernel.org>,
+        Davidlohr Bueso
+	<dave@stgolabs.net>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Dave
+ Jiang <dave.jiang@intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan
+ Williams <dan.j.williams@intel.com>,
+        Takashi Sakamoto
+	<o-takashi@sakamocchi.jp>,
+        Timur Tabi <timur@kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
+        <netdev@vger.kernel.org>
+References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
+ <20240811-const_dfc_prepare-v1-2-d67cc416b3d3@quicinc.com>
+ <2024081314-marbling-clasp-442a@gregkh>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <2024081314-marbling-clasp-442a@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: BwLEZ1fydPE7qZsoyL-lqd11wCChzbl4
+X-Proofpoint-ORIG-GUID: BwLEZ1fydPE7qZsoyL-lqd11wCChzbl4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ phishscore=0 suspectscore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408130078
 
-On Sat, Aug 10, 2024 at 11:54:31AM +0200, Vincenzo Mezzela wrote:
-> From: Johannes Berg <johannes.berg@intel.com>
+On 8/13/2024 5:45 PM, Greg Kroah-Hartman wrote:
+> On Sun, Aug 11, 2024 at 08:18:08AM +0800, Zijun Hu wrote:
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> Introduce constify_device_find_child_helper() to replace existing
+>> device_find_child()'s usages whose match functions will modify
+>> caller's match data.
 > 
-> commit ce04abc3fcc62cd5640af981ebfd7c4dc3bded28 upstream.
+> Ick, that's not a good name, it should be "noun_verb" with the subsystem being on the prefix always.
 > 
-> When userspace sets basic rates, it might send us some rates
-> list that's empty or consists of invalid values only. We're
-> currently ignoring invalid values and then may end up with a
-> rates bitmap that's empty, which later results in a warning.
-> 
-> Reject the call if there were no valid rates.
-> 
-> [ Conflict resolution involved adjusting the patch to accommodate
-> changes in the function signature of ieee80211_parse_bitrates,
-> specifically the updated first parameter ]
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> Reported-by: syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-> Tested-by: syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=19013115c9786bfd0c4e
-> Signed-off-by: Vincenzo Mezzela <vincenzo.mezzela@gmail.com>
-> ---
-> Hi,
-> I'm resending the backport for v5.15 [1], following the one I previously
-> sent for v6.1 [2].
+okay, got it.
 
-Now queued up, thanks.
+is it okay to use device_find_child_mut() suggested by Przemek Kitszel ?
 
-greg k-h
+> But why is this even needed?  Device pointers are NOT const for the
+> obvious reason that they can be changed by loads of different things.
+> Trying to force them to be const is going to be hard, if not impossible.
+> 
+
+[PATCH 3/5] have more discussion about these questions with below link:
+https://lore.kernel.org/all/8b8ce122-f16b-4207-b03b-f74b15756ae7@icloud.com/
+
+
+The ultimate goal is to make device_find_child() have below prototype:
+
+struct device *device_find_child(struct device *dev, const void *data,
+		int (*match)(struct device *dev, const void *data));
+
+Why ?
+
+(1) It does not make sense, also does not need to, for such device
+finding operation to modify caller's match data which is mainly
+used for comparison.
+
+(2) It will make the API's match function parameter have the same
+signature as all other APIs (bus|class|driver)_find_device().
+
+
+My idea is that:
+use device_find_child() for READ only accessing caller's match data.
+
+use below API if need to Modify caller's data as
+constify_device_find_child_helper() does.
+int device_for_each_child(struct device *dev, void *data,
+                    int (*fn)(struct device *dev, void *data));
+
+So the The ultimate goal is to protect caller's *match data* @*data  NOT
+device @*dev.
+
+> thanks,
+> 
+> greg k-h
+
 
