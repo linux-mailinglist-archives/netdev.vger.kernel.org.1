@@ -1,133 +1,204 @@
-Return-Path: <netdev+bounces-117903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB0894FBFA
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:50:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4090494FC0B
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F26F1C21939
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 02:50:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6522F1C211F0
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 02:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B854217588;
-	Tue, 13 Aug 2024 02:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293DA18028;
+	Tue, 13 Aug 2024 02:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJ3+panW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DPOeMylN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F15518AEA;
-	Tue, 13 Aug 2024 02:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723517443; cv=none; b=H8cJQ4FzzEp09Tfs+Z0Q3yV6tn56aRQsc9hNptYftAbxmvkxr2u5f3jaB468jyOhpvMWPFY2ILprHRit6DO+26moe2+Sy0doAjwoCelf1oY/GG9vrDwXnUYI9POLz2OgHM7gGoE+9A4IUh5yrQzrcXVAogCwLQrPelxQsgqGihQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723517443; c=relaxed/simple;
-	bh=CF9HW3eNFhOVDA/sxRBdxiNTt85AJDi7Zr7sdnYlRo0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KIYDJmtomNfwi6sW1g2w9m47O6jNXjy34w88oGHnoL6741XWkuRgpM3NFboQsB9h64jyt7BytM7PJR9oAEMN6XGfbqrl8R46tJhbjRIlXHnBHvzKeAyDRHoiFzlK7mjlmK3XPuFe8pLxjNEa4W/m/dL7rIvHKYPk9LiOT+ivgmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJ3+panW; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-691c85525ebso47369127b3.0;
-        Mon, 12 Aug 2024 19:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723517440; x=1724122240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5X/LLJbCQIJdAHCZobbfZ15M33n1HKUhsdxOtakpmKU=;
-        b=TJ3+panWonqSSnbGJ/5VSGdAcGT0hxM4XB4rX0Sz96kTgHX9zkrbyvVed+aNePNzND
-         /Gim2f5m17rIQxkTx+iK7fyX/IRJM7PBEyxiGq9AAM2fIGAcscw7gXiwlguqn9DErYCc
-         cJZlAi9QdtKm5RCJgt48uK/HXnTKq38BIfHCpFg2I+IwxP4H6UpswvVZtH6fh4EyQAKn
-         5HpYLmPo1246WyEYf+utFAwzfgzizrpEu4opZ4l2TfNBguZG1wiButMgG39FSmmYT2ut
-         lRhk6qIs3YMpR80yE/maknjOIe2plD5v7KBQuEWSkIHEbRtnWwH4U4WARRQ1qml166zH
-         qNgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723517440; x=1724122240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5X/LLJbCQIJdAHCZobbfZ15M33n1HKUhsdxOtakpmKU=;
-        b=Bi55IwczXhgiZPHp4Fc/ewt6HA0NOl5whd3Yiz0ksiPzI96AHbLgkEn+xrL69+otv6
-         baf5WedgvCJ8RvrbBTORXEmiJEmHAvkrDQa/V8o1+U9aep98pU6vEL0TD/5I6xicVLWQ
-         IPPsmUwqN+SxaOITydIhf6IbZHHQ1Lx2mloYGsjkeb4Z/c/xCdHs8EpoVpmglV07Lvi1
-         +fuwTmNF04Z4wsBzOG1m+YiH9uXR7zsI6zwYQAFL+tAG+5c6Ulv/+evnWt7BbRLZE9xD
-         OY62X/A6Yi5jOur5SBXkJllP/nwxYe4gf/oN4XMvZvbARvQRoJLJxCUBvjYkFFvWNNo/
-         mf5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVFUyb8zgtXb1+0YoeQK3qxWk3ZzAqim8vfei5W6pV7qdXgt1BhpmjrTbAbb1VTPZOQt8UfViJWDR30xbTLXrxN9lqh6wCC421Is4PN
-X-Gm-Message-State: AOJu0YyReeT3jOUmpcelMQhnZaexkjDOAIcnG1tsGXzaFM7AHjlbQS6F
-	z1dkmvg+BZGx7mIYKhEpZnhK8mXvlZB0o5vW4M6AI9Yh7dxgFUJIbsZ/joce/W2RCsBrybhI2tZ
-	cGApGoJQGcn7WofGRPrVf5XCdDYQ=
-X-Google-Smtp-Source: AGHT+IEtD8/3jwjUQ+AEI2oWq1b72HdraqJL7SYGlFXfY5Ubeh//o2e4Ryc3x/THyllge9fIvvnW9ZqvGRbDPAY7n8s=
-X-Received: by 2002:a05:690c:f92:b0:665:30bf:7752 with SMTP id
- 00721157ae682-6a97151cb4dmr28162177b3.2.1723517440450; Mon, 12 Aug 2024
- 19:50:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9367B14A96
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 02:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723517897; cv=fail; b=tA2eKylJnyUI22lS9BslrZvFkK97pZ/ZCxZd9E6gq33TIG5BiFVE5kBjCs1s4OzsBTSrrQZdYlVNy8AuBHvcyE6vTGNkWb9G+szP3n5J3hiCt51ZlyfbSROORzZbtuZ2OS2qyTJ3+QG59CwWSdugTttMFNwacQazu02H0CliBwY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723517897; c=relaxed/simple;
+	bh=drqvnMAVf9syFRiU+DcnWZ2bI2A/xpbzGXebL8gq4xQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SFKdgQVLDVZ3zPBP1fexQDvdgFa87nmCUYAxsHN9RUodEuqvNz4o8dt5i5EjumjpGIeRPXH3EUvyjqx9PMW//botvmY0qwe+hWGOXcrHGCp2ZqkdfAbrgq7nQfuwITsF6IyvsVUN1biTUziuhgL5Kby8w6Af/ZSLfWBOMGZN3DE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DPOeMylN; arc=fail smtp.client-ip=40.107.244.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FG3wTNk13vm0B+CdkDwz0Ku1R+rbgJaWxbLRc4CsQ541we3Ea5nn3sse0I/NRdoXTBjNicG0EBBBssDO+z7l+l5NVVpYFhci63wtmEc38ZinaAKcX8KwbMq7dJXBmxK9aD0DoJChQMm6VrJx7oys6bJNBY6ZyyA4aSZamyl/Lgv7zrroE9X1IfCnzymGanxbZmCoQrtI1rxrI1jggSFKxXwgPLh9/QAtdPnABfA0npny5xtMil3M12JwY92Lk7nNcsIGgwkntcP0yWAcRIQ9gQoZNSQS6CKkKdcaV/lq9IEyrGPRjs47YnOCXxxoN9jNwKeyzI+zPMyTmt8WAPGTfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=drqvnMAVf9syFRiU+DcnWZ2bI2A/xpbzGXebL8gq4xQ=;
+ b=yY5U5R/8vO+x9KJOPsUDziMmbK02xI7RPDX6o2ovWX6ptnWunmeGdN0XGSVojWk39SSe4RsT+OP6HAyk5RemuXVuFHMrBNgx0jJbFkknMhWktdRmEsCtEKZMZNWSVlyZiqWpr7Dczd9vbWG/lPURwxdQ4Dfn1gute4920xzDkC9Wn3lxXMIKJLZ7MDSonUfcjblBOa/IRn1i2CDjRUJ7rbkAC5tIR/Er/QNV8DmgoE8BDRMmXyBBqsbYd0QXOCZdKzRi7Gf9ENmgYjiTvOyVzqpLUHrBi1TcecN1G1Cno4AXOWFj3U8xprinAb4FwyJpHEiLg8FIzoWLK8/cvCrUNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=drqvnMAVf9syFRiU+DcnWZ2bI2A/xpbzGXebL8gq4xQ=;
+ b=DPOeMylN81KttzU0El6V0sJfSom1XK1NNXwHmXuxaDNzX63IZyIU81qarXkjS0uLEA8zM+mr7Zfm04XwYvYco0jMdSqd7rGdMzUi2a0AhPEcnzpph25Yg3b59kMzbvDUSIifLWQ3Shx9wRA/C+AL1Dz362HBJvdPCyAFdJBq0sJv3nQxw5aKrgjRsjruvWiijOMgMWbj3PjYLrvlDgt/mVrlpckILyKSizzJIR+o7D2jukQgGJm2HgdL/RXcauTfZkMCJOhdz/suxpwzjSq9SneeUS8zNq4oGCTmoDrZKom/YUjTFwFN2g6vyJZe+PdHeZ01DE/gPIkE+UGrXDjpCg==
+Received: from IA1PR12MB8554.namprd12.prod.outlook.com (2603:10b6:208:450::8)
+ by MW6PR12MB9020.namprd12.prod.outlook.com (2603:10b6:303:240::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Tue, 13 Aug
+ 2024 02:58:12 +0000
+Received: from IA1PR12MB8554.namprd12.prod.outlook.com
+ ([fe80::f8d:a30:6e41:546d]) by IA1PR12MB8554.namprd12.prod.outlook.com
+ ([fe80::f8d:a30:6e41:546d%4]) with mapi id 15.20.7849.021; Tue, 13 Aug 2024
+ 02:58:12 +0000
+From: Jianbo Liu <jianbol@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "liuhangbin@gmail.com" <liuhangbin@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "andy@greyhouse.net" <andy@greyhouse.net>, Gal
+ Pressman <gal@nvidia.com>, "jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net V3 1/3] bonding: implement xdo_dev_state_free and call
+ it after deletion
+Thread-Topic: [PATCH net V3 1/3] bonding: implement xdo_dev_state_free and
+ call it after deletion
+Thread-Index: AQHa5vUrWi/gseXBCEqaGlxcFyce2bIkZyIAgAAkNgA=
+Date: Tue, 13 Aug 2024 02:58:12 +0000
+Message-ID: <14564f4a8e00ecfa149ef1712d06950802e72605.camel@nvidia.com>
+References: <20240805050357.2004888-1-tariqt@nvidia.com>
+	 <20240805050357.2004888-2-tariqt@nvidia.com>
+	 <20240812174834.4bcba98d@kernel.org>
+In-Reply-To: <20240812174834.4bcba98d@kernel.org>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.40.0-1 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR12MB8554:EE_|MW6PR12MB9020:EE_
+x-ms-office365-filtering-correlation-id: 7809cf8e-f81d-4510-808c-08dcbb43c542
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d3ExbVFHYXBCVHlSdmxudGJzazBsODZzRmpjbXV6b0dWWHNhYVloNVdaK3BR?=
+ =?utf-8?B?UEwxbHB4OVJIZVJzVGhEWlNBMUF5d3VvenJlcytLUlhTQ1NraVZWczExSlB5?=
+ =?utf-8?B?dDF0N3hmUGdoMnFzWnl5U3RNTVFKRHcyMDZMaWJ1NTRZZTdES3U5dEN0bE9S?=
+ =?utf-8?B?aFlZOVpWWUFtU3pJSWlXd3hUMWZNYTB1YkF4Z1RiUnpTcG44bUlqbWI5K25V?=
+ =?utf-8?B?MWdvcjBqRHYyUWVyaS96ODQxYnY3aWU3RTBYQ0l6cUFGbkRaTnA5MGdycnpp?=
+ =?utf-8?B?bG5CcDUyOFMxNko1N210YnYyN0FQL1NOU1ZZSlBPOHlvMUNMckVuTHhNM2Fh?=
+ =?utf-8?B?d05wYW0zWFIydHlRR09lUUdVODZBTTQvK1UwejJLendpbzYzTVNvQmV1WWVo?=
+ =?utf-8?B?NGdiSlFQNmpJM3N0czBhR3FPL1lmR0tTS0YrUVlOQUFlSi8wS1NFa0Z6WXhy?=
+ =?utf-8?B?ME55UnZuQ1FURnlJc2VaNFZhSjZsMm1Fajg3bFhkUkFCczM2NmVaVHMvOGk4?=
+ =?utf-8?B?Q3NvOFI2VUw2eTR6blZFYnY0WUZ6aFVyME9CTWtMK0w3TDVwMXhTYzU0UXNC?=
+ =?utf-8?B?dVNRSlV2clB1dUI5SG1wcGJycWZxMVR2dEk0MjZ6ZmtDbUFCZ2dJMjVJazZU?=
+ =?utf-8?B?ZVcwUG9SRmxZeVhYMS9PeENHZ0ZNM1NqdlJaTmNaSDZweVZuVStxdzJ0ekty?=
+ =?utf-8?B?WldHditnT0VnUHBOM3k0dkpqc0prR1V1RVk2VlVwVEFCUDdkelVkNGhXSG5V?=
+ =?utf-8?B?bkl1Sy91bXVuYmE3dmZvdEVpVnRxNlN5dlF0WUZwNWlvN2tzblpHTjd3R2k0?=
+ =?utf-8?B?YUlLTTE0enlYM09FU1hXa1VmR0NNdHZqTjAzQmJvOUxQanVKZ2NaRUR0bm01?=
+ =?utf-8?B?TDF6cGNzdGI1VkRyMlpIZVlON3pVQWhuTTNPNFcrMGUrai9iTFBzRTNpL2FJ?=
+ =?utf-8?B?V00xWUtBaWdPdVp4UjZyMEI5dXVnQVcvMVp1QThnbUVNekJkQTZXTmhXY3Vm?=
+ =?utf-8?B?UWlCQU0rTHdKS3A2ODBUZWVubnBCODhyemdzTFJOVHB6RUp3Yk5hTjhaNkFH?=
+ =?utf-8?B?UERzSDZ3aDQ1bkdVVFhadnRQblJLUUtOUXRpSzdaUVZvbjRFRWtLejdSUm5h?=
+ =?utf-8?B?K3pJcS9mU053RnJQU2ozOFkwK3pQdnhzNDhOODZVWGpGRHhWNDFkUi8vd1pR?=
+ =?utf-8?B?Y043c2dZLzhrc1Z0cEJuSlJnbnZINkVYZjFqZXJvOGgwQlZiM1V2THBwbU05?=
+ =?utf-8?B?OFFMYjdZTVpPZXRvcGFlQUQ3eFhubDhsR1ZsNk9EWjRJakZZZnlLTU54dE14?=
+ =?utf-8?B?ZGptWmd6cm9BNjEwY2RaMXZya0R5V0xPUkx2YnpTdUtPa3BqbENRWVU1dHVV?=
+ =?utf-8?B?K2s2c05BVkgwSDRKQ09HclRoQWE2MkhteGRUNEJUWHJTeFhucU1ZUE1wWUYv?=
+ =?utf-8?B?ai95a3VOL0N6SnJKc2psa3R5cmtTekFrL0RpeDZKemlyN3p1cHNZQ0tDaCts?=
+ =?utf-8?B?WHVNbk50K2RGODZhK1hpVEc4NkJTd3UzTE5zZFVlZExWRkFOSzBZY1AzbS9k?=
+ =?utf-8?B?WmIzdEJxU2tpS1RMajNramcya3NuUUVkdnAzbmVoUjloQzZsVGgxS0FYbTVN?=
+ =?utf-8?B?Tko4RUVMYlNFY3NzbDUzRUxXVEdzVng1b1N3blRtRnNObjFEQzNNcUQ0dkRO?=
+ =?utf-8?B?RHkrcU5EaHNma3hTOEx3TUh2aWNlSnpBR0toTm1RZW81TVRvZS9pV2ZDSlZT?=
+ =?utf-8?B?RWdLMXc1OWs1Q0N2Yk95K2hOKzl4UjJsdnlSVVNMNVVETVlCaFRFOEF3Mi9s?=
+ =?utf-8?B?Q2EzeEVCR3FFR2dZMUxLc2pucU05ak9oWFFFLzVDbWljL3U0MEY0WWhyenY0?=
+ =?utf-8?B?YlNOYUNPeVBJZW5OczQzb3NpQWNwMmNHemFZc05pYlpXZkE9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8554.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UCs3YVNGczVRSnJXanJKbVloTUFPczB5d3M2RWFIUjFrbDlQd1NSY2tBazBV?=
+ =?utf-8?B?ODFqVEZjQW5RTS9haHVrckRZWDhqeVM5Qm5WQmF5TWRwRGp0NWM1YmN2bVlL?=
+ =?utf-8?B?b25IelFRQzlYSjNMWWVkTUN2UXJMUGErRFFkaWFJWlQ2REtyVVdac1czV0hV?=
+ =?utf-8?B?Wk1RaWFubk9PUFpCMFB5K2k4d2pxWDdVZFZRRFFaTHBLZnRiZ1FBbHVoQ0Iz?=
+ =?utf-8?B?ak1Zc3RNQjd3aWJRdCsxTkVHVjhMNlgwZ0RzcVJRWlNvam9pRkxPNlZ5dGk4?=
+ =?utf-8?B?eUxpUER5VUhqaVhVRityNHo1TXZWekNtdXBMTUtOS3pHSmM3NndLOTB5Wmcy?=
+ =?utf-8?B?V1Byc1ZmU2t6aVBLb3AxcVM4OU1DbUJjU21MbjR4NU9vWWtpTWNVTXg4Tkw0?=
+ =?utf-8?B?d3NvenY0R3FJM2FLYTBtSXB6S2NZVXNPNC9TZnhyOG1Oc1phM3FsaGtnNk5n?=
+ =?utf-8?B?QVdaNmZOMzhRMTV1VmpMbUc0b0gza2FDZVQ0eVNraXlXSURaUUlSeFBCbExV?=
+ =?utf-8?B?QjJvR0hxUUNTMHFDaUFRV1hzVUxWNlNpY2tLMTFJNXFBRk43UFF5Y29aNElG?=
+ =?utf-8?B?byt6cHFwVnExanJuMm43OE1HaXc5WEpicUV1czQ0NDJEK1BKQmRwYUZVRzUy?=
+ =?utf-8?B?ajlOaGl6eHlRRGg3RUNkbHdlbk1TcW03TjBHbzExT0g2QndkWVg0STBnK3FR?=
+ =?utf-8?B?dkNGaXdBZ3d1T3AwSUI1RlU4VWpEY0dvZytCREo4UmRoU3h6RldaT25zSWpJ?=
+ =?utf-8?B?ZENUcHcyK0hselVNd0tNL3g0SCtrQ2tMOGpvOUljNXVFSGVqbFIxamtTdE0x?=
+ =?utf-8?B?OUZBWnhQdTM0UVFyN2lPdEVmcUNoZUtUWDUwVTI0NFpDYW5POGdHcy82Smtm?=
+ =?utf-8?B?U1NsU00xSS9MNSs1emFFYWU0R1BKVDNpZy9qeFd0Tjd5a2FxVThremthL01o?=
+ =?utf-8?B?MTAzK2Fzd1FPb1ZlUlRyejY1UlNlUmgxM1R0S3UycTFhcjcwUmgweW1wMnQz?=
+ =?utf-8?B?dXhTL1NlNU1BaXRVZEhyS0hWQ0NCU3ZNSlp6d3ZseGN4aUxkS0krZFIvTFVj?=
+ =?utf-8?B?Y1NYdnVMUFZ2WWJTQldJQlJ1WUgybTBRVUx4akFteWtYMTF0SjB2NVpPYkdv?=
+ =?utf-8?B?UTRFMnJzN0NSaSszUlNSQkJJejNib29XLzBPcHhCMitvR2tDNm1IWTBZUkxw?=
+ =?utf-8?B?U1Q1U1cvSzMyUWtRdjA5SFdUeStvaUZWZ2JNdWJXampDWEFVSElnRE9nRlhu?=
+ =?utf-8?B?RGtyK085Z1FhdGJCMUJWWVZkbFhzRCsvNnl4S3ZidUJVcy9Wd1o5WVJNdVc3?=
+ =?utf-8?B?MkRoSFZYY0U3MVFOTFRCYStPYmw0UWQzRWVtWVc5ZHNYSHRLYittVEhBQXdN?=
+ =?utf-8?B?ZFd1eTZEWUluVGV0MnFObnNrUndiWWpMaVJ3Y2RDUnhvMkx2WlNXZlViYzZ1?=
+ =?utf-8?B?RGRTVHV3ekVZVUcwVkEySW0xVm5oT2FXRlkyMWtKQm8zKzJ4ZWt5b0lJSVB6?=
+ =?utf-8?B?c3ZRcW90NHRWSUR4RXdCUkhoZ284bFQzQk5iaWwwd04yZjc3WGdyZnM5anpa?=
+ =?utf-8?B?Qm45YjlrcGJIZjRobDIwQnhWbWxrWmliemNZNUVIbnFRa202Q2Z5alJTYVRH?=
+ =?utf-8?B?YUJrV0hIZ2U3azlDclRER1Z3MVloU1BsRjNsMlJPblFNQnFyU1Z0bGo3L0pn?=
+ =?utf-8?B?MitYekcxL2puRWFaMmQzdzJoeU1uVXZvRGdzbHNYcStsTStNYkMwb2tpTmNX?=
+ =?utf-8?B?RGx3RzNNQTJZRDhnTTVnTkRmaXgrOS8rYTdWQ0RtRGcrK05XQU1NbGQzQnUr?=
+ =?utf-8?B?Ukx3NmJuYyt4K3FwZW52ajQzcXpjTlp4SGZKNGQzQmtRcUFPWDdwKytNL1lI?=
+ =?utf-8?B?d2oxRHpIU2ZNa1I2ajNpOFYxb1VUNUcrNzFIQkl0Y0R6UVFPdk04eTJRTGg3?=
+ =?utf-8?B?RTJRbFdlZ0NKcHJWbEFaMDA0bW9IQU4vcUMrd2xrek5HeHpkVmNCR1pCdGZ5?=
+ =?utf-8?B?cmdtSTE1dmpnaE55WUJZOFIwQlBmWTF2RXhQZzZOUnpVVnA0b1JnTk1GckNp?=
+ =?utf-8?B?SFMxWGgwa2FvSkMxM295dDlzR3lhdC8wR24vK3g1cWNIaHNaOVUxb3h3UFlz?=
+ =?utf-8?Q?WebicHlvRC/igkd4DvcJG06it?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0ECDC64EA275F04995FA949469C4128F@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812190700.14270-1-rosenp@gmail.com> <20240812190700.14270-3-rosenp@gmail.com>
- <ae818694-e697-41cc-a731-73cd50dd7d99@lunn.ch> <CAKxU2N9p4DrbREqHuagmVS=evjK48SWE5NM3RbD5zF6D-H93kA@mail.gmail.com>
- <38c43119-4158-4be8-8919-f6890a5f4722@lunn.ch>
-In-Reply-To: <38c43119-4158-4be8-8919-f6890a5f4722@lunn.ch>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Mon, 12 Aug 2024 19:50:29 -0700
-Message-ID: <CAKxU2N8-bPnkouJ_95U9NkRh7AP94MuMJTMeThWQhnuL1n0SMg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net: ag71xx: use devm for of_mdiobus_register
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk, 
-	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8554.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7809cf8e-f81d-4510-808c-08dcbb43c542
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2024 02:58:12.6148
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: f8ipDX2Qm6J/sAGO+cedXuyUVGunoxI2TEeEPWC95KoKHYvoD2JvsI0S1sLzwoLSC51GF8qLljKDjVU01ahqvw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB9020
 
-On Mon, Aug 12, 2024 at 7:41=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Mon, Aug 12, 2024 at 02:35:45PM -0700, Rosen Penev wrote:
-> > On Mon, Aug 12, 2024 at 2:28=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > On Mon, Aug 12, 2024 at 12:06:52PM -0700, Rosen Penev wrote:
-> > > > Allows removing ag71xx_mdio_remove.
-> > > >
-> > > > Removed local mii_bus variable and assign struct members directly.
-> > > > Easier to reason about.
-> > >
-> > > This mixes up two different things, making the patch harder to
-> > > review. Ideally you want lots of little patches, each doing one thing=
-,
-> > > and being obviously correct.
-> > >
-> > > Is ag->mii_bus actually used anywhere, outside of ag71xx_mdio_probe()=
-?
-> > > Often swapping to devm_ means the driver does not need to keep hold o=
-f
-> > > the resources. So i actually think you can remove ag->mii_bus. This
-> > > might of been more obvious if you had first swapped to
-> > > devm_of_mdiobus_register() without the other changes mixed in.
-> > not sure I follow. mdiobus_unregister would need to be called in
-> > remove without devm. That would need a private mii_bus of some kind.
-> > So with devm this is unneeded?
->
-> If you use devm_of_mdiobus_register(), the device core will call
-> devm_mdiobus_unregister() on remove. Your patch removed
-> mdiobus_unregister() in remove....
->
-> Is there any user of ag->mii_bus left after converting to
-> devm_of_mdiobus_register()?
-There is not. I've applied the change removing mii_bus from ag locally.
-
-From testing, nothing has blown up. Although there's still a problem
-with switched ports (except for lan1) dying after a while. I think
-that bug's in qca8k though.
-
-calling restart results in no surprises, unlike with some of my other
-questionable patches.
->
->         Andrew
+T24gTW9uLCAyMDI0LTA4LTEyIGF0IDE3OjQ4IC0wNzAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
+Cj4gT24gTW9uLCA1IEF1ZyAyMDI0IDA4OjAzOjU1ICswMzAwIFRhcmlxIFRvdWthbiB3cm90ZToN
+Cj4gPiArc3RhdGljIHZvaWQgYm9uZF9pcHNlY19mcmVlX3NhKHN0cnVjdCB4ZnJtX3N0YXRlICp4
+cykNCj4gPiArew0KPiA+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBuZXRfZGV2aWNlICpib25kX2Rl
+diA9IHhzLT54c28uZGV2Ow0KPiA+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBuZXRfZGV2aWNlICpy
+ZWFsX2RldjsNCj4gPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgYm9uZGluZyAqYm9uZDsNCj4gPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2xhdmUgKnNsYXZlOw0KPiA+ICsNCj4gPiArwqDCoMKgwqDC
+oMKgwqBpZiAoIWJvbmRfZGV2KQ0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBy
+ZXR1cm47DQo+IA0KPiBjYW4geHMtPnhzby5kZXYgYmUgTlVMTCBkdXJpbmcgdGhlIGRldl9mcmVl
+X3N0YXRlIGNhbGxiYWNrPw0KDQpTaG91bGRuJ3QgYmUgTlVMTCBiZWNhdXNlIGJvbmRfaXBzZWNf
+ZGVsX3NhIGlzIGNhbGxlZCBiZWZvcmUgYW5kIHhzIGlzDQpyZW1vdmVkIGZyb20gYm9uZC0+aXBz
+ZWNfbGlzdCwgc28geHMtPnhzby5kZXYgaXMga2VwdCB1bmxlc3MgaXQncw0KY2xlYXJlZCBpbiBk
+ZXYncyB4ZG9fZGV2X3N0YXRlX2RlbGV0ZSBjYWxsYmFjay4NCg0KPiANCj4gPiArwqDCoMKgwqDC
+oMKgwqByY3VfcmVhZF9sb2NrKCk7DQo+ID4gK8KgwqDCoMKgwqDCoMKgYm9uZCA9IG5ldGRldl9w
+cml2KGJvbmRfZGV2KTsNCj4gPiArwqDCoMKgwqDCoMKgwqBzbGF2ZSA9IHJjdV9kZXJlZmVyZW5j
+ZShib25kLT5jdXJyX2FjdGl2ZV9zbGF2ZSk7DQo+ID4gK8KgwqDCoMKgwqDCoMKgcmVhbF9kZXYg
+PSBzbGF2ZSA/IHNsYXZlLT5kZXYgOiBOVUxMOw0KPiA+ICvCoMKgwqDCoMKgwqDCoHJjdV9yZWFk
+X3VubG9jaygpOw0KPiANCj4gV2hhdCdzIGhvbGRpbmcgb250byByZWFsX2RldiBvbmNlIHlvdSBk
+cm9wIHRoZSByY3UgbG9jayBoZXJlPw0KDQpJIHRoaW5rIGl0IHNob3VsZCBiZSB4ZnJtIHN0YXRl
+IChhbmQgYm9uZCBkZXZpY2UpLg0KDQpUaGFua3MhDQpKaWFuYm8NCg0K
 
