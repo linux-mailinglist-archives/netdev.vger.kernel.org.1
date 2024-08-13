@@ -1,166 +1,291 @@
-Return-Path: <netdev+bounces-117914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AD9594FC86
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:06:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D37194FC89
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42A192829E8
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:06:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EBD81C222C3
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723E71BF3F;
-	Tue, 13 Aug 2024 04:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLeDPZK5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517241C286;
+	Tue, 13 Aug 2024 04:07:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F0B1CABA;
-	Tue, 13 Aug 2024 04:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095071CAA6;
+	Tue, 13 Aug 2024 04:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723522012; cv=none; b=U+wjHZeQ6MADCRXkQjAbFZRAc3GSDUm8GH6LbHtmLIF4LLkMI0aeHOZ5UeoykBwP7aiJVaIItaY1BGmUO43lGjHu+SwIN0aynOd88w7egzS7dQF7rhldfPwuAwUitdd80lkvuobpjfaSmYe+vz2uNf8b/VX4GSFsL6UbfvJNOhk=
+	t=1723522040; cv=none; b=E/Jhbw9ZYsyrBwSs7smuzYi4iUggxl6RRNib+mVIqFqqB4pNiJvEjb0FoxPg02dKZX9CUS1OysKla+U5BDZrkeYHYUTRvEsNMmE4W8pDtTxfeW3x9+nlFAC2MsHLQem9GG8/WdQw8AKXM9avvTJyVUbTiUJ5S34bcxvpBjOuByk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723522012; c=relaxed/simple;
-	bh=roCIEbH2gg3+xLljjbam2KFELuB6WIlssj8o5JNoK+o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hD1kFTtIQtBnnYcip6SjFP0Lha4k48DYpTi8IA3d4y/NtexnW4mEyiB0lza57R2i7PbsURqGx/7Nd9aionW46ZPVgcVvnQ7/koyt02fPNPSHIaA99sxqSUStyz9cOHYstqDatJOsiiB8kWimqxrxsrfCIQI2k7QDVL2jdhzIo3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LLeDPZK5; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1723522040; c=relaxed/simple;
+	bh=wduxGjkaQBkHndHQ4+MxkGTh593eBdYKEJfri6mqeRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNVcrlxaQKgkurJXT3sZUAm/jnwYT1ZzK21k20lJ/h+hhNPQLxADcfTPKm88QarWR7TL3WjaVR84V0XTTRXg6ueEP6aW0G4PlIhz07qaZKrjTcRYBAThjEPin9Iq/Ja1Hyoqb7dKkgXD8rbVfKuKATD15QDP2l9h1376ocFOrr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3db1270da60so3938496b6e.2;
-        Mon, 12 Aug 2024 21:06:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723522010; x=1724126810; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=roCIEbH2gg3+xLljjbam2KFELuB6WIlssj8o5JNoK+o=;
-        b=LLeDPZK5kJlMJ3LUbMseyyCjciAuRknq1Y+jE/BbZfcbolHEgC8d98CdHLpNNaZsuH
-         v5wdkzSW6jydhpKIIlHLXGWIsm9QU3t7HQ3zTB1RnKW9afDlbZjAeoSoJ6sd3l4oPNdf
-         3UVvfFWYpMxXzephVidn4bAtOcJJQvz9AzDbreOSkTa5R/s0aqDqMdjN0RDZufHAtdCk
-         pxIU44uoW4tK7JLSLh8FcZhG4tWj0LRlgHFcViO351or7HNJRu+XKy4M0TZhaz8JAmce
-         XpCJGlbmMz3fmc4QKbAX4zKS2dgs3BnU8xybhVZf/gJCq0j1kARmL6n/ASsDiG1TmdwF
-         HjRA==
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70d1d6369acso4072847b3a.0;
+        Mon, 12 Aug 2024 21:07:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723522010; x=1724126810;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=roCIEbH2gg3+xLljjbam2KFELuB6WIlssj8o5JNoK+o=;
-        b=sot3/2UQs8P5Un1RB0O4mh99CCDQjGKvfBxLxk5VOdkTq6NEULHfB6N5bFvQYKcQIg
-         D06ak4XWBn5/sk2wh+zE+66QOJKlIEIZKyCGURbByGImiLwJsmc6fiG3qFudj06nYdSB
-         14r32Lf1BRvJhypL619Y14v69eZ6t/50kGSs+3/LG8TPiamol4VRTtXk7kFHJ+e5EW0H
-         G8Hn1Km41494LQfKGKKGvW+3jqTLMpx+2od6InYuGLZrFoKctKODp71mLmoVZIqcM/yG
-         XLPYAlX5HPJ4+Hskvvg60yhytfB1kuOi2p2MMF7Njh3YJw7oRPflzaTImt2PrdCGQSWI
-         B6fw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlm7TWi4rusSmm6iy8UrEya6vIdrN+6clZtFkCHr5pUi+2SgRbfUB/plEXhecAyLi88VOtt3t79iOY3X4Vl+QkzvVErXPk7/E3G0Qzpr/bKeNt/ieofe5MJPTH4/7gFgZN2hEMcw2AHorVHqdxBTigWk2QNhfrfVG59gEGTVe+KQ==
-X-Gm-Message-State: AOJu0Yx9xmFcxNlfa6fC7oxSDdFsnxVpdA/FBr/piliMk754mkJP29mt
-	ra+eDNL7kIPJ150oZvsmqJQHp/Oa323k2XhDUITT13N6TE4lvT3y
-X-Google-Smtp-Source: AGHT+IH91Xu9KMJ5r/KHKbHXr1AGQ+WdR4LqNy4MduV4YAd5dGO45jJhMvli73ULT3Z6BNlCu3YieA==
-X-Received: by 2002:a05:6871:5cf:b0:261:1f7d:cf6e with SMTP id 586e51a60fabf-26fcb891fc3mr2475842fac.41.1723522009786;
-        Mon, 12 Aug 2024 21:06:49 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6979d60a9sm471894a12.10.2024.08.12.21.06.46
+        d=1e100.net; s=20230601; t=1723522037; x=1724126837;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qZSIFrHXFl/CMttBH8Bjgfh4zzvoz4mEhSiua6DUcew=;
+        b=WGdxYN77jOD5zaBPq1hI+ZowoUgSH66sOL7vIVH6qp+gCExfZ7DT3hz33BfadQyZBQ
+         am/dvx+bLWwGgt4Lh8PrfKWXEAx2X8BjEAJdNu24bLUtuPTGYZFBr9S0glDDfacFd7Ps
+         aM4ULiT3ENopHge0yxc17LSQEYl5oh1ROj2jOG+F6uJMmDQk7JIMfWvLQMx8ovroDwH2
+         oODw0zb4BBtrGgd+w88cbSaJBarpU3w7SCr+YVevFwxHBQGaaRTO55IZ0b6wn+FpCHzO
+         wPbh0B4N35nqJMq5rE5wI1DoAidyVKPUs0YdNr14m80mYHb5ncy+M6xNqUBfVdy/a4UF
+         I5rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXiUQ3uX8eiQMf/8ZTvEqib55PfOw54OKA3/ZNGoW2kZnTm1oYmhQ5rVAFnKmWsg8xbyGVKn/jNeF1SL+XOvrGoFgg44JmPsJPk2/DmmVnf0Sp9WxD0hQ/H1wyhS5WbMxkl+I/vAYGXp2TgXBgqQh3+s13mtzMdfXuOygJnE6cWGh0HutWucw==
+X-Gm-Message-State: AOJu0YyBR9Gjqlw8PfXthc6tiCkACiU5mrvwPb+WgjtHDl8U2vPdWEkd
+	QADAIRJ5YinHLfbbW2q7aS07E8Wr5HBlTP6o+tIT0PAhc2Gb8k8=
+X-Google-Smtp-Source: AGHT+IFFflwlZ19WfFa+AEhg9VCTnQe30R9NKm0lHmyXm6lxFruzj38JW4Y7jOVZVGJM9f3hzAaGFg==
+X-Received: by 2002:a17:902:db10:b0:1fb:4f57:6a65 with SMTP id d9443c01a7336-201cbc923eemr21957205ad.30.1723522037021;
+        Mon, 12 Aug 2024 21:07:17 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1b82bfsm4218065ad.210.2024.08.12.21.07.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 21:06:49 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: aha310510@gmail.com
-Cc: alibuda@linux.alibaba.com,
-	davem@davemloft.net,
-	dust.li@linux.alibaba.com,
-	edumazet@google.com,
-	guwen@linux.alibaba.com,
-	jaka@linux.ibm.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	tonylu@linux.alibaba.com,
-	wenjia@linux.ibm.com,
-	syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net/smc: prevent NULL pointer dereference in txopt_get
-Date: Tue, 13 Aug 2024 13:06:41 +0900
-Message-Id: <20240813040641.163841-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240810172259.621270-1-aha310510@gmail.com>
-References: <20240810172259.621270-1-aha310510@gmail.com>
+        Mon, 12 Aug 2024 21:07:16 -0700 (PDT)
+Date: Mon, 12 Aug 2024 21:07:15 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: netdev@vger.kernel.org, Joe Damato <jdamato@fastly.com>,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+Message-ID: <Zrrb8xkdIbhS7F58@mini-arch>
+References: <20240812125717.413108-1-jdamato@fastly.com>
+ <ZrpuWMoXHxzPvvhL@mini-arch>
+ <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
+ <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
+ <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=yes
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
 
-Jeongjun Park wrote:
->
-> Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
-> copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
->
-> In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
->
-> To solve this, we need to add a smc6_sock structure for ipv6_pinfo_offset
-> initialization and modify the smc_sock structure.
->
-> [  278.629552][T28696] ==================================================================
-> [  278.631367][T28696] BUG: KASAN: null-ptr-deref in txopt_get+0x102/0x430
-> [  278.632724][T28696] Read of size 4 at addr 0000000000000200 by task syz.0.2965/28696
-> [  278.634802][T28696]
-> [  278.635236][T28696] CPU: 0 UID: 0 PID: 28696 Comm: syz.0.2965 Not tainted 6.11.0-rc2 #3
-> [  278.637458][T28696] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> [  278.639426][T28696] Call Trace:
-> [  278.639833][T28696]  <TASK>
-> [  278.640190][T28696]  dump_stack_lvl+0x116/0x1b0
-> [  278.640844][T28696]  ? txopt_get+0x102/0x430
-> [  278.641620][T28696]  kasan_report+0xbd/0xf0
-> [  278.642440][T28696]  ? txopt_get+0x102/0x430
-> [  278.643291][T28696]  kasan_check_range+0xf4/0x1a0
-> [  278.644163][T28696]  txopt_get+0x102/0x430
-> [  278.644940][T28696]  ? __pfx_txopt_get+0x10/0x10
-> [  278.645877][T28696]  ? selinux_netlbl_socket_setsockopt+0x1d0/0x420
-> [  278.646972][T28696]  calipso_sock_getattr+0xc6/0x3e0
-> [  278.647630][T28696]  calipso_sock_getattr+0x4b/0x80
-> [  278.648349][T28696]  netlbl_sock_getattr+0x63/0xc0
-> [  278.649318][T28696]  selinux_netlbl_socket_setsockopt+0x1db/0x420
-> [  278.650471][T28696]  ? __pfx_selinux_netlbl_socket_setsockopt+0x10/0x10
-> [  278.652217][T28696]  ? find_held_lock+0x2d/0x120
-> [  278.652231][T28696]  selinux_socket_setsockopt+0x66/0x90
-> [  278.652247][T28696]  security_socket_setsockopt+0x57/0xb0
-> [  278.652278][T28696]  do_sock_setsockopt+0xf2/0x480
-> [  278.652289][T28696]  ? __pfx_do_sock_setsockopt+0x10/0x10
-> [  278.652298][T28696]  ? __fget_files+0x24b/0x4a0
-> [  278.652308][T28696]  ? __fget_light+0x177/0x210
-> [  278.652316][T28696]  __sys_setsockopt+0x1a6/0x270
-> [  278.652328][T28696]  ? __pfx___sys_setsockopt+0x10/0x10
-> [  278.661787][T28696]  ? xfd_validate_state+0x5d/0x180
-> [  278.662821][T28696]  __x64_sys_setsockopt+0xbd/0x160
-> [  278.663719][T28696]  ? lockdep_hardirqs_on+0x7c/0x110
-> [  278.664690][T28696]  do_syscall_64+0xcb/0x250
-> [  278.665507][T28696]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> [  278.666618][T28696] RIP: 0033:0x7fe87ed9712d
-> [  278.667236][T28696] Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> [  278.670801][T28696] RSP: 002b:00007fe87faa4fa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-> [  278.671832][T28696] RAX: ffffffffffffffda RBX: 00007fe87ef35f80 RCX: 00007fe87ed9712d
-> [  278.672806][T28696] RDX: 0000000000000036 RSI: 0000000000000029 RDI: 0000000000000003
-> [  278.674263][T28696] RBP: 00007fe87ee1bd8a R08: 0000000000000018 R09: 0000000000000000
-> [  278.675967][T28696] R10: 0000000020000000 R11: 0000000000000246 R12: 0000000000000000
-> [  278.677953][T28696] R13: 000000000000000b R14: 00007fe87ef35f80 R15: 00007fe87fa85000
-> [  278.679321][T28696]  </TASK>
-> [  278.679917][T28696] ==================================================================
->
+On 08/12, Martin Karsten wrote:
+> On 2024-08-12 21:54, Stanislav Fomichev wrote:
+> > On 08/12, Martin Karsten wrote:
+> > > On 2024-08-12 19:03, Stanislav Fomichev wrote:
+> > > > On 08/12, Martin Karsten wrote:
+> > > > > On 2024-08-12 16:19, Stanislav Fomichev wrote:
+> > > > > > On 08/12, Joe Damato wrote:
+> > > > > > > Greetings:
+> > > > > > > 
+> > > > > > > Martin Karsten (CC'd) and I have been collaborating on some ideas about
+> > > > > > > ways of reducing tail latency when using epoll-based busy poll and we'd
+> > > > > > > love to get feedback from the list on the code in this series. This is
+> > > > > > > the idea I mentioned at netdev conf, for those who were there. Barring
+> > > > > > > any major issues, we hope to submit this officially shortly after RFC.
+> > > > > > > 
+> > > > > > > The basic idea for suspending IRQs in this manner was described in an
+> > > > > > > earlier paper presented at Sigmetrics 2024 [1].
+> > > > > > 
+> > > > > > Let me explicitly call out the paper. Very nice analysis!
+> > > > > 
+> > > > > Thank you!
+> > > > > 
+> > > > > [snip]
+> > > > > 
+> > > > > > > Here's how it is intended to work:
+> > > > > > >      - An administrator sets the existing sysfs parameters for
+> > > > > > >        defer_hard_irqs and gro_flush_timeout to enable IRQ deferral.
+> > > > > > > 
+> > > > > > >      - An administrator sets the new sysfs parameter irq_suspend_timeout
+> > > > > > >        to a larger value than gro-timeout to enable IRQ suspension.
+> > > > > > 
+> > > > > > Can you expand more on what's the problem with the existing gro_flush_timeout?
+> > > > > > Is it defer_hard_irqs_count? Or you want a separate timeout only for the
+> > > > > > perfer_busy_poll case(why?)? Because looking at the first two patches,
+> > > > > > you essentially replace all usages of gro_flush_timeout with a new variable
+> > > > > > and I don't see how it helps.
+> > > > > 
+> > > > > gro-flush-timeout (in combination with defer-hard-irqs) is the default irq
+> > > > > deferral mechanism and as such, always active when configured. Its static
+> > > > > periodic softirq processing leads to a situation where:
+> > > > > 
+> > > > > - A long gro-flush-timeout causes high latencies when load is sufficiently
+> > > > > below capacity, or
+> > > > > 
+> > > > > - a short gro-flush-timeout causes overhead when softirq execution
+> > > > > asynchronously competes with application processing at high load.
+> > > > > 
+> > > > > The shortcomings of this are documented (to some extent) by our experiments.
+> > > > > See defer20 working well at low load, but having problems at high load,
+> > > > > while defer200 having higher latency at low load.
+> > > > > 
+> > > > > irq-suspend-timeout is only active when an application uses
+> > > > > prefer-busy-polling and in that case, produces a nice alternating pattern of
+> > > > > application processing and networking processing (similar to what we
+> > > > > describe in the paper). This then works well with both low and high load.
+> > > > 
+> > > > So you only want it for the prefer-busy-pollingc case, makes sense. I was
+> > > > a bit confused by the difference between defer200 and suspend200,
+> > > > but now I see that defer200 does not enable busypoll.
+> > > > 
+> > > > I'm assuming that if you enable busypool in defer200 case, the numbers
+> > > > should be similar to suspend200 (ignoring potentially affecting
+> > > > non-busypolling queues due to higher gro_flush_timeout).
+> > > 
+> > > defer200 + napi busy poll is essentially what we labelled "busy" and it does
+> > > not perform as well, since it still suffers interference between application
+> > > and softirq processing.
+> > 
+> > With all your patches applied? Why? Userspace not keeping up?
+> 
+> Note our "busy" case does not utilize our patches.
 
-Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-Tested-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
+Great, thanks for confirming, that makes sense!
 
-I think the root cause of this syzbot report and the above bug report is the same.
+> As illustrated by our performance numbers, its performance is better than
+> the base case, but at the cost of higher cpu utilization and it's still not
+> as good as suspend20.
+> 
+> Explanation (conjecture):
+> 
+> It boils down to having to set a particular static value for
+> gro-flush-timeout that is then always active.
+> 
+> If busy-poll + application processing takes longer than this timeout, the
+> next softirq runs while the application is still active, which causes
+> interference.
+> 
+> Once a softirq runs, the irq-loop (Loop 2) takes control. When the
+> application thread comes back to epoll_wait, it already finds data, thus
+> ep_poll does not run napi_busy_poll at all, thus the irq-loop stays in
+> control.
+> 
+> This continues until by chance the application finds no readily available
+> data when calling epoll_wait and ep_poll runs another napi_busy_poll. Then
+> the system switches back to busy-polling mode.
+> 
+> So essentially the system non-deterministically alternates between
+> busy-polling and irq deferral. irq deferral determines the high-order tail
+> latencies, but there is still enough interference to make a difference. It's
+> not as bad as in the base case, but not as good as properly controlled irq
+> suspension.
+> 
+> > > > > > Maybe expand more on what code paths are we trying to improve? Existing
+> > > > > > busy polling code is not super readable, so would be nice to simplify
+> > > > > > it a bit in the process (if possible) instead of adding one more tunable.
+> > > > > 
+> > > > > There are essentially three possible loops for network processing:
+> > > > > 
+> > > > > 1) hardirq -> softirq -> napi poll; this is the baseline functionality
+> > > > > 
+> > > > > 2) timer -> softirq -> napi poll; this is deferred irq processing scheme
+> > > > > with the shortcomings described above
+> > > > > 
+> > > > > 3) epoll -> busy-poll -> napi poll
+> > > > > 
+> > > > > If a system is configured for 1), not much can be done, as it is difficult
+> > > > > to interject anything into this loop without adding state and side effects.
+> > > > > This is what we tried for the paper, but it ended up being a hack.
+> > > > > 
+> > > > > If however the system is configured for irq deferral, Loops 2) and 3)
+> > > > > "wrestle" with each other for control. Injecting the larger
+> > > > > irq-suspend-timeout for 'timer' in Loop 2) essentially tilts this in favour
+> > > > > of Loop 3) and creates the nice pattern describe above.
+> > > > 
+> > > > And you hit (2) when the epoll goes to sleep and/or when the userspace
+> > > > isn't fast enough to keep up with the timer, presumably? I wonder
+> > > > if need to use this opportunity and do proper API as Joe hints in the
+> > > > cover letter. Something over netlink to say "I'm gonna busy-poll on
+> > > > this queue / napi_id and with this timeout". And then we can essentially make
+> > > > gro_flush_timeout per queue (and avoid
+> > > > napi_resume_irqs/napi_suspend_irqs). Existing gro_flush_timeout feels
+> > > > too hacky already :-(
+> > > 
+> > > If someone would implement the necessary changes to make these parameters
+> > > per-napi, this would improve things further, but note that the current
+> > > proposal gives strong performance across a range of workloads, which is
+> > > otherwise difficult to impossible to achieve.
+> > 
+> > Let's see what other people have to say. But we tried to do a similar
+> > setup at Google recently and getting all these parameters right
+> > was not trivial. Joe's recent patch series to push some of these into
+> > epoll context are a step in the right direction. It would be nice to
+> > have more explicit interface to express busy poling preference for
+> > the users vs chasing a bunch of global tunables and fighting against softirq
+> > wakups.
+> 
+> One of the goals of this patch set is to reduce parameter tuning and make
+> the parameter setting independent of workload dynamics, so it should make
+> things easier. This is of course notwithstanding that per-napi settings
+> would be even better.
+> 
+> If you are able to share more details of your previous experiments (here or
+> off-list), I would be very interested.
+
+We went through a similar exercise of trying to get the tail latencies down.
+Starting with SO_BUSY_POLL, then switching to the per-epoll variant (except
+we went with a hard-coded napi_id argument instead of tracking) and trying to
+get a workable set of budget/timeout/gro_flush. We were fine with burning all
+cpu capacity we had and no sleep at all, so we ended up having a bunch
+of special cases in epoll loop to avoid the sleep.
+
+But we were trying to make a different model work (the one you mention in the
+paper as well) where the userspace busy-pollers are just running napi_poll
+on one cpu and the actual work is consumed by the userspace on a different cpu.
+(we had two epoll fds - one with napi_id=xxx and no sockets to drive napi_poll
+and another epoll fd with actual sockets for signaling).
+
+This mode has a different set of challenges with socket lock, socket rx
+queue and the backlog processing :-(
+
+> > > Note that napi_suspend_irqs/napi_resume_irqs is needed even for the sake of
+> > > an individual queue or application to make sure that IRQ suspension is
+> > > enabled/disabled right away when the state of the system changes from busy
+> > > to idle and back.
+> > 
+> > Can we not handle everything in napi_busy_loop? If we can mark some napi
+> > contexts as "explicitly polled by userspace with a larger defer timeout",
+> > we should be able to do better compared to current NAPI_F_PREFER_BUSY_POLL
+> > which is more like "this particular napi_poll call is user busy polling".
+> 
+> Then either the application needs to be polling all the time (wasting cpu
+> cycles) or latencies will be determined by the timeout.
+> 
+> Only when switching back and forth between polling and interrupts is it
+> possible to get low latencies across a large spectrum of offered loads
+> without burning cpu cycles at 100%.
+
+Ah, I see what you're saying, yes, you're right. In this case ignore my comment
+about ep_suspend_napi_irqs/napi_resume_irqs.
+
+Let's see how other people feel about per-dev irq_suspend_timeout. Properly
+disabling napi during busy polling is super useful, but it would still
+be nice to plumb irq_suspend_timeout via epoll context or have it set on
+a per-napi basis imho.
 
