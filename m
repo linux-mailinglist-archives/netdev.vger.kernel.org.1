@@ -1,93 +1,119 @@
-Return-Path: <netdev+bounces-117985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64C59502AC
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:43:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC529502C4
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 054171C21F41
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:43:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABD91F23760
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F852195B27;
-	Tue, 13 Aug 2024 10:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF96E1991DC;
+	Tue, 13 Aug 2024 10:45:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abm405H2"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lQEtOPgk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDAEC194C73
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3028E19A288
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723545787; cv=none; b=lvJY2Vss43pGnGsSCLeJIuDjmyOJ19vo+f0YrTk7xZKQ2EkWlwI2rHcQv+OAq3mHZwDjaFud2UwkGEiv+gZDBNPhGF009SmK+3UqymtuNkaH1IB7fnqv6ycx5ZfkuNUmEORQ84UO4+yrtxInB8CEd7w6Yo3iztNLjt2nbCMS8MA=
+	t=1723545945; cv=none; b=BIxv2pd13NhQ6hENz56cRovtfpG4cRX/g289toG0roIU50NdaUfNfduLPaKWhbhxFIm5b+mQxe31E/b7fmGvPJgDGRek7EKiKaZv+TfYBJYukNhhuR27ebdwF7mTh5jk/RBRoXdIf76dX/uBC00h6FmN53JFmfBEQ/InMVu2rUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723545787; c=relaxed/simple;
-	bh=zWp0o9xh28pyAM4p55ml5Y76UacX0NtQX7AzptO7Cbg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=UQSFyyHXBNfw0w6kDRnBWVq8H4qNCNdpx1ApykAWHybA6XBg1YtlZd3seF9SN1slu+oJJPSZB8uk1RqrDxwIv3WngAoYCXe2vSB44mQTyKjNa+Cfuxelh7KjnHoitCiL45X6KD8S+N52Be5PTLS/PdtULUnTpk8qsDWBUk/vRkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=abm405H2; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5b9d48d1456so1897670a12.1
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 03:43:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723545784; x=1724150584; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zWp0o9xh28pyAM4p55ml5Y76UacX0NtQX7AzptO7Cbg=;
-        b=abm405H26/S1dS06G5vl3AzdDT39QC+6TEqxDW3h82SuXQ9XixPaCCOfk6oE+/dz/w
-         e4/puRB8irvdbW51qjBRQSoqHzUKL/aCIgQGVHfMIrdeMFKzmq83YaPPI4s00Xh7OwRb
-         NPmrDvbFiE+LzTiwTOeAMO76Bywe4ZRCHaL8OAUJSv/ZGViVI3fI2lZZvpssblRRzFms
-         zrAoORh90RAfaCrMoEGlTMzW3nAsH1h3UfF7AQ0Mkpk5yFWGIXHGENNld9MwvLpBU2lI
-         Xv5xSFkZDDseQdrXeUmL6aBicIvMIgwq8iz9WfCo3sjSRV+Pq7qc7legsghHz0P1I76i
-         VaGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723545784; x=1724150584;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zWp0o9xh28pyAM4p55ml5Y76UacX0NtQX7AzptO7Cbg=;
-        b=uv/9ifkW0wDjutOLvAxfDAShSn8NjjF/14fgtcKsYs6Nb1c2fQUGkNI5TLxBwqDqbR
-         RF/rAzL8n/IB3ykhBIYOt2M86y7SIJ6+VsurAVg7NwPWAyxpCAKuaJmGRCVhphFFM7QA
-         Qs29C5L9RxJ3RIkM2UdDNMoLrmmp74A/Hnw0Z7K7PiFdyJh/7Kwp7SyoeVuJ0a2dhZP/
-         X3R0o+QX++mN9zo/0SSFos17geQjcBZVQZjig4jRzF8Tu8T6S6+iJcWKKuoLJhIKGEzd
-         vDJnAWv4ZpC/Z4XVkxldCea8uwvk07euGEcxZht0VACBGbkaCXbONmelxHhBCstwBwdz
-         yuUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOhbCr/hi0y2RhQyqR1WboqIqckkpqIfsfJkGSssamLYIAOniyGb8Wp+/mS/hDrgb2HRnZimexUwqGlR3cJaGeMl6FQ8hG
-X-Gm-Message-State: AOJu0YxXQPVaQdkdML9enP+sUP3I3z2iezZZuwBHLdWdzTUfAppOC0SK
-	leELZcvyW8aFNaZe5e/PHErO633he51I+gTeQ2Pur/9FvQVnDNG91N3zTYcTLcIazPHQUDlrUmM
-	OH4JhpInfSfg9od5MWrdbc4EQlF8=
-X-Google-Smtp-Source: AGHT+IGkkJ7fTEkr0h/dm3ZYVk5Cl4/rdCTWZU0aaBrCV5Ttw9VKa5ZJbNbwyTwQalXJPH0MxiJBMan58aDqq5SkI9g=
-X-Received: by 2002:a05:6402:1ed5:b0:59f:9f59:b034 with SMTP id
- 4fb4d7f45d1cf-5bd461c5d8emr2090303a12.13.1723545783767; Tue, 13 Aug 2024
- 03:43:03 -0700 (PDT)
+	s=arc-20240116; t=1723545945; c=relaxed/simple;
+	bh=dSSrvIrzaSFBD6AM5pRevzia/lDzCE40W+TUXd90I1g=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e2U6usiICVHarLBlBjSA/Jykjmmpm0Cj+mWpj+mrC4mK+JIcFPOrxrHcHSWplGi4VQoxy5YZQbnGR+1zmLArEXwL6Kv0N1VKiBf7m9xmjOOagJtpr+w4WRe37N1STI1pugtEsxmtcooCWyaAGQakU1P4E0lMbseP6+q2rCy0P1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lQEtOPgk; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9TGP6013756;
+	Tue, 13 Aug 2024 03:45:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=upz99kQhapywIbZ7C5DtFIt9y
+	u0TUW14BfQwSPm5riY=; b=lQEtOPgkGkI6jI/WWFkV1RllFqG/UtMvu22PnJS8p
+	YG/CSKL3hy083z/F3yF4EdY/9k1PrqUzWLXCqlOVd5px6Op3AR5Y7BYZc244aEJw
+	s9Gp3MoEfSQX1WXxTFfvKWSgH4VwVpTkIE1lAnviWzCO1bOQxix47Rr+3o6F5Hz1
+	9/6S6ALUnnvpQBX28/Frm7PVr3f/DBRNczr7UV2mvKGX3MTWHsRjwc5YY7jeBPR8
+	oHLVfQyuL4YPj6RSNTUuLYchdc9CkQYzx+pH/uJDRo/po6hG/LNq+4vsuCeLBJds
+	nweiYhqbJZsvWbHb+6+NJgopQM2LHxXvyPU/xvO5r2nAw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4104w6g6gx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 03:45:36 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 13 Aug 2024 03:45:35 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 13 Aug 2024 03:45:35 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 6BA933F7060;
+	Tue, 13 Aug 2024 03:45:31 -0700 (PDT)
+Date: Tue, 13 Aug 2024 16:15:30 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <willemb@google.com>,
+        <jeroendb@google.com>, <shailend@google.com>, <hramamurthy@google.com>,
+        <jfraker@google.com>, Ziwei Xiao <ziweixiao@google.com>
+Subject: Re: [PATCH net-next v3 2/2] gve: Add RSS adminq commands and ethtool
+ support
+Message-ID: <Zrs5SspHV06zP4cK@test-OptiPlex-Tower-Plus-7010>
+References: <20240812222013.1503584-1-pkaligineedi@google.com>
+ <20240812222013.1503584-3-pkaligineedi@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Tue, 13 Aug 2024 19:42:51 +0900
-Message-ID: <CAMArcTXtKGp24EAd6xUva0x=81agVcNkm9rMos+CdEh6V_Ae4g@mail.gmail.com>
-Subject: Question about TPA/HDS feature of bnxt_en
-To: Michael Chan <michael.chan@broadcom.com>, David Wei <dw@davidwei.uk>, 
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Cc: Mina Almasry <almasrymina@google.com>, Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240812222013.1503584-3-pkaligineedi@google.com>
+X-Proofpoint-GUID: LN4cTF62J6RcpIjqBIUyN4HmJsgbZKOT
+X-Proofpoint-ORIG-GUID: LN4cTF62J6RcpIjqBIUyN4HmJsgbZKOT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
 
-Hi,
-I'm currently testing the device memory TCP feature with the bnxt_en
-driver because Broadcom NICs support TPA/HDS, which is a mandatory
-feature for the devmem TCP.
-But it doesn't work for short-sized packets(under 300?)
-So, the devmem TCP stops or errors out if it receives non-header-splitted skb.
-
-I hope the bnxt_en driver or firmware has options that force TPA to
-work for short-sized packets.
-So, Can I get any condition information on TPA?
-
-Thanks a lot!
-Taehee Yoo
+On 2024-08-13 at 03:50:13, Praveen Kaligineedi (pkaligineedi@google.com) wrote:
+> From: Jeroen de Borst <jeroendb@google.com>
+> 
+> Introduce adminq commands to configure and retrieve RSS settings from
+> the device. Implement corresponding ethtool ops for user-level
+> management.
+> 
+> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+> Changes in v2:
+> 	- Update the GVE's get/set_rxfh functions to send the
+> 	  ethtool_rxfh_param directly to related adminq functions so
+> 	  that it can avoid the extra copy between ethtool and the
+> 	  local gve_rss_config struct(Jakub Kicinski)
+> 	- Remove the struct gve_rss_config that becomes unused
+> 	- Add a comment in the gve_adminq_configure_rss function to
+> 	  describe the device expections for the configure_rss adminq
+> 	  command
+> 
+>  drivers/net/ethernet/google/gve/gve.h         |   2 +
+>  drivers/net/ethernet/google/gve/gve_adminq.c  | 146 ++++++++++++++++++
+>  drivers/net/ethernet/google/gve/gve_adminq.h  |  44 ++++++
+>  drivers/net/ethernet/google/gve/gve_ethtool.c |  44 +++++-
+>  4 files changed, 235 insertions(+), 1 deletion(-)
+>
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
 
