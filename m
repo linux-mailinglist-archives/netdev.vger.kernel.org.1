@@ -1,97 +1,89 @@
-Return-Path: <netdev+bounces-117921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF17994FD9F
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:13:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009FD94FDBC
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:18:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7BC1F23BC4
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:13:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7992846BF
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB8239FC6;
-	Tue, 13 Aug 2024 06:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E9C3D3BF;
+	Tue, 13 Aug 2024 06:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k/wSoJUC"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="A+0GD+SI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234612262B;
-	Tue, 13 Aug 2024 06:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF5039AD5;
+	Tue, 13 Aug 2024 06:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723529593; cv=none; b=kXfWpN9pII73KVR9h+sV6/KO0PenTzYrv3J7MOqdXXffdJAbOZOmnLIgumCCIN1+vqNTMyD9btaF5N009WP7aVdag6KZrWkhXdmojvTXayaub7olDOJGFByvFVycDH9LJUSOJJ0by22trismJGT9FPsqnevhXoB6m++ekZV3Vss=
+	t=1723529891; cv=none; b=iFZnkjjybjqZNkijEXFqVvFQWUbtKwdEZQh+XbO40BvCfyAjzITPmn/xQvgf+bdNAab3jVIwakYuioUR2yiENwwypZU8or+ZZsIy//cBFPbOK2AWMn3+rL6oVOiky9VEDyKEChR5JdN9xi5BR7qJRr64pIoyjmYFSSX47wYlDws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723529593; c=relaxed/simple;
-	bh=gKFhI0S2mlLMqPuudOyLilnNWOeupixtPdSxKimBLLs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s8HWVyIHOBUccFc8TAs3Tkzjwlfm+gw89l5DZS3q9wX/H+36Jw3XjHDxvKrVsm8i9paxN4QczxkKs16YIfuEFmm8MBGwG2QlrHYnEfwLbLXEjOwO8R1PS9/Z+ccLn2hFJugay4lt0KbZ0P/VkMvq1TyFTbMAQiTBrcCfF4eqQIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k/wSoJUC; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723529592; x=1755065592;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gKFhI0S2mlLMqPuudOyLilnNWOeupixtPdSxKimBLLs=;
-  b=k/wSoJUC/guXrTE/4tHCYL0P8/rMQONi1MLDxyE+FoMpVKpoSDYdvHAx
-   0mjO355h/gh+8JB7xB7docWhB4/MiMr4H/oGDT8J/ajIgW6LmB/Uu2nTd
-   gLnxEsgYFKyelQUFQhSmiAo5MWFI4/DMWUmbBuuqs7CYBLdF8lAT/AHvu
-   o=;
-X-IronPort-AV: E=Sophos;i="6.09,285,1716249600"; 
-   d="scan'208";a="420886268"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 06:13:08 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:5817]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.23:2525] with esmtp (Farcaster)
- id bdc15a2d-7174-4d53-9c6f-090ba981ef3d; Tue, 13 Aug 2024 06:13:08 +0000 (UTC)
-X-Farcaster-Flow-ID: bdc15a2d-7174-4d53-9c6f-090ba981ef3d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 13 Aug 2024 06:13:05 +0000
-Received: from 88665a182662.ant.amazon.com (10.142.139.164) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 13 Aug 2024 06:13:02 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <david.hunter.linux@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>,
-	<javier.carrasco.cruz@gmail.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
-Subject: Re: [PATCH] Kselftest: msg_oob.c: Fix warning for Incorrect Specifier
-Date: Mon, 12 Aug 2024 23:12:54 -0700
-Message-ID: <20240813061254.36825-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240813060036.754213-1-david.hunter.linux@gmail.com>
-References: <20240813060036.754213-1-david.hunter.linux@gmail.com>
+	s=arc-20240116; t=1723529891; c=relaxed/simple;
+	bh=U+bVojLDr+Ccs++CN7csFb/9v+iLI1hzibGKi2SMQgc=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=GulfK/JTuu9Cgqg95e84YI1+YM1d5TUBZYONpMhi54KU9OQ4tmT5c2I9rYUima75gVuQsKmHMUpPhb7rOqKIC1MERVDI7ctGNRX0dzgCDACbpYj0aCARHm24Ws/hOyIMoCkcETdcPDJskW0orgaupcDyVtWtq77aHH3ieaeKmQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=A+0GD+SI; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47CJIijN014733;
+	Mon, 12 Aug 2024 23:17:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=I+dxloyuRKlWMgUXJQsj70YbnM6qyFdv5hQ6uIpqGV4=; b=A+0
+	GD+SImCIQ3uZwWYm7lJXkc4DTwkVJoMcOanCkNhBj9vaMgcgBPI+oJB7VLC4yTV1
+	DLfOMW6PHRRjAbRc8o8j9pWNt8RDWh7JprjetnPu/CiDgVMA9QKKcpC/yjtkOtOg
+	CcBK2JESpxsC4XPBOWxIYWpkUyXqsveE+7RgUS+VxZRSg0PZngAK/hTssrSHBEXG
+	e1azhqTaZb28N9pyd5lpSCXsJhGjQRWla591sqXx9wK1hSdwEY6GoL6NmLQEwPdm
+	6ypVwShPadZMn/4yKlfdQz6FShHvaXv+k83uxvgFL+mkSENYcxgxX7tAFEonqmRJ
+	yRJ3MCnlKBS9cGoCYEA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 40yredhtd6-7
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Aug 2024 23:17:36 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 12 Aug 2024 23:17:32 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 12 Aug 2024 23:17:32 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 971E15B6929;
+	Mon, 12 Aug 2024 23:17:29 -0700 (PDT)
+Date: Tue, 13 Aug 2024 11:47:28 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Rosen Penev <rosenp@gmail.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <linux@armlinux.org.uk>,
+        <linux-kernel@vger.kernel.org>, <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next 3/3] net: ag71xx: use devm for register_netdev
+Message-ID: <20240813061728.GB3072284@maili.marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-Proofpoint-ORIG-GUID: wth30T6xJRbH31XWWMAPk4yXanCk84Ro
+X-Proofpoint-GUID: wth30T6xJRbH31XWWMAPk4yXanCk84Ro
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-12_12,2024-08-13_01,2024-05-17_01
 
-From: David Hunter <david.hunter.linux@gmail.com>
-Date: Tue, 13 Aug 2024 01:59:57 -0400
-> Change specifier to %p to correctly substitute type 'const void *'. A
-> specifer involved with a macro is causing a misleading warning to occur:
+On 2024-08-13 at 00:36:53, Rosen Penev (rosenp@gmail.com) wrote:
+>
+> -	err = register_netdev(ndev);
+> +	err = devm_register_netdev(ndev);
+devm_register_netdev() needs two arguments.
 
-You may want to run the test before/after the patch.
-
-This is the 3rd patch posted for this warning, so it would be nice to
-check lore before posting if the patch/issue is simple enough :)
-
-And here's the correct fix.
-https://lore.kernel.org/netdev/20240812191122.1092806-1-jain.abhinav177@gmail.com/
-
-Thanks !
+>
 
