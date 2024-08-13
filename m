@@ -1,151 +1,192 @@
-Return-Path: <netdev+bounces-117969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F4B49501D9
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:01:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330AA9501E8
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B9C21C21E69
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:01:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87EC7B2935C
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD6313BADF;
-	Tue, 13 Aug 2024 10:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9289518A6DD;
+	Tue, 13 Aug 2024 10:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AvChRrV/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kvm93Z8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BDE19470;
-	Tue, 13 Aug 2024 10:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1629043165;
+	Tue, 13 Aug 2024 10:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543279; cv=none; b=m+38gWKTuhICrVdRzUYF8/MECQzk1yciBNLi+NqjbGIvD4pVM/NNq0w8HOvQSLPdAwFtJY9c4KlaFK8L+FcgIlIjWZkmdg2LKI+87uVBdCwR2naoUW7aqFJv+oUs0pL1DQVp4Pym8+CD0DsAujm1ud9ZkIiof4IDtkeF1IWSelc=
+	t=1723543391; cv=none; b=Ld2fkTuXb+G12hRYRkVGKgSlvjaiRf4/z2hHRKZ/tBJo4LuKU+0kwreGORvKeSAykAu7uPK3QObZmWfeOGm9gPPXWTjt+xCybGhBdbO+qNljUVkc6vXe9OWFA/eKXXZ6hvSqCJ8UXJSVixk1OxAu6MpcyudyuknVaiZwhMcrUd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543279; c=relaxed/simple;
-	bh=Z1oVe7T8LHuIdU/LiTOlXSqGr4WUrp3gsiY+G3UVEGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OVggngoVAkBcM70k49TRbAyLFaENwguoGyaM84KuTOAAJgpKoGvPSSPFz8M8TNg8ojC4iZU6icrkTXV4jsKbanbPwU9eFkyRdXGLMrvvFpIMXegzV9aD+oKjSC3EnXgIPZnPbZOyOnO+DY01L/J1ZaSFhvIbGbc7p0ssYquk2Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AvChRrV/; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D8MOWR004626;
-	Tue, 13 Aug 2024 10:00:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	VsvtXm/v428aOkoWR84mCKI/dm4EvDwjowuajS7NOkc=; b=AvChRrV/+7aOZ4QR
-	32J2jiBV4MF01U/GiZyaFMvtn88xdh1QgVyP2VaTgco9m3QncMtKuopuWcLi98JI
-	VIxaKdOLUm0GIZAp2vS54gTedHQCFJB4n20u7MrP9Cx/QJ7DJnJdEyw3kU4JTzMB
-	zmU5d7R+gFPDRePhgPULVlxxh5jRGR2voC9t7IGCCz1iUAydlDSw369zk8nK69GA
-	qTyqh0tAubBkD6ttM54jANm5nGMJxo7OUjI3K1FvymbvAHLrd5e+XwKNCd4J28E7
-	cjGXv1l17o+62hg37X30pxup9XpCdrf9zWjXclG3NhkAekJURh26F4C1YI4WTVoh
-	2MTq+w==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4103ws09ej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 10:00:38 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47DA0bMm014849
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 10:00:37 GMT
-Received: from [10.253.34.30] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 13 Aug
- 2024 03:00:32 -0700
-Message-ID: <4f4095a7-2fd1-48df-b3c9-cdb9f7da0e79@quicinc.com>
-Date: Tue, 13 Aug 2024 18:00:30 +0800
+	s=arc-20240116; t=1723543391; c=relaxed/simple;
+	bh=CU/3pjFcw+rqJMo9Zw0J9Qej5sIvuE9+onQ2jq6mmjk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RyINku8QGBPpLYTCub4QCtQ4aiFZQln+EZ9JS7oQ70HEIpFEOoro/IwowhRr1/xE/Ac66nZbMEaQfRUDfUlZcti0N732Rf1XJ2DvlZfn+j1r4wu/KvLb5L49ly+eXYUpWD4TT5qjSU7/YZFFAfu6ENUkkzqs/GWo5z6mS2BWu3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kvm93Z8z; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fd65aaac27so42862335ad.1;
+        Tue, 13 Aug 2024 03:03:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723543389; x=1724148189; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlWr7h+QISzkZDuzfGOkZ330zkPe5mVXUP4ufUDh6KA=;
+        b=Kvm93Z8znOyRu9jdFOhoXd0eLLzB9tlf2LFWzXjF1BRIrUu5MYpQdbQ6dC3P7hKcgx
+         AkCXhuygIAP4hM6fXnfVmR9XHgb16nMfZ076LqP3Lh5tjxt0O/wU+jk31yA/ZD8oCKAP
+         cFWuSoNgLA2HMGlntmSGbdqGHfufV9EZ45rONy/rpDqbUoPOfi0s3F9VyZpCOQtJ1y5a
+         Bfz9erYh9T7ifFjO8I4RXWjtbldPhJq5vTQ06YMx2ciUjkC3VX03awP6e+c8NYgqauD7
+         ulto07nbF0vskTZQX4jSmlfmQybnzWL/oXddcE+YlD25F3UJBoEjPZTA1yxJWiGZlO/F
+         dVWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723543389; x=1724148189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zlWr7h+QISzkZDuzfGOkZ330zkPe5mVXUP4ufUDh6KA=;
+        b=B/fpGtxs7lfvE6Ehqx/RDyydR+uqxv5F38Nv6keFkJ7uA/adR5gVf4Wfb2tcmBrUy3
+         DB3KYCxFgy6dgIPDKqE/f9ZwhYWarT28Ls8d3SUSvS3+SgrR7xBZ4syUzK8DFsNx5S/2
+         UynYSmKcxppl4sGyRAXMyIBs/6P8dIEwEqXWJR9y8o/u/DxgBgbTP/Sp3ua8F1f2I8SL
+         9ZJdhCZmDLKa/2ER4gt/U+iaYsq2Rv7tdG8YWazHzPzoRfkl8tKbJVfPi0ZyFLP6tXhL
+         jPb2uHrol4MaWMs9Zfc7g/TOC69C6Q6LgyeyxVxgGfWli2wabzfRFYEI9iusSxw/RppQ
+         B0tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZhNFJlbjm8RQeBmOfJ7LoUjI5CmsEk2mi8gCdQyPReHX4NESsErqPEUPX6YOvLPSl+vvQ3D8sqSuUdJGXyWwBHxu7TgqKc81wxHMpPk17aOpqeQkzQGKs+QZEWDf8DhxEDywWWKH5ZmRKrfKYzQRRrg16u2GIRIe0u/iXBvZ4Qw==
+X-Gm-Message-State: AOJu0YxrBMPZckUcoDGy1sTzG2XVSpOHR/+c/5CtC+IMNOjTWTyc6w6s
+	e8RANIrt9bxTIxQjD8jDaYB+r+pBeewIz/G4dJfQhH+oHEdVx11U
+X-Google-Smtp-Source: AGHT+IE+C+lINQxUVtSRnFABRk5+bu1+A6301+CJsJ6CNolFTJUpzWoO7I+eV4lNT8mqLYuYsSVUJA==
+X-Received: by 2002:a17:903:230a:b0:1fc:4aa0:fad2 with SMTP id d9443c01a7336-201cbba9ee2mr39479965ad.6.1723543389163;
+        Tue, 13 Aug 2024 03:03:09 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1b4509sm10090235ad.190.2024.08.13.03.03.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 03:03:08 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	gbayer@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH net,v2] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Tue, 13 Aug 2024 19:03:01 +0900
+Message-Id: <20240813100301.180592-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] driver core: Add simple parameter checks for APIs
- device_(for_each|find)_child()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>,
-        Davidlohr Bueso
-	<dave@stgolabs.net>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Dave
- Jiang <dave.jiang@intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan
- Williams <dan.j.williams@intel.com>,
-        Takashi Sakamoto
-	<o-takashi@sakamocchi.jp>,
-        Timur Tabi <timur@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
-        <netdev@vger.kernel.org>, Zijun Hu
-	<zijun_hu@icloud.com>
-References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
- <20240811-const_dfc_prepare-v1-1-d67cc416b3d3@quicinc.com>
- <2024081328-blanching-deduce-5cee@gregkh>
-Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <2024081328-blanching-deduce-5cee@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: QGwAKjM9GrkdGWPWKYU_bqjwKEOf2Hz8
-X-Proofpoint-ORIG-GUID: QGwAKjM9GrkdGWPWKYU_bqjwKEOf2Hz8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=807 bulkscore=0 adultscore=0 priorityscore=1501 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408130071
+Content-Transfer-Encoding: 8bit
 
-On 8/13/2024 5:44 PM, Greg Kroah-Hartman wrote:
-> On Sun, Aug 11, 2024 at 08:18:07AM +0800, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>
->> Add simple parameter checks for APIs device_(for_each|find)_child() and
->> device_for_each_child_reverse().
-> 
-> Ok, but why?  Who is calling this with NULL as a parent pointer?
-> 
-> Remember, changelog text describes _why_ not just _what_ you are doing.
-> 
+Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
+copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
 
-For question why ?
+In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
+point to the same address, when smc_create_clcsk() stores the newly
+created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
+into clcsock. This causes NULL pointer dereference and various other
+memory corruptions.
 
-The main purpose of this change is to make these APIs have *CONSISTENT*
-parameter checking (!parent || !parent->p)
+To solve this, we need to add a smc6_sock structure for ipv6_pinfo_offset
+initialization and modify the smc_sock structure.
 
-currently, 2 of them have checking (!parent->p), the other have checking
-(!parent), the are INCONSISTENT.
+Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
+Tested-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
+Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ net/smc/smc.h      | 19 ++++++++++---------
+ net/smc/smc_inet.c | 24 +++++++++++++++---------
+ 2 files changed, 25 insertions(+), 18 deletions(-)
 
-
-For question who ?
-device_find_child() have had such checking (!parent), that maybe mean
-original author has concern that parent may be NULL.
-
-Moreover, these are core driver APIs, it is worthy checking input
-parameter strictly.
-
-
-will correct commit message with v2.
-
-> thanks,
-> 
-> greg k-h
-
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 34b781e463c4..f4d9338b5ed5 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -284,15 +284,6 @@ struct smc_connection {
+ 
+ struct smc_sock {				/* smc sock container */
+ 	struct sock		sk;
+-	struct socket		*clcsock;	/* internal tcp socket */
+-	void			(*clcsk_state_change)(struct sock *sk);
+-						/* original stat_change fct. */
+-	void			(*clcsk_data_ready)(struct sock *sk);
+-						/* original data_ready fct. */
+-	void			(*clcsk_write_space)(struct sock *sk);
+-						/* original write_space fct. */
+-	void			(*clcsk_error_report)(struct sock *sk);
+-						/* original error_report fct. */
+ 	struct smc_connection	conn;		/* smc connection */
+ 	struct smc_sock		*listen_smc;	/* listen parent */
+ 	struct work_struct	connect_work;	/* handle non-blocking connect*/
+@@ -325,6 +316,16 @@ struct smc_sock {				/* smc sock container */
+ 						/* protects clcsock of a listen
+ 						 * socket
+ 						 * */
++	struct socket		*clcsock;	/* internal tcp socket */
++	void			(*clcsk_state_change)(struct sock *sk);
++						/* original stat_change fct. */
++	void			(*clcsk_data_ready)(struct sock *sk);
++						/* original data_ready fct. */
++	void			(*clcsk_write_space)(struct sock *sk);
++						/* original write_space fct. */
++	void			(*clcsk_error_report)(struct sock *sk);
++						/* original error_report fct. */
++
+ };
+ 
+ #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+index bece346dd8e9..976644b28735 100644
+--- a/net/smc/smc_inet.c
++++ b/net/smc/smc_inet.c
+@@ -60,16 +60,22 @@ static struct inet_protosw smc_inet_protosw = {
+ };
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
++struct smc6_sock {
++	struct smc_sock smc;
++	struct ipv6_pinfo np;
++};
++
+ static struct proto smc_inet6_prot = {
+-	.name		= "INET6_SMC",
+-	.owner		= THIS_MODULE,
+-	.init		= smc_inet_init_sock,
+-	.hash		= smc_hash_sk,
+-	.unhash		= smc_unhash_sk,
+-	.release_cb	= smc_release_cb,
+-	.obj_size	= sizeof(struct smc_sock),
+-	.h.smc_hash	= &smc_v6_hashinfo,
+-	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
++	.name				= "INET6_SMC",
++	.owner				= THIS_MODULE,
++	.init				= smc_inet_init_sock,
++	.hash				= smc_hash_sk,
++	.unhash				= smc_unhash_sk,
++	.release_cb			= smc_release_cb,
++	.obj_size			= sizeof(struct smc6_sock),
++	.h.smc_hash			= &smc_v6_hashinfo,
++	.slab_flags			= SLAB_TYPESAFE_BY_RCU,
++	.ipv6_pinfo_offset	= offsetof(struct smc6_sock, np),
+ };
+ 
+ static const struct proto_ops smc_inet6_stream_ops = {
+--
 
