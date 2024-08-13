@@ -1,88 +1,92 @@
-Return-Path: <netdev+bounces-118170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56218950D2F
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:33:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2AE950D3C
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01E1E1F21CFA
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:33:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7521C232C7
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D5419CD13;
-	Tue, 13 Aug 2024 19:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB8C19CD13;
+	Tue, 13 Aug 2024 19:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBK5qn3F"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pMwUFne4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F6C1DDF4;
-	Tue, 13 Aug 2024 19:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373335589A;
+	Tue, 13 Aug 2024 19:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723577605; cv=none; b=b5IhQgBWoHGiyVKNBw61DyjnjLh/9PbadX4xHWFHrieWIWVET6WOndoVS0cFkHfMId5cPa5NP2Lvi13XDTtdugn/HdY83NmNU06M8suvo9QEbwnNw8ITEwWeMczPDLXUV6SK6MiFDdmEHiye2WE7W/JIk/u1fgzsaR/1Zdb3+Y8=
+	t=1723577897; cv=none; b=A7ue/SqHon30H6ZauR8B3hmQHkud09xNETQxTvGMHsT1VT3FS//x3GGAAZpngQUe+cra30MS0/MKKQ8kwGOWYY6oqjFjc8AtuihWoFs67m9N5acKsf1KZI07ZzldIqlZBn8prDtBoA60DuLU38FhctI3sxHgjaZEsB1SsO7Tabc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723577605; c=relaxed/simple;
-	bh=rm97gXI+l1Fwe6Kn2YMqYOXmvbNtrrbI4C/PzxPhonU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K1lvJv8S/Vmr0FgzyioeEHTJQW3ZNe3sh53nmY4pYc5zEqod5z7snnzqVAWsw10vDdBbwGI02HzjsZYyLLdiz9VNxEdMTkpAWJjPTvAse//KAa4j9vFDuu2Z8E/zE9N3wa8HRmkKBLmpGux9nSro0lVo+WE5ZnSR+40HF4wP+sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBK5qn3F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16DAFC32782;
-	Tue, 13 Aug 2024 19:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723577604;
-	bh=rm97gXI+l1Fwe6Kn2YMqYOXmvbNtrrbI4C/PzxPhonU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SBK5qn3Fh+9veh4jfspLI6ZCtcpaFLIMdcZQlwvXpCX2gRMfhsGRsPkEkbGwZr0Z8
-	 gZ7WwKJXVmmta+QoGGxmpRbhkZq/0j/nvtrYKxqOc1GztqWU6IDjDiIiW1RhMxCXAO
-	 njdJ7boURAGkoFyzs9ZMuEhmA3tkghHRtkUVH2YJWq36ZEpDgDZzrVATdxlVUAFY/k
-	 HxErlrv63ULNtbPqAwF1v/wl3NlyARiDFQPMTbSznCuLWVdBdcqdrOuKezCR01DL0/
-	 Gr+839yc2umGohfk9Ka2LQjPOXdVFY/WidoQHG3ts9b7Xt+j0Ls3APrtGTKBf7T1+y
-	 PCLj5GY0MN3Pg==
-Date: Tue, 13 Aug 2024 13:33:22 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Danila Tikhonov <danila@jiaxyga.com>
-Cc: quic_rjendra@quicinc.com, ulf.hansson@linaro.org,
-	linux-pm@vger.kernel.org, pabeni@redhat.com, rafael@kernel.org,
-	konradybcio@kernel.org, kees@kernel.org,
-	linux-hardening@vger.kernel.org, conor+dt@kernel.org,
-	viresh.kumar@linaro.org, macromorgan@hotmail.com,
-	dmitry.baryshkov@linaro.org, gpiccoli@igalia.com,
-	devicetree@vger.kernel.org, davidwronek@gmail.com,
-	tony.luck@intel.com, kuba@kernel.org, neil.armstrong@linaro.org,
-	linux-arm-msm@vger.kernel.org, andre.przywara@arm.com,
-	krzk+dt@kernel.org, rafal@milecki.pl, linus.walleij@linaro.org,
-	andersson@kernel.org, netdev@vger.kernel.org, fekz115@gmail.com,
-	davem@davemloft.net, edumazet@google.com, heiko.stuebner@cherry.de,
-	linux-kernel@vger.kernel.org, lpieralisi@kernel.org
-Subject: Re: [PATCH v2 06/11] dt-bindings: nfc: nxp,nci: Document PN553
- compatible
-Message-ID: <172357760218.1617229.6241404560319061675.robh@kernel.org>
-References: <20240808184048.63030-1-danila@jiaxyga.com>
- <20240808184048.63030-7-danila@jiaxyga.com>
+	s=arc-20240116; t=1723577897; c=relaxed/simple;
+	bh=XtWwt1oYdjy3qJ/1lKeyNY+5x12gEy2WBxAW2zPJIHU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O6qPKfqzE+F+GkGq4VAxhkc+cj4YdDHiiZB6lLy1LCBRflwCwKOXO+41ZKEk2v9GQO5swK5R531HSZ/QPwIGsQG5c4bCqDzPfjyo61V4PJkVImWkoNCFxgEra5UJkejz4iQZhpJwlcn32ctsZYD41okBjFo+e3hYqDNTMrTH13I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pMwUFne4; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723577896; x=1755113896;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XtWwt1oYdjy3qJ/1lKeyNY+5x12gEy2WBxAW2zPJIHU=;
+  b=pMwUFne4IhOykyVOQU0LUm/zVDjUHeA6rWkH27jAmbrESTqfj1uU5qvQ
+   dQfD4GSBeGTwc60O68fON0WGGWbaz3xcJwXufHNM1yTTBs76i8bgj6v0O
+   0fXahWqf/UfsU4UZ4QvipLEt5CSjbJYmpETY9vbZ2GU6V8NoAa1e9S4QX
+   w=;
+X-IronPort-AV: E=Sophos;i="6.09,286,1716249600"; 
+   d="scan'208";a="673708519"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 19:38:12 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:3184]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.61:2525] with esmtp (Farcaster)
+ id d2bfa5a3-3d3d-4fc5-b153-09f4356060fc; Tue, 13 Aug 2024 19:38:10 +0000 (UTC)
+X-Farcaster-Flow-ID: d2bfa5a3-3d3d-4fc5-b153-09f4356060fc
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 19:38:10 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.205.65) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 19:38:07 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <david.hunter.linux@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>,
+	<javier.carrasco.cruz@gmail.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
+Subject: Re: [PATCH 1/1 V2] Kselftest: msg_oob.c: Fix Compiler Warning For Incorrect Specifier
+Date: Tue, 13 Aug 2024 12:38:00 -0700
+Message-ID: <20240813193800.19311-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240813191932.991638-1-david.hunter.linux@gmail.com>
+References: <20240813191932.991638-1-david.hunter.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240808184048.63030-7-danila@jiaxyga.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+From: David Hunter <david.hunter.linux@gmail.com>
+Date: Tue, 13 Aug 2024 15:19:32 -0400
+> Apologies for not looking ahead of time. I definitely need to remember
+> to check ahead of time. I understand that the other person was first; I
+> just wanted to get some practice sending patches. This is all still new
+> to me.
 
-On Thu, 08 Aug 2024 21:40:20 +0300, Danila Tikhonov wrote:
-> The PN553 is another NFC chip from NXP, document the compatible in the
-> bindings.
-> 
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
-> ---
->  Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
-
+I understand, but let's not respin an unnecessary patch just for practice
+that waste community time...
 
