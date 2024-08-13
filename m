@@ -1,153 +1,95 @@
-Return-Path: <netdev+bounces-118119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9AD3950939
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:37:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D680950950
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18AF5B22CB3
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:37:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4371C20C76
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B2D1A0708;
-	Tue, 13 Aug 2024 15:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4CA1A071A;
+	Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ftY0zj6W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtCE97rY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB51199245;
-	Tue, 13 Aug 2024 15:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AD01E86A
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563429; cv=none; b=lnyfC4nNESnTjnWxoxKcFVLbhgI5PDLRmcakFVjicEnvcN3x1xBEzLB857/rdywdF+llre0cnCh68doIOonZEkOrRgjx4ijb6tWhUyvVWWo9omxXFoOd2CMELK13jGAEpHTmZWO+df3FWy+XI8dFGUIKZzsA3eXmITgL+qU5IWk=
+	t=1723563827; cv=none; b=OtfRpSZcSpQVronpZ2C+MvjV+g7rpQXfcIOejWU3HOki4mMOx13uDo9uozYb+ISxhPCjBTfEYkALRaarolSrGe7R2RBiAkV18wS5PLVe8OsLYC76N8Y7gnVSTnglPb4SlP8uWDfpXRrQ9RHTAlf7bumnf6wHGrby4eLCkrTVq5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563429; c=relaxed/simple;
-	bh=QVJpNiVerk9xPP/kZXVkpqNKK+oHO9hrON1+2Sbx5EM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YmuH0x0X+nKvupuFV/VMt+LvpidEE0hwAua/GhB6cH6hdyoCZJLQIbRbKk2BOSPWf5ajWpyuGH0AtNGeqy6m/7lfolexZlo26+aWhU6wSndNHtV3Rhyn9mqkTCiDJ7MtpQfuCwfyMJehsHsTDXxPF3oatwGlITTBNim5pUe2GXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ftY0zj6W; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5bd1a9bdce4so3825873a12.3;
-        Tue, 13 Aug 2024 08:37:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723563426; x=1724168226; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OHvjoU9H+Sgc7R6GwAwflnlqFXRVRCL0RMPB/ZWgdjQ=;
-        b=ftY0zj6WEtpvzBRGabqeH6QcbB6rjbxVAvJ80w0YK5UJ/1J3yrms+vNlpTTCKEHV/w
-         hrkfw02iqV0VTyl+rwSzXmW7LQTHUAOUV4XDtQJ6YxTWYyTHnTwqctqyfPhD0fe5BbjK
-         I6LKcIvFX9Gymr34V1XucBGFbbycHRCHJrTh+KFSfnY4MFmZeetu/Mf6yEqabssBfpo9
-         WO3MBpXks9SoHSjsU7ibhfSPdRkDPH/ogOWFXwEhBTNfNRbpH5SYvYAsNjhIUt0zQ372
-         GMO/K0eQ8Mu5uepD27p49NLIjasuxDcn6kGSw5Drq6akgkAJiFxN1zmH0f/X/GNiZTna
-         1gsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723563426; x=1724168226;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OHvjoU9H+Sgc7R6GwAwflnlqFXRVRCL0RMPB/ZWgdjQ=;
-        b=T+E9C7+3Yx0ly/m2Nl38bgovdmgx7PulJJtgA/6JjSgPHuA6mplTNNm+4Te1AUFqXV
-         y31htHGGCNPENpVwF1+aXI8999n/by8Sy2NHtRVkIQi+a97+Ykt5KuH1bmFg+NZnhpHG
-         0ITOOe0atM4sKj7dqXCbj0C/aaPeIhoj4AAdxDTt1ToXswFgM6Za4C+/D2wlxYv5hIeE
-         yl5DphUNc1bXFASFoy7nhIQg5rPYgtADwzpc4XrfILJdVufyaQMfgPelIHwrI9W+ioMd
-         cCAndk6+gfWsM7h9ibz2lnPdCLeeLXjht2DCvddLVs49JWTw8odsQTEko1cP+hHWSGww
-         tseg==
-X-Forwarded-Encrypted: i=1; AJvYcCUieHzsPZHblNAfOXBA144dldpmxn4jT90wncrcniAF2rNI9SAJ5Xw/VFxtsfr+L13sDl7juOXd1DAo9Z/usVD7qVxhpFZ5dVqoIv4PTSSiJuYx6TNH8DCWKSKrqQktQjUszHNqvDNvGwmx8ejWl4hJUpL6gpE57rpVuLRpJ3x87vqAs3xB
-X-Gm-Message-State: AOJu0YwlZOt49HPeKcfieG6fUxw4uZcalIqGq/tjIAr8mTdAvBKZzjHj
-	SmPbdFXh1SwKWW/XxcZ6jrCCAJo3X7zF8aNOULFFA9R79Two+YOBmMmzWQ==
-X-Google-Smtp-Source: AGHT+IEQlDbnLbzSs4uXeAi5uFLqqcCOEWgKmEg9oXeIQtjqLte9jlaPMXzHCYFh30qYZAq1w3tIQg==
-X-Received: by 2002:a17:907:f186:b0:a7d:a29e:5c33 with SMTP id a640c23a62f3a-a80ed1c1d76mr303743366b.28.1723563425896;
-        Tue, 13 Aug 2024 08:37:05 -0700 (PDT)
-Received: from [192.168.178.20] (dh207-40-227.xnet.hr. [88.207.40.227])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3f45c86sm78694066b.25.2024.08.13.08.37.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Aug 2024 08:37:05 -0700 (PDT)
-Message-ID: <391af1fe-53ff-4678-a78c-74262724c2e9@gmail.com>
-Date: Tue, 13 Aug 2024 17:36:41 +0200
+	s=arc-20240116; t=1723563827; c=relaxed/simple;
+	bh=w1nD4oRKBHOTRWEMFdmVdwweMJpT7+oYgkT4zTsMCIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f/NeOyVlVJhMrdn0mo6vXk8y4KtxwDRSK3Yr8C0cp4adK10p8qC6eI+CD540OoLMjg7oEMjxUV1NfXCEjBRt+KoVJii6kzpxjTsMvFQzikNwemxUjSWW0fFPrbU25JcMxNFJgveODbUGTtRVmPakulFX1abzXqxNTCvz9IzFPpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtCE97rY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3162BC4AF09;
+	Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723563827;
+	bh=w1nD4oRKBHOTRWEMFdmVdwweMJpT7+oYgkT4zTsMCIk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TtCE97rYske5F3PtQtthB9FvbW+ueZ0wdcIlTnQQ0PtAhiSO/ZmZIGOao5FH2p8K7
+	 VpiXEsGPGIWbK14WnIttj6lfPc2AzRtYr50kqMwSCQy0IWTFGEWmI9vzEpmwPY4N0C
+	 6IRhN5A7uHIhKIvU/aa00PLp4uJ27qV5nU4DRQa35628tUGtqc+LT5uumWB3IBjSnJ
+	 k1GPLby8PUKkEBIv7iBHsaliunwT6MghKARN+w33jbbrEnJ/ttVakvCe2Xw4HyU62N
+	 NQ0gXqAaoOPbaE32FUpw+zBs+I1nDGZDYoiOX2PzfYfj3qOpIT7vLq5AHOoF0BkfAO
+	 PQ+AUlHzgjC3A==
+Date: Tue, 13 Aug 2024 08:43:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Donald Hunter <donald.hunter@gmail.com>,
+ netdev@vger.kernel.org, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
+ Samudrala <sridhar.samudrala@intel.com>, Simon Horman <horms@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Sunil Kovvuri Goutham
+ <sgoutham@marvell.com>, Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
+Message-ID: <20240813084345.575ffd78@kernel.org>
+In-Reply-To: <9f4854e4-f199-467a-bf42-9633033f191d@redhat.com>
+References: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+	<ZquJWp8GxSCmuipW@nanopsycho.orion>
+	<8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
+	<Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
+	<74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
+	<ZrHLj0e4_FaNjzPL@nanopsycho.orion>
+	<f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
+	<20240812082544.277b594d@kernel.org>
+	<Zro9PhW7SmveJ2mv@nanopsycho.orion>
+	<20240812104221.22bc0cca@kernel.org>
+	<ZrrxZnsTRw2WPEsU@nanopsycho.orion>
+	<20240813071214.5724e81b@kernel.org>
+	<eb027f6b-83aa-4524-8956-266808a1f919@redhat.com>
+	<20240813075828.4ead43d4@kernel.org>
+	<9f4854e4-f199-467a-bf42-9633033f191d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/1] selftests: net: af_unix: cast void* to char* in
- call to macro TH_LOG()
-To: Simon Horman <horms@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>
-References: <20240812002257.23447-2-mtodorovac69@gmail.com>
- <20240812151725.GB21855@kernel.org>
-Content-Language: en-US
-From: Mirsad Todorovac <mtodorovac69@gmail.com>
-In-Reply-To: <20240812151725.GB21855@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi, Simon,
-
-On 8/12/24 17:17, Simon Horman wrote:
-> On Mon, Aug 12, 2024 at 02:22:58AM +0200, Mirsad Todorovac wrote:
->> GCC 13.2.0 reported warning about (void *) beeing used as a param where (char *) is expected:
+On Tue, 13 Aug 2024 17:31:17 +0200 Paolo Abeni wrote:
+> > "set" is not a sensible verb for creating something. "group" in
+> > the original was the verb.
+> > Why are both saying "set" and not "create"? What am I missing?  
 > 
-> nit: being
+> Please, don't read too much in my limited English skills!
+> I'm fine with group_create() - or create_group()
 
-Ouch! No patch is small enough that one should take its correctness for granted. :-O
+Again, group was a verb :)
+I don't think anyone suggested group as a noun / object.
 
->> In file included from msg_oob.c:14:
->> msg_oob.c: In function ‘__recvpair’:
->> ../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument of type ‘char *’,
->> 							but argument 6 has type ‘const void *’ [-Wformat=]
->>   106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
->>       |                                        ^~~~~~~~~~~~~
->> ../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
->>   101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
->>       |                 ^~~~~~~~
->> msg_oob.c:235:17: note: in expansion of macro ‘TH_LOG’
->>   235 |                 TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
->>       |                 ^~~~~~
->> ../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument of type ‘char *’,
->> 							but argument 6 has type ‘const void *’ [-Wformat=]
->>   106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
->>       |                                        ^~~~~~~~~~~~~
->> ../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
->>   101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
->>       |                 ^~~~~~~~
->> msg_oob.c:259:25: note: in expansion of macro ‘TH_LOG’
->>   259 |                 TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
->>       |                 ^~~~~~
-> 
-> Thanks, I see this too.
-> 
->> Casting param to (char *) silences the warning.
-> 
-> It seems that all callers pass a string as the expected_errno argument.
-> Perhaps it's type could be updated to char *, if that is what it is.
-> I think this would avoid the need to cast.
+> Still WRT naming, I almost forgot about the much blamed 'detached' 
+> scope. Would 'node' or 'group' be a better name? (the latter only if we 
+> rename the homonymous operation)
 
-Agreed and verified. If it is OK with you, I might post a v2.
-
-Best regards,
-Mirsad Todorovac
-
->> Fixes: d098d77232c37 ("selftest: af_unix: Add msg_oob.c.")
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Shuah Khan <shuah@kernel.org>
->> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
->> Cc: netdev@vger.kernel.org
->> Cc: linux-kselftest@vger.kernel.org
->> Signed-off-by: Mirsad Todorovac <mtodorovac69@gmail.com>
-> 
-> ...
+I vote 'node', given the above.
 
