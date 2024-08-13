@@ -1,199 +1,145 @@
-Return-Path: <netdev+bounces-117919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BCE994FD5C
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:42:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C0D94FD7F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 305CC1C22849
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 05:42:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC631C20FC0
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1FA2C19E;
-	Tue, 13 Aug 2024 05:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACCB2E64B;
+	Tue, 13 Aug 2024 06:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EIq8E9Yq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzChrwou"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206E13BB21
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 05:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303151BF53;
+	Tue, 13 Aug 2024 06:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723527715; cv=none; b=NSj3ARxdJ4LhDcyHVv/0Fz/Z1XSXcTRJTNjz7gLUlPFztqEI9S0fC9in2sQLwD8B+OMeyAWwuwQX+MYZrdtJJWoMmokunPx2XuBip5qqKiSK44t5yppkZ7EJ2jOhnMxTo+khL6Xgw1KPIGc6doGZb66rUV6LyP8HaYvrTToGLQ4=
+	t=1723528857; cv=none; b=K9uhbt01/5ef203Hu5h0b/J7V5C8YrUT72/jnWDo+1U1LzpU86XsVFPQiH+EDi1WxJDdJDMEALVtSRZzdgEsCvMV/rgjqIcdtnHtNdDpgG2bQj8I9jTjf/27AavhAq7D8Fev+4GMIMlHCkhxtcLzdNQBoJG4Bx8R0w2AvQr6MQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723527715; c=relaxed/simple;
-	bh=fY/+L8l5ii+AgzZtNjqwOV5aIJKUFkgY7GEi/jLl3fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n02aej0R+xzZFMGOC+WXSXfreIYOxrPbYL7XXA5Xf+xvoNMUviFLCY1RMXNcEB+G0kO7IvRSpnEz/SmEvrziSFR7dhr54zVnge3PiYpGa8hzoJaRiM98CC0ULtBJQp4pU31wzFP4I8UlweX+We2pZJ1DVdFB65WoUrn43h1XgtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EIq8E9Yq; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42809d6e719so39068635e9.3
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:41:52 -0700 (PDT)
+	s=arc-20240116; t=1723528857; c=relaxed/simple;
+	bh=eoz8SypQVeUi7S44huxs+5Uqa8k0/GfMVkclaeuBME4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tcFszQyvhBVW4VEqgq+vvxSntrb1hsdnOqENxHrlNbkpAIkABHZwQlfxD56MLbLNq+ZH3fGSIOo9BSkySZlei1yNS4ym+4Pk67zM5v4neLCgZnzx8XjNM/Fmvqz++sLO7jquVJctEZIjmxzfaHw6u7+Do78yRn3rPIzfg5YgwkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzChrwou; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4f6b8b7d85bso1749792e0c.1;
+        Mon, 12 Aug 2024 23:00:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723527711; x=1724132511; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vu66s/MTj9mzSOP2T0sqELP/S3U/U+aUqAs4Pl23wBI=;
-        b=EIq8E9YqqwPdh2AchpmCC0yfHaukCk4jZYbHntiQde89VwRzdGejDLBdoKoSzTdzCt
-         YA8U7qecI4ER5r6M9TrFOiU38isNiFhy7Ac8EmGShRY6q2cfNqPjEygbNB62sxEKWwli
-         6IeauXnUjM9FTWCUebhbSPctieQ7Hvg7356YGG0ALK2OtGN9DOYOFinAvuHf9Zn+7HDD
-         7tKk8PDnYRkpN/DBmMdDZQV+xMKZBzkjyen0tRBcKqqxlub8/NnZLYtem9ZW403rlwng
-         wFXlNwYCHv4EbI4kZRRnMCRKSAsPolMPfjF9xX4StuZ93ltS/3Wg24q3Wa95jGlTgXsL
-         uYwQ==
+        d=gmail.com; s=20230601; t=1723528855; x=1724133655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2QcXZLiSHSC9Xh+N1wM5xwm7PSlXvs0f4mmP999nFg=;
+        b=UzChrwou2imwo7J563uCrqggrfOkuGjgaZDR0IkNmMIU0b9SehFRdybjJj7ynEdTRK
+         KZjp7BxjJiVAKnimZf7mbA/4yEzEekHz9q+sAE8P1Sy4EsEHo2j4NaFzCS1H+jX7kIDR
+         c+8fB/rcg32ExDeNhrvpaLcZhrEf0A+wXLMhFUhL+b68CGTKENUqLSYGaptgf5ZR48RS
+         J/zuqQEipExAtuSjVaz/LYNVhOER2RWkIIq7B8/DVLhClL9ofb50r8CgLKvZWvG1YuWp
+         /BiU4kG2oOAKiwPrsJNx4+ZOe2QO0A6396veg5NjgLu7TrKukLhTdrM14hVIEKn3hPsr
+         m2Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723527711; x=1724132511;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vu66s/MTj9mzSOP2T0sqELP/S3U/U+aUqAs4Pl23wBI=;
-        b=pvy80TlmXyciORWbXe50IEd+1qZ5J4nbDJslrFHC+SvOJ2UEugkdihHT9EazCh6uO/
-         KKqQSz1k1LfNNYu68pqK88Iox6nKdew38ue3AtFReigTaxFPIVgkWCoRnuGG5ChUGyjY
-         6gwH76iZ5a+M+15YhvWdZNFMLLpwi+sBqtJCUb/1okp96MotaSmbIv9N7x8NWrcO4grE
-         Rozuav72/m3amM5+pmYqzU8rXKkcwzZdiJNtP0FgBHF55FOMixqpy9qt4xsVynESnCv7
-         3T+5hT9yEz219U7xE0m3+wOHw4j72GydQyx5FjJ/CcfVCKELXZUhlieHKXLiywLhmqXW
-         Yjqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWrzACRzYcpPpHH3N50jLRWdBVMTfm0i4duXz0rC+++1R/OAtJ57zsWUiisQxRh9V+O7aDTy0hFQgY0/nsuIUw0E8pCUJj0
-X-Gm-Message-State: AOJu0Yxs2WKKzqYJPtn5GmZ6TJj7Ztzdx6qsdF+7O/g8vdlQ3aBUNaMO
-	SxRjX9Q2ZdPiC5/AzmskbrK3iI7jDAUZzBgsFuZOzxwZ80zZpxymNNFaVNj4JVc=
-X-Google-Smtp-Source: AGHT+IHV0row3uLNcJDWvblITgnetX5YEnxG01/khyJPskb8RTxM1tIYbNpzxFrW94vyED6ZPdgVPA==
-X-Received: by 2002:a05:600c:1d02:b0:426:67ad:38e3 with SMTP id 5b1f17b1804b1-429d47f4295mr17448965e9.3.1723527711349;
-        Mon, 12 Aug 2024 22:41:51 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c738eb4sm210792575e9.14.2024.08.12.22.41.50
+        d=1e100.net; s=20230601; t=1723528855; x=1724133655;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y2QcXZLiSHSC9Xh+N1wM5xwm7PSlXvs0f4mmP999nFg=;
+        b=nRfFpY6WvQ4pUsqFQ9DTgCE5ld3Bzv+TYiiP49j5a22dg26ZJ7OJZjIg8BnezcZYlF
+         ScHFE7y8dEo6fWQ+PZ2rYWXlxfnCvUZ1I1Fxc30M/DFvVbgSrz6BCawWkQP+lQ3f2VGV
+         Vt8VHz0yv/Pkc8up/HLhwKkUI0L4q49S4QNh9SQ41B7K00JapyFSY8BazrRInmNpbROq
+         mi2F4pJagk1FIHwPJAg5kzti+QaxYuGYp1ZUYbAaJcQJNLkby0YDY73qIgzvLGTUx+wH
+         lq/68n4zNrect8lmDDFvGS3SdZxwumNtGW7m1h6X65wepAyVFJlM9wzqdQqC6kCeLeWC
+         xQCw==
+X-Forwarded-Encrypted: i=1; AJvYcCXAcV/eaU2gaV3maArvZ/l+jNs6v2VfSRRLnhh3hOGHyyFQ7zOtudeyvoi/ILG/2pNTCeyyG3DWePSTNp9+gM38jzPzl90QUrLTwikRUDHeqpFQmdzYP4wPxav7ELCd+tlM4JVmHmTen6HacSoKWqRjj5qsC9d/iBtaFs5HgbaS6lwTzaYW
+X-Gm-Message-State: AOJu0Yw0s1vcVsk2gOfbcSLKbOsF7P/6v4pdaKnVK73262ocrhn84s/O
+	uCAILVQBZT/hmI7wzBNqIEhn23JWs+FBUZ7IOTIIcvlQZj+hZmki
+X-Google-Smtp-Source: AGHT+IEj+VoLjm5/vLvrxYFGVDuef8pX7BrNKsLxM7K2tmngP8ETL3B04OJJnLrqKd81Zf/cwm0ISw==
+X-Received: by 2002:a05:6122:312a:b0:4ed:185:258c with SMTP id 71dfb90a1353d-4fabeec0d21mr3337865e0c.2.1723528854832;
+        Mon, 12 Aug 2024 23:00:54 -0700 (PDT)
+Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f91f1192fasm867098e0c.0.2024.08.12.23.00.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 22:41:50 -0700 (PDT)
-Date: Tue, 13 Aug 2024 07:41:48 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net-next 4/5] devlink: embed driver's priv data callback
- param into devlink_resource
-Message-ID: <ZrryHH4VbiPSdFzx@nanopsycho.orion>
-References: <20240806143307.14839-1-przemyslaw.kitszel@intel.com>
- <20240806143307.14839-5-przemyslaw.kitszel@intel.com>
- <ZrMZFWvo20hn49He@nanopsycho.orion>
- <20240808194150.1ac32478@kernel.org>
- <ZrX3KB10sAoqAoKa@nanopsycho.orion>
- <589aed8d-500c-4e92-91ca-492302bb2542@intel.com>
- <Zrojg-svvDA7_OUV@nanopsycho.orion>
- <2c38d704-f018-4bc6-b688-a7a7ce4adc0a@intel.com>
+        Mon, 12 Aug 2024 23:00:54 -0700 (PDT)
+From: David Hunter <david.hunter.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	kuniyu@amazon.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: javier.carrasco.cruz@gmail.com,
+	David Hunter <david.hunter.linux@gmail.com>
+Subject: [PATCH] Kselftest: msg_oob.c: Fix warning for Incorrect Specifier
+Date: Tue, 13 Aug 2024 01:59:57 -0400
+Message-ID: <20240813060036.754213-1-david.hunter.linux@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c38d704-f018-4bc6-b688-a7a7ce4adc0a@intel.com>
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 
-Tue, Aug 13, 2024 at 05:45:47AM CEST, przemyslaw.kitszel@intel.com wrote:
->On 8/12/24 17:00, Jiri Pirko wrote:
->> Mon, Aug 12, 2024 at 01:50:06PM CEST, przemyslaw.kitszel@intel.com wrote:
->> > On 8/9/24 13:02, Jiri Pirko wrote:
->> > > Fri, Aug 09, 2024 at 04:41:50AM CEST, kuba@kernel.org wrote:
->> > > > On Wed, 7 Aug 2024 08:49:57 +0200 Jiri Pirko wrote:
->> > > > > > 	lockdep_assert_held(&devlink->lock);
->> > > > > > 
->> > > > > > 	resource = devlink_resource_find(devlink, NULL, resource_id);
->> > > > > > -	if (WARN_ON(!resource))
->> > > > > > +	if (WARN_ON(!resource || occ_priv_size > resource->priv_size))
->> > > > > 
->> > > > > Very odd. You allocate a mem in devl_resource_register() and here you
->> > > > > copy data to it. Why the void pointer is not enough for you? You can
->> > > > > easily alloc struct in the driver and pass a pointer to it.
->> > > > > 
->> > > > > This is quite weird. Please don't.
->> > > > 
->> > > > The patch is a bit of a half measure, true.
->> > 
->> > Another option to suit my wants would be to just pass resource_id to the
->> > callbacks, would you accept that?
->> 
->> Why, the callback is registered for particular resource. Passing ID is
->> just redundant.
->
->Yet enables one to nicely combine all occ getters/setters for given
+Change specifier to %p to correctly substitute type 'const void *'. A
+specifer involved with a macro is causing a misleading warning to occur:
 
-I don't see the benefit, sorry :/
+In file included from msg_oob.c:14:
+msg_oob.c: In function ‘__recvpair’:
+../../kselftest_harness.h:106:40: warning: format ‘%s’ expects 
+	argument of type ‘char *’, but argument 6 has type 
+	‘const void *’ [-Wformat=]
+  106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
+      |                                        ^~~~~~~~~~~~~
+../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
+  101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
+      |                 ^~~~~~~~
+msg_oob.c:235:17: note: in expansion of macro ‘TH_LOG’
+  235 |                 TH_LOG("Expected:%s", expected_errno ? 
+			strerror(expected_errno) : expected_buf);
+      |                 ^~~~~~
 
->resource group. It is also straightforward (compared to this series).
->You are right it is not absolutely necessary, but does not hurt and
->improves thing (this time I will don't update mlxsw just to have
->consumer though, will just post later - as this is not so controversial,
->I hope).
->
->> 
->> 
->> > 
->> > > > 
->> > > > Could you shed more light on the design choices for the resource API,
->> > > > tho? Why the tying of objects by driver-defined IDs? It looks like
->> > > 
->> > > The ids are exposed all the way down to the user. They are the same
->> > > across the reboots and allow user to use the same scripts. Similar to
->> > > port index for example.
->> > > 
->> > > 
->> > > > the callback for getting resources occupancy is "added" later once
->> > > > the resource is registered? Is this some legacy of the old locking
->> > > > scheme? It's quite unusual.
->> > 
->> > I did such review last month, many decisions really bother me :F, esp:
->> > - whole thing is about limiting resources, driver asks HW for occupancy.
->> 
->> Can you elaborate what's exactly wrong with that?
->
->Typical way to think about resources is "there are X foos" (resource
->register time), "give me one foo" (later, on user request). Users could
->be heterogeneous, such as VFs and PFs, and resource pool shared over.
->This is what I have for (different sizes of) RSS contexes.
->(Limit is constant, need to "get*" resources by one at a time, so driver
->knows occupancy and arbitrages usage requests).
->
->"get*" == set usage to be increased by one
->
->> 
->> 
->> > 
->> > Some minor things:
->> > - resizing request validation: parent asks children for permission;
->> > - the function to commit the size after the reload is named
->> >   devl_resource_size_get().
->> > 
->> > From the user perspective, I'm going to add a setter, that will be
->> > another mode of operation (if compared to the first thing on my complain
->> > list):
->> > + there is a limit that is constant, and driver/user allocates resource
->> >   from such pool.
->> > 
->> > > 
->> > > It's been some while since I reviewed this, but afaik the reason is that
->> > > the occupancy was not possible to obtain during reload, yet the resource
->> > > itself stayed during reload. This is now not a problem, since
->> > > devlink->lock protects it. I don't see why occupancy getter cannot be
->> > > put during resource register, you are correct.
->> > > 
->> > I could add that to my todo list
->> 
->> Cool.
->
->I guess no one cared about it yet, as resource register and occ getter
->register is much separated in code space (to the point of being in
->different file).
+A second set of these three warnings occur later for the incorrect
+specifier at msg_oob.c:256. By tracing the various macros involved, the
+correct specifier (in msg_oob.c) can be spotted and changed.
+
+Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+---
+ tools/testing/selftests/net/af_unix/msg_oob.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
+index 16d0c172eaeb..87090ebda2a7 100644
+--- a/tools/testing/selftests/net/af_unix/msg_oob.c
++++ b/tools/testing/selftests/net/af_unix/msg_oob.c
+@@ -232,7 +232,7 @@ static void __recvpair(struct __test_metadata *_metadata,
+ 
+ 	if (ret[0] != expected_len || recv_errno[0] != expected_errno) {
+ 		TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
+-		TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
++		TH_LOG("Expected:%p", expected_errno ? strerror(expected_errno) : expected_buf);
+ 
+ 		ASSERT_EQ(ret[0], expected_len);
+ 		ASSERT_EQ(recv_errno[0], expected_errno);
+@@ -256,7 +256,7 @@ static void __recvpair(struct __test_metadata *_metadata,
+ 		cmp = strncmp(expected_buf, recv_buf[0], expected_len);
+ 		if (cmp) {
+ 			TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
+-			TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
++			TH_LOG("Expected:%p", expected_errno ? strerror(expected_errno) : expected_buf);
+ 
+ 			ASSERT_EQ(cmp, 0);
+ 		}
+-- 
+2.43.0
+
 
