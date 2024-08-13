@@ -1,103 +1,88 @@
-Return-Path: <netdev+bounces-117961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4527D950157
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:39:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FB9950173
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96481F23783
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:39:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94FE9B22094
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7EB17BB2F;
-	Tue, 13 Aug 2024 09:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FDD17CA1B;
+	Tue, 13 Aug 2024 09:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="ckxUkD7S"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rV2hgrEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14E08BF3
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 09:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57C58BF3;
+	Tue, 13 Aug 2024 09:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723541963; cv=none; b=H5+B1b3dsOCLyDjY4/iq2r0Mk64KW0LVYyJIEvOKBbZH/hbHrCX/izfDHXyMYzdZBLr8tEhRyodhZc+99493akm+lcuOxtF7K42TVZMz4xAC3MaPHFzNPCkFahxEsSXZXeGwezN3YorvGtxSpHv5jdRjBhE8zdFrgSzgnrMvATI=
+	t=1723542244; cv=none; b=EwPeeuFab4h8ZGBltaGR25eVEdW9uJsaqV0ic1BotJCpwk1daBBzz1SKZB0qL6i7arv7e1GegWjLX9MXZVcptWM0mA6itZttS37c6IHusZh8X4YAZ2euQoifQYgdaNw6blbeJyFMif42eUJ1rUiufYnTxLKhzb9Eqx/tIhF6L/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723541963; c=relaxed/simple;
-	bh=MV6v4jSkO2tXUxVTHYU3dl7iZFPsR2ylTKMKZkVBxMI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kTCOYCXRpIQFW+/N6H8o3eyEAJRnMzFLfb1ocEKtx9tXMAQZ+dkoxAzUSHW+WRz740ngwrc0poCAFy0GExE7Ywg8p8L7GaFt6EKYgU0ufne8c7ZD1JLsH5z6BSe4ekt5ibqW9kC1kmo5CWy+wAfixC4GpEMaLqUGtAbEor3DMjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=ckxUkD7S; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:af87:af35:ed7:5bd0])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id DB1927D948;
-	Tue, 13 Aug 2024 10:39:14 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1723541955; bh=MV6v4jSkO2tXUxVTHYU3dl7iZFPsR2ylTKMKZkVBxMI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
-	 hern@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09xiyou.wangco
-	 ng@gmail.com|Subject:=20[PATCH=20net-next]=20l2tp:=20use=20skb_que
-	 ue_purge=20in=20l2tp_ip_destroy_sock|Date:=20Tue,=2013=20Aug=20202
-	 4=2010:39:14=20+0100|Message-Id:=20<20240813093914.501183-1-jchapm
-	 an@katalix.com>|MIME-Version:=201.0;
-	b=ckxUkD7S4tWr7jTEaHmVGBq1yFse2g7H9EB8LLsiIh9nAjV2AP6ihPAym58HM1hGd
-	 l00h9qiFsuFGqnOklqnd1CSHHxXbBuV/dBmXJoxY6JGBMkn3G+ouzmMJ8xdRCN6tak
-	 vJCkmRnKiF0sQeSHwfWvRDb8oVPO/m0ZS899NlwiieWNgeCn+g6vF+DpDtzRAC780q
-	 AWWNyJSdFupoz2JHKLhCadzUzThyFpZ8+YjpZpi+6jKMzJsix3CSvnmsyOYfcDE46C
-	 tLiy2pSzZF6E3Pqc0vx/m2gn0TSxamYraawRun6OdfGgKymKp2sG66v2MxGy4barZW
-	 nc0E1KprMr5qg==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	tparkin@katalix.com,
-	xiyou.wangcong@gmail.com
-Subject: [PATCH net-next] l2tp: use skb_queue_purge in l2tp_ip_destroy_sock
-Date: Tue, 13 Aug 2024 10:39:14 +0100
-Message-Id: <20240813093914.501183-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723542244; c=relaxed/simple;
+	bh=SxG354utO1q5nwLS9z0IUadYK5y7vlEJwJWJ/6D6G48=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lMqOqsOyaAiDbSL//aluhk12tZ1908kkBhudGGt8TFC2H36soQz0aXjZOAtFFeC+OAxzdzDs69CT02nC1RL2ZYfyvOmMh401/oHg4b3Ufh12GeR038V7nM8uKixhGO/3Wkh/SmuelWjAGL13OBRePQ8d+r1bvuctxM+VZC7wcJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rV2hgrEc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86463C4AF09;
+	Tue, 13 Aug 2024 09:44:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723542244;
+	bh=SxG354utO1q5nwLS9z0IUadYK5y7vlEJwJWJ/6D6G48=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rV2hgrEcOPHdVhYTtRA2dTRcOHxoAON/lXryn9dcSFzaYu15XWIKHFM2b0nX+bxHh
+	 DU+9pLyMZ+cynmC3c+TnQxo8uVgI0uD37XR1oKSHYOfu+M2cogqRqv/iW1wpa1krRu
+	 l+/qZ7DpRUZFNXp311UKACq4HdxeyrSo87UYDuhU=
+Date: Tue, 13 Aug 2024 11:44:01 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Alison Schofield <alison.schofield@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Timur Tabi <timur@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
+	Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH 1/5] driver core: Add simple parameter checks for APIs
+ device_(for_each|find)_child()
+Message-ID: <2024081328-blanching-deduce-5cee@gregkh>
+References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
+ <20240811-const_dfc_prepare-v1-1-d67cc416b3d3@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240811-const_dfc_prepare-v1-1-d67cc416b3d3@quicinc.com>
 
-Recent commit ed8ebee6def7 ("l2tp: have l2tp_ip_destroy_sock use
-ip_flush_pending_frames") was incorrect in that l2tp_ip does not use
-socket cork and ip_flush_pending_frames is for sockets that do. Use
-skb_queue_purge instead and remove the unnecessary lock.
+On Sun, Aug 11, 2024 at 08:18:07AM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> Add simple parameter checks for APIs device_(for_each|find)_child() and
+> device_for_each_child_reverse().
 
-Suggested-by: xiyou.wangcong@gmail.com
-Signed-off-by: James Chapman <jchapman@katalix.com>
-Signed-off-by: Tom Parkin <tparkin@katalix.com>
----
- net/l2tp/l2tp_ip.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Ok, but why?  Who is calling this with NULL as a parent pointer?
 
-diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
-index 39f3f1334c4a..ad659f4315df 100644
---- a/net/l2tp/l2tp_ip.c
-+++ b/net/l2tp/l2tp_ip.c
-@@ -258,9 +258,7 @@ static void l2tp_ip_destroy_sock(struct sock *sk)
- {
- 	struct l2tp_tunnel *tunnel;
- 
--	lock_sock(sk);
--	ip_flush_pending_frames(sk);
--	release_sock(sk);
-+	skb_queue_purge(&sk->sk_write_queue);
- 
- 	tunnel = l2tp_sk_to_tunnel(sk);
- 	if (tunnel) {
--- 
-2.34.1
+Remember, changelog text describes _why_ not just _what_ you are doing.
 
+thanks,
+
+greg k-h
 
