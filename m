@@ -1,269 +1,166 @@
-Return-Path: <netdev+bounces-117982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DC4A95027D
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:31:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3344F950284
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A273C1C20A97
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:31:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9B1D1F21943
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2711898E6;
-	Tue, 13 Aug 2024 10:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF88190067;
+	Tue, 13 Aug 2024 10:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SqNplxsL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqBOgdaR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D0E42AB9
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20ED718CBEB;
+	Tue, 13 Aug 2024 10:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723545073; cv=none; b=bmsV3EHCn1NKcIHEgUvafvgxVl5t5/Ns+k/SQhgBE48r7qcab1alfk3FzeEe+eFQ7tYSvUbv/9a2SGJ0FgI9VvWsblAXIvehyuZfcv1e4tdbLqyScg11EKDvFRCt8hIlBBsJdxTX/ygWpwIOQtm4i1Ged25mCn7r+U4zrORbh3U=
+	t=1723545261; cv=none; b=mKmqXl4phqgxsSUgEY6POwBFq6rU6bsWra9aV9vQc2BARqY/AFX0WRblMHGcwGGsLC+mwwOsxlgab7/pAhbOkXtEZ6GZ86nlWM7ElJ2pZmfyh8DZOef27Xbw3PVSFHIqVRaAeU64h8r9d0U+epRCNYuc2RovYxFBklMwFhus84Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723545073; c=relaxed/simple;
-	bh=Qemy//FKBAOaddDCdfMrlr9kRUC4yXU0upqAkPghsKY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dmdRj5FSRROGznPYU5AYtWc+VSKnLtObW+DArjVttAxLjZL2mTH7M/AlqIcqqFAbxPZ2LUqAaIGoiRmSXZUKXaJCiP826cpQqsyOpQJIXZFWPQTG4o2ZJKqs30uzeU37/mDwK+NDrxyz9eGD48b9GwOkx1vEy5gbkv9cgI/KE1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SqNplxsL; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D9SJ8S005863;
-	Tue, 13 Aug 2024 03:31:00 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=II9nA/T/OCR7vUWsar7cg39Az
-	PisJqlMX1AJ4T49eAw=; b=SqNplxsLelrgU8tGGR6HjwRpDJ9iLvGQHIisB4ypW
-	C6/NvNdMr5N+UVjRbG1+kTdu+l9TcHs+IdA2BMDRVMeljMnTSABCB/Yl4dVrVyWQ
-	tRiTzxcLc+x+cXRJnI4agADCTu2T0bDVqvqsjSDNlxLEa+tEOdUYqrnmB7YHQBZc
-	FcOVEATedj8Udein0NbvhzYWf5DK2GV0L+/7yw5jg4AaCdC+FfMQ1pfpYNnhVix0
-	S9XfNUSjY9MELktG3wZHOJ9nc3p5So/f+LVP8nb/6PT9+NwQwMNN9EKP48CeiScc
-	1IZjOb2ayi4ihVHy0evO3Khd7YR9FX8n088/kG6kpyjkw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4100cjh1g0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 03:31:00 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 13 Aug 2024 03:30:59 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 13 Aug 2024 03:30:59 -0700
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 72ADD3F704B;
-	Tue, 13 Aug 2024 03:30:55 -0700 (PDT)
-Date: Tue, 13 Aug 2024 16:00:54 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Praveen Kaligineedi <pkaligineedi@google.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <willemb@google.com>,
-        <jeroendb@google.com>, <shailend@google.com>, <hramamurthy@google.com>,
-        <jfraker@google.com>, Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [PATCH net-next v3 1/2] gve: Add RSS device option
-Message-ID: <Zrs13uJmpA2eD3Yb@test-OptiPlex-Tower-Plus-7010>
-References: <20240812222013.1503584-1-pkaligineedi@google.com>
- <20240812222013.1503584-2-pkaligineedi@google.com>
+	s=arc-20240116; t=1723545261; c=relaxed/simple;
+	bh=fzXoe1isBjct/QtD2OM5E7SMpJeuXFjqSDl3SsBrgaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BQXSoniujqZNxvlTqX3rR4uYWwd9rlyPbUreLCo4aWImk8vxdefW4+xanyBurpzkPg7f5H+a/alAv6t3ygensMsVUK/75l60t7KK89mD9NJjkTtRpauEM+vrNIINOvirtJdvwH8HimPHd0SEU9Ef/e1NYsEJBdog5TmsrdKgIJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqBOgdaR; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f16d2f2b68so74344241fa.3;
+        Tue, 13 Aug 2024 03:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723545258; x=1724150058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fzXoe1isBjct/QtD2OM5E7SMpJeuXFjqSDl3SsBrgaE=;
+        b=MqBOgdaR+8bt20K1m4Hake7eVGSstG0FonsxGcJEshaceIvNWjq3z03k4IR31oypj1
+         fFN9Hba2/3fvVCoc8gj1Wf6AJwfP6ZZPh0OzGusj02DZN2lxP+8ZqGWsGcdzpsa1GZYV
+         SWe2f3dJkjrVJs3pkR9yRQfO69XgXZU1CsrpKq5uuvXOxIOTGIf3H6lklEimsWu6zkog
+         z4bXJCTOVV9JrshvpC3qH1rebox0fW5aIP5Lhv33+HKuCWo4GrEwaL8L/s/Rd6E91vs5
+         FMJLF+CMVA4CJ/Fr4FwiTqzKRSlYnss/EpJIFK9bPHs3w0/H6U2mtk371GMx2GGOu+FJ
+         N37Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723545258; x=1724150058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fzXoe1isBjct/QtD2OM5E7SMpJeuXFjqSDl3SsBrgaE=;
+        b=OJDbtiurdojINUr2Gr4knN/RWdaZz5Af0uOFeV9qUmfxRT2VnjW+o+JXfnVW6iRohW
+         H8CpjvfO/9sA2DeuKVuhSUDu+fyJOdtQixA9vgs1CuqJp8eUvU9uHHnJVRsLxSII/4V6
+         N8Vm9CKr9UQpw6LUxyDpJEw26sSiaJguxhie2La1L9nlExvE29/98AuiOyGGT4Yj6PJ9
+         43hdHOMx0GYUf4Bk1sphkjtQsLs9U5LYiTAbqXFLxiyj8FJsHNC+3ykcpsgmE9rF9/bS
+         pxgkA71dMUMENC84et+qRxIEktPzIDHimwzWa4mqOpEazfKVl+xcq07CKiZBGrNhZqkY
+         oRtw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5Xwj57AIXy8ubMC1Yqi6JXDiQhgcq3JYKOhhSmqcgFSIGfcQnOKyhGZw1OaYRdT3fSXA3R5Qy9IJQ1Q==@vger.kernel.org, AJvYcCUtE0zcueduJGJrBlIjUAgIOBlrZL5w637lQlpTBZotReYTz8qAaUmDFasVQVy/Uow28zra+wTPHko=@vger.kernel.org, AJvYcCWbbB9Hlj2n3272RxpewsoxNB1fWCQOK9i4k2ssZdnu5M3Q5QSnFMwLJYaniv0fYGzRFacUrJcL@vger.kernel.org
+X-Gm-Message-State: AOJu0YyB6ITibDAIWyHG1Wvtc59Hui5/S9SF9TzuAToOt9f4EF8aUqk4
+	KnCamk2fOjjNQysqgvzgo4857P5s0zRV5SMRV33JBjbf/OHn+kY8eED22PhcenUU5bb7o4tOlio
+	oErSIQG2z2OAJ5kPnCvpuvp1ORkQ=
+X-Google-Smtp-Source: AGHT+IFQf6uBkibY15otBoNAQq1YHezfZ8+u3cXNIwNpeGJbOjExMfCzxCYaXKDYewH7buD8RCrm5VcdY8XNGaXhT2I=
+X-Received: by 2002:a05:651c:1991:b0:2f1:922f:8751 with SMTP id
+ 38308e7fff4ca-2f2b70d3584mr30397801fa.0.1723545257786; Tue, 13 Aug 2024
+ 03:34:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240812222013.1503584-2-pkaligineedi@google.com>
-X-Proofpoint-ORIG-GUID: 2e3l2Ozkg9slSW-eZg96ypABoQF65BuJ
-X-Proofpoint-GUID: 2e3l2Ozkg9slSW-eZg96ypABoQF65BuJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
+References: <CAPybu_1SiMmegv=4dys+1tzV6=PumKxfB5p12ST4zasCjwzS9g@mail.gmail.com>
+ <20240725200142.GF14252@pendragon.ideasonboard.com> <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
+ <20240726105936.GC28621@pendragon.ideasonboard.com> <CAPybu_1y7K940ndLZmy+QdfkJ_D9=F9nTPpp=-j9HYpg4AuqqA@mail.gmail.com>
+ <20240728171800.GJ30973@pendragon.ideasonboard.com> <CAPybu_3M9GYNrDiqH1pXEvgzz4Wz_a672MCkNGoiLy9+e67WQw@mail.gmail.com>
+ <Zqol_N8qkMI--n-S@valkosipuli.retiisi.eu> <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
+ <CA+Ln22E1YXGykjKqVO+tT8d_3-GYSEf-zY0TEHJq3w7HQEhFhA@mail.gmail.com> <20240813102638.GB24634@pendragon.ideasonboard.com>
+In-Reply-To: <20240813102638.GB24634@pendragon.ideasonboard.com>
+From: Tomasz Figa <tomasz.figa@gmail.com>
+Date: Tue, 13 Aug 2024 19:33:59 +0900
+Message-ID: <CA+Ln22EzL7M+BLXS6dFi0n80XXkQu1CuoUad0EtjZ2ZEnNX=Kg@mail.gmail.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>, Sakari Ailus <sakari.ailus@iki.fi>, 
+	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>, Dan Williams <dan.j.williams@intel.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, ksummit@lists.linux.dev, 
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	jgg@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-08-13 at 03:50:12, Praveen Kaligineedi (pkaligineedi@google.com) wrote:
-> From: Ziwei Xiao <ziweixiao@google.com>
-> 
-> Add a device option to inform the driver about the hash key size and
-> hash table size used by the device. This information will be stored and
-> made available for RSS ethtool operations.
-> 
-> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> ---
-> Changes in v2:
-> 	- Unify the RSS argument order in related functions(Jakub Kicinski)
-> 
->  drivers/net/ethernet/google/gve/gve.h        |  3 ++
->  drivers/net/ethernet/google/gve/gve_adminq.c | 36 ++++++++++++++++++--
->  drivers/net/ethernet/google/gve/gve_adminq.h | 15 +++++++-
->  3 files changed, 51 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-> index 84ac004d3953..6c21f3c53619 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -831,6 +831,9 @@ struct gve_priv {
->  	u32 num_flow_rules;
->  
->  	struct gve_flow_rules_cache flow_rules_cache;
-> +
-> +	u16 rss_key_size;
-> +	u16 rss_lut_size;
->  };
->  
->  enum gve_service_task_flags_bit {
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-> index c5bbc1b7524e..b5c801d2f8b5 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -45,6 +45,7 @@ void gve_parse_device_option(struct gve_priv *priv,
->  			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
->  			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
->  			     struct gve_device_option_flow_steering **dev_op_flow_steering,
-> +			     struct gve_device_option_rss_config **dev_op_rss_config,
->  			     struct gve_device_option_modify_ring **dev_op_modify_ring)
->  {
->  	u32 req_feat_mask = be32_to_cpu(option->required_features_mask);
-> @@ -207,6 +208,23 @@ void gve_parse_device_option(struct gve_priv *priv,
->  				 "Flow Steering");
->  		*dev_op_flow_steering = (void *)(option + 1);
->  		break;
-> +	case GVE_DEV_OPT_ID_RSS_CONFIG:
-> +		if (option_length < sizeof(**dev_op_rss_config) ||
-> +		    req_feat_mask != GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG) {
-> +			dev_warn(&priv->pdev->dev, GVE_DEVICE_OPTION_ERROR_FMT,
-> +				 "RSS config",
-> +				 (int)sizeof(**dev_op_rss_config),
-> +				 GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG,
-> +				 option_length, req_feat_mask);
-> +			break;
-> +		}
-> +
-> +		if (option_length > sizeof(**dev_op_rss_config))
-> +			dev_warn(&priv->pdev->dev,
-> +				 GVE_DEVICE_OPTION_TOO_BIG_FMT,
-> +				 "RSS config");
-> +		*dev_op_rss_config = (void *)(option + 1);
-> +		break;
->  	default:
->  		/* If we don't recognize the option just continue
->  		 * without doing anything.
-> @@ -227,6 +245,7 @@ gve_process_device_options(struct gve_priv *priv,
->  			   struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
->  			   struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
->  			   struct gve_device_option_flow_steering **dev_op_flow_steering,
-> +			   struct gve_device_option_rss_config **dev_op_rss_config,
->  			   struct gve_device_option_modify_ring **dev_op_modify_ring)
->  {
->  	const int num_options = be16_to_cpu(descriptor->num_device_options);
-> @@ -249,7 +268,8 @@ gve_process_device_options(struct gve_priv *priv,
->  					dev_op_gqi_rda, dev_op_gqi_qpl,
->  					dev_op_dqo_rda, dev_op_jumbo_frames,
->  					dev_op_dqo_qpl, dev_op_buffer_sizes,
-> -					dev_op_flow_steering, dev_op_modify_ring);
-> +					dev_op_flow_steering, dev_op_rss_config,
-> +					dev_op_modify_ring);
->  		dev_opt = next_opt;
->  	}
->  
-> @@ -867,6 +887,8 @@ static void gve_enable_supported_features(struct gve_priv *priv,
->  					  *dev_op_buffer_sizes,
->  					  const struct gve_device_option_flow_steering
->  					  *dev_op_flow_steering,
-> +					  const struct gve_device_option_rss_config
-> +					  *dev_op_rss_config,
->  					  const struct gve_device_option_modify_ring
->  					  *dev_op_modify_ring)
->  {
-> @@ -931,6 +953,14 @@ static void gve_enable_supported_features(struct gve_priv *priv,
->  				 priv->max_flow_rules);
->  		}
->  	}
-> +
-> +	if (dev_op_rss_config &&
-> +	    (supported_features_mask & GVE_SUP_RSS_CONFIG_MASK)) {
-> +		priv->rss_key_size =
-> +			be16_to_cpu(dev_op_rss_config->hash_key_size);
-> +		priv->rss_lut_size =
-> +			be16_to_cpu(dev_op_rss_config->hash_lut_size);
-> +	}
->  }
->  
->  int gve_adminq_describe_device(struct gve_priv *priv)
-> @@ -939,6 +969,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
->  	struct gve_device_option_buffer_sizes *dev_op_buffer_sizes = NULL;
->  	struct gve_device_option_jumbo_frames *dev_op_jumbo_frames = NULL;
->  	struct gve_device_option_modify_ring *dev_op_modify_ring = NULL;
-> +	struct gve_device_option_rss_config *dev_op_rss_config = NULL;
->  	struct gve_device_option_gqi_rda *dev_op_gqi_rda = NULL;
->  	struct gve_device_option_gqi_qpl *dev_op_gqi_qpl = NULL;
->  	struct gve_device_option_dqo_rda *dev_op_dqo_rda = NULL;
-> @@ -973,6 +1004,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
->  					 &dev_op_jumbo_frames, &dev_op_dqo_qpl,
->  					 &dev_op_buffer_sizes,
->  					 &dev_op_flow_steering,
-> +					 &dev_op_rss_config,
->  					 &dev_op_modify_ring);
->  	if (err)
->  		goto free_device_descriptor;
-> @@ -1035,7 +1067,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
->  	gve_enable_supported_features(priv, supported_features_mask,
->  				      dev_op_jumbo_frames, dev_op_dqo_qpl,
->  				      dev_op_buffer_sizes, dev_op_flow_steering,
-> -				      dev_op_modify_ring);
-> +				      dev_op_rss_config, dev_op_modify_ring);
->  
->  free_device_descriptor:
->  	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-> index ed1370c9b197..7d9ef9a12fef 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.h
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-> @@ -164,6 +164,14 @@ struct gve_device_option_flow_steering {
->  
->  static_assert(sizeof(struct gve_device_option_flow_steering) == 12);
->  
-> +struct gve_device_option_rss_config {
-> +	__be32 supported_features_mask;
-> +	__be16 hash_key_size;
-> +	__be16 hash_lut_size;
-> +};
-> +
-> +static_assert(sizeof(struct gve_device_option_rss_config) == 8);
-> +
->  /* Terminology:
->   *
->   * RDA - Raw DMA Addressing - Buffers associated with SKBs are directly DMA
-> @@ -182,6 +190,7 @@ enum gve_dev_opt_id {
->  	GVE_DEV_OPT_ID_JUMBO_FRAMES		= 0x8,
->  	GVE_DEV_OPT_ID_BUFFER_SIZES		= 0xa,
->  	GVE_DEV_OPT_ID_FLOW_STEERING		= 0xb,
-> +	GVE_DEV_OPT_ID_RSS_CONFIG		= 0xe,
->  };
->  
->  enum gve_dev_opt_req_feat_mask {
-> @@ -194,6 +203,7 @@ enum gve_dev_opt_req_feat_mask {
->  	GVE_DEV_OPT_REQ_FEAT_MASK_BUFFER_SIZES		= 0x0,
->  	GVE_DEV_OPT_REQ_FEAT_MASK_MODIFY_RING		= 0x0,
->  	GVE_DEV_OPT_REQ_FEAT_MASK_FLOW_STEERING		= 0x0,
-> +	GVE_DEV_OPT_REQ_FEAT_MASK_RSS_CONFIG		= 0x0,
->  };
->  
->  enum gve_sup_feature_mask {
-> @@ -201,6 +211,7 @@ enum gve_sup_feature_mask {
->  	GVE_SUP_JUMBO_FRAMES_MASK	= 1 << 2,
->  	GVE_SUP_BUFFER_SIZES_MASK	= 1 << 4,
->  	GVE_SUP_FLOW_STEERING_MASK	= 1 << 5,
-> +	GVE_SUP_RSS_CONFIG_MASK		= 1 << 7,
-Use BIT()
+2024=E5=B9=B48=E6=9C=8813=E6=97=A5(=E7=81=AB) 19:27 Laurent Pinchart <laure=
+nt.pinchart@ideasonboard.com>:
+>
+> Hi Tomasz,
+>
+> On Tue, Aug 13, 2024 at 07:17:07PM +0900, Tomasz Figa wrote:
+> > 2024=E5=B9=B47=E6=9C=8831=E6=97=A5(=E6=B0=B4) 22:16 Daniel Vetter <dani=
+el.vetter@ffwll.ch>:
+> > >
+> > > On Wed, 31 Jul 2024 at 13:55, Sakari Ailus <sakari.ailus@iki.fi> wrot=
+e:
+> > > > This is also very different from GPUs or accel devices that are bui=
+lt to be
+> > > > user-programmable. If I'd compare ISPs to different devices, then t=
+he
+> > > > closest match would probably be video codecs -- which also use V4L2=
+.
+> > >
+> > > Really just aside, but I figured I should correct this. DRM supports
+> > > plenty of video codecs. They're all tied to gpus, but the real reason
+> > > really is that the hw has decent command submission support so that
+> > > running the entire codec in userspace except the basic memory and
+> > > batch execution and synchronization handling in the kernel is a
+> > > feasible design.
+> >
+> > FWIW, V4L2 also has an interface for video decoders that require
+> > bitstream processing in software, it's called the V4L2 Stateless
+> > Decoder interface [1]. It defines low level data structures that map
+> > directly to the particular codec specification, so the kernel
+> > interface is generic and the userspace doesn't need to have
+> > hardware-specific components. Hardware that consumes command buffers
+> > can be supported simply by having the kernel driver fill the command
+> > buffers as needed (as opposed to writing the registers directly).
+> > On the other hand, DRM also has the fixed function (i.e. V4L2-alike)
+> > KMS interface for display controllers, rather than a command buffer
+> > passthrough, even though some display controllers actually are driven
+> > by command buffers.
+> > So arguably it's possible and practical to do both command
+> > buffer-based and fixed interfaces for both display controllers and
+> > video codecs. Do you happen to know some background behind why one or
+> > the other was chosen for each of them in DRM?
+> >
+> > For how it applies to ISPs, there are both types of ISPs out in the
+> > wild, some support command buffers, while some are programmed directly
+> > via registers.
+>
+> Could you provide examples of ISPs that use command buffers ? The
+> discussion has remained fairly vague so far, which I think hinders
+> progress.
+>
+> > For the former, I can see some loss of flexibility if
+> > the command buffers are hidden behind a fixed function API, because
+> > the userspace would only be able to do what the kernel driver supports
+> > internally, which could make some use case-specific optimizations very
+> > challenging if not impossible.
+>
+> Let's try to discuss this with specific examples.
 
-Thanks,
-Hariprasad k
->  };
+AFAIK Intel IPU6 and newer, Qualcomm and MediaTek ISPs use command
+buffers natively.
+
+>
+> > [1] https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/dev-=
+stateless-decoder.html
+> >
+> > > And actually good, because your kernel wont ever blow
+> > > up trying to parse complex media formats because it just doesn't.
+>
+> --
+> Regards,
+>
+> Laurent Pinchart
 
