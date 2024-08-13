@@ -1,133 +1,143 @@
-Return-Path: <netdev+bounces-117993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0329595031C
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:58:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DB895031E
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 353C51C224FA
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:58:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13B171F239E6
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630EB19B3C5;
-	Tue, 13 Aug 2024 10:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12BD619AD6C;
+	Tue, 13 Aug 2024 10:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BT1RWm05"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="vRJU9sAN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B66B19A2BD;
-	Tue, 13 Aug 2024 10:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4499619AA5F;
+	Tue, 13 Aug 2024 10:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723546667; cv=none; b=rVJvwntTzq4qioqs9rj5tH3//p+rXZMxxh62Q+Oq5BmGpP1T0+o5NBY1WozrOuc6ADWK1zTIz0yRwW+xEaZp6LCyaI87ESdlHwA7fFaKHUt5puVqeaA97nBzDZ7t/j51ZMSJGqTN5Tfse2yZEOnTgWeap/XDpIJpBX997cMJXaQ=
+	t=1723546728; cv=none; b=OY03rrgs+9iPbFUF0gqhguCWUNHhQxpZ//gzMX+DhYPGIMEG3Jc0+a6P//OEfzYzVKKcRHVlxy5VGcWODKmLurjqKve5waCOicfw1WVCUXHraDkZ5pIx0YU+I8/HBbSGWAa6nJkRmoJl0ZEi5E3UWTfP44w4kj78dk3YBERwoNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723546667; c=relaxed/simple;
-	bh=V5hl2VkMO6rgdQk2s5zwqazwuUp62vPKP4mkTn7a+b8=;
+	s=arc-20240116; t=1723546728; c=relaxed/simple;
+	bh=amLSKSyOu/TcfOjB3E3e/dsqli4Esy0qc7vDMfnCbcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=To5YyzNHi3G/50BoI7x7q+kMiyuJ1uNzE6Q6GPZ7I+VwKXz0lSnzAGQ1WSj9KRMOMpo1XjAkccvcLThI4JiIA6dRzwxhSn9KrESyabDiLQsM692aoMiqLhUmkHjGgwds9P76vEWOoaV6O+ztSLEVMVkHVOSwN62wnKVpqRlXJ2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BT1RWm05; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C3ABC4AF09;
-	Tue, 13 Aug 2024 10:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1723546666;
-	bh=V5hl2VkMO6rgdQk2s5zwqazwuUp62vPKP4mkTn7a+b8=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=M6dx4lVqfNUyrF0U06AxwPpHSO1UOVswto5PJ1WTH0R8cxJErPEL8XXlJwPLuN7Q+w5gDSg3OCr9Z5zf6pPQl6TOcVnLf0Nei2QYtJjcL0GyyxHqrdzaPKR4QI8DwbIEgsAdZXAqHMs6MlrI4MOFyszn+4phozZKzxHQmIiDt4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=vRJU9sAN; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id A049B2EC;
+	Tue, 13 Aug 2024 12:57:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1723546668;
+	bh=amLSKSyOu/TcfOjB3E3e/dsqli4Esy0qc7vDMfnCbcI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BT1RWm051pHj7rei2TztKCZxk4OEok3dlUFAOjt4PMPW/KTXt74lFYAi3VqkMixu/
-	 jaAGH3tbYJfxIIg/jrU2/Qjov2CajGBhQrGuz8GzhlRsvQ3WW1hypcIjcDt0Ge+gx3
-	 Wrn0S57OcET5z7/IbDXfVMuisCUNEed2PVO14dxc=
-Date: Tue, 13 Aug 2024 12:57:43 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>,
+	b=vRJU9sANRKu+3vwmYfX2EQKmkIvXsWKIVnQ/85XypownXWAeXSs+pqSG9YBxgDbFK
+	 rtZ8/4JRyY2GW7khAZAMiTOR0LHnX328e2WVMHsvY/ZHq80EYP+2FrX9k5UaswNaSy
+	 WXDmMpomtpDTxzJChGbXQ+9/16+NxkW1qWXYjPiY=
+Date: Tue, 13 Aug 2024 13:58:22 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Tomasz Figa <tomasz.figa@gmail.com>
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Sakari Ailus <sakari.ailus@iki.fi>,
+	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
 	Dan Williams <dan.j.williams@intel.com>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	Timur Tabi <timur@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/5] driver core: Introduce an API
- constify_device_find_child_helper()
-Message-ID: <2024081311-mortality-opal-cf0f@gregkh>
-References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
- <20240811-const_dfc_prepare-v1-2-d67cc416b3d3@quicinc.com>
- <2024081314-marbling-clasp-442a@gregkh>
- <3f7e9969-5285-4dba-b16e-65c6b10ee89a@quicinc.com>
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240813105822.GD24634@pendragon.ideasonboard.com>
+References: <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
+ <20240726105936.GC28621@pendragon.ideasonboard.com>
+ <CAPybu_1y7K940ndLZmy+QdfkJ_D9=F9nTPpp=-j9HYpg4AuqqA@mail.gmail.com>
+ <20240728171800.GJ30973@pendragon.ideasonboard.com>
+ <CAPybu_3M9GYNrDiqH1pXEvgzz4Wz_a672MCkNGoiLy9+e67WQw@mail.gmail.com>
+ <Zqol_N8qkMI--n-S@valkosipuli.retiisi.eu>
+ <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
+ <CA+Ln22E1YXGykjKqVO+tT8d_3-GYSEf-zY0TEHJq3w7HQEhFhA@mail.gmail.com>
+ <20240813102638.GB24634@pendragon.ideasonboard.com>
+ <CA+Ln22EzL7M+BLXS6dFi0n80XXkQu1CuoUad0EtjZ2ZEnNX=Kg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3f7e9969-5285-4dba-b16e-65c6b10ee89a@quicinc.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+Ln22EzL7M+BLXS6dFi0n80XXkQu1CuoUad0EtjZ2ZEnNX=Kg@mail.gmail.com>
 
-On Tue, Aug 13, 2024 at 06:50:04PM +0800, quic_zijuhu wrote:
-> On 8/13/2024 5:45 PM, Greg Kroah-Hartman wrote:
-> > On Sun, Aug 11, 2024 at 08:18:08AM +0800, Zijun Hu wrote:
-> >> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> >>
-> >> Introduce constify_device_find_child_helper() to replace existing
-> >> device_find_child()'s usages whose match functions will modify
-> >> caller's match data.
-> > 
-> > Ick, that's not a good name, it should be "noun_verb" with the subsystem being on the prefix always.
-> > 
-> okay, got it.
+On Tue, Aug 13, 2024 at 07:33:59PM +0900, Tomasz Figa wrote:
+> 2024年8月13日(火) 19:27 Laurent Pinchart <laurent.pinchart@ideasonboard.com>:
+> > On Tue, Aug 13, 2024 at 07:17:07PM +0900, Tomasz Figa wrote:
+> > > 2024年7月31日(水) 22:16 Daniel Vetter <daniel.vetter@ffwll.ch>:
+> > > >
+> > > > On Wed, 31 Jul 2024 at 13:55, Sakari Ailus <sakari.ailus@iki.fi> wrote:
+> > > > > This is also very different from GPUs or accel devices that are built to be
+> > > > > user-programmable. If I'd compare ISPs to different devices, then the
+> > > > > closest match would probably be video codecs -- which also use V4L2.
+> > > >
+> > > > Really just aside, but I figured I should correct this. DRM supports
+> > > > plenty of video codecs. They're all tied to gpus, but the real reason
+> > > > really is that the hw has decent command submission support so that
+> > > > running the entire codec in userspace except the basic memory and
+> > > > batch execution and synchronization handling in the kernel is a
+> > > > feasible design.
+> > >
+> > > FWIW, V4L2 also has an interface for video decoders that require
+> > > bitstream processing in software, it's called the V4L2 Stateless
+> > > Decoder interface [1]. It defines low level data structures that map
+> > > directly to the particular codec specification, so the kernel
+> > > interface is generic and the userspace doesn't need to have
+> > > hardware-specific components. Hardware that consumes command buffers
+> > > can be supported simply by having the kernel driver fill the command
+> > > buffers as needed (as opposed to writing the registers directly).
+> > > On the other hand, DRM also has the fixed function (i.e. V4L2-alike)
+> > > KMS interface for display controllers, rather than a command buffer
+> > > passthrough, even though some display controllers actually are driven
+> > > by command buffers.
+> > > So arguably it's possible and practical to do both command
+> > > buffer-based and fixed interfaces for both display controllers and
+> > > video codecs. Do you happen to know some background behind why one or
+> > > the other was chosen for each of them in DRM?
+> > >
+> > > For how it applies to ISPs, there are both types of ISPs out in the
+> > > wild, some support command buffers, while some are programmed directly
+> > > via registers.
+> >
+> > Could you provide examples of ISPs that use command buffers ? The
+> > discussion has remained fairly vague so far, which I think hinders
+> > progress.
+> >
+> > > For the former, I can see some loss of flexibility if
+> > > the command buffers are hidden behind a fixed function API, because
+> > > the userspace would only be able to do what the kernel driver supports
+> > > internally, which could make some use case-specific optimizations very
+> > > challenging if not impossible.
+> >
+> > Let's try to discuss this with specific examples.
 > 
-> is it okay to use device_find_child_mut() suggested by Przemek Kitszel ?
+> AFAIK Intel IPU6 and newer, Qualcomm and MediaTek ISPs use command
+> buffers natively.
 
-No, just switch all callers over to be const and keep the same name.
+At the hardware level, firmware level, or both ? Is there a way we can
+get more information about the structure of the command buffer and how
+it is handled by the ISP for any of those three platforms ?
 
-> > But why is this even needed?  Device pointers are NOT const for the
-> > obvious reason that they can be changed by loads of different things.
-> > Trying to force them to be const is going to be hard, if not impossible.
-> > 
-> 
-> [PATCH 3/5] have more discussion about these questions with below link:
-> https://lore.kernel.org/all/8b8ce122-f16b-4207-b03b-f74b15756ae7@icloud.com/
-> 
-> 
-> The ultimate goal is to make device_find_child() have below prototype:
-> 
-> struct device *device_find_child(struct device *dev, const void *data,
-> 		int (*match)(struct device *dev, const void *data));
-> 
-> Why ?
-> 
-> (1) It does not make sense, also does not need to, for such device
-> finding operation to modify caller's match data which is mainly
-> used for comparison.
-> 
-> (2) It will make the API's match function parameter have the same
-> signature as all other APIs (bus|class|driver)_find_device().
-> 
-> 
-> My idea is that:
-> use device_find_child() for READ only accessing caller's match data.
-> 
-> use below API if need to Modify caller's data as
-> constify_device_find_child_helper() does.
-> int device_for_each_child(struct device *dev, void *data,
->                     int (*fn)(struct device *dev, void *data));
-> 
-> So the The ultimate goal is to protect caller's *match data* @*data  NOT
-> device @*dev.
+> > > [1] https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/dev-stateless-decoder.html
+> > >
+> > > > And actually good, because your kernel wont ever blow
+> > > > up trying to parse complex media formats because it just doesn't.
 
-Ok, sorry, I was confused.
+-- 
+Regards,
 
-thanks,
-
-greg k-h
+Laurent Pinchart
 
