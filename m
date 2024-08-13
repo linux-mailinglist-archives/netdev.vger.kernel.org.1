@@ -1,93 +1,135 @@
-Return-Path: <netdev+bounces-118131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672FE950A84
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:42:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61CD7950ABE
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10A461F255FD
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:42:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94FA71C22122
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A231AAE29;
-	Tue, 13 Aug 2024 16:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1052319EEAB;
+	Tue, 13 Aug 2024 16:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U83X13tZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDbE0rW9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFDF1AAE24;
-	Tue, 13 Aug 2024 16:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3B41CA9F;
+	Tue, 13 Aug 2024 16:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723567147; cv=none; b=fHKKFE6Ck1ak8WwxIQDllZUZVKRvV2Mstu8UHVFCs7yz7pxwjBgLf7iqTrMFSLuWfL1NN92aw7Kbj9qCiTVlEqrPvzLLg0XqYukvZmYVbJz/jubZDS66abj5U0APGB9NUFfPYz1Op3sz48IEw0++ueJa4yexHPA8mTyuuO2DUyY=
+	t=1723567747; cv=none; b=AbEkZufBwDXtRzXuaK/OvmvBWqp5XBtIxAk32E42sA89bqQRwQtwqGAAo0VIPBMkx2zW1Tag2TMZ4KV3oHpE/3ewK2NbkXMqLdakMZpuFZU2dnq/CTbGeTHA8DOaA3d7BCOfUImrvuobjFJrVWlouQBoBrrFESdLLfGKCGbRaSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723567147; c=relaxed/simple;
-	bh=roREPA9w0B4QAmH4r0DoxNSGqiEyAAIoSzcgMliRsOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pM1KUONsZKu4eNcEYSQ65K7Ddhl6+1+J763u0D4xMW0mXAfTyx4QqvS6rZS7oI2d1X22YNrh2XNRPEHC+dUiPeCA6LO5+aQEOuXwnxPo01GbE0qG9LbaRk0us+49Qp37tO+apue7A4GuhbhqyXWEqHie0vrc52/ibYhixEGtsxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U83X13tZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF608C4AF09;
-	Tue, 13 Aug 2024 16:39:06 +0000 (UTC)
+	s=arc-20240116; t=1723567747; c=relaxed/simple;
+	bh=m6VisToohIEMIQJQIbU8qwBhwVBuJUfVH2KDYx1eBWQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D/817RNhd6CfT7Q+aX514/QGJ8ike1h8ookgDYu7C1xXrB82ofeue1moRofgQsNg2a6E2iiBWXxxhAIyylwRAGn6GR05QxJMwDp5JOu04OgtEWQ+GQ0nVPN9C8EO86Ezn5iaV5+kRzcF27bCIq34pt2Qq7Y+fZIs3atq8Ovhis8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDbE0rW9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E7BDC4AF09;
+	Tue, 13 Aug 2024 16:49:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723567147;
-	bh=roREPA9w0B4QAmH4r0DoxNSGqiEyAAIoSzcgMliRsOE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U83X13tZQk/OI6R78ui8JndwEQGAras2KVqWeG8ITZK1AZFFWUMvuOlXV3Gg5wTex
-	 6U3o+vGf2sUnQMgLNvhrkNhkoPKaYaddn0yVuTJtSzGFvigS4841h2ChI+BsW2uROw
-	 KqX+quzQSkwtFDemaMxN1OPkYRbmJqvsah/NfmKMStAiJj50bwvu29jt5PcS4JRWvV
-	 JXsNf6TuS3ItTKQ0x0bCGBbtFeS39vvvDF11JADw4MzxjGfqRW48g+DnOK1C4AsENb
-	 5+GrvXq6OWkZncL+SSROQwFfr2V/FszfaU4WTxXGqVS5Lu99qBtFGHoffaf2994qGb
-	 e3fJeIFmi0U3Q==
-Date: Tue, 13 Aug 2024 10:39:05 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Ayush Singh <ayush@beagleboard.org>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Alex Elder <elder@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jakub Kicinski <kuba@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	robertcnelson@beagleboard.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	s=k20201202; t=1723567746;
+	bh=m6VisToohIEMIQJQIbU8qwBhwVBuJUfVH2KDYx1eBWQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IDbE0rW91NfgeiyaVSeUG+leSIJD28drSzhjH79F/ohoMaJOx/o3fpMzrt+BoEFOB
+	 G0v8LK+bDG2+Hr+7zYY6x5ih92Ie+CpERw0cuiGIeu3PiMHA1d46z+LUJMBqIVRtu3
+	 3PoEHKElKNBWozlUp0IkA9LRyHvVClVf3EsX3Engg+aTJ6Iv4qz6eq7RPUbboIjTDl
+	 1BwIqjkQ/mEPC50dvdAIRC934MPbCEXIzUlibJUdYWtYj9W6USLekd2qTerSuTpOj2
+	 0/drEIfE2neATCFj24azxArhbSvQ7Tmxf59qwmgs20ItEsqJtkLw7/EGHPdaSCYgUn
+	 k/dE1cv0npviA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sduhk-003QLJ-AG;
+	Tue, 13 Aug 2024 17:49:04 +0100
+Date: Tue, 13 Aug 2024 17:49:04 +0100
+Message-ID: <86wmkkz7un.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sunil Goutham <sgoutham@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	lorforlinux@beagleboard.org, greybus-dev@lists.linaro.org,
-	Nishanth Menon <nm@ti.com>, jkridner@beagleboard.org,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Johan Hovold <johan@kernel.org>
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: ti,cc1352p7: Add
- bootloader-backdoor-gpios
-Message-ID: <172356714476.1180285.11438350948461770539.robh@kernel.org>
-References: <20240801-beagleplay_fw_upgrade-v2-0-e36928b792db@beagleboard.org>
- <20240801-beagleplay_fw_upgrade-v2-1-e36928b792db@beagleboard.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: thunder_bgx: Fix netdev structure allocation
+In-Reply-To: <ZruI940YZCETGNGq@gmail.com>
+References: <20240812141322.1742918-1-maz@kernel.org>
+	<ZruI940YZCETGNGq@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801-beagleplay_fw_upgrade-v2-1-e36928b792db@beagleboard.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leitao@debian.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-On Thu, 01 Aug 2024 00:21:05 +0530, Ayush Singh wrote:
-> bootloader-backdoor-gpio (along with reset-gpio) is used to enable
-> bootloader backdoor for flashing new firmware.
+On Tue, 13 Aug 2024 17:25:27 +0100,
+Breno Leitao <leitao@debian.org> wrote:
 > 
-> The pin and pin level to enable bootloader backdoor is configured using
-> the following CCFG variables in cc1352p7:
-> - SET_CCFG_BL_CONFIG_BL_PIN_NO
-> - SET_CCFG_BL_CONFIG_BL_LEVEL
+> Hello Marc,
 > 
-> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
-> ---
->  Documentation/devicetree/bindings/net/ti,cc1352p7.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
+> On Mon, Aug 12, 2024 at 03:13:22PM +0100, Marc Zyngier wrote:
+> > Commit 94833addfaba ("net: thunderx: Unembed netdev structure") had
+> > a go at dynamically allocating the netdev structures for the thunderx_bgx
+> > driver.  This change results in my ThunderX box catching fire (to be fair,
+> > it is what it does best).
 > 
+> Should I be proud of it? :-)
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+It's always good practice to check that someone still cares about
+terrible HW. Break it, wait for a few releases, and purge it if nobody
+was looking.
 
+Unfortunately, this is one of the few machines I have that has 16kB
+page support, so I can't really turn a blind eye on the
+breakage... ;-)
+
+> 
+> > The issues with this change are that:
+> > 
+> > - bgx_lmac_enable() is called *after* bgx_acpi_register_phy() and
+> >   bgx_init_of_phy(), both expecting netdev to be a valid pointer.
+> > 
+> > - bgx_init_of_phy() populates the MAC addresses for *all* LMACs
+> >   attached to a given BGX instance, and thus needs netdev for each of
+> >   them to have been allocated.
+> > 
+> > There is a few things to be said about how the driver mixes LMAC and
+> > BGX states which leads to this sorry state, but that's beside the point.
+> > 
+> > To address this, go back to a situation where all netdev structures
+> > are allocated before the driver starts relying on them, and move the
+> > freeing of these structures to driver removal. Someone brave enough
+> > can always go and restructure the driver if they want.
+> > 
+> > Fixes: 94833addfaba ("net: thunderx: Unembed netdev structure")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Breno Leitao <leitao@debian.org>
+> 
+> Thanks for taming my fiery commit.
+
+No worries.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
