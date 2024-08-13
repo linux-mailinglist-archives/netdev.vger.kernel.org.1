@@ -1,162 +1,163 @@
-Return-Path: <netdev+bounces-118141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28DC0950B8A
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:39:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A276950B93
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:42:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4344285E62
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:39:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 205AC1F2316D
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95381A2C17;
-	Tue, 13 Aug 2024 17:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1fTvT0C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8141A2C16;
+	Tue, 13 Aug 2024 17:42:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B5D18C3D;
-	Tue, 13 Aug 2024 17:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA3419D06C
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 17:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723570793; cv=none; b=mnu4jkvz2UNmXDNF0TtqWa06ReQexHfsqGhI+XTpVKm1LdnGk9yTzcXc1zJ7eRO4B2JojQwJMzMkLq/l4G+8GzYqqdckv+8nu9z7b9Vcyh/m7ni+ZB2dDWdoDHbqwh7/NhMwBY9QQhh1VaMSli+6NkXDDrJ1TdKBj3kJXCL3sH4=
+	t=1723570948; cv=none; b=SxyLwCFqRdciZh4ME1RBUzwqTwWfKdInsnIa8zvm6+2zJnHnPaEPuEym00u2VGIGrn3pbHi507ljc0E2DYLq9wgXEffWl2Kt+4nRT+pEzrEow9gOa0Lkx6fwdmjhPsVvOfjh8EXcM5XfoAnd/dcV2KYnw41w2vcAQB0TMWe82S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723570793; c=relaxed/simple;
-	bh=DJq9kjbIzOVRgUeTLJfGxppcJGxEJfJ+p/jj5GHFgQ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UxajcZWFSrmdztxji3XZs1CgVVbGD5u17af4y9caVr2GshPJhnlPzmKQ9h1CT+RypCzq5xcFy+xAQeVfszziMjgT09Ecmgl6f6Xy2L8s9MHuMPGgJn5La0Y0Q47NTOOiYWRri8G8yQgcMgUPxP01uGtpGXXaR2XKnpnvqHoNBto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1fTvT0C; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so3984550a12.3;
-        Tue, 13 Aug 2024 10:39:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723570791; x=1724175591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HE5r/HJMJZgTTMlLXtLllz4r3gH1IYPGCs8AltB06Yo=;
-        b=k1fTvT0ChiZ1ChDOOJ5vmb60Hxi4/TDWKLDsVkJ+ydJrNar9dHCNOfvd87lJsJD10j
-         XJIIhwxp0pqg/xJ+AiiaNzsPGKzVcw54/eU1FtnVBFWOHulk4whKbkcKnI+v4cnbO1qW
-         2UTO2DNwUAF9F4haOOz1djaowRQlOSUJ2/GodsriyqIhcObuij8BSLlwFaJpKDnI9o+R
-         Sz/AIcnTLgUXv8qJMGcCHyN5o1H2X8K8o8rtkCdeIQBuOC/rqKrqMvZzWnDFIWTBnZsf
-         b5zszPTvKu3J1OOM8QOt0l/0tcyXjEVcHacV5Zdp//GHBolC/jF8oBWgxLGm/A/7qQw4
-         H3pA==
+	s=arc-20240116; t=1723570948; c=relaxed/simple;
+	bh=2d3VYw/1eOMTBjp7dH5IiNqY/jPTBNsR8t75kEEa7a4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cibDrOKkbSs0ZoL+yf/hq1LLu+OVbNrEgKxCHPJfUgIUZe47G0V1rUECqjATu5xHrLPfuSlKjYv7kZkhotT0tFE6It8TNPUWDpeYRRAyzvFA131R2LjaVfhIlxq+ucmSbDFgOhR+XKF33NRGv4l4U+NDrM+LmQ4v8YRUnxK/y9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-824c925d120so174693539f.3
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 10:42:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723570791; x=1724175591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HE5r/HJMJZgTTMlLXtLllz4r3gH1IYPGCs8AltB06Yo=;
-        b=KqglnadEEE0YRC9AQNzeHcv4yHY/9sxweGAMFQGPnUCWyGnqXhuC1XQ1kaKm41kfHQ
-         utcytVXDMZNd5Gqx59p8qqsQ8ePqlFEreIN5Smj6cJgujqHHCJojYtZGpmR7//MURT/t
-         5wpFciTQpkgaXw3YwtYtrEDrqYa2shbwJCO3mIjmar94UiiQsO7YckD4iwpoKi9+FZwu
-         wjuwYNUgEABrUcF7BvqkJ7iO+/Jm8gyS5Rh1FJGXDaYnEKVvQOcQIbBQCGrYhycLiXWK
-         fEWsU2Ia82er4AbRy7hxGNKZJBvJ8uSOnPYv4lzhvRbALqchrX3Z23HjeQngObZrVyLB
-         dZCA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnw9/BmkEFCbtQpjoBxr1Gpo2vsN0SfqWfkzv7kCKb6LVgLSvNWVKXJ/BCMnMDtPFWDxD5YJ+1S2N5pZC21QWYkLCCQF6NChZAiHjfeW4hTQrfu/hyqoTvxrzPlPQjKVHC/A5wc4ZXMObzOZailD/sdgJyIvmc4/Axe6Dq
-X-Gm-Message-State: AOJu0Yw2wKfhfIdOas/bIoWGMNg21e2Yrnb699Dt39KTsiNn5ZYFdaFm
-	r9q6UuT3XfXdcWDl73f5aqabWEU+QSyNmDEpgjg8bQS1nRuBDRDEimMBSpoVtgM4NcMbMrgjYIh
-	BsDS6bUL12KopRuzsxOmbYieKsw==
-X-Google-Smtp-Source: AGHT+IGMzSKM2bdnuT/c+oYMrtTjyVQTc1oN6ctNxnHjJehIoDruTX5c8H5k+7pGEx9Y8Jlol+Cpyhz3rhSXR1KWbMk=
-X-Received: by 2002:a17:902:e84a:b0:1fd:9420:1044 with SMTP id
- d9443c01a7336-201d63abdfcmr2857755ad.16.1723570791336; Tue, 13 Aug 2024
- 10:39:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723570946; x=1724175746;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ngDN4+t5W8gLgpUeHVUEQJgpMaZ70F1wn8Uciag940=;
+        b=Z/MKO2530IF4M5OTWMXuu5jZJ/ML9k8mv7m4eaFtmts1deBDGKT2Imbf1Q7IXEqG5v
+         TzHFCXzjJAo1AKJ9OfjFKIr1IF7mg/2qY/D+jhdgFHrxQZlBQ+4iTiVOAkks9L7OkYI7
+         OQtZDPdWWCQ7ywpxyo7e4rJa7eukyiDVcSRdPIy5VrvEcyO6ySJBEzPOCnCOjyez+WmK
+         1avhCBTD1/473bDLNPk1gBNQbWoPfMPDxo3rsqzfNwN1+zOqYAhSma2lQ71XM0CpKYMO
+         9xKmWxqDoShheMWm4byZWyCeokiWpH3UprJiUvjtkPICXFU093NLC9Pyjpt5psfky6+j
+         vQnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVLOeqXDvAAT1CSn8l45j5V6QY6Fbja/OC/pZ9u+Wv4C0bH4AuOErMxmScAgHijJB/6SWZF/V6i/pYMc/eh4zR1SZumL2gd
+X-Gm-Message-State: AOJu0YxG9sZOuR490Zs9WwsDjCfWeloxW3DKdqA/QssMF3y8tB8N274k
+	yxLjqEnD/Yha+GBIfANz3BLIgiSjUXzsXxLcjD0Raos4ZPBzRG2jTEJ00hNLH/Q0+ubjxQkoJWZ
+	fNX0Rxcg2KTFa4r9p83zYLbQByTtZZTwWMGxUgTN4AJqMzzUuJBkr/js=
+X-Google-Smtp-Source: AGHT+IHVguG5xXxvhqwOBEihCFi7Yu1nqF/zF7J/rU/bN58IdxkAm0gjS95Q4OqkFr87+2m8AyyFaxmYqbY6T3Cw2GeppG0WdhSv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812004503.43206-1-danieltimlee@gmail.com> <CAEf4BzZsZYNx_mV0_0RrWvQS+Y7ixvtzv3SmTTQkOveeZeot+w@mail.gmail.com>
-In-Reply-To: <CAEf4BzZsZYNx_mV0_0RrWvQS+Y7ixvtzv3SmTTQkOveeZeot+w@mail.gmail.com>
-From: "Daniel T. Lee" <danieltimlee@gmail.com>
-Date: Wed, 14 Aug 2024 02:39:34 +0900
-Message-ID: <CAEKGpzgnQ+=W==EQ56CKXYCpDx=kLHMhoo+3KZQy9sOUKNeYtw@mail.gmail.com>
-Subject: Re: [bpf-next 0/3] samples/bpf: Remove obsolete tracing-related tests
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Yipeng Zou <zouyipeng@huawei.com>, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a05:6602:6d05:b0:824:d6b8:8844 with SMTP id
+ ca18e2360f4ac-824dadff815mr966239f.3.1723570945558; Tue, 13 Aug 2024 10:42:25
+ -0700 (PDT)
+Date: Tue, 13 Aug 2024 10:42:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f4a1b7061f9421de@google.com>
+Subject: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (2)
+From: syzbot <syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 13, 2024 at 6:17=E2=80=AFAM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Sun, Aug 11, 2024 at 5:45=E2=80=AFPM Daniel T. Lee <danieltimlee@gmail=
-.com> wrote:
-> >
-> > The BPF tracing infrastructure has undergone significant evolution,
-> > leading to the introduction of more robust and efficient APIs.
-> > However, some of the existing tests in the samples/bpf directory have
-> > not kept pace with these developments. These outdated tests not only
-> > create confusion among users but also increase maintenance overhead.
-> >
-> > For starter, this patchset focuses on cleaning up outdated 'tracing'
-> > related tests within the BPF testing framework. The goal is to
-> > modernize and streamline selftests by removing obsolete tests and
-> > migrating necessaries to more appropriate locations.
-> >
-> > Daniel T. Lee (3):
-> >   selftests/bpf: migrate tracepoint overhead test to prog_tests
-> >   selftests/bpf: add rename tracepoint bench test
-> >   samples/bpf: remove obsolete tracing related tests
-> >
->
-> We already have tracepoint-specific benchmark (see
-> benchs/bench_trigger.c), try `./bench trig-tp` (it will pretty recent
-> kernel due to reliance on bpf_modify_return_test_tp() kfunc).
->
-> So maybe instead of adding code to selftests, let's just remove it
-> from both samples/bpf and prog_tests' test_overhead? Either way
-> test_overhead isn't very representative anymore, given big chunk of
-> its overhead is in write() syscall?
->
+Hello,
 
-Thanks for the insight!
-I'll just drop these two and resend them.
+syzbot found the following issue on:
 
-> >  samples/bpf/Makefile                          |  12 -
-> >  samples/bpf/test_overhead_kprobe.bpf.c        |  41 ----
-> >  samples/bpf/test_overhead_raw_tp.bpf.c        |  17 --
-> >  samples/bpf/test_overhead_tp.bpf.c            |  23 --
-> >  samples/bpf/test_overhead_user.c              | 225 ------------------
-> >  samples/bpf/test_override_return.sh           |  16 --
-> >  samples/bpf/test_probe_write_user.bpf.c       |  52 ----
-> >  samples/bpf/test_probe_write_user_user.c      | 108 ---------
-> >  samples/bpf/tracex7.bpf.c                     |  15 --
-> >  samples/bpf/tracex7_user.c                    |  56 -----
-> >  tools/testing/selftests/bpf/bench.c           |   2 +
-> >  .../selftests/bpf/benchs/bench_rename.c       |  16 ++
-> >  .../selftests/bpf/benchs/run_bench_rename.sh  |   2 +-
-> >  .../selftests/bpf/prog_tests/test_overhead.c  |  14 +-
-> >  .../selftests/bpf/progs/test_overhead.c       |  11 +-
-> >  15 files changed, 39 insertions(+), 571 deletions(-)
-> >  delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
-> >  delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
-> >  delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
-> >  delete mode 100644 samples/bpf/test_overhead_user.c
-> >  delete mode 100755 samples/bpf/test_override_return.sh
-> >  delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
-> >  delete mode 100644 samples/bpf/test_probe_write_user_user.c
-> >  delete mode 100644 samples/bpf/tracex7.bpf.c
-> >  delete mode 100644 samples/bpf/tracex7_user.c
-> >
-> > --
-> > 2.43.0
-> >
+HEAD commit:    ee9a43b7cfe2 Merge tag 'net-6.11-rc3' of git://git.kernel...
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=13da25d3980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e8a2eef9745ade09
+dashboard link: https://syzkaller.appspot.com/bug?extid=e0bd4e4815a910c0daa8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9227adf96f75/disk-ee9a43b7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c65c46b78c57/vmlinux-ee9a43b7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/467d374f18b9/bzImage-ee9a43b7.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com
+
+RBP: 00007f2c78995090 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 0000000000000000 R14: 00007f2c77d05f80 R15: 00007fff6de33538
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 8054 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x37f/0x390 net/ieee802154/core.c:258
+Modules linked in:
+CPU: 1 UID: 0 PID: 8054 Comm: syz.0.839 Not tainted 6.11.0-rc2-syzkaller-00111-gee9a43b7cfe2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+RIP: 0010:cfg802154_switch_netns+0x37f/0x390 net/ieee802154/core.c:258
+Code: a3 2b f6 90 0f 0b 90 43 80 3c 3e 00 75 8d eb 93 e8 c6 a3 2b f6 e9 8b fe ff ff e8 bc a3 2b f6 e9 81 fe ff ff e8 b2 a3 2b f6 90 <0f> 0b 90 e9 73 fe ff ff 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90
+RSP: 0018:ffffc9000337f408 EFLAGS: 00010293
+RAX: ffffffff8b67d3ce RBX: 00000000fffffff4 RCX: ffff8880215f3c00
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffff88802324e198 R08: ffffffff8b67d23d R09: 1ffff11004649c3a
+R10: dffffc0000000000 R11: ffffed1004649c3b R12: 0000000000000000
+R13: 0000000000000000 R14: ffff88802324e078 R15: dffffc0000000000
+FS:  00007f2c789956c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff818548d58 CR3: 000000007f648000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f0/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
+ ___sys_sendmsg net/socket.c:2651 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f2c77b779f9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2c78995038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f2c77d05f80 RCX: 00007f2c77b779f9
+RDX: 0000000000000000 RSI: 0000000020000200 RDI: 000000000000000e
+RBP: 00007f2c78995090 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 0000000000000000 R14: 00007f2c77d05f80 R15: 00007fff6de33538
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
---=20
-Best,
-Daniel T. Lee
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
