@@ -1,209 +1,210 @@
-Return-Path: <netdev+bounces-118121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45816950997
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:57:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5755D95099A
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69EBF1C20E64
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:57:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6D911F21D9F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653BE1A08AF;
-	Tue, 13 Aug 2024 15:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdCX8VNJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAF71A08B8;
+	Tue, 13 Aug 2024 15:58:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1D1A08A3;
-	Tue, 13 Aug 2024 15:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFE91A08AB;
+	Tue, 13 Aug 2024 15:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723564671; cv=none; b=hAv0TiuCd972aiC1xEsECAXUlB00rP+oFWiZHQwG+6JJzuYtgFtfFMc10peVw7dIVrH35viYlWydleEWcFNr+z5TMPO2EB0fEfmPAvmziL0ew9Akk1jFqg0Tea9iduL8ldY6FamOh26VGH9ygOTYuWbxKEqxVRRRtF/kmeFeRug=
+	t=1723564684; cv=none; b=hGxPuoKhBYhBMSJY03uijf/Zf/2c7lY5oL+sTQ3VrR0b65ZaTFR1oD3RT5BZOySUgXS5MpJWPAbASGCpXh4nLcg6gNcYKYcxiNZQo9sXvXfdgLBgyU54WEcZlnYw2duB+bEOSVv8sWXJjxAMXVC4STrlNczcJXlbBWoeiJ//8SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723564671; c=relaxed/simple;
-	bh=0xi5AT6zUg1ZXFT0NFQY+gVhVfp0M/lxZ7XtHuU3RF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aXfPvXIT3bPXGgPa6fi6A6KCBZAu1JtGjFAkenUAo9+Js19Wxq0NaqzwFiq0S0fHvTmoiUfGNndW1pWgd5dBN2SORXUieImsGQrpXQjZD+I/n2Eqo4QM8Ckknhaq2rFGyi4IRpWiBAnad58jcMQsGrfLYD+B7MapILDVNnLW4mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdCX8VNJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD059C4AF09;
-	Tue, 13 Aug 2024 15:57:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723564671;
-	bh=0xi5AT6zUg1ZXFT0NFQY+gVhVfp0M/lxZ7XtHuU3RF4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DdCX8VNJe90QKoQX216sdtt9T+80ps80Eq1X5Kbok2xhjLLTd5kRnC/6TXTs7FhyY
-	 e4szbm7fiMeU/FI/4p1sYeZdqoTpUZn3GJDa/pvaNjcPg4yoLM4a8C1VEbho087Exp
-	 Z8r76OpysB7oRoECbolGR2JsON8f7L+rot3dJsMz5opR5o5UWnPkjROADRbFoZalaX
-	 YhCKRj9izVhJRmhDn/VJ7+LWNANMXsjJ1CAjeoAu3K3k/0ahHsQ/KGywOO4mrCZzXv
-	 +1ZpuRzL9fDdjupqGtHiWiLZ7vZQG8B+i6o+TjhLq4TAlVbpKzKtBAZcLaNsl/uwUK
-	 zX7/+WyGjRf6A==
-Message-ID: <34cc17a1-dee2-4eb0-9b24-7b264cb63521@kernel.org>
-Date: Tue, 13 Aug 2024 17:57:44 +0200
+	s=arc-20240116; t=1723564684; c=relaxed/simple;
+	bh=NwNbrf8vyk0cQ+c5B2X8sNmPAnM/D0iMY1BoA8Eb9ko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hg6QUxTX92Xmua2hM3GkJQUh+5C7W8RroyeQMLojPd7dqV5EvRKZJJMx+DLxAJDHAOzgljyopqRmxWpenf8xCMZUX1FpNSpqvUp4mRv9SWKMMxenWJ8YD0m/SqNHS1VoUQEZ8gHbu8nqWB8BIQhEYtjRkfGQ056j7J1qJtS+U18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ef2cce8be8so62352191fa.1;
+        Tue, 13 Aug 2024 08:58:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723564681; x=1724169481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mSf70t9XpCK5iIbrD4iy0fziurLgLo486TifTDvrv8c=;
+        b=GKxRZZbRzoRRKCu2eGgJS1YW0uYUeSZ6bo7cAgjCP/IRLd9R0nu+PQLO9CWLHj0cGd
+         vDcos1DnL4ISqJg071OsrNUpXsaJH/zPNES8S5/Sij+ajsmKFoDNTQLhpM9nszQZazy1
+         StT+NbmkJ4yqr48IJ6vDRd95yJmzushHTV7HoW+lxzV5nhmMXCOsqw8GhCgqM3+4gM0N
+         qJRjSXpNHXN9mNvWbQA0px+PSSNE/i1sim3jWd8jEDcfziixhZb1U4StLwu/dyqkeE9l
+         3xlFQ+5dYo39yo3FjCIv9jq0ZJ9CUA2VeWwtQZ2RbBYbrVmcvvwMUSM5dwjK+vl9ZWXU
+         rTAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXysj12xMU7UfyHlj2N1+K4A1YnC/jwk2s1DgvrVWxeJrWnEvaIYLKl+Cw4L/uk/N/5HriPNDGvQ178a0d3ppK5J+VJdAywUK6N9ovlUqSWHSsaHvBNMYIvmlVzye4GjNz576uQ
+X-Gm-Message-State: AOJu0Yy1Uki61260l6PSnv87isGbWV7cOPi49+u4jv5m5NztCJIOoL7K
+	1/1+IxE03x63R7AWz6o6eWfzlG3xr0nxz9Ee4O9X4enCXQNp33xZ
+X-Google-Smtp-Source: AGHT+IGKNz3GNvIY1G8qdlnpx5J4zf4Cy1AdZab+IoibU9hrggopiEst8Rc9BIBgxV5GIuiBOgx5SA==
+X-Received: by 2002:a05:651c:544:b0:2ef:2332:5e63 with SMTP id 38308e7fff4ca-2f2b71569a3mr31462821fa.23.1723564680387;
+        Tue, 13 Aug 2024 08:58:00 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-014.fbsv.net. [2a03:2880:30ff:e::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd187f5d3asm3040424a12.12.2024.08.13.08.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 08:57:59 -0700 (PDT)
+Date: Tue, 13 Aug 2024 08:57:57 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Aijay Adams <aijay@meta.com>
+Subject: Re: [PATCH net-next] net: netconsole: Populate dynamic entry even if
+ netpoll fails
+Message-ID: <ZruChcqv1kdTdFtE@gmail.com>
+References: <20240809161935.3129104-1-leitao@debian.org>
+ <6185be94-65b9-466d-ad1a-bded0e4f8356@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to
- GRO from netif_receive_skb_list()
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Daniel Xu <dxu@dxuuu.xyz>
-Cc: Alexander Lobakin <alexandr.lobakin@intel.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
- Yajun Deng <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
-References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
- <20220628194812.1453059-33-alexandr.lobakin@intel.com>
- <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
- <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
- <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
- <e0616dcc-1007-4faf-8825-6bf536799cbf@intel.com> <874j7oean6.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <874j7oean6.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6185be94-65b9-466d-ad1a-bded0e4f8356@redhat.com>
+
+Hello Paolo,
+
+On Tue, Aug 13, 2024 at 01:55:27PM +0200, Paolo Abeni wrote:
+> On 8/9/24 18:19, Breno Leitao wrote:> @@ -1304,8 +1308,6 @@ static int
+> __init init_netconsole(void)
+> >   		while ((target_config = strsep(&input, ";"))) {
+> >   			nt = alloc_param_target(target_config, count);
+> >   			if (IS_ERR(nt)) {
+> > -				if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC))
+> > -					continue;
+> >   				err = PTR_ERR(nt);
+> >   				goto fail;
+> >   			}
+
+First of all, thanks for the in-depth review and suggestion.
 
 
-
-On 13/08/2024 16.54, Toke Høiland-Jørgensen wrote:
-> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+> AFAICS the above introduces a behavior change: if CONFIG_NETCONSOLE_DYNAMIC
+> is enabled, and the options parsing fails for any targets in the command
+> line, all the targets will be removed.
 > 
->> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->> Date: Thu, 8 Aug 2024 13:57:00 +0200
->>
->>> From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
->>> Date: Thu, 8 Aug 2024 06:54:06 +0200
->>>
->>>>> Hi Alexander,
->>>>>
->>>>> On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
->>>>>> cpumap has its own BH context based on kthread. It has a sane batch
->>>>>> size of 8 frames per one cycle.
->>>>>> GRO can be used on its own, adjust cpumap calls to the
->>>>>> upper stack to use GRO API instead of netif_receive_skb_list() which
->>>>>> processes skbs by batches, but doesn't involve GRO layer at all.
->>>>>> It is most beneficial when a NIC which frame come from is XDP
->>>>>> generic metadata-enabled, but in plenty of tests GRO performs better
->>>>>> than listed receiving even given that it has to calculate full frame
->>>>>> checksums on CPU.
->>>>>> As GRO passes the skbs to the upper stack in the batches of
->>>>>> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
->>>>>> device where the frame comes from, it is enough to disable GRO
->>>>>> netdev feature on it to completely restore the original behaviour:
->>>>>> untouched frames will be being bulked and passed to the upper stack
->>>>>> by 8, as it was with netif_receive_skb_list().
->>>>>>
->>>>>> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
->>>>>> ---
->>>>>>   kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->>>>>>   1 file changed, 38 insertions(+), 5 deletions(-)
->>>>>>
->>>>>
->>>>> AFAICT the cpumap + GRO is a good standalone improvement. I think
->>>>> cpumap is still missing this.
->>>
->>> The only concern for having GRO in cpumap without metadata from the NIC
->>> descriptor was that when the checksum status is missing, GRO calculates
->>> the checksum on CPU, which is not really fast.
->>> But I remember sometimes GRO was faster despite that.
->>>
->>>>>
->>>>> I have a production use case for this now. We want to do some intelligent
->>>>> RX steering and I think GRO would help over list-ified receive in some cases.
->>>>> We would prefer steer in HW (and thus get existing GRO support) but not all
->>>>> our NICs support it. So we need a software fallback.
->>>>>
->>>>> Are you still interested in merging the cpumap + GRO patches?
->>>
->>> For sure I can revive this part. I was planning to get back to this
->>> branch and pick patches which were not related to XDP hints and send
->>> them separately.
->>>
->>>>
->>>> Hi Daniel and Alex,
->>>>
->>>> Recently I worked on a PoC to add GRO support to cpumap codebase:
->>>> - https://github.com/LorenzoBianconi/bpf-next/commit/a4b8264d5000ecf016da5a2dd9ac302deaf38b3e
->>>>    Here I added GRO support to cpumap through gro-cells.
->>>> - https://github.com/LorenzoBianconi/bpf-next/commit/da6cb32a4674aa72401c7414c9a8a0775ef41a55
->>>>    Here I added GRO support to cpumap trough napi-threaded APIs (with a some
->>>>    changes to them).
->>>
->>> Hmm, when I was testing it, adding a whole NAPI to cpumap was sorta
->>> overkill, that's why I separated GRO structure from &napi_struct.
->>>
->>> Let me maybe find some free time, I would then test all 3 solutions
->>> (mine, gro_cells, threaded NAPI) and pick/send the best?
->>>
->>>>
->>>> Please note I have not run any performance tests so far, just verified it does
->>>> not crash (I was planning to resume this work soon). Please let me know if it
->>>> works for you.
->>
->> I did tests on both threaded NAPI for cpumap and my old implementation
->> with a traffic generator and I have the following (in Kpps):
->>
+> I think the old behavior is preferable - just skip the targets with wrong
+> options.
 
-What kind of traffic is the traffic generator sending?
+Thinking about it again, and I think I agree with you here. I will
+update.
 
-E.g. is this a type of traffic that gets GRO aggregated?
+> Side note: I think the error paths in __netpoll_setup() assume the struct
+> netpoll will be freed in case of error, e.g. the device refcount is released
+> but np->dev is not cleared, I fear we could hit a reference underflow on
+> <setup error>, <disable>
 
->>              direct Rx    direct GRO    cpumap    cpumap GRO
->> baseline    2900         5800          2700      2700 (N/A)
->> threaded                               2300      4000
->> old GRO                                2300      4000
->>
+That is a good catch, and I was even able to simulate it, by forcing two
+errors:
 
-Nice results. Just to confirm, the units are in Kpps.
+Something as:
 
+--- a/net/core/netpoll.c
+	+++ b/net/core/netpoll.c
+	@@ -637,7 +637,8 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+		}
 
->> IOW,
->>
->> 1. There are no differences in perf between Lorenzo's threaded NAPI
->>     GRO implementation and my old implementation, but Lorenzo's is also
->>     a very nice cleanup as it switches cpumap to threaded NAPI completely
->>     and the final diffstat even removes more lines than adds, while mine
->>     adds a bunch of lines and refactors a couple hundred, so I'd go with
->>     his variant.
->>
->> 2. After switching to NAPI, the performance without GRO decreases (2.3
->>     Mpps vs 2.7 Mpps), but after enabling GRO the perf increases hugely
->>     (4 Mpps vs 2.7 Mpps) even though the CPU needs to compute checksums
->>     manually.
-> 
-> One question for this: IIUC, the benefit of GRO varies with the traffic
-> mix, depending on how much the GRO logic can actually aggregate. So did
-> you test the pathological case as well (spraying packets over so many
-> flows that there is basically no aggregation taking place)? Just to make
-> sure we don't accidentally screw up performance in that case while
-> optimising for the aggregating case :)
-> 
+		if (!ndev->npinfo) {
+	-               npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
+	+               npinfo = NULL;
 
-For the GRO use-case, I think a basic TCP stream throughput test (like
-netperf) should show a benefit once cpumap enable GRO, Can you confirm this?
-Or does the missing hardware RX-hash and RX-checksum cause TCP GRO not
-to fully work, yet?
+	diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+	index 41a61fa88c32..2c6190808e75 100644
+	--- a/drivers/net/netconsole.c
+	+++ b/drivers/net/netconsole.c
+	@@ -1327,12 +1330,17 @@ static int __init init_netconsole(void)
+		}
 
-Thanks A LOT for doing this benchmarking!
---Jesper
+		err = dynamic_netconsole_init();
+	+       err = 1;
+		if (err)
+			goto undonotifier;
 
+	
+This caused the following issue:
+	
+	[   19.530831] netconsole: network logging stopped on interface eth0 as it unregistered
+	[   19.531205] ref_tracker: reference already released.
+	[   19.531426] ref_tracker: allocated in:
+	[   19.531505]  netpoll_setup+0xfd/0x7f0
+	[   19.531505]  init_netconsole+0x300/0x960
+	....
+	[   19.534532] ------------[ cut here ]------------
+	[   19.534784] WARNING: CPU: 5 PID: 1 at lib/ref_tracker.c:255 ref_tracker_free+0x4e5/0x740
+	[   19.535103] Modules linked in:
+	....
+	[   19.542116]  ? ref_tracker_free+0x4e5/0x740
+	[   19.542286]  ? refcount_inc+0x40/0x40
+	[   19.542571]  ? do_netpoll_cleanup+0x4e/0xb0
+	[   19.542752]  ? netconsole_process_cleanups_core+0xcd/0x260
+	[   19.542961]  ? netconsole_netdev_event+0x3ab/0x3e0
+	[   19.543199]  ? unregister_netdevice_notifier+0x27c/0x2f0
+	[   19.543456]  ? init_netconsole+0xe4/0x960
+	[   19.543615]  ? do_one_initcall+0x1a8/0x5d0
+	[   19.543764]  ? do_initcall_level+0x133/0x1e0
+	[   19.543963]  ? do_initcalls+0x43/0x80
+	....
+
+That said, now, the list contains enabled and disabled targets. All the
+disable targets have netpoll disabled, thus, we don't handle network
+operations in the disabled targets.
+
+This is my new proposal, based on your feedback, how does it look like?
+
+Thanks for the in-depth review,
+--breno
+
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 30b6aac08411..60325383ab6d 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1008,6 +1008,8 @@ static int netconsole_netdev_event(struct notifier_block *this,
+ 	mutex_lock(&target_cleanup_list_lock);
+ 	spin_lock_irqsave(&target_list_lock, flags);
+ 	list_for_each_entry_safe(nt, tmp, &target_list, list) {
++		if (!nt->enabled)
++			continue;
+ 		netconsole_target_get(nt);
+ 		if (nt->np.dev == dev) {
+ 			switch (event) {
+@@ -1258,11 +1260,15 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+ 		goto fail;
+ 
+ 	err = netpoll_setup(&nt->np);
+-	if (err)
++	if (!err)
++		nt->enabled = true;
++	else if (!IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC))
++		/* only fail if dynamic reconfiguration is set,
++		 * otherwise, keep the target in the list, but disabled.
++		 */
+ 		goto fail;
+ 
+ 	populate_configfs_item(nt, cmdline_count);
+-	nt->enabled = true;
+ 
+ 	return nt;
+ 
+@@ -1274,7 +1280,8 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+ /* Cleanup netpoll for given target (from boot/module param) and free it */
+ static void free_param_target(struct netconsole_target *nt)
+ {
+-	netpoll_cleanup(&nt->np);
++	if (nt->enabled)
++		netpoll_cleanup(&nt->np);
+ 	kfree(nt);
+ }
+ 
 
