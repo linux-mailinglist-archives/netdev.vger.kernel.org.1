@@ -1,48 +1,46 @@
-Return-Path: <netdev+bounces-117965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4EC950199
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:52:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35EFA9501BB
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C6641C21CFF
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:52:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D132E1F213FA
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E6718B480;
-	Tue, 13 Aug 2024 09:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DAE186E37;
+	Tue, 13 Aug 2024 09:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ytm7Tvhu"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bAqzeJzF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B119D18A94E;
-	Tue, 13 Aug 2024 09:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0554184537;
+	Tue, 13 Aug 2024 09:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723542712; cv=none; b=WGNIDrPMvVZ4gM98lPcwGTv90QUwu1tOroOBQsoq1qxfae4KNncsUes+XWBODeoExv0mdWEs4SZRT64Ke9Sv5jEg83DCXr6plYNX/eFbO/ih9a9nqW7FUYT2j6Ho0P/JvX2gxnqE7jUaGdUZpWNHKwxEgbqNZ2XZgjqRsmfMcHo=
+	t=1723542930; cv=none; b=qw4e2UQ6vrP+sWxv+QRIO9dhojXYIJF+/831cCOmhcEuh5DGdZzGaA5vyPcqNYeTPTq7cn4Xj4JYEFUIvUgEaJ8KJA7US+gcOVRr3BbbvryB4dArj3FxMlq6j05m9CkdF5ALX70ttIKz6dC642U7XI43LufxQk4ifAzEEXSnVN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723542712; c=relaxed/simple;
-	bh=uVOY6MUqZfSq5bY4z+orE5FTCDv75mRnwySRQagyf+g=;
+	s=arc-20240116; t=1723542930; c=relaxed/simple;
+	bh=mBZjPsIip8ChxWqV/5GWGXSHC/8iHBTHDrncClDOvA0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kwtZFTvTEnB+2xfilhFwlIkgTKNNysVhNGAaPbkIFL4yTJuW1uh/6A9xQQtgKe4teIu8vtYpbn1gzGnvYtSr/3Wh2hm8/iWcgVZBRB7MoNrAJQ8FbgHpEAhBIc8CTfghFp53iV4Ty3QIdKLTmX4gmhuntVWDG3qx88qw918y2eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ytm7Tvhu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09894C4AF09;
-	Tue, 13 Aug 2024 09:51:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723542712;
-	bh=uVOY6MUqZfSq5bY4z+orE5FTCDv75mRnwySRQagyf+g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ytm7TvhuuejqWWg1WHrU3jv75npQYgUzDDT5st8BLE2SxX1uDkDV0E2HZLzS8jbC2
-	 le65h2j5yY1CN+R5DzTnynWTPTTS+nTJ+loHoZN5Ib+Pja9YJC9jJWboCiM8SwaRUT
-	 2+UToawwW62NZcJorDViGjTDo1D050P2H3KTirPlxzuOpu8Yf7Gj9r+p1FqUeQ05v2
-	 Ny2NBKHPvom94GNNGVgrANr+ata9umSor01qhB4MlwECY48TOKuc91z6v0F4igIXBJ
-	 /+aTwuiv3Ei0jozth6vmA+Xhde3NPflEoXODwfn+cxoxp0QqBKioU+/GNFILu/2aMx
-	 e5AAAOwaKTRsA==
-Message-ID: <25860d8b-a980-4f04-a376-b9cec03605fb@kernel.org>
-Date: Tue, 13 Aug 2024 11:51:45 +0200
+	 In-Reply-To:Content-Type; b=dPlDxxl4h5wXZNAyqM1YKAPZUzdxecULSZPss5iEmaqA4M/rvFhkHEbYzg3yiCA/MtYPe7r4/0/VzuseFdGFzdzugJ6zeickTECXUGcz7SGiGRgt+qlOzc+IKYm0Zm5jBk7dlgKwbMzoa/LY6yeqI2f6ZXnTtoX2kKomW2ExrrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bAqzeJzF; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723542919; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=PciOPByFQj1IHN+EiM5rFX59Gxp74CyWVTSVv+ptmmM=;
+	b=bAqzeJzFZY3sHWGkdPLoPAXX5Sp6KRAi0TH5rknVYePWj907SBuCeovDAjhOsEgYa1+L+0MteYr8TdYrBjeTa+v6Di3bix0lU23/tjqRx+97r1NaM4T1TDQD9I4lpOoPZmxwtui/74c9Q6QnKFhLttBRxTz1OXnJeLkVTscikDM=
+Received: from 30.221.130.54(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCod0x1_1723542917)
+          by smtp.aliyun-inc.com;
+          Tue, 13 Aug 2024 17:55:18 +0800
+Message-ID: <b3e8c9b9-f708-4906-b010-b76d38db1fb1@linux.alibaba.com>
+Date: Tue, 13 Aug 2024 17:55:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,96 +48,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to
- GRO from netif_receive_skb_list()
-To: Jakub Kicinski <kuba@kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Lorenzo Bianconi
- <lorenzo.bianconi@redhat.com>, Alexander Lobakin
- <alexandr.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, "toke@redhat.com"
- <toke@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- John Fastabend <john.fastabend@gmail.com>, Yajun Deng
- <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
-References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
- <20220628194812.1453059-33-alexandr.lobakin@intel.com>
- <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
- <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
- <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
- <308fd4f1-83a9-4b74-a482-216c8211a028@app.fastmail.com>
- <99662019-7e9b-410d-99fe-a85d04af215c@intel.com>
- <20240812183307.0b6fbd60@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240812183307.0b6fbd60@kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] net/smc: introduce statistics for
+ allocated ringbufs of link group
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240807075939.57882-1-guwen@linux.alibaba.com>
+ <20240807075939.57882-2-guwen@linux.alibaba.com>
+ <20240812174144.1a6c2c7a@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240812174144.1a6c2c7a@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 13/08/2024 03.33, Jakub Kicinski wrote:
-> On Fri, 9 Aug 2024 14:20:25 +0200 Alexander Lobakin wrote:
->> But I think one solution could be:
->>
->> 1. We create some generic structure for cpumap, like
->>
->> struct cpumap_meta {
->> 	u32 magic;
->> 	u32 hash;
->> }
->>
->> 2. We add such check in the cpumap code
->>
->> 	if (xdpf->metalen == sizeof(struct cpumap_meta) &&
->> 	    <here we check magic>)
->> 		skb->hash = meta->hash;
->>
->> 3. In XDP prog, you call Rx hints kfuncs when they're available, obtain
->> RSS hash and then put it in the struct cpumap_meta as XDP frame metadata.
+On 2024/8/13 08:41, Jakub Kicinski wrote:
+> On Wed,  7 Aug 2024 15:59:38 +0800 Wen Gu wrote:
+>> +	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_R_SNDBUF_ALLOC,
+>> +			      lgr->alloc_sndbufs, SMC_NLA_LGR_R_PAD))
 > 
-> I wonder what the overhead of skb metadata allocation is in practice.
-> With Eric's "return skb to the CPU of origin" we can feed the lockless
-> skb cache one the right CPU, and also feed the lockless page pool
-> cache. I wonder if batched RFS wouldn't be faster than the XDP thing
-> that requires all the groundwork.
+> nla_put_uint()
 
-I explicitly developed CPUMAP because I was benchmarking Receive Flow
-Steering (RFS) and Receive Packet Steering (RPS), which I observed was
-the bottleneck.  The overhead was too large on the RX-CPU and bottleneck
-due to RFS and RPS maintaining data structures to avoid Out-of-Order
-packets.   The Flow Dissector step was also a limiting factor.
+Hi, Jakub. Thank you for reminder.
 
-By bottleneck I mean it didn't scale, as RX-CPU packet per second
-processing speeds was too low compared to the remote-CPU pps.
-Digging in my old notes, I can see that RPS was limited to around 4.8
-Mpps (and I have a weird disabling part of it showing 7.5Mpps).  In [1]
-remote-CPU could process (starts at) 2.7 Mpps when dropping UDP packet
-due to UdpNoPorts configured (and baseline 3.3 Mpps if not remote), thus
-it only scales up-to 1.78 remote-CPUs.  [1] shows how optimizations
-brings remote-CPU to handle 3.2Mpps (close non-remote to 3.3Mpps
-baseline). In [2] those optimizations bring remote-CPU to 4Mpps (for
-UdpNoPorts case).  XDP RX-redirect in [1]+[2] was around 19Mpps (which
-might be lower today due to perf paper cuts).
-
-  [1] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/cpumap/cpumap02-optimizations.org
-  [2] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/cpumap/cpumap03-optimizations.org
-
-The benefits Eric's "return skb to the CPU of origin" should help
-improve the case for the remote-CPU, as I was seeing some bottlenecks in
-how we returned the memory.
-
---Jesper
+I read the commit log and learned the advantages of this helper.
+But it seems that the support for corresponding user-space helpers
+hasn't kept up yet, e.g. can't find a helper like nla_get_uint in
+latest libnl.
 
