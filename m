@@ -1,143 +1,189 @@
-Return-Path: <netdev+bounces-117994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DB895031E
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 12:58:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564BD95033E
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:06:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13B171F239E6
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 10:58:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C3E1284704
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12BD619AD6C;
-	Tue, 13 Aug 2024 10:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3571F189918;
+	Tue, 13 Aug 2024 11:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="vRJU9sAN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch0rXnO0"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4499619AA5F;
-	Tue, 13 Aug 2024 10:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C99421345
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723546728; cv=none; b=OY03rrgs+9iPbFUF0gqhguCWUNHhQxpZ//gzMX+DhYPGIMEG3Jc0+a6P//OEfzYzVKKcRHVlxy5VGcWODKmLurjqKve5waCOicfw1WVCUXHraDkZ5pIx0YU+I8/HBbSGWAa6nJkRmoJl0ZEi5E3UWTfP44w4kj78dk3YBERwoNk=
+	t=1723547183; cv=none; b=sQKGRB3KHtbr0b5f7kI1Scvxrsva4PYPc4e5zreIu/4ysFK3RxfWea4Y/qxFng0fG7EIzORN1P472G+qnywRRbVtSDotPCdeQ32NVO02n6wk2eKxGeH4fRD6giUnp2Bk0tPoP0QnYqLUfEPI3Y6eO0RO2B7MSD25KvPK4RR+JMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723546728; c=relaxed/simple;
-	bh=amLSKSyOu/TcfOjB3E3e/dsqli4Esy0qc7vDMfnCbcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M6dx4lVqfNUyrF0U06AxwPpHSO1UOVswto5PJ1WTH0R8cxJErPEL8XXlJwPLuN7Q+w5gDSg3OCr9Z5zf6pPQl6TOcVnLf0Nei2QYtJjcL0GyyxHqrdzaPKR4QI8DwbIEgsAdZXAqHMs6MlrI4MOFyszn+4phozZKzxHQmIiDt4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=vRJU9sAN; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id A049B2EC;
-	Tue, 13 Aug 2024 12:57:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1723546668;
-	bh=amLSKSyOu/TcfOjB3E3e/dsqli4Esy0qc7vDMfnCbcI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vRJU9sANRKu+3vwmYfX2EQKmkIvXsWKIVnQ/85XypownXWAeXSs+pqSG9YBxgDbFK
-	 rtZ8/4JRyY2GW7khAZAMiTOR0LHnX328e2WVMHsvY/ZHq80EYP+2FrX9k5UaswNaSy
-	 WXDmMpomtpDTxzJChGbXQ+9/16+NxkW1qWXYjPiY=
-Date: Tue, 13 Aug 2024 13:58:22 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Tomasz Figa <tomasz.figa@gmail.com>
-Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Sakari Ailus <sakari.ailus@iki.fi>,
-	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240813105822.GD24634@pendragon.ideasonboard.com>
-References: <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
- <20240726105936.GC28621@pendragon.ideasonboard.com>
- <CAPybu_1y7K940ndLZmy+QdfkJ_D9=F9nTPpp=-j9HYpg4AuqqA@mail.gmail.com>
- <20240728171800.GJ30973@pendragon.ideasonboard.com>
- <CAPybu_3M9GYNrDiqH1pXEvgzz4Wz_a672MCkNGoiLy9+e67WQw@mail.gmail.com>
- <Zqol_N8qkMI--n-S@valkosipuli.retiisi.eu>
- <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
- <CA+Ln22E1YXGykjKqVO+tT8d_3-GYSEf-zY0TEHJq3w7HQEhFhA@mail.gmail.com>
- <20240813102638.GB24634@pendragon.ideasonboard.com>
- <CA+Ln22EzL7M+BLXS6dFi0n80XXkQu1CuoUad0EtjZ2ZEnNX=Kg@mail.gmail.com>
+	s=arc-20240116; t=1723547183; c=relaxed/simple;
+	bh=bkhqbZYWYWSZvsQl29u3Z23IpM9oWQsNayuAc+Nsvbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o0LxyNETgss1Uu5b/3IJn5cM66ysS5vCNP7b7N+GlCeYPGoOjTwn/AZBMIjMNH6mZW+8YJ81qKsHmAsK9m5RAPBpD36zZHWTd2cbBOPrHEdObl1+naI2Z/8GV82WVCpK38MLBtqC3bHljS/YLZ63QnLFx2fil7yaoDB2OvDBwQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ch0rXnO0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723547180;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t2NdeYI2y6Sud7cQVQ4w+JoVN5gbV8B7m8JMtP5JxuA=;
+	b=ch0rXnO06Iwpnkc/pwi8uQRYVMlKkPWXAn+wqEh3VbGJfo0Rwe0pDGazAzC+MXbIhexPx0
+	HbmoI0Qea46ACIKXkroY7ICaEpuGo7+x9nCKuu90Mv0gaqqJEBbFwHyXh56PdWFOIXMlss
+	HojUMqkv+5fRJWFNNyAWj8lU8scnqU4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-PSBImtjeN0uO_DM0JFKfTg-1; Tue, 13 Aug 2024 07:06:19 -0400
+X-MC-Unique: PSBImtjeN0uO_DM0JFKfTg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-428e4f08510so10394445e9.3
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 04:06:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723547178; x=1724151978;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t2NdeYI2y6Sud7cQVQ4w+JoVN5gbV8B7m8JMtP5JxuA=;
+        b=PttxMCCmStkrfgIGeNjowy6BrKVukDAC44ZMwh4AfTHk0MiJIdhRY3ZmfTjvcxTIjF
+         SARQiGjMtrlYRU5xk2IvTvOYzgEINoTcmc/0Dr6uq/V9St7Odu8X6BFRZPxIWCs9un0p
+         KgUqE0C2DycZgMPq0NOfYAyGPLq5mGWFbJ4gSEt8HJkH7xvCTIXbUiigeLIRug4GNNM1
+         C/s1aiB0r3ivmnfMSyX7iRrxCCt+40H7e7WqVB4jwff/PimH8ynIL56EAxJdL7ViAEhA
+         OJeQKhks8su67bCxPJgw1Bp3TFDj/fEQmLccErG5GrG6i7oXcyvqeEIN1JaCGyz140Hz
+         h7zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxx6ZJ7qqn8XRenA5P536VpqeUlt6J35XvwyWftSkDlFKBWC0bXJ79spiEMjDPa7IAhLBjxf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5S24PpC0ROb13uXwyQClqtQ/R7NRK0t2rB3fNchpCNOaIJT1R
+	hP6KPyj321yBIkuxiB/Jh1wfGS4AQj+limW1MS+DdOItbRIfgmwguBkJRplrHP0X38qyB1fm412
+	QQwbAx2WsaCbpY6tggjXXVOLS4x3YU06hBu8SBfMpTME8DvPgnOw3kg==
+X-Received: by 2002:a5d:6d82:0:b0:367:9505:73ed with SMTP id ffacd0b85a97d-3716fc78f67mr732476f8f.7.1723547177673;
+        Tue, 13 Aug 2024 04:06:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFa7Vi7jbvh74+IcXC90KHicELNDDcvYfv7kh0HQ3hv001MY6PHY4Uwx5U6i85VLvRvhb37Nw==
+X-Received: by 2002:a5d:6d82:0:b0:367:9505:73ed with SMTP id ffacd0b85a97d-3716fc78f67mr732456f8f.7.1723547177128;
+        Tue, 13 Aug 2024 04:06:17 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1708:9110:151e:7458:b92f:3067? ([2a0d:3344:1708:9110:151e:7458:b92f:3067])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4cfef6fasm9961156f8f.60.2024.08.13.04.06.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 04:06:16 -0700 (PDT)
+Message-ID: <8fe01ef6-2c85-4843-b686-8cb43cc1f454@redhat.com>
+Date: Tue, 13 Aug 2024 13:06:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+Ln22EzL7M+BLXS6dFi0n80XXkQu1CuoUad0EtjZ2ZEnNX=Kg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: ipv6: ioam6: new feature tunsrc
+To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org
+References: <20240809123915.27812-1-justin.iurman@uliege.be>
+ <20240809123915.27812-3-justin.iurman@uliege.be>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240809123915.27812-3-justin.iurman@uliege.be>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 07:33:59PM +0900, Tomasz Figa wrote:
-> 2024年8月13日(火) 19:27 Laurent Pinchart <laurent.pinchart@ideasonboard.com>:
-> > On Tue, Aug 13, 2024 at 07:17:07PM +0900, Tomasz Figa wrote:
-> > > 2024年7月31日(水) 22:16 Daniel Vetter <daniel.vetter@ffwll.ch>:
-> > > >
-> > > > On Wed, 31 Jul 2024 at 13:55, Sakari Ailus <sakari.ailus@iki.fi> wrote:
-> > > > > This is also very different from GPUs or accel devices that are built to be
-> > > > > user-programmable. If I'd compare ISPs to different devices, then the
-> > > > > closest match would probably be video codecs -- which also use V4L2.
-> > > >
-> > > > Really just aside, but I figured I should correct this. DRM supports
-> > > > plenty of video codecs. They're all tied to gpus, but the real reason
-> > > > really is that the hw has decent command submission support so that
-> > > > running the entire codec in userspace except the basic memory and
-> > > > batch execution and synchronization handling in the kernel is a
-> > > > feasible design.
-> > >
-> > > FWIW, V4L2 also has an interface for video decoders that require
-> > > bitstream processing in software, it's called the V4L2 Stateless
-> > > Decoder interface [1]. It defines low level data structures that map
-> > > directly to the particular codec specification, so the kernel
-> > > interface is generic and the userspace doesn't need to have
-> > > hardware-specific components. Hardware that consumes command buffers
-> > > can be supported simply by having the kernel driver fill the command
-> > > buffers as needed (as opposed to writing the registers directly).
-> > > On the other hand, DRM also has the fixed function (i.e. V4L2-alike)
-> > > KMS interface for display controllers, rather than a command buffer
-> > > passthrough, even though some display controllers actually are driven
-> > > by command buffers.
-> > > So arguably it's possible and practical to do both command
-> > > buffer-based and fixed interfaces for both display controllers and
-> > > video codecs. Do you happen to know some background behind why one or
-> > > the other was chosen for each of them in DRM?
-> > >
-> > > For how it applies to ISPs, there are both types of ISPs out in the
-> > > wild, some support command buffers, while some are programmed directly
-> > > via registers.
-> >
-> > Could you provide examples of ISPs that use command buffers ? The
-> > discussion has remained fairly vague so far, which I think hinders
-> > progress.
-> >
-> > > For the former, I can see some loss of flexibility if
-> > > the command buffers are hidden behind a fixed function API, because
-> > > the userspace would only be able to do what the kernel driver supports
-> > > internally, which could make some use case-specific optimizations very
-> > > challenging if not impossible.
-> >
-> > Let's try to discuss this with specific examples.
+On 8/9/24 14:39, Justin Iurman wrote:
+> This patch provides a new feature (i.e., "tunsrc") for the tunnel (i.e.,
+> "encap") mode of ioam6. Just like seg6 already does, except it is
+> attached to a route. The "tunsrc" is optional: when not provided (by
+> default), the automatic resolution is applied. Using "tunsrc" when
+> possible has a benefit: performance.
+
+It's customary to include performances figures in performance related 
+changeset ;)
+
 > 
-> AFAIK Intel IPU6 and newer, Qualcomm and MediaTek ISPs use command
-> buffers natively.
+> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+> ---
+>   include/uapi/linux/ioam6_iptunnel.h |  7 +++++
+>   net/ipv6/ioam6_iptunnel.c           | 48 ++++++++++++++++++++++++++---
+>   2 files changed, 51 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/uapi/linux/ioam6_iptunnel.h b/include/uapi/linux/ioam6_iptunnel.h
+> index 38f6a8fdfd34..6cdbd0da7ad8 100644
+> --- a/include/uapi/linux/ioam6_iptunnel.h
+> +++ b/include/uapi/linux/ioam6_iptunnel.h
+> @@ -50,6 +50,13 @@ enum {
+>   	IOAM6_IPTUNNEL_FREQ_K,		/* u32 */
+>   	IOAM6_IPTUNNEL_FREQ_N,		/* u32 */
+>   
+> +	/* Tunnel src address.
+> +	 * For encap,auto modes.
+> +	 * Optional (automatic if
+> +	 * not provided).
+> +	 */
+> +	IOAM6_IPTUNNEL_SRC,		/* struct in6_addr */
+> +
+>   	__IOAM6_IPTUNNEL_MAX,
+>   };
+>   
+> diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+> index cd2522f04edf..e0e73faf9969 100644
+> --- a/net/ipv6/ioam6_iptunnel.c
+> +++ b/net/ipv6/ioam6_iptunnel.c
+> @@ -42,6 +42,8 @@ struct ioam6_lwt {
+>   	struct ioam6_lwt_freq freq;
+>   	atomic_t pkt_cnt;
+>   	u8 mode;
+> +	bool has_tunsrc;
+> +	struct in6_addr tunsrc;
+>   	struct in6_addr tundst;
+>   	struct ioam6_lwt_encap tuninfo;
+>   };
+> @@ -72,6 +74,7 @@ static const struct nla_policy ioam6_iptunnel_policy[IOAM6_IPTUNNEL_MAX + 1] = {
+>   	[IOAM6_IPTUNNEL_MODE]	= NLA_POLICY_RANGE(NLA_U8,
+>   						   IOAM6_IPTUNNEL_MODE_MIN,
+>   						   IOAM6_IPTUNNEL_MODE_MAX),
+> +	[IOAM6_IPTUNNEL_SRC]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
+>   	[IOAM6_IPTUNNEL_DST]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
+>   	[IOAM6_IPTUNNEL_TRACE]	= NLA_POLICY_EXACT_LEN(
+>   					sizeof(struct ioam6_trace_hdr)),
+> @@ -144,6 +147,11 @@ static int ioam6_build_state(struct net *net, struct nlattr *nla,
+>   	else
+>   		mode = nla_get_u8(tb[IOAM6_IPTUNNEL_MODE]);
+>   
+> +	if (tb[IOAM6_IPTUNNEL_SRC] && mode == IOAM6_IPTUNNEL_MODE_INLINE) {
+> +		NL_SET_ERR_MSG(extack, "no tunnel source expected in this mode");
+> +		return -EINVAL;
+> +	}
 
-At the hardware level, firmware level, or both ? Is there a way we can
-get more information about the structure of the command buffer and how
-it is handled by the ISP for any of those three platforms ?
+when mode is IOAM6_IPTUNNEL_MODE_AUTO, the data path could still add the 
+encapsulation for forwarded packets, why explicitly preventing this 
+optimization in such scenario?
 
-> > > [1] https://www.kernel.org/doc/html/latest/userspace-api/media/v4l/dev-stateless-decoder.html
-> > >
-> > > > And actually good, because your kernel wont ever blow
-> > > > up trying to parse complex media formats because it just doesn't.
+> +
+>   	if (!tb[IOAM6_IPTUNNEL_DST] && mode != IOAM6_IPTUNNEL_MODE_INLINE) {
+>   		NL_SET_ERR_MSG(extack, "this mode needs a tunnel destination");
+>   		return -EINVAL;
+> @@ -178,6 +186,14 @@ static int ioam6_build_state(struct net *net, struct nlattr *nla,
+>   	ilwt->freq.n = freq_n;
+>   
+>   	ilwt->mode = mode;
+> +
+> +	if (!tb[IOAM6_IPTUNNEL_SRC]) {
+> +		ilwt->has_tunsrc = false;
+> +	} else {
+> +		ilwt->has_tunsrc = true;
+> +		ilwt->tunsrc = nla_get_in6_addr(tb[IOAM6_IPTUNNEL_SRC]);
 
--- 
-Regards,
+Since you are going to use the source address only if != ANY, I think it 
+would be cleaner to refuse such addresses here. That will avoid an 
+additional check in the datapath.
 
-Laurent Pinchart
+Cheers,
+
+Paolo
+
 
