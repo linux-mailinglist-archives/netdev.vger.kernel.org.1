@@ -1,93 +1,111 @@
-Return-Path: <netdev+bounces-117895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A5C494FB86
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 03:59:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57DBC94FB97
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 04:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6D41C220C7
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 01:59:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8929D1C215E5
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 02:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD5CC156;
-	Tue, 13 Aug 2024 01:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CA311CA1;
+	Tue, 13 Aug 2024 02:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeQU0UF7"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="wntuwfQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC1C14A82
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 01:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62451B27D;
+	Tue, 13 Aug 2024 02:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723514334; cv=none; b=oQ58PLKSX+/mIBmyPYXPf2SN5YhVPrbjQIR/5X/b48MkBx7ejwxUd60rvsDWPoKjvgZbVnJfGi4Yj7B5ApxN3BcwNiW33RGY17v9fvuRDazPGrnnOfa6WXsdHRnTMFy1P+96XDRLpx4alytsCRGiNA9UBlIlPvt76u8Zk4XpRyM=
+	t=1723514818; cv=none; b=Jdo73GzOrte/xkK8pi7DJjiPC1BEm9VmajPKkemDkCAIPAujWrlz2ca+UHWC748jm8PK8haPaePx4UMsIIY1SRbQkggihTbvrpNT17RT7jO7zVjBTokqwcpf4DJH15ZHY68rg2Jvnm8VIis8PpUlFFMD59bABiiiRVfJWAWVwUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723514334; c=relaxed/simple;
-	bh=BHWWaqT5IAXIKhwTKbpDfl06h51StkdnU/MRzOcRkGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WEDFeNMlLmDp3i7bCAYkLK+73oYhWcXzwpkRHqoSJ8WfzGq3WZBm4Gj0+RWE8uJLbDbTzTcr6qiTJTiRJCA6Wp8eaNwPi7/aeBsXC1hN9lRRCDkgUAmqU3yQKADq70BszqKrOL9V0kLjVf9i6gIbS2unYvnhr7tLwl808HzM7Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeQU0UF7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54E6FC4AF0D;
-	Tue, 13 Aug 2024 01:58:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723514334;
-	bh=BHWWaqT5IAXIKhwTKbpDfl06h51StkdnU/MRzOcRkGY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MeQU0UF7p9y37w+sxLBUvuvLUWEm0VAxIs0081Bq2JVkvE/JxDRE5jocQQuJvP/h3
-	 IkK3l3Afen+al+TGn3CQZnwcL/jbG7KUMv/WPO2Z5MZgqUORSgOBfWW+KYkQV9SLUS
-	 80k8m2FhlHfFen6c6GR94+BPQ7ozNt0ZGl91G5tJDdGhz6v6oHJ64VMrClj1lj4Vcr
-	 cb+IY5NCgWagro64s+VNfyxRWcbTvhOOK0Q4Ip4VBzckL7Bh1smM8X0CClwpKC3sC2
-	 LEPOLL637bu7lxPeDnZMJ0g/kB8anjB8Y3XfwkOAcJ4oRezhrgpLLaBXcd/5xqBjmk
-	 ags5DSh5FHLIw==
-Date: Mon, 12 Aug 2024 18:58:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse,
- David" <dwmw@amazon.com>, "Machulsky, Zorik" <zorik@amazon.com>,
- "Matushevsky, Alexander" <matua@amazon.com>, Saeed Bshara
- <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
- <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
- "Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
- <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
- <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>, "Abboud, Osama"
- <osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>,
- "Tabachnik, Ofir" <ofirt@amazon.com>, Ron Beider <rbeider@amazon.com>, Igor
- Chauskin <igorch@amazon.com>
-Subject: Re: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
- reporting support
-Message-ID: <20240812185852.46940666@kernel.org>
-In-Reply-To: <20240811100711.12921-3-darinzon@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
+	s=arc-20240116; t=1723514818; c=relaxed/simple;
+	bh=corVORvV5k/DGCqcVkY6rnEC5BkIcEdPfj2clKEZgII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQmIG0HX8ye8DdnAabRDYWhNrEo61Q3kgqkUpAD9EHkof4ADCBGpfsWXS1Ex5Phyl48L/nFeL670lZqTXc41XeFkjvOw+vWM/264el27ynKbqyqsTlBinAs3hd5PIJl60oHhymswuPJX5dZigcxNbdJFfJnYB1I14Aysk/LRjZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=wntuwfQe; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=txsNHBxQvWtLf0VpxS59PXDVocFGq080wGelPeQfVz0=; b=wntuwfQeuuOoqMv0Qf7ZjfFRmV
+	4Tv3wJQChMzeZxtJ71bIS3Arst0jMGCeUUtlXzMyGENsDQcDPugimaIxQnJ63v/xMX9Bx2SKl6kPt
+	pR+0jg4lKgPTJHwnny3VqQO3xgJnaRtJA9s5OsFEpQIPh4hPAmgkizyWkXpQmWJNxIyWCJNJu1mhU
+	B+7salhZ2nOxTpcj6TCO/ulx2mPxb4Kcui5i4gO+YM+v9TjErXQXp5cs2C285mjS+kLIf9i1JbTgO
+	iR6s+EXWk7M5/jbqJA/absXhsT6/zNhIMf52lNYceshXf7ls5qlLbFZ+UYvqUG/Iliq1CMudxdYWh
+	iJ7vlvSQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1sdgvz-00000001GNS-3BM1;
+	Tue, 13 Aug 2024 02:06:51 +0000
+Date: Tue, 13 Aug 2024 03:06:51 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Christian Brauner <brauner@kernel.org>, viro@kernel.org,
+	bpf <bpf@vger.kernel.org>,
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+	kvm@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
+ single ldimm64 insn into helper
+Message-ID: <20240813020651.GJ13701@ZenIV>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-17-viro@kernel.org>
+ <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
+ <20240807-fehlschlag-entfiel-f03a6df0e735@brauner>
+ <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
+ <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+ <20240810032952.GB13701@ZenIV>
+ <CAEf4Bzb=yJKSByBktNXQDd8rqWPNCU9EWziqQhFBnCVuTGKCdg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEf4Bzb=yJKSByBktNXQDd8rqWPNCU9EWziqQhFBnCVuTGKCdg@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Sun, 11 Aug 2024 13:07:11 +0300 David Arinzon wrote:
-> +	ENA_ADMIN_BW_IN_ALLOWANCE_EXCEEDED         = 0,
-> +	ENA_ADMIN_BW_OUT_ALLOWANCE_EXCEEDED        = 1,
-> +	ENA_ADMIN_PPS_ALLOWANCE_EXCEEDED           = 2,
-> +	ENA_ADMIN_CONNTRACK_ALLOWANCE_EXCEEDED     = 3,
-> +	ENA_ADMIN_LINKLOCAL_ALLOWANCE_EXCEEDED     = 4,
-> +	ENA_ADMIN_CONNTRACK_ALLOWANCE_AVAILABLE    = 5,
+On Mon, Aug 12, 2024 at 01:05:19PM -0700, Andrii Nakryiko wrote:
+> On Fri, Aug 9, 2024 at 8:29???PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+> >
+> > On Thu, Aug 08, 2024 at 09:51:34AM -0700, Alexei Starovoitov wrote:
+> >
+> > > The bpf changes look ok and Andrii's approach is easier to grasp.
+> > > It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
+> > > so it goes through bpf CI and our other testing.
+> > >
+> > > bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
+> > > and fderr, so pretty much independent from other patches.
+> >
+> > Representation change and switch to accessors do matter, though.
+> > OTOH, I can put just those into never-rebased branch (basically,
+> > "introduce fd_file(), convert all accessors to it" +
+> > "struct fd representation change" + possibly "add struct fd constructors,
+> > get rid of __to_fd()", for completeness sake), so you could pull it.
+> > Otherwise you'll get textual conflicts on all those f.file vs. fd_file(f)...
+> 
+> Yep, makes sense. Let's do that, we can merge that branch into
+> bpf-next/master and I will follow up with my changes on top of that.
+> 
+> Let's just drop the do_one_ldimm64() extraction, and keep fdput(f)
+> logic, plus add fd_file() accessor changes. I'll then add a switch to
+> CLASS(fd) after a bit more BPF-specific clean ups. This code is pretty
+> sensitive, so I'd rather have all the non-trivial refactoring done
+> separately. Thanks!
 
-We have similar stats in the standard "queue-capable" stats:
-
-https://docs.kernel.org/next/networking/netlink_spec/netdev.html#rx-hw-drop-ratelimits-uint
-https://docs.kernel.org/next/networking/netlink_spec/netdev.html#tx-hw-drop-ratelimits-uint
-
-they were added based on the virtio stats spec. They appear to map very
-neatly to the first stats you have. Drivers must report the stats via
-a common API if one exists.
--- 
-pw-bot: cr
+Done (#stable-struct_fd); BTW, which tree do you want "convert __bpf_prog_get()
+to CLASS(fd)" to go through?
 
