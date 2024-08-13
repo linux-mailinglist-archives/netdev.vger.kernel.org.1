@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-118160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BD9950CBB
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:01:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68B38950CC4
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1999B26827
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9960C1C226FE
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C501A3BC4;
-	Tue, 13 Aug 2024 19:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105D11A3BBD;
+	Tue, 13 Aug 2024 19:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Ac4Vw9K3"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="g6hHk7Yx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BFA19D07B
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 19:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AF318E752
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 19:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723575708; cv=none; b=OipDFLbJc7Saue9OKuIUfyCy5NfPq3qEb9wHo1mX/pnxVZ9weWDLmRphO2hK/KQcyGPvEB76AsuD5NtoeJSYY1gmoNWcXVG3nLZEWo4+AlG5MVkRwbus/rUloHpIJC/hPEroCzJ4m1sJ9+qX6N0BiBIkAVBsB3h5IDMISmko7m0=
+	t=1723575798; cv=none; b=E7nANl6w3Vc2PFmrXE0CSVYX4DsHXKVDCogeZ9r8Pco7Fkmnk87IIkhNJUqLoxpu+63W2KEJ+cCpBMypC0utZpV/Ts4JXiHaSCPFHpHXHsukBEzfhzoscI1sI9uGYL+r3unzDEn5Yh7LijdG3AR5cKgPoxvUHDbwtTZceCnJXQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723575708; c=relaxed/simple;
-	bh=B06vCpEVkLscAk1EZQAejwdszDJu8BDjq69UVV3hPZM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FSplbrk2y+7mm4ETrKZjtOk9nEa6DZ/igdi/x+/m4cCO+UTHKnOWD6yLoMVCJR+3VkxBtvsrVgwJ+M44b8mkrlwhMJJ02/KqXWuFRfKdOvXa2XCeB2FBTjokrRl7jdhgfDjTIqYOl0ftSbM2IAlUlwQQbnZxSW+HVE56lxehO3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Ac4Vw9K3; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1723575798; c=relaxed/simple;
+	bh=wZZi2FnrSd3Y6ntD+VqvzTWx0ibV9Sj/dK6MjW4hzrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EB8/4kMIsQ905SZfnT3aPNox6s3Q0cD+1wiWylI43CKKM5LuF6A3PDRFWYtD2kQ1JqKSODL5ECb+sR/i2TPEAqc6pEYHaR5F5lT0jk6KCMkjX/7eNznUeys8NbCaktWoJ7sBcFFbMhroUGF2iB/zEkzQ3RjuHV2+1YvZCd771xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=g6hHk7Yx; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-427fc97a88cso45040205e9.0
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 12:01:46 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53212e0aa92so1964401e87.0
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 12:03:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723575705; x=1724180505; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723575794; x=1724180594; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/bvdIz9zw5pv/6chqiDZ2OQiZvZ77IK4vNhyI9I4tGw=;
-        b=Ac4Vw9K3EnkjLNI+v9Z9UL/1IWaI1scoFxfKP1S+VnVkDTCTAqEtrklgFN5mhlHt1U
-         6NNVfg458rIuDylw07BCJc+p+kw1K5als6Afp/CrnJaeumohyDvDaoO3zSruZcNKRImO
-         v/iZQSoiUiNRa1/ZdlXtKiBtH8rKy1n8ukQqudPMivtWigDsh+PXsLMnyjiW37KWLV0I
-         1d+3ll0gpxxrmOmTU+UmFUNxllKov5hU9net3vVuHm1HshgiJMrhuLOvtWgYbALDulaS
-         mDLi7MgSi+iTZf2IFvm9/K0FcklcIPAoLbJfIzo78TsI3XJcoeZikSfZdFGF2oppHrae
-         KW3w==
+        bh=fpSg/3y828Pw97blr6HDnxsdU+5aKQgCf2MNnTGXTPg=;
+        b=g6hHk7YxcXKw9XYZlz/rldPNPtP9sSxJ3sP5e9/TD+gaMjqzohmlaZeYju6RqwpK3s
+         EW0YwOgAKdyl9GFH5qavww7ownEi0yz+UHzqKtdW2ThprXl+rQQEditJeq3TgyjN2FUE
+         mbEd9Vk6WF/WHVu32tWpkTG7SA+mqCzGMXQhzZdKoXv9KRXYEtWTH7h1WOOIsIGKIRZM
+         uIT//+AZ2sQCMC9gON8jVUTrD+OewaVnYf48Rspq19wg5V6bSmNlcuuFLgNZ8a+SIlfG
+         Sya7cPzOOX29nHuhRPMkGljQIKFbJbYai10US3rO6qkz2NH5I8MdO3VfXUiDa2kpKFJv
+         JygQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723575705; x=1724180505;
+        d=1e100.net; s=20230601; t=1723575794; x=1724180594;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/bvdIz9zw5pv/6chqiDZ2OQiZvZ77IK4vNhyI9I4tGw=;
-        b=HG6nGSPQwcCj0RgXa4rWWoDGLgFKgruwURj599Yr7IQwOS3BsmxRQDSjGnfngEoer2
-         QmjSgxOgl+tpWnA95gZ5yaoc0ms/KMUA6Oj7ITIQyNJyt/5MOTL8WAyr2GvEtdWnEhUa
-         KpeHF1YjLuI5rctb8VIm8q90VJQmQOG79EvSOszZrVMZbMrPtHrU+pAWDoyNyEm1gdnN
-         tJ8oiOaQuXl8BA+0SJS6iUu5ThZyBzLwnVihPWML+dzekR0rizEZPW1i5ROMYt2PY+XG
-         JIMS5EfKcoWYdEzvzrjViUOyZRrxAAU9RRtKw9F55JNq8eTYJqcjMuKmYOOUV22Us7Oz
-         jSeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVR6NsRzCXroDtd1CmMyUxg+uuB7cN9XUVy8kkY2X891Zn9uahEndunXEQb9QCydkE1CQ/zKekEfgak3j1EJJ8DkGgeDJdj
-X-Gm-Message-State: AOJu0YzfQuXt67m2VZT/ofqsm6DIXFltzrKWp1TGpuWgZ/A8TJDbceVX
-	d6/j2I5Tf0Fux08rDoAnbtKhMh9DhOFJvrkfIGorKQs/Oac7COG0eWcbrFXrCdI=
-X-Google-Smtp-Source: AGHT+IHSXmOSdT9xJa1IO63Ic3pBT1N7/ru5bLA9LmFrAWiboWXekJJr2W814VAyRznK7QNO3pcZxw==
-X-Received: by 2002:a05:600c:19d0:b0:426:58cb:8ca3 with SMTP id 5b1f17b1804b1-429dd23d446mr3364135e9.21.1723575704374;
-        Tue, 13 Aug 2024 12:01:44 -0700 (PDT)
+        bh=fpSg/3y828Pw97blr6HDnxsdU+5aKQgCf2MNnTGXTPg=;
+        b=XNfpYByZmRAkWXzN9dcaaRV1TVBIwyTjAXpAMUHf4jKxE30uCp48eRLhGB6ALxp6xG
+         zXilrSCHSFxSdajZrdvce6xU7LES0RbHGLk6BIV5QVDDoVOx4KO7LlNSlh9yclI8C/Q3
+         lhWzdCBhMnFCfJ4RQf6a/oEyq/hmdx3Ay2eESvFfERRP2tLHnnrGNXiEwkSwlW8sXjBG
+         gcyODbTy1IiyamxhU5wGXUqQd60RCfVhizAF2TUijyfXOvKXmVyyvDOgOH0duRUtFwCj
+         8HK9+VRnHBvXAWHFVFp1ng285y7MIGb1ZVekLnoF9ddSsLV/TmNMU7I356zFYJknWkPw
+         b6+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXTVXOFM1ZcMgjvb3cbazoZvGsZ7WocIHnMaSeQB2HwClzodGbC/MQ32jdD7YKxWI8hLiIusjj0DtfNH53iIP6yNsC/V3Rd
+X-Gm-Message-State: AOJu0YyUEQ0m4dDr54X+ceu+EKDuElf2vtixqyxkkHNRU8M2pO5ituTI
+	BwlNLPcOZdv6MTM95akOBzw+CoLZ81tShr9gVcofFhmTPMpAV44ebMVL+x2xYmQ=
+X-Google-Smtp-Source: AGHT+IH+VagueuQIXMxGnIX0w5CylWhKwU2nLQR+DMf+tI3DEgtgkMQnem1H9OyA00MT+ZbTBm902g==
+X-Received: by 2002:a05:6512:2351:b0:52c:b479:902d with SMTP id 2adb3069b0e04-532eda5b0famr222373e87.4.1723575794356;
+        Tue, 13 Aug 2024 12:03:14 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:3979:ff54:1b42:968a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c738947sm234170345e9.10.2024.08.13.12.01.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c72d8ffsm229487185e9.7.2024.08.13.12.03.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 12:01:44 -0700 (PDT)
+        Tue, 13 Aug 2024 12:03:14 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+To: Kalle Valo <kvalo@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>
+Cc: linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
+	ath11k@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH] dt-bindings: bluetooth: bring the HW description closer to reality for wcn6855
-Date: Tue, 13 Aug 2024 21:01:31 +0200
-Message-ID: <20240813190131.154889-1-brgl@bgdev.pl>
+Subject: [PATCH] dt-bindings: net: ath11k: document the inputs of the ath11k on WCN6855
+Date: Tue, 13 Aug 2024 21:03:05 +0200
+Message-ID: <20240813190306.154943-1-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,42 +95,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Describe the inputs from the PMU that the Bluetooth module on wcn6855
-consumes and drop the ones from the host.
+Describe the inputs from the PMU of the ath11k module on WCN6855.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
-Note: This breaks the current contract but the only two users of wcn6855
-upstream - sc8280xp based boards - will be updated in DTS patches sent
-separately.
+ .../net/wireless/qcom,ath11k-pci.yaml         | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml     | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index 68c5ed111417..64a5c5004862 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -172,14 +172,14 @@ allOf:
-               - qcom,wcn6855-bt
-     then:
-       required:
--        - enable-gpios
--        - swctrl-gpios
--        - vddio-supply
--        - vddbtcxmx-supply
-         - vddrfacmn-supply
+diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
+index 8675d7d0215c..404974d77826 100644
+--- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
+@@ -50,6 +50,9 @@ properties:
+   vddrfa1p7-supply:
+     description: VDD_RFA_1P7 supply regulator handle
+ 
++  vddrfa1p8-supply:
++    description: VDD_RFA_1P8 supply regulator handle
++
+   vddpcie0p9-supply:
+     description: VDD_PCIE_0P9 supply regulator handle
+ 
+@@ -77,6 +80,22 @@ allOf:
+         - vddrfa1p7-supply
+         - vddpcie0p9-supply
+         - vddpcie1p8-supply
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: pci17cb,1103
++    then:
++      required:
++        - vddrfacmn-supply
 +        - vddaon-supply
 +        - vddwlcx-supply
 +        - vddwlmx-supply
-+        - vddbtcmx-supply
-         - vddrfa0p8-supply
-         - vddrfa1p2-supply
--        - vddrfa1p7-supply
++        - vddrfa0p8-supply
++        - vddrfa1p2-supply
 +        - vddrfa1p8-supply
-   - if:
-       properties:
-         compatible:
++        - vddpcie0p9-supply
++        - vddpcie1p8-supply
+ 
+ additionalProperties: false
+ 
 -- 
 2.43.0
 
