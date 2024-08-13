@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-118094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F2E9507B3
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:33:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B8F99507B5
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C39284CED
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:33:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2105A1F21875
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8331219DF40;
-	Tue, 13 Aug 2024 14:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B285142AB9;
+	Tue, 13 Aug 2024 14:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gb7KCUj7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="df4jM4Yr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F80B125AC
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 14:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F736125AC
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 14:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723559584; cv=none; b=tt6W5W7xLpW8od2m0Xw5U0ACTTlZHuMukSZWc8NJROm4+BwxoM+EWmteSyEuC+sNd+EVKIAXzAIP4ly65Yh80VPHgEDQki35G527VrMV26zQyRqSIgEyzRsGAlDRA1ssdaa8GBgu+q0MVIqtm1cRYjic47HSIQHvCX2vQqjOLiU=
+	t=1723559586; cv=none; b=sUwDv7mGAVFYzaV27k4m2uRxb3EkTL2nreuUNgSz7H+eFvDLQpPJzohshKQQVS9PUk29UiwE7alAI5o4LIExPzeVWFKSN7dPhlZmfhgMcW19qQC2fk81kO+ld5XDg2Boo2/AXuhBk/yOGQL/dITbNjTT1LNK1GCvgj6cJSbDsnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723559584; c=relaxed/simple;
-	bh=+Toju3c/JnKuyBGDMJ2Je6BDER8BS+DlIMjmnUJKK04=;
+	s=arc-20240116; t=1723559586; c=relaxed/simple;
+	bh=Sf7ZfeU8qW8sdKGSALwGOdHZsOt9zxm8T1Ht7GlBukA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EnY2nWHg54jDPkrzaZ6tmJPboWzV1BvPT2ViHEsRCgMyApVETPqXZySKhm4i+LnNmDL1SzubaWtqFDOmctK8YkPmD781oZeNMghCtfotIBtv8gvbFmapwof/hSC0sWM+EXsRwP/nchsKqy6xc82OamuZ0ficGRwfQYQYF1LnHYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gb7KCUj7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE034C4AF17;
-	Tue, 13 Aug 2024 14:33:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uAI2wrjzty87/KAptXLg3xWczWHmoojhBUV5U869f7RlyRV4Rt6bmF+0I6Y5DfdgLTt9Aq7QTE9Ea/WGjjIWQbRwV0K+/ycdRyjsKAv4cnKhn2xbyZN396DEMvEflnne4tUKyArc0VICw6+fn2dh4KPIIb9/fQiIWVihX3d5sIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=df4jM4Yr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50990C4AF09;
+	Tue, 13 Aug 2024 14:33:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723559583;
-	bh=+Toju3c/JnKuyBGDMJ2Je6BDER8BS+DlIMjmnUJKK04=;
+	s=k20201202; t=1723559586;
+	bh=Sf7ZfeU8qW8sdKGSALwGOdHZsOt9zxm8T1Ht7GlBukA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Gb7KCUj7xzybxnt9szxumMeWx3cJ3B9T7saZwW/7EwUCflOX9fl3w+NRDykWB+uW4
-	 QJDHoboFfiCRpOp4YLQxgPvrCzexSHr1BmIThLRO4gAy07p062I8+nuZmcSku/ljdA
-	 WKwlDejGvC52Rsgqmm7S/yMMirMJWvJbePdj/Vgrm8WZ5il4CY/4bgzLcZaYtmXtbD
-	 A3CUWh7L0LnPvrtRb8un7AmZXoPWQLOq3YI5eA+p6ury4Jx/QTuY7CCfuD0gpCAZcl
-	 5bK4FU7EESEs6FZr70pT5Mf86YPe/Cf+WedBbjx/QVsWWzroAAutID/bGMlfILIS4q
-	 R3plJ0hMjBZfQ==
+	b=df4jM4YroUpsGnoY6/Ohz4ptvk2Ryu3kQDFOm+UJHEP/FjZjXRsgZ5LxxX4AcKOv1
+	 6WxaU6A/PgtnLXvfxT9KJ391gepUA6MLSDSVMxPrQOuAdEXfPnz0vp9e2hoxuLiQ6+
+	 BVZ0+9sL/RzB3KFBFqJoCkftGFQNPt1u3hsCgc06vFJ4fn8BJEEfsC/R245w5K3Fen
+	 wNCRS1rEqQdQ2aObUKlfcda45rJTzEifm4BK0eukQ/m/zGhs1EBxOpUswnBahND1oo
+	 INx4GCPc4BzJjUu56dqhvgsyKEdtKw6UE7Na6daaSA7GgEZziJW7SsYO6HO47Zgpd2
+	 SxhLYoeDQq3Lg==
 From: Simon Horman <horms@kernel.org>
-Date: Tue, 13 Aug 2024 15:32:55 +0100
-Subject: [PATCH net-next v2 1/2] bnxt_en: Extend maximum length of version
- string by 1 byte
+Date: Tue, 13 Aug 2024 15:32:56 +0100
+Subject: [PATCH net-next v2 2/2] bnxt_en: avoid truncation of per rx run
+ debugfs filename
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240813-bnxt-str-v2-1-872050a157e7@kernel.org>
+Message-Id: <20240813-bnxt-str-v2-2-872050a157e7@kernel.org>
 References: <20240813-bnxt-str-v2-0-872050a157e7@kernel.org>
 In-Reply-To: <20240813-bnxt-str-v2-0-872050a157e7@kernel.org>
 To: Michael Chan <michael.chan@broadcom.com>
@@ -63,34 +63,61 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
 X-Mailer: b4 0.14.0
 
-This corrects an out-by-one error in the maximum length of the package
-version string. The size argument of snprintf includes space for the
-trailing '\0' byte, so there is no need to allow extra space for it by
-reducing the value of the size argument by 1.
+Although it seems unlikely in practice - there would need to be
+rx ring indexes greater than 10^10 - it is theoretically possible
+for the filename of per rx ring debugfs files to be truncated.
 
-Found by inspection.
-Compile tested only.
+This is because although a 16 byte buffer is provided, the length
+of the filename is restricted to 10 bytes. Remove this restriction
+and allow the entire buffer to be used.
+
+Also reduce the buffer to 12 bytes, which is sufficient.
+
+Given that the range of rx ring indexes likely much smaller than the
+maximum range of a 32-bit signed integer, a smaller buffer could be
+used, with some further changes.  But this change seems simple, robust,
+and has minimal stack overhead.
+
+Flagged by gcc-14:
+
+  .../bnxt_debugfs.c: In function 'bnxt_debug_dev_init':
+  drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c:69:30: warning: '%d' directive output may be truncated writing between 1 and 11 bytes into a region of size 10 [-Wformat-truncation=]
+     69 |         snprintf(qname, 10, "%d", ring_idx);
+        |                              ^~
+  In function 'debugfs_dim_ring_init',
+      inlined from 'bnxt_debug_dev_init' at .../bnxt_debugfs.c:87:4:
+  .../bnxt_debugfs.c:69:29: note: directive argument in the range [-2147483643, 2147483646]
+     69 |         snprintf(qname, 10, "%d", ring_idx);
+        |                             ^~~~
+  .../bnxt_debugfs.c:69:9: note: 'snprintf' output between 2 and 12 bytes into a destination of size 10
+     69 |         snprintf(qname, 10, "%d", ring_idx);
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Compile tested only
 
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-v2: New patch
+v2: No change
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 61d6afc3cacb..39eed5831e3a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4161,7 +4161,7 @@ static void bnxt_get_pkgver(struct net_device *dev)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
+index 156c2404854f..127b7015f676 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c
+@@ -64,9 +64,9 @@ static const struct file_operations debugfs_dim_fops = {
+ static void debugfs_dim_ring_init(struct dim *dim, int ring_idx,
+ 				  struct dentry *dd)
+ {
+-	static char qname[16];
++	static char qname[12];
  
- 	if (!bnxt_get_pkginfo(dev, buf, sizeof(buf))) {
- 		len = strlen(bp->fw_ver_str);
--		snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len - 1,
-+		snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len,
- 			 "/pkg %s", buf);
- 	}
+-	snprintf(qname, 10, "%d", ring_idx);
++	snprintf(qname, sizeof(qname), "%d", ring_idx);
+ 	debugfs_create_file(qname, 0600, dd, dim, &debugfs_dim_fops);
  }
+ 
 
 -- 
 2.43.0
