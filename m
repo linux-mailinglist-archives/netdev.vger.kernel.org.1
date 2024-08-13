@@ -1,145 +1,163 @@
-Return-Path: <netdev+bounces-118161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B38950CC4
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85647950CE3
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9960C1C226FE
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41065285D86
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105D11A3BBD;
-	Tue, 13 Aug 2024 19:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AD21A3BD3;
+	Tue, 13 Aug 2024 19:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="g6hHk7Yx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iaPV2Cg6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AF318E752
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 19:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083001A3BC7;
+	Tue, 13 Aug 2024 19:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723575798; cv=none; b=E7nANl6w3Vc2PFmrXE0CSVYX4DsHXKVDCogeZ9r8Pco7Fkmnk87IIkhNJUqLoxpu+63W2KEJ+cCpBMypC0utZpV/Ts4JXiHaSCPFHpHXHsukBEzfhzoscI1sI9uGYL+r3unzDEn5Yh7LijdG3AR5cKgPoxvUHDbwtTZceCnJXQk=
+	t=1723576158; cv=none; b=hWTxsB81Tzr2xWdBWJXRMw1EgrjIZ6gSRaJy3wZPpLnV0bbfKHQaNmVcdg8aZ6eTAXLFkLVGBe8UkPK7uoU/1Ap7FRgLnMstUy4snxRUnMkMVwpGFv8edDzGKmhMT1XnITQbkbsIV8RhU13OswQT/SWWANKcHYuEhaxQuBf4rX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723575798; c=relaxed/simple;
-	bh=wZZi2FnrSd3Y6ntD+VqvzTWx0ibV9Sj/dK6MjW4hzrY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EB8/4kMIsQ905SZfnT3aPNox6s3Q0cD+1wiWylI43CKKM5LuF6A3PDRFWYtD2kQ1JqKSODL5ECb+sR/i2TPEAqc6pEYHaR5F5lT0jk6KCMkjX/7eNznUeys8NbCaktWoJ7sBcFFbMhroUGF2iB/zEkzQ3RjuHV2+1YvZCd771xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=g6hHk7Yx; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53212e0aa92so1964401e87.0
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 12:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723575794; x=1724180594; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fpSg/3y828Pw97blr6HDnxsdU+5aKQgCf2MNnTGXTPg=;
-        b=g6hHk7YxcXKw9XYZlz/rldPNPtP9sSxJ3sP5e9/TD+gaMjqzohmlaZeYju6RqwpK3s
-         EW0YwOgAKdyl9GFH5qavww7ownEi0yz+UHzqKtdW2ThprXl+rQQEditJeq3TgyjN2FUE
-         mbEd9Vk6WF/WHVu32tWpkTG7SA+mqCzGMXQhzZdKoXv9KRXYEtWTH7h1WOOIsIGKIRZM
-         uIT//+AZ2sQCMC9gON8jVUTrD+OewaVnYf48Rspq19wg5V6bSmNlcuuFLgNZ8a+SIlfG
-         Sya7cPzOOX29nHuhRPMkGljQIKFbJbYai10US3rO6qkz2NH5I8MdO3VfXUiDa2kpKFJv
-         JygQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723575794; x=1724180594;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fpSg/3y828Pw97blr6HDnxsdU+5aKQgCf2MNnTGXTPg=;
-        b=XNfpYByZmRAkWXzN9dcaaRV1TVBIwyTjAXpAMUHf4jKxE30uCp48eRLhGB6ALxp6xG
-         zXilrSCHSFxSdajZrdvce6xU7LES0RbHGLk6BIV5QVDDoVOx4KO7LlNSlh9yclI8C/Q3
-         lhWzdCBhMnFCfJ4RQf6a/oEyq/hmdx3Ay2eESvFfERRP2tLHnnrGNXiEwkSwlW8sXjBG
-         gcyODbTy1IiyamxhU5wGXUqQd60RCfVhizAF2TUijyfXOvKXmVyyvDOgOH0duRUtFwCj
-         8HK9+VRnHBvXAWHFVFp1ng285y7MIGb1ZVekLnoF9ddSsLV/TmNMU7I356zFYJknWkPw
-         b6+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXTVXOFM1ZcMgjvb3cbazoZvGsZ7WocIHnMaSeQB2HwClzodGbC/MQ32jdD7YKxWI8hLiIusjj0DtfNH53iIP6yNsC/V3Rd
-X-Gm-Message-State: AOJu0YyUEQ0m4dDr54X+ceu+EKDuElf2vtixqyxkkHNRU8M2pO5ituTI
-	BwlNLPcOZdv6MTM95akOBzw+CoLZ81tShr9gVcofFhmTPMpAV44ebMVL+x2xYmQ=
-X-Google-Smtp-Source: AGHT+IH+VagueuQIXMxGnIX0w5CylWhKwU2nLQR+DMf+tI3DEgtgkMQnem1H9OyA00MT+ZbTBm902g==
-X-Received: by 2002:a05:6512:2351:b0:52c:b479:902d with SMTP id 2adb3069b0e04-532eda5b0famr222373e87.4.1723575794356;
-        Tue, 13 Aug 2024 12:03:14 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:3979:ff54:1b42:968a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c72d8ffsm229487185e9.7.2024.08.13.12.03.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 12:03:14 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1723576158; c=relaxed/simple;
+	bh=5yLTqYrEVFQBJuTrsiDLUVqVWQqyOnzlNTbvg0gBosQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NB2WrZp+MezVvntEqQTBS73d5P3rzqVFNoduWhSep2vW/s1ltY2hHw67a9zyr1+NJylpjdvh5kQeaag6ASHlJjYCPNRFlPfbH5+P4k8BaCxypLCXi78fpW5YtyAGoE980pdrX7TPEVPPEJ5nF77BVDc2ULHx5K3X/HPweBxQNNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iaPV2Cg6; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723576157; x=1755112157;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5yLTqYrEVFQBJuTrsiDLUVqVWQqyOnzlNTbvg0gBosQ=;
+  b=iaPV2Cg6Vk4UysQvw+uXX0bMJLss9PaSJtlbLUAUyiFLQzBNYYl4FnaW
+   WlsXZc7Ddu78802F9wYEbY2FSnpo3iEruTadffIBUUks+HLImUbAmLZXm
+   Vddfn1jESgXnAHZp9/7ZnzaqZTIymEJJWQnhukZwjOyrmarsw4lkH1RCV
+   XLp1yu9CT1ficnd01iKA77S3wUsJr6pmmyCh7BDcjlNloHVZ/+5l5NP1l
+   mGDEehRbRQfzmnpsJqErcEqliO68TVz3EZNRUPAlHXdbLpWWo2w4XJPke
+   1/RvVbQ0Y97wVwL9nXQS7vqgrYWiByvlvaC+Hcc/a1FjKMapFgJhs/QYy
+   g==;
+X-CSE-ConnectionGUID: g5b5cTQnT0mXXkQGDvvK3Q==
+X-CSE-MsgGUID: M3hGPMg2TDmf/p+yqo5VQQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21907742"
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="21907742"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 12:05:41 -0700
+X-CSE-ConnectionGUID: 6mYXJ2zMRLqwskgoE5g5gw==
+X-CSE-MsgGUID: h8E2xQ/tSUCvLL31HYqiLg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="58754347"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 13 Aug 2024 12:05:37 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sdwpq-0000fW-1n;
+	Tue, 13 Aug 2024 19:05:34 +0000
+Date: Wed, 14 Aug 2024 03:05:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Elad Yifee <eladwf@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, eladwf@gmail.com, daniel@makrotopia.org,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	ath11k@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH] dt-bindings: net: ath11k: document the inputs of the ath11k on WCN6855
-Date: Tue, 13 Aug 2024 21:03:05 +0200
-Message-ID: <20240813190306.154943-1-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Chen Lin <chen45464546@163.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix memory leak in
+ LRO rings release
+Message-ID: <202408140256.AkgMaR7u-lkp@intel.com>
+References: <20240812152126.14598-1-eladwf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812152126.14598-1-eladwf@gmail.com>
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Hi Elad,
 
-Describe the inputs from the PMU of the ath11k module on WCN6855.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- .../net/wireless/qcom,ath11k-pci.yaml         | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+[auto build test ERROR on net/main]
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-index 8675d7d0215c..404974d77826 100644
---- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-@@ -50,6 +50,9 @@ properties:
-   vddrfa1p7-supply:
-     description: VDD_RFA_1P7 supply regulator handle
- 
-+  vddrfa1p8-supply:
-+    description: VDD_RFA_1P8 supply regulator handle
-+
-   vddpcie0p9-supply:
-     description: VDD_PCIE_0P9 supply regulator handle
- 
-@@ -77,6 +80,22 @@ allOf:
-         - vddrfa1p7-supply
-         - vddpcie0p9-supply
-         - vddpcie1p8-supply
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: pci17cb,1103
-+    then:
-+      required:
-+        - vddrfacmn-supply
-+        - vddaon-supply
-+        - vddwlcx-supply
-+        - vddwlmx-supply
-+        - vddrfa0p8-supply
-+        - vddrfa1p2-supply
-+        - vddrfa1p8-supply
-+        - vddpcie0p9-supply
-+        - vddpcie1p8-supply
- 
- additionalProperties: false
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Elad-Yifee/net-ethernet-mtk_eth_soc-fix-memory-leak-in-LRO-rings-release/20240813-015755
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240812152126.14598-1-eladwf%40gmail.com
+patch subject: [PATCH net v2] net: ethernet: mtk_eth_soc: fix memory leak in LRO rings release
+config: arm-randconfig-003-20240813 (https://download.01.org/0day-ci/archive/20240814/202408140256.AkgMaR7u-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240814/202408140256.AkgMaR7u-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408140256.AkgMaR7u-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_rx_put_buff':
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:1768:28: error: expected expression before 'unsigned'
+    1768 |                 free_pages(unsigned long)data, get_order(mtk_max_frag_size(ring->frag_size)));
+         |                            ^~~~~~~~
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:1768:17: error: too few arguments to function 'free_pages'
+    1768 |                 free_pages(unsigned long)data, get_order(mtk_max_frag_size(ring->frag_size)));
+         |                 ^~~~~~~~~~
+   In file included from include/linux/xarray.h:16,
+                    from include/linux/radix-tree.h:21,
+                    from include/linux/idr.h:15,
+                    from include/linux/kernfs.h:12,
+                    from include/linux/sysfs.h:16,
+                    from include/linux/kobject.h:20,
+                    from include/linux/of.h:18,
+                    from drivers/net/ethernet/mediatek/mtk_eth_soc.c:9:
+   include/linux/gfp.h:372:13: note: declared here
+     372 | extern void free_pages(unsigned long addr, unsigned int order);
+         |             ^~~~~~~~~~
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:1768:42: error: expected ';' before 'data'
+    1768 |                 free_pages(unsigned long)data, get_order(mtk_max_frag_size(ring->frag_size)));
+         |                                          ^~~~
+         |                                          ;
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:1767:9: warning: this 'else' clause does not guard... [-Wmisleading-indentation]
+    1767 |         else
+         |         ^~~~
+   drivers/net/ethernet/mediatek/mtk_eth_soc.c:1768:93: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'else'
+    1768 |                 free_pages(unsigned long)data, get_order(mtk_max_frag_size(ring->frag_size)));
+         |                                                                                             ^
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:1768:93: error: expected statement before ')' token
+
+
+vim +/unsigned +1768 drivers/net/ethernet/mediatek/mtk_eth_soc.c
+
+  1759	
+  1760	static void mtk_rx_put_buff(struct mtk_rx_ring *ring, void *data, bool napi)
+  1761	{
+  1762		if (ring->page_pool)
+  1763			page_pool_put_full_page(ring->page_pool,
+  1764						virt_to_head_page(data), napi);
+  1765		else if (ring->frag_size <= PAGE_SIZE)
+  1766			skb_free_frag(data);
+> 1767		else
+> 1768			free_pages(unsigned long)data, get_order(mtk_max_frag_size(ring->frag_size)));
+  1769	}
+  1770	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
