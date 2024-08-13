@@ -1,145 +1,97 @@
-Return-Path: <netdev+bounces-117920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C0D94FD7F
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:01:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF17994FD9F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 08:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC631C20FC0
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:01:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7BC1F23BC4
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 06:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACCB2E64B;
-	Tue, 13 Aug 2024 06:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB8239FC6;
+	Tue, 13 Aug 2024 06:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzChrwou"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k/wSoJUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303151BF53;
-	Tue, 13 Aug 2024 06:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234612262B;
+	Tue, 13 Aug 2024 06:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723528857; cv=none; b=K9uhbt01/5ef203Hu5h0b/J7V5C8YrUT72/jnWDo+1U1LzpU86XsVFPQiH+EDi1WxJDdJDMEALVtSRZzdgEsCvMV/rgjqIcdtnHtNdDpgG2bQj8I9jTjf/27AavhAq7D8Fev+4GMIMlHCkhxtcLzdNQBoJG4Bx8R0w2AvQr6MQo=
+	t=1723529593; cv=none; b=kXfWpN9pII73KVR9h+sV6/KO0PenTzYrv3J7MOqdXXffdJAbOZOmnLIgumCCIN1+vqNTMyD9btaF5N009WP7aVdag6KZrWkhXdmojvTXayaub7olDOJGFByvFVycDH9LJUSOJJ0by22trismJGT9FPsqnevhXoB6m++ekZV3Vss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723528857; c=relaxed/simple;
-	bh=eoz8SypQVeUi7S44huxs+5Uqa8k0/GfMVkclaeuBME4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tcFszQyvhBVW4VEqgq+vvxSntrb1hsdnOqENxHrlNbkpAIkABHZwQlfxD56MLbLNq+ZH3fGSIOo9BSkySZlei1yNS4ym+4Pk67zM5v4neLCgZnzx8XjNM/Fmvqz++sLO7jquVJctEZIjmxzfaHw6u7+Do78yRn3rPIzfg5YgwkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzChrwou; arc=none smtp.client-ip=209.85.221.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4f6b8b7d85bso1749792e0c.1;
-        Mon, 12 Aug 2024 23:00:55 -0700 (PDT)
+	s=arc-20240116; t=1723529593; c=relaxed/simple;
+	bh=gKFhI0S2mlLMqPuudOyLilnNWOeupixtPdSxKimBLLs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s8HWVyIHOBUccFc8TAs3Tkzjwlfm+gw89l5DZS3q9wX/H+36Jw3XjHDxvKrVsm8i9paxN4QczxkKs16YIfuEFmm8MBGwG2QlrHYnEfwLbLXEjOwO8R1PS9/Z+ccLn2hFJugay4lt0KbZ0P/VkMvq1TyFTbMAQiTBrcCfF4eqQIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k/wSoJUC; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723528855; x=1724133655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2QcXZLiSHSC9Xh+N1wM5xwm7PSlXvs0f4mmP999nFg=;
-        b=UzChrwou2imwo7J563uCrqggrfOkuGjgaZDR0IkNmMIU0b9SehFRdybjJj7ynEdTRK
-         KZjp7BxjJiVAKnimZf7mbA/4yEzEekHz9q+sAE8P1Sy4EsEHo2j4NaFzCS1H+jX7kIDR
-         c+8fB/rcg32ExDeNhrvpaLcZhrEf0A+wXLMhFUhL+b68CGTKENUqLSYGaptgf5ZR48RS
-         J/zuqQEipExAtuSjVaz/LYNVhOER2RWkIIq7B8/DVLhClL9ofb50r8CgLKvZWvG1YuWp
-         /BiU4kG2oOAKiwPrsJNx4+ZOe2QO0A6396veg5NjgLu7TrKukLhTdrM14hVIEKn3hPsr
-         m2Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723528855; x=1724133655;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y2QcXZLiSHSC9Xh+N1wM5xwm7PSlXvs0f4mmP999nFg=;
-        b=nRfFpY6WvQ4pUsqFQ9DTgCE5ld3Bzv+TYiiP49j5a22dg26ZJ7OJZjIg8BnezcZYlF
-         ScHFE7y8dEo6fWQ+PZ2rYWXlxfnCvUZ1I1Fxc30M/DFvVbgSrz6BCawWkQP+lQ3f2VGV
-         Vt8VHz0yv/Pkc8up/HLhwKkUI0L4q49S4QNh9SQ41B7K00JapyFSY8BazrRInmNpbROq
-         mi2F4pJagk1FIHwPJAg5kzti+QaxYuGYp1ZUYbAaJcQJNLkby0YDY73qIgzvLGTUx+wH
-         lq/68n4zNrect8lmDDFvGS3SdZxwumNtGW7m1h6X65wepAyVFJlM9wzqdQqC6kCeLeWC
-         xQCw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAcV/eaU2gaV3maArvZ/l+jNs6v2VfSRRLnhh3hOGHyyFQ7zOtudeyvoi/ILG/2pNTCeyyG3DWePSTNp9+gM38jzPzl90QUrLTwikRUDHeqpFQmdzYP4wPxav7ELCd+tlM4JVmHmTen6HacSoKWqRjj5qsC9d/iBtaFs5HgbaS6lwTzaYW
-X-Gm-Message-State: AOJu0Yw0s1vcVsk2gOfbcSLKbOsF7P/6v4pdaKnVK73262ocrhn84s/O
-	uCAILVQBZT/hmI7wzBNqIEhn23JWs+FBUZ7IOTIIcvlQZj+hZmki
-X-Google-Smtp-Source: AGHT+IEj+VoLjm5/vLvrxYFGVDuef8pX7BrNKsLxM7K2tmngP8ETL3B04OJJnLrqKd81Zf/cwm0ISw==
-X-Received: by 2002:a05:6122:312a:b0:4ed:185:258c with SMTP id 71dfb90a1353d-4fabeec0d21mr3337865e0c.2.1723528854832;
-        Mon, 12 Aug 2024 23:00:54 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f91f1192fasm867098e0c.0.2024.08.12.23.00.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 23:00:54 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	kuniyu@amazon.com,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: javier.carrasco.cruz@gmail.com,
-	David Hunter <david.hunter.linux@gmail.com>
-Subject: [PATCH] Kselftest: msg_oob.c: Fix warning for Incorrect Specifier
-Date: Tue, 13 Aug 2024 01:59:57 -0400
-Message-ID: <20240813060036.754213-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723529592; x=1755065592;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=gKFhI0S2mlLMqPuudOyLilnNWOeupixtPdSxKimBLLs=;
+  b=k/wSoJUC/guXrTE/4tHCYL0P8/rMQONi1MLDxyE+FoMpVKpoSDYdvHAx
+   0mjO355h/gh+8JB7xB7docWhB4/MiMr4H/oGDT8J/ajIgW6LmB/Uu2nTd
+   gLnxEsgYFKyelQUFQhSmiAo5MWFI4/DMWUmbBuuqs7CYBLdF8lAT/AHvu
+   o=;
+X-IronPort-AV: E=Sophos;i="6.09,285,1716249600"; 
+   d="scan'208";a="420886268"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 06:13:08 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:5817]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.23:2525] with esmtp (Farcaster)
+ id bdc15a2d-7174-4d53-9c6f-090ba981ef3d; Tue, 13 Aug 2024 06:13:08 +0000 (UTC)
+X-Farcaster-Flow-ID: bdc15a2d-7174-4d53-9c6f-090ba981ef3d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 06:13:05 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.139.164) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 06:13:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <david.hunter.linux@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>,
+	<javier.carrasco.cruz@gmail.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
+Subject: Re: [PATCH] Kselftest: msg_oob.c: Fix warning for Incorrect Specifier
+Date: Mon, 12 Aug 2024 23:12:54 -0700
+Message-ID: <20240813061254.36825-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240813060036.754213-1-david.hunter.linux@gmail.com>
+References: <20240813060036.754213-1-david.hunter.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Change specifier to %p to correctly substitute type 'const void *'. A
-specifer involved with a macro is causing a misleading warning to occur:
+From: David Hunter <david.hunter.linux@gmail.com>
+Date: Tue, 13 Aug 2024 01:59:57 -0400
+> Change specifier to %p to correctly substitute type 'const void *'. A
+> specifer involved with a macro is causing a misleading warning to occur:
 
-In file included from msg_oob.c:14:
-msg_oob.c: In function ‘__recvpair’:
-../../kselftest_harness.h:106:40: warning: format ‘%s’ expects 
-	argument of type ‘char *’, but argument 6 has type 
-	‘const void *’ [-Wformat=]
-  106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
-      |                                        ^~~~~~~~~~~~~
-../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
-  101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
-      |                 ^~~~~~~~
-msg_oob.c:235:17: note: in expansion of macro ‘TH_LOG’
-  235 |                 TH_LOG("Expected:%s", expected_errno ? 
-			strerror(expected_errno) : expected_buf);
-      |                 ^~~~~~
+You may want to run the test before/after the patch.
 
-A second set of these three warnings occur later for the incorrect
-specifier at msg_oob.c:256. By tracing the various macros involved, the
-correct specifier (in msg_oob.c) can be spotted and changed.
+This is the 3rd patch posted for this warning, so it would be nice to
+check lore before posting if the patch/issue is simple enough :)
 
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
- tools/testing/selftests/net/af_unix/msg_oob.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+And here's the correct fix.
+https://lore.kernel.org/netdev/20240812191122.1092806-1-jain.abhinav177@gmail.com/
 
-diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
-index 16d0c172eaeb..87090ebda2a7 100644
---- a/tools/testing/selftests/net/af_unix/msg_oob.c
-+++ b/tools/testing/selftests/net/af_unix/msg_oob.c
-@@ -232,7 +232,7 @@ static void __recvpair(struct __test_metadata *_metadata,
- 
- 	if (ret[0] != expected_len || recv_errno[0] != expected_errno) {
- 		TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
--		TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-+		TH_LOG("Expected:%p", expected_errno ? strerror(expected_errno) : expected_buf);
- 
- 		ASSERT_EQ(ret[0], expected_len);
- 		ASSERT_EQ(recv_errno[0], expected_errno);
-@@ -256,7 +256,7 @@ static void __recvpair(struct __test_metadata *_metadata,
- 		cmp = strncmp(expected_buf, recv_buf[0], expected_len);
- 		if (cmp) {
- 			TH_LOG("AF_UNIX :%s", ret[0] < 0 ? strerror(recv_errno[0]) : recv_buf[0]);
--			TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-+			TH_LOG("Expected:%p", expected_errno ? strerror(expected_errno) : expected_buf);
- 
- 			ASSERT_EQ(cmp, 0);
- 		}
--- 
-2.43.0
-
+Thanks !
 
