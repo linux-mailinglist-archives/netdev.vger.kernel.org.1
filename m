@@ -1,179 +1,160 @@
-Return-Path: <netdev+bounces-118051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C61995065B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:22:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909BC950680
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B842B25BE3
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:22:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC5431C22871
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4199619B3C4;
-	Tue, 13 Aug 2024 13:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge1LNCQt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60ED319CD13;
+	Tue, 13 Aug 2024 13:29:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CE419ADBE;
-	Tue, 13 Aug 2024 13:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5325919CCEF;
+	Tue, 13 Aug 2024 13:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723555361; cv=none; b=QARWn6tP7DH2xuFKeUrc8DNU6bY6pJ/HHg1NJdHfiNm16svK4kZsqwqISMc5dqjHD55wTKytwM/WrLZa30ygrsQItdY5ydAfXvuoiGpJjebVo6ZA9dGYh7xUTE26sypWY0zRiCxVncoqQT/8zuuVMaFQfWU9ww0/2rcWxG0Lwhw=
+	t=1723555767; cv=none; b=KzCBnCast7ebnM023EvHTIAzDjTZJ6MHMmwM1Lz2yHUSRDIrytfLRDkPWSVEZzqTLNhsSasEuLp9ku7+fvg9C44CXGy4zsGhHAl62ugd5zcW1lHMOpegAJwLI3MIR8wzryhBeqKG8qP23L6doJMGWRtujod59zksJlxBv4hr6MY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723555361; c=relaxed/simple;
-	bh=t37IbrI0SmClR4kXYdS8rSEW9SNNFFJf+Irl+n7NehE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=OLuOEhZbBpMDFwtElb5bkD1Y7fxn84GAb+L4unAyGlGn7x+YYPJNx+cm2Gmc15fjef8JTvGuvs00zTo1xIOhGzgSL9hXYLq8sP9XXRQYbvGmf9x7BFyPnhvz0Tw3ScUZ47Sd1IhUXagjXyMEBm2EeHFfajacSydswnUfLXYRNnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ge1LNCQt; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7094468d392so3168001a34.0;
-        Tue, 13 Aug 2024 06:22:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723555359; x=1724160159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t37IbrI0SmClR4kXYdS8rSEW9SNNFFJf+Irl+n7NehE=;
-        b=Ge1LNCQttmlQpNR514CwW/lTRghp79izuVkK6ErCZsXk9jw8bdgL+KPDjXZd+FU2YJ
-         rFVGRklsS+k5HlPgi6Hspn7x3r3dee8iUK/pTOqgHzGkLjR1vE2iyQN0VAO3RPfEtZ/n
-         HObr6Vd6qpTEJi/zEdZ6OK1dKRvdGkXNMlkkGA0J/nC3wBaFEZScDEK/cXAXel0jLYqV
-         zjx3FxDNUe/eDVXCzghgTn409mfHq7QCWgq+Srg4OnmnlcCMGnntdlGqbJsbI4Ib5SiJ
-         Elu2BZKLyQ+pAVzVu8NFYdA38T+dcJrX1dsWmT27aKqfXacYX8Atd0bAyGtrHQmfu7h8
-         GlZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723555359; x=1724160159;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=t37IbrI0SmClR4kXYdS8rSEW9SNNFFJf+Irl+n7NehE=;
-        b=ZuIpZEzJ8eW90tHQM/OJz4sS6qeEahQhWeviUE1lnJYeRKrdpJiEeg+hQkQuFGxhIN
-         TKNtwiqJ37sc/LAgSh5ohMwctMvb6ZehPsCoF85NkQ1IzQoe2jkeEgu4x88/M/TOdM1P
-         6HUUMmtahp96IlCOEoMTaxuOrVva/DBVTU/TwG1+mJK2yNse6NesadIw50x9l3YuvY3O
-         CYxxvJgXu3gjFgW51ROzqzgIiojoNVPuHJOlEF2Eic9cG9wP4lOuHYl6HbwKbROdu85D
-         qIUhvQYpG8GrxbRGudcvINBu0eyHBRNsjnkGvUa5js3sQcHcaB3sNtQN29NmMoDpEOy7
-         F13g==
-X-Forwarded-Encrypted: i=1; AJvYcCXmQ/2nFq8PsNOP3bkoXmwhYEZoQS863rgnh3vdJ1jKyZnRC4WNxKbqJ73D4av1dkJcnvS/Z8tFlhIfOcrYDACAlhzxEtM8eAPtMxYwMxdWa9I0G2qQT8Db+FM133tWK6PZb33I
-X-Gm-Message-State: AOJu0Ywet/TukCSS7zshg8X4MT10axL4lx71ZeffBwI6CmbTcc6GqU4E
-	+oZtI/dtpkyx5s0rrcikksN72QRc0QGK7Wgr1KeffH3YRBIrK2z3
-X-Google-Smtp-Source: AGHT+IH/Qf0k+m2iDASHI3SyiGgcxfMIpa9nxLKjcPsxqqH2z1dqv+idi8LfQ5+2St8Nx0gIy5dVLA==
-X-Received: by 2002:a05:6358:4195:b0:1aa:b9f2:a0c4 with SMTP id e5c5f4694b2df-1b19d2c578bmr442506955d.11.1723555358669;
-        Tue, 13 Aug 2024 06:22:38 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4c7d6e49bsm340232085a.32.2024.08.13.06.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 06:22:38 -0700 (PDT)
-Date: Tue, 13 Aug 2024 09:22:37 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Wang <jasowang@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: ayaka <ayaka@soulik.info>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <66bb5e1dbf778_6ef1329466@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CACGkMEt0QF0vnyCM5H8LDywG+gnrq_sf7O8+uYr=_Ko8ncUh3g@mail.gmail.com>
-References: <CAF=yD-JVs3h1PUqHaJAOFGXQQz-c36v_tP4vOiHpfeRhKh-UpA@mail.gmail.com>
- <9C79659E-2CB1-4959-B35C-9D397DF6F399@soulik.info>
- <66b62df442a85_3bec1229461@willemb.c.googlers.com.notmuch>
- <CACGkMEsw-B5b-Kkx=wfW=obMuj-Si3GPyr_efSeCoZj+FozWmA@mail.gmail.com>
- <66ba421ee77f4_48f70294e@willemb.c.googlers.com.notmuch>
- <CACGkMEt0QF0vnyCM5H8LDywG+gnrq_sf7O8+uYr=_Ko8ncUh3g@mail.gmail.com>
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
- index
+	s=arc-20240116; t=1723555767; c=relaxed/simple;
+	bh=qJpxspnrWXoqQxoImgHoe5rKtDxy5tct/IFJXI+M+Yk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LQZ6t4NVO2T8Cmf0DJRKmARW3uyL0ftdFWWoME8jctuKVETlRDz6goRDAz2W8FkKTUu3nmaYnBj7C3ykSP0ypNREWp9z/OncMjfOjWq8aXu394qKv5dIq5nLQzM34d/dLQclDW/Z6MakVbNOfqOsKRa2V87Flj7R6r9WW/B4MNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.09,285,1716217200"; 
+   d="scan'208";a="215500539"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie5.idc.renesas.com with ESMTP; 13 Aug 2024 22:29:22 +0900
+Received: from [10.226.93.14] (unknown [10.226.93.14])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id E9BE041E20BE;
+	Tue, 13 Aug 2024 22:29:18 +0900 (JST)
+Message-ID: <524873e1-d770-4f29-a374-dab99fe87c14@bp.renesas.com>
+Date: Tue, 13 Aug 2024 14:29:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
+Content-Language: en-GB
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+ Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
+ <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
+ <b1c10539-4d47-4752-8613-785b0ad83f5e@lunn.ch>
+ <933ffa58-8092-4768-993d-cd62897d203d@bp.renesas.com>
+ <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jason Wang wrote:
-> On Tue, Aug 13, 2024 at 1:11=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Wang wrote:
-> > > On Fri, Aug 9, 2024 at 10:55=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > ayaka wrote:
-> > > > >
-> > > > > Sent from my iPad
-> > > >
-> > > > Try to avoid ^^^
-> > > >
-> > >
-> > > [...]
-> > >
-> > > > > 2. Does such a hash operation happen to every packet passing th=
-rough?
-> > > >
-> > > > For packets with a local socket, the computation is cached in the=
+On 17/06/2024 15:29, Andrew Lunn wrote:
+> On Mon, Jun 17, 2024 at 03:03:21PM +0100, Paul Barker wrote:
+>> On 16/06/2024 02:23, Andrew Lunn wrote:
+>>> On Sat, Jun 15, 2024 at 11:30:38AM +0100, Paul Barker wrote:
+>>>> The RX frame size limit should not be based on the current MTU setting.
+>>>> Instead it should be based on the hardware capabilities.
+>>>
+>>> This is a bit odd. MTU is Maximum Transmission Unit, so clearly is
+>>> about Tx. MRU does not really exist. Does TCP allow for asymmetric
+>>> MTU/MRU? Does MTU discovery work correctly for this?
+>>>
+>>> In general, it seems like drivers implement min(MTU, MRU) and nothing
+>>> more. Do you have a real use case for this asymmetry?
+>>>
+>>>       Andrew
+>>
+>> Hi Andrew,
+>>
+>> This change is based on my understanding of MTU/MRU, on the specs of the
+>> RZ SoCs I'm working with (primarily RZ/G2L family, RZ/G3S and RZ/G2H)
+>> and on some testing. My goal here is just to make the capabilities of
+>> the hardware available to users.
+>>
+>> For the RZ/G2L family and RZ/G3S, we can only support an MTU of up to
+>> 1500 bytes, but we can receive frames of up to (IIRC) 8192 bytes. I have
+>> tested sending jumbo frames to an RZ/G2L device using both iperf3 and
+>> ping and I see no errors.
+>>
+>> * For iperf3 RX testing, the RZ/G2L is only responding with acks. These
+>>   are small regardless of the size of the received packets, so the
+>>   mis-match in MTU between the two hosts causes no issue.
+>>
+>> * For ping testing, the RZ/G2L will give a fragmented response to the
+>>   ping packet which the other host can reassemble.
+>>
+>> For the RZ/G2H, we support sending frames of up to 2047 bytes but we can
+>> receive frames of up to 4092 bytes. The driver will need a few more
+>> changes to handle reception of packets >2kB in size, but this is
+>> something we can do in the near future.
+>>
+>> Is there any reason why we shouldn't support this? I am by no means an
+>> expert in the Linux networking internals so there may be things I'm
+>> missing.
+> 
+> I've no really experience what the Linux stack will do. I have seen a
+> number of devices which do not limit received packets to the MTU,
+> i.e. they are happy to receive bigger packets. And i don't think this
+> has caused an issue. But is it ever actually used? Do users setup
+> asymmetric jumbo systems? I've no idea.
+> 
+> One thing i suggest you test is you put this in the middle of two
+> systems which do support jumbo.
+> 
+>      4K       1.5K       4K
+> A <-----> B <-----> C <------> D.
+> 
+> Make your device B and C, setting the MTU as supported. But set A and
+> D with a jumbo MTU which your systems should be able to receive. Do IP
+> routing along the chain. And then do some iperf transfers. I would
+> test both IPv4 and IPv6, since MTU path discovery in IPv6 is used a
+> lot, and gateways are not supposed to fragment.
+> 
+> I'm assuming here your device does actually have two interfaces?  If
+> it is only ever an end system, that simplifies it a lot, and these
+> tests are not needed.
+> 
+>     Andrew
 
-> > > > socket.
-> > > >
-> > > > For these tunnel packets, see tun_automq_select_queue. Specifical=
-ly,
-> > > > the call to __skb_get_hash_symmetric.
-> > > >
-> > > > I'm actually not entirely sure why tun has this, rather than defe=
-r
-> > > > to netdev_pick_tx, which call skb_tx_hash.
-> > >
-> > > Not sure I get the question, but it needs to use a consistent hash =
-to
-> > > match the flows stored before.
-> >
-> > This is a bit tangential to Randy's original thread, but I would like=
+Apologies, my response here is abysmally late due to illness, other
+priorities and then the loss of my main dev box.
 
-> > to understand this part a bit better, if you don't mind.
-> =
+As you've said, a number of devices do not limit received packet size to
+the MTU. There are many applications, other than a gateway, where using
+jumbo packets in even just one direction would be beneficial. For
+example if an application needs to receive large amounts of data but
+only needs to send back control and acknowledgement messages. I think we
+should support this where possible. This is the thought behind the first
+patch in this series as the GbEth IP present in the RZ/G2L and other
+Renesas SoCs has a very asymmetric capability (it can receive 8000 byte
+frames but only transmit 1522 byte frames).
 
-> Comments are more than welcomed. The code is written more than 10
-> years, it should have something that can be improved.
-> =
+If we explicitly do not wish to support this, that restriction should be
+documented and then (maybe over time) handled uniformly for all network
+drivers.
 
-> >
-> > Tun automq calls __skb_get_hash_symmetric instead of the
-> > non-symmetrical skb_get_hash of netdev_pick_tx. That makes sense.
-> >
-> > Also, netdev_pick_tx tries other things first, like XPS.
-> =
+I'm planning to submit v2 of this series shortly.
 
-> Right, using XPS may conflict with the user expected behaviour (e.g
-> the automatic steering has been documented in the virtio spec, though
-> it's best effort somehow).
-> =
+Thanks,
 
-> >
-> > Why does automq have to be stateful, keeping a table. Rather than
-> > always computing symmetrical_hash % reciprocal_scale(txq, numqueues)
-> > directly, as is does when the flow is not found?
-> >
-> > Just curious, thanks.
-> =
-
-> You are right, I think we can avoid the hash calculation and depend on
-> the fallback in netdev_pick_tx().
-> =
-
-> Have put this in my backlog.
-
-Great. Thanks for taking a look at that Jason.
-
-It may very well be that standard netdev_pick_tx does not conform to
-the virtio spec behavior. But if it does, nice simplification.
-
-If we have to create a variant that takes a bool skip_xps, that's
-totally worth it.
+-- 
+Paul Barker
 
