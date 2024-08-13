@@ -1,211 +1,121 @@
-Return-Path: <netdev+bounces-117998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F946950371
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:16:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D0B95036F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:16:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F22F91F23B4B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:16:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18D15B23132
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917F21940AB;
-	Tue, 13 Aug 2024 11:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E83F16E89B;
+	Tue, 13 Aug 2024 11:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RynpPxkD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fO2AHxMH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4252233A;
-	Tue, 13 Aug 2024 11:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9402233A
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723547782; cv=none; b=ONdWHl5qiQbryjj7OOjIm4Inaz9xb0PwE+/XGxeqWcRl6hHOsLKNfyWSZaxSAC+S1XnFxnyYxBHPuJz604LZmlRdh3jz+VbIUnN/CJjQOgpjP0ssUmGDxQ9xaGov5AiReJCcOgYngQvT7M87PIoy2OyKaHhlBiVP/UX+AVhYwOU=
+	t=1723547765; cv=none; b=C83hCIBIrXc8unIYAFmvA8+1kzloefe6rtHIe+R7AtXhfaBcMg/DF23ZaV1b9SHLU7uiL++ocChF2rRCkZD3P1cYva/zy95xmEhyepoo1ZqpCVUJKI6eiGdHKPUxWSbxqpiUUU1CCs6t9eKghA1EdtETLfMyYPEn0L7Cgx4/VrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723547782; c=relaxed/simple;
-	bh=0pvmmClk/9etW+oQMaKMGdyOe2h/CS2zyoTRmUUjXMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=nf07HxPqFpGyxwIv/i6bW4OG4MwZAGLwc5gxReuUGMhdO7a/r4eQkCBIL6tO/80NVAlsynt1X4picupkW0KI5qGa1j0BoKturyHvRWpsqF5M0l7Zur81MY78DKTQ0Za7NQ4nSqFitPvHhRF1oR0k8zYr0G5hI+SwsGA2pM3PYpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RynpPxkD; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D4CoEB017529;
-	Tue, 13 Aug 2024 11:15:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	b7deeTtD7MN0s6d3k9imGFJKKj1a50GFHv1bAjq2O+k=; b=RynpPxkDKg6Ew/gQ
-	CXDHGTCy1KmwTCYpjy7Oy762AKqh/b3lrLfUimuGEos82+sSmyVFa88AmnHz6IVZ
-	+TSPtaCA/d629ThRMhp+kYAKK1QdWzAcyylpzCd17HnrAk/51P0pmAfplGhRBFAh
-	kFTfU3oO4jD/z1E6+3tfRtJ0ku0SVwC/P+WEdVr8Jep8xBuB6vQO3PYtf/aXfWJK
-	EpDLG7ptOJB52qCIv6j336iusSAlP9N91uj2Iua2sZmI9BMdgwQpbT0ZzuPfvH6o
-	1AHckS4qFYSQ2fp9ufeX9lAIT1iXwu7fNQWawDLKlhiGdPRpiXUuE89aHqdzBJhn
-	xmwIuw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40x1d4f7x0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 11:15:38 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47DBFaLt021630
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Aug 2024 11:15:36 GMT
-Received: from [10.253.34.30] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 13 Aug
- 2024 04:15:32 -0700
-Message-ID: <96268791-4c32-4390-97bd-758e6525bd11@quicinc.com>
-Date: Tue, 13 Aug 2024 19:15:30 +0800
+	s=arc-20240116; t=1723547765; c=relaxed/simple;
+	bh=vNjy5GQmH7yNpSwDex0PylkIdnKV/B8d3Ihgv7G6zbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GEyOcSQdGXG1f5OOK/cIOwP/f3R6Wx4lGXuSWUQsETgwZ1Hrq1aSHK6iiqsTvokBzGQ2L/69LwkrzKXR3m3goEsokLV9WCk7AmS5jt/eVHsRo+2Cj8mRdCFk9cxQLX/IQt/W9wmxLIcVMr04kxI8jXwA2rc5JmZUtJlPzrSMPd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fO2AHxMH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E66C4AF09;
+	Tue, 13 Aug 2024 11:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723547764;
+	bh=vNjy5GQmH7yNpSwDex0PylkIdnKV/B8d3Ihgv7G6zbg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fO2AHxMHoozxkIOjvPGJsqTNgqVF8YowML3OVY/bO345IVaG/Wh9wgMT8to9//A54
+	 SVoZ+pI2Vhi+e+m+dHSZfgE+PGYlj9FxYVuiaKhBGskzeneKJn2TKFGUfrB/AnzBG8
+	 zpHPvO/G+hhVfXTX4f8a/Pz9sJje+IVyzou66HP32JBIdmdszElPnRx/e+6ERUUX2Z
+	 fHwa/N27iG1fJZXJDxp6wiX1T3on+T8htmk2mccDbtg+OORpBxMOcCR1KtPoDW/k2d
+	 oU/su3FHSDBuTBLANHYND2buTzwxkg/uakI2GV+5klWwS68LkloqXqfiatQb7drPK6
+	 Om4lArqHVZkpg==
+Date: Tue, 13 Aug 2024 13:16:00 +0200
+From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Drop serdes methods for 88E6172
+Message-ID: <2m2phdcy4pdij7vbi4kknu42knjwq24cgjwc7iogfeyqgqkjk7@elwngvs6bsni>
+References: <20240811162329.15171-1-kabel@kernel.org>
+ <Zrogu1jaD3hp0yHL@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] driver core: Introduce an API
- constify_device_find_child_helper()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Zijun Hu <zijun_hu@icloud.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Jonathan Cameron
-	<jonathan.cameron@huawei.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alison
- Schofield <alison.schofield@intel.com>,
-        Vishal Verma
-	<vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams
-	<dan.j.williams@intel.com>,
-        Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-        Timur
- Tabi <timur@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <linux-cxl@vger.kernel.org>, <linux1394-devel@lists.sourceforge.net>,
-        <netdev@vger.kernel.org>
-References: <20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com>
- <20240811-const_dfc_prepare-v1-2-d67cc416b3d3@quicinc.com>
- <2024081314-marbling-clasp-442a@gregkh>
- <3f7e9969-5285-4dba-b16e-65c6b10ee89a@quicinc.com>
- <2024081311-mortality-opal-cf0f@gregkh>
-Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <2024081311-mortality-opal-cf0f@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: wqksSs9F8-wVIYgx7ZbItk2RkXWeUniP
-X-Proofpoint-GUID: wqksSs9F8-wVIYgx7ZbItk2RkXWeUniP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-13_03,2024-08-13_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- adultscore=0 phishscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408130080
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zrogu1jaD3hp0yHL@shell.armlinux.org.uk>
 
-On 8/13/2024 6:57 PM, Greg Kroah-Hartman wrote:
-> On Tue, Aug 13, 2024 at 06:50:04PM +0800, quic_zijuhu wrote:
->> On 8/13/2024 5:45 PM, Greg Kroah-Hartman wrote:
->>> On Sun, Aug 11, 2024 at 08:18:08AM +0800, Zijun Hu wrote:
->>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>
->>>> Introduce constify_device_find_child_helper() to replace existing
->>>> device_find_child()'s usages whose match functions will modify
->>>> caller's match data.
->>>
->>> Ick, that's not a good name, it should be "noun_verb" with the subsystem being on the prefix always.
->>>
->> okay, got it.
->>
->> is it okay to use device_find_child_mut() suggested by Przemek Kitszel ?
+On Mon, Aug 12, 2024 at 03:48:27PM +0100, Russell King (Oracle) wrote:
+> On Sun, Aug 11, 2024 at 06:23:29PM +0200, Marek Behún wrote:
+> > Drop serdes methods for 88E6172. This switch from the 6352 family does
+> > not have serdes. Until commit 85764555442f ("net: dsa: mv88e6xxx:
+> > convert 88e6352 to phylink_pcs") these methods were checking for serdes
+> > presence by looking at port's cmode, but in that commit the check was
+> > dropped, so now the nonexistent serdes registers are being accessed.
 > 
-> No, just switch all callers over to be const and keep the same name.
+> This attributes blame incorrectly, and shows a lack of understanding.
+> No, one can *not* discover presence of the serdes "by looking at the
+> port's cmode" - that is total rubbish.
 > 
->>> But why is this even needed?  Device pointers are NOT const for the
->>> obvious reason that they can be changed by loads of different things.
->>> Trying to force them to be const is going to be hard, if not impossible.
->>>
->>
->> [PATCH 3/5] have more discussion about these questions with below link:
->> https://lore.kernel.org/all/8b8ce122-f16b-4207-b03b-f74b15756ae7@icloud.com/
->>
->>
->> The ultimate goal is to make device_find_child() have below prototype:
->>
->> struct device *device_find_child(struct device *dev, const void *data,
->> 		int (*match)(struct device *dev, const void *data));
->>
->> Why ?
->>
->> (1) It does not make sense, also does not need to, for such device
->> finding operation to modify caller's match data which is mainly
->> used for comparison.
->>
->> (2) It will make the API's match function parameter have the same
->> signature as all other APIs (bus|class|driver)_find_device().
->>
->>
->> My idea is that:
->> use device_find_child() for READ only accessing caller's match data.
->>
->> use below API if need to Modify caller's data as
->> constify_device_find_child_helper() does.
->> int device_for_each_child(struct device *dev, void *data,
->>                     int (*fn)(struct device *dev, void *data));
->>
->> So the The ultimate goal is to protect caller's *match data* @*data  NOT
->> device @*dev.
+> The MV88E6352 family supports ports that can auto-select between the
+> integrated baseT PHY and the serdes depending on which has link. The
+> port CMODE tells us *nothing* about whether the port supports serdes
+> or not.
 > 
-> Ok, sorry, I was confused.
+> Please fix your description not to spread misinformation, and
+> incorrectly indirectly blame others for stuff that is not appropriate.
 > 
+> Thanks.
 
-Current prototype of the API:
-struct device *device_find_child(struct device *dev, void *data,
-                                 int (*match)(struct device *dev, void
-*data));								
+Hi,
 
-prototype we want:
+sorry about this.
 
-struct device *device_find_child(struct device *dev, const void *data,
-                                 int (*match)(struct device *dev, const
-void *data));
+It seems that the 6352 family was always written with serdes
+support for the whole family, 6172 included, even before the switch
+operations structure was introduced.
 
-The only differences are shown below:
-void *data -> const void *data  // as argument of paramter @data of
-(*match)().
-int (*match)(struct device *dev, void *data) -> int (*match)(struct
-device *dev, const void *data).
+But it really did check whether it should touch serdes registers by
+checking cmode:
+  in commit 85764555442f~1 the function mv88e6352_serdes_get_lane()
+  checks the port's cmode:
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/dsa/mv88e6xxx/serdes.c?id=4aabe35c385ce6c28613ab56b334b4a9521d62b7#n260
 
-We don't change type of @dev. we just make above two parameters have the
-same types as below existing finding APIs.
+  then in chip.c this is used in
+    mv88e6xxx_serdes_pcs_get_state
+    mv88e6xxx_serdes_pcs_config
+    mv88e6xxx_serdes_pcs_an_restart
+    mv88e6xxx_serdes_pcs_link_up
+    mv88e6xxx_serdes_irq_thread_fn
+    mv88e6xxx_serdes_power
 
-struct device *bus_find_device(const struct bus_type *bus, struct device
-*start,
-                               const void *data,
-                               int (*match)(struct device *dev, const
-void *data));
-struct device *driver_find_device(const struct device_driver *drv,
-                                  struct device *start, const void *data,
-                                  int (*match)(struct device *dev, const
-void *data));
-struct device *class_find_device(const struct class *class, const struct
-device *start,
-                                 const void *data, int (*match)(struct
-device *, const void *));
-> thanks,
-> 
-> greg k-h
+  and even before, in commit 10fa5bfcd697, it was decided by looking
+  at cmode whether serdes should be powered on
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/dsa/mv88e6xxx/chip.c?id=10fa5bfcd697#n1885
 
+I propose dropping the Fixes tag and having just this in the commit
+message:
+  Drop serdes methods for 88E6172. This switch from the 6352 family does
+  not have serdes.
+
+What do you think?
+
+Marek
 
