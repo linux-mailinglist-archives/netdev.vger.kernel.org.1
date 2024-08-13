@@ -1,81 +1,99 @@
-Return-Path: <netdev+bounces-117966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EFA9501BB
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:55:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9050B9501C6
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D132E1F213FA
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:55:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C22D51C21D20
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DAE186E37;
-	Tue, 13 Aug 2024 09:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BB8184547;
+	Tue, 13 Aug 2024 09:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bAqzeJzF"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OVrXI/+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0554184537;
-	Tue, 13 Aug 2024 09:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69D343165;
+	Tue, 13 Aug 2024 09:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723542930; cv=none; b=qw4e2UQ6vrP+sWxv+QRIO9dhojXYIJF+/831cCOmhcEuh5DGdZzGaA5vyPcqNYeTPTq7cn4Xj4JYEFUIvUgEaJ8KJA7US+gcOVRr3BbbvryB4dArj3FxMlq6j05m9CkdF5ALX70ttIKz6dC642U7XI43LufxQk4ifAzEEXSnVN0=
+	t=1723543038; cv=none; b=NxPZEngqavnyMP9OdMgB6WV0a7bLvH/U2Z2eW2zAcj6C/WBM9BD0syn1ZjKEHf36xzDJnsYGeDzqTYH+vukygHSAs+eVLjkiVaKXYwH3bCO3xLK/Hl17sAq86b73HA5zDA2tPr9WvPamFNCuRMQ7joJUbWm3qWRmeAfOcbtf2DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723542930; c=relaxed/simple;
-	bh=mBZjPsIip8ChxWqV/5GWGXSHC/8iHBTHDrncClDOvA0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dPlDxxl4h5wXZNAyqM1YKAPZUzdxecULSZPss5iEmaqA4M/rvFhkHEbYzg3yiCA/MtYPe7r4/0/VzuseFdGFzdzugJ6zeickTECXUGcz7SGiGRgt+qlOzc+IKYm0Zm5jBk7dlgKwbMzoa/LY6yeqI2f6ZXnTtoX2kKomW2ExrrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bAqzeJzF; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723542919; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=PciOPByFQj1IHN+EiM5rFX59Gxp74CyWVTSVv+ptmmM=;
-	b=bAqzeJzFZY3sHWGkdPLoPAXX5Sp6KRAi0TH5rknVYePWj907SBuCeovDAjhOsEgYa1+L+0MteYr8TdYrBjeTa+v6Di3bix0lU23/tjqRx+97r1NaM4T1TDQD9I4lpOoPZmxwtui/74c9Q6QnKFhLttBRxTz1OXnJeLkVTscikDM=
-Received: from 30.221.130.54(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCod0x1_1723542917)
-          by smtp.aliyun-inc.com;
-          Tue, 13 Aug 2024 17:55:18 +0800
-Message-ID: <b3e8c9b9-f708-4906-b010-b76d38db1fb1@linux.alibaba.com>
-Date: Tue, 13 Aug 2024 17:55:17 +0800
+	s=arc-20240116; t=1723543038; c=relaxed/simple;
+	bh=ZNnGkI0dGL0wSwGojEl+IOMHCQh5GYTMnNTRrFyWYgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RucKvOmMmVa1l3cJzH9RKeJrjiEQXhu9FaQPA99l4/tFgQU3JCJ0IZRlguF7jL1ZXWJwoWJrKyHAVCy2GzyfXvjjyRSQbPsHoOjnYspTizGj+5mxjoYnU3LxKKylX0CTdUTiXEFK52MbMwqgMmQJu/HpwOJR3AZSGNwuV45FU5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OVrXI/+E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89931C4AF09;
+	Tue, 13 Aug 2024 09:57:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723543038;
+	bh=ZNnGkI0dGL0wSwGojEl+IOMHCQh5GYTMnNTRrFyWYgc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OVrXI/+E5X7qnh5hjA1pLVnFhqAnq+Td7ISZbwYxD87apof8YTewNMVs3Tbny5gZD
+	 hCO38pZYN4HPQruS2mioTLiUMsEkR4TV6dGUiN4Gb7Rq9bAgjb283FF85PHyOEDvPC
+	 THCEPndPQtiUAYm9R+OPcGOx7ig7CMOXxePXBOEI=
+Date: Tue, 13 Aug 2024 11:57:15 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 1/8] misc: Add support for LAN966x PCI device
+Message-ID: <2024081356-mutable-everyday-6f9d@gregkh>
+References: <20240808154658.247873-1-herve.codina@bootlin.com>
+ <20240808154658.247873-2-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net/smc: introduce statistics for
- allocated ringbufs of link group
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240807075939.57882-1-guwen@linux.alibaba.com>
- <20240807075939.57882-2-guwen@linux.alibaba.com>
- <20240812174144.1a6c2c7a@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20240812174144.1a6c2c7a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808154658.247873-2-herve.codina@bootlin.com>
 
-
-
-On 2024/8/13 08:41, Jakub Kicinski wrote:
-> On Wed,  7 Aug 2024 15:59:38 +0800 Wen Gu wrote:
->> +	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_R_SNDBUF_ALLOC,
->> +			      lgr->alloc_sndbufs, SMC_NLA_LGR_R_PAD))
+On Thu, Aug 08, 2024 at 05:46:50PM +0200, Herve Codina wrote:
+> Add a PCI driver that handles the LAN966x PCI device using a device-tree
+> overlay. This overlay is applied to the PCI device DT node and allows to
+> describe components that are present in the device.
 > 
-> nla_put_uint()
+> The memory from the device-tree is remapped to the BAR memory thanks to
+> "ranges" properties computed at runtime by the PCI core during the PCI
+> enumeration.
+> 
+> The PCI device itself acts as an interrupt controller and is used as the
+> parent of the internal LAN966x interrupt controller to route the
+> interrupts to the assigned PCI INTx interrupt.
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-Hi, Jakub. Thank you for reminder.
+misc device is fine, even if it's not really one :)
 
-I read the commit log and learned the advantages of this helper.
-But it seems that the support for corresponding user-space helpers
-hasn't kept up yet, e.g. can't find a helper like nla_get_uint in
-latest libnl.
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
