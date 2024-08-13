@@ -1,88 +1,128 @@
-Return-Path: <netdev+bounces-118173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B3A950D5C
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:48:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84F2950D66
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 21:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EF4D281A8B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:48:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46EB81F22360
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2741A3BC5;
-	Tue, 13 Aug 2024 19:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17571A3BC5;
+	Tue, 13 Aug 2024 19:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Laq+qodc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qFeqBTuN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58D81C287;
-	Tue, 13 Aug 2024 19:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5041C287;
+	Tue, 13 Aug 2024 19:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723578499; cv=none; b=Y4FrlpkZW+1yar6CGpGAqsitJGbv9dLUCSewHyZEIJubxkUeU/2CNSJipCD6WqN9QHWrJ55jNynr/iMVSwmE1Hv6evZ4wYWc8MCBi3CzxLGdNqsRIMSMUgio4Tjgu9GKlvJspXq0HbmyrpTsPjvJBKlBcOMoQkl5W1Z139bZzsQ=
+	t=1723578785; cv=none; b=Dbv9Pyr43XjZr8sXukhvhsq2ZSKRpfuVxp0xCA7Noj0wdhUsPX5e2rDEDMX0AeXwBdckfoBMybTMX5uGXdYQuNqa24T44qa2qzkz7Hy96LEXwBhKccsMdx+P0WQsIB24UIt3r1hWYvfFb9Mi6l4hlvcGyexBLFcx388AwA98lrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723578499; c=relaxed/simple;
-	bh=9bGTubr5YdOVCwXC1TYYkAvuioa2SJyu7Quj5N+agEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=orQGz+I/g4b+3tZsFjkAUoBT1m741RDr2SsTT1ihHlI+URFKhAqjV996XzWZd2MOjcyg+A+f2/jS0M6oSiOzodgtidNt1/xitClMoeJmf556hEB08AOQXh43jvqOS5mfrf9eGBp/eYwXBpf+nqKYt3K4yIQfxdvuLpAIXh+S1iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Laq+qodc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1D2C4AF0C;
-	Tue, 13 Aug 2024 19:48:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723578499;
-	bh=9bGTubr5YdOVCwXC1TYYkAvuioa2SJyu7Quj5N+agEk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Laq+qodcciDQo5f1Nn06klCTpwZbXKfLvNbrijxLmGoFZeSznBrw+aSOG3u1lgwD3
-	 U3enzBsqOA41HDCjnkDnJdsdSgJgWMS541BTe/R5ZeT7qsw8PJJeW4tBgaOD6MCJK2
-	 mrBe+fqHiL2kiQNTbOkPC7oUgOaoPWPj13zYZWKvEEC733JCQZZuOtfdXf6XMdmflP
-	 CjUTg1HmmWx+1jjhNQ49q7AmaEvi3U7wht67VuNI+Js21Uy2cOMZ9MZW09e6zeQULK
-	 vELV9Kesb5hN0j3YQ0ITOa0MzHSyYR0eOYAV/Nn7+r7SjJPAlwHP+iBmKII7cn8ChK
-	 SYIIktM02g3OQ==
-Date: Tue, 13 Aug 2024 13:48:17 -0600
-From: Rob Herring <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH 1/1] dt-bindings: net: convert maxim,ds26522.txt to yaml
- format
-Message-ID: <20240813194817.GA1629980-robh@kernel.org>
-References: <20240809143208.3447888-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1723578785; c=relaxed/simple;
+	bh=u8azd52hcgNwadO9/+lnq74JXjt/FATQutSvfuZ5SNY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eg4Xn90go8DuE83mbtoscWgQ9n8gBqlVfeSyWA15T3qNDxrlyMVJIJI2E9UYiFDThoeRK9ffzAW29mb5b/0W+mZN38FyMOK19znPQurdsTbpmC8imdabMtORp1xSYJ9FL3ue7WYe3lHHLk0OHqaOGoV+LhQIghJ4one/EvPx7V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qFeqBTuN; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723578784; x=1755114784;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+shor+OzxsCmcctq1mFydd9s6unzmpHSdyiC8OC4HD0=;
+  b=qFeqBTuNUUjssvzHYMQdl81R2dTSWn+OuUOFA02C7lLQ5/qMfVRRLhzH
+   nJEMnbw30pXLvN/giPPzdfavuQX0wWORC200ALmqvg2AHEhERi3yDwPoW
+   +aWI6te8ly5b54Ra/o3bLy9y1ALnF9UVpDeoMksnDQUhqAhWLt3VqrYZs
+   M=;
+X-IronPort-AV: E=Sophos;i="6.09,286,1716249600"; 
+   d="scan'208";a="362106529"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 19:52:57 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:24099]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.1:2525] with esmtp (Farcaster)
+ id 152d6685-bac2-4119-b626-a486ea676ec8; Tue, 13 Aug 2024 19:52:55 +0000 (UTC)
+X-Farcaster-Flow-ID: 152d6685-bac2-4119-b626-a486ea676ec8
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 19:52:55 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.205.65) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 13 Aug 2024 19:52:52 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com>
+CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <stefan@datenfreihafen.org>,
+	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (2)
+Date: Tue, 13 Aug 2024 12:52:44 -0700
+Message-ID: <20240813195244.23260-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <000000000000f4a1b7061f9421de@google.com>
+References: <000000000000f4a1b7061f9421de@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240809143208.3447888-1-Frank.Li@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Aug 09, 2024 at 10:32:06AM -0400, Frank Li wrote:
-> Convert binding doc maxim,ds26522.txt to yaml format.
-> Additional changes
-> - Remove spi-max-frequency because ref to
-> /schemas/spi/spi-peripheral-props.yaml
-> - Add address-cells and size-cells in example
+From: syzbot <syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com>
+Date: Tue, 13 Aug 2024 10:42:25 -0700
+> Hello,
 > 
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dtb: /soc/spi@2100000/slic@2: failed to match any schema with compatible: ['maxim,ds26522']
+> syzbot found the following issue on:
 > 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  .../devicetree/bindings/net/maxim,ds26522.txt | 13 ------
->  .../bindings/net/maxim,ds26522.yaml           | 40 +++++++++++++++++++
->  2 files changed, 40 insertions(+), 13 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/maxim,ds26522.txt
->  create mode 100644 Documentation/devicetree/bindings/net/maxim,ds26522.yaml
+> HEAD commit:    ee9a43b7cfe2 Merge tag 'net-6.11-rc3' of git://git.kernel...
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13da25d3980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e8a2eef9745ade09
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e0bd4e4815a910c0daa8
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
 
-netdev didn't pick this up, so I applied, thanks.
+kstrdup() failed due to fault injection.
+
+We may want to change the WARN_ON(1) in these functions
+to net_warn_ratelimited() as we do so in do_setlink().
+
+  * __dev_change_net_namespace
+  * cfg802154_switch_netns
+  * cfg80211_switch_netns()
+
+[  141.438766][ T8054] FAULT_INJECTION: forcing a failure.
+[  141.438766][ T8054] name failslab, interval 1, probability 0, space 0, times 0
+[  141.453868][ T8054] CPU: 1 UID: 0 PID: 8054 Comm: syz.0.839 Not tainted 6.11.0-rc2-syzkaller-00111-gee9a43b7cfe2 #0
+[  141.464514][ T8054] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+[  141.474602][ T8054] Call Trace:
+[  141.477906][ T8054]  <TASK>
+[  141.480854][ T8054]  dump_stack_lvl+0x241/0x360
+[  141.507418][ T8054]  should_fail_ex+0x3b0/0x4e0
+[  141.512110][ T8054]  should_failslab+0xac/0x100
+[  141.516785][ T8054]  __kmalloc_node_track_caller_noprof+0xda/0x440
+[  141.523098][ T8054]  ? device_rename+0xb5/0x1b0
+[  141.527767][ T8054]  kstrdup+0x3a/0x80
+[  141.531651][ T8054]  device_rename+0xb5/0x1b0
+[  141.536142][ T8054]  cfg802154_switch_netns+0x1df/0x390
+[  141.541523][ T8054]  nl802154_wpan_phy_netns+0x13d/0x210
+[  141.546984][ T8054]  genl_rcv_msg+0xb14/0xec0
+[...]
+[  141.801010][ T8054]  </TASK>
+[  141.865238][ T8054] ------------[ cut here ]------------
+[  141.871127][ T8054] WARNING: CPU: 1 PID: 8054 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x37f/0x390
 
