@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-118150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B186950C3B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 20:28:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7445E950C3D
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 20:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63070286242
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:28:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 033F81F225F9
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301B61A38FB;
-	Tue, 13 Aug 2024 18:28:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9301A4F2A;
+	Tue, 13 Aug 2024 18:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kl0qYfGx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nwazf42l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9842B1A3BD0
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 18:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EC21A4F1F
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 18:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723573685; cv=none; b=o+VZnVvPfXGFgw6WJA58szRkhDo3VErrfhDO0WxrltkWqQJWVVRNsAVQDkpmgsMDN3TpDnGtjliFKNmEWfOp8HbDuWxo3j4wRs6TlEmT9VzQnltk5julOfZDe5xwsmpIuKmymyGGWBcZdxZIuKOOFL82HXlOU++37wd5i10j5JI=
+	t=1723573687; cv=none; b=Qk8HZuuGK20pEOB7geMCyEKjGEy9ErK1+jwW/p2Bq3iV7XKUbSoENhEwsWXzxs+s7MvveMS7ZsrxzBIKAFalSZi+FGPAwWrcTd2Ook6Eby92L3W/2hy+wZtZyBBEEtOw4VAfp1GqUed/wjwGTprm8PEX0yvSoiruigqs4t+QPVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723573685; c=relaxed/simple;
-	bh=341AIaEeBSFJu73c47ddLKfkUSw2l+H2RZ6SJ/BltPE=;
+	s=arc-20240116; t=1723573687; c=relaxed/simple;
+	bh=j69ckPh7E3QD6AiHqrqUQtHhaCzw1plGFQ8OeVu17UQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N00RonzQ8c8bj6iM6Y8iZRes1sdjaxuF9arPEh0iXadZJCqHIdW4t61Ad2U78HvvTrCjnbs4CetU7wsVy9W2JoZxi8V/ELB1HcRgfMjfi3pJ3XQWuS6zVsqIyTDGVgmgq/S4GQLACapbqDb3gCdl6zPXf8d1nkKOIx+ZxPEMXcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--manojvishy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kl0qYfGx; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=qFufTm1JhGNDK2WlNKi3GDZOKppDAN++MUp1zUpWd4VyVfkykwZARyfxtfG+QjGXV+xXUKJf/ag44rwCg/c6k0aPplw5m0uZV3JJzyHZpxBknm8aai0dihGzB56HOioMEi8vtN1cN83sfD+X4HSpyv9lfy4d61ukcuMRI6Lk1AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--manojvishy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nwazf42l; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--manojvishy.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66619cb2d3eso158615127b3.2
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:28:03 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66890dbb7b8so131011437b3.0
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723573682; x=1724178482; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723573685; x=1724178485; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvCJH3TZ9fBYiYpF5a88AFpsytgjevnUGq5R4un9KfQ=;
-        b=Kl0qYfGx59p5J73dw8Ih+eN5iZ2LHLA4V4tl2uU0KQvdtJ0pw0mJ9uWt+zGCQSGDtN
-         LRT9I+awdlnIqQHd+x18pPxtZPsP5FVxknjSzkFAPBP/vRIoSjLAU2wLHhOgy9vBkcnS
-         dHTw3Lgtz7DtdNo0xvDGc8mlxTLmIGvgfI9TfKY1XAi6VhnDr0wDJpPdzWFyojrVWvuO
-         QaGHVP0vd/sYow/JDgi5EcSbW1ioKn+QRSiPBJSvWfAe0EMBPJWwwhZQCcJWr/jNW0DI
-         wwlQkL8Ql/7eRJkHfjzue7hAPcVQbM6Pq9AXlXVvm/mJ3VayM6Jp0q8dwYWYGHjDmtBk
-         5FJw==
+        bh=TP961J72JDd3W/A5AwIhTA95rpBeW3mVlPbF5keUAfI=;
+        b=nwazf42lrD42GpXfM+jnF7888q8ncFWYTMYMigAohgEzXGv4S9yAa0SXQ0eOm3P4bR
+         BzO5S2StBzMBoQ+hjldsU3GyApif5J8S1m9mayupmZZEWq70wwPjlzbiQdWeO8UZhiak
+         2EL9qtMAftz5I6UMFGiY4lA3ZBAl6ZzrsW7XI6AQqND8DEhuctR72AFniEq3oncViDuq
+         0q/I+1LC1ijdleIBL+0c9vY9VKuFOo2lnf/JjbiEcMhoK6Zx+tPVPqO4UG/NSNzuXPvq
+         XqfFcud5tH/eyIl6Hpoe7W5sY8SwIugdkoRCrDXjecapJefBwqGKa5NyDbPeuNE0D+D9
+         z3aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723573682; x=1724178482;
+        d=1e100.net; s=20230601; t=1723573685; x=1724178485;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvCJH3TZ9fBYiYpF5a88AFpsytgjevnUGq5R4un9KfQ=;
-        b=RrxpR1bxBuJnkPpCwOPVk5hHDK1G+uHvrc/9FD8zGe5LAAyqgfzW8vH+wAMkb0Ijqe
-         L+nKhTn6AoOQUOBIPy2fkV11RQWGmhrDfNWnXApdKHhyHv/8cP+p3dYAI5CiGaqil/6B
-         JKNBotfM127xYwUJ1rSBZ9dPPfAekmvfXn65F34zU7v7NWaBd20aDvNdJ60YSy42p/uz
-         2kKb/8pvYtf/1Ih6+oYEM2pSbr/7y/gTkjoyFl/hv586giGWjympdbuJbQUPdr/OdnzF
-         aCIId5wRdGZSmb+bYYZHKdQ5T7dpJf1BKxVdKm6SF7SVSRL7aOxK6THUw4Ita+xJUZpI
-         Jiaw==
-X-Gm-Message-State: AOJu0YxGqEKtMZxAswuIv64SC8uyAS14k88LH5ryPnDSgK5frmoqJvcT
-	3ovrujV5S4/HbVcO5gD3yZAaDFxD+b9jU1UNLfR8MMGrweTLW7TWsxw+c1la7X9VXIYJL5wBlkP
-	2ocxUK11SPpXjSKsmCg==
-X-Google-Smtp-Source: AGHT+IGj4/G4VHtyu7j84mLj7yhWkQtHtTJEHKj/H2cGvmAy6yo3iqZtz9v6g07d1BL8wXt51Jxah1P72bzfqR2d
+        bh=TP961J72JDd3W/A5AwIhTA95rpBeW3mVlPbF5keUAfI=;
+        b=dcgNoC1fJqBcabxsZrX34RO3fwu3Kb8cQX38ulxdMCfPuJAlTlA5jqfkN3HAizsldD
+         oNS928vlaPHkeaKHlzoQVeI6Iov9n6BDHPrzlqXIFuj5peTE9rfv7+8ovuh2n1UexFuA
+         JNeAjrXuQnzaAsWCkSyXqPYC6WyawIt7ETEiUK5slCn4zjJjcKJrEItsYR708oQa1p4M
+         jYExcrIJ6wcLq/jtIZtiAg0GHh1H9bdYcvXTCE3BCDK4IYVokab+UcoMfqPrNIXnXAkr
+         3iikHDCTzxKTce0o+sLwYJQuNOqusAc/w5rcFrsykoWOqiFpPwgyfdvP4GS2gpM9M2D0
+         /j8w==
+X-Gm-Message-State: AOJu0YwLcSv0PFgAV+pJXdr2owAbslcW2/o7IUA9uTJzLNNuBGf5XoV9
+	XuAJ973T1SMkxvMK96Ug3h4WWKw2MIAtTeqfdvR9cTjm3Z9ianh8l/y6wLpA4pa6gq0AgVZlWdq
+	gH/NBFbV+DcdApOxA9w==
+X-Google-Smtp-Source: AGHT+IEcUJ4nno820COmCVkqEY2grkP8CkJXPuWKQlxjBtfvY5Cd6Kury80B6+oOUU3OFR28ZBOqgQRdHfLwWACY
 X-Received: from manojvishy.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:413f])
- (user=manojvishy job=sendgmr) by 2002:a5b:b43:0:b0:e03:5b06:6db2 with SMTP id
- 3f1490d57ef6-e1155a57e9amr896276.3.1723573682504; Tue, 13 Aug 2024 11:28:02
- -0700 (PDT)
-Date: Tue, 13 Aug 2024 18:27:44 +0000
+ (user=manojvishy job=sendgmr) by 2002:a25:c5c3:0:b0:e0b:f69b:da30 with SMTP
+ id 3f1490d57ef6-e1155b7c6cbmr11272276.9.1723573685319; Tue, 13 Aug 2024
+ 11:28:05 -0700 (PDT)
+Date: Tue, 13 Aug 2024 18:27:45 +0000
 In-Reply-To: <20240813182747.1770032-1-manojvishy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,48 +73,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240813182747.1770032-1-manojvishy@google.com>
 X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240813182747.1770032-3-manojvishy@google.com>
-Subject: [PATCH v1 2/5] idpf: Acquire the lock before accessing the xn->salt
+Message-ID: <20240813182747.1770032-4-manojvishy@google.com>
+Subject: [PATCH v1 3/5] idpf: convert workqueues to unbound
 From: Manoj Vishwanathan <manojvishy@google.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	google-lan-reviews@googlegroups.com, 
+	google-lan-reviews@googlegroups.com, Marco Leogrande <leogrande@google.com>, 
 	Manoj Vishwanathan <manojvishy@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The transaction salt was being accessed before acquiring the
-idpf_vc_xn_lock when idpf has to forward the virtchnl reply.
+From: Marco Leogrande <leogrande@google.com>
 
-Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
+When a workqueue is created with `WQ_UNBOUND`, its work items are
+served by special worker-pools, whose host workers are not bound to
+any specific CPU. In the default configuration (i.e. when
+`queue_delayed_work` and friends do not specify which CPU to run the
+work item on), `WQ_UNBOUND` allows the work item to be executed on any
+CPU in the same node of the CPU it was enqueued on. While this
+solution potentially sacrifices locality, it avoids contention with
+other processes that might dominate the CPU time of the processor the
+work item was scheduled on.
 
+This is not just a theoretical problem: in b/317234476, a
+misconfigured process was hogging most of the time from CPU0, leaving
+less than 0.5% of its CPU time to the kworker. The IDPF workqueues
+that were using the kworker on CPU0 suffered large completion delays
+as a result, causing performance degradation, timeouts and eventual
+system crash.
+
+Tested:
+
+* I have also run a manual test to gauge the performance
+  improvement. The test consists of an antagonist process
+  (`./stress --cpu 2`) consuming as much of CPU 0 as possible. This
+  process is run under `taskset 01` to bind it to CPU0, and its
+  priority is changed with `chrt -pQ 9900 10000 ${pid}` and
+  `renice -n -20 ${pid}` after start.
+
+  Then, the IDPF driver is forced to prefer CPU0 by editing all calls
+  to `queue_delayed_work`, `mod_delayed_work`, etc... to use CPU 0.
+
+  Finally, `ktraces` for the workqueue events are collected.
+
+  Without the current patch, the antagonist process can force
+  arbitrary delays between `workqueue_queue_work` and
+  `workqueue_execute_start`, that in my tests were as high as
+  `30ms`. With the current patch applied, the workqueue can be
+  migrated to another unloaded CPU in the same node, and, keeping
+  everything else equal, the maximum delay I could see was `6us`.
+
+Signed-off-by: Marco Leogrande <leogrande@google.com>
 Signed-off-by: Manoj Vishwanathan <manojvishy@google.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/idpf_main.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 70986e12da28..30eec674d594 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -612,14 +612,15 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapter,
- 		return -EINVAL;
- 	}
- 	xn = &adapter->vcxn_mngr->ring[xn_idx];
-+	idpf_vc_xn_lock(xn);
- 	salt = FIELD_GET(IDPF_VC_XN_SALT_M, msg_info);
- 	if (xn->salt != salt) {
- 		dev_err_ratelimited(&adapter->pdev->dev, "Transaction salt does not match (%02x != %02x)\n",
- 				    xn->salt, salt);
-+		idpf_vc_xn_unlock(xn);
- 		return -EINVAL;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index db476b3314c8..dfd56fc5ff65 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -174,7 +174,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	pci_set_master(pdev);
+ 	pci_set_drvdata(pdev, adapter);
+ 
+-	adapter->init_wq = alloc_workqueue("%s-%s-init", 0, 0,
++	adapter->init_wq = alloc_workqueue("%s-%s-init",
++					   WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
+ 					   dev_driver_string(dev),
+ 					   dev_name(dev));
+ 	if (!adapter->init_wq) {
+@@ -183,7 +184,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_free;
  	}
  
--	idpf_vc_xn_lock(xn);
- 	switch (xn->state) {
- 	case IDPF_VC_XN_WAITING:
- 		/* success */
+-	adapter->serv_wq = alloc_workqueue("%s-%s-service", 0, 0,
++	adapter->serv_wq = alloc_workqueue("%s-%s-service",
++					   WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
+ 					   dev_driver_string(dev),
+ 					   dev_name(dev));
+ 	if (!adapter->serv_wq) {
+@@ -192,7 +194,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_serv_wq_alloc;
+ 	}
+ 
+-	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", 0, 0,
++	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx",
++					  WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
+ 					  dev_driver_string(dev),
+ 					  dev_name(dev));
+ 	if (!adapter->mbx_wq) {
+@@ -201,7 +204,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_mbx_wq_alloc;
+ 	}
+ 
+-	adapter->stats_wq = alloc_workqueue("%s-%s-stats", 0, 0,
++	adapter->stats_wq = alloc_workqueue("%s-%s-stats",
++					    WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
+ 					    dev_driver_string(dev),
+ 					    dev_name(dev));
+ 	if (!adapter->stats_wq) {
+@@ -210,7 +214,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_stats_wq_alloc;
+ 	}
+ 
+-	adapter->vc_event_wq = alloc_workqueue("%s-%s-vc_event", 0, 0,
++	adapter->vc_event_wq = alloc_workqueue("%s-%s-vc_event",
++					       WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
+ 					       dev_driver_string(dev),
+ 					       dev_name(dev));
+ 	if (!adapter->vc_event_wq) {
 -- 
 2.46.0.76.ge559c4bf1a-goog
 
