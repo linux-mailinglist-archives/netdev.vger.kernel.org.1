@@ -1,171 +1,132 @@
-Return-Path: <netdev+bounces-118006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 206959503DE
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:37:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DC79503E9
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524B71C215EE
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:37:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D2AD1F23C01
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0931990CE;
-	Tue, 13 Aug 2024 11:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256471990D6;
+	Tue, 13 Aug 2024 11:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Zca166UX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWbESJuz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23E9170A2B;
-	Tue, 13 Aug 2024 11:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40811990CE
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723549072; cv=none; b=VziQWm4gd8Dt+KkHBJhNx11DcskznT0yOJV4UsSTauDjaz1wJ+oNVNVRquoUmvb/pSIi01Sspe0l8V5vd4XkKmpUlPKiFp3WkkjjIjLAzHcRrHzqfSM143YkdjZ9DHDq//ADwAX5rKgXFUHbZLsY/VAN0T6am408hyBWtRcuFzI=
+	t=1723549232; cv=none; b=o8AigAlIXH9uA3Zi6g2IxY62xLJnbYtAdElONeUqc0Dula3/4wVpTeEUGJOoe9mkiDKkmFaYZucctLDXtJl9J7UPqn3ydq36WoOnvvcBvY+2oOKvrtTn3MlM8RikGrrhneK1j/V2E82KNKdTY+qfrHzQnTcgVe4VHUNIs5Nh8QY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723549072; c=relaxed/simple;
-	bh=PJWrgO5y3JhQ6pVObk1LLEY6Ws3Bwk+wMwfRzlsIZFA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fa7scv6IPuV1kBgJ6OlI8DRuKi5DUhm5kVwxkRohV/c4mtMaRKEPdrLsfBXc0pLtz1Ma21izxzcTnGdA7j3+VF9OZL4zG5H1TXXupCfOJfo7Io/cdFhOIU9d53iq212vz8kdMgmp4Kn08Zy5+NncbEq4Pwp9s85EsttyiMd0xwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Zca166UX; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723549060; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=2I77YcUJn4wmoyRvCpJBoQDGsqzU26+ytOtN/lJqgpI=;
-	b=Zca166UXp0gsLxPfMParM7J41ZaWOC1flL67+gzZ/V2W+yGvBXNsPBKbq5Yu6aQOvlggmCGXFkuiOKWCdRKS3O+Nf3kwjgz3cH9Lsda8Aq0JLIc8rOhO5TwXmRS2earhdcN93g20SEwBwUrWRixtnKizp/ng0Mtr7PTtL3kp7/E=
-Received: from 30.221.149.156(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WCp.8vm_1723549058)
-          by smtp.aliyun-inc.com;
-          Tue, 13 Aug 2024 19:37:39 +0800
-Message-ID: <b4b49770-2042-4ee8-a1e8-1501cdd807cf@linux.alibaba.com>
-Date: Tue, 13 Aug 2024 19:37:38 +0800
+	s=arc-20240116; t=1723549232; c=relaxed/simple;
+	bh=ebpFbm/NIDIJmFg9Q2QiDeBNxT+9vl/HwSgUXAcv5mE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nYhBXbNuoTR6FcObdQUkEwkVta4mb94J2xTqdpMx4N1E3dlwL/zJ48UxcMdU+zhblGac4iPmaxAyngUQogf8M87vT9sxe9AxVrpMulubyboF58fzvPhT6oF/5SvgS/sfMgGJrHSXAwogHGfO2KkvL8+2MFiCYkL16FTiqsyuU4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rWbESJuz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2840C4AF09;
+	Tue, 13 Aug 2024 11:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723549231;
+	bh=ebpFbm/NIDIJmFg9Q2QiDeBNxT+9vl/HwSgUXAcv5mE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=rWbESJuzESu5IRQ0UQhWcrIZnexc0k3uRsMj7PrpJJRxknp2zjW0B4mb2wrdFgHT/
+	 HTrOt5Pw8Ky7xGKUFnROFytF8pW4nVASGlFxo8jIiTjLk90EOXEGhhXxQPuZvZ6UPH
+	 f3oIAH4Bko0egS2UcGXLqIBL1v1tyJJR8Y9mzg6idz5xIfggszJvtCmNkQml/+cC5p
+	 EhQVedEadRfPiXX888iGCbCpwnNI0Tesp/YXPOvyampY0T4ieen69kPgHGcy7DTynm
+	 mcPMJAv9Bh7jNALNnamUaEtSnlbXFv3GRHxQRLv/AQ+KBDgwHv7Z+2YwEBU/cO3Km8
+	 NtvmhxKJ3t28w==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9332114ADED1; Tue, 13 Aug 2024 13:40:28 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Duan Jiong <djduanjiong@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
+In-Reply-To: <CALttK1Qe-25JNwOmrhuVv3bbEZ=7-SNJgq_X+gB9e4BfzLLnXA@mail.gmail.com>
+References: <20240808070428.13643-1-djduanjiong@gmail.com>
+ <87v80bpdv9.fsf@toke.dk>
+ <CALttK1RsDvuhdroqo_eaJevARhekYLKnuk9t8TkM5Tg+iWfvDQ@mail.gmail.com>
+ <87mslnpb5r.fsf@toke.dk> <00f872ac-4f59-4857-9c50-2d87ed860d4f@Spark>
+ <87h6bvp5ha.fsf@toke.dk>
+ <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
+ <87seveownu.fsf@toke.dk>
+ <CALttK1Qe-25JNwOmrhuVv3bbEZ=7-SNJgq_X+gB9e4BfzLLnXA@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 13 Aug 2024 13:40:28 +0200
+Message-ID: <87frr8wt03.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in
- txopt_get
-To: Jeongjun Park <aha310510@gmail.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, gbayer@linux.ibm.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com
-Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com,
- pabeni@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-References: <20240813100722.181250-1-aha310510@gmail.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20240813100722.181250-1-aha310510@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Duan Jiong <djduanjiong@gmail.com> writes:
 
-
-On 8/13/24 6:07 PM, Jeongjun Park wrote:
-> Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
-> copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
+> Sorry for responding to the email so late.
 >
-> In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
+>>
+>> I do see your point that a virtual device doesn't really *have* to
+>> respect MTU, though. So if we were implementing a new driver this
+>> argument would be a lot easier to make. In fact, AFAICT the newer netkit
+>> driver doesn't check the MTU setting before forwarding, so there's
+>> already some inconsistency there.
+>>
+>> >> You still haven't answered what's keeping you from setting the MTU
+>> >> correctly on the veth devices you're using?
+>> >
 >
-> To solve this, we need to add a smc6_sock structure for ipv6_pinfo_offset
-> initialization and modify the smc_sock structure.
+> vm1(mtu 1600)---ovs---ipsec vpn1(mtu 1500)---ipsec vpn2(mtu
+> 1500)---ovs---vm2(mtu 1600)
+
+Where's the veth device in this setup?
+
+> My scenario is that two vms are communicating via ipsec vpn gateway,
+> the two vpn gateways are interconnected via public network, the vpn
+> gateway has only one NIC, single arm mode. vpn gateway mtu will be
+> 1500 in general, but the packets sent by the vm's to the vpn gateway
+> may be more than 1500, and at this time, if implemented according to
+> the existing veth driver, the packets sent by the vm's will be
+> discarded. If allowed to receive large packets, the vpn gateway can
+> actually accept large packets then esp encapsulate them and then
+> fragment so that in the end it doesn't affect the connectivity of the
+> network.
+
+I'm not sure I quite get the setup; it sounds like you want a subset of
+the traffic to adhere to one MTU, and another subset to adhere to a
+different MTU, on the same interface? Could you not divide the traffic
+over two different interfaces (with different MTUs) instead?
+
+>> > Agreed that it has a risk, so some justification is in order. Similar
+>> > to how commit 5f7d57280c19 (" bpf: Drop MTU check when doing TC-BPF
+>> > redirect to ingress") addressed a specific need.
+>>
+>> Exactly :)
+>>
+>> And cf the above, using netkit may be an alternative that doesn't carry
+>> this risk (assuming that's compatible with the use case).
+>>
+>> -Toke
 >
-> Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-> Tested-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->   net/smc/smc.h      | 19 ++++++++++---------
->   net/smc/smc_inet.c | 24 +++++++++++++++---------
->   2 files changed, 25 insertions(+), 18 deletions(-)
 >
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index 34b781e463c4..f4d9338b5ed5 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -284,15 +284,6 @@ struct smc_connection {
->   
->   struct smc_sock {				/* smc sock container */
->   	struct sock		sk;
-> -	struct socket		*clcsock;	/* internal tcp socket */
-> -	void			(*clcsk_state_change)(struct sock *sk);
-> -						/* original stat_change fct. */
-> -	void			(*clcsk_data_ready)(struct sock *sk);
-> -						/* original data_ready fct. */
-> -	void			(*clcsk_write_space)(struct sock *sk);
-> -						/* original write_space fct. */
-> -	void			(*clcsk_error_report)(struct sock *sk);
-> -						/* original error_report fct. */
->   	struct smc_connection	conn;		/* smc connection */
->   	struct smc_sock		*listen_smc;	/* listen parent */
->   	struct work_struct	connect_work;	/* handle non-blocking connect*/
-> @@ -325,6 +316,16 @@ struct smc_sock {				/* smc sock container */
->   						/* protects clcsock of a listen
->   						 * socket
->   						 * */
-> +	struct socket		*clcsock;	/* internal tcp socket */
-> +	void			(*clcsk_state_change)(struct sock *sk);
-> +						/* original stat_change fct. */
-> +	void			(*clcsk_data_ready)(struct sock *sk);
-> +						/* original data_ready fct. */
-> +	void			(*clcsk_write_space)(struct sock *sk);
-> +						/* original write_space fct. */
-> +	void			(*clcsk_error_report)(struct sock *sk);
-> +						/* original error_report fct. */
-> +
->   };
->   
->   #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
-> diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-> index bece346dd8e9..25f34fd65e8d 100644
-> --- a/net/smc/smc_inet.c
-> +++ b/net/smc/smc_inet.c
-> @@ -60,16 +60,22 @@ static struct inet_protosw smc_inet_protosw = {
->   };
->   
->   #if IS_ENABLED(CONFIG_IPV6)
-> +struct smc6_sock {
-> +	struct smc_sock smc;
-> +	struct ipv6_pinfo np;
-> +};
+> I can see how there could be a potential risk here, can we consider
+> adding a switchable option to control this behavior?
 
-I prefer to:
+Hmm, a toggle has its own cost in terms of complexity and overhead. Plus
+it's adding new UAPI. It may be that this is the least bad option in the
+end, but before going that route we should be very sure that there's not
+another way to solve your problem (cf the above).
 
-struct ipv6_pinfo inet6;
+This has been discussed before, BTW, most recently five-and-some
+years ago:
 
-> +
->   static struct proto smc_inet6_prot = {
-> -	.name		= "INET6_SMC",
-> -	.owner		= THIS_MODULE,
-> -	.init		= smc_inet_init_sock,
-> -	.hash		= smc_hash_sk,
-> -	.unhash		= smc_unhash_sk,
-> -	.release_cb	= smc_release_cb,
-> -	.obj_size	= sizeof(struct smc_sock),
-> -	.h.smc_hash	= &smc_v6_hashinfo,
-> -	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
-> +	.name				= "INET6_SMC",
-> +	.owner				= THIS_MODULE,
-> +	.init				= smc_inet_init_sock,
-> +	.hash				= smc_hash_sk,
-> +	.unhash				= smc_unhash_sk,
-> +	.release_cb			= smc_release_cb,
-> +	.obj_size			= sizeof(struct smc6_sock),
-> +	.h.smc_hash			= &smc_v6_hashinfo,
-> +	.slab_flags			= SLAB_TYPESAFE_BY_RCU,
-> +	.ipv6_pinfo_offset		= offsetof(struct smc6_sock, np),
->   };
->   
->   static const struct proto_ops smc_inet6_stream_ops = {
-> --
+https://patchwork.ozlabs.org/project/netdev/patch/CAMJ5cBHZ4DqjE6Md-0apA8aaLLk9Hpiypfooo7ud-p9XyFyeng@mail.gmail.com/
 
+-Toke
 
