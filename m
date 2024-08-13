@@ -1,160 +1,103 @@
-Return-Path: <netdev+bounces-118052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909BC950680
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:29:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1388A950690
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC5431C22871
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:29:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 920CAB2380E
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60ED319CD13;
-	Tue, 13 Aug 2024 13:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5527D19B5BE;
+	Tue, 13 Aug 2024 13:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmYjnoYr"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5325919CCEF;
-	Tue, 13 Aug 2024 13:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE4D19AD6E;
+	Tue, 13 Aug 2024 13:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723555767; cv=none; b=KzCBnCast7ebnM023EvHTIAzDjTZJ6MHMmwM1Lz2yHUSRDIrytfLRDkPWSVEZzqTLNhsSasEuLp9ku7+fvg9C44CXGy4zsGhHAl62ugd5zcW1lHMOpegAJwLI3MIR8wzryhBeqKG8qP23L6doJMGWRtujod59zksJlxBv4hr6MY=
+	t=1723556038; cv=none; b=Gx4Kk716VLwBw44WguYNnWaPuDGg+dGgZm0qummsDQgachCVTzgKj4aLBbb6YIMV8/G5w62v89L5B9n/QbrTEcXGLIjA8HtzDEUm34BYBxf/3UVfytyj5dXx3a+eTgKFu6zg16OH0ia6IF8LnwdujibwNCwZm1ror1f6dJmHKv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723555767; c=relaxed/simple;
-	bh=qJpxspnrWXoqQxoImgHoe5rKtDxy5tct/IFJXI+M+Yk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LQZ6t4NVO2T8Cmf0DJRKmARW3uyL0ftdFWWoME8jctuKVETlRDz6goRDAz2W8FkKTUu3nmaYnBj7C3ykSP0ypNREWp9z/OncMjfOjWq8aXu394qKv5dIq5nLQzM34d/dLQclDW/Z6MakVbNOfqOsKRa2V87Flj7R6r9WW/B4MNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.09,285,1716217200"; 
-   d="scan'208";a="215500539"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 13 Aug 2024 22:29:22 +0900
-Received: from [10.226.93.14] (unknown [10.226.93.14])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id E9BE041E20BE;
-	Tue, 13 Aug 2024 22:29:18 +0900 (JST)
-Message-ID: <524873e1-d770-4f29-a374-dab99fe87c14@bp.renesas.com>
-Date: Tue, 13 Aug 2024 14:29:17 +0100
+	s=arc-20240116; t=1723556038; c=relaxed/simple;
+	bh=z+NJxoXGT6DAoM3jpcIPdgMxSjAu22qbMus24gzDpxw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VSsaxn45fu26U9PxAfMB1vaWc0QgD0k/fFJ8ComCZbWXb+trsAst5kev9kK8yq3jUfxFYWO7i4SXEQZ2GD/uO9r7EXbqzsnXi2VKL0Nz8gG3YtwdplpWPD0t2n8MojhsbLMpezczP1BiarHpZ5HyHgOzv05YGYCuudLZcLUkmbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmYjnoYr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 682B9C4AF09;
+	Tue, 13 Aug 2024 13:33:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723556036;
+	bh=z+NJxoXGT6DAoM3jpcIPdgMxSjAu22qbMus24gzDpxw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=pmYjnoYrLCAXhpLUA6LwgPyFir2W7RJXhjAg2B3WS7Y2aG761JlUYoHj4497xm2or
+	 8VanwvABUAjAqANhqMgkyhq8bwDOMlhTjjbYJavTD/mxwOSGU3+Wo2oTimalDq+pwc
+	 TP0ZXIsaEj+lM2bX6bdxKwPtIb8tJ9Skq1LACKwXL/p9W5W5vY/j8F6jaG2+u0WW2o
+	 FETcPeZ216/C/11FgCOSwQhGnunDyJp6N8MNna6s1nAR/abzkcHQ4ui4TRfH2CTERp
+	 DInpgca+MDes+PhFoIB6c4MpA4oaP2sH4o3AIu53in9Ah2HN0Lnv6eABtf0/OJ323b
+	 DmLgwm0Ws2hdA==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 0/3] ipv6: Add
+ ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+Date: Tue, 13 Aug 2024 14:33:46 +0100
+Message-Id: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
-Content-Language: en-GB
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
- <b1c10539-4d47-4752-8613-785b0ad83f5e@lunn.ch>
- <933ffa58-8092-4768-993d-cd62897d203d@bp.renesas.com>
- <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALpgu2YC/32NQQqDMBBFryKz7pQkjaJdeY8iJZqJhkqUiQSLe
+ PcGD9Dl4/HfPyASe4rwLA5gSj76JWRQtwKGyYSR0NvMoITSopYK/Zqqt7GWcaJ5JY7omrrXjXa
+ 9oArybmVyfr+aLwi0YaB9gy6bycdt4e91luTl/3STRIHG9KWV7lEOWrQf4kDzfeERuvM8fw8A0
+ tO9AAAA
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Yisen Zhuang <yisen.zhuang@huawei.com>, 
+ Salil Mehta <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+X-Mailer: b4 0.14.0
 
-On 17/06/2024 15:29, Andrew Lunn wrote:
-> On Mon, Jun 17, 2024 at 03:03:21PM +0100, Paul Barker wrote:
->> On 16/06/2024 02:23, Andrew Lunn wrote:
->>> On Sat, Jun 15, 2024 at 11:30:38AM +0100, Paul Barker wrote:
->>>> The RX frame size limit should not be based on the current MTU setting.
->>>> Instead it should be based on the hardware capabilities.
->>>
->>> This is a bit odd. MTU is Maximum Transmission Unit, so clearly is
->>> about Tx. MRU does not really exist. Does TCP allow for asymmetric
->>> MTU/MRU? Does MTU discovery work correctly for this?
->>>
->>> In general, it seems like drivers implement min(MTU, MRU) and nothing
->>> more. Do you have a real use case for this asymmetry?
->>>
->>>       Andrew
->>
->> Hi Andrew,
->>
->> This change is based on my understanding of MTU/MRU, on the specs of the
->> RZ SoCs I'm working with (primarily RZ/G2L family, RZ/G3S and RZ/G2H)
->> and on some testing. My goal here is just to make the capabilities of
->> the hardware available to users.
->>
->> For the RZ/G2L family and RZ/G3S, we can only support an MTU of up to
->> 1500 bytes, but we can receive frames of up to (IIRC) 8192 bytes. I have
->> tested sending jumbo frames to an RZ/G2L device using both iperf3 and
->> ping and I see no errors.
->>
->> * For iperf3 RX testing, the RZ/G2L is only responding with acks. These
->>   are small regardless of the size of the received packets, so the
->>   mis-match in MTU between the two hosts causes no issue.
->>
->> * For ping testing, the RZ/G2L will give a fragmented response to the
->>   ping packet which the other host can reassemble.
->>
->> For the RZ/G2H, we support sending frames of up to 2047 bytes but we can
->> receive frames of up to 4092 bytes. The driver will need a few more
->> changes to handle reception of packets >2kB in size, but this is
->> something we can do in the near future.
->>
->> Is there any reason why we shouldn't support this? I am by no means an
->> expert in the Linux networking internals so there may be things I'm
->> missing.
-> 
-> I've no really experience what the Linux stack will do. I have seen a
-> number of devices which do not limit received packets to the MTU,
-> i.e. they are happy to receive bigger packets. And i don't think this
-> has caused an issue. But is it ever actually used? Do users setup
-> asymmetric jumbo systems? I've no idea.
-> 
-> One thing i suggest you test is you put this in the middle of two
-> systems which do support jumbo.
-> 
->      4K       1.5K       4K
-> A <-----> B <-----> C <------> D.
-> 
-> Make your device B and C, setting the MTU as supported. But set A and
-> D with a jumbo MTU which your systems should be able to receive. Do IP
-> routing along the chain. And then do some iperf transfers. I would
-> test both IPv4 and IPv6, since MTU path discovery in IPv6 is used a
-> lot, and gateways are not supposed to fragment.
-> 
-> I'm assuming here your device does actually have two interfaces?  If
-> it is only ever an end system, that simplifies it a lot, and these
-> tests are not needed.
-> 
->     Andrew
+Hi,
 
-Apologies, my response here is abysmally late due to illness, other
-priorities and then the loss of my main dev box.
+This series adds and uses some new helpers,
+ipv6_addr_{cpu_to_be32,be32_to_cpu}, which are intended to assist in
+byte order manipulation of IPv6 addresses stored as as arrays.
 
-As you've said, a number of devices do not limit received packet size to
-the MTU. There are many applications, other than a gateway, where using
-jumbo packets in even just one direction would be beneficial. For
-example if an application needs to receive large amounts of data but
-only needs to send back control and acknowledgement messages. I think we
-should support this where possible. This is the thought behind the first
-patch in this series as the GbEth IP present in the RZ/G2L and other
-Renesas SoCs has a very asymmetric capability (it can receive 8000 byte
-frames but only transmit 1522 byte frames).
+---
+Changes in v2:
+- Collected tags from Andrew Lunn and Jijie Shao. Thanks!
+- Corrected typo in commit message of 1st patch: cpy -> CPU.
+  Thanks to Andrew Lunn.
+- Also enhanced same commit message to mention both helpers.
+- Link to v1: https://lore.kernel.org/r/20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org
 
-If we explicitly do not wish to support this, that restriction should be
-documented and then (maybe over time) handled uniformly for all network
-drivers.
+---
+Simon Horman (3):
+      ipv6: Add ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+      net: ethernet: mtk_eth_soc: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+      net: hns3: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
 
-I'm planning to submit v2 of this series shortly.
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 79 +++++++++++-----------
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |  8 ++-
+ drivers/net/ethernet/mediatek/mtk_ppe.c            | 10 +--
+ drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c    |  9 +--
+ include/net/ipv6.h                                 | 12 ++++
+ 5 files changed, 66 insertions(+), 52 deletions(-)
 
-Thanks,
+base-commit: dd1bf9f9df156b43e5122f90d97ac3f59a1a5621
 
--- 
-Paul Barker
 
