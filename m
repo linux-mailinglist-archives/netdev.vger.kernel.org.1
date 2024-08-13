@@ -1,94 +1,153 @@
-Return-Path: <netdev+bounces-118113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DCAD9508EF
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:23:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2F095090B
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0DCF1C2402B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:23:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3794BB25DCD
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E0919FA6B;
-	Tue, 13 Aug 2024 15:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4AC91A0720;
+	Tue, 13 Aug 2024 15:26:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L6wEfXzG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lz/8AFXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF0619925A;
-	Tue, 13 Aug 2024 15:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9F81A0702;
+	Tue, 13 Aug 2024 15:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723562602; cv=none; b=Nn9iKOtqZf6RuiXRFFQmA7H2cGJP5+qMqDkLR5P1MgcK8H2iavFQoBG7O3xsjeV5PIJjL9/W4BXphhrKTet/YjYluItAciHbWTsR6qZgsZt+wICCDgYMFD/odOCxOEzk3SR3HxQBwW89cVmudYik0kzk6O4MmNEEGuzgGTHyj5g=
+	t=1723562778; cv=none; b=FiFRPKjgBIMtckf0FQGy2769Llk6uE8x0JdewxQ8sAjTksN1TW9RAjdhOR4PhiGpwY1cmNgTivEtr3lJwhuwtxODVN9mJDSsqLNCKPWgXnW0WcBFZI5WlJItFTQ6IfzOQ3qbi7jMa/t7HXqwl1VnFuztrziuByw2HKFhebwNT9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723562602; c=relaxed/simple;
-	bh=NTkQs0Af3L/SAagPlvcpiuyXx574nzjMiR7hobHTfVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m6gurXijJFdcpTcdCqVyBpPvH66JJE+XNe45CJLBYhR7JJt15X2uwdqmxAbOQNHrb1yCAAlndzYBP4N6chxJl4A26LONkbP9aP1WGXLGE+wIP8cdSKymKlmgeglG6wl9eHeV7pZpIBiXASR4GmZmVH/iwaJFSmg6+W3nqXf2KIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L6wEfXzG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JZ2l5RamidfdZzqlVKYX21MPAXo5/WvszqGbg4rd2KI=; b=L6wEfXzGshZS6PUtqrntoDwdWJ
-	2hqFVOcto6hCkLdSrksn3/49pKfETy23+AwkSTs9GJjEMWtgQ8l+HHIh2C60ZWctv9uzDU8TA7jia
-	zIe5K487f+k3+rNY6T9cnHkebbsMOSGqEdI3FGGXjFlgBA7tuuoE9crVcQF4YM/DFFCQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sdtMY-004h9S-7y; Tue, 13 Aug 2024 17:23:06 +0200
-Date: Tue, 13 Aug 2024 17:23:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2 5/7] net: ti: icssg-prueth: Enable HSR Tx
- Packet duplication offload
-Message-ID: <985e10e4-49df-46d8-b9c2-d385dab569a9@lunn.ch>
-References: <20240813074233.2473876-1-danishanwar@ti.com>
- <20240813074233.2473876-6-danishanwar@ti.com>
+	s=arc-20240116; t=1723562778; c=relaxed/simple;
+	bh=IUkzPMLKL9hxrVCRse+Tn29r759bkrevm8jISz7/NVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UbsOmQQdGWMDbcfV/jpIGkSGX0p1u501CI9Yu9agfQy4Qxq04hiin40huzffZRJu7XUMLTcF3C2jxa2Q0SN7QfDrt86kDa5aBOLX2SMZcJKixc3NE5BXCQ7C9D9rEjLFqiUFseTcz8/xhvG37IrsLVGpnF/DZK98HCmld2TnxEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lz/8AFXr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F8B9C4AF09;
+	Tue, 13 Aug 2024 15:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723562778;
+	bh=IUkzPMLKL9hxrVCRse+Tn29r759bkrevm8jISz7/NVM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lz/8AFXrJT9670zCrN4KWrpS/qHfbJzVH2SwYK+34AfLrA0BJHSl1PU5fdFq+JWZF
+	 w9W7Lypd8K0zGJCHv5Z/sowDvHbYIfbBp7Qrv+uZy7QgzSdkZdmwtxEfMb3IxqQSoB
+	 Re677vy+gy/FDsDswIsBN++DRbLYmQgLIZBpwC/UbUBIqKIl9qfbd4QQOOynyku23w
+	 2ExdG33d3W2Y0Ga5N8uD/ONPmABMxCL57CGjbBP/gVYxH6EyTFuoBnFWbjoDlc5fQO
+	 FYeFxXWOZWcjtZi+psvbkL8E5jSTK+NUzEh6Wp+GLlYhD96vdQ4pN9L3CGpgMeVw2Q
+	 PVEWD+5jh8ZgA==
+Date: Tue, 13 Aug 2024 08:26:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
+ Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Steffen
+ Klassert <steffen.klassert@secunet.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, David Wei <dw@davidwei.uk>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend
+ Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [PATCH net-next v18 07/14] memory-provider: dmabuf devmem
+ memory provider
+Message-ID: <20240813082615.53693b97@kernel.org>
+In-Reply-To: <6a779dbb-ad3a-47cf-bb8e-1a50732a9694@gmail.com>
+References: <20240805212536.2172174-1-almasrymina@google.com>
+	<20240805212536.2172174-8-almasrymina@google.com>
+	<20240806135924.5bb65ec7@kernel.org>
+	<CAHS8izOA80dxpB9rzOwv7Oe_1w4A7vo5S3c3=uCES8TSnjyzpg@mail.gmail.com>
+	<20240808192410.37a49724@kernel.org>
+	<CAHS8izMH4UhD+UDYqMjt9d=gu-wpGPQBLyewzVrCWRyoVtQcgA@mail.gmail.com>
+	<fc6a8f0a-cdb4-4705-a08f-7033ef15213e@gmail.com>
+	<20240809205236.77c959b0@kernel.org>
+	<CAHS8izOXwZS-8sfvn3DuT1XWhjc--7-ZLjr8rMn1XHr5F+ckbA@mail.gmail.com>
+	<48f3a61f-9e04-4755-b50c-8fae6e6112eb@gmail.com>
+	<20240812105732.5d2845e4@kernel.org>
+	<CAHS8izPb51gvEHGHeQwWTs4YmimLLamau1c4j=Z4KGM8ZJrx5g@mail.gmail.com>
+	<a6747b29-ed79-49d4-9ffe-b62074db1e09@gmail.com>
+	<20240812165708.33234ed6@kernel.org>
+	<5a51b11d-9c35-42a5-879b-08dc7ca2ca18@gmail.com>
+	<20240813073917.690ac1cc@kernel.org>
+	<6a779dbb-ad3a-47cf-bb8e-1a50732a9694@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813074233.2473876-6-danishanwar@ti.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -41,7 +41,8 @@
->  #define DEFAULT_PORT_MASK	1
->  #define DEFAULT_UNTAG_MASK	1
->  
-> -#define NETIF_PRUETH_HSR_OFFLOAD	NETIF_F_HW_HSR_FWD
-> +#define NETIF_PRUETH_HSR_OFFLOAD	(NETIF_F_HW_HSR_FWD | \
-> +					 NETIF_F_HW_HSR_DUP)
+On Tue, 13 Aug 2024 16:11:15 +0100 Pavel Begunkov wrote:
+> On 8/13/24 15:39, Jakub Kicinski wrote:
+> > On Tue, 13 Aug 2024 03:31:13 +0100 Pavel Begunkov wrote:  
+> >> I'm getting lost, so repeating myself a bit. What I think
+> >> would be a good approach is if we get an error back from
+> >> the driver if it doesn't support netiov / providers.
+> >>
+> >> netdev_rx_queue_restart() {
+> >> 	...
+> >> 	err = dev->queue_mgmt_ops->ndo_queue_mem_alloc();
+> >> 	if (err == -EOPNOTSUPP) // the driver doesn't support netiov
+> >> 		return -EOPNOTSUPP;
+> >> 	...
+> >> }
+> >>
+> >> That can be done if drivers opt in to support providers,
+> >> e.g. via a page pool flag.
+> >>
+> >> What I think wouldn't be a great option is getting back a
+> >> "success" from the driver even though it ignored  
+> > 
+> > page pool params are not the right place for a supported flag.
+> > Sooner or later we'll want to expose this flag to user space.  
+> 
+> Fair enough, it appeared to me that's what you was suggesting
+> 
+> "What comes to mind is adding an "I can gobble up net_iovs from this
+> pool" flag in page pool params (the struct that comes from the driver),
+> and then on the installation path we can check ..."
 
-Ah! Now i see why you added the alias. This is O.K. then.
+Yes, we still need one flag in page pool params -- functioning like 
+the inverse of PP_IGNORE_PROVIDERS, I'd call it something like
+PP_CAP_NET(MEM|IOV). To distinguish the header and data pools.
 
-Maybe NETIF_PRUETH_HSR_OFFLOAD_FEATURES, although that is a bit long,
-but it makes it clear it is a collection of features, not an alias for
-one feature.
+> We can also move it from pp flags to queue API callbacks, however if we
+> want to expose it to the userspace, I'd imagine we need a queue flag set
+> by the driver, which then can be queried by netlink or whichever
+> interface is appropriate. And it can be used can be used to fail
+> netdev_rx_queue_restart() for queues/drivers that don't support mp.
+> 
+> netdev_rx_queue_restart() {
+> 	if (rxq->mp_params && !rxq->netiov_supported)
+> 		fail;
+> }
 
-
-	Andrew
+Yup!
 
