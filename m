@@ -1,145 +1,162 @@
-Return-Path: <netdev+bounces-118140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164A3950B23
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DC0950B8A
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 19:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6ED32878CF
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:06:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4344285E62
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A498198A3D;
-	Tue, 13 Aug 2024 17:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95381A2C17;
+	Tue, 13 Aug 2024 17:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPOxKoGm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1fTvT0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009E91A2C01;
-	Tue, 13 Aug 2024 17:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B5D18C3D;
+	Tue, 13 Aug 2024 17:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723568771; cv=none; b=XdTm7ZT+XyWO+rqm3BORCGs8Mv1par/4u9BCsYnuJImPQRMp6moxphdhDmcR/3dMQ3vfKNUzYhNoQ8m+l5mdzsHUk1ckPBgyBAGKUG9OS6fvZ4j/o2ZfcCZV9rk7wP57i27C8hTzyS1jvIoHV/tRZt57/9C7wICE/9hmvAeit4Q=
+	t=1723570793; cv=none; b=mnu4jkvz2UNmXDNF0TtqWa06ReQexHfsqGhI+XTpVKm1LdnGk9yTzcXc1zJ7eRO4B2JojQwJMzMkLq/l4G+8GzYqqdckv+8nu9z7b9Vcyh/m7ni+ZB2dDWdoDHbqwh7/NhMwBY9QQhh1VaMSli+6NkXDDrJ1TdKBj3kJXCL3sH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723568771; c=relaxed/simple;
-	bh=dWbaslV3ImDpvRvaMLnGXkIpncnPCFLL0dppXw0Goew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m16FTV0WgZHbbIK2dXqiC++WbwWnfC64wZpZGZU4yYdhCunSy/Ehf2Ehij62BUMmLmJaRxeWLm0IXO4V6JHKwAaqMvghEAq5fQtu12sUy3LIhOC2mkTxgOw8AZLzzh/tbvCFLeNrdFU8FPA7nYWfXZmIloKIu2aib45RiyQkOAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPOxKoGm; arc=none smtp.client-ip=209.85.166.45
+	s=arc-20240116; t=1723570793; c=relaxed/simple;
+	bh=DJq9kjbIzOVRgUeTLJfGxppcJGxEJfJ+p/jj5GHFgQ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UxajcZWFSrmdztxji3XZs1CgVVbGD5u17af4y9caVr2GshPJhnlPzmKQ9h1CT+RypCzq5xcFy+xAQeVfszziMjgT09Ecmgl6f6Xy2L8s9MHuMPGgJn5La0Y0Q47NTOOiYWRri8G8yQgcMgUPxP01uGtpGXXaR2XKnpnvqHoNBto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1fTvT0C; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-81fbbd4775bso222883839f.3;
-        Tue, 13 Aug 2024 10:06:09 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so3984550a12.3;
+        Tue, 13 Aug 2024 10:39:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723568769; x=1724173569; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1723570791; x=1724175591; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c0sZsb6ltlwXBeuXfPHSdXrF6cY3aDT1sNvM6eUoQL8=;
-        b=DPOxKoGmAMfATjexjiknVR3UCwIrZEYjPdIVbMAMFaTTVCHruFPIJmmWlhbE6wtI0q
-         7IAs5/VV2tsL9O+dD7jMzzx3cG+p06K+jP6e5bA62YC9TnCU1slINY2WmOyM6xPk9mk3
-         LXDBkcMbE6XzV7uX6r+GYLCE6BJwf/wdfkPzH43gtxW5AoVpB2DenOzn7YSXkmJy+SSc
-         AGwCs2nL0UsIY5iHiWCs6rfGOZWeYWOLoNwq9Xq4w+fscPGQBNYOX50Ff92S/NAN2JQ8
-         RDKoMQexuxy7pJf15KjNASFWjXe+NH41RGnS6ocbznbIOaq/NEvo0wp2eVbJiquO3gBj
-         +5ZQ==
+        bh=HE5r/HJMJZgTTMlLXtLllz4r3gH1IYPGCs8AltB06Yo=;
+        b=k1fTvT0ChiZ1ChDOOJ5vmb60Hxi4/TDWKLDsVkJ+ydJrNar9dHCNOfvd87lJsJD10j
+         XJIIhwxp0pqg/xJ+AiiaNzsPGKzVcw54/eU1FtnVBFWOHulk4whKbkcKnI+v4cnbO1qW
+         2UTO2DNwUAF9F4haOOz1djaowRQlOSUJ2/GodsriyqIhcObuij8BSLlwFaJpKDnI9o+R
+         Sz/AIcnTLgUXv8qJMGcCHyN5o1H2X8K8o8rtkCdeIQBuOC/rqKrqMvZzWnDFIWTBnZsf
+         b5zszPTvKu3J1OOM8QOt0l/0tcyXjEVcHacV5Zdp//GHBolC/jF8oBWgxLGm/A/7qQw4
+         H3pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723568769; x=1724173569;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723570791; x=1724175591;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c0sZsb6ltlwXBeuXfPHSdXrF6cY3aDT1sNvM6eUoQL8=;
-        b=VDMCkWkblT+zpvS1kTVzm17Ib4b9JHPRoHXjVgre28CGDv0CqEJAdLrtAryFA9f45W
-         H54iY/Nt/XukeWTHkZuGEB7ABs9pMUHiJOJkmTw5sUg1YWfmRVfTuui+FUsTcDS6QXsk
-         JjqtSbca7ExerzZWPGmenOo5kdTOnqrGRwtffo5UnZvasYvrN5jybu5DkgMy+g2ZbS/z
-         j/tAuuxo6rMTV4LD/feg4gm7n32LX98he9Y4+/SyYkHqtSe5/QlsfXSI3lrnD/wESP/8
-         ZiHWUTzoeF4VoW8InJrDtEqfejFewW1MCocGoo374WTdPm1smTPfMnJW+pWAXjRgy27r
-         hnJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUz+MwPqkUzJwpwLepH14vuUaIouo6Z6BZvowtDVFXXSkOK1zjxGdmF9JkYhZGwbguAiULj6fvtD4bR+dxRg0GxAfoJ6p3NEl6i3dZ
-X-Gm-Message-State: AOJu0Yxi4Y2dawkcbVhyhLBzLLwoz42bfddEafJ7XvQHq0tFanXMb9/g
-	5KGW1Jv0M32/x6pA8b6sMVTVwe4ZQ9YY/kVfRZbEwT8/oT4nbDAwlRvG/kLI
-X-Google-Smtp-Source: AGHT+IESjOSkHOg1sqqE8IWaty0EbuhRg33ls2pxHZr3llzO5NHrG0AsvgMrxRBsP/ADgZRQADvFBQ==
-X-Received: by 2002:a17:903:1208:b0:1fd:a0b9:2be7 with SMTP id d9443c01a7336-201d638d72fmr2751805ad.13.1723568721909;
-        Tue, 13 Aug 2024 10:05:21 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1a947fsm15946425ad.140.2024.08.13.10.05.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 10:05:21 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org,
-	o.rempel@pengutronix.de
-Subject: [PATCH net-next v2 3/3] net: ag71xx: use devm for register_netdev
-Date: Tue, 13 Aug 2024 10:04:59 -0700
-Message-ID: <20240813170516.7301-4-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240813170516.7301-1-rosenp@gmail.com>
-References: <20240813170516.7301-1-rosenp@gmail.com>
+        bh=HE5r/HJMJZgTTMlLXtLllz4r3gH1IYPGCs8AltB06Yo=;
+        b=KqglnadEEE0YRC9AQNzeHcv4yHY/9sxweGAMFQGPnUCWyGnqXhuC1XQ1kaKm41kfHQ
+         utcytVXDMZNd5Gqx59p8qqsQ8ePqlFEreIN5Smj6cJgujqHHCJojYtZGpmR7//MURT/t
+         5wpFciTQpkgaXw3YwtYtrEDrqYa2shbwJCO3mIjmar94UiiQsO7YckD4iwpoKi9+FZwu
+         wjuwYNUgEABrUcF7BvqkJ7iO+/Jm8gyS5Rh1FJGXDaYnEKVvQOcQIbBQCGrYhycLiXWK
+         fEWsU2Ia82er4AbRy7hxGNKZJBvJ8uSOnPYv4lzhvRbALqchrX3Z23HjeQngObZrVyLB
+         dZCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnw9/BmkEFCbtQpjoBxr1Gpo2vsN0SfqWfkzv7kCKb6LVgLSvNWVKXJ/BCMnMDtPFWDxD5YJ+1S2N5pZC21QWYkLCCQF6NChZAiHjfeW4hTQrfu/hyqoTvxrzPlPQjKVHC/A5wc4ZXMObzOZailD/sdgJyIvmc4/Axe6Dq
+X-Gm-Message-State: AOJu0Yw2wKfhfIdOas/bIoWGMNg21e2Yrnb699Dt39KTsiNn5ZYFdaFm
+	r9q6UuT3XfXdcWDl73f5aqabWEU+QSyNmDEpgjg8bQS1nRuBDRDEimMBSpoVtgM4NcMbMrgjYIh
+	BsDS6bUL12KopRuzsxOmbYieKsw==
+X-Google-Smtp-Source: AGHT+IGMzSKM2bdnuT/c+oYMrtTjyVQTc1oN6ctNxnHjJehIoDruTX5c8H5k+7pGEx9Y8Jlol+Cpyhz3rhSXR1KWbMk=
+X-Received: by 2002:a17:902:e84a:b0:1fd:9420:1044 with SMTP id
+ d9443c01a7336-201d63abdfcmr2857755ad.16.1723570791336; Tue, 13 Aug 2024
+ 10:39:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240812004503.43206-1-danieltimlee@gmail.com> <CAEf4BzZsZYNx_mV0_0RrWvQS+Y7ixvtzv3SmTTQkOveeZeot+w@mail.gmail.com>
+In-Reply-To: <CAEf4BzZsZYNx_mV0_0RrWvQS+Y7ixvtzv3SmTTQkOveeZeot+w@mail.gmail.com>
+From: "Daniel T. Lee" <danieltimlee@gmail.com>
+Date: Wed, 14 Aug 2024 02:39:34 +0900
+Message-ID: <CAEKGpzgnQ+=W==EQ56CKXYCpDx=kLHMhoo+3KZQy9sOUKNeYtw@mail.gmail.com>
+Subject: Re: [bpf-next 0/3] samples/bpf: Remove obsolete tracing-related tests
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Yipeng Zou <zouyipeng@huawei.com>, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Allows completely removing the remove function. Nothing is being done
-manually now.
+On Tue, Aug 13, 2024 at 6:17=E2=80=AFAM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Sun, Aug 11, 2024 at 5:45=E2=80=AFPM Daniel T. Lee <danieltimlee@gmail=
+.com> wrote:
+> >
+> > The BPF tracing infrastructure has undergone significant evolution,
+> > leading to the introduction of more robust and efficient APIs.
+> > However, some of the existing tests in the samples/bpf directory have
+> > not kept pace with these developments. These outdated tests not only
+> > create confusion among users but also increase maintenance overhead.
+> >
+> > For starter, this patchset focuses on cleaning up outdated 'tracing'
+> > related tests within the BPF testing framework. The goal is to
+> > modernize and streamline selftests by removing obsolete tests and
+> > migrating necessaries to more appropriate locations.
+> >
+> > Daniel T. Lee (3):
+> >   selftests/bpf: migrate tracepoint overhead test to prog_tests
+> >   selftests/bpf: add rename tracepoint bench test
+> >   samples/bpf: remove obsolete tracing related tests
+> >
+>
+> We already have tracepoint-specific benchmark (see
+> benchs/bench_trigger.c), try `./bench trig-tp` (it will pretty recent
+> kernel due to reliance on bpf_modify_return_test_tp() kfunc).
+>
+> So maybe instead of adding code to selftests, let's just remove it
+> from both samples/bpf and prog_tests' test_overhead? Either way
+> test_overhead isn't very representative anymore, given big chunk of
+> its overhead is in write() syscall?
+>
 
-Tested on TP-LINK Archer C7v2.
+Thanks for the insight!
+I'll just drop these two and resend them.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/atheros/ag71xx.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+> >  samples/bpf/Makefile                          |  12 -
+> >  samples/bpf/test_overhead_kprobe.bpf.c        |  41 ----
+> >  samples/bpf/test_overhead_raw_tp.bpf.c        |  17 --
+> >  samples/bpf/test_overhead_tp.bpf.c            |  23 --
+> >  samples/bpf/test_overhead_user.c              | 225 ------------------
+> >  samples/bpf/test_override_return.sh           |  16 --
+> >  samples/bpf/test_probe_write_user.bpf.c       |  52 ----
+> >  samples/bpf/test_probe_write_user_user.c      | 108 ---------
+> >  samples/bpf/tracex7.bpf.c                     |  15 --
+> >  samples/bpf/tracex7_user.c                    |  56 -----
+> >  tools/testing/selftests/bpf/bench.c           |   2 +
+> >  .../selftests/bpf/benchs/bench_rename.c       |  16 ++
+> >  .../selftests/bpf/benchs/run_bench_rename.sh  |   2 +-
+> >  .../selftests/bpf/prog_tests/test_overhead.c  |  14 +-
+> >  .../selftests/bpf/progs/test_overhead.c       |  11 +-
+> >  15 files changed, 39 insertions(+), 571 deletions(-)
+> >  delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
+> >  delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
+> >  delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
+> >  delete mode 100644 samples/bpf/test_overhead_user.c
+> >  delete mode 100755 samples/bpf/test_override_return.sh
+> >  delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
+> >  delete mode 100644 samples/bpf/test_probe_write_user_user.c
+> >  delete mode 100644 samples/bpf/tracex7.bpf.c
+> >  delete mode 100644 samples/bpf/tracex7_user.c
+> >
+> > --
+> > 2.43.0
+> >
 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 3c16f6c5e75c..b74856760be3 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -1917,7 +1917,7 @@ static int ag71xx_probe(struct platform_device *pdev)
- 		return err;
- 	}
- 
--	err = register_netdev(ndev);
-+	err = devm_register_netdev(&pdev->dev, ndev);
- 	if (err) {
- 		netif_err(ag, probe, ndev, "unable to register net device\n");
- 		platform_set_drvdata(pdev, NULL);
-@@ -1931,17 +1931,6 @@ static int ag71xx_probe(struct platform_device *pdev)
- 	return 0;
- }
- 
--static void ag71xx_remove(struct platform_device *pdev)
--{
--	struct net_device *ndev = platform_get_drvdata(pdev);
--
--	if (!ndev)
--		return;
--
--	unregister_netdev(ndev);
--	platform_set_drvdata(pdev, NULL);
--}
--
- static const u32 ar71xx_fifo_ar7100[] = {
- 	0x0fff0000, 0x00001fff, 0x00780fff,
- };
-@@ -2026,7 +2015,6 @@ static const struct of_device_id ag71xx_match[] = {
- 
- static struct platform_driver ag71xx_driver = {
- 	.probe		= ag71xx_probe,
--	.remove_new	= ag71xx_remove,
- 	.driver = {
- 		.name	= "ag71xx",
- 		.of_match_table = ag71xx_match,
--- 
-2.46.0
 
+
+--=20
+Best,
+Daniel T. Lee
 
