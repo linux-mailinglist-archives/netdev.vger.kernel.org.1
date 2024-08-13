@@ -1,172 +1,178 @@
-Return-Path: <netdev+bounces-118220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97780950F9B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:19:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08260950FA7
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AFBE1F23B01
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 22:19:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDBE72815FD
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 22:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651CB1AB508;
-	Tue, 13 Aug 2024 22:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66491AAE25;
+	Tue, 13 Aug 2024 22:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XmuOb7JL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XO9GxeIq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7FD16BE34
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF4756766
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723587571; cv=none; b=Trqx1RKu/yZEiwH6NrBYu1vkbXb1keAtqHjpRHRV1uikgMW9EMnRQyJNJBjA2ChlzCpkEAGQqhTAwl9A3W3draR3j1rud1bo+FBqhjIFoyBVQetUjhYLWk3sVJK3hILRaKT9jaoFmWUfPoSh901xXsrrM8F7uMI3B4G7o5CRFHE=
+	t=1723587776; cv=none; b=ECRKHROKTkX0dt/P0COKvM9fXHPW04EuzrhbHUnCNfHmwOC0U9YpTKO8Ly76OiLiYYywMA07dBYLbyT+FL3Wz0MWPwc+CCbWnQKejPPyo57Q8WViFGWheDSIKwuBuqdrT8R7+dsb9HtoBDdX4FTQnHmfvDgwaa3tZQ4MLh/mjR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723587571; c=relaxed/simple;
-	bh=nUuj1yFQwQctPZyeaZf8ffYlrw7QeFKprNsInQ+jTuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BgpcPglcpJsMszeBI28HyYW/K8z89K1CY/nmDJ5KpEOm0DoVIT6LChsoRJZrhYKT9aVlA3Kz08zifnNkUUJ7BSX88EN6AysPt8dVR0XLq88eXzLJYr8e9c2qZU7HZGeG/M5eVyLnzw5fLcpLndxTGCr3j3ThbOwkef9GoDUk/xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XmuOb7JL; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-81fd1e05a5aso256811939f.0
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:19:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723587569; x=1724192369; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+QN8X+bBf4e4pg8ECVJmLV7aoGPPE4M9h9y5SfDnco4=;
-        b=XmuOb7JLvyzRoKVkigT8zV8uE0biCueUrdLC+6pXN5AjqeaxqAFGWT1hU9rPNRvsDZ
-         3fU5eBj4VHgEnvMbyOxDo4SlyF1dqm7T4zhNy+oWaV1J6qezOEKZ865/5a5QD6yf2zSE
-         zsQq6zZ31fcYemRtrJa5mxHUIsD3W7QlY7Iahg5D168bjobssTF11yaUpsmZBmKP3QY6
-         5ld4bJnVvmBPuUbevyZk00bRd5Lb1Yj1wt/HAHV8cdrDd/44dWqWllW0xGH36kY1+DHb
-         i0Jm6spuAdClmzuVQhUe8wMeuVMAO2Cv8iEw7Ie6jVlsxGLfspWZBbVehKyGXuViZ+tw
-         x0Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723587569; x=1724192369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+QN8X+bBf4e4pg8ECVJmLV7aoGPPE4M9h9y5SfDnco4=;
-        b=XH6sR2zvzB+UI+k8MRvb9E+ZHLKR+PXHzbxyCojdZZi1n5R7VlMc2keBc1k2d6Ot1E
-         jWQSfQBnBzPb3BAyeRcMIQd8cH0mI6GK5IaUkU3Is9lzdNj8mSvQzXPUcI8fauq5qGTF
-         PGB46mlqpw2FQpwOElGlWQh7kPt1X5CHFGaPvWvmzswRdZ8zgsHGAgALkZocdn6TxPKJ
-         /Gr7Nrz8AmvFiIGbci3d5ZE9nFzvkdA1/oYE9sRR8sspx2QIUZr62pLZrdtC1yo3pYY4
-         2cArxA9NJrDVXSO8d2XHgEk1PaYLAnfo/zHrQcD9xyBK4NkSTRkIoBsY7ESAAneZ1IYH
-         jGjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUX0kEPBDpwAYb+c/4ssYDXEKYR6jY2CSkAFf8alZSxpEy2yjJGwbyW02UXQi0Uf+pI1L1SxIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVf4PK3wg8OO9pcHCid3cqBrkDPYvd5ey9mVzOI0pYGaJIWJ2Z
-	Q+ONezbVc8ZKvlmQt+0k63FcoJ74kTAzfLqEcZS5UihpKO8ZSsFeiE+5s3vCrg==
-X-Google-Smtp-Source: AGHT+IH+Vc3rvDiFEg5ElrB7bMI7N4hpSdsoFZYx8k23AbxObZpcHIjRmC/uICTdWR81lxtCEKl/zQ==
-X-Received: by 2002:a05:6602:27c1:b0:824:d58c:ec9 with SMTP id ca18e2360f4ac-824dad3f48bmr165323439f.10.1723587568538;
-        Tue, 13 Aug 2024 15:19:28 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ca769f9d7dsm2773101173.118.2024.08.13.15.19.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 15:19:28 -0700 (PDT)
-Date: Tue, 13 Aug 2024 15:19:25 -0700
-From: Justin Stitt <justinstitt@google.com>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org, 
-	catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Subject: Re: [PATCH v6 7/9] tracing: Replace strncpy() with strscpy()
-Message-ID: <hbjxkyhugi27mbrj5zo2thfdg2gotz6syz6qoeows6l6qwbzkt@c3yb26z4pn62>
-References: <20240812022933.69850-1-laoar.shao@gmail.com>
- <20240812022933.69850-8-laoar.shao@gmail.com>
+	s=arc-20240116; t=1723587776; c=relaxed/simple;
+	bh=phMzR7+ioTz7l6JEkFB0TBB0P6PGSnLn8ZtKR2/AdIM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWdodMK/2GnJjN8vplAb+Z6nEo9hPzjlpDRKVgQl0XN3bKjd2sfeiUQ3rAbYzK0xD3KV5vjBuJiyAzNGfDTHNThZbf2qBknhsZbCVCPTfJIEWLXUKAopJ9IVyfKEVroPtwpd+RaeKY6wnF89+Hqea58GEifKcJdNoZNwi6s+Xw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XO9GxeIq; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723587775; x=1755123775;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=phMzR7+ioTz7l6JEkFB0TBB0P6PGSnLn8ZtKR2/AdIM=;
+  b=XO9GxeIqHstLaULXMDFXg0x8Y9WEvcMweJdI5+IZ3WUpd63TFv7F05O/
+   L1BOkQPcq5iNZogKqxQ+9/pHqUUmMTcjtHv38YHZGURrmJcRGtzQmizOa
+   ZcNjdBM6+G6bH9sqV5nBviFiSsHu2cb6LbYRzHEVpzK+y58Vlf2iBS+ig
+   t3F2wNU8nPY80ZJcrDbB8KAR79c9GMKXedV1cD56hAxYH4RG4wL4r9cR5
+   /mKfwznaLe+OSCVy1nzQ4tkpZTMl+Ud/zpOtjTrBaEcCpiJXuUC9/FBov
+   HRS6ycxSFjI4sAqsYJF5m3YS4JD9UvBZinxB0zHCjy37jeh3UzkCPd62J
+   g==;
+X-CSE-ConnectionGUID: tYtpNc8PQhS5eC7air8b6w==
+X-CSE-MsgGUID: yb2SKxgqRQGTXeYxkaV3JQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="39287068"
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="39287068"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 15:22:54 -0700
+X-CSE-ConnectionGUID: M6ufxz/fTHeEqw+XbCAEvw==
+X-CSE-MsgGUID: C+ySxeGiR5mccNtznEg9LA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="59381046"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa007.jf.intel.com with ESMTP; 13 Aug 2024 15:22:53 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	ahmed.zaki@intel.com,
+	madhu.chittim@intel.com,
+	horms@kernel.org,
+	hkelam@marvell.com
+Subject: [PATCH net-next v2 00/13][pull request] ice: iavf: add support for TC U32 filters on VFs
+Date: Tue, 13 Aug 2024 15:22:35 -0700
+Message-ID: <20240813222249.3708070-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812022933.69850-8-laoar.shao@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Ahmed Zaki says:
 
-On Mon, Aug 12, 2024 at 10:29:31AM GMT, Yafang Shao wrote:
-> Using strscpy() to read the task comm ensures that the name is
-> always NUL-terminated, regardless of the source string. This approach also
-> facilitates future extensions to the task comm.
+The Intel Ethernet 800 Series is designed with a pipeline that has
+an on-chip programmable capability called Dynamic Device Personalization
+(DDP). A DDP package is loaded by the driver during probe time. The DDP
+package programs functionality in both the parser and switching blocks in
+the pipeline, allowing dynamic support for new and existing protocols.
+Once the pipeline is configured, the driver can identify the protocol and
+apply any HW action in different stages, for example, direct packets to
+desired hardware queues (flow director), queue groups or drop.
 
-Thanks for sending patches replacing str{n}cpy's!
+Patches 1-8 introduce a DDP package parser API that enables different
+pipeline stages in the driver to learn the HW parser capabilities from 
+the DDP package that is downloaded to HW. The parser library takes raw
+packet patterns and masks (in binary) indicating the packet protocol fields
+to be matched and generates the final HW profiles that can be applied at
+the required stage. With this API, raw flow filtering for FDIR or RSS
+could be done on new protocols or headers without any driver or Kernel
+updates (only need to update the DDP package). These patches were submitted
+before [1] but were not accepted mainly due to lack of a user.
 
-I believe there's at least two more instances of strncpy in trace.c as
-well as in trace_events_hist.c (for a grand total of 6 instances in the
-files you've touched in this specific patch).
+Patches 9-11 extend the virtchnl support to allow the VF to request raw
+flow director filters. Upon receiving the raw FDIR filter request, the PF
+driver allocates and runs a parser lib instance and generates the hardware
+profile definitions required to program the FDIR stage. These were also
+submitted before [2].
 
-It'd be great if you could replace those instances in this patch as well :>)
+Finally, patches 12 and 13 add TC U32 filter support to the iavf driver.
+Using the parser API, the ice driver runs the raw patterns sent by the
+user and then adds a new profile to the FDIR stage associated with the VF's
+VSI. Refer to examples in patch 13 commit message.
 
-This would help greatly with [1].
+[1]: https://lore.kernel.org/netdev/20230904021455.3944605-1-junfeng.guo@intel.com/
+[2]: https://lore.kernel.org/intel-wired-lan/20230818064703.154183-1-junfeng.guo@intel.com/
+---
+v2:
+- Resolve incorrect type warning
+- Add kdoc short description to ice_nearest_proto_id()
 
-> 
-> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> ---
->  kernel/trace/trace.c             | 2 +-
->  kernel/trace/trace_events_hist.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-> index 578a49ff5c32..1b2577f9d734 100644
-> --- a/kernel/trace/trace.c
-> +++ b/kernel/trace/trace.c
-> @@ -1907,7 +1907,7 @@ __update_max_tr(struct trace_array *tr, struct task_struct *tsk, int cpu)
->  	max_data->critical_start = data->critical_start;
->  	max_data->critical_end = data->critical_end;
->  
-> -	strncpy(max_data->comm, tsk->comm, TASK_COMM_LEN);
-> +	strscpy(max_data->comm, tsk->comm, TASK_COMM_LEN);
+v1: https://lore.kernel.org/netdev/20240809173615.2031516-1-anthony.l.nguyen@intel.com/
 
-If max_data->comm wants to be NUL-terminated then this is the right
-replacement. Without knowing how the trace stack works at all, it's hard
-for me to tell if that is the case.
+iwl: https://lore.kernel.org/intel-wired-lan/20240725220810.12748-1-ahmed.zaki@intel.com/
 
-There's a length-supplied format specifier for which this comm field is
-used with; Either this is just another safeguard against spilling over
-the buffer or this field really doesn't care about NUL-termination.
-| seq_printf(m, "#    | task: %.16s-%d "
-|       "(uid:%d nice:%ld policy:%ld rt_prio:%ld)\n",
-|       data->comm, data->pid,
+The following are changes since commit dd1bf9f9df156b43e5122f90d97ac3f59a1a5621:
+  net: hinic: use ethtool_sprintf/puts
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
 
-In the event this field doesn't need to be NUL-terminated then we are
-introducing an off-by-one error where we are copying one less useful
-byte with strscpy -- Linus pointed out earlier [2] that these things all
-just want to be c-strings so this is probably the right change :>)
+Ahmed Zaki (2):
+  iavf: refactor add/del FDIR filters
+  iavf: add support for offloading tc U32 cls filters
 
->  	max_data->pid = tsk->pid;
->  	/*
->  	 * If tsk == current, then use current_uid(), as that does not use
-> diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
-> index 6ece1308d36a..4cd24c25ce05 100644
-> --- a/kernel/trace/trace_events_hist.c
-> +++ b/kernel/trace/trace_events_hist.c
-> @@ -1599,7 +1599,7 @@ static inline void save_comm(char *comm, struct task_struct *task)
->  		return;
->  	}
->  
-> -	strncpy(comm, task->comm, TASK_COMM_LEN);
-> +	strscpy(comm, task->comm, TASK_COMM_LEN);
->  }
->  
->  static void hist_elt_data_free(struct hist_elt_data *elt_data)
-> -- 
-> 2.43.5
-> 
+Junfeng Guo (11):
+  ice: add parser create and destroy skeleton
+  ice: parse and init various DDP parser sections
+  ice: add debugging functions for the parser sections
+  ice: add parser internal helper functions
+  ice: add parser execution main loop
+  ice: support turning on/off the parser's double vlan mode
+  ice: add UDP tunnels support to the parser
+  ice: add API for parser profile initialization
+  virtchnl: support raw packet in protocol header
+  ice: add method to disable FDIR SWAP option
+  ice: enable FDIR filters from raw binary patterns for VFs
 
-Link: https://github.com/KSPP/linux/issues/90 [1]
-Link: https://lore.kernel.org/all/CAHk-=whWtUC-AjmGJveAETKOMeMFSTwKwu99v7+b6AyHMmaDFA@mail.gmail.com/ [2]
+ drivers/net/ethernet/intel/iavf/iavf.h        |   30 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   59 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   89 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.h   |   13 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  160 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   25 +-
+ drivers/net/ethernet/intel/ice/Makefile       |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |    1 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   13 +
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   99 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    7 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  109 +-
+ drivers/net/ethernet/intel/ice/ice_flow.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 2430 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   |  540 ++++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    |  861 ++++++
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |    4 +
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  403 ++-
+ include/linux/avf/virtchnl.h                  |   13 +-
+ 22 files changed, 4792 insertions(+), 90 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
 
-Thanks
-Justin
+-- 
+2.42.0
+
 
