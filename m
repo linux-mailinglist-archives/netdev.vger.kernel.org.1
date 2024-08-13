@@ -1,97 +1,125 @@
-Return-Path: <netdev+bounces-118060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E248A9506E2
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:50:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0B99506EC
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F75F283328
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:50:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6049E1C22B78
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FAE19B5BC;
-	Tue, 13 Aug 2024 13:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C7519D078;
+	Tue, 13 Aug 2024 13:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tH9WPsem"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahzPcV1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989481EA8D;
-	Tue, 13 Aug 2024 13:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAFB19CD19
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 13:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723557028; cv=none; b=IbRhVj7ESF4JUQCh9Y6D9LHAaASfzxPA+3Y7lgqbsdY1wy1yIsUbPUpi781O/djWEbH0c/dLeDU9TVi+WElG0KlEcqkhapc4vLeeanGuhUJinjgxaNATo029VqLT5lYH5ff19x5wY8glTMt+QrKocqxYz36jJ7Hgsb6pa1+Aq9s=
+	t=1723557274; cv=none; b=OYg8NBQNWjOW1KlXYYjobBBvkbbQOsJwIj1kfsONe4mC0eF9J0trd5h+KLUxLLIOQYihFxtWrjwL9UZP8cf/thr+KNG6CXLQv69j3A7R6cIdGmv6N4xFVA5cOUUBORaQpm/jq2TqR+UM8m5zXcKGiPBizIiEECfuYzjwXpNp8CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723557028; c=relaxed/simple;
-	bh=Y+N81luiDhpmwTIpzxfPqMn67Yivx08cv0joM+WD/oE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=leAm8SCu4kuQXhmUWD3L8JcKo2pGiezHDTtFUasZ00Kyxh3+OvqNizy5oFv23jRla1HFWkIbAWRmGU5jHE3VsfEhHQDlxjMlfG/GKP1VDDQ5exV1P3s/xv1sbdVoXcOJf/2FtdLytdHIN93w4/YyXtO47PUF9AJqzsy7GKs2Pwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tH9WPsem; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CDD1C4AF0B;
-	Tue, 13 Aug 2024 13:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723557028;
-	bh=Y+N81luiDhpmwTIpzxfPqMn67Yivx08cv0joM+WD/oE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tH9WPsemb1A+VaddFPBN6MrRffdBGHwoQAiyZVD8Nwy99JYM2T0h/BC9/19N3bbng
-	 ASakimI7XblF4wdXhFdxMJ62Pekln7YxYXD22r2p/wriVqcpXuIYeRmSy5ZLjJGyVA
-	 FwgwsDyLe3Hu6EsjSCSDQH8yJ29SI8vTuZKH6p07QBBtiHT8thPAbyNRIJsvOcnEHJ
-	 39lmrbBRC+vYlXuSO9RsFj9F0fg5uegjEaztBNPaISSJ8bcHAWfC/+AYJq57DIAzCP
-	 Mb+B+AYCM+RMLuIs3vV33ndbAVX5VrBR4pkTg0pJmEwz8AuSePEy3pHL7mqIQfb+KA
-	 gfDKv2va0DUGg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7105D3823327;
-	Tue, 13 Aug 2024 13:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723557274; c=relaxed/simple;
+	bh=VXxCCJXPNv8rAnDPDBR/EdsEcMV2Jfe8Wu2+Nlrny5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OIXCvy8DMaO94CRySCFwPAHrhaF8rSXPiAXhWB21F///otfdEo+U44zHWntWHW413imc+VH6wrrBCF4ZdhGyto/oRfjo671bAyioHfc/6L96pSYyMG7xfLKDMtW6CU1StCg1YDkGk0QTRQxIGa8QzH7bRrHjtf+8rC4iXrPrFt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ahzPcV1U; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723557271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ftSvgbnin9t8+uyc0Qyra1ua6IsRzeg+RnvJFpXFr3Q=;
+	b=ahzPcV1UK8WZFsA3WyW9iO/HA8YyYXN/UGr7HMQTzMAsFjvVQyS7vBjYq95UWp6b755mc8
+	EpRibJimuSS6m5Ygbuk3ehmtke91w7RPgdofeqO0lCcVJmJrx6EzJypeDQrnAwQnDuOwwl
+	Hk4H9dcNqSAZt1WigUrZDujm1SBIX50=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-297-2k4kTbqdNK2S0UhNMhtEgQ-1; Tue, 13 Aug 2024 09:54:26 -0400
+X-MC-Unique: 2k4kTbqdNK2S0UhNMhtEgQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42818ae1a68so10508775e9.2
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 06:54:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723557265; x=1724162065;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ftSvgbnin9t8+uyc0Qyra1ua6IsRzeg+RnvJFpXFr3Q=;
+        b=I0LasXsUPzbi30ciVK63Id98R1lrRHpPWQY+9ZLJVM3VMvokY2ZvJPToGBamU5udY2
+         xZwpyLZAOlrDyX5E+Oxu7JFievsQsoRNx260u2db/2NQuEKIvEGIffeh/LQ2FrUiafJT
+         z4ncKOGKbtZU9gGx0XERSnrQsTmKTwpxyky8x3At0KhU9kN93j+wEZbRqUFsEuTRJ0wv
+         AZReHnvihVHtAG5G5LzracJM9k/QaqyT2EpDP51dAzfu6FAvycSVhUMXKJJroKb6oHQx
+         Rz7XdjVTwC1c1u6Gvq65FXhRgBFLIQ6q/ojsJnS6l7IVer3BYJunkaUgjq9NADwj76LP
+         /zIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnY4l0e+0XlmUwF0bmkEhKpmveYzSb+btKMhdwbCrNcQ/oZcCmTPrbsd/tdvvVWaxOXbSdCpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSk3Xsd38paW9bNvXcrhKnxiXr99MEcAVZ0OALqTR9770+fIiI
+	1dbvmzSdS2zlqdeapsjtZqKbccAnV9Jzmui89323gVoY/P8NupRIvzpzKa1l/8D2j6buSd4+Git
+	CSCDaQGjdMxGRLkPIVIUulxUWfDhJU8g78rWC9MebCRO8IxqxBep1QQ==
+X-Received: by 2002:a5d:64e7:0:b0:368:4c5:12ec with SMTP id ffacd0b85a97d-3717028178fmr1083058f8f.8.1723557265266;
+        Tue, 13 Aug 2024 06:54:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkGXvuWmr9Mw17RK3kt8FwYNiZEJrqhn5ZvawfheaNNHSvSGHpYTP6xuawTq17tPof0GuX2Q==
+X-Received: by 2002:a5d:64e7:0:b0:368:4c5:12ec with SMTP id ffacd0b85a97d-3717028178fmr1083037f8f.8.1723557264732;
+        Tue, 13 Aug 2024 06:54:24 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1708:9110::f71? ([2a0d:3344:1708:9110::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51eb47sm10459247f8f.88.2024.08.13.06.54.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 06:54:24 -0700 (PDT)
+Message-ID: <8dfa7ffb-f40b-452c-9c3e-6bb500e1a46a@redhat.com>
+Date: Tue, 13 Aug 2024 15:54:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] mlxbf_gige: disable RX filters until RX path
- initialized
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172355702725.1643029.11168261839990556381.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Aug 2024 13:50:27 +0000
-References: <20240809163612.12852-1-davthompson@nvidia.com>
-In-Reply-To: <20240809163612.12852-1-davthompson@nvidia.com>
-To: David Thompson <davthompson@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, leon@kernel.org, yuehaibing@huawei.com,
- andriy.shevchenko@linux.intel.com, u.kleine-koenig@pengutronix.de,
- asmaa@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] net: dsa: microchip: Add KSZ8895/KSZ8864
+ switch support
+To: Tristram.Ha@microchip.com, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240809212142.3575-1-Tristram.Ha@microchip.com>
+ <20240809212142.3575-3-Tristram.Ha@microchip.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240809212142.3575-3-Tristram.Ha@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 8/9/24 23:21, Tristram.Ha@microchip.com wrote:
+> @@ -542,11 +545,11 @@ static int ksz8_r_sta_mac_table(struct ksz_device *dev, u16 addr,
+>   			shifts[STATIC_MAC_FWD_PORTS];
+>   	alu->is_override = (data_hi & masks[STATIC_MAC_TABLE_OVERRIDE]) ? 1 : 0;
+>   
+> -	/* KSZ8795 family switches have STATIC_MAC_TABLE_USE_FID and
+> +	/* KSZ8795/KSZ8895 family switches have STATIC_MAC_TABLE_USE_FID and
+>   	 * STATIC_MAC_TABLE_FID definitions off by 1 when doing read on the
+>   	 * static MAC table compared to doing write.
+>   	 */
+> -	if (ksz_is_ksz87xx(dev))
+> +	if (!ksz_is_ksz88x3(dev))
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I think that for consistency and readability the above should be:
 
-On Fri, 9 Aug 2024 12:36:12 -0400 you wrote:
-> A recent change to the driver exposed a bug where the MAC RX
-> filters (unicast MAC, broadcast MAC, and multicast MAC) are
-> configured and enabled before the RX path is fully initialized.
-> The result of this bug is that after the PHY is started packets
-> that match these MAC RX filters start to flow into the RX FIFO.
-> And then, after rx_init() is completed, these packets will go
-> into the driver RX ring as well. If enough packets are received
-> to fill the RX ring (default size is 128 packets) before the call
-> to request_irq() completes, the driver RX function becomes stuck.
-> 
-> [...]
+	if (ksz_is_ksz87xx(dev) || ksz_is_8895_family(dev))
 
-Here is the summary with links:
-  - [net,v1] mlxbf_gige: disable RX filters until RX path initialized
-    https://git.kernel.org/netdev/net/c/df934abb185c
+Thanks,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Paolo
 
 
