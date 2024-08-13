@@ -1,111 +1,87 @@
-Return-Path: <netdev+bounces-118241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FE45950FFD
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:57:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7748A951046
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D13FB26AA3
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 22:57:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F5FA1F24820
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0177A1AB52D;
-	Tue, 13 Aug 2024 22:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D496D1AED22;
+	Tue, 13 Aug 2024 23:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q49BPO3Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OlObxjtY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932FB36B11;
-	Tue, 13 Aug 2024 22:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69FB1AC427;
+	Tue, 13 Aug 2024 23:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723589847; cv=none; b=CRqK2LXs1JA/N3OyaSYkEJROXK1QnfbxQDSxMoRWiicuTYDy2qdROgve4R0iFiqCTqRP6tvRfvBXMsL//R0E5ls11RrsxZD3gs1f4FhZDu0vFMD2AGO4PoRpYPaW9mz2//pvbdM0/tCSVKD0JiyvBJQYGZim6B2EEVsm+wtXQGk=
+	t=1723590219; cv=none; b=UhzjdNisglys4dQjSXcf6DbciM2mlIPAJGTNjz+4iEriiqYOwbkt+nw0x8PGRPDUUfB8jdGj5nsd4yoSUr/59RIO2bfgrdciukvWyo8hg6AqC9WDecQoKqKvcaOdsSXPxUA3PgXhdo3tkmW4AodrkS9mRRK1kE5cfWjQ1RHxQ0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723589847; c=relaxed/simple;
-	bh=GN/tNCf1J+3djJB1qyOAIMGREHE4dIzC14ofAY9keQk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E/WhnQWSNoK0M+kwKnzmPQFyFqerhUljoqwJHdqvwCJag8Q7AbBVyWGM5FAKHuDP5V0dBXy5fN+atCs8KoNk+BVtonH3Xhyme6uzaRrwIsZK9Ib62u4bYPI/0eW2JPwpOfpVONVLd+R+nQyjSxcVEXUDx75QzvUie51yyhuLO04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q49BPO3Q; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2cb5787b4a5so3975060a91.2;
-        Tue, 13 Aug 2024 15:57:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723589846; x=1724194646; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E+X9amBCNGzPbKLhSrsybSJwOHCEylYOwiuwStURnpQ=;
-        b=Q49BPO3QzwCu5uG49zPy4ixwcxFRofWZW+ivx/7IicbV53nQt6BIqe5Fay1RLyuvxJ
-         Rxo9QuKeFDMbJ5HaYq6XayTGDjHG+50Ke6j7DMQoOlS25GPz8h6lk7KwHSOl/vsqwW2y
-         b0jgZ/UfmuvrF50h8C7+a5hBAGDVX3JUkvHR7GXvFYS1YlKbIl++12lOk54jryKnWNbj
-         PSeKzeHFbO4CuwycX3wf4AxuRAgu/dnx2CC3L7K6jmehj3Z+NtVfi+UMo43KEPr5B9RQ
-         8+tWMFLYcjmNr0r1p96duiEZaXV+VCo+FngSLSy86zd55crQMRPQhDUF4SFfAM78ts5m
-         huOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723589846; x=1724194646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E+X9amBCNGzPbKLhSrsybSJwOHCEylYOwiuwStURnpQ=;
-        b=eTJ1Twstrn0kAUpmH2cEewtRcKzITy7mV2uu8CUBhszBgtGBJka5UFm61NANqZNAwz
-         uA0pheTZkl42F7hOrVSVOgv9te4B/Rtkx0U+aTuiS642uxro47FBoPmFQUAkFk5KK0+1
-         XUjLAipbWpWqQQp1Nbl7oxeysUS+lL/sjU78Cdfloj3IS4qTM+L/u2a9U55X3vwyoKV0
-         D6+6Ukqv2gfaswfgl2rharU11tT9873DsnY4wEXp/xiMcXtlhI+uwAAxMnutZ82qZW6/
-         X7xTDHx7NCur8PwRp9/aU3mUr5S0snJWFMJfHYB3SE27dYq/FGdtOLsUo7zhiZU2KObH
-         3iNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfPFMPqHelNkFrFaPN8lUTXFbycyiIOcogQxu3hgrtU1OZS4N49F4y+85O1prbLrVzTN72jta1/6V9vq9rVT0SttQuJH/M8diuVbDDky5hbtY5DjOy3e8dpxS4wRZES3kVJkwL9dUDXrMBvO6twmzbVvqgiqliP6YrTO1IaULmezWhpQk6XRaU4iquTKWNJZ2ydpqYsA==
-X-Gm-Message-State: AOJu0YzYqcGy26rWs5mi4KaEPCrlQTwMrDEnGf9WOS1RZqPj25BoENhN
-	PGfqnDYKpaqxdzlqeXN11zounYNoIaCtBSjMF3UTIyniVla/KJY0hNyAzeuX6EXs9wsAA4oGTYg
-	oW6k2oq9Ig53j4+D9byw0k96DQ5g4hw==
-X-Google-Smtp-Source: AGHT+IEknBc9gZ8ToZRdgOZ21NGJ7+F84SQdCx1+V9pZydDzRl629BLydncsPEzDtfoq2qbwFCCXqwGj6f5s2S5NF3o=
-X-Received: by 2002:a17:90a:10d7:b0:2c9:923e:faf1 with SMTP id
- 98e67ed59e1d1-2d3aaa8a696mr1183852a91.18.1723589845703; Tue, 13 Aug 2024
- 15:57:25 -0700 (PDT)
+	s=arc-20240116; t=1723590219; c=relaxed/simple;
+	bh=lp7uSJRiTTBHrLo/DVE+4oyUfn9+eFpgssiOiAeRz74=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TnIS4X0uGPMnYmF4Rl6yRbjPB9WvN+mI6NWH+JJFz54ovg0REDZ/HdLfmNSCiIipCwOBmZ+KA7V3aMvQkpkNWd842ShgRDPuVsiVY17ydA1DZd6gqd3Vj8WeNGxOBi/A4U4kEzHuPeI4zMirco8QUbiMj6+UPwjn22nfTsFZqUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OlObxjtY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801DBC4AF0C;
+	Tue, 13 Aug 2024 23:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723590219;
+	bh=lp7uSJRiTTBHrLo/DVE+4oyUfn9+eFpgssiOiAeRz74=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OlObxjtYKz5g50GL6TE5MQVvfbAGE4f2Yk7bubkJH+8i51mL+B78bBoLkQu1jMGEL
+	 R1OmAu6Kg5WDIpDcRHsV60/O8zn8mIfzN8994M17jBLMY2oYQVk8+ryNj5HQn1olNW
+	 nFcUZQkZZ+mWoSSfIA17i3ttkXjaQVKkIAxWfOgeVBJoko4rAhxJkDeflY80cdvvfu
+	 ZomQ0+SXA1XSg53e4ka+nvEYdkNeg3MmuJ2gQfh3v/9FU7wdzG/P1dStqfo3xafckF
+	 v+r//v3NpfLINC1unM9U0u+GH1d3wdfIQ9Bcn/AVNAu8su18LUa4QxsroyMipBrI1w
+	 1T0wwGldtHHGA==
+Date: Tue, 13 Aug 2024 16:03:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+ devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE
+ TREE BINDINGS), linux-kernel@vger.kernel.org (open list),
+ linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC DRIVERS),
+ linux-arm-kernel@lists.infradead.org (moderated list:FREESCALE SOC
+ DRIVERS), imx@lists.linux.dev
+Subject: Re: [PATCH 1/1] dt-bindings: soc: fsl: cpm_qe: convert network.txt
+ to yaml
+Message-ID: <20240813160337.638eee6f@kernel.org>
+In-Reply-To: <20240812165041.3815525-1-Frank.Li@nxp.com>
+References: <20240812165041.3815525-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814085319.719b42ff@canb.auug.org.au>
-In-Reply-To: <20240814085319.719b42ff@canb.auug.org.au>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 13 Aug 2024 15:57:13 -0700
-Message-ID: <CAEf4BzY56aDs3GsVPAKM0=VZA6GGZFr5ZTDYZqf_cxMQP5UDYw@mail.gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the bpf-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 3:53=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> Commits
->
->   e811c1ee15c7 ("bpf: convert bpf_token_create() to CLASS(fd, ...)")
->   795bc52f75ad ("bpf: more trivial fdget() conversions")
->   139dc6fa791d ("bpf: trivial conversions for fdget()")
->   2d74d8e9897c ("bpf: switch maps to CLASS(fd, ...)")
->   b57c48f806fd ("bpf: switch fdget_raw() uses to CLASS(fd_raw, ...)")
->   b7014005e1e8 ("bpf: convert __bpf_prog_get() to CLASS(fd, ...)")
->
-> are missing a Signed-off-by from their committers.
->
+On Mon, 12 Aug 2024 12:50:35 -0400 Frank Li wrote:
+>  create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-enet.yaml
+>  create mode 100644 Documentation/devicetree/bindings/net/fsl,cpm-mdio.yaml
+>  create mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,ucc-hdlc.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/soc/fsl/cpm_qe/network.txt
 
-That was fast! I'll add my SOBs and force-push, thanks!
+Any preference who applies this? net or soc or Rob? No preference here,
+FWIW:
 
-> --
-> Cheers,
-> Stephen Rothwell
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+
+> Sorry, It is sent by accidently. it was already post at
+> https://lore.kernel.org/imx/20240809175113.3470393-1-Frank.Li@nxp.com/T/#u
+
+patchwork for one thing considers this a newer version of the previous
+posting. So hard to tell where any discussion is expected to happen.
 
