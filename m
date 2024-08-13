@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-118091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7168D950793
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:29:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD1A950798
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94E2C1C21F46
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:29:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17CF8B28A3D
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E7919EEC8;
-	Tue, 13 Aug 2024 14:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E750D19FA66;
+	Tue, 13 Aug 2024 14:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0WfIQc9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvXseIby"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D25D19E83D;
-	Tue, 13 Aug 2024 14:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3619EEBD;
+	Tue, 13 Aug 2024 14:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723559316; cv=none; b=tnvMzWuCE++x4hEZ8U6o5fM6LOoHetM+wf1AzbZ8buQnOuI8b/9RgGdC0z1/vRfjPVEvwGNnEGFT9zvnukwzwLZGqZ0fBINbgf+YstgsR4Qrxq5apnAoVAsj9gSStZztJoXBNg9p6Fzq+0gQhMfZ83MMhBac8aKL3JXVR11N7Mk=
+	t=1723559317; cv=none; b=uJ6bvqGJ1bW8L6xmh690j4Oowisukx+18zj6GJHeg2WS4/H+YxOfvYcvbmOgCLBD2Ts8pILg8902dKpqt4pH9ZNMsYoq9X1XBH7Yrh7TUiBRB5T/jLIdgj0O+4+iXFSrFTwiqFsjOHe6zdAZZP0hq81WINSK+ssVH6b+MXzu6QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723559316; c=relaxed/simple;
-	bh=Dl2XlbH7I+RV5d1Dk9ofxgBFzl7ct+AQ/da3g5ataGM=;
+	s=arc-20240116; t=1723559317; c=relaxed/simple;
+	bh=MPZXuzZ8WACzat8l11Ii/Qp/mkN47G0iiUtzKBu72R0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PcS2UBVRsx2eiXAWvX4ThJy9wXiqCjGCjAc/qU9KGmyTUofcp8YakHJ61+2rch0o5XNhZwRpT1QRtEL1UEbU9LSnHkpll5ed6snBhvBcfAVnYF/dUBbhT+8BSmjde5bKJ61LrdgvfiGshd2BMrDhWzP0e7wV4l0Z/n+0prwpXmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0WfIQc9; arc=none smtp.client-ip=209.85.167.54
+	 MIME-Version; b=rxSclDjvFwwUgFJOcKyGQBrRYTCOZTUmz4Ymg07hRO5Wdc1iNYM/iq/3ORYSUH/R4J2xAQ2k6Kb8lg53Mz/oJCFR8rdNlm2OL722HzwgoObblf7zv6kBy7lLpkOBsSf9PgqBc+o2LtP8HCU2+zdskDSQiuIYO1Jp5Kmq653626Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvXseIby; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52efa16aad9so7267125e87.0;
-        Tue, 13 Aug 2024 07:28:34 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f149845fbaso58773361fa.3;
+        Tue, 13 Aug 2024 07:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723559312; x=1724164112; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723559314; x=1724164114; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hH9A5Szkc/IlyuIN03/o/3XyWT9l7X0+GSlwBPiML/U=;
-        b=J0WfIQc9b4jEDgASe2JiOFqve6Yu/tl6qYH/PXLUPovxZZav+Wmr0JsBXPEwHRrKAz
-         zbt3mlLUjqUyV+HSo+QkyaFRwQEGcj0W+h77ItEuUDynLbag03Xie9laYVD8iQpHedo/
-         rtq/JMP1RyyJAPRfu7nx49dG+ii6NYsxqqKj+Z1iDhrsdwLqgBpMl1RARBLc3rwO8Jm2
-         qUfUZQEecs2/oxu6SlEatGpWOBC6ghv/2lm1Gw4Jsd5WwtFsly8NhMQ9uySuSI2n2Bka
-         27JNCs/IOtffkUtoOngyBBBB2S1TiF3ngBJSI0DIsDkuKoxPu/f91kYI/u5cX/cv/xhy
-         APFA==
+        bh=Hn6Gg49+0hckXkrCaPpgjvaSHPmWcIMwvpPpEJxp9s8=;
+        b=dvXseIbyGl8zeqg0bx2q+277fFe0Eav73EWTUtHEbUK7a4FcAolGGNdjd2+DHZ02PE
+         XS+H/Ps8OZY2+Tg9vt/d+uWCTHrV7z6h5Dq8FPW5ceICHpwSlShDADwibqvohekbzmOi
+         UIrBQDtfSH+QJi5PwuPbEf9xx3/fOlBC8yprh/J0myycmr2omha/F0bFhfyVzuu/YRQS
+         1/4wYWSvXcSKLtVV/wy84/nLu/NQ2RZJiIquNmrJflCcFowNvUc2p5AfwGq67koOUYen
+         UIzeaGS36FTgCjtFqcTXDPBLfnBqMqXIn+W6YZeyR48aHi1o+dN54rOFtvoAfcImlIyB
+         4R7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723559312; x=1724164112;
+        d=1e100.net; s=20230601; t=1723559314; x=1724164114;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hH9A5Szkc/IlyuIN03/o/3XyWT9l7X0+GSlwBPiML/U=;
-        b=RyGPgOvVWesFBU34lGMEZMPz2BVeGmXTAPG5HveuF5YtDxj8WIZDo4wgDoeIhJRGu5
-         sqcl7bGDn4vTqnxXpUHXyE3k6BJ0UFq/iZsL5T3GlbYL85opeB9uUsDTFlBis4xqY7Is
-         ixQ9bodbKYuXVamHa+7vgYS48b0/xnVBV8hHKNDjFiaQczf39kP+stHmcF2xGjbklTYu
-         kmqRunbBGbF/PXvrT5DAREqt1jgp+760QDhIOuZBLPph6Iay9wzbmQm7lsTMGfYERHui
-         qGaxUvZwAsgCpbT6PvJhIXcebFz2ciaIF6l2yP3eXSRbnAPTpVAGl3DvwUDKvGtpsmbt
-         fo0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXj1ttchYIK3he0RORvqwjxQCRdiQH2axOnLOfzLY1Ez5kfU+H03ZF4J76ezXh+vMxurSU6B1jie1JYK33Q9vSx9pK647BoTrWxG1QOTxITUzvXnreOuCoV0F7grsgxRJLnBc/Es4o2O5zjPVIK64dcfJUwPBlPHgevpEa1ahliQg==
-X-Gm-Message-State: AOJu0Yz8N7pQOEjPzyfyRl/y70KWjJfjqzjlqWPF3XdxfS9lBp2zuxMB
-	RAmmb0tJpFzDKI451TJKtvCy2Qoslbn2U/9xOXzaRUuxPd81x3i8
-X-Google-Smtp-Source: AGHT+IG39YK0aR2tCjBu623dnSdp6lDNkQzwjk6JyWm7+BSt9km+iWXJTeMzJHGFWFDy2QTXo0scuQ==
-X-Received: by 2002:a05:6512:12d5:b0:52e:be1f:bf84 with SMTP id 2adb3069b0e04-532136a4a20mr2999994e87.53.1723559311932;
-        Tue, 13 Aug 2024 07:28:31 -0700 (PDT)
+        bh=Hn6Gg49+0hckXkrCaPpgjvaSHPmWcIMwvpPpEJxp9s8=;
+        b=pUK9gqFUjWZaXwFErSAq/QqgbRV1XTKn6KUG/HSELm6eVonqWVBIAcIv05DMQblARA
+         c0Ohqa7dFjWvMJGFSvozP84+DvnjXUVmSdlTnTbPwypS0hY5EcTiB+VSL/Hgd3W8DWpl
+         aR4pQnO5b64zkLjRaazfAs3dHk74IgMOX4dKk0ZWtbM0pXzmCDZKJi3npeM/3S5uO2t2
+         LpqCa1xEyQi4Xjaukn0YdvS3ZnIf8rCYmTRWXjHF6Ve9D0smAMURQZCFSDQoHlK+oE38
+         GWIU3y6GHbJ1bDmwSJB2snrX0Be0TzH1jS7Q1BSrLNrbnis2VkqPtYubPQLYEC4+fqga
+         qqHA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2d7yUGvzsAXYyxXoRjSNtquCsfJqGStU/fbC8pcEYX+paLVQUVsJ3D35fYTiRhSOCoJfjXclCfIpP6NK8H0nYZGNP4pxQMfRAXhKWf3HLZ2+l3l2fIYdCWvzFkUgcodqawivj6c/hY3g6V9/8ohNV5CxZyUUKHzsMy2qWJ8amGA==
+X-Gm-Message-State: AOJu0Yy5Pb/tuqAcPns4fQUTt321cXj6R4LJwOVX50IjY9XD5gAgiOLr
+	Ynd7hkAjSiVGD5gu9/lb8N/uJ5gE8sUq0l335/k67y+bW03XlO1E
+X-Google-Smtp-Source: AGHT+IF87do1H9InRqDB5Qgg5LpkSpMVtB6L44r6xxw4f65l1fI92ZeQAyrs/Ihk8e7lWJ3t2omBYA==
+X-Received: by 2002:a05:651c:19a6:b0:2f0:1a19:f3ec with SMTP id 38308e7fff4ca-2f2b717a379mr30497411fa.33.1723559313735;
+        Tue, 13 Aug 2024 07:28:33 -0700 (PDT)
 Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3fa7c27sm74345166b.66.2024.08.13.07.28.31
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3fa7c27sm74345166b.66.2024.08.13.07.28.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 07:28:31 -0700 (PDT)
+        Tue, 13 Aug 2024 07:28:33 -0700 (PDT)
 From: vtpieter@gmail.com
 To: Woojung Huh <woojung.huh@microchip.com>,
 	UNGLinuxDriver@microchip.com,
@@ -80,17 +80,15 @@ To: Woojung Huh <woojung.huh@microchip.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Marek Vasut <marex@denx.de>,
-	Russell King <linux@armlinux.org.uk>
+	Marek Vasut <marex@denx.de>
 Cc: Woojung Huh <Woojung.Huh@microchip.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Subject: [PATCH net-next v6 5/6] net: dsa: microchip: fix KSZ87xx family structure wrt the datasheet
-Date: Tue, 13 Aug 2024 16:27:39 +0200
-Message-ID: <20240813142750.772781-6-vtpieter@gmail.com>
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Subject: [PATCH net-next v6 6/6] net: dsa: microchip: fix tag_ksz egress mask for KSZ8795 family
+Date: Tue, 13 Aug 2024 16:27:40 +0200
+Message-ID: <20240813142750.772781-7-vtpieter@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240813142750.772781-1-vtpieter@gmail.com>
 References: <20240813142750.772781-1-vtpieter@gmail.com>
@@ -104,131 +102,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-The KSZ87xx switches have 32 static MAC address table entries and not
-8. This fixes -ENOSPC non-critical errors from ksz8_add_sta_mac when
-configured as a bridge.
-
-Add a new ksz87xx_dev_ops structure to be able to use the
-ksz_r_mib_stat64 pointer for this family; this corrects a wrong
-mib->counters cast to ksz88xx_stats_raw. This fixes iproute2
-statistics. Rename ksz8_dev_ops structure to ksz88x3_dev_ops, in line
-with ksz_is_* naming conventions from ksz_common.h.
+Fix the tag_ksz egress mask for DSA_TAG_PROTO_KSZ8795, the port is
+encoded in the two and not three LSB. This fix is for completeness,
+for example the bug doesn't manifest itself on the KSZ8794 because bit
+2 seems to be always zero.
 
 Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
 ---
- drivers/net/dsa/microchip/ksz_common.c | 51 ++++++++++++++++++++++----
- 1 file changed, 43 insertions(+), 8 deletions(-)
+ net/dsa/tag_ksz.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 3f3230d181d8..cd3991792b69 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -277,7 +277,7 @@ static const struct phylink_mac_ops ksz8_phylink_mac_ops = {
- 	.mac_link_up	= ksz8_phylink_mac_link_up,
- };
+diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
+index ee7b272ab715..1f46de394f2e 100644
+--- a/net/dsa/tag_ksz.c
++++ b/net/dsa/tag_ksz.c
+@@ -111,9 +111,10 @@ static struct sk_buff *ksz_common_rcv(struct sk_buff *skb,
+  * DA(6bytes)|SA(6bytes)|....|Data(nbytes)|tag0(1byte)|FCS(4bytes)
+  * ---------------------------------------------------------------------------
+  * tag0 : zero-based value represents port
+- *	  (eg, 0x00=port1, 0x02=port3, 0x06=port7)
++ *	  (eg, 0x0=port1, 0x2=port3, 0x3=port4)
+  */
  
--static const struct ksz_dev_ops ksz8_dev_ops = {
-+static const struct ksz_dev_ops ksz88x3_dev_ops = {
- 	.setup = ksz8_setup,
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
-@@ -312,6 +312,41 @@ static const struct ksz_dev_ops ksz8_dev_ops = {
- 	.pme_pwrite8 = ksz8_pme_pwrite8,
- };
++#define KSZ8795_TAIL_TAG_EG_PORT_M	GENMASK(1, 0)
+ #define KSZ8795_TAIL_TAG_OVERRIDE	BIT(6)
+ #define KSZ8795_TAIL_TAG_LOOKUP		BIT(7)
  
-+static const struct ksz_dev_ops ksz87xx_dev_ops = {
-+	.setup = ksz8_setup,
-+	.get_port_addr = ksz8_get_port_addr,
-+	.cfg_port_member = ksz8_cfg_port_member,
-+	.flush_dyn_mac_table = ksz8_flush_dyn_mac_table,
-+	.port_setup = ksz8_port_setup,
-+	.r_phy = ksz8_r_phy,
-+	.w_phy = ksz8_w_phy,
-+	.r_mib_cnt = ksz8_r_mib_cnt,
-+	.r_mib_pkt = ksz8_r_mib_pkt,
-+	.r_mib_stat64 = ksz_r_mib_stats64,
-+	.freeze_mib = ksz8_freeze_mib,
-+	.port_init_cnt = ksz8_port_init_cnt,
-+	.fdb_dump = ksz8_fdb_dump,
-+	.fdb_add = ksz8_fdb_add,
-+	.fdb_del = ksz8_fdb_del,
-+	.mdb_add = ksz8_mdb_add,
-+	.mdb_del = ksz8_mdb_del,
-+	.vlan_filtering = ksz8_port_vlan_filtering,
-+	.vlan_add = ksz8_port_vlan_add,
-+	.vlan_del = ksz8_port_vlan_del,
-+	.mirror_add = ksz8_port_mirror_add,
-+	.mirror_del = ksz8_port_mirror_del,
-+	.get_caps = ksz8_get_caps,
-+	.config_cpu_port = ksz8_config_cpu_port,
-+	.enable_stp_addr = ksz8_enable_stp_addr,
-+	.reset = ksz8_reset_switch,
-+	.init = ksz8_switch_init,
-+	.exit = ksz8_switch_exit,
-+	.change_mtu = ksz8_change_mtu,
-+	.pme_write8 = ksz8_pme_write8,
-+	.pme_pread8 = ksz8_pme_pread8,
-+	.pme_pwrite8 = ksz8_pme_pwrite8,
-+};
-+
- static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
- 					struct phy_device *phydev,
- 					unsigned int mode,
-@@ -1262,12 +1297,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8795",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
-@@ -1303,12 +1338,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8794",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
-@@ -1330,12 +1365,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8765",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
-@@ -1362,7 +1397,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.port_cnt = 3,
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz88x3_dev_ops,
- 		.phylink_mac_ops = &ksz8830_phylink_mac_ops,
- 		.mib_names = ksz88xx_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
+@@ -141,7 +142,8 @@ static struct sk_buff *ksz8795_rcv(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+ 
+-	return ksz_common_rcv(skb, dev, tag[0] & 7, KSZ_EGRESS_TAG_LEN);
++	return ksz_common_rcv(skb, dev, tag[0] & KSZ8795_TAIL_TAG_EG_PORT_M,
++			      KSZ_EGRESS_TAG_LEN);
+ }
+ 
+ static const struct dsa_device_ops ksz8795_netdev_ops = {
 -- 
 2.43.0
 
