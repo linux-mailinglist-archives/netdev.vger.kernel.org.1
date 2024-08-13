@@ -1,164 +1,110 @@
-Return-Path: <netdev+bounces-118129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C7A950A23
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:29:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76728950A11
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 18:25:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A67E9285AB5
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:29:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 213321F22FDB
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11401A0B10;
-	Tue, 13 Aug 2024 16:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jy34e68H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B16A1A0B05;
+	Tue, 13 Aug 2024 16:25:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E88C19AD90;
-	Tue, 13 Aug 2024 16:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE543168C20;
+	Tue, 13 Aug 2024 16:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723566547; cv=none; b=Rmz6p/4vYSIZlVWQRjpeZS86Qt/wnD4mO8Jlc2DszwcS+l+T03Cofo/MMoNQ5OyHlDy8DVI3TY3kyJSuLzuuPdbcalnmlRF8zqQakRHsumkfE78MFxPwJi2QiVuTl2XgR2uHO32zSkHQsLCT9icUMWaJfMnfz/LyMAbPEYG0tQo=
+	t=1723566334; cv=none; b=S01Q6WHmxFkf4ptg3lENFNY3gTZ4yu/xyVoePkzCT6G3ygwOAR6WhXw9/KVV31tezIWYesoGArZxoaUbnuN3mq8zx7LPNMc2DcAOQ2E0oU8r0D14OFwGPzB7g/FZ7zP/ZWASxKzJHbM9Jqvfrnsv3Do+xb8WRgXfuDO91epb1c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723566547; c=relaxed/simple;
-	bh=JGh9VB5dzq5Ts+lVa17EXNj6slFzF9LotVeHXIQDwPM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bOqMHVUyOZty6pPPFA6w6ZfuZwO6KNndJUtZMEEIf5mErhlOp6Zi5qH/g/eptA7YxMvu+IrCXD2tJMyK7DhIMTm0ngd3blthX7T9UmkVEFDdVuEKOjRREDlFPcl9rKf1FelrvFQtFYnnTgXYpFdiwwIif+0aZ7yHJrWuz8TIzEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jy34e68H; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1723566334; c=relaxed/simple;
+	bh=s4+lnu5hdM2McYsYFItOtd1MUrvx99HOpg7qojDxEgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ctk7DKfm6gkT7MSTF/m00qOqZOB92QN3EFvzlS2ilMCHa4zJyRnFAmb9CvfZ+/ry2fEB1JzPPhm7JeaBvT+OL/7xemETROLZGQyI7xkJuoLAlqx7p7s4Y4lVpAvPvxqA7KddYvS+rHIhOgJt12Ws9pZ3xC6AWbtRr5+GWA2SN7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a611adso6691530a12.1;
-        Tue, 13 Aug 2024 09:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723566544; x=1724171344; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MsbiuRUlmo4RLNQnmGHI8pchnz0f5Sp6onkgIW0DlX4=;
-        b=jy34e68HB7yvy6qkLBKIS1L3FGI2FjTL/vFLQ6dURmeTq22dp7gmp7+QtkxzSxaL/9
-         qm39u4iE14WX5it0/PmNtr6M8CUScX++SuElRySrtgUt61bRWShHIxPmr/EdNEsIjpHr
-         u4t1Cv2TaZMG7qB6v9nDsZlAc4yuFv+ATD5iOXsgJwPNkgks8OodkY63hkHVUi9bH4og
-         zUfvQ5R78DouIO+FBsUIo58e1J8oFgcrz7fvRTmeehOFMd13FZJA9EvqPq07Ah1SYtxA
-         PB+AWce2LviB91Z9rCbQ0dmqa+Mlu+50+kAAfZrVr37eoxSpu96QGE/T1sVrfZvya5Er
-         xcbA==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7aa086b077so517330566b.0;
+        Tue, 13 Aug 2024 09:25:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723566544; x=1724171344;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MsbiuRUlmo4RLNQnmGHI8pchnz0f5Sp6onkgIW0DlX4=;
-        b=njCcuQhzNiN+47tm1vcVlhK6rEy5jWYdPkQrwgHVBIArQ68aaQGifeNu3a3a1T4J3w
-         aB5p7ncb+Di8mBh+M/66jzH7Uch3Y7fqq0lC2W/d8/lxVL3SRQVYTT11Lup8zqBwxud2
-         46jgGe3cN8S6s89g9X01s2Czd1RdJCjgCIQ1Xg94rrGTh8aRMak47Mc1zRJHRCShDsm8
-         c1DLp6E/6NUhHap5PSTpxktH3bGkHiTVY5/y/viE8CWhl03hc3fuxDskOkxSwmm/Bs1N
-         GQyw6F8nDZGfPjPPOpxiWpnmZCThGYmJKMNMf4lR+/B/O7U6wqEm9i8FaVwbnQQ2uxw6
-         NSag==
-X-Forwarded-Encrypted: i=1; AJvYcCWVw5oI670GNSE06J7JZulLsDamUCPp5YxRSHLgZvWe6z3z/kohebhPWpcrp9z5gE2SkF7Y7fTYVySdChoxZTI3+LD0iX81uoxMjmUQ+1OZJ8227QxnTXKpEzHQ9tKKcx8A3WCUhzsDqF8UiieUepLnZvRpPkmEaTyXq1FjKlh0TJ0ngVof
-X-Gm-Message-State: AOJu0YxOSKbqrPABb+3eAw99tBa1cC9E/N+UB5X1WkoQKbgfhPTDeh1n
-	H9TvXQU1uxR4Nu/zFn9AQk2V1NYVvJUsZ+4N3WvzZr1/ruXJGLrT
-X-Google-Smtp-Source: AGHT+IFhM8MfQy/NKffVoj7J9CoSEpQI9NXHY4jV8akjJkOPDrXqH/6wlV6/772rcL7gJR8l95SVmg==
-X-Received: by 2002:a05:6402:84c:b0:5a2:abcb:c4cf with SMTP id 4fb4d7f45d1cf-5bea1c7f2c7mr31901a12.22.1723566544025;
-        Tue, 13 Aug 2024 09:29:04 -0700 (PDT)
-Received: from localhost (dh207-40-227.xnet.hr. [88.207.40.227])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd1968af77sm3005390a12.40.2024.08.13.09.29.03
+        d=1e100.net; s=20230601; t=1723566331; x=1724171131;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5NoZCSaoOttYGFP4/rYe/XKjJjPS0m2JdIDQ6t2cpfA=;
+        b=r+ZNt/NKg6A6M4cUzMX79DyFlJGHlWf6Hb9PJliLasf/LszeJfnjJqXVEeo5XJrIjC
+         RbP/I/o6EcY4o+EIW2xmuU/m/MZ+0v2d4mkLzcCD7I3hJ2gFuqkSOahX6NxFD9OuctFh
+         f7iCoKwjRhaHXEEcSuL7sdmSuq6hqT7L+7MRvavErakmLgVe3DhjyQS9TmdqM6P3tcnR
+         +tKDgkIygqo5FnuGG43jEBEhAfroQTzqOlVa2elv57EqAjvHt8X4X4EgY600JgRPT8Tn
+         py2ilLMlg7nIWmom67Hbx5gviaoBfZhwME/jdwslKREnCsXTD7SXVOmNCFFYWxtDYtte
+         oC9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVw9R+yDBWmTTSLq1BIfYCYggJnWgb4NRWaGLsbUEDM53/KABkhrgrxJnQyU/IswtMjnc2W0bkNndgFCGqbBQ1YFRclj2nWOKImaM+pkSZLHTC5QwzvryZBmCH1vkaqidWCb6hB
+X-Gm-Message-State: AOJu0YyxoFpkPN28sFTpJMbQ9yt9nO0SiEaEwvDyg9bsm/XyF/DjdxQm
+	vl3QA6HWVoToZ32zQGbljxcdf3cZh2Z+BX6AE/AP1k79VtqQUwrGSFhyaA==
+X-Google-Smtp-Source: AGHT+IFkpR0IkCYUU+T11+NYu6VUySRtWZV3ow4RwBvn3WjywCNSuBqDVsW3Qc8BvnDESX+CuMTY+w==
+X-Received: by 2002:a17:907:1c26:b0:a6f:6126:18aa with SMTP id a640c23a62f3a-a80ed2d5a41mr280573866b.67.1723566330595;
+        Tue, 13 Aug 2024 09:25:30 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f414f04csm80637366b.166.2024.08.13.09.25.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 09:29:03 -0700 (PDT)
-From: Mirsad Todorovac <mtodorovac69@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+        Tue, 13 Aug 2024 09:25:30 -0700 (PDT)
+Date: Tue, 13 Aug 2024 09:25:27 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Sunil Goutham <sgoutham@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Mirsad Todorovac <mtodorovac69@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2 1/1] selftests: net: af_unix: convert param to const char* in __recvpair() to fix warning
-Date: Tue, 13 Aug 2024 18:20:06 +0200
-Message-ID: <20240813162004.2464421-3-mtodorovac69@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: thunder_bgx: Fix netdev structure allocation
+Message-ID: <ZruI940YZCETGNGq@gmail.com>
+References: <20240812141322.1742918-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812141322.1742918-1-maz@kernel.org>
 
-GCC 13.2.0 reported warning about (void *) being used as a param where (char *)
-is expected:
+Hello Marc,
 
-In file included from msg_oob.c:14:
-msg_oob.c: In function ‘__recvpair’:
-../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument of type ‘char *’, \
-						but argument 6 has type ‘const void *’ [-Wformat=]
-  106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
-      |                                        ^~~~~~~~~~~~~
-../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
-  101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
-      |                 ^~~~~~~~
-msg_oob.c:235:17: note: in expansion of macro ‘TH_LOG’
-  235 |                 TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-      |                 ^~~~~~
-../../kselftest_harness.h:106:40: warning: format ‘%s’ expects argument of type ‘char *’, \
-						but argument 6 has type ‘const void *’ [-Wformat=]
-  106 |                 fprintf(TH_LOG_STREAM, "# %s:%d:%s:" fmt "\n", \
-      |                                        ^~~~~~~~~~~~~
-../../kselftest_harness.h:101:17: note: in expansion of macro ‘__TH_LOG’
-  101 |                 __TH_LOG(fmt, ##__VA_ARGS__); \
-      |                 ^~~~~~~~
-msg_oob.c:259:25: note: in expansion of macro ‘TH_LOG’
-  259 |                 TH_LOG("Expected:%s", expected_errno ? strerror(expected_errno) : expected_buf);
-      |                 ^~~~~~
+On Mon, Aug 12, 2024 at 03:13:22PM +0100, Marc Zyngier wrote:
+> Commit 94833addfaba ("net: thunderx: Unembed netdev structure") had
+> a go at dynamically allocating the netdev structures for the thunderx_bgx
+> driver.  This change results in my ThunderX box catching fire (to be fair,
+> it is what it does best).
 
-As Simon suggested, all calls to __recvpair() have char * as expected_buf param, so
-it is safe to change param type from (const void *) to (const char *), which silences
-the warning.
+Should I be proud of it? :-)
 
-Fixes: d098d77232c37 ("selftest: af_unix: Add msg_oob.c.")
-Reported-by: Mirsad Todorovac <mtodorovac69@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
-Suggested-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Mirsad Todorovac <mtodorovac69@gmail.com>
----
-v1 -> v2:
- fixed a typo.
- change funct param type rather than making two casts, as Simon suggested.
- changed Subject: line to reflect the modification.
- minor formatting changes.
+> The issues with this change are that:
+> 
+> - bgx_lmac_enable() is called *after* bgx_acpi_register_phy() and
+>   bgx_init_of_phy(), both expecting netdev to be a valid pointer.
+> 
+> - bgx_init_of_phy() populates the MAC addresses for *all* LMACs
+>   attached to a given BGX instance, and thus needs netdev for each of
+>   them to have been allocated.
+> 
+> There is a few things to be said about how the driver mixes LMAC and
+> BGX states which leads to this sorry state, but that's beside the point.
+> 
+> To address this, go back to a situation where all netdev structures
+> are allocated before the driver starts relying on them, and move the
+> freeing of these structures to driver removal. Someone brave enough
+> can always go and restructure the driver if they want.
+> 
+> Fixes: 94833addfaba ("net: thunderx: Unembed netdev structure")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-v1:
- initial version to fix the compiler warning.
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
- tools/testing/selftests/net/af_unix/msg_oob.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
-index 16d0c172eaeb..535eb2c3d7d1 100644
---- a/tools/testing/selftests/net/af_unix/msg_oob.c
-+++ b/tools/testing/selftests/net/af_unix/msg_oob.c
-@@ -209,7 +209,7 @@ static void __sendpair(struct __test_metadata *_metadata,
- 
- static void __recvpair(struct __test_metadata *_metadata,
- 		       FIXTURE_DATA(msg_oob) *self,
--		       const void *expected_buf, int expected_len,
-+		       const char *expected_buf, int expected_len,
- 		       int buf_len, int flags)
- {
- 	int i, ret[2], recv_errno[2], expected_errno = 0;
--- 
-2.43.0
-
+Thanks for taming my fiery commit.
 
