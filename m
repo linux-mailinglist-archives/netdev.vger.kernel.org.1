@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-117934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4FF94FF01
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:44:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2029F94FEF8
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 09:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD46F1C2251E
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:44:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E801F242F0
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B713170A03;
-	Tue, 13 Aug 2024 07:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7799678676;
+	Tue, 13 Aug 2024 07:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Du12wlz4"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="xEahoXeS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABDB13AD16;
-	Tue, 13 Aug 2024 07:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A276F099;
+	Tue, 13 Aug 2024 07:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723534996; cv=none; b=o+ciSzBWhO1bYu9RYz+tZuz7nZ+UwQP1/mxnCpj1tio+9TNVv1rxp6HpFsYPdkTJRTiqi5PY2tDGNdtJ0u/hMYLazA+uqPLgx4yHampM4mNAQVT3A9xnuW+tRi8PGCGiz/p8ELTFC4KQM/wDaSvQCFeLI2hsNBddwsw6OJZK/Bs=
+	t=1723534993; cv=none; b=QjYPHWKhWHEpAFDkQlDffS0FE896tcAGV73OAqhJAzNtVq1l/xnPuNoNIQ2nv727MP2gVi86pyTFLhBUPZ9ksRqlK5Sb0SQ9gPcSJjNN/X8SUdnXM3Fc2Zd2Q53UMC8PDgpvQujJVUVQOVz92pWMIIU2+8bD/vRgzHZ1Bt6k/2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723534996; c=relaxed/simple;
-	bh=9s+3xaJBbwHb9C+wu9VXfez3rks7CNhLZAuywepH7HY=;
+	s=arc-20240116; t=1723534993; c=relaxed/simple;
+	bh=Y9y+TLj+I3OnjynxjXKjkRwhm/knIdzh42jxIIcfbbY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TdFQ7QHe7jwxrkfz6/NfaUTpEO9XOPjrXUDKqdKW/2YDsgtT651bZsaytrpO1YHYi136HMyL0umpVhGrxnt44rvs4wMrKl23ba8Dvv4sjoYVbWN+Qy0Y7ozk0OFo4RODlK5Bs30T4bRKmWp15OpU081IPaZwe1WRheV8nB0dpxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Du12wlz4; arc=none smtp.client-ip=198.47.19.141
+	 MIME-Version:Content-Type; b=CmEAJ55L5CtUG8KP4zRCD0WEGBgKtd9s9qpxkIuyejRNLagt0wxy+eTDMnAbEvA54KMhJT4nG8GGl35ZvGlfZ/pufsIcXMzNGWpuiaZGj2LuhugdBYorszSxjmj87hFCy7Rp/d8GWHkEfcN3fuBtL9t6kUJbGdR6CxJCm4IubKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=xEahoXeS; arc=none smtp.client-ip=198.47.19.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47D7gcPe119101;
-	Tue, 13 Aug 2024 02:42:38 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47D7geRx050727;
+	Tue, 13 Aug 2024 02:42:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1723534958;
-	bh=NCPtPO0MqDaWJYgs7//uxS+xHxRG49uQMHSjCZMNdck=;
+	s=ti-com-17Q1; t=1723534960;
+	bh=gxYldqWRrS9F2HMgFdh4UAt50xD/n/7jb5L2jXFeAM4=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Du12wlz49B3vDgpkjFzYoIFyuduRBmoodBtXrguyaorT6IKqYCAmj5TCudezwC6Al
-	 DU6+IYdN0opg0sLWkGRAmvE6oJawgBeDHgt3sbr2RNxbxxrWoTP0j88IjzT4UqjZen
-	 eXIdhLAUNtlVAprSy4AzO+bNRh6zxoYko4fpu9Sk=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47D7gcQt031419
+	b=xEahoXeS70V2l5slJjHmP8CjgQlUlBXYMzi6ub9qRnvb9jt+bwKISLuYHde6ulkNG
+	 uQuIUkazY4ibItNBVRQkcwbPARrK/8H6SMzxf9DAMwdQ8v9atn9rsCyPYjBGUf0Pnj
+	 +vTPbYt1caOBWBR8pX/T30bJ/bY17TDYK/WVadyE=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47D7gecj039906
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 13 Aug 2024 02:42:38 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+	Tue, 13 Aug 2024 02:42:40 -0500
+Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 13
- Aug 2024 02:42:38 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ Aug 2024 02:42:40 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 13 Aug 2024 02:42:38 -0500
+ Frontend Transport; Tue, 13 Aug 2024 02:42:40 -0500
 Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47D7gcHv073015;
-	Tue, 13 Aug 2024 02:42:38 -0500
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47D7geBB025711;
+	Tue, 13 Aug 2024 02:42:40 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 47D7gbZq008713;
-	Tue, 13 Aug 2024 02:42:37 -0500
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 47D7gdNU008726;
+	Tue, 13 Aug 2024 02:42:39 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Dan Carpenter <dan.carpenter@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
         Jan Kiszka <jan.kiszka@siemens.com>,
@@ -78,9 +78,9 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
         Roger Quadros
 	<rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v2 1/7] net: ti: icssg-prueth: Enable IEP1
-Date: Tue, 13 Aug 2024 13:12:27 +0530
-Message-ID: <20240813074233.2473876-2-danishanwar@ti.com>
+Subject: [PATCH net-next v2 2/7] net: ti: icss-iep: Move icss_iep structure
+Date: Tue, 13 Aug 2024 13:12:28 +0530
+Message-ID: <20240813074233.2473876-3-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240813074233.2473876-1-danishanwar@ti.com>
 References: <20240813074233.2473876-1-danishanwar@ti.com>
@@ -94,53 +94,184 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-IEP1 is needed by firmware to enable FDB learning and FDB ageing.
-Always enable IEP1
+Move icss_iep structure definition and to icss_iep.h file so that the
+structure members can be used / accessed by all icssg driver files.
 
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/ti/icssg/icss_iep.c | 72 -----------------------
+ drivers/net/ethernet/ti/icssg/icss_iep.h | 73 +++++++++++++++++++++++-
+ 2 files changed, 72 insertions(+), 73 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 53a3e44b99a2..613bd8de6eb8 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1256,12 +1256,8 @@ static int prueth_probe(struct platform_device *pdev)
- 		goto put_iep0;
- 	}
+diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
+index 75c294ce6fb6..5d6d1cf78e93 100644
+--- a/drivers/net/ethernet/ti/icssg/icss_iep.c
++++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+@@ -53,78 +53,6 @@
+ #define IEP_CAP_CFG_CAPNR_1ST_EVENT_EN(n)	BIT(LATCH_INDEX(n))
+ #define IEP_CAP_CFG_CAP_ASYNC_EN(n)		BIT(LATCH_INDEX(n) + 10)
  
--	if (prueth->pdata.quirk_10m_link_issue) {
--		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
--		 * traffic.
--		 */
--		icss_iep_init_fw(prueth->iep1);
--	}
-+	/* Enable IEP1 for FW as it's needed by FW for FDB Learning and FDB ageing */
-+	icss_iep_init_fw(prueth->iep1);
+-enum {
+-	ICSS_IEP_GLOBAL_CFG_REG,
+-	ICSS_IEP_GLOBAL_STATUS_REG,
+-	ICSS_IEP_COMPEN_REG,
+-	ICSS_IEP_SLOW_COMPEN_REG,
+-	ICSS_IEP_COUNT_REG0,
+-	ICSS_IEP_COUNT_REG1,
+-	ICSS_IEP_CAPTURE_CFG_REG,
+-	ICSS_IEP_CAPTURE_STAT_REG,
+-
+-	ICSS_IEP_CAP6_RISE_REG0,
+-	ICSS_IEP_CAP6_RISE_REG1,
+-
+-	ICSS_IEP_CAP7_RISE_REG0,
+-	ICSS_IEP_CAP7_RISE_REG1,
+-
+-	ICSS_IEP_CMP_CFG_REG,
+-	ICSS_IEP_CMP_STAT_REG,
+-	ICSS_IEP_CMP0_REG0,
+-	ICSS_IEP_CMP0_REG1,
+-	ICSS_IEP_CMP1_REG0,
+-	ICSS_IEP_CMP1_REG1,
+-
+-	ICSS_IEP_CMP8_REG0,
+-	ICSS_IEP_CMP8_REG1,
+-	ICSS_IEP_SYNC_CTRL_REG,
+-	ICSS_IEP_SYNC0_STAT_REG,
+-	ICSS_IEP_SYNC1_STAT_REG,
+-	ICSS_IEP_SYNC_PWIDTH_REG,
+-	ICSS_IEP_SYNC0_PERIOD_REG,
+-	ICSS_IEP_SYNC1_DELAY_REG,
+-	ICSS_IEP_SYNC_START_REG,
+-	ICSS_IEP_MAX_REGS,
+-};
+-
+-/**
+- * struct icss_iep_plat_data - Plat data to handle SoC variants
+- * @config: Regmap configuration data
+- * @reg_offs: register offsets to capture offset differences across SoCs
+- * @flags: Flags to represent IEP properties
+- */
+-struct icss_iep_plat_data {
+-	const struct regmap_config *config;
+-	u32 reg_offs[ICSS_IEP_MAX_REGS];
+-	u32 flags;
+-};
+-
+-struct icss_iep {
+-	struct device *dev;
+-	void __iomem *base;
+-	const struct icss_iep_plat_data *plat_data;
+-	struct regmap *map;
+-	struct device_node *client_np;
+-	unsigned long refclk_freq;
+-	int clk_tick_time;	/* one refclk tick time in ns */
+-	struct ptp_clock_info ptp_info;
+-	struct ptp_clock *ptp_clock;
+-	struct mutex ptp_clk_mutex;	/* PHC access serializer */
+-	u32 def_inc;
+-	s16 slow_cmp_inc;
+-	u32 slow_cmp_count;
+-	const struct icss_iep_clockops *ops;
+-	void *clockops_data;
+-	u32 cycle_time_ns;
+-	u32 perout_enabled;
+-	bool pps_enabled;
+-	int cap_cmp_irq;
+-	u64 period;
+-	u32 latch_enable;
+-	struct work_struct work;
+-};
+-
+ /**
+  * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
+  * @iep: Pointer to structure representing IEP.
+diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
+index 803a4b714893..0bdca0155abd 100644
+--- a/drivers/net/ethernet/ti/icssg/icss_iep.h
++++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
+@@ -12,7 +12,78 @@
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/regmap.h>
  
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
-@@ -1366,8 +1362,7 @@ static int prueth_probe(struct platform_device *pdev)
- 	}
+-struct icss_iep;
++enum {
++	ICSS_IEP_GLOBAL_CFG_REG,
++	ICSS_IEP_GLOBAL_STATUS_REG,
++	ICSS_IEP_COMPEN_REG,
++	ICSS_IEP_SLOW_COMPEN_REG,
++	ICSS_IEP_COUNT_REG0,
++	ICSS_IEP_COUNT_REG1,
++	ICSS_IEP_CAPTURE_CFG_REG,
++	ICSS_IEP_CAPTURE_STAT_REG,
++
++	ICSS_IEP_CAP6_RISE_REG0,
++	ICSS_IEP_CAP6_RISE_REG1,
++
++	ICSS_IEP_CAP7_RISE_REG0,
++	ICSS_IEP_CAP7_RISE_REG1,
++
++	ICSS_IEP_CMP_CFG_REG,
++	ICSS_IEP_CMP_STAT_REG,
++	ICSS_IEP_CMP0_REG0,
++	ICSS_IEP_CMP0_REG1,
++	ICSS_IEP_CMP1_REG0,
++	ICSS_IEP_CMP1_REG1,
++
++	ICSS_IEP_CMP8_REG0,
++	ICSS_IEP_CMP8_REG1,
++	ICSS_IEP_SYNC_CTRL_REG,
++	ICSS_IEP_SYNC0_STAT_REG,
++	ICSS_IEP_SYNC1_STAT_REG,
++	ICSS_IEP_SYNC_PWIDTH_REG,
++	ICSS_IEP_SYNC0_PERIOD_REG,
++	ICSS_IEP_SYNC1_DELAY_REG,
++	ICSS_IEP_SYNC_START_REG,
++	ICSS_IEP_MAX_REGS,
++};
++
++/**
++ * struct icss_iep_plat_data - Plat data to handle SoC variants
++ * @config: Regmap configuration data
++ * @reg_offs: register offsets to capture offset differences across SoCs
++ * @flags: Flags to represent IEP properties
++ */
++struct icss_iep_plat_data {
++	const struct regmap_config *config;
++	u32 reg_offs[ICSS_IEP_MAX_REGS];
++	u32 flags;
++};
++
++struct icss_iep {
++	struct device *dev;
++	void __iomem *base;
++	const struct icss_iep_plat_data *plat_data;
++	struct regmap *map;
++	struct device_node *client_np;
++	unsigned long refclk_freq;
++	int clk_tick_time;	/* one refclk tick time in ns */
++	struct ptp_clock_info ptp_info;
++	struct ptp_clock *ptp_clock;
++	struct mutex ptp_clk_mutex;	/* PHC access serializer */
++	u32 def_inc;
++	s16 slow_cmp_inc;
++	u32 slow_cmp_count;
++	const struct icss_iep_clockops *ops;
++	void *clockops_data;
++	u32 cycle_time_ns;
++	u32 perout_enabled;
++	bool pps_enabled;
++	int cap_cmp_irq;
++	u64 period;
++	u32 latch_enable;
++	struct work_struct work;
++};
++
+ extern const struct icss_iep_clockops prueth_iep_clockops;
  
- exit_iep:
--	if (prueth->pdata.quirk_10m_link_issue)
--		icss_iep_exit_fw(prueth->iep1);
-+	icss_iep_exit_fw(prueth->iep1);
- 	icss_iep_put(prueth->iep1);
- 
- put_iep0:
-@@ -1424,8 +1419,7 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
--	if (prueth->pdata.quirk_10m_link_issue)
--		icss_iep_exit_fw(prueth->iep1);
-+	icss_iep_exit_fw(prueth->iep1);
- 
- 	icss_iep_put(prueth->iep1);
- 	icss_iep_put(prueth->iep0);
+ /* Firmware specific clock operations */
 -- 
 2.34.1
 
