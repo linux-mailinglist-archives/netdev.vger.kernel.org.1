@@ -1,95 +1,209 @@
-Return-Path: <netdev+bounces-118120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D680950950
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:43:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45816950997
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 17:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4371C20C76
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:43:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69EBF1C20E64
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4CA1A071A;
-	Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653BE1A08AF;
+	Tue, 13 Aug 2024 15:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtCE97rY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdCX8VNJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AD01E86A
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1D1A08A3;
+	Tue, 13 Aug 2024 15:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563827; cv=none; b=OtfRpSZcSpQVronpZ2C+MvjV+g7rpQXfcIOejWU3HOki4mMOx13uDo9uozYb+ISxhPCjBTfEYkALRaarolSrGe7R2RBiAkV18wS5PLVe8OsLYC76N8Y7gnVSTnglPb4SlP8uWDfpXRrQ9RHTAlf7bumnf6wHGrby4eLCkrTVq5Q=
+	t=1723564671; cv=none; b=hAv0TiuCd972aiC1xEsECAXUlB00rP+oFWiZHQwG+6JJzuYtgFtfFMc10peVw7dIVrH35viYlWydleEWcFNr+z5TMPO2EB0fEfmPAvmziL0ew9Akk1jFqg0Tea9iduL8ldY6FamOh26VGH9ygOTYuWbxKEqxVRRRtF/kmeFeRug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563827; c=relaxed/simple;
-	bh=w1nD4oRKBHOTRWEMFdmVdwweMJpT7+oYgkT4zTsMCIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f/NeOyVlVJhMrdn0mo6vXk8y4KtxwDRSK3Yr8C0cp4adK10p8qC6eI+CD540OoLMjg7oEMjxUV1NfXCEjBRt+KoVJii6kzpxjTsMvFQzikNwemxUjSWW0fFPrbU25JcMxNFJgveODbUGTtRVmPakulFX1abzXqxNTCvz9IzFPpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtCE97rY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3162BC4AF09;
-	Tue, 13 Aug 2024 15:43:47 +0000 (UTC)
+	s=arc-20240116; t=1723564671; c=relaxed/simple;
+	bh=0xi5AT6zUg1ZXFT0NFQY+gVhVfp0M/lxZ7XtHuU3RF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aXfPvXIT3bPXGgPa6fi6A6KCBZAu1JtGjFAkenUAo9+Js19Wxq0NaqzwFiq0S0fHvTmoiUfGNndW1pWgd5dBN2SORXUieImsGQrpXQjZD+I/n2Eqo4QM8Ckknhaq2rFGyi4IRpWiBAnad58jcMQsGrfLYD+B7MapILDVNnLW4mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdCX8VNJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD059C4AF09;
+	Tue, 13 Aug 2024 15:57:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723563827;
-	bh=w1nD4oRKBHOTRWEMFdmVdwweMJpT7+oYgkT4zTsMCIk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TtCE97rYske5F3PtQtthB9FvbW+ueZ0wdcIlTnQQ0PtAhiSO/ZmZIGOao5FH2p8K7
-	 VpiXEsGPGIWbK14WnIttj6lfPc2AzRtYr50kqMwSCQy0IWTFGEWmI9vzEpmwPY4N0C
-	 6IRhN5A7uHIhKIvU/aa00PLp4uJ27qV5nU4DRQa35628tUGtqc+LT5uumWB3IBjSnJ
-	 k1GPLby8PUKkEBIv7iBHsaliunwT6MghKARN+w33jbbrEnJ/ttVakvCe2Xw4HyU62N
-	 NQ0gXqAaoOPbaE32FUpw+zBs+I1nDGZDYoiOX2PzfYfj3qOpIT7vLq5AHOoF0BkfAO
-	 PQ+AUlHzgjC3A==
-Date: Tue, 13 Aug 2024 08:43:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Donald Hunter <donald.hunter@gmail.com>,
- netdev@vger.kernel.org, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>, Simon Horman <horms@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Sunil Kovvuri Goutham
- <sgoutham@marvell.com>, Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <20240813084345.575ffd78@kernel.org>
-In-Reply-To: <9f4854e4-f199-467a-bf42-9633033f191d@redhat.com>
-References: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
-	<ZquJWp8GxSCmuipW@nanopsycho.orion>
-	<8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
-	<Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
-	<74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
-	<ZrHLj0e4_FaNjzPL@nanopsycho.orion>
-	<f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
-	<20240812082544.277b594d@kernel.org>
-	<Zro9PhW7SmveJ2mv@nanopsycho.orion>
-	<20240812104221.22bc0cca@kernel.org>
-	<ZrrxZnsTRw2WPEsU@nanopsycho.orion>
-	<20240813071214.5724e81b@kernel.org>
-	<eb027f6b-83aa-4524-8956-266808a1f919@redhat.com>
-	<20240813075828.4ead43d4@kernel.org>
-	<9f4854e4-f199-467a-bf42-9633033f191d@redhat.com>
+	s=k20201202; t=1723564671;
+	bh=0xi5AT6zUg1ZXFT0NFQY+gVhVfp0M/lxZ7XtHuU3RF4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DdCX8VNJe90QKoQX216sdtt9T+80ps80Eq1X5Kbok2xhjLLTd5kRnC/6TXTs7FhyY
+	 e4szbm7fiMeU/FI/4p1sYeZdqoTpUZn3GJDa/pvaNjcPg4yoLM4a8C1VEbho087Exp
+	 Z8r76OpysB7oRoECbolGR2JsON8f7L+rot3dJsMz5opR5o5UWnPkjROADRbFoZalaX
+	 YhCKRj9izVhJRmhDn/VJ7+LWNANMXsjJ1CAjeoAu3K3k/0ahHsQ/KGywOO4mrCZzXv
+	 +1ZpuRzL9fDdjupqGtHiWiLZ7vZQG8B+i6o+TjhLq4TAlVbpKzKtBAZcLaNsl/uwUK
+	 zX7/+WyGjRf6A==
+Message-ID: <34cc17a1-dee2-4eb0-9b24-7b264cb63521@kernel.org>
+Date: Tue, 13 Aug 2024 17:57:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [xdp-hints] Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to
+ GRO from netif_receive_skb_list()
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Daniel Xu <dxu@dxuuu.xyz>
+Cc: Alexander Lobakin <alexandr.lobakin@intel.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
+ Yajun Deng <yajun.deng@linux.dev>, Willem de Bruijn <willemb@google.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+ <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+ <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
+ <ZrRPbtKk7RMXHfhH@lore-rh-laptop>
+ <54aab7ec-80e9-44fd-8249-fe0cabda0393@intel.com>
+ <e0616dcc-1007-4faf-8825-6bf536799cbf@intel.com> <874j7oean6.fsf@toke.dk>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <874j7oean6.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 13 Aug 2024 17:31:17 +0200 Paolo Abeni wrote:
-> > "set" is not a sensible verb for creating something. "group" in
-> > the original was the verb.
-> > Why are both saying "set" and not "create"? What am I missing?  
+
+
+On 13/08/2024 16.54, Toke Høiland-Jørgensen wrote:
+> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
 > 
-> Please, don't read too much in my limited English skills!
-> I'm fine with group_create() - or create_group()
+>> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+>> Date: Thu, 8 Aug 2024 13:57:00 +0200
+>>
+>>> From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+>>> Date: Thu, 8 Aug 2024 06:54:06 +0200
+>>>
+>>>>> Hi Alexander,
+>>>>>
+>>>>> On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
+>>>>>> cpumap has its own BH context based on kthread. It has a sane batch
+>>>>>> size of 8 frames per one cycle.
+>>>>>> GRO can be used on its own, adjust cpumap calls to the
+>>>>>> upper stack to use GRO API instead of netif_receive_skb_list() which
+>>>>>> processes skbs by batches, but doesn't involve GRO layer at all.
+>>>>>> It is most beneficial when a NIC which frame come from is XDP
+>>>>>> generic metadata-enabled, but in plenty of tests GRO performs better
+>>>>>> than listed receiving even given that it has to calculate full frame
+>>>>>> checksums on CPU.
+>>>>>> As GRO passes the skbs to the upper stack in the batches of
+>>>>>> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
+>>>>>> device where the frame comes from, it is enough to disable GRO
+>>>>>> netdev feature on it to completely restore the original behaviour:
+>>>>>> untouched frames will be being bulked and passed to the upper stack
+>>>>>> by 8, as it was with netif_receive_skb_list().
+>>>>>>
+>>>>>> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+>>>>>> ---
+>>>>>>   kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+>>>>>>   1 file changed, 38 insertions(+), 5 deletions(-)
+>>>>>>
+>>>>>
+>>>>> AFAICT the cpumap + GRO is a good standalone improvement. I think
+>>>>> cpumap is still missing this.
+>>>
+>>> The only concern for having GRO in cpumap without metadata from the NIC
+>>> descriptor was that when the checksum status is missing, GRO calculates
+>>> the checksum on CPU, which is not really fast.
+>>> But I remember sometimes GRO was faster despite that.
+>>>
+>>>>>
+>>>>> I have a production use case for this now. We want to do some intelligent
+>>>>> RX steering and I think GRO would help over list-ified receive in some cases.
+>>>>> We would prefer steer in HW (and thus get existing GRO support) but not all
+>>>>> our NICs support it. So we need a software fallback.
+>>>>>
+>>>>> Are you still interested in merging the cpumap + GRO patches?
+>>>
+>>> For sure I can revive this part. I was planning to get back to this
+>>> branch and pick patches which were not related to XDP hints and send
+>>> them separately.
+>>>
+>>>>
+>>>> Hi Daniel and Alex,
+>>>>
+>>>> Recently I worked on a PoC to add GRO support to cpumap codebase:
+>>>> - https://github.com/LorenzoBianconi/bpf-next/commit/a4b8264d5000ecf016da5a2dd9ac302deaf38b3e
+>>>>    Here I added GRO support to cpumap through gro-cells.
+>>>> - https://github.com/LorenzoBianconi/bpf-next/commit/da6cb32a4674aa72401c7414c9a8a0775ef41a55
+>>>>    Here I added GRO support to cpumap trough napi-threaded APIs (with a some
+>>>>    changes to them).
+>>>
+>>> Hmm, when I was testing it, adding a whole NAPI to cpumap was sorta
+>>> overkill, that's why I separated GRO structure from &napi_struct.
+>>>
+>>> Let me maybe find some free time, I would then test all 3 solutions
+>>> (mine, gro_cells, threaded NAPI) and pick/send the best?
+>>>
+>>>>
+>>>> Please note I have not run any performance tests so far, just verified it does
+>>>> not crash (I was planning to resume this work soon). Please let me know if it
+>>>> works for you.
+>>
+>> I did tests on both threaded NAPI for cpumap and my old implementation
+>> with a traffic generator and I have the following (in Kpps):
+>>
 
-Again, group was a verb :)
-I don't think anyone suggested group as a noun / object.
+What kind of traffic is the traffic generator sending?
 
-> Still WRT naming, I almost forgot about the much blamed 'detached' 
-> scope. Would 'node' or 'group' be a better name? (the latter only if we 
-> rename the homonymous operation)
+E.g. is this a type of traffic that gets GRO aggregated?
 
-I vote 'node', given the above.
+>>              direct Rx    direct GRO    cpumap    cpumap GRO
+>> baseline    2900         5800          2700      2700 (N/A)
+>> threaded                               2300      4000
+>> old GRO                                2300      4000
+>>
+
+Nice results. Just to confirm, the units are in Kpps.
+
+
+>> IOW,
+>>
+>> 1. There are no differences in perf between Lorenzo's threaded NAPI
+>>     GRO implementation and my old implementation, but Lorenzo's is also
+>>     a very nice cleanup as it switches cpumap to threaded NAPI completely
+>>     and the final diffstat even removes more lines than adds, while mine
+>>     adds a bunch of lines and refactors a couple hundred, so I'd go with
+>>     his variant.
+>>
+>> 2. After switching to NAPI, the performance without GRO decreases (2.3
+>>     Mpps vs 2.7 Mpps), but after enabling GRO the perf increases hugely
+>>     (4 Mpps vs 2.7 Mpps) even though the CPU needs to compute checksums
+>>     manually.
+> 
+> One question for this: IIUC, the benefit of GRO varies with the traffic
+> mix, depending on how much the GRO logic can actually aggregate. So did
+> you test the pathological case as well (spraying packets over so many
+> flows that there is basically no aggregation taking place)? Just to make
+> sure we don't accidentally screw up performance in that case while
+> optimising for the aggregating case :)
+> 
+
+For the GRO use-case, I think a basic TCP stream throughput test (like
+netperf) should show a benefit once cpumap enable GRO, Can you confirm this?
+Or does the missing hardware RX-hash and RX-checksum cause TCP GRO not
+to fully work, yet?
+
+Thanks A LOT for doing this benchmarking!
+--Jesper
+
 
