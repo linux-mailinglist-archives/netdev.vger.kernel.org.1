@@ -1,199 +1,286 @@
-Return-Path: <netdev+bounces-118013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652FB95041D
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C26095042A
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAA331F21811
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:49:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12201F2191F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 11:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC74199396;
-	Tue, 13 Aug 2024 11:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A281991D2;
+	Tue, 13 Aug 2024 11:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DuwR6l17"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g/u+q+44"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DAF199E9D;
-	Tue, 13 Aug 2024 11:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723549724; cv=none; b=WHXNP2aWTwNryxs23PaY9x4XEQsPlZDmxy6Wa6/Kp0ymFKBFNt61XI5G7uOGFd37vNlUP3k2Tc4t8RVYQptcc2eYSoa7UFhnFWwi9DsF+EpsAMn0xvhy543vXhqvGP4EcQtKO0HhjRkKk1zFesm6rA5xxEnAH6DHB7OYuY88A4g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723549724; c=relaxed/simple;
-	bh=Rhfwq0cg5lz4S8pNN27okoWlHYgUkEy8uDoZXs5jFZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eCnzM905mPOfWpOIHdye9bd0XNGEtkPu2M331Aj7TBX0pqwjBojpxgp1X4H1Pinq9H8qL2Qj5JK3kxJNY65NAURFADPbI/KUalDFP12ea5sA5Q5ORconbWMdbwI6x66o0aSFRuGv4etlo5xqKlmYBR8900pZDNvy9m0fLoqjORk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DuwR6l17; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-70eb0ae23e4so3937571b3a.0;
-        Tue, 13 Aug 2024 04:48:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723549722; x=1724154522; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fEwvddfgj60Kx5Z2+SKgI2f8D3YPCRs94fs0x4VsDhg=;
-        b=DuwR6l174DMBDdXy96JjnoNE7JGDLtnFPDbtAXYsr9PwobbXO4inddFuQm+trI9tXA
-         0nxEfREuVzC4YKpr+kdd8rVpqB6kYWZnOu1ZgtvjaDqlvx81KukX1OUWBuENjBYRniLD
-         6lzC41nfXTXHvZxIpW8FllZmlGsQ5KPmvsdSqHAJqmZmijy3hqFYXi9thgV5jcPXc9Xs
-         rtSdCeHF+ttycX6M5LA6k4PSW0aLVWk+0V+toP8b3QW+Krm5UUWacVIKOQnUjzrTjNaY
-         dMeIB3Pq6I5s8qAlasZsjjWdMFzTas0/zLn3BuOnbVsbyRF3bOpOsQX2pf99Hu7SDdgx
-         INxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723549722; x=1724154522;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fEwvddfgj60Kx5Z2+SKgI2f8D3YPCRs94fs0x4VsDhg=;
-        b=Rw6TAl04dZQACIoCS20MeoTCHD2JUdkaMYe0iHLMARmdrE/B3nddTeemY0Xj3U08PP
-         6qxcP/naAgPwwDPdyTVPioQ1f9hnDKhebshy4hcNsdas6ptDvbhNvp53qyWOcfj/gj6W
-         zembcoK2KxB4gd2z5cOh4O8kMyfIkZhIgaF0zYOBGzJBxQGYo9HreCsdw5MriD3bRUPB
-         Utvij0MDdLw6CsKCvzfxlxbhFcjMm4RZixP6GRg58M5UA7IFLioT5bdAzG+BSPChdzqA
-         yDJzdZJ3R8yEJIuNPltXJmrDUttuF6EMResF7lW41H4HurBk9lFrMhCVqBBwdZtS/0cE
-         KbLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/U3WpZEtFTuCtQDqdp5SDxkzhxjnwMC273oZMfM2YO92PJmOuUgMy30Fz74phGSORBb8augO/qaxvhfYjkYwVD3793bVh9xcJnRhCnWxGYTjW57rKTlTiQ66k+qui2cg8lADJB8OCVO2BO7sgnvGr20duPPrKkFDPuI/dz5vvog==
-X-Gm-Message-State: AOJu0Yw6mcrMBtFIjCY6yWU6COCdJuv3Dwyp5jhN2eVnaZsSMpdSL8im
-	Iz/NHJBxz+rwOzLRltAjxSkP6UvzjGMwT89JVZXLJYRwKgqaH11ZEC293AgzOvFL3gtOldSYcRY
-	I9adl2SV/4VxfLMC4OqHbqfNA5A8=
-X-Google-Smtp-Source: AGHT+IErLKHaiYPu7SrHVEFIcB1NY4fQJwHTKBS3L1t80KOvCgat/nd00Cg6FmkDz305JLaCQONbAQzBWe5muBnYW8I=
-X-Received: by 2002:a05:6a21:78b:b0:1c6:b0cc:c448 with SMTP id
- adf61e73a8af0-1c8d75b6731mr3449127637.43.1723549722103; Tue, 13 Aug 2024
- 04:48:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FADE199395
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 11:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723549774; cv=fail; b=iP/Nxa0UELn4Qe6GkjRXfEphVKvmVSy821xRzFAN7gnCpepuu0gIsTTDmxMysSRSAjUbYOiYevd8ePJahpZP0H64JQJtlTdrlgrJDfDQgKk24LeV4TsHVkGNjItlbtJVprgf4A48BsWl9lP9go4I3LtE3Xs6DNI+PPAR2/OQLD4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723549774; c=relaxed/simple;
+	bh=kD2LXdnl176zvn8PT4klFVIK8h5+nhY2s0MfewO2jh0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nwFo5bB+LBFSvDaaO8GBSkUGVZZHXD/B6uhC75Hxjw2I2AFKuvrgxYrUk7Uc2b6lwkIlIm8CCmHDrytsKO1cvBPG/XXA59t22qoRg0UuMPEu4c7xbzWM1uPoiGTENzN6Wkyo7H3FUOcKROTI2SKPyLzBGlpCtVhnULyMOGsxSKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g/u+q+44; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723549772; x=1755085772;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=kD2LXdnl176zvn8PT4klFVIK8h5+nhY2s0MfewO2jh0=;
+  b=g/u+q+44rYV5/a3oJhY5JXcUFUJO2Q6aGrDO/KjFQKvIyhUyERQAe7EF
+   opliIQJA4ImRJbDOIJLM1Qjme/WrihhP3TCIuH9ZbC0lhvWJ+iQih7znm
+   Obf4SWKrlOWxIwswmg2MWqv01ZFRDeDiA2GzOI41E96qcvPZTePyaRzLQ
+   J7rk/ecC+W1QvTrYZG/e3ilOBZ4KZE6fZaTPDLIN9jG4kkTs6YTaLKi8u
+   T+/xKuvJj/TR3Ko9q349KwUClCLsvGOQU2I2TY0GqR+AWEvihdJ8Dd8GW
+   zj8djKJbfBSnr6rLD5WXqf4CY/JeH0C1LG0b7RbGIDv9BCxJfFwON0HN5
+   Q==;
+X-CSE-ConnectionGUID: 5j8JcjALQIq/hl3LfNsKMw==
+X-CSE-MsgGUID: 9fGpyvv8TGuMZGwbbgC6wQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="44227607"
+X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
+   d="scan'208";a="44227607"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 04:49:30 -0700
+X-CSE-ConnectionGUID: ARwwo4pdRdWatORF2Gvbdw==
+X-CSE-MsgGUID: AzqfSpwVQl6dtymN1b6Ikg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
+   d="scan'208";a="58337931"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Aug 2024 04:49:30 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 13 Aug 2024 04:49:29 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 13 Aug 2024 04:49:29 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 13 Aug 2024 04:49:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NLXCUpXm2xA8zXUZgM/SOdPl/gU8OyQ1tnp6Nffo1YplxenY46UsRQYHugZ30aROU2b3w5zCxK64/WqM5jGLS7sMZGht7ftfUuZyG9MtLkwkA5x+LTGL8N8G3dfgiyy2yoUk1GyRcoy4eJ/AoQXhgUhjmKNNcRbL/wbdiVfPrWmuhH57HYhk754aR08DyX0KSM5xFMjwoOoUBAltROR17QSd/JLBKxGer+DWKUwBKg/l+PUaudSIANGAPRB+da3VeWaALO32PaO+DJdjb5KwRcEzp+4vaRhD8UOVVmueXCD8u4XZo0IH8sGuIu+qvU/Foq+T8BHRNuDyHTM5QNEPuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9W2PmRxVZaTopLKPv2FuG1/ZBL7I2BokLPKLdSOxkmA=;
+ b=nXI/KdOON/YyxT+nRBNbBaRhDwWfWrxxVYSsdc8JuVdIlzKRbMACnBrWK3wN1AqGOPdwWTqxY6cEoKvarlkdXgP3lqbo0Y3OVswosso/6/QvlmQbotaKHbHEEUhIn8GMPmB2YgSBtR4IGIHdrfhECulBiICU38JWPuUsA36JymVHmZRn3o2BbYyMEtceHvAwPFL8lwhYzydduE7U+QlvRFugKi7EhSUXn86gYjuf3hfZx5+Esw+dAVCw2CcKjvbD9l8Y4ebh2P+0TH8z5e/glYvtuDnDNMGywmOB4DSWtyP401qvb+LGHKor3xOp8oFhMOPxqJT6ektgmE/VCGOgjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ PH7PR11MB7479.namprd11.prod.outlook.com (2603:10b6:510:27f::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7828.25; Tue, 13 Aug 2024 11:49:26 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.7828.023; Tue, 13 Aug 2024
+ 11:49:26 +0000
+Date: Tue, 13 Aug 2024 13:49:15 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Jakub
+ Kicinski" <kuba@kernel.org>, Igor Bagnucki <igor.bagnucki@intel.com>
+Subject: Re: [PATCH iwl-net v2] ice: Add netif_device_attach/detach into PF
+ reset flow
+Message-ID: <ZrtIO2durwKP7ue/@boxer>
+References: <20240812125009.62635-1-dawid.osuchowski@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240812125009.62635-1-dawid.osuchowski@linux.intel.com>
+X-ClientProxiedBy: MI0P293CA0006.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::17) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240813100722.181250-1-aha310510@gmail.com> <b4b49770-2042-4ee8-a1e8-1501cdd807cf@linux.alibaba.com>
-In-Reply-To: <b4b49770-2042-4ee8-a1e8-1501cdd807cf@linux.alibaba.com>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Tue, 13 Aug 2024 20:48:28 +0900
-Message-ID: <CAO9qdTFjG7TZ7BKJZ_dvvOm08tjYooVtjh-8mNSoOZ7Ys5H=Ww@mail.gmail.com>
-Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, gbayer@linux.ibm.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net, 
-	dust.li@linux.alibaba.com, edumazet@google.com, pabeni@redhat.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH7PR11MB7479:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21d1e0c5-9a03-4f1f-0a2b-08dcbb8dfb7a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZvoFTATMU3Tm+vU2iRR2lDKBbfW6sBkILu5X3VE2f2zaap58trRY71RpNOiD?=
+ =?us-ascii?Q?V1doH1NYB3HDVSvogj1RQjrINU9xdoOGt1l9aWbnNgISIBV5NakoDqXHCQRA?=
+ =?us-ascii?Q?/kcLOHRmFxAQb7mx51SUkc0DJje94ucxWT3mX4fqeN3lfN2/uO5xely4JgxF?=
+ =?us-ascii?Q?ex+eZsSm9ZWke0WfffScqMDqa6xvQvA9FikxlGtP+YlqIj6LIvFluHv+uHwE?=
+ =?us-ascii?Q?5XZqb+Z531J5RlsGPrLjtXyli6telym+bmSBDRvxoF2Dy/SbEqtkTmlpvLdL?=
+ =?us-ascii?Q?lAXprhwlU/Jgr8upJrNxFUT2G0cKfOmeCqfp0enuqU1FlipJFrbuWEO9g5gk?=
+ =?us-ascii?Q?xVcOsGMyVjVDbGtvVgNqW40f6w7eEFUYhOxQ6PdCLBC57/tFn7JtrUap8TxT?=
+ =?us-ascii?Q?Kc0bnhUHj68odiovW5EjPhxSNpmCyjmD/jOEumeXqByeeCPK5BR/T9ck3v4B?=
+ =?us-ascii?Q?o8gUcD+H8uyTQm7pdbRJHl4aFy0X9Ig/9Ao6p8KevmXVVK/Pcl8/v3sSH6C2?=
+ =?us-ascii?Q?y7+eljGGjUlHq5YrtVbb8LWiDMx+3wyNj/Ugp6fi4ZzkJ3WuGTCbo0imtxXc?=
+ =?us-ascii?Q?ywKh06Yv4jf05p5A7wKgdo606E7am8WhiJXkXEWACJN3q17BWENjNX9RBcCS?=
+ =?us-ascii?Q?VS9aqYs1ixE4iEaJj/8ursqoKTNZKDQzH3uJIZjGqkyGqpDnC5KAElvzebUl?=
+ =?us-ascii?Q?BUen9OsXfsvUXZ5sUnhRiwc1bE1RwKLceo6w42swGS7PVFmbSo+BThadIKcW?=
+ =?us-ascii?Q?3od+M5RMHabWXbAfo4HFqn+5TfVLlHglQsboC+h3KnVq5JGb5UzI12cSEqel?=
+ =?us-ascii?Q?RePgzZbBD1RVbJRuIqOo7921PCo0odcpLlUldnGXMKyCYRJfur7d9o3cuE3t?=
+ =?us-ascii?Q?R1a4a74T+11aM+dzBNKlrd7vlI0bJtvUAAESNp2yaq+YrOGfLDiof47BJlMS?=
+ =?us-ascii?Q?8cJpclCReUOos5uIz99+7k0L1Mmu6c+tdZCxubfrdpweel+VxMoJS+R1yfQ/?=
+ =?us-ascii?Q?Pzk4AMS68Vbgb+5c5y8aaRURJ2mV6zxkccD1iWc3lZ4pP9GAfTLEx3fHkk3I?=
+ =?us-ascii?Q?VLK3LLTToWyqTTVeG+qqG+GxRt2Tr85yktZFAvZyGySFV1SbAAswW2+NSbw1?=
+ =?us-ascii?Q?3BO0cARvEDa1//UnTQegISfbMcHq0+RZzBmN4NR9XvztFGrET7GwfMMgK6md?=
+ =?us-ascii?Q?6icL3hr8zXfTbtF+9p5vCraNlQpET0OzofGC9ZaBxjB38oZTBXNpjZ5slApx?=
+ =?us-ascii?Q?o35bkW/06nNos1noYzskXh5zj4pV/piSFrg+BEuaurWWuYya7opxPyCOHfkl?=
+ =?us-ascii?Q?SFI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?I4pc/t3Hx/WeQaEh5w73TZLyErqSa4O4ptCl9b8jmU+Et8xqKGy8iKoz9UH9?=
+ =?us-ascii?Q?PQ3NILhnqXkf8yowoHktyus+glyWv9ZlYruLwnXi2ae/vhxXj8uZMWB5Fg+5?=
+ =?us-ascii?Q?s5XPDfgYmyApzemPfsRuXZfvngvuwO1KdgM8VpPC2zp6Jjvb2RJ7x8ZAHJCN?=
+ =?us-ascii?Q?eHXSvT0KYOgauccq+G8b97WQaty0Q8ey9ybBd3WsL1ggQ9bM5zTMP8WHyQA+?=
+ =?us-ascii?Q?aP7Wf+C/tZcwrbSR/csJjBzyyGQnu0IeL/82W0vcRvPR0l19ldto6QMrsDs2?=
+ =?us-ascii?Q?4P5CAJSHTs95vOhLmLoYC6SoBdlR+8nrk28Q32UAjCaH0vobicC1kbbDAfRm?=
+ =?us-ascii?Q?5fCQp1cCAQRqaTs5dl2JjyOSD7LSEzm7ZLQ2nm0mmwDbfaPUW7OyVguhW5Ig?=
+ =?us-ascii?Q?Nmi2X4uhWCBPODAsEZsJ3rqtL6nN6rddj1gfn5ibcXxe5Tg5j0aWbLkZvQSw?=
+ =?us-ascii?Q?UzY5jfHxENkswewebFYsEN8K+CfAo38hnzbvK3agqrQmJn1t371SIyjLTN8m?=
+ =?us-ascii?Q?UFNhCpcfw7hCqGrRhkL/Lhv9f7yrAnhH8dOuWlJfzcWCZDu7KVTa8UKamX5O?=
+ =?us-ascii?Q?PoR2KGska5Z8yVsUHiMASRPS/D4G2DORdOU6ALPkIxy46TZIGJJGEg3Zpn0h?=
+ =?us-ascii?Q?P+7Q7sbR4zBEpFrFwEaiKn+BWd2zotSOdKjkcVvjM9BNhmDUOs6BSSQ12aVH?=
+ =?us-ascii?Q?G4QucDFeLHpRdtW1eqdcnwVr0+ac/cT21KmHm4c7XBFMW09rA0XuQLnV7IpZ?=
+ =?us-ascii?Q?Zl6Pal1sipJHAhxeHx9h9bMc7H5shYvxS2ewnxF5bXghmrALI3kIN7HJ9Iak?=
+ =?us-ascii?Q?SEzj2SBM29MOGguWfcnM+mjzep50ZHwNK4nCZ+nGSG5tHWaRw1DD0aEsR4wP?=
+ =?us-ascii?Q?NpPKcCc/VMRC+8LWzePWVCRT2wqtPhN+YZ/V7buDKJzx3Wki4ZVmVuOb49em?=
+ =?us-ascii?Q?Pp0Oil1djl+up2XdtOBMTqLTNNh52+/2o/Cd51LdJom3bxDHX03Jml4Qm26u?=
+ =?us-ascii?Q?Ce2BE8pFCdhtmuF77cg/6fJib7v2L6E4j2/OPVGTCHHXvDP7jrhiJ5re0F/c?=
+ =?us-ascii?Q?NtaN0iy0ayHJIz1aJw9T6Gl6lgJOpfk1/Wypl69Bxf95SF+us+Q0lIMn823h?=
+ =?us-ascii?Q?fUfMbRIWKj1OBbH0mLRXuElN4lkDgrH2wgpkJLy4qy9mnqpb5R7Z69SqBFL/?=
+ =?us-ascii?Q?X4LP4O0gVEEydpxe/hVSEi6ps6QAd6h55zZA2tkW3qeQvmpTBHhl6CUArd9j?=
+ =?us-ascii?Q?vgzao5RjYRg6413y+toMAfJ1M0398hTE5J6hzdJeXmXc38pb1yy+ZN33DtSb?=
+ =?us-ascii?Q?50FzOkWUeF7n78BYHgk6wk/zt0qqz/2hVh3deRE3thPxBA8cIn5cf5osG+TL?=
+ =?us-ascii?Q?EDD3VyWwe/N8gp/MirRONvjL6ohS0/+we0zBnSt7eqoUFEheC/v1wmcsjg+D?=
+ =?us-ascii?Q?9ifh4FXZthuiUK+fy8nkbgZRfeamRYg6gaUwV0ab7RMXN7qGoYXs97mmnKKD?=
+ =?us-ascii?Q?e1HixZmx82wcjN/SofYcLQ/hvzVD5YsOBiwsjNAeGLZusGkoCfRiBim4pCWs?=
+ =?us-ascii?Q?BEH05oyEMC7zcOzW5dSbMCiu/CY7QGdu+sgSE8GnGlzEJmcN7DvSNuXiIBR2?=
+ =?us-ascii?Q?ng=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21d1e0c5-9a03-4f1f-0a2b-08dcbb8dfb7a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2024 11:49:26.4395
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /NDPlthjtZ95joCCjpl/VtejywevCo5QUQzntXCqN0iEa8hrYsio3T3reSEYPa44mi0t0+nDi9ckYDSL4EvzKIz7CISHTfTNEvWNEt2mWbI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7479
+X-OriginatorOrg: intel.com
 
-D. Wythe wrote:
->
->
->
-> On 8/13/24 6:07 PM, Jeongjun Park wrote:
-> > Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
-> > copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
-> >
-> > In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> > point to the same address, when smc_create_clcsk() stores the newly
-> > created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> > into clcsock. This causes NULL pointer dereference and various other
-> > memory corruptions.
-> >
-> > To solve this, we need to add a smc6_sock structure for ipv6_pinfo_offset
-> > initialization and modify the smc_sock structure.
-> >
-> > Reported-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-> > Tested-by: syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com
-> > Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> > ---
-> >   net/smc/smc.h      | 19 ++++++++++---------
-> >   net/smc/smc_inet.c | 24 +++++++++++++++---------
-> >   2 files changed, 25 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/net/smc/smc.h b/net/smc/smc.h
-> > index 34b781e463c4..f4d9338b5ed5 100644
-> > --- a/net/smc/smc.h
-> > +++ b/net/smc/smc.h
-> > @@ -284,15 +284,6 @@ struct smc_connection {
-> >
-> >   struct smc_sock {                           /* smc sock container */
-> >       struct sock             sk;
-> > -     struct socket           *clcsock;       /* internal tcp socket */
-> > -     void                    (*clcsk_state_change)(struct sock *sk);
-> > -                                             /* original stat_change fct. */
-> > -     void                    (*clcsk_data_ready)(struct sock *sk);
-> > -                                             /* original data_ready fct. */
-> > -     void                    (*clcsk_write_space)(struct sock *sk);
-> > -                                             /* original write_space fct. */
-> > -     void                    (*clcsk_error_report)(struct sock *sk);
-> > -                                             /* original error_report fct. */
-> >       struct smc_connection   conn;           /* smc connection */
-> >       struct smc_sock         *listen_smc;    /* listen parent */
-> >       struct work_struct      connect_work;   /* handle non-blocking connect*/
-> > @@ -325,6 +316,16 @@ struct smc_sock {                                /* smc sock container */
-> >                                               /* protects clcsock of a listen
-> >                                                * socket
-> >                                                * */
-> > +     struct socket           *clcsock;       /* internal tcp socket */
-> > +     void                    (*clcsk_state_change)(struct sock *sk);
-> > +                                             /* original stat_change fct. */
-> > +     void                    (*clcsk_data_ready)(struct sock *sk);
-> > +                                             /* original data_ready fct. */
-> > +     void                    (*clcsk_write_space)(struct sock *sk);
-> > +                                             /* original write_space fct. */
-> > +     void                    (*clcsk_error_report)(struct sock *sk);
-> > +                                             /* original error_report fct. */
-> > +
-> >   };
-> >
-> >   #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
-> > diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-> > index bece346dd8e9..25f34fd65e8d 100644
-> > --- a/net/smc/smc_inet.c
-> > +++ b/net/smc/smc_inet.c
-> > @@ -60,16 +60,22 @@ static struct inet_protosw smc_inet_protosw = {
-> >   };
-> >
-> >   #if IS_ENABLED(CONFIG_IPV6)
-> > +struct smc6_sock {
-> > +     struct smc_sock smc;
-> > +     struct ipv6_pinfo np;
-> > +};
->
-> I prefer to:
->
-> struct ipv6_pinfo inet6;
+On Mon, Aug 12, 2024 at 02:50:09PM +0200, Dawid Osuchowski wrote:
+> Ethtool callbacks can be executed while reset is in progress and try to
+> access deleted resources, e.g. getting coalesce settings can result in a
+> NULL pointer dereference seen below.
+> 
+> Reproduction steps:
+> Once the driver is fully initialized, trigger reset:
+> 	# echo 1 > /sys/class/net/<interface>/device/reset
+> when reset is in progress try to get coalesce settings using ethtool:
+> 	# ethtool -c <interface>
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000020
+> PGD 0 P4D 0
+> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
+> CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+ #7
+> RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
+> RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
+> RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
+> R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
+> FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0
+> Call Trace:
+> <TASK>
+> ice_get_coalesce+0x17/0x30 [ice]
+> coalesce_prepare_data+0x61/0x80
+> ethnl_default_doit+0xde/0x340
+> genl_family_rcv_msg_doit+0xf2/0x150
+> genl_rcv_msg+0x1b3/0x2c0
+> netlink_rcv_skb+0x5b/0x110
+> genl_rcv+0x28/0x40
+> netlink_unicast+0x19c/0x290
+> netlink_sendmsg+0x222/0x490
+> __sys_sendto+0x1df/0x1f0
+> __x64_sys_sendto+0x24/0x30
+> do_syscall_64+0x82/0x160
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7faee60d8e27
+> 
+> Calling netif_device_detach() before reset makes the net core not call
+> the driver when ethtool command is issued, the attempt to execute an
+> ethtool command during reset will result in the following message:
+> 
+>     netlink error: No such device
+> 
+> instead of NULL pointer dereference. Once reset is done and
+> ice_rebuild() is executing, the netif_device_attach() is called to allow
+> for ethtool operations to occur again in a safe manner.
+> 
+> Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
 
-Okay, I'll write a v4 patch and send it to you tomorrow.
+What about other intel drivers tho?
 
-Regards,
-Jeongjun Park
-
->
-> > +
-> >   static struct proto smc_inet6_prot = {
-> > -     .name           = "INET6_SMC",
-> > -     .owner          = THIS_MODULE,
-> > -     .init           = smc_inet_init_sock,
-> > -     .hash           = smc_hash_sk,
-> > -     .unhash         = smc_unhash_sk,
-> > -     .release_cb     = smc_release_cb,
-> > -     .obj_size       = sizeof(struct smc_sock),
-> > -     .h.smc_hash     = &smc_v6_hashinfo,
-> > -     .slab_flags     = SLAB_TYPESAFE_BY_RCU,
-> > +     .name                           = "INET6_SMC",
-> > +     .owner                          = THIS_MODULE,
-> > +     .init                           = smc_inet_init_sock,
-> > +     .hash                           = smc_hash_sk,
-> > +     .unhash                         = smc_unhash_sk,
-> > +     .release_cb                     = smc_release_cb,
-> > +     .obj_size                       = sizeof(struct smc6_sock),
-> > +     .h.smc_hash                     = &smc_v6_hashinfo,
-> > +     .slab_flags                     = SLAB_TYPESAFE_BY_RCU,
-> > +     .ipv6_pinfo_offset              = offsetof(struct smc6_sock, np),
-> >   };
-> >
-> >   static const struct proto_ops smc_inet6_stream_ops = {
-> > --
->
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
+> ---
+> Changes since v1:
+> * Changed Fixes tag to point to another commit
+> * Minified the stacktrace
+> 
+> Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5be90@kernel.org/
+> Previous attempt: https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@linux.intel.com/
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index eaa73cc200f4..16b4920741ff 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -608,6 +608,8 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+>  			memset(&vsi->mqprio_qopt, 0, sizeof(vsi->mqprio_qopt));
+>  		}
+>  	}
+> +	if (vsi->netdev)
+> +		netif_device_detach(vsi->netdev);
+>  skip:
+>  
+>  	/* clear SW filtering DB */
+> @@ -7568,11 +7570,13 @@ static void ice_update_pf_netdev_link(struct ice_pf *pf)
+>  
+>  		ice_get_link_status(pf->vsi[i]->port_info, &link_up);
+>  		if (link_up) {
+> +			netif_device_attach(pf->vsi[i]->netdev);
+>  			netif_carrier_on(pf->vsi[i]->netdev);
+>  			netif_tx_wake_all_queues(pf->vsi[i]->netdev);
+>  		} else {
+>  			netif_carrier_off(pf->vsi[i]->netdev);
+>  			netif_tx_stop_all_queues(pf->vsi[i]->netdev);
+> +			netif_device_detach(pf->vsi[i]->netdev);
+>  		}
+>  	}
+>  }
+> -- 
+> 2.44.0
+> 
+> 
 
