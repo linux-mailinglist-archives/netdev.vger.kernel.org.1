@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-118053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1388A950690
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:34:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5719295068F
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 15:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 920CAB2380E
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C8391F230B3
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 13:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5527D19B5BE;
-	Tue, 13 Aug 2024 13:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81EE19D081;
+	Tue, 13 Aug 2024 13:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmYjnoYr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/+VatEt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE4D19AD6E;
-	Tue, 13 Aug 2024 13:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF37619AD6E;
+	Tue, 13 Aug 2024 13:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723556038; cv=none; b=Gx4Kk716VLwBw44WguYNnWaPuDGg+dGgZm0qummsDQgachCVTzgKj4aLBbb6YIMV8/G5w62v89L5B9n/QbrTEcXGLIjA8HtzDEUm34BYBxf/3UVfytyj5dXx3a+eTgKFu6zg16OH0ia6IF8LnwdujibwNCwZm1ror1f6dJmHKv8=
+	t=1723556041; cv=none; b=ayxs3eizMsprGo2apGcbXVCEJFgoJ5XzXojt1NvVAnGZPrFxNheYyCKII/cl6HQI5+mWg2UB7bZcDuzzy8CLkQRZuu44pdoeR0nbl5D3lOGisYAVh6uUliF55N3kqjqF5OEX6BSotEU1g69PraR8PfpvUVBxHkiJ97Du+lQ9RrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723556038; c=relaxed/simple;
-	bh=z+NJxoXGT6DAoM3jpcIPdgMxSjAu22qbMus24gzDpxw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VSsaxn45fu26U9PxAfMB1vaWc0QgD0k/fFJ8ComCZbWXb+trsAst5kev9kK8yq3jUfxFYWO7i4SXEQZ2GD/uO9r7EXbqzsnXi2VKL0Nz8gG3YtwdplpWPD0t2n8MojhsbLMpezczP1BiarHpZ5HyHgOzv05YGYCuudLZcLUkmbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmYjnoYr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 682B9C4AF09;
-	Tue, 13 Aug 2024 13:33:52 +0000 (UTC)
+	s=arc-20240116; t=1723556041; c=relaxed/simple;
+	bh=YjUeMGxUokPWbR1FpTGedLaSX1C6UavzEGCHc8VtbR0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=dwg4VBhmWpv7FFUGNRc7O9HkXiCyN8uTOUtLVFhaav9pj7chKTP6plJR6hHQMaCeaI87AU4FxIXW+lcH42KmPva1HY6fX2gksCuXXuWEegdP0O4+xeYNeivPy/yijRmc8IEL8dy+tmwYqo4gWoKR62bl/K82O4VRjL1p4dQqQf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/+VatEt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21C13C4AF0B;
+	Tue, 13 Aug 2024 13:33:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723556036;
-	bh=z+NJxoXGT6DAoM3jpcIPdgMxSjAu22qbMus24gzDpxw=;
-	h=From:Subject:Date:To:Cc:From;
-	b=pmYjnoYrLCAXhpLUA6LwgPyFir2W7RJXhjAg2B3WS7Y2aG761JlUYoHj4497xm2or
-	 8VanwvABUAjAqANhqMgkyhq8bwDOMlhTjjbYJavTD/mxwOSGU3+Wo2oTimalDq+pwc
-	 TP0ZXIsaEj+lM2bX6bdxKwPtIb8tJ9Skq1LACKwXL/p9W5W5vY/j8F6jaG2+u0WW2o
-	 FETcPeZ216/C/11FgCOSwQhGnunDyJp6N8MNna6s1nAR/abzkcHQ4ui4TRfH2CTERp
-	 DInpgca+MDes+PhFoIB6c4MpA4oaP2sH4o3AIu53in9Ah2HN0Lnv6eABtf0/OJ323b
-	 DmLgwm0Ws2hdA==
+	s=k20201202; t=1723556041;
+	bh=YjUeMGxUokPWbR1FpTGedLaSX1C6UavzEGCHc8VtbR0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=Q/+VatEtPTBjkcOq0MBnr6OXIJnKVOTEx3h+Yq7EBHNuSom/YOwF8j+XP/D2B2ov3
+	 XfuKY2e/uxf16cjp4pksVT+3uipxuLeGmF1WC3+/B+171i4ACPwkdI/oR8/HQvslsb
+	 HpyTDZW1mNs0yiSp+BBSoUDTQj32Kwejtn6oepGUzH1XfAjXAR6QOsugLADwacQnIO
+	 DcVpPfnpngTQ3YzBG4Aovfiu/yJdr4gaZXlnZPlPKMTEd8akxDOtFBU0ap3/H7QY9v
+	 FWWgg16rytcSUqiQT8OF4H7WjK0tqxgI1V5+NEUOVdUuAd/jcoMGT+TYBTSoqG3iCg
+	 KBnsuFGpYJhSA==
 From: Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v2 0/3] ipv6: Add
+Date: Tue, 13 Aug 2024 14:33:47 +0100
+Subject: [PATCH net-next v2 1/3] ipv6: Add
  ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-Date: Tue, 13 Aug 2024 14:33:46 +0100
-Message-Id: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,10 +53,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALpgu2YC/32NQQqDMBBFryKz7pQkjaJdeY8iJZqJhkqUiQSLe
- PcGD9Dl4/HfPyASe4rwLA5gSj76JWRQtwKGyYSR0NvMoITSopYK/Zqqt7GWcaJ5JY7omrrXjXa
- 9oArybmVyfr+aLwi0YaB9gy6bycdt4e91luTl/3STRIHG9KWV7lEOWrQf4kDzfeERuvM8fw8A0
- tO9AAAA
+Message-Id: <20240813-ipv6_addr-helpers-v2-1-5c974f8cca3e@kernel.org>
+References: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
+In-Reply-To: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: "David S. Miller" <davem@davemloft.net>, 
  David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
@@ -71,33 +70,43 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 X-Mailer: b4 0.14.0
 
-Hi,
+Add helpers to convert an ipv6 addr, expressed as an array
+of words, from CPU to big-endian byte order, and vice versa.
 
-This series adds and uses some new helpers,
-ipv6_addr_{cpu_to_be32,be32_to_cpu}, which are intended to assist in
-byte order manipulation of IPv6 addresses stored as as arrays.
+No functional change intended.
+Compile tested only.
 
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://lore.kernel.org/netdev/c7684349-535c-45a4-9a74-d47479a50020@lunn.ch/
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-Changes in v2:
-- Collected tags from Andrew Lunn and Jijie Shao. Thanks!
-- Corrected typo in commit message of 1st patch: cpy -> CPU.
-  Thanks to Andrew Lunn.
-- Also enhanced same commit message to mention both helpers.
-- Link to v1: https://lore.kernel.org/r/20240812-ipv6_addr-helpers-v1-0-aab5d1f35c40@kernel.org
+ include/net/ipv6.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
----
-Simon Horman (3):
-      ipv6: Add ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-      net: ethernet: mtk_eth_soc: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-      net: hns3: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 88a8e554f7a1..e7113855a10f 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1365,4 +1365,16 @@ static inline void ip6_sock_set_recvpktinfo(struct sock *sk)
+ 	release_sock(sk);
+ }
+ 
++#define IPV6_ADDR_WORDS 4
++
++static inline void ipv6_addr_cpu_to_be32(__be32 *dst, const u32 *src)
++{
++	cpu_to_be32_array(dst, src, IPV6_ADDR_WORDS);
++}
++
++static inline void ipv6_addr_be32_to_cpu(u32 *dst, const __be32 *src)
++{
++	be32_to_cpu_array(dst, src, IPV6_ADDR_WORDS);
++}
++
+ #endif /* _NET_IPV6_H */
 
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 79 +++++++++++-----------
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |  8 ++-
- drivers/net/ethernet/mediatek/mtk_ppe.c            | 10 +--
- drivers/net/ethernet/mediatek/mtk_ppe_debugfs.c    |  9 +--
- include/net/ipv6.h                                 | 12 ++++
- 5 files changed, 66 insertions(+), 52 deletions(-)
-
-base-commit: dd1bf9f9df156b43e5122f90d97ac3f59a1a5621
+-- 
+2.43.0
 
 
