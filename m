@@ -1,144 +1,97 @@
-Return-Path: <netdev+bounces-118092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD1A950798
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7669507B1
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 16:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17CF8B28A3D
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2CC284A97
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 14:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E750D19FA66;
-	Tue, 13 Aug 2024 14:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0501D19D09D;
+	Tue, 13 Aug 2024 14:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvXseIby"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmByuc3E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3619EEBD;
-	Tue, 13 Aug 2024 14:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C6E19D086
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 14:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723559317; cv=none; b=uJ6bvqGJ1bW8L6xmh690j4Oowisukx+18zj6GJHeg2WS4/H+YxOfvYcvbmOgCLBD2Ts8pILg8902dKpqt4pH9ZNMsYoq9X1XBH7Yrh7TUiBRB5T/jLIdgj0O+4+iXFSrFTwiqFsjOHe6zdAZZP0hq81WINSK+ssVH6b+MXzu6QU=
+	t=1723559581; cv=none; b=Nt6YNGVYrmcMy7xgKHwG9cpG4cEGwjavclQLBh3ecHznJWPQXJ9nuYLAoN3mVYeWuAlvX/vSxwoQd1Y6A5jaEIy414qZc++e02EsvN4ymDzYLt4R3Czkvsa4q5EPujYdqXmYJKK6Uh/8xQfP9PlHwDd+qnOG4yZMXiTT5vly/z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723559317; c=relaxed/simple;
-	bh=MPZXuzZ8WACzat8l11Ii/Qp/mkN47G0iiUtzKBu72R0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rxSclDjvFwwUgFJOcKyGQBrRYTCOZTUmz4Ymg07hRO5Wdc1iNYM/iq/3ORYSUH/R4J2xAQ2k6Kb8lg53Mz/oJCFR8rdNlm2OL722HzwgoObblf7zv6kBy7lLpkOBsSf9PgqBc+o2LtP8HCU2+zdskDSQiuIYO1Jp5Kmq653626Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvXseIby; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f149845fbaso58773361fa.3;
-        Tue, 13 Aug 2024 07:28:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723559314; x=1724164114; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hn6Gg49+0hckXkrCaPpgjvaSHPmWcIMwvpPpEJxp9s8=;
-        b=dvXseIbyGl8zeqg0bx2q+277fFe0Eav73EWTUtHEbUK7a4FcAolGGNdjd2+DHZ02PE
-         XS+H/Ps8OZY2+Tg9vt/d+uWCTHrV7z6h5Dq8FPW5ceICHpwSlShDADwibqvohekbzmOi
-         UIrBQDtfSH+QJi5PwuPbEf9xx3/fOlBC8yprh/J0myycmr2omha/F0bFhfyVzuu/YRQS
-         1/4wYWSvXcSKLtVV/wy84/nLu/NQ2RZJiIquNmrJflCcFowNvUc2p5AfwGq67koOUYen
-         UIzeaGS36FTgCjtFqcTXDPBLfnBqMqXIn+W6YZeyR48aHi1o+dN54rOFtvoAfcImlIyB
-         4R7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723559314; x=1724164114;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hn6Gg49+0hckXkrCaPpgjvaSHPmWcIMwvpPpEJxp9s8=;
-        b=pUK9gqFUjWZaXwFErSAq/QqgbRV1XTKn6KUG/HSELm6eVonqWVBIAcIv05DMQblARA
-         c0Ohqa7dFjWvMJGFSvozP84+DvnjXUVmSdlTnTbPwypS0hY5EcTiB+VSL/Hgd3W8DWpl
-         aR4pQnO5b64zkLjRaazfAs3dHk74IgMOX4dKk0ZWtbM0pXzmCDZKJi3npeM/3S5uO2t2
-         LpqCa1xEyQi4Xjaukn0YdvS3ZnIf8rCYmTRWXjHF6Ve9D0smAMURQZCFSDQoHlK+oE38
-         GWIU3y6GHbJ1bDmwSJB2snrX0Be0TzH1jS7Q1BSrLNrbnis2VkqPtYubPQLYEC4+fqga
-         qqHA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2d7yUGvzsAXYyxXoRjSNtquCsfJqGStU/fbC8pcEYX+paLVQUVsJ3D35fYTiRhSOCoJfjXclCfIpP6NK8H0nYZGNP4pxQMfRAXhKWf3HLZ2+l3l2fIYdCWvzFkUgcodqawivj6c/hY3g6V9/8ohNV5CxZyUUKHzsMy2qWJ8amGA==
-X-Gm-Message-State: AOJu0Yy5Pb/tuqAcPns4fQUTt321cXj6R4LJwOVX50IjY9XD5gAgiOLr
-	Ynd7hkAjSiVGD5gu9/lb8N/uJ5gE8sUq0l335/k67y+bW03XlO1E
-X-Google-Smtp-Source: AGHT+IF87do1H9InRqDB5Qgg5LpkSpMVtB6L44r6xxw4f65l1fI92ZeQAyrs/Ihk8e7lWJ3t2omBYA==
-X-Received: by 2002:a05:651c:19a6:b0:2f0:1a19:f3ec with SMTP id 38308e7fff4ca-2f2b717a379mr30497411fa.33.1723559313735;
-        Tue, 13 Aug 2024 07:28:33 -0700 (PDT)
-Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3fa7c27sm74345166b.66.2024.08.13.07.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 07:28:33 -0700 (PDT)
-From: vtpieter@gmail.com
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David S Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marek Vasut <marex@denx.de>
-Cc: Woojung Huh <Woojung.Huh@microchip.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: [PATCH net-next v6 6/6] net: dsa: microchip: fix tag_ksz egress mask for KSZ8795 family
-Date: Tue, 13 Aug 2024 16:27:40 +0200
-Message-ID: <20240813142750.772781-7-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240813142750.772781-1-vtpieter@gmail.com>
-References: <20240813142750.772781-1-vtpieter@gmail.com>
+	s=arc-20240116; t=1723559581; c=relaxed/simple;
+	bh=SASPVryu3QfzrPw/SslZZw8S3rRs3fI25rqzmRvIKBA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OrAZm7KNT9PZ/99Xkfus9XcmNXjiV0joPG5Hr0SqMW3niXcuN+33dk/NOj3g4o09GZAvkrTdKgml1xWDObQ8DvIFk8zOLlBm0MIarLUF9X4dQiawB/CWrA0hQ8dTy66FduX2zIRWH7PY9uULA+y0esTUB8he5OHrqwFjSUh0MqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmByuc3E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79A9C4AF0B;
+	Tue, 13 Aug 2024 14:32:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723559581;
+	bh=SASPVryu3QfzrPw/SslZZw8S3rRs3fI25rqzmRvIKBA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=HmByuc3EXo/LtIWM7dk45tqwpnsfPy5s2yVVHAf6jVpVLPiK9ywiO3y6+Wo8wlEEg
+	 FJdhd0f1tQray/laRAuYIrtrUDXPAnVMoR7E7MRnO4AI7V8DQXBkg/GGH29QKOLvcs
+	 I60M+4LCtYmDT+t0GS6qqfhpM3Iz3yvXwKlfiGg1xgQ6cqmFoE2Wabdx8//Fg3rZeY
+	 eQw6+7jKWDTQ1Kut4894X0/uLt4wp6TiQu6RJQvS1ySH90tT1s0LbJHdXjI+nR2SmH
+	 IoEHbz1HtixvBBjJxUHKpToINJox7mtZCjNS5Sd5EFFfZ+7fbp7zhv1O1SvVc8Olz/
+	 rK/ozYJktmWyg==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 0/2] bnxt_en: address string truncation
+Date: Tue, 13 Aug 2024 15:32:54 +0100
+Message-Id: <20240813-bnxt-str-v2-0-872050a157e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJZuu2YC/2WNQQqDMBBFryKz7pQktUa76j2Ki6ijDi2JTIJYx
+ Ls3uO3y8T7v7xBJmCI8ih2EVo4cfAZzKaCfnZ8IecgMRplSWXXHzm8JYxI0tbZOW12VtwHyfBE
+ aeTtTL/CU0NOWoM1m5piCfM+PVZ/+P7dqVNi5sbdVQ0Pd0PNN4ulzDTJBexzHD6jMM3GrAAAA
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Hi,
 
-Fix the tag_ksz egress mask for DSA_TAG_PROTO_KSZ8795, the port is
-encoded in the two and not three LSB. This fix is for completeness,
-for example the bug doesn't manifest itself on the KSZ8794 because bit
-2 seems to be always zero.
+This series addresses several string truncation issues that are flagged
+by gcc-14. I do not have any reason to believe these are bugs, so I am
+targeting this at net-next and have not provided Fixes tags.
 
-Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 ---
- net/dsa/tag_ksz.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Changes in v2:
+- Added patch:
+  + bnxt_en: Extend maximum length of version string by 1 byte
+- Dropped the following patches.
+  - bnxt_en: check for irq name truncation
+  - bnxt_en: check for fw_ver_str truncation
+  + The approach I had taken was to return error on truncation, but the
+    feedback I received was that it would be better to replace the last
+    three bytes with "..." or some other similar scheme.  While simple
+    enough to implement, it does add some complexity, and I have so far
+    been unable to convince myself that it is warranted. So I have
+    decided to drop these patches for now.
+- Link to v1: https://lore.kernel.org/r/20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org
 
-diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-index ee7b272ab715..1f46de394f2e 100644
---- a/net/dsa/tag_ksz.c
-+++ b/net/dsa/tag_ksz.c
-@@ -111,9 +111,10 @@ static struct sk_buff *ksz_common_rcv(struct sk_buff *skb,
-  * DA(6bytes)|SA(6bytes)|....|Data(nbytes)|tag0(1byte)|FCS(4bytes)
-  * ---------------------------------------------------------------------------
-  * tag0 : zero-based value represents port
-- *	  (eg, 0x00=port1, 0x02=port3, 0x06=port7)
-+ *	  (eg, 0x0=port1, 0x2=port3, 0x3=port4)
-  */
- 
-+#define KSZ8795_TAIL_TAG_EG_PORT_M	GENMASK(1, 0)
- #define KSZ8795_TAIL_TAG_OVERRIDE	BIT(6)
- #define KSZ8795_TAIL_TAG_LOOKUP		BIT(7)
- 
-@@ -141,7 +142,8 @@ static struct sk_buff *ksz8795_rcv(struct sk_buff *skb, struct net_device *dev)
- {
- 	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
- 
--	return ksz_common_rcv(skb, dev, tag[0] & 7, KSZ_EGRESS_TAG_LEN);
-+	return ksz_common_rcv(skb, dev, tag[0] & KSZ8795_TAIL_TAG_EG_PORT_M,
-+			      KSZ_EGRESS_TAG_LEN);
- }
- 
- static const struct dsa_device_ops ksz8795_netdev_ops = {
--- 
-2.43.0
+---
+Simon Horman (2):
+      bnxt_en: Extend maximum length of version string by 1 byte
+      bnxt_en: avoid truncation of per rx run debugfs filename
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c | 4 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+base-commit: dd1bf9f9df156b43e5122f90d97ac3f59a1a5621
 
 
