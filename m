@@ -1,94 +1,97 @@
-Return-Path: <netdev+bounces-117918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-117919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA7F94FD47
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:39:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BCE994FD5C
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 07:42:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0D681F21B4C
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 05:38:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 305CC1C22849
+	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 05:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FC92374C;
-	Tue, 13 Aug 2024 05:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1FA2C19E;
+	Tue, 13 Aug 2024 05:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CZWsV7+V"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EIq8E9Yq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05A814A82
-	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 05:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206E13BB21
+	for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 05:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723527535; cv=none; b=Hbc/g0GdB2y7wjN2zr1c9n0K968Jq0zRfG+iNaC0xRymn9KSaOHY0ftuJ4Qcp5W/TR5yW9Zm+GVkf/RuATnejHrcf0ZRF+oEgK2YmR2YRzXTktFCMX1rGM2Jx/3Dac4y1MGzuMr2ixrvuNmIcUCI1khDSKqJ5vgvfCZ4t6QwalU=
+	t=1723527715; cv=none; b=NSj3ARxdJ4LhDcyHVv/0Fz/Z1XSXcTRJTNjz7gLUlPFztqEI9S0fC9in2sQLwD8B+OMeyAWwuwQX+MYZrdtJJWoMmokunPx2XuBip5qqKiSK44t5yppkZ7EJ2jOhnMxTo+khL6Xgw1KPIGc6doGZb66rUV6LyP8HaYvrTToGLQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723527535; c=relaxed/simple;
-	bh=4S7WM7RybjiTPLle/bWEVEs4rbk05HHoUl3uV2tpW8g=;
+	s=arc-20240116; t=1723527715; c=relaxed/simple;
+	bh=fY/+L8l5ii+AgzZtNjqwOV5aIJKUFkgY7GEi/jLl3fk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N0FofFv4HaYLBKE5n6WIP+7dpd6PNP23MLSO3OTONa6GTQhZ8JL7/thjtemrWeIss8EGE8o8F4+gWXWiAaYmQcRpfeKrnWr1Ar6fwo/epnqNR/3yNrkQZhsxo+rJt0+b7D4Fe5NoWhAZMpOTbm/8CdYHin0BxRu1xhD3sbz5g80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CZWsV7+V; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=n02aej0R+xzZFMGOC+WXSXfreIYOxrPbYL7XXA5Xf+xvoNMUviFLCY1RMXNcEB+G0kO7IvRSpnEz/SmEvrziSFR7dhr54zVnge3PiYpGa8hzoJaRiM98CC0ULtBJQp4pU31wzFP4I8UlweX+We2pZJ1DVdFB65WoUrn43h1XgtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EIq8E9Yq; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-429c4a4c6a8so25299315e9.0
-        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:38:52 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42809d6e719so39068635e9.3
+        for <netdev@vger.kernel.org>; Mon, 12 Aug 2024 22:41:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723527531; x=1724132331; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723527711; x=1724132511; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7PnScSw7uJC5Aim3AFPCq508Jec7s6BJ/aiCOYhCdJo=;
-        b=CZWsV7+Vpu5L6okX7MIu52qw56AddMmtKBnoh5RkDOEorDN6iPCTnDQC5P0tTTWKDC
-         2ANniQDJF83Tv52OlI2vIqjFkRZCkF0pFHS+uHVJtl51npahiVXjHFs0UqHPffBC0SZe
-         t7CRMD7Ndtpza1jplMTom+IGrG1vvfRcyeFw9WIkYhIQ4Vua0oXJYo6e4ovLtXZoh0GB
-         pcX3jX+qz97MhQ4H+xYixG2v618wrpwTeaNwcrKIdaRphqUIEvYxZdGTlp8yymcb0aNu
-         KcjwqcclRFXVbs8+09+d3aRUYO0Thyq3ibrged+to3m9DA/eDRoX4TJOv4hVAw3BH9yf
-         8Yjw==
+        bh=vu66s/MTj9mzSOP2T0sqELP/S3U/U+aUqAs4Pl23wBI=;
+        b=EIq8E9YqqwPdh2AchpmCC0yfHaukCk4jZYbHntiQde89VwRzdGejDLBdoKoSzTdzCt
+         YA8U7qecI4ER5r6M9TrFOiU38isNiFhy7Ac8EmGShRY6q2cfNqPjEygbNB62sxEKWwli
+         6IeauXnUjM9FTWCUebhbSPctieQ7Hvg7356YGG0ALK2OtGN9DOYOFinAvuHf9Zn+7HDD
+         7tKk8PDnYRkpN/DBmMdDZQV+xMKZBzkjyen0tRBcKqqxlub8/NnZLYtem9ZW403rlwng
+         wFXlNwYCHv4EbI4kZRRnMCRKSAsPolMPfjF9xX4StuZ93ltS/3Wg24q3Wa95jGlTgXsL
+         uYwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723527531; x=1724132331;
+        d=1e100.net; s=20230601; t=1723527711; x=1724132511;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7PnScSw7uJC5Aim3AFPCq508Jec7s6BJ/aiCOYhCdJo=;
-        b=VqhMotLMoMlwp+hOdwNBH3EH421AmrCHBqfA5Ip0cHKF48MxJbQnx67xBSHTLBpKtD
-         17HoUKI5UL/GhZ1I1H6ga6qOppPdVcKmz7j/pVJwxPhpJAQ4iHmadZuFw0qisfnyMWB+
-         qEZ6hhkKzzz72/AEE4a4Wl0IGARPgT8i3PSNX88Nur5DNSx9EIa71n+eTZ8w8lHOEVdQ
-         TGelL3vpN3deFnkILOd8jjg3aXTufI16/gN3EmhLu8BY18qoiwCOoA42DXlTBqQNriUU
-         hVkektfwFKQNw+Sy/q4S1O/99d1ZJOYZ+Fkhb2eE940/QW8EcCRDs9WNm535wEkvph/p
-         qZKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHyr72ChhJ67L+PHFVfGW9qR0c/0Fwu57RHa7EoSMWqfe6rrEfAmxUSHrDj6sbxC+xAfea7GA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKg8SD0eN2JaxBySkWtNPtGIrfHPUkF7HZZGWSqyJ/N79Qk6Cf
-	eOUIHpUjZat8HCWnEcEIRAna3i2rNK2W5Jjt5WCr+lhcJCYA5+D7sw1lxssFhQc=
-X-Google-Smtp-Source: AGHT+IEYKBlRPX9bVKp8cRXDSRgCz2eMMxWkFhQ2MW3khxllq0ePcf6gQsDNpa40p6T/snlsK+dxyg==
-X-Received: by 2002:a05:600c:450d:b0:428:640:c1b1 with SMTP id 5b1f17b1804b1-429d481a198mr17583735e9.17.1723527530566;
-        Mon, 12 Aug 2024 22:38:50 -0700 (PDT)
+        bh=vu66s/MTj9mzSOP2T0sqELP/S3U/U+aUqAs4Pl23wBI=;
+        b=pvy80TlmXyciORWbXe50IEd+1qZ5J4nbDJslrFHC+SvOJ2UEugkdihHT9EazCh6uO/
+         KKqQSz1k1LfNNYu68pqK88Iox6nKdew38ue3AtFReigTaxFPIVgkWCoRnuGG5ChUGyjY
+         6gwH76iZ5a+M+15YhvWdZNFMLLpwi+sBqtJCUb/1okp96MotaSmbIv9N7x8NWrcO4grE
+         Rozuav72/m3amM5+pmYqzU8rXKkcwzZdiJNtP0FgBHF55FOMixqpy9qt4xsVynESnCv7
+         3T+5hT9yEz219U7xE0m3+wOHw4j72GydQyx5FjJ/CcfVCKELXZUhlieHKXLiywLhmqXW
+         Yjqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrzACRzYcpPpHH3N50jLRWdBVMTfm0i4duXz0rC+++1R/OAtJ57zsWUiisQxRh9V+O7aDTy0hFQgY0/nsuIUw0E8pCUJj0
+X-Gm-Message-State: AOJu0Yxs2WKKzqYJPtn5GmZ6TJj7Ztzdx6qsdF+7O/g8vdlQ3aBUNaMO
+	SxRjX9Q2ZdPiC5/AzmskbrK3iI7jDAUZzBgsFuZOzxwZ80zZpxymNNFaVNj4JVc=
+X-Google-Smtp-Source: AGHT+IHV0row3uLNcJDWvblITgnetX5YEnxG01/khyJPskb8RTxM1tIYbNpzxFrW94vyED6ZPdgVPA==
+X-Received: by 2002:a05:600c:1d02:b0:426:67ad:38e3 with SMTP id 5b1f17b1804b1-429d47f4295mr17448965e9.3.1723527711349;
+        Mon, 12 Aug 2024 22:41:51 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ebd372fsm9117700f8f.108.2024.08.12.22.38.49
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290c738eb4sm210792575e9.14.2024.08.12.22.41.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 22:38:50 -0700 (PDT)
-Date: Tue, 13 Aug 2024 07:38:46 +0200
+        Mon, 12 Aug 2024 22:41:50 -0700 (PDT)
+Date: Tue, 13 Aug 2024 07:41:48 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <ZrrxZnsTRw2WPEsU@nanopsycho.orion>
-References: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
- <ZquJWp8GxSCmuipW@nanopsycho.orion>
- <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
- <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
- <74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
- <ZrHLj0e4_FaNjzPL@nanopsycho.orion>
- <f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
- <20240812082544.277b594d@kernel.org>
- <Zro9PhW7SmveJ2mv@nanopsycho.orion>
- <20240812104221.22bc0cca@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [PATCH net-next 4/5] devlink: embed driver's priv data callback
+ param into devlink_resource
+Message-ID: <ZrryHH4VbiPSdFzx@nanopsycho.orion>
+References: <20240806143307.14839-1-przemyslaw.kitszel@intel.com>
+ <20240806143307.14839-5-przemyslaw.kitszel@intel.com>
+ <ZrMZFWvo20hn49He@nanopsycho.orion>
+ <20240808194150.1ac32478@kernel.org>
+ <ZrX3KB10sAoqAoKa@nanopsycho.orion>
+ <589aed8d-500c-4e92-91ca-492302bb2542@intel.com>
+ <Zrojg-svvDA7_OUV@nanopsycho.orion>
+ <2c38d704-f018-4bc6-b688-a7a7ce4adc0a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,64 +100,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240812104221.22bc0cca@kernel.org>
+In-Reply-To: <2c38d704-f018-4bc6-b688-a7a7ce4adc0a@intel.com>
 
-Mon, Aug 12, 2024 at 07:42:21PM CEST, kuba@kernel.org wrote:
->On Mon, 12 Aug 2024 18:50:06 +0200 Jiri Pirko wrote:
->> Mon, Aug 12, 2024 at 05:25:44PM CEST, kuba@kernel.org wrote:
->> >I think the confusion is primarily about the parent / child.
->> >input and output should be very clear, IMO.  
+Tue, Aug 13, 2024 at 05:45:47AM CEST, przemyslaw.kitszel@intel.com wrote:
+>On 8/12/24 17:00, Jiri Pirko wrote:
+>> Mon, Aug 12, 2024 at 01:50:06PM CEST, przemyslaw.kitszel@intel.com wrote:
+>> > On 8/9/24 13:02, Jiri Pirko wrote:
+>> > > Fri, Aug 09, 2024 at 04:41:50AM CEST, kuba@kernel.org wrote:
+>> > > > On Wed, 7 Aug 2024 08:49:57 +0200 Jiri Pirko wrote:
+>> > > > > > 	lockdep_assert_held(&devlink->lock);
+>> > > > > > 
+>> > > > > > 	resource = devlink_resource_find(devlink, NULL, resource_id);
+>> > > > > > -	if (WARN_ON(!resource))
+>> > > > > > +	if (WARN_ON(!resource || occ_priv_size > resource->priv_size))
+>> > > > > 
+>> > > > > Very odd. You allocate a mem in devl_resource_register() and here you
+>> > > > > copy data to it. Why the void pointer is not enough for you? You can
+>> > > > > easily alloc struct in the driver and pass a pointer to it.
+>> > > > > 
+>> > > > > This is quite weird. Please don't.
+>> > > > 
+>> > > > The patch is a bit of a half measure, true.
+>> > 
+>> > Another option to suit my wants would be to just pass resource_id to the
+>> > callbacks, would you accept that?
 >> 
->> For me, "inputs" and "output" in this context sounds very odd. It should
->> be children and parent, isn't it. Confused...
+>> Why, the callback is registered for particular resource. Passing ID is
+>> just redundant.
 >
->Parent / child is completely confusing. Let's not.
+>Yet enables one to nicely combine all occ getters/setters for given
+
+I don't see the benefit, sorry :/
+
+>resource group. It is also straightforward (compared to this series).
+>You are right it is not absolutely necessary, but does not hurt and
+>improves thing (this time I will don't update mlxsw just to have
+>consumer though, will just post later - as this is not so controversial,
+>I hope).
 >
->User will classify traffic based on 'leaf' attributes.
->Therefore in my mind traffic enters the tree at the "leaves", 
->and travels towards the root (whether or not that's how HW 
->evaluates the hierarchy).
->
->This is opposite to how trees as an data structure are normally
->traversed. Hence I find the tree analogy to be imperfect.
-
-Normally? Tree as a datastructure could be traversed freely, why it
-can't? In this case, it is traversed from leaf to root. It's still a
-tree. Why the tree analogy is imperfect. From what I see, it fits 100%.
-
-
->But yes, root and leaf are definitely better than parent / child.
-
-Node has 0-n children and 0-1 parents. In case it has 0 children, it's a
-leaf, in case it has 0 parents, it's a root.
-This is the common tree terminology, isn't it?
-
-
->
->> >> Also while at it, I think renaming the 'group()' operation as 
->> >> 'node_set()' could be clearer (or at least less unclear), WDYT?  
->> >
->> >No idea how we arrived at node_set(), and how it can possibly   
 >> 
->> subtree_set() ?
->
->The operation is grouping inputs and creating a scheduler node.
-
-Creating a node inside a tree, isn't it? Therefore subtree.
-
-But it could be unified to node_set() as Paolo suggested. That would
-work for any node, including leaf, tree, non-existent internal node.
-
-
->
->> >represent a grouping operation.
->> >The operations is grouping inputs and creating a scheduler node.
->> >  
->> >> Note: I think it's would be more user-friendly to keep a single 
->> >> delete/get/dump operation for 'nodes' and leaves.  
->> >
->> >Are you implying that nodes and leaves are different types of objects?
->> >Aren't leaves nodes without any inputs?  
 >> 
->> Agree. Same op would be nice for both.
+>> > 
+>> > > > 
+>> > > > Could you shed more light on the design choices for the resource API,
+>> > > > tho? Why the tying of objects by driver-defined IDs? It looks like
+>> > > 
+>> > > The ids are exposed all the way down to the user. They are the same
+>> > > across the reboots and allow user to use the same scripts. Similar to
+>> > > port index for example.
+>> > > 
+>> > > 
+>> > > > the callback for getting resources occupancy is "added" later once
+>> > > > the resource is registered? Is this some legacy of the old locking
+>> > > > scheme? It's quite unusual.
+>> > 
+>> > I did such review last month, many decisions really bother me :F, esp:
+>> > - whole thing is about limiting resources, driver asks HW for occupancy.
+>> 
+>> Can you elaborate what's exactly wrong with that?
+>
+>Typical way to think about resources is "there are X foos" (resource
+>register time), "give me one foo" (later, on user request). Users could
+>be heterogeneous, such as VFs and PFs, and resource pool shared over.
+>This is what I have for (different sizes of) RSS contexes.
+>(Limit is constant, need to "get*" resources by one at a time, so driver
+>knows occupancy and arbitrages usage requests).
+>
+>"get*" == set usage to be increased by one
+>
+>> 
+>> 
+>> > 
+>> > Some minor things:
+>> > - resizing request validation: parent asks children for permission;
+>> > - the function to commit the size after the reload is named
+>> >   devl_resource_size_get().
+>> > 
+>> > From the user perspective, I'm going to add a setter, that will be
+>> > another mode of operation (if compared to the first thing on my complain
+>> > list):
+>> > + there is a limit that is constant, and driver/user allocates resource
+>> >   from such pool.
+>> > 
+>> > > 
+>> > > It's been some while since I reviewed this, but afaik the reason is that
+>> > > the occupancy was not possible to obtain during reload, yet the resource
+>> > > itself stayed during reload. This is now not a problem, since
+>> > > devlink->lock protects it. I don't see why occupancy getter cannot be
+>> > > put during resource register, you are correct.
+>> > > 
+>> > I could add that to my todo list
+>> 
+>> Cool.
+>
+>I guess no one cared about it yet, as resource register and occ getter
+>register is much separated in code space (to the point of being in
+>different file).
 
