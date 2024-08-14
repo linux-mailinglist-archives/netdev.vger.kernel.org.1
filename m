@@ -1,150 +1,148 @@
-Return-Path: <netdev+bounces-118532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71726951E16
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:06:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8070951E22
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CBDD1F2225F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:06:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F66E1F23262
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD711B3F2B;
-	Wed, 14 Aug 2024 15:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FFD1B4C27;
+	Wed, 14 Aug 2024 15:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lo8Pr/Gg"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="G+tNeBGJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730FE1B3F25;
-	Wed, 14 Aug 2024 15:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723647967; cv=none; b=mZ95FJWjKh14HUYG4v0ImcJ4vPSKpfqD63rcvNtWPA/GLB+Fc3Ps9nS0+/sL6l7pMKsS3R204y5PCS/n2izDFd1KmBHXqq/2lICOhBxb6t96iQmTFuIH75k/40W4fwdW2pm/5RAYogxn9diwGKJmZ3ASiKl+SCRcMAllFbo5iAk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723647967; c=relaxed/simple;
-	bh=8cK0GvF5QFceshCvw1XcYlJrjfm3NLa//F8dGczr9ko=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pq4UKPT5HuQQBAr+FkaoKUsFyKWKvJfeQIeCVMFA3inN9VmheMnzJjrFndMTPP2zksXAmkdwBK4AOgKWn7iDI0z1gST91/4xQaUZjME23rTs1PMmiA3W8VtgvYMxy0Qp9mwZffV791KqGoHszRTTkjR2jtOS9CeaF2E1Vg8I9Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lo8Pr/Gg; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71275436546so147935b3a.1;
-        Wed, 14 Aug 2024 08:06:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723647965; x=1724252765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vBNNXqbtdbYFsD6uUrAH/OBdUYwLKiBcMh/OK4+Ox7A=;
-        b=lo8Pr/GgxyuPfLeUK/umgoYFUZK5tUXYSdZYuNggW//zHX68On+LkmORQelEWYAUX8
-         eY72aUYnLLprhuK+AN2q9uQT37mLstTQ5JJBWa+voy3Sn0/NYnKpqg6bpaP3q53Tpzlz
-         4QgDmpixBL1Y6s4jxW+08B/FHLmSOBGSgb7Uk3RDyJNvQGp+lggBCk/q6gVcV8kYNNPd
-         yQc4HQrMt9ArL9XTZPC/GnHjYKclWK13fkey93cxUxll8VOv3j5JhYPn/Bu5RGww0JWi
-         sYokc8/Kma5lCm0XtGuIuhpflc0LOpuL8RRihjHnSeFLfY500YV6VjZZ1VQX6KGx1HZ5
-         F9tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723647965; x=1724252765;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vBNNXqbtdbYFsD6uUrAH/OBdUYwLKiBcMh/OK4+Ox7A=;
-        b=bpJXwmckvOL7WlPtHrlXxT4z7zFUkGG1gZXMeChP8OoFnFdBj2tgQLxJze9tf99WCv
-         3RmBmY9ouPkU+JjaCFflSgqkZu70kJymvYQO3mlcoDTp39Jr4fIMq9v51sM2bzttZ3j0
-         MyGBwttDdMCJXpqvnowO6kPOkfLTLglaGj1R0CKqyqzuh1p+SpJsdRgDCmGIA/+i13nJ
-         YhKfoH7L4CBcTX449f3omewQ66oUgNmKxZLP6I/eQt0FvZT62qSqccVoCGZQlWQGmTAq
-         ReKNdyfx3rg6bGnegjBAH4pxaDGLdn3e1JRNF23WlD6M7RkgotWhWn4Bl7fY8x9ciMwp
-         155A==
-X-Forwarded-Encrypted: i=1; AJvYcCUzI9LgZOwLxLQFK8dDNqC0buQlBDfOBoC4ciRSlqn+COKxQd302qGR71L1ubxaRiVrCOBV3nR1QKxK2vfWvi/ubntTMP0kWiG21V7IIHv9O70MwePOyp+xYvKFkOKa6gttH6e9eweMf6uNiTPD7reyt2ok3eDte/jPMaRYlvs6Iw==
-X-Gm-Message-State: AOJu0Yw7ZS6wpPL1BPNSjxBYtbp0jGLsjetvbe9jFtOODzfU7tvjTWsv
-	8mZb2sIOAN3RzJOkLWasWr5/LP/ayBvpK7cF6HV+5mQh/OUtY1T4
-X-Google-Smtp-Source: AGHT+IG6NXju3u9uZ1M2mdalYsZOqTUXuZluM3xmOKU+R9fWBY3JxN9QRZVLpL2g6H83xxWtFjtB2Q==
-X-Received: by 2002:a05:6a20:d486:b0:1c4:ba7c:741c with SMTP id adf61e73a8af0-1c8eae811a1mr4098557637.21.1723647964422;
-        Wed, 14 Aug 2024 08:06:04 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7126ad714a6sm1236278b3a.186.2024.08.14.08.06.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 08:06:04 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: wintera@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	gbayer@linux.ibm.com,
-	guwen@linux.alibaba.com,
-	jaka@linux.ibm.com,
-	tonylu@linux.alibaba.com,
-	wenjia@linux.ibm.com
-Cc: davem@davemloft.net,
-	dust.li@linux.alibaba.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in txopt_get
-Date: Thu, 15 Aug 2024 00:05:58 +0900
-Message-Id: <20240814150558.46178-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
-References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBF81B3F2D
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 15:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723648129; cv=pass; b=uTDa4Z8dbb79Le0y06QVymjsPGfMmg8gRQAZv7LIDkupZeQkpN/3FpCYOGIuxFzj8Z0HSaRdTVYBRxTnZkjaNo+4CnazTf5SV6gSFlXuqyiYGkYMFR3/Scg5SGXq4dfs2sEUjFWoeaazTOECe+IuaWQ+XRL67crafxUN/4lOAik=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723648129; c=relaxed/simple;
+	bh=tzzNWmIHy7GialirAluI6vdJxJdoWVtSWHbvXFSbyKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T8y8UgBJlDIU6GqfddEOqPWg1rCI09lWVGqm6Dwo/Y2oHiUqD62xWErZqOeMYgfDHlyl56uhWGYL5YV/lUv8AChhfL8dZ8UmemYPtcgZTJmdnGELAvsCgHrI3Ov6zxVAtuExhI8wpcNFGtu2THt297t8py59noam+9wTp4OrfcA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=G+tNeBGJ; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1723648112; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=BHSN6lRXaGcDY7bwC35z4DIarfOQhJBxJ0e6CRnplvR+6ues+jRqC5Xuo8pjB52sMSb1/Mzhtbzk1i6VqK+ZSezDmm4T04O1HqVl2lQcFO4Hg1HEM1+StjwY0P0whQyUJyM4ooVFZ/R/DKwCpvc9124l1Bt0ohBnlu0PkkltQmA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1723648112; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=elmUNn+WwzhQf2ZD0cT0xYadLjMAyv+MK+0Z4/9BIC4=; 
+	b=EIeWL3dkMMHRpYI/RGwDBORphFKeHpDFfqyQTMzcvSRT+gQRMXc/NI8yltCpaAoWltOi0jeM7w2Zcq79w41vAzftOIN05c0cj4ns6AiT9UvS3l+FqTFyasXclSqiW2f5EhPAfSIR7557mNohD29eStu3CrHqYUTXWeg52b4muwo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723648112;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=elmUNn+WwzhQf2ZD0cT0xYadLjMAyv+MK+0Z4/9BIC4=;
+	b=G+tNeBGJIalM7ckB3p8CcJAOI59Nya7G1gT6Z8I9aLaXGOkEvq2TMJFNSvLTsYqn
+	anIqEv1jJkhkSauVFhkLm+9IQ+8XNL6Jj6jrpngrJhjjJSDhpJ8v64wbtuUmd3QlckV
+	fzHqKhHa5/d4laSpMubVYDNHes2EaNUp5j2WCYcwSYGzV6Km7iSvPJ8SgVwt3R9tSnp
+	YKF7Bzb8PIJNEX1DR0Tr1EV7HuMCrB64nJ2Rz+KfL5kYWCWnX/uvYPLrDZ2ScFlP7Hs
+	EUblVMCul2y57pAu9Ov1RZ0raGaMKhBxQdGGuaOQgIv+Grtux8njNQho4RIAR/BS3L3
+	4YqMQwJcTA==
+Received: by mx.zohomail.com with SMTPS id 1723648109953513.5698680578232;
+	Wed, 14 Aug 2024 08:08:29 -0700 (PDT)
+Message-ID: <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
+Date: Wed, 14 Aug 2024 17:08:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] ptp: Add esterror support
+To: Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
+ jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
+References: <20240813125602.155827-1-maciek@machnikowski.net>
+ <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
+ <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+ <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-Alexandra Winter wrote:
+
+
+On 14/08/2024 15:08, Andrew Lunn wrote:
+> On Wed, Aug 14, 2024 at 09:44:29AM +0100, Vadim Fedorenko wrote:
+>> On 13/08/2024 21:05, Andrew Lunn wrote:
+>>> On Tue, Aug 13, 2024 at 12:55:59PM +0000, Maciek Machnikowski wrote:
+>>>> This patch series implements handling of timex esterror field
+>>>> by ptp devices.
+>>>>
+>>>> Esterror field can be used to return or set the estimated error
+>>>> of the clock. This is useful for devices containing a hardware
+>>>> clock that is controlled and synchronized internally (such as
+>>>> a time card) or when the synchronization is pushed to the embedded
+>>>> CPU of a DPU.
+>>>
+>>> How can you set the estimated error of a clock? Isn't it a properties
+>>> of the hardware, and maybe the network link? A 10BaseT/Half duplex
+>>> link is going to have a bigger error than a 1000BaseT link because the
+>>> bits take longer on the wire etc.
+>>
+>> AFAIU, it's in the spec of the hardware, but it can change depending on
+>> the environment, like temperature. The link speed doesn't matter here,
+>> this property can be used to calculate possible drift of the clock in
+>> the micro holdover mode (between sync points).
 > 
-> On 14.08.24 15:11, D. Wythe wrote:
-> >     struct smc_sock {                /* smc sock container */
-> > -    struct sock        sk;
-> > +    union {
-> > +        struct sock        sk;
-> > +        struct inet_sock    inet;
-> > +    };
+> Is there a clear definition then? Could you reference a standard
+> indicating what is included and excluded from this?
 > 
+The esterror should return the error calculated by the device. There is
+no standard defining this, but the simplest implementation can put the
+offset calculated by the ptp daemon, or the offset to the nearest PPS in
+cases where PPS is used as a source of time
+
+
+>>> What is the device supposed to do with the set value?
+>>
+>> It can be used to report the value back to user-space to calculate the
+>> boundaries of "true time" returned by the hardware.
 > 
-> I don't see a path where this breaks, but it looks risky to me.
-> Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
-> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
+> So the driver itself does not know its own error? It has to be told
+> it, so it can report it back to user space. Then why bother, just put
+> it directly into the ptp4l configuration file?
+> 
+> Maybe this is all obvious to somebody who knows PTP inside out, but to
+> me it is not. Please could you put a better explanation and
+> justification into the commit message. We need PHY driver writers who
+> have limited idea about PTP can implement these new calls.
+>
+> Andrew
 
-hmm... then how about changing it to something like this?
+It's designed to enable devices that either synchronize its own hw clock
+to some source of time on a hardware layer (e.g. a Timecard that uses a
+PPS signal from the GNSS), or a device in which the PTP is done on a
+different function (multifunction NIC, or a DPU) to convey its best
+estimate of the error (see above). In case of a multifunction NIC the
+ptp daemon running on a function that synchronizes the clock will use
+the ADJ_ESTERROR to push the error estimate to the device. The device
+will then be able to
+a. provide that information to hardware clocks on different functions
+b. prevent time-dependent functionalities from acting when a clock
+shifts beyond a predefined limit.
 
-@@ -283,7 +283,7 @@ struct smc_connection {
- };
- 
- struct smc_sock {				/* smc sock container */
--	struct sock		sk;
-+	struct inet_sock	inet;
- 	struct socket		*clcsock;	/* internal tcp socket */
- 	void			(*clcsk_state_change)(struct sock *sk);
- 						/* original stat_change fct. */
-@@ -327,7 +327,7 @@ struct smc_sock {				/* smc sock container */
- 						 * */
- };
- 
--#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
-+#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
- 
- static inline void smc_init_saved_callbacks(struct smc_sock *smc)
- {
+Also esterror is not maxerror and is not designed to include all errors,
+but the best estimate
 
-It is definitely not normal to make the first member of smc_sock as sock. 
-
-Therefore, I think it would be appropriate to modify it to use inet_sock 
-as the first member like other protocols (sctp, dccp) and access sk in a 
-way like &smc->inet.sk.
-
-Although this fix would require more code changes, we tested the bug and 
-confirmed that it was not triggered and the functionality was working 
-normally.
-
-What do you think?
-
-Regards,
-Jeongjun Park
+Thanks
+Maciek
 
