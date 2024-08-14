@@ -1,202 +1,141 @@
-Return-Path: <netdev+bounces-118333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7BF951476
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:24:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC4C95147D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E67EB286C12
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:24:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3B92862E1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAA213D8A4;
-	Wed, 14 Aug 2024 06:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A129D7345B;
+	Wed, 14 Aug 2024 06:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TssGwZm4"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="USszB5Ee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B036513CABC;
-	Wed, 14 Aug 2024 06:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB811F94D;
+	Wed, 14 Aug 2024 06:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723616586; cv=none; b=X0o1b5dwsWeb6Q5U8p4FVZJxjfziQqQ2H8uc8XU8yA+RUM9DNnL+ZgP4yasVQB9UU15ieKsGvgQFFwo4+yGgFWvqNvkU+YAySRqms/h0kVaVAqWz3CreqY8J0JkTTd5l+XZhfAZIaFaSW8wcP2TGUgY4ezNZfGkKQEfva3opSdI=
+	t=1723616795; cv=none; b=Z4et+mwe/ZeJen3LUQHrrDfkEnDLPEoviIO2J9IMDOebXt+bJLA9plC4j/JcnoWNpNJrK68p7MG32yANs2euQJ19UeQPtG6m0EpepQeJoND8UCjdSjDNoeEup453uDi4z4/mYWiOO2ym4mYE53AVaPK+1a2+rF/Y0+LiOy/Rrxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723616586; c=relaxed/simple;
-	bh=WbizJY1JUcwczi5iymZY7vyl+95kV8i1U2PWaG0v9Uk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zk/vWUL8doniaLYAYQg6V14nobbGaSCGK/f/gV/+Z/Zd7EUgDTcBp/bvgcs5rV1hGjwRQwVxnsy42O5shm4EPoEhR0qgD6azFcey7zebrIicRSWmZ1oJ+IEHs7AFyCXLcHMI3x1300HidNOZLGtpZK5njnA6rSKxJra0wXPxXP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TssGwZm4; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2cb4b7fef4aso4906143a91.0;
-        Tue, 13 Aug 2024 23:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723616584; x=1724221384; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BOXF/mk6fi+su1BZXevEKau7aDc4101e4pARIviEtYA=;
-        b=TssGwZm4sDfr81ZRNSsl5YguQ0972GJsHfh3Xe2+5xAMeZ/QSPjHDdmfn2FyI5T+hO
-         Z6ihG3ZO6F4oy7gbDcO66izQst+b9V7Khj4G74VOaBuHFXRaNCVvW0PQMqEloshXb1NI
-         7Lbwj0nU18NoIBRCgObtKZjJhxW/O4j1nizJe3CzcUTil5aizXitqNy1a6ivgEPjKzyW
-         JGzRxMSN5277zkXSGmur35/pnLMIL/VV1CRYezEHbY72eLTH8ruSPkSdpRdtm4X6+q3z
-         T5UKnHmpiddoeWAkMI08rUpj5WnrtTNe0lYzmv9QHdDjZD7xjpFvT3dQWMf2dY81lPRm
-         kYnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723616584; x=1724221384;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BOXF/mk6fi+su1BZXevEKau7aDc4101e4pARIviEtYA=;
-        b=HNssGOieco/ke5Hem9u1uq8Iq9y4DZoTg9nqXzWleMzO47QujCCeE08mQnDa7XWGDO
-         Zl3xaWcDOn86poQkbbzed3M20vaNtVQHU21A8/gslJ8tr4tBsoMWUbdsJgxMLvuasWdr
-         bM9QEBkS5El6a3rcTqTk0BwtLdMuPQ1w6MHrihO/LwA9TZH6fqxeZKlMEPFmJXXZBhIU
-         P9LO0PE7LD+/N8J5cpC5OQmwbPnvkACuRW3r3UDudYt2bX2mgR3vrJVKv049JF5o/HGr
-         +YSenTF+MvAKiPSpbcX29LvPoXZsDL2KqTLeSUWIobJXX7AyUYeJv63AVyyG8/GkeR1J
-         U0xA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/2polWqdJ/WbRiFQvUNUm9dw8vkJnXlX09xVc/lif2s5M23i4ZhxFsiB2kvTx69eNDQY2plcgX1XcR6UoVHJw5r1F/z5Wc1u6FBwU06FQxRUmxPubFV/e+uC78TteZYviBsyL6v51dSdpzy9m23kW3Nu4TJYtMtsB8JelSFbzdfovt1Vd5phLeMaV
-X-Gm-Message-State: AOJu0YwO323au1+57KoLZVh8EweUWUv2F0lXuTa0ZmCFJSBRDMtsOv3t
-	8zGljqnanhIhKZmdhsGOjmqiFqo/K7sSUUeI9BSOMGalMgI52ove
-X-Google-Smtp-Source: AGHT+IGnacH6xdXHc7HMG9kQdrthisEdqyOEUd8elau0NzGFjqqKSMK6zwmrSwuMifeckUn+hbb+kw==
-X-Received: by 2002:a17:90b:1811:b0:2c9:7849:4e28 with SMTP id 98e67ed59e1d1-2d3aab43815mr2191088a91.27.1723616583775;
-        Tue, 13 Aug 2024 23:23:03 -0700 (PDT)
-Received: from tahera-OptiPlex-5000.uc.ucalgary.ca ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3ac7f2120sm728811a91.31.2024.08.13.23.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 23:23:03 -0700 (PDT)
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: outreachy@lists.linux.dev
-Cc: mic@digikod.net,
-	gnoack@google.com,
-	paul@paul-moore.com,
-	jmorris@namei.org,
-	serge@hallyn.com,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bjorn3_gh@protonmail.com,
-	jannh@google.com,
-	netdev@vger.kernel.org,
-	Tahera Fahimi <fahimitahera@gmail.com>
-Subject: [PATCH v9 5/5] Landlock: Document LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI versioning
-Date: Wed, 14 Aug 2024 00:22:23 -0600
-Message-Id: <c70649f74688605f31ab632350ab77d2a4453ab9.1723615689.git.fahimitahera@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1723615689.git.fahimitahera@gmail.com>
-References: <cover.1723615689.git.fahimitahera@gmail.com>
+	s=arc-20240116; t=1723616795; c=relaxed/simple;
+	bh=c/B3zpodqQDg3Gm46P+OGE0a77kg/8gf/IGqyQqdCbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=KsycB8MX6uzqfNrhY1rQlB3uOv5sIdDEx5IGNcJeqJYJ7/OJvlQ7SNvDj66iVKOi1+tumH92ouFtZKFYoB0+NTNLgeQmNbC0pbWLlwN5ioUHlKzxUqtohyTH7m2TEBrjQsG9HmL252izOIvOBtX+4OiPStoiCubq23PlvBIYChU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=USszB5Ee; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47E6Q55e083647;
+	Wed, 14 Aug 2024 01:26:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1723616765;
+	bh=TV4YYPMGzdKwvmV4+H2ipDGrWg6oUeN1Y/HB2RJrHLU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=USszB5EerDqLAd8bKn+vrAU0auLqrZ2UsqL9IeLDcOvb+IrSUwxizd3ZRYj5eQL8M
+	 CQCfCL52dd/tvD21aOBk/5ODt6eNpawGgTTeQVwgxV03L5Bkj3NnCIKCgVHYH1eNkD
+	 yi+A8We0wmZUSceS4UVOh7HHscEQrBkp5RDeK52A=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47E6Q5wk003091
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 14 Aug 2024 01:26:05 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 14
+ Aug 2024 01:26:05 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 14 Aug 2024 01:26:05 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47E6PvMF073293;
+	Wed, 14 Aug 2024 01:25:58 -0500
+Message-ID: <69043091-dd59-4b7a-aae0-34f9695b378d@ti.com>
+Date: Wed, 14 Aug 2024 11:55:57 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/7] Introduce HSR offload support for ICSSG
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka
+	<jan.kiszka@siemens.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Javier
+ Carrasco <javier.carrasco.cruz@gmail.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <d061bfb6-0ccc-4a41-adad-68a90a340475@lunn.ch>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <d061bfb6-0ccc-4a41-adad-68a90a340475@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Introducing LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET as an IPC scoping
-mechanism in Landlock ABI version 6, and updating ruleset_attr,
-Landlock ABI version, and access rights code blocks based on that.
+Hi Andrew,
 
-Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
----
-v8:
-- Improving documentation by specifying differences between scoped and
-  non-scoped domains.
-- Adding review notes of version 7.
-- Update date
-v7:
-- Add "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" explanation to IPC scoping
-  section and updating ABI to version 6.
-- Adding "scoped" attribute to the Access rights section.
-- In current limitation, unnamed sockets are specified as sockets that
-  are not restricted.
-- Update date
----
- Documentation/userspace-api/landlock.rst | 33 ++++++++++++++++++++++--
- 1 file changed, 31 insertions(+), 2 deletions(-)
+On 13/08/24 8:19 pm, Andrew Lunn wrote:
+> On Tue, Aug 13, 2024 at 01:12:26PM +0530, MD Danish Anwar wrote:
+>> Hi All,
+>> This series introduces HSR offload support for ICSSG driver. To support HSR
+>> offload to hardware, ICSSG HSR firmware is used.
+> 
+> Oh, no, not another firmware. How does this interact with using the
+> switch firmware and switchdev? I see in your examples you talk about
+> HSR to Dual EMAC, but what about HSR and Switchdev?
+> 
 
-diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-index 07b63aec56fa..0582f93bd952 100644
---- a/Documentation/userspace-api/landlock.rst
-+++ b/Documentation/userspace-api/landlock.rst
-@@ -8,7 +8,7 @@ Landlock: unprivileged access control
- =====================================
- 
- :Author: Mickaël Salaün
--:Date: April 2024
-+:Date: July 2024
- 
- The goal of Landlock is to enable to restrict ambient rights (e.g. global
- filesystem or network access) for a set of processes.  Because Landlock
-@@ -81,6 +81,8 @@ to be explicit about the denied-by-default access rights.
-         .handled_access_net =
-             LANDLOCK_ACCESS_NET_BIND_TCP |
-             LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+        .scoped =
-+            LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
-     };
- 
- Because we may not know on which kernel version an application will be
-@@ -119,6 +121,9 @@ version, and only use the available subset of access rights:
-     case 4:
-         /* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
-         ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-+    case 5:
-+        /* Removes LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET for ABI < 6 */
-+        ruleset_attr.scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
-     }
- 
- This enables to create an inclusive ruleset that will contain our rules.
-@@ -306,6 +311,23 @@ To be allowed to use :manpage:`ptrace(2)` and related syscalls on a target
- process, a sandboxed process should have a subset of the target process rules,
- which means the tracee must be in a sub-domain of the tracer.
- 
-+IPC Scoping
-+-----------
-+
-+Similar to the implicit `Ptrace restrictions`_, we may want to further restrict
-+interactions between sandboxes. Each Landlock domain can be explicitly scoped
-+for a set of actions by specifying it on a ruleset. For example, if a sandboxed
-+process should not be able to :manpage:`connect(2)` to a non-sandboxed process
-+through abstract :manpage:`unix(7)` sockets, we can specify such restriction
-+with ``LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET``.
-+
-+A sandboxed process can connect to a non-sandboxed process when its domain is
-+not scoped. If a process's domain is scoped, it can only connect to sockets
-+created by processes in the same scoped domain.
-+
-+IPC scoping does not support Landlock rules, so if a domain is scoped, no rules
-+can be added to allow accessing to a resource outside of the scoped domain.
-+
- Truncating files
- ----------------
- 
-@@ -404,7 +426,7 @@ Access rights
- -------------
- 
- .. kernel-doc:: include/uapi/linux/landlock.h
--    :identifiers: fs_access net_access
-+    :identifiers: fs_access net_access scope
- 
- Creating a new ruleset
- ----------------------
-@@ -541,6 +563,13 @@ earlier ABI.
- Starting with the Landlock ABI version 5, it is possible to restrict the use of
- :manpage:`ioctl(2)` using the new ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right.
- 
-+Abstract UNIX sockets Restriction  (ABI < 6)
-+--------------------------------------------
-+
-+With ABI version 6, it is possible to restrict connection to an abstract Unix socket
-+through ``LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET``, thanks to the ``scoped`` ruleset
-+attribute.
-+
- .. _kernel_support:
- 
- Kernel support
+HSR to Switch mode or switch mode to HSR is not supported by the firmware.
+
+Only dual EMAC to Switch , dual EMAC to HSR, switch to dual EMAC and HSR
+to dual EMAC is supported.
+
+Software HSR, software Switch / bridging can be done only with dual EMAC
+firmware.
+
+To summarize,
+Dual EMAC firmware - Supports normal Ethernet operations, Can do
+software bridging, software HSR
+Switch Firmware - Can do bridging in hardware. For software bridging
+this firmware is not needed, DUAL EMAC firmware will be used.
+HSR firmware - Can do HSR offloading in hardware. For software offload
+this firmware is not needed, dual EMAC firmware will be used for that.
+
+By default the firmware is Dual EMAC firmware. Firmware will only be
+changed when offloading in hardware is needed.
+
+> How many more different firmwares do you have?
+> 
+
+We have these 3 firmwares only for ICSSG.
+
+> 	Andrew
+
 -- 
-2.34.1
-
+Thanks and Regards,
+Danish
 
