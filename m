@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-118464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A63951B5C
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:06:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E98E0951B5D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1E301F23C4D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E938C1C21385
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6BC1B1413;
-	Wed, 14 Aug 2024 13:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B041B0128;
+	Wed, 14 Aug 2024 13:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Nx2uzmij"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QzbIXfDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447581109
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C3C1109
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723640801; cv=none; b=rxOQfbAwn/7+ASrvp4hIxKgw3vFT4gx4qgeJrnX3tmR2+cL1zDzvjDpxHXKciFWTiWr5t4pl9/8qpT8dgGOJY6MvJ5L/2HMPNKBraM0uJbF7P0dPe0GQDsZFfiDoVLql1nn7f4SQWB0vni9V0yernUosQwzmECfiL1HJ7jUDXwI=
+	t=1723640806; cv=none; b=u+UDo2ZCCw45WXWyB/Gn+zERGt0iJ1bJgVqcLbTa8ZFGV2z1Fo2BkMcglJitnyGzFIcLG8YJWqaOdCCVi4zpEd3S7RakkTGJXjNFYo6D+94/8i5LuyCF1V/Do08/nGIQYTfOdniQOrDgl9L5C2J5HOcmzUVrTSfSEASCzA0aIwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723640801; c=relaxed/simple;
-	bh=SlklGaSkB1CVAnGcEiIJsuqo82vRigsMVmvwV1Rzjjc=;
+	s=arc-20240116; t=1723640806; c=relaxed/simple;
+	bh=YuT7tgOIJJfuO/twk1piOsn+GOR2DJ2NNNUzwgW9wPU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SHqPm5BB+uIrCIqbKrSZUrZ+J2fyVt386rE8ikksdqs8/DcYy4nCt5j15oM6fjmhooXhdH6aN4jq6sFXixAxRaJcmB5q72Tc6Qgkwb+7d+nyh1U3vGiv/A4aEC9kZJ3uAxQibRAaCrG9RNVIJ5gr/Gbze+P36zpZnBiUb7E+PE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Nx2uzmij; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=GmSXFcLoDMRpMNuf2hr7HRJfsCuj3fl4rw8q6kttDDhhUfyi9GBOh9UZm6Y2bk/Z9fd9yIBF+3rJg1JkjA/Zo1XA9ljTDjRwUbbkl8nds3JyPReEaE2IOM3wY/P/Oo8AcHfub5yD3wAl8gJKxupWkarfh8ZoAJBzkOnOVVLxZco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QzbIXfDt; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-70d18d4b94cso4969682b3a.2
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:06:40 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7106e2d0ec1so4688462b3a.2
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:06:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1723640799; x=1724245599; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1723640804; x=1724245604; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rJdRS+SiiKicF87avM76gJAE3mWhqo9TmxE70LOsA1M=;
-        b=Nx2uzmijo+LP4BtzcCXQ/Ml7X2NznbCzybNcLDwUPwDw8zm5T7pgKiRXnEUEK5OujE
-         qMsYXNLoRhodMvfr0dWgetuigTnm2OSRnRedGw/hrfVvqqr2A81Ta0q4eeBJlms99AQD
-         J0h0pyaj4wvN9g/WNPNayVcrqpcnEFpLRv6xY=
+        bh=pbTOvAUXILro3y1EmGJyFXmNSNhQtv1tC+lWw1ig7R0=;
+        b=QzbIXfDtmZ8SOLRCNX4afhAb5SX6q5Cifkmuu579vZqNOkHp/2wqtkZf6njdZ/NTIz
+         OILccKz8edDwIKI+2HOxSUlCh+tVthZMfEk3JWJ4zh3J1/IU1xSc2gebOak4VA8Hp3Qo
+         maAtscwis+/C28M+QOGqzgVmT+nYw8WGhFwwI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723640799; x=1724245599;
+        d=1e100.net; s=20230601; t=1723640804; x=1724245604;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rJdRS+SiiKicF87avM76gJAE3mWhqo9TmxE70LOsA1M=;
-        b=q4PgS3pFf64ZjIINSFzRThoaRt9f4KqZA2sdrp6Lnvgg+dF0Vz7cAWGA7xYwwTdaER
-         vnCSevJlkn6pTBq2u0/+MAhMf6xUBL4tcu99RmLsV8gCDyGIEU/Q6HXN4Gjbm1leJm00
-         /JksCl5z7fN2s1QWjEUByyqx72SyWEzIw5//YzJ5a4pzWkY9hrUp/uLwdhB2j5v8BZXz
-         TSdMkXJhdn4SOYWnXWQQHkQ+3TmZD+3P8WK2tT2SvwXQGNCmpIukH+lUFo9EIWlMxvuC
-         eN3UWQuwng15LRckmdMH2A1qMAiEz3bKae7xQiAdl3WZUPcRLp2Z8/mQngf0nMLVgFX7
-         1r3Q==
-X-Gm-Message-State: AOJu0YyjncRMmz/KAO++QjBlNg82fuHXM0/kFSMwUIw4hp73bzBWrhDB
-	JZ3RsRNN79ycFXpz2qWYVW3KlPrqgqd/OpChnQrsW5guq8pmEZPaxrOiYtbmgPVWECR1lJSo8M5
-	x53isntWPgiDGmXXJ99ncauFHJzPiHI8CVY4sCvXTUu18bMYzZa8n+FIwb263wF1YPKSnfNUMna
-	W4sDXRFGqP+m/aaK8RfYWVlmRWIICT+QRV6OcYn72euFDmVDJ9
-X-Google-Smtp-Source: AGHT+IHtR8wc6H7BmYCMXw9Fe/+/9RGP+sY5pV/IRcBYSi6n+iwcy/T5+YA4I0mchKBGxtpL8KNJKA==
-X-Received: by 2002:a05:6a00:4f95:b0:710:4d55:4d39 with SMTP id d2e1a72fcca58-712670e8635mr3028656b3a.4.1723640798593;
-        Wed, 14 Aug 2024 06:06:38 -0700 (PDT)
+        bh=pbTOvAUXILro3y1EmGJyFXmNSNhQtv1tC+lWw1ig7R0=;
+        b=THS/HR/Nx5shflbvQUY74H4JsGr/eG9gVPvPDiiRbNxG0B+MvtHd3aSiFc3Jp3QN9y
+         MlgHvTp3BUtRIBgLnIus9g4LNfzUDzIxOD81RJcPvC+Q/444gcUubPdAiQRfLxYeW5Dn
+         GLC1+QrTf3OuJU1V1+KLXk2qJdsI+B/cABtKKyCZspTMdoyKIXHoMqVEw+eI+gMNvaAQ
+         k3Ivr+0BoFdAGNUPdn3LsUfbhHYSle7EfWtnO/D5NOv/AXh7u8camLxScoTk9lqPuYe2
+         +/s+TukfhU/rhCnLhB6avJak39xka1Tf8ZUlUWTTeBGkskgOCWj9cuvtKcaw2OW8wAN4
+         9PTg==
+X-Gm-Message-State: AOJu0Yx0tASExvof0Jgd2rGDnkoxAFVbaFqnekqBEbuGQG/8rnxl/eEg
+	ho9paVTTjza9E7ghPA7WWPjpXsKLv6WLh68bXU42pLqU+qNXfuiRyuWqgX7uOCXinTvCEb8xKJT
+	1AygWONJXAmOUH9WGdWwAkbEJHnqXSVV8k+RSFEu7w5dHCDgAPaKPaDTFN/ZflbgrRNmSosUPKw
+	XApKuRvxz6gSZFxiwEiaFcd0UsbEtfQaqsXrR4PaE3PVdQBSFz
+X-Google-Smtp-Source: AGHT+IFl9foKY9Yinyk+5LmC8WJCLj1BfV1CYr0rIE6L83nn5qKDxB0bDZtB9fzKNn0fqUMJEh2s2g==
+X-Received: by 2002:a05:6a20:c78e:b0:1c6:fc56:744 with SMTP id adf61e73a8af0-1c8eae97a21mr3241638637.31.1723640803518;
+        Wed, 14 Aug 2024 06:06:43 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.250.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-711841effe9sm4904543b3a.31.2024.08.14.06.06.33
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-711841effe9sm4904543b3a.31.2024.08.14.06.06.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 06:06:37 -0700 (PDT)
+        Wed, 14 Aug 2024 06:06:43 -0700 (PDT)
 From: Boris Sukholitko <boris.sukholitko@broadcom.com>
 To: netdev@vger.kernel.org,
 	"David S . Miller" <davem@davemloft.net>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	David Howells <dhowells@redhat.com>
 Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
-Subject: [PATCH net-next v2 1/6] skb: add skb_vlan_flush helper
-Date: Wed, 14 Aug 2024 16:06:13 +0300
-Message-ID: <20240814130618.2885431-2-boris.sukholitko@broadcom.com>
+Subject: [PATCH net-next v2 2/6] skb: move mac_len adjustment out of skb_vlan_flush
+Date: Wed, 14 Aug 2024 16:06:14 +0300
+Message-ID: <20240814130618.2885431-3-boris.sukholitko@broadcom.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240814130618.2885431-1-boris.sukholitko@broadcom.com>
 References: <20240814130618.2885431-1-boris.sukholitko@broadcom.com>
@@ -94,70 +94,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Refactor flushing of the inner vlan in the skb_vlan_push by moving the code
-into static skb_vlan_flush helper.
+Let its callers worry about skb headers adjustment.
 
 Signed-off-by: Boris Sukholitko <boris.sukholitko@broadcom.com>
 ---
- net/core/skbuff.c | 40 ++++++++++++++++++++++++----------------
- 1 file changed, 24 insertions(+), 16 deletions(-)
+ net/core/skbuff.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 83f8cd8aa2d1..23f0db1db048 100644
+index 23f0db1db048..1bd817c8ddc8 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -6220,30 +6220,38 @@ int skb_vlan_pop(struct sk_buff *skb)
- }
- EXPORT_SYMBOL(skb_vlan_pop);
+@@ -6237,7 +6237,6 @@ static int skb_vlan_flush(struct sk_buff *skb)
+ 		return err;
  
-+static int skb_vlan_flush(struct sk_buff *skb)
-+{
-+	int offset = skb->data - skb_mac_header(skb);
-+	int err;
-+
-+	if (WARN_ONCE(offset,
-+		      "skb_vlan_push got skb with skb->data not at mac header (offset %d)\n",
-+		      offset)) {
-+		return -EINVAL;
-+	}
-+
-+	err = __vlan_insert_tag(skb, skb->vlan_proto,
-+				skb_vlan_tag_get(skb));
-+	if (err)
-+		return err;
-+
-+	skb->protocol = skb->vlan_proto;
-+	skb->mac_len += VLAN_HLEN;
-+
-+	skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
-+	return 0;
-+}
-+
- /* Push a vlan tag either into hwaccel or into payload (if hwaccel tag present).
-  * Expects skb->data at mac header.
-  */
- int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
- {
- 	if (skb_vlan_tag_present(skb)) {
--		int offset = skb->data - skb_mac_header(skb);
--		int err;
--
--		if (WARN_ONCE(offset,
--			      "skb_vlan_push got skb with skb->data not at mac header (offset %d)\n",
--			      offset)) {
--			return -EINVAL;
--		}
--
--		err = __vlan_insert_tag(skb, skb->vlan_proto,
--					skb_vlan_tag_get(skb));
-+		int err = skb_vlan_flush(skb);
+ 	skb->protocol = skb->vlan_proto;
+-	skb->mac_len += VLAN_HLEN;
+ 
+ 	skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
+ 	return 0;
+@@ -6252,6 +6251,8 @@ int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
+ 		int err = skb_vlan_flush(skb);
  		if (err)
  			return err;
--
--		skb->protocol = skb->vlan_proto;
--		skb->mac_len += VLAN_HLEN;
--
--		skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
++
++		skb->mac_len += VLAN_HLEN;
  	}
  	__vlan_hwaccel_put_tag(skb, vlan_proto, vlan_tci);
  	return 0;
