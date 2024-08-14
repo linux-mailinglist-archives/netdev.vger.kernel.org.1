@@ -1,162 +1,268 @@
-Return-Path: <netdev+bounces-118602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C964695236B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:37:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BDF95236D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 569191F22958
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:37:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0009C28503F
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A7A1BF315;
-	Wed, 14 Aug 2024 20:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943921C5788;
+	Wed, 14 Aug 2024 20:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="eUl6VTSj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItywRmCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF55218C910
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 20:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE431C3F29
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 20:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723667849; cv=none; b=P9N5v/lBKNOTQ0QqCN+g4f806pQeQiyNxsBLxXZZHamP8UKmb4JcDTdE9Oz59qlgj+4wWlQmUi588l180IJRV2NUm4sAfcOiDslo5SxGD3st6np+LuMVtvzJpReKf6I8CwIiaM1W8QY+n5Zqj6KF1y8JsESAUfJtv04vgdIV5EI=
+	t=1723667951; cv=none; b=nhpYY7sbmWDP+j+eC0HpbwvSglTE2jSC3f62ObHkpA7RKDtF5JPkkT5JxDIF4lCdu/j1cFrHgDbRZhxARUsdF+O6SkaeFDT2UhPJoqBoz12N8oN7o9FpORLm3YLbFUUh67I67lftFGSQ9HwLkr4oWdQNBcdLtu8DmIN7JeM/Eg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723667849; c=relaxed/simple;
-	bh=TLftIb1Si+biTr6rYjJIM382CS7J4BsQWh/7YbOdigQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dGvncfUEKxLBNQxAiOaRzeIXe81gGeWFbYsjqIhYCqZZihxM09pE2bVgdvAmfyczknSHx/4WBrQ3ij9/8qApdytvtt0j9I3Kw5ZNz4rfAOAeOQiYTQ8VLsjP2cCfXBX84TqZToKUWlSNb85uF8X+Z/QDHrSKq+9XObsc9orTyAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=eUl6VTSj; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5ba482282d3so475891a12.2
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:37:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1723667846; x=1724272646; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TLftIb1Si+biTr6rYjJIM382CS7J4BsQWh/7YbOdigQ=;
-        b=eUl6VTSjTli6mKrjOX56n1a4RTzFv9PKcdCklcj+owjI22cWIgXvW4oPoYPh1W/eUA
-         YEP4pePtW3S5nPjWlzcra+mIkDB65FdpHFR8rRT1/+k4tcaZjQRAthrPPI/xVSlUL6Ae
-         EwTom6FJkeLBR0QTXL25V5CzSZ9eFO4vMTU9w11XhJm/wRYvbyErn90ikjH3wtvxib/6
-         oBnkmXCfBFih4rSIUYR/EmKGiDwvVg2qoETFBbSnZyG6elH+dQWeXOwY+nJfweyjGOFQ
-         jgXm+TEjyAeEGTZjogFPcMkwntgGVaNGJKYTxfxDzXOHzt5ddyPWXiGvJYokR0iFOHHb
-         ij/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723667846; x=1724272646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TLftIb1Si+biTr6rYjJIM382CS7J4BsQWh/7YbOdigQ=;
-        b=gugxd66+KyQ04D3gszUsbmWdKU47Si9IdNi5V/TZqsa89hnN6CRHRYrQLQ3NrbIwX4
-         7C6DX1D61wo+cwlIaADjEDYRGs/rVGRvDYb29i0b9xNxOgFJeUFTSqj/kckErredGgDO
-         wExqBmegwR6qv95LY+I6apmzgDZ4kKfuw6y4cBt2muCp/EQvLFngXxrZE03h1b4K85OC
-         XoQjLbo+ipGqOI6EXU8/wynrbO7XDr/b40mv0hLWkTOyAAjEpYU75gCvYXLR0emA09Kn
-         +ZZIjWMrqv3XQtUuqtBn1Dsj6bZlrnAQhOaDoeJ7vp8W2fLQPe9UxvECcDJdOIK4g5W3
-         hjnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVc6Wuo5tL5MxifC3A+/9ILMweLF9p6nMSMLVSLaFmn59tp5UmGnyqxkiQ0n6T8VnpLsO4eglpsl21dkJD2tfFpMEsSLPC
-X-Gm-Message-State: AOJu0YyRBK5iVS0FDaJrC9oOc87TuC3AmcH6sF5MK92QeEi9IJK/9peA
-	32R5zJAJ0X6PbFNdIq4oOnAANGb8gJlJQ27Cub/C15+ouEZXzmdlNy0JLiVj/tLlq9/N7QpSa13
-	+MI7ruvoyU0O+a8V0klopzfSrHr2fgg7lYuHQoiZHMpffvMf5Zg==
-X-Google-Smtp-Source: AGHT+IECSKhWvub+J5jLYPsIyibU4mdTElyLtByP7KuwytcBwiNhyAWbfD3scyJEX/dBpjYdI/4CB5OKroIzwR/heQ0=
-X-Received: by 2002:a17:907:97c5:b0:a72:8c15:c73e with SMTP id
- a640c23a62f3a-a836701bdeemr226210566b.55.1723667845584; Wed, 14 Aug 2024
- 13:37:25 -0700 (PDT)
+	s=arc-20240116; t=1723667951; c=relaxed/simple;
+	bh=58NvRL6I3meHI4Ytv/TxU/cXiYub3jbCyc5s3+cIGXE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t8vBZMgBttu+xSunIrBcgPbF8E0wnAyIsymTkmifJr7inY2j2bfo5NC7H8iouWC7honLpReCRjIEo4nNiROMyehyZEY3WqZHA5IJ2WxYr1XQcvlXCzYHzScZzBCBfec6JuskJm8cGX2uKmEm3GxK74sXsSzGwd6m7l303VehJek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ItywRmCL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723667948;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2qkrZ0/6WswDsKwJcP06CqB1C0tA8HBneZAb2bmJdwA=;
+	b=ItywRmCLvxdwGoFl5JmYjg21bSPBkp3lxL07tocDv78cE+wguEbKKpCKL1b2RptytOp1i8
+	yQGniMX58rqkPzLqocdZJbsj9zpP7G5YRisJV6sy9gjz1h94QD+u0uC3X2z1K34UvbGau6
+	QW5Cl+gJdyj0Bco+bz9CpO/0MtZVxYA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-609-4Uw9jJb8M_aeO76Ft5VBjg-1; Wed,
+ 14 Aug 2024 16:39:05 -0400
+X-MC-Unique: 4Uw9jJb8M_aeO76Ft5VBjg-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 06CDE1956095;
+	Wed, 14 Aug 2024 20:39:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.30])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E87101955E8C;
+	Wed, 14 Aug 2024 20:38:53 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/25] netfs: Read/write improvements
+Date: Wed, 14 Aug 2024 21:38:20 +0100
+Message-ID: <20240814203850.2240469-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731172332.683815-1-tom@herbertland.com> <66ab8b9ef3d74_2441da2947d@willemb.c.googlers.com.notmuch>
- <CALx6S37FjSB6h6zLAdV+YF-C5H0O0968Zooo=9cJCm8Z3x0XvQ@mail.gmail.com>
-In-Reply-To: <CALx6S37FjSB6h6zLAdV+YF-C5H0O0968Zooo=9cJCm8Z3x0XvQ@mail.gmail.com>
-From: Tom Herbert <tom@herbertland.com>
-Date: Wed, 14 Aug 2024 13:37:14 -0700
-Message-ID: <CALx6S37ENf9AVc9oqoJ+Uh-6DAG6ctNdi0H-Y-8KHQnwZt0AFg@mail.gmail.com>
-Subject: Re: [PATCH 00/12] flow_dissector: Dissect UDP encapsulation protocols
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
-	netdev@vger.kernel.org, felipe@sipanda.io
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, Aug 14, 2024 at 1:28=E2=80=AFPM Tom Herbert <tom@herbertland.com> w=
-rote:
->
-> On Thu, Aug 1, 2024 at 6:20=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Tom Herbert wrote:
-> > > Add support in flow_dissector for dissecting into UDP
-> > > encapsulations like VXLAN. __skb_flow_dissect_udp is called for
-> > > IPPROTO_UDP. The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsi=
-ng
-> > > of UDP encapsulations. If the flag is set when parsing a UDP packet t=
-hen
-> > > a socket lookup is performed. The offset of the base network header,
-> > > either an IPv4 or IPv6 header, is tracked and passed to
-> > > __skb_flow_dissect_udp so that it can perform the socket lookup.
-> > > If a socket is found and it's for a UDP encapsulation (encap_type is
-> > > set in the UDP socket) then a switch is performed on the encap_type
-> > > value (cases are UDP_ENCAP_* values)
-> >
-> > The main concern with the flow dissector is that its execution depends
-> > on untrusted packets.
-> >
-> > For this reason we added the BPF dissector for new protocols. What is
-> > the reason to prefer adding more C code?
-> >
-> > And somewhat academic, but: would it be different if the BPF would
-> > ship with the kernel and autoload at boot, just like C modules?
->
-> Hi Willem,
->
-> I agree with that, and believe the ultimate goal is to replace flow
-> dissector C code with eBPF which I still intend to work on that, but
-> right now I'm hoping to get support as part of obsoleting protocol
-> specific checksum offload on receive. We can use flow dissector to
-> identify the checksum in a packet marked checksum-unnecessary by a
-> legacy device for doing conversion to checksum-complete. This handles
-> the case where the device reports a valid L4 checksum in a UDP
-> encapsulation and the outer UDP checksum is zero.
+Hi Christian, Steve, Willy,
 
-Also, there's another wrinkle with doing this in eBPF. UDP
-encapsulations are identified by port number, not a protocol number,
-so we can't hardcode port numbers into eBPF like we can other protocol
-constants. We'd probably need to hook into setup_udp_tunnel_sock
-somehow.
+This set of patches includes a couple of fixes:
 
-Tom
+ (1) Revert the removal of waits on PG_private_2 from netfs_release_page()
+     and netfs_invalidate_page().
 
->
-> >
-> > A second concern is changing the defaults. I have not looked at this
-> > closely, but if dissection today stops at the outer UDP header for
-> > skb_get_hash, then we don't want to accidentally change this behavior.
-> > Or if not accidental, call it out explicitly.
->
-> No defaults are being changed. Flow dissector flag
-> FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS needs to be set in the call to flow
-> dissector. In this patch set it's not being used, but as I mentioned
-> it will be used in subsequent patch sets for obsoleting
-> CHECKSUM_UNNECESSARY.
->
-> For other use cases, the flag can be optionally set. TC-flower for
-> instance could use this for VXLAN and Geneve parsing.
->
-> >
-> > >
-> > > Tested: Verified fou, gue, vxlan, and geneve are properly dissected f=
-or
-> > > IPv4 and IPv6 cases. This includes testing ETH_P_TEB case
-> >
-> > Manually?
->
-> Yes for the time being.
->
-> Tom
+ (2) Make cachefiles take the sb_writers lock around set/removexattr.
+
+A couple of adjustments to the /proc/fs/netfs/stats file:
+
+ (3) All the netfs stats lines begin 'Netfs:'.  Change this to something a
+     bit more useful.
+
+ (4) Add a couple of stats counters to track the numbers of skips and waits
+     on the per-inode writeback serialisation lock to make it easier to
+     check for this as a source of performance loss.
+
+Some miscellaneous bits:
+
+ (5) Reduce the number of conditional branches in netfs_perform_write().
+
+ (6) Move the CIFS_INO_MODIFIED_ATTR flag to the netfs_inode struct and
+     remove cifs_post_modify().
+
+ (7) Move the max_len/max_nr_segs members from netfs_io_subrequest to
+     netfs_io_request as they're only needed for one subreq at a time.
+
+ (8) Add an 'unknown' source value for tracing purposes.
+
+ (9) Remove NETFS_COPY_TO_CACHE as it's no longer used.
+
+(10) Set the request work function up front at allocation time.
+
+(11) Use bh-disabling spinlocks for rreq->lock as cachefiles completion may
+     be run from block-filesystem DIO completion in softirq context.
+
+Then there's the main performance enhancing changes:
+
+(12) Define a structure, struct folio_queue, and a new iterator type,
+     ITER_FOLIOQ, to hold a buffer as a replacement for ITER_XARRAY.  See
+     that patch for questions about naming and form.
+
+(13) Provide a copy_folio_from_iter() wrapper.
+
+(14) Make cifs RDMA support ITER_FOLIOQ.
+
+(15) Use folio queues in the write-side helpers instead of xarrays.
+
+(16) Add a function to reset the iterator in a subrequest.
+
+(17) Simplify the write-side helpers to use sheaves to skip gaps rather than
+     trying to work out where gaps are.
+
+(18) In afs, make the read subrequests asynchronous, putting them into work
+     items to allow the next patch to do progressive unlocking/reading.
+
+(19) Overhaul the read-side helpers to improve performance.
+
+(20) Remove fs/netfs/io.c.
+
+(21) Fix the caching of a partial block at the end of a file.
+
+(22) Allow a store to be cancelled.
+
+Then some changes for cifs to make it use folio queues instead of xarrays
+for crypto bufferage:
+
+(23) Use raw iteration functions rather than manually coding iteration when
+     hashing data.
+
+(24) Switch to using folio_queue for crypto buffers.
+
+(25) Remove the xarray bits.
+
+Changes
+=======
+ver #2)
+ - Rebase to the merge of vfs.fixes after v6.11-rc3.
+ - Add fixes for missing waits on PG_private_2.
+ - Make the read-side helper overhaul support PG_private_2-based
+   filesystems also.
+ - When reading, only limit server downloads to the max download size, not
+   cache reads or simple zeroing.
+ - Add some missing cases of skipping forward when iterating over a folio
+   queue list when the place we're at has the current slot number parked
+   just past the last slot (typically, because we're extending the list
+   incrementally).
+ - Don't use folio_batch_release() to release the refs on pages in the
+   folio_queue struct mid-read as we rely on the count in the batch later.
+ - Fix the determination of whether an operation can access the cache.
+
+David
+
+David Howells (25):
+  netfs, ceph: Partially revert "netfs: Replace PG_fscache by setting
+    folio->private and marking dirty"
+  cachefiles: Fix non-taking of sb_writers around set/removexattr
+  netfs: Adjust labels in /proc/fs/netfs/stats
+  netfs: Record contention stats for writeback lock
+  netfs: Reduce number of conditional branches in netfs_perform_write()
+  netfs, cifs: Move CIFS_INO_MODIFIED_ATTR to netfs_inode
+  netfs: Move max_len/max_nr_segs from netfs_io_subrequest to
+    netfs_io_stream
+  netfs: Reserve netfs_sreq_source 0 as unset/unknown
+  netfs: Remove NETFS_COPY_TO_CACHE
+  netfs: Set the request work function upon allocation
+  netfs: Use bh-disabling spinlocks for rreq->lock
+  mm: Define struct folio_queue and ITER_FOLIOQ to handle a sequence of
+    folios
+  iov_iter: Provide copy_folio_from_iter()
+  cifs: Provide the capability to extract from ITER_FOLIOQ to RDMA SGEs
+  netfs: Use new folio_queue data type and iterator instead of xarray
+    iter
+  netfs: Provide an iterator-reset function
+  netfs: Simplify the writeback code
+  afs: Make read subreqs async
+  netfs: Speed up buffered reading
+  netfs: Remove fs/netfs/io.c
+  cachefiles, netfs: Fix write to partial block at EOF
+  netfs: Cancel dirty folios that have no storage destination
+  cifs: Use iterate_and_advance*() routines directly for hashing
+  cifs: Switch crypto buffer to use a folio_queue rather than an xarray
+  cifs: Don't support ITER_XARRAY
+
+ fs/9p/vfs_addr.c             |   5 +-
+ fs/afs/file.c                |  30 +-
+ fs/afs/fsclient.c            |   9 +-
+ fs/afs/write.c               |   4 +-
+ fs/afs/yfsclient.c           |   9 +-
+ fs/cachefiles/io.c           |  19 +-
+ fs/cachefiles/xattr.c        |  34 +-
+ fs/ceph/addr.c               |  76 ++--
+ fs/ceph/inode.c              |   1 +
+ fs/netfs/Makefile            |   4 +-
+ fs/netfs/buffered_read.c     | 766 ++++++++++++++++++++-------------
+ fs/netfs/buffered_write.c    | 309 +++++++-------
+ fs/netfs/direct_read.c       | 147 ++++++-
+ fs/netfs/internal.h          |  43 +-
+ fs/netfs/io.c                | 796 -----------------------------------
+ fs/netfs/iterator.c          |  50 +++
+ fs/netfs/main.c              |   7 +-
+ fs/netfs/misc.c              | 101 +++++
+ fs/netfs/objects.c           |  16 +-
+ fs/netfs/read_collect.c      | 544 ++++++++++++++++++++++++
+ fs/netfs/read_pgpriv2.c      | 264 ++++++++++++
+ fs/netfs/read_retry.c        | 256 +++++++++++
+ fs/netfs/stats.c             |  27 +-
+ fs/netfs/write_collect.c     | 246 ++++-------
+ fs/netfs/write_issue.c       |  93 ++--
+ fs/nfs/fscache.c             |  19 +-
+ fs/nfs/fscache.h             |   7 +-
+ fs/smb/client/cifsencrypt.c  | 144 +------
+ fs/smb/client/cifsglob.h     |   3 +-
+ fs/smb/client/cifssmb.c      |   6 +-
+ fs/smb/client/file.c         |  71 ++--
+ fs/smb/client/smb2ops.c      | 218 +++++-----
+ fs/smb/client/smb2pdu.c      |  10 +-
+ fs/smb/client/smbdirect.c    |  82 ++--
+ include/linux/folio_queue.h  | 156 +++++++
+ include/linux/iov_iter.h     | 104 +++++
+ include/linux/netfs.h        |  45 +-
+ include/linux/uio.h          |  18 +
+ include/trace/events/netfs.h | 144 +++++--
+ lib/iov_iter.c               | 240 ++++++++++-
+ lib/kunit_iov_iter.c         | 259 ++++++++++++
+ lib/scatterlist.c            |  69 ++-
+ 42 files changed, 3515 insertions(+), 1936 deletions(-)
+ delete mode 100644 fs/netfs/io.c
+ create mode 100644 fs/netfs/read_collect.c
+ create mode 100644 fs/netfs/read_pgpriv2.c
+ create mode 100644 fs/netfs/read_retry.c
+ create mode 100644 include/linux/folio_queue.h
+
 
