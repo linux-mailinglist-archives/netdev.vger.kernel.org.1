@@ -1,130 +1,109 @@
-Return-Path: <netdev+bounces-118483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F62951BBB
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:22:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A08A951BD1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B27491F22647
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:22:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3585CB22DEA
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0A41AE867;
-	Wed, 14 Aug 2024 13:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19671B1418;
+	Wed, 14 Aug 2024 13:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LeermY8z"
+	dkim=pass (2048-bit key) header.d=vultr.com header.i=@vultr.com header.b="ukpNUVZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF40C1AC43B;
-	Wed, 14 Aug 2024 13:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FAD1879
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723641738; cv=none; b=aKGKEUlm1JrK29NMMqVm8CI1o0y6g3vSQ3JpbzYfWjvmDNX4ViPErVFPEpaf6JKMipI3k6jZRE+odTLEZaMM/d2gdAvs31sgnYUIMON0L9/L1nJ9EiLucUxwW9EOWA8+z6wx6/jj5UDCuQuBA7JB4d4kfKZvS6cGN07uy7cTbcM=
+	t=1723642093; cv=none; b=Y4n693tJS/mDmSTVzTWhy8gUpLrjCk/RnXw4xWgJ5sg9oppvSTCh9OH8aw7YvCfBnGvfT323wkiHR/R90hHEwQ6sr/uAjmOs4c0DuBVQHYULfd4JX8i7Kpa96FsjSjwOYBcpAD/SNIIIv5NtXBBObylSH/b4it/scVjbH4QaKJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723641738; c=relaxed/simple;
-	bh=52woe/DhP6yxVtoJ7+/JjkpqgmOTnHaYBvNtOBgqJ9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ltFInKF7oCOAVMTWyOeXUDxSv04AJ4muL4nq1ktQpDu7vq94Pb0Ls/jqx8p46v8X/g5uG19qXWSb6m+kNcX3KdxlhIwVMos6XbN8A4wxJgnIboGo7Uv9G/eIZOn8CN5+OpnwavAa+6HvxDdFvLXUlJhiMgJU2Y921tYoGdLkeaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LeermY8z; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EBnJoU032754;
-	Wed, 14 Aug 2024 13:22:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=5
-	2woe/DhP6yxVtoJ7+/JjkpqgmOTnHaYBvNtOBgqJ9Y=; b=LeermY8zHzSZhQJ2s
-	rRYUW2uDhXMXxrOV6Ie/s6OW2Euuqd6PG6eENANPgn6Sa5gc3XqJM++JBt9M+/Sf
-	vez1J/ndQ37EcsBGnERJdDSHW/zLy9Riugf2CFSlh28maRbIMgtyffFqMDQMpmlU
-	GRb6WiCPHzZClygtnmMAcPLtZKCkn32L0eIE1xAbU/Iv80F7/j6luIt1eNF58fhs
-	RmazMSCJFCweF3rWDL2CkH83KtLbw7NukREKSgVJlzepORtMzyzOu0D4Kq0UQr3K
-	rXvfybw5HPbau7DRjwYQiFgAcgW0ucTrRekMKIILBgJMzxZFLysWAxveRrvprEoy
-	tyx0Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 410v1vrcta-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 13:22:06 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47EDM5bo024245;
-	Wed, 14 Aug 2024 13:22:06 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 410v1vrct3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 13:22:05 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47ECnG69011511;
-	Wed, 14 Aug 2024 13:22:04 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40xjhu9puu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 13:22:04 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47EDLxks51380600
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Aug 2024 13:22:01 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DA312004F;
-	Wed, 14 Aug 2024 13:21:59 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0984E2004D;
-	Wed, 14 Aug 2024 13:21:59 +0000 (GMT)
-Received: from [9.152.224.208] (unknown [9.152.224.208])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 14 Aug 2024 13:21:58 +0000 (GMT)
-Message-ID: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
-Date: Wed, 14 Aug 2024 15:21:58 +0200
+	s=arc-20240116; t=1723642093; c=relaxed/simple;
+	bh=V56bb2SBeWuj7U2AOoCQl9ccR/u0/St6ciB6GMAx3/s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=oyStCv907Q+a+0qXEZE16+6LIA4LgMNh0tMg71njFEl6p1C6IKcRyPVz2RHTt5RueQzLwAZAIKsd4bo4CZHJqVTWw0B8Y0ISgtMp0qTlvFQ855+aTjyKpv+QwaeRrTvQRNJR3oMv3qE1JadUnEOm8QBwK7ymztE62pYK65sGMrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vultr.com; spf=pass smtp.mailfrom=vultr.com; dkim=pass (2048-bit key) header.d=vultr.com header.i=@vultr.com header.b=ukpNUVZS; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vultr.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vultr.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3db1e21b0e4so4514128b6e.2
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:28:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vultr.com; s=google; t=1723642091; x=1724246891; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qpPX7lZVsuwgLLnRc1mGzsnfVgyXzTNONNpmbI4+pZM=;
+        b=ukpNUVZSYnEtejG5aJb4h4AOTkHKne4W76MMJ50MKL0F9KsxVykXmu0rm80i6bZX0P
+         TaIacJ5yGUmZFpU8G9l5nbULIDHYKXPZd6B0Q5Bi3M+CB4Uv33tc/07/OPVr4MDW05Xh
+         pL3HJntQGfwxgOZWG5lxC6372gs7owmyMpjNNZz9fn0xzArElg44qd+jBiKyNcVPmA86
+         T53Hu96lP7Yn/SVKlNbhhns3KtIvn8lk0qPw/pU8mJx++WPZ9MA3iNbrFj7lu4wq1k2u
+         Wqnf6eEbzJEwdWdPKsqAcG1ukIFUi4oWMhNjwJaAy3I00AmK7XacD0Df6m3zE4dGyOVX
+         +CjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723642091; x=1724246891;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qpPX7lZVsuwgLLnRc1mGzsnfVgyXzTNONNpmbI4+pZM=;
+        b=B2tO7mMpYe1lYiOREwXWvipNK79qGWAhp83Vk/BF2KdE1OhyjHTm836vpmfDrzIxyE
+         C/32T9G15JCEYxtnooIuBO136pF0tox+6T8ftkfPJnoU+jAzppPCw/lx+xMt7Spyic3J
+         AF720+8a1bjkpj8dKc7wZFN5UH8EUmlP67D9b6FjG4jGoXPT/iKIXgMAUmUYhVF3busW
+         MDCODwvRTY5y3+80SnkFNeFXb2o99HdjhloekckBwV+5ZarTNkQLXA/XLmPbUCZAc36p
+         fqAQSsfpBHBh60faHubvU+aIrZRHWS25Za5kA733UqU1q4THx8L7nL+CTkNegCy6S9M6
+         D9IA==
+X-Gm-Message-State: AOJu0YzuzBgtOXDMwYMQwDoH0dnoZK86JifACwU0gqfQl7QGUUWDQsNt
+	04iZ5RW5v5vQSXy4hoKHtKyZcG6WU7utqO3s+XTI9rm6trAZQaYbJhhNBOkOgua4Irjshd1wKLI
+	PnYBxE++Xx2R5sdnIwEyDL2V5qdRdSWwGLFBvBooD855SXJddODJ+jQ==
+X-Google-Smtp-Source: AGHT+IFieDgJ3jOJW1QIqhwCx+X4t2oVIxMIhWAW4LAW/O/SFpcuTm2RhrCT7rE3RO3Mwl8CaATwPibvp/mZL2zma2U=
+X-Received: by 2002:a05:6808:1150:b0:3da:b335:538e with SMTP id
+ 5614622812f47-3dd298dc3d5mr3303561b6e.8.1723642090888; Wed, 14 Aug 2024
+ 06:28:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in
- txopt_get
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Jeongjun Park <aha310510@gmail.com>, wenjia@linux.ibm.com,
-        jaka@linux.ibm.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-        gbayer@linux.ibm.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, dust.li@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20240814104910.243859-1-aha310510@gmail.com>
- <e2d56814-0664-4c3a-9d5f-3f32dc15ccd4@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <e2d56814-0664-4c3a-9d5f-3f32dc15ccd4@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0y2k-9VOra7wgj4QZyRJI0DyzkO0nLHd
-X-Proofpoint-GUID: OfSvat6veq4dpmJSbr2dUiDsrpezpumY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-14_09,2024-08-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- malwarescore=0 lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=748 clxscore=1015 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408140092
+From: Mike Waterman <mwaterman@vultr.com>
+Date: Wed, 14 Aug 2024 09:28:00 -0400
+Message-ID: <CABmay2CxFPpsgzSx6wCxyDzjw2cqwAAKs6YjiArR1A2UPLpgJA@mail.gmail.com>
+Subject: Add `auto` VRF table ID option in iproute2
+To: netdev@vger.kernel.org, stephen@networkplumber.org, 
+	=?UTF-8?Q?Daniel_Gr=C3=B6ber?= <dxld@darkboxed.org>
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
+Package: iproute2
+Version: 5.10.0-4
 
-On 14.08.24 15:11, D. Wythe wrote:
->     struct smc_sock {                /* smc sock container */
-> -    struct sock        sk;
-> +    union {
-> +        struct sock        sk;
-> +        struct inet_sock    inet;
-> +    };
+Feature request: Add an `auto` option for VRF table ID management like
+in Cumulus Linux. I believe it'd be the iproute2 package on Debian
+(11/12).
 
+Example: Instead of specifying, say, 1001 for a table ID, we'd do the
+following with the `auto` option:
 
-I don't see a path where this breaks, but it looks risky to me.
-Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
-Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
+```
+auto vrfexample
+iface vrfexample
+    vrf-table auto
+```
+
+Or:
+
+```
+ip link add vrfexample type vrf table auto
+```
+
+(I'm new to the list and this is my first request. I tried to be brief
+to respect time. Please ask any follow-ups as needed.)
+
+Thanks!
+
+Best,
+Mike Waterman
 
