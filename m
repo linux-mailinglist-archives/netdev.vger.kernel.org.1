@@ -1,357 +1,320 @@
-Return-Path: <netdev+bounces-118306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEB59512F8
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:16:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC73995130A
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C9A282087
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 03:16:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 945F9283EF9
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 03:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380F232C85;
-	Wed, 14 Aug 2024 03:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43877381D4;
+	Wed, 14 Aug 2024 03:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoP48sBp"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OnMgGH4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A513394;
-	Wed, 14 Aug 2024 03:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0733C4204B
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723605371; cv=none; b=Zz+eg8uOgcOtgafO1lzCZKwN0tU9R6KiGqvo6S3bMtEhEiNHXv93H/4Bur5vxySOy7Cqf489NK3oA8T+/RzgwzZmT70c8K/3FbkSbpmFTj6JgnKOfDrOP0/ywRaK9orMp6G7yLfeP7EWM5/As2bhuDp2hjUKbZ8RpvPi2aeJmrs=
+	t=1723605567; cv=none; b=X54iWOlBvJEpoqRc45j4PABOm3AQcoqr2gRZGXYQdBOGNLY2vtSiFICj4A0URCjJkzS91rmheW82D8py3Hc4kY5u6vefseGqLTOSOUGQjCxalmt9ccZJDnSH3wEh/qgGVxlzkUFrFyfcJbyVyiB2n6/0YDpC1vVsol2C9tphdbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723605371; c=relaxed/simple;
-	bh=gL5kFHzDGcNpuQvhLnaEZyo7Fuok7+JFbobMGciEdQQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=s0UOEV2saX6gEWdBoTyNdouAtP2WRmMzDVxRrBpc7eTDjUuCcBfjUh6oaaPAjMX4fTgV7ASeloZPgTQ705FA6rIAjNesJURTPV1cpRBB2J/ebtELyyksce6KgP44PJt8sFrBsqvCxcfp5M941F/4nAHaTnVrtLkRCaw+lli37Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MoP48sBp; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a1d7bc07b7so413139985a.0;
-        Tue, 13 Aug 2024 20:16:09 -0700 (PDT)
+	s=arc-20240116; t=1723605567; c=relaxed/simple;
+	bh=UE6un8hghOMyCwf0Kz4uUNrCGBbLKZppvBBVEul44s4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WrELpnyppy90w4Lp23IC2FvrpkBC5UkQjJEFdTFHoqT2qOrmn8+V77jtwtR9o8iUDp7K88MPLcCaaJw2NWub2VOhFr+t5L6VrDcYfsFSMnCoHIMj0uTUpsgWtyXCzpPJJPTXoB4QKAI48APzsATzGDtyrzRawPWowf02LTrTcmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OnMgGH4s; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52efdf02d13so10045818e87.2
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 20:19:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723605368; x=1724210168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gL5kFHzDGcNpuQvhLnaEZyo7Fuok7+JFbobMGciEdQQ=;
-        b=MoP48sBp1aLDgBl02x+5Go9R7zN9PJD6QKLme0M9c2fUtyeo17LEw9mmL6zEnqwAVS
-         J928h/pDNCNzV8NjurbvMw7TWBbz/uiJ79J+hZxslNvHkoCgCusob7KcRiBY36Su9y6C
-         hJtE0+E3pz23ZYLs8mzpk6QtacPN9Rc04MBz5GQVoGvOBRHFmDDZSPuK2NWcEw62VcWx
-         fl2Oq0dd0r1sM2M1nDegqOZAUh8mTfZu+SqvlBnsnAOR532db7kCxm27/SYgJ2iwUfp/
-         FAgx7yxMKkPfGPFWbcKtmVgIq1mTjtK2FXQY0/TargTaIsVCc3Rwnlp5D4QOBcqPAxvz
-         RMDg==
+        d=broadcom.com; s=google; t=1723605563; x=1724210363; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D8zqyiZlDFrYu6fAuIwT2tzW8eYeO0k+MqGwXychlDY=;
+        b=OnMgGH4skx50d8U1r3MsYuF4oFruHbSg6RVCFz8QxMfDVM7uBD2tEJxkfXfxJtxMk6
+         RnvpbqR2oAeZQ6Qmah8obIQEYmdt5+eEHBGaBZ/5QtQ8aFVH/H1ef4qJ6UoAvWlgsS7l
+         hx9kYTr+lsITCL8xaZDURK/hHOOYvCXg0nBMs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723605368; x=1724210168;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gL5kFHzDGcNpuQvhLnaEZyo7Fuok7+JFbobMGciEdQQ=;
-        b=jqrJPiDk4J8iuAH05z7/xKkCP/OXr1C5tGjzypEyWc0q68T3FH+mQIuF5DpWk8nPUu
-         OEgwtF6/5aJHDIgGdGw7egPE/d9biOeH+9MxpMCYY0p9nFVsKJ8EU23NWYsaCCBgmCtV
-         L4BdAatPZA0iMIjNjxUIezYBu5rZo2T81aefBmOF5fFdqhXQgERayqNduj/G8fftP8Ea
-         QL+e/KQGq7zWAt3EnoKF1nHJMzZ8hjcuccRdPfM0xnjUa6zF6kNv8HAzkN9wQVXZ7tYM
-         KBMjMI5ucXyHB10MttQjfyGQ/MfpI6/IWafCwLWwH7X/f7lyyLaRMfNKTpufGU03/4I8
-         WjBg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnPAidAKNH+lwPx62KxqNmhqE8iYam0AoTpba/UHQsnLkdH48O2RDtz86qwjQDJNRB+ve7V3JnFcyWfz59ZMn5qqCf+NPX1uXeTkOHMi7WkMaxy91HWmDAhWj9h4sABpnCzmhrGakFrJtJ+97/bS9qdgXF4AkHQec1CV2VAUURfuyRhAWWyg==
-X-Gm-Message-State: AOJu0Yy+4NpBTbe3hPuEr0FaNStfYiv5oNBISkJNu9X+/x7jDr5oHwhj
-	fsZYHf/P7yLSlXBvNNJIimQPQhPU0FQA+QmwqG3nrqUZPapBWjU5
-X-Google-Smtp-Source: AGHT+IF1qSogIJgN39CK/edq9OoeNnK2AmQgxeHsjP18PzTXK8fS7OFyyR4Z5adA4z2oUrk2/odenQ==
-X-Received: by 2002:a05:620a:4621:b0:79f:44d:bafb with SMTP id af79cd13be357-7a4ee33e84cmr164403685a.38.1723605368035;
-        Tue, 13 Aug 2024 20:16:08 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4c7dedf55sm392014285a.95.2024.08.13.20.16.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 20:16:07 -0700 (PDT)
-Date: Tue, 13 Aug 2024 23:16:07 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin Karsten <mkarsten@uwaterloo.ca>, 
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, 
- Joe Damato <jdamato@fastly.com>, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Breno Leitao <leitao@debian.org>, 
- Christian Brauner <brauner@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jan Kara <jack@suse.cz>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Johannes Berg <johannes.berg@intel.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
- "open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, 
- open list <linux-kernel@vger.kernel.org>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Message-ID: <66bc21772c6bd_985bf294b0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <ZrpuWMoXHxzPvvhL@mini-arch>
- <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
- <ZrqU3kYgL4-OI-qj@mini-arch>
- <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
- <Zrq8zCy1-mfArXka@mini-arch>
- <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
- <Zrrb8xkdIbhS7F58@mini-arch>
- <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+        d=1e100.net; s=20230601; t=1723605563; x=1724210363;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D8zqyiZlDFrYu6fAuIwT2tzW8eYeO0k+MqGwXychlDY=;
+        b=q7qMN2TcbfiGrmxGnEUhIbQIYhvEq7Wy1RYidkvGTaE74ysyDyr/NxzXV+mlRUpbWw
+         M1fgPtJpmvxheNUUhjWgUkfdxXH0Yn3RoYJg7xY5yF0PZbvBpJg8bmyK4oRRF20//7Zp
+         y8/3s07hpIHT0U3sFt1DMWNrktl7RnDVvCgxwiAmDgaQ0dFQgEyfOrZhnHU+SpyDim95
+         tr+t1pzBIeKTzh5Rlkrkr7RV0LitH4cb0vSrI8JMv0Tz9HHX2l0+H3HHCH9VW5uLpYm4
+         TaP0lV7qeaMywZ+Z3n9/0CuhwEExF367qFibPnwv0vLVGnSqU98oeesOhvSTRnP6h5sY
+         KmuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUF+EF5eH/xgJZdT456cosfYG5JYVhl08Ps1wWuXT8BPO9S7V9bXy3gYNkNXTBa7Hu5GoWRTpg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXsG9hVqtj0F6Et259mQ0Jg9VuhiKlRXflmii456kSWHrQFlUq
+	ac8FW4YshCb0rwD4XZSr0s9AXKusBr+tRHRMb2OyepznHjLrL+Qm1rXodJ1a1oatSKycC+yjZ7V
+	Z7KINCBGS13sssJ9PBQijHHcRSF7uFI75961W+pmA7438aXw=
+X-Google-Smtp-Source: AGHT+IHYzJAaOVGWBVUYMwIchE/Sc2szLIxuVcGNwE0L6jSmc2TarnCUWJHSbTYzVO0YOHYqLXYezdbt6izvKyZoFdM=
+X-Received: by 2002:a05:6512:3d0a:b0:52e:8071:e89d with SMTP id
+ 2adb3069b0e04-532edbaedbdmr883736e87.40.1723605562724; Tue, 13 Aug 2024
+ 20:19:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <20240812102210.61548-1-dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20240812102210.61548-1-dawid.osuchowski@linux.intel.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 14 Aug 2024 08:49:10 +0530
+Message-ID: <CAH-L+nOFqs-K5YzfrfmpRHbhDGM-+1ahhWh4NXATX1FqZiPVLQ@mail.gmail.com>
+Subject: Re: [PATCH iwl-net] ice: Add netif_device_attach/detach into PF reset flow
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, Igor Bagnucki <igor.bagnucki@intel.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000055deca061f9c317f"
+
+--00000000000055deca061f9c317f
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Martin Karsten wrote:
-> On 2024-08-13 00:07, Stanislav Fomichev wrote:
-> > On 08/12, Martin Karsten wrote:
-> >> On 2024-08-12 21:54, Stanislav Fomichev wrote:
-> >>> On 08/12, Martin Karsten wrote:
-> >>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
-> >>>>> On 08/12, Martin Karsten wrote:
-> >>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
-> >>>>>>> On 08/12, Joe Damato wrote:
-> >>>>>>>> Greetings:
-> =
+Hi David,
 
-> [snip]
-> =
+One question in line.
 
-> >>>>>>> Maybe expand more on what code paths are we trying to improve? =
-Existing
-> >>>>>>> busy polling code is not super readable, so would be nice to si=
-mplify
-> >>>>>>> it a bit in the process (if possible) instead of adding one mor=
-e tunable.
-> >>>>>>
-> >>>>>> There are essentially three possible loops for network processin=
-g:
-> >>>>>>
-> >>>>>> 1) hardirq -> softirq -> napi poll; this is the baseline functio=
-nality
-> >>>>>>
-> >>>>>> 2) timer -> softirq -> napi poll; this is deferred irq processin=
-g scheme
-> >>>>>> with the shortcomings described above
-> >>>>>>
-> >>>>>> 3) epoll -> busy-poll -> napi poll
-> >>>>>>
-> >>>>>> If a system is configured for 1), not much can be done, as it is=
- difficult
-> >>>>>> to interject anything into this loop without adding state and si=
-de effects.
-> >>>>>> This is what we tried for the paper, but it ended up being a hac=
-k.
-> >>>>>>
-> >>>>>> If however the system is configured for irq deferral, Loops 2) a=
-nd 3)
-> >>>>>> "wrestle" with each other for control. Injecting the larger
-> >>>>>> irq-suspend-timeout for 'timer' in Loop 2) essentially tilts thi=
-s in favour
-> >>>>>> of Loop 3) and creates the nice pattern describe above.
-> >>>>>
-> >>>>> And you hit (2) when the epoll goes to sleep and/or when the user=
-space
-> >>>>> isn't fast enough to keep up with the timer, presumably? I wonder=
+On Mon, Aug 12, 2024 at 3:52=E2=80=AFPM Dawid Osuchowski
+<dawid.osuchowski@linux.intel.com> wrote:
+>
+> Ethtool callbacks can be executed while reset is in progress and try to
+> access deleted resources, e.g. getting coalesce settings can result in a
+> NULL pointer dereference seen below.
+>
+> Once the driver is fully initialized, trigger reset:
+>         # echo 1 > /sys/class/net/<interface>/device/reset
+> when reset is in progress try to get coalesce settings using ethtool:
+>         # ethtool -c <interface>
+>
+> Calling netif_device_detach() before reset makes the net core not call
+> the driver when ethtool command is issued, the attempt to execute an
+> ethtool command during reset will result in the following message:
+>
+>     netlink error: No such device
+>
+> instead of NULL pointer dereference. Once reset is done and
+> ice_rebuild() is executing, the netif_device_attach() is called to allow
+> for ethtool operations to occur again in a safe manner.
+>
+> [  +0.000105] BUG: kernel NULL pointer dereference, address: 000000000000=
+0020
+> [  +0.000027] #PF: supervisor read access in kernel mode
+> [  +0.000011] #PF: error_code(0x0000) - not-present page
+> [  +0.000011] PGD 0 P4D 0
+> [  +0.000008] Oops: Oops: 0000 [#1] PREEMPT SMP PTI
+> [  +0.000012] CPU: 11 PID: 19713 Comm: ethtool Tainted: G S              =
+   6.10.0-rc7+ #7
+> [  +0.000015] Hardware name: Supermicro Super Server/X10SRi-F, BIOS 2.0 1=
+2/17/2015
+> [  +0.000013] RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
+> [  +0.000090] Code: 00 55 53 48 89 fb 48 89 f7 48 83 ec 08 0f b7 8b 86 04=
+ 00 00 0f b7 83 82 04 00 00 39 d1 7e 30 48 8b 4b 18 48 63 ea 48 8b 0c e9 <4=
+8> 8b 71 20 48 81 c6 a0 01 00 00 39 c2 7c 32 e8 ee fe ff ff 85 c0
+> [  +0.000029] RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
+> [  +0.000012] RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000=
+000000
+> [  +0.000012] RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3=
+f2e588
+> [  +0.000012] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000=
+000000
+> [  +0.000013] R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121=
+fa9000
+> [  +0.000012] R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e=
+65dd40
+> [  +0.000012] FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS=
+:0000000000000000
+> [  +0.000014] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  +0.000011] CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 0000000000=
+1706f0
+> [  +0.000012] Call Trace:
+> [  +0.000009]  <TASK>
+> [  +0.000007]  ? __die+0x23/0x70
+> [  +0.000012]  ? page_fault_oops+0x173/0x510
+> [  +0.000011]  ? ice_get_q_coalesce+0x2e/0xa0 [ice]
+> [  +0.000071]  ? search_module_extables+0x19/0x60
+> [  +0.000013]  ? search_bpf_extables+0x5f/0x80
+> [  +0.000012]  ? exc_page_fault+0x7e/0x180
+> [  +0.000013]  ? asm_exc_page_fault+0x26/0x30
+> [  +0.000014]  ? ice_get_q_coalesce+0x2e/0xa0 [ice]
+> [  +0.000070]  ice_get_coalesce+0x17/0x30 [ice]
+> [  +0.000070]  coalesce_prepare_data+0x61/0x80
+> [  +0.000012]  ethnl_default_doit+0xde/0x340
+> [  +0.000012]  genl_family_rcv_msg_doit+0xf2/0x150
+> [  +0.000013]  genl_rcv_msg+0x1b3/0x2c0
+> [  +0.000009]  ? __pfx_ethnl_default_doit+0x10/0x10
+> [  +0.000011]  ? __pfx_genl_rcv_msg+0x10/0x10
+> [  +0.000010]  netlink_rcv_skb+0x5b/0x110
+> [  +0.000013]  genl_rcv+0x28/0x40
+> [  +0.000007]  netlink_unicast+0x19c/0x290
+> [  +0.000012]  netlink_sendmsg+0x222/0x490
+> [  +0.000011]  __sys_sendto+0x1df/0x1f0
+> [  +0.000013]  __x64_sys_sendto+0x24/0x30
+> [  +0.000340]  do_syscall_64+0x82/0x160
+> [  +0.000309]  ? __mod_memcg_lruvec_state+0xa6/0x150
+> [  +0.000309]  ? __lruvec_stat_mod_folio+0x68/0xa0
+> [  +0.000311]  ? folio_add_file_rmap_ptes+0x86/0xb0
+> [  +0.000309]  ? next_uptodate_folio+0x89/0x290
+> [  +0.000309]  ? filemap_map_pages+0x521/0x5f0
+> [  +0.000302]  ? do_fault+0x26e/0x470
+> [  +0.000293]  ? __handle_mm_fault+0x7dc/0x1060
+> [  +0.000295]  ? __count_memcg_events+0x58/0xf0
+> [  +0.000289]  ? count_memcg_events.constprop.0+0x1a/0x30
+> [  +0.000292]  ? handle_mm_fault+0xae/0x320
+> [  +0.000284]  ? do_user_addr_fault+0x33a/0x6a0
+> [  +0.000280]  ? exc_page_fault+0x7e/0x180
+> [  +0.000289]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  +0.000271] RIP: 0033:0x7faee60d8e27
+>
+> Fixes: 67fe64d78c43 ("ice: Implement getting and setting ethtool coalesce=
+")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethe=
+rnet/intel/ice/ice_main.c
+> index eaa73cc200f4..16b4920741ff 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -608,6 +608,8 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_res=
+et_req reset_type)
+>                         memset(&vsi->mqprio_qopt, 0, sizeof(vsi->mqprio_q=
+opt));
+>                 }
+>         }
+> +       if (vsi->netdev)
+> +               netif_device_detach(vsi->netdev);
+>  skip:
+>
+>         /* clear SW filtering DB */
+> @@ -7568,11 +7570,13 @@ static void ice_update_pf_netdev_link(struct ice_=
+pf *pf)
+>
+>                 ice_get_link_status(pf->vsi[i]->port_info, &link_up);
+>                 if (link_up) {
+> +                       netif_device_attach(pf->vsi[i]->netdev);
+>                         netif_carrier_on(pf->vsi[i]->netdev);
+>                         netif_tx_wake_all_queues(pf->vsi[i]->netdev);
+>                 } else {
+>                         netif_carrier_off(pf->vsi[i]->netdev);
+>                         netif_tx_stop_all_queues(pf->vsi[i]->netdev);
+> +                       netif_device_detach(pf->vsi[i]->netdev);
+[Kalesh] Is there any reason to attach back the netdev only if link is
+up? IMO, you should attach the device back irrespective of physical
+link status. In ice_prepare_for_reset(), you are detaching the device
+unconditionally.
 
-> >>>>> if need to use this opportunity and do proper API as Joe hints in=
- the
-> >>>>> cover letter. Something over netlink to say "I'm gonna busy-poll =
-on
-> >>>>> this queue / napi_id and with this timeout". And then we can esse=
-ntially make
-> >>>>> gro_flush_timeout per queue (and avoid
-> >>>>> napi_resume_irqs/napi_suspend_irqs). Existing gro_flush_timeout f=
-eels
-> >>>>> too hacky already :-(
-> >>>>
-> >>>> If someone would implement the necessary changes to make these par=
-ameters
-> >>>> per-napi, this would improve things further, but note that the cur=
-rent
-> >>>> proposal gives strong performance across a range of workloads, whi=
-ch is
-> >>>> otherwise difficult to impossible to achieve.
-> >>>
-> >>> Let's see what other people have to say. But we tried to do a simil=
-ar
-> >>> setup at Google recently and getting all these parameters right
-> >>> was not trivial. Joe's recent patch series to push some of these in=
-to
-> >>> epoll context are a step in the right direction. It would be nice t=
-o
-> >>> have more explicit interface to express busy poling preference for
-> >>> the users vs chasing a bunch of global tunables and fighting agains=
-t softirq
-> >>> wakups.
-> >>
-> >> One of the goals of this patch set is to reduce parameter tuning and=
- make
-> >> the parameter setting independent of workload dynamics, so it should=
- make
-> >> things easier. This is of course notwithstanding that per-napi setti=
-ngs
-> >> would be even better.
+I may be missing something here.
+>                 }
+>         }
+>  }
 
-I don't follow how adding another tunable reduces parameter tuning.
-
-> >>
-> >> If you are able to share more details of your previous experiments (=
-here or
-> >> off-list), I would be very interested.
-> > =
-
-> > We went through a similar exercise of trying to get the tail latencie=
-s down.
-> > Starting with SO_BUSY_POLL, then switching to the per-epoll variant (=
-except
-> > we went with a hard-coded napi_id argument instead of tracking) and t=
-rying to
-> > get a workable set of budget/timeout/gro_flush. We were fine with bur=
-ning all
-> > cpu capacity we had and no sleep at all, so we ended up having a bunc=
-h
-> > of special cases in epoll loop to avoid the sleep.
-> > =
-
-> > But we were trying to make a different model work (the one you mentio=
-n in the
-> > paper as well) where the userspace busy-pollers are just running napi=
-_poll
-> > on one cpu and the actual work is consumed by the userspace on a diff=
-erent cpu.
-> > (we had two epoll fds - one with napi_id=3Dxxx and no sockets to driv=
-e napi_poll
-> > and another epoll fd with actual sockets for signaling).
-> > =
-
-> > This mode has a different set of challenges with socket lock, socket =
-rx
-> > queue and the backlog processing :-(
-> =
-
-> I agree. That model has challenges and is extremely difficult to tune r=
-ight.
-> =
-
-> >>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for th=
-e sake of
-> >>>> an individual queue or application to make sure that IRQ suspensio=
-n is
-> >>>> enabled/disabled right away when the state of the system changes f=
-rom busy
-> >>>> to idle and back.
-> >>>
-> >>> Can we not handle everything in napi_busy_loop? If we can mark some=
- napi
-> >>> contexts as "explicitly polled by userspace with a larger defer tim=
-eout",
-> >>> we should be able to do better compared to current NAPI_F_PREFER_BU=
-SY_POLL
-> >>> which is more like "this particular napi_poll call is user busy pol=
-ling".
-> >>
-> >> Then either the application needs to be polling all the time (wastin=
-g cpu
-> >> cycles) or latencies will be determined by the timeout.
-> >>
-> >> Only when switching back and forth between polling and interrupts is=
- it
-> >> possible to get low latencies across a large spectrum of offered loa=
-ds
-> >> without burning cpu cycles at 100%.
-> > =
-
-> > Ah, I see what you're saying, yes, you're right. In this case ignore =
-my comment
-> > about ep_suspend_napi_irqs/napi_resume_irqs.
-> =
-
-> Thanks for probing and double-checking everything! Feedback is importan=
-t =
-
-> for us to properly document our proposal.
-> =
-
-> > Let's see how other people feel about per-dev irq_suspend_timeout. Pr=
-operly
-> > disabling napi during busy polling is super useful, but it would stil=
-l
-> > be nice to plumb irq_suspend_timeout via epoll context or have it set=
- on
-> > a per-napi basis imho.
-> =
-
-> Fingers crossed. I hope this patch will be accepted, because it has =
-
-> practical performance and efficiency benefits, and that this will =
-
-> further increase the motivation to re-design the entire irq =
-
-> defer(/suspend) infrastructure for per-napi settings.
-
-Overall, the idea of keeping interrupts disabled during event
-processing is very interesting.
-
-Hopefully the interface can be made more intuitive. Or documented more
-easily. I had to read the kernel patches to fully (perhaps) grasp it.
-
-Another +1 on the referenced paper. Pointing out a specific difference
-in behavior that is unrelated to the protection domain, rather than a
-straightforward kernel vs user argument. The paper also had some
-explanation that may be clearer for a commit message than the current
-cover letter:
-
-"user-level network stacks put the application in charge of the entire
-network stack processing (cf. Section 2). Interrupts are disabled and
-the application coordinates execution by alternating between
-processing existing requests and polling the RX queues for new data"
-" [This series extends this behavior to kernel busy polling, while
-falling back onto interrupt processing to limit CPU overhead.]
-
-"Instead of re-enabling the respective interrupt(s) as soon as
-epoll_wait() returns from its NAPI busy loop, the relevant IRQs stay
-masked until a subsequent epoll_wait() call comes up empty, i.e., no
-events of interest are found and the application thread is about to be
-blocked."
-
-"A fallback technical approach would use a kernel timeout set on the
-return path from epoll_wait(). If necessary, the timeout re-enables
-interrupts regardless of the application=E2=80=99s (mis)behaviour."
-[Where misbehavior is not calling epoll_wait again]
-
-"The resulting execution model mimics the execution model of typical
-user-level network stacks and does not add any requirements compared
-to user-level networking. In fact, it is slightly better, because it
-can resort to blocking and interrupt delivery, instead of having to
-continuously busyloop during idle times."
-
-This last part shows a preference on your part to a trade-off:
-you want low latency, but also low cpu utilization if possible.
-This also came up in this thread. Please state that design decision
-explicitly.
-
-There are plenty of workloads where burning a core is acceptable
-(especially as core count continues increasing), not "slightly worse".
-Kernel polling with full busy polling is also already possible, by
-choosing a very high napi_defer_hard_irqs and gro_flush_timeout. So
-high in fact, that these tunables need not be tuned carefully. So
-what this series add is not interrupt suppression during event
-processing per se, but doing so in a hybrid mode balancing latency
-and cpu load.
+> --
+> 2.44.0
+>
+>
 
 
+--
+Regards,
+Kalesh A P
+
+--00000000000055deca061f9c317f
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIIPtc0QfBYf6Wof/1YgfDgYq0Cxz7Hk/YZOW33lEJs/nMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDgxNDAzMTkyM1owaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB3hwKnksyS
+94JPfOErruVb9wHlzOBpTgd1JU4ALiSKeGX3Zua5l46sB1AlayXXDeAEZy36IsJG9/t85L9Ip056
+bqFSomYwrXBEGcCE/oGob92UIih7THRz001Xcn199qXFwfnnmtvX0EPKtpsp2rauj5T6nKxU0604
+0M+YUBGnyazNSmoaV5eS/4GWt9Kxom0HxHhI9WKgrMLOlTx4LaKEJJzqWC40jw7yjlNyi4jowM1I
+FRGMq7Z7d9BlAvZTsiPgjLlTN4Jp5UJum/8h1V573du73ri7AMjeaMW4gFUb54pQzmf/9cG+GY1F
+O5D72+zCrVat2UFqw3LqrEsME/16
+--00000000000055deca061f9c317f--
 
