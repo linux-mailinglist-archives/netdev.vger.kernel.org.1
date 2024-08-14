@@ -1,81 +1,56 @@
-Return-Path: <netdev+bounces-118447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 284F59519F6
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043C3951A57
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6BA61F23403
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 373D31C2165B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5D61AED3C;
-	Wed, 14 Aug 2024 11:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E9B19EEAF;
+	Wed, 14 Aug 2024 11:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="RU7lzRw7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brqXe4Nb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD483A29C
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4616143879
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723635205; cv=none; b=FNSoHwuNRmpyQwrN6WUEH2os0MVW9N1rQ6X5bQlTzv1Cv8Zsn4jlflu593HoAR2/tdvoKFwX63b5+NMW2QFHbjNcAswIpQo8wY5xiYWaU2vskxBYg+PJaP6+qOpI1MusIdXxHEspm0wLB1kxTOWjidsywM/5A+Z4FXJAqiiJwfw=
+	t=1723635969; cv=none; b=RfU52sXNWUid+/FhSOKog965blqKnJCIDxDKVSVEa4AZt+AS2CV92NQ4XrR6PouLqd60AVKfmKRt/hfHrAHc/GrW94Hjx6g55x8OMwt+0pMAuT2cN84v9/dC+U7RkiWqY4YHd/fi8upHKe8DL8jSNW29VKovuf2xLTqPlAjQmns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723635205; c=relaxed/simple;
-	bh=sJxo3o8K9KDeAWhBjPPWO10Ny3PWd7xWJyRQuyO8sf4=;
+	s=arc-20240116; t=1723635969; c=relaxed/simple;
+	bh=W0++7NsE+uSBaD5heL7GBMaXR3rmJU8cgDBbLfCucVw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N9Mu0IAfTScPbFWSqjYfueez24ZynL6bnyr7zb+YSmMq0UxF+TJJW4y0anL32hrOcWbVaR1jcNi0Be9fhHF24CXCXfds5ppB1eCxESo0qts2WIwO1OJ8U9Ocq6G27rxmxVtLNlE9h3B3afCZUto0vSV1brLtFSKPdEuuXfnSYkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=RU7lzRw7; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42803bbf842so64135105e9.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 04:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723635202; x=1724240002; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uEzhaGqc2uKIO2GIW3tkbCIZ74uL5DIJxcJ/qRFa2wk=;
-        b=RU7lzRw7RVib9/YMOSS1v1KSNN7PCO6EECFFmDzIgnR6YwW4pBfaCIuTI/fUqcOx7k
-         PXbZlyS8c3f3q9E8BTQ1SEPGqGMbJlyHWZEMJUr6o6XjWoxHFQtalOItfxlrvnsUCvKc
-         eNc6qyHrYOvgFI6L1MaT5e1ra0W7ZcnNMbRVM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723635202; x=1724240002;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uEzhaGqc2uKIO2GIW3tkbCIZ74uL5DIJxcJ/qRFa2wk=;
-        b=ojCiWdwtRP0DqcEUL1bdNZ/NENTWU9yaSM94gFifKo5fY64c6DEvrwX1yDEkZcfrqW
-         qYacUUEwxo6R5HlYjlE6I5b9qRUSeNaV/Pes2Pxh6ZqUqeImNB0MjJJAk6hRsCknFFy9
-         ev+RoCOHcIBnN/Jl7F6UgrPBiSc5NDPZBsby7zdCNiOPWmIy/V2xb4oadGK4PePRJVsW
-         uKTZPZE/FE272WFNJl7scRYMZuo88pDYxrTuUPlYLQAO+0hRECEHOynODgREejBKG07p
-         40VSCvi63+HtwbCh3LK7m/KXm0L70dQM9ovNln4Jqsv3KGGNu8ig7MnTd6ogN2KUPc4O
-         +5bQ==
-X-Gm-Message-State: AOJu0Yxvyu6p7hBOEjCTCnckC4IhKb2Ixz4sn8jGXJzqRUCYyVRjibod
-	6NDJxvah6COKTNI66+zSya/XwokcIbpBHMkDoakCRieuy6byjcMhTBNZp0VbpCA=
-X-Google-Smtp-Source: AGHT+IHZRC7tiMJ9Hv2wWUkB/F+PTMZkEaHi1EnDmtBDYexvU24sdPR3Mx6Ff6UfCuT4fjOrRyIftQ==
-X-Received: by 2002:a05:600c:4706:b0:426:6fd2:e14b with SMTP id 5b1f17b1804b1-429dd2365c1mr19467345e9.11.1723635202092;
-        Wed, 14 Aug 2024 04:33:22 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429dec892c8sm17668235e9.0.2024.08.14.04.33.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 04:33:21 -0700 (PDT)
-Date: Wed, 14 Aug 2024 12:33:20 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, shannon.nelson@amd.com
-Subject: Re: [PATCH net 1/2] ionic: Fix napi case where budget == 0
-Message-ID: <ZryWAFkWSmp3brjE@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Brett Creeley <brett.creeley@amd.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, shannon.nelson@amd.com
-References: <20240813234122.53083-1-brett.creeley@amd.com>
- <20240813234122.53083-2-brett.creeley@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EyrdaKnEIe6fy4LY0HQEWKKNLqjN+HmlKfXTp6cFa5HdpRtJm6jFmYILxg8STQiNO7idfRoTRCme8vMJ+ouDlto1UMDsKVIa2YvZBUJbA4KFKe97jY0v47y+QXvQy7X628zESJF7lUfWqAUuGSfCUS9zLLlCDqIhANVRBBRskYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brqXe4Nb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE71C4AF0D;
+	Wed, 14 Aug 2024 11:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723635969;
+	bh=W0++7NsE+uSBaD5heL7GBMaXR3rmJU8cgDBbLfCucVw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=brqXe4Nbm7O0OeNAK3sXgWPD6JAkm/AVudjTmiDTEZOXC0oB6fwPL5d7STY7mTldQ
+	 D3UvfUE+2FIx1mk23nSZVURWGFpwgXu3u+2FKc8PXuiBfDTkbjNXeq5faEWhlvVt+8
+	 eW0b7zfApy/l1wcPdh5Co6hMOZ4ePEoM5+yVYKbvTuE0TJ/z7IqupZV8EgwAMga9lx
+	 Pi0D90lb1jFsTGn4/LGktEPoQbMPzWiymeDCBg99LWxjAUL4gl4L/A4Ccm12OJOES4
+	 qLapEs6aVWJYcWmSb1qSKTGxqnPvwca/7219R4hGL1b2jA/0U/zAuVD8ZyWYx4fZaR
+	 c46IOKN0a68pQ==
+Date: Wed, 14 Aug 2024 12:46:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maciek Machnikowski <maciek@machnikowski.net>
+Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
+	jacob.e.keller@intel.com, vadfed@meta.com, darinzon@amazon.com,
+	kuba@kernel.org
+Subject: Re: [RFC 1/3] ptp: Implement timex esterror support
+Message-ID: <20240814114605.GC69536@kernel.org>
+References: <20240813125602.155827-1-maciek@machnikowski.net>
+ <20240813125602.155827-2-maciek@machnikowski.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,27 +59,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240813234122.53083-2-brett.creeley@amd.com>
+In-Reply-To: <20240813125602.155827-2-maciek@machnikowski.net>
 
-On Tue, Aug 13, 2024 at 04:41:21PM -0700, Brett Creeley wrote:
-> The change in the fixes allowed the ionic_tx_cq_service() function
-> to be called when budget == 0, but no packet completions will
-> actually be serviced since it returns immediately when budget is
-> passed in as 0. Fix this by not checking budget before entering
-> the completion servicing while loop. This will allow a single
-> cq entry to be processed since ++work_done will always be greater
-> than work_to_do.
+On Tue, Aug 13, 2024 at 12:56:00PM +0000, Maciek Machnikowski wrote:
+> The Timex structure returned by the clock_adjtime() POSIX API allows
+> the clock to return the estimated error. Implement getesterror
+> and setesterror functions in the ptp_clock_info to enable drivers
+> to interact with the hardware to get the error information.
 > 
-> With this change a simple netconsole test as described in
-> Documentation/networking/netconsole.txt works as expected.
+> getesterror additionally implements returning hw_ts and sys_ts
+> to enable upper layers to estimate the maximum error of the clock
+> based on the last time of correction. This functionality is not
+> directly implemented in the clock_adjtime and will require
+> a separate interface in the future.
 > 
-> Fixes: 2f74258d997c ("ionic: minimal work with 0 budget")
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
 > ---
->  drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  drivers/ptp/ptp_clock.c          | 18 +++++++++++++++++-
+>  include/linux/ptp_clock_kernel.h | 11 +++++++++++
+>  2 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index c56cd0f63909..2cb1f6af60ea 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -164,9 +164,25 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
+>  
+>  			err = ops->adjphase(ops, offset);
+>  		}
+> +	} else if (tx->modes & ADJ_ESTERROR) {
+> +		if (ops->setesterror)
+> +			if (tx->modes & ADJ_NANO)
+> +				err = ops->setesterror(ops, tx->esterror * 1000);
+> +			else
+> +				err = ops->setesterror(ops, tx->esterror);
 
-I think fixes may need to CC stable, but in either case:
+Both GCC-14 and Clang-18 complain when compiling with W=1 that the relation
+of the else to the two if's is ambiguous. Based on indentation I suggest
+adding a { } to the outer-if.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+>  	} else if (tx->modes == 0) {
+> +		long esterror;
+> +
+>  		tx->freq = ptp->dialed_frequency;
+> -		err = 0;
+> +		if (ops->getesterror) {
+> +			err = ops->getesterror(ops, &esterror, NULL, NULL);
+> +			if (err)
+> +				return err;
+> +			tx->modes &= ADJ_NANO;
+> +			tx->esterror = esterror;
+> +		} else {
+> +			err = 0;
+> +		}
+>  	}
+>  
+>  	return err;
+
+...
 
