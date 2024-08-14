@@ -1,146 +1,187 @@
-Return-Path: <netdev+bounces-118371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0B49516B1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:36:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0EB49516B5
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E2CE1C216CB
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:36:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B69E280FCD
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6015413D8AC;
-	Wed, 14 Aug 2024 08:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6155913F01A;
+	Wed, 14 Aug 2024 08:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1BzCgrJ5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LxFeso71"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lgjK4w4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065513C9A3;
-	Wed, 14 Aug 2024 08:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E8913AD18
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723624597; cv=none; b=W9/XCK4GBagpH+w92nRSCNVQ9Boovbh1thA4xJa6wraP+pIHhBhUjxVFiWFyIe/uEDFDJaYr2Xbu0deZEOBnGFxjXsBMeM10yyl7Lo7lRpH01VgxKKl54901ZQfLA9hlS+fDIgqE9MA4RoBOGsrFrMgT4JTWsLVb/REUxVnDOkw=
+	t=1723624646; cv=none; b=hWuAh08q0dzZBitnwb3oJxHp7nQsnkmuSCn+hTtTDdaSNyg+f0W7TCAotT+ldfgtFVcyU/QfOU6IzYmRtoaxZoZ3hlHYcr4pEWC17UGT07eKUN4k2h4BpXCbcsCc57RsAdEwUr1X9m+TVTqmqdAThlNp4WtEEsGLHg2fFcGYAZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723624597; c=relaxed/simple;
-	bh=VXCGZWQuWfTRAw65U8n6iAZqDA9V0VPlTJr2IadTOjw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=A1B94Y+tqdmWLsp/rjvLnvFRZp3wh85C7R8PZTwoBaGg0ZaHxIWnibpwolTHRqQAdKCRnXTelv7geKz2GtScbyjXxSDeXI8KM7TlCS81KpTfHnlL/WVhucbVf2N1RZ502DUKyIU9nMgH9dETCv8cxKY1g55hSa+Kr1tFrzmGsfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1BzCgrJ5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LxFeso71; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1723624594;
+	s=arc-20240116; t=1723624646; c=relaxed/simple;
+	bh=aZOB9mN762DDkKivmK/LpSGlLxoxhfXRQmMRy9JdTLA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aUHQ7uwGAwG/93r6/e/ozoDCEH6GZQ+nVWYLlgRyBpPdtXrX1ITxG9hWWM3zfXoumCQat2IHWR5cCARjJaEceDogNvQ27ZmDmxaHaSbyfQq8wtyR5UHXXPXvuVTxcTmUrIHJNetvI/BavO4RsyjeYZAG3s0TzILswlAVb3Gx97s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lgjK4w4d; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6a28249c-be3a-498a-8a48-af853350c5d8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723624641;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OQEiZAOw6fZAmQXa97WENJ1ydcrexOcWOenvv7CDZ5Q=;
-	b=1BzCgrJ5kxkjecdhp/u/ZjQUJAVTeKEcSbiSL/Ck+bB8f7+T3823SbIz/2nxsW4V2otlrN
-	Gg9RYsrTanmBWL1prKCRm+KRQqMKRaaFnniqkhcJVpiDsuQ3uqugLwI07G1gblYiDMG6Fx
-	x22yUMBqxFbpgF5sbQPlgxlrmjHYfJT2QPewgdeGu5pTPZSjI9QYNsz8FPwARfjaebi4GM
-	jZ5VaqGzolGLZEOnkCT6P8HCpfEXjhepbwsFqpH3FDP0Lg7ng+jkcgOIZyo2jnfxIghZ/0
-	qUoQBc0cRvoZliU1NZ7OQQfbTbqdWFsweTgdZctS4OJgxkarmtUD7EIbYW38Gw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1723624594;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OQEiZAOw6fZAmQXa97WENJ1ydcrexOcWOenvv7CDZ5Q=;
-	b=LxFeso71GT04QSO6yzVnAdZXnvuip1VUgwzP+Ire7M1nwX53AQBEF0EKraW2hO4xjCgoeH
-	x0jxTK7nbpOwfvAw==
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, Sriram Yagnaraman
- <sriram.yagnaraman@est.tech>, magnus.karlsson@intel.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- bpf@vger.kernel.org, sriram.yagnaraman@ericsson.com,
- richardcochran@gmail.com, benjamin.steinke@woks-audio.com,
- bigeasy@linutronix.de, Chandan Kumar
- Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net-next 4/4] igb: add AF_XDP zero-copy Tx support
-In-Reply-To: <Zrd0vnsU2l0OTsvj@boxer>
-References: <20240808183556.386397-1-anthony.l.nguyen@intel.com>
- <20240808183556.386397-5-anthony.l.nguyen@intel.com>
- <Zrd0vnsU2l0OTsvj@boxer>
-Date: Wed, 14 Aug 2024 10:36:32 +0200
-Message-ID: <874j7nzejz.fsf@kurt.kurt.home>
+	bh=ZU85aRcnLeKwDO62xl2WYaro1cSTjHoMcnP7VtGOiLo=;
+	b=lgjK4w4dB5XtCoKI5QFEE21CO4Vv8NOBj5YtrmByO9Lx0XhGDFdKY5c3lxeyEJ3G0/+Hlt
+	DM9mUUkaNTRrFIcqOc8Yjwuk2+Pm87Ls7r4u8i+tsyEMPD2IqI917qnPpqpmH68u5UvCu4
+	HZ5Zb2v5Ahs3KbVqQWYzJQ8qwues2mo=
+Date: Wed, 14 Aug 2024 09:37:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Subject: Re: [PATCH net v2 1/2] ptp: ocp: adjust sysfs entries to expose tty
+ information
+To: Jiri Slaby <jirislaby@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Vadim Fedorenko <vadfed@meta.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org
+References: <20240805220500.1808797-1-vadfed@meta.com>
+ <2024081350-tingly-coming-a74d@gregkh>
+ <a38797d7-326d-4ca9-b764-61045ad17b50@linux.dev>
+ <dc9df0fd-6344-49ad-87c6-8e5c63857bd6@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <dc9df0fd-6344-49ad-87c6-8e5c63857bd6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
---=-=-=
-Content-Type: text/plain
+On 14/08/2024 06:00, Jiri Slaby wrote:
+> On 13. 08. 24, 20:24, Vadim Fedorenko wrote:
+>> On 13/08/2024 10:33, Greg Kroah-Hartman wrote:
+>>> On Mon, Aug 05, 2024 at 03:04:59PM -0700, Vadim Fedorenko wrote:
+>>>> Starting v6.8 the serial port subsystem changed the hierarchy of 
+>>>> devices
+>>>> and symlinks are not working anymore. Previous discussion made it clear
+>>>> that the idea of symlinks for tty devices was wrong by design. 
+>>>> Implement
+>>>> additional attributes to expose the information. Fixes tag points to 
+>>>> the
+>>>> commit which introduced the change.
+>>>>
+>>>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be 
+>>>> children of serial core port device")
+>>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>>>> ---
+>>>>   drivers/ptp/ptp_ocp.c | 68 
+>>>> +++++++++++++++++++++++++++++++++----------
+>>>>   1 file changed, 52 insertions(+), 16 deletions(-)
+>>>>
+>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+>>>> index ee2ced88ab34..7a5026656452 100644
+>>>> --- a/drivers/ptp/ptp_ocp.c
+>>>> +++ b/drivers/ptp/ptp_ocp.c
+>>>> @@ -3346,6 +3346,55 @@ static EXT_ATTR_RO(freq, frequency, 1);
+>>>>   static EXT_ATTR_RO(freq, frequency, 2);
+>>>>   static EXT_ATTR_RO(freq, frequency, 3);
+>>>> +static ssize_t
+>>>> +ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, 
+>>>> char *buf)
+>>>> +{
+>>>> +    struct dev_ext_attribute *ea = to_ext_attr(attr);
+>>>> +    struct ptp_ocp *bp = dev_get_drvdata(dev);
+>>>> +    struct ptp_ocp_serial_port *port;
+>>>> +
+>>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
+>>>
+>>> That's insane pointer math, how do we know this is correct?
+>>>
+>>>> +    return sysfs_emit(buf, "ttyS%d", port->line);
+>>>> +}
+>>>> +
+>>>> +static umode_t
+>>>> +ptp_ocp_timecard_tty_is_visible(struct kobject *kobj, struct 
+>>>> attribute *attr, int n)
+>>>> +{
+>>>> +    struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+>>>> +    struct ptp_ocp_serial_port *port;
+>>>> +    struct device_attribute *dattr;
+>>>> +    struct dev_ext_attribute *ea;
+>>>> +
+>>>> +    if (strncmp(attr->name, "tty", 3))
+>>>> +        return attr->mode;
+>>>> +
+>>>> +    dattr = container_of(attr, struct device_attribute, attr);
+>>>> +    ea = container_of(dattr, struct dev_ext_attribute, attr);
+>>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
+>>>
+>>> That's crazy pointer math, how are you ensured that it is correct?  Why
+>>> isn't there a container_of() thing here instead?
+>>
+>> Well, container_of cannot be used here because the attributes are static
+>> while the function reads dynamic instance. The only values that are
+>> populated into the attributes of the group are offsets.
+>> But I can convert it to a helper which will check that the offset 
+>> provided is the real offset of the structure we expect. And it could 
+>> be reused in both "is_visible" and "show" functions.
+> 
+> Strong NACK against this approach.
+> 
+> What about converting those 4 ports into an array and adding an enum { 
+> PORT_GNSS, POTR_GNSS2, PORT_MAC, PORT_NMEA }?
 
-On Sat Aug 10 2024, Maciej Fijalkowski wrote:
->> +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, budget);
->> +	if (!nb_pkts)
->> +		return true;
->> +
->> +	while (nb_pkts-- > 0) {
->> +		dma = xsk_buff_raw_get_dma(pool, descs[i].addr);
->> +		xsk_buff_raw_dma_sync_for_device(pool, dma, descs[i].len);
->> +
->> +		tx_buffer_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
->> +		tx_buffer_info->bytecount = descs[i].len;
->> +		tx_buffer_info->type = IGB_TYPE_XSK;
->> +		tx_buffer_info->xdpf = NULL;
->> +		tx_buffer_info->gso_segs = 1;
->> +		tx_buffer_info->time_stamp = jiffies;
->> +
->> +		tx_desc = IGB_TX_DESC(tx_ring, tx_ring->next_to_use);
->> +		tx_desc->read.buffer_addr = cpu_to_le64(dma);
->> +
->> +		/* put descriptor type bits */
->> +		cmd_type = E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
->> +			   E1000_ADVTXD_DCMD_IFCS;
->> +		olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
->> +
->> +		cmd_type |= descs[i].len | IGB_TXD_DCMD;
->
-> This is also sub-optimal as you are setting RS bit on each Tx descriptor,
-> which will in turn raise a lot of irqs. See how ice sets RS bit only on
-> last desc from a batch and then, on cleaning side, how it finds a
-> descriptor that is supposed to have DD bit written by HW.
+Why is it a problem? I don't see big difference between these 2
+implementations:
 
-I see your point. That requires changes to the cleaning side. However,
-igb_clean_tx_irq() is shared between normal and zero-copy path.
+struct ptp_ocp_serial_port *get_port(struct ptp_ocp *bp, void *offset)
+{
+	switch((uintptr_t)offset) {
+		case offsetof(struct ptp_ocp, gnss_port):
+			return &bp->gnss_port;
+		case offsetof(struct ptp_ocp, gnss2_port):
+			return &bp->gnss2_port;
+		case offsetof(struct ptp_ocp, mac_port):
+			return &bp->mac_port;
+		case offsetof(struct ptp_ocp, nmea_port):
+			return &bp->nmea_port;
+	}
+	return NULL;
+}
 
-The amount of irqs can be also controlled by irq coalescing or even
-using busy polling. So I'd rather keep this implementation as simple as
-it is now.
+and:
 
-Thanks,
-Kurt
+struct ptp_ocp_serial_port *get_port(struct ptp_ocp *bp, void *offset)
+{
+	switch((enum port_type)offset) {
+		case PORT_GNSS:
+			return &bp->tty_port[PORT_GNSS];
+		case PORT_GNSS2:
+			return &bp->tty_port[PORT_GNSS2];
+		case PORT_MAC:
+			return &bp->tty_port[PORT_MAC];
+		case PORT_NMEA:
+			return &bp->tty_port[PORT_NMEA];
+	}
+	return NULL;
+}
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+The second option will require more LoC to change the initialization
+part of the driver, but will not simplify the access.
+If you suggest to use enum value directly, without the check, then
+it will not solve the problem of checking the boundary, which Greg
+refers to AFAIU.
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAma8bJATHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgsu1EACyPuTMVe5/qToYKpAfN5aDe86gXOX/
-I7LvnY/eE6aiBSmqg1JnzK6WG+xygrQlM+6opnO1SfffjgPgiR2yCGBPH8l2XlUM
-O6O9a2vwQ/Ov+YMFuvWkzulpRaQaW6l+ZoWcTJlIKu/Wah2y0f2r6u/L3EIm5HGm
-Wsi4VYQMQv9wiffqOhus6VrbTY0Bq5IxwZa7fXt1zit0WqDMLX3VEdWHSErZ28uP
-EsbvCoYDdOOnRaIgbcUM5t8QC4kzbi7LUEz8pMs9gOnc+wlkajkouBgMD1QjSHpo
-DD9o8RTPGnii858HCFlCqgHmxS4gox7lkdkyyqOfsFMQuTkokhwqagEVAPUB/lSz
-ix7BHR3yAvn9Fe24fstnjpvI44aSMoOk2r1fJ/M/KxhjrUO3Mlt7rgFI1k+h42BH
-LSflRzC8tDekqtIkYUA6wW0CBS1Q238PFrWs1aktm03n/u6bHRke9KGrYHPE0LNo
-027qze1Xbj55LIFWKUhUmLE1rxfxkZh2H9zGtTU11ub0cHweVUbiGa02s4IK+UJh
-HHiASyLWMODoLVNv+Ubg5IQ/F+bMJlYEgV2X+0qs0LpGQd3j5NNq9S3sJuZMlZh0
-GguH6LCvIVVkwJNRCR2eh8jb0P9GrrZmgIjHCE1OYx6K5L5OcDtwbYEWYgpg39fP
-AktCRhSt+KmgHw==
-=EK8e
------END PGP SIGNATURE-----
---=-=-=--
+Thanks!
 
