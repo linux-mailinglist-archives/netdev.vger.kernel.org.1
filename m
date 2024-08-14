@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-118274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB68951225
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:20:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF63951230
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 330E6B2535C
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:20:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67500283EC0
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D403A14A0A2;
-	Wed, 14 Aug 2024 02:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BE11514EF;
+	Wed, 14 Aug 2024 02:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtUBumDj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J3RCpJVp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06A314A61B;
-	Wed, 14 Aug 2024 02:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505381509B6;
+	Wed, 14 Aug 2024 02:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723601737; cv=none; b=Y5+wpYLFkItaBu6qzHOFInE+p0FleaNiwC/gJXvSBSMd3Nbqq4N9a/NyQtwp7+yphexwz1zyulG4pRa4Tm8sjW3tdCmYG/pQ2BXihgnOyz2rcfjkJVKN1xFnmvu+36Y3z0bPAuy4XZMEGueWdpZi+Zd9+KZ6CT1HJIT0hJblmKg=
+	t=1723601745; cv=none; b=dQTXVr0J0/Zk2IAPsV2BNsHyNFEy++xVQ/dWPHMvmnXSZy2hmoIqiMg+L2otxeafySYnECMOTxEqFVxLnzwzliJ0oglWrd475rGrOCoDpYa0XN/qN1RsodnRvoRdOwlPeKVXOMI3M/pSUyqrfJESAa/VVnB8rpy7NzpnCWUw4Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723601737; c=relaxed/simple;
-	bh=0CxybjnCZWWxFNZ/t7yqsSLJXK5BFtRaH8fY7XvtFq4=;
+	s=arc-20240116; t=1723601745; c=relaxed/simple;
+	bh=urdSdk3z6CyeHVQyoVrGJwL5l6YZGllkPUTACaQ9hz4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TvOyeWkL6wVH2U+FgBPlIsljwKcu4y4+3SFUU3xyHPbtoeIu5FkfQoOothIhkKXdFKeI0XNWO+sUivL2mOBCfpPR6DZrbdCozW8/hCQms6hvdIMeJdRCYRgQKyOm5PuszZlBLk1UkPPeEp8bPhZ5I2F4/4r9vnlV/f0XXwYjO1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtUBumDj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E83B2C4AF10;
-	Wed, 14 Aug 2024 02:15:35 +0000 (UTC)
+	 MIME-Version; b=R3eue2MUXShj5poD+C9kM+unbx2e1qZpTthbGGCTC6aVh04euIYesQJsdxna97jrl2C1AQYJFQVbIAx9gViYt2s7VEBTqw6kozd8IEsrbwejywDqu8JVFt+6sgr8FeYfNiU4W/EhFMXjQY3U+klWEuOwKHdiCrWh1bamtbyE5g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J3RCpJVp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D65C32782;
+	Wed, 14 Aug 2024 02:15:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723601737;
-	bh=0CxybjnCZWWxFNZ/t7yqsSLJXK5BFtRaH8fY7XvtFq4=;
+	s=k20201202; t=1723601745;
+	bh=urdSdk3z6CyeHVQyoVrGJwL5l6YZGllkPUTACaQ9hz4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZtUBumDjx8EBphDiweaGBkFdaNwIzWr9ttcmSq5ed6/YRKFRWT0g7rEx1pvxPS6+a
-	 MJU2USTNpklRGrjPg/r2Yr+FTedEzkJTac80kJxOr7fqrivZhXZruKxlDTftOHsMcc
-	 MNUmbQff+t7V/Ehm0GU192jBRb6sLSRniCnFB6cJ1ZokOVOVurfkwi765PcSOY6uww
-	 6ogAqsRnR04vErViik5lh39UgTGC+8RvDW4OrQva2DWBzHcgGcbg8FalUeu4IaYJJh
-	 FL4UtpHCax5NhQpMnfjq6Yf9ru6aZIE7ek+PcAJI2s1p/g5G189cLywgPcH6yxrYP4
-	 Z2MFBheF9TZjw==
+	b=J3RCpJVp8VBFll/isMOTen+4NOu9Kv1m6nFfEaSClwBsZIjuq2ShdFxD4EAH8zPxz
+	 J+53TYfyIEC3e1TMNIScPx7E2o1zVtC+7VSCGl3WXKxF+7NrzzfwFS5Q3PNsUyPm+P
+	 hP7vlRVgvnMJUjqQ8ObfLxALfcIqEiZAqJnvwCeMjVtmTFpcvOEUcQ2gWoZSN3tM7L
+	 H8F8cAQALE9v6ZR2VwOklenbFbpyDJgBal9Z7/HcplmulRQZITx2w3bWP2Q8p4IxU8
+	 pUA4Np+eUiAbzSjBITL9np7CAJp2KQeye2kNbToG11/ti5Pg781mMOleknfP7WwPM4
+	 jIiLpp1Mm9QgQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -53,12 +53,12 @@ Cc: ZHANG Yuntian <yt@radxa.com>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 3/4] net: usb: qmi_wwan: add MeiG Smart SRM825L
-Date: Tue, 13 Aug 2024 22:15:29 -0400
-Message-ID: <20240814021532.4130407-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 3/3] net: usb: qmi_wwan: add MeiG Smart SRM825L
+Date: Tue, 13 Aug 2024 22:15:40 -0400
+Message-ID: <20240814021540.4130505-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240814021532.4130407-1-sashal@kernel.org>
-References: <20240814021532.4130407-1-sashal@kernel.org>
+In-Reply-To: <20240814021540.4130505-1-sashal@kernel.org>
+References: <20240814021540.4130505-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.104
+X-stable-base: Linux 5.15.164
 Content-Transfer-Encoding: 8bit
 
 From: ZHANG Yuntian <yt@radxa.com>
@@ -115,10 +115,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 46e0e1f1c20e0..8bc6268b92916 100644
+index fb09e95cbc258..ed83fa601cdc7 100644
 --- a/drivers/net/usb/qmi_wwan.c
 +++ b/drivers/net/usb/qmi_wwan.c
-@@ -1435,6 +1435,7 @@ static const struct usb_device_id products[] = {
+@@ -1425,6 +1425,7 @@ static const struct usb_device_id products[] = {
  	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
  	{QMI_QUIRK_SET_DTR(0x1546, 0x1342, 4)},	/* u-blox LARA-L6 */
  	{QMI_QUIRK_SET_DTR(0x33f8, 0x0104, 4)}, /* Rolling RW101 RMNET */
