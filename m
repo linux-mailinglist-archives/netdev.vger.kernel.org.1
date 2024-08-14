@@ -1,156 +1,116 @@
-Return-Path: <netdev+bounces-118310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE2595134B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:58:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 980C095138C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C30761C2265E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 03:58:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AA271F238E2
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CB041C69;
-	Wed, 14 Aug 2024 03:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12054D8B8;
+	Wed, 14 Aug 2024 04:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9vAQxMO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oWVspdyU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47483F9D2;
-	Wed, 14 Aug 2024 03:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1611722309
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 04:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723607902; cv=none; b=Tp+izhTmfc/qaTPOUMMO93qU8RGHnvcNqTzoKNoWpjvp+z2/nYLoEkecWjsoJ2jvJVTzSfBfOeEvbqIxgHOUtJELuB6KNqeZy0IOvEV65QU5YrYPofGqwmW/dn1XEeCJdyhiFcli0n0K6/O/n2oizw5p0uaG6vo/XDS/I5qelm8=
+	t=1723610633; cv=none; b=L1cSw0tRLmaHN0dDcYX0qktT5qSedXxJ5KtcnKWCqwyowvTWt5iAEb4Vs+ndNTC/a+qTQ8GQ3D+QQPoJDr+2RtvyXlGBIPZNgcurvP8dtQ0wFB4GOmUgGJO/xHXakXiFRfzuEbzAzxTrInvz0JIN01DCpCqcvcmY0+xRIe036hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723607902; c=relaxed/simple;
-	bh=MywvLjGFnu0PuDALyBiz0zB7O/S8FusLCbWrv7VDYL0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k+Km/49tR1pJ40QsNwoyLkz5GOFhYpNm1QgVtJLjNHtkSX8hMP1P+yxtC1ZsI0B8JpcpyVK5FSsCsauXxSBRk9XFmTzZS9iPXw/LqpFNVMpVfovFPHKQy1bwCdpvXseLP1VaiP+tTkIK+Yj8JRB7/gj1JQkRkiNvibK9l/Dxdgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9vAQxMO; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3db23a608eeso4432917b6e.1;
-        Tue, 13 Aug 2024 20:58:20 -0700 (PDT)
+	s=arc-20240116; t=1723610633; c=relaxed/simple;
+	bh=wH8EP7X4EvbIVVJt6WX02eT72un8jl8+0EWsViuNY/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DmwUOVqvaFwpvocsoJ3DwLx/68Bu/SI1PSEbCda9TXsR1cy8uUqaOdAMbuCiwaKG+nhHDtVCKJmIxBXVo4R96BiV3dehBTyaHu4Sm+/x2ILbvJEpge/MOsFJ6n95EPpefzdRlsTFPMEJoyLGsS92Y9Dj22xeOVLcAY5/PN4VCBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oWVspdyU; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7a8a4f21aeso668823766b.2
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 21:43:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723607900; x=1724212700; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1723610630; x=1724215430; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=asVqmMHKTJYyqQNuXxax/chZqdGHjEmq/OlhVUVNg9s=;
-        b=k9vAQxMOrv4euQtZ6hu/1TE9aj80zeKQXIod5v7GjaTxaOytBn+3giqgBzrwmG+H4a
-         UreCxgxJf95FDzKTQ+oO5rU1kc6qn6NtBm99/dJlwZhD8BCDzwReSMyyPN0caqSCQIlz
-         EAMqOiDQpJkwNVa2qU0GtyD5uW3r/5dMXy0Ueq4qsuvWJXeZkxKavIkAC+id6iFiivWn
-         WRcfs/aZjY6s8zEqztbS9fOla0Jle0nukbecc0oCf+jnkrF2EfYz/+dkCDrMxbMjFxbu
-         Z5Hp7pTNlNce3vKbDbQAxxoStALfCwVPmgXa54mBCHhUaQdLdfwtZIA7xea7ReLBBoiI
-         lgGQ==
+        bh=wH8EP7X4EvbIVVJt6WX02eT72un8jl8+0EWsViuNY/A=;
+        b=oWVspdyUJ7JPU41fFXylLxXITAe0bfxRYMjx/0X8C2m9Fd3t/Q2QhzufcP5ITe9SIo
+         59pSOx8h10xx7RrlI9FNbHFLdEomB/Cpo9iLrCGeo3XuHi78bZYTT/lENoFBFEJw/GRx
+         P7ipQ0rOxeG5uESLihgjb5fOMWDPkMPrJwTIBOZujSBBCFVcQ/FP5rcwiF/tvsI5+YOF
+         Xzn6WwRw6h7NEUKygPoYkBVEFnOwFJ1Mzkk+awi8i27ZRVk5pQZtXGOixglnG8kGH68M
+         Z3QWmXW2qYeAeXHuiNeCWkc5XP8kBb5gEmqGis91rJnD6XgkrC3Kd+e8tyDdv2zbcDSE
+         7wSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723607900; x=1724212700;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723610630; x=1724215430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=asVqmMHKTJYyqQNuXxax/chZqdGHjEmq/OlhVUVNg9s=;
-        b=t62/ZDiunrW53xhsW71CA1qlyfbJoSdo6xh+4t7YhSw/i23RSkFfCb1ebQdGgoVdQ/
-         fYnuogAJRyQV+FkIEbc2LtafYBm2LmTJdY1hxWAv6ErkP+tn7vOYkqcwm+X3T2YimbrJ
-         BrIL35dNJPRgrTmrtSPIcZBE2d5w7YRa8bO0FywW0wNmdK5XqRma5iyw5HAwyv19lxAE
-         menx7IhVmkUimjz9UUzi5MTJfWxz4rtFFj1NVumS2A85mZ8mieSfIgFjpvyfAIeCQNA4
-         uTVBnG9PFj83UrhAR/e49tQFQUMWJ0uh3DA9XLrwLVSGCGbxvHYEWWPWYDRkuBPN8RDK
-         bAlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOZN5qe+uI+6WRYPWt3Z801BSoBqbl7KeOQJ62trjOgV4SxSbrwub1vDhM923FAC9Q1hr5ZPNuwBgjlXI=@vger.kernel.org, AJvYcCWkiDHdl0WlMhGxZuO5eB4740TmgfGksZbqkphu+Hv0pUlrrWZffnhJq+uI97dqFvdRpagdcreR@vger.kernel.org, AJvYcCXN0TQtX+339tuW2uHCFMpln0Sjrnwv7sAYWdm6qfhhUwCQEFsFusHu9OhhjmrVT8K/TRocB9eOdJ67rw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKfgnNEItvp8oGcSWyG6HFm1oeCzoa2b+PuF2ZzTM54ygQfBzp
-	0A15JkStbgzraHOUneFXjSYYqBdxLn4ryvHnGs8puKlk6sqT/NEA
-X-Google-Smtp-Source: AGHT+IG6MR8kpk2Z2A693IQiXuZjNyKq/lYek8L2cI0UvC7yGtFnaJXFtGVMHtZM0HwEudIyv5AbFQ==
-X-Received: by 2002:a05:6808:1707:b0:3d9:1f05:845 with SMTP id 5614622812f47-3dd29907957mr1598986b6e.19.1723607899705;
-        Tue, 13 Aug 2024 20:58:19 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c697a72c69sm2221137a12.83.2024.08.13.20.58.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 20:58:19 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: alibuda@linux.alibaba.com
-Cc: aha310510@gmail.com,
-	davem@davemloft.net,
-	dust.li@linux.alibaba.com,
-	edumazet@google.com,
-	gbayer@linux.ibm.com,
-	guwen@linux.alibaba.com,
-	jaka@linux.ibm.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com,
-	tonylu@linux.alibaba.com,
-	wenjia@linux.ibm.com
-Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
-Date: Wed, 14 Aug 2024 12:58:12 +0900
-Message-Id: <20240814035812.220388-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <56255393-cae8-4cdf-9c91-b8ddf0bd2de2@linux.alibaba.com>
-References: <56255393-cae8-4cdf-9c91-b8ddf0bd2de2@linux.alibaba.com>
+        bh=wH8EP7X4EvbIVVJt6WX02eT72un8jl8+0EWsViuNY/A=;
+        b=PoBdZE3ShNulIldLzqmYyAUiMxd+wJRvQjDj2k2Qq8fXb16rRiwwAEd/koIoiMDDKt
+         g0jrlP2RstyDMoMyoSNzcuD/V+Zqj9qOkkucEvQLrEGBS1WNEsB66I1eoPdQOMDWDIq8
+         kbaRLJ6JI3rMYBxlm3rUlhiR1Fcggdx643RTiHeufCWosEZPcDrLEKzf3vmHXHA4gWs1
+         r41uK+bdkIs5zj7L1Rq4sbTi/m5TdOketyibZdh4RlsO+nuViP8zO6gK8T/zRVykjVWR
+         KXguwX8lDGl2gxhGAI3g9EB+vI0H0E+N+QLQKYud9RlzeyGaJtY3WUJrxUWkYWIe6x+N
+         o46A==
+X-Forwarded-Encrypted: i=1; AJvYcCX5KEs0qXVZeLYnJ1mmTjzdECgW4qdHdOGGIQCRuv2Hm8i2E+HXUFuSZADf4JXWWuWbnNLJ+2o2jGDhfmtxfSghRO4fe3aK
+X-Gm-Message-State: AOJu0YxWKOfLrp03f2nD3JeMVRxqo/88SMXFNJo5ETy7vCVK/WWR8GoE
+	53/l9c9OP91NTHBTi3ZhHoqjQhwrV26hEa1qMSBk66i8YAX3kUQlQomYder9eBfqdubcpabKJRm
+	Wr8XeOFUJ7gQ3PdzHDy9pNQx+VZDMkBWKG5GU
+X-Google-Smtp-Source: AGHT+IFU4tVAwgDjxJOtN+y4G2xoazQ7Er3tFwPB4mIZjlbslZrAeIshzbMfLNYKsBMnJ0fPXimycTH/nugZadAqIPo=
+X-Received: by 2002:a17:906:d257:b0:a7d:2a62:40e9 with SMTP id
+ a640c23a62f3a-a8367015aebmr82799066b.50.1723610630000; Tue, 13 Aug 2024
+ 21:43:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
+References: <20240801111611.84743-1-kuro@kuroa.me> <CANn89iKp=Mxu+kyB3cSB2sKevMJa6A3octSCJZM=oz4q+DC=bA@mail.gmail.com>
+ <CAL+tcoAHBSDLTNobA1MJ2itLja1xnWwmejDioPBQJh83oma55Q@mail.gmail.com>
+ <CAL+tcoDnFCWpFvkjs=7r2C2L_1Fb_8X2J9S0pDNV1KfJKsFo+Q@mail.gmail.com> <CANn89iLNnXEnaAY8xMQR6zeJPTd6ZxnJWo3vHE4d7oe9uXRMUg@mail.gmail.com>
+In-Reply-To: <CANn89iLNnXEnaAY8xMQR6zeJPTd6ZxnJWo3vHE4d7oe9uXRMUg@mail.gmail.com>
+From: Lorenzo Colitti <lorenzo@google.com>
+Date: Wed, 14 Aug 2024 13:43:32 +0900
+Message-ID: <CAKD1Yr2rqFdtCNmvacEvd_DR3nGVo8+7+sbGPU=g6Gr45T9TQQ@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Xueming Feng <kuro@kuroa.me>, 
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Because clcsk_*, like clcsock, is initialized during the smc init process, 
-the code was moved to prevent clcsk_* from having an address like 
-inet_sk(sk)->pinet6, thereby preventing the previously initialized values 
-​​from being tampered with.
+On Mon, Aug 5, 2024 at 4:23=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+> > Each time we call inet_csk_destroy_sock(), we must make sure we've
+> > already set the state to TCP_CLOSE. Based on this, I think we can use
+> > this as an indicator to avoid calling twice to destroy the socket.
+>
+> I do not think this will work.
+>
+> With this patch, a listener socket will not get an error notification.
+>
+> Ideally we need tests for this seldom used feature.
 
-Additionally, if you don't need alignment in smc_inet6_prot , I'll modify 
-the patch to only add the necessary code without alignment.
+FWIW there is a fair amount of test coverage here:
 
-Regards,
-Jeongjun Park
+https://cs.android.com/android/platform/superproject/main/+/main:kernel/tes=
+ts/net/test/sock_diag_test.py
 
->
->
-> >
-> > Also, regarding alignment, it's okay for me whether it's aligned or
-> > not，But I checked the styles of other types of
-> > structures and did not strictly require alignment, so I now feel that
-> > there is no need to
-> > modify so much to do alignment.
-> >
-> > D. Wythe
->
->
->
-> >
-> >>
-> >>>> +
-> >>>>    static struct proto smc_inet6_prot = {
-> >>>> -     .name           = "INET6_SMC",
-> >>>> -     .owner          = THIS_MODULE,
-> >>>> -     .init           = smc_inet_init_sock,
-> >>>> -     .hash           = smc_hash_sk,
-> >>>> -     .unhash         = smc_unhash_sk,
-> >>>> -     .release_cb     = smc_release_cb,
-> >>>> -     .obj_size       = sizeof(struct smc_sock),
-> >>>> -     .h.smc_hash     = &smc_v6_hashinfo,
-> >>>> -     .slab_flags     = SLAB_TYPESAFE_BY_RCU,
-> >>>> +     .name                           = "INET6_SMC",
-> >>>> +     .owner                          = THIS_MODULE,
-> >>>> +     .init                           = smc_inet_init_sock,
-> >>>> +     .hash                           = smc_hash_sk,
-> >>>> +     .unhash                         = smc_unhash_sk,
-> >>>> +     .release_cb                     = smc_release_cb,
-> >>>> +     .obj_size                       = sizeof(struct smc6_sock),
-> >>>> +     .h.smc_hash                     = &smc_v6_hashinfo,
-> >>>> +     .slab_flags                     = SLAB_TYPESAFE_BY_RCU,
-> >>>> +     .ipv6_pinfo_offset              = offsetof(struct smc6_sock,
-> >>>> np),
-> >>>>    };
-> >>>>
-> >>>>    static const struct proto_ops smc_inet6_stream_ops = {
-> >>>> --
-> >
->
+though unfortunately they don't pass on unmodified kernels (I didn't
+look into why - maybe Maciej knows). I ran the tests on the "v2-ish
+patch" and they all passed except for a test that expects that
+SOCK_DESTROY on a FIN_WAIT1 socket does nothing. That seems OK because
+it's the thing your patch is trying to fix.
+
+Just to confirm - it's OK to send a RST on a connection that's already
+in FIN_WAIT1 state? Is that allowed by the RFC?
 
