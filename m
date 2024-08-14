@@ -1,98 +1,89 @@
-Return-Path: <netdev+bounces-118538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5106951E9B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:32:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D77951EA0
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 426301F2151F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:32:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 272931C226CE
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F0E1B580B;
-	Wed, 14 Aug 2024 15:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEB31B4C34;
+	Wed, 14 Aug 2024 15:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="L7kywoeb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKqkeXUc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAC21B4C5F
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 15:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3101E529;
+	Wed, 14 Aug 2024 15:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723649519; cv=none; b=cetel/3U9Ppc1cV+loWNbJ1cyZ3l2IhW1QoopQNfymiG2FKcXuTJ77ska43FgSuZGAedcf4+8pGe2CcGrUgxpowM8SbSvemIpN1EZNIJipOmEK/dzOgZGG8HNL7LC9bX2A9PMrVPCQsSKj5VPyxHRlQ2vNN1GwYUf9S5kc9WUFo=
+	t=1723649640; cv=none; b=aUloyP/CiH3wK6AskHJI8wNrLG/d3yAS2ZT4DG4HyHnlDl8DB6/oDQPBfFy3cguLqG+mxYOxn4up5E/boIXe226j5osv2y5bousUSRG0UhUtAmix+eJAHWuyH4KXq2sHlrldbjd9+LAaM1v2fArTtGgD/HdH0/9Ny3aqy8OuE50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723649519; c=relaxed/simple;
-	bh=E+2Pw5hxbES/0EglkCm5CiwV6EZJY1YFGz6Dpoh0RI0=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=aJIhQewbDKc4YQn9NiqrIko5eZnIt5ndaRmgkmHd4r1iAPF8oEXoOy5q5LM+TGDGujO1PlVd5Icm8xKhSRM7nJXHHFIvJHPQiwBH3om+qTw5QQls1/Arkiiuw48R/DepXZzlVmoWLvpFiXrEzVNvC2jYJ/INInQgM2N7wRanX4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=L7kywoeb; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1723649640; c=relaxed/simple;
+	bh=QLbYuL5iDDVjrekLj6uwxZzS6Qfq6dEj/vjZ3vOcbZg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eJcxvC3XF2r0ffkCdH3POM5E5GcRkEvZP1Q+OlNNPDBYhcNnGewb3OFqGq6yT18FASaKbfoNUzoGOBzA/POIQhu3s6FxoCZvOMSOB8BBZksmlifnC77xPcUGT5jLJZREJmh5pTOsA+O7mms7bZYee1RKbuqEVaSMa/K7ejYBYfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKqkeXUc; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-70930972e19so1931975a34.3;
+        Wed, 14 Aug 2024 08:33:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723649519; x=1755185519;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=E+2Pw5hxbES/0EglkCm5CiwV6EZJY1YFGz6Dpoh0RI0=;
-  b=L7kywoebGiL/ezil7SkMTY9qpgOrOf+eXWAhxFxlkxg3xYiXcv1lRugG
-   lSbaFTmsYO13hsFQpMgM13vJV05/vClkXGFeVjYbRKxWYdO4LKZdW6PeI
-   Yhp0y0nnKBGoKwwfhpf43P0hdnZJZW03dl5SFWfgTh5MfjrtrW4knjWOG
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.10,146,1719878400"; 
-   d="scan'208";a="443911327"
-Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting
- support
-Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting support
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 15:31:52 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:23688]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.42.231:2525] with esmtp (Farcaster)
- id 5d82139a-37fa-4758-bfb8-1b5f1fe415b9; Wed, 14 Aug 2024 15:31:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 5d82139a-37fa-4758-bfb8-1b5f1fe415b9
-Received: from EX19D030EUB004.ant.amazon.com (10.252.61.33) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 14 Aug 2024 15:31:50 +0000
-Received: from EX19D047EUB004.ant.amazon.com (10.252.61.5) by
- EX19D030EUB004.ant.amazon.com (10.252.61.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 14 Aug 2024 15:31:50 +0000
-Received: from EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20]) by
- EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20%3]) with mapi id
- 15.02.1258.034; Wed, 14 Aug 2024 15:31:50 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
- Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
-	"Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
-	<shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Beider, Ron" <rbeider@amazon.com>, "Chauskin,
- Igor" <igorch@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>
-Thread-Index: AQHa7SRj5VISt7WkiEq52al7KaOO2rIlC6FwgAA/3QCAAZZYsA==
-Date: Wed, 14 Aug 2024 15:31:49 +0000
-Message-ID: <8aea0fda1e48485291312a4451aa5d7c@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
-	<20240812185852.46940666@kernel.org>
-	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
- <20240813081010.02742f87@kernel.org>
-In-Reply-To: <20240813081010.02742f87@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
+        d=gmail.com; s=20230601; t=1723649638; x=1724254438; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=miqNK+B744VEtho+Cz5BtriydmdXkbKnexaiIQFok4E=;
+        b=XKqkeXUcV2xNnZsYuMIUh+RtZhGRKvcio6Hv8eAioXvu5nP/d38e9m1qbWr8V5UbzK
+         SdFSivmY/hTsD1f8Cmj3lpkXuL5kcFVfsLmyLKIYzirSXGoK3MbSweihoxz8cF7rRIjM
+         MUb4Eplu2zTktziZ/hHcPkEFf/O8SpdDfpSTODPxv4Uge6QfHzLKmIxt0dMbXXMgKaC3
+         jncql18YjVPuooN6DxTZOh37s7AV19vv1YLmM8lPkcCMKbvC8Rk24aTDeE1vZZ2+YPRp
+         LOcdqkkslLRBl4HB+3376yzREb9MvSPjc/pLwk+yFefrvsP9Ezb4iNPPsNhRjsD0lJR5
+         Kupg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723649638; x=1724254438;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=miqNK+B744VEtho+Cz5BtriydmdXkbKnexaiIQFok4E=;
+        b=ASFRXUJCqZ1HdqT9nAk9G7eG7YXX2Iaa1xFfKU9tQJOlSllqI0K6TW0Pg0HikSKAYN
+         qxbRf91QajrogcOIcwSxKYyaGSRTGs1m1WS/vrtUNuMqSWFW3k+OxuqXSWWxUwIxPVND
+         C0Mtg59bgl3s6YWc+igz8eaEuYja6u3ztIL3o6h/0hCvRTaL/GZnepjJ64M39wQPR9Dd
+         YEE5l4yW2my89MBG3S6hlql7yfG4brjCcnlcovt35lmiewA4UggAMlBmMYg1vO6b6PfD
+         l51oU+HiXQxmKix5DrH3RvYxOQ1fX+QbCESkxtv7qh2gV8fepFx2TIC9oOoK9gxgd+ar
+         ZLVg==
+X-Forwarded-Encrypted: i=1; AJvYcCXPl5jLkBgf06+1Y6myRxCg8uejYeb7oIdWG4qzjgjAVMjzXVc+FtrypjCRwu2OzHqH6ISceSw0Dpr9y65Wq2XwG5rKEpkaDQeFFQcjCrxoAcvUh+p+BEI28+sLfeoAhQoEehcxeAmBtZpse9H4
+X-Gm-Message-State: AOJu0YyCI3VTqVZkHX3i3do5yjLop6m69fOxZTw9NGxtOP57wR1nFqW8
+	h2znOAvPw4fpRybOpO2Zm0S3glwXWfqhhR6ChaOuMJ0pFs8s63rW
+X-Google-Smtp-Source: AGHT+IEwQqDD1BqP+Zoiab/YVxTNQIEozpAACW41iApb8rmqIU4uPEKI6+p9bS5UeKAf+1oOHFHzqA==
+X-Received: by 2002:a05:6830:d13:b0:70a:92e4:6736 with SMTP id 46e09a7af769-70c9d9d9529mr4164350a34.28.1723649638136;
+        Wed, 14 Aug 2024 08:33:58 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70c7b89c042sm2254766a34.78.2024.08.14.08.33.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 08:33:57 -0700 (PDT)
+Message-ID: <bc279009c4c3c901033e23601efcf9ed4da8743d.camel@gmail.com>
+Subject: Re: [PATCH net-next v13 02/14] mm: move the page fragment allocator
+ from page_alloc into its own file
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, David Howells
+ <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+ linux-mm@kvack.org,  linux-kselftest@vger.kernel.org
+Date: Wed, 14 Aug 2024 08:33:55 -0700
+In-Reply-To: <20240808123714.462740-3-linyunsheng@huawei.com>
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+	 <20240808123714.462740-3-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,63 +91,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-> > I will note that this patch modifies the infrastructure/logic in which
-> > these stats are retrieved to allow expandability and flexibility of
-> > the interface between the driver and the device (written in the commit
-> > message). The top five (0 - 4) are already part of the upstream code
-> > and the last one (5) is added in this patch.
+On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> Inspired by [1], move the page fragment allocator from page_alloc
+> into its own c file and header file, as we are about to make more
+> change for it to replace another page_frag implementation in
+> sock.c
 >=20
-> That's not clear at all from the one sentence in the commit message.
-> Please don't assume that the reviewers are familiar with your driver.
+> As this patchset is going to replace 'struct page_frag' with
+> 'struct page_frag_cache' in sched.h, including page_frag_cache.h
+> in sched.h has a compiler error caused by interdependence between
+> mm_types.h and mm.h for asm-offsets.c, see [2]. So avoid the compiler
+> error by moving 'struct page_frag_cache' to mm_types_task.h as
+> suggested by Alexander, see [3].
 >=20
-> > The statistics discussed here and are exposed by ENA are not on a
-> > queue level but on an interface level, therefore, I am not sure that
-> > the ones pointed out by you would be a good fit for us.
+> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.c=
+om/
+> 2. https://lore.kernel.org/all/15623dac-9358-4597-b3ee-3694a5956920@gmail=
+.com/
+> 3. https://lore.kernel.org/all/CAKgT0UdH1yD=3DLSCXFJ=3DYM_aiA4OomD-2wXykO=
+42bizaWMt_HOA@mail.gmail.com/
+> CC: David Howells <dhowells@redhat.com>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/linux/gfp.h                           |  22 ---
+>  include/linux/mm_types.h                      |  18 ---
+>  include/linux/mm_types_task.h                 |  18 +++
+>  include/linux/page_frag_cache.h               |  31 ++++
+>  include/linux/skbuff.h                        |   1 +
+>  mm/Makefile                                   |   1 +
+>  mm/page_alloc.c                               | 136 ----------------
+>  mm/page_frag_cache.c                          | 145 ++++++++++++++++++
+>  .../selftests/mm/page_frag/page_frag_test.c   |   2 +-
+>  9 files changed, 197 insertions(+), 177 deletions(-)
+>  create mode 100644 include/linux/page_frag_cache.h
+>  create mode 100644 mm/page_frag_cache.c
 >=20
-> The API in question is queue-capable, but it also supports reporting the =
-stats
-> for the overall device, without per-queue breakdown (via the
-> "get_base_stats" callback).
 >=20
-> > But in any case, would it be possible from your point of view to
-> > progress in two paths, one would be this patchset with the addition of
-> > the new metric and another would be to explore whether there are such
-> > stats on an interface level that can be exposed?
->=20
-> Adding a callback and filling in two stats is not a large ask.
-> Just do it, please.
 
-Hi Jakub,
+...
 
-I've looked into the definition of the metrics under question
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> new file mode 100644
+> index 000000000000..a758cb65a9b3
+> --- /dev/null
+> +++ b/include/linux/page_frag_cache.h
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _LINUX_PAGE_FRAG_CACHE_H
+> +#define _LINUX_PAGE_FRAG_CACHE_H
+> +
+> +#include <linux/log2.h>
+> +#include <linux/types.h>
+> +#include <linux/mm_types_task.h>
+> +
 
-Based on AWS documentation (https://docs.aws.amazon.com/AWSEC2/latest/UserG=
-uide/monitoring-network-performance-ena.html)
+Minor nit. These should usually be in alphabetical order. So
+mm_types_task.h should be between log2.h and types.h.
 
-bw_in_allowance_exceeded: The number of packets queued or dropped because t=
-he inbound aggregate bandwidth exceeded the maximum for the instance.
-bw_out_allowance_exceeded: The number of packets queued or dropped because =
-the outbound aggregate bandwidth exceeded the maximum for the instance.
-
-Based on the netlink spec (https://docs.kernel.org/next/networking/netlink_=
-spec/netdev.html)
-
-rx-hw-drop-ratelimits (uint)
-doc: Number of the packets dropped by the device due to the received packet=
-s bitrate exceeding the device rate limit.
-tx-hw-drop-ratelimits (uint)
-doc: Number of the packets dropped by the device due to the transmit packet=
-s bitrate exceeding the device rate limit.
-
-The AWS metrics are counting for packets dropped or queued (delayed, but ar=
-e sent/received with a delay), a change in these metrics is an indication t=
-o customers to check their applications and workloads due to risk of exceed=
-ing limits.
-There's no distinction between dropped and queued in these metrics, therefo=
-re, they do not match the ratelimits in the netlink spec.
-In case there will be a separation of these metrics in the future to droppe=
-d and queued, we'll be able to add the support for hw-drop-ratelimits.
-
-Thanks,
-David
 
