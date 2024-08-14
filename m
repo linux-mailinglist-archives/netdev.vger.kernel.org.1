@@ -1,165 +1,112 @@
-Return-Path: <netdev+bounces-118378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AEBF9516E4
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:45:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6209D9516E6
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DF901C2259C
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:45:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9486C1C218B8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9784F142904;
-	Wed, 14 Aug 2024 08:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBA31422C3;
+	Wed, 14 Aug 2024 08:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="hg5UqsW6"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="MA4I+/KE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3A9137772
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF89A139D13
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723625122; cv=none; b=lZ8Sw/WUa32rLpoz2nMrd/wZ+ZMhtFplJGUSrNtGPswuCJD0WHd6gSVAJvfAVrCsbXAeUnfGIr2GfKMUs9pyf3Y3i6weami7hocRCZtqikgWfIJzDhWERXpf4sBOCjH+03e7fmyodnRxr/rBeO/zXcoUNnq999DMWOQchFlhAjc=
+	t=1723625133; cv=none; b=KspuOVaapDwQ5tFufstjoQDcDF4zqDUkeXThGse5z3gJRSW4hEChIVhYT6A4MMHLbENE3KrxtSjenucfUgDfdIaV8RjFcOPJVs874SZsFhKRdPgUvF2Cp9BKIEr8lUcAxXBR0+jIeINpKeK7U/yWZW71yaq4CqQ5savkrSkVwTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723625122; c=relaxed/simple;
-	bh=rP0BJSU43YUuU9/R8Fx0nn/NVCzVpX9I9QY7RttkZh4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YXIjmrouvwZVydlPe7+huf4tfbcliKwKpjQhkm163stE5+yZjMSPfOfipvWlWJU1ZagT3YhhRN18g3VcgTFge999/jnd1O7cVVqw/F9ytNM97lHjchT/Gin1pG8qsnM6hfKC6RcLcUZ7HfWZyXgxvdVBMNqrlP5aPgoc5LGv040=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=hg5UqsW6; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fc60c3ead4so43161585ad.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 01:45:19 -0700 (PDT)
+	s=arc-20240116; t=1723625133; c=relaxed/simple;
+	bh=J5/jo3hgryM8uNvFF7g2Ox+mflSd2uupsd/HG5kMIXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hkhzx1bzpkXIDQMTNX2TMsird55xLGiuYI+sEeo1iPbUsqudWQaRfBXyZL0ajtqH6qrodGROgSim+jDknkpeKsfDZ561bTSbVF8bnVxeDTMZTKayI8prYxk+855lwSyEw8D/ostg3j/KjAhHrAeMN5Ow+QOuRYkP4ytN8tar9yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=MA4I+/KE; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ef2c56d9dcso74030531fa.2
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 01:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1723625119; x=1724229919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TH1M4v3WVE7mB9RLKtgXX+m2D/YPKIYBQHunV/cYH4Y=;
-        b=hg5UqsW6IsFbRosFffN4LvKAELoXaTvCfXyJOAdpMzq7g0U4nEtsbyDGNNFW6ylPYZ
-         jC7A47Uvy8eBoztewlm6JaHf9yuLfQBoD5iULAaLnUcS3igg/TbMGdfymwWMLcJ5ixmA
-         E/VbOh5ckbjgglidHDgHCVOcnZLPY5aF1jYOB5MoEioSQNcNftZusFkk0cbmzFNpShD7
-         430ajNK0ImEvudbLQGh49IR/wAe5mDj8eMJMTVhVdxjIkr4fULp7k1/bhklV5guepmdf
-         sxb9Q52rkfp8wDMgyGFolQfWwvfIlakc+rr6Y2M/rYIYhjvoIh18eRiCvJqt2ErJAcbz
-         p0XQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723625130; x=1724229930; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J5/jo3hgryM8uNvFF7g2Ox+mflSd2uupsd/HG5kMIXw=;
+        b=MA4I+/KEZBxnh67GmBoU1dH7WjC8KONaFsPnOayizRr/6052UMWRGj4OX7aS+viwZ+
+         WoL8VzSXR/dtUPqd2uKvdNZZcIDygHi/zLLqQ/adMDdk9YIbStK0R6ffrQClCXMO+FuR
+         jP4b2vcchiTJDy1M3vcMVdEAQtOsmx9jUqtlezYoT4LmpRhDfgvRMHgI1x1twXnbZYs1
+         S89TnLr2cCq1IaiqaR9fw/RbduZYOgGzpUTf+vxC1S8CT87sLlvuOGe4h9FgYQeDJc1S
+         fhVgJ1TSMAkBR8aTQNlDJ3lSofCls4aCKXPyDRHi+xYGgpbEgswdWiQZuPV+Am0+DrXf
+         GYXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723625119; x=1724229919;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TH1M4v3WVE7mB9RLKtgXX+m2D/YPKIYBQHunV/cYH4Y=;
-        b=CEcMIhJ+RvFmlt8keI71SG8+zjXJk2tY40jUaGamkiAwjqPuwqWnFj5dVTfiX28B1L
-         aficxGGTkFwGWs6AwJ4dlPKZHvICshqmTvaBKCxKSOVC1lkhf4woEu0tOuEmULjMUQzh
-         Kw+GVPN5IJtFsiQnjJGfEYRAEW50tO3C3PGa25cgVVVoDP5jmpfQFYzRYv5LF/E7b5Cn
-         p2Fc/nsFGtbLwkG1IyoOE/vq2YkAnhKpI1vAZb0pmyZiEazFufOH+SEsEAAG2Nvj9uGh
-         ik1NQGUhG0OFN+y9WxrrJKNVJizHIFa+uqp305CVpP+m+Tj5rLloVks+XE8vlQheYX6H
-         7+Gg==
-X-Gm-Message-State: AOJu0YxVGAD18Ji7V2mChP4IVS2bp1AAnN5ZTJKQ1bHIiH08dLD3v627
-	+oNi6rhRO5WB0yzqi1XMzttrKytXgb4Z5gIKUKd34WTC7z5Pp4xp5UjcTS2Buek=
-X-Google-Smtp-Source: AGHT+IF6U/jKHy8IrZmFjWfX+RHKB/V6pImruUUL82Kvd3FD/Ry4bV66gBZEGB2/4lRsfrz+jjEL7Q==
-X-Received: by 2002:a17:903:41c9:b0:201:e634:d84f with SMTP id d9443c01a7336-201e634db7fmr189975ad.59.1723625119315;
-        Wed, 14 Aug 2024 01:45:19 -0700 (PDT)
-Received: from C02F52LSML85.bytedance.net ([203.208.167.150])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1a940esm25151785ad.159.2024.08.14.01.45.10
+        d=1e100.net; s=20230601; t=1723625130; x=1724229930;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J5/jo3hgryM8uNvFF7g2Ox+mflSd2uupsd/HG5kMIXw=;
+        b=N3jFTTIAKLq6CvW0+NCaCVmofKJdxLdIlvAX/IlWFup5bDCGM9dN38g+fniZzlNHuh
+         X0uk4Oo+mjWA83TKZQQ1CkdG6yWLwfBDOrd/Tj6UydN5YxDTdbAHZpg8szjvH2qkqeA9
+         qIu0ooP0iJGzQIOD4v3b2SSvq6XMtm92oPjbsXejWTYZWkpwsT8EmqkN5K1EC4RYjHAf
+         Hny2yIH2zLW+yzj+TaC1MvWS+bNz1jnjgAQYbhtZThB9n/GZdHHv2bByZejdXKmoEx6v
+         AiKYQtPrgHn77tQ/u4U0y132xN/z+FwlwlN2KSwa8fZ4wOII5ZmDO84u4ZIT5Sd05J/w
+         tH1w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+9EG1Zn4efBKLVAGDq2cuxuuyNc/yCAS2/IOcwvr6hgpUVrK1VW/DaD6QmmgO76hjmMAD7pLV4WDVFNa4dvv1mchIyla4
+X-Gm-Message-State: AOJu0Yyrs/02LD1dM3bRiecFg2Dfuo71zmcXtpyE5u2aASd8RITXBni4
+	oyDR2rwydb9VL2eUOUuMDfgMU/lmtwVT7CNSl7wf8Zc4ys+1aiKY0Nw7D5EHdNE=
+X-Google-Smtp-Source: AGHT+IGcANcpSv267sJ1ZUOeS/o7nyV0NNsbZOApBdVdw1u4GSU/5InJvwxB+a4D59BFfqZfM77QUw==
+X-Received: by 2002:a05:651c:c3:b0:2ef:3126:390d with SMTP id 38308e7fff4ca-2f3aa1ef4demr12723801fa.42.1723625129572;
+        Wed, 14 Aug 2024 01:45:29 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd1a60214dsm3602651a12.91.2024.08.14.01.45.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:45:17 -0700 (PDT)
-From: Feng zhou <zhoufeng.zf@bytedance.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	dsahern@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	yangzhenze@bytedance.com,
-	wangdongdong.6@bytedance.com,
-	zhoufeng.zf@bytedance.com
-Subject: [PATCH] bpf: Fix bpf_get/setsockopt to tos not take effect when TCP over IPv4 via INET6 API
-Date: Wed, 14 Aug 2024 16:45:04 +0800
-Message-Id: <20240814084504.22172-1-zhoufeng.zf@bytedance.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+        Wed, 14 Aug 2024 01:45:29 -0700 (PDT)
+Date: Wed, 14 Aug 2024 10:45:27 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	michal.swiatkowski@linux.intel.com, jiri@nvidia.com,
+	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
+	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
+	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
+	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: Re: [PATCH net-next v4 15/15] ice: subfunction activation and base
+ devlink ops
+Message-ID: <Zrxup6D86L4bM_HZ@nanopsycho.orion>
+References: <20240813215005.3647350-1-anthony.l.nguyen@intel.com>
+ <20240813215005.3647350-16-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240813215005.3647350-16-anthony.l.nguyen@intel.com>
 
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
+Tue, Aug 13, 2024 at 11:50:04PM CEST, anthony.l.nguyen@intel.com wrote:
+>From: Piotr Raczynski <piotr.raczynski@intel.com>
+>
+>Use previously implemented SF aux driver. It is probe during SF
+>activation and remove after deactivation.
+>
+>Implement set/get hw_address and set/get state as basic devlink ops for
+>subfunction.
+>
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+>Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+>Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 
-When TCP over IPv4 via INET6 API, bpf_get/setsockopt with ipv4 will
-fail, because sk->sk_family is AF_INET6. With ipv6 will success, not
-take effect, because inet_csk(sk)->icsk_af_ops is ipv6_mapped and
-use ip_queue_xmit, inet_sk(sk)->tos.
-
-So bpf_get/setsockopt needs add the judgment of this case. Just check
-"inet_csk(sk)->icsk_af_ops == &ipv6_mapped".
-
-Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
----
- include/net/tcp.h   | 2 ++
- net/core/filter.c   | 2 +-
- net/ipv6/tcp_ipv6.c | 5 +++++
- 3 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 2aac11e7e1cc..ea673f88c900 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -493,6 +493,8 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
- 					    struct tcp_options_received *tcp_opt,
- 					    int mss, u32 tsoff);
- 
-+bool is_tcp_sock_ipv6_mapped(struct sock *sk);
-+
- #if IS_ENABLED(CONFIG_BPF)
- struct bpf_tcp_req_attrs {
- 	u32 rcv_tsval;
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 78a6f746ea0b..9798537044be 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -5399,7 +5399,7 @@ static int sol_ip_sockopt(struct sock *sk, int optname,
- 			  char *optval, int *optlen,
- 			  bool getopt)
- {
--	if (sk->sk_family != AF_INET)
-+	if (sk->sk_family != AF_INET && !is_tcp_sock_ipv6_mapped(sk))
- 		return -EINVAL;
- 
- 	switch (optname) {
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 200fea92f12f..84651d630c89 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -92,6 +92,11 @@ static const struct tcp_sock_af_ops tcp_sock_ipv6_mapped_specific;
- #define tcp_inet6_sk(sk) (&container_of_const(tcp_sk(sk), \
- 					      struct tcp6_sock, tcp)->inet6)
- 
-+bool is_tcp_sock_ipv6_mapped(struct sock *sk)
-+{
-+	return (inet_csk(sk)->icsk_af_ops == &ipv6_mapped);
-+}
-+
- static void inet6_sk_rx_dst_set(struct sock *sk, const struct sk_buff *skb)
- {
- 	struct dst_entry *dst = skb_dst(skb);
--- 
-2.30.2
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
