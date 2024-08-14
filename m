@@ -1,131 +1,159 @@
-Return-Path: <netdev+bounces-118489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0BB951C3F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:51:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90085951C50
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D78B27F74
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:51:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B49DC1C22DFF
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8FB1B0125;
-	Wed, 14 Aug 2024 13:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7361B151E;
+	Wed, 14 Aug 2024 13:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KVcJLNgj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blww45Ki"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA811AD9D6
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA30D1B1433;
+	Wed, 14 Aug 2024 13:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723643488; cv=none; b=NgZkM+NfplpyEXwRDhpIkl9Cyn8nNcsiIPFn3f8LzsQNz/2VsvdMD6QLeBaxKzv4NJjr6FaoPDhqhbbNP1VkcsuGndlHRnMnA6KyCYy8440yc2EPRS5IlHoMnNde24nk245AiZOt0Uu1yGaQ/QWwAIEh+eCgtZyw6KcexTYpREQ=
+	t=1723643642; cv=none; b=f0ACczXsdB52u2Z1mFda3qkMNds/mdJqlje3gv4NhO5a7veTLD70ThJcGeTAKtdM0/Rj42rkKhFOGeyKwjrxb/N65LyNbCgacayNa+IKtw0cBa5gJVYgxuJSPcKX7hG4Yy2vPEMok/fr5ib98nwZ6Gm3xOqPUxHIPs+ZDbpDRQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723643488; c=relaxed/simple;
-	bh=3dQ/HGv/ji9zjO6Tb5pvCC52gsFGMkZG3P4/qUzvWMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uH5exfM9TZrPfCbi8UG+36JPWyZx0OYahac65vuenwGgt7s4by8z1OebR3TGTijEB38+W7brHQ/rg3ok2sKT3uqV0CsMEZ3BCR/1O/uCnhOK9TvY6ChPPcTgm4HtQLDrN/AdMjiLRQnS2cw+vrtvheh4cBNlcnKi6alnXd51yDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KVcJLNgj; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3687ea0521cso4713766f8f.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:51:24 -0700 (PDT)
+	s=arc-20240116; t=1723643642; c=relaxed/simple;
+	bh=pVmwF7G2P8agT0vOSGb5CBnNzfqC5aZAhldqlokDAlQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=uoaUBzdKN9ecOn+/iHV76kAuJVHWfJUGO0XYT8fh97qFUOwz2OkYTUcIyUnqx1SGi9SIoPMrtyhvrcH6ZDGqzQ85rrpwCMPPTOEFyxkTjUEMWzBv2ZdSskjikCs/CKmPsrafeM7NWaoGi6J1wpO/1jvg+xMoVB5gtByhvSntemc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blww45Ki; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4519383592aso40926351cf.3;
+        Wed, 14 Aug 2024 06:54:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723643483; x=1724248283; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HY6+pCY9ehqSqJDFE8HV9VdLuiE98nA8v+BgVfOFgHw=;
-        b=KVcJLNgj+D4lLHA2hRz2rfNoUmf7OjAdDEeUqEARHziaN3SjDZ+PkSWDCZathESLtF
-         cSB82d9+XrbOSXAsOlyOwuAy5w+KINmFQyUINjFdNqXl6xz8wqw2NoplPz2znOfJ3ojx
-         arcJtmObjcRnL2KKjCHfT7oW6hQjJC66rquMSQA1wzMtxkMqf8NTyMeNUiMg8zdx/sES
-         fQVzBiFGyrVdL1t8JU/VLPLqCcvrlT0sVklVtWzaCFzTxe2HCkOyhdzWjegG9yIcqeYC
-         MHZ4xPnDLZmuGxl3eXe1UC4uocBvCySLFrpFZ2xCZK5evrLzNLG5lTO7RhdX4JdAvjix
-         Y1ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723643483; x=1724248283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1723643639; x=1724248439; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HY6+pCY9ehqSqJDFE8HV9VdLuiE98nA8v+BgVfOFgHw=;
-        b=O9pGRHQvLSKar0vkmoOvTN1K8PRYxPTKOR65qJfAOmOtCW+TByWdujq3F3M5mYpNTq
-         AdwiHHxHr5QNx/EL5D/lkrDD9VM3cZUAd1vd3pw60gQdv0I8k73Ma8y4QIqxhgDebPkC
-         KUl4JBdcqkb19dhdgkLY3b5KJd92rwfhk3wPKD751lSlmEr1vT1kKJUtX+EPOV0RR+vu
-         fGeJHSINytMJiIJLHRCsDCC2a2wblmZrctUy6uNt73YDHZs1MSPPLfmoJiJGpGHZgSeZ
-         B7fxLSVEgPqt9gyM7v/h0y7CTZ7b/irFFqgeyPyRcEGKuPIi5cAvXhTg4eAQfAgyUr4I
-         2tSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9MajzrbGGfINzMq666CBYoNTfgITkv7gvXSv9pwF+6nVSQekatLxvqqc+MmN0A6YPxhvCGodKizXwDTCsDHG26BeJ0TFm
-X-Gm-Message-State: AOJu0YzFhxJhoVrglcpmTsyHcgHdS+Uspb8tzs05hhVJlwDFb6L8NmmB
-	ZTeKxM9mxk+XidzAO12ILjDPEu5TcEm+qacMGv0xFfDUJ8EWVFZBG6+eDS3MBaeJz+hUxn/Qv66
-	6
-X-Google-Smtp-Source: AGHT+IGM/Kg8J/CcdohjEY5RAm1+8y6SdzbAu07J03j+lQEZzw0NedV1E9ohGzx8kXDzo6AVkCvs3Q==
-X-Received: by 2002:a05:6000:2ac:b0:360:75b1:77fb with SMTP id ffacd0b85a97d-37177742ccamr3008355f8f.8.1723643482955;
-        Wed, 14 Aug 2024 06:51:22 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4c93714asm12856184f8f.27.2024.08.14.06.51.22
+        bh=utWJHul5Du4R9rd2S0MY4SOzJbviKmWuhT4Hw98IBd8=;
+        b=blww45KiB24dmYr0j/pFBxsgcJc/9QvL7zyZVHncfHv1wkVxE39WVxEo6xYAfWTNPy
+         /0a5NFRpwYSxNuOjjNRy4P6Fah9K+knWwZVaiRjIimHGpRem6iUt+CI0IbeSgCM5COiB
+         ALKMdpbcPnfkZVgJDBAbb1thjlC3S4mOedZfok0ahpCyZliD6h6RM/E+rxWvevs6Mz/l
+         OtXoqNj7DphYwGBcE2H9vvb8HHT5VrtvPQ2H9Dz9eZ5GL7mTRsPuZdpuxa+96t/b7SYQ
+         UPU91OCNrP5r6ryYmBPvidLfCTjs8Zt6+Qpc+B1hx7Q3VqER93rqWGzi14Ga7S5nx+fq
+         OOAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723643639; x=1724248439;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=utWJHul5Du4R9rd2S0MY4SOzJbviKmWuhT4Hw98IBd8=;
+        b=A3a1ceBiJhxt4cgExW6JXL/OwKqZMtGCknLtk6y0cSz4zWJn7PL5l6gyxSeaR5JeB1
+         YQXG1gdzUeKEmuczwvUDRwpYh2L8vwe1lUe2P4fnl59Ity2Y0R1xlGdAPTV+RekRYcmk
+         OXZBB9rKug3K/wLsZ+uHTE1a3nAIzC4PD0W0LpVE5Yd+mjKtko40EsjwFtg+4hmJScXp
+         7OD1u9RPWBjNjMJcxR88hG4PghP3m9rOtMv8FZ6iixSA+wtNVgeW6+Gnrn0H64JY7j2F
+         IeLU8ouXPK6yeK5ChV/nT1dt7er44ykQimv1JmkuSmGn3a9aNHfZVB16N4MvI47i0dVK
+         sRwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQR50FzAszaxfYS2s2Wt5+pqsizewzdo61dUsw4jJcnpcW2YzWXrN6y97/tb3LeA3e6DBCbqBRBQaHym13QRyZbH0kr3CvkEWVKVxAjAAqSOSPcvmCFRtyKEpW9rZu
+X-Gm-Message-State: AOJu0YxLkeojg1G++wO+LCJF2DaLtQ0Xs6qnJrBYWKEEFUZpeTASfhca
+	g4+v7gT2SFq3VJbFNFqpsZ56pZXb2Y2g24WrnGNtvqn7j1sT4Mpp
+X-Google-Smtp-Source: AGHT+IG26aHZQ4o0SHh+Y2TSRBi05r/HN4WM3gUgtjuZvwpzGsDAKYKOBtBVn8mEfs/ixoJC6h9VXA==
+X-Received: by 2002:a05:622a:5b0a:b0:44f:ddad:c21c with SMTP id d75a77b69052e-4535ba7aee4mr25549581cf.13.1723643639434;
+        Wed, 14 Aug 2024 06:53:59 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4531c1a7f28sm41705531cf.10.2024.08.14.06.53.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 06:51:22 -0700 (PDT)
-Date: Wed, 14 Aug 2024 15:51:20 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	wojciech.drewek@intel.com
-Subject: Re: [iwl-next v1] ice: use internal pf id instead of function number
-Message-ID: <Zry2WL9JFtz4Q-N1@nanopsycho.orion>
-References: <20240813071610.52295-1-michal.swiatkowski@linux.intel.com>
+        Wed, 14 Aug 2024 06:53:58 -0700 (PDT)
+Date: Wed, 14 Aug 2024 09:53:58 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Christian Heusel <christian@heusel.eu>, 
+ Adrian Vladu <avladu@cloudbasesolutions.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Greg KH <gregkh@linuxfoundation.org>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
+ "alexander.duyck@gmail.com" <alexander.duyck@gmail.com>, 
+ "arefev@swemel.ru" <arefev@swemel.ru>, 
+ "davem@davemloft.net" <davem@davemloft.net>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "jasowang@redhat.com" <jasowang@redhat.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "stable@vger.kernel.org" <stable@vger.kernel.org>, 
+ "willemb@google.com" <willemb@google.com>, 
+ "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Message-ID: <66bcb6f68172f_adbf529471@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+References: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
+ <20240805212829.527616-1-avladu@cloudbasesolutions.com>
+ <2024080703-unafraid-chastise-acf0@gregkh>
+ <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
+ <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+ <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+ <20240814055408-mutt-send-email-mst@kernel.org>
+ <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
+ <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
+ <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813071610.52295-1-michal.swiatkowski@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Tue, Aug 13, 2024 at 09:16:10AM CEST, michal.swiatkowski@linux.intel.com wrote:
->Use always the same pf id in devlink port number. When doing
->pass-through the PF to VM bus info func number can be any value.
+Christian Heusel wrote:
+> On 24/08/14 10:10AM, Adrian Vladu wrote:
+> > Hello,
+> > 
+> > The 6.6.y branch has the patch already in the stable queue -> https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/?id=3e713b73c01fac163a5c8cb0953d1e300407a773, and it should be available in the 6.6.46 upcoming minor.
+> > 
+> > Thanks, Adrian.
+> 
+> Yeah it's also queued up for 6.10, which I both missed (sorry for that!).
+> If I'm able to properly backport the patch for 6.1 I'll send that one,
+> but my hopes are not too high that this will work ..
 
-From the patch subject I'm not sure which tree you target, but since
-this is a bugfix of something not recent, you should target -net.
-Also, please provide "Fixes" tag blaming the commit(s) that introduced
-the issue.
+There are two conflicts.
 
+The one in include/linux/virtio_net.h is resolved by first backporting
+commit fc8b2a6194693 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4
+validation")
 
->
->Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
->Suggested-by: Jiri Pirko <jiri@resnulli.us>
->Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->---
-> drivers/net/ethernet/intel/ice/devlink/devlink_port.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->index 4abdc40d345e..1fe441bfa0ca 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->@@ -340,7 +340,7 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
-> 		return -EIO;
-> 
-> 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
->-	attrs.phys.port_number = pf->hw.bus.func;
->+	attrs.phys.port_number = pf->hw.pf_id;
-> 
-> 	/* As FW supports only port split options for whole device,
-> 	 * set port split options only for first PF.
->@@ -458,7 +458,7 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
-> 		return -EINVAL;
-> 
-> 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
->-	attrs.pci_vf.pf = pf->hw.bus.func;
->+	attrs.pci_vf.pf = pf->hw.pf_id;
-> 	attrs.pci_vf.vf = vf->vf_id;
-> 
-> 	ice_devlink_set_switch_id(pf, &attrs.switch_id);
->-- 
->2.42.0
->
+We did not backport that to stable because there was some slight risk
+that applications might be affected. This has not surfaced.
+
+The conflict in net/ipv4/udp_offload.c is not so easy to address.
+There were lots of patches between v6.1 and linus/master, with far
+fewer of these betwee v6.1 and linux-stable/linux-6.1.y.
+
+We can also avoid the backport of fc8b2a6194693 and construct a custom
+version for this older kernel. All this is needed in virtio_net.h is
+
++               case SKB_GSO_UDP_L4:
++               case SKB_GSO_TCPV4:
++               case SKB_GSO_TCPV6:
++                       if (skb->csum_offset != offsetof(struct tcphdr, check))
+
+and in __udp_gso_segment
+
++       if (unlikely(skb_checksum_start(gso_skb) !=
++                    skb_transport_header(gso_skb)))
++               return ERR_PTR(-EINVAL);
++
+
+The Fixes tag points to a commit introduced in 6.1. 6.6 is queued up,
+so this is the only release for which we have to create a custom
+patch, right?
+
+Let me know if you will send this, or I should?
+
 
