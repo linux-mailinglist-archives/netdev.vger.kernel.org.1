@@ -1,86 +1,56 @@
-Return-Path: <netdev+bounces-118485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CDC2951BFC
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:36:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18BB8951BFF
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0D72288697
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:36:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44F7B1C2103D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6CD1B1505;
-	Wed, 14 Aug 2024 13:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5618D1B1405;
+	Wed, 14 Aug 2024 13:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zw2j8wAl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKppiM8T"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC241B1439
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5861AE86B;
+	Wed, 14 Aug 2024 13:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723642587; cv=none; b=p/iEvOnbn1l/KGi4A2kOmUUBEOiJ6wsGnZKdtU2w9Fj4/T1NB+UuevVI1RHP+L2oFyerglLQisZf7ZpK1z3hdsh3/4xPWQKOhPEluBlM7MxLE+DWi+0v1Ey29j8O7keBCMs/ajOXPiWznbqoU+7I3ujH5OSXwRQzzdg8dGO36I4=
+	t=1723642616; cv=none; b=pOoWavOyBOk8tQGhCfqte0vyH8yPkPDQX6wU2L6I76orjTgOf/lL07MGvMyrDbjDwjsSfDoEQxcC7GF8h0xczcA7snelloCHg1kErmFdEDGO47Ncfcep7+l1mpef3JHoW/BSAGlUqMMGzx1dSwTK1D3v22IEnBQMfmgfIftaIhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723642587; c=relaxed/simple;
-	bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
+	s=arc-20240116; t=1723642616; c=relaxed/simple;
+	bh=AfZwoXYyHlaI4AyS0IHIY7OBojZ3hrhEHOAmUSWTFSI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ay/KIp/AORd3ohSZ+ki78v0puQc89tWo57NuUtc5trxj2p5UYY8PgXLXPkRpEIR+MEA1Qu23avMh8z1Htp6bqrXlWfxowE0rBTa+1XnQuo04ntu17xUwqrxS8UAsJFbG1y/nSHnbBakBWO+sZ6p1xDGQ37n16XOn9QT123nAQyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zw2j8wAl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723642584;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
-	b=Zw2j8wAlve/ue92sW3VV6H/LHcgEpFTJmvr5f8unq22yKxALVhIfjUOBoV0ks2NfLuJIi+
-	k2YQYcYqFH9YDOBYxw2ZeUz71s8djxWA0JUlbCRfnug1LRW8+9xq4hmMmA+hjRsfGwnoMB
-	NY1okDuy3ISRlAJcO4vS79cb1HSqxNQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-ehF6iOKsMQSEEH0E0c080g-1; Wed, 14 Aug 2024 09:36:23 -0400
-X-MC-Unique: ehF6iOKsMQSEEH0E0c080g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3717cc80ce1so211317f8f.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:36:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723642582; x=1724247382;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
-        b=ldsB7O+E2VPLIoMhKMNAYlfWJbGzebtQETk32HXncOV0FMZOrM0PxXChB8GMQ++rRd
-         /A00NuaoR9lMdhG58W/AuD086FeiKYqvAAPJX6vbBdRga894owMDu1kcUdU0WGFMrZdX
-         s/rd091I9iIoYG5aYPUa0RKGlAAtqYPMQTK8LYL0mawZhVzlH52x5lbl2rG+w+jDVgvt
-         bKhsOCCH+nU6ARPoxvx0jbaEnJTg3D7E8vEcRZzqHRwiyq7goQsyYzyR177af9rL75Zc
-         gpOfHrIMXxNBrHtjDPUGgM9kE8nQrGx/yAyBhPNE2a3v4e4CeLq+Ql+pq+EPLtpKlPON
-         BCjw==
-X-Gm-Message-State: AOJu0YzklM/Ua4TZaJ561dWT7T+9NoWmexkyRxwHhcE11vo1autV0PUu
-	ilnHhOM63KMzFJ7Ntk7ZTKaS2fJv6P7HLtrIIhoTqmz4FWX5dLV/T9AqB8VXK+yN5j3yaRzCSPj
-	qA5G/e9/qUCSxMCuilMaeN4PK1WGeGL5lNGcamyINc0v2m8PcR9iGvg==
-X-Received: by 2002:adf:b350:0:b0:366:e89c:342e with SMTP id ffacd0b85a97d-371778091e9mr1996784f8f.53.1723642581969;
-        Wed, 14 Aug 2024 06:36:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFt3HMQ/Qa2E+4THPS3lYFr/As/KTDUwtd6B1IFDJ4smFL2ezjwNeRkWkKIxjBpSzNt949ptA==
-X-Received: by 2002:adf:b350:0:b0:366:e89c:342e with SMTP id ffacd0b85a97d-371778091e9mr1996754f8f.53.1723642581029;
-        Wed, 14 Aug 2024 06:36:21 -0700 (PDT)
-Received: from debian (2a01cb058918ce00537dacc92215c427.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:537d:acc9:2215:c427])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4cfeeb09sm12894856f8f.51.2024.08.14.06.36.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 06:36:20 -0700 (PDT)
-Date: Wed, 14 Aug 2024 15:36:18 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, dsahern@kernel.org, pablo@netfilter.org,
-	kadlec@netfilter.org, fw@strlen.de
-Subject: Re: [PATCH net-next v2 0/3] Preparations for FIB rule DSCP selector
-Message-ID: <Zryy0jQ0adJU+L7s@debian>
-References: <20240814125224.972815-1-idosch@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z7VXvVcqVL+ogABelbsI5I6UlOJqFdIsixAEKeByBQEEHHFCOMOX2/otGekXiI1Jb6tnc6UpdFqnvOz7uXI5WIkGq9C6puJdayaJu0LnCM79HQN6BnB60LPbOfhwgSktVfgiMlGBLfjQ1t1kXFCn3y5X2GahFvFm8YHz8lCvtTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKppiM8T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EF0C32786;
+	Wed, 14 Aug 2024 13:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723642616;
+	bh=AfZwoXYyHlaI4AyS0IHIY7OBojZ3hrhEHOAmUSWTFSI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vKppiM8TI7lg9JcPCqT3Sn2s7Dbo55T0W+E2BmfhSpBkLZPy8I8QGQnz/vSKybnXK
+	 E9lR4jrEmyE2rA+inP9wlEDEa0HG5ToUIFQ26LAzmitN9b9ZdFMMJgA22e1nn8skwx
+	 1AH+5YWgdWXAALyM4BX1Nin1y1z/GOm6GaBAXiL3t2hDhzOB86YOhN++iFjviAU7tk
+	 5wxCnVXr2UAA/xr8/UCZU8J+R3RNH4nsK3R5AHvwPMsjwYzmD94nUK033aeUcwN8y1
+	 gDZUksJo3wa1LJ4IDhtx1Pubx97ppcalgz8tjGGf+vwhwif+p4852NDC149g7lqYkA
+	 HEvFRtp8VV80w==
+Date: Wed, 14 Aug 2024 14:36:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nils Fuhler <nils@nilsfuhler.de>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ip6: ndisc: fix incorrect forwarding of proxied ns
+ packets
+Message-ID: <20240814133651.GA322002@kernel.org>
+References: <20240814123105.8474-2-nils@nilsfuhler.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,14 +59,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240814125224.972815-1-idosch@nvidia.com>
+In-Reply-To: <20240814123105.8474-2-nils@nilsfuhler.de>
 
-On Wed, Aug 14, 2024 at 03:52:21PM +0300, Ido Schimmel wrote:
-> This patchset moves the masking of the upper DSCP bits in 'flowi4_tos'
-> to the core instead of relying on callers of the FIB lookup API to do
-> it.
+On Wed, Aug 14, 2024 at 02:31:06PM +0200, Nils Fuhler wrote:
+> When enabling proxy_ndp per interface instead of globally, neighbor
+> solicitation packets sent to proxied global unicast addresses are
+> forwarded instead of generating a neighbor advertisement. When
+> proxy_ndp is enabled globally, these packets generate na responses as
+> expected.
+> 
+> This patch fixes this behaviour. When an ns packet is sent to a
+> proxied unicast address, it generates an na response regardless
+> whether proxy_ndp is enabled per interface or globally.
+> 
+> Signed-off-by: Nils Fuhler <nils@nilsfuhler.de>
+> ---
+>  net/ipv6/ip6_output.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index ab504d31f0cd..13eaacc5a747 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -551,8 +551,8 @@ int ip6_forward(struct sk_buff *skb)
+>  		return -ETIMEDOUT;
+>  	}
+>  
+> -	/* XXX: idev->cnf.proxy_ndp? */
+> -	if (READ_ONCE(net->ipv6.devconf_all->proxy_ndp) &&
+> +	if ((READ_ONCE(net->ipv6.devconf_all->proxy_ndp) ||
+> +	     READ_ONCE(idev->cnf.proxy_ndp)) &&
 
-FWIW, I plan to review this patch set next week (I'm mostly offline
-this week).
+Hi Nils,
 
+Earlier in this function it is assumed that idev may be NULL,
+I think you need to take that into account here too.
+
+Flagged by Smatch.
+
+If you do post an update, please be sure to wait 24h before doing so.
+https://docs.kernel.org/process/maintainer-netdev.html
+
+>  	    pneigh_lookup(&nd_tbl, net, &hdr->daddr, skb->dev, 0)) {
+>  		int proxied = ip6_forward_proxy_check(skb);
+>  		if (proxied > 0) {
+> -- 
+> 2.39.2
+> 
+> 
 
