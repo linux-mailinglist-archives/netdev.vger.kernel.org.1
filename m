@@ -1,268 +1,111 @@
-Return-Path: <netdev+bounces-118583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C1D95227C
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:10:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968B0952280
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2BC1C217F6
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:10:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175521F23718
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887A41BE246;
-	Wed, 14 Aug 2024 19:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AF81BE254;
+	Wed, 14 Aug 2024 19:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PCJd+9So"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3P2JAD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E181BD514
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2BBB679
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723662614; cv=none; b=UN5ny6lXzl8JG6RJQe6L4Om8XW6yWeXj78MCqsLXKiOiG6G/ke3ucTarlITrMa3nPnZiV4tmTx0y4NAKoBevx/6e45ZW5knIE7iBdr0etJIRGJbqneR2wpKTovRy87AdUN1JTAvwshSscq6ZloKvjFeA7x3S45N4OSAGNivVuPU=
+	t=1723662707; cv=none; b=VmJBX7tn9pep+cg8CxXBWk95hcMZ7S/q3lm2l2c03CZZEwh120dWOySnjbRsqkVDU/AGg+qvkxkNShn15e5Oeu0E/uW8L8wG0NQqzDJYdadkyf3gru939yA91kbMAYOi5RGGQtBDjo22gAPFCP9o0iO9YQ9pLdaLDh/wjvNCiWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723662614; c=relaxed/simple;
-	bh=puAXCRFRIP++S42Pw9m2tr+d7epYbIyOvbOE3LYbsyI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DJ5Zua9ue3zOl/hfp6DSersGYQBGfeCw+QOkr5JFsTwKeeLpwtW86rm/Z376T2GeAUSWki1zZVt9B+oiLmZHcCQtYVK6R82ARHoajXqou45/ihvRDgpTqSgE8fcdYy6V7xj2auvxwJAZ+sd8XX5PLlzzYgu6vy9nx6Rnhvmm53Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PCJd+9So; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723662613; x=1755198613;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=puAXCRFRIP++S42Pw9m2tr+d7epYbIyOvbOE3LYbsyI=;
-  b=PCJd+9SofdWPPqkk/IyiKyGiTizn+7LNlwZpo++SHzuuHBg++USMGSXB
-   rer8pT6vmjr9iycEXAF3QBt6uOZba3uiybEH83Y3pfyfnnDU34JDymZDi
-   opGHePC/labg8EApVbShmQzGwFc61Uo+rpYA0N5WWJn09niivmrdwcLsF
-   m5SlAxNNSfj6Tkx3y4Ihc+xK1YVWPUQBMiWFFmeKj6X77LROxpguAH4cD
-   3CnCCv6RddOJb/pHPPkRo0Rqf55WhQ8q/HWyaCN1vor3Y0GGMnpL6vDwo
-   IR3GnqcSdMInt9+CjKqF7rUbLUQX1F2yR4G+MtMD9wLDP/hhUhfx8CRvg
-   w==;
-X-CSE-ConnectionGUID: PnuLX/chRV+wBH7iW6Ou2A==
-X-CSE-MsgGUID: ayRklKaSRmm8bpAkP75hHQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="21869963"
-X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
-   d="scan'208";a="21869963"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 12:10:12 -0700
-X-CSE-ConnectionGUID: c8ycNxVXSiSegtYsF2ACmg==
-X-CSE-MsgGUID: CryTS2bkTnyETYHl7t3KJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
-   d="scan'208";a="59395720"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by orviesa006.jf.intel.com with ESMTP; 14 Aug 2024 12:10:10 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-next v2] i40e: Add Energy Efficient Ethernet ability for X710 Base-T/KR/KX cards
-Date: Wed, 14 Aug 2024 21:10:09 +0200
-Message-Id: <20240814191009.1127679-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1723662707; c=relaxed/simple;
+	bh=VcmlmTXDV4KXDOB1h9BS0wkwd7KF9mO8IUQjqM61JtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F8SZOsM+0+CMYBBE2dGX6A0a2nRDA1dAGQy2nv9t+wHY810up+C1bzM+1AJRefo7roVNSmZZS98CEPSPjGsiT04DW1cyWDMjZ/6+sN5+kHj2HRgQQ0Q/kTBDQYuvD9XMvsGOXJ7y6xf3JmmZUpsrxFhp+dhH0wPp2AldxKHGsDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D3P2JAD2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3665C116B1;
+	Wed, 14 Aug 2024 19:11:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723662707;
+	bh=VcmlmTXDV4KXDOB1h9BS0wkwd7KF9mO8IUQjqM61JtI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D3P2JAD2j1598XvxGC0/Wo58CAHH5Eeo3dPv/EeuY4hfes9k+xpZ1tgLqHn0fzi4z
+	 qd59NvjGGDwG2ngV+mOTNcaKqpwiL/EOaMPA+/4UilH6drxbRSLgl0QHlKyJkq/Eft
+	 9BZdEJmwJiYWmwQo+VDNvGr8aHYu4pUdlTVvPB2LeUadsbQHD1CNfeVY1Ahp5TCwWk
+	 NXlhjQnZhoNOcbKOHMNTJ0ry3EZb/IjzSo7bjKC1FI52IGcW/Pfq8zG/P/V45B/VkJ
+	 IJ2eJyreUluVPOWbekfVREOMfFVIjgaoQACun6Jwz2nEy4SagyvGLt6AH6forS2YEP
+	 KDpXtxyXvvFRA==
+Date: Wed, 14 Aug 2024 12:11:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>
+Cc: "Arinzon, David" <darinzon@amazon.com>, David Miller
+ <davem@davemloft.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky, Zorik"
+ <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, "Bshara,
+ Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori,
+ Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
+ "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
+ <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+ "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
+ <ndagan@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar"
+ <itzko@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky,
+ Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
+ "Beider, Ron" <rbeider@amazon.com>, "Chauskin, Igor" <igorch@amazon.com>,
+ "Bernstein, Amit" <amitbern@amazon.com>, Parav Pandit <parav@nvidia.com>,
+ Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
+ reporting support
+Message-ID: <20240814121145.37202722@kernel.org>
+In-Reply-To: <8aea0fda1e48485291312a4451aa5d7c@amazon.com>
+References: <20240811100711.12921-1-darinzon@amazon.com>
+	<20240811100711.12921-3-darinzon@amazon.com>
+	<20240812185852.46940666@kernel.org>
+	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
+	<20240813081010.02742f87@kernel.org>
+	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add "EEE: Enabled/Disabled" to dmesg for supported X710 Base-T/KR/KX cards.
-According to the IEEE standard report the EEE ability and and the
-EEE Link Partner ability. Use the kernel's 'ethtool_keee' structure
-and report EEE link modes.
+On Wed, 14 Aug 2024 15:31:49 +0000 Arinzon, David wrote:
+> I've looked into the definition of the metrics under question
+> 
+> Based on AWS documentation (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-network-performance-ena.html)
+> 
+> bw_in_allowance_exceeded: The number of packets queued or dropped because the inbound aggregate bandwidth exceeded the maximum for the instance.
+> bw_out_allowance_exceeded: The number of packets queued or dropped because the outbound aggregate bandwidth exceeded the maximum for the instance.
+> 
+> Based on the netlink spec (https://docs.kernel.org/next/networking/netlink_spec/netdev.html)
+> 
+> rx-hw-drop-ratelimits (uint)
+> doc: Number of the packets dropped by the device due to the received packets bitrate exceeding the device rate limit.
+> tx-hw-drop-ratelimits (uint)
+> doc: Number of the packets dropped by the device due to the transmit packets bitrate exceeding the device rate limit.
+> 
+> The AWS metrics are counting for packets dropped or queued (delayed, but are sent/received with a delay), a change in these metrics is an indication to customers to check their applications and workloads due to risk of exceeding limits.
+> There's no distinction between dropped and queued in these metrics, therefore, they do not match the ratelimits in the netlink spec.
+> In case there will be a separation of these metrics in the future to dropped and queued, we'll be able to add the support for hw-drop-ratelimits.
 
-Example:
-dmesg | grep 'NIC Link is'
-ethtool --show-eee <device>
+Xuan, Michael, the virtio spec calls out drops due to b/w limit being
+exceeded, but AWS people say their NICs also count packets buffered
+but not dropped towards a similar metric.
 
-Before:
-	NIC Link is Up, 10 Gbps Full Duplex, Flow Control: None
-
-        Supported EEE link modes:  Not reported
-        Advertised EEE link modes:  Not reported
-        Link partner advertised EEE link modes:  Not reported
-
-After:
-	NIC Link is Up, 10 Gbps Full Duplex, Flow Control: None, EEE: Enabled
-
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-                                   10000baseT/Full
-        Advertised EEE link modes:  100baseT/Full
-                                    1000baseT/Full
-                                    10000baseT/Full
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
-                                                 10000baseT/Full
-
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v1->v2 removed some not mandatory changes, some style improvements
----
- drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
- .../net/ethernet/intel/i40e/i40e_ethtool.c    | 36 ++++++++++++++++---
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 23 ++++++++++--
- 3 files changed, 53 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index d546567..0f25a48 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -7,6 +7,7 @@
- #include <linux/pci.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/types.h>
-+#include <linux/linkmode.h>
- #include <linux/avf/virtchnl.h>
- #include <linux/net/intel/i40e_client.h>
- #include <net/devlink.h>
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 1d0d2e5..47c5d05 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -5641,50 +5641,78 @@ static int i40e_get_module_eeprom(struct net_device *netdev,
- 	return 0;
- }
- 
-+static void i40e_eee_capability_to_kedata_supported(__le16  eee_capability_,
-+						    unsigned long *supported)
-+{
-+	const int eee_capability = le16_to_cpu(eee_capability_);
-+	static const int lut[] = {
-+		ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-+		ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-+		ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
-+		ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
-+		ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
-+		ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
-+		ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
-+	};
-+
-+	linkmode_zero(supported);
-+	for (unsigned int i = ARRAY_SIZE(lut); i--; )
-+		if (eee_capability & BIT(i + 1))
-+			linkmode_set_bit(lut[i], supported);
-+}
-+
- static int i40e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_aq_get_phy_abilities_resp phy_cfg;
- 	struct i40e_vsi *vsi = np->vsi;
- 	struct i40e_pf *pf = vsi->back;
- 	struct i40e_hw *hw = &pf->hw;
--	int status = 0;
-+	int status;
- 
- 	/* Get initial PHY capabilities */
- 	status = i40e_aq_get_phy_capabilities(hw, false, true, &phy_cfg, NULL);
- 	if (status)
- 		return -EAGAIN;
- 
- 	/* Check whether NIC configuration is compatible with Energy Efficient
- 	 * Ethernet (EEE) mode.
- 	 */
- 	if (phy_cfg.eee_capability == 0)
- 		return -EOPNOTSUPP;
- 
-+	i40e_eee_capability_to_kedata_supported(phy_cfg.eee_capability,
-+						edata->supported);
-+	linkmode_copy(edata->lp_advertised, edata->supported);
-+
- 	/* Get current configuration */
- 	status = i40e_aq_get_phy_capabilities(hw, false, false, &phy_cfg, NULL);
- 	if (status)
- 		return -EAGAIN;
- 
-+	linkmode_zero(edata->advertised);
-+	if (phy_cfg.eee_capability)
-+		linkmode_copy(edata->advertised, edata->supported);
- 	edata->eee_enabled = !!phy_cfg.eee_capability;
- 	edata->tx_lpi_enabled = pf->stats.tx_lpi_status;
- 
- 	edata->eee_active = pf->stats.tx_lpi_status && pf->stats.rx_lpi_status;
- 
- 	return 0;
- }
- 
- static int i40e_is_eee_param_supported(struct net_device *netdev,
- 				       struct ethtool_keee *edata)
- {
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_vsi *vsi = np->vsi;
- 	struct i40e_pf *pf = vsi->back;
- 	struct i40e_ethtool_not_used {
--		u32 value;
-+		bool value;
- 		const char *name;
- 	} param[] = {
--		{edata->tx_lpi_timer, "tx-timer"},
-+		{!!(edata->advertised[0] & ~edata->supported[0]), "advertise"},
-+		{!!edata->tx_lpi_timer, "tx-timer"},
- 		{edata->tx_lpi_enabled != pf->stats.tx_lpi_status, "tx-lpi"}
- 	};
- 	int i;
-@@ -5710,7 +5738,7 @@ static int i40e_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 	struct i40e_pf *pf = vsi->back;
- 	struct i40e_hw *hw = &pf->hw;
- 	__le16 eee_capability;
--	int status = 0;
-+	int status;
- 
- 	/* Deny parameters we don't support */
- 	if (i40e_is_eee_param_supported(netdev, edata))
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index cbcfada..5c102f8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -7263,6 +7263,25 @@ static int i40e_init_pf_dcb(struct i40e_pf *pf)
- 	return err;
- }
- #endif /* CONFIG_I40E_DCB */
-+static void i40e_print_link_message_eee(struct i40e_vsi *vsi,
-+			    const char *speed, const char *fc)
-+{
-+	struct ethtool_keee kedata;
-+
-+	memzero_explicit(&kedata, sizeof(kedata));
-+	if (vsi->netdev->ethtool_ops->get_eee)
-+		vsi->netdev->ethtool_ops->get_eee(vsi->netdev, &kedata);
-+
-+	if (!linkmode_empty(kedata.supported))
-+		netdev_info(vsi->netdev,
-+			    "NIC Link is Up, %sbps Full Duplex, Flow Control: %s, EEE: %s\n",
-+			    speed, fc,
-+			    kedata.eee_enabled ? "Enabled" : "Disabled");
-+	else
-+		netdev_info(vsi->netdev,
-+			    "NIC Link is Up, %sbps Full Duplex, Flow Control: %s\n",
-+			    speed, fc);
-+}
- 
- /**
-  * i40e_print_link_message - print link up or down
-@@ -7395,9 +7414,7 @@ void i40e_print_link_message(struct i40e_vsi *vsi, bool isup)
- 			    "NIC Link is Up, %sbps Full Duplex, Requested FEC: %s, Negotiated FEC: %s, Autoneg: %s, Flow Control: %s\n",
- 			    speed, req_fec, fec, an, fc);
- 	} else {
--		netdev_info(vsi->netdev,
--			    "NIC Link is Up, %sbps Full Duplex, Flow Control: %s\n",
--			    speed, fc);
-+		i40e_print_link_message_eee(vsi, speed, fc);
- 	}
- 
- }
--- 
-2.25.1
-
+I presume the virtio spec is supposed to cover the same use cases.
+Have the stats been approved? Is it reasonable to extend the definition
+of the "exceeded" stats in the virtio spec to cover what AWS specifies? 
+Looks like PR is still open:
+https://github.com/oasis-tcs/virtio-spec/issues/180
 
