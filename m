@@ -1,65 +1,72 @@
-Return-Path: <netdev+bounces-118432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A09B95193F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:45:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3FE951944
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E2211F262F9
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:45:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0A271C20833
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CAC713D298;
-	Wed, 14 Aug 2024 10:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCD01AE866;
+	Wed, 14 Aug 2024 10:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="awt0IobI"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QgBiCUtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F831AE043
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB831AE053
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723632307; cv=none; b=bx6nnok/Nu5IdGg8gx9YTVdZ/bkZ8qudcrIn3BPt0o0Jai18Nh7qNud/NEH04GNQSyfRkWyr4WrY+UaLeUl6Ojx55kaQZKMi7lTtB9SgpZJrSSV2fhvwKSsG/IBZu/kSlfXcsHclkE+beaA8578wwu1tfC44rmTdS5pfqJhv+8k=
+	t=1723632309; cv=none; b=BjZRzaV/SkjmVIqzErhMbeCLP5NCfU1SSonE/FFVAOW6T2WDp/1X1Y7KcKBgIIrUbImk2C9boZNB7vdVPgmePwhqWNHIFy/jdE2LcFB5Fr8z5JULfJYb0xr6WE0W+qD3kjB8B+/wl4rUVMjcbyAd2aPyJP/NiYbGgJFjT5pTgH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723632307; c=relaxed/simple;
-	bh=a5KrdtRLOgpr8DwJFZLF1WHA9kk/i1MzhU2jglxWUG8=;
+	s=arc-20240116; t=1723632309; c=relaxed/simple;
+	bh=cZ9BkgG63rEN8kNe9FhooxE8MhReOnBZMnAbDlarQAQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PNCFwPaLdd5qZuC01Vg6OdcVdnKHugA8Y9VbVD7+0Tq+L3wsjGc57c+6kFfT2yPQOnqKbOdAtZFyIBaxFxjcLJ4WWVkF5KCoP8JtrQ9o2Ogv7icc//hGoEJqjJoOrFAy1mNjPVftCiWBVMjMLss0y/VNjnyo0DAFkQj87bo6pIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=awt0IobI; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723632305; x=1755168305;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=a5KrdtRLOgpr8DwJFZLF1WHA9kk/i1MzhU2jglxWUG8=;
-  b=awt0IobIe07XFV02y4FHz4F9gxH2N6FYYSJy4ie5Vr3ZMqs9zwwhPDJu
-   askzufJHm6lz6HdsgMDj2jhsenhiMQ0mIXm3Tfr1uItN8y4uYxUK1TgeF
-   r4sWathxWlIfsUb6MCtnrzvACRhpY+hLIxlZCaAHaNWKqiI8kheDk3B+n
-   uULDqUjgxVU+GAuY6CB3zZRX04rWts5dEgkvPxqzq8He5S7yv3d59aNdE
-   5swmS/Tl70107Hg583gREi+YpnXkTprcYLka2nTcNM7c4YA/K4VwtBoPH
-   niUA0oRav44QMlCEcLHhXZ/zTsSJkqeOroOUstHS9n66BLAcq3MuEGN+6
-   Q==;
-X-CSE-ConnectionGUID: YdJxscb5QoSfdjNs4JsPJA==
-X-CSE-MsgGUID: jbncllqERbO48LslSSHsww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21651978"
-X-IronPort-AV: E=Sophos;i="6.09,145,1716274800"; 
-   d="scan'208";a="21651978"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 03:45:04 -0700
-X-CSE-ConnectionGUID: FXDONt9bRzKKKWKeerycnA==
-X-CSE-MsgGUID: R6hydafiSUCzC5YE6Bp2tA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,145,1716274800"; 
-   d="scan'208";a="58933088"
-Received: from dosuchow-mobl2.ger.corp.intel.com (HELO [10.245.130.66]) ([10.245.130.66])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 03:45:00 -0700
-Message-ID: <40210c88-1e3a-44d2-8907-1530500eab91@linux.intel.com>
-Date: Wed, 14 Aug 2024 12:44:56 +0200
+	 In-Reply-To:Content-Type; b=O8G3YfZoYeERJt6ItXBLPXYei1F8/RppTDNGt2FsHS0kA9ChTremMB0qvLMB8W4yVoM4y29REscrdHyHghZAsukdg0ybCVrtpF9q/GroE1nxSxDuQQnH5EKN2hwKTAQwrmWppAxrYNd/Ocr3rs8HWzKziDUtA/zhplqtqLuMXJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QgBiCUtp; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6bbc1cee9b7so38249536d6.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1723632305; x=1724237105; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LFk4lh3cCjG0SR06SvOvwiuhTMezfgXvWpzfkPomYos=;
+        b=QgBiCUtpXay0ZhB65ngHKiBM74LRtmQEDxXXIn2/XXjq0QggV11C+PHdes5yT0WZII
+         1UU4rqBRDAfKfcKR6LgFstRXi+v80/a+9EaCzbiSEsGqLuhT5OrdJjPCjOEw73cYOOeL
+         J2UqsUf0nRPwQhDRuL6TLvQZNbVdaf2SzV268=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723632305; x=1724237105;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LFk4lh3cCjG0SR06SvOvwiuhTMezfgXvWpzfkPomYos=;
+        b=c9Uw3Alf4CsPf5Z042aos8va4vffCfwsC99zmIrM3b+egyiYX/A5ldutc0ZucVzUwm
+         hJ9EM2TfJU1cnZ7piVsdLBgMKJx5kuujGPbx4gXUbMWljGPphmHS9czDNxphPSXtnx98
+         F0praoLOfNMbkKo6XBwL0s68belIBLlTQk/mgL4DnDA41nwN91HFPTXv+HTG4PV47H3w
+         Zo2uRlfUniw1DjcChsrzYEdcJxY8YUTAzZNwk2I6pHC7QliAbPIpVF3TN9lxNbMVJdzY
+         FmEYYRjZ9/MKS4jh/XXVIWrtBobli7DdnTROu6OWdg/9s93FD4dMO/0pWbwgL7MpgZcz
+         OHkA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXVLNjBGFyiWyayS4vM3Mpk1oulLCBmgcYHaKkqAv260Fuv33bll/lC/NngR3RllbuwYd4xHa9F3iZQ1U3b64Gp0HrmOqP
+X-Gm-Message-State: AOJu0Yyu35CcnV2PeZu8V+EKllHZ7xfTjJP/w+ym4LSLkEoWCdVQx1TY
+	sA4FBOjMf39+GK8t78WTuLiX9HRHXRcF99lhvP++YHoiJu74qkOQA0jNy3h8BA==
+X-Google-Smtp-Source: AGHT+IGINV7Cr6/yUzciRzHq2zhc1Ek5UNVW7N0rj9HFgKO7ExivX+a6umTbzKbdjzFu5OuVUGXsyg==
+X-Received: by 2002:a0c:f7ce:0:b0:6bf:6714:43b3 with SMTP id 6a1803df08f44-6bf6714448emr2393696d6.21.1723632304908;
+        Wed, 14 Aug 2024 03:45:04 -0700 (PDT)
+Received: from [10.176.68.61] ([192.19.176.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bd82c87843sm42263316d6.31.2024.08.14.03.45.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 03:45:04 -0700 (PDT)
+Message-ID: <8de856d4-8526-4662-bb29-898b80476df9@broadcom.com>
+Date: Wed, 14 Aug 2024 12:44:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,63 +74,220 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] ice: Add netif_device_attach/detach into PF reset
- flow
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Igor Bagnucki <igor.bagnucki@intel.com>
-References: <20240812102210.61548-1-dawid.osuchowski@linux.intel.com>
- <CAH-L+nOFqs-K5YzfrfmpRHbhDGM-+1ahhWh4NXATX1FqZiPVLQ@mail.gmail.com>
-Content-Language: pl
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <CAH-L+nOFqs-K5YzfrfmpRHbhDGM-+1ahhWh4NXATX1FqZiPVLQ@mail.gmail.com>
+Subject: Re: [PATCH v10 4/5] wifi: brcmfmac: Add optional lpo clock enable
+ support
+To: Alexey Charkov <alchark@gmail.com>, Jacobe Zang <jacobe.zang@wesion.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, conor+dt@kernel.org, linux-rockchip@lists.infradead.org,
+ efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, arend@broadcom.com,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, megi@xff.cz,
+ duoming@zju.edu.cn, bhelgaas@google.com, minipli@grsecurity.net,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ nick@khadas.com, Sai Krishna <saikrishnag@marvell.com>
+References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
+ <20240813082007.2625841-5-jacobe.zang@wesion.com>
+ <721da64c-42ec-4be6-8ad3-e2685a84823a@broadcom.com>
+ <2269063.vFx2qVVIhK@latitude-fedora>
+ <fa019ee9-3f4d-4bea-92a7-929713518dc9@wesion.com>
+ <CABjd4YwTbG8pm_xwrOVtVwMwvarvz2SB9bapH3LDMqPn6pH9Ew@mail.gmail.com>
+Content-Language: en-US
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
+ xsFNBGP96SABEACfErEjSRi7TA1ttHYaUM3GuirbgqrNvQ41UJs1ag1T0TeyINqG+s6aFuO8
+ evRHRnyAqTjMQoo4tkfy21XQX/OsBlgvMeNzfs6jnVwlCVrhqPkX5g5GaXJnO3c4AvXHyWik
+ SOd8nOIwt9MNfGn99tkRAmmsLaMiVLzYfg+n3kNDsqgylcSahbd+gVMq+32q8QA+L1B9tAkM
+ UccmSXuhilER70gFMJeM9ZQwD/WPOQ2jHpd0hDVoQsTbBxZZnr2GSjSNr7r5ilGV7a3uaRUU
+ HLWPOuGUngSktUTpjwgGYZ87Edp+BpxO62h0aKMyjzWNTkt6UVnMPOwvb70hNA2v58Pt4kHh
+ 8ApHky6IepI6SOCcMpUEHQuoKxTMw/pzmlb4A8PY//Xu/SJF8xpkpWPVcQxNTqkjbpazOUw3
+ 12u4EK1lzwH7wjnhM3Fs5aNBgyg+STS1VWIwoXJ7Q2Z51odh0XecsjL8EkHbp9qHdRvZQmMu
+ Ns8lBPBkzpS7y2Q6Sp7DcRvDfQQxPrE2sKxKLZVGcRYAD90r7NANryRA/i+785MSPUNSTWK3
+ MGZ3Xv3fY7phISvYAklVn/tYRh88Zthf6iDuq86m5mr+qOO8s1JnCz6uxd/SSWLVOWov9Gx3
+ uClOYpVsUSu3utTta3XVcKVMWG/M+dWkbdt2KES2cv4P5twxyQARAQABzS9BcmVuZCB2YW4g
+ U3ByaWVsIDxhcmVuZC52YW5zcHJpZWxAYnJvYWRjb20uY29tPsLBhwQTAQgAMRYhBLX1Z69w
+ T4l/vfdb0pZ6NOIYA/1RBQJj/ek9AhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQlno04hgD/VGw
+ 8A//VEoGTamfCks+a12yFtT1d/GjDdf3i9agKMk3esn08JwjJ96x9OFFl2vFaQCSiefeXITR
+ K4T/yT+n/IXntVWT3pOBfb343cAPjpaZvBMh8p32z3CuV1H0Y+753HX7gdWTEojGWaWmKkZh
+ w3nGoRZQEeAcwcF3gMNwsM5Gemj7aInIhRLUeoKh/0yV85lNE1D7JkyNheQ+v91DWVj5/a9X
+ 7kiL18fH1iC9kvP3lq5VE54okpGqUj5KE5pmHNFBp7HZO3EXFAd3Zxm9ol5ic9tggY0oET28
+ ucARi1wXLD/oCf1R9sAoWfSTnvOcJjG+kUwK7T+ZHTF8YZ4GAT3k5EwZ2Mk3+Rt62R81gzRF
+ A6+zsewqdymbpwgyPDKcJ8YUHbqvspMQnPTmXNk+7p7fXReVPOYFtzzfBGSCByIkh1bB45jO
+ +TM5ZbMmhsUbqA0dFT5JMHjJIaGmcw21ocgBcLsJ730fbLP/L08udgWHywPoq7Ja7lj5W0io
+ ZDLz5uQ6CEER6wzD07vZwSl/NokljVexnOrwbR3wIhdr6B0Hc/0Bh7T8gpeM+QcK6EwJBG7A
+ xCHLEacOuKo4jinf94YQrOEMnOmvucuQRm9CIwZrQ69Mg6rLn32pA4cK4XWQN1N3wQXnRUnb
+ MTymLAoxE4MInhDVsZCtIDFxMVvBUgZiZZszN33OwU0EY/3pIgEQAN35Ii1Hn90ghm/qlvz/
+ L+wFi3PTQ90V6UKPv5Q5hq+1BtLA6aj2qmdFBO9lgO9AbzHo8Eizrgtxp41GkKTgHuYChijI
+ kdhTVPm+Pv44N/3uHUeFhN3wQ3sTs1ZT/0HhwXt8JvjqbhvtNmoGosZvpUCTwiyM1VBF/ICT
+ ltzFmXd5z7sEuDyZcz9Q1t1Bb2cmbhp3eIgLmVA4Lc9ZS3sK1UMgSDwaR4KYBhF0OKMC1OH8
+ M5jfcPHR8OLTLIM/Thw0YIUiYfj6lWwWkb82qa4IQvIEmz0LwvHkaLU1TCXbehO0pLWB9HnK
+ r3nofx5oMfhu+cMa5C6g3fBB8Z43mDi2m/xM6p5c3q/EybOxBzhujeKN7smBTlkvAdwQfvuD
+ jKr9lvrC2oKIjcsO+MxSGY4zRU0WKr4KD720PV2DCn54ZcOxOkOGR624d5bhDbjw1l2r+89V
+ WLRLirBZn7VmWHSdfq5Xl9CyHT1uY6X9FRr3sWde9kA/C7Z2tqy0MevXAz+MtavOJb9XDUlI
+ 7Bm0OPe5BTIuhtLvVZiW4ivT2LJOpkokLy2K852u32Z1QlOYjsbimf77avcrLBplvms0D7j6
+ OaKOq503UKfcSZo3lF70J5UtJfXy64noI4oyVNl1b+egkV2iSXifTGGzOjt50/efgm1bKNkX
+ iCVOYt9sGTrVhiX1ABEBAAHCwXYEGAEIACAWIQS19WevcE+Jf733W9KWejTiGAP9UQUCY/3p
+ PgIbDAAKCRCWejTiGAP9UaC/EACZvViKrMkFooyACGaukqIo/s94sGuqxj308NbZ4g5jgy/T
+ +lYBzlurnFmIbJESFOEq0MBZorozDGk+/p8pfAh4S868i1HFeLivVIujkcL6unG1UYEnnJI9
+ uSwUbEqgA8vwdUPEGewYkPH6AaQoh1DdYGOleQqDq1Mo62xu+bKstYHpArzT2islvLdrBtjD
+ MEzYThskDgDUk/aGPgtPlU9mB7IiBnQcqbS/V5f01ZicI1esy9ywnlWdZCHy36uTUfacshpz
+ LsTCSKICXRotA0p6ZiCQloW7uRH28JFDBEbIOgAcuXGojqYx5vSM6o+03W9UjKkBGYFCqjIy
+ Ku843p86Ky4JBs5dAXN7msLGLhAhtiVx8ymeoLGMoYoxqIoqVNaovvH9y1ZHGqS/IYXWf+jE
+ H4MX7ucv4N8RcsoMGzXyi4UbBjxgljAhTYs+c5YOkbXfkRqXQeECOuQ4prsc6/zxGJf7MlPy
+ NKowQLrlMBGXT4NnRNV0+yHmusXPOPIqQCKEtbWSx9s2slQxmXukPYvLnuRJqkPkvrTgjn5d
+ eSE0Dkhni4292/Nn/TnZf5mxCNWH1p3dz/vrT6EIYk2GSJgCLoTkCcqaM6+5E4IwgYOq3UYu
+ AAgeEbPV1QeTVAPrntrLb0t0U5vdwG7Xl40baV9OydTv7ghjYZU349w1d5mdxg==
+In-Reply-To: <CABjd4YwTbG8pm_xwrOVtVwMwvarvz2SB9bapH3LDMqPn6pH9Ew@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 14.08.2024 05:19, Kalesh Anakkur Purayil wrote:
-> On Mon, Aug 12, 2024 at 3:52 PM Dawid Osuchowski
-> <dawid.osuchowski@linux.intel.com> wrote:
->> @@ -7568,11 +7570,13 @@ static void ice_update_pf_netdev_link(struct ice_pf *pf)
->>
->>                  ice_get_link_status(pf->vsi[i]->port_info, &link_up);
->>                  if (link_up) {
->> +                       netif_device_attach(pf->vsi[i]->netdev);
->>                          netif_carrier_on(pf->vsi[i]->netdev);
->>                          netif_tx_wake_all_queues(pf->vsi[i]->netdev);
->>                  } else {
->>                          netif_carrier_off(pf->vsi[i]->netdev);
->>                          netif_tx_stop_all_queues(pf->vsi[i]->netdev);
->> +                       netif_device_detach(pf->vsi[i]->netdev);
-> [Kalesh] Is there any reason to attach back the netdev only if link is
-> up? IMO, you should attach the device back irrespective of physical
-> link status. In ice_prepare_for_reset(), you are detaching the device
-> unconditionally.
-> 
-> I may be missing something here.
-
-Hey Kalesh,
-
-I think you are right, it is a mistake on my end. I have already sent a 
-v2 but without this change. I just tested if this works with the attach 
-irrespective of link status and it also resolves the reported issue that 
-the patch is supposed to fix and doesn't introduce any regression that I 
-am aware of. I will forward your concern to the v2 thread and will post 
-a v3 with the change.
-
---Dawid
-
->>                  }
->>          }
->>   }
-> 
->> --
->> 2.44.0
+On 8/14/2024 11:48 AM, Alexey Charkov wrote:
+> On Wed, Aug 14, 2024 at 12:27 PM Jacobe Zang <jacobe.zang@wesion.com> wrote:
 >>
 >>
+>>
+>> On 2024/8/14 16:47, Alexey Charkov wrote:
+>>> Hi Arend, Jacobe,
+>>>
+>>> On Tuesday, August 13, 2024 2:57:28 PM GMT+3 Arend van Spriel wrote:
+>>>> On 8/13/2024 10:20 AM, Jacobe Zang wrote:
+>>>>> WiFi modules often require 32kHz clock to function. Add support to
+>>>>> enable the clock to PCIe driver and move "brcm,bcm4329-fmac" check
+>>>>> to the top of brcmf_of_probe. Change function prototypes from void
+>>>>> to int and add appropriate errno's for return values that will be
+>>>>> send to bus when error occurred.
+>>>>
+>>>> I was going to say it looks good to me, but....
+>>>>
+>>>>> Co-developed-by: Ondrej Jirman <megi@xff.cz>
+>>>>> Signed-off-by: Ondrej Jirman <megi@xff.cz>
+>>>>> Co-developed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>>>>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>>>>> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+>>>>> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+>>>>> ---
+>>>>>
+>>>>>     .../broadcom/brcm80211/brcmfmac/bcmsdh.c      |  4 +-
+>>>>>     .../broadcom/brcm80211/brcmfmac/common.c      |  3 +-
+>>>>>     .../wireless/broadcom/brcm80211/brcmfmac/of.c | 53 +++++++++++--------
+>>>>>     .../wireless/broadcom/brcm80211/brcmfmac/of.h |  9 ++--
+>>>>>     .../broadcom/brcm80211/brcmfmac/pcie.c        |  3 ++
+>>>>>     .../broadcom/brcm80211/brcmfmac/sdio.c        | 22 +++++---
+>>>>>     .../broadcom/brcm80211/brcmfmac/usb.c         |  3 ++
+>>>>>     7 files changed, 61 insertions(+), 36 deletions(-)
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
+>>>>> b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c index
+>>>>> e406e11481a62..f19dc7355e0e8 100644
+>>>>> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
+>>>>> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
+>>>>
+>>>> [...]
+>>>>
+>>>>> @@ -113,33 +118,39 @@ void brcmf_of_probe(struct device *dev, enum
+>>>>> brcmf_bus_type bus_type,>
+>>>>>              of_node_put(root);
+>>>>>
+>>>>>      }
+>>>>>
+>>>>> -   if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac"))
+>>>>> -           return;
+>>>>> -
+>>>>>
+>>>>>      err = brcmf_of_get_country_codes(dev, settings);
+>>>>>      if (err)
+>>>>>
+>>>>>              brcmf_err("failed to get OF country code map (err=%d)
+>>> \n", err);
+>>>>>
+>>>>>      of_get_mac_address(np, settings->mac);
+>>>>>
+>>>>> -   if (bus_type != BRCMF_BUSTYPE_SDIO)
+>>>>> -           return;
+>>>>> +   if (bus_type == BRCMF_BUSTYPE_SDIO) {
+>>>>
+>>>> Don't like the fact that this now has an extra indentation level and it
+>>>> offers no extra benefit. Just keep the original if-statement and return
+>>>> 0. Consequently the LPO clock code should move just before the if-statement.
+>>>>> +           if (of_property_read_u32(np, "brcm,drive-strength",
+>>> &val) == 0)
+>>>>> +                   sdio->drive_strength = val;
+>>>>>
+>>>>> -   if (of_property_read_u32(np, "brcm,drive-strength", &val) == 0)
+>>>>> -           sdio->drive_strength = val;
+>>>>> +           /* make sure there are interrupts defined in the node */
+>>>>> +           if (!of_property_present(np, "interrupts"))
+>>>>> +                   return 0;
+>>>>>
+>>>>> -   /* make sure there are interrupts defined in the node */
+>>>>> -   if (!of_property_present(np, "interrupts"))
+>>>>> -           return;
+>>>>> +           irq = irq_of_parse_and_map(np, 0);
+>>>>> +           if (!irq) {
+>>>>> +                   brcmf_err("interrupt could not be
+>>> mapped\n");
+>>>>> +                   return 0;
+>>>>> +           }
+>>>>> +           irqf = irqd_get_trigger_type(irq_get_irq_data(irq));
+>>>>> +
+>>>>> +           sdio->oob_irq_supported = true;
+>>>>> +           sdio->oob_irq_nr = irq;
+>>>>> +           sdio->oob_irq_flags = irqf;
+>>>>> +   }
+>>>>>
+>>>>> -   irq = irq_of_parse_and_map(np, 0);
+>>>>> -   if (!irq) {
+>>>>> -           brcmf_err("interrupt could not be mapped\n");
+>>>>> -           return;
+>>>>> +   clk = devm_clk_get_optional_enabled(dev, "lpo");
+>>>>> +   if (!IS_ERR_OR_NULL(clk)) {
+>>>>> +           brcmf_dbg(INFO, "enabling 32kHz clock\n");
+>>>>> +           return clk_set_rate(clk, 32768);
+>>>>> +   } else {
+>>>>> +           return PTR_ERR_OR_ZERO(clk);
+>>>>>
+>>>>>      }
+>>>>
+>>>> Change this to:
+>>>>    > +        clk = devm_clk_get_optional_enabled(dev, "lpo");
+>>>>    > +        if (IS_ERR_OR_NULL(clk)) {
+>>>>    > +                return PTR_ERR_OR_ZERO(clk);
+>>>
+>>> Perhaps in this case we should go for IS_ERR and PTR_ERR respectively.
+>>> devm_clk_get_optional_enabled would return NULL when the optional clock is not
+>>> found, so NULL is not an error state but serves as a dummy clock that can be> used with clk_set_rate.
+>>
+>> I think we don't need to set clock rate for clock is NULL. So it should
+>> be changed to:
+>>
+>> +       clk = devm_clk_get_optional_enabled(dev, "lpo");
+>> +       if (IS_ERR(clk)) {
+>> +               return PTR_ERR(clk);
+>> +       } else if (clk) {
+>> +               brcmf_dbg(INFO, "enabling 32kHz clock\n");
+>> +               clk_set_rate(clk, 32768);
+>> +       }
 > 
-> 
-> --
-> Regards,
-> Kalesh A P
+> If clk is NULL then clk_set_rate returns immediately with status zero,
+> so there is little difference from whether you wrap it into another if
+> (clk) or not. You can probably drop the debug statement altogether and
+> call clk_set_rate unconditionally - this will look neater.
 
+The construct above is indeed only needed to get the debug statement 
+correct given the behavior of clk_set_rate(). However, for debugging it 
+is useful to know that the LPO clock is defined and used or not. Maybe 
+do this:
+
+        clk = devm_clk_get_optional_enabled(dev, "lpo");
+        if (IS_ERR(clk))
+                return PTR_ERR(clk);
+
+        brcmf_dbg(INFO, "%s LPO clock\n", clk ? "enable" : "no");
+        clk_set_rate(clk, 32768);
+
+Regards,
+Arend
 
