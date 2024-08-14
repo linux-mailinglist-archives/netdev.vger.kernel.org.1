@@ -1,248 +1,115 @@
-Return-Path: <netdev+bounces-118655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E7779525D8
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:37:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3119525E0
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA7552838D0
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A32B22828E8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AE114AD2C;
-	Wed, 14 Aug 2024 22:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF2614AD0A;
+	Wed, 14 Aug 2024 22:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wjh/wcFn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VVMsdcVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876CF14A617
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 22:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1074714900E;
+	Wed, 14 Aug 2024 22:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723675045; cv=none; b=gNRxKrge2sNx2+np72RI9jWKMpS78OV/L95n+XogbRVquQhV+PCgW55IQFpwksf5dCkHTgXRd9stycL9MWN7t+7h5BQBZ5Mums1GHVrPUhA4UwRpahnL62wkwmtaJE/tns8pp3fPPl2PfMcrGQyK2gbTmGVVuNImBq0LooecurE=
+	t=1723675258; cv=none; b=l3GzIV30B9xr03I4jRxR2Dow4EoSUorM62kEQycEnrocUK3xbiddRbHBTMOekz9ULVVXevRUBd33vHAwHiAjlxXsVfheei0Ve3PHx22HniN4sNrUUQULuSVuHTnPD3VMXl6GoiFOV9hI2aWdVuHh5kNqklgbmJWu3urPaqv1dT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723675045; c=relaxed/simple;
-	bh=RyBEIF+WkRp3KbGMySEBlxB8nRiemo7+pvynatFUUJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kRdL7kAQt7Oo0fBx56qJe5xmFSg8a00/QsGeJ5IQBdtNJE3IR18IVUPQyzAxKR6I1r7+1pwdhfR1ZZVRtXvT/vqgQC8VOr7wpfXN72jH6Cgv01QyDCcYtMU3FC7gCdRZdD94s19LZL+p2PyFV3ulVLdX0tEXSEGuBh5Cw0p7W7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wjh/wcFn; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <716cbd56-4a44-4451-a6f3-5bacef3e0729@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723675041;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f86mRHsZH4bwWIAKgadOnwJ3hSEJ46GTw8tBGGkcal4=;
-	b=wjh/wcFn6Y9Kool1UBy57C1o4V+xz4OEDXKBw49EfwGjgiKzLJHtcZ2LbVGODU0go8Y9A6
-	R8NCLaZcadw/Zs8GZ87RXu+LR6tLJdaoiQ9twKqFnRxCL2sa+WFv1ka0+UhCdC7oKy2BMj
-	96ePr6rzwxMShYVcnAykZCHgYxt2Lzs=
-Date: Wed, 14 Aug 2024 15:37:09 -0700
+	s=arc-20240116; t=1723675258; c=relaxed/simple;
+	bh=012qWjFcXHvJxGFI3ewDgtFYGDwmYmUSmtkoQc4FfBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qWRHbFjsyh3jXe+4gNo+7Wna7KrW9rU7EIrZ/D8ECq7nNCAi9pyXr7ZMGSqLZ+inKy5/nK/2Eq1AEG+NaDb+s3JVDAvtMN9A0Eoa7FAK/ys88ruqF14+z5wYAqzKd9b83X1oapQVghg+DggcMFPFqDL3QGmgWPWaJp+ss8b4p4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VVMsdcVa; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TEl/SlxA1xVlzUpkGUWQyXMGv73dhmpW6HQm+tKJpkU=; b=VVMsdcVaSP3wXqKYIpq4Bdj/7w
+	xpDXP61QW0a6VjEk+AT+2E0sDJcweEv17SxFfZhhh6p92qpiENB+jPkTAB7+BD1EwFuBY2WhM+62O
+	9jiNewpfsnqAa1J6i0f25A8ZMWw4BLGDXrBCHEdPFqfeLr8zNdNbd4Fy6WkEzgl1hTto=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1seMfR-004o5X-9Z; Thu, 15 Aug 2024 00:40:33 +0200
+Date: Thu, 15 Aug 2024 00:40:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, marex@denx.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: microchip: add SGMII
+ port support to KSZ9477 switch
+Message-ID: <4d4d06e9-c0b4-4b49-a892-11efd07faf9a@lunn.ch>
+References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
+ <20240809233840.59953-2-Tristram.Ha@microchip.com>
+ <eae7d246-49c3-486e-bc62-cdb49d6b1d72@lunn.ch>
+ <BYAPR11MB355823A969242508B05D7156EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <144ed2fd-f6e4-43a1-99bc-57e6045996da@lunn.ch>
+ <BYAPR11MB35584725C73534BC26009F77EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <9b960383-6f6c-4a8c-85bb-5ccba96abb01@lunn.ch>
+ <MN2PR11MB3566A463C897A7967F4FCB09EC872@MN2PR11MB3566.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v4 2/2] selftests/bpf: Add mptcp subflow subtest
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Daniel Xu <dxu@dxuuu.xyz>,
- Manu Bretelle <chantra@meta.com>
-References: <20240805-upstream-bpf-next-20240506-mptcp-subflow-test-v4-0-2b4ca6994993@kernel.org>
- <20240805-upstream-bpf-next-20240506-mptcp-subflow-test-v4-2-2b4ca6994993@kernel.org>
- <2136317a-3e95-4993-b2fc-1f3b2c28dbdc@linux.dev>
- <8a2ff1bd-52dc-421d-87b7-fc2f56e81da2@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <8a2ff1bd-52dc-421d-87b7-fc2f56e81da2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN2PR11MB3566A463C897A7967F4FCB09EC872@MN2PR11MB3566.namprd11.prod.outlook.com>
 
-On 8/14/24 3:04 AM, Matthieu Baerts wrote:
-> Hi Martin,
+> > The board should be designed such that the I2C bus pins of the SFP
+> > cage are connected to an I2C controller. There are also a few pins
+> > which ideally should be connected to GPIOs, LOS, Tx disable etc. You
+> > can then put a node in DT describing the SFP cage:
+> > 
+> > Documentation/devicetree/bindings/net/sff,sfp.yaml
+> > 
+> >     sfp2: sfp {
+> >       compatible = "sff,sfp";
+> >       i2c-bus = <&sfp_i2c>;
+> >       los-gpios = <&cps_gpio1 28 GPIO_ACTIVE_HIGH>;
+> >       mod-def0-gpios = <&cps_gpio1 27 GPIO_ACTIVE_LOW>;
+> >       pinctrl-names = "default";
+> >       pinctrl-0 = <&cps_sfpp0_pins>;
+> >       tx-disable-gpios = <&cps_gpio1 29 GPIO_ACTIVE_HIGH>;
+> >       tx-fault-gpios = <&cps_gpio1 26 GPIO_ACTIVE_HIGH>;
+> >     };
+> > 
+> > and then the ethernet node has a link to it:
+> > 
+> >     ethernet {
+> >       phy-names = "comphy";
+> >       phys = <&cps_comphy5 0>;
+> >       sfp = <&sfp1>;
+> >     };
+> > 
+> > Phylink will then driver the SFP and tell the MAC what to do.
 > 
-> Thank you for your reply!
-> 
-> On 14/08/2024 03:12, Martin KaFai Lau wrote:
->> On 8/5/24 2:52 AM, Matthieu Baerts (NGI0) wrote:
->>> +static int endpoint_init(char *flags)
->>> +{
->>> +    SYS(fail, "ip -net %s link add veth1 type veth peer name veth2",
->>> NS_TEST);
->>> +    SYS(fail, "ip -net %s addr add %s/24 dev veth1", NS_TEST, ADDR_1);
->>> +    SYS(fail, "ip -net %s link set dev veth1 up", NS_TEST);
->>> +    SYS(fail, "ip -net %s addr add %s/24 dev veth2", NS_TEST, ADDR_2);
->>> +    SYS(fail, "ip -net %s link set dev veth2 up", NS_TEST);
->>> +    if (SYS_NOFAIL("ip -net %s mptcp endpoint add %s %s", NS_TEST,
->>> ADDR_2, flags)) {
->>> +        printf("'ip mptcp' not supported, skip this test.\n");
->>> +        test__skip();
->>
->> It is always a skip now in bpf CI:
->>
->> #171/3   mptcp/subflow:SKIP
->>
->> This test is a useful addition for the bpf CI selftest.
->>
->> It can't catch regression if it is always a skip in bpf CI though.
-> 
-> Indeed, for the moment, this test is skipped in bpf CI.
-> 
-> The MPTCP CI checks the MPTCP BPF selftests that are on top of net and
-> net-next at least once a day. It is always running with the last stable
-> version of iproute2, so this test is not skipped:
-> 
->     #169/3   mptcp/subflow:OK
-> 
-> https://github.com/multipath-tcp/mptcp_net-next/actions/runs/10384566794/job/28751869426#step:7:11080
-> 
->> iproute2 needs to be updated (cc: Daniel Xu and Manu, the outdated
->> iproute2 is something that came up multiple times).
->>
->> Not sure when the iproute2 can be updated. In the mean time, your v3 is
->> pretty close to getting pm_nl_ctl compiled. Is there other blocker on this?
-> 
-> I will try to find some time to check the modifications I suggested in
-> the v3, but I don't know how long it will take to have them ready, as
-> they might require some adaptations of the CI side as well, I need to
-> check. On the other hand, I understood adding a duplicated version of
-> the mptcp.h UAPI header is not an option either.
-> 
-> So not to block this (already old) series, I thought it would help to
-> first focus on this version using 'ip mptcp', while I'm looking at the
-> selftests modifications. If these modifications are successful, I can
-> always resend the patch 2/3 from the v3 later, and using 'pm_nl_ctl'
-> instead of 'ip mptcp', to be able to work with IPRoute2 5.5.
-> 
-> Do you think that could work like that?
+> I do not think the KSZ9477 switch design allows I2C access to the SFP
+> EEPROM.
 
-If there is CI started covering it, staying with the 'ip mptcp' is fine.
+This is not a switch design issue, it is a board design issue. Plenty
+of Marvell switches have a PCR which do SGMII and 1000BaseX. Only the
+SFP SERDES data lines are connected to the switch. The I2C bus and
+other lines are connected to the SoC, not the switch.
 
-The bpf CI has to start testing it asap also. The iproute2 package will need to 
-be updated on the bpf CI side. I think this has to be done regardless.
+Do you have the schematics for the board you are testing on? Is it
+open? Can you give us a link?
 
-It will be useful to avoid the uapi header dup on its own. The last one you have 
-seems pretty close.
-
-> 
->>> +        goto fail;
->>> +    }
->>> +
->>> +    return 0;
->>> +fail:
->>> +    return -1;
->>> +}
->>> +
->>> +static int _ss_search(char *src, char *dst, char *port, char *keyword)
->>> +{
->>> +    return SYS_NOFAIL("ip netns exec %s ss -enita src %s dst %s %s %d
->>> | grep -q '%s'",
->>> +              NS_TEST, src, dst, port, PORT_1, keyword);
->>> +}
->>> +
->>> +static int ss_search(char *src, char *keyword)
->>> +{
->>> +    return _ss_search(src, ADDR_1, "dport", keyword);
->>> +}
->>> +
->>> +static void run_subflow(char *new)
->>> +{
->>> +    int server_fd, client_fd, err;
->>> +    char cc[TCP_CA_NAME_MAX];
->>> +    socklen_t len = sizeof(cc);
->>> +
->>> +    server_fd = start_mptcp_server(AF_INET, ADDR_1, PORT_1, 0);
->>> +    if (!ASSERT_GE(server_fd, 0, "start_mptcp_server"))
->>> +        return;
->>> +
->>> +    client_fd = connect_to_fd(server_fd, 0);
->>> +    if (!ASSERT_GE(client_fd, 0, "connect to fd"))
->>> +        goto fail;
->>> +
->>> +    err = getsockopt(server_fd, SOL_TCP, TCP_CONGESTION, cc, &len);
->>> +    if (!ASSERT_OK(err, "getsockopt(srv_fd, TCP_CONGESTION)"))
->>> +        goto fail;
->>> +
->>> +    send_byte(client_fd);
->>> +
->>> +    ASSERT_OK(ss_search(ADDR_1, "fwmark:0x1"), "ss_search fwmark:0x1");
->>> +    ASSERT_OK(ss_search(ADDR_2, "fwmark:0x2"), "ss_search fwmark:0x2");
->>> +    ASSERT_OK(ss_search(ADDR_1, new), "ss_search new cc");
->>> +    ASSERT_OK(ss_search(ADDR_2, cc), "ss_search default cc");
->>
->> Is there a getsockopt way instead of ss + grep?
-> 
-> No there isn't: from the userspace, the app communicates with the MPTCP
-> socket, which can have multiple paths (subflows, a TCP socket). To keep
-> the compatibility with TCP, [gs]etsockopt() will look at/modify the
-> whole MPTCP connection. For example, in some cases, a setsockopt() will
-> propagate the option to all the subflows. Depending on the option, the
-> modification might only apply to the first subflow, or to the
-> user-facing socket.
-> 
-> For advanced users who want to have different options set to the
-> different subflows of an MPTCP connection, they can use BPF: that's what
-> is being validated here. In other words, doing a 'getsockopt()' from the
-> userspace program here will not show all the different marks and TCP CC
-> that can be set per subflow with BPF. We can see that in the test: a
-> getsockopt() is done on the MPTCP socket to retrieve the default TCP CC
-> ('cc' which is certainly 'cubic'), but we expect to find another one
-> ('new' which is 'reno'), set by the BPF program from patch 1/2. I guess
-> we could use bpf to do a getsockopt() per subflow, but that's seems a
-> bit cheated to have the BPF test program setting something and checking
-> if it is set. Here, it is an external way. Because it is done from a
-
-I think the result is valid by having a bpf prog to inspect the value of a sock. 
-Inspecting socket is an existing use case. There are many existing bpf tests 
-covering this inspection use case to ensure the result is legit. A separate 
-cgroup/getsockopt program should help here (more on this below).
-
-> dedicated netns, it sounds OK to do that, no?
-
-Thanks for the explanation. I was hoping there is a way to get to the underlying 
-subflow fd. It seems impossible.
-
-In the netns does help here. It is not only about the ss iterating a lot of 
-connections or not. My preference is not depending on external tool/shell-ing if 
-possible, e.g. to avoid the package update discussion like the iproute2 here. 
-The uapi from the testing kernel is always up-to-date. ss is another binary but 
-arguably in the same iproute2 package. There is now another extra "grep" and 
-pipe here. We had been bitten by different shell behaviors and some arch has 
-different shells ...etc.
-
-I think it is ok to take this set as is if you (and Gelang?) are ok to followup 
-a "cgroup/getsockopt" way to inspect the subflow as the very next patch to the 
-mptcp selftest. It seems inspecting subflow will be a common test going forward 
-for mptcp, so it will be beneficial to have a "cgroup/getsockopt" way to inspect 
-the subflow directly.
-
-Take a look at a recent example [0]. The mptcp test is under a cgroup already 
-and has the cgroup setup. An extra "cgroup/getsockopt" prog should be enough. 
-That prog can walk the msk->conn_list and use bpf_rdonly_cast (or the 
-bpf_core_cast macro in libbpf) to cast a pointer to tcp_sock for readonly. It 
-will allow to inspect all the fields in a tcp_sock.
-
-Something needs to a fix in patch 2(replied separately), so a re-spin is needed.
-
-pw-bot: cr
-
-[0]: https://lore.kernel.org/all/20240808150558.1035626-3-alan.maguire@oracle.com/
-
-
+	Andrew
 
