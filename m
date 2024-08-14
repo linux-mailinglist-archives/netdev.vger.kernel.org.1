@@ -1,284 +1,248 @@
-Return-Path: <netdev+bounces-118354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E039515E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:52:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F21D9515DB
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25F2FB28872
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:50:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83A331C23087
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDF413C906;
-	Wed, 14 Aug 2024 07:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DA81422D3;
+	Wed, 14 Aug 2024 07:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kc3Ad1Dy"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BG/d7Nwd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9BD41746;
-	Wed, 14 Aug 2024 07:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723621782; cv=fail; b=mnzFIoxy5QzKrclAOxJpFnhMF0Ap7jmiZmb0rfXXyd+iusWnVqXCEi4S+mBqzTbqk1qqa/nf0xieGEF3QvyyypGCslPngfUM3RwNl+ocVuj2+/ZiFMaSaNYnS3p2uYnssmaP5L4tkmcQJs8dMGTl9+c9s365EKkWdck4nWKjLXA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723621782; c=relaxed/simple;
-	bh=ppCnsxw1KmHPFFmJnmdmRMArBiuRkNDlugNn2HZX4oQ=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xk3FQruANRmBpW0eYkVvQPT3Y/+vNfDX0VOMN8UddaTEcXLEnaNq4zRD+ghTjW+R9L/8DWuus29EyMS/XBiD7bt2qNIqMBhuRbr4eJweD+1EwYglsYQy1WiHfM4XTWUmEZZ6bHQhJfZO0083uI0AuU+1UPjJu86ogZiQ6GsBgm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kc3Ad1Dy; arc=fail smtp.client-ip=40.107.223.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=typ14nSrjNL6uaya9jMfsYUDjgS+Oi5Khs7DKApuz5VTf1RVKp0GqajjHkElkZvfklW0+TTcG87Iw9ymRw7Z7UNQB+AgqrCOdfG+96j4UA7VwinA324NM37zAbnfwJNso0ehb0KWkTY3xN6QJWhJgVDi69JcBjDhYT2nhlwAm1en+oFfuF8WXZx5xlksm+iLqaLUUnSaZclZbxhryev5Wlrhg+EM1A5zmuiD0q5Bk/X8XA1p8Sn3XffN2NhQ+JKE7vlwlIdGrBpeBdViV6uY8Ht3G/p0uZZQuOiBCku3vK1D6ud1Xt9CpkQgBXoiwW1XHCg1SrqHem3yqasIyIoS4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yQicGjiHU31M2QkG+kBqN3G8aYmddGYNHbAuIBL/t/A=;
- b=eeGZGqvhHj+bNADZ2+4kN6V7sPLrZ/3acNaG3Ro1LqeBAvBSNtbdAAF3qKU2p4AtsL9kJsSpVQX+jI3eXNi3e9v4CnQfYLHcOvBIOic6JrYPYAzn5nrQFpJIMIhykKegxNh0Eph9gvvMUNzXScFpjU/1onZkCeaAz/SVBMiTvUIJwbgIvUo81Oua7/ln0o0Ld+XCP7ucxnFCiitiNdMQws2Nzb/fHuqoFiSJd/Fqck5nwfzBIv9KXO5bSg++WLtbt6YlOnJfZHELtT0CcbW3p0ZtF9H9lZJQQYs2OT02utGyN3scHWqbH0b2JtZLVelWBXth1vQZgswvCans80xoiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yQicGjiHU31M2QkG+kBqN3G8aYmddGYNHbAuIBL/t/A=;
- b=kc3Ad1DyMn81NT413w0jFKcgHbBGP/XcvKg/d503c4KKPfgSDuNCzxwpOdirDGbF2ui2pg/fK3NC8dOsxYx4sezRJBzdbdOoc/2gHnzMl/iTl9ypEU99CbZ8eokiNYH8STAy5Miywjlhuk0RnxtohtFag2I/DzmkRFjHZTsldf4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SJ2PR12MB9190.namprd12.prod.outlook.com (2603:10b6:a03:554::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.17; Wed, 14 Aug
- 2024 07:49:38 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
- 07:49:38 +0000
-Message-ID: <3666c22e-c3fe-fcc0-e944-2992452764d3@amd.com>
-Date: Wed, 14 Aug 2024 08:49:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 02/15] cxl: add function for type2 cxl regs setup
-Content-Language: en-US
-To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- richard.hughes@amd.com
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
- <20240715172835.24757-3-alejandro.lucero-palau@amd.com>
- <33c34f2d-55cb-4b50-888d-1293ea2fa67d@intel.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <33c34f2d-55cb-4b50-888d-1293ea2fa67d@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0255.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:194::8) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C26613E04C
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 07:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723621804; cv=none; b=tB8uOfH1NB/aMTWmc8PJadhgxeVtxgT4/C4NPU30/w5vw2ITpXkzH3bZkBzgM3Qug6SpcqjDWOk3BowK3Q4ee1HK6pYSW1OznUbydvd5eDgrvChgdFZTIKDf4OOLBhWdBgLa9s2F9WQt4/PyxD5RxjXHi/+WqMOZNT/UKIWcAbA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723621804; c=relaxed/simple;
+	bh=3XyxrEltgK1nQeckRz3DVUv5HnufWJ/MNwMkq/665R8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1EpYyzu9oR3D1HRnJ+z+FAsS77ayL8uaO31C1DVKDNUQMIvOMTZGx4X8OpgVPMSG7ahxhJVwsq4S1gu+7XI6tMwg2nlA/kdltOupMCApdA6wjVeCrcQdJyIt1kfFo9JmjB04z/Og4GcdrQ4P5+xVxctHhQlylpw6gZf2jHGE2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BG/d7Nwd; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3685b3dbcdcso3805816f8f.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 00:50:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723621800; x=1724226600; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KnxJF5vH42xnqLu8xE2L8+p5aHLeiaYjf9bYmJEwKy4=;
+        b=BG/d7Nwdh38EBkDbx4LswLa00CNxJgdZ/rqiPeEpkPcIQ0qudyECTMzHQtZ0dsnZW4
+         xJFluroWhj5lBg/3kTRag/dzadV15EiiYW8H2BdXQPMP2obqZx+5qNwI62lDi9rMLT80
+         QJ7/za64kSh9c0fzlaUbLvbjVngXRHwAdSu2s2/LIGHm/wQOf0eEhXbbIE8TNEL6O0hm
+         Ek0/8nehHWFUowmNNbMQ1Cn7aOG24UQQyBuk5RChx7s9z9eOnmVq/upZeQGyNNOuuEfo
+         gEcE1J13pshrmQ+hKy1pPRwvTmU/1/GPkXJ67FU6qNNucftM9QvBbnKKUlZgi5ijTN/s
+         a5rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723621800; x=1724226600;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KnxJF5vH42xnqLu8xE2L8+p5aHLeiaYjf9bYmJEwKy4=;
+        b=ERUZD0W56eNtas0H/Jw03eKLfdhndHUAkbgiD9v+E4XhRL/YoOwEkcRXj5Ia1NfEf7
+         nzaExoqz4aOPgnbcPgZX3/avYGkdSqSDGt1UT/5N3/PcfkyzGb7kZd9yzgVp7857ZnnN
+         FR7Je7tXbOZv3aB0Kfk1Os/MLJzr0zltZGR8RF9Ge0jNyNgfa1hB/B18KwVrfVuK9Dim
+         nsnUXybS7/kMwEK4lzqODGBM1PMwcpbpE2klagJVFdOAAIuaD6sf+rhZrbUma6S/JlZu
+         RyIturPcdqs3ivLd5UNClS6kRhH1wllL6FIdjtVIj4mapCiOnirlJF6pEqgBWoABcJ2h
+         CNtQ==
+X-Gm-Message-State: AOJu0YxQA3pDth6TajQiBvjIjkClUSkyxdnNVwudYMiO34Yfy2YKLcSQ
+	Kix+ojxOgf8brJLaaCVd8BM9weM7ui03aUJMjCdOmD+/rEbGaBZwF+vXVyh3vUo=
+X-Google-Smtp-Source: AGHT+IFDEahJ5TuQ6wfQ74bhe+20YkRc8SKFzJOg0+w9UOAlQ4KsmXfVhIzwImvRfdT1x+E4Q/i4uA==
+X-Received: by 2002:adf:eb08:0:b0:36b:a3c7:b9fd with SMTP id ffacd0b85a97d-3717780b10bmr1110647f8f.56.1723621799872;
+        Wed, 14 Aug 2024 00:49:59 -0700 (PDT)
+Received: from localhost ([37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded71ed8sm11708075e9.31.2024.08.14.00.49.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 00:49:59 -0700 (PDT)
+Date: Wed, 14 Aug 2024 09:49:57 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	dave.taht@gmail.com, kerneljasonxing@gmail.com,
+	hengqi@linux.alibaba.com
+Subject: Re: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
+Message-ID: <Zrxhpa4fkVlMPf3Z@nanopsycho.orion>
+References: <20240618144456.1688998-1-jiri@resnulli.us>
+ <CGME20240812145727eucas1p22360b410908e41aeafa7c9f09d52ca14@eucas1p2.samsung.com>
+ <cabe5701-6e25-4a15-b711-924034044331@samsung.com>
+ <Zro8l2aPwgmMLlbW@nanopsycho.orion>
+ <e632e378-d019-4de7-8f13-07c572ab37a9@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SJ2PR12MB9190:EE_
-X-MS-Office365-Filtering-Correlation-Id: cca239cc-1c91-47b8-c3f1-08dcbc35a59a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z1VDeml5OUUzQ05zdktML3hmb0lTb2xxS2RlbnowcVM4eEJneUlNa2VyanlX?=
- =?utf-8?B?Wlc2UVpPQmtha21zZE91OW1ZclFGUDNPSG0yYmxLajBiNFRMc1hOckZSdzhP?=
- =?utf-8?B?dmlJUmZTU1p6NmhlWkZwallhUVFjc1dPVjZpUEpyRzhXZ0Uyc3d4RkRvakRH?=
- =?utf-8?B?aGIvbjZOenVRRHhnSXkvZWVRMW9PZGExSlZjOWt5TDZMWWdLdTFtdjhXZVRi?=
- =?utf-8?B?RVFOTkx6a2VDV3R3dmhXL0dDYlpPcmJOcVMrSVhTeGhGRHBZdHd1TFJpYkwv?=
- =?utf-8?B?ZFRFWWVIK2hVZ3BnOUlsTlNYZXg1TE1lZ1FjMTlJUk4zRzZ2WCtHbHFWdU9P?=
- =?utf-8?B?THQyTm54VTFDZXUwanM1Ni8xanJWQWp3c0NMTDdYbTBhSUdoNUVpUnpkaEtY?=
- =?utf-8?B?VlZzc3FITFV1c3VPNVF3TjNSaGtuZGUzeE9qNkNrUXp4NlBXWmtCZzA1YWtY?=
- =?utf-8?B?ZG9lQUR1UG9iR2hSSUxFOCtteTJkY0xhQWJjQlVQa1ZhNkJGNFVyblF5NkZW?=
- =?utf-8?B?dDBaZCtpbkJ4RlJFZzVLdnZMVmIrelduUVoxZzNIeXFZMzIvckZ1RHd2bkli?=
- =?utf-8?B?ZHVMUFdZSnQ0QTJuVmpTVS9aNngvRWw3NSt4U2ZWUUVpYWpyaStZNDdEa1lS?=
- =?utf-8?B?bGk1ZFFiVjZrODZLc0NsRUsrTHdScXQwVHhIYUJDZSttcGhVblRBSDM4dEo1?=
- =?utf-8?B?YlJ0RklBNXY5QmVtMDFJMmdyaW1FOGh2dUI1YXpXWmhCc3dOdjdUUGxFSXQx?=
- =?utf-8?B?b2dFaS90dlhKTlJzVGZ2aS9zMWhtamY3V0xhc2xTQndyczlzeFk3QTJuSFRh?=
- =?utf-8?B?WmZyQjFFTTEzdHQ3OVlUbnhyQU1VTXovdUI4aTNoZEZSQVRFMXY2d0MwTDZz?=
- =?utf-8?B?aHJYbGNTbEVJcnVjLzRVMFNoNlQ0NlNvWDNwOXVXdGZpT08wTXNXWHEyVXd5?=
- =?utf-8?B?K1ZVODJsVFhSbEtGSzN0dFlVSFRoZEFialNEbEN1NzRWR0d3Zlo2UVNWMUov?=
- =?utf-8?B?R1hUT3Q0Q2tiSFFXVzN6MURneW92cWRMdHExWWNMcW10aWFsNHFDbytJQ05l?=
- =?utf-8?B?S21jMDluaU9QczRNemQ2dEpmZjZ3MlNGQ1daM3F6T3JOZTVQVnU0MkVOdk1p?=
- =?utf-8?B?SnRNUWtBQWExNUthSHZtVEg4YVRKbkRzeE5nU0Z3b3VTUUYyNG5MdGxyK1di?=
- =?utf-8?B?VDNlT21DMy9hNVUydkFtYmU4RkFVQUFDc0xvVmU5eXhYZXRvcFZZT2NwaGJE?=
- =?utf-8?B?QXpSbGRTRXZORFdaRkk1RFlka0owSi95dzRHWTdkNXNROW5ReDhkN2VaSDBP?=
- =?utf-8?B?c0hVNGNoREYzWkdqeks3MkJoM1Y1TUR6a2xncWlpSXArR3BsU2ZkdWZYVWpJ?=
- =?utf-8?B?MmRBVGRBdjZRQjVpa2orckJmWXBFUk53L3pyQ0hCR0tSNW9PUjUvYk4yd05v?=
- =?utf-8?B?bWNyamNRR2dJUHJaN0lUOFJOUkljYkpUbFZJcnB1bHNYMUYvV2x4R2UvYVRi?=
- =?utf-8?B?YjlwaHF6SFBUZTFQb29VTlpXeHRHeUVxV2VlcXVXdkpTSzM3M1lDcFJJRDZl?=
- =?utf-8?B?UWdBMUlhamNJQXFxanpmaFlwcHR1Sk4zbkFHVFJMNjVPRUJ3QjdxTnV1b0xt?=
- =?utf-8?B?ekJFUHlvZGJ3UitTaTVnMUVOR0lyeWJzMkFZTmZhRko4ck5Xd2x5eE84QUhU?=
- =?utf-8?B?UlRJZUpWT1BUeHd1TE5VN2tLb0Y3TjQ2a0Rka2xlbEs3SmR6Y1d2S3cvamJl?=
- =?utf-8?B?UEdUYUZWL0lTSGZFV2hSaU9Fc1pQK2ZJcG1iNmtSMFRzME0xb1FiNzlhMkxM?=
- =?utf-8?B?Tk8veW9GS2ZHNG5uamRGTERSb1pSL3RDcngzdEZZUkFZT2tHNDF3SzZ2bUwr?=
- =?utf-8?Q?8J177NyE1ZBr2?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cmJ5enpJNVhKeEQ2NTcrcCtLcTlYcHZKMDJRWlNVYUkvc1dLMHFzR0srZnZ3?=
- =?utf-8?B?NXhNTkNmeGtaVkFxd0hHVXFiQ0tSWGV2S25xMmlMV0kwR3pXWDdudHJ2b0c5?=
- =?utf-8?B?UWc0TkltRERGU3VxSjdjWWJFNGFCZ0twRjlWUjVzT3dLWkZXQndKdDA0am9x?=
- =?utf-8?B?ZjMycTFrT05NTnd3VU9CMXR3MDhDcit4L2htUUxxNE9QR0h3SnNzdkg4Mzhp?=
- =?utf-8?B?NUg1dWJHdVptVnlvdVNMQXo3RFVadlhIZXkwOGliejRIUjh6SlJFODNJdFJH?=
- =?utf-8?B?bkxDMW1SQUI2VWtobzJpb3hRSm9ubUFtMytGZXZCYmJVdVIyMmdONXNKZlRX?=
- =?utf-8?B?YlBIK2VhdGxMd29xc1BkcnBkZngwZmpqZzQ2WVhSK0RFYVVlN1F3NHJwZEk4?=
- =?utf-8?B?WkdlU3Rvc0U1QXE3Nmpxb25YRitpalhQbVJsREZsYTJvNHExRU1LUmR1ckVL?=
- =?utf-8?B?dXdVZzJKWUJGTUtCRnZudUoxc2lRTmtzUmVTSDF3WEhPTkVhNURiU0RLR0FM?=
- =?utf-8?B?SS94VEowSnoyVE5UVjA1VmF0SS9nZ3YzKzFwR2t2ZS9seW1OWlMyd3ZoaUo2?=
- =?utf-8?B?WWVqdlpYRHFkWU9wQ1hJWllzTmVFekluT3dlQkFPZ3ljREZ2cytpWVZRZThi?=
- =?utf-8?B?YWloTHlkenhGSWRzY1NuTFE3ckVtcnhENVBVTmd6K0Y2NHdGdjFoWVRVR3hP?=
- =?utf-8?B?bmhvSWw1MjlXUHBBWlZoRHdGVVNlVnZvWWNKNVV1Q09ZT1V1UHpOaFVkTU1P?=
- =?utf-8?B?K2dac25IMVhOMVVJTk5QS2pHb0VBUG5COU16bGFFUlRRb1E5S0QzYXVjUEJs?=
- =?utf-8?B?bnlNSW5nQ05IUDVrTndQUXM4QXRMdERRc0tzL3c4NTFqU05GWlhEeWJ4c1hE?=
- =?utf-8?B?K0JPZy9WVkJ1ZU9wOEo1a1N0Tmg0blprODdXY09PbHA2TmozZkFpeDlFd0ZF?=
- =?utf-8?B?bE8rSG13Y2RsQ3V2NWc1OWZ2cm11NFhGWHEydnczNk1xaW43eHBVVmFHV0Iy?=
- =?utf-8?B?bFJLdzVVZXlmaGFMamZEM0tGRTlGa0FQYWl3aTZpNEdvZ25mdXBOZE1ZQkgx?=
- =?utf-8?B?MXZKZU5RY0lPakxtU1luYm81Y0tQWWI0bTBMcWFWNUdhMWgrTUZrMWlXOG5U?=
- =?utf-8?B?RnQ4Z3NjZnFDaDZjTUk0YjRtUlVOdWtieHBNbFFRY1U0Vy84NlhiSkk4ajh3?=
- =?utf-8?B?Z2NucCt2WWV2Q1FwekJ2VEpmQ1pTeHY1YzlWSmxXdVBQUmR3aXM5VzZmMnJu?=
- =?utf-8?B?WGhTTlNDVzZNL0x6V2FSQ1N6MVZXdTVlZDNBSCtkMWdmbjNMNkQ0WG8zSlR3?=
- =?utf-8?B?VFI1STlRcVdOSU5HVHYyMk8vRFJCUjVIOWFQS25jSWtrcWxONTNFNDVCOCtl?=
- =?utf-8?B?TVZTTSttQlh5Y3NjVXc4bXB1ZitOU1AzZnBhdmQ3QkpBc1NoVVY0QXRvS25j?=
- =?utf-8?B?TzVIeEs2VTlkK3dSYkxuMi9HSEZGVU8ySlIrajJVbW1aMXVQNzJrUmllU3hH?=
- =?utf-8?B?T1ZQbUJIaUg4ZHFuRVVsQXh0TkRudmVLZWtsQllIV25NMy95ell2TmRicDNO?=
- =?utf-8?B?Y2hEbElRQ3pGTDAzSDBXMWJtSjlydFNMOTVjVHk2MnRjOHRtRnRFT1k3cWhm?=
- =?utf-8?B?bVI3WU5hbkhvV1Rld3RVTkZlUTd3QSt5RVVYT1ZPdU1wOW52dmhOWWxxVkhJ?=
- =?utf-8?B?WHRTMFdMaUhhMnVqZzFPRzhEWXE5ZTdQZXNCVDNSNzVoeDQvaW1tWDM4c1dk?=
- =?utf-8?B?UjdXNGZ2K0hMbnhpdEpzVTl1SkJxRGpoRk0vOWZIMXd2cTRSVHlWNzFrUHVQ?=
- =?utf-8?B?WE5lN3owMzlaMFBBR2w0ODZNa1FlVGF3VHVGNjdiRDhmQitjbW1ydEQrZ093?=
- =?utf-8?B?a2g3eWNpUzFnOU42Nk4ycmo0YWREWm5qK1p6RGFNTDhEekpoNDNXWGhQSXls?=
- =?utf-8?B?cUpubGRZZUZrUzlsRVMrL0Y2disyYmhyZVNnNUNyL2lZc1RWbDRxK1VqSTl6?=
- =?utf-8?B?MGRUSmJnRldZc3QyaGl5SUZ4ekQxTmNNc2lIRHFqOXdYVGtyWHp1OG9rN0pL?=
- =?utf-8?B?M3l1Y0xKRU8yM2daNTJCM3h1bHg1OUw4SndMVUxlcnMvKzhabEtLTFY1VFlD?=
- =?utf-8?Q?/pEc5Dj+Kfw+KUSU4EJCd8nvs?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cca239cc-1c91-47b8-c3f1-08dcbc35a59a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 07:49:37.9436
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LULGCrDXsFbn7ajKGzAwMhVDZvlFxfHHmnqTIvKMov7FntEVZCFRyWlnT1AjGgzxxNEFpE09X0VGXBt0eFLIJg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9190
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e632e378-d019-4de7-8f13-07c572ab37a9@samsung.com>
 
-
-On 7/19/24 00:27, Dave Jiang wrote:
+Mon, Aug 12, 2024 at 06:55:26PM CEST, m.szyprowski@samsung.com wrote:
+>On 12.08.2024 18:47, Jiri Pirko wrote:
+>> Mon, Aug 12, 2024 at 04:57:24PM CEST, m.szyprowski@samsung.com wrote:
+>>> On 18.06.2024 16:44, Jiri Pirko wrote:
+>>>> From: Jiri Pirko <jiri@nvidia.com>
+>>>>
+>>>> Add support for Byte Queue Limits (BQL).
+>>>>
+>>>> Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
+>>>> Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
+>>>> running in background. Netperf TCP_RR results:
+>>>>
+>>>> NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
+>>>> NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
+>>>> NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
+>>>> NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
+>>>> NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
+>>>> NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
+>>>>     BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
+>>>>     BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
+>>>>     BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
+>>>>     BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
+>>>>     BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
+>>>>     BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
+>>>>
+>>>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>>>> ---
+>>>> v2->v3:
+>>>> - fixed the switch from/to orphan mode while skbs are yet to be
+>>>>     completed by using the second least significant bit in virtqueue
+>>>>     token pointer to indicate skb is orphan. Don't account orphan
+>>>>     skbs in completion.
+>>>> - reorganized parallel skb/xdp free stats accounting to napi/others.
+>>>> - fixed kick condition check in orphan mode
+>>>> v1->v2:
+>>>> - moved netdev_tx_completed_queue() call into __free_old_xmit(),
+>>>>     propagate use_napi flag to __free_old_xmit() and only call
+>>>>     netdev_tx_completed_queue() in case it is true
+>>>> - added forgotten call to netdev_tx_reset_queue()
+>>>> - fixed stats for xdp packets
+>>>> - fixed bql accounting when __free_old_xmit() is called from xdp path
+>>>> - handle the !use_napi case in start_xmit() kick section
+>>>> ---
+>>>>    drivers/net/virtio_net.c | 81 ++++++++++++++++++++++++++++------------
+>>>>    1 file changed, 57 insertions(+), 24 deletions(-)
+>>> I've recently found an issue with virtio-net driver and system
+>>> suspend/resume. Bisecting pointed to the c8bd1f7f3e61 ("virtio_net: add
+>>> support for Byte Queue Limits") commit and this patch. Once it got
+>>> merged to linux-next and then Linus trees, the driver occasionally
+>>> crashes with the following log (captured on QEMU's ARM 32bit 'virt'
+>>> machine):
+>>>
+>>> root@target:~# time rtcwake -s10 -mmem
+>>> rtcwake: wakeup from "mem" using /dev/rtc0 at Sat Aug 10 12:40:26 2024
+>>> PM: suspend entry (s2idle)
+>>> Filesystems sync: 0.000 seconds
+>>> Freezing user space processes
+>>> Freezing user space processes completed (elapsed 0.006 seconds)
+>>> OOM killer disabled.
+>>> Freezing remaining freezable tasks
+>>> Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+>>> ------------[ cut here ]------------
+>>> kernel BUG at lib/dynamic_queue_limits.c:99!
+>>> Internal error: Oops - BUG: 0 [#1] SMP ARM
+>>> Modules linked in: bluetooth ecdh_generic ecc libaes
+>>> CPU: 1 PID: 1282 Comm: rtcwake Not tainted
+>>> 6.10.0-rc3-00732-gc8bd1f7f3e61 #15240
+>>> Hardware name: Generic DT based system
+>>> PC is at dql_completed+0x270/0x2cc
+>>> LR is at __free_old_xmit+0x120/0x198
+>>> pc : [<c07ffa54>]    lr : [<c0c42bf4>]    psr: 80000013
+>>> ...
+>>> Flags: Nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+>>> Control: 10c5387d  Table: 43a4406a  DAC: 00000051
+>>> ...
+>>> Process rtcwake (pid: 1282, stack limit = 0xfbc21278)
+>>> Stack: (0xe0805e80 to 0xe0806000)
+>>> ...
+>>> Call trace:
+>>>   dql_completed from __free_old_xmit+0x120/0x198
+>>>   __free_old_xmit from free_old_xmit+0x44/0xe4
+>>>   free_old_xmit from virtnet_poll_tx+0x88/0x1b4
+>>>   virtnet_poll_tx from __napi_poll+0x2c/0x1d4
+>>>   __napi_poll from net_rx_action+0x140/0x2b4
+>>>   net_rx_action from handle_softirqs+0x11c/0x350
+>>>   handle_softirqs from call_with_stack+0x18/0x20
+>>>   call_with_stack from do_softirq+0x48/0x50
+>>>   do_softirq from __local_bh_enable_ip+0xa0/0xa4
+>>>   __local_bh_enable_ip from virtnet_open+0xd4/0x21c
+>>>   virtnet_open from virtnet_restore+0x94/0x120
+>>>   virtnet_restore from virtio_device_restore+0x110/0x1f4
+>>>   virtio_device_restore from dpm_run_callback+0x3c/0x100
+>>>   dpm_run_callback from device_resume+0x12c/0x2a8
+>>>   device_resume from dpm_resume+0x12c/0x1e0
+>>>   dpm_resume from dpm_resume_end+0xc/0x18
+>>>   dpm_resume_end from suspend_devices_and_enter+0x1f0/0x72c
+>>>   suspend_devices_and_enter from pm_suspend+0x270/0x2a0
+>>>   pm_suspend from state_store+0x68/0xc8
+>>>   state_store from kernfs_fop_write_iter+0x10c/0x1cc
+>>>   kernfs_fop_write_iter from vfs_write+0x2b0/0x3dc
+>>>   vfs_write from ksys_write+0x5c/0xd4
+>>>   ksys_write from ret_fast_syscall+0x0/0x54
+>>> Exception stack(0xe8bf1fa8 to 0xe8bf1ff0)
+>>> ...
+>>> ---[ end trace 0000000000000000 ]---
+>>> Kernel panic - not syncing: Fatal exception in interrupt
+>>> ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>>>
+>>> I have fully reproducible setup for this issue. Reverting it together
+>>> with f8321fa75102 ("virtio_net: Fix napi_skb_cache_put warning") (due to
+>>> some code dependencies) fixes this issue on top of Linux v6.11-rc1 and
+>>> recent linux-next releases. Let me know if I can help debugging this
+>>> issue further and help fixing.
+>> Will fix this tomorrow. In the meantime, could you provide full
+>> reproduce steps?
 >
-> On 7/15/24 10:28 AM, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Create a new function for a type2 device initialising the opaque
->> cxl_dev_state struct regarding cxl regs setup and mapping.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> ---
->>   drivers/cxl/pci.c                  | 28 ++++++++++++++++++++++++++++
->>   drivers/net/ethernet/sfc/efx_cxl.c |  3 +++
->>   include/linux/cxl_accel_mem.h      |  1 +
->>   3 files changed, 32 insertions(+)
->>
->> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
->> index e53646e9f2fb..b34d6259faf4 100644
->> --- a/drivers/cxl/pci.c
->> +++ b/drivers/cxl/pci.c
->> @@ -11,6 +11,7 @@
->>   #include <linux/pci.h>
->>   #include <linux/aer.h>
->>   #include <linux/io.h>
->> +#include <linux/cxl_accel_mem.h>
->>   #include "cxlmem.h"
->>   #include "cxlpci.h"
->>   #include "cxl.h"
->> @@ -521,6 +522,33 @@ static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
->>   	return cxl_setup_regs(map);
->>   }
->>   
->> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds)
-> Function should go into cxl/core/pci.c
+>Well, it is easy to reproduce it simply by calling
+>
+># time rtcwake -s10 -mmem
+>
+>a few times and sooner or later it will cause a kernel panic.
+
+I found the problem. Following patch will help:
 
 
-It will be in v3.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 3f10c72743e9..c6af18948092 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2867,8 +2867,8 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+ 	if (err < 0)
+ 		goto err_xdp_reg_mem_model;
+ 
+-	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+ 	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
++	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+ 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
+ 
+ 	return 0;
 
 
->> +{
->> +	struct cxl_register_map map;
->> +	int rc;
->> +
->> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
->> +	if (rc)
->> +		return rc;
->> +
->> +	rc = cxl_map_device_regs(&map, &cxlds->regs.device_regs);
->> +	if (rc)
->> +		return rc;
->> +
->> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
->> +				&cxlds->reg_map);
->> +	if (rc)
->> +		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
->> +
->> +	rc = cxl_map_component_regs(&cxlds->reg_map, &cxlds->regs.component,
->> +				    BIT(CXL_CM_CAP_CAP_ID_RAS));
->> +	if (rc)
->> +		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
-> dev_warn()? also maybe add the errno in the error emissioni.
+Will submit the patch in a jiff. Thanks!
 
-
-Yes. Thanks
 
 
 >
->> +
->> +	return rc;
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, CXL);
->> +
->>   static int cxl_pci_ras_unmask(struct pci_dev *pdev)
->>   {
->>   	struct cxl_dev_state *cxlds = pci_get_drvdata(pdev);
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> index 4554dd7cca76..10c4fb915278 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -47,6 +47,9 @@ void efx_cxl_init(struct efx_nic *efx)
->>   
->>   	res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
->>   	cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_RAM);
->> +
->> +	if (cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds))
->> +		pci_info(pci_dev, "CXL accel setup regs failed");
-> pci_warn()? although seems unnecesary since error emitted in cxl_pci_accel_setup_regs().
-
-
-Right. I think I'll remove it.
-
-Thanks
-
-
->>   }
->>   
->>   
->> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
->> index daf46d41f59c..ca7af4a9cefc 100644
->> --- a/include/linux/cxl_accel_mem.h
->> +++ b/include/linux/cxl_accel_mem.h
->> @@ -19,4 +19,5 @@ void cxl_accel_set_dvsec(cxl_accel_state *cxlds, u16 dvsec);
->>   void cxl_accel_set_serial(cxl_accel_state *cxlds, u64 serial);
->>   void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
->>   			    enum accel_resource);
->> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
->>   #endif
+>Best regards
+>-- 
+>Marek Szyprowski, PhD
+>Samsung R&D Institute Poland
+>
 
