@@ -1,120 +1,128 @@
-Return-Path: <netdev+bounces-118449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043C3951A57
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:47:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C17F0951A68
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 373D31C2165B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:47:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655D31F22959
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E9B19EEAF;
-	Wed, 14 Aug 2024 11:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brqXe4Nb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031BB1AC427;
+	Wed, 14 Aug 2024 11:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4616143879
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B2F33D8;
+	Wed, 14 Aug 2024 11:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723635969; cv=none; b=RfU52sXNWUid+/FhSOKog965blqKnJCIDxDKVSVEa4AZt+AS2CV92NQ4XrR6PouLqd60AVKfmKRt/hfHrAHc/GrW94Hjx6g55x8OMwt+0pMAuT2cN84v9/dC+U7RkiWqY4YHd/fi8upHKe8DL8jSNW29VKovuf2xLTqPlAjQmns=
+	t=1723636518; cv=none; b=q7qOf9nexA0GX5Eta1lCdhEJR+I5/YwinvkHUdXbuB44Yx1M6wf9Q/vmGpnXaImvusBIBXHx9T9PK41ZF55rh1oa35wlwNYM/M63kuq6qEFBBluLzQbSd6tAWFUNyL8A97Kg6UH8qwTgCbQ0jpnI+mOv8PjsKq/OGKD2ER4hcrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723635969; c=relaxed/simple;
-	bh=W0++7NsE+uSBaD5heL7GBMaXR3rmJU8cgDBbLfCucVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EyrdaKnEIe6fy4LY0HQEWKKNLqjN+HmlKfXTp6cFa5HdpRtJm6jFmYILxg8STQiNO7idfRoTRCme8vMJ+ouDlto1UMDsKVIa2YvZBUJbA4KFKe97jY0v47y+QXvQy7X628zESJF7lUfWqAUuGSfCUS9zLLlCDqIhANVRBBRskYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brqXe4Nb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE71C4AF0D;
-	Wed, 14 Aug 2024 11:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723635969;
-	bh=W0++7NsE+uSBaD5heL7GBMaXR3rmJU8cgDBbLfCucVw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=brqXe4Nbm7O0OeNAK3sXgWPD6JAkm/AVudjTmiDTEZOXC0oB6fwPL5d7STY7mTldQ
-	 D3UvfUE+2FIx1mk23nSZVURWGFpwgXu3u+2FKc8PXuiBfDTkbjNXeq5faEWhlvVt+8
-	 eW0b7zfApy/l1wcPdh5Co6hMOZ4ePEoM5+yVYKbvTuE0TJ/z7IqupZV8EgwAMga9lx
-	 Pi0D90lb1jFsTGn4/LGktEPoQbMPzWiymeDCBg99LWxjAUL4gl4L/A4Ccm12OJOES4
-	 qLapEs6aVWJYcWmSb1qSKTGxqnPvwca/7219R4hGL1b2jA/0U/zAuVD8ZyWYx4fZaR
-	 c46IOKN0a68pQ==
-Date: Wed, 14 Aug 2024 12:46:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
-	jacob.e.keller@intel.com, vadfed@meta.com, darinzon@amazon.com,
-	kuba@kernel.org
-Subject: Re: [RFC 1/3] ptp: Implement timex esterror support
-Message-ID: <20240814114605.GC69536@kernel.org>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <20240813125602.155827-2-maciek@machnikowski.net>
+	s=arc-20240116; t=1723636518; c=relaxed/simple;
+	bh=VCi9tNsc5VuFyVQbvBISWKlHjyhF2EFFoW2acglhie0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Z7GiN/S+rhQ2tCxAogLITO6yZn7djs8/I0XUT0zO+lowrTrkauy6ccMWgFL8UQ8DsznEw0h4ty0mQx23tS4PTjFDQ0cewkIhJMoUijyPX3AyuAI3da3y1qrq1fl/NCKM/1ztJdhYAucFnS6e7AKpe44F5rlYJrILGpckCnwe5v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WkRQH04FVz2CmlL;
+	Wed, 14 Aug 2024 19:50:15 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 13E4F180019;
+	Wed, 14 Aug 2024 19:55:07 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 14 Aug 2024 19:55:06 +0800
+Message-ID: <302315e8-9c0d-433a-a6fd-24b46645179e@huawei.com>
+Date: Wed, 14 Aug 2024 19:55:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813125602.155827-2-maciek@machnikowski.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 00/14] Replace page_frag with page_frag_cache
+ for sk_page_frag()
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+ <4aba9fae-563d-4a4e-8336-44e24551d9f9@huawei.com>
+ <CAKgT0UezjgRX9QUWkee_p8KVQQa1va12k2CaGJeOYrr5LGg4YQ@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0UezjgRX9QUWkee_p8KVQQa1va12k2CaGJeOYrr5LGg4YQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Tue, Aug 13, 2024 at 12:56:00PM +0000, Maciek Machnikowski wrote:
-> The Timex structure returned by the clock_adjtime() POSIX API allows
-> the clock to return the estimated error. Implement getesterror
-> and setesterror functions in the ptp_clock_info to enable drivers
-> to interact with the hardware to get the error information.
+On 2024/8/13 23:11, Alexander Duyck wrote:
+> On Tue, Aug 13, 2024 at 4:30 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/8/8 20:37, Yunsheng Lin wrote:
+>>
+>> ...
+>>
+>>>
+>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>>>
+>>> 1. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
+>>>
+>>> Change log:
+>>> V13:
+>>>    1. Move page_frag_test from mm/ to tools/testing/selftest/mm
+>>>    2. Use ptr_ring to replace ptr_pool for page_frag_test.c
+>>>    3. Retest based on the new testing ko, which shows a big different
+>>>       result than using ptr_pool.
+>>
+>> Hi, Davem & Jakub & Paolo
+>>     It seems the state of this patchset is changed to 'Deferred' in the
+>> patchwork, as the info regarding the state in 'Documentation/process/
+>> maintainer-netdev.rst':
+>>
+>> Deferred           patch needs to be reposted later, usually due to dependency
+>>                    or because it was posted for a closed tree
+>>
+>> Obviously it was not the a closed tree reason here, I guess it was the dependency
+>> reason casuing the 'Deferred' here? I am not sure if I understand what sort of
+>> dependency this patchset is running into? It would be good to mention what need
+>> to be done avoid the kind of dependency too.
+>>
+>>
+>> Hi, Alexander
+>>     The v13 mainly address your comments about the page_fage_test module.
+>> It seems the your main comment about this patchset is about the new API
+>> naming now, and it seems there was no feedback in previous version for
+>> about a week:
+>>
+>> https://lore.kernel.org/all/ca6be29e-ab53-4673-9624-90d41616a154@huawei.com/
+>>
+>> If there is still disagreement about the new API naming or other things, it
+>> would be good to continue the discussion, so that we can have better
+>> understanding of each other's main concern and better idea might come up too,
+>> like the discussion about new layout for 'struct page_frag_cache' and the
+>> new refactoring in patch 8.
 > 
-> getesterror additionally implements returning hw_ts and sys_ts
-> to enable upper layers to estimate the maximum error of the clock
-> based on the last time of correction. This functionality is not
-> directly implemented in the clock_adjtime and will require
-> a separate interface in the future.
-> 
-> Signed-off-by: Maciek Machnikowski <maciek@machnikowski.net>
-> ---
->  drivers/ptp/ptp_clock.c          | 18 +++++++++++++++++-
->  include/linux/ptp_clock_kernel.h | 11 +++++++++++
->  2 files changed, 28 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index c56cd0f63909..2cb1f6af60ea 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -164,9 +164,25 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
->  
->  			err = ops->adjphase(ops, offset);
->  		}
-> +	} else if (tx->modes & ADJ_ESTERROR) {
-> +		if (ops->setesterror)
-> +			if (tx->modes & ADJ_NANO)
-> +				err = ops->setesterror(ops, tx->esterror * 1000);
-> +			else
-> +				err = ops->setesterror(ops, tx->esterror);
+> Sorry for not getting to this sooner. I have been travelling for the
+> last week and a half. I just got home on Sunday and I am suffering
+> from a pretty bad bout of jet lag as I am overcoming a 12.5 hour time
+> change. The earliest I can probably get to this for review would be
+> tomorrow morning (8/14 in the AM PDT) as my calendar has me fully
+> booked with meetings most of today.
 
-Both GCC-14 and Clang-18 complain when compiling with W=1 that the relation
-of the else to the two if's is ambiguous. Based on indentation I suggest
-adding a { } to the outer-if.
-
->  	} else if (tx->modes == 0) {
-> +		long esterror;
-> +
->  		tx->freq = ptp->dialed_frequency;
-> -		err = 0;
-> +		if (ops->getesterror) {
-> +			err = ops->getesterror(ops, &esterror, NULL, NULL);
-> +			if (err)
-> +				return err;
-> +			tx->modes &= ADJ_NANO;
-> +			tx->esterror = esterror;
-> +		} else {
-> +			err = 0;
-> +		}
->  	}
->  
->  	return err;
-
-...
+Thanks for the clarifying.
+Appreciating for the time and effort of reviewing.
 
