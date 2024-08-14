@@ -1,87 +1,82 @@
-Return-Path: <netdev+bounces-118361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93479515F5
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:58:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F048F9515FC
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05838B2146E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:58:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 771B0283B4C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7395113C9DE;
-	Wed, 14 Aug 2024 07:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D3213CA8D;
+	Wed, 14 Aug 2024 08:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SZ5KyJGE"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lyxbsx6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2067.outbound.protection.outlook.com [40.107.244.67])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2048.outbound.protection.outlook.com [40.107.223.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADC813C918;
-	Wed, 14 Aug 2024 07:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933E520DF4;
+	Wed, 14 Aug 2024 08:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723622325; cv=fail; b=f108Sfu3sgy2YKkRuuWGDLrdLKQ2rH4TJlry6uRzJoTntCCfJjqkNZtEJFEe+6OJhWY30sOaOPpVTobb3wBE+iFun1G50BSiEN7llg5NxHtq3f8o5hp6/jh3hOjbHTKRd0SnEg+jrFdYB8OQv3vnrUu98PRbbEil96yFneIv2PQ=
+	t=1723622445; cv=fail; b=jrxXVnKrxjID8rFLFIYBqCl4Rrrx1Q02Nn0Kg5FDR8TlVej8k/jc2QBMom2i4nm5vW2h1Vozxc+wpK1zBDU7wFIGO4EEHZHGYA/ZPqxQry8owQTgdQVqVl73dGsOAHeFOgpbXm0YcnhuyArK74wQklrIm/VwkeSUVFM3yEIsxzo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723622325; c=relaxed/simple;
-	bh=+9V2nvWsDLQ5czrRemdgSPdtGafHF5BgyW4HPbmBpac=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Kl0YWOuonYvdN2NNGi7RQr4OQXLX5j4cn22J+//qOVk7OqrmsAn3zLfsjLnM0eaCIVzSaQaZZMt3MHiVigr37cqL6OUJTmNrt8GLXBl7lBzryO9a1YlgriK13IPMRUkcQXPAvGKWPfrbiITTNfZG/qrSnSDKr5MBaIVmfwLvZac=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SZ5KyJGE; arc=fail smtp.client-ip=40.107.244.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1723622445; c=relaxed/simple;
+	bh=V4JPL96Px+U5JDkVDquJRhkyj7OFwIU0MyES27/G8Vw=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kDHMbzmihQpHh91868JQbKCztixsg0Y6Zm+FglFSM38ys6NoMORRDnteCaYIkQySMraaNZkD9P+LHZrQN1nRNLo3gsRyu1cwUJL6pJupilCBQZoMGx0PR+ad+WUaweaFA8tpAjHIVuvbjvlHPau05xMFKwlkzc5sLJcOiSeZBHE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lyxbsx6H; arc=fail smtp.client-ip=40.107.223.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bzEq4GptIaKcQ5hqsCiP/knJBFU+eDP5QCJXuV6uSbD/D8gR657V/6e3yTkOkRNYqytv5XeJXLzARAw5EyX68lyJE6/diRMVMCV5neR0ParvZgUKZBa8qvmRb/D0Ki4qJqFTRhj1VpDuh+HTBB6RvrQv112EqncJ5QmI2IAvvkgx0jFCn8sRmJnvLikpaMPXFeuUhc9jHQzGA0jijz7H13nVBdE3HGU7DFHrQ8uRcArneCAo9n/gouWhbo/Re0b/UPrCXb8Y1/rOxVS3vC7NCVtZWxKoqyb3ZwlHHdJ434iPjRLTY7neifCeXyVU4VFGLJZa3meGqDrBh6BVFT6B6A==
+ b=EAqDjp8j8CMKN9h1k2iv3oSWLX6M20zxjjJYHnvbBwO+zKWXAszRY8d82dV/hOIr7zJlIuVemaiKQKeS8quUXQMEznojdwUyIYsjDR+7yaMAhfQiYTq5ogSIGS2PpL7UBetuCA8gYrBIJijdZM7MWP1A+LGsOePUh3S+w5O3l8k0VDXe8uBrGiEEoX/eVPB2GofHUcHYJXYzQnSxznGhkAozBwzcqhjmfZHfcCH8qnlHH00hIN7USMptjKc9y0mqb+If0FCk1FFyml4+azB+/AjC8TT4qNyE5C+QsSACNywCmwGAI/gStIpn4Oyu9ev/JRtIw+VzAA3DicyqfuSvxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K7kriZNlyp44Zv0azIsrkSHCNjHf+2EuvNDZJUXNq4o=;
- b=QUA/dLJzBeS+kPzL+lbnt880rjUmSK8njXskvkrB6qOXsrxq0Ziruh2d7WyOq080WZsNuuKh0VNVo5v/m+uhx3LQr+bslUKXJ3+5tqw7OJrEAy3qDWXg0yLO0348DRiZOIBINxHLy5WfmajUIBOGxe9gxe4rXidPePJgEwO06E9b0Igf7xHSbykveV0D6j1Ifq1039utPteHI+uffH1QMVgVTqn/WF2s47M7yVXLPpJc9nc4pEnf1gDIWv8tLaI/n/AAU3gsIir73I1eJHGkTjkfiqWroo45iSouJhdoSs7W43QbPyg572g5AJDTwJXs++5yJWiFzs5bhFfxWKTjfg==
+ bh=PIX2yohfsbihLvDEBU5kR76G+wSRANhO9/LVUkRwMrQ=;
+ b=SFsrXVZOV1YZuRp6q5KxQkFH7cKhjJgq5nJybesl+YE7WBG5sed9pOOdYLiCyP7Ry7foDkT19qZHarMpam3xXeZ9mVaSdN5FPEG3zkWQ8QI/4J/k0W986yKyQOsERxl+6e/IhWiqYdAjfQJALkaSDSFUKam2ndoTi07IKWUg+6D0eh+/HgvG2fTmMnqIvU53l8heH6UhKKiWrXrkSebMCDi5FRAYDjlKOS+EiQZU8WMv1Fs63hYW+WsNFXfWFKO//XE7LWEdI70+ZL5DGe1FWESLbRlIrkJeUNSDJibWHN9/qdcOtahB3FDxUidLleN6a+1nd7/mcGBuXWNcRTLnkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K7kriZNlyp44Zv0azIsrkSHCNjHf+2EuvNDZJUXNq4o=;
- b=SZ5KyJGE2yNFWgHOf6n5SLcj+/ljY0+yNHgBbouIAnf07AHCr8xybh1Kajuwol0oOoU1XPcu3h+RsWWZAXYXwHm+A0GczUUWQd4Zx6r+dkUaGwV+BVUnAd4gFzb8/OnKBZ0uroPBIhHWQLjddT1WWbc4Q3TQVac1KZUdf8AyfkNQnoc6a/06jVmmLMgSLTTWhnZdJOgsHrfjKHtB/LVe/GAO8Ipqkof3+7488WRaF+EwTf6vkhklvr2NMNL3OEyklit06f6b4eKAZt7J7lzr3yjFDdRCgOkcLLMPmVDXLaaFCEwayLvTDmGGm4dIIuziVbcBasNQM7d9JCBifK4ASQ==
+ bh=PIX2yohfsbihLvDEBU5kR76G+wSRANhO9/LVUkRwMrQ=;
+ b=lyxbsx6HUBSkgTBL7JNZ187n25Lvjb4wh5jSrB88lFs1X/Itzl/xLP0bdZ3ulTJQDnqw6KoyUXHdAlOu8sn4jt9UebKNUXX6FF4WH7QVUMWiOIFGJzznvHvj2W3n1sNtpklnA5nOvymsnXNekIECs4U4oWeTv43SbLdR2+OKpPU=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
- by PH7PR12MB6665.namprd12.prod.outlook.com (2603:10b6:510:1a7::10) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by CY8PR12MB7433.namprd12.prod.outlook.com (2603:10b6:930:53::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.19; Wed, 14 Aug
- 2024 07:58:40 +0000
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4%4]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
- 07:58:40 +0000
-Message-ID: <1431d84b-2d92-4a78-af49-702f005359f9@nvidia.com>
-Date: Wed, 14 Aug 2024 09:58:35 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token
- correctly
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240808082044.11356-1-jasowang@redhat.com>
- <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
- <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
- <CACGkMEvAVM+KLpq7=+m8q1Wajs_FSSfftRGE+HN16OrFhqX=ow@mail.gmail.com>
- <ede5a20f-0314-4281-9100-89a265ff6411@nvidia.com>
- <CACGkMEtVMq83rK9ykrN3OvGDYKg6L1Jnpa2wsnfDEbswpcnM1g@mail.gmail.com>
- <b4c144f8-5941-4bca-afdb-5feeb23b14c1@nvidia.com>
- <CACGkMEs2Sr_uEd+7Ry1e5MOcD5eKuSeCzHDLRodD0RbuweJ0qA@mail.gmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Wed, 14 Aug
+ 2024 08:00:40 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
+ 08:00:40 +0000
+Message-ID: <6f9dc18e-6f47-e276-2388-68e1d4dc581b@amd.com>
+Date: Wed, 14 Aug 2024 09:00:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 03/15] cxl: add function for type2 resource request
 Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <CACGkMEs2Sr_uEd+7Ry1e5MOcD5eKuSeCzHDLRodD0RbuweJ0qA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR3P281CA0186.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a4::13) To CY8PR12MB8297.namprd12.prod.outlook.com
- (2603:10b6:930:79::18)
+To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ richard.hughes@amd.com
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-4-alejandro.lucero-palau@amd.com>
+ <abff9def-a878-47e9-b9c8-27cf3c008c29@intel.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <abff9def-a878-47e9-b9c8-27cf3c008c29@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0145.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:188::6) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,311 +84,170 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|PH7PR12MB6665:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8de1cced-3483-4b24-ce9b-08dcbc36e8e4
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CY8PR12MB7433:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18336921-f4fb-47a4-c8ac-08dcbc373099
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Uk1Sa0dFaGF1V2NzRkFwTm5HMSt5dDVGOU5POHhkUmJleko2M3pMZ2FvL3Yz?=
- =?utf-8?B?eGNhcXMySHRWeGFTM2l5VGZqT3poaFhJSUJSS1A1d25zZlA4d2F0RXBTM1lw?=
- =?utf-8?B?T1NtQTNZZVNuWXh2Y2plZXhkcGdoeHFva1J4cmtUa2tKcXhXRnVxVDVENHlw?=
- =?utf-8?B?MGpOd1czUGZ5NjNxUFFkQkZ3NzJGdFpIaG50RXBrbkpwRDJYMTdhc2FCaWk5?=
- =?utf-8?B?VzcvU3R2SXYrQzVCMVA3L0lPZTljeDczSlpNMHpvaWI4amNGVXdjbmNOZHNp?=
- =?utf-8?B?Rm1MN1B1WTBqaEV2S0dSZmZEWEk1VXVZNmpMTTZVUy9hdEZncG02c3VQdTZ0?=
- =?utf-8?B?N2ZnY3hXbWNDTU84V1VaSUVLNEdkN3Y5aFNvWFk1WGhTcEE2VWkzbWI3N2Mw?=
- =?utf-8?B?U3lCWTkrNU5TT3ZkdnIzQVFBVDl0aW9pL3FUOSs1bUtOMjJCL2NYUWk2aCtl?=
- =?utf-8?B?U3JWTXArS3o1M0FkN0ErVFpWUWpYaENLL1RydzZ6WUsyRlpsM004TVh5blMr?=
- =?utf-8?B?em1PUCttUElpdzVlZGFzSElHRy9KL3NYZ09wblpaWk5qc3pWU1JFa2Vobnk1?=
- =?utf-8?B?VEhOT1dGMWpac0hFTU5UWEtoanlhNmJlQ0RJN2Q3bmxoKzIzWkpkRkhueE9B?=
- =?utf-8?B?TnF5YjNHY1p4ZkRNYUViSE13UjJ5VC9YNnh6WThBWGVHWjNhMUhWaTFDQ3hx?=
- =?utf-8?B?UzZjUldtbzVibVhvbUVqZDBySEZiNDlNbVRwbGkzZVBHYzgxeDVFbUk5Vm1H?=
- =?utf-8?B?eWNBTWttOHBFc0g5aDdUT0l3WENnN3Rsb2NWNDBPU2xpNGxMWW5UM0FZWFo3?=
- =?utf-8?B?VHYxUituLzd2SnlwNnEwM29heFArZ0hCeUxtVDNLWTV5UWxpVVVaSDY3ZEc2?=
- =?utf-8?B?bGFGeVUzTWx0aVRQWWxDWmlwWmpLR21tR1RmTlRiQ2dRTi9oSmJBeURMbWZX?=
- =?utf-8?B?UHczSVNYM3Q2SnJ2dmJLTDd6dXlydmlvYnFGUHd3TTY2QThyOG45WnM1Rzh4?=
- =?utf-8?B?UFRIdngzNTVTS2cvb1lxWUQyL3FNb1dvQU9XK3pFSkN5MWhQYTlkVmFMazJi?=
- =?utf-8?B?bGxEWmtDVTdlRHNaQnRteFZCa2RCMXhhd1gxSEpVbFVqWmIyTlliRWJEdldl?=
- =?utf-8?B?c0lZbzVzNVBPZXBwZ1ZKRDJMd2JwY0Z5RFh3VnRnd3NUODU3YW5vb1A0ck9E?=
- =?utf-8?B?K0c0ZVd6enBJT3h0Rk0yQUxYTExoK1lNMnhIcnpYcjJ3c3BHMXMwa3JQMkYx?=
- =?utf-8?B?a0dvT1R2TjdRMmtLRHNsUHZnTkMvM0Q0NHAwZEJuMGk1K0FMNGxDUWh4WU52?=
- =?utf-8?B?UUw5dnJCMERrVFZLcUhZVlRiUDJ0MWd5TzY5ZGZJbVJ5RXA3bWh5Qm9uSWU1?=
- =?utf-8?B?dnFuNTEyUGw1d0ZyTjRBSUNaRGF5NlhrVTV0REpJOFZTbVZSZGQvUGdmTCt1?=
- =?utf-8?B?VHo2QnNhVUJ4VlQzZ0ZTV3dINGdKNXd4UmE0eGZCaXJCcDhlaEFSK2pVZmsx?=
- =?utf-8?B?TkdzQVJpdHJKb0JUdkNIc1Rua2ExMlhmQnpjK2w1UVAxTVBoLzQvZCt5b0dx?=
- =?utf-8?B?NGI1MWcxMGJraU1kcDlvWGFPdFVyR20zT1lLVzVLcHp6MU8zNVI4SDFLWXhs?=
- =?utf-8?B?aWlZNXU2b3lnTzBtM3hkZEpUZGQ5NXhSRldJbkZXZFk2WGNRK0haS09NRDFw?=
- =?utf-8?B?MWlyVXJVSlRFNFFkLzdjSWtxbkdvaG9mL08yWWlobjh3encvUzhOdGYzOUw5?=
- =?utf-8?B?d3VxRHB0WTNwcnNFVTFSb3RkSXVwdk1YWitSdDJJTTJJbEUrWFViS1FKbHp0?=
- =?utf-8?B?Lzk0UHJsOW5qdk16bWFTZz09?=
+	=?utf-8?B?V3RuOGZQdWZseEliVi9KRWdPM1dYWlBwc3MveXZNUmFZWGlhazB5NFJld2lM?=
+ =?utf-8?B?bGJzZVdWVzFTeWNFa0NOeGF2ZklldzFPMFkzNWwwVU84UHo0RXJTODU0TzFP?=
+ =?utf-8?B?REd3S1FMN2IyVjFZVlJYNSthNzUxamNDcUFOcEpkRVlJWXhXY2FsOWZQVmtK?=
+ =?utf-8?B?WVB3aTlodkVIUGJnT1JyQTlkN0N2eExjR0Y3a1ZKbGY0ZDNieTIwdFNMMjQx?=
+ =?utf-8?B?OU5GZm8xMGtCZHppbzZPSm1wS1MycERnVzNGN29RMEx3dDlYWjE3UW1ncit1?=
+ =?utf-8?B?Y3VNcUxPWHhCcHUxRW9OVUZHU2kvOUFGUGhOVmQ2SGxvZW5ZbjRpdmFvdjVE?=
+ =?utf-8?B?cndoYmNWNTMxTFNYMFB0ZnMyRjhuUjVTZFA1QjNOd0IyUnFKYm5QS0x5Z2JZ?=
+ =?utf-8?B?bW95anArWk9rZzBXd3p5N1lkY2xsQmFCUHlsR0pyektMTWdDZGdHRTBHbzNW?=
+ =?utf-8?B?ZG1tWnBZcWZLMjJxU1RYZFBYN1pFV1hvK1NMNk5IRUVhRng1UndYTEtJUmZu?=
+ =?utf-8?B?aTNYM0ljRFkyTWpkZk91dHJiMkdLU01acThGSkZ5L3JSS3pGZVJrMnNLOHpv?=
+ =?utf-8?B?UDVBeGlXcVB1NkFUWGtDNnA0UUdhdTFZT3Radk5pZmVyTEFiMk5tb0JPLzR0?=
+ =?utf-8?B?eUZFZE9IUXRsbWFxNDhVTVJjcGt2VnBiVzFPR1cybVFkcVo5VUNxY3lCekdV?=
+ =?utf-8?B?UjdHRmdWVjk0aHJ2VFc1V1JCS3dnRXJUaXQyTGsvcWp4aWNxczRFYkQzY2Fa?=
+ =?utf-8?B?bXF5LzlDRnJuTFhNcm01Z0JRK3UwenVhTDVPbDR5RHpoNTdNN1Zob1BGNWIw?=
+ =?utf-8?B?UjVCSGZZeTR2QlU5cnlwT0VubktlaE16SDNLUE83TlVIVjY1aGgyeXJkNnJh?=
+ =?utf-8?B?TDV0bFZBeGRVNHBjWlNnU1Y5ZGFvdHp1VlZMdVZuOUd6UW9JZEhVQ0FibEE1?=
+ =?utf-8?B?bmtwVWxtLzE4ZFZ2Zm14dDh1WFBYK0M5U2VoRjA3bjEyS255L0pNdmRFWTdw?=
+ =?utf-8?B?VUdsM1JqR0Q5ZmNhWUdvMlpiM1lobkRVS2ZTMVBoQXYrWS96UkI0ZFE4MmZ2?=
+ =?utf-8?B?OUg4c1lYd2wxWWtMS2hiZnlrQUoyTDNRQS9BYWR2eUJualNzQUVUdEJVTG4w?=
+ =?utf-8?B?dEN5RGxBTmRqQ0hnamN5bitlNVB1MVB3VjRJdCtQZlNQTTZnTnY2TUJZRDRS?=
+ =?utf-8?B?SHBWazNTdHZwMVR5WFBUd1E2czdQSEJhdTZJeDRrN1NnUlAyRzVZV2dMb1Iz?=
+ =?utf-8?B?b3V0Y09nZzFjOWxJcjFaR09zRFJNY0QreUk1UHV0NUkwaEU4RjVUTnVVQnFH?=
+ =?utf-8?B?dFBnNVRsR0t3T05ZQU92U3p6QlVzOEdDdzYxM1phSmpsTFNVSGxnZUJZdnMz?=
+ =?utf-8?B?MGY0bzNHdkpaTVVTUE9Qbm5aN2x3VW5jQURBaC9MQncydHV2NG9lazY1UVlK?=
+ =?utf-8?B?UmZROU4vOGFQbkZsak41aExPQ09tK1I0N3N2d3hQNnlCK0x6ejN0TEJjMldR?=
+ =?utf-8?B?RFFSaWZEVGZUUUlDb0F5SnFZblpRVC9XS1ErTHU2dlRLcVZ1UlZDZmxvR1Y3?=
+ =?utf-8?B?bElHYTVBRml3VVdmOWdqWXlGazNpcHJWRG15NkhtcTBnT0FpNGdaSE1LS1ZV?=
+ =?utf-8?B?ejJYdFl5WVIwYjFGVk54MWg5VmtWQktKbjRoTlBTTUU2VHNMeFZ4WWJnWW5I?=
+ =?utf-8?B?Nm9MV2hhbFFHVjFyZmQ5VHFLVHhFWHZwZXFiVHBVdHBqSjV1Rk1jOU9EZDJT?=
+ =?utf-8?B?eEV0dXhFVUV5RUJwb1JhZzdkajBWZ1E3YW9ENUNGdEUrREFrMWhJL3Y4RHo0?=
+ =?utf-8?B?ZGZESXdZdEJNNi9JQWlYQnRzWi90RmZVVC9QYUlnSDNXQ0RWcTZpM1FKT2hI?=
+ =?utf-8?Q?fThPGBp2FRnlY?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cW5hQ2hHOEpSNmNsOGpqbTVHYzQ1bmI2WWc2VEVDVWJHRlhJVFhWam5ZZjk5?=
- =?utf-8?B?N29CQUlacUZMWmhaOUs0S0tyWi9IY0kraXdnaFJqQnY3eHdTTFRQY0I1emtH?=
- =?utf-8?B?bS93dFJJd2VXaVZIUUFOeHBmRSt1cUw5R0dGMENyTXlKTDdJdDVhWmNRVWFw?=
- =?utf-8?B?SkhvaVpsOWpFeGZPUitOMHpmd21XSUg0QXVEVzhWZVhLdkNsZWN4M3pSc0Fq?=
- =?utf-8?B?U0VhUGwyVGdlTE0yeFdSTGhmRHFrc1RGZEJ2MjNCRzhhNlgvN3o0MEF2SU5D?=
- =?utf-8?B?OGpocDJqbzRxOUJTdnNla3N1ckl0ZlBPbUQ4bkZPY1FxcDg0MDdQaGtzd1Za?=
- =?utf-8?B?TlVHYldJT1poSHFCQXRWVERnalcwUi91Ly80dlNkZW1XTFNsQmd1THY4U3Ja?=
- =?utf-8?B?Ty9OdGx0VE9SeEo0UnZPaFo1V1diMVdjNG9TWXhjOE1WeDlGYUhrYkZyVjBF?=
- =?utf-8?B?WlMya25WT2RNRkszNjhzaE1ZVys2VEVFVi9lMTduajlyVThqc2psTWNrdTc0?=
- =?utf-8?B?Y1VCR0VXdy9TVzdveVRJNExDRERoa3V5eXR5M0pHbys5aE04cWM3M250bGlH?=
- =?utf-8?B?V1RYcFBWR21DYUQrRktRREZDOHU2RkVvVVNFdWFTTGdWRUV1d3l4dmtxVW5r?=
- =?utf-8?B?TzJyamJNQXMxakRMZ3JVN0h2QzBCMmtlVUk4Ly9ZcFJNaCtwbUZWa01INEFw?=
- =?utf-8?B?QVdZenBSMGNWdFdXeXdRYWFsaG11bHhRQkovMW40VE81L3l6Qnp5UW5ZV1Ro?=
- =?utf-8?B?ZGpGKzBQZS9jR0M2ZnJQcGFwbU81dFQ1ZGlRQkkxeGRnN0hSY2lhamZRbnV0?=
- =?utf-8?B?K0pURURJT0w0SHNESmlqZXdsTUFBZ2xobVk4dUxnb3liajQ0SmtiUFNXL3RU?=
- =?utf-8?B?K2ZJd3MwdDJLdUxUYWRCM0NCVURRMXRvK0hMT1F1OUx0K01PTjhFb01CM3NK?=
- =?utf-8?B?c2ZYU00xNzd6akFKVDNpdG5HU1E4Y1ROSmxrVDRGc1ZqK1VLSk9xZGlpazJ1?=
- =?utf-8?B?bElGNVJKVHFDOTBPRmo1a3JyYW1tZld2akRxMXRrbC9ZMUVDS2Voc1FUcFlz?=
- =?utf-8?B?Ym9wQ0NUZ3JMUzQ5Um1RcnNqT1FIMGpTbjR4NDJPckJnQU9lNkxiNUE2Y3RF?=
- =?utf-8?B?L2ZZNlA5Y0wzK3pZQk4ydzV1cnVxdXZSR0c1SU1hZ09YcktiUExBNmFRRkg3?=
- =?utf-8?B?bEhPcWRkZ0dQTXNRZ0xxMWVXaWRnYitVREUwZUxKUFoxbCtLS2M4bU8vU2g1?=
- =?utf-8?B?cGVuR1l3dEhiajYyWlZvVlNZS0J5TjRlS1JJbVl4VFdDNGFSdTJ6Wm16dXdU?=
- =?utf-8?B?M2IyaWdIdzdqOEM5WVZNdHNuUExNVmtpc0hLd0JyVEtyR2Q2eHl2bmdJLzdV?=
- =?utf-8?B?R2hkTjQ4VFM5NEduVXAydXVIcTJrNVJEbkhuZFpEU0ZQMGJLYzg3TUkzaDJv?=
- =?utf-8?B?TWhMWVZ2elZvWWNZTlRFTXR4UTZlR0doV1UzNGxCbmdMdncrWXVoRHRlREdh?=
- =?utf-8?B?RjVNeTE0STZqSVhSWmJCYzhjbS9YSitFSEVvVC9uTnR4bFdHUDhPcndVM3lJ?=
- =?utf-8?B?WUVkei81dGJ2SVkyelA0UG01OVNkUzQ3NnJLUWgwd2Vyemd5Q25QbzJKdkd0?=
- =?utf-8?B?SFRNcXFPQjU5RmNoaWE4LzVyOWNKYjhzTUU2R0xPVWpuc0txNzcwT2pncEVa?=
- =?utf-8?B?d3RaQVpEVEVZdk5PNHkrUHRQM2p2N2RtdkplcXF3cHNXZUdlK0puczVxS1Yw?=
- =?utf-8?B?dzErcDB6YzY1MGh3QnRMRGYyR1BVMzNZajdsZGF1MlUvdXEzM2pYZHRBRXhv?=
- =?utf-8?B?ZUxvblZrMi9FMlhhUG9JSGZyckRxVmF0Y1JYMFFXdERIeGF6Z2RqdFNFRmly?=
- =?utf-8?B?WTFUMHAxTWJoaUhuOXJZOW14TTIxclJwaUtmc1QwOVhSNTJ2dUltemttM2FM?=
- =?utf-8?B?Uit2eTlHdEhmRXVvZFZHQmZ3WTBOL3lBTVRJNzk1YzArSWFjdjdteEQ5UGFx?=
- =?utf-8?B?ZVJKYllZczlXNkQ2eDc5aCtxd09RUy9LZEZISUpGVzg2RUk1NFBnY0FQWUpF?=
- =?utf-8?B?N0ZKYzF4QkIwR0lzNjFkdmtGdVhVT3VCR0wrQ2NaNkJxS2FRWG5MT0dUem9O?=
- =?utf-8?Q?BMCoXUfXIG4+B/BaScYovVl0+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8de1cced-3483-4b24-ce9b-08dcbc36e8e4
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
+	=?utf-8?B?dm0zUU90bDQzdVFYc2h2RDNvcVd3UmNXUExPc3hVZlRPeXJvL1pUa3NyNjlo?=
+ =?utf-8?B?WjloNW9OT2FCRGV6dVJpZGFFQmV3eGMreXZ1emJvMnM4c1B3SUdFQTN6UzFL?=
+ =?utf-8?B?K0hTdTc0M2J0Ry93REd1QkIrZmpQVnN3dHI5QnowZmhuK3hCY2g1bHhvOVhs?=
+ =?utf-8?B?TFRNYVc1OFkzVlZXaTVYSit4eFFYd2pSRFpKaGRpMFF3VWJRVUdlY2FPL1V6?=
+ =?utf-8?B?RnpVWXJpUXVRZXhKVXFyL3E0YnVzNHVRaUczaVkvUERndzR1N241V3FCNURU?=
+ =?utf-8?B?SDdWNW9ncVRtRW5WVHhta1JPN3F6STZqVHZnd001Yit2aE5QcHBLNUsxWTlC?=
+ =?utf-8?B?Q29sOFVLckFJVWdUVDNDaFZyc0NzNExJRlIwT3JHMFk5cWVZMGcrSGR1UHZT?=
+ =?utf-8?B?M3gyaVQ0K1o1UjJGMnJpVERNV29ObUVPWEkyWlRCSEhmaFgwZlljTld4bEpY?=
+ =?utf-8?B?RE80WUtDbjE3L2FBRGNDaVFyZEg0b2MrSkY3ZDY3L21QYWVHS254aFFUZTFY?=
+ =?utf-8?B?azk5SkF2Smg5NmY4aXdMb3REL2NpSTJYb1hMY2NvOTJDcU5reE9kcW5IcWJn?=
+ =?utf-8?B?YkJ3Uk5Xc01MYjlGd0t6K0xQaHowNWY2V0FQL1hpVUNkUGVIVk5OQmNLNWlI?=
+ =?utf-8?B?ZWdlOFV4WTRBS202bEc3QnVLZXpXekI1dzZqbkhoS3FkSnM3V2hpQlB6aHRy?=
+ =?utf-8?B?RGZSNG8xckVTMDZNQkZQNUE2N21sZzVmUThIZDVnVGJEK21YRU1zZ2J5cUdq?=
+ =?utf-8?B?QnJCL3lFcDlDaklJaTI1Qzc3eklXQjNDVStReGIxR2FuVlJYeThWR2RobkFx?=
+ =?utf-8?B?aDRNcXZMOVJTOW0rcS9rQzV0cnF3MGFwM3h1Z1BMd2Q2S01HcTBtZ3FwUExO?=
+ =?utf-8?B?S05QSEpidENwVEhqNVBiTnFGTnMrY3NBYlJPMHRtbmtWRDB3VkJXd0wrUkU1?=
+ =?utf-8?B?NjFTc1lxdWN3bWF6UEVxOFpPZmQzZVFWMGJKUGJNY3E1OC8rSkhDQkZRYUJl?=
+ =?utf-8?B?S2ZCc1U1ZjM5OUpKS0FXSWxiVVRwclJoTHFORFhVNzhueUFyeFZETXdicG5Q?=
+ =?utf-8?B?QklYRS9FMFFoZW9kODZRdTJ0MXlwZjc2ZFVVSnQ0TGxGLytLUS81OEIzYnUx?=
+ =?utf-8?B?RW5saENwVTZqUzMzWDlmVnBlNDBJRkMrck9ZVFZiOE9zRHJCMnNLN3JYUnNt?=
+ =?utf-8?B?emR6TWF4RWNteFY3OFZZZzc5Q3hITHFDYXUwaDdTajVBNEZISlZLdHBYTXgr?=
+ =?utf-8?B?MDE3N2psVmdrRDBzR0VEVjFmTlYyVjhBblVVcWpEeDVvOTlFQjc5azEzZlBR?=
+ =?utf-8?B?MXZZWDhIME9aSlo3SWRrUjJyaDJGQjM3V0pyRkdZKzl0ODcydkM5b21LMzJ5?=
+ =?utf-8?B?ZytYd1BURk1RK1FQd2ZZZTJobDdNN0tvOThhT0ozNk1YclZpc2NWa1Q0WFBm?=
+ =?utf-8?B?UmVwSDMrOVl2M2JaMU94TmFrWlBoVmM4MlkybVpxL254bXNSc2dXT3pTK1RJ?=
+ =?utf-8?B?TVBoSGpRYWczQlpGckJtUUJoM1JkV05CYWszaFRsTmgvVks1SGhsVjJaZzhY?=
+ =?utf-8?B?N3dIL01CY1BZc2lucTEvV2ZUbmRCZytrelpyK0xmUUNRY0xpM2xERWJDTUhs?=
+ =?utf-8?B?WnQ4cDhCcHMxNGNnQ1VEV0FkZjM2Ny9sdCtZcHRjSmxhWUdsNmFVNDA4Qy9R?=
+ =?utf-8?B?RktRS2U4MitmWlh3TXdXQnlNamVjZXNFNGRUbk43MFpsaEI2VHVrTmtaWHg0?=
+ =?utf-8?B?b1I5eG9XWkZ1cDI5alA3VlFOa3I3WnFIWkUydktyWityVHNieFh1YStHYWoy?=
+ =?utf-8?B?VGNFcU95MlUzRDJvNlU0aTJyNXBXK1YzT2dwUHVhR1EvUDltVkVtb3g4Yk9G?=
+ =?utf-8?B?QUszZW5aTHo5ZTdYekJXU0k4bGg0QmZyS0hXOXo1YmMyOER4elRiYytWaWND?=
+ =?utf-8?B?MXFBTi9PUVFiSlczWUtaNm1jNnZHd21GZXoxOEVURDhqcFF4eWhJR3JVVGNN?=
+ =?utf-8?B?dWI4Q29BRGV4UGV3WkZWaVNjcGdtQkRDcHBGK1l4SERGb3Y5OTluRC9PeXFu?=
+ =?utf-8?B?SmhlMFY5UG5sZHJ0dFROR1pkMXNiNytlVzFvbWFwb25KMVNRY3hDN29yRC9Y?=
+ =?utf-8?Q?P5UQ+IYPeuJ6ue74nB+0FnAy1?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18336921-f4fb-47a4-c8ac-08dcbc373099
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 07:58:40.3255
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 08:00:40.6433
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5I0QL2wR19Xy81D3BvrC0vXk095f667zTUefg0lA1UXIAby9yRvhWCIpR2rOg6sL3Fv3B7QXMyaPJbRkejKBPQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6665
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7PBS2DLH9gPQnUYllJMeepZfB1bfPHTemWWuUD2nuh1edNX1ALzBcu5c0OkdcHq6s9OFjxb1nkUwhzxA7/vYPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7433
 
 
+On 7/19/24 00:36, Dave Jiang wrote:
+>
+> On 7/15/24 10:28 AM, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Create a new function for a type2 device requesting a resource
+>> passing the opaque struct to work with.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/memdev.c          | 13 +++++++++++++
+>>   drivers/net/ethernet/sfc/efx_cxl.c |  7 ++++++-
+>>   include/linux/cxl_accel_mem.h      |  1 +
+>>   3 files changed, 20 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+>> index 61b5d35b49e7..04c3a0f8bc2e 100644
+>> --- a/drivers/cxl/core/memdev.c
+>> +++ b/drivers/cxl/core/memdev.c
+>> @@ -744,6 +744,19 @@ void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>>   }
+>>   EXPORT_SYMBOL_NS_GPL(cxl_accel_set_resource, CXL);
+>>   
+>> +int cxl_accel_request_resource(struct cxl_dev_state *cxlds, bool is_ram)
+> Maybe declare a common enum like cxl_resource_type instead of 'enum accel_resource' and use here instead of bool?
 
-On 14.08.24 07:29, Jason Wang wrote:
-> On Tue, Aug 13, 2024 at 8:53 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>
->>
->>
->> On 13.08.24 08:26, Jason Wang wrote:
->>> On Mon, Aug 12, 2024 at 7:22 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>>
->>>>
->>>>
->>>> On 12.08.24 08:49, Jason Wang wrote:
->>>>> On Mon, Aug 12, 2024 at 1:47 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>>
->>>>>> On Fri, Aug 9, 2024 at 2:04 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> On 08.08.24 10:20, Jason Wang wrote:
->>>>>>>> We used to call irq_bypass_unregister_producer() in
->>>>>>>> vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
->>>>>>>> token pointer is still valid or not.
->>>>>>>>
->>>>>>>> Actually, we use the eventfd_ctx as the token so the life cycle of the
->>>>>>>> token should be bound to the VHOST_SET_VRING_CALL instead of
->>>>>>>> vhost_vdpa_setup_vq_irq() which could be called by set_status().
->>>>>>>>
->>>>>>>> Fixing this by setting up  irq bypass producer's token when handling
->>>>>>>> VHOST_SET_VRING_CALL and un-registering the producer before calling
->>>>>>>> vhost_vring_ioctl() to prevent a possible use after free as eventfd
->>>>>>>> could have been released in vhost_vring_ioctl().
->>>>>>>>
->>>>>>>> Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
->>>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>>>>>> ---
->>>>>>>> Note for Dragos: Please check whether this fixes your issue. I
->>>>>>>> slightly test it with vp_vdpa in L2.
->>>>>>>> ---
->>>>>>>>  drivers/vhost/vdpa.c | 12 +++++++++---
->>>>>>>>  1 file changed, 9 insertions(+), 3 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>>>>>>> index e31ec9ebc4ce..388226a48bcc 100644
->>>>>>>> --- a/drivers/vhost/vdpa.c
->>>>>>>> +++ b/drivers/vhost/vdpa.c
->>>>>>>> @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
->>>>>>>>       if (irq < 0)
->>>>>>>>               return;
->>>>>>>>
->>>>>>>> -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
->>>>>>>>       if (!vq->call_ctx.ctx)
->>>>>>>>               return;
->>>>>>>>
->>>>>>>> -     vq->call_ctx.producer.token = vq->call_ctx.ctx;
->>>>>>>>       vq->call_ctx.producer.irq = irq;
->>>>>>>>       ret = irq_bypass_register_producer(&vq->call_ctx.producer);
->>>>>>>>       if (unlikely(ret))
->>>>>>>> @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->>>>>>>>                       vq->last_avail_idx = vq_state.split.avail_index;
->>>>>>>>               }
->>>>>>>>               break;
->>>>>>>> +     case VHOST_SET_VRING_CALL:
->>>>>>>> +             if (vq->call_ctx.ctx) {
->>>>>>>> +                     vhost_vdpa_unsetup_vq_irq(v, idx);
->>>>>>>> +                     vq->call_ctx.producer.token = NULL;
->>>>>>>> +             }
->>>>>>>> +             break;
->>>>>>>>       }
->>>>>>>>
->>>>>>>>       r = vhost_vring_ioctl(&v->vdev, cmd, argp);
->>>>>>>> @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->>>>>>>>                       cb.callback = vhost_vdpa_virtqueue_cb;
->>>>>>>>                       cb.private = vq;
->>>>>>>>                       cb.trigger = vq->call_ctx.ctx;
->>>>>>>> +                     vq->call_ctx.producer.token = vq->call_ctx.ctx;
->>>>>>>> +                     vhost_vdpa_setup_vq_irq(v, idx);
->>>>>>>>               } else {
->>>>>>>>                       cb.callback = NULL;
->>>>>>>>                       cb.private = NULL;
->>>>>>>>                       cb.trigger = NULL;
->>>>>>>>               }
->>>>>>>>               ops->set_vq_cb(vdpa, idx, &cb);
->>>>>>>> -             vhost_vdpa_setup_vq_irq(v, idx);
->>>>>>>>               break;
->>>>>>>>
->>>>>>>>       case VHOST_SET_VRING_NUM:
->>>>>>>> @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->>>>>>>>       for (i = 0; i < nvqs; i++) {
->>>>>>>>               vqs[i] = &v->vqs[i];
->>>>>>>>               vqs[i]->handle_kick = handle_vq_kick;
->>>>>>>> +             vqs[i]->call_ctx.ctx = NULL;
->>>>>>>>       }
->>>>>>>>       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
->>>>>>>>                      vhost_vdpa_process_iotlb_msg);
->>>>>>>
->>>>>>> No more crashes, but now getting a lot of:
->>>>>>>  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) registration fails, ret =  -16
->>>>>>>
->>>>>>> ... seems like the irq_bypass_unregister_producer() that was removed
->>>>>>> might still be needed somewhere?
->>>>>>
->>>> My statement above was not quite correct. The error comes from the
->>>> VQ irq being registered twice:
->>>>
->>>> 1) VHOST_SET_VRING_CALL ioctl gets called for vq 0. VQ irq is unregistered
->>>>    (vhost_vdpa_unsetup_vq_irq() and re-registered (vhost_vdpa_setup_vq_irq())
->>>>    successfully. So far so good.
->>>>
->>>> 2) set status !DRIVER_OK -> DRIVER_OK happens. VQ irq setup is done
->>>>    once again (vhost_vdpa_setup_vq_irq()). As the producer unregister
->>>>    was removed in this patch, the register will complain because the producer
->>>>    token already exists.
->>>
->>> I see. I think it's probably too tricky to try to register/unregister
->>> a producer during set_vring_call if DRIVER_OK is not set.
->>>
->>> Does it work if we only do vhost_vdpa_unsetup/setup_vq_irq() if
->>> DRIVER_OK is set in vhost_vdpa_vring_ioctl() (on top of this patch)?
->>>
->>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>> index 388226a48bcc..ab441b8ccd2e 100644
->>> --- a/drivers/vhost/vdpa.c
->>> +++ b/drivers/vhost/vdpa.c
->>> @@ -709,7 +709,9 @@ static long vhost_vdpa_vring_ioctl(struct
->>> vhost_vdpa *v, unsigned int cmd,
->>>                 break;
->>>         case VHOST_SET_VRING_CALL:
->>>                 if (vq->call_ctx.ctx) {
->>> -                       vhost_vdpa_unsetup_vq_irq(v, idx);
->>> +                       if (ops->get_status(vdpa) &
->>> +                           VIRTIO_CONFIG_S_DRIVER_OK)
->>> +                               vhost_vdpa_unsetup_vq_irq(v, idx);
->>>                         vq->call_ctx.producer.token = NULL;
->> I was wondering if it's safe to set NULL also for !DRIVER_OK case,
->> but then I noticed that the !DRIVER_OK transition doesn't set .token to
->> NULL so this is actually beneficial. Did I get it right?
-> 
-> Yes, actually the reason is that we use eventfd as the token, so the
-> life cycle of the token is tied to eventfd itself. If we don't set the
-> token to NULL here the vhost_vring_ioctl() may just release it which
-> may lead to a use-after-free. So this patch doesn't set a token during
-> DRIVER_OK transition but during SET_VRING_CALL.
-> 
-Ack. Thanks for the explanation.
 
->>
->>>                 }
->>>                 break;
->>> @@ -752,7 +754,9 @@ static long vhost_vdpa_vring_ioctl(struct
->>> vhost_vdpa *v, unsigned int cmd,
->>>                         cb.private = vq;
->>>                         cb.trigger = vq->call_ctx.ctx;
->>>                         vq->call_ctx.producer.token = vq->call_ctx.ctx;
->>> -                       vhost_vdpa_setup_vq_irq(v, idx);
->>> +                       if (ops->get_status(vdpa) &
->>> +                           VIRTIO_CONFIG_S_DRIVER_OK)
->>> +                               vhost_vdpa_setup_vq_irq(v, idx);
->>>                 } else {
->>>                         cb.callback = NULL;
->>>                         cb.private = NULL;
->>>
->> Yup, this works.
->>
->> I do understand the fix, but I don't fully understand why this is
->> better than setting the .token to NULL in vhost_vdpa_unsetup_vq_irq()
->> and keeping the token logic inside the vhost_vdpa_setup/unsetup_vq_irq()
->> API.
-> 
-> See the above explanation, hope it clarifies things.
-> 
-Yes it does.
+Yes. Thanks
 
->>
->> In any case, if you send this fix:
->> Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
-FWIW:
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-
-> 
-> Thanks
-> 
->>
->> Thanks,
->> Dragos
->>>>
->>>>
->>>>>> Probably, but I didn't see this when testing vp_vdpa.
->>>>>>
->>>>>> When did you meet those warnings? Is it during the boot or migration?
->>>> During boot, on the first 2 VQs only (so before the QPs are resized).
->>>> Traffic does work though when the VM is booted.
->>>
->>> Right.
->>>
->>>>
->>>>>
->>>>> Btw, it would be helpful to check if mlx5_get_vq_irq() works
->>>>> correctly. I believe it should return an error if the virtqueue
->>>>> interrupt is not allocated. After a glance at the code, it seems not
->>>>> straightforward to me.
->>>>>
->>>> I think we're good on that front:
->>>> mlx5_get_vq_irq() returns EOPNOTSUPP if the vq irq is not allocated.
->>>
->>> Good to know that.
->>>
->>> Thanks
->>>
->>>>
->>>>
->>>> Thanks,
->>>> Dragos
->>>>
->>>
->>
-> 
-
+>> +{
+>> +	int rc;
+>> +
+>> +	if (is_ram)
+>> +		rc = request_resource(&cxlds->dpa_res, &cxlds->ram_res);
+>> +	else
+>> +		rc = request_resource(&cxlds->dpa_res, &cxlds->pmem_res);
+>> +
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_accel_request_resource, CXL);
+>> +
+>>   static int cxl_memdev_release_file(struct inode *inode, struct file *file)
+>>   {
+>>   	struct cxl_memdev *cxlmd =
+>> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+>> index 10c4fb915278..9cefcaf3caca 100644
+>> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+>> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+>> @@ -48,8 +48,13 @@ void efx_cxl_init(struct efx_nic *efx)
+>>   	res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
+>>   	cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_RAM);
+>>   
+>> -	if (cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds))
+>> +	if (cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds)) {
+>>   		pci_info(pci_dev, "CXL accel setup regs failed");
+>> +		return;
+>> +	}
+>> +
+>> +	if (cxl_accel_request_resource(cxl->cxlds, true))
+>> +		pci_info(pci_dev, "CXL accel resource request failed");
+> pci_warn()? also emitting the errno would be nice.
+>
+>>   }
+>>   
+>>   
+>> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
+>> index ca7af4a9cefc..c7b254edc096 100644
+>> --- a/include/linux/cxl_accel_mem.h
+>> +++ b/include/linux/cxl_accel_mem.h
+>> @@ -20,4 +20,5 @@ void cxl_accel_set_serial(cxl_accel_state *cxlds, u64 serial);
+>>   void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>>   			    enum accel_resource);
+>>   int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
+>> +int cxl_accel_request_resource(struct cxl_dev_state *cxlds, bool is_ram);
+>>   #endif
 
