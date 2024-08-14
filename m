@@ -1,290 +1,109 @@
-Return-Path: <netdev+bounces-118591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1424D9522E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:53:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0B69522F4
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF7C8280DAD
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:53:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB7B4B23821
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB64D1BF304;
-	Wed, 14 Aug 2024 19:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A081BF32B;
+	Wed, 14 Aug 2024 19:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pCsgS6S4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DkX/ht54"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A331BC065
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286E01AED23
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723665205; cv=none; b=V89peFn8R5diD+wJToBqUFaUa9Fl5QFJY0BR2NcfqE4Plji6rcoj5dONOJ6KEo7veWIJTuL3mma9Bzv9H6cAYY6llschoGIaeS1h1ORw/L5ayJ014Dp/mP9Ru80T4OnvmJV/sFJ8ngM+bEqfHJzOhkKyss6y8LrFf3PZIIPOEbA=
+	t=1723665383; cv=none; b=ZahOODfveoYbbEmlww874X5D04f4Ga+6qgYbs3kU+DzQnZAPdzEZlJp/BDH/AylmtGY52gWo5qdhAxyfOwlWdK1tX+hLv4zfxhSEaRL9Dxv98beNJehXYLwOIqRbBddQNVSH57pwbvLS9GCpswFRpaNA9vzCxaMeApnMNE2tqTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723665205; c=relaxed/simple;
-	bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PgiTc9mgh3ozHtTQxx/rK/uqobF3I8U+zUcinnA1LnQQ6VWGx2fsqSw8obnBlmXOaPHR1/EyT5JfQC+YXLz47XxGDlLek6mwSmnC+0wIeOOv4f34EJOsnmVzkm8lbK4hKHbNj+gK8iKPMZD1l+AIWKSEfO2knxGVLj8K7gDOedI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pCsgS6S4; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-44fee2bfd28so7481cf.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 12:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723665203; x=1724270003; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
-        b=pCsgS6S4qvJBE7CJCdnTu1ozTBi+dqTE37zsLV31LKFyhBVKWDSER2hPeTvDVkJpay
-         q+mWpytm3oNK21szbD86AsNpPGCimCjQMKaoEUHKD1CuZIQjlmUzRx+zvFTAD7jejWIt
-         VXFq3AV0a5gVuZMPbg/k4Yxe/P3CfHm5Eqc9wjZXlF3iEAmQocrJ69Aj7oJV9TCKOk23
-         1OYV1aOlMRWzRTZnnXlJ8XXI6F6ByvkBd+aGhTdhY4GWKXmmwGRZ0jymTWmHNa+5lCNp
-         K0TH6YMrK2y6ZiEm2hmIPrFKHTqFqfp/uI110IYVxv6ry2IOIJ4N8ncLuWoumjQwGdD3
-         yD4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723665203; x=1724270003;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
-        b=aiNxix6ZetRATLO7HGvj30ZMu4WXg3t3AP8zkZ60J+M1zA2GUmFqBs4UbWOQAKx/uM
-         FXb6Vbf6RwX0FQqtkWO0F/rFKSLXoCO6y41iQSyt6hKivbGGPXx81b4/SuTawp1Go8Ir
-         tCUYLKvvspRtHyg9S1o153xwAnmSks7A08yiYFDToA8oDIS2mDVmTz7VVWCMIIE7jSCd
-         KvM00JXy/r+kZ6r3/3wKfMYwj7aT8X8Y20IKZ+rusM15U/XjQv5UcQKqrjga2ACj5h6e
-         O3Jka/xb8SI6LER8xU2Db92iC8jupFR2vIISgbzbBbrv27mrm2FmlpCehmIFtHdFc80R
-         VB2g==
-X-Forwarded-Encrypted: i=1; AJvYcCUSwjnyo0WWHjjUfXjeUfMS4z/XJ60Xzc26VAWuscl6jWL1jm9s3GbEXlHe3FH7izcz54+U+e0OJc8nLhDo/bZW5F7iEoLg
-X-Gm-Message-State: AOJu0YzcAXfYuyVPZ0oH2zzkP170k3AMsL0V5ZABGVL1VyExvKoAG2c0
-	PCEsWLzZYlIVj1Yz9OqMVXyGnDJHk80u5a2QZwjqlzbZxBYENNmVR8hhNwvpg/lZcdVoxUwPErI
-	1KW1vR4ZXB7r4gmp9xEU9dTgGfoCAjC2wDgcPWs2kxP+yQhnfl6h6emEfCg==
-X-Google-Smtp-Source: AGHT+IEFg40ZSJEF95A3diV9x3plTBjAQ3CA036HBdyf1mC2UdAq8xozTT3D2y+6l3hbaCcVPzJW798aEGJJ19g9Ihs=
-X-Received: by 2002:a05:622a:81:b0:447:eeb1:3d2 with SMTP id
- d75a77b69052e-45368bcf26amr218461cf.27.1723665202801; Wed, 14 Aug 2024
- 12:53:22 -0700 (PDT)
+	s=arc-20240116; t=1723665383; c=relaxed/simple;
+	bh=aECfMSpTudw67XI81fDh7hFBWPgL1yuEKnnS7XVgk9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZvKHu0mg0Y9C04mVt6svvY5Vcl4o6vD+6DhcxZsjsM5jW71wM4or2pkC5ZoaZeRiJ8+3w/WFws6sFaOdA3DQZtz/aWO9FDnoaHvVf+T+J3UJgUyX25ekFi5DxPkrjTszSUz+Q48HHr+bv3kFR2lbMo99m1j7bGztf2fKTgQaF7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DkX/ht54; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723665381; x=1755201381;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aECfMSpTudw67XI81fDh7hFBWPgL1yuEKnnS7XVgk9A=;
+  b=DkX/ht54AsXLKKKcEAkESSKZAxQJhrOJD1jqyvbgClqZXc6YMOA72zQW
+   DyGbaY0KQA63jr2/qvVOPXP3yCxCGazVjU0VgUl/gdoXTBFfOb3yBDsK3
+   uLUlZtmxC1prYKkQ0rHp+vDzeU8yzTHIjd7dd4dBWsNBGYphpej8AmiPP
+   0Iot77qag5G6ZPiQ/eUSDJC8sH20lmUR45XC/0zT6Sm2lpI1mc7POeNh5
+   ZLobUj1HlDITiU5n6ezkyQz/Vb6/b8Db0a++1UzGOYrDSifgAMilor4yg
+   Uwvr9DapkNCKPcC8bI9HzkIoWqUhk9IA+Gt2pRMTfZJ1gC1fnoKG7aSv6
+   Q==;
+X-CSE-ConnectionGUID: vsI7LBDaSE+BxnwZvkrCrw==
+X-CSE-MsgGUID: rHoBTfZbQl+DbPqQFHEe+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="33292495"
+X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
+   d="scan'208";a="33292495"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 12:56:20 -0700
+X-CSE-ConnectionGUID: E9NPFh9gT5SmfwhlxNAywA==
+X-CSE-MsgGUID: 7iNoreR3TlmD+rvG2U1q8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
+   d="scan'208";a="59869696"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by orviesa008.jf.intel.com with ESMTP; 14 Aug 2024 12:56:20 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v4 0/5] Replace auxbus with ice_adapter in the PTP support code
+Date: Wed, 14 Aug 2024 21:54:29 +0200
+Message-ID: <20240814195434.72928-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240812125717.413108-1-jdamato@fastly.com> <ZrpuWMoXHxzPvvhL@mini-arch>
- <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca> <ZrqU3kYgL4-OI-qj@mini-arch>
- <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca> <Zrq8zCy1-mfArXka@mini-arch>
- <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca> <Zrrb8xkdIbhS7F58@mini-arch>
- <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
-In-Reply-To: <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Wed, 14 Aug 2024 12:53:07 -0700
-Message-ID: <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
-To: Martin Karsten <mkarsten@uwaterloo.ca>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	Joe Damato <jdamato@fastly.com>, amritha.nambiar@intel.com, sridhar.samudrala@intel.com, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Breno Leitao <leitao@debian.org>, Christian Brauner <brauner@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes.berg@intel.com>, 
-	Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 13, 2024 at 6:19=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo.=
-ca> wrote:
->
-> On 2024-08-13 00:07, Stanislav Fomichev wrote:
-> > On 08/12, Martin Karsten wrote:
-> >> On 2024-08-12 21:54, Stanislav Fomichev wrote:
-> >>> On 08/12, Martin Karsten wrote:
-> >>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
-> >>>>> On 08/12, Martin Karsten wrote:
-> >>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
-> >>>>>>> On 08/12, Joe Damato wrote:
-> >>>>>>>> Greetings:
->
-> [snip]
->
-> >>>>>>> Maybe expand more on what code paths are we trying to improve? Ex=
-isting
-> >>>>>>> busy polling code is not super readable, so would be nice to simp=
-lify
-> >>>>>>> it a bit in the process (if possible) instead of adding one more =
-tunable.
-> >>>>>>
-> >>>>>> There are essentially three possible loops for network processing:
-> >>>>>>
-> >>>>>> 1) hardirq -> softirq -> napi poll; this is the baseline functiona=
-lity
-> >>>>>>
-> >>>>>> 2) timer -> softirq -> napi poll; this is deferred irq processing =
-scheme
-> >>>>>> with the shortcomings described above
-> >>>>>>
-> >>>>>> 3) epoll -> busy-poll -> napi poll
-> >>>>>>
-> >>>>>> If a system is configured for 1), not much can be done, as it is d=
-ifficult
-> >>>>>> to interject anything into this loop without adding state and side=
- effects.
-> >>>>>> This is what we tried for the paper, but it ended up being a hack.
-> >>>>>>
-> >>>>>> If however the system is configured for irq deferral, Loops 2) and=
- 3)
-> >>>>>> "wrestle" with each other for control. Injecting the larger
-> >>>>>> irq-suspend-timeout for 'timer' in Loop 2) essentially tilts this =
-in favour
-> >>>>>> of Loop 3) and creates the nice pattern describe above.
-> >>>>>
-> >>>>> And you hit (2) when the epoll goes to sleep and/or when the usersp=
-ace
-> >>>>> isn't fast enough to keep up with the timer, presumably? I wonder
-> >>>>> if need to use this opportunity and do proper API as Joe hints in t=
-he
-> >>>>> cover letter. Something over netlink to say "I'm gonna busy-poll on
-> >>>>> this queue / napi_id and with this timeout". And then we can essent=
-ially make
-> >>>>> gro_flush_timeout per queue (and avoid
-> >>>>> napi_resume_irqs/napi_suspend_irqs). Existing gro_flush_timeout fee=
-ls
-> >>>>> too hacky already :-(
-> >>>>
-> >>>> If someone would implement the necessary changes to make these param=
-eters
-> >>>> per-napi, this would improve things further, but note that the curre=
-nt
-> >>>> proposal gives strong performance across a range of workloads, which=
- is
-> >>>> otherwise difficult to impossible to achieve.
-> >>>
-> >>> Let's see what other people have to say. But we tried to do a similar
-> >>> setup at Google recently and getting all these parameters right
-> >>> was not trivial. Joe's recent patch series to push some of these into
-> >>> epoll context are a step in the right direction. It would be nice to
-> >>> have more explicit interface to express busy poling preference for
-> >>> the users vs chasing a bunch of global tunables and fighting against =
-softirq
-> >>> wakups.
-> >>
-> >> One of the goals of this patch set is to reduce parameter tuning and m=
-ake
-> >> the parameter setting independent of workload dynamics, so it should m=
-ake
-> >> things easier. This is of course notwithstanding that per-napi setting=
-s
-> >> would be even better.
-> >>
-> >> If you are able to share more details of your previous experiments (he=
-re or
-> >> off-list), I would be very interested.
-> >
-> > We went through a similar exercise of trying to get the tail latencies =
-down.
-> > Starting with SO_BUSY_POLL, then switching to the per-epoll variant (ex=
-cept
-> > we went with a hard-coded napi_id argument instead of tracking) and try=
-ing to
-> > get a workable set of budget/timeout/gro_flush. We were fine with burni=
-ng all
-> > cpu capacity we had and no sleep at all, so we ended up having a bunch
-> > of special cases in epoll loop to avoid the sleep.
-> >
-> > But we were trying to make a different model work (the one you mention =
-in the
-> > paper as well) where the userspace busy-pollers are just running napi_p=
-oll
-> > on one cpu and the actual work is consumed by the userspace on a differ=
-ent cpu.
-> > (we had two epoll fds - one with napi_id=3Dxxx and no sockets to drive =
-napi_poll
-> > and another epoll fd with actual sockets for signaling).
-> >
-> > This mode has a different set of challenges with socket lock, socket rx
-> > queue and the backlog processing :-(
->
-> I agree. That model has challenges and is extremely difficult to tune rig=
-ht.
-We noticed a similar issue when we were using the same thread to do
-application work
-and also napi busy polling on it. Large gro_flush_timeout would
-improve throughput under
-load but reduce latency in low load and vice versa.
+This series replaces multiple aux buses and devices used in the PTP support
+code with struct ice_adapter holding the necessary shared data
 
-We were actually thinking of having gro_flush_timeout value change
-based on whether
-napi is in busy_poll state and resetting it to default value for
-softirq driven mode when
-busy_polling is stopped.
+Patches 1,2 add convenience wrappers
+Patch 3 does the main refactoring
+Patch 4 finalizes the refactoring
 
-Since we didn't have cpu constraints, we had
-dedicated pollers polling napi and separate threads polling for epoll
-events and doing
-application work.
->
-> >>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for the =
-sake of
-> >>>> an individual queue or application to make sure that IRQ suspension =
-is
-> >>>> enabled/disabled right away when the state of the system changes fro=
-m busy
-> >>>> to idle and back.
-> >>>
-> >>> Can we not handle everything in napi_busy_loop? If we can mark some n=
-api
-> >>> contexts as "explicitly polled by userspace with a larger defer timeo=
-ut",
-> >>> we should be able to do better compared to current NAPI_F_PREFER_BUSY=
-_POLL
-> >>> which is more like "this particular napi_poll call is user busy polli=
-ng".
-> >>
-> >> Then either the application needs to be polling all the time (wasting =
-cpu
-> >> cycles) or latencies will be determined by the timeout.
-But if I understand correctly, this means that if the application
-thread that is supposed
-to do napi busy polling gets busy doing work on the new data/events in
-userspace, napi polling
-will not be done until the suspend_timeout triggers? Do you dispatch
-work to a separate worker
-threads, in userspace, from the thread that is doing epoll_wait?
-> >>
-> >> Only when switching back and forth between polling and interrupts is i=
-t
-> >> possible to get low latencies across a large spectrum of offered loads
-> >> without burning cpu cycles at 100%.
-> >
-> > Ah, I see what you're saying, yes, you're right. In this case ignore my=
- comment
-> > about ep_suspend_napi_irqs/napi_resume_irqs.
->
-> Thanks for probing and double-checking everything! Feedback is important
-> for us to properly document our proposal.
->
-> > Let's see how other people feel about per-dev irq_suspend_timeout. Prop=
-erly
-> > disabling napi during busy polling is super useful, but it would still
-> > be nice to plumb irq_suspend_timeout via epoll context or have it set o=
-n
-> > a per-napi basis imho.
-I agree, this would allow each napi queue to tune itself based on
-heuristics. But I think
-doing it through epoll independent interface makes more sense as Stan
-suggested earlier.
->
-> Fingers crossed. I hope this patch will be accepted, because it has
-> practical performance and efficiency benefits, and that this will
-> further increase the motivation to re-design the entire irq
-> defer(/suspend) infrastructure for per-napi settings.
->
-> Thanks,
-> Martin
->
->
+Previous discussion: https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20240715/042744.html
+
+v1->v2: Code rearrangement between patches
+v2->v3: Patch cleanup
+v3->v4: E825C support in ice_adapter
+v4->v5: Rebased on top of the latest changes
+
+Sergey Temerkhanov (5):
+  ice: Introduce ice_get_phy_model() wrapper
+  ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+  ice: Initial support for E825C hardware in ice_adapter
+  ice: Use ice_adapter for PTP shared data instead of auxdev
+  ice: Drop auxbus use for PTP to finalize ice_adapter move
+
+ drivers/net/ethernet/intel/ice/ice.h         |   5 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c |  22 +-
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 340 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  24 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |   5 +
+ 7 files changed, 129 insertions(+), 311 deletions(-)
+
+-- 
+2.43.0
+
 
