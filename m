@@ -1,129 +1,189 @@
-Return-Path: <netdev+bounces-118390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C217951733
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:58:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CAA8951751
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:06:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87A0BB28082
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:58:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B5C61F22354
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EEA143C6E;
-	Wed, 14 Aug 2024 08:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7397314389F;
+	Wed, 14 Aug 2024 09:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KqzkuyiJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIzinRqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5130C1442F7
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D11914387B;
+	Wed, 14 Aug 2024 09:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723625817; cv=none; b=UxHSWKiawrWVyKELirE8LgcCrm0yu1S1XfATAAu3KwxLwvpscONLaXBsoJe7pkI3LsmyL6iEc1ulQiCGDDrllbOONM5GeN7tUpik14XurZaQIv7CUT8mh5JcP1NT6RRR3RzJOFISxNMVnJXT9pj0NCDYVfPI9CCWN89YnMhml8E=
+	t=1723626411; cv=none; b=o+AJwE/Bl/6v4m3hkexSnrtgSrk3nRdrWNLlbG0pbW0/fZ+7+/2ZLV6JT7sf1ImFUl414xIhOX3220qZFtEbasUD797ZE7avCjg9ez1ddrEKulmtOmfEJBE7D+S6ZEDqM230K2g7exsP/LVcDfdbblJ7Gip+cRiO9+fPbDnnpIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723625817; c=relaxed/simple;
-	bh=E/SJ1R/e4a6yUAjBZkY2QBigcGkFZO7JvDc77oR48AM=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=c5656lwa8wd5l380zACutiYXF6ZPvXzNet4GNVtV5Jua3q5qFMF9mfZwmJxl1s3/Ru3oxmAixi8uV17GYAbbkx6Zsm/0/MPV4nOh82Rrjd3hmt9O5rCKzauAx5zM1zcGCmawCNVzZIILkrReVimUge4EtfNZivNw8XRtphvs9XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KqzkuyiJ; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-428e3129851so46616045e9.3
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 01:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723625814; x=1724230614; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VmuuD1Mg38RuJK+XXDOfDQ0zQ/m/bh2bzVqjtBHG08=;
-        b=KqzkuyiJt+szkaDbBhA3452yecMeHZQxq15Ar4BOtF92RwF9cq/KJVbtb8j9g7WiK4
-         hQsVgCnwITrOzv2abZQg0wIheJEg5gRMmviUMHTgc0BJk3zr4iB3KB5GeDbNTibeiEFA
-         jb5C/a5KuuoUtyimBE7LIGdG0D6HZUKVX9HfVlqJQfoSITO02llCRW09stYoMc1bd9Pw
-         wDElk/FEBXRWdZ323Zic8lun+Upc7iaS1Z10T5Rq8edPOfO2QtE/Tf8EGxC8KAFUr+vY
-         9TmY8lKy9jvvT12gW+vwgfQKlpij1w6avP7cF2guKYy7KoOnJ55ltYWUvLLYKn3eQTmT
-         Q0uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723625814; x=1724230614;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7VmuuD1Mg38RuJK+XXDOfDQ0zQ/m/bh2bzVqjtBHG08=;
-        b=PwnuhsrJ0Jko3Uv7kYtYCg2EyxviJjh4yj8H+RhPKyeJsw5A1E86+YVFohZiPqrDsc
-         /fMws2lsUHRgTNSrWrUjIZlzJRgQ40GywgfQssCaKPxUz11oTaQa72jGYatRysKQ6N6u
-         mAB3BagrjjxfxSW12d5uTAYsTMpr4J5uX56a3k7bIW61/i9tkd/U0EMjw1YcBNegwzSo
-         BlfWE2OFhpqPDP9VU4JbD+uLxPadpcOwCD7XPVyT19lMBgCJQKGgtnPnSJ41tK7ukV6w
-         Hn83twD0dhEoqNX4b5YDJQVFVYjZlwhFsybIpENqIng0bvN4CL/oHnDkzRU8iQJlXMf/
-         yM7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWJJ3hXefbeDrEb2HMSUqnDEOgNcqCv34+zGQimtTweMkv4cF3KDJKxzfwQFiWB2EyG//XyDlBrVqPX0Q6XAL8ktCE3c1w2
-X-Gm-Message-State: AOJu0YzCh3K/TCNIVqLPR5MYLTaG/En+XQzS79QLi3vhman9urVGMRUc
-	V+O0Ok4HvGMqxvxHoUz6rQt6jw0Qt4/krthRSQeVbi984HcQ7uOs
-X-Google-Smtp-Source: AGHT+IEYCfmo678SPjgRyqoDEel50YXZKbaxwj/GIYVyBS5qUFyUi+PpF9lmSQusgp/6BLNVV3FXzQ==
-X-Received: by 2002:a05:600c:3556:b0:426:602d:a246 with SMTP id 5b1f17b1804b1-429dd26c0a9mr15673965e9.32.1723625814063;
-        Wed, 14 Aug 2024 01:56:54 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:5991:634d:1e:51b4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded32538sm13274735e9.16.2024.08.14.01.56.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:56:53 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  Jiri Pirko <jiri@resnulli.us>,
-  netdev@vger.kernel.org,  Madhu Chittim <madhu.chittim@intel.com>,
-  Sridhar Samudrala <sridhar.samudrala@intel.com>,  Simon Horman
- <horms@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,  Sunil
- Kovvuri Goutham <sgoutham@marvell.com>,  Jamal Hadi Salim
- <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-In-Reply-To: <eb027f6b-83aa-4524-8956-266808a1f919@redhat.com> (Paolo Abeni's
-	message of "Tue, 13 Aug 2024 16:47:34 +0200")
-Date: Wed, 14 Aug 2024 09:56:42 +0100
-Message-ID: <m27ccjlbxx.fsf@gmail.com>
-References: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
-	<ZquJWp8GxSCmuipW@nanopsycho.orion>
-	<8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
-	<Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
-	<74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
-	<ZrHLj0e4_FaNjzPL@nanopsycho.orion>
-	<f2e82924-a105-4d82-a2ad-46259be587df@redhat.com>
-	<20240812082544.277b594d@kernel.org>
-	<Zro9PhW7SmveJ2mv@nanopsycho.orion>
-	<20240812104221.22bc0cca@kernel.org>
-	<ZrrxZnsTRw2WPEsU@nanopsycho.orion>
-	<20240813071214.5724e81b@kernel.org>
-	<eb027f6b-83aa-4524-8956-266808a1f919@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1723626411; c=relaxed/simple;
+	bh=aWmH3sWtQ+FGj5on2nAJT14mAoJFktWZxP7WslPeMW0=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=EQ4WhdhDfxnFfm3RG3frKinLQW9NbWWPm7FE6mWuPmmI2qi+rDoV9tA9C/W379Gc82sk+tbDRw3WPkQnCjaYEWVs/wHyTarbf89Ii0dmU8KQaQkep8a0HfKoUsdOcVGeYJu12kNMwdI1L2aRHGHKyzaCbJUNBPVoW6RcyUV6KtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIzinRqT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ABDFC4AF13;
+	Wed, 14 Aug 2024 09:06:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723626411;
+	bh=aWmH3sWtQ+FGj5on2nAJT14mAoJFktWZxP7WslPeMW0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YIzinRqTgZLiUEVZ0ipr2k/xKvy+TKwiETqWc3B0FTT6GAr3GhNNVX1+Eev+jbNmP
+	 LsruYt1YTxCyEMwZJqzva57v2Lmu6NrTsN2HHnpNFAqNwBvVytGOctxgtBY9dgkTaC
+	 Uq/4hcTwXhssYNlQqy6OqdEQeZ4+C6h6SVaBw/aH7Rvqck00Y+h8QD2YRrydto78xi
+	 SopYwhUmrvaYu2RfHHo9YHpLCrw007ukuIU10sE+KjkJWAJjTcxZpwqypHAh8TqlN7
+	 3+Bp9Mu+iWBhXSbXB+EC+QHy1snq0O1o3YixjNQL/s9SmyaOy/w7hPa8w9gHFLVg65
+	 4XQBZY7deaKoQ==
+Content-Type: multipart/mixed; boundary="------------7JMRSDFsHcdDrMqFd7RB8dW5"
+Message-ID: <6b5897e7-1bed-4eb3-8574-093db5dea159@kernel.org>
+Date: Wed, 14 Aug 2024 11:06:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v3 1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: using
+ unevaluatedProperties: manual merge
+Content-Language: en-GB
+To: Frank Li <Frank.Li@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: imx@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+ Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+ Stephen Rothwell <sfr@canb.auug.org.au>
+References: <20240811184049.3759195-1-Frank.Li@nxp.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240811184049.3759195-1-Frank.Li@nxp.com>
 
-Paolo Abeni <pabeni@redhat.com> writes:
+This is a multi-part message in MIME format.
+--------------7JMRSDFsHcdDrMqFd7RB8dW5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> On 8/13/24 16:12, Jakub Kicinski wrote:
->> To me using input / output is more intuitive, as it matches direction
->> of traffic flow. I'm fine with root / leaf tho, as I said.
->
-> Can we converge on root / leaf ?
->
->>>>> subtree_set() ?
->>>>
->>>> The operation is grouping inputs and creating a scheduler node.
->>>
->>> Creating a node inside a tree, isn't it? Therefore subtree.
->> All nodes are inside the tree.
->> 
->>> But it could be unified to node_set() as Paolo suggested. That would
->>> work for any node, including leaf, tree, non-existent internal node.
->> A "set" operation which creates a node.
->
-> Here the outcome is unclear to me. My understanding is that group() does not fit Jiri nor Donald
-> and and node_set() or subtree_set() do not fit Jakub.
+Hi Frank,
 
-I found group() confusing because it does not imply creation. So
-create-group() would be fine. But it seems like creating a group is a
-step towards creating a scheduler node?
+On 11/08/2024 20:40, Frank Li wrote:
+> Replace additionalProperties with unevaluatedProperties because it have
+> allOf: $ref: ethernet-controller.yaml#.
+> 
+> Remove all properties, which already defined in ethernet-controller.yaml.
+> 
+> Fixed below CHECK_DTBS warnings:
+> arch/arm64/boot/dts/freescale/fsl-lx2160a-bluebox3.dtb:
+>    fsl-mc@80c000000: dpmacs:ethernet@11: 'fixed-link' does not match any of the regexes: 'pinctrl-[0-9]+'
+>         from schema $id: http://devicetree.org/schemas/misc/fsl,qoriq-mc.yaml#
+
+FYI, we got a small conflict when merging 'net' in 'net-next' in the
+MPTCP tree due to this patch applied in 'net':
+
+  c25504a0ba36 ("dt-bindings: net: fsl,qoriq-mc-dpmac: add missed
+property phys")
+
+and this one from 'net-next':
+
+  be034ee6c33d ("dt-bindings: net: fsl,qoriq-mc-dpmac: using
+unevaluatedProperties")
+
+----- Generic Message -----
+The best is to avoid conflicts between 'net' and 'net-next' trees but if
+they cannot be avoided when preparing patches, a note about how to fix
+them is much appreciated.
+
+The conflict has been resolved on our side[1] and the resolution we
+suggest is attached to this email. Please report any issues linked to
+this conflict resolution as it might be used by others. If you worked on
+the mentioned patches, don't hesitate to ACK this conflict resolution.
+---------------------------
+
+Regarding this conflict, a merge of the two modifications has been
+taken: adding 'phys', and removing 'managed'
+
+Rerere cache is available in [2].
+
+Cheers,
+Matt
+
+1: https://github.com/multipath-tcp/mptcp_net-next/commit/691930dfa066
+2: https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/d15f8
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
+--------------7JMRSDFsHcdDrMqFd7RB8dW5
+Content-Type: text/x-patch; charset=UTF-8;
+ name="691930dfa066cc019020ee32efc7a795736dc1e6.patch"
+Content-Disposition: attachment;
+ filename="691930dfa066cc019020ee32efc7a795736dc1e6.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWNjIERvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQvZnNsLHFv
+cmlxLW1jLWRwbWFjLnlhbWwKaW5kZXggNDJmOTg0M2QxODY4LGYxOWM0ZmE2NmYxOC4uYmU4
+YTIxNjNiNzNlCi0tLSBhL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQv
+ZnNsLHFvcmlxLW1jLWRwbWFjLnlhbWwKKysrIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVl
+L2JpbmRpbmdzL25ldC9mc2wscW9yaXEtbWMtZHBtYWMueWFtbApAQEAgLTM2LDEyIC0zMCw2
+ICszMCwxMCBAQEAgcHJvcGVydGllcwogICAgICAgIEEgcmVmZXJlbmNlIHRvIGEgbm9kZSBy
+ZXByZXNlbnRpbmcgYSBQQ1MgUEhZIGRldmljZSBmb3VuZCBvbgogICAgICAgIHRoZSBpbnRl
+cm5hbCBNRElPIGJ1cy4KICAKLSAgIG1hbmFnZWQ6IHRydWUKLSAKICsgIHBoeXM6CiArICAg
+IGRlc2NyaXB0aW9uOiBBIHJlZmVyZW5jZSB0byB0aGUgU2VyRGVzIGxhbmUocykKICsgICAg
+bWF4SXRlbXM6IDEKICsKICByZXF1aXJlZDoKICAgIC0gcmVnCiAgCg==
+
+--------------7JMRSDFsHcdDrMqFd7RB8dW5--
 
