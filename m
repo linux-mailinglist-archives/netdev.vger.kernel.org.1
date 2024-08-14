@@ -1,121 +1,91 @@
-Return-Path: <netdev+bounces-118452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861FE951A9A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:12:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36D48951AA6
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E99E7B22809
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:12:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B933281B8F
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F331AED40;
-	Wed, 14 Aug 2024 12:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2A31AED57;
+	Wed, 14 Aug 2024 12:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ER91I/pA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mr1AoX2s"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E497A1B010D
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 12:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994E41AED3C
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 12:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723637534; cv=none; b=sAscyhtvi1GeilGVD7fkgfGInD4D/PngcenBKopCOYxmZlPFeWRNi0ZK1HZNIaJ/4KpFBRHNMbdP5e958Onom78noQFM0dnmIamMo+x2r+A3eUZvY3FkDQ35NI2obX51XzuWL9gAWVv01rNgSART3Orx3EO1xJL48R1cH2x38e0=
+	t=1723637785; cv=none; b=AJNSppyQUvh5QKvQO64vwih2tyIF0X1j6I/Vi6993RpvMCh5YIHzu40Yi/OntCijIR8eMSbXAA6qr9PIR4pGT6qiU3XQXXSdgHyAmjxRdjTLHvMOWwXyHeVroa6RJje2DQBa/uzJxwv3flFX1qacHPK6y/TfeNGB4/FukhVRPUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723637534; c=relaxed/simple;
-	bh=MQ57xcNRnx2hbtvSnDnW9ALhWFVxGf3zZIIpvn2IVqk=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YF0LzcWRh54JYt6Nm36StsYsGgHUMUXKYiY9JaqIr/IOlaA//8rWV0tspdzi4GmPWJUh/OcvR4bm3+DgRjEFtJg64KZTPdGI2ymSxEw+1zC33lXqZL+CFZPnOHSWFZvFI99FtweWh3BXWrjlZRXfrA+XAVUD16PIND1UJ4c3EMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ER91I/pA; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42819654737so48297825e9.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:12:12 -0700 (PDT)
+	s=arc-20240116; t=1723637785; c=relaxed/simple;
+	bh=LOXtqIv4EVemkhjUSrHDTA/YAtXnYgGDmfhh2wCEyLQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewKfrdp/w/9OGnBu9O0NfmxTpLE1Pt12+Et6KGqG/+gV0FuyvRrn8LaOHIlpCLCWdbcTNzOyqJ886ZF9CTSNbHS6oVk+LjDnQfsSYBu6SN+RSdEeoejoWHyEy4nMgVNUfyi9Ohjy8BGOAFSnLIPX0hV54LjQxLP9JcAdIRACncA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mr1AoX2s; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-429da8b5feaso14088675e9.2
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:16:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723637531; x=1724242331; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PG9e6JitvYXoqzSTP8p6u30qXecQWEzNyRf8++iwfzg=;
-        b=ER91I/pAUCKFn6ndSuySZNLG422z4clo57ycN76odiFyCjcH0QMFJQp2MN2KmlXIo9
-         /UIISX3qwXpFZT0GEMPLg8kDii+imqwHiSvzq3KPDu+rHcXwilLPLGqqpGZR/7qSjLJ8
-         Xns+oN5HGUECJ2zb3vkHnQT3nPtPVY03X0LNE=
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723637782; x=1724242582; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eYDRTUiCJggNa2PcVthlMSA7/lNsNWAZITIINEDwZnc=;
+        b=mr1AoX2sM7g45zVyacHt2Tv24cGBRwzDzZ++vKCHQN6hj+J9KAjpzCkAM1Xb/I2mU8
+         q/E3ShvfGttukD42C66Xm/8LeRfaBkEXPoZzbcCXBOb/x041Tdk8+0e4pDdfeJTeET7O
+         NfMhYp6hlxgwbSpU4tzkxpmKLJtVUMVVSvBrpb2WTWwVjxYI7rxs6vwM0IYM4Togtc3A
+         X54Hv24lvv5wKgAqE/uRCskLNEUCAjs8bo8Ja4sYKiVRJ+abmEwNBoGhPq+KVwukDHU3
+         YfDbDOd8x8CgrL5++4XEnA6DqE4L8jQdRg97OEmd3e0n3RNPVBHnnu+y++4gokMN11hI
+         e9OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723637531; x=1724242331;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PG9e6JitvYXoqzSTP8p6u30qXecQWEzNyRf8++iwfzg=;
-        b=VcJGRAavZ9kDq42UL9eF89GXt0BFSxXjPgdeefYdfjFVn57bADJmGXeAtc46zjue/u
-         +vnz6Pq9SnUWBcEZrUKIFoFb3udOxPWb30R5re0D4Zcfg1KbV4lWVKt/Jkb4sHQlP7mW
-         hZIZ0cXZJcvENpdrvrPgyP/MJId7MWLaU7OG7g5VhulI5rv4Vc9TVI3O5kKL/IK/ONsN
-         IBBgvaWmHpdrxZDLFuy2qwQIc4Stzdxka3l2GfcU5W5X3I+YqlrnL8yoCKy5MMmoHFA6
-         xHEE37vApo7+98UmBraXYJIL0dqPF2JVA/+QanhdZfQOepElYCw2nF+dqcre52ctPozZ
-         iUCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyJzTAGwCEzCNLNTU+/18oFvl6F0u9VUPf8eiSRRwB3ry0iYa9qOOU/H8MCpxQ2NCJb697a5e/G3P77rKHAkyEO1qXQpjM
-X-Gm-Message-State: AOJu0YxZq0E/FYv5hgCBBvMtfjUYcbI3iKAWcxUheIkzPTAym4hB4dh2
-	TMJ5EjPS/Is/R9qslZXjO8IFKhTXWXPCMZK5ItOK9MeY9cMFvmQ40vBlfdHDOT0=
-X-Google-Smtp-Source: AGHT+IEXQhc1DRLmbpucvwdmK1QHHySaNdm9iIXPW0P1dXOgYRVT3R+EtoisglPADmrSMdzG+PAwVw==
-X-Received: by 2002:a05:600c:4710:b0:426:62c5:4741 with SMTP id 5b1f17b1804b1-429dd22fe4dmr18421295e9.2.1723637531117;
-        Wed, 14 Aug 2024 05:12:11 -0700 (PDT)
-Received: from LQ3V64L9R2.home ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded1e3f7sm18267235e9.4.2024.08.14.05.12.09
+        d=1e100.net; s=20230601; t=1723637782; x=1724242582;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eYDRTUiCJggNa2PcVthlMSA7/lNsNWAZITIINEDwZnc=;
+        b=W7ghIByNn+GGCLUqA4AsjzPBP+ro7gROfbRc1vjelaSpF+M8K4B1gw87CLhPUCINOz
+         kmHc6T/74qjBjjJpbPQiY4zy0VybQjOx/P8HomIjywPuJrM71HVYlMsKWa3ftFIh20ws
+         jLIK5T8LXnNLFP4uWZ4qKCZPeQLRsfU3fLc/NUgQk8h44UBP4gec0sskUcATu/2QpGmK
+         TgeD52Lnkdbmi9DKwhncJlEAGG+4xZRsdFd29P7REWkocuqik4qg9Nm12keNey90e8QO
+         4r26S26Pk64QPGvgjQYavvFp8bzHl0TOFcI9UmYo/egVUcOr3sQ8FlWJbW4Tzl0/44+a
+         6iJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnzw7BaO0GLMMQ3+w6mWOa8pJ7WP0dtw9JzmSMHoRlSB76GWJSwJNbvcM37zqIRI4Yq5nnjJTMV7QjPE6gl0Xz852Sr+eP
+X-Gm-Message-State: AOJu0Yx8oSXwT5li3Pa4euaqG3M80TnQiRwkDSeZBrVaV+JpKPuEjb62
+	toeqJ/Z/ZZA+uk8UphtOUJxqrHup1mQyEpWTPG3JkhuQCZMr9JBtrKmFtSWzAe4=
+X-Google-Smtp-Source: AGHT+IGnqvle1WrbIFXUtN34+72aFtlxZcxGUlbtEIG6FFewrjtBnIeHhP/1ArXBUzRbii/b6pQz7Q==
+X-Received: by 2002:a05:600c:4751:b0:426:593c:9359 with SMTP id 5b1f17b1804b1-429dd267b32mr26501015e9.32.1723637781552;
+        Wed, 14 Aug 2024 05:16:21 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded1eff2sm18360945e9.3.2024.08.14.05.16.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 05:12:10 -0700 (PDT)
-Date: Wed, 14 Aug 2024 13:12:08 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
-Message-ID: <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-References: <20240812145633.52911-1-jdamato@fastly.com>
- <20240813171710.599d3f01@kernel.org>
- <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
+        Wed, 14 Aug 2024 05:16:20 -0700 (PDT)
+Date: Wed, 14 Aug 2024 14:16:19 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	dave.taht@gmail.com, kerneljasonxing@gmail.com,
+	hengqi@linux.alibaba.com
+Subject: Re: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
+Message-ID: <ZrygE7SjwPpdWM5G@nanopsycho.orion>
+References: <20240618144456.1688998-1-jiri@resnulli.us>
+ <CGME20240812145727eucas1p22360b410908e41aeafa7c9f09d52ca14@eucas1p2.samsung.com>
+ <cabe5701-6e25-4a15-b711-924034044331@samsung.com>
+ <Zro8l2aPwgmMLlbW@nanopsycho.orion>
+ <e632e378-d019-4de7-8f13-07c572ab37a9@samsung.com>
+ <Zrxhpa4fkVlMPf3Z@nanopsycho.orion>
+ <ZrxoC_jCc00MzD-o@nanopsycho.orion>
+ <20240814053637-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -124,69 +94,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
+In-Reply-To: <20240814053637-mutt-send-email-mst@kernel.org>
 
-On Wed, Aug 14, 2024 at 08:14:48AM +0100, Joe Damato wrote:
-> On Tue, Aug 13, 2024 at 05:17:10PM -0700, Jakub Kicinski wrote:
-> > On Mon, 12 Aug 2024 14:56:21 +0000 Joe Damato wrote:
-> > > Several drivers make a check in their napi poll functions to determine
-> > > if the CPU affinity of the IRQ has changed. If it has, the napi poll
-> > > function returns a value less than the budget to force polling mode to
-> > > be disabled, so that it can be rescheduled on the correct CPU next time
-> > > the softirq is raised.
-> > 
-> > Any reason not to use the irq number already stored in napi_struct ?
-> 
-> Thanks for taking a look.
-> 
-> IIUC, that's possible if i40e, iavf, and gve are updated to call
-> netif_napi_set_irq first, which I could certainly do.
-> 
-> But as Stanislav points out, I would be adding a call to
-> irq_get_effective_affinity_mask in the hot path where one did not
-> exist before for 4 of 5 drivers.
-> 
-> In that case, it might make more sense to introduce:
-> 
->   bool napi_affinity_no_change(const struct cpumask *aff_mask)
-> 
-> instead and the drivers which have a cached mask can pass it in and
-> gve can be updated later to cache it.
-> 
-> Not sure how crucial avoiding the irq_get_effective_affinity_mask
-> call is; I would guess maybe some driver owners would object to
-> adding a new call in the hot path where one didn't exist before.
-> 
-> What do you think?
+Wed, Aug 14, 2024 at 11:43:51AM CEST, mst@redhat.com wrote:
+>On Wed, Aug 14, 2024 at 10:17:15AM +0200, Jiri Pirko wrote:
+>> >diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> >index 3f10c72743e9..c6af18948092 100644
+>> >--- a/drivers/net/virtio_net.c
+>> >+++ b/drivers/net/virtio_net.c
+>> >@@ -2867,8 +2867,8 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+>> > 	if (err < 0)
+>> > 		goto err_xdp_reg_mem_model;
+>> > 
+>> >-	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+>> > 	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
+>> >+	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+>> > 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
+>> 
+>> Hmm, I have to look at this a bit more. I think this might be accidental
+>> fix. The thing is, napi can be triggered even if it is disabled:
+>> 
+>>        ->__local_bh_enable_ip()
+>>          -> net_rx_action()
+>>            -> __napi_poll()
+>> 
+>> Here __napi_poll() calls napi_is_scheduled() and calls virtnet_poll_tx()
+>> in case napi is scheduled. napi_is_scheduled() checks NAPI_STATE_SCHED
+>> bit in napi state.
+>> 
+>> However, this bit is set previously by netif_napi_add_weight().
+>
+>It's actually set in napi_disable too, isn't it?
 
-Actually... how about a slightly different approach, which caches
-the affinity mask in the core?
+Yes, in both.
 
-  0. Extend napi struct to have a struct cpumask * field
+I actually find exactly what's the issue.
 
-  1. extend netif_napi_set_irq to:
-    a. store the IRQ number in the napi struct (as you suggested)
-    b. call irq_get_effective_affinity_mask to store the mask in the
-       napi struct
-    c. set up generic affinity_notify.notify and
-       affinity_notify.release callbacks to update the in core mask
-       when it changes
+After virtnet_napi_enable() is called, the following path is hit
+  __napi_poll()
+    -> virtnet_poll()
+      -> virtnet_poll_cleantx()
+        -> netif_tx_wake_queue()
 
-  2. add napi_affinity_no_change which now takes a napi_struct
+That wakes the TX queue and allows skbs to be submitted and accounted by
+BQL counters.
 
-  3. cleanup all 5 drivers:
-    a. add calls to netif_napi_set_irq for all 5 (I think no RTNL
-       is needed, so I think this would be straight forward?)
-    b. remove all affinity_mask caching code in 4 of 5 drivers
-    c. update all 5 drivers to call napi_affinity_no_change in poll
+Then netdev_tx_reset_queue() is called that resets BQL counters and
+eventually leads to the BUG in dql_completed().
 
-Then ... anyone who adds support for netif_napi_set_irq to their
-driver in the future gets automatic support in-core for
-caching/updating of the mask? And in the future netdev-genl could
-dump the mask since its in-core?
+That's why virtnet_napi_tx_enable() move helped. Will submit.
 
-I'll mess around with that locally to see how it looks, but let me
-know if that sounds like a better overall approach.
 
-- Joe
+>
+>> 
+>> >
+>> > > ...
+>> >
+>> >Best regards
+>> >-- 
+>> >Marek Szyprowski, PhD
+>> >Samsung R&D Institute Poland
+>> >
+>> 
+>> 
+>> > 
+>> > 	return 0;
+>> >
+>> >
+>> >Will submit the patch in a jiff. Thanks!
+>> >
+>> >
+>> >
+>> >>
+>> >>Best regards
+>> >>-- 
+>> >>Marek Szyprowski, PhD
+>> >>Samsung R&D Institute Poland
+>> >>
+>
 
