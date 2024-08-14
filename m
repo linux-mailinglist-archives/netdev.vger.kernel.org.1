@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-118249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AAC9510BB
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:43:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A689510E3
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26FC71F2436B
-	for <lists+netdev@lfdr.de>; Tue, 13 Aug 2024 23:43:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5ED71F23158
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 00:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288071AC432;
-	Tue, 13 Aug 2024 23:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A37E365;
+	Wed, 14 Aug 2024 00:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lk6nj1TH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nvni09KB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1A416BE34;
-	Tue, 13 Aug 2024 23:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C0D195;
+	Wed, 14 Aug 2024 00:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723592593; cv=none; b=iQLDaF24gCB/w3ryf4cXBtZc+ImPlm1jhs52G0vKqvjZmEf2mEKd0NYDWKcq/kDBw4sICJ31y4jQHj12BZ8Ifk0bKZbdtek/a5sF7vNeAkdPqyk4WBiNdnn6MmZaMbuRyGsoYIFlBmLzdtnI21mgAwPhvUUWhSFKFK0vwY8Ksxo=
+	t=1723594218; cv=none; b=n/9fTj/uxK+kTqCdUIatVFwK37r3eR3vpBsJk6+VwBpYaGgCzs6VBF9swpe8geOHj7woSpsGG9bq0q4NarK2GXXdncviDvgrKJvCPWHwqfxPE6jDi+jWTdb0l1DFlIzkxaCvY4bEmX7Qzs9DPjTiZstu9VUlvBw5P1vdwUi+4qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723592593; c=relaxed/simple;
-	bh=ZfMQddyR4VMROisJI2TkO82wkmQw5Dh8ZMYlE15Cg7g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l1RCilQR5NIC/ER+NMgQBUVN8oySf8FIWo0qxlaR7qzEJ1y1eFgQjP4pjPOJrLI83fz8S6htQW71MkFakbfj5SfH5M9PtsKCIXFoW2IMRulMFG5iqnNP7g2AaE6+qZ/CCMY1l7HijtrEMZHz8VIupSHHTceScQ+GGdlllizeJZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lk6nj1TH; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fc5296e214so58011875ad.0;
-        Tue, 13 Aug 2024 16:43:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723592591; x=1724197391; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8YlYlablwzelVOdHb3auZk1KYuThzW8ziJWSrPypAD8=;
-        b=lk6nj1TH9habK2cHBs6jikvMWgV+HnnONUD5rfjV2x8J8HtJ61fZobTQBGE99MvtkF
-         v4LdPIWWDI6unuSTlr/XiX7XWgSR9X1RHS84Yvzjfw9hJ7SF9pexeiRzlKRZ/0Ur33XU
-         vSaONSeo3C3ME1OLxXVH7v2AZydZW23HtJypspTtqgAa6rBV+6ahwm9z3TbzN5ego2My
-         /yLyBU9ZLeigIQiCO312hEVVJalgfhgTmd2qDZZnhuK+9N3Om5ZvGwDzktJryo3h0WmN
-         Bzngf0ZQgdTt74Fm3wqTPz0VotLovgxDARPjLZ6E3avZvyoQsawsyiy1a0r/fI0BYfgn
-         vyIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723592591; x=1724197391;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8YlYlablwzelVOdHb3auZk1KYuThzW8ziJWSrPypAD8=;
-        b=SPCaBDamo4FLGNA2bsNG+cfRJYUUsA8Cx3xqeCUme5pAC/oVi5BXUcrxm5Nk2bcqJc
-         3LxrIs1BbTg+tEPEMyUR+NfGpQ/ONBg6QUQtWbJaAEhDchsTmkHY7+z+DCwJP6xmUdqy
-         OUKtQzIy+cC62+tDsOPYZyx6wcNJTNCPY8Wlw93cGfCs0GoYeRLsCcVzssI5W/fjl1uI
-         0cVNnqvlGS1wJWcgyhfgK6LghhLNdQ3FWCE6IKbAKz/zH9uW7uXc55sMbcN7JmThV2v0
-         XHAaaDxyB9LZb49E2j2QuaIS1zxz9BB/LCpJux4fgJ6MZWY5ruBAy8FmjKZF+VJx/iua
-         mgEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzymLBo6BZ58CWUl/OD1nH3nZ5c6Y1TXFGZsZqLU3Nh96qCxh4v7jMEomXLsblsxLVRMDem78=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNp7yuBqtACeunudGUBRph1Gq5bQtZMGu2I2Le3+IfPoRGAR0N
-	5MQ7NPI5ZzU1ifqgSp8FpnkqgothGEk0ZqGWqBzifjil9JorD/lA
-X-Google-Smtp-Source: AGHT+IH0GL6af1pA8zksuvMNp84AGZzVGr7AjhFG3EMFCfx5Fsq6rzzBzjkAn+31T/UzZB0C/XFGAA==
-X-Received: by 2002:a17:902:db10:b0:200:9a4f:19ad with SMTP id d9443c01a7336-201d648802emr11586605ad.46.1723592590932;
-        Tue, 13 Aug 2024 16:43:10 -0700 (PDT)
-Received: from localhost.localdomain ([2620:10d:c090:400::5:66ca])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1aa80csm18844525ad.146.2024.08.13.16.43.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 13 Aug 2024 16:43:10 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@kernel.org
-Subject: [GIT PULL] bpf for v6.11-rc4
-Date: Tue, 13 Aug 2024 16:43:07 -0700
-Message-Id: <20240813234307.82773-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1723594218; c=relaxed/simple;
+	bh=CgGiCU1U9xTQYDZRxZm7Un7VEpNMJSVzVM6bJDlOdxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IsqehI4AjUTinGZqR4LddOZJOQ+UzwnHFwVGiYLIvrtdtC2QPoMrmbaLuXov8bb9IX88KbBh13BZA0QWKU4pKtMZtBFlP5NuWFYppgL6uMlSzMJIgM4mG5aWUIl0vNAWsGIAZMVqJvuAz9VFjrOX5quvEHAZQYpjbDJRw7NTEto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nvni09KB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A95D2C32782;
+	Wed, 14 Aug 2024 00:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723594217;
+	bh=CgGiCU1U9xTQYDZRxZm7Un7VEpNMJSVzVM6bJDlOdxk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Nvni09KBGRfPgKM0VLV7+RkFXHKxWveneB40K/7YISiqq8MNws8kWwgwQs1zw5YKX
+	 3TOKan99uX7wRudaxZN6twe2lAaS7QHxgQmu1F9qHXV1PF2uoAceqBpIHQSJuSCvEa
+	 FoFqg7NUsDTM4krBHmtN/pcq+jI7Z9TlSN4IbSY/ZzM7p0p3GAIe4q42GgmcY1Vwsb
+	 DeeWR0BNVGG+a965Kmwx4ZIoOBF+/k1+Wmud6I9png+Rkb7g9qRVa2myEGM2Vw7vbv
+	 LSwh+xVmyXwczJTlnlfpvSUoQF/NfsMtTF8g90NtD8/rXVMko3HnPcZeswM9zLC+SP
+	 4rDf7QhhKwn6w==
+Date: Tue, 13 Aug 2024 17:10:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, Joe Damato
+ <jdamato@fastly.com>, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Breno Leitao <leitao@debian.org>, Christian Brauner <brauner@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jan Kara
+ <jack@suse.cz>, Jiri Pirko <jiri@resnulli.us>, Johannes Berg
+ <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, "open
+ list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:FILESYSTEMS
+ (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+Message-ID: <20240813171015.425f239e@kernel.org>
+In-Reply-To: <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
+References: <20240812125717.413108-1-jdamato@fastly.com>
+	<ZrpuWMoXHxzPvvhL@mini-arch>
+	<2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On Mon, 12 Aug 2024 17:46:42 -0400 Martin Karsten wrote:
+> >> Here's how it is intended to work:
+> >>    - An administrator sets the existing sysfs parameters for
+> >>      defer_hard_irqs and gro_flush_timeout to enable IRQ deferral.
+> >>
+> >>    - An administrator sets the new sysfs parameter irq_suspend_timeout
+> >>      to a larger value than gro-timeout to enable IRQ suspension.  
+> > 
+> > Can you expand more on what's the problem with the existing gro_flush_timeout?
+> > Is it defer_hard_irqs_count? Or you want a separate timeout only for the
+> > perfer_busy_poll case(why?)? Because looking at the first two patches,
+> > you essentially replace all usages of gro_flush_timeout with a new variable
+> > and I don't see how it helps.  
+> 
+> gro-flush-timeout (in combination with defer-hard-irqs) is the default 
+> irq deferral mechanism and as such, always active when configured. Its 
+> static periodic softirq processing leads to a situation where:
+> 
+> - A long gro-flush-timeout causes high latencies when load is 
+> sufficiently below capacity, or
+> 
+> - a short gro-flush-timeout causes overhead when softirq execution 
+> asynchronously competes with application processing at high load.
+> 
+> The shortcomings of this are documented (to some extent) by our 
+> experiments. See defer20 working well at low load, but having problems 
+> at high load, while defer200 having higher latency at low load.
+> 
+> irq-suspend-timeout is only active when an application uses 
+> prefer-busy-polling and in that case, produces a nice alternating 
+> pattern of application processing and networking processing (similar to 
+> what we describe in the paper). This then works well with both low and 
+> high load.
 
-The following changes since commit d74da846046aeec9333e802f5918bd3261fb5509:
+What about NIC interrupt coalescing. defer_hard_irqs_count was supposed
+to be used with NICs which either don't have IRQ coalescing or have a
+broken implementation. The timeout of 200usec should be perfectly within
+range of what NICs can support.
 
-  Merge tag 'platform-drivers-x86-v6.11-3' of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86 (2024-08-12 08:21:52 -0700)
+If the NIC IRQ coalescing works, instead of adding a new timeout value
+we could add a new deferral control (replacing defer_hard_irqs_count)
+which would always kick in after seeing prefer_busy_poll() but also
+not kick in if the busy poll harvested 0 packets.
 
-are available in the Git repository at:
+> > Maybe expand more on what code paths are we trying to improve? Existing
+> > busy polling code is not super readable, so would be nice to simplify
+> > it a bit in the process (if possible) instead of adding one more tunable.  
+> 
+> There are essentially three possible loops for network processing:
+> 
+> 1) hardirq -> softirq -> napi poll; this is the baseline functionality
+> 
+> 2) timer -> softirq -> napi poll; this is deferred irq processing scheme 
+> with the shortcomings described above
+> 
+> 3) epoll -> busy-poll -> napi poll
+> 
+> If a system is configured for 1), not much can be done, as it is 
+> difficult to interject anything into this loop without adding state and 
+> side effects. This is what we tried for the paper, but it ended up being 
+> a hack.
+> 
+> If however the system is configured for irq deferral, Loops 2) and 3) 
+> "wrestle" with each other for control. Injecting the larger 
+> irq-suspend-timeout for 'timer' in Loop 2) essentially tilts this in 
+> favour of Loop 3) and creates the nice pattern describe above.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-6.11-rc4
-
-for you to fetch changes up to 100bff23818eb61751ed05d64a7df36ce9728a4d:
-
-  perf/bpf: Don't call bpf_overflow_handler() for tracing events (2024-08-13 10:25:28 -0700)
-
-----------------------------------------------------------------
-- Fix bpftrace regression from Kyle Huey.
-  Tracing bpf prog was called with perf_event input arguments causing
-  bpftrace produce garbage output.
-
-- Fix verifier crash in stacksafe() from Yonghong Song.
-  Daniel Hodges reported verifier crash when playing with sched-ext.
-  The stack depth in the known verifier state was larger than
-  stack depth in being explored state causing out-of-bounds access.
-
-- Fix update of freplace prog in prog_array from Leon Hwang.
-  freplace prog type wasn't recognized correctly.
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Kyle Huey (1):
-      perf/bpf: Don't call bpf_overflow_handler() for tracing events
-
-Leon Hwang (1):
-      bpf: Fix updating attached freplace prog in prog_array map
-
-Yonghong Song (2):
-      bpf: Fix a kernel verifier crash in stacksafe()
-      selftests/bpf: Add a test to verify previous stacksafe() fix
-
- include/linux/bpf_verifier.h              |  4 +--
- kernel/bpf/verifier.c                     |  5 +--
- kernel/events/core.c                      |  3 +-
- tools/testing/selftests/bpf/progs/iters.c | 54 +++++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+), 5 deletions(-)
 
