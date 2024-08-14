@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-118495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA2B951CA1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 16:09:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B06951CBD
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 16:13:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C981F2233A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8479E1F23BA8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72851B29D7;
-	Wed, 14 Aug 2024 14:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143531B373D;
+	Wed, 14 Aug 2024 14:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MOKlONNL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+i3Jtcu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4A81B29CF
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 14:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062EB1B29C3;
+	Wed, 14 Aug 2024 14:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723644535; cv=none; b=Y2oTNJbNDnzbMNEGCYQFaihaeGZtwWwbTLfe+HE1t8hsUhjw87BRaakvyNjBNVl64S6laGS1Fsa6iqCNbrl8QZYz5FW5T5EE9TT6Dk4yKMRhwQlYRrotgqWGv35ws455pOc0+AdzBW/heYw1Qtu8JyIclUshXvsv2d81R0LtVMM=
+	t=1723644711; cv=none; b=qObsNo0u5cswj9biRf+QBEgvk1Y6DNHNFKLC65kuUgOjcez4VRoJ8Ghtc5k4SmnJF53WQGPxXjEoXHKjq2laTfLjsQK85Szh9yhaPK4y2QzKiC+Edpa6n3katPU4HZbDBq/i9rdE+/JB9FF6Jsk/jVPqMqbgZjxYnjxy8Ebgu+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723644535; c=relaxed/simple;
-	bh=gkysqq+eLkCi72KkUF3mmkTlr9D3RYFJHiqsDd5o8oo=;
+	s=arc-20240116; t=1723644711; c=relaxed/simple;
+	bh=ufkTbXrNRde7ku9ILWA6f0z/jzzMRkyg14KCdQcjT34=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RvTz4B4jb8ZzAj9nGWID3DnEsybjhMJhueEX1dtRy8JSohOkb5BhOB/8vYf9+ue8T3j62vtJCIfk9uvM1WN5AV5hrS1R+NtAyfpLMmQuxUuUDfglovbGXCqE34Yh80epRmCSIyxKnWR9cNx46IXFNzByLvjK1lX0fO+NKrTJxP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MOKlONNL; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso5526855e9.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 07:08:53 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=DjuclYS0UqIp6lWBJoIShHb4i4dLMz7mxs4p5ANOUlEfEQ976UuY2lm3zKiQ4XkCkXDOv1WfbOvjV97WLYNN/D80K5zq/02I8WAoKu9p3dNIM2GH1Cke/8XqLWyeEsm8VH/W2qrE7xlzCX1cs4joTG2/nMDUYBmDl5L9doVi0R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k+i3Jtcu; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a7aa086b077so620306866b.0;
+        Wed, 14 Aug 2024 07:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723644532; x=1724249332; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=N82Nc2+gY4/+lTNM9bo2pmanPWXfOJy6ZWbbOExaRpU=;
-        b=MOKlONNLCgOrJnkneGdvJ78/SfBYYus3A9BHGVscm53nbV9zHatVGCFE+8O7ExP/h4
-         1VrJz1m+gKGlCoGxaWQZcSKK17JGJOSa8ayd059gkNqo8db4bcZAZw1TrXAPzBlLeEB7
-         eCVg2qXmstPYvKWDXwrXNoYF42WTcnqEsQy5fgFlwnY/xGk203PVZ2nH0X0OYPMwLmO9
-         K7oRjXI3rHbrCqTq3mhKW6pYqHYjwDPaFl7GrCr4OVACqXHeKo3ATziHrZI/qwqKwUGj
-         h9WUdNKA3FcBMtERY3MZIFLWo91yBBBODrM1nCHUi3b7tEa4sNseMuKUC6aqp63SihDL
-         5Bew==
+        d=gmail.com; s=20230601; t=1723644708; x=1724249508; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I4lEcDVn0ScVYDJNBB09gtNeZOhx/qNGY5FB/NSTnIE=;
+        b=k+i3JtcuFWAPkBWE1dNXlsP4TKNuCj/fmzT6jQB47dBcYHmlLHSTyNt1gB3pXDTa27
+         3VpaRWAAGYb5CzNKer+/MJJk8D+VvskdzE+0ck4Yn7OfCT/ZS+Z0owISf5DSmqMalIlA
+         RGb+6a10QkLr0oWnuxrcB5MOW/SJnkTVqgOEdQz4W+zKuiT4HJPrhCKXFKpZcFRRXO4F
+         Q+1dlLm5vi39+LyiOPEiYLsOi8Te1POlX510ncbOoetM4Z5ZD1dB9cdNFDxBXC0PR3uu
+         esA5EjkUcH/j5ZXeN4h2EpyMMIFWSHkVYjVbXX0Aqoy10Fzc++pKsixVzr4cPWSFRttL
+         JmYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723644532; x=1724249332;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N82Nc2+gY4/+lTNM9bo2pmanPWXfOJy6ZWbbOExaRpU=;
-        b=iRKoMAYb5K+VF5gcQb2yjknzhenzX9zqdgohRUyqoy2fOvBkp6RB959Bl3i5r1r2ay
-         t90W6dSfYUT3rxWQRhomA8XgFHjbzRI/yTJOVNVL8JxQReVXj2SpL5xGiU9TEVlV0NOm
-         vJirIJHNi9Pi5vMuCE3d642uZYqhlIndmMDNtnZs/6cUQkccHSHHU3PTso88X7yoygIb
-         2jeuzZSIYEAgN4qhm8r0Ettbxj+UZ6zHi1/+PO3lzKZ5X6TNOmLjDYvcnSuw4f+4aJoE
-         kdJNLWLSC+uPlI/uQZIdv5GvODXNo/mX6VgQ0a+ynwY6IUsGRbXcKf1q8gZj7bLHDk95
-         dp+A==
-X-Forwarded-Encrypted: i=1; AJvYcCX8PjoxdxTxCLiQQstZ1KWe5U0wRkhWPZpcgGeHYu4BMy+jpKC2E9U7uzhm6qR9bs9v51L/lXMMKZkdFt8xseNaY1M1rmBi
-X-Gm-Message-State: AOJu0Yziuj+7Vx/0M3fqu5/XelIDjShi6qRHTdJm4WkhGsOHHMQAu16S
-	UJWjHISN/Yd1renZNVUw1ASgGWgX0TZQE5n4WAzKLF2xlVA1OlBEidU2utgeC9g=
-X-Google-Smtp-Source: AGHT+IGDqgiodX5asQzw8Eqc0zS1NjySybHtSTj+w8HqPC6KzCZ1oRb7Ab3PGuHo2p4wURp/PaZg9Q==
-X-Received: by 2002:a5d:4530:0:b0:360:8c88:ab82 with SMTP id ffacd0b85a97d-371796a10b9mr1591919f8f.30.1723644532127;
-        Wed, 14 Aug 2024 07:08:52 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.215.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4cfefa29sm12945847f8f.61.2024.08.14.07.08.50
+        d=1e100.net; s=20230601; t=1723644708; x=1724249508;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I4lEcDVn0ScVYDJNBB09gtNeZOhx/qNGY5FB/NSTnIE=;
+        b=EqQJfVzgjeHa4jj0W7W7K92Qqa8m5aID4omIDRdTeT0inlY8eFPfNHLTaGsSDXuUwM
+         LDbj2SNTuWV/Zgr1A1i+kC8u03F4vv5H9kw2uQxuT5PJS1S4Kpm15wMi45g0xWJfW+1M
+         jiFPgcLl9/aYzH7OweRdW4F9Tv1WcYoDKjPtqjTz4mUV6SeA/EjDYP3qLX24xQTEVkur
+         VwCFMNooWPKXyjsumYxRUusI5H0yOF4GECXkSQUCxTdOpsupYVcutZUBZjgZjNqPyZH+
+         KdxaJWxcedmdKXSYHG0ODORkkWRzVsHF8hPQOHNuTE7b70U6ZVvsqJELEpwqULINKZOc
+         5C4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVuHGXOb69ekfbkyMt4BMITQ6M2wblrIhzK6UNqBPsQpy1/JlEO1edvV+bt+MqzMx1zvdn1cmEHHnc/u+8Y/V+TwBS7xKvjNSQpeePRyW5BkpTOLsizmCA3l92xAOOt3Kktepejvfou49nsGRt+NsK5k4E3IPvsMsp5AEeDmexGTRlLH/2179xI2y6bg0H4SBZMjWxB4wba1NJ3seU4nZhCv9JFWhLt+W3YbpM0CeL+bkIeYJh+4vkC6EpCJvrdTfo66Cg3Ay659mm2o99UeOABG1mL/wJgC1T4wSxWyOjRRz82SCUjkTgeplCQJasO7G9hZPtFyULhguJM7FEKfiASuFqa7ANxrUtjF88KYAJBt6aFgBCy2/EITCPDS012RWL4qsIrVHHzD99isaR3eASVR3TAona0uTum6zUgXNf2R9ojqeXd/nX47QWYiIAT61YX1Kn0lF1lTQpFUOHxMafmGpWWWtM4v4zfMWFakDwYyGhZOOh6j9TilQ7cOz4Nn5mWuSTEcw==
+X-Gm-Message-State: AOJu0YzWKJCPa8GYS6XQv8CMqLbGbS96nzkdj8HEsN83lGySVl4rdnU+
+	5eJLmpQk/84ucO46NzoHWiFoSoXd7XN04wAikDYb6QinAAruP8l3
+X-Google-Smtp-Source: AGHT+IG9Udegnx6quFDnRlNaUIR9wp347Gf23kUw37RLzMtyl8o18emPPEx2i7tEi7aMsgFUqg2ZVw==
+X-Received: by 2002:a17:907:e6a9:b0:a7a:a5ae:11b7 with SMTP id a640c23a62f3a-a83670893e1mr182918366b.49.1723644707787;
+        Wed, 14 Aug 2024 07:11:47 -0700 (PDT)
+Received: from [192.168.42.53] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f3f4592esm177630266b.26.2024.08.14.07.11.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 07:08:51 -0700 (PDT)
-Message-ID: <f504a3e7-cb18-41ce-a76d-267d464b6b05@linaro.org>
-Date: Wed, 14 Aug 2024 16:08:49 +0200
+        Wed, 14 Aug 2024 07:11:47 -0700 (PDT)
+Message-ID: <de7daf80-a2e4-4451-b666-2a67ccc3649e@gmail.com>
+Date: Wed, 14 Aug 2024 15:12:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,160 +76,229 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 1/5] dt-bindings: net: wireless: brcm4329-fmac: add
- pci14e4,449d
-To: Arend van Spriel <arend.vanspriel@broadcom.com>,
- Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>,
- robh@kernel.org, krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, conor+dt@kernel.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
- minipli@grsecurity.net, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com
-References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
- <20240813082007.2625841-2-jacobe.zang@wesion.com>
- <1914cb2b1a8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <e7401e25-7802-4dc3-9535-226f32b52be1@kernel.org>
- <062d8d4e-6d61-4f11-a9c0-1bbe1bfe0542@broadcom.com>
- <1e442710-a233-4ab2-a551-f28ba6394b5b@linaro.org>
- <180f7459-39fa-4e96-83d6-504e7802dc94@broadcom.com>
- <df52a968-96be-4f05-8d6f-32a2abde1d91@linaro.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v19 06/13] memory-provider: dmabuf devmem memory
+ provider
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240813211317.3381180-7-almasrymina@google.com>
 Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <df52a968-96be-4f05-8d6f-32a2abde1d91@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240813211317.3381180-7-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14/08/2024 13:15, Krzysztof Kozlowski wrote:
-> On 14/08/2024 12:59, Arend van Spriel wrote:
->> On 8/14/2024 12:39 PM, Krzysztof Kozlowski wrote:
->>> On 14/08/2024 12:08, Arend van Spriel wrote:
->>>> On 8/14/2024 10:53 AM, Krzysztof Kozlowski wrote:
->>>>> On 13/08/2024 19:04, Arend Van Spriel wrote:
->>>>>> On August 13, 2024 10:20:24 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
->>>>>>
->>>>>>> It's the device id used by AP6275P which is the Wi-Fi module
->>>>>>> used by Rockchip's RK3588 evaluation board and also used in
->>>>>>> some other RK3588 boards.
->>>>>>
->>>>>> Hi Kalle,
->>>>>>
->>>>>> There probably will be a v11, but wanted to know how this series will be
->>>>>> handled as it involves device tree bindings, arm arch device tree spec, and
->>>>>> brcmfmac driver code. Can it all go through wireless-next?
->>>>>
->>>>> No, DTS must not go via wireless-next. Please split it from the series
->>>>> and provide lore link in changelog for bindings.
->>>>
->>>> Hi Krzysztof,
->>>>
->>>> Is it really important how the patches travel upstream to Linus. This
->>>> binding is specific to Broadcom wifi devices so there are no
->>>> dependencies(?). To clarify what you are asking I assume two separate
->>>> series:
->>>>
->>>> 1) DT binding + Khadas Edge2 DTS  -> devicetree@vger.kernel.org
->>>> 	reference to:
->>>> https://patch.msgid.link/20240813082007.2625841-1-jacobe.zang@wesion.com
->>>>
->>>> 2) brcmfmac driver changes	  -> linux-wireless@vger.kernel.org
->>>
->>> No. I said only DTS is separate. This was always the rule, since forever.
->>>
->>> Documentation/devicetree/bindings/submitting-patches.rst
->>
->> I am going slightly mad (by Queen). That documents says:
->>
->>    1) The Documentation/ and include/dt-bindings/ portion of the patch 
->> should
->>       be a separate patch.
->>
->> and
->>
->>    4) Submit the entire series to the devicetree mailinglist at
->>
->>         devicetree@vger.kernel.org
->>
->> Above I mentioned "series", not "patch". So 1) is a series of 3 patches 
->> (2 changes to the DT binding file and 1 patch for the Khadas Edge2 DTS. 
->> Is that correct?
->>
+On 8/13/24 22:13, Mina Almasry wrote:
+> Implement a memory provider that allocates dmabuf devmem in the form of
+> net_iov.
 > 
-> My bookmark to elixir.bootling does not work, so could not paste
-> specific line. Now it works, so:
+> The provider receives a reference to the struct netdev_dmabuf_binding
+> via the pool->mp_priv pointer. The driver needs to set this pointer for
+> the provider in the net_iov.
 > 
-> https://elixir.bootlin.com/linux/v6.11-rc3/source/Documentation/devicetree/bindings/submitting-patches.rst#L79
+> The provider obtains a reference on the netdev_dmabuf_binding which
+> guarantees the binding and the underlying mapping remains alive until
+> the provider is destroyed.
 > 
-> The rule was/is:
-> 1. Binding for typical devices always go via subsystem tree, with the
-> driver changes.
-> There can be exceptions from above, e.g. some subsystems do not pick up
-> bindings, so Rob does. But how patches are organized is not an exception
-> - it is completely normal workflow.
+> Usage of PP_FLAG_DMA_MAP is required for this memory provide such that
+> the page_pool can provide the driver with the dma-addrs of the devmem.
 > 
-> 2. DTS *always* goes via SoC maintainer. DTS cannot go via any other
-> driver subsystem tree. There is no exception here. There cannot be an
-> exception, because it would mean the hardware depends on driver, which
-> is obviously false.
+> Support for PP_FLAG_DMA_SYNC_DEV is omitted for simplicity & p.order !=
+> 0.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> 
+> ---
+> 
+> v19:
+> - Add PP_FLAG_ALLOW_UNREADABLE_NETMEM flag. It serves 2 purposes, (a)
+>    it guards drivers that don't support unreadable netmem (net_iov
+>    backed) from accidentally getting exposed to it, and (b) drivers that
+>    wish to create header pools can unset it for that pool to force
+>    readable netmem.
+> - Add page_pool_check_memory_provider, which verifies that the driver
+>    has created a page_pool with the expected configuration. This is used
+>    to report to the user if the mp configuration succeeded, and also
+>    verify that the driver is doing the right thing.
+> - Don't reset niov->dma_addr on allocation/free.
+> 
+> v17:
+> - Use ASSERT_RTNL (Jakub)
+> 
+> v16:
+> - Add DEBUG_NET_WARN_ON_ONCE(!rtnl_is_locked()), to catch cases if
+>    page_pool_init without rtnl_locking when the queue is provided. In
+>    this case, the queue configuration may be changed while we're initing
+>    the page_pool, which could be a race.
+> 
+> v13:
+> - Return on warning (Pavel).
+> - Fixed pool->recycle_stats not being freed on error (Pavel).
+> - Applied reviewed-by from Pavel.
+> 
+> v11:
+> - Rebase to not use the ops. (Christoph)
+> 
+> v8:
+> - Use skb_frag_size instead of frag->bv_len to fix patch-by-patch build
+>    error
+> 
+> v6:
+> - refactor new memory provider functions into net/core/devmem.c (Pavel)
+> 
+> v2:
+> - Disable devmem for p.order != 0
+> 
+> v1:
+> - static_branch check in page_is_page_pool_iov() (Willem & Paolo).
+> - PP_DEVMEM -> PP_IOV (David).
+> - Require PP_FLAG_DMA_MAP (Jakub).
+> 
+...
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index 301f4250ca82..2f2a7f4dee4c 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -17,6 +17,7 @@
+>   #include <linux/genalloc.h>
+>   #include <linux/dma-buf.h>
+>   #include <net/devmem.h>
+> +#include <net/mp_dmabuf_devmem.h>
+>   #include <net/netdev_queues.h>
+>   
+>   #include "page_pool_priv.h"
+> @@ -153,6 +154,10 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+>   	if (err)
+>   		goto err_xa_erase;
+>   
+> +	err = page_pool_check_memory_provider(dev, rxq, binding);
 
-In case my message was not clear: we talk here about organizing
-patchsets, not individual patches. If you ask about patches, then DTS,
-bindings and driver are all separate patches. This set already is split
-like that, so this was fine and I did not comment on it. Only through
-whom the DTS patch goes - separate tree.
+Frankly, I pretty much don't like it.
 
-And just in case: this is neither specific to wireless nor to Broadcom.
-This is for entire Linux kernel.
+1. We do it after reconfiguring the queue just to fail and reconfigure
+it again.
 
-Best regards,
-Krzysztof
+2. It should be a part of the common path like netdev_rx_queue_restart(),
+not specific to devmem TCP.
 
+These two can be fixed by moving the check into
+netdev_rx_queue_restart() just after ->ndo_queue_mem_alloc, assuming
+that the callback where we init page pools.
+
+3. That implicit check gives me bad feeling, instead of just getting
+direct feedback from the driver, either it's a flag or an error
+returned, we have to try to figure what exactly the driver did, with
+a high chance this inference will fail us at some point.
+
+And page_pool_check_memory_provider() is not that straightforward,
+it doesn't walk through pools of a queue. Not looking too deep,
+but it seems like the nested loop can be moved out with the same
+effect, so it first looks for a pool in the device and the follows
+with the bound_rxqs. And seems the bound_rxqs check would always turn
+true, you set the binding into the map in
+net_devmem_bind_dmabuf_to_queue() before the restart and it'll be there
+after restart for page_pool_check_memory_provider(). Maybe I missed
+something, but it's not super clear.
+
+4. And the last thing Jakub mentioned is that we need to be prepared
+to expose a flag to the userspace for whether a queue supports
+netiov. Not really doable in a sane manner with such implicit
+post configuration checks.
+
+And that brings us back to the first approach I mentioned, where
+we have a flag in the queue structure, drivers set it, and
+netdev_rx_queue_restart() checks it before any callback. That's
+where the thread with Jakub stopped, and it reads like at least
+he's not against the idea.
+
+
+> +	if (err)
+> +		goto err_xa_erase;
+> +
+>   	return 0;
+>   
+>   err_xa_erase:
+> @@ -305,4 +310,69 @@ void dev_dmabuf_uninstall(struct net_device *dev)
+>   				xa_erase(&binding->bound_rxqs, xa_idx);
+>   	}
+>   }
+> +
+...
+> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+> index 3a3277ba167b..cbc54ee4f670 100644
+> --- a/net/core/page_pool_user.c
+> +++ b/net/core/page_pool_user.c
+> @@ -344,6 +344,32 @@ void page_pool_unlist(struct page_pool *pool)
+>   	mutex_unlock(&page_pools_lock);
+>   }
+>   
+> +int page_pool_check_memory_provider(struct net_device *dev,
+> +				    struct netdev_rx_queue *rxq,
+> +				    struct net_devmem_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *binding_rxq;
+> +	struct page_pool *pool;
+> +	struct hlist_node *n;
+> +	unsigned long xa_idx;
+> +
+> +	mutex_lock(&page_pools_lock);
+> +	hlist_for_each_entry_safe(pool, n, &dev->page_pools, user.list) {
+> +		if (pool->mp_priv != binding)
+> +			continue;
+> +
+> +		xa_for_each(&binding->bound_rxqs, xa_idx, binding_rxq) {
+> +			if (rxq != binding_rxq)
+> +				continue;
+> +
+> +			mutex_unlock(&page_pools_lock);
+> +			return 0;
+> +		}
+> +	}
+> +	mutex_unlock(&page_pools_lock);
+> +	return -ENODATA;
+> +}
+> +
+>   static void page_pool_unreg_netdev_wipe(struct net_device *netdev)
+>   {
+>   	struct page_pool *pool;
+
+-- 
+Pavel Begunkov
 
