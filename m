@@ -1,133 +1,146 @@
-Return-Path: <netdev+bounces-118370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D8C95169F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:31:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B0B49516B1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9774F1C21331
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:31:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E2CE1C216CB
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CCCF13DDC2;
-	Wed, 14 Aug 2024 08:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6015413D8AC;
+	Wed, 14 Aug 2024 08:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1BzCgrJ5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LxFeso71"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC767156CE;
-	Wed, 14 Aug 2024 08:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065513C9A3;
+	Wed, 14 Aug 2024 08:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723624293; cv=none; b=JsZcgSYFVYeZ+xG0ZAfQOg0GWHJssl3oZOTfRF+iuLd27M4+KlcykRLGwtL40haGmSOv2LFTozQHJ8Y7AnxnrlOiWSl3WVAmyX1eiEbea446UhFv2tJ3+wCi5hgVF2d5YDm6naNdOtGXGcyBs1QJxEFXomGnc/31xOx+HdPMeRI=
+	t=1723624597; cv=none; b=W9/XCK4GBagpH+w92nRSCNVQ9Boovbh1thA4xJa6wraP+pIHhBhUjxVFiWFyIe/uEDFDJaYr2Xbu0deZEOBnGFxjXsBMeM10yyl7Lo7lRpH01VgxKKl54901ZQfLA9hlS+fDIgqE9MA4RoBOGsrFrMgT4JTWsLVb/REUxVnDOkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723624293; c=relaxed/simple;
-	bh=qLgPMTD8brmUiPtdQTHvl3GL78o3cgeafqOFHMB+b5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P+s4rq3ocGnRapapL1e7N9yJEm+6ZZOSZufS8NSXi1qKZpIppOuWsp6yeEMZIsDGFgPjBuAAYbYcOJETKNfBIlWPMwpBh/CXlFLM2t4Wyob43z5egBnwwwvkk0AY1BYcSQoVhuVvOe/zlPHcgRahO87IGDvGsKHN7n6Ok9veug4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a80ea7084e9so114458166b.0;
-        Wed, 14 Aug 2024 01:31:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723624289; x=1724229089;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Var23HW/s7TX9giPkDbAte7j+80vM7UgNHHeU87uVfs=;
-        b=JKElAPenb1uob6n0wIu/QvZXxlOf+Q87KemEqoJrW7jXDemsiLuZ4lnRBnT8DcSpUa
-         KHgncYms8/uLbJMB1MEjS0XkH1hcuOJq4/u8HxklBPdB2CEfV627qFNG48AceHQ2+VxF
-         lHcjpZro+5LRB8tu+CRqaWeFMRytNDJaWs8uWDdxHqTve3ZT/z+mnyFo5GLLiKz/VTyY
-         ludrs/Wzfk4ckI+uDOx4EQCGqCNNGkv6HGaVjpDpTrN+XEr4p614AhpQbJQajlLWkUFs
-         PK1Hj5jGnb93GtgkJkeWVRFyJQYln2Xn5j6da9WxLVVIsDlO7JE1hgeDZxLg8r7JdEI8
-         L5rw==
-X-Forwarded-Encrypted: i=1; AJvYcCVT++DelLPDqJdl65gLD7nKS1SNnrfShbKNc0PqZg6LqpOly+UCA86cM9iQezDTTVFNmDgrcEC5WIVUAznpcyffq3hcp19XluqcvzoIPN/bNDAFjpRRhLhYYpWa5QQdoy5/zPOr4ohxShSiYapoL9mzH2uNEl4lpbs7U8R9zpFLCZRMNzGY
-X-Gm-Message-State: AOJu0YzSTOhoRUuokuZVDtJJRlJe7F7zKmgasNKsacQQexNXGqNKOy0h
-	pANfKaWKrehA5Asahdw/TmpsDkxKHengxMJbm+UkGDT9oa2qJd9i
-X-Google-Smtp-Source: AGHT+IHWllMk+HxVh1J0rYuGPzLBcwjU/JEdQ2TNEU86gkehBe+cCIHY0hOhGtnVu22GQFikgecexQ==
-X-Received: by 2002:a05:6402:35c2:b0:5b9:3846:8ba9 with SMTP id 4fb4d7f45d1cf-5bea1c6aceemr1888435a12.3.1723624288778;
-        Wed, 14 Aug 2024 01:31:28 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd190ad1bcsm3696115a12.30.2024.08.14.01.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:31:28 -0700 (PDT)
-Date: Wed, 14 Aug 2024 01:31:26 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	David Wei <dw@davidwei.uk>, Willem de Bruijn <willemb@google.com>,
-	Petr Machata <petrm@nvidia.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] net: netconsole: selftests: Create a new
- netconsole selftest
-Message-ID: <ZrxrXlU9+lluncm2@gmail.com>
-References: <20240813183825.837091-1-leitao@debian.org>
- <20240813153716.76abf5ce@kernel.org>
+	s=arc-20240116; t=1723624597; c=relaxed/simple;
+	bh=VXCGZWQuWfTRAw65U8n6iAZqDA9V0VPlTJr2IadTOjw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=A1B94Y+tqdmWLsp/rjvLnvFRZp3wh85C7R8PZTwoBaGg0ZaHxIWnibpwolTHRqQAdKCRnXTelv7geKz2GtScbyjXxSDeXI8KM7TlCS81KpTfHnlL/WVhucbVf2N1RZ502DUKyIU9nMgH9dETCv8cxKY1g55hSa+Kr1tFrzmGsfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1BzCgrJ5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LxFeso71; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1723624594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OQEiZAOw6fZAmQXa97WENJ1ydcrexOcWOenvv7CDZ5Q=;
+	b=1BzCgrJ5kxkjecdhp/u/ZjQUJAVTeKEcSbiSL/Ck+bB8f7+T3823SbIz/2nxsW4V2otlrN
+	Gg9RYsrTanmBWL1prKCRm+KRQqMKRaaFnniqkhcJVpiDsuQ3uqugLwI07G1gblYiDMG6Fx
+	x22yUMBqxFbpgF5sbQPlgxlrmjHYfJT2QPewgdeGu5pTPZSjI9QYNsz8FPwARfjaebi4GM
+	jZ5VaqGzolGLZEOnkCT6P8HCpfEXjhepbwsFqpH3FDP0Lg7ng+jkcgOIZyo2jnfxIghZ/0
+	qUoQBc0cRvoZliU1NZ7OQQfbTbqdWFsweTgdZctS4OJgxkarmtUD7EIbYW38Gw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1723624594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OQEiZAOw6fZAmQXa97WENJ1ydcrexOcWOenvv7CDZ5Q=;
+	b=LxFeso71GT04QSO6yzVnAdZXnvuip1VUgwzP+Ire7M1nwX53AQBEF0EKraW2hO4xjCgoeH
+	x0jxTK7nbpOwfvAw==
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, Sriram Yagnaraman
+ <sriram.yagnaraman@est.tech>, magnus.karlsson@intel.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, sriram.yagnaraman@ericsson.com,
+ richardcochran@gmail.com, benjamin.steinke@woks-audio.com,
+ bigeasy@linutronix.de, Chandan Kumar
+ Rout <chandanx.rout@intel.com>
+Subject: Re: [PATCH net-next 4/4] igb: add AF_XDP zero-copy Tx support
+In-Reply-To: <Zrd0vnsU2l0OTsvj@boxer>
+References: <20240808183556.386397-1-anthony.l.nguyen@intel.com>
+ <20240808183556.386397-5-anthony.l.nguyen@intel.com>
+ <Zrd0vnsU2l0OTsvj@boxer>
+Date: Wed, 14 Aug 2024 10:36:32 +0200
+Message-ID: <874j7nzejz.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813153716.76abf5ce@kernel.org>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hello Jakub,
+--=-=-=
+Content-Type: text/plain
 
-On Tue, Aug 13, 2024 at 03:37:16PM -0700, Jakub Kicinski wrote:
-> On Tue, 13 Aug 2024 11:38:16 -0700 Breno Leitao wrote:
-> > Adds a selftest that creates two virtual interfaces, assigns one to a
-> > new namespace, and assigns IP addresses to both.
-> > 
-> > It listens on the destination interface using socat and configures a
-> > dynamic target on netconsole, pointing to the destination IP address.
-> > 
-> > The test then checks if the message was received properly on the
-> > destination interface.
-> 
-> We're getting a:
-> 
-> SKIP: directory /sys/kernel/config/netconsole does not exist. Check if NETCONSOLE_DYNAMIC is enabled
-> 
-> https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/726381/4-netcons-basic-sh/stdout
-> 
-> Gotta extend tools/testing/selftests/drivers/net/config
+On Sat Aug 10 2024, Maciej Fijalkowski wrote:
+>> +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, budget);
+>> +	if (!nb_pkts)
+>> +		return true;
+>> +
+>> +	while (nb_pkts-- > 0) {
+>> +		dma = xsk_buff_raw_get_dma(pool, descs[i].addr);
+>> +		xsk_buff_raw_dma_sync_for_device(pool, dma, descs[i].len);
+>> +
+>> +		tx_buffer_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
+>> +		tx_buffer_info->bytecount = descs[i].len;
+>> +		tx_buffer_info->type = IGB_TYPE_XSK;
+>> +		tx_buffer_info->xdpf = NULL;
+>> +		tx_buffer_info->gso_segs = 1;
+>> +		tx_buffer_info->time_stamp = jiffies;
+>> +
+>> +		tx_desc = IGB_TX_DESC(tx_ring, tx_ring->next_to_use);
+>> +		tx_desc->read.buffer_addr = cpu_to_le64(dma);
+>> +
+>> +		/* put descriptor type bits */
+>> +		cmd_type = E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
+>> +			   E1000_ADVTXD_DCMD_IFCS;
+>> +		olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
+>> +
+>> +		cmd_type |= descs[i].len | IGB_TXD_DCMD;
+>
+> This is also sub-optimal as you are setting RS bit on each Tx descriptor,
+> which will in turn raise a lot of irqs. See how ice sets RS bit only on
+> last desc from a batch and then, on cleaning side, how it finds a
+> descriptor that is supposed to have DD bit written by HW.
 
-Thanks, I've added the following changes in
-tools/testing/selftests/drivers/net/config:
+I see your point. That requires changes to the cleaning side. However,
+igb_clean_tx_irq() is shared between normal and zero-copy path.
 
-	CONFIG_NETCONSOLE=m
-	CONFIG_NETCONSOLE_DYNAMIC=y
+The amount of irqs can be also controlled by irq coalescing or even
+using busy polling. So I'd rather keep this implementation as simple as
+it is now.
 
-Then I was able to get the test executing running the following
-commands:
+Thanks,
+Kurt
 
-	# vng --build  --config tools/testing/selftests/net/config
-	# vng -v --run . --user root --cpus 4 -- \
-		make -C tools/testing/selftests TARGETS=drivers/net  \
-		TEST_PROGS="netcons_basic.sh" TEST_GEN_PROGS="" run_tests
-	.....
-	# timeout set to 45
-	# selftests: drivers/net: netcons_basic.sh
-	[   11.172987] netdevsim netdevsim407 eni407np1: renamed from eth1
-	[   12.441965] printk: legacy console [netcon_ext0] enabled
-	[   12.443049] netpoll: netconsole: local port 6665
-	[   12.444104] netpoll: netconsole: local IPv4 address 192.168.1.1
-	[   12.445281] netpoll: netconsole: interface 'eni407np1'
-	[   12.446299] netpoll: netconsole: remote port 6666
-	[   12.447246] netpoll: netconsole: remote IPv4 address 192.168.1.2
-	[   12.448419] netpoll: netconsole: remote ethernet address aa:c8:83:a5:05:b3
-	[   12.450646] netconsole: network logging started
-	[   13.547405] netconsole selftest: netcons_GjLI0
-	ok 1 selftests: drivers/net: netcons_basic.sh
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I will wait a bit more, and then integrate this change into v2.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks for the review
---breno
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAma8bJATHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgsu1EACyPuTMVe5/qToYKpAfN5aDe86gXOX/
+I7LvnY/eE6aiBSmqg1JnzK6WG+xygrQlM+6opnO1SfffjgPgiR2yCGBPH8l2XlUM
+O6O9a2vwQ/Ov+YMFuvWkzulpRaQaW6l+ZoWcTJlIKu/Wah2y0f2r6u/L3EIm5HGm
+Wsi4VYQMQv9wiffqOhus6VrbTY0Bq5IxwZa7fXt1zit0WqDMLX3VEdWHSErZ28uP
+EsbvCoYDdOOnRaIgbcUM5t8QC4kzbi7LUEz8pMs9gOnc+wlkajkouBgMD1QjSHpo
+DD9o8RTPGnii858HCFlCqgHmxS4gox7lkdkyyqOfsFMQuTkokhwqagEVAPUB/lSz
+ix7BHR3yAvn9Fe24fstnjpvI44aSMoOk2r1fJ/M/KxhjrUO3Mlt7rgFI1k+h42BH
+LSflRzC8tDekqtIkYUA6wW0CBS1Q238PFrWs1aktm03n/u6bHRke9KGrYHPE0LNo
+027qze1Xbj55LIFWKUhUmLE1rxfxkZh2H9zGtTU11ub0cHweVUbiGa02s4IK+UJh
+HHiASyLWMODoLVNv+Ubg5IQ/F+bMJlYEgV2X+0qs0LpGQd3j5NNq9S3sJuZMlZh0
+GguH6LCvIVVkwJNRCR2eh8jb0P9GrrZmgIjHCE1OYx6K5L5OcDtwbYEWYgpg39fP
+AktCRhSt+KmgHw==
+=EK8e
+-----END PGP SIGNATURE-----
+--=-=-=--
 
