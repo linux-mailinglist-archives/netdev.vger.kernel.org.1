@@ -1,222 +1,254 @@
-Return-Path: <netdev+bounces-118419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00679951870
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:11:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C92E2951858
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A6581F23F1B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:11:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FAAD283CA6
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20441AD9C9;
-	Wed, 14 Aug 2024 10:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE421AE854;
+	Wed, 14 Aug 2024 10:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="zQ7eWnJE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzXctX8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA8C60B96;
-	Wed, 14 Aug 2024 10:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1309D1AE845
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723630309; cv=none; b=cSZKOU4aiS2BotOF8aTfGVKSZQwC0XPC7gd1zuZVVTd7sJwOJ47P8cql58UsozMElI6bfV/7E6TN0iRXamyt9fQYNcuVic+LQ4VjFm0Pnt2SQC4UMTKMTj7M5IMXsVOIwXvn7aX1YoHZ1uP9xbIZATptP1eLVQL3RC1RaiRddl4=
+	t=1723630016; cv=none; b=hUTnQUo/7d0aA04TuynaU3JXUmsoz+0KFzFDsPY3XJdcQ9eICjTW/wG14XID/N54AD0BR13u2j+x0NYOw83A9iujJYl4D+Du39vAPAyyNUBFNl7R7aae3prgcuu/Z78TrCyfBLTuW28GAvnujepb/YHSliJIc9E7IJjEgBlcCd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723630309; c=relaxed/simple;
-	bh=gSCIJAjvmTgIynjqWMZZVI/qzc8vdXECxlDegaa88sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldCXRqNunH2EHYzSRSK/fdf5QlVszL4Y9qd+gQ/hBoSk97XddSCSUdRO6coftvUjWUstMVXAlxLcxMsBrJ96p0YEaxUdKokGk3W0D08Mv33NKDHm6YpWH8stjhkhEO+KzA8xYumeM3CyYLsphUbQu1iUaS/DNSceoeaJeCaZBIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=zQ7eWnJE; arc=none smtp.client-ip=212.227.17.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
-	s=s1-ionos; t=1723630288; x=1724235088; i=christian@heusel.eu;
-	bh=CDLABFtqCikjyatU7UNWwTnvi6lYTc5e87Rh5YmROqA=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:In-Reply-To:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=zQ7eWnJEe1bFX0SD+B2OkXuEb4gYWgb8Ldc4ifrwgcy5sRZ6ApB0Vgv958c9jRAE
-	 l44FJxJ9sAwh2cn8GhacNYIwHPhb1MSfhgtTfig2jGgrdduGEaB6OBMQ+SFmJMK9b
-	 /XnTD5FT5ROxjlr0uJUfsO2+LAhaoK779SpkLejIq8oHZi7RpKMuOl7mmzAMNTNlL
-	 u5joeThG5dvNka3fSpjUSsg06+4HiRtTOh8xbS4daJYbj7KKDz/fbMku++WsKiwso
-	 177V1eF2SEZyq1S/nF9MkSGV30XhNznCVZO6M4tcd3onEPRqh8kNO2Yoibb8jUAYa
-	 aIebMJJcmD8FsEXfuw==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from localhost ([93.196.132.14]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MulVd-1sNKit1sWp-00vm6B; Wed, 14 Aug 2024 12:05:40 +0200
-Date: Wed, 14 Aug 2024 12:05:38 +0200
-From: Christian Heusel <christian@heusel.eu>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, avladu@cloudbasesolutions.com, 
-	willemdebruijn.kernel@gmail.com, alexander.duyck@gmail.com, arefev@swemel.ru, davem@davemloft.net, 
-	edumazet@google.com, jasowang@redhat.com, kuba@kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stable@vger.kernel.org, willemb@google.com, 
-	regressions@lists.linux.dev
-Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
- virtio_net_hdr
-Message-ID: <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
-References: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
- <20240805212829.527616-1-avladu@cloudbasesolutions.com>
- <2024080703-unafraid-chastise-acf0@gregkh>
- <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
- <2024080857-contusion-womb-aae1@gregkh>
- <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
- <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
- <20240814055408-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1723630016; c=relaxed/simple;
+	bh=fU2OpyDvLpE+HH9+rELCwyUrT6j7uONJM7mmYQ5/+3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e/DpelWFBlMH+ErKwH7loDJTqiirOb2iMF1n/RuYvR7BNxP05FVrSPxpPUBAo10G5CKccx1RxrTarP+ZinCwHFiZ8CMwuY7G8YQaMsqnqkdq/TlVs1c747jx8uaxoiqaRN43oUlHBONUl8poxb8Ur17bK77647hEBsAAjvnM5vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bzXctX8e; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723630014;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FYG8QE/F6/H21PSMLxuHmyFmtZdBI0WC0YNLldNkBDw=;
+	b=bzXctX8e0bGPe8MRFtu2iT0Vx6zvCZXw5lCutguIf/ghIsaFS5psOgyNBgrPv+2bql75kJ
+	93s9/jqeDJYeuOKHLKGsvvQ0lOizUTR1c7a3GLsWUW0fGX2TlwPR6X4Zm37ELYWfhPI3Zx
+	/JEVqVCzVAwFiOjwjxtz97reOFrwZ2M=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-60-7-FTwf7-PR-PBOH46sMg_w-1; Wed, 14 Aug 2024 06:06:52 -0400
+X-MC-Unique: 7-FTwf7-PR-PBOH46sMg_w-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ef973d9b41so7272401fa.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:06:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723630011; x=1724234811;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FYG8QE/F6/H21PSMLxuHmyFmtZdBI0WC0YNLldNkBDw=;
+        b=CwCIua/TjRdyu337xUf9NDyrrDjLfRCNWVDQEv3XCAL8JnGvRIb978IoBWSf2TtP1C
+         xeWwJDYY+haM8iOlfG0AdlYHabu0G4fso1LFnLWh/9S8kzgUHJHnsdCpqlEpdQ/G8jhP
+         ydjbrogY+LQ37sSKVLbWVdIAGBqXCRJ4RKoEWhTyAPUv8oy1yYG5bkiy8XOMtpeSjVR5
+         Nikjvw737fdmjAarkWr18dL8FO7ECZAL5804+Z7lnOmyLgyhORFuIrp37Efg5uyFIFw4
+         bkyNXqN9fBwEVes3tDWweavMNHiV3+BZjWutnWbM9vSBB7XPUwxYeKmVdrMTP8yj40Db
+         K9gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWmCvZC9vQvW0A3CmuOofl6ZuV7pXQK46XpsX3xOyMk0gIKo45sA4B4S1+UMI7MNwfwxoJ8ks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyffdW7RSVmXiWRaRzOdBFUdfFOlXMOvOzqlEk/hjDyxnCMm9vW
+	EHREBeaihpNazrAHfqCc1oxK6a7GuylUhW8DFbogvKaeh4aC6TwJ9LMkCk9RA0aQDNV0qyc6CfT
+	3zMm/BOep8LNWCn/NMKiBmieJuJrG9lvyupN/FN6BG63HI1WeXqvl0A==
+X-Received: by 2002:a05:6512:b12:b0:52e:fb8b:32d0 with SMTP id 2adb3069b0e04-532eda65aedmr761179e87.1.1723630011048;
+        Wed, 14 Aug 2024 03:06:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjZmfjw/hKq6hs5IjXpyCA0yCcaB5OTZmNB0Wb48xRjKomb22RTjgW/u4nZcDYcUEUeK8AVQ==
+X-Received: by 2002:a05:6512:b12:b0:52e:fb8b:32d0 with SMTP id 2adb3069b0e04-532eda65aedmr761159e87.1.1723630010456;
+        Wed, 14 Aug 2024 03:06:50 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1711:4010:5731:dfd4:b2ed:d824? ([2a0d:3344:1711:4010:5731:dfd4:b2ed:d824])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ebd361bsm12343795f8f.101.2024.08.14.03.06.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 03:06:49 -0700 (PDT)
+Message-ID: <2e63b0aa-5394-4a4b-ab7f-0550a5faa342@redhat.com>
+Date: Wed, 14 Aug 2024 12:06:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="v54pu6pztjzufuzm"
-Content-Disposition: inline
-In-Reply-To: <20240814055408-mutt-send-email-mst@kernel.org>
-X-Provags-ID: V03:K1:3r0TRlbShhcdW6ddM6y4IrMqeSpfYyd8s5n+jwIKsQ1tlraaJPI
- wZlxrgUd7jLrgRLwMPFIvBoWKxqtzlIGz6eZLoDhsey12com7sOTAf8tQvP3Tq3cC5cOciy
- B39zD6HC6QeLj7EjF9N3AQ3BHXIqPCECL31AsAv+x2n79I0eIn8Irq2FEnWWHS7WtFxFQBx
- a77zNM5ctniJZINgzT6DQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:C8Qw8if6FsA=;SNJ+gQKzZvB/VY7i+ZXiUMXn+ux
- IJCRX3iUe7f02xtRqxoYcWROE5lB//YLJCGpFtVi4NzI0A4GnbgsOQ2wT+YGJnLVM1eeTGVfX
- /wMXuafuM3AF422zNyVz8SraSwUgXddcOffMPLk+syBszJ1uJkePGla8oQ54AsiPXHoXjb2Da
- Pi7rIabC/Quo9EPjfi8y72MS7Tj+E6geuqlm0v7OVn+gGYd4WEWlnPavXP3tnNZhj/EnBtfOZ
- tsupbLx0MHHAr20Gebsiik5pnVTqctiWkNst1IlLsLgoH8dCOTZFNO1ESdtM+QnQB2vXqcq98
- LZUjVGysqNliIlxRfPT0Xd39VCjWRVoo7FSU34/xpuNGERuzbKJsUlfFvYCJsqVbrMO1rOU8y
- UDTGmTzlnMkySki6BckK5sfpfLipgCqV03hWzH+raGJubtsu7vJBu+xZIWO6GJ5docHK7jU33
- uD3UzwQvtdPefbq/ba+EBg6S1G96NNcVSqzyIX9ki93UWh10h1ylaG+Oqu+Ykscfwn8zuhu4H
- Fx5YxMo35XISTr+7exjSSbrjhPDCui7vKi3xMgmIsIr2o/SGfKkOtn5AnZ0YQsJF8xdv/XpDR
- Ht1Zj9zhhSTX6l6dTyJ86asNINMhxg3z/bhWfeV+u0Rgr1DSjS5ZD7I+WAkK8rdumk6HPKtdM
- L0tlP4rpu6s8obbZoxOWDGcG6/VpFoCeXorCnxePFq4X1zkRSpKHBaG2JqFpEYmm+tDrkwZYL
- nwXirEX3pbpwsIO6gHZThB+h5BN1ZMs1g==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: netconsole: Populate dynamic entry even if
+ netpoll fails
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ thepacketgeek@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Aijay Adams <aijay@meta.com>
+References: <20240809161935.3129104-1-leitao@debian.org>
+ <6185be94-65b9-466d-ad1a-bded0e4f8356@redhat.com>
+ <ZruChcqv1kdTdFtE@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZruChcqv1kdTdFtE@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 8/13/24 17:57, Breno Leitao wrote:
+> On Tue, Aug 13, 2024 at 01:55:27PM +0200, Paolo Abeni wrote:
+>> On 8/9/24 18:19, Breno Leitao wrote:> @@ -1304,8 +1308,6 @@ static int
+>> __init init_netconsole(void)
+>>>    		while ((target_config = strsep(&input, ";"))) {
+>>>    			nt = alloc_param_target(target_config, count);
+>>>    			if (IS_ERR(nt)) {
+>>> -				if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC))
+>>> -					continue;
+>>>    				err = PTR_ERR(nt);
+>>>    				goto fail;
+>>>    			}
+> 
+> First of all, thanks for the in-depth review and suggestion.
+> 
+> 
+>> AFAICS the above introduces a behavior change: if CONFIG_NETCONSOLE_DYNAMIC
+>> is enabled, and the options parsing fails for any targets in the command
+>> line, all the targets will be removed.
+>>
+>> I think the old behavior is preferable - just skip the targets with wrong
+>> options.
+> 
+> Thinking about it again, and I think I agree with you here. I will
+> update.
+> 
+>> Side note: I think the error paths in __netpoll_setup() assume the struct
+>> netpoll will be freed in case of error, e.g. the device refcount is released
+>> but np->dev is not cleared, I fear we could hit a reference underflow on
+>> <setup error>, <disable>
+> 
+> That is a good catch, and I was even able to simulate it, by forcing two
+> errors:
+> 
+> Something as:
+> 
+> --- a/net/core/netpoll.c
+> 	+++ b/net/core/netpoll.c
+> 	@@ -637,7 +637,8 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+> 		}
+> 
+> 		if (!ndev->npinfo) {
+> 	-               npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
+> 	+               npinfo = NULL;
+> 
+> 	diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> 	index 41a61fa88c32..2c6190808e75 100644
+> 	--- a/drivers/net/netconsole.c
+> 	+++ b/drivers/net/netconsole.c
+> 	@@ -1327,12 +1330,17 @@ static int __init init_netconsole(void)
+> 		}
+> 
+> 		err = dynamic_netconsole_init();
+> 	+       err = 1;
+> 		if (err)
+> 			goto undonotifier;
+> 
+> 	
+> This caused the following issue:
+> 	
+> 	[   19.530831] netconsole: network logging stopped on interface eth0 as it unregistered
+> 	[   19.531205] ref_tracker: reference already released.
+> 	[   19.531426] ref_tracker: allocated in:
+> 	[   19.531505]  netpoll_setup+0xfd/0x7f0
+> 	[   19.531505]  init_netconsole+0x300/0x960
+> 	....
+> 	[   19.534532] ------------[ cut here ]------------
+> 	[   19.534784] WARNING: CPU: 5 PID: 1 at lib/ref_tracker.c:255 ref_tracker_free+0x4e5/0x740
+> 	[   19.535103] Modules linked in:
+> 	....
+> 	[   19.542116]  ? ref_tracker_free+0x4e5/0x740
+> 	[   19.542286]  ? refcount_inc+0x40/0x40
+> 	[   19.542571]  ? do_netpoll_cleanup+0x4e/0xb0
+> 	[   19.542752]  ? netconsole_process_cleanups_core+0xcd/0x260
+> 	[   19.542961]  ? netconsole_netdev_event+0x3ab/0x3e0
+> 	[   19.543199]  ? unregister_netdevice_notifier+0x27c/0x2f0
+> 	[   19.543456]  ? init_netconsole+0xe4/0x960
+> 	[   19.543615]  ? do_one_initcall+0x1a8/0x5d0
+> 	[   19.543764]  ? do_initcall_level+0x133/0x1e0
+> 	[   19.543963]  ? do_initcalls+0x43/0x80
+> 	....
+> 
+> That said, now, the list contains enabled and disabled targets. All the
+> disable targets have netpoll disabled, thus, we don't handle network
+> operations in the disabled targets.
+> 
+> This is my new proposal, based on your feedback, how does it look like?
+> 
+> Thanks for the in-depth review,
+> --breno
+> 
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 30b6aac08411..60325383ab6d 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -1008,6 +1008,8 @@ static int netconsole_netdev_event(struct notifier_block *this,
+>   	mutex_lock(&target_cleanup_list_lock);
+>   	spin_lock_irqsave(&target_list_lock, flags);
+>   	list_for_each_entry_safe(nt, tmp, &target_list, list) {
+> +		if (!nt->enabled)
+> +			continue;
+>   		netconsole_target_get(nt);
+>   		if (nt->np.dev == dev) {
+>   			switch (event) {
+> @@ -1258,11 +1260,15 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+>   		goto fail;
+>   
+>   	err = netpoll_setup(&nt->np);
+> -	if (err)
+> +	if (!err)
+> +		nt->enabled = true;
+> +	else if (!IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC))
+> +		/* only fail if dynamic reconfiguration is set,
+> +		 * otherwise, keep the target in the list, but disabled.
+> +		 */
+>   		goto fail;
+>   
+>   	populate_configfs_item(nt, cmdline_count);
+> -	nt->enabled = true;
+>   
+>   	return nt;
+>   
+> @@ -1274,7 +1280,8 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+>   /* Cleanup netpoll for given target (from boot/module param) and free it */
+>   static void free_param_target(struct netconsole_target *nt)
+>   {
+> -	netpoll_cleanup(&nt->np);
+> +	if (nt->enabled)
+> +		netpoll_cleanup(&nt->np);
+>   	kfree(nt);
+>   }
 
---v54pu6pztjzufuzm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I fear the late cleanup could still be dangerous - what if multiple, 
+consecutive, enabled_store() on the same target fails?
 
-On 24/08/14 05:54AM, Michael S. Tsirkin wrote:
-> On Wed, Aug 14, 2024 at 11:46:30AM +0200, Christian Heusel wrote:
-> > On 24/08/08 11:52AM, Christian Heusel wrote:
-> > > On 24/08/08 08:38AM, Greg KH wrote:
-> > > > On Wed, Aug 07, 2024 at 08:34:48PM +0200, Christian Heusel wrote:
-> > > > > On 24/08/07 04:12PM, Greg KH wrote:
-> > > > > > On Mon, Aug 05, 2024 at 09:28:29PM +0000, avladu@cloudbasesolut=
-ions.com wrote:
-> > > > > > > Hello,
-> > > > > > >=20
-> > > > > > > This patch needs to be backported to the stable 6.1.x and 6.6=
-4.x branches, as the initial patch https://github.com/torvalds/linux/commit=
-/e269d79c7d35aa3808b1f3c1737d63dab504ddc8 was backported a few days ago: ht=
-tps://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/inclu=
-de/linux/virtio_net.h?h=3D3Dv6.1.103&id=3D3D5b1997487a3f3373b0f580c8a20b56c=
-1b64b0775
-> > > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.=
-git/commit/include/linux/virtio_net.h?h=3D3Dv6.6.44&id=3D3D90d41ebe0cd4635f=
-6410471efc1dd71b33e894cf
-> > > > > >=20
-> > > > > > Please provide a working backport, the change does not properly
-> > > > > > cherry-pick.
-> > > > > >=20
-> > > > > > greg k-h
-> > > > >=20
-> > > > > Hey Greg, hey Sasha,
-> > > > >=20
-> > > > > this patch also needs backporting to the 6.6.y and 6.10.y series =
-as the
-> > > > > buggy commit was backported to to all three series.
-> > > >=20
-> > > > What buggy commit?
-> > >=20
-> > > The issue is that commit e269d79c7d35 ("net: missing check virtio")
-> > > introduces a bug which is fixed by 89add40066f9 ("net: drop bad gso
-> > > csum_start and offset in virtio_net_hdr") which it also carries a
-> > > "Fixes:" tag for.
-> > >=20
-> > > Therefore it would be good to also get 89add40066f9 backported.
-> > >=20
-> > > > And how was this tested, it does not apply cleanly to the trees for=
- me
-> > > > at all.
-> > >=20
-> > > I have tested this with the procedure as described in [0]:
-> > >=20
-> > >     $ git switch linux-6.10.y
-> > >     $ git cherry-pick -x 89add40066f9ed9abe5f7f886fe5789ff7e0c50e
-> > >     Auto-merging net/ipv4/udp_offload.c
-> > >     [linux-6.10.y fbc0d2bea065] net: drop bad gso csum_start and offs=
-et in virtio_net_hdr
-> > >      Author: Willem de Bruijn <willemb@google.com>
-> > >      Date: Mon Jul 29 16:10:12 2024 -0400
-> > >      3 files changed, 12 insertions(+), 11 deletions(-)
-> > >=20
-> > > This also works for linux-6.6.y, but not for linux-6.1.y, as it fails
-> > > with a merge error there.
-> > >=20
-> > > The relevant commit is confirmed to fix the issue in the relevant Git=
-hu
-> > > issue here[1]:
-> > >=20
-> > >     @marek22k commented
-> > >     > They both fix the problem for me.
-> > >=20
-> > > > confused,
-> > >=20
-> > > Sorry for the confusion! I hope the above clears things up a little :)
-> > >=20
-> > > > greg k-h
-> > >=20
-> > > Cheers,
-> > > Christian
-> > >=20
-> > > [0]: https://lore.kernel.org/all/2024060624-platinum-ladies-9214@greg=
-kh/
-> > > [1]: https://github.com/tailscale/tailscale/issues/13041#issuecomment=
--2272326491
-> >=20
-> > Since I didn't hear from anybody so far about the above issue it's a bit
-> > unclear on how to proceed here. I still think that I would make sense to
-> > go with my above suggestion about patching at least 2 out of the 3
-> > stable series where the patch applies cleanly.
-> >=20
-> > 	~ Chris
->=20
->=20
->=20
-> Do what Greg said:
->=20
-> 	Please provide a working backport, the change does not properly
-> 	cherry-pick.
->=20
-> that means, post backported patches to stable, copy list.
+I *think* it would be safer always zeroing np->dev in the error path of 
+netpoll_setup().
 
-Alright, will do!
+It could be a separate patch for bisectability.
 
---v54pu6pztjzufuzm
-Content-Type: application/pgp-signature; name="signature.asc"
+Side note: I additionally think that in the same error path we should 
+conditionally clear np->local_ip.ip, if the previous code initialized 
+such field, or we could get weird results if e.g.
+- a target uses eth0 with local_ip == 0
+- enabled_store() of such target fails e.g. due ndo_netpoll_setup() failure
+- address on eth0 changes for some reason
+- anoter enabled_store() is issued on the same target.
 
------BEGIN PGP SIGNATURE-----
+At this point the netpoll target should be wrongly using the old address.
 
-iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAma8gXIACgkQwEfU8yi1
-JYXqCxAAr38hvUiyFDyyNtXLHY+lWWJPTMSMUrF+g9eSdXEE3xiSNkvQzkaOqA1z
-kEPk7WaVU8A2WWObLwRV3i5MU2+YQMBKx1SNyZN5QBkEbWSY4IpWo3G8AdMEvUjo
-LA7L75dKeIcPRFq5ZFYb6Zox4cs8N2wY/pQ/e8t219SdRFkcHGIWXk4/IboZknXm
-TNO5RdG5gtv/xnMAQgfum1NRnDkFaULR4gqOwBN6Gsx2iPXMYjdGl6PkT1JWXBdN
-Ro680wL73Q02ney1aTHo1Xo2poavPWWWlXMGVWhd+5nhz9L3dnbh5wuOTENqA627
-sdhNv29/lSGRf7HbD9fi+nbYpNiSLuuGQ5YrrSYnY7SHaf02OlEWh2PCWI3jHQ13
-tBMY5uEAQ/IC8AZ9XIlWFnoJt7PqBhQzjcccKDcUsdi+zjKNdauxwwSfLmij6c2T
-4EIkT50X39H99F7A3AwGnM3ODXsiPiVbFdD2RzpGLMP8XREUegtbMWucW4Kt3hes
-/Z8thZZdx4DdLREXlFrXq6Imh0+tvKmztywcC+mu8qr+VaKVZC5hNwtRvlJUzU7n
-fwWSQ8v0+JTFrlN/Q4smsWpLuSlG5Hfi9JXVeWjej67EKFRpfF9GFdb2QoCaJeux
-LRpMMDFE4bQmGbBnU0zTLMy8JYitEmwS+Dj8ZtkZniLXAvWH2W4=
-=ci4z
------END PGP SIGNATURE-----
+Thanks,
 
---v54pu6pztjzufuzm--
+Paolo
+
 
