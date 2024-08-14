@@ -1,180 +1,112 @@
-Return-Path: <netdev+bounces-118349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56C295158E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:30:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A954F9515A4
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAFF01C26F4E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:30:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67F58B21C1F
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DEB54F8C;
-	Wed, 14 Aug 2024 07:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2760113B2A9;
+	Wed, 14 Aug 2024 07:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlItA6OR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hf1QrPtF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA4BEA4;
-	Wed, 14 Aug 2024 07:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFB67F486
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 07:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723620617; cv=none; b=e2fHUVT2pyZ3BSZ5EEPBJqOINiHIXFKJg1rqwv1P8qFgtP8G65OKOUDelyR3AIEbXAGfU34+pQWLgJJHfomU5/r2KFAVQRdMwLeZn4VSRwWA6EHGctvC4AJl3+yqVf25/cn3yO1pwXkN05DlG++5BaqxOnF4tzzHUDAo13cJHkc=
+	t=1723620911; cv=none; b=jXYnX0YkIJhzX/GeWAiGIwdxSJoE5wzWF7QFibfLIjbGfFSSXsRo8vvFcx8tMECc8pNYUSr2a9xJeCfJV6+6DT3qMRN1u8pBEDu6Vei7VwWG8I+mFFIM8zJtZh6j0j1W9eSofRIHac8PYe6EgTk0Y569rI4aFtF8pxjxxplVzUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723620617; c=relaxed/simple;
-	bh=m3S7JU+HCylBG7tym+JkEbCTnGOtEt9vkuHrFlnGleA=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=kVe+f4VTh8MRrnkCVuxUmJw9DKB4+pdCeCj6eOoVLntkJIzzll1gKtlIvAhbaoG2MRxV9557nsXLlwxx6Jvkx/CWiyzz6udHlIM295pcTcGogAIg2HpKEyMBwy9LyeHtmu+aYpyNI/npxGiCRaA7n8+v8flhmRPWChjpKvYpu6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlItA6OR; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fd66cddd4dso60873045ad.2;
-        Wed, 14 Aug 2024 00:30:15 -0700 (PDT)
+	s=arc-20240116; t=1723620911; c=relaxed/simple;
+	bh=dn+L6oAUJ8ys/t5tJ3WejzYSbtBeeeBMxySZGq3wZzE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K8y1cdSf1IAQZ/G7DpDR/WShtpyG69rvmyKuHQG+6spdwqB1HDx6l1owdA23Zqo41TTk8i78DbwfwUauu7NIyaHucZgVBTc01lhprSslC6perf98KU5WcyVMoRpXQwfRym0JoqD0FIlmlNLCA5lUekYVPr+qWYc6Nd25hZMAf0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hf1QrPtF; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a7a9a369055so495652466b.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 00:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723620615; x=1724225415; darn=vger.kernel.org;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gZjg8zveGCIUd8Xm20UvhZjkI4TEvCstRkn7S7YAXGA=;
-        b=GlItA6OResk2DIJQMDFuVxSMKoPwtmhuWWmOLFfzVkNjw+HxCzJFDVnpls1p+DJyw4
-         XGMd7dMH/E3CPJ4CKGTC67wY7BKSubjqIUBQOZSqx9XDFVID0Vdc5Ya99FH8wLTC1T2k
-         02nHAx3qRqWfxlUTmiKYx2KttE8B8pg9LGlXYHBTaihIxZ4z3lxdrxwXvyUUVCGSdnbY
-         7wtHEX38W/ZulwOCV8p12UqyfvwpA3zMjasN09H2Bb+GINk7o7ElxgfyzLIKevwMqtgt
-         SY4B9XTWOUSglNHKGIbntcYbboTns9I+RzA+iEkjCE/IThSvVRa2FzCPrxtlTGtW1ST7
-         SFiw==
+        d=google.com; s=20230601; t=1723620907; x=1724225707; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RYvlbKLns5cdVvpTzIYsdMbPag5YJ/RZP19+Oopz0OQ=;
+        b=Hf1QrPtFntJi4a2ZUMCqHkYbjRfgDaYdnELk/ST0tj2n2bhNMiC2yr5OjMKOaQL5Qz
+         wz9NJDyR7OyTXR054sl+dzNVWi57GRMfsiVWJVlt+y/7aIoslcijL5hMPF3vlGFuldHf
+         S8IEy120eJK+N+qp5PrDKTkQvZv+dfq+ryIuvA7maRF1PjHGngJgrZWxRpVGQ9XgHZ4Z
+         hVtnVRAFazpi/aSMClpfP2Xbg1wtlzu6VHGjHNCRNOnRoTU+9ftVhHUHRjuFR0dEJhkE
+         YYR80mv/M1ugp1md05ADOa37hJAv59x53GY5bL3t7Jobj4dtWHasTu9cacx5Iktg2ULX
+         5D/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723620615; x=1724225415;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723620907; x=1724225707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gZjg8zveGCIUd8Xm20UvhZjkI4TEvCstRkn7S7YAXGA=;
-        b=LzaynaOWqvew7AA6RgOVrBSsMIsuhvf7j/uQ/AkGx4TD2S67i9UiZJAgYIJXTyrlmE
-         l7rmYW3X/y22+EZKimFz3r1hwVWrpd3OfZFP+MTdYXD/puzZFp8r99VjF6nqbHk1ZuFV
-         C0gN3CqdV4TU/1hwsAfjwRPP5bZg8WRUwxjyZgNSo68QBa+kUCjJzuKbQZonWxnTT4+b
-         U7KhGt92n2A/8fiiH7q+IAAG8SmoC6sL/6QWC2rgveUQRK7WcOp/oDsJNQP46CJ/12tM
-         4iR9U6OsYDqRDIfmnwfbJxQx7H65Smbuw4/jOyJGW8o8b70dTRXdhDcFC0R8WD6CyC0V
-         O8hQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKZFOPToJhdVK23rXCPaO1WsXyKxXtXVuNrpACTzWGo0gkJgLcecs1F9JpQZTOhJTuB9jnZxhQX+84H4ZB2/FEYkg0UByVkqXH2nRBHV5JxImGKKd+ulvJUQ7+8MfroxS9jWH0RQfaEgGC7en8uHqeUlCWkXq+kmnAbNo3dmojSA==
-X-Gm-Message-State: AOJu0Yy4yvdhn2rZ8liHfeWJgqIz7fszgwsCISyvCc2A3FNNH90acqDf
-	p6FnNQbcbuduZxz8LoGSdqM1s/+X3dwVuvsIXg+HDJFISpyxyf8I
-X-Google-Smtp-Source: AGHT+IF9vetZEBq79rLwnfC3eNHkEvNAwOlqnrjH9+Gl+rQcBXi7+FTtVhF9PCJKqZ3PQov6/++wHw==
-X-Received: by 2002:a17:902:f687:b0:1f8:6bae:28f with SMTP id d9443c01a7336-201d638cec6mr29496275ad.9.1723620615271;
-        Wed, 14 Aug 2024 00:30:15 -0700 (PDT)
-Received: from smtpclient.apple ([2001:e60:a406:4828:124:7d18:f674:4bb1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1a94b1sm24050485ad.122.2024.08.14.00.30.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 00:30:14 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Jeongjun Park <aha310510@gmail.com>
+        bh=RYvlbKLns5cdVvpTzIYsdMbPag5YJ/RZP19+Oopz0OQ=;
+        b=fpGzSR92DNB/qad0S7/63pGlHx/qJnZUD+kUd/yISysJTY040VmcWPAfZ6XtIAlcF9
+         sHyVvPXkm9MXc4E0udYqQkh0Mz0p7gwJx6EJ4H76sUNWyYQrqA518wbhm3teB4uBreRn
+         mdgzcYNDr2JJl2MdELjkMzkVROWJCmhmZhSMkrZu907qBSemusvP7j46Xov16i9zYwGv
+         YxHhlON9qUT208UVjj3yFYM2/HWT/LFGDLDUv8ixhHyAhmKShrGa2AwbE3j9BCGdrWZt
+         r98AQh3hc/7Bu0/+4fJlS164vw44qaczXdfl0esx1Aa7EpDftzS/X/uvM7KxDrNpLKDy
+         bGZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaeVEO1fcsSWv0oNiTI98wagq15YsQbix63BmHNrh7xuJXK8U8IUjspmEJ2eevB+75QkvucfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/GQV8EZp+nbcXkDPz+m0ppHiSZE4OLG+UT9zeE6AF+UpBPNkx
+	aZeNNwI2acQWpQkExhE1pahwa5655g0yhRLQo3qE0dSG5HzJpjleIetBaS8PazLLrDsqkisWbcq
+	Y5lby22iufh9leL7wyAmb7+pacVKSiyGUWHGz
+X-Google-Smtp-Source: AGHT+IE/CG/1vgT1Y1n6PG7T2xGjZvOmrCdMCKO7yg5oBdpqAfSoZGVyiIo9FT8otgRh6yvRXfQeu0fk1v0Z/6Ec7BU=
+X-Received: by 2002:a17:907:f155:b0:a77:cb7d:f356 with SMTP id
+ a640c23a62f3a-a8367087b2amr110481066b.51.1723620907107; Wed, 14 Aug 2024
+ 00:35:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
-Date: Wed, 14 Aug 2024 16:30:02 +0900
-Message-Id: <75AFEC8C-C050-4AC4-AF63-0B798B040502@gmail.com>
-References: <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
-Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com,
- gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com,
- tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-In-Reply-To: <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-X-Mailer: iPhone Mail (21F90)
+MIME-Version: 1.0
+References: <20240812105315.440718-1-kuro@kuroa.me>
+In-Reply-To: <20240812105315.440718-1-kuro@kuroa.me>
+From: Lorenzo Colitti <lorenzo@google.com>
+Date: Wed, 14 Aug 2024 16:34:51 +0900
+Message-ID: <CAKD1Yr3i+858zNvSwbuFLiBHS52xhTw5oh6P-sPgRNcMbWEbhw@mail.gmail.com>
+Subject: Re: [PATCH net,v2] tcp: fix forever orphan socket caused by tcp_abort
+To: Xueming Feng <kuro@kuroa.me>
+Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Jason Xing <kerneljasonxing@gmail.com>, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Aug 12, 2024 at 7:53=E2=80=AFPM Xueming Feng <kuro@kuroa.me> wrote:
+> The -ENOENT code comes from the associate patch Lorenzo made for
+> iproute2-ss; link attached below.
 
+ENOENT does seem reasonable. It's the same thing that would happen if
+userspace passed in a nonexistent cookie (we have a test for that).
+I'd guess this could happen if userspace was trying to destroy a
+socket but it lost the race against the process owning a socket
+closing it?
 
-> D. Wythe wrote:
->=20
-> =EF=BB=BF
->=20
->> On 8/14/24 11:58 AM, Jeongjun Park wrote:
->> Because clcsk_*, like clcsock, is initialized during the smc init process=
-,
->> the code was moved to prevent clcsk_* from having an address like
->> inet_sk(sk)->pinet6, thereby preventing the previously initialized values=
+>         bh_unlock_sock(sk);
+>         local_bh_enable();
+> -       tcp_write_queue_purge(sk);
 
->> =E2=80=8B=E2=80=8Bfrom being tampered with.
->=20
-> I don't agree with your approach, but I finally got the problem you descri=
-bed. In fact, the issue here is that smc_sock should also be an inet_sock, w=
-hereas currently it's just a sock. Therefore, the best solution would be to e=
-mbed an inet_sock within smc_sock rather than performing this movement as yo=
-u suggested.
->=20
-> struct smc_sock {               /* smc sock container */
->     union {
->         struct sock         sk;
->         struct inet_sock    inet;
->     };
->=20
->     ...
->=20
-> Thanks.
-> D. Wythe
->=20
+Is this not necessary in any other cases? What if there is
+retransmitted data, shouldn't that be cleared?
 
-Wow, I didn't know this could be done this way. I'll test it with that code=20=
+Other than that, I have run the Android tests on this patch and they
+all passed other than the test that checks that closing FIN_WAIT1
+sockets can't be closed. That's expected to fail because it checking
+that the kernel does not support what you are trying to support. I
+uploaded a CL to fix that: https://r.android.com/3217682 .
 
-and get back to you
-
-Regards,
-Jeongjun Park
-
->=20
->>=20
->> Additionally, if you don't need alignment in smc_inet6_prot , I'll modify=
-
->> the patch to only add the necessary code without alignment.
->>=20
->> Regards,
->> Jeongjun Park
->=20
->=20
->>>=20
->>>> Also, regarding alignment, it's okay for me whether it's aligned or
->>>> not=EF=BC=8CBut I checked the styles of other types of
->>>> structures and did not strictly require alignment, so I now feel that
->>>> there is no need to
->>>> modify so much to do alignment.
->>>>=20
->>>> D. Wythe
->>>=20
->>>=20
->>>>>>> +
->>>>>>>    static struct proto smc_inet6_prot =3D {
->>>>>>> -     .name           =3D "INET6_SMC",
->>>>>>> -     .owner          =3D THIS_MODULE,
->>>>>>> -     .init           =3D smc_inet_init_sock,
->>>>>>> -     .hash           =3D smc_hash_sk,
->>>>>>> -     .unhash         =3D smc_unhash_sk,
->>>>>>> -     .release_cb     =3D smc_release_cb,
->>>>>>> -     .obj_size       =3D sizeof(struct smc_sock),
->>>>>>> -     .h.smc_hash     =3D &smc_v6_hashinfo,
->>>>>>> -     .slab_flags     =3D SLAB_TYPESAFE_BY_RCU,
->>>>>>> +     .name                           =3D "INET6_SMC",
->>>>>>> +     .owner                          =3D THIS_MODULE,
->>>>>>> +     .init                           =3D smc_inet_init_sock,
->>>>>>> +     .hash                           =3D smc_hash_sk,
->>>>>>> +     .unhash                         =3D smc_unhash_sk,
->>>>>>> +     .release_cb                     =3D smc_release_cb,
->>>>>>> +     .obj_size                       =3D sizeof(struct smc6_sock),
->>>>>>> +     .h.smc_hash                     =3D &smc_v6_hashinfo,
->>>>>>> +     .slab_flags                     =3D SLAB_TYPESAFE_BY_RCU,
->>>>>>> +     .ipv6_pinfo_offset              =3D offsetof(struct smc6_sock,=
-
->>>>>>> np),
->>>>>>>    };
->>>>>>>=20
->>>>>>>    static const struct proto_ops smc_inet6_stream_ops =3D {
->>>>>>> --
->=20
+Tested-By: Lorenzo Colitti <lorenzo@google.com>
 
