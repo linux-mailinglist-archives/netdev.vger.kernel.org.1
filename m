@@ -1,176 +1,166 @@
-Return-Path: <netdev+bounces-118394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFE395176E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:12:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BF395176B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:12:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75E9A1F22D87
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB9DB282B97
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D2C1448E8;
-	Wed, 14 Aug 2024 09:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D294414389F;
+	Wed, 14 Aug 2024 09:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WaEU8Xtf";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4LYLFcpB"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2126.outbound.protection.outlook.com [40.107.117.126])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EB4143C40;
-	Wed, 14 Aug 2024 09:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.126
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723626757; cv=fail; b=KCynYdJCTtqcLMy24+5i+S7DCx4g0vcEi7iv5SGXBmBz6WDk8mVj5lUSIB//KziTPw3G8xbVYC0HfQkIuSrqUnGAs70XmcYc8KTR71hMEr0oLvSKdzIRmYhBANtrnS9z26b/K3AuLEzBz+iiNdxfSGdy52DKhxeZ/8U25T4cOw0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723626757; c=relaxed/simple;
-	bh=4WNb1Ixkn6UVoK8h2BWRr9J2Ra1XuY8XpkOosu3JM/w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Wf8CG16mH2Es4c4g4k0Zdkh2y/HduCbxkp7pI8AjEZA3EvHLHNkvp+FlLH4BdpSoaR8CMwOn/+exaf/Jv9Jim9wP93IkfrWZxgGqQrdenioT+vZUZGKLGO56pC+pyijo+M5uBO5T1Uhh1m2GrID7gbEM6DtR9UdS2OwKCevh3tI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com; spf=pass smtp.mailfrom=wesion.com; arc=fail smtp.client-ip=40.107.117.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wesion.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KQpueTpEDvFfy7vyNFlfPO8RXRIMm1IkHBLH4nItbcOv5sfjA2sPPLjc9DIjXXkUpoTbyimhkQXSJCV6zB8AhT5GAjLumr8iBqTPBmsIlryQYiF8W7BslCpDJSL+BTr8+Zf0ScDKDSqkar/neHcjbM3ey50GiYxXq/vuLH0vo+RXrC1ImMZAsIVHih86LRBaCdBpdERzSuQraF3VxPIeyiZQxJNMOoo2xYVIxuXw7DbUJZvLbtoTwS6kBaPDdioq968IkFZR34a2NhJ18oOfGX8ASVPp/iY83hsff2YT/JezYSJ61KzKZFApWX9t2XXRbiGYQIQ7PYjs3bo5fzAwhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ekx+MKu3mtux56VZIxn0Fig16nNQE9oTOBsZXqmCnzY=;
- b=x/oZv2ryfGXu5tvcKHA1vB3hUmfZLEnyLZsc44fIxJoZPJ+BmsHk4xVopDLX1Ex94D/LmJkJwFtOMO8s/H6A1tzmp44ULXGHCnOqKwKIzuWOmjvp8JEjF6kjmSijg03ZhCp8/j+/b9ju8JDSnjJ1MOLC2lSKxGrcwAWDLBueCCyM7ujPPz5qOgVZobFbHfvqhRNSWKfgTOsnD4B0Q2i77s1rNZhSgQ+4gyKsQpoSUHl4FDYAy31FN9HTVVesDo1aaKnRrttJX0ToXYcsP30sfEYR2s8Jm2S5mj9Qf3Vd+tf/OPT8K4PIliTSOLPJr6Wz6Ym2yI6xZLvivFOgmg4G2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wesion.com; dmarc=pass action=none header.from=wesion.com;
- dkim=pass header.d=wesion.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wesion.com;
-Received: from TYZPR03MB7001.apcprd03.prod.outlook.com (2603:1096:400:26a::14)
- by TYZPR03MB7745.apcprd03.prod.outlook.com (2603:1096:400:421::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Wed, 14 Aug
- 2024 09:12:29 +0000
-Received: from TYZPR03MB7001.apcprd03.prod.outlook.com
- ([fe80::78dd:5e68:1a9c:36c0]) by TYZPR03MB7001.apcprd03.prod.outlook.com
- ([fe80::78dd:5e68:1a9c:36c0%6]) with mapi id 15.20.7849.019; Wed, 14 Aug 2024
- 09:12:28 +0000
-Message-ID: <05785794-6eca-4ade-a990-2deac7156c48@wesion.com>
-Date: Wed, 14 Aug 2024 17:12:21 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 1/5] dt-bindings: net: wireless: brcm4329-fmac: add
- pci14e4,449d
-To: Krzysztof Kozlowski <krzk@kernel.org>,
- Arend Van Spriel <arend.vanspriel@broadcom.com>, robh@kernel.org,
- krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
- minipli@grsecurity.net, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
- <20240813082007.2625841-2-jacobe.zang@wesion.com>
- <1914cb2b1a8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <e7401e25-7802-4dc3-9535-226f32b52be1@kernel.org>
-Content-Language: en-US
-From: Jacobe Zang <jacobe.zang@wesion.com>
-In-Reply-To: <e7401e25-7802-4dc3-9535-226f32b52be1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR01CA0126.apcprd01.prod.exchangelabs.com
- (2603:1096:4:40::30) To TYZPR03MB7001.apcprd03.prod.outlook.com
- (2603:1096:400:26a::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD9251016;
+	Wed, 14 Aug 2024 09:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723626755; cv=none; b=NfjSA/3X4w5BQNZh3yniGZ6KmPL8pvwEUHuR+R3+gLx5ErnQzZ4JrjreUBvdYKND2UX9DMwib8BNpiMx7wK6TN4FJM4p0Aqcb6I8hZ/+Q/+Fd4nTB5pn831wwBRX0cOmsPf8chaaGB3oAimiRsV8AWofxaAoRXTgSf4hJ1hsb7o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723626755; c=relaxed/simple;
+	bh=vUDzFHyeLTwRTSAHAzsXGSNcaLJoDOOgxk2LxkpoFXg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=U4EZ6gPbCqBAzFScchoXTmiGFf/c+McIAzH/8Uhe4qZikqK8boQZ+V3o2FcL3JQEe0AaoWG7bP2e6sBjflzDFn4/QCQhxPtC0yt7RZHq0nbbEuIrG8o7udWLFtYeWpFAeB2YSheFgrzlodexgqC2JMSDcu9xRmi2Iu9HTjgOYp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WaEU8Xtf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4LYLFcpB; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1723626752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=772casCPZxLKonJvdo774FKG4e7auqm+TrxX53zerPg=;
+	b=WaEU8XtfW8Y0r/93yEMP3WmzPFesN+fNFMdwFqIN4LohO6dr+IN2HMzp7xSDXZxQGBnKXi
+	wuMr0Zs7RGatDFF7O8dfHFzxL14dHgFU1LPkQX7Y+kElY87C3PZDnXWwB0pJY29ygThFr6
+	h6+Y0in3fm8gnZ0I3r1iUZ2ElfvhpOI29uaYgAi3d0Xc8oD8esyCVtXmODJpzHvW9gsXTK
+	wtWY3JeLSZ6ehtWLxF459l0Pw/dA6OKlyL4yydrufjBQiV1jlmy501X49aty0OE3NCXnv/
+	XWFwOGFXIvj4oWVWtG6JR0VoB5m3DcLEK6Xe9nCQlfWmXk3YKn5aYK+t6t6cMA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1723626752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=772casCPZxLKonJvdo774FKG4e7auqm+TrxX53zerPg=;
+	b=4LYLFcpBGCG6C/JLS2mZnyHYdfKAIstHcrmWCcbIVOKDYyfLO+uEj++YnMqgrbLf0KIefv
+	en5r94w4Q2Qv6PBA==
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
+ magnus.karlsson@intel.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ sriram.yagnaraman@ericsson.com, richardcochran@gmail.com,
+ benjamin.steinke@woks-audio.com, bigeasy@linutronix.de, Chandan Kumar
+ Rout <chandanx.rout@intel.com>
+Subject: Re: [PATCH net-next 4/4] igb: add AF_XDP zero-copy Tx support
+In-Reply-To: <Zrxw+FI7rbYHXN2d@boxer>
+References: <20240808183556.386397-1-anthony.l.nguyen@intel.com>
+ <20240808183556.386397-5-anthony.l.nguyen@intel.com>
+ <Zrd0vnsU2l0OTsvj@boxer> <874j7nzejz.fsf@kurt.kurt.home>
+ <Zrxw+FI7rbYHXN2d@boxer>
+Date: Wed, 14 Aug 2024 11:12:30 +0200
+Message-ID: <871q2rzcw1.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYZPR03MB7001:EE_|TYZPR03MB7745:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55e288b1-dc1e-420c-6c0b-08dcbc413873
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	LX+UrrNMZY2ewFMnzYfCfQU0M93JBlTo1M2nvQUd9IzcWps5nE9Rjrpg763y0kf1JiAjUtrR/sKlDcLgPZWOSk99Gfnk+qYoFHlYlfv6WVesPuk48YBAbaz9e3/ZqfQlhhnvmqvVHDR1CisvZOclVgGFPG5I+/acDM40GxTy4G4+RAdz4vVlZ5v1sGgTfb7361rqDa7A0NnxVGEEfKwZrdxPBwptpyaj2z/4NOQA0jEw/QO01NtLiY/DOFXHHvVviEjF1IJYjF0zYxqA/yRC/kK8bvqf+2nWqbigegsYsVRId7aUqy6OXwm06sgZpv5QO1LOeCRSvxXV1naIEbJgre5h4HJpT/YMv3YTAnFOk6EnlHMgvB42hG8cJ68eAS1MVNOK1S2dA0igSOqXN7HgwUygE0wcvShruypDgoqMbCZWbdojUkrT1emTfHyqgEAr+GVwlhjrOoQnoSSvgsh7XmEFUviGsfcctd4PQIQTH/m49M9KbzVt3krFk6wmW0ArFu+hiqFpHARROAdr5a1y1m4yCCYVL9WlT3ApNPbbXY9vZSoo8fUGPNrbpDtLVu9D6qMa6EXvxIIN9LiIr+MtQpSmE4J6tgXzlflCizvmvYMsr2rKvtf/mKDA81S3qgaEeS4Hz5cqn2Fftel+fLIyBjiRGH8ICN56OAom2/8Vx63o+O7xiIQ6EHlIjLSmwBE29ZZZa0kHCVx6gif4XT+75g==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB7001.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NGZrUHRvenpQU2tRNnJodGhXTTFLbkhMS09Ca0tnR05FQU9acnVqQWxlU0pz?=
- =?utf-8?B?WE5kT1A2WkJ6OWlhZlN1Ui9yV1g1QTZreHhPT3BwNm9QVnZORGljK0Njc3Zt?=
- =?utf-8?B?Qm5kYTdSTUpibzhHT1pPbnFoTFpkS0JQVkhLczZoZTF2TXVWUFUrb210a2FQ?=
- =?utf-8?B?ekZuRENRR2RTQSs4dFpYbTZQRU8rUWlTL1g2bERoaEhJeG1TZzlzOEp4VFRn?=
- =?utf-8?B?RUp0a3hCTzZRaHdsQjIrQzhPYjhUcUhVYWhvK1lFYTVTMEhWSzdxTlUyQkpr?=
- =?utf-8?B?K2NqMjY0V3RLaVZldisyOUtVSGFWU0FvcXhEV0J2TXhFQkVPVjlvK1FOUkxV?=
- =?utf-8?B?eERTdmM2Y0piKytOTWdGSTVaYlh6Rm5WbWUvTWdldSs2ZVoydUxxcHdxaVJz?=
- =?utf-8?B?YUVIYVpqS1FMeDlTczRaSlIxRy9xRGFzZVJMQlhCckE1UGplVWdKUXZXNWYv?=
- =?utf-8?B?NHZZM2ZYRXRESzVXYnV5TTl6Qm1XaWpWOXlFQzdNWkNhLzU3NEJxdE1sTkk4?=
- =?utf-8?B?UE5UK2g0NkZ2RXZ1MUY0TGE5SzRHTkRVcU14S250MzJmNlF6Vk5WQVlXaFc3?=
- =?utf-8?B?UnZZSzFUelhNUFdEY2twblJNeDRBT09WZmpqTVgrS09WL25keXUvclM2NStN?=
- =?utf-8?B?MEV2TnpOUVRYcjlaZ3hZMlFSc0VvZlg2MnNSQTZMZTBKTUdhWGtHNDc5QVBN?=
- =?utf-8?B?dTNFT1ZIaWp6MGJ5ek1Ga0dNWElFSExIZWtsSzZLUmdMTHRtbmFMV3pUVjJr?=
- =?utf-8?B?dkh2cDRBU1VQbkRRSERKeVB3Wi9NRmRNaytvTjBTcTcxVXpYWWlRMFpWbnBH?=
- =?utf-8?B?NWE4Wm92cGhPZGdrRmp4V2xJRGZUamVCSHUzUHZmOUdmV016dzNCbmNlR0k5?=
- =?utf-8?B?RU10aEZNd1R0T1YvVGR1Y3Nuc1VFd0pEUlBtVWwxNThSZk8vOXZHSHNyeE95?=
- =?utf-8?B?cXkyS2JpQTU1WThlLzU1WW1RdFVrc0Z0Y3pjOFNZL2t2cmFDUHJuWE1XenpZ?=
- =?utf-8?B?OWRyb3BWaHl0NVQ1Vi81NDNmaUhlKzJnN0xOc0pBZ1NweDBFaDdvSURuRGd0?=
- =?utf-8?B?azJWbkkzV3hkQWpDcHhNV3Z5QXZnWU1SSEkwS2oyMzIyTnk4bnkzZkZSaFZN?=
- =?utf-8?B?QnlDSWhHZWxkL3M1d0duUzJ3emhlTTI4UDZvU1FIUTR4ZnZjWW5VTGRCRkl1?=
- =?utf-8?B?QlZQT3kxQVpCR1phenNyTHN0K3NRSnRCRTh5QXloTFdrM3ozRlNCMWE0bm56?=
- =?utf-8?B?TnV3OE0xNERFc0t5MzF0TkpTcml1YklKS1drVDBkdFFOak1iQ1o2b1FLSlpQ?=
- =?utf-8?B?WCtRSUVlZ0d0eHd6ZkErbzVKbEJZK1lNMi9mT3RXYzdHREphalZKZHJBNkpB?=
- =?utf-8?B?cnV4blVHSGZYeHNnMTRzckQydmlJcXpVY1M1MStzTnlUcTdEOTZXOXkxNTJO?=
- =?utf-8?B?Zm84bFpGZkxwSVlIZjFTVU43QVpONzRhNDBSVFl2bGlCb1JIKy9PTEdTWVZt?=
- =?utf-8?B?SkUzc2hmTW4xU05wQzZVMTlqR1BIckpUQmZjMk5vTDltRnhLTk1lL3hXVnJo?=
- =?utf-8?B?TkVVUmxUc0ZXRkJ0TWx2blBWcThJVGlrNUc5V0Y5Nkw4UzFGNmducmo4ZXdG?=
- =?utf-8?B?Wm42NTd6OWxLamt1dFpnaGtudGhzTFRtR2FYanhKK1JkbGo2clNHRkVHak1B?=
- =?utf-8?B?NFBjQi9oV2VaYXBMWllhT3J3Y2UrYXhVY3cvczVLbUVma0ZCUEpXQ2NFUWdQ?=
- =?utf-8?B?ZVRyVVdmSk5USE1WakhJODMvRzh6Skx6VHRCWms0WVhDNUxoejhUcW1oRkU0?=
- =?utf-8?B?amhnUUR1WGxhbERVaC82aXJvcWVtM1ptMVhCVVFoOWFRUjY2UkJoQzkrOW5M?=
- =?utf-8?B?NGpSbVZEU3BuK2pZZ2MwWU9QTVEreUMrMHEvRmhSS25DNUtWNVo1TVFLUHNs?=
- =?utf-8?B?RzZtdEJvVGs1aHd4bVpRWjIwTzhCODl2Wm0zQ3JubmNLbFNsVUNSM2V4Ym42?=
- =?utf-8?B?SWhua0VSaGNqQnZQcVFPRHNhenZoaEhvNzkzMGpVMlFRWVFRbnIrdXRHRklx?=
- =?utf-8?B?SCtlY0NPOGNxOGduWDJyOStUOFFsRkVJU0p6N2VjYW5mdFhBVEJlQUZqdy8v?=
- =?utf-8?Q?PcnwCowuuk8T2W7DYtKO6AkS3?=
-X-OriginatorOrg: wesion.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55e288b1-dc1e-420c-6c0b-08dcbc413873
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB7001.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 09:12:28.7505
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2dc3bd76-7ac2-4780-a5b7-6c6cc6b5af9b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1PGnmCue3N+84KEbXL17g3pVUEbfg2bkr2jitxRLB54Kd813uV+kGyZOvQVdkL/1Er+9RvNHa+UJa48I9G4UaA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR03MB7745
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+On Wed Aug 14 2024, Maciej Fijalkowski wrote:
+> On Wed, Aug 14, 2024 at 10:36:32AM +0200, Kurt Kanzenbach wrote:
+>> On Sat Aug 10 2024, Maciej Fijalkowski wrote:
+>> >> +	nb_pkts =3D xsk_tx_peek_release_desc_batch(pool, budget);
+>> >> +	if (!nb_pkts)
+>> >> +		return true;
+>> >> +
+>> >> +	while (nb_pkts-- > 0) {
+>> >> +		dma =3D xsk_buff_raw_get_dma(pool, descs[i].addr);
+>> >> +		xsk_buff_raw_dma_sync_for_device(pool, dma, descs[i].len);
+>> >> +
+>> >> +		tx_buffer_info =3D &tx_ring->tx_buffer_info[tx_ring->next_to_use];
+>> >> +		tx_buffer_info->bytecount =3D descs[i].len;
+>> >> +		tx_buffer_info->type =3D IGB_TYPE_XSK;
+>> >> +		tx_buffer_info->xdpf =3D NULL;
+>> >> +		tx_buffer_info->gso_segs =3D 1;
+>> >> +		tx_buffer_info->time_stamp =3D jiffies;
+>> >> +
+>> >> +		tx_desc =3D IGB_TX_DESC(tx_ring, tx_ring->next_to_use);
+>> >> +		tx_desc->read.buffer_addr =3D cpu_to_le64(dma);
+>> >> +
+>> >> +		/* put descriptor type bits */
+>> >> +		cmd_type =3D E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
+>> >> +			   E1000_ADVTXD_DCMD_IFCS;
+>> >> +		olinfo_status =3D descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
+>> >> +
+>> >> +		cmd_type |=3D descs[i].len | IGB_TXD_DCMD;
+>> >
+>> > This is also sub-optimal as you are setting RS bit on each Tx descript=
+or,
+>> > which will in turn raise a lot of irqs. See how ice sets RS bit only on
+>> > last desc from a batch and then, on cleaning side, how it finds a
+>> > descriptor that is supposed to have DD bit written by HW.
+>>=20
+>> I see your point. That requires changes to the cleaning side. However,
+>> igb_clean_tx_irq() is shared between normal and zero-copy path.
+>
+> Ok if that's too much of a hassle then let's leave it as-is. I can address
+> that in some nearby future.
 
-On 2024/8/14 16:53, Krzysztof Kozlowski wrote:
-> On 13/08/2024 19:04, Arend Van Spriel wrote:
->> On August 13, 2024 10:20:24 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
->>
->>> It's the device id used by AP6275P which is the Wi-Fi module
->>> used by Rockchip's RK3588 evaluation board and also used in
->>> some other RK3588 boards.
->>
->> Hi Kalle,
->>
->> There probably will be a v11, but wanted to know how this series will be
->> handled as it involves device tree bindings, arm arch device tree spec, and
->> brcmfmac driver code. Can it all go through wireless-next?
-> 
-> No, DTS must not go via wireless-next. Please split it from the series
-> and provide lore link in changelog for bindings.
-> 
+How would you do that, by adding a dedicated igb_clean_tx_irq_zc()
+function? Or is there a more simple way?
 
-I'm little confused that I should push bindings as a series, DTS as a 
-series and driver as a series separately, so next time I should push 3 
-series, right?
+BTW: This needs to be addressed in igc too.
 
--- 
-Best Regards
-Jacobe
+>
+>>=20
+>> The amount of irqs can be also controlled by irq coalescing or even
+>> using busy polling. So I'd rather keep this implementation as simple as
+>> it is now.
+>
+> That has nothing to do with what I was describing.
+
+Ok, maybe I misunderstood your suggestion. It seemed to me that adding
+the RS bit to the last frame of the burst will reduce the amount of
+raised irqs.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAma8dP4THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzggrdD/9BfXH6fGp+potTmQvrCvFzPhUjDPOg
+dqEWToijLBnOVf3e7gLP0kkL1DxFYlPivYaaHhbOH199X2PKJbYINbs3ZfuJaf4M
+U8qRW+4xAuT65XMXC+nA2W93EDnPnUKJei85eCQGHL9+RA4hQm/A9I6CwQDAqMBo
+wWdJOwWdFhtgHLKY7NXOOX+20MiZkThnR3NcLNuA+o4RBmUOd0CKxPrT5HASUa33
+EpLI5r5QTZgZNJcNfWAqdQL8ZT2swW8KtEFXsQfZPjqrpR7lCtx61AeZBnAmbm8z
+b1zVwSn6cVZUMRI/uGhUTgczYT+1m+v4Nve6DntzjpcRgiRyMPkIiSgFZu9dTKhf
+ZrV5wD43Q1e1EeTNfZgqfFgAJiLPi9cjC5a7we2NhzbJiNeEw0uIMBxBAsO5KPq6
+JOM5XYkQzRer4+4GbCqOOeQMw/3LGQw8tgRTT6bGDnPM5wFZ1UVVeJqy5abU4T8N
+R9BnFqNY+aAGIBpXIJ6cKd7k/NFiFA6ZZMvaKv/taS/FFqcIJudhsCQ+0NTGvpWV
+LSe8CfcgkcHhWj5wFXX9o52tv1DdMHOeQZv6gFexa5ssT99PTrn0cwQTwPdQlQPw
+Y9KvSF1b+GRkTTKj7fBK7QWjrp7Se0Vzl7QR+AXIB+tn17EK0XoWRGrtS4IsSmVM
+R5S5Gjf+0fyWUg==
+=jUNR
+-----END PGP SIGNATURE-----
+--=-=-=--
 
