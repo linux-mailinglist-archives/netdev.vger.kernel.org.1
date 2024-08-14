@@ -1,141 +1,158 @@
-Return-Path: <netdev+bounces-118334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC4C95147D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:26:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216429514C5
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3B92862E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:26:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76981F24AC6
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A129D7345B;
-	Wed, 14 Aug 2024 06:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C853C74424;
+	Wed, 14 Aug 2024 06:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="USszB5Ee"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="modYS0Wt"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB811F94D;
-	Wed, 14 Aug 2024 06:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029088488
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723616795; cv=none; b=Z4et+mwe/ZeJen3LUQHrrDfkEnDLPEoviIO2J9IMDOebXt+bJLA9plC4j/JcnoWNpNJrK68p7MG32yANs2euQJ19UeQPtG6m0EpepQeJoND8UCjdSjDNoeEup453uDi4z4/mYWiOO2ym4mYE53AVaPK+1a2+rF/Y0+LiOy/Rrxs=
+	t=1723617781; cv=none; b=a0REHLNQ+S4EKrHeUQgBonDhMilwjcbQGftvjvl0o7dNCCCLfdjLbFK8yNDd4B9Fugr568iYtEvvxL7/51keL7kIKmMMeeB3QnTDzoefbaaCv3aNKFn9vCTfXaomtrnBlnavXAaaWVlPxXumR54ffL48FURNStXSY6GzAVDsDnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723616795; c=relaxed/simple;
-	bh=c/B3zpodqQDg3Gm46P+OGE0a77kg/8gf/IGqyQqdCbE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KsycB8MX6uzqfNrhY1rQlB3uOv5sIdDEx5IGNcJeqJYJ7/OJvlQ7SNvDj66iVKOi1+tumH92ouFtZKFYoB0+NTNLgeQmNbC0pbWLlwN5ioUHlKzxUqtohyTH7m2TEBrjQsG9HmL252izOIvOBtX+4OiPStoiCubq23PlvBIYChU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=USszB5Ee; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47E6Q55e083647;
-	Wed, 14 Aug 2024 01:26:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1723616765;
-	bh=TV4YYPMGzdKwvmV4+H2ipDGrWg6oUeN1Y/HB2RJrHLU=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=USszB5EerDqLAd8bKn+vrAU0auLqrZ2UsqL9IeLDcOvb+IrSUwxizd3ZRYj5eQL8M
-	 CQCfCL52dd/tvD21aOBk/5ODt6eNpawGgTTeQVwgxV03L5Bkj3NnCIKCgVHYH1eNkD
-	 yi+A8We0wmZUSceS4UVOh7HHscEQrBkp5RDeK52A=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47E6Q5wk003091
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 14 Aug 2024 01:26:05 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 14
- Aug 2024 01:26:05 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 14 Aug 2024 01:26:05 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47E6PvMF073293;
-	Wed, 14 Aug 2024 01:25:58 -0500
-Message-ID: <69043091-dd59-4b7a-aae0-34f9695b378d@ti.com>
-Date: Wed, 14 Aug 2024 11:55:57 +0530
+	s=arc-20240116; t=1723617781; c=relaxed/simple;
+	bh=jZ2PmbZ8xodunhbCZWMEKC3g1etMNx66h/wxu/zzeEk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y6cgfGdoA6gG9i9nUCHj6KuG6pp7Nco4tzUthmd+Aq9u0Yq9JN6VEmjM4VwQWFs6LROfeKpQPVi5ZDCCjmem5qeXO8NA38MnC9k6cP+aQl+2gZxIMxNQ+qUi9Kfl7HyB3yfZCV1UC2J4zmrrzwSzJhnroXMNzSnAihk9eqbNEIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=modYS0Wt; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5b391c8abd7so7482665a12.2
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 23:42:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723617777; x=1724222577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jZ2PmbZ8xodunhbCZWMEKC3g1etMNx66h/wxu/zzeEk=;
+        b=modYS0WtAiCtmFJEBptVa9H+efkd8vSZ5c6u5XsDq3s28WNz6O4JIYNjIKOuPul4ie
+         eRsHL+T+qUXrYUcFdjJBheovwYgPzxzGPGik9Q2yiBPYgxyD3Fmobc8lKaTgaXsQEvIP
+         xmwNp/CNYB+KLQVKSsLkGEj7VcJEI8bYQzUP4cDq++Z1U7eUiWvjuSxJAYPX8eGFhdwz
+         K6rFun1BFBwX4ZRaB3ONuPvmd7PdQTuxn6wDlVj2nykunsvRaqdvbkSJVeZ75habw/Lp
+         fMnaKK4gAbF1g1NnAXCe6EJBwBFwmVsG7jZlixBZ9OrW6ZC259lG+PzWzna2BEbiYeBa
+         /dFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723617777; x=1724222577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jZ2PmbZ8xodunhbCZWMEKC3g1etMNx66h/wxu/zzeEk=;
+        b=rifnM8Ba/+HkTq8+24m58+4flWUrBYryS2itvQv0CW6O32RdHMKBGWUM9jEnyb5JQJ
+         f7nndl/1F0vydfUXVJmYlJH78zwOE9gAQuLH4cd+q0ssXcR45IdMlbDMBtyojKLrq7GU
+         DTSyr1RXuNNZfrAApjGDXEV2BXzICpzT7RbJ9eQvrtt7KmIt72RluZNTz427r6q4oRQD
+         gVF2EOULrFBzvNRpotUVrfxb6rtXULouv/mxIv71INKYzHNYHEsMPSI9vG5iMkcvz2k6
+         cDOebuUfRJlZTRCO8CpzoWbgj0eqeM7xz04puBr+fyweyqJyrN4jmHOrlQxPiPilQ+qZ
+         9zLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVap1wplSenkHWvRkdnEEb2jscckl3zuQ+TZy4ZQftFfPXTtsIxG2CVVSJyf+HzuU8k/SaJLAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0gcX3vegBXY31cIcybFUDXO0WXiqBnV8xsKL4Bju33GFuSMf7
+	4yMXKA4AnQUSt2zcLuLt0QQRzwRtlhjBiX+t5SOLSOZQQtIClUWcE8wtIAF6wchil554stHuBZj
+	p9J77/LzpdlYP0Hl9hZ32snIPwGA=
+X-Google-Smtp-Source: AGHT+IGekfdZ7lJr187IMt6EVQ3l+DylqbSOCZ5tS4Yp+XdwoUPNLzKAaUwiMFVQ9WeNtHy5uYiKmG0OzFCLSAaESNs=
+X-Received: by 2002:a17:907:dab:b0:a7a:b9dd:775a with SMTP id
+ a640c23a62f3a-a8367058fbdmr102141466b.67.1723617777095; Tue, 13 Aug 2024
+ 23:42:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/7] Introduce HSR offload support for ICSSG
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Dan Carpenter <dan.carpenter@linaro.org>,
-        Jan Kiszka
-	<jan.kiszka@siemens.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Javier
- Carrasco <javier.carrasco.cruz@gmail.com>,
-        Jacob Keller
-	<jacob.e.keller@intel.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
-	<horms@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>
-References: <20240813074233.2473876-1-danishanwar@ti.com>
- <d061bfb6-0ccc-4a41-adad-68a90a340475@lunn.ch>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <d061bfb6-0ccc-4a41-adad-68a90a340475@lunn.ch>
+References: <20240808070428.13643-1-djduanjiong@gmail.com> <87v80bpdv9.fsf@toke.dk>
+ <CALttK1RsDvuhdroqo_eaJevARhekYLKnuk9t8TkM5Tg+iWfvDQ@mail.gmail.com>
+ <87mslnpb5r.fsf@toke.dk> <00f872ac-4f59-4857-9c50-2d87ed860d4f@Spark>
+ <87h6bvp5ha.fsf@toke.dk> <66b51e9aebd07_39ab9f294e6@willemb.c.googlers.com.notmuch>
+ <87seveownu.fsf@toke.dk> <CALttK1Qe-25JNwOmrhuVv3bbEZ=7-SNJgq_X+gB9e4BfzLLnXA@mail.gmail.com>
+ <87frr8wt03.fsf@toke.dk>
+In-Reply-To: <87frr8wt03.fsf@toke.dk>
+From: Duan Jiong <djduanjiong@gmail.com>
+Date: Wed, 14 Aug 2024 14:42:45 +0800
+Message-ID: <CALttK1TWBeZWDwHoW9q6qkT6=XT4EmZM1ZbK3KtKSXR-ZcAFeA@mail.gmail.com>
+Subject: Re: [PATCH v3] veth: Drop MTU check when forwarding packets
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Tue, Aug 13, 2024 at 7:40=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@kernel.org> wrote:
+>
+> Duan Jiong <djduanjiong@gmail.com> writes:
+>
+> >> >
+> >
+> > vm1(mtu 1600)---ovs---ipsec vpn1(mtu 1500)---ipsec vpn2(mtu
+> > 1500)---ovs---vm2(mtu 1600)
+>
+> Where's the veth device in this setup?
+>
 
-On 13/08/24 8:19 pm, Andrew Lunn wrote:
-> On Tue, Aug 13, 2024 at 01:12:26PM +0530, MD Danish Anwar wrote:
->> Hi All,
->> This series introduces HSR offload support for ICSSG driver. To support HSR
->> offload to hardware, ICSSG HSR firmware is used.
-> 
-> Oh, no, not another firmware. How does this interact with using the
-> switch firmware and switchdev? I see in your examples you talk about
-> HSR to Dual EMAC, but what about HSR and Switchdev?
-> 
+The veth device is used for ipsec vpn containers to connect to ovs, and
+traffic before and after esp encapsulation goes to this NIC.
 
-HSR to Switch mode or switch mode to HSR is not supported by the firmware.
 
-Only dual EMAC to Switch , dual EMAC to HSR, switch to dual EMAC and HSR
-to dual EMAC is supported.
+> > My scenario is that two vms are communicating via ipsec vpn gateway,
+> > the two vpn gateways are interconnected via public network, the vpn
+> > gateway has only one NIC, single arm mode. vpn gateway mtu will be
+> > 1500 in general, but the packets sent by the vm's to the vpn gateway
+> > may be more than 1500, and at this time, if implemented according to
+> > the existing veth driver, the packets sent by the vm's will be
+> > discarded. If allowed to receive large packets, the vpn gateway can
+> > actually accept large packets then esp encapsulate them and then
+> > fragment so that in the end it doesn't affect the connectivity of the
+> > network.
+>
+> I'm not sure I quite get the setup; it sounds like you want a subset of
+> the traffic to adhere to one MTU, and another subset to adhere to a
+> different MTU, on the same interface? Could you not divide the traffic
+> over two different interfaces (with different MTUs) instead?
+>
 
-Software HSR, software Switch / bridging can be done only with dual EMAC
-firmware.
+This is indeed a viable option, but it's not easy to change our own
+implementation right now, so we're just seeing if it's feasible to skip
+the veth mtu check.
 
-To summarize,
-Dual EMAC firmware - Supports normal Ethernet operations, Can do
-software bridging, software HSR
-Switch Firmware - Can do bridging in hardware. For software bridging
-this firmware is not needed, DUAL EMAC firmware will be used.
-HSR firmware - Can do HSR offloading in hardware. For software offload
-this firmware is not needed, dual EMAC firmware will be used for that.
 
-By default the firmware is Dual EMAC firmware. Firmware will only be
-changed when offloading in hardware is needed.
-
-> How many more different firmwares do you have?
-> 
-
-We have these 3 firmwares only for ICSSG.
-
-> 	Andrew
-
--- 
-Thanks and Regards,
-Danish
+> >> > Agreed that it has a risk, so some justification is in order. Simila=
+r
+> >> > to how commit 5f7d57280c19 (" bpf: Drop MTU check when doing TC-BPF
+> >> > redirect to ingress") addressed a specific need.
+> >>
+> >> Exactly :)
+> >>
+> >> And cf the above, using netkit may be an alternative that doesn't carr=
+y
+> >> this risk (assuming that's compatible with the use case).
+> >>
+> >> -Toke
+> >
+> >
+> > I can see how there could be a potential risk here, can we consider
+> > adding a switchable option to control this behavior?
+>
+> Hmm, a toggle has its own cost in terms of complexity and overhead. Plus
+> it's adding new UAPI. It may be that this is the least bad option in the
+> end, but before going that route we should be very sure that there's not
+> another way to solve your problem (cf the above).
+>
+> This has been discussed before, BTW, most recently five-and-some
+> years ago:
+>
+> https://patchwork.ozlabs.org/project/netdev/patch/CAMJ5cBHZ4DqjE6Md-0apA8=
+aaLLk9Hpiypfooo7ud-p9XyFyeng@mail.gmail.com/
+>
+> -Toke
 
