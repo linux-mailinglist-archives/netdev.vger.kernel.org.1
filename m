@@ -1,90 +1,121 @@
-Return-Path: <netdev+bounces-118451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE35B951A6F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:56:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861FE951A9A
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:12:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F404D1C21D70
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:55:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E99E7B22809
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBD31AED3E;
-	Wed, 14 Aug 2024 11:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F331AED40;
+	Wed, 14 Aug 2024 12:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xflRKiKI"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ER91I/pA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9347413CABC
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E497A1B010D
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 12:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723636549; cv=none; b=kPFQ1pwVpoaQqhLnl0ZhJROBbIed/SM11kPUVAHjETzVEmePhY2U5JB01R8IRilx8qRjZbgl3vgt11hQw7s61JMLZUEh9nbyTDUAc07eyPqUUMZaUp+8MXzCuL3+dsHUpMuT4ociabbppEUM8J1qtIyjx6vxam5zzoq8OQH7PTA=
+	t=1723637534; cv=none; b=sAscyhtvi1GeilGVD7fkgfGInD4D/PngcenBKopCOYxmZlPFeWRNi0ZK1HZNIaJ/4KpFBRHNMbdP5e958Onom78noQFM0dnmIamMo+x2r+A3eUZvY3FkDQ35NI2obX51XzuWL9gAWVv01rNgSART3Orx3EO1xJL48R1cH2x38e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723636549; c=relaxed/simple;
-	bh=19q1gGkjxUPS+gVjduBiyChW7OfOoSMsvwD77sPZHfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpVgDYObuOjOyaCMwbKjNsPS3KYsrT0NbsFrXgz5mVwqkIbJSrVFbQPDZJIt2m/2EKX7Voamr1mhom7u1iSbSTACDsT8Wiav28AKiQZrDEONEZPFS027yl3BhzegSRQ+e2v1Jv68iFzTvbeYRL6moZIIwoNU5qSB9LPJUBmnnd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xflRKiKI; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42819654737so48190195e9.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 04:55:46 -0700 (PDT)
+	s=arc-20240116; t=1723637534; c=relaxed/simple;
+	bh=MQ57xcNRnx2hbtvSnDnW9ALhWFVxGf3zZIIpvn2IVqk=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YF0LzcWRh54JYt6Nm36StsYsGgHUMUXKYiY9JaqIr/IOlaA//8rWV0tspdzi4GmPWJUh/OcvR4bm3+DgRjEFtJg64KZTPdGI2ymSxEw+1zC33lXqZL+CFZPnOHSWFZvFI99FtweWh3BXWrjlZRXfrA+XAVUD16PIND1UJ4c3EMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ER91I/pA; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42819654737so48297825e9.1
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:12:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723636545; x=1724241345; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4nvtD3c7ebsVrPpVCsIwSE/KyHPBO/xTewUEQFql/I=;
-        b=xflRKiKIKN2/oU90S8tG1nGg26HDSkQ83UzsXRrjqsu7CzNQk+ay1oyN5dlPQx7SR3
-         virKEhrPbq2eAkq+H0vMIpawvVw5vti+2oIGnHBhTyVCtN5Uf7IFhCFro4yv8gtdAEHK
-         dH1V5zRj/Sq2xmaSTquHuwGf1PrIZj+MzhMCeojqypwHfRnJzYwbJNnjrf32iqJqezXU
-         v8d/ULpUc5sUwBTUwn4zRN4WexASMyC2JiTIwa27kazCT08EJhhn/kwYKPm31B8i5ChJ
-         PouWuXYkCrRQ3YxNFotz941bDISloML/1d7wP5C00Ye6LFY8zoi2gLEBBW9SfudMN3R3
-         Ox5A==
+        d=fastly.com; s=google; t=1723637531; x=1724242331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PG9e6JitvYXoqzSTP8p6u30qXecQWEzNyRf8++iwfzg=;
+        b=ER91I/pAUCKFn6ndSuySZNLG422z4clo57ycN76odiFyCjcH0QMFJQp2MN2KmlXIo9
+         /UIISX3qwXpFZT0GEMPLg8kDii+imqwHiSvzq3KPDu+rHcXwilLPLGqqpGZR/7qSjLJ8
+         Xns+oN5HGUECJ2zb3vkHnQT3nPtPVY03X0LNE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723636545; x=1724241345;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R4nvtD3c7ebsVrPpVCsIwSE/KyHPBO/xTewUEQFql/I=;
-        b=CLlNRJR0ZlqMOKnM/aBYaawJG/rtiGvONghLvffbopbvYf1pZCZYpWJLyUMxscz4j2
-         mLbIUfcotQqYKkQP9m1QMNWRijYQZx0HIeQ141/j22BzUHy2WSQgSTWiZV+kQqUGGWEP
-         ieZbdu5uN8XCktIW146dofuYkIz2AlZkEET0R36NwD/Yv1MeopIHHblCF0vPTh5dlWm+
-         7B9h2VgBXnmaCcGPTwXHDwU0xQTrOMI2wzjRpRBAQpNbYgJaWzizSy6dEsgNngQjdkHb
-         dNU+hV0b1fJT7OiZLgZOBW3VxxtDWLZJH+Of1OLeZrJgxUmrgUm6HADQotld4nVHNvZc
-         Vmkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVjqZvidtqz577NMZRmeaFCR5uQtJu3xPwunqZJhWI9Cud0TmPM+cPfOO1LM+e7j4aAJPmuLxRmEqGPmT0avs8rPMGIh989
-X-Gm-Message-State: AOJu0YxLZiVnBNAPw6v1WJ++aVKqO05JKuBGrIK/WUNL1716TefTmlGE
-	JgB8kf6gUkLh7qNUyaPtzmlEFZsieWR4TbjzdgUZLLW4WcN2MzDqevcXH9z6i8E=
-X-Google-Smtp-Source: AGHT+IG/oWYG/5D+p98Rp7KAVxRVxjGJs1wOlXg+00mZIUXb5l1hERyUsUPY2xsjzxQExrxEaDi0XA==
-X-Received: by 2002:a05:600c:3588:b0:426:6876:83bb with SMTP id 5b1f17b1804b1-429dd23d80emr16028355e9.17.1723636544378;
-        Wed, 14 Aug 2024 04:55:44 -0700 (PDT)
-Received: from localhost ([37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4f0a7111sm12766566f8f.117.2024.08.14.04.55.43
+        d=1e100.net; s=20230601; t=1723637531; x=1724242331;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PG9e6JitvYXoqzSTP8p6u30qXecQWEzNyRf8++iwfzg=;
+        b=VcJGRAavZ9kDq42UL9eF89GXt0BFSxXjPgdeefYdfjFVn57bADJmGXeAtc46zjue/u
+         +vnz6Pq9SnUWBcEZrUKIFoFb3udOxPWb30R5re0D4Zcfg1KbV4lWVKt/Jkb4sHQlP7mW
+         hZIZ0cXZJcvENpdrvrPgyP/MJId7MWLaU7OG7g5VhulI5rv4Vc9TVI3O5kKL/IK/ONsN
+         IBBgvaWmHpdrxZDLFuy2qwQIc4Stzdxka3l2GfcU5W5X3I+YqlrnL8yoCKy5MMmoHFA6
+         xHEE37vApo7+98UmBraXYJIL0dqPF2JVA/+QanhdZfQOepElYCw2nF+dqcre52ctPozZ
+         iUCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyJzTAGwCEzCNLNTU+/18oFvl6F0u9VUPf8eiSRRwB3ry0iYa9qOOU/H8MCpxQ2NCJb697a5e/G3P77rKHAkyEO1qXQpjM
+X-Gm-Message-State: AOJu0YxZq0E/FYv5hgCBBvMtfjUYcbI3iKAWcxUheIkzPTAym4hB4dh2
+	TMJ5EjPS/Is/R9qslZXjO8IFKhTXWXPCMZK5ItOK9MeY9cMFvmQ40vBlfdHDOT0=
+X-Google-Smtp-Source: AGHT+IEXQhc1DRLmbpucvwdmK1QHHySaNdm9iIXPW0P1dXOgYRVT3R+EtoisglPADmrSMdzG+PAwVw==
+X-Received: by 2002:a05:600c:4710:b0:426:62c5:4741 with SMTP id 5b1f17b1804b1-429dd22fe4dmr18421295e9.2.1723637531117;
+        Wed, 14 Aug 2024 05:12:11 -0700 (PDT)
+Received: from LQ3V64L9R2.home ([80.208.222.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded1e3f7sm18267235e9.4.2024.08.14.05.12.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 04:55:43 -0700 (PDT)
-Date: Wed, 14 Aug 2024 13:55:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	netdev@vger.kernel.org, jiri@nvidia.com, shayd@nvidia.com,
-	wojciech.drewek@intel.com, horms@kernel.org,
-	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
-	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
-	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net-next v4 03/15] ice: add basic devlink subfunctions
- support
-Message-ID: <ZrybPfS9bUtn-N3c@nanopsycho.orion>
-References: <20240813215005.3647350-1-anthony.l.nguyen@intel.com>
- <20240813215005.3647350-4-anthony.l.nguyen@intel.com>
- <Zrxt64Ff5iG1W21p@nanopsycho.orion>
- <ZrxwqMyIyfX1XcPn@mev-dev.igk.intel.com>
+        Wed, 14 Aug 2024 05:12:10 -0700 (PDT)
+Date: Wed, 14 Aug 2024 13:12:08 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>
+Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
+Message-ID: <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>
+References: <20240812145633.52911-1-jdamato@fastly.com>
+ <20240813171710.599d3f01@kernel.org>
+ <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,123 +124,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrxwqMyIyfX1XcPn@mev-dev.igk.intel.com>
+In-Reply-To: <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
 
-Wed, Aug 14, 2024 at 10:54:00AM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Wed, Aug 14, 2024 at 10:42:19AM +0200, Jiri Pirko wrote:
->> Tue, Aug 13, 2024 at 11:49:52PM CEST, anthony.l.nguyen@intel.com wrote:
->> >From: Piotr Raczynski <piotr.raczynski@intel.com>
->> >
->> >Implement devlink port handlers responsible for ethernet type devlink
->> >subfunctions. Create subfunction devlink port and setup all resources
->> >needed for a subfunction netdev to operate. Configure new VSI for each
->> >new subfunction, initialize and configure interrupts and Tx/Rx resources.
->> >Set correct MAC filters and create new netdev.
->> >
->> >For now, subfunction is limited to only one Tx/Rx queue pair.
->> >
->> >Only allocate new subfunction VSI with devlink port new command.
->> >Allocate and free subfunction MSIX interrupt vectors using new API
->> >calls with pci_msix_alloc_irq_at and pci_msix_free_irq.
->> >
->> >Support both automatic and manual subfunction numbers. If no subfunction
->> >number is provided, use xa_alloc to pick a number automatically. This
->> >will find the first free index and use that as the number. This reduces
->> >burden on users in the simple case where a specific number is not
->> >required. It may also be slightly faster to check that a number exists
->> >since xarray lookup should be faster than a linear scan of the dyn_ports
->> >xarray.
->> >
->> >Reviewed-by: Simon Horman <horms@kernel.org>
->> 
->> I don't think it is okay to carry the reviewed-by tag when you do
->> changes to the patch. You should drop those.
->> 
->> 
->
->I changed only warn messages, but ok, I will drop it.
+On Wed, Aug 14, 2024 at 08:14:48AM +0100, Joe Damato wrote:
+> On Tue, Aug 13, 2024 at 05:17:10PM -0700, Jakub Kicinski wrote:
+> > On Mon, 12 Aug 2024 14:56:21 +0000 Joe Damato wrote:
+> > > Several drivers make a check in their napi poll functions to determine
+> > > if the CPU affinity of the IRQ has changed. If it has, the napi poll
+> > > function returns a value less than the budget to force polling mode to
+> > > be disabled, so that it can be rescheduled on the correct CPU next time
+> > > the softirq is raised.
+> > 
+> > Any reason not to use the irq number already stored in napi_struct ?
+> 
+> Thanks for taking a look.
+> 
+> IIUC, that's possible if i40e, iavf, and gve are updated to call
+> netif_napi_set_irq first, which I could certainly do.
+> 
+> But as Stanislav points out, I would be adding a call to
+> irq_get_effective_affinity_mask in the hot path where one did not
+> exist before for 4 of 5 drivers.
+> 
+> In that case, it might make more sense to introduce:
+> 
+>   bool napi_affinity_no_change(const struct cpumask *aff_mask)
+> 
+> instead and the drivers which have a cached mask can pass it in and
+> gve can be updated later to cache it.
+> 
+> Not sure how crucial avoiding the irq_get_effective_affinity_mask
+> call is; I would guess maybe some driver owners would object to
+> adding a new call in the hot path where one didn't exist before.
+> 
+> What do you think?
 
-Well, you changed the pfnum assigment too. Any functional change means
-drop the tag.
+Actually... how about a slightly different approach, which caches
+the affinity mask in the core?
 
+  0. Extend napi struct to have a struct cpumask * field
 
->
->> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
->> >Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
->> >Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->> >Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
->> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->> >Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
->> >Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
->> >---
->> > .../net/ethernet/intel/ice/devlink/devlink.c  |   3 +
->> > .../ethernet/intel/ice/devlink/devlink_port.c | 290 +++++++++++++++++-
->> > .../ethernet/intel/ice/devlink/devlink_port.h |  34 ++
->> > drivers/net/ethernet/intel/ice/ice.h          |   4 +
->> > drivers/net/ethernet/intel/ice/ice_lib.c      |   5 +-
->> > drivers/net/ethernet/intel/ice/ice_lib.h      |   2 +
->> > drivers/net/ethernet/intel/ice/ice_main.c     |   7 +
->> > 7 files changed, 342 insertions(+), 3 deletions(-)
->> >
->> >diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->> >index 810a901d7afd..b7eb1b56f2c6 100644
->> >--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
->> >+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->> >@@ -6,6 +6,7 @@
->> > #include "ice.h"
->> > #include "ice_lib.h"
->> > #include "devlink.h"
->> >+#include "devlink_port.h"
->> > #include "ice_eswitch.h"
->> > #include "ice_fw_update.h"
->> > #include "ice_dcb_lib.h"
->> >@@ -1277,6 +1278,8 @@ static const struct devlink_ops ice_devlink_ops = {
->> > 
->> > 	.rate_leaf_parent_set = ice_devlink_set_parent,
->> > 	.rate_node_parent_set = ice_devlink_set_parent,
->> >+
->> >+	.port_new = ice_devlink_port_new,
->> > };
->> > 
->> > static int
->> >diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->> >index 00fed5a61d62..aae518399508 100644
->> >--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->> >+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->> >@@ -5,6 +5,9 @@
->> > 
->> > #include "ice.h"
->> > #include "devlink.h"
->> >+#include "devlink_port.h"
->> >+#include "ice_lib.h"
->> >+#include "ice_fltr.h"
->> > 
->> > static int ice_active_port_option = -1;
->> > 
->> >@@ -455,7 +458,7 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
->> > 		return -EINVAL;
->> > 
->> > 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
->> >-	attrs.pci_vf.pf = pf->hw.bus.func;
->> >+	attrs.pci_vf.pf = pf->hw.pf_id;
->> 
->> You should do this in a separate patch, most probably -net targetted as
->> it fixes a bug.
->>
->
->It is already on ML:
->https://lore.kernel.org/netdev/20240813071610.52295-1-michal.swiatkowski@linux.intel.com/
+  1. extend netif_napi_set_irq to:
+    a. store the IRQ number in the napi struct (as you suggested)
+    b. call irq_get_effective_affinity_mask to store the mask in the
+       napi struct
+    c. set up generic affinity_notify.notify and
+       affinity_notify.release callbacks to update the in core mask
+       when it changes
 
-Then I don't understand why it is part of this patch. This patchset
-should be on top of the fix.
+  2. add napi_affinity_no_change which now takes a napi_struct
 
+  3. cleanup all 5 drivers:
+    a. add calls to netif_napi_set_irq for all 5 (I think no RTNL
+       is needed, so I think this would be straight forward?)
+    b. remove all affinity_mask caching code in 4 of 5 drivers
+    c. update all 5 drivers to call napi_affinity_no_change in poll
 
->
->> 
->> 
->> > 	attrs.pci_vf.vf = vf->vf_id;
->> > 
->> > 	ice_devlink_set_switch_id(pf, &attrs.switch_id);
->> 
->> [...]
+Then ... anyone who adds support for netif_napi_set_irq to their
+driver in the future gets automatic support in-core for
+caching/updating of the mask? And in the future netdev-genl could
+dump the mask since its in-core?
+
+I'll mess around with that locally to see how it looks, but let me
+know if that sounds like a better overall approach.
+
+- Joe
 
