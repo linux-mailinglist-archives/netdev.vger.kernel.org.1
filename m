@@ -1,238 +1,265 @@
-Return-Path: <netdev+bounces-118287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DDD7951294
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:38:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0089095129C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADB401F24E41
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:38:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B324A28279C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3C31CF8A;
-	Wed, 14 Aug 2024 02:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4557917C64;
+	Wed, 14 Aug 2024 02:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="SRK6Ixpr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ekAO2D2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE2D1E4A4;
-	Wed, 14 Aug 2024 02:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723603082; cv=none; b=aT1KNqhcJU0CmZ5i5wFYd4YxiszcGbcuynYAhHOl2Vh0fWG4jyEzMXovRChvVjfcFk4s4lrICpqXby2tDkyfio7BRQ5oyAPBeuuXoUe5rJ6A/t9VMj4GQjGlK3lAwc21EzSPfzTEpZKYd65iSXprg52h+6u5a1EeMwslHTHdy0I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723603082; c=relaxed/simple;
-	bh=eKIM5ZFdypC0nBgsRBj5o3fYRfWidtgqnbzcMNKdzXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nUWOcPNGInk+Q+BMsY3pwmHN8MVQLXNcKSFOEGMGUKxcblnDOU6CXJkPOYX8/mfUwUxASOxc1j6nPiEqie/ztIXN5GikYP9Jlnky63sZHdggmxzw3OyMgeIZq2NDYwKnbtZXbbSJvHyvs3AyzTovkcj4KSX8mTrSJODPAfrAhis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=SRK6Ixpr; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1723603075;
-	bh=rtvbE0qmkdGcMntdWqvbt6QfVYNElwJh+1J4IukKgFA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SRK6IxprkmRaCIhVc7Di2JTB5pb4JB/QjpXj9vBcmQMIUfGmqcgwgLulX3SmyWNZc
-	 veb5X142/YUarYbbsgV0rUuqSi0Y/sQEvWBfmN5gxCeiT0hfBhkWaVG4DDEW1dwpGz
-	 rLA7KekcStEHV+OMBOw5lSaMkxHhqVfwX53/Q/EtsCH1ekCXFtrdK+0uNzqdgTCwNP
-	 NlmgS+Lm+dkUMCDd+9beCrvO96S9zT+K5Co2/aD6pKl5VuoXXOYXllnVPiyKc/eLNe
-	 gBkLgMmJAd7ThZYIv4ByCVvVUOS1fB0KrX+m5qWE0UKPo+tTNiXLLGuL3nA5aLUH4z
-	 9fM7+5vH33iow==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WkC8z0XTPz4wb0;
-	Wed, 14 Aug 2024 12:37:54 +1000 (AEST)
-Date: Wed, 14 Aug 2024 12:37:53 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Christian Brauner
- <brauner@kernel.org>, bpf <bpf@vger.kernel.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <20240814123753.70dd1389@canb.auug.org.au>
-In-Reply-To: <20240814014157.GM13701@ZenIV>
-References: <20240814112504.42f77e3c@canb.auug.org.au>
-	<20240814014157.GM13701@ZenIV>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2AE381BD
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 02:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723603362; cv=fail; b=fDxX3ukOixkFhHDEq64l5bzMzhAcl+h0KMvl31AzR55d1CKDEY5EGivLkn2oew1y9o7ajfnA5ERDlbmMjImOfHtguvUVccc3GBwS8CmGX0GrAo/cDZgmOES6qnN5gwrNIjRSYRDb15AKBCwlzMPjlk7hqv/1BavrQakEiYQ7/wM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723603362; c=relaxed/simple;
+	bh=x4YHL208ymluSZmxG59HNfriXMPkyNMgtdbtPvJwHg8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=TNnjSghnm/Gxm7tcdXNvq0l/Qwh9TQpc/i4emIylJAWS+VX2KhPxEvliRaI5CZLVYT1CxrnJlq1BU5DmYdgpc1CaM/ywzRrRYVDr6MGI/qfVh3NI27D8CeN7vV26cNWY6PTmNvMf23X/eIgTGd58jRy2VSnWXWmKr+ABHRHVR2k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ekAO2D2L; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723603360; x=1755139360;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=x4YHL208ymluSZmxG59HNfriXMPkyNMgtdbtPvJwHg8=;
+  b=ekAO2D2LDs2pjE3Z+DgtKg3FcOXcOoC2vdiApdhALNc/eFHx82TmJv0w
+   937DfaiU4Pv3/lt/w6B6ivJu/bFChY1FYQeVsMRivFdkQ6LVdr/JLLAis
+   P5HefXHdIuJWiu+1HV48k3oYnoqSISvg4e8i2T2oa6Jo3YXskTo99u7iF
+   pOeF7jAzg9OHRc8Gu4rytIWz2kwZerFApR/kzV/1ikPA7zyJqub5dp+pw
+   KQ9KNOWLTuvDfykVcC+l+Hn8rpnda55q4kDBP+IZdYXC/aXb4BWVrt8cn
+   +BKHoX9hwqvRlUpgC7v4gjDQXdGRO2iIsztBrCUgMhxa5yEtk3UZdIJ8u
+   A==;
+X-CSE-ConnectionGUID: MkmyVlqOR1qvWx7cUTQkDA==
+X-CSE-MsgGUID: KzUnYFN9Rxm/vCGQFSVW9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="25662118"
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="25662118"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 19:42:40 -0700
+X-CSE-ConnectionGUID: O3+jtLQIQfSvAtAVKiITcg==
+X-CSE-MsgGUID: v3BCspXoR9qdQTbY0LImQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="89550356"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Aug 2024 19:42:40 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 13 Aug 2024 19:42:39 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 13 Aug 2024 19:42:38 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 13 Aug 2024 19:42:38 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 13 Aug 2024 19:42:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BUH9qKh3mlgfOh4LdWor4ag7IVTqn/ce21EsrXssWn2DWOD3hR3CUrxqtecVpPF/qMvc2qOMqFiGGJj+Aq56gwRYLHeTUM9hgxpz3EB8PhCzJ2VDy+kQQMATN9P3dieiqvtExHi76t1cv1E3RTlF+fmAEFYcQXMi1LadlTe1heTKt7lXf1RvnJ5zRAZ8NU2/hvzc39g2LckAzTCxsspvkwDU1q/G8MAlCnlKXj6w35wVPeTMMKYHENE/O/wgwjiPK1Qoj3JL8QCJec+VPxoWYIbycFHn2wYlZSC0Pd7Db2Wlk0FEVtnRwCJl4eiizloSqgQTsE0qt5Xru5n0TAbIow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x4YHL208ymluSZmxG59HNfriXMPkyNMgtdbtPvJwHg8=;
+ b=agXvuoapi2yLzX5DwVCsngyG8p1vSfkd+BgGmO7FqAtaLrcuJUPplWqqjFAqsBze+xIsDANzO43nx20lM5MAYNpnWk38DFD60fqfU0Rey/vUbbZ8MY1MaKTQz8cvI5egtl0ca0bvdv+RRQGxQG7CbJRD+KfXi4U89OT5sKxKyUwLmnBeo3CD6yz6PiAV0bCawHtme04n1HRBomlxnmyMiN6vXI2kTcVwyhRKQ2IinHiTADZyDh+MTwVkKT1OAUnSp2NxdgVae8GDdrKmASrJyeU+sR68JJ7kAV52TNs4pUqvVfuS9K4Oz7trEuvb97UrwaIwfk4pS3Q/UDAR8kZYQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB8313.namprd11.prod.outlook.com (2603:10b6:610:17c::15)
+ by MW6PR11MB8438.namprd11.prod.outlook.com (2603:10b6:303:241::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 14 Aug
+ 2024 02:42:35 +0000
+Received: from CH3PR11MB8313.namprd11.prod.outlook.com
+ ([fe80::3251:fc84:d223:79a3]) by CH3PR11MB8313.namprd11.prod.outlook.com
+ ([fe80::3251:fc84:d223:79a3%5]) with mapi id 15.20.7828.024; Wed, 14 Aug 2024
+ 02:42:34 +0000
+From: "Rout, ChandanX" <chandanx.rout@intel.com>
+To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bjorn@kernel.org"
+	<bjorn@kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, "luizcap@redhat.com"
+	<luizcap@redhat.com>, "Kuruvinakunnel, George"
+	<george.kuruvinakunnel@intel.com>, "Nagraj, Shravan"
+	<shravan.nagraj@intel.com>, "Pandey, Atul" <atul.pandey@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net 3/3] ice: fix truesize
+ operations for PAGE_SIZE >= 8192
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net 3/3] ice: fix truesize
+ operations for PAGE_SIZE >= 8192
+Thread-Index: AQHa6LhleZ3s6xhViEK7blc8BZx2Y7ImFS6Q
+Date: Wed, 14 Aug 2024 02:42:34 +0000
+Message-ID: <CH3PR11MB831365B031718C0DBF32FDB0EA872@CH3PR11MB8313.namprd11.prod.outlook.com>
+References: <20240807105326.86665-1-maciej.fijalkowski@intel.com>
+ <20240807105326.86665-4-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240807105326.86665-4-maciej.fijalkowski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR11MB8313:EE_|MW6PR11MB8438:EE_
+x-ms-office365-filtering-correlation-id: 2ac7fd44-13e5-4a02-c54e-08dcbc0ac051
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?2sWblByZK5/oYYWZNXpYAx5rO/oBsClcAbPcWvus3adibxzX6Sb4LCjPVjib?=
+ =?us-ascii?Q?j1UqjjY3K0Ynf2BnQuTy6F+51RG4EoDqKLDYGI1YtGBiZE76oEdINN0jVl98?=
+ =?us-ascii?Q?x8M7nDKfDE/S8uv5d4kgSFfzD8LYPWNCkWVubc+WaTYQJo/3jKQ7RLLYjxDe?=
+ =?us-ascii?Q?3C5dEoAHqnKHIWT+JEQ8j8UUuwfnaABDZ9h+BDX9jRsam5gzYQX3God0oIw+?=
+ =?us-ascii?Q?sopHvaQalFafGGZ098Yi6N1bQyjWaUwsKD7ExhtLqvMY+IpEI1BN2CcY3UHY?=
+ =?us-ascii?Q?v445SDEKDnEeAsfCJX483+rh+3vCgQ+p4ywD0URB5MiPDLVcwAeAaw4F+K5Q?=
+ =?us-ascii?Q?BRBq1wlD0DJm7Kqr3aR14EfzBkjOq/XcEx2UXX0uZS1Hemi16q8FahAfzVGR?=
+ =?us-ascii?Q?C16aZt5bKBnwFwHMGhixo9qDU8RP1lctO9s52+fdhSlA9/rCLZ/kHBvSTGjE?=
+ =?us-ascii?Q?8Ap04rIlNwLbAyD/DvkkYmzqGWsXoPSU+LIq5jhaP0nBWxTQk042GCk/Kz+j?=
+ =?us-ascii?Q?VkC9K1dXI/C700X6ag1pcf3dqGXDXrwAUGTqK1kMwCBmXTtMn6dAhLt73Pw+?=
+ =?us-ascii?Q?CpkeovrNtBe60HQvMThPYbOzV2oeiRqYZg2AoN7BtNlrBzy9QJPOHPX4YroG?=
+ =?us-ascii?Q?USEZHaknXZpFXagQJSNIy1J+jCGNymokwX9qusNQq/qtrog/EumdNJh1tBIx?=
+ =?us-ascii?Q?+qHRIbFl63Xs72l0skvzlkzzSF+YWPOZmC5hHz7I1jFlfwyKQCdjGQOZiJW9?=
+ =?us-ascii?Q?FEhee2k6rUV2rr9aYSm1cvP/wDIuJjYN+MozlD1DYa4wFEIsuqcmTlNkciEt?=
+ =?us-ascii?Q?i6o6fDQplb36tokmZr+kV2tz82FL3Oq5naObXH0YWInP+nPToEUzMewr2EDT?=
+ =?us-ascii?Q?exfIOP8763xZKuw2MCrYPlUclHRg63BQpBNjMNjnWoA5yZKSx4ONTYbTtWap?=
+ =?us-ascii?Q?HT0EmX14HyCPlO7SxpJ4CHOKhfDkYJ/bpOJCjS/gWkPKkKMTniJAi5FR00Ml?=
+ =?us-ascii?Q?vb8bmFMqL+w7QxNv5akVP6OpyzVCvQesPnaxTmJcnT7haiV8B3N5i71NgRwY?=
+ =?us-ascii?Q?Wrsg+KFtefK/STLccGoeuKq0MW+hdpOX/SSnHilfNro4FdQABG+CyN/wtvwA?=
+ =?us-ascii?Q?HL4VTjHflDlUPghfREvC083lJFaUz23dgKFsCFCmjFwMstL4I8Uz2rU0JhLx?=
+ =?us-ascii?Q?NcsblFFmRuhQeZY5ulW+MCd3dkVqmL8qpdyGRlcFb2LwiV+DbtArcmw15LFL?=
+ =?us-ascii?Q?JDBISuCcguQm2hYDbyJG0PaAX46oMWN/kHyg64i81Woq1oD/89tVjMXYC4TC?=
+ =?us-ascii?Q?sg006nSeJRr8SNIkKSauDxkFizS76MEzGg1+n3T+2RszGj3tbVi2NkdoheTD?=
+ =?us-ascii?Q?Bl6Q7Ek=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8313.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cPYEzdADYuFH7k/CxDdRPllEb5vIIY0ZQngIqIq/rAhwYudwkf4zZR2OvzSL?=
+ =?us-ascii?Q?V4XLDEJ02OSCIsOD+aRnd+LUytH7aee+FiweFy95vO98KIgjPxiDskzKu1pX?=
+ =?us-ascii?Q?QYMUCL8GgH39MksfpXQFPTgenCGUNkfHJ5vAKCy9ySyjqOqoG0opCF1RRiiP?=
+ =?us-ascii?Q?x6xRdTetKWfQhrS34RPiaSZgCeEpHE9o7OnrbpFXsM1FpCdgqP2/v9j154f+?=
+ =?us-ascii?Q?+lI39kAEC648ZyVRrvoTGfENzsR+zrhzc6qSJMmka9lOsXBbQAf3klweNGes?=
+ =?us-ascii?Q?NcB+VVhPqvQI1nwurAmdn7v2cZ35DhfT+ujVMd7IkCXuI/7sK8xa5DgqqTv3?=
+ =?us-ascii?Q?/l5rEtroafQ9mJ9ZdSrjE5o8uK7vm1WLhYD//E8/7hyLdDd7OjAgKxyPXeNW?=
+ =?us-ascii?Q?x7Xyt2xkvkulRNihZzSXgx0kYixqNYc98O9p09pHiTsC+XSvWiEAOGP5L8E/?=
+ =?us-ascii?Q?Qj4H4Yql/8P39Mms5lQTeo1bmk3dDilo4LbYln2JRSQspeKahTRn0LiTaldK?=
+ =?us-ascii?Q?SuNX+Uj53GXlq+GXx2Q1CUiSC22p/o8K9ff3gO27RYb9lhgVFGyp1GOM7ajQ?=
+ =?us-ascii?Q?hrZ+u9I5tkHtXEmCnnfBkEl9dfU+bU+5Dk8w6mF0Adg947IOxsmjIQpPt2Dm?=
+ =?us-ascii?Q?DPhQO4v/kxYsftttPmLHTb964Yc4fukwioWBvYAD+nvPTQKF4l7wmvgrIpor?=
+ =?us-ascii?Q?j+tFtWDqwUaE4uarDG2vIsiRmegAadpwqCTknhbsywNOIbjeFWjY2YPd2M+N?=
+ =?us-ascii?Q?EX1ilqpiXFATIjY9pbhOJ2mnyFmLvh+rwc0tCjVAAogrQCAWIQA9rcqacyj6?=
+ =?us-ascii?Q?OE6qVwOVtcvWMojactVyR0+bA3QWAThO+9Nx7L+uHdIQ6OD+x84ePx8iqoue?=
+ =?us-ascii?Q?4ohTgOZfVSxWTelUkGpyTqWsbUvehnXtN9YBOWV0OzIR0+cP1eppVTfFQJfl?=
+ =?us-ascii?Q?0b/DCYuelyNXiNVbKHXDLGtXfX9aNFfrg8ndLWaXOXnpa9iaeSbd5mYLHLtJ?=
+ =?us-ascii?Q?rFrMJ3cfuuDqRctIy3b909cGyMCZ5pPmjtN5Omzz+KozZm4b7A5sFQeXmR+a?=
+ =?us-ascii?Q?u76EjEKJrifFURoJiDaowXxMepnl6DOjyhATNQnjltof2n0iGVRWtoI8Jixy?=
+ =?us-ascii?Q?+uxQAdCxFepeLXrQ+30WMkQuVwZ+H0F3+mYzhz5ldPHfpQJEc7rp69xIuJ1Y?=
+ =?us-ascii?Q?IgVwbXW3c0nfDUXXEIfShL/T5k0hvp1aUwWPy3mIj4UHb0WOuHetfkbFKEfX?=
+ =?us-ascii?Q?qHwkwQH4BcvHin75+mL6X0tN0B6d1NrBqTHn4/8FmrJ2G+OYvzaHoxjg64sS?=
+ =?us-ascii?Q?56VlfFjEPLL2nSEkyqVlV8iNp+6wx5vAt+mXeJIOJIZGxdKvbt8GtPT5cnzr?=
+ =?us-ascii?Q?qEKNdQu5OApMyHClzVtVQsfPakFGrZ69tjz1VnfY8V9rJbFKi3yuJOtQq9+d?=
+ =?us-ascii?Q?QBM4EP7Lqi93KPPBPdWpfPRzV6fwXzhjhDiZMrOMcvLqCNhd+wGwu65vEw25?=
+ =?us-ascii?Q?HnRzClEXTHdWmrvOwwHaLJ2YdqyTmb8GFQD+ak1s6Du9QE7aWoccTBBwGC71?=
+ =?us-ascii?Q?n+ZHiMgbFcIR2z/4RvnLmPbn2HPcVmb6Fri+Jhqr?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ztEVtAiiMi3qbUtUcPVWd.+";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8313.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ac7fd44-13e5-4a02-c54e-08dcbc0ac051
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2024 02:42:34.1508
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jfKrJ453gTxxwhpdIByKoD4bFrk1XNycMwbMmtlQ721RwV3XE1SGuSPnKZXK67Uk6J2Fhiw8bzC4hkTCs6j+tA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8438
+X-OriginatorOrg: intel.com
 
---Sig_/ztEVtAiiMi3qbUtUcPVWd.+
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi Al,
 
-On Wed, 14 Aug 2024 02:41:57 +0100 Al Viro <viro@zeniv.linux.org.uk> wrote:
+>-----Original Message-----
+>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+>Fijalkowski, Maciej
+>Sent: Wednesday, August 7, 2024 4:23 PM
+>To: intel-wired-lan@lists.osuosl.org
+>Cc: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>;
+>netdev@vger.kernel.org; bjorn@kernel.org; Nguyen, Anthony L
+><anthony.l.nguyen@intel.com>; Karlsson, Magnus
+><magnus.karlsson@intel.com>; luizcap@redhat.com
+>Subject: [Intel-wired-lan] [PATCH iwl-net 3/3] ice: fix truesize operation=
+s for
+>PAGE_SIZE >=3D 8192
 >
-> On Wed, Aug 14, 2024 at 11:25:04AM +1000, Stephen Rothwell wrote:
-> >  	if (at_flags & AT_EMPTY_PATH && vfs_empty_path(dfd, pathname)) {
-> >  		CLASS(fd, f)(dfd);
-> > -		if (!f.file)
-> > +		if (!fd_file(f)) =20
->=20
-> 		if (fd_empty(f))
->=20
-> actually, and similar for the rest of it.  Anyway, that'll need to be
-> sorted out in vfs/vfs.git; sorry about the delay.
+>When working on multi-buffer packet on arch that has PAGE_SIZE >=3D 8192,
+>truesize is calculated and stored in xdp_buff::frame_sz per each processed=
+ Rx
+>buffer. This means that frame_sz will contain the truesize based on last r=
+eceived
+>buffer, but commit 1dc1a7e7f410 ("ice:
+>Centrallize Rx buffer recycling") assumed this value will be constant for =
+each
+>buffer, which breaks the page recycling scheme and mess up the way we
+>update the page::page_offset.
+>
+>To fix this, let us work on constant truesize when PAGE_SIZE >=3D 8192 ins=
+tead of
+>basing this on size of a packet read from Rx descriptor. This way we can s=
+implify
+>the code and avoid calculating truesize per each received frame and on top=
+ of
+>that when using xdp_update_skb_shared_info(), current formula for truesize
+>update will be valid.
+>
+>This means ice_rx_frame_truesize() can be removed altogether.
+>Furthermore, first call to it within ice_clean_rx_irq() for 4k PAGE_SIZE w=
+as
+>redundant as xdp_buff::frame_sz is initialized via xdp_init_buff() in
+>ice_vsi_cfg_rxq(). This should have been removed at the point where xdp_bu=
+ff
+>struct started to be a member of ice_rx_ring and it was no longer a stack =
+based
+>variable.
+>
+>There are two fixes tags as my understanding is that the first one exposed=
+ us to
+>broken truesize and page_offset handling and then second introduced broken
+>skb_shared_info update in ice_{construct,build}_skb().
+>
+>Reported-and-tested-by: Luiz Capitulino <luizcap@redhat.com>
+>Closes: https://lore.kernel.org/netdev/8f9e2a5c-fd30-4206-9311-
+>946a06d031bb@redhat.com/
+>Fixes: 1dc1a7e7f410 ("ice: Centrallize Rx buffer recycling")
+>Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
+>Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>---
+> drivers/net/ethernet/intel/ice/ice_base.c | 21 ++++++++++++++-
+>drivers/net/ethernet/intel/ice/ice_txrx.c | 33 -----------------------
+> 2 files changed, 20 insertions(+), 34 deletions(-)
+>
 
-So from tomorrow, the two merge resolution patches will be these:
+Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worke=
+r at Intel)
 
-rom: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Wed, 14 Aug 2024 11:07:38 +1000
-Subject: [PATCH] fixup for "introduce fd_file(), convert all accessors to i=
-t."
-
-interacting with "fs: allow mount namespace fd" from the vfs-brauner tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/namespace.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/namespace.c b/fs/namespace.c
-index 159be8ed9d24..7aed325c48ad 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -5292,13 +5292,13 @@ static struct mnt_namespace *grab_requested_mnt_ns(=
-const struct mnt_id_req *kreq
- 		struct ns_common *ns;
-=20
- 		CLASS(fd, f)(kreq->spare);
--		if (!f.file)
-+		if (fd_empty(f))
- 			return ERR_PTR(-EBADF);
-=20
--		if (!proc_ns_file(f.file))
-+		if (!proc_ns_file(fd_file(f)))
- 			return ERR_PTR(-EINVAL);
-=20
--		ns =3D get_proc_ns(file_inode(f.file));
-+		ns =3D get_proc_ns(file_inode(fd_file(f)));
- 		if (ns->ops->type !=3D CLONE_NEWNS)
- 			return ERR_PTR(-EINVAL);
-=20
---=20
-2.43.0
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Wed, 14 Aug 2024 11:20:43 +1000
-Subject: [PATCH] fixup2 for "introduce fd_file(), convert all accessors to =
-it."
-
-interacting with
-
-  1a61c9d6ec1d ("xattr: handle AT_EMPTY_PATH when setting xattrs")
-  278397b2c592 ("xattr: handle AT_EMPTY_PATH when getting xattrs")
-  5560ab7ee32e ("xattr: handle AT_EMPTY_PATH when listing xattrs")
-  33fce6444e7d ("xattr: handle AT_EMPTY_PATH when removing xattrs")
-
-from the vfs-brauner tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/xattr.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/fs/xattr.c b/fs/xattr.c
-index fa992953fa78..c0ecd0809172 100644
---- a/fs/xattr.c
-+++ b/fs/xattr.c
-@@ -829,10 +829,10 @@ static ssize_t path_getxattrat(int dfd, const char __=
-user *pathname,
-=20
- 	if (at_flags & AT_EMPTY_PATH && vfs_empty_path(dfd, pathname)) {
- 		CLASS(fd, f)(dfd);
--		if (!f.file)
-+		if (fd_empty(f))
- 			return -EBADF;
--		audit_file(f.file);
--		return getxattr(file_mnt_idmap(f.file), file_dentry(f.file),
-+		audit_file(fd_file(f));
-+		return getxattr(file_mnt_idmap(fd_file(f)), file_dentry(fd_file(f)),
- 				name, value, size);
- 	}
-=20
-@@ -949,10 +949,10 @@ static ssize_t path_listxattrat(int dfd, const char _=
-_user *pathname,
-=20
- 	if (at_flags & AT_EMPTY_PATH && vfs_empty_path(dfd, pathname)) {
- 		CLASS(fd, f)(dfd);
--		if (!f.file)
-+		if (fd_empty(f))
- 			return -EBADF;
--		audit_file(f.file);
--		return listxattr(file_dentry(f.file), list, size);
-+		audit_file(fd_file(f));
-+		return listxattr(file_dentry(fd_file(f)), list, size);
- 	}
-=20
- 	lookup_flags =3D (at_flags & AT_SYMLINK_NOFOLLOW) ? 0 : LOOKUP_FOLLOW;
-@@ -1018,9 +1018,9 @@ static int do_fremovexattr(int fd, const char __user =
-*name)
- 	int error =3D -EBADF;
-=20
- 	CLASS(fd, f)(fd);
--	if (!f.file)
-+	if (fd_empty(f))
- 		return error;
--	audit_file(f.file);
-+	audit_file(fd_file(f));
-=20
- 	error =3D strncpy_from_user(kname, name, sizeof(kname));
- 	if (error =3D=3D 0 || error =3D=3D sizeof(kname))
-@@ -1028,11 +1028,11 @@ static int do_fremovexattr(int fd, const char __use=
-r *name)
- 	if (error < 0)
- 		return error;
-=20
--	error =3D mnt_want_write_file(f.file);
-+	error =3D mnt_want_write_file(fd_file(f));
- 	if (!error) {
--		error =3D removexattr(file_mnt_idmap(f.file),
--				    f.file->f_path.dentry, kname);
--		mnt_drop_write_file(f.file);
-+		error =3D removexattr(file_mnt_idmap(fd_file(f)),
-+				    fd_file(f)->f_path.dentry, kname);
-+		mnt_drop_write_file(fd_file(f));
- 	}
- 	return error;
- }
---=20
-2.43.0
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/ztEVtAiiMi3qbUtUcPVWd.+
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAma8GIEACgkQAVBC80lX
-0Gx73wgAmH056FTl+Z9ypBghIBS6OubaRQkj2+EkE0wc9T2KOMhMfdE4JvHztvKU
-4kuaozw7ZzMiQLU08SURs/aB2xD7MOMlfskCbOwXghprenlDWZd5uogIEP6ZziAy
-99EnKYPFGM40JvQWymnkBo370/6HdiXNTS4Jdf/ouUKqY/PUtye0QEAvUT9/MTQT
-Z3mbXiu73KxyFTQHAhvhwqaMkVGtC4AVQvwkx5p9pJJr1OOvA4YmT3okYDtCP8cK
-yAPjMq7jDJJRLvfLTJ92ZOcMHrmPAYJKXLZAEst9EHWbYzmlQzxWeHrnPrzw53RO
-H977Wp0sEw8ordknMhH7qZXGu9jIJg==
-=TtEj
------END PGP SIGNATURE-----
-
---Sig_/ztEVtAiiMi3qbUtUcPVWd.+--
 
