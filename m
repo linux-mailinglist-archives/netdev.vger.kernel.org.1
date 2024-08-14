@@ -1,133 +1,123 @@
-Return-Path: <netdev+bounces-118270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26D59511E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:12:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814E39511FF
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B4161C2133F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:12:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B424F1C21363
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F701864C;
-	Wed, 14 Aug 2024 02:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE99A1369B1;
+	Wed, 14 Aug 2024 02:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E91PY0Qh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sY0sKfd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B661CD06;
-	Wed, 14 Aug 2024 02:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5C8768EC;
+	Wed, 14 Aug 2024 02:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723601523; cv=none; b=dYr9w9L6fA4BgYXEkR5LuRbkvkXr3QSzIaFqMXN2oS1uU3diQVxXhMunHB7lCxRN2SJfy34n0PCAYj5UPDmyE6DRilUqcziJfyRG1iNLFJAvV1tQ7cVuUbna2zbBIGkVbOpp9DBNERi7oZQAmnNPK3VrZOK3ivTrkIxgWfS2LcY=
+	t=1723601705; cv=none; b=swZ3IqxfAPu2VFA8IS8YH1Q0eOqz/H6njuO+5c2WC0iwTHhhP147CpSFAT49dypeRWxbCej4EcHC/8XqaSkVB7C4dAIPjBXpSf723kJ5c34SC2VZKJcrl575E64yrRhm3cMPv59itTDfIUk25PxNYzSFo/4/7365iXfgTK3KqQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723601523; c=relaxed/simple;
-	bh=qjWNxatVepm9lmO+9FgXCva7g5Nu5Dg8pKaKKJ0IaZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UE+keru5zwvK/obBDWl70QIGFogcd5vhY/16npg6qoPiMdSeSiwQA53rdGcllKgrwwCqThANzGxMcQueGlsXzLMz7QpxXaSMTs2jV2pK+kppjBq4LM/34/kA6P3tCIB+4Jgp8sRwEyCh+hL4Xv0EwgOL5TAwZiKXgjJq0WParWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E91PY0Qh; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-710ffaf921fso305290b3a.1;
-        Tue, 13 Aug 2024 19:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723601521; x=1724206321; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wgQt2+VGAGY/RroWfxhoKY1UxciJC2B6QVwLu16mYH0=;
-        b=E91PY0QhHecGN+fgsE0mKtaSMJ6kZAsP2oeXqOaRbPggPOB9zG7ymvfkPNbq+8OtdV
-         h8Cl9EimMTbDGJARLJXkBTRGqWM/SHz6W3WD+y9I0Os1iYn+w6R3FPpOWYWHB0E/SMgn
-         DwUsxo2XgY/YrZtRz1Drlf1H2f3gyYwxWEN0KCBwr6ZXH9TexacY9w9omipvWdU2SYFU
-         yB0PMU3nugGJ9XCwbv8Yv1qh35KwbWCo/6ZRH+orieN+vmaeYN3GRHjHuVh3rlS9D5iS
-         t+lHjS4mhWpzrj9TYPfBaCZvFzsgQUWYLLTVdOaHUegc0/wPa+7BBT8xNGQjAtBMEkrH
-         JBlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723601521; x=1724206321;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wgQt2+VGAGY/RroWfxhoKY1UxciJC2B6QVwLu16mYH0=;
-        b=lppxgbgSD/d57dHFGCk4IJkn5MpFdWWeZ+tn+8SmEKs6f8tAWyK4yjefV/StvCDg9p
-         +JWVuayv8KWu9Oz7bMRvx5MPtzgwcpaCMCcEEWwT1ZGKKxYWDFahE59bAqDNLLDJBR91
-         0gefCxhBYjQxnti03DrkF0q0qAA2xNTgn4iS2REklphZXErzZ7w34UjaQA/tmYMUj2M1
-         A9mAAnm1qCB71rY5kCvek2OYKpsRK8IfAhwfOIkb/KmxkCb0b5ZXqxB6cSmVrnZeYdCT
-         RQYcKYe70ZcrfNwiRwtkFhV8XlHaAIZ9pfdyGh9UPuzBkr7sC+VGrZp4K+nDyqcwIP9k
-         GYBA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdS5Y2xZzA/mmENx2jH9pGzOuVINHio1Zp7WB2I5mYExPHBMSwPCx90p6pRoZv9vBi7y1TlHhHiQU3BcUSdPae7zTlWW/y0EPlbN+c+sLsKa+mic/7nM0sWM2P8qPru+6lcbfonLkBim3W00PGMOxMHm1ok/G2F8fXRF/gRwJgmWnVoCcV
-X-Gm-Message-State: AOJu0YzePsbIPRlldkuIgrwZlk7QYNqcFTu0M7NO5IfqR1bXOneBsOaA
-	Vw7slS8KeZUfOUYQ6E8seprpjmoTWexztRLBrhBx/liZ3rqxAQTk
-X-Google-Smtp-Source: AGHT+IE+JEWKhfRkf5F4tu2TR4+I4T+y1Sh8oOhAQItB9Y0LNz4oM5JPDKC3DoLO2lBxGaMuMQmtkw==
-X-Received: by 2002:a05:6a20:c889:b0:1c4:779b:fb02 with SMTP id adf61e73a8af0-1c8ee9c68fcmr1101408637.21.1723601520808;
-        Tue, 13 Aug 2024 19:12:00 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a99acsm6363636b3a.71.2024.08.13.19.11.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 19:12:00 -0700 (PDT)
-Date: Wed, 14 Aug 2024 10:11:48 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>
-Subject: Re: [PATCH net] selftests: net: lib: kill PIDs before del netns
-Message-ID: <ZrwSZGj-BgJJADaG@Laptop-X1>
-References: <20240813-upstream-net-20240813-selftests-net-lib-kill-v1-1-27b689b248b8@kernel.org>
+	s=arc-20240116; t=1723601705; c=relaxed/simple;
+	bh=1DN7OE4XKRCrfF9fvqikmkCbAY0PdivoPjLfcJKBRFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NAbB5oAOpV/rR0j74YokQXvxOaUtefUnupa6pO4h1nO89ewn4hDoBZUtOIdm54zEhACblFRIqsN/yjGzOaK6+KViz0Sb427Yjfms8vHDggVlumA6MJfPvqOoW08LPjunh8H1jWAyCofWF2HkIR8D1BMvemcmKCmmmCXNTIpDnRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sY0sKfd9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33CDC4AF09;
+	Wed, 14 Aug 2024 02:15:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723601705;
+	bh=1DN7OE4XKRCrfF9fvqikmkCbAY0PdivoPjLfcJKBRFg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sY0sKfd9CqRoSZJ8dOOrBwTMGCddSvHMg9MLlKN8r/1KaUQ+HOlyl2vd/A+av9Xe6
+	 3zpEF3guwoa2C9tJPmI7OAI8uqJBrMZqPfR5VZq9RYNWvXqFnaMt9bpPfmrucHuiiN
+	 j8oMWDSISisv9Vq+cwH33wUhGL2g1vSFt+5+yhga4gwv9sYW6uC2kvQeRLc6fKNrKy
+	 hkSPS58ri7r/7aao1+aZklMjnimri5+iQfiLfbeqRBuMgDifeM6ip/xW2+oiol/3a0
+	 sdMkyDeRYkufpkCutOnHKykr7iyxs0r67LUhZpZRjuGVoDsF/Ajk34j7ZcCBRtcZcQ
+	 7BFrmP+eREIDw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Heng Qi <hengqi@linux.alibaba.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 09/13] virtio-net: check feature before configuring the vq coalescing command
+Date: Tue, 13 Aug 2024 22:14:40 -0400
+Message-ID: <20240814021451.4129952-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240814021451.4129952-1-sashal@kernel.org>
+References: <20240814021451.4129952-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813-upstream-net-20240813-selftests-net-lib-kill-v1-1-27b689b248b8@kernel.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.10.4
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 13, 2024 at 03:39:34PM +0200, Matthieu Baerts (NGI0) wrote:
-> When deleting netns, it is possible to still have some tasks running,
-> e.g. background tasks like tcpdump running in the background, not
-> stopped because the test has been interrupted.
-> 
-> Before deleting the netns, it is then safer to kill all attached PIDs,
-> if any. That should reduce some noises after the end of some tests, and
-> help with the debugging of some issues. That's why this modification is
-> seen as a "fix".
-> 
-> Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-> Acked-by: Mat Martineau <martineau@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  tools/testing/selftests/net/lib.sh | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-> index d0219032f773..8ee4489238ca 100644
-> --- a/tools/testing/selftests/net/lib.sh
-> +++ b/tools/testing/selftests/net/lib.sh
-> @@ -146,6 +146,7 @@ cleanup_ns()
->  
->  	for ns in "$@"; do
->  		[ -z "${ns}" ] && continue
-> +		ip netns pids "${ns}" 2> /dev/null | xargs -r kill || true
->  		ip netns delete "${ns}" &> /dev/null || true
->  		if ! busywait $BUSYWAIT_TIMEOUT ip netns list \| grep -vq "^$ns$" &> /dev/null; then
->  			echo "Warn: Failed to remove namespace $ns"
-> 
-> ---
-> base-commit: 58a63729c957621f1990c3494c702711188ca347
-> change-id: 20240813-upstream-net-20240813-selftests-net-lib-kill-f7964a3a58fe
-> 
-> Best regards,
-> -- 
-> Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> 
+From: Heng Qi <hengqi@linux.alibaba.com>
 
-Thanks for the fix
+[ Upstream commit b50f2af9fbc5c00103ca8b72752b15310bd77762 ]
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Virtio spec says:
+
+	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
+	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
+	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+
+So we add the feature negotiation check to
+virtnet_send_{r,t}x_ctrl_coal_vq_cmd as a basis for the next bugfix patch.
+
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/virtio_net.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 5161e7efda2cb..08a83944dcc0a 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3172,6 +3172,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
+ {
+ 	int err;
+ 
++	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
++		return -EOPNOTSUPP;
++
+ 	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
+ 					    max_usecs, max_packets);
+ 	if (err)
+@@ -3189,6 +3192,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
+ {
+ 	int err;
+ 
++	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
++		return -EOPNOTSUPP;
++
+ 	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
+ 					    max_usecs, max_packets);
+ 	if (err)
+-- 
+2.43.0
+
 
