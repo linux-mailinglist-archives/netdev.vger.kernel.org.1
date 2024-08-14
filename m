@@ -1,177 +1,179 @@
-Return-Path: <netdev+bounces-118427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BF295190E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:39:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A641951914
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B01D81F2468A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:39:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87F81B20D13
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47CA41AE02D;
-	Wed, 14 Aug 2024 10:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD401AE046;
+	Wed, 14 Aug 2024 10:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2Sm+F81"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DD7OpIbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE3B1AE030;
-	Wed, 14 Aug 2024 10:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0051AE030
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723631855; cv=none; b=B0oTCgG6plVuClLsTzWbPlL80VqhykUO18dZsHkr223a88EWtouEHEuYrRPS1c+fpPUKq8O7i40RRWolhXGB7kHKUybMFriQq2rzmp//yNJtiqkGUXMHny0D4+S/ChIz7DuPc4zUYgZvG4D4O0073B8RhF8cs1MB+juxXLahnDw=
+	t=1723631888; cv=none; b=dm1eaXk6AkDUtP7I48+wjXkMuX1QCBbztCMO9kXWpAOjzKAMcqv1z8LhjixcgJj+I8StiE9RLEn9KS8XZsYY1Z0iKl+/jHnbcLKz9ZH3SSY5yYbmiwHmf4jviWaDTlp/vvhAuYKk9NACvUun/igVrWxDab+SyS8TGbqaeHShCN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723631855; c=relaxed/simple;
-	bh=lIDZfIJCwS9kOpHOYSU0fUk1LBYFw3wNKq7zRpsW9ZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JSo5A9bGxobEJ58Pt1OzZ5n67gSuzG/huKTQBgoK0sYcpOt3kQi0Nzomc931TKwwcIrkJO+UVQS9rH+E0m399THx262EGQwJnjhl2wfGdr4UAWqvbGQRZQUtdHtqgenzdj9/DnpXZamkQT6R/yb6l20XrVCjPZLik1396erBV3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2Sm+F81; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7a1be7b5d70so497396a12.0;
-        Wed, 14 Aug 2024 03:37:33 -0700 (PDT)
+	s=arc-20240116; t=1723631888; c=relaxed/simple;
+	bh=BjLFDKJyMJol4iq7ns3l6PNcv2TAWojsCWm8EzURTP8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=huqeIjSu1JY/rsXi1ys+4XjfIZg6uJ2UnOA9T40afjNfc3U6GTzi7JT2sGG/rCyxrXHOoni77hu77sdBSVzUA2STP4PIAbraRH1/jFu4UJ3p2zyrOppuWlwPXCKfXiDtmCZGJsuvKY8EnB671b4Y3KKoQoMWYfwcyYBAwLX/bws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DD7OpIbQ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-368313809a4so418403f8f.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:38:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723631853; x=1724236653; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuYo2+Zx6hAIj6J/3osNO/3OPdKH5IIxqLSLHJJmTBI=;
-        b=J2Sm+F81rpZIjNHrG68kyKuLtnA2/JjZcqrnV6tIZHHZJS1bs0v1NJPsZgmMldK7hj
-         HipzlYjvMqBKtlO4MTU4IG/iSY0kKa+3RX4YqIOf73BEz2u6/00xer44Moym3+6/AxOt
-         E321awv/ToB+BzhkhId2GuDyiIMeNK7hLk0gE9XCxDUKNPq2dGMIpTaYQy+hp9ocfF89
-         WzdtNrR55yEPgANv0I0Pu5W8KuCZ3x47w4Ak05BGWvyDHn6LsXu557BQp7PtyxOD5zHH
-         NYnrqgx/OBqWVPfKNe6nv9F63Bt6GEBFPYwCr5dDtHARi97WtrjrZTu9j/9bdSxWCek8
-         pObA==
+        d=linaro.org; s=google; t=1723631886; x=1724236686; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fNKkWw51f5wypgz5w1sJpTMeYJTuNSrvezVgh7cX/iw=;
+        b=DD7OpIbQzKUaMSOAKsPFGdPVDH4oT+5nuwnyrNo93E2y/w6bbTo+S9g5yLCx41oPRI
+         9aFguTIb+a3yojSJwW0CW+MRoXlu35C/DIm6un32o7TDegumRiwaNUmT4y3f8dBdlwdt
+         4ui0WfkUUiryyFjvubnAdMIQcAdEBlNse1hEtqOo8SD+5oAfV3UIN8OnnDwdt9mQmtdR
+         79ZbJe2s28BTPJlvmIvNrglGKJ44XeyFjd/ohzVc7L0kuyFm++vfM5n1OdrBeHXaXmF6
+         Ikti87u24oxT1Yv85eiTSmdXSAp3ydfRzhwvaUKRaWbu7NesMKL5U5m2CJ+PVDEX+bl8
+         Jw3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723631853; x=1724236653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tuYo2+Zx6hAIj6J/3osNO/3OPdKH5IIxqLSLHJJmTBI=;
-        b=b5WS5gUjPVGqqYa8eLCO9uT96BtHKf/mhlzxhlZrr7H/QL/EbeYS1C/tjrWCzbfhgr
-         Eo5AoEHA4ug3PJ4yQ2bnWCNQSBNP/phqphjc1K04kvgsMb5eAxoM4vfZb5loPlArquF7
-         QCEheMs9Y5vjuRKuLx3OCDweDZQVnEEpjF8rxBXf9c18/hD2PvI4qTfxMh0DlN7ndi3j
-         nVipbW2U3Bg7PWmUXGC6a1bivCUTlxXwOXX8JHbA3kMfjdccP5NnobSiJzdjumZ4i7Uz
-         uw+m0k/SiYm58XfXE9Ye8vfOFsAXpVt2L319G+VyXkh/j+zAoS7hU47tqaB+Wfd/YUU7
-         Pa8A==
-X-Forwarded-Encrypted: i=1; AJvYcCVf46YvJbefBCNOnlAuyrfSYHS5LsqunK9DdLnVHJw+WlvpFiHGonYSuWpy1Zd6uZUuGo3DNnDGrocbLxFWhzZXBONrBnxkRdQyoOZbXuFrbiyxPIM+nq0h6m2vuUpVoEGRUc9XSWANd90rhnT0amNHwCPFlmy6+jTl/wigokOgNw==
-X-Gm-Message-State: AOJu0YxZpakjTQLLQgfSEKCMZcMbJImXZqcQSfr2Se05DgcgQMazADaV
-	GxALx/hsOpEmq70AhFn1dYFp6gaaVH1tqkdNA7s7YhB3c6GYhSYGYDR74c4Jrqs55mncIJW8xyn
-	+b4G+1y2Mtd187BjKHYFZDfO+meE=
-X-Google-Smtp-Source: AGHT+IGBFWuLGzL/ikc1kuuvu59ml2SiwwutFZWQ8BtuzM8bfmR90/zyu1Z/RvYcLeWY3ZlW3o3X4Fv5CiPOiw2MhDA=
-X-Received: by 2002:a17:90b:4b12:b0:2cb:5fe6:8a1d with SMTP id
- 98e67ed59e1d1-2d39424d4edmr8982969a91.9.1723631852956; Wed, 14 Aug 2024
- 03:37:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723631886; x=1724236686;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fNKkWw51f5wypgz5w1sJpTMeYJTuNSrvezVgh7cX/iw=;
+        b=sz8q8FaFl+wdEaOOZ1JorOQiZ2jWcB81vE1IcXZ73/pwU4eLhFefXc6b475+CYWauW
+         jLZgJKnPY/FnqklhsFXmzDJy4hLY0ZvUmUlDlUIN8lE6NKC5i9yg7JaWDRwH8Zp+EVkC
+         zDE+yPDkK2O46HYiQs/tbPAIO4eeXSlGYZPbWVIb+d8SwIxMJzEg40Ye4AvQxpVsMnl5
+         QKKpRwNgI1aVSAnb4wLl+QiCT+fyL8rpG0WoCA76c7lRmy+zfhwn9oprO8qdbaqHjTUT
+         PzHV7nJXeBx6SmvQS3hK3PtIJzVrrUrYjzLQ8tBwwoTZF1cxK8dHv6Km+ouxulD3hzCT
+         XQxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXU1O8IVsbE9iYWgyCZDOvgUIkttsNGvt9AWFEhUwPZcVWnv31DpZZFLY/qOo9pgcL7n7NQ6js9H9/fHmBI1FSbTWtJeL/I
+X-Gm-Message-State: AOJu0YyXyuw9rqUdOxIisnO4vCCrXr6C5XN5OWwrFqcNFMgxhnjnGXP6
+	9lzmNlEmAn6hLx4vQYDl/A07tK+BDamT8XLT0sv6a3Vdeeqz/YwMUXmXJigoDEk=
+X-Google-Smtp-Source: AGHT+IFAKzLv7ilDET28IMwrLig755ftX5WyeocJ71rGFpy8qsd2JDPFQqU5/gZhPVT74JHfONE3xg==
+X-Received: by 2002:adf:e549:0:b0:36b:a9e8:6b5 with SMTP id ffacd0b85a97d-37179620f6dmr1306544f8f.10.1723631885531;
+        Wed, 14 Aug 2024 03:38:05 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.215.209])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4e51eb10sm12424380f8f.84.2024.08.14.03.38.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 03:38:04 -0700 (PDT)
+Message-ID: <7bf93d78-ba51-45b9-85d7-2b7e4e0b2e56@linaro.org>
+Date: Wed, 14 Aug 2024 12:38:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <56255393-cae8-4cdf-9c91-b8ddf0bd2de2@linux.alibaba.com>
- <20240814035812.220388-1-aha310510@gmail.com> <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
-In-Reply-To: <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Wed, 14 Aug 2024 19:37:20 +0900
-Message-ID: <CAO9qdTG=aspVkmB9zSh1x-5QLc-FBkxsnPfVErPVmCR3saCe9A@mail.gmail.com>
-Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com, 
-	gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 1/5] dt-bindings: net: wireless: brcm4329-fmac: add
+ pci14e4,449d
+To: Jacobe Zang <jacobe.zang@wesion.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Arend Van Spriel <arend.vanspriel@broadcom.com>, robh@kernel.org,
+ krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org
+Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
+ arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
+ minipli@grsecurity.net, brcm80211@lists.linux.dev,
+ brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com
+References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
+ <20240813082007.2625841-2-jacobe.zang@wesion.com>
+ <1914cb2b1a8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <e7401e25-7802-4dc3-9535-226f32b52be1@kernel.org>
+ <05785794-6eca-4ade-a990-2deac7156c48@wesion.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <05785794-6eca-4ade-a990-2deac7156c48@wesion.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-2024=EB=85=84 8=EC=9B=94 14=EC=9D=BC (=EC=88=98) =EC=98=A4=ED=9B=84 3:00, D=
-. Wythe <alibuda@linux.alibaba.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
->
->
-> On 8/14/24 11:58 AM, Jeongjun Park wrote:
-> > Because clcsk_*, like clcsock, is initialized during the smc init proce=
-ss,
-> > the code was moved to prevent clcsk_* from having an address like
-> > inet_sk(sk)->pinet6, thereby preventing the previously initialized valu=
-es
-> > from being tampered with.
->
-> I don't agree with your approach, but I finally got the problem you
-> described. In fact, the issue here is that smc_sock should also be an
-> inet_sock, whereas currently it's just a sock. Therefore, the best
-> solution would be to embed an inet_sock within smc_sock rather than
-> performing this movement as you suggested.
->
-> struct smc_sock {               /* smc sock container */
->      union {
->          struct sock         sk;
->          struct inet_sock    inet;
->      };
->
->      ...
->
-> Thanks.
-> D. Wythe
->
+On 14/08/2024 11:12, Jacobe Zang wrote:
+> 
+> 
+> On 2024/8/14 16:53, Krzysztof Kozlowski wrote:
+>> On 13/08/2024 19:04, Arend Van Spriel wrote:
+>>> On August 13, 2024 10:20:24 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
+>>>
+>>>> It's the device id used by AP6275P which is the Wi-Fi module
+>>>> used by Rockchip's RK3588 evaluation board and also used in
+>>>> some other RK3588 boards.
+>>>
+>>> Hi Kalle,
+>>>
+>>> There probably will be a v11, but wanted to know how this series will be
+>>> handled as it involves device tree bindings, arm arch device tree spec, and
+>>> brcmfmac driver code. Can it all go through wireless-next?
+>>
+>> No, DTS must not go via wireless-next. Please split it from the series
+>> and provide lore link in changelog for bindings.
+>>
+> 
+> I'm little confused that I should push bindings as a series, DTS as a 
+> series and driver as a series separately, so next time I should push 3 
+> series, right?
 
-I tested it myself and it doesn't trigger the existing issue, so
-I'll write a v4 patch with this code and send it to you.
+No. I said only DTS.
 
-Regards,
-Jeongjun Park
+Best regards,
+Krzysztof
 
->
-> >
-> > Additionally, if you don't need alignment in smc_inet6_prot , I'll modi=
-fy
-> > the patch to only add the necessary code without alignment.
-> >
-> > Regards,
-> > Jeongjun Park
->
->
-> >>
-> >>> Also, regarding alignment, it's okay for me whether it's aligned or
-> >>> not=EF=BC=8CBut I checked the styles of other types of
-> >>> structures and did not strictly require alignment, so I now feel that
-> >>> there is no need to
-> >>> modify so much to do alignment.
-> >>>
-> >>> D. Wythe
-> >>
-> >>
-> >>>>>> +
-> >>>>>>     static struct proto smc_inet6_prot =3D {
-> >>>>>> -     .name           =3D "INET6_SMC",
-> >>>>>> -     .owner          =3D THIS_MODULE,
-> >>>>>> -     .init           =3D smc_inet_init_sock,
-> >>>>>> -     .hash           =3D smc_hash_sk,
-> >>>>>> -     .unhash         =3D smc_unhash_sk,
-> >>>>>> -     .release_cb     =3D smc_release_cb,
-> >>>>>> -     .obj_size       =3D sizeof(struct smc_sock),
-> >>>>>> -     .h.smc_hash     =3D &smc_v6_hashinfo,
-> >>>>>> -     .slab_flags     =3D SLAB_TYPESAFE_BY_RCU,
-> >>>>>> +     .name                           =3D "INET6_SMC",
-> >>>>>> +     .owner                          =3D THIS_MODULE,
-> >>>>>> +     .init                           =3D smc_inet_init_sock,
-> >>>>>> +     .hash                           =3D smc_hash_sk,
-> >>>>>> +     .unhash                         =3D smc_unhash_sk,
-> >>>>>> +     .release_cb                     =3D smc_release_cb,
-> >>>>>> +     .obj_size                       =3D sizeof(struct smc6_sock)=
-,
-> >>>>>> +     .h.smc_hash                     =3D &smc_v6_hashinfo,
-> >>>>>> +     .slab_flags                     =3D SLAB_TYPESAFE_BY_RCU,
-> >>>>>> +     .ipv6_pinfo_offset              =3D offsetof(struct smc6_soc=
-k,
-> >>>>>> np),
-> >>>>>>     };
-> >>>>>>
-> >>>>>>     static const struct proto_ops smc_inet6_stream_ops =3D {
-> >>>>>> --
->
 
