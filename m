@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-118486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18BB8951BFF
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:37:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E72E951C30
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44F7B1C2103D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:37:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3AF3B2316B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5618D1B1405;
-	Wed, 14 Aug 2024 13:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDAE1AD9D6;
+	Wed, 14 Aug 2024 13:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKppiM8T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="idHyUaVc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5861AE86B;
-	Wed, 14 Aug 2024 13:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF221DA5E;
+	Wed, 14 Aug 2024 13:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723642616; cv=none; b=pOoWavOyBOk8tQGhCfqte0vyH8yPkPDQX6wU2L6I76orjTgOf/lL07MGvMyrDbjDwjsSfDoEQxcC7GF8h0xczcA7snelloCHg1kErmFdEDGO47Ncfcep7+l1mpef3JHoW/BSAGlUqMMGzx1dSwTK1D3v22IEnBQMfmgfIftaIhA=
+	t=1723643421; cv=none; b=Vq8KDREz32XuLwa+b6g2W8di0mTTSC0iKf2PzAfLQKc5+6iKYZs3SNUZriLjSRXYG15GkO44kOVS1lyUAYoXMq+Sbnr2XCCIRxUDKl7CmwptHIPgTXoFMWrYwQQYeUZFQnpxf6z+8RomvDwqI8je4/7wIaFxBrSf0ooXwKo0soY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723642616; c=relaxed/simple;
-	bh=AfZwoXYyHlaI4AyS0IHIY7OBojZ3hrhEHOAmUSWTFSI=;
+	s=arc-20240116; t=1723643421; c=relaxed/simple;
+	bh=Kw+XlTMl2iL53nQYEy4hsiCKGhI9ZACh2cz6PiKd0Y0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z7VXvVcqVL+ogABelbsI5I6UlOJqFdIsixAEKeByBQEEHHFCOMOX2/otGekXiI1Jb6tnc6UpdFqnvOz7uXI5WIkGq9C6puJdayaJu0LnCM79HQN6BnB60LPbOfhwgSktVfgiMlGBLfjQ1t1kXFCn3y5X2GahFvFm8YHz8lCvtTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKppiM8T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EF0C32786;
-	Wed, 14 Aug 2024 13:36:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jS5YIDJ67Tqjm8So7K4q5T7IPq/2R3ZEmQWNfzPyklCS+rKN/0Q+1LJaTJSjSGX8wkbqW1GNFOziqH+F8zNjQ8Xv8KwbP1fMbgy0EnVooDuZZgmxahctnigmM9Mlw1xNDGWsEOdAATo/jgwhFoTyCFUTLgz94U6HmJ+ceKANO4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=idHyUaVc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15EA8C32786;
+	Wed, 14 Aug 2024 13:50:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723642616;
-	bh=AfZwoXYyHlaI4AyS0IHIY7OBojZ3hrhEHOAmUSWTFSI=;
+	s=k20201202; t=1723643420;
+	bh=Kw+XlTMl2iL53nQYEy4hsiCKGhI9ZACh2cz6PiKd0Y0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vKppiM8TI7lg9JcPCqT3Sn2s7Dbo55T0W+E2BmfhSpBkLZPy8I8QGQnz/vSKybnXK
-	 E9lR4jrEmyE2rA+inP9wlEDEa0HG5ToUIFQ26LAzmitN9b9ZdFMMJgA22e1nn8skwx
-	 1AH+5YWgdWXAALyM4BX1Nin1y1z/GOm6GaBAXiL3t2hDhzOB86YOhN++iFjviAU7tk
-	 5wxCnVXr2UAA/xr8/UCZU8J+R3RNH4nsK3R5AHvwPMsjwYzmD94nUK033aeUcwN8y1
-	 gDZUksJo3wa1LJ4IDhtx1Pubx97ppcalgz8tjGGf+vwhwif+p4852NDC149g7lqYkA
-	 HEvFRtp8VV80w==
-Date: Wed, 14 Aug 2024 14:36:51 +0100
+	b=idHyUaVcWvfxVmA90KoxoIgzCUebYlKNJuASj6XGcJY5KD9cvaDlsksrOoFOPxEN2
+	 zL2RGNPWR1F2Hrg9v/N8V2rlfpsVAja0mLveUInj6N31j6qtS6dH6U8nvyw831I2oW
+	 f/X/4CufUTlYykN/THi8WTwOw1zkK21xtufeyPmuaiMcAf1+5MZQ17gvCWhv+pw2bK
+	 nOgdGI3pOWmb5K52KtlfDwaGHL7YMH6Qf/rjvDh9o0SFteGOnNGLY3/AzlnPaS8IPu
+	 fIbz0fWdoOeGxwUGcuikPcx4gqvx8L7mYntXgnEPhhf/zCDqXlXKp3LtJcTRhn0iLX
+	 on/wRZiOuG7Jg==
+Date: Wed, 14 Aug 2024 14:50:15 +0100
 From: Simon Horman <horms@kernel.org>
-To: Nils Fuhler <nils@nilsfuhler.de>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ip6: ndisc: fix incorrect forwarding of proxied ns
- packets
-Message-ID: <20240814133651.GA322002@kernel.org>
-References: <20240814123105.8474-2-nils@nilsfuhler.de>
+To: Daiwei Li <daiweili@google.com>
+Cc: intel-wired-lan@lists.osuosl.org, vinicius.gomes@intel.com,
+	anthony.l.nguyen@intel.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, kurt@linutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, przemyslaw.kitszel@intel.com,
+	richardcochran@gmail.com, sasha.neftin@intel.com
+Subject: Re: [PATCH iwl-net v3] igb: Fix not clearing TimeSync interrupts for
+ 82580
+Message-ID: <20240814135015.GB322002@kernel.org>
+References: <20240814045553.947331-1-daiweili@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,52 +62,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240814123105.8474-2-nils@nilsfuhler.de>
+In-Reply-To: <20240814045553.947331-1-daiweili@google.com>
 
-On Wed, Aug 14, 2024 at 02:31:06PM +0200, Nils Fuhler wrote:
-> When enabling proxy_ndp per interface instead of globally, neighbor
-> solicitation packets sent to proxied global unicast addresses are
-> forwarded instead of generating a neighbor advertisement. When
-> proxy_ndp is enabled globally, these packets generate na responses as
-> expected.
+On Tue, Aug 13, 2024 at 09:55:53PM -0700, Daiwei Li wrote:
+> 82580 NICs have a hardware bug that makes it
+> necessary to write into the TSICR (TimeSync Interrupt Cause) register
+> to clear it:
+> https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
 > 
-> This patch fixes this behaviour. When an ns packet is sent to a
-> proxied unicast address, it generates an na response regardless
-> whether proxy_ndp is enabled per interface or globally.
+> Add a conditional so only for 82580 we write into the TSICR register,
+> so we don't risk losing events for other models.
 > 
-> Signed-off-by: Nils Fuhler <nils@nilsfuhler.de>
-> ---
->  net/ipv6/ip6_output.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Without this change, when running ptp4l with an Intel 82580 card,
+> I get the following output:
 > 
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index ab504d31f0cd..13eaacc5a747 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -551,8 +551,8 @@ int ip6_forward(struct sk_buff *skb)
->  		return -ETIMEDOUT;
->  	}
->  
-> -	/* XXX: idev->cnf.proxy_ndp? */
-> -	if (READ_ONCE(net->ipv6.devconf_all->proxy_ndp) &&
-> +	if ((READ_ONCE(net->ipv6.devconf_all->proxy_ndp) ||
-> +	     READ_ONCE(idev->cnf.proxy_ndp)) &&
-
-Hi Nils,
-
-Earlier in this function it is assumed that idev may be NULL,
-I think you need to take that into account here too.
-
-Flagged by Smatch.
-
-If you do post an update, please be sure to wait 24h before doing so.
-https://docs.kernel.org/process/maintainer-netdev.html
-
->  	    pneigh_lookup(&nd_tbl, net, &hdr->daddr, skb->dev, 0)) {
->  		int proxied = ip6_forward_proxy_check(skb);
->  		if (proxied > 0) {
-> -- 
-> 2.39.2
+> > timed out while polling for tx timestamp increasing tx_timestamp_timeout or
+> > increasing kworker priority may correct this issue, but a driver bug likely
+> > causes it
 > 
+> This goes away with this change.
 > 
+> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
+> 
+> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
+> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
+> Tested-by: Daiwei Li <daiweili@google.com>
+> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Signed-off-by: Daiwei Li <daiweili@google.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
