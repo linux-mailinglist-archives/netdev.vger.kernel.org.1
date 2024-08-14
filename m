@@ -1,126 +1,83 @@
-Return-Path: <netdev+bounces-118579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9059521C1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C69E29521CA
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B6B1F21FE1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 18:01:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CD291F22AAC
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 18:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1F11BB699;
-	Wed, 14 Aug 2024 18:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222021BB699;
+	Wed, 14 Aug 2024 18:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZTD6ismn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlmDG1X+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570331B373D
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 18:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94461BD025
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 18:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723658507; cv=none; b=e/fpnYx5/4tNXqg350ratx8+EJN/NpFJU9pQlkm9i9K7LrMv3NAdbhYAP7e2te+X8xDacUOc9340bkinGGHac2Z+jJeNRl2NdrtESO38i5MLn6fkwhOn03PqSYu9ZciMNbZkJH1D0k5Sx5YzdyHOaaxX0xT42APNCstfw5iXJ8g=
+	t=1723658709; cv=none; b=fTd0A4VaXwlxe/G3GPsYXrWRNDqCHty02aZbmwvkycd/GDUXDjpkWUX2zXeIKOrnl/dpqTUojMXXbL5IiQ0zEv3FIim60tEnsXYKQ3p9k0v/7j2Q5O1FCIAnXsWzeT5WHf83h0RKJU0EANhpvAe8X6Zro0eOPU9x3h+GnS/JOUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723658507; c=relaxed/simple;
-	bh=VKidP+OQljS2EXJyioas4CypU+BVrUWJoPUVdLvxkoA=;
+	s=arc-20240116; t=1723658709; c=relaxed/simple;
+	bh=62rETTyuNkVruC27CYCPISlviIZHaAYvVtTtYOii+M8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MlbQnEtWOF1xkDBlvSShJt8cu7Y5gZNtYE6D6Uxq1KzJf1LQiHG9ifcbnUQ0CLX9v+dx7ZpCsD3UdOvgB++rkQytQ/DTWsmbTH1jrDXaXnakMcfbxkP+JmkzhU8YBDW47PKAYfIFS9ClRxiOc6MJeRuJrewmLGP4WrEVw2/OI7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZTD6ismn; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3718706cf8aso63253f8f.3
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:01:45 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=BWQxN3oGES9DBtGWjYRZ7zWD8oMq542E+LmKbnhxL8P+NPM/LaHFkySnDBvYLTRIziPNZ6pqXj1XEXGGLL+FAG6yhY3g5FtytQoVrt+ejjPV6MpG3n7ZamA1xFwdwNjagbqibtYbIw5vXXAkhnOiezj5of4VhFIPhzbH7Mlv5nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TlmDG1X+; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-710ece280b6so58906b3a.2
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:05:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723658504; x=1724263304; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iKG1BA6nZA/+iN2W0nGROx4tq6HJetKTMlW3JVQELg0=;
-        b=ZTD6ismnXgkRbK6WF3IeepqWr8YZY0DolpdxJ6Xq/AmWZY/mdBcpLeqeHY3MmmJL7S
-         N8AsNXVlWrK7UlqUg1gSlgUBD0ULB3V85WnGYrlrUjFZrOyWp4ubQPy4TwpVD7xIsfOO
-         ENKdhuYLXKIFaLaG2SED8fxQZLfL5KztqKa/E=
+        d=gmail.com; s=20230601; t=1723658707; x=1724263507; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Qdv2pjUYClueVHHYlVI8urUMsjeD3uGQyiP8PfAErE=;
+        b=TlmDG1X+6m4iZcuMT+Y1hD0g7zIMxpDIOYSTuZuT/ueSaVouXFkMZ9F9Njr57fujCK
+         qoV5d5diIuL0z1UMXFG1IFwrDu9yjRmnGNIUWYvy5Z6UjbPHnLRIq4w/CSYgXkAcFqd0
+         b0i4QUi5kTHU/o4gsjHS0yAl5J6ULqgVXSyn2ybkfFsbKsC1eoKE4ja8GKYBV9ej7egS
+         8WZ1IR0fL1+C+y0clkF6HJHTUpUOD2dcRQM/+auDlHCr+NdpYiBh/sm8WxDCoSuE+eNv
+         NBmGXvmeeNLd2siZqnCbPFHcgAODId75ByR3jy0GNQOoExIy/WmtP1cWfpksAT952tOm
+         +WsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723658504; x=1724263304;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iKG1BA6nZA/+iN2W0nGROx4tq6HJetKTMlW3JVQELg0=;
-        b=utOZCNotzC+Ol8Uiut2RTduyIF2WKzQ4ZJNP6ucDEJ9aP75ewOS6QsLG3/I5gSRkqr
-         HmCf/j3eDnEfLjVhPjRaWjnSjFdvX97rX6lGUSxlhKe3BAl5iQJKA2B8tb+/41iy6b0l
-         9J1G/3y3UHpewxRI9s7oaYpnUJRSVpshUM84ubHJWeDBGRZXtlVxQxB4vnvLTyUsUiWn
-         ADcSKOMcVJ6dBfJP8qbiHRpEY30bxzAZJtk5a4dLQ4EjUk6IGhio43/xJnM5fuuT7sZr
-         FovKVAIcmhe4r1rcsAmweHB5KeGA74X1L2o0Gwcyvb/HFsNE9b6G1dTgYVXvzYlVpwRY
-         2f2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWg0d+qPLFtrz9qFkR94H5GOwcA9npK+p56xOsqUcffBOnTG5n0ulygsViwwxJNMV8c9sxtGRyOqqdl3MaPXMugJyRmptaj
-X-Gm-Message-State: AOJu0YzBQiP5dDHllcoGuUjWGPkr56rqfY3TGzwDzDMcN58Wvsr2jQsJ
-	VdGgZOtLmpU6wjmnnMJtYqxCu9BcngPvLxaupFSKinEwyzJmZF4K/hM05u1IDkA=
-X-Google-Smtp-Source: AGHT+IGCmSIjhxSRM6zFrHvolmN2wXREY83zZw95/jXyk6UpHYC0uXJzFqUFz4BGJeihuJswIDQe0w==
-X-Received: by 2002:a5d:59a5:0:b0:36b:357a:bfee with SMTP id ffacd0b85a97d-37177749bc7mr2760473f8f.1.1723658503541;
-        Wed, 14 Aug 2024 11:01:43 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718479c332sm548792f8f.87.2024.08.14.11.01.42
+        d=1e100.net; s=20230601; t=1723658707; x=1724263507;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Qdv2pjUYClueVHHYlVI8urUMsjeD3uGQyiP8PfAErE=;
+        b=X4Mm7xZhPHIflejnuUpawDTCWWpTA1jpP7eJdlPz7ktdllT29LLtjuoVHQ92WKXw0B
+         tuwZcQrW5EPc9X3vcuy5Uv+CWUXbLLFOCn25XBlpazqO/yrbfpv+hB4h2xSRuubUA5kR
+         I58v3LuwSWWPv4KSQGSbhfBxCk+eOQ4f/T/gz6+OS17jQvNxtXkZHCDjgOMoEkrvBHgP
+         p3mhjYUZkobomO7E+lpABzumlC3bI8vE9+6WGQVWDskWiwHFs2ErqqTI1rGxbsvFQi6E
+         pZ1BYVG60GHtcP6Pq3AVItA1/6GX1frid996mXwACd6MTViOD6eMrHDC9oJjR0Tc57Qr
+         biCQ==
+X-Gm-Message-State: AOJu0YzeImO7ya1UetR2pJWtWWp1SxGey4fULrMv/US597+1a0ufAw2N
+	sVly4Y+5osirqvxULxDwCwnzy2RHhoJvgMplOHQ+LNwMHKobXcIg
+X-Google-Smtp-Source: AGHT+IEy8hMC8Brbv0YZ1Ag/kY2WagXz/GIHM01Y7BjKr3FEmQDpgo90zRBjzMznLyjEod1xXOfKaw==
+X-Received: by 2002:a05:6a20:9f0a:b0:1c8:9749:a4c1 with SMTP id adf61e73a8af0-1c8eaf96890mr4821745637.49.1723658706796;
+        Wed, 14 Aug 2024 11:05:06 -0700 (PDT)
+Received: from localhost ([12.216.211.103])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e5ab56f0sm7629825b3a.197.2024.08.14.11.05.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 11:01:43 -0700 (PDT)
-Date: Wed, 14 Aug 2024 19:01:40 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Shay Drori <shayd@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
-Message-ID: <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Shay Drori <shayd@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-References: <20240812145633.52911-1-jdamato@fastly.com>
- <20240813171710.599d3f01@kernel.org>
- <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
- <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
- <20240814080915.005cb9ac@kernel.org>
- <ZrzLEZs01KVkvBjw@LQ3V64L9R2>
- <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
+        Wed, 14 Aug 2024 11:05:06 -0700 (PDT)
+Date: Wed, 14 Aug 2024 11:05:05 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+	tparkin@katalix.com, horms@kernel.org
+Subject: Re: [PATCH v2 net-next 6/9] l2tp: use get_next APIs for management
+ requests and procfs/debugfs
+Message-ID: <Zrzx0RimFyQw063m@pop-os.localdomain>
+References: <cover.1723011569.git.jchapman@katalix.com>
+ <0ed95752e184f213260e84b4ff3ee4f4bedeed9e.1723011569.git.jchapman@katalix.com>
+ <ZrkEofKqANg/9sTB@pop-os.localdomain>
+ <6730f50c-929d-aaed-0282-60eb321f8679@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -129,61 +86,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
+In-Reply-To: <6730f50c-929d-aaed-0282-60eb321f8679@katalix.com>
 
-On Wed, Aug 14, 2024 at 07:03:35PM +0300, Shay Drori wrote:
+On Mon, Aug 12, 2024 at 09:14:42AM +0100, James Chapman wrote:
+> On 11/08/2024 19:36, Cong Wang wrote:
+> > On Wed, Aug 07, 2024 at 07:54:49AM +0100, James Chapman wrote:
+> > > diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
+> > > index cc464982a7d9..0fabacffc3f3 100644
+> > > --- a/net/l2tp/l2tp_core.h
+> > > +++ b/net/l2tp/l2tp_core.h
+> > > @@ -219,14 +219,12 @@ void l2tp_session_dec_refcount(struct l2tp_session *session);
+> > >    * the caller must ensure that the reference is dropped appropriately.
+> > >    */
+> > >   struct l2tp_tunnel *l2tp_tunnel_get(const struct net *net, u32 tunnel_id);
+> > > -struct l2tp_tunnel *l2tp_tunnel_get_nth(const struct net *net, int nth);
+> > >   struct l2tp_tunnel *l2tp_tunnel_get_next(const struct net *net, unsigned long *key);
+> > >   struct l2tp_session *l2tp_v3_session_get(const struct net *net, struct sock *sk, u32 session_id);
+> > >   struct l2tp_session *l2tp_v2_session_get(const struct net *net, u16 tunnel_id, u16 session_id);
+> > >   struct l2tp_session *l2tp_session_get(const struct net *net, struct sock *sk, int pver,
+> > >   				      u32 tunnel_id, u32 session_id);
+> > > -struct l2tp_session *l2tp_session_get_nth(struct l2tp_tunnel *tunnel, int nth);
+> > >   struct l2tp_session *l2tp_session_get_next(const struct net *net, struct sock *sk, int pver,
+> > >   					   u32 tunnel_id, unsigned long *key);
+> > >   struct l2tp_session *l2tp_session_get_by_ifname(const struct net *net,
+> > > diff --git a/net/l2tp/l2tp_debugfs.c b/net/l2tp/l2tp_debugfs.c
+> > > index 8755ae521154..b2134b57ed18 100644
+> > > --- a/net/l2tp/l2tp_debugfs.c
+> > > +++ b/net/l2tp/l2tp_debugfs.c
+> > > @@ -34,8 +34,8 @@ static struct dentry *rootdir;
+> > >   struct l2tp_dfs_seq_data {
+> > >   	struct net	*net;
+> > >   	netns_tracker	ns_tracker;
+> > > -	int tunnel_idx;			/* current tunnel */
+> > > -	int session_idx;		/* index of session within current tunnel */
+> > > +	unsigned long tkey;		/* lookup key of current tunnel */
+> > > +	unsigned long skey;		/* lookup key of current session */
+> > 
+> > Any reason to change the type from int to unsigned long?
+> > 
+> > Asking because tunnel ID remains to be 32bit unsigned int as a part of
+> > UAPI.
+> > 
+> > Thanks.
 > 
-> 
-> On 14/08/2024 18:19, Joe Damato wrote:
-> > On Wed, Aug 14, 2024 at 08:09:15AM -0700, Jakub Kicinski wrote:
-> > > On Wed, 14 Aug 2024 13:12:08 +0100 Joe Damato wrote:
-> > > > Actually... how about a slightly different approach, which caches
-> > > > the affinity mask in the core?
-> > > 
-> > > I was gonna say :)
-> > > 
-> > > >    0. Extend napi struct to have a struct cpumask * field
-> > > > 
-> > > >    1. extend netif_napi_set_irq to:
-> > > >      a. store the IRQ number in the napi struct (as you suggested)
-> > > >      b. call irq_get_effective_affinity_mask to store the mask in the
-> > > >         napi struct
-> > > >      c. set up generic affinity_notify.notify and
-> > > >         affinity_notify.release callbacks to update the in core mask
-> > > >         when it changes
-> > > 
-> > > This part I'm not an export on.
-> 
-> several net drivers (mlx5, mlx4, ice, ena and more) are using a feature
-> called ARFS (rmap)[1], and this feature is using the affinity notifier
-> mechanism.
-> Also, affinity notifier infra is supporting only a single notifier per
-> IRQ.
-> 
-> Hence, your suggestion (1.c) will break the ARFS feature.
-> 
-> [1] see irq_cpu_rmap_add()
+> It's used as the key in and potentially modified by idr_get_next_ul calls.
 
-Thanks for taking a look and your reply.
+idr_get_next() takes an `int` ID. So the reason is not this API, it must be
+something else.
 
-I did notice ARFS use by some drivers and figured that might be why
-the notifiers were being used in some cases.
-
-I guess the question comes down to whether adding a call to
-irq_get_effective_affinity_mask in the hot path is a bad idea.
-
-If it is, then the only option is to have the drivers pass in their
-IRQ affinity masks, as Stanislav suggested, to avoid adding that
-call to the hot path.
-
-If not, then the IRQ from napi_struct can be used and the affinity
-mask can be generated on every napi poll. i40e/gve/iavf would need
-calls to netif_napi_set_irq to set the IRQ mapping, which seems to
-be straightforward.
-
-In both cases: the IRQ notifier stuff would be left as is so that it
-wouldn't break ARFS.
-
-I suspect that the preferred solution would be to avoid adding that
-call to the hot path, right?
 
