@@ -1,190 +1,198 @@
-Return-Path: <netdev+bounces-118314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176319513B2
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:58:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969AA9513B9
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8BAA286BF8
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:58:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 183B01F22205
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F623BBF7;
-	Wed, 14 Aug 2024 04:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waymo.com header.i=@waymo.com header.b="lY50OUnU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E3339879;
+	Wed, 14 Aug 2024 05:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D485589B
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 04:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04907286A2
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723611501; cv=none; b=j2xYA3yMMbPw1rz9ICXEHVvzP3ChMCVhl6kARtIQBk220sM04kcRQpMK1w58Bn3mVDMk5ATPaJmY3peNjGc97ffEckgGW8xo/8rs2hDd+nMeq+XNbOQAWF17hTHe0Uk9fnWE+pHVOuCGRDs/v54wjhQ/vQVCS+NlL1onryjJBT4=
+	t=1723611625; cv=none; b=qFfo7K1KINn0FrDpq3S8e89T3ShXLWm4hujmxjHwNEKtU4f2r7YB8ZhQ40svuuAnixlMbPHaGflxBAvyiHYCHtF86uaGA9zFlDBvy3clTB08hpfohCBBV4HPmM80JyE4P0EG8iV+nLbSIvXfR3CKnnAcMoj4dgxAnlzlAFOGJSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723611501; c=relaxed/simple;
-	bh=PBcv7AEUH9uG2X0lUtNcI/Bqxmh4kq7YdmO9pd7bAQs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=loCh7kcd73+nyw6tUbpS77Pd1QqMrEeXSTXdP0Eipp8OTlSBIzZ6++tZFG2fbLWua4mZym6E1w5763V50FCIK/G+jlCzp6Ynh/Al6VppfxUtLKcG4zfDnmr191xKM4MSDbmVFilCNGjXnBKuKD/G6AqqSirG5EpLn4JZiFjYjB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=waymo.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=waymo.com header.i=@waymo.com header.b=lY50OUnU; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=waymo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6b7af49e815so36923186d6.0
-        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 21:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waymo.com; s=20230601; t=1723611499; x=1724216299; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cZbsYN7hywOio9CebOtG5ipZd6XqFXAATkmmHXXoYiY=;
-        b=lY50OUnUBITPCdeiU2ovLyNK3tW8wfIfX90NAYJi5jC3vN5p0jybmuvmSGJPmi4VzY
-         55v+uFvsF8WIG8DVoLYAynY22EEmO3Pl4UgevnYHWk3cvlOFCREPRJVLf0IcVCcDr7EO
-         MMRwDxVZpPmO+NbsmcLxLGts6qzZPkqezTfAopDYaJebcSOTbtKKKD3dxHb6oGY+WEMa
-         qgy96SDlakupDbCTxyXOgYlF4GZyKAtVxjGa80XfDIB6TClO4ltqm20u+dkbDFGGck5n
-         VLXsHmn8OF/ywZvvYreo+UT44+RMak2mw2/0DKwpvnHngavsACVsT/RsPdP/ZW7Ob4T/
-         iDKA==
+	s=arc-20240116; t=1723611625; c=relaxed/simple;
+	bh=9BNXSKP/aqgDEv5pgWnt0nOgPlpcmupJ3ccD2GqVxF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GadU5JJ3jWxXDgbbLZhV/V6MjyI3aRnu2025gUn+1EPxEBUf2l28x67bR+9pQQ2U4FK+1c9D2taxfQ3HkxAMBJMnbWlr4+m0xNZyMcXLG/++e7LlfXib4K6ScXixsGKzJIbL8960LB7cbcq+20gASVZ8EvkI+LnYesimOvOXxOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7aac70e30dso689181566b.1
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:00:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723611499; x=1724216299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cZbsYN7hywOio9CebOtG5ipZd6XqFXAATkmmHXXoYiY=;
-        b=CBYjbA3V4pk74LP/75SnjiGzdgWWhgYIIS7WB6d6gUaY1Z3zO5jZr5I0QX6JD7jiog
-         VT40WkXKpSg7Bl0xuI7Ixs/f8CP6wfL/JVhA0nr+OigH9UZ8vl5g0hCsSB6cSKn9cjfH
-         4U/ian//DUMmsmiF95uxRKUhmNcd27rCVMlz7vbqYN4XWSpLA9PxH9Qh8TUFr8bUZUhc
-         9QzkUYizr7LxWIdG6Q5NCNxSLYxTu2tTk5a2XnPvMPOoFiWdLtw1hIggJzXVt+AT79R+
-         0NYcWZ05MVIjFn07HupQSwdReNYFSyfqaoaVGDjBrSU6XQPfvH/MV8IhAV/I5ipuKJMj
-         OtRw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6nVe1AtRmpjC5SUUmWjRuwVFQkfj+6oNIuLG+TKaK8A3esB1v2ZxDc3JwNic4oG68E7j4oDs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8oM0ru3jYOppHJtyFU7zzPxIBOXFcufPKFGSEGH3Pq7OiNYwC
-	F898FlWA7wsuJ1YAdwPUCkxH9YSa6mGgPuImEg5p1ksas15AirXr1+uFqSvOGaWA7Ntp6uO7vl0
-	ony1lm15Fj4RdR07/GCmpiNHQ7+NeaNV1b10=
-X-Google-Smtp-Source: AGHT+IE3wmqWQC8hH6zZI3LxdJ0W45BhWmHg3wpq0EuaM73ZIPGiS2LC/8R6MAF1HWhkBv59JXB0Iutnq0JiQV7NQ+E=
-X-Received: by 2002:a05:6214:4909:b0:6b7:b1b7:c44a with SMTP id
- 6a1803df08f44-6bf5d1846ffmr17979386d6.16.1723611498599; Tue, 13 Aug 2024
- 21:58:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723611622; x=1724216422;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tYUCmWL8Hkl6zsFmwTAECInMtiFeosdeg5txclz9CL0=;
+        b=Q8QoWaAQjBcS2TURj4W7pyawwPjux1N0vv4wPB+DF34Mq22vCDN0BKoLavzvFH9iVj
+         fsdueT9UfIYlfC7Xc4Pxt8QjADuaL3dHt6hkm5ddvYaom2P693ntlJwRsn5mgxEjQJE1
+         5bVWxfUwerCIDaBy0VdXGhSQjVSlhdpYZdLy3quAtu621opAYtsSNm8bIBEBSj2tHqpO
+         Iui5lVQAN4gO4/lrs2EWdCFlpzgVi0S5O4kTppXn8cuTsRD5ciGEkZRTdfVLKYGeov0I
+         fM0xop8VBwD7Kyfj5x/+vPZiXFT3O7CknlhO+3255WHeAu3l587JTnlypOwLy3BjSR0V
+         M2FA==
+X-Forwarded-Encrypted: i=1; AJvYcCWE50NBmbIitpZcfsV/tPkGYZX2eJMiZitlbDRh8JRxjTTBT3O+xMRMVYWYQhx0gP3gdiuxJvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO6/hvptCHZ9hdx9UzmQXTGaDV/FHmvcl/5VCY+H5S+lydG5yi
+	5vozqU2gtVp6k2EkAzMXhk1QpA8HLOkGyR2BWMPunYgHdVnePlMz
+X-Google-Smtp-Source: AGHT+IHOmtZ8AR/RyZGoiRm3RpnFl+CmXo1XwXVZToUyAUzLRXhHwpeDwfjZWPvTdcIHxNERtleHeQ==
+X-Received: by 2002:a17:907:f76a:b0:a80:7ce0:8b2a with SMTP id a640c23a62f3a-a8366d37f3emr100601666b.19.1723611621654;
+        Tue, 13 Aug 2024 22:00:21 -0700 (PDT)
+Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:69? ([2a0b:e7c0:0:107::aaaa:69])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f411bdf0sm127624766b.114.2024.08.13.22.00.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 22:00:20 -0700 (PDT)
+Message-ID: <dc9df0fd-6344-49ad-87c6-8e5c63857bd6@kernel.org>
+Date: Wed, 14 Aug 2024 07:00:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <87sev9wrkj.fsf@intel.com> <20240813033508.781022-1-daiweili@google.com>
- <871q2svz40.fsf@intel.com>
-In-Reply-To: <871q2svz40.fsf@intel.com>
-Reply-To: daiweili@waymo.com
-From: Daiwei Li <daiweili@waymo.com>
-Date: Tue, 13 Aug 2024 21:58:06 -0700
-Message-ID: <CALhna8C4Ux27SWYRxY4iViwRPSjReUgQpiJtfivNT-bCZLhuqQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-net v2] igb: Fix not clearing TimeSync interrupts for 82580
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: anthony.l.nguyen@intel.com, daiweili@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, intel-wired-lan@lists.osuosl.org, kuba@kernel.org, 
-	kurt@linutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, przemyslaw.kitszel@intel.com, richardcochran@gmail.com, 
-	sasha.neftin@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] ptp: ocp: adjust sysfs entries to expose tty
+ information
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Vadim Fedorenko <vadfed@meta.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org
+References: <20240805220500.1808797-1-vadfed@meta.com>
+ <2024081350-tingly-coming-a74d@gregkh>
+ <a38797d7-326d-4ca9-b764-61045ad17b50@linux.dev>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <a38797d7-326d-4ca9-b764-61045ad17b50@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Thank you for the review! I've sent out another patch that hopefully
-addresses the comments.
+On 13. 08. 24, 20:24, Vadim Fedorenko wrote:
+> On 13/08/2024 10:33, Greg Kroah-Hartman wrote:
+>> On Mon, Aug 05, 2024 at 03:04:59PM -0700, Vadim Fedorenko wrote:
+>>> Starting v6.8 the serial port subsystem changed the hierarchy of devices
+>>> and symlinks are not working anymore. Previous discussion made it clear
+>>> that the idea of symlinks for tty devices was wrong by design. Implement
+>>> additional attributes to expose the information. Fixes tag points to the
+>>> commit which introduced the change.
+>>>
+>>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be 
+>>> children of serial core port device")
+>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>>> ---
+>>>   drivers/ptp/ptp_ocp.c | 68 +++++++++++++++++++++++++++++++++----------
+>>>   1 file changed, 52 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+>>> index ee2ced88ab34..7a5026656452 100644
+>>> --- a/drivers/ptp/ptp_ocp.c
+>>> +++ b/drivers/ptp/ptp_ocp.c
+>>> @@ -3346,6 +3346,55 @@ static EXT_ATTR_RO(freq, frequency, 1);
+>>>   static EXT_ATTR_RO(freq, frequency, 2);
+>>>   static EXT_ATTR_RO(freq, frequency, 3);
+>>> +static ssize_t
+>>> +ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, 
+>>> char *buf)
+>>> +{
+>>> +    struct dev_ext_attribute *ea = to_ext_attr(attr);
+>>> +    struct ptp_ocp *bp = dev_get_drvdata(dev);
+>>> +    struct ptp_ocp_serial_port *port;
+>>> +
+>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
+>>
+>> That's insane pointer math, how do we know this is correct?
+>>
+>>> +    return sysfs_emit(buf, "ttyS%d", port->line);
+>>> +}
+>>> +
+>>> +static umode_t
+>>> +ptp_ocp_timecard_tty_is_visible(struct kobject *kobj, struct 
+>>> attribute *attr, int n)
+>>> +{
+>>> +    struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
+>>> +    struct ptp_ocp_serial_port *port;
+>>> +    struct device_attribute *dattr;
+>>> +    struct dev_ext_attribute *ea;
+>>> +
+>>> +    if (strncmp(attr->name, "tty", 3))
+>>> +        return attr->mode;
+>>> +
+>>> +    dattr = container_of(attr, struct device_attribute, attr);
+>>> +    ea = container_of(dattr, struct dev_ext_attribute, attr);
+>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
+>>
+>> That's crazy pointer math, how are you ensured that it is correct?  Why
+>> isn't there a container_of() thing here instead?
+> 
+> Well, container_of cannot be used here because the attributes are static
+> while the function reads dynamic instance. The only values that are
+> populated into the attributes of the group are offsets.
+> But I can convert it to a helper which will check that the offset 
+> provided is the real offset of the structure we expect. And it could be 
+> reused in both "is_visible" and "show" functions.
 
+Strong NACK against this approach.
 
-On Tue, Aug 13, 2024 at 3:26=E2=80=AFPM Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
->
-> Daiwei Li <daiweili@google.com> writes:
->
-> > 82580 NICs have a hardware bug that makes it
-> > necessary to write into the TSICR (TimeSync Interrupt Cause) register
-> > to clear it:
-> > https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
-> >
-> > Add a conditional so only for 82580 we write into the TSICR register,
-> > so we don't risk losing events for other models.
->
-> Please add some information in the commit message about how to reproduce
-> the issue, as Paul suggested.
->
-> >
-> > This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sy=
-nc events").
-> >
-> > Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
-> > Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn=
-6f7vvDKp2h507sMryobkBKe=3Dxk=3Dw@mail.gmail.com/
-> > Tested-by: Daiwei Li <daiweili@google.com>
-> > Signed-off-by: Daiwei Li <daiweili@google.com>
-> > ---
-> >
-> > @Vinicius Gomes, this is my first time submitting a Linux kernel patch,
-> > so apologies if I missed any part of the procedure (e.g. this is
-> > currently on top of 6.7.12, the kernel I am running; should I be
-> > rebasing on inline?). Also, is there any way to annotate the patch
-> > to give you credit for the original change?
->
-> Your submission format looks fine. Just a couple details:
->  - No need for setting in-reply-to (or something like it);
->
->  - For this particular patch, you got lucky and it applies cleanly
->  against current tip, but for future submissions, for intel-wired-lan
->  and patches intended for the stable tree, please rebase against:
->
->  https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git/
->
-> For credits, you can add something like:
->
-> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->
-> >
-> >  drivers/net/ethernet/intel/igb/igb_main.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/et=
-hernet/intel/igb/igb_main.c
-> > index ada42ba63549..1210ddc5d81e 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> > +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> > @@ -6986,6 +6986,16 @@ static void igb_tsync_interrupt(struct igb_adapt=
-er *adapter)
-> >       struct e1000_hw *hw =3D &adapter->hw;
-> >       u32 tsicr =3D rd32(E1000_TSICR);
-> >       struct ptp_clock_event event;
-> > +     const u32 mask =3D (TSINTR_SYS_WRAP | E1000_TSICR_TXTS |
-> > +                       TSINTR_TT0 | TSINTR_TT1 |
-> > +                       TSINTR_AUTT0 | TSINTR_AUTT1);
-> > +
->
-> Please move the declaration of 'mask' up, to follow the convention, the
-> "reverse christmas tree" rule. Or separate the attribution from the
-> declaration.
->
-> > +     if (hw->mac.type =3D=3D e1000_82580) {
-> > +             /* 82580 has a hardware bug that requires a explicit
->
-> And as pointed by Paul, "*an* explicit".
->
-> > +              * write to clear the TimeSync interrupt cause.
-> > +              */
-> > +             wr32(E1000_TSICR, tsicr & mask);
-> > +     }
-> >
-> >       if (tsicr & TSINTR_SYS_WRAP) {
-> >               event.type =3D PTP_CLOCK_PPS;
-> > --
-> > 2.46.0.76.ge559c4bf1a-goog
-> >
->
-> --
-> Vinicius
+What about converting those 4 ports into an array and adding an enum { 
+PORT_GNSS, POTR_GNSS2, PORT_MAC, PORT_NMEA }?
 
+thanks,
+-- 
+js
+suse labs
 
-
---=20
-Daiwei Li
-Software Engineer
-Mobile: 415-736-8670
-waymo.com
 
