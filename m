@@ -1,159 +1,204 @@
-Return-Path: <netdev+bounces-118406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4639517EB
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 11:44:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D690B95182A
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB88F1F2312D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:44:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BD41C208A5
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D496166F3B;
-	Wed, 14 Aug 2024 09:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800671AE02A;
+	Wed, 14 Aug 2024 10:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rcj2f1Mv"
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="OhECLRBr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3631166F3F
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 09:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387A01AD9EE;
+	Wed, 14 Aug 2024 10:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723628645; cv=none; b=V0pfWcJiG9fE1puXZW5n9kABAVDld5R700fT8Catv7XF5RNYwdzYxYqr7Wb5yPmtCEyEYIJJ4cPTSRLtZFp+4UPc+bvrfqFQckUyYk3Y3KWfKyEd6Iy06Zx/Xm8KmPt1bIq52oFRcx68Qi5DZGeIdErJk+1A630e0BIKQNNSRgU=
+	t=1723629640; cv=none; b=YFXh914WbC3s/qauBUDXjZSTqHI5SXHBvtYN1BvKkAkZG8VDUKOxHAbdxBpel5LRsnt4ypl+K7M1swhGjvghucsIseDBSmZs4UdJz2fxcvHeak9VX/qPqPWjFiwBvv676HXs4AbMe9vvnJRdc7G8x1U727iNDFgXX9oTWUH6x5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723628645; c=relaxed/simple;
-	bh=bDX0W0YcHfz6UrXy8uYh9/2NpWe0JqnGzLjCtVJFHL0=;
+	s=arc-20240116; t=1723629640; c=relaxed/simple;
+	bh=sqT577nAbUsMEOsuMnHzpa0wXYIYsj5igcWcJy972GY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/Usg4MuFMlpYBaUm5um6crrVnkE0fdx24cpD40SC1jD7pB7+Msh9eXbUb3CLKiaB75xWwHFpM2nqmEHqlRttIm44nysuKwBTMQ1fUPoGN9xN+Pfq6edQGCq4+OiAx+TO29sDeLIkMC8koSb+u/m6QxzndNxPKFDPCazNQEKaoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rcj2f1Mv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723628642;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+elik60oxPmXl+HwPhEYp0jss+bQ52uuhXHHXAgMsXQ=;
-	b=Rcj2f1MvhZB0SAPQ0QkaOM8ZaAmogswKVVpUGITj7kIec9JEjfo354pnItXPNPNgurMOT6
-	iGbjqVMMJCiy0p4gDGazNAs+R2M/nGbIoagRQQh0GdqrOHyXCIuVNrFKCo8lNI2wg7BzZk
-	g2rWCdWc5+A11uPPdvGTSYEJo7nxxf8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-sJTzAkxdOzGudMMsvCoIUQ-1; Wed, 14 Aug 2024 05:43:59 -0400
-X-MC-Unique: sJTzAkxdOzGudMMsvCoIUQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a7a9761bf6dso539073666b.3
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 02:43:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723628639; x=1724233439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+elik60oxPmXl+HwPhEYp0jss+bQ52uuhXHHXAgMsXQ=;
-        b=AJ+ZYQcnv/Jub6q3tMbPmjJHurGi5Pidt4y40bjYo8mPPqw/jLP9C7MGGUMJRdU+9Q
-         AWQjS/ICSb5KegNKmHEM6Y50sUcsTIogiJw2BEoKO8rUNm/fniR3an3o0vpjmXVrRe5Z
-         CI8rpdWN/mfqH2pJtRKVPyA3CORW37P5/QhLWagUdKZ5yO4Jjfmz6JfhQK2BbQHu6oiQ
-         i/JAtaDFg/7+VICGbrmgODW3mkuzk/LhJk7l2UtbF7pDm91A6T2V/6j3uY0of66Vz2W2
-         Iu3fmnt6SRJcKnaDcr+q7qVn72PnPP6xzT3kzq0a6PaRnfmTh8vd8GPpKzRlIv+tsDl5
-         6lNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVL4SIPE6tCglX/czfwkzx1N7WobSa4cDVUtVkxMlfVEcUQdyXPsmSWEx7QzG0g6SH5dT2SJ0TEzmJ2XSYsr22jIbPkaz8d
-X-Gm-Message-State: AOJu0YwzJOwE1cKqzo4qi2al8sW03QDWJ3+bxi+422i1f1qnwaf+0SkJ
-	LCwDTnAuzJHBOvh2yKP+3yA/h2FR4SbcbvBu3OcgJnhrKdedphuKi3ymbMdXwmeah47A8hS4xPD
-	8jK01n1lqQ8OTfvMLoul/zI7ZwunR6rgxvgC5wpTEekzk25UWWhnefg==
-X-Received: by 2002:a17:907:7e95:b0:a77:db36:1ccf with SMTP id a640c23a62f3a-a83670913a4mr157848666b.42.1723628638688;
-        Wed, 14 Aug 2024 02:43:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqgSyfSPfgnA5rfz+Si+DMzLKsMw6jiA0HIHLtzrsRJoI+UE3pbGrO6gcYuSOHr66pPBiDBA==
-X-Received: by 2002:a17:907:7e95:b0:a77:db36:1ccf with SMTP id a640c23a62f3a-a83670913a4mr157844566b.42.1723628637900;
-        Wed, 14 Aug 2024 02:43:57 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:346:dcde:9c09:aa95:551d:d374])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f418260esm150658566b.197.2024.08.14.02.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 02:43:57 -0700 (PDT)
-Date: Wed, 14 Aug 2024 05:43:51 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	dave.taht@gmail.com, kerneljasonxing@gmail.com,
-	hengqi@linux.alibaba.com
-Subject: Re: [PATCH net-next v3] virtio_net: add support for Byte Queue Limits
-Message-ID: <20240814053637-mutt-send-email-mst@kernel.org>
-References: <20240618144456.1688998-1-jiri@resnulli.us>
- <CGME20240812145727eucas1p22360b410908e41aeafa7c9f09d52ca14@eucas1p2.samsung.com>
- <cabe5701-6e25-4a15-b711-924034044331@samsung.com>
- <Zro8l2aPwgmMLlbW@nanopsycho.orion>
- <e632e378-d019-4de7-8f13-07c572ab37a9@samsung.com>
- <Zrxhpa4fkVlMPf3Z@nanopsycho.orion>
- <ZrxoC_jCc00MzD-o@nanopsycho.orion>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EiWZdJ7gYAMRBxbVGyZl2jc8fHbo+AOhiO5MiS0+OU0BXVYPmrAAAwMMKRjR1z23izwbQIILyeTiwTDi+JLqTqNkr1vCJSErXBskrV/N4GveS50NmVFp0gexbBJc6g4Gx2o2Nd2h8hmJ55X56r6XjmovynnTs+XXw0/ItS3OVZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=OhECLRBr; arc=none smtp.client-ip=212.227.126.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1723629635; x=1724234435; i=christian@heusel.eu;
+	bh=aXUAzAt/Xa4BzWb4o8KVaXMXRWHP/DGLw4/QNcQNPaw=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=OhECLRBrC93XkMjzBeg5JdFNbPy6Ldyu8yWkwMH0ZlzaB6QpQTKG1B1btfN4jRGK
+	 8vmB2rvxUF8wCsowG/lJ70srzgduEo3o6+oYw63Uuddnw0H7pQ/ncu8b7NfaevKwv
+	 TbZ6qdJKGKxyaVthS5+wrRCx2SD32BqwVEIr7xfd5YduOEkNqejAPcjfACxYowzCr
+	 RuM6mA1nYUsOoMUgjRVJGyvWpPx7yQSaTUn5fJUBACpU+30u8qbyn5CIa+KLGjFLg
+	 NQQaKnDWFWQkxkK0JNsdiJdVtsRiGKNbBULa4kY3kQ9V8ugc4+bx5SheN6tygle3A
+	 pkWunsT01QHSizwueA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([93.196.132.14]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MTzve-1snPxq1HsI-00XzbY; Wed, 14 Aug 2024 11:46:32 +0200
+Date: Wed, 14 Aug 2024 11:46:30 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: avladu@cloudbasesolutions.com, willemdebruijn.kernel@gmail.com, 
+	alexander.duyck@gmail.com, arefev@swemel.ru, davem@davemloft.net, edumazet@google.com, 
+	jasowang@redhat.com, kuba@kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stable@vger.kernel.org, willemb@google.com, 
+	regressions@lists.linux.dev
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
+Message-ID: <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+References: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
+ <20240805212829.527616-1-avladu@cloudbasesolutions.com>
+ <2024080703-unafraid-chastise-acf0@gregkh>
+ <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
+ <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2mzl5l6sgb6uplk5"
+Content-Disposition: inline
+In-Reply-To: <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+X-Provags-ID: V03:K1:OQn6Lp+6oyiAbiERKIBwzgLEG9lNFwdubjCxGrBhmRrEjKKAovD
+ M9eUn+t+LAuoOPUAuuz9wn7/UI2tUpX+i+slh4ccpmk1rvHmXJPSfHngX2JfhewZmmTcIag
+ nuZDiokyFTQLQL+UwwjkobY73VrhjvzXtPylOsmyMp1i8YR975A2QurdFzLngCcsVjc0os2
+ ilJUIkyy1lI57wePjeW5A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:HIUIR4bgoXE=;lVNke9+rOe0wp8jGamQzkFrNwo6
+ Vw2GwhKHNtFhzcVKrKFsYsZ2NAoHL+j4L9LHwUY2fUq8M5jJe11foiHDuHmuYTI2Vg6fPTEs6
+ 0Ec68DUQU7JCtWzKV5U2sohJPFTZIJuPi1K5WkXAZGgI7DCEsotQLRa21lLOFFyeYbdLiSZVh
+ 9GrC8+8xuL0p0b11QbvF4lQuFAt+/KPbk91vSe9AudxNoi3zFvaEhcjP93PiGSFS92FTwwEJl
+ 0ABDCZWoIuHeZ3XSCBuocz5MDJrhwxlpYZ4wr0saWLgShR7gH8cCKaOeVOboFDhf76b193q+B
+ vpUgjkkWe1ybOAx+U5As4AZZnbMXV0dHiYqh1iXk1zSN5K0R+e+9ccof1bVW6uVfsH84YnxKZ
+ bhvUxCG8S0aISSFKB6+r1CmmrQA6ObsGj8SDRE7NlaUlS+MrnFQeuXiNpX4sLPFkTSsFTv5jf
+ r+bROymu8VTaTD95pyYiBjFwnUnS88Fv4Tj/UyP8SXQFa+KgiEPNj2sfjAVROXzzq3dfw79ga
+ EDkSWSFW3N8l55TpAba0Flgjkv7FyKjttUYQk6GoUW3tW0tkeK1pmV4k5oY11SxxbjjCtuu0y
+ h85nthA9kC5MLi5ZsekFUquvsCJ8TxAhAKgK2McxPGE6+3E2yAWCs9pzOUBtFCXdXupOPAPGy
+ hfA2RR8aZR4uQ7VhL2WRrrfp2TrF4C5MH1Uv0uOMobi4l1CaiMxa3wboAoI074efEKvs90B7e
+ zWZPSajggpnzC1DfBygTA1uDYc8R4lDIw==
+
+
+--2mzl5l6sgb6uplk5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrxoC_jCc00MzD-o@nanopsycho.orion>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 14, 2024 at 10:17:15AM +0200, Jiri Pirko wrote:
-> >diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> >index 3f10c72743e9..c6af18948092 100644
-> >--- a/drivers/net/virtio_net.c
-> >+++ b/drivers/net/virtio_net.c
-> >@@ -2867,8 +2867,8 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
-> > 	if (err < 0)
-> > 		goto err_xdp_reg_mem_model;
-> > 
-> >-	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
-> > 	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
-> >+	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
-> > 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
-> 
-> Hmm, I have to look at this a bit more. I think this might be accidental
-> fix. The thing is, napi can be triggered even if it is disabled:
-> 
->        ->__local_bh_enable_ip()
->          -> net_rx_action()
->            -> __napi_poll()
-> 
-> Here __napi_poll() calls napi_is_scheduled() and calls virtnet_poll_tx()
-> in case napi is scheduled. napi_is_scheduled() checks NAPI_STATE_SCHED
-> bit in napi state.
-> 
-> However, this bit is set previously by netif_napi_add_weight().
+On 24/08/08 11:52AM, Christian Heusel wrote:
+> On 24/08/08 08:38AM, Greg KH wrote:
+> > On Wed, Aug 07, 2024 at 08:34:48PM +0200, Christian Heusel wrote:
+> > > On 24/08/07 04:12PM, Greg KH wrote:
+> > > > On Mon, Aug 05, 2024 at 09:28:29PM +0000, avladu@cloudbasesolutions=
+=2Ecom wrote:
+> > > > > Hello,
+> > > > >=20
+> > > > > This patch needs to be backported to the stable 6.1.x and 6.64.x =
+branches, as the initial patch https://github.com/torvalds/linux/commit/e26=
+9d79c7d35aa3808b1f3c1737d63dab504ddc8 was backported a few days ago: https:=
+//git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/include/l=
+inux/virtio_net.h?h=3D3Dv6.1.103&id=3D3D5b1997487a3f3373b0f580c8a20b56c1b64=
+b0775
+> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/=
+commit/include/linux/virtio_net.h?h=3D3Dv6.6.44&id=3D3D90d41ebe0cd4635f6410=
+471efc1dd71b33e894cf
+> > > >=20
+> > > > Please provide a working backport, the change does not properly
+> > > > cherry-pick.
+> > > >=20
+> > > > greg k-h
+> > >=20
+> > > Hey Greg, hey Sasha,
+> > >=20
+> > > this patch also needs backporting to the 6.6.y and 6.10.y series as t=
+he
+> > > buggy commit was backported to to all three series.
+> >=20
+> > What buggy commit?
+>=20
+> The issue is that commit e269d79c7d35 ("net: missing check virtio")
+> introduces a bug which is fixed by 89add40066f9 ("net: drop bad gso
+> csum_start and offset in virtio_net_hdr") which it also carries a
+> "Fixes:" tag for.
+>=20
+> Therefore it would be good to also get 89add40066f9 backported.
+>=20
+> > And how was this tested, it does not apply cleanly to the trees for me
+> > at all.
+>=20
+> I have tested this with the procedure as described in [0]:
+>=20
+>     $ git switch linux-6.10.y
+>     $ git cherry-pick -x 89add40066f9ed9abe5f7f886fe5789ff7e0c50e
+>     Auto-merging net/ipv4/udp_offload.c
+>     [linux-6.10.y fbc0d2bea065] net: drop bad gso csum_start and offset i=
+n virtio_net_hdr
+>      Author: Willem de Bruijn <willemb@google.com>
+>      Date: Mon Jul 29 16:10:12 2024 -0400
+>      3 files changed, 12 insertions(+), 11 deletions(-)
+>=20
+> This also works for linux-6.6.y, but not for linux-6.1.y, as it fails
+> with a merge error there.
+>=20
+> The relevant commit is confirmed to fix the issue in the relevant Githu
+> issue here[1]:
+>=20
+>     @marek22k commented
+>     > They both fix the problem for me.
+>=20
+> > confused,
+>=20
+> Sorry for the confusion! I hope the above clears things up a little :)
+>=20
+> > greg k-h
+>=20
+> Cheers,
+> Christian
+>=20
+> [0]: https://lore.kernel.org/all/2024060624-platinum-ladies-9214@gregkh/
+> [1]: https://github.com/tailscale/tailscale/issues/13041#issuecomment-227=
+2326491
 
-It's actually set in napi_disable too, isn't it?
+Since I didn't hear from anybody so far about the above issue it's a bit
+unclear on how to proceed here. I still think that I would make sense to
+go with my above suggestion about patching at least 2 out of the 3
+stable series where the patch applies cleanly.
 
-> 
-> >
-> > > ...
-> >
-> >Best regards
-> >-- 
-> >Marek Szyprowski, PhD
-> >Samsung R&D Institute Poland
-> >
-> 
-> 
-> > 
-> > 	return 0;
-> >
-> >
-> >Will submit the patch in a jiff. Thanks!
-> >
-> >
-> >
-> >>
-> >>Best regards
-> >>-- 
-> >>Marek Szyprowski, PhD
-> >>Samsung R&D Institute Poland
-> >>
+	~ Chris
 
+--2mzl5l6sgb6uplk5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAma8fPYACgkQwEfU8yi1
+JYVymBAAzP5fIg+bFUsU5LnKu5GXrSkr61UKgNv4C+2NVB7TigjYoQz30kXEWJPz
+6Tx00F5cryBPPN3IuCn+5QBFnx+g62ZCFUay6nUC/gzlWcfFAPCPAXDrziYyc+eD
+TCCZLyNSXwGaeXJwPCOIpW170Ep4yWK0ilaliUtEzSHGLfWzF9Jcl4xL6hhJ8xA8
+q7KQ2WwrdD+7Q7jMiVXric0yMI6zyan3Lqg4PyLgsvVW6ZqfO3FMsY8LM1WI0peR
+J/+w9PzQCbooi8WRsuHo2GcGzNNnjT8n6zILwObLOs37dcqAusHR22zyNozTXal2
+ha1qs98ijwXnsm6wQq7e4eh7SI59xbO8WU3/bHLh3ip9Q/w3f6gO10/kIObq2Ctz
+0rb8+SOv+mRfGiog1dofV8O6RHTYIV1bwkohP24lYdz2u8WnFfqpijuieaSwo4r4
+RasMGBnkV00k2aBJwnG4VhUuHm1fEdnbM7iUD2pGmrXDOVbiB19n4KeXkXmO+Fp4
+O22a6+/HFK1m0oJ8cX+H/YoiYkym/D5bHVriAsbDQfS1Br/Ex8eS4KFMo29Vlw9t
+3/HSAkrj2IpxS1ZRIg8lTWK9HB6mxs7KUowo8qPI/HrglObSpJTewVciC++0FazZ
+hwpeOOyOgJiggPBBhSVZft5RJFNH/v2IrJ0qrd4CnSrmr24TWeQ=
+=U63T
+-----END PGP SIGNATURE-----
+
+--2mzl5l6sgb6uplk5--
 
