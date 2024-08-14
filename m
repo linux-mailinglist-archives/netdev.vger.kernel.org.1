@@ -1,123 +1,128 @@
-Return-Path: <netdev+bounces-118491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF22951C56
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:56:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0260951C70
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 16:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62274B22FF4
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:56:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5078DB2165C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 14:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB38B1B142C;
-	Wed, 14 Aug 2024 13:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745211B3721;
+	Wed, 14 Aug 2024 14:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BKwnKJ+2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GPEMgoXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664B41AE031;
-	Wed, 14 Aug 2024 13:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1147B1B32D7
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 14:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723643764; cv=none; b=buFmiNDhnSCg3k74FuH0n3l0lciCOta1rpdU/etCqOrEwP+AW1yQS1r/7GcYuEq885nZ+gyUiZj7JcFIoTBMBENI2eS23svqX63zs7K5MSuC4esJELG1QA35hGbkB2gZuCThezGlc6U+Iq0FN3TqM2cJa0kOYVxd3riIfxPZF8I=
+	t=1723644026; cv=none; b=gPsKtzzFhctMHFJG0GAGn95RT8h31Pusf8N94QhBKRu+rnvLn41UQVivYi2CjicORkjG0bt3VlO2Tr8kfJxsyGybojyQgic521fE9yYzVI2sU8ePRDB76y+QQ7W/jLTqHjdGo+Ti+HSk/whM8AGM5rtVuuIvNZvLogrMKzdfu1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723643764; c=relaxed/simple;
-	bh=/rpKccHLFeMPwfh8/Z3y3vKNFKr0wxlFnLrbW9Ap9Hc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KNmJjdFrFrl929iKQ8eTPqmV8pxrUDmsBChHvmRfr8glQk1KQhHLW3mBA8TXLQRazM9ZHQ+28p+cxxUA1QI7IBBPvIE34woLn6jQZ0g/AFbBBCd5I2Ec7B25feV1jzBvmW79kVgIhb1VaqJgqBpv9rq4XNJshu6YPzo3b4QfC5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BKwnKJ+2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=d7XSpVSeMThBLiB59+Xltez9tOwwh3c3sJ0sf1rJdMg=; b=BKwnKJ+2LVVEnDZ1xzaQphigK5
-	L/qkHI/an1sVfcvLFqhR+12ngv9e3UgJh6KPsMz3rPLwIMJG+UdfD58p54B1em3noCC9kjHK2YoL+
-	CZS1PkI+rhh2de4UJoLfk5EMWKL5d3PwDBh6OcR7qP7CMDZNLdjguxutlCHqlST1vWzc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1seETg-004ljl-0m; Wed, 14 Aug 2024 15:55:52 +0200
-Date: Wed, 14 Aug 2024 15:55:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, marex@denx.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net: dsa: microchip: handle most interrupts
- in KSZ9477/KSZ9893 switch families
-Message-ID: <736f67be-a21a-40ba-9eeb-d94040d56dc2@lunn.ch>
-References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
- <20240809233840.59953-4-Tristram.Ha@microchip.com>
- <301c5f90-0307-4c23-b867-6677d41dce47@lunn.ch>
- <BYAPR11MB3558DD354E8162D02E1FCC21EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1723644026; c=relaxed/simple;
+	bh=Rm/3lW+0YffOquvhbtAmA9ex5ArcP5gTJnxyJkmvq/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jbW6QjEkHhk0K4okNuxlysgVJblM0aVBcscbYRym+dztI4rAQVTKaz/ioz1sT/gF2KKvPWxRITv+ebPVP12XXeML0Q05QUadIulzEfDn/UgW7tGzx3zjFoEQXn13Ftkk9eO/PkHYCC416FnCxg4AtAxvbVgAxr/S8hg7gVEjRGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GPEMgoXs; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7c3d415f85eso36509a12.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 07:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723644023; x=1724248823; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pPPbcnH9ElDp0HrPGBFxxmp8KGuGyOIeFoZaRnlkCRk=;
+        b=GPEMgoXsSmAEvWDQVhP2rFop9ZJNj/3fFNafVSOWaTwYSBOlJuKNzKXFQ9KwxG2bsL
+         MczgC/FPJ8/gK9YONMDqMXYAhE9phmsVUK2C8Z5BQKKYipxOef2+wgIlXFjniDg1IccP
+         kMNg5iFv6ARx+mU8XPwGQK9oFPTRIBbxadeHjetJ3Mxp+yZFsxMSiC8hUOkEEuoulVF0
+         /qvVLc8bZk1RXo4s/y+YPWm1rokwlGI88+jTXLXqIgPq9tTjl8gWENDDSbLVyW0zOMuz
+         JjLEgL4NKbq/X1de6faEUlJFErtODtoA9Z/t+6fKaEPDUExdBo9pt9n0/DLXbqppdYsN
+         OKLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723644023; x=1724248823;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pPPbcnH9ElDp0HrPGBFxxmp8KGuGyOIeFoZaRnlkCRk=;
+        b=boVNcWbzJYAOCsH1Fp0qDx5z2eTYTi5RN7VbtWJNv+bXIu9mqe3i0w2eyOstRiUz39
+         k5VbAUrJnyUPOBSDdxCoY76S3oDyquYRyx4oXwZ5tNnDsGl7kPZ3/JsNCIBHVKZhaPw4
+         AKbBxhYbH8x9N57AKUPFK98J+ZUB5QxV1Q/lGhBse9bevGR8n5VD4b48RbsdDFAsVltV
+         pv9s/8rucguL4tCgpwDt0fWuqHv1s8rcioYH+m3lq+aOO8VqqkpKkrUNhudzd7QqK1UP
+         JQzdmPQYBXd+9CN6YJnrvbidFcgNlJcN9mTpYeeJg3ikIdgFaFFR/SgjPyh+MmT550oM
+         j//Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUB3MQIrJNLH3kjtjL3OjmofbExRpQuBd9YM9fO3vCUnVJYk8hWfgjHFMP0fBpDPin7VCjkJow9YYG8DNbVJN5fnh/WPTGQ
+X-Gm-Message-State: AOJu0Yx5DxN1F8uG67tmq0Q3ltYtGtSmjswyDZJRRPF9O4bsqzsuFisz
+	hZO83woFpixUasqrwA0XOe2ftgOCyAYVmJFJG2f2CaBgZL8lnoxqNXGkct7g/Iw=
+X-Google-Smtp-Source: AGHT+IFej6G9ENKms8sCLz4PlMZguobfmGkOJPwW8ux5QRbbPWvSalJ7KlkeiZXZ2VIdS4yhHVtNqA==
+X-Received: by 2002:a05:6a00:3915:b0:704:173c:5111 with SMTP id d2e1a72fcca58-712673ee118mr2053455b3a.3.1723644022755;
+        Wed, 14 Aug 2024 07:00:22 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710e58a0b5dsm7350482b3a.47.2024.08.14.07.00.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 07:00:22 -0700 (PDT)
+Message-ID: <0f19dd9a-e2fd-4221-aaf5-bafc516f9c32@kernel.dk>
+Date: Wed, 14 Aug 2024 08:00:19 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR11MB3558DD354E8162D02E1FCC21EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] softirq: remove parameter from action callback
+To: Caleb Sander Mateos <csander@purestorage.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joel@joelfernandes.org>,
+ Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
+ <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+ Valentin Schneider <vschneid@redhat.com>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org
+References: <20240813233202.2836511-1-csander@purestorage.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240813233202.2836511-1-csander@purestorage.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 10:24:52PM +0000, Tristram.Ha@microchip.com wrote:
-> > > +static irqreturn_t ksz9477_handle_port_irq(struct ksz_device *dev, u8 port,
-> > > +                                        u8 *data)
-> > > +{
-> > > +     struct dsa_switch *ds = dev->ds;
-> > > +     struct phy_device *phydev;
-> > > +     int cnt = 0;
-> > > +
-> > > +     phydev = mdiobus_get_phy(ds->user_mii_bus, port);
-> > > +     if (*data & PORT_PHY_INT) {
-> > > +             /* Handle the interrupt if there is no PHY device or its
-> > > +              * interrupt is not registered yet.
-> > > +              */
-> > > +             if (!phydev || phydev->interrupts != PHY_INTERRUPT_ENABLED) {
-> > > +                     u8 phy_status;
-> > > +
-> > > +                     ksz_pread8(dev, port, REG_PORT_PHY_INT_STATUS,
-> > > +                                &phy_status);
-> > > +                     if (phydev)
-> > > +                             phy_trigger_machine(phydev);
-> > > +                     ++cnt;
-> > > +                     *data &= ~PORT_PHY_INT;
-> > > +             }
-> > > +     }
-> > 
-> > This looks like a layering violation. Why is this needed? An interrupt
-> > controller generally has no idea what the individual interrupt is
-> > about. It just calls into the interrupt core to get the handler
-> > called, and then clears the interrupt. Why does that not work here?
-> > 
-> > What other DSA drivers do if they need to handle some of the
-> > interrupts is just request the interrupt like any other driver:
-> > 
-> > https://elixir.bootlin.com/linux/v6.10.3/source/drivers/net/dsa/mv88e6xxx/pcs-
-> > 639x.c#L95
+On 8/13/24 5:31 PM, Caleb Sander Mateos wrote:
+> When softirq actions are called, they are passed a pointer to the
+> entry in the softirq_vec table containing the action's function pointer.
+> This pointer isn't very useful, as the action callback already knows
+> what function it is. And since each callback handles a specific softirq,
+> the callback also knows which softirq number is running.
 > 
-> The PHY and ACL interrupt handling can be removed, but the SGMII
-> interrupt handling cannot as the SGMII port is simulated as having an
-> internal PHY but the regular PHY interrupt processing will not clear the
-> interrupt.
-> 
-> Furthermore, there will be a situation where the SGMII interrupt is
-> triggered before the PHY interrupt handling function is registered.
+> No softirq action callbacks actually use this parameter,
+> so remove it from the function pointer signature.
+> This clarifies that softirq actions are global routines
+> and makes it slightly cheaper to call them.
 
-This is one of the reasons i suggested a PCS driver. Look at
-drivers/net/dsa/mv88e6xxx/pcs-6185.c as an example, how it handles
-interrupts from the PCS. And it is a similar setup, the switch has an
-interrupt controller, and the PCS driver requests the interrupt. PCS
-drivers do not need to be complex. pcs-6185.c has an empty AN restart
-callback, pcs_config does nothing, etc.
+Commit message should use ~72 char line lengths, but outside of that:
 
-	  Andrew
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
+
 
