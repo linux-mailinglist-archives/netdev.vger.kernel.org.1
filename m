@@ -1,108 +1,182 @@
-Return-Path: <netdev+bounces-118365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B9A95163A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:11:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4B695166C
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55FE01C213D2
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:11:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 007431F2367D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E5380631;
-	Wed, 14 Aug 2024 08:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847D713DDA7;
+	Wed, 14 Aug 2024 08:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TgN8oQY6"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="uMGrFIFI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A58394;
-	Wed, 14 Aug 2024 08:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DE913D88E
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723623064; cv=none; b=Lyo59ShFj/qqsZu2/LXRo57quVG2SypGfYAPNBRPCZoMyEI8FCAvA0NWFHc+eCO1r61Qv5V/WXZBYjt5Lva7S6bxJpmNErBqu7hVLs1UIxhgGUsPxdBSTwbR0+j+UA2uEK3AUZQWgDDOsl7XEThf7isAXBMXgjCjFaLOWLNv3cs=
+	t=1723623448; cv=none; b=TdZ1gW3U2RzKbHFO66/FxPDJF5FYMCEnlTpscSPEzTQlhoneVDTNCW6oeEg7YiQ+qrSbs9To30meKuRi/AFzsVGvKe8QiGL2sjQ2WuTM/f2kLZiiy/wG5nQzLQUxJA5knyIEDTuzEWdXq8YDY1ejlgq1FlNW6LX53EB1fmqwr6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723623064; c=relaxed/simple;
-	bh=zQYI2CyBp6VDnSmKB6kWAIMSX4CGofuhq0CGvnnCLjw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Hif9VLh86GCbqAdCWAQ/otJL85PQFcDCJTCmkZKePLdsKyhQCqohqwCrdsDAFiYUxu/4bPGgxCJYZS9qIeCxfRwhDuVJBmo7NUWZNJL/V7v5l8wM4dwOINr20HiR7eHSSSJpntFAPbh9KQrcsEeFUMdrOtmjPp+kQP+jxh5VBns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TgN8oQY6; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7c3ebba7fbbso2235414a12.1;
-        Wed, 14 Aug 2024 01:11:02 -0700 (PDT)
+	s=arc-20240116; t=1723623448; c=relaxed/simple;
+	bh=Fw1ZzF4puvC8w/0p/Rm/AdsvzvgJ0Zl7btq/IhBSGQ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HjiRIjNQapYmKHXUAWgQHmwvzZ3Hs2Gei6fSidw0msnTa7xS8ggsiVJKyRLfY5IIjtLjQv8gzydP8iOMpjzjc6l2WE44TeAxZX8GOHWJvwL9M5VCWV+PSEOve6430ofXpkVox7DRYc2tO2kBWfglZQ12CX704XzRTy0LiwOASA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=uMGrFIFI; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-530ae4ef29dso11667371e87.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 01:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723623062; x=1724227862; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723623444; x=1724228244; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zQYI2CyBp6VDnSmKB6kWAIMSX4CGofuhq0CGvnnCLjw=;
-        b=TgN8oQY6T12TbDs2O5XVxiiuDYogyA0fLHg8DL0z244hiREqh9Z3Asa/8/qBUmGBIe
-         osVZfkuyV0Q7ACC+mNHws/U/EAGgBmA5sKG3PwLb7+7e5GbrGF57ySAKsN+kH0OxkxL+
-         Jm9fd/eYKy+PoCRwLsS8S8Ed2MJXwr1z62Re9ZBy83/rQfo9kSdyxpbOLrpL+pHswVJk
-         m5qo52QWSRMzvjJQpksZBKU6LLkgqxI5EPvMTYwIVQlWOFkbrU47kebfJssid5jn2zvE
-         w3pdo3Eya2hkcpVUL05yGfObyGxYr4ZftQESk25KGdiGW7wqHJHTOnhhF2CcA83FwZEe
-         Lv7w==
+        bh=/2TgENL3xawlLU4YIOAIlHofb+6muDPN75SD/sHSKy0=;
+        b=uMGrFIFIEWy/kjEUM7tnh6G2NLfpBBR+l5jkI0cnVmAGJS9r1vL+2s/xHowW3Qt3pQ
+         C/WwUf5FvynXPlv0LwsmhpZGDZRBFDcYt1w7P/gNI0WK7HHUEH6Mq7V6ydwqntc+3xs/
+         YtEzVNq4j2SQIhGdGwaPIKXX7IdkxkqoJ0Yw1WaaXWgTY2iQ40IblKXMJYKSbDHzUZgh
+         kVyOVB7CAWCMj58llZaH2WZ8YfZYROEkJm+8iJ1stUoPVKo3JmJmeSNowplrlXI4IvfL
+         3KGg0PYPYBRc7YlZ5NMvIzVzop/K2tUBlvLxooLAGLKDWq/K0DnUXIIcsHV2JeO7OflB
+         G3ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723623062; x=1724227862;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723623444; x=1724228244;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zQYI2CyBp6VDnSmKB6kWAIMSX4CGofuhq0CGvnnCLjw=;
-        b=w0oN/RpHSjsxgR4SdGxrQd2D39eQbgwz1gqPIJc68qFodnDXDVg5S82h5n0d7/60nU
-         KS7zW0h3/I97ZywNuy1pOJ1r31x7/BKRUYIpCAiOVivohvmFnGAQRKG6n3HAqzhsxgwi
-         xCf+mOK/QUZTRJHkjXfjLPibjoHK8Ot0g/CYi/BTUVccpEA4TWxeUd6Est5ZA5aTRUZO
-         ahwtrg4V4LUGDOhZYZdCdlWW1k8f5VnzhJ5BRN4Hrn//SwhAP3qrH7E1DyCpYMVrjJ0p
-         Wf1wprhW4v9yWDIgMLKWKlEQYSE09dSCc9nSLIXBvRNqzw3vRhMrqMGnuvN60PmpFDHM
-         FzTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdhbn5W7rk+EHgGUz0DQXMZEbXlzwoywGrDfECX1AMHPwQIqc+ILevarbvXK5fY1BP2WiutcnPsvsCMQNeZk6Zl+YONZTPCnnr7H3joKOu2pdEAlAmovz3OlDysKZBMYlxoLZruoBLf6HKGoXVokddMk1LWCKsyHYHYsw5L9sRO7F9k/e0
-X-Gm-Message-State: AOJu0YzIiSidgtX+xebR1CsyM6gobRQ8798pcwv8MIbvKwLcYnL1Of4r
-	DSNbjDf1gt4Dhlq+wWsQu4oqq2v7YQ3qAAyktFRBhT4bNpKw0ubkLiLxNLKL
-X-Google-Smtp-Source: AGHT+IEEosjrpDepYydNQqfH/3IAYteZdHzQhmNJ9bRYCqjLuJtK2WpXw4iV806TF4Jldbv8j7pruw==
-X-Received: by 2002:a17:90a:1f8c:b0:2c9:cbdd:acd with SMTP id 98e67ed59e1d1-2d3aab8363amr2377782a91.35.1723623062127;
-        Wed, 14 Aug 2024 01:11:02 -0700 (PDT)
-Received: from dev0.. ([2405:201:6803:30b3:1250:5301:54db:4816])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3ac843640sm979642a91.41.2024.08.14.01.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:11:01 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jain.abhinav177@gmail.com,
-	javier.carrasco.cruz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH net v2] selftest: af_unix: Fix kselftest compilation warnings
-Date: Wed, 14 Aug 2024 13:40:54 +0530
-Message-Id: <20240814081054.1156422-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240813182106.1f44d161@kernel.org>
-References: <20240813182106.1f44d161@kernel.org>
+        bh=/2TgENL3xawlLU4YIOAIlHofb+6muDPN75SD/sHSKy0=;
+        b=Zyl/PllOKYRK5TB9XpvUf7Ha33CartArcdgY/5VLzc2Bl6BdzgwOj3KyUB0SP8rVxe
+         eC02S4GxWYIJ5QGu/Agx7BaaRSeEY3NLy5WhiwAvSUOPUYys4NuzmwgC/CJZaSP9k1A9
+         FQaOeO1laZRXWw7okh10zF0C77nhP/UVl60ErhpEkhEsLT/68866RYlNcF7/cL4BS0nk
+         Am37sIzdU95Bk4BQScs9Zl+au9ZxyMXFj3C4Op/dNSeYllO1wSzyoeV+/XcFcPEoWYre
+         UwoyUQ1vBSJQdfXZ6r6EsPP8xQFU/RXiCat8Aq/1O2SRQesDPMzOwRXxTv7p/LU7fIVf
+         w89A==
+X-Forwarded-Encrypted: i=1; AJvYcCXLJldVnVQp0+nOhnHr5EKtnwtQLedDgsfDC3kVM7alUAbCoLXZVqQS6kudMN9KkeG1HP5jksL23CnN6nOQa1V9ZhKvcvxg
+X-Gm-Message-State: AOJu0Yyx1IurE5YRTmdkgY5qq1uGRUdffwzOTK0rid54xM7ESX5VExPm
+	LVZrCPwYthEKL7e5yEJkTjtT+k4CL7Ln3ycJbWhmOScOcYSgeo95JLnz91wiD8Z3mUuJo2HiW0p
+	fse+ZR+8Sw/s233I7Wrwh/SnCMupD5sVU8nvd5Q==
+X-Google-Smtp-Source: AGHT+IHKjTX3v03zjUihKU1aJBKyTKGdAZsW85MS+ZnqWBZeBvBl+H7h6kwdOiR/LFg4qqcFO1k0iWiGDkGBp9lCNMM=
+X-Received: by 2002:a05:6512:3d8a:b0:52c:e10b:cb33 with SMTP id
+ 2adb3069b0e04-532edbbf006mr1492770e87.50.1723623444198; Wed, 14 Aug 2024
+ 01:17:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240813190306.154943-1-brgl@bgdev.pl> <172358277338.2007176.5717215982820920385.robh@kernel.org>
+In-Reply-To: <172358277338.2007176.5717215982820920385.robh@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 14 Aug 2024 10:17:12 +0200
+Message-ID: <CAMRc=Me+FFH7duM_H6fcxdPd_oTtZGk1TQ_AioWDXb-GQTspQQ@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: ath11k: document the inputs of the
+ ath11k on WCN6855
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Kalle Valo <kvalo@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	ath11k@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 13 Aug 2024 18:21:06 -0700, Jakub Kicinski wrote:
-> Some patchwork malfunction, the patch didn't get registered :(
-> Could you resend?
+On Tue, Aug 13, 2024 at 10:59=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org=
+> wrote:
 >
-> Please keep Kuniyuki's review tag and address his feedback.
+>
+> On Tue, 13 Aug 2024 21:03:05 +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Describe the inputs from the PMU of the ath11k module on WCN6855.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> >  .../net/wireless/qcom,ath11k-pci.yaml         | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> >
+>
+> My bot found errors running 'make dt_binding_check' on your patch:
+>
+> yamllint warnings/errors:
+>
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddrfacmn-supply' is a re=
+quired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddaon-supply' is a requi=
+red property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddwlcx-supply' is a requ=
+ired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddwlmx-supply' is a requ=
+ired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddrfa0p8-supply' is a re=
+quired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddrfa1p2-supply' is a re=
+quired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddrfa1p8-supply' is a re=
+quired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddpcie0p9-supply' is a r=
+equired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/wireless/qcom,ath11k-pci.example.dtb: wifi@0: 'vddpcie1p8-supply' is a r=
+equired property
+>         from schema $id: http://devicetree.org/schemas/net/wireless/qcom,=
+ath11k-pci.yaml#
+>
+> doc reference errors (make refcheckdocs):
+>
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/202408=
+13190306.154943-1-brgl@bgdev.pl
+>
+> The base for the series is generally the latest rc1. A different dependen=
+cy
+> should be noted in *this* patch.
+>
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+>
+> pip3 install dtschema --upgrade
+>
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your sch=
+ema.
+>
 
-Sure. I have submitted v3 keeping the above in mind, please review:
-https://lore.kernel.org/all/20240814080743.1156166-1-jain.abhinav177@gmail.com/
+Sorry, I ran dtbs_check but forgot to test the binding document itself.
 
-Also, @Jakub, please kindly check this and revert (another patch on which you
-have helped a lot already, need one small input and I can send the next version):
-https://lore.kernel.org/all/20240810175509.404094-1-jain.abhinav177@gmail.com/
+Bart
 
