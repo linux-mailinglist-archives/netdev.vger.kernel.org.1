@@ -1,154 +1,178 @@
-Return-Path: <netdev+bounces-118539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D77951EA0
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:34:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB725951EB8
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 272931C226CE
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:34:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FF761F23236
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEB31B4C34;
-	Wed, 14 Aug 2024 15:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA6D1B5824;
+	Wed, 14 Aug 2024 15:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKqkeXUc"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XgPkTXNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3101E529;
-	Wed, 14 Aug 2024 15:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61821B580C
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 15:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723649640; cv=none; b=aUloyP/CiH3wK6AskHJI8wNrLG/d3yAS2ZT4DG4HyHnlDl8DB6/oDQPBfFy3cguLqG+mxYOxn4up5E/boIXe226j5osv2y5bousUSRG0UhUtAmix+eJAHWuyH4KXq2sHlrldbjd9+LAaM1v2fArTtGgD/HdH0/9Ny3aqy8OuE50=
+	t=1723649833; cv=none; b=dGI6QLjhuusZlcZfX4tgRJ/cZoxHmt5PM9mThP+ReCPthTmVyWItiYUrS6zFJKGH7VvE71HKNF2j/TutfRZNTU73oM8OK7Ju+JXhBgnZQGfzdk3yr+4C+SDMI1ny3b9DC0zY/L9TG3TC8VIl1hdg9UimdTrNrr3LKZiRed+TrEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723649640; c=relaxed/simple;
-	bh=QLbYuL5iDDVjrekLj6uwxZzS6Qfq6dEj/vjZ3vOcbZg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eJcxvC3XF2r0ffkCdH3POM5E5GcRkEvZP1Q+OlNNPDBYhcNnGewb3OFqGq6yT18FASaKbfoNUzoGOBzA/POIQhu3s6FxoCZvOMSOB8BBZksmlifnC77xPcUGT5jLJZREJmh5pTOsA+O7mms7bZYee1RKbuqEVaSMa/K7ejYBYfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKqkeXUc; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-70930972e19so1931975a34.3;
-        Wed, 14 Aug 2024 08:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723649638; x=1724254438; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=miqNK+B744VEtho+Cz5BtriydmdXkbKnexaiIQFok4E=;
-        b=XKqkeXUcV2xNnZsYuMIUh+RtZhGRKvcio6Hv8eAioXvu5nP/d38e9m1qbWr8V5UbzK
-         SdFSivmY/hTsD1f8Cmj3lpkXuL5kcFVfsLmyLKIYzirSXGoK3MbSweihoxz8cF7rRIjM
-         MUb4Eplu2zTktziZ/hHcPkEFf/O8SpdDfpSTODPxv4Uge6QfHzLKmIxt0dMbXXMgKaC3
-         jncql18YjVPuooN6DxTZOh37s7AV19vv1YLmM8lPkcCMKbvC8Rk24aTDeE1vZZ2+YPRp
-         LOcdqkkslLRBl4HB+3376yzREb9MvSPjc/pLwk+yFefrvsP9Ezb4iNPPsNhRjsD0lJR5
-         Kupg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723649638; x=1724254438;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=miqNK+B744VEtho+Cz5BtriydmdXkbKnexaiIQFok4E=;
-        b=ASFRXUJCqZ1HdqT9nAk9G7eG7YXX2Iaa1xFfKU9tQJOlSllqI0K6TW0Pg0HikSKAYN
-         qxbRf91QajrogcOIcwSxKYyaGSRTGs1m1WS/vrtUNuMqSWFW3k+OxuqXSWWxUwIxPVND
-         C0Mtg59bgl3s6YWc+igz8eaEuYja6u3ztIL3o6h/0hCvRTaL/GZnepjJ64M39wQPR9Dd
-         YEE5l4yW2my89MBG3S6hlql7yfG4brjCcnlcovt35lmiewA4UggAMlBmMYg1vO6b6PfD
-         l51oU+HiXQxmKix5DrH3RvYxOQ1fX+QbCESkxtv7qh2gV8fepFx2TIC9oOoK9gxgd+ar
-         ZLVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPl5jLkBgf06+1Y6myRxCg8uejYeb7oIdWG4qzjgjAVMjzXVc+FtrypjCRwu2OzHqH6ISceSw0Dpr9y65Wq2XwG5rKEpkaDQeFFQcjCrxoAcvUh+p+BEI28+sLfeoAhQoEehcxeAmBtZpse9H4
-X-Gm-Message-State: AOJu0YyCI3VTqVZkHX3i3do5yjLop6m69fOxZTw9NGxtOP57wR1nFqW8
-	h2znOAvPw4fpRybOpO2Zm0S3glwXWfqhhR6ChaOuMJ0pFs8s63rW
-X-Google-Smtp-Source: AGHT+IEwQqDD1BqP+Zoiab/YVxTNQIEozpAACW41iApb8rmqIU4uPEKI6+p9bS5UeKAf+1oOHFHzqA==
-X-Received: by 2002:a05:6830:d13:b0:70a:92e4:6736 with SMTP id 46e09a7af769-70c9d9d9529mr4164350a34.28.1723649638136;
-        Wed, 14 Aug 2024 08:33:58 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70c7b89c042sm2254766a34.78.2024.08.14.08.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 08:33:57 -0700 (PDT)
-Message-ID: <bc279009c4c3c901033e23601efcf9ed4da8743d.camel@gmail.com>
-Subject: Re: [PATCH net-next v13 02/14] mm: move the page fragment allocator
- from page_alloc into its own file
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, David Howells
- <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
- linux-mm@kvack.org,  linux-kselftest@vger.kernel.org
-Date: Wed, 14 Aug 2024 08:33:55 -0700
-In-Reply-To: <20240808123714.462740-3-linyunsheng@huawei.com>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
-	 <20240808123714.462740-3-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1723649833; c=relaxed/simple;
+	bh=ZumYsDCZmNMkpQksJ8p659OKJ3KtAe7xWrm338kFaDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u+PXP74Xz7ANuu0q1DwrFT6GDhYXDYiFk2SVc4UWgkdFrGWzsHX4L6UfLD4TggYGckY4OUCsAe4LsXCh5h0Ofr7GEYFS89g3c9seP5RCWlhdN1scDyX/emLI1Pd7xqjtTBBdDYJaLpeTOQrms9dcTeOt0QRlMnaFK1q7W91ferE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XgPkTXNc; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-05.internal (phl-compute-05.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id BB91A114E848;
+	Wed, 14 Aug 2024 11:37:10 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Wed, 14 Aug 2024 11:37:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1723649830; x=1723736230; bh=E7NQK8pGwDr/SXWkifVBJ5OeYlOA
+	2Ziuc367RQ4iMyg=; b=XgPkTXNc0KZWxe1d0FjL/qQGiA/g2d9bnzbJsvnFUKb1
+	7SXaXt0SL7FfhPpFKRVlh6tSSWRGp5s/CgvGWuZuYyygnMD+mau061QCXVTHOnLY
+	deYZ7AgCESidkmDaFv+8Ko/Xcgk8G9rz9eRoBorBP+ea+GPCTrtojj0l19VCHH1D
+	2R/J35oqpWUAwnZGMSRAsYSAnUDCWBs0cMAu/cPW31VaybZUgy1seiLlk0C93t94
+	wohhSjFJe423X3SHv4LA+UEQd1UQihPNnf6ZM8p6W5bqA+HJpb7Q4aZPGxkHFiIo
+	KQ6QF7ZBK8UdX3kR26FwpWcOMXScmA/Xziu2C0o16A==
+X-ME-Sender: <xms:Js-8ZsI17SgBR8AHHzki0zna3rnF_jLFRHpMwg-IMzuDfUa1wB1FFA>
+    <xme:Js-8ZsJLGp5j4WTUBpMX1vib-Hhb315HLU3SQvH89RUybC5iVxl4qq6tQPx8FeNcb
+    lHes20xgeF-nho>
+X-ME-Received: <xmr:Js-8Zsvlevus-CVbQEV6VodRK5ltGUX-tfiFRWBAJH5ble3A9MUkgfn9zbK-3B990KxBdJfCTu6ZuuAxmAx3Br7i-DhrKg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtgedgledvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
+    hrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieef
+    gfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthht
+    ohepudehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegsohhrihhsrdhsuhhkhh
+    holhhithhkohessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhloh
+    hfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhr
+    tghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnih
+    esrhgvughhrghtrdgtohhmpdhrtghpthhtohepjhhhshesmhhojhgrthgrthhurdgtohhm
+    pdhrtghpthhtohepgihihihouhdrfigrnhhgtghonhhgsehgmhgrihhlrdgtohhmpdhrtg
+    hpthhtohepjhhirhhisehrvghsnhhulhhlihdruhhs
+X-ME-Proxy: <xmx:Js-8Zpalz6PujSRP78yQgZyCgdorjNCzyeikv4t24pFY_rLmXrmuvg>
+    <xmx:Js-8ZjYJukTTHUvfHhPOX-2k7RNyM-_ZQenOsU6V-ogOG2Z7uiuRqA>
+    <xmx:Js-8ZlAMKzrFjsgvbZfL1MSwkUso-qFuH23Hsnb8IzoTzPNrRH8Ttg>
+    <xmx:Js-8ZpavwZ2lvmygbFSW6FEQpJCXG6QZFThc6_mr6DBdTQpLKGL7GA>
+    <xmx:Js-8ZpzEcUyXjXtsYrqhbaSKxK0aOk9ZHDtlq5S4Zg4EeRwMRRGVYa39>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 14 Aug 2024 11:37:09 -0400 (EDT)
+Date: Wed, 14 Aug 2024 18:37:06 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Boris Sukholitko <boris.sukholitko@broadcom.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Mina Almasry <almasrymina@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Ilya Lifshits <ilya.lifshits@broadcom.com>
+Subject: Re: [PATCH net-next v2 6/6] selftests: forwarding: tc_actions: test
+ vlan flush
+Message-ID: <ZrzPIgP5HGmzBuEn@shredder.mtl.com>
+References: <20240814130618.2885431-1-boris.sukholitko@broadcom.com>
+ <20240814130618.2885431-7-boris.sukholitko@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240814130618.2885431-7-boris.sukholitko@broadcom.com>
 
-On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
-> Inspired by [1], move the page fragment allocator from page_alloc
-> into its own c file and header file, as we are about to make more
-> change for it to replace another page_frag implementation in
-> sock.c
->=20
-> As this patchset is going to replace 'struct page_frag' with
-> 'struct page_frag_cache' in sched.h, including page_frag_cache.h
-> in sched.h has a compiler error caused by interdependence between
-> mm_types.h and mm.h for asm-offsets.c, see [2]. So avoid the compiler
-> error by moving 'struct page_frag_cache' to mm_types_task.h as
-> suggested by Alexander, see [3].
->=20
-> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.c=
-om/
-> 2. https://lore.kernel.org/all/15623dac-9358-4597-b3ee-3694a5956920@gmail=
-.com/
-> 3. https://lore.kernel.org/all/CAKgT0UdH1yD=3DLSCXFJ=3DYM_aiA4OomD-2wXykO=
-42bizaWMt_HOA@mail.gmail.com/
-> CC: David Howells <dhowells@redhat.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+On Wed, Aug 14, 2024 at 04:06:18PM +0300, Boris Sukholitko wrote:
+> Add new test checking the correctness of inner vlan flushing to the skb
+> data when outer vlan tag is added through act_vlan.
+> 
+> Signed-off-by: Boris Sukholitko <boris.sukholitko@broadcom.com>
 > ---
->  include/linux/gfp.h                           |  22 ---
->  include/linux/mm_types.h                      |  18 ---
->  include/linux/mm_types_task.h                 |  18 +++
->  include/linux/page_frag_cache.h               |  31 ++++
->  include/linux/skbuff.h                        |   1 +
->  mm/Makefile                                   |   1 +
->  mm/page_alloc.c                               | 136 ----------------
->  mm/page_frag_cache.c                          | 145 ++++++++++++++++++
->  .../selftests/mm/page_frag/page_frag_test.c   |   2 +-
->  9 files changed, 197 insertions(+), 177 deletions(-)
->  create mode 100644 include/linux/page_frag_cache.h
->  create mode 100644 mm/page_frag_cache.c
->=20
->=20
+>  .../selftests/net/forwarding/tc_actions.sh    | 22 ++++++++++++++++++-
+>  1 file changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
+> index 589629636502..65ff80d66b17 100755
+> --- a/tools/testing/selftests/net/forwarding/tc_actions.sh
+> +++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
+> @@ -4,7 +4,7 @@
+>  ALL_TESTS="gact_drop_and_ok_test mirred_egress_redirect_test \
+>  	mirred_egress_mirror_test matchall_mirred_egress_mirror_test \
+>  	gact_trap_test mirred_egress_to_ingress_test \
+> -	mirred_egress_to_ingress_tcp_test"
+> +	mirred_egress_to_ingress_tcp_test vlan_flush_test"
+>  NUM_NETIFS=4
+>  source tc_common.sh
+>  source lib.sh
+> @@ -244,6 +244,26 @@ mirred_egress_to_ingress_tcp_test()
+>  	log_test "mirred_egress_to_ingress_tcp ($tcflags)"
+>  }
+>  
+> +vlan_flush_test()
+> +{
+> +	ip link add x$h1 type veth peer x$h2
+> +	ip link set x$h1 up
+> +	ip link set x$h2 up
 
-...
+The test already creates the needed topology, there is no need to create
+more interfaces. You can use $h1 and $swp1 which are either a veth pair
+(default if you didn't configure anything) or two connected physical
+ports.
 
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> new file mode 100644
-> index 000000000000..a758cb65a9b3
-> --- /dev/null
-> +++ b/include/linux/page_frag_cache.h
-> @@ -0,0 +1,31 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
 > +
-> +#ifndef _LINUX_PAGE_FRAG_CACHE_H
-> +#define _LINUX_PAGE_FRAG_CACHE_H
-> +
-> +#include <linux/log2.h>
-> +#include <linux/types.h>
-> +#include <linux/mm_types_task.h>
-> +
+> +	tc qdisc add dev x$h1 clsact
+> +	tc filter add dev x$h1 ingress pref 20 chain 0 handle 20 flower num_of_vlans 1 \
 
-Minor nit. These should usually be in alphabetical order. So
-mm_types_task.h should be between log2.h and types.h.
+Please use $tcflags like other test cases.
 
+> +		action vlan push id 100 protocol 0x8100 action goto chain 5
+> +	tc filter add dev x$h1 ingress pref 30 chain 5 handle 30 flower num_of_vlans 2 \
+
+The cover letter says that the bug also exists on egress so I suggest
+checking that as well to avoid future regressions.
+
+> +		cvlan_ethtype 0x800 action pass
+> +
+> +	$MZ x$h2 -t udp -Q 10 -q
+
+For consistency, please invoke $MZ with similar parameters to other test
+cases.
+
+> +	tc_check_packets "dev x$h1 ingress" 30 1
+> +	check_err $? "No double-vlan packets received"
+> +
+> +	ip link del x$h1
+> +	log_test "vlan_flush_test ($tcflags)"
+> +}
+> +
+>  setup_prepare()
+>  {
+>  	h1=${NETIFS[p1]}
+> -- 
+> 2.42.0
+> 
+> 
 
