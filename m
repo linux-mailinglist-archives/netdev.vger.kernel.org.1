@@ -1,145 +1,144 @@
-Return-Path: <netdev+bounces-118421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFFF951888
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0506F95188D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 194D11C215F7
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:19:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 384861C20D6F
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE1A1A4F10;
-	Wed, 14 Aug 2024 10:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66671AD9DD;
+	Wed, 14 Aug 2024 10:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cD6jR9ZJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kg31RwLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291701AAE28
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3709A1AD9CF
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723630786; cv=none; b=GduTVarTVn05saHUhLgyorsC5zW4BPRk5KOWoRZkEOtX+avH20W3e5TAL8xc7fmJM8GSrdgXEjxH713gleyWpI8wO7xDRVM7/ecoFtnfhs5IBcsKcwHWAFc1gORYehWZBsF+Dz4zvkP+AabfPZc8DwpJnZPLCuwd4IjpE+gvDE4=
+	t=1723630844; cv=none; b=W/5BgTUPjO6/5ae6jSOb9nDU8bRU7Wxir8Q9e7XmqMf2rwpR7O5sO5ka+7yfYdGzQT0Kdd+b/A4f9NvwWkmlDg6myA6wkfew0Td2dTO9z5tglQ1YaQeWbmhPLCUWL3TIlS+ulYE/2ZG/kQhx8mvvZmBOKD194flRu1SCxPOapYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723630786; c=relaxed/simple;
-	bh=FZz7rN1iHlj31dNr3oGwlQhhvu2v+gYIwV29BtDPZZs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DW4PAD6+FjnpAKNRlTjabyRTRmXsbZ2URTDAjw3zY+N8GjHE4ow8iLE3hD/DGMJ6OPOTgudlusbXQ8pVjzUTELQdfjr9BuaTTjJXfNxzSyN/qtUrGesWgQi0PIiV+fohWk3Z0JppEVUj9CbnKJ8IX5uI5iB43pmBH7WkKj14H2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cD6jR9ZJ; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1723630844; c=relaxed/simple;
+	bh=OesaZVG85sa5tJ2CWd0ZRjKD4AAHsYi37iOiX+FHu/A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FOF7Dix5WHCI6ZpEHGD+6FggZu1QDS2G6zGfDQJtlnoMUiwPiAQWNW9WL311+B2BaqZ9ySxN7HLMVg7klunDszuJAaiVyoZV1GGW4KB4tdSH6fFll2MZtIK8iTOZVW5fAN+TMegrIR03atHYAnoqtysG1mxjNix2s9cqKwRmf6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kg31RwLP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723630784;
+	s=mimecast20190719; t=1723630842;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ujjRrY9jmmA5hNr8cZIFcVaa3uq5D7CrEXBCcjjRwbY=;
-	b=cD6jR9ZJTju5AGr8dlYOIGO8A3TytJOAhgTxBxkc6NGoeduhzoytp5bZwJmpIGeL/sOY2L
-	OA1irGSmK6mYr84jO3i0DLtVXezQ30JIW3GOTiVY19Q8dXpzcdypPeaNg0a8NNPUHXa2L2
-	xcGtHXR/hZWwEM581jZ/mnJIJNJehL4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ArvT52QZCzAIBxygYJAvMZW0y/eajEvYt8KDonFX9zk=;
+	b=Kg31RwLPujNgmUi26E8Dm5jL9ubn+RiKe5LH5k06QgRT/x6v2sDdj6O32lvi7RhKBTAQx1
+	ggvQsAFZmsLjEAZOWBZHAfv5Cah/VHe5b/it0nUXTCokUkYbYXiEy19FXffBp+4S3+Z3GP
+	thGlVovp/gAPwDItXd4u59L3o1NHDLA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-FubyJwhGOgGK6Nbz07LdDA-1; Wed, 14 Aug 2024 06:19:42 -0400
-X-MC-Unique: FubyJwhGOgGK6Nbz07LdDA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280645e3e0so46668005e9.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:19:42 -0700 (PDT)
+ us-mta-686-NAK-kLw1PwaF_XCsF52-GQ-1; Wed, 14 Aug 2024 06:20:38 -0400
+X-MC-Unique: NAK-kLw1PwaF_XCsF52-GQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42809bbece7so997035e9.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:20:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723630782; x=1724235582;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ujjRrY9jmmA5hNr8cZIFcVaa3uq5D7CrEXBCcjjRwbY=;
-        b=esTMajgDZF76KYKX6rJRTLmy+nKJx9Xc7DHF61RjD8hS6w7Ffz4SiHGsFnw3yT8Etv
-         v/UcJdAIUwzPiTobMTEyNL1m2WF2AR65EKLXAF+IBI8L4vjWaC//qsYZmX0l5TlLDTcy
-         HcLcdR05L2mDHnjh7dcFYlLsNdPQNUysK1JsHeVntbE3IndLXAxNaif3EUs7EGduyWPY
-         Sah7iPHcWnDPEl58eYO8SIgRsa1CqnGw4WB+wOOfBsXIyKR2jzZ8b6sxvElNWkluelcR
-         PNCbIfu7umDtSxgYnC6j35jhMVF8UMaWjVaZKC7Y0MXrmwMpp7/jcl6PkZpG6mm4kJa3
-         bsBA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPPTm4X85dSLLsWjsQdI+ssA3yofqiJP6GFiIV1LOsC88HV6KmMksFYIhyX2C7SOB2jEWLE8O2wz0msA0XAjBMM6iJA9Xm
-X-Gm-Message-State: AOJu0YxtJsHRpbo8oTVQDFnAqueBXjq8OkoCoE8JE4u7zUVWzUnPCmER
-	35ekSt5PZQnODaN3GeG+RWV0gQh2WT/pwqQNcuHvasKf6wcUmB0AKteB2OXVLh4E6q0ss2yiagC
-	VTSVQ+YvWE8G7IonkoTYE7IiX8RG1DiYLFLe5F22v91Dr1PhU5L6+Xw==
-X-Received: by 2002:adf:e644:0:b0:368:6b28:5911 with SMTP id ffacd0b85a97d-37177760a1bmr1546852f8f.2.1723630781709;
-        Wed, 14 Aug 2024 03:19:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFC502yJUKbD+xbFsQIpm66zQN+FX64YOh1xGOvttuPua4rFxKJdQmq1Q8KvP6ui+G9bsDLMg==
-X-Received: by 2002:adf:e644:0:b0:368:6b28:5911 with SMTP id ffacd0b85a97d-37177760a1bmr1546827f8f.2.1723630781208;
-        Wed, 14 Aug 2024 03:19:41 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4c938280sm12483923f8f.36.2024.08.14.03.19.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 03:19:40 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id D04C714ADF7D; Wed, 14 Aug 2024 12:19:39 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Ignat
- Korchagin <ignat@cloudflare.com>, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>, Yi Chen
- <yiche@redhat.com>
-Subject: Re: [PATCH net 2/2] selftests: udpgro: no need to load xdp for gro
-In-Reply-To: <20240814075758.163065-3-liuhangbin@gmail.com>
-References: <20240814075758.163065-1-liuhangbin@gmail.com>
- <20240814075758.163065-3-liuhangbin@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 14 Aug 2024 12:19:39 +0200
-Message-ID: <87v803csp0.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1723630837; x=1724235637;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ArvT52QZCzAIBxygYJAvMZW0y/eajEvYt8KDonFX9zk=;
+        b=utyBtjmUZMKyZKWveR0cvC42uzDSNx4PgULjLBmNMDQBE4fOnhBFos4zNvnOQiEgcl
+         BbNeZgSXNARF4UdbRV7/B6rJYgJNWMSwuWzDFbz3N2G5wj996KEGCvRumO5oQY2ESJPg
+         lZmNOoCzhaw2EnaythxBk+6xLomrUB1f52Zemr9fX7sO1mamqlWfZTEUhs+5XIqEH2GP
+         g9FNUW8ZvdVCZGTJRow8/5bZGp2N46L1waw3QLr0ll0/r1q0VtCrSViQRLm4VnOnE8x5
+         voOchqWIYj48ELyWd6ebIYP0teTcm/ifMNbE1T1a8ByPul4RoFDSVkMKb45vDTwPaIN2
+         bITA==
+X-Forwarded-Encrypted: i=1; AJvYcCVypy4U5BFYCSYhhjXZHA/P5wepeTkZJzyHTa43I9VWbS9T4Et2yszY2KhRwjB422VTyArF+nzINzs3LTqH9nr+SUTmBR+2
+X-Gm-Message-State: AOJu0Yy+zgV8E/xa3agXLKBoyco3c+BePC9J9Mdi17eU9uE43YhCiyip
+	FvlR0+D6jlaiZbGxCi/b/rjOvmtlgIS1Ep0fDkYQ96Sumcdmy3nUGAMAGy6PudpB3t0L8CKGnTO
+	Jpb2h8OMp19DVmfX24WJBXXIoyAxBZ0uYF8bJxP+BVpxFn8BeBMGAIJJv8zHgX7Vv
+X-Received: by 2002:a05:6000:1a8d:b0:36d:1d66:554f with SMTP id ffacd0b85a97d-371777b426cmr1041945f8f.3.1723630837331;
+        Wed, 14 Aug 2024 03:20:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWUqTtYdG3Z83woA9aA35QcrGb+K5syL0svoCJ4GlfCHLPwm9xo1NeGshX8quWbWdeBH9ywQ==
+X-Received: by 2002:a05:6000:1a8d:b0:36d:1d66:554f with SMTP id ffacd0b85a97d-371777b426cmr1041911f8f.3.1723630836299;
+        Wed, 14 Aug 2024 03:20:36 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1711:4010:5731:dfd4:b2ed:d824? ([2a0d:3344:1711:4010:5731:dfd4:b2ed:d824])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4c36bea4sm12524894f8f.13.2024.08.14.03.20.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 03:20:35 -0700 (PDT)
+Message-ID: <696bc883-68f5-48f0-bf7e-258b4dc05bcc@redhat.com>
+Date: Wed, 14 Aug 2024 12:20:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] selftests: udpgro: no need to load xdp for gro
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Ignat Korchagin <ignat@cloudflare.com>, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, Yi Chen <yiche@redhat.com>
+References: <20240814075758.163065-1-liuhangbin@gmail.com>
+ <20240814075758.163065-3-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240814075758.163065-3-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hangbin Liu <liuhangbin@gmail.com> writes:
-
+On 8/14/24 09:57, Hangbin Liu wrote:
 > After commit d7db7775ea2e ("net: veth: do not manipulate GRO when using
 > XDP"), there is no need to load XDP program to enable GRO. On the other
 > hand, the current test is failed due to loading the XDP program. e.g.
->
->  # selftests: net: udpgro.sh
->  # ipv4
->  #  no GRO                                  ok
->  #  no GRO chk cmsg                         ok
->  #  GRO                                     ./udpgso_bench_rx: recv: bad =
-packet len, got 1472, expected 14720
->  #
->  # failed
->
->  [...]
->
->  #  bad GRO lookup                          ok
->  #  multiple GRO socks                      ./udpgso_bench_rx: recv: bad =
-packet len, got 1452, expected 14520
->  #
->  # ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
->  #
->  # failed
->  ok 1 selftests: net: udpgro.sh
->
-> After fix, all the test passed.
->
->  # ./udpgro.sh
->  ipv4
->   no GRO                                  ok
+> 
+>   # selftests: net: udpgro.sh
+>   # ipv4
+>   #  no GRO                                  ok
+>   #  no GRO chk cmsg                         ok
+>   #  GRO                                     ./udpgso_bench_rx: recv: bad packet len, got 1472, expected 14720
+>   #
+>   # failed
+> 
 >   [...]
->   multiple GRO socks                      ok
->
+> 
+>   #  bad GRO lookup                          ok
+>   #  multiple GRO socks                      ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
+>   #
+>   # ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
+>   #
+>   # failed
+>   ok 1 selftests: net: udpgro.sh
+> 
+> After fix, all the test passed.
+> 
+>   # ./udpgro.sh
+>   ipv4
+>    no GRO                                  ok
+>    [...]
+>    multiple GRO socks                      ok
+> 
 > Fixes: d7db7775ea2e ("net: veth: do not manipulate GRO when using XDP")
 > Reported-by: Yi Chen <yiche@redhat.com>
 > Closes: https://issues.redhat.com/browse/RHEL-53858
 > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+LGTM,
+
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
