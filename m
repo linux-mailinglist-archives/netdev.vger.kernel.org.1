@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-118557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F249520B9
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:10:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48759520E4
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 811951F2288E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:10:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40664B25810
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74631BB69B;
-	Wed, 14 Aug 2024 17:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB951B9B3E;
+	Wed, 14 Aug 2024 17:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vDu9hroN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A38B4502B;
-	Wed, 14 Aug 2024 17:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0530716BE14;
+	Wed, 14 Aug 2024 17:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723655416; cv=none; b=E/mfpC/YdKTqEjuv/mMSFVCpZc50HBGGlHEAnnDAE431MTNGkjPc6V1eYFhs8CsCyQky24oZu0/RcAskCwM1luAAeuiBMJSx6totqz9m0OKDXcYg3qFPhpL8bDWP7LPtCV906ee9lVZbApV08FUcObO/jVLVBfRCl2/ez94fCPE=
+	t=1723655768; cv=none; b=HCIavEg1+3lvVyuaKarprUt8wwJnhpJlU7BSpltQ1z0+/TNdXrVCCWkDKPXp7RSIixMqGn3rMgh6vDICT+d1wKPabmMBVDpTMXnCEBvtCNO3Y/Jl0TfE/XMCvMzsTwN01iCde5S+JmE/jV4oAHwwsAUCDOsdnrex1VTar90+cWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723655416; c=relaxed/simple;
-	bh=F4XPMawEpVXT9q7pRj4NtWJkjyAA81vm0rr2VpJL9tI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mTogRPGrgwhfOMQMXDYcSo4WrcQDQ4MM8GxE5rqdZSzkH2WfQaCleIgUB/xy8bUHAhPdyFwmS0ebggLUEf5ZWxgVHxnYkoKfROrjMMcjM2VoU7Um7bMvow5YMMH+dWngJZkMQnj8n+NssV0jiL8DIlzyI7Dh/m37YC3dzEeL68w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f032cb782dso1068431fa.3;
-        Wed, 14 Aug 2024 10:10:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723655413; x=1724260213;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sP0prdJ764zDRhGrMOxeD1PYZLi3P8WVzp9dTBreHs=;
-        b=JGhbgY8mtlubOMfvtFbBlXKCr3VDxVCUGuNctqVOLPLslG00L3L3FwcpVf+RQCu+mK
-         X03J2fCIUGfd4hZUgI/vL+7rFz+2wkXj1RgqISQKWw8ykKYax8jWsGd9WU/seemDSdbN
-         2uwCJaxj2GJ0r2Xjr2/fDEM8RAwyK+CjC1CwYfU0dsqWNfeSoyvxWvzLyt/yAPYv6QzQ
-         5Xmha5DyuvTrTfYloVeIPYDBAsNmsuC2SfR8S8MSe9yxEASVfVfbMoRs1roNhXvJVhF2
-         V5VVxNQEYj4mQb7AX0VRWoxmvMP+2jTuJUml7z9W6137QooWidGcNc7rHmm13puML/XV
-         +g3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXi273ST6BSjrT914G6mloFY6MiI6iV0FbBiTrU9gk6vwj3y6sP4QDtEPED1Cv27VBtyRBwPUKflleyyy3IzlPBtL6JqNpiW6+s3rV/7W7BrE3J/ulNt+U9hM9xOCEaZ0ZfQb+L9+7c
-X-Gm-Message-State: AOJu0YxADe2Q+5EBti77PvUKzzotUD0KZ/+EuohlnUYIl+VSVe9rXAW4
-	zkCsaJHlgifyW7Tn+94DbULVO0Z598xFf+7/RD023uTlnHJeUfvn
-X-Google-Smtp-Source: AGHT+IH8Z01+eFXbFBwCYnLygKYJO8nh4RI5+IJx3TWPFQdiMFkE4hEKhkA7azYW55nofQIrBXQquw==
-X-Received: by 2002:a2e:a99f:0:b0:2ee:7dfe:d99c with SMTP id 38308e7fff4ca-2f3aa1f51a3mr23695561fa.31.1723655412783;
-        Wed, 14 Aug 2024 10:10:12 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5be9bb73800sm1569528a12.38.2024.08.14.10.10.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 10:10:12 -0700 (PDT)
-Date: Wed, 14 Aug 2024 10:10:10 -0700
-From: Breno Leitao <leitao@debian.org>
-To: kees@kernel.org, elver@google.com, andreyknvl@gmail.com,
-	ryabinin.a.a@gmail.com
-Cc: kasan-dev@googlegroups.com, linux-hardening@vger.kernel.org,
-	axboe@kernel.dk, asml.silence@gmail.com, netdev@vger.kernel.org
-Subject: UBSAN: annotation to skip sanitization in variable that will wrap
-Message-ID: <Zrzk8hilADAj+QTg@gmail.com>
+	s=arc-20240116; t=1723655768; c=relaxed/simple;
+	bh=DJ3OGZQZDTcW64uk40abaAwztnSLyz6hIkXSoOybgOE=;
+	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=BA1aJZ2c5hk0HEyFXT6wITQIHOhZZU4WC1A2Dp/WvqTJSk2PSHnr8OqgFTuQhHExLmE9sp1xx7C+F1C69RPbxtk9gzmUba+aJ0xuWqRsneqprhMcHk1pNJXOv9MtPKmmlzlbPzEukYTfjJ25908PEYNxw9kZRAoEE3aSHGL45E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vDu9hroN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E14A0C116B1;
+	Wed, 14 Aug 2024 17:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723655767;
+	bh=DJ3OGZQZDTcW64uk40abaAwztnSLyz6hIkXSoOybgOE=;
+	h=From:Subject:To:Cc:Date:From;
+	b=vDu9hroN0qPSu6jjUcZ5RJysCRhIYK/AuNG3Dihfw+Q3kEa1Iz3j28sF5TTRkg57S
+	 8fgbqoer+qPHHhFpP1frzgpbIt/dUCpokj9rxNmqDqFsNrzA7YjBSdrJtG1Cx+RjFh
+	 59VDNI5m3Bwe7Ks3I1KEcOiwtVWzewn9WMblkC0JgdZlCqqh7jGeHdTiqMG1REKJ06
+	 86rymoCmX+fprHr3KTANwifnJQTBNbmvd3r9e3JWMu0m2emyU0mXo/QvCN9zGisLau
+	 NyOEVezgZ6z/qpWWpOML4VJuKSO4LxTqBRymi9jhbSZZ7IDDffUlismKK4OPdsu0Si
+	 vLJJBwri1aWrQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+From: Kalle Valo <kvalo@kernel.org>
+Subject: pull-request: wireless-2024-08-14
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Message-Id: <20240814171606.E14A0C116B1@smtp.kernel.org>
+Date: Wed, 14 Aug 2024 17:16:06 +0000 (UTC)
 
-Hello,
+Hi,
 
-I am seeing some signed-integer-overflow in percpu reference counters.
+here's a pull request to net tree, more info below. Please let me know if there
+are any problems.
 
-	UBSAN: signed-integer-overflow in ./arch/arm64/include/asm/atomic_lse.h:204:1
-	-9223372036854775808 - 1 cannot be represented in type 's64' (aka 'long long')
-	Call trace:
+Kalle
 
-	 handle_overflow
-	 __ubsan_handle_sub_overflow
-	 percpu_ref_put_many
-	 css_put
-	 cgroup_sk_free
-	 __sk_destruct
-	 __sk_free
-	 sk_free
-	 unix_release_sock
-	 unix_release
-	 sock_close
+The following changes since commit de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed:
 
-This overflow is probably happening in percpu_ref->percpu_ref_data->count.
+  Linux 6.11-rc2 (2024-08-04 13:50:53 -0700)
 
-Looking at the code documentation, it seems that overflows are fine in
-per-cpu values. The lib/percpu-refcount.c code comment says:
+are available in the Git repository at:
 
- * Note that the counter on a particular cpu can (and will) wrap - this
- * is fine, when we go to shutdown the percpu counters will all sum to
- * the correct value
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-08-14
 
-Is there a way to annotate the code to tell UBSAN that this overflow is
-expected and it shouldn't be reported?
+for you to fetch changes up to e37a9184f27084b891d3617723b9410f8fcaff99:
 
-Thanks
---breno
+  Merge tag 'ath-current-20240812' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath (2024-08-13 12:51:21 +0300)
+
+----------------------------------------------------------------
+wireless fixes for v6.11
+
+We have few fixes to drivers. The most important here is a fix for iwlwifi which
+caused major slowdowns for several users.
+
+----------------------------------------------------------------
+Baochen Qiang (1):
+      wifi: ath12k: use 128 bytes aligned iova in transmit path for WCN7850
+
+Benjamin Berg (1):
+      wifi: iwlwifi: correctly lookup DMA address in SG table
+
+Bert Karwatzki (1):
+      wifi: mt76: mt7921: fix NULL pointer access in mt7921_ipv6_addr_change
+
+Bitterblue Smith (1):
+      wifi: rtlwifi: rtl8192du: Initialise value32 in _rtl92du_init_queue_reserved_page
+
+Janne Grunau (1):
+      wifi: brcmfmac: cfg80211: Handle SSID based pmksa deletion
+
+Kalle Valo (1):
+      Merge tag 'ath-current-20240812' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+ drivers/net/wireless/ath/ath12k/dp_tx.c            | 72 ++++++++++++++++++++++
+ drivers/net/wireless/ath/ath12k/hw.c               |  6 ++
+ drivers/net/wireless/ath/ath12k/hw.h               |  4 ++
+ drivers/net/wireless/ath/ath12k/mac.c              |  1 +
+ .../broadcom/brcm80211/brcmfmac/cfg80211.c         | 13 +++-
+ drivers/net/wireless/intel/iwlwifi/pcie/internal.h |  3 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/tx-gen2.c  |  5 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c       | 32 +++++++---
+ drivers/net/wireless/mediatek/mt76/mt7921/main.c   |  2 +-
+ .../net/wireless/realtek/rtlwifi/rtl8192du/hw.c    |  2 +-
+ 10 files changed, 123 insertions(+), 17 deletions(-)
 
 
