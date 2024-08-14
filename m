@@ -1,152 +1,290 @@
-Return-Path: <netdev+bounces-118590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6B09522BC
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:39:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1424D9522E1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DFE71C210AF
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:39:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF7C8280DAD
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B9B1BE872;
-	Wed, 14 Aug 2024 19:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB64D1BF304;
+	Wed, 14 Aug 2024 19:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tzN0PIET"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pCsgS6S4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BEBB679
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A331BC065
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723664346; cv=none; b=NGLTstfWZ7eD9+6EVLMYjFMUqwampaF3mVDBgk4jSCiPG4e0Qb/0kg/6i9hOzNGvksrC0+MtdjoQ0hyDClHMm6xSmPUkXQ8gm4PyGfRo63Ax2dOthVYBstiT989h0OLWWatZ6Iky3+jbb2svz4X7TyMD7DGsJuRTI2i6ZtNhvww=
+	t=1723665205; cv=none; b=V89peFn8R5diD+wJToBqUFaUa9Fl5QFJY0BR2NcfqE4Plji6rcoj5dONOJ6KEo7veWIJTuL3mma9Bzv9H6cAYY6llschoGIaeS1h1ORw/L5ayJ014Dp/mP9Ru80T4OnvmJV/sFJ8ngM+bEqfHJzOhkKyss6y8LrFf3PZIIPOEbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723664346; c=relaxed/simple;
-	bh=5o8bLJKQZXs/B1xrtD9asnPMIVh3qZvsOhfSBIbrKvM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rUFKU6IuR0tV6lW2ENzHrlQqHhgNYkPHcnwul3avSWKQuI/dw6xJneDfkDAD+qyFwsnReEVEVVkKqNqc4J7lLLt52V1gwsb+X+/PDM+etq0nr4c2YdX8Z4P710WrTYDNx4Z4q0SBeJa3uQX5CyccJObKJDHzIrifU9R8DeB+aW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tzN0PIET; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1723665205; c=relaxed/simple;
+	bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PgiTc9mgh3ozHtTQxx/rK/uqobF3I8U+zUcinnA1LnQQ6VWGx2fsqSw8obnBlmXOaPHR1/EyT5JfQC+YXLz47XxGDlLek6mwSmnC+0wIeOOv4f34EJOsnmVzkm8lbK4hKHbNj+gK8iKPMZD1l+AIWKSEfO2knxGVLj8K7gDOedI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pCsgS6S4; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-44fee2bfd28so7481cf.1
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 12:53:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723664342; x=1755200342;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3QLulvlesH7Cf5KgzaYpwdCDM0l4BosUdEnq871myPk=;
-  b=tzN0PIETbnPtWvCGdaMzGPTOzIGoSH5NAVjexrd/bMwC9sXFURg50JGg
-   ZOMOVKPrUMK1egRpu/47NkIa+UHTcGMZj+WKQNqVM7kvtD92o6fCzX4ER
-   tgsmnAqo/shhRMbBZAAkUChGTsAyAvoiaCzSLNJcpafKID3YyfOSzsg9m
-   8=;
-X-IronPort-AV: E=Sophos;i="6.10,146,1719878400"; 
-   d="scan'208";a="18978133"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 19:38:59 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:57195]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.153:2525] with esmtp (Farcaster)
- id 8798cb4a-2cf9-4005-9efa-fd8b9aae0ba8; Wed, 14 Aug 2024 19:38:56 +0000 (UTC)
-X-Farcaster-Flow-ID: 8798cb4a-2cf9-4005-9efa-fd8b9aae0ba8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 14 Aug 2024 19:38:56 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.6) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 14 Aug 2024 19:38:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<jadedong@tencent.com>, <kernelxing@tencent.com>, <kuba@kernel.org>,
-	<ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH net-next] tcp: avoid reusing FIN_WAIT2 when trying to find port in connect() process
-Date: Wed, 14 Aug 2024 12:38:44 -0700
-Message-ID: <20240814193844.66189-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240814035136.60796-1-kerneljasonxing@gmail.com>
-References: <20240814035136.60796-1-kerneljasonxing@gmail.com>
+        d=google.com; s=20230601; t=1723665203; x=1724270003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
+        b=pCsgS6S4qvJBE7CJCdnTu1ozTBi+dqTE37zsLV31LKFyhBVKWDSER2hPeTvDVkJpay
+         q+mWpytm3oNK21szbD86AsNpPGCimCjQMKaoEUHKD1CuZIQjlmUzRx+zvFTAD7jejWIt
+         VXFq3AV0a5gVuZMPbg/k4Yxe/P3CfHm5Eqc9wjZXlF3iEAmQocrJ69Aj7oJV9TCKOk23
+         1OYV1aOlMRWzRTZnnXlJ8XXI6F6ByvkBd+aGhTdhY4GWKXmmwGRZ0jymTWmHNa+5lCNp
+         K0TH6YMrK2y6ZiEm2hmIPrFKHTqFqfp/uI110IYVxv6ry2IOIJ4N8ncLuWoumjQwGdD3
+         yD4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723665203; x=1724270003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/BY3SvLRnHgR+5U5306XFRmMRoyDEwL1zSSFrkoTRK0=;
+        b=aiNxix6ZetRATLO7HGvj30ZMu4WXg3t3AP8zkZ60J+M1zA2GUmFqBs4UbWOQAKx/uM
+         FXb6Vbf6RwX0FQqtkWO0F/rFKSLXoCO6y41iQSyt6hKivbGGPXx81b4/SuTawp1Go8Ir
+         tCUYLKvvspRtHyg9S1o153xwAnmSks7A08yiYFDToA8oDIS2mDVmTz7VVWCMIIE7jSCd
+         KvM00JXy/r+kZ6r3/3wKfMYwj7aT8X8Y20IKZ+rusM15U/XjQv5UcQKqrjga2ACj5h6e
+         O3Jka/xb8SI6LER8xU2Db92iC8jupFR2vIISgbzbBbrv27mrm2FmlpCehmIFtHdFc80R
+         VB2g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSwjnyo0WWHjjUfXjeUfMS4z/XJ60Xzc26VAWuscl6jWL1jm9s3GbEXlHe3FH7izcz54+U+e0OJc8nLhDo/bZW5F7iEoLg
+X-Gm-Message-State: AOJu0YzcAXfYuyVPZ0oH2zzkP170k3AMsL0V5ZABGVL1VyExvKoAG2c0
+	PCEsWLzZYlIVj1Yz9OqMVXyGnDJHk80u5a2QZwjqlzbZxBYENNmVR8hhNwvpg/lZcdVoxUwPErI
+	1KW1vR4ZXB7r4gmp9xEU9dTgGfoCAjC2wDgcPWs2kxP+yQhnfl6h6emEfCg==
+X-Google-Smtp-Source: AGHT+IEFg40ZSJEF95A3diV9x3plTBjAQ3CA036HBdyf1mC2UdAq8xozTT3D2y+6l3hbaCcVPzJW798aEGJJ19g9Ihs=
+X-Received: by 2002:a05:622a:81:b0:447:eeb1:3d2 with SMTP id
+ d75a77b69052e-45368bcf26amr218461cf.27.1723665202801; Wed, 14 Aug 2024
+ 12:53:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20240812125717.413108-1-jdamato@fastly.com> <ZrpuWMoXHxzPvvhL@mini-arch>
+ <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca> <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca> <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca> <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+In-Reply-To: <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Wed, 14 Aug 2024 12:53:07 -0700
+Message-ID: <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+	Joe Damato <jdamato@fastly.com>, amritha.nambiar@intel.com, sridhar.samudrala@intel.com, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Breno Leitao <leitao@debian.org>, Christian Brauner <brauner@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes.berg@intel.com>, 
+	Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 14 Aug 2024 11:51:36 +0800
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> We found that one close-wait socket was reset by the other side
-> which is beyond our expectation, so we have to investigate the
-> underlying reason. The following experiment is conducted in the
-> test environment. We limit the port range from 40000 to 40010
-> and delay the time to close() after receiving a fin from the
-> active close side, which can help us easily reproduce like what
-> happened in production.
-> 
-> Here are three connections captured by tcpdump:
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-> // a few seconds later, within 60 seconds
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-> // later, very quickly
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-> 
-> As we can see, the first flow is reset because:
-> 1) client starts a new connection, I mean, the second one
-> 2) client tries to find a suitable port which is a timewait socket
->    (its state is timewait, substate is fin_wait2)
-> 3) client occupies that timewait port to send a SYN
-> 4) server finds a corresponding close-wait socket in ehash table,
->    then replies with a challenge ack
-> 5) client sends an RST to terminate this old close-wait socket.
-> 
-> I don't think the port selection algo can choose a FIN_WAIT2 socket
-> when we turn on tcp_tw_reuse because on the server side there
-> remain unread data. If one side haven't call close() yet, we should
-> not consider it as expendable and treat it at will.
-> 
-> Even though, sometimes, the server isn't able to call close() as soon
-> as possible like what we expect, it can not be terminated easily,
-> especially due to a second unrelated connection happening.
-> 
-> After this patch, we can see the expected failure if we start a
-> connection when all the ports are occupied in fin_wait2 state:
-> "Ncat: Cannot assign requested address."
-> 
-> Reported-by: Jade Dong <jadedong@tencent.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/ipv4/inet_hashtables.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index 9bfcfd016e18..6115ee0c5d90 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -563,7 +563,8 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
->  			continue;
->  
->  		if (likely(inet_match(net, sk2, acookie, ports, dif, sdif))) {
-> -			if (sk2->sk_state == TCP_TIME_WAIT) {
-> +			if (sk2->sk_state == TCP_TIME_WAIT &&
-> +			    inet_twsk(sk2)->tw_substate != TCP_FIN_WAIT2) {
+On Tue, Aug 13, 2024 at 6:19=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo.=
+ca> wrote:
+>
+> On 2024-08-13 00:07, Stanislav Fomichev wrote:
+> > On 08/12, Martin Karsten wrote:
+> >> On 2024-08-12 21:54, Stanislav Fomichev wrote:
+> >>> On 08/12, Martin Karsten wrote:
+> >>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
+> >>>>> On 08/12, Martin Karsten wrote:
+> >>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
+> >>>>>>> On 08/12, Joe Damato wrote:
+> >>>>>>>> Greetings:
+>
+> [snip]
+>
+> >>>>>>> Maybe expand more on what code paths are we trying to improve? Ex=
+isting
+> >>>>>>> busy polling code is not super readable, so would be nice to simp=
+lify
+> >>>>>>> it a bit in the process (if possible) instead of adding one more =
+tunable.
+> >>>>>>
+> >>>>>> There are essentially three possible loops for network processing:
+> >>>>>>
+> >>>>>> 1) hardirq -> softirq -> napi poll; this is the baseline functiona=
+lity
+> >>>>>>
+> >>>>>> 2) timer -> softirq -> napi poll; this is deferred irq processing =
+scheme
+> >>>>>> with the shortcomings described above
+> >>>>>>
+> >>>>>> 3) epoll -> busy-poll -> napi poll
+> >>>>>>
+> >>>>>> If a system is configured for 1), not much can be done, as it is d=
+ifficult
+> >>>>>> to interject anything into this loop without adding state and side=
+ effects.
+> >>>>>> This is what we tried for the paper, but it ended up being a hack.
+> >>>>>>
+> >>>>>> If however the system is configured for irq deferral, Loops 2) and=
+ 3)
+> >>>>>> "wrestle" with each other for control. Injecting the larger
+> >>>>>> irq-suspend-timeout for 'timer' in Loop 2) essentially tilts this =
+in favour
+> >>>>>> of Loop 3) and creates the nice pattern describe above.
+> >>>>>
+> >>>>> And you hit (2) when the epoll goes to sleep and/or when the usersp=
+ace
+> >>>>> isn't fast enough to keep up with the timer, presumably? I wonder
+> >>>>> if need to use this opportunity and do proper API as Joe hints in t=
+he
+> >>>>> cover letter. Something over netlink to say "I'm gonna busy-poll on
+> >>>>> this queue / napi_id and with this timeout". And then we can essent=
+ially make
+> >>>>> gro_flush_timeout per queue (and avoid
+> >>>>> napi_resume_irqs/napi_suspend_irqs). Existing gro_flush_timeout fee=
+ls
+> >>>>> too hacky already :-(
+> >>>>
+> >>>> If someone would implement the necessary changes to make these param=
+eters
+> >>>> per-napi, this would improve things further, but note that the curre=
+nt
+> >>>> proposal gives strong performance across a range of workloads, which=
+ is
+> >>>> otherwise difficult to impossible to achieve.
+> >>>
+> >>> Let's see what other people have to say. But we tried to do a similar
+> >>> setup at Google recently and getting all these parameters right
+> >>> was not trivial. Joe's recent patch series to push some of these into
+> >>> epoll context are a step in the right direction. It would be nice to
+> >>> have more explicit interface to express busy poling preference for
+> >>> the users vs chasing a bunch of global tunables and fighting against =
+softirq
+> >>> wakups.
+> >>
+> >> One of the goals of this patch set is to reduce parameter tuning and m=
+ake
+> >> the parameter setting independent of workload dynamics, so it should m=
+ake
+> >> things easier. This is of course notwithstanding that per-napi setting=
+s
+> >> would be even better.
+> >>
+> >> If you are able to share more details of your previous experiments (he=
+re or
+> >> off-list), I would be very interested.
+> >
+> > We went through a similar exercise of trying to get the tail latencies =
+down.
+> > Starting with SO_BUSY_POLL, then switching to the per-epoll variant (ex=
+cept
+> > we went with a hard-coded napi_id argument instead of tracking) and try=
+ing to
+> > get a workable set of budget/timeout/gro_flush. We were fine with burni=
+ng all
+> > cpu capacity we had and no sleep at all, so we ended up having a bunch
+> > of special cases in epoll loop to avoid the sleep.
+> >
+> > But we were trying to make a different model work (the one you mention =
+in the
+> > paper as well) where the userspace busy-pollers are just running napi_p=
+oll
+> > on one cpu and the actual work is consumed by the userspace on a differ=
+ent cpu.
+> > (we had two epoll fds - one with napi_id=3Dxxx and no sockets to drive =
+napi_poll
+> > and another epoll fd with actual sockets for signaling).
+> >
+> > This mode has a different set of challenges with socket lock, socket rx
+> > queue and the backlog processing :-(
+>
+> I agree. That model has challenges and is extremely difficult to tune rig=
+ht.
+We noticed a similar issue when we were using the same thread to do
+application work
+and also napi busy polling on it. Large gro_flush_timeout would
+improve throughput under
+load but reduce latency in low load and vice versa.
 
-I prefer comparing explicitly like
+We were actually thinking of having gro_flush_timeout value change
+based on whether
+napi is in busy_poll state and resetting it to default value for
+softirq driven mode when
+busy_polling is stopped.
 
-  inet_twsk(sk2)->tw_substate == TCP_TIME_WAIT
+Since we didn't have cpu constraints, we had
+dedicated pollers polling napi and separate threads polling for epoll
+events and doing
+application work.
+>
+> >>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for the =
+sake of
+> >>>> an individual queue or application to make sure that IRQ suspension =
+is
+> >>>> enabled/disabled right away when the state of the system changes fro=
+m busy
+> >>>> to idle and back.
+> >>>
+> >>> Can we not handle everything in napi_busy_loop? If we can mark some n=
+api
+> >>> contexts as "explicitly polled by userspace with a larger defer timeo=
+ut",
+> >>> we should be able to do better compared to current NAPI_F_PREFER_BUSY=
+_POLL
+> >>> which is more like "this particular napi_poll call is user busy polli=
+ng".
+> >>
+> >> Then either the application needs to be polling all the time (wasting =
+cpu
+> >> cycles) or latencies will be determined by the timeout.
+But if I understand correctly, this means that if the application
+thread that is supposed
+to do napi busy polling gets busy doing work on the new data/events in
+userspace, napi polling
+will not be done until the suspend_timeout triggers? Do you dispatch
+work to a separate worker
+threads, in userspace, from the thread that is doing epoll_wait?
+> >>
+> >> Only when switching back and forth between polling and interrupts is i=
+t
+> >> possible to get low latencies across a large spectrum of offered loads
+> >> without burning cpu cycles at 100%.
+> >
+> > Ah, I see what you're saying, yes, you're right. In this case ignore my=
+ comment
+> > about ep_suspend_napi_irqs/napi_resume_irqs.
+>
+> Thanks for probing and double-checking everything! Feedback is important
+> for us to properly document our proposal.
+>
+> > Let's see how other people feel about per-dev irq_suspend_timeout. Prop=
+erly
+> > disabling napi during busy polling is super useful, but it would still
+> > be nice to plumb irq_suspend_timeout via epoll context or have it set o=
+n
+> > a per-napi basis imho.
+I agree, this would allow each napi queue to tune itself based on
+heuristics. But I think
+doing it through epoll independent interface makes more sense as Stan
+suggested earlier.
+>
+> Fingers crossed. I hope this patch will be accepted, because it has
+> practical performance and efficiency benefits, and that this will
+> further increase the motivation to re-design the entire irq
+> defer(/suspend) infrastructure for per-napi settings.
+>
+> Thanks,
+> Martin
+>
+>
 
