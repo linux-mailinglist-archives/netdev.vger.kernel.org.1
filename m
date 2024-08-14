@@ -1,212 +1,475 @@
-Return-Path: <netdev+bounces-118630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F34952435
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:53:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71A395245F
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 23:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1F41F288C2
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:53:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 314EA1F25369
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C88A1C4633;
-	Wed, 14 Aug 2024 20:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75471C68AC;
+	Wed, 14 Aug 2024 21:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QsxI+6ij"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TBYUkfiI"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2084.outbound.protection.outlook.com [40.107.22.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF991210FB;
-	Wed, 14 Aug 2024 20:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723668402; cv=fail; b=H4dDy1SLAltUf7Zh6JDZMTIONzFTB0fAnPqUwRQ5sW+gqVG0XPARo4CPh5A6I/c74nB+EL76dPzgB2HQlOYzZ3QvddCHBwzsBHKSznIS4Ztebk0rSA1w4wF+hLloxDVTyJJob9xiOfM9s9y2s5i0Fj7oDf/m/aREW0gg0m0Nz0M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723668402; c=relaxed/simple;
-	bh=hJnZnHBXVQmK06k0U8wzJ6NX1rH/Rr4kZqSxRidD9fc=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=n5Xhy4Inz7RT2tQPpTH1YGee5ZlKS35AhGRin2S8JeznNd+fpMY2lRjJHKfo6NmjIiSb+5mVizJeOdSv7CQAZt7EFr14dMxnSRefA9m9G8MhiyWWnyZ6uAB1t0r06CebP4zVN7aLbgagltVFmWKblfDnr2j/AO4jHoN5YQIJFl0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QsxI+6ij; arc=fail smtp.client-ip=40.107.22.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LCWqp7f7O4oCg/zPl68xB9fO80b3jdaDTEgyOHmoTaBvPWSs8LttZTsmsXwHOblHC251tGtTl5aCNXwQ2oZZE6cvsU6pGarU0Jae6K9d+ARHnDd4jlW23iEZXMjEHv1KYYmfZJKFNR/wZiPQsujB68QRv7akD2lE9RYioKJww+SZoar9mOar65BWpUIlY57G7sfp9AP7sU56jlqBJx0FZs7SDvbtaxMJ18r8KdE5i+hyddSEa3GYQ6lKmIty6l2DmXCPMamSVGHevXbAs33b+V0tZ6vgtkfX9I8PT9HTOWI+ggVofuEH3svLNYDYVknlXDE95kXFnuGohbCK9G1u+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NDxdOnbiDPQ55SL3ikDy1a7FboOyHIkQiUxGzih1moY=;
- b=BQAwb6fObD/wLUv+hMo0Wb99YQiX0rLW8LsI+ttamNUHxLPetGqBBC3YvPkSjiNdINlG2k8R++AOAfKHRpCrjZKg+NVLX0I7hYbQ9uIlYvlTp8ElAof2KOCpUTEWcLKH8OcjGhBcWfnT9DXxTuNyltp//zpiIw4Hcz2Dt/UbEg/czM5uNZJuLdYmgUMYC9Pr4rdMA1ljtfprtARn8Ohem7rBvYKY1rRMjQ/ZSVl4fqcekk8xkwQrWGu99uPhpHvY8APreoSLV/YmN9Qh5gDcgX34jdQPIO0C6YTg7Ha0Yxke9MaJfgKKBi6FIT2mPAODOUUfM5Og4klv7PsDHTKRrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NDxdOnbiDPQ55SL3ikDy1a7FboOyHIkQiUxGzih1moY=;
- b=QsxI+6ijYlkMs4Ee5P5vQh4cffFPwuANul+mYnzgtmeDjWcya+++K1soQDp+iBljZV2h1dFI2KIxWJpXA87M1/1SIOhhVGXxF5/A+oSemkvb982Bpk/hqmebhAcD0uBoy2A80/E4Ca03FfiSxkXlSUr4NSenLJUylQe8iRsKIhgA0ZRUUsmQ4Na/+49D15SBz6pd4E02XFHXtYW4wtiTE5cfjrZOQ0tE5iZd5QETRuiX/QjqSpVhjYTMHtIcqiKx8PBJq9X25dynupJOjiA4toH2CWfgNlfAViT3OC8hblWdasDC5s5kKE2injEK1iGvu0+jfqqVZ7ZQgJZtXnTmlQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by DBAPR04MB7288.eurprd04.prod.outlook.com (2603:10a6:10:1a3::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Wed, 14 Aug
- 2024 20:46:35 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%3]) with mapi id 15.20.7875.016; Wed, 14 Aug 2024
- 20:46:35 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Yangbo Lu <yangbo.lu@nxp.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org (open list:FREESCALE QORIQ PTP CLOCK DRIVER),
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list)
-Cc: imx@lists.linux.dev
-Subject: [PATCH 1/1] dt-binding: ptp: fsl,ptp: add pci1957,ee02 compatible string for fsl,enetc-ptp
-Date: Wed, 14 Aug 2024 16:46:18 -0400
-Message-Id: <20240814204619.4045222-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY5PR04CA0015.namprd04.prod.outlook.com
- (2603:10b6:a03:1d0::25) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CAB1B9B59;
+	Wed, 14 Aug 2024 21:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723669228; cv=none; b=KMM8+GFdjYfLggorFTOTbGErXmHwCd0guPOlvCmdYOCyNviez4w7+Nau5WuGDNarJ7j2VymFOLlKH4yhgWVK0uBMvqQouzIaztwczq1RaN9CMqPlzb5dqP0RocA7TuqfCx8D8pnJ8aCqykryk3x7YpmWgvbfLJZ+geceXCxmQMA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723669228; c=relaxed/simple;
+	bh=DzDTsvmObquPyGzIFTK7wf7BeEVUJOGrq0ajpa/zX08=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AcG8iRNabzs0trywc45U2bSNGfygwVPgD7QoUrqnqoSs2jqZQolfXHjNa3+6QCbnJZAYL1wEgvcI3h6Ubi9pM5nwcXVveuzwrZIMWVBRFRWy/0RSwKrsrg51ny9DsH7mghqUeFcfN3c8jueAGzHVzzcgOSoPszFadb2Wd3h47pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TBYUkfiI; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-2689f749702so187247fac.3;
+        Wed, 14 Aug 2024 14:00:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723669224; x=1724274024; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e1NygBbcJ8x72qP+tM/Wp1YkzJ5Lw47jE4xYaVvdbwc=;
+        b=TBYUkfiICBbWPeIT/Yu/ISzhWChMqIbSKOS0KYgWLrU6drwvAG455hZ4R4pBOcf6RS
+         ViFqlfM6VNOyu0FlKyrC9okIVnbNvWb2pdS+uhJYNloIEQMONNAyJ7Rsvk22zqcCEtfV
+         pWLoxXJhpb9dk7nbe3pEvnPAf/IriONlLmzduAIdmKNzYKKz6XZ+GTpIFlJxNteXD4D+
+         /DlNTxQ4Hr4a5Z4SEC0iWFqgNtCexX+A3aKwKdpDzgfV1d8eT12EQOlNlQTnEe24wRCh
+         Kc83O+lfdeufEgKI6h8+ObCZYReKvZqKNCHSXTTW0tUX1CnqzAqQHxY1Ba/9/91f3ZvA
+         jpgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723669224; x=1724274024;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e1NygBbcJ8x72qP+tM/Wp1YkzJ5Lw47jE4xYaVvdbwc=;
+        b=Ym1WeMS+7jEesEzXcfhpmE5H9Em4hD5/AIMhLIs9v2rnCQTdKn3Y3Al33qmQVldl9O
+         nBqJEX9M795zGUernEYAXJozbfRXI6+kz96y5sNewWgztN7/ovanr77lxjYaACVzOnAU
+         QFnesvjYWhUO0pc0Cghh7srpxGz29+CNsqy6+NEalaCsYIHieD4W/t0t6QINaoenGMJ2
+         +lPDx0Kl7hJ4CTf6SBM792Ac8b3dfjV45VvRdnjWDTY0RUNyaYFz1Jl/75iK9zbV3nvG
+         zNfDD9SkOdHewf/ByBLz4smh3wAUqXX4wt7kz1VAlwiScvNzmC4GmDnFDRlHQfrxp6mW
+         zJ1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhvZ6LXsM+XJVYqvOs01ONcEGDSUJZeYbdtAH7+lFQ7meDTvj19HbH6Fe7gY6yPkcSwKDT4mnU+bBIvY8LMLOUe2iqsfNUEajhsmh4
+X-Gm-Message-State: AOJu0Yxd0y7bAA9Q4i5nYuCNT/QLF9offY9ASSgjfH7rkoHTcTK3UIMT
+	3NI2KXXB6SBaalQspjs3eJLihSQncU3yI1fyLo6AIh445ma815Kr
+X-Google-Smtp-Source: AGHT+IG/yiWqO0H6ViVm+AspkVWf1BH2fpLRIW708oGGkUvZsXz90qpoJMlLGLVWQDSIDUzQX0eRsg==
+X-Received: by 2002:a05:6870:b6a0:b0:260:e453:5368 with SMTP id 586e51a60fabf-26fe5c2f603mr4785472fac.46.1723669224438;
+        Wed, 14 Aug 2024 14:00:24 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-270044811ddsm34789fac.13.2024.08.14.14.00.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 14:00:24 -0700 (PDT)
+Message-ID: <d9814d6628599b7b28ed29c71d6fb6631123fdef.camel@gmail.com>
+Subject: Re: [PATCH net-next v13 11/14] mm: page_frag: introduce
+ prepare/probe/commit API
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Wed, 14 Aug 2024 14:00:21 -0700
+In-Reply-To: <20240808123714.462740-12-linyunsheng@huawei.com>
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+	 <20240808123714.462740-12-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|DBAPR04MB7288:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1eab749d-d27b-4a72-d22a-08dcbca22f9d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zEpVJ8VJE6xsiY+DI+LDWoTFSwI5pcvpEjCz9OfcZPYIWXap8JAlWyMSsSPb?=
- =?us-ascii?Q?5n807AxImnRCKhQRtm4+9txvvSIRtkptTirUJHP7kcdWQYYXww5oRfiq6foG?=
- =?us-ascii?Q?PcyvhPp1BHKxbVdkT+WJ8OIlk3yH8IZEDr8M6pG12puxo8us+9YVmun41xT7?=
- =?us-ascii?Q?H6L6pW3EJA38fPAYxnFiHuQ4z25PZYmKk4ROIsxpnAN0SCZBkSETofeBLIVA?=
- =?us-ascii?Q?IGwg2pcHlqmzVZJ4hO9UVqC92F1ZJkD/oAP2JWmhTVI6Utov3tYT3YaXZn09?=
- =?us-ascii?Q?z2m+BTsWFJbFl/fZ1Iu9VjojrHDYtnAU6ZKyw6C6fDakmaPGcxcOHy25+shk?=
- =?us-ascii?Q?MgE+SbMGJO07tQktKJkmfMZ544NsU4uOCzrgU6TSvKOhI88BDIFi2EmrhXAM?=
- =?us-ascii?Q?bifUEueHXOADD5XSnpIwavenBIKs+6eoyQM3LpevQ6+N3W0ovWvKLn0TFmxk?=
- =?us-ascii?Q?cHnkSVlrrZUrhKtLMDYAgUt63B95saO1nnhve4awiUKveZifhWMFIhA1asoN?=
- =?us-ascii?Q?79r18guyVzezYOJcDzBte6IYZ7B19KDDjalbvE/MVmfbuefSriR76JUKB89Q?=
- =?us-ascii?Q?KeaPhVxbOSrCi28ycd+ub9YGT/Ga0TAszcB13JBLyePH1kgt3t9yc7s+MzHn?=
- =?us-ascii?Q?Bt7EXhA9FVT2xDo6sj209UvWAF/SNGTS+xEwUw7zX0S5pEgD7FO+vf5OGvfw?=
- =?us-ascii?Q?DdaGNTO1DE9SdYQDoZ3V7cJpfSRU+u+pilQQJXbqNcEWU9P+MZBin36oRh9r?=
- =?us-ascii?Q?gK58p7+hIUkwl6UCwqoOi2gqdvOIq8ZzJFC3jCGqPgGzkXRjFMbTpJNVhQre?=
- =?us-ascii?Q?LLokQ6ruwzZ6k+a2VK+nCCsDie3KZOT3f+rH1CBhPiBqRTTeZogoX6xXnT95?=
- =?us-ascii?Q?r8HBsTEqXg0j7VVL5zjht91iMYaLJsgbe0CwrZAv0faWHYAjiJszkytrIAR1?=
- =?us-ascii?Q?lp9sbKZkScXCtf1AGoM3sN+yYrZSLB+QzVfMwHRNIjipaTGLGzGOePCCUIYr?=
- =?us-ascii?Q?v2teKvPvnZCVQN+80PTTi/aDE8rINs2zMO6fFGD1zqNESgvwicsU/nHEmIId?=
- =?us-ascii?Q?OxvyHQQom5WaqVLHfxhJAplnH4+Ul79HWQKfyIKQqZgPtCBgVOD8BbktVUqA?=
- =?us-ascii?Q?7B0+lgMQjcQuG/nmy1Gey1YcUZNRIlw2goiA1z6rQiUESu4K8keCEPgcVt10?=
- =?us-ascii?Q?MF0/oYDsUH1TVvXBGQIfIDncpetsBw+N16HXDVFN2SD+RBPSockP1YEMx3nC?=
- =?us-ascii?Q?ak5Xf/JA54l0MT3o2IpI05Gerzqhu24XhW/gBmIAECsOlzlQFzefl6zSHeQB?=
- =?us-ascii?Q?Xt3Tw32li8hrSGs9PROfYcxukMgQYYBjYGiXZzhEdqWC0kr5FwTcjKA+I+2F?=
- =?us-ascii?Q?XW3Y7hohnzwyb0V8UKXVAf5B4S/b0SFFQAPiQLBwxRvSmjg+hg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TA1aw2v6w3kBXiiUhMmjbOTvNSjYF//BfdJf7kN7Xuhe44I1Bn74SJ567CoQ?=
- =?us-ascii?Q?22hqua8832vvOUmeMTrSZhtIp4xFEERDIqsCcyqeq8ffW+JIVhJlQD0zells?=
- =?us-ascii?Q?CDL2Z4WkamAIfdek6EMyunoNhh6uhLw4F6Q1A4sZE3VAmjlo4lsk0f/W4M+o?=
- =?us-ascii?Q?1Fea2AksDVDRpZyHUkN3+sAKsaMTCFFImlZdNjHW4JKKHcoxYmCd+ZNz8UXH?=
- =?us-ascii?Q?/YadU8AnnPyHrEnuNOIAiHx8XmZTMIIfD9EVCgs9Y+F75OqxcgNKOz910SoA?=
- =?us-ascii?Q?wNmPF4rWLLjh+k8+c0xvipuO1N9mb3SO8bWfNvOivOJ5y0hbIwqihUU39R6w?=
- =?us-ascii?Q?rTNXXfVCOzHyOSjru3w0PvegYE0k66M9di3BcoYjByMbfhb7IM4QFA+nIkMx?=
- =?us-ascii?Q?1ZyY9LaSoq5KIDVzOXlKszx2npoMlE1sLocRp0A/N59c2uOEw2zSYtkErSPe?=
- =?us-ascii?Q?UC2FDW8bop+Q3dWyLJxQqNGBCYa3VLY5DVNva1flOvkWM28b8pqh7o2IPBQA?=
- =?us-ascii?Q?/vJZD7qvadHhT/XtvXs9rbdS2KYnKUw9EnBMsGdPyKuWFI/BpNTBWYS6hxzv?=
- =?us-ascii?Q?iCKGkZ+DZg0z9uqaC2SHJq2ywDrGdD9cVsyouQGVwH2HSiiFlRy/eeZVvR6c?=
- =?us-ascii?Q?IQJaMFMrVZehGU4VGCnMbXTnIKg0s1FQD9q9QzmAY+GjJHmc+4yfd/gXHNQ4?=
- =?us-ascii?Q?H5ChzTzdj5/1CD0VHTgnmLRLvcDSLLaDs7aeDCOTnr+Zp3oL1suY7H7QwC55?=
- =?us-ascii?Q?pOLc71mfg9Jxx4ocxs7y41AxHOMgLJBZUOSIk7rMiECgaqZu+bAJO4FeAOvn?=
- =?us-ascii?Q?DJ+n8yrMz4OZLrAHok6OIA5SzVPqVLkYS6znhp6mWiLMEeHpMpgjXyoE3CdQ?=
- =?us-ascii?Q?GvgbG7BzG2OZOtj8wjln+QA1cOMnj3GsP6BoHMmOSyKpwpjPj9UH26gji2c+?=
- =?us-ascii?Q?0tblqgk2p41fHWrLXu7tQvKpVYqhb5tUXsZv42DoRcn+utIMUUOdGtWk7H9J?=
- =?us-ascii?Q?LRTtVyWWwivBtTbLk3VA4/4bUX88yDSRXNIkaWOf1hyzzpIFCtIfbxs6vWGt?=
- =?us-ascii?Q?jzxJyO1VuCsSz2ftESmLk8BnquU4AFQ0hM1JG25WvVO+doqB+ZwyFJDNxOd+?=
- =?us-ascii?Q?hIYRT7VPBWic5hvu4H0y23WNxM3Xvk/GsS9CbA/IqmvAx23Qm6HbUHs5qWJE?=
- =?us-ascii?Q?ReqeIprq4uWeSQ0OSdO22tQV41edbGBztCcK/+6LgwcPoZK5ilxTH3JFFqjt?=
- =?us-ascii?Q?TADf1sK3nCgcipW5B2yX3gxJSrqR1lElXwnfUEyz8cKlU2l2s/gmwYfBnZoF?=
- =?us-ascii?Q?HNjBmmgEAKfeIVtQSA60+MxLG3nsaqhodrdAyTwZvb10FWU2LRqiVSkT23vq?=
- =?us-ascii?Q?vy16YbtvsvDv62oQWDj0S86H/5EgTb9ONZsJ/P0QFf+fbKRbQEdC2NYT65JE?=
- =?us-ascii?Q?xNWJPii3bSiOwogAChffrr5JvH/fnUJ9PT69SEdz+p2Q6hhKoCCpAJUV5O54?=
- =?us-ascii?Q?iwaI0tfh8BTlE4fkEtSof7a1vhBYADjoo6sSVrueV5GX7xoQQf69h+IjKFLw?=
- =?us-ascii?Q?aMx9+Q3uTEExU/EnBGk=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1eab749d-d27b-4a72-d22a-08dcbca22f9d
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 20:46:35.0781
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CHhdm8PYv603BOPeXJTybSVhXMKt0/qJFQRNSZYwhp2ayLPzbammobRmHchkxUF6OSw2gvitsTSO/gzebRDrjA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7288
 
-fsl,enetc-ptp is embedded pcie device. Add compatible string pci1957,ee02.
+On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> There are many use cases that need minimum memory in order
+> for forward progress, but more performant if more memory is
+> available or need to probe the cache info to use any memory
+> available for frag caoleasing reason.
+>=20
+> Currently skb_page_frag_refill() API is used to solve the
+> above use cases, but caller needs to know about the internal
+> detail and access the data field of 'struct page_frag' to
+> meet the requirement of the above use cases and its
+> implementation is similar to the one in mm subsystem.
+>=20
+> To unify those two page_frag implementations, introduce a
+> prepare API to ensure minimum memory is satisfied and return
+> how much the actual memory is available to the caller and a
+> probe API to report the current available memory to caller
+> without doing cache refilling. The caller needs to either call
+> the commit API to report how much memory it actually uses, or
+> not do so if deciding to not use any memory.
+>=20
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/linux/page_frag_cache.h |  75 ++++++++++++++++
+>  mm/page_frag_cache.c            | 152 ++++++++++++++++++++++++++++----
+>  2 files changed, 212 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> index 0abffdd10a1c..ba5d7f8a03cd 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -7,6 +7,8 @@
+>  #include <linux/build_bug.h>
+>  #include <linux/log2.h>
+>  #include <linux/types.h>
+> +#include <linux/mm.h>
+> +#include <linux/mmdebug.h>
+>  #include <linux/mm_types_task.h>
+> =20
+>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> @@ -67,6 +69,9 @@ static inline unsigned int page_frag_cache_page_size(un=
+signed long encoded_va)
+> =20
+>  void page_frag_cache_drain(struct page_frag_cache *nc);
+>  void __page_frag_cache_drain(struct page *page, unsigned int count);
+> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
+> +				unsigned int *offset, unsigned int fragsz,
+> +				gfp_t gfp);
+>  void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  				 unsigned int fragsz, gfp_t gfp_mask,
+>  				 unsigned int align_mask);
+> @@ -79,12 +84,82 @@ static inline void *page_frag_alloc_va_align(struct p=
+age_frag_cache *nc,
+>  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, -align);
+>  }
+> =20
+> +static inline unsigned int page_frag_cache_page_offset(const struct page=
+_frag_cache *nc)
+> +{
+> +	return page_frag_cache_page_size(nc->encoded_va) - nc->remaining;
+> +}
+> +
+>  static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
+>  				       unsigned int fragsz, gfp_t gfp_mask)
+>  {
+>  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, ~0u);
+>  }
+> =20
+> +void *page_frag_alloc_va_prepare(struct page_frag_cache *nc, unsigned in=
+t *fragsz,
+> +				 gfp_t gfp);
+> +
+> +static inline void *page_frag_alloc_va_prepare_align(struct page_frag_ca=
+che *nc,
+> +						     unsigned int *fragsz,
+> +						     gfp_t gfp,
+> +						     unsigned int align)
+> +{
+> +	WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
+> +	nc->remaining =3D nc->remaining & -align;
+> +	return page_frag_alloc_va_prepare(nc, fragsz, gfp);
+> +}
+> +
+> +struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+> +					unsigned int *offset,
+> +					unsigned int *fragsz, gfp_t gfp);
+> +
+> +struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+> +				     unsigned int *offset,
+> +				     unsigned int *fragsz,
+> +				     void **va, gfp_t gfp);
+> +
+> +static inline struct page *page_frag_alloc_probe(struct page_frag_cache =
+*nc,
+> +						 unsigned int *offset,
+> +						 unsigned int *fragsz,
+> +						 void **va)
+> +{
+> +	unsigned long encoded_va =3D nc->encoded_va;
+> +	struct page *page;
+> +
+> +	VM_BUG_ON(!*fragsz);
+> +	if (unlikely(nc->remaining < *fragsz))
+> +		return NULL;
+> +
+> +	*va =3D encoded_page_address(encoded_va);
+> +	page =3D virt_to_page(*va);
+> +	*fragsz =3D nc->remaining;
+> +	*offset =3D page_frag_cache_page_size(encoded_va) - *fragsz;
+> +	*va +=3D *offset;
+> +
+> +	return page;
+> +}
+> +
 
-Fix warning:
-arch/arm64/boot/dts/freescale/fsl-ls1028a-kontron-kbox-a-230-ls.dtb: ethernet@0,4:
-	compatible:0: 'pci1957,ee02' is not one of ['fsl,etsec-ptp', 'fsl,fman-ptp-timer', 'fsl,dpaa2-ptp', 'fsl,enetc-ptp']
+I still think this should be populating a bio_vec instead of passing
+multiple arguments by pointer. With that you would be able to get all
+the fields without as many arguments having to be passed.
 
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
- .../devicetree/bindings/ptp/fsl,ptp.yaml      | 22 ++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+> +static inline void page_frag_alloc_commit(struct page_frag_cache *nc,
+> +					  unsigned int fragsz)
+> +{
+> +	VM_BUG_ON(fragsz > nc->remaining || !nc->pagecnt_bias);
+> +	nc->pagecnt_bias--;
+> +	nc->remaining -=3D fragsz;
+> +}
+> +
 
-diff --git a/Documentation/devicetree/bindings/ptp/fsl,ptp.yaml b/Documentation/devicetree/bindings/ptp/fsl,ptp.yaml
-index 3bb8615e3e919..42ca895f3c4eb 100644
---- a/Documentation/devicetree/bindings/ptp/fsl,ptp.yaml
-+++ b/Documentation/devicetree/bindings/ptp/fsl,ptp.yaml
-@@ -11,11 +11,14 @@ maintainers:
- 
- properties:
-   compatible:
--    enum:
--      - fsl,etsec-ptp
--      - fsl,fman-ptp-timer
--      - fsl,dpaa2-ptp
--      - fsl,enetc-ptp
-+    oneOf:
-+      - enum:
-+          - fsl,etsec-ptp
-+          - fsl,fman-ptp-timer
-+          - fsl,dpaa2-ptp
-+      - items:
-+          - const: pci1957,ee02
-+          - const: fsl,enetc-ptp
- 
-   reg:
-     maxItems: 1
-@@ -123,6 +126,15 @@ required:
-   - compatible
-   - reg
- 
-+allOf:
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: fsl,enetc-ptp
-+    then:
-+      $ref: /schemas/pci/pci-device.yaml
-+
- additionalProperties: false
- 
- examples:
--- 
-2.34.1
+I would really like to see this accept a bio_vec as well. With that you
+could verify the page and offset matches the expected value before
+applying fragsz.
+
+> +static inline void page_frag_alloc_commit_noref(struct page_frag_cache *=
+nc,
+> +						unsigned int fragsz)
+> +{
+> +	VM_BUG_ON(fragsz > nc->remaining);
+> +	nc->remaining -=3D fragsz;
+> +}
+> +
+
+Same here.
+
+> +static inline void page_frag_alloc_abort(struct page_frag_cache *nc,
+> +					 unsigned int fragsz)
+> +{
+> +	nc->pagecnt_bias++;
+> +	nc->remaining +=3D fragsz;
+> +}
+> +
+
+This doesn't add up. Why would you need abort if you have commit? Isn't
+this more of a revert? I wouldn't think that would be valid as it is
+possible you took some sort of action that might have resulted in this
+memory already being shared. We shouldn't allow rewinding the offset
+pointer without knowing that there are no other entities sharing the
+page.
+
+>  void page_frag_free_va(void *addr);
+> =20
+>  #endif
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index 27596b84b452..f8fad7d2cca8 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -19,27 +19,27 @@
+>  #include <linux/page_frag_cache.h>
+>  #include "internal.h"
+> =20
+> -static bool __page_frag_cache_reuse(unsigned long encoded_va,
+> -				    unsigned int pagecnt_bias)
+> +static struct page *__page_frag_cache_reuse(unsigned long encoded_va,
+> +					    unsigned int pagecnt_bias)
+>  {
+>  	struct page *page;
+> =20
+>  	page =3D virt_to_page((void *)encoded_va);
+>  	if (!page_ref_sub_and_test(page, pagecnt_bias))
+> -		return false;
+> +		return NULL;
+> =20
+>  	if (unlikely(encoded_page_pfmemalloc(encoded_va))) {
+>  		free_unref_page(page, encoded_page_order(encoded_va));
+> -		return false;
+> +		return NULL;
+>  	}
+> =20
+>  	/* OK, page count is 0, we can safely set it */
+>  	set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+> -	return true;
+> +	return page;
+>  }
+> =20
+> -static bool __page_frag_cache_refill(struct page_frag_cache *nc,
+> -				     gfp_t gfp_mask)
+> +static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+> +					     gfp_t gfp_mask)
+>  {
+>  	unsigned long order =3D PAGE_FRAG_CACHE_MAX_ORDER;
+>  	struct page *page =3D NULL;
+> @@ -55,7 +55,7 @@ static bool __page_frag_cache_refill(struct page_frag_c=
+ache *nc,
+>  		page =3D __alloc_pages(gfp, 0, numa_mem_id(), NULL);
+>  		if (unlikely(!page)) {
+>  			memset(nc, 0, sizeof(*nc));
+> -			return false;
+> +			return NULL;
+>  		}
+> =20
+>  		order =3D 0;
+> @@ -69,29 +69,151 @@ static bool __page_frag_cache_refill(struct page_fra=
+g_cache *nc,
+>  	 */
+>  	page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+> =20
+> -	return true;
+> +	return page;
+>  }
+> =20
+>  /* Reload cache by reusing the old cache if it is possible, or
+>   * refilling from the page allocator.
+>   */
+> -static bool __page_frag_cache_reload(struct page_frag_cache *nc,
+> -				     gfp_t gfp_mask)
+> +static struct page *__page_frag_cache_reload(struct page_frag_cache *nc,
+> +					     gfp_t gfp_mask)
+>  {
+> +	struct page *page;
+> +
+>  	if (likely(nc->encoded_va)) {
+> -		if (__page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias))
+> +		page =3D __page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias);
+> +		if (page)
+>  			goto out;
+>  	}
+> =20
+> -	if (unlikely(!__page_frag_cache_refill(nc, gfp_mask)))
+> -		return false;
+> +	page =3D __page_frag_cache_refill(nc, gfp_mask);
+> +	if (unlikely(!page))
+> +		return NULL;
+> =20
+>  out:
+>  	/* reset page count bias and remaining to start of new frag */
+>  	nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+>  	nc->remaining =3D page_frag_cache_page_size(nc->encoded_va);
+> -	return true;
+> +	return page;
+> +}
+> +
+
+None of the functions above need to be returning page.
+
+> +void *page_frag_alloc_va_prepare(struct page_frag_cache *nc,
+> +				 unsigned int *fragsz, gfp_t gfp)
+> +{
+> +	unsigned int remaining =3D nc->remaining;
+> +
+> +	VM_BUG_ON(!*fragsz);
+> +	if (likely(remaining >=3D *fragsz)) {
+> +		unsigned long encoded_va =3D nc->encoded_va;
+> +
+> +		*fragsz =3D remaining;
+> +
+> +		return encoded_page_address(encoded_va) +
+> +			(page_frag_cache_page_size(encoded_va) - remaining);
+> +	}
+> +
+> +	if (unlikely(*fragsz > PAGE_SIZE))
+> +		return NULL;
+> +
+> +	/* When reload fails, nc->encoded_va and nc->remaining are both reset
+> +	 * to zero, so there is no need to check the return value here.
+> +	 */
+> +	__page_frag_cache_reload(nc, gfp);
+> +
+> +	*fragsz =3D nc->remaining;
+> +	return encoded_page_address(nc->encoded_va);
+> +}
+> +EXPORT_SYMBOL(page_frag_alloc_va_prepare);
+> +
+> +struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+> +					unsigned int *offset,
+> +					unsigned int *fragsz, gfp_t gfp)
+> +{
+> +	unsigned int remaining =3D nc->remaining;
+> +	struct page *page;
+> +
+> +	VM_BUG_ON(!*fragsz);
+> +	if (likely(remaining >=3D *fragsz)) {
+> +		unsigned long encoded_va =3D nc->encoded_va;
+> +
+> +		*offset =3D page_frag_cache_page_size(encoded_va) - remaining;
+> +		*fragsz =3D remaining;
+> +
+> +		return virt_to_page((void *)encoded_va);
+> +	}
+> +
+> +	if (unlikely(*fragsz > PAGE_SIZE))
+> +		return NULL;
+> +
+> +	page =3D __page_frag_cache_reload(nc, gfp);
+> +	*offset =3D 0;
+> +	*fragsz =3D nc->remaining;
+> +	return page;
+> +}
+> +EXPORT_SYMBOL(page_frag_alloc_pg_prepare);
+> +
+> +struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+> +				     unsigned int *offset,
+> +				     unsigned int *fragsz,
+> +				     void **va, gfp_t gfp)
+> +{
+> +	unsigned int remaining =3D nc->remaining;
+> +	struct page *page;
+> +
+> +	VM_BUG_ON(!*fragsz);
+> +	if (likely(remaining >=3D *fragsz)) {
+> +		unsigned long encoded_va =3D nc->encoded_va;
+> +
+> +		*offset =3D page_frag_cache_page_size(encoded_va) - remaining;
+> +		*va =3D encoded_page_address(encoded_va) + *offset;
+> +		*fragsz =3D remaining;
+> +
+> +		return virt_to_page((void *)encoded_va);
+> +	}
+> +
+> +	if (unlikely(*fragsz > PAGE_SIZE))
+> +		return NULL;
+> +
+> +	page =3D __page_frag_cache_reload(nc, gfp);
+> +	*offset =3D 0;
+> +	*fragsz =3D nc->remaining;
+> +	*va =3D encoded_page_address(nc->encoded_va);
+> +
+> +	return page;
+> +}
+> +EXPORT_SYMBOL(page_frag_alloc_prepare);
+> +
+> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
+> +				unsigned int *offset, unsigned int fragsz,
+> +				gfp_t gfp)
+> +{
+> +	unsigned int remaining =3D nc->remaining;
+> +	struct page *page;
+> +
+> +	VM_BUG_ON(!fragsz);
+> +	if (likely(remaining >=3D fragsz)) {
+> +		unsigned long encoded_va =3D nc->encoded_va;
+> +
+> +		*offset =3D page_frag_cache_page_size(encoded_va) -
+> +				remaining;
+> +
+> +		return virt_to_page((void *)encoded_va);
+> +	}
+> +
+> +	if (unlikely(fragsz > PAGE_SIZE))
+> +		return NULL;
+> +
+> +	page =3D __page_frag_cache_reload(nc, gfp);
+> +	if (unlikely(!page))
+> +		return NULL;
+> +
+> +	*offset =3D 0;
+> +	nc->remaining =3D remaining - fragsz;
+> +	nc->pagecnt_bias--;
+> +
+> +	return page;
+>  }
+> +EXPORT_SYMBOL(page_frag_alloc_pg);
+
+Again, this isn't returning a page. It is essentially returning a
+bio_vec without calling it as such. You might as well pass the bio_vec
+pointer as an argument and just have it populate it directly.
+
+It would be identical to the existing page_frag for all intents and
+purposes. In addition you could use that as an intermediate value
+between the page_frag_cache for your prepare/commit call setup as you
+could limit the size/bv_len to being the only item that can be
+adjusted, specifically reduced between the prepare and commit calls.
+
 
 
