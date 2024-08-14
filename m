@@ -1,144 +1,148 @@
-Return-Path: <netdev+bounces-118422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0506F95188D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:20:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE9495189B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 384861C20D6F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:20:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D32AE287484
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66671AD9DD;
-	Wed, 14 Aug 2024 10:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790AE1AE023;
+	Wed, 14 Aug 2024 10:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kg31RwLP"
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="DXUUFQgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3709A1AD9CF
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A859213D8AC;
+	Wed, 14 Aug 2024 10:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723630844; cv=none; b=W/5BgTUPjO6/5ae6jSOb9nDU8bRU7Wxir8Q9e7XmqMf2rwpR7O5sO5ka+7yfYdGzQT0Kdd+b/A4f9NvwWkmlDg6myA6wkfew0Td2dTO9z5tglQ1YaQeWbmhPLCUWL3TIlS+ulYE/2ZG/kQhx8mvvZmBOKD194flRu1SCxPOapYQ=
+	t=1723631077; cv=none; b=HSmKseh9IAG+d2pPmDVwEJ4D6BiNkaQMT58QB4MFN3IFxVzRHHVzq7qku7sudKAOrnXoqaifWjOefT/agOzt8JWeHSxTM+o8dwsKGcUEd1VNGfMIU2nD3eHDnUHSNB2BsvPQuAfYsoK+WSm8/YhyjjTjUWHRuLH0U9+GJ2rmEO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723630844; c=relaxed/simple;
-	bh=OesaZVG85sa5tJ2CWd0ZRjKD4AAHsYi37iOiX+FHu/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FOF7Dix5WHCI6ZpEHGD+6FggZu1QDS2G6zGfDQJtlnoMUiwPiAQWNW9WL311+B2BaqZ9ySxN7HLMVg7klunDszuJAaiVyoZV1GGW4KB4tdSH6fFll2MZtIK8iTOZVW5fAN+TMegrIR03atHYAnoqtysG1mxjNix2s9cqKwRmf6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kg31RwLP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723630842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ArvT52QZCzAIBxygYJAvMZW0y/eajEvYt8KDonFX9zk=;
-	b=Kg31RwLPujNgmUi26E8Dm5jL9ubn+RiKe5LH5k06QgRT/x6v2sDdj6O32lvi7RhKBTAQx1
-	ggvQsAFZmsLjEAZOWBZHAfv5Cah/VHe5b/it0nUXTCokUkYbYXiEy19FXffBp+4S3+Z3GP
-	thGlVovp/gAPwDItXd4u59L3o1NHDLA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-NAK-kLw1PwaF_XCsF52-GQ-1; Wed, 14 Aug 2024 06:20:38 -0400
-X-MC-Unique: NAK-kLw1PwaF_XCsF52-GQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42809bbece7so997035e9.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:20:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723630837; x=1724235637;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ArvT52QZCzAIBxygYJAvMZW0y/eajEvYt8KDonFX9zk=;
-        b=utyBtjmUZMKyZKWveR0cvC42uzDSNx4PgULjLBmNMDQBE4fOnhBFos4zNvnOQiEgcl
-         BbNeZgSXNARF4UdbRV7/B6rJYgJNWMSwuWzDFbz3N2G5wj996KEGCvRumO5oQY2ESJPg
-         lZmNOoCzhaw2EnaythxBk+6xLomrUB1f52Zemr9fX7sO1mamqlWfZTEUhs+5XIqEH2GP
-         g9FNUW8ZvdVCZGTJRow8/5bZGp2N46L1waw3QLr0ll0/r1q0VtCrSViQRLm4VnOnE8x5
-         voOchqWIYj48ELyWd6ebIYP0teTcm/ifMNbE1T1a8ByPul4RoFDSVkMKb45vDTwPaIN2
-         bITA==
-X-Forwarded-Encrypted: i=1; AJvYcCVypy4U5BFYCSYhhjXZHA/P5wepeTkZJzyHTa43I9VWbS9T4Et2yszY2KhRwjB422VTyArF+nzINzs3LTqH9nr+SUTmBR+2
-X-Gm-Message-State: AOJu0Yy+zgV8E/xa3agXLKBoyco3c+BePC9J9Mdi17eU9uE43YhCiyip
-	FvlR0+D6jlaiZbGxCi/b/rjOvmtlgIS1Ep0fDkYQ96Sumcdmy3nUGAMAGy6PudpB3t0L8CKGnTO
-	Jpb2h8OMp19DVmfX24WJBXXIoyAxBZ0uYF8bJxP+BVpxFn8BeBMGAIJJv8zHgX7Vv
-X-Received: by 2002:a05:6000:1a8d:b0:36d:1d66:554f with SMTP id ffacd0b85a97d-371777b426cmr1041945f8f.3.1723630837331;
-        Wed, 14 Aug 2024 03:20:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEWUqTtYdG3Z83woA9aA35QcrGb+K5syL0svoCJ4GlfCHLPwm9xo1NeGshX8quWbWdeBH9ywQ==
-X-Received: by 2002:a05:6000:1a8d:b0:36d:1d66:554f with SMTP id ffacd0b85a97d-371777b426cmr1041911f8f.3.1723630836299;
-        Wed, 14 Aug 2024 03:20:36 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1711:4010:5731:dfd4:b2ed:d824? ([2a0d:3344:1711:4010:5731:dfd4:b2ed:d824])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4c36bea4sm12524894f8f.13.2024.08.14.03.20.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 03:20:35 -0700 (PDT)
-Message-ID: <696bc883-68f5-48f0-bf7e-258b4dc05bcc@redhat.com>
-Date: Wed, 14 Aug 2024 12:20:34 +0200
+	s=arc-20240116; t=1723631077; c=relaxed/simple;
+	bh=RWVcbCNlHx8lGMYK5gifzzGb7Dttynafxk1chvCUirw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJQ47ZEKeKyGoONm8Sgis4SkQ7H34T40KTxCk/s5uYiwTYnAIlpeHJ6bbRNDleBv++d1SFGi14VnTEGhgQY8UwmVPerJ7+nD4CP8NqhetgOHceEnmDZY7VOarbmQaMH1kCG7u4ZFMsiOmqBRmPoSc6YRjVw7a/Ca35v14Qs2Fyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=DXUUFQgK; arc=none smtp.client-ip=212.227.126.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1723631055; x=1724235855; i=christian@heusel.eu;
+	bh=RWVcbCNlHx8lGMYK5gifzzGb7Dttynafxk1chvCUirw=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=DXUUFQgKtY6yx+ehm/AXrEclPMeZk1vwQznH1tU+JNxX+eY0v6m8KcWvcW+M1UdW
+	 H2NCBn1HtFdwJhpwbMYY0r5903QoZXtABiDjAxs3HyAyfZoZiSQ7FwLhZzVAJb+3c
+	 UGe7MQVA94/iKwkgfu9KexOOelvBh+rIGd0V+N35V/VZhe81Hnd4fatQ0WYk1reh1
+	 25CaK1QoEakCmLaPSHz9JKN56d5W2o2LN1rqgI7kujnPscuK0LbyioZ4Tmn7ofTA/
+	 DSjmcrq/PovRSg4gvpmNtQzj0Q7NKMUMO9awBk/Lt4dr1LP3LFcJ+H4STGgXUerGo
+	 geEbHnqxwPDi14XpyA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([93.196.132.14]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1N79Ey-1s64Gp2dcy-0114XL; Wed, 14 Aug 2024 12:24:15 +0200
+Date: Wed, 14 Aug 2024 12:24:13 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Adrian Vladu <avladu@cloudbasesolutions.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Greg KH <gregkh@linuxfoundation.org>, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "alexander.duyck@gmail.com" <alexander.duyck@gmail.com>, 
+	"arefev@swemel.ru" <arefev@swemel.ru>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>, 
+	"willemb@google.com" <willemb@google.com>, "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
+Message-ID: <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+References: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
+ <20240805212829.527616-1-avladu@cloudbasesolutions.com>
+ <2024080703-unafraid-chastise-acf0@gregkh>
+ <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
+ <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+ <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+ <20240814055408-mutt-send-email-mst@kernel.org>
+ <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
+ <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] selftests: udpgro: no need to load xdp for gro
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Ignat Korchagin <ignat@cloudflare.com>, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, Yi Chen <yiche@redhat.com>
-References: <20240814075758.163065-1-liuhangbin@gmail.com>
- <20240814075758.163065-3-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240814075758.163065-3-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fupy5ioaujgzhzoh"
+Content-Disposition: inline
+In-Reply-To: <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
+X-Provags-ID: V03:K1:4LsNBPKGSnKaAahV+kC9ffd/uvKcATEsJ6TpVO9NzBj0gyzllPp
+ XaCZBYi9pTlC7pAxI2xIw7hAymOApW4HoC9FHD256ZxqUi2zb2MrwwgrgziB3zc55Sn5+VE
+ onIH2ZYis+vylAgxys6bM4qlKHWD1WjzbRRLS/Qzo4SLMuAlOFHDx2LltNAJPjn5Qq+ztfl
+ cRFVO0CtPamPx/x4ojAPw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Swh0577sYtM=;i4mr60u07hEUuF/IcxtkbPL6zn0
+ LB4zdQZYZlBRXiMXnPGUvkYwornnELug71UPfaJkCCsSyrOL+lxx+jj4Dlk9I362dO1ZeUX+R
+ p59E+A8V5tKQX4Wqqd+4uj+nHgp4oMIgjavRLnDeNZpQ0ADPfuMtpQA2QWNw9HfXfcQvNZcEW
+ UPVNvvnUVoYrC7gIsap/YYmIp3p7NC0iawOkuPz6T7K4FjB1d8D8KclsMnPfmBKfhKdHBjoB9
+ 4D40K9VWnDL7MCYiiVAuRH49ADiZSjeCnbTB7tQvroRDWMr1NxQnldL05UGmJ0wciB8SkmUXu
+ ku1/nsFlkSrFuJBiJc4YsFpAJb7slWuC0FX4J3TtYvWfSZdEs5i+EdJGYmG/nlRzRX5MV2U9y
+ 8aIZObfYISouhIDmMjnjX7gpNaCg+bWDVuC/XrM2jrcorcbZdbBHQQNTVyu/9nkZP7mYfd4Ee
+ 7yofj5S/e33l6PtjpWV4zu+IgOOpMJXvZpicad2vPNeeUD2z/Cqm0PZ1GCSL1RmYgTFdRLu/t
+ 6SjunKw6Ib6avTvDR3EhDqDSrZU88ErxQLQadQZvkk6QSL6MYuEaRDCMke3AtD3iET/1LZrpI
+ FEl35QvI6PgROHdpqmHtTyHVPf2xXV3q9tIY8/LNoZm53RH4MHZTXPKKRr4E74xFRAdP2Nacg
+ t1rp1Mmzd2WPTQn1NQlLRAoztb1MNAbqRzAOEkrWOjozNNXYDkXXRmcG8NGYm3ia5QVPqduws
+ 3XQHdynm77k80BRlmtiGQg+neJNMiueTQ==
 
-On 8/14/24 09:57, Hangbin Liu wrote:
-> After commit d7db7775ea2e ("net: veth: do not manipulate GRO when using
-> XDP"), there is no need to load XDP program to enable GRO. On the other
-> hand, the current test is failed due to loading the XDP program. e.g.
-> 
->   # selftests: net: udpgro.sh
->   # ipv4
->   #  no GRO                                  ok
->   #  no GRO chk cmsg                         ok
->   #  GRO                                     ./udpgso_bench_rx: recv: bad packet len, got 1472, expected 14720
->   #
->   # failed
-> 
->   [...]
-> 
->   #  bad GRO lookup                          ok
->   #  multiple GRO socks                      ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
->   #
->   # ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
->   #
->   # failed
->   ok 1 selftests: net: udpgro.sh
-> 
-> After fix, all the test passed.
-> 
->   # ./udpgro.sh
->   ipv4
->    no GRO                                  ok
->    [...]
->    multiple GRO socks                      ok
-> 
-> Fixes: d7db7775ea2e ("net: veth: do not manipulate GRO when using XDP")
-> Reported-by: Yi Chen <yiche@redhat.com>
-> Closes: https://issues.redhat.com/browse/RHEL-53858
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-LGTM,
+--fupy5ioaujgzhzoh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+On 24/08/14 10:10AM, Adrian Vladu wrote:
+> Hello,
+>=20
+> The 6.6.y branch has the patch already in the stable queue -> https://git=
+=2Ekernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/?id=
+=3D3e713b73c01fac163a5c8cb0953d1e300407a773, and it should be available in =
+the 6.6.46 upcoming minor.
+>=20
+> Thanks, Adrian.
 
+Yeah it's also queued up for 6.10, which I both missed (sorry for that!).
+If I'm able to properly backport the patch for 6.1 I'll send that one,
+but my hopes are not too high that this will work ..
+
+Have a nice day everybody :)
+Cheers,
+Chris
+
+--fupy5ioaujgzhzoh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAma8hc0ACgkQwEfU8yi1
+JYX/Rw//dc3Z21CFqjdEjiKPqsv2W/NbMF0S7mtARSQKZYQV0ENEMNmeuLEoh0Xf
+yzkQuIETOTiSuTEN2UqnG6VTX13w7+9MNZYYV/lv87/8wQkbwsOsE1y8/lstCSc4
+wPhY+xYpvLTTRcp41sv1OSpoMgRpa8uFZcaKz7b8UyWW570UH61deEJa79chF5k/
+iMRHGA9BzrIT2Fp2NpAWLcJ6nR5uA5JvcnzGznnOoByiBtP8lW2vyIkv5UKBXxHX
+uh151Q46CA6p9tZTlRUhn6KurnaPovVY1GoHCDzrby1BzKWHt9T0PcQYc8dMaIUC
+6+CJEgz+GANAtllA9XDmN+9MtC7b9656FXbtPukvxM2cFhbDDuAh83AEHU5Mhacc
+ufA72bIg94B8StX5iqH/u1A+NGtN7CsBqy13827cXYB28wQopdvYrqmqBeJZ2at8
+qDchFajnChAjgG/UsNgxvcMd6VRYZk/LIQQ6UXpPFC7KeuWjLhnBgqqUApqCpXBJ
+vOVqnmI5NNpgzAYg3IAd8PDpKoiyMeJsWPEyaICQ4sPRsK0S/ZoFnk3DI3UEMxTz
+BO9w3nZ+7cw9ulJ9Z6zA6TuWQQuWVUJ27622hF43DhpKhCgG0jMWZmhPBaO+JU5m
+jiHp7/xTI/aXG7k1vOQJeDroTQBK9gCbFIniRlBGbObN1vO67no=
+=6DM2
+-----END PGP SIGNATURE-----
+
+--fupy5ioaujgzhzoh--
 
