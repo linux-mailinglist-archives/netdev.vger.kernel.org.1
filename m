@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-118593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABEA9522F5
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:56:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51F059522F6
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 530ED1C213B0
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:56:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FFC280290
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F318F1C0DDB;
-	Wed, 14 Aug 2024 19:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961F31BF32C;
+	Wed, 14 Aug 2024 19:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dz2WOhzq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Drb16wzP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA0F1BF32C
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE72C1BF304
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723665385; cv=none; b=RAdtR+NOFs1ksCOmzapnsshHn0ntKs0/2hCJDP6kdsTMjpEc58APVYbStP4MeAlf7nZPzTjEhZnONSavGWKU4R1LU1xAX6jVbKMUvOl2Y4ns8+2y3OFfpk6QPc6u5Sd/yHaZgtUM+t48W8uJ0UqaJHxUi4/eSCeSxQZIsW3MQeU=
+	t=1723665387; cv=none; b=bSdIZabFCYk5CZ3gbCP/fLa8sY8btanbV2waQWPXxrlm/+vCO4uiykig1ctpdHGxiCxPBznaIHwJpjrWPICsCQmjn31bDe3GsmsqgV/8kP6ZUfirjiDDsZGKJ6FXoxyaNNLrzHc7jV7b5YHd7mJoY8o0hcrD1ykwrsHIMWCjwZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723665385; c=relaxed/simple;
-	bh=M6c4ow6mAYEda5bDxya6P+NzMW8nw9RYLyGS2t4l8/k=;
+	s=arc-20240116; t=1723665387; c=relaxed/simple;
+	bh=ce4Gm9sK8DtjolFBXVB0Ofy9mfw0ari2vWHuCBCGd8A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rMW5+fKHtkzsUcjkKCJ4nwEgVLiWsCKWDwAjeO2+dkx0tAGPdTn2HFBTedIyRicU+BP0NIuIlmalmja8qRg7fEkxIbmabNYSw8gxH/Tcr6HfVqLwq12oFwwbrqY/Y9+XVYfPvBI7sxJzCRfxrNsXNo6JTaauuJGvKRWpU8TDGhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dz2WOhzq; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=KJeh7zFHRWe40nM7bYpeY5cYuSynrnkH6MWrvyDmhOVWN2SuXxH8IhAN4bfwXNkjugWQpc3nqRcJ4yBsSbMzR6xDUJuZPpMwh8uUNfJHlatANKbzGkvhv0mMGl/t2TVx1JMXpUt6fi3gMiQsKPXHBeoF51B6ipqhBH8iDW8DlDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Drb16wzP; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723665384; x=1755201384;
+  t=1723665386; x=1755201386;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=M6c4ow6mAYEda5bDxya6P+NzMW8nw9RYLyGS2t4l8/k=;
-  b=dz2WOhzqG7RT4N6WfyAd87snVwlxYZbMpcB69PYkzY1u6reA1xcVo1Q8
-   ZhPVtQB1wHNxSqiWiwXBTnFfLhOepKqGyt+dECon6MPF+4HyvC+kgIS8q
-   yLrL4MDWrs8WUzgIMNzce40UTyfNsOYttN3q1UBCTZ0uOpp/oJ7wdoGEP
-   Yf78xXpUpFUEKKNedV0GBkEv2CC0fBR7b1ZMPlMkzHyYPE7aSStDV1xoD
-   LfUtosNkxVUPCt38O+F4EkwCs7G+bkfzOkJ3wyyPxJUJSnZzsl+sfb6hG
-   xnxyIYs5yBXigAWEm0DlySaMo8BBEr9jfuJXhgeSIU49DSMfCKXJ5f8/I
-   A==;
-X-CSE-ConnectionGUID: ASWXphV4TbSW6IPMn20qdA==
-X-CSE-MsgGUID: jILnhdrVRUWpUJmmi9iCBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="33292503"
+  bh=ce4Gm9sK8DtjolFBXVB0Ofy9mfw0ari2vWHuCBCGd8A=;
+  b=Drb16wzPo0zYZU6j1tnu5Uzs3BKZX42Zvsi7tZ33Sf9NsaXtx+aUaA+M
+   b5xpSxl0ktVe6JLYI/Dfdt5YVpLj357iCJB0QLLgEy0C9hmg2CkpKHKBK
+   dHgjqDZQwf0s0eRT3l5rHEov7iswjt9H9JpC/JuWO38UBTm7KK87gE7E1
+   s7+gGUc18NyrkvtnMZH0z35w8N/X72H7DxGQy64xNbVeYwAwLmfakz8UC
+   ym6hY7YmelTLBsCrjtLux8qN0sRyTlrJV5QQVmgRMe6SoAUd1qauNsS25
+   21s99ZOp3HxXF8wBSBWN7mIbYpO6BKj5eeasQD+ohrqORTz8xZ0SKkmVy
+   w==;
+X-CSE-ConnectionGUID: swBZkCS8QKadg5zspWlmkQ==
+X-CSE-MsgGUID: DoJ7oIVXTfCNYJZ8M0JAVg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="33292511"
 X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
-   d="scan'208";a="33292503"
+   d="scan'208";a="33292511"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 12:56:23 -0700
-X-CSE-ConnectionGUID: /XIUI8qrQ4+dzc66XimUlA==
-X-CSE-MsgGUID: Mo2T2gl/TA+79kslKf7rBw==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 12:56:26 -0700
+X-CSE-ConnectionGUID: H6NyRvX/RMOBzSeG9vr2wQ==
+X-CSE-MsgGUID: 3dRDiYg5SC6rRCksWYI5ng==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,146,1719903600"; 
-   d="scan'208";a="59869703"
+   d="scan'208";a="59869708"
 Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by orviesa008.jf.intel.com with ESMTP; 14 Aug 2024 12:56:22 -0700
+  by orviesa008.jf.intel.com with ESMTP; 14 Aug 2024 12:56:25 -0700
 From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next v5 1/5] ice: Introduce ice_get_phy_model() wrapper
-Date: Wed, 14 Aug 2024 21:54:30 +0200
-Message-ID: <20240814195434.72928-2-sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-next v5 2/5] ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+Date: Wed, 14 Aug 2024 21:54:31 +0200
+Message-ID: <20240814195434.72928-3-sergey.temerkhanov@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240814195434.72928-1-sergey.temerkhanov@intel.com>
 References: <20240814195434.72928-1-sergey.temerkhanov@intel.com>
@@ -79,221 +79,69 @@ MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-Introduce ice_get_phy_model() to improve code readability
+Add ice_get_ctrl_ptp() wrapper to simplify the PTP support code
+in the functions that do not use ctrl_pf directly.
+Add the control PF pointer to struct ice_adapter
+Rearrange fields in struct ice_adapter
 
 Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice.h        |  5 +++++
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 19 +++++++++---------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 22 ++++++++++-----------
- 3 files changed, 25 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  5 ++++-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 12 ++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 0046684004ff..387d1e85a8ca 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -1045,5 +1045,10 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
- 	clear_bit(ICE_FLAG_RDMA_ENA, pf->flags);
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index 9d11014ec02f..eb7cac01c242 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -8,18 +8,21 @@
+ #include <linux/refcount_types.h>
  
-+static inline enum ice_phy_model ice_get_phy_model(const struct ice_hw *hw)
-+{
-+	return hw->ptp.phy_model;
-+}
-+
- extern const struct xdp_metadata_ops ice_xdp_md_ops;
- #endif /* _ICE_H_ */
+ struct pci_dev;
++struct ice_pf;
+ 
+ /**
+  * struct ice_adapter - PCI adapter resources shared across PFs
+  * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
+  *                        register of the PTP clock.
+  * @refcount: Reference count. struct ice_pf objects hold the references.
++ * @ctrl_pf: Control PF of the adapter
+  */
+ struct ice_adapter {
++	refcount_t refcount;
+ 	/* For access to the GLTSYN_TIME register */
+ 	spinlock_t ptp_gltsyn_time_lock;
+ 
+-	refcount_t refcount;
++	struct ice_pf *ctrl_pf;
+ };
+ 
+ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 8ed6280af320..31d1ab575ec2 100644
+index 31d1ab575ec2..f6c50063d374 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1285,7 +1285,7 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
+@@ -57,6 +57,18 @@ static const struct ice_ptp_pin_desc ice_pin_desc_e810_sma[] = {
+ 	{  UFL2, { -1,  3 }},
+ };
  
- 	mutex_lock(&ptp_port->ps_lock);
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		err = ice_stop_phy_timer_eth56g(hw, port, true);
- 		break;
-@@ -1331,7 +1331,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- 
- 	mutex_lock(&ptp_port->ps_lock);
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		err = ice_start_phy_timer_eth56g(hw, port);
- 		break;
-@@ -1402,8 +1402,7 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 	/* Skip HW writes if reset is in progress */
- 	if (pf->hw.reset_ongoing)
- 		return;
--
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_E810:
- 		/* Do not reconfigure E810 PHY */
- 		return;
-@@ -1436,7 +1435,7 @@ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
- 
- 	ice_ptp_reset_ts_memory(hw);
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G: {
- 		int port;
- 
-@@ -1475,7 +1474,7 @@ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
- 	case ICE_PHY_UNSUP:
- 	default:
- 		dev_warn(dev, "%s: Unexpected PHY model %d\n", __func__,
--			 hw->ptp.phy_model);
-+			 ice_get_phy_model(hw));
- 		return -EOPNOTSUPP;
- 	}
- }
-@@ -2046,7 +2045,7 @@ ice_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
- 	/* For Vernier mode on E82X, we need to recalibrate after new settime.
- 	 * Start with marking timestamps as invalid.
- 	 */
--	if (hw->ptp.phy_model == ICE_PHY_E82X) {
-+	if (ice_get_phy_model(hw) == ICE_PHY_E82X) {
- 		err = ice_ptp_clear_phy_offset_ready_e82x(hw);
- 		if (err)
- 			dev_warn(ice_pf_to_dev(pf), "Failed to mark timestamps as invalid before settime\n");
-@@ -2070,7 +2069,7 @@ ice_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
- 	ice_ptp_enable_all_perout(pf);
- 
- 	/* Recalibrate and re-enable timestamp blocks for E822/E823 */
--	if (hw->ptp.phy_model == ICE_PHY_E82X)
-+	if (ice_get_phy_model(hw) == ICE_PHY_E82X)
- 		ice_ptp_restart_all_phy(pf);
- exit:
- 	if (err) {
-@@ -3265,7 +3264,7 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 
- 	mutex_init(&ptp_port->ps_lock);
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_ptp_init_tx_eth56g(pf, &ptp_port->tx,
- 					      ptp_port->port_num);
-@@ -3363,7 +3362,7 @@ static void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
-  */
- static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
- {
--	switch (pf->hw.ptp.phy_model) {
-+	switch (ice_get_phy_model(&pf->hw)) {
- 	case ICE_PHY_E82X:
- 		/* E822 based PHY has the clock owner process the interrupt
- 		 * for all ports.
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 6dff422b7f4e..da88c6ccfaeb 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -829,7 +829,7 @@ static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
- 	/* Certain hardware families share the same register values for the
- 	 * port register and source timer register.
- 	 */
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_E810:
- 		return ice_ptp_tmr_cmd_to_src_reg(hw, cmd) & TS_CMD_MASK_E810;
- 	default:
-@@ -5502,7 +5502,7 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- static int ice_ptp_write_port_cmd(struct ice_hw *hw, u8 port,
- 				  enum ice_ptp_tmr_cmd cmd)
- {
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_ptp_write_port_cmd_eth56g(hw, port, cmd);
- 	case ICE_PHY_E82X:
-@@ -5567,7 +5567,7 @@ static int ice_ptp_port_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- 	u32 port;
- 
- 	/* PHY models which can program all ports simultaneously */
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_E810:
- 		return ice_ptp_port_cmd_e810(hw, cmd);
- 	default:
-@@ -5646,7 +5646,7 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
- 
- 	/* PHY timers */
- 	/* Fill Rx and Tx ports and send msg to PHY */
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		err = ice_ptp_prep_phy_time_eth56g(hw,
- 						   (u32)(time & 0xFFFFFFFF));
-@@ -5692,7 +5692,7 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		err = ice_ptp_prep_phy_incval_eth56g(hw, incval);
- 		break;
-@@ -5761,7 +5761,7 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), 0);
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), adj);
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		err = ice_ptp_prep_phy_adj_eth56g(hw, adj);
- 		break;
-@@ -5794,7 +5794,7 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
-  */
- int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
- {
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_read_ptp_tstamp_eth56g(hw, block, idx, tstamp);
- 	case ICE_PHY_E810:
-@@ -5824,7 +5824,7 @@ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
-  */
- int ice_clear_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx)
- {
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_clear_ptp_tstamp_eth56g(hw, block, idx);
- 	case ICE_PHY_E810:
-@@ -5887,7 +5887,7 @@ static int ice_get_pf_c827_idx(struct ice_hw *hw, u8 *idx)
-  */
- void ice_ptp_reset_ts_memory(struct ice_hw *hw)
- {
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		ice_ptp_reset_ts_memory_eth56g(hw);
- 		break;
-@@ -5916,7 +5916,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	/* Clear event err indications for auxiliary pins */
- 	(void)rd32(hw, GLTSYN_STAT(src_idx));
- 
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_ptp_init_phc_eth56g(hw);
- 	case ICE_PHY_E810:
-@@ -5941,7 +5941,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
-  */
- int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- {
--	switch (hw->ptp.phy_model) {
-+	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_ETH56G:
- 		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
- 							  tstamp_ready);
++static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
++{
++	return !pf->adapter ? NULL : pf->adapter->ctrl_pf;
++}
++
++static __maybe_unused struct ice_ptp *ice_get_ctrl_ptp(struct ice_pf *pf)
++{
++	struct ice_pf *ctrl_pf = ice_get_ctrl_pf(pf);
++
++	return !ctrl_pf ? NULL : &ctrl_pf->ptp;
++}
++
+ /**
+  * ice_ptp_find_pin_idx - Find pin index in ptp_pin_desc
+  * @pf: Board private structure
 -- 
 2.43.0
 
