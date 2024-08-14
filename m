@@ -1,106 +1,134 @@
-Return-Path: <netdev+bounces-118471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31931951B66
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:08:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD51951B67
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8FC31F2291A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B62828166B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4F61B14E5;
-	Wed, 14 Aug 2024 13:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677A41B1417;
+	Wed, 14 Aug 2024 13:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PAMB5WQx"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="u3PeH0rd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB941B142C
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B7D1B012A;
+	Wed, 14 Aug 2024 13:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723640899; cv=none; b=K23v3FYaxEdLvNm7T+saRiJnJkNSMfvMrWkIor9wl2oHUw3xRCRSZrutaeIVuKd0aqBQ5a5Y+w+kXwozXvliDBhuyhS50ibJLOvI8QVZJw0lv18D1/e1ngFOo9d586pd90hSGlBRYCUkq8447PY5hfhVFmFXe6O9ZY71wJLFV9k=
+	t=1723640920; cv=none; b=k+ChCtHMDq0LSH5ntZxvIJ9LJBott2Ezw/m8VqRsWssHYxmJrkxzDna9KygBmJbqArzwe/9npu27AI5hA5bInkwFeiIRWnfkKosInxn3OJxl8fQh7EK+H7vBX6PWFxBsZT/Xkn+ONW3x4hPwbpmYSfleLCsITxt4HaUt9C/MNxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723640899; c=relaxed/simple;
-	bh=KctMPxse9owqidMn71Rsz/8HSq6jPkX+Vt+hjOXLrrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0gNW6YEJYtBL9Mq9c6p2dlca89bk6AGhR895i6llL5qRaUc+E+d1UT8orj9bQiNaNCUcC0wskBA5jbJMuU7Jdyid/AETT+qd7nCYErkjb/C9rkRrzDkH6/LJP3UnYcjqIJzstKkfonWjgMdmYzqxfn3+P+d6UcnBmSSb/hWvzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PAMB5WQx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wOSd+OBDx+0wpZ3WLFWwiHrjC5kYHIOUwP6Cijcu9MU=; b=PAMB5WQxMUDKuruwm64+o4XLFH
-	xGRdRT0AI9oqyVx01a3b7XPwP0jMraOLGDiX9+klcn2r+yENfBRVLGExRPlL3vQwutAvb80ybXBfN
-	T7ClZRX7dll/+tTulEQ2eifWXPjDSsBs643i5Z0C3QKcrjll4h4HtVBMQtV7WCtqyHL4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1seDjT-004lVZ-PE; Wed, 14 Aug 2024 15:08:07 +0200
-Date: Wed, 14 Aug 2024 15:08:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Maciek Machnikowski <maciek@machnikowski.net>, netdev@vger.kernel.org,
-	richardcochran@gmail.com, jacob.e.keller@intel.com,
-	darinzon@amazon.com, kuba@kernel.org
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+	s=arc-20240116; t=1723640920; c=relaxed/simple;
+	bh=C1QXmAb5awmgtUbSLUzO4ZM5vxb43iMYoyesmXLeBG8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t+jw57f/+/wQNRQ8hrFIfEmZ5jfTwkV6Jqf7NlHdtwmZBtlGRwa9fQ8K1bcEoFJ5bt3H5r5+ZUOUdRXfKP9IBgm4te9dF8t1wCb6orcmT8mZoho4dCC8CTCbMbLsSKThWVVpBup6SnD3OMX/0Z1Snx6zPzOM4H32EJPrU9cQH+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=u3PeH0rd; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723640909; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=7FgzcJpB/wpgVSm+fy4fQ0U0lAMVZkWuLXhsSTMu6ho=;
+	b=u3PeH0rd0FQt9s1DydvFDquMWltRQLycOxN0DwTXFysg43az7fu2Rut5kLkiJrlP9hxrP0r+D9MAFVOHpD4IvKvGDR7Dcc2U9cy/owVEAeLEibgC0QB3BSVfAug1xRisbMYss+9Gud38eDZbU5cKOFPIiF4gfaTB7/ArqGv0Vbk=
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCt6n1E_1723640907)
+          by smtp.aliyun-inc.com;
+          Wed, 14 Aug 2024 21:08:28 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v3 0/2] net/smc: introduce ringbufs usage statistics
+Date: Wed, 14 Aug 2024 21:08:25 +0800
+Message-Id: <20240814130827.73321-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 14, 2024 at 09:44:29AM +0100, Vadim Fedorenko wrote:
-> On 13/08/2024 21:05, Andrew Lunn wrote:
-> > On Tue, Aug 13, 2024 at 12:55:59PM +0000, Maciek Machnikowski wrote:
-> > > This patch series implements handling of timex esterror field
-> > > by ptp devices.
-> > > 
-> > > Esterror field can be used to return or set the estimated error
-> > > of the clock. This is useful for devices containing a hardware
-> > > clock that is controlled and synchronized internally (such as
-> > > a time card) or when the synchronization is pushed to the embedded
-> > > CPU of a DPU.
-> > 
-> > How can you set the estimated error of a clock? Isn't it a properties
-> > of the hardware, and maybe the network link? A 10BaseT/Half duplex
-> > link is going to have a bigger error than a 1000BaseT link because the
-> > bits take longer on the wire etc.
-> 
-> AFAIU, it's in the spec of the hardware, but it can change depending on
-> the environment, like temperature. The link speed doesn't matter here,
-> this property can be used to calculate possible drift of the clock in
-> the micro holdover mode (between sync points).
+Currently, we have histograms that show the sizes of ringbufs that ever
+used by SMC connections. However, they are always incremental and since
+SMC allows the reuse of ringbufs, we cannot know the actual amount of
+ringbufs being allocated or actively used.
 
-Is there a clear definition then? Could you reference a standard
-indicating what is included and excluded from this?
+So this patch set introduces statistics for the amount of ringbufs that
+actually allocated by link group and actively used by connections of a
+certain net namespace, so that we can react based on these memory usage
+information, e.g. active fallback to TCP.
 
-> > What is the device supposed to do with the set value?
-> 
-> It can be used to report the value back to user-space to calculate the
-> boundaries of "true time" returned by the hardware.
+With appropriate adaptations of smc-tools, we can obtain these ringbufs
+usage information:
 
-So the driver itself does not know its own error? It has to be told
-it, so it can report it back to user space. Then why bother, just put
-it directly into the ptp4l configuration file?
+$ smcr -d linkgroup
+LG-ID    : 00000500
+LG-Role  : SERV
+LG-Type  : ASYML
+VLAN     : 0
+PNET-ID  :
+Version  : 1
+Conns    : 0
+Sndbuf   : 12910592 B    <-
+RMB      : 12910592 B    <-
 
-Maybe this is all obvious to somebody who knows PTP inside out, but to
-me it is not. Please could you put a better explanation and
-justification into the commit message. We need PHY driver writers who
-have limited idea about PTP can implement these new calls.
+or
 
-	Andrew
+$ smcr -d stats
+[...]
+RX Stats
+  Data transmitted (Bytes)      869225943 (869.2M)
+  Total requests                 18494479
+  Buffer usage  (Bytes)          12910592 (12.31M)  <-
+  [...]
+
+TX Stats
+  Data transmitted (Bytes)    12760884405 (12.76G)
+  Total requests                 36988338
+  Buffer usage  (Bytes)          12910592 (12.31M)  <-
+  [...]
+[...]
+
+
+Change log:
+v3->v2
+- use new helper nla_put_uint() instead of nla_put_u64_64bit().
+
+v2->v1
+https://lore.kernel.org/r/20240807075939.57882-1-guwen@linux.alibaba.com/
+- remove inline keyword in .c files.
+- use local variable in macros to avoid potential side effects.
+
+v1
+https://lore.kernel.org/r/20240805090551.80786-1-guwen@linux.alibaba.com/
+
+Wen Gu (2):
+  net/smc: introduce statistics for allocated ringbufs of link group
+  net/smc: introduce statistics for ringbufs usage of net namespace
+
+ include/uapi/linux/smc.h |  6 ++++
+ net/smc/smc_core.c       | 68 +++++++++++++++++++++++++++++++++-------
+ net/smc/smc_core.h       |  2 ++
+ net/smc/smc_stats.c      |  6 ++++
+ net/smc/smc_stats.h      | 28 +++++++++++------
+ 5 files changed, 90 insertions(+), 20 deletions(-)
+
+-- 
+2.32.0.3.g01195cf9f
+
 
