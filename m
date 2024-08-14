@@ -1,242 +1,219 @@
-Return-Path: <netdev+bounces-118381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267E29516F6
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:48:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2AC95170D
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B8A61F23F90
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:48:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4BC1B26E33
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8EC149C58;
-	Wed, 14 Aug 2024 08:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F975144D21;
+	Wed, 14 Aug 2024 08:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOzM+mpY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AfPmLvH8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8630E14375C;
-	Wed, 14 Aug 2024 08:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723625236; cv=none; b=tFcZsYbqhfvqu3b3NXsO5tdS8Scqw1hhpODrWpCCwwQ9iK8KJHA9AS4usdWZbSCoZAB72I/lVjMUcnBmLU/nmQpebpcsLHh3a1ucTxnVVWVD7v5uQp9WGOPYYRT1lGVFjMV6t2WM4pkqBtXy4sKWYH0m10jYqQsztsIwz3nC6xE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723625236; c=relaxed/simple;
-	bh=UNXzIpOo4I3UGLxgdEwwuDOJCsyLxZPjEX/otvupq/g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PDQxt+XJDOsn8BTAzRa7dZo8Um21eIViZgDeFfLx6tyCnuPbgszaTPkzEy1gXr+xASk1HxrH2VOMhiQGuQtbn+Dh35fhlDu0iJPbuZ7/ueDFjhxAahTsRsgnbCDYyXHBtqnEVZ/3v1almG2vJLLAqyjX+3cqLrmIp94M4ZrR/GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOzM+mpY; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-530e2287825so5946780e87.1;
-        Wed, 14 Aug 2024 01:47:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723625233; x=1724230033; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v93U00J3W/G+3iiDSm+KOsmeueDudNy3zc5gSs6I6cA=;
-        b=VOzM+mpYHFXFwQVGH3OTJJ9qlHl7668QlrtENaRp/G8pt22CBeYXQaeyYDPJ+gzFwW
-         fq+ytL5BvTlQGsj59Fc9tpGhVWgpAKicVCkYqdRYVTNbBYwhhbw3cstBOdnhF2F0Nc4L
-         Odf+exgaxmjVup42U8dPGWo6xG43hvFy7yJno+GJS9x6ocUTfwZNYV06koTV/jXNvVSy
-         Q+2mg44M/PAqcy+9R36ouOG+ULe+6U8Qs/YbCBwWEHZcmmT0zFGSfctEifRqB27ePLGb
-         Lx1qI90LxK3ZQVMb4b3aRbAsfymO+ok3emH7RuuMNrmTbqBC7bf99LaN6xnXcsHId94y
-         uYxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723625233; x=1724230033;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v93U00J3W/G+3iiDSm+KOsmeueDudNy3zc5gSs6I6cA=;
-        b=HtTDZKj48zhHIQOz2cIaRG3JmeVx4cmD6sGbPPMXZSIhw55JTMQiOECP/B9AYtbkcf
-         VcID3O+a2X3F8xR0WEfmWez0x8WY7y29xU6JhhrDHXd9gKi0vouEBWlibYKOeMd7l0IX
-         c3B0ZMdtHVZ9IWwX0NkqmlP+75qUV4QPVZF7bvEokb0yAMv2QoQIkZD82FmzC5GY7eGh
-         uxm1HO+SnDcEfsPIqNcdTxI5d6ecXRhd8W8m2mh+NqytIS8HkC5VFa2bSTKKlDE13phf
-         mRUKPywnerUSjhNZ9R8OTJz++vB7y0EjIWmmkYvJh2hJOcLKrNV44qWghV9LJ+9n6tLE
-         hOfw==
-X-Forwarded-Encrypted: i=1; AJvYcCUIjKqgFDVmsL03mXA2wSz0DMbnBbTgBzFc357r75tn5AnenNWcaUi6t+cD4YUKSZvkMw9fCwZZjARHsgxudowbISMs44N8+T848cq83FSwCY0HccQvNGdShaRI+xnr4qEdWVATZs1dKv2VuXGxu3EmD0s5rpOIFDE4oaWl1pvuoBkAbQmpCeQmY5ORE8mcvd7Ck2u1ANi+eEVUWtYzHTDm
-X-Gm-Message-State: AOJu0YzTOvMIwlSfYYpmR3bdfH8J9G7VJb1e112tPESPzGMORk4MqUDR
-	6TL9bx5UpaB3wT58Wft2oq76UXmMDUp07X82N+GkefjZ9wozIlsU
-X-Google-Smtp-Source: AGHT+IH4EjACtsvCABaDeBjsVWwwYox558+OITuZDnWDDQJqpAVHjQXpEtVnsv3StoTxLrge71ISzA==
-X-Received: by 2002:a05:6512:118f:b0:516:d219:3779 with SMTP id 2adb3069b0e04-532edbd5a4emr1271567e87.58.1723625232130;
-        Wed, 14 Aug 2024 01:47:12 -0700 (PDT)
-Received: from latitude-fedora.localnet ([194.247.191.114])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53200f42241sm1180073e87.265.2024.08.14.01.47.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:47:11 -0700 (PDT)
-From: Alexey Charkov <alchark@gmail.com>
-To: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org, krzk+dt@kernel.org,
- heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org,
- linux-rockchip@lists.infradead.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com, minipli@grsecurity.net,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- nick@khadas.com, Sai Krishna <saikrishnag@marvell.com>,
- Arend van Spriel <arend.vanspriel@broadcom.com>
-Subject:
- Re: [PATCH v10 4/5] wifi: brcmfmac: Add optional lpo clock enable support
-Date: Wed, 14 Aug 2024 11:47:09 +0300
-Message-ID: <2269063.vFx2qVVIhK@latitude-fedora>
-In-Reply-To: <721da64c-42ec-4be6-8ad3-e2685a84823a@broadcom.com>
-References:
- <20240813082007.2625841-1-jacobe.zang@wesion.com>
- <20240813082007.2625841-5-jacobe.zang@wesion.com>
- <721da64c-42ec-4be6-8ad3-e2685a84823a@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B5D144D0A
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 08:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723625637; cv=fail; b=C4mzIpG1THpiaS4jVxJbrN2YuawEZf1DVQMC+r9pnUV8kmb0mV7LztuQNZElWzg5wLgSVDOzX5O7oD0ug+w2VbKWq5gvUdwuYyk5KygSemGqPYfkBF6G7NQc0W0xFZ7qhedU/0fWBv+FCNcMTsYb4trzjpOXiT3yNzx2H2cHx8g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723625637; c=relaxed/simple;
+	bh=sDrYER+cHqdgfMT1UCzlTlKBNspGp+woHBMJprdBVtM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GEoFJ6WMkgzWqU9uFrJLBvmVOOyqfHsEkQmw4VA/C05mc/iOMQlhfy9xKvPMXqyjpsUXr2KpG7k2ALusG5hlYNtjb1dLGKwxxbZfqZTfY+g/Hp/pB57rzrT96uVf5xUKdYsTHwoWkQr3o1FAPMJb5JwIKu2+9rfbooroqFkA0BI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AfPmLvH8; arc=fail smtp.client-ip=40.107.244.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yITI6xhnakJDo6qfm2819TeWmG49ZC4g+kc2Ae6JHOjfvaY1VARE6ETSZCOE5V6+GL2q0b4S7cvs45LeWkHKpaiV59NXCzyZJjT9bxfhtRKT9sHjYTquqAQ0VQezzOLA51sbAxHQgL9eR+W82uimfEJdJMwQa+qk/XzjzV4tfDkv8tD61WWmZyo4JIDTR01GFXmuIlXE0rGeGvFRe/3HAla+MCus8b3eY2avn6X0ILRdZsZv+gxgT66K+kPuJlb1HWp/zo/5QywC3J+gzR5XxUeunWe3iqV4TtycgUKWu1KTvz44TYfmvN4AzHWwbQhJvMi0/im4E1pmp7h86xSE9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QexZhNSAl3oDcHkX7Qz9zWFc4GcYF9spoYsI4TDAIn8=;
+ b=shgZYGJ4VJ5GeofV0R3LyksHUMFd4QXlayUTzCRiDRJQWlOHD9+tF3ZaG/MopjDJ6/pUyfWZZl6fTwlvxuYxC1Q3uT7w9inTX7Li3ZN0M+w632tt0l+ch3lyCwKm1P/f4ppxR+T2Odx+IN74GGaLA4WiycKgzf6pBnka6dvGK1M01fvGg2XIdbPt77tXaUW/NVP5X3MwyB60pCvj2T4PIg4MCcJhx1NpRCrufYtkTHhKTIevkQRHOPEw1TgrAmP9R1wo0QvGt1M4ZZoxifj7MsFQt9U6ajeZhALKj1F7IwcTy1WCDcAF+vH+YhzuCMfOzhn1g250qDyvelqfQcqnYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QexZhNSAl3oDcHkX7Qz9zWFc4GcYF9spoYsI4TDAIn8=;
+ b=AfPmLvH8k4MYVadh4TgvCO/Lapt+YoBkQJZXNVEjK8mNORR6lKxQBIpXEaFOcpak25RsmhV98NziKu1HGlfLCOt+GPGrpVplgl/7rpZ3qQgq2Go92SXadoLtUphIHap7/xKNUU9KG/p4e19PMz235ZxMWRlIRJvF7iq5kR5Bn/y1Rm0Ez4k4Q1kAtyetDMfdgglgJA+UnH/Jt8cnsccUj0bEH6dqrksh8qzJ7+AJ46fD4FXHNu0IC7Uci5rNEVFGpMdPZ8IxKDeEWtferD1AovzjfYo1w+tr43wqs1sTpsWkkAUJ7gD21ysyf8p8NNplzlw4w66Kzm2eZoCNxx7GPw==
+Received: from CH2PR17CA0018.namprd17.prod.outlook.com (2603:10b6:610:53::28)
+ by SA3PR12MB7782.namprd12.prod.outlook.com (2603:10b6:806:31c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Wed, 14 Aug
+ 2024 08:53:51 +0000
+Received: from CH1PEPF0000AD81.namprd04.prod.outlook.com
+ (2603:10b6:610:53:cafe::bb) by CH2PR17CA0018.outlook.office365.com
+ (2603:10b6:610:53::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.24 via Frontend
+ Transport; Wed, 14 Aug 2024 08:53:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH1PEPF0000AD81.mail.protection.outlook.com (10.167.244.89) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Wed, 14 Aug 2024 08:53:51 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 Aug
+ 2024 01:53:38 -0700
+Received: from nexus.mtl.labs.mlnx (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 Aug
+ 2024 01:53:35 -0700
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <cjubran@nvidia.com>, <cratiu@nvidia.com>, <tariqt@nvidia.com>,
+	<saeedm@nvidia.com>, <yossiku@nvidia.com>, <gal@nvidia.com>,
+	<jiri@nvidia.com>
+Subject: [RFC PATCH] devlink: Extend the devlink rate API to support DCB ETS
+Date: Wed, 14 Aug 2024 11:51:45 +0300
+Message-ID: <20240814085320.134075-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD81:EE_|SA3PR12MB7782:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92c8c83a-ae0b-42b3-8349-08dcbc3e9e7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?S0JEcjZXUnRpajlyUXpEb1E0cTJiY0FpMHUrbDV0VU9ydG9YODYxV2V2RUVY?=
+ =?utf-8?B?UjNsem9kTlpDSjNFU01oVWtmQ2RscUtEK2FHT3JhNTlRSjA5Qlp2UTZHVndK?=
+ =?utf-8?B?ODc3bi8xc1RBTFovNmw3TGQ1MHZEcFNrTUJjRzltK2Z1UW5qMWdHM1hIbnNy?=
+ =?utf-8?B?UzBkTmZucTkvR2R6c0VwL0xUSGIyZ1hHWjBiZHRWbUFNYjlXOXVCbjZ1d1Y4?=
+ =?utf-8?B?RGVuR1A2SUQ5SGMzblFGbFZEckREeE1RWE1wRXdRM1hBTlFJZUJFV0hxM2gz?=
+ =?utf-8?B?bVBEMU5MUHdxTzhpalFabURBM1pFcngydk1LbjBMQWpXM2pGQ2dqUXhjZ1NN?=
+ =?utf-8?B?d2N6LytNNEZ1V1pSdWFrZytmV21RMkFmNGpNRmZGd3g4VW9sdUdMaStaaFVP?=
+ =?utf-8?B?Y3hHaXVQZVdKcldxN0pRWGE0QzUzbG92R212a2dVYmxLM2d5YTFodzN5Z1lN?=
+ =?utf-8?B?cncxY0xNcTBEZ3l1bE1ndzlpZXZkM3lyL09zbWgvc09TWFFYazBlY1VuVHU2?=
+ =?utf-8?B?T01HcVN4M2s1aVk0ZzM1TEJHeXhQQXMvTnRLdEdXeGQrdE50ZkJJcDZaNjlm?=
+ =?utf-8?B?d210UGpFd0pSbGt0d0N0MUYxYXN3RUhsZVVWTlNZUzFpcjRtUE5OdnpiZGRT?=
+ =?utf-8?B?L2RzazUrNzZQMUN2U2VVWVdWdURSUzRnaXBmQlZKRFdUV05UQytYc25qTnFC?=
+ =?utf-8?B?ZkxnT05zeFRyWkREWm9PallSS2xydGNmY3hMTXlHc3NCWUl6QmpTbStuVVJG?=
+ =?utf-8?B?cUN0ell5L3VUV296aGZFSU80Wi9zZWJiU05PTmtVKzZQY1ltc3lGbk5mQmov?=
+ =?utf-8?B?WkY1ODRlT0ZMK3BLVnZ1UXc3OFUwVkV5K3lsRFB0Vkp5cS9MelFja3ZGdnI2?=
+ =?utf-8?B?d1lqL0IxWVdmRk5EQTA1eGs0Ni90TXZka2FuNVpYM0JldG1lS2ZGdklGMGp5?=
+ =?utf-8?B?endoZFpGdXN4aDJucm01UkVGbytIYkorWFByN0dkL3NPV1FndVBiQ1B4YUwv?=
+ =?utf-8?B?Q1ZwWlc1TGt5Y2lsdURyVEpSdm9RWjJ5SjhVRHlEU3ZETjcyTXlXaklmUnhz?=
+ =?utf-8?B?dTJScEZaZW5QVENoT0F3Skl6SWxtbzlYRGJvRWpaLzVCS2J5NThPSzZUUnU3?=
+ =?utf-8?B?YW1LWjBmSjZaVmFReUJYMlB0WFJ5THBZSlQxZ1dRTUNIemh2anJoNVdMbnF6?=
+ =?utf-8?B?K2Q5U29SRU1SVzZ3S3pEWXlzQmhjUWEzQmNBaG9JaytDS2NNZk0zbXhkS1cr?=
+ =?utf-8?B?eFhSd0dtbjBEWVVDZEtHd3AxTVN0MDRPUm1EYTc3bUlKVFp1a0NYM2xUNEdm?=
+ =?utf-8?B?b3kydHpQeHdlbEU1OXRtVjdRc3dNRnFIZFFWZVVjQ1R4OGkzTG8xUXd6ZFRk?=
+ =?utf-8?B?cmtHSFBqVEJpbnN2YUtEU1Mxck15NGY1UXhzTWFzVFZIeUdLYXhNc0MzaEZx?=
+ =?utf-8?B?dlBHaTBzMURwMzNpeDdmVmdaK25WMEhTY1ZrYmZNR0ZORkkwQllTNFgwZVVS?=
+ =?utf-8?B?a3dFaFo1MTlYMUF4bThYNXFnMU5pV3BjT3NjWjhOVDVwZzdvNnFtZk1qWWhS?=
+ =?utf-8?B?VlBrakw2T2swaXNoQXlkUlJ3b3plK2Z5UjYvWElIdEo4QnVVQUZETm56dmJX?=
+ =?utf-8?B?RW5uQWlIblBTUkVhRlVLZE1CRVpHWWNkNDNQZjJEWmEzSlBTa0dHTGg5UDRR?=
+ =?utf-8?B?TG1WeUZxeDIzRUFrdFlhT1FHTXNhcGhIczByRE9lNisrUEg2a283N1IzZ0J2?=
+ =?utf-8?B?QUFFWG1tYkdEaVQ5TmlhM1hpWHQ0RnhoMkh5b2IzaG03blVQVFhkNFZka2xG?=
+ =?utf-8?B?RFRrQllhVlp1eThqTERaM29JRzhidHZMZUpzejY3d3ExekNVVitSSDB4L1Z2?=
+ =?utf-8?B?NjlleWx4NDI4SlNhK0ViclllZFpIYzYxVzkyQ1Ezc0lwRW5od0tNclB1dy9Q?=
+ =?utf-8?Q?WXJaz8CXOiKLe3pCfsfYErAfcMgXEUOK?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 08:53:51.1381
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92c8c83a-ae0b-42b3-8349-08dcbc3e9e7d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD81.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7782
 
-Hi Arend, Jacobe,
+Hi,
 
-On Tuesday, August 13, 2024 2:57:28=E2=80=AFPM GMT+3 Arend van Spriel wrote:
-> On 8/13/2024 10:20 AM, Jacobe Zang wrote:
-> > WiFi modules often require 32kHz clock to function. Add support to
-> > enable the clock to PCIe driver and move "brcm,bcm4329-fmac" check
-> > to the top of brcmf_of_probe. Change function prototypes from void
-> > to int and add appropriate errno's for return values that will be
-> > send to bus when error occurred.
->=20
-> I was going to say it looks good to me, but....
->=20
-> > Co-developed-by: Ondrej Jirman <megi@xff.cz>
-> > Signed-off-by: Ondrej Jirman <megi@xff.cz>
-> > Co-developed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> > Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> > Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
-> > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> > ---
-> >=20
-> >   .../broadcom/brcm80211/brcmfmac/bcmsdh.c      |  4 +-
-> >   .../broadcom/brcm80211/brcmfmac/common.c      |  3 +-
-> >   .../wireless/broadcom/brcm80211/brcmfmac/of.c | 53 +++++++++++--------
-> >   .../wireless/broadcom/brcm80211/brcmfmac/of.h |  9 ++--
-> >   .../broadcom/brcm80211/brcmfmac/pcie.c        |  3 ++
-> >   .../broadcom/brcm80211/brcmfmac/sdio.c        | 22 +++++---
-> >   .../broadcom/brcm80211/brcmfmac/usb.c         |  3 ++
-> >   7 files changed, 61 insertions(+), 36 deletions(-)
->=20
-> [...]
->=20
-> > diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> > b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c index
-> > e406e11481a62..f19dc7355e0e8 100644
-> > --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> > +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
->=20
-> [...]
->=20
-> > @@ -113,33 +118,39 @@ void brcmf_of_probe(struct device *dev, enum
-> > brcmf_bus_type bus_type,>=20
-> >   		of_node_put(root);
-> >   =09
-> >   	}
-> >=20
-> > -	if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac"))
-> > -		return;
-> > -
-> >=20
-> >   	err =3D brcmf_of_get_country_codes(dev, settings);
-> >   	if (err)
-> >   =09
-> >   		brcmf_err("failed to get OF country code map (err=3D%d)
-\n", err);
-> >   =09
-> >   	of_get_mac_address(np, settings->mac);
-> >=20
-> > -	if (bus_type !=3D BRCMF_BUSTYPE_SDIO)
-> > -		return;
-> > +	if (bus_type =3D=3D BRCMF_BUSTYPE_SDIO) {
->=20
-> Don't like the fact that this now has an extra indentation level and it
-> offers no extra benefit. Just keep the original if-statement and return
-> 0. Consequently the LPO clock code should move just before the if-stateme=
-nt.
-> > +		if (of_property_read_u32(np, "brcm,drive-strength",=20
-&val) =3D=3D 0)
-> > +			sdio->drive_strength =3D val;
-> >=20
-> > -	if (of_property_read_u32(np, "brcm,drive-strength", &val) =3D=3D 0)
-> > -		sdio->drive_strength =3D val;
-> > +		/* make sure there are interrupts defined in the node */
-> > +		if (!of_property_present(np, "interrupts"))
-> > +			return 0;
-> >=20
-> > -	/* make sure there are interrupts defined in the node */
-> > -	if (!of_property_present(np, "interrupts"))
-> > -		return;
-> > +		irq =3D irq_of_parse_and_map(np, 0);
-> > +		if (!irq) {
-> > +			brcmf_err("interrupt could not be=20
-mapped\n");
-> > +			return 0;
-> > +		}
-> > +		irqf =3D irqd_get_trigger_type(irq_get_irq_data(irq));
-> > +
-> > +		sdio->oob_irq_supported =3D true;
-> > +		sdio->oob_irq_nr =3D irq;
-> > +		sdio->oob_irq_flags =3D irqf;
-> > +	}
-> >=20
-> > -	irq =3D irq_of_parse_and_map(np, 0);
-> > -	if (!irq) {
-> > -		brcmf_err("interrupt could not be mapped\n");
-> > -		return;
-> > +	clk =3D devm_clk_get_optional_enabled(dev, "lpo");
-> > +	if (!IS_ERR_OR_NULL(clk)) {
-> > +		brcmf_dbg(INFO, "enabling 32kHz clock\n");
-> > +		return clk_set_rate(clk, 32768);
-> > +	} else {
-> > +		return PTR_ERR_OR_ZERO(clk);
-> >=20
-> >   	}
->=20
-> Change this to:
->  > +	clk =3D devm_clk_get_optional_enabled(dev, "lpo");
->  > +	if (IS_ERR_OR_NULL(clk)) {
->  > +		return PTR_ERR_OR_ZERO(clk);
+We have support for DCB-ETS for quite a while: mapping priorities to TC
+(traffic class) and setting min-share per TC. The configuration is set on the
+PF/uplink and affects all the traffic/queues including any VFs/SFs instantiated
+from that PF.
 
-Perhaps in this case we should go for IS_ERR and PTR_ERR respectively.=20
-devm_clk_get_optional_enabled would return NULL when the optional clock is =
-not=20
-found, so NULL is not an error state but serves as a dummy clock that can b=
-e=20
-used with clk_set_rate.
+We have a customer requirement to apply ETS for a group of VFs. For example,
+TC0 and TC5 for TCP/UDP and RoCE, 20 / 80 respectively.
 
-This way we won't skip over the interrupts initialization below in case the=
-=20
-clock is absent.
+Two options we considered that didn’t meet the bar:
 
->  > +	}
->  > +	brcmf_dbg(INFO, "enabling 32kHz clock\n");
->  > +	clk_set_rate(clk, 32768);
->=20
-> As said above this should be moved before the if-statement:
->  > -	if (bus_type !=3D BRCMF_BUSTYPE_SDIO)
->  > -		return 0;
-> >=20
-> > -	irqf =3D irqd_get_trigger_type(irq_get_irq_data(irq));
-> >=20
-> > -	sdio->oob_irq_supported =3D true;
-> > -	sdio->oob_irq_nr =3D irq;
-> > -	sdio->oob_irq_flags =3D irqf;
-> > +	return 0;
-> >=20
-> >   }
+1. MQPRIO: the DSCP or VLAN-PCP values are set by the VM, one can use MQPRIO
+qdisc from inside the VM to implement ETS, however, it is not possible to share a
+qdisc across multiple net-devices.
+2. TC police action: use TC filters (on the VF-representors) to classify packet
+based on DSCP/PCP and apply a policer (a policer action can be shared across
+multiple filters). However, this is policing and not traffic shaping (no
+backpressure to the VM).
 
-Best regards,
-Alexey
+To this end, devlink-rate seems to be the most suitable interface – has support
+for group of VFs. Following are two options to extend it:
 
+1. In addition to leaf and node, expose a new type: TC.
+Each VF will expose TC0 to TC7:
+pci/0000:04:00.0/1/tc0
+…
+pci/0000:04:00.0/1/tc7
+
+Example:
+DEV=pci/0000:04:00.0
+# Creating a group:
+devlink port function rate add $DEV/vfs_group tx_share 10Gbit tx_max 50Gbit
+
+# Creating two groups TC0 and TC5:
+devlink port function rate add $DEV/group_tc0 tx_weight 20 parent vfs_group
+devlink port function rate add $DEV/group_tc5 tx_weight 80 parent vfs_group
+
+# Adding TCs
+devlink port function rate set $DEV/1/tc0 parent group_tc0
+devlink port function rate set $DEV/2/tc0 parent group_tc0
+
+devlink port function rate set $DEV/1/tc5 parent group_tc5
+devlink port function rate set $DEV/2/tc5 parent group_tc5
+
+2. New option to specify the bandwidth proportions between the TCs:
+devlink port function rate add $DEV/vfs_group \
+  tx_share 10Gbit tx_max 50Gbit tc-bw 0:20 1:0 2:0 3:0 4:0 5:80 6:0 7:0
+
+All traffic (group of VFs) will be subjected to share (10), max (50) and adhere
+to the specified TC weights.
+
+Moreover, we need a mechanism to configure TC-priority mapping and selecting
+the DSCP or PCP (trust state); this could be either using the existing tools
+(e.g., dcb-ets/lldp) or by other means.
+
+This patch is based on a previous attempt at extending devlink rate to support
+per queue rate limiting ([1]). In that case, a different approach was chosen.
+Here, we propose extending devlink rate with a new node type to represent
+traffic classes, necessary because of the interactions with VF groups.
+
+We’ll appreciate any feedback.
+
+Cosmin.
+
+[1] https://lore.kernel.org/netdev/20220915134239.1935604-3-michal.wilczynski@intel.com/
 
 
