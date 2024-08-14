@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-118487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E72E951C30
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:50:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E08D5951C34
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3AF3B2316B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:50:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B6A7B23275
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDAE1AD9D6;
-	Wed, 14 Aug 2024 13:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EC11B0126;
+	Wed, 14 Aug 2024 13:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="idHyUaVc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aBpOHnEz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF221DA5E;
-	Wed, 14 Aug 2024 13:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1651DA4C;
+	Wed, 14 Aug 2024 13:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723643421; cv=none; b=Vq8KDREz32XuLwa+b6g2W8di0mTTSC0iKf2PzAfLQKc5+6iKYZs3SNUZriLjSRXYG15GkO44kOVS1lyUAYoXMq+Sbnr2XCCIRxUDKl7CmwptHIPgTXoFMWrYwQQYeUZFQnpxf6z+8RomvDwqI8je4/7wIaFxBrSf0ooXwKo0soY=
+	t=1723643438; cv=none; b=PFxN5/HMd7uVpS+lbNENRSDRKeIGfsYLypfAsimjIwb8e3zr+zr08eeiTsGRkvhpKSmj46pOplxGUqRG/ih8f2EU/HM6zrvlTASC8dBxYzF+Hd7VVXJYq049GNxtxg8YVwAkH+qSGX1r+Acl2uatFF8FzoDL5BxG2KhYIaQ46rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723643421; c=relaxed/simple;
-	bh=Kw+XlTMl2iL53nQYEy4hsiCKGhI9ZACh2cz6PiKd0Y0=;
+	s=arc-20240116; t=1723643438; c=relaxed/simple;
+	bh=L77S3EQ47II05J3Jqp4pq7LaCKMh2mMq1bPcetyBe6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jS5YIDJ67Tqjm8So7K4q5T7IPq/2R3ZEmQWNfzPyklCS+rKN/0Q+1LJaTJSjSGX8wkbqW1GNFOziqH+F8zNjQ8Xv8KwbP1fMbgy0EnVooDuZZgmxahctnigmM9Mlw1xNDGWsEOdAATo/jgwhFoTyCFUTLgz94U6HmJ+ceKANO4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=idHyUaVc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15EA8C32786;
-	Wed, 14 Aug 2024 13:50:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723643420;
-	bh=Kw+XlTMl2iL53nQYEy4hsiCKGhI9ZACh2cz6PiKd0Y0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=idHyUaVcWvfxVmA90KoxoIgzCUebYlKNJuASj6XGcJY5KD9cvaDlsksrOoFOPxEN2
-	 zL2RGNPWR1F2Hrg9v/N8V2rlfpsVAja0mLveUInj6N31j6qtS6dH6U8nvyw831I2oW
-	 f/X/4CufUTlYykN/THi8WTwOw1zkK21xtufeyPmuaiMcAf1+5MZQ17gvCWhv+pw2bK
-	 nOgdGI3pOWmb5K52KtlfDwaGHL7YMH6Qf/rjvDh9o0SFteGOnNGLY3/AzlnPaS8IPu
-	 fIbz0fWdoOeGxwUGcuikPcx4gqvx8L7mYntXgnEPhhf/zCDqXlXKp3LtJcTRhn0iLX
-	 on/wRZiOuG7Jg==
-Date: Wed, 14 Aug 2024 14:50:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daiwei Li <daiweili@google.com>
-Cc: intel-wired-lan@lists.osuosl.org, vinicius.gomes@intel.com,
-	anthony.l.nguyen@intel.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, kurt@linutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, przemyslaw.kitszel@intel.com,
-	richardcochran@gmail.com, sasha.neftin@intel.com
-Subject: Re: [PATCH iwl-net v3] igb: Fix not clearing TimeSync interrupts for
- 82580
-Message-ID: <20240814135015.GB322002@kernel.org>
-References: <20240814045553.947331-1-daiweili@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l/rxf6iJK3luGUmHWvrmhqHOtTmuGPm9jD8cLc6NF1W3Z0MBzvlXL7FAgl1WPZC7ShVQPXQyk3IwwjZo0XDj+cPoKrNAD0ajSHBQflolFqsI7RkabPXBWpSSTe3p/7eJ2GsWtHYVIGiAo2MALFhxyrYrpVkwUqFgAgEopFSgCwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aBpOHnEz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=k2gPQomNmMNNm1/ovY9l8pCGvwEeBiuMBoC6iMko/88=; b=aBpOHnEzqmgwtCozBCSdtc2mIh
+	WPkwexFP17B9iiAQLYwD1Cx396dCzWbwA6Fu6KNqARGzd36mO0jLxKQKH717SLrBwzRtOURGeZP0L
+	extJlMK0nch4iSDuaKzKikINbbjrqpHUmfVQYUC6/bfQWqNvyBdW0FbMUPeeljCAwx6k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1seEOM-004lg6-HL; Wed, 14 Aug 2024 15:50:22 +0200
+Date: Wed, 14 Aug 2024 15:50:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, marex@denx.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: microchip: add SGMII
+ port support to KSZ9477 switch
+Message-ID: <9b960383-6f6c-4a8c-85bb-5ccba96abb01@lunn.ch>
+References: <20240809233840.59953-1-Tristram.Ha@microchip.com>
+ <20240809233840.59953-2-Tristram.Ha@microchip.com>
+ <eae7d246-49c3-486e-bc62-cdb49d6b1d72@lunn.ch>
+ <BYAPR11MB355823A969242508B05D7156EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <144ed2fd-f6e4-43a1-99bc-57e6045996da@lunn.ch>
+ <BYAPR11MB35584725C73534BC26009F77EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,34 +68,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240814045553.947331-1-daiweili@google.com>
+In-Reply-To: <BYAPR11MB35584725C73534BC26009F77EC862@BYAPR11MB3558.namprd11.prod.outlook.com>
 
-On Tue, Aug 13, 2024 at 09:55:53PM -0700, Daiwei Li wrote:
-> 82580 NICs have a hardware bug that makes it
-> necessary to write into the TSICR (TimeSync Interrupt Cause) register
-> to clear it:
-> https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
-> 
-> Add a conditional so only for 82580 we write into the TSICR register,
-> so we don't risk losing events for other models.
-> 
-> Without this change, when running ptp4l with an Intel 82580 card,
-> I get the following output:
-> 
-> > timed out while polling for tx timestamp increasing tx_timestamp_timeout or
-> > increasing kworker priority may correct this issue, but a driver bug likely
-> > causes it
-> 
-> This goes away with this change.
-> 
-> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
-> 
-> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
-> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
-> Tested-by: Daiwei Li <daiweili@google.com>
-> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Signed-off-by: Daiwei Li <daiweili@google.com>
+On Tue, Aug 13, 2024 at 10:17:03PM +0000, Tristram.Ha@microchip.com wrote:
+> > > > > From: Tristram Ha <tristram.ha@microchip.com>
+> > > > >
+> > > > > The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
+> > > > > connect, 1 for 1000BaseT SFP, and 2 for 10/100/1000 SFP.
+> > > > >
+> > > > > SFP is typically used so the default is 1.  The driver can detect
+> > > > > 10/100/1000 SFP and change the mode to 2.  For direct connect this mode
+> > > > > has to be explicitly set to 0 as driver cannot detect that
+> > > > > configuration.
+> > > >
+> > > > Could you explain this in more detail. Other SGMII blocks don't need
+> > > > this. Why is this block special?
+> > > >
+> > > > Has this anything to do with in-band signalling?
+> > >
+> > > There are 2 ways to program the hardware registers so that the SGMII
+> > > module can communicate with either 1000Base-T/LX/SX SFP or
+> > > 10/100/1000Base-T SFP.  When a SFP is plugged in the driver can try to
+> > > detect which type and if it thinks 10/100/1000Base-T SFP is used it
+> > > changes the mode to 2 and program appropriately.
+> > 
+> > What should happen here is that phylink will read the SFP EEPROM and
+> > determine what mode should be used. It will then tell the MAC or PCS
+> > how to configure itself, 1000BaseX, or SGMII. Look at the
+> > mac_link_up() callback, parameter interface.
+>  
+> I am not sure the module can retrieve SFP EEPROM information.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The board should be designed such that the I2C bus pins of the SFP
+cage are connected to an I2C controller. There are also a few pins
+which ideally should be connected to GPIOs, LOS, Tx disable etc. You
+can then put a node in DT describing the SFP cage:
 
+Documentation/devicetree/bindings/net/sff,sfp.yaml
+
+    sfp2: sfp {
+      compatible = "sff,sfp";
+      i2c-bus = <&sfp_i2c>;
+      los-gpios = <&cps_gpio1 28 GPIO_ACTIVE_HIGH>;
+      mod-def0-gpios = <&cps_gpio1 27 GPIO_ACTIVE_LOW>;
+      pinctrl-names = "default";
+      pinctrl-0 = <&cps_sfpp0_pins>;
+      tx-disable-gpios = <&cps_gpio1 29 GPIO_ACTIVE_HIGH>;
+      tx-fault-gpios = <&cps_gpio1 26 GPIO_ACTIVE_HIGH>;
+    };
+
+and then the ethernet node has a link to it:
+
+    ethernet {
+      phy-names = "comphy";
+      phys = <&cps_comphy5 0>;
+      sfp = <&sfp1>;
+    };
+
+Phylink will then driver the SFP and tell the MAC what to do.
+
+	Andrew
 
