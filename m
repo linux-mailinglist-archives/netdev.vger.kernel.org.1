@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-118271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814E39511FF
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:16:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74FD951206
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B424F1C21363
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:16:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E45EB225BE
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE99A1369B1;
-	Wed, 14 Aug 2024 02:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9815713BC26;
+	Wed, 14 Aug 2024 02:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sY0sKfd9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cchVd5Ah"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5C8768EC;
-	Wed, 14 Aug 2024 02:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B74E13AD29;
+	Wed, 14 Aug 2024 02:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723601705; cv=none; b=swZ3IqxfAPu2VFA8IS8YH1Q0eOqz/H6njuO+5c2WC0iwTHhhP147CpSFAT49dypeRWxbCej4EcHC/8XqaSkVB7C4dAIPjBXpSf723kJ5c34SC2VZKJcrl575E64yrRhm3cMPv59itTDfIUk25PxNYzSFo/4/7365iXfgTK3KqQc=
+	t=1723601708; cv=none; b=WhEHyu6z4ck8zJmr+8uA8W79R+DissNclitJNspG07h8KUO+LrZwnjrV+fDcOInwUfW5BAreZUaFLSTY+wEB1stIYfEvQO+QCdgPgCL/dwjwgHP2RfDDi/mHoJRHm1vkNYutZGPoB1YChAoMys9KU2SjZGW1hyE4vxk+tTx/ACs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723601705; c=relaxed/simple;
-	bh=1DN7OE4XKRCrfF9fvqikmkCbAY0PdivoPjLfcJKBRFg=;
+	s=arc-20240116; t=1723601708; c=relaxed/simple;
+	bh=+r1J4e6PKxgzHtUbdQZwa/WmEVH8Fp/ZO/Ws0VVBNNk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NAbB5oAOpV/rR0j74YokQXvxOaUtefUnupa6pO4h1nO89ewn4hDoBZUtOIdm54zEhACblFRIqsN/yjGzOaK6+KViz0Sb427Yjfms8vHDggVlumA6MJfPvqOoW08LPjunh8H1jWAyCofWF2HkIR8D1BMvemcmKCmmmCXNTIpDnRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sY0sKfd9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33CDC4AF09;
-	Wed, 14 Aug 2024 02:15:03 +0000 (UTC)
+	 MIME-Version; b=WaP/dMzSBOpEgylbcGGtPc9dm8QGzDiuZm9zGz4LoR+RgPO+ojp3e8fBWVJOY9rQopFiu/lGkqT9QCnva1b/WfZ0ZpLLesKEpBaLRMxMzuqnrc7Tsis70AN4+HQzBfJKeHsVKiN1rkXslrjHOR5AlotA5PKkbFEe6Czr898Prr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cchVd5Ah; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4777C4AF0C;
+	Wed, 14 Aug 2024 02:15:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723601705;
-	bh=1DN7OE4XKRCrfF9fvqikmkCbAY0PdivoPjLfcJKBRFg=;
+	s=k20201202; t=1723601708;
+	bh=+r1J4e6PKxgzHtUbdQZwa/WmEVH8Fp/ZO/Ws0VVBNNk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sY0sKfd9CqRoSZJ8dOOrBwTMGCddSvHMg9MLlKN8r/1KaUQ+HOlyl2vd/A+av9Xe6
-	 3zpEF3guwoa2C9tJPmI7OAI8uqJBrMZqPfR5VZq9RYNWvXqFnaMt9bpPfmrucHuiiN
-	 j8oMWDSISisv9Vq+cwH33wUhGL2g1vSFt+5+yhga4gwv9sYW6uC2kvQeRLc6fKNrKy
-	 hkSPS58ri7r/7aao1+aZklMjnimri5+iQfiLfbeqRBuMgDifeM6ip/xW2+oiol/3a0
-	 sdMkyDeRYkufpkCutOnHKykr7iyxs0r67LUhZpZRjuGVoDsF/Ajk34j7ZcCBRtcZcQ
-	 7BFrmP+eREIDw==
+	b=cchVd5AhnHLSZIjxndiLTUL9+xfxdXvKJmPivrtKWB2TVL1PWSMD/XrUzdlajyCz9
+	 H0vm6IVd1DY0lHyK9J1Y4BD6PCl0V7wT9AD9P0GLBP3E6xZOZEC6ZVJh3tIWvzwMco
+	 nzJkX+fsVczQ3psP07NHI7tVqNya8pXBfhAGLXC0waQs75XlyTjuoR9wv5M1CAfZRT
+	 Eh8Q4BY7qpXF6t7TqeEwYRx4kAlN/ucz4HGU8QEHbtZRCXZb4wuXMBqZJM7e73vko8
+	 hXi6r5WyC5N8f7vmJySTlksp+p+Kp5TW8/w85hZyZV9q89/b0EWQU5S+foHUTCtVQE
+	 yKB9RUFaMTjXQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Heng Qi <hengqi@linux.alibaba.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: ZHANG Yuntian <yt@radxa.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	bjorn@mork.no,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 09/13] virtio-net: check feature before configuring the vq coalescing command
-Date: Tue, 13 Aug 2024 22:14:40 -0400
-Message-ID: <20240814021451.4129952-9-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 11/13] net: usb: qmi_wwan: add MeiG Smart SRM825L
+Date: Tue, 13 Aug 2024 22:14:42 -0400
+Message-ID: <20240814021451.4129952-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240814021451.4129952-1-sashal@kernel.org>
 References: <20240814021451.4129952-1-sashal@kernel.org>
@@ -71,52 +70,62 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.4
 Content-Transfer-Encoding: 8bit
 
-From: Heng Qi <hengqi@linux.alibaba.com>
+From: ZHANG Yuntian <yt@radxa.com>
 
-[ Upstream commit b50f2af9fbc5c00103ca8b72752b15310bd77762 ]
+[ Upstream commit 1ca645a2f74a4290527ae27130c8611391b07dbf ]
 
-Virtio spec says:
+Add support for MeiG Smart SRM825L which is based on Qualcomm 315 chip.
 
-	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=5000 MxCh= 0
+D:  Ver= 3.20 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 9 #Cfgs=  1
+P:  Vendor=2dee ProdID=4d22 Rev= 4.14
+S:  Manufacturer=MEIG
+S:  Product=LTE-A Module
+S:  SerialNumber=6f345e48
+C:* #Ifs= 6 Cfg#= 1 Atr=80 MxPwr=896mA
+I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=81(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=01(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=84(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=03(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+E:  Ad=87(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=86(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+E:  Ad=05(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=88(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 5 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=89(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+E:  Ad=8e(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=0f(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
 
-So we add the feature negotiation check to
-virtnet_send_{r,t}x_ctrl_coal_vq_cmd as a basis for the next bugfix patch.
-
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: ZHANG Yuntian <yt@radxa.com>
+Link: https://patch.msgid.link/D1EB81385E405DFE+20240803074656.567061-1-yt@radxa.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/virtio_net.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 5161e7efda2cb..08a83944dcc0a 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3172,6 +3172,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
- {
- 	int err;
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 386d62769dedb..eba8bbd9e64f1 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1431,6 +1431,7 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1546, 0x1312, 4)},	/* u-blox LARA-R6 01B */
+ 	{QMI_QUIRK_SET_DTR(0x1546, 0x1342, 4)},	/* u-blox LARA-L6 */
+ 	{QMI_QUIRK_SET_DTR(0x33f8, 0x0104, 4)}, /* Rolling RW101 RMNET */
++	{QMI_FIXED_INTF(0x2dee, 0x4d22, 5)},    /* MeiG Smart SRM825L */
  
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return -EOPNOTSUPP;
-+
- 	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
- 					    max_usecs, max_packets);
- 	if (err)
-@@ -3189,6 +3192,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
- {
- 	int err;
- 
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return -EOPNOTSUPP;
-+
- 	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
- 					    max_usecs, max_packets);
- 	if (err)
+ 	/* 4. Gobi 1000 devices */
+ 	{QMI_GOBI1K_DEVICE(0x05c6, 0x9212)},	/* Acer Gobi Modem Device */
 -- 
 2.43.0
 
