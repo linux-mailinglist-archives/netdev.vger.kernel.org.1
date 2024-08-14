@@ -1,83 +1,126 @@
-Return-Path: <netdev+bounces-118578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9683D9521BF
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:01:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A9059521C1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 20:01:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9CD61C21C4B
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 18:01:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B6B1F21FE1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 18:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EC01B5818;
-	Wed, 14 Aug 2024 18:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1F11BB699;
+	Wed, 14 Aug 2024 18:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jWsUQIMD"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZTD6ismn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192D11B373D
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 18:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570331B373D
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 18:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723658488; cv=none; b=TtnkrSOapnKNu9GI0ayDvO5DfegyLpY8YbQXvV8FSHDHzdjd4GHb5egRMWReEXY4UBy7dNCA2Ogctu0I0vGJYCRUxsHWtq8+Yoi61G2lC4yXKyqJjn177EGeCavTz1RlW4tcRyJvv7pp0/ypvZqGj5JOTKGKB7c+PQSbL64MG0k=
+	t=1723658507; cv=none; b=e/fpnYx5/4tNXqg350ratx8+EJN/NpFJU9pQlkm9i9K7LrMv3NAdbhYAP7e2te+X8xDacUOc9340bkinGGHac2Z+jJeNRl2NdrtESO38i5MLn6fkwhOn03PqSYu9ZciMNbZkJH1D0k5Sx5YzdyHOaaxX0xT42APNCstfw5iXJ8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723658488; c=relaxed/simple;
-	bh=Ct9pmwBg5XugDwJQq3ELV53mv3uTakM9zUzju9I0eTk=;
+	s=arc-20240116; t=1723658507; c=relaxed/simple;
+	bh=VKidP+OQljS2EXJyioas4CypU+BVrUWJoPUVdLvxkoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F245gRW/n00uu5l/MHf116yAvTWvhNAinMAWubKw8TBUfW4X0t92WFBEOSzZO2nSHXOqsA+/1jdLeH6cEXkyYw4C5w0A8Cx1xfpGYhJpZQ8RmpMiP4oj3IBoSUJYS8zmp3FGdeGGF9ie93KUaoF6F0p89LEHeNyvSfswL4Hrdac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jWsUQIMD; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1fc47abc040so1194915ad.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:01:25 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=MlbQnEtWOF1xkDBlvSShJt8cu7Y5gZNtYE6D6Uxq1KzJf1LQiHG9ifcbnUQ0CLX9v+dx7ZpCsD3UdOvgB++rkQytQ/DTWsmbTH1jrDXaXnakMcfbxkP+JmkzhU8YBDW47PKAYfIFS9ClRxiOc6MJeRuJrewmLGP4WrEVw2/OI7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZTD6ismn; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3718706cf8aso63253f8f.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 11:01:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723658485; x=1724263285; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/njC2I8sB3xEiJtucgGLyFQRqn1VRs8wW/ab4iro77c=;
-        b=jWsUQIMDjuZgve3Z1wcBjTkvL4Gi0Ack1CVOhS0C4fUwEAgsGK8EhnETZodr5aNdnx
-         M+ME1yyJ1PwkXTP555hg4y1jTLnltY6KLWh8zloSiMunfbGrC+c38VYSiJHaUS/XO7Nc
-         RxkjdJM7jp1r44zzhbNRrYlSGEmDZDuFzHZpFT1TMn5KLQhsqTqBQjNIUIrxNaoMbv0B
-         aS+mB8WkMuWZkzLPGqMoTNupoeHi9o9pX11WP0utM9dIx1NHtPNPP9O219A8/tTVUHvM
-         i9HRetcsEjAKCNGnw1H3HULt+hi1GhZjZtAyPhqD6pVDjYg8NV0u4fAWZHnSTJFeLzlW
-         0bXw==
+        d=fastly.com; s=google; t=1723658504; x=1724263304; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iKG1BA6nZA/+iN2W0nGROx4tq6HJetKTMlW3JVQELg0=;
+        b=ZTD6ismnXgkRbK6WF3IeepqWr8YZY0DolpdxJ6Xq/AmWZY/mdBcpLeqeHY3MmmJL7S
+         N8AsNXVlWrK7UlqUg1gSlgUBD0ULB3V85WnGYrlrUjFZrOyWp4ubQPy4TwpVD7xIsfOO
+         ENKdhuYLXKIFaLaG2SED8fxQZLfL5KztqKa/E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723658485; x=1724263285;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/njC2I8sB3xEiJtucgGLyFQRqn1VRs8wW/ab4iro77c=;
-        b=m6MjYfhOKvEvn03NBb1TJmngDzXE59rYJ6Ca2g08Y/598hgu8vJHEBFYWcDCqtz1a2
-         e7uc9jD0eP8mw+JglQpKvzCl7iZNO8sVmFtDkSDHlyXlT/OKFSCUkJ38x6fdWpz4y+HE
-         8HuHf3Afe9s4/TyhJW+ET9S4rfUkc9eib1oN0RpwjH2+2r+y5AkzqhUBEoHmGblQUQpp
-         lU4SYfnKtc1xFM0jbQERKeBoYQEgWfffA4lSDyS3C0nZcut4JlQYCP1TCBoNp4MkJjy4
-         X1s1VE02ikDZPU3/SmQne2h1d9hQVTTaTUE+VXbpY1nOtdQoZGJwUmFNl3qM66l/9l0C
-         EMbg==
-X-Gm-Message-State: AOJu0Yx/DrhiWPPvFbiINd05cUjw67lBnBGl4eviPONSsTtV4efo9Qcy
-	OcQ3msYSUqCnhopNuQNys4O/HXOerSesDWJxPiTkNPiOi6lnHLa6
-X-Google-Smtp-Source: AGHT+IHCYpciuCeQJFJTUdrB1PLndgYWlkflh7swucjGk7iJZ7fzT/SsK2JQ1CvXtQ2xM2W+cf1v6w==
-X-Received: by 2002:a17:902:c94d:b0:1fd:a360:446f with SMTP id d9443c01a7336-201d65c0d14mr51469915ad.65.1723658485204;
-        Wed, 14 Aug 2024 11:01:25 -0700 (PDT)
-Received: from localhost ([12.216.211.103])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1b4635sm32143225ad.199.2024.08.14.11.01.23
+        d=1e100.net; s=20230601; t=1723658504; x=1724263304;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iKG1BA6nZA/+iN2W0nGROx4tq6HJetKTMlW3JVQELg0=;
+        b=utOZCNotzC+Ol8Uiut2RTduyIF2WKzQ4ZJNP6ucDEJ9aP75ewOS6QsLG3/I5gSRkqr
+         HmCf/j3eDnEfLjVhPjRaWjnSjFdvX97rX6lGUSxlhKe3BAl5iQJKA2B8tb+/41iy6b0l
+         9J1G/3y3UHpewxRI9s7oaYpnUJRSVpshUM84ubHJWeDBGRZXtlVxQxB4vnvLTyUsUiWn
+         ADcSKOMcVJ6dBfJP8qbiHRpEY30bxzAZJtk5a4dLQ4EjUk6IGhio43/xJnM5fuuT7sZr
+         FovKVAIcmhe4r1rcsAmweHB5KeGA74X1L2o0Gwcyvb/HFsNE9b6G1dTgYVXvzYlVpwRY
+         2f2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWg0d+qPLFtrz9qFkR94H5GOwcA9npK+p56xOsqUcffBOnTG5n0ulygsViwwxJNMV8c9sxtGRyOqqdl3MaPXMugJyRmptaj
+X-Gm-Message-State: AOJu0YzBQiP5dDHllcoGuUjWGPkr56rqfY3TGzwDzDMcN58Wvsr2jQsJ
+	VdGgZOtLmpU6wjmnnMJtYqxCu9BcngPvLxaupFSKinEwyzJmZF4K/hM05u1IDkA=
+X-Google-Smtp-Source: AGHT+IGCmSIjhxSRM6zFrHvolmN2wXREY83zZw95/jXyk6UpHYC0uXJzFqUFz4BGJeihuJswIDQe0w==
+X-Received: by 2002:a5d:59a5:0:b0:36b:357a:bfee with SMTP id ffacd0b85a97d-37177749bc7mr2760473f8f.1.1723658503541;
+        Wed, 14 Aug 2024 11:01:43 -0700 (PDT)
+Received: from LQ3V64L9R2 ([80.208.222.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718479c332sm548792f8f.87.2024.08.14.11.01.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 11:01:24 -0700 (PDT)
-Date: Wed, 14 Aug 2024 11:01:22 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: James Chapman <jchapman@katalix.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
-	tparkin@katalix.com, horms@kernel.org,
-	syzbot+0e85b10481d2f5478053@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 net-next 9/9] l2tp: flush workqueue before draining it
-Message-ID: <Zrzw8oe+LBoTModP@pop-os.localdomain>
-References: <cover.1723011569.git.jchapman@katalix.com>
- <2bdc4b63a4caea153f614c1f041f2ac3492044ed.1723011569.git.jchapman@katalix.com>
- <Zrj6w89B7so74jRU@pop-os.localdomain>
- <6f0e2c8e-205c-71ae-2b93-02538122097a@katalix.com>
+        Wed, 14 Aug 2024 11:01:43 -0700 (PDT)
+Date: Wed, 14 Aug 2024 19:01:40 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Shay Drori <shayd@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>
+Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
+Message-ID: <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Shay Drori <shayd@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>
+References: <20240812145633.52911-1-jdamato@fastly.com>
+ <20240813171710.599d3f01@kernel.org>
+ <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
+ <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
+ <20240814080915.005cb9ac@kernel.org>
+ <ZrzLEZs01KVkvBjw@LQ3V64L9R2>
+ <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,60 +129,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6f0e2c8e-205c-71ae-2b93-02538122097a@katalix.com>
+In-Reply-To: <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
 
-On Mon, Aug 12, 2024 at 10:24:11AM +0100, James Chapman wrote:
-> On 11/08/2024 18:54, Cong Wang wrote:
-> > On Wed, Aug 07, 2024 at 07:54:52AM +0100, James Chapman wrote:
-> > > syzbot exposes a race where a net used by l2tp is removed while an
-> > > existing pppol2tp socket is closed. In l2tp_pre_exit_net, l2tp queues
-> > > TUNNEL_DELETE work items to close each tunnel in the net. When these
-> > > are run, new SESSION_DELETE work items are queued to delete each
-> > > session in the tunnel. This all happens in drain_workqueue. However,
-> > > drain_workqueue allows only new work items if they are queued by other
-> > > work items which are already in the queue. If pppol2tp_release runs
-> > > after drain_workqueue has started, it may queue a SESSION_DELETE work
-> > > item, which results in the warning below in drain_workqueue.
+On Wed, Aug 14, 2024 at 07:03:35PM +0300, Shay Drori wrote:
+> 
+> 
+> On 14/08/2024 18:19, Joe Damato wrote:
+> > On Wed, Aug 14, 2024 at 08:09:15AM -0700, Jakub Kicinski wrote:
+> > > On Wed, 14 Aug 2024 13:12:08 +0100 Joe Damato wrote:
+> > > > Actually... how about a slightly different approach, which caches
+> > > > the affinity mask in the core?
 > > > 
-> > > Address this by flushing the workqueue before drain_workqueue such
-> > > that all queued TUNNEL_DELETE work items run before drain_workqueue is
-> > > started. This will queue SESSION_DELETE work items for each session in
-> > > the tunnel, hence pppol2tp_release or other API requests won't queue
-> > > SESSION_DELETE requests once drain_workqueue is started.
+> > > I was gonna say :)
 > > > 
-> > 
-> > I am not convinced here.
-> > 
-> > 1) There is a __flush_workqueue() inside drain_workqueue() too. Why
-> > calling it again?
+> > > >    0. Extend napi struct to have a struct cpumask * field
+> > > > 
+> > > >    1. extend netif_napi_set_irq to:
+> > > >      a. store the IRQ number in the napi struct (as you suggested)
+> > > >      b. call irq_get_effective_affinity_mask to store the mask in the
+> > > >         napi struct
+> > > >      c. set up generic affinity_notify.notify and
+> > > >         affinity_notify.release callbacks to update the in core mask
+> > > >         when it changes
+> > > 
+> > > This part I'm not an export on.
 > 
-> Once drain_workqueue starts, it considers any new work item queued outside
-> of its processing as an unexpected condition. By doing __flush_workqueue
-> first, we ensure that all TUNNEL_DELETE items are processed, which means
-> that SESSION_DELETE work items are queued for all existing sessions before
-> drain_workqueue starts. Now if an API request is processed to delete a
-> session, l2tp_session_delete will do nothing because session->dead has
-> already been set.
-
-What about the following case?
-
-CPU 0			CPU1
-test_and_set_bit()
-			__flush_workqueue()
-  queue_work()
-  			drain_workqueue()
-
+> several net drivers (mlx5, mlx4, ice, ena and more) are using a feature
+> called ARFS (rmap)[1], and this feature is using the affinity notifier
+> mechanism.
+> Also, affinity notifier infra is supporting only a single notifier per
+> IRQ.
 > 
-> > 2) What prevents new work items be queued right between your
-> > __flush_workqueue() and drain_workqueue()?
+> Hence, your suggestion (1.c) will break the ARFS feature.
 > 
-> Hmm, to do so, a new tunnel would need to be created and then deleted by API
-> request once drain_workqueue starts. Is it possible to create new sockets in
-> a net once a net's pre_exit starts? I didn't think so, but I'll recheck.
+> [1] see irq_cpu_rmap_add()
 
-I don't quite understand why you need to create a new one while tearing
-down the old one(s). I think what you need here is some way to properly
-waiting for the socket tear down to finish.
+Thanks for taking a look and your reply.
 
-Thanks.
+I did notice ARFS use by some drivers and figured that might be why
+the notifiers were being used in some cases.
+
+I guess the question comes down to whether adding a call to
+irq_get_effective_affinity_mask in the hot path is a bad idea.
+
+If it is, then the only option is to have the drivers pass in their
+IRQ affinity masks, as Stanislav suggested, to avoid adding that
+call to the hot path.
+
+If not, then the IRQ from napi_struct can be used and the affinity
+mask can be generated on every napi poll. i40e/gve/iavf would need
+calls to netif_napi_set_irq to set the IRQ mapping, which seems to
+be straightforward.
+
+In both cases: the IRQ notifier stuff would be left as is so that it
+wouldn't break ARFS.
+
+I suspect that the preferred solution would be to avoid adding that
+call to the hot path, right?
 
