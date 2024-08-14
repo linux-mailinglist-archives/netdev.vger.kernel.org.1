@@ -1,109 +1,102 @@
-Return-Path: <netdev+bounces-118484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A08A951BD1
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:28:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDC2951BFC
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3585CB22DEA
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0D72288697
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19671B1418;
-	Wed, 14 Aug 2024 13:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6CD1B1505;
+	Wed, 14 Aug 2024 13:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vultr.com header.i=@vultr.com header.b="ukpNUVZS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zw2j8wAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FAD1879
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC241B1439
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723642093; cv=none; b=Y4n693tJS/mDmSTVzTWhy8gUpLrjCk/RnXw4xWgJ5sg9oppvSTCh9OH8aw7YvCfBnGvfT323wkiHR/R90hHEwQ6sr/uAjmOs4c0DuBVQHYULfd4JX8i7Kpa96FsjSjwOYBcpAD/SNIIIv5NtXBBObylSH/b4it/scVjbH4QaKJo=
+	t=1723642587; cv=none; b=p/iEvOnbn1l/KGi4A2kOmUUBEOiJ6wsGnZKdtU2w9Fj4/T1NB+UuevVI1RHP+L2oFyerglLQisZf7ZpK1z3hdsh3/4xPWQKOhPEluBlM7MxLE+DWi+0v1Ey29j8O7keBCMs/ajOXPiWznbqoU+7I3ujH5OSXwRQzzdg8dGO36I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723642093; c=relaxed/simple;
-	bh=V56bb2SBeWuj7U2AOoCQl9ccR/u0/St6ciB6GMAx3/s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=oyStCv907Q+a+0qXEZE16+6LIA4LgMNh0tMg71njFEl6p1C6IKcRyPVz2RHTt5RueQzLwAZAIKsd4bo4CZHJqVTWw0B8Y0ISgtMp0qTlvFQ855+aTjyKpv+QwaeRrTvQRNJR3oMv3qE1JadUnEOm8QBwK7ymztE62pYK65sGMrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vultr.com; spf=pass smtp.mailfrom=vultr.com; dkim=pass (2048-bit key) header.d=vultr.com header.i=@vultr.com header.b=ukpNUVZS; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vultr.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vultr.com
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3db1e21b0e4so4514128b6e.2
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vultr.com; s=google; t=1723642091; x=1724246891; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qpPX7lZVsuwgLLnRc1mGzsnfVgyXzTNONNpmbI4+pZM=;
-        b=ukpNUVZSYnEtejG5aJb4h4AOTkHKne4W76MMJ50MKL0F9KsxVykXmu0rm80i6bZX0P
-         TaIacJ5yGUmZFpU8G9l5nbULIDHYKXPZd6B0Q5Bi3M+CB4Uv33tc/07/OPVr4MDW05Xh
-         pL3HJntQGfwxgOZWG5lxC6372gs7owmyMpjNNZz9fn0xzArElg44qd+jBiKyNcVPmA86
-         T53Hu96lP7Yn/SVKlNbhhns3KtIvn8lk0qPw/pU8mJx++WPZ9MA3iNbrFj7lu4wq1k2u
-         Wqnf6eEbzJEwdWdPKsqAcG1ukIFUi4oWMhNjwJaAy3I00AmK7XacD0Df6m3zE4dGyOVX
-         +CjQ==
+	s=arc-20240116; t=1723642587; c=relaxed/simple;
+	bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ay/KIp/AORd3ohSZ+ki78v0puQc89tWo57NuUtc5trxj2p5UYY8PgXLXPkRpEIR+MEA1Qu23avMh8z1Htp6bqrXlWfxowE0rBTa+1XnQuo04ntu17xUwqrxS8UAsJFbG1y/nSHnbBakBWO+sZ6p1xDGQ37n16XOn9QT123nAQyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zw2j8wAl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723642584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
+	b=Zw2j8wAlve/ue92sW3VV6H/LHcgEpFTJmvr5f8unq22yKxALVhIfjUOBoV0ks2NfLuJIi+
+	k2YQYcYqFH9YDOBYxw2ZeUz71s8djxWA0JUlbCRfnug1LRW8+9xq4hmMmA+hjRsfGwnoMB
+	NY1okDuy3ISRlAJcO4vS79cb1HSqxNQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-ehF6iOKsMQSEEH0E0c080g-1; Wed, 14 Aug 2024 09:36:23 -0400
+X-MC-Unique: ehF6iOKsMQSEEH0E0c080g-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3717cc80ce1so211317f8f.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:36:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723642091; x=1724246891;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qpPX7lZVsuwgLLnRc1mGzsnfVgyXzTNONNpmbI4+pZM=;
-        b=B2tO7mMpYe1lYiOREwXWvipNK79qGWAhp83Vk/BF2KdE1OhyjHTm836vpmfDrzIxyE
-         C/32T9G15JCEYxtnooIuBO136pF0tox+6T8ftkfPJnoU+jAzppPCw/lx+xMt7Spyic3J
-         AF720+8a1bjkpj8dKc7wZFN5UH8EUmlP67D9b6FjG4jGoXPT/iKIXgMAUmUYhVF3busW
-         MDCODwvRTY5y3+80SnkFNeFXb2o99HdjhloekckBwV+5ZarTNkQLXA/XLmPbUCZAc36p
-         fqAQSsfpBHBh60faHubvU+aIrZRHWS25Za5kA733UqU1q4THx8L7nL+CTkNegCy6S9M6
-         D9IA==
-X-Gm-Message-State: AOJu0YzuzBgtOXDMwYMQwDoH0dnoZK86JifACwU0gqfQl7QGUUWDQsNt
-	04iZ5RW5v5vQSXy4hoKHtKyZcG6WU7utqO3s+XTI9rm6trAZQaYbJhhNBOkOgua4Irjshd1wKLI
-	PnYBxE++Xx2R5sdnIwEyDL2V5qdRdSWwGLFBvBooD855SXJddODJ+jQ==
-X-Google-Smtp-Source: AGHT+IFieDgJ3jOJW1QIqhwCx+X4t2oVIxMIhWAW4LAW/O/SFpcuTm2RhrCT7rE3RO3Mwl8CaATwPibvp/mZL2zma2U=
-X-Received: by 2002:a05:6808:1150:b0:3da:b335:538e with SMTP id
- 5614622812f47-3dd298dc3d5mr3303561b6e.8.1723642090888; Wed, 14 Aug 2024
- 06:28:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723642582; x=1724247382;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VZupSk4sxKMpLAdgordBv4RG0EDtzQgp6RbCdSY74GI=;
+        b=ldsB7O+E2VPLIoMhKMNAYlfWJbGzebtQETk32HXncOV0FMZOrM0PxXChB8GMQ++rRd
+         /A00NuaoR9lMdhG58W/AuD086FeiKYqvAAPJX6vbBdRga894owMDu1kcUdU0WGFMrZdX
+         s/rd091I9iIoYG5aYPUa0RKGlAAtqYPMQTK8LYL0mawZhVzlH52x5lbl2rG+w+jDVgvt
+         bKhsOCCH+nU6ARPoxvx0jbaEnJTg3D7E8vEcRZzqHRwiyq7goQsyYzyR177af9rL75Zc
+         gpOfHrIMXxNBrHtjDPUGgM9kE8nQrGx/yAyBhPNE2a3v4e4CeLq+Ql+pq+EPLtpKlPON
+         BCjw==
+X-Gm-Message-State: AOJu0YzklM/Ua4TZaJ561dWT7T+9NoWmexkyRxwHhcE11vo1autV0PUu
+	ilnHhOM63KMzFJ7Ntk7ZTKaS2fJv6P7HLtrIIhoTqmz4FWX5dLV/T9AqB8VXK+yN5j3yaRzCSPj
+	qA5G/e9/qUCSxMCuilMaeN4PK1WGeGL5lNGcamyINc0v2m8PcR9iGvg==
+X-Received: by 2002:adf:b350:0:b0:366:e89c:342e with SMTP id ffacd0b85a97d-371778091e9mr1996784f8f.53.1723642581969;
+        Wed, 14 Aug 2024 06:36:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFt3HMQ/Qa2E+4THPS3lYFr/As/KTDUwtd6B1IFDJ4smFL2ezjwNeRkWkKIxjBpSzNt949ptA==
+X-Received: by 2002:adf:b350:0:b0:366:e89c:342e with SMTP id ffacd0b85a97d-371778091e9mr1996754f8f.53.1723642581029;
+        Wed, 14 Aug 2024 06:36:21 -0700 (PDT)
+Received: from debian (2a01cb058918ce00537dacc92215c427.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:537d:acc9:2215:c427])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4cfeeb09sm12894856f8f.51.2024.08.14.06.36.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 06:36:20 -0700 (PDT)
+Date: Wed, 14 Aug 2024 15:36:18 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, pablo@netfilter.org,
+	kadlec@netfilter.org, fw@strlen.de
+Subject: Re: [PATCH net-next v2 0/3] Preparations for FIB rule DSCP selector
+Message-ID: <Zryy0jQ0adJU+L7s@debian>
+References: <20240814125224.972815-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Mike Waterman <mwaterman@vultr.com>
-Date: Wed, 14 Aug 2024 09:28:00 -0400
-Message-ID: <CABmay2CxFPpsgzSx6wCxyDzjw2cqwAAKs6YjiArR1A2UPLpgJA@mail.gmail.com>
-Subject: Add `auto` VRF table ID option in iproute2
-To: netdev@vger.kernel.org, stephen@networkplumber.org, 
-	=?UTF-8?Q?Daniel_Gr=C3=B6ber?= <dxld@darkboxed.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240814125224.972815-1-idosch@nvidia.com>
 
-Hello,
+On Wed, Aug 14, 2024 at 03:52:21PM +0300, Ido Schimmel wrote:
+> This patchset moves the masking of the upper DSCP bits in 'flowi4_tos'
+> to the core instead of relying on callers of the FIB lookup API to do
+> it.
 
-Package: iproute2
-Version: 5.10.0-4
+FWIW, I plan to review this patch set next week (I'm mostly offline
+this week).
 
-Feature request: Add an `auto` option for VRF table ID management like
-in Cumulus Linux. I believe it'd be the iproute2 package on Debian
-(11/12).
-
-Example: Instead of specifying, say, 1001 for a table ID, we'd do the
-following with the `auto` option:
-
-```
-auto vrfexample
-iface vrfexample
-    vrf-table auto
-```
-
-Or:
-
-```
-ip link add vrfexample type vrf table auto
-```
-
-(I'm new to the list and this is my first request. I tried to be brief
-to respect time. Please ask any follow-ups as needed.)
-
-Thanks!
-
-Best,
-Mike Waterman
 
