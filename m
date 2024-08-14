@@ -1,148 +1,338 @@
-Return-Path: <netdev+bounces-118533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8070951E22
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:09:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A2D2951E24
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 17:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F66E1F23262
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78402833D7
 	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FFD1B4C27;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433851B4C2D;
 	Wed, 14 Aug 2024 15:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="G+tNeBGJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DY5D38zp"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBF81B3F2D
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 15:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723648129; cv=pass; b=uTDa4Z8dbb79Le0y06QVymjsPGfMmg8gRQAZv7LIDkupZeQkpN/3FpCYOGIuxFzj8Z0HSaRdTVYBRxTnZkjaNo+4CnazTf5SV6gSFlXuqyiYGkYMFR3/Scg5SGXq4dfs2sEUjFWoeaazTOECe+IuaWQ+XRL67crafxUN/4lOAik=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C7E1B3F30;
+	Wed, 14 Aug 2024 15:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723648129; cv=none; b=RTlhol5MN3slxjAHsFu7qJgWcmHrn5lBAfEOOIwIjy15mXH9bYHU9hNHYFg5X2IkIQIT8nTKnDhF180VGxeNrj5HVFsglHoq3AICOs7rIqU460plijjUI9nkf21Yqr1ttiue4+pPT8Qv1HhpEbhIj9C08ot2eg3E3yXQae1/UpM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723648129; c=relaxed/simple;
-	bh=tzzNWmIHy7GialirAluI6vdJxJdoWVtSWHbvXFSbyKY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T8y8UgBJlDIU6GqfddEOqPWg1rCI09lWVGqm6Dwo/Y2oHiUqD62xWErZqOeMYgfDHlyl56uhWGYL5YV/lUv8AChhfL8dZ8UmemYPtcgZTJmdnGELAvsCgHrI3Ov6zxVAtuExhI8wpcNFGtu2THt297t8py59noam+9wTp4OrfcA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=G+tNeBGJ; arc=pass smtp.client-ip=136.143.188.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1723648112; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=BHSN6lRXaGcDY7bwC35z4DIarfOQhJBxJ0e6CRnplvR+6ues+jRqC5Xuo8pjB52sMSb1/Mzhtbzk1i6VqK+ZSezDmm4T04O1HqVl2lQcFO4Hg1HEM1+StjwY0P0whQyUJyM4ooVFZ/R/DKwCpvc9124l1Bt0ohBnlu0PkkltQmA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723648112; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=elmUNn+WwzhQf2ZD0cT0xYadLjMAyv+MK+0Z4/9BIC4=; 
-	b=EIeWL3dkMMHRpYI/RGwDBORphFKeHpDFfqyQTMzcvSRT+gQRMXc/NI8yltCpaAoWltOi0jeM7w2Zcq79w41vAzftOIN05c0cj4ns6AiT9UvS3l+FqTFyasXclSqiW2f5EhPAfSIR7557mNohD29eStu3CrHqYUTXWeg52b4muwo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=machnikowski.net;
-	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
-	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723648112;
-	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=elmUNn+WwzhQf2ZD0cT0xYadLjMAyv+MK+0Z4/9BIC4=;
-	b=G+tNeBGJIalM7ckB3p8CcJAOI59Nya7G1gT6Z8I9aLaXGOkEvq2TMJFNSvLTsYqn
-	anIqEv1jJkhkSauVFhkLm+9IQ+8XNL6Jj6jrpngrJhjjJSDhpJ8v64wbtuUmd3QlckV
-	fzHqKhHa5/d4laSpMubVYDNHes2EaNUp5j2WCYcwSYGzV6Km7iSvPJ8SgVwt3R9tSnp
-	YKF7Bzb8PIJNEX1DR0Tr1EV7HuMCrB64nJ2Rz+KfL5kYWCWnX/uvYPLrDZ2ScFlP7Hs
-	EUblVMCul2y57pAu9Ov1RZ0raGaMKhBxQdGGuaOQgIv+Grtux8njNQho4RIAR/BS3L3
-	4YqMQwJcTA==
-Received: by mx.zohomail.com with SMTPS id 1723648109953513.5698680578232;
-	Wed, 14 Aug 2024 08:08:29 -0700 (PDT)
-Message-ID: <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
-Date: Wed, 14 Aug 2024 17:08:24 +0200
+	bh=I4/5wqtOSUu+M385EHWXdTF02i9g4nL1NlaP6k2SrFQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=svwB/UTNVDjhLvE1ifi352+AZ2xEJ11awahWhzGiAr1/19CMsHGQ/W+ain02aTrIoM0K8WoHLkxh2fuLH7BfC+iOpaQPKo9Ly/vYCeKJtA3iPAsDxSIE4go2Hn3mYsHRbh5is1ywMSpgC6MMUdGWCtQ0k+59a2Ru8qrpe77r3uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DY5D38zp; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7a1d81dc0beso429100085a.2;
+        Wed, 14 Aug 2024 08:08:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723648126; x=1724252926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+JnJVLsmunKz1N0MNEXD3u4nXpBfSOLV7GhQ/fPiuuU=;
+        b=DY5D38zp/XdaZX5+vJTlxZdZkinU+jbU4O4FBwPy6gX+eXcUr9LgzpC6A5wkmnUPAQ
+         hslwsuhQ4n+3rf4Rc/gqXI9J9oR6CVsefP4RBQ2q5HCFSgOvAIJ1JNyOfwSaYQ8ZHD2R
+         effdf4N/HkMxRGXIkc2ipfEFtATwyZGHnwJWCkcfJsKzXNUJ7FgsA6xoqlpaybtyvDy8
+         AJam6E8rFkxsY3UBfQ6y71yu2+da+XYw/ECLUVzuDxWoXNyuFlf9udD28OfcgB9zK3fv
+         yWTUZdXrTVIHt4yk1vqxbYgXguoP7P9GWJDEWx3kT/nol2xLVVf9f1lvZnBAjeDw80rH
+         YBeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723648126; x=1724252926;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+JnJVLsmunKz1N0MNEXD3u4nXpBfSOLV7GhQ/fPiuuU=;
+        b=K+fHyCfWn3uVAGf7lPte5ye29yy2+lzDdK48o5cmzKqk6WxT74aDCPK330hz/+T8Hn
+         ex8L7yUeCXQdmzN4v4DmrK5uljEDNeTcNTwyixUIki/3YT/LK7eM1y9+INd8JSrj4vTH
+         yIoe0062cPENAgsa+unLv8Oob393CogObda5jHiYVC9sXAj98SwqhPPk28J3jxaBwcqW
+         jjl10e88EcfM5jZm9pUwYDqfaDDXOpYvtxPeFZR6qCoogYQGW+q9a1XzX7PIRTGIefYx
+         x3mUfkgjmWe89SE2fjK39f4Ha8qIddjzEth6TbUeYZhwS9d9X9Clq/yabgDfOoxd4h1a
+         +dHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFkXIt8q+XnZDqUrunKYgJA6At3tsXoJCBwneSYlwdlaUtDPk/c4wj8Gsy106uvxHiHmcqU5D2CLHNkl2n3I9GGCngT92FKHJ9oy+Jlv5ZMzuljT0J7tzSSJbwWSNEIwybI4k2xgciwIrypywd/cDNyZMhSY1JvXjOFSBzwINXlTsmSdtcH4woNZpvxeIubVJpp78CTs4cbnICb/KKBw==
+X-Gm-Message-State: AOJu0Yz9vdrqIMk7iRku6pfCPkzszlNOLzpVCRNz/pNmvheeDlallz4E
+	zrg17SCcpBaFAPZWbvEb9YStRyHjWOMQtdeyjbFkyq1d9LL3bdzm
+X-Google-Smtp-Source: AGHT+IEl77zc4g8f5fHZ7ZSChLtcAm72gMMmppwUCxI922umY71YyYZo6G6p71ce8GqwCEo1zqzbbg==
+X-Received: by 2002:a05:620a:31a9:b0:79e:fc62:c3fb with SMTP id af79cd13be357-7a4ee3ac5f7mr329523285a.53.1723648125840;
+        Wed, 14 Aug 2024 08:08:45 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4e428e2c9sm181095485a.134.2024.08.14.08.08.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 08:08:45 -0700 (PDT)
+Date: Wed, 14 Aug 2024 11:08:45 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ netdev@vger.kernel.org, 
+ amritha.nambiar@intel.com, 
+ sridhar.samudrala@intel.com, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Breno Leitao <leitao@debian.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Jan Kara <jack@suse.cz>, 
+ Jiri Pirko <jiri@resnulli.us>, 
+ Johannes Berg <johannes.berg@intel.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ "open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, 
+ open list <linux-kernel@vger.kernel.org>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Message-ID: <66bcc87d605_b1f942948@willemb.c.googlers.com.notmuch>
+In-Reply-To: <Zry9AO5Im6rjW0jm@LQ3V64L9R2.home>
+References: <20240812125717.413108-1-jdamato@fastly.com>
+ <ZrpuWMoXHxzPvvhL@mini-arch>
+ <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
+ <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
+ <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
+ <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+ <66bc21772c6bd_985bf294b0@willemb.c.googlers.com.notmuch>
+ <Zry9AO5Im6rjW0jm@LQ3V64L9R2.home>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-To: Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
- jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
-Content-Language: en-US
-From: Maciek Machnikowski <maciek@machnikowski.net>
-In-Reply-To: <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Joe Damato wrote:
+> On Tue, Aug 13, 2024 at 11:16:07PM -0400, Willem de Bruijn wrote:
+> > Martin Karsten wrote:
+> > > On 2024-08-13 00:07, Stanislav Fomichev wrote:
+> > > > On 08/12, Martin Karsten wrote:
+> > > >> On 2024-08-12 21:54, Stanislav Fomichev wrote:
+> > > >>> On 08/12, Martin Karsten wrote:
+> > > >>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
+> > > >>>>> On 08/12, Martin Karsten wrote:
+> > > >>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
+> > > >>>>>>> On 08/12, Joe Damato wrote:
+> =
+
+> [...]
+> =
+
+> > > >>
+> > > >> One of the goals of this patch set is to reduce parameter tuning=
+ and make
+> > > >> the parameter setting independent of workload dynamics, so it sh=
+ould make
+> > > >> things easier. This is of course notwithstanding that per-napi s=
+ettings
+> > > >> would be even better.
+> > =
+
+> > I don't follow how adding another tunable reduces parameter tuning.
+> =
+
+> Thanks for taking a look and providing valuable feedback, Willem.
+> =
+
+> An early draft of the cover letter included some paragraphs which were =
+removed
+> for the sake of brevity that we can add back in, which addresses your c=
+omment
+> above:
+> =
+
+>  The existing mechanism in the kernel (defer_hard_irqs and gro_flush_ti=
+meout)
+>  is useful, but picking the correct values for these settings is diffic=
+ult and
+>  the ideal values change as the type of traffic and workload changes.
+> =
+
+>  For example: picking a large timeout value is good for batching packet=
+
+>  processing, but induces latency. Picking a small timeout value will in=
+terrupt
+>  user app processing and reduce efficiency. The value chosen would be d=
+ifferent
+>  depending on whether the system is under high load (large timeout) or =
+when less
+>  busy (small timeout).
+> =
+
+> As such, adding the new tunable makes it much easier to use the existin=
+g ones
+> and also produces better performance as shown in the results we present=
+ed. =
+
+> =
+
+> Please let me know if you have any questions; I know that the change we=
+ are
+> introducing is very subtle and I am happy to expand the cover letter if=
+ it'd be
+> helpful for you.
+> =
+
+> My concern was that the cover letter was too long already, but a big ta=
+keaway
+> for me thus far has been that we should expand the cover letter.
+> =
+
+> [...]
+> =
+
+> > > > Let's see how other people feel about per-dev irq_suspend_timeout=
+. Properly
+> > > > disabling napi during busy polling is super useful, but it would =
+still
+> > > > be nice to plumb irq_suspend_timeout via epoll context or have it=
+ set on
+> > > > a per-napi basis imho.
+> > > =
+
+> > > Fingers crossed. I hope this patch will be accepted, because it has=
+ =
+
+> > > practical performance and efficiency benefits, and that this will =
+
+> > > further increase the motivation to re-design the entire irq =
+
+> > > defer(/suspend) infrastructure for per-napi settings.
+> > =
+
+> > Overall, the idea of keeping interrupts disabled during event
+> > processing is very interesting.
+> =
+
+> Thanks; I'm happy to hear we are aligned on this.
+> =
+
+> > Hopefully the interface can be made more intuitive. Or documented mor=
+e
+> > easily. I had to read the kernel patches to fully (perhaps) grasp it.=
+
+> > =
+
+> > Another +1 on the referenced paper. Pointing out a specific differenc=
+e
+> > in behavior that is unrelated to the protection domain, rather than a=
+
+> > straightforward kernel vs user argument. The paper also had some
+> > explanation that may be clearer for a commit message than the current=
+
+> > cover letter:
+> > =
+
+> > "user-level network stacks put the application in charge of the entir=
+e
+> > network stack processing (cf. Section 2). Interrupts are disabled and=
+
+> > the application coordinates execution by alternating between
+> > processing existing requests and polling the RX queues for new data"
+> > " [This series extends this behavior to kernel busy polling, while
+> > falling back onto interrupt processing to limit CPU overhead.]
+> > =
+
+> > "Instead of re-enabling the respective interrupt(s) as soon as
+> > epoll_wait() returns from its NAPI busy loop, the relevant IRQs stay
+> > masked until a subsequent epoll_wait() call comes up empty, i.e., no
+> > events of interest are found and the application thread is about to b=
+e
+> > blocked."
+> > =
+
+> > "A fallback technical approach would use a kernel timeout set on the
+> > return path from epoll_wait(). If necessary, the timeout re-enables
+> > interrupts regardless of the application=C2=B4s (mis)behaviour."
+> > [Where misbehavior is not calling epoll_wait again]
+> > =
+
+> > "The resulting execution model mimics the execution model of typical
+> > user-level network stacks and does not add any requirements compared
+> > to user-level networking. In fact, it is slightly better, because it
+> > can resort to blocking and interrupt delivery, instead of having to
+> > continuously busyloop during idle times."
+> >
+> > This last part shows a preference on your part to a trade-off:
+> > you want low latency, but also low cpu utilization if possible.
+> > This also came up in this thread. Please state that design decision
+> > explicitly.
+> =
+
+> Sure, we can include that in the list of cover letter updates we
+> need to make. I could have called it out more clearly, but in the cover=
+
+> letter [1] I mentioned that latency improved for compared CPU usage (i.=
+e.
+> CPU efficiency improved):
+> =
+
+>   The overall takeaway from the results below is that the new mechanism=
+
+>   (suspend20, see below) results in reduced 99th percentile latency and=
+
+>   increased QPS in the MAX QPS case (compared to the other cases), and
+>   reduced latency in the lower QPS cases for comparable CPU usage to th=
+e
+>   base case (and less CPU than the busy case).
+> =
+
+> > There are plenty of workloads where burning a core is acceptable
+> > (especially as core count continues increasing), not "slightly worse"=
+.
+> =
+
+> Respectfully, I don't think I'm on board with this argument. "Burning a=
+ core"
+> has side effects even as core counts increase (power, cooling, etc) and=
+ it
+> seems the counter argument is equally valid, as well: there are plenty =
+of
+> workloads where burning a core is undesirable.
+
+Even more, likely. As this might be usable for standard efficiency
+focused production services.
+
+> Using less CPU to get comparable performance is strictly better, even i=
+f a
+> system can theoretically support the increased CPU/power/cooling load.
+
+If it is always a strict win yes. But falling back onto interrupts
+with standard moderation will not match busy polling in all cases.
+
+Different solutions for different workloads. No need to stack rank
+them. My request is just to be explicit which design point this
+chooses, and that the other design point (continuous busy polling) is
+already addressed in Linux kernel busypolling.
+
+> Either way: this is not an either/or. Adding support for the code we've=
+
+> proposed will be very beneficial for an important set of workloads with=
+out
+> taking anything anyway.
+> =
+
+> - Joe
+> =
+
+> [1]: https://lore.kernel.org/netdev/20240812125717.413108-1-jdamato@fas=
+tly.com/
 
 
-
-On 14/08/2024 15:08, Andrew Lunn wrote:
-> On Wed, Aug 14, 2024 at 09:44:29AM +0100, Vadim Fedorenko wrote:
->> On 13/08/2024 21:05, Andrew Lunn wrote:
->>> On Tue, Aug 13, 2024 at 12:55:59PM +0000, Maciek Machnikowski wrote:
->>>> This patch series implements handling of timex esterror field
->>>> by ptp devices.
->>>>
->>>> Esterror field can be used to return or set the estimated error
->>>> of the clock. This is useful for devices containing a hardware
->>>> clock that is controlled and synchronized internally (such as
->>>> a time card) or when the synchronization is pushed to the embedded
->>>> CPU of a DPU.
->>>
->>> How can you set the estimated error of a clock? Isn't it a properties
->>> of the hardware, and maybe the network link? A 10BaseT/Half duplex
->>> link is going to have a bigger error than a 1000BaseT link because the
->>> bits take longer on the wire etc.
->>
->> AFAIU, it's in the spec of the hardware, but it can change depending on
->> the environment, like temperature. The link speed doesn't matter here,
->> this property can be used to calculate possible drift of the clock in
->> the micro holdover mode (between sync points).
-> 
-> Is there a clear definition then? Could you reference a standard
-> indicating what is included and excluded from this?
-> 
-The esterror should return the error calculated by the device. There is
-no standard defining this, but the simplest implementation can put the
-offset calculated by the ptp daemon, or the offset to the nearest PPS in
-cases where PPS is used as a source of time
-
-
->>> What is the device supposed to do with the set value?
->>
->> It can be used to report the value back to user-space to calculate the
->> boundaries of "true time" returned by the hardware.
-> 
-> So the driver itself does not know its own error? It has to be told
-> it, so it can report it back to user space. Then why bother, just put
-> it directly into the ptp4l configuration file?
-> 
-> Maybe this is all obvious to somebody who knows PTP inside out, but to
-> me it is not. Please could you put a better explanation and
-> justification into the commit message. We need PHY driver writers who
-> have limited idea about PTP can implement these new calls.
->
-> Andrew
-
-It's designed to enable devices that either synchronize its own hw clock
-to some source of time on a hardware layer (e.g. a Timecard that uses a
-PPS signal from the GNSS), or a device in which the PTP is done on a
-different function (multifunction NIC, or a DPU) to convey its best
-estimate of the error (see above). In case of a multifunction NIC the
-ptp daemon running on a function that synchronizes the clock will use
-the ADJ_ESTERROR to push the error estimate to the device. The device
-will then be able to
-a. provide that information to hardware clocks on different functions
-b. prevent time-dependent functionalities from acting when a clock
-shifts beyond a predefined limit.
-
-Also esterror is not maxerror and is not designed to include all errors,
-but the best estimate
-
-Thanks
-Maciek
 
