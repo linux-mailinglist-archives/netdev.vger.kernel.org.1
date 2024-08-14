@@ -1,150 +1,187 @@
-Return-Path: <netdev+bounces-118327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDC7095144D
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:15:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D485951468
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 08:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979F31F220D4
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:15:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107861F25996
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 06:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77484139D13;
-	Wed, 14 Aug 2024 06:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C09E80631;
+	Wed, 14 Aug 2024 06:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lzq4aCZ3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TP+CAf8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BBE77F11;
-	Wed, 14 Aug 2024 06:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A94C1F94D;
+	Wed, 14 Aug 2024 06:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723616077; cv=none; b=GUTf8cGeZGwqHxJdxqDxryPqs3oyzm2+ZnjXACeO8Zc30SaQKL/lP5Z1RHRe2acAEf2tAw4GI1I2mnI8YjaewWMmpC+T0tjcXroPIwh/i0RxryQFtN1NEu+zjBzzVPNTO5gAZbIZrav1mgUz+w6Qm70antk01nr685B7JQXI2HQ=
+	t=1723616580; cv=none; b=Ui1R4DTFlpyAlfYb3xejvtCH1zQTN42Rzexps51e6UyeCe4EWEZK1JpTzswMN4xXv7FqpZtjmFDtNXFXTcz3T/8l+QnMJfBp0B5tLmxQeSHuPb6k5TBU3Jyg0mlgamJfYeYFiXyqIE+qssKxHrt37W91oGyIdE3p8pizVhW8D64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723616077; c=relaxed/simple;
-	bh=DlYJNSBGA6tUTVu+Z6JtO34CDRzygC+vKhA7dQZQvfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V8QVRTYnmMDubulpgsWeH9hYSbFFFhh5vkxOyadBrtZ6FX5z4yC1T64eV0+KRrWrYuPYd+SXI/mZX68l4cbKlRvPMCJw/a5euMe0SKdQEXuOia6xELWX0VIkI3YA8gk6IQmUQztWpcjgYK337UYfqex3RNThm4PeXu+Y5ySacJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lzq4aCZ3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C18C2C32786;
-	Wed, 14 Aug 2024 06:14:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723616076;
-	bh=DlYJNSBGA6tUTVu+Z6JtO34CDRzygC+vKhA7dQZQvfw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Lzq4aCZ3TiVmSIHUEW4tnHs6dVDSxOtgaP1M8Uc8lBRyXIQfn4cVuymcIMDx9ozbj
-	 PunzJtAX+/2IT9+l+/PQOfkmOLi78BsyB6SRb5Uzjl2LG/gZTDyppnos3j09+gzdFq
-	 Qar46Uq9eFM3A7EcieLju/jWP2DgKVYnxHI1DQGCgAG4k4c/tnooT0kmUw/CLoKSOP
-	 5HgHuYbuKRKAbGEgOnGzdm3kOYKKgdjU7xijbeocp72bAQ7Qq+FRoqVArJOdGSQXx1
-	 Wk44FfqImhg+HBefd1wICZsWAj/ur/4Qu9f6ntcJqCS4SLB/hyVxttdb5jSyZrNPy2
-	 rnRgy/kTaWhTw==
-Message-ID: <3350aae1-a4a2-4a7c-a075-c29c8f67f5a2@kernel.org>
-Date: Wed, 14 Aug 2024 08:14:28 +0200
+	s=arc-20240116; t=1723616580; c=relaxed/simple;
+	bh=zL+qnPL1jO2zhvpEIpxLqlOnW6CEZ9PD7cHRsrI7EA0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kri2JOXk4quqqjV3oC3JBjdUI+HRY3PJRViWJ8lf8/y76pLy69TRzqqZuJHS1VUXrY9V3NrlB+KuRQWQgka7C1jmCa1nD9fEKrUsU6tQHJKyX6+RGTSDepUxgksoEIz9QrfGwf0svB3DKIBs2bJgdLeXipC24fiZ6+r3M4cm69M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TP+CAf8n; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7a10b293432so4394328a12.0;
+        Tue, 13 Aug 2024 23:22:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723616577; x=1724221377; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t6qpq46Cmtk8VQ38Im8rdWFCBv9ylccY5eUMWeEbdM0=;
+        b=TP+CAf8nhukf2zaA+jB3kMF7QHwlNM9JobMbfEAPQ7/k1EafSZNF5M5WucbdXFDcOg
+         QEDB9xRloO2XQO3FLxP886heg2xzAyqt++KgoBhNOYeAgGXNkX4NMVbOSO5zJqAdQl9W
+         hYcIi1WidntPnuCMWv329op9YET5aylgQbD4gueUbdBY96DLSCgQAq20OrhKYV56i9KF
+         dIYa5vLe/ePZtoH6AFMgbqeIxtXAWxfHRa2P+/KYjgjhcxsE/q7iVn5X9nqAh31UU1P8
+         SQvQYHSLKLMedkovvVt5Rn6CtSmLX6lmPgOf7sX5b7AsVoq/8wn5STq2Dqbw4Hq9gcp+
+         lgDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723616577; x=1724221377;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t6qpq46Cmtk8VQ38Im8rdWFCBv9ylccY5eUMWeEbdM0=;
+        b=f+n2k9XS/chF/NND5URZpkud6fJw+FMZsyRXDFqNtrQoiDHxOwALc/HTKKB3shpz/z
+         pHh/VDw7C/29GkmkxE6kZ7TQHvGcRRewGqecjBAz/7M+3o8jrDp8OhwdRT/XC2XIsejw
+         AgEeA0LJ3EXaVR2u4hmK1XD1fkYk9l8KkC0thEuaebW2CWbxXB13Z4eWAzzZG4GxaaZV
+         plCyCZ19ITKGfaNBJnglqvYHne+O9a3eDdCF/O2CtU182swSKPVqemSYt8RAkiMYE+ib
+         I8tzJOXD1crWtNskkF7qS46rps/6sBx8A2ZbFQkhS3nx/xyhr+O1jMHv44yIcNlM/6OF
+         c0Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqdZxF9xSAcUzIvPhJwrS1cawIZslKlBs4e0leuQf5UKzVmCwIl4pSFR0f+f0LmKTQ7ok+v33fuBDwg7ZJCaURZmdlE8U3pudQAmRbQfNHht/r0PbDyV99niJfKCp03Y2LJzAslIml3ME93UPS6Q761ZthXdjrzeA3Apy/Js2w30WwmRhmo0ozOvjC
+X-Gm-Message-State: AOJu0YwzJajGn4vDeMiFYqCFo6xi3xXd2kJUa5j2urrRc8WE4vAanHMf
+	CnYME4oWTYI+qG7/+muSKlocgv+yNxMdo5Va/ttOyRHHHRA05lDp
+X-Google-Smtp-Source: AGHT+IEM+cQkNQYxKAzkEIN3SXPl5pEpGF0VS4xS43WkOmnpmzPVe0bsCIM7q1PBWtzTRnWKOVOufQ==
+X-Received: by 2002:a05:6a21:3a81:b0:1c4:214c:cc0d with SMTP id adf61e73a8af0-1c8eaf80489mr2271288637.36.1723616577336;
+        Tue, 13 Aug 2024 23:22:57 -0700 (PDT)
+Received: from tahera-OptiPlex-5000.uc.ucalgary.ca ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3ac7f2120sm728811a91.31.2024.08.13.23.22.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 23:22:56 -0700 (PDT)
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: outreachy@lists.linux.dev
+Cc: mic@digikod.net,
+	gnoack@google.com,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bjorn3_gh@protonmail.com,
+	jannh@google.com,
+	netdev@vger.kernel.org,
+	Tahera Fahimi <fahimitahera@gmail.com>
+Subject: [PATCH v9 0/5] Landlock: Add abstract unix socket connect restriction
+Date: Wed, 14 Aug 2024 00:22:18 -0600
+Message-Id: <cover.1723615689.git.fahimitahera@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] dt-bindings: net: bluetooth: qualcomm: add QCA9379
- compatible
-To: Felix Kaechele <felix@kaechele.ca>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- linux-mmc@vger.kernel.org
-References: <20240805040131.450412-1-felix@kaechele.ca>
- <20240805040131.450412-4-felix@kaechele.ca>
- <645ae5c7-5421-4bf2-9aac-8151b7db4e0b@kernel.org>
- <3f16cd19-7609-4f97-bacd-9ab307bd8533@kaechele.ca>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <3f16cd19-7609-4f97-bacd-9ab307bd8533@kaechele.ca>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 14/08/2024 00:11, Felix Kaechele wrote:
-> Thanks for taking a look, Krzysztof.
-> 
-> In this case I think it would be easiest to just use the existing 
-> qca9377 fallback and drop his part of the patchset.
+This patch series adds scoping mechanism for abstract unix sockets.
+Closes: https://github.com/landlock-lsm/linux/issues/7
 
-You need then other patchset documenting new compatible with fallback.
-Compatibles are always specific.
+Problem
+=======
 
-https://elixir.bootlin.com/linux/v6.10-rc1/source/Documentation/devicetree/bindings/writing-bindings.rst
+Abstract unix sockets are used for local inter-process communications
+independent of the filesystem. Currently, a sandboxed process can
+connect to a socket outside of the sandboxed environment, since Landlock
+has no restriction for connecting to an abstract socket address(see more
+details in [1,2]). Access to such sockets for a sandboxed process should
+be scoped the same way ptrace is limited.
 
-> 
-> As for the supplies: For the particular module I am working with the 
-> supplies are mostly shared with the WiFi side. So it "just works" 
-> without taking care of supplies on the BT side.
+[1] https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
+[2] https://lore.kernel.org/all/20231102.MaeWaepav8nu@digikod.net/
 
-You still should describe the hardware.
+Solution
+========
 
-> 
-> But I agree it would be more correct to add and handle these as well. 
-> The documentation I have access to through the FCC filing of this module 
-> is not really conclusive of how to correctly name them in this context.
-> I would rather avoid submitting a patch with incorrect supply names.
+To solve this issue, we extend the user space interface by adding a new
+"scoped" field to Landlock ruleset attribute structure. This field can
+contains different rights to restrict different functionalities. For
+abstract unix sockets, we introduce
+"LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" field to specify that a ruleset
+will deny any connection from within the sandbox domain to its parent
+(i.e. any parent sandbox or non-sandbox processes).
 
-OK
+Example
+=======
+
+Starting a listening socket with socat(1):
+	socat abstract-listen:mysocket -
+
+Starting a sandboxed shell from $HOME with samples/landlock/sandboxer:
+	LL_FS_RO=/ LL_FS_RW=. LL_SCOPED="a" ./sandboxer /bin/bash
+
+If we try to connect to the listening socket, the connection would be
+refused.
+	socat - abstract-connect:mysocket --> fails
 
 
+Notes of Implementation
+=======================
 
-Best regards,
-Krzysztof
+* Using the "scoped" field provides enough compatibility and flexibility
+  to extend the scoping mechanism for other IPCs(e.g. signals).
+
+* To access the domain of a socket, we use its credentials of the file's FD
+  which point to the credentials of the process that created the socket.
+  (see more details in [3]). Cases where the process using the socket has
+  a different domain than the process created it are covered in the 
+  unix_sock_special_cases test.
+
+[3]https://lore.kernel.org/all/20240611.Pi8Iph7ootae@digikod.net/
+
+Previous Versions
+=================
+v8: https://lore.kernel.org/all/cover.1722570749.git.fahimitahera@gmail.com/
+v7: https://lore.kernel.org/all/cover.1721269836.git.fahimitahera@gmail.com/
+v6: https://lore.kernel.org/all/Zn32CYZiu7pY+rdI@tahera-OptiPlex-5000/
+and https://lore.kernel.org/all/Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000/
+v5: https://lore.kernel.org/all/ZnSZnhGBiprI6FRk@tahera-OptiPlex-5000/
+v4: https://lore.kernel.org/all/ZnNcE3ph2SWi1qmd@tahera-OptiPlex-5000/
+v3: https://lore.kernel.org/all/ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000/
+v2: https://lore.kernel.org/all/ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000/
+v1: https://lore.kernel.org/all/ZgXN5fi6A1YQKiAQ@tahera-OptiPlex-5000/
+
+Tahera Fahimi (5):
+  Landlock: Add abstract unix socket connect restriction
+  selftests/Landlock: Abstract unix socket restriction tests
+  selftests/Landlock: Adding pathname Unix socket tests
+  sample/Landlock: Support abstract unix socket restriction
+  Landlock: Document LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI
+    versioning
+
+ Documentation/userspace-api/landlock.rst      |   33 +-
+ include/uapi/linux/landlock.h                 |   27 +
+ samples/landlock/sandboxer.c                  |   58 +-
+ security/landlock/limits.h                    |    3 +
+ security/landlock/ruleset.c                   |    7 +-
+ security/landlock/ruleset.h                   |   23 +-
+ security/landlock/syscalls.c                  |   17 +-
+ security/landlock/task.c                      |  129 ++
+ tools/testing/selftests/landlock/base_test.c  |    2 +-
+ tools/testing/selftests/landlock/common.h     |   38 +
+ tools/testing/selftests/landlock/net_test.c   |   31 +-
+ .../landlock/scoped_abstract_unix_test.c      | 1146 +++++++++++++++++
+ 12 files changed, 1469 insertions(+), 45 deletions(-)
+ create mode 100644 tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+
+-- 
+2.34.1
 
 
