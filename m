@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-118284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F12951268
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:31:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7650F951269
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 04:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E74DD1C20BFC
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:31:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1C45B23E9B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 02:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775C918E3F;
-	Wed, 14 Aug 2024 02:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2037A49650;
+	Wed, 14 Aug 2024 02:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G7NoJQZC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHsLBaGs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545623FB83
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 02:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DF81C680
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 02:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723602636; cv=none; b=nbLCpbDizKAAOPJRGIh/p5xWcN9cL3EytE0fZewkjLtMwQHsT9fW96uOaxsA85bavSHy7dE1ER1ATU3/6rixdlRtH0HeOQYcrGE9QqcR0vYLZMoO03GX+MQG/wvbnnWIPZqoUvUc/QxHHsqSS4XCL20C/48TgIvTPMpGLcCt8vg=
+	t=1723602638; cv=none; b=E2y1xNT592Ou3Yu47O2eYsPwmLYMJgjpkxpWgChX6bBIo9OVC5x61idDOytZRhghFTK7Vn5S3QczQ7CIJn4pJHlIX0m61zOA6S3okVPM0XrrdGZwin5Pd6qav8uckRzH8Xymog4MjonNo+6IHr1PA3O75Q1xoYx4YVU2+N69YAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723602636; c=relaxed/simple;
-	bh=0lK/eqQvfIfbT3e2ZAuQd8Zi4pUwItDQYCTOojulOzg=;
+	s=arc-20240116; t=1723602638; c=relaxed/simple;
+	bh=b/0nCSWcts7zhFkW6ZmmAx0JBYDNjhlIIKvcUs/hrGk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X3nPUGcRAmLWK3cFJR5WDQVO4Qt7UPhKTmsa1g6/J8ApbuRjbY8W18Ud7Fcw4YnjY98Xev8QB5yRvu+vbhfJ7slu35SxcygVe2qU4mxB5swuj/Dm0bljvzrdcNfDXvgJBdqWHIt5YgOGrLYjoRE7WlybMvLIADu1gc5kT809Gpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G7NoJQZC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E00C32782;
-	Wed, 14 Aug 2024 02:30:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=V8yws6+QAtwd+1cN1mJCo9zyeQ+326E2libBqzSJevohpHhdGrnooFLmcR8jwGPbG4nWEyYhPzE2D2Ur+ONUXZ4jqrJqamePr6NSBu9wxLwTBmVxw+QU7jCDCagt2NenCiZUWxyhUGFR5znu9M+9Y4wOp6rYr6CEHD/XtVt95s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHsLBaGs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57BE4C32782;
+	Wed, 14 Aug 2024 02:30:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723602635;
-	bh=0lK/eqQvfIfbT3e2ZAuQd8Zi4pUwItDQYCTOojulOzg=;
+	s=k20201202; t=1723602637;
+	bh=b/0nCSWcts7zhFkW6ZmmAx0JBYDNjhlIIKvcUs/hrGk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G7NoJQZCKRkkVZPf/bFMubRGEWWzZp4r12h6+bJ0Za13EQrEUl7CYqQ4Tz3tbBKnj
-	 YayjYHEs/ZtCsPEhivGVY7xBmVSuZc+cAKmb4QLKFkmfE2GHTxMJ5S2OXL7FC7dXJj
-	 NeYvy94DyvZJPf6oJOYK15zHcllqJwesXsuBxpxzCt60o7mrpkes9ls7HC36yc7yrF
-	 nGlQRH+zQZnItGaKg9EQu540EumiMV13nmEdCTzFv+TjpsJ5QkOT7rw1U3+eBTg6J3
-	 mWvQuE5hiM/W+G8BiClKsnof5RwurPpQgdY3TIxbvlnoOUXODGMrIZ72xo01S8SqQZ
-	 OR3WFUcOb5jHg==
+	b=XHsLBaGse5IOdnmVk6AbOTbg1jDG5CpYAv4YR76L4eha+0X+fsjrB6CHQtfX0pf/M
+	 I9rluZaRDLF3UiNrDW5uG8W4xlTiXtkioLtqtwGpqkCmA4zseicckFq8Jv0Jnbn90N
+	 /KFVIjPMhodZd0tUs1WJ40ypA36+CZD8mJMkKNL5OiYVUjjcvFaodWSPG6q8fZ4jCw
+	 c6mWcp7f6Agr72Z79EHrF+cp86R5R1+KpoQzUbhmAWNLXyKktzhukiEJVVl4+G8OHN
+	 HqGbmXf8I4GUdMgWIwv+damgsyVZtDbVNM0vVvNEZ7x+CS6cnkahZynH21EXfAUdfF
+	 yJUOMRJNOy29w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342553823327;
-	Wed, 14 Aug 2024 02:30:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2CB3823327;
+	Wed, 14 Aug 2024 02:30:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mvneta: Use __be16 for l3_proto parameter of
- mvneta_txq_desc_csum()
+Subject: Re: [PATCH net-next] net: dsa: microchip: ksz9477: unwrap URL in comment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172360263474.1842448.12842229512784993971.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Aug 2024 02:30:34 +0000
-References: <20240812-mvneta-be16-v1-1-e1ea12234230@kernel.org>
-In-Reply-To: <20240812-mvneta-be16-v1-1-e1ea12234230@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: marcin.s.wojtas@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+ <172360263624.1842448.969911821179362586.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Aug 2024 02:30:36 +0000
+References: <20240812124346.597702-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+In-Reply-To: <20240812124346.597702-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, kuba@kernel.org, Tristram.Ha@microchip.com,
+ Arun.Ramadoss@microchip.com, horms@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Aug 2024 12:24:13 +0100 you wrote:
-> The value passed as the l3_proto argument of mvneta_txq_desc_csum()
-> is __be16. And mvneta_txq_desc_csum uses this parameter as a __be16
-> value. So use __be16 as the type for the parameter, rather than
-> type with host byte order.
+On Mon, 12 Aug 2024 12:43:47 +0000 you wrote:
+> Keep the URL in a single line for easier copy-pasting.
 > 
-> Flagged by Sparse as:
-> 
-> [...]
+> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/dsa/microchip/ksz9477.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [net-next] net: mvneta: Use __be16 for l3_proto parameter of mvneta_txq_desc_csum()
-    https://git.kernel.org/netdev/net-next/c/29cabacef102
+  - [net-next] net: dsa: microchip: ksz9477: unwrap URL in comment
+    https://git.kernel.org/netdev/net-next/c/712f585ab8b2
 
 You are awesome, thank you!
 -- 
