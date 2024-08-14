@@ -1,132 +1,187 @@
-Return-Path: <netdev+bounces-118429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A07951916
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:40:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F59951917
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 12:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93ABC280DDE
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:40:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA2F1283A6E
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 10:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CADBE1AE05F;
-	Wed, 14 Aug 2024 10:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232AF1AE84E;
+	Wed, 14 Aug 2024 10:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wYdlf0u3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KNntctkk"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1519A1AE846
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723631928; cv=none; b=myx92Jsx4BzgVQzjHrNcoqBxbf5sA2dFjYFHG57XUC5lz4KEkKqVgZfwAmVfjBBIrMskGBjsq51Zq07sTKmOclG36cj2cHkoCKqAT8fT2zbi3ZR4zfNtlbS8Ug40WFb30mOD4hIJFhQn8R6+vWfi5rluhwEIEpx30gqqVYHLHeE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723631928; c=relaxed/simple;
-	bh=gl8j4o7Uh7r7Lsj4M2joYb38IIVntAuwj7dSLnGxV7M=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCA089TW2bA5qSVRZHDyf4sOSjwEWYmIcAVirSqZmmitnpK1WGT45HWMu6+hUavhO6IfSkOcqJkhQaer9AagRAWNDnvLpTF00WrEQF6F8cdbSin+8lXw1plk7/u6Qq0CvkIWuiw6I8VbpLndv2/jh8XM8aIi832wbWC1u0s7rnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wYdlf0u3; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 5634F2082B;
-	Wed, 14 Aug 2024 12:38:37 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yioXiE5HLmcc; Wed, 14 Aug 2024 12:38:36 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 764892058E;
-	Wed, 14 Aug 2024 12:38:36 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 764892058E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1723631916;
-	bh=H39C4c2odq7KyJ9Ta48l0A3WPAGo9oZKtUSM+ba3WbU=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=wYdlf0u3wQxITPIjzh37M7HQPiN0v9btRs//5cnad68VqTh39N2JWo3MJJQhjUrWX
-	 cR7ydQH8AsdUt+0ByQQUeI2fxgkzb2/h3Ni9+9nf/3mM8CtGoNpnx0g3TH42kb12Lc
-	 BYk+PdElyPkc64fgSmCtAWhdUUS/S9c1RQF/QQzrxuNiKAyw91L7hBo6aZXU2sn5Si
-	 FQ7MH4+LWmcO+ivhPkdGh0HV2lcIHtZBQhfMd8NsEAftGt8q6AoUEzKQAjtRHSi3/O
-	 5X3SVZbiKaUdcunnp3yfKEfq8h6kbcJr6nE751PzY0fZPW9tWtc4h3EvxHMvg625k7
-	 IBCFP8h0QAb6A==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 14 Aug 2024 12:38:36 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 14 Aug
- 2024 12:38:35 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 9996A318199B; Wed, 14 Aug 2024 12:38:35 +0200 (CEST)
-Date: Wed, 14 Aug 2024 12:38:35 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Christian Hopps <chopps@chopps.org>, <devel@linux-ipsec.org>,
-	<netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Florian
- Westphal" <fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
-	<horms@kernel.org>, Antony Antony <antony@phenome.org>, Christian Hopps
-	<chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v2 1/2] net: refactor common skb header copy
- code for re-use
-Message-ID: <ZryJK8W1Acz0L/tU@gauss3.secunet.de>
-References: <20240809083500.2822656-1-chopps@chopps.org>
- <20240809083500.2822656-2-chopps@chopps.org>
- <567fc2d7-63bf-4953-a4c0-e4aedfe6e917@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A421AE05C
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 10:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723631977; cv=none; b=rid2UAsYnCq3adJvA4fhS9416QN4+TYb5/8063HSWYfa3OSQqnxwPBw2obLSrezmmZexAH+NLMYs9WE/EvTgfkHnVgTKBj9xr58pFeUh5zS2TXDrnjyuSLcZE26pKTtepkWNMjxsWETfxYDVRdrDeUvF03fHefDS7kHw6Nm59RQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723631977; c=relaxed/simple;
+	bh=++bW5wMefnS7yJM5ubwMFA3JD9os0eJ2KTHGaw/AzjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HhuLD+7UFXg/7JY5Wv7JoRTssuaoyU3XfZeJdIPicoOliQ2FNQyxPtyjBPpf0NB7HF32q1wjYELPNW36Iiv9UeW3VNaDmdZVkpSdFPc4kAgb8sK+VNecUTiCdwR6JNSLu/ixsxwxm7N0Z/S8ol/REJjCf6zl+NYGdgpu0QYwQyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KNntctkk; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3684eb5be64so3575896f8f.3
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 03:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723631974; x=1724236774; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6WRMEt7FBWJjYyyscCC3U3OCHTs2LMcI2PM9S0kbD08=;
+        b=KNntctkkwlaITc52JBEL6nWMWVf20j0PJzn/YgfC9WIUvuWa+5yE5hEGspKRK9xcBd
+         3QqaZLOL4z2BZdxiH3ZtqcoLPL0BG8r1Ra7I1QtOfDYQLpRPQtxB97M02di5TyhWGGtd
+         +4NnR7fEJ/WY1UIScaSvVEoWRKr6hmf78UYm5TW+ld0e3lp3TqAf1O/JFiDAdKtoa9IR
+         2BQDbmhPLnyzRSPji0HBjpLZwJY47Dx8BxMk+7k9HoPqwlVHscbmampGOGo7NQLk4oJ2
+         tI+vULF1wzqVgRd4n/9rJVJ/39lnqTu6a+M/C/2eaafsbKPoj/5zYeTjC5Z3BsdbGRlx
+         uVlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723631974; x=1724236774;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6WRMEt7FBWJjYyyscCC3U3OCHTs2LMcI2PM9S0kbD08=;
+        b=dPln3Kyc8/tQoQ5g8rvlfDg0EFlt3nOYCFRFjavVPbHNTAf4OmVkazqycGzgJl8qwS
+         pvGG0+BKg14+k51iQoSTeeCRiMokIOmhIBh1PaPiMzjDhpSZs/H8lDsE0e5QFVgrJCSh
+         VNfKYL40i4QgirK4pQpV1lsyBpWj3L//BwOEYNrBqVwVsLXuHzKVMLWMyBH+aU4Qh+3u
+         6vUZDA/r3FtTLQC72KtkQxmKTBpmQwkvv0fyZIy+xb6+NzsMqIZhrzyzudAJIcup99Fv
+         iwGX4zGyDKPFp4LxCrysQT57OLoRR5Tv7PojWkI+WJXfzTzJq5hvOpnhbzGMQvG7B4o4
+         4GIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUWyOFY8qLBh6nOXb6ABn9BlkLBcQb3I4hQRdaUusOA3NR3I6B7YIFqnNhU/EnAxOxASkoz/mMHk5DFLQugGNjZuXcSZAe
+X-Gm-Message-State: AOJu0YxZq4ce8b2BCLSnPmOVEFtBF7MGFib2Omd44IPolwcemlv3P1vN
+	MKPP6cWV+iH8zIgUU2+xhT2VQK18aMCXosAAXcvHJUU8C2TcCPE32El59Ci4Ftw=
+X-Google-Smtp-Source: AGHT+IEsFnMkEPMABflOWSpHSTdZcGDUv5V3RMUWkg8aYLGAOnolNRBF80iFXPk0KvmcXBKPYRU9EA==
+X-Received: by 2002:a5d:5012:0:b0:36b:3384:40e5 with SMTP id ffacd0b85a97d-37177786e4dmr1476575f8f.24.1723631973511;
+        Wed, 14 Aug 2024 03:39:33 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.215.209])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4c36bcf6sm12456115f8f.17.2024.08.14.03.39.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 03:39:32 -0700 (PDT)
+Message-ID: <1e442710-a233-4ab2-a551-f28ba6394b5b@linaro.org>
+Date: Wed, 14 Aug 2024 12:39:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <567fc2d7-63bf-4953-a4c0-e4aedfe6e917@redhat.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 1/5] dt-bindings: net: wireless: brcm4329-fmac: add
+ pci14e4,449d
+To: Arend van Spriel <arend.vanspriel@broadcom.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>,
+ robh@kernel.org, krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, conor+dt@kernel.org
+Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
+ arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
+ minipli@grsecurity.net, brcm80211@lists.linux.dev,
+ brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com
+References: <20240813082007.2625841-1-jacobe.zang@wesion.com>
+ <20240813082007.2625841-2-jacobe.zang@wesion.com>
+ <1914cb2b1a8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <e7401e25-7802-4dc3-9535-226f32b52be1@kernel.org>
+ <062d8d4e-6d61-4f11-a9c0-1bbe1bfe0542@broadcom.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <062d8d4e-6d61-4f11-a9c0-1bbe1bfe0542@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 14, 2024 at 11:46:56AM +0200, Paolo Abeni wrote:
-> On 8/9/24 10:34, Christian Hopps wrote:
-> > From: Christian Hopps <chopps@labn.net>
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -1515,7 +1515,7 @@ EXPORT_SYMBOL(napi_consume_skb);
-> >   	BUILD_BUG_ON(offsetof(struct sk_buff, field) !=		\
-> >   		     offsetof(struct sk_buff, headers.field));	\
-> > -static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
-> > +void ___copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
-> >   {
-> >   	new->tstamp		= old->tstamp;
-> >   	/* We do not copy old->sk */
-> > @@ -1524,6 +1524,12 @@ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
-> >   	skb_dst_copy(new, old);
-> >   	__skb_ext_copy(new, old);
-> >   	__nf_copy(new, old, false);
-> > +}
-> > +EXPORT_SYMBOL_GPL(___copy_skb_header);
-> > +
-> > +static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
-> > +{
-> > +	___copy_skb_header(new, old); >
-> >   	/* Note : this field could be in the headers group.
-> >   	 * It is not yet because we do not want to have a 16 bit hole
+On 14/08/2024 12:08, Arend van Spriel wrote:
+> On 8/14/2024 10:53 AM, Krzysztof Kozlowski wrote:
+>> On 13/08/2024 19:04, Arend Van Spriel wrote:
+>>> On August 13, 2024 10:20:24 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
+>>>
+>>>> It's the device id used by AP6275P which is the Wi-Fi module
+>>>> used by Rockchip's RK3588 evaluation board and also used in
+>>>> some other RK3588 boards.
+>>>
+>>> Hi Kalle,
+>>>
+>>> There probably will be a v11, but wanted to know how this series will be
+>>> handled as it involves device tree bindings, arm arch device tree spec, and
+>>> brcmfmac driver code. Can it all go through wireless-next?
+>>
+>> No, DTS must not go via wireless-next. Please split it from the series
+>> and provide lore link in changelog for bindings.
 > 
-> Could you please point where/how are you going to use this helper? factoring
-> out this very core bits of skbuff copy looks quite bug prone - and exporting
-> the helper could introduce additional unneeded function calls in the core
-> code.
+> Hi Krzysztof,
+> 
+> Is it really important how the patches travel upstream to Linus. This 
+> binding is specific to Broadcom wifi devices so there are no 
+> dependencies(?). To clarify what you are asking I assume two separate 
+> series:
+> 
+> 1) DT binding + Khadas Edge2 DTS  -> devicetree@vger.kernel.org
+> 	reference to: 
+> https://patch.msgid.link/20240813082007.2625841-1-jacobe.zang@wesion.com
+> 
+> 2) brcmfmac driver changes	  -> linux-wireless@vger.kernel.org
 
-It is supposed to be used in the IPTFS pachset:
+No. I said only DTS is separate. This was always the rule, since forever.
 
-https://lore.kernel.org/netdev/20240807211331.1081038-12-chopps@chopps.org/
+Documentation/devicetree/bindings/submitting-patches.rst
 
-It was open coded before, but there were some concerns that
-IPTFS won't get updated if __copy_skb_header changes.
+Best regards,
+Krzysztof
+
 
