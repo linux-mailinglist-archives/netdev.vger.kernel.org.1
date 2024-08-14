@@ -1,129 +1,111 @@
-Return-Path: <netdev+bounces-118320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09169513DB
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:24:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9709513DC
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A401A28536A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:24:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD2531F248EA
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 05:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807A213C80A;
-	Wed, 14 Aug 2024 05:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0C86F2F4;
+	Wed, 14 Aug 2024 05:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUWTkfyK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HkyYEUW5"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD8E13B59B
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35DF6A01E
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 05:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723612997; cv=none; b=fY+m1ohLCMLuu3vwibLgGuNH++JXiDV/HvwYeGyMEI6caaO9iPbfTXgWTVJfW/PSTcSPqcGk+RjCF6M/2aBbHVtU5dzjpTtCXVElFlQ//Kz53r9wZAuggxIVLqs3y0gdQ7yWk+9NUjXGpkqIrwnFahbHqndeQwPYS8rifbDalkA=
+	t=1723613022; cv=none; b=rbXfQCMYWNU2xvF5EATrC0+T13B3aodkabq2xxhlYrL/yzMXm0Yu9qVVc/QcKeDJ/aFlZJ6FkZZ1Wb5G7tHvZS+q/9RbPuFzJvjuwOd2fsNLRbejobr2adTZBu3GdP1t2BD2aWn9VqgBy08z16yJb0GXmPUtnxA2arId/18gJmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723612997; c=relaxed/simple;
-	bh=XJEvt+yIN4yZx5BK8Fprghh8IxukmlAPgsAMgtIfSNE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dqrL5oTt/UYNiIC/qgOoxhqP8903x8AAnJDl7CC3kB49RJdIZIKsMOADjJpVHMXswzezhQOnVvuas6Ey6A5VikrUh0X07Fke1Shohb6lFRyWG2wJOsEiIhLLUONUmSJne6irjPy+hEaaIJ9G5AsSzgETqN4ZXym1Pt95LLq0nbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GUWTkfyK; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1723613022; c=relaxed/simple;
+	bh=7Gh/M8Zyi+t+eXsvHhqy4r72SOYBFck1SgwYl7QpDkI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BUc3sPPrZqj0sBk8wQkzmuOrVQqLS3TrybJNKKMp6bz4Nqz4zQAUTM1sEX4wnOV1drRtR/+yz8ZTcUxV4kv9yQqLqFw8Q8VfueGzHlHdnFuYTBqznUbHT/PAZ4Zld9Zw4KH4D07GCdT/f4twQzbgOYZOc5kALttgmkNRh03x7as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HkyYEUW5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723612994;
+	s=mimecast20190719; t=1723613019;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vfwh1eGCzguoUvuJz78z6dH7f3hxP70/1uP7cAzG5qY=;
-	b=GUWTkfyKfzXPuhWQTDCiu4zQ0pPWHbAZYptM0pAZlgKwqhArYJxnBC1HkfYx1iRyBvh7/6
-	IfJw53uyz0uXvMaDo+GlxH68UV7rHig0onRHJ2MlpAe1bsxno5/DL3+q8/39ib709oETVw
-	7JVZHG5KLhzKDvPN5mpAZZyvAsrxOro=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-fhVs7HFGNlKlMCBwDsygtg-1; Wed,
- 14 Aug 2024 01:23:11 -0400
-X-MC-Unique: fhVs7HFGNlKlMCBwDsygtg-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 860ED18EB232;
-	Wed, 14 Aug 2024 05:23:09 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.112.38])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E1F4A1944A95;
-	Wed, 14 Aug 2024 05:23:02 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	venkat.x.venkatsubra@oracle.com,
-	gia-khanh.nguyen@oracle.com
-Subject: [PATCH net-next v7 4/4] virtio-net: synchronize probe with ndo_set_features
-Date: Wed, 14 Aug 2024 13:22:28 +0800
-Message-ID: <20240814052228.4654-5-jasowang@redhat.com>
-In-Reply-To: <20240814052228.4654-1-jasowang@redhat.com>
-References: <20240814052228.4654-1-jasowang@redhat.com>
+	bh=7Gh/M8Zyi+t+eXsvHhqy4r72SOYBFck1SgwYl7QpDkI=;
+	b=HkyYEUW5osLqsxHCp/kX3lIq4qFE0Dokwyo0u0DdD4JmdE2UOdQ4/1MY9hV5AtIr5v1e+q
+	ySkhLByNFQ6/mhYh/dwZS0qxyVTTCjcBFLyiGqPy1zDVGy4LrblzsWkIRVGCoidoMo6JPH
+	9RysIl1lsh0hRwsV1DE25B1dc3ohit0=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-QCVxA4E7N8mVMuXzDdoObw-1; Wed, 14 Aug 2024 01:23:38 -0400
+X-MC-Unique: QCVxA4E7N8mVMuXzDdoObw-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-6818fa37eecso6141769a12.1
+        for <netdev@vger.kernel.org>; Tue, 13 Aug 2024 22:23:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723613017; x=1724217817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7Gh/M8Zyi+t+eXsvHhqy4r72SOYBFck1SgwYl7QpDkI=;
+        b=gxkB4PTUXY39SvpaMV7MkdSZX7lSXRVI0GRkdKcoFUwwM5spUR4FtPxuMK1PORRDkP
+         TnyxQT+fWeahqpNDuGYY2zev4H9/eOlQhECeSXC90onaCqEc4DSneFH/ShsnToDtaR9E
+         aTCgPAIxjJxSGXy0J15lyGx2Etap0kr++nx686Cqis8GUKDla4OFXHp+MeGgX4i3StBQ
+         ShXpqIRWW7MiEWPJzgUFrzMJYRw9RQOUjAuSmA/3B6PdowuMpk6Jklh7QXfSOQBqkp5J
+         tJRI/XE/3PHzaG53tYM7hDpHiASeCAsVHl3DQlcGIxcgDWU3tDtZZPa7dpNjB+UBwA/0
+         EP2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUhexMnsTq4Ru/uoReoOLOfOZCFLBg6qmAGwWWHxxOZZ6d5oKE74oqD8BNl7WACgUm4YoTHXHhf4f0VFkySY9tnTpp7OdBG
+X-Gm-Message-State: AOJu0Yxw6DWjDcZCRmS2h6lWBqEYayH2/BhLyWWGBens04khqDtCfnvh
+	N9A6J6kV0HiEmpkVacvwVMq1jvu4X0+HMxwM6mHwm3OUUwIGD2MtEBZajIy0cexNwLthwIjU7Qi
+	o7tsCFWqkmamKSK0Awjosu5ww1prjYblS3l9GS7BmMtzifbASgF7Mrhfly3Z25L+yMHfEceJoe4
+	vSTMlv/FwBsQw6J6xtSLeMXR8Y24jo
+X-Received: by 2002:a05:6a20:9c8a:b0:1c3:b143:303b with SMTP id adf61e73a8af0-1c8eafa7573mr2348523637.54.1723613016863;
+        Tue, 13 Aug 2024 22:23:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdZRuzr5BORXPw4xiTNxfSeMsERm+uEiuPU9gtfoN69wIp+0iSWNDVdKc6GMkTcU0cZjXWT0eGwLrjrBvb11U=
+X-Received: by 2002:a05:6a20:9c8a:b0:1c3:b143:303b with SMTP id
+ adf61e73a8af0-1c8eafa7573mr2348504637.54.1723613016313; Tue, 13 Aug 2024
+ 22:23:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20240806022224.71779-1-jasowang@redhat.com> <20240807095118-mutt-send-email-mst@kernel.org>
+ <CACGkMEvht5_yswTOGisfOhrjLTc4m4NEMA-=ws_wpmOiMjKoGw@mail.gmail.com> <20240813074018.21afe523@kernel.org>
+In-Reply-To: <20240813074018.21afe523@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 14 Aug 2024 13:23:25 +0800
+Message-ID: <CACGkMEviUsiE1bj+RLfVzH7bmnL3s=Dg-uyC3WFcbNLGAPAbZA@mail.gmail.com>
+Subject: Re: [PATCH net-next V6 0/4] virtio-net: synchronize op/admin state
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, edumazet@google.com, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, inux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We calculate guest offloads during probe without the protection of
-rtnl_lock. This lead to race between probe and ndo_set_features. Fix
-this by moving the calculation under the rtnl_lock.
+On Tue, Aug 13, 2024 at 10:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Tue, 13 Aug 2024 11:43:43 +0800 Jason Wang wrote:
+> > Hello netdev maintainers.
+> >
+> > Could we get this series merged?
+>
+> Repost it with the Fixes tag correctly included.
 
-Fixes: 3f93522ffab2 ("virtio-net: switch off offloads on demand if possible on XDP set")
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/virtio_net.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Ok, I've posted a new version.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 55b712a71e63..6c79fc43fa31 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -6606,6 +6606,11 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		netif_carrier_on(dev);
- 	}
- 
-+	for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
-+		if (virtio_has_feature(vi->vdev, guest_offloads[i]))
-+			set_bit(guest_offloads[i], &vi->guest_offloads);
-+	vi->guest_offloads_capable = vi->guest_offloads;
-+
- 	rtnl_unlock();
- 
- 	err = virtnet_cpu_notif_add(vi);
-@@ -6614,11 +6619,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		goto free_unregister_netdev;
- 	}
- 
--	for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
--		if (virtio_has_feature(vi->vdev, guest_offloads[i]))
--			set_bit(guest_offloads[i], &vi->guest_offloads);
--	vi->guest_offloads_capable = vi->guest_offloads;
--
- 	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
- 		 dev->name, max_queue_pairs);
- 
--- 
-2.31.1
+Thanks
+
+>
 
 
