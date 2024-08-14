@@ -1,111 +1,159 @@
-Return-Path: <netdev+bounces-118584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 968B0952280
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:11:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A82C0952286
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 21:15:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175521F23718
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:11:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E3591F23EC2
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 19:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AF81BE254;
-	Wed, 14 Aug 2024 19:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D96E1BE86B;
+	Wed, 14 Aug 2024 19:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3P2JAD2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I9keJ5ip"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2BBB679
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 19:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB331BE857;
+	Wed, 14 Aug 2024 19:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723662707; cv=none; b=VmJBX7tn9pep+cg8CxXBWk95hcMZ7S/q3lm2l2c03CZZEwh120dWOySnjbRsqkVDU/AGg+qvkxkNShn15e5Oeu0E/uW8L8wG0NQqzDJYdadkyf3gru939yA91kbMAYOi5RGGQtBDjo22gAPFCP9o0iO9YQ9pLdaLDh/wjvNCiWA=
+	t=1723662931; cv=none; b=i79xi8DQsEJqIpaZGfg86e6lqqGdSR3adlXBQljGnD4ra+9kRrtCtxElg0Ew8+nssSZOYJt8n0VHHS0bIRFCpvQkqj13NaVs5G/sXHZ6Ab+l8piogUeM7Phx7Q6Kdi/IYjo+EWT+ZL6MaxWJrcrxT93VkhezfGWzDon9/IlUxUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723662707; c=relaxed/simple;
-	bh=VcmlmTXDV4KXDOB1h9BS0wkwd7KF9mO8IUQjqM61JtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F8SZOsM+0+CMYBBE2dGX6A0a2nRDA1dAGQy2nv9t+wHY810up+C1bzM+1AJRefo7roVNSmZZS98CEPSPjGsiT04DW1cyWDMjZ/6+sN5+kHj2HRgQQ0Q/kTBDQYuvD9XMvsGOXJ7y6xf3JmmZUpsrxFhp+dhH0wPp2AldxKHGsDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D3P2JAD2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3665C116B1;
-	Wed, 14 Aug 2024 19:11:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723662707;
-	bh=VcmlmTXDV4KXDOB1h9BS0wkwd7KF9mO8IUQjqM61JtI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D3P2JAD2j1598XvxGC0/Wo58CAHH5Eeo3dPv/EeuY4hfes9k+xpZ1tgLqHn0fzi4z
-	 qd59NvjGGDwG2ngV+mOTNcaKqpwiL/EOaMPA+/4UilH6drxbRSLgl0QHlKyJkq/Eft
-	 9BZdEJmwJiYWmwQo+VDNvGr8aHYu4pUdlTVvPB2LeUadsbQHD1CNfeVY1Ahp5TCwWk
-	 NXlhjQnZhoNOcbKOHMNTJ0ry3EZb/IjzSo7bjKC1FI52IGcW/Pfq8zG/P/V45B/VkJ
-	 IJ2eJyreUluVPOWbekfVREOMfFVIjgaoQACun6Jwz2nEy4SagyvGLt6AH6forS2YEP
-	 KDpXtxyXvvFRA==
-Date: Wed, 14 Aug 2024 12:11:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Cc: "Arinzon, David" <darinzon@amazon.com>, David Miller
- <davem@davemloft.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky, Zorik"
- <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, "Bshara,
- Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori,
- Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
- "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
- <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
- "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
- <ndagan@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar"
- <itzko@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
- "Beider, Ron" <rbeider@amazon.com>, "Chauskin, Igor" <igorch@amazon.com>,
- "Bernstein, Amit" <amitbern@amazon.com>, Parav Pandit <parav@nvidia.com>,
- Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
- reporting support
-Message-ID: <20240814121145.37202722@kernel.org>
-In-Reply-To: <8aea0fda1e48485291312a4451aa5d7c@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
-	<20240812185852.46940666@kernel.org>
-	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
-	<20240813081010.02742f87@kernel.org>
-	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
+	s=arc-20240116; t=1723662931; c=relaxed/simple;
+	bh=kCKmkxqpKDVIZ5/l2Mxu/MdocjIDTV7PR9QYSVEYqoA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XKUzec47Dzsr51HrI2F1Y4AHkA8wUyjYmDfOFiMnOwwcwNqjyb4wzGOWq/byEk/Wq+7jg2CfDTTmjh09OyJhQuKeXC+ehKQ9NswGGxrT+TKFgJk2xj8sd6mnSXnE/Ipq1HkZUV87ymwRCPzjv+x24WO1HumTxMOYKZleajryxm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I9keJ5ip; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-76cb5b6b3e4so223565a12.1;
+        Wed, 14 Aug 2024 12:15:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723662929; x=1724267729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y569x91Td7XRE+lMbNluWg7Ybo+veJRFXIycDOnA3b4=;
+        b=I9keJ5ip+Smm9NAmj8UPga8hU5B42Ysu8PHQTlbUoNEOG8kzp38CnfAkRcTh786TkC
+         bS/EP756H7zecZKeE1Izl18sec9/ImPfo1af6+mTE7fVX/YfvkGVpqbU+gqncznvg8yg
+         3PXXPnT19JUHkM9Ge8PmARMnG/YFMtie6rGMFpsj0OlUFYtxsuCWhdmRMw7tsk0XdwcN
+         mIfNaZF+Cup0fZo3LrHxuyz4vB8aFRKEbH8dpjO28iJy45XvhaUjaluSe5XSY5XNPP8J
+         7I0fmSQFa1fgHZcOEJ3AFtYjMAAAVdMvxnDq0F7r/H2wKRz9Xuq7HBv1N0BBeugKqcLT
+         bXGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723662929; x=1724267729;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y569x91Td7XRE+lMbNluWg7Ybo+veJRFXIycDOnA3b4=;
+        b=eyVAatD39sI016N3Axw5OSy9CPI8GE2DYDjaI+u3lfzTBFhu9lBfU996dOf3H1ci6p
+         gAzmCuRgNkRWiY4+tMrzlLSftXniP/vgu+SO3esZ8dIZJX3EFcKXONsmMt72HVBfu7A+
+         mmZ0kKlgLPwPiy+mf7sZq/CoB1XANdbI0OkO9D/qNLCOY4vEYfG9X0xp1kbv0SS4fo1G
+         g/Sj2RzH/2vyBRBvUxZECjJsQSsx61Wg3kS9CvCj5+zE+RygUYkNoOFVVZkdMwXjoIPH
+         9Y+/87bkImbz8P06RGURWY+WNSZY8GaAKjYaKkb93ZRaeN+Xuv1SUbaBEm9Xi9HynQh6
+         UFkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmPOj2Ksq8pbjjdK3be0VIK1k8+hygeufH8O7mFiGKqLQ0tjickaNMHfMhRzL+Wrm+HY98XtzJqfZC9tEtokrGNUMZd0bD8OZhActmlEElW1B7ScV9LFg/dFW+Q3yldME5keMnN50ljuo2nDQHFoE6Oz+Wf9ZuRIbueA1drn7KBh5L9QVZ
+X-Gm-Message-State: AOJu0YxbQHTT7Cx59Pe2iVmw8QWTTfWCqXa4HH5cibVpWV1Djnx7LIKV
+	6VY3wpzVJsBUTIhe5L4VyvpXziu160H+VoGpUmp8jHGLByURRo9m
+X-Google-Smtp-Source: AGHT+IFkKwmvDWZNC3rpujMmYQWLJn0M72tWGasujGlI7tpvi7MnznnyiGEFQFPLO3Awn2JHMQ7z2g==
+X-Received: by 2002:a17:90b:4a83:b0:2c1:9892:8fb with SMTP id 98e67ed59e1d1-2d3aaa7a01emr4207219a91.5.1723662928994;
+        Wed, 14 Aug 2024 12:15:28 -0700 (PDT)
+Received: from dev0.. ([49.43.168.58])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3ac844e54sm2134282a91.44.2024.08.14.12.15.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 12:15:28 -0700 (PDT)
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: skhan@linuxfoundation.org,
+	javier.carrasco.cruz@gmail.com,
+	Abhinav Jain <jain.abhinav177@gmail.com>
+Subject: [PATCH net v6 0/2] Enhance network interface feature testing
+Date: Wed, 14 Aug 2024 19:15:15 +0000
+Message-Id: <20240814191517.50466-1-jain.abhinav177@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 14 Aug 2024 15:31:49 +0000 Arinzon, David wrote:
-> I've looked into the definition of the metrics under question
-> 
-> Based on AWS documentation (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-network-performance-ena.html)
-> 
-> bw_in_allowance_exceeded: The number of packets queued or dropped because the inbound aggregate bandwidth exceeded the maximum for the instance.
-> bw_out_allowance_exceeded: The number of packets queued or dropped because the outbound aggregate bandwidth exceeded the maximum for the instance.
-> 
-> Based on the netlink spec (https://docs.kernel.org/next/networking/netlink_spec/netdev.html)
-> 
-> rx-hw-drop-ratelimits (uint)
-> doc: Number of the packets dropped by the device due to the received packets bitrate exceeding the device rate limit.
-> tx-hw-drop-ratelimits (uint)
-> doc: Number of the packets dropped by the device due to the transmit packets bitrate exceeding the device rate limit.
-> 
-> The AWS metrics are counting for packets dropped or queued (delayed, but are sent/received with a delay), a change in these metrics is an indication to customers to check their applications and workloads due to risk of exceeding limits.
-> There's no distinction between dropped and queued in these metrics, therefore, they do not match the ratelimits in the netlink spec.
-> In case there will be a separation of these metrics in the future to dropped and queued, we'll be able to add the support for hw-drop-ratelimits.
+This small series includes fixes for creation of veth pairs for
+networkless kernels & adds tests for turning the different network
+interface features on and off in selftests/net/netdevice.sh script.
 
-Xuan, Michael, the virtio spec calls out drops due to b/w limit being
-exceeded, but AWS people say their NICs also count packets buffered
-but not dropped towards a similar metric.
+Changes in v6:
+Use XFAIL for ethtool operations that are unsupported instead of SKIP.
 
-I presume the virtio spec is supposed to cover the same use cases.
-Have the stats been approved? Is it reasonable to extend the definition
-of the "exceeded" stats in the virtio spec to cover what AWS specifies? 
-Looks like PR is still open:
-https://github.com/oasis-tcs/virtio-spec/issues/180
+Changes in v5:
+https://lore.kernel.org/all/20240808122452.25683-1-jain.abhinav177@gmail.com/
+
+Rectify the syntax for ip add link.
+Fix the veth_created condition check.
+
+Changes in v4:
+https://lore.kernel.org/all/20240807175717.7775-1-jain.abhinav177@gmail.com/
+
+Move veth creation/removal to the main shell script.
+Tested using vng on a networkless kernel and the script works, sample
+output below the changes.
+
+Changes in v3:
+https://lore.kernel.org/all/20240614113240.41550-1-jain.abhinav177@gmail.com/
+
+Add a check for netdev, create veth pair for testing.
+Restore feature to its initial state.
+
+Changes in v2:
+https://lore.kernel.org/all/20240609132124.51683-1-jain.abhinav177@gmail.com/
+
+Remove tail usage; use read to parse the features from temp file.
+
+v1:
+https://lore.kernel.org/all/20240606212714.27472-1-jain.abhinav177@gmail.com/
+
+```
+# selftests: net: netdevice.sh
+# No valid network device found, creating veth pair
+# PASS: veth0: set interface up
+# PASS: veth0: set MAC address
+# SKIP: veth0: set IP address
+# PASS: veth0: ethtool list features
+# PASS: veth0: Turned off feature: rx-checksumming
+# PASS: veth0: Turned on feature: rx-checksumming
+# PASS: veth0: Restore feature rx-checksumming to initial state on
+# Actual changes:
+
+
+# PASS: veth0: Restore feature rx-gro-list to initial state off
+# PASS: veth0: Turned off feature: rx-udp-gro-forwarding
+# PASS: veth0: Turned on feature: rx-udp-gro-forwarding
+# PASS: veth0: Restore feature rx-udp-gro-forwarding to initial state off
+# Cannot get register dump: Operation not supported
+# XFAIL: veth0: ethtool dump not supported
+# PASS: veth0: ethtool stats
+# PASS: veth0: stop interface
+```
+
+Abhinav Jain (2):
+  selftests: net: Create veth pair for testing in networkless kernel
+  selftests: net: Add on/off checks for non-fixed features of interface
+
+ tools/testing/selftests/net/netdevice.sh | 55 +++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 2 deletions(-)
+
+--
+2.34.1
+
 
