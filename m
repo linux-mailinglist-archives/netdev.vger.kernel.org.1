@@ -1,177 +1,180 @@
-Return-Path: <netdev+bounces-118347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC87595157E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:28:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C56C295158E
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 09:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA701C266AF
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:28:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAFF01C26F4E
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 07:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24726143C7B;
-	Wed, 14 Aug 2024 07:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DEB54F8C;
+	Wed, 14 Aug 2024 07:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ih4OhHVA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlItA6OR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A61455898
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 07:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA4BEA4;
+	Wed, 14 Aug 2024 07:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723620447; cv=none; b=XOOYF5Pm/GBDyEJT+f+BAv2ZmCig+zy34pT8dxW/MM3ZFC9hk7GuBxu6O2whzQbcEPy/J5NgJEX0pzdUbJbx6tBKhd2xFWomH53CPVSq2AM5Lf+1ixXaDkd4AUxhjPebVOjHgllm5Z++5ZPFvtUqOdJLbXtl3Ca7o/uDJMP7pG8=
+	t=1723620617; cv=none; b=e2fHUVT2pyZ3BSZ5EEPBJqOINiHIXFKJg1rqwv1P8qFgtP8G65OKOUDelyR3AIEbXAGfU34+pQWLgJJHfomU5/r2KFAVQRdMwLeZn4VSRwWA6EHGctvC4AJl3+yqVf25/cn3yO1pwXkN05DlG++5BaqxOnF4tzzHUDAo13cJHkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723620447; c=relaxed/simple;
-	bh=1UP383j6hjG1P69n1FRHYze421i09BJSQebpheB6rVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AECP6WAJ/vTHeeG5b1r/NRlzHq7wViyc2xWzVGoZj2EcZ8omYpSd9LlNqCjP7OuShgiFzDl52LJz0vGIiGP7741ZWdtJjQqCOk2koTk2wmOI1bqWGqJKnMxDpe7oXLD9ytzrFQfylMHgsL1YkjXg2wZ7NYpv6hElNsrsP5njyJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ih4OhHVA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723620443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lWW6/JtLLOdbS2RriwQ1Xt/j+3UDgvX+fkiP4SLbmfs=;
-	b=Ih4OhHVAICbUeWWP6Tgwb5apy9vBT1ETH2CNM8owRiUdiSPhhG+bXggByXmOJfQlC34hNY
-	9ml8wSSi9U4GRzOqzzgsRLW6sLC6kSMMBu28ZAwUmC+LbpeUxTU4d33J+tnZMy/ErTTtDD
-	b5yqGCyidS9uLAvHrAi7dxcPVgUY4Kg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-454-tKIPdbRLO3ySZpUz5sCodw-1; Wed, 14 Aug 2024 03:27:21 -0400
-X-MC-Unique: tKIPdbRLO3ySZpUz5sCodw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a7a822ee907so506536366b.1
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 00:27:21 -0700 (PDT)
+	s=arc-20240116; t=1723620617; c=relaxed/simple;
+	bh=m3S7JU+HCylBG7tym+JkEbCTnGOtEt9vkuHrFlnGleA=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=kVe+f4VTh8MRrnkCVuxUmJw9DKB4+pdCeCj6eOoVLntkJIzzll1gKtlIvAhbaoG2MRxV9557nsXLlwxx6Jvkx/CWiyzz6udHlIM295pcTcGogAIg2HpKEyMBwy9LyeHtmu+aYpyNI/npxGiCRaA7n8+v8flhmRPWChjpKvYpu6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlItA6OR; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fd66cddd4dso60873045ad.2;
+        Wed, 14 Aug 2024 00:30:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723620615; x=1724225415; darn=vger.kernel.org;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gZjg8zveGCIUd8Xm20UvhZjkI4TEvCstRkn7S7YAXGA=;
+        b=GlItA6OResk2DIJQMDFuVxSMKoPwtmhuWWmOLFfzVkNjw+HxCzJFDVnpls1p+DJyw4
+         XGMd7dMH/E3CPJ4CKGTC67wY7BKSubjqIUBQOZSqx9XDFVID0Vdc5Ya99FH8wLTC1T2k
+         02nHAx3qRqWfxlUTmiKYx2KttE8B8pg9LGlXYHBTaihIxZ4z3lxdrxwXvyUUVCGSdnbY
+         7wtHEX38W/ZulwOCV8p12UqyfvwpA3zMjasN09H2Bb+GINk7o7ElxgfyzLIKevwMqtgt
+         SY4B9XTWOUSglNHKGIbntcYbboTns9I+RzA+iEkjCE/IThSvVRa2FzCPrxtlTGtW1ST7
+         SFiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723620440; x=1724225240;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lWW6/JtLLOdbS2RriwQ1Xt/j+3UDgvX+fkiP4SLbmfs=;
-        b=v0EI0wHV1f959Q1vKjjxDhd+uLdHCJwc6VQrSJbpvAwUdlONZUeHljye9hd4TrNWGy
-         SCJ+XrkQpPotzXyrnzHiMQm8Jdof8u9PNLtUus0a+SSD+/xPDAQWvIMb9xrDvbGbxqxD
-         Nsr1P0blbhD33mM9lxT7tdU8U2OoUa68y1EnAMsbIpgkHDhWKn16aieKABsUey+G37/1
-         06z8aq06ezz5eRksBSafOQ4VeJ63ZYtb7eFcnDVeBjIPn3MvDDqBGtFUmVUTACyAhU9W
-         6/zwVBHGAAZqxCaEN/fp3U7loFXHwEjc1WcV0gUHSzTnbtHm9V/Wal1yVOttj/vi7YoE
-         Z+Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCV2V1I5FD7u1GuIDlqBz+bw0nti58v6YWTzDtGRKKk70dLCuWMGqzCmhJpCIKCSSza54IvaQ35cPRvm3HpNi9s+8mxUY1J2
-X-Gm-Message-State: AOJu0Yy9K/VGqFRdHCeQ2RE9fXx+Rvq4AG7YP5ui/7RH5yaYkeWFygMB
-	caSYVZZmNCx7Tp33K49w0C/Wd6J6AadIDZkyvNGTicOxImudEcCKbyuo/OQXw+38G7REC4NOmEY
-	mKEVjOzp3NUtuGdJsLgSuVa0kY1NE7Lbm1UggHVefucFO6jMRcVbztw==
-X-Received: by 2002:a17:907:e6cb:b0:a7a:83f8:cfd5 with SMTP id a640c23a62f3a-a8366c31b00mr116566366b.18.1723620440175;
-        Wed, 14 Aug 2024 00:27:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFWLP3dpgqeL2l8ABzufX/5DIla/d7Ejaojfhfx0OWK/1bdtH+0ljIF9zLiuDaMf7faqOl25Q==
-X-Received: by 2002:a17:907:e6cb:b0:a7a:83f8:cfd5 with SMTP id a640c23a62f3a-a8366c31b00mr116563466b.18.1723620439327;
-        Wed, 14 Aug 2024 00:27:19 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:346:dcde:9c09:aa95:551d:d374])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f411d225sm137283666b.107.2024.08.14.00.27.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 00:27:18 -0700 (PDT)
-Date: Wed, 14 Aug 2024 03:27:14 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: dtatulea@nvidia.com, lingshan.zhu@intel.com, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token
- correctly
-Message-ID: <20240814032700-mutt-send-email-mst@kernel.org>
-References: <20240808082044.11356-1-jasowang@redhat.com>
+        d=1e100.net; s=20230601; t=1723620615; x=1724225415;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gZjg8zveGCIUd8Xm20UvhZjkI4TEvCstRkn7S7YAXGA=;
+        b=LzaynaOWqvew7AA6RgOVrBSsMIsuhvf7j/uQ/AkGx4TD2S67i9UiZJAgYIJXTyrlmE
+         l7rmYW3X/y22+EZKimFz3r1hwVWrpd3OfZFP+MTdYXD/puzZFp8r99VjF6nqbHk1ZuFV
+         C0gN3CqdV4TU/1hwsAfjwRPP5bZg8WRUwxjyZgNSo68QBa+kUCjJzuKbQZonWxnTT4+b
+         U7KhGt92n2A/8fiiH7q+IAAG8SmoC6sL/6QWC2rgveUQRK7WcOp/oDsJNQP46CJ/12tM
+         4iR9U6OsYDqRDIfmnwfbJxQx7H65Smbuw4/jOyJGW8o8b70dTRXdhDcFC0R8WD6CyC0V
+         O8hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKZFOPToJhdVK23rXCPaO1WsXyKxXtXVuNrpACTzWGo0gkJgLcecs1F9JpQZTOhJTuB9jnZxhQX+84H4ZB2/FEYkg0UByVkqXH2nRBHV5JxImGKKd+ulvJUQ7+8MfroxS9jWH0RQfaEgGC7en8uHqeUlCWkXq+kmnAbNo3dmojSA==
+X-Gm-Message-State: AOJu0Yy4yvdhn2rZ8liHfeWJgqIz7fszgwsCISyvCc2A3FNNH90acqDf
+	p6FnNQbcbuduZxz8LoGSdqM1s/+X3dwVuvsIXg+HDJFISpyxyf8I
+X-Google-Smtp-Source: AGHT+IF9vetZEBq79rLwnfC3eNHkEvNAwOlqnrjH9+Gl+rQcBXi7+FTtVhF9PCJKqZ3PQov6/++wHw==
+X-Received: by 2002:a17:902:f687:b0:1f8:6bae:28f with SMTP id d9443c01a7336-201d638cec6mr29496275ad.9.1723620615271;
+        Wed, 14 Aug 2024 00:30:15 -0700 (PDT)
+Received: from smtpclient.apple ([2001:e60:a406:4828:124:7d18:f674:4bb1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201cd1a94b1sm24050485ad.122.2024.08.14.00.30.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Aug 2024 00:30:14 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Jeongjun Park <aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240808082044.11356-1-jasowang@redhat.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH net,v3] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Wed, 14 Aug 2024 16:30:02 +0900
+Message-Id: <75AFEC8C-C050-4AC4-AF63-0B798B040502@gmail.com>
+References: <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
+Cc: davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com,
+ gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+f69bfae0a4eb29976e44@syzkaller.appspotmail.com,
+ tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+In-Reply-To: <4eeb32b7-d750-4c39-87df-43fd8365f163@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+X-Mailer: iPhone Mail (21F90)
 
-On Thu, Aug 08, 2024 at 04:20:44PM +0800, Jason Wang wrote:
-> We used to call irq_bypass_unregister_producer() in
-> vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
-> token pointer is still valid or not.
-> 
-> Actually, we use the eventfd_ctx as the token so the life cycle of the
-> token should be bound to the VHOST_SET_VRING_CALL instead of
-> vhost_vdpa_setup_vq_irq() which could be called by set_status().
-> 
-> Fixing this by setting up  irq bypass producer's token when handling
-> VHOST_SET_VRING_CALL and un-registering the producer before calling
-> vhost_vring_ioctl() to prevent a possible use after free as eventfd
-> could have been released in vhost_vring_ioctl().
-> 
-> Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Want to post a non-RFC version?
 
-> ---
-> Note for Dragos: Please check whether this fixes your issue. I
-> slightly test it with vp_vdpa in L2.
-> ---
->  drivers/vhost/vdpa.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index e31ec9ebc4ce..388226a48bcc 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
->  	if (irq < 0)
->  		return;
->  
-> -	irq_bypass_unregister_producer(&vq->call_ctx.producer);
->  	if (!vq->call_ctx.ctx)
->  		return;
->  
-> -	vq->call_ctx.producer.token = vq->call_ctx.ctx;
->  	vq->call_ctx.producer.irq = irq;
->  	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
->  	if (unlikely(ret))
-> @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->  			vq->last_avail_idx = vq_state.split.avail_index;
->  		}
->  		break;
-> +	case VHOST_SET_VRING_CALL:
-> +		if (vq->call_ctx.ctx) {
-> +			vhost_vdpa_unsetup_vq_irq(v, idx);
-> +			vq->call_ctx.producer.token = NULL;
-> +		}
-> +		break;
->  	}
->  
->  	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
-> @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->  			cb.callback = vhost_vdpa_virtqueue_cb;
->  			cb.private = vq;
->  			cb.trigger = vq->call_ctx.ctx;
-> +			vq->call_ctx.producer.token = vq->call_ctx.ctx;
-> +			vhost_vdpa_setup_vq_irq(v, idx);
->  		} else {
->  			cb.callback = NULL;
->  			cb.private = NULL;
->  			cb.trigger = NULL;
->  		}
->  		ops->set_vq_cb(vdpa, idx, &cb);
-> -		vhost_vdpa_setup_vq_irq(v, idx);
->  		break;
->  
->  	case VHOST_SET_VRING_NUM:
-> @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->  	for (i = 0; i < nvqs; i++) {
->  		vqs[i] = &v->vqs[i];
->  		vqs[i]->handle_kick = handle_vq_kick;
-> +		vqs[i]->call_ctx.ctx = NULL;
->  	}
->  	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
->  		       vhost_vdpa_process_iotlb_msg);
-> -- 
-> 2.31.1
+> D. Wythe wrote:
+>=20
+> =EF=BB=BF
+>=20
+>> On 8/14/24 11:58 AM, Jeongjun Park wrote:
+>> Because clcsk_*, like clcsock, is initialized during the smc init process=
+,
+>> the code was moved to prevent clcsk_* from having an address like
+>> inet_sk(sk)->pinet6, thereby preventing the previously initialized values=
 
+>> =E2=80=8B=E2=80=8Bfrom being tampered with.
+>=20
+> I don't agree with your approach, but I finally got the problem you descri=
+bed. In fact, the issue here is that smc_sock should also be an inet_sock, w=
+hereas currently it's just a sock. Therefore, the best solution would be to e=
+mbed an inet_sock within smc_sock rather than performing this movement as yo=
+u suggested.
+>=20
+> struct smc_sock {               /* smc sock container */
+>     union {
+>         struct sock         sk;
+>         struct inet_sock    inet;
+>     };
+>=20
+>     ...
+>=20
+> Thanks.
+> D. Wythe
+>=20
+
+Wow, I didn't know this could be done this way. I'll test it with that code=20=
+
+and get back to you
+
+Regards,
+Jeongjun Park
+
+>=20
+>>=20
+>> Additionally, if you don't need alignment in smc_inet6_prot , I'll modify=
+
+>> the patch to only add the necessary code without alignment.
+>>=20
+>> Regards,
+>> Jeongjun Park
+>=20
+>=20
+>>>=20
+>>>> Also, regarding alignment, it's okay for me whether it's aligned or
+>>>> not=EF=BC=8CBut I checked the styles of other types of
+>>>> structures and did not strictly require alignment, so I now feel that
+>>>> there is no need to
+>>>> modify so much to do alignment.
+>>>>=20
+>>>> D. Wythe
+>>>=20
+>>>=20
+>>>>>>> +
+>>>>>>>    static struct proto smc_inet6_prot =3D {
+>>>>>>> -     .name           =3D "INET6_SMC",
+>>>>>>> -     .owner          =3D THIS_MODULE,
+>>>>>>> -     .init           =3D smc_inet_init_sock,
+>>>>>>> -     .hash           =3D smc_hash_sk,
+>>>>>>> -     .unhash         =3D smc_unhash_sk,
+>>>>>>> -     .release_cb     =3D smc_release_cb,
+>>>>>>> -     .obj_size       =3D sizeof(struct smc_sock),
+>>>>>>> -     .h.smc_hash     =3D &smc_v6_hashinfo,
+>>>>>>> -     .slab_flags     =3D SLAB_TYPESAFE_BY_RCU,
+>>>>>>> +     .name                           =3D "INET6_SMC",
+>>>>>>> +     .owner                          =3D THIS_MODULE,
+>>>>>>> +     .init                           =3D smc_inet_init_sock,
+>>>>>>> +     .hash                           =3D smc_hash_sk,
+>>>>>>> +     .unhash                         =3D smc_unhash_sk,
+>>>>>>> +     .release_cb                     =3D smc_release_cb,
+>>>>>>> +     .obj_size                       =3D sizeof(struct smc6_sock),
+>>>>>>> +     .h.smc_hash                     =3D &smc_v6_hashinfo,
+>>>>>>> +     .slab_flags                     =3D SLAB_TYPESAFE_BY_RCU,
+>>>>>>> +     .ipv6_pinfo_offset              =3D offsetof(struct smc6_sock,=
+
+>>>>>>> np),
+>>>>>>>    };
+>>>>>>>=20
+>>>>>>>    static const struct proto_ops smc_inet6_stream_ops =3D {
+>>>>>>> --
+>=20
 
