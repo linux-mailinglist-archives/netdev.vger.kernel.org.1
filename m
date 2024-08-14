@@ -1,76 +1,87 @@
-Return-Path: <netdev+bounces-118481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3212E951B7F
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:10:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06356951B5B
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 15:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B03431F246A2
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:10:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8952C1F23BED
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 13:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61F11B29DE;
-	Wed, 14 Aug 2024 13:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021971AED2E;
+	Wed, 14 Aug 2024 13:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U5IFbey6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LbiwJv0d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D6B1B29D4
-	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3308F1109
+	for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 13:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723640977; cv=none; b=ZuXsMzU/plpvfsUqAHkyOruKviOlpZLJLlnCanuf28fJibIAS1DsFW127QjuEYAZq6GD2HnJvJVK+G5x+uKY+C754kbXqZ1sUflzM82g7Uo40D8QLwr0wRKBG7AWp+LKQuYdJ3nJWVjauQfttkImk9mTy5jyZWZiH202QDA4vw8=
+	t=1723640796; cv=none; b=aNL1efXDH+Vi8G8nn51m4LPwxtODaxnWm4aFUW4masl6xs+9RM2VqYh2isr4wTPA4ZAeag06tNsUUgkjXP/FgMOdh+8ZDNLiKc0EVn9wne0iMERXwCLPH6TRmRfFYB4fpAgFZV6x1lOE3uvhhU9ZkFv6AdmuJJnN5ISpyp2H/wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723640977; c=relaxed/simple;
-	bh=+eVWypsTV9e4bjQWBZrCnsQfyOd4izCUkhvv5CKscGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LT9237YAje8ZogCkeHmR6XrEa4gt5S1iiDMo7zuiMtLJ4Kq82IIXS7JqElHIDSIBXXyIgymyhpe75IgXkJwTmOViHH2XUk8EpkVYa3jKNrEUfMgYRUmbAF+o6d7CXOpoSmMI0J3aZjEdRhZ9+V2FmxWfiAR0SoMTa58Y6FNhaRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U5IFbey6; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723640975; x=1755176975;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+eVWypsTV9e4bjQWBZrCnsQfyOd4izCUkhvv5CKscGQ=;
-  b=U5IFbey6q3HcfFTfJjh6R/awVnKCIgtGhPjW5CJWW7NcbMRkS5WgE0Wm
-   hFmqLXuKMH/fw1PEsu10kR7oTYSmBEM3yvqRzDk5AHitGIdswnSEhAhHs
-   h55xG5k1nu8f1IkE1ToRMf5CQfvsWZ2mPrTVYFy8mNQd+c577Svd+r9BL
-   iWjN/S4L23gLV4raDA4b/mz0GqD5GlUvuFJ+Zro2J72n/3yKUFpqxLwgZ
-   Gz4loshBClTug49X5StPnjeMotHK+M7pu0TpFC6CocM0kjg3/gvvE7lpr
-   I3o2GCaqvDleTyty8Ew2at+fqMgZq3lYpWrUYHFOEX4aMvyVYbQxSHKhl
-   g==;
-X-CSE-ConnectionGUID: fM+5kT0bSZGirZgvYRlmsQ==
-X-CSE-MsgGUID: +hnOQFf6RkiGnahbKRcDcA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="25658826"
-X-IronPort-AV: E=Sophos;i="6.10,145,1719903600"; 
-   d="scan'208";a="25658826"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 06:09:35 -0700
-X-CSE-ConnectionGUID: iFmNirLBRO6E/skOTY6lyA==
-X-CSE-MsgGUID: BABGOYl+QlmTI26g5ZG7ew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,145,1719903600"; 
-   d="scan'208";a="59009733"
-Received: from unknown (HELO kkolacin-desk1.igk.intel.com) ([10.217.160.108])
-  by fmviesa009.fm.intel.com with ESMTP; 14 Aug 2024 06:09:33 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v6 iwl-next 6/6] ice: combine cross timestamp functions for E82x and E830
-Date: Wed, 14 Aug 2024 15:05:44 +0200
-Message-ID: <20240814130918.58444-14-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240814130918.58444-8-karol.kolacinski@intel.com>
-References: <20240814130918.58444-8-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1723640796; c=relaxed/simple;
+	bh=gvdtm+x/U1EFEgJT04Hh8fiZkjIEvzAJ89d7XSrLkUo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UD7Bk79N5UN+sRNuN9aTH4afZBWXe11XaJgM7Su7BF5/hIZvvWi3OmI5Pz76X8/liXVKlX6nqhethA8f28Z8kPMHFf16O5Jn0s1x/rr6akN5AMGHEGA0HReR8lXiBi2IvZIGBv7FYBc9XE+Fg45Qlcgr5l7CZBKR5unh2HrQXPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LbiwJv0d; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d28023accso5303671b3a.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 06:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1723640794; x=1724245594; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6HoN464ahMlnHnNoGzSGItWS0vo11BXE09zi0AeEArk=;
+        b=LbiwJv0dbXMN++y+loha2r6J2cf952qwJGk/ivjlJJcTaFRVb/orjRkSzKnLnwqQxt
+         FB+y3MYOMmYCE0/61z+CvVMIdIum8SKYnqdypCJ+XPd/6721UDsniGi+ENC97qTmkVBM
+         rrPRqGhI9QvFaW1PNwda2wTbu6u4rxFGxngSQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723640794; x=1724245594;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6HoN464ahMlnHnNoGzSGItWS0vo11BXE09zi0AeEArk=;
+        b=LSQB5OCjhQUGjNn/zPqEaMiP+0AldOWzrk0UfDq0EwyS1Pt1v87K+/gbhmgknRhtTz
+         G6uc6PpN5srRsHv2i3qk5Es0xXF0o+qUjQ2FIXB1WqOYkUNewXGOakVuzmIJm6AQGPYw
+         4pPKooLifx6OFBbDyFpXIA6CFmVKmXgV1On3DFN741aeS4MeOu/Nbt8dya4/iCdvs3tV
+         rJTKScPX7p+0/Tx9UxzyOWRNb+nSzUgQSsNGtY43Ox9QtanFv4WpsYx7BOAVTFaW1ITJ
+         NUEtIkyu+vUYCorVHLLHxmzIcSTjQ3oCTBchqF8WAeqt5TbPn2cBSwND2oPALHma/pll
+         p1Tg==
+X-Gm-Message-State: AOJu0YzAWurND0wpCMc65/1uibbD6Y20ygYoBN19xBkdRr1XQ0Q3TVb+
+	rIJjIU5+YPMFw9PZpf2SIfrDPf33oxgG3hpOG4sAd2HKxKsB09sc/vGbl6xaeOQwrlJynWQe5Xz
+	ET/wiS88KFfr+YxcHnf0iUihLk54dOtAa5LVjY48FSY19qiJXIb40rBYd0UKtqhbbBbB3/ceXSw
+	MJDRrPFgS40y2H/iG7yO+9iX08PSSUnS4sB/HZUYsCERgrrf8B
+X-Google-Smtp-Source: AGHT+IFMbYekOC+ymTuJCU4XsDX67jFSkwDlRv2AJkUNP9+QjwRqyNrfnq0yWjxp/H2nbL5FaxOTbQ==
+X-Received: by 2002:a05:6a00:4fd6:b0:710:6f54:bc9c with SMTP id d2e1a72fcca58-712670f78d2mr3577411b3a.2.1723640793532;
+        Wed, 14 Aug 2024 06:06:33 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.250.250])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-711841effe9sm4904543b3a.31.2024.08.14.06.06.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 06:06:32 -0700 (PDT)
+From: Boris Sukholitko <boris.sukholitko@broadcom.com>
+To: netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Mina Almasry <almasrymina@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Howells <dhowells@redhat.com>
+Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
+Subject: [PATCH net-next v2 0/6] tc: adjust network header after 2nd vlan push
+Date: Wed, 14 Aug 2024 16:06:12 +0300
+Message-ID: <20240814130618.2885431-1-boris.sukholitko@broadcom.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,439 +90,189 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+<tldr>
+skb network header of the single-tagged vlan packet continues to point the
+vlan payload (e.g. IP) after second vlan tag is pushed by tc act_vlan. This
+causes problem at the dissector which expects double-tagged packet network
+header to point to the inner vlan.
 
-The E830 and E82x devices use essentially the same logic for performing
-a crosstimestamp. The only difference is that E830 hardware has
-different offsets. Instead of having two implementations, combine them
-into a single ice_capture_crosststamp() function.
+The fix is to adjust network header in tcf_act_vlan.c but requires
+refactoring of skb_vlan_push function.
+</tldr>
 
-Also combine the wrapper functions which call
-get_device_system_crosststamp() into a single ice_ptp_getcrosststamp()
-function.
+Consider the following shell script snippet configuring TC rules on the
+veth interface:
 
-To support both hardware types, the ice_capture_crosststamp function
-must be able to determine the appropriate registers to access. To handle
-this, pass a custom context structure instead of the PF pointer. This
-structure, ice_crosststamp_ctx, contains a pointer to the PF, and
-a pointer to the device configuration structure. This new structure also
-will make it easier to implement historic snapshot support in a future
-commit.
+ip link add veth0 type veth peer veth1
+ip link set veth0 up
+ip link set veth1 up
 
-The device configuration structure is a static const data which defines
-the offsets and flags for the various registers. This includes the lock
-register, the cross timestamp control register, the upper and lower ART
-system time capture registers, and the upper and lower device time
-capture registers for each timer index.
+tc qdisc add dev veth0 clsact
 
-This does add extra data to the .text of the module (and thus kernel),
-but it also removes 2 near duplicate functions for enabling E830
-support.
+tc filter add dev veth0 ingress pref 10 chain 0 flower \
+	num_of_vlans 2 cvlan_ethtype 0x800 action goto chain 5
+tc filter add dev veth0 ingress pref 20 chain 0 flower \
+	num_of_vlans 1 action vlan push id 100 \
+	protocol 0x8100 action goto chain 5
+tc filter add dev veth0 ingress pref 30 chain 5 flower \
+	num_of_vlans 2 cvlan_ethtype 0x800 action simple sdata "success"
 
-Use the configuration structure to access all of the registers in
-ice_capture_crosststamp(). Ensure that we don't over-run the device time
-array by checking that the timer index is 0 or 1. Previously this was
-simply assumed, and it would cause the device to read an incorrect and
-likely garbage register.
+Sending double-tagged vlan packet with the IP payload inside:
 
-It does feel like there should be a kernel interface for managing
-register offsets like this, but the closest thing I saw was
-<linux/regmap.h> which is interesting but not quite what we're looking
-for...
+cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
+0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 64   ..........."...d
+0010  81 00 00 14 08 00 45 04 00 26 04 d2 00 00 7f 11   ......E..&......
+0020  18 ef 0a 00 00 01 14 00 00 02 00 00 00 00 00 12   ................
+0030  e1 c7 00 00 00 00 00 00 00 00 00 00               ............
+ENDS
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V4 -> V5: Removed unnecessary CPU features check for SoCs (E82X) and
-          X86_FEATURE_TSC_KNOWN_FREQ check for E830
+will match rule 10, goto rule 30 in chain 5 and correctly emit "success" to
+the dmesg.
 
- drivers/net/ethernet/intel/Kconfig            |   2 +-
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
- drivers/net/ethernet/intel/ice/ice_main.c     |   7 +
- drivers/net/ethernet/intel/ice/ice_ptp.c      | 246 ++++++++++++------
- 4 files changed, 187 insertions(+), 76 deletions(-)
+OTOH, sending single-tagged vlan packet:
 
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 0375c7448a57..90415fe785ac 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -334,7 +334,7 @@ config ICE_SWITCHDEV
- config ICE_HWTS
- 	bool "Support HW cross-timestamp on platforms with PTM support"
- 	default y
--	depends on ICE && X86
-+	depends on ICE && X86 && PCIE_PTM
- 	help
- 	  Say Y to enable hardware supported cross-timestamping on platforms
- 	  with PCIe PTM support. The cross-timestamp is available through
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 646089f3e26c..495b182ea13b 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -541,6 +541,14 @@
- #define E830_PRTMAC_CL01_QNT_THR_CL0_M		GENMASK(15, 0)
- #define E830_PRTTSYN_TXTIME_H(_i)		(0x001E5800 + ((_i) * 32))
- #define E830_PRTTSYN_TXTIME_L(_i)		(0x001E5000 + ((_i) * 32))
-+#define E830_GLPTM_ART_CTL			0x00088B50
-+#define E830_GLPTM_ART_CTL_ACTIVE_M		BIT(0)
-+#define E830_GLPTM_ART_TIME_H			0x00088B54
-+#define E830_GLPTM_ART_TIME_L			0x00088B58
-+#define E830_GLTSYN_PTMTIME_H(_i)		(0x00088B48 + ((_i) * 4))
-+#define E830_GLTSYN_PTMTIME_L(_i)		(0x00088B40 + ((_i) * 4))
-+#define E830_PFPTM_SEM				0x00088B00
-+#define E830_PFPTM_SEM_BUSY_M			BIT(0)
- #define VFINT_DYN_CTLN(_i)			(0x00003800 + ((_i) * 4))
- #define VFINT_DYN_CTLN_CLEARPBA_M		BIT(1)
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 9108613dcac3..ef322f846f1b 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5042,6 +5042,12 @@ static int ice_init(struct ice_pf *pf)
- 	if (err)
- 		return err;
- 
-+	if (pf->hw.mac_type == ICE_MAC_E830) {
-+		err = pci_enable_ptm(pf->pdev, NULL);
-+		if (err)
-+			dev_dbg(ice_pf_to_dev(pf), "PCIe PTM not supported by PCIe bus/controller\n");
-+	}
-+
- 	err = ice_alloc_vsis(pf);
- 	if (err)
- 		goto err_alloc_vsis;
-@@ -5272,6 +5278,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 	hw->subsystem_device_id = pdev->subsystem_device;
- 	hw->bus.device = PCI_SLOT(pdev->devfn);
- 	hw->bus.func = PCI_FUNC(pdev->devfn);
-+
- 	ice_set_ctrlq_len(hw);
- 
- 	pf->msg_enable = netif_msg_init(debug, ICE_DFLT_NETIF_M);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index b438647717cc..765ec175941d 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2144,93 +2144,157 @@ static int ice_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
- 	return 0;
- }
- 
-+/**
-+ * struct ice_crosststamp_cfg - Device cross timestamp configuration
-+ * @lock_reg: The hardware semaphore lock to use
-+ * @lock_busy: Bit in the semaphore lock indicating the lock is busy
-+ * @ctl_reg: The hardware register to request cross timestamp
-+ * @ctl_active: Bit in the control register to request cross timestamp
-+ * @art_time_l: Lower 32-bits of ART system time
-+ * @art_time_h: Upper 32-bits of ART system time
-+ * @dev_time_l: Lower 32-bits of device time (per timer index)
-+ * @dev_time_h: Upper 32-bits of device time (per timer index)
-+ */
-+struct ice_crosststamp_cfg {
-+	/* HW semaphore lock register */
-+	u32 lock_reg;
-+	u32 lock_busy;
-+
-+	/* Capture control register */
-+	u32 ctl_reg;
-+	u32 ctl_active;
-+
-+	/* Time storage */
-+	u32 art_time_l;
-+	u32 art_time_h;
-+	u32 dev_time_l[2];
-+	u32 dev_time_h[2];
-+};
-+
-+static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e82x = {
-+	.lock_reg = PFHH_SEM,
-+	.lock_busy = PFHH_SEM_BUSY_M,
-+	.ctl_reg = GLHH_ART_CTL,
-+	.ctl_active = GLHH_ART_CTL_ACTIVE_M,
-+	.art_time_l = GLHH_ART_TIME_L,
-+	.art_time_h = GLHH_ART_TIME_H,
-+	.dev_time_l[0] = GLTSYN_HHTIME_L(0),
-+	.dev_time_h[0] = GLTSYN_HHTIME_H(0),
-+	.dev_time_l[1] = GLTSYN_HHTIME_L(1),
-+	.dev_time_h[1] = GLTSYN_HHTIME_H(1),
-+};
-+
- #ifdef CONFIG_ICE_HWTS
-+static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e830 = {
-+	.lock_reg = E830_PFPTM_SEM,
-+	.lock_busy = E830_PFPTM_SEM_BUSY_M,
-+	.ctl_reg = E830_GLPTM_ART_CTL,
-+	.ctl_active = E830_GLPTM_ART_CTL_ACTIVE_M,
-+	.art_time_l = E830_GLPTM_ART_TIME_L,
-+	.art_time_h = E830_GLPTM_ART_TIME_H,
-+	.dev_time_l[0] = E830_GLTSYN_PTMTIME_L(0),
-+	.dev_time_h[0] = E830_GLTSYN_PTMTIME_H(0),
-+	.dev_time_l[1] = E830_GLTSYN_PTMTIME_L(1),
-+	.dev_time_h[1] = E830_GLTSYN_PTMTIME_H(1),
-+};
-+
-+#endif /* CONFIG_ICE_HWTS */
-+/**
-+ * struct ice_crosststamp_ctx - Device cross timestamp context
-+ * @snapshot: snapshot of system clocks for historic interpolation
-+ * @pf: pointer to the PF private structure
-+ * @cfg: pointer to hardware configuration for cross timestamp
-+ */
-+struct ice_crosststamp_ctx {
-+	struct system_time_snapshot snapshot;
-+	struct ice_pf *pf;
-+	const struct ice_crosststamp_cfg *cfg;
-+};
-+
- /**
-- * ice_ptp_get_syncdevicetime - Get the cross time stamp info
-+ * ice_capture_crosststamp - Capture a device/system cross timestamp
-  * @device: Current device time
-  * @system: System counter value read synchronously with device time
-- * @ctx: Context provided by timekeeping code
-+ * @__ctx: Context passed from ice_ptp_getcrosststamp
-  *
-  * Read device and system (ART) clock simultaneously and return the corrected
-  * clock values in ns.
-+ *
-+ * Return: zero on success, or a negative error code on failure.
-  */
--static int
--ice_ptp_get_syncdevicetime(ktime_t *device,
--			   struct system_counterval_t *system,
--			   void *ctx)
-+static int ice_capture_crosststamp(ktime_t *device,
-+				   struct system_counterval_t *system,
-+				   void *__ctx)
- {
--	struct ice_pf *pf = (struct ice_pf *)ctx;
--	struct ice_hw *hw = &pf->hw;
--	u32 hh_lock, hh_art_ctl;
--	int i;
-+	struct ice_crosststamp_ctx *ctx = __ctx;
-+	const struct ice_crosststamp_cfg *cfg;
-+	u32 lock, ctl, ts_lo, ts_hi, tmr_idx;
-+	struct ice_pf *pf;
-+	struct ice_hw *hw;
-+	int err;
-+	u64 ts;
- 
--#define MAX_HH_HW_LOCK_TRIES	5
--#define MAX_HH_CTL_LOCK_TRIES	100
-+	cfg = ctx->cfg;
-+	pf = ctx->pf;
-+	hw = &pf->hw;
- 
--	for (i = 0; i < MAX_HH_HW_LOCK_TRIES; i++) {
--		/* Get the HW lock */
--		hh_lock = rd32(hw, PFHH_SEM + (PFTSYN_SEM_BYTES * hw->pf_id));
--		if (hh_lock & PFHH_SEM_BUSY_M) {
--			usleep_range(10000, 15000);
--			continue;
--		}
--		break;
--	}
--	if (hh_lock & PFHH_SEM_BUSY_M) {
--		dev_err(ice_pf_to_dev(pf), "PTP failed to get hh lock\n");
-+	tmr_idx = hw->func_caps.ts_func_info.tmr_index_assoc;
-+	if (tmr_idx > 1)
-+		return -EINVAL;
-+
-+	/* Poll until we obtain the cross-timestamp hardware semaphore */
-+	err = rd32_poll_timeout(hw, cfg->lock_reg, lock,
-+				!(lock & cfg->lock_busy),
-+				10 * USEC_PER_MSEC, 50 * USEC_PER_MSEC);
-+	if (err) {
-+		dev_err(ice_pf_to_dev(pf), "PTP failed to get cross timestamp lock\n");
- 		return -EBUSY;
- 	}
- 
-+	/* Snapshot system time for historic interpolation */
-+	ktime_get_snapshot(&ctx->snapshot);
-+
- 	/* Program cmd to master timer */
- 	ice_ptp_src_cmd(hw, ICE_PTP_READ_TIME);
- 
- 	/* Start the ART and device clock sync sequence */
--	hh_art_ctl = rd32(hw, GLHH_ART_CTL);
--	hh_art_ctl = hh_art_ctl | GLHH_ART_CTL_ACTIVE_M;
--	wr32(hw, GLHH_ART_CTL, hh_art_ctl);
--
--	for (i = 0; i < MAX_HH_CTL_LOCK_TRIES; i++) {
--		/* Wait for sync to complete */
--		hh_art_ctl = rd32(hw, GLHH_ART_CTL);
--		if (hh_art_ctl & GLHH_ART_CTL_ACTIVE_M) {
--			udelay(1);
--			continue;
--		} else {
--			u32 hh_ts_lo, hh_ts_hi, tmr_idx;
--			u64 hh_ts;
--
--			tmr_idx = hw->func_caps.ts_func_info.tmr_index_assoc;
--			/* Read ART time */
--			hh_ts_lo = rd32(hw, GLHH_ART_TIME_L);
--			hh_ts_hi = rd32(hw, GLHH_ART_TIME_H);
--			hh_ts = ((u64)hh_ts_hi << 32) | hh_ts_lo;
--			system->cycles = hh_ts;
--			system->cs_id = CSID_X86_ART;
--			/* Read Device source clock time */
--			hh_ts_lo = rd32(hw, GLTSYN_HHTIME_L(tmr_idx));
--			hh_ts_hi = rd32(hw, GLTSYN_HHTIME_H(tmr_idx));
--			hh_ts = ((u64)hh_ts_hi << 32) | hh_ts_lo;
--			*device = ns_to_ktime(hh_ts);
--			break;
--		}
--	}
-+	ctl = rd32(hw, cfg->ctl_reg);
-+	ctl |= cfg->ctl_active;
-+	wr32(hw, cfg->ctl_reg, ctl);
- 
-+	/* Poll until hardware completes the capture */
-+	err = rd32_poll_timeout(hw, cfg->ctl_reg, ctl, !(ctl & cfg->ctl_active),
-+				5, 20 * USEC_PER_MSEC);
-+	if (err)
-+		goto err_timeout;
-+
-+	/* Read ART system time */
-+	ts_lo = rd32(hw, cfg->art_time_l);
-+	ts_hi = rd32(hw, cfg->art_time_h);
-+	ts = ((u64)ts_hi << 32) | ts_lo;
-+	system->cycles = ts;
-+	system->cs_id = CSID_X86_ART;
-+
-+	/* Read Device source clock time */
-+	ts_lo = rd32(hw, cfg->dev_time_l[tmr_idx]);
-+	ts_hi = rd32(hw, cfg->dev_time_h[tmr_idx]);
-+	ts = ((u64)ts_hi << 32) | ts_lo;
-+	*device = ns_to_ktime(ts);
-+
-+err_timeout:
- 	/* Clear the master timer */
- 	ice_ptp_src_cmd(hw, ICE_PTP_NOP);
- 
- 	/* Release HW lock */
--	hh_lock = rd32(hw, PFHH_SEM + (PFTSYN_SEM_BYTES * hw->pf_id));
--	hh_lock = hh_lock & ~PFHH_SEM_BUSY_M;
--	wr32(hw, PFHH_SEM + (PFTSYN_SEM_BYTES * hw->pf_id), hh_lock);
--
--	if (i == MAX_HH_CTL_LOCK_TRIES)
--		return -ETIMEDOUT;
-+	lock = rd32(hw, cfg->lock_reg);
-+	lock &= ~cfg->lock_busy;
-+	wr32(hw, cfg->lock_reg, lock);
- 
--	return 0;
-+	return err;
- }
- 
- /**
-- * ice_ptp_getcrosststamp_e82x - Capture a device cross timestamp
-+ * ice_ptp_getcrosststamp - Capture a device cross timestamp
-  * @info: the driver's PTP info structure
-  * @cts: The memory to fill the cross timestamp info
-  *
-@@ -2238,22 +2302,36 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
-  * clock. Fill the cross timestamp information and report it back to the
-  * caller.
-  *
-- * This is only valid for E822 and E823 devices which have support for
-- * generating the cross timestamp via PCIe PTM.
-- *
-  * In order to correctly correlate the ART timestamp back to the TSC time, the
-  * CPU must have X86_FEATURE_TSC_KNOWN_FREQ.
-+ *
-+ * Return: zero on success, or a negative error code on failure.
-  */
--static int
--ice_ptp_getcrosststamp_e82x(struct ptp_clock_info *info,
--			    struct system_device_crosststamp *cts)
-+static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
-+				  struct system_device_crosststamp *cts)
- {
- 	struct ice_pf *pf = ptp_info_to_pf(info);
-+	struct ice_crosststamp_ctx ctx = {
-+		.pf = pf,
-+	};
- 
--	return get_device_system_crosststamp(ice_ptp_get_syncdevicetime,
--					     pf, NULL, cts);
--}
-+	switch (pf->hw.mac_type) {
-+	case ICE_MAC_GENERIC:
-+	case ICE_MAC_GENERIC_3K_E825:
-+		ctx.cfg = &ice_crosststamp_cfg_e82x;
-+		break;
-+#ifdef CONFIG_ICE_HWTS
-+	case ICE_MAC_E830:
-+		ctx.cfg = &ice_crosststamp_cfg_e830;
-+		break;
- #endif /* CONFIG_ICE_HWTS */
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return get_device_system_crosststamp(ice_capture_crosststamp, &ctx,
-+					     &ctx.snapshot, cts);
-+}
- 
- /**
-  * ice_ptp_get_ts_config - ioctl interface to read the timestamping config
-@@ -2528,12 +2606,8 @@ static int ice_ptp_parse_sdp_entries(struct ice_pf *pf, __le16 *entries,
-  */
- static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
- {
--#ifdef CONFIG_ICE_HWTS
--	if (boot_cpu_has(X86_FEATURE_ART) &&
--	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
--		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp_e82x;
-+	pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
- 
--#endif /* CONFIG_ICE_HWTS */
- 	if (pf->hw.mac_type == ICE_MAC_GENERIC_3K_E825) {
- 		pf->ptp.ice_pin_desc = ice_pin_desc_e825c;
- 		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e825c);
-@@ -2600,6 +2674,26 @@ static void ice_ptp_set_funcs_e810(struct ice_pf *pf)
- 	}
- }
- 
-+/**
-+ * ice_ptp_set_funcs_e830 - Set specialized functions for E830 support
-+ * @pf: Board private structure
-+ *
-+ * Assign functions to the PTP capabiltiies structure for E830 devices.
-+ * Functions which operate across all device families should be set directly
-+ * in ice_ptp_set_caps. Only add functions here which are distinct for E830
-+ * devices.
-+ */
-+static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
-+{
-+#ifdef CONFIG_ICE_HWTS
-+	if (pcie_ptm_enabled(pf->pdev) && boot_cpu_has(X86_FEATURE_ART))
-+		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
-+
-+#endif /* CONFIG_ICE_HWTS */
-+	/* Rest of the config is the same as base E810 */
-+	ice_ptp_set_funcs_e810(pf);
-+}
-+
- /**
-  * ice_ptp_set_caps - Set PTP capabilities
-  * @pf: Board private structure
-@@ -2624,9 +2718,11 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 
- 	switch (pf->hw.mac_type) {
- 	case ICE_MAC_E810:
--	case ICE_MAC_E830:
- 		ice_ptp_set_funcs_e810(pf);
- 		return;
-+	case ICE_MAC_E830:
-+		ice_ptp_set_funcs_e830(pf);
-+		return;
- 	case ICE_MAC_GENERIC:
- 	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_set_funcs_e82x(pf);
+cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
+0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 14   ..........."....
+0010  08 00 45 04 00 2a 04 d2 00 00 7f 11 18 eb 0a 00   ..E..*..........
+0020  00 01 14 00 00 02 00 00 00 00 00 16 e1 bf 00 00   ................
+0030  00 00 00 00 00 00 00 00 00 00 00 00               ............
+ENDS
+
+will match rule 20, will push the second vlan tag but will *not* match
+rule 30. IOW, the match at rule 30 fails if the second vlan was freshly
+pushed by the kernel.
+
+Lets look at  __skb_flow_dissect working on the double-tagged vlan packet.
+Here is the relevant code from around net/core/flow_dissector.c:1277
+copy-pasted here for convenience:
+
+	if (dissector_vlan == FLOW_DISSECTOR_KEY_MAX &&
+	    skb && skb_vlan_tag_present(skb)) {
+		proto = skb->protocol;
+	} else {
+		vlan = __skb_header_pointer(skb, nhoff, sizeof(_vlan),
+					    data, hlen, &_vlan);
+		if (!vlan) {
+			fdret = FLOW_DISSECT_RET_OUT_BAD;
+			break;
+		}
+
+		proto = vlan->h_vlan_encapsulated_proto;
+		nhoff += sizeof(*vlan);
+	}
+
+The "else" clause above gets the protocol of the encapsulated packet from
+the skb data at the network header location. printk debugging has showed
+that in the good double-tagged packet case proto is
+htons(0x800 == ETH_P_IP) as expected. However in the single-tagged packet
+case proto is garbage leading to the failure to match tc filter 30.
+
+proto is being set from the skb header pointed by nhoff parameter which is
+defined at the beginning of __skb_flow_dissect
+(net/core/flow_dissector.c:1055 in the current version):
+
+		nhoff = skb_network_offset(skb);
+
+Therefore the culprit seems to be that the skb network offset is different
+between double-tagged packet received from the interface and single-tagged
+packet having its vlan tag pushed by TC.
+
+Lets look at the interesting points of the lifetime of the single/double
+tagged packets as they traverse our packet flow.
+
+Both of them will start at __netif_receive_skb_core where the first vlan
+tag will be stripped:
+
+	if (eth_type_vlan(skb->protocol)) {
+		skb = skb_vlan_untag(skb);
+		if (unlikely(!skb))
+			goto out;
+	}
+
+At this stage in double-tagged case skb->data points to the second vlan tag
+while in single-tagged case skb->data points to the network (eg. IP)
+header.
+
+Looking at TC vlan push action (net/sched/act_vlan.c) we have the following
+code at tcf_vlan_act (interesting points are in square brackets):
+
+	if (skb_at_tc_ingress(skb))
+[1]		skb_push_rcsum(skb, skb->mac_len);
+
+	....
+
+	case TCA_VLAN_ACT_PUSH:
+		err = skb_vlan_push(skb, p->tcfv_push_proto, p->tcfv_push_vid |
+				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
+				    0);
+		if (err)
+			goto drop;
+		break;
+
+	....
+
+out:
+	if (skb_at_tc_ingress(skb))
+[3]		skb_pull_rcsum(skb, skb->mac_len);
+
+And skb_vlan_push (net/core/skbuff.c:6204) function does:
+
+		err = __vlan_insert_tag(skb, skb->vlan_proto,
+					skb_vlan_tag_get(skb));
+		if (err)
+			return err;
+
+		skb->protocol = skb->vlan_proto;
+[2]		skb->mac_len += VLAN_HLEN;
+
+in the case of pushing the second tag. Lets look at what happens with
+skb->data of the single-tagged packet at each of the above points:
+
+1. As a result of the skb_push_rcsum, skb->data is moved back to the start
+   of the packet.
+
+2. First VLAN tag is moved from the skb into packet buffer, skb->mac_len is
+   incremented, skb->data still points to the start of the packet.
+
+3. As a result of the skb_pull_rcsum, skb->data is moved forward by the
+   modified skb->mac_len, thus pointing to the network header again.
+
+Then __skb_flow_dissect will get confused by having double-tagged vlan
+packet with the skb->data at the network header.
+
+Our solution for the bug is to preserve "skb->data at second vlan header"
+semantics in the act_vlan.c. We do this by manipulating skb->network_header
+rather than skb->mac_len in act_vlan.c. skb_reset_mac_len is done at the
+end.
+
+More about the patch series:
+
+* patches 1-3 refactor skb_vlan_push to make skb_vlan_flush helper
+* patch 4 open codes skb_vlan_push in act_vlan.c
+* patch 5 contains the actual fix
+* patch 6 adds test to tc_action.sh selftests
+
+Thanks,
+Boris.
+
+v2:
+    - add test to tc_actions.sh
+
+Boris Sukholitko (6):
+  skb: add skb_vlan_flush helper
+  skb: move mac_len adjustment out of skb_vlan_flush
+  skb: export skb_vlan_flush
+  act_vlan: open code skb_vlan_push
+  act_vlan: adjust network header
+  selftests: forwarding: tc_actions: test vlan flush
+
+ include/linux/skbuff.h                        |  1 +
+ net/core/skbuff.c                             | 38 ++++++++++++-------
+ net/sched/act_vlan.c                          | 12 ++++--
+ .../selftests/net/forwarding/tc_actions.sh    | 22 ++++++++++-
+ 4 files changed, 55 insertions(+), 18 deletions(-)
+
 -- 
-2.46.0
+2.42.0
 
 
