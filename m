@@ -1,166 +1,95 @@
-Return-Path: <netdev+bounces-118259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A812B95117E
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 03:18:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFEDF951185
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 03:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DF42283D35
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:18:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC336B23F21
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 01:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CC6C2FC;
-	Wed, 14 Aug 2024 01:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA99DE57E;
+	Wed, 14 Aug 2024 01:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="j06q4w+A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t1NJt4ku"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44A6EA4;
-	Wed, 14 Aug 2024 01:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D5BC2FC;
+	Wed, 14 Aug 2024 01:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723598323; cv=none; b=q31E5XthLNppvOzLvYehtiXI5LPHnJLPWO52+mGDsnS1FgoLRv8n8Fdsb5sGLPJcXbkOyLm1bIvpxZYeM6VbJgz7m/5WtKPpeD+UKRLYEG2wtOT6ySV5FD1AvBv+LNtENqA0xZBGmBoKB7r/v2BpL+Gj8bzj7m30TOyWVzDm5as=
+	t=1723598431; cv=none; b=HgLabJA6kVAyUjcBYm+ku5bQvz3ZEkiw72P4fzjkuA3+lDUGtCg6juZeEjB624XgvGYO+8QeTckS1qPNLGesp8ZLAQp0H4TB5cPN5Q2LRuy/L14VioHPF1zYrO0//wvDBxCtwhsbNQChp4KNyF3zP+pjw1IDsG4dI1lb40UD8XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723598323; c=relaxed/simple;
-	bh=9AN1aK0mVOw+4AMqAA7eA3E7CftcUJUPCGhvtus+yHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=J1YewQiXPcguJxIdcrGmSbqOp4iyFr5XMO5IdyAj3wNw1qlqZ9X4e4C+uACKP5Jp6u1438J9dVvbbJgR8owzjjuQbqQA67lS7uRxLYrCgVeXMvfl589amYbYLUmcVidOGuu1NWbo6Vd7V4wzURUIALLFKs0/yKhLMUE4ybBahZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=j06q4w+A; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1723598317;
-	bh=Br9qH9Jk7Tl93g+nwXetRusfuXievN8ptR19hgTy48g=;
-	h=Date:From:To:Cc:Subject:From;
-	b=j06q4w+ArXj1QPIbSOExuMWd4ltqBssrp7zjvhqEpE4HAyx3T2jI9esz962iYDf+Q
-	 rD2pWIAAWPGSA0jW8p8hDlEdXw3Ryl6Tv8ILaq3zfp348d2aFmIvn4DYFXUI+wJRbt
-	 wgAD6oyVCafHtioJIXbX9sCVlikQbfhJBNhs/dPvCEdr6/NuMekSfX5yle80zAthrn
-	 ZE4TUQJ5kgIpI2KZUT+iLL6G6IDKsht4X7pQnUP42xwWZ8e2evQQGx0V54WLe8HmG3
-	 2GjjSNNghjO29uBl+yrEp1Hgbrryv0XDtfCQlQDvWXRJEv02wIOwpKFFh74ngIiK/W
-	 s+YMhJNnTueQg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wk9PS55bCz4x2J;
-	Wed, 14 Aug 2024 11:18:36 +1000 (AEST)
-Date: Wed, 14 Aug 2024 11:18:36 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Christian Brauner
- <brauner@kernel.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, bpf <bpf@vger.kernel.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <20240814111836.6368311a@canb.auug.org.au>
+	s=arc-20240116; t=1723598431; c=relaxed/simple;
+	bh=W6swBgT80tmBDtSPDAhEwgWUWAIf8rwbd06ukImaqK4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ei5fV9zge8SLn+GiAUfz/Hs9F0/IGzo4/VtyaCiFdchC1TqrSK38sy7bxwivMpuLuZ902e23tkvm7qkY7YPkI8A0JKVNj8AmI7O6yaU3Gm+Qx6oSKSeTlq0lWoqofCAfha9wAGzI8Vy75kfaXvBtmTyobKiZTUsbOEEkhXMTjkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t1NJt4ku; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ADD8C32782;
+	Wed, 14 Aug 2024 01:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723598430;
+	bh=W6swBgT80tmBDtSPDAhEwgWUWAIf8rwbd06ukImaqK4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t1NJt4kumuVDt6o9p2JCfz3Uur4zKNxcpSFohuOOAQHTfwEpz+JhOQ5WnG0cmaeCe
+	 ElDbj2NtWJjiDI9f+ZQ6gGpoMwkivOJyuS3jMi9ySiuOLNi+fGyBX3LqxndA7pwKJZ
+	 xT3N0Ug7XMLQ6WrT9ztm6ibB4kN8lj4jAib2yAH3iCX3TuBxZj+E6jM+1sz1JSD5tb
+	 eTC+JA6ysGWfEh4rVJ87xkGoGqawHHQZPxvYYoTqYokZDkfHMdaatOGZoAV9OLiAln
+	 3RCxCWIDajfyslG6ZKDigdxsD3n4GHJ10HzmzmtyBeosqdAUA4gyd+dm49aM7Sg4Ej
+	 4M0/VSfE5nL6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FA53823327;
+	Wed, 14 Aug 2024 01:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/TfZx_yJwhKhclQMIBV=B4BZ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Documentation: networking: correct spelling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172359842926.1830772.9207347240431343352.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Aug 2024 01:20:29 +0000
+References: <20240812170910.5760-1-zoo868e@gmail.com>
+In-Reply-To: <20240812170910.5760-1-zoo868e@gmail.com>
+To: Jing-Ping Jan <zoo868e@gmail.com>
+Cc: horms@kernel.org, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ skhan@linuxfoundation.org
 
---Sig_/TfZx_yJwhKhclQMIBV=B4BZ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-After merging the bpf-next tree, today's linux-next build (powerpc
-ppc64_defconfig) failed like this:
+On Tue, 13 Aug 2024 01:09:10 +0800 you wrote:
+> Correct spelling problems for Documentation/networking/ as reported
+> by ispell.
+> 
+> Signed-off-by: Jing-Ping Jan <zoo868e@gmail.com>
+> ---
+> Thank you Simon, for the review.
+> Changes in v2: corrected the grammer and added the missing spaces before
+> each '('.
+> 
+> [...]
 
-fs/namespace.c: In function 'grab_requested_mnt_ns':
-fs/namespace.c:5295:23: error: 'class_fd_t' {aka 'struct fd'} has no member=
- named 'file'
- 5295 |                 if (!f.file)
-      |                       ^
-fs/namespace.c:5298:36: error: 'class_fd_t' {aka 'struct fd'} has no member=
- named 'file'
- 5298 |                 if (!proc_ns_file(f.file))
-      |                                    ^
-In file included from fs/namespace.c:25:
-fs/namespace.c:5301:46: error: 'class_fd_t' {aka 'struct fd'} has no member=
- named 'file'
- 5301 |                 ns =3D get_proc_ns(file_inode(f.file));
-      |                                              ^
-include/linux/proc_ns.h:75:50: note: in definition of macro 'get_proc_ns'
-   75 | #define get_proc_ns(inode) ((struct ns_common *)(inode)->i_private)
-      |                                                  ^~~~~
+Here is the summary with links:
+  - [v2] Documentation: networking: correct spelling
+    https://git.kernel.org/netdev/net-next/c/baae8b0ba835
 
-Caused by commit
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  1da91ea87aef ("introduce fd_file(), convert all accessors to it.")
 
-interacting with commit
-
-  7b9d14af8777 ("fs: allow mount namespace fd")
-
-from the vfs-brauner tree.
-
-I applied the following merge fix patch:
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Wed, 14 Aug 2024 11:07:38 +1000
-Subject: [PATCH] fixup for "introduce fd_file(), convert all accessors to i=
-t."
-
-interacting with "fs: allow mount namespace fd" from hte vfs-brauner tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/namespace.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/namespace.c b/fs/namespace.c
-index 159be8ed9d24..7aed325c48ad 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -5292,13 +5292,13 @@ static struct mnt_namespace *grab_requested_mnt_ns(=
-const struct mnt_id_req *kreq
- 		struct ns_common *ns;
-=20
- 		CLASS(fd, f)(kreq->spare);
--		if (!f.file)
-+		if (!fd_file(f))
- 			return ERR_PTR(-EBADF);
-=20
--		if (!proc_ns_file(f.file))
-+		if (!proc_ns_file(fd_file(f)))
- 			return ERR_PTR(-EINVAL);
-=20
--		ns =3D get_proc_ns(file_inode(f.file));
-+		ns =3D get_proc_ns(file_inode(fd_file(f)));
- 		if (ns->ops->type !=3D CLONE_NEWNS)
- 			return ERR_PTR(-EINVAL);
-=20
---=20
-2.43.0
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/TfZx_yJwhKhclQMIBV=B4BZ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAma8BewACgkQAVBC80lX
-0GzM9QgAjSRyVeP1ciq/55IBfR7IdFBIXY4wt3a54vqsfk94K8HbQ4yDp5KD4Avr
-HIVK7d1xQu1R2GpWsnP1KO74L15i5lk/ETw5pvD+FZbxTY8GrepDzoWQioe5QA3b
-mqxYf52jSoC0t1fgfdYJLZc4t4e2+28pdAcgi9i6ELz2vIWtopsTIgaHVYasMQz7
-j+hQDwzdQXsuwhFR/At9kSZM0ty1QHcKRLV+ePwxUFlL6gfCTn1HOmh2lIFocyhK
-ryn+W2MP9SQrflcF8kj6zgKxw/hQfbLz8uzL8H4vswlINke2L9o8EKP/bmb/mSZa
-E0mbFBipwxlAYDpXf/6tsJ7sOeTOhQ==
-=5Hnt
------END PGP SIGNATURE-----
-
---Sig_/TfZx_yJwhKhclQMIBV=B4BZ--
 
