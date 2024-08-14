@@ -1,509 +1,212 @@
-Return-Path: <netdev+bounces-118634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D3D495252C
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:01:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24FF495253F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1BE81C2513A
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3FE1282CE1
+	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 22:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B82145327;
-	Wed, 14 Aug 2024 22:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CC21474D7;
+	Wed, 14 Aug 2024 22:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjJtPJSq"
+	dkim=pass (1024-bit key) header.d=est.tech header.i=@est.tech header.b="fcDXVzGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2070.outbound.protection.outlook.com [40.107.249.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9A714389F;
-	Wed, 14 Aug 2024 22:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723672910; cv=none; b=ro3gh9w29gXhYhKN5in8TLfOHvT6OxV4pLu320ouyGWN5EDPMo0oJatItjdzLZifYnCBHbzpOlB9F4T3KxuX6pX2+IK59r49EIVYTrPGWk8/zoMRQPFi3K5olAvMs7cAIbl0PjnoxUYvxKSmqDrzq7yF70jfsQgLOnEcG1YXczY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723672910; c=relaxed/simple;
-	bh=JgR+5pUUFdEBu+CLEhc5Ct/mjo3k4E6z/0DU6sOfWEY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sdK+v/O+j+kiFZxVvz49A7anBov/hcsCdsjQ3FLBO6JtAd81ZXvvud789LGOnlPcmmcE69HkxepHQsSriM2rMlUZyqA8mVRGlhDj/xg975k37+NJBxNec9MnMyERjaSiodiuQknjdvwu5P2HeVaPc2yTCtLVDUkYrCBRdG7ZbjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TjJtPJSq; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso330886a12.2;
-        Wed, 14 Aug 2024 15:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723672906; x=1724277706; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=v8bT9nQVgHrKlpDM0654oBIbzorki97BZwntPNW1GuQ=;
-        b=TjJtPJSqcn5crgFpyT7ARtmT1vHbAqU0UvmntmoRv4mEh7DxLEJjOab+UGsNGIN0ZK
-         A7yWOPlqLvOFfCka2ruAUcF9pHvSFG7QHwabsqhvRezE9maRgPRdNw4ch54wtnJmARVF
-         unmRmrkdnfaAkOQsJ27IlnneqiJ8ZcdN7vbqLqsrmiHd3vhLPOYGKypYuwMlNkpKhvCx
-         1RE0OXu6QvnpBlKvdgcc6XAUyZwGtiIbfqN37GGmIi5vcVq3vDjCpblgp75msQED/+HE
-         xzBhCBMgbp4oxt9jDlbGsiCeRJsnizMQtVyJlhjI0eeI31pypuBPLhMHzYc8Pmqldt+B
-         ha/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723672906; x=1724277706;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v8bT9nQVgHrKlpDM0654oBIbzorki97BZwntPNW1GuQ=;
-        b=cZPy77VjieUxg4MFeqhPG2wSD63MSBXqH8KObfzW3MyZ+VZvHVmBfY6cTIlhqxE7QH
-         so7yCrhi/MaLboV66wsWS+DG8l+EDWscfgCRiFnlG0e8mOs8BX6St5fqodBhTZ5PG1Z2
-         2j3WUNvTVf69peaARqSwuKtN/CB70PQ2SxO5VZbIiDkn8a3Gs64ULOxVtiQ8ZpFKg9Hr
-         gSpi5ncoWVb03FZBPLkAe0Ma8AClNsu1UIu9t6WWzI3ICw9aWUCpyR4PUCc9xP4AVWY1
-         h2HVq1rDphhcUz33aV/lPtD/ol40Sc6HP7ujrcON6+wgazX9tUn7GEZqWa+TLP5lojqb
-         SLBw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1nktky1DYHOiuGM3d2SPZF2VWLsT7bzR6jiTN2WCECOAcLqM8YIXlZAYedMKLc2LETfwVzaZ6/kBWix2g@vger.kernel.org, AJvYcCWzJBQbkKgjGF7Wo+mM3/7xqhrtCnVSbmx5e6BfHpf/raJX0QkjeUy/uArymjspT3GQvKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAMNQZUwavAVQMjixVTvtdceNJ82J3p/REmasjFyAspxaG2g8h
-	RaTvZgtaIjmxNMzG1/tM1aCJi6QdaTZQawty8LGtbILMolayZuLC
-X-Google-Smtp-Source: AGHT+IGP/sgTMlCcNUcO7pLU+9GygJIRYCWc03JOq27h+FyeDaXC/17UfPTQaoU7d2r7+KZjRaHRqg==
-X-Received: by 2002:a17:90a:9318:b0:2cf:c9df:4cc8 with SMTP id 98e67ed59e1d1-2d3aab8a4ebmr4712159a91.38.1723672905573;
-        Wed, 14 Aug 2024 15:01:45 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2d3ac7ca442sm2314451a91.5.2024.08.14.15.01.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 15:01:45 -0700 (PDT)
-Message-ID: <4b0b48c30dbfa1f4bc35577552af414bc307717b.camel@gmail.com>
-Subject: Re: [PATCH net-next v13 12/14] net: replace page_frag with
- page_frag_cache
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Mat Martineau
- <martineau@kernel.org>, Ayush Sawal <ayush.sawal@chelsio.com>, Eric Dumazet
- <edumazet@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, Ingo Molnar <mingo@redhat.com>, Peter
- Zijlstra <peterz@infradead.org>,  Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, Ben
- Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Valentin
- Schneider <vschneid@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, David Ahern <dsahern@kernel.org>,
- Matthieu Baerts <matttbe@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Boris Pismenny <borisp@nvidia.com>,
- bpf@vger.kernel.org,  mptcp@lists.linux.dev
-Date: Wed, 14 Aug 2024 15:01:42 -0700
-In-Reply-To: <20240808123714.462740-13-linyunsheng@huawei.com>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
-	 <20240808123714.462740-13-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECB160B96;
+	Wed, 14 Aug 2024 22:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723673355; cv=fail; b=sr9GxwDxStn8Uz7Pf+HUWpFjWa4CapSyyvUVuZZhaN6GyvI03YP5TQ6na6qTIg7n2pXNvXPZ5DcQXij1MbP1dURajrDV9NARBfAdg0X7d9FqejVJhq/63RmqwEm0GHR04amOnjRvuMFTqpPqT0et+Sic2ORkeu6NR9SsnKWbZrI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723673355; c=relaxed/simple;
+	bh=wHU7NSI9v4vY9e3t251QYEPPJNc0i0NdkAdgx3dW5UQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IB054wQnzZxSogrxuRjTUAWhCMoCdp1gzad7pmdN0Ki2f9PsFidMJrFwZ8v8BvcYtAmj34IpXDBhX26UjKA/uYhrP0jilYeOtkpJYau1Fa0Mq90pqILRIwp61lXdHIg4GbsR7BfWkREy8tvaaNPl6EPqWK5eU/cbewYk18zudHM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (1024-bit key) header.d=est.tech header.i=@est.tech header.b=fcDXVzGH; arc=fail smtp.client-ip=40.107.249.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eqCLSpgUOe0OT7RTFCDvAKhhgI2uCsLMa8GHE22R4yDeD6dca+oWSGCRzZzq/g3oZwgacsqZLYzog103NCO4Mk6JkKvCDjjXp06AKEhKy1Sv496KRbnhonC3rSuci4Ja4dHbelTLqGDexncCYdHBHBV0xsfVAdzExQ0djzN0oQrQsLXsNk+lzT4NAZsPXUNN77eTwM1tPFVuni6+LStyZMTJohEVtFvR5XVuaehFMsefqNaS7w8n+bEmQWrLov1fZpjklcQ07Bf9hMeW5eGZ5JZD2Yxmc1N06LHgW/k7jOFqBsl4C+zveC8T5i+7o/jjvg/VkCdNoE0tDwk/YSsMVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BtFLbOnKLT3hu4BPolgkLjacxFuR28nKcaSOslyEhe8=;
+ b=CDp/dVQY2b9zzVg3jiiRkO2PDarklnrueKRqMi76yDAktdLkK1sWUA7EB0ZSI3o+XS9CUv+y7Deh2F5sY98wvWoSPeAVo3VBOzBESHg5xLjG5HuvPqSt7zZw1Sh2+W/GuBfJQFLE4hbnLV+6YiRBK6niELe6mlnz0GZ4DHRerNj211evQdNNMgYXicvItqChcelUNTdSlxorY+5TehzSytbKOFCVzAUPv58mnfRfQ3m7Mv/Hriy2Fz2RmxVL3Yr+3SORJZYPwKpRrb69/OoRY6p0iP0RjwnaF1Y4hKgy9IW1v5PCYucMs/0dVyxepUtK2LHWBxKBcFEdx4RFYRLcCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BtFLbOnKLT3hu4BPolgkLjacxFuR28nKcaSOslyEhe8=;
+ b=fcDXVzGHVKVqRuzoF2Vk0d+/6HVCr26oXa+l+tK8vftazGxitxD6IwaH40G6dJYvQm/5wVkXwf/AsI6YoqGmrCRM/rOQy6ZrWilPrmitgOnXEy2kS+Q77veqcf4LBlJqGhACQO8M1G+MXE/0zPLxroxKbPZWVUJsP8+RuFF7hsY=
+Received: from AM7P189MB0807.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:115::19)
+ by GV2P189MB2429.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:d2::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Wed, 14 Aug
+ 2024 22:09:07 +0000
+Received: from AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
+ ([fe80::53cd:a2f6:34be:7dab]) by AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
+ ([fe80::53cd:a2f6:34be:7dab%6]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
+ 22:09:06 +0000
+From: Kyle Swenson <kyle.swenson@est.tech>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+CC: Kory Maincent <kory.maincent@bootlin.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>, "kernel@pengutronix.de" <kernel@pengutronix.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net v1] pse-core: Conditionally set current limit during
+ PI regulator registration
+Thread-Topic: [PATCH net v1] pse-core: Conditionally set current limit during
+ PI regulator registration
+Thread-Index: AQHa7VO98gSpx9TQMU2uTRtF5dImDLInUnqA
+Date: Wed, 14 Aug 2024 22:09:06 +0000
+Message-ID: <Zr0q6HGW4wSBIUWz@p620>
+References: <20240813073719.2304633-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240813073719.2304633-1-o.rempel@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM7P189MB0807:EE_|GV2P189MB2429:EE_
+x-ms-office365-filtering-correlation-id: 87f117e4-71e9-48fd-71fb-08dcbcadb71c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?mjX5nqf5IYaJnWMv4z2uECbdzTTZa9cwNtXmFQhcRxnIHXVzZLRpgCafGPLa?=
+ =?us-ascii?Q?roFtH84bX4fqKFYLCzDtoi2qzNSPoIpsxpDr1p/zbr1rDq1y6yLkklclCtER?=
+ =?us-ascii?Q?dV7lOy1p4vgJ1e39E7BSDIGwmcNzmH1SaMkgAWfKPicZ6F2cAunmLhxLut2W?=
+ =?us-ascii?Q?ySIcqIJ6YczSGdI8WAjxzolF5qLBxdVBOjItnXqVuEMDe/uLAp3smAFYUHX2?=
+ =?us-ascii?Q?pmH7nRG7yTzAAwHbX96S2IVg3XxjW+LPWXg9o88kdWTQPTm8APupPfR5zUKC?=
+ =?us-ascii?Q?OLKet4GoAIDO4Y1fPnvn1+xJkklM8k+yJSHijHGdSO0ONed4thoXIahuSy/g?=
+ =?us-ascii?Q?inBikrc+drhXON4bPUdytmAmEs7y9HN2rDXcHnEhMh/NlyszCkYCZGBOrP+W?=
+ =?us-ascii?Q?3DM5nYXuCNV668bwRfXH/2iHyoc117AH6V2ZqS06vkqrKrmt8MmCjoRqf+vg?=
+ =?us-ascii?Q?0YVDkO4I5KZwYgzgyfdLVcN3eoRcK6739aWirmlkp3vEqYbHrXhJ1Ga3+/D3?=
+ =?us-ascii?Q?fjIGVVXXanQAyI1B/Fr3Se+/ELjHT65NymH7KwVX4Oj4YVIrrzUyUersBS5l?=
+ =?us-ascii?Q?78WO7I40uQ9LgKxdJuu2C56jmvHe2nVuzRca1LvZARfqfao04uDtiEaaZQFt?=
+ =?us-ascii?Q?8pyUzLqJUFl+TNJ+EOf90ivWjp4xoXovDEAR+7DLS4wVvkswdUwCy9+hkOx/?=
+ =?us-ascii?Q?vg8EpGruoHW4054ekaeq+ps/cGK3iEUNss5i7/ehcv/DHI0aiEAt87oO3JZd?=
+ =?us-ascii?Q?wQNMe0BRJhiNqdDrAZFYf108Z3KH6XWVVOYSz0e0EVWWe8TRQhDFiMMyoaxu?=
+ =?us-ascii?Q?/RVaOumsF/6B7w51QvLpVxFnoB0stIMKJW88gKbS65KfO37KmxbvOFGg2L+C?=
+ =?us-ascii?Q?+Ewbh7KFD5SNjOx5bkWTPLpLDI+gwfuQglwYgRy4JuSeNbzZeNZ9yvTv/53e?=
+ =?us-ascii?Q?h3sCRozwtNxg3f7R0fbm/gu6klxnp8WE4Dq456RRjD+3Ldk6Ew+iCj851B83?=
+ =?us-ascii?Q?K2dWW2H7Q2ocDJPob9NEC94wRIWO3Pzf8Xy68yiyvxDWpQQ/ltjXjNvnhF88?=
+ =?us-ascii?Q?QizHDnPLPpIlN0ZB5PGuISDlkCjdahNAl/jePPx3bvFgKw6OfnZC0jUvVpSV?=
+ =?us-ascii?Q?uLJzHsY27tJV9BLErM9xOdhVF8DDUW2HtwQ6tMDLYlEIlDvnhEjEc3M2BF5m?=
+ =?us-ascii?Q?MNIO/2syOheRkDTMv+Ka4qZD8Xt9lF3r82glBoq3cLhyt4BdcTxM+CrTtJUu?=
+ =?us-ascii?Q?gY+byQMrkCYQUBXEdZnKjolQW4L7eiiKp/drng4PrTTz4qo2NBDkpTxhuXcJ?=
+ =?us-ascii?Q?v2xOQtCgZl3WQzFLjhpjVM6YoZYVCekperjtKWJqI5qfS+iZ0Zb4PbieuVWZ?=
+ =?us-ascii?Q?B0FqVBjXspnl+Wi/Cw9LArxm8U1yMTfY6IHI8IBWckjQMJsDgQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7P189MB0807.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?iI91PjRb/PuiXUxs9/LMDg3b8wrFKGf4GPYuHKvJbWam+c6zodKgGZynZ67I?=
+ =?us-ascii?Q?hQIJ3CsyuSv11eCskDbtO9+ScawTYj5D0nMf3Muu5sps1kJTg0a2uAboTvaI?=
+ =?us-ascii?Q?bJTfctX1f13g9aeL7gvPokMsS1caZnpYez9JVrQVkz9Vqmv/KEN6nwQi//WO?=
+ =?us-ascii?Q?0IPvMVjc4cTFmZmwr8b6mU4GjUEpOIuTp8P90WdfYNvrLZvNbpzRggm1VdPO?=
+ =?us-ascii?Q?2V1dDvE3yCowqwpCdX8aaR+qAxpDa5GloGl5p+ZOCALzlDeVTjiUPmm+bssm?=
+ =?us-ascii?Q?eyG/5cycXBA2QWLEZ3HHEOOY5y+he2cLLjL3hTz2WsReybER1qDEglksctb+?=
+ =?us-ascii?Q?bm17Fme3ugBBamOKwpiM66uZ5kE0QAEFcW+Z0CvtqhKvXg7W6gq2L/XdRgkQ?=
+ =?us-ascii?Q?vCwW8kNfJy221pohHuiTGy34CrfsVgzf2BWCXZsirY4WYHw2CUuqvpS+1VLb?=
+ =?us-ascii?Q?VUYCSLo83NQ1wFki+M9B8/WjjHXjoDnFc/8EPB0/c6YijAC+7F2g6gIg1ini?=
+ =?us-ascii?Q?wgHJw3yu4pjVXU8+T3FLbO046qWiIzPsR9Dx4eLJ9Rzq9+53Ws/Lu90Z2amF?=
+ =?us-ascii?Q?QHlqd1oSHuo0LC8S52GUrksaJ5QduSPrJH5DWJAe9Lv/1ngAgPD8Wz4YTR8l?=
+ =?us-ascii?Q?3538uD0xuGbV8hga5Zu43OoeXsofLMGRCadhmMoOPkVSxFY/Ut3MZBAOVqhG?=
+ =?us-ascii?Q?Hg8lcalqxUfPgVY2aOpNrxxYRcuJnt9tdtnhd3nbrGHv6yT45mBdOQWRxzFe?=
+ =?us-ascii?Q?+O3nZPETnpqyqdwLnXZhS5LJ782Efag1P259BdC0VEkTQUWnsINxw9YLMJJ9?=
+ =?us-ascii?Q?oqY7B0S2+8b9ykfRcFsqpJKDGAWflOIr06qGnT9AbHVtojrpqRftTPvbbQiQ?=
+ =?us-ascii?Q?G6qjkIX9Ucww3/oOtNF9rM0SpAZXd49R5filc3FhF1mIsBQJQBPxaOdwrAzs?=
+ =?us-ascii?Q?sXnAPSRmLb6Cfy9mc0FbeTHNuqYpfkxtoLCQwlaaZcbA0q0u1EF6CQypz7iF?=
+ =?us-ascii?Q?lMOXcKe3ee6BMZIOepsx0/StKJuhPSnoKDdLwiWPFOku3OAlVun+SixAcGXf?=
+ =?us-ascii?Q?gBGSq+a9oQQC+GGiiQgVqgQdETOeoOOel9EUYKwR3KFz25yTSRMeq/Ol/YHM?=
+ =?us-ascii?Q?yB/vP7VPxGYxW1EZ5pqbla/djVvY1l4Y73nMFJWRTh0spHijBE1YWylwBv1k?=
+ =?us-ascii?Q?vou3q+cXgA+UrRmCc/dL39u5pWe3j1ANe0irvs8tgQ196U8RsOFw1z0bZP5r?=
+ =?us-ascii?Q?Fe7iTng3GvL8yW1mQ353hKnbcPZo3edCUUpPjizxk3A7RCpXXGHNj7TXpoQ6?=
+ =?us-ascii?Q?oTBNb+38EvzV5s3puDJdBb/0esmLn/WIk7GPU11Az95R7W+OQUQzhikEgXDM?=
+ =?us-ascii?Q?ewSAwnal8bXIAXkPUsvCYrvHn1NA+Nk8WvKcTa/atNRbFNre0a/mC5C/iAoc?=
+ =?us-ascii?Q?LNR+RqWSOaFqDPN2I/0lh7zpUcVr6DzS5H0trKQbsrVZw/425xjaG1QoIURu?=
+ =?us-ascii?Q?+gpBe94+7Uc/MhActG19yQkE6XgZz8RDlhYdxeuy8ksuYGJmG/3Oy5VUNxVk?=
+ =?us-ascii?Q?0ZjwHTINkU5y2cvdSkFQKVtCLcVl7CvULHQtgmNJ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9ADBF82B47EDFC4E90B3F88EC281CDE8@EURP189.PROD.OUTLOOK.COM>
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87f117e4-71e9-48fd-71fb-08dcbcadb71c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2024 22:09:06.6972
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7W5Fssv6BrhmOJOOrA+P01WYRBq3IuikUKhrNnL0NSxRqeWtkc+f2yhtl2aFnA4pDSncTlj2DPrjoT4Medx5Ag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P189MB2429
 
-On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
-> Use the newly introduced prepare/probe/commit API to
-> replace page_frag with page_frag_cache for sk_page_frag().
+On Tue, Aug 13, 2024 at 09:37:19AM +0200, Oleksij Rempel wrote:
+> Fix an issue where `devm_regulator_register()` would fail for PSE
+> controllers that do not support current limit control, such as simple
+> GPIO-based controllers like the podl-pse-regulator. The
+> `REGULATOR_CHANGE_CURRENT` flag and `max_uA` constraint are now
+> conditionally set only if the `pi_set_current_limit` operation is
+> supported. This change prevents the regulator registration routine from
+> attempting to call `pse_pi_set_current_limit()`, which would return
+> `-EOPNOTSUPP` and cause the registration to fail.
 >=20
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Acked-by: Mat Martineau <martineau@kernel.org>
+> Fixes: 4a83abcef5f4f ("net: pse-pd: Add new power limit get and set c33 f=
+eatures")
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 > ---
->  .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
->  .../chelsio/inline_crypto/chtls/chtls_io.c    | 100 ++++---------
->  .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
->  drivers/net/tun.c                             |  48 +++---
->  include/linux/sched.h                         |   2 +-
->  include/net/sock.h                            |  14 +-
->  kernel/exit.c                                 |   3 +-
->  kernel/fork.c                                 |   3 +-
->  net/core/skbuff.c                             |  59 +++++---
->  net/core/skmsg.c                              |  22 +--
->  net/core/sock.c                               |  46 ++++--
->  net/ipv4/ip_output.c                          |  33 +++--
->  net/ipv4/tcp.c                                |  32 ++--
->  net/ipv4/tcp_output.c                         |  28 ++--
->  net/ipv6/ip6_output.c                         |  33 +++--
->  net/kcm/kcmsock.c                             |  27 ++--
->  net/mptcp/protocol.c                          |  67 +++++----
->  net/sched/em_meta.c                           |   2 +-
->  net/tls/tls_device.c                          | 137 ++++++++++--------
->  19 files changed, 347 insertions(+), 315 deletions(-)
+>  drivers/net/pse-pd/pse_core.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h b/d=
-rivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-> index 7ff82b6778ba..fe2b6a8ef718 100644
-> --- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-> +++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-> @@ -234,7 +234,6 @@ struct chtls_dev {
->  	struct list_head list_node;
->  	struct list_head rcu_node;
->  	struct list_head na_node;
-> -	unsigned int send_page_order;
->  	int max_host_sndbuf;
->  	u32 round_robin_cnt;
->  	struct key_map kmap;
-> @@ -453,8 +452,6 @@ enum {
-> =20
->  /* The ULP mode/submode of an skbuff */
->  #define skb_ulp_mode(skb)  (ULP_SKB_CB(skb)->ulp_mode)
-> -#define TCP_PAGE(sk)   (sk->sk_frag.page)
-> -#define TCP_OFF(sk)    (sk->sk_frag.offset)
-> =20
->  static inline struct chtls_dev *to_chtls_dev(struct tls_toe_device *tlsd=
-ev)
->  {
-> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c =
-b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-> index d567e42e1760..334381c1587f 100644
-> --- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-> +++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-> @@ -825,12 +825,6 @@ void skb_entail(struct sock *sk, struct sk_buff *skb=
-, int flags)
->  	ULP_SKB_CB(skb)->flags =3D flags;
->  	__skb_queue_tail(&csk->txq, skb);
->  	sk->sk_wmem_queued +=3D skb->truesize;
-> -
-> -	if (TCP_PAGE(sk) && TCP_OFF(sk)) {
-> -		put_page(TCP_PAGE(sk));
-> -		TCP_PAGE(sk) =3D NULL;
-> -		TCP_OFF(sk) =3D 0;
-> -	}
->  }
-> =20
->  static struct sk_buff *get_tx_skb(struct sock *sk, int size)
-> @@ -882,16 +876,12 @@ static void push_frames_if_head(struct sock *sk)
->  		chtls_push_frames(csk, 1);
->  }
-> =20
-> -static int chtls_skb_copy_to_page_nocache(struct sock *sk,
-> -					  struct iov_iter *from,
-> -					  struct sk_buff *skb,
-> -					  struct page *page,
-> -					  int off, int copy)
-> +static int chtls_skb_copy_to_va_nocache(struct sock *sk, struct iov_iter=
- *from,
-> +					struct sk_buff *skb, char *va, int copy)
->  {
->  	int err;
-> =20
-> -	err =3D skb_do_copy_data_nocache(sk, skb, from, page_address(page) +
-> -				       off, copy, skb->len);
-> +	err =3D skb_do_copy_data_nocache(sk, skb, from, va, copy, skb->len);
->  	if (err)
->  		return err;
-> =20
-> @@ -1114,82 +1104,44 @@ int chtls_sendmsg(struct sock *sk, struct msghdr =
-*msg, size_t size)
->  			if (err)
->  				goto do_fault;
->  		} else {
-> +			struct page_frag_cache *pfrag =3D &sk->sk_frag;
-
-Is this even valid? Shouldn't it be using sk_page_frag to get the
-reference here? Seems like it might be trying to instantiate an unused
-cache.
-
-As per my earlier suggestion this could be made very simple if we are
-just pulling a bio_vec out from the page cache at the start. With that
-we could essentially plug it into the TCP_PAGE/TCP_OFF block here and
-most of it would just function the same.
-
->  			int i =3D skb_shinfo(skb)->nr_frags;
-> -			struct page *page =3D TCP_PAGE(sk);
-> -			int pg_size =3D PAGE_SIZE;
-> -			int off =3D TCP_OFF(sk);
-> -			bool merge;
-> -
-> -			if (page)
-> -				pg_size =3D page_size(page);
-> -			if (off < pg_size &&
-> -			    skb_can_coalesce(skb, i, page, off)) {
-> +			unsigned int offset, fragsz;
-> +			bool merge =3D false;
-> +			struct page *page;
-> +			void *va;
-> +
-> +			fragsz =3D 32U;
-> +			page =3D page_frag_alloc_prepare(pfrag, &offset, &fragsz,
-> +						       &va, sk->sk_allocation);
-> +			if (unlikely(!page))
-> +				goto wait_for_memory;
-> +
-> +			if (skb_can_coalesce(skb, i, page, offset))
->  				merge =3D true;
-> -				goto copy;
-> -			}
-> -			merge =3D false;
-> -			if (i =3D=3D (is_tls_tx(csk) ? (MAX_SKB_FRAGS - 1) :
-> -			    MAX_SKB_FRAGS))
-> +			else if (i =3D=3D (is_tls_tx(csk) ? (MAX_SKB_FRAGS - 1) :
-> +				       MAX_SKB_FRAGS))
->  				goto new_buf;
-> =20
-> -			if (page && off =3D=3D pg_size) {
-> -				put_page(page);
-> -				TCP_PAGE(sk) =3D page =3D NULL;
-> -				pg_size =3D PAGE_SIZE;
-> -			}
-> -
-> -			if (!page) {
-> -				gfp_t gfp =3D sk->sk_allocation;
-> -				int order =3D cdev->send_page_order;
-> -
-> -				if (order) {
-> -					page =3D alloc_pages(gfp | __GFP_COMP |
-> -							   __GFP_NOWARN |
-> -							   __GFP_NORETRY,
-> -							   order);
-> -					if (page)
-> -						pg_size <<=3D order;
-> -				}
-> -				if (!page) {
-> -					page =3D alloc_page(gfp);
-> -					pg_size =3D PAGE_SIZE;
-> -				}
-> -				if (!page)
-> -					goto wait_for_memory;
-> -				off =3D 0;
-> -			}
-> -copy:
-> -			if (copy > pg_size - off)
-> -				copy =3D pg_size - off;
-> +			copy =3D min_t(int, copy, fragsz);
->  			if (is_tls_tx(csk))
->  				copy =3D min_t(int, copy, csk->tlshws.txleft);
-> =20
-> -			err =3D chtls_skb_copy_to_page_nocache(sk, &msg->msg_iter,
-> -							     skb, page,
-> -							     off, copy);
-> -			if (unlikely(err)) {
-> -				if (!TCP_PAGE(sk)) {
-> -					TCP_PAGE(sk) =3D page;
-> -					TCP_OFF(sk) =3D 0;
-> -				}
-> +			err =3D chtls_skb_copy_to_va_nocache(sk, &msg->msg_iter,
-> +							   skb, va, copy);
-> +			if (unlikely(err))
->  				goto do_fault;
-> -			}
-> +
->  			/* Update the skb. */
->  			if (merge) {
->  				skb_frag_size_add(
->  						&skb_shinfo(skb)->frags[i - 1],
->  						copy);
-> +				page_frag_alloc_commit_noref(pfrag, copy);
->  			} else {
-> -				skb_fill_page_desc(skb, i, page, off, copy);
-> -				if (off + copy < pg_size) {
-> -					/* space left keep page */
-> -					get_page(page);
-> -					TCP_PAGE(sk) =3D page;
-> -				} else {
-> -					TCP_PAGE(sk) =3D NULL;
-> -				}
-> +				skb_fill_page_desc(skb, i, page, offset, copy);
-> +				page_frag_alloc_commit(pfrag, copy);
->  			}
-> -			TCP_OFF(sk) =3D off + copy;
->  		}
->  		if (unlikely(skb->len =3D=3D mss))
->  			tx_skb_finalize(skb);
-
-Really there is so much refactor here it is hard to tell what is what.
-I would suggest just trying to plug in an intermediary value and you
-can save the refactor for later.
-
-> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.=
-c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-> index 455a54708be4..ba88b2fc7cd8 100644
-> --- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-> +++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-> @@ -34,7 +34,6 @@ static DEFINE_MUTEX(notify_mutex);
->  static RAW_NOTIFIER_HEAD(listen_notify_list);
->  static struct proto chtls_cpl_prot, chtls_cpl_protv6;
->  struct request_sock_ops chtls_rsk_ops, chtls_rsk_opsv6;
-> -static uint send_page_order =3D (14 - PAGE_SHIFT < 0) ? 0 : 14 - PAGE_SH=
-IFT;
-> =20
->  static void register_listen_notifier(struct notifier_block *nb)
->  {
-> @@ -273,8 +272,6 @@ static void *chtls_uld_add(const struct cxgb4_lld_inf=
-o *info)
->  	INIT_WORK(&cdev->deferq_task, process_deferq);
->  	spin_lock_init(&cdev->listen_lock);
->  	spin_lock_init(&cdev->idr_lock);
-> -	cdev->send_page_order =3D min_t(uint, get_order(32768),
-> -				      send_page_order);
->  	cdev->max_host_sndbuf =3D 48 * 1024;
-> =20
->  	if (lldi->vr->key.size)
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 1d06c560c5e6..51df92fd60db 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1598,21 +1598,19 @@ static bool tun_can_build_skb(struct tun_struct *=
-tun, struct tun_file *tfile,
->  }
-> =20
->  static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
-> -				       struct page_frag *alloc_frag, char *buf,
-> -				       int buflen, int len, int pad)
-> +				       char *buf, int buflen, int len, int pad)
->  {
->  	struct sk_buff *skb =3D build_skb(buf, buflen);
-> =20
-> -	if (!skb)
-> +	if (!skb) {
-> +		page_frag_free_va(buf);
->  		return ERR_PTR(-ENOMEM);
-> +	}
-> =20
->  	skb_reserve(skb, pad);
->  	skb_put(skb, len);
->  	skb_set_owner_w(skb, tfile->socket.sk);
-> =20
-> -	get_page(alloc_frag->page);
-> -	alloc_frag->offset +=3D buflen;
-> -
-
-Rather than freeing the buf it would be better if you were to just
-stick to the existing pattern and commit the alloc_frag at the end here
-instead of calling get_page.
-
->  	return skb;
->  }
-> =20
-> @@ -1660,7 +1658,7 @@ static struct sk_buff *tun_build_skb(struct tun_str=
-uct *tun,
->  				     struct virtio_net_hdr *hdr,
->  				     int len, int *skb_xdp)
->  {
-> -	struct page_frag *alloc_frag =3D &current->task_frag;
-> +	struct page_frag_cache *alloc_frag =3D &current->task_frag;
->  	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
->  	struct bpf_prog *xdp_prog;
->  	int buflen =3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> @@ -1676,16 +1674,16 @@ static struct sk_buff *tun_build_skb(struct tun_s=
-truct *tun,
->  	buflen +=3D SKB_DATA_ALIGN(len + pad);
->  	rcu_read_unlock();
-> =20
-> -	alloc_frag->offset =3D ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
-> -	if (unlikely(!skb_page_frag_refill(buflen, alloc_frag, GFP_KERNEL)))
-> +	buf =3D page_frag_alloc_va_align(alloc_frag, buflen, GFP_KERNEL,
-> +				       SMP_CACHE_BYTES);
-> +	if (unlikely(!buf))
->  		return ERR_PTR(-ENOMEM);
-> =20
-> -	buf =3D (char *)page_address(alloc_frag->page) + alloc_frag->offset;
-> -	copied =3D copy_page_from_iter(alloc_frag->page,
-> -				     alloc_frag->offset + pad,
-> -				     len, from);
-> -	if (copied !=3D len)
-> +	copied =3D copy_from_iter(buf + pad, len, from);
-> +	if (copied !=3D len) {
-> +		page_frag_alloc_abort(alloc_frag, buflen);
->  		return ERR_PTR(-EFAULT);
-> +	}
-> =20
->  	/* There's a small window that XDP may be set after the check
->  	 * of xdp_prog above, this should be rare and for simplicity
-> @@ -1693,8 +1691,7 @@ static struct sk_buff *tun_build_skb(struct tun_str=
-uct *tun,
->  	 */
->  	if (hdr->gso_type || !xdp_prog) {
->  		*skb_xdp =3D 1;
-> -		return __tun_build_skb(tfile, alloc_frag, buf, buflen, len,
-> -				       pad);
-> +		return __tun_build_skb(tfile, buf, buflen, len, pad);
->  	}
-> =20
->  	*skb_xdp =3D 0;
-> @@ -1711,21 +1708,16 @@ static struct sk_buff *tun_build_skb(struct tun_s=
-truct *tun,
->  		xdp_prepare_buff(&xdp, buf, pad, len, false);
-> =20
->  		act =3D bpf_prog_run_xdp(xdp_prog, &xdp);
-> -		if (act =3D=3D XDP_REDIRECT || act =3D=3D XDP_TX) {
-> -			get_page(alloc_frag->page);
-> -			alloc_frag->offset +=3D buflen;
-> -		}
->  		err =3D tun_xdp_act(tun, xdp_prog, &xdp, act);
-> -		if (err < 0) {
-> -			if (act =3D=3D XDP_REDIRECT || act =3D=3D XDP_TX)
-> -				put_page(alloc_frag->page);
-> -			goto out;
-> -		}
-> -
->  		if (err =3D=3D XDP_REDIRECT)
->  			xdp_do_flush();
-> -		if (err !=3D XDP_PASS)
-> +
-> +		if (err =3D=3D XDP_REDIRECT || err =3D=3D XDP_TX) {
-> +			goto out;
-> +		} else if (err < 0 || err !=3D XDP_PASS) {
-> +			page_frag_alloc_abort(alloc_frag, buflen);
->  			goto out;
-> +		}
-> =20
-
-Your abort function here is not necessarily safe. It is assuming that
-nothing else might have taken a reference to the page or modified it in
-some way. Generally we shouldn't allow rewinding the pointer until we
-check the page count to guarantee nobody else is now working with a
-copy of the page.
-
->  		pad =3D xdp.data - xdp.data_hard_start;
->  		len =3D xdp.data_end - xdp.data;
-> @@ -1734,7 +1726,7 @@ static struct sk_buff *tun_build_skb(struct tun_str=
-uct *tun,
->  	rcu_read_unlock();
->  	local_bh_enable();
-> =20
-> -	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad);
-> +	return __tun_build_skb(tfile, buf, buflen, len, pad);
-> =20
->  out:
->  	bpf_net_ctx_clear(bpf_net_ctx);
-> diff --git a/include/linux/sched.h b/include/linux/sched.h
-> index f8d150343d42..bb9a8e9d6d2d 100644
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -1355,7 +1355,7 @@ struct task_struct {
->  	/* Cache last used pipe for splice(): */
->  	struct pipe_inode_info		*splice_pipe;
-> =20
-> -	struct page_frag		task_frag;
-> +	struct page_frag_cache		task_frag;
-> =20
->  #ifdef CONFIG_TASK_DELAY_ACCT
->  	struct task_delay_info		*delays;
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index b5e702298ab7..8f6cc0dd2f4f 100644
+> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.=
+c
+> index ec20953e0f825..4f032b16a8a0a 100644
+> --- a/drivers/net/pse-pd/pse_core.c
+> +++ b/drivers/net/pse-pd/pse_core.c
+> @@ -401,9 +401,14 @@ devm_pse_pi_regulator_register(struct pse_controller=
+_dev *pcdev,
+>  	rdesc->ops =3D &pse_pi_ops;
+>  	rdesc->owner =3D pcdev->owner;
 >=20
+> -	rinit_data->constraints.valid_ops_mask =3D REGULATOR_CHANGE_STATUS |
+> -						 REGULATOR_CHANGE_CURRENT;
+> -	rinit_data->constraints.max_uA =3D MAX_PI_CURRENT;
+> +	rinit_data->constraints.valid_ops_mask =3D REGULATOR_CHANGE_STATUS;
+> +
+> +	if (pcdev->ops->pi_set_current_limit) {
+> +		rinit_data->constraints.valid_ops_mask |=3D
+> +			REGULATOR_CHANGE_CURRENT;
+> +		rinit_data->constraints.max_uA =3D MAX_PI_CURRENT;
+> +	}
+> +
+>  	rinit_data->supply_regulator =3D "vpwr";
+>=20
+>  	rconfig.dev =3D pcdev->dev;
+> --
+> 2.39.2
 
-It occurs to me that bio_vec and page_frag are essentially the same
-thing. Instead of having your functions pass a bio_vec it might make
-more sense to work with just a page_frag as the unit to be probed and
-committed with the page_frag_cache being what is borrowed from.
+This patch solves the problem I was having with the regulator setup for
+the tps23881 on my hardware.  Great timing, and thanks for the fix!
 
-With that I think you could clean up a bunch of the change this code is
-generating as there is too much refactor to make this easy to review.
-If you were to change things though so that you maintain working with a
-page_frag and are just probing it out of the page_frag_cache and
-committing your change back in it would make the diff much more
-readable in my opinion.
-
-The general idea would be that the page and offset should not be
-changed from probe to commit, and size would only be able to be reduced
-vs remaining. It would help to make this more readable instead of
-returning page while passing pointers to offset and length/size.
-
-Also as I mentioned earlier we cannot be rolling the offset backwards.
-It needs to always be making forward progress unless we own all
-instances of the page as it is possible that a section may have been
-shared out from underneath us when we showed some other entity the
-memory.
+Tested-by: Kyle Swenson <kyle.swenson@est.tech>=
 
