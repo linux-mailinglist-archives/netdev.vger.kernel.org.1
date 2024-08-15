@@ -1,129 +1,154 @@
-Return-Path: <netdev+bounces-118866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093149535FB
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:45:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627CB95360E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:46:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B431D282E76
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969D81C21E9A
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5771AED41;
-	Thu, 15 Aug 2024 14:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CBD1AAE3B;
+	Thu, 15 Aug 2024 14:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrBgl2ZH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="plSphVst"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5420319D89D;
-	Thu, 15 Aug 2024 14:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D121AAE38
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723732973; cv=none; b=Qw4fTnZJmEZKXCwN+GLPou1IdQdtiRBcG0CGbKmXmmp/Fvf6cfsVFd+rpNqaqqxooAZ3y++z8LBegpN8Jf74jbe6bXHOs2U13YVbNN2tgq3Tn/tG6shstYUo/aw0oN9I3eoOXlR8tYvbC02NWiiOwb6DZqZvWZhLoIyw6Kvu+eA=
+	t=1723733026; cv=none; b=TG+wLW2el8WsdWJ773EzqjQoWAyrBysLD1OghLUuGkG/hfqAIFl9QDoM7osd6kv27TYGucFoylIJvOhV0EMsAqU2DXTMsRFplrk78f6bJwWiuYQXG6UFsjrfCKF51c+8Y1y7L4Am9+8rCAQqxz1w4pmXvplCkWtBvrNggzSYfQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723732973; c=relaxed/simple;
-	bh=bBXh6kYTTgi9MjJkwNqZSkd5ZjNPCu6uClsTZcZBw00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gV40JTmEvu9Ke24j9PTfMOW1lc6h0IaVnay1e7jPL2cc+0PeKHVH3IgG5ruOLwLakFI2Q/aNZFkTRax1AAr8mRHmTWafTKy0wfjowXEjvb/3PrmUtwxHWIz1BBBh2touDeliYhi6G1gf/nj457CVybDGWQRv+/ft5YGCMawAgkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrBgl2ZH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E0BC32786;
-	Thu, 15 Aug 2024 14:42:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723732973;
-	bh=bBXh6kYTTgi9MjJkwNqZSkd5ZjNPCu6uClsTZcZBw00=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UrBgl2ZHr7mefzi+wNxigOZl5d8WLC+stExumTJ+IY72s4ivFNvWEP3hpFiyi2SxZ
-	 jcEyjRj1swk9iHH2azkFjuCHilrOYneLbgBQ0HTz4ZGbe4c+cs45hWKW8fuDftBEHM
-	 i2/FGokcI+aarAer2EA7QGR9IZXA7GqRA0Tu1sumvdp1dszeNkaBvfNFaBZiFEZJCp
-	 iLxvzBlOsKStWUyD0PE0GqPCAhV9gEupfHPNF7+o/CTE3syMOn7ADYCwT3yMoErqOg
-	 Jw+9rw6exhDwc3odftHL0WZASdyAGi9BLYlmpo4f5Uqtd6qseh/UcMHajvREJFdvMZ
-	 IPdsOviboiReA==
-Date: Thu, 15 Aug 2024 15:42:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ramon.nordin.rodriguez@ferroamp.se,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next 5/7] net: phy: microchip_t1s: add support for
- Microchip's LAN867X Rev.C1
-Message-ID: <20240815144248.GF632411@kernel.org>
-References: <20240812134816.380688-1-Parthiban.Veerasooran@microchip.com>
- <20240812134816.380688-6-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1723733026; c=relaxed/simple;
+	bh=gY4ozU6gyhqMmNCsCqp211fP1r7Rlf0AVXkjTY4l5oI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z+rnqVM8rHMw4WkK3CWz+efybwcjv/ZhOiUA2Sj1tW5ak5Gut1VNCZQKB2mgTngAYoODCbUvBILMjI+eoYuZiXcGbtCVl0Qu+NStYJsPtgdj+9AdXqQe76VpT1jpUhV4Ge9gXQipKlknfUuy/4Qsb3A1uoFhhOufHsaMjJLqwQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=plSphVst; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4928d2f45e2so377019137.0
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:43:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723733023; x=1724337823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QwBkKvkjuMTQTL16fVdJGUHMEbhdM1JaYDW1ua3VpKQ=;
+        b=plSphVstw1DaQ1GoIobJqvu4z1pkp9eAqaiFthQoQn5zsryxbJLAiGFy+U7+eAwCXh
+         ikhyJmg4rySjGsiLYlFoIugyeu/0ZUttPeN61NDjiZW0g7WgxH7dptx/iVSdtlaogMmY
+         c3dvH7wNl6xGwBGp3lqlSGUzmHelmT5Jt/yERMXRPTJPHks51nMtW2iRd+UBkvTconyX
+         IwHtUMM2/gsyHXEpNNN36yr5LAwhjGkndl22lYcbftw8mpWKsVZgeusqH8bmd1zmUllW
+         sGfB5oaEdbeoc2xwrnBLdSoYwlfx26yxO51QvI3nHQw9j2PasuTukrZOxYv9x8Ce0LKb
+         07ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723733023; x=1724337823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QwBkKvkjuMTQTL16fVdJGUHMEbhdM1JaYDW1ua3VpKQ=;
+        b=QFLyJAObCG0YElcQyzOumvTLGXtNg01ez/tm8il386wwdWcB/c3E4gR1o4PPrMz+Ya
+         IGaZNSuBTpC98M1aq70SiTEoTaUw71+t1pfDY19Awqh7F5tudRVk7wdp19uIhH+FxPxg
+         tjQNpShJTHq5iYdZ0otlaDnzKk4gJio0sIfyZ+ELRNuY3q6NlDms3dGdP19ZthSKJlYz
+         r4QTfESo4B6T6xyknKOPkBV8EXHIqw5pCTJZHeTzcWFPeOBORoeXD8iM7ARVi1AZC7LX
+         0QyBJgqaHsd+QU4D+0xwdlnYksWjmvamRrHoepHVQefc5CzZyqyUDCWg70iU2fwaSJwt
+         /MPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXpdvcF2oGopxUYAO+lQsNSHEqrHJWZyiAnBguGwdIeHepOaPXy7T2C25wc11Ah2vx/vuQ19MhirLA5vigC1Ky2ul5SEZW0
+X-Gm-Message-State: AOJu0YyRLUzxUH7FUfFedKD6Lnxn+3UDQ4amEY8CHw/K7/ycjbPpMHYu
+	NuKFXZ3HGOHJUdO2FAfWfKTWUkOH02NFXcGX2M2zHGBY+zOVFUNhZEg5BguD6irpZ0lLKVfJt/c
+	J1i/+pa1VBXVdXtsecq+QqSEm/iWAc/GWgMa+
+X-Google-Smtp-Source: AGHT+IEN5VFP6U/VmxETVwcEZttUPnQRikGz4dY+s3IN90ckwUwOan/QeUgeiV/MFmQeQHIsMn+17C02oD+2gBv9xMg=
+X-Received: by 2002:a05:6102:509e:b0:492:aaae:835d with SMTP id
+ ada2fe7eead31-4977962ac53mr74477137.0.1723733023019; Thu, 15 Aug 2024
+ 07:43:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812134816.380688-6-Parthiban.Veerasooran@microchip.com>
+References: <20240815001718.2845791-1-mrzhang97@gmail.com> <20240815001718.2845791-2-mrzhang97@gmail.com>
+In-Reply-To: <20240815001718.2845791-2-mrzhang97@gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 15 Aug 2024 10:43:23 -0400
+Message-ID: <CADVnQykHS1uPT1Wa4WjOdnJ2=bQh1ZkQUBK2GNXGwcg5u5SC3g@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/3] tcp_cubic: fix to run bictcp_update() at least
+ once per RTT
+To: Mingrui Zhang <mrzhang97@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	Lisong Xu <xu@unl.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 12, 2024 at 07:18:14PM +0530, Parthiban Veerasooran wrote:
-> This patch adds support for LAN8670/1/2 Rev.C1 as per the latest
-> configuration note AN1699 released (Revision E (DS60001699F - June 2024))
-> https://www.microchip.com/en-us/application-notes/an1699
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+On Wed, Aug 14, 2024 at 8:19=E2=80=AFPM Mingrui Zhang <mrzhang97@gmail.com>=
+ wrote:
+>
+> The original code bypasses bictcp_update() under certain conditions
+> to reduce the CPU overhead. Intuitively, when last_cwnd=3D=3Dcwnd,
+> bictcp_update() is executed 32 times per second. As a result,
+> it is possible that bictcp_update() is not executed for several
+> RTTs when RTT is short (specifically < 1/32 second =3D 31 ms and
+> last_cwnd=3D=3Dcwnd which may happen in small-BDP networks),
+> thus leading to low throughput in these RTTs.
+>
+> The patched code executes bictcp_update() 32 times per second
+> if RTT > 31 ms or every RTT if RTT < 31 ms, when last_cwnd=3D=3Dcwnd.
+>
+> Thanks
+> Mingrui, and Lisong
+>
+> Fixes: 91a4599c2ad8 ("tcp_cubic: fix to run bictcp_update() at least once=
+ per RTT")
+
+The Fixes: footer is not for restating the commit title in your new
+patch. Instead, it should list the SHA1 and first commit message line
+from the old commit (potentially years ago) that has buggy behavior
+that you are fixing. That way the Linux maintainers know which Linux
+releases have the bug, and they know how far back in release history
+the fix should be applied, when backporting fixes to stable releases.
+
+More information:
+ https://www.kernel.org/doc/html/v6.10/process/submitting-patches.html#usin=
+g-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
+
+Please update the Fixes footers in the three commits and repost. :-)
+
+Thanks!
+neal
+
+
+> Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
+> Signed-off-by: Lisong Xu <xu@unl.edu>
+>
 > ---
->  drivers/net/phy/Kconfig         |  2 +-
->  drivers/net/phy/microchip_t1s.c | 68 ++++++++++++++++++++++++++++++++-
->  2 files changed, 67 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> index 68db15d52355..63b45544c191 100644
-> --- a/drivers/net/phy/Kconfig
-> +++ b/drivers/net/phy/Kconfig
-> @@ -282,7 +282,7 @@ config MICREL_PHY
->  config MICROCHIP_T1S_PHY
->  	tristate "Microchip 10BASE-T1S Ethernet PHYs"
->  	help
-> -	  Currently supports the LAN8670/1/2 Rev.B1 and LAN8650/1 Rev.B0/B1
-> +	  Currently supports the LAN8670/1/2 Rev.B1/C1 and LAN8650/1 Rev.B0/B1
->  	  Internal PHYs.
->  
->  config MICROCHIP_PHY
-> diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-> index d0af02a25d01..62f5ce548c6a 100644
-> --- a/drivers/net/phy/microchip_t1s.c
-> +++ b/drivers/net/phy/microchip_t1s.c
-> @@ -3,7 +3,7 @@
->   * Driver for Microchip 10BASE-T1S PHYs
->   *
->   * Support: Microchip Phys:
-> - *  lan8670/1/2 Rev.B1
-> + *  lan8670/1/2 Rev.B1/C1
->   *  lan8650/1 Rev.B0/B1 Internal PHYs
->   */
->  
-> @@ -12,6 +12,7 @@
->  #include <linux/phy.h>
->  
->  #define PHY_ID_LAN867X_REVB1 0x0007C162
-> +#define PHY_ID_LAN867X_REVC1 0x0007C164
->  /* Both Rev.B0 and B1 clause 22 PHYID's are same due to B1 chip limitation */
->  #define PHY_ID_LAN865X_REVB 0x0007C1B3
->  
-> @@ -243,7 +244,7 @@ static int lan865x_revb_config_init(struct phy_device *phydev)
->  		if (ret)
->  			return ret;
->  
-> -		if (i == 2) {
-> +		if (i == 1) {
->  			ret = lan865x_setup_cfgparam(phydev, offsets);
->  			if (ret)
->  				return ret;
-
-Hi Parthiban,
-
-This patch is addressing LAN867X Rev.C1 support.
-But the hunk above appears to update LAN865X Rev.B0/B1 support.
-Is that intentional?
-
-...
+>  net/ipv4/tcp_cubic.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+> index 5dbed91c6178..11bad5317a8f 100644
+> --- a/net/ipv4/tcp_cubic.c
+> +++ b/net/ipv4/tcp_cubic.c
+> @@ -218,8 +218,12 @@ static inline void bictcp_update(struct bictcp *ca, =
+u32 cwnd, u32 acked)
+>
+>         ca->ack_cnt +=3D acked;   /* count the number of ACKed packets */
+>
+> +       /* Update 32 times per second if RTT > 1/32 second,
+> +        *        every RTT if RTT < 1/32 second
+> +        *        even when last_cwnd =3D=3D cwnd
+> +        */
+>         if (ca->last_cwnd =3D=3D cwnd &&
+> -           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
+> +           (s32)(tcp_jiffies32 - ca->last_time) <=3D min(HZ / 32, usecs_=
+to_jiffies(ca->delay_min)))
+>                 return;
+>
+>         /* The CUBIC function can update ca->cnt at most once per jiffy.
+> --
+> 2.34.1
+>
 
