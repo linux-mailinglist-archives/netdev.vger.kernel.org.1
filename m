@@ -1,164 +1,236 @@
-Return-Path: <netdev+bounces-118820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4481952D9E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:37:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9E7952DA8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA1471C23567
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:37:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480091F22731
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454E07DA9E;
-	Thu, 15 Aug 2024 11:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7091714C8;
+	Thu, 15 Aug 2024 11:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekX3HEXe"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nd0h1rxi";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="h+NSoNfS";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nd0h1rxi";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="h+NSoNfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3AA1714A3
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 11:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B47DA9E;
+	Thu, 15 Aug 2024 11:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723721875; cv=none; b=c8+huYjvzCvuK3g5WyxX1wohb/Htha9pvZhOZjDJ/N/5+zxE++3dUJ3HY4W6i2TwHnmkitgQ2Wc0wJRpks4wQJSKiIsrRhRjZC2pmHd1YLLANZ0X1+uBeyyfH++Z4HcYebE4Oi8/OSg1ZBFdJEmR2qTNi/Uct714Qj7V4kqg46E=
+	t=1723721960; cv=none; b=E98CgI6TrA1Fq72bvMEjr+FpelO2DmOgur4OB9me2xm+EYCj8+0Xspmytb3UJO/bf9T/RDYpSIl6pCWvZfd8R/WL/CJB1G8JrEdCwY90vAd3H9fCJrclUVfCDGowySsbgiYoTT4fWYoxmLfGJT8zUj8uQlHeN2MVRL2GyO3/Iv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723721875; c=relaxed/simple;
-	bh=HKDeMAR4b5rFbDFaaFPgm2vIKLOBeHRUZM+Hjqan3+c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jl+YYeYj1oo9SEwE+5E3vLh1sXd44OsJQEfOZXbfUoIYlsw0ExIv5xBtwmGHTViDQYnI02NQYsDOTGRTv5YPr12tG6yiujKHT3Usqx+ni+8lhDK3z2qUcAV27K1I5TydT9b9xFvZP+poEieXvJPpcPSj8l8H5S8QVqO9acCWQrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekX3HEXe; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7c68b71ada4so653269a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 04:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723721873; x=1724326673; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G/yNayYpqSsyft6W3uQUIFwwke3rQ+bWb3rq6DLbVds=;
-        b=ekX3HEXeuo7nEWiYOdinQKPhY6TNC/vmLWlP8WgzdovdIJ9XsTu30w1qx2HURPRLeg
-         XY4VqnHwv59ftPXBneuMnsjBID8ZRNUnfYqIKTzKeh8qATLRL1ofX6QMVh63pikhi0Gu
-         eX6bbJavXs5SnX7TmYu1767AZMGzNgzUcoZVEvTQf16R70eCc2VEf2zQkk/m7hN2N3FC
-         Nlt10xmlaVpDKjukaRtmkRkVk5P92qxKIhdTmvV6YhnJLs6G7psLR1aGcZwF6tphXUo3
-         XYM9aYTSXcrPmEWL6ROA4U0NqkB8T1JY1HCHf1HpQg3EhFNzS2ZnE/zWjQ4SgWipj3IO
-         P6gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723721873; x=1724326673;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G/yNayYpqSsyft6W3uQUIFwwke3rQ+bWb3rq6DLbVds=;
-        b=I9G3Hw8Mr/8e3+CQgLgqzwbE3BRFjHDjRcpUHS/GMI9W/QumCwHlgpPRmx0tLkOU23
-         3TJ+EDVF05APRx+hNOfVIr20em1Ce+VoMic4YudRM8SpkxljjiwdHTbA9ln1gUPKEDUV
-         bB97VI+OfAUSWeSM2GAQmogLMHxUHRTLWeaHT4j6DVrNw1TckEh1GyDEJXTkqbBoGA4Y
-         //trx7nhwGQm29ydU4/mCKLB19OztBQwrNdtmf7s7TBoznL57OLhzk9iXJHNPwv2Uy/O
-         uo3nmt1I7Fc91JRQwadp8ylv2gSx02gnr/g8KBzf2R3reho3LwQ06d67woDY9SgHa7Ts
-         W89w==
-X-Gm-Message-State: AOJu0Yzmvmp9xz4yVQFAq6N+bAF31HVRx1XkqLy+hovwbE3daRG9aLMg
-	0k1KNsU4VcVI01ZaXUPS46HwKcDAJrEB3Hmrm3AW7Yy/gaXKyPC+
-X-Google-Smtp-Source: AGHT+IFyCxTWVWZZ5N/NvToYGH2s5LCqB3z5lY9NGpmY7Trsz/MA++bMTe2QjDiuXRAjeOxrTXoHXQ==
-X-Received: by 2002:a05:6a20:2d22:b0:1c8:95cb:c42c with SMTP id adf61e73a8af0-1c8eae2f6b5mr8540328637.6.1723721872825;
-        Thu, 15 Aug 2024 04:37:52 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3c88406f2sm1140517a91.42.2024.08.15.04.37.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 04:37:52 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	ncardwell@google.com,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Jade Dong <jadedong@tencent.com>
-Subject: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to find port in connect() process
-Date: Thu, 15 Aug 2024 19:37:45 +0800
-Message-Id: <20240815113745.6668-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1723721960; c=relaxed/simple;
+	bh=l6rcWtVPc1rg8CGlJhZWcF1c3U+WD5PE2ri2IiuBJ4g=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=ukpdMAxhgE5bM7DL7V5h3xVjcTdKseFvNo35CK27IsL6bHz4WBxhx80ySVo+j7yUNW/XARADr5WYdcsj4pQuwAyYuJQA72CsHazvwfrgLaTGA+oOn3mYmxSNA7kkSE1X80vo5KBd0soNsXAVI3TPGgeq344pWLXC1fTDa439U+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nd0h1rxi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=h+NSoNfS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nd0h1rxi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=h+NSoNfS; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6238A1FFF8;
+	Thu, 15 Aug 2024 11:39:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723721955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
+	b=nd0h1rxiIfUn7ca5dbmdkVbg8eiE8yAKVMfi4NbYyxSG9MtlCzl98WhhUT6LkhVyFD9fxu
+	RlqQmNOielc0wD/pFx65cpsHZJJIO9hcVOvKUIfaFsPsA/rYaQXFPApw7yT66Qxu2LDyba
+	SZ4lK0pV83G+GrsBWCQJb0rrHVevps8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723721955;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
+	b=h+NSoNfSb+/b6aUitZ+o0G4B3ziGTqg3Mp9IEHPYFtKpkq3I1BWBdnR8exWvL0qydABUH4
+	c9G14u36Lxa6xQCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723721955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
+	b=nd0h1rxiIfUn7ca5dbmdkVbg8eiE8yAKVMfi4NbYyxSG9MtlCzl98WhhUT6LkhVyFD9fxu
+	RlqQmNOielc0wD/pFx65cpsHZJJIO9hcVOvKUIfaFsPsA/rYaQXFPApw7yT66Qxu2LDyba
+	SZ4lK0pV83G+GrsBWCQJb0rrHVevps8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723721955;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
+	b=h+NSoNfSb+/b6aUitZ+o0G4B3ziGTqg3Mp9IEHPYFtKpkq3I1BWBdnR8exWvL0qydABUH4
+	c9G14u36Lxa6xQCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 486C813B0C;
+	Thu, 15 Aug 2024 11:39:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id B7XfOt3ovWaEPgAAD6G6ig
+	(envelope-from <neilb@suse.de>); Thu, 15 Aug 2024 11:39:09 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: "NeilBrown" <neilb@suse.de>
+To: "Kunwu Chan" <kunwu.chan@linux.dev>
+Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+ jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Kunwu Chan" <chentao@kylinos.cn>
+Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
+In-reply-to: <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
+References: <>, <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
+Date: Thu, 15 Aug 2024 21:39:06 +1000
+Message-id: <172372194692.6062.4519803974558688969@noble.neil.brown.name>
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
-From: Jason Xing <kernelxing@tencent.com>
+On Thu, 15 Aug 2024, Kunwu Chan wrote:
+> Thanks for your reply.
+>=20
+> On 2024/8/14 18:28, NeilBrown wrote:
+> > On Wed, 14 Aug 2024, kunwu.chan@linux.dev wrote:
+> >> From: Kunwu Chan <chentao@kylinos.cn>
+> >>
+> >> Increase size of the servername array to avoid truncated output warning.
+> >>
+> >> net/sunrpc/clnt.c:582:75: error=EF=BC=9A=E2=80=98%s=E2=80=99 directive o=
+utput may be truncated
+> >> writing up to 107 bytes into a region of size 48
+> >> [-Werror=3Dformat-truncation=3D]
+> >>    582 |                   snprintf(servername, sizeof(servername), "%s",
+> >>        |                                                             ^~
+> >>
+> >> net/sunrpc/clnt.c:582:33: note:=E2=80=98snprintf=E2=80=99 output
+> >> between 1 and 108 bytes into a destination of size 48
+> >>    582 |                     snprintf(servername, sizeof(servername), "%=
+s",
+> >>        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~
+> >>    583 |                                          sun->sun_path);
+> >>
+> >> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> >> ---
+> >>   net/sunrpc/clnt.c | 2 +-
+> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+> >> index 09f29a95f2bc..874085f3ed50 100644
+> >> --- a/net/sunrpc/clnt.c
+> >> +++ b/net/sunrpc/clnt.c
+> >> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *=
+args)
+> >>   		.connect_timeout =3D args->connect_timeout,
+> >>   		.reconnect_timeout =3D args->reconnect_timeout,
+> >>   	};
+> >> -	char servername[48];
+> >> +	char servername[108];
+> > If we choose this approach to removing the warning, then we should use
+> > UNIX_PATH_MAX rather than 108.
+> My negligence.
+> >
+> > However the longest server name copied in here will in practice be
+> >     /var/run/rpcbind.sock
+> >
+> > so the extra 60 bytes on the stack is wasted ...  maybe that doesn't
+> > matter.
+> I'm thinking=C2=A0 about use a dynamic space alloc method like kasprintf to=
+=20
+> avoid space waste.
+> > The string is only used by xprt_create_transport() which requires it to
+> > be less than RPC_MAXNETNAMELEN - which is 256.
+> > So maybe that would be a better value to use for the array size ....  if
+> > we assume that stack space isn't a problem.
+>=20
+> Thank you for the detailed explanation. I read the=20
+> xprt_create_transport,=C2=A0 the RPC_MAXNETNAMELEN
+>=20
+> is only use to xprt_create_transport .
+>=20
+> > What ever number we use, I'd rather it was a defined constant, and not
+> > an apparently arbitrary number.
+>=20
+> Whether we could check the sun->sun_path length before using snprintf?=C2=
+=A0=20
+> The array size should smaller
+>=20
+> than=C2=A0 the minimum of sun->sun_path and RPC_MAXNETNAMELEN.
+>=20
+> Or use the dynamic space allocate method to save space.
 
-We found that one close-wait socket was reset by the other side
-which is beyond our expectation, so we have to investigate the
-underlying reason. The following experiment is conducted in the
-test environment. We limit the port range from 40000 to 40010
-and delay the time to close() after receiving a fin from the
-active close side, which can help us easily reproduce like what
-happened in production.
+I think that dynamically allocating space is not a good idea.  It means
+you have to handle failure which is just a waste of code.
 
-Here are three connections captured by tcpdump:
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-// a few seconds later, within 60 seconds
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-// later, very quickly
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+I'd suggest simply changing the array to RPC_MAXNETNAMELEN.
 
-As we can see, the first flow is reset because:
-1) client starts a new connection, I mean, the second one
-2) client tries to find a suitable port which is a timewait socket
-   (its state is timewait, substate is fin_wait2)
-3) client occupies that timewait port to send a SYN
-4) server finds a corresponding close-wait socket in ehash table,
-   then replies with a challenge ack
-5) client sends an RST to terminate this old close-wait socket.
+NeilBrown
 
-I don't think the port selection algo can choose a FIN_WAIT2 socket
-when we turn on tcp_tw_reuse because on the server side there
-remain unread data. If one side haven't call close() yet, we should
-not consider it as expendable and treat it at will.
 
-Even though, sometimes, the server isn't able to call close() as soon
-as possible like what we expect, it can not be terminated easily,
-especially due to a second unrelated connection happening.
 
-After this patch, we can see the expected failure if we start a
-connection when all the ports are occupied in fin_wait2 state:
-"Ncat: Cannot assign requested address."
-
-Reported-by: Jade Dong <jadedong@tencent.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v2
-Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxing@gmail.com/
-1. change from fin_wait2 to timewait test statement, no functional
-change (Kuniyuki)
----
- net/ipv4/inet_hashtables.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 9bfcfd016e18..b95215fc15f6 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -563,7 +563,8 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
- 			continue;
- 
- 		if (likely(inet_match(net, sk2, acookie, ports, dif, sdif))) {
--			if (sk2->sk_state == TCP_TIME_WAIT) {
-+			if (sk2->sk_state == TCP_TIME_WAIT &&
-+			    inet_twsk(sk2)->tw_substate == TCP_TIME_WAIT) {
- 				tw = inet_twsk(sk2);
- 				if (sk->sk_protocol == IPPROTO_TCP &&
- 				    tcp_twsk_unique(sk, sk2, twp))
--- 
-2.37.3
+>=20
+> >
+> > Thanks,
+> > NeilBrown
+> >
+> >
+> >>   	struct rpc_clnt *clnt;
+> >>   	int i;
+> >>  =20
+> >> --=20
+> >> 2.40.1
+> >>
+> >>
+> --=20
+> Thanks,
+>    Kunwu.Chan
+>=20
+>=20
 
 
