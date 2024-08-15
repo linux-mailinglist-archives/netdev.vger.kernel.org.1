@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-118830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568F1952E77
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B7B5952E79
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5BA8B24541
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:46:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B660B285BF3
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFF11993AE;
-	Thu, 15 Aug 2024 12:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509BD19D885;
+	Thu, 15 Aug 2024 12:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TeMM8esl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOTTKMSz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9821C60B96;
-	Thu, 15 Aug 2024 12:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BDF19F49B;
+	Thu, 15 Aug 2024 12:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723725959; cv=none; b=mQpSeVo1L4MB8IBIPQ5FdHLDAjnRrO5NVscqEtJSd0bFi/ZYn9JFFUgGLNjiS1nXcrSCQi0hF4W+gnHRtKdpdDg+rONHKxEuspd9/BfUJfHOQ1zeh0HxkI+qE3KeiU46bHex+WfVPSk7iOWk5hwJKQl771X+wb9W2i6mPw0dyEc=
+	t=1723725965; cv=none; b=kAUhAZknmA0Q9wpA3uyqRd+kF6qOWTHBuZ6dazc1N4pXmt17PIH1NtNu+N+0Fj+20cjrGjjDU8V0BfrXwBe5Ov1+/idkVrOD0BtInnA/PnxtWe1sD8MhrJo7zCezfIFZFKC9TDTruRZ9oIAc6aIPffGRt1I7aPIqLbXf43mbrfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723725959; c=relaxed/simple;
-	bh=8LAOWEJKivormVDWhY8ctyx3bdfsXrYENOdStCSlCMo=;
+	s=arc-20240116; t=1723725965; c=relaxed/simple;
+	bh=al8FeJDNANmBeWYeB5orKViRkkRdMcv1FPWSbriMh1I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o5d2J4pG8jBKysWCCmha80eZy9frRykUiJOq83L6v9LiP+cD/WtC/RIHT8Snwd/uTf77ivaX0uSCjUxf1jrO3H7HAdfxFi2phK4r+KdVxf5HEG7rN1dVvz3akS2+mU6EnaidWYUyGz5wxmqQRI5cweGgJTMICVCsuLIkdfQQY5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TeMM8esl; arc=none smtp.client-ip=209.85.215.193
+	 MIME-Version; b=siopsPY42kXRN6t36G0C36bCwH0y4H9pAGcGcwnmDP8a4xwpiPd2hVr2najFFG/f+AQqIMg2lgLW1NHbzgnXY6AnABndDohwNjfOcB9JjEX5FIqXRc9S3AkFcspRq8rylw3F4VcEqLnePPtttpP3KurUFRlCS6tj52pp+sfGEwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YOTTKMSz; arc=none smtp.client-ip=209.85.215.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-7a103ac7be3so678239a12.3;
-        Thu, 15 Aug 2024 05:45:57 -0700 (PDT)
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-7163489149eso717496a12.1;
+        Thu, 15 Aug 2024 05:46:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723725957; x=1724330757; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723725962; x=1724330762; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Xj+qWSDyX4FBhZM05vM8itqjIPEXstrdTgRr1ZL+rkA=;
-        b=TeMM8eslShkatQhJPmMyqxozDfKPUz0XGeIeAy4RhoNxm0PHbBBWeYlHIXIJEeYzHU
-         1jmmRpQIV4BntE9+SGDDB05adQp6rPFQ5igBPXYdEk73K1Tlqdu82CE8A9wSjlgoXAEM
-         W/fMk0W9/M+wZg41xJR+EcBOfiqVxjmJbRJTM9/bzLFS2n053550sCW5XFJ91hISWKuU
-         yPkCo7A8HJ+5UajAVk8nevgacJ00gTdXXn6SaS2HLD9yO1VWFzwTkRIgPve6XfH8df6N
-         q+DNOgDIK99NI5x2mNGNIvDLilpNejq+HzadsPPhaq0PpFQmRboSkSJ7MxINLKn4MRYR
-         W5Kw==
+        bh=VAYPfmQdBURVtmFJo/kNdkK9wo4RhP92Q0e8N3nnuIg=;
+        b=YOTTKMSzTVg/E2Y7REQQdWg9FoMc3Ye/QrpMG3rEKS1NXCVvlcBPPV5igb7Yq2vQgI
+         76w6v81PFvRGaCzvDhPeVC30OGaH/HYX2fSUKNHaNG2R7TN95bhOQdfARyjqdG5lrkRt
+         B0sMdBCSfn1SSIAAS+yz6r+dbiVeWpFjLTDIyHN13TDTQYVDWv52dfhMPnk5hV38Gvjx
+         wOOvcSGlw0oOqgacYJJYoF/TWef7w+SpF+rbrl5/Wap4SH/EZXbJbac9rqosJSuk63fW
+         K8uVzU0r9ru4Xf/2K98b189GGUu/pLcDtsBUmUwX/n3C/FT0Oa9nWesm+QLwe/uAD61C
+         Scng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723725957; x=1724330757;
+        d=1e100.net; s=20230601; t=1723725962; x=1724330762;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Xj+qWSDyX4FBhZM05vM8itqjIPEXstrdTgRr1ZL+rkA=;
-        b=oW6uB3Gx5CVVhsdtRdftI/pCbf3+vWek3zSZjIeywfPm6VIxvSUlytw6fB4ZtItNd/
-         P9b47rr5MSg+viaLECDkVc6GqsOVdO5sN6o+ojGeDoWjcHTVjIFBIce57uhphfvUaZgz
-         4BvBFz9oOFOE2LtvHMkVP3AWXdhw3jbWJpFITBe/dumUM5Ev2Nw8QkE6RmbQystniUM4
-         nUQ3HDQAvRCRQJpvE224lYFx2+gKLv2+pytUNjpnUOZIwh5UMF0GTvxBw1o29/GTAbkE
-         Yx5Dox9rx0pcSYbexZvEFDJiJnwVsitxH7tHheNG3QS7HBMXFfZ/133a58TlGk/w6Doz
-         MlyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXdRG+wPcBKCCJo1bLp+0JQZ6GV/S1xaOSE7xygUX2AQhFieMy2W5MThGkmQyNKhOkYOUN4qcI2f+9Yq15KhljVvy2DAUJg1OUIdUjrNJO7BC/HumEA4nQGJGb6ljCw0YZOQZMr
-X-Gm-Message-State: AOJu0YwhLRNfZqL7oA6pgFMsDBlGtsEj2S8IW7wV7tDudr6LQ9wzjUbR
-	4ipS4USM1rlVQCICndKPrR3V/A2MgduEpMW/31gsirM5IRQ8gK7c
-X-Google-Smtp-Source: AGHT+IEcciK8oBshBV27dKgjADfcnngiRpIshadKUClsh24EnLpmUHM4kwEBkRoADhZa4q09ZKfgDw==
-X-Received: by 2002:a05:6a20:6f89:b0:1c4:b843:fa25 with SMTP id adf61e73a8af0-1c8eae900d5mr8335640637.26.1723725956738;
-        Thu, 15 Aug 2024 05:45:56 -0700 (PDT)
+        bh=VAYPfmQdBURVtmFJo/kNdkK9wo4RhP92Q0e8N3nnuIg=;
+        b=OVH2VlZSKFPLSYyZycJvCnGQ2yROErv2fjnsASLzIbjkXBiG6z1QJp8n9YjaIDFjW1
+         aIp8sdgLF+1XfvFNd2XXjHbAIeG2wltmR7f5fcN/d2+G5nxj+/C60gEaGWFBOoAQoJj9
+         xkR+jMPTVmqebSqf2Uwr9eegD2jfhcHGa8a6vSYMUuCblGCb2ijwi71nQI9ph5zTBJ4f
+         LElHdt4Kk4H4hHdve3XwUBpqPmGZgWBzHPPrXFi2MEJ+Ig9DYjs9ykR/NT3qKwapb9Dj
+         kg+1S5+PAoyADfdhSoJuquZOTb6PeE2gvLzlvn5BO7nuq/18RLKG7pdyWvQKtsn8GP0o
+         IhLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdJKxLsGWi05ZsO0M/A2mmaBdEqvi73iSgUZRay+6Ox16Y6yeGZdM5g0dLAsqJntigaFS8RsWgEKLwsv0=@vger.kernel.org, AJvYcCUo1N26kdbMIj+0g0VsuPCVlSNTjasc7V5jdK2rl2f9GNONK9BH5FDLJVYAyzMWqrG/mnEuNADm@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpAKlcMpiQIq2cTSGAywHoH+70+DFzYizHewHBIh+BUD60djQs
+	CFmh809Tw0s9KqhRXN5xY41qRIGgG92rd0wGrYUKclWSCg2Heil4iZ1ajEGL
+X-Google-Smtp-Source: AGHT+IHsnR0ieo0N7TBiEGpR5o2UiXO9Njg/AGFXhLg6fbxKtIkB9LaI39JJnqzTgOQn6Y1tVbVbTw==
+X-Received: by 2002:a05:6a20:d70b:b0:1c4:8bba:76e4 with SMTP id adf61e73a8af0-1c8eb046c44mr7587095637.50.1723725961651;
+        Thu, 15 Aug 2024 05:46:01 -0700 (PDT)
 Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af2b942sm923605b3a.183.2024.08.15.05.45.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af2b942sm923605b3a.183.2024.08.15.05.45.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 05:45:56 -0700 (PDT)
+        Thu, 15 Aug 2024 05:46:01 -0700 (PDT)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: kuba@kernel.org
@@ -84,9 +84,9 @@ Cc: davem@davemloft.net,
 	petrm@nvidia.com,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 03/10] net: skb: introduce pskb_network_may_pull_reason()
-Date: Thu, 15 Aug 2024 20:42:55 +0800
-Message-Id: <20240815124302.982711-4-dongml2@chinatelecom.cn>
+Subject: [PATCH net-next 04/10] net: ip: introduce pskb_inet_may_pull_reason()
+Date: Thu, 15 Aug 2024 20:42:56 +0800
+Message-Id: <20240815124302.982711-5-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815124302.982711-1-dongml2@chinatelecom.cn>
 References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
@@ -98,35 +98,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce the function pskb_network_may_pull_reason() and make
-pskb_network_may_pull() a simple inline call to it.
+Introduce the function pskb_inet_may_pull_reason() and make
+pskb_inet_may_pull a simple inline call to it.
 
 Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 ---
- include/linux/skbuff.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ include/net/ip_tunnels.h | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index cf8f6ce06742..fe6f97b550fc 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3114,9 +3114,15 @@ static inline int skb_inner_network_offset(const struct sk_buff *skb)
- 	return skb_inner_network_header(skb) - skb->data;
- }
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 1db2417b8ff5..12992aa792fc 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -439,7 +439,8 @@ int ip_tunnel_encap_del_ops(const struct ip_tunnel_encap_ops *op,
+ int ip_tunnel_encap_setup(struct ip_tunnel *t,
+ 			  struct ip_tunnel_encap *ipencap);
  
+-static inline bool pskb_inet_may_pull(struct sk_buff *skb)
 +static inline enum skb_drop_reason
-+pskb_network_may_pull_reason(struct sk_buff *skb, unsigned int len)
-+{
-+	return pskb_may_pull_reason(skb, skb_network_offset(skb) + len);
++pskb_inet_may_pull_reason(struct sk_buff *skb)
+ {
+ 	int nhlen;
+ 
+@@ -456,7 +457,12 @@ static inline bool pskb_inet_may_pull(struct sk_buff *skb)
+ 		nhlen = 0;
+ 	}
+ 
+-	return pskb_network_may_pull(skb, nhlen);
++	return pskb_network_may_pull_reason(skb, nhlen);
 +}
 +
- static inline int pskb_network_may_pull(struct sk_buff *skb, unsigned int len)
- {
--	return pskb_may_pull(skb, skb_network_offset(skb) + len);
-+	return pskb_network_may_pull_reason(skb, len) == SKB_NOT_DROPPED_YET;
++static inline bool pskb_inet_may_pull(struct sk_buff *skb)
++{
++	return pskb_inet_may_pull_reason(skb) == SKB_NOT_DROPPED_YET;
  }
  
- /*
+ /* Variant of pskb_inet_may_pull().
 -- 
 2.39.2
 
