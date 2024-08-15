@@ -1,235 +1,275 @@
-Return-Path: <netdev+bounces-118770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA98952BF8
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:24:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4664E952BFB
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B57D31F24695
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:24:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5C711F245F8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F8A1BDA83;
-	Thu, 15 Aug 2024 09:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88101BE860;
+	Thu, 15 Aug 2024 09:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hHTUAgd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEC71B8EAF;
-	Thu, 15 Aug 2024 09:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723713038; cv=none; b=F0GWAFbiyPFZ8bNSXCF06O5MMoaDo7A26eorGmoREvVsNK65nhvicWJCe95xe/rtAqqoBGUSHECcMdhd9sVUpztirxKzzH8fgwzm7YPcIWHnfnDGCtH0GpuuJ4rtgj1szRCDrrKBPPYSrAAFw+WR3O19ysq30wIsrcCZpMP+KIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723713038; c=relaxed/simple;
-	bh=gXbtDV3Den7rYv5gxqLb1TBgiTVBk3gTcwJQqn4DZto=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hmN7rNlG/I1hR6U+F419+MBmK3i+i4O90QK3/vCdBXCMpB24kybJCFvpLz+sbJNGHglpCjexS/TTnMyHPc79udGQJEnPMR/XzlxZ/noCLt+ZTC419/9wnrQU8X5y979Fh1Q95+8/FEVmS76wu74Ef7V2D5mZgF+Ek4JRnx6CBl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.10,148,1719846000"; 
-   d="asc'?scan'208";a="215659341"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 15 Aug 2024 18:10:27 +0900
-Received: from [10.226.92.106] (unknown [10.226.92.106])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 6B69941B0FBE;
-	Thu, 15 Aug 2024 18:10:23 +0900 (JST)
-Message-ID: <4e1034fb-daf6-4bdb-80d2-62536394fc2d@bp.renesas.com>
-Date: Thu, 15 Aug 2024 10:10:21 +0100
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC971B5828;
+	Thu, 15 Aug 2024 09:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723713083; cv=fail; b=cBZUwEx5ylgcoi62xEfksD+q7H1UnPnoa3lAONYI3EP+ZMhdBNm6jQ15h2PE//+NKUOoniqMd7gAFLbFxrEYTiRprJDAVdx/4bhXi0XtPZP22HP1GcuSPbGaXYkEOXigH4wiNTwysBWtMu0iCt97/AYC5E7n2E5fHMQlz4ZoPOE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723713083; c=relaxed/simple;
+	bh=l8U10CcJJ02AVpxvYHmaYDN/WmbNP+xbV5sQsLAVeyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dvn9NNrX6Ilag79DobWlIknSzS7z/zoGM0EV/MTexuWOe6WR2htFSSk89GTai3y/INNxHZEBbv/z4xGX2rZKrC91SQi+CJJJnC1eVAtY/RbFSsAGpGYd12+9R08sjXFxKHgJJzpjnNlk4Vg9w4aZ5cSxHD7KpcDrvfsAAI6PQjg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hHTUAgd0; arc=fail smtp.client-ip=40.107.94.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cqcXSfzovm0Bc3thqxIHbXNNsV5UCO99RQo21o1MRhAkgrNqldgaF9SAAFOomNij7kn92iDCVXoH1+komUpqxS8sTJ73F8/yfykMVLapasiy5xd7j2YbXOmkm9V+aZycHDA0qIUUVVZnmcEA6ad/tpjkH/ybdqXnCGf5Yy4B9kwDR9UOHRraMu4BVgUbsa7Ja3TYoGdYK72imRnYyxLLSP8hY1gUxr05BlR0VidhRhfIMxcPrlDdzYHoN2Hjt5/MPftVssnWUcXO2saHUfBkVyesuoV/NhiLGAlmavxDTYk4OtB+pxRKB8ofce6Rq0EH4HSWGj4VZr8agbPWhobO5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UeVkKYM7st/9hkMrrwNSo5fU1sbQnQmLyvU8eumB7sg=;
+ b=Da78GZhASCD6FUBzS/IzN4m64kVvquBEJQB0ZyAKFffzsvqF4y5qaKfyckkbJ73PUvNbSmVvFfLUL0iXqQE3YWZFv8UO0X+Hh6EjbVMuO+cNtYPj4fzUgOGWPhodn1Yd5M3YmueTMOQHRB4/S3x8girlGkW/Lmtg7Gc2cUgHTk7zgsiKfEcqKvBbuF2HhzeKYd4GRlgExEqUX2Zh1mJkY1hF0CSvGFtREB1xza4jBhmk2ZnOX29QkZ3m33kr89CnWPa4xqZqh766IHgWsdGeOWqOU42htrD/xb0gmVYeIAKVCE6kRJa+Ypw2qoAfAy7/mZjJQg15haCMcDOWtoxTKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UeVkKYM7st/9hkMrrwNSo5fU1sbQnQmLyvU8eumB7sg=;
+ b=hHTUAgd0BT6JjaxUeHfQ6x+WU8GorzYqJ82IaL7Kqk006MCT6wFgCOBQys53WEzauzo/FUvo0mSfk/q/CsUVjUOsAx21mYxAQ1mrRoIJXP7YjPds4pTRytZjifMML0qkFqyVVSL0XWeJMc9wKPyhkcRXUy1bmD5SphwMu/2ttF5bile4+ulGkzukDr9HUBEE+aOR+XBXZ4XiyPdbzi+2KQULjKciHM+QEjeblaoTv1fVJO5leyZJfr85yywdiBp0duos6C+6IqyrTOwHWnR0pAQbNvSg3p1AZ1RivR1w3KYZXv8uodpWh2hMpdsXuZFcn5Wr7PL3PNyFONGYRyhwrA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by LV3PR12MB9118.namprd12.prod.outlook.com (2603:10b6:408:1a1::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Thu, 15 Aug
+ 2024 09:11:19 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f%5]) with mapi id 15.20.7849.021; Thu, 15 Aug 2024
+ 09:11:18 +0000
+Date: Thu, 15 Aug 2024 12:11:07 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Antoine Tenart <atenart@kernel.org>, UNGLinuxDriver@microchip.com,
+	Hongbo Wang <hongbo.wang@nxp.com>,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Colin Foster <colin.foster@in-advantage.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Hangbin Liu <liuhangbin@gmail.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 08/14] selftests: net: bridge_vlan_aware: test that
+ other TPIDs are seen as untagged
+Message-ID: <Zr3GK3NeZGGt2lpx@shredder.mtl.com>
+References: <20240815000707.2006121-1-vladimir.oltean@nxp.com>
+ <20240815000707.2006121-9-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815000707.2006121-9-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: TL2P290CA0003.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::20) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
- <b1c10539-4d47-4752-8613-785b0ad83f5e@lunn.ch>
- <933ffa58-8092-4768-993d-cd62897d203d@bp.renesas.com>
- <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
- <524873e1-d770-4f29-a374-dab99fe87c14@bp.renesas.com>
- <d5e2d054-e309-4382-a211-9fa9a0e83783@lunn.ch>
-Content-Language: en-GB
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <d5e2d054-e309-4382-a211-9fa9a0e83783@lunn.ch>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------erULbL10teRUTagGlpnZc7J2"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|LV3PR12MB9118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3be87896-2f7c-434e-a503-08dcbd0a393a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Sq3nYlqwSzAi+ajHiwL+PO9GkwSHZYHQBIVVi4JlwyXyWh0k1/5crV9RIGQD?=
+ =?us-ascii?Q?6SXKhtpFMsGzWvN8ESdp/WuifQxOUKUfWNn2+J/i0R6AKfa04VS6g6/+FdlP?=
+ =?us-ascii?Q?UJsmgwBUQPz18wkBYyGabD+1QnGlSStvNNhqjXYD5mCePdXJ3rA+I3L2zuvM?=
+ =?us-ascii?Q?lcmq2od39A+ayp6hWguW0jIFtT2FX35hpnhQwsnTnzWbNsDjS6pqDlDJw+o7?=
+ =?us-ascii?Q?AyA8k5FMumJ9XtAIrwY64IzZzm+absHU7v3/kLB83YcoxL8hXm+KAR0k76kN?=
+ =?us-ascii?Q?G7KCKs4YkCMZMyuUDr2oa43zV8X+ijDDRmgwAZif7Tom2dLb784luGI74kB8?=
+ =?us-ascii?Q?LhvPCuJ+07KtwffQeNU9s/I5QOQVIQtlLm7szLtz+VmhRQHqVbm3q2AQagNN?=
+ =?us-ascii?Q?/KfRC9sWy6qSznj8KTgU2VrXBhQfl+E+TLMnVgoUbqvoE1G6eXidn4ZdVm1f?=
+ =?us-ascii?Q?RPSECcyptvcEGK1EmWlPSHwblN3ExrJJCq7QgAqjS6yJx6pEoZXdhqWdjiZd?=
+ =?us-ascii?Q?iiYba0blVHma2QibYiGifaTZziTnGHhNd8emmepoezMBRtTevWRnaaVKeEjU?=
+ =?us-ascii?Q?+Hw7n6vINrLNaGxIRi6Lyyu6xBUyS423civ1NZb7aOVNORrJGsES79/A6RpD?=
+ =?us-ascii?Q?lQfIZK5D/aW67G6m8uvvUp9+7oq5G5eigHmF69ScWtL1tulmLu9vXvpP/5oD?=
+ =?us-ascii?Q?Tqg8sBBKxvTzszLm77lpovyqdve+6wu136u/a0cwkuzD3e4WbEj33gHMkNuP?=
+ =?us-ascii?Q?+9+yKxJ3WlzqSdzcca+0V3DbdNmEhf27aJMGC3/Voj4DsIzlx9cBJ0Q9cKC7?=
+ =?us-ascii?Q?gz9r+5IdkCm21vLQ/5qhVGMgFQxQxQwnFeYeIgkfE7BDE5WA8GjVaFn7HzL5?=
+ =?us-ascii?Q?XjBnGPRN4QlAip3FOOQU51c50IBfZ2rKvQAEJF4eh3EzEN3J2r7bfxU8XgkK?=
+ =?us-ascii?Q?VEnPm3AUHU2Rb3U/FzVefEsbX+7oQ6aoYj7JKIG7mOv30WL3Qk5ez1btgd1/?=
+ =?us-ascii?Q?+TQtxz5K6xhtso6PDQCeWNGGsoqX5P0kLzCsmXauyiUV5EJTSYGyxTYDudNn?=
+ =?us-ascii?Q?zq0WUCdV2HR3fB8tBRBn3lSgKw2KZfpOxDRjb1k0Mfhe61m0yq4PCnYVJgVo?=
+ =?us-ascii?Q?9c9Wf14XnREhvSY1W8ZZmerteE0WaJgXTfojUpzLgMjbHHDeXfz9hEh1j+xR?=
+ =?us-ascii?Q?DjUj1SKo7Na/VkwHlrkmX7sxtIESSBv5IJfsWfh9R52UZAu0ndQuyIE6OI/w?=
+ =?us-ascii?Q?oGkvla7mTpfe1EBMKI6QVzIJJ5ziQ4su2u68NroHd/tfVRDXXshRDq+9ySOa?=
+ =?us-ascii?Q?fntfms3Rl3hgTIvYnQxT8cpkykTrhjwzvW+iA6bs7XKMAA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LOGJs6ExXTwXL+S6oHU8Ixjufhiz1RI5GUAXF591P4We3juZ8Ro46gHHun4U?=
+ =?us-ascii?Q?sIS4R1TEgQsvgMk1G28us3H3HXGHsTJFlfI89kX7pMhyOf7WAYBnGXenzEb0?=
+ =?us-ascii?Q?v/Z4hBanYEoemzs+tTieoqxgxunvl1m3pssq0enxjd9kdu0HR8Ogb16aAix3?=
+ =?us-ascii?Q?JeJHzVNqp8R1gcSMuEQyj/yQ64EocBHL6umGQhv/BJowKwKLzE8fGab4j4RV?=
+ =?us-ascii?Q?R7FrBpFmH1pa7aVP1Nm025K5HeOTqQViue7GgoWMGACZrlPGwHng0TS5gmhV?=
+ =?us-ascii?Q?WELdEhKgjM2AFTquIaCf047joVLcZPvuTCMwMpQY4bT5du6V5HBcNJSV/vGM?=
+ =?us-ascii?Q?W0t4wqbuGtLk2mQNUVToY2rOM1rp04vnI0DLlRN7gtu6MJbuH/Fi4QdxHTzM?=
+ =?us-ascii?Q?945zEhYIFyWFWhZZrAuHjcvCNoCxxMmOT/0+iW/QTlMt9t02bUODjCqft7g3?=
+ =?us-ascii?Q?rlETha39XySYVHoLPo2cmlUDi6F3GWNI2jBEl3Vk3SZGkNvF0mswOhw5iSLo?=
+ =?us-ascii?Q?Dz7oyTwnEFVgs7PZCb4jKVKbgY/oXK++t1hQxfSBwJEfZ79HRN0BJk0jKIdk?=
+ =?us-ascii?Q?0YAnFuUzVyrduh6nf8oPvUzWqKahR0D1fpxBtIoI/qlHKAbW7vV/E8RRo9Re?=
+ =?us-ascii?Q?W/haTSJ5j8fGsebUmc9I8cXnFh0k1r54DA0ce06yySg8YjFWeJH7G5cP6j46?=
+ =?us-ascii?Q?eEitlF8ktHr8UMIbM5kbGwz+cnVMEatVvGYBaCZMTBDNHP7bugIJ+7aXunLU?=
+ =?us-ascii?Q?qju0umDDNyilezeE39v4uzgDM0RZePObtVx0bG9tZZOTe8bQK0aAGMFJYLSZ?=
+ =?us-ascii?Q?iJUDxg50MKsmd1kvZA3rwtLbTnlz4SX6WDPxqUqLMmLGSXhjToNUJJb0EzPi?=
+ =?us-ascii?Q?4ZAR6Q/Ns/nWoef5FgsL9CThITJQ+cKg67aTL239OPQyYFD+eBjmkGEJk71N?=
+ =?us-ascii?Q?Yi6Hr5dVmmnlt0Lk1qtGrnk727AjfJ/0eRa2/Iok/opsEEJ4s+B3EP3BROLn?=
+ =?us-ascii?Q?DbGyPOkV8orPiq6EAe4row/Miy0ZEBlbOf9uI3Fj+w6pIiVjF+ZPZ3HEDH/d?=
+ =?us-ascii?Q?TDTCBgNGW469lJJGT+VGUqHZjH2pQzsWwBsAHA+J+Cfvq8/7K5RwylnNrzgi?=
+ =?us-ascii?Q?mJjlDH2btgGvZwb6rEtC2H6+c5/X0Xm9uR9k/WQR/0Jd+Ba9mRCkjJx8z7Me?=
+ =?us-ascii?Q?WzpA6ot+AA0p9TeMNO0Pdn7z8ZdBp13F31rOROaadeBb3OCvC99jKLeRBWfI?=
+ =?us-ascii?Q?QmWmqUgl4Hv37nL9f7GpEivD64H2UPXqh7UA8Sopkba4vlmohio34+oSomLI?=
+ =?us-ascii?Q?p2YMhk9EAXso1aCcMrfdtDPOxrrlVDtN+ESpR9sNsiJKRf1znWYK17NQvOAv?=
+ =?us-ascii?Q?bGlwO43arKgVBEfEZUpxGNGMNw++3OeHXAbrczk4AQ8FKHG6aemsBQwyo6nH?=
+ =?us-ascii?Q?Nfu4kTTFPZkJeZLFNmB2E0H74u311QzAoiuwubMYtg0IlVhRkCfhMQ+UlZgb?=
+ =?us-ascii?Q?iZ3H7ORVLfz1+iF9qAB8Loko8nDYo14UAGUtsqQvaS0sa0Ek9yYkqomVHB11?=
+ =?us-ascii?Q?Iss48rWg4A+ny7PJ8mtSLwhlTh6CHYCP3qZABVt7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3be87896-2f7c-434e-a503-08dcbd0a393a
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 09:11:18.8225
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0U61TaFldENkqC/Q9IJl6rsJW8JwtyjISlC5UGYtg6QNArdR703AODhSKQJHWswT9uv2/Kfrto/CAY3mnuAFrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9118
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------erULbL10teRUTagGlpnZc7J2
-Content-Type: multipart/mixed; boundary="------------VVx40Kl2aWXzy9BT3U745Et1";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <4e1034fb-daf6-4bdb-80d2-62536394fc2d@bp.renesas.com>
-Subject: Re: [net-next PATCH 2/2] net: ravb: Fix R-Car RX frame size limit
-References: <20240615103038.973-1-paul.barker.ct@bp.renesas.com>
- <20240615103038.973-3-paul.barker.ct@bp.renesas.com>
- <b1c10539-4d47-4752-8613-785b0ad83f5e@lunn.ch>
- <933ffa58-8092-4768-993d-cd62897d203d@bp.renesas.com>
- <ed455f3f-dcb3-4654-af78-6ff6c6c5c22e@lunn.ch>
- <524873e1-d770-4f29-a374-dab99fe87c14@bp.renesas.com>
- <d5e2d054-e309-4382-a211-9fa9a0e83783@lunn.ch>
-In-Reply-To: <d5e2d054-e309-4382-a211-9fa9a0e83783@lunn.ch>
+On Thu, Aug 15, 2024 at 03:07:01AM +0300, Vladimir Oltean wrote:
+> The bridge VLAN implementation w.r.t. VLAN protocol is described in
+> merge commit 1a0b20b25732 ("Merge branch 'bridge-next'"). We are only
+> sensitive to those VLAN tags whose TPID is equal to the bridge's
+> vlan_protocol. Thus, an 802.1ad VLAN should be treated as 802.1Q-untagged.
+> 
+> Add 3 tests which validate that:
+> - 802.1ad-tagged traffic is learned into the PVID of an 802.1Q-aware
+>   bridge
+> - Double-tagged traffic is forwarded when just the PVID of the port is
+>   present in the VLAN group of the ports
+> - Double-tagged traffic is not forwarded when the PVID of the port is
+>   absent from the VLAN group of the ports
+> 
+> The test passes with both veth and ocelot.
 
---------------VVx40Kl2aWXzy9BT3U745Et1
-Content-Type: multipart/mixed; boundary="------------0pJW0lJQaD5HaO0BUI0PAW4f"
+Thanks for the test. Passes with mlxsw as well.
 
---------------0pJW0lJQaD5HaO0BUI0PAW4f
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-On 13/08/2024 15:06, Andrew Lunn wrote:
->> Apologies, my response here is abysmally late due to illness, other
->> priorities and then the loss of my main dev box.
->=20
-> Not a problem, life happens.
->=20
->> As you've said, a number of devices do not limit received packet size =
-to
->> the MTU. There are many applications, other than a gateway, where usin=
-g
->> jumbo packets in even just one direction would be beneficial. For
->> example if an application needs to receive large amounts of data but
->> only needs to send back control and acknowledgement messages. I think =
-we
->> should support this where possible. This is the thought behind the fir=
-st
->> patch in this series as the GbEth IP present in the RZ/G2L and other
->> Renesas SoCs has a very asymmetric capability (it can receive 8000 byt=
-e
->> frames but only transmit 1522 byte frames).
->>
->> If we explicitly do not wish to support this, that restriction should =
-be
->> documented and then (maybe over time) handled uniformly for all networ=
-k
->> drivers.
->>
->> I'm planning to submit v2 of this series shortly.
->=20
-> Does the hardware support scatter/gather? How does supporting jumbo
-> receive affect memory usage? Can you give the hardware a number of 2K
-> buffers, and it will use one for a typical packet, and 4 for a jumbo
-> frame?
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
-This is exactly what happens. After recent changes [1], we use 2kB RX
-buffers and an 8kB maximum RX frame size for the GbEth IP. The hardware
-will split the received frame over one or more buffers as needed. As we
-would allocate a ring of 2kB buffers in any case, supporting jumbo
-packets doesn't cause any increase in memory usage or in CPU time spent
-in memory management.
+One question below
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c=
-ommit/?id=3D966726324b7b14009216fda33b47e0bc003944c6
+> ---
+>  .../net/forwarding/bridge_vlan_aware.sh       | 54 ++++++++++++++++++-
+>  1 file changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_aware.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_aware.sh
+> index 64bd00fe9a4f..90f8a244ea90 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_vlan_aware.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_vlan_aware.sh
+> @@ -1,7 +1,7 @@
+>  #!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> -ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding vlan_deletion extern_learn"
+> +ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding vlan_deletion extern_learn other_tpid"
+>  NUM_NETIFS=4
+>  CHECK_TC="yes"
+>  source lib.sh
+> @@ -142,6 +142,58 @@ extern_learn()
+>  	bridge fdb del de:ad:be:ef:13:37 dev $swp1 master vlan 1 &> /dev/null
+>  }
+>  
+> +other_tpid()
+> +{
+> +	local mac=de:ad:be:ef:13:37
+> +
+> +	# Test that packets with TPID 802.1ad VID 3 + TPID 802.1Q VID 5 are
+> +	# classified as untagged by a bridge with vlan_protocol 802.1Q, and
+> +	# are processed in the PVID of the ingress port (here 1). Not VID 3,
+> +	# and not VID 5.
+> +	RET=0
+> +
+> +	tc qdisc add dev $h2 clsact
+> +	tc filter add dev $h2 ingress protocol all pref 1 handle 101 \
+> +		flower dst_mac $mac action drop
+> +	ip link set $h2 promisc on
+> +	ethtool -K $h2 rx-vlan-filter off rx-vlan-stag-filter off
 
-Thanks,
+Any reason not to undo it at the end of the test like other settings?
 
---=20
-Paul Barker
---------------0pJW0lJQaD5HaO0BUI0PAW4f
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
-
---------------0pJW0lJQaD5HaO0BUI0PAW4f--
-
---------------VVx40Kl2aWXzy9BT3U745Et1--
-
---------------erULbL10teRUTagGlpnZc7J2
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZr3F/gUDAAAAAAAKCRDbaV4Vf/JGvYDB
-AP9ii2E2RVOgViQWR4hwEteXogdhQevtQDhtKYFohrPM6gEAicbbVIF6CnteUb65/fPI6HFXJdjs
-y5kNFqt69TdVwAk=
-=kSLz
------END PGP SIGNATURE-----
-
---------------erULbL10teRUTagGlpnZc7J2--
+> +
+> +	$MZ -q $h1 -c 1 -b $mac -a own "88:a8 00:03 81:00 00:05 08:00 aa-aa-aa-aa-aa-aa-aa-aa-aa"
+> +	sleep 1
+> +
+> +	# Match on 'self' addresses as well, for those drivers which
+> +	# do not push their learned addresses to the bridge software
+> +	# database
+> +	bridge -j fdb show $swp1 | \
+> +		jq -e ".[] | select(.mac == \"$(mac_get $h1)\") | select(.vlan == 1)" &> /dev/null
+> +	check_err $? "FDB entry was not learned when it should"
+> +
+> +	log_test "FDB entry in PVID for VLAN-tagged with other TPID"
+> +
+> +	RET=0
+> +	tc -j -s filter show dev $h2 ingress \
+> +		| jq -e ".[] | select(.options.handle == 101) \
+> +		| select(.options.actions[0].stats.packets == 1)" &> /dev/null
+> +	check_err $? "Packet was not forwarded when it should"
+> +	log_test "Reception of VLAN with other TPID as untagged"
+> +
+> +	bridge vlan del dev $swp1 vid 1
+> +
+> +	$MZ -q $h1 -c 1 -b $mac -a own "88:a8 00:03 81:00 00:05 08:00 aa-aa-aa-aa-aa-aa-aa-aa-aa"
+> +	sleep 1
+> +
+> +	RET=0
+> +	tc -j -s filter show dev $h2 ingress \
+> +		| jq -e ".[] | select(.options.handle == 101) \
+> +		| select(.options.actions[0].stats.packets == 1)" &> /dev/null
+> +	check_err $? "Packet was forwarded when should not"
+> +	log_test "Reception of VLAN with other TPID as untagged (no PVID)"
+> +
+> +	bridge vlan add dev $swp1 vid 1 pvid untagged
+> +	ip link set $h2 promisc off
+> +	tc qdisc del dev $h2 clsact
+> +}
+> +
+>  trap cleanup EXIT
+>  
+>  setup_prepare
+> -- 
+> 2.34.1
+> 
 
