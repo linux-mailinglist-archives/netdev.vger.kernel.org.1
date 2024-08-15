@@ -1,104 +1,124 @@
-Return-Path: <netdev+bounces-118768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480F3952BCA
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:18:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1106952BCC
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C88002826AB
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:18:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D851C2172A
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0FE1BBBD0;
-	Thu, 15 Aug 2024 09:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3569817C214;
+	Thu, 15 Aug 2024 09:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABbpPZRW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0172319DF68;
-	Thu, 15 Aug 2024 09:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925B91A00DE
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 09:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723712651; cv=none; b=Z0oyjamUQlB3W1QTzjaodCPwUhqfLSC34/udDbfecIevEhmZmiY048m8MghTBLRCzvozRSEWJRdkOkuTEmKGYNuBS8Avp+49re6t0ae1bIRZdDP4XCto1Jjwzn/MYdFRj79mqGccHlDP4nfmDxYrF+aGxUeTuow2L1V0P2Drgng=
+	t=1723712828; cv=none; b=VBID0PYMtrVYH3le2SAwQMFDnSx5g7VIZ9Vsn8qWZEiExHL/xtmU6MrAx3xaIAKs8GGMtxGCgUfi+HjwKTq0w9Pmmmg9GagbD3Yv9acsVQb/bFYPU9pNNK9NewScvz9Vp6fPtpq04t/7Vc6IOvjCjtNq8VPLis/8n2K2gFcQwik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723712651; c=relaxed/simple;
-	bh=Cy92Jp84Df9o5H0KPaXA6rhuX88LhcChTDxIsiUS+FU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lmXuCX2UJYOsa3X2fiTekWm41wIIsgJrBbEGDIcivr7oaVJYYCz/U7qzpa9oul9srN7pT3ZqTcCKx+fgZCOg4vGaz+v6h87U6i69+B/hsVf4wjbCNsz0cEG+2O3OPUfYKOeB91qgwYu71WtzEtTSUK6yWTrhvo8RRWShL/8t3m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1723712828; c=relaxed/simple;
+	bh=gKYghzI8XPlguzTzjYaQoAp8WbKODgzAPsgN3v43m40=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hulp4geFKtMBfYuI/830L9zxlhR414qiaJcciLIE/IT591Y5xKH6lbXUzO2SytZKxepfnL1OHtPSSbRLsoF7ck8BkwW6uw7v2Hmo9BQfThG/6Uu0AUMrEAFk/rJazRLTylwHKFjDRZZCmEb0Wtziz5KQwKV2wuqgLCrESxL/Kpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ABbpPZRW; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f01e9f53e3so11039821fa.1;
-        Thu, 15 Aug 2024 02:04:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723712648; x=1724317448;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a61386so1012000a12.2
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 02:07:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723712825; x=1724317625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GGdA1uTAZfwjQPOwAEugx2cuORuo6xK2pemc/JdMcEs=;
-        b=NfVTLe/0weUHYFQGcaouRf+JHCXzM5ogrTYw05eaWi/vqeMZJvatibAkWk78y/am2r
-         LZOsAdO3BHf8YP5dDz0MyAgsHSkrGm7YyY5SFf24LA0KAFHXTH4GFgS0FSNYl7q70/wb
-         0frwGBQqINqwfr01EIe69wxpq99haZMoN2gIqs+4/731yWi+KW8k4mGy1kjoZKyG5NFQ
-         NtFkPxtNn0C1WBWNoFNIp202k9xa2G8+tz6utdUb69XT9lkfH1L1avqGs7Vz3ToeBlr5
-         0LDjw6b+NZpq/Z7bwEUbw5Is7vRDpGpMnyD0683LPrs6BCOzB9bqxhObjtZNHN3e/UOK
-         Kbdw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJVxIpSp+QrD73yfs29leNg4ArhU9M2Om8h+yjjJAIdbu9vHyJ59/Fhd+bIB3D1go+9InwCmA7CqybhLSFTEvci63o5Q+0wHg9souLYljpTYs6nkzvDOW5RyWLvjr+jydN6fVRgTjCRUx9miXYuaWaG2VHAi4Td2Zv2BwZw2iH/GA6WMro
-X-Gm-Message-State: AOJu0Yz3nY9noErHw0vIfyy/H3qjVJfzn0FZN5DG8uKLheFowA+vZ0ZZ
-	HRNSh0p+OUhrwjP/qheI/ZWVK9XNW9p5uvLuq97I8i1DNXzyFWYV
-X-Google-Smtp-Source: AGHT+IGEOchYHmiCwd/DoRSgts40Fxyf+kMc/9VZZdbawHLe55tHQbdSBvwegPU1kWP2Jr4dfG0TsA==
-X-Received: by 2002:a2e:e09:0:b0:2ef:17ee:62a2 with SMTP id 38308e7fff4ca-2f3aa1df04emr36835281fa.14.1723712647572;
-        Thu, 15 Aug 2024 02:04:07 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-011.fbsv.net. [2a03:2880:30ff:b::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c70afsm70871266b.15.2024.08.15.02.04.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 02:04:07 -0700 (PDT)
-Date: Thu, 15 Aug 2024 02:04:04 -0700
-From: Breno Leitao <leitao@debian.org>
-To: icejl <icejl0001@gmail.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: nfnetlink: fix uninitialized local variable
-Message-ID: <Zr3EhKBKllxigfcD@gmail.com>
-References: <20240815082733.272087-1-icejl0001@gmail.com>
+        bh=gKYghzI8XPlguzTzjYaQoAp8WbKODgzAPsgN3v43m40=;
+        b=ABbpPZRW52jCk+URg5QmSiMl8qyqK0FKBCUwVSsEtWza64w7qBuYjnqBwJ7GHs7bom
+         9lewW6pKFlWDf+z0zeZEEQKqK/AkhKNd44tMhd7vJE84dsfm/UaxaAZ7YDQYdcK2dhwW
+         pm8uaJo17d3T2fnnTbw0DnlWnhIZZqSxPAWWpi+5Hi5L0J84XEfCQmAGIQJmCVNtt7YC
+         sWgBr6t/1U8hX15q8YnGA33XigYuukclcAWFZUIxJXmS++oc93aJSEAwircjUAHmvqse
+         CHDvFwV2ht1sFl16Wz0RC0ZkeuBwcNiy/y1wnw4bfK9THz5vaPy+4v3sZSO6M85gbkbS
+         x98g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723712825; x=1724317625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gKYghzI8XPlguzTzjYaQoAp8WbKODgzAPsgN3v43m40=;
+        b=bFRUtHOBDtANzpHKa8Zci1fN5Avi4g6c+wBTOEM5OnsPB42bCiZskHw1kaNWMtG8e7
+         pVo+eSJRL2esFll7eBaxE6q3uXy8WI13kMzQs6sYYfHw/Vf49Hv1HgD+iBjrjWBJ3OiX
+         oX4tru8j5Bd+PKYZ99CxybpaCnpOBrXFM20ahr3yiteihe7RasLLrWwt9EFruQUV0HGk
+         Ly3vWBnIgNF2R+Soxy+LPPniUj2d+hBJAd/xMauNy8DyBgt7vnnJlGtVWm951IgqYErS
+         DvvbthfOOz9zfeRKvPpCo5F+Qg0MFFX3OCTmGTuT4YXj3ypkSYj9enCDdupv11YH/9+H
+         P37Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQuyp6UvyMBr5+dRAi/whs1Fum5KNxjYjxdaZmmeq8lceAxlFT41LXYZtEPgvQC45uVZKlbEvRhhlpIPxOXpr+aT1FydxV
+X-Gm-Message-State: AOJu0YwPKVyIQhLzqvQ+LvF75W6LYnA5b8S/snoA6Ex81pua2bOvzTcd
+	2Ij7AH/pnQj90w+6DRYkXBL8gKyoh8NnMoNEcU41KRsaXZs1Is5fCHH9tJYsaI80Lh+U10UIpXK
+	cpkZAnzQeol42AWwysA/m85I6sAg=
+X-Google-Smtp-Source: AGHT+IFhYvisV+ZsDCGEKasVDt7Mo6N8WA+POz5bJNHpn8nhcIso4kSnrJReyl4tV/V781+kbTxgfxmN5T5sfJSnDrM=
+X-Received: by 2002:a05:6402:2344:b0:5be:c34c:f467 with SMTP id
+ 4fb4d7f45d1cf-5bec34d09bcmr723410a12.24.1723712824344; Thu, 15 Aug 2024
+ 02:07:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240815082733.272087-1-icejl0001@gmail.com>
+References: <CAMArcTXtKGp24EAd6xUva0x=81agVcNkm9rMos+CdEh6V_Ae4g@mail.gmail.com>
+ <20240813181708.5ff6f5de@kernel.org> <CACKFLimwA=P4M8UEW5cKgnCMCRu99d5DBX17O6ERriUkC=NxMA@mail.gmail.com>
+ <CAMArcTW2yvEJLr_55G7FDsGtzKjTa2zMndOrAOBCshsW7UUj5A@mail.gmail.com> <CACKFLikxTXW4xg8vz7-NfModfn-ymf=a4pL6BtM8LebOmPsdfw@mail.gmail.com>
+In-Reply-To: <CACKFLikxTXW4xg8vz7-NfModfn-ymf=a4pL6BtM8LebOmPsdfw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 15 Aug 2024 18:06:52 +0900
+Message-ID: <CAMArcTWnDk4eQLgzNXJ-LtudXugEwrLSFB+T-EByaFAcudOk2A@mail.gmail.com>
+Subject: Re: Question about TPA/HDS feature of bnxt_en
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>, 
+	Somnath Kotur <somnath.kotur@broadcom.com>, Mina Almasry <almasrymina@google.com>, 
+	Netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2024 at 04:27:33PM +0800, icejl wrote:
-> In the nfnetlink_rcv_batch function, an uninitialized local variable
-> extack is used, which results in using random stack data as a pointer.
-> This pointer is then used to access the data it points to and return
-> it as the request status, leading to an information leak. If the stack
-> data happens to be an invalid pointer, it can cause a pointer access
-> exception, triggering a kernel crash.
-> 
-> Signed-off-by: icejl <icejl0001@gmail.com>
-> ---
->  net/netfilter/nfnetlink.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
-> index 4abf660c7baf..b29b281f4b2c 100644
-> --- a/net/netfilter/nfnetlink.c
-> +++ b/net/netfilter/nfnetlink.c
-> @@ -427,6 +427,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
->  
->  	nfnl_unlock(subsys_id);
->  
-> +	memset(&extack, 0, sizeof(extack));
->  	if (nlh->nlmsg_flags & NLM_F_ACK)
->  		nfnl_err_add(&err_list, nlh, 0, &extack);
+On Thu, Aug 15, 2024 at 2:18=E2=80=AFAM Michael Chan <michael.chan@broadcom=
+.com> wrote:
+>
 
-There is a memset later in that function , inside the 
-`while (skb->len >= nlmsg_total_size(0))` loop. Should that one be
-removed?
+Hi Michael
+
+> On Wed, Aug 14, 2024 at 12:51=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> =
+wrote:
+> >
+> > On Wed, Aug 14, 2024 at 11:08=E2=80=AFAM Michael Chan <michael.chan@bro=
+adcom.com> wrote:
+> > > Yes, the rx_copy_thresh is also the HDS threshold. The default value
+> > > is 256, meaning that packet sizes below 256 will not be split. So a
+> > > 300-byte packet should be split.
+> > >
+> > > TPA is related but is separate. There is a min_agg_len that is
+> > > currently set to 512 in bnxt_hwrm_vnic_set_tpa(). I think it should
+> > > be fine to reduce this value for TPA to work on smaller packets.
+> >
+> > Thank you so much for confirming the hds_threshold variable.
+> > I tested this variable, it worked as I expected.
+> > For testing, I kept the rx_copy_threshold and tpa settings unchanged,
+> > but modified the hds_threshold variable to 0.
+> >
+> > BTW, how about separating rx_copy_threshold into rx-copy-break
+> > and hds_threshold?
+> > If so, we can implement `ethtool --set-tunable eth0 rx-copybreak N`
+> > and `ethtool -G eth0 tcp-data-split on`
+> >
+> Yes, we can do that. I have the rx-copybreak tunable implemented in
+> the OOT driver already and can be sent upstream. tcp_data_split can
+> also be added. Thanks.
+
+Thanks a lot for sharing that!
+Taehee Yoo
 
