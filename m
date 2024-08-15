@@ -1,132 +1,159 @@
-Return-Path: <netdev+bounces-118843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD3CD952EBD
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:04:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A254952EC6
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 807BB281DCF
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:04:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CD99B25C7E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7606919E7C8;
-	Thu, 15 Aug 2024 13:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D8B19DF60;
+	Thu, 15 Aug 2024 13:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iNBLvtY+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWysPbmr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B02819DFA6;
-	Thu, 15 Aug 2024 13:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9BD1714A8;
+	Thu, 15 Aug 2024 13:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723727038; cv=none; b=aHXwgbATypQnwLiq9MkqRsYa1Ad55M3sj83VU0ynABy8qM1u5zcXkiwysZiI7KNq+fw+INwCcKrI4ZSsuwFxzt5QpdkENOoinHW1r4f21aKLj+iQZ3523BsHUBWhm/R9+CBY2C/RmtWlgg42/de/vjLgyFbmITgc2JXBxodzgxc=
+	t=1723727274; cv=none; b=Y5LtgRdPlYSG4DLjfYUrHbBRfTnlmGFLpv5JRI9bLPL/rK4XX6B8HVHnVyre/oNpQkJo2LA7Ujp/cbJe/EJTR0HDYtlA9uvSNz1BYo8kUkQpnIgzAIMHOso7CzQszsDLH2zU6+i4WF9ElS4Yd3w97AAC+lX7+Xum/3ZbaXiWMYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723727038; c=relaxed/simple;
-	bh=yEDFxqo+NF6WMAkJcoYLgmvXG6sQYuYfVp3i9QXS9HE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vh6/627i3adSr5MUXQC0MEdLUdk5GidTjpP1RApVfDLb7rF8wargv8Uv5JhrQpgfjNGWn31THg3x4JJ2zV1R+WiACEH5pX7l7jEGwXspU7lH0xdaCt3IVXSb1DYhBDosvFtBPg7m9WxvYE6dYPOZq6JM8+u5lE5YSqx+lsJequ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iNBLvtY+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF954C4AF0A;
-	Thu, 15 Aug 2024 13:03:55 +0000 (UTC)
+	s=arc-20240116; t=1723727274; c=relaxed/simple;
+	bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sK4OKI0xV2ECB2cAJ29dVLkJy9xmJE9ZqXf5KKAG/AYe+Y7fHV4ehrLrl1ucKaa7pR9/Dl2jk1Vt6wHghZHFyj02mfLerz4sVNvA7GL5O2wA8VqIxdWR/yoeTeJCcmQ+RIS1OynoUBmUgaarZpojtWUc774tFU2hjQYuOL/J7g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWysPbmr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC276C4AF12;
+	Thu, 15 Aug 2024 13:07:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723727038;
-	bh=yEDFxqo+NF6WMAkJcoYLgmvXG6sQYuYfVp3i9QXS9HE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iNBLvtY+ikrUFRzMe3U4cW60OaAz3dOt8PXL4Ky9gIPEdF1A3fRxzCSZpfOmFbSQM
-	 CmlYJV9PvA6uEyQsRSEANhAVdvNjh7nkBFNe7nekXxAT/IzOAPjqaMl/HPDQKXCrDi
-	 x4/fOhCzzqVE8dpasb29v7ybfsywum6vTUqcWCK3IYlr5nPLLKIWZb1zkt/OdWDGII
-	 aUvLdcIj3zTXF+nLgwxo7XyVZcdJZCcir44gJLe0HvcNV6wD4ZAnSevgfZhpTrLdyJ
-	 ADfSZ0qkPoQ6SdOTyO1v3heW8imXWw5DAYv8tLwZjKsRFSMLa2Vk/UYfgpqGuBwiVW
-	 nXDnrXLKV3I4w==
-Date: Thu, 15 Aug 2024 14:03:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH v7 net-next 2/3] selftests: net: Add on/off checks for
- non-fixed features of interface
-Message-ID: <20240815130353.GB632411@kernel.org>
-References: <20240815105924.1389290-1-jain.abhinav177@gmail.com>
- <20240815105924.1389290-3-jain.abhinav177@gmail.com>
+	s=k20201202; t=1723727274;
+	bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CWysPbmrhoJPoY6REaRiKM1koRkT1R+xchonrJPpv1x9I+tee+tSfKXPRigLEF1Pp
+	 H0I6xL+kL3jAdP83wrbd95nqrX4gOFtGasClay/ikEcqMAsrRbgUgm8uymaNB2JJyC
+	 s9fAuxND+GVsI3CvvG4maGRFXUv1mrH/QMsPdEHwjeAnn4LLJl1uL87/6fKQvF81e/
+	 gN47e2z5uZcj4pF1aOpUhKbSFnw/JNFL2aRtTdKMtegAQCGM+3alB+E0XbvxVZ0GZx
+	 vSI/1pnVv1gMF6wJ8a7T6crM136WP7rIW/dyqW6P8SmyiDRFQoN0YMbOf3Fz7aHcH8
+	 iawKWeu/fPcSQ==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gao Xiang <xiang@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v2 00/25] netfs: Read/write improvements
+Date: Thu, 15 Aug 2024 15:07:42 +0200
+Message-ID: <20240815-umzog-irgendein-80514d89315a@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240814203850.2240469-1-dhowells@redhat.com>
+References: <20240814203850.2240469-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240815105924.1389290-3-jain.abhinav177@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3763; i=brauner@kernel.org; h=from:subject:message-id; bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaTt/TvfdD5fB2vZ4St+TJxt5mWrLDw33/gjvqHIU/p1x 4z/b++v6yhlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZjI3TKGf7rW+puKJr8xC2Fc +4dN6MQSIQHtD5UCjw3EjTPKG9RWaTEyrOUUX7jY9aVQn42A5tbDjh4fbp/6mSTXO6u8fQdHhII sPwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 15, 2024 at 04:29:23PM +0530, Abhinav Jain wrote:
-> Implement on/off testing for all non-fixed features via while loop.
-> Save the initial state so that it can be restored after on/off checks.
+On Wed, 14 Aug 2024 21:38:20 +0100, David Howells wrote:
+> This set of patches includes a couple of fixes:
 > 
-> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
-> ---
->  tools/testing/selftests/net/netdevice.sh | 37 +++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
+>  (1) Revert the removal of waits on PG_private_2 from netfs_release_page()
+>      and netfs_invalidate_page().
 > 
-> diff --git a/tools/testing/selftests/net/netdevice.sh b/tools/testing/selftests/net/netdevice.sh
-> index 0c32950fdd17..50f7b9d1163d 100755
-> --- a/tools/testing/selftests/net/netdevice.sh
-> +++ b/tools/testing/selftests/net/netdevice.sh
-> @@ -124,7 +124,42 @@ kci_netdev_ethtool()
->  		return 1
->  	fi
->  	echo "PASS: $netdev: ethtool list features"
-> -	#TODO for each non fixed features, try to turn them on/off
-> +
-> +	while read -r FEATURE VALUE FIXED; do
-> +		[ "$FEATURE" != "Features" ] || continue # Skip "Features"
-> +		[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-> +		feature="${FEATURE%:*}"
-> +
-> +		initial_state=$(ethtool -k "$netdev" | grep "$feature:" \
-> +			| awk '{print $2}')
+>  (2) Make cachefiles take the sb_writers lock around set/removexattr.
+> 
+> [...]
 
-Hi Abhinav,
+Applied to the vfs.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs.netfs branch should appear in linux-next soon.
 
-Isn't the value being read into $initial_state here already present in $VALUE?
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-> +		ethtool --offload "$netdev" "$feature" off
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned off feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn off feature:" \
-> +				"$feature"
-> +		fi
-> +
-> +		ethtool --offload "$netdev" "$feature" on
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned on feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn on feature:" \
-> +				"$feature"
-> +		fi
-> +
-> +		#restore the feature to its initial state
-> +		ethtool --offload "$netdev" "$feature" "$initial_state"
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Restore feature $feature" \
-> +				"to initial state $initial_state"
-> +		else
-> +			echo "FAIL: $netdev: Failed to restore feature" \
-> +				"$feature to default $initial_state"
-> +		fi
-> +
-> +	done < "$TMP_ETHTOOL_FEATURES"
-> +
->  	rm "$TMP_ETHTOOL_FEATURES"
->  
->  	kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
-> -- 
-> 2.34.1
-> 
-> 
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.netfs
+
+[01/25] cachefiles: Fix non-taking of sb_writers around set/removexattr
+        https://git.kernel.org/vfs/vfs/c/4ca422fc1c25
+[02/25] netfs: Adjust labels in /proc/fs/netfs/stats
+        https://git.kernel.org/vfs/vfs/c/2d8e8e0dcfa8
+[03/25] netfs: Record contention stats for writeback lock
+        https://git.kernel.org/vfs/vfs/c/b946f63b34fa
+[04/25] netfs: Reduce number of conditional branches in netfs_perform_write()
+        https://git.kernel.org/vfs/vfs/c/922d33ef048c
+[05/25] netfs, cifs: Move CIFS_INO_MODIFIED_ATTR to netfs_inode
+        https://git.kernel.org/vfs/vfs/c/4c1daf044aed
+[06/25] netfs: Move max_len/max_nr_segs from netfs_io_subrequest to netfs_io_stream
+        https://git.kernel.org/vfs/vfs/c/a479f52b4401
+[07/25] netfs: Reserve netfs_sreq_source 0 as unset/unknown
+        https://git.kernel.org/vfs/vfs/c/e1de76429131
+[08/25] netfs: Remove NETFS_COPY_TO_CACHE
+        https://git.kernel.org/vfs/vfs/c/2a4e83a305ef
+[09/25] netfs: Set the request work function upon allocation
+        https://git.kernel.org/vfs/vfs/c/52c62b5f6dc0
+[10/25] netfs: Use bh-disabling spinlocks for rreq->lock
+        https://git.kernel.org/vfs/vfs/c/45268b70a77d
+[11/25] mm: Define struct folio_queue and ITER_FOLIOQ to handle a sequence of folios
+        https://git.kernel.org/vfs/vfs/c/3e73d92929db
+[12/25] iov_iter: Provide copy_folio_from_iter()
+        https://git.kernel.org/vfs/vfs/c/7a51f5cf0851
+[13/25] cifs: Provide the capability to extract from ITER_FOLIOQ to RDMA SGEs
+        https://git.kernel.org/vfs/vfs/c/97b15fbddd0c
+[14/25] netfs: Use new folio_queue data type and iterator instead of xarray iter
+        https://git.kernel.org/vfs/vfs/c/b33aa21f3b7f
+[15/25] netfs: Provide an iterator-reset function
+        https://git.kernel.org/vfs/vfs/c/7306dffdd871
+[16/25] netfs: Simplify the writeback code
+        https://git.kernel.org/vfs/vfs/c/5fb0299ed8df
+[17/25] afs: Make read subreqs async
+        https://git.kernel.org/vfs/vfs/c/05fd361eb083
+[18/25] netfs: Speed up buffered reading
+        https://git.kernel.org/vfs/vfs/c/6437a28f5de1
+[19/25] netfs: Remove fs/netfs/io.c
+        https://git.kernel.org/vfs/vfs/c/85112b95630c
+[20/25] cachefiles, netfs: Fix write to partial block at EOF
+        https://git.kernel.org/vfs/vfs/c/3b5a6483e8d2
+[21/25] netfs: Cancel dirty folios that have no storage destination
+        https://git.kernel.org/vfs/vfs/c/3cca08a1c4c5
+[22/25] cifs: Use iterate_and_advance*() routines directly for hashing
+        https://git.kernel.org/vfs/vfs/c/c86e6c334311
+[23/25] cifs: Switch crypto buffer to use a folio_queue rather than an xarray
+        https://git.kernel.org/vfs/vfs/c/04c9967360ea
+[24/25] cifs: Don't support ITER_XARRAY
+        https://git.kernel.org/vfs/vfs/c/7d0f7f2d1e8b
 
