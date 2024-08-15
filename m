@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-118827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7AEB952E71
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:45:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C858F952E73
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5387A2859E4
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:45:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 446B31F23887
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AEB7DA62;
-	Thu, 15 Aug 2024 12:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FA0150997;
+	Thu, 15 Aug 2024 12:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOecwiQ0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3CM/Cqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A265B1AC88C;
-	Thu, 15 Aug 2024 12:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8132E1AC88C;
+	Thu, 15 Aug 2024 12:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723725944; cv=none; b=rhcUxb21VdJIvk2PWSqPowDIsJQSb6E+owiL5SAsJ34tzzB06hkaVQUTLGAnwNZAG1w2qzo0R/MsSEQgwpWlHsOX0+cu1nOQ4vpoOLS5W/DXGAKwp7Van0WLY8ZGdgW8bfTbJI7Kf0OboIf176TG8w7dvOBEUfZY7ESQHFnSWg4=
+	t=1723725951; cv=none; b=ekK4UuypCueVr0ntFZwOfh8uwXrVJzFy9lvb6fOIzVEzEUFequlNERonmL5OBIlKVWWY/EZx6WANMWU2AscZQ3+Mn6K2wl49KanDycEe9IauU7Jpt93+sK8Y+gGqe/LKr2OHBtgykBM0cxxlXRhy3gfte88euWw0eWOEAc9XRJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723725944; c=relaxed/simple;
-	bh=gSkvPCZ5F2KLNjbUA9QQF59rFMN29CicQcVimMZA7Sc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=br4OymBL5/JDyvKdB24BPsGOId0BYFVIcHYVg6pleagmQSUDHEM1JmA3sCJJjK97LIwzrU778Z4otKLvZ08Hxu4NHDkKYu9LZGYdTKbho55WaBHEq33Zx5bVWUe3wPC535jMi9DRxlN1OxX+kYQFeartUZNQ9gs9vTMIrvNkae4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOecwiQ0; arc=none smtp.client-ip=209.85.210.196
+	s=arc-20240116; t=1723725951; c=relaxed/simple;
+	bh=tL6JvbRjlWSlxR/d/T0eoTIwMHVhyn1u2kUnYN6CNX0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=I41LvMTfrrjs6TvvBsXvclT8JrkbEFyc73gSCy46unUk4gH2kI+jMdnx5RUqQTYrISy/UNP1W5oNLliS0tRs6bVx9ICMEW+mtz4IvAzNMgcDoUIahg91cETv4/BZqqT8Fe3dzTZXv0fIxT5jlajMR6grTCPUJRz46QFWDb3iBiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3CM/Cqu; arc=none smtp.client-ip=209.85.215.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-70d2b921cdfso676819b3a.0;
-        Thu, 15 Aug 2024 05:45:42 -0700 (PDT)
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so681998a12.3;
+        Thu, 15 Aug 2024 05:45:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723725942; x=1724330742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wNzBxnmVRpnlx1Ed/XHkpcoP45ab/H3XRfB6s4a8DXQ=;
-        b=GOecwiQ0OSKMJNW/RcTSMeza5iWqkpY562qiB0GmZB1dnbn9/Bms4zXiIaeXY/xTME
-         h+EtQ1+O7k4bcGwbd+sErUI93v3tuOI2svbvbEZTEdj9YbuRu903M8zAY2SGqom9NRZi
-         0FBzud/3kA+xZlRGktVq+mKXD1wjd4uMwwDhR7a+AzEKdzN1eoUmhs7wP46VQuRqgess
-         w85TAWl0nRzP4gXqYG6uI8OjPovSwBVWiyh5/6aWodvy/GhQcUQsrWWmC00WqCoBHns/
-         fpIO+C4Sea6LhpCjP574XiTh7C3QP6bz0NJ2A/sl2DQXtt1cO/Lao9PxViKgwGvFfb3O
-         lKvw==
+        d=gmail.com; s=20230601; t=1723725947; x=1724330747; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2fta6JFeSB7c5lYbnKfFdO8GDsHLzjfZEltROIk0550=;
+        b=g3CM/Cquv1Fa9NOTei3pjTrQ2LeAp1E7Ahc8Su7QKRc7Vu4F3uo+5++qUgeSR1z24q
+         gmNvcozeksCJ8pMyHTFm5iFfJL+H0V3Gc+DnsYI8T/f6NWGxhrp8VW5sIImVMCzspDAZ
+         SRENaXoOtCHETUiURnp/w4I1iP6CQv/VC8DzcaYasZVZcR9z3tzT5XIv9fskiBA1gg7h
+         xqLmxz1GRuAA72dEfSYCyVdnqToLRA58VlGoF0kbXjZVIAnxqUe9jvswnU0q9S0Zj/vq
+         BU7MVppt3oyBkr7OZOa7JeTlYTZTlD8Tn9948eVe/xgz7QDpFUVhwQYh43/BJzKlqEsh
+         MNFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723725942; x=1724330742;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wNzBxnmVRpnlx1Ed/XHkpcoP45ab/H3XRfB6s4a8DXQ=;
-        b=eDLPaFWnHTTgy21I8b03j13mZsSjsmLLX63BwDkkmGjTzHw/Wg/qztNlIBur9HObLt
-         7/JAaadQCIyy7hu1PXsRZpPEn05CGUzhPLzH/QgVyLh0EaUnzkQc56oDcy/2dImZNKxw
-         /madQvTzouJBbfh2mZvmLTHU0g9KfGyUM0NXfCyFJNzp5rGt7MW5ojqlygcvhJp9tvft
-         SkhhSKlZXNi3CE4GdYrjB/kuK1xFsWEnKYcN6EBAsDHhJ+YgESVKP1SMqDBCNsr17Afr
-         a/pBIBnUvBUIn2pDTabJWF2ZFRbwLW6yPW90m58VNlvouymvz5Yhcrm/XxeP6o4COjGA
-         nXrg==
-X-Forwarded-Encrypted: i=1; AJvYcCVXFqTWgIID3jrjC7QB/4PxaiY8E9acT2WCbmpQKAexsmBit2UNKCOwHAsV617U/hMOHM4yu57gXg2TmxY20F+UlyHaW58Kx10/keMO0k7D5zVhrOZm7++mu0a8qJwh2h/5H3VG
-X-Gm-Message-State: AOJu0YyJAo3fbbJpsaxtaAh6Gfw/zD87/G6CRhUhQ9Op0VKk0LXm9c6E
-	QrTTeI3Y7CboEjZPSdNV2TDNXac8JDPDOjYcgWuBRjU+s8H99dfG
-X-Google-Smtp-Source: AGHT+IH8vXh5XNtlrYF0WHkQ6rw2dEXfq12CBNFZ81eLTYiYWiRfHWd31IeL39BUnDZIyZJuzFVqUw==
-X-Received: by 2002:a05:6a00:21d6:b0:70d:278e:4e94 with SMTP id d2e1a72fcca58-71267420cf8mr5780950b3a.30.1723725941686;
-        Thu, 15 Aug 2024 05:45:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723725947; x=1724330747;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2fta6JFeSB7c5lYbnKfFdO8GDsHLzjfZEltROIk0550=;
+        b=A97GMnIhysBMa2UA9jSuLDcfmG2jPzEp0sjXNqo+51tU4bQ2/X4Zt9A/mWSsMYyrR0
+         F7XgFPXxxWHViiw6rXq9jRlsgsw9Usq0aqWbkztNHUCK7Fmkw397ysxcoSjkJ7h3aCN6
+         mFaij+2pTYcKknBhKiZYFfrqRCBInpbtMprt/jjrizA+iSiGtBCor9SPdklIMPy1lLtN
+         czYv87nOUOOMq5RXs7TCsX54I/VqWsx/d8ZigCuwjKjoplQNNaziS8u5cVbm0HOLHrct
+         HFDz560h0+hjTVQRTVrushPIpHVQ+taQC1LQbkFlpoP9skK+qoVn5ilOw/tTb03jBHqs
+         rkKg==
+X-Forwarded-Encrypted: i=1; AJvYcCX69+cKG0W3u9q/7OD8ZwmUm45MEIjEcGyF2QkmXZMP6PpgoGWrukm86qEqq9PlGkqHpYECo+13Sg1XFPTaGI38WJ77Unedv4Y5D9sHal7cFdNPLykfCAcGjrzHJZRVMtdKiswh
+X-Gm-Message-State: AOJu0YygU1TvIXMJQoqev5GHYRhYzB3QbpFRKnOngDOpfkvJxDlydBe2
+	MFCxP6Tam/43f0DVB0TEVOnqquoDkag4J+P3UNJhsD8CEpubgQ29
+X-Google-Smtp-Source: AGHT+IGzeTxcYDyToKt5s0HI8cdzCxZaGdO46vqfYjT8o0A7YZnjgjuqL7cbmf0urTwPOjFBFnsOFg==
+X-Received: by 2002:a05:6a21:3483:b0:1c6:fbc8:670d with SMTP id adf61e73a8af0-1c8eaf63fc5mr6876058637.43.1723725946566;
+        Thu, 15 Aug 2024 05:45:46 -0700 (PDT)
 Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af2b942sm923605b3a.183.2024.08.15.05.45.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af2b942sm923605b3a.183.2024.08.15.05.45.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 05:45:41 -0700 (PDT)
+        Thu, 15 Aug 2024 05:45:46 -0700 (PDT)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: kuba@kernel.org
@@ -82,10 +84,12 @@ Cc: davem@davemloft.net,
 	petrm@nvidia.com,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 00/10] net: vxlan: add skb drop reasons support
-Date: Thu, 15 Aug 2024 20:42:52 +0800
-Message-Id: <20240815124302.982711-1-dongml2@chinatelecom.cn>
+Subject: [PATCH net-next 01/10] net: vxlan: add vxlan to the drop reason subsystem
+Date: Thu, 15 Aug 2024 20:42:53 +0800
+Message-Id: <20240815124302.982711-2-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240815124302.982711-1-dongml2@chinatelecom.cn>
+References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,50 +98,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In this series, we add skb drop reasons to the vxlan module. After the
-commit 071c0fc6fb91 ("net: extend drop reasons for multiple subsystems"),
-we can add the skb drop reasons as a subsystem.
+In this commit, we introduce the SKB_DROP_REASON_SUBSYS_VXLAN to make the
+vxlan support skb drop reasons.
 
-So, we now add a new skb drop reason subsystem for vxlan. I'm not sure
-if it is better to add them directly to enum skb_drop_reason, as there
-are only 6 new drop reasons that we introduce for vxlan:
+As the vxlan is a network protocol, maybe we can directly add it to the
+enum skb_drop_reason instead of a subsystem?
 
-  VXLAN_DROP_FLAGS
-  VXLAN_DROP_VNI
-  VXLAN_DROP_MAC
-  VXLAN_DROP_TXINFO
-  VXLAN_DROP_REMOTE
-  VXLAN_DROP_REMOTE_IP
-
-And we add the "SKB_DROP_REASON_IP_TUNNEL_ECN" to enum skb_drop_reason,
-as it not only belongs to vxlan subsystem.
-
-In order to reset the reason to NOT_SPECIFIED if it is
-SKB_NOT_DROPPED_YET, we introduce the SKB_DR_RESET() in the 2nd patch.
-This is to make sure that the skb is indeed dropped.
-
-Menglong Dong (10):
-  net: vxlan: add vxlan to the drop reason subsystem
-  net: skb: add SKB_DR_RESET
-  net: skb: introduce pskb_network_may_pull_reason()
-  net: ip: introduce pskb_inet_may_pull_reason()
-  net: vxlan: make vxlan_remcsum() return skb drop reasons
-  net: vxlan: add skb drop reasons to vxlan_rcv()
-  net: vxlan: use vxlan_kfree_skb() in vxlan_xmit()
-  net: vxlan: add drop reasons support to vxlan_xmit_one()
-  net: vxlan: use kfree_skb_reason in vxlan_encap_bypass
-  net: vxlan: use vxlan_kfree_skb in encap_bypass_if_local
-
- drivers/net/vxlan/drop.h          | 36 ++++++++++++
- drivers/net/vxlan/vxlan_core.c    | 91 +++++++++++++++++++++++--------
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+---
+ drivers/net/vxlan/drop.h          | 30 ++++++++++++++++++++++++++++++
+ drivers/net/vxlan/vxlan_core.c    | 15 +++++++++++++++
  drivers/net/vxlan/vxlan_private.h |  1 +
- include/linux/skbuff.h            |  8 ++-
- include/net/dropreason-core.h     |  7 +++
- include/net/dropreason.h          |  6 ++
- include/net/ip_tunnels.h          | 10 +++-
- 7 files changed, 133 insertions(+), 26 deletions(-)
+ include/net/dropreason.h          |  6 ++++++
+ 4 files changed, 52 insertions(+)
  create mode 100644 drivers/net/vxlan/drop.h
 
+diff --git a/drivers/net/vxlan/drop.h b/drivers/net/vxlan/drop.h
+new file mode 100644
+index 000000000000..83e10550dd6a
+--- /dev/null
++++ b/drivers/net/vxlan/drop.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * VXLAN drop reason list.
++ */
++
++#ifndef VXLAN_DROP_H
++#define VXLAN_DROP_H
++#include <linux/skbuff.h>
++#include <net/dropreason.h>
++
++#define VXLAN_DROP_REASONS(R)			\
++	/* deliberate comment for trailing \ */
++
++enum vxlan_drop_reason {
++	__VXLAN_DROP_REASON = SKB_DROP_REASON_SUBSYS_VXLAN <<
++				SKB_DROP_REASON_SUBSYS_SHIFT,
++#define ENUM(x) x,
++	VXLAN_DROP_REASONS(ENUM)
++#undef ENUM
++
++	VXLAN_DROP_MAX,
++};
++
++static inline void
++vxlan_kfree_skb(struct sk_buff *skb, enum vxlan_drop_reason reason)
++{
++	kfree_skb_reason(skb, (u32)reason);
++}
++
++#endif /* VXLAN_DROP_H */
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 8983e75e9881..5785902e20ce 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -4834,6 +4834,17 @@ static int vxlan_nexthop_event(struct notifier_block *nb,
+ 	return NOTIFY_DONE;
+ }
+ 
++static const char * const vxlan_drop_reasons[] = {
++#define S(x)	[(x) & ~SKB_DROP_REASON_SUBSYS_MASK] = (#x),
++	VXLAN_DROP_REASONS(S)
++#undef S
++};
++
++static struct drop_reason_list drop_reason_list_vxlan = {
++	.reasons = vxlan_drop_reasons,
++	.n_reasons = ARRAY_SIZE(vxlan_drop_reasons),
++};
++
+ static __net_init int vxlan_init_net(struct net *net)
+ {
+ 	struct vxlan_net *vn = net_generic(net, vxlan_net_id);
+@@ -4915,6 +4926,9 @@ static int __init vxlan_init_module(void)
+ 
+ 	vxlan_vnifilter_init();
+ 
++	drop_reasons_register_subsys(SKB_DROP_REASON_SUBSYS_VXLAN,
++				     &drop_reason_list_vxlan);
++
+ 	return 0;
+ out4:
+ 	unregister_switchdev_notifier(&vxlan_switchdev_notifier_block);
+@@ -4929,6 +4943,7 @@ late_initcall(vxlan_init_module);
+ 
+ static void __exit vxlan_cleanup_module(void)
+ {
++	drop_reasons_unregister_subsys(SKB_DROP_REASON_SUBSYS_VXLAN);
+ 	vxlan_vnifilter_uninit();
+ 	rtnl_link_unregister(&vxlan_link_ops);
+ 	unregister_switchdev_notifier(&vxlan_switchdev_notifier_block);
+diff --git a/drivers/net/vxlan/vxlan_private.h b/drivers/net/vxlan/vxlan_private.h
+index b35d96b78843..8720d7a1206f 100644
+--- a/drivers/net/vxlan/vxlan_private.h
++++ b/drivers/net/vxlan/vxlan_private.h
+@@ -8,6 +8,7 @@
+ #define _VXLAN_PRIVATE_H
+ 
+ #include <linux/rhashtable.h>
++#include "drop.h"
+ 
+ extern unsigned int vxlan_net_id;
+ extern const u8 all_zeros_mac[ETH_ALEN + 2];
+diff --git a/include/net/dropreason.h b/include/net/dropreason.h
+index 56cb7be92244..2e5d158d670e 100644
+--- a/include/net/dropreason.h
++++ b/include/net/dropreason.h
+@@ -29,6 +29,12 @@ enum skb_drop_reason_subsys {
+ 	 */
+ 	SKB_DROP_REASON_SUBSYS_OPENVSWITCH,
+ 
++	/**
++	 * @SKB_DROP_REASON_SUBSYS_VXLAN: vxlan drop reason, see
++	 * drivers/net/vxlan/drop.h
++	 */
++	SKB_DROP_REASON_SUBSYS_VXLAN,
++
+ 	/** @SKB_DROP_REASON_SUBSYS_NUM: number of subsystems defined */
+ 	SKB_DROP_REASON_SUBSYS_NUM
+ };
 -- 
 2.39.2
 
