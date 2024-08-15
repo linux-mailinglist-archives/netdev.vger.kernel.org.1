@@ -1,168 +1,137 @@
-Return-Path: <netdev+bounces-118915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93AF9953823
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:20:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CB7953825
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11AE91F23C9F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:20:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EBF81F23C76
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F1A1B9B4A;
-	Thu, 15 Aug 2024 16:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7993C1B4C23;
+	Thu, 15 Aug 2024 16:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="M1RwssTr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+4zvyf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2ED1B582B;
-	Thu, 15 Aug 2024 16:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5FB37703;
+	Thu, 15 Aug 2024 16:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723738798; cv=none; b=G164+BdK3nJYXR0OOFrEjllMqBUXICIHIDexIdYoP7pP/a4UjBd2F7QvfwY/01zHBO+SNsp2TJGTSdeAZJ3kZx/mxqds+MFULzS0wy8WAaTeLS97GVx7tk9HCpsRZJS/a9ccErI4LSqBjVhllAdrRKVdQZksghZAE3M2zRfukZM=
+	t=1723738808; cv=none; b=U06q/IlzdQzaRbsMsbXkW6Ax/tN6lKVOJvDlJ+iiR1CbAWJVBTaa8z74F7cAm8lfALGS7fQNkT4SK2+MOIR/PJb9aV8/cTAN3xYywkALDSU+RN8P92ok+JxzuJGCFZEueDrL4WqHjJj9/LddwqN07pFWBxjfqTDQLOkTVYYt+r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723738798; c=relaxed/simple;
-	bh=DYbBiyj5qYewvbb7Re7XGSYEHPMVwyQyJX5sJF6AXRY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=r8TPUzqUfN6bN1M06kJokHXnLDouNP55/c1yMlYl6rjLf9fGezLE3OXoYbVMnokjUd8rhO6Z4HYZCbBQa6bu9CVhp2soHdMbM0TOfQSbn5JYwLPQNWPxv+JH3MNIAhHo3KB+ywLXBUO8z4r+QF0xx5t1of6BbPm+ru3cTiOH5oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=M1RwssTr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47FFsAYf022989;
-	Thu, 15 Aug 2024 16:18:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=HSE9lOXCQAY2IALUk8wdaT
-	jRFfDB8opieWccJFkeUPQ=; b=M1RwssTrbhws/TAQlsg1zB0eqYHuPFoQbB0n90
-	5IT1A01AcyQf46vp2fglgbC4iRGVqFbY6A8dqdEQ7bSWfyHPYGD/OVOlBpIY0F+A
-	U/v65s+6eWIIc1owERHo6RnXSuo+UnLCwuangl8hCxUmPti9Ng46r52M7Q7OLSi+
-	cWSnfrxO6/HapOXh+CtoDQQyfl0Npt3EZhKAxRKt7zo8edRJf7OBwip9ii/ciaLV
-	zIKfcxpbBDG+fqS4R2VVosrTbugBvYgsORXeyAfm2AdGm5fC0Ib/LmctSESu2QSG
-	1LLXIV+MjI22yB1ClAa9WLo1KgTkm0F/8aAGLGKQPDss6dcg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 410m29543a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 16:18:32 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47FGIVe9004160
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 16:18:31 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 15 Aug
- 2024 09:18:30 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 15 Aug 2024 09:18:30 -0700
-Subject: [PATCH] wifi: mac80211: Fix ieee80211_convert_to_unicast() logic
+	s=arc-20240116; t=1723738808; c=relaxed/simple;
+	bh=tINqSAJ3XeozQYxrCrqrG4Gnf0ia+Hyq8LR2Egz4I8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VrHXEDpVKQPBUEF93hl+ms43i1lmIbBSDA8hH6vGSHsRU8Q2/1wX6dWUKA6in+kIU1rR7XKBHQKoUrQd0CUciXcafuNcsCE4HJlZp5TlIhlARU9GlKE61aLpV/KGknIEvyGNgAC4axlG8JE58hykupSz3NkUo8leODdUEXDgINc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+4zvyf7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C473FC32786;
+	Thu, 15 Aug 2024 16:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723738807;
+	bh=tINqSAJ3XeozQYxrCrqrG4Gnf0ia+Hyq8LR2Egz4I8M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V+4zvyf7Dn9bhrMk44cFgS6zC4kGy9J8vPELArVvCYQRZPdvVO6d5rq0U9x+Gr5Os
+	 zlySxxiFUq6Vk5vY99XBuQrGPD8J6vGwnxHSEa3mehVjW9IGaR77xqtPZRH6OO1cIa
+	 z3WnCylFV7Ua3KngAGJbeQF4g9A71qhZHdNfAHVuWQN4E21/UiyHwRzpEs/0Jq/X/y
+	 zRV2P1seD+ddhctZSflVmE3TA09qZ85ad42AJ1h9BQyFNZ8Kj98IF9KqgN5t260SRQ
+	 lXfkNCXliNlE1fAby9q2KIh2slIMMiC3VKWKe7OdQ3Ji/sMOcWbOBvn2SIe6yR/EPu
+	 d/YUmuneot25w==
+Date: Thu, 15 Aug 2024 09:20:07 -0700
+From: Kees Cook <kees@kernel.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Breno Leitao <leitao@debian.org>, elver@google.com,
+	andreyknvl@gmail.com, ryabinin.a.a@gmail.com,
+	kasan-dev@googlegroups.com, linux-hardening@vger.kernel.org,
+	axboe@kernel.dk, asml.silence@gmail.com, netdev@vger.kernel.org
+Subject: Re: UBSAN: annotation to skip sanitization in variable that will wrap
+Message-ID: <202408150915.150AC9A3E@keescook>
+References: <Zrzk8hilADAj+QTg@gmail.com>
+ <CAFhGd8oowe7TwS88SU1ETJ1qvBP++MOL1iz3GrqNs+CDUhKbzg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240815-ieee80211_convert_to_unicast-v1-1-648f0c195474@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAFUqvmYC/32Oyw6CMBBFf8V0bQ3DQ4sr/8MQUtpRJpFW21Ixh
- H+3kLh1eRb3nDszj47Qs/NuZg4jebImAex3TPXS3JGTTszyLC8zAQUnRBRZDtAqayK60Abbjoa
- U9IGD1oj1UZwANEuKp8MbTZv+2iTupEfeOWlUv0rf5PCB3nODU+CDJLOOevLBus92KcI6/dWr/
- /UIHDhmhehqIcpKi8trJEVGHZQdWLMsyxfLlnAK7wAAAA==
-To: Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Michael Braun
-	<michael-dev@fami-braun.de>
-CC: Harsh Kumar Bijlani <hbijlani@qti.qualcomm.com>,
-        Kalyan Tallapragada
-	<ktallapr@qti.qualcomm.com>,
-        Jyothi Chukkapalli <jchukkap@qti.qualcomm.com>,
-        Anirban Sirkhell <anirban@qti.qualcomm.com>,
-        Johannes Berg
-	<johannes.berg@intel.com>,
-        <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <ath12k@lists.infradead.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.14.0
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: NsLUW30wjT628CfXDSWPNx6PGr70rEfB
-X-Proofpoint-ORIG-GUID: NsLUW30wjT628CfXDSWPNx6PGr70rEfB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-15_09,2024-08-15_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
- spamscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 adultscore=0
- impostorscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408150118
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFhGd8oowe7TwS88SU1ETJ1qvBP++MOL1iz3GrqNs+CDUhKbzg@mail.gmail.com>
 
-The current logic in ieee80211_convert_to_unicast() uses skb_clone()
-to obtain an skb for each individual destination of a multicast
-frame, and then updates the destination address in the cloned skb's
-data buffer before placing that skb on the provided queue.
+On Wed, Aug 14, 2024 at 02:05:49PM -0700, Justin Stitt wrote:
+> Hi,
+> 
+> On Wed, Aug 14, 2024 at 10:10 AM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > Hello,
+> >
+> > I am seeing some signed-integer-overflow in percpu reference counters.
+> 
+> it is brave of you to enable this sanitizer :>)
+> 
+> >
+> >         UBSAN: signed-integer-overflow in ./arch/arm64/include/asm/atomic_lse.h:204:1
+> >         -9223372036854775808 - 1 cannot be represented in type 's64' (aka 'long long')
+> >         Call trace:
+> >
+> >          handle_overflow
+> >          __ubsan_handle_sub_overflow
+> >          percpu_ref_put_many
+> >          css_put
+> >          cgroup_sk_free
+> >          __sk_destruct
+> >          __sk_free
+> >          sk_free
+> >          unix_release_sock
+> >          unix_release
+> >          sock_close
+> >
+> > This overflow is probably happening in percpu_ref->percpu_ref_data->count.
+> >
+> > Looking at the code documentation, it seems that overflows are fine in
+> > per-cpu values. The lib/percpu-refcount.c code comment says:
+> >
+> >  * Note that the counter on a particular cpu can (and will) wrap - this
+> >  * is fine, when we go to shutdown the percpu counters will all sum to
+> >  * the correct value
+> >
+> > Is there a way to annotate the code to tell UBSAN that this overflow is
+> > expected and it shouldn't be reported?
+> 
+> Great question.
+> 
+> 1) There exists some new-ish macros in overflow.h that perform
+> wrapping arithmetic without triggering sanitizer splats -- check out
+> the wrapping_* suite of macros.
+> 
+> 2) I have a Clang attribute in the works [1] that would enable you to
+> annotate expressions or types that are expected to wrap and will
+> therefore silence arithmetic overflow/truncation sanitizers. If you
+> think this could help make the kernel better then I'd appreciate a +1
+> on that PR so it can get some more review from compiler people! Kees
+> and I have some other Clang features in the works that will allow for
+> better mitigation strategies for intended overflow in the kernel.
+> 
+> 3) Kees can probably chime in with some other methods of getting the
+> sanitizer to shush -- we've been doing some work together in this
+> space. Also check out [2]
 
-This logic is flawed since skb_clone() shares the same data buffer
-with the original and the cloned skb, and hence each time the
-destination address is updated, it overwrites the previous destination
-address in this shared buffer. As a result, due to the special handing
-of the first valid destination, all of the skbs will eventually be
-sent to that first destination.
+I haven't checked closely yet, but I *think* top 4 patches here[1]
+(proposed here[2]) fix the atomics issues. The haven't landed due to
+atomics maintainers wanting differing behavior from the compiler that
+Justin is still working on (the "wraps" attribute alluded to above[3]).
 
-Fix this issue by using skb_copy() instead of skb_clone(). This will
-result in a duplicate data buffer being allocated for each
-destination, and hence each skb will be transmitted to the proper
-destination.
+-Kees
 
-Fixes: ebceec860fc3 ("mac80211: multicast to unicast conversion")
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- net/mac80211/tx.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=dev/v6.8-rc2/signed-overflow-sanitizer
+[2] https://lore.kernel.org/linux-hardening/20240424191225.work.780-kees@kernel.org/
+[3] https://github.com/llvm/llvm-project/pull/86618
 
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index 72a9ba8bc5fd..0ee1c7df424c 100644
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -4408,7 +4408,7 @@ ieee80211_convert_to_unicast(struct sk_buff *skb, struct net_device *dev,
- 	struct ieee80211_local *local = sdata->local;
- 	const struct ethhdr *eth = (struct ethhdr *)skb->data;
- 	struct sta_info *sta, *first = NULL;
--	struct sk_buff *cloned_skb;
-+	struct sk_buff *copied_skb;
- 
- 	rcu_read_lock();
- 
-@@ -4423,14 +4423,14 @@ ieee80211_convert_to_unicast(struct sk_buff *skb, struct net_device *dev,
- 			first = sta;
- 			continue;
- 		}
--		cloned_skb = skb_clone(skb, GFP_ATOMIC);
--		if (!cloned_skb)
-+		copied_skb = skb_copy(skb, GFP_ATOMIC);
-+		if (!copied_skb)
- 			goto multicast;
--		if (unlikely(ieee80211_change_da(cloned_skb, sta))) {
--			dev_kfree_skb(cloned_skb);
-+		if (unlikely(ieee80211_change_da(copied_skb, sta))) {
-+			dev_kfree_skb(copied_skb);
- 			goto multicast;
- 		}
--		__skb_queue_tail(queue, cloned_skb);
-+		__skb_queue_tail(queue, copied_skb);
- 	}
- 
- 	if (likely(first)) {
-
----
-base-commit: ae98f5c9fd8ba84cd408b41faa77e65bf1b4cdfa
-change-id: 20240813-ieee80211_convert_to_unicast-1ddee968711d
-
+-- 
+Kees Cook
 
