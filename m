@@ -1,145 +1,136 @@
-Return-Path: <netdev+bounces-118839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4787F952EA0
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 281D8952EAE
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC3DD1F22103
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:59:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4C2F1F21B8A
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83D219DFB9;
-	Thu, 15 Aug 2024 12:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1165615CD52;
+	Thu, 15 Aug 2024 13:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="GmfWc+iD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCsg5EeE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF58719DF70
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 12:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9111DFFB;
+	Thu, 15 Aug 2024 13:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726768; cv=none; b=MKl59bVV/rmCjd2ARvJmDktpaTq5ZGB/CvgsZy8kl+YjK5AkipSp7D85frZPuy53tN/+HY5sy7WM85bfBnrQgYOuBQrc3qs16OC7z4B+nljAdxFTx4+Ip7z03WjuvVaejSfFUcZ9nQkj9S8faal5lqNwzcqzWaWbiQ5Vd+eo0jY=
+	t=1723726909; cv=none; b=qbfrDcryoBaT+6u0/LxjBtXrwTOsf6KijglSKtRvk/5Jt5rvkpRmYXng3uye0iMrVWEHYrTYLwdNnZV+kMDpL2CYVL4iYiKuPX4KhSgf1SyXcftV4M1DQ36ottHmMFoTF7yMDEbguRYKXptLrBcbCy8TwVXE4XcaHlCofXlmx/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723726768; c=relaxed/simple;
-	bh=gDDBCPpOC1eDlyXMtb+M28G43nhd2o9AYEneDllbejE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K9fXZZJ3Bus/8ZSfLQ9fIMFN+7WLAWDO/3kzjWhdN4pl0TwgtgHYpI+OVSwGg61LSHdE2TIXxMJfiOlTG/0WJ69SrGI7FCTjqMx4WrsDxTI2u+3geDyum69lfuiRWSz1F2nI0ooi7VhfBNSHy1NE6GALOdo/rDwOghTbl9WiTCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=GmfWc+iD; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47FC1a8i007134;
-	Thu, 15 Aug 2024 05:59:19 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=Iyis40lxIGSxee/Qz5fQ/C2M2PF4yoS2KNmODSG/FUI=; b=
-	GmfWc+iDUFi7oEAaFzxDVJxSV4zTq98jOcDkPXzrMrdfZ/6yfqtiDTJio7Cp6dNH
-	pCYJBtAiVAnOWewAHuz8sjjMXdX3JG4dCVHFOuamic3BlkZbsJ9JiZI5jkelWFFF
-	IX2M5IxeEoatxoNIOZ9XzJl2Ow3Qrk0XG0okLcXCm+bJKpTTJNL0SO+cb05UaAG/
-	NPSFclhTsWyXCrGi78NCjLKrOkrbqfZq3qwCIRMKyAefjKLhTh0GfXgJQD1jFmEB
-	s/J+1WMkL2/FtljlEb1KHKcEAc22IDaDRGmLrBR2L8NT9WQgp05ZKfT1/lqMqrqQ
-	3JJtqcs5e3DCffMvkyz7iQ==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 410u2c7ang-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 15 Aug 2024 05:59:19 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server id
- 15.2.1544.11; Thu, 15 Aug 2024 12:59:17 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        Jiri Slaby
-	<jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v3 2/2] docs: ABI: update OCP TimeCard sysfs entries
-Date: Thu, 15 Aug 2024 05:59:05 -0700
-Message-ID: <20240815125905.1667148-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240815125905.1667148-1-vadfed@meta.com>
-References: <20240815125905.1667148-1-vadfed@meta.com>
+	s=arc-20240116; t=1723726909; c=relaxed/simple;
+	bh=sXMYf+v+9isfvGYFsv9Oh7uS72yjEyA9xJY+Z/JwoWs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=taPWKO5hTM1kHRLxTaZvkaVS6CRUmVnwMRKSkBslAwGTbWnRksKhHhAYdIPkWIEYuqztUjJjHU3lm68N0nB6wWB1MS0F/Ouf/Z0AFq0uEoTFpBi5nyNRyzi75v0n+7r2mqkRlmrk2oVWix8dSZD+dnlfMdTiKGV2IBci22fNJsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCsg5EeE; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-371893dd249so353857f8f.2;
+        Thu, 15 Aug 2024 06:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723726905; x=1724331705; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sXMYf+v+9isfvGYFsv9Oh7uS72yjEyA9xJY+Z/JwoWs=;
+        b=fCsg5EeEXuzuXsJZ6Pd6VQDWSjStD40KKrryOtw7U9+44dmwwSFeJ/GCqQw7LP75rC
+         nBBk6AfvOT+ZeLNPnU5svxZS+h5+Ul+zoLEr0WTrr2Ah3YhdClyeNDdvDq/6R+snPapj
+         DIVL/eV9xRpD9DWk4neHGGNtVV3uR4G4vAe0FeNfiJkcsMFUMd8IU1ZWtpWRZtRY6f31
+         vzD5uIxnJ1cic4cb9uPGIHB9YtdUOzz+0BlAVzqNFw7I/XFRd1SRd74sT8n4oH+UtyMl
+         KeYVwcfs8CrD4xSjbFDra0M/Npa1mbEYQXN1stHCCAGbMGt++pz8PZ78ouKaOWGouTi1
+         vnZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723726905; x=1724331705;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sXMYf+v+9isfvGYFsv9Oh7uS72yjEyA9xJY+Z/JwoWs=;
+        b=fs7kAcIoJ9Vq7rSJ+WRcWHGcsG4XsswKXuJZw0BLdsVlKwm3BTDUymMovvmWBZRzEL
+         dTvq2c7n8ZgiU0HJ6sZitPuGZyLvIKkLQ8yVXOWN6YJA9HdJQFAbi6r8UWk7UHvd0yY4
+         SsnWqb9FBiIkDTONw+Uv6chCX3xnGcXrEWKlO18cbfm0LqIiKAWbwenIEWpV9K8lYg+F
+         UN1AJYEEueakpIpNXVHb+bWCDWRy+yqcerFizFa1avqbETsdk3VqOJbxBeh+Li6VvA0J
+         BPE/mCBPrfooOB2iT/FARmRscr6swyjPIQc3JAZm0cj53WbKYevFVgCvkdIe9Kp6Zqv5
+         +G/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU+sFUGxcTu4n6JstNgr/i3koj2PYupP/9Jp3fSOzyg/0L8ghLX5PtXs4HHVcyxgz7SSezoQIu2rOKLC+6PHeXjibihBl9u
+X-Gm-Message-State: AOJu0YxfSCelMhz9/ezK+acQemO2kMVQEEa5HHK8+Zrioa5XajyAeTFc
+	bfP32wgtQfOlsIQdj64tVPrvN/8ajPT8fJVK4G/UaAil+0NyG2HAoUyEE0o+UGU3Z2UlKFaeTbl
+	inYr9jZpojfdht2q/pnHShpdPcw0=
+X-Google-Smtp-Source: AGHT+IFS9+Aq+B7gQqzRKZ+YsSAvq8fnCFhAiRQhFWQIJrLbzske8v+JhGw7GGlFnSUmFmnbO/FTUMNR9CsmhhbnN1I=
+X-Received: by 2002:a05:6000:3:b0:371:8c09:dd9a with SMTP id
+ ffacd0b85a97d-3718c09de6amr1083215f8f.62.1723726904989; Thu, 15 Aug 2024
+ 06:01:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: rwzXn3wpAYjnQTi49rd0DkRTvHIsHELJ
-X-Proofpoint-ORIG-GUID: rwzXn3wpAYjnQTi49rd0DkRTvHIsHELJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-15_03,2024-08-15_01,2024-05-17_01
+References: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
+ <87bk1ucctj.fsf@toke.dk>
+In-Reply-To: <87bk1ucctj.fsf@toke.dk>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 15 Aug 2024 15:01:33 +0200
+Message-ID: <CAADnVQKNULb55aFOt1Di53Crf64TvF6p7upvUxLwSbrgMw=puw@mail.gmail.com>
+Subject: Re: bpf-next experiment
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <eric.dumazet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Update documentation according to the changes in the driver.
+On Thu, Aug 15, 2024 at 12:15=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <=
+toke@redhat.com> wrote:
+>
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>
+> > 2. Non-networking bpf commits land in bpf-next/master branch.
+> > It will form bpf-next PR during the merge window.
+> >
+> > 3. Networking related commits (like XDP) land in bpf-next/net branch.
+> > They will be PR-ed to net-next and ffwded from net-next
+> > as we do today. All these patches will get to mainline
+> > via net-next PR.
+>
+> So from a submitter PoV, someone submitting an XDP-related patch (say),
+> should base this off of bpf-next/net, and tag it as bpf-next in the
+> subject? Or should it also be tagged as bpf-next/net?
 
-New attributes group tty is exposed and ttyGNSS, ttyGNSS2, ttyMAC and
-ttyNMEA are moved to this group. Also, these attributes are no more
-links to the devices but rather simple text files containing names of
-tty devices.
+This part we're still figuring out.
+There are few considerations...
+it's certainly easier for bpf CI when the patch set
+is tagged with [PATCH bpf-next/net] then CI won't try
+to find the branch,
+but it will take a long time to teach all contributors
+to tag things differently,
+so CI would need to get smart anyway and would need
+to apply to /master, run tests, apply to /net, run tests too.
+Currently when there is no tag CI attempts to apply to bpf.git,
+if it fails, it tries to apply to bpf-next/master and only
+then reports back "merge conflict".
+It will do this for bpf, bpf-next/master, bpf-next/net now.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- Documentation/ABI/testing/sysfs-timecard | 31 ++++++++++++++----------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+Sometimes devs think that the patch is a fix, so they
+tag it with [PATCH bpf], but it might not be,
+and after review we apply it to bpf-next instead.
 
-diff --git a/Documentation/ABI/testing/sysfs-timecard b/Documentation/ABI/testing/sysfs-timecard
-index 220478156297..3ae41b7634ac 100644
---- a/Documentation/ABI/testing/sysfs-timecard
-+++ b/Documentation/ABI/testing/sysfs-timecard
-@@ -258,24 +258,29 @@ Description:	(RW) When retrieving the PHC with the PTP SYS_OFFSET_EXTENDED
- 		the estimated point where the FPGA latches the PHC time.  This
- 		value may be changed by writing an unsigned integer.
- 
--What:		/sys/class/timecard/ocpN/ttyGNSS
--What:		/sys/class/timecard/ocpN/ttyGNSS2
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty
-+Date:		August 2024
-+Contact:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-+Description:	(RO) Directory containing the sysfs nodes for TTY attributes
-+
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS2
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	These optional attributes link to the TTY serial ports
--		associated with the GNSS devices.
-+Description:	(RO) These optional attributes contain names of the TTY serial
-+		ports associated with the GNSS devices.
- 
--What:		/sys/class/timecard/ocpN/ttyMAC
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyMAC
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		associated with the Miniature Atomic Clock.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port associated with the Miniature Atomic Clock.
- 
--What:		/sys/class/timecard/ocpN/ttyNMEA
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyNMEA
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		which outputs the PHC time in NMEA ZDA format.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port which outputs the PHC time in NMEA ZDA format.
- 
- What:		/sys/class/timecard/ocpN/utc_tai_offset
- Date:		September 2021
--- 
-2.43.5
-
+So tree/branch to base patches off and tag don't
+matter that much.
+So I hope, in practice, we won't need to teach all
+developers about new tag and about new branch.
+We certainly won't be asking to resubmit if patches
+are not tagged one way or the other,
+but if you want to help CI and tell maintainers
+your preferences then certainly start using
+[PATCH bpf-next] and [PATCH bpf-next/net] when necessary.
+Or don't :) and instead help us make CI smarter :)
 
