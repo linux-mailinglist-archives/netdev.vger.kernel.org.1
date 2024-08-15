@@ -1,138 +1,197 @@
-Return-Path: <netdev+bounces-119024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336C5953DDB
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:11:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D516D953DEC
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B200AB26F72
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:11:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 572591F2652F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75815155385;
-	Thu, 15 Aug 2024 23:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DC6155738;
+	Thu, 15 Aug 2024 23:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AjrU+an2"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VJVWBe4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5374F12B94
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 23:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617C01AC897;
+	Thu, 15 Aug 2024 23:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723763513; cv=none; b=l/EEtbha9ymD4LWlju0YmBl44pQAG9IPd+CSDE8M2U4LqCj1tvQvTBW2rMd7lI3S/hM3FCf6l+SdUw69QRr4WFu+VZHUoD77Zo6QE1oMXXv5Xi7EcJECEm+kHlsiYWTgrD50EnLBMKyN/lp9Z2lzullnoh/xkaVouHhoVlBpGWY=
+	t=1723764695; cv=none; b=Kk/tx+Hloe2nAJ+LMk/ag2REF9in/9/NMrCqUdLVRjHruneoVVeva8Fh9G0UaRGaHzJ+peitxpOgWEX+yhIPkqKobMNvnPYBuhblbgVDgfoJti7YXUedT/06YMCiqr7Xvhsi/2YD6/KytLpj6snHG1ARxQCRDMrMDvJwAk0gWj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723763513; c=relaxed/simple;
-	bh=Ec8h09rEooXMLSUW91MkFZkyw6M+PqveKq4WGFsqfAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8HQs/uQg06OxbPisV8/7RNomcq15rILx6zFJd8it9Mag+32hIhdqy/wMg1phyBisE9EQR5QEFfIwVaL5ywhBRPUZ11Sp1D9h5roS2lm0Nvs19e9JG9koYZ/E+3S86NWdKoCzFriXNrXl5EFSqlkCFuOidV2JpWCcFPAGsWiNus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AjrU+an2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=J43jmhnC+s2StBUpkeCduuqxxGyHhIWLNhI4QZ0eZzg=; b=AjrU+an2Kg5RmeP3gS0bwa0bUl
-	va59xGGD95WaBlqDW/LEZN6JZVIEi8wtiZgwV+261zjRhYejoQU/j+dpuiNAoD/Dcm058LDtVudKS
-	Xd4YugiKhY3aHL1J6h/5nHELoDVYz8sz963PK3gHUlz1iobAE9dRReflsxcPprKp7Dhw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sejdA-004sXJ-1w; Fri, 16 Aug 2024 01:11:44 +0200
-Date: Fri, 16 Aug 2024 01:11:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <a1bb18d0-174f-486a-bdfd-295d7c5ce4b2@lunn.ch>
-References: <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
- <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
- <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
- <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
- <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
- <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
- <Zr5uV8uLYRQo5qfX@hoboy.vegasvil.org>
- <ed2519db-b3f8-4ab8-9c89-720633100490@machnikowski.net>
+	s=arc-20240116; t=1723764695; c=relaxed/simple;
+	bh=qXz/ssZwDPPTCVUF9wgWuSXjbU0Ny93i6rKAEkva0kk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ODvy9Ni72SEtnQJUEZ4UVW2lLVm3tMYWQxomOirvvnYTwRz0M6WM6cyhlEL0QyFjMpa1hENph1jvEGPruARpXJgTSzAl+V7NxER1paafZACSROAaKrJ5bhmzgVLGEJ9h3Zwg7jIGiNgRq+BD6zIpmKC+yEKAgPlZLfEwMqX5wXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VJVWBe4u; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47FKcADN017978;
+	Thu, 15 Aug 2024 23:30:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Xui2spjGje6pCXlMy7bJ20vZUsBjTeOYHBfaMs++FG4=; b=VJVWBe4uzzpmdLcp
+	Ixt5Y6/P8L0MrOMviZ6DsB5GhUEcLgnTvL6g92676WJLLJwLblAAWqORwF7i7Y2x
+	BprknDC52My8QxKXd1owzgSYZsEadxeB58Kz7R2JNe/eAHIqGvhU2YKBCLFvOrVF
+	mh7GsJncoqeDppUS/UD5l1D+1tYA16YPqySZVUx84QFe7f3OFbeElBwpjwdqRtA4
+	H2YhlKWxxl4cjmNSdfcXcBZ6zHh7OyWf2kCowR9HhytkqQqqMJmWtQxe1kpGbJx4
+	AiUdOjtS0nn1RoFOR2x4TblGB3APo+Ahg7DrsoD0kR4YiRNWlz+mNsgAWtnz/7uZ
+	JfhDEQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 411rvr891p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 23:30:42 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47FNUfpX005445
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 23:30:41 GMT
+Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 15 Aug
+ 2024 16:30:40 -0700
+Message-ID: <2ad03012-8a10-49fc-9e80-3b91762b9cc3@quicinc.com>
+Date: Thu, 15 Aug 2024 16:30:31 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed2519db-b3f8-4ab8-9c89-720633100490@machnikowski.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v4 1/5] net: stmmac: Add HDMA mapping for dw25gmac
+ support
+To: <jitendra.vegiraju@broadcom.com>, <netdev@vger.kernel.org>
+CC: <alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+        <bcm-kernel-feedback-list@broadcom.com>, <richardcochran@gmail.com>,
+        <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+        <john.fastabend@gmail.com>, <fancer.lancer@gmail.com>,
+        <rmk+kernel@armlinux.org.uk>, <ahalaney@redhat.com>,
+        <xiaolei.wang@windriver.com>, <rohan.g.thomas@intel.com>,
+        <Jianheng.Zhang@synopsys.com>, <leong.ching.swee@intel.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <bpf@vger.kernel.org>,
+        <andrew@lunn.ch>, <linux@armlinux.org.uk>, <horms@kernel.org>,
+        <florian.fainelli@broadcom.com>,
+        Sagar Cheluvegowda
+	<quic_scheluve@quicinc.com>
+References: <20240814221818.2612484-1-jitendra.vegiraju@broadcom.com>
+ <20240814221818.2612484-2-jitendra.vegiraju@broadcom.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <20240814221818.2612484-2-jitendra.vegiraju@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: D26Z6C0OL0tCkQUExsEuaABgFByfXNjD
+X-Proofpoint-ORIG-GUID: D26Z6C0OL0tCkQUExsEuaABgFByfXNjD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-15_15,2024-08-15_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 malwarescore=0 spamscore=0 phishscore=0
+ mlxlogscore=999 priorityscore=1501 clxscore=1011 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408150171
 
-On Fri, Aug 16, 2024 at 12:06:51AM +0200, Maciek Machnikowski wrote:
+
+
+On 8/14/2024 3:18 PM, jitendra.vegiraju@broadcom.com wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 > 
+> Add hdma configuration support in include/linux/stmmac.h file.
+> The hdma configuration includes mapping of virtual DMAs to physical DMAs.
+> Define a new data structure stmmac_hdma_cfg to provide the mapping.
 > 
-> On 15/08/2024 23:08, Richard Cochran wrote:
-> > On Thu, Aug 15, 2024 at 05:00:24PM +0200, Maciek Machnikowski wrote:
-> > 
-> >> Think about a Time Card
-> >> (https://opencomputeproject.github.io/Time-Appliance-Project/docs/time-card/introduction).
-> > 
-> > No, I won't think about that!
-> > 
-> > You need to present the technical details in the form of patches.
-> > 
-> > Hand-wavey hints don't cut it.
-> > 
-> > Thanks,
-> > Richard
+> Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> ---
+>  include/linux/stmmac.h | 50 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
 > 
-> This implementation addresses 3 use cases:
-> 
-> 1. Autonomous devices that synchronize themselves to some external
-> sources (GNSS, NTP, dedicated time sync networks) and have the ability
-> to return the estimated error from the HW or FW loop to users
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 338991c08f00..1775bd2b7c14 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -89,6 +89,55 @@ struct stmmac_mdio_bus_data {
+>  	bool needs_reset;
+>  };
+>  
+> +/* DW25GMAC Hyper-DMA Overview
+> + * Hyper-DMA allows support for large number of Virtual DMA(VDMA)
+> + * channels using a smaller set of physical DMA channels(PDMA).
+> + * This is supported by the  mapping of VDMAs to Traffic Class (TC)
+> + * and PDMA to TC in each traffic direction as shown below.
+> + *
+> + *        VDMAs            Traffic Class      PDMA
+> + *       +--------+          +------+         +-----------+
+> + *       |VDMA0   |--------->| TC0  |-------->|PDMA0/TXQ0 |
+> + *TX     +--------+   |----->+------+         +-----------+
+> + *Host=> +--------+   |      +------+         +-----------+ => MAC
+> + *SW     |VDMA1   |---+      | TC1  |    +--->|PDMA1/TXQ1 |
+> + *       +--------+          +------+    |    +-----------+
+> + *       +--------+          +------+----+    +-----------+
+> + *       |VDMA2   |--------->| TC2  |-------->|PDMA2/TXQ1 |
+> + *       +--------+          +------+         +-----------+
+> + *            .                 .                 .
+> + *       +--------+          +------+         +-----------+
+> + *       |VDMAn-1 |--------->| TCx-1|-------->|PDMAm/TXQm |
+> + *       +--------+          +------+         +-----------+
+> + *
+> + *       +------+          +------+         +------+
+> + *       |PDMA0 |--------->| TC0  |-------->|VDMA0 |
+> + *       +------+   |----->+------+         +------+
+> + *MAC => +------+   |      +------+         +------+
+> + *RXQs   |PDMA1 |---+      | TC1  |    +--->|VDMA1 |  => Host
+> + *       +------+          +------+    |    +------+
+> + *            .                 .                 .
+> + */
+> +
+> +#define STMMAC_DW25GMAC_MAX_NUM_TX_VDMA		128
+> +#define STMMAC_DW25GMAC_MAX_NUM_RX_VDMA		128
+> +
+> +#define STMMAC_DW25GMAC_MAX_NUM_TX_PDMA		8
+> +#define STMMAC_DW25GMAC_MAX_NUM_RX_PDMA		10
+> +
+I have a query here. 
 
-So this contradicts what you said earlier, when you said the device
-does not know its own error, it has to be told it.
+Why do we need to hardcode the number of TX PDMA and RX PDMA to 8 an 10. On some platforms the number of supported TXPDMA and RXPDMA are 11 and 11 respectively ? 
 
-So what is user space supposed to do with this error? And given that
-you said it is undefined what this error includes and excludes, how is
-user space supposed to deal with the error in the error? Given how
-poorly this is defined, what is user space supposed to do when the
-device changes the definition of the error?
+how do we overcome this problem, do we increase the value in such case? 
 
-The message Richard has always given is that those who care about
-errors freeze their kernel and do measurement campaign to determine
-what the real error is and then configure user space to deal with
-it. Does this error value negate the need for this?
-
-> 2. Multi function devices that may have a single isolated function
-> synchronizing the device clock (by means of PTP, or PPS or any other)
-> and letting other functions access the uncertainty information
-
-So this is the simple message passing API, which could be implemented
-purely in the core? This sounds like it should be a patch of its own,
-explaining the use case. 
-
-> 3. Create a common interface to read the uncertainty from a device
-> (currently you can use PMC for PTP, but there is no way of receiving
-> that information from ts2phc)
-
-That sounds like a problem with ts2phc? Please could you expand on why
-the kernel should be involved in feature deficits of user space tools?
-
-> Also this is an RFC to help align work on this functionality across
-> different devices ] and validate if that's the right direction. If it is
-> - there will be a patch series with real drivers returning uncertainty
-> information using that interface. If it's not - I'd like to understand
-> what should I improve in the interface.
-
-I think you took the wrong approach. You should first state in detail
-the use cases. Then show how you solve each use cases, both the user
-and kernel space parts, and include the needed changes to a real
-device driver.
-
-	Andrew
+> +#define STMMAC_DW25GMAC_MAX_TC			8
+> +
+> +/* Hyper-DMA mapping configuration
+> + * Traffic Class associated with each VDMA/PDMA mapping
+> + * is stored in corresponding array entry.
+> + */
+> +struct stmmac_hdma_cfg {
+> +	u8 tvdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_VDMA];
+> +	u8 rvdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_VDMA];
+> +	u8 tpdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_PDMA];
+> +	u8 rpdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_PDMA];
+> +};
+> +
+>  struct stmmac_dma_cfg {
+>  	int pbl;
+>  	int txpbl;
+> @@ -101,6 +150,7 @@ struct stmmac_dma_cfg {
+>  	bool multi_msi_en;
+>  	bool dche;
+>  	bool atds;
+> +	struct stmmac_hdma_cfg *hdma_cfg;
+>  };
+>  
+>  #define AXI_BLEN	7
 
