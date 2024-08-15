@@ -1,202 +1,170 @@
-Return-Path: <netdev+bounces-118849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5771953043
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:40:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645B895309A
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 525991F24E4D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:40:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF97CB24767
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B7119F470;
-	Thu, 15 Aug 2024 13:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8121A00DF;
+	Thu, 15 Aug 2024 13:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AsvEY52o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UPK9Dycm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63AA19EEBD
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 13:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69E9176ADE
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 13:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723729249; cv=none; b=Qncusa6Xb55zMqTgRkrbLf7L3dVHIsAHQRUiiXm5L9qONo+G8VcGZbM9BmNiJJBS27xiYn+EGIgF0BFj9W436wiHcldWaCqXXYRXxtl/aQHxPPQyc1SuiK7Z8wRa7020NMrwN0qO5/uSulgsFxb8Fc2+Ag21noJSMlFsEn29wCk=
+	t=1723729469; cv=none; b=qojbpqO/Sd18TsTzum6rgbeHBxeEyuv8/6QQWAnPnUqHchRAHTUceaGDRZBrZ/tmuIt5nZDb5uJFW8C6BfzrBVBGGg59oJi8ig6NSJRpIy+f0CtUx1frwbm7WuwSeZQUsGsqZhnGDr3Jk/OtKsjg7PDOE1+x1WesWwkiDvmKhrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723729249; c=relaxed/simple;
-	bh=EwoFp5uhJ3xjo7fyBB3WaA3jtI/5X83XGkL/wsdzg4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mo78zQ0mzaWmAcHWmzqaomB9ChZLLclyUcmdEdFsOidcOyaQi/clOKwuArXgafIcvAaI2bP6HfQj5xTAV1PMgNgtC8r0pTklEYbo1SDfnBwMEE4jgUuMzAH7j1RuLOPDuRsl0vVltlYajwUObk5jdQFDaBfH/4LMvI3Z6667Mi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AsvEY52o; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <faa45811-367f-40bd-ad95-f6f08fdf2603@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723729243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+7dtiC3LnRc2ztddUY6fQ1AsDOaxgzAAKjg92ZZJBYA=;
-	b=AsvEY52o2FEzXvJPS9cPX28AHqM8bR0/zEfn+PgzyK5nuLo+t0Af0xDCIXQwXZ72ifYTCD
-	VyE/flzU9f6VPlAD5FokaNgY3rkudAOur6g40BYPDuMJuyStGpB5eqXMIDkkKUE4x0dzmk
-	7wzGNVzSf435RrklDlgUVfCOPUIyHAc=
-Date: Thu, 15 Aug 2024 14:40:33 +0100
+	s=arc-20240116; t=1723729469; c=relaxed/simple;
+	bh=JAhkToa8kENM9IWhecnUHOPPD3QlivwP5mYXpK0KO0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MpidP5u8HlbiYsGoicmMgOzy1uIhlNG23JyAJwxg/63Ycg4jaMFWGSPMG7ClFdcM8tnK3j8og3ZvH6a40w9xfRBxVuQOd4ten2XgqjlomneRwkIf209fdPypklFbYHHaSYJPeQVu4NQJvZI8e65Xw4Mr662liqhpXm2/RbmeTMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UPK9Dycm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68FEFC32786;
+	Thu, 15 Aug 2024 13:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723729469;
+	bh=JAhkToa8kENM9IWhecnUHOPPD3QlivwP5mYXpK0KO0E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UPK9Dycm8Vpj3zV7/0+5ojf7UWmU2lpvepQYRH+AGfZVBzGYgJuny3mOXZwfdvrmr
+	 ePAOu7sXRUjFSrBkbFoSOI3BdsrOpmx+O/oyJHvrXYQRnVU3ddzNmXxpR1zUJPOY/0
+	 xPvvtgUirbCiQn07/ywx4+Ri493nRH7ycg8vYe0C8c11DsX8LF58+Sy82mtxdFOPad
+	 4xFqSCHkzdbOYS7ffqnl+CiB9iICh/5qkXpxNmEflquL53AcmaNq8gKL69G925sw+5
+	 DdlgpuTCVJhTw4EvxFf7oIX/os6bQopvHTGUaYccGcyvn/IDgUULErN+OMeoHJP6Va
+	 zJWaL9WZsrpSw==
+Date: Thu, 15 Aug 2024 14:44:25 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next 03/10] net/mlx5: hw counters: Replace IDR+lists
+ with xarray
+Message-ID: <20240815134425.GD632411@kernel.org>
+References: <20240815054656.2210494-1-tariqt@nvidia.com>
+ <20240815054656.2210494-4-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2 1/2] ptp: ocp: adjust sysfs entries to expose tty
- information
-To: Jiri Slaby <jirislaby@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Vadim Fedorenko <vadfed@meta.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, netdev@vger.kernel.org
-References: <20240805220500.1808797-1-vadfed@meta.com>
- <2024081350-tingly-coming-a74d@gregkh>
- <a38797d7-326d-4ca9-b764-61045ad17b50@linux.dev>
- <dc9df0fd-6344-49ad-87c6-8e5c63857bd6@kernel.org>
- <6a28249c-be3a-498a-8a48-af853350c5d8@linux.dev>
- <831c8bb5-fb39-439b-9ffa-3f55620cb6b3@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <831c8bb5-fb39-439b-9ffa-3f55620cb6b3@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815054656.2210494-4-tariqt@nvidia.com>
 
-On 14/08/2024 11:30, Jiri Slaby wrote:
-> On 14. 08. 24, 10:37, Vadim Fedorenko wrote:
->> On 14/08/2024 06:00, Jiri Slaby wrote:
->>> On 13. 08. 24, 20:24, Vadim Fedorenko wrote:
->>>> On 13/08/2024 10:33, Greg Kroah-Hartman wrote:
->>>>> On Mon, Aug 05, 2024 at 03:04:59PM -0700, Vadim Fedorenko wrote:
->>>>>> Starting v6.8 the serial port subsystem changed the hierarchy of 
->>>>>> devices
->>>>>> and symlinks are not working anymore. Previous discussion made it 
->>>>>> clear
->>>>>> that the idea of symlinks for tty devices was wrong by design. 
->>>>>> Implement
->>>>>> additional attributes to expose the information. Fixes tag points 
->>>>>> to the
->>>>>> commit which introduced the change.
->>>>>>
->>>>>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be 
->>>>>> children of serial core port device")
->>>>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->>>>>> ---
->>>>>>   drivers/ptp/ptp_ocp.c | 68 ++++++++++++++++++++++++++++++++ 
->>>>>> +----------
->>>>>>   1 file changed, 52 insertions(+), 16 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
->>>>>> index ee2ced88ab34..7a5026656452 100644
->>>>>> --- a/drivers/ptp/ptp_ocp.c
->>>>>> +++ b/drivers/ptp/ptp_ocp.c
->>>>>> @@ -3346,6 +3346,55 @@ static EXT_ATTR_RO(freq, frequency, 1);
->>>>>>   static EXT_ATTR_RO(freq, frequency, 2);
->>>>>>   static EXT_ATTR_RO(freq, frequency, 3);
->>>>>> +static ssize_t
->>>>>> +ptp_ocp_tty_show(struct device *dev, struct device_attribute 
->>>>>> *attr, char *buf)
->>>>>> +{
->>>>>> +    struct dev_ext_attribute *ea = to_ext_attr(attr);
->>>>>> +    struct ptp_ocp *bp = dev_get_drvdata(dev);
->>>>>> +    struct ptp_ocp_serial_port *port;
->>>>>> +
->>>>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
->>>>>
->>>>> That's insane pointer math, how do we know this is correct?
->>>>>
->>>>>> +    return sysfs_emit(buf, "ttyS%d", port->line);
->>>>>> +}
->>>>>> +
->>>>>> +static umode_t
->>>>>> +ptp_ocp_timecard_tty_is_visible(struct kobject *kobj, struct 
->>>>>> attribute *attr, int n)
->>>>>> +{
->>>>>> +    struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
->>>>>> +    struct ptp_ocp_serial_port *port;
->>>>>> +    struct device_attribute *dattr;
->>>>>> +    struct dev_ext_attribute *ea;
->>>>>> +
->>>>>> +    if (strncmp(attr->name, "tty", 3))
->>>>>> +        return attr->mode;
->>>>>> +
->>>>>> +    dattr = container_of(attr, struct device_attribute, attr);
->>>>>> +    ea = container_of(dattr, struct dev_ext_attribute, attr);
->>>>>> +    port = (void *)((uintptr_t)bp + (uintptr_t)ea->var);
->>>>>
->>>>> That's crazy pointer math, how are you ensured that it is correct?  
->>>>> Why
->>>>> isn't there a container_of() thing here instead?
->>>>
->>>> Well, container_of cannot be used here because the attributes are 
->>>> static
->>>> while the function reads dynamic instance. The only values that are
->>>> populated into the attributes of the group are offsets.
->>>> But I can convert it to a helper which will check that the offset 
->>>> provided is the real offset of the structure we expect. And it could 
->>>> be reused in both "is_visible" and "show" functions.
->>>
->>> Strong NACK against this approach.
->>>
->>> What about converting those 4 ports into an array and adding an enum 
->>> { PORT_GNSS, POTR_GNSS2, PORT_MAC, PORT_NMEA }?
->>
->> Why is it a problem? I don't see big difference between these 2
->> implementations:
->>
->> struct ptp_ocp_serial_port *get_port(struct ptp_ocp *bp, void *offset)
->> {
->>      switch((uintptr_t)offset) {
->>          case offsetof(struct ptp_ocp, gnss_port):
->>              return &bp->gnss_port;
->>          case offsetof(struct ptp_ocp, gnss2_port):
->>              return &bp->gnss2_port;
->>          case offsetof(struct ptp_ocp, mac_port):
->>              return &bp->mac_port;
->>          case offsetof(struct ptp_ocp, nmea_port):
->>              return &bp->nmea_port;
->>      }
->>      return NULL;
->> }
->>
->> and:
->>
->> struct ptp_ocp_serial_port *get_port(struct ptp_ocp *bp, void *offset)
->> {
->>      switch((enum port_type)offset) {
->>          case PORT_GNSS:
->>              return &bp->tty_port[PORT_GNSS];
->>          case PORT_GNSS2:
->>              return &bp->tty_port[PORT_GNSS2];
->>          case PORT_MAC:
->>              return &bp->tty_port[PORT_MAC];
->>          case PORT_NMEA:
->>              return &bp->tty_port[PORT_NMEA];
->>      }
->>      return NULL;
->> }
->>
->> The second option will require more LoC to change the initialization
->> part of the driver, but will not simplify the access.
->> If you suggest to use enum value directly, without the check, then
->> it will not solve the problem of checking the boundary, which Greg
->> refers to AFAIU.
-> 
-> Why do you need this get_port() here at all? Simply doing bp- 
->  >tty_port[ea->var] as in already present attrs will do the job, right?
-> 
+On Thu, Aug 15, 2024 at 08:46:49AM +0300, Tariq Toukan wrote:
 
-Alright, the v3 is up for review with this way applied,
-thanks!
+...
 
-> thanks,
+> +/* Synchronization notes
+> + *
+> + * Access to counter array:
+> + * - create - mlx5_fc_create() (user context)
+> + *   - inserts the counter into the xarray.
+> + *
+> + * - destroy - mlx5_fc_destroy() (user context)
+> + *   - erases the counter from the xarray and releases it.
+> + *
+> + * - query mlx5_fc_query(), mlx5_fc_query_cached{,_raw}() (user context)
+> + *   - user should not access a counter after destroy.
+> + *
+> + * - bulk query (single thread workqueue context)
+> + *   - create: query relies on 'lastuse' to avoid updating counters added
+> + *             around the same time as the current bulk cmd.
+> + *   - destroy: destroyed counters will not be accessed, even if they are
+> + *              destroyed during a bulk query command.
+> + */
+> +static void mlx5_fc_stats_query_all_counters(struct mlx5_core_dev *dev)
+>  {
+>  	struct mlx5_fc_stats *fc_stats = dev->priv.fc_stats;
+> -	bool query_more_counters = (first->id <= last_id);
+> -	int cur_bulk_len = fc_stats->bulk_query_len;
+> +	u32 bulk_len = fc_stats->bulk_query_len;
+> +	XA_STATE(xas, &fc_stats->counters, 0);
+>  	u32 *data = fc_stats->bulk_query_out;
+> -	struct mlx5_fc *counter = first;
+> +	struct mlx5_fc *counter;
+> +	u32 last_bulk_id = 0;
+> +	u64 bulk_query_time;
+>  	u32 bulk_base_id;
+> -	int bulk_len;
+>  	int err;
+>  
+> -	while (query_more_counters) {
+> -		/* first id must be aligned to 4 when using bulk query */
+> -		bulk_base_id = counter->id & ~0x3;
+> -
+> -		/* number of counters to query inc. the last counter */
+> -		bulk_len = min_t(int, cur_bulk_len,
+> -				 ALIGN(last_id - bulk_base_id + 1, 4));
+> -
+> -		err = mlx5_cmd_fc_bulk_query(dev, bulk_base_id, bulk_len,
+> -					     data);
+> -		if (err) {
+> -			mlx5_core_err(dev, "Error doing bulk query: %d\n", err);
+> -			return;
+> -		}
+> -		query_more_counters = false;
+> -
+> -		list_for_each_entry_from(counter, &fc_stats->counters, list) {
+> -			int counter_index = counter->id - bulk_base_id;
+> -			struct mlx5_fc_cache *cache = &counter->cache;
+> -
+> -			if (counter->id >= bulk_base_id + bulk_len) {
+> -				query_more_counters = true;
+> -				break;
+> +	xas_lock(&xas);
+> +	xas_for_each(&xas, counter, U32_MAX) {
+> +		if (xas_retry(&xas, counter))
+> +			continue;
+> +		if (unlikely(counter->id >= last_bulk_id)) {
+> +			/* Start new bulk query. */
+> +			/* First id must be aligned to 4 when using bulk query. */
+> +			bulk_base_id = counter->id & ~0x3;
+> +			last_bulk_id = bulk_base_id + bulk_len;
+> +			/* The lock is released while querying the hw and reacquired after. */
+> +			xas_unlock(&xas);
+> +			/* The same id needs to be processed again in the next loop iteration. */
+> +			xas_reset(&xas);
+> +			bulk_query_time = jiffies;
+> +			err = mlx5_cmd_fc_bulk_query(dev, bulk_base_id, bulk_len, data);
+> +			if (err) {
+> +				mlx5_core_err(dev, "Error doing bulk query: %d\n", err);
+> +				return;
+>  			}
+> -
+> -			update_counter_cache(counter_index, data, cache);
+> +			xas_lock(&xas);
+> +			continue;
+>  		}
+> +		/* Do not update counters added after bulk query was started. */
 
+Hi Cosmin and Tariq,
+
+It looks like bulk_query_time and bulk_base_id may be uninitialised or
+stale - from a previous loop iteration - if the condition above is not met.
+
+Flagged by Smatch.
+
+> +		if (time_after64(bulk_query_time, counter->cache.lastuse))
+> +			update_counter_cache(counter->id - bulk_base_id, data,
+> +					     &counter->cache);
+>  	}
+> +	xas_unlock(&xas);
+>  }
+
+...
 
