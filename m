@@ -1,123 +1,93 @@
-Return-Path: <netdev+bounces-118824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E6E952E31
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B16952E5B
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE06282F62
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:24:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A4AC285363
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049A717C9A8;
-	Thu, 15 Aug 2024 12:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AEC1993BD;
+	Thu, 15 Aug 2024 12:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DeMuCeHl"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="YYeG19Ry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD35B2770B;
-	Thu, 15 Aug 2024 12:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0421714B9
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 12:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723724694; cv=none; b=PYzMPyqS806w5HgkgVzNiFGMX2C84g1JyzOc5gA1MTvMY5qtjhAEEjqgxFa0camiEZcxnTneCfnIX7Okl5ZLdqDAVHOqOrTf889V5nXc2eXdexcKDoLOQz+3PNOaacWu1L3NSrsMhlsxlin37OMJbGYe0ZMt4U2DMx8wMEHlsME=
+	t=1723725289; cv=none; b=NneQB2D18GOeCpFFR6jsdTbKzQGBF4iU+/PcOnQ6LmTb8A3W8mGWfDDwzNEFcPGL7hb8jh2gHyQgk+WIYAD9PPptK2N2lqG8zSX0VVsWQGszEG9eHKHfGvjennaiPHykmWb/A2vEJMXLD/9JR13CpG4iksh0A/VcynEQThfRgjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723724694; c=relaxed/simple;
-	bh=+8XLyx5gD7zmeN0Xi7DKcQU4YaXWAtMWwR1bYjpV5BU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XewEEcTIok8kZC8dlE6LCXEQJ9vOB8U75pY8n81ymqlUaHVzUt3ebO+ABCgSwdGLcqzLs7mXhqG7+WhRACfSg9mtY3G7DpXZ9CRNnVAn5XrYADRJMNcrK0nXLdYB1xSneFfI/28weTiXCVddCLsshvmXxym5SgNQsM8KYgSJLb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DeMuCeHl; arc=none smtp.client-ip=209.85.167.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-3dab336717fso523662b6e.0;
-        Thu, 15 Aug 2024 05:24:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723724692; x=1724329492; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QxS9QDTFLbA2CX3R1ChvoqHgn0+hEmCdq7e6c92S6PQ=;
-        b=DeMuCeHlATpofc4YW1mEcapqTzvjJUmvdnVUUgeNh83oC9NhiOgU640zPfxyyLAJw4
-         WtrfY/81v4ynCDihgvMqhR+or4kzenn5qrPxa11FTqhOC5E5MQomk893lz/+XcT37JA+
-         HAX34DqYsVNUh3Z/qPsuo/89ugPyZNiO8dXJ9UR+vUTvHIQzbY3zSTPt+Fi2PEMq3lSX
-         9qLd+9tXllSIe5SpwiGL/n0nmreo4ifijCqHV62cJx1ZBwdV4kF6yisLJxdauvvKIW/U
-         FppBLrlFPsB/8YoWRGnAxDuTQqkeyBY3YQW003s00MoB3PGXanB8glbgMXYqRLEj4msz
-         dngA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723724692; x=1724329492;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QxS9QDTFLbA2CX3R1ChvoqHgn0+hEmCdq7e6c92S6PQ=;
-        b=CYiBRqu5646/wrrQeWME5Gf3Agh9yY4hnaQiGlfD9neTE+WOp7FbkbXpSWbpk1frLF
-         VwnF+H/otCMQfMuhdHiOqv0Ny+a4fI6Vj8tXXpNwEZOBdtu2QlZaFzR5HsjsYeB1DnFb
-         3I25hBV4WEHJI+FyFij9dRajm520SfO1vwAN80G4EVb5dH+/TG/nWRsn8liVRTaZEDL0
-         D8c/irOXigr4nYpztltt93vzVMBVVJpx7zpKk6/44LRVL+xwA8rg46ez/1By0D8nA6Di
-         CfYb61FbwyxSfswO6lYWZvhNTqbtLcxC0n3YSFSjJJS71P1BiUqRnEMKzVKGLoP3I63L
-         wu1g==
-X-Forwarded-Encrypted: i=1; AJvYcCV+e7s8JQK7W/zVwbZtCokkFdulaQKtmbat1t4ty9IdQ6SvsW961EDjYliI3lKiaq3ZIbaE6sQwKX2qmCLUeIox6H4N2SpXKsl/q/5JYM/O2nSoOhaM9KD8j81LAYSC94unnLBP
-X-Gm-Message-State: AOJu0YxmfTkRzrIS/++kAbroq9thYCInhbikw4k43iiDCx0R4NQkHoyF
-	VEvidd+77wAmwzw3oJbMnO2OSatNIC/c29VQBiQ7vP/vnt871GGf
-X-Google-Smtp-Source: AGHT+IHIrTaJEIUiOcUHjqKGw6Ka09v76TLRn7Sp/z9fRuaNGgGF03pll2eFfDuHHArafP39b1s+FA==
-X-Received: by 2002:a05:6808:1892:b0:3d9:41d1:acd2 with SMTP id 5614622812f47-3dd2991b8e9mr7225116b6e.27.1723724691653;
-        Thu, 15 Aug 2024 05:24:51 -0700 (PDT)
-Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b63585d6sm1031724a12.70.2024.08.15.05.24.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 05:24:51 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: kuba@kernel.org
-Cc: pshelar@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	amorenoz@redhat.com,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	Menglong Dong <dongml2@chinatelecom.cn>
-Subject: [PATCH net-next] net: ovs: fix ovs_drop_reasons error
-Date: Thu, 15 Aug 2024 20:22:45 +0800
-Message-Id: <20240815122245.975440-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1723725289; c=relaxed/simple;
+	bh=/TIeo+bG7sjgvMiPLNeA4/1aWjXq7WMPetIeuy7Gkfs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=HQWcnBA8pkWJZtfgqspH0hM9WQTEfCwN69ye6J8LiEt1TYOZdj3YU4Aqd3NoVZpDOnOFLsOezjc11WGbkC/pquRNyJ9mw6wL+sm6NqSeHMg0wYmbV9r3jZ/OZNmnBinq2TWXIY8AzC1sNTGmuY2zWRklGj1Na8pEr4CBkR8UKlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=YYeG19Ry reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=TW460Yv1ow6zntOqK5StPPgDtYFaHiahtYN74xhtNr8=; b=Y
+	YeG19RywDTJT/aBc388pWW7XfG2QYSC2aaatYPIheETe8NzKCWOXWwC11Zk4RacJ
+	87fwP0wbtiKSlKfmU0quD2tPhPYx8QsL4hFJjPy+pVBXP3PVHzz8EeFBGDdKj/HO
+	GZbJD3EmVxJoomL+IK5s71oGYkCkUQ1U9wjEnJaWZs=
+Received: from 13514081436$163.com ( [116.235.71.46] ) by
+ ajax-webmail-wmsvr-40-111 (Coremail) ; Thu, 15 Aug 2024 20:33:21 +0800
+ (CST)
+Date: Thu, 15 Aug 2024 20:33:21 +0800 (CST)
+From: wkx <13514081436@163.com>
+To: "Florian Westphal" <fw@strlen.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, 21210240012@m.fudan.edu.cn
+Subject: Re:Re: [BUG net] possible use after free bugs due to race condition
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
+ Copyright (c) 2002-2024 www.mailtech.cn 163com
+In-Reply-To: <20240812190057.GB21559@breakpoint.cc>
+References: <49ee57f2.9a9d.191465ab362.Coremail.13514081436@163.com>
+ <20240812190057.GB21559@breakpoint.cc>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <25a912f1.9be7.19156073fad.Coremail.13514081436@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:_____wC3_9iR9b1m8hIjAA--.36971W
+X-CM-SenderInfo: zprtkiiuqyikitw6il2tof0z/1tbiwhY52GWXwNt-YwAEsE
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-I'm sure if I understand it correctly, but it seems that there is
-something wrong with ovs_drop_reasons.
-
-ovs_drop_reasons[0] is "OVS_DROP_LAST_ACTION", but
-OVS_DROP_LAST_ACTION == __OVS_DROP_REASON + 1, which means that
-ovs_drop_reasons[1] should be "OVS_DROP_LAST_ACTION".
-
-Fix this by initializing ovs_drop_reasons with index.
-
-Fixes: 9d802da40b7c ("net: openvswitch: add last-action drop reason")
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- net/openvswitch/datapath.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index 99d72543abd3..249210958f0b 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -2706,7 +2706,7 @@ static struct pernet_operations ovs_net_ops = {
- };
- 
- static const char * const ovs_drop_reasons[] = {
--#define S(x)	(#x),
-+#define S(x)	[(x) & ~SKB_DROP_REASON_SUBSYS_MASK] = (#x),
- 	OVS_DROP_REASONS(S)
- #undef S
- };
--- 
-2.39.2
-
+VGhhbmsgeW91IGZvciB5b3VyIHJlcGx577yBCuWcqCAyMDI0LTA4LTEzIDAzOjAwOjU377yMIkZs
+b3JpYW4gV2VzdHBoYWwiIDxmd0BzdHJsZW4uZGU+IOWGmemBk++8mgo+d2t4IDwxMzUxNDA4MTQz
+NkAxNjMuY29tPiB3cm90ZToNCj4+IA0KPj4gDQo+PiBPdXLCoHRlYW3CoHJlY2VudGx5wqBkZXZl
+bG9wZWTCoGHCoHZ1bG5lcmFiaWxpdHnCoGRldGVjdGlvbsKgdG9vbCzCoGFuZMKgd2XCoGhhdmXC
+oGVtcGxveWVkwqBpdMKgdG/CoHNjYW7CoHRoZcKgTGludXjCoEtlcm5lbMKgKHZlcnNpb27CoDYu
+OS42KS7CoEFmdGVywqBtYW51YWzCoHJldmlldyzCoHdlwqBmb3VuZMKgc29tZcKgcG90ZW50aWFs
+bHnCoHZ1bG5lcmFibGXCoGNvZGXCoHNuaXBwZXRzLMKgd2hpY2jCoG1hecKgaGF2ZcKgdXNlLWFm
+dGVyLWZyZWXCoGJ1Z3PCoGR1ZcKgdG/CoHJhY2XCoGNvbmRpdGlvbnMuwqBUaGVyZWZvcmUswqB3
+ZcKgd291bGTCoGFwcHJlY2lhdGXCoHlvdXLCoGV4cGVydMKgaW5zaWdodMKgdG/CoGNvbmZpcm3C
+oHdoZXRoZXLCoHRoZXNlwqB2dWxuZXJhYmlsaXRpZXPCoGNvdWxkwqBpbmRlZWTCoHBvc2XCoGHC
+oHJpc2vCoHRvwqB0aGXCoHN5c3RlbS4NCj4+IA0KPj4gMS7CoC9kcml2ZXJzL25ldC9ldGhlcm5l
+dC9icm9hZGNvbS9iY202M3h4X2VuZXQuYw0KPj4gDQo+PiBJbsKgYmNtX2VuZXRfcHJvYmUswqAm
+cHJpdi0+bWliX3VwZGF0ZV90YXNrwqBpc8KgYm91bmRlZMKgd2l0aMKgYmNtX2VuZXRfdXBkYXRl
+X21pYl9jb3VudGVyc19kZWZlci7CoGJjbV9lbmV0X2lzcl9tYWPCoHdpbGzCoGJlwqBjYWxsZWTC
+oHRvwqBzdGFydMKgdGhlwqB3b3JrLg0KPj4gSWbCoHdlwqByZW1vdmXCoHRoZcKgZHJpdmVywqB3
+aGljaMKgd2lsbMKgY2FsbMKgYmNtX2VuZXRfcmVtb3ZlwqB0b8KgbWFrZcKgYcKgY2xlYW51cCzC
+oHRoZXJlwqBtYXnCoGJlwqB1bmZpbmlzaGVkwqB3b3JrLg0KPj4gVGhlwqBwb3NzaWJsZcKgc2Vx
+dWVuY2XCoGlzwqBhc8KgZm9sbG93czoNCj4+IENQVTDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBDUFUxDQo+PiDCoA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHzCoGJjbV9lbmV0X3Vw
+ZGF0ZV9taWJfY291bnRlcnNfZGVmZXINCj4+IGJjbV9lbmV0X3JlbW92ZcKgwqDCoMKgwqDCoMKg
+wqB8DQo+DQo+ICB1bnJlZ2lzdGVyX25ldGRldihkZXYpOw0KPg0KPi4uLiB3aGljaCBzaG91bGQg
+ZW5kIHVwIGNhbGxpbmcgYmNtX2VuZXRfc3RvcCgpICh2aWEgb3BzLT5uZG9fc3RvcCBpbg0KPl9f
+ZGV2X2Nsb3NlX21hbnkoKSkuICBUaGlzIGNhbGxzIGNhbmNlbF93b3JrX3N5bmMoKS4NCj4NCj5E
+aWQgbm90IGxvb2sgYXQgdGhlIG90aGVycy4NCg==
 
