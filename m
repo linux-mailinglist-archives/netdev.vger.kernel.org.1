@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-118964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33418953B02
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:42:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0439953B03
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 951701F26355
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:42:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40036B23DFC
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6143A74059;
-	Thu, 15 Aug 2024 19:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A21D78C73;
+	Thu, 15 Aug 2024 19:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIobDVLk"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="aZGWwxZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B83344C6F
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 19:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F5D44C94
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 19:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723750969; cv=none; b=g7R37XLv4A5GfJeD3KLwPn+qL3NwCoK6Hyv545LciJ5FWadEnuRKDEQlZfNxTkHiE4KB1gn2zT5nopwkYoDPTdgQ+i4vHuXx5xl7Wt7evp5X0p1AyHCfWTiJZTQBEiu3+sxKGLqgFHfSGi0KAGyKGjkSOIaP3Ynmo3PNSG59eEs=
+	t=1723750984; cv=none; b=Hk7EBxRh0iKD318Ta8YjWx/NHTWHXmhHuZN5hhopqKQCt9PSKGDGrIRqo9+ZlCg3LHgGsvLLU8JLifClDjwTstuhPK/TGj1xgVLVQ6z+TE1Xra3oHRARWyZ4sGm+P8vv/hxI7bqEYMkb/s5brISkc4/JAzIGfarhoogmuLY6qC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723750969; c=relaxed/simple;
-	bh=u/IqK+S/r7ib9JEr5SAFjFtWYeq+ChUgz11sl8tJUbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CSQnGtyRIBj9gqjjFIkuy9uimENasJNit2wVyHS/VzO9z2uM04Wne/kMeR8xcsZS1grcXMgcyvrgNCRBrvBYFF5alqle9mQVlaFBDWMXvphNcZeQ8VuUVScl1dAVEA4fVDn+oUUS7mBjkW2dmT/oOPH4R7ZsWGRGUr1gvidHkks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIobDVLk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82CB0C32786;
-	Thu, 15 Aug 2024 19:42:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723750968;
-	bh=u/IqK+S/r7ib9JEr5SAFjFtWYeq+ChUgz11sl8tJUbQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QIobDVLkLqYiArLl3q2uPF+iIMEcgYvbnDI4QMLTuLzmXgTHMQfAJSzD3yZmC/wv+
-	 3ek0RcF91udrLySebtgSJmHbvaIRbyO/xWso4Pu3fMn/Ruqdk8trTS1QwaHJhxMH6L
-	 55V13aB3h+P4l5TEZvw/QNVQSmDVCW9p3Fc95SCLCJ5ee4xmVi9qYK2htOPhFlAugK
-	 5VTbNIwACOysQrUembVgzpmN5YXizswHd6OMpMADkYAT2FmhlaxIvH+tOYdoNX9r1M
-	 kCP3iUsBQfoTD7CXyPwsqKaHg5Ok8S4Zl2xtMCtCKA6nsWXCD271G2zWnWYriLXcPx
-	 LZzTleVO2JbqA==
-Date: Thu, 15 Aug 2024 12:42:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>
-Subject: Re: Per-queue stats question
-Message-ID: <20240815124247.65183cbf@kernel.org>
-In-Reply-To: <56a36d45-f779-0c67-2853-6ead9e8f9dc9@gmail.com>
-References: <56a36d45-f779-0c67-2853-6ead9e8f9dc9@gmail.com>
+	s=arc-20240116; t=1723750984; c=relaxed/simple;
+	bh=sEyGgIsx4I0i1iKMrpzB60ko2kOeXUeaYFB6teuKaKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MGy0OfpapDD+gAKr4XoEXsTox88TDwRjFeoDaQyG1IN2Ow701DuySaOQPDuhxHcvg6n4kafVduEy75I2XaWr/ToAfWCw3zIqN+F0mnDWVN3ZO/OkGlV6ukpIn7M0J3AXjuW2o0kNy+il/o+jZ5Mq1gar1G7w1rfUjJ8FIk86R6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=aZGWwxZF; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5b9d48d1456so2104611a12.1
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 12:43:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=herbertland.com; s=google; t=1723750981; x=1724355781; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sEyGgIsx4I0i1iKMrpzB60ko2kOeXUeaYFB6teuKaKY=;
+        b=aZGWwxZF/gNufBeaGwJHFUHgOO5roAoB8OcPfnTxg4jIFUuKrotAq+o4trK8kmSJDU
+         jOr9/mw6sKDJZWyKnReT/o79nfSZxvsm8Wry0dg9fqeRJ5KviJJrqts6zqNX1iM6670o
+         wYOEym83lbf0JzGZea/Q698yI0ugvyoU1tKidvOcFxvdVaFGpzIbSOaZlJJaro0zEuEV
+         hels1Z0MElXpBzqozFc3unW/e+g3sw58PRRAwr7hSa/Bw5GEHGAtRLnZhO3e8fyqyQhn
+         9ekJpRn4Kgx8ISA6Gjxk3eVU356ctgBUFMvfll3XsaFmK6PFk+YCoRUJAwFFrSyLL5DL
+         Anrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723750981; x=1724355781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sEyGgIsx4I0i1iKMrpzB60ko2kOeXUeaYFB6teuKaKY=;
+        b=JkaQU64Cz+s1jyw7uonG/DUola1zm0tsDIUgUyRJXZc9pbq3hPO2h/jxb+IWdS1Fyr
+         swR5f+Ob3g20+6iIqx4buetjDJ0TW7YyxAVObCHAefANaNkTEl0Uzxe8l4rfe51HEHtr
+         00c8kOKt2AUgp0L/f/xaeF4+szAZkzIVbDT+BudTx6jq03EFNoBXTN6Bugvffakp6rOG
+         TUEPv0+7s8Xev9YhcJXFLo+lx38WNQ3r0apD67J1i2I0I3eYpFBrsGIRUurnnwMpCleg
+         9RhFhc5cmnt+HhceSrQUs0EFahl+N4QB+eHLHNIh4lk7rkb2+mH/ee9mobMCT/Tzo6be
+         1t+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVOP1ksHdsXhvwY0c6M6i7NXgoqNjbdrKehX8C8y5plLb4+9A7lsiCQEhCGbkqXfjGwfQYeAMQcVMdLqFMYsSeZkdQ9TTya
+X-Gm-Message-State: AOJu0YxsqHRjgVx9Pq619T/R0kKPqwzbRzWyMbcYcZurHzvqZAEaaz7N
+	SwVADWxnl7tQYvCsvruIzUTTmiBiwTvtcfJII0o58ponzroj3P20PHvMZ++uJRIKrSfbVfWs6uM
+	N3RQUJ2RBeWPFyj5SpwLD14pVRM7Vxn4OW2S9
+X-Google-Smtp-Source: AGHT+IHe9tB9fPoSHvMFHqoGuRET6sAyFziPG5D+6p2mNSNAZLZBMFrN1dWKk0OAzsZycakW1HBGJf1XA09Asum5Se0=
+X-Received: by 2002:a05:6402:1e89:b0:5a1:4ca9:c667 with SMTP id
+ 4fb4d7f45d1cf-5becb5edc13mr308280a12.11.1723750980553; Thu, 15 Aug 2024
+ 12:43:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240731172332.683815-1-tom@herbertland.com> <20240731172332.683815-2-tom@herbertland.com>
+ <CANn89i+N2TGk=WjyUyWj=gEZoYe2K2xYPw+Nn2jb-uDf3cu=MQ@mail.gmail.com> <CALx6S36HFR2TnxzHuf8x-76VSBTbEZDF2pJEpSp400PWBS83xQ@mail.gmail.com>
+In-Reply-To: <CALx6S36HFR2TnxzHuf8x-76VSBTbEZDF2pJEpSp400PWBS83xQ@mail.gmail.com>
+From: Tom Herbert <tom@herbertland.com>
+Date: Thu, 15 Aug 2024 12:42:49 -0700
+Message-ID: <CALx6S36CPBvPCTGfzOqnkQpdxtR+2oR6z5Fi+OzYHO=TsK2Qww@mail.gmail.com>
+Subject: Re: [PATCH 01/12] skbuff: Unconstantify struct net argument in
+ flowdis functions
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+	felipe@sipanda.io
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 15 Aug 2024 18:11:42 +0100 Edward Cree wrote:
-> I'm working on adding netdev_stat_ops support to sfc, and finding that
->  the expectations of the selftest around the relation between qstats
->  and rtnl stats are difficult for us to meet.  I'm not sure whether it
->  is our existing rtnl stats or the qstats I'm adding that have the
->  wrong semantics.
-> 
-> sfc fills in rtnl_link_stats64 with MAC stats from the firmware (or
->  'vadaptor stats' if using SR-IOV).  These count packets (or bytes)
->  since last FW boot/reset (for instance, "ethtool --reset $dev all"
->  clears them).  (Also, for reasons I'm still investigating, while the
->  interface is administratively down they read as zero, then jump back
->  to what they were on "ip link set up".)  Moreover, the counts are
->  updated by periodic DMA, so can be up to 1 second stale.
-> The queue stats, meanwhile, are maintained in software, and count
->  since ifup (efx_start_channels()), so that they can be reset on
->  reconfiguration; the base_stats count since driver probe
->  (efx_alloc_channels()).
-> 
-> Thus, as it stands, it is possible for qstats and rtstats to disagree,
->  in both directions.  For example:
+On Thu, Aug 15, 2024 at 11:50=E2=80=AFAM Tom Herbert <tom@herbertland.com> =
+wrote:
+>
+> On Fri, Aug 2, 2024 at 6:34=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Wed, Jul 31, 2024 at 7:23=E2=80=AFPM Tom Herbert <tom@herbertland.co=
+m> wrote:
+> > >
+> > > We want __skb_flow_dissect to be able to call functions that
+> > > take a non-constant struct net argument (UDP socket lookup
+> > > functions for instance). Change the net argument of flow dissector
+> > > functions to not be const
+> > >
+> > > Signed-off-by: Tom Herbert <tom@herbertland.com>
+> >
+> >
+> > Hmm... let me send a patch series doing the opposite, ie add const
+> > qualifiers to lookup functions.
+>
+> I had done that originally, but there were a lot of callers so it was
+> pretty messy.
 
-[reordering for grouped answer]
+Oops, I see this was already applied. Thanks!
 
-> * Driver is unloaded and then loaded again.  base_stats will reset,
->   but MAC stats won't.
-> * ethtool reset.  MAC stats will reset, but base_stats won't.
-> * RX filter drops (e.g. unwanted destination MAC address).  These are
->   counted in MAC stats but since they never reach the driver they're
->   not counted in qstats/base_stats (and by my reading of netdev.yaml
->   they shouldn't be, even if we could).
+Tom
 
-rstats have no clear semantics on modern devices, some drivers count
-at the MAC (potentially including VF traffic), some drivers count after
-XDP (i.e. don't count XDP_DROP!?!)
-
-We should maintain the qstat semantics as packets intended for a given
-netdev, with rx-packets being packets which got delivered to the host
-and picked up by the driver.
-
-> * Traffic is passing during the test.  qstats will be up to date,
->   whereas MAC stats, being up to 1s stale, could be far behind.
-
-That's a bug, we should pop a env.wait_hw_stats_settle() in the right
-spots in the test.
-
-> Any of these will cause the stats.pkt_byte_sum selftest to fail.
-> Which side do I need to change, qstats or rtstats?  Or is the test
->  being too strict?
-
-Test is too strict, I'm not sure what to do about it. It has proven useful
-in the past, mlx5 has "misc queues" for PTP, for example, and it caught
-that they are added to rstats but weren't added to the base. IDK what
-to do about drivers which use MAC stats for rstat :( The fact that the
-test fails doesn't mean they misuse qstat.
-
-> On a related note, I notice that the stat_cmp() function within that
->  selftest returns the first nonzero delta it finds in the stats, so
->  that if (say) tx-packets goes forwards but rx-packets goes backwards,
->  it will return >0 causing the rx-packets delta to be ignored.  Is
->  this intended behaviour, or should I submit a patch?
-
-Looks like a bug.
+>
+> Tom
 
