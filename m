@@ -1,91 +1,55 @@
-Return-Path: <netdev+bounces-118928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F88B953884
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:46:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3179538B7
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3004287C57
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:46:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF451B23818
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17B21B9B4A;
-	Thu, 15 Aug 2024 16:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AIsAEdct"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05AF1ABEDD;
+	Thu, 15 Aug 2024 17:03:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F08636AF8;
-	Thu, 15 Aug 2024 16:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6B529A1
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 17:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723740382; cv=none; b=JSTugAtp/2dl4l5N6V9K+dIFStcLBjfjTcW0XC6hk1uqJv+R3cMg2N91I8XdgXIeP1VE95ZNqXYUkkZoyjSmM+y9CKevmc24v9vn7GqPCReHPC8sqY7LbszH2+D+mmBtBz1v4uyFOCh9NkmBvq/2XzoIam7EdFgWZC1RSMsCmfs=
+	t=1723741396; cv=none; b=gEzWjCjsPsEYpqS+IGzioIexa065Q6K6nUQVlNw7bG5jgJXyj8P9c/U+crDTIGcZDJ3QdNBNbefsY5ZaSEBMoSM0InJAoveGV1euyX0UIcsLN3p4w7S4yKGjkFEWkyKsZyiQH8qjC4YccmUqcC07G1tCfy2h4xF3dqF2cj0ySTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723740382; c=relaxed/simple;
-	bh=720GAGoLwGQkKkRvyMK3aY3Serxtc3h9lJiV0K+BedE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VA9NdbxAWnuapW0zKrBX5xw9W2PK/Cxd/D3830GzmNTcbV3b2fJYdlKIwPWeJsmO4Wocp7rMyFy9Che73uFgcybTpUKCBxXNNUjyUF8kFEOWOrFNciD2vz3CI0Ojh9DqJ+EEcLwRgVFTDxeWqW2Q19Dwp9BcepNz3V+xixTqQPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AIsAEdct; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-201ee6b084bso9725405ad.2;
-        Thu, 15 Aug 2024 09:46:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723740381; x=1724345181; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HQNiAcSg9ZN0/2zqUqbRE6RupMkOltmLXOfMXjko6Lc=;
-        b=AIsAEdct0mNbYx0HvCYCY9DHY2WqiairrAXQbA/dise2+SL46OLvItfcNmDp1JUPw/
-         h0PbmoFfdawW4IPpojxEFryjQbVIQSZVgzMpaf7uBGsufMXk9ZVulE4iU2sxytKe4RfH
-         dVt2OElqHr71Gs8O5r0jdbQTGLJVdgF/9BpT37PmikDkbuW3Jrx6iNhhnVKGsgFPYbM6
-         FZ4dgljJRWezqkZ6A46/szLsrJKjrLgoBbBVavNLqwjdnrmTaLh7k6sUBd+BokrvQGPb
-         QtlKeRMgvPgILkW5pM3a8t+AoUBVGPV4K24hZbc6ioFoiRrsoEOhXemhrYfZP3x3U5pb
-         HY4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723740381; x=1724345181;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HQNiAcSg9ZN0/2zqUqbRE6RupMkOltmLXOfMXjko6Lc=;
-        b=iadUZU4TjBP3kP6ztmrB3P6GcLsXSAxOhDVQ2J8jPYvV4bhJEhtBsrVgAJ7f5Vhsqd
-         SZTdRljqgWcU0SygnPS640h2RDxZUC505UfdSBQyci9uGXWy2RZ1yZCsXrEiGRnVLqGA
-         BQiIvyI0Kcw6p6XxI5O12ISo67IgSyipIXDXz+qztrmHt2JlcxVx+mGBsvCDZZ/5zy0n
-         GFMm6+xOazt5EQp+6I6ZotE+QzB4rGEogPZGIl+8EV8bzXd0rZQazKHz2MFyB+w1VPBp
-         sOhHEtbXmq92UQdTUyzhMwYNgd8AoWz/W7bgh731OvP7QsoqrjqYH/7LQ1mP06JlIb0a
-         49pg==
-X-Forwarded-Encrypted: i=1; AJvYcCWc+G3SohSx0b7TDjyOXAsWkWgCzi/ZWViZWizrJBPBEBG8uZAUcCAuFeEtTPjt/BZxWDFsFsB1byxTC1Tcyz9v+tfb61QlXlk8M6dSFTcC7uArO+NMgaduNdqWtrsKD6JcfVXDiWi3alEzfROIeAd55Yzh6pGkrke2tu1czpqbLuvBS9Vz
-X-Gm-Message-State: AOJu0Yxow362vhWPcxn+cWwvmt/7N98x04WwMQABHjxjacEuClTbev+z
-	WMo9r85jI4Ys0RelxNAbQSsv3OBAARNhlSl/PECJJQGCDefqvzgI
-X-Google-Smtp-Source: AGHT+IFs3+tFqEKdUJYLvgNTrrIN+2WdfL5DlnSs/zkJAmFw0eT/nMoTtGlQC8CsapY2Sjprm5eYlA==
-X-Received: by 2002:a17:902:f9ce:b0:1fb:8aa9:e2a9 with SMTP id d9443c01a7336-20203e8f81dmr3518455ad.15.1723740380569;
-        Thu, 15 Aug 2024 09:46:20 -0700 (PDT)
-Received: from dev0.. ([2405:201:6803:30b3:f070:7306:329d:c8ca])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f02faa2dsm12162305ad.36.2024.08.15.09.46.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 09:46:20 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jain.abhinav177@gmail.com,
-	javier.carrasco.cruz@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	s=arc-20240116; t=1723741396; c=relaxed/simple;
+	bh=owU/7xzWoAqW5c1yBMupNzUZFN7pqSB7hjXTC8QkBQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cazDONc+tjPIbLRKMLif3v9wEEuW+t+MFP1Pw4MFyG+BOurhjCUpLwuQkfcgbWXP+2araDcGTKyh96wxXJr7k+TKIvWmBq3JITI352Te1Ddi8hZc/s1S5EBxQm2TDgT/6Kms0g5YDwxaY2Ore/d8oS+C39hm5Cw5OvjNj+Vw1zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id A17307D065;
+	Thu, 15 Aug 2024 17:03:13 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v7 net-next 2/3] selftests: net: Add on/off checks for non-fixed features of interface
-Date: Thu, 15 Aug 2024 22:16:12 +0530
-Message-Id: <20240815164612.1408408-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240815130353.GB632411@kernel.org>
-References: <20240815130353.GB632411@kernel.org>
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@chopps.org>,
+	Christian Hopps <chopps@labn.net>
+Subject: [PATCH ipsec-next v3 1/1] net: add copy from skb_seq_state to buffer function
+Date: Thu, 15 Aug 2024 13:02:27 -0400
+Message-ID: <20240815170227.665219-1-chopps@chopps.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,13 +58,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Thu, 15 Aug 2024 14:03:53 +0100, Simon Horman wrote:
+From: Christian Hopps <chopps@labn.net>
 
-> Hi Abhinav,
-> 
-> Isn't the value being read into $initial_state here already present in $VALUE?
+Add an skb helper function to copy a range of bytes from within
+an existing skb_seq_state.
 
-Yes, that is correct. I will wait for a day and send v8 using $VALUE.
-Thanks.
+Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
+
+This is used in a followup patchset implementing IP-TFS/AggFrag
+encapsulation (https://www.rfc-editor.org/rfc/rfc9347.txt)
+
+Patchset History:
+
+  v1 (8/9/2024)
+    - Created from IP-TFS patchset v9
+
+  v2 (8/9/2024)
+    - resend with corrected CC list.
+
+  v3 (8/15/2024)
+    - removed ___copy_skb_header refactoring
+
+---
+ include/linux/skbuff.h |  1 +
+ net/core/skbuff.c      | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 29c3ea5b6e93..a871533b8568 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1433,6 +1433,7 @@ void skb_prepare_seq_read(struct sk_buff *skb, unsigned int from,
+ unsigned int skb_seq_read(unsigned int consumed, const u8 **data,
+ 			  struct skb_seq_state *st);
+ void skb_abort_seq_read(struct skb_seq_state *st);
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len);
+ 
+ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
+ 			   unsigned int to, struct ts_config *config);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..aa5dc64dbd2f 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4409,6 +4409,41 @@ void skb_abort_seq_read(struct skb_seq_state *st)
+ }
+ EXPORT_SYMBOL(skb_abort_seq_read);
+ 
++/**
++ * skb_copy_seq_read() - copy from a skb_seq_state to a buffer
++ * @st: source skb_seq_state
++ * @offset: offset in source
++ * @to: destination buffer
++ * @len: number of bytes to copy
++ *
++ * Copy @len bytes from @offset bytes into the source @st to the destination
++ * buffer @to. `offset` should increase (or be unchanged) with each subsequent
++ * call to this function. If offset needs to decrease from the previous use `st`
++ * should be reset first.
++ *
++ * Return: 0 on success or a negative error code on failure
++ */
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len)
++{
++	const u8 *data;
++	u32 sqlen;
++
++	for (;;) {
++		sqlen = skb_seq_read(offset, &data, st);
++		if (sqlen == 0)
++			return -ENOMEM;
++		if (sqlen >= len) {
++			memcpy(to, data, len);
++			return 0;
++		}
++		memcpy(to, data, sqlen);
++		to += sqlen;
++		offset += sqlen;
++		len -= sqlen;
++	}
++}
++EXPORT_SYMBOL(skb_copy_seq_read);
++
+ #define TS_SKB_CB(state)	((struct skb_seq_state *) &((state)->cb))
+ 
+ static unsigned int skb_ts_get_next_block(unsigned int offset, const u8 **text,
+-- 
+2.46.0
+
 
