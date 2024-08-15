@@ -1,156 +1,123 @@
-Return-Path: <netdev+bounces-118823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489C5952E2E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:21:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61E6E952E31
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:25:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D8A1C212D7
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:21:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE06282F62
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464EB17BED9;
-	Thu, 15 Aug 2024 12:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049A717C9A8;
+	Thu, 15 Aug 2024 12:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hCzo2QrO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DeMuCeHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7E917BEBC;
-	Thu, 15 Aug 2024 12:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD35B2770B;
+	Thu, 15 Aug 2024 12:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723724485; cv=none; b=q71rRKdCAiE5S5nDQhHe6T3ErFua2S0O7j5OJet6nVsszOrLld3kF2MyjTDrTuGWWWvaImZA4ERRQe9b8rJZjjjdv5yaB8F7rfFRJc7vQdZE9Be44svGZEsQnUhjzj5dJ12qYLIpYIo8shxwudsj43SW44FDwGM7qwtWZsnoViA=
+	t=1723724694; cv=none; b=PYzMPyqS806w5HgkgVzNiFGMX2C84g1JyzOc5gA1MTvMY5qtjhAEEjqgxFa0camiEZcxnTneCfnIX7Okl5ZLdqDAVHOqOrTf889V5nXc2eXdexcKDoLOQz+3PNOaacWu1L3NSrsMhlsxlin37OMJbGYe0ZMt4U2DMx8wMEHlsME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723724485; c=relaxed/simple;
-	bh=kLINGGZfiGZJKTJM8m3ioz0N0Jh+G2wChbSE1siUMpY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XVhk485sdjDiW6uRJpJEATHx/5OrvmpkiRr6FyGq5HEdfms0eSmP70je1+oTnWnZvUznYeyimkTKHuSaZq9CxSgQJSzMmAafsKESQ8gN9bzy9bM8cWJ3NpCsM2O83xR/xEJug8wyMQ/u00A5T2nx4arCwaYZMOOq8dx+bL77bPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hCzo2QrO; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723724482; x=1755260482;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kLINGGZfiGZJKTJM8m3ioz0N0Jh+G2wChbSE1siUMpY=;
-  b=hCzo2QrOYBoqN5n05uXGQFNuLvt/vc1+rRCTZBph0YlOB3g+w6AoRgf8
-   NyICglxC+BLhzFcpniktMzLK6gib6PlY+hQugP6v7qd5z5H9yi4aKrwAQ
-   304nyNsqS09YNno1V2zkoMfvqYS/RZlAzvigzmcCZgHM4fcHdsN0hXGeH
-   42BdznzXlyd7lUmH3v5qfivHrJ/ZaBInWTcgK9tzEtQpb+SjKGzczuEFa
-   RqXbnZvcbMDONGP96erMyQk/yqtT8LmbbnJ0MfZz9zYNZwT+AbZzYRHqk
-   Vc9BfMJUzAo4zpTgSqZUHOsn8mFjyaowMu2GWHT2RSogogb+oZn6roYL5
-   w==;
-X-CSE-ConnectionGUID: hy3XdD24QtGvTXap6iAWIg==
-X-CSE-MsgGUID: GDv7ACJ0SfKBmeNiRj1m0g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11165"; a="22118297"
-X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
-   d="scan'208";a="22118297"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 05:21:21 -0700
-X-CSE-ConnectionGUID: BujiYMx6RLGItZoks5C5pA==
-X-CSE-MsgGUID: aebKlseYQsq4GJ5WUdlVbg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
-   d="scan'208";a="59362073"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 15 Aug 2024 05:21:16 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1seZTd-0003Z8-3C;
-	Thu, 15 Aug 2024 12:21:14 +0000
-Date: Thu, 15 Aug 2024 20:20:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Feng zhou <zhoufeng.zf@bytedance.com>, edumazet@google.com,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
-	yonghong.song@linux.dev, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
-	jolsa@kernel.org, dsahern@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	yangzhenze@bytedance.com, wangdongdong.6@bytedance.com,
-	zhoufeng.zf@bytedance.com
-Subject: Re: [PATCH] bpf: Fix bpf_get/setsockopt to tos not take effect when
- TCP over IPv4 via INET6 API
-Message-ID: <202408152034.lw9Ilsj6-lkp@intel.com>
-References: <20240814084504.22172-1-zhoufeng.zf@bytedance.com>
+	s=arc-20240116; t=1723724694; c=relaxed/simple;
+	bh=+8XLyx5gD7zmeN0Xi7DKcQU4YaXWAtMWwR1bYjpV5BU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XewEEcTIok8kZC8dlE6LCXEQJ9vOB8U75pY8n81ymqlUaHVzUt3ebO+ABCgSwdGLcqzLs7mXhqG7+WhRACfSg9mtY3G7DpXZ9CRNnVAn5XrYADRJMNcrK0nXLdYB1xSneFfI/28weTiXCVddCLsshvmXxym5SgNQsM8KYgSJLb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DeMuCeHl; arc=none smtp.client-ip=209.85.167.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-3dab336717fso523662b6e.0;
+        Thu, 15 Aug 2024 05:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723724692; x=1724329492; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QxS9QDTFLbA2CX3R1ChvoqHgn0+hEmCdq7e6c92S6PQ=;
+        b=DeMuCeHlATpofc4YW1mEcapqTzvjJUmvdnVUUgeNh83oC9NhiOgU640zPfxyyLAJw4
+         WtrfY/81v4ynCDihgvMqhR+or4kzenn5qrPxa11FTqhOC5E5MQomk893lz/+XcT37JA+
+         HAX34DqYsVNUh3Z/qPsuo/89ugPyZNiO8dXJ9UR+vUTvHIQzbY3zSTPt+Fi2PEMq3lSX
+         9qLd+9tXllSIe5SpwiGL/n0nmreo4ifijCqHV62cJx1ZBwdV4kF6yisLJxdauvvKIW/U
+         FppBLrlFPsB/8YoWRGnAxDuTQqkeyBY3YQW003s00MoB3PGXanB8glbgMXYqRLEj4msz
+         dngA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723724692; x=1724329492;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QxS9QDTFLbA2CX3R1ChvoqHgn0+hEmCdq7e6c92S6PQ=;
+        b=CYiBRqu5646/wrrQeWME5Gf3Agh9yY4hnaQiGlfD9neTE+WOp7FbkbXpSWbpk1frLF
+         VwnF+H/otCMQfMuhdHiOqv0Ny+a4fI6Vj8tXXpNwEZOBdtu2QlZaFzR5HsjsYeB1DnFb
+         3I25hBV4WEHJI+FyFij9dRajm520SfO1vwAN80G4EVb5dH+/TG/nWRsn8liVRTaZEDL0
+         D8c/irOXigr4nYpztltt93vzVMBVVJpx7zpKk6/44LRVL+xwA8rg46ez/1By0D8nA6Di
+         CfYb61FbwyxSfswO6lYWZvhNTqbtLcxC0n3YSFSjJJS71P1BiUqRnEMKzVKGLoP3I63L
+         wu1g==
+X-Forwarded-Encrypted: i=1; AJvYcCV+e7s8JQK7W/zVwbZtCokkFdulaQKtmbat1t4ty9IdQ6SvsW961EDjYliI3lKiaq3ZIbaE6sQwKX2qmCLUeIox6H4N2SpXKsl/q/5JYM/O2nSoOhaM9KD8j81LAYSC94unnLBP
+X-Gm-Message-State: AOJu0YxmfTkRzrIS/++kAbroq9thYCInhbikw4k43iiDCx0R4NQkHoyF
+	VEvidd+77wAmwzw3oJbMnO2OSatNIC/c29VQBiQ7vP/vnt871GGf
+X-Google-Smtp-Source: AGHT+IHIrTaJEIUiOcUHjqKGw6Ka09v76TLRn7Sp/z9fRuaNGgGF03pll2eFfDuHHArafP39b1s+FA==
+X-Received: by 2002:a05:6808:1892:b0:3d9:41d1:acd2 with SMTP id 5614622812f47-3dd2991b8e9mr7225116b6e.27.1723724691653;
+        Thu, 15 Aug 2024 05:24:51 -0700 (PDT)
+Received: from localhost.localdomain ([43.129.25.208])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b63585d6sm1031724a12.70.2024.08.15.05.24.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 05:24:51 -0700 (PDT)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: kuba@kernel.org
+Cc: pshelar@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	amorenoz@redhat.com,
+	netdev@vger.kernel.org,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Menglong Dong <dongml2@chinatelecom.cn>
+Subject: [PATCH net-next] net: ovs: fix ovs_drop_reasons error
+Date: Thu, 15 Aug 2024 20:22:45 +0800
+Message-Id: <20240815122245.975440-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240814084504.22172-1-zhoufeng.zf@bytedance.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Feng,
+I'm sure if I understand it correctly, but it seems that there is
+something wrong with ovs_drop_reasons.
 
-kernel test robot noticed the following build errors:
+ovs_drop_reasons[0] is "OVS_DROP_LAST_ACTION", but
+OVS_DROP_LAST_ACTION == __OVS_DROP_REASON + 1, which means that
+ovs_drop_reasons[1] should be "OVS_DROP_LAST_ACTION".
 
-[auto build test ERROR on bpf-next/master]
-[also build test ERROR on bpf/master net-next/main net/main linus/master v6.11-rc3 next-20240815]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fix this by initializing ovs_drop_reasons with index.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Feng-zhou/bpf-Fix-bpf_get-setsockopt-to-tos-not-take-effect-when-TCP-over-IPv4-via-INET6-API/20240814-231142
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20240814084504.22172-1-zhoufeng.zf%40bytedance.com
-patch subject: [PATCH] bpf: Fix bpf_get/setsockopt to tos not take effect when TCP over IPv4 via INET6 API
-config: alpha-defconfig (https://download.01.org/0day-ci/archive/20240815/202408152034.lw9Ilsj6-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240815/202408152034.lw9Ilsj6-lkp@intel.com/reproduce)
+Fixes: 9d802da40b7c ("net: openvswitch: add last-action drop reason")
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+---
+ net/openvswitch/datapath.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408152034.lw9Ilsj6-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   alpha-linux-ld: net/core/filter.o: in function `sol_ip_sockopt':
->> net/core/filter.c:5402:(.text+0x8acc): undefined reference to `is_tcp_sock_ipv6_mapped'
->> alpha-linux-ld: net/core/filter.c:5402:(.text+0x8ad4): undefined reference to `is_tcp_sock_ipv6_mapped'
-   alpha-linux-ld: net/core/filter.c:5402:(.text+0xc84c): undefined reference to `is_tcp_sock_ipv6_mapped'
-   alpha-linux-ld: net/core/filter.c:5402:(.text+0xc858): undefined reference to `is_tcp_sock_ipv6_mapped'
-
-
-vim +5402 net/core/filter.c
-
-  5397	
-  5398	static int sol_ip_sockopt(struct sock *sk, int optname,
-  5399				  char *optval, int *optlen,
-  5400				  bool getopt)
-  5401	{
-> 5402		if (sk->sk_family != AF_INET && !is_tcp_sock_ipv6_mapped(sk))
-  5403			return -EINVAL;
-  5404	
-  5405		switch (optname) {
-  5406		case IP_TOS:
-  5407			if (*optlen != sizeof(int))
-  5408				return -EINVAL;
-  5409			break;
-  5410		default:
-  5411			return -EINVAL;
-  5412		}
-  5413	
-  5414		if (getopt)
-  5415			return do_ip_getsockopt(sk, SOL_IP, optname,
-  5416						KERNEL_SOCKPTR(optval),
-  5417						KERNEL_SOCKPTR(optlen));
-  5418	
-  5419		return do_ip_setsockopt(sk, SOL_IP, optname,
-  5420					KERNEL_SOCKPTR(optval), *optlen);
-  5421	}
-  5422	
-
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index 99d72543abd3..249210958f0b 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -2706,7 +2706,7 @@ static struct pernet_operations ovs_net_ops = {
+ };
+ 
+ static const char * const ovs_drop_reasons[] = {
+-#define S(x)	(#x),
++#define S(x)	[(x) & ~SKB_DROP_REASON_SUBSYS_MASK] = (#x),
+ 	OVS_DROP_REASONS(S)
+ #undef S
+ };
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.2
+
 
