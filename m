@@ -1,232 +1,111 @@
-Return-Path: <netdev+bounces-118971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE3A953B66
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:26:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99695953C15
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1616286F86
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:26:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 431F21F267C6
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEFC1494C7;
-	Thu, 15 Aug 2024 20:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F10714B092;
+	Thu, 15 Aug 2024 20:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ID8BNhMO"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="emq4Trxp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A7F1465A3
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 20:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED6014A4D8
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 20:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723753557; cv=none; b=rktCXs7CNuLzi49cD4XFSf7Av0In3qgYRPqjugrZ8t/41AFkI6eIBQTv46dxud3+3GIwvzVwzR7V0kuxUEP5xqu4CzQDRKFkKy63BcZTSSr/ZoNBq05+euT1ECas+GpsRCiHvpakhI26005xTt3H49S2qSCO2zsTIbU6pZt0I3s=
+	t=1723754606; cv=none; b=FzuB4qR0j6hQaEDevaBYX/yxDy7alMSLTnijPgDG47nL2OyaBJQum6ZqbyUxv0EBiA2XXG8JHIDbet8NHi6hugkzFhEhHwVIBRfwLqRQ0B2Gvss1DjRsKgk90Dve7PJodE/AKHQms39n1UanE3ErPYp9XScueM18InCdWuDuh74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723753557; c=relaxed/simple;
-	bh=YAJU5FXFJWul5IBRO+xgbMm+u28pgF2I2YVoq8F/x7w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p6Z3BSv0jwFrJZcpAnu0DDsHkctoGfJXsZFVYVGfq4Gj85TwnDcDDTR5X9bXDBrxmdejZgn/oHoxU0n52jlpJ8Y69vrzhBeQZ9mHTf5/gaZ23bCWfsz+xpTupMZJZeZKsb5HOtj+KjA2VsRgwR4m4dHJciJKKVpLkEsX5LNqjTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ID8BNhMO; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5bebb241fddso332a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 13:25:55 -0700 (PDT)
+	s=arc-20240116; t=1723754606; c=relaxed/simple;
+	bh=tR6AAtnzr4ifyv4uLfYfeXZrBedBMyCqUHKxzK3IT54=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F0bmvoBc9cGcb27lkDL8YPpfrbUapBnjwmh/tpDAyVDGAOVD7Maa1Zzzf4zofW6HbHJarSYAeFaj0wFb4ZtRii7OdvV0dKARhBFqJ87JowOr9JgVmFDjp4FVSQ4dF1hfSftwyLaUru3LZKTRsHYus5y2WlhyiaC+AgiwZiwr4ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=emq4Trxp; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723753554; x=1724358354; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZGBFlGgZ7VtdNdOp2YXWEF9NLY36Dieaz09krWWwzbA=;
-        b=ID8BNhMOSXOQpxkxo20k3fZPIzyAOjUmYrwl0zDj2l09MDoc3TNK2WqghNV52+hRrR
-         2aoQ1n6ziQcVf+u4LvUnEme4YVl4NnrP7qAqwtPO5C9pLjKGyOH6HNkOfvCLYtjinViK
-         SqZ5o6VMYdo7OmnT8N+sPNqzqmJSCLi4uPyYkwEUbM6I/MPUV4m1aDHe22XfpSfQRaNL
-         oN7XwWFjak61VoQPXt7kHxR6H69xkjedtVOMCmjO8yMeunPiWI8ATD+a5Sg+0jxU5crh
-         y/AGYFmt3iAMJDhD79owgL+Qspy2TEpVUxOlZSJ1tw3jt5i7Y0vxc/aJp85FxoHAqO6q
-         jhcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723753554; x=1724358354;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZGBFlGgZ7VtdNdOp2YXWEF9NLY36Dieaz09krWWwzbA=;
-        b=Ap9962QMxfYBajWp/bcfrtloMpsO/VVKymXQbyHBl326wbXFzMJ6hJrKnJjZONdyZs
-         Wobk5djBKdYfzC20nYBKT2D2gkjyf+9XM3YZNoLyxZwVTxx7CEoCCt0uqftijuRjcXwP
-         Du4PSbvY7Gy4M3mgUNcjtjUSJZufC9Y16DOOyOX059oTTvDkazQwMi5N+eOarYLP22aW
-         uG9ExTvvzljRQUMxyDxIVkJ6XLdPl6etjbCQ8SfCFKGWZ3q+o84DircPJBnYBU6OiBlT
-         pJ7HShl2WnMEADAwmn/w+b6sejozjR+vq4gn8lNH8Ub2x8marXSPSUoR0ixkxSdyA6OX
-         K7Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbv6uwAaO4/2u8YuHqqBrxO1J03md4Q1jYD90osWfJ7LsNWnp52fKqeO29K88lWRqlFNct2Si289eOndHrAiWHBwga4h1A
-X-Gm-Message-State: AOJu0Yx2BJlZw0rY0vYO9eadKNnfASp2cNuORQuJI31nQesV4mAAbmKE
-	pC/EBQApQbd4SZxNRIYzBVgP6wZ6WKFpPJvwnhn95mnsJxjo2u4r3FEO0M/Iteb7+vF57ULbNkP
-	wBK0ctmTmHIIVWR50yR9sqg82c9KdvY66lgID
-X-Google-Smtp-Source: AGHT+IHW5fNrRqjmAxt5DnpIwzQVwF2s/Lpn7NEkdzTAcCzAlgn22XdfKmFmZSjDvwO/Heip3bPeXDyJhSVfcONpWDs=
-X-Received: by 2002:a05:6402:4407:b0:58b:93:b624 with SMTP id
- 4fb4d7f45d1cf-5becd683a30mr323a12.1.1723753551916; Thu, 15 Aug 2024 13:25:51
- -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723754605; x=1755290605;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9nqPG81OosFh5oQ2zkH7uqY2XJwp28XZTxuMPCXeiJc=;
+  b=emq4TrxpWNKblvScfYOETl7+7FiFpAVYLqX/nTjqQzLqYOCLeTbBfoz9
+   Xt4hVLhyl/EAD/PcsH7YfPs4qXmYdnkqutf85QeUtr7XaUGZFR94AB0LM
+   nF32snf+PM/xYioJH4EYOlTUn80JySRbcA7R6rE5SLhscqFaAZJbZsQ1s
+   4=;
+X-IronPort-AV: E=Sophos;i="6.10,149,1719878400"; 
+   d="scan'208";a="421496196"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 20:43:20 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:13673]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.29:2525] with esmtp (Farcaster)
+ id 08a02d94-07c4-4e91-9e00-671f693b7d31; Thu, 15 Aug 2024 20:43:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 08a02d94-07c4-4e91-9e00-671f693b7d31
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 20:43:17 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 20:43:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
+	<matt@codeconstruct.com.au>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net] mctp: Use __mctp_dev_get() in mctp_fill_link_af().
+Date: Thu, 15 Aug 2024 13:42:54 -0700
+Message-ID: <20240815204254.49813-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1723680305.git.fahimitahera@gmail.com> <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
-In-Reply-To: <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
-From: Jann Horn <jannh@google.com>
-Date: Thu, 15 Aug 2024 22:25:15 +0200
-Message-ID: <CAG48ez2Sw0Cy3RYrgrsEDKyWoxMmMbzX6yY-OEfZqeyGDQhy9w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] Landlock: Adding file_send_sigiotask signal
- scoping support
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: outreachy@lists.linux.dev, mic@digikod.net, gnoack@google.com, 
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn3_gh@protonmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Aug 15, 2024 at 8:29=E2=80=AFPM Tahera Fahimi <fahimitahera@gmail.c=
-om> wrote:
-> This patch adds two new hooks "hook_file_set_fowner" and
-> "hook_file_free_security" to set and release a pointer to the
-> domain of the file owner. This pointer "fown_domain" in
-> "landlock_file_security" will be used in "file_send_sigiotask"
-> to check if the process can send a signal.
->
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
->  security/landlock/fs.c   | 18 ++++++++++++++++++
->  security/landlock/fs.h   |  6 ++++++
->  security/landlock/task.c | 27 +++++++++++++++++++++++++++
->  3 files changed, 51 insertions(+)
->
-> diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-> index 7877a64cc6b8..d05f0e9c5e54 100644
-> --- a/security/landlock/fs.c
-> +++ b/security/landlock/fs.c
-> @@ -1636,6 +1636,21 @@ static int hook_file_ioctl_compat(struct file *fil=
-e, unsigned int cmd,
->         return -EACCES;
->  }
->
-> +static void hook_file_set_fowner(struct file *file)
-> +{
-> +       write_lock_irq(&file->f_owner.lock);
+Since commit 5fa85a09390c ("net: core: rcu-ify rtnl af_ops"),
+af_ops->fill_link_af() is called under RCU.
 
-Before updating landlock_file(file)->fown_domain, this hook must also
-drop a reference on the old domain - maybe by just calling
-landlock_put_ruleset_deferred(landlock_file(file)->fown_domain) here.
+mctp_fill_link_af() calls mctp_dev_get_rtnl() that uses
+rtnl_dereference(), so lockdep should complain about it.
 
-> +       landlock_file(file)->fown_domain =3D landlock_get_current_domain(=
-);
-> +       landlock_get_ruleset(landlock_file(file)->fown_domain);
-> +       write_unlock_irq(&file->f_owner.lock);
-> +}
-> +
-> +static void hook_file_free_security(struct file *file)
-> +{
-> +       write_lock_irq(&file->f_owner.lock);
-> +       landlock_put_ruleset(landlock_file(file)->fown_domain);
-> +       write_unlock_irq(&file->f_owner.lock);
-> +}
-> +
->  static struct security_hook_list landlock_hooks[] __ro_after_init =3D {
->         LSM_HOOK_INIT(inode_free_security, hook_inode_free_security),
->
-> @@ -1660,6 +1675,9 @@ static struct security_hook_list landlock_hooks[] _=
-_ro_after_init =3D {
->         LSM_HOOK_INIT(file_truncate, hook_file_truncate),
->         LSM_HOOK_INIT(file_ioctl, hook_file_ioctl),
->         LSM_HOOK_INIT(file_ioctl_compat, hook_file_ioctl_compat),
-> +
-> +       LSM_HOOK_INIT(file_set_fowner, hook_file_set_fowner),
-> +       LSM_HOOK_INIT(file_free_security, hook_file_free_security),
->  };
->
->  __init void landlock_add_fs_hooks(void)
-> diff --git a/security/landlock/fs.h b/security/landlock/fs.h
-> index 488e4813680a..6054563295d8 100644
-> --- a/security/landlock/fs.h
-> +++ b/security/landlock/fs.h
-> @@ -52,6 +52,12 @@ struct landlock_file_security {
->          * needed to authorize later operations on the open file.
->          */
->         access_mask_t allowed_access;
-> +       /**
-> +        * @fown_domain: A pointer to a &landlock_ruleset of the process =
-own
-> +        * the file. This ruleset is protected by fowner_struct.lock same=
- as
-> +        * pid, uid, euid fields in fown_struct.
-> +        */
-> +       struct landlock_ruleset *fown_domain;
->  };
->
->  /**
-> diff --git a/security/landlock/task.c b/security/landlock/task.c
-> index 9de96a5005c4..568292dbfe7d 100644
-> --- a/security/landlock/task.c
-> +++ b/security/landlock/task.c
-> @@ -18,6 +18,7 @@
->
->  #include "common.h"
->  #include "cred.h"
-> +#include "fs.h"
->  #include "ruleset.h"
->  #include "setup.h"
->  #include "task.h"
-> @@ -261,12 +262,38 @@ static int hook_task_kill(struct task_struct *const=
- p,
->         return 0;
->  }
->
-> +static int hook_file_send_sigiotask(struct task_struct *tsk,
-> +                                   struct fown_struct *fown, int signum)
-> +{
-> +       struct file *file;
-> +       bool is_scoped;
-> +       const struct landlock_ruleset *dom, *target_dom;
-> +
-> +       /* struct fown_struct is never outside the context of a struct fi=
-le */
-> +       file =3D container_of(fown, struct file, f_owner);
-> +
-> +       read_lock_irq(&file->f_owner.lock);
-> +       dom =3D landlock_file(file)->fown_domain;
-> +       read_unlock_irq(&file->f_owner.lock);
+Let's use __mctp_dev_get() instead.
 
-At this point, the ->fown_domain pointer could concurrently change,
-and (once you apply my suggestion above) the old ->fown_domain could
-therefore be freed concurrently. One way to avoid that would be to use
-landlock_get_ruleset() to grab a reference before calling
-read_unlock_irq(), and drop that reference with
-landlock_put_ruleset_deferred() before exiting from this function.
+Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/mctp/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +       if (!dom)
-> +               return 0;
-> +
-> +       rcu_read_lock();
-> +       target_dom =3D landlock_get_task_domain(tsk);
-> +       is_scoped =3D domain_is_scoped(dom, target_dom, LANDLOCK_SCOPED_S=
-IGNAL);
-> +       rcu_read_unlock();
-> +       if (is_scoped)
-> +               return -EPERM;
-> +       return 0;
-> +}
-> +
->  static struct security_hook_list landlock_hooks[] __ro_after_init =3D {
->         LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
->         LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
->         LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
->         LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
->         LSM_HOOK_INIT(task_kill, hook_task_kill),
-> +       LSM_HOOK_INIT(file_send_sigiotask, hook_file_send_sigiotask),
->  };
->
->  __init void landlock_add_task_hooks(void)
-> --
-> 2.34.1
->
+diff --git a/net/mctp/device.c b/net/mctp/device.c
+index acb97b257428..7ffddab01e97 100644
+--- a/net/mctp/device.c
++++ b/net/mctp/device.c
+@@ -366,7 +366,7 @@ static int mctp_fill_link_af(struct sk_buff *skb,
+ {
+ 	struct mctp_dev *mdev;
+ 
+-	mdev = mctp_dev_get_rtnl(dev);
++	mdev = __mctp_dev_get(dev);
+ 	if (!mdev)
+ 		return -ENODATA;
+ 	if (nla_put_u32(skb, IFLA_MCTP_NET, mdev->net))
+-- 
+2.30.2
+
 
