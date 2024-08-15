@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-118860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 417E6953489
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:27:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B04195350D
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74CEC1C20D3F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:27:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE8F287717
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E691A3BCA;
-	Thu, 15 Aug 2024 14:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA83F1A00CE;
+	Thu, 15 Aug 2024 14:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NC/U8XBm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nz0XuEsX"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712761A2C35
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA01D14AD0A;
+	Thu, 15 Aug 2024 14:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723732025; cv=none; b=H2O22N5K9FB/rlHzdSZa+8aH0ndzVkS25SbZkdtus+X8Qtm7FkHdC6052V59BtJS/8NQvlBEjT3UdfWC3PpW6tzb8179SFLdyhd6w7VS/i5U2k8x/gO/Bh+z/nGcVvXQjpui5U3tTKWUNPJmuco8ZMILqCKVi/oWS0RptHG0VgU=
+	t=1723732399; cv=none; b=IwnYq/L9G0MJOJGTzSCQIIxHgDaV/NCNrz7wjXF8LF7AXsq4J0SHHwfZrvjpVdH32bdtBXvxi5V8tzyXs5/uMwdVRATiX05jNbY/+rvEvb2qPIANv5hwV+K6xOILnyehn82eevl9bQB7Q1C6hZE275ENOvqm0xfG3c7551gDydc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723732025; c=relaxed/simple;
-	bh=hdSMf2J9Hr/cKE4Rl9/fu+MBaSuTj/N1mudCEX2bQak=;
+	s=arc-20240116; t=1723732399; c=relaxed/simple;
+	bh=5zLlgiauFmtzDe0WGZrVO5jLD2j3yrPLGKIoogSK2Eo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jFI4ayfpjvB3TnSUu72R2+cSy88w+gtouCSUmBbzFQlJpOOJu6GV+aX1o71lvCScCZU+5eTcRH/2g8b6ylYycaRrh/F/gBzRg7pyVXZo2CGafBsaFL84B7yALBlQVt4xP5XNjcrRA9sP0OmoDdQWjVax1Lc+2mQwJFkjgvJBL0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NC/U8XBm; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogQn/fn2vJB6roo13u00wVIZvkm8fu+/qZ48eqzln0uljvWZcbdZvatfpSSVeY8ynQ8zbj4lI1DBMoUpT0m44cEw9YG3RTXuwh8OK6N1JHcjC28ztO4cgkLOwgRirqVYSTY8KREZEghkDP1YHp41HFy+D/oxNPYPpQdswaj6CBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nz0XuEsX; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3ninEvBj3BKY/YJXH7u6tbwW+gt3fQsqvRqPhhX3jF8=; b=NC/U8XBmI/rcxv/QXw8+TJcE06
-	s/2/bWUaqbNeujLPOE15HRZ4TXLa47ivwGpS2TnCkHaqy9YIqFRLkpKTY3DHoKu5UTTgHAyF9Uwpc
-	6l7ISDS2BQNk6/gsA82U576kGj/VgI92Oq/IlcCUV7oHhuq9QbKktK8/r3xTaf6f0/EI=;
+	bh=M8aNZa8nyfe/bSa1TM/F99VXtKGXCBMqn9UQAaHvcN0=; b=nz0XuEsX1PBBgoXUQqeR2HGbFm
+	OLQdQ4hC8kvHZ0tIad/Flwa+wLzOXEW4+8EFJSXOPpMstRwI8KuSt0U0TYktNgyeFAni0V4VvH8kK
+	mFyFDiVHGNnbeNl/iNGftrtCGYfti4WDi+uEzZHab/VUC2V25GNiJ+GwmaWPx8n8N94Q=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sebRH-004qhH-2h; Thu, 15 Aug 2024 16:26:55 +0200
-Date: Thu, 15 Aug 2024 16:26:55 +0200
+	id 1sebXA-004qjE-V3; Thu, 15 Aug 2024 16:33:00 +0200
+Date: Thu, 15 Aug 2024 16:33:00 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
- <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
- <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
- <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, f.fainelli@gmail.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, andrei.botila@oss.nxp.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: tja11xx: use reverse-mode
+ to instead of rmii-refclk-in
+Message-ID: <7aabe196-6d5a-4207-ba75-20187f767cf9@lunn.ch>
+References: <20240815055126.137437-1-wei.fang@nxp.com>
+ <20240815055126.137437-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,36 +64,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
+In-Reply-To: <20240815055126.137437-2-wei.fang@nxp.com>
 
-On Thu, Aug 15, 2024 at 11:40:28AM +0200, Maciek Machnikowski wrote:
-> 
-> 
-> On 15/08/2024 05:53, Richard Cochran wrote:
-> > On Wed, Aug 14, 2024 at 05:08:24PM +0200, Maciek Machnikowski wrote:
-> > 
-> >> The esterror should return the error calculated by the device. There is
-> >> no standard defining this, but the simplest implementation can put the
-> >> offset calculated by the ptp daemon, or the offset to the nearest PPS in
-> >> cases where PPS is used as a source of time
-> > 
-> > So user space produces the number, and other user space consumes it?
-> > 
-> > Sounds like it should say in user space, shared over some IPC, like
-> > PTP management messages for example.
-> 
-> The user spaces may run on completely isolated platforms in isolated
-> network with no direct path to communicate that.
-> I'm well aware of different solutions on the same platform (libpmc, AWS
-> Nitro or Clock Manager) , but this patchset tries to address different
-> use case
+On Thu, Aug 15, 2024 at 01:51:24PM +0800, Wei Fang wrote:
+> Per the MII and RMII specifications, for the standard RMII mode,
+> the REF_CLK is sourced from MAC to PHY or from an external source.
+> For the standard MII mode, the RX_CLK and TX_CLK are both sourced
+> by the PHY. But for TJA11xx PHYs, they support reverse mode, that
+> is, for revRMII mode, the REF_CLK is output, and for revMII mode,
+> the TX_CLK and RX_CLK are inputs to the PHY.
+> Previously the "nxp,rmii-refclk-in" was added to indicate that in
+> RMII mode, if this property present, REF_CLK is input to the PHY,
+> otherwise it is output. This seems inappropriate now. Firstly, for
+> the standard RMII mode, REF_CLK is originally input, and there is
+> no need to add the "nxp,rmii-refclk-in" property to indicate that
+> REF_CLK is input. Secondly, this property is not generic for TJA
+> PHYs, because it cannot cover the settings of TX_CLK and RX_CLK in
+> MII mode. Therefore, add new property "nxp,reverse-mode" to instead
+> of the "nxp,rmii-refclk-in" property.
 
-So this in effect is just a communication mechanism between two user
-space processes. The device itself does not know its own error, and
-when told about its error, it does nothing. So why add new driver API
-calls? It seems like the core should be able to handle this. You then
-don't need a details explanation of the API which a PHY driver writer
-can understand...
+Please could you add some justification why using
+PHY_INTERFACE_MODE_REVRMII is not possible.
 
-       Andrew
+	Andrew
 
