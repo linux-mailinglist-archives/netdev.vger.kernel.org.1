@@ -1,236 +1,196 @@
-Return-Path: <netdev+bounces-118983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B80953C95
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:28:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C944D953CA2
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FFF28762E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED28D1C22EC7
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C385A14F117;
-	Thu, 15 Aug 2024 21:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B514D2A6;
+	Thu, 15 Aug 2024 21:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCFWPeAt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qq/oxXOW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA0138DC7;
-	Thu, 15 Aug 2024 21:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FAA1537A4;
+	Thu, 15 Aug 2024 21:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723757292; cv=none; b=BNjB63yraiWlAbnhfABZ6ozLHClIzl+NH5ljoXK5en83W8gV/cxae1GyccSwl5kustQyKm3frfPLnsDU8fdrWNBclNdGdKm48sEp7+mWhsuyLnCXv2pzdIvdrMal3+ZbT5Anv5l3opMgiOp0d84DNPaSE00WFnBlKZ1PWCckrwY=
+	t=1723757569; cv=none; b=jH7VdJJFFoqWNbEAR5yd60y5nVyASoSMzeMi1eY3U9aiUIq3HxR5D5sgS/aefID0wptdAn+pL022Hh3uNtz39FB8T1YgIUd4fSgXlR4iiQCDW7GnXek3Trza30jKzRwMnRGgfalj88vKIwkijljZJ/XirjcyoYRZO6otKv1ADgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723757292; c=relaxed/simple;
-	bh=jv9kPifNQM215uQBs9ws5FlWKr9VkxuphUrKDyJRKS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iO4Q6TO/YU5cYIkUAr/WkBTLezIHU55VObmoCqgQtPJaphIkRuhiCn01RPeDO13ksfA+2d03B1NpGfIIJzZWU4GL9yjX7bktppIRk60cGTZ2vIggwLiUt7BW2kb3zcsLfRiGOxM3MGHIDT3VQzySzZ5PXsAyRND8nVWYjyXAFfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCFWPeAt; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fd66cddd4dso13744345ad.2;
-        Thu, 15 Aug 2024 14:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723757290; x=1724362090; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YxPV3ZREq4n/G2jT071ytxKeDYYaNwjp4tCRsSv8bG8=;
-        b=FCFWPeAtCKJKTyqWbr8MUYQnft68WiRIPf4ZQdLafkphWwD/kbdck4854dTRJD6Gcr
-         StZ7bkxz6GVJa9IugkOmHTzshSDipy2n1swf5cor1KG7mg7EtLwEG2u7rsvlY8I0Jf3Q
-         5aSfCCKnQEMy32GV548m6S1pgQX1wSsRDh+nuyg57ghxZaGfGSopr2pr4X8n7V3/jCTs
-         ynFK+KeE/VrlDA3LcN512aX25MeSwOYuFe8MPXR5ow3JgfKC+d7XWM/7XCsk59QQB7Wj
-         nt7Smf6BJRQT+ruaoGF4XJRA52bz9tbvZgdX8N4knL+J0ygzBr7sAfNj39f4FIpJj8qd
-         wWlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723757290; x=1724362090;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YxPV3ZREq4n/G2jT071ytxKeDYYaNwjp4tCRsSv8bG8=;
-        b=uSbiNdLdohMQmG4STXP3RAOUVdBmp2uN5sL17PIjfxTtJltbIlHkTEDDCiY6WIvLrO
-         rNvHMh5cs7dcCT4kobBrOMF7oAJBmI3sc5hqg49v03l+bmTCNhrdSpjhYIdn77mXw+fM
-         tXaPhC1psMIJL20Sb1N1olYBCwsqUDN3QMPCyL77DvTL77LMaffEgmUAYkO6Q+q2FdhK
-         RW/tbPK8vUei7XPHKPO3P2ZeajWpK8Sg5sZw7Zpwaf+jAa0ubgy/hbkBRZCaM0ijU9bE
-         hdpvky6hbhTBJwAMpN9F/CCYXXBjsonKqtkvEl5reCIPlabDTeikzPXy0n4w4caE6gcI
-         quRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpz75f7R+2kXlGFhpzwpl/4+roulSsJ3mODPYhZJ0zGOh8kIHIHKyv3RyLLAY4q/j0ZWvTAhEkT/+k/KYZ1f5DZ5yJakunvBZHEoRT7uitkoZp4qOJK9gz2ku4H0fHJozdmqjtxg7vZ8AHvvHzIXS+4gQQx+TrBVJISn7bnFbwBhRaffILPIlCAUfk
-X-Gm-Message-State: AOJu0YzqECZ10Jg3JmS54grTsyMnnwoQ7ZwAQ2e2mQoOk51sFKGX8t6R
-	JIVcaTXerVYiZv/ebzmyvaZ9yzo7okNGIl9E1nYRYAoBrQQ8MqD+32Kp9hyL
-X-Google-Smtp-Source: AGHT+IGSlCcvuEjiEbfNez6PbFPzli6qRWOsJ2K6awcqpLgg/grw92Lj2XgLglt9a0YzocdAYjJxBQ==
-X-Received: by 2002:a17:902:ce91:b0:202:1fe:9fdd with SMTP id d9443c01a7336-20203ea075fmr12772205ad.24.1723757290281;
-        Thu, 15 Aug 2024 14:28:10 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0379e19sm14239435ad.136.2024.08.15.14.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 14:28:09 -0700 (PDT)
-Date: Thu, 15 Aug 2024 15:28:07 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: Jann Horn <jannh@google.com>
-Cc: outreachy@lists.linux.dev, mic@digikod.net, gnoack@google.com,
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bjorn3_gh@protonmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/6] Landlock: Adding file_send_sigiotask signal
- scoping support
-Message-ID: <Zr5y53Bl6cgdLKjj@tahera-OptiPlex-5000>
-References: <cover.1723680305.git.fahimitahera@gmail.com>
- <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
- <CAG48ez2Sw0Cy3RYrgrsEDKyWoxMmMbzX6yY-OEfZqeyGDQhy9w@mail.gmail.com>
+	s=arc-20240116; t=1723757569; c=relaxed/simple;
+	bh=//WNbzYpYU+e2ln5VDiF2W/YrA6HlyMjUvhsSCGFMs8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aabSMyRjZt6twH0e8Nnp/xIcvFlyKH7oDuowj0k+lleUJyhX9mLTcYV9EvzHF8rK2TjwkDIgi2CcT9LvrAyJ2fclTmTQL8U3SDxXm/H2DkbqkHOY2tcYHFsToTiLXAYu9quFM3BC+qwvtMhVPR5kQQnXDpIg93/bv6TZTy8Fkyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qq/oxXOW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3113FC32786;
+	Thu, 15 Aug 2024 21:32:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723757569;
+	bh=//WNbzYpYU+e2ln5VDiF2W/YrA6HlyMjUvhsSCGFMs8=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=qq/oxXOWavPT3+hbtA09RHmrQOnG36JcVAKYJ2j4qibGGPS9V2o/1iidMpnQXOxAR
+	 TKX/u12boEdb9PFovcU7zdF9YucEmdL4TXAH9uNFKeh3XnEpfJR9V1I8WlGMkVVzWS
+	 PAlsN+OpYqkpIBLTKmlNRmgMT4kbjJlop/G7Clb39lVT1E40AXztSi2xmVa2MZHlU1
+	 YCqaxpWf5QKzhFFs2ijhKdtDbY6y69DVkcV7R8k3p8niX5pqy+4DhphAT5aTa7F1pY
+	 XRONg58/Ip2Rolt59N7e1q8CDRmC8iEgAGz0VCr5DT+joDv3knuE1oL1ffED7ebfaz
+	 LAfzP3zG9pVxA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A8CC3DA7F;
+	Thu, 15 Aug 2024 21:32:49 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net-next v3 0/8] net/selftests: TCP-AO selftests updates
+Date: Thu, 15 Aug 2024 22:32:25 +0100
+Message-Id: <20240815-tcp-ao-selftests-upd-6-12-v3-0-7bd2e22bb81c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG48ez2Sw0Cy3RYrgrsEDKyWoxMmMbzX6yY-OEfZqeyGDQhy9w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOlzvmYC/43OywrCMBAF0F8pWTuaR5+u/A9xkSYTG6hJSWJRp
+ P9uLIiuxOVwuefOg0QMFiPZFw8ScLbRepcPsSmIGqQ7I1idb8IpL2kjKCQ1gfQQcTQJY4pwnTT
+ UwDiUWmAlZFMaYUjuTwGNva32kThM4PCWyCknvYwIfZBODS/7ne0u0rpXc7Ax+XBfn5rZ2v9jf
+ 2ZAwRhd9oZVuhbt4ZzBcav8ZV2d+UdqKf8l8SyJhqquE1XLavYtLcvyBAKYSpk2AQAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1723757567; l=5573;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=//WNbzYpYU+e2ln5VDiF2W/YrA6HlyMjUvhsSCGFMs8=;
+ b=WcN86bjnC908xnl0YKemHzlj5UiSYYu3NmhGQoaipWYAM06enzSuWaHj7dwzlo3yK+1m5bI+G
+ IELW8xMHJTHA1YB4sM/6cczcm/xz5bqZq5h9abfycp/0vQUnZN376St
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On Thu, Aug 15, 2024 at 10:25:15PM +0200, Jann Horn wrote:
-> On Thu, Aug 15, 2024 at 8:29 PM Tahera Fahimi <fahimitahera@gmail.com> wrote:
-> > This patch adds two new hooks "hook_file_set_fowner" and
-> > "hook_file_free_security" to set and release a pointer to the
-> > domain of the file owner. This pointer "fown_domain" in
-> > "landlock_file_security" will be used in "file_send_sigiotask"
-> > to check if the process can send a signal.
-> >
-> > Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> > ---
-> >  security/landlock/fs.c   | 18 ++++++++++++++++++
-> >  security/landlock/fs.h   |  6 ++++++
-> >  security/landlock/task.c | 27 +++++++++++++++++++++++++++
-> >  3 files changed, 51 insertions(+)
-> >
-> > diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-> > index 7877a64cc6b8..d05f0e9c5e54 100644
-> > --- a/security/landlock/fs.c
-> > +++ b/security/landlock/fs.c
-> > @@ -1636,6 +1636,21 @@ static int hook_file_ioctl_compat(struct file *file, unsigned int cmd,
-> >         return -EACCES;
-> >  }
-> >
-> > +static void hook_file_set_fowner(struct file *file)
-> > +{
-> > +       write_lock_irq(&file->f_owner.lock);
-> 
-> Before updating landlock_file(file)->fown_domain, this hook must also
-> drop a reference on the old domain - maybe by just calling
-> landlock_put_ruleset_deferred(landlock_file(file)->fown_domain) here.
-Hi Jann,
+First 3 patches are more-or-less cleanups/preparations.
 
-Thanks for the feedback :)
-It totally make sense.
-> > +       landlock_file(file)->fown_domain = landlock_get_current_domain();
-> > +       landlock_get_ruleset(landlock_file(file)->fown_domain);
-> > +       write_unlock_irq(&file->f_owner.lock);
-> > +}
-> > +
-> > +static void hook_file_free_security(struct file *file)
-> > +{
-> > +       write_lock_irq(&file->f_owner.lock);
-> > +       landlock_put_ruleset(landlock_file(file)->fown_domain);
-I was thinking of if we can replace this landlock_put_ruleset with
-landlock_put_ruleset_deferred. In this case, it would be better use of
-handling the lock?
+Patches 4/5 are fixes for netns file descriptors leaks/open.
 
-> > +       write_unlock_irq(&file->f_owner.lock);
-> > +}
-> > +
-> >  static struct security_hook_list landlock_hooks[] __ro_after_init = {
-> >         LSM_HOOK_INIT(inode_free_security, hook_inode_free_security),
-> >
-> > @@ -1660,6 +1675,9 @@ static struct security_hook_list landlock_hooks[] __ro_after_init = {
-> >         LSM_HOOK_INIT(file_truncate, hook_file_truncate),
-> >         LSM_HOOK_INIT(file_ioctl, hook_file_ioctl),
-> >         LSM_HOOK_INIT(file_ioctl_compat, hook_file_ioctl_compat),
-> > +
-> > +       LSM_HOOK_INIT(file_set_fowner, hook_file_set_fowner),
-> > +       LSM_HOOK_INIT(file_free_security, hook_file_free_security),
-> >  };
-> >
-> >  __init void landlock_add_fs_hooks(void)
-> > diff --git a/security/landlock/fs.h b/security/landlock/fs.h
-> > index 488e4813680a..6054563295d8 100644
-> > --- a/security/landlock/fs.h
-> > +++ b/security/landlock/fs.h
-> > @@ -52,6 +52,12 @@ struct landlock_file_security {
-> >          * needed to authorize later operations on the open file.
-> >          */
-> >         access_mask_t allowed_access;
-> > +       /**
-> > +        * @fown_domain: A pointer to a &landlock_ruleset of the process own
-> > +        * the file. This ruleset is protected by fowner_struct.lock same as
-> > +        * pid, uid, euid fields in fown_struct.
-> > +        */
-> > +       struct landlock_ruleset *fown_domain;
-> >  };
-> >
-> >  /**
-> > diff --git a/security/landlock/task.c b/security/landlock/task.c
-> > index 9de96a5005c4..568292dbfe7d 100644
-> > --- a/security/landlock/task.c
-> > +++ b/security/landlock/task.c
-> > @@ -18,6 +18,7 @@
-> >
-> >  #include "common.h"
-> >  #include "cred.h"
-> > +#include "fs.h"
-> >  #include "ruleset.h"
-> >  #include "setup.h"
-> >  #include "task.h"
-> > @@ -261,12 +262,38 @@ static int hook_task_kill(struct task_struct *const p,
-> >         return 0;
-> >  }
-> >
-> > +static int hook_file_send_sigiotask(struct task_struct *tsk,
-> > +                                   struct fown_struct *fown, int signum)
-> > +{
-> > +       struct file *file;
-> > +       bool is_scoped;
-> > +       const struct landlock_ruleset *dom, *target_dom;
-> > +
-> > +       /* struct fown_struct is never outside the context of a struct file */
-> > +       file = container_of(fown, struct file, f_owner);
-> > +
-> > +       read_lock_irq(&file->f_owner.lock);
-> > +       dom = landlock_file(file)->fown_domain;
-> > +       read_unlock_irq(&file->f_owner.lock);
-> 
-> At this point, the ->fown_domain pointer could concurrently change,
-> and (once you apply my suggestion above) the old ->fown_domain could
-> therefore be freed concurrently. One way to avoid that would be to use
-> landlock_get_ruleset() to grab a reference before calling
-> read_unlock_irq(), and drop that reference with
-> landlock_put_ruleset_deferred() before exiting from this function.
-Correct, I applied the changes. 
-> > +       if (!dom)
-> > +               return 0;
-> > +
-> > +       rcu_read_lock();
-> > +       target_dom = landlock_get_task_domain(tsk);
-> > +       is_scoped = domain_is_scoped(dom, target_dom, LANDLOCK_SCOPED_SIGNAL);
-> > +       rcu_read_unlock();
-> > +       if (is_scoped)
-> > +               return -EPERM;
-> > +       return 0;
-> > +}
-> > +
-> >  static struct security_hook_list landlock_hooks[] __ro_after_init = {
-> >         LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
-> >         LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
-> >         LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
-> >         LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
-> >         LSM_HOOK_INIT(task_kill, hook_task_kill),
-> > +       LSM_HOOK_INIT(file_send_sigiotask, hook_file_send_sigiotask),
-> >  };
-> >
-> >  __init void landlock_add_task_hooks(void)
-> > --
-> > 2.34.1
-> >
+Patch 6 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+kernels to run TCP-AO.
+
+Patch 7 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+the issue, but I hope it will fix netdev flakes for connect-deny-*
+tests.
+
+And the biggest change is adding TCP-AO tracepoints to selftests.
+I think it's a good addition by the following reasons:
+- The related tracepoints are now tested;
+- It allows tcp-ao selftests to raise expectations on the kernel
+  behavior - up from the syscalls exit statuses + net counters.
+- Provides tracepoints usage samples.
+
+As tracepoints are not a stable ABI, any kernel changes done to them
+will be reflected to the selftests, which also will allow users
+to see how to change their code. It's quite better than parsing dmesg
+(what BGP was doing pre-tracepoints, ugh).
+
+Somewhat arguably, the code parses trace_pipe, rather than uses
+libtraceevent (which any sane user should do). The reason behind that is
+the same as for rt-netlink macros instead of libmnl: I'm trying
+to minimize the library dependencies of the selftests. And the
+performance of formatting text in kernel and parsing it again in a test
+is not critical.
+
+Current output sample:
+> ok 73 Trace events matched expectations: 13 tcp_hash_md5_required[2] tcp_hash_md5_unexpected[4] tcp_hash_ao_required[3] tcp_ao_key_not_found[4]
+
+Previously, tracepoints selftests were part of kernel tcp tracepoints
+submission [1], but since then the code was quite changed:
+- Now generic tracing setup is in lib/ftrace.c, separate from
+  lib/ftrace-tcp.c which utilizes TCP trace points. This separation
+  allows future selftests to trace non-TCP events, i.e. to find out
+  an skb's drop reason, which was useful in the creation of TCP-CLOSE
+  stress-test (not in this patch set, but used in attempt to reproduce
+  the issue from [2]).
+- Another change is that in the previous submission the trace events
+  where used only to detect unexpected TCP-AO/TCP-MD5 events. In this
+  version the selftests will fail if an expected trace event didn't
+  appear.
+  Let's see how reliable this is on the netdev bot - it obviously passes
+  on my testing, but potentially may require a temporary XFAIL patch
+  if it misbehaves on a slow VM.
+
+[1] https://lore.kernel.org/lkml/20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=33700a0c9b56
+
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+Changes in v3:
+- Corrected the selftests printing of tcp header flags, parsed from
+  trace points
+- Fixed an issue with VRF kconfig checks (and tests)
+- Made check for unexpected trace events XFAIL, yet looking into the
+  reason behind the fail
+- Link to v2: https://lore.kernel.org/r/20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com
+
+Changes in v2:
+- Fixed two issues with parsing TCP-AO events: the socket state and TCP
+  segment flags. Hopefully, won't fail on netdev.
+- Reword patch 1 & 2 messages to be more informative and at some degree
+  formal (Paolo)
+- Since commit e33a02ed6a4f ("selftests: Add printf attribute to
+  kselftest prints") it's possible to use __printf instead of "raw" gcc
+  attribute - switch using that, as checkpatch suggests.
+- Link to v1: https://lore.kernel.org/r/20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com
+
+---
+Dmitry Safonov (7):
+      selftests/net: Clean-up double assignment
+      selftests/net: Provide test_snprintf() helper
+      selftests/net: Be consistent in kconfig checks
+      selftests/net: Open /proc/thread-self in open_netns()
+      selftests/net: Don't forget to close nsfd after switch_save_ns()
+      selftests/net: Synchronize client/server before counters checks
+      selftests/net: Add trace events matching to tcp_ao
+
+Mohammad Nassiri (1):
+      selftests/tcp_ao: Fix printing format for uint64_t
+
+ tools/testing/selftests/net/tcp_ao/Makefile        |   3 +-
+ tools/testing/selftests/net/tcp_ao/bench-lookups.c |   2 +-
+ tools/testing/selftests/net/tcp_ao/config          |   1 +
+ tools/testing/selftests/net/tcp_ao/connect-deny.c  |  25 +-
+ tools/testing/selftests/net/tcp_ao/connect.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/icmps-discard.c |   2 +-
+ .../testing/selftests/net/tcp_ao/key-management.c  |  18 +-
+ tools/testing/selftests/net/tcp_ao/lib/aolib.h     | 176 ++++++-
+ .../testing/selftests/net/tcp_ao/lib/ftrace-tcp.c  | 549 +++++++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/ftrace.c    | 466 +++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/kconfig.c   |  31 +-
+ tools/testing/selftests/net/tcp_ao/lib/setup.c     |  17 +-
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |   1 -
+ tools/testing/selftests/net/tcp_ao/lib/utils.c     |  26 +
+ tools/testing/selftests/net/tcp_ao/restore.c       |  30 +-
+ tools/testing/selftests/net/tcp_ao/rst.c           |   2 +-
+ tools/testing/selftests/net/tcp_ao/self-connect.c  |  19 +-
+ tools/testing/selftests/net/tcp_ao/seq-ext.c       |  28 +-
+ .../selftests/net/tcp_ao/setsockopt-closed.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/unsigned-md5.c  |  35 +-
+ 20 files changed, 1376 insertions(+), 67 deletions(-)
+---
+base-commit: a9c60712d71ff07197b2982899b9db28ed548ded
+change-id: 20240730-tcp-ao-selftests-upd-6-12-4d3e53a74f3f
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
+
 
