@@ -1,291 +1,134 @@
-Return-Path: <netdev+bounces-119014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5844F953D20
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:05:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCF30953D23
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B0D51C24DF7
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:04:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E9F41F23965
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18F814A4D8;
-	Thu, 15 Aug 2024 22:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3D014D2B8;
+	Thu, 15 Aug 2024 22:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XJ4Mfuxl"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="Y1r+nkAs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FA814A089
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 22:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723759496; cv=none; b=r7TQlMPfqZ9DuACmhRApK944r5ZlnD7To7DWs+OM71ZnVZEJq1lJ2o/SOtXT2jmbRcxu39FKY2ooNXVf3WxMFAimCSG0iq0RaiTVujZOPZKxF8w5dRtTiY8DRuHQjynJAUEnaeQ01TIJ2cq/OIp4esCmmKObNAz8O+cFh/09aE8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723759496; c=relaxed/simple;
-	bh=UDZJw6cFXn6qTJQy/kbzhauQz+WQz0QNVdlW0x3pGUw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rI/FkSy46irWCtAoXcFo3FVYEMGgz0UvCVOQEzGI7Y4CqxFCDMWXP0eABv1sDrvBmQ3kOzbgfFYZFWlqnAdm2/Tmn7I5LB+uWPW4t/OrVqzjuDd8pxJvwl3n0saZfXKZ66nXOcHX1bMVQ5qtLoDk2nluK/itPfuptDK64l8+zbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XJ4Mfuxl; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723759495; x=1755295495;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ef6EmRZ68nTmwZghfFaV47TMbUja6BIb+vLyJ1FexSA=;
-  b=XJ4MfuxlXoxcgqYdG7W7JwFlSuuahQyJOfUDzPOjS78B1He9LRTMEI1b
-   tpN6OsJamY2OVMgHjGiWiIVhYkc9E2ibhwwQe5ahQgFUBuUdtbU2NqjMI
-   +HsbqPSI7Tk9bcSlWt1mDT624t2q0kKnw/7sgGD0TvBtz0mw8xAemKdot
-   0=;
-X-IronPort-AV: E=Sophos;i="6.10,150,1719878400"; 
-   d="scan'208";a="19214924"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 22:04:52 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:59876]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.153:2525] with esmtp (Farcaster)
- id 80b7f0b8-10be-4d0b-9b49-5892bc3e5dfc; Thu, 15 Aug 2024 22:04:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 80b7f0b8-10be-4d0b-9b49-5892bc3e5dfc
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 15 Aug 2024 22:04:50 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.33) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 15 Aug 2024 22:04:47 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Tom Herbert <tom@herbertland.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com>
-Subject: [PATCH v1 net] kcm: Serialise kcm_sendmsg() for the same socket.
-Date: Thu, 15 Aug 2024 15:04:37 -0700
-Message-ID: <20240815220437.69511-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF4014A089
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 22:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723759630; cv=pass; b=gcvcI1G75ak7YMg++MFlYrNmrbsJ32ZhOV52FDLqk1h7APUAbeJ/cRFDoO7yU0z1LmH7i+ppSR5Rmm7EdptFqiLwn57/Dqcf6v/5gxN3KUxIeZBGU5ZhYkSsqO9cXpXca0pP2U5IjHv+UNTTAGfl0vixt1Pa0ZX5nKyMDQApGWc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723759630; c=relaxed/simple;
+	bh=7tN9QaDcEe6swWfiv//Qee41PZEZvXM4Gb6lljFceF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TZvJrnYIRxwxfmdl9mSy3ZiZrS7VvtgX4bUDVPSF4XAaSyY7IbSYoBfXXQ/otKUUhrPxkhYgh/6SXOaa5hrbVaivshbKgCoTZlhU/lRdbqjh4UDJ2c/SpSh8QWBykskjAUySTqvfCcvgD9XLnK+9sJ3jSNK6Jtu5PZb20x8BFfY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=Y1r+nkAs; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1723759617; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=SVcV0Y+X2y/9nycMEdca7TjDiqzT9uoBFggDzaG5XJKLkyAQI674EhMboezrg41+VS8y06MyYiD5OXiLVoF8p8w+Ks5/W9+n6erO2zxo9CPPLRYr+Zr0vso5+3H2GUrw4tlVRtjmwxCa6tqfT/U/gFLa3C53CrgBFeOzIBOFzAk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1723759617; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=94enMT6IgcWD7o283z6nZs0lSa0qSTbUCX8c6kC/usU=; 
+	b=Zl3AgJtO2YvF8efsSSTEvV9WRSoHfDTaQHz2JKWHSgCYnjOzcEwA0t9sGDGk0KEHvMEFTAHDG19jlzImxWN+TD+iI+6Jjr2EgPMyxWHDav3g5Q2E3L7Q1srvS+jeDtiPhBCq4nhXOVHGe3phQki7DK4+DCGOx66T+VVKhzt9940=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723759617;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=94enMT6IgcWD7o283z6nZs0lSa0qSTbUCX8c6kC/usU=;
+	b=Y1r+nkAspCqpCauTibfiggIsPRprkHw1iMrMXq1hgPR8fzb/DREMRgFn6ETgYPt+
+	VdBYjmsRxgPYDuZ0Vj4939Vxb6KSonS1x4x8TykymsvNz4XoWkejEWOOcazLX8nofjv
+	B8yooojmr/mpWoZmL9mWBhKDpRF2PyXikyZJ98MVy0x1RND5N9RElzDXcZMxu5FfvEt
+	YZj+isbC6/Pr7OjrV7xl4duRGqipMrJ6fntS49R7RQyG+qQ2GMo9aa8ndWOdP9/7dmP
+	cRSBq48F+Va+CWcwohtRVuiblNvLL/N3QnTO4UNASUx5IGwUvfgcAbsoRUE4LK5B2py
+	BVgVMMXOZA==
+Received: by mx.zohomail.com with SMTPS id 1723759615292107.85678322031367;
+	Thu, 15 Aug 2024 15:06:55 -0700 (PDT)
+Message-ID: <ed2519db-b3f8-4ab8-9c89-720633100490@machnikowski.net>
+Date: Fri, 16 Aug 2024 00:06:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] ptp: Add esterror support
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+ jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
+References: <20240813125602.155827-1-maciek@machnikowski.net>
+ <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
+ <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+ <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+ <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
+ <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
+ <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
+ <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
+ <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
+ <Zr5uV8uLYRQo5qfX@hoboy.vegasvil.org>
+Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <Zr5uV8uLYRQo5qfX@hoboy.vegasvil.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-syzkaller reported UAF in kcm_release(). [0]
 
-The scenario is
 
-  1. Thread A builds a skb with MSG_MORE and sets kcm->seq_skb.
+On 15/08/2024 23:08, Richard Cochran wrote:
+> On Thu, Aug 15, 2024 at 05:00:24PM +0200, Maciek Machnikowski wrote:
+> 
+>> Think about a Time Card
+>> (https://opencomputeproject.github.io/Time-Appliance-Project/docs/time-card/introduction).
+> 
+> No, I won't think about that!
+> 
+> You need to present the technical details in the form of patches.
+> 
+> Hand-wavey hints don't cut it.
+> 
+> Thanks,
+> Richard
 
-  2. Thread A resumes building skb from kcm->seq_skb but is blocked
-     by sk_stream_wait_memory()
+This implementation addresses 3 use cases:
 
-  3. Thread B calls sendmsg() concurrently, finishes building kcm->seq_skb
-     and puts the skb to the write queue
+1. Autonomous devices that synchronize themselves to some external
+sources (GNSS, NTP, dedicated time sync networks) and have the ability
+to return the estimated error from the HW or FW loop to users
 
-  4. Thread A faces an error and finally frees skb that is already in the
-     write queue
+2. Multi function devices that may have a single isolated function
+synchronizing the device clock (by means of PTP, or PPS or any other)
+and letting other functions access the uncertainty information
 
-  5. kcm_release() does double-free the skb in the write queue
+3. Create a common interface to read the uncertainty from a device
+(currently you can use PMC for PTP, but there is no way of receiving
+that information from ts2phc)
 
-When a thread is building a MSG_MORE skb, another thread must not touch it.
+#1 and #2 requires an interface to the driver to retrieve the error from
+a device
+#2 requires an interface to adjust the esterror and push it to the device
+#3 can be terminated locally in the ptp class driver using the same
+principle as the presented ptp_mock implementation, or something more
+sophisticated
 
-Let's add a per-sk mutex and serialise kcm_sendmsg().
+Also this is an RFC to help align work on this functionality across
+different devices ] and validate if that's the right direction. If it is
+- there will be a patch series with real drivers returning uncertainty
+information using that interface. If it's not - I'd like to understand
+what should I improve in the interface.
 
-[0]:
-BUG: KASAN: slab-use-after-free in __skb_unlink include/linux/skbuff.h:2366 [inline]
-BUG: KASAN: slab-use-after-free in __skb_dequeue include/linux/skbuff.h:2385 [inline]
-BUG: KASAN: slab-use-after-free in __skb_queue_purge_reason include/linux/skbuff.h:3175 [inline]
-BUG: KASAN: slab-use-after-free in __skb_queue_purge include/linux/skbuff.h:3181 [inline]
-BUG: KASAN: slab-use-after-free in kcm_release+0x170/0x4c8 net/kcm/kcmsock.c:1691
-Read of size 8 at addr ffff0000ced0fc80 by task syz-executor329/6167
-
-CPU: 1 PID: 6167 Comm: syz-executor329 Tainted: G    B              6.8.0-rc5-syzkaller-g9abbc24128bc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:291
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:298
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x178/0x518 mm/kasan/report.c:488
- kasan_report+0xd8/0x138 mm/kasan/report.c:601
- __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
- __skb_unlink include/linux/skbuff.h:2366 [inline]
- __skb_dequeue include/linux/skbuff.h:2385 [inline]
- __skb_queue_purge_reason include/linux/skbuff.h:3175 [inline]
- __skb_queue_purge include/linux/skbuff.h:3181 [inline]
- kcm_release+0x170/0x4c8 net/kcm/kcmsock.c:1691
- __sock_release net/socket.c:659 [inline]
- sock_close+0xa4/0x1e8 net/socket.c:1421
- __fput+0x30c/0x738 fs/file_table.c:376
- ____fput+0x20/0x30 fs/file_table.c:404
- task_work_run+0x230/0x2e0 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0x618/0x1f64 kernel/exit.c:871
- do_group_exit+0x194/0x22c kernel/exit.c:1020
- get_signal+0x1500/0x15ec kernel/signal.c:2893
- do_signal+0x23c/0x3b44 arch/arm64/kernel/signal.c:1249
- do_notify_resume+0x74/0x1f4 arch/arm64/kernel/entry-common.c:148
- exit_to_user_mode_prepare arch/arm64/kernel/entry-common.c:169 [inline]
- exit_to_user_mode arch/arm64/kernel/entry-common.c:178 [inline]
- el0_svc+0xac/0x168 arch/arm64/kernel/entry-common.c:713
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-Allocated by task 6166:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_alloc_info+0x70/0x84 mm/kasan/generic.c:626
- unpoison_slab_object mm/kasan/common.c:314 [inline]
- __kasan_slab_alloc+0x74/0x8c mm/kasan/common.c:340
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3813 [inline]
- slab_alloc_node mm/slub.c:3860 [inline]
- kmem_cache_alloc_node+0x204/0x4c0 mm/slub.c:3903
- __alloc_skb+0x19c/0x3d8 net/core/skbuff.c:641
- alloc_skb include/linux/skbuff.h:1296 [inline]
- kcm_sendmsg+0x1d3c/0x2124 net/kcm/kcmsock.c:783
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- sock_sendmsg+0x220/0x2c0 net/socket.c:768
- splice_to_socket+0x7cc/0xd58 fs/splice.c:889
- do_splice_from fs/splice.c:941 [inline]
- direct_splice_actor+0xec/0x1d8 fs/splice.c:1164
- splice_direct_to_actor+0x438/0xa0c fs/splice.c:1108
- do_splice_direct_actor fs/splice.c:1207 [inline]
- do_splice_direct+0x1e4/0x304 fs/splice.c:1233
- do_sendfile+0x460/0xb3c fs/read_write.c:1295
- __do_sys_sendfile64 fs/read_write.c:1362 [inline]
- __se_sys_sendfile64 fs/read_write.c:1348 [inline]
- __arm64_sys_sendfile64+0x160/0x3b4 fs/read_write.c:1348
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-Freed by task 6167:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_free_info+0x5c/0x74 mm/kasan/generic.c:640
- poison_slab_object+0x124/0x18c mm/kasan/common.c:241
- __kasan_slab_free+0x3c/0x78 mm/kasan/common.c:257
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2121 [inline]
- slab_free mm/slub.c:4299 [inline]
- kmem_cache_free+0x15c/0x3d4 mm/slub.c:4363
- kfree_skbmem+0x10c/0x19c
- __kfree_skb net/core/skbuff.c:1109 [inline]
- kfree_skb_reason+0x240/0x6f4 net/core/skbuff.c:1144
- kfree_skb include/linux/skbuff.h:1244 [inline]
- kcm_release+0x104/0x4c8 net/kcm/kcmsock.c:1685
- __sock_release net/socket.c:659 [inline]
- sock_close+0xa4/0x1e8 net/socket.c:1421
- __fput+0x30c/0x738 fs/file_table.c:376
- ____fput+0x20/0x30 fs/file_table.c:404
- task_work_run+0x230/0x2e0 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0x618/0x1f64 kernel/exit.c:871
- do_group_exit+0x194/0x22c kernel/exit.c:1020
- get_signal+0x1500/0x15ec kernel/signal.c:2893
- do_signal+0x23c/0x3b44 arch/arm64/kernel/signal.c:1249
- do_notify_resume+0x74/0x1f4 arch/arm64/kernel/entry-common.c:148
- exit_to_user_mode_prepare arch/arm64/kernel/entry-common.c:169 [inline]
- exit_to_user_mode arch/arm64/kernel/entry-common.c:178 [inline]
- el0_svc+0xac/0x168 arch/arm64/kernel/entry-common.c:713
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-The buggy address belongs to the object at ffff0000ced0fc80
- which belongs to the cache skbuff_head_cache of size 240
-The buggy address is located 0 bytes inside of
- freed 240-byte region [ffff0000ced0fc80, ffff0000ced0fd70)
-
-The buggy address belongs to the physical page:
-page:00000000d35f4ae4 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10ed0f
-flags: 0x5ffc00000000800(slab|node=0|zone=2|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 05ffc00000000800 ffff0000c1cbf640 fffffdffc3423100 dead000000000004
-raw: 0000000000000000 00000000000c000c 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff0000ced0fb80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000ced0fc00: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
->ffff0000ced0fc80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff0000ced0fd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
- ffff0000ced0fd80: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
-
-Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
-Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
-Tested-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/kcm.h | 1 +
- net/kcm/kcmsock.c | 4 ++++
- 2 files changed, 5 insertions(+)
-
-diff --git a/include/net/kcm.h b/include/net/kcm.h
-index 90279e5e09a5..441e993be634 100644
---- a/include/net/kcm.h
-+++ b/include/net/kcm.h
-@@ -70,6 +70,7 @@ struct kcm_sock {
- 	struct work_struct tx_work;
- 	struct list_head wait_psock_list;
- 	struct sk_buff *seq_skb;
-+	struct mutex tx_mutex;
- 	u32 tx_stopped : 1;
- 
- 	/* Don't use bit fields here, these are set under different locks */
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 2f191e50d4fc..d4118c796290 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -755,6 +755,7 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 		  !(msg->msg_flags & MSG_MORE) : !!(msg->msg_flags & MSG_EOR);
- 	int err = -EPIPE;
- 
-+	mutex_lock(&kcm->tx_mutex);
- 	lock_sock(sk);
- 
- 	/* Per tcp_sendmsg this should be in poll */
-@@ -926,6 +927,7 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 	KCM_STATS_ADD(kcm->stats.tx_bytes, copied);
- 
- 	release_sock(sk);
-+	mutex_unlock(&kcm->tx_mutex);
- 	return copied;
- 
- out_error:
-@@ -951,6 +953,7 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 		sk->sk_write_space(sk);
- 
- 	release_sock(sk);
-+	mutex_unlock(&kcm->tx_mutex);
- 	return err;
- }
- 
-@@ -1204,6 +1207,7 @@ static void init_kcm_sock(struct kcm_sock *kcm, struct kcm_mux *mux)
- 	spin_unlock_bh(&mux->lock);
- 
- 	INIT_WORK(&kcm->tx_work, kcm_tx_work);
-+	mutex_init(&kcm->tx_mutex);
- 
- 	spin_lock_bh(&mux->rx_lock);
- 	kcm_rcv_ready(kcm);
--- 
-2.30.2
-
+HTH
+Maciek
 
