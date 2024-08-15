@@ -1,179 +1,348 @@
-Return-Path: <netdev+bounces-119017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066BB953D31
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5782C953D3C
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:16:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86BF8286FFB
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:11:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F7D5285773
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E512D1547FB;
-	Thu, 15 Aug 2024 22:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1A51537D9;
+	Thu, 15 Aug 2024 22:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="El6QmRwZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j7k/eiHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E310B1547CE
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 22:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723759884; cv=none; b=huwsTz09aak7rAiRABOO6l/yKnknI6IFTLHAevzGdjeyBJz4P02tFfUqLHrUYDjYBi0VGryQvtNw5hjXdzJO8WuPJtGL9wG9fYrcZdVHr11kqofl7Xseq0qDBH33o46ZGCF4jIqhw/3+IsfnqxMKbISi72atNXNyp0QsLc+tids=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723759884; c=relaxed/simple;
-	bh=OUrB7jjq0zzcJBlRNS5gBbkoim1wQkYk3hv5MCVg2jw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EwTMgx0iJ130GR8HAxWkHpBoTgvrrANm/qJ+fZlRrCJ4qcnsc3lDueaEqkym99IE1YKcEVJfnZkl8hsomiHvYXXh2E+qCDjgzgi0rNfXZYsLawerDH88PhIOhXCNhhWu7PYW/HLbW3BPcqz7t5ZjZd7+k0qAxPH5PbEMhB8pJ3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=El6QmRwZ; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5bec507f4ddso2793a12.0
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 15:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723759881; x=1724364681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k0EbhLIoeNQ2r+xrZ9UdYSTABXF+0gbcRVGeJ3HRC5U=;
-        b=El6QmRwZjMbszOdQrKGOyaQhjWzVwtfA3x0BU/TWnfb5OFnlpv9HylMSxHJIICfISh
-         NCD1OoplTRM8KClLAPUgvHnnjC0LqiiANTwdgNKQC4C4200zht8/mq67v3gc4V1begsO
-         0fFhe0wy4fOmOoTXaI8gM2jo4w248iCcrbTDA8RGVfBAWbQutuieYYb+Tu4niZlvewtM
-         Rcx4S1+cM8AExiKEFlUdL5kwecMrs9jaCT8/oc8/8w0G7AnE/6w1k1iNuk9xGHehJjsw
-         1ycm0/mKPJjqN+tR6pOil0x2o3FAgBHd7JxO3EapGIR9zOr7Ol8lEXL4cJ6JvysJ2kA8
-         WTyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723759881; x=1724364681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k0EbhLIoeNQ2r+xrZ9UdYSTABXF+0gbcRVGeJ3HRC5U=;
-        b=Oi+9tonSODj/8FAdP1Hcfv4semTnxIHu6ojEY6wcEAesdaGhIXRWmEWYfvd5VCW3G/
-         UDkqoP9pkbymfNjnezhyHIibu3sYlNUvZLYg2mnF6ppA75EjYCi/q90pmGfgtcnc+Xyz
-         jnBIWpnFHnHyVnnwFf40k1ZBvAZrkYdUxlb6fhR54mdJhjOrbPhTASHXGMMsFoHDCE90
-         ctiz+ybU0zP8erU3IxZqrOz0q5P7GG3u9T/eFSbFClirDTX21vYjdRzS9aCwTri8o3Dm
-         UAbYExe/UJVB/ciWseQ02rrJe5YgRjQm9VFvDhq32ec5BdJMChhTbDUW3+aNLKEaIIEE
-         w9sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVoqR0zRGVNkYm+HTDMRrm8C7afqYupOT5wrG/P4o9A4vCPr/xI67sqmLfm/drCkz6PBSP/bVZTiO/vNecJqMQ3kQYgl+cZ
-X-Gm-Message-State: AOJu0YyiiI0jSDD8YVh0zgaXxwy+k/bAGFYyQC+Pul08lDN1M3+jvUVy
-	z7Mw3HUVN1R6asfCLJenRBc9g5vzn9Th53hZqpi547Ep9ZOeHYLheuyJCHNT5R5BtGzG0KucyjZ
-	ywJEakaNoE7M2jJR9uEvdl9RabIDpyadcELx8
-X-Google-Smtp-Source: AGHT+IHnL6ZPj0JywgJ6DAhMXWPxpocgbzFPs+YcLitYohDgiihNIv3VjQgAC2NO/FExipns+1pkK+rBnkU66YasC0c=
-X-Received: by 2002:a05:6402:280d:b0:5be:9bb0:1189 with SMTP id
- 4fb4d7f45d1cf-5becb3e5a03mr28885a12.2.1723759880647; Thu, 15 Aug 2024
- 15:11:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FB114D2B8
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 22:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723760180; cv=fail; b=r5qd+bihdiXDHqFh7sR7heYcMJl7s2/VWZdxXsl9SMigopOsrTK7l0y6vBI9A2D1CieXO4LQzT/AeHQdZLjikQzJuxKFgobQwdl3im6k/EA+ug4B10Vyg4bnRFo42si/CzZlKjlPPwMP7UuTJfKxzROYDb1bTlQZBDMhCvHhjYU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723760180; c=relaxed/simple;
+	bh=ljTgiaUkq7yizJvxosCLffo0k9vKqoOdYK3SAhLktsU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O1g/+Y7E2YAMaGl0ZGAhgfV83mh7cSP4LjD6i9qAVkD+iO/gmrfHNaK023QtCqX3aoxaIH81sTamLUmDZPPMOEutGVsdkMJL5imp383qpBup1PGrg4+E64iSxdqVHOomEfQ4BANSGodC0qiSZNoTnejB6o3Bx9j3ax8HQLs9Ag4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j7k/eiHZ; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723760178; x=1755296178;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ljTgiaUkq7yizJvxosCLffo0k9vKqoOdYK3SAhLktsU=;
+  b=j7k/eiHZqudCz2pmGZC6vS93NbKZeIUIRzRabNOi1uzwcJSbuQeFL/nW
+   Us1AnjNmdOy047LpnpmAydcyV089whRmHc8OR3+urL86NX159cH316/Oz
+   VGsBWLGIzgM9r3+PBpwo2SNHl8r7PwhSg2uVmhOQ9Xzwp1QDf9n3273Ke
+   HwuJB0hFe09Igt0JRD5wgfGjerXR0XbhQ+7O9tBMRKOEt2zULJCi8qwYG
+   E+G1U0iOvHt+cIbTb8Rep2f1YIGmTJQJGkRBW+extcilFnQVLWyonNELN
+   k+pfNIs8HIdDCnq9/cCFhdhjkKY9zj85EApenQ1hX4t+4o4TUSOjuooce
+   Q==;
+X-CSE-ConnectionGUID: c6hNP413SROauCNQCVnfXA==
+X-CSE-MsgGUID: 4oYq7AKVTzq4RMehp/8qOQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11165"; a="21592656"
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="21592656"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 15:16:18 -0700
+X-CSE-ConnectionGUID: dKGDY51HQr2sXujq15Eq7g==
+X-CSE-MsgGUID: WNlsZC1lT22jtjcb+YZibA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="64377591"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Aug 2024 15:16:18 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 15 Aug 2024 15:16:17 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 15 Aug 2024 15:16:17 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 15 Aug 2024 15:16:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oRLut9Nrl0JiF5KWuKHvJDzXIMcXH2UikoJoECdGG4/9JHKnXupRcBuyHXB06W8P/F6kF+O0hsld6EVrZMrupiINhtsjtF59RwqOT4Nbp1q6eBC3d9HgOitC95mvDidT99oKR4I9UdrZHuPdML5zej9nnWTKESc/ieRfcjT2jMbtCe54P4LC91gNK4Js03DwtuBPSxk8JYPGEK8ebbL7jRCFeuO8W0As/MKFh0qVD5Skr9WnGdMuTrvFcHS4yPaz9Wfey6sYpFAfzWAxlabscUb832JQSskpSkoudtL8D3UYg9XJxd6SZD3CqqYljIXho04HAfzVqJeEP1kjzm/8UA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mlw0vTZgEGMpAcaUX91AksMCXSYCOTL/cPvYOhEAQzA=;
+ b=TlNGDbvxuQ0bBYSBxRsm3Mx69E/1opK7OsVzzcrx5MoEx8Wx8gPcR7aBo/4gT5bxl+FyMxSj3I0AIlLkIJvq32IXq2jX+/k1BJRAcRrTZBQiO7lDOPtwV75sFM7BuEhLNBf8kOEA0DGducxQgE25LdPx1/skG1wKe5ggD/fGPh9eXUv38778FPeLssdgWEdClOxtveZAmVILYQiJrMbCeXuDnhw8D+06qVc14/6ujwuJrIrhB4RasB4Gb1mAPgHvlakrbhtnFjzqnHfFpch63Iqm1j6m/Jv1ip15APFIr6FB0WL4xlZi+/mgltCyV5XyNbP5TQdnPwuXDgh5JDvoLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by SA2PR11MB4971.namprd11.prod.outlook.com (2603:10b6:806:118::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Thu, 15 Aug
+ 2024 22:16:14 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::23a7:1661:19d4:c1ab%2]) with mapi id 15.20.7875.016; Thu, 15 Aug 2024
+ 22:16:14 +0000
+Message-ID: <b9ed4b41-98c9-a562-ea6c-efdf3d9d3f62@intel.com>
+Date: Thu, 15 Aug 2024 15:16:10 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v9 00/14] Add support for Rx
+ timestamping for both ice and iavf drivers
+Content-Language: en-US
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <aleksander.lobakin@intel.com>
+CC: <netdev@vger.kernel.org>
+References: <20240813125513.8212-1-mateusz.polchlopek@intel.com>
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240813125513.8212-1-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR02CA0048.namprd02.prod.outlook.com
+ (2603:10b6:a03:54::25) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1723680305.git.fahimitahera@gmail.com> <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
- <CAG48ez2Sw0Cy3RYrgrsEDKyWoxMmMbzX6yY-OEfZqeyGDQhy9w@mail.gmail.com> <Zr5y53Bl6cgdLKjj@tahera-OptiPlex-5000>
-In-Reply-To: <Zr5y53Bl6cgdLKjj@tahera-OptiPlex-5000>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 16 Aug 2024 00:10:44 +0200
-Message-ID: <CAG48ez1PcHRDhRjtsq_JAr5e6z=XNjB1Mi_jjtr8EsRphnnb2g@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] Landlock: Adding file_send_sigiotask signal
- scoping support
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: outreachy@lists.linux.dev, mic@digikod.net, gnoack@google.com, 
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn3_gh@protonmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|SA2PR11MB4971:EE_
+X-MS-Office365-Filtering-Correlation-Id: cf82d8a5-3e78-4ad1-fbc4-08dcbd77e035
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NEhaMmhZVU9CZlJHT28zS0UwZlpKeFlZaHc4RHV4d2UvUzBvc05ZSzVQMlF6?=
+ =?utf-8?B?WWdzU1dsM2JSd3ZqQWM4NTRpMW5xK3Zya0dDT1FDZkJiU00rV1M4bStpY1lR?=
+ =?utf-8?B?TzRRU0lXeXRXMURzSmhSRUdUZ2c3enh2V2JMSlpwN2QrZ3JaeUptVXJaU0t6?=
+ =?utf-8?B?ZGJpUW91VUVaUUVkUzNJa0xUcTVEUzBPYkl2V2l6b2R6QWFQWkMzYWw3eGpJ?=
+ =?utf-8?B?L1FVd1Vld2xKQXBVK0U3Y1FUanlTRFRWbmVwSlVxNW84QWpNL05PaDF6UEdh?=
+ =?utf-8?B?dlZLcHY5MnhCVHA1MlBzYm5icTg4LzYvQUx4bEJUOEJwVUpCc1pOZ3YzQ2t0?=
+ =?utf-8?B?TjN2aXlCQzVEZGs4Q0Nmckgyb3d0WXprNFduOXBuaE9WanpydW1DYTFMRVZ0?=
+ =?utf-8?B?ellneWpxYVRoRU55OFpJSXhiVnFRWkdyZTcwdWJtejRnWFkxR3VIeWNPeE9L?=
+ =?utf-8?B?NExIdi9IQkNMVGV2R0EvR2tqYUtsWHBvWE5BVGRhSW0yQjBMM0xwY0Z0VXh2?=
+ =?utf-8?B?cGxZa1NNMERmUjNjUHd5ZEUvQ1ErS2o1U1MzeG1ucnlRQ2FlZW01M3NHUzBh?=
+ =?utf-8?B?eFRvU1VtbWxWY1hZUWVyTSs3WmxXQVYzd3hTZG0zMktCTnRwNjNpMVZNUlRE?=
+ =?utf-8?B?UzlPdm9OcmMzOFBPczhoSVQ4M3d3ckdpbFk1UHVnTWRpK0Z4bmgxY2k5aVdy?=
+ =?utf-8?B?MTBaUmYvMXprRGdMaFVEa1BqMDZSOVFZRE43QWNQMk80RHRmY2tHSEFiQkZw?=
+ =?utf-8?B?L0FEVmEyaWRNOGdieXhWMWkyMGluMHliWVJjY2dsMkh2elM0b2JtaFk3c3I0?=
+ =?utf-8?B?V0dMaTQwcGJpcEk0aVdHWGd2WEZMNlVWa0c1cWJJMXJoT0Q5NEw2ZnQySlgr?=
+ =?utf-8?B?VCt1U3ZWYmxIR0dpeVcydTBqc3NLdGFiaFNkdUhxTTVWdm5BUUh4cEhocEV5?=
+ =?utf-8?B?WjdwaktSRkQ0UkZxVGM5dFNrZHhzNWpMVFhRSzVIY1FHWHNwU3lJaytoT1lS?=
+ =?utf-8?B?Q2srQXVmN2hHOU1WK1ptL2VjL0RDWTNiektJNkhPYVlYYy9hSnlpRUJTM1U5?=
+ =?utf-8?B?N0NjWjdFRFpxVDZLdnVlTXpyKytIL3NLNENyUmlvR0hqRURUcUdyNFFkRUM1?=
+ =?utf-8?B?ZWNzN3Q2VDNXTVg2WWVjQ2hMVlduNXZrcm9COGhyRWJiOFZRbTczOGxTWCtK?=
+ =?utf-8?B?MWxpRldhZEVyYnNpQm1LRFNZZ2ttNGtNc0RIYkx2VDR6aXVrMnpFVnBRYk5w?=
+ =?utf-8?B?VjVlL1FRb1JkUHRPalB3Wms3RFRIdGlMK2xKaGppazhvZWNpUVgvSnB4YzNv?=
+ =?utf-8?B?UmJKN0RLUEJaczFYbTB0RjJTbEdSdG52OUZIRWZCWFhFdlcxSWtYVk54R0RW?=
+ =?utf-8?B?VkIrdHJYdlBaaWFjN3R2TUIrNVFIOWpXbmxzODJMWmlYQWRKeEpMdGxwbGtO?=
+ =?utf-8?B?Q2tuV1E5UVd4OTVjZ2tmaFMwdVNaTDJHMGIwMm5OczFLNnMzei9POTR3Y3Jj?=
+ =?utf-8?B?emw4azJpTTJkeXlPSzBIemhpTk9rdmZjMVcxeW81TWZ3aVFYaXhmWVM3R0tJ?=
+ =?utf-8?B?a2NHNHVtN3daeExIbnNZRUI2Q3NYS1E3QWJObE4xdk5vVHdUdnRiQkRsYnhu?=
+ =?utf-8?B?dWp4RHBzMUpjUW8xSGxkMWw5d3RXWmFLMExpUm40cWFRMElKK0lUK1VmWTh4?=
+ =?utf-8?B?SmxDQ3FTaGJ6V2ZwaE84dVhZVDNrZXdVWWxmSmgxdzZiVWFXWEtFOWJSa2Vk?=
+ =?utf-8?B?Vmh3NmFiRlRZcW4rS285c2JOSmh2U3BidUFxUjVMSXNrUktZdGR1cERmVVM4?=
+ =?utf-8?Q?oW/8phRJPJQKT11GlwQjbjsACCTiJrHkrLM4U=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c0tBMHJkM1BtUDNkdCsyUHdISlcvSW5mekFDalhiUlBUVWlpZFVTU0pQaC95?=
+ =?utf-8?B?ZjlsUTE0QjUvcHExQi9ISlVvcHozUzBZNFJ1QkZ3M0hjeHRUS3EyS05OVHdm?=
+ =?utf-8?B?cVI2a3hlMXk2d21sUzNvN3JtUkdnWU9Ia3ZsTHlwQkVKaVV4N3cwa0JyOVMw?=
+ =?utf-8?B?cE5Ha0dhTFFab2FZVW80bHYyU1BBNnEyek5Jdkd2SHo4V25TZW1DaVh6Qlh5?=
+ =?utf-8?B?Tmx6YXRrYUg0NGcvRWh0MkVzaU4xenlYcVRKZWNXSVhOVTl3eUkwamlCcHVH?=
+ =?utf-8?B?RjhVaENJUkZ0c1lSS2toMGhFSm1FbGVkT1QwSVErUkJRaWdvTnd5aDZiRE9o?=
+ =?utf-8?B?RWhSeFlkejVZaGJvejV2dmY2c0c2Y0VvL3Bnck4rREpXMXAyZ0FQcDRkY3VR?=
+ =?utf-8?B?ODNFaEJKSGlnK0NGWUp0bFllNkRrQWJDREFsOU9pZGFHRTFIaEFIMlFENEdo?=
+ =?utf-8?B?R2hVTDcrRWhIYkFDZmpqNUdVNWZqMzNRR3JNWWtHUTJZais2SE9FYWFZeDFD?=
+ =?utf-8?B?dnRVUFE5UFRZK0h0UlNVdGxFZ0xZRjBtZE1mMHBqeGxJSDdsMEhlK0NQTndR?=
+ =?utf-8?B?bzdpNndYOVlTUm16WW9sUUdpRXpwY0FjV3NOQ0psN1RVZEQzZUkwOVJsYVhS?=
+ =?utf-8?B?ckRqNERDWDhDUDVOczM2Q2IzOTNuSUxsSEp5MUhVbUZkSG5IZmpqYzJPQ3dx?=
+ =?utf-8?B?YjRVOEptWWZTOGZFR3FmWTFRUmNjd1BkTUVwak1RUXJHRmRSQ25nNHJxU01W?=
+ =?utf-8?B?WkxJclh0RXdHM1Zya3VVNm9KRXN2RmFMS3RyVkc3eXc3SkJXRmFzYWFmOGxt?=
+ =?utf-8?B?ZS90TGxUUks3Wm81b2JldHNjdEVZWkZFS2trWFJDSUtGelUwMXUvRkhGa1Ev?=
+ =?utf-8?B?RFJraE9DdEdTL3JyY2RyajlhU0R2TlFZeWZkOVZMekJYeU9XZi9mYUxDWlhX?=
+ =?utf-8?B?L2NFK2p6Tm05d2ZXQ0NpbWs4SHZCczdBMUk3cm5FRWF5djF2ZEFIQ0I5R0t3?=
+ =?utf-8?B?SEJ2NWxCZW81TU9jd1pFTW9OdUltbkk2OHNpaUwvY0Y1aHJ5N3NYQTVJQXhF?=
+ =?utf-8?B?M1paallxSi9seVA4UkZwa2IxNlM5c3VuYTY1NU1aZVRpOEQrZmI0VkdxTkVn?=
+ =?utf-8?B?NUEvbTFOWWlFQk51a1d1QWRDT2lGTEtXUGhlU1JxTFRrT1lCU1BjVDdXUU9X?=
+ =?utf-8?B?ektEcDZmVlZObnZFZXFEbVRIUGM4clVSdHdiWE9kY2FkTTNBOHllWUh0NzZY?=
+ =?utf-8?B?MHRySjFNN1hZZ1Q0NjZMNEpNTHZHQ2dYNVkzOEZIQW5mSTJ1bERUcUpjV1Ji?=
+ =?utf-8?B?VHpIVUtlcGNWcFZUeVRXYXRseTZFcVpxTDJLZG4xMm15MnhSQ1JRdWJzWnNx?=
+ =?utf-8?B?eEY4NDdxSkV2Q2JpMWZpblFPd1BVZndJSG1FRFAxREtab3hac1d4MllLczZT?=
+ =?utf-8?B?V1lQeEp3UWNUTG1Vc1dqWUgrK09DN0pQU3B3Slg3QVNpcURIMG1SR3M4YzJP?=
+ =?utf-8?B?VmVsc0o1MDAyeEdDZDVtSmFoaW9QaG9VTTdNZ2k3SHd6QTA1K2N0Qk9YS0Vk?=
+ =?utf-8?B?SHJxTW10RlRRUlNUTXk1UHVyU0h3U1MxVlNxeU5DWkNDR3JrQlF4OVRUY0xa?=
+ =?utf-8?B?b0RITkZkb1NKWXFSNW1YR2RwSlMwN29DMkx2Q0hBMzVuaGxrYUhXYW5leWRn?=
+ =?utf-8?B?L1NzakNsTFgyeGMzVHVBMk9EeVVGZ1RrZ1M1SE9hSTZNWDZ1Z0VGczNWWmYw?=
+ =?utf-8?B?cnlmL2pld2JsYWlxWjJ6MitDWEZoSDdPdXN5VzZLSmVzR1o5VHBCaFlnYUFL?=
+ =?utf-8?B?aHozSm1HanBoTkJCQ1d6dm1HSG5RL3JUT3FXRlVtNHZPVFRSaEhES1NJby9w?=
+ =?utf-8?B?b0VES1FmT255RkpTOWVLaXpTRlZLWEdINm1ZeTRHcHczdnZpME0rTjFQS2Vw?=
+ =?utf-8?B?RkYwdTZXWGJvMjl5cVRjaXRQU0lIcFc5bEZmTnhkWUxxS0lRTE1DTlVUVTJE?=
+ =?utf-8?B?cWR4SDltOFVKdlJ0TDJqSXBTc0x1ekdtTVFFZTBQOGMzTVhmejVPTWk5SEVr?=
+ =?utf-8?B?K2FjTDRTTnprR1hCcDlZeXpVSnBqMlN1VkNxSUJZb1owUWJBd0tPSFRQVlNo?=
+ =?utf-8?B?RG5TVGFRaVpEMWVsOFZzMG1JdXpwS1NSejQ0eEhFdGhISjliQThXYlQ0eWs0?=
+ =?utf-8?B?aHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf82d8a5-3e78-4ad1-fbc4-08dcbd77e035
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 22:16:14.2364
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PetY8P3AWfHyWwleNRYcq/zkbUHfvXDRFaD7mqxL1qaZAIUucI8JlSZZGZz1fJVJbEWVxeNEaXqbKjs9aeaPk4xQaaXuSPz/9ekcWOCQZxo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4971
+X-OriginatorOrg: intel.com
 
-On Thu, Aug 15, 2024 at 11:28=E2=80=AFPM Tahera Fahimi <fahimitahera@gmail.=
-com> wrote:
->
-> On Thu, Aug 15, 2024 at 10:25:15PM +0200, Jann Horn wrote:
-> > On Thu, Aug 15, 2024 at 8:29=E2=80=AFPM Tahera Fahimi <fahimitahera@gma=
-il.com> wrote:
-> > > This patch adds two new hooks "hook_file_set_fowner" and
-> > > "hook_file_free_security" to set and release a pointer to the
-> > > domain of the file owner. This pointer "fown_domain" in
-> > > "landlock_file_security" will be used in "file_send_sigiotask"
-> > > to check if the process can send a signal.
-> > >
-> > > Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> > > ---
-> > >  security/landlock/fs.c   | 18 ++++++++++++++++++
-> > >  security/landlock/fs.h   |  6 ++++++
-> > >  security/landlock/task.c | 27 +++++++++++++++++++++++++++
-> > >  3 files changed, 51 insertions(+)
-> > >
-> > > diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-> > > index 7877a64cc6b8..d05f0e9c5e54 100644
-> > > --- a/security/landlock/fs.c
-> > > +++ b/security/landlock/fs.c
-> > > @@ -1636,6 +1636,21 @@ static int hook_file_ioctl_compat(struct file =
-*file, unsigned int cmd,
-> > >         return -EACCES;
-> > >  }
-> > >
-> > > +static void hook_file_set_fowner(struct file *file)
-> > > +{
-> > > +       write_lock_irq(&file->f_owner.lock);
-> >
-> > Before updating landlock_file(file)->fown_domain, this hook must also
-> > drop a reference on the old domain - maybe by just calling
-> > landlock_put_ruleset_deferred(landlock_file(file)->fown_domain) here.
-> Hi Jann,
->
-> Thanks for the feedback :)
-> It totally make sense.
-> > > +       landlock_file(file)->fown_domain =3D landlock_get_current_dom=
-ain();
-> > > +       landlock_get_ruleset(landlock_file(file)->fown_domain);
-> > > +       write_unlock_irq(&file->f_owner.lock);
-> > > +}
-> > > +
-> > > +static void hook_file_free_security(struct file *file)
-> > > +{
-> > > +       write_lock_irq(&file->f_owner.lock);
-> > > +       landlock_put_ruleset(landlock_file(file)->fown_domain);
-> I was thinking of if we can replace this landlock_put_ruleset with
-> landlock_put_ruleset_deferred. In this case, it would be better use of
-> handling the lock?
 
-I don't think you have to take the "file->f_owner.lock" in this hook -
-the file has already been torn down pretty far, nothing is going to be
-able to trigger the file_set_fowner hook anymore.
 
-But either way, you're right that we can't just use
-landlock_put_ruleset() here because landlock_put_ruleset() can sleep
-and the file_free_security hook can be invoked from non-sleepable
-context. (This only happens when fput() directly calls file_free(),
-and I think that only happens with ->fown_domain=3D=3DNULL, so technically
-it would also be fine to do something like "if (domain)
-landlock_put_ruleset(domain);".)
-If you test your current code in a kernel that was built with
-CONFIG_DEBUG_ATOMIC_SLEEP=3Dy, this will probably print an warning
-message in the kernel log (dmesg). You're right that using
-landlock_put_ruleset_deferred() instead would fix that.
+On 8/13/2024 5:54 AM, Mateusz Polchlopek wrote:
+> Initially, during VF creation it registers the PTP clock in
+> the system and negotiates with PF it's capabilities. In the
+> meantime the PF enables the Flexible Descriptor for VF.
+> Only this type of descriptor allows to receive Rx timestamps.
+> 
+> Enabling virtual clock would be possible, though it would probably
+> perform poorly due to the lack of direct time access.
+> 
+> Enable timestamping should be done using userspace tools, e.g.
+> hwstamp_ctl -i $VF -r 14
+> 
+> In order to report the timestamps to userspace, the VF extends
+> timestamp to 40b.
+> 
+> To support this feature the flexible descriptors and PTP part
+> in iavf driver have been introduced.
 
-I think the right solution here is probably just to do:
+Can you check that each patch compiles cleanly? Some of these are not 
+(especially w/clang).
 
-static void hook_file_free_security(struct file *file)
-{
-  landlock_put_ruleset_deferred(landlock_file(file)->fown_domain);
-}
+Also, there's some scattered checkpatch issues if you could run and 
+correct the applicable ones.
 
-Alternatively it would also work to do this - this code is probably a
-bit more efficient but also a little less clear:
+Thanks,
+Tony
 
-static void hook_file_free_security(struct file *file)
-{
-  /* don't trigger might_sleep() for tearing down unopened file */
-  if (landlock_file(file)->fown_domain)
-    landlock_put_ruleset(landlock_file(file)->fown_domain);
-}
-
->
-> > > +       write_unlock_irq(&file->f_owner.lock);
-> > > +}
+> ---
+> v9:
+> - another big refactor of code, again the list is too long to describe each change. Only
+>    patch1 and patch12 has not been changed AFAIR. Please take a look on v8 and changes
+>    requests from Alexander L. (in short - fixed structs paddings, aligns, optimized rx hot
+>    path, renamed few structs, added "const" keyword where applicable, added kdoc comments
+>    to newly introduced structs and defines, removed unnecessary casts, simplified few
+>    functions and few more).
+> 
+> v8:
+> - big refactor to make code more optimised (too many changes to list them here, please
+>    take a look on v7 patch9 and comments from Alexander L) - patch 11. Because of that I
+>    decided to remove all gathered RB tags.
+> - changed newly introduced spinlock aq_cmd_lock to mutex type to avoid deadlock - patch 7
+> - adjusted function iavf_is_descriptor_done() to extract fields from descriptor in a new
+>    way - patch 12
+> - changed (and removed unused) defines that describe specific fields and bits in
+>    descriptor
+> https://lore.kernel.org/netdev/20240730091509.18846-1-mateusz.polchlopek@intel.com/
+> 
+> v7:
+> - changed .ndo_eth_ioctl to .ndo_hwtstamp_get and .ndo_hwtstamp_set
+>    (according to Kuba's suggestion) - patch 11
+> https://lore.kernel.org/netdev/20240604131400.13655-1-mateusz.polchlopek@intel.com/
+> 
+> v6:
+> - reordered tags
+> - added RB tags where applicable
+> - removed redundant instructions in ifs - patch 4 and patch 5
+> - changed teardown to LIFO, adapter->ptp.initialized = false
+>    moved to the top of function - patch 6
+> - changed cpu-endianess for testing - patch 9
+> - aligned to libeth changes - patch 9
+> https://lore.kernel.org/netdev/20240528112301.5374-1-mateusz.polchlopek@intel.com/
+> 
+> v5:
+> - fixed all new issues generated by this series in kernel-doc
+> https://lore.kernel.org/netdev/20240418052500.50678-1-mateusz.polchlopek@intel.com/
+> 
+> v4:
+> - fixed duplicated argument in iavf_virtchnl.c reported by coccicheck
+> https://lore.kernel.org/netdev/20240410121706.6223-1-mateusz.polchlopek@intel.com/
+> 
+> v3:
+> - added RB in commit 6
+> - removed inline keyword in commit 9
+> - fixed sparse issues in commit 9 and commit 10
+> - used GENMASK_ULL when possible in commit 9
+> https://lore.kernel.org/netdev/20240403131927.87021-1-mateusz.polchlopek@intel.com/
+> 
+> v2:
+> - fixed warning related to wrong specifier to dev_err_once in
+>    commit 7
+> - fixed warnings related to unused variables in commit 9
+> https://lore.kernel.org/netdev/20240327132543.15923-1-mateusz.polchlopek@intel.com/
+> 
+> v1:
+> - initial series
+> https://lore.kernel.org/netdev/20240326115116.10040-1-mateusz.polchlopek@intel.com/
+> ---
+> 
+> Jacob Keller (10):
+>    virtchnl: add support for enabling PTP on iAVF
+>    virtchnl: add enumeration for the rxdid format
+>    iavf: add support for negotiating flexible RXDID format
+>    iavf: negotiate PTP capabilities
+>    iavf: add initial framework for registering PTP clock
+>    iavf: add support for indirect access to PHC time
+>    iavf: periodically cache PHC time
+>    iavf: refactor iavf_clean_rx_irq to support legacy and flex
+>      descriptors
+>    iavf: handle set and get timestamps ops
+>    iavf: add support for Rx timestamps to hotpath
+> 
+> Mateusz Polchlopek (3):
+>    libeth: move idpf_rx_csum_decoded and idpf_rx_extracted
+>    iavf: define Rx descriptors as qwords
+>    iavf: Implement checking DD desc field
+> 
+> Simei Su (1):
+>    ice: support Rx timestamp on flex descriptor
+> 
+>   drivers/net/ethernet/intel/iavf/Makefile      |   2 +
+>   drivers/net/ethernet/intel/iavf/iavf.h        |  35 +-
+>   drivers/net/ethernet/intel/iavf/iavf_main.c   | 228 ++++++++-
+>   drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 481 ++++++++++++++++++
+>   drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  26 +
+>   drivers/net/ethernet/intel/iavf/iavf_trace.h  |   6 +-
+>   drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 425 ++++++++++++----
+>   drivers/net/ethernet/intel/iavf/iavf_txrx.h   |  22 +-
+>   drivers/net/ethernet/intel/iavf/iavf_type.h   | 272 +++++-----
+>   drivers/net/ethernet/intel/iavf/iavf_types.h  |  36 ++
+>   .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 223 ++++++++
+>   drivers/net/ethernet/intel/ice/ice_base.c     |   3 -
+>   drivers/net/ethernet/intel/ice/ice_lib.c      |   5 +-
+>   drivers/net/ethernet/intel/ice/ice_ptp.c      |   4 +-
+>   drivers/net/ethernet/intel/ice/ice_ptp.h      |   8 +
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +
+>   drivers/net/ethernet/intel/ice/ice_virtchnl.c |  96 +++-
+>   drivers/net/ethernet/intel/ice/ice_virtchnl.h |   6 +
+>   .../intel/ice/ice_virtchnl_allowlist.c        |   7 +
+>   .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  51 +-
+>   drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  16 +-
+>   drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  19 -
+>   include/linux/avf/virtchnl.h                  | 131 ++++-
+>   include/net/libeth/rx.h                       |  42 ++
+>   24 files changed, 1810 insertions(+), 336 deletions(-)
+>   create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.c
+>   create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.h
+>   create mode 100644 drivers/net/ethernet/intel/iavf/iavf_types.h
+> 
+> 
+> base-commit: d1815992133ebcc6007009645571f322f4bc7c44
 
