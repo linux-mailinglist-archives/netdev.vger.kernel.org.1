@@ -1,98 +1,121 @@
-Return-Path: <netdev+bounces-118708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D23E95286B
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:51:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD8D952870
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B48ABB222CC
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:51:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0E61F221CD
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E9F43156;
-	Thu, 15 Aug 2024 03:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171432BAEF;
+	Thu, 15 Aug 2024 03:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCvVAOcf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1ivuq/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358A042056;
-	Thu, 15 Aug 2024 03:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951AF2032A
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723693836; cv=none; b=qGoL7CukvuTERBsqb4K+N4eg3bSXZEQaVDOKZnsoJ1xLB1F+dVST5W+kjOrnagedq58JPDK8LO7ctjd1waEkT9O19Qvpminc4NgNe+sZEQdDYq3XlfniIofrdJxzIg3ZHCACfqvW/i8SX4th3nvVwfZqxlFgjW6Et5x8K8Z+n1c=
+	t=1723694022; cv=none; b=ehz0Ch+6Rv2HMNqQ9MOHe1iZlO52/5062V9ZAwGp7dJmX9LA9N4J0RsnltR9EDr2pbe+Eeom4yEmbR+2uXUuyj0Hs7eWOWzhLo4u03DAFdZf/c0xaG/XhKn+qQaUbz+ueDTuEnsMSJA2sn+iWvjZvzwK8nO8LMw2P7rv5tU2V1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723693836; c=relaxed/simple;
-	bh=5qRwC82KpDXvBwqWDUCuIrJF+pNBzAZ2uhECqrpB95E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=p5v0bI0bJhOBP3qFfBYkC6q0Ff8hcUWd4aNkHaK6U5j8mn8q8LhUbVZXjWU5USkL2QfGDNcRv1bfYq5lNNOcGvWYyx3+O3ohwSrZAGrS6BEtlbWz+aswGaEH7WZLHadQEifAokx5XFQw1CkM+d8/EjQxQHaCKz5a22v8jVPm22A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCvVAOcf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C26ABC4AF0A;
-	Thu, 15 Aug 2024 03:50:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723693835;
-	bh=5qRwC82KpDXvBwqWDUCuIrJF+pNBzAZ2uhECqrpB95E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mCvVAOcfSHk9eqRgLArhNINeZnbEIydLZTxZEY1Zd9W+olhqbit0g+OlU6MU4By5L
-	 YCRh7aHE2TkaT51EilPUBaPPsYQQllox6U1fZbV7aQPD+xQvI4R2OCqjUJdPkbwrCZ
-	 M/0xX+EjI5Uely8VCkIyc00sUZodPzVwwisCMU9nsQShw95R147UsLVJqZ5OYpejXQ
-	 dqk+WMAb2K3ws6fb22TNI8V9tVGoEjn0sJcLK6nlxjFGBRx7MEc69ITRfN7yMkfIxs
-	 4y77Sj/8BDF6vHM0su7bLsif2nm2gmnAeo/EPUBEf9lCreQO6Se0rSjljRKcTqi+Tr
-	 k3AA8MPfZugNg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C153810934;
-	Thu, 15 Aug 2024 03:50:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723694022; c=relaxed/simple;
+	bh=xhpPIXGUPyvAvaEvZ5S3sXpGT+3ekJJfhtXF1DiuFlc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wm5dR3zRFSA1iqqxkT6MgkFNaul+I40ORjr+1KPOD4Yy2BPPkPJcOWhKX8ZEA1xov5L1aPHNEVBvN19GjnMKTsA5uvZ/GEFxjDdho66MOK2ZQeBOFK6S15WFc7GFIKcWI7xvw1CGe4W851o+z+Y5HycAkLebUU1x4SH8RKs61PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1ivuq/q; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5d5cba31939so66412eaf.0
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 20:53:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723694020; x=1724298820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o5ihU4/WgUnc0w6u9y1lVBbKtWNjHz9wvPIWm0kTIQY=;
+        b=L1ivuq/qZHCZlYNpHlCgTEaa+Rlg03aZsodXPgNXYjZTSdqSOkO0fqGhNwNVaFZmIF
+         0tSpdvz2/15zVq+aQ9F4IBxg/QKONmvQzox9WEb//d4R3ZS4yDbAb6vLd3et449F1O6o
+         H9RzxXY4Zu0rsASm5qebu+w5WiZKqJni67PLqjEWUs+kvf1Ga1t76N5GvULciD64nC9e
+         vT4fkwFowHfjOaILPMq7sJ9688ALfFX4hpbyaOyNchseEVYG3SNFbm48X6aBIdwhPh/i
+         11VdkhInFOnuGYMHM7brl5rc5p9T0ty7hv9+OP6igO83Ru+9LKmr5+15Hxl5qwAEFtZZ
+         veLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723694020; x=1724298820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o5ihU4/WgUnc0w6u9y1lVBbKtWNjHz9wvPIWm0kTIQY=;
+        b=ffMxCNaQyUioMETfk1pe8tHYf39KsblB1j1jMAMeKOdBA/yqMIdBXrMDbvzl0/Lh+V
+         4u0YjeJI5OTy6tKgF9jDaVrW6unmen6ScqWW/AtavlZnDfFLSImjKjZIICrJ1ZKQQXy7
+         duSLQ8J7/9pFH3c83HY6DqslQ/AhvO2vIS08CZX7Aar2isufcU+UaotH2IYCrTt6YqVH
+         TGppcSIAee6Em1sq/rwzngeZRX1Dz+ZV9nrznaxpJP5e2S1mB/Gk6gpD0VGi2SRI0ar2
+         GW0ZFOupRkGNPIaFTggiebtOo7h16wnpPAAUdxvAV2oOft3Dl1vTLAHwWnVtyOtVE9JJ
+         tsUg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5il1WXC4ChVPy2qw1/a2shtOnM935SUuD+cltbQCRSHI++IY4PPSBFV/ydQ8E9trY5G6Z5hZttxK86ASj/jL/WmYV4oPC
+X-Gm-Message-State: AOJu0YyL162UBUfSu9rIdM86JK1ShrB7h/KaWgFN8ss1fwfY5QzXKpMW
+	QlGu++GAzNB9N9/56U5x5rn1jybCme7A0B8xVHQsxcBzXmvuti8HkQxvPg==
+X-Google-Smtp-Source: AGHT+IF6UaXslpD7xgwTc706Lysw4c8SUWzD/a8sm59fPAbXtl687nJZBUHEIaaMVBR1i8TgUA7AwQ==
+X-Received: by 2002:a05:6820:2d4c:b0:5d8:2c3:f9b4 with SMTP id 006d021491bc7-5da8a5dbb54mr904804eaf.1.1723694019707;
+        Wed, 14 Aug 2024 20:53:39 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5da8cd699c7sm146979eaf.7.2024.08.14.20.53.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 20:53:39 -0700 (PDT)
+Date: Wed, 14 Aug 2024 20:53:32 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Maciek Machnikowski <maciek@machnikowski.net>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
+Subject: Re: [RFC 0/3] ptp: Add esterror support
+Message-ID: <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
+References: <20240813125602.155827-1-maciek@machnikowski.net>
+ <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
+ <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+ <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+ <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2][next] UAPI: net/sched - cxgb4: Fix
- -Wflex-array-member-not-at-end warning
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172369383473.2458412.370604795772411458.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Aug 2024 03:50:34 +0000
-References: <cover.1723586870.git.gustavoars@kernel.org>
-In-Reply-To: <cover.1723586870.git.gustavoars@kernel.org>
-To: Gustavo A. R. Silva <gustavoars@kernel.org>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- bharat@chelsio.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
 
-Hello:
+On Wed, Aug 14, 2024 at 05:08:24PM +0200, Maciek Machnikowski wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> The esterror should return the error calculated by the device. There is
+> no standard defining this, but the simplest implementation can put the
+> offset calculated by the ptp daemon, or the offset to the nearest PPS in
+> cases where PPS is used as a source of time
 
-On Tue, 13 Aug 2024 16:13:58 -0600 you wrote:
-> Small patch series aimed at fixing a -Wflex-array-member-not-at-end
-> warning by creating a new tagged struct within a flexible structure.
-> We then use this new struct type to fix a problematic middle-flex-array
-> declaration in a composite struct.
-> 
-> Gustavo A. R. Silva (2):
->   UAPI: net/sched: Use __struct_group() in flex struct tc_u32_sel
->   cxgb4: Avoid -Wflex-array-member-not-at-end warning
-> 
-> [...]
+So user space produces the number, and other user space consumes it?
 
-Here is the summary with links:
-  - [1/2,next] UAPI: net/sched: Use __struct_group() in flex struct tc_u32_sel
-    https://git.kernel.org/netdev/net-next/c/216203bdc228
-  - [2/2,next] cxgb4: Avoid -Wflex-array-member-not-at-end warning
-    https://git.kernel.org/netdev/net-next/c/6c5cdabb3ec3
+Sounds like it should say in user space, shared over some IPC, like
+PTP management messages for example.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> the ADJ_ESTERROR to push the error estimate to the device. The device
+> will then be able to
+> a. provide that information to hardware clocks on different functions
 
+Not really, because there no in-kernel API for one device to query
+another.  At least you didn't provide one.  Looks like you mean that
+some user space program sets the value, and another program reads it
+to share it with other devices?
 
+> b. prevent time-dependent functionalities from acting when a clock
+> shifts beyond a predefined limit.
+
+This can be controlled by the user space stack.  For example, "if
+estimated error exceeds threshold, disable PPS output".
+
+Thanks,
+Richard
 
