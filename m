@@ -1,109 +1,100 @@
-Return-Path: <netdev+bounces-118977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73386953C5F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:08:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D5D8953C64
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:12:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AFB11F255AD
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:08:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB7041F21A3F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553D1420DD;
-	Thu, 15 Aug 2024 21:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A204146D60;
+	Thu, 15 Aug 2024 21:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hRek2K+q"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Rl6wFCi6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4028A7BB15
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 21:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B558438DC7
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 21:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723756124; cv=none; b=Dm0tBzQUhH2xRL7wKRO9DsP1yCfhnfVmnW7PJsVo9D/pdx1aT2NxdeSyJwysCuI1x0wk6+f3s1lUdcwJoi0SLs1+STN9AON69HyACfOFSS1ap8LjbQsuLqiq/XXJo3rQA+gsPUrvnk+FH5UeKqEqeacoiRkhZuO9kvvFhiwWgEo=
+	t=1723756316; cv=none; b=HchMXal7TFo6hEKmMoC8pJIXOBkYN6NF8tIqCa9V1Tdlsbd9XSLo2x8gbdiBM+xo2bIjuKO9D94hWtGADGZGqJ2tSECFPbigQRvdyw1vROeI8R8kOrhg+FdeD3IzALqgnCy6N20YXJZWf9T+3wpSpsHW5WjA74w7//Hdc+Rf1Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723756124; c=relaxed/simple;
-	bh=GR0FP0Lbj7Bn+lqzD4mL5WXT/EhT9LYrDsw9dyf2o3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXD97HYPf99C4XavANY5J3WesRNZaQ55A17LiiNYxdxw7LAmU9QoSeR+vnakYJW8/OpljPlCYnW7pA4+fyYNt40uAZWAJ1hHpp3IlTs3EYASkalIe5ubT3HMzZ14+/11cSPGM7TdA+Cr2JMQlKmWvcZtie/o7Omk4+238U0E2D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hRek2K+q; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-26110765976so205867fac.1
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:08:43 -0700 (PDT)
+	s=arc-20240116; t=1723756316; c=relaxed/simple;
+	bh=AxYXnddmpI/l0yzFmj5WAcB1dJpg6JabAnlkunSLZyQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VQmntiONrNgvJBCFkMR+q8MUUbio3sSD1E+ze9yXtJIx5qtm5TYPrGauK+UB1fFFtTDE8nUz/DQM7FhFSBn1vjZVH2z38MYqkgVv1rB7UWGRH0t4vqNAMZAy6VCFB2+Z7tuK6qKSRdWkq+8TsTryAFvLuwiYuwzKJunW3ZFyjDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Rl6wFCi6; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723756122; x=1724360922; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GR0FP0Lbj7Bn+lqzD4mL5WXT/EhT9LYrDsw9dyf2o3M=;
-        b=hRek2K+qtsfPVu0Kp+wN0lBPr6DFi8LOJO161v5qF2BEQ+iJM2Agd2zU9mm3bg8iup
-         hvKDsFj0g+QucRwYq99KiIvY3k/ygexYTnj8OCZ92NLnQYMZ54cXwKhCR0p9CHWzy5fg
-         t4grI97bcHaDzbRSX26KnjR1CBUMKYSYmnonB/VhDN/8zRzaku0Fm0yYLIvQuw0vjx1p
-         supwi6MQHfcUbWiedxyQSyqe5PN9A95Ae2q3i6J6+wcW6BcUdoqwAXxisvpRjICOP8r8
-         65nxdrmOR8fDN/+Ujy1fMdhbuCjgHVHFQevSwDPn/FptIJMB+32ksAKA4jVmmLZaBi09
-         ypgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723756122; x=1724360922;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GR0FP0Lbj7Bn+lqzD4mL5WXT/EhT9LYrDsw9dyf2o3M=;
-        b=Zs+fse9JhYXW6+R6EqnxoAaz1SnzONl/7DWCkuvgSXXEz5kbNpcz+Gr8mIwimnrOxG
-         +R/sIVOSiYxyVid3a4TgKCxAb8qhhd+ZQJkAJxLwTruy9RtGvZmd3vCKrpPhGBw4WOW8
-         TZaGtX2Ptpk5L5xzYgzkL+sFsuBv5wyGP2ZsxKvW6nwAPLf7kgBHfRgy2TrntHbwvxTr
-         zc/LigE1ZKgRGfAl+jeFxXzlLkVioHeA1d6BI/Q2fzsaI6ksR2rEIzF1GtKY3l7xzjfX
-         vb/Lgfx64Bbm/4UIc+ey5qA85e0DdSw4HNt60pFLN9r1RHDv+mPOH6BxIit3ALfLz4fI
-         3lnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZsJd1T/AjldjjeD7he2ZT8k+jQICm8zxq9Lhcu43oyUYDTXHF3AontKoIP15RAWEur7HsiG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFbHw5w8L6bFJ1U9Ue3BVXKJFoNmeSoKxBn9VaRaAdiOtSQ+Qq
-	bQLtqOrJjBNJmG48AG4DEQgSMVLWwdJg6gu0JMKIqDISy1VBx+g5
-X-Google-Smtp-Source: AGHT+IGmZjhZbSQ+q5XVcFgpEhPE2vK7gfm1Yg6kZOkQW66+OhPJGAyqFrkyWa4jvKDdX1Eyx7Rb3A==
-X-Received: by 2002:a05:6870:7b4b:b0:25e:14d9:da27 with SMTP id 586e51a60fabf-2701c0a0273mr578198fac.0.1723756122292;
-        Thu, 15 Aug 2024 14:08:42 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-270049f6ae3sm544363fac.48.2024.08.15.14.08.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 14:08:41 -0700 (PDT)
-Date: Thu, 15 Aug 2024 14:08:39 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <Zr5uV8uLYRQo5qfX@hoboy.vegasvil.org>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
- <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
- <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
- <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
- <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
- <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723756314; x=1755292314;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/O31I9VrR8vFmbcVT1sXPpvvkjYRzu8Yp5/khKDMQ24=;
+  b=Rl6wFCi62hnmdsv0nZTtmkwF1S123ZhaLgNu+eWNYwBVHdMSWdVm7dEe
+   dPWG3j0LvcPV+SWIQjdZVgjjj/7PkVc9mCTmnR4uIL1tE1NeNxZW/ssF7
+   EJ2qq1xwMSiQ+Vm3O4ld+Yv/930Pt/lbC3yCx5LabcHlq2LDDfaLGXrCK
+   8=;
+X-IronPort-AV: E=Sophos;i="6.10,150,1719878400"; 
+   d="scan'208";a="321385032"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 21:11:52 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:17119]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.18:2525] with esmtp (Farcaster)
+ id 7af8d986-afce-4cc8-a6a8-364b8ea055c5; Thu, 15 Aug 2024 21:11:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 7af8d986-afce-4cc8-a6a8-364b8ea055c5
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 21:11:51 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 21:11:48 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Roopa Prabhu
+	<roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/2] net: Clean up af_ops->{get_link_af_size,fill_link_af}().
+Date: Thu, 15 Aug 2024 14:11:35 -0700
+Message-ID: <20240815211137.62280-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Aug 15, 2024 at 05:00:24PM +0200, Maciek Machnikowski wrote:
+Since commit 5fa85a09390c ("net: core: rcu-ify rtnl af_ops"),
+af_ops->{get_link_af_size,fill_link_af}() are called under RCU.
 
-> Think about a Time Card
-> (https://opencomputeproject.github.io/Time-Appliance-Project/docs/time-card/introduction).
+Patch 1 makes the context clear and patch 2 removes unnecessary
+rcu_read_lock().
 
-No, I won't think about that!
 
-You need to present the technical details in the form of patches.
+Kuniyuki Iwashima (2):
+  ipv4: Use RCU helper in inet_get_link_af_size() and
+    inet_fill_link_af().
+  net: bridge: Remove rcu_read_lock() in br_get_link_af_size_filtered().
 
-Hand-wavey hints don't cut it.
+ net/bridge/br_netlink.c | 2 --
+ net/ipv4/devinet.c      | 6 ++----
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-Thanks,
-Richard
+-- 
+2.30.2
+
 
