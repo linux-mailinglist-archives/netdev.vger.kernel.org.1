@@ -1,93 +1,129 @@
-Return-Path: <netdev+bounces-118825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B16952E5B
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:36:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99C4952E61
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A4AC285363
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:36:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D5C3B20328
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AEC1993BD;
-	Thu, 15 Aug 2024 12:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEA91714A8;
+	Thu, 15 Aug 2024 12:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="YYeG19Ry"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ervPDhk8"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0421714B9
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 12:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2340F14884B
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 12:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723725289; cv=none; b=NneQB2D18GOeCpFFR6jsdTbKzQGBF4iU+/PcOnQ6LmTb8A3W8mGWfDDwzNEFcPGL7hb8jh2gHyQgk+WIYAD9PPptK2N2lqG8zSX0VVsWQGszEG9eHKHfGvjennaiPHykmWb/A2vEJMXLD/9JR13CpG4iksh0A/VcynEQThfRgjM=
+	t=1723725422; cv=none; b=n7cQxqlKsD9hGbR0pYFbTQjzKQssZw11VlOUivfhI/S6aTd6CjeZZ2FE0c2LOIxCtXshQPA+v1t9BOdZiwaS6GNNvI5NJJvAvLJeI6B7MLBfniL3b2G/+uL22DkoeiZOoRTDPzd+JOCO9EP+VKEj6f6gdMiN/3XKc44OCC2j9ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723725289; c=relaxed/simple;
-	bh=/TIeo+bG7sjgvMiPLNeA4/1aWjXq7WMPetIeuy7Gkfs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=HQWcnBA8pkWJZtfgqspH0hM9WQTEfCwN69ye6J8LiEt1TYOZdj3YU4Aqd3NoVZpDOnOFLsOezjc11WGbkC/pquRNyJ9mw6wL+sm6NqSeHMg0wYmbV9r3jZ/OZNmnBinq2TWXIY8AzC1sNTGmuY2zWRklGj1Na8pEr4CBkR8UKlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=YYeG19Ry reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=TW460Yv1ow6zntOqK5StPPgDtYFaHiahtYN74xhtNr8=; b=Y
-	YeG19RywDTJT/aBc388pWW7XfG2QYSC2aaatYPIheETe8NzKCWOXWwC11Zk4RacJ
-	87fwP0wbtiKSlKfmU0quD2tPhPYx8QsL4hFJjPy+pVBXP3PVHzz8EeFBGDdKj/HO
-	GZbJD3EmVxJoomL+IK5s71oGYkCkUQ1U9wjEnJaWZs=
-Received: from 13514081436$163.com ( [116.235.71.46] ) by
- ajax-webmail-wmsvr-40-111 (Coremail) ; Thu, 15 Aug 2024 20:33:21 +0800
- (CST)
-Date: Thu, 15 Aug 2024 20:33:21 +0800 (CST)
-From: wkx <13514081436@163.com>
-To: "Florian Westphal" <fw@strlen.de>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, 21210240012@m.fudan.edu.cn
-Subject: Re:Re: [BUG net] possible use after free bugs due to race condition
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-In-Reply-To: <20240812190057.GB21559@breakpoint.cc>
-References: <49ee57f2.9a9d.191465ab362.Coremail.13514081436@163.com>
- <20240812190057.GB21559@breakpoint.cc>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1723725422; c=relaxed/simple;
+	bh=NS6q424zO7FscwxFWdgMShaWvsF8IGf1p5nneAfiDas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PqVdg0FoEJPCBC/2aFmjxaRU4WVW9iayhZmk5N+LzendRJs9n5ot+XoJaB3yI+jd/IY8oguxIy0EBS/y1ulvZu+ZA06sBPDz19JK6ARh15ahVeGQSRgTquCA8FzWPQNX9tzU1ZW+g9zbHCgm+YzvR2RIPqQR85Kr4+WtjUyVwn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ervPDhk8; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3687f91af40so529124f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 05:36:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723725418; x=1724330218; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gb4V01q4sny8As1O2rChFyvwv7yAOmXjNlhHJpN4eAw=;
+        b=ervPDhk83nVvi1QltmOWIdQVdK9Enjvif7cHa4PvW3yqLzeAnbJ1LTg6LNfLLM8XmQ
+         jBfHlT22J/ICuCG/Zg50fL9hNftu86JvZdl2esJ9ZxgNPdwrfUQM0H3RPqMpvvLiP3vF
+         MylTNqs2JWxRSkqNY49RLMzNNAofcj5WCwXIqCYaA7zuENeYPWRehGO/LKVzZa5kFDyW
+         +KLxQSEe84FCcmWCTzd2VX3pmtCbgZYtmYKEV2Iss+E0yXyeFxj/Qxp3SBIX/uWcenIK
+         TAOoJ5TiyHuRBhXN6aRf5XPFm4L2pSMdwZri7+5tCtD+BRpMai/nrzrlKfgnF6Hjp1bX
+         S0gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723725418; x=1724330218;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gb4V01q4sny8As1O2rChFyvwv7yAOmXjNlhHJpN4eAw=;
+        b=FioN1UcGcXS6Rrnn6DXRCM3XqGsjlWAAuX4VuXWasQmVyoYYL60/4+/K6sxWF6GUo5
+         I0YrEZU9XZBSVkv4VZDp0N23M5P4HScELksFbn7s2zbGMnA66EzAatXpBSaIFxkWx2JR
+         35Rq+FKJqUw5ArmFSBi1IHxRc7tg/0Cp0CKkexHl8kJtGJXy5bkyxXaLBrjFPPM8yShF
+         olH3gyipVEkL7v9n+Xw9r4P7Hc6UZq016AISTCKCzJdO+XVwTqcHJpcPtb8wVW/fVJ8U
+         zRQH5OOdx88CRL6tjts2vREhfjMxPfiRIzmfJekw6VPZCzxOm01p84Sd0dxQbOArCoI+
+         5q2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUlRtQfUMu1rnsihRx+tjlEvThQFUic540z1l03Pyngb+co9CNl5hcyxEiO81OEv4JuHJhi5P+vDVzeqdK7PnSAEAVKOqF4
+X-Gm-Message-State: AOJu0YwOLRE82qLveS+67MMzDm5qYSMezm3C1eGwDPl/VG280ebLBeZ0
+	E+RT24yjVh/3DtEcMawwZb2ZsjcxGTEFxCyuU0eJXdrjFzopwVA5FycxcNFZ+oM=
+X-Google-Smtp-Source: AGHT+IHcLDt9IoOFHX1Ggjkc+pHg819sFLwh88mJRPXfyUtVcXrq7jTkTm5cpMdGh5Xwbwbif9PGmw==
+X-Received: by 2002:adf:ec52:0:b0:368:5e34:4b4b with SMTP id ffacd0b85a97d-37177768ef1mr3617632f8f.6.1723725418092;
+        Thu, 15 Aug 2024 05:36:58 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7e1c46fsm18353045e9.39.2024.08.15.05.36.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 05:36:56 -0700 (PDT)
+Date: Thu, 15 Aug 2024 14:36:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Feng zhou <zhoufeng.zf@bytedance.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	bigeasy@linutronix.de, lorenzo@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+Subject: Re: [PATCH] net: Don't allow to attach xdp if bond slave device's
+ upper already has a program
+Message-ID: <Zr32ZZ8e4RhYN1xd@nanopsycho.orion>
+References: <20240814090811.35343-1-zhoufeng.zf@bytedance.com>
+ <fd30815f-cf2b-42a0-9911-4f71e4e4dd14@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <25a912f1.9be7.19156073fad.Coremail.13514081436@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wC3_9iR9b1m8hIjAA--.36971W
-X-CM-SenderInfo: zprtkiiuqyikitw6il2tof0z/1tbiwhY52GWXwNt-YwAEsE
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd30815f-cf2b-42a0-9911-4f71e4e4dd14@redhat.com>
 
-VGhhbmsgeW91IGZvciB5b3VyIHJlcGx577yBCuWcqCAyMDI0LTA4LTEzIDAzOjAwOjU377yMIkZs
-b3JpYW4gV2VzdHBoYWwiIDxmd0BzdHJsZW4uZGU+IOWGmemBk++8mgo+d2t4IDwxMzUxNDA4MTQz
-NkAxNjMuY29tPiB3cm90ZToNCj4+IA0KPj4gDQo+PiBPdXLCoHRlYW3CoHJlY2VudGx5wqBkZXZl
-bG9wZWTCoGHCoHZ1bG5lcmFiaWxpdHnCoGRldGVjdGlvbsKgdG9vbCzCoGFuZMKgd2XCoGhhdmXC
-oGVtcGxveWVkwqBpdMKgdG/CoHNjYW7CoHRoZcKgTGludXjCoEtlcm5lbMKgKHZlcnNpb27CoDYu
-OS42KS7CoEFmdGVywqBtYW51YWzCoHJldmlldyzCoHdlwqBmb3VuZMKgc29tZcKgcG90ZW50aWFs
-bHnCoHZ1bG5lcmFibGXCoGNvZGXCoHNuaXBwZXRzLMKgd2hpY2jCoG1hecKgaGF2ZcKgdXNlLWFm
-dGVyLWZyZWXCoGJ1Z3PCoGR1ZcKgdG/CoHJhY2XCoGNvbmRpdGlvbnMuwqBUaGVyZWZvcmUswqB3
-ZcKgd291bGTCoGFwcHJlY2lhdGXCoHlvdXLCoGV4cGVydMKgaW5zaWdodMKgdG/CoGNvbmZpcm3C
-oHdoZXRoZXLCoHRoZXNlwqB2dWxuZXJhYmlsaXRpZXPCoGNvdWxkwqBpbmRlZWTCoHBvc2XCoGHC
-oHJpc2vCoHRvwqB0aGXCoHN5c3RlbS4NCj4+IA0KPj4gMS7CoC9kcml2ZXJzL25ldC9ldGhlcm5l
-dC9icm9hZGNvbS9iY202M3h4X2VuZXQuYw0KPj4gDQo+PiBJbsKgYmNtX2VuZXRfcHJvYmUswqAm
-cHJpdi0+bWliX3VwZGF0ZV90YXNrwqBpc8KgYm91bmRlZMKgd2l0aMKgYmNtX2VuZXRfdXBkYXRl
-X21pYl9jb3VudGVyc19kZWZlci7CoGJjbV9lbmV0X2lzcl9tYWPCoHdpbGzCoGJlwqBjYWxsZWTC
-oHRvwqBzdGFydMKgdGhlwqB3b3JrLg0KPj4gSWbCoHdlwqByZW1vdmXCoHRoZcKgZHJpdmVywqB3
-aGljaMKgd2lsbMKgY2FsbMKgYmNtX2VuZXRfcmVtb3ZlwqB0b8KgbWFrZcKgYcKgY2xlYW51cCzC
-oHRoZXJlwqBtYXnCoGJlwqB1bmZpbmlzaGVkwqB3b3JrLg0KPj4gVGhlwqBwb3NzaWJsZcKgc2Vx
-dWVuY2XCoGlzwqBhc8KgZm9sbG93czoNCj4+IENQVTDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBDUFUxDQo+PiDCoA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHzCoGJjbV9lbmV0X3Vw
-ZGF0ZV9taWJfY291bnRlcnNfZGVmZXINCj4+IGJjbV9lbmV0X3JlbW92ZcKgwqDCoMKgwqDCoMKg
-wqB8DQo+DQo+ICB1bnJlZ2lzdGVyX25ldGRldihkZXYpOw0KPg0KPi4uLiB3aGljaCBzaG91bGQg
-ZW5kIHVwIGNhbGxpbmcgYmNtX2VuZXRfc3RvcCgpICh2aWEgb3BzLT5uZG9fc3RvcCBpbg0KPl9f
-ZGV2X2Nsb3NlX21hbnkoKSkuICBUaGlzIGNhbGxzIGNhbmNlbF93b3JrX3N5bmMoKS4NCj4NCj5E
-aWQgbm90IGxvb2sgYXQgdGhlIG90aGVycy4NCg==
+Thu, Aug 15, 2024 at 01:18:33PM CEST, pabeni@redhat.com wrote:
+>On 8/14/24 11:08, Feng zhou wrote:
+>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
+>> 
+>> Cannot attach when an upper device already has a program, This
+>> restriction is only for bond's slave devices, and should not be
+>> accidentally injured for devices like eth0 and vxlan0.
+>> 
+>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+>> ---
+>>   net/core/dev.c | 10 ++++++----
+>>   1 file changed, 6 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 6ea1d20676fb..e1f87662376a 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -9501,10 +9501,12 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
+>>   	}
+>>   	/* don't allow if an upper device already has a program */
+>> -	netdev_for_each_upper_dev_rcu(dev, upper, iter) {
+>> -		if (dev_xdp_prog_count(upper) > 0) {
+>> -			NL_SET_ERR_MSG(extack, "Cannot attach when an upper device already has a program");
+>> -			return -EEXIST;
+>> +	if (netif_is_bond_slave(dev)) {
+>
+>I think we want to consider even team port devices.
+
+netif_is_lag_port()
+
+
+>
+>Thanks,
+>
+>Paolo
+>
 
