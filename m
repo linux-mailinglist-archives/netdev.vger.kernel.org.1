@@ -1,155 +1,138 @@
-Return-Path: <netdev+bounces-118924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84150953867
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:38:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 692C0953877
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 300A7287C48
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:38:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0392BB2473B
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5DB19E7E8;
-	Thu, 15 Aug 2024 16:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0qqiAzO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC4819E7E8;
+	Thu, 15 Aug 2024 16:40:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE671AC8B2
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 16:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30061B4C2D;
+	Thu, 15 Aug 2024 16:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723739934; cv=none; b=c2NP/3BZwBjHlKE0o5PxRb+YrJfmwOMtqIEzVTWgOzn2RtcZsoJ9MdN5EVW58E+t1OPA98dtity8V/14rvSqZNLujSdNL7Pi718GKJ0jqHlaOxrDLIv/w+2En98HuHBIX09hSt0b9nJEWPI84//oRTeTmHr6DXML19qK0SClNbA=
+	t=1723740047; cv=none; b=gOp/udYqYGi6UoTjkwTkUP85GGzBtrXPkDmDJJ3NCecU6wrDxkPy4CYgzK/+gzuuaoiQ5FZonZcytMOWeliQR8xsKHrRTJFWu3bSx1czWWI8GQ1KUFytGRdcjr3gDQtocrAb9nXTRARJ2uvg91zHhFuvpEGbTRp6rxesOFGpO2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723739934; c=relaxed/simple;
-	bh=XNqqCRvGv06TG9C6Suu5ay22wjRBbLYGGKqYBW2PhWU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gyVQQq+Mjy9RHXFfOSIYiLBDoUhP49PB+IGK/Lx/34o0ezvQlQP7qNlOIp9m2Iuh4sUKlK1pE1nW4qMh5wTO82v6jjc/3/PDEqcrMLo56UlQ2yg0Xz54a+LlQ/RYo1UIhxS8bpRosx65RoL4uckrckgGobue7F4IYANOdaZKm2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0qqiAzO; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-201fbd0d7c2so4466875ad.0
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 09:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723739932; x=1724344732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rl9lcgzrBFJlPh/Jc5JC63Tk/Sye9b2WgE/pAAjbI/Y=;
-        b=C0qqiAzOVgQkiZNXCuqfGvufkfzqYObytfg48C9mbQMS3wSSVsRXIX59Co7/WOfOsZ
-         PR536ssUH/G0r0toTbaQj6shW0bVhqk6bB6tirq0+Wv5eNqHKjHGQs8NILr7Zwk5+7Bw
-         NSHNlqbed8XDnaDZbBX8yqqinHKa8AX1NX0Fl+7iS/j0p7mEBkBiFElDo2DoagC87A/A
-         4y918cEVzAB0+ruUV8jDx0hCuK+b696AGX3JjrjkTPGsfqCNoW6TGY1+1VBXu8lFF+tO
-         c+MbKTj9rY3+9YHgEYQ770GVeUqE35l7wZs51QRnxrL3eHfiyAZIX6Ei5NlzQKA0PKnB
-         yZ9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723739932; x=1724344732;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rl9lcgzrBFJlPh/Jc5JC63Tk/Sye9b2WgE/pAAjbI/Y=;
-        b=S5Do0ImvATAj0sqTx6dFDl55adPmZhPAE/IjGm2vpuWhQ+vlZdJHk01H49CEpldE5V
-         bKEuz7TdN/WdKogdBnHE/Ivq8FYKtV3/0Fa8qLOlG6FXH/LjfYwsYvf8wRKggEWMOfLJ
-         CiTf9nym2XCw7uXhNoJ5HCuVWF8OK+K+cm/CBLRLR6KGcrKhQUsv+NJz7W1x89mdHYnj
-         klPJmsAEBPLt24v35TxQD9A/2AGlm3p0UytcJLwaffhBzgMwlbM2oCUBCMxTgzLvos3o
-         OQS9EmzH2zvChZzK6UVI7s2fy+qtykczvthYs7iFQVuUZz8qAy2+MzIb4GSPV/8n471j
-         Mt4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXHOT5Ely9Mfq8m+ZNIAur2u4yGnT8v1qCd4rMwDbrF6OW4hCk39FG9h8vSUP5lKh7wTRJqQ8eULH+KkyTC/bT5Oy2pko3o
-X-Gm-Message-State: AOJu0YxMyl8+fVuDOjRtmVqIiVZKg0zUfTkP1wm+Byl/IvR6T0bYke+O
-	+vyG7JD5yuDgaNxeZDc6E9O8OgJm02sTL/BzbTuVgmebQOh5J+nz
-X-Google-Smtp-Source: AGHT+IGeOYsXfEqtNRRSVyeVNwo3VEOcdS7lFTAZKqWeXr/AhU4GI4FIQBuK1b14La1/N88EWZgsUQ==
-X-Received: by 2002:a17:902:ced2:b0:201:eed3:80dd with SMTP id d9443c01a7336-20204062fc9mr3379795ad.65.1723739932070;
-        Thu, 15 Aug 2024 09:38:52 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-201f03a5706sm11970205ad.296.2024.08.15.09.38.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Aug 2024 09:38:51 -0700 (PDT)
-Message-ID: <a9027470-f4b4-483b-b0f3-88e17edaa7a1@gmail.com>
-Date: Thu, 15 Aug 2024 09:38:48 -0700
+	s=arc-20240116; t=1723740047; c=relaxed/simple;
+	bh=sv6PdVVlm7tbr0UuPHCEZZey6A1hPyaBMpr3lsc1k/o=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tcljUjGT8BNvRU62jGdMEBorE+Vq70seRIId4ESa51lVgaASuTJuCxJosdHEHe4HQRkxJqgg9EhTCpTb35K5wOqjbX+SlV0Bt+snI75akMWEE5hWxL8wPMbbksGgdvgmVd+BzT1rR3qJoQaGGKWQSdfDx+cNW2CmqUV3TAX9y64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wl9ll428Cz6K9B4;
+	Fri, 16 Aug 2024 00:37:55 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0CC221400DB;
+	Fri, 16 Aug 2024 00:40:37 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 15 Aug
+ 2024 17:40:36 +0100
+Date: Thu, 15 Aug 2024 17:40:35 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
+	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<richard.hughes@amd.com>
+Subject: Re: [PATCH v2 02/15] cxl: add function for type2 cxl regs setup
+Message-ID: <20240815174035.00005bb0@Huawei.com>
+In-Reply-To: <5d8f8771-8e43-6559-c510-0b8b26171c05@amd.com>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+	<20240715172835.24757-3-alejandro.lucero-palau@amd.com>
+	<20240804181529.00004aa9@Huawei.com>
+	<5d8f8771-8e43-6559-c510-0b8b26171c05@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ethtool: add tunable api to disable various
- firmware offloads
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
- Doug Berger <opendmb@gmail.com>, Justin Chen <justin.chen@broadcom.com>,
- =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>,
- Linux Network Development Mailing List <netdev@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>, Edward Cree <ecree.xilinx@gmail.com>,
- Yuyang Huang <yuyanghuang@google.com>, Lorenzo Colitti <lorenzo@google.com>
-References: <20240813223325.3522113-1-maze@google.com>
- <20240814173248.685681d7@kernel.org>
- <b46f8151-29ab-453c-9830-884adcecdcfb@gmail.com>
- <20240815084526.5b1975c3@kernel.org>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240815084526.5b1975c3@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 8/15/24 08:45, Jakub Kicinski wrote:
-> On Wed, 14 Aug 2024 20:08:05 -0700 Florian Fainelli wrote:
->>> You gotta find an upstream driver which implements this for us to merge.
->>> If Florian doesn't have any quick uses -- I think Intel ethernet drivers
->>> have private flags for enabling/disabling an LLDP agent. That could be
->>> another way..
->>
->> Currently we have both bcmgenet and bcmasp support the WAKE_FILTER
->> Wake-on-LAN specifier. Our configuration is typically done in user-space
->> for mDNS with something like:
->>
->> ethtool -N eth0 flow-type ether dst 33:33:00:00:00:fb action
->> 0xfffffffffffffffe user-def 0x320000 m 0xffffffffff000fff
->> ethtool -N eth0 flow-type ether dst 01:00:5e:00:00:fb action
->> 0xfffffffffffffffe user-def 0x1e0000 m 0xffffffffff000fff
->> ethtool -s eth0 wol f
->>
->> I would offer that we wire up the tunable into bcmgenet and bcmasp and
->> we'd make sure on our side that the respective firmware implementations
->> behave accordingly, but the respective firmware implementations
->> currently look at whether any network filter have been programmed into
->> the hardware, and if so, they are using those for offload. So we do not
->> really need the tunable in a way, but if we were to add it, then we
->> would need to find a way to tell the firmware not to use the network
->> filters. We liked our design because there is no kernel <=> firmware
->> communication.
+On Wed, 14 Aug 2024 08:56:35 +0100
+Alejandro Lucero Palau <alucerop@amd.com> wrote:
+
+> On 8/4/24 18:15, Jonathan Cameron wrote:
+> > On Mon, 15 Jul 2024 18:28:22 +0100
+> > alejandro.lucero-palau@amd.com wrote:
+> >  
+> >> From: Alejandro Lucero <alucerop@amd.com>
+> >>
+> >> Create a new function for a type2 device initialising the opaque
+> >> cxl_dev_state struct regarding cxl regs setup and mapping.
+> >>
+> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> >> ---
+> >>   drivers/cxl/pci.c                  | 28 ++++++++++++++++++++++++++++
+> >>   drivers/net/ethernet/sfc/efx_cxl.c |  3 +++
+> >>   include/linux/cxl_accel_mem.h      |  1 +
+> >>   3 files changed, 32 insertions(+)
+> >>
+> >> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+> >> index e53646e9f2fb..b34d6259faf4 100644
+> >> --- a/drivers/cxl/pci.c
+> >> +++ b/drivers/cxl/pci.c
+> >> @@ -11,6 +11,7 @@
+> >>   #include <linux/pci.h>
+> >>   #include <linux/aer.h>
+> >>   #include <linux/io.h>
+> >> +#include <linux/cxl_accel_mem.h>
+> >>   #include "cxlmem.h"
+> >>   #include "cxlpci.h"
+> >>   #include "cxl.h"
+> >> @@ -521,6 +522,33 @@ static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
+> >>   	return cxl_setup_regs(map);
+> >>   }
+> >>   
+> >> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds)
+> >> +{
+> >> +	struct cxl_register_map map;
+> >> +	int rc;
+> >> +
+> >> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
+> >> +	if (rc)
+> >> +		return rc;
+> >> +
+> >> +	rc = cxl_map_device_regs(&map, &cxlds->regs.device_regs);
+> >> +	if (rc)
+> >> +		return rc;
+> >> +
+> >> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
+> >> +				&cxlds->reg_map);
+> >> +	if (rc)
+> >> +		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);  
+> > Not fatal?  If we think it will happen on real devices, then dev_warn
+> > is too strong.  
 > 
-> Hm, I may be lacking the practical exposure to such systems to say
-> anything sensible, but when has that ever stopped me..
-> IIUC you're saying that FW enables MLD offload if the wake filter is
-> in place. But for ping/arp/igmp offload there's no need to wake, ever,
-> so there wouldn't be a filter?
+> 
+> This is more complex than what it seems, and it is not properly handled 
+> with the current code.
+> 
+> I will cover it in another patch in more detail, but the fact is those 
+> calls to cxl_pci_setup_regs need to be handled better, because Type2 has 
+> some of these registers as optional.
 
-That is right, we only want to wake-up on mDNS in our case. There are 
-two cases deployed, at least the first one is, the second one might have 
-been more of a "to be added in the future" improvement:
+I'd argue you don't have to support all type 2 devices with your
+first code.  Things like optionality of registers can come in when
+a device shows up where they aren't present.
 
-- a simplistic one where we use the hardware filters to trigger a 
-wake-up event, and then some piece of firmware will look at the mDNS 
-query contents and figure out whether the query was for one of the 
-services in the local database (typically _googlecast._tcp.local is of 
-particular interest). If that is the case, we trigger a system wake-up 
-and we let the Host CPU process the mDNS query and we stay awake for a 
-few seconds in case a streaming operation happens
-
-- a more sophisticated one where after the mDNS query wake-up event has 
-been identified we wait until we get a 3-way TCP handshake targeting the 
-_googlecast._tcp.local service before waking up the Host CPU. This is 
-more reflective of an actual intent to use the device that was asleep
-
-Hope this helps.
---
-Florian
-
+Jonathan
 
