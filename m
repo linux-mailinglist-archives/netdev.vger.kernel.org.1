@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-118949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAC57953A19
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:32:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C31E953A1B
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDA5B1C256F8
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:32:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7023B24802
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5D71547CF;
-	Thu, 15 Aug 2024 18:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAD71547FF;
+	Thu, 15 Aug 2024 18:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYT6Whnx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRdpsfQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4195B1FB;
-	Thu, 15 Aug 2024 18:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF57E153837;
+	Thu, 15 Aug 2024 18:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723746587; cv=none; b=KtVtxj8jckJ2O5Pd7wEZdYEhZmamzXqG8WFHmLNedmzEVAy0MOzPQR9+BjbPUQjk/ze+pa2itOo2BJtZLGG3jMT1Mvpd6H2HO3iluHc2NVconereAiVkJxtAH/V7lUcgWlketG4WhEFIX5s/1EJMqPv6LEMrpOQBVajIfQ0GWY0=
+	t=1723746588; cv=none; b=nop6MOv/NrSwqalaP0ROEsDrO6TXSsDphEB8Hv5w4vTm4V4D88DpQFxlLwLeETmNJhAvHAA+fl9qMqTkTLEW5pvd1AWxTAyuXJkCo6f7weklS7TaXUR9YKXzGn/5FX8UfdhApDjtTdk+5bh9Tr3LDuCJaI8V9ouRTEZeDZimzfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723746587; c=relaxed/simple;
-	bh=Dwr57pngHUSLhksrsKqWWibkSxtCwUUh0p6vmB6rYUc=;
+	s=arc-20240116; t=1723746588; c=relaxed/simple;
+	bh=qnk7k4HDDGkZoFSO8IpFZuu5vCiPAJLRX3jzzWccaYI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OdpLyaTcagp208gRD9pW4eZCucUynDFWD5eFck68nPyuJvvFcffQ55h2ZkadnXxadCJn52dSjjJXncewCQ566BKYjp0O4K9yrFAznxrsSD49XbPfGyKL9QQN8lhUR4V5kEGxpQSiPy3a5oQExy8UXVO3pnn3DW2pDGHzkTD/IRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYT6Whnx; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=OM9BpKZjQN29E4xLluQ1XHFlyruWj5DZ6/XGp7wA4/tfnETtQdHMNnopBs0QfvIDVDVJJ+DU6tgsqo5ASiEPuL0gt30CUKVn+Dj2B0YJNB0dZO5hyMOGC3yDvS9TSqeOC9m4jksrQsXoU4UQrLgTiEdRzoP7KAKX/nUWh7d2zFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRdpsfQ9; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-712603f7ba5so987572b3a.3;
-        Thu, 15 Aug 2024 11:29:45 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-710ec581999so1070737b3a.2;
+        Thu, 15 Aug 2024 11:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723746585; x=1724351385; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723746586; x=1724351386; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CDmpFZN7V1g06/ZGYNIP4Pk8NE5ZqNFuGVyTota0SLk=;
-        b=JYT6WhnxxNlbbh6BQuKj+eDMz8/7nClPHPwNtY48kprcQfcnFvHHGFnHOlaQukQNJV
-         RJVx/ElVJPe1XIZFCw+LrMQUOix1Y9Olbqq3PcN+7UDngzg1KxJgQHKno1et6pIcxNv5
-         kca8gwZOOQPtuQyNxyscjHs6lEHQ8qiz11EiHgg9MVm8u0saqJz6V7fq6f2u8b0Tn+eF
-         SCC9aNedPPqUZqFS6Sw4Fj74Z/7+NX2RyUvRT/9Ssy/ePg3XLOb9hBpnwdZKrNXF3xwv
-         b9iKm5lP47nLgw+ojTDO7KYmgZn2JhJCUr6v5jLqtMIn2ZhYUOx8cbQArRArwjdGYVmB
-         vo5w==
+        bh=sB8A2+Y35t17lg44SzaxZqI5HJVqbqkWh0aRgxli2G0=;
+        b=HRdpsfQ9dSnLirq0xkm3WAH7qoG7o7qBVBLrzqEzSKnZHQeFc9xK1nwYqIfSdC/5F4
+         uV/YiRNbNWkqPYkOBrIlhPN9QiI8SwPsz9CqytAJhHJOeYAD8Ff4QUt+xKEoG7rBhJ7N
+         ijZ+kW2s9OTVQGRBv33Vw+6gdz7nV4JLs40aNWuoLMSCmv2jOJoLq7b9OFMt2hB8Vp1M
+         I0jwQRpd58Dt7vwXp1vwrGEJ0tcOKU08wkrYyTjWZpkWkB11xL/7rbRrAwDeGwfXFxEp
+         JSxPdidkJNPyYH6abQ3AmRggoRUSqnkKH/hiQE3dBKOmwHOdfvyevG//TGQkX4mjkmBF
+         M2cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723746585; x=1724351385;
+        d=1e100.net; s=20230601; t=1723746586; x=1724351386;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CDmpFZN7V1g06/ZGYNIP4Pk8NE5ZqNFuGVyTota0SLk=;
-        b=mDxux2hG12aOGjNFX1S3Qk//XBQEfcGCncnget345rZCdHOOnEvbn8n+WSqr4rcFkH
-         vUIPlTf08a5jlQjdwxUF3SMKGkoapY8IAeGpi+XiE5D/K+Op2Q7HJ9ZjS8b9gFB5MDTj
-         2SbVHR/BgZ8r8F12ZgeW8s3IXxQmHYaXr1XEVQ99J1k1ExRPCEp6KKOcYVB8LiA9Aqyq
-         wsxpz8GyNNrGvEH3LNrbRsb2Std0M4g0cujcTqbbcbPIxGVHJEP1c0ObPVa3DStpIynr
-         OUBBjKKUPfXlc4wjKLjkfLfC/ocqMr9BdSh1EykHkiap4A75xr+jZlIA+DqQ3ARGPSi/
-         ij8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUM0LNHcxOlm3NeWQ3DOro+iJilpAaNm4rhD92F7Qi1KsAHlTgRNRPRVu01Jn7bikwokdfhoecp@vger.kernel.org, AJvYcCVchMor3sgDrQrrmiRsb6yISn4WVH3RAWyVIJJCMi7dE7Hxs7oRBabMbdij55IwCYTP2IpP7N32D4dJMz8=@vger.kernel.org, AJvYcCXT8z+2mIa9MSQNC2sUDxoS81ZWJohu6cDz+zYM/ejB7hL3rXBCdj1qTsbUVVn/YrwcAcEZRIVH1MYVbIgTgP8fy0wj3wml@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyuoccu5I5sXwdl9u5vH37u65zNo20N3N2RD9DRkLRtHxLgxxBE
-	66Zp+0vgWJWxEOb0ZkbIQeUUL4Y6hT0qc8CDULAGSrkUNJSw4Yiu
-X-Google-Smtp-Source: AGHT+IEAx3eAq13eKvyQi76A8rHmXhmvNa2y+UtFzSmr+VF8ucB8ZCth/llQ5TrkB5fficwGiAOAxQ==
-X-Received: by 2002:a05:6a21:2d86:b0:1c4:9100:6a1b with SMTP id adf61e73a8af0-1c904fca42bmr648447637.30.1723746584960;
-        Thu, 15 Aug 2024 11:29:44 -0700 (PDT)
+        bh=sB8A2+Y35t17lg44SzaxZqI5HJVqbqkWh0aRgxli2G0=;
+        b=ZQUiIP5mbc3zV3B8cXqDwu6os0FQvOjnc32SiodyUl9+J96h3RIUibmAv6QiU/Gr0G
+         BSD1uDaLusMKaSFMMgJKcxEu6BIkw07UuILh8xPn8afoTNBOvRUPPlZsOdtOuwzm64GK
+         cvreLGmyEbUvGoTVuUo9Uwx2e8rQfVI/InDDiCi5/bIa1rCzpo4ATmznUvx1/amQpmCb
+         NyH4aobE8qPGN33Ihw3Z9vy1I675/mZVrCJ5PtEOc9WVxJY6QBw39EmQWx01Y7wCRXYT
+         VGq2y67spXOaj6b1JeonpJwp/pj8GYVFHn5VsBWsC2oFKm/f5TIHe9BTHop9SxOlCH0m
+         OcAw==
+X-Forwarded-Encrypted: i=1; AJvYcCWogZFFqjjw2PQdTx6OFkkeS7rcQc8n6gz9oJ7TO8KcfuHL3OopjwmSkgvDD+uXfzGkj2Hns1rKdWJOwAFbEbcJjdgVfe4HaiCPlGzxXYpBY9vk+i16sKOwOB/r+ezgHrhu5HS1KQr01Nop71WbiKr6U5c7RKXDKHd2hc/x6bQ+D282hGni+xKBh4ix
+X-Gm-Message-State: AOJu0YwjA2XI5aSg8LfzQxr2cH3sPcUX/A5YBod+DPTQi/NOgqqcuQtk
+	9taNgqaZbFxQdHyWMye9D5mtHiZbvNoOmGmAIeuWTv6D0nEHaphI
+X-Google-Smtp-Source: AGHT+IHhUcnSE4tNQTfofPuCwTWx0qmX/19gly0HrhSf4hLYSpIm3FPQoVdv6nfNh3SJzMM92aglkw==
+X-Received: by 2002:a05:6a00:2192:b0:70e:a6b5:d80d with SMTP id d2e1a72fcca58-713c4f34736mr806264b3a.26.1723746585898;
+        Thu, 15 Aug 2024 11:29:45 -0700 (PDT)
 Received: from tahera-OptiPlex-5000.uc.ucalgary.ca ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b6356c76sm1431683a12.62.2024.08.15.11.29.43
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b6356c76sm1431683a12.62.2024.08.15.11.29.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 11:29:44 -0700 (PDT)
+        Thu, 15 Aug 2024 11:29:45 -0700 (PDT)
 From: Tahera Fahimi <fahimitahera@gmail.com>
 To: outreachy@lists.linux.dev
 Cc: mic@digikod.net,
@@ -80,9 +80,9 @@ Cc: mic@digikod.net,
 	jannh@google.com,
 	netdev@vger.kernel.org,
 	Tahera Fahimi <fahimitahera@gmail.com>
-Subject: [PATCH v3 3/6] selftest/Landlock: Signal restriction tests
-Date: Thu, 15 Aug 2024 12:29:22 -0600
-Message-Id: <82b0d2103013397d8b46de9fc7c8c78456055299.1723680305.git.fahimitahera@gmail.com>
+Subject: [PATCH v3 4/6] selftest/Landlock: pthread_kill(3) tests
+Date: Thu, 15 Aug 2024 12:29:23 -0600
+Message-Id: <f9ddc707873b30f440779feb1f284fc2a4aae40b.1723680305.git.fahimitahera@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1723680305.git.fahimitahera@gmail.com>
 References: <cover.1723680305.git.fahimitahera@gmail.com>
@@ -92,338 +92,69 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch expands Landlock ABI version 6 by providing tests for
-signal scoping mechanism. Base on kill(2), if the signal is 0,
-no signal will be sent, but the permission of a process to send
-a signal will be checked. Likewise, this test consider one signal
-for each signal category.
+This patch expands the signal scoping tests with pthread_kill(3)
+It tests if an scoped thread can send signal to a process in
+the same scoped domain, or a non-sandboxed thread.
 
 Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 ---
-Chnages in versions:
-V2:
-* Moving tests from ptrace_test.c to scoped_signal_test.c
-* Remove debugging statements.
-* Covering all basic restriction scenarios by sending 0 as signal
-V1:
-* Expanding Landlock ABI version 6 by providing basic tests for
-  four signals to test signal scoping mechanism.
----
- .../selftests/landlock/scoped_signal_test.c   | 302 ++++++++++++++++++
- 1 file changed, 302 insertions(+)
- create mode 100644 tools/testing/selftests/landlock/scoped_signal_test.c
+ .../selftests/landlock/scoped_signal_test.c   | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/tools/testing/selftests/landlock/scoped_signal_test.c b/tools/testing/selftests/landlock/scoped_signal_test.c
-new file mode 100644
-index 000000000000..92958c6266ca
---- /dev/null
+index 92958c6266ca..2edba1e6cd82 100644
+--- a/tools/testing/selftests/landlock/scoped_signal_test.c
 +++ b/tools/testing/selftests/landlock/scoped_signal_test.c
-@@ -0,0 +1,302 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Landlock tests - Signal Scoping
-+ *
-+ * Copyright © 2017-2020 Mickaël Salaün <mic@digikod.net>
-+ * Copyright © 2019-2020 ANSSI
-+ */
-+
-+#define _GNU_SOURCE
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <linux/landlock.h>
-+#include <signal.h>
-+#include <sys/prctl.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+#include <unistd.h>
-+
-+#include "common.h"
-+
-+static sig_atomic_t signaled;
-+
-+static void create_signal_domain(struct __test_metadata *const _metadata)
+@@ -10,6 +10,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <linux/landlock.h>
++#include <pthread.h>
+ #include <signal.h>
+ #include <sys/prctl.h>
+ #include <sys/types.h>
+@@ -18,6 +19,7 @@
+ 
+ #include "common.h"
+ 
++#define DEFAULT_THREAD_RUNTIME 0.001
+ static sig_atomic_t signaled;
+ 
+ static void create_signal_domain(struct __test_metadata *const _metadata)
+@@ -299,4 +301,31 @@ TEST_F(signal_scoping, test_signal)
+ 		_metadata->exit_code = KSFT_FAIL;
+ }
+ 
++static void *thread_func(void *arg)
 +{
-+	int ruleset_fd;
-+	const struct landlock_ruleset_attr ruleset_attr = {
-+		.scoped = LANDLOCK_SCOPED_SIGNAL,
-+	};
-+
-+	ruleset_fd =
-+		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-+	EXPECT_LE(0, ruleset_fd)
-+	{
-+		TH_LOG("Failed to create a ruleset: %s", strerror(errno));
-+	}
-+	enforce_ruleset(_metadata, ruleset_fd);
-+	EXPECT_EQ(0, close(ruleset_fd));
++	sleep(DEFAULT_THREAD_RUNTIME);
++	return NULL;
 +}
 +
-+static void scope_signal_handler(int sig, siginfo_t *info, void *ucontext)
++TEST(signal_scoping_threads)
 +{
-+	if (sig == SIGHUP || sig == SIGURG || sig == SIGTSTP ||
-+	    sig == SIGTRAP || sig == SIGUSR1) {
-+		signaled = 1;
-+	}
++	pthread_t no_sandbox_thread, scoped_thread;
++	int err;
++
++	ASSERT_EQ(0,
++		  pthread_create(&no_sandbox_thread, NULL, thread_func, NULL));
++	create_signal_domain(_metadata);
++	ASSERT_EQ(0, pthread_create(&scoped_thread, NULL, thread_func, NULL));
++
++	/* Send signal to threads */
++	err = pthread_kill(no_sandbox_thread, 0);
++	ASSERT_EQ(EPERM, err);
++
++	err = pthread_kill(scoped_thread, 0);
++	ASSERT_EQ(0, err);
++
++	ASSERT_EQ(0, pthread_join(scoped_thread, NULL));
++	ASSERT_EQ(0, pthread_join(no_sandbox_thread, NULL));
 +}
 +
-+/* clang-format off */
-+FIXTURE(signal_scoping) {};
-+/* clang-format on */
-+
-+FIXTURE_VARIANT(signal_scoping)
-+{
-+	const int sig;
-+	const bool domain_both;
-+	const bool domain_parent;
-+	const bool domain_child;
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_without_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = false,
-+	.domain_parent = false,
-+	.domain_child = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_child_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = false,
-+	.domain_parent = false,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_parent_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_sibling_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_sibling_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = true,
-+	.domain_parent = false,
-+	.domain_child = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_nested_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = true,
-+	.domain_parent = false,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_nested_and_parent_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain) {
-+	/* clang-format on */
-+	.sig = 0,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* Default Action: Terminate*/
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGHUP) {
-+	/* clang-format on */
-+	.sig = SIGHUP,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGHUP) {
-+	/* clang-format on */
-+	.sig = SIGHUP,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* Default Action: Ignore*/
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGURG) {
-+	/* clang-format on */
-+	.sig = SIGURG,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGURG) {
-+	/* clang-format on */
-+	.sig = SIGURG,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* Default Action: Stop*/
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGTSTP) {
-+	/* clang-format on */
-+	.sig = SIGTSTP,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGTSTP) {
-+	/* clang-format on */
-+	.sig = SIGTSTP,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* Default Action: Coredump*/
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGTRAP) {
-+	/* clang-format on */
-+	.sig = SIGTRAP,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGTRAP) {
-+	/* clang-format on */
-+	.sig = SIGTRAP,
-+	.domain_both = false,
-+	.domain_parent = true,
-+	.domain_child = false,
-+};
-+
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGUSR1) {
-+	/* clang-format on */
-+	.sig = SIGUSR1,
-+	.domain_both = true,
-+	.domain_parent = true,
-+	.domain_child = true,
-+};
-+
-+FIXTURE_SETUP(signal_scoping)
-+{
-+}
-+
-+FIXTURE_TEARDOWN(signal_scoping)
-+{
-+}
-+
-+TEST_F(signal_scoping, test_signal)
-+{
-+	pid_t child;
-+	pid_t parent = getpid();
-+	int status;
-+	bool can_signal;
-+	int pipe_parent[2];
-+	struct sigaction action = {
-+		.sa_sigaction = scope_signal_handler,
-+		.sa_flags = SA_SIGINFO,
-+
-+	};
-+
-+	can_signal = !variant->domain_child;
-+
-+	if (variant->sig > 0)
-+		ASSERT_LE(0, sigaction(variant->sig, &action, NULL));
-+
-+	if (variant->domain_both) {
-+		create_signal_domain(_metadata);
-+		if (!__test_passed(_metadata))
-+			/* Aborts before forking. */
-+			return;
-+	}
-+	ASSERT_EQ(0, pipe2(pipe_parent, O_CLOEXEC));
-+
-+	child = fork();
-+	ASSERT_LE(0, child);
-+	if (child == 0) {
-+		char buf_child;
-+		int err;
-+
-+		ASSERT_EQ(0, close(pipe_parent[1]));
-+		if (variant->domain_child)
-+			create_signal_domain(_metadata);
-+
-+		/* Waits for the parent to be in a domain, if any. */
-+		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
-+
-+		err = kill(parent, variant->sig);
-+		if (can_signal) {
-+			ASSERT_EQ(0, err);
-+		} else {
-+			ASSERT_EQ(-1, err);
-+			ASSERT_EQ(EPERM, errno);
-+		}
-+		/* no matter of the domain, a process should be able to send
-+		 * a signal to itself.
-+		 */
-+		ASSERT_EQ(0, raise(variant->sig));
-+		if (variant->sig > 0)
-+			ASSERT_EQ(1, signaled);
-+		_exit(_metadata->exit_code);
-+		return;
-+	}
-+	ASSERT_EQ(0, close(pipe_parent[0]));
-+	if (variant->domain_parent)
-+		create_signal_domain(_metadata);
-+
-+	/* Signals that the parent is in a domain, if any. */
-+	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+
-+	if (can_signal && variant->sig > 0) {
-+		ASSERT_EQ(-1, pause());
-+		ASSERT_EQ(EINTR, errno);
-+		ASSERT_EQ(1, signaled);
-+	} else {
-+		ASSERT_EQ(0, signaled);
-+	}
-+
-+	ASSERT_EQ(child, waitpid(child, &status, 0));
-+
-+	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
-+	    WEXITSTATUS(status) != EXIT_SUCCESS)
-+		_metadata->exit_code = KSFT_FAIL;
-+}
-+
-+TEST_HARNESS_MAIN
+ TEST_HARNESS_MAIN
 -- 
 2.34.1
 
