@@ -1,137 +1,143 @@
-Return-Path: <netdev+bounces-118916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CB7953825
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C786695383F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EBF81F23C76
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:20:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 037251C21FA8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7993C1B4C23;
-	Thu, 15 Aug 2024 16:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+4zvyf7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55A91B9B56;
+	Thu, 15 Aug 2024 16:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5FB37703;
-	Thu, 15 Aug 2024 16:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0822C19FA7E
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 16:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723738808; cv=none; b=U06q/IlzdQzaRbsMsbXkW6Ax/tN6lKVOJvDlJ+iiR1CbAWJVBTaa8z74F7cAm8lfALGS7fQNkT4SK2+MOIR/PJb9aV8/cTAN3xYywkALDSU+RN8P92ok+JxzuJGCFZEueDrL4WqHjJj9/LddwqN07pFWBxjfqTDQLOkTVYYt+r0=
+	t=1723739429; cv=none; b=NgAqnS4Ocl9bVBQRhdF6rFHnQ53jLhDx96OUmjbpzUzM8yUnyyqTExhiLl7+zpocP0TY++aapqGsyXcCNSQIKRSJxnS/XWE3JxWDZRSU61KMT80cdVoQc8GRJcwy0HEiemnBTU/RkEScOddz/G/LSXtfBuBvHRRTfmur+ebjRag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723738808; c=relaxed/simple;
-	bh=tINqSAJ3XeozQYxrCrqrG4Gnf0ia+Hyq8LR2Egz4I8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VrHXEDpVKQPBUEF93hl+ms43i1lmIbBSDA8hH6vGSHsRU8Q2/1wX6dWUKA6in+kIU1rR7XKBHQKoUrQd0CUciXcafuNcsCE4HJlZp5TlIhlARU9GlKE61aLpV/KGknIEvyGNgAC4axlG8JE58hykupSz3NkUo8leODdUEXDgINc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+4zvyf7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C473FC32786;
-	Thu, 15 Aug 2024 16:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723738807;
-	bh=tINqSAJ3XeozQYxrCrqrG4Gnf0ia+Hyq8LR2Egz4I8M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V+4zvyf7Dn9bhrMk44cFgS6zC4kGy9J8vPELArVvCYQRZPdvVO6d5rq0U9x+Gr5Os
-	 zlySxxiFUq6Vk5vY99XBuQrGPD8J6vGwnxHSEa3mehVjW9IGaR77xqtPZRH6OO1cIa
-	 z3WnCylFV7Ua3KngAGJbeQF4g9A71qhZHdNfAHVuWQN4E21/UiyHwRzpEs/0Jq/X/y
-	 zRV2P1seD+ddhctZSflVmE3TA09qZ85ad42AJ1h9BQyFNZ8Kj98IF9KqgN5t260SRQ
-	 lXfkNCXliNlE1fAby9q2KIh2slIMMiC3VKWKe7OdQ3Ji/sMOcWbOBvn2SIe6yR/EPu
-	 d/YUmuneot25w==
-Date: Thu, 15 Aug 2024 09:20:07 -0700
-From: Kees Cook <kees@kernel.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Breno Leitao <leitao@debian.org>, elver@google.com,
-	andreyknvl@gmail.com, ryabinin.a.a@gmail.com,
-	kasan-dev@googlegroups.com, linux-hardening@vger.kernel.org,
-	axboe@kernel.dk, asml.silence@gmail.com, netdev@vger.kernel.org
-Subject: Re: UBSAN: annotation to skip sanitization in variable that will wrap
-Message-ID: <202408150915.150AC9A3E@keescook>
-References: <Zrzk8hilADAj+QTg@gmail.com>
- <CAFhGd8oowe7TwS88SU1ETJ1qvBP++MOL1iz3GrqNs+CDUhKbzg@mail.gmail.com>
+	s=arc-20240116; t=1723739429; c=relaxed/simple;
+	bh=ucxPUj1yJ7m2vVIr7c9pCOLhBMxgeVxokmlu44Tmhos=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=lXVpuqiEmsWxTTZ8IfMUGlU6gElAnrxGj/T46Iuqh6c8dqmgB/c9ogDUViwhQMGteCFrjVoVgWBmwYx6Hd60+Wlv4qY+FuIe3sGyPu4Ym7JMIoa3ofGaIDpUBaWl765eUHhpRuwOnaGJzQaHXl/im6wQ6z17ATXP45bbET3NK68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id C02BB7D065;
+	Thu, 15 Aug 2024 16:30:25 +0000 (UTC)
+References: <20240809083500.2822656-1-chopps@chopps.org>
+ <20240809083500.2822656-2-chopps@chopps.org>
+ <567fc2d7-63bf-4953-a4c0-e4aedfe6e917@redhat.com>
+ <ZryJK8W1Acz0L/tU@gauss3.secunet.de>
+ <4d226a9e-8231-4794-a5ac-d426fac03361@redhat.com>
+ <m2bk1uq3a7.fsf@ja-home.int.chopps.org>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, Christian Hopps
+ <chopps@chopps.org>, devel@linux-ipsec.org, netdev@vger.kernel.org, "David
+  S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Florian Westphal <fw@strlen.de>, Sabrina
+  Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony
+  Antony <antony@phenome.org>, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v2 1/2] net: refactor common skb header copy
+ code for re-use
+Date: Thu, 15 Aug 2024 12:24:12 -0400
+In-reply-to: <m2bk1uq3a7.fsf@ja-home.int.chopps.org>
+Message-ID: <m2sev592an.fsf@ja-home.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFhGd8oowe7TwS88SU1ETJ1qvBP++MOL1iz3GrqNs+CDUhKbzg@mail.gmail.com>
+Content-Type: text/plain; format=flowed
 
-On Wed, Aug 14, 2024 at 02:05:49PM -0700, Justin Stitt wrote:
-> Hi,
-> 
-> On Wed, Aug 14, 2024 at 10:10 AM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > Hello,
-> >
-> > I am seeing some signed-integer-overflow in percpu reference counters.
-> 
-> it is brave of you to enable this sanitizer :>)
-> 
-> >
-> >         UBSAN: signed-integer-overflow in ./arch/arm64/include/asm/atomic_lse.h:204:1
-> >         -9223372036854775808 - 1 cannot be represented in type 's64' (aka 'long long')
-> >         Call trace:
-> >
-> >          handle_overflow
-> >          __ubsan_handle_sub_overflow
-> >          percpu_ref_put_many
-> >          css_put
-> >          cgroup_sk_free
-> >          __sk_destruct
-> >          __sk_free
-> >          sk_free
-> >          unix_release_sock
-> >          unix_release
-> >          sock_close
-> >
-> > This overflow is probably happening in percpu_ref->percpu_ref_data->count.
-> >
-> > Looking at the code documentation, it seems that overflows are fine in
-> > per-cpu values. The lib/percpu-refcount.c code comment says:
-> >
-> >  * Note that the counter on a particular cpu can (and will) wrap - this
-> >  * is fine, when we go to shutdown the percpu counters will all sum to
-> >  * the correct value
-> >
-> > Is there a way to annotate the code to tell UBSAN that this overflow is
-> > expected and it shouldn't be reported?
-> 
-> Great question.
-> 
-> 1) There exists some new-ish macros in overflow.h that perform
-> wrapping arithmetic without triggering sanitizer splats -- check out
-> the wrapping_* suite of macros.
-> 
-> 2) I have a Clang attribute in the works [1] that would enable you to
-> annotate expressions or types that are expected to wrap and will
-> therefore silence arithmetic overflow/truncation sanitizers. If you
-> think this could help make the kernel better then I'd appreciate a +1
-> on that PR so it can get some more review from compiler people! Kees
-> and I have some other Clang features in the works that will allow for
-> better mitigation strategies for intended overflow in the kernel.
-> 
-> 3) Kees can probably chime in with some other methods of getting the
-> sanitizer to shush -- we've been doing some work together in this
-> space. Also check out [2]
 
-I haven't checked closely yet, but I *think* top 4 patches here[1]
-(proposed here[2]) fix the atomics issues. The haven't landed due to
-atomics maintainers wanting differing behavior from the compiler that
-Justin is still working on (the "wraps" attribute alluded to above[3]).
+Christian Hopps <chopps@chopps.org> writes:
 
--Kees
+> Paolo Abeni <pabeni@redhat.com> writes:
+>
+>> On 8/14/24 12:38, Steffen Klassert wrote:
+>>> On Wed, Aug 14, 2024 at 11:46:56AM +0200, Paolo Abeni wrote:
+>>>> On 8/9/24 10:34, Christian Hopps wrote:
+>>>>> From: Christian Hopps <chopps@labn.net>
+>>>>> --- a/net/core/skbuff.c
+>>>>> +++ b/net/core/skbuff.c
+>>>>> @@ -1515,7 +1515,7 @@ EXPORT_SYMBOL(napi_consume_skb);
+>>>>>    	BUILD_BUG_ON(offsetof(struct sk_buff, field) !=		\
+>>>>>    		     offsetof(struct sk_buff, headers.field));	\
+>>>>> -static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+>>>>> +void ___copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+>>>>>    {
+>>>>>    	new->tstamp		= old->tstamp;
+>>>>>    	/* We do not copy old->sk */
+>>>>> @@ -1524,6 +1524,12 @@ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+>>>>>    	skb_dst_copy(new, old);
+>>>>>    	__skb_ext_copy(new, old);
+>>>>>    	__nf_copy(new, old, false);
+>>>>> +}
+>>>>> +EXPORT_SYMBOL_GPL(___copy_skb_header);
+>>>>> +
+>>>>> +static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+>>>>> +{
+>>>>> +	___copy_skb_header(new, old); >
+>>>>>    	/* Note : this field could be in the headers group.
+>>>>>    	 * It is not yet because we do not want to have a 16 bit hole
+>>>>
+>>>> Could you please point where/how are you going to use this helper? factoring
+>>>> out this very core bits of skbuff copy looks quite bug prone - and exporting
+>>>> the helper could introduce additional unneeded function calls in the core
+>>>> code.
+>>> It is supposed to be used in the IPTFS pachset:
+>>> https://lore.kernel.org/netdev/20240807211331.1081038-12-chopps@chopps.org/
+>>> It was open coded before, but there were some concerns that
+>>> IPTFS won't get updated if __copy_skb_header changes.
+>>
+>> The code is copying a subset of the skb header from a 'template' skb to a newly
+>> allocated skbuff.
+>> It's unclear to me why would be useful to copy only a subset of the skb header,
+>> excluding queue_mapping, priority, etc..
+>> I think we need a good justification for that, otherwise we could end-up with a
+>> large amount of "almost copy" skb header slicing the skb in many different ways.
+>
+> IP-TFS sometimes needs to allocate new skb[s] to fragment a too-large tunnel
+> ingress user packet. IP-TFS may also need to extract multiple aggregated user
+> packets for tunnel egress from inside a single IPTFS tunnel packet. For these 1
+> to N cases (which are different from regular IPsec which is always 1-1 and thus
+> re-using the existing skb) we need to create multiple skbs from a single source
+> skb and we need to replicate the work done to the existing skb so far in the
+> netdev/xfrm infrastructure (e.g. the _refdst and _nfct are expected to be there
+> and refcounted as they are dropped later in the stack). This work is captured in
+> those first few values that we are copying. The `headers` and other field
+> values; however, are not appropriate to be copied (or clobbered e.g., alloc_cpu)
+> into the new allocated skb.
+>
+> I originally had this code local to the IP-TFS implementation, but I was persuaded to move it in skbuff.c to track any possible changes to these fields in the future.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=dev/v6.8-rc2/signed-overflow-sanitizer
-[2] https://lore.kernel.org/linux-hardening/20240424191225.work.780-kees@kernel.org/
-[3] https://github.com/llvm/llvm-project/pull/86618
+I've gone back through the skb use again for both tunnel ingress and egress and I need even less than the subset of fields being copied here.
 
--- 
-Kees Cook
+I'm going to resend this patchset removing this somewhat controversial refactoring for now, and just leave the second commit with the useful copy from read_seq function.
+
+Thanks,
+Chris.
+
+
+>
+> Thanks,
+> Chris.
+>
+>> Cheers,
+>>
+>> Paolo
+
+a
 
