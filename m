@@ -1,156 +1,166 @@
-Return-Path: <netdev+bounces-118792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D8F952CA4
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:44:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86165952CA9
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8327C28204A
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:44:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217FE281A86
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C3C1BC088;
-	Thu, 15 Aug 2024 10:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227CE1BD51B;
+	Thu, 15 Aug 2024 10:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VuIST5my"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMOcgjnq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADCF19DF40
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 10:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0DE1BC9FA;
+	Thu, 15 Aug 2024 10:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723717385; cv=none; b=XTaKXnIZa8TShgBg2PjNAcXkdH2wBciAurZp7BhXe+h+1Vj0jt0K8UBpggruN//SJFCkq1PSiZTDnQmXL7WBxXOEUKfLvOxeOXszA2bho8z5jxgrhEP6BO9ANWy0iKL87wvj330IT6s69tKewjo7PJ17qQIdvyMC6H7RprI84EQ=
+	t=1723717429; cv=none; b=gvjxi0AC4/mqUHU9QuIJ230oExavvSvCUMT3cfJUJe2FOtsTP9E61zdcirS7zZOktnxiGJSewe9xvSiCQUpgH/nmxv/jkfpDCzxlxZygWL4olH/e2chPXuRCk4MU6DmgLaXlZwDxzg8VgX76OgqGG4oub9G1gCIhHsmCuibT6S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723717385; c=relaxed/simple;
-	bh=jyE+hLQ8pkbqTYJwWiYn5/uR3k4gGzfFdMNkZy0nq80=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IO1IuFm2Antuhpl8VsGHtrjEfMAdb3I60f5TsDPl8yPMs5K74id2xqu7+iDaXxk0sSh8dcColbVAI0XawUtQ68DAhXGM9f0LrJTG1P6lVjzaoLtqRKWOLZmg5EaDgo14Zz5wvYHkcxdo4+3i7O0LAE1zCCWYJEszkRPqrcYiZH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VuIST5my; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-428178fc07eso4636595e9.3
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:23:03 -0700 (PDT)
+	s=arc-20240116; t=1723717429; c=relaxed/simple;
+	bh=sDQnLPPU7CmUJJcoqQzx+GzeOhbElOfyvYedxIsokAU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CV+2rux6T+59rluSmdJdilh8R+Bqh6jbjtmaW8dbaM+rYzCOI8n7GXqxSQ4EKbQ9K1hU6chaU9s/ArRBjx5uR8FEGWQYcXswPZd5d4e2Npn+//acaqrQkkWFEGdxNdfUNM4r2J+nsHRwwcqWVfDZl4nHqPdpf+mzz4B1T2LNHcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMOcgjnq; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7093f3a1af9so433541a34.1;
+        Thu, 15 Aug 2024 03:23:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723717382; x=1724322182; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JbsnFZH9IAeMkQGJJtoUFHpAfF+HiIlJJCpWSwAym4I=;
-        b=VuIST5myus23tcf/F4O8t9+3AvwGuzfGIND/IuED+a2LlLnx7JOXKA/w12xYFu3S4Y
-         tl0kraWzDCPvNvrfYpno9lcYQsewTTNDiDjm+hwiNiVngIBtQGDp/AQqgponc044F8YW
-         W7tLbkpdvtifb2wM9X6vfjUYYCm97ejNsgEPc=
+        d=gmail.com; s=20230601; t=1723717426; x=1724322226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u3zCUHzp/42aLKvNYjy11VU0WvKfSv2JHMOxj6wRNYs=;
+        b=ZMOcgjnqiQB83OcnM18kIFIw9Tt6WdlAEuCY+UMiT622qzn1uACeZ6HwMeo5cd01bj
+         fmgIQSEoyCg8+HnE3A1WoA4vmYf2agaFFmOdw8azcJmklj2m/Cag8iv8/RnidsUDbL3y
+         sLXF6+B0GrLNpDelGlXAZgflhKvzLLg5tsiYrrAXB4bObN75Jvx/F5edghiei4hhiSdy
+         rwcWifF1bf9yk8bZrF+NV6CI6rQJ0N4eZ4MDAfSrkdBUrCBQuopMLuP6FXAg2awOCWns
+         0ldM2eTvaiSXsCDIM0xBAYtuz7qlfKTHgqlEkstLS87rLC6Vm3//YskzvGfpOchHJ4Rs
+         2keQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723717382; x=1724322182;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbsnFZH9IAeMkQGJJtoUFHpAfF+HiIlJJCpWSwAym4I=;
-        b=Q6xq89jcwf/jnTHSnrhmnFksZTPxP5Ir+cuyRP4+oNvNBlufhWwUyPLDxe4z6ZTxcn
-         IW6zFgWydU/yqfCbtPFt6HmFt+t94FBcSQ8E74QveKwnbjSsK5Omjy2LLFHpvs24qTKq
-         S7doDia5b2W7BJsde4r7p9KHmskJ3+fFT74Yu3F1pX71f9qqr8HDUqADxN9LuR+bIuPe
-         Tgzrla0TMbIy7tPsmS9KalfbjaThy53/wpYAQNU2Jq2No6EUQc8H9qbo0ilbZt9NtiBV
-         GWDw+vd/roZkH6XKFHmrc16DmOBTxIWDHpeYSE1a8/GQA97zvHd8uPSw8YQFbQ7H38Yd
-         fV+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWf3v51P7jKgsQzM2U/HeZ/hlmezVIFIjNk83Qt5bS+CCoJpJGmp9hNgJ83V/c1P6HKHP7Ed9o8B5kf+nPbsdV6ZzGUefJf
-X-Gm-Message-State: AOJu0YwKO/OC1T18FKHXioLDl11ubUyahousRP/klgoVSQnEGmneu0By
-	wZl8CYuJUPMly7Qna2FauECotudTpHt890PrernOTDEfmIzbOC61XpLVE24eIpPELORlG7r90bR
-	7+T8=
-X-Google-Smtp-Source: AGHT+IFRMnpq89Ndgm1XWkrIwkNFCLIoPM8Uv6CXkf8fMwmcHs21IKRm+btZ4KEJCdOrXMWmGT28lg==
-X-Received: by 2002:a05:600c:4445:b0:426:689b:65b7 with SMTP id 5b1f17b1804b1-429dd264da5mr36184295e9.25.1723717382050;
-        Thu, 15 Aug 2024 03:23:02 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189856b07sm1135018f8f.50.2024.08.15.03.23.00
+        d=1e100.net; s=20230601; t=1723717426; x=1724322226;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u3zCUHzp/42aLKvNYjy11VU0WvKfSv2JHMOxj6wRNYs=;
+        b=kszxmLuazL7hfNZHW4FtYpHNUUbRGYstAlOmYlgawhvYuwKVcGDCamDHPYQmF8+Tuu
+         BNMACMpPWrr/0PUADGe2uf7acZSWrdMiud5WTjKKw1evfnLvjcZFpClDTrdkND58tlM8
+         EkChN3W4/VGSO09X6kLHK+gVL9i943p55fZKeTVx6M1g1G0AI2puMic9jGclze2KeL6t
+         i0q48VcKtI4NZCxdmSZSxoisw1Cr8kiy1k0mVqrSh9eDSQuMJal3bUJWRpE2AehVDClf
+         13q2LbeSLrQX2SmAKHF30qUZwn48qM3KfIR7BcRZU9vEaovGGQpT3jqAofypVsfmKJ54
+         r33A==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ36khcPDfmW7eab7jEDo1cXHZN2Gsh4AmJYBTrLy5+lfnSIRH7FD5du4Sm938sNc3TjWFfEN4aT2Q5eMcjdgvuRLNAljlBXUsHy8/RCHOymWVoAf94Bnjy30914Y+E+vhGiUA
+X-Gm-Message-State: AOJu0Yxa5axvHOPcOzrwxCk5HVD+2kPtDa9JzbJTqehQKantYtBOGn2s
+	3vzUbRjIUtPV6bJXd5pLU0M5p7dKi3OPbYE4AsTRG5cRswLlfi40
+X-Google-Smtp-Source: AGHT+IHg0rTvW1URXIJnndrN5lBUZKzPcNKldhzVUS7WjmxvA0df04isk9562g++e7EnyLb3vki6cA==
+X-Received: by 2002:a05:6830:660a:b0:709:34e4:9b8b with SMTP id 46e09a7af769-70c9da1770dmr7368623a34.32.1723717426470;
+        Thu, 15 Aug 2024 03:23:46 -0700 (PDT)
+Received: from localhost.localdomain ([49.0.197.176])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127ae73564sm786129b3a.92.2024.08.15.03.23.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 03:23:01 -0700 (PDT)
-Date: Thu, 15 Aug 2024 11:22:59 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Shay Drori <shayd@nvidia.com>, netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
-Message-ID: <Zr3XA-VIE_pAu_k0@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, Shay Drori <shayd@nvidia.com>,
-	netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>
-References: <20240812145633.52911-1-jdamato@fastly.com>
- <20240813171710.599d3f01@kernel.org>
- <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
- <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
- <20240814080915.005cb9ac@kernel.org>
- <ZrzLEZs01KVkvBjw@LQ3V64L9R2>
- <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
- <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
- <20240814172046.7753a62c@kernel.org>
+        Thu, 15 Aug 2024 03:23:46 -0700 (PDT)
+From: sunyiqi <sunyiqixm@gmail.com>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sunyiqixm@gmail.com
+Subject: Re: Re: [PATCH] net: do not release sk in sk_wait_event
+Date: Thu, 15 Aug 2024 18:23:29 +0800
+Message-Id: <20240815102329.172161-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <e6171479-28b4-4155-8578-37a14dabee50@redhat.com>
+References: <e6171479-28b4-4155-8578-37a14dabee50@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240814172046.7753a62c@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 14, 2024 at 05:20:46PM -0700, Jakub Kicinski wrote:
-> On Wed, 14 Aug 2024 19:01:40 +0100 Joe Damato wrote:
-> > If it is, then the only option is to have the drivers pass in their
-> > IRQ affinity masks, as Stanislav suggested, to avoid adding that
-> > call to the hot path.
+On Thu, 15 Aug 2024 12:03:37 +0200, Paolo Abeni wrote:
+> On 8/15/24 10:49, sunyiqi wrote:
+> > When investigating the kcm socket UAF which is also found by syzbot,
+> > I found that the root cause of this problem is actually in
+> > sk_wait_event.
 > > 
-> > If not, then the IRQ from napi_struct can be used and the affinity
-> > mask can be generated on every napi poll. i40e/gve/iavf would need
-> > calls to netif_napi_set_irq to set the IRQ mapping, which seems to
-> > be straightforward.
+> > In sk_wait_event, sk is released and relocked and called by
+> > sk_stream_wait_memory. Protocols like tcp, kcm, etc., called it in some
+> > ops function like *sendmsg which will lock the sk at the beginning.
+> > But sk_stream_wait_memory releases sk unexpectedly and destroy
+> > the thread safety. Finally it causes the kcm sk UAF.
+> > 
+> > If at the time when a thread(thread A) calls sk_stream_wait_memory
+> > and the other thread(thread B) is waiting for lock in lock_sock,
+> > thread B will successfully get the sk lock as thread A release sk lock
+> > in sk_wait_event.
+> > 
+> > The thread B may change the sk which is not thread A expecting.
+> > 
+> > As a result, it will lead kernel to the unexpected behavior. Just like
+> > the kcm sk UAF, which is actually cause by sk_wait_event in
+> > sk_stream_wait_memory.
+> > 
+> > Previous commit d9dc8b0f8b4e ("net: fix sleeping for sk_wait_event()")
+> > in 2016 seems do not solved this problem. Is it necessary to release
+> > sock in sk_wait_event? Or just delete it to make the protocol ops
+> > thread-secure.
 > 
-> It's a bit sad to have the generic solution blocked.
-> cpu_rmap_update() is exported. Maybe we can call it from our notifier?
-> rmap lives in struct net_device
+> As a I wrote previously, please describe the suspected race more 
+> clearly, with the exact calls sequence that lead to the UAF.
+> 
+> Releasing the socket lock is not enough to cause UAF.
 
-I agree on the sadness. I will take a look today.
+Thread A                 Thread B
+kcm_sendmsg
+ lock_sock               kcm_sendmsg
+                          lock_sock (blocked & waiting)
+ head = sk->seq_buf
+ sk_stream_wait_memory
+  sk_wait_event
+   release_sock
+                          lock_sock (get the lock)
+                          head = sk->seq_buf
+                          add head to sk->sk_write_queue
+                          release_sock
+   lock_sock              return
+ err_out to free(head)
+ release_sock
+ return
+// ...
+kcm_release
+ // ...
+ __skb_queue_purge(&sk->sk_write_queue) // <--- UAF
+ // ...
 
-I guess if we were being really ambitious, we'd try to move ARFS
-stuff into the core (as RSS was moved into the core).
+The repro can be downloaded here:
+https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
+ 
+> Removing the release/lock pair in sk_wait_event() will break many 
+> protocols (e.g. TCP) as the stack will not be able to land packets in 
+> the receive queue while the socked lock is owned.
+> 
+> Cheers,
+> 
+> Paolo
+> 
+
+Also a question about it's protocol itself should carefully use low-level
+kernel API encapsulation to ensure its thread-safety or kernel API should
+guarantee thread-safety since sk_wait_event or sk_stream_wait_memory used
+in many cases.
+
+Sincerely,
+Yiqi Sun
 
