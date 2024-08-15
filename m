@@ -1,111 +1,90 @@
-Return-Path: <netdev+bounces-118972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99695953C15
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2958E953C2E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 22:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 431F21F267C6
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB75E281875
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 20:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F10714B092;
-	Thu, 15 Aug 2024 20:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="emq4Trxp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0929614A617;
+	Thu, 15 Aug 2024 20:52:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED6014A4D8
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 20:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9C2149E17
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 20:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723754606; cv=none; b=FzuB4qR0j6hQaEDevaBYX/yxDy7alMSLTnijPgDG47nL2OyaBJQum6ZqbyUxv0EBiA2XXG8JHIDbet8NHi6hugkzFhEhHwVIBRfwLqRQ0B2Gvss1DjRsKgk90Dve7PJodE/AKHQms39n1UanE3ErPYp9XScueM18InCdWuDuh74=
+	t=1723755124; cv=none; b=qv5vvO9B4jwyYRXx4EPZ+8lNk4h5b19CciOP7GRj/zAhGKkkt65ll7h50Z9TSyzVRQtdv3m7ANA6YEqtjAEfJaLm8qowiA2TpoAYLWIhJ60Gbj9GpSgxhBdyXkl6h5yzhOxzKFBCPjUDzycAB3Bnp5ZSPehgf0wcvXtRaw6A6Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723754606; c=relaxed/simple;
-	bh=tR6AAtnzr4ifyv4uLfYfeXZrBedBMyCqUHKxzK3IT54=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F0bmvoBc9cGcb27lkDL8YPpfrbUapBnjwmh/tpDAyVDGAOVD7Maa1Zzzf4zofW6HbHJarSYAeFaj0wFb4ZtRii7OdvV0dKARhBFqJ87JowOr9JgVmFDjp4FVSQ4dF1hfSftwyLaUru3LZKTRsHYus5y2WlhyiaC+AgiwZiwr4ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=emq4Trxp; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723754605; x=1755290605;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=9nqPG81OosFh5oQ2zkH7uqY2XJwp28XZTxuMPCXeiJc=;
-  b=emq4TrxpWNKblvScfYOETl7+7FiFpAVYLqX/nTjqQzLqYOCLeTbBfoz9
-   Xt4hVLhyl/EAD/PcsH7YfPs4qXmYdnkqutf85QeUtr7XaUGZFR94AB0LM
-   nF32snf+PM/xYioJH4EYOlTUn80JySRbcA7R6rE5SLhscqFaAZJbZsQ1s
-   4=;
-X-IronPort-AV: E=Sophos;i="6.10,149,1719878400"; 
-   d="scan'208";a="421496196"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 20:43:20 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:13673]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.29:2525] with esmtp (Farcaster)
- id 08a02d94-07c4-4e91-9e00-671f693b7d31; Thu, 15 Aug 2024 20:43:18 +0000 (UTC)
-X-Farcaster-Flow-ID: 08a02d94-07c4-4e91-9e00-671f693b7d31
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 15 Aug 2024 20:43:17 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.33) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 15 Aug 2024 20:43:14 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
-	<matt@codeconstruct.com.au>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net] mctp: Use __mctp_dev_get() in mctp_fill_link_af().
-Date: Thu, 15 Aug 2024 13:42:54 -0700
-Message-ID: <20240815204254.49813-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1723755124; c=relaxed/simple;
+	bh=rd1Cnjg8HqvTRUrkPSu71JAx37ijk2fo18kKgdeESyM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=geK/CvREhHJid9keuiaDaPDPpYullsg1t4yn5nDe/NJVgMDAJmsmTU7IvdzlPh/C7zfk2TQgf3Gj8YuUGISX8dm8bYBfJ1SaLjfnoGTFZy8u7A8ExIKdBx8CZSm3zZqoBGsH7toisl/7kLeuY2MmHv93I7FMhadagSVXnOBIL0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f8c780fe7so134743839f.1
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 13:52:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723755122; x=1724359922;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PmfgG2sEu8+G2CG0RoP+yWQdYWCMeIH1e2ClrHYdhNo=;
+        b=l1XOMSDgHhLPmXbpoY5a6uEKEfwTV0SAnK6X67e3ddR8GOum/caq6GPOVl+xR4UuJo
+         CtDxRz9d4UAy9l+teey0DMndcpoYu/JseojwtJfENsZSSGb4bfoNw6eKJrbYILKAxuNk
+         5McFWduJF/VUBv8xd5ykOh7b2fgIQrS2Bj0MbqOki8JLj5qyqyKbdk/9VDta39jGukkF
+         2hcMMDb7ja8HYd8Ikcy0oQOfmes4JD/rMtd7YbpBgG6NwaFjkXp80C5VfYFjqZHl/RJS
+         0DHFaNTmNF91Hos9UssRSUQ6J/IFh7Wnv+KF6iIqWViBhLRhnUZv4kGjp+rm0HWp/nt9
+         wp2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWObpFp2FbRyUvIQiHnS7fLycoxaALH2z65nEYCMd9u0KNWJXDk9dX9m7rITqsN8j97gcP6bYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweSbDK7HKg/JA0ddrRMBvWsiMWZ3dILuVtxr4NeJdv0lNKLibT
+	6RZSEyfn15RqmdItwQCwW5PcVg+I1+md3pXXc0DrZfbIgyVv/Mzd94SkhaZDCG3lZAy67fLRu2Z
+	NNFa799oUmE2uchZN/dUtUmsSRFk77Agf6iJirfLPTdB2QmNVh1kRfCc=
+X-Google-Smtp-Source: AGHT+IGs7lknKx7FKGwrwcQBq/RTU7sOk433dVOXfbde2SVdrkw8EbZkPKVZznsNhq50/MdKqJG7u++q10YXlQD/zoZGK+6GjHrO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Received: by 2002:a05:6638:370f:b0:4be:d44b:de24 with SMTP id
+ 8926c6da1cb9f-4cce15d4602mr24400173.2.1723755122515; Thu, 15 Aug 2024
+ 13:52:02 -0700 (PDT)
+Date: Thu, 15 Aug 2024 13:52:02 -0700
+In-Reply-To: <20240815200058.44124-1-kuniyu@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c1f1d4061fbf03cc@google.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in kcm_release
+From: syzbot <syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	kuniyu@amazon.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Since commit 5fa85a09390c ("net: core: rcu-ify rtnl af_ops"),
-af_ops->fill_link_af() is called under RCU.
+Hello,
 
-mctp_fill_link_af() calls mctp_dev_get_rtnl() that uses
-rtnl_dereference(), so lockdep should complain about it.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Let's use __mctp_dev_get() instead.
+Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+Tested-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
 
-Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/mctp/device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Tested on:
 
-diff --git a/net/mctp/device.c b/net/mctp/device.c
-index acb97b257428..7ffddab01e97 100644
---- a/net/mctp/device.c
-+++ b/net/mctp/device.c
-@@ -366,7 +366,7 @@ static int mctp_fill_link_af(struct sk_buff *skb,
- {
- 	struct mctp_dev *mdev;
- 
--	mdev = mctp_dev_get_rtnl(dev);
-+	mdev = __mctp_dev_get(dev);
- 	if (!mdev)
- 		return -ENODATA;
- 	if (nla_put_u32(skb, IFLA_MCTP_NET, mdev->net))
--- 
-2.30.2
+commit:         9c5af2d7 Merge tag 'nf-24-08-15' of git://git.kernel.o..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git HEAD
+console output: https://syzkaller.appspot.com/x/log.txt?x=1643f583980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=60413f696e3b4be4
+dashboard link: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=123cfde5980000
 
+Note: testing is done by a robot and is best-effort only.
 
