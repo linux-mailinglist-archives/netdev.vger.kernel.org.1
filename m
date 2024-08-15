@@ -1,136 +1,193 @@
-Return-Path: <netdev+bounces-118879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1742953674
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:00:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEECB953679
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00B8A1C21089
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:00:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E6FC1C25353
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF6E19D891;
-	Thu, 15 Aug 2024 15:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049B51A08C6;
+	Thu, 15 Aug 2024 15:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="DpHCwkRd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dy8gyr0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FF829CE6
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 15:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723734041; cv=pass; b=pQvWcW1eQp6nMm/SPyqIR+9Mjq2y7i0mSxCiBgRQKPH+/5s5OmUZlPXYVLw1sICKvjBJ3jCxcmNJoIJk71cUq+jjRos5HG6j5bjtOTj03ege3MkvpeTn8r9V4JDYcesK6fSYAzeN+LGEbGRKcQuDER2zaLfDYKpINzwGJDInjLI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723734041; c=relaxed/simple;
-	bh=pkBYJrBDiQV+qst2bgeoenELBiozAL7Gvv38EWT5GUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f3u/Wp9JMabCD/S/NBgLkff54FIP95u7xl3afcR/OmDLezhgXyTy+3XU7skx6wPxo4qUJGIwfM62qhVtnN1YFfMoKaG+wmkfLxgKCaK6FSmHt3AbNFf3QFzq6j7jjoJsSd9biwAMGFkrdRZaqFPuUhe4ziYMt4gGibibYBEjXt8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=DpHCwkRd; arc=pass smtp.client-ip=136.143.188.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1723734029; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=d0m1BGL1EfaIgSsR59SmFDwpfmbQD/3D5Du/VYoRIhtwbg87Pfo76Eqttw58+ag8psAq729oRZXIf3dXc105ZnCVEMfMw9tQrUugd04pls8MIcZDll0f6gGdVG2BUTrwM9GazsykC5ag+9U09g9mOU6jqx4TmDxLZ4SWCCGFJCY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723734029; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=MLSlDo06DyGsyFA9aLNd/8Ac8QJyaJZtthBddrPJBLU=; 
-	b=ZF7Joh/rjwYNzer7SUTt7addJaGZK6kSs8rNc6qjhYSISeaIVxko3opuetTk6por7DebyM/f7yOf6Ux73A2fyebueMqMQRnJwnwxCh5od6m3CTDSu/ZK+/42dDyQ1JWc/aLmQYhGOtgE9LEUbHH6+3ieSx5SYy+fEWlV0l87ZAY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=machnikowski.net;
-	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
-	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723734029;
-	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=MLSlDo06DyGsyFA9aLNd/8Ac8QJyaJZtthBddrPJBLU=;
-	b=DpHCwkRd20lTtrMHZWGz2FrGB2WH+QM+pFRxShLm5Ivtzn5z23Tl3d5U4Mhx46s3
-	6G2s5yilp1qzH/9M73/jX4lYSp1wRuF1JFi2HGTHOdadkkr1Xry2G0i+bBKAMnVx8wX
-	woa0CchsGWc5v7DJjTQajeTbbbdER6mPWKBzhN7ows4Gpgf08KMjz5w3oJhXo0hoIot
-	/0ZLlNA/Ht+OlVtQd17mkYwpvnEHNeBycnfJ3McRoUOyD9Ih0QJiRflTTZ/ZXLYuxLM
-	yOy8ASxgM20Ka7Jp1efjUnXtXH+F1E2GTSNIosUaAFiD0ZlfPfLU7ZCsGwGyzzuJ+Fv
-	51r2oL7JPg==
-Received: by mx.zohomail.com with SMTPS id 1723734027924837.2281162563226;
-	Thu, 15 Aug 2024 08:00:27 -0700 (PDT)
-Message-ID: <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
-Date: Thu, 15 Aug 2024 17:00:24 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CF41AC8BD;
+	Thu, 15 Aug 2024 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723734089; cv=none; b=GQ/bPFkD59tDgIFK64ZwdFkdCDXgIQkykWMHXzxqt4tPWXeybwG5IYoyaHi64FvGnPwcE9v8/3fBptm41bU0CVBb4WDi1QIk4AI74ysYLl5QVlW5D7Kxw465dk2OaCkDZxj/BU6a6IMBNy7I/lkokAhXLnoovkD1/O3OQNSYSM4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723734089; c=relaxed/simple;
+	bh=AZof4Bx69ydPqYVIrzeRixgG1XQf1cxPLetvRiCSI14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qj1kuWMuEj4ErKIwRqNW9DvmQ9FU2zQtoGh/5oO/p/7QVCZJ5kQCvWRVxKGPp2azoc0Y9v0yrjRGhrgluCxHICbKe8vCTscnayT9cRmvYhsRnVkZm8zr5SYwDbc4N8y7YNEnLWjHj9znoSLR/22wkfk1N+vRXC6J7fABv9mpn2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dy8gyr0J; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso9485065e9.3;
+        Thu, 15 Aug 2024 08:01:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723734086; x=1724338886; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X5A/Pf35dj4E2EpVtARhuhl6tAP8WNgJnMyspcYzO+k=;
+        b=dy8gyr0JZC/GvY1aYc/YPk/Si3wqqX1WVmY+sz6zEV+tvYhfV5pa7OcsvIRnsHYHdy
+         14JIXDiXrXRWZpUUp0AitQN6rTVZW59i4gxQdhQa7flGxfIX9AB41KlVWd0ctX1ghqIS
+         eU2BsGHZJnRJcipvmmnnUJvP6gSpNXLal968OxI87/dhqUgkGvn408xDDMrxlL5C6wSz
+         j4o3La6ObiqOUewr8MBq3ja5b9X1wrZw10yu7RYc7ogaLC3fBUupO9J/agBwBedMYH3Z
+         v1WXvH0t/zGTGiV3AzE7uaBRIdp/9uxUZaA3bkeZspa/KUh+5jFOZvTVtBFc5zmK9kkb
+         VS8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723734086; x=1724338886;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5A/Pf35dj4E2EpVtARhuhl6tAP8WNgJnMyspcYzO+k=;
+        b=VFFnBDVS/NMC+b3DyNFvVBc1uy01ELlBbq0O6PB9naBINyUwAtwJCNx1kPnlJqEWm8
+         zXoStR9Fbi+NDi+tkQpnRsj1xy0103wJVx1cUSIyLjrvNd+jD3gzljZTfARUUIbz7H7m
+         uHDzfJmUG7LGtcI3eejToEbUB1EalRqsiIdCTW1wZcAAezroM4Hn9aHAO3TrxeaQSsXh
+         KKVP9gCBEq/i7QNziozCC4Om8F6PhQSQZFGPgTC8av0sM16felOLoomTqjNINLYyhlaK
+         wz2aXQ3kdv7Cpy15jzpYwBl+CrQbL9HJSGtUNLu24glPHjHrqHO9Nx77VijMNeCbAB03
+         ajMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFIvoK/Ye7cwG7Xj7MtxetJBlPt9+PpOEobadnF64amBRKmc9pzWdPLC6ZhPHCz2m0S9kUSrRcEMFAiOVPmhD8zj+1B6iI3KZxXy5aou4ltMKLFtIN90CoXlzGUyq8/cHgigzP06wWSFrEvdAHFuneYrsib3WqIh5O3ujJSNcM5/cw/SQXZV8/PcPwISAF8EKVDENEX2CJGVmcMW93iGhtH76wBsStyCvY9o82mMiiMqj0UHWAJ3LO2Azzq85+cN2+8V2iDMJWsKZo
+X-Gm-Message-State: AOJu0YxHH2dZOcaDHHdY7RP+O6m5UP7ReZOpX2m6iDIVe7RpDdH1J6Yd
+	9wg89DwiL7Te/5CIavSeQOoBFYNeyokzW79xcQ+InGHTfD+AqAhg+7DsnhonU7ublJ62XvGY1DQ
+	75TbPM/i5yzO77NZuJlU/qKOC+H0=
+X-Google-Smtp-Source: AGHT+IFDnpMtbZ2O72JrYtKTcNGdeMRDRFuISj162VcIBgDVR4ZNDcEgvb9oYMQdJ7UgCrLds6/xYlzhvGcrtQXyvpA=
+X-Received: by 2002:a05:600c:511e:b0:426:59d3:8cae with SMTP id
+ 5b1f17b1804b1-429dd236521mr62262805e9.13.1723734085882; Thu, 15 Aug 2024
+ 08:01:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Richard Cochran <richardcochran@gmail.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
- jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
- <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
- <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
- <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
- <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
-Content-Language: en-US
-From: Maciek Machnikowski <maciek@machnikowski.net>
-In-Reply-To: <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+ <20240808123714.462740-5-linyunsheng@huawei.com> <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
+ <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
+In-Reply-To: <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 15 Aug 2024 08:00:49 -0700
+Message-ID: <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Sagi Grimberg <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
+	bpf@vger.kernel.org, linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Aug 14, 2024 at 8:00=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/8/14 23:49, Alexander H Duyck wrote:
+> > On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> >> Currently the page_frag API is returning 'virtual address'
+> >> or 'va' when allocing and expecting 'virtual address' or
+> >> 'va' as input when freeing.
+> >>
+> >> As we are about to support new use cases that the caller
+> >> need to deal with 'struct page' or need to deal with both
+> >> 'va' and 'struct page'. In order to differentiate the API
+> >> handling between 'va' and 'struct page', add '_va' suffix
+> >> to the corresponding API mirroring the page_pool_alloc_va()
+> >> API of the page_pool. So that callers expecting to deal with
+> >> va, page or both va and page may call page_frag_alloc_va*,
+> >> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+> >>
+> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> >> Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> >> Acked-by: Sagi Grimberg <sagi@grimberg.me>
+> >> ---
+> >>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
+> >>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+> >>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+> >>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
+> >>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
+> >>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
+> >>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
+> >>  drivers/nvme/host/tcp.c                       |  8 +++----
+> >>  drivers/nvme/target/tcp.c                     | 22 +++++++++---------=
+-
+> >>  drivers/vhost/net.c                           |  6 ++---
+> >>  include/linux/page_frag_cache.h               | 21 +++++++++---------
+> >>  include/linux/skbuff.h                        |  2 +-
+> >>  kernel/bpf/cpumap.c                           |  2 +-
+> >>  mm/page_frag_cache.c                          | 12 +++++-----
+> >>  net/core/skbuff.c                             | 16 +++++++-------
+> >>  net/core/xdp.c                                |  2 +-
+> >>  net/rxrpc/txbuf.c                             | 15 +++++++------
+> >>  net/sunrpc/svcsock.c                          |  6 ++---
+> >>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
+> >>  19 files changed, 75 insertions(+), 70 deletions(-)
+> >>
+> >
+> > I still say no to this patch. It is an unnecessary name change and adds
+> > no value. If you insist on this patch I will reject the set every time.
+> >
+> > The fact is it is polluting the git history and just makes things
+> > harder to maintain without adding any value as you aren't changing what
+> > the function does and there is no need for this. In addition it just
+>
+> I guess I have to disagree with the above 'no need for this' part for
+> now, as mentioned in [1]:
+>
+> "There are three types of API as proposed in this patchset instead of
+> two types of API:
+> 1. page_frag_alloc_va() returns [va].
+> 2. page_frag_alloc_pg() returns [page, offset].
+> 3. page_frag_alloc() returns [va] & [page, offset].
+>
+> You seemed to miss that we need a third naming for the type 3 API.
+> Do you see type 3 API as a valid API? if yes, what naming are you
+> suggesting for it? if no, why it is not a valid API?"
 
+I didn't. I just don't see the point in pushing out the existing API
+to support that. In reality 2 and 3 are redundant. You probably only
+need 3. Like I mentioned earlier you can essentially just pass a
+page_frag via pointer to the function. With that you could also look
+at just returning a virtual address as well if you insist on having
+something that returns all of the above. No point in having 2 and 3 be
+seperate functions.
 
-On 15/08/2024 16:26, Andrew Lunn wrote:
-> On Thu, Aug 15, 2024 at 11:40:28AM +0200, Maciek Machnikowski wrote:
->>
->>
->> On 15/08/2024 05:53, Richard Cochran wrote:
->>> On Wed, Aug 14, 2024 at 05:08:24PM +0200, Maciek Machnikowski wrote:
->>>
->>>> The esterror should return the error calculated by the device. There is
->>>> no standard defining this, but the simplest implementation can put the
->>>> offset calculated by the ptp daemon, or the offset to the nearest PPS in
->>>> cases where PPS is used as a source of time
->>>
->>> So user space produces the number, and other user space consumes it?
->>>
->>> Sounds like it should say in user space, shared over some IPC, like
->>> PTP management messages for example.
->>
->> The user spaces may run on completely isolated platforms in isolated
->> network with no direct path to communicate that.
->> I'm well aware of different solutions on the same platform (libpmc, AWS
->> Nitro or Clock Manager) , but this patchset tries to address different
->> use case
-> 
-> So this in effect is just a communication mechanism between two user
-> space processes. The device itself does not know its own error, and
-> when told about its error, it does nothing. So why add new driver API
-> calls? It seems like the core should be able to handle this. You then
-> don't need a details explanation of the API which a PHY driver writer
-> can understand...
-> 
->        Andrew
-
-No - it is not the main use case. The easiest one to understand would be
-the following:
-
-Think about a Time Card
-(https://opencomputeproject.github.io/Time-Appliance-Project/docs/time-card/introduction).
-
-It is a device that exposes the precise time to the user space using the
-PTP subsystem, but it is an autonomous device and the synchronization is
-implemented on the hardware layer.
-In this case no user space process is now aware of what is the expected
-estimated error, because that is only known to the HW and its control loop.
-And this information is needed for the aforementioned userspace
-processes to calculate error boundaries (time uncertaninty) of a given
-clock.
-
--Maciek
+I am going to nack this patch set if you insist on this pointless
+renaming. The fact is it is just adding noise that adds no value.
 
