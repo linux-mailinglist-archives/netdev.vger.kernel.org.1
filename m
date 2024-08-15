@@ -1,102 +1,144 @@
-Return-Path: <netdev+bounces-118702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F309595284B
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:33:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E9E952850
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B745F2830AE
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:33:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C2D0B23E97
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9903A179BD;
-	Thu, 15 Aug 2024 03:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1730F179BD;
+	Thu, 15 Aug 2024 03:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SITWaFlr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CD2H0Ajp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313ABAD5A
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7373BBC1
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723692811; cv=none; b=bWYEemk+ZY5WVW8lzYurgi+/rm9GQUHigkl4rAln9cTT7zFlfPnP/6pr/iU9dH87EgnhHcj2lrk6y4EHrwEUmBgT/KqkrPnhK/pxoLnD1hU2qs1ZqyQCn3egaYzkQWpJJaSXtHPsOHXewsN3NfSAf0mUTitURYxetF4QXlGX1PI=
+	t=1723692874; cv=none; b=sT0JUAJNbLeOU5Rw0gtmS11rUHizdBd6G3iOXbjV3Z4E3ZWoN7wDXKB197bzwwFuqz3iNauaTGXMrcFZSCakLPs8ZKUbe7jyGRRwZLLhzaM+v6TpW0NqIkDNs/Q+kbCj6r3hwNlVvtk0XlZ0uR/gxEw87XMw0ynuJWd32opLe60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723692811; c=relaxed/simple;
-	bh=ERhNLA/iM5v1ARLOrtA/An1a4AW8+5QtZLhMpO8Tb0Q=;
+	s=arc-20240116; t=1723692874; c=relaxed/simple;
+	bh=LskeHLOxUMrtiYMaGkpeCFet1G2vmBnmWwbbwGmBjjw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QlyxwlXKgXIGAl/rAnjBPgEv30mTRyR4JQvWY38CferoTTAP8DBn88vLU5jCBJq3j/8gVfJqj50M9CeMcaCr+WzsME7LKC9d+C28Gf6hhdLbxFDXksOS2i3V1ZR6FwKdK9lT8gRcvkgNDlpR5nIHuK/FK/XQTQzuvX9+ZzvMeHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SITWaFlr; arc=none smtp.client-ip=209.85.160.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSNziwAWqFc1iCUTHd4darKz9WKfWx35g1G00xSMCbPmP1cThRQARHG2vgURo6qiaWWhfejdDBEq08AeDyiZvnwhj7eQks9tEHMmVetsL8QVKP2dKF+zEKjCrQl/sE4dURs5r80KniHddpt1zvdJVTgTFPOINsa4nDT0jGZDXQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CD2H0Ajp; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-25075f3f472so152197fac.2
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 20:33:30 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7c68b71ada4so453713a12.1
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 20:34:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723692809; x=1724297609; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ERhNLA/iM5v1ARLOrtA/An1a4AW8+5QtZLhMpO8Tb0Q=;
-        b=SITWaFlrnzymDRxer13Um3Kyu0TRRf23/6t54yegSmCT/IUcSBp7NO+WwYx+invzj6
-         6MHdk8RSUgOQv6ttQKSQMAwHttBw0Xoqub9W40tIdoRgEWNWTDFCfj3JLkU7gnmbaEjc
-         79rwDwh+jRN0sX8Vrcdf/nGWtrFYqVKwre+1lRaAVSah6hoc05Ea5Lytu4Ku/t+Hmb/t
-         WlArjJKPJnuw+arOCIY+R04XLa3m7+FWmnreqddEq4NVjkgZIyQE08rl6J0g1IQ60Fjl
-         3ASCGAUuRd8NZAplLIjZtSG4PJpzHOT/fjQZvpgFV6/P621lyOtQaHZOW5prcQHvv4En
-         BXFw==
+        d=gmail.com; s=20230601; t=1723692871; x=1724297671; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s+4/xunNrVBNIdFeNAHhM8gKhTcXGDAbnZ5oVytXM6c=;
+        b=CD2H0AjpaZg3kfzbfAJ70y5tjKATquiX4QslfXRRC3lzyFih/A+ws8i5sZbuNppyP+
+         Gjdnv4uLeTk5XrEUB62rayHTvyG9cz7DBjh9d2r5bxh0BIxE1JVSSYp80E8hjYKyo5Ky
+         JBV/gJqfodmn99d7LwOuyT8k5cu3gq5oxZf96XhbZFAQipcQ/dRdvNV1KRfrLd1139BF
+         KT1u24nTIeeRbNTknfyVF++whH6tej8e9LHRX2rjVHWDjtYbWWuRrQ4gtta7e3U+TA8m
+         5STSdl8sQ78eantbW3TgJHC2LKABw7CwrSnyo9dLpZlx4dkfS3CoSf9FbsisCVxPehzJ
+         FOqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723692809; x=1724297609;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ERhNLA/iM5v1ARLOrtA/An1a4AW8+5QtZLhMpO8Tb0Q=;
-        b=DZDtV0QiQuqQban3SmIKfb7WnOi4CmNxzCpkLqtZMQruCnbIPLsRDuORiS5mXs+hWC
-         AovblXOz8nAu4v4g0viAknSXKaK0Gjwh+EYXacF1qW3oGmTrPjnM2CgJwWRUgZpyMj48
-         dGkPxnBTUN3uWBKHFvONGxRhj2k3Dnqe8PsalwpE/5AnSHFwPnaSke7uZSFJ11NxjT3C
-         jcQM/2xN2bJVisoT2z5m2SapFtmGcFynvQMAZP+3ljUSzqjmQI+Jta1b5XS+4kg7ftHT
-         ezJ26IAO+HZ4klhd1FYbpKPCPtjQHUstTv25zVPTv5gHYwGXQSGwarQ3TUgsnXKTF/gv
-         qxiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrr7Hsxh5mKA+fhyoIjvlUUTAQe3J+s4H6rsVzWFogYlVIEEWd7trhsiWcU1a9uxL+mzIiB94=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjAvW39BbGGoSLZZCtqxdkLng76zMkElA76WB17jrP1FEd5Ljv
-	UJf1sk1joqliqG6zDgAMyI37iGUOakwmFBcRhqh1DD2/WQYUmyY/
-X-Google-Smtp-Source: AGHT+IFWq8LtR4q9qOsmfF3V1Bbd1ccx/O/TebsQb/GNXgRXtSLAFgqXKPT9gc9UM0/u1RQ2LY92Tg==
-X-Received: by 2002:a05:6870:56a3:b0:260:ccfd:b26f with SMTP id 586e51a60fabf-26fe5bf8677mr2870357fac.6.1723692809225;
-        Wed, 14 Aug 2024 20:33:29 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af1e773sm299210b3a.174.2024.08.14.20.33.28
+        d=1e100.net; s=20230601; t=1723692871; x=1724297671;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s+4/xunNrVBNIdFeNAHhM8gKhTcXGDAbnZ5oVytXM6c=;
+        b=OrC6sr8mqafKPhfy30FbobLB/0jUe4yI/ma77RxWJWaUaRKuYrIHZZGRfM0P+LFxYB
+         JS1c12DpNlpBGjjuNQRyab6pQ55EMp0lBnrR0YXxdcbiNNbamfz9r7dsFwF/IgCCK9dR
+         6seSei6Xd9avgnyVoEgEdUxuvXzdH/dQLF0AgEY/G5bPy7qGK4ooo5G+j/Vfvp/NWt1J
+         BZC4gR9c4yiqrRFS5ZsU3pYf06im8Ok+sC2OeZDY96rvwkvf2zoDZz8+nHYCXYKfl4XR
+         BwgOCfbhGiu64qU2rvpYE0BmqDc9DwVTnJ98m78FwMUf6ykuANgeLbsFY8UoQLcLjZXL
+         tImA==
+X-Forwarded-Encrypted: i=1; AJvYcCVc3wleZiEYs3sbPmwEWvKRqvS8tCHhdxgaxrbzzP3+70A90+HPkGXqpiVW7p0rHESqnX7QqvUiuLwORaeXPbgw5e4BmJ3B
+X-Gm-Message-State: AOJu0YxY0qs0L1dzNyfOt6q1jVN/7CsIeTPq44kkxUvO0bCxQ7gmz4nM
+	kXfSvMdlIkgQ/60dd139Kq1qhd8/XYeF3I2AqL6NXlJ45KHmz6Pn
+X-Google-Smtp-Source: AGHT+IH1fte05DP8k3ebLpinjySNfojjYbsMIW9vsnGDruTTPWAFUL3hktw9EWAhiBoRE+KZUvSckg==
+X-Received: by 2002:a05:6a20:6f08:b0:1c3:b16d:9ebf with SMTP id adf61e73a8af0-1c8eae6f45cmr6129429637.15.1723692870745;
+        Wed, 14 Aug 2024 20:34:30 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af416fbsm291379b3a.207.2024.08.14.20.34.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 20:33:28 -0700 (PDT)
-Date: Wed, 14 Aug 2024 20:33:26 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Maciek Machnikowski <maciek@machnikowski.net>,
-	netdev@vger.kernel.org, jacob.e.keller@intel.com,
-	darinzon@amazon.com, kuba@kernel.org
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <Zr13BpeT1on0k7TN@hoboy.vegasvil.org>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+        Wed, 14 Aug 2024 20:34:30 -0700 (PDT)
+Date: Thu, 15 Aug 2024 11:34:24 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"andy@greyhouse.net" <andy@greyhouse.net>,
+	Gal Pressman <gal@nvidia.com>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net V3 1/3] bonding: implement xdo_dev_state_free and
+ call it after deletion
+Message-ID: <Zr13QBes8L4i1Kvn@Laptop-X1>
+References: <20240805050357.2004888-1-tariqt@nvidia.com>
+ <20240805050357.2004888-2-tariqt@nvidia.com>
+ <20240812174834.4bcba98d@kernel.org>
+ <14564f4a8e00ecfa149ef1712d06950802e72605.camel@nvidia.com>
+ <20240813071445.3e5f1cc9@kernel.org>
+ <ad64982c3e12c15e2c8c577473dfcb7095065d77.camel@nvidia.com>
+ <ZrwgRaDc1Vo0Jhcj@Laptop-X1>
+ <e7ee528b3db5ba94937ca6c933f9060e32f79f3d.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e7ee528b3db5ba94937ca6c933f9060e32f79f3d.camel@nvidia.com>
 
-On Wed, Aug 14, 2024 at 03:08:07PM +0200, Andrew Lunn wrote:
+On Thu, Aug 15, 2024 at 01:23:05AM +0000, Jianbo Liu wrote:
+> On Wed, 2024-08-14 at 11:11 +0800, Hangbin Liu wrote:
+> > On Wed, Aug 14, 2024 at 02:03:58AM +0000, Jianbo Liu wrote:
+> > > On Tue, 2024-08-13 at 07:14 -0700, Jakub Kicinski wrote:
+> > > > On Tue, 13 Aug 2024 02:58:12 +0000 Jianbo Liu wrote:
+> > > > > > > +       rcu_read_lock();
+> > > > > > > +       bond = netdev_priv(bond_dev);
+> > > > > > > +       slave = rcu_dereference(bond->curr_active_slave);
+> > > > > > > +       real_dev = slave ? slave->dev : NULL;
+> > > > > > > +       rcu_read_unlock();  
+> > > > > > 
+> > > > > > What's holding onto real_dev once you drop the rcu lock
+> > > > > > here?  
+> > > > > 
+> > > > > I think it should be xfrm state (and bond device).
+> > > > 
+> > > > Please explain it in the commit message in more certain terms.
+> > > 
+> > > Sorry, I don't understand. The real_dev is saved in xs-
+> > > >xso.real_dev,
+> > > and also bond's slave. It's straightforward. What else do I need to
+> > > explain?
+> > 
+> > I think Jakub means you need to make sure the real_dev is not freed
+> > during
+> > xfrmdev_ops. See bond_ipsec_add_sa(). You unlock it too early and
+> > later
+> > xfrmdev_ops is not protected.
+> 
+> This RCU lock is to protect the reading of curr_active_slave, which is
+> pointing to a big stuct - slave struct, so there is no error to get
+> real_dev from slave->dev.
 
-> So the driver itself does not know its own error? It has to be told
-> it, so it can report it back to user space. Then why bother, just put
-> it directly into the ptp4l configuration file?
+It's not about getting real_dev from slave->dev. As Jakub said, What's holding
+on real_dev once you drop the rcu lock?
 
-This way my first reaction as well.
-
-Thanks,
-Richard
+Thanks
+Hangbin
 
