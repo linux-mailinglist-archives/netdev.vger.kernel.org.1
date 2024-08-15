@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-118734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C660952955
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 08:25:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA05952957
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 08:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB00D285F32
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 06:25:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5ECBAB25336
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 06:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4023D177980;
-	Thu, 15 Aug 2024 06:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098B417838C;
+	Thu, 15 Aug 2024 06:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pJK9uc/Q"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ryQFGrMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2069.outbound.protection.outlook.com [40.107.237.69])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2053.outbound.protection.outlook.com [40.107.236.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50D853365
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 06:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E05F176FA2
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 06:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723703106; cv=fail; b=K1KvN5b5dLnjsSzW5I3TNtqiYLYP8dbhIICm5ojb42d7AqczDAUgKDfL4MKE4Rgnz6X/76iLGIsUvdF8j3wWXkCKmRxZ4/erIpsmrc/JgzOmCJfFFvezNw1CGWhTH3c3zSKUCRd11FOp6sP3XUjrihGT6reWt9ahnHhNVUS0Py8=
+	t=1723703112; cv=fail; b=qRgYZjyeYgkVFV+L+sIRx2m6xv3fywFo0VJKqnppObDb8ZIk2OxCojdvvU91p2ujiKx7vETrrH4hMEuuKXe6e0LI4ynnhyHwazsbX+XX7zLF5JpsD4eIjpObj4YXs7QRqZv+DqjqluezRv0o2YOLQo42KRrdvMoV0GbwYYUO0Ho=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723703106; c=relaxed/simple;
-	bh=3qLR1HOzA7KXGPzPHs9IllVyCNzs+3ovsPUATPBYLJg=;
+	s=arc-20240116; t=1723703112; c=relaxed/simple;
+	bh=uskiWukM+M3TVU+rZ6kxlMLLssI+Wfm1Q5GeRyFkpp0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fjK/2ggGiH3NnpAnnTOlRSKLFmT5PBgMteiJINvzdJYjDBEKUnyvquRFVIno+m/MDNnHXnSYfGilFT4sf8ymeqZkL0mpGukOmFvqpNwWWfkqlHu+ZXSyrc+15SlKMd9WwjQCwD7x5nHD1Y4b5e/y4Un7bm6BtlC/kyAlhQcGhrE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pJK9uc/Q; arc=fail smtp.client-ip=40.107.237.69
+	 MIME-Version:Content-Type; b=O6ZeFR4R3EuTKySQ/EY9jHv8ZeJlD325ilfkNUxGZ+LRshpkDNLradfJDes1DVKg9Gg9T1dc0LKJCmeucaGln0NEY2euu3cieKnPM+fzkDH6xnuQa9mBnQ4PFgWPvyLUnipBAzUEUqrf1wVFAxseC5ClmERraApUXAGxHtNfMn4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ryQFGrMM; arc=fail smtp.client-ip=40.107.236.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dHf2TCvkU8Wy0XfgfnCjE8tZyAjNPG2dZq6uJ5DwVh6wetXBE5CVgdKiMEDY9hUe6HcPDuPnc/mbsAeoVx8CKMk7v2+VvFFx9W2jCVdRl3sBcFI2ejb271cyljHATpdQ81v10/v63/7/yhz8TOYrS8546mGym3YEgO7g8WC63BX9u591vcUI/C/J4SIh9jc5j6lJuE3GUCD5U3T7lGuLfw1qA7bRKa/R1PZlWHahsDSNtU54SRKK43rs6ld8z+gPIGzR2gupKcsQytLrUqMrKCtcDnjT7WEWE0cbEiIwtUHJ9WauII1IE1fFEQMe/buZ2ck+k5e0/PHhbAWb8jwEoQ==
+ b=qI5WVRH3c0oJIzvhwpcif7pwhP+VLhsR+uLgSrZ4a7h7dgp5b6Ft3OLrJV+2uGMuhFXZaabTMWsbaqwXiAjzhTBW1gUksboxpN2fbpfBMHVt60aqUAb2n9UraOR5Jy6BTqfK/dRkX9vTX5vgI1rnujzRXz1ux+rgVr7auhO7goV1+zLLv8IXRfP7vdiZnjuU05L5yglah1TAmmAkqPabG49GzNyAJxPDrPLmw7EZnO/ADbHj7+jlK1JGBArxkQm/r3KrGmu1ubr3mX2PWEkZq1x4RWLCLEFm0vyYpXje98rg8AnMVDBWTmSdX3dWDUUfpToWsggbiYQQW3vpN9bo3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LqdNv4xduBCzwabNZTwSsZsQNC6fZXLLBnCrxvKFGwQ=;
- b=oeS2yyVf8DB+qmLPd/WZ4HjW/eF9Xjo0yJWhmKPHSZWv67gaUVDsxO3xMmaTdw67aeckotdy0JDprprOBuuII/Qdkc3S1HSMlC3nKhD63duEsSmBYKITFlwyHeOJ3wnm9Qh2k94nQoQ5B9AFffp457mfS1okCl5uB2UKk09uA9BOjcutl9iIVh0CWbTnJvaCUoJvTyAL2PToKfHNeySOYOgJQnVt36eKY1efK8RskuV7nR6WIoN8zSdTwD5gYelTtoMYebKyWgf0400S6wwf5ZGGr/7AQu+gV2rmaJY8ft3zyDQvpbBjTFKe1Y3L2KGUyd2/L4uUZHn2qCCw6S5U8Q==
+ bh=4yRNU2yc1MeixEpUrqMoY0hLv9tT1Q0wGITbp62jifs=;
+ b=IH1qt20bdiLzBikx4KeKFAD3b6qi1ScqQcEVVZq5VmPJNy3x2jUnKcS1N1M8GF2xMP19j+Vp4jCHa0ZlYJjsceHiMj8RNQQT4Iml5CZhUI30+Bfz2LsS+Ty0yXwiElM7NnZrTtr6LUpISbbnHFy+QLC90aAJq9WCMLK4lgjFRxUhILoAHoM0Q6F3riySJ2Sd54vSA35JI5UBfbptiGuJOzPC0oiViCfUv1qwpdjWafatUJBtqiKx1oC4aifPJHFwv45QDsJ09nNpXB8+8zb3SwNBwq0UqafZF6IFw0OTmchGMdXSWG2p70/oP0cTBptyJPGqMU3O/QqO4RYj+/A9gg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LqdNv4xduBCzwabNZTwSsZsQNC6fZXLLBnCrxvKFGwQ=;
- b=pJK9uc/QZJs2fZJPTbC6jk4fCZMDKR0hyT0PVSC3oO8skjVErihKaVUvPUa6eE+rTgrMsFRRe6pKrqus8FS9GcMUJOP8NnpmWrge8DALx4OIN6/NyKvQPImeZ0MpL9uiu4yEyrGMzeQxKtEWoRdASv1VdFRs02EuQA+kf7AqgaZB74msTUYmJQJ8slZc8n12aF1os88xihNG2HEtyzdxJuDDQ1R6YGWr5NGvcUXccXMbIXn0BpQD2PcVbdNn3msMkg3Td7kVSZREhYXPGdWFlmG4+M2sZUMckwansaXpz1YdNvJ9gymGgGUXzR+DKmPDs8CQi1RwvD0XeK7jK4mUNQ==
-Received: from BN9PR03CA0774.namprd03.prod.outlook.com (2603:10b6:408:13a::29)
- by DM6PR12MB4281.namprd12.prod.outlook.com (2603:10b6:5:21e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Thu, 15 Aug
- 2024 06:25:01 +0000
-Received: from BN2PEPF000044AB.namprd04.prod.outlook.com
- (2603:10b6:408:13a:cafe::40) by BN9PR03CA0774.outlook.office365.com
- (2603:10b6:408:13a::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.33 via Frontend
- Transport; Thu, 15 Aug 2024 06:25:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ bh=4yRNU2yc1MeixEpUrqMoY0hLv9tT1Q0wGITbp62jifs=;
+ b=ryQFGrMMjkuviJxG99f07S7zVqwJX2s8SgJkdlsdQ+wx47SakibdOu9jgDBFXqmjujRySyNDbT2IGM7AApxisUwQSpFptemJbplJF/tUv7a/teWrKH/mLYpsS/1vOAXlrXtH7XFYn0ykZttX+ICGxtWKuMgMMkQ51GLHpoYRVxf+HhTCmPq9g34pY63sRSjzgpe33FOFhlyR0N2bhlpx18JXi3OnLz3z0Ar/Cxv2W1lxEJ1KuOHSloM1pdq5Ag1W8Gp7EzTH3XNzVuao96QPN1sAGt2BrByFXBFqJBz+E+QuuhG2vtpDZ5GMyWCFwDfqz18srUgNlB9uy8vXxdJTCA==
+Received: from BN0PR02CA0057.namprd02.prod.outlook.com (2603:10b6:408:e5::32)
+ by DM4PR12MB6469.namprd12.prod.outlook.com (2603:10b6:8:b6::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.23; Thu, 15 Aug 2024 06:25:03 +0000
+Received: from BN2PEPF000055E0.namprd21.prod.outlook.com
+ (2603:10b6:408:e5:cafe::b1) by BN0PR02CA0057.outlook.office365.com
+ (2603:10b6:408:e5::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.23 via Frontend
+ Transport; Thu, 15 Aug 2024 06:25:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN2PEPF000044AB.mail.protection.outlook.com (10.167.243.106) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN2PEPF000055E0.mail.protection.outlook.com (10.167.245.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7849.8 via Frontend Transport; Thu, 15 Aug 2024 06:25:00 +0000
+ 15.20.7897.4 via Frontend Transport; Thu, 15 Aug 2024 06:25:02 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 Aug
- 2024 23:24:41 -0700
+ 2024 23:24:44 -0700
 Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 Aug
- 2024 23:24:40 -0700
+ 2024 23:24:44 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
  with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 14 Aug
- 2024 23:24:38 -0700
+ 2024 23:24:41 -0700
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Shay Drory
-	<shayd@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next 08/10] net/mlx5: Add NOT_READY command return status
-Date: Thu, 15 Aug 2024 08:46:54 +0300
-Message-ID: <20240815054656.2210494-9-tariqt@nvidia.com>
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next 09/10] net/mlx5e: SHAMPO, Add no-split ethtool counters for header/data split
+Date: Thu, 15 Aug 2024 08:46:55 +0300
+Message-ID: <20240815054656.2210494-10-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240815054656.2210494-1-tariqt@nvidia.com>
 References: <20240815054656.2210494-1-tariqt@nvidia.com>
@@ -101,115 +100,161 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044AB:EE_|DM6PR12MB4281:EE_
-X-MS-Office365-Filtering-Correlation-Id: c345f131-d35d-46ca-5fc6-08dcbcf2fdf8
+X-MS-TrafficTypeDiagnostic: BN2PEPF000055E0:EE_|DM4PR12MB6469:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4435c1bd-0ca2-47d4-fd4e-08dcbcf2fed0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7JHMAg9jrtjmHIyLwF2xtj2JbVMv6b0kHVaA6xlt/5jIff9yYlmsY67E9k/7?=
- =?us-ascii?Q?bNSHGVhF2s5OIxiXvz31FMGVea8kU0vwtda9XSbHyD79NjV+Yg9AIvB881QT?=
- =?us-ascii?Q?AjDji/ks2jGZmUveWqTEij5rcsHSJn6rLsaR9cXGkMy5BgNVHg4J+3ZbdMUM?=
- =?us-ascii?Q?+leHTi5cIGJQGtgD5uhWUhKGNo+DS3mcWI2OKbzZPSxYufVI/6d75mlybbQO?=
- =?us-ascii?Q?64nVrp5+x1XPLQC9SLgshwnX6/YN6o+ZlegJsTicpI4cp+RQ+h0jNYbP4Z8p?=
- =?us-ascii?Q?+cOoqZsUPB0POep1cClPGxK/WA+D43qyZiHSLmYIvJmTy0jDfdd4vBzRbabH?=
- =?us-ascii?Q?5fdKY9RlRlsnceP1MmADdGyPjOYhKkg/onmnxoWZSLHTEMacVtMsXGg7XX35?=
- =?us-ascii?Q?xx+KrQNYoV63RNmlTUVmB6IdLIQlP4Qn6LhZeBtSoNA/f/TGYRowNFJZY7i1?=
- =?us-ascii?Q?sUHQvOmwEdsJJ8c1On+vJXsZ8o7wwZRsOc7skdCAsyvf5AeWFloRuS6s+7c9?=
- =?us-ascii?Q?mmSueifdE72fsu0AnxAc43KgQxdD+MEPvT3ZFVoAqHBPpXFRBoanPFKG+ul+?=
- =?us-ascii?Q?76vnEi3YUuxszRxbkGeMdEfUoxaKKx64jDI1St6Lh09XgX2OBiUnqQDH6Swy?=
- =?us-ascii?Q?TOphysuSqc7FvfuLMcs5t4TaHsfGwXhblelM+tKgfMd1enZqBFGnHu+XMPpt?=
- =?us-ascii?Q?XuuD4p1pvOJvQPlbLJIRBfdqCederco0bK7IrAuvvigIhT5MLTqAYaFhu5Cb?=
- =?us-ascii?Q?4snZ3mh9ja1DWKomSxmBjKi1feGcCmEnlkir898bJmQy0FzlQnjo4l0IBFk8?=
- =?us-ascii?Q?xAi0YmgUrso1bHzJ8/LtJKO4FWW8GEMo1aEwS2ZBRx2Gv8nCfuB+aJ2UoaOa?=
- =?us-ascii?Q?vvb/u0td44QXff/QAOTJrlHqmpjbq3obqBFCLSiskZ8YN6tIUu9ehbCboatX?=
- =?us-ascii?Q?BqJxoocSfaXomzhvWT6Vt9eMjTHuHlypW8Asm3w2gf0TvlBOxTfqJwQFQviz?=
- =?us-ascii?Q?xkJHBt1/3WKz9gcsJF6oqE67krJ47ZM1UkCLfeH9dWea0xAB3YBXoj/ema1W?=
- =?us-ascii?Q?ARoS0nkRRMhsk35oxzoCq+2lrZ2kfyY0m9jEHBXQ0wkJGXe/ZT04D+JIoHPr?=
- =?us-ascii?Q?YJ7Fhpn7FLrBVKcf4X3DwM8TNCdCJldc2WuEGU24ZGN7FuD0B+okCmWDkdsL?=
- =?us-ascii?Q?cgolbWjbYxd0sajcadHxXNshJ1UzJSVVnGxoCC97dxRjT12FxP+eGJf3izGC?=
- =?us-ascii?Q?42Gb6xuCbZKuswnZ8mtnFxMKo3wTdDdOTlDwXfmhPqGVhp6vqcMZYjLEMea2?=
- =?us-ascii?Q?11P8hRR092iGBzNG/HYvrK1Hpnb4GO1GoCWpJBS5l3UJheXzcQdGKvC394if?=
- =?us-ascii?Q?RkOeHgCMvYlRQxgFrH1XntC9449mBVJ3pHNJGjKr5UBopft5sfgYiCewnj2f?=
- =?us-ascii?Q?1FbBscw/PFbRGWWCmMFFe7vL+PoD9Dwz?=
+	=?us-ascii?Q?pTiidSJiHj5KTM1D1aravYpxXmSt8a2/t1RdDRoXplNc46JRyP4HZVTSi9r6?=
+ =?us-ascii?Q?Od/iaJwhgKsnsEGvf2TfwwekCM+UmB0DQA0bMeKzB/rZTCYztjGvOUDy/n1p?=
+ =?us-ascii?Q?aHlAQ2zIehL89DNs1koeoTz5SLh7mI0vAgVF2jy6DTrBzM3IciPTY30fDNgA?=
+ =?us-ascii?Q?b6d2/zUNZQUabD/IkIaMFKJN5/4aizD4IhJvshm1XfWqWtWJG4MZGdapJkxG?=
+ =?us-ascii?Q?4u4uchqyCc3kVO9beeJcX0v5iflV1/A/A7fdlTArVj0bNzH+Iw8Suenypnz4?=
+ =?us-ascii?Q?SRvHjV04+GQUrgx5zPaTC+I5YcUV4YRfNPzh+XZD5xWUxhbM8Uh4VL4OMOB2?=
+ =?us-ascii?Q?kS+fdwvCwK9dVaRHi/2ajUOugKV+i3SDF9T2I0Op8rGwkW/+CQR/0sxHkdr2?=
+ =?us-ascii?Q?sOwsyGdRXmruNYDXig1oKAIoi8DN17b67usdx9r1VLmNvJ56GMHtW+XgcOs4?=
+ =?us-ascii?Q?MZf85iPAUPNY/lMoOcjHlmZQOm6oO6cOQIgnI/F4FUGFyB+zKLamDE7ksRfG?=
+ =?us-ascii?Q?3por5OtpweUwUUnDHGLXYFeSvPMP2bdgoERVLOypDvqdRDQBC+nfsu9GjU5g?=
+ =?us-ascii?Q?CUAO+XjPwRYFNxTJY7jW8tOOqKJPbmzmJCuf59+G6m4rBKkroO456vmn2IG8?=
+ =?us-ascii?Q?sPFJ4NsKvj8yqNkmbDjkVwkHTwLiHBfehCmn1HEnRx+QXENCz3RuRoMeUM9/?=
+ =?us-ascii?Q?5Ee+Lgb/g9dqEyLFRvvW0AB9ADqH3hp8Q50tLoR3soFE4yyEA644EgM6tiS6?=
+ =?us-ascii?Q?4GHwI+PCTn/vPxGne8P1vv8fA33pwD9Fwh3qrnSClg6XEPoCZxgTvVSaxCVH?=
+ =?us-ascii?Q?PiqO/MIds+x+T08wm3Bhm5aHkSrVktc+QGdWA+feD3OoWXb+lM2swf9/nm88?=
+ =?us-ascii?Q?5lu2LXJLtwBXTgMVVcqN7AWmMzIk6cQ2UQ8XsHEuNZPs0tG/HfJH+TjjEZar?=
+ =?us-ascii?Q?s86nukmPl3jgSuiOt/GkWLG3SJvDYy/uIe8Us6k5cyDWSqxukC6ZivB6duoG?=
+ =?us-ascii?Q?urNQ3SLiiIvilR+VYvbiaHLKq3uxdzJIOXHbc12eM6uSlTHUZpJa8YVYFvga?=
+ =?us-ascii?Q?U9Msv7qYqsfB+2V8yGHyvgrReCBTzg/1kmOzx0ODirsrCPTPsu5nFtoezdpR?=
+ =?us-ascii?Q?/7MrR9U2PB81TjkDdaD4jAf+D3/NmoUQUTzM/lTQl8Zqjay4Q/HId/pi8Rm3?=
+ =?us-ascii?Q?6TpK8xzIuG81BhivXqYbxRsgS/0TYg4LERTWtrAwdkkRhrquh52R7H65CmK2?=
+ =?us-ascii?Q?p8V+rGJ9REbeseH22kztkjH+Cnbz3zSjkPHYbfmSG88nEzt5/XYI6i/RJDpN?=
+ =?us-ascii?Q?LeqNTz0HniMBj9tkYfD7QJktRetmJLLc+FPl+1Rs7vTMsFGIKgLxSQF4Vbmy?=
+ =?us-ascii?Q?bRO8nCYrR1ct+DzFG8KSQxT4v6bDD+/C7P/cetha//m1yW3knocvbgkjb4ev?=
+ =?us-ascii?Q?QA4f/OIXQNbABnXRt9D3MTXEg78uHwDW?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 06:25:00.6444
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 06:25:02.0640
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c345f131-d35d-46ca-5fc6-08dcbcf2fdf8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4435c1bd-0ca2-47d4-fd4e-08dcbcf2fed0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044AB.namprd04.prod.outlook.com
+	BN2PEPF000055E0.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4281
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6469
 
-From: Shay Drory <shayd@nvidia.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-Add a new command status MLX5_CMD_STAT_NOT_READY to handle cases
-where the firmware is not ready.
+When SHAMPO can't identify the protocol/header of a packet, it will
+yield a packet that is not split - all the packet is in the data part.
+Count this value in packets and bytes.
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 7 ++++++-
- include/linux/mlx5/device.h                   | 1 +
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ .../ethernet/mellanox/mlx5/counters.rst          | 16 ++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c  |  3 +++
+ .../net/ethernet/mellanox/mlx5/core/en_stats.c   |  6 ++++++
+ .../net/ethernet/mellanox/mlx5/core/en_stats.h   |  4 ++++
+ 4 files changed, 29 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index 20768ef2e9d2..9af8ddb4a78f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -754,6 +754,8 @@ static const char *cmd_status_str(u8 status)
- 		return "bad resource";
- 	case MLX5_CMD_STAT_RES_BUSY:
- 		return "resource busy";
-+	case MLX5_CMD_STAT_NOT_READY:
-+		return "FW not ready";
- 	case MLX5_CMD_STAT_LIM_ERR:
- 		return "limits exceeded";
- 	case MLX5_CMD_STAT_BAD_RES_STATE_ERR:
-@@ -787,6 +789,7 @@ static int cmd_status_to_err(u8 status)
- 	case MLX5_CMD_STAT_BAD_SYS_STATE_ERR:		return -EIO;
- 	case MLX5_CMD_STAT_BAD_RES_ERR:			return -EINVAL;
- 	case MLX5_CMD_STAT_RES_BUSY:			return -EBUSY;
-+	case MLX5_CMD_STAT_NOT_READY:			return -EAGAIN;
- 	case MLX5_CMD_STAT_LIM_ERR:			return -ENOMEM;
- 	case MLX5_CMD_STAT_BAD_RES_STATE_ERR:		return -EINVAL;
- 	case MLX5_CMD_STAT_IX_ERR:			return -EINVAL;
-@@ -815,14 +818,16 @@ EXPORT_SYMBOL(mlx5_cmd_out_err);
- static void cmd_status_print(struct mlx5_core_dev *dev, void *in, void *out)
- {
- 	u16 opcode, op_mod;
-+	u8 status;
- 	u16 uid;
+diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
+index 3bd72577af9a..99d95be4d159 100644
+--- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
++++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
+@@ -218,6 +218,22 @@ the software port.
+        [#accel]_.
+      - Informative
  
- 	opcode = in_to_opcode(in);
- 	op_mod = MLX5_GET(mbox_in, in, op_mod);
- 	uid    = MLX5_GET(mbox_in, in, uid);
-+	status = MLX5_GET(mbox_out, out, status);
++   * - `rx[i]_hds_nosplit_packets`
++     - Number of packets that were not split in header/data split mode. A
++       packet will not get split when the hardware does not support its
++       protocol splitting. An example such a protocol is ICMPv4/v6. Currently
++       TCP and UDP with IPv4/IPv6 are supported for header/data split
++       [#accel]_.
++     - Informative
++
++   * - `rx[i]_hds_nosplit_bytes`
++     - Number of bytes for packets that were not split in header/data split
++       mode. A packet will not get split when the hardware does not support its
++       protocol splitting. An example such a protocol is ICMPv4/v6. Currently
++       TCP and UDP with IPv4/IPv6 are supported for header/data split
++       [#accel]_.
++     - Informative
++
+    * - `rx[i]_lro_packets`
+      - The number of LRO packets received on ring i [#accel]_.
+      - Acceleration
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 225da8d691fc..1db26a2f237b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -2340,6 +2340,9 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 			stats->hds_nodata_packets++;
+ 			stats->hds_nodata_bytes += head_size;
+ 		}
++	} else {
++		stats->hds_nosplit_packets++;
++		stats->hds_nosplit_bytes += data_bcnt;
+ 	}
  
- 	if (!uid && opcode != MLX5_CMD_OP_DESTROY_MKEY &&
--	    opcode != MLX5_CMD_OP_CREATE_UCTX)
-+	    opcode != MLX5_CMD_OP_CREATE_UCTX && status != MLX5_CMD_STAT_NOT_READY)
- 		mlx5_cmd_out_err(dev, opcode, op_mod, out);
- }
- 
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index a94bc9e3af96..d0f7d1f36c5e 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -1449,6 +1449,7 @@ enum {
- 	MLX5_CMD_STAT_BAD_SYS_STATE_ERR		= 0x4,
- 	MLX5_CMD_STAT_BAD_RES_ERR		= 0x5,
- 	MLX5_CMD_STAT_RES_BUSY			= 0x6,
-+	MLX5_CMD_STAT_NOT_READY			= 0x7,
- 	MLX5_CMD_STAT_LIM_ERR			= 0x8,
- 	MLX5_CMD_STAT_BAD_RES_STATE_ERR		= 0x9,
- 	MLX5_CMD_STAT_IX_ERR			= 0xa,
+ 	mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index e7a3290a708a..611ec4b6f370 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -144,6 +144,8 @@ static const struct counter_desc sw_stats_desc[] = {
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_gro_large_hds) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nodata_packets) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nodata_bytes) },
++	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nosplit_packets) },
++	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nosplit_bytes) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_ecn_mark) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_removed_vlan_packets) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_csum_unnecessary) },
+@@ -347,6 +349,8 @@ static void mlx5e_stats_grp_sw_update_stats_rq_stats(struct mlx5e_sw_stats *s,
+ 	s->rx_gro_large_hds           += rq_stats->gro_large_hds;
+ 	s->rx_hds_nodata_packets      += rq_stats->hds_nodata_packets;
+ 	s->rx_hds_nodata_bytes        += rq_stats->hds_nodata_bytes;
++	s->rx_hds_nosplit_packets     += rq_stats->hds_nosplit_packets;
++	s->rx_hds_nosplit_bytes       += rq_stats->hds_nosplit_bytes;
+ 	s->rx_ecn_mark                += rq_stats->ecn_mark;
+ 	s->rx_removed_vlan_packets    += rq_stats->removed_vlan_packets;
+ 	s->rx_csum_none               += rq_stats->csum_none;
+@@ -2062,6 +2066,8 @@ static const struct counter_desc rq_stats_desc[] = {
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, gro_large_hds) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nodata_packets) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nodata_bytes) },
++	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nosplit_packets) },
++	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nosplit_bytes) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, ecn_mark) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, removed_vlan_packets) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, wqe_err) },
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+index 4c5858c1dd82..5961c569cfe0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+@@ -156,6 +156,8 @@ struct mlx5e_sw_stats {
+ 	u64 rx_gro_large_hds;
+ 	u64 rx_hds_nodata_packets;
+ 	u64 rx_hds_nodata_bytes;
++	u64 rx_hds_nosplit_packets;
++	u64 rx_hds_nosplit_bytes;
+ 	u64 rx_mcast_packets;
+ 	u64 rx_ecn_mark;
+ 	u64 rx_removed_vlan_packets;
+@@ -356,6 +358,8 @@ struct mlx5e_rq_stats {
+ 	u64 gro_large_hds;
+ 	u64 hds_nodata_packets;
+ 	u64 hds_nodata_bytes;
++	u64 hds_nosplit_packets;
++	u64 hds_nosplit_bytes;
+ 	u64 mcast_packets;
+ 	u64 ecn_mark;
+ 	u64 removed_vlan_packets;
 -- 
 2.44.0
 
