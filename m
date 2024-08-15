@@ -1,122 +1,105 @@
-Return-Path: <netdev+bounces-118687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C473395276A
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:11:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE70C952779
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F85BB230F5
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 01:11:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AA901F221D8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 01:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0D910FF;
-	Thu, 15 Aug 2024 01:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="G6NBdMSE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1EA18D645;
+	Thu, 15 Aug 2024 01:21:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C2E53AC;
-	Thu, 15 Aug 2024 01:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F230E36D
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 01:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723684273; cv=none; b=AWEdvn7OStwiwIbZ3K2E2RLCpoc5vKAwrzY1S7b76P6rJ4SxRrMnpnkiQUcDsEqgNAF5u98pRUiyIgMBGR5kAaKCj4lZ0PhV0U316xzk6ku1majbruUU+lsWMo1HKeCk1TBj3qzQ//eo/udf76CqaHsf67dWKipKD2WNbK4lhVI=
+	t=1723684876; cv=none; b=As0J0DZZTXpTe+MYchsieAnY7WF9s6BIRIkfSXxQjf1NZmNMncOIJQFKJOB9U/zRiTTakJFWPZ3Ogd5/tY1ecC11ezVWp2IGXEgJuwqZyWa90x5Vc7G/MhJewwbvT836PZxTeJVb/TDbL3gjh50rsApN/djwCWahVm6krrdCSJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723684273; c=relaxed/simple;
-	bh=dcecRVPjLIngGI1RLxMq5/GH4z1JjDZM6eoc+0xvyc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nIl8MfceaasKMDaG5M/5uGfXwMCEsu3CNfXc6WQHUuKIHuZu6ozg4rW14210e+hiAy6zv9uaAtip9GrsKdXFMJ4xsFs+HKn6FPgOPKljHT9wpmAcfJ4ikl26JSznjwhd29RiR/ukIbPo2xQ9eyQdQqZ6Q7G85ryeIeEN/QiaBdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=G6NBdMSE; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1723684270;
-	bh=dqMqyY5BdvgE4KGngVIuwXBI5jdKPLu5bwHVc7uCeV8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G6NBdMSEWv7wZh13H6FyFH6cv7wpTfSuvXCPo4Q/s8zrZKxA17GL8kvPT7nYTerE/
-	 JOWpkg3b/vGBQbKwKHZInFWr107imDQa+8hxZyNL4f+LjrkeoKwSKx0SBoH9AGfR7U
-	 mPoK14C9czlUN5uQBFcOVEebmM/wDTOxk21jo7uSacPNBemyGtScWuwK9bs/3Jchi5
-	 khOEFycDvu/2k0YIvPCroYl8rKlMY/ZJE9AQm0Tp8FApkJb+MO6l0BysC17Gx5BtKz
-	 7dAigZZMEDqCs7G+HX7GoZPNK/xYD9tGrInx9APyS/kB+1IMDj9ezg9AG4b+3CIejp
-	 XbZcX6blvYXXw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WknBP4Swvz4wp0;
-	Thu, 15 Aug 2024 11:11:08 +1000 (AEST)
-Date: Thu, 15 Aug 2024 11:11:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Frank Li <Frank.Li@nxp.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- imx@lists.linux.dev, Eric Dumazet <edumazet@google.com>, Rob Herring
- <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "open
- list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, "open list:OPEN FIRMWARE
- AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>, Ioana Ciornei <ioana.ciornei@nxp.com>,
- Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v3 1/1] dt-bindings: net: fsl,qoriq-mc-dpmac: using
- unevaluatedProperties: manual merge
-Message-ID: <20240815111107.15bfbf93@canb.auug.org.au>
-In-Reply-To: <6b5897e7-1bed-4eb3-8574-093db5dea159@kernel.org>
-References: <20240811184049.3759195-1-Frank.Li@nxp.com>
-	<6b5897e7-1bed-4eb3-8574-093db5dea159@kernel.org>
+	s=arc-20240116; t=1723684876; c=relaxed/simple;
+	bh=Hb3X4riTxNkNCGjBLuPrCPRcXoa2jIrWSholPAoh3Io=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=dJlUEfAn9tKF8VVvw9EKzQUWvOw63BTct6/PwFhuUqAFZAn1Qt8Uz/1R8nO6RF2CX+QBoYKgOdUwF4HDB8xwqCSEPN9Ff9I0d1Y8ocEP5Fk5Rj0y4bjDSdP0lqvhn0YJhxE3ANy1I5sxPo4bWOd3Al3esc6V0I5GEnClAi/kNfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39b3245b20eso3787575ab.1
+        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 18:21:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723684874; x=1724289674;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hb3X4riTxNkNCGjBLuPrCPRcXoa2jIrWSholPAoh3Io=;
+        b=qWX/GX81j5PGBGNGvsw6YDTXxh4C9qQuM55vrJwPgKqex1kbsGX71yPJ77Tk47MBVn
+         wMOPfkwydOBg9dVibTMlLUGqJCuoQ6x1Uiaeqlgo6lujEq+oY8qREYRFLmPU7+XuPt2x
+         +/xcMRA8RTa4FSERhax9O4iu5VksknOPB54xu/wgBn75q7EQMsYam874kSxlTxwcvHkJ
+         Cq0wQMpWmaeTEZ6R4CJbMUFPq/VtCDdwqFVPC9hEORspLzBsfJJvCSfUEJDhvVKcLY5g
+         frIYtLNzajPk8ZNxVqGoxKOhonufexrMDttVIXmNftjKQAExE9LOzr4P7sG/0UO4qt07
+         hwUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWpst8vE7cTWw66+ZO/oil581lK9u2vaoIoJQD9LB/Sjwcj4y+30ZylEsQ6PUvCZqWzNI1pSb35yz5ckiJXtXcLXAksx+d
+X-Gm-Message-State: AOJu0YwfGc4Bp7AgvjkEL20dNCcME07MlDcsv2fNXG4pElWXf0TiUseE
+	zGDR+WOXjAjWs9rNznFrvTfKVNfdqov55v2q4aina2FBwVIZ+rnfhY/o+q2udZgP7lqCq0FRkM0
+	eN8bbX83EilesikJznvOjvTWYxm3s94yLRT5rk7XrU/wqwlXPquMOTrw=
+X-Google-Smtp-Source: AGHT+IE1L+cIMMAFHcc0Wx8kcH60VX5XGrnjTgUDbjMF+9tGU9/HcW1WoLcbwHPNqV8SKgFyweHjql3dcF+ilk3XSi+FpZYWPhcz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/aPD.HFt93=D=+W9o/EKyCJQ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Received: by 2002:a05:6e02:2181:b0:39b:c00:85aa with SMTP id
+ e9e14a558f8ab-39d1bd3bb90mr881145ab.0.1723684873954; Wed, 14 Aug 2024
+ 18:21:13 -0700 (PDT)
+Date: Wed, 14 Aug 2024 18:21:13 -0700
+In-Reply-To: <000000000000ac237d06179e3237@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009df8df061faea836@google.com>
+Subject: Re: [syzbot] KASAN: slab-use-after-free Read in htab_map_alloc (2)
+From: syzbot <syzbot+061f58eec3bde7ee8ffa@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	houtao@huaweicloud.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/aPD.HFt93=D=+W9o/EKyCJQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This bug is marked as fixed by commit:
+net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc
 
-Hi Matthieu,
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-On Wed, 14 Aug 2024 11:06:10 +0200 Matthieu Baerts <matttbe@kernel.org> wro=
-te:
->
-> FYI, we got a small conflict when merging 'net' in 'net-next' in the
-> MPTCP tree due to this patch applied in 'net':
->=20
->   c25504a0ba36 ("dt-bindings: net: fsl,qoriq-mc-dpmac: add missed
-> property phys")
->=20
-> and this one from 'net-next':
->=20
->   be034ee6c33d ("dt-bindings: net: fsl,qoriq-mc-dpmac: using
-> unevaluatedProperties")
->
-> Regarding this conflict, a merge of the two modifications has been
-> taken: adding 'phys', and removing 'managed'
+#syz fix: exact-commit-title
 
-Thanks for the heads up.
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
 
---=20
-Cheers,
-Stephen Rothwell
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=061f58eec3bde7ee8ffa
 
---Sig_/aPD.HFt93=D=+W9o/EKyCJQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+---
+[1] I expect the commit to be present in:
 
------BEGIN PGP SIGNATURE-----
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAma9VasACgkQAVBC80lX
-0Gwvkgf9HtOzYV8LuzEXP88ithcFW7/+sTYyD80bPKv6k5CXgAjVPTV2N+/SZSwr
-ABrsyj6W0YBb8EAZm3C3NxBJbPNkxQ6o/d6DfK0Y3WeEd9dGaJNU3NrQ5o92vhCp
-Jx819A0fCBeIwi6SmI8hbSIXZ0aHuN+2QzjqIZtlKVdWl/87osqwHVuPlVkRTy79
-CIlfrpYQ7Ecpwt1fUUJTjqqOdTzXPRG2OuZzHU+pZoVxI3M1SjdfSXn/BUjL+wJ6
-OGI+lML6E+0T3q/R4QT+VDxyTw+CkYShLSTQ2jfPsjBLFOAcH5RyHnDYlOs7pfGe
-y/4R8xUKD/S6ZeNNP7Ttb6Y7zNM25Q==
-=zKyj
------END PGP SIGNATURE-----
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
 
---Sig_/aPD.HFt93=D=+W9o/EKyCJQ--
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 10 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
