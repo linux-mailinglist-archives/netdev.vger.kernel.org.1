@@ -1,94 +1,113 @@
-Return-Path: <netdev+bounces-118902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7529C953748
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:30:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2641C953768
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A87DA1C236DF
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:30:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58A4A1C25358
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7F22562E;
-	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6312C1AAE07;
+	Thu, 15 Aug 2024 15:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuFc7DwZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ObQkE2vw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9896053365
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B03E19DF92;
+	Thu, 15 Aug 2024 15:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723735831; cv=none; b=o11RTFQxXlZg7EQFLDthrUvRHn/0UTQrYVRQX8GCuNvAUoCYGe0XODHPT/Tg1ya38atD3XNwZf99BGfTlGQiLhbKWlwO3u0uBLJwn1ROYR2dbMkk7oH73zOLWU7uUYsZcARHWF1hNsAV4Cx8VHAqXfEEzKDsQdDeB+q1FXyyTXs=
+	t=1723736241; cv=none; b=K6Yz0yItqhWL2tFl2/5rLJ9QWOBa/9k3DT16zlwcrygaQvhe0DC8Y9gN+8C/LkylzHnT+7QIU/BGfjrwujjo+9vtn0UA7NrwVGxZVz5lEUbUtDQy2eAIesppvvU3OasguW4OSL3XS4/3UIje2jZSeSdgWWbfzUVFtzgLa5HQ+Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723735831; c=relaxed/simple;
-	bh=3/AENTPsyst1+S6R1n+5acS1+PeXRxsoYGTHpCN6KAg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IVIt7Qnxx7EjWM5u98vqwSKNywUDp0NoQIRUumjyiXBRzRlfc7eDEiwef2c0inBlo3msqtcn5c75+qy6n9cip58s5U+YTusz2fAqPTVETzEOGG9WELnWqNz1ZRq5zjILW5HKAGakeOa656JIzacvLoounojaLBPnVMuYhl11Pbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuFc7DwZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF70C32786;
-	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
+	s=arc-20240116; t=1723736241; c=relaxed/simple;
+	bh=l0HOjb5v7Td6b7+4wjyPWOza7JPXStwNXiC9vrsrtXw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=oOD23L9bfyqOGkCzDgPj95N5Y6FYOf5ZeVcLMuvdlpqRP8qeM6Zfyj27o2Q0ttWwFFCm5x0ZZWhufvocqOqqBAbRbb20DU4VULSAoHAZ9zavzaj0QEF1Y6qJkFnZeWteTX01oNOQW3z0c26YloAApxjphTY1jlIxhNLao6eF9VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ObQkE2vw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A22C32786;
+	Thu, 15 Aug 2024 15:37:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723735831;
-	bh=3/AENTPsyst1+S6R1n+5acS1+PeXRxsoYGTHpCN6KAg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LuFc7DwZIFTyXMjP0/HMVjSJeZi1XAjvHSFsH2Wc7aVo849nsPJ/GM2kNF/J837g/
-	 r46UWvNiCM/JKhxeT/x/YUD66WuLaVYUtDP2n2lxypAQ2xW/VxC48zSMWKGic3VuYt
-	 LF4XkcaKwvs8Vo7z2ymItsccZEJItPZdJuwH1tqfok11JC3gkL51yZQoBVQjcD1t10
-	 y5ijSxbbqiH47sc983ju1wggjiFvicYy2mfzkjWgZcKtIXesBay0ORJJhQLZ3D7M/I
-	 FoRRdA6mPNJvfll3NUcgDtO2Q831FmfcM7YT9p1sahZ1XbSwz795tjVESWAJOFgpJh
-	 uEii8bZXvtARw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADED6382327A;
-	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1723736239;
+	bh=l0HOjb5v7Td6b7+4wjyPWOza7JPXStwNXiC9vrsrtXw=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ObQkE2vwR7Xy8BPJb9RtXIvKjISUxYIsCF9f3z9NId4DpxIhFLcgZFky8srnHKbQ+
+	 GIAiU/bWKeG+tqdjJ0ULMvndN8czTr6gkv+2y+TYMaeQABVTowfc30IGsj2cfKH8jg
+	 F5+X5Q1Muq/lE69meP7+tLnQu8pk4tmCflmg6pZcu4UUJhNYpuMm+Xt7eTdGQGm3rb
+	 +e2Qeoabzu+HHBwyCW+jYlNpOJTWZq3I/xN36LmUnSAwhVU4nGZeLI9xrhOdZwb9xt
+	 wlfJ5XU5D4y5e1Y+NyAM/5TRpeJnOV4fahrM2sxmpiz2TpdHkV1PoNSJcEETHONKHk
+	 tcM9K/Rh1L6XA==
+From: Simon Horman <horms@kernel.org>
+Date: Thu, 15 Aug 2024 16:37:13 +0100
+Subject: [PATCH net] tc-testing: don't access non-existent variable on
+ exception
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] iproute2: ss: clarify build warnings when building with
- libbpf 0.5.0
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172373583050.2888429.15348991883247460843.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Aug 2024 15:30:30 +0000
-References: <20240811223135.1173783-1-stefan.maetje@esd.eu>
-In-Reply-To: <20240811223135.1173783-1-stefan.maetje@esd.eu>
-To: =?utf-8?b?U3RlZmFuIE3DpHRqZSA8c3RlZmFuLm1hZXRqZUBlc2QuZXU+?=@codeaurora.org
-Cc: dsahern@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240815-tdc-test-ordinal-v1-1-0255c122a427@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKggvmYC/x3MTQqAIBBA4avIrBuwwejnKtHCcqqB0FCJILp70
+ vJbvPdA4iicYFAPRL4kSfAFdaVg2a3fGMUVA2ky2pDG7BbMnDKG6MTbA83cm75tOmqpgZKdkVe
+ 5/+UInjNM7/sBKZCUtmcAAAA=
+To: Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+ Shuah Khan <shuah@kernel.org>, Lucas Bates <lucasb@mojatatu.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: 
+X-Mailer: b4 0.14.0
 
-Hello:
+Since commit 255c1c7279ab ("tc-testing: Allow test cases to be skipped")
+the variable test_ordinal doesn't exist in call_pre_case().
+So it should not be accessed when an exception occurs.
 
-This series was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+This resolves the following splat:
 
-On Mon, 12 Aug 2024 00:31:33 +0200 you wrote:
-> Hi,
-> when building current iproute2 source on Ubuntu 22.04 with libbpf0
-> 0.5.0 installed, I stumbled over the warning "libbpf version 0.5 or
-> later is required, ...". This prompted me to look closer having the
-> version 0.5.0 installed which should suppress this warning.
-> The warning lured me into the impression that building without
-> warning should be possible using libbpf 0.5.0.
-> 
-> [...]
+  ...
+  During handling of the above exception, another exception occurred:
 
-Here is the summary with links:
-  - [1/2] configure: provide surrogates for possibly missing libbpf_version.h
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=0ddadc93e54f
-  - [2/2] ss: fix libbpf version check for ENABLE_BPF_SKSTORAGE_SUPPORT
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=e9096586e070
+  Traceback (most recent call last):
+    File ".../tdc.py", line 1028, in <module>
+      main()
+    File ".../tdc.py", line 1022, in main
+      set_operation_mode(pm, parser, args, remaining)
+    File ".../tdc.py", line 966, in set_operation_mode
+      catresults = test_runner_serial(pm, args, alltests)
+    File ".../tdc.py", line 642, in test_runner_serial
+      (index, tsr) = test_runner(pm, args, alltests)
+    File ".../tdc.py", line 536, in test_runner
+      res = run_one_test(pm, args, index, tidx)
+    File ".../tdc.py", line 419, in run_one_test
+      pm.call_pre_case(tidx)
+    File ".../tdc.py", line 146, in call_pre_case
+      print('test_ordinal is {}'.format(test_ordinal))
+  NameError: name 'test_ordinal' is not defined
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: 255c1c7279ab ("tc-testing: Allow test cases to be skipped")
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ tools/testing/selftests/tc-testing/tdc.py | 1 -
+ 1 file changed, 1 deletion(-)
 
+diff --git a/tools/testing/selftests/tc-testing/tdc.py b/tools/testing/selftests/tc-testing/tdc.py
+index ee349187636f..4f255cec0c22 100755
+--- a/tools/testing/selftests/tc-testing/tdc.py
++++ b/tools/testing/selftests/tc-testing/tdc.py
+@@ -143,7 +143,6 @@ class PluginMgr:
+             except Exception as ee:
+                 print('exception {} in call to pre_case for {} plugin'.
+                       format(ee, pgn_inst.__class__))
+-                print('test_ordinal is {}'.format(test_ordinal))
+                 print('testid is {}'.format(caseinfo['id']))
+                 raise
+ 
 
 
