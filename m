@@ -1,206 +1,120 @@
-Return-Path: <netdev+bounces-118748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48E7952A06
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00469952A04
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:35:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3118B1F22C6E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:40:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA1D61F22C9D
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE8017AE1B;
-	Thu, 15 Aug 2024 07:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFAD17AE1B;
+	Thu, 15 Aug 2024 07:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sV4809zs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0pHQfrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB5B13A26F;
-	Thu, 15 Aug 2024 07:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038F017ADE3;
+	Thu, 15 Aug 2024 07:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723707630; cv=none; b=BynBQs3CJ1PzEAXAZBvjuV3QiWTQcKlOYeLHq5N6jli5kWlBvL8MC0BTDAMvGPwgp0QXXa7Kr0Br1cQw7H9SQChhpZXUNLcQVDGdSEu/UAf6Jdo46CkqzainWeF7IfwmRIO5mlyGTkguyZ5CL1PdrELH2DGCvDGmOhZEFKOdBxo=
+	t=1723707353; cv=none; b=g2zau1NrpgjNWZ78UlQvJFAQCb/7g/NHTtqVFzbusRQbQ/MjrXB70blH47XofTSudn5PDOjBQJpRZz7IVBKlesGtdBzEYehHGlNULl3hEB4U4Gc9MKRUAEjuaCrCGAiUzTtwan1mk6f/w8TLZEX0XaUCfIpGmngF8q4AfGz6DrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723707630; c=relaxed/simple;
-	bh=ELK1TUq9Bz71fAHvrUMzChwNrvo7+0jN0Q9iyU/EqdE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G3djkUWdcd6ZwDBm4F9uG7txr9xtzrF1Fr+N9A1Kgf1DoiRVHmehBPeMA2XiVSJhBldhkjyU8hKyGRzPz97Bvy22pJaaZAD2CYdxkG+LWIGjgoI2wdwACW/k34XgM9PboMu74piLMNLahRmYibCzsbu+3hl24oFXL5a2pfO+WPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sV4809zs; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723707618; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=pFrK2j7ehfMhjy01kT1kIShp9CVxKwgMTY3JXGTAbn8=;
-	b=sV4809zslRSo6q+0MeClKuumPmDaNwkCyCfv82Od5dkdQBhqxylvQZsggvWCbr7NtzYo0Hxjb50DwlK6RzElBozY2eyosAW/L7wsDHGv0wdCakEPPd+Q8+EZR7dsYmMqQTWOk0Z3Yh6XCQqXlcqdl7y6LNJsalhOpyWlfIYm5dU=
-Received: from 30.221.149.192(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WCvsuc6_1723707295)
-          by smtp.aliyun-inc.com;
-          Thu, 15 Aug 2024 15:34:56 +0800
-Message-ID: <08f4d3cf-4d9a-47e6-a033-ed8c03ee5a0e@linux.alibaba.com>
-Date: Thu, 15 Aug 2024 15:34:55 +0800
+	s=arc-20240116; t=1723707353; c=relaxed/simple;
+	bh=/ClYCRhRXoARnrFGFZjHo8wcQMVacH8aXVCfxJFOCPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHT+bMuSRZCyd3a/5bHpRUX11DprvUskuRfrU/+y43/vkgAZJ9P0QHapjYh6dmNwH8kRElR3QGkopirws1aeieTnZOoIp6q4X7majEWCWyrqeF+ryfOW7Hqr/lYCCUs9evNZ2YORnsPv9VtKxiGjJElb6GazVVnT48QrSbmcbUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0pHQfrH; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-201ee6b084bso5812605ad.2;
+        Thu, 15 Aug 2024 00:35:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723707351; x=1724312151; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mVdDh2W/DflIXN0zSp6BYnyUoARG2HTuRmiCmWARiGo=;
+        b=C0pHQfrHng3jNyXSH9Qa/A/91ErkMPEafg8GaE0dgb1VRnL3rYv27wShsamqHVRSIV
+         N62RSjNvHX9EImAD6vvMBTSeTv7TSpm4pmaJkklg44T9VzWi/pJ3TCNffi426YIS6cw5
+         5jL9dPpbtXxxlfjSE2wSd62uyW729NvxvMYRJOx+NEtTpGpwcqPTQpOzcvIbkn9JPr+F
+         n1XeVW5HE/3sJ5nf13ogp4os7xCyj8xODwnVcZ8oULqOJolvikcuE3/+GyyBU2K7Hv/W
+         x2C6II0BiwbAw/1CMco+nTlqRhhx5hVawivUT6GCfEcWqeiF6EXOnXZlBDSWpj65To26
+         aWKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723707351; x=1724312151;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mVdDh2W/DflIXN0zSp6BYnyUoARG2HTuRmiCmWARiGo=;
+        b=fNx6bTGCeTeoWL2OJpF+1ohKHPK/nEbVGVAqy38eDQx6uCWqUiNpLhyKls9UNGUbCw
+         4Kis7ZEdfSWHpP6zXBkhaz0/1QAxoGh1KXpF34PeO+qY/GRqwQ/rGj0SJgLvU+3ZzoMc
+         nRSNOU7gtFVmzBXyzGNhpaDH5p7yziTR7WZchHYZDBZPTi0Gx4uvyJ08brlCulgJqsGN
+         QKl+RXSDw9ZjGvLhDk2VNZ3qZvcWCa2TDZQtqtlhtM0Vzc6bCzY9R4np7KeTsuMU3tPn
+         OpXPDRnMxYFZZhUQdb5ynYbUQKimp5laAN0/xyfCkshD0+4l8lPLOBhB23f+beafLsAZ
+         NEFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDx9fWeVnvBx+lYcka2yPdFouOko8QSYJ23K9eA4L8DJJPgT4LqkJrntv/PThDtMYayRun+hWJzVWyThuEYqbSlmD4CJObN4Bf6It44NpMg6EHNnifkWyQUZPrx+MolqU2oRC+
+X-Gm-Message-State: AOJu0YztHMPxFJ06fBgD7r+V047YWmo3bkgy+p0D2qNuD7RxxtRWQQyV
+	LZG7hcz5d4wT2MeV6uANgdSStREU+Q2maOuG3Zjy32isMFvY/GsV
+X-Google-Smtp-Source: AGHT+IEB1o4GZqA/yBACJA/I3OSxcH2OQMPFJY4wQdT0+6qsaym/npdQtE3ve32iDnp6RbuB/9ROqQ==
+X-Received: by 2002:a17:902:d2cf:b0:1f9:fb48:7cf9 with SMTP id d9443c01a7336-201d64d0255mr64396895ad.63.1723707351109;
+        Thu, 15 Aug 2024 00:35:51 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f031979asm6025415ad.81.2024.08.15.00.35.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 00:35:50 -0700 (PDT)
+Date: Thu, 15 Aug 2024 15:35:45 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Abhash Jha <abhashkumarjha123@gmail.com>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kuba@kernel.org, shuah@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] selftests/net/pmtu.sh: Fix typo in error message
+Message-ID: <Zr2v0Q-wJr_LTAzs@Laptop-X1>
+References: <20240814173121.33590-1-abhashkumarjha123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in
- txopt_get
-To: Alexandra Winter <wintera@linux.ibm.com>,
- Jeongjun Park <aha310510@gmail.com>
-Cc: gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
- tonylu@linux.alibaba.com, wenjia@linux.ibm.com, davem@davemloft.net,
- dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
- <20240814150558.46178-1-aha310510@gmail.com>
- <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
- <CAO9qdTGFGxgD_8RYQKTx9NJbwa0fiFziFyx2FJpnYk3ZvFbUmw@mail.gmail.com>
- <6bcd6097-13dd-44fd-aa67-39a3bcc69af2@linux.alibaba.com>
- <c9c35759-33e7-4103-a4f0-af1d5fdefcdf@linux.ibm.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <c9c35759-33e7-4103-a4f0-af1d5fdefcdf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240814173121.33590-1-abhashkumarjha123@gmail.com>
 
+Hi Abhash,
 
+You need add target repo for the patch. e.g. [PATCH net] selftests...
 
-On 8/15/24 3:03 PM, Alexandra Winter wrote:
->
-> On 15.08.24 08:43, D. Wythe wrote:
->>
->> On 8/15/24 11:15 AM, Jeongjun Park wrote:
->>> 2024년 8월 15일 (목) 오전 11:51, D. Wythe <alibuda@linux.alibaba.com>님이 작성:
->>>>
->>>> On 8/14/24 11:05 PM, Jeongjun Park wrote:
->>>>> Alexandra Winter wrote:
->>>>>> On 14.08.24 15:11, D. Wythe wrote:
->>>>>>>        struct smc_sock {                /* smc sock container */
->>>>>>> -    struct sock        sk;
->>>>>>> +    union {
->>>>>>> +        struct sock        sk;
->>>>>>> +        struct inet_sock    inet;
->>>>>>> +    };
->>>>>> I don't see a path where this breaks, but it looks risky to me.
->>>>>> Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
->>>>>> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
->>>> There is no smc_sock->inet_sock->sk before. And this part here was to
->>>> make smc_sock also
->>>> be an inet_sock.
->>>>
->>>> For IPPROTO_SMC, smc_sock should be an inet_sock, but it is not before.
->>>> So, the initialization of certain fields
->>>> in smc_sock(for example, clcsk) will overwrite modifications made to the
->>>> inet_sock part in inet(6)_create.
->>>>
->>>> For AF_SMC,  the only problem is that  some space will be wasted. Since
->>>> AF_SMC don't care the inet_sock part.
->>>> However, make the use of sock by AF_SMC and IPPROTO_SMC separately for
->>>> the sake of avoid wasting some space
->>>> is a little bit extreme.
->>>>
->
-> Thank you for the explanation D. Wythe. That was my impression also.
-> I think it is not very clean and risky to use the same structure (smc_sock)
-> as inet_sock for IPPROTO_SMC and as smc_sock type for AF_SMC.
-> I am not concerned about wasting space, mroe about maintainability.
->
->
+On Wed, Aug 14, 2024 at 11:01:21PM +0530, Abhash Jha wrote:
+> The word 'expected' was spelled as 'exepcted'.
+> Fixed the typo in this patch.
+> 
 
-Hi Alexandra,
+Here you need to add the fixes tag. e.g.
+Fixes: 136a1b434bbb ("selftests: net: test vxlan pmtu exceptions with tcp")
 
-I understand your concern, the maintainability is of course the most 
-important. But if we use different
-sock types for IPPROTO_SMC and AF_SMC, it would actually be detrimental 
-to maintenance because
-we have to use a judgment of which type of sock is to use in all the 
-code of smc, it's really dirty.
-
-In fact, because a sock is either given to IPPROTO_SMC as inet_sock or 
-to AF_SMC as smc_sock,
-it cannot exist the same time.  So it's hard to say what risks there are.
-
-Of course, I have to say that this may not be that clean, but compared 
-to adding a type judgment
-for every sock usage, it is already a very clean approach.
-
-Best wishes,
-D. Wythe
-
->>> Okay. I think using inet_sock instead of sock is also a good idea, but I
->>> understand for now.
->>>
->>> However, for some reason this patch status has become Changes Requested
->
-> Afaiu, changes requested in this case means that there is discussion ongoing.
->
->
->>> , so we will split the patch into two and resend the v5 patch.
->>>
->>> Regards,
->>> Jeongjun Park
->> Why so hurry ? Are you rushing for some tasks ? Please be patient.
->>
->> The discussion is still ongoing, and you need to wait for everyone's opinions,
->> at least you can wait a few days to see if there are any other opinions, even if you think
->> your patch is correct.
->>
-> [...]
->> Best wishes,
->> D. Wythe
->
-> I understand that we have a real problem and need a fix. But I agree with D. Wythe,
-> please give people a chance for discussion before sending new versions.
-> Also a version history would be helpful (what changed and why)
->
->
->>>>> hmm... then how about changing it to something like this?
->>>>>
->>>>> @@ -283,7 +283,7 @@ struct smc_connection {
->>>>>     };
->>>>>
->>>>>     struct smc_sock {                           /* smc sock container */
->>>>> -     struct sock             sk;
->>>>> +     struct inet_sock        inet;
->>>>>         struct socket           *clcsock;       /* internal tcp socket */
->>>>>         void                    (*clcsk_state_change)(struct sock *sk);
->>>> Don't.
->>>>
->>>>>                                                 /* original stat_change fct. */
->>>>> @@ -327,7 +327,7 @@ struct smc_sock {                         /* smc sock container */
->>>>>                                                  * */
->>>>>     };
->>>>>
->>>>> -#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
->>>>> +#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
->>>>>
->>>>>     static inline void smc_init_saved_callbacks(struct smc_sock *smc)
->>>>>     {
->>>>>
->>>>> It is definitely not normal to make the first member of smc_sock as sock.
->>>>>
->>>>> Therefore, I think it would be appropriate to modify it to use inet_sock
->>>>> as the first member like other protocols (sctp, dccp) and access sk in a
->>>>> way like &smc->inet.sk.
->>>>>
->>>>> Although this fix would require more code changes, we tested the bug and
->>>>> confirmed that it was not triggered and the functionality was working
->>>>> normally.
->>>>>
->>>>> What do you think?
->
-> Yes, that looks like what I had in mind.
-> I am not familiar enough with the details of the SMC code to judge all implications.
->
->
->>>>> Regards,
->>>>> Jeongjun Park
->>
-
+> Signed-off-by: Abhash Jha <abhashkumarjha123@gmail.com>
+> ---
+>  tools/testing/selftests/net/pmtu.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
+> index cfc849580..62eceb385 100755
+> --- a/tools/testing/selftests/net/pmtu.sh
+> +++ b/tools/testing/selftests/net/pmtu.sh
+> @@ -1347,7 +1347,7 @@ test_pmtu_ipvX_over_bridged_vxlanY_or_geneveY_exception() {
+>  		size=$(du -sb $tmpoutfile)
+>  		size=${size%%/tmp/*}
+>  
+> -		[ $size -ne 1048576 ] && err "File size $size mismatches exepcted value in locally bridged vxlan test" && return 1
+> +		[ $size -ne 1048576 ] && err "File size $size mismatches expected value in locally bridged vxlan test" && return 1
+>  	done
+>  
+>  	rm -f "$tmpoutfile"
+> -- 
+> 2.43.0
+> 
 
