@@ -1,120 +1,124 @@
-Return-Path: <netdev+bounces-118747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00469952A04
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:35:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929F9952A16
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:43:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA1D61F22C9D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F8D1C21312
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFAD17AE1B;
-	Thu, 15 Aug 2024 07:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77074179965;
+	Thu, 15 Aug 2024 07:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0pHQfrH"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="NFbpqKEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038F017ADE3;
-	Thu, 15 Aug 2024 07:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B135A17B4E5
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723707353; cv=none; b=g2zau1NrpgjNWZ78UlQvJFAQCb/7g/NHTtqVFzbusRQbQ/MjrXB70blH47XofTSudn5PDOjBQJpRZz7IVBKlesGtdBzEYehHGlNULl3hEB4U4Gc9MKRUAEjuaCrCGAiUzTtwan1mk6f/w8TLZEX0XaUCfIpGmngF8q4AfGz6DrQ=
+	t=1723707801; cv=none; b=aXsDI+YW1C1f0Yec0G9LWVzMNUcUrGchTkg/lCITgE12eIe1XJ0OduPPvmbmODLe8mpW+xjQeOvItJVGJ1vSPS9FjH1Qs6+z/st2NuaAQ4YiMOOlINhH6QcOHoJaIWSBjafB9cYob04+YpTEUcec+DpaKVBts6tVtrj4oRVHXSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723707353; c=relaxed/simple;
-	bh=/ClYCRhRXoARnrFGFZjHo8wcQMVacH8aXVCfxJFOCPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LHT+bMuSRZCyd3a/5bHpRUX11DprvUskuRfrU/+y43/vkgAZJ9P0QHapjYh6dmNwH8kRElR3QGkopirws1aeieTnZOoIp6q4X7majEWCWyrqeF+ryfOW7Hqr/lYCCUs9evNZ2YORnsPv9VtKxiGjJElb6GazVVnT48QrSbmcbUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C0pHQfrH; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-201ee6b084bso5812605ad.2;
-        Thu, 15 Aug 2024 00:35:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723707351; x=1724312151; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mVdDh2W/DflIXN0zSp6BYnyUoARG2HTuRmiCmWARiGo=;
-        b=C0pHQfrHng3jNyXSH9Qa/A/91ErkMPEafg8GaE0dgb1VRnL3rYv27wShsamqHVRSIV
-         N62RSjNvHX9EImAD6vvMBTSeTv7TSpm4pmaJkklg44T9VzWi/pJ3TCNffi426YIS6cw5
-         5jL9dPpbtXxxlfjSE2wSd62uyW729NvxvMYRJOx+NEtTpGpwcqPTQpOzcvIbkn9JPr+F
-         n1XeVW5HE/3sJ5nf13ogp4os7xCyj8xODwnVcZ8oULqOJolvikcuE3/+GyyBU2K7Hv/W
-         x2C6II0BiwbAw/1CMco+nTlqRhhx5hVawivUT6GCfEcWqeiF6EXOnXZlBDSWpj65To26
-         aWKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723707351; x=1724312151;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mVdDh2W/DflIXN0zSp6BYnyUoARG2HTuRmiCmWARiGo=;
-        b=fNx6bTGCeTeoWL2OJpF+1ohKHPK/nEbVGVAqy38eDQx6uCWqUiNpLhyKls9UNGUbCw
-         4Kis7ZEdfSWHpP6zXBkhaz0/1QAxoGh1KXpF34PeO+qY/GRqwQ/rGj0SJgLvU+3ZzoMc
-         nRSNOU7gtFVmzBXyzGNhpaDH5p7yziTR7WZchHYZDBZPTi0Gx4uvyJ08brlCulgJqsGN
-         QKl+RXSDw9ZjGvLhDk2VNZ3qZvcWCa2TDZQtqtlhtM0Vzc6bCzY9R4np7KeTsuMU3tPn
-         OpXPDRnMxYFZZhUQdb5ynYbUQKimp5laAN0/xyfCkshD0+4l8lPLOBhB23f+beafLsAZ
-         NEFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDx9fWeVnvBx+lYcka2yPdFouOko8QSYJ23K9eA4L8DJJPgT4LqkJrntv/PThDtMYayRun+hWJzVWyThuEYqbSlmD4CJObN4Bf6It44NpMg6EHNnifkWyQUZPrx+MolqU2oRC+
-X-Gm-Message-State: AOJu0YztHMPxFJ06fBgD7r+V047YWmo3bkgy+p0D2qNuD7RxxtRWQQyV
-	LZG7hcz5d4wT2MeV6uANgdSStREU+Q2maOuG3Zjy32isMFvY/GsV
-X-Google-Smtp-Source: AGHT+IEB1o4GZqA/yBACJA/I3OSxcH2OQMPFJY4wQdT0+6qsaym/npdQtE3ve32iDnp6RbuB/9ROqQ==
-X-Received: by 2002:a17:902:d2cf:b0:1f9:fb48:7cf9 with SMTP id d9443c01a7336-201d64d0255mr64396895ad.63.1723707351109;
-        Thu, 15 Aug 2024 00:35:51 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f031979asm6025415ad.81.2024.08.15.00.35.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 00:35:50 -0700 (PDT)
-Date: Thu, 15 Aug 2024 15:35:45 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Abhash Jha <abhashkumarjha123@gmail.com>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kuba@kernel.org, shuah@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] selftests/net/pmtu.sh: Fix typo in error message
-Message-ID: <Zr2v0Q-wJr_LTAzs@Laptop-X1>
-References: <20240814173121.33590-1-abhashkumarjha123@gmail.com>
+	s=arc-20240116; t=1723707801; c=relaxed/simple;
+	bh=P4pIVe1BYrGKxOEDHyqYXAYrTjEDVpHvcxwvLaFg7p0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TwMm5XAk8zQlC8BSbgjdMP6fAfjbT/iRWKm2+Wy75TQs36Uj7JRgjMDOpj3GtdeNK75DXDYGcrUt9tbvYYBttkYbmkPRXVLp/i7Kc1KYoLe9p6Qot5yFQUflnRIYHVDwmuh34GsamOUVNXCaVFawP/8AwBJi3eF22K/9dopym/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=NFbpqKEO; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:712d:ca1e:f0c3:1856])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 7BA2A7D8E0;
+	Thu, 15 Aug 2024 08:43:12 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1723707793; bh=P4pIVe1BYrGKxOEDHyqYXAYrTjEDVpHvcxwvLaFg7p0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
+	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
+	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
+	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
+	 hern@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09xiyou.wangco
+	 ng@gmail.com|Subject:=20[PATCH=20net-next=20v2]=20l2tp:=20use=20sk
+	 b_queue_purge=20in=20l2tp_ip_destroy_sock|Date:=20Thu,=2015=20Aug=
+	 202024=2008:43:11=20+0100|Message-Id:=20<20240815074311.1238511-1-
+	 jchapman@katalix.com>|MIME-Version:=201.0;
+	b=NFbpqKEOUvjMAlFRQD9j8PB1/pmvP/f/C2qv1M+PqlV86zetV5jnCf4rciHP8yvVY
+	 dHjqPEoiFYnRqo5D7NjdYdQV+5T2PAZtVrgUu+NP0uvPkmdkI2eh+QTMM9JR7RGjjh
+	 unfdqDZTQvZyz/GOMVzPJnt0/0ilKOnA6pFI919q1r1XP67mrQh2uRTfnc3FxVn9Q5
+	 wl31MtWJMX0bVwgpEwxDXocse21bfukLxlF+WA6mSnbeGfCF1QDdqeS7CAbCwwe+qE
+	 DnmWg+3S+1se41lZ1E7PdUmBDR0wWwikqK+wbjm0k8Pq8BNXfrRGJLY8IY2Iv08mTH
+	 MOCsEJnBfAe2w==
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	tparkin@katalix.com,
+	xiyou.wangcong@gmail.com
+Subject: [PATCH net-next v2] l2tp: use skb_queue_purge in l2tp_ip_destroy_sock
+Date: Thu, 15 Aug 2024 08:43:11 +0100
+Message-Id: <20240815074311.1238511-1-jchapman@katalix.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240814173121.33590-1-abhashkumarjha123@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Abhash,
+Recent commit ed8ebee6def7 ("l2tp: have l2tp_ip_destroy_sock use
+ip_flush_pending_frames") was incorrect in that l2tp_ip does not use
+socket cork and ip_flush_pending_frames is for sockets that do. Use
+skb_queue_purge instead and remove the unnecessary lock.
 
-You need add target repo for the patch. e.g. [PATCH net] selftests...
+Also unexport ip_flush_pending_frames since it was originally exported
+in commit 4ff8863419cd ("ipv4: export ip_flush_pending_frames") for
+l2tp and is not used by other modules.
 
-On Wed, Aug 14, 2024 at 11:01:21PM +0530, Abhash Jha wrote:
-> The word 'expected' was spelled as 'exepcted'.
-> Fixed the typo in this patch.
-> 
+---
+  v2:
+    - also unexport ip_flush_pending_frames (cong)
+  v1: https://lore.kernel.org/all/20240813093914.501183-1-jchapman@katalix.com/
 
-Here you need to add the fixes tag. e.g.
-Fixes: 136a1b434bbb ("selftests: net: test vxlan pmtu exceptions with tcp")
+Suggested-by: xiyou.wangcong@gmail.com
+Signed-off-by: James Chapman <jchapman@katalix.com>
+---
+ net/ipv4/ip_output.c | 1 -
+ net/l2tp/l2tp_ip.c   | 4 +---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-> Signed-off-by: Abhash Jha <abhashkumarjha123@gmail.com>
-> ---
->  tools/testing/selftests/net/pmtu.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-> index cfc849580..62eceb385 100755
-> --- a/tools/testing/selftests/net/pmtu.sh
-> +++ b/tools/testing/selftests/net/pmtu.sh
-> @@ -1347,7 +1347,7 @@ test_pmtu_ipvX_over_bridged_vxlanY_or_geneveY_exception() {
->  		size=$(du -sb $tmpoutfile)
->  		size=${size%%/tmp/*}
->  
-> -		[ $size -ne 1048576 ] && err "File size $size mismatches exepcted value in locally bridged vxlan test" && return 1
-> +		[ $size -ne 1048576 ] && err "File size $size mismatches expected value in locally bridged vxlan test" && return 1
->  	done
->  
->  	rm -f "$tmpoutfile"
-> -- 
-> 2.43.0
-> 
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 8a10a7c67834..b90d0f78ac80 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1534,7 +1534,6 @@ void ip_flush_pending_frames(struct sock *sk)
+ {
+ 	__ip_flush_pending_frames(sk, &sk->sk_write_queue, &inet_sk(sk)->cork.base);
+ }
+-EXPORT_SYMBOL_GPL(ip_flush_pending_frames);
+ 
+ struct sk_buff *ip_make_skb(struct sock *sk,
+ 			    struct flowi4 *fl4,
+diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
+index 39f3f1334c4a..ad659f4315df 100644
+--- a/net/l2tp/l2tp_ip.c
++++ b/net/l2tp/l2tp_ip.c
+@@ -258,9 +258,7 @@ static void l2tp_ip_destroy_sock(struct sock *sk)
+ {
+ 	struct l2tp_tunnel *tunnel;
+ 
+-	lock_sock(sk);
+-	ip_flush_pending_frames(sk);
+-	release_sock(sk);
++	skb_queue_purge(&sk->sk_write_queue);
+ 
+ 	tunnel = l2tp_sk_to_tunnel(sk);
+ 	if (tunnel) {
+-- 
+2.34.1
+
 
