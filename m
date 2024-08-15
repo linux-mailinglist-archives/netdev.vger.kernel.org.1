@@ -1,78 +1,54 @@
-Return-Path: <netdev+bounces-118935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B6C9538E2
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:19:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A659538E8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8D832822EF
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:19:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD1AB2822B1
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C59B1AED29;
-	Thu, 15 Aug 2024 17:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dtz93dBS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324001A00CB;
+	Thu, 15 Aug 2024 17:21:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0936029A1;
-	Thu, 15 Aug 2024 17:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3652229A1
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 17:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723742395; cv=none; b=bx4VsB4HdnxhiibhrGcWaYgfA83gqEtd3nGKrlxUJdh2NAahVLkP95y34m1mgW6DbVScdOvbDkKhFpfJfBB5WHF9iVu+nW8BV7DjBUJ7wSqP9l+fMkb9stPnqCuBRi9DRK5tFfZS7CTmpGRvUhTAt5iKa2+pg2B3er2TaQEsP4U=
+	t=1723742517; cv=none; b=CyBPc9C+RLrxkaB0bSn9tVnQ5lLB9BtV38uN5pQwN9ZgSh7HcMEmqHJ8GzUp7ScglxYwFuiP8M3st+BPkaHnyRfEPYImCiecVKREbv/a/eJhTMDRYkm17URLZgjzZMrPprXj9ru5tTmuny+W8YQkPTpQPdXu5G2HFin0/q/MClw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723742395; c=relaxed/simple;
-	bh=SwPU4QOd8AivF9U+GkmeBISXHsED3XwPWgpHTYU2Io0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SuiM/nUXz5TBAFKhwJgP6KfdDCH1sr9S6qgYRSdBG4FHu7s+uvYz+P7raTzXpoHTHQFDsD2AV7GC9R9qGBFZ8cCIhyNuTYDBOesK7rCDDFwpweJh1f9NDx1/NkLzMsEywHH5uI9NwMDoqIBjQq6QKyBvftq2jFmcuknmmgHiuew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dtz93dBS; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-654cf0a069eso11031767b3.1;
-        Thu, 15 Aug 2024 10:19:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723742393; x=1724347193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eh3O3ncETIBJTVpBD2l0ABcyKKpQHlgCgG7u1HpZU2U=;
-        b=Dtz93dBS1pyQ/txHY6YBhqGaoHqmdHvb7h9jzU9yoV2HKH+FzXpEkOJ1oF6pKDzanv
-         Me3lNphi+ItJPMfXDWvgKlr2XiuF+dhTcoHh+I01ETLScl7JmqWF//HoAklbp1a4sqps
-         jMIH8S5IxZ4Ch20/6d8pPqI4XNv8LcqqcG6xOThb6VXFQmN1wRtzwo1dMwzB/dBq+d3k
-         a8Yfq1QWQ+PSL6gmzaR74GfMQ/EcitNza2F+wmExpjHzDGuELxJJp061PjZsrtSPC/n+
-         v9r98xEcO4sAdSoQ6fubF0iUfEueDP7g5RWNpoPqHiV2YR0QYt5CglrlDTuHW5h6zJQI
-         X6gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723742393; x=1724347193;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Eh3O3ncETIBJTVpBD2l0ABcyKKpQHlgCgG7u1HpZU2U=;
-        b=cHkqcbjTah52l7LPMMtgxTtCHtBXrL7tjaDec/e5KdzCxEhqn1rJPU09JaXrFU1c1X
-         FK1MLRBhoBKApBTqKGlOE9zzpVLF9Yl0T7sfb14MjOS0NpMsqiWseJUTYB2xMjW/MOo9
-         rWwSOZIuAVkyVAzFIieTrBS9vIU9mAxrwoa4pmkxbDxioQbt24tf+ryfJ8nPHSX1Hn1U
-         x9VXzWuIL+QKvvF/GytaaJL8q7GAL8A3qnGClVyRoNc6NTCWVLtH4E6raNd8Dw+3CM5K
-         7+ih21BLf2ZUYsKUZzWIDAAce9FA4wIDqMH8o/gqnEMiXXw92CeyIWlHzgvD+UKzc1Nr
-         1oxg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/xdml1MKGZAeaqL53ptkalCuSEK57tvD/0Q9dLElawYPdq/CdU48pKwpDnrDIld4qWC4YInaecACZlRB9DIhCneHIitqd
-X-Gm-Message-State: AOJu0YyA0lEhxzWeWgCH2c4zYadWqxOYXUEaMncX0/EAJsKFgut9bsRz
-	/A6rEfMYlKNMae+KAkZcvXlZIqdpgsfIaqtUT/DjZ4P/aQzl41yj3GHSTg==
-X-Google-Smtp-Source: AGHT+IGPBXQqg/YT1VfKMS/LADagUnOuinioJuRwZqFv5v2rOWIDPFddfYiCQYAlJlCe02jDm7WxBA==
-X-Received: by 2002:a05:690c:368a:b0:6ae:528f:be36 with SMTP id 00721157ae682-6b1b852ec2cmr4803927b3.12.1723742392918;
-        Thu, 15 Aug 2024 10:19:52 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6af9e1d93a4sm3129087b3.139.2024.08.15.10.19.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 10:19:52 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-09-15
-Date: Thu, 15 Aug 2024 13:19:50 -0400
-Message-ID: <20240815171950.1082068-1-luiz.dentz@gmail.com>
+	s=arc-20240116; t=1723742517; c=relaxed/simple;
+	bh=zT9VyLMVK1/XGAswxj+/VLR1yotkecG1IGtmyxPRKe4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HgLQ9dUgSR2RHB/QSnIL3neNw6OqldGTDho0S0zVb3qd3L/HjCc5CLd/NvG97W14HsThqq9AgAhURyLxdStx2WKAk4EwvTyXyaA7QGPTrOK9tQmr+feV0HmnfGDZmazUG0taPEIvt7e4cNZbn2PoEcP6rz9LuBcGrXBsSYfZIFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 81CD57D065;
+	Thu, 15 Aug 2024 17:21:53 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@chopps.org>,
+	Christian Hopps <chopps@labn.net>
+Subject: [PATCH ipsec-next v4 1/1] net: add copy from skb_seq_state to buffer function
+Date: Thu, 15 Aug 2024 13:21:14 -0400
+Message-ID: <20240815172114.696205-1-chopps@chopps.org>
 X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -82,47 +58,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit 9c5af2d7dfe18e3a36f85fad8204cd2442ecd82b:
+From: Christian Hopps <chopps@labn.net>
 
-  Merge tag 'nf-24-08-15' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2024-08-15 13:25:06 +0200)
+Add an skb helper function to copy a range of bytes from within
+an existing skb_seq_state.
 
-are available in the Git repository at:
+Signed-off-by: Christian Hopps <chopps@labn.net>
+---
+This is used in a followup patchset implementing IP-TFS/AggFrag
+encapsulation (https://www.rfc-editor.org/rfc/rfc9347.txt)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-15
+Patchset History:
 
-for you to fetch changes up to 538fd3921afac97158d4177139a0ad39f056dbb2:
+  v1 (8/9/2024)
+    - Created from IP-TFS patchset v9
 
-  Bluetooth: MGMT: Add error handling to pair_device() (2024-08-15 13:09:35 -0400)
+  v2 (8/9/2024)
+    - resend with corrected CC list.
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+  v3 (8/15/2024)
+    - removed ___copy_skb_header refactoring
 
- - MGMT: Add error handling to pair_device()
- - HCI: Invert LE State quirk to be opt-out rather then opt-in
- - hci_core: Fix LE quote calculation
- - SMP: Fix assumption of Central always being Initiator
+  v4 (8/15/2024)
+    - change returned error from -ENOMEM to -EINVAL
+---
+ include/linux/skbuff.h |  1 +
+ net/core/skbuff.c      | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-----------------------------------------------------------------
-Griffin Kroah-Hartman (1):
-      Bluetooth: MGMT: Add error handling to pair_device()
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 29c3ea5b6e93..a871533b8568 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1433,6 +1433,7 @@ void skb_prepare_seq_read(struct sk_buff *skb, unsigned int from,
+ unsigned int skb_seq_read(unsigned int consumed, const u8 **data,
+ 			  struct skb_seq_state *st);
+ void skb_abort_seq_read(struct skb_seq_state *st);
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len);
+ 
+ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
+ 			   unsigned int to, struct ts_config *config);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..fe4b2dc5c19b 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4409,6 +4409,41 @@ void skb_abort_seq_read(struct skb_seq_state *st)
+ }
+ EXPORT_SYMBOL(skb_abort_seq_read);
+ 
++/**
++ * skb_copy_seq_read() - copy from a skb_seq_state to a buffer
++ * @st: source skb_seq_state
++ * @offset: offset in source
++ * @to: destination buffer
++ * @len: number of bytes to copy
++ *
++ * Copy @len bytes from @offset bytes into the source @st to the destination
++ * buffer @to. `offset` should increase (or be unchanged) with each subsequent
++ * call to this function. If offset needs to decrease from the previous use `st`
++ * should be reset first.
++ *
++ * Return: 0 on success or -EINVAL if the copy ended early
++ */
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len)
++{
++	const u8 *data;
++	u32 sqlen;
++
++	for (;;) {
++		sqlen = skb_seq_read(offset, &data, st);
++		if (sqlen == 0)
++			return -EINVAL;
++		if (sqlen >= len) {
++			memcpy(to, data, len);
++			return 0;
++		}
++		memcpy(to, data, sqlen);
++		to += sqlen;
++		offset += sqlen;
++		len -= sqlen;
++	}
++}
++EXPORT_SYMBOL(skb_copy_seq_read);
++
+ #define TS_SKB_CB(state)	((struct skb_seq_state *) &((state)->cb))
+ 
+ static unsigned int skb_ts_get_next_block(unsigned int offset, const u8 **text,
+-- 
+2.46.0
 
-Luiz Augusto von Dentz (3):
-      Bluetooth: HCI: Invert LE State quirk to be opt-out rather then opt-in
-      Bluetooth: hci_core: Fix LE quote calculation
-      Bluetooth: SMP: Fix assumption of Central always being Initiator
-
- drivers/bluetooth/btintel.c      |  10 ---
- drivers/bluetooth/btintel_pcie.c |   3 -
- drivers/bluetooth/btmtksdio.c    |   3 -
- drivers/bluetooth/btrtl.c        |   1 -
- drivers/bluetooth/btusb.c        |   4 +-
- drivers/bluetooth/hci_qca.c      |   4 +-
- drivers/bluetooth/hci_vhci.c     |   2 -
- include/net/bluetooth/hci.h      |  17 +++--
- include/net/bluetooth/hci_core.h |   2 +-
- net/bluetooth/hci_core.c         |  19 ++----
- net/bluetooth/hci_event.c        |   2 +-
- net/bluetooth/mgmt.c             |   4 ++
- net/bluetooth/smp.c              | 144 +++++++++++++++++++--------------------
- 13 files changed, 99 insertions(+), 116 deletions(-)
 
