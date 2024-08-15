@@ -1,257 +1,241 @@
-Return-Path: <netdev+bounces-118739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A774952992
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:02:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF62952994
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 061B21F231B5
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:02:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3FE31C219B7
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9AE44376;
-	Thu, 15 Aug 2024 07:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AB641AAC;
+	Thu, 15 Aug 2024 07:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="dmqB7oLQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FN6ZGRz9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC4FBA20
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1553215572E;
+	Thu, 15 Aug 2024 07:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723705338; cv=none; b=X66SkmUIl+hO/fCi0zDhzKcnCa1sAqIG0SDOCbso0HNDs9sBZLADzd3vaycmU6PfOFBOg5vATtWTDzJJahB4NqtuV7cW+mXMalA0dIkPXK69QFdTGECtnsMoFv4TUFXgJYu0ya+vv5JpJa+UA4HHtmnTM9q+5BlexDFdlFNaLto=
+	t=1723705416; cv=none; b=COQhJbyB/uIlH6tTWBmyhXU0rjblrHbcKA4QpTI0WU1wOCYqw7WDKAeqlmiIDY0co1IFiDveDSzRLC4M7p2sDiQoeA16F7QFtrYXH+tVZq0Ck2N8Qw0Mo9uzwiZBMYqHXbK/lgDv8onT52qg+X9TQiaLsI4caqi/aQGsdm265b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723705338; c=relaxed/simple;
-	bh=0f8oia0kVOYVNnQUoLHlgmHduqJZjTju7a2LblSQ8vY=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=opR1NM52hZsYWW6wzqr7qvzJrx91z9ipij9lt5/FSrdCJNOGlZqbWXazPeU8NWf90d59Zupte5S8VRDkxDqnXwpZMPgS+qxoghRT+WahIsf0gb0uhSKn/wGSbaU9AAXjKo6DoncKYJBj/MJUfEZ31ZmG0BKpPX/3/bzPodCAVlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=dmqB7oLQ; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52fc4388a64so823333e87.1
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 00:02:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1723705334; x=1724310134; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pAslx6WQu0HWG5VYqKA6S6Ff3xwjQguT3tFW108uL18=;
-        b=dmqB7oLQfBLsE1AfQdVb4xOpm0xnwix0q0UWi4HgF6d5d8KRijxa00XnWZrUIecM2I
-         k9QxVxrS1Tn0F4r8h8jrj+8WNZCOL9NugCb3CrC1Iqe1vPOwt9pZKbhDQVRilwYEUCCO
-         WT4aUtax90/AVcnEt7/Apj2d0eZ4CAnwPFQ41P3hF+y8W9ZHpGYkKbnhLHPlYGnD9S6d
-         vEHsyBHJMtw73M183JJBRNqBVnon9TcT2Q7uuNe/wUotR/tXoeCq0MIJegtFcgrw2WMT
-         4xbp/XDMmyTiMqBW1GSNf6w/7dTUdiupYqcJDVmIW4x4pqbB88lU97UzXSwDtglk9pnf
-         SsYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723705334; x=1724310134;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pAslx6WQu0HWG5VYqKA6S6Ff3xwjQguT3tFW108uL18=;
-        b=H9VlkvtGXSiKuhft11wsW89UR159Put2IzOfpTESoi7zLHoT2VcqrDTV7ElS23J9rZ
-         idzlG+IhvLSerFj4j4SlZSUD6bP8VUKNLwwvEfsfG0XyDlj058h15KpbVu+HoIfyVHGn
-         yko1PIbRxxCAPVc4ZKQCIHVWsk+kgRbsd3socgMM/4sCDdnzRDt4Eu7x9OXpwuxPuO7w
-         4eAuuhYy4ZQBDH9tO3TnOrspkiuTgrlx1P5Kneww1wgLVfOrMA/jkaZ1AjTuOsoJv6hW
-         Ni6OuC232eZMeHWYiu2VNuW5u8116Z99dafyHIUX7ZU/uv5W7w0YhNIoT+rEyzfWX8W1
-         Vulw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLolYLMXPZuD1lX8totbN3hXCJAjCAeeGIRfgdkl6Y1gTTTulNWFLMqlYwVaddzPkrgWakpZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz82rQskNgv8V6TGimhg/EAbbr6GSIhRL7Lf9UxBP+e98fvxDEy
-	mJt+iueZJdnWlQdK00AIwHEouzeVGEnUpu34lBS7VjqZMWvTMK5PQcrK4NdefV8=
-X-Google-Smtp-Source: AGHT+IGf+smvoS59QpQDtpSMbkWGFu2UiUmXrboM7kAbTjxnXldadlUv/Nc0OfK4ij/LahEWFimnlQ==
-X-Received: by 2002:a05:6512:1322:b0:52f:c148:f5e4 with SMTP id 2adb3069b0e04-532eda7a53emr3287550e87.21.1723705333693;
-        Thu, 15 Aug 2024 00:02:13 -0700 (PDT)
-Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5330d42503fsm107070e87.283.2024.08.15.00.02.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 00:02:12 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>, netdev
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: understanding switchdev notifications
-In-Reply-To: <d3244cef-9c6b-4bba-b184-4139f12224df@alliedtelesis.co.nz>
-References: <d5c526af-5062-42ed-9d92-f7fc97a5d4bd@alliedtelesis.co.nz>
- <87jzgjfvcl.fsf@waldekranz.com>
- <d3244cef-9c6b-4bba-b184-4139f12224df@alliedtelesis.co.nz>
-Date: Thu, 15 Aug 2024 09:02:11 +0200
-Message-ID: <87h6bmfevg.fsf@waldekranz.com>
+	s=arc-20240116; t=1723705416; c=relaxed/simple;
+	bh=BEfDmDLiFad+5GzVwyb3AAz0mwzIqaWk0/6y5E/Ryy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KisQFH0iOLgigKKFyxt4VybO8DF/AgtSXY/6CyN7OB5IzGNwSc1r3u7C4h2e0AD8SXKtF0tmzaBGwlDQLRPlxYxIUnbFdT5GDSCh+RBBkxy+Ko4p37y9Ka/PuSW3o7a4dN66GsPS59zuCgh+GZDZfKFmhEfy1+RZPJYnzq8qoqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FN6ZGRz9; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EHsaPD025265;
+	Thu, 15 Aug 2024 07:03:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=M
+	6fGN17QXNey//B4JZT3qXU3ULMgMp5zqQzwbf/Z44k=; b=FN6ZGRz9HpIZgE1bm
+	37x4J3ZNDUDX1++wuvHvsm7FIfXq9m3RpdzzMKiRO07G0997pmPZXwihbuQ1UHc/
+	qBkd9mff1YR6qIFoE3faOExzFWXvTDSrC+B9WdpTu0mobI0/fzPSfJj3c/KyVkvD
+	b/4bcXWqRtxmHFlgkAPyebRf0rnF79NIvoP9bBPaFgtLvKTFU8Lgx8CO05j2I4P2
+	U1ASgNbYTIsTD9B725Pr0PRCe1UNqWyOQRnTEfc8RjA6dX4tTZQZ2cAwjzshpSuM
+	sLB/Ekc/jW3kJdurGtrMvg6C7jdbx3P/adsqUbGB+Ij4rwbdKOvIek9TYRlcBg/S
+	KCUqw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6jcu1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:03:16 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47F73G4B015275;
+	Thu, 15 Aug 2024 07:03:16 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6jctv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:03:16 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47F6pghY020901;
+	Thu, 15 Aug 2024 07:03:15 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40xn83d495-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:03:15 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47F739ku42139976
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Aug 2024 07:03:12 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BE7EF2004D;
+	Thu, 15 Aug 2024 07:03:09 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6F3C32004B;
+	Thu, 15 Aug 2024 07:03:09 +0000 (GMT)
+Received: from [9.152.224.208] (unknown [9.152.224.208])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 15 Aug 2024 07:03:09 +0000 (GMT)
+Message-ID: <c9c35759-33e7-4103-a4f0-af1d5fdefcdf@linux.ibm.com>
+Date: Thu, 15 Aug 2024 09:03:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in
+ txopt_get
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Jeongjun Park <aha310510@gmail.com>
+Cc: gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
+        tonylu@linux.alibaba.com, wenjia@linux.ibm.com, davem@davemloft.net,
+        dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com
+References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
+ <20240814150558.46178-1-aha310510@gmail.com>
+ <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
+ <CAO9qdTGFGxgD_8RYQKTx9NJbwa0fiFziFyx2FJpnYk3ZvFbUmw@mail.gmail.com>
+ <6bcd6097-13dd-44fd-aa67-39a3bcc69af2@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <6bcd6097-13dd-44fd-aa67-39a3bcc69af2@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: EGurLq0YklRQv9tWU13end9SdZk8U2QN
+X-Proofpoint-ORIG-GUID: lVMeSkxC0gWET55WUyUgRCNYIhoOziXq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-14_22,2024-08-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ adultscore=0 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408150049
 
-On tor, aug 15, 2024 at 10:18, Chris Packham <chris.packham@alliedtelesis.c=
-o.nz> wrote:
-> Hi Tobias,
 
-Hi Chris!
 
-> On 14/08/24 18:54, Tobias Waldekranz wrote:
->> On tor, aug 08, 2024 at 12:48, Chris Packham <chris.packham@alliedtelesi=
-s.co.nz> wrote:
->>> Hi,
+On 15.08.24 08:43, D. Wythe wrote:
+> 
+> 
+> On 8/15/24 11:15 AM, Jeongjun Park wrote:
+>> 2024년 8월 15일 (목) 오전 11:51, D. Wythe <alibuda@linux.alibaba.com>님이 작성:
 >>>
->>> I'm trying to get to grips with how the switchdev notifications are
->>> supposed to be used when developing a switchdev driver.
 >>>
->>> I have been reading through
->>> https://www.kernel.org/doc/html/latest/networking/switchdev.html which
->>> covers a few things but doesn't go into detail around the notifiers that
->>> one needs to implement for a new switchdev driver (which is probably
->>> very dependent on what the hardware is capable of).
+>>> On 8/14/24 11:05 PM, Jeongjun Park wrote:
+>>>> Alexandra Winter wrote:
+>>>>> On 14.08.24 15:11, D. Wythe wrote:
+>>>>>>       struct smc_sock {                /* smc sock container */
+>>>>>> -    struct sock        sk;
+>>>>>> +    union {
+>>>>>> +        struct sock        sk;
+>>>>>> +        struct inet_sock    inet;
+>>>>>> +    };
+>>>>> I don't see a path where this breaks, but it looks risky to me.
+>>>>> Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
+>>>>> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
 >>>
->>> Specifically right now I'm looking at having a switch port join a vlan
->>> aware bridge. I have a configuration something like this
+>>> There is no smc_sock->inet_sock->sk before. And this part here was to
+>>> make smc_sock also
+>>> be an inet_sock.
 >>>
->>>   =C2=A0=C2=A0=C2=A0 ip link add br0 type bridge vlan_filtering 1
->>>   =C2=A0=C2=A0=C2=A0 ip link set sw1p5 master br0
->>>   =C2=A0=C2=A0=C2=A0 ip link set sw1p1 master br0
->>>   =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev br0 self
->>>   =C2=A0=C2=A0=C2=A0 ip link add link br0 br0.2 type vlan id 2
->>>   =C2=A0=C2=A0=C2=A0 ip addr add dev br0.2 192.168.2.1/24
->>>   =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev lan5 pvid untagged
->>>   =C2=A0=C2=A0=C2=A0 bridge vlan add vid 2 dev lan1
->>>   =C2=A0=C2=A0=C2=A0 ip link set sw1p5 up
->>>   =C2=A0=C2=A0=C2=A0 ip link set sw1p1 up
->>>   =C2=A0=C2=A0=C2=A0 ip link set br0 up
->>>   =C2=A0=C2=A0=C2=A0 ip link set br0.2 up
+>>> For IPPROTO_SMC, smc_sock should be an inet_sock, but it is not before.
+>>> So, the initialization of certain fields
+>>> in smc_sock(for example, clcsk) will overwrite modifications made to the
+>>> inet_sock part in inet(6)_create.
 >>>
->>> Then I'm testing by sending a ping to a nonexistent host on the
->>> 192.168.2.0/24 subnet and looking at the traffic with tcpdump on another
->>> device connected to sw1p5.
+>>> For AF_SMC,  the only problem is that  some space will be wasted. Since
+>>> AF_SMC don't care the inet_sock part.
+>>> However, make the use of sock by AF_SMC and IPPROTO_SMC separately for
+>>> the sake of avoid wasting some space
+>>> is a little bit extreme.
 >>>
->>> I'm a bit confused about how I should be calling
->>> switchdev_bridge_port_offload(). It takes two netdevs (brport_dev and
->>> dev) but as far as I've been able to see all the callers end up passing
->>> the same netdev for both of these (some create a driver specific brport
->>> but this still ends up with brport->dev and dev being the same object).
->> In the simple case when a switchport is directly attached to a bridge,
->> brport_dev and dev will be the same. If the attachment is indirect, via
->> a bond for example, they will differ:
+
+
+Thank you for the explanation D. Wythe. That was my impression also. 
+I think it is not very clean and risky to use the same structure (smc_sock)
+as inet_sock for IPPROTO_SMC and as smc_sock type for AF_SMC.
+I am not concerned about wasting space, mroe about maintainability.
+
+
+
+>> Okay. I think using inet_sock instead of sock is also a good idea, but I
+>> understand for now.
 >>
->>         br0
->>         /
->>      bond0
->>     /    \
->> sw1p1  sw1p5
+>> However, for some reason this patch status has become Changes Requested
+
+
+Afaiu, changes requested in this case means that there is discussion ongoing.
+
+
+>> , so we will split the patch into two and resend the v5 patch.
 >>
->> In the setup above, the bridge has no reference to any sw*p* interfaces,
->> all generated notifications will reference "bond0". By including the
->> switchdev port in the message back to the bridge, it can perform
->> validation on the setup; e.g. that bond0 is not made up of interfaces
->> from different hardware domains.
->
-> Ah that makes sense. I haven't got to bonds yet so I hadn't hit that case.
->
->>> I've figured out that I need to set tx_fwd_offload=3Dtrue so that the
->>> bridge software only sends one packet to the hardware. That makes sense
->>> as a way of saying the my hardware can take care of sending the packet
->>> out the right ports.
+>> Regards,
+>> Jeongjun Park
+> 
+> Why so hurry ? Are you rushing for some tasks ? Please be patient.
+> 
+> The discussion is still ongoing, and you need to wait for everyone's opinions,
+> at least you can wait a few days to see if there are any other opinions, even if you think
+> your patch is correct.
+> 
+[...]
+> 
+> Best wishes,
+> D. Wythe
+
+
+I understand that we have a real problem and need a fix. But I agree with D. Wythe,
+please give people a chance for discussion before sending new versions.
+Also a version history would be helpful (what changed and why)
+
+
+>>>> hmm... then how about changing it to something like this?
+>>>>
+>>>> @@ -283,7 +283,7 @@ struct smc_connection {
+>>>>    };
+>>>>
+>>>>    struct smc_sock {                           /* smc sock container */
+>>>> -     struct sock             sk;
+>>>> +     struct inet_sock        inet;
+>>>>        struct socket           *clcsock;       /* internal tcp socket */
+>>>>        void                    (*clcsk_state_change)(struct sock *sk);
 >>>
->>> I do have a problem that what I get from the bridge has a vlan tag
->>> inserted (which makes sense in sw when the packet goes from br0.2 to
->>> br0). But I don't actually need it as the hardware will insert a tag for
->>> me if the port is setup for egress tagging. I can shuffle the Ethernet
->>> header up but I was wondering if there was a way of telling the bridge
->>> not to insert the tag?
->> Signaling tx_fwd_offload=3Dtrue means assuming responsibility for
->> delivering each packet to all ports that the bridge would otherwise have
->> sent individual skbs for.
->>
->> Let's expand your setup slightly, and see why you need the tag:
->>
->>     br0.2 br0.3
->>         \ /
->>         br0
->>        / |  \
->>       /  |   \
->> sw1p1 sw1p3  sw1p5
->> (2U)  (3U)  (2T,3T)
->>
->> sw1p5 is now a trunk. We can trigger an ARP broadcast to be sent out
->> either via br0.2 or br0.3, depending on the subnet we choose to target.
->>
->> Your driver will receive a single skb to transmit, and skb->dev can be
->> set to any of sw1p{1,3,5} depending on config order, FDB entries
->> (i.e. the order of previously received packets) etc., and is thus
->> nondeterministic.
->>
->> So presumably, even though you might need to remove the 802.1Q tag from
->> the frame, you need some way of tagging the packet with the correct VID
->> in order for the hardware to do the right thing; possibly via a field in
->> the vendor's hardware specific tag.
->
-> I did eventually find NETIF_F_HW_VLAN_CTAG_TX which stops the packet=20
-> data coming down to the switch driver with a vlan tag inserted. The=20
-> intended egress vlan is still available via skb_vlan_tag_get_id() so I=20
-> can add it to hardware specific tag (which for me is part of the TX DMA=20
-> descriptor) and I don't need to shuffle any bytes around which is great.
+>>> Don't.
+>>>
+>>>>                                                /* original stat_change fct. */
+>>>> @@ -327,7 +327,7 @@ struct smc_sock {                         /* smc sock container */
+>>>>                                                 * */
+>>>>    };
+>>>>
+>>>> -#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+>>>> +#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
+>>>>
+>>>>    static inline void smc_init_saved_callbacks(struct smc_sock *smc)
+>>>>    {
+>>>>
+>>>> It is definitely not normal to make the first member of smc_sock as sock.
+>>>>
+>>>> Therefore, I think it would be appropriate to modify it to use inet_sock
+>>>> as the first member like other protocols (sctp, dccp) and access sk in a
+>>>> way like &smc->inet.sk.
+>>>>
+>>>> Although this fix would require more code changes, we tested the bug and
+>>>> confirmed that it was not triggered and the functionality was working
+>>>> normally.
+>>>>
+>>>> What do you think?
 
-I see now that I might have misunderstood your original question. You
-just wanted to avoid the VLAN info being moved from skb->vlan_tci into
-skb->data - good that you found the right netif flag!
 
->>> Finally I'm confused about the atomic_nb/atomic_nb parameters. Some
->>> drivers just pass NULL and others pass the same notifier blocks that
->>> they've already registered with
->>> register_switchdev_notifier()/register_switchdev_notifier(). If
->>> notifiers are registered why does switchdev_bridge_port_offload() take
->>> them as parameters?
->> Because when you add a port to the bridge, lots of stuff that you want
->> to offload might already have been configured. E.g., imagine that you
->> were to add vlan 2 to br0 before adding the switchports; then you
->> probably need those events to be replayed to the new ports in order to
->> add your CPU-facing switchport to vlan 2. However, we do not want to
->> bother existing bridge members with duplicated events (and risk messing
->> up any reference counters they might maintain for these
->> objects). Therefore we bypass the standard notifier calls and "unicast"
->> the replay events only to the driver for the port being added.
->
-> This part I still don't get. I understand that there may be scenarios=20
-> where switchdev decides it needs to unicast events to a specific device.=
-=20
+Yes, that looks like what I had in mind. 
+I am not familiar enough with the details of the SMC code to judge all implications.
 
-That's the thing, switchdev (really: the bridge) can't always decide
-when this need arises. Imagine this transition:
 
-      br0                  br0
-      /                    /
-   bond0      =3D>        bond0
-    / \                /  |  \
-swp1  swp2        swp1  swp2  swp3
-
-From the bridge's perspective, the two configurations are the same:
-There's one attached port, which is still a member of the same VLANs,
-multicast groups etc. that it was before the new port was added to the
-bond.
-
-In order to get to the right hardware configuration though, we typically
-need to add swp3 to all of those objects that bond0 is a member of. If
-it would be the bridge's responsibility to handle that, then it would
-have to consern itself with the inner workings of all kinds of
-interfaces that can be attached to it.
-
-The current "replay request" model instead places that responsibility on
-each individual driver, which is the entity that knows about the
-particular offloads that it supports.
-
-> But why does the caller of switchdev_bridge_port_offload() need to make=20
-> that distinction?
-
-AFAIK, the core idea with notifier blocks is to decouple the publisher
-from its subscribers. I.e. switchdev does not know anything about the
-subscribers listening to the notifications that it generates. It just
-publishes information to the chain and checks for any errors
-reported. In order to address an individual subscriber, that subscriber
-must instead be the initiator and pass along the callbacks.
-
->>> Thanks,
->>> Chris
+>>>>
+>>>> Regards,
+>>>> Jeongjun Park
+> 
+> 
 
