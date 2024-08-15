@@ -1,170 +1,108 @@
-Return-Path: <netdev+bounces-118714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA39952888
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 06:30:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F4395288C
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 06:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F15CB1F235B9
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 04:30:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 876BCB2184E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 04:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0AF43155;
-	Thu, 15 Aug 2024 04:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F276C374C4;
+	Thu, 15 Aug 2024 04:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwjNp6eS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njV3gTok"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AB13D967
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 04:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F1BEC4;
+	Thu, 15 Aug 2024 04:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723696201; cv=none; b=UTVO1iWeuyexnb/SpV44irsDzofYE8knx5vh2AL+vC/UGda9j7NR5T3T+p5eW1R0pm9rFBVlrK9U+LLVwUc3mVTpE+fp6q228BQlxUpP1sV3GQnYMWXCF1Pp1fWz9CmfLF8kHDfiGYdkMz5r5DIG46Lrumyg1fT9wzTo9kNl3g0=
+	t=1723696642; cv=none; b=PGFdARJjwfjQJoswgmLjSjVdo5TEHgpw/1+zBMzoNCRQzV5NyGuaapPhZAsaekOOyiDvxLCjNExNPgEOhQYU/2t642taqFRl2F1u6nZpmaDOWu7EyBKX1Vb3wZI1mNx33+E6YHs22KxC2WfvF6JVuBQIkFT2r00fg3ez/6/fmtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723696201; c=relaxed/simple;
-	bh=ScuQSNpmu8cfwGAkpUxdJZd/0YU+jDoQJzaTX0HMMl8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lw/Q9CAvGyRpsi3FuvCDZ4r4ooDm89hXAh7fvV3FcAONsR/8cSspZ2WAUaiZMJNrwTEJNDF2FqeZlJ3Qp5jGdevauGfitLd7Ymyl/iwOZKO6pQ3oY9tyJ0J8P4ykCfLuWwO5251ZtnCNHCpO0HG8vPr9x6WH+aA1i/TZNi0eiNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FwjNp6eS; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1723696642; c=relaxed/simple;
+	bh=y9J5zSN5z0sua8E2eLCGRkvQ6EfUE41XgG3IlsTHUxo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CzsTYXAG4oCcsnHwW25pvQuTqILoofdZ4oyzbera7Y/ymtIM+JQc2B1c4dR7z2rvfkwZDPCzVmZmcGxqRqIxb0PpyFB/he/0zJkLc5/zU4liEvKiLm5ShndwRZOrys97D48XE3WrtM13CeqihmvqxnHsqubeCtbDY+EXvtIWDkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=njV3gTok; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-397ba4f7387so2634025ab.0
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 21:29:59 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fd9e70b592so5519315ad.3;
+        Wed, 14 Aug 2024 21:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723696199; x=1724300999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/brrcTmmZ6JsVQPbhOMEvNk0Eca0/oU69zHiC6XRQ/s=;
-        b=FwjNp6eSOeeYook//YHD0AGP+/6YsQy6gELVipAMSLWH0Esd7+Tf8r5mu5hNKuD80B
-         Bnnu+XZJ1SbJIvgjzjylrrS1vgRv7vwO1ugr70crhyjx/C7te8lRLRj5xcZ6xRbmTd5s
-         ZNz9UZd9g3xluVmkYljyYYPIU1rfa36xBFR4JIhosr29pRwZIWH0IeoThL1/Bt01QIpH
-         ZgRtEtEY0EUZR+r4mUgW/Sl7rENHx6uZ2muccR/LOKXmmrYC7Lly/41cvd60ajg5n3Sf
-         QR5tRWNAs9fyPZaVIPY/Hmfs9pmLCtn61gTPsqhdQBxmZWHP2jN4LDNS4VRGBJXN0knq
-         JFVg==
+        d=gmail.com; s=20230601; t=1723696641; x=1724301441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Delqls4XZvd+0CZ7c4mLJoMdC6GpSpAW8Lh/tFw2bE=;
+        b=njV3gToka/9md5KdKFADr0+blDLom1oILO1T8TJM6OQyKaiauU0lIVbUj8bNGBzpp5
+         Mioaz/SV/qmp4jQfTaitAIPub7SnOIWqWxMi3642NgjVOF9BNUSicLShKViEj2SNDSdU
+         EUFbeJKe3mcXxIKKBQttreFiHgwh06ju6gia17qLFlbo+jbOJ2nsIKmtKNZInGcHxf2o
+         gv0gi9gMLmySOj6RTpoI+qq9qCGdTfIYxVjHj3j9Ltn+JoyU+wvdiSKbAJBDRjV3UT+h
+         ViOC9q1V4vyNDEJvp+oW62ptEOEqmr6Y5gORI1w4hyMRNb1qyK/6zs3lNASTG2bgsDM2
+         mC3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723696199; x=1724300999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/brrcTmmZ6JsVQPbhOMEvNk0Eca0/oU69zHiC6XRQ/s=;
-        b=lWJn2Uh5Zj+86ermH3QEL7kYSqT2tAbfSbAc3RS3l3rTO11Ojr+0k2KsSdNEZej4HD
-         2rXkMDwAum+mNFGF9eZt1T7Ds1Kmxlqe/V6ZH2NK66auDVPPmgp2kq+Jk7w//4U3K777
-         nxps15B1b6z6Zvtzu4URsz4PjmDBMrehPkej0snNgVH5ZLb5KRHlTxAx4VfXuwEczntR
-         oPA8RBi2sDRLezGVJdGFEndcX24H6FPyLGEtKZtTOJxvuFTlwZuQeV/98m+ScwS0Fky/
-         MhJLHIOl0FQ+dBADEU00MO41e1CMoESqmGz2JvePgu3919vwe2BW5DPH7Hyti5MvS0h/
-         P4vg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5LggmntsfBQAdog9AEnmaTzR2Z2XtP4nK3MeckAkkurlSk7WnralXGoLrUGrcKDhVVGkhucP86qY9G9OTofpj7l91HrRt
-X-Gm-Message-State: AOJu0YxKk1RmehbmFJVk21qDdePsdN2pe6EWUOslISKXiy8sruSabxTm
-	wknaQsPRH0cUWo/6lp+rrVrf9vAsUcvXDxqaT3YEcyhEy7UnkMLgAwbc0OdwrE6f4SMWeJKDqXQ
-	WxiIW2anUKWGLXJ5cedmZE/wsiZM=
-X-Google-Smtp-Source: AGHT+IET394LuBhb2N4n0HWAh4fJBbzO/5E5RODGZPiV8iae3vRPUnjCqV8rz32aBmSiqkOKKN1J1LLYqAc2Lv4g7Qs=
-X-Received: by 2002:a92:3603:0:b0:39b:324a:d37f with SMTP id
- e9e14a558f8ab-39d1245b039mr48819535ab.2.1723696199010; Wed, 14 Aug 2024
- 21:29:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723696641; x=1724301441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Delqls4XZvd+0CZ7c4mLJoMdC6GpSpAW8Lh/tFw2bE=;
+        b=qno8ko2iRuY8CN1NUnHR6wuiBRezF70JWLW+LgLq0cz9XDXH/TJnCMuzp4Co3hssrH
+         HS0tCmukcGHwz9qeuhs/sdQNVSzSco9vBc18HO+Z9Z0/izFcMcP0obsEUgb7PG73EM8+
+         Bvbm0Ub79E1ejNkRq1inFrS2LNFcpYL2efSCar+wFNakt7uoUck1CEXAh2t97nU7NpSp
+         ZkKFHwMLNtQQLE5wq6kYf+sPvu9G0jnNPo8e5yEqBcyNw5BBvRsFrcCz92/1eaCEOeCF
+         jokisjGTL5u4ialTq96qSTakEmzPym8QBd5+t2dA8AtW4nBJFagsBCTUHY3X30Vy9xs8
+         1huA==
+X-Forwarded-Encrypted: i=1; AJvYcCXw2KK+jPcA/eHvymjqMpeaXfmMhWmgRYE1eLfKuOKsautHeEAsOwYPvkIZtMoS1yvfElaRdls6UzCyGi1kCWGFubtFtFgLtebsINpr1GVUAj3zd0ot32AQ+QHALKTeCJaNDbJuvDmGBowKjVqYgVCRrgkZcziLTtPL8smGx4UKGw==
+X-Gm-Message-State: AOJu0Ywm3cyM2yonXJ8zhKusT06FsKp2zClaED+E4R4EM07mXBa7ero8
+	yGZoWI/5WHaCWUkgANIqjOj7nCxM+isBPXfIGm4DGGubZnN/Haqa
+X-Google-Smtp-Source: AGHT+IFsl94gUcWu8Q1A/r/Mbwxmnvec4Jrd6LKqDJcfReBU+3PcMfb8gJ5kP77tYZZMvSZ8030bAg==
+X-Received: by 2002:a17:90a:db86:b0:2d3:c862:aa81 with SMTP id 98e67ed59e1d1-2d3c862c27fmr1345303a91.32.1723696640735;
+        Wed, 14 Aug 2024 21:37:20 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3c8840a1bsm493157a91.45.2024.08.14.21.37.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 21:37:20 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dust.li@linux.alibaba.com,
+	ubraun@linux.vnet.ibm.com,
+	utz.bacher@de.ibm.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net,v5,0/2] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Thu, 15 Aug 2024 13:37:14 +0900
+Message-Id: <20240815043714.38772-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814035136.60796-1-kerneljasonxing@gmail.com> <20240814193844.66189-1-kuniyu@amazon.com>
-In-Reply-To: <20240814193844.66189-1-kuniyu@amazon.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 15 Aug 2024 12:29:22 +0800
-Message-ID: <CAL+tcoALxw0Pi+c1imyPHJu=ahaY5bU-adWPfCC4s4MGCQNTmA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid reusing FIN_WAIT2 when trying to find
- port in connect() process
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	jadedong@tencent.com, kernelxing@tencent.com, kuba@kernel.org, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello Kuniyuki,
+This patch is to resolve vulnerabilities that occur in the process of 
+creating an IPv6 socket with IPPROTO_SMC.
 
-On Thu, Aug 15, 2024 at 3:39=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> From: Jason Xing <kerneljasonxing@gmail.com>
-> Date: Wed, 14 Aug 2024 11:51:36 +0800
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > We found that one close-wait socket was reset by the other side
-> > which is beyond our expectation, so we have to investigate the
-> > underlying reason. The following experiment is conducted in the
-> > test environment. We limit the port range from 40000 to 40010
-> > and delay the time to close() after receiving a fin from the
-> > active close side, which can help us easily reproduce like what
-> > happened in production.
-> >
-> > Here are three connections captured by tcpdump:
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-> > // a few seconds later, within 60 seconds
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-> > // later, very quickly
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-> >
-> > As we can see, the first flow is reset because:
-> > 1) client starts a new connection, I mean, the second one
-> > 2) client tries to find a suitable port which is a timewait socket
-> >    (its state is timewait, substate is fin_wait2)
-> > 3) client occupies that timewait port to send a SYN
-> > 4) server finds a corresponding close-wait socket in ehash table,
-> >    then replies with a challenge ack
-> > 5) client sends an RST to terminate this old close-wait socket.
-> >
-> > I don't think the port selection algo can choose a FIN_WAIT2 socket
-> > when we turn on tcp_tw_reuse because on the server side there
-> > remain unread data. If one side haven't call close() yet, we should
-> > not consider it as expendable and treat it at will.
-> >
-> > Even though, sometimes, the server isn't able to call close() as soon
-> > as possible like what we expect, it can not be terminated easily,
-> > especially due to a second unrelated connection happening.
-> >
-> > After this patch, we can see the expected failure if we start a
-> > connection when all the ports are occupied in fin_wait2 state:
-> > "Ncat: Cannot assign requested address."
-> >
-> > Reported-by: Jade Dong <jadedong@tencent.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/ipv4/inet_hashtables.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > index 9bfcfd016e18..6115ee0c5d90 100644
-> > --- a/net/ipv4/inet_hashtables.c
-> > +++ b/net/ipv4/inet_hashtables.c
-> > @@ -563,7 +563,8 @@ static int __inet_check_established(struct inet_tim=
-ewait_death_row *death_row,
-> >                       continue;
-> >
-> >               if (likely(inet_match(net, sk2, acookie, ports, dif, sdif=
-))) {
-> > -                     if (sk2->sk_state =3D=3D TCP_TIME_WAIT) {
-> > +                     if (sk2->sk_state =3D=3D TCP_TIME_WAIT &&
-> > +                         inet_twsk(sk2)->tw_substate !=3D TCP_FIN_WAIT=
-2) {
->
-> I prefer comparing explicitly like
->
->   inet_twsk(sk2)->tw_substate =3D=3D TCP_TIME_WAIT
+Jeongjun Park (2):
+  net/smc: initialize ipv6_pinfo_offset in smc_inet6_prot and add smc6_sock structure
+  net/smc: modify smc_sock structure
 
-Thanks, I will adjust in the v2 patch soon.
+ net/smc/smc.h 		| 5 ++++-
+ net/smc/smc_inet.c | 8 +++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-Thanks,
-Jason
+--
 
