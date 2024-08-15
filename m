@@ -1,124 +1,201 @@
-Return-Path: <netdev+bounces-118749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929F9952A16
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:43:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83DC952A31
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:56:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F8D1C21312
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:43:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF1D1F21BB4
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 07:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77074179965;
-	Thu, 15 Aug 2024 07:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B3217625A;
+	Thu, 15 Aug 2024 07:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="NFbpqKEO"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EDlgqko4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B135A17B4E5
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FA519D884;
+	Thu, 15 Aug 2024 07:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723707801; cv=none; b=aXsDI+YW1C1f0Yec0G9LWVzMNUcUrGchTkg/lCITgE12eIe1XJ0OduPPvmbmODLe8mpW+xjQeOvItJVGJ1vSPS9FjH1Qs6+z/st2NuaAQ4YiMOOlINhH6QcOHoJaIWSBjafB9cYob04+YpTEUcec+DpaKVBts6tVtrj4oRVHXSo=
+	t=1723708585; cv=none; b=sSv0FU8hDE8wPT68gvZ0IhAMQ+gf0K9dPxdwXN1FlA1W+oRiB8y0pfMbfM6BCqUFpp2BaysFaFZVrBuDaO5TPtaG2fhwsfIahu2EgmVPu04hY1tCj7rhJBogr9IVrTW9uO+4y+h64jZ7ugqHPL2MBT0ZGZUmFRqVsFNtJxsZ5UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723707801; c=relaxed/simple;
-	bh=P4pIVe1BYrGKxOEDHyqYXAYrTjEDVpHvcxwvLaFg7p0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TwMm5XAk8zQlC8BSbgjdMP6fAfjbT/iRWKm2+Wy75TQs36Uj7JRgjMDOpj3GtdeNK75DXDYGcrUt9tbvYYBttkYbmkPRXVLp/i7Kc1KYoLe9p6Qot5yFQUflnRIYHVDwmuh34GsamOUVNXCaVFawP/8AwBJi3eF22K/9dopym/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=NFbpqKEO; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:712d:ca1e:f0c3:1856])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 7BA2A7D8E0;
-	Thu, 15 Aug 2024 08:43:12 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1723707793; bh=P4pIVe1BYrGKxOEDHyqYXAYrTjEDVpHvcxwvLaFg7p0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
-	 hern@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09xiyou.wangco
-	 ng@gmail.com|Subject:=20[PATCH=20net-next=20v2]=20l2tp:=20use=20sk
-	 b_queue_purge=20in=20l2tp_ip_destroy_sock|Date:=20Thu,=2015=20Aug=
-	 202024=2008:43:11=20+0100|Message-Id:=20<20240815074311.1238511-1-
-	 jchapman@katalix.com>|MIME-Version:=201.0;
-	b=NFbpqKEOUvjMAlFRQD9j8PB1/pmvP/f/C2qv1M+PqlV86zetV5jnCf4rciHP8yvVY
-	 dHjqPEoiFYnRqo5D7NjdYdQV+5T2PAZtVrgUu+NP0uvPkmdkI2eh+QTMM9JR7RGjjh
-	 unfdqDZTQvZyz/GOMVzPJnt0/0ilKOnA6pFI919q1r1XP67mrQh2uRTfnc3FxVn9Q5
-	 wl31MtWJMX0bVwgpEwxDXocse21bfukLxlF+WA6mSnbeGfCF1QDdqeS7CAbCwwe+qE
-	 DnmWg+3S+1se41lZ1E7PdUmBDR0wWwikqK+wbjm0k8Pq8BNXfrRGJLY8IY2Iv08mTH
-	 MOCsEJnBfAe2w==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	tparkin@katalix.com,
-	xiyou.wangcong@gmail.com
-Subject: [PATCH net-next v2] l2tp: use skb_queue_purge in l2tp_ip_destroy_sock
-Date: Thu, 15 Aug 2024 08:43:11 +0100
-Message-Id: <20240815074311.1238511-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723708585; c=relaxed/simple;
+	bh=6BhjSpizZ0Gn/gEBSMDptr/RtW/vCUqv/gmT0WSuE6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RuNt48YVa67K+T8ydmafA+6jmOGu1D6QVvaTrYBjFi1REtrBD25zRpCeGJRSBG8bYwknZJXnvwKH4DUgXYiS2NhoHb2H51yqTwzKzSuJcjJqjSCuYcdryox7w0dhRo+hzfiam1t3BDaaN3KMCnFwn7eiiW95Nyi9TXO7Oh1Xf5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EDlgqko4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EMulLa012207;
+	Thu, 15 Aug 2024 07:56:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=7
+	io1MFeoMtoJwh/jXFpWzsxYD5WXCgYN5/FHgaGKZB4=; b=EDlgqko4wp66Ckj8A
+	VNkaLHiQytwW0DEZF5eSjng/CtoukA+JK98ba1IhEU9UfTab2j7jxOP1jgBuOIlJ
+	LXyLdcBqRGuE3w0dScAyN3905gQIwWVpNfxtYDsrANXUHVhkyYNmeKiKfIZB4kYv
+	MIxdsTaI3baVDpunIjdqtoY1/CKAM9rK6iw6cWFqSWAvWLKZU6A2S694Ao2kY6pp
+	vLZMupSVkQDB2tX2gAi65wFoC/wejjRD2MLiaSrTpR6a0wIR0oscOANne2jz8/9V
+	TtRInXt6Q6gbME/MrZiUPU0erQcXa8aDlF0ovt4GmANFtIHUCKoxHj1V7erp6f5h
+	aTQxg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6an73-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:56:18 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47F7sSJJ023422;
+	Thu, 15 Aug 2024 07:56:18 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6an6w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:56:17 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47F6p6DJ029698;
+	Thu, 15 Aug 2024 07:56:16 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40xmrmneqb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Aug 2024 07:56:16 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47F7uBBw31523504
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Aug 2024 07:56:13 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 27A9F20043;
+	Thu, 15 Aug 2024 07:56:11 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E66982004D;
+	Thu, 15 Aug 2024 07:56:10 +0000 (GMT)
+Received: from [9.152.224.208] (unknown [9.152.224.208])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 15 Aug 2024 07:56:10 +0000 (GMT)
+Message-ID: <5ad4de6f-48d4-4d1b-b062-e1cd2e8b3600@linux.ibm.com>
+Date: Thu, 15 Aug 2024 09:56:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in
+ txopt_get
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Jeongjun Park <aha310510@gmail.com>
+Cc: gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
+        tonylu@linux.alibaba.com, wenjia@linux.ibm.com, davem@davemloft.net,
+        dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com
+References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
+ <20240814150558.46178-1-aha310510@gmail.com>
+ <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
+ <CAO9qdTGFGxgD_8RYQKTx9NJbwa0fiFziFyx2FJpnYk3ZvFbUmw@mail.gmail.com>
+ <6bcd6097-13dd-44fd-aa67-39a3bcc69af2@linux.alibaba.com>
+ <c9c35759-33e7-4103-a4f0-af1d5fdefcdf@linux.ibm.com>
+ <08f4d3cf-4d9a-47e6-a033-ed8c03ee5a0e@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <08f4d3cf-4d9a-47e6-a033-ed8c03ee5a0e@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FoRFb1DcaXsE1uMC0uGfVmIPg14Ei-bt
+X-Proofpoint-ORIG-GUID: 0fO5n6-BJHdT4GfMqX3VCxvwOPa4PuZH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-14_22,2024-08-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=961 phishscore=0
+ spamscore=0 malwarescore=0 priorityscore=1501 impostorscore=0 adultscore=0
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408150053
 
-Recent commit ed8ebee6def7 ("l2tp: have l2tp_ip_destroy_sock use
-ip_flush_pending_frames") was incorrect in that l2tp_ip does not use
-socket cork and ip_flush_pending_frames is for sockets that do. Use
-skb_queue_purge instead and remove the unnecessary lock.
 
-Also unexport ip_flush_pending_frames since it was originally exported
-in commit 4ff8863419cd ("ipv4: export ip_flush_pending_frames") for
-l2tp and is not used by other modules.
 
----
-  v2:
-    - also unexport ip_flush_pending_frames (cong)
-  v1: https://lore.kernel.org/all/20240813093914.501183-1-jchapman@katalix.com/
+On 15.08.24 09:34, D. Wythe wrote:
+> 
+> 
+> On 8/15/24 3:03 PM, Alexandra Winter wrote:
+>>
+>> On 15.08.24 08:43, D. Wythe wrote:
+>>>
+>>> On 8/15/24 11:15 AM, Jeongjun Park wrote:
+>>>> 2024년 8월 15일 (목) 오전 11:51, D. Wythe <alibuda@linux.alibaba.com>님이 작성:
+>>>>>
+>>>>> On 8/14/24 11:05 PM, Jeongjun Park wrote:
+>>>>>> Alexandra Winter wrote:
+>>>>>>> On 14.08.24 15:11, D. Wythe wrote:
+>>>>>>>>        struct smc_sock {                /* smc sock container */
+>>>>>>>> -    struct sock        sk;
+>>>>>>>> +    union {
+>>>>>>>> +        struct sock        sk;
+>>>>>>>> +        struct inet_sock    inet;
+>>>>>>>> +    };
+>>>>>>> I don't see a path where this breaks, but it looks risky to me.
+>>>>>>> Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
+>>>>>>> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
+>>>>> There is no smc_sock->inet_sock->sk before. And this part here was to
+>>>>> make smc_sock also
+>>>>> be an inet_sock.
+>>>>>
+>>>>> For IPPROTO_SMC, smc_sock should be an inet_sock, but it is not before.
+>>>>> So, the initialization of certain fields
+>>>>> in smc_sock(for example, clcsk) will overwrite modifications made to the
+>>>>> inet_sock part in inet(6)_create.
+>>>>>
+>>>>> For AF_SMC,  the only problem is that  some space will be wasted. Since
+>>>>> AF_SMC don't care the inet_sock part.
+>>>>> However, make the use of sock by AF_SMC and IPPROTO_SMC separately for
+>>>>> the sake of avoid wasting some space
+>>>>> is a little bit extreme.
+>>>>>
+>>
+>> Thank you for the explanation D. Wythe. That was my impression also.
+>> I think it is not very clean and risky to use the same structure (smc_sock)
+>> as inet_sock for IPPROTO_SMC and as smc_sock type for AF_SMC.
+>> I am not concerned about wasting space, mroe about maintainability.
+>>
+>>
+> 
+> Hi Alexandra,
+> 
+> I understand your concern, the maintainability is of course the most important. But if we use different
+> sock types for IPPROTO_SMC and AF_SMC, it would actually be detrimental to maintenance because
+> we have to use a judgment of which type of sock is to use in all the code of smc, it's really dirty.
+> 
+> In fact, because a sock is either given to IPPROTO_SMC as inet_sock or to AF_SMC as smc_sock,
+> it cannot exist the same time.  So it's hard to say what risks there are.
+> 
+> Of course, I have to say that this may not be that clean, but compared to adding a type judgment
+> for every sock usage, it is already a very clean approach.
+> 
 
-Suggested-by: xiyou.wangcong@gmail.com
-Signed-off-by: James Chapman <jchapman@katalix.com>
----
- net/ipv4/ip_output.c | 1 -
- net/l2tp/l2tp_ip.c   | 4 +---
- 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 8a10a7c67834..b90d0f78ac80 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1534,7 +1534,6 @@ void ip_flush_pending_frames(struct sock *sk)
- {
- 	__ip_flush_pending_frames(sk, &sk->sk_write_queue, &inet_sk(sk)->cork.base);
- }
--EXPORT_SYMBOL_GPL(ip_flush_pending_frames);
- 
- struct sk_buff *ip_make_skb(struct sock *sk,
- 			    struct flowi4 *fl4,
-diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
-index 39f3f1334c4a..ad659f4315df 100644
---- a/net/l2tp/l2tp_ip.c
-+++ b/net/l2tp/l2tp_ip.c
-@@ -258,9 +258,7 @@ static void l2tp_ip_destroy_sock(struct sock *sk)
- {
- 	struct l2tp_tunnel *tunnel;
- 
--	lock_sock(sk);
--	ip_flush_pending_frames(sk);
--	release_sock(sk);
-+	skb_queue_purge(&sk->sk_write_queue);
- 
- 	tunnel = l2tp_sk_to_tunnel(sk);
- 	if (tunnel) {
--- 
-2.34.1
+At least the union makes it visible now, so it is cleaner than before. 
+Maybe add a comment to the union, which one is used in which case?
+
+
+> Best wishes,
+> D. Wythe
+> 
+
+[...]
+
+>>>>>>
+>>>>>> -#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+>>>>>> +#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
+>>>>>>
+
+
+Just an idea: Maybe it would be sufficient to do the type judgement in smc_sk() ?
+
+
 
 
