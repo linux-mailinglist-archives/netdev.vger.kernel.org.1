@@ -1,138 +1,109 @@
-Return-Path: <netdev+bounces-118817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B65952D82
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:30:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69A24952D83
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAEA51C24C19
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98C0E1C235E2
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBE01714C4;
-	Thu, 15 Aug 2024 11:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C5814658F;
+	Thu, 15 Aug 2024 11:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LvXdQuIk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bGoUdKVW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA4614A084
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 11:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF601AC88A;
+	Thu, 15 Aug 2024 11:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723721386; cv=none; b=KqAQ43/O9URqYb4Sh3mCuKlTIpg+dMMo0H6B0wAbIBf1ec+k3zv5bCnpxNA/SAMeg4+/jxK1zXMTbapCmLU5OOHgGnkeBdPw/8CqCXVVX/89XMT8KXlOJX3oLYJNmcyyj1viOr+fIqPnNgsGI6DgYpUQjwChcmxHjIL4cot5KUA=
+	t=1723721433; cv=none; b=fvDQi5aCkPPDy4aXNIwAHGPhCIfbMjHT4BrtRpsW0ZLpB+7ebEv7xMvm5PKnOCjMeO2N1+1XgOME0mKZq7mp9WNe0h+We7zO5h6eRY5qTusEJ58SkrpRe4RjLkfbqkmu1ckiiaGFz4ftJhAjAtPfK9vXYdyPfKJu3+qDuPk87jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723721386; c=relaxed/simple;
-	bh=DqyqdYabPh0aw25x8ckVUskslZZoaj5FjvZVX9VZAqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=WhHoIjfTBBnw85mUAr/8dboX+dMSXLzwIrUlTAnmsy5Y1Ot76w/TA7R0WAp9FlpENih8Ztx0WH6UdCAmCeP6Luo7DUTNN4lHgV76Bppdb1q8da7MUXsNHf5UpB5VvCSEZVg/ItPqv9fPddjrd6tYobgRAPlP4+z58pby2+BB5qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LvXdQuIk; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52efd08e6d9so959077e87.1
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 04:29:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723721383; x=1724326183; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2KeTly4BwT7ZPFxX/n2y0xZHyT72zEKqHO6v/pZeCyg=;
-        b=LvXdQuIkAfEFw/laVw+eWFDEDntGJ9jPfw1ip0cCKpqvkaUIdAvDuQWe4wwfjNebmZ
-         zGC6TmpLAiqo1u1MV9b11YKMMFdZ79dqISH7GxZSG5Dc8zEXSZkf7YVQ1eBHL/GQ6gG5
-         MIFP87zTlzz/MVJdz0GlI3yVcSJLkMvYmiJ/msm6j6z7bbJbim7xWTNsr4IuhPuTO2xD
-         xtzShdgl5PvDrEJTNrU9E0i3ppmWkBQ208dd/bMHzMcqm3M4sojTvc842HBOKndUhJZn
-         72uVYPN5ghlZHSQesrYgT4km2xM6fFg95zJ7mKz9lzazJSxKpibmjnZcDnPkOh62T4e8
-         u0uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723721383; x=1724326183;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2KeTly4BwT7ZPFxX/n2y0xZHyT72zEKqHO6v/pZeCyg=;
-        b=RAmcOqiTYUk1kgG4JNhtHbxRSnfNmvIagDwQ0+XFRbQLSAH6MjCg3ax0ClXxZrCxlQ
-         nA36E8LH10iaoUMfq6KfPiFgmaJC+GjlGVkflgo27+d3VXj+iu4fy5FGaQ2Y1CJlU4gl
-         wc8lcHN2UpwUUOYFeEfb0vCdu5oIuHJDWrnjA730X0ora6AHAL3SHIdBFjcSw1w5qLf7
-         cwRGShUm6X5MIf37KLBv+DVmU8P8IsdTQ/sX4oHDWqf6oS8v6hiWjU+isbj1yL2AGcTK
-         M9bq7yKHerzLe5kPUcg7qSMT+TIRLYSEK9FJYJ/P3nb3567mqjFKV9C6d2g+1KWnkOL0
-         nZ7A==
-X-Gm-Message-State: AOJu0YxBHlDYJoDsr9Ug4VT2rXb8bWjmmWRi20JoA+pycLL8Ke7iG2dD
-	7zW1Rae4J+SU3ztfiG7uyqrt7bIPI2UNG9mR664siSKPjZ47pZx5x4kp9ssK8pI=
-X-Google-Smtp-Source: AGHT+IExJuXfh2ykDB8bAO26usfZV0AiJ4tDFs1cOp8MDNbpXrpQ4S+JWLJJ8GB2MHwEtJ9+6d+BhQ==
-X-Received: by 2002:a05:6512:158d:b0:52e:768e:4d1f with SMTP id 2adb3069b0e04-532eda8e172mr3990568e87.36.1723721382727;
-        Thu, 15 Aug 2024 04:29:42 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189849818sm1270999f8f.33.2024.08.15.04.29.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 04:29:42 -0700 (PDT)
-Date: Thu, 15 Aug 2024 14:29:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Dimitris Michailidis <d.michailidis@fungible.com>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] net/funeth: probing and netdev ops
-Message-ID: <f9fa829d-2580-4b49-b0c6-cf2e2a8f6cac@stanley.mountain>
+	s=arc-20240116; t=1723721433; c=relaxed/simple;
+	bh=VXKwRhcRuxEu298WKTNUffaBAZ2wVb1AlEfAAloaUgw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SQqsvEfsN/qmUleJgRxroLHkxGhBzvn1+qVnvCaZxrUUb+hO//Kk5iJzJGZP0T1MYMYZK3WJiI73ZEyjD+dKZFJXKbNanYRsDiW+9pfptQ4JQGUbZf/0NbxLQJbrNTd9yxIq+KadEBuEejvVGpodAhn/3SX96kgwgXUUPhob4lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bGoUdKVW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0BECC32786;
+	Thu, 15 Aug 2024 11:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723721431;
+	bh=VXKwRhcRuxEu298WKTNUffaBAZ2wVb1AlEfAAloaUgw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bGoUdKVW4TEfvONLBae7FZBy+q776xblF2IBc99KOlwG8z58sbHz3o8jQkOLE4ld5
+	 2f9GNUDOiinlNrkUez5VH505pDj57ofvJXezXj0nIu/zL3H2FlhGGuSuAAqjNsFxkT
+	 T6U4LBdbqO7Ouh1xIpnuFjAeLHtGb7+ngTxXnNWB4XdFa3Buic24jKU8GpFQGHLZPc
+	 CY7EZCrinZHlFZUPYUJcCS1c+sc7YMxTe5TsmNZcn6mXWS3D0PoAfTG+/PkzDGUwOl
+	 VxyrrbzXNxctPy2BKkEhQjBhf6OKTAbOXfeWginQUHvjh+p9+FNn+R6D5wxzVK8Ld2
+	 qPUsAIDiJ4TlQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342CA382327A;
+	Thu, 15 Aug 2024 11:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/8] netfilter: allow ipv6 fragments to arrive on
+ different devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172372143101.2826755.5906949342368006907.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Aug 2024 11:30:31 +0000
+References: <20240814222042.150590-2-pablo@netfilter.org>
+In-Reply-To: <20240814222042.150590-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
-Hello Dimitris Michailidis,
+Hello:
 
-Commit ee6373ddf3a9 ("net/funeth: probing and netdev ops") from Feb
-24, 2022 (linux-next), leads to the following Smatch static checker
-warning:
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-	drivers/net/ethernet/fungible/funeth/funeth_main.c:475 fun_free_rings()
-	warn: 'rxqs' was already freed. (line 472)
+On Thu, 15 Aug 2024 00:20:35 +0200 you wrote:
+> From: Tom Hughes <tom@compton.nu>
+> 
+> Commit 264640fc2c5f4 ("ipv6: distinguish frag queues by device
+> for multicast and link-local packets") modified the ipv6 fragment
+> reassembly logic to distinguish frag queues by device for multicast
+> and link-local packets but in fact only the main reassembly code
+> limits the use of the device to those address types and the netfilter
+> reassembly code uses the device for all packets.
+> 
+> [...]
 
-drivers/net/ethernet/fungible/funeth/funeth_main.c
-    441 static void fun_free_rings(struct net_device *netdev, struct fun_qset *qset)
-    442 {
-    443         struct funeth_priv *fp = netdev_priv(netdev);
-    444         struct funeth_txq **xdpqs = qset->xdpqs;
-    445         struct funeth_rxq **rxqs = qset->rxqs;
-    446 
-    447         /* qset may not specify any queues to operate on. In that case the
-    448          * currently installed queues are implied.
-    449          */
-    450         if (!rxqs) {
-    451                 rxqs = rtnl_dereference(fp->rxqs);
-    452                 xdpqs = rtnl_dereference(fp->xdpqs);
-    453                 qset->txqs = fp->txqs;
-    454                 qset->nrxqs = netdev->real_num_rx_queues;
-    455                 qset->ntxqs = netdev->real_num_tx_queues;
-    456                 qset->nxdpqs = fp->num_xdpqs;
-    457         }
-    458         if (!rxqs)
-    459                 return;
-    460 
-    461         if (rxqs == rtnl_dereference(fp->rxqs)) {
-    462                 rcu_assign_pointer(fp->rxqs, NULL);
-    463                 rcu_assign_pointer(fp->xdpqs, NULL);
-    464                 synchronize_net();
-    465                 fp->txqs = NULL;
-    466         }
-    467 
-    468         free_rxqs(rxqs, qset->nrxqs, qset->rxq_start, qset->state);
-    469         free_txqs(qset->txqs, qset->ntxqs, qset->txq_start, qset->state);
-    470         free_xdpqs(xdpqs, qset->nxdpqs, qset->xdpq_start, qset->state);
-    471         if (qset->state == FUN_QSTATE_DESTROYED)
-    472                 kfree(rxqs);
-                        ^^^^^^^^^^^
-Freed.
+Here is the summary with links:
+  - [net,1/8] netfilter: allow ipv6 fragments to arrive on different devices
+    https://git.kernel.org/netdev/net/c/3cd740b98596
+  - [net,2/8] netfilter: nfnetlink: Initialise extack before use in ACKs
+    https://git.kernel.org/netdev/net/c/d1a7b382a9d3
+  - [net,3/8] netfilter: flowtable: initialise extack before use
+    https://git.kernel.org/netdev/net/c/e9767137308d
+  - [net,4/8] netfilter: nf_queue: drop packets with cloned unconfirmed conntracks
+    https://git.kernel.org/netdev/net/c/7d8dc1c7be8d
+  - [net,5/8] selftests: netfilter: add test for br_netfilter+conntrack+queue combination
+    https://git.kernel.org/netdev/net/c/ea2306f0330c
+  - [net,6/8] netfilter: nf_tables: Audit log dump reset after the fact
+    https://git.kernel.org/netdev/net/c/e0b6648b0446
+  - [net,7/8] netfilter: nf_tables: Introduce nf_tables_getobj_single
+    https://git.kernel.org/netdev/net/c/69fc3e9e90f1
+  - [net,8/8] netfilter: nf_tables: Add locking for NFT_MSG_GETOBJ_RESET requests
+    https://git.kernel.org/netdev/net/c/bd662c4218f9
 
-    473 
-    474         /* Tell the caller which queues were operated on. */
---> 475         qset->rxqs = rxqs;
-                             ^^^^^
-why are we saving a freed pointer?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    476         qset->xdpqs = xdpqs;
-    477 }
 
-regards,
-dan carpenter
 
