@@ -1,115 +1,150 @@
-Return-Path: <netdev+bounces-118789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C0B952C92
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:43:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2725B952CBB
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 820E7285135
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:43:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99227B25094
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40051D6193;
-	Thu, 15 Aug 2024 10:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531381D3643;
+	Thu, 15 Aug 2024 10:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnABYyfx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6GdOCC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520E41D618B
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 10:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EE717CA1D
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 10:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723716911; cv=none; b=Tt44hxiNJ6DloLOQmfOBhgJctqlpbwK3PoL151ecjo6/Zy/ByT2iEPj1MR6RI8caEeeU8Q5wjbxRI3x2R/RICq8z0VWKKficAdRAf7LEvCbnC3itMpziE26VeYrX9veBkmcdTu08497GC4AZnoxeBSRxKpFzMatU4Fs2BIVeeU4=
+	t=1723716942; cv=none; b=NQwvzHavqihxcQk32s6aycGlu51CnhmRaT05AW55vpFE4t8V65pQGaZVkmVl+ePadKT6IfQGrYix4ZF38D1Cadh00Nzzr9AP2R1oQdpBuZedvX7A67CJm8c0l/RO/q+lG9IQ7o40eB38WEpuNkNsSxebtW+B8FBsZh1TaHgP8hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723716911; c=relaxed/simple;
-	bh=4VPEfJTvmfBgqpWEmhZGfaI0okNNuQ9tbPIdnKzIPNs=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BC6naRL6TnP/sueDZ/Y18XRCItet1P3FFaInPwGpMksMW3coq4NBZ/8cAPexuVcZW4a0A0qngpQiFSJgx2IQ6ZHQewTbbAVi7hjQCAQjmr268Tk5nyLZKkZzYBQszP2Us+5j4vZqdKD8Or9CCgggsfUZE8BxmQ69AFQ22sj5T4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnABYyfx; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1723716942; c=relaxed/simple;
+	bh=AdiUipSYIITQmujXM+dsl0/SAp0EzSVs4dl30+o3xxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NE+k30gg928XbHthctRrkGp3DfoFDrkRiu2b1ewx7V4h5ijWq+53so7YnA9ZLusxVmVLI9TAgrwlnOv9QShvFUUqWjR04WeDn58dYG397QB8mUv77lHQVfanmqmVROgpbp9+E0IznEuf684UKD/6EYWsKg5GGx9tY/7CsI297ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S6GdOCC0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723716909;
+	s=mimecast20190719; t=1723716939;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4VPEfJTvmfBgqpWEmhZGfaI0okNNuQ9tbPIdnKzIPNs=;
-	b=WnABYyfxs6ibJBFfRqfsU+LNAO6efovBzMp0/wJBBtM2w12Zy2hh5YHbjG2Q6Y39+OlxKz
-	3gSpkZ+QUgpzQfrnmWi0aT5Mk0Lw1FA3eHVsMRPVTU63HCIfnU7JmQjLBC0rstSEvbVtbt
-	QsSH6ut9FPnWenSj3Zq5t+N34yLBSM0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=n6lfx3W6Lwtd9tothv1NiHXO8z6f8pwl7KxDOAFTg+A=;
+	b=S6GdOCC0TU7+Q8SmNV0D3qxiAApo4xq+ePVaQAiQDxM+ySXFr1UYgQd2X6kzClE4avzi9H
+	CyMeay1B6ZujKLIKllcOR1rIV+zkOrearNeP2lFYIfI2FUqwCHZPZ6YkRdRK8IwvkfyYNO
+	RLp+OtzKpCkaFDf1fO6EslcZ+kessNY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-dZSLeQjwPjy6AkrdkZZ9jg-1; Thu, 15 Aug 2024 06:15:07 -0400
-X-MC-Unique: dZSLeQjwPjy6AkrdkZZ9jg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3718eb22836so18775f8f.3
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:15:07 -0700 (PDT)
+ us-mta-588-Yq3kW_ojOD2yQcrB_Y1XNA-1; Thu, 15 Aug 2024 06:15:37 -0400
+X-MC-Unique: Yq3kW_ojOD2yQcrB_Y1XNA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36860dd1fe8so89435f8f.1
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:15:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723716907; x=1724321707;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
+        d=1e100.net; s=20230601; t=1723716936; x=1724321736;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VPEfJTvmfBgqpWEmhZGfaI0okNNuQ9tbPIdnKzIPNs=;
-        b=AEbNjxtn5mfXRbKdlmQvMC86cExcMG5zfNhHS2JulJp25hI0Ya8ZqUJLuWnpdxC7Hw
-         x12pPV0ZB4PeO33yk0dkiCDbl1bk9+yN9HdPeIIu0KGH1x7TY1Mby0MLdlLCliTfEx2Q
-         kwe8+iMtW9uogc4HDfNSoIEv/4HhRo6lYizrOftRZvzmtJ/AAgq5Nwfx6+AHs8nW4Hpy
-         iOqMOwOp+SRsGvcAGLpd3pgJItFLYIRqXO3dKtzo4FMoDKgkWw/SwpKp0jBQtlwWBGss
-         99KIPV2+3XvBw1vJ71s33nHRX/HY7uHuwgJ0qrt5stwecgs3wwlzm03GvRwX+O9e5Fp/
-         N7gw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyVORSTlWOVBcwbNvSkcgspBHvbAZ5TlfMXoQOUSK6DcWvyNXHQEja+yeZfnYDD+MwSGQ0L7WwpLEr/LiRu31f1ab9jkOZ
-X-Gm-Message-State: AOJu0Yx6l1h04Ap7O9IAGkdAvy2zhsNvrkMjc9ZsqMLTQsJ8/H+DwOkY
-	iaOKaUkgFKBRiz9A/dbHXx8EbwFiEtktyp7gV9V6+MGWAfKvIkzaMbkW83PR9DT86DSlYWcwOqR
-	s56cw17A2HQojK6CeTidS9STqq6+LSe8OFSb750t44ztW31Lkgma0gQ==
-X-Received: by 2002:a5d:69c6:0:b0:371:8d47:c174 with SMTP id ffacd0b85a97d-3718d47c283mr514289f8f.30.1723716906707;
-        Thu, 15 Aug 2024 03:15:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9xiZ0Rp3LP6sBcNq0A1flnPS/fGarKdASNjYgytk1FrZTuuV1rFMPXAlRStkxIzOmMDD8+A==
-X-Received: by 2002:a5d:69c6:0:b0:371:8d47:c174 with SMTP id ffacd0b85a97d-3718d47c283mr514263f8f.30.1723716906191;
-        Thu, 15 Aug 2024 03:15:06 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718983a184sm1113408f8f.14.2024.08.15.03.14.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 03:15:05 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6FB3E14AE03F; Thu, 15 Aug 2024 12:14:48 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf
- <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, Linus
- Torvalds <torvalds@linux-foundation.org>, Jonathan Corbet
- <corbet@lwn.net>, Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <eric.dumazet@gmail.com>
-Subject: Re: bpf-next experiment
-In-Reply-To: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
-References: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 15 Aug 2024 12:14:48 +0200
-Message-ID: <87bk1ucctj.fsf@toke.dk>
+        bh=n6lfx3W6Lwtd9tothv1NiHXO8z6f8pwl7KxDOAFTg+A=;
+        b=gaozRlVRHcTeANgNwaHCrAG7yzKLKrLW3Nxtl8r0oCIii75T+cgTQSfvZSWj7jAKAM
+         0q8v4tPjB8AjinwvCbBwNyyTdi8Uut2s6rUpMtwzkHCAXw72MKuJHP19vI5UGC8REBmr
+         AQDIOyfRrLEbIzuZH178Q00oy8aTrgScfdh0NlEX4CBZcD21/F0QkcoyvCNLesPOHLZn
+         GZU5g2C66VLm1dmSRBEIw3TY8eOEtJhCaA7KxFrzyRtiixocY3or6sHLquvONyC7Rj+Y
+         DFsU1plod2uGASqxj3r+PFmJYifXUr7Z+zhSRyX9cdAQhOy5b54F+bNSYkGyr5kdCdZQ
+         rcPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmOS4UkBdBu7VHEM7WdD8g0K0mrKlMwLBQdoiMT7Swh8LLO6HKp7g7X1jJF8q5U8LIiDEZd2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhjgEQChdqpgicDg+PRPsZd+Uca9tPL7WkmaMypcGmXGI3nJom
+	Sb/yLM9qXDMLEHPp0TI/ab0Oj9vm9y3rVRFI/MSjEZ3Nk0sXOqpa4eSE1lvL4lDxaYSC/upZFg+
+	bm/TmLvSj4ZzAzX2AhgC0CrNNhegqJaHOa3ukmWaJO024Xtbr+FyYHA==
+X-Received: by 2002:a05:600c:3ca8:b0:427:9f6c:e4bd with SMTP id 5b1f17b1804b1-429e6b7d04fmr8185795e9.6.1723716936648;
+        Thu, 15 Aug 2024 03:15:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGRrTwDphN4E7O+3WrfKLMR0jDf6LMLrDL1gibBbR02UI9lUcb+TUehl+mDIfUvS6ndo6dmhw==
+X-Received: by 2002:a05:600c:3ca8:b0:427:9f6c:e4bd with SMTP id 5b1f17b1804b1-429e6b7d04fmr8185615e9.6.1723716936106;
+        Thu, 15 Aug 2024 03:15:36 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1711:4010:5731:dfd4:b2ed:d824? ([2a0d:3344:1711:4010:5731:dfd4:b2ed:d824])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7c03d53sm14826355e9.19.2024.08.15.03.15.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Aug 2024 03:15:35 -0700 (PDT)
+Message-ID: <f7fdecaf-c3c4-4770-9e03-d1f15fd093fa@redhat.com>
+Date: Thu, 15 Aug 2024 12:15:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ngbe: Fix phy mode set to external phy
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: przemyslaw.kitszel@intel.com, andrew@lunn.ch, jiawenwu@trustnetic.com,
+ duanqiangwen@net-swift.com
+References: <E9C427FDDCF0CBC3+20240812103025.42417-1-mengyuanlou@net-swift.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <E9C427FDDCF0CBC3+20240812103025.42417-1-mengyuanlou@net-swift.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+On 8/12/24 12:30, Mengyuan Lou wrote:
+> The MAC only has add the TX delay and it can not be modified.
+> MAC and PHY are both set the TX delay cause transmission problems.
+> So just disable TX delay in PHY, when use rgmii to attach to
+> external phy, set PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
+> And it is does not matter to internal phy.
+> 
+> Fixes: a1cf597b99a7 ("net: ngbe: Add ngbe mdio bus driver.")
+> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+> ---
+> v2:
+> -Add a comment for the code modification.
+> -Add the problem in commit messages.
+> v1:
+> https://lore.kernel.org/netdev/C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com/
+> 
+>   drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+> index ba33a57b42c2..0876b2e810c0 100644
+> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+> @@ -215,10 +215,14 @@ int ngbe_phy_connect(struct wx *wx)
+>   {
+>   	int ret;
+>   
+> +	/* The MAC only has add the Tx delay and it can not be modified.
+> +	 * So just disable TX delay in PHY, and it is does not matter to
+> +	 * internal phy.
+> +	 */
+>   	ret = phy_connect_direct(wx->netdev,
+>   				 wx->phydev,
+>   				 ngbe_handle_link_change,
+> -				 PHY_INTERFACE_MODE_RGMII_ID);
+> +				 PHY_INTERFACE_MODE_RGMII_RXID);
+>   	if (ret) {
+>   		wx_err(wx, "PHY connect failed.\n");
+>   		return ret;
 
-> 2. Non-networking bpf commits land in bpf-next/master branch.
-> It will form bpf-next PR during the merge window.
->
-> 3. Networking related commits (like XDP) land in bpf-next/net branch.
-> They will be PR-ed to net-next and ffwded from net-next
-> as we do today. All these patches will get to mainline
-> via net-next PR.
+Does not apply cleanly to net since:
 
-So from a submitter PoV, someone submitting an XDP-related patch (say),
-should base this off of bpf-next/net, and tag it as bpf-next in the
-subject? Or should it also be tagged as bpf-next/net?
+commit bc2426d74aa35cd8ec9c97a253ef57c2c5cd730c
+Author: Jiawen Wu <jiawenwu@trustnetic.com>
+Date:   Wed Jan 3 10:08:49 2024 +0800
 
--Toke
+     net: ngbe: convert phylib to phylink
+
+Please rebase
+
+Thanks,
+
+Paolo
 
 
