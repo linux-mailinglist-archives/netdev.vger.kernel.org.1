@@ -1,235 +1,237 @@
-Return-Path: <netdev+bounces-118658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BEA495265D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 01:57:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 169C0952681
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9152284418
-	for <lists+netdev@lfdr.de>; Wed, 14 Aug 2024 23:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB2F282A3D
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28F14B97E;
-	Wed, 14 Aug 2024 23:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B29A32;
+	Thu, 15 Aug 2024 00:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="NPpE7be0"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CeX5ISSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02olkn2054.outbound.protection.outlook.com [40.92.43.54])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011030.outbound.protection.outlook.com [52.101.70.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C60839FE5;
-	Wed, 14 Aug 2024 23:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.43.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC55A20;
+	Thu, 15 Aug 2024 00:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.30
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723679832; cv=fail; b=ADs+QdSMec/Gjoh018NIOvtzSkoAM1Ro28BUrY2ot/MedHZXhU+1GUGDdauZU9vbfEu22L6E1n089zpLHuLd+FapNp8NvexEoJn5PlhE3nfBGjsne2kYQX93Ekfa1/GqcCce4S5H+DG9W/ddfaMUve3PMLZ70rbqM/mTdoUZpGg=
+	t=1723680569; cv=fail; b=mTXBrUDy05X04WgKIuO6IRHg8fP1Lnsys+o4kOeHuaCRzXOsXb8aIdFeMOKjib9y5Q2Rjcp4eF7IQm/PMi+pifimkBdDFZqczMUC4ztqvhctr5lbEZQ+T3vZV6A1+8eWoBFCe7pHhd+lgc4rGOy4WvafEl73VCU7sRvco+lns5g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723679832; c=relaxed/simple;
-	bh=hFu7bIUm5KXpUtlqIFq6XbW3C2XZETPO/Nv8ulpH0Ds=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Zx/YsNlJoj22HVkQuTeu9QQ7dvcVOtr2BvnZ5iRt1FPklC19T+pAy/o9x/f3oF5eE5CtgEFwfLR5lFwHOVPuZB97CRdxWNCUcJvX3fdJ8qVkNBwXmpvRupH8AbNIQRtWofKyGH1kUUo3eEBVP+G7JsBVEPS+j/qag3H2oXttQJo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=NPpE7be0; arc=fail smtp.client-ip=40.92.43.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1723680569; c=relaxed/simple;
+	bh=JqdqPVoQKIaKtIPhR9Y598LN+cwBiChjJxTPCg6YioQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=AcMJeW+gDe3k0c1EcSAN14J9hVdG+CjKUavDAm/4AsUMV4ylwX7mKJKY3Q8w13HVm2UnqlnP/FJmF0EM2T08xNBwig27JSvdkA1WmkC5m1Mdf6ysRuuvNu8mwIMrA+TP6pl/zx+sJ1KB8gwQn7ZykKJBo3GqPAC8Ui/nUV+09nk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CeX5ISSW; arc=fail smtp.client-ip=52.101.70.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i2QmxD4CB6UuZ6DTizWw6ZE7QJKvYVVDeAHgnKEk4/o0nkLluU/hbDpRSMnDVCmm1YVFrdrOalnwhqPRyjcBVxivkxdbeL83X6QrGwD65eEOJG6Jrziqi3sPGziVMMkGjVNVqN7KF7S5SF2mcuoLERxCrovX6P81Drca8hq+9AuvtpUku7DL2FwJqGumV5sYTiPwpoX8psyiQnxagwHAuPnCE/p7rEc9bqo1xHaI45nRidomT7C10lgZ45Oa+cZGhg655n3aCFNRq/Lw0FxRApRbDf+Tcb1riB0PhhNbbaS7hyB3szKp90i/Mwtwpt996/CaslvP/LJtAkoLqzgm+A==
+ b=K7dgnFQBpLkkozeTvxsYEgpy0cpZyimra8SEtrRy44wORtUfv+HpuFK7a564o35lM4d9+QPwPPhesT3wATqG18iqyRVs9qGzY4lA54po6ZFH+4gCMP+tvRZYi+oUJ7DKGQzfG8bA01VCz/+wRgvSOAWm/GPkmY4TNpTO7DgMrhOsS+YQEDgwIz4B+13tkZJHXABEdi2/OZiUOPHsNGyYdVkpkXV/p9W0YcHxZEPi9VNz1ouA86DfwEMjJQDlorvj3+LWIvJ+HImWEIzANSZzDjnORwYN87o1Cam9BfVpyAoAVHNyZwxnRrvChp5kRMHlts7nGHJrKZBFjCTWDDMi4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l0bxjjdjaZW+x3wGlCC3Dlde+V/r1A/YrT99HoZbFlk=;
- b=FlZvU1fkUGGpVYK/eEg9gYNk5DuFh2Ra0JbrpLqdnd3iXDMSCJZhFGyPtVdlCv+tmsLtljJ54h26C+HFdF8Er2SMbmTsdDDLvTKEO9TubSHHoh++7KBFYK/siA2YrGJ34nICvl59nM3mcP8NjRaPjpgKM+Pqi/C0vE97IBumA3heyaSUHCf/8rEmkd1XOoLOTtFewmilf35r3MytauEnW2Fk7e+IijtD8kFj/jnjy3Fe5wgsjF2ORDL8e2cK/RoB+F9e/Sh6X5F6pbu17zz441lh8sNErF4rxDCJLZHHXF2A02Fj7VmgQhc5dkl7C0gvWfRo0t+Org6aysk8waZ/8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=2s2J5v4yNMJYUmwxuWj6s+lY7aSx7dDlXfFFyax224c=;
+ b=FojmB2rGChjGhuMdr+Limq3j7mLXLfoxP51x3B2WwDWojN+rXwISyDHwBPNj/orM+xZMnAgZZq0+vY5J7lkFrF6UiQ3UeOoWKyCYNLjcOSEoWm0cXdgRVcwsU3bAPLtutQGnwJlHr3SYtTBQnTjPZhoQlVWkrJ+PiObv4ZKu3qHF+okPKtm4EQFw5ylZhdVCWxnZTDZD7PgkuVmtcqJPHZy7wDuzx9uCgizuK+uNPJjdTkEgRY07c4Nf1n7ibUnGYq9OhhZwStGF/QezkxEghlfg5SfSV6md0+j4Hs1h+TBeWUVJBVL10T+4xOKfnk9no/jAUWemlicT8Qd2TbN9Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l0bxjjdjaZW+x3wGlCC3Dlde+V/r1A/YrT99HoZbFlk=;
- b=NPpE7be0vnP8Lfz0oQPVx31sBCFNMknKQ4WgpWnvWvTmcd6HteSNdyTVUSUKsdPEOV2J0ihK1RnXim7gp2TY6LHJEOP9eVb40w6zYNZPuQron6n8HnEa4I+I/YmWq7VeHzePoEGHwZeGOsthPC2DmTk6X18CfEalITs1gUXraCquZw6HkIeY1DLc2bDJKm7q+EouOY1HHTRaIvgv1iSPIWKlCfWV1f1hquYiBbBXKd0lyTBRSGdtE7I/z9Dsmq4Z8JXALpi1gEdj9hlcg7cAn8eDcicsS7raIdqihRhjX+4wxjZJWlCTy1gi+SLtipcezxxAlmnqPeaDr9v4MF971A==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by DM6PR02MB6809.namprd02.prod.outlook.com (2603:10b6:5:218::24) with
+ bh=2s2J5v4yNMJYUmwxuWj6s+lY7aSx7dDlXfFFyax224c=;
+ b=CeX5ISSWz2GCO7upMn5xyr0st2JU7r4Hu9UDShghYD6iW4esd4rKWcB/GWefl3J5TNnK86Le2I0bK8Xx85ekvcVWsw6OIC7LRRPOafeEW8nA6srG4gq98QZhgKfDjZSQgKxnGNg1iRW5WNmuKr0gt2x+SOli8+08G9F7uPyQ6SoSqxlmArefoy9VsC+3LQ2S1OQy+bfZp8Z8zrAdNpFTy0oPWMX6EDrxuVi4Cct6MehhJujO2htWPZIrh0ZfSWS5stYZ57Lb+PJ8SpbtT/Db4N92yVUJnIUPyamt9oWwNSX0dlm5yg4dOf80Gmp9r78YzaG+UydxYnEvZtvXt+YlLg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by VI2PR04MB10285.eurprd04.prod.outlook.com (2603:10a6:800:21e::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Wed, 14 Aug
- 2024 23:57:07 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%6]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
- 23:57:07 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, "kys@microsoft.com"
-	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
-	<decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "ernis@microsoft.com" <ernis@microsoft.com>
-Subject: RE: [PATCH v2] net: netvsc: Update default VMBus channels
-Thread-Topic: [PATCH v2] net: netvsc: Update default VMBus channels
-Thread-Index: AQHa7mtihlctUjAqEkyZ5zpnW8ltobInaf0A
-Date: Wed, 14 Aug 2024 23:57:07 +0000
-Message-ID:
- <SN6PR02MB4157330500B79F4E728DFF7FD4872@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <1723654753-27893-1-git-send-email-ernis@linux.microsoft.com>
-In-Reply-To: <1723654753-27893-1-git-send-email-ernis@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [s+QGmKsdXT8sQhy65HLMtdmDdXU4oPmm]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|DM6PR02MB6809:EE_
-x-ms-office365-filtering-correlation-id: 102b9317-ae4e-4ef4-b3f2-08dcbcbccde3
-x-microsoft-antispam:
- BCL:0;ARA:14566002|15080799003|19110799003|8060799006|461199028|3412199025|440099028|102099032;
-x-microsoft-antispam-message-info:
- XjPrM6M7YPRS0uNuUt3ZFE+OKCQ6mSbjXINRwN+Iu+0hv5EK6ku4UwZcXuT8xd/U52j44fn2u5JdBBGq3R4YxQVYHACIVa4Gu/1vZK0gq9vHlZm/QkHCK1mQMLYNI+uZyD0UkepJtqNz0ayrJ9nygBZgZ3fyXrGetoOrcwh0NyuYPKfhxm/W2I6y4Bkq0Efff4b4p6KsB5MwHQwy4kHUsCIgg5V7W7ji58Pv9dgtoxfZgkLvivqnm/LdEDHlJwZAvNBzMmDi6UVLoEp/S3vloFL/2eW0uV3//WnGjMFDM/6hnxW7yY42u6hRLLIlTGmkWSpRHioi63ZMuPvyVlV38Xe/45+uJqgg3/8Rl49DGUyR5Wfti5BEMOYY8V4FnzpNlHO4bBIs67TJxTAFyTNfYhBgEHPsY6PUJTc8ajA5jBQ0YPFqrEBk0dY62jOJiSboFP3XVFtmXFvyNIkgwjzruOYMvB6r3ZXkNwTX4/IazIGIsyVi/fVMQrHl1ShxVONf9rNmHhovSC/RwzhCtzH1DPyMtXEhc6XCqyHIhfM03l1RlbT7cBMklPbkRGdqhE0Lndb4h5qvI9OqVMb2DQpYsDRXxHqOIBDLkO3uPx9Y5oPBgHzYL+cozSkt0BkW6CvTuErKnw8331gcyZzST4gJZhBTMBIDXRpGZApmc7uupYMHiqCwyIwAigMtHBOh/Agv
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?r+APi7rHDS6jcfcjtEcLN7IC4Edt/WcKXmA1NZeXu9kQgSBqmhZ2Yw1Lytjz?=
- =?us-ascii?Q?oKuiwFH8Nr36JQCFbXWSvenrqcSSRF2P5f6vH1xsweVedwdJjlp7OhzJzSp3?=
- =?us-ascii?Q?iJdFUSvLl9N1gs5wZgjc9OQNTwsEvlCM/4Qfb6YFJ3v1RE8/IpX5J1/Ca9RU?=
- =?us-ascii?Q?A/2BuuqMDDVYkyW2P15JwtP5ILgRB8ew/VqcLGEmRgYNbzEdV0JQWsnmv5+q?=
- =?us-ascii?Q?Exa2+WRINtfB0Z8pCCEHaiQ/hsAaW6GfNtOugRJdd9j4BtOQrD/18yxTqXcs?=
- =?us-ascii?Q?e9uI04B2d27HPoz5YkR90GAzlZ0Vox9qZbLg8E7f8La2eeVsOeLbhVEZjEQS?=
- =?us-ascii?Q?BmGoQ/3nSv1X1qbou653I/UV5zjmwxrvOYHfwrImtyGLXliOLTJ6669MK96O?=
- =?us-ascii?Q?YJIfEZ3M4vK+TeAu/u4Z7KN89Q9VzPUnayPDQvGGe4J7cLVbK7JrqeRz5+Wq?=
- =?us-ascii?Q?Nm18rN462dUn4eDjyotaGUZPHqlgo6S3ehykuxEd2wGgFtof5m6YqfneDI00?=
- =?us-ascii?Q?7kSerpdA8BXpDfH06PSL0SCbP7Y9NI7Af2dSSk2qh9HfD/EyX72R1m36rfAV?=
- =?us-ascii?Q?j0C7u+18Zw0yu2s7avPc7SIEmlwf3oY4SKgCgJx4x7EOkksj4WReHetsqev3?=
- =?us-ascii?Q?8+X5qvaM4mQpHSs4YaUsEpjiNxALFxofG0L7iuBaLuTUtaqNIWNISZazvot7?=
- =?us-ascii?Q?qDgIRKYLGAH4tJKrPOOi6b+SK9jJjqSNPQUvz3bbjHcyvrNOE5jSDGwVd7sl?=
- =?us-ascii?Q?P6XGffquayMeWuUsvOaLkN3CxRY6w38cLULk8ZMdgiDZoL6GHvF07BFK0Bvx?=
- =?us-ascii?Q?F0PK3h2wm6FxtQoS3J6aVcErU0sPwPxYW8FDutc74JzRqJ2/X3l9uBdE7vcD?=
- =?us-ascii?Q?Eh/eutS9o4kcpvvn9WwRpBy0zB08sB4+88CohbJ37hK1czISuHzILOgKw+1F?=
- =?us-ascii?Q?F9OcPgoRhkEtSLJlAIoYCBuADFcocPgqM9yQsgtbUz915OqXhJzZc3q6IN9I?=
- =?us-ascii?Q?h/2o2xJlvH7sIKldX9vTZkuNTZIHEyk7rU24z+ughaCeM9e0yUUQ9nVqAilf?=
- =?us-ascii?Q?IIC3G+F+7Mu8CkdIx0v3R9Alju/ajQJ3DQKbH4bZ4hryRDdw7AUn0r27KrO8?=
- =?us-ascii?Q?1umnAhwtr70GttLiTAprxj197XmEP0lpuOMy4dUXtq2lkqbhjiR9uPuM4fuk?=
- =?us-ascii?Q?6xNCs+efpWJlZpZzStUu2CWLZyiRez059gH4qLqVkqn5swZci1iRG8auhTs?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Thu, 15 Aug
+ 2024 00:09:24 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.7875.016; Thu, 15 Aug 2024
+ 00:09:23 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	UNGLinuxDriver@microchip.com,
+	Hongbo Wang <hongbo.wang@nxp.com>,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Colin Foster <colin.foster@in-advantage.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 00/14] VLAN fixes for Ocelot driver
+Date: Thu, 15 Aug 2024 03:06:53 +0300
+Message-Id: <20240815000707.2006121-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: HE1PR06CA0143.eurprd06.prod.outlook.com
+ (2603:10a6:7:16::30) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI2PR04MB10285:EE_
+X-MS-Office365-Filtering-Correlation-Id: a80d87d8-5fc3-40d8-d530-08dcbcbe8478
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|7416014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Pp+DcOLGht55cRLJT7/6pPzYFnmkrqJTHg5XE0ZkZkhTOscA8tA1Gg2TF+CO?=
+ =?us-ascii?Q?Srt3kPIXJFqiUCkp7ZezkWVpRfxuskd0FgPAFkWZKIRW+t58K0lgZCRmuXLy?=
+ =?us-ascii?Q?XjnFWv+Yk3o5lVbIpew2L+QSOaXVMhMXuCuouR2cEiZojVf4yZmw2oYxGVrC?=
+ =?us-ascii?Q?dw7OATnkPkl0+UkVZnsCXCEQsqnJ6zKhUnuRBXBG/2bAGTiYkfRjULeqj4Gw?=
+ =?us-ascii?Q?IJFbMMIgKPY4ePXgYOXxSLTpaZ523EtYHVmBvavmSC2NXc68jeRtwme5/z9a?=
+ =?us-ascii?Q?HDgXc1MWKG2agcq4rSlsbfmEdM0Z6f45jb4T4a4OJNXzSEdfOZnYfXd4gtnR?=
+ =?us-ascii?Q?PdcWrv2p+LPVGikTlFIjljjXokV8Td7uevW5a5/kfMceojTtn6Z4K+7XyghY?=
+ =?us-ascii?Q?g4O9LsPwbVukQXn2wpe6S4s+RmKfsqlQPqm0cU4vW4Xqg4rp6lwanPfh6gVk?=
+ =?us-ascii?Q?2ljzZNH1Eo8tks8I1623KZo7K4wXFFAwlqKsvBpZPJZZMlxrBvV7NA+vDIHl?=
+ =?us-ascii?Q?tq8vWEL70af8ajUz4jnLD3Az8SFhY17jSluoJ6icHJD2rQPztQT3av/D0+Ib?=
+ =?us-ascii?Q?QEM8wAbP1vjlHUFxLQT1X/NsIGgCjIZ1hQ4AZnEofYZnGsQr/RetqmHyqXkc?=
+ =?us-ascii?Q?qF6GFCVLuzq4joffd1+3f0rM3ydQfilfn1SbYfsrH9J4eHrvXxnrh9awF7nH?=
+ =?us-ascii?Q?yrFtZIJCzb3koGL2AfncPSlh8vLRSzcxiPYAyMOixhS++GCEVri017asyz3o?=
+ =?us-ascii?Q?RiMcGSQIW572vsmtHqVsEaIgYO0dd/a+iOXvHOhiI/bdmIP6dy/5w7SGDYLP?=
+ =?us-ascii?Q?2/rfS0On0lNCOqY0TCPI3jAv4NXmMVp+9wQ+vAehXeaBp7e0DQ3OPwJTsWbe?=
+ =?us-ascii?Q?RRI/f4jPMbt8+EAfj3CoJA/e+mG8rQxGYwXF0lxV+htOPvJHHXjfPRrJLx9m?=
+ =?us-ascii?Q?nQCeVrkfukabmxiI3Da8yk055I0LOlEUoF/nsiYC5Se0rfsOzuSwLFs/2yEP?=
+ =?us-ascii?Q?TTpBj7f+9KaRUr1OclUYoDg5hR6jOQP4PpBUHm96W32RRvcMrN/U61r1CXOG?=
+ =?us-ascii?Q?VK9jkYOzZARQi7bnw4ZQnrqkyFEF6MOgwV0o6bmcT17lxp7RdhzVOHhpWMSV?=
+ =?us-ascii?Q?2Ya/u+KmRkdbVUA2DlQwl9N3IoHrcIZS1/o3BZ68TUqOYlcpzjRw+ISu9qjP?=
+ =?us-ascii?Q?pfN1rrr0RArEEhcVK/LFEfSLqkhvRg1BVedV5EkEP42Pj1dgAN2ptbjg2AIs?=
+ =?us-ascii?Q?Wio8Y/3t+cB1DJ/R26DfJY6kOS8K/QPEi3+ZhgL7KeCUignV3aMB5hX/Ms0U?=
+ =?us-ascii?Q?CEJl1yb6tO5QRbnF86RaTt2OTupJ3dr7zO6UXtIQaaLRO9Lo0GfD3qtuUlls?=
+ =?us-ascii?Q?JufgjCIYBiX4e0wL576PfM4P7q+tStRVHqrMY3yuHBjiZqS8zQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(7416014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GGMnuT3HYsixZruPaxIGvxSg9kgmAUOIjGNe6oQxFf93hO4xstN6yLK8sNYR?=
+ =?us-ascii?Q?yeoLzQLYFaa48t8BeKLWZW1D4gVjkJ51GOAIFZGnGHN2jgSojIduhVTTxMOF?=
+ =?us-ascii?Q?R8vXmzfL1QO2HAcn5gqYMyN6/u0wNhrZbBHLZoJPHryeFqHLKWPklmfFquxa?=
+ =?us-ascii?Q?77B+xs9f1l+j8e7+ehq8VKFd9jlZTN5Xb6KiQ+C60XeiIyOEh7xLCGW05BHI?=
+ =?us-ascii?Q?jqg6q95BEu5Yh2VHvORef4gnIAUt79Ho5QiKHFso92j41aKdGAHYfV2irpET?=
+ =?us-ascii?Q?x4BBSXHNB7VML1DcCFkqTlh4Y2xIBJciq7td3M67TWA7XUGhL9iMmix9WKl0?=
+ =?us-ascii?Q?MoSiiuCCIys1ij2PnLKdIe7u8449l7SEGlh6LiHWjxqbVCnLkhT0EGV8Safb?=
+ =?us-ascii?Q?I1PVi293nJnbW/PYkCUVD0QTsaWYFGq3gHePHq8ajZrEzMgJOJEtpM0180ix?=
+ =?us-ascii?Q?ANqnSs9ZM+PPV7xksHwH83XmpSTdQWxfqmhvXqstF7PyL58s3Gp3q3/NqZvE?=
+ =?us-ascii?Q?oqaoYpb8BbNVsyqhuwoWYJSrxvqw5W8bBH26TqGbdkDEruPGgdMSUZqK1ysa?=
+ =?us-ascii?Q?hiO2+1Dr3k+crM+2pv2wwMQQ9vHAfYseGNL0Q0LNZwUob3ktdmho0u8F69Y6?=
+ =?us-ascii?Q?TeJV8JgbQ+a044vn66d0Dj9kw3Yu1zpI0lYF+3iaNwljNtLnTmhCeHPhrH6q?=
+ =?us-ascii?Q?f5wvezBgJMbrCpTmiHltT7Y982bGzYPe7Gz7KnNJgCE/1F49f3J+m5QTSj9m?=
+ =?us-ascii?Q?o9lEuxO8GLDPrk3GnlTEPtawtjTUVWkJIY6AC2wsDDjnj2UQrmu5Dh7QrAzx?=
+ =?us-ascii?Q?6sdUUtlmlbsgb+P91aH7AH4thpxz5qLXFViacuZ9FFeTKyYXYXZIwu7LOoMb?=
+ =?us-ascii?Q?k0S5BWmGvL4rtiqgPgRKGfXut3zbhCErjb3wCq0Ew0Pcez60qn6Za6OdQm9u?=
+ =?us-ascii?Q?ESvmwKCzK5FuaOzcgItu4jg+jDBVdWhH6H3x+OhlOynOd/e3EW94TfMp0Zuy?=
+ =?us-ascii?Q?Sb0eWkAQVoNJDHRyJA2v6FigAChTu6TtqqyXx8Eu3DIVsd89mmsVhCOYyiSq?=
+ =?us-ascii?Q?AommhsVlqJZRbdwyrbBI4pp93AHCPlU/fZebDQstQy0j30iMlT0Qa14dWsDM?=
+ =?us-ascii?Q?rwI+moPbB76DCwlro9R+zp3hQZGWVG86SuLJsXstD0OlVZoyufMqyure6W+M?=
+ =?us-ascii?Q?J4MeXi1DEUYc012TsEwRKerNlTGyadK6Do1efAAKC5f4zs4cMZsHdntcU0Gw?=
+ =?us-ascii?Q?x1RUBPed3TUAeSRpEruy7AMd8A4ZUp6U+edhPKyhDovOGVwc12yrt70Q9Ph1?=
+ =?us-ascii?Q?KLAxazw7A4Q0QwQvpp6gvM0c2Jb23QFs8TT69/HIWVY9cakYbuGTiNL50Z20?=
+ =?us-ascii?Q?i2vDo4iISu2PGKwwmpMWqJvQuLDDnAncOO4OQuDmSbF/gIVUmJqb1k7MBXlg?=
+ =?us-ascii?Q?VdvvUMI2VS9WxV7ccGTfdUNl3xPK8FHNF0nrWZebSg1jHTpICzt7A6IAsOvb?=
+ =?us-ascii?Q?HZvO3TnATbPlRkRhLNCF99ZhcWpVrRFnhWv2A19uBYHo4aQxQ4jys0YO8EaM?=
+ =?us-ascii?Q?jU/LfwwbpszZm5ynQqayUab7xmFQsEE1ZhRJK4pNOVbV8cYwbVfM1OePgpkz?=
+ =?us-ascii?Q?RA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a80d87d8-5fc3-40d8-d530-08dcbcbe8478
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 102b9317-ae4e-4ef4-b3f2-08dcbcbccde3
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2024 23:57:07.3388
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 00:09:23.3912
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6809
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LY0TZSYjFtUvUqkBNwhDWRp1FYLy4pOF1915Qf45bgT8/zyPvhx3L3wk0Jl8XiTyjME02GprgnAKCr9zB/fohw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10285
 
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com> Sent: Wednesday, A=
-ugust 14, 2024 9:59 AM
->=20
-> Change VMBus channels macro (VRSS_CHANNEL_DEFAULT) in
-> Linux netvsc from 8 to 16 to align with Azure Windows VM
-> and improve networking throughput.
->=20
-> For VMs having less than 16 vCPUS, the channels depend
-> on number of vCPUs. Between 16 to 32 vCPUs, the channels
-> default to VRSS_CHANNEL_DEFAULT. For greater than 32 vCPUs,
-> set the channels to number of physical cores / 2 as a way
-> to optimize CPU resource utilization and scale for high-end
-> processors with many cores.
-> Maximum number of channels are by default set to 64.
+This is a collection of patches I've gathered over the past several
+months.
 
-Where in the code is this enforced? It's not part of this patch. It
-might be in rndis_set_subchannel(), where a value larger than
-64 could be sent to the Hyper-V host, expecting that the Hyper-V
-host will limit it to 64. But netvsc driver code is declaring an array
-of size VRSS_CHANNEL_MAX, and there's nothing that guarantees
-that Hyper-V will always limit the channel count to 64. But maybe
-the netvsc driver enforces the limit of VRSS_CHANNEL_MAX in a
-place that I didn't immediately see in a quick look at the code.
+Patches 1-6/14 are supporting patches for selftests.
 
->=20
-> Based on this change the subchannel creation would change as follows:
->=20
-> -------------------------------------------------------------
-> |No. of vCPU	|dev_info->num_chn	|subchannel created |
-> -------------------------------------------------------------
-> |  0-16		|	16		|	vCPU	    |
-> | >16 & <=3D32	|	16		|	16          |
-> | >32 & <=3D128	|	vCPU/2		|	vCPU/2      |
-> | >128		|	vCPU/2		|	64          |
-> -------------------------------------------------------------
+Patch 9/14 fixes PTP TX from a VLAN upper of a VLAN-aware bridge port
+when using the "ocelot-8021q" tagging protocol. Patch 7/14 is its
+supporting selftest.
 
-The terminology here is slightly wrong. A VMBus device has one
-primary channel plus zero or more subchannels. The chart
-above is specifying the total number of channels (primary plus
-subchannels), not the number of subchannels.
+Patch 10/14 fixes the QoS class used by PTP in the same case as above.
+It is hard to quantify - there is no selftest.
 
-Michael
+Patch 11/14 fixes potential data corruption during PTP TX in the same
+case as above. Again, there is no selftest.
 
->=20
-> Performance tests showed significant improvement in throughput:
-> - 0.54% for 16 vCPUs
-> - 0.83% for 32 vCPUs
-> - 1.76% for 48 vCPUs
-> - 10.35% for 64 vCPUs
-> - 13.47% for 96 vCPUs
->=20
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> ---
-> Changes in v2:
-> * Set dev_info->num_chn based on vCPU count
-> ---
->  drivers/net/hyperv/hyperv_net.h | 2 +-
->  drivers/net/hyperv/netvsc_drv.c | 5 ++++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_=
-net.h
-> index 810977952f95..e690b95b1bbb 100644
-> --- a/drivers/net/hyperv/hyperv_net.h
-> +++ b/drivers/net/hyperv/hyperv_net.h
-> @@ -882,7 +882,7 @@ struct nvsp_message {
->=20
->  #define VRSS_SEND_TAB_SIZE 16  /* must be power of 2 */
->  #define VRSS_CHANNEL_MAX 64
-> -#define VRSS_CHANNEL_DEFAULT 8
-> +#define VRSS_CHANNEL_DEFAULT 16
->=20
->  #define RNDIS_MAX_PKT_DEFAULT 8
->  #define RNDIS_PKT_ALIGN_DEFAULT 8
-> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_=
-drv.c
-> index 44142245343d..e32eb2997bf7 100644
-> --- a/drivers/net/hyperv/netvsc_drv.c
-> +++ b/drivers/net/hyperv/netvsc_drv.c
-> @@ -27,6 +27,7 @@
->  #include <linux/rtnetlink.h>
->  #include <linux/netpoll.h>
->  #include <linux/bpf.h>
-> +#include <linux/cpumask.h>
->=20
->  #include <net/arp.h>
->  #include <net/route.h>
-> @@ -987,7 +988,9 @@ struct netvsc_device_info *netvsc_devinfo_get(struct
-> netvsc_device *nvdev)
->  			dev_info->bprog =3D prog;
->  		}
->  	} else {
-> -		dev_info->num_chn =3D VRSS_CHANNEL_DEFAULT;
-> +		int count =3D num_online_cpus();
-> +
-> +		dev_info->num_chn =3D (count < 32) ? VRSS_CHANNEL_DEFAULT : DIV_ROUND_=
-UP(count, 2);
->  		dev_info->send_sections =3D NETVSC_DEFAULT_TX;
->  		dev_info->send_section_size =3D NETVSC_SEND_SECTION_SIZE;
->  		dev_info->recv_sections =3D NETVSC_DEFAULT_RX;
-> --
-> 2.34.1
->=20
+Patch 13/14 fixes RX in the same case as above - 8021q upper of a
+VLAN-aware bridge port, with the "ocelot-8021q" tagging protocol. Patch
+12/14 is a supporting patch for this in the DSA core, and 7/14 is also
+its selftest.
+
+Patch 14/14 ensures that VLAN-aware bridges offloaded to Ocelot only
+react to the ETH_P_8021Q TPID, and treat absolutely everything else as
+VLAN-untagged, including ETH_P_8021AD. Patch 8/14 is the supporting
+selftest.
+
+Vladimir Oltean (14):
+  selftests: net: local_termination: refactor macvlan creation/deletion
+  selftests: net: local_termination: parameterize sending interface
+  selftests: net: local_termination: parameterize test name
+  selftests: net: local_termination: add one more test for VLAN-aware
+    bridges
+  selftests: net: local_termination: introduce new tests which capture
+    VLAN behavior
+  selftests: net: local_termination: don't use xfail_on_veth()
+  selftests: net: local_termination: add PTP frames to the mix
+  selftests: net: bridge_vlan_aware: test that other TPIDs are seen as
+    untagged
+  net: mscc: ocelot: use ocelot_xmit_get_vlan_info() also for FDMA and
+    register injection
+  net: mscc: ocelot: fix QoS class for injected packets with
+    "ocelot-8021q"
+  net: mscc: ocelot: serialize access to the injection/extraction groups
+  net: dsa: provide a software untagging function on RX for VLAN-aware
+    bridges
+  net: dsa: felix: fix VLAN tag loss on CPU reception with ocelot-8021q
+  net: mscc: ocelot: treat 802.1ad tagged traffic as 802.1Q-untagged
+
+ drivers/net/dsa/ocelot/felix.c                | 126 ++++-
+ drivers/net/ethernet/mscc/ocelot.c            | 279 +++++++++++-
+ drivers/net/ethernet/mscc/ocelot_fdma.c       |   3 +-
+ drivers/net/ethernet/mscc/ocelot_vcap.c       |   1 +
+ drivers/net/ethernet/mscc/ocelot_vsc7514.c    |   4 +
+ include/linux/dsa/ocelot.h                    |  47 ++
+ include/net/dsa.h                             |  16 +-
+ include/soc/mscc/ocelot.h                     |  12 +-
+ include/soc/mscc/ocelot_vcap.h                |   2 +
+ net/dsa/tag.c                                 |   5 +-
+ net/dsa/tag.h                                 | 135 ++++--
+ net/dsa/tag_ocelot.c                          |  37 +-
+ .../net/forwarding/bridge_vlan_aware.sh       |  54 ++-
+ tools/testing/selftests/net/forwarding/lib.sh |  57 +++
+ .../net/forwarding/local_termination.sh       | 431 +++++++++++++++---
+ 15 files changed, 1036 insertions(+), 173 deletions(-)
+
+-- 
+2.34.1
+
 
