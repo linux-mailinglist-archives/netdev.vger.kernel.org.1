@@ -1,119 +1,151 @@
-Return-Path: <netdev+bounces-118760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFF0952AF9
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:57:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A62952B17
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:14:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C8601C20F70
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 08:57:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F4461C21352
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA611BB692;
-	Thu, 15 Aug 2024 08:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1561C0DD9;
+	Thu, 15 Aug 2024 08:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THyOwnBN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QQ5kBSSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25011AC451;
-	Thu, 15 Aug 2024 08:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28AB2177980
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 08:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723710536; cv=none; b=K832ibX6m41wU6FkgKlWdN+1MVeOjqoqerm+pK92JwVcI+SVhzNUMqVBrbW1YffKRrWIuqNx1+bo3LPAfsMx8xHKD7HyE8pu4MfWB7cW05W6twGX+iJQ/VAReB9cnA/GKeYnWCT2o9MRApxyoP66F6D14yzCXNuTmNbXtdxAHTs=
+	t=1723710648; cv=none; b=f5E/8IyoInPSlO00m3NDRFJLwE+3SP5snNSEC94N2c+OtB3FiSfFsvELxU6NUqyvjzjJ7E0zZD2jTE30uVGyEkiyk3yFCH/ORlfWn3dWMUjX/r/ydbQQNvSaRO5s6K7hu2mJgEGhtiBNcMJ7DtfkNAY571i1GkQL2me87yeGB1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723710536; c=relaxed/simple;
-	bh=pYiibuPCOQ+DnlvpyzyPHr7ObAv45Sa/IJPwOtF5a28=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gN8QP3jz5Z7koSvTI56kks7QmNoG/aJh6sDkgh9b3cBqclfCO/2dwCD80VpNUaO7EcwOAA4g8xVNufstD/ffGttS1rltwXODgqmm1Aou0F2Pne8qJFpBNIwxpoaBM5SL1cJ5Vk1Z9AJ5sIa0aQhN8/DMeDb+PJhEIYB8Gg8lJ/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THyOwnBN; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fc611a0f8cso5943915ad.2;
-        Thu, 15 Aug 2024 01:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723710534; x=1724315334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Po+qMQMbpzYP4uJIJ/eolh7Aqpx5R5OsB3tn5+DTss=;
-        b=THyOwnBNVZwbhh4uL6afjY7pzPuTcDFHCgz5u3rBnCC6V6/twyf9Atn0Sf0b/QuyTK
-         DfqlhOHQ9Z0W6ae5YSU4LwIb4VJbCS+SaHV68TmlOwGQWwcutyjtUZIguqclUyIuMLA1
-         yxGUr+8sJ+syj+qKH7u4/5o/GPZ1cqqbHmHoXWXwZdqsawrkz3cRfOjBeNk2bj3Q1kH3
-         kSGhN0BCkfo6xz4RTvf9AYNac3PHfyWoO6PObgxQ6okosH6d470jBSCg0KrZUg/Yr76p
-         HuktaGlO88YOTK2k5ZpLUi8xSXLQ0KLAdeSer2/7pdCQpJNqFSsM4pAaa+AhMT5Z+ESe
-         jMsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723710534; x=1724315334;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1Po+qMQMbpzYP4uJIJ/eolh7Aqpx5R5OsB3tn5+DTss=;
-        b=DAuYU5T/Q1IoUdhJvJf/GAsLbIv7ia0o2Z5Oudeb479szbn5H9rKIj4E62Xz41GOZe
-         JFytoUyjXreOjnUUzyPDNDXSaW+nCSuT7TkfU6yz+fN5UrMqi8+xQWtLYSaooTxIeBj8
-         S3dOOszCDQejLVzcYAiyuVmm6xZpld/SHsOAIPC8tZLDTMCTD2O+gLI4awlltf2TZLAe
-         CaQcowXcRV1Q5ZCC23NRG3YKqdgYZDyYfE/hGEudLKKGx/+mwuP5SICE5l6RMiAvURID
-         7ZoTl/b5OmmsrpLpVoXZL0cRUH9ScziZujh0iPRQkoOt8X1LHlhjt6MNrywQf/j5DFW5
-         d07w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Ll0INFdNSwbrP7r4naVIkhT8k3CVx73RZmaPTonVHTNpp4gfdUqBRR/3LqnoC4USYHdg52NY2R9KCLGJ27tZMHMH/i3mCHs0Y4/EjsSWvJStpRmB6gVPEdO5f+fnzRidVVNa
-X-Gm-Message-State: AOJu0YxwpLglHCAPWFDs+1e9VxH4JqWDv7bsrge9/TU2zHlDFrniPgSj
-	FcxTwuksNYZY8sZlJZjIWiw36cqzh9eKfr2WNHyk7MTtmpZjkDBk
-X-Google-Smtp-Source: AGHT+IHRwFFkBt4msVtwJ6Wb4AlGastbzIbW6wEHvNQuV7vRPGZDuqYXnRG7QAKqUyzRRhD1J1dU1A==
-X-Received: by 2002:a17:902:c943:b0:1fc:4763:445c with SMTP id d9443c01a7336-201d644d894mr60980815ad.32.1723710529240;
-        Thu, 15 Aug 2024 01:28:49 -0700 (PDT)
-Received: from localhost.localdomain ([139.159.170.18])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f031bc36sm6613965ad.100.2024.08.15.01.28.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 01:28:48 -0700 (PDT)
-From: icejl <icejl0001@gmail.com>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	icejl <icejl0001@gmail.com>
-Subject: [PATCH] netfilter: nfnetlink: fix uninitialized local variable
-Date: Thu, 15 Aug 2024 16:27:33 +0800
-Message-Id: <20240815082733.272087-1-icejl0001@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723710648; c=relaxed/simple;
+	bh=nl3MznZJdMVxI4LJ4em4IKdizm38EsySmGVIpcr66fw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=srqY4m+y69cs+ZXXqh/QLpVWCdcP7D55YXoHZ1mfYhF1SqFeGMGTJ27xUBRQujOEQ3PtRZWYhF7WNVasXKwnrGWAQ2VK9jXHN4A+6NkQK/2HUWDHPV2gdTrUYVk9eNhA1ut4qag6El6QwEaM+TN8SAyW4h8rTx/3+f0HnuLAfts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QQ5kBSSU; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723710642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H46cTvBqsMii2CYcoZMIb49w/3n4/lbMyRjfJLUdJ2Y=;
+	b=QQ5kBSSUL/fpningt+lddUKbZtmay4Op1qrYDO1/87pza2jcYIc7WLCb1I3KId3gx/Y21J
+	MeEc4lJHD0snpaw9tVRGOABPPFW8MDsbkJ3N3EnRcy4782lC6efr73WO/6PLdrKIsbjnno
+	W8Gx4HYxvt5aORCsrhqVxaQGT1LlpTA=
+Date: Thu, 15 Aug 2024 16:30:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
+To: NeilBrown <neilb@suse.de>
+Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+ jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kunwu Chan <chentao@kylinos.cn>
+References: <20240814093853.48657-1-kunwu.chan@linux.dev>
+ <172363131189.6062.4199842989565550209@noble.neil.brown.name>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kunwu Chan <kunwu.chan@linux.dev>
+In-Reply-To: <172363131189.6062.4199842989565550209@noble.neil.brown.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-In the nfnetlink_rcv_batch function, an uninitialized local variable
-extack is used, which results in using random stack data as a pointer.
-This pointer is then used to access the data it points to and return
-it as the request status, leading to an information leak. If the stack
-data happens to be an invalid pointer, it can cause a pointer access
-exception, triggering a kernel crash.
+Thanks for your reply.
 
-Signed-off-by: icejl <icejl0001@gmail.com>
----
- net/netfilter/nfnetlink.c | 1 +
- 1 file changed, 1 insertion(+)
+On 2024/8/14 18:28, NeilBrown wrote:
+> On Wed, 14 Aug 2024, kunwu.chan@linux.dev wrote:
+>> From: Kunwu Chan <chentao@kylinos.cn>
+>>
+>> Increase size of the servername array to avoid truncated output warning.
+>>
+>> net/sunrpc/clnt.c:582:75: error：‘%s’ directive output may be truncated
+>> writing up to 107 bytes into a region of size 48
+>> [-Werror=format-truncation=]
+>>    582 |                   snprintf(servername, sizeof(servername), "%s",
+>>        |                                                             ^~
+>>
+>> net/sunrpc/clnt.c:582:33: note:‘snprintf’ output
+>> between 1 and 108 bytes into a destination of size 48
+>>    582 |                     snprintf(servername, sizeof(servername), "%s",
+>>        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>    583 |                                          sun->sun_path);
+>>
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>> ---
+>>   net/sunrpc/clnt.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+>> index 09f29a95f2bc..874085f3ed50 100644
+>> --- a/net/sunrpc/clnt.c
+>> +++ b/net/sunrpc/clnt.c
+>> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *args)
+>>   		.connect_timeout = args->connect_timeout,
+>>   		.reconnect_timeout = args->reconnect_timeout,
+>>   	};
+>> -	char servername[48];
+>> +	char servername[108];
+> If we choose this approach to removing the warning, then we should use
+> UNIX_PATH_MAX rather than 108.
+My negligence.
+>
+> However the longest server name copied in here will in practice be
+>     /var/run/rpcbind.sock
+>
+> so the extra 60 bytes on the stack is wasted ...  maybe that doesn't
+> matter.
+I'm thinking  about use a dynamic space alloc method like kasprintf to 
+avoid space waste.
+> The string is only used by xprt_create_transport() which requires it to
+> be less than RPC_MAXNETNAMELEN - which is 256.
+> So maybe that would be a better value to use for the array size ....  if
+> we assume that stack space isn't a problem.
 
-diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
-index 4abf660c7baf..b29b281f4b2c 100644
---- a/net/netfilter/nfnetlink.c
-+++ b/net/netfilter/nfnetlink.c
-@@ -427,6 +427,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	nfnl_unlock(subsys_id);
- 
-+	memset(&extack, 0, sizeof(extack));
- 	if (nlh->nlmsg_flags & NLM_F_ACK)
- 		nfnl_err_add(&err_list, nlh, 0, &extack);
- 
+Thank you for the detailed explanation. I read the 
+xprt_create_transport,  the RPC_MAXNETNAMELEN
+
+is only use to xprt_create_transport .
+
+> What ever number we use, I'd rather it was a defined constant, and not
+> an apparently arbitrary number.
+
+Whether we could check the sun->sun_path length before using snprintf?  
+The array size should smaller
+
+than  the minimum of sun->sun_path and RPC_MAXNETNAMELEN.
+
+Or use the dynamic space allocate method to save space.
+
+>
+> Thanks,
+> NeilBrown
+>
+>
+>>   	struct rpc_clnt *clnt;
+>>   	int i;
+>>   
+>> -- 
+>> 2.40.1
+>>
+>>
 -- 
-2.34.1
+Thanks,
+   Kunwu.Chan
 
 
