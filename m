@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-118764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09439952B43
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:42:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C30F7952B48
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F105128305B
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:42:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 344E42828A9
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 09:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0881A00D3;
-	Thu, 15 Aug 2024 08:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73AB1A08C6;
+	Thu, 15 Aug 2024 08:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="kIUGT9u0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dESvSrli"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E0E19EECF
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 08:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EFB19D09F;
+	Thu, 15 Aug 2024 08:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723711116; cv=none; b=Ist/H8SuP9D/0YULnxRMUmTV7GmHw+L+YcG9uYGIZFxmHa+gE62fGId5u6b7fImBS6/ozsw93oYp/60YgU2WU3ksTXvZSU1a8piUxqIEONGPkBayFfeygir6KdBHJmTBb5LhicVvaBuXH9iM3hy54QBVyVG2T9/wP1jM28wA4dc=
+	t=1723711437; cv=none; b=S9B+I+DfVqLO0Nszhca08wOz3rbnzf7gIr2ZreH3BJt3ZAGEXr2gnDTzUqOFj9VWZJr9npIln7Ersu6Ojg7C9vc0sp4nGV/sUqtZHBrmBunje4dKzmMeoqcy18gkUP3mjgLBhDv6DtvMVI9w8gBGTq2FsFOo6lNy3+y56XPFqEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723711116; c=relaxed/simple;
-	bh=DoYXZggKWwas4BPjqmW28gROX9NXEaRFWWYOoOTn/G4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W1UwMOTE7DfxYkOxS+rV/NRQ4z77JlY/VWuJhXwhGiGfcZJdwnHT53oNFzNjT+UjkHM1CrrAhQPrQOCJMzXY2FFW7WGEmu9LTN2QtOE5fqkYoP8QcvMPV+URDj2k/sXCWZYJpGk9y3B0dniRw30TwBPlpiDJsDH3uobutQ1e+VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=kIUGT9u0; arc=none smtp.client-ip=212.227.126.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
+	s=arc-20240116; t=1723711437; c=relaxed/simple;
+	bh=FO7AnkhwQyc9LhN8JC/o1Qjan4QTR/ZpW+sH5LA0iWs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t+3TeqzZSn80F/SlaPB3hKfbAB1ArtYtfFdqv/k9PLSzW6EbRpgpAVG4s4iJ2/eyxkmEcgq5SmDTDg6uKBx6eA9EozH0iumsuC75oGl7imvPmDhRRA81bP2uJuTTLIg2KjqDdV3CTDLDOs4OWDOzEA2r/y0eKyIipmStHx8Ixig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dESvSrli; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-201f44ad998so1348985ad.0;
+        Thu, 15 Aug 2024 01:43:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=martin-whitaker.me.uk; s=s1-ionos; t=1723711097; x=1724315897;
-	i=foss@martin-whitaker.me.uk;
-	bh=m18xWgr3xx9aFGB0h0G2K0H6V7SEZm2JZmuWpA75Ww0=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=kIUGT9u0c0Voq+hDN7VHiCwAfkSl88zZbnJm+B96cLfcDSnhrSuzsYnH3Q+FVWJu
-	 JBP09iBgGa0Ofql9doE+wp6NNSqLHD3qO5mvOJNdphLeO0e2PCUpI1hSRE0jNHdSn
-	 qpz0x8R66396v53YtSIFMaNKQX0fypqd9/1kwv9AWeV8WynhDCvYGpQ/8D2jpciT+
-	 1dAYSozbvu+TJgDTMe64Nw0Y/jnOkHBh40oRrlQQAmv8L8Of5qDtHVihfYQpQDKkD
-	 ug7TltVjXavhjQz/E3GWZ8VM0saDKCT6vAjbBjhlE0ZIjL6msMNhPC6H0AT6ipGLm
-	 fcGZrZd9ic9q2aJ0jA==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from thor.lan ([194.120.133.17]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1MEVBa-1sPbTn2lEg-000DX3; Thu, 15 Aug 2024 10:38:17 +0200
-From: Martin Whitaker <foss@martin-whitaker.me.uk>
-To: netdev@vger.kernel.org
-Cc: UNGLinuxDriver@microchip.com,
-	Woojung.Huh@microchip.com,
-	ceggers@arri.de,
-	arun.ramadoss@microchip.com,
-	andrew@lunn.ch,
-	Martin Whitaker <foss@martin-whitaker.me.uk>
-Subject: [PATCH net] net: dsa: microchip: fix PTP config failure when using multiple ports
-Date: Thu, 15 Aug 2024 09:38:14 +0100
-Message-ID: <20240815083814.4273-1-foss@martin-whitaker.me.uk>
-X-Mailer: git-send-email 2.41.1
+        d=gmail.com; s=20230601; t=1723711435; x=1724316235; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lPX9A1uvCQ4gNMQHnZ6Jg67ZdZgU4Gk19HgaovouPWw=;
+        b=dESvSrliPxXPgu991cxBFNP4uOKdJSK4+Dez4jrt7wK/mMTp+cxrDVB/SKQe+X+v+p
+         l5lU8WG/JcK0AZpG1Rcwz2Lia+oo/dmjKmQfQSoudzjdiVK+eHu/4yDjhO8tsCAwFkcB
+         zQjuSutPR8Ox2gtAA4Z6Fp3YUnqlgddcw8NxfW8+Bwf+Col7PPu3H8TMp46hdYTe8P0w
+         oA4T+WHozfBitiYuS5FGwUqRguqD1lp25IxoOaLTvrAPt4bZGhivSrjFH7a20GpYjF10
+         9KLdoFF/GewS1ANWD7/ug0y1pPnIjTuwktnVKsMN45fHmu0JhuhmhEweMjt9rWHwUVl5
+         p7Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723711435; x=1724316235;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lPX9A1uvCQ4gNMQHnZ6Jg67ZdZgU4Gk19HgaovouPWw=;
+        b=HXwaJiNPqOGDlTnshOrG52CljwmtmML6aGyPUAqJlydCtRdY14SN+1Dyys+6NwU3qn
+         GOPOhtaqP3Yx0dDzmlU3gugH0CyfJmyA1r8c6+ILYA8X2M6YgIZ2HGP8QE87r4B0ouaK
+         GWLzAUXG0MKnh0zSGIH2KiwurAYaP/KNnKCjOXIeeJKD5JzZm7AA32aa7zi/AK/gYZOA
+         v1zAj7s7oAOwSr7IdTv/3/o2MACBgkEPe2O2dGzFNjLR4DD3Z0vAeEDyP23HM/lEKi9E
+         AVDIlcsxbSL6ZUf00Ufec65TH0wFUayv1aqJFlMgGue/VGzy8Eu9OXfuvOMRWFNi8lW5
+         0uSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWiKqIAmCJb9Anr/OWkkGjtORhFd4V0pK91JNvHjreccYlAVYHfqKcSKpYclt5/uF+BvS0jY7shvGeR9QrlRFxysU9RJCT96pLEYo9Z
+X-Gm-Message-State: AOJu0YzGTzBM4XkMncoXFNnd9rB3Igo3BnL2z/vEbtlt7DsbG3l5Doe8
+	32V2vnKO+VB9I1qk20Af2PAgOwWnpLURYwJNL03qht0NrqbsqQ6As5/0yRgh/93OtQ==
+X-Google-Smtp-Source: AGHT+IFG5IUzajGO8WTnXHCc/L6HrLRQovNVOWulK/PTn9tc6hwuJYOydAxLLcEQZtHaGhinVaFaEw==
+X-Received: by 2002:a17:902:ce83:b0:1fd:6ca4:f987 with SMTP id d9443c01a7336-201ee4bc32cmr42639545ad.15.1723711435400;
+        Thu, 15 Aug 2024 01:43:55 -0700 (PDT)
+Received: from localhost.localdomain ([49.0.197.176])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f02fb4f1sm6814175ad.1.2024.08.15.01.43.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 01:43:55 -0700 (PDT)
+From: sunyiqi <sunyiqixm@gmail.com>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	sunyiqi <sunyiqixm@gmail.com>
+Subject: [PATCH] net: remove release/lock_sock in tcp_splice_read
+Date: Thu, 15 Aug 2024 16:43:30 +0800
+Message-Id: <20240815084330.166987-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:a38OgKORuwsd2WIhwTp3RlZvGq1igiMRqt2xyz4vIvBqCalhf6A
- VMCM0LThM0hl21xKaNGC+dj4g4ctNBQPRyp4Virod6J/Ghw63jUevaiVT6OISB6JqALQtxk
- EoXt2JWkA5VtAiSOottHBJdEWNQP4SV5TBiPWins0eQNCSUWt4WmnuIMXU1WrcnedkLeY+6
- wfG1AvcTMNXBqE830hOTg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:PI88lZDMeMM=;IoRZ2g/YO2wFGk9C2hv9Kj/UEw0
- ZJccyH4AQ9m+CYCMXFB+ZgzV1xpEOfOFVUam1VON1svh9ZLXFu6J1yp/qf/1yRJcJXNolaOIm
- eeucMsEereGJoTyZpf7IIsZc8ipOW6TcNrrLJmLRKAyN3dUr9ijr1M809fMbPUheALv6gw4Rq
- SHYuaOh4YPGil5MkihLnhyXyGJviwaG5dhvJ5QLWTiYHQuNSnmUpwwQ2DVJCtPybRiyxDb32k
- lVhuvkms5VrluTPoXblQjx5KnQ7F/CAXmK957g7knMNXbKiTdLdJtkshJTeas8CRVtoXR9xl9
- GLr0ch3LTyaOX2yYq8UAF6O8e8MJMtPGCO91GAtj9LO/Yo69SUfDCfTV6cldyZp7E7zmcWz3q
- RVwol8qWRFUXJ48HvUuJH0CxS5qse8FGQAcUKHeQzf+M/HMhXlm5PVcZKVd4/o1DyrdQEfMcu
- fD0bXXU0csbR2ZGMe40pvWgv1/t/83UZAvtMPF9KOLhKl22XleMkjeCatXA8h1yinOzcK+eQ9
- cbtTcNXYShiajFjbOQ8KJW0RZiQIGhQ275XhtQpXZ1WZUhP99vBvrDkiPaBRFYiMH0i9iPsc1
- ENSsTZy1nLp8sQE5K4DZNK4+0IvBTZm6UvVIjFYQaN866ee09cJR0xzwlx2+36YoObs1p6ayb
- /ULWqtHUSMjDGXsCQjE8NMXpnmnv4WSm2jGrm/4yQtlEfvMr9y7LKgCxuFJOnp+s5ZgZceP53
- nU4/bmNS9LhtRAznk1Ey2hnupK2aS7F9A==
+Content-Transfer-Encoding: 8bit
 
-When performing the port_hwtstamp_set operation, ptp_schedule_worker()
-will be called if hardware timestamoing is enabled on any of the ports.
-When using multiple ports for PTP, port_hwtstamp_set is executed for
-each port. When called for the first time ptp_schedule_worker() returns
-0. On subsequent calls it returns 1, indicating the worker is already
-scheduled. Currently the ksz driver treats 1 as an error and fails to
-complete the port_hwtstamp_set operation, thus leaving the timestamping
-configuration for those ports unchanged.
+When enters tcp_splice_read, tcp_splice_read will call lock_sock
+for sk in order to prevent other threads acquiring sk and release it
+before return.
 
-This patch fixes this by ignoring the ptp_schedule_worker() return
-value.
+But in while(tss.len) loop, it releases and re-locks sk, give the other
+thread a small window to lock the sk.
 
-Link: https://lore.kernel.org/netdev/7aae307a-35ca-4209-a850-7b2749d40f90@=
-martin-whitaker.me.uk/
-Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk>
-=2D--
- drivers/net/dsa/microchip/ksz_ptp.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+As a result, release/lock_sock in the while loop in tcp_splice_read may
+cause race condition.
 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microch=
-ip/ksz_ptp.c
-index f0bd46e5d4ec..050f17c43ef6 100644
-=2D-- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -266,7 +266,6 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
- 	struct ksz_port *prt;
- 	struct dsa_port *dp;
- 	bool tag_en =3D false;
--	int ret;
+Fixes: 9c55e01c0cc8 ("[TCP]: Splice receive support.")
+Signed-off-by: sunyiqi <sunyiqixm@gmail.com>
+---
+ net/ipv4/tcp.c | 2 --
+ 1 file changed, 2 deletions(-)
 
- 	dsa_switch_for_each_user_port(dp, dev->ds) {
- 		prt =3D &dev->ports[dp->index];
-@@ -277,9 +276,7 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
- 	}
-
- 	if (tag_en) {
--		ret =3D ptp_schedule_worker(ptp_data->clock, 0);
--		if (ret)
--			return ret;
-+		ptp_schedule_worker(ptp_data->clock, 0);
- 	} else {
- 		ptp_cancel_worker_sync(ptp_data->clock);
- 	}
-=2D-
-2.41.1
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e03a342c9162..7a2ce0e2e5be 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -856,8 +856,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
+ 
+ 		if (!tss.len || !timeo)
+ 			break;
+-		release_sock(sk);
+-		lock_sock(sk);
+ 
+ 		if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
+ 		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+-- 
+2.34.1
 
 
