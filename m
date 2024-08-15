@@ -1,124 +1,184 @@
-Return-Path: <netdev+bounces-118699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929CD952828
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33DC4952837
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 05:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E601286F94
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4863286755
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 03:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9ED2231C;
-	Thu, 15 Aug 2024 03:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0A522092;
+	Thu, 15 Aug 2024 03:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcSPsOf9"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EC62C182;
-	Thu, 15 Aug 2024 03:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7608F6FC3;
+	Thu, 15 Aug 2024 03:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723691455; cv=none; b=cE8Sb23uFZ6Qd6yayFsefBOyLF3nNyqBuDS5BRg/gCUdfx25HZas2SxGH8YbR1hCcDdodbbu0kxzQ7evuYfv6tX3/H8QCv3uPcG8+1Kc07yjDVi1Isp6Xa+m7/je1JJgQgdiwzyNkD1KDNcThSoIBS5wLRE2HUjTemvrq6sUimE=
+	t=1723691727; cv=none; b=fMy61FaruFTpy4+7p9sTZ35IeEWsmRJEolF1u/bgl/Xe5Oq9KKVXvgBc5UOQmhrjuSyO0Td/pdZizeqV5MmcWhivvffl4sTBcvAMzl1SIOrT87VY+hVQp2XWBdCQxPUjgrCFPapoGHH+Ir9HL6OXo3eX+Td8BRu+i+YxmnxNQjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723691455; c=relaxed/simple;
-	bh=tK+nz4AIb/ZASImI4NIaDpVVASdlmoPWEZXYhi1XNJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LMYRRBXI21YLJo5sjXHuzaR8h3eG+N7cJb7kFXbfK5cJvTLSbZyyHXrhao9M0SXSsc3EMXI3oQggyM8UlP+9ktvV66sODORsCGLVccdKZg33E0RO9pZLwM0PgLSZQ1jg8GaD6j2uMKkDnfdL6wC8tmgJg9oF5qT+fHQAO0E8XBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wkqks15GZz2CmNF;
-	Thu, 15 Aug 2024 11:05:57 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0D10814040F;
-	Thu, 15 Aug 2024 11:10:50 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 15 Aug 2024 11:10:49 +0800
-Message-ID: <a036abc3-76a0-450c-afea-2db3c10f0ed5@huawei.com>
-Date: Thu, 15 Aug 2024 11:10:49 +0800
+	s=arc-20240116; t=1723691727; c=relaxed/simple;
+	bh=+8pEvT4Kr+975J7uHniAljyXE+nSa1o1trJ3UZzOjfs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q567axAipoAxDX1Cahc2gWNo225tzzupt6e34cJ7Ke8kCjGUuN2I9haz8NitMyyKhtmdgMqj2ruPMJVkO/T6dLNg9pdcFtRBs33NamNBebfNh24AymwFNNwrIUeLuLnwvYFYoopcwwK9sTib2Hl6RWJh19I48VtCTIFyWCpvxRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IcSPsOf9; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2d3b5f2f621so369234a91.1;
+        Wed, 14 Aug 2024 20:15:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723691726; x=1724296526; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dtPf+04gKObZUgi4bIGxCdJ2e58CFxBSSmwvE0nQa2Y=;
+        b=IcSPsOf9QCgi3ekcuyQ4GFnvdO0LAnUUVLSHl51+IDS1Tu8luDT1ALQA+jnaIwUNgc
+         QCfKkUuGA2zMmbQ4E9eSZynyCtQIYbPZ9o4xWUz92IwclJwoMARjxhFaaYnCQO/0KipX
+         JLY8oO5F9CQbCIl6cwoFYZnlfYziE/HWbss4bvEydO2/whoTm+aBZdTT/8hC/w4CiS9O
+         8o5ZGrBFg0+JdkjlZkaZTi/d9DSHPYAUpEf5C8/rSpEqzN3IqZzf9XLtw3j8P+naWDjg
+         aRLTTe3dCL4l8l0Bzcc2BvOeOJuccT783jnjhA3PvxBPdhc4EckntZ21S4PB+j55PHeu
+         U+cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723691726; x=1724296526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dtPf+04gKObZUgi4bIGxCdJ2e58CFxBSSmwvE0nQa2Y=;
+        b=AgaPMmqmNs7/Uzg+lEax6WvrDj5S0/vFcl0OIMYab/C5pZGgBdCiEWLnxh7KCDY5aO
+         AGDrfGtngsJGyRbev7J9e/SMwNWLG6qvwXON2+aotclgIySVKkE9V47M6U4/urT+F49e
+         XMXcxwpGIqJOsN+BlJrVoY27Rca8vMmJIcPZu6WF/SalrLUoCgXp5YGGUi4AzWKKcyVy
+         Zxl6Knjuea0ZtN6jSVrblNW6phY0oVTnUQbx1SQRrbywsqlI6o0+5HoY5baET/LdClPt
+         5KMN7RnI5vNYoAkLqFRP4Qz9VS1Ugpo0m2Kk2A0JsTUBhg+pPkY5hwGGvTVlGEcHdHjT
+         Aorg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLJ9VPSvW7hXq/aPKZ51LKr6Mv3DRIXlQdOtdI8ViBOEq0e+xERuyLE+UgrAG9Hf5FnDEm2k5JahS01MzABa03Gq277bdLjlv3jSJLxWtaNQEjz9Vgq25ZJ3k4e5D/x7XGXrb7GvRKYxlUoCQewqFSBM2P7yPsJWJ1iI43OBkz8Q==
+X-Gm-Message-State: AOJu0Ywn1QxkFNH1aL5B00dmfIc4iRQRTwmZHHfzDP/1MOqief7MNUtv
+	53HxcY7yYxw7u2BIV02C6G68h75QmBzns5DCJdrDv+F86tA8FeQkjNffY+W+vbfd3PTJGBCivk9
+	4gFPrf9KKesHWovyrBvtA+QwTpF0=
+X-Google-Smtp-Source: AGHT+IFiThIhX+9FhLiAcH6DoPTaT9aFpP6Lkgxy9dJF8YKw8N/bmIWpxt9ge0Vce96c5hJyDA6LFSAG2T3kfQpE3Qo=
+X-Received: by 2002:a17:90a:bb8f:b0:2c9:5c7c:815d with SMTP id
+ 98e67ed59e1d1-2d3aaac3e34mr5518852a91.22.1723691725581; Wed, 14 Aug 2024
+ 20:15:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 07/14] mm: page_frag: reuse existing space
- for 'size' and 'pfmemalloc'
-To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-8-linyunsheng@huawei.com>
- <0002cde37fcead62813006ab9516c5b2fdbf113a.camel@gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <0002cde37fcead62813006ab9516c5b2fdbf113a.camel@gmail.com>
+References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
+ <20240814150558.46178-1-aha310510@gmail.com> <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
+In-Reply-To: <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Thu, 15 Aug 2024 12:15:14 +0900
+Message-ID: <CAO9qdTGFGxgD_8RYQKTx9NJbwa0fiFziFyx2FJpnYk3ZvFbUmw@mail.gmail.com>
+Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in txopt_get
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: wintera@linux.ibm.com, gbayer@linux.ibm.com, guwen@linux.alibaba.com, 
+	jaka@linux.ibm.com, tonylu@linux.alibaba.com, wenjia@linux.ibm.com, 
+	davem@davemloft.net, dust.li@linux.alibaba.com, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/8/15 0:13, Alexander H Duyck wrote:
-> On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
->> Currently there is one 'struct page_frag' for every 'struct
->> sock' and 'struct task_struct', we are about to replace the
->> 'struct page_frag' with 'struct page_frag_cache' for them.
->> Before begin the replacing, we need to ensure the size of
->> 'struct page_frag_cache' is not bigger than the size of
->> 'struct page_frag', as there may be tens of thousands of
->> 'struct sock' and 'struct task_struct' instances in the
->> system.
->>
->> By or'ing the page order & pfmemalloc with lower bits of
->> 'va' instead of using 'u16' or 'u32' for page size and 'u8'
->> for pfmemalloc, we are able to avoid 3 or 5 bytes space waste.
->> And page address & pfmemalloc & order is unchanged for the
->> same page in the same 'page_frag_cache' instance, it makes
->> sense to fit them together.
->>
->> After this patch, the size of 'struct page_frag_cache' should be
->> the same as the size of 'struct page_frag'.
->>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> ---
->>  include/linux/mm_types_task.h   | 16 +++++-----
->>  include/linux/page_frag_cache.h | 52 +++++++++++++++++++++++++++++++--
->>  mm/page_frag_cache.c            | 49 +++++++++++++++++--------------
->>  3 files changed, 85 insertions(+), 32 deletions(-)
->>
->> diff --git a/include/linux/mm_types_task.h b/include/linux/mm_types_task.h
->> index b1c54b2b9308..f2610112a642 100644
->> --- a/include/linux/mm_types_task.h
->> +++ b/include/linux/mm_types_task.h
->> @@ -50,18 +50,18 @@ struct page_frag {
->>  #define PAGE_FRAG_CACHE_MAX_SIZE	__ALIGN_MASK(32768, ~PAGE_MASK)
->>  #define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
->>  struct page_frag_cache {
->> -	void *va;
->> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->> +	/* encoded_va consists of the virtual address, pfmemalloc bit and order
->> +	 * of a page.
->> +	 */
->> +	unsigned long encoded_va;
->> +
-> 
-> Rather than calling this an "encoded_va" we might want to call this an
-> "encoded_page" as that would be closer to what we are actually working
-> with. We are just using the virtual address as the page pointer instead
-> of the page struct itself since we need quicker access to the virtual
-> address than we do the page struct.
+2024=EB=85=84 8=EC=9B=94 15=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 11:51, =
+D. Wythe <alibuda@linux.alibaba.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+>
+>
+> On 8/14/24 11:05 PM, Jeongjun Park wrote:
+> > Alexandra Winter wrote:
+> >> On 14.08.24 15:11, D. Wythe wrote:
+> >>>      struct smc_sock {                /* smc sock container */
+> >>> -    struct sock        sk;
+> >>> +    union {
+> >>> +        struct sock        sk;
+> >>> +        struct inet_sock    inet;
+> >>> +    };
+> >>
+> >> I don't see a path where this breaks, but it looks risky to me.
+> >> Is an smc_sock always an inet_sock as well? Then can't you go with smc=
+_sock->inet_sock->sk ?
+> >> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an i=
+net_sock?
+>
+>
+> There is no smc_sock->inet_sock->sk before. And this part here was to
+> make smc_sock also
+> be an inet_sock.
+>
+> For IPPROTO_SMC, smc_sock should be an inet_sock, but it is not before.
+> So, the initialization of certain fields
+> in smc_sock(for example, clcsk) will overwrite modifications made to the
+> inet_sock part in inet(6)_create.
+>
+> For AF_SMC,  the only problem is that  some space will be wasted. Since
+> AF_SMC don't care the inet_sock part.
+> However, make the use of sock by AF_SMC and IPPROTO_SMC separately for
+> the sake of avoid wasting some space
+> is a little bit extreme.
+>
 
-Calling it "encoded_page" seems confusing enough when calling virt_to_page()
-with "encoded_page" when virt_to_page() is expecting a 'va', no?
+Okay. I think using inet_sock instead of sock is also a good idea, but I
+understand for now.
 
-> 
+However, for some reason this patch status has become Changes Requested
+, so we will split the patch into two and resend the v5 patch.
 
+Regards,
+Jeongjun Park
+
+>
+> > hmm... then how about changing it to something like this?
+> >
+> > @@ -283,7 +283,7 @@ struct smc_connection {
+> >   };
+> >
+> >   struct smc_sock {                           /* smc sock container */
+> > -     struct sock             sk;
+> > +     struct inet_sock        inet;
+> >       struct socket           *clcsock;       /* internal tcp socket */
+> >       void                    (*clcsk_state_change)(struct sock *sk);
+>
+>
+> Don't.
+>
+> >                                               /* original stat_change f=
+ct. */
+> > @@ -327,7 +327,7 @@ struct smc_sock {                         /* smc so=
+ck container */
+> >                                                * */
+> >   };
+> >
+> > -#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+> > +#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
+> >
+> >   static inline void smc_init_saved_callbacks(struct smc_sock *smc)
+> >   {
+> >
+> > It is definitely not normal to make the first member of smc_sock as soc=
+k.
+> >
+> > Therefore, I think it would be appropriate to modify it to use inet_soc=
+k
+> > as the first member like other protocols (sctp, dccp) and access sk in =
+a
+> > way like &smc->inet.sk.
+> >
+> > Although this fix would require more code changes, we tested the bug an=
+d
+> > confirmed that it was not triggered and the functionality was working
+> > normally.
+> >
+> > What do you think?
+> >
+> > Regards,
+> > Jeongjun Park
+>
 
