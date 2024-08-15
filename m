@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-118682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E7795272D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:53:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A1695274E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2ECD1F22A8D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:53:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D5961C216AB
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B115C3;
-	Thu, 15 Aug 2024 00:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70D515CB;
+	Thu, 15 Aug 2024 00:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7TldrFL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H39DNUXt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89681362;
-	Thu, 15 Aug 2024 00:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4BCC144;
+	Thu, 15 Aug 2024 00:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723683214; cv=none; b=tEE+Fqc3nzrxu1avswbfKfq5IDANwznqtNNbH7YUTSjj9OUKe2tB5QzxNEU+RbOFaCmg8ffSpoMrWzSxfQ9z0UA9i90I4dfFeV+ObgtBba1DMdgG7W1mQ1AqmL1RLo+xjWjQpvwvdv7px/7dXpv1TqM85qoriS2b9QlI7oZDWsQ=
+	t=1723683412; cv=none; b=oQoWvKhKvzCAxoiquqnGYdYzOAPPyPNw5fSECYa440Y0CueM29bBRolP9eFj9D6nOkn+0a/EkCK+QhVosFDAOa9J3CHDsFpRDEAchjnPC2Cl0YtSZrUv7YVeLN0Qrje2epimTZ5xOmNhvyitljOeMzPBWue6sLkCHpV8t1o/b+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723683214; c=relaxed/simple;
-	bh=fQQ7RAC1Q4Q3MLAxhDAoVqBcLxpuT2PExNe+KLXKew4=;
+	s=arc-20240116; t=1723683412; c=relaxed/simple;
+	bh=dKyxcfo7YNnxvmGb0vztFcT/BfgAs5jKOb2gY5+XKgI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SIQyaOPQq9KW4ebozaLY6EkWCdUyqJozc++6XgjlSeHnu8RYDSUpYzpR0BlimhWv2y8URRDRcGMUSmsjaeyI7y4zFmekhfkehKWOJupelBSE/ouzjdr1qIhKDAAb5P2Ykw3uSTJp+S8AIjhnmw3PUXwGVTZm9Gt9uV+marm6DzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7TldrFL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFED7C116B1;
-	Thu, 15 Aug 2024 00:53:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NTrCNNb/QLN/NdifWIXS+Xddgv/WvM416wW6yq/6PH6WqSy5natAQIj/0obYAU0RsLKhjOniKPZRtPIdZvKbTZcHL8as7YHLW0GZ6ET28ueHAPpO/CGfnhYhanCNrbI0GcEed1GYNYB7he+UWz4BM/R66gituKk/UJUBnu32mzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H39DNUXt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B43CC116B1;
+	Thu, 15 Aug 2024 00:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723683214;
-	bh=fQQ7RAC1Q4Q3MLAxhDAoVqBcLxpuT2PExNe+KLXKew4=;
+	s=k20201202; t=1723683412;
+	bh=dKyxcfo7YNnxvmGb0vztFcT/BfgAs5jKOb2gY5+XKgI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m7TldrFLR1+y2FcB3TPKoYS4zwqCceHmiAQXSLtqyvd/+oToHTYI1gNFRvFVY3LUt
-	 fsxGAmhkss/hXOSmK7L0ndVR9MddAUYddxt4qd22yaDvKM4gHWFyZH8xIuogNX2YmM
-	 G7DGNAaQVAc+Hc8CJn8s8E3DZT3rb+Aj//CMHRGhrExY2D4QV4TUNdjCktT72NCOFc
-	 8XYw+cIU3+xyDguVaf9Iod8m+E9PSBhICGs+NadlLrCUb+tHn+bCxZ/ElpJBJdsl4A
-	 UWE+iHy03wXEdVhOUrVIO4N/VNKkgwuSZCXNFi11HXYjfCuCNmvv7loqIsRx3zFY4f
-	 2QeHjA4hpMMGg==
-Date: Wed, 14 Aug 2024 17:53:33 -0700
+	b=H39DNUXtPJ1v7ch9W68IYEDJQgHFbm/jtYkbquTcWQAJvzM8fDyDn/ICZAkV2EsMe
+	 vvmb17PUT+73VJ+G/oyXF8AVMNtOExNSVUEWNNOntMtnmPZAH1mD0EkEmEhLUIh83c
+	 z+yvIwcFIgml7qnpsGd1AFa4fSWbBqXlbHmjlAvYOB00+Yypm4WYlZ28Z8vI25Shd5
+	 Vg0EMl7UK7Wlk21FLWl//hBPQhoAabULryVw3Z/zaam3jP3NV9DAdxIIsT9pUvI6uP
+	 f86O+IH/7ZCPd3gFLOlYX9vqOmBi+kp4tnJd6iF5N+UbCO6KWYt5H4kRhWtm2KkUXS
+	 VLJUoej8nJV4w==
+Date: Wed, 14 Aug 2024 17:56:51 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>, Jonathan Corbet
- <corbet@lwn.net>, Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: bpf-next experiment
-Message-ID: <20240814175333.6bcaa522@kernel.org>
-In-Reply-To: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
-References: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
+To: Abhinav Jain <jain.abhinav177@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ javier.carrasco.cruz@gmail.com
+Subject: Re: [PATCH net v6 0/2] Enhance network interface feature testing
+Message-ID: <20240814175651.447982cc@kernel.org>
+In-Reply-To: <20240814191517.50466-1-jain.abhinav177@gmail.com>
+References: <20240814191517.50466-1-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,16 +61,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Aug 2024 12:32:00 -0700 Alexei Starovoitov wrote:
-> Couple years ago folks suggested that bpf-next should be
-> a separate pull request to increase subsystem visibility.
-> Back then we rejected the idea since many networking related
-> changes required bpf core changes. Things are different now.
-> bpf kfuncs can be added independently by various subsystems,
-> verifier additions are mainly driven by sched-ext,
-> so it's time to give it a shot. It's an experiment.
-> If things don't work out as expected we will go back to
-> the old model of feeding bpf trees through net/net-next trees.
+On Wed, 14 Aug 2024 19:15:15 +0000 Abhinav Jain wrote:
+> Changes in v6:
+> Use XFAIL for ethtool operations that are unsupported instead of SKIP.
 
-Excellent, fingers crossed :)
+One more:
+
+tools/testing/selftests/net/netdevice.sh:       echo "SKIP: $netdev: set IP address"
+
+I think the SKIP -> XFAIL conversion should be a separate patch (for
+total of 3 patches in the series).
+-- 
+pw-bot: cr
 
