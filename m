@@ -1,143 +1,200 @@
-Return-Path: <netdev+bounces-118917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C786695383F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:30:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2302953848
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 18:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 037251C21FA8
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 533631F24833
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55A91B9B56;
-	Thu, 15 Aug 2024 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F2C1B9B49;
+	Thu, 15 Aug 2024 16:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RbsVmKtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0822C19FA7E
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 16:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452991B1429;
+	Thu, 15 Aug 2024 16:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723739429; cv=none; b=NgAqnS4Ocl9bVBQRhdF6rFHnQ53jLhDx96OUmjbpzUzM8yUnyyqTExhiLl7+zpocP0TY++aapqGsyXcCNSQIKRSJxnS/XWE3JxWDZRSU61KMT80cdVoQc8GRJcwy0HEiemnBTU/RkEScOddz/G/LSXtfBuBvHRRTfmur+ebjRag=
+	t=1723739578; cv=none; b=uiB8sZwSaHRxq88l3l5xEPiP9b+jZlh5syTvaAdZBckfZlyUttxGqOoSczr73U+BW7p0xy0tfZ1AGPngvyL5xZ9oOODkRzvssMSBE+AAbzxz+nc4aPkPe2gjaiYqcfrfwPCk60PP0Kqol8dsli0PkSCJGDwqmYcgFFpCaHr3HPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723739429; c=relaxed/simple;
-	bh=ucxPUj1yJ7m2vVIr7c9pCOLhBMxgeVxokmlu44Tmhos=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=lXVpuqiEmsWxTTZ8IfMUGlU6gElAnrxGj/T46Iuqh6c8dqmgB/c9ogDUViwhQMGteCFrjVoVgWBmwYx6Hd60+Wlv4qY+FuIe3sGyPu4Ym7JMIoa3ofGaIDpUBaWl765eUHhpRuwOnaGJzQaHXl/im6wQ6z17ATXP45bbET3NK68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id C02BB7D065;
-	Thu, 15 Aug 2024 16:30:25 +0000 (UTC)
-References: <20240809083500.2822656-1-chopps@chopps.org>
- <20240809083500.2822656-2-chopps@chopps.org>
- <567fc2d7-63bf-4953-a4c0-e4aedfe6e917@redhat.com>
- <ZryJK8W1Acz0L/tU@gauss3.secunet.de>
- <4d226a9e-8231-4794-a5ac-d426fac03361@redhat.com>
- <m2bk1uq3a7.fsf@ja-home.int.chopps.org>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, Christian Hopps
- <chopps@chopps.org>, devel@linux-ipsec.org, netdev@vger.kernel.org, "David
-  S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Florian Westphal <fw@strlen.de>, Sabrina
-  Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony
-  Antony <antony@phenome.org>, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v2 1/2] net: refactor common skb header copy
- code for re-use
-Date: Thu, 15 Aug 2024 12:24:12 -0400
-In-reply-to: <m2bk1uq3a7.fsf@ja-home.int.chopps.org>
-Message-ID: <m2sev592an.fsf@ja-home.int.chopps.org>
+	s=arc-20240116; t=1723739578; c=relaxed/simple;
+	bh=oex+NN6RpNLLdno9D4x6XuydzPruIYMG1hE1IXuZRM8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m7xniKssbeVNDWk+xGiJQKLrG+qdLZd6NRZLbkIbHvSiG0QqjBHWssXEsyatLUJovajLYMAJF7B0LEYPjL6MtvtRd6TtO6pzbL0PQUDXUv8EP08KXN5PFXe4m5YNVtaNc+mQK6dz54pBSfJHbN8oCH2lYQxKhKIKLsr112/pGDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RbsVmKtp; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f025b94e07so13148151fa.0;
+        Thu, 15 Aug 2024 09:32:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723739574; x=1724344374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7YPHhglnz9AoIQWEr0RxYjspKNhJlZykA7F7KTO9WhY=;
+        b=RbsVmKtpqzfEAdSFoODLS/ZKbp/rkxD33hL7tXBd2bky16RREth4B2RUgtoLDjS0kO
+         6WMCnhSLLu0SixZCdKcfB5N5+G07EBDGJtLd2XZOjb1/En5SM/+xixYvh/ZphovwYrLx
+         syWUdcIYC0AQozqIoowwyF/5d/FsKrnmQX9v1LvngfTEcTnWkBE3DgbtNtcDwinAcYe6
+         nl+aPdFIHSWjiDANX1iiwc6vn0f4eFLf2OPkzOIqjyVHH+cZx9vrHsl5LhlegOChjn7J
+         EedGpTqo9I2s6QgmW54Y4dYGilyqSk5UYROVbwkikeOFk3idsYPEvqL4724yww+qs9c9
+         vkdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723739574; x=1724344374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7YPHhglnz9AoIQWEr0RxYjspKNhJlZykA7F7KTO9WhY=;
+        b=G4LfaYeQ8W1NB0ytCBjecMN+iwPV0tvFMIWcXggngbM7dWd0cJ9AMjwVpSNj1CineS
+         pLJUj1WF5D6ZMQorlpM6WaLmecgCx+72aOul4/Y1Wbo9AlOwsuLDVezVth7sJqoC0udm
+         ZWwZFVw+jMKjaatLPsPMFOgppFe/QqtmzhFz5sLSOQ0o7ScTBRbQqBY7IF3SOPWGGWuz
+         tSExYm3mfA/cmSD/eVATiY5GLlYpwCCwlMZX33QW1aiX7SbCol9nLwCRUtZyi5QZWA5U
+         d4GZMGDLQlENqJlkmmgKwB3BgI2ouPM9Ifmfmbv+TGuGiuTlFhEkeNTt6aGWRAEbEH/w
+         0NGg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0Zd5YmHWv1Ylj7nHAB7AUr+XQHaAzX1+hfkvijHPbLEG4sNsxfT9QNiMoGSJPqOAzwJGUFdqS0oHnY6c9c59dFyO7s1fKy8gtf9j0Curfp0ArIYeUOWauk0tyDEPPeXA25qx1bbt8
+X-Gm-Message-State: AOJu0Yyk7L3yb2k8xaG4Sf5wKVcA71HoTljpOEq44LAZ7DCoud/MSG8v
+	5ulTrCdQu8qdaDq8ELcGwmDg075GNQxxaHpKOvdhBVFf/Juap2bR6zDtaNYVGRwMyy3J1ZGt/sI
+	o05+vteXQbG8hmeY32JvwkKGm99OYRT6p
+X-Google-Smtp-Source: AGHT+IHtUB/ZB9bSRJKkA5F6lU6s40qmXBUALwJKt7aJT1CtiPF7hLpDBlgVAesiIXOcCXARUeuEXrtDoHJH8LYKJlA=
+X-Received: by 2002:a2e:6111:0:b0:2ef:18ae:5cc2 with SMTP id
+ 38308e7fff4ca-2f3be5a1facmr1512131fa.21.1723739573816; Thu, 15 Aug 2024
+ 09:32:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
+References: <20240807210103.142483-1-luiz.dentz@gmail.com> <172308842863.2761812.8638817331652488290.git-patchwork-notify@kernel.org>
+ <CABBYNZ+ERf+EzzbWSz3nt2Qo2yudktM_wiV5n3PRajaOnEmU=A@mail.gmail.com>
+ <CABBYNZJW7t=yDbZi68L_g3iwTWatGDk=WAfv1acQWY_oG-_QPA@mail.gmail.com>
+ <ZrZ0BHp5-eHGcaV-@zx2c4.com> <CABBYNZ+3yMdHu77Mz-8jmEgJ-j3WPHD8r_Mhz8Qu-bTJbdspUQ@mail.gmail.com>
+ <ZrZ6MUj2egxakWUT@zx2c4.com>
+In-Reply-To: <ZrZ6MUj2egxakWUT@zx2c4.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 15 Aug 2024 12:32:40 -0400
+Message-ID: <CABBYNZ+usGWfFjHeO0n=ndyb4+xLZTQasAPeQM37y=2AUektYQ@mail.gmail.com>
+Subject: Re: pull request: bluetooth 2024-07-26
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Jason,
 
-Christian Hopps <chopps@chopps.org> writes:
-
-> Paolo Abeni <pabeni@redhat.com> writes:
+On Fri, Aug 9, 2024 at 4:21=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com>=
+ wrote:
 >
->> On 8/14/24 12:38, Steffen Klassert wrote:
->>> On Wed, Aug 14, 2024 at 11:46:56AM +0200, Paolo Abeni wrote:
->>>> On 8/9/24 10:34, Christian Hopps wrote:
->>>>> From: Christian Hopps <chopps@labn.net>
->>>>> --- a/net/core/skbuff.c
->>>>> +++ b/net/core/skbuff.c
->>>>> @@ -1515,7 +1515,7 @@ EXPORT_SYMBOL(napi_consume_skb);
->>>>>    	BUILD_BUG_ON(offsetof(struct sk_buff, field) !=		\
->>>>>    		     offsetof(struct sk_buff, headers.field));	\
->>>>> -static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
->>>>> +void ___copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
->>>>>    {
->>>>>    	new->tstamp		= old->tstamp;
->>>>>    	/* We do not copy old->sk */
->>>>> @@ -1524,6 +1524,12 @@ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
->>>>>    	skb_dst_copy(new, old);
->>>>>    	__skb_ext_copy(new, old);
->>>>>    	__nf_copy(new, old, false);
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(___copy_skb_header);
->>>>> +
->>>>> +static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
->>>>> +{
->>>>> +	___copy_skb_header(new, old); >
->>>>>    	/* Note : this field could be in the headers group.
->>>>>    	 * It is not yet because we do not want to have a 16 bit hole
->>>>
->>>> Could you please point where/how are you going to use this helper? factoring
->>>> out this very core bits of skbuff copy looks quite bug prone - and exporting
->>>> the helper could introduce additional unneeded function calls in the core
->>>> code.
->>> It is supposed to be used in the IPTFS pachset:
->>> https://lore.kernel.org/netdev/20240807211331.1081038-12-chopps@chopps.org/
->>> It was open coded before, but there were some concerns that
->>> IPTFS won't get updated if __copy_skb_header changes.
->>
->> The code is copying a subset of the skb header from a 'template' skb to a newly
->> allocated skbuff.
->> It's unclear to me why would be useful to copy only a subset of the skb header,
->> excluding queue_mapping, priority, etc..
->> I think we need a good justification for that, otherwise we could end-up with a
->> large amount of "almost copy" skb header slicing the skb in many different ways.
+> On Fri, Aug 09, 2024 at 04:02:36PM -0400, Luiz Augusto von Dentz wrote:
+> > Hi Jason,
+> >
+> > On Fri, Aug 9, 2024 at 3:54=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.=
+com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Fri, Aug 09, 2024 at 11:12:32AM -0400, Luiz Augusto von Dentz wrot=
+e:
+> > > > Hi,
+> > > >
+> > > > On Fri, Aug 9, 2024 at 10:48=E2=80=AFAM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Jakub,
+> > > > >
+> > > > > On Wed, Aug 7, 2024 at 11:40=E2=80=AFPM <patchwork-bot+netdevbpf@=
+kernel.org> wrote:
+> > > > > >
+> > > > > > Hello:
+> > > > > >
+> > > > > > This pull request was applied to netdev/net.git (main)
+> > > > > > by Jakub Kicinski <kuba@kernel.org>:
+> > > > > >
+> > > > > > On Wed,  7 Aug 2024 17:01:03 -0400 you wrote:
+> > > > > > > The following changes since commit 1ca645a2f74a4290527ae27130=
+c8611391b07dbf:
+> > > > > > >
+> > > > > > >   net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:3=
+5:08 -0700)
+> > > > > > >
+> > > > > > > are available in the Git repository at:
+> > > > > > >
+> > > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/blu=
+etooth.git tags/for-net-2024-08-07
+> > > > > > >
+> > > > > > > [...]
+> > > > > >
+> > > > > > Here is the summary with links:
+> > > > > >   - pull request: bluetooth 2024-07-26
+> > > > > >     https://git.kernel.org/netdev/net/c/b928e7d19dfd
+> > > > > >
+> > > > > > You are awesome, thank you!
+> > > > >
+> > > > > Im trying to rebase on top of net-next but Im getting the followi=
+ng error:
+> > > > >
+> > > > > In file included from arch/x86/entry/vdso/vgetrandom.c:7:
+> > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c: In function
+> > > > > =E2=80=98memcpy_and_zero_src=E2=80=99:
+> > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:18:17: error=
+:
+> > > > > implicit declaration of function =E2=80=98__put_unaligned_t=E2=80=
+=99; did you mean
+> > > > > =E2=80=98__put_unaligned_le24=E2=80=99? [-Wimplicit-function-decl=
+aration]
+> > > > >
+> > > > > I tried to google it but got no results, perhaps there is somethi=
+ng
+> > > > > wrong with my .config, it used to work just fine but it seems
+> > > > > something had changed.
+> > > >
+> > > > Looks like the culprit is "x86: vdso: Wire up getrandom() vDSO
+> > > > implementation", if I revert that I got it to build properly.
+> > > >
+> > > > @Jason A. Donenfeld since you are the author of the specific change
+> > > > perhaps you can tell me what is going on, my .config is based on:
+> > > >
+> > > > https://github.com/Vudentz/BlueZ/blob/master/doc/test-runner.txt
+> > >
+> > > Could you send your actual .config so I can repro?
+> >
+> > Here it is.
 >
-> IP-TFS sometimes needs to allocate new skb[s] to fragment a too-large tunnel
-> ingress user packet. IP-TFS may also need to extract multiple aggregated user
-> packets for tunnel egress from inside a single IPTFS tunnel packet. For these 1
-> to N cases (which are different from regular IPsec which is always 1-1 and thus
-> re-using the existing skb) we need to create multiple skbs from a single source
-> skb and we need to replicate the work done to the existing skb so far in the
-> netdev/xfrm infrastructure (e.g. the _refdst and _nfct are expected to be there
-> and refcounted as they are dropped later in the stack). This work is captured in
-> those first few values that we are copying. The `headers` and other field
-> values; however, are not appropriate to be copied (or clobbered e.g., alloc_cpu)
-> into the new allocated skb.
->
-> I originally had this code local to the IP-TFS implementation, but I was persuaded to move it in skbuff.c to track any possible changes to these fields in the future.
+> Hmm, I did a clean checkout of net-next, used this .config, and it built
+> just fine. Any oddities I should look into?
 
-I've gone back through the skb use again for both tunnel ingress and egress and I need even less than the subset of fields being copied here.
+Something is wrong with asm/unaligned.h on my system, if I do the
+following change it builds properly:
 
-I'm going to resend this patchset removing this somewhat controversial refactoring for now, and just leave the second commit with the useful copy from read_seq function.
+diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
+index b230f0b10832..c1a18f5c6fe3 100644
+--- a/lib/vdso/getrandom.c
++++ b/lib/vdso/getrandom.c
+@@ -10,7 +10,7 @@
+ #include <vdso/getrandom.h>
+ #include <asm/vdso/getrandom.h>
+ #include <asm/vdso/vsyscall.h>
+-#include <asm/unaligned.h>
++#include <asm-generic/unaligned.h>
+ #include <uapi/linux/mman.h>
 
-Thanks,
-Chris.
+ #define MEMCPY_AND_ZERO_SRC(type, dst, src, len) do {
+         \
+
+My system is based on meteor lake, not sure if that is affecting the
+build with a mix of LP+E+P cores?
+
+> Jason
 
 
->
-> Thanks,
-> Chris.
->
->> Cheers,
->>
->> Paolo
 
-a
+--=20
+Luiz Augusto von Dentz
 
