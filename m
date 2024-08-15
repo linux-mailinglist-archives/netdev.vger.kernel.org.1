@@ -1,134 +1,134 @@
-Return-Path: <netdev+bounces-118785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067A1952C68
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:38:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0191952C6F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0641D1C20D04
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:38:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 856751F23CE8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD441B32BF;
-	Thu, 15 Aug 2024 10:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eViwh9SX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE8F1C9EDA;
+	Thu, 15 Aug 2024 10:03:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32AF1714C4
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 10:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE8F1714C4;
+	Thu, 15 Aug 2024 10:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723716053; cv=none; b=G3hv3N9y2rPUwfYafvu3QeCqyIgzpin+UHHopjq52Zwl8rPvNvetZUrH7FQRC+mJKjwLxulAUDtWGlxfSuavDa3OvlYvPaV+g1G3Ior6qgr+YxHVqmlCRBsybzgGmo4iv79Og844mx5jQPtc0h/FKzc8gFncoWeV06EmOxt3+qk=
+	t=1723716214; cv=none; b=SpqZQaubfW/L7yPS97PXkgJzROg/l9NFQUZxUz7IpbJMyGSE1KMAWtLV2boyVOwTz/WVOd/I71aOSl/GBasn29E1Kx6jENDB88GbRGV1ShozY+6h+Y7NFjhip5X+RBpVRRMM2bkIRB3r6TCu7MNg66xukZriZ3B5Q0gmPke9CMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723716053; c=relaxed/simple;
-	bh=5/CQNvLxQFoeAnRFoQafzP+JcE7z0R+s7OsIoIWaaeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y/ablBJ2qjS6IwgSM62G7kuP9d1s7mTNwNGLYQs2eyviNrzlUcfpuavAKQq34Z6ri/nS3dbfhuPzJLCvgucuUH/bYm/pUMF2qXaFu9egDPrf4ekLPxZSDpLZwvx92BZP9xWygbl9JHdE6pvNjwy35d1Qz+xM/GCAJLuaiQeNDFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eViwh9SX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723716048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yDb6GNX3vOwuU98VN/SEplLulkRUAIt+sW7YYE4YmTM=;
-	b=eViwh9SXnjpl6NVCGaSvIUJbsn572zLUa/Sb1F0ASjCeXYu0P3Dmo0Cf/UahrzV6nploB0
-	hXY4M09iODe3Tdq4tw/79pFK3+7QYoA1UTJc9VI+1XJyTuBxJf7tgTQ1eMVBhuO02nak/B
-	xl9804QUB5nYczVrBMBzjgTlj0Wz4ao=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-306-qd7afqDXMHGrDoJzfRbP6g-1; Thu, 15 Aug 2024 06:00:45 -0400
-X-MC-Unique: qd7afqDXMHGrDoJzfRbP6g-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42818ae1a68so1155575e9.2
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 03:00:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723716043; x=1724320843;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yDb6GNX3vOwuU98VN/SEplLulkRUAIt+sW7YYE4YmTM=;
-        b=cywdTH3PAx5gcyGvOfs9li7B8Q9AK2WIUXuNkkwE56Fv9MK7t8H1lF5sfks0/eJKke
-         Ziwcz3fzfvQius5Ik3lorkXRPk+94tWe4IseA7GI1y+o6Ige0sbOqQR7rW4hXNWjGifB
-         cnPCgtmayjia9yBMNi11KnpzVPBzZHgAlbMabctVR9jnuavjhooTQX68t5SXfo1Unc/P
-         Jc5zecy5eT/UD9XYzFsmUqFPEMfx2/8wvr5P0h2/WaiBaMLr2t4PqcGUFiLLfaP0wHXp
-         CJrN8I91usaUAhYh7YgvXxL0OGHlZQPpIMdz+kp7WqPI1a46+RfwvViNKbPmkmX9Htaw
-         yagA==
-X-Gm-Message-State: AOJu0YzxyMSlB1LZZk3RyzN7kv9o3jJo/A8WCF6E2sHZwPHmfyHAiJfW
-	Ed5xPw7eikPUT7NPzHHmDiV0l7bqvsGcR9mthqdbkkFQNeY/CXbf849PHE4wCVgDhyvBxv9tPsx
-	yQovAXxsqjlsczsMtBpK3fHG1Co/gFCY/HcYMmr5FOf11JBUUE6DFuR4w80oszPr7
-X-Received: by 2002:a05:600c:1c23:b0:426:668f:5ed7 with SMTP id 5b1f17b1804b1-429e0f5be95mr14363315e9.2.1723716042913;
-        Thu, 15 Aug 2024 03:00:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEgfGyY9sJWRMdsj2O7AcKX5GLCUo+hMEsGgOfgNDPFXCG8fhKxt8YuNlc9i8Oi+q9lTCUs/w==
-X-Received: by 2002:a05:600c:1c23:b0:426:668f:5ed7 with SMTP id 5b1f17b1804b1-429e0f5be95mr14363135e9.2.1723716042423;
-        Thu, 15 Aug 2024 03:00:42 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1711:4010:5731:dfd4:b2ed:d824? ([2a0d:3344:1711:4010:5731:dfd4:b2ed:d824])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded7ead3sm44363415e9.47.2024.08.15.03.00.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Aug 2024 03:00:41 -0700 (PDT)
-Message-ID: <66bdb158-7452-4f70-836f-bd4682c04297@redhat.com>
-Date: Thu, 15 Aug 2024 12:00:40 +0200
+	s=arc-20240116; t=1723716214; c=relaxed/simple;
+	bh=hGrc0+7koAoE/zRVnogeniLcqspdZ2o824cLSZ7LmRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FCmlOS7Qyo42JuFgSKgVU0gw3VznM0fTEAqNLJqSRx9a6xSW4o2hpzPvBGbwKhbxuB/4cJNmoK4VExF3tTxDLgb3a+HuTtymuqKoGRuUKqYVdL4sTovd6nK3R8lZXnhgY7x4Ah3opLRC/alaJ7hiuJsNPXCZeOZn3NXkA7RifA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=45690 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1seXKJ-00Gvy0-1j; Thu, 15 Aug 2024 12:03:29 +0200
+Date: Thu, 15 Aug 2024 12:03:25 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: icejl <icejl0001@gmail.com>, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: nfnetlink: fix uninitialized local variable
+Message-ID: <Zr3SbSEb6oD87FVo@calendula>
+References: <20240815082733.272087-1-icejl0001@gmail.com>
+ <Zr3EhKBKllxigfcD@gmail.com>
+ <Zr3LQ4hGx-sN5T8Q@calendula>
+ <Zr3Qh5FW7PsynJ4O@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: remove release/lock_sock in tcp_splice_read
-To: sunyiqi <sunyiqixm@gmail.com>, edumazet@google.com, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240815084330.166987-1-sunyiqixm@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240815084330.166987-1-sunyiqixm@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zr3Qh5FW7PsynJ4O@gmail.com>
+X-Spam-Score: -1.9 (-)
 
-On 8/15/24 10:43, sunyiqi wrote:
-> When enters tcp_splice_read, tcp_splice_read will call lock_sock
-> for sk in order to prevent other threads acquiring sk and release it
-> before return.
+On Thu, Aug 15, 2024 at 02:55:19AM -0700, Breno Leitao wrote:
+> Hello Pablo,
 > 
-> But in while(tss.len) loop, it releases and re-locks sk, give the other
-> thread a small window to lock the sk.
+> On Thu, Aug 15, 2024 at 11:32:51AM +0200, Pablo Neira Ayuso wrote:
+> > On Thu, Aug 15, 2024 at 02:04:04AM -0700, Breno Leitao wrote:
+> > > On Thu, Aug 15, 2024 at 04:27:33PM +0800, icejl wrote:
+> > > > In the nfnetlink_rcv_batch function, an uninitialized local variable
+> > > > extack is used, which results in using random stack data as a pointer.
+> > > > This pointer is then used to access the data it points to and return
+> > > > it as the request status, leading to an information leak. If the stack
+> > > > data happens to be an invalid pointer, it can cause a pointer access
+> > > > exception, triggering a kernel crash.
+> > > > 
+> > > > Signed-off-by: icejl <icejl0001@gmail.com>
+> > > > ---
+> > > >  net/netfilter/nfnetlink.c | 1 +
+> > > >  1 file changed, 1 insertion(+)
+> > > > 
+> > > > diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+> > > > index 4abf660c7baf..b29b281f4b2c 100644
+> > > > --- a/net/netfilter/nfnetlink.c
+> > > > +++ b/net/netfilter/nfnetlink.c
+> > > > @@ -427,6 +427,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+> > > >  
+> > > >  	nfnl_unlock(subsys_id);
+> > > >  
+> > > > +	memset(&extack, 0, sizeof(extack));
+> > > >  	if (nlh->nlmsg_flags & NLM_F_ACK)
+> > > >  		nfnl_err_add(&err_list, nlh, 0, &extack);
+> > > 
+> > > There is a memset later in that function , inside the 
+> > > `while (skb->len >= nlmsg_total_size(0))` loop. Should that one be
+> > > removed?
+> > 
+> > no, the batch contains a series of netlink message, each of them needs
+> > a fresh extack area which is zeroed.
 > 
-> As a result, release/lock_sock in the while loop in tcp_splice_read may
-> cause race condition.
-
-Which race condition exactly? do you have a backtrace?
-
+> Sorry, this is a bit unclear to me. This is the code I see in
+> netnext/main:
 > 
-> Fixes: 9c55e01c0cc8 ("[TCP]: Splice receive support.")
-> Signed-off-by: sunyiqi <sunyiqixm@gmail.com>
-> ---
->   net/ipv4/tcp.c | 2 --
->   1 file changed, 2 deletions(-)
 > 
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index e03a342c9162..7a2ce0e2e5be 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -856,8 +856,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
->   
->   		if (!tss.len || !timeo)
->   			break;
-> -		release_sock(sk);
-> -		lock_sock(sk);
+> 	memset(&extack, 0, sizeof(extack));   // YOUR CHANGE
+> 
+>         if (nlh->nlmsg_flags & NLM_F_ACK)
+>                 nfnl_err_add(&err_list, nlh, 0, &extack);
+> 
+>         while (skb->len >= nlmsg_total_size(0)) {
+>                 int msglen, type;
+> 
+>                 if (fatal_signal_pending(current)) {
+>                         nfnl_err_reset(&err_list);
+>                         err = -EINTR;
+>                         status = NFNL_BATCH_FAILURE;
+>                         goto done;
+>                 }
+> 
+> ->              memset(&extack, 0, sizeof(extack));
+> 
+> 
+> nfnl_err_add() does not change extack. Tht said, the second memset (last
+> line in the snippet above), seems useless, doesn't it?
 
-This is needed to flush the sk backlog.
+Processing continues on error, several errors can be reported to
+userspace.
 
-Somewhat related, I think we could replace the pair with sk_flush_backlog().
+        message A1 fails (set extack)
+        ...
+        message An fails too (but does not set extack)
 
-Thanks,
+if extack is not reset, then message B gets a misleading error report
+that was set by message A.
 
-Paolo
-
+Some error paths do not set extack, eg. EINVAL.
 
