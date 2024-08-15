@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-118779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29A8952C49
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:34:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DC8952C4E
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 12:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DD3928400F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:34:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F9EF1F221C8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC56719D8BA;
-	Thu, 15 Aug 2024 09:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8448C1A01D2;
+	Thu, 15 Aug 2024 09:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="XBlxBaYY"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="YcXk999z"
 X-Original-To: netdev@vger.kernel.org
 Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2441714D7
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 09:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED61B19FA93
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 09:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723714883; cv=pass; b=kvbcyA9+GdX5Myj6V74VT10qh4k/YDqYHeixOYEGs4DnhNdq4XuVV41qZvdLzzTK4XQdpUZvh1QN+krMTAqAFpCGrPuHNQ8O1rqQGSSZ1FG0nk+dgzEyltIwWCHycHOjM4EEyWwr83qetTHZJquXOOQEE075f0LGPwIS1yX8IjI=
+	t=1723715049; cv=pass; b=W1EcC99fg9t5UIyBaHRTf4/YmhHCSCCokTzG644O5VwhMZcWG7SmD2O53guNfYH6rbFJpWBxxWXx9IhcUBVLETt4U8Fz5tA1beyVngksOMUgOAIuF7YKHX1PoNtVlHWwOUmval0TWoEyq35nywCqPcuuh0o7WwNd97gRG+z9HPk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723714883; c=relaxed/simple;
-	bh=mg5SFzY/s/tNTj69kCybAxxSjjyMEpBgQ6iqN9WKcnM=;
+	s=arc-20240116; t=1723715049; c=relaxed/simple;
+	bh=C1u/nzICGc5ZOTkip2yj6o/t+/QkkP+tzdWFN4c3Ado=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SiVKNvmvNMJTZx+/ml39Am9jBw4IikomAgOdC9UHIFxk6sq8jLU8j5nNQHU400mbzSPqsA7zNnuA/0rOq2FDB6Os0w+xdMShmolFwLloB26ePy6FuXpmZsaEA0X7OEb/W/RO5eCnoemSapRIQqpEVyXIXrh0oQxLmFMLR8bgHDU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=XBlxBaYY; arc=pass smtp.client-ip=136.143.188.54
+	 In-Reply-To:Content-Type; b=ae06niy9ZZAguSsQr2zuUBJGJC6p0iPOk+OMvhBB4LNXTRXJjF/vUBGiL1gIyX9MsKSl213SAWywog8n17YoboZnD+k9DVFVa+k1QcO9iXi+6tHw3jR7IJ6xGHgQdVyqS337fchtnbA9Pz3iwI5J/LMTMEIdutIqVvy6jfzr28A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=YcXk999z; arc=pass smtp.client-ip=136.143.188.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1723714868; cv=none; 
+ARC-Seal: i=1; a=rsa-sha256; t=1723715041; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=G+a1b4nlaJAzUpCK7j0MEHfZDhMh5mzCj+Qeky4QY0nm2eLrn2+vH75FknZZt26JnSLKaM5VkaQ/Vw7qgc1ORB8qpr10or+/7Zam4PfiWLWHG/H6vU6GbQroHmKS4I71IdkSggRK1c8d1jDTZUW8I5UID8kTUJeU+apL0t/Ri/g=
+	b=DC6Q/DTCrYHpcEFkNzLqec6M4e0jrWlkuDlLCNAFnuOpyH3cMXyE0YcCJKUAQQtv6p53boHtSJpXrNp8K8K3+haPIKNXxbUNj4qIwZG/JfBacigVFMGl74VOrTtYcahlPpTUKFDsLhMsPYpT5+edsk9q/hmJ5AQdDYfsl/Q/arI=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1723714868; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=kNTL3CSFqQa/BhU/52ZlxEors/CFFPiovqa5eu0s1vY=; 
-	b=H76b1vq/+Q3mGFcy8A5a5fBrRYJBy2SsHiiA9gaQ9iQhhF7GSS+V7EFg2rX5hezUR73Go/1kgBbQ/5vK+vqS7KmXaoWjZzhj9ndAWlDIWjM1Yg+cPDYk7riMeBd33W3GXWkx2c2Fs9Oxs4QnqgrdCe9hUGE8ikI4zA6DsTSg8RU=
+	t=1723715041; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Mc62v3MUAfy7RdOFbORlUe7UZ/xC+9PZNHAtP/3llb8=; 
+	b=JfNmK9RgCJ/Dvr+DwzD3cA7ScQqJYowT01FsDqDcBvLx/WYE6g05+YeI2Xd2pWYUEf+9cBuwjrPzU4p/pbrE1pUF2ae6iY3tyvLbUEbWI5D1KyFVK/caQrVEkQg0XpfnSsLSFTbcDBYp5ojjNcePG3d1HCtDAcUh9xfmgfG3P3E=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=machnikowski.net;
 	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
 	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723714868;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723715041;
 	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
 	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=kNTL3CSFqQa/BhU/52ZlxEors/CFFPiovqa5eu0s1vY=;
-	b=XBlxBaYYlDXWdd4nL+vWEmfw0gUf+mVhbknhYW58F2D+Z5ichtze0BPM694pxN1x
-	JFF5mCPCVpbgqgPutEC1w7dJNEnECNZ/Wj/PV10PPs/hoj5lZ4FJ4VMO1pIZS/M0Hm1
-	PANlmztLBiV+8x7QeSvpvVcr+xkp4GiDPM1DJgrVRPIknWmiX9ZqLF+RRV3JkqxHyhO
-	paJpCjEbwBtukdWCK0DA+/NUjCQKF5jZxumTyRKTLt8YQRfhykfjVKWXatD40HKJFoz
-	Xh05QP5wLFy/WxjzhICNSvoSurOxrwz9MMSJ2CrHs3LdwwaEX1YThv0k68r5+79fZ0Z
-	ahlJN3meMA==
-Received: by mx.zohomail.com with SMTPS id 1723714866802410.0035902741008;
-	Thu, 15 Aug 2024 02:41:06 -0700 (PDT)
-Message-ID: <3ee121a9-6326-4cd0-8440-38f13255c3b4@machnikowski.net>
-Date: Thu, 15 Aug 2024 11:41:04 +0200
+	bh=Mc62v3MUAfy7RdOFbORlUe7UZ/xC+9PZNHAtP/3llb8=;
+	b=YcXk999zo5v553OMkLfa/QSa2hGDAoZIadSLH/WjW3LEIY4Na9UX+ppnF6RwtKUB
+	KZZszzWR7i3+fpLUYcT07670kBYrKdjnhyTImb+0mnj5xilrLitgD4SFMzajXAjpr2N
+	OLEI0+7f0MiuumTbgY8tfwKL7C9ORqSGvGaNUOf/EmbTB5RRc3HzHAX0+PtYhskS5jX
+	eeJRUsfh9kCRFe4wNIGWOYy0nchSli/8HBheoyeeAw1428QY4qjV2lIuVz1HRGW77xe
+	OOfzHx6wSI9tOpvqrZg9JkOqNo6IjKCfedFhQAktOMR+CfvYyFAwDZgW3GrHqGly+rK
+	04f0F8+KVg==
+Received: by mx.zohomail.com with SMTPS id 17237150402661012.7845203558948;
+	Thu, 15 Aug 2024 02:44:00 -0700 (PDT)
+Message-ID: <8562b135-900f-4e8c-991b-4315fde5f1a7@machnikowski.net>
+Date: Thu, 15 Aug 2024 11:43:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,54 +63,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-To: Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: Miroslav Lichvar <mlichvar@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
- jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
+Subject: Re: [RFC 1/3] ptp: Implement timex esterror support
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, jacob.e.keller@intel.com, vadfed@meta.com,
+ darinzon@amazon.com, kuba@kernel.org
 References: <20240813125602.155827-1-maciek@machnikowski.net>
- <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
- <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
- <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
- <Zr13BpeT1on0k7TN@hoboy.vegasvil.org> <Zr2BDLnmIHCrceze@hoboy.vegasvil.org>
+ <20240813125602.155827-2-maciek@machnikowski.net>
+ <Zr2Cun2AhVLRAm1t@hoboy.vegasvil.org>
 Content-Language: en-US
 From: Maciek Machnikowski <maciek@machnikowski.net>
-In-Reply-To: <Zr2BDLnmIHCrceze@hoboy.vegasvil.org>
+In-Reply-To: <Zr2Cun2AhVLRAm1t@hoboy.vegasvil.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-ZohoMailClient: External
 
 
 
-On 15/08/2024 06:16, Richard Cochran wrote:
-> On Wed, Aug 14, 2024 at 08:33:26PM -0700, Richard Cochran wrote:
->> On Wed, Aug 14, 2024 at 03:08:07PM +0200, Andrew Lunn wrote:
->>
->>> So the driver itself does not know its own error? It has to be told
->>> it, so it can report it back to user space. Then why bother, just put
->>> it directly into the ptp4l configuration file?
->>
->> This way my first reaction as well.
+On 15/08/2024 06:23, Richard Cochran wrote:
+> On Tue, Aug 13, 2024 at 12:56:00PM +0000, Maciek Machnikowski wrote:
+>> The Timex structure returned by the clock_adjtime() POSIX API allows
+>> the clock to return the estimated error. Implement getesterror
+>> and setesterror functions in the ptp_clock_info to enable drivers
+>> to interact with the hardware to get the error information.
 > 
-> Actually, looking at the NTP code, we have:
+> So this can be implemented in the PTP class layer directly.  No need
+> for driver callbacks.
+Not if there is no connection between PTP layer and the consumer of this
+information (TimeCard that uses PPS from embedded GNSS receiver, or a
+PTP stack running on the infrastructure function of the multi-host
+adapter or a DPU)
+
+>  
+>> getesterror additionally implements returning hw_ts and sys_ts
+>> to enable upper layers to estimate the maximum error of the clock
+>> based on the last time of correction.
 > 
-> void process_adjtimex_modes(const struct __kernel_timex *txc,)
-> {
-> 	...
-> 	if (txc->modes & ADJ_ESTERROR)
-> 		time_esterror = txc->esterror;
-> 	...
-> }
+> But where are the upper layers?
+They will be used to calculate the estimate of maxerror - don't want to
+implement an API just to change it in a next RFC
+
 > 
-> So I guess PHCs should also support setting this from user space?
+>> This functionality is not
+>> directly implemented in the clock_adjtime and will require
+>> a separate interface in the future.
 > 
-> adding CC: Miroslav
-> 
-> At least it would be consistent.
-> 
+> We don't add interfaces that have no users.
 > 
 > Thanks,
 > Richard
 
-Yes! It's exactly what inspired this patchset :)
+Noted - I'll try to explain it better next time
+
+
 
