@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-118867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627CB95360E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:46:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F179953624
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969D81C21E9A
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7677B20F03
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CBD1AAE3B;
-	Thu, 15 Aug 2024 14:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7328119FA9D;
+	Thu, 15 Aug 2024 14:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="plSphVst"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DJH6v3f/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D121AAE38
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8561AC437
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723733026; cv=none; b=TG+wLW2el8WsdWJ773EzqjQoWAyrBysLD1OghLUuGkG/hfqAIFl9QDoM7osd6kv27TYGucFoylIJvOhV0EMsAqU2DXTMsRFplrk78f6bJwWiuYQXG6UFsjrfCKF51c+8Y1y7L4Am9+8rCAQqxz1w4pmXvplCkWtBvrNggzSYfQs=
+	t=1723733215; cv=none; b=T+gPsxcQO63HdbZWlrIfOU0cJjAS1GSFOWjHh5XjW5za1oboXtnADkDix90gawF8YKVkscxBHa6ObJvwlsyJ/GZTctDtE/kHomdfRDGrEt6tflrlZDEOtf27CRxyrrmWaWC0zFaadDwmLbAFAxy6V9o3TvkLod8vKPm+ZsypUyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723733026; c=relaxed/simple;
-	bh=gY4ozU6gyhqMmNCsCqp211fP1r7Rlf0AVXkjTY4l5oI=;
+	s=arc-20240116; t=1723733215; c=relaxed/simple;
+	bh=pnJpgohckSrsEOlgAlyXU7Z9yiTmkx2jJ9CyfBMcsVU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z+rnqVM8rHMw4WkK3CWz+efybwcjv/ZhOiUA2Sj1tW5ak5Gut1VNCZQKB2mgTngAYoODCbUvBILMjI+eoYuZiXcGbtCVl0Qu+NStYJsPtgdj+9AdXqQe76VpT1jpUhV4Ge9gXQipKlknfUuy/4Qsb3A1uoFhhOufHsaMjJLqwQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=plSphVst; arc=none smtp.client-ip=209.85.217.52
+	 To:Cc:Content-Type; b=Vsvsjl+nXUTGE5up+gqLEgXMm6USwDbqvVS3rETmGgtmyn4ScWmhQ68uJOFvz/q+P+/8lhfK5Eg75rHKLeJk0y3cP+7i9jBtWMO9uKQPuUUjagQO4kQ0DyZBUiPpIZTd7WNlc4fOmnUy+RfjyO/wKGcuMf90EqAVmXbV7AZ+FtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DJH6v3f/; arc=none smtp.client-ip=209.85.217.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4928d2f45e2so377019137.0
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:43:44 -0700 (PDT)
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-4929754aee9so287667137.1
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 07:46:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723733023; x=1724337823; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723733212; x=1724338012; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QwBkKvkjuMTQTL16fVdJGUHMEbhdM1JaYDW1ua3VpKQ=;
-        b=plSphVstw1DaQ1GoIobJqvu4z1pkp9eAqaiFthQoQn5zsryxbJLAiGFy+U7+eAwCXh
-         ikhyJmg4rySjGsiLYlFoIugyeu/0ZUttPeN61NDjiZW0g7WgxH7dptx/iVSdtlaogMmY
-         c3dvH7wNl6xGwBGp3lqlSGUzmHelmT5Jt/yERMXRPTJPHks51nMtW2iRd+UBkvTconyX
-         IwHtUMM2/gsyHXEpNNN36yr5LAwhjGkndl22lYcbftw8mpWKsVZgeusqH8bmd1zmUllW
-         sGfB5oaEdbeoc2xwrnBLdSoYwlfx26yxO51QvI3nHQw9j2PasuTukrZOxYv9x8Ce0LKb
-         07ow==
+        bh=j7JC8W2JHCPXgYR+Bw6jZJ7bH3hdODhQovUmZlKATdc=;
+        b=DJH6v3f/oZgZxTWQzwV8moYWqo9WQFV8VZX+m/UROOAOQJjJJidRhR8qtBxofxvzG6
+         rDuA29KePQt9VeMhWjHRogCKHTb0PmCPA33ElCqsxT47a7my2JG+L1NNLe6YC9W1dHVb
+         3mOPmPXhdmG9amL97zIw6D7hyjzJnOxcs8yhxilLWI+AvqLUmX1O9B018VwZWPqsjrru
+         4cZWDOxLTX9+Y1FzZizZfaG53I/UauVJDNJWKWp4TRR24oabeRnA/eyLNO9ZB4yoqGjS
+         i8oIOtrrA2bBBDFptNGLjcpK7YNgKLO89sAjYDMbqnqnmLoRiNc985vFGrPi8WbTbAze
+         g3VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723733023; x=1724337823;
+        d=1e100.net; s=20230601; t=1723733212; x=1724338012;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QwBkKvkjuMTQTL16fVdJGUHMEbhdM1JaYDW1ua3VpKQ=;
-        b=QFLyJAObCG0YElcQyzOumvTLGXtNg01ez/tm8il386wwdWcB/c3E4gR1o4PPrMz+Ya
-         IGaZNSuBTpC98M1aq70SiTEoTaUw71+t1pfDY19Awqh7F5tudRVk7wdp19uIhH+FxPxg
-         tjQNpShJTHq5iYdZ0otlaDnzKk4gJio0sIfyZ+ELRNuY3q6NlDms3dGdP19ZthSKJlYz
-         r4QTfESo4B6T6xyknKOPkBV8EXHIqw5pCTJZHeTzcWFPeOBORoeXD8iM7ARVi1AZC7LX
-         0QyBJgqaHsd+QU4D+0xwdlnYksWjmvamRrHoepHVQefc5CzZyqyUDCWg70iU2fwaSJwt
-         /MPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpdvcF2oGopxUYAO+lQsNSHEqrHJWZyiAnBguGwdIeHepOaPXy7T2C25wc11Ah2vx/vuQ19MhirLA5vigC1Ky2ul5SEZW0
-X-Gm-Message-State: AOJu0YyRLUzxUH7FUfFedKD6Lnxn+3UDQ4amEY8CHw/K7/ycjbPpMHYu
-	NuKFXZ3HGOHJUdO2FAfWfKTWUkOH02NFXcGX2M2zHGBY+zOVFUNhZEg5BguD6irpZ0lLKVfJt/c
-	J1i/+pa1VBXVdXtsecq+QqSEm/iWAc/GWgMa+
-X-Google-Smtp-Source: AGHT+IEN5VFP6U/VmxETVwcEZttUPnQRikGz4dY+s3IN90ckwUwOan/QeUgeiV/MFmQeQHIsMn+17C02oD+2gBv9xMg=
-X-Received: by 2002:a05:6102:509e:b0:492:aaae:835d with SMTP id
- ada2fe7eead31-4977962ac53mr74477137.0.1723733023019; Thu, 15 Aug 2024
- 07:43:43 -0700 (PDT)
+        bh=j7JC8W2JHCPXgYR+Bw6jZJ7bH3hdODhQovUmZlKATdc=;
+        b=W361ZKgyW2t2W0W+OAHowAWG13daFGUF1PZ/kyX7NzTfygx8Vv6PTwhMkq4ez8rC4F
+         P0LKVAPEcPmGdONQQ3s0OnjXWcDkS87vgRu6+gRdmgTSlPEAzPYL/3iNydepMNzuC3wT
+         sBZViorPgE7StJ7yapEJui8KVN6zxlvgAjnsCe4meJiYTk67RNkYpUBHLCBHEIYRgWYK
+         LXm4eBM9R8/J+7mXOI3YEi/0GQh+JMf4cIST/AQYiF6zFpCe3vTJ9vq7+kR9Xz16SP9b
+         nSIjVKh3HS98HykM4X10V4MCba0ENmjEvDaqMAEnhDhaNxdWIoX8iydfEY/iUJjU29jv
+         RJsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7e+GWCSmVWMl96DzsT+XPw411dYY58QRwt/YyFzIIjFNPucf2j9Ppv/M9KXLvbdEUu0ZPgvK8rHmjJZ5eCbAEkCNJcyhd
+X-Gm-Message-State: AOJu0YxV4uA8ZoMSidazUW5/WC6uf0Ui/HYZndZnx/YEymG9rM8Olmgz
+	/UCa5SOzzAoTr8ljljwvU3J4KNrblhJwj2SAUxWnCTKbGlQBpSLfGLLA9XrmCKkSsuOUss7XoEH
+	1MRilPfXkfUIRAaeK1U6RBLaORdM0I10fGOAj
+X-Google-Smtp-Source: AGHT+IFQWS3T7S5BQqZ0aRDuc1AzNEE4ebBHy3Sd7a8Yn+FCpBwaFebeV5CDeov+3+XFP1dD8bm9Ff4fR8BvT9SM6iU=
+X-Received: by 2002:a05:6102:5122:b0:493:b52f:ecb6 with SMTP id
+ ada2fe7eead31-497799d5ab8mr23471137.20.1723733212305; Thu, 15 Aug 2024
+ 07:46:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,8 +74,8 @@ MIME-Version: 1.0
 References: <20240815001718.2845791-1-mrzhang97@gmail.com> <20240815001718.2845791-2-mrzhang97@gmail.com>
 In-Reply-To: <20240815001718.2845791-2-mrzhang97@gmail.com>
 From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 15 Aug 2024 10:43:23 -0400
-Message-ID: <CADVnQykHS1uPT1Wa4WjOdnJ2=bQh1ZkQUBK2GNXGwcg5u5SC3g@mail.gmail.com>
+Date: Thu, 15 Aug 2024 10:46:36 -0400
+Message-ID: <CADVnQymaehUnVtqhraet3tryvMyJCbA1f7FCb+h4EbbdR+oOzw@mail.gmail.com>
 Subject: Re: [PATCH net v2 1/3] tcp_cubic: fix to run bictcp_update() at least
  once per RTT
 To: Mingrui Zhang <mrzhang97@gmail.com>
@@ -100,27 +100,19 @@ On Wed, Aug 14, 2024 at 8:19=E2=80=AFPM Mingrui Zhang <mrzhang97@gmail.com>=
 >
 > Thanks
 > Mingrui, and Lisong
->
-> Fixes: 91a4599c2ad8 ("tcp_cubic: fix to run bictcp_update() at least once=
- per RTT")
 
-The Fixes: footer is not for restating the commit title in your new
-patch. Instead, it should list the SHA1 and first commit message line
-from the old commit (potentially years ago) that has buggy behavior
-that you are fixing. That way the Linux maintainers know which Linux
-releases have the bug, and they know how far back in release history
-the fix should be applied, when backporting fixes to stable releases.
+Another note: please remove these commit message lines like this with
+"Thanks" and your names, from each of the 3 commits.
 
-More information:
- https://www.kernel.org/doc/html/v6.10/process/submitting-patches.html#usin=
-g-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
-
-Please update the Fixes footers in the three commits and repost. :-)
+Please run "git log" in your git Linux working directory to get a
+sense of the conventions for Linux commit messages. :-)
 
 Thanks!
 neal
 
 
+> Fixes: 91a4599c2ad8 ("tcp_cubic: fix to run bictcp_update() at least once=
+ per RTT")
 > Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
 > Signed-off-by: Lisong Xu <xu@unl.edu>
 >
