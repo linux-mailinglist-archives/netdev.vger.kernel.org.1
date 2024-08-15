@@ -1,132 +1,74 @@
-Return-Path: <netdev+bounces-118845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A9F952EDE
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:15:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB9A2952FE5
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE3201F22423
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:15:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647F01F21854
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A48819E7C8;
-	Thu, 15 Aug 2024 13:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296781A00CE;
+	Thu, 15 Aug 2024 13:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nxbPYXDc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPEqGsa4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB9219DFA4;
-	Thu, 15 Aug 2024 13:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F298B19FA92;
+	Thu, 15 Aug 2024 13:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723727705; cv=none; b=MoUoHxUhapg6YCCXM+a11DVxqHPwU/1iRd3YI7Fg8AOVZNCdlcDVrdfSL9RPSXjO4nth/SufF7uRRriDrtmDes/jSipUShP909Ncy7vx1hZo5bQA4qgMtHZc4S5EztaG5puS/mg4qJHMIchN3I9bJY6QH8kkRDnw6+ixRrP4YPk=
+	t=1723729026; cv=none; b=gFo1JSPFMG8eDC+0NxrSm7LpJywvudXR775k2x/3VJfyqOaR9gRcwFoROOtcp7YAml/Xk51nlSsYNiP2ZCMMGBD2rMOP8B8oOsZ/EuqQA9cyM2oaMv78+opk56t/MvvSi7jaISGSqBHD2mgp3rYzUjvGvMH9i81+/XW9FpGWWYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723727705; c=relaxed/simple;
-	bh=JRQl+0ZEFmGsUtBjXY/ysbNQyqzwoKtRYv6O7By/lJY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ibIhwL+m6IbjptN1pMk1TOo5cU6Mvc5o7a6qkdUdxD8rhDeTrnsWG1nr1PGCBe56zTw+C+J20Gc1WfSgyqCcvatZwt2I9wyooMjZ8nl4KV//EdZn4zyl8lX84OJ0kphn8eTf8Ww6RDvdw6WhD3+DCfJL7LAVq+ZoG1PHC+UBrrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nxbPYXDc; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723727694; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=pWBh4p9yI2moDU/VfvO40E3xJpS6Qt9QfhRqxfqTYYg=;
-	b=nxbPYXDcz7T36OfiJ6BSIzelJJAhtnMdwseW9yHg3FGz73hklf3nbpQLjfQ7IpdFZJmWqIQYUrmQb+AtqhpAqfZRiy7SL+E6Ux4uC2SNdJNBQ1oU5XfMfsx5XaGufEFPN9OrYG0XVcgVTxjabiZo1iNJwIr1q5qDFI4sDVI7J5I=
-Received: from 30.221.130.128(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCwrPf4_1723727692)
-          by smtp.aliyun-inc.com;
-          Thu, 15 Aug 2024 21:14:53 +0800
-Message-ID: <67a37386-6d88-43b4-8cd4-fdbe263addb7@linux.alibaba.com>
-Date: Thu, 15 Aug 2024 21:14:51 +0800
+	s=arc-20240116; t=1723729026; c=relaxed/simple;
+	bh=C0REqQ8bYvLooFvtBXI3ykCRV2HA3TZfc6hkK4WOSSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JImw0bC1d8h5Eiz306Dqo0sdbRS1mA7UIJ5741Rl/cT911+VB7xHmqYQO+vAhj8GRP73F3Hhs039UO+ENr0wpVFIeQowzFz5SG+zqyuB5WQ+f8EpwECCsAoU2BlkHHAS5UJt/6bpDRP2e1P91DP0mmLXBlpFvucp9d3sIY1Hfhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPEqGsa4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BBC1C32786;
+	Thu, 15 Aug 2024 13:37:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723729025;
+	bh=C0REqQ8bYvLooFvtBXI3ykCRV2HA3TZfc6hkK4WOSSY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IPEqGsa4HiknOQDc9sMqE8vB54t15nDwA6eIwtVJ+APpbDFH/EJGjrA1h9tNAsgKS
+	 oCKObwOnHcDlqwezKfcDs4WXgi8P4X1xQvkao9VMnigQRF7BOA2+qQv+ck9k+nsZfx
+	 4eXbKHvrHeaURZDB1nCECv85WV9M/wTk+GS+Q6nKCCfXS03PAbFycPDKG3oWlTdOo5
+	 JeWIhuaApO/OsK/fRRg7b1JqYlsF3kDJgpe6rkrd0wEj44dcE7qX6U/iJ+D+vttCiZ
+	 iYg7Rhtu6bt4rP5na8qflLqE1JT9lJ0P3ZxGzHjyiIAT6u/Ff+E2JuWPAejWA9OJAN
+	 A6Zr0+voFjV0Q==
+Date: Thu, 15 Aug 2024 06:37:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ liuhangbin@gmail.com, petrm@nvidia.com, matttbe@kernel.org, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, David Wei <dw@davidwei.uk>,
+ Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org (open
+ list), linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST
+ FRAMEWORK)
+Subject: Re: [PATCH net-next v3] net: netconsole: selftests: Create a new
+ netconsole selftest
+Message-ID: <20240815063704.0d83c8f8@kernel.org>
+In-Reply-To: <20240815095157.3064722-1-leitao@debian.org>
+References: <20240815095157.3064722-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: add sysctl for smc_limit_hs
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1723726988-78651-1-git-send-email-alibuda@linux.alibaba.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <1723726988-78651-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Thu, 15 Aug 2024 02:51:44 -0700 Breno Leitao wrote:
+> +CONFIG_NETCONSOLE=m
+> +CONFIG_NETCONSOLE_DYNAMIC=y
 
-
-On 2024/8/15 21:03, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
-> we introduce a mechanism to put constraint on SMC connections visit according to
-> the pressure of SMC handshake process.
-> 
-> At that time, we believed that controlling the feature through netlink was sufficient,
-> However, most people have realized now that netlink is not convenient in
-> container scenarios, and sysctl is a more suitable approach.
-> 
-> In addition, it is not reasonable for us to initialize limit_smc_hs in
-> smc_pnet_net_init, we made a mistable before. It should be initialized
-
-nit: mistable -> mistake?
-
-> in smc_sysctl_net_init(), just like other systcl.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
->   net/smc/smc_pnet.c   |  3 ---
->   net/smc/smc_sysctl.c | 11 +++++++++++
->   2 files changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 2adb92b..1dd3623 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
-> @@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
->   
->   	smc_pnet_create_pnetids_list(net);
->   
-> -	/* disable handshake limitation by default */
-> -	net->smc.limit_smc_hs = 0;
-> -
->   	return 0;
->   }
->   
-> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-> index 13f2bc0..2fab645 100644
-> --- a/net/smc/smc_sysctl.c
-> +++ b/net/smc/smc_sysctl.c
-> @@ -90,6 +90,15 @@
->   		.extra1		= &conns_per_lgr_min,
->   		.extra2		= &conns_per_lgr_max,
->   	},
-> +	{
-> +		.procname	= "limit_smc_hs",
-> +		.data		= &init_net.smc.limit_smc_hs,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ZERO,
-> +		.extra2		= SYSCTL_ONE,
-> +	},
->   };
->   
->   int __net_init smc_sysctl_net_init(struct net *net)
-> @@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
->   	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
->   	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->   	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-> +	/* disable handshake limitation by default */
-> +	net->smc.limit_smc_hs = 0;
->   
->   	return 0;
->   
+It's missing dependencies, configfs but maybe more.
+Please test the build as described here:
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#how-to-build
 
