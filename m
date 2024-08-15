@@ -1,236 +1,119 @@
-Return-Path: <netdev+bounces-118821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9E7952DA8
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:39:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B3E952DAA
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480091F22731
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:39:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605311F21DC8
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 11:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7091714C8;
-	Thu, 15 Aug 2024 11:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCB41714C0;
+	Thu, 15 Aug 2024 11:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nd0h1rxi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="h+NSoNfS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nd0h1rxi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="h+NSoNfS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vRX2bA4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B47DA9E;
-	Thu, 15 Aug 2024 11:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CD47DA70
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 11:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723721960; cv=none; b=E98CgI6TrA1Fq72bvMEjr+FpelO2DmOgur4OB9me2xm+EYCj8+0Xspmytb3UJO/bf9T/RDYpSIl6pCWvZfd8R/WL/CJB1G8JrEdCwY90vAd3H9fCJrclUVfCDGowySsbgiYoTT4fWYoxmLfGJT8zUj8uQlHeN2MVRL2GyO3/Iv0=
+	t=1723722042; cv=none; b=CMUXSE2jviAM7Zg7qkcK1s4s8fnHzQa4yOTbPjpEwgDmplYvA6xgkEyctGBnl50TKgfiBOTm7a7Qn9my+xl+gMrb7vgKreAgtT+xf7PkfCK/KpM/TuKPhq66hZ3T0ZhvaSmB8g+NGdY0JQJBEKab9sIS1DBPvwAH8o69/mY5eWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723721960; c=relaxed/simple;
-	bh=l6rcWtVPc1rg8CGlJhZWcF1c3U+WD5PE2ri2IiuBJ4g=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=ukpdMAxhgE5bM7DL7V5h3xVjcTdKseFvNo35CK27IsL6bHz4WBxhx80ySVo+j7yUNW/XARADr5WYdcsj4pQuwAyYuJQA72CsHazvwfrgLaTGA+oOn3mYmxSNA7kkSE1X80vo5KBd0soNsXAVI3TPGgeq344pWLXC1fTDa439U+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nd0h1rxi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=h+NSoNfS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nd0h1rxi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=h+NSoNfS; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6238A1FFF8;
-	Thu, 15 Aug 2024 11:39:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723721955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
-	b=nd0h1rxiIfUn7ca5dbmdkVbg8eiE8yAKVMfi4NbYyxSG9MtlCzl98WhhUT6LkhVyFD9fxu
-	RlqQmNOielc0wD/pFx65cpsHZJJIO9hcVOvKUIfaFsPsA/rYaQXFPApw7yT66Qxu2LDyba
-	SZ4lK0pV83G+GrsBWCQJb0rrHVevps8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723721955;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
-	b=h+NSoNfSb+/b6aUitZ+o0G4B3ziGTqg3Mp9IEHPYFtKpkq3I1BWBdnR8exWvL0qydABUH4
-	c9G14u36Lxa6xQCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723721955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
-	b=nd0h1rxiIfUn7ca5dbmdkVbg8eiE8yAKVMfi4NbYyxSG9MtlCzl98WhhUT6LkhVyFD9fxu
-	RlqQmNOielc0wD/pFx65cpsHZJJIO9hcVOvKUIfaFsPsA/rYaQXFPApw7yT66Qxu2LDyba
-	SZ4lK0pV83G+GrsBWCQJb0rrHVevps8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723721955;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JkDQhnOA0LzdK2HzsAZj+T0x6/mTNFsFWfXDFNt2kvU=;
-	b=h+NSoNfSb+/b6aUitZ+o0G4B3ziGTqg3Mp9IEHPYFtKpkq3I1BWBdnR8exWvL0qydABUH4
-	c9G14u36Lxa6xQCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 486C813B0C;
-	Thu, 15 Aug 2024 11:39:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id B7XfOt3ovWaEPgAAD6G6ig
-	(envelope-from <neilb@suse.de>); Thu, 15 Aug 2024 11:39:09 +0000
+	s=arc-20240116; t=1723722042; c=relaxed/simple;
+	bh=kVCrIMobmP4Nbic0P011XUimqrdstzBHB+zvD2g4cl0=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FfMrs8hscJcj2pA+y8Dp+Stur0caqy3Vl48zep8B6MCsED/i9UN01uqdPdwcdb1yuCU3wlr5wSczmxApeB33x1whBW9cG6COlYUH6PmPj91ZaFa6yCmxkSaKAmJpeUn1lZis0sdKkJTKUx3uJvWlz+z7LqT/sb2LA8AlcNkYgvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vRX2bA4H; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723722042; x=1755258042;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=kVCrIMobmP4Nbic0P011XUimqrdstzBHB+zvD2g4cl0=;
+  b=vRX2bA4HaVNR61FMxki4QShxI402Z6N3kEBAEOI1xS3mPZ5t2/OXboC8
+   zYaGsjzq6D1psMeSTLMHoM+VDk9p4v/LGzEsJNTTQ+eKB8K2QrnaiB+aE
+   zyIWU5Kgbh1wCLAM43moZtiHh7Jrw1Qs4HKE2Q2YFBejItLGF+xHFn/ld
+   k=;
+X-IronPort-AV: E=Sophos;i="6.10,148,1719878400"; 
+   d="scan'208";a="19102411"
+Subject: RE: [RFC 0/3] ptp: Add esterror support
+Thread-Topic: [RFC 0/3] ptp: Add esterror support
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 11:40:39 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:56808]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.173:2525] with esmtp (Farcaster)
+ id dd8f31ff-a194-4560-a842-8546bca82efc; Thu, 15 Aug 2024 11:40:37 +0000 (UTC)
+X-Farcaster-Flow-ID: dd8f31ff-a194-4560-a842-8546bca82efc
+Received: from EX19D037EUB002.ant.amazon.com (10.252.61.93) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 11:40:37 +0000
+Received: from EX19D047EUB004.ant.amazon.com (10.252.61.5) by
+ EX19D037EUB002.ant.amazon.com (10.252.61.93) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 15 Aug 2024 11:40:37 +0000
+Received: from EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20]) by
+ EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20%3]) with mapi id
+ 15.02.1258.034; Thu, 15 Aug 2024 11:40:37 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Vadim Fedorenko <vadfed@meta.com>, Maciek Machnikowski
+	<maciek@machnikowski.net>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>
+Thread-Index: AQHa7qv1iikdcHJy9EKoXFjOAK1UtbIoD6oAgAAO6ICAABN90A==
+Date: Thu, 15 Aug 2024 11:40:37 +0000
+Message-ID: <e61e087d636c44cba4aa94cc414e921c@amazon.com>
+References: <20240813125602.155827-1-maciek@machnikowski.net>
+ <20240814174147.761e1ea7@kernel.org>
+ <38459609-c0a3-434a-aeba-31dd56eb96f8@machnikowski.net>
+ <9a15379e-9c1e-4778-bda1-38474a8d9317@meta.com>
+In-Reply-To: <9a15379e-9c1e-4778-bda1-38474a8d9317@meta.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Kunwu Chan" <kunwu.chan@linux.dev>
-Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
- jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com, tom@talpey.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Kunwu Chan" <chentao@kylinos.cn>
-Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
-In-reply-to: <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
-References: <>, <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
-Date: Thu, 15 Aug 2024 21:39:06 +1000
-Message-id: <172372194692.6062.4519803974558688969@noble.neil.brown.name>
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
-On Thu, 15 Aug 2024, Kunwu Chan wrote:
-> Thanks for your reply.
->=20
-> On 2024/8/14 18:28, NeilBrown wrote:
-> > On Wed, 14 Aug 2024, kunwu.chan@linux.dev wrote:
-> >> From: Kunwu Chan <chentao@kylinos.cn>
-> >>
-> >> Increase size of the servername array to avoid truncated output warning.
-> >>
-> >> net/sunrpc/clnt.c:582:75: error=EF=BC=9A=E2=80=98%s=E2=80=99 directive o=
-utput may be truncated
-> >> writing up to 107 bytes into a region of size 48
-> >> [-Werror=3Dformat-truncation=3D]
-> >>    582 |                   snprintf(servername, sizeof(servername), "%s",
-> >>        |                                                             ^~
-> >>
-> >> net/sunrpc/clnt.c:582:33: note:=E2=80=98snprintf=E2=80=99 output
-> >> between 1 and 108 bytes into a destination of size 48
-> >>    582 |                     snprintf(servername, sizeof(servername), "%=
-s",
-> >>        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
-> >>    583 |                                          sun->sun_path);
-> >>
-> >> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> >> ---
-> >>   net/sunrpc/clnt.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-> >> index 09f29a95f2bc..874085f3ed50 100644
-> >> --- a/net/sunrpc/clnt.c
-> >> +++ b/net/sunrpc/clnt.c
-> >> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *=
-args)
-> >>   		.connect_timeout =3D args->connect_timeout,
-> >>   		.reconnect_timeout =3D args->reconnect_timeout,
-> >>   	};
-> >> -	char servername[48];
-> >> +	char servername[108];
-> > If we choose this approach to removing the warning, then we should use
-> > UNIX_PATH_MAX rather than 108.
-> My negligence.
-> >
-> > However the longest server name copied in here will in practice be
-> >     /var/run/rpcbind.sock
-> >
-> > so the extra 60 bytes on the stack is wasted ...  maybe that doesn't
-> > matter.
-> I'm thinking=C2=A0 about use a dynamic space alloc method like kasprintf to=
-=20
-> avoid space waste.
-> > The string is only used by xprt_create_transport() which requires it to
-> > be less than RPC_MAXNETNAMELEN - which is 256.
-> > So maybe that would be a better value to use for the array size ....  if
-> > we assume that stack space isn't a problem.
->=20
-> Thank you for the detailed explanation. I read the=20
-> xprt_create_transport,=C2=A0 the RPC_MAXNETNAMELEN
->=20
-> is only use to xprt_create_transport .
->=20
-> > What ever number we use, I'd rather it was a defined constant, and not
-> > an apparently arbitrary number.
->=20
-> Whether we could check the sun->sun_path length before using snprintf?=C2=
-=A0=20
-> The array size should smaller
->=20
-> than=C2=A0 the minimum of sun->sun_path and RPC_MAXNETNAMELEN.
->=20
-> Or use the dynamic space allocate method to save space.
-
-I think that dynamically allocating space is not a good idea.  It means
-you have to handle failure which is just a waste of code.
-
-I'd suggest simply changing the array to RPC_MAXNETNAMELEN.
-
-NeilBrown
-
-
-
->=20
-> >
-> > Thanks,
-> > NeilBrown
-> >
-> >
-> >>   	struct rpc_clnt *clnt;
-> >>   	int i;
-> >>  =20
-> >> --=20
-> >> 2.40.1
-> >>
-> >>
-> --=20
-> Thanks,
->    Kunwu.Chan
->=20
->=20
-
+PiA+DQo+ID4NCj4gPiBPbiAxNS8wOC8yMDI0IDAyOjQxLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
+Cj4gPj4gT24gVHVlLCAxMyBBdWcgMjAyNCAxMjo1NTo1OSArMDAwMCBNYWNpZWsgTWFjaG5pa293
+c2tpIHdyb3RlOg0KPiA+Pj4gVGhpcyBwYXRjaCBzZXJpZXMgaW1wbGVtZW50cyBoYW5kbGluZyBv
+ZiB0aW1leCBlc3RlcnJvciBmaWVsZCBieSBwdHANCj4gPj4+IGRldmljZXMuDQo+ID4+Pg0KPiA+
+Pj4gRXN0ZXJyb3IgZmllbGQgY2FuIGJlIHVzZWQgdG8gcmV0dXJuIG9yIHNldCB0aGUgZXN0aW1h
+dGVkIGVycm9yIG9mDQo+ID4+PiB0aGUgY2xvY2suIFRoaXMgaXMgdXNlZnVsIGZvciBkZXZpY2Vz
+IGNvbnRhaW5pbmcgYSBoYXJkd2FyZSBjbG9jaw0KPiA+Pj4gdGhhdCBpcyBjb250cm9sbGVkIGFu
+ZCBzeW5jaHJvbml6ZWQgaW50ZXJuYWxseSAoc3VjaCBhcyBhIHRpbWUgY2FyZCkNCj4gPj4+IG9y
+IHdoZW4gdGhlIHN5bmNocm9uaXphdGlvbiBpcyBwdXNoZWQgdG8gdGhlIGVtYmVkZGVkIENQVSBv
+ZiBhIERQVS4NCj4gPj4+DQo+ID4+PiBDdXJyZW50IGltcGxlbWVudGF0aW9uIG9mIEFESl9FU1RF
+UlJPUiBjYW4gZW5hYmxlIHB1c2hpbmcgY3VycmVudA0KPiA+Pj4gb2Zmc2V0IG9mIHRoZSBjbG9j
+ayBjYWxjdWxhdGVkIGJ5IGEgdXNlcnNwYWNlIGFwcCB0byB0aGUgZGV2aWNlLA0KPiA+Pj4gd2hp
+Y2ggY2FuIGFjdCB1cG9uIHRoaXMgaW5mb3JtYXRpb24gYnkgZW5hYmxpbmcgb3IgZGlzYWJsaW5n
+DQo+ID4+PiB0aW1lLXJlbGF0ZWQgZnVuY3Rpb25zIHdoZW4gY2VydGFpbiBib3VuZGFyaWVzIGFy
+ZSBub3QgbWV0IChlZy4NCj4gPj4+IHBhY2tldCBsYXVuY2h0aW1lKQ0KPiA+Pg0KPiA+PiBQbGVh
+c2UgZG8gQ0MgcGVvcGxlIHdobyBhcmUgd29ya2luZyBvbiB0aGUgVk0gLyBQVFAgLyB2ZHNvIHRo
+aW5nLCBhbmQNCj4gPj4gdGltZSBwZW9wbGUgbGlrZSB0Z2x4LiBBbmQgYW4gaW1wbGVtZW50YXRp
+b24gZm9yIGEgcmVhbCBkZXZpY2Ugd291bGQNCj4gPj4gYmUgbmljZSB0byBlc3RhYmxpc2ggYXR0
+ZW50aW9uLg0KPiA+DQo+ID4gTm90ZWQgLSB3aWxsIENDIGluIGZ1dHVyZSByZWxlYXNlcy4NCj4g
+Pg0KPiA+IEFXUyBwbGFubmVkIHRoZSBpbXBsZW1lbnRhdGlvbiBpbiBFTkEgZHJpdmVyIC0gd2ls
+bCB3b3JrIHdpdGggRGF2aWQgb24NCj4gPiBtYWtpbmcgaXQgcGFydCBvZiB0aGUgcGF0Y2hzZXQg
+b25jZSB3ZSAidXBncmFkZSIgZnJvbSBhbiBSRkMgLSBidXQNCj4gPiB3YW50ZWQgdG8gZGlzY3Vz
+cyB0aGUgYXBwcm9hY2ggZmlyc3QuDQo+IA0KPiBJIGNhbiBpbXBsZW1lbnQgdGhlIGludGVyZmFj
+ZSBmb3IgT0NQIFRpbWVDYXJkIHRvbywgSSB0aGluayB3ZSBoYXZlIEhXDQo+IGluZm9ybWF0aW9u
+IGFib3V0IGl0IGFscmVhZHkuDQoNCkNDIEFtaXQgQmVybnN0ZWluIChBV1MsIEVOQSBkcml2ZXIp
+Lg0K
 
