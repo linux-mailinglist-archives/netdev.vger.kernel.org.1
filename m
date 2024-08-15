@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-118957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F563953AE9
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:36:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB975953AEB
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDB59B210D6
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:36:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020031C225E9
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 19:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6B978C73;
-	Thu, 15 Aug 2024 19:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B33E14386C;
+	Thu, 15 Aug 2024 19:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UOmGk4nL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hxhnZvhQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E257580A
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 19:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CF013AD11
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 19:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723750588; cv=none; b=MFa41n18pci/ArxutLKx7TiyRByaesv97d3i/mrR/rwtb0rO3vk/raidTZwwHQ3tl6dbcMUq1uR8KCsRxnG66ZWDrztX8zksw2O0KGhRQcj60DATMoE0H+4DDGnCwdCxfaldWsG14B7q34N1izYWVULSaudvfXKcHiNWAm8sw8w=
+	t=1723750590; cv=none; b=i3v/Zt5rLArObn2j4nNS1DGKgl8Ecwbpyvc+gkgIfyqg/uHn2ycWrpSqnig4BWiC+GGjAgZYAChjDp7z/az4zpkyOOO9Weo3FEkdycSrIe348mQ8bScIWVziEyh3HQx2sO+cBBatVBTzH2x8hNQaW55mtlhPmEtSLplIfwsGW3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723750588; c=relaxed/simple;
-	bh=QcM8GLB5+lVbex8gGtplA6bEZAXYjE9GY8O+dIjUI0A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qito7FwbRzlc11tTt+5kCkbFCre3FsMwHRyQ2on/vSPPyz8RdvX0vjWfXu29kwWMWnDbyzUjq7hgAA757ab2AdBoAtG6wyPyPi8kooCysOT2srXSq/fzTrxu6cjDc4xadj1Hevh2jbuvk1zEnc524uJkEVqobIJZBp3GgmZ86eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UOmGk4nL; arc=none smtp.client-ip=91.218.175.175
+	s=arc-20240116; t=1723750590; c=relaxed/simple;
+	bh=Skx/W98s0OlT3RwKTPnsB4maHdk8wwKmbbaMdIKJlQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HOqNwGWs0a4U2BNK5M6gYacGJOg+icLSaXajO1948IIPqk3yYb073tvo6SU/vuUu+yn/rPg5Y5Uzk7/QpOA4bL8YWV771sD4vxyRyvLmU1LS8O+jYsxRrOYObtgiO5budICrMOHOlCCr+fZ3gCe3VDKwhQR92N2YGAgMN+NQZ6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hxhnZvhQ; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723750584;
+	t=1723750586;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JoT+PgcUjqGva36HBaNEdB+NyyP5wVwsRBkZBx54lXA=;
-	b=UOmGk4nLeXkCSC0+YXNVSfGMqlup6GLGnG7ToTNOBToTVd6mU11HJz4SM6Uio9OFmECAq6
-	wqoj7XP9iz9nKvQkcXlTGMkjRilsqm75jVcDuPu5s51P5ivCI9tD5Lx2i1xrMxklVPMIWB
-	Kynlch9DHc+obH2SC2CQt4yHyqyXedk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mS/XIHwO7Vk4ocj6oR1f4FPm+sxNBxQSiDNNRlZ+GRw=;
+	b=hxhnZvhQUOPTc6d8r1wrCKAE7xhQHxRrW0CiCGtj7PcJ1MXdf59voT/FRZxv2qw7GnBnpB
+	VXSapOfCL5BPff04QtlRnXfjWOxmj/JeBmaV8pvKwMQvkV+3pkXlMDKcfXIPiswVcyRUEe
+	PYCHzE2jo5pApx81G9SaOdVxK61u5+Y=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	netdev@vger.kernel.org
@@ -52,10 +54,13 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net-next v2 0/5] net: xilinx: axienet: Multicast fixes and improvements
-Date: Thu, 15 Aug 2024 15:36:09 -0400
-Message-Id: <20240815193614.4120810-1-sean.anderson@linux.dev>
+	Sean Anderson <sean.anderson@linux.dev>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 1/5] net: xilinx: axienet: Always disable promiscuous mode
+Date: Thu, 15 Aug 2024 15:36:10 -0400
+Message-Id: <20240815193614.4120810-2-sean.anderson@linux.dev>
+In-Reply-To: <20240815193614.4120810-1-sean.anderson@linux.dev>
+References: <20240815193614.4120810-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,38 +70,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This series has a few small patches improving the handling of multicast
-addresses. In particular, it makes the driver a whole lot less spammy,
-and adjusts things so we aren't in promiscuous mode when we have more
-than four multicast addresses (a common occurance on modern systems).
+If promiscuous mode is disabled when there are fewer than four multicast
+addresses, then it will to be reflected in the hardware. Fix this by
+always clearing the promiscuous mode flag even when we program multicast
+addresses.
 
-As the hardware has a 4-entry CAM, the ideal method would be to "pack"
-multiple addresses into one CAM entry. Something like:
+Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
 
-entry.address = address[0] | address[1];
-entry.mask = ~(address[0] ^ address[1]);
+(no changes since v1)
 
-Which would make the entry match both addresses (along with some others
-that would need to be filtered in software).
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Mapping addresses to entries in an efficient way is a bit tricky. If
-anyone knows of an in-tree example of something like this, I'd be glad
-to hear about it.
-
-Changes in v2:
-- Split off IFF_PROMISC change from printing changes
-
-Sean Anderson (5):
-  net: xilinx: axienet: Always disable promiscuous mode
-  net: xilinx: axienet: Fix dangling multicast addresses
-  net: xilinx: axienet: Don't print if we go into promiscuous mode
-  net: xilinx: axienet: Don't set IFF_PROMISC in ndev->flags
-  net: xilinx: axienet: Support IFF_ALLMULTI
-
- drivers/net/ethernet/xilinx/xilinx_axienet.h  |  3 ++
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 52 +++++++++----------
- 2 files changed, 29 insertions(+), 26 deletions(-)
-
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index ca04c298daa2..e664611c29cf 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -451,6 +451,10 @@ static void axienet_set_multicast_list(struct net_device *ndev)
+ 	} else if (!netdev_mc_empty(ndev)) {
+ 		struct netdev_hw_addr *ha;
+ 
++		reg = axienet_ior(lp, XAE_FMI_OFFSET);
++		reg &= ~XAE_FMI_PM_MASK;
++		axienet_iow(lp, XAE_FMI_OFFSET, reg);
++
+ 		i = 0;
+ 		netdev_for_each_mc_addr(ha, ndev) {
+ 			if (i >= XAE_MULTICAST_CAM_TABLE_NUM)
 -- 
 2.35.1.1320.gc452695387.dirty
 
