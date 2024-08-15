@@ -1,85 +1,89 @@
-Return-Path: <netdev+bounces-118846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF36A952FE1
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:37:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 132EC953615
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 16:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A1E1F2143D
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 13:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2D6C282BA5
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 14:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD3019DF9E;
-	Thu, 15 Aug 2024 13:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEE61AC426;
+	Thu, 15 Aug 2024 14:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oHarmSyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E471714AE;
-	Thu, 15 Aug 2024 13:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADB81AC422
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723729023; cv=none; b=PKSxDEKvG0XIzrA+VaWDyk2M5mzswpv/UoGv3EizPUx5jZnTW8cF4E6UjsGmKkuDRujpXsTHzcwJ5YNE+hwA4vHuOB8BGPgtUTau9SusvcyUsNuvGxCEoFLJ7DehMarwgqEC6AHhHVHw8wz5GtGbd77lNkyDVSc24tJV9OLidFg=
+	t=1723733069; cv=none; b=ifA4euuqIHWO4sCGqQlnknDX9fDe0AA0ntcVG10CvFytsIGDgXJlyddbGprBzSnm7iFtEmWJKMKXE3hlkRzxPoIsftYcnVb/zufKEvwuoWLVr8jZV898XrIAqMOZds0WyyTrtxYjrAWfss680D5jrtQxOqLWvlkPyt3AsfXtMQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723729023; c=relaxed/simple;
-	bh=tq7t/is/d+c/coOXCCU7VrTmWNejKvA/lI1Oeh8yr2E=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=irURVkdDcg2rTlyHwLtz6K4/xPwj+HUo+6QrD2xsLWuqLq/Q70509RMuVCTeplTzKeP9l/lt2UoRaWwT+LEh5UKsHL4zxEaSqSHTp8m5VI7WzuYSQuFWPJ1+uXQweGBTrbmS09mMat5dpS+66mLnlP90g4GptS+V3X4mig5NN8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wl5hX3dGKzDqW9;
-	Thu, 15 Aug 2024 21:34:52 +0800 (CST)
-Received: from dggpeml500006.china.huawei.com (unknown [7.185.36.76])
-	by mail.maildlp.com (Postfix) with ESMTPS id 43D7618006C;
-	Thu, 15 Aug 2024 21:36:50 +0800 (CST)
-Received: from localhost.localdomain (10.175.112.70) by
- dggpeml500006.china.huawei.com (7.185.36.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 15 Aug 2024 21:36:49 +0800
-From: Zhang Changzhong <zhangchangzhong@huawei.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Zhang Changzhong <zhangchangzhong@huawei.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: remove redundant check in skb_shift()
-Date: Thu, 15 Aug 2024 22:09:42 +0800
-Message-ID: <1723730983-22912-1-git-send-email-zhangchangzhong@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1723733069; c=relaxed/simple;
+	bh=qm6RS91ieENK+z2/TMyLHWO14ioZVtkzWFGfmQzIqOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U14pbfAcgNeDoV8aWWXhmEHD/jsDk3PVF6SraFWJPpqJQSZiBOK4Ff4lQ1ndL09wzFw0Pjbf8EBCD1hw5UhJv9geGYhyWufFrdls9ISUDOfRyv/t0J5kmJVnbRRMdS6rrND3uGP0KCN4clGAmCpGBEIlPZzYtoG+OLdiSrCQnAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oHarmSyQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03B85C32786;
+	Thu, 15 Aug 2024 14:44:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723733069;
+	bh=qm6RS91ieENK+z2/TMyLHWO14ioZVtkzWFGfmQzIqOQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oHarmSyQ/6lFd/69pewjwzArWJ/tKsOGREc8zqpoAVbCs8Iib79ASAUxJFS9dOxJE
+	 5GiKz+xIX9KablDPStihcGu58x7uQiZx2SqiXbBntS1446wxlxIRa7aK7SW5iyHNGK
+	 T27alyqRayQ8O4GiQNMytRUHVEzaPIUJzbFyWeC4=
+Date: Thu, 15 Aug 2024 15:41:38 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Jiri Slaby <jirislaby@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net v3 1/2] ptp: ocp: adjust sysfs entries to expose tty
+ information
+Message-ID: <2024081530-clasp-frown-1586@gregkh>
+References: <20240815125905.1667148-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500006.china.huawei.com (7.185.36.76)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815125905.1667148-1-vadfed@meta.com>
 
-The check for '!to' is redundant here, since skb_can_coalesce() already
-contains this check.
+On Thu, Aug 15, 2024 at 05:59:04AM -0700, Vadim Fedorenko wrote:
+> Starting v6.8 the serial port subsystem changed the hierarchy of devices
+> and symlinks are not working anymore. Previous discussion made it clear
+> that the idea of symlinks for tty devices was wrong by design. Implement
+> additional attributes to expose the information. Fixes tag points to the
+> commit which introduced the change.
+> 
+> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 
-Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
----
- net/core/skbuff.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Complicated fixes, nice!  Thanks for doing this.  One question:
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 83f8cd8..f915234 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4169,8 +4169,7 @@ int skb_shift(struct sk_buff *tgt, struct sk_buff *skb, int shiftlen)
- 	/* Actual merge is delayed until the point when we know we can
- 	 * commit all, so that we don't have to undo partial changes
- 	 */
--	if (!to ||
--	    !skb_can_coalesce(tgt, to, skb_frag_page(fragfrom),
-+	if (!skb_can_coalesce(tgt, to, skb_frag_page(fragfrom),
- 			      skb_frag_off(fragfrom))) {
- 		merge = -1;
- 	} else {
--- 
-2.9.5
+> +static ssize_t
+> +ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
+> +{
+> +	struct dev_ext_attribute *ea = to_ext_attr(attr);
+> +	struct ptp_ocp *bp = dev_get_drvdata(dev);
+> +	struct ptp_ocp_serial_port *port;
+> +
+> +	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
 
+"uintptr_t"?  That's not a normal kernel type.  var is of type "void *"
+so can't this just be "int" here?  Or am I reading this wrong?
+
+thanks,
+
+greg k-h
 
