@@ -1,89 +1,126 @@
-Return-Path: <netdev+bounces-118908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851A795379F
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:50:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5369537B1
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1B5C1C252E2
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9868C1F25B0F
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B951AED32;
-	Thu, 15 Aug 2024 15:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45EC1B3747;
+	Thu, 15 Aug 2024 15:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQiuTurO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rI2dR1Pz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C3115E88;
-	Thu, 15 Aug 2024 15:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF2A1A4F0F;
+	Thu, 15 Aug 2024 15:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723737014; cv=none; b=M/yC4GfqvozApulbcE0ponq66iczJAvJPgtfZbervSAz6rvGKFC+tsioOMgS96DGqhOJbPs5lbJrgKSr4h0nXBN9/G9bBAkWaB/WhKbJmiuFkt2kHTUhH2GKjEAMnTteXoPiCDDJxpPEscjTjSQQpMtLhL1Ho9D1p0qr8abvv/Q=
+	t=1723737284; cv=none; b=ZeDNnXZbxiIgZnfEgaRkIHo3jR0uQLAONi3y1taHDmQv/IAg5tR3HeDIpcmtkixY9/+E8O6GC2v8Iv0rQ/9MDs8fpzn+Azn/GuydCdJ7i+hAk3a6+oGZ/iZvGc6bU1CUF0/8DuAhQuoWqF9sw164fE1Rah1QMJmY4bdLOORcBzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723737014; c=relaxed/simple;
-	bh=xN7UdZrI0x2sSwbrhbNFyqv5rQaHms9/rajWM/qikRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pzLLbtnVWlPLQ/v8Zqfe8V1iiK1T1DWm/WUfaViyAsxIu+LCcFKD0IR6Nh87DI3X8eEUYtha9ume+27pk8VJGtiQIPBt0sIiLGBorqhIsMV+UOImC/SR42uY/EHlwZYzfcgX324kL0ElM/+4j9qRkWdfsI1+9NkhXyKNagtd2hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQiuTurO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA46FC32786;
-	Thu, 15 Aug 2024 15:50:13 +0000 (UTC)
+	s=arc-20240116; t=1723737284; c=relaxed/simple;
+	bh=8fxD0SycfeG1dlS20JGKOC5Kh4/oDqEslSOmZnRUIVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qbZxCM+uTIUa0lri0uvQjFXPDHZ6fI98GbiP3W682tF/gHgefhFnGOAKWhT4aKFdp1jX4KMly8Tuvy+RXvgFF7QogLa4d/aom1SCo1y6fKMgNzXZ1Lf5+hSADrF5sT/gJM427Te3btYf/PDnFgIY9xVBlFofh1+9wyGy3fnzSg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rI2dR1Pz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EAB5C4AF09;
+	Thu, 15 Aug 2024 15:54:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723737014;
-	bh=xN7UdZrI0x2sSwbrhbNFyqv5rQaHms9/rajWM/qikRM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EQiuTurOYvuoI1KRGYJYqmsfOEuf0rl9jFywmsfiy6GmUh3Fp6fIrwxku7H8EvOMD
-	 CuTieCONOnKJQ0cw0tLPy7X7Vs3qIaeUP3m8Wzz5b1FODZ0VHh457wYgs5w8i1DQ8h
-	 yzPupHAe7fim7a9Gro546sB0IkSdXa0NytmPBgPKwucPAZHXg6rxwQse6fUXgmD6Wo
-	 /4AD9ZjQjMiJo7p0IAMxTdspbn3+F/yGdMtbcs07DjBMosHQx5EljlmO6cpqe+eKON
-	 qhjKBHPMCzeT+aR8MQRZ51JGRkWN7d/sKJmxzq35rOuHU8vg+rHyjJ0sTS269FY46z
-	 fLUNw8zPAyv+A==
-Date: Thu, 15 Aug 2024 08:50:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com,
- javier.carrasco.cruz@gmail.com, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- shuah@kernel.org, skhan@linuxfoundation.org
-Subject: Re: [PATCH net v6 0/2] Enhance network interface feature testing
-Message-ID: <20240815085012.01edb574@kernel.org>
-In-Reply-To: <20240815110442.1389625-1-jain.abhinav177@gmail.com>
-References: <20240814175748.35889b6d@kernel.org>
-	<20240815110442.1389625-1-jain.abhinav177@gmail.com>
+	s=k20201202; t=1723737284;
+	bh=8fxD0SycfeG1dlS20JGKOC5Kh4/oDqEslSOmZnRUIVg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rI2dR1PzQUeM1RP4ybWzRG+tetOuN9ad/hL8WdZuoldo1+7/SO39+Aqn2yVy5pJAm
+	 r4m8KW8QGAlqED8d4spSbbvpDCLdWuSQuKdg0fG0oGg8TX1TyWTxPQOsM4MuSSVK4d
+	 JnFVE11k9gE4NnsEpnNuBJdyF0oO8pEgREQCjtmXX4a9xFshT+5g9E9niFvLcpsAEb
+	 iBb+gw4abGmxJ/UgZPCyuj91z+6EnnsLqAXDdbcV1h0H5VAsBfeOTv2UP+JszzDRNn
+	 KfrV7acvEruBVRIvONCphHKUQ7ztJH39dXILdV5bfgZDbIecGG/DxlSQDNZjX7/fXS
+	 PKG4cwD7j0N0Q==
+Date: Thu, 15 Aug 2024 16:54:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>
+Subject: Re: bpf-next experiment
+Message-ID: <20240815155439.GM632411@kernel.org>
+References: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
 
-On Thu, 15 Aug 2024 16:34:42 +0530 Abhinav Jain wrote:
-> > > One more:
-> > >
-> > > tools/testing/selftests/net/netdevice.sh: echo "SKIP: $netdev: set IP address"
-> > >
-> > > I think the SKIP -> XFAIL conversion should be a separate patch (for
-> > > total of 3 patches in the series).  
-> >
-> > P.S. and please change the subject to [PATCH net-next], it's a net-next
-> > change, not a net fix.  
+On Wed, Aug 14, 2024 at 12:32:00PM -0700, Alexei Starovoitov wrote:
+> Hi All,
 > 
-> I have sent v7 now with net-next instead of net:
-> https://lore.kernel.org/all/20240815105924.1389290-1-jain.abhinav177@gmail.com
+> Couple years ago folks suggested that bpf-next should be
+> a separate pull request to increase subsystem visibility.
+> Back then we rejected the idea since many networking related
+> changes required bpf core changes. Things are different now.
+> bpf kfuncs can be added independently by various subsystems,
+> verifier additions are mainly driven by sched-ext,
+> so it's time to give it a shot. It's an experiment.
+> If things don't work out as expected we will go back to
+> the old model of feeding bpf trees through net/net-next trees.
 > 
-> For set IP address part, I have added logic to XFAIL if veth pair was created 
-> and to SKIP if that's not the case in third patch of the series as directed above.
+> So here is the plan:
 > 
-> Right now, there is no logic to set IP address in the script for normal interfaces
-> either and it is a TODO as well. I will focus on it next after this one is applied.
+> 1. bpf fixes go directly to Linus (skipping net tree) and
+> net/bpf trees are fast forwarded afterwards as usual.
+> 
+> 2. Non-networking bpf commits land in bpf-next/master branch.
+> It will form bpf-next PR during the merge window.
+> 
+> 3. Networking related commits (like XDP) land in bpf-next/net branch.
+> They will be PR-ed to net-next and ffwded from net-next
+> as we do today. All these patches will get to mainline
+> via net-next PR.
 
-Minor note, please keep your guidance on frequency of reposting in mind:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
--- 
-pv-bot: 24h
+Hi Alexei,
+
+Nice plan :)
+
+I wonder if, bpf-next/net-next might be a more intuitive name, as the
+proposed branch is closely related to net-next.
+
+OTOH, mabey one '-next', as per your proposal, is enough :)
+
+> 
+> 4. bpf-next/master and bpf-next/net branches are manually
+> merged into bpf-next/for-next branch.
+> This step achieves two objectives:
+> - bpf maintainers watch for conflicts between /master and /net
+> - Stephen Rothwell continues taking /for-next branch into linux-next
+> as usual
+> 
+> bpf CI will run tests against 4 trees (instead of 2):
+> bpf, bpf-next/master, bpf-next/net, bpf-next/for-next.
+> This is wip. Watch for more "Checks" in patchwork.
+> 
+> By the merge window in September we will reassess
+> the situation and if it's still worth doing we will
+> proceed with PR formed from bpf-next/master.
+> If not, we will PR bpf-next/master into net-next and
+> call it a failed experiment.
+> 
+> We feel that there are more positives to this process
+> than headaches, so fingers crossed.
+> 
 
