@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-119006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E54953CE5
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:47:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 245F9953CE6
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E66361C25296
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:47:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B711F25643
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 21:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB54E155732;
-	Thu, 15 Aug 2024 21:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166A715574D;
+	Thu, 15 Aug 2024 21:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="GdqGHA1i"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="Hq3RQMeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39870155353
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 21:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93930155730
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 21:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723758386; cv=none; b=Eb4Cm40vhU9R8C17iq6LSiFCqHW0HNAUHAsmHOv3PdjEyKECX7TlAnvYiFJfR2bGD4ULAP4eASTLseGY0R04Vl4C3Bmr1PJRPK5JhE7x7BZfC0rratKYDXMZrnWfdg2/eFy5l8HAonnemoJcasfYccJ490ECjg6532OqPdOwBoU=
+	t=1723758388; cv=none; b=BX2UkBYh3aYkB9BRifClXenMFmyuagstksLR2CQLpiG55R8V+LO+9cKDZovh49yglaZpS7E2bFP40JKrvtTOkJngnJFAQL01k/IOW1evfdj4agzBjOEvRaVsdq+A7YAuR8MRM7WHFQHjEuL4V9NGfuaj7PQ8Z3SnKikZOUcsDNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723758386; c=relaxed/simple;
-	bh=AKZTwTOl/6402WHfcJqVRq+TsbkjKlN8zLi+0jDoEds=;
+	s=arc-20240116; t=1723758388; c=relaxed/simple;
+	bh=VSaUriivj9kHl2ATci4Yrkr8UVaJCANZPPFfenBzm7A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P8quDLFOaFf0RzkPGMZQZKG1fsL0YKdyvtmWo0luhCJXXIRKeEZtr74BUk70npz+LgPibdnkVzIY/ERFdeAqnr2B3SHaqf1kyCUivWqdKjThAlqpYGsZCbJxDWJ6SlhtCNbvY+0llnU2iGPvKXjROh07o7VfTVaupKbX2Gfnrhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=GdqGHA1i; arc=none smtp.client-ip=209.85.216.52
+	 MIME-Version; b=G/wtPMwpTMPRwjqKA3i9a3UGexEBogZpw7ItYxHm61209seZen62KJM9dIeAj1UD6D6GSbpN9wcvuaVrh8LEEiNc28FbGON7rnyFp9RfPhjzZwXk1S11vIdzMRV+WhmoljATAhlU07i0OZYmCPPMROLI6MLjBt56LWjQewd50yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=Hq3RQMeC; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2d3e44b4613so174014a91.3
-        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:46:25 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so1040982a12.3
+        for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 14:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1723758384; x=1724363184; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1723758386; x=1724363186; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6KLZ8lvNd3VBHtbxfeJSmBIFPoMINjfQPWX7ldcRSDA=;
-        b=GdqGHA1ilIHDP7eP4BSQuYahjkX4HbmZy0UU0lVKEVanpzQDpCXwzrDfx32819UrQz
-         7+Ix7CATCEg6bXCnkYh2oJh5mx73ExkyWOi+drIjRfTgZ5FPCMY7XpLa47/d287sMEa4
-         l0fOZECERvtzL/lK+DlVsWv9ZB8zC/NEnwntX2uU/E3scEJ41xC7dD86jU01AS1wir/X
-         1mb25GauGFxHIhvxl0a68CtoCCCayMA7ek248Psc/V0tlHe++adXLGqH+l28Syr6AG7u
-         k9pEJFiuU5u7MkN7c/gNmnbxsJzmoL/bUM7XjcW3tigyowiV6zBAl706b1ZAs4wvHMCx
-         Q9oA==
+        bh=Kr0BLhj/kH1I2bfmAdGzcmYGGYBiHhQ0koclENsRg7Y=;
+        b=Hq3RQMeCTZPX47j5jXZ3OGhgKoxv/hpwOLqyzoGCxWVHQj853M1W/g5qBKC/AUxmg9
+         /g2/5RRkXOkruzdzZm0TlZ12FHCO+7mbQPV2L9sSbGigdXRnK9vI5697ABkKtUJw24l4
+         eX9LqUHGJVDVc8Iw7VpHbBZeaTGxcWrPYxbwYYmWSLXc+Q3k6/Uhp1Dosiq6blbzOFHZ
+         ruZtFlkzF+SINx77kJMaC9oRcWq4tIAEQPaIVyS0cc4dNxUWtoldZh/k+bV4GVw9wtQr
+         pRwPuDlpfZtcK1qUByGMpenEqylBrhd99xmJQWK2+g9Iu6U8i1gyjHONKVFAdTkXhkT8
+         pnmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723758384; x=1724363184;
+        d=1e100.net; s=20230601; t=1723758386; x=1724363186;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6KLZ8lvNd3VBHtbxfeJSmBIFPoMINjfQPWX7ldcRSDA=;
-        b=PCSHK1QT2IxU+ewbk0Umx+qnj71uzSgSlhvuRo9YBkfWgIjOkWXTbpGf4JcoWHWBDp
-         uTqt943cbS6AAFabZpcM5SH/AjjolLKVsMN1Rb5NtcDgUjYP4o1I9Wow1VcYUJETBjxO
-         Ur7Wzw90db25cnORk3S3SOq33EAvD2qc2sLyjhPJuhLAUjAMHXQOPXY1XPYpbnQb2MoU
-         AFYAtZWbUFMVh0eajzvdhAaRkMg+gHvbbiZ8pzb/CYO7ptm7dBmdqR4TWu1S08+UaqB5
-         u0T+8fjm/Saq9yoxFs4hCS6BSeeIoCaovH97TB1//77fzUf5W2nnUWUO4+WyCVxjvofn
-         +/zw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhZAZpqWpn1WDMKbrJJ1SI7A1Oa5LIBSlulhc5FjpSQ1cn50NmWAR1SMp4HxBDyhnFowVmLJFmKy+Y1CzmE4iRGdO2voIl
-X-Gm-Message-State: AOJu0Yz2pnfi4LyBIZCeOKB/Lc5dl6Ej2O+Ud3O1n4wJK2E+P7lkTJRB
-	fSjKYjv5LpJ4pzfljnCqqzB+9HjrLC2eUNFRoavBK37PB8ez8tX7+GtunSq+OQ==
-X-Google-Smtp-Source: AGHT+IF48AOdOPZrsNIWrKiHI9u535TaG3hKjZUbJlHm3BNsZaYMcA8pCXkUNogGa39/TnFW5mXH6w==
-X-Received: by 2002:a17:90a:e548:b0:2c9:8b33:3197 with SMTP id 98e67ed59e1d1-2d3dfc6862bmr1223257a91.10.1723758384405;
-        Thu, 15 Aug 2024 14:46:24 -0700 (PDT)
+        bh=Kr0BLhj/kH1I2bfmAdGzcmYGGYBiHhQ0koclENsRg7Y=;
+        b=cBmtYQXhmtVaLdG/ZT1U5za4rLbM+FVKsolYt9QPM8qhpkeuONB9/stqDMBr19J22M
+         xiwMghds8SPrf9ZorP96jZKzYdXEhA8Dj7B2qCfGzFapGELYfYm4uHm0cdS+HxazWzvP
+         fucqB4ieIJKz8GlQGWfVdOf2N6bsuQ2VDWigHl2b2tT56Iwc+Mr7k2BkUrboiooiN3ch
+         h3yYDzAmTRBwG0xYgLlb+TYWb2rvjZWMA3Uk3diqbrVPtjZDPjcF3KyUIIY899OSko3w
+         HKx1VmoZoKmKRbj7vC2p/hVwPdWX5z5Hwj8ll4WkROvOgRkZv1/ilDXIiWD7fDUaltpo
+         mxug==
+X-Forwarded-Encrypted: i=1; AJvYcCVVYlYrjJboKKVfbcq8MZgE++Ie+vbCWQtMmLHN4BWPCjp7KfsJyHUyuVhSRmeYnCT+69XQMENDJOSWEuWzxKoJT6QNPNBQ
+X-Gm-Message-State: AOJu0YwEyRjanHcfg3DydW6MoiT8RSON5XIf6/ORbhotsuB50B3DV8uo
+	IHosUZZHu/GkXu+wypiq+dgn4g2FR7/RDA3wr9fj2fOb39ckUiSl5gmjfoicZH3prgQpCgIdJ0s
+	=
+X-Google-Smtp-Source: AGHT+IH9Hy+zG2DIdFJJ9oxk9WYqurorb9EmdCBBY9VuUOe4fuE174MFR1SM3InslTaXlnyoRTdDCQ==
+X-Received: by 2002:a17:90a:c718:b0:2d3:b357:7859 with SMTP id 98e67ed59e1d1-2d3dffc5ccbmr1255483a91.13.1723758385667;
+        Thu, 15 Aug 2024 14:46:25 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:99b4:e046:411:1b72])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e2c652ffsm303288a91.10.2024.08.15.14.46.23
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e2c652ffsm303288a91.10.2024.08.15.14.46.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 14:46:24 -0700 (PDT)
+        Thu, 15 Aug 2024 14:46:25 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -75,9 +76,9 @@ To: davem@davemloft.net,
 	felipe@sipanda.io,
 	willemdebruijn.kernel@gmail.com
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v2 09/12] flow_dissector: Parse GUE in UDP
-Date: Thu, 15 Aug 2024 14:45:24 -0700
-Message-Id: <20240815214527.2100137-10-tom@herbertland.com>
+Subject: [PATCH net-next v2 10/12] gtp: Move gtp_parse_exthdrs into net/gtp.h
+Date: Thu, 15 Aug 2024 14:45:25 -0700
+Message-Id: <20240815214527.2100137-11-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240815214527.2100137-1-tom@herbertland.com>
 References: <20240815214527.2100137-1-tom@herbertland.com>
@@ -89,94 +90,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Parse both version 0 and 1 of GUE encapsulated in UDP. Add helper
-function __skb_direct_ip_dissect to convert an IP header to
-IPPROTO_IPIP or IPPROTO_IPV6 (by looking just at the version
-number)
+gtp_parse_exthdrs is a generic function, move into a header file
+so we can call it outside of the GTP driver (specifically, we can
+call it from flow dissector)
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- net/core/flow_dissector.c | 60 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ drivers/net/gtp.c | 37 -------------------------------------
+ include/net/gtp.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 37 deletions(-)
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index e2a0d67b2753..fb8c0d97384e 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -832,6 +832,61 @@ __skb_flow_dissect_geneve(const struct sk_buff *skb,
- 	return FLOW_DISSECT_RET_PROTO_AGAIN;
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index 427b91aca50d..61d5dfd48c88 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -742,43 +742,6 @@ static int gtp1u_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
  }
  
-+static __u8
-+__skb_direct_ip_dissect(void *hdr)
+-static int gtp_parse_exthdrs(struct sk_buff *skb, unsigned int *hdrlen)
+-{
+-	struct gtp_ext_hdr *gtp_exthdr, _gtp_exthdr;
+-	unsigned int offset = *hdrlen;
+-	__u8 *next_type, _next_type;
+-
+-	/* From 29.060: "The Extension Header Length field specifies the length
+-	 * of the particular Extension header in 4 octets units."
+-	 *
+-	 * This length field includes length field size itself (1 byte),
+-	 * payload (variable length) and next type (1 byte). The extension
+-	 * header is aligned to to 4 bytes.
+-	 */
+-
+-	do {
+-		gtp_exthdr = skb_header_pointer(skb, offset, sizeof(*gtp_exthdr),
+-						&_gtp_exthdr);
+-		if (!gtp_exthdr || !gtp_exthdr->len)
+-			return -1;
+-
+-		offset += gtp_exthdr->len * 4;
+-
+-		/* From 29.060: "If no such Header follows, then the value of
+-		 * the Next Extension Header Type shall be 0."
+-		 */
+-		next_type = skb_header_pointer(skb, offset - 1,
+-					       sizeof(_next_type), &_next_type);
+-		if (!next_type)
+-			return -1;
+-
+-	} while (*next_type != 0);
+-
+-	*hdrlen = offset;
+-
+-	return 0;
+-}
+-
+ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ {
+ 	unsigned int hdrlen = sizeof(struct udphdr) +
+diff --git a/include/net/gtp.h b/include/net/gtp.h
+index c0253c8702d0..a513aa1c7394 100644
+--- a/include/net/gtp.h
++++ b/include/net/gtp.h
+@@ -83,4 +83,42 @@ struct gtp_ext_hdr {
+ 	__u8	data[];
+ };
+ 
++static inline int gtp_parse_exthdrs(const struct sk_buff *skb,
++				    unsigned int *hdrlen)
 +{
-+	/* Direct encapsulation of IPv4 or IPv6 */
++	struct gtp_ext_hdr *gtp_exthdr, _gtp_exthdr;
++	unsigned int offset = *hdrlen;
++	__u8 *next_type, _next_type;
 +
-+	switch (((struct iphdr *)hdr)->version) {
-+	case 4:
-+		return IPPROTO_IPIP;
-+	case 6:
-+		return IPPROTO_IPV6;
-+	default:
-+		return 0;
-+	}
++	/* From 29.060: "The Extension Header Length field specifies the length
++	 * of the particular Extension header in 4 octets units."
++	 *
++	 * This length field includes length field size itself (1 byte),
++	 * payload (variable length) and next type (1 byte). The extension
++	 * header is aligned to 4 bytes.
++	 */
++
++	do {
++		gtp_exthdr = skb_header_pointer(skb, offset, sizeof(*gtp_exthdr),
++						&_gtp_exthdr);
++		if (!gtp_exthdr || !gtp_exthdr->len)
++			return -1;
++
++		offset += gtp_exthdr->len * 4;
++
++		/* From 29.060: "If no such Header follows, then the value of
++		 * the Next Extension Header Type shall be 0."
++		 */
++		next_type = skb_header_pointer(skb, offset - 1,
++					       sizeof(_next_type), &_next_type);
++		if (!next_type)
++			return -1;
++
++	} while (*next_type != 0);
++
++	*hdrlen = offset;
++
++	return 0;
 +}
 +
-+static enum flow_dissect_ret
-+__skb_flow_dissect_gue(const struct sk_buff *skb,
-+		       struct flow_dissector *flow_dissector,
-+		       void *target_container, const void *data,
-+		       __u8 *p_ip_proto, int *p_nhoff,
-+		       int hlen, unsigned int flags)
-+{
-+	struct guehdr *hdr, _hdr;
-+	__u8 proto;
-+
-+	hdr = __skb_header_pointer(skb, *p_nhoff, sizeof(_hdr), data, hlen,
-+				   &_hdr);
-+	if (!hdr)
-+		return FLOW_DISSECT_RET_OUT_BAD;
-+
-+	switch (hdr->version) {
-+	case 0:
-+		if (unlikely(hdr->control))
-+			return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+		*p_nhoff += sizeof(struct guehdr) + (hdr->hlen << 2);
-+		*p_ip_proto = hdr->proto_ctype;
-+
-+		break;
-+	case 1:
-+		/* Direct encapsulation of IPv4 or IPv6 */
-+
-+		proto = __skb_direct_ip_dissect(hdr);
-+		if (proto) {
-+			*p_ip_proto = proto;
-+			break;
-+		}
-+		fallthrough;
-+	default:
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+	}
-+
-+	return FLOW_DISSECT_RET_IPPROTO_AGAIN;
-+}
-+
- /**
-  * __skb_flow_dissect_batadv() - dissect batman-adv header
-  * @skb: sk_buff to with the batman-adv header
-@@ -995,6 +1050,11 @@ __skb_flow_dissect_udp(const struct sk_buff *skb, const struct net *net,
- 		*p_ip_proto = fou_protocol;
- 		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
- 		break;
-+	case UDP_ENCAP_GUE:
-+		ret = __skb_flow_dissect_gue(skb, flow_dissector,
-+					     target_container, data,
-+					     p_ip_proto, p_nhoff, hlen, flags);
-+		break;
- 	case UDP_ENCAP_SCTP:
- 		*p_ip_proto = IPPROTO_SCTP;
- 		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
+ #endif
 -- 
 2.34.1
 
