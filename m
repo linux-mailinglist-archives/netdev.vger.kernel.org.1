@@ -1,164 +1,94 @@
-Return-Path: <netdev+bounces-118901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA2595373E
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:29:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7529C953748
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 17:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7CCB1F22108
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:29:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A87DA1C236DF
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 15:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18111B0123;
-	Thu, 15 Aug 2024 15:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7F22562E;
+	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmckYDFb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuFc7DwZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6371AED38;
-	Thu, 15 Aug 2024 15:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9896053365
+	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723735722; cv=none; b=POtA9ldKEamq6lLbW9pFw8klAnTeGdlnV8GZv9lGvVkyQcUtHI6ZaHzDT63ce8981LOTppXbC5RvVfTJi7tHytgGb3CpYro5tfp6yAs2Hw05RuIgvf1Gbr9UEwn0PGGQ99eM5PHJa2BsFsEvl8atpjPwX/y69dQj9RNSn6eLKmU=
+	t=1723735831; cv=none; b=o11RTFQxXlZg7EQFLDthrUvRHn/0UTQrYVRQX8GCuNvAUoCYGe0XODHPT/Tg1ya38atD3XNwZf99BGfTlGQiLhbKWlwO3u0uBLJwn1ROYR2dbMkk7oH73zOLWU7uUYsZcARHWF1hNsAV4Cx8VHAqXfEEzKDsQdDeB+q1FXyyTXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723735722; c=relaxed/simple;
-	bh=aU7GONG7+wdh9Cvq+jMv1PVglb/zFWUeoCL51NGnd9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TLGVgu6mx3m40Gok1no32YyU18fA1Zd+Y384LqXTxnHpDjS+KAtC/ORawGt4vShbCH6chLoYeZPqU4bC/6Ti84qCwH66wyhGsrjWT5uFLjlTSvBr4oyF9hcTF5GzYdTJHMi9fCqKDmV4s3L3CTclD7saY5LQIVSK+vw7fTH+pmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmckYDFb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D43D8C32786;
-	Thu, 15 Aug 2024 15:28:41 +0000 (UTC)
+	s=arc-20240116; t=1723735831; c=relaxed/simple;
+	bh=3/AENTPsyst1+S6R1n+5acS1+PeXRxsoYGTHpCN6KAg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IVIt7Qnxx7EjWM5u98vqwSKNywUDp0NoQIRUumjyiXBRzRlfc7eDEiwef2c0inBlo3msqtcn5c75+qy6n9cip58s5U+YTusz2fAqPTVETzEOGG9WELnWqNz1ZRq5zjILW5HKAGakeOa656JIzacvLoounojaLBPnVMuYhl11Pbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuFc7DwZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF70C32786;
+	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723735722;
-	bh=aU7GONG7+wdh9Cvq+jMv1PVglb/zFWUeoCL51NGnd9g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XmckYDFbKyRbsHxnQj8xCA1kuO7Q4d0vNyo22LbnsGtLRjE1eMv/zsscUQyYUa/Xz
-	 5+VcPgerJJM7ziE+az3MChN30JEzEBgOXdX9Z0gIhLNI1XjUMtexrkbVpGv797lyDA
-	 LTUluYs/tZLTx0eq2IH4zIxebMtqJD2R6wuN6uQzyZwx55xqMG8nEwpAQoO76YAzaj
-	 e4ZMC9uKcJygiiqXTkACsw54dribRz9NtPbQXdxSmmqnGbUfYO8J9eeN5/bj/sWV4U
-	 bi8nDMpdjbdnw4rXfZhmXwq+vzGAfyJt5bfcbgmkmZvIqXrOcUj73D7nIlUC7Ad2KH
-	 IMLuv6zJnBeKQ==
-Date: Thu, 15 Aug 2024 09:28:41 -0600
-From: Rob Herring <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"open list:ETHERNET PHY LIBRARY" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH v3 1/1] dt-bindings: net: mdio: change nodename match
- pattern
-Message-ID: <20240815152841.GA1903517-robh@kernel.org>
-References: <20240814170322.4023572-1-Frank.Li@nxp.com>
+	s=k20201202; t=1723735831;
+	bh=3/AENTPsyst1+S6R1n+5acS1+PeXRxsoYGTHpCN6KAg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LuFc7DwZIFTyXMjP0/HMVjSJeZi1XAjvHSFsH2Wc7aVo849nsPJ/GM2kNF/J837g/
+	 r46UWvNiCM/JKhxeT/x/YUD66WuLaVYUtDP2n2lxypAQ2xW/VxC48zSMWKGic3VuYt
+	 LF4XkcaKwvs8Vo7z2ymItsccZEJItPZdJuwH1tqfok11JC3gkL51yZQoBVQjcD1t10
+	 y5ijSxbbqiH47sc983ju1wggjiFvicYy2mfzkjWgZcKtIXesBay0ORJJhQLZ3D7M/I
+	 FoRRdA6mPNJvfll3NUcgDtO2Q831FmfcM7YT9p1sahZ1XbSwz795tjVESWAJOFgpJh
+	 uEii8bZXvtARw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADED6382327A;
+	Thu, 15 Aug 2024 15:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240814170322.4023572-1-Frank.Li@nxp.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/2] iproute2: ss: clarify build warnings when building with
+ libbpf 0.5.0
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172373583050.2888429.15348991883247460843.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Aug 2024 15:30:30 +0000
+References: <20240811223135.1173783-1-stefan.maetje@esd.eu>
+In-Reply-To: <20240811223135.1173783-1-stefan.maetje@esd.eu>
+To: =?utf-8?b?U3RlZmFuIE3DpHRqZSA8c3RlZmFuLm1hZXRqZUBlc2QuZXU+?=@codeaurora.org
+Cc: dsahern@gmail.com, netdev@vger.kernel.org
 
-On Wed, Aug 14, 2024 at 01:03:21PM -0400, Frank Li wrote:
-> Change mdio.yaml nodename match pattern to
-> 	'^mdio(-(bus|external))?(@.+|-([0-9]+))$'
-> 
-> Fix mdio.yaml wrong parser mdio controller's address instead phy's address
-> when mdio-mux exist.
-> 
-> For example:
-> mdio-mux-emi1@54 {
-> 	compatible = "mdio-mux-mmioreg", "mdio-mux";
-> 
->         mdio@20 {
-> 		reg = <0x20>;
-> 		       ^^^ This is mdio controller register
-> 
-> 		ethernet-phy@2 {
-> 			reg = <0x2>;
->                               ^^^ This phy's address
-> 		};
-> 	};
-> };
-> 
-> Only phy's address is limited to 31 because MDIO bus definition.
-> 
-> But CHECK_DTBS report below warning:
-> 
-> arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dtb: mdio-mux-emi1@54:
-> 	mdio@20:reg:0:0: 32 is greater than the maximum of 31
-> 
-> The reason is that "mdio-mux-emi1@54" match "nodename: '^mdio(@.*)?'" in
-> mdio.yaml.
-> 
-> Change to '^mdio(-(bus|external))?(@.+|-([0-9]+))$' to avoid wrong match
-> mdio mux controller's node.
-> 
-> Also change node name mdio to mdio-0 in example of mdio-gpio.yaml to avoid
-> warning.
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
-> Change from v2 to v3
-> - update mdio-gpio.yaml node name mdio to mdio-0 to fix dt_binding_check
-> error foud by rob's bot.
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mdio-gpio.example.dtb: mdio: $nodename:0: 'mdio' does not match '^mdio(-(bus|external))?(@.+|-([0-9]+))$'
-> 	from schema $id: http://devicetree.org/schemas/net/mdio-gpio.yaml#
-> 
-> Change from v1 to v2
-> - use rob's suggest to fix node name pattern.
-> ---
->  Documentation/devicetree/bindings/net/mdio-gpio.yaml | 2 +-
->  Documentation/devicetree/bindings/net/mdio.yaml      | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/mdio-gpio.yaml b/Documentation/devicetree/bindings/net/mdio-gpio.yaml
-> index eb4171a1940e4..3be4f94638e61 100644
-> --- a/Documentation/devicetree/bindings/net/mdio-gpio.yaml
-> +++ b/Documentation/devicetree/bindings/net/mdio-gpio.yaml
-> @@ -44,7 +44,7 @@ examples:
->          mdio-gpio0 = &mdio0;
->      };
->  
-> -    mdio0: mdio {
+Hello:
 
-Just 'mdio' should be accepted. There's a lot of those.
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-> +    mdio0: mdio-0 {
->        compatible = "virtual,mdio-gpio";
->        #address-cells = <1>;
->        #size-cells = <0>;
-> diff --git a/Documentation/devicetree/bindings/net/mdio.yaml b/Documentation/devicetree/bindings/net/mdio.yaml
-> index a266ade918ca7..2ed787e4fbbf2 100644
-> --- a/Documentation/devicetree/bindings/net/mdio.yaml
-> +++ b/Documentation/devicetree/bindings/net/mdio.yaml
-> @@ -19,7 +19,7 @@ description:
->  
->  properties:
->    $nodename:
-> -    pattern: "^mdio(@.*)?"
-> +    pattern: '^mdio(-(bus|external))?(@.+|-([0-9]+))$'
-
-Needs a '?' on the end:
-
-'^mdio(-(bus|external))?(@.+|-([0-9]+))?$'
-
->  
->    "#address-cells":
->      const: 1
-> -- 
-> 2.34.1
+On Mon, 12 Aug 2024 00:31:33 +0200 you wrote:
+> Hi,
+> when building current iproute2 source on Ubuntu 22.04 with libbpf0
+> 0.5.0 installed, I stumbled over the warning "libbpf version 0.5 or
+> later is required, ...". This prompted me to look closer having the
+> version 0.5.0 installed which should suppress this warning.
+> The warning lured me into the impression that building without
+> warning should be possible using libbpf 0.5.0.
 > 
+> [...]
+
+Here is the summary with links:
+  - [1/2] configure: provide surrogates for possibly missing libbpf_version.h
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=0ddadc93e54f
+  - [2/2] ss: fix libbpf version check for ENABLE_BPF_SKSTORAGE_SUPPORT
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=e9096586e070
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
