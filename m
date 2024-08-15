@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-118681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13EE95271C
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:41:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E7795272D
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37545B20C77
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:41:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2ECD1F22A8D
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03CBEBE;
-	Thu, 15 Aug 2024 00:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B115C3;
+	Thu, 15 Aug 2024 00:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDEREAiN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7TldrFL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC3936D
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 00:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89681362;
+	Thu, 15 Aug 2024 00:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723682509; cv=none; b=tqLCA2xG0j8hPDhbs0xCvbW7L23idXrA5ejfpymstWXO3yuOAy3U3wMrxUOhehhI20oK+ukp2MIQRSvtS4VultuiwRSYFHsGTFmyqOoUWrrLQXw+s5HDptyZ1vZnnlxeo4O8GAycNkTKtNCuurJCCxEZxhTHgqC6zJY0ym1jxTs=
+	t=1723683214; cv=none; b=tEE+Fqc3nzrxu1avswbfKfq5IDANwznqtNNbH7YUTSjj9OUKe2tB5QzxNEU+RbOFaCmg8ffSpoMrWzSxfQ9z0UA9i90I4dfFeV+ObgtBba1DMdgG7W1mQ1AqmL1RLo+xjWjQpvwvdv7px/7dXpv1TqM85qoriS2b9QlI7oZDWsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723682509; c=relaxed/simple;
-	bh=bu+z5XLj4qyB7v8eXOpPJI3a7tH5ny3jkscek1cbfrI=;
+	s=arc-20240116; t=1723683214; c=relaxed/simple;
+	bh=fQQ7RAC1Q4Q3MLAxhDAoVqBcLxpuT2PExNe+KLXKew4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NQmIJfNa3cee1bbbjldB5x1dm+10XW+Dt2x5QJa0ZeixeLetou42ZO6MSX9nfWU+1vIPAUy3uHqnytlIkR8GQ0pd6CvHVKE2zEc+V89B8N4zy7H9dDThmn7t6LInX4wpBM7OUNTbLOxcdzBGAYTzkH/bJae6DcrDYXvDhnRDec0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDEREAiN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9F89C116B1;
-	Thu, 15 Aug 2024 00:41:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SIQyaOPQq9KW4ebozaLY6EkWCdUyqJozc++6XgjlSeHnu8RYDSUpYzpR0BlimhWv2y8URRDRcGMUSmsjaeyI7y4zFmekhfkehKWOJupelBSE/ouzjdr1qIhKDAAb5P2Ykw3uSTJp+S8AIjhnmw3PUXwGVTZm9Gt9uV+marm6DzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7TldrFL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFED7C116B1;
+	Thu, 15 Aug 2024 00:53:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723682509;
-	bh=bu+z5XLj4qyB7v8eXOpPJI3a7tH5ny3jkscek1cbfrI=;
+	s=k20201202; t=1723683214;
+	bh=fQQ7RAC1Q4Q3MLAxhDAoVqBcLxpuT2PExNe+KLXKew4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CDEREAiN2Tg3IFIoD4gUifECssPjRw/yyqJlU9vUTDgTitbjrvAvq9YKGBvy6yQB0
-	 2/wc9iqGgK3iLSx2ezTB3c+PlNxvv/HIqqxUFCLY1HjdcxO6JKKNtkE/Hxt+wpVlIF
-	 wTnu7akMXFzdIQA+Xk6sVZahRtmjatm4c+UWqwZO8SfSYc5Xu7knTuVguX40z+v2g+
-	 74hRjlCXaMzGy/EBYDO2ThySgrTmRG1XpyU6VFwSgz2rTYqr6/7HBFIe5bAVR7rorh
-	 EhVYysjGF99CzqIThQ83josv74vuhlkgg+xpYj5svWp6xRmEqn04IYxNTM9bT2LSHp
-	 TzKgLno2K2FKg==
-Date: Wed, 14 Aug 2024 17:41:47 -0700
+	b=m7TldrFLR1+y2FcB3TPKoYS4zwqCceHmiAQXSLtqyvd/+oToHTYI1gNFRvFVY3LUt
+	 fsxGAmhkss/hXOSmK7L0ndVR9MddAUYddxt4qd22yaDvKM4gHWFyZH8xIuogNX2YmM
+	 G7DGNAaQVAc+Hc8CJn8s8E3DZT3rb+Aj//CMHRGhrExY2D4QV4TUNdjCktT72NCOFc
+	 8XYw+cIU3+xyDguVaf9Iod8m+E9PSBhICGs+NadlLrCUb+tHn+bCxZ/ElpJBJdsl4A
+	 UWE+iHy03wXEdVhOUrVIO4N/VNKkgwuSZCXNFi11HXYjfCuCNmvv7loqIsRx3zFY4f
+	 2QeHjA4hpMMGg==
+Date: Wed, 14 Aug 2024 17:53:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maciek Machnikowski <maciek@machnikowski.net>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
- jacob.e.keller@intel.com, vadfed@meta.com, darinzon@amazon.com
-Subject: Re: [RFC 0/3] ptp: Add esterror support
-Message-ID: <20240814174147.761e1ea7@kernel.org>
-In-Reply-To: <20240813125602.155827-1-maciek@machnikowski.net>
-References: <20240813125602.155827-1-maciek@machnikowski.net>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>, Jonathan Corbet
+ <corbet@lwn.net>, Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <eric.dumazet@gmail.com>
+Subject: Re: bpf-next experiment
+Message-ID: <20240814175333.6bcaa522@kernel.org>
+In-Reply-To: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
+References: <CAADnVQJgwGh+Jf=DUFuX28R2bpWVezigQYObNoKJT8UbqekOHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,23 +63,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Aug 2024 12:55:59 +0000 Maciek Machnikowski wrote:
-> This patch series implements handling of timex esterror field
-> by ptp devices.
-> 
-> Esterror field can be used to return or set the estimated error
-> of the clock. This is useful for devices containing a hardware
-> clock that is controlled and synchronized internally (such as
-> a time card) or when the synchronization is pushed to the embedded
-> CPU of a DPU.
-> 
-> Current implementation of ADJ_ESTERROR can enable pushing
-> current offset of the clock calculated by a userspace app
-> to the device, which can act upon this information by enabling
-> or disabling time-related functions when certain boundaries
-> are not met (eg. packet launchtime)
+On Wed, 14 Aug 2024 12:32:00 -0700 Alexei Starovoitov wrote:
+> Couple years ago folks suggested that bpf-next should be
+> a separate pull request to increase subsystem visibility.
+> Back then we rejected the idea since many networking related
+> changes required bpf core changes. Things are different now.
+> bpf kfuncs can be added independently by various subsystems,
+> verifier additions are mainly driven by sched-ext,
+> so it's time to give it a shot. It's an experiment.
+> If things don't work out as expected we will go back to
+> the old model of feeding bpf trees through net/net-next trees.
 
-Please do CC people who are working on the VM / PTP / vdso thing,
-and time people like tglx. And an implementation for a real device
-would be nice to establish attention.
+Excellent, fingers crossed :)
 
