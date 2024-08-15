@@ -1,179 +1,170 @@
-Return-Path: <netdev+bounces-118754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F28F952A75
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:29:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A1C952AB6
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 10:40:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3443CB20DF0
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 08:29:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756082837AD
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 08:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2218119E808;
-	Thu, 15 Aug 2024 08:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50F41AAE38;
+	Thu, 15 Aug 2024 08:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3uZQVr4"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ij/YyljS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80F719E7C8;
-	Thu, 15 Aug 2024 08:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCBD224EF;
+	Thu, 15 Aug 2024 08:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723708821; cv=none; b=rT9hAPYBRhLC+ZtgJzjgNuuNbUdKK5O21rf/canTM3Kkcexb3tTP9SdKxjuk9+2q2ofKgHeJmKNuGgF/Uc2loTKXZT486JiF9mlY0+PHNlXnJGQcvAZAOf/DleTJTo2waFGQQYse4Jo8/YWVV2cj+8PeLKmam2lqvvRKu17Y7K0=
+	t=1723709407; cv=none; b=CREMFp8FSHbxukhW+E3+/f3FuUHEw92dVRR60HqhXv6tZ7y61YZXcVTIS74BhNH6TS8TAk3BY7LAfAECJCVviAOHjeRPjTm7ipsS/S9VLcvMi3Qszdxmz73tuvnfXVfDvV0eGH8azEDAy+MYy5/fOThjzytb6vXebbzONnjsriI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723708821; c=relaxed/simple;
-	bh=/PSAS6fGscIZZGwr+tXSEVxTQmx2lfatLsRY05pzoyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aX4CdbJdBvFnEFjAbYUqnDrTgYfGSrBlTP7bOiBs6beFMGwZE4T49lcQmfZevNgsd9k2GTj3MX+qR/jQOMS1TJ/vcUH62QrM+iTRiT+6o6BvoIihLBENXIXoksKrwiF0r/w2f5Ys6hM/IJ0Bxt+E8h/TfY2rX+esXRDjSWughSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3uZQVr4; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7a263f6439eso550054a12.3;
-        Thu, 15 Aug 2024 01:00:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723708819; x=1724313619; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XfRMP9yHEwG0TQMvHjZIar43XCUon3TZcQShYdfW53A=;
-        b=M3uZQVr4tsM1Ru3DPDysrdxQ/PEFpweGv1YOuUU3oK0qx3bxuc8v6/6RXYmpKuB6PW
-         Ne/iF4U3ADhW+Gi4GkKYwQ6Ibdp2MLVoBddlWvlgH1UB0ZPaOZOih4KiZ8IIVP6ay4tD
-         SfLzRyJF6Az134uV5iSdyDC+e7YeTlm04xkThHevdjMn8CnZIDa3j5DU1IYUoHkW+3uw
-         AE5JvEpyNxE+fDo50IgWm6eBO1dHXZAFEG6P5UB/bhY+jMivLUWLKv8iKXXLm8//4GRU
-         aBKZqgt69ExVuhvvYqWdIsLO6FdxtASTv1BW/zTekSNWaOa/ZGj98gkAMnyzz+dCPAAL
-         0Bzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723708819; x=1724313619;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XfRMP9yHEwG0TQMvHjZIar43XCUon3TZcQShYdfW53A=;
-        b=iUSj0QJaCK3pvUup3lXW0/WJYVZn7MnX/V2/KLCEgvkSx7U1Q0ABnd9B8QEtK56vwR
-         lGuyRlKseto1ZgwV9yKK5p8TeLirTTM2YrmjXSyxx4UKB49h/7y/x4sBOTQz0MwOzwqx
-         jNBTYc0+DY/PIC4Idiha0zBWTq7QFrnqbrhXhKzMtsZFny9ZLs+QDfL0z1zzfUuN6erw
-         THoJnMKtxX8GG6WWzB7slOrwJzntxYoKyPqC6B3NgSWOfbWP3Y094T5Pl+kaEHLa6yP9
-         YBTSw3XSdJSHDX3x07Bnn3fb8M/G26b7mWLCg7kpBlDrRalRWRega8s0OMl8rL6iSFkc
-         4dcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnIRyDFF82t2MGUnvc+AKFp9lFQ8BpCUTJUt681TCkPOG212gTd8DbFoxoBRlhrxH1zuXyTD1P0GJkn/1ecFDIDT4o6KRKs4y0wvbqk7O0mKuhcc6ULdpCY4x+6d2OeVDhaj3N
-X-Gm-Message-State: AOJu0Yx2pebVDRq23y1xaZAIL8K+96kisXtSY5zZ5jkutEdlWxgB1XLG
-	IWFQCa+c7Gz801I+K36e2pNwAoE7Wct1jFIm+MgbpP2zX4S3qU6g/0Cc9Mc2
-X-Google-Smtp-Source: AGHT+IEbYTmoog3EB+Mrw2CDH49mp3bDC5vNbIyQ4pn+4hrgp7pS8ROqq/Rp5zAOYTdiWuRlhgfEvA==
-X-Received: by 2002:a05:6a20:c887:b0:1c2:8fd1:a47d with SMTP id adf61e73a8af0-1c8eae59c9dmr7405017637.6.1723708818277;
-        Thu, 15 Aug 2024 01:00:18 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0375649sm6250515ad.124.2024.08.15.01.00.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 01:00:18 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Yi Chen <yiche@redhat.com>
-Subject: [PATCHv2 net 2/2] selftests: udpgro: no need to load xdp for gro
-Date: Thu, 15 Aug 2024 15:59:51 +0800
-Message-ID: <20240815075951.189059-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240815075951.189059-1-liuhangbin@gmail.com>
-References: <20240815075951.189059-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1723709407; c=relaxed/simple;
+	bh=Vq9fdpiHYCcA3YutqCJf5nOgy5ZsiZMwomSl6P5m1+k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IPMadaO94IegUsM3PIsJcxfCfwhXr8GYYf2q5ocTMDwpILtiZpzMflwNd1ODkV3AXhptzpAYRnruMIMFBA4GIRXhaP7rVyS3iZijOA5V78o0Ui5TSSXhOn2MbqYXa+19V+X1zSnQEIm0NvjILiDHDyehKKixrCMRFYc1gQfFzDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ij/YyljS; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723709396; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=dhlnD4w2ERVomdZm2wZoEaPSUN72pF3OY/AUE2o6W1E=;
+	b=Ij/YyljSxBzt4x0JMM0Wt9lEGIHPeQqWvoLvVORm3/1o+FOzsPn463lzmX4PKsgcBBpABDoeibAtg0KrmOe1filN5iTnOtUTN1QSRZ4CQfpJNdV0oaLUjRUOQROjucRnBUPR2K4Dd1FBJFt/dyao5NUpkF1vpx6dLnZZWQ+nVm0=
+Received: from 30.221.149.192(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WCw3Kx0_1723709394)
+          by smtp.aliyun-inc.com;
+          Thu, 15 Aug 2024 16:09:55 +0800
+Message-ID: <5f283fe3-92e9-4622-bda6-ad40b718aadc@linux.alibaba.com>
+Date: Thu, 15 Aug 2024 16:09:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net,v4] net/smc: prevent NULL pointer dereference in
+ txopt_get
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Jeongjun Park <aha310510@gmail.com>
+Cc: gbayer@linux.ibm.com, guwen@linux.alibaba.com, jaka@linux.ibm.com,
+ tonylu@linux.alibaba.com, wenjia@linux.ibm.com, davem@davemloft.net,
+ dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com
+References: <64c2d755-eb4b-42fa-befb-c4afd7e95f03@linux.ibm.com>
+ <20240814150558.46178-1-aha310510@gmail.com>
+ <9db86945-c889-4c0f-adcf-119a9cbeb0cc@linux.alibaba.com>
+ <CAO9qdTGFGxgD_8RYQKTx9NJbwa0fiFziFyx2FJpnYk3ZvFbUmw@mail.gmail.com>
+ <6bcd6097-13dd-44fd-aa67-39a3bcc69af2@linux.alibaba.com>
+ <c9c35759-33e7-4103-a4f0-af1d5fdefcdf@linux.ibm.com>
+ <08f4d3cf-4d9a-47e6-a033-ed8c03ee5a0e@linux.alibaba.com>
+ <5ad4de6f-48d4-4d1b-b062-e1cd2e8b3600@linux.ibm.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <5ad4de6f-48d4-4d1b-b062-e1cd2e8b3600@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-After commit d7db7775ea2e ("net: veth: do not manipulate GRO when using
-XDP"), there is no need to load XDP program to enable GRO. On the other
-hand, the current test is failed due to loading the XDP program. e.g.
 
- # selftests: net: udpgro.sh
- # ipv4
- #  no GRO              ok
- #  no GRO chk cmsg     ok
- #  GRO                 ./udpgso_bench_rx: recv: bad packet len, got 1472, expected 14720
- #
- # failed
 
- [...]
+On 8/15/24 3:56 PM, Alexandra Winter wrote:
+>
+> On 15.08.24 09:34, D. Wythe wrote:
+>>
+>> On 8/15/24 3:03 PM, Alexandra Winter wrote:
+>>> On 15.08.24 08:43, D. Wythe wrote:
+>>>> On 8/15/24 11:15 AM, Jeongjun Park wrote:
+>>>>> 2024년 8월 15일 (목) 오전 11:51, D. Wythe <alibuda@linux.alibaba.com>님이 작성:
+>>>>>> On 8/14/24 11:05 PM, Jeongjun Park wrote:
+>>>>>>> Alexandra Winter wrote:
+>>>>>>>> On 14.08.24 15:11, D. Wythe wrote:
+>>>>>>>>>         struct smc_sock {                /* smc sock container */
+>>>>>>>>> -    struct sock        sk;
+>>>>>>>>> +    union {
+>>>>>>>>> +        struct sock        sk;
+>>>>>>>>> +        struct inet_sock    inet;
+>>>>>>>>> +    };
+>>>>>>>> I don't see a path where this breaks, but it looks risky to me.
+>>>>>>>> Is an smc_sock always an inet_sock as well? Then can't you go with smc_sock->inet_sock->sk ?
+>>>>>>>> Or only in the IPPROTO SMC case, and in the AF_SMC case it is not an inet_sock?
+>>>>>> There is no smc_sock->inet_sock->sk before. And this part here was to
+>>>>>> make smc_sock also
+>>>>>> be an inet_sock.
+>>>>>>
+>>>>>> For IPPROTO_SMC, smc_sock should be an inet_sock, but it is not before.
+>>>>>> So, the initialization of certain fields
+>>>>>> in smc_sock(for example, clcsk) will overwrite modifications made to the
+>>>>>> inet_sock part in inet(6)_create.
+>>>>>>
+>>>>>> For AF_SMC,  the only problem is that  some space will be wasted. Since
+>>>>>> AF_SMC don't care the inet_sock part.
+>>>>>> However, make the use of sock by AF_SMC and IPPROTO_SMC separately for
+>>>>>> the sake of avoid wasting some space
+>>>>>> is a little bit extreme.
+>>>>>>
+>>> Thank you for the explanation D. Wythe. That was my impression also.
+>>> I think it is not very clean and risky to use the same structure (smc_sock)
+>>> as inet_sock for IPPROTO_SMC and as smc_sock type for AF_SMC.
+>>> I am not concerned about wasting space, mroe about maintainability.
+>>>
+>>>
+>> Hi Alexandra,
+>>
+>> I understand your concern, the maintainability is of course the most important. But if we use different
+>> sock types for IPPROTO_SMC and AF_SMC, it would actually be detrimental to maintenance because
+>> we have to use a judgment of which type of sock is to use in all the code of smc, it's really dirty.
+>>
+>> In fact, because a sock is either given to IPPROTO_SMC as inet_sock or to AF_SMC as smc_sock,
+>> it cannot exist the same time.  So it's hard to say what risks there are.
+>>
+>> Of course, I have to say that this may not be that clean, but compared to adding a type judgment
+>> for every sock usage, it is already a very clean approach.
+>>
+>
+> At least the union makes it visible now, so it is cleaner than before.
+> Maybe add a comment to the union, which one is used in which case?
+>
+>> Best wishes,
+>> D. Wythe
+>>
+> [...]
+>
+>>>>>>> -#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+>>>>>>> +#define smc_sk(ptr) container_of_const(ptr, struct smc_sock, inet.sk)
+>>>>>>>
+>
+> Just an idea: Maybe it would be sufficient to do the type judgement in smc_sk() ?
 
- #  bad GRO lookup      ok
- #  multiple GRO socks  ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
- #
- # ./udpgso_bench_rx: recv: bad packet len, got 1452, expected 14520
- #
- # failed
- ok 1 selftests: net: udpgro.sh
+I'm afraid not. We need do at least like this
 
-After fix, all the test passed.
+void  smc_sendmsg(struct sock *sk, ...)
+{
+     struct smc_inet_sock *inet_smc;
+     struct smc_sock * smc ;
 
- # ./udpgro.sh
- ipv4
-  no GRO                                  ok
-  [...]
-  multiple GRO socks                      ok
+     if (sk->protocol == IPPROTO_SMC) {
+         inet_smc = smc_inet_sk(sk);
+         do_same_sendmsg_but_with_inet_sock(inet_smc);
+     } else {
+         smc = smc_sk(sk);
+         do_same_sendmsg_but_with_smc_sock(smc);
+     }
+}
 
-Fixes: d7db7775ea2e ("net: veth: do not manipulate GRO when using XDP")
-Reported-by: Yi Chen <yiche@redhat.com>
-Closes: https://issues.redhat.com/browse/RHEL-53858
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/net/udpgro.sh | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+I am more prefer to what you said about adding more comments. Of course 
+it's just my idea,
+We can also see if Jan and Wenjia have any other ideas too.
 
-diff --git a/tools/testing/selftests/net/udpgro.sh b/tools/testing/selftests/net/udpgro.sh
-index 4659cf01e438..d5ffd8c9172e 100755
---- a/tools/testing/selftests/net/udpgro.sh
-+++ b/tools/testing/selftests/net/udpgro.sh
-@@ -7,8 +7,6 @@ source net_helper.sh
- 
- readonly PEER_NS="ns-peer-$(mktemp -u XXXXXX)"
- 
--BPF_FILE="xdp_dummy.bpf.o"
--
- # set global exit status, but never reset nonzero one.
- check_err()
- {
-@@ -38,7 +36,7 @@ cfg_veth() {
- 	ip -netns "${PEER_NS}" addr add dev veth1 192.168.1.1/24
- 	ip -netns "${PEER_NS}" addr add dev veth1 2001:db8::1/64 nodad
- 	ip -netns "${PEER_NS}" link set dev veth1 up
--	ip -n "${PEER_NS}" link set veth1 xdp object ${BPF_FILE} section xdp
-+	ip netns exec "${PEER_NS}" ethtool -K veth1 gro on
- }
- 
- run_one() {
-@@ -206,11 +204,6 @@ run_all() {
- 	return $ret
- }
- 
--if [ ! -f ${BPF_FILE} ]; then
--	echo "Missing ${BPF_FILE}. Run 'make' first"
--	exit -1
--fi
--
- if [[ $# -eq 0 ]]; then
- 	run_all
- elif [[ $1 == "__subprocess" ]]; then
--- 
-2.45.0
+Best wishes,
+D. Wythe
+
+
+>
 
 
