@@ -1,130 +1,96 @@
-Return-Path: <netdev+bounces-118677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-118678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBA79526C6
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:20:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2459526CC
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 02:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C18021C21257
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:20:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDEE7282743
+	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 00:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2442FA5F;
-	Thu, 15 Aug 2024 00:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F15A5F;
+	Thu, 15 Aug 2024 00:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2aksTqO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDPO14qK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAE518D627
-	for <netdev@vger.kernel.org>; Thu, 15 Aug 2024 00:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BA9A35;
+	Thu, 15 Aug 2024 00:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723681194; cv=none; b=DpLFb6rLo1jIXtZ6x/bOzQtttVPVd2+iM5glscz/q+BV2uiFlL4BXjMorNOSfc8NQ6xGvLLbRkWphCXDYOcMckNJi3Xbb5Rizeh699j54dwD8NDBuZZdiB0Mvqw4dXBLrEC4LXgvalKNkBnc8eIGa8lTW6UAV7dQyw+HRskUxc0=
+	t=1723681249; cv=none; b=GtFHbRv7L3a2L/p16Y9sZyFx2h8KoG372ne46QI754YP4U3ztOm1wkW9MlIqjhXdyQz82sV5HChbV1CfC28WBL9tRQpbKVDWciAkbTRUO7aiDtlxky/ff5u4KQpgv/VRuM2oIoUrpNk9p6EP9Aj+tcg0Mu8gZjToRN3bnuJAT2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723681194; c=relaxed/simple;
-	bh=8iRzqDoYf39rgtBU1oLcruq0trBu0TN+0kpem5OBr3g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rrlt4KebgkilWz0Jy/gix1MhrWjQ4Q16grThqGcmydFNJxRe4kyaoknXzdDmNxboEtxxL9SSQNdUrgSyCd0BaD/6kmQlQ+lrUTqIVAfqtrlZSMuPk8s18TPwwe42xjU4lzfMH3d945M3G8j7K2nSUt3X36YHpLKIFzZQfu3Hf/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2aksTqO; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-39834949f27so1902975ab.2
-        for <netdev@vger.kernel.org>; Wed, 14 Aug 2024 17:19:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723681192; x=1724285992; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4BoaaryjN+kmznsXNg0/iu0at6ootyNT2WSzfJdTBZ4=;
-        b=k2aksTqO9fCosCWFYXUor3ovoAuTwveZXI30uiYEpC4zTnSoFM94aRJGxXX9FIOzJS
-         I53jOaT4E0v6iRSMac0iJ+MPh+MHLvAl00z7hmmFm7RtZ9nWCA0BkYuzFOdttX8F+bf5
-         2Pwt2iMzYsjM0WzRuo6raMmKx4Ap1UPrs2lBUcRy3DBQ8SVJUfQErNzZBKPEN2AyRgRQ
-         s8oM90DUmiDg4YD+G22QKbEkn8tuWg7gDwWHKeS9rhwx+fh+GqKncJlAUHsrhEuuyyj/
-         rOpJNvc1ag5lNTL6Wzc2zmLK3uYbaRoNLG6R3Npa9/AdFZx65kRlbhwXQqNyPnmLwB01
-         uzHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723681192; x=1724285992;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4BoaaryjN+kmznsXNg0/iu0at6ootyNT2WSzfJdTBZ4=;
-        b=GDfB2JLwrf/Jmbq3wmsqn6RAZV0HeQhXBG4NI2c3VCWEVdpWmspoG9WoIN4dpihf5b
-         YfH8bryDdeNAfj5+26KkboYit5r5xRvSsrL1tBWNXHwxaGD1y/sBE+s6bpGyiWQNJqRj
-         HrGb6ShbMCnF3y+XU1zLOmNUwM/TIrYaBLkhMOMgM0mDd9CkgPw62kXAOKWQ9v2Ve33w
-         TkjkIB16+TXxtPIMZlFO93wFYLCv/fKnqSy1wDXXVyb/zVi4O//buZJ7WFQI7JpmwNbl
-         ghZ7UDQYL3YMfxaqUtgQLMDb0iw8vRdwBRjtPBUrLkpk7LmQ02LjQkHv/OnXvkEu63On
-         Vt1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWsTbj9yptwj4FX7MD1EKhYw2Mu3WMLUdEl8f4iDUBpmx2EBkSBnSs2unsrrlCvAsYVFVa1xIQ1cXRuMPy/ytG1lo/wYcK8
-X-Gm-Message-State: AOJu0YyC8V3Oi4tBDtxm9qm9umtaIJdvNB0Eq87J3V5RAOQEgkIYWJks
-	sMwfcN5gwVIsiV6rLmcD6g1+iFPtM06C8qtVtV/MSQgD2TxwtpbI
-X-Google-Smtp-Source: AGHT+IFVyn+FvDgaM9qfcrvEI9LQzcnVnP0CS2w58XvbGumiN4Pv5V21D8NMT1A0wMf2Y7MY6enXFg==
-X-Received: by 2002:a05:6e02:1ca6:b0:397:980d:bb1b with SMTP id e9e14a558f8ab-39d12447b1dmr54817385ab.7.1723681191760;
-        Wed, 14 Aug 2024 17:19:51 -0700 (PDT)
-Received: from jshao-Precision-Tower-3620.tail18e7e.ts.net ([129.93.161.236])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39d1ed74e0dsm1244935ab.78.2024.08.14.17.19.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 17:19:51 -0700 (PDT)
-From: Mingrui Zhang <mrzhang97@gmail.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	ncardwell@google.com,
-	netdev@vger.kernel.org
-Cc: Mingrui Zhang <mrzhang97@gmail.com>,
-	Lisong Xu <xu@unl.edu>
-Subject: [PATCH net v2 3/3] tcp_cubic: fix to use emulated Reno cwnd one RTT in the future
-Date: Wed, 14 Aug 2024 19:17:18 -0500
-Message-Id: <20240815001718.2845791-4-mrzhang97@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240815001718.2845791-1-mrzhang97@gmail.com>
-References: <20240815001718.2845791-1-mrzhang97@gmail.com>
+	s=arc-20240116; t=1723681249; c=relaxed/simple;
+	bh=FSrgGRb2+2F//PvIuCsVOMjuXhKEz50wuCkJVSwdb+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k3+WJjEzZ7yOVMgf2uxa/WTeS79Ho5arksLldlLXzsdaoACQI6QH1iAgAVP+HHNKqi5Tikqi5NCj0YcopX5mPi3sTapt3HfEp0CWgtjBvwnOYT5SV13cDST///yNkmaJ9LfTq0URswsyYNVHn6v9NaaZ93O6VrI2cHhgFe4WK/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDPO14qK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54EF3C32786;
+	Thu, 15 Aug 2024 00:20:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723681248;
+	bh=FSrgGRb2+2F//PvIuCsVOMjuXhKEz50wuCkJVSwdb+I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rDPO14qKjJ1wnJ5ZxvYB9oMTm0/dws2WGAOGyl+hbv6KhS7THK4MgXl5q5cfVfsnq
+	 zgV9IHzFBohsEXiQzywZv65pzVGd9Qb+xnraM5bvU64DylyBf7QpsVihlIwMEttQ3G
+	 hzFh+IRclmhDON97ZiVB1HbgZKQSFjjFv58beXMeaJEM0ZnT9yFaK5ERXdF6zAHZaG
+	 9z8P6BwK//xXongNDIzPn/rySWH5hk75m+HFbk6WeOIqRsOTBwBl2bv4AKKEHmyKy3
+	 n3TduAjS4Thzq+grfjIa6nb6jrMEE6gF06O+/Hw606DJ/UlKnUS5tPJ5yeblHKnGZg
+	 6Y/Aozow4NgSw==
+Date: Wed, 14 Aug 2024 17:20:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Shay Drori <shayd@nvidia.com>, netdev@vger.kernel.org, Daniel Borkmann
+ <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Harshitha Ramamurthy
+ <hramamurthy@google.com>, "moderated list:INTEL ETHERNET DRIVERS"
+ <intel-wired-lan@lists.osuosl.org>, Jeroen de Borst <jeroendb@google.com>,
+ Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>, open list
+ <linux-kernel@vger.kernel.org>, "open list:MELLANOX MLX4 core VPI driver"
+ <linux-rdma@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shailend Chand <shailend@google.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Willem de Bruijn
+ <willemb@google.com>, Yishai Hadas <yishaih@nvidia.com>, Ziwei Xiao
+ <ziweixiao@google.com>
+Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several
+ drivers
+Message-ID: <20240814172046.7753a62c@kernel.org>
+In-Reply-To: <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
+References: <20240812145633.52911-1-jdamato@fastly.com>
+	<20240813171710.599d3f01@kernel.org>
+	<ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
+	<ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
+	<20240814080915.005cb9ac@kernel.org>
+	<ZrzLEZs01KVkvBjw@LQ3V64L9R2>
+	<701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
+	<ZrzxBAWwA7EuRB24@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The original code estimates RENO snd_cwnd using the estimated 
-RENO snd_cwnd at the current time (i.e., tcp_cwnd).
+On Wed, 14 Aug 2024 19:01:40 +0100 Joe Damato wrote:
+> If it is, then the only option is to have the drivers pass in their
+> IRQ affinity masks, as Stanislav suggested, to avoid adding that
+> call to the hot path.
+> 
+> If not, then the IRQ from napi_struct can be used and the affinity
+> mask can be generated on every napi poll. i40e/gve/iavf would need
+> calls to netif_napi_set_irq to set the IRQ mapping, which seems to
+> be straightforward.
 
-The patched code estimates RENO snd_cwnd using the estimated 
-RENO snd_cwnd after one RTT (i.e., tcp_cwnd_next_rtt), 
-because ca->cnt is used to increase snd_cwnd for the next RTT.
-
-Thanks
-Mingrui, and Lisong
-
-Fixes: 856873e362b0 ("tcp_cubic: fix to use emulated Reno cwnd one RTT in the future")
-Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
-Signed-off-by: Lisong Xu <xu@unl.edu>
-
----
- net/ipv4/tcp_cubic.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-index 7bc6db82de66..a1467f99a233 100644
---- a/net/ipv4/tcp_cubic.c
-+++ b/net/ipv4/tcp_cubic.c
-@@ -315,8 +315,11 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
- 			ca->tcp_cwnd++;
- 		}
- 
--		if (ca->tcp_cwnd > cwnd) {	/* if bic is slower than tcp */
--			delta = ca->tcp_cwnd - cwnd;
-+		/* Reno cwnd one RTT in the future */
-+		u32 tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
-+
-+		if (tcp_cwnd_next_rtt > cwnd) {  /* if bic is slower than Reno */
-+			delta = tcp_cwnd_next_rtt - cwnd;
- 			max_cnt = cwnd / delta;
- 			if (ca->cnt > max_cnt)
- 				ca->cnt = max_cnt;
--- 
-2.34.1
-
+It's a bit sad to have the generic solution blocked.
+cpu_rmap_update() is exported. Maybe we can call it from our notifier?
+rmap lives in struct net_device
 
