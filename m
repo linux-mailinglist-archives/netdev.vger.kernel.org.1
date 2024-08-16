@@ -1,56 +1,72 @@
-Return-Path: <netdev+bounces-119218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D5F954D22
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:55:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85A3954D2E
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C382818D5
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:55:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75F27B22635
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BD51BD502;
-	Fri, 16 Aug 2024 14:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DKv5Jqpc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541631BE23E;
+	Fri, 16 Aug 2024 14:50:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E281B8EA0;
-	Fri, 16 Aug 2024 14:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762FF1BE227;
+	Fri, 16 Aug 2024 14:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723819731; cv=none; b=cwt1vZfnG/YXh3p0Sz2HFsF2+Y9cEaoaEqJlqY0rniflsnVU7Gxfm+9sFS1BUZ44Sq3W/xNcNwZtBkod4RyX9P6Iu/mntraZm/ZtVd1w37Tv1ZzFKp4GLX+iqzAtXLT9iFK7CclYVY/2T0epQ1nWucZI985En4zOugj1iZCFFNM=
+	t=1723819837; cv=none; b=rdVNOzw9N7wqPUbH7vGge8egCjQiZmNTxTgIbq3X02JrR4tXgi7vLrO2t/jgY9yEOCdzgUJKfn9EZVfW3HUwS3h2f31H0RhFJ9nhWz0d6/btNFK88SYUHFRZZxxCnVrSYXbPKdU8YvFr22+GqmYKLX9qf4K0wPeuD57baf3RLDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723819731; c=relaxed/simple;
-	bh=wUUZt68W5TSFTs8g2OOy4LOdhMv3gikKhPW9Fz33RZo=;
+	s=arc-20240116; t=1723819837; c=relaxed/simple;
+	bh=eBoT9mHnDEYNWbfyadzLnfSTUlg88qznghVjHEnGjoE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IlVs5ME293QXTgEguaq5ypHB/LC9z+HtGHw3tGyprGtcwYcX4hutryuWswKbAli8DfAAHXNxNoA1lfklQCbAfKuNAUZqUbsz45FuBOWRh/uh+24LD76xIFGrqlNciT4lnARiDycZeSMS5fy1djEo8TjiKY1UJI4Kt50FwT0U7H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=DKv5Jqpc; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 4D7EB20B7165; Fri, 16 Aug 2024 07:48:47 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4D7EB20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1723819727;
-	bh=V+dT4zs9I5lkBTlL0snnuXlkW9cxOnIPH3HT0S1qiX8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DKv5JqpcEsy1dMqJFPcsn6ex2ohRwhQPjJRszVDKZLbaYuuX5hUlYs6fraWAXLps0
-	 IW4qm6frZoXjavb1FCYHGuqYrmRCkiFvEElwTrMozFTUs4IDkp14yZ/kB71EjgXLXd
-	 A62/HWSS9yW6RGLRN+W0EEjXKJsyF0TG0mKgUSIk=
-Date: Fri, 16 Aug 2024 07:48:47 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ernis@microsoft.com
-Subject: Re: [PATCH v2] net: netvsc: Update default VMBus channels
-Message-ID: <20240816144847.GA9829@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1723654753-27893-1-git-send-email-ernis@linux.microsoft.com>
- <20240815090856.7f8ec005@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5XVmK/j/ilidChMiOj/lkombIh2tE5a0/BGbez4+Qj66vmN8FzUZc5vPcMOQgXpT8wLVGx4+ZYRuOqYiXoYqnf/3khzSZe6oBPvvad3oNPdcvjQouDRY5KltA6SztGt6FjWMqCzrTnXED5uDaA1x1/ruORM1CCjfizxwm6fOFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5b9d48d1456so80681a12.1;
+        Fri, 16 Aug 2024 07:50:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723819834; x=1724424634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gUA2d/1y4mfr6AuFj1uEEZ1GzNQmbmFC00Tg3yKPBf8=;
+        b=MRsrR2NDdwC1X+Vr5Y14/jWlQolaIEvsMcBrpkoFAZLajRJpEr5pPk5NlrZqjMx54V
+         W8j7/eaClvNUe7aB/CRQys2gQBfZ2oa70wQE4G9JtMaU25TtQ0lO6XDsZ7oqd8yodcyg
+         diLRWyEWbp2IHmdD+zH4RDcgzegFR8Dv33O7JNqzrYT6FTqak8asHWZt9ojEU9fiO4zW
+         e7nr94PB+EoVgemiXL39Yr39oOPwia4PNOWsJYXWuTpBZ/dZm3YcZRJMP3nRoIKw+1Wk
+         E1hVQzbPy5N9z6wyI2NW+MGzeV/051An95Fn6CUp5CVTorml2p2IvQ79wzqbn+6uD6ir
+         27qA==
+X-Forwarded-Encrypted: i=1; AJvYcCUav4TDpsncZnXfyMsJY9zRohbj8ooJie4jUFH7LYwzBE5FW+JRxmLZWSibvJKVZ2ybLzRnIvnfEREAj3eWgWIVFY1qpZxVzMEjWDohgpYJ4attoYrFTBilPNUQBBRSbiB5JEnXzVJAvmmpf5cEy4Gp8/VdKL5vexgjs+zej0WWFuXX1vjq
+X-Gm-Message-State: AOJu0YzVANvsvoR1Ud/OrQOJr0yQdUGZ7J5dps6f26TPX5z1aHgP/hBh
+	jXule+kv3b+dWbz/UiqjrT5YzPBF7xaBxbJSot7D7XXhUKpuP45A
+X-Google-Smtp-Source: AGHT+IEUwBIAA9oSte3H/Y6Jvhdn0QDDlhtFHetUMF8KZGSE/oW7YXVYlZHU6dV5KdpoT2Yxr37+uw==
+X-Received: by 2002:a05:6402:4006:b0:5be:d595:5413 with SMTP id 4fb4d7f45d1cf-5bed59556f1mr1609784a12.3.1723819833180;
+        Fri, 16 Aug 2024 07:50:33 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebc081cf5sm2320189a12.90.2024.08.16.07.50.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 07:50:32 -0700 (PDT)
+Date: Fri, 16 Aug 2024 07:50:30 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, liuhangbin@gmail.com, petrm@nvidia.com,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>, David Wei <dw@davidwei.uk>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v4] net: netconsole: selftests: Create a new
+ netconsole selftest
+Message-ID: <Zr9nNnAsqpmPnQOx@gmail.com>
+References: <20240816132450.346744-1-leitao@debian.org>
+ <cd9473bb-36d5-4b62-8523-f9112dc176f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,51 +75,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240815090856.7f8ec005@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <cd9473bb-36d5-4b62-8523-f9112dc176f2@kernel.org>
 
-On Thu, Aug 15, 2024 at 09:08:56AM -0700, Jakub Kicinski wrote:
-> On Wed, 14 Aug 2024 09:59:13 -0700 Erni Sri Satya Vennela wrote:
-> > Change VMBus channels macro (VRSS_CHANNEL_DEFAULT) in
-> > Linux netvsc from 8 to 16 to align with Azure Windows VM
-> > and improve networking throughput.
-> > 
-> > For VMs having less than 16 vCPUS, the channels depend
-> > on number of vCPUs. Between 16 to 32 vCPUs, the channels
-> > default to VRSS_CHANNEL_DEFAULT. For greater than 32 vCPUs,
-> > set the channels to number of physical cores / 2 as a way
-> > to optimize CPU resource utilization and scale for high-end
-> > processors with many cores.
-> > Maximum number of channels are by default set to 64.
-> > 
-> > Based on this change the subchannel creation would change as follows:
-> > 
-> > -------------------------------------------------------------
-> > |No. of vCPU	|dev_info->num_chn	|subchannel created |
-> > -------------------------------------------------------------
-> > |  0-16		|	16		|	vCPU	    |
-> > | >16 & <=32	|	16		|	16          |
-> > | >32 & <=128	|	vCPU/2		|	vCPU/2      |
-> > | >128		|	vCPU/2		|	64          |
-> > -------------------------------------------------------------
-> > 
-> > Performance tests showed significant improvement in throughput:
-> > - 0.54% for 16 vCPUs
-> > - 0.83% for 32 vCPUs
-> > - 1.76% for 48 vCPUs
-> > - 10.35% for 64 vCPUs
-> > - 13.47% for 96 vCPUs
+On Fri, Aug 16, 2024 at 04:02:51PM +0200, Matthieu Baerts wrote:
+> Hi Breno,
 > 
-> Is there anything that needs clarifying in my feedback on v1?
+> On 16/08/2024 15:24, Breno Leitao wrote:
+> > Adds a selftest that creates two virtual interfaces, assigns one to a
+> > new namespace, and assigns IP addresses to both.
+> > 
+> > It listens on the destination interface using socat and configures a
+> > dynamic target on netconsole, pointing to the destination IP address.
+> > 
+> > The test then checks if the message was received properly on the
+> > destination interface.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> > Changelog:
+> > 
+> > v4:
+> >  * Avoid sleeping in waiting for sockets and files (Matthieu Baerts)
+> >  * Some other improvements (Matthieu Baerts)
+> >  * Add configfs as a dependency (Jakub)
 > 
-> https://lore.kernel.org/all/20240807201857.445f9f95@kernel.org/
+> Thank you for the new version!
 > 
-> Ignoring maintainer feedback is known to result in angry outbursts.
+> It looks good to me, but again, my review mainly focused on the
+> Bash-related stuff, not on the netconsole test itself.
+> 
+> I just have one question below, but not blocking.
+> 
+> (...)
+> 
+> > diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
+> > new file mode 100755
+> > index 000000000000..5c3686af1fe8
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
+> > @@ -0,0 +1,249 @@
+> 
+> (...)
+> 
+> > +check_file_size() {
+> > +	local file="$1"
+> > +
+> > +	if [[ ! -f "$file" ]]; then
+> > +		# File might not exist yet
+> > +		return 1
+> > +	fi
+> > +
+> > +	# Get file size
+> > +	local size=$(stat -c %s "$file" 2>/dev/null)
+> > +	# Check if stat command succeeded
+> > +	if [[ $? -ne 0 ]]; then
+> > +		return 1
+> > +	fi
+> > +
+> > +	# Check if size is greater than zero
+> > +	if [[ "$size" -gt 0 ]]; then
+> > +		return 0  # file size > 0
+> > +	else
+> > +		return 1  # file size == 0
+> > +	fi
+> > +}
+> 
+> (...)
+> 
+> > +# Wait until socat saves the file to disk
+> > +busywait "${BUSYWAIT_TIMEOUT}" check_file_size "${OUTPUT_FILE}"
+> 
+> It looks like your 'check_file_size' helper is a reimplementation of
+> 'test -s <FILE>', no? Can you not simply use:
 
-I sincerely apologize for the miss on my part. I will make sure this
-never happens again. As Haiyang mentioned, we were trying to use a
-similar logic as in netif_get_num_default_rss_queues(), and trying to
-make sure there are no potential regressions. I will work on Michael's
-and  Haiyang's follow up comments. 
-Please let us know your opinion on the same.
+Why would you like to do it in one line when you can write a 15-lines
+function that does exactly the same!? :-P
+
+I will send a v5 with `test -x`, I will just wait for more reviews.
+
+Thanks!
 
