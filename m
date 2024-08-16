@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-119177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58598954845
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D47B3954846
 	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCECCB20EE5
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:51:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EB6B283A1B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174F119DF4F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99B01ABEB4;
 	Fri, 16 Aug 2024 11:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="QuFR1VL0"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="NTuTsYTH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3684D13C695
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ACB198A2F
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723809080; cv=none; b=m3UEGp47rboj1T/X+jqJlC7kHkZ7U25LELV76GyIWsaB6Nn4Khkr6a88mP7JkWavoW7KJ/pYtuXk65bCwuS2bP+ejhcwLomOMxNp7yahgy7te+lhTQbcHgwg/2s0IOzsZRGXwu30H50BSycX7LIkeutpt6KM0d0kSqzu1swkEp8=
+	t=1723809080; cv=none; b=ZTiSvD49sHYSIbeJRGm1QnOxcBc6u3JaaEjg5fgmtkfymE7b333DCYPBKPtMLmJ7LCD+rGxtwjzVzJ0NMFFz/AWd5CQONQ+xJajQZmUjx8xiuGifGBUvJUpxpq9t6GOHl9vui0xSTdL+F1gSqKp+RlgvZZlOsZydd6JfnBwqa0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723809080; c=relaxed/simple;
-	bh=UGZL/mAkZErDFt2CP/y/FIvs4tlYqejHbAabBlsj+NY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fvn9sYO6f35rXCbclrkUZoP9rsfEGnbMtJiHs7kdIpvuoksOrXrWT/mJGoRsSXnBqwdyAKjjedZOkR1XvKEnomZaLtB5vk4CUny3GFRTHa1kHFk69wzYilErWu320UqVJbceFYrL8Apwboq1EIOKLqMbhcXATrH+/rvlEhBs4V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=QuFR1VL0; arc=none smtp.client-ip=209.85.208.177
+	bh=JO93xhbgSaTuYjxi+Cl4YUEu7bGerZYLXHtYiTT/wYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ovFnfh5WDQ1oOhkNjskD4edoVTEcK1f3rilQuDSvQyeKwUHepKJOFza5hVPBGLecbwysO5IR2K6A+NJ4HmGxww4OSDIX9B9PsZpdUkmkZ42xM9YxvF9xO0egPYeqPa3diurwOAaFSaS1hAFzVnOA1+0VFkT9l4UtTIQXTYfBTSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=NTuTsYTH; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f16767830dso20379481fa.0
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:51:17 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a80ea7084e9so105829766b.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723809075; x=1724413875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ld/u168ByXssnaaADdxVHAJdHsRQneSaRZiRwjZKgQQ=;
-        b=QuFR1VL09xuCG4OslP7kx5fFxsVbwvpCo3hlXcpx8VeEt8SObM1CcGk74QrGBVWK5g
-         eYH396VyZTViQfV+AzWeZX73GrayiQhXZGA3SDucjWCTQ1oCFmEkM6FIzy7eyy+weIvR
-         sCrlXTiIKfxe9Z3X0qbc4A0rQEzoVx5xnr6/A8vTMAgBpt2sGTKNTWFmpwPzdF9ExnG8
-         Y1EaPWUmBd8LUnCC8N93FfkZMSrg69R/+tYB6LH355gkRslgt9kbAFdI2AaDcl8EAY2v
-         o8BSzNjVRxTRZh8mHokBoUN7w86SVOqvk6FTu7bw3e2wzH2nlwBI0OZGj/3bwIGXYGzh
-         Z3Ng==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723809077; x=1724413877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O29xCPNUIaer8YJvgLSvXVeHF8sRBOh8qRqEGZYZ06I=;
+        b=NTuTsYTHRg9zCGIA2ToaELGVVLBHy6uvR68Q01HXLaSQMU+AW0zf/IO7NdN+4fwean
+         61PIu68LmSIHNPh2/ZzI/Lku5pFIEblsxrTBdEoWsBa/sOBSXvv4lU03/PdO4owRecjT
+         yQWGTAmYTFY/P4kTwXXBLYBMlJ5w0KsFGHy97eCOtZx3/b2q2EkYQHGDtUHt76vCUwk3
+         qzgK7Mh+KMFX1xZtVeY4KxGnBiHYdfCsB1Q7HwBo+1flYFFd5GU60/TrtyT2Iwk5PEJN
+         eT7x4ZCbcLvNVRfACCwvplZTguM+Q1XDYVyBk8pvx0uE793ngMxuEDPduhSZEcLEbk6a
+         bpVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723809075; x=1724413875;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ld/u168ByXssnaaADdxVHAJdHsRQneSaRZiRwjZKgQQ=;
-        b=maQqXTDIXOSSezDlMBTWgWHtSsNGcIR7C4OtJQAOvvFr82kDrMIyULDy4m+sUb6Zn5
-         8wBDd4LiEDGnTNWoK1eljS75dhJwWWVT+Py9wHwM1OdX6If94+tyM9Z0wlutnUImQsMK
-         +tijEho58D0ECe+OrVEHpe02iGaNLHEwKTHc/XKD0b9Ql2lFtXTpnyGSMgCi7hQGfJaG
-         ZBUXTX6KJMjel6SaLj5t1lbbCfMYvy3lMbaWjuogEGUhUBErdS2cE3/kVe5KexS/oNLB
-         ht+AKx4rDEhqExbkl+KsLmqXLMb0kgu6lCSghoMzI6smKSCMlGaZbDm6o5NX3QaJVztQ
-         e7zA==
-X-Gm-Message-State: AOJu0Yw7lG5XQHv8TlBMaNPjWk+BVg33IDZ2/1Eqw0I1FA+npzs869GI
-	a93Vnpcc+KlxRwYa6ayi0q2e6sYHN5ztvyT+a1WA0w/vZ++ESM7Mg3+RoOLYVqBFpgGbGceyZKa
-	R
-X-Google-Smtp-Source: AGHT+IEUvPG0QNw61jYp8skGfLNABj72aBzRZIOMe11a/tP5xvcrbGt/ZaPA3PV5HmuKLqS+oS778w==
-X-Received: by 2002:a05:651c:546:b0:2ef:2c86:4d45 with SMTP id 38308e7fff4ca-2f3be5a6d5fmr19587121fa.27.1723809074989;
-        Fri, 16 Aug 2024 04:51:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723809077; x=1724413877;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O29xCPNUIaer8YJvgLSvXVeHF8sRBOh8qRqEGZYZ06I=;
+        b=jZg7Hq+Pwxf2tDSzLMerQpl88MI0S5AosNcDRiQr/oIehsSZyhE8qPP15+Wys5ajwO
+         h8PnToTGy7pUrAMZtakFXbmYSHFPg2wHICxkzdWAdHEFZvm/fv0k5WiDc34K1NhrK77a
+         smLmhpQZnLb+KV4rT3UUyT8BDLVhzgW2X3SyN2F9WJ5bPKdyMoH5XfBjJrm4MVUqWhad
+         s0wQf6/wsAmqfgfZoMUypyy2QqIL67D6XrMZaycAGpGc5HPYDR+CgY2iJg91sseqS13N
+         Pxz+bDPbwKK7CovFB+EZ31PW7wfFin32b0CQSSLZ8l4uCw81pVlxSKQ+7qgoPGoU7Uhv
+         s73g==
+X-Gm-Message-State: AOJu0Yy0mAg2CkUlERUoNSDVbdEF7esRogeq/HWZMBKpV/08vcC+Ldq5
+	vXk527GFwaHLlwQIcdt9TNZkdq1joLFmduuHLRwGqlASupCKynQW9Zi8gp3DFWOCNDTVphI7ZdG
+	m
+X-Google-Smtp-Source: AGHT+IE6Q/nHSMjbkfeXvNXGMkTgqve2YDIQIW9PCdqFyozXNBnlvN/G9zRZv5WkXP9EYvo1R1zXEg==
+X-Received: by 2002:a05:6402:50cb:b0:5a1:f9bc:7f13 with SMTP id 4fb4d7f45d1cf-5beca5ae7ccmr2228090a12.22.1723809076220;
+        Fri, 16 Aug 2024 04:51:16 -0700 (PDT)
 Received: from debil.. ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2152845a12.39.2024.08.16.04.51.13
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2152845a12.39.2024.08.16.04.51.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 04:51:14 -0700 (PDT)
+        Fri, 16 Aug 2024 04:51:15 -0700 (PDT)
 From: Nikolay Aleksandrov <razor@blackwall.org>
 To: netdev@vger.kernel.org
 Cc: Taehee Yoo <ap420073@gmail.com>,
@@ -76,10 +78,12 @@ Cc: Taehee Yoo <ap420073@gmail.com>,
 	pabeni@redhat.com,
 	jarod@redhat.com,
 	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH net 0/4] bonding: fix xfrm offload bugs
-Date: Fri, 16 Aug 2024 14:48:09 +0300
-Message-ID: <20240816114813.326645-1-razor@blackwall.org>
+Subject: [PATCH net 1/4] bonding: fix bond_ipsec_offload_ok return type
+Date: Fri, 16 Aug 2024 14:48:10 +0300
+Message-ID: <20240816114813.326645-2-razor@blackwall.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240816114813.326645-1-razor@blackwall.org>
+References: <20240816114813.326645-1-razor@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,28 +92,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
-I noticed these problems while reviewing a bond xfrm patch recently.
-The fixes are straight-forward, please review carefully the last one
-because it has side-effects. This set has passed bond's selftests
-and my custom bond stress tests which crash without these fixes.
+Fix the return type which should be bool.
 
-Note the first patch is not critical, but it simplifies the next fix.
+Fixes: 955b785ec6b3 ("bonding: fix suspicious RCU usage in bond_ipsec_offload_ok()")
+Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+---
+ drivers/net/bonding/bond_main.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-Thanks,
- Nik
-
-
-Nikolay Aleksandrov (4):
-  bonding: fix bond_ipsec_offload_ok return type
-  bonding: fix null pointer deref in bond_ipsec_offload_ok
-  bonding: fix xfrm real_dev null pointer dereference
-  bonding: fix xfrm state handling when clearing active slave
-
- drivers/net/bonding/bond_main.c    | 21 ++++++++-------------
- drivers/net/bonding/bond_options.c |  2 +-
- 2 files changed, 9 insertions(+), 14 deletions(-)
-
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 1cd92c12e782..85b5868deeea 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -599,34 +599,28 @@ static bool bond_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
+ 	struct net_device *real_dev;
+ 	struct slave *curr_active;
+ 	struct bonding *bond;
+-	int err;
++	bool ok = false;
+ 
+ 	bond = netdev_priv(bond_dev);
+ 	rcu_read_lock();
+ 	curr_active = rcu_dereference(bond->curr_active_slave);
+ 	real_dev = curr_active->dev;
+ 
+-	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
+-		err = false;
++	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
+ 		goto out;
+-	}
+ 
+-	if (!xs->xso.real_dev) {
+-		err = false;
++	if (!xs->xso.real_dev)
+ 		goto out;
+-	}
+ 
+ 	if (!real_dev->xfrmdev_ops ||
+ 	    !real_dev->xfrmdev_ops->xdo_dev_offload_ok ||
+-	    netif_is_bond_master(real_dev)) {
+-		err = false;
++	    netif_is_bond_master(real_dev))
+ 		goto out;
+-	}
+ 
+-	err = real_dev->xfrmdev_ops->xdo_dev_offload_ok(skb, xs);
++	ok = real_dev->xfrmdev_ops->xdo_dev_offload_ok(skb, xs);
+ out:
+ 	rcu_read_unlock();
+-	return err;
++	return ok;
+ }
+ 
+ static const struct xfrmdev_ops bond_xfrmdev_ops = {
 -- 
 2.44.0
 
