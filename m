@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-119312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A62795522F
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 23:02:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C99955230
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 23:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB9DC2864D0
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 21:02:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A331F22542
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 21:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EA481AD7;
-	Fri, 16 Aug 2024 21:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41D31386C6;
+	Fri, 16 Aug 2024 21:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L8hZYQAG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FhUrnLZL"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37855893
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 21:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81B482488;
+	Fri, 16 Aug 2024 21:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723842118; cv=none; b=VJaWjtcz2AkLlpCZh73zDEWXmF6P2AFu51VE8iMairkwaF1p21GwKdSjLCCqRMVtpoVMJSOCY/65kU3MOByTPUHyyJSoZW1iX+PN6KmLvjhk3I0RcFEn/cDFeGEam9Ml4jcqrNd81wFbeJ/JhKeheiHUJ8ihLT6Ss/FAFqvJZKA=
+	t=1723842294; cv=none; b=H8wAlZ3BhF7vc6rTNo+C4TKKUiAlu8I7ELHlLtalfTmTKQaHjzKA4lJzUozvdGupksr9WAyYiVsf59RxLGBcsBjQFJihhhRhxLAqYVCss7NEPGh94M+fqW0eQRCNkeIpngdyqCHBcqhW52MsEHOG8YQYVNpfjBXwNRpNtV1npyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723842118; c=relaxed/simple;
-	bh=yfv/5f3LO31w3lGqEJqEAwKGDf0CEiS72lCeG7B5ksg=;
+	s=arc-20240116; t=1723842294; c=relaxed/simple;
+	bh=lIPl6mg4iSxAeM9Cffphu+kosAR6pV+zKre+ORdcLOA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oLFqHYEJbIZxrNAOQLJG4lNu6KyjZaNQaMy84VREpCzPJqRyUpd1b0TvJqPsNtEo9Dbl9Bi9WhvgoCxidhKalE7wbgxVI2Fq/xJaG+Es9f45gxzF5OTYyF7ezAksEMB8ebdfJvWCaqydgJkEQ41ftqPbsfo++lDJMKR4F5E9Le0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L8hZYQAG; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dz7iODRS5oaNHiLQ4jZGeDBSbjAwrZ3qyANJmkQfaP9FcXPNign7JWAjoY3AW9QsRsiyNlKAnG8owSsrA2ezWpuqO13B5SeXD6LhtUGTxmPjRw3k1l0lBNQPAFUPml2NiLHuBMve4D6yg1diIywPe0WuhRGeX/e+NLPJQaYs/gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FhUrnLZL; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Xd7VXcBl257GszwHi+LyPbSYSmxpqwT0rbxgq8qtS1I=; b=L8hZYQAG5pwjxsbJQgbpYPGTEm
-	7hBG/CxMuUvVib7ZCwCCegsLS03Cw44gAzJnVY0ElQ1XPGZ0Jo7aO75oeCptCvrSqS4gbZA/oludS
-	jxjhvp4RTRN9rv211GHA2gWrPXX7OkTVpS2DI+K6nAQaY73V2OMNuZelXSwcubAB+AUo=;
+	bh=gH/TATT1pUnq9TeLpMZd1I83/KKpMcKp23KQ5KwZ9l4=; b=FhUrnLZLEN22xNPr2B5D4QhaL+
+	orMMoaIMyPcZWyVgwA9I6II6sOh//L7mPjw6dwOxXTFhHSfH1RWtmvJCtnecaSiEKjhnLzHchFQeT
+	ETNbUwg3vQ38UbqmeRBnmVxkMl5qEWOv7Bd27tkMpyp1fNNLB6rqA3/TLiiaxMJ7K/hM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sf453-004xpS-Tf; Fri, 16 Aug 2024 23:01:53 +0200
-Date: Fri, 16 Aug 2024 23:01:53 +0200
+	id 1sf47l-004xqk-MH; Fri, 16 Aug 2024 23:04:41 +0200
+Date: Fri, 16 Aug 2024 23:04:41 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Martin Whitaker <foss@martin-whitaker.me.uk>
-Cc: netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	Woojung.Huh@microchip.com, ceggers@arri.de,
-	arun.ramadoss@microchip.com
-Subject: Re: [PATCH net] net: dsa: microchip: fix PTP config failure when
- using multiple ports
-Message-ID: <f80d7a6b-651f-4c00-a068-c0cba2ff7ca9@lunn.ch>
-References: <20240815083814.4273-1-foss@martin-whitaker.me.uk>
- <f335b2b8-aec7-4679-993a-3e147bf65d1d@lunn.ch>
- <b21de19d-db51-4d8e-b9be-d688f1c71be2@martin-whitaker.me.uk>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com, jdamato@fastly.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH V2 net-next 03/11] net: hibmcge: Add mdio and
+ hardware configuration supported in this module
+Message-ID: <7bab865c-b5f6-4319-ba0f-1d0ddc09f9cd@lunn.ch>
+References: <20240813135640.1694993-1-shaojijie@huawei.com>
+ <20240813135640.1694993-4-shaojijie@huawei.com>
+ <79122634-093b-44a3-bbcd-479d6692affc@lunn.ch>
+ <1ff7ba7c-3a25-46b5-a9de-a49d96926e64@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,48 +67,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b21de19d-db51-4d8e-b9be-d688f1c71be2@martin-whitaker.me.uk>
+In-Reply-To: <1ff7ba7c-3a25-46b5-a9de-a49d96926e64@huawei.com>
 
-On Fri, Aug 16, 2024 at 06:18:46PM +0100, Martin Whitaker wrote:
-> On 15/08/2024 15:38, Andrew Lunn wrote:
-> > On Thu, Aug 15, 2024 at 09:38:14AM +0100, Martin Whitaker wrote:
-> > > When performing the port_hwtstamp_set operation, ptp_schedule_worker()
-> > > will be called if hardware timestamoing is enabled on any of the ports.
-> > > When using multiple ports for PTP, port_hwtstamp_set is executed for
-> > > each port. When called for the first time ptp_schedule_worker() returns
-> > > 0. On subsequent calls it returns 1, indicating the worker is already
-> > > scheduled. Currently the ksz driver treats 1 as an error and fails to
-> > > complete the port_hwtstamp_set operation, thus leaving the timestamping
-> > > configuration for those ports unchanged.
-> > > 
-> > > This patch fixes this by ignoring the ptp_schedule_worker() return
-> > > value.
+On Fri, Aug 16, 2024 at 02:10:36PM +0800, Jijie Shao wrote:
+> 
+> on 2024/8/16 10:25, Andrew Lunn wrote:
+> > > +struct hbg_mdio_command {
+> > > +	union {
+> > > +		struct {
+> > > +			u32 mdio_devad : 5;
+> > > +			u32 mdio_prtad :5;
+> > > +			u32 mdio_op : 2;
+> > > +			u32 mdio_st : 2;
+> > > +			u32 mdio_start : 1;
+> > > +			u32 mdio_clk_sel : 1;
+> > > +			u32 mdio_auto_scan : 1;
+> > > +			u32 mdio_clk_sel_exp : 1;
+> > > +			u32 rev : 14;
+> > > +		};
+> > > +		u32 bits;
+> > > +	};
+> > > +};
+> > This is generally not the way to do this. Please look at the macros in
+> > include/linux/bitfield.h. FIELD_PREP, GENMASK, BIT, FIELD_GET
+> > etc. These are guaranteed to work for both big and little endian, and
+> > you avoid issues where the compiler decides to add padding in your
+> > bitfields.
 > > 
-> > Hi Martin
-> > 
-> > Is this your first patch to netdev? Nicely done. A few minor
-> > improvements. You have the correct tree, net, since this is a fix. You
-> > should add a Fixes: tag indicating the patch which added the bug. And
-> > also Cc: stable@stable@vger.kernel.org
-> > 
-> > Thanks
 > > 	Andrew
 > 
-> Hi Andrew,
+> Thanks, I already know about macros like FIELD_PREP or FIELD_GET.
+> and these macros are already used in parts of this patch set.
 > 
-> It's my second patch. Yes, I missed the Fixes: tag. It should be
+> But I think this writing style in here very convenient.
+> Although padding needs to be added during definition,
+> but you can use command.mdio_start or command->mdio_start
+> to access specific bitfields.
 > 
-> Fixes: bb01ad30570b0 ("net: dsa: microchip: ptp: manipulating absolute
-> time using ptp hw clock")
-> 
-> Will you insert this, or do you need me to resend the patch?
+> Although FIELD_PREP/FIELD_GET is convenient,
+> But it also needs to define the mask using BIT or GENMASK,
+> and the mask can only be a static constant,
+> which makes it difficult to use sometimes.
 
-Ideally, please resend it. patchwork might pickup the Fixes: tag from
-your reply, but since it was wrapped, it might get it wrong. Sometimes
-Jakub fixes things like this when merging patches, but it is easier
-for him if there is a new correct version. And it is a good learning
-exercise for somebody who i hope will submit more patches in the
-future..
+Have a look around. How many drivers use this sort of union? How many
+use bitfield.h. There is a reason the union is not used. I suspect
+there is nothing in the C standard which guarantees it works.
 
-    Andrew
+      Andrew
 
