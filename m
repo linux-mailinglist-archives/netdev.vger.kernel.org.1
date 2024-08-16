@@ -1,101 +1,165 @@
-Return-Path: <netdev+bounces-119055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB93953F11
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:46:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B281953F20
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C27E284F18
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F51F1C210C3
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731B22209B;
-	Fri, 16 Aug 2024 01:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11A12BCFF;
+	Fri, 16 Aug 2024 01:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+KJRsXY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h8qKUBzp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A41B1D69E;
-	Fri, 16 Aug 2024 01:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B01C2868D
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 01:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723772797; cv=none; b=JyZfgXlbdg6GZVZuXQSMiTB0rrrDhB2sEi/nC2ni9f08blcEyanxaBuVs9CUSLUNx9HDQeSIZArmS7mP6zyGdk75gAfppW6T7p6HWhZTCmk6/gPuE9eH/HVeHfm+9D1JcnZjaefJ+4C/yz9N7UNvCgg5fImkB3MZIqclyX5ai3o=
+	t=1723773187; cv=none; b=FxdfEnIusKh+oTUWFSPBO7a18edBHfqpMgm9OCFJS+qgUB15vxAfS+fmZrzeuE2z1cFP/4ob2A04CVqXV1qMNs6bgdi0I+NLdYrAWt2ZjYEND5isljZ72cico/TN1F6ty0cKQh6gMvW9WEsEAEk6Zph166ylrwEdW+zP8y+apcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723772797; c=relaxed/simple;
-	bh=W5RlR6IOzzkUiWZtCi1XNt5G8fjNo236VeXd2ClDJUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tC8txRlaHLwhz2AAODji31rrVyOUbuUW/TnY1XQ8PynuB2o+78OO5tz+lKbqxN01zc1LWmY7keP5gbSClUoJm2Cgg2/y6V/XjvkLqO4bjBrT+9C04z9WN+JqfpLhgFxYWLKTUjoHxQA0ABI8s1YyXmQggeSaahZqKJrk2PiJ1Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+KJRsXY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C338C32786;
-	Fri, 16 Aug 2024 01:46:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723772796;
-	bh=W5RlR6IOzzkUiWZtCi1XNt5G8fjNo236VeXd2ClDJUE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D+KJRsXYRlCEjPXztVWNO/Wi3OJBvrB4jPzXZhFLUWzKKazBRaw63hbuQEVd5xZCG
-	 +MEGurA+ZDBbfZJqEAA6RbMsmhL6RnEIR5j1vcPUUg5s47AcESqlIq6uS2NJy87tYU
-	 Oa9ZB1aM+N9VX5vERk6GfHXMJa2UlnZqyAACHcdoh4xszAXVHQ9ovdNuel2H9PHyty
-	 xBV31wdoNvrPxFlNxoKeb5t3qoexY51ejvfbRtAVVf0893WjPsvYw5Jfhnw+C4bWyl
-	 4oCyd9LY65pKhhU4LQs20tnPWm4CfmQaB0gbOHyw23wYbMrwxE6OX1E56M0uz1MEHP
-	 v0/tAYrrOlokQ==
-Date: Thu, 15 Aug 2024 18:46:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
- <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
- <jdamato@fastly.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v27 10/13] rtase: Implement ethtool function
-Message-ID: <20240815184635.4c074130@kernel.org>
-In-Reply-To: <20240812063539.575865-11-justinlai0215@realtek.com>
-References: <20240812063539.575865-1-justinlai0215@realtek.com>
-	<20240812063539.575865-11-justinlai0215@realtek.com>
+	s=arc-20240116; t=1723773187; c=relaxed/simple;
+	bh=tNvSG2qi/Vms8GKiFMc5zZLxko1a99mjyAniXm2u8kI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ULNpx/ZeYnVaTJ8URTYUZTgXZweiQyW9mFw5PveC8z9ablMangGy/xRg5Aay7StRHZ451q8+TFXc3z39K1GN+Gidf2mFmP6l3sfdAWguLyNl8eWF30+UwKFAk3rip7g+ZA6tZtGhBgdbmCgsF1mREcnHXjoUIRcL9i14bH1L58s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h8qKUBzp; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <59d78829-6744-420c-bb8e-f015ca76ecae@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723773183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ivala+vb4qzVTVVyFC1nWTgHgxHExBS2dPPK5Wr9eR8=;
+	b=h8qKUBzp2R5/INg4/Be9oikxzV1SnHdFz5FdzWUFhpcp/MZxWpRpsiPiWiVhxyCkoJZFSZ
+	mhC4+pTTXp5Vv6mnpS0GySKUHLQUXhfhC7yqHr7CgriMSH6yqJdJSryXi2Y5DtGooL5FMj
+	qVuwkuy9cnTODv9DCmCqrNc+HpAGg4o=
+Date: Fri, 16 Aug 2024 09:52:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
+To: NeilBrown <neilb@suse.de>
+Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+ jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kunwu Chan <chentao@kylinos.cn>
+References: <> <0282be6f-e8ac-4428-a2ac-1ea6b7c25f4a@linux.dev>
+ <172372194692.6062.4519803974558688969@noble.neil.brown.name>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kunwu Chan <kunwu.chan@linux.dev>
+In-Reply-To: <172372194692.6062.4519803974558688969@noble.neil.brown.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 12 Aug 2024 14:35:36 +0800 Justin Lai wrote:
-> +static void rtase_get_drvinfo(struct net_device *dev,
-> +			      struct ethtool_drvinfo *info)
-> +{
-> +	const struct rtase_private *tp = netdev_priv(dev);
-> +
-> +	strscpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
-> +	strscpy(info->bus_info, pci_name(tp->pdev), sizeof(info->bus_info));
-> +}
+Thanks for your reply.
 
-This shouldn't be necessary, can you delete this function from the
-driver and check if the output of ethtool -i changes?
-ethtool_get_drvinfo() should fill this in for you.
+On 2024/8/15 19:39, NeilBrown wrote:
+> On Thu, 15 Aug 2024, Kunwu Chan wrote:
+>> Thanks for your reply.
+>>
+>> On 2024/8/14 18:28, NeilBrown wrote:
+>>> On Wed, 14 Aug 2024, kunwu.chan@linux.dev wrote:
+>>>> From: Kunwu Chan <chentao@kylinos.cn>
+>>>>
+>>>> Increase size of the servername array to avoid truncated output warning.
+>>>>
+>>>> net/sunrpc/clnt.c:582:75: error：‘%s’ directive output may be truncated
+>>>> writing up to 107 bytes into a region of size 48
+>>>> [-Werror=format-truncation=]
+>>>>     582 |                   snprintf(servername, sizeof(servername), "%s",
+>>>>         |                                                             ^~
+>>>>
+>>>> net/sunrpc/clnt.c:582:33: note:‘snprintf’ output
+>>>> between 1 and 108 bytes into a destination of size 48
+>>>>     582 |                     snprintf(servername, sizeof(servername), "%s",
+>>>>         |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>     583 |                                          sun->sun_path);
+>>>>
+>>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>>>> ---
+>>>>    net/sunrpc/clnt.c | 2 +-
+>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+>>>> index 09f29a95f2bc..874085f3ed50 100644
+>>>> --- a/net/sunrpc/clnt.c
+>>>> +++ b/net/sunrpc/clnt.c
+>>>> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *args)
+>>>>    		.connect_timeout = args->connect_timeout,
+>>>>    		.reconnect_timeout = args->reconnect_timeout,
+>>>>    	};
+>>>> -	char servername[48];
+>>>> +	char servername[108];
+>>> If we choose this approach to removing the warning, then we should use
+>>> UNIX_PATH_MAX rather than 108.
+>> My negligence.
+>>> However the longest server name copied in here will in practice be
+>>>      /var/run/rpcbind.sock
+>>>
+>>> so the extra 60 bytes on the stack is wasted ...  maybe that doesn't
+>>> matter.
+>> I'm thinking  about use a dynamic space alloc method like kasprintf to
+>> avoid space waste.
+>>> The string is only used by xprt_create_transport() which requires it to
+>>> be less than RPC_MAXNETNAMELEN - which is 256.
+>>> So maybe that would be a better value to use for the array size ....  if
+>>> we assume that stack space isn't a problem.
+>> Thank you for the detailed explanation. I read the
+>> xprt_create_transport,  the RPC_MAXNETNAMELEN
+>>
+>> is only use to xprt_create_transport .
+>>
+>>> What ever number we use, I'd rather it was a defined constant, and not
+>>> an apparently arbitrary number.
+>> Whether we could check the sun->sun_path length before using snprintf?
+>> The array size should smaller
+>>
+>> than  the minimum of sun->sun_path and RPC_MAXNETNAMELEN.
+>>
+>> Or use the dynamic space allocate method to save space.
+> I think that dynamically allocating space is not a good idea.  It means
+> you have to handle failure which is just a waste of code.
+>
+> I'd suggest simply changing the array to RPC_MAXNETNAMELEN.
+I'll follow your suggestion and change it in v2.
+>
+> NeilBrown
+>
+>
+>
+>>> Thanks,
+>>> NeilBrown
+>>>
+>>>
+>>>>    	struct rpc_clnt *clnt;
+>>>>    	int i;
+>>>>    
+>>>> -- 
+>>>> 2.40.1
+>>>>
+>>>>
+>> -- 
+>> Thanks,
+>>     Kunwu.Chan
+>>
+>>
+-- 
+Thanks,
+   Kunwu.Chan
 
-> +static void rtase_get_pauseparam(struct net_device *dev,
-> +				 struct ethtool_pauseparam *pause)
-> +{
-> +	const struct rtase_private *tp = netdev_priv(dev);
-> +	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
-> +
-> +	pause->autoneg = AUTONEG_DISABLE;
-> +
-> +	if ((value & (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) ==
-> +	    (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) {
-> +		pause->rx_pause = 1;
-> +		pause->tx_pause = 1;
-> +	} else if (value & RTASE_FORCE_TXFLOW_EN) {
-> +		pause->tx_pause = 1;
-> +	} else if (value & RTASE_FORCE_RXFLOW_EN) {
-> +		pause->rx_pause = 1;
-> +	}
-
-This 3 if statements can be replaced with just two lines:
-
-	pause->rx_pause = !!(value & RTASE_FORCE_RXFLOW_EN);
-	pause->tx_pause = !!(value & RTASE_FORCE_TXFLOW_EN);
 
