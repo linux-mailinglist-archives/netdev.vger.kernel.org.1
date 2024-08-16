@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-119284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C7A9550DF
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:31:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6CE9550E8
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE3DEB210A8
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:31:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D072843EC
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427511BE873;
-	Fri, 16 Aug 2024 18:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B061C3F25;
+	Fri, 16 Aug 2024 18:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XzgIC5Qp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofKZ0bde"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C1C1BB6B3
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F09A1C3F11
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723833074; cv=none; b=m+9JRU0EAAg/fvQyGjc+DyBHEhDUcHi0+12BGgaMOgWbyb5QTRYO2lhUG20vm5S9yqEfQsglKHMMDQaGgV4ZlIabNhHn00m5NBwskvgoRF6ye882Sqr6EuW0pf1IYxPWwKkPT1ihK9qdWHfVoS7ZXBJNXlokYDVm80pgDReZtd4=
+	t=1723833174; cv=none; b=rinNlNa0/sHXtvj3gheoOLzE5LuUKjv4eFiXkQmbLDX5ZambuD6/AThHLYY1C8xtx8kuQw4mplEYsUi9COI6TuGzOnDQW5wIS/lywCf6wydKJb7QNw6kpfxhzjI3tBTf8WGz1hLQk8ooznRnS7cdD8TFmZrf3+hwHf136mRRxLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723833074; c=relaxed/simple;
-	bh=uhcp3WZFLxQgQfnu4wAaQeAS1geKbGsIKl4HHwyijRY=;
+	s=arc-20240116; t=1723833174; c=relaxed/simple;
+	bh=UFlHCdDv+1gK+/Yn166EjWKCK2mmvNB8Unr7fnDOwBg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E5c2vZ8E7RphSB9Ss1mxlG6z8UsJvXDXc+9KhxCkPtl6l/7SqYOjeorU1ZRf8Vnlg0u6ulF+gF6xufCYaD7zZRSls+pZBWU6/pyvOCBuHDoPDAfHO3jX5dTPe5+ZdOJmgNcdseLm/Fb09a71JD6BhhCVlYCg39OrLy0UWfBsS3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XzgIC5Qp; arc=none smtp.client-ip=209.85.221.179
+	 To:Cc:Content-Type; b=LD5gh8eGjXvWVyt8xEnb6bcn/dTQl6tuXdr0g26HXHR6i7j+6NEQngfmncWp9mNOmhgNBdtio4Ew5ZfwG5plJJsrpQGk+S+pkc3FMwjZjmvoFRe+lHxyIFyEqfkw2VktqDmHv/jSvAIItLBSRxJJRviO2YoEzdYzbN809dlbLFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofKZ0bde; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-4f6b8b7d85bso781302e0c.1
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:31:12 -0700 (PDT)
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4f6c136a947so1032992e0c.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723833071; x=1724437871; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723833172; x=1724437972; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bQJAIgd/BEbyvSRpuIu0cmDP252zyDFStxo8ODaclzY=;
-        b=XzgIC5QpIf9kkgNf4jX/jTeceR8tRBtHxlriboaaQKw6esNU6d1/54Y0B7/u3pXLGG
-         S/uR7gtfNTyAzXLHDHP3/j4ttOD8uRuy6Mb44mAWvPnTaAJYaCM3+mw6n6ZiZqe01xzv
-         NB68hLNSnt65jZApVLeg1WL+DXVrNyEjBiAOmahQw0R1BpNOdxCESTFO+zs2sd3RR2A1
-         1xRj02jSJwGMRy3DyoKC5PpzvVc9UKndG3I2RRaPSFxb4eIai78kTcOZ7lg8TkdEyIS1
-         q6rsOD91oI6RaHOuGTKrc0yCzaROuQ+i10gtsHurWWPcGEVVpUsNYwmqYIyciepH5iKQ
-         vkdw==
+        bh=5rjKqKUVGp8fdP/ihVTIvHa/NSn6CTLuRPoa9qMW33E=;
+        b=ofKZ0bdehU0ZycCsCNYp97tmg9pUXwv3bUPsMD2LOND81wjIeqhMFp+T/ypk2Zk5oZ
+         JG/Cc6YgrKmI5BiJ/GtFeHTbZ+YsNoXaqKxn6V7vT5drU2hWkEzD1pNND6jGvny5Mtsk
+         tETFFQswmuihnZUig2fDnVvqV8V1C/hwzD35SMB/Y6x2DIorhpwC7fi69SaD9mqt06L1
+         f+mr3aNPgKqzRQzPVxDhY9Q5S+jiNxMNWjV5AMZSApCMHv3o1MrSNNiUtpHxNcu8ut7c
+         lvsYyPApTGbCthnF9/MlOdYt8l3rt7ShLIyD26iT6xqz8JsM7PbUrwgULCEk5BsYgYsV
+         OsbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723833071; x=1724437871;
+        d=1e100.net; s=20230601; t=1723833172; x=1724437972;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bQJAIgd/BEbyvSRpuIu0cmDP252zyDFStxo8ODaclzY=;
-        b=vetqvL7prS5fpj5PDM0CRiDMocMMKoB1ApjQ/NqF35+IAc0wVj41aacArTWI4Gxrgf
-         hEipgAQx/oAq4Pw7wnsbZpBD+Q9ElaacKeA1uawjrVL8ZppPCwEkPsz/IkRhsdq7s4qs
-         OPgT65CCCbkfMuSLpVpozjdhTM6mffom1oYh5KZkd7cC6YO7EdvvuV7vcGkPRvQUdGvK
-         gjeFFSUy3EsLggRUv6oJjib1Hg0eoPoOLJoB8jsN3m7H/w+jl1EKwD5e38gxEwmSkJIC
-         QX2rlLb3ievvwpFlcV7FoUJN+FGrYijUcQRBG3P38oPK8Tn4ZhnyKLfBkOPMzPkCn9u9
-         xx2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWnnsgjqus1ILpTsSmjW8XB+0YFiYzld/I3RSMMolm+vdpNuIFhf94QqimfGUOtKp2/0yWRkUnbFQhIFKbCxoFH5q8NTmVM
-X-Gm-Message-State: AOJu0Yw0195Ww4SNrj4W9edr36XXHBVe5sfzwKrQM1vmZxT3FqQQc3Le
-	cO+JC7IDl1s7KBxWbb5LrdGBg/XS0IUDNkM2BkSjwckt4fyCL+dDegiDnvrGzsUyiH178GVJdNa
-	6/2t7busUA5mqMl1wBhfBkumjbKUD4l+0CqCAP21Nv8pvpOAEp0HG
-X-Google-Smtp-Source: AGHT+IEo7ihw2rCkZ9z2tQcHda907ojygUEBgq2VAYybHsuz3+8IQenZr6hfJCQXXyuiRvZohAzF85ygqVzPh48vUck=
-X-Received: by 2002:a05:6122:17a3:b0:4f6:b18e:26e4 with SMTP id
- 71dfb90a1353d-4fc6cb22c20mr5066861e0c.10.1723833071255; Fri, 16 Aug 2024
- 11:31:11 -0700 (PDT)
+        bh=5rjKqKUVGp8fdP/ihVTIvHa/NSn6CTLuRPoa9qMW33E=;
+        b=vIg2PQmlLXRJ4eXJxlAqyJd7ps3nGez/2YIxOHoeqex3OmgtNJEmruUd4VHTwGxoNu
+         zptj5Q0+NhvcQ9p8slS6k2NQ/cqApGgpdv9tjUjjS1JVFKYs1Ygl14BvKD0if8+B9voc
+         yofWWWgyrwWK37yq1UR4ClHyVCUiwXpnP0tUn8fMYNUkx03PH1O13RU7qZ7wyiWBN9Qe
+         zIcjwNza2kd6gDIOJkILRugjLhnFmyVnIyCHIDg/hjR09q884netL/kZdKTMBKHS2ngF
+         8bIqe7sUCqyQo+CKnLENYWPLTH5vH1VL7JNqoDRO0NVPz88M8sS5sIkREaDi70DULnZ1
+         JUtA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEMdXP9pT4qo4XWpSAa3RdG5XvZyVdbiNT3D1zJTFLTpuyntXV313M+eNq3848qmUy9AkPr1VmTYZuahre6lrDIk/++J1k
+X-Gm-Message-State: AOJu0Yzv4W2fvc3PW+exBH2O+s712hPLVIlcQBVhsNq6nxBbFlp+OYP8
+	xMZV1xHzSaiZPNBtsxFzV86k9S1UXdTdyiWOFGc4rtKpKSWA6vNFzf8Gx6AuWi8CY3tP/3Ujfnd
+	JtV4KWikSgR4DEezyNtilV/9UpkHbK3YVuNGbWDpL//RGHV7gSmM3
+X-Google-Smtp-Source: AGHT+IE9y9Qwde/sAmECzbjTmj+QyKkGZLy3/r+3uNjFduuZ/tG4JaE9edLMsnU7TE0FhapB+DVwikJCehgoWuloqEc=
+X-Received: by 2002:a05:6122:7cf:b0:4f5:2276:136d with SMTP id
+ 71dfb90a1353d-4fc6c5e6093mr4498545e0c.1.1723833171999; Fri, 16 Aug 2024
+ 11:32:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815214035.1145228-1-mrzhang97@gmail.com> <20240815214035.1145228-2-mrzhang97@gmail.com>
-In-Reply-To: <20240815214035.1145228-2-mrzhang97@gmail.com>
+References: <20240815214035.1145228-1-mrzhang97@gmail.com> <20240815214035.1145228-4-mrzhang97@gmail.com>
+In-Reply-To: <20240815214035.1145228-4-mrzhang97@gmail.com>
 From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 16 Aug 2024 14:30:51 -0400
-Message-ID: <CADVnQy=+Ad3cHHCxge37OKm=fHi6+aHyyy_0hp7p4VCSAGX4cw@mail.gmail.com>
-Subject: Re: [PATCH net v3 1/3] tcp_cubic: fix to run bictcp_update() at least
- once per RTT
+Date: Fri, 16 Aug 2024 14:32:35 -0400
+Message-ID: <CADVnQy=URvcxoU70b0TMJ9gpYVWgKE_CNwQXrP9r2ZJ3EGWgfg@mail.gmail.com>
+Subject: Re: [PATCH net v3 3/3] tcp_cubic: fix to use emulated Reno cwnd one
+ RTT in the future
 To: Mingrui Zhang <mrzhang97@gmail.com>
 Cc: edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org, 
 	Lisong Xu <xu@unl.edu>
@@ -87,66 +87,62 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Aug 15, 2024 at 5:41=E2=80=AFPM Mingrui Zhang <mrzhang97@gmail.com>=
  wrote:
 >
-> The original code bypasses bictcp_update() under certain conditions
-> to reduce the CPU overhead. Intuitively, when last_cwnd=3D=3Dcwnd,
-> bictcp_update() is executed 32 times per second. As a result,
-> it is possible that bictcp_update() is not executed for several
-> RTTs when RTT is short (specifically < 1/32 second =3D 31 ms and
-> last_cwnd=3D=3Dcwnd which may happen in small-BDP networks),
-> thus leading to low throughput in these RTTs.
+> The original code estimates RENO snd_cwnd using the estimated
+> RENO snd_cwnd at the current time (i.e., tcp_cwnd).
 >
-> The patched code executes bictcp_update() 32 times per second
-> if RTT > 31 ms or every RTT if RTT < 31 ms, when last_cwnd=3D=3Dcwnd.
+> The patched code estimates RENO snd_cwnd using the estimated
+> RENO snd_cwnd after one RTT (i.e., tcp_cwnd_next_rtt),
+> because ca->cnt is used to increase snd_cwnd for the next RTT.
 >
-> Fixes: df3271f3361b ("[TCP] BIC: CUBIC window growth (2.0)")
-> Fixes: ac35f562203a ("tcp: bic, cubic: use tcp_jiffies32 instead of tcp_t=
-ime_stamp")
+> Fixes: 89b3d9aaf467 ("[TCP] cubic: precompute constants")
 > Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
 > Signed-off-by: Lisong Xu <xu@unl.edu>
 > ---
 > v2->v3: Corrent the "Fixes:" footer content
 > v1->v2: Separate patches
 >
->  net/ipv4/tcp_cubic.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  net/ipv4/tcp_cubic.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 >
 > diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-> index 5dbed91c6178..11bad5317a8f 100644
+> index 7bc6db82de66..a1467f99a233 100644
 > --- a/net/ipv4/tcp_cubic.c
 > +++ b/net/ipv4/tcp_cubic.c
-> @@ -218,8 +218,12 @@ static inline void bictcp_update(struct bictcp *ca, =
+> @@ -315,8 +315,11 @@ static inline void bictcp_update(struct bictcp *ca, =
 u32 cwnd, u32 acked)
+>                         ca->tcp_cwnd++;
+>                 }
 >
->         ca->ack_cnt +=3D acked;   /* count the number of ACKed packets */
->
-> +       /* Update 32 times per second if RTT > 1/32 second,
-> +        *        every RTT if RTT < 1/32 second
-> +        *        even when last_cwnd =3D=3D cwnd
-> +        */
->         if (ca->last_cwnd =3D=3D cwnd &&
-> -           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
-> +           (s32)(tcp_jiffies32 - ca->last_time) <=3D min(HZ / 32, usecs_=
-to_jiffies(ca->delay_min)))
->                 return;
->
->         /* The CUBIC function can update ca->cnt at most once per jiffy.
+> -               if (ca->tcp_cwnd > cwnd) {      /* if bic is slower than =
+tcp */
+> -                       delta =3D ca->tcp_cwnd - cwnd;
+> +               /* Reno cwnd one RTT in the future */
+> +               u32 tcp_cwnd_next_rtt =3D ca->tcp_cwnd + (ca->ack_cnt + c=
+wnd) / delta;
+> +
+> +               if (tcp_cwnd_next_rtt > cwnd) {  /* if bic is slower than=
+ Reno */
+> +                       delta =3D tcp_cwnd_next_rtt - cwnd;
+>                         max_cnt =3D cwnd / delta;
+>                         if (ca->cnt > max_cnt)
+>                                 ca->cnt =3D max_cnt;
 > --
 
-I'm getting a compiler error with our builds with clang:
+I'm getting a compilation error with clang:
 
-net/ipv4/tcp_cubic.c:230:46: error: comparison of distinct pointer
-types
-('typeof (1000 / 32) *' (aka 'int *') and
-'typeof (usecs_to_jiffies(ca->delay_min)) *' (aka 'unsigned long *'))
-[-Werror,-Wcompare-distinct-pointer-types]
-          (s32)(tcp_jiffies32 - ca->last_time) <=3D min(HZ / 32,
-usecs_to_jiffies(ca->delay_min)))
+net/ipv4/tcp_cubic.c:322:7: error: mixing declarations and code
+is incompatible with standards before C99
+[-Werror,-Wdeclaration-after-statement]
+    u32 tcp_cwnd_next_rtt =3D ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
 
-Can you please try something like the following, which works for our build:
+Can you please try something like the following:
 
-           (s32)(tcp_jiffies32 - ca->last_time) <=3D
-           min_t(s32, HZ / 32, usecs_to_jiffies(ca->delay_min)))
+-               u32 scale =3D beta_scale;
++               u32 scale =3D beta_scale, tcp_cwnd_next_rtt;
+...
++               tcp_cwnd_next_rtt =3D ca->tcp_cwnd + (ca->ack_cnt + cwnd) /=
+ delta;
 
-thanks,
+Thanks!
 neal
 
