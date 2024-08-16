@@ -1,265 +1,243 @@
-Return-Path: <netdev+bounces-119222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F98954D49
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:00:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC85A954D4C
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1B9BB26A58
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:00:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2701F215B0
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618B91BCA09;
-	Fri, 16 Aug 2024 14:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661A41BB68D;
+	Fri, 16 Aug 2024 15:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBdT4xN1"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pPVupozX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45672BB0D;
-	Fri, 16 Aug 2024 14:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723820395; cv=none; b=UbD7vQSpuN/4O1SwtRUtozRz2DC2VEllmbyfyy649ixVajUwhKx1ofvdc+9l9AfERJka/drxJR6Pcu7C9iqade5PEv3uGib5FVCeIEB8JdUavA9O5UVn3W3qFUWE95MB57/Tgd46WRhbpyqF1wd7SdsPEuCzBFyf1KFxHVDZkcc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723820395; c=relaxed/simple;
-	bh=9uudIYw7JfGhepxtxZOatr+V5nc/nujXyLaeMxNmwnI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AytkqjhtKfnutP3x4aAD9L03On65dGUrR2JoAXpLYVAtW38vdWv+fNsecsMLCombddOBV9Csscavh1g4nRCbHW1fvHcYDIIjBN7dUlXweHWp1DqSUZ2WLn/yjh8jB34YHy1ApGzWbIHfj8EE+xpqMlzPqd3V9xwjwIPNcbyb4EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBdT4xN1; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7093705c708so2062357a34.1;
-        Fri, 16 Aug 2024 07:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723820393; x=1724425193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9uudIYw7JfGhepxtxZOatr+V5nc/nujXyLaeMxNmwnI=;
-        b=aBdT4xN1tj70NCTRZH2PRAZ0l+dL8UzpPIUvMPVKYuNmnibb0pDGnLSozzn9ny5eGC
-         LRjmQ0sRRt4iTj+CDKk2/3Oo4Q5AGcUzhpFD2KUXV4xgyfGcwnRibV+4l8N6Ag31gGKd
-         8F9Ji/V0jvTH/IJYEofzE40qme64wfS7PQ21eKdrWbtnIAANY5mrwDgFPKsSpL35NbLq
-         FMyGIu0G850gYdD2BR5rhZX1Z3rUYsLij0xFRZl38x+hEkmnBHFYXkjlPwLMlvgSRLZ/
-         8LQGuH1Y1+TSgvP602Wx4PX7mZXMet/GIpY7HioNKMVnNwztV1WILlt63CkCtRHT91Au
-         1k4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723820393; x=1724425193;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9uudIYw7JfGhepxtxZOatr+V5nc/nujXyLaeMxNmwnI=;
-        b=rE2pqx/p87Xk4Jvs780dFmWWDz/qZq4cmA91AdAdGPjMe1h7YULw4M8KMUmPhKVRad
-         qnK6xF8os1RZxmI4IXFDy09EAmK8n1WNXQGo0V/lK3RbaChl+OG8dFtttUE3kXyhaaUS
-         zKOeJBcPxyEYuC1OjhZSnrMfQkOuhQ2+0ofaWiRUxChOwya9DQurhVZ4+J+hB5A3+7n7
-         GRYEAnw7i4Pw+cJrs8nIEr0qmiOEd0xzkLJ9f2u8OB+QZGi2J/o8R3xIkB6lO/4BjDUD
-         nLZpvuMNRVG+tfquBE69Bh83xKXgzgXZob9RegvGjPgSlM/CZhMSIE27Efep1/DHCQgW
-         5RNA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/owUUaS8xUaDqwbKsl0maNAB3KgxA23YA15162lFeCFP8/S9t86thnFQEc7UZXor3loZOoKdrju93sCl54pc942K74g5rJwA/pDy4QJTeWXwK1GcPYMf42EFqEbD80mkK3ang8J3iUvRzmqowGBhT+/9r9g8Cjlrsx7Pfg3IO2/bhjCsKn2/vlpggizeyAvO6blJjfDCHhQmOc4C8fw==
-X-Gm-Message-State: AOJu0YzoSMpHr/Lw19kPJIgx7VRGGPcaqcTPagEFkbgmKW7VeB9GPfPu
-	+XmG54EvEnsFKUCFyEL1IyI2h0ki2Ppy3E3kuvv3ZDJhpiF+3LjA
-X-Google-Smtp-Source: AGHT+IH8bNKxlLVLRFW31fzvhnrm6P/uFjcbBZfMpnQ0C0jYoE9r99AQRbAKARdhOb9UQlmmh6jTFQ==
-X-Received: by 2002:a05:6830:6e99:b0:708:721b:4077 with SMTP id 46e09a7af769-70cac8af7f8mr3841658a34.23.1723820392605;
-        Fri, 16 Aug 2024 07:59:52 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4536a050f7esm17012891cf.66.2024.08.16.07.59.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 07:59:52 -0700 (PDT)
-Date: Fri, 16 Aug 2024 10:59:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin Karsten <mkarsten@uwaterloo.ca>, 
- Samiullah Khawaja <skhawaja@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, 
- netdev@vger.kernel.org, 
- Joe Damato <jdamato@fastly.com>, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Breno Leitao <leitao@debian.org>, 
- Christian Brauner <brauner@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jan Kara <jack@suse.cz>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Johannes Berg <johannes.berg@intel.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
- "open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, 
- open list <linux-kernel@vger.kernel.org>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Message-ID: <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <ZrpuWMoXHxzPvvhL@mini-arch>
- <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
- <ZrqU3kYgL4-OI-qj@mini-arch>
- <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
- <Zrq8zCy1-mfArXka@mini-arch>
- <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
- <Zrrb8xkdIbhS7F58@mini-arch>
- <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
- <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
- <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
- <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92B91B373E;
+	Fri, 16 Aug 2024 15:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723820451; cv=fail; b=XekOVOqCIqAgkuQuGrS5Y+9l0Jl5Jc+5fmEJEW7saM/RPlI06KS9hqAYSAw8dOmbMXRplI0Yphw8+5AeX8hHOul5V5O+XLKERA4tL+Rd3tQxtuhxss/W6yue4fLTIB9NkoR3eWLBUbIcZIoqs1zRZ3MRuDsIivDoSbrRSU7HZvg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723820451; c=relaxed/simple;
+	bh=SGUx3K5NMP6fpTkObJmO7nc3oONEGowBjj1c+71H8cA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ueSBsNqXiUe29nnoUJQrF3SiHaFFtEwBJnPQYflOxnwVerLSFb0SbTBWjVCkw0hdpf9Lhi220VHy8v0S/gF3LViN+f3Nuw8Cw4dd1FsQ6a2VDUzDYVcIz4N42h4PFALgXhLjEtNSIOqIHMWZRLfrTgHhuXp1ciRoBDcQVrq0akI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pPVupozX; arc=fail smtp.client-ip=40.107.223.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CvMfHloTWBCTYPVL1mH/et30/dVLc3Hy2gRBM7//V9UbSFNXTLT8Uw5+6OsZNuPLH91Elfgp1AYfQzGm7Hl+IGJgt6s7FtRwTzmfV/G8S9woZRWPIJSUvLDbl9w4HLYLdhbWPGlobvNcYtRteKk9vgiA8lx1PdbJwiA2nhpk3z0+YnKBsTKoPkRxgnL4lySqNY/BwTA+SyQr5c/RQ47tbAtxKaPtOQWp5D0JNYWnaVxly4ZcUnfPn8l6GQuOEkMCln9a83LCcPROAjuogp83XIEU2xKEE+DsdMaOraMQhQ4qOhDuqt3PWPXCg51ndNUI1dz00veMYxzsT/xyUUyYng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GDzq8qBInC9kp508LPpDzuMnjQY7j1R+uUJN7SNlFnI=;
+ b=SLnfh4sRGPjEGiu9+Nq3mp2SLenwcrw0t6wtYv0AvJjxx36hZvj//qSkOukgNKjK8hQl1wNEwcWWa1bcWE5OhKlsrVppYfVCK939e3mouqSB2hrXCQU+Dp3Eaky/V4GemU3Vfdd5SmRUdYW6IUwt9iCYYBNtVSyO5OR0BGK3ueVUEE8YTyIw+/KEl4eCUegDws7LhMCx1x54jc+gRtrHRQCzJvmbE49ELW6Jz1wf9kOK882Ke8zBty4uvu3JePDx9UOZc5v2BDO+HdnoplCsCRE4Fl4133FY4wgZl6KErJ/mLqTcnse0VDicgTSlh3DbAfSYxOv1E1eUERYdWYHcBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GDzq8qBInC9kp508LPpDzuMnjQY7j1R+uUJN7SNlFnI=;
+ b=pPVupozXli24Xmc59fhYOiD+pATaVP20WV2MuMDB3/Y5bLQz8PLAf/aJLdA6iS9fXMlu5CtAefvzU0+wmCKxUWY3Hy6MGUkroVipSJTTxsFk/A4qxVT6P2e+cI6v8xYFtP9CTLtCktIMYTEdR8I6OjGtf5Ab9YnimuTL7ajsmuc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB5999.namprd12.prod.outlook.com (2603:10b6:510:1db::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Fri, 16 Aug
+ 2024 15:00:41 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7875.019; Fri, 16 Aug 2024
+ 15:00:41 +0000
+Message-ID: <05ee01d8-4687-b44a-effc-1c14cd28d79f@amd.com>
+Date: Fri, 16 Aug 2024 16:00:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 07/15] cxl: support type2 memdev creation
+Content-Language: en-US
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, richard.hughes@amd.com
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-8-alejandro.lucero-palau@amd.com>
+ <20240804183139.000019e2@Huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240804183139.000019e2@Huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0024.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2ae::19) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB5999:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a660dab-c00b-4484-ce59-08dcbe043205
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bWdzTkVLSnV0YzJMVzZGZ3o1S1ozdCtIZ3BFNGdXbnlkZk9GWGRlMW9CUXRF?=
+ =?utf-8?B?eDR3WjAxOUNCT2txb1RNaVZ4SnIzU0h4aE1lcTdobDQySmVDZTEwdWhLd3lu?=
+ =?utf-8?B?YmxpZ1UvalNoTUJyVlBXM1EvazAvbEFBZ3Fjb2FRNWNndEVxZzBnbmRPNkpD?=
+ =?utf-8?B?QlI3aU5VRWozSDFPaUlGRWZHLzhtOWxpampjYmo0TjJ6K1NVVDV3TzZhOFl6?=
+ =?utf-8?B?ZWFOMEVPeE96WC93N1R6TUh1bzR1Nms4T2UyS3laTE9JcHRoMXVMdlZRTkJI?=
+ =?utf-8?B?NzRhSk9yQmdEUWJOaXB2V0lQNWtKS3d3djhoa3lyc2d4d3R3NWhiVkp0eFBJ?=
+ =?utf-8?B?RkZHSGpHQnNoM0FHSHdrb01QMm9laC9hUVhaWVNoT3R3Sk90WHlpK1ZiUk5U?=
+ =?utf-8?B?M2JZbGY0Y2xhaEZWamtTcnl3MFR6MGw0ZnZ1REx5UE5FV0hlb1h3QW5WY0lL?=
+ =?utf-8?B?RnNLeWRJMFRoakVuT0JQQU5qQmgzSitTejdqMlFHTTJuTTVYMWx2SDkvaU92?=
+ =?utf-8?B?SWYwK0c0a1VIRUFqbnc2dk1JZVYwRHBhQmJrQ3R4bm9vSFhTeXUvMzFERmc0?=
+ =?utf-8?B?eE9lbXQ3Y2JLWHNGV1pqam1HNWdacmdzT3JLZXhMSk85K2d4K3J4MDRIUFc2?=
+ =?utf-8?B?OE1GZ0sxRzRpM3JNRE9ldjBZakVPQWFZQmRzeFF1SENOWGZnYzhTeHVFK1NR?=
+ =?utf-8?B?dEEydHBhMXMxbXlwaXdFbXlMa0FreG9JWC9UT2Z6eWJPWGkwSlQrR0JlMncv?=
+ =?utf-8?B?U1Y2Z0pCeFFUWlBxM2c3TkV5dEhCODduUE9TcDlPb1hCbHJ1dGE2SXM1MlpK?=
+ =?utf-8?B?c1h2UFU3bkxVZU56eXBwWkU2dllrcUVsU3NiUEY2NXMvYUwwcGlVRDRDMWlF?=
+ =?utf-8?B?VjdXd3dYYkFvYVZpV0JmWWtDT2JRaEswMktOWDgzeURrUmgydmRmZVNvSUZX?=
+ =?utf-8?B?RExJSXpJRnN4WXB6UEVYV1pVNjQxVFN4Q0orTEZmM3NBUmhOMWV3Y3BlVE9Y?=
+ =?utf-8?B?NEV0UUo4MzFVKzloQTlKcnQyMXRqQlFNT3lmYnJyK2JSWnVRZGNHRjRHMkYv?=
+ =?utf-8?B?eFpmek9xYUcvdy8vZXJteHREVlg4ZVZqa2N1MmFkdFp1K0JLN3J4c1pVV2Zl?=
+ =?utf-8?B?VzRVSVB2dDdTY1hBSDdiZmdPNU5Ddk05cXhxUHlaTXpWeXNqOEFJZjdsRlIy?=
+ =?utf-8?B?eDA1T1E5S0FHbU5qamNyZk5WS0V6cko4WE5yMmpOQmF2YW5ic1FyM3MwWHI1?=
+ =?utf-8?B?QTExT2NJaURqdnRnZzVRWmdUQUwrZzdYZU0wZlgyZVM4OHpQaGNMb294V1c4?=
+ =?utf-8?B?Wkw1RExtaDc5RGRoUkRDRk5jTEpJWG9leDQ0N3ByNUVOWTJyVDRabFFuTVJ4?=
+ =?utf-8?B?NzZrR1k2dXRQd1BSampUWXZJWlJZVU5wdVNaNFJST1hWUmtMSEU4NUtyL1Rk?=
+ =?utf-8?B?bVBmajJuTlliNmFvZGJPYWErVEZLT1A0L1lGN21zSFVMdEVjWHNPNnR6TThs?=
+ =?utf-8?B?Ri92NW11Nm5ESVRlb3c3NWVEY0lMMzg0YUJLdUJzUnZwTC8wSEFEbWlaZ0Ru?=
+ =?utf-8?B?bXRrVUdqVzVSMVRKZHlqSGFsZFdEbjVxWGs2R2RkWXZ2bGlNcE50MEh5RUtJ?=
+ =?utf-8?B?NmlsdU9FclUrNWJZVGJtR2QwRWdTU0VKZHorKzZtaS9vbUYyTXZvYVJPQmRH?=
+ =?utf-8?B?cUVkYnJuNzdqb1JzbzNtOFJYUHp4dk1zMWYyd3E4MWY5WHNieVhzRVIrV1Uz?=
+ =?utf-8?B?c1dNZ2dwL2FsTldEWVlPS0Ura1dyTmdCOXJ0eENENUxUU3d3RlR2YXBUbnBi?=
+ =?utf-8?B?T0J5THVtYkFzdWQxOXJrUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UzU3bE5jRjZRS25ENFF0eGFMZGRtMU5McHR0S2J3aWZlWXJnSXVpZzVIcUJj?=
+ =?utf-8?B?U3c4dVk2YTdGNlA5REswNUVvOHl2UW04TjU4cENwSVFxRXVUcVpRTCt3WXN1?=
+ =?utf-8?B?aDVXUjVsaUZwUjhveFVGRTFySG1LaDhuR2RDZmh5WXlMdURpYkQ3UlhucGJT?=
+ =?utf-8?B?NSt3eFBOWlpHU29vbTdVNkdlREs4d1JYbXJiNHJSeHEzSkFzS0s0cVJUSjI3?=
+ =?utf-8?B?RTZFdVpoSjhZYUZKNlIxWC9pL1UrdUNVTHd0ZGJKL1NnZ2pmb0liRzhrWDJK?=
+ =?utf-8?B?R0E4NklaWVlwVGtvdGlrME93U2JZWXBCUGJhZklUeUlld3k5QnpVbFNWZ2RN?=
+ =?utf-8?B?QVQzYXo2YU4rV2VkK3ZpTXdpUGFROWppOFNoQjM0dkUxdGdOWVZDc29UcjlW?=
+ =?utf-8?B?eWkzZjVhSnB0YXFUVTZzRHBFQXM1eVpiV21PcmpOUm53TS93YkVrVHg4VXBp?=
+ =?utf-8?B?elhtWjZNTnh6QXlCMlAxOHo0RWp6dXM1MmxlZTFMMTc2dUJRbkE5dElyTEhL?=
+ =?utf-8?B?UjBwOHFhZnhWdDB3dElPSGpSbHl4Nk1mQklPZDFsYmljM25PM2VTdlZlOGlY?=
+ =?utf-8?B?eWZjNzRrS3ZWc0Y4cVhrcDRkbWUxWUVYOE8rNUJub2xEZ05pQzRQSzN4OUp3?=
+ =?utf-8?B?TWc4alpOaXBlM3dMVnU3QkQvREhNV3Mwd2ZDcEZlMXIxNGlpNXpWNTdCTjVT?=
+ =?utf-8?B?VEhEMWxUZWZIOVBtZHpkUndMNExUR2ZtQ1U3c3lNczF6cHNlWTU5aHg4Njds?=
+ =?utf-8?B?UkdZVDlLTHhLSG1wV2RrRDhBRUtpQitSTXI0YWtaeWcwRUwvVW1tRzQzVjhO?=
+ =?utf-8?B?TWlkaXE5dWNtTzkxcE10MkxUaWQyK0tSbm15aG1qV0tlUzVDaW9lZDQ1M1FS?=
+ =?utf-8?B?WFdUaUFQLzJJZXZFRmdmcUxhdGtxTlBHZ3dQYUgrZ3RUa0xSVXFwcEZNaGJi?=
+ =?utf-8?B?MkpjN3M0ZHlCdXRwZEVlbE9CWlN6TlJ6QmU0UVlhRzAvVEpUWHVpWm5NdjQw?=
+ =?utf-8?B?eVBObGZDNFcyWjVXVnlEOWI4ZU0xMlIrcVBUNHROU1hIYS9NMVc5RjFCVFNN?=
+ =?utf-8?B?QWFxajN6Q2xTT3VwaUhRdHkzRjZiVlNFcDdvMFplQ0tCdlVyc1JOQUtmOXdt?=
+ =?utf-8?B?VkZmNjRndUxSZVJwSFRFOURpQTllYVVMQ2Vlb1lmRHU5TUdCdmJIQ0kxRWJm?=
+ =?utf-8?B?RFgwMTdxQVA5UndvU21RODd5Um9EUm1MNWFjcWlUWFVNZkVrRjVNamw3aXFp?=
+ =?utf-8?B?VFk4S1d3Z1cwQUgwdEdHd2I2QmJPcTRsd2J3ZGtkMVYzNGV0MkpweDRuVW45?=
+ =?utf-8?B?MHEyRVY2bHF4NkRWZ2hibGhJN0xGcmlSRzA1ZmY1NHpSVU03UHJpaWltWVBS?=
+ =?utf-8?B?TUZQclUwcThBVmFtUlp5aWxQU1UyeWhzME4vbUhLbGwzVStLaUV6cDJ2eGha?=
+ =?utf-8?B?eVpyRFlLSHhreXI3Z1o2MmxjVlBKSm80QzdocXdMMGdtNHZ2OWZNc0hqNnNj?=
+ =?utf-8?B?SE5XOTdTU0owQ1VZSkpwRUVTY1RFMzloa3pES00ybFhzMkpnc3BJYkIxZllj?=
+ =?utf-8?B?eSs2Y1k0OFlkL0RVUjFQNk1WUUNCb1hFQjhSM3daUjdITlRhRWQveUFZdCtL?=
+ =?utf-8?B?c2lGeGo2bUU4aFplTTNaL3d1SkJLK2pNdEY5UnllQ09Nakoxc25iV0VHc2Rk?=
+ =?utf-8?B?K3VHMUZTMW56TzRwNnpXUGlHVHRma0RMUytsME1YUjhIYkpsZGsyV2QwUE03?=
+ =?utf-8?B?ZElZdDEwOHFqWGR1ejltRDN2bU5HZEl3MGdRWTJ5dlZ2enRnUDAzU3pLVCtE?=
+ =?utf-8?B?cUh3SnRWWVRuOG14NXI3QytFaTlEeXVIUDlPOW5hYmxiSUpVVVJxQnFhSjl2?=
+ =?utf-8?B?THROMEVkQ0h2cWx6aDVlbGZvTlc3ZWdXVDYydW81NkRLd3MrWU1NZEpSQXFh?=
+ =?utf-8?B?NHg1cWVJMExQMDZSVUEyOW1aQlZsOEhiRXhPMEZ3L3JYbFJUMGZNN2RlMytj?=
+ =?utf-8?B?dEppdnJIbGMrREtFaEhMV3ZIK3RFWnJ0dEdZa1YvYnNOZnJqanArSVFvZUZj?=
+ =?utf-8?B?UndRYytuQTZ2V0dPdkRVZG1aMVdGalFVTnVoci9jdnhONjhTcnB1UExOZGdO?=
+ =?utf-8?Q?pVUsMDylt2j96y2mQHpBf1nMK?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a660dab-c00b-4484-ce59-08dcbe043205
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2024 15:00:41.0377
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QnzYaUZlNkQSF5RWiffIAeWoz1aVR+pGCVOkczB6n8NI2ebNrip1NBzVgmUbrYleDxiPhfR++Kr5W/AdMrXp+g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5999
 
-Willem de Bruijn wrote:
-> Martin Karsten wrote:
-> > On 2024-08-14 15:53, Samiullah Khawaja wrote:
-> > > On Tue, Aug 13, 2024 at 6:19=E2=80=AFAM Martin Karsten <mkarsten@uw=
-aterloo.ca> wrote:
-> > >>
-> > >> On 2024-08-13 00:07, Stanislav Fomichev wrote:
-> > >>> On 08/12, Martin Karsten wrote:
-> > >>>> On 2024-08-12 21:54, Stanislav Fomichev wrote:
-> > >>>>> On 08/12, Martin Karsten wrote:
-> > >>>>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
-> > >>>>>>> On 08/12, Martin Karsten wrote:
-> > >>>>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
-> > >>>>>>>>> On 08/12, Joe Damato wrote:
-> > >>>>>>>>>> Greetings:
-> > =
 
-> > [snip]
-> > =
+On 8/4/24 18:31, Jonathan Cameron wrote:
+> On Mon, 15 Jul 2024 18:28:27 +0100
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Add memdev creation from sfc driver.
+>>
+>> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
+>> creating a memdev leading to problems when obtaining cxl_memdev_state
+>> references from a CXL_DEVTYPE_DEVMEM type. This last device type is
+>> managed by a specific vendor driver and does not need same sysfs files
+>> since not userspace intervention is expected. This patch checks for the
+>> right device type in those functions using cxl_memdev_state.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Same general comment about treating failure to get things you expect
+> as proper driver probe errors.  Very unlikely we'd ever want to carry
+> on if these fail. If we do want to, that should be a high level decision
+> and the chances are the driver needs to know that the error occurred
+> so it can take some mitigating measures (using some alternative mechanisms
+> etc).
 
-> > >>>>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even fo=
-r the sake of
-> > >>>>>> an individual queue or application to make sure that IRQ suspe=
-nsion is
-> > >>>>>> enabled/disabled right away when the state of the system chang=
-es from busy
-> > >>>>>> to idle and back.
-> > >>>>>
-> > >>>>> Can we not handle everything in napi_busy_loop? If we can mark =
-some napi
-> > >>>>> contexts as "explicitly polled by userspace with a larger defer=
- timeout",
-> > >>>>> we should be able to do better compared to current NAPI_F_PREFE=
-R_BUSY_POLL
-> > >>>>> which is more like "this particular napi_poll call is user busy=
- polling".
-> > >>>>
-> > >>>> Then either the application needs to be polling all the time (wa=
-sting cpu
-> > >>>> cycles) or latencies will be determined by the timeout.
-> > > But if I understand correctly, this means that if the application
-> > > thread that is supposed
-> > > to do napi busy polling gets busy doing work on the new data/events=
- in
-> > > userspace, napi polling
-> > > will not be done until the suspend_timeout triggers? Do you dispatc=
-h
-> > > work to a separate worker
-> > > threads, in userspace, from the thread that is doing epoll_wait?
-> > =
 
-> > Yes, napi polling is suspended while the application is busy between =
+OK
 
-> > epoll_wait calls. That's where the benefits are coming from.
-> > =
 
-> > The consequences depend on the nature of the application and overall =
+Other comments below already addressed when replying to fan.
 
-> > preferences for the system. If there's a "dominant" application for a=
- =
+Thanks!
 
-> > number of queues and cores, the resulting latency for other backgroun=
-d =
 
-> > applications using the same queues might not be a problem at all.
-> > =
-
-> > One other simple mitigation is limiting the number of events that eac=
-h =
-
-> > epoll_wait call accepts. Note that this batch size also determines th=
-e =
-
-> > worst-case latency for the application in question, so there is a =
-
-> > natural incentive to keep it limited.
-> > =
-
-> > A more complex application design, like you suggest, might also be an=
- =
-
-> > option.
-> > =
-
-> > >>>> Only when switching back and forth between polling and interrupt=
-s is it
-> > >>>> possible to get low latencies across a large spectrum of offered=
- loads
-> > >>>> without burning cpu cycles at 100%.
-> > >>>
-> > >>> Ah, I see what you're saying, yes, you're right. In this case ign=
-ore my comment
-> > >>> about ep_suspend_napi_irqs/napi_resume_irqs.
-> > >>
-> > >> Thanks for probing and double-checking everything! Feedback is imp=
-ortant
-> > >> for us to properly document our proposal.
-> > >>
-> > >>> Let's see how other people feel about per-dev irq_suspend_timeout=
-. Properly
-> > >>> disabling napi during busy polling is super useful, but it would =
-still
-> > >>> be nice to plumb irq_suspend_timeout via epoll context or have it=
- set on
-> > >>> a per-napi basis imho.
-> > > I agree, this would allow each napi queue to tune itself based on
-> > > heuristics. But I think
-> > > doing it through epoll independent interface makes more sense as St=
-an
-> > > suggested earlier.
-> > =
-
-> > The question is whether to add a useful mechanism (one sysfs paramete=
-r =
-
-> > and a few lines of code) that is optional, but with demonstrable and =
-
-> > significant performance/efficiency improvements for an important clas=
-s =
-
-> > of applications - or wait for an uncertain future?
-> =
-
-> The issue is that this one little change can never be removed, as it
-> becomes ABI.
-> =
-
-> Let's get the right API from the start.
-> =
-
-> Not sure that a global variable, or sysfs as API, is the right one.
-
-Sorry per-device, not global.
-
-My main concern is that it adds yet another user tunable integer, for
-which the right value is not obvious.
-
-If the only goal is to safely reenable interrupts when the application
-stops calling epoll_wait, does this have to be user tunable?
-
-Can it be either a single good enough constant, or derived from
-another tunable, like busypoll_read.
+>> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+>> index a84fe7992c53..0abe66490ef5 100644
+>> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+>> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+>> @@ -57,10 +57,16 @@ void efx_cxl_init(struct efx_nic *efx)
+>>   	if (cxl_accel_request_resource(cxl->cxlds, true))
+>>   		pci_info(pci_dev, "CXL accel resource request failed");
+>>   
+>> -	if (!cxl_await_media_ready(cxl->cxlds))
+>> +	if (!cxl_await_media_ready(cxl->cxlds)) {
+>>   		cxl_accel_set_media_ready(cxl->cxlds);
+>> -	else
+>> +	} else {
+>>   		pci_info(pci_dev, "CXL accel media not active");
+>> +		return;
+> Once you are returning an error in this path you can just have
+> 		return -ETIMEDOUT; or similar here adn avoid
+> this code changing in this patch.
+>> +	}
+>> +
+>> +	cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
+>> +	if (IS_ERR(cxl->cxlmd))
+>> +		pci_info(pci_dev, "CXL accel memdev creation failed");
+> I'd treat this one as fatal as well.
+>
+> People argue in favor of muddling on to allow firmware upgrade etc.
+> That is fine, but pass up the errors then decide to ignore them
+> at the higher levels.
+>
+>>   }
+>>   
+>>   
+>
 
