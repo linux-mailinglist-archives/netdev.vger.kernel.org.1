@@ -1,109 +1,161 @@
-Return-Path: <netdev+bounces-119261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E2A955001
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 19:30:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE32B955006
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 19:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003EF28435B
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:30:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73D041F23FBB
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D220E1BD4E4;
-	Fri, 16 Aug 2024 17:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE622E636;
+	Fri, 16 Aug 2024 17:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+RJWxvz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RLFIc+PS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A225F4AEE5;
-	Fri, 16 Aug 2024 17:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA7728FF
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 17:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723829432; cv=none; b=KRw2s/LwsvOgWA37OBqkASQ0m7izxDHnS0+y6r9wvKGhwgXbvVfKrtmjl7MhUucIi1QRcrKR+CUjZ1VbOgcTyEtmmFTdR5rYy7bVT10zbMtt6QnsWTZ25MZkKbw2RXQQvqBe+93GcQuYKjfUQ1S5hvBfQ5w1gBbwznnHnHLLvZQ=
+	t=1723829587; cv=none; b=sMsO2j+/R5iZkF28pyg0oUlADO62m2TqUxvcrNd9Rs4nPvMLhJeD1S/Qe/kt5MWgt9oQNphCuQTJJKwt2GO7Y3oiEjp56H9EXvdghnKUWVm9cdevJqR9jdfqY6Jm1gnXYr1QNM5hjWWgAtxs0315RyTK3Vxl3k7fZiRhilq42Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723829432; c=relaxed/simple;
-	bh=JaXZdxvF0nAJddX1aXf3wtQLWu28jEQt1m9rfw8bTrw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m3F+nFLde9Au9/j2e8MQAgIBt1DHlAgyhf8KKYTvWz4nYYzuPgiCrKs+tZHWpK0ZozU4ey6CFapzyPvfpWCWTo7cImcld7BYv47pJ78hlV9xiI7j18SKzToO97A8xmvgFrfsh4Arlhr27OqkYJ67wxcQWcMWazHyhI364n5XngU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+RJWxvz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 322DBC4AF0C;
-	Fri, 16 Aug 2024 17:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723829432;
-	bh=JaXZdxvF0nAJddX1aXf3wtQLWu28jEQt1m9rfw8bTrw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q+RJWxvzYNIUt0B78tCDYLG+JfLVDTuMaT60Nchze714XISTy6z5djviY6HAhHhYT
-	 us/xc/TCoqm8CxIbu8RljRGFKKspOsI4Dm4QUkYYkSsQABM13EyWnBnl/oX7I7DGya
-	 c1WSsZmwfpY+emvoM/4CWsZbJhv5/L2y0WRMAkCRZiRKqVVNFbCTshPzVSAF9Bkmet
-	 pZHjHNFDq23cf60yJCRn7+6IjEWwh0+Y9UNyje8nAmYFspXfdGAT0xz8Pfkwxwci5y
-	 hXPPgBryNlzadAu9y1SHx8AS5frkOMgSYpdr002o9mDeXqzqtAJ3el0M2ru78lYgoW
-	 wGnEL6zBDahpA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE6B238231F8;
-	Fri, 16 Aug 2024 17:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723829587; c=relaxed/simple;
+	bh=X6eZrp9K193ViZvQXdQBdu726D8gpPnHWzwO+aspjdQ=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EfU04hR3YJ9qK2oUPD48qoiT0ggp38sBPaQPnNtXXe38o8dN0lcRaoXihO8eh5i+73lr9KbgIZxNhWZ1Ama/AuToePy2yJDj0epFiJcO8LAqTEoEy+gPSXpmMSSxJZGiYX+6A/rPwy8+zr3IyFEBl4XKFRUmddHvVOCjmTnpgzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=RLFIc+PS; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1723829587; x=1755365587;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=X6eZrp9K193ViZvQXdQBdu726D8gpPnHWzwO+aspjdQ=;
+  b=RLFIc+PSe/qALwtZgaLUKrE9wK+my1WxZSI7bSFgA6ys1dUu8VxdWqU5
+   UWrL0SX/6x011pQg04Qv7c5rpCSSIua/Gwno+In8FZbczBNyP0452INnZ
+   nbnzykBu2QIbnDVvrP24neqE1XuBPREwFy6IcPqa726eLBz/ZGWTak1ff
+   4=;
+X-IronPort-AV: E=Sophos;i="6.10,152,1719878400"; 
+   d="scan'208";a="750768862"
+Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting
+ support
+Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting support
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2024 17:33:00 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:7251]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.3.85:2525] with esmtp (Farcaster)
+ id 4375fe12-e36f-4fa9-9d32-b6797f31624a; Fri, 16 Aug 2024 17:32:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 4375fe12-e36f-4fa9-9d32-b6797f31624a
+Received: from EX19D028EUB003.ant.amazon.com (10.252.61.31) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 16 Aug 2024 17:32:57 +0000
+Received: from EX19D047EUB004.ant.amazon.com (10.252.61.5) by
+ EX19D028EUB003.ant.amazon.com (10.252.61.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 16 Aug 2024 17:32:56 +0000
+Received: from EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20]) by
+ EX19D047EUB004.ant.amazon.com ([fe80::e4ef:7b7e:20b2:9c20%3]) with mapi id
+ 15.02.1258.034; Fri, 16 Aug 2024 17:32:56 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Jakub Kicinski <kuba@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>
+CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
+ Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
+	"Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
+	<shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>, "Abboud, Osama"
+	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Beider, Ron" <rbeider@amazon.com>, "Chauskin,
+ Igor" <igorch@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Parav
+ Pandit" <parav@nvidia.com>, Cornelia Huck <cohuck@redhat.com>
+Thread-Index: AQHa7SRj5VISt7WkiEq52al7KaOO2rIlC6FwgAA/3QCAAZZYsIAAP3yAgAMGr1A=
+Date: Fri, 16 Aug 2024 17:32:56 +0000
+Message-ID: <6236150118de4e499304ba9d0a426663@amazon.com>
+References: <20240811100711.12921-1-darinzon@amazon.com>
+	<20240811100711.12921-3-darinzon@amazon.com>
+	<20240812185852.46940666@kernel.org>
+	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
+	<20240813081010.02742f87@kernel.org>
+	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
+ <20240814121145.37202722@kernel.org>
+In-Reply-To: <20240814121145.37202722@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/6]  net: dsa: microchip: ksz8795: add Wake on
- LAN support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172382943150.3583497.14805648315334646638.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Aug 2024 17:30:31 +0000
-References: <20240813142750.772781-1-vtpieter@gmail.com>
-In-Reply-To: <20240813142750.772781-1-vtpieter@gmail.com>
-To: Pieter <vtpieter@gmail.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, marex@denx.de,
- Woojung.Huh@microchip.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- pieter.van.trappen@cern.ch
 
-Hello:
+> > I've looked into the definition of the metrics under question
+> >
+> > Based on AWS documentation
+> > (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-
+> networ
+> > k-performance-ena.html)
+> >
+> > bw_in_allowance_exceeded: The number of packets queued or dropped
+> because the inbound aggregate bandwidth exceeded the maximum for the
+> instance.
+> > bw_out_allowance_exceeded: The number of packets queued or dropped
+> because the outbound aggregate bandwidth exceeded the maximum for the
+> instance.
+> >
+> > Based on the netlink spec
+> > (https://docs.kernel.org/next/networking/netlink_spec/netdev.html)
+> >
+> > rx-hw-drop-ratelimits (uint)
+> > doc: Number of the packets dropped by the device due to the received
+> packets bitrate exceeding the device rate limit.
+> > tx-hw-drop-ratelimits (uint)
+> > doc: Number of the packets dropped by the device due to the transmit
+> packets bitrate exceeding the device rate limit.
+> >
+> > The AWS metrics are counting for packets dropped or queued (delayed,
+> but are sent/received with a delay), a change in these metrics is an indi=
+cation
+> to customers to check their applications and workloads due to risk of
+> exceeding limits.
+> > There's no distinction between dropped and queued in these metrics,
+> therefore, they do not match the ratelimits in the netlink spec.
+> > In case there will be a separation of these metrics in the future to dr=
+opped
+> and queued, we'll be able to add the support for hw-drop-ratelimits.
+>=20
+> Xuan, Michael, the virtio spec calls out drops due to b/w limit being
+> exceeded, but AWS people say their NICs also count packets buffered but
+> not dropped towards a similar metric.
+>=20
+> I presume the virtio spec is supposed to cover the same use cases.
+> Have the stats been approved? Is it reasonable to extend the definition o=
+f
+> the "exceeded" stats in the virtio spec to cover what AWS specifies?
+> Looks like PR is still open:
+> https://github.com/oasis-tcs/virtio-spec/issues/180
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+How do we move forward with this patchset?
+Regarding the counter itself, even though we don't support this at the mome=
+nt, I would recommend to keep the queued and dropped
+as split (for example, add tx/rx-hw-queued-ratelimits, or something similar=
+, if that makes sense).=20
 
-On Tue, 13 Aug 2024 16:27:34 +0200 you wrote:
-> From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
-> 
-> Add WoL support for KSZ8795 family of switches. This code was tested
-> with a KSZ8794 chip.
-> 
-> Strongly based on existing KSZ9477 code which has now been moved to
-> ksz_common instead of duplicating, as proposed during the review of
-> the v1 version of this patch.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v6,1/6] dt-bindings: net: dsa: microchip: add microchip,pme-active-high flag
-    https://git.kernel.org/netdev/net-next/c/6a66873d820b
-  - [net-next,v6,2/6] net: dsa: microchip: move KSZ9477 WoL functions to ksz_common
-    https://git.kernel.org/netdev/net-next/c/f3ac6198a719
-  - [net-next,v6,3/6] net: dsa: microchip: generalize KSZ9477 WoL functions at ksz_common
-    https://git.kernel.org/netdev/net-next/c/fd250fed1f88
-  - [net-next,v6,4/6] net: dsa: microchip: add WoL support for KSZ87xx family
-    https://git.kernel.org/netdev/net-next/c/90b06ac06529
-  - [net-next,v6,5/6] net: dsa: microchip: fix KSZ87xx family structure wrt the datasheet
-    https://git.kernel.org/netdev/net-next/c/0d3edc90c4a0
-  - [net-next,v6,6/6] net: dsa: microchip: fix tag_ksz egress mask for KSZ8795 family
-    https://git.kernel.org/netdev/net-next/c/6f2b72c04d58
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks
+David
 
