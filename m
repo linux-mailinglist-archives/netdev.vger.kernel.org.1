@@ -1,264 +1,158 @@
-Return-Path: <netdev+bounces-119213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5FF2954C58
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:27:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A230B954C5F
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55E8A1F255BE
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:27:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5E71C21B4B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290321A3BC0;
-	Fri, 16 Aug 2024 14:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9351B86F5;
+	Fri, 16 Aug 2024 14:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2MT2ZLB"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oAgzcDBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8131C1E520;
-	Fri, 16 Aug 2024 14:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47BF2BB0D;
+	Fri, 16 Aug 2024 14:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723818457; cv=none; b=cxUHuq4HGN588V511rJO8XGjrEJEvxipFzjOD5+mKAUWS4hXcupl+aVFaY72jrIqduespZub4ocqISqi4PKzX351Ie020yMng2i6rZ6pPl7PFfWO/KLqj4EUGDsuo9dXCSmrHVkug2KIGgeQFNnzEoxreZETzXHadOrLdma3Fhk=
+	t=1723818650; cv=none; b=JatDIXWg05mvkhjmTJjH8MOR+cosc1gwZnivEhBFNTl4G8OVzB/1sCBb+yBVSvwIIcqF0x2ZuSqF6OfQOgTENrJxM15uCspPURNYPfbJL4AW+Zsyh10iuiilj104zKe85PflC3znyG2EdqfOF88DCdUiJ0/uWOkmPArcOsxRl4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723818457; c=relaxed/simple;
-	bh=epUQhCUoZJomPlLyNhHI2k19KhOtsav0prihszzKOeI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=o8CcbOJ3+bZ72XYB4j7fMj9t/PTEj2xQS0jLqqbFXHnTNH9b2jYLNICdU/fNHowVtz14qa0aNeLUOApe5EsT0pflT8LWA2bhI17i6MNWKv4qY9vayGeEmEcUDdQ8sBlpllX0HGvH1UjfuZY0AYf5HKz8MqnX3cFo5ztondDC+9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X2MT2ZLB; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-65fe1239f12so20325307b3.0;
-        Fri, 16 Aug 2024 07:27:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723818454; x=1724423254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=epUQhCUoZJomPlLyNhHI2k19KhOtsav0prihszzKOeI=;
-        b=X2MT2ZLBKj1f0vC5LYVbMoO1+rJt1XwoFuVNSuPjiHq1Byxczh7X3x21BMYtJy4hCw
-         OB4MzYSbuwUnurhV7mMqK2Gq58FFW5G/pvpirNX65c3IvlMHdEwWHgRFhA+vM45id9Gf
-         c/+JF4yL2zHyhp+9XQW11irk+wa14w2bAZGuJuCguuJ16YJVqBvli8evZSVROr2OAtJ0
-         ixJNLtR57TDoKl6k+HiDuXYMuPiXEz9FXdtQBjTFR8hzSY4RoFkd3TmBvmmcYN2HriAL
-         ecmiPMwVlCjtluGfXaSFhKckZ7Do7Bz7XVEzGCjHnL3QKOuxXhkTkSg1JyIfT7P/uIQZ
-         rwcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723818454; x=1724423254;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=epUQhCUoZJomPlLyNhHI2k19KhOtsav0prihszzKOeI=;
-        b=VBSGAIlqi8tt6FmSDq8AfNgGtGq8UhfcjJ0d/iWwhbAR3j/4PmkIbmskJCak+vsvNb
-         +iKAAMFI4WKK9Us5oELtZQX9/eMDlw48sfT6rzPIR7ZPn5IoiqAyrHiY156CjWHOTo5A
-         ASJsC/xgBbUhqF190umCaQFfGQTBXpLeNF4emBq2NZrTodtj+bJpzhnUuzI6Vxn7Xl9K
-         wJzTHHo7qqiqtGLd9ANrldVdwEkJF08UksRIZAe73sngG/nohovi3SbHvpqmCtnbhzbj
-         zI++BlBFCQIxwxhBKt1lLJecMKGJlCr/1sSAMIU6bRE7gOZFZyagJVPoINJ/RKjMq9Q3
-         UpEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaiEvhEhLgGyRjxH48UCAwXgNm5y/yyU1CvEo7SupMoVveZLh4TafJDBNxHjIP5JbWiJ5GXMi+EPmHzI7zLRMbSlhBQjmSkHJvYd0hFM/FhfuZZ65Fm+NiiNhtegSczvEWjFnMaPDbJjHry1v3P8iMXPsHMVII/sqVkraPzqkWuOkqRofZQ3lJ0j2fC1e0SR7MkqY6PG6F3RPSQ3Msng==
-X-Gm-Message-State: AOJu0Yz13DGD0CEG02UiZVOnn09+9wyBUdC4ti6RGfxZxlbJvVfpF15U
-	1yaM1hrIHXZjREll7NdMXIVdrzNpS9wUfNuEUElfPEbsWs5voFxQ
-X-Google-Smtp-Source: AGHT+IGt/dJGWf0EDGxWM6ryJxB8oHTyXH4vDL8ur9dEAQcu5rwOL7x8XtvPchwmTEGKORnNrV19DQ==
-X-Received: by 2002:a05:690c:2f0b:b0:61b:3364:d193 with SMTP id 00721157ae682-6b1bb570dd9mr28289787b3.40.1723818454218;
-        Fri, 16 Aug 2024 07:27:34 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe06fd4sm18000986d6.43.2024.08.16.07.27.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 07:27:33 -0700 (PDT)
-Date: Fri, 16 Aug 2024 10:27:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin Karsten <mkarsten@uwaterloo.ca>, 
- Samiullah Khawaja <skhawaja@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, 
- netdev@vger.kernel.org, 
- Joe Damato <jdamato@fastly.com>, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Breno Leitao <leitao@debian.org>, 
- Christian Brauner <brauner@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jan Kara <jack@suse.cz>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Johannes Berg <johannes.berg@intel.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
- "open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, 
- open list <linux-kernel@vger.kernel.org>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Message-ID: <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
-In-Reply-To: <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
-References: <20240812125717.413108-1-jdamato@fastly.com>
- <ZrpuWMoXHxzPvvhL@mini-arch>
- <2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
- <ZrqU3kYgL4-OI-qj@mini-arch>
- <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
- <Zrq8zCy1-mfArXka@mini-arch>
- <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
- <Zrrb8xkdIbhS7F58@mini-arch>
- <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
- <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
- <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+	s=arc-20240116; t=1723818650; c=relaxed/simple;
+	bh=okqa08d3NtplnUtcUNsK/7qdSLfF0QhpEZkh/WIk5OQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AkOtw0KZ17cuhQxufq3Z0xhJsHvI3djFtzEfXA4+9R0Js/KS9AABSjcpE631LxvoQ1FBMqpmmJFKzVwZJuHbEHqZepRcvxNF0jZFpXApZqVA38W8I9O2bTFyrFw9Vuv81/DY7kngui2QENgpl6SgVZa3fYOJ6A11bSrvn8bBxD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oAgzcDBk; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47GA37iQ018931;
+	Fri, 16 Aug 2024 14:30:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ySmGx9Vjqb+jCe6jKNHQOd/iD3jo8brjdUCvlYIe8t4=; b=oAgzcDBkGYLECNsP
+	nZJzgPMJ9llY3CeB6RZaBPofHTXhlpD2en4QmwOh1xfDcJmvHlE37sKWm7Cgmt1Y
+	ory+T6Kb9cSf8cFM3+iM+aQD9mGvoe6iu3zbdISWmSu/T0qW5unpM59/PmQ6mIQ6
+	Yr7vsVRDISG3f/4/jKi2a8whzA5KiFxEKCAz9irXsdEUihjflMjdBukoJRHpUJ3U
+	moWdG5RgyffzEUyBYKu7ZJW2QMTv3qQAu9K5EcdhKX5OLEr9eYA2gS5LsgDcXO+6
+	5KAjFvalMh5QFtfYxZ02hkdcvd5wk+ZTubYUKEhjsijtTVHQg8pp0hRjXuFoE1cN
+	VGVmfQ==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 411rvra4y6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 14:30:27 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47GEUPkE025479
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 14:30:25 GMT
+Received: from [10.111.179.45] (10.49.16.6) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 16 Aug
+ 2024 07:30:24 -0700
+Message-ID: <229bcc37-de76-40ea-a30a-14e54a73265d@quicinc.com>
+Date: Fri, 16 Aug 2024 07:30:23 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: mac80211: Fix ieee80211_convert_to_unicast() logic
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+        "Johannes
+ Berg" <johannes@sipsolutions.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Paolo
+ Abeni" <pabeni@redhat.com>,
+        Michael Braun <michael-dev@fami-braun.de>
+CC: Harsh Kumar Bijlani <hbijlani@qti.qualcomm.com>,
+        Kalyan Tallapragada
+	<ktallapr@qti.qualcomm.com>,
+        Jyothi Chukkapalli <jchukkap@qti.qualcomm.com>,
+        Anirban Sirkhell <anirban@qti.qualcomm.com>,
+        Johannes Berg
+	<johannes.berg@intel.com>,
+        <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <ath12k@lists.infradead.org>
+References: <20240815-ieee80211_convert_to_unicast-v1-1-648f0c195474@quicinc.com>
+ <877ccgd7re.fsf@toke.dk>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <877ccgd7re.fsf@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: oX_0gPwsd6f-dAdRGHMLir2hI64zJ9fy
+X-Proofpoint-ORIG-GUID: oX_0gPwsd6f-dAdRGHMLir2hI64zJ9fy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-16_08,2024-08-16_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 malwarescore=0 spamscore=0 phishscore=0
+ mlxlogscore=999 priorityscore=1501 clxscore=1011 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408160105
 
-Martin Karsten wrote:
-> On 2024-08-14 15:53, Samiullah Khawaja wrote:
-> > On Tue, Aug 13, 2024 at 6:19=E2=80=AFAM Martin Karsten <mkarsten@uwat=
-erloo.ca> wrote:
-> >>
-> >> On 2024-08-13 00:07, Stanislav Fomichev wrote:
-> >>> On 08/12, Martin Karsten wrote:
-> >>>> On 2024-08-12 21:54, Stanislav Fomichev wrote:
-> >>>>> On 08/12, Martin Karsten wrote:
-> >>>>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
-> >>>>>>> On 08/12, Martin Karsten wrote:
-> >>>>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
-> >>>>>>>>> On 08/12, Joe Damato wrote:
-> >>>>>>>>>> Greetings:
-> =
+On 8/16/2024 4:31 AM, Toke Høiland-Jørgensen wrote:
+> Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+> 
+>> The current logic in ieee80211_convert_to_unicast() uses skb_clone()
+>> to obtain an skb for each individual destination of a multicast
+>> frame, and then updates the destination address in the cloned skb's
+>> data buffer before placing that skb on the provided queue.
+>>
+>> This logic is flawed since skb_clone() shares the same data buffer
+>> with the original and the cloned skb, and hence each time the
+>> destination address is updated, it overwrites the previous destination
+>> address in this shared buffer. As a result, due to the special handing
+>> of the first valid destination, all of the skbs will eventually be
+>> sent to that first destination.
+> 
+> Did you actually observe this happen in practice? ieee80211_change_da()
+> does an skb_ensure_writable() check on the Ethernet header before
+> writing it, so AFAICT it does not, in fact, overwrite the data of the
+> original frame.
 
-> [snip]
-> =
+I'm proxying this change for our internal team, and they have observed that
+unicast frames are not being sent to the separate STAs.
 
-> >>>>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for =
-the sake of
-> >>>>>> an individual queue or application to make sure that IRQ suspens=
-ion is
-> >>>>>> enabled/disabled right away when the state of the system changes=
- from busy
-> >>>>>> to idle and back.
-> >>>>>
-> >>>>> Can we not handle everything in napi_busy_loop? If we can mark so=
-me napi
-> >>>>> contexts as "explicitly polled by userspace with a larger defer t=
-imeout",
-> >>>>> we should be able to do better compared to current NAPI_F_PREFER_=
-BUSY_POLL
-> >>>>> which is more like "this particular napi_poll call is user busy p=
-olling".
-> >>>>
-> >>>> Then either the application needs to be polling all the time (wast=
-ing cpu
-> >>>> cycles) or latencies will be determined by the timeout.
-> > But if I understand correctly, this means that if the application
-> > thread that is supposed
-> > to do napi busy polling gets busy doing work on the new data/events i=
-n
-> > userspace, napi polling
-> > will not be done until the suspend_timeout triggers? Do you dispatch
-> > work to a separate worker
-> > threads, in userspace, from the thread that is doing epoll_wait?
-> =
+In response to your reply I went through the code again and it seems the
+manner in which this functionality fails isn't as it was described to me.
 
-> Yes, napi polling is suspended while the application is busy between =
+Instead this functionality fails because we'd fail on the first
+ieee80211_change_da() call and hence goto multicast and where only the
+original skb would be queued and transmitted as a multicast frame
 
-> epoll_wait calls. That's where the benefits are coming from.
-> =
+So the original logic is still faulty, only the actual faulty behavior is not
+being described correctly: instead of sending multiple unicast frames to the
+same STA we'd send a single multicast frame.
 
-> The consequences depend on the nature of the application and overall =
+>> Fix this issue by using skb_copy() instead of skb_clone(). This will
+>> result in a duplicate data buffer being allocated for each
+>> destination, and hence each skb will be transmitted to the proper
+>> destination.
+> 
+> Cf the above, it seems this change will just lead to more needless
+> copying.
 
-> preferences for the system. If there's a "dominant" application for a =
+What other way is there to implement this multicast to unicast functionality?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ebceec860fc370b2f4c23e95c51daa932e047913
 
-> number of queues and cores, the resulting latency for other background =
+All of this logic exists to support that feature.
 
-> applications using the same queues might not be a problem at all.
-> =
+Also note MLO multicast uses the skb_copy() methodology as well.
 
-> One other simple mitigation is limiting the number of events that each =
-
-> epoll_wait call accepts. Note that this batch size also determines the =
-
-> worst-case latency for the application in question, so there is a =
-
-> natural incentive to keep it limited.
-> =
-
-> A more complex application design, like you suggest, might also be an =
-
-> option.
-> =
-
-> >>>> Only when switching back and forth between polling and interrupts =
-is it
-> >>>> possible to get low latencies across a large spectrum of offered l=
-oads
-> >>>> without burning cpu cycles at 100%.
-> >>>
-> >>> Ah, I see what you're saying, yes, you're right. In this case ignor=
-e my comment
-> >>> about ep_suspend_napi_irqs/napi_resume_irqs.
-> >>
-> >> Thanks for probing and double-checking everything! Feedback is impor=
-tant
-> >> for us to properly document our proposal.
-> >>
-> >>> Let's see how other people feel about per-dev irq_suspend_timeout. =
-Properly
-> >>> disabling napi during busy polling is super useful, but it would st=
-ill
-> >>> be nice to plumb irq_suspend_timeout via epoll context or have it s=
-et on
-> >>> a per-napi basis imho.
-> > I agree, this would allow each napi queue to tune itself based on
-> > heuristics. But I think
-> > doing it through epoll independent interface makes more sense as Stan=
-
-> > suggested earlier.
-> =
-
-> The question is whether to add a useful mechanism (one sysfs parameter =
-
-> and a few lines of code) that is optional, but with demonstrable and =
-
-> significant performance/efficiency improvements for an important class =
-
-> of applications - or wait for an uncertain future?
-
-The issue is that this one little change can never be removed, as it
-becomes ABI.
-
-Let's get the right API from the start.
-
-Not sure that a global variable, or sysfs as API, is the right one.
- =
-
-> Note that adding our mechanism in no way precludes switching the contro=
-l =
-
-> parameters from per-device to per-napi as Joe alluded to earlier. In =
-
-> fact, it increases the incentive for doing so.
-> =
-
-> After working on this for quite a while, I am skeptical that anything =
-
-> fundamentally different could be done without re-architecting the entir=
-e =
-
-> napi control flow.
-> =
-
-> Thanks,
-> Martin
-> =
-
-
-
+/jeff
 
