@@ -1,83 +1,115 @@
-Return-Path: <netdev+bounces-119274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7B995508B
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4587C955090
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 301991F22E47
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:09:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFCB81F22A9C
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBC21C378C;
-	Fri, 16 Aug 2024 18:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E041C37A0;
+	Fri, 16 Aug 2024 18:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4voLZmR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w8udlA3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087681482F4;
-	Fri, 16 Aug 2024 18:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ED31C2326
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723831773; cv=none; b=Ot3cYLOBwBBEBOpTx+DCHvyhl8tatUbYxkaIBPl6HrsUMMgRI2ZGheVKAfODvP78adwh4vl6LjzzVW/pimU2TqfPCdBPfgDwz7MstYaBKysBFeFH5/+cibSW6/15UpH0NCP5ynF82O4Nn3b6SWdZ60pcjrtH2RkMrDEr9iZgs0c=
+	t=1723831836; cv=none; b=Cw16gkPlJc56xZ7hyPfZkc2GsKojlzrljnnC981j1pkLyXJyPstywfT9ZSlgeD+nGcsh+IHs3q9Df6WceGp43at+b2tOMJF4BYOAAGTZlxAwhtWgRQNMUy3j4g4Pziays2EwED0tijP8ozgL27tvT7HyTphVOUJX4XBcAtDRcEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723831773; c=relaxed/simple;
-	bh=2pwdYzQ2ojaf94uUSc3VfR/126ez82e5gZxfj8e+7BA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DIsHIdKwSrWuXfQZvJiwdE34oVT3gu5eISisLDXpNOOw2pW3kt9Uj/gDi3rP6WeV5WMx1T0Feiis1aJ7pIXvqXw2N+q5FGfdYTZZ/YhWNrwkX6S9sr0L7y4AM2pevwKp2aHToULuNTfY8QSbavG2cRQ2pNi+m+hOYWezNfvbZy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4voLZmR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2F8C4AF0E;
-	Fri, 16 Aug 2024 18:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723831771;
-	bh=2pwdYzQ2ojaf94uUSc3VfR/126ez82e5gZxfj8e+7BA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C4voLZmRQ5Wf7Hx+7sGeKAABNuyIbLbewF/VAV0+W+YSxA8X4e8A62Lo4Myd2tkCp
-	 qS4TMHCH0Bs0gG+Ra4ABe5l7fK8XozXgNK1T31AqzAJ3AYTCbD7LdXBS9SV1JvBI8o
-	 PWU+/tMTo2HqIV+CSEKqlm7w2NIDN+EBBRbFsG908yoOb1J4YosA7yRRM/pU+nYInN
-	 dFkUU4GFP4JRAO4NsgO68P8OEJgeaCd1L0ggEN+q0zYv7I8R8ygoWeiAth2rEA3hx7
-	 dM4yTPHqN9DD8IPgCT2iHNmU0jore++z0+JkyyXdQ47IWeq80GkFgAXMrb4MxB7SKS
-	 6WgQBHYw6atmg==
-Date: Fri, 16 Aug 2024 11:09:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: ende.tan@starfivetech.com
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, leyfoon.tan@starfivetech.com,
- minda.chen@starfivetech.com, endeneer@gmail.com
-Subject: Re: [net-next,v1,1/1] net: stmmac: Introduce set_rx_ic() for
- enabling RX interrupt-on-completion
-Message-ID: <20240816110928.1a75d223@kernel.org>
-In-Reply-To: <20240814092438.3129-1-ende.tan@starfivetech.com>
-References: <20240814092438.3129-1-ende.tan@starfivetech.com>
+	s=arc-20240116; t=1723831836; c=relaxed/simple;
+	bh=xHQoPuqd+D9OllJ85LC8A6kuHS0jVMOrx5MVSJ99RK0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=r4cBlL4rEXsuDeivYY8gEnYukvTeKc/yePeDdbleU/vQHaNn88DHhEMeeyvOz0G+DUW7ujULW0kOy284h44eWDQdZdfFDuyrkY82hX1wySePmB+tMWpgyxF7htlyNLTkmI8z/k+mvY9ak5NNMh4VBi7xDaVM1DsAvXf+9DKHp5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w8udlA3U; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-79028eac001so2289158a12.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:10:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723831834; x=1724436634; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LKLhc9rN0MWqFTzo18sKWvguSCEcuhqaVkCHFGI4wZg=;
+        b=w8udlA3ULp5tWe6SGZmCUaSiCpmZTliz/JYbXR1G93R4/wBxSOHGxe7M+lXRHAdBf6
+         g0IE6tmr2tJ1yQ2EKPOGAeiZ0HqnGkNP0gj7beeQqR5HSpb4JZR9XJ8V8rX+btNh24Ke
+         hloKUv8zxJeb+EpEb9Gh4auD36pgEVY72MY73dFYOHY61Xvkcjp8CoC1Fo60ocIOcBCG
+         gTr22uTVA5XG3BikPNWleefD3XlOglH7UHp8jqCN3son1Koia/1ATOQjCf/Hg11KXd7m
+         gfEgc2VTBYDghAmulz29Ug7WMOmstGWjxIGV3Lpt+o10oooJpSFneWK/x8m4q/z/tt5O
+         /ORA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723831834; x=1724436634;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LKLhc9rN0MWqFTzo18sKWvguSCEcuhqaVkCHFGI4wZg=;
+        b=L5prLpTHUkvRVD9qfJJVfYhIbKgCbRgrvDmINWT+0TzCU0E18GaUKOVPL1Q3kdUnGy
+         JzNYdEYj3mlxvT79IexB0P3JRu0H5YAntE3RCC7HxxQv2pvHw5orzKB5uoS9lYs7Ar6v
+         Uq0Q7wMit+8fM7tmIsipExa9spsIX+Qb7Q2iuhpJMywoiXZs3FjhyYMfpZyMnf3AoD0D
+         QsSztKJ2PmKS5B8dyR94lexTef7rg4WGU6D8eXxR4h58Tk6o0fS2s+Q+3Q7BW+b34Kol
+         q+QUipOuSrg8hT2+ljCnt8qNv2+N5GI8hf5KDj/zql5FlDFkWy2SY5VWk5r1gLhcrsU4
+         wsvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFipSLAvLmwsiAWesL1c/ez/rGRvx5x++LkmHtD+eGwWWLQVhzu0JKjpKUFG0mf8qhnHOOJkbcM+TyzImKVsiJLvEkuA3D
+X-Gm-Message-State: AOJu0YzUHzup8GmAgPBhQwJNHZzmzokXu0t+zszzTmK2Tdszf+u3T/Ys
+	IvyWc7l8KPpampWKMJY+LhggviAK0ij28TqyYmTXzZJ5ZkevJ4Zk/Op9s18p2ddgaAiQPTeRR2s
+	n7A==
+X-Google-Smtp-Source: AGHT+IETDCf7j3tWXi0l8Zbb8sKAD0O6am89PjJGOYdyX0iluckeLErw8vyRXlL+vHPvSkgy+0M3cMXJJsI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:622:b0:7c6:b68e:de7e with SMTP id
+ 41be03b00d2f7-7c97ad6bbd0mr6141a12.6.1723831834162; Fri, 16 Aug 2024 11:10:34
+ -0700 (PDT)
+Date: Fri, 16 Aug 2024 11:10:32 -0700
+In-Reply-To: <000000000000fd6343061fd0d012@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <Zr-VGSRrn0PDafoF@google.com> <000000000000fd6343061fd0d012@google.com>
+Message-ID: <Zr-WGJtLd3eAJTTW@google.com>
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] INFO: task hung in __vhost_worker_flush
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com>
+Cc: eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 14 Aug 2024 17:24:38 +0800 ende.tan@starfivetech.com wrote:
-> From: Tan En De <ende.tan@starfivetech.com>
+On Fri, Aug 16, 2024, syzbot wrote:
+> > On Wed, May 29, 2024, syzbot wrote:
+> >> Hello,
+> >> 
+> >> syzbot found the following issue on:
+> >> 
+> >> HEAD commit:    9b62e02e6336 Merge tag 'mm-hotfixes-stable-2024-05-25-09-1..
+> >> git tree:       upstream
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=16cb0eec980000
+> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3e73beba72b96506
+> >> dashboard link: https://syzkaller.appspot.com/bug?extid=7f3bbe59e8dd2328a990
+> >> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> >> 
+> >> Unfortunately, I don't have any reproducer for this issue yet.
+> >> 
+> >> Downloadable assets:
+> >> disk image: https://storage.googleapis.com/syzbot-assets/61b507f6e56c/disk-9b62e02e.raw.xz
+> >> vmlinux: https://storage.googleapis.com/syzbot-assets/6991f1313243/vmlinux-9b62e02e.xz
+> >> kernel image: https://storage.googleapis.com/syzbot-assets/65f88b96d046/bzImage-9b62e02e.xz
+> >> 
+> >> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> >> Reported-by: syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com
+> >
+> > #syz unset kvm
 > 
-> Currently, some set_rx_owner() callbacks set interrupt-on-completion bit
-> in addition to OWN bit, without inserting a dma_wmb() barrier. This
-> might cause missed interrupt if the DMA sees the OWN bit before the
-> interrupt-on-completion bit is set.
-> 
-> Thus, let's introduce set_rx_ic() for enabling interrupt-on-completion,
-> and call it before dma_wmb() and set_rx_owner() in the main driver,
-> ensuring proper ordering and preventing missed interrupt.
+> The following labels did not exist: kvm
 
-Having multiple indirect function calls to write a single descriptor 
-is really not great. Looks like it's always bit 31, can't this be coded
-up as common handler which sets bit 31 in the appropriate word (word
-offset specified per platform)?
+Hrm, looks like there's no unset for a single subsytem, so:
+
+#syz set subsystems: net,virt
 
