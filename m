@@ -1,73 +1,79 @@
-Return-Path: <netdev+bounces-119135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A4A954495
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 10:37:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D1A9544E2
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 10:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E84951F27D72
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 08:37:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66A48B210C1
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 08:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67CA12E1E9;
-	Fri, 16 Aug 2024 08:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9406713B286;
+	Fri, 16 Aug 2024 08:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="hpKx1L0l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvLM91NB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD121D69E
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 08:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186D320E3
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 08:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723797469; cv=none; b=ebtcfQVY/7qT6Pn6Ymnnl2A0w7eovQCmTaVv52eTGnX29SOJGX+xi7G+I0G4VIgzZE/eWnz7wddKLI4a8JwDHEcSeUcGuYKSwWQ0+IWwOHbNTNQuWoZfYWovu6awF16+rlwCMfiKgOI5NkaVhWY8Qpbn1py4eqBpSeCVwHyoZf4=
+	t=1723798387; cv=none; b=Er2kOPetE1To/wWTYCW0xaIBTf0KGYuqXEDzjaX7KY7A8dVt3uL+xqUlOmiX/Hjh6fF+C5W/SGTqdPt2lgqCqKhnLMtlaXL9lMIohrM5jLvQ/BN7mIRYwIOxamc3rCd0TVho43laK0dj5lVZZWTkRwYuq+GccIz7K4BQhAbjIuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723797469; c=relaxed/simple;
-	bh=ZUz2iYHqvrn/cYuUYnR5+uUUQuLflOpWkqyDGbWD3qk=;
+	s=arc-20240116; t=1723798387; c=relaxed/simple;
+	bh=C3ob2MWZ3738p2ZEM60khYNON0etiXA/vFERvLF5kZA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KgzT9Jd7bNKTpCPSQTztb/ck7q6xmmW+YNhrE9vyryqn1ifYwDGSXJxMK9Kjndo1KVMg7WJxkAND0UiE+oPkfWJH75cpbVTylel06/tYw2RdhOD66evvSGFzH7XLntAOy0ZufRYvlGCbkkIAYOBplojgc+lbfjD2bYdBxoYJTJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=hpKx1L0l; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5bec4fc82b0so2033283a12.1
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 01:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723797466; x=1724402266; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=okRaO2NjndrnhHpvoryAQJD7oMur192dhTfSj5AVPe8=;
-        b=hpKx1L0lWu6EytY1EPJov7Qm0dF5oHAFxEazrhsP7BZ3FLYh3nI1FrhL4tAuB+zYD5
-         lKsp30d33/WK2IzM2sHueOWx1zfpzJYrri023qLKZ/ZMD7PxRoA3CXswKz0WyULPMWWN
-         CjPdq5zrTA/e0pYKl1u0TJqDbPMaHLwjsZDiT19pISviej4K9/i077iPOvHrCeuiMVgu
-         39PfZs3NEPBo7fmRjwdiKQHo4s0jRDB5LafiBPx1giRdCaffEh6+BTQtM9zjlhM+on/H
-         Qh753m4bsbf/IQxThX+ki1UBPckjJ0Osz1omM8qMHUexn+nyR4FJKykkhLBVOFLD17Dp
-         0qmw==
+	 In-Reply-To:Content-Type; b=urzxqxySj//h/pB/Fz71vOnvAH/L91JVfIdHwh50DUltAdeO2pZSwvS4QWB11fGSI2UFGgk5pHPPf0599jLwYYGoAiOrNctMceb++AUU0y49W5NT/SBhojZsFN4zP/TJFG0V/KTAfbZQV+yaPAYs3uAka+GsMv6g35YWL4apUIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MvLM91NB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723798385;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pV+HA2ofcxI3jpsz2oHleqpP+QHPiwJOmoe0od4xFQY=;
+	b=MvLM91NBm6rUehIPZ8MDOs8HW9lrSMXTqlJGoZHUvmibKhFI71T00ubWHL+iLjOdZHMGaJ
+	MKuPkvI82SX36W/2khv/v8A9lJa0qvIjwZTZOu1K3rNT6GQUxHdbrrAQM7QB8u1zksE8d2
+	oJeqf1wBzIz/ABwW4yWwSIFi/41D/0k=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-416-DvCHMjtsOQecIaXVXeEkBg-1; Fri, 16 Aug 2024 04:53:02 -0400
+X-MC-Unique: DvCHMjtsOQecIaXVXeEkBg-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52eff9a3109so321950e87.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 01:53:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723797466; x=1724402266;
+        d=1e100.net; s=20230601; t=1723798381; x=1724403181;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=okRaO2NjndrnhHpvoryAQJD7oMur192dhTfSj5AVPe8=;
-        b=tWCEcN0MZqyn7mS0WgMYAji/KwnDBLODjJhR3mAXapdGOBC1yoHarjyRH0bdZJerQD
-         F0dybrQBCLbmVI+5B89KoiznTjW3OGixAFb4bvxCP2ga2w6M1AvGEc8+7NOhKC7eNYzx
-         kB91JwL2BNGFSrhBvg+GUfeSaZzh8UBraU1rqIJaAvFR9ey92mZtpWn4R/vYk/ft7l9n
-         5Bd1A1OA2YzUziszxN838hbdH3bMLSTivYM3t55w30006F9CFopgOwe/AYlTwriJ6w0v
-         mB98GcKqWpZSghxECd8x1pitKJE4CCTQjwWZs1kXsbw9FmpQD2EgrE09uRyRvnjNAxFW
-         lQLg==
-X-Gm-Message-State: AOJu0YzDlVq04d1emJxhSRKoGxnUL4Qae7eIwnPbdC/pGOnpENNTCdGe
-	VZXoqkT0K+TFsMYttiqb5dyeJaDOvceNIbqaW7po9SqTfSkf0o7PS7Bba79erBE=
-X-Google-Smtp-Source: AGHT+IF26iEZolzdLpUFhd2gCBXE7C+mJuNCGkv8MGQMrxemlq2genccuvMjA0jgsuRvIQs/3YGlfA==
-X-Received: by 2002:a17:907:6d2a:b0:a72:5967:b34 with SMTP id a640c23a62f3a-a8394f7e0b9mr170559766b.22.1723797466029;
-        Fri, 16 Aug 2024 01:37:46 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383934508sm223985966b.101.2024.08.16.01.37.44
+        bh=pV+HA2ofcxI3jpsz2oHleqpP+QHPiwJOmoe0od4xFQY=;
+        b=F18AWLZwBuplObvXK4ugG1DXNp+in0RgsbVM5hNLpK7YNsqdUgovanOVLW++xcu+vq
+         TIaBQa3PHwQdl9sWULc3zIlTKli1mVuWO19qwoA1W6R97Ty35hgHc0zHo2ydxWNgCthL
+         fvrSFIU1UqVsEZ8ssAm86eh3Zal5Wb5lMvd2dc/+Zsn6zdWwoXgflUL5yBA61fGJhizG
+         Jpp7M7UQlSsA8vWAx8PxU5M4jxmLLOpiKj4aEAlAoDED+Te87+BgmPZAJ2K1Y38IBulN
+         ypY3wVXRJvhv0a6HZjihIbZ/EaKx0cAEpZQmLjCFpZCtWkZ4eBeuauiPlBO0xuaZkTBW
+         qw4g==
+X-Gm-Message-State: AOJu0Yw+MhrbrIrLSmi7X0RLUmPNdbP6UFUsaxyQzgSWJ4EZaFePGf3/
+	oT0v12ALxmGdua2eDw7ldMqdc/EXeI5Lav0r2a0L+/4kjnynOq49qfasYwdnKtLNcvd5a/L7Np2
+	p1EkR3mlV8EXrJoV+/h6WFBybAH//DWsxPzjTsAbhV0gmoQgiQwd8dQ==
+X-Received: by 2002:a05:651c:1504:b0:2f1:75f4:a6c1 with SMTP id 38308e7fff4ca-2f3be6f3727mr7600191fa.3.1723798381275;
+        Fri, 16 Aug 2024 01:53:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHfKWc5gCqwJR+Egk5e1EC7+Q0IY/RDRYX5FnDjfICzI4B4EKBcIPSrGtaZ1osMwWsCPW7Gng==
+X-Received: by 2002:a05:651c:1504:b0:2f1:75f4:a6c1 with SMTP id 38308e7fff4ca-2f3be6f3727mr7600031fa.3.1723798380668;
+        Fri, 16 Aug 2024 01:53:00 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1711:4010::f71? ([2a0d:3344:1711:4010::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898497f0sm3156763f8f.39.2024.08.16.01.52.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 01:37:45 -0700 (PDT)
-Message-ID: <13fecb7a-c88a-4f94-b076-b81631175f7f@blackwall.org>
-Date: Fri, 16 Aug 2024 11:37:44 +0300
+        Fri, 16 Aug 2024 01:53:00 -0700 (PDT)
+Message-ID: <f320213f-7b1a-4a7b-9e0c-94168ca187db@redhat.com>
+Date: Fri, 16 Aug 2024 10:52:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,59 +81,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] Bonding: support new xfrm state offload
- functions
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <20240816035518.203704-1-liuhangbin@gmail.com>
- <334c87f5-cec8-46b5-a4d4-72b2165726d9@blackwall.org>
- <Zr8Ouho0gi_oKIBu@Laptop-X1>
+Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <7ed5d9b312ccda58c3400c7ba78bca8e5f8ea853.1722357745.git.pabeni@redhat.com>
+ <ZquQyd6OTh8Hytql@nanopsycho.orion>
+ <b75dfc17-303a-4b91-bd16-5580feefe177@redhat.com>
+ <ZrxsvRzijiSv0Ji8@nanopsycho.orion>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <Zr8Ouho0gi_oKIBu@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZrxsvRzijiSv0Ji8@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/08/2024 11:32, Hangbin Liu wrote:
-> On Fri, Aug 16, 2024 at 09:06:12AM +0300, Nikolay Aleksandrov wrote:
->> On 16/08/2024 06:55, Hangbin Liu wrote:
->>> I planned to add the new XFRM state offload functions after Jianbo's
->>> patchset [1], but it seems that may take some time. Therefore, I am
->>> posting these two patches to net-next now, as our users are waiting for
->>> this functionality. If Jianbo's patch is applied first, I can update these
->>> patches accordingly.
+On 8/14/24 10:37, Jiri Pirko wrote:
+> Tue, Aug 13, 2024 at 05:17:12PM CEST, pabeni@redhat.com wrote:
+>> On 8/1/24 15:42, Jiri Pirko wrote:
+>> [...]
+>>>> int net_shaper_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
+>>>> {
+>>>> -	return -EOPNOTSUPP;
+>>>> +	struct net_shaper_info *shaper;
+>>>> +	struct net_device *dev;
+>>>> +	struct sk_buff *msg;
+>>>> +	u32 handle;
+>>>> +	int ret;
+>>>> +
+>>>> +	ret = fetch_dev(info, &dev);
 >>>
->>> [1] https://lore.kernel.org/netdev/20240815142103.2253886-2-tariqt@nvidia.com
->>>
->>> Hangbin Liu (2):
->>>   bonding: Add ESN support to IPSec HW offload
->>>   bonding: support xfrm state update
->>>
->>>  drivers/net/bonding/bond_main.c | 76 +++++++++++++++++++++++++++++++++
->>>  1 file changed, 76 insertions(+)
->>>
+>>> This is quite net_device centric. Devlink rate shaper should be
+>>> eventually visible throught this api as well, won't they? How do you
+>>> imagine that?
 >>
->> (not related to this set, but to bond xfrm)
->> By the way looking at bond's xfrm code, what prevents bond_ipsec_offload_ok()
->> from dereferencing a null ptr?
->> I mean it does:
->>         curr_active = rcu_dereference(bond->curr_active_slave);
->>         real_dev = curr_active->dev;
->>
->> If this is running only under RCU as the code suggests then
->> curr_active_slave can change to NULL in parallel. Should there be a
->> check for curr_active before deref or am I missing something?
+>> I'm unsure we are on the same page. Do you foresee this to replace and
+>> obsoleted the existing devlink rate API? It was not our so far.
 > 
-> Yes, we can do like
-> real_dev = curr_active ? curr_active->dev : NULL;
-> 
-> Thanks
-> Hangbin
+> Driver-api-wise, yes. I believe that was the goal, to have drivers to
+> implement one rate api.
 
-Right, let me try and trigger it and I'll send a patch. :)
+I initially underlooked at this point, I'm sorry.
+
+Re-reading this I think we are not on the same page.
+
+The net_shaper_ops are per network device operations: they are aimed 
+(also) at consolidating network device shaping related callbacks, but 
+they can't operate on non-network device objects (devlink port).
+
+Cheers,
+
+Paolo
 
 
