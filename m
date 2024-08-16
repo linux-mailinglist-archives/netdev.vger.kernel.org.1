@@ -1,151 +1,138 @@
-Return-Path: <netdev+bounces-119157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01173954650
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:58:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AA0954651
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8C481F21D73
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:58:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F398281620
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376E116C69F;
-	Fri, 16 Aug 2024 09:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="G967YlJm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4513716EB63;
+	Fri, 16 Aug 2024 09:59:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604E536C
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 09:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CB814830D;
+	Fri, 16 Aug 2024 09:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723802316; cv=none; b=iR0XzuiZrw5v+oBajNb/pbNlxYvvo+hIU3j/t3/9ymTSeKBlhrh+/w6YxMzWokVoWTGEkNUfEbXnfR4k2WKjHrZP/7cA4EQ2AWXZypcg8YIqXyQKhg2legeaklSGV1fhboa5Bi0Lul9rVLCt7pb/oRXdbCMvTmICqRs1FaSAfyI=
+	t=1723802348; cv=none; b=nP2Bjm+XFUycA51NJDiFma8OPNwK93x7pWt4ow+cYeXFXcThEokduWQ2JwnPfthCQcoGgwmocnBVdQ+29po5TqRunqJeKYT5L163tcKAw8J4uF7Djwz264otyeTDha/RaPHZjQkG11iu64NrAGNCMIOMkR9CwfGH/2g8+riznaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723802316; c=relaxed/simple;
-	bh=OumBy7TCU3N/VpZy7ND89lMgLM66f67c1xqdU4VBJh4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pPLq0DR+m/evTtcNNSE28CIVt/eGzg9Wwgcust2IWFiJouS9FNKAHuqhxTAcTcmuIlVaus80BsxncrvyJDNfhceRS1uuwEOPTp+pMAuwXq6GIhYJ/tWUVGKbcYmAU95cD3pzbHta0o7RxZgVkZAS+74uyVj+KEVNED2Z1gCze8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=G967YlJm; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5bec4e00978so1307882a12.0
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 02:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723802313; x=1724407113; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Zl+hd3BrnmF0mZkERWZJnOOgZlicvOau8G1gwejR6H0=;
-        b=G967YlJmy0wqPO4L3Z//tKyanwba1viyWO3vG0mkYtPw09e83HRMSe4+hzdsVmENiA
-         P9oeWo2vv36v4pJugm4qaimOmUns7hXPVJfYeAqlfRkJ5MqOe2I8BXIAji3Yvebnju+g
-         07dJTySG7zI/CInZMCeIyZSWnvrPRZ+N38Uuy5CGuYlPcDXlXqUg0CaR47guLyLCgChV
-         McmDf4SWSB9Xm3I1vhvoUNyCE6W0guD0BjKtzf6krCkeqBDF7usTcDHn/UOj6cpPnsWn
-         EE71rEyeCOErIngC1N2PF999vBAv6RwZsqooTnaf1KlWwwj/d2Rlb8u1cG0Ki+KNOwS9
-         ExWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723802313; x=1724407113;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zl+hd3BrnmF0mZkERWZJnOOgZlicvOau8G1gwejR6H0=;
-        b=lFEKSyytMlGTG9EcaMfOKD+27CesxMnQY1MxhOQUcRS9DwQNImHYIe+5uH8Ox8oQQ+
-         K7N7xa7uuyBfqINhoc2niQpyYEHdiZndmjILU0ZnuvuNlD0sL+RzQs85FkTOrak2jz1V
-         LWpkZGbnP+1ICv+LAhDqBC3yzLcN4XQXo1z/y2OKt2KkbVt/DzAtOUeL7rorxPp/j/hI
-         PP8gC0WdF23dO9M/ZnaS+M1IAOTdv1+hjg0SgdAEkjs4GezI03rPIrEo3elbPnaZETmB
-         NBUoBqM2f1WTbN91efgCH+Os72iyzfxUvwjYWQjVfXMgbP0Vg53GnAwklTrbS0vlz3OK
-         UOuw==
-X-Gm-Message-State: AOJu0YzQA6MffamvrNj7gQUMhskKq0pfbg8KlTrKwgA5jInvMmWAeOYC
-	NUzYw0E8POAtch3HWhCacPZxxvjybOH0trmSU88b/8QG7Td/6SRvURZwVmLoVO8wmESSgbOR3bK
-	+
-X-Google-Smtp-Source: AGHT+IHNlc3aajiU+vAI4ZJ2PBWTm8K7uRgB+c8gTrf++4nBHafk+V9W0Y+5Dss0/s66ll6sNuZjgQ==
-X-Received: by 2002:a05:6402:2809:b0:5a1:cab1:fbd0 with SMTP id 4fb4d7f45d1cf-5beca4d5f71mr1534652a12.5.1723802312248;
-        Fri, 16 Aug 2024 02:58:32 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde4913sm2017068a12.27.2024.08.16.02.58.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 02:58:31 -0700 (PDT)
-Message-ID: <69a8ec12-ac65-46e3-9d0c-ba9a56dbe5bb@blackwall.org>
-Date: Fri, 16 Aug 2024 12:58:30 +0300
+	s=arc-20240116; t=1723802348; c=relaxed/simple;
+	bh=qwNlm8uTabWBcWAKcpFjMkrkArb4FqURXqO1BVFp5qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i14MzTEHjIHikcf0AyzEsFQMi6oqAeSDp6xWzW7gojPd6DVTJ9dCL+LFerTlAaVZTyPlQVPqo8e1CG7EWZhDbUZRKu+0y05aS4FLXvv2y6FkuBPbg738hhgfYr8G3ers9WK+wDKHwmpmh4CMfZDVvbJU3ukOxviFLn7aQgG1ybU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=44818 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1setjO-000p5M-EC; Fri, 16 Aug 2024 11:58:52 +0200
+Date: Fri, 16 Aug 2024 11:58:49 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	donald.hunter@redhat.com, mkoutny@suse.cz,
+	Michal Kubecek <mkubecek@suse.cz>
+Subject: Re: [PATCH net-next v4 4/4] netfilter: nfnetlink: Handle ACK flags
+ for batch messages
+Message-ID: <Zr8i2cwJtTe76h7F@calendula>
+References: <20240418104737.77914-1-donald.hunter@gmail.com>
+ <20240418104737.77914-5-donald.hunter@gmail.com>
+ <3f714aad-43b8-443d-a168-db02cb9453af@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] Bonding: support new xfrm state offload
- functions
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <20240816035518.203704-1-liuhangbin@gmail.com>
- <334c87f5-cec8-46b5-a4d4-72b2165726d9@blackwall.org>
- <Zr8Ouho0gi_oKIBu@Laptop-X1>
- <13fecb7a-c88a-4f94-b076-b81631175f7f@blackwall.org>
- <bbb2c180-d38d-4bda-bc24-9500eb97cd65@blackwall.org>
-Content-Language: en-US
-In-Reply-To: <bbb2c180-d38d-4bda-bc24-9500eb97cd65@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3f714aad-43b8-443d-a168-db02cb9453af@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On 16/08/2024 12:04, Nikolay Aleksandrov wrote:
-> On 16/08/2024 11:37, Nikolay Aleksandrov wrote:
->> On 16/08/2024 11:32, Hangbin Liu wrote:
->>> On Fri, Aug 16, 2024 at 09:06:12AM +0300, Nikolay Aleksandrov wrote:
->>>> On 16/08/2024 06:55, Hangbin Liu wrote:
->>>>> I planned to add the new XFRM state offload functions after Jianbo's
->>>>> patchset [1], but it seems that may take some time. Therefore, I am
->>>>> posting these two patches to net-next now, as our users are waiting for
->>>>> this functionality. If Jianbo's patch is applied first, I can update these
->>>>> patches accordingly.
->>>>>
->>>>> [1] https://lore.kernel.org/netdev/20240815142103.2253886-2-tariqt@nvidia.com
->>>>>
->>>>> Hangbin Liu (2):
->>>>>   bonding: Add ESN support to IPSec HW offload
->>>>>   bonding: support xfrm state update
->>>>>
->>>>>  drivers/net/bonding/bond_main.c | 76 +++++++++++++++++++++++++++++++++
->>>>>  1 file changed, 76 insertions(+)
->>>>>
->>>>
->>>> (not related to this set, but to bond xfrm)
->>>> By the way looking at bond's xfrm code, what prevents bond_ipsec_offload_ok()
->>>> from dereferencing a null ptr?
->>>> I mean it does:
->>>>         curr_active = rcu_dereference(bond->curr_active_slave);
->>>>         real_dev = curr_active->dev;
->>>>
->>>> If this is running only under RCU as the code suggests then
->>>> curr_active_slave can change to NULL in parallel. Should there be a
->>>> check for curr_active before deref or am I missing something?
->>>
->>> Yes, we can do like
->>> real_dev = curr_active ? curr_active->dev : NULL;
->>>
->>> Thanks
->>> Hangbin
->>
->> Right, let me try and trigger it and I'll send a patch. :)
->>
-> 
-> Just fyi I was able to trigger this null deref easily and one more
-> thing - there is a second null deref after this one because real_dev is
-> used directly :(
-> 
-> I'll send a patch to fix both in a bit.
-> 
-> 
+Hi Jiri,
 
-TBH I don't know how bond xfrm code is running at all. There are *many*
-bugs when I took a closer look. I'll try to prepare a patch-set to address
-them all. This code is seriously broken...
+On Fri, Aug 16, 2024 at 11:23:55AM +0200, Jiri Slaby wrote:
+> On 18. 04. 24, 12:47, Donald Hunter wrote:
+> > The NLM_F_ACK flag is ignored for nfnetlink batch begin and end
+> > messages. This is a problem for ynl which wants to receive an ack for
+> > every message it sends, not just the commands in between the begin/end
+> > messages.
+> > 
+> > Add processing for ACKs for begin/end messages and provide responses
+> > when requested.
+> > 
+> > I have checked that iproute2, pyroute2 and systemd are unaffected by
+> > this change since none of them use NLM_F_ACK for batch begin/end.
+> > 
+> > Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> > ---
+> >   net/netfilter/nfnetlink.c | 5 +++++
+> >   1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+> > index c9fbe0f707b5..4abf660c7baf 100644
+> > --- a/net/netfilter/nfnetlink.c
+> > +++ b/net/netfilter/nfnetlink.c
+> > @@ -427,6 +427,9 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+> >   	nfnl_unlock(subsys_id);
+> > +	if (nlh->nlmsg_flags & NLM_F_ACK)
+> 
+> I believe a memset() is missing here:
+> +               memset(&extack, 0, sizeof(extack));
 
+Indeed, see below.
+
+> > +		nfnl_err_add(&err_list, nlh, 0, &extack);
+> > +
+> 
+> Otherwise:
+> > [   36.330875][ T1048] Oops: general protection fault, probably for non-canonical address 0x339e5eab81f1f600: 0000 [#1] PREEMPT SMP NOPTI
+> > [   36.334610][ T1048] CPU: 1 PID: 1048 Comm: systemd-network Not tainted 6.10.3-1-default #1 openSUSE Tumbleweed 5d3a202ce24e9b465acfbb908cc2eb4f0547bea7
+> > [   36.335330][ T1048] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+> > [   36.335906][ T1048] RIP: 0010:strlen+0x4/0x30
+> > [   36.336204][ T1048] Code: f7 75 ec 31 c0 e9 17 e0 25 00 48 89 f8 e9 0f e0 25 00 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa <80> 3f 00 74 14 48 89 f8 48 83 c0 01 80 38 00 75 f7 48 29 f8 e9 de
+> > [   36.338921][ T1048] RSP: 0018:ffffb023808f3878 EFLAGS: 00010206
+> > [   36.339802][ T1048] RAX: 00000000000000c2 RBX: 0000000000000000 RCX: ffff9291ca559620
+> > [   36.340735][ T1048] RDX: ffff9291ca559620 RSI: 0000000000000000 RDI: 339e5eab81f1f600
+> > [   36.341177][ T1048] RBP: ffff9291ca559620 R08: 0000000000000000 R09: ffff9291ce8a6500
+> > [   36.341639][ T1048] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+> > [   36.342063][ T1048] R13: ffff9291c1015680 R14: dead000000000100 R15: ffff9291ce8a6500
+> > [   36.342517][ T1048] FS:  00007f2ee943d900(0000) GS:ffff92923bd00000(0000) knlGS:0000000000000000
+> > [   36.342732][ T1048] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [   36.342868][ T1048] CR2: 00007f9d4769c000 CR3: 0000000100b82006 CR4: 0000000000370ef0
+> > [   36.343044][ T1048] Call Trace:
+> > [   36.343329][ T1048]  <TASK>
+> > [   36.344518][ T1048]  ? __die_body.cold+0x14/0x24
+> > [   36.344831][ T1048]  ? die_addr+0x3c/0x60
+> > [   36.345029][ T1048]  ? exc_general_protection+0x1cc/0x3e0
+> > [   36.345674][ T1048]  ? asm_exc_general_protection+0x26/0x30
+> > [   36.349001][ T1048]  ? strlen+0x4/0x30
+> > [   36.349423][ T1048]  ? nf_tables_abort+0x67c/0xee0 [nf_tables c16b4fb993ee603261e060fba374eb60b413741a]
+> > [   36.350380][ T1048]  netlink_ack_tlv_len+0x32/0xb0
+> > [   36.352876][ T1048]  netlink_ack+0x59/0x280
+> > [   36.353269][ T1048]  nfnetlink_rcv_batch+0x60c/0x7e0 [nfnetlink a5ded37673006e964178e189bb08592f3ffd89ce]
+> 
+> extack->_msg is 0x339e5eab81f1f600 (garbage from stack).
+> 
+> See:
+> https://github.com/systemd/systemd/actions/runs/10282472628/job/28454253577?pr=33958#step:12:30
+
+Fix:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=d1a7b382a9d3f0f3e5a80e0be2991c075fa4f618
 
