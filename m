@@ -1,293 +1,124 @@
-Return-Path: <netdev+bounces-119124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ACD395429E
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:21:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B06B6954374
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56471F219D9
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612B728126D
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228C112EBE7;
-	Fri, 16 Aug 2024 07:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884861474CF;
+	Fri, 16 Aug 2024 07:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Jh+rY8yf"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="BtP/w0Hj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E77139CEF
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 07:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F8C146017;
+	Fri, 16 Aug 2024 07:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723792828; cv=none; b=WlvVaYYN8tsR6XJ/hinLABHq+q4aKJ+H0oDA8/N7HDbqWfCnvPfNZj93pEufu0NDzviTcGTCVDcDOwQhURPJ+gfXtDxqHEzrqCpL8F9xsVQ9GoQ64+RFcrUvYybE3+JuV5ofs/i20rimKmqBDBsAAqZE2qNoJDbscylZKQUW0DU=
+	t=1723794692; cv=none; b=miMAF4DDCZyxhZYSJBNnwFm91NYIeoEG7/2FHx6oruWak5zGId95c51+n8Y+TzZlEbUWw8LosvsnksHEIOkZSP4NkSyH6umEkQWWob76aFWdJ5GRRWcjBR1W0oBwgESYymktMtIFuJFNC7tOfNoNq+MP01oxYs87S3sHs4o60wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723792828; c=relaxed/simple;
-	bh=FBdsxbZkd/XyWzqhUS+S8phQd/eB6ljWnJRZVKicTlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f56R0yaRBjCoez0i6+N9y8eSWzhJEvDUo7Q5QzGnzlngq110UHMYB9Z4SUlTi+/YR2EV7AyPpFri6Eea4TlvHAI/hUEedjVDoi5D88cVkLO6i6AqYM+D55MfgC+sSBqloXtlfnZhPBjlIw15XBK/G7lwPUG/hYbL2jGNY3WYE3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Jh+rY8yf; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3718acbc87fso690745f8f.3
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 00:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723792823; x=1724397623; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3snyla+eJmB32kFu1uE1ex9HKSxBtPWetc+mZ58IGKM=;
-        b=Jh+rY8yfUTnHBa0GOBafif9rMkOrJ1rN0T1egXDGKyXDislvXXNQcW4rKaK2ZWSJF7
-         A7b1115eIi0ABtGYK3Z2niI/7x67zGEwOYpOJF2O8PCOSwxc74ERTQeF11wz9Jf/perB
-         3WFVBuaevhZtS2mlAmqfnDlqEeoY8UISAj9Gf/n0e30hKPF9W68XZqZ3kSsp+xi34uqk
-         Fxs7BBfOIkGAbFQ8GHG+fB4wc9bTb8rCwZx/IHNPv9pEmBUTKm3GRM4dL8QLzFLBiNsH
-         g43RwqKl+oZeXoG1RarXOcW2CyK2LcKqe3+sTB7Cimc9jDuzjfMvtlYPiUBii9R4NobY
-         BHXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723792823; x=1724397623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3snyla+eJmB32kFu1uE1ex9HKSxBtPWetc+mZ58IGKM=;
-        b=tcrxqz5vafB+qAYoQGw+/6KWdLQ/5867UUQP7l/TVQPw9Tk8CDpB3GmAPP54Tpz7Ck
-         2r4hE+S7VhCgLxUc7O6E3rfbQDVQ+PsvHZJ/0PvbSu5/k8E+FYr1GU8CD8QWxD5L617e
-         3Yi9gSM8ZfmQyRf8par1+A8vdg2XQUXt2HtvduUx5uLgtolli+dLtcMEuwEvW4hW1hqe
-         4Qfq29zjxqpDQdkKOeE3gFKthfML3Uwwo+b+r0dhQcepaQtzUAR9wNnCTKRlphiYQ2CZ
-         PZqHAYAv6M13dK5SfKmcFFeMrVD9CwkTMbEZVVWaJHAGgspippa6xkhD5umbs5i81nIp
-         2JHw==
-X-Gm-Message-State: AOJu0YwNgyozknqOraENMt6fLDdmCdf4+ZDyTZWoZvHvgF8Pp7bmYCIk
-	YALkoXehgZIzqYM/y12LLppv18BgDfccYKzP14WLHV4Nfd9n+tdgfYoj0Rmwo7o=
-X-Google-Smtp-Source: AGHT+IFoaRPNnOwLK9w6p8NpJI6HT5xaUSv9rvEcER9vXxKKPqyNl34k5Tu5tjMQYgTIRY0FLlJm1Q==
-X-Received: by 2002:a05:6000:12c7:b0:368:7583:54c7 with SMTP id ffacd0b85a97d-3719431519fmr945821f8f.8.1723792822997;
-        Fri, 16 Aug 2024 00:20:22 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898497f0sm2999669f8f.39.2024.08.16.00.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 00:20:22 -0700 (PDT)
-Date: Fri, 16 Aug 2024 09:20:19 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: yangzhuorao <alex000young@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, davem@davemloft.net, security@kernel.org,
-	xkaneiki@gmail.com, hackerzheng666@gmail.com
-Subject: Re: [PATCH] net: sched: use-after-free in tcf_action_destroy
-Message-ID: <Zr79s6C-2FoLhoWj@nanopsycho.orion>
-References: <20240816015355.688153-1-alex000young@gmail.com>
+	s=arc-20240116; t=1723794692; c=relaxed/simple;
+	bh=bnyAfH+ev0FhWqNoOsERGAc1djGIBHFpQvIiRrY1a1w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VRQ8MDFBg+exEYiudDzz2HtQW7vf94KJ9lO5F9/A4Fu6ntv4smH2E/5hArSy+6dMOimd0PF6BIsnahj/wGHOIM5eHIkthYX3gJ+6PaGZtcYb0PloHHV+DefhItWecn49daTGQ/0GcgR060JalT7/glBIRhRF87DjxdnPqRtjt3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=BtP/w0Hj; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47G7okfV7817816, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1723794646; bh=bnyAfH+ev0FhWqNoOsERGAc1djGIBHFpQvIiRrY1a1w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=BtP/w0HjcA1Dqzf4wbW7XEXY3DfG75o9aT4FPpUdtYJJPp8VH3WAuKWeIGp7qC4i0
+	 DNfgaXSat/12+tWZPBWPbK8CuSWJF5cEr7r8WwejpjP+USQ8zACaypHiFwMX90euYo
+	 qx6qqZ2wcmYdthKBsDa8QT9KI2E2SMY3iB03cOAP1P6WwDDrRpYgkYGP4dNw2Jw9UR
+	 hWV+Ho9RGOgRMDosjTVd7FMs5pGY6AbwbGi164yLVQues2Fuff2Nx4jF0cQwDT/C0j
+	 0WHhxCV7doDGlHnZLcI+8RpB+OQPNtviJg5i3N7tKaHS9ouzET15I45zjj7LjY2Y01
+	 9vc6OvLyglqtA==
+Received: from mail.realtek.com (smtpsrv.realtek.com[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47G7okfV7817816
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 16 Aug 2024 15:50:46 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 16 Aug 2024 15:50:46 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 16 Aug 2024 15:50:45 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Fri, 16 Aug 2024 15:50:45 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        "jdamato@fastly.com" <jdamato@fastly.com>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v27 07/13] rtase: Implement a function to receive packets
+Thread-Topic: [PATCH net-next v27 07/13] rtase: Implement a function to
+ receive packets
+Thread-Index: AQHa7IJbqA7Iv5MkSUushVJbxjZdzbIon3AAgADoo1A=
+Date: Fri, 16 Aug 2024 07:50:45 +0000
+Message-ID: <3adea6bbe1384e0ea6a06f4343d03ac2@realtek.com>
+References: <20240812063539.575865-1-justinlai0215@realtek.com>
+	<20240812063539.575865-8-justinlai0215@realtek.com>
+ <20240815185452.3df3eea9@kernel.org>
+In-Reply-To: <20240815185452.3df3eea9@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240816015355.688153-1-alex000young@gmail.com>
 
-Fri, Aug 16, 2024 at 03:53:55AM CEST, alex000young@gmail.com wrote:
->There is a uaf bug in net/sched/act_api.c.
->When Thread1 call [1] tcf_action_init_1 to alloc act which saves
->in actions array. If allocation failed, it will go to err path.
->Meanwhile thread2 call tcf_del_walker to delete action in idr.
->So thread 1 in err path [3] tcf_action_destroy will cause
->use-after-free read bug.
->
->Thread1                            Thread2
-> tcf_action_init
->  for(i;i<TCA_ACT_MAX_PRIO;i++)
->   act=tcf_action_init_1 //[1]
->   if(IS_ERR(act))
->    goto err
->   actions[i] = act
->                                   tcf_del_walker
->                                    idr_for_each_entry_ul(idr,p,id)
->                                     __tcf_idr_release(p,false,true)
->                                      free_tcf(p) //[2]
->  err:
->   tcf_action_destroy
->    a=actions[i]
->    ops = a->ops //[3]
->
->We add lock and unlock in tcf_action_init and tcf_del_walker function
+> On Mon, 12 Aug 2024 14:35:33 +0800 Justin Lai wrote:
+> > +     if (!delta && workdone)
+> > +             netdev_info(dev, "no Rx buffer allocated\n");
+> > +
+> > +     ring->dirty_idx +=3D delta;
+> > +
+> > +     if ((ring->dirty_idx + RTASE_NUM_DESC) =3D=3D ring->cur_idx)
+> > +             netdev_emerg(dev, "Rx buffers exhausted\n");
+>=20
+> Memory allocation failures happen, we shouldn't risk spamming the logs.
+> I mean these two messages and the one in rtase_alloc_rx_data_buf(), the
+> should be removed.
+>=20
+> There is a alloc_fail statistic defined in include/net/netdev_queues.h th=
+at's the
+> correct way to report buffer allocation failures.
+> And you should have a periodic service task / work which checks for buffe=
+rs
+> being exhausted, and if they are schedule NAPI so that it tries to alloca=
+te.
 
-Who's "we"? Be imperative, tell the codebase what to do in order to fix
-this bug.
+Hi Jakub,
 
+Thank you for the comments you provided. I will modify it.
 
->to aviod race condition.
->
->==================================================================
->BUG: KASAN: use-after-free in tcf_action_destroy+0x138/0x150
->Read of size 8 at addr ffff88806543e100 by task syz-executor156/295
->
->CPU: 0 PID: 295 Comm: syz-executor156 Not tainted 4.19.311 #2
->Call Trace:
-> __dump_stack lib/dump_stack.c:77 [inline]
-> dump_stack+0xcd/0x110 lib/dump_stack.c:118
-> print_address_description+0x60/0x224 mm/kasan/report.c:255
-> kasan_report_error mm/kasan/report.c:353 [inline]
-> kasan_report mm/kasan/report.c:411 [inline]
-> kasan_report.cold+0x9e/0x1c6 mm/kasan/report.c:395
-> tcf_action_destroy+0x138/0x150 net/sched/act_api.c:664
-> tcf_action_init+0x252/0x330 net/sched/act_api.c:961
-> tcf_action_add+0xdb/0x370 net/sched/act_api.c:1326
-> tc_ctl_action+0x327/0x410 net/sched/act_api.c:1381
-> rtnetlink_rcv_msg+0x79e/0xa40 net/core/rtnetlink.c:4793
-> netlink_rcv_skb+0x156/0x420 net/netlink/af_netlink.c:2459
-> netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-> netlink_unicast+0x4d6/0x690 net/netlink/af_netlink.c:1357
-> netlink_sendmsg+0x6ce/0xce0 net/netlink/af_netlink.c:1907
-> sock_sendmsg_nosec net/socket.c:652 [inline]
-> __sock_sendmsg+0x126/0x160 net/socket.c:663
-> ___sys_sendmsg+0x7f2/0x920 net/socket.c:2258
-> __sys_sendmsg+0xec/0x1b0 net/socket.c:2296
-> do_syscall_64+0xbd/0x360 arch/x86/entry/common.c:293
-> entry_SYSCALL_64_after_hwframe+0x5c/0xc1
->RIP: 0033:0x7fc19796b10d
->RSP: 002b:00007fc197910d78 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
->RAX: ffffffffffffffda RBX: 00007fc1979fe2e0 RCX: 00007fc19796b10d
->RDX: 0000000000000000 RSI: 0000000020000480 RDI: 0000000000000004
->RBP: 00007fc1979fe2e8 R08: 0000000000000000 R09: 0000000000000000
->R10: 0000000000000002 R11: 0000000000000246 R12: 00007fc1979fe2ec
->R13: 00007fc1979fc010 R14: 5c56ebd45a42de31 R15: 00007fc1979cb008
->
->Allocated by task 295:
-> __kmalloc+0x89/0x1d0 mm/slub.c:3808
-> kmalloc include/linux/slab.h:520 [inline]
-> kzalloc include/linux/slab.h:709 [inline]
-> tcf_idr_create+0x59/0x5e0 net/sched/act_api.c:361
-> tcf_nat_init+0x4b7/0x850 net/sched/act_nat.c:63
-> tcf_action_init_1+0x981/0xc90 net/sched/act_api.c:879
-> tcf_action_init+0x216/0x330 net/sched/act_api.c:945
-> tcf_action_add+0xdb/0x370 net/sched/act_api.c:1326
-> tc_ctl_action+0x327/0x410 net/sched/act_api.c:1381
-> rtnetlink_rcv_msg+0x79e/0xa40 net/core/rtnetlink.c:4793
-> netlink_rcv_skb+0x156/0x420 net/netlink/af_netlink.c:2459
-> netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-> netlink_unicast+0x4d6/0x690 net/netlink/af_netlink.c:1357
-> netlink_sendmsg+0x6ce/0xce0 net/netlink/af_netlink.c:1907
-> sock_sendmsg_nosec net/socket.c:652 [inline]
-> __sock_sendmsg+0x126/0x160 net/socket.c:663
-> ___sys_sendmsg+0x7f2/0x920 net/socket.c:2258
-> __sys_sendmsg+0xec/0x1b0 net/socket.c:2296
-> do_syscall_64+0xbd/0x360 arch/x86/entry/common.c:293
-> entry_SYSCALL_64_after_hwframe+0x5c/0xc1
->
->Freed by task 275:
-> slab_free_hook mm/slub.c:1391 [inline]
-> slab_free_freelist_hook mm/slub.c:1419 [inline]
-> slab_free mm/slub.c:2998 [inline]
-> kfree+0x8b/0x1a0 mm/slub.c:3963
-> __tcf_action_put+0x114/0x160 net/sched/act_api.c:112
-> __tcf_idr_release net/sched/act_api.c:142 [inline]
-> __tcf_idr_release+0x52/0xe0 net/sched/act_api.c:122
-> tcf_del_walker net/sched/act_api.c:266 [inline]
-> tcf_generic_walker+0x66a/0x9c0 net/sched/act_api.c:292
-> tca_action_flush net/sched/act_api.c:1154 [inline]
-> tca_action_gd+0x8b6/0x15b0 net/sched/act_api.c:1260
-> tc_ctl_action+0x26d/0x410 net/sched/act_api.c:1389
-> rtnetlink_rcv_msg+0x79e/0xa40 net/core/rtnetlink.c:4793
-> netlink_rcv_skb+0x156/0x420 net/netlink/af_netlink.c:2459
-> netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-> netlink_unicast+0x4d6/0x690 net/netlink/af_netlink.c:1357
-> netlink_sendmsg+0x6ce/0xce0 net/netlink/af_netlink.c:1907
-> sock_sendmsg_nosec net/socket.c:652 [inline]
-> __sock_sendmsg+0x126/0x160 net/socket.c:663
-> ___sys_sendmsg+0x7f2/0x920 net/socket.c:2258
-> __sys_sendmsg+0xec/0x1b0 net/socket.c:2296
-> do_syscall_64+0xbd/0x360 arch/x86/entry/common.c:293
-> entry_SYSCALL_64_after_hwframe+0x5c/0xc1
->
->The buggy address belongs to the object at ffff88806543e100
-> which belongs to the cache kmalloc-192 of size 192
->The buggy address is located 0 bytes inside of
-> 192-byte region [ffff88806543e100, ffff88806543e1c0)
->The buggy address belongs to the page:
->flags: 0x100000000000100(slab)
->page dumped because: kasan: bad access detected
->
->Memory state around the buggy address:
-> ffff88806543e000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff88806543e080: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
->>ffff88806543e100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                   ^
-> ffff88806543e180: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-> ffff88806543e200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->
-
-You are missing tags. "Fixes" at least.
-
-
->Signed-off-by: yangzhuorao <alex000young@gmail.com>
-
-Usually, name starts with capital letter and most often it is multiple
-words, yours is different?
-
-
->---
-> net/sched/act_api.c | 9 ++++++---
-> 1 file changed, 6 insertions(+), 3 deletions(-)
->
->diff --git a/net/sched/act_api.c b/net/sched/act_api.c
->index ad0773b20d83..d29ea69ba312 100644
->--- a/net/sched/act_api.c
->+++ b/net/sched/act_api.c
->@@ -261,7 +261,7 @@ static int tcf_del_walker(struct tcf_idrinfo *idrinfo, struct sk_buff *skb,
-> 		goto nla_put_failure;
-> 	if (nla_put_string(skb, TCA_KIND, ops->kind))
-> 		goto nla_put_failure;
->-
->+	rcu_read_lock();
-> 	idr_for_each_entry_ul(idr, p, id) {
-> 		ret = __tcf_idr_release(p, false, true);
-> 		if (ret == ACT_P_DELETED) {
->@@ -271,12 +271,14 @@ static int tcf_del_walker(struct tcf_idrinfo *idrinfo, struct sk_buff *skb,
-> 			goto nla_put_failure;
-> 		}
-> 	}
->+	rcu_read_unlock();
-> 	if (nla_put_u32(skb, TCA_FCNT, n_i))
-> 		goto nla_put_failure;
-> 	nla_nest_end(skb, nest);
-> 
-> 	return n_i;
-> nla_put_failure:
->+	rcu_read_unlock();
-> 	nla_nest_cancel(skb, nest);
-> 	return ret;
-> }
->@@ -940,7 +942,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
-> 	err = nla_parse_nested(tb, TCA_ACT_MAX_PRIO, nla, NULL, extack);
-> 	if (err < 0)
-> 		return err;
->-
->+	rcu_read_lock();
-> 	for (i = 1; i <= TCA_ACT_MAX_PRIO && tb[i]; i++) {
-> 		act = tcf_action_init_1(net, tp, tb[i], est, name, ovr, bind,
-> 					rtnl_held, extack);
->@@ -953,11 +955,12 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
-> 		/* Start from index 0 */
-> 		actions[i - 1] = act;
-> 	}
->-
->+	rcu_read_unlock();
-
-
-Can you please describe in details, how exactly you fix this issue. I'm
-asking because the rcu_read_lock section here looks to me very
-suspicious.
-
-
-
-> 	*attr_size = tcf_action_full_attrs_size(sz);
-> 	return i - 1;
-> 
-> err:
->+	rcu_read_lock();
-> 	tcf_action_destroy(actions, bind);
-> 	return err;
-> }
->-- 
->2.25.1
->
+Thanks
+Justin
 
