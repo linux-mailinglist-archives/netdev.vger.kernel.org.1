@@ -1,331 +1,154 @@
-Return-Path: <netdev+bounces-119211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18167954C29
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:17:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D622B954C49
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71AD3B22AFB
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:17:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F6EEB21008
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4CC1BD013;
-	Fri, 16 Aug 2024 14:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCFF1B86C1;
+	Fri, 16 Aug 2024 14:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="loNZRDKO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C/4D4kII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF0E1BC9F6
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 14:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D18D85270
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 14:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723817843; cv=none; b=nXg3K8Ysa4aG8L/47RwS88LsUj86pw/Cfm50gjGNtKqkrVtMCR01zZUxoN4jw4RHz7thO7fILt7D6TkpDYQqbrg2cLVvIIlfHSxC996VYI8XgRbfBYdPMUk589/TjlBbLCbksKKedyB4BYNhsfX6ZupfghYbo021udcEpNb+gFg=
+	t=1723818158; cv=none; b=t/n0ngCqWu0TxFJxTU9Dk47khZ4XxEZdD0VEZOfvzV2CuzRIONFTwZOxepC+hK3kjYLzS/h29Q7TSqKpwn8fssYUhT4ElAGbUhLuOZEaG/UztJA8ecCDcsUsZkCaZpUUvxswgSSz3Hnwm3g59yCKkiOTYzo4PZsdUI54OvigRC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723817843; c=relaxed/simple;
-	bh=ukMZebz2RZdo5DgbVI6epr9ngCrJzkah5zzCfs1lWxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YCo/t8rKTEfyaqqvxeL2vTdHZmD0qN12Bya/4HkCt9RkgEdsdkfc6D3VgwiydxzFxmbsbRxm1d8ZbeLm3Lw/WGgpv83yJ/34Y+IaHsnXGzGPowBNr89ZVbJqfp5hOVfCOfo4tmfQ1CPi96p4ZhE4ULnVdoF6yNE5t+/ccEeZ61M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=loNZRDKO; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ef27bfd15bso24089141fa.2
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 07:17:20 -0700 (PDT)
+	s=arc-20240116; t=1723818158; c=relaxed/simple;
+	bh=ldEfgjSvrlYO+j8A3+5pFp0N+U44pO9DIE3KQwtnbD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=OOwQ0+oTLqAvAxKUrf8Z6DWhWxXUS32w4pNHqlJGz7uDfUFQP8yg8pP/lGPg8U2NHr2CfOklW5dMszG2z14JGT4/d/Jgs9GJIwQA8KEnTNTiToAFKmznac+sYzD6OrRv2lihkTOtZOZGGeENapLUMOtXU+mTgnUwxOZrhzfNRo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C/4D4kII; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-530e2287825so2048789e87.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 07:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1723817839; x=1724422639; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VvN3FvbpNRoICbi1AtBly0NJ6wX4AMf0pS50QK6KaOc=;
-        b=loNZRDKOm1aQR5NN5z2drbcSHHlz1tO0yX98E1TnQOh+pNXFVzcRt+l/AiF+Kxrksa
-         jB+sQsaSVd4bA2QY4dLsOMTZGKBfoYfY8g72ikyjUsrrKKWLtldqIIdpAtW8YZUkY3GX
-         kKNXo/eGZH2p8OTYg/w0aeIOBedOHAi7UQvzq6iJZifx7Xu/bwyeDrCV4IkMP/9PDQ4B
-         ayr3uMsONSBh/TdlcYuxW8rXyJkVSZVVATzIetM32RFXXiDB86/WWVn36C+KLL5jf6yk
-         1mB4NhXf42v1C5b7NKpNCmrSxmtMlzehoSE+4Xg+9pB3/aINoATFCUs6LuDULQ/9dUPs
-         PjvQ==
+        d=linaro.org; s=google; t=1723818155; x=1724422955; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jimNm+5PYvpG2rfnGN1p7tnY2o3UaaaVM0INh4uOJaQ=;
+        b=C/4D4kII439RfNL7leKh7gn0GtGC+0BNn+1XN59HJJtqjmKVWs5I9+CXLLK2ZBsuji
+         lnN/+YI1toBJ5efUnuQ3S30u1FSxxwnKD1RQbjbRQQJaVZr8SEK5KxP7PfCx4SkkHxlr
+         eQrN17GSGitHUSxUFZgySO+CF1Ricy4pmVLygxG4DcssHCSKfFTVvb6Bz6Jtb2cTr2uZ
+         KYBQIwbU33AfGmvSHrYTaDwATAzNEzEu3d762zGZbKyZpj3WXW+XQ89W7rU2Qj/R8fiE
+         x/8xP1CsV30OpjL4E0KT15AD2TE9CELLh/EGFljdAW0NmB8kpiCUsIFW9hwoi+pdXoD+
+         sRKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723817839; x=1724422639;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1723818155; x=1724422955;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VvN3FvbpNRoICbi1AtBly0NJ6wX4AMf0pS50QK6KaOc=;
-        b=e4ag0g0o6EuN7HMDMeW6C88YOYVVOx3809HLNIUvvvhxQF6ZK3yi7VbCLsYmFuC4kP
-         8x6klB9BwOkEjY8r0PdcS06uG+80clS8DHfS9HKo8a5gNtJaJm+k+4xk4v4RkMfxm9xL
-         6M1JFXQVnf/JCSG+UiSebY6TegOuGuU36ZTsvt/fRagebBO67/4zLz9TtQg+WISah0YM
-         cNC7L92go98JXxW9kE7B10pf3XZJ3/4eWSkqnBFW++d2fE8Dw27Z/RYvcNd2IkKW+MDO
-         vEnHFaBdUEj3HdZuA4rqzZfp4NSuuYfSZxn0LDg7KYA396khz/+eLDdPJa9NMeEGbulF
-         Zb4w==
-X-Gm-Message-State: AOJu0YyS6T5Y6NRVyBH0M5lRn6e+aIzSegwuKTvHhmvLlqPpnRN3qL7Q
-	N7NwbJZKpwOwBbq9ziDTztWzwYsmeBRG8l2olHAos8E9ylpoq3XQfvQ54MO8718=
-X-Google-Smtp-Source: AGHT+IHJmY4mVajyYXJzMIa95KHs1BP/XHnHGNW3M09OkNCU5WCh7jVf29kVpFgMqUmSLbGupmk/Tg==
-X-Received: by 2002:a2e:b8c1:0:b0:2ef:2d4c:b4ba with SMTP id 38308e7fff4ca-2f3c6a22cbemr4193091fa.36.1723817838860;
-        Fri, 16 Aug 2024 07:17:18 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded180e7sm78079165e9.3.2024.08.16.07.17.17
+        bh=jimNm+5PYvpG2rfnGN1p7tnY2o3UaaaVM0INh4uOJaQ=;
+        b=PFRBA205Kaxt9jsn7TlRasbLQENf6R/Ra3PWob+wwab/JoOqGe/2HmyJ/7CDd3roxV
+         N9n0S19rV+1cUFZ5T1L4WN8j4x0mTRZS4ZFSVeHVN2AxobCBT61gC8VDG7kG3j9gthpq
+         KIt1XhpG/ExL3JTnge5cHr6MA7ftpR0jKhOL659m8jX6uuQTdkaiYzvwRkoikP/CSVPt
+         wPyTwdOT6eZJrXm4zNcbhiaE61C+p5JjZddBKu/I3gPj6OO4qfTdUoux1hTaQRfVcGXJ
+         FEyuBEsVRK7xmdLPUW/zwYrk3o457/6nfS9IWUqgVd+kzukahKCSu8frD8UAqO9QY4mw
+         xy3g==
+X-Gm-Message-State: AOJu0YybHvxLPfRDOsNXdOlcwfOPh5JcFrJJIenyTUE6DcAKQY8ri+6i
+	MevTWRBcoDoH4ajcbRE/K57zMGLVH/Aw0f/mYYHoR1ylnAF2LVLSys9xcNgjeu8=
+X-Google-Smtp-Source: AGHT+IF1pWTuwybaNLHVr5Zdz4yRS/+g7KtdPX2Zva/1cwJbhQVkh3l1ev5ywowvpCc7uahneb9YXQ==
+X-Received: by 2002:a05:6512:220b:b0:52e:9b92:4999 with SMTP id 2adb3069b0e04-5331c690ce0mr2181620e87.2.1723818154423;
+        Fri, 16 Aug 2024 07:22:34 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189897029sm3741479f8f.74.2024.08.16.07.22.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 07:17:18 -0700 (PDT)
-Date: Fri, 16 Aug 2024 16:17:13 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Geethasowjanya Akula <gakula@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>
-Subject: Re: [EXTERNAL] Re: [net-next PATCH v10 00/11] Introduce RVU
- representors
-Message-ID: <Zr9faQVDuJydDwir@nanopsycho.orion>
-References: <20240805131815.7588-1-gakula@marvell.com>
- <ZrTob59KQxzbcKhF@nanopsycho.orion>
- <CH0PR18MB43399A157452720075C21D99CD812@CH0PR18MB4339.namprd18.prod.outlook.com>
+        Fri, 16 Aug 2024 07:22:33 -0700 (PDT)
+Date: Fri, 16 Aug 2024 17:22:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Rao Shoaib <rao.shoaib@oracle.com>
+Cc: netdev@vger.kernel.org
+Subject: [bug report] af_unix: Add OOB support
+Message-ID: <44c91443-3ac0-4e67-8a56-57ae9e21d7db@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CH0PR18MB43399A157452720075C21D99CD812@CH0PR18MB4339.namprd18.prod.outlook.com>
 
-Fri, Aug 16, 2024 at 03:36:25PM CEST, gakula@marvell.com wrote:
->
->
->>-----Original Message-----
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Thursday, August 8, 2024 9:17 PM
->>To: Geethasowjanya Akula <gakula@marvell.com>
->>Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org;
->>davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
->>Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
->><sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
->>Subject: [EXTERNAL] Re: [net-next PATCH v10 00/11] Introduce RVU
->>representors
->>
->>Mon, Aug 05, 2024 at 03: 18: 04PM CEST, gakula@ marvell. com wrote: >This
->>series adds representor support for each rvu devices. >When switchdev mode
->>is enabled, representor netdev is registered >for each rvu device. In
->>implementation of 
->>Mon, Aug 05, 2024 at 03:18:04PM CEST, gakula@marvell.com wrote:
->>>This series adds representor support for each rvu devices.
->>>When switchdev mode is enabled, representor netdev is registered for
->>>each rvu device. In implementation of representor model, one NIX HW LF
->>>with multiple SQ and RQ is reserved, where each RQ and SQ of the LF are
->>>mapped to a representor. A loopback channel is reserved to support
->>>packet path between representors and VFs.
->>>CN10K silicon supports 2 types of MACs, RPM and SDP. This patch set
->>>adds representor support for both RPM and SDP MAC interfaces.
->>>
->>>- Patch 1: Refactors and exports the shared service functions.
->>>- Patch 2: Implements basic representor driver.
->>>- Patch 3: Add devlink support to create representor netdevs that
->>>  can be used to manage VFs.
->>>- Patch 4: Implements basec netdev_ndo_ops.
->>>- Patch 5: Installs tcam rules to route packets between representor and
->>>	   VFs.
->>>- Patch 6: Enables fetching VF stats via representor interface
->>>- Patch 7: Adds support to sync link state between representors and VFs .
->>>- Patch 8: Enables configuring VF MTU via representor netdevs.
->>>- Patch 9: Add representors for sdp MAC.
->>>- Patch 10: Add devlink port support.
->>>
->>>
->>>Command to create PF/VF representor
->>>#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev VF
->>>representors are created for each VF when switch mode is set switchdev
->>>on representor PCI device
->>>
->>>#devlink dev
->>>pci/0002:01:00.0
->>>pci/0002:02:00.0
->>>pci/0002:1c:00.0
->>
->>What are these 3 instances representing? How many PFs do you have? 3?
->>How many physical ports you have?
->The test setup has 3 PFs one for each physical port.
->
->Below example is for the device pci/0002:1c:00.0.
+Hello Rao Shoaib,
 
-3 port nic, that sounds odd. Is this something shipped already? Care to
-paste a link?
+Commit 314001f0bf92 ("af_unix: Add OOB support") from Aug 1, 2021
+(linux-next), leads to the following Smatch static checker warning:
 
+	net/unix/af_unix.c:2718 manage_oob()
+	warn: 'skb' was already freed. (line 2699)
 
->>
->>
->>>
->>>#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
->>>
->>># ip link show
->>>	eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->>mode
->>>DEFAULT group default qlen 1000 link/ether 7e:58:2d:b6:97:51 brd
->>>ff:ff:ff:ff:ff:ff
->>
->>What is this eth0? Why isn't it connected to any devlink port?
->>
->>>	r0p1v0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->>mode DEFAULT group default qlen 1000 link/ether 7e:5a:66:ea:fe:d6 brd
->>ff:ff:ff:ff:ff:ff
->>>	r1p1v1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->>mode DEFAULT group default qlen 1000 link/ether de:29:be:10:9e:bf brd
->>ff:ff:ff:ff:ff:ff
->>>	r2p1v2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->>mode DEFAULT group default qlen 1000 link/ether 4a:12:c7:a2:66:ad brd
->>ff:ff:ff:ff:ff:ff
->>>	r3p1v3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->>mode
->>>DEFAULT group default qlen 1000 link/ether c2:b8:a8:0e:73:fd brd
->>>ff:ff:ff:ff:ff:ff
->>>
->>>
->>>~# devlink port
->>>pci/0002:1c:00.0/0: type eth netdev r0p1v0 flavour pcipf controller 0
->>>pfnum 1 vfnum 0 external false splittable false
->>>pci/0002:1c:00.0/1: type eth netdev r1p1v1 flavour pcivf controller 0
->>>pfnum 1 vfnum 1 external false splittable false
->>>pci/0002:1c:00.0/2: type eth netdev r2p1v2 flavour pcivf controller 0
->>>pfnum 1 vfnum 2 external false splittable false
->>>pci/0002:1c:00.0/3: type eth netdev r3p1v3 flavour pcivf controller 0
->>>pfnum 1 vfnum 3 external false splittable false
->>
->>You are missing physical port devlink instance here? Where is it?
->pci/0002:1c:00.0/0: type eth netdev r0p1v0 flavour pcipf controller 0 pfnum 1 vfnum 0 external false splittable false
->This is for the PF.
+net/unix/af_unix.c
+    2665 static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+    2666                                   int flags, int copied)
+    2667 {
+    2668         struct unix_sock *u = unix_sk(sk);
+    2669 
+    2670         if (!unix_skb_len(skb)) {
+    2671                 struct sk_buff *unlinked_skb = NULL;
+    2672 
+    2673                 spin_lock(&sk->sk_receive_queue.lock);
+    2674 
+    2675                 if (copied && (!u->oob_skb || skb == u->oob_skb)) {
+    2676                         skb = NULL;
+    2677                 } else if (flags & MSG_PEEK) {
+    2678                         skb = skb_peek_next(skb, &sk->sk_receive_queue);
+    2679                 } else {
+    2680                         unlinked_skb = skb;
+    2681                         skb = skb_peek_next(skb, &sk->sk_receive_queue);
+    2682                         __skb_unlink(unlinked_skb, &sk->sk_receive_queue);
+    2683                 }
+    2684 
+    2685                 spin_unlock(&sk->sk_receive_queue.lock);
+    2686 
+    2687                 consume_skb(unlinked_skb);
+    2688         } else {
+    2689                 struct sk_buff *unlinked_skb = NULL;
+    2690 
+    2691                 spin_lock(&sk->sk_receive_queue.lock);
+    2692 
+    2693                 if (skb == u->oob_skb) {
+    2694                         if (copied) {
+    2695                                 skb = NULL;
+    2696                         } else if (!(flags & MSG_PEEK)) {
+    2697                                 if (sock_flag(sk, SOCK_URGINLINE)) {
+    2698                                         WRITE_ONCE(u->oob_skb, NULL);
+    2699                                         consume_skb(skb);
 
-That is not a physical port. The flavour should be "physical" for them.
+Why are we returning this freed skb?  It feels like we should return NULL.
 
+    2700                                 } else {
+    2701                                         __skb_unlink(skb, &sk->sk_receive_queue);
+    2702                                         WRITE_ONCE(u->oob_skb, NULL);
+    2703                                         unlinked_skb = skb;
+    2704                                         skb = skb_peek(&sk->sk_receive_queue);
+    2705                                 }
+    2706                         } else if (!sock_flag(sk, SOCK_URGINLINE)) {
+    2707                                 skb = skb_peek_next(skb, &sk->sk_receive_queue);
+    2708                         }
+    2709                 }
+    2710 
+    2711                 spin_unlock(&sk->sk_receive_queue.lock);
+    2712 
+    2713                 if (unlinked_skb) {
+    2714                         WARN_ON_ONCE(skb_unref(unlinked_skb));
+    2715                         kfree_skb(unlinked_skb);
+    2716                 }
+    2717         }
+--> 2718         return skb;
+                        ^^^
 
->
->Below is the example on a setup with one PF before  3VFs are created.
->
->#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
->
-># ip link show
->	eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode
->DEFAULT group default qlen 1000 link/ether 7e:58:2d:b6:97:51 brd ff:ff:ff:ff:ff:ff
->r0p1v0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->mode DEFAULT group default qlen 1000 link/ether 7e:5a:66:ea:fe:d6 brd ff:ff:ff:ff:ff:ff
->r1p1v1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->mode DEFAULT group default qlen 1000 link/ether de:29:be:10:9e:bf brd
->ff:ff:ff:ff:ff:ff
->r2p1v2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
->mode DEFAULT group default qlen 1000 link/ether 4a:12:c7:a2:66:ad brd ff:ff:ff:ff:ff:ff
->r3p1v3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode
+    2719 }
 
-How you setup the netdevice names? Do you have custom udev rule? Would
-be great to give here the out-of-box udev names instead.
-
-
-
->DEFAULT group default qlen 1000 link/ether c2:b8:a8:0e:73:fd brd ff:ff:ff:ff:ff:ff
->
->Above shows the PF physical port and 4 representors(1 for PF and 3 for VFs).
-># devlink port
->pci/0002:1c:00.0/0: type eth netdev r0p1v0 flavour pcipf controller  0 pfnum 1 vfnum 0 external false splittable false
->pci/0002:1c:00.0/1: type eth netdev r1p1v1 flavour pcivf controller 0 pfnum 1 vfnum 1 external false splittable false
->pci/0002:1c:00.0/2: type eth netdev r2p1v2 flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
->pci/0002:1c:00.0/3: type eth netdev r3p1v3 flavour pcivf controller 0 pfnum 1 vfnum 3 external false splittable false
->
->>
->>>
->>>
->>>-----------
->>>v1-v2:
->>> -Fixed build warnings.
->>> -Address review comments provided by "Kalesh Anakkur Purayil".
->>>
->>>v2-v3:
->>> - Used extack for error messages.
->>> - As suggested reworked commit messages.
->>> - Fixed sparse warning.
->>>
->>>v3-v4:
->>> - Patch 2 & 3: Fixed coccinelle reported warnings.
->>> - Patch 10: Added devlink port support.
->>
->>
->>When someone reviews your patchset at some version, you put him to cc list
->>from that point. Why didn't you put me to cc list?
->>
->>
->>>
->>>v4-v5:
->>>  - Patch 3: Removed devm_* usage in rvu_rep_create()
->>>  - Patch 3: Fixed build warnings.
->>>
->>>v5-v6:
->>>  - Addressed review comments provided by "Simon Horman".
->>>  - Added review tag.
->>>
->>>v6-v7:
->>>  - Rebased on top net-next branch.
->>>
->>>v7-v8:
->>>   - Implmented offload stats ndo.
->>>   - Added documentation.
->>>
->>>v8-v9:
->>>   - Updated the documentation.
->>>
->>>v9-v10:
->>>  - Fixed build warning w.r.t documentation.
->>>
->>>Geetha sowjanya (11):
->>>  octeontx2-pf: Refactoring RVU driver
->>>  octeontx2-pf: RVU representor driver
->>>  octeontx2-pf: Create representor netdev
->>>  octeontx2-pf: Add basic net_device_ops
->>>  octeontx2-af: Add packet path between representor and VF
->>>  octeontx2-pf: Get VF stats via representor
->>>  octeontx2-pf: Add support to sync link state between representor and
->>>    VFs
->>>  octeontx2-pf: Configure VF mtu via representor
->>>  octeontx2-pf: Add representors for sdp MAC
->>>  octeontx2-pf: Add devlink port support
->>>  octeontx2-pf: Implement offload stats ndo for representors
->>>
->>> .../ethernet/marvell/octeontx2.rst            |  85 ++
->>> .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
->>> .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
->>> .../ethernet/marvell/octeontx2/af/common.h    |   2 +
->>> .../net/ethernet/marvell/octeontx2/af/mbox.h  |  74 ++
->>> .../net/ethernet/marvell/octeontx2/af/npc.h   |   1 +
->>> .../net/ethernet/marvell/octeontx2/af/rvu.c   |  11 +
->>> .../net/ethernet/marvell/octeontx2/af/rvu.h   |  30 +-
->>> .../marvell/octeontx2/af/rvu_debugfs.c        |  27 -
->>> .../marvell/octeontx2/af/rvu_devlink.c        |   6 +
->>> .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  81 +-
->>> .../marvell/octeontx2/af/rvu_npc_fs.c         |   5 +
->>> .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   4 +
->>> .../ethernet/marvell/octeontx2/af/rvu_rep.c   | 464 +++++++++++
->>> .../marvell/octeontx2/af/rvu_struct.h         |  26 +
->>> .../marvell/octeontx2/af/rvu_switch.c         |  20 +-
->>> .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
->>> .../ethernet/marvell/octeontx2/nic/cn10k.c    |   4 +-
->>> .../ethernet/marvell/octeontx2/nic/cn10k.h    |   2 +-
->>> .../marvell/octeontx2/nic/otx2_common.c       |  58 +-
->>> .../marvell/octeontx2/nic/otx2_common.h       |  84 +-
->>> .../marvell/octeontx2/nic/otx2_devlink.c      |  49 ++
->>> .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 305 +++++---
->>> .../marvell/octeontx2/nic/otx2_txrx.c         |  38 +-
->>> .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +-
->>> .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  19 +-
->>> .../net/ethernet/marvell/octeontx2/nic/rep.c  | 725 ++++++++++++++++++
->>> .../net/ethernet/marvell/octeontx2/nic/rep.h  |  53 ++
->>> 28 files changed, 1962 insertions(+), 227 deletions(-) create mode
->>> 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
->>> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
->>> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->>>
->>>--
->>>2.25.1
->>>
->>>
+regards,
+dan carpenter
 
