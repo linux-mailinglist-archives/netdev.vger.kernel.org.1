@@ -1,104 +1,159 @@
-Return-Path: <netdev+bounces-119164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C1289546C7
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 12:29:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3229546D0
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 12:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5886528155D
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 10:29:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D2D1F22BA8
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 10:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E7218FC92;
-	Fri, 16 Aug 2024 10:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E26158DC8;
+	Fri, 16 Aug 2024 10:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="fFJPqCZs"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="RRr32zKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E083318FC98
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 10:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FD12A1CF;
+	Fri, 16 Aug 2024 10:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723804180; cv=none; b=s+ISnihPywkyWjo/3uhMY1BcWjmzZ0ZrTm9A9+CyoOsuYbf0tmwu2hjqblzFTgta9Hse/RvHVe0FyyYgGu0AjZEQiD6nk1NThTVOawSSIdE20ilGIJjyusqpUAMIcouoLJM6d1iPThZRftAf/tCiRgUp9isM8qwWLx4rf0cNfCo=
+	t=1723804734; cv=none; b=Es8cu+Vl8DwBdzjhlrR9To7gIFZUJf3TXBnOO5GamuUsjs2biyqTBCBW81m4GsIV5FygCX1xP/XVanvtzx5Awfx+NzELuKujOSWncpA/1V6IePq2j34Prs/K2fbdqPmkpFkMOWJoKD4NCfaEXqHvm/00zTDr9CgOYYCxSXUEfaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723804180; c=relaxed/simple;
-	bh=VXDnrnKA6PlumFk21oNOnZd0eV1B5JBwNu72qT9QQOs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZVa59/2R8pCJJ+VvUKMddUyTQ4nZm47Xje8KxZmsfAT0aaZO76edv3X3oH0VoCB972uz2I/obmAOzUxCVOtiRhr+QHN9KQponYtBVMaw4ycwxa+BK48/LkJGwC3jGgc+9cj5f+Y/12JzW0ZHMEId1DaOway3Q0lDDwpCoAGIVD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=fFJPqCZs; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1723804169;
-	bh=huOy5WWiXKdLaQwOh8vM0BWn5YamttLiUn3xYtf3Byo=;
-	h=From:Date:Subject:To:Cc;
-	b=fFJPqCZsHi/nvr/OA5OibnqHHCrLyzVMgOHzgaALYvWLO3AALNi5dl3dWk8xceriY
-	 tHX+xBTdi9Sz9vMoVmB2AYrsDgeuQspiW0dBMjoP1zDjdpFIP40gyITK5EQyVga7dQ
-	 0wK/XxfN4+kyOTy+uXGfT+boSwbNfZ3F8vxHxVDO2bSXc8hqsBCGw6Y4hqUQftzyP0
-	 ataIjd17vuFrGg6Af+Q6GkB9DAnfj1CEluiwwYx1x68ssxbCyQe8qeLzfkZIcO5cuV
-	 C436nVil+VI4PimiM5H0xVw3M/zqiWfv5aWiEZU5sKre8wk3j1nLjAKdkr95stIRFk
-	 4B5drVQVEpGsw==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id B9929671D5; Fri, 16 Aug 2024 18:29:29 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Fri, 16 Aug 2024 18:29:17 +0800
-Subject: [PATCH net-next] net: mctp: test: Use correct skb for route input
- check
+	s=arc-20240116; t=1723804734; c=relaxed/simple;
+	bh=J4M4kvsLInnExY/QCbU9J9DriPGrhWN5e+IA/qfKpcY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kk8s3MBqxNoOSdiYwEH0x9bJKPzusc8QZBJ0tqbQqJLCZ9vj46KWs+nkmoCQWkh4MJxn5atdPW1FdyGCvFLycgGreSyanImS7U+bNaQB0KdTxEhJt4iU6a1TzDPmqQPD5TP/YlS/L8W17WT/Ui0bqkc9EXF1zqgIafCRR96qtk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=RRr32zKJ; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47GACYRe009392;
+	Fri, 16 Aug 2024 03:38:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=qyS6gmL9fUjso1gx6fyW6lU
+	7ArR8Ee+ubGGTs2Kfv8g=; b=RRr32zKJ8nFCATzSPK4dkWjTdS1S+k6IW727N7g
+	qCHKe86gESfkyQ9+gs93nPJvpnE/UXhZU7nWc9YQ0hOa3xqdteUjlGiz/kcFOpJj
+	T5t37RwKYo03I9HZJwIrZuUddjqJ64KVbJuzmsfgMxFw6wIcwML4YMpI3En18Guc
+	ilscjF8vb5Urk0Rz+4ROT2UIMIMvMbNa6f0Us+DsEKRxp/xi6ZCyq3OVlr3nPEua
+	IJIbelXJTNZXmddCNaLGbyhu2j270ekPU0z8q04623Rj7IjLgcNOXkLwUmgS8bPi
+	gPWThlwn1lsd0UmfkR/1HkkLvJOwNMN7Y1KWXjq11hRx9OA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4124h5043u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 03:38:31 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 16 Aug 2024 03:38:29 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 16 Aug 2024 03:38:29 -0700
+Received: from bharat-OptiPlex-Tower-Plus-7020.. (unknown [10.28.34.254])
+	by maili.marvell.com (Postfix) with ESMTP id 0A9173F707D;
+	Fri, 16 Aug 2024 03:38:24 -0700 (PDT)
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
+        <lcherian@marvell.com>, <ndabilpuram@marvell.com>,
+        <bbhushan2@marvell.com>, <bharatb.linux@gmail.com>
+Subject: [net PATCH] octeontx2-af: Fix CPT AF register offset calculation
+Date: Fri, 16 Aug 2024 16:08:22 +0530
+Message-ID: <20240816103822.2091922-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240816-mctp-kunit-skb-fix-v1-1-3c367ac89c27@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIAPwpv2YC/x2MWw5AMBAAryL7bZPWm6uID2qxEUvaEom4u8bnT
- DLzgCPL5KCJHrB0seNdAug4ArP0MhPyGBgSlWSq0gVuxh+4nsIe3TrgxDfmOi21GsvaDDmE8LA
- U9D9tQcij0O2he98PdgNvG24AAAA=
-To: Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 1KMMMTTxdoC4jnZ9SpzwfoYUgd_MxwOB
+X-Proofpoint-ORIG-GUID: 1KMMMTTxdoC4jnZ9SpzwfoYUgd_MxwOB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-16_02,2024-08-15_01,2024-05-17_01
 
-In the MCTP route input test, we're routing one skb, then (when delivery
-is expected) checking the resulting routed skb.
+Some CPT AF registers are per LF and others are global.
+Translation of PF/VF local LF slot number to actual LF slot
+number is required only for accessing perf LF registers.
+CPT AF global registers access does not requires any LF
+slot number.
 
-However, we're currently checking the original skb length, rather than
-the routed skb. Check the routed skb instead; the original will have
-been freed at this point.
+Also there is no reason CPT PF/VF to know actual lf's register
+offset.
 
-Fixes: 8892c0490779 ("mctp: Add route input to socket tests")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/kernel-janitors/4ad204f0-94cf-46c5-bdab-49592addf315@kili.mountain/
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+Fixes: bc35e28af789 ("octeontx2-af: replace cpt slot with lf id on reg write")
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 ---
- net/mctp/test/route-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   | 23 +++++++++----------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index 77e5dd422258..8551dab1d1e6 100644
---- a/net/mctp/test/route-test.c
-+++ b/net/mctp/test/route-test.c
-@@ -366,7 +366,7 @@ static void mctp_test_route_input_sk(struct kunit *test)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+index 3e09d2285814..daf4b951e905 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+@@ -632,7 +632,9 @@ int rvu_mbox_handler_cpt_inline_ipsec_cfg(struct rvu *rvu,
+ 	return ret;
+ }
  
- 		skb2 = skb_recv_datagram(sock->sk, MSG_DONTWAIT, &rc);
- 		KUNIT_EXPECT_NOT_ERR_OR_NULL(test, skb2);
--		KUNIT_EXPECT_EQ(test, skb->len, 1);
-+		KUNIT_EXPECT_EQ(test, skb2->len, 1);
+-static bool is_valid_offset(struct rvu *rvu, struct cpt_rd_wr_reg_msg *req)
++static bool validate_and_update_reg_offset(struct rvu *rvu,
++					   struct cpt_rd_wr_reg_msg *req,
++					   u64 *reg_offset)
+ {
+ 	u64 offset = req->reg_offset;
+ 	int blkaddr, num_lfs, lf;
+@@ -663,6 +665,11 @@ static bool is_valid_offset(struct rvu *rvu, struct cpt_rd_wr_reg_msg *req)
+ 		if (lf < 0)
+ 			return false;
  
- 		skb_free_datagram(sock->sk, skb2);
++		/* Translate local LF's offset to global CPT LF's offset to
++		 * access LFX register.
++		 */
++		*reg_offset = (req->reg_offset & 0xFF000) + (lf << 3);
++
+ 		return true;
+ 	} else if (!(req->hdr.pcifunc & RVU_PFVF_FUNC_MASK)) {
+ 		/* Registers that can be accessed from PF */
+@@ -697,7 +704,7 @@ int rvu_mbox_handler_cpt_rd_wr_register(struct rvu *rvu,
+ 					struct cpt_rd_wr_reg_msg *rsp)
+ {
+ 	u64 offset = req->reg_offset;
+-	int blkaddr, lf;
++	int blkaddr;
  
-
----
-base-commit: 34afb82a3c67f869267a26f593b6f8fc6bf35905
-change-id: 20240816-mctp-kunit-skb-fix-513710d79cb5
-
-Best regards,
+ 	blkaddr = validate_and_get_cpt_blkaddr(req->blkaddr);
+ 	if (blkaddr < 0)
+@@ -708,18 +715,10 @@ int rvu_mbox_handler_cpt_rd_wr_register(struct rvu *rvu,
+ 	    !is_cpt_vf(rvu, req->hdr.pcifunc))
+ 		return CPT_AF_ERR_ACCESS_DENIED;
+ 
+-	if (!is_valid_offset(rvu, req))
++	if (!validate_and_update_reg_offset(rvu, req, &offset))
+ 		return CPT_AF_ERR_ACCESS_DENIED;
+ 
+-	/* Translate local LF used by VFs to global CPT LF */
+-	lf = rvu_get_lf(rvu, &rvu->hw->block[blkaddr], req->hdr.pcifunc,
+-			(offset & 0xFFF) >> 3);
+-
+-	/* Translate local LF's offset to global CPT LF's offset */
+-	offset &= 0xFF000;
+-	offset += lf << 3;
+-
+-	rsp->reg_offset = offset;
++	rsp->reg_offset = req->reg_offset;
+ 	rsp->ret_val = req->ret_val;
+ 	rsp->is_write = req->is_write;
+ 
 -- 
-Jeremy Kerr <jk@codeconstruct.com.au>
+2.34.1
 
 
