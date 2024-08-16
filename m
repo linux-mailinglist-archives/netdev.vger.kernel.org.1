@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-119331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3DB9552FE
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 00:01:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B5C955334
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 00:16:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05741285270
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 000D71C2129E
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5702713D882;
-	Fri, 16 Aug 2024 22:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A90F13F426;
+	Fri, 16 Aug 2024 22:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PbbBwFHg"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mQ0ktfPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23EF12BF25;
-	Fri, 16 Aug 2024 22:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1EEBA33;
+	Fri, 16 Aug 2024 22:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723845697; cv=none; b=kLscyCHBjz8mZprLtRqRRLO1vz/zqGIo2w8MSU0USeq1bCZFxDNEUY+HcQh/5ndSl13wYMhVEd/YkS2GUSV1gG7AFRmwi++DYHnnvEn/PontI5cAb+39NDtJy1dK7UTGdU/tbCaA/AUlsoAW91LwZ+g91YqeqBblnbic4/fgLI8=
+	t=1723846573; cv=none; b=FR7Ul1wHQnr50arOkXjji0D2P/EpaMvuh6M+zxxPsWO6nZWMx5NsTgOW2Q1uif8fNREwKP1w5voyfT3LmmGdSvyHrirXuL2/yoHxdk0rsU9tup4LSUDneoPZiT5MbEbehaTqBsP295WnJcXoO6ENbBdn8vGWzbXnL6te0NKCdLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723845697; c=relaxed/simple;
-	bh=0HzA09g6sncaVFLN1ygOc655jpNPyx52cqfYOEjeFVc=;
+	s=arc-20240116; t=1723846573; c=relaxed/simple;
+	bh=M+NRfJND15DgXXHSYtlJHCFyMUTY/cbt4gOqY0fSQKQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0xpc6x8EaInp0HJxJFmVnAR98i2UjOGIBm3EMZj5xvn4Kpz4HdCnpxHUCQfIcAbKdFoUexwN1X2yTpYFGN3npc1JyUzosi+I0PDo7W+V6FFdmFC1KqMJkqLl27S71/CF/1cYmKaSy9gIBSbLU1BjxECftXa4VHm40bGGRXR7I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PbbBwFHg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=BkwwjSarLNtVM9B4pKtnQmkM8GKaYSD8cPtcvq8Zki4=; b=Pb
-	bBwFHgYCKHqAX6mRwOHPTGJWps+Cn82FX5I/w8cmN0nRLtej1YdfWw2fksk7lFBPS7kf8SJxTafTZ
-	4cVUOPXB1bgxktKIA/lytLcqP/AJW73ovbLviDeh+3HwUCVlWuNqgebqRoe1Xkg+CqmXupx8i8rle
-	arm2wRhyMSCFCwk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sf50J-004y4d-Nv; Sat, 17 Aug 2024 00:01:03 +0200
-Date: Sat, 17 Aug 2024 00:01:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: kunwu.chan@linux.dev
-Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, neilb@suse.de, kolga@netapp.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kunwu Chan <chentao@kylinos.cn>
-Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
-Message-ID: <a957b7bb-e5c2-480f-8f5c-2fa40637d8ba@lunn.ch>
-References: <20240814093853.48657-1-kunwu.chan@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CMCcQ8NnVH3TCsYEPXOxu0Uajxz3BeHT45RqU5hmVua6/HGMfclm6QYajA6oKNqY76+AZkmZg87iqNrABbwf+DWRF42XbBdVOrgKe7zMvZv8qjGzfTfXsdjfHyYJ0amQAiC9PaKMIDoYwm4yFc6vNnHVvzFG6JnLfq3Qsdbuhbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mQ0ktfPa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF1FC32782;
+	Fri, 16 Aug 2024 22:16:11 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mQ0ktfPa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1723846569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S0q5my1Gxzq5sbks3fTcsMFKFgho8smshyrb0IyHeLE=;
+	b=mQ0ktfPaKJsESX8PGs+iJxyLhHMGhfX7ELVZWdMlnGzpmLCL5qUJa0seVqE5J/uuPZV7IL
+	2Kb+ri7T0cvXYDAm6nzX/fHuKW++B9UzLHgg5VE3YFOetb4/pXxYKgCu8OaOtV9HBcbV1e
+	bL+me1+63vABwBzimD/a1Rz4d3ze6Yc=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1169246f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 16 Aug 2024 22:16:08 +0000 (UTC)
+Date: Fri, 16 Aug 2024 22:16:03 +0000
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: syzbot <syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Subject: Re: [syzbot] [kvm?] general protection fault in get_work_pool (2)
+Message-ID: <Zr_Po5Rj7wsDj_BX@zx2c4.com>
+References: <0000000000006eb03a061b20c079@google.com>
+ <Zr-ZY8HSGfVuoQpl@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,30 +65,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240814093853.48657-1-kunwu.chan@linux.dev>
+In-Reply-To: <Zr-ZY8HSGfVuoQpl@google.com>
 
-On Wed, Aug 14, 2024 at 05:38:53PM +0800, kunwu.chan@linux.dev wrote:
-> From: Kunwu Chan <chentao@kylinos.cn>
+On Fri, Aug 16, 2024 at 11:24:35AM -0700, Sean Christopherson wrote:
+> On Mon, Jun 17, 2024, syzbot wrote:
+> > Hello,
+> > 
+> > syzbot found the following issue on:
+> > 
+> > HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=16f23146980000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=81c0d76ceef02b39
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=0dc211bc2adb944e1fd6
+> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > userspace arch: i386
+> > 
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> > 
+> > Downloadable assets:
+> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2ccbdf43.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/13cdb5bfbafa/vmlinux-2ccbdf43.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/7a14f5d07f81/bzImage-2ccbdf43.xz
+> > 
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com
 > 
-> Increase size of the servername array to avoid truncated output warning.
+> See https://lore.kernel.org/all/Zr-Ydj8FBpiqmY_c@google.com for an explanation.
 > 
-> net/sunrpc/clnt.c:582:75: error：‘%s’ directive output may be truncated
-> writing up to 107 bytes into a region of size 48
-> [-Werror=format-truncation=]
->   582 |                   snprintf(servername, sizeof(servername), "%s",
->       |                                                             ^~
-> 
-> net/sunrpc/clnt.c:582:33: note:‘snprintf’ output
-> between 1 and 108 bytes into a destination of size 48
->   582 |                     snprintf(servername, sizeof(servername), "%s",
->       |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   583 |                                          sun->sun_path);
+> #syz invalid
 
-I think this has come up before, but i could be mis-remembering.
-Please could you do a search for the discussion. The fact it is not
-solved suggests to me it is not so simple to fix. Maybe there is some
-protocol implications here.
+Oh. Thanks very much for following up on this. I spent some time puzzling
+over it and didn't find a wireguard bug. Glad that turned out to be so.
 
-       Andrew
+Jason
 
