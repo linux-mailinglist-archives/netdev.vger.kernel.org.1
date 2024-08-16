@@ -1,131 +1,262 @@
-Return-Path: <netdev+bounces-119227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 427BE954D94
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:20:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3CA5954D9B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:25:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E06E71F276CE
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:20:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95A21C22AD4
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F1C16F831;
-	Fri, 16 Aug 2024 15:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D481BD4E3;
+	Fri, 16 Aug 2024 15:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B5rTgdys"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KipCaYZq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7B813CF86
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 15:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615F51BC9E6
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 15:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723821647; cv=none; b=W/dJbiugoktmAy6Y8TAok2CL+AaBW1iX4j1yx3T8tpPl3zd5XB0dxjPOSFMj9xqQ0UOkF6OTPElYyjGWTOCOvPDNzwKlWMHJ4EMwKrr2gDp2FDMVv83IRPTkvRGd30AGBIemhSqvtDO3SsWnJhh/q19vrRRFoMhcCqrXeQgmpYk=
+	t=1723821936; cv=none; b=Oo7DYYIdzvJvS79cJRFxnn5g7Hm30rtswCPezTvRKqkDIZhM16JjC2T5SMA820NTpz9+ne9n+eXFniqKqS6rrguN2SKEOZs4+phuTYw2IEcdTlXcAcfHKEQ4d0w1Io3MHcS8851eNgqGe1YcXCrbCFLDMs+4Lxp4h4pTknyYt1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723821647; c=relaxed/simple;
-	bh=K1+VKir0cVoh0i4hJNitZAps1JN69SvIXV2kBZWfsNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cC/+hZBa/UctQpAd12EROO267wCgPP1V5sdvVK/eFhPhTaUq+fo8xq7RLsHi9wFDOzlpwnoxS4ldp4ksuv9nN0mrR/zritZQOKTjvoNWGf4LdiSO3KWuMo7ZivRSxRnJ3bGYgs87LvIGQaGE4YnbCm2h4jNpYV8GLmfUPGAa3oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B5rTgdys; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723821644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=4UoO1U2g7LUID0LDP1Gf00/pKKAKOTut19E2FMPwsqs=;
-	b=B5rTgdysn87GA7fE/yYqVMKTQDTuPhRK3m4EAsjNW07vSrgKAy8bbVoZN5KvviMDAQ1MEu
-	mDL63LpKcQO0uv4TZbmnZj2fEkFUPFPLwlcECk0OC+T2XBVMw3kKDi+YlGeLV2qHBenTaX
-	VnW0ED+LVp9KRdhO5iU3lASIdP8i53I=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-211-vEAI-sA-On6mxT5WDZpkVw-1; Fri,
- 16 Aug 2024 11:20:40 -0400
-X-MC-Unique: vEAI-sA-On6mxT5WDZpkVw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E7B3E1955D57;
-	Fri, 16 Aug 2024 15:20:37 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.193.109])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CEA31300019A;
-	Fri, 16 Aug 2024 15:20:36 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 4B9E4A80739; Fri, 16 Aug 2024 17:20:34 +0200 (CEST)
-From: Corinna Vinschen <vinschen@redhat.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1723821936; c=relaxed/simple;
+	bh=aBS448puOCLfZfdq/o3Me/oBWgsTW6EOTQ++9jhQTyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jpNW4a1/V+xLOQ2JqHX3Upe1tcmJ9ijv4Hp/UxwMJlzYj3hLmwX5tTUww0bKhMUykTLllTk8ef4wZDuWdyOoL97BvBV+jiiNydZTsPMfACV/MWMxrmxkAfNydYxQXjyyRVM5n0LLCJt33dvCqMvPfxfsQZrnxvgQ/pMn3IAsOfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KipCaYZq; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso15599305e9.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 08:25:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1723821932; x=1724426732; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cTUJbqayHrtVOvzwKnfAPewIumbIhGdXnQQAZNKKC+s=;
+        b=KipCaYZqK1SLPdNuB4qm3cu6GvOFIvJNNTWxln8kWwg4u7/SoPhiZlUStlpOUATdpv
+         nYf9sOAVAlblEkqJPbYjjS7nxx5ZKVLhYygAT4xnXb/JYXN1C49ttmhVMMi6JjulgREQ
+         Y2RBL9GOd3Y2saVZguY/O4K1593wYfJSuM5pQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723821932; x=1724426732;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cTUJbqayHrtVOvzwKnfAPewIumbIhGdXnQQAZNKKC+s=;
+        b=gu29wf8VwMAy4LA8n1TIT9jZ+oFyR/yjdK1Dc+5MpnZI8lU9uy1RvOQsH2OKPhEUOD
+         SGUYSUePN5yWp/4L+I8n9Ii2kHSFzVsAnA26ASTC2vTHC5vnLoUb7UmHdEojlqf1jrwJ
+         IUgSYCmgibjRMeNVFFHvYKuWsV3uQ7OSQy1VCh3ICEeXc6j1AKPNVIih+4bVk3dRsW6J
+         ipGtAm7s65nXWEvnj45ezRPJ0xCnldEv1xkjdR8pQ5hkqs9SCMAfy3bEa4jgXvpsqiwf
+         +Telv5zp5aHjiimUFNir+8iJw0w4KNQpIUGFGCyBH6h2/eMvVsf7ZCBMBkd3u5trTf2c
+         1bww==
+X-Forwarded-Encrypted: i=1; AJvYcCXrevRjI/mPr3T4ZCSTz2fWn4y/k/dar2rTCqljGU15WE9bTAQSq1r6EKHK2i2778l9EHD7/jfCTMff7QB57dMQ34F7lo7v
+X-Gm-Message-State: AOJu0Yw2kp8V52B8SGaqBlVHMu1Qk6yr+calusH28RdJJBThleYRAq1p
+	APOFOBCxoLxoV3PPb7TWRDORI9sgTYsWZkinwte16RKtlv/pYM4I95pO1uPjU9I=
+X-Google-Smtp-Source: AGHT+IHq47iCJYMwKCbcJghfwhSS/voGTaFRKxK9fCt6bzpworCDB98kJXJSD/II9rrHQu0kxbDLYA==
+X-Received: by 2002:a05:600c:4ecb:b0:427:ffa4:32d0 with SMTP id 5b1f17b1804b1-429ed7e4309mr20380495e9.28.1723821932332;
+        Fri, 16 Aug 2024 08:25:32 -0700 (PDT)
+Received: from LQ3V64L9R2 (default-46-102-197-122.interdsl.co.uk. [46.102.197.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ed65072asm25072915e9.13.2024.08.16.08.25.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 08:25:32 -0700 (PDT)
+Date: Fri, 16 Aug 2024 16:25:30 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Jan Tluka <jtluka@redhat.com>,
-	Jirka Hladky <jhladky@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Corinna Vinschen <vinschen@redhat.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net v2] igb: cope with large MAX_SKB_FRAGS
-Date: Fri, 16 Aug 2024 17:20:34 +0200
-Message-ID: <20240816152034.1453285-1-vinschen@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+Message-ID: <Zr9vavqD-QHD-JcG@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
+ <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
+ <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+ <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
+ <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
+ <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
+ <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
 
-From: Paolo Abeni <pabeni@redhat.com>
+On Fri, Aug 16, 2024 at 10:59:51AM -0400, Willem de Bruijn wrote:
+> Willem de Bruijn wrote:
+> > Martin Karsten wrote:
+> > > On 2024-08-14 15:53, Samiullah Khawaja wrote:
+> > > > On Tue, Aug 13, 2024 at 6:19 AM Martin Karsten <mkarsten@uwaterloo.ca> wrote:
+> > > >>
+> > > >> On 2024-08-13 00:07, Stanislav Fomichev wrote:
+> > > >>> On 08/12, Martin Karsten wrote:
+> > > >>>> On 2024-08-12 21:54, Stanislav Fomichev wrote:
+> > > >>>>> On 08/12, Martin Karsten wrote:
+> > > >>>>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
+> > > >>>>>>> On 08/12, Martin Karsten wrote:
+> > > >>>>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
+> > > >>>>>>>>> On 08/12, Joe Damato wrote:
+> > > >>>>>>>>>> Greetings:
+> > > 
+> > > [snip]
+> > > 
+> > > >>>>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for the sake of
+> > > >>>>>> an individual queue or application to make sure that IRQ suspension is
+> > > >>>>>> enabled/disabled right away when the state of the system changes from busy
+> > > >>>>>> to idle and back.
+> > > >>>>>
+> > > >>>>> Can we not handle everything in napi_busy_loop? If we can mark some napi
+> > > >>>>> contexts as "explicitly polled by userspace with a larger defer timeout",
+> > > >>>>> we should be able to do better compared to current NAPI_F_PREFER_BUSY_POLL
+> > > >>>>> which is more like "this particular napi_poll call is user busy polling".
+> > > >>>>
+> > > >>>> Then either the application needs to be polling all the time (wasting cpu
+> > > >>>> cycles) or latencies will be determined by the timeout.
+> > > > But if I understand correctly, this means that if the application
+> > > > thread that is supposed
+> > > > to do napi busy polling gets busy doing work on the new data/events in
+> > > > userspace, napi polling
+> > > > will not be done until the suspend_timeout triggers? Do you dispatch
+> > > > work to a separate worker
+> > > > threads, in userspace, from the thread that is doing epoll_wait?
+> > > 
+> > > Yes, napi polling is suspended while the application is busy between 
+> > > epoll_wait calls. That's where the benefits are coming from.
+> > > 
+> > > The consequences depend on the nature of the application and overall 
+> > > preferences for the system. If there's a "dominant" application for a 
+> > > number of queues and cores, the resulting latency for other background 
+> > > applications using the same queues might not be a problem at all.
+> > > 
+> > > One other simple mitigation is limiting the number of events that each 
+> > > epoll_wait call accepts. Note that this batch size also determines the 
+> > > worst-case latency for the application in question, so there is a 
+> > > natural incentive to keep it limited.
+> > > 
+> > > A more complex application design, like you suggest, might also be an 
+> > > option.
+> > > 
+> > > >>>> Only when switching back and forth between polling and interrupts is it
+> > > >>>> possible to get low latencies across a large spectrum of offered loads
+> > > >>>> without burning cpu cycles at 100%.
+> > > >>>
+> > > >>> Ah, I see what you're saying, yes, you're right. In this case ignore my comment
+> > > >>> about ep_suspend_napi_irqs/napi_resume_irqs.
+> > > >>
+> > > >> Thanks for probing and double-checking everything! Feedback is important
+> > > >> for us to properly document our proposal.
+> > > >>
+> > > >>> Let's see how other people feel about per-dev irq_suspend_timeout. Properly
+> > > >>> disabling napi during busy polling is super useful, but it would still
+> > > >>> be nice to plumb irq_suspend_timeout via epoll context or have it set on
+> > > >>> a per-napi basis imho.
+> > > > I agree, this would allow each napi queue to tune itself based on
+> > > > heuristics. But I think
+> > > > doing it through epoll independent interface makes more sense as Stan
+> > > > suggested earlier.
+> > > 
+> > > The question is whether to add a useful mechanism (one sysfs parameter 
+> > > and a few lines of code) that is optional, but with demonstrable and 
+> > > significant performance/efficiency improvements for an important class 
+> > > of applications - or wait for an uncertain future?
+> > 
+> > The issue is that this one little change can never be removed, as it
+> > becomes ABI.
+> > 
+> > Let's get the right API from the start.
+> > 
+> > Not sure that a global variable, or sysfs as API, is the right one.
+> 
+> Sorry per-device, not global.
+> 
+> My main concern is that it adds yet another user tunable integer, for
+> which the right value is not obvious.
 
-Sabrina reports that the igb driver does not cope well with large
-MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
-corruption on TX.
+This is a feature for advanced users just like SO_INCOMING_NAPI_ID
+and countless other features.
 
-An easy reproducer is to run ssh to connect to the machine.  With
-MAX_SKB_FRAGS=17 it works, with MAX_SKB_FRAGS=45 it fails.  This has
-been reported originally in
-https://bugzilla.redhat.com/show_bug.cgi?id=2265320
+The value may not be obvious, but guidance (in the form of
+documentation) can be provided.
 
-The root cause of the issue is that the driver does not take into
-account properly the (possibly large) shared info size when selecting
-the ring layout, and will try to fit two packets inside the same 4K
-page even when the 1st fraglist will trump over the 2nd head.
+> If the only goal is to safely reenable interrupts when the application
+> stops calling epoll_wait, does this have to be user tunable?
+> 
+> Can it be either a single good enough constant, or derived from
+> another tunable, like busypoll_read.
 
-Address the issue by checking if 2K buffers are insufficient.
+I believe you meant busy_read here, is that right?
 
-Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAGS")
-Reported-by: Jan Tluka <jtluka@redhat.com>
-Reported-by: Jirka Hladky <jhladky@redhat.com>
-Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-Tested-by: Sabrina Dubroca <sd@queasysnail.net>
-Tested-by: Corinna Vinschen <vinschen@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
----
- drivers/net/ethernet/intel/igb/igb_main.c | 1 +
- 1 file changed, 1 insertion(+)
+At any rate:
 
-v2: utilize IGB_2K_TOO_SMALL_WITH_PADDING
+  - I don't think a single constant is appropriate, just as it
+    wasn't appropriate for the existing mechanism
+    (napi_defer_hard_irqs/gro_flush_timeout), and
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 11be39f435f3..33a42b4c21e0 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -4808,6 +4808,7 @@ static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
- 
- #if (PAGE_SIZE < 8192)
- 	if (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
-+	    IGB_2K_TOO_SMALL_WITH_PADDING ||
- 	    rd32(E1000_RCTL) & E1000_RCTL_SBP)
- 		set_ring_uses_large_buffer(rx_ring);
- #endif
--- 
-2.45.2
+  - Deriving the value from a pre-existing parameter to preserve the
+    ABI, like busy_read, makes using this more confusing for users
+    and complicates the API significantly.
 
+I agree we should get the API right from the start; that's why we've
+submit this as an RFC ;)
+
+We are happy to take suggestions from the community, but, IMHO,
+re-using an existing parameter for a different purpose only in
+certain circumstances (if I understand your suggestions) is a much
+worse choice than adding a new tunable that clearly states its
+intended singular purpose.
+
+- Joe
 
