@@ -1,143 +1,165 @@
-Return-Path: <netdev+bounces-119137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3803A954524
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:06:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0D195452B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D2B11C20C73
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:06:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78E9B2818B9
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857E613AA41;
-	Fri, 16 Aug 2024 09:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C6913C667;
+	Fri, 16 Aug 2024 09:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="jCEp/m4s"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="FeGL0h+s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20DD13A26B
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 09:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C1413A416
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 09:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723799064; cv=none; b=sVLqQKRyw5duGHwegMbXVneOMVH3l2wtRwpxXukOzp34YemoTpe+WlIVKYOAq3vWxWJj3uQbxFc2XUTXjppOBnlhTZmINTZGoJWUBmkm6msbaQxDOmV1uaynKSa1kxJFGlTyeGaby02VSUi3vubCl+W6aNEtC+L/8vEevKgO2Yg=
+	t=1723799416; cv=none; b=u+60eX80xnEboauB1b19K0ECntpjm4Ax22yiX8OuOKfprjW2GDSgKKR94D1TezCrkRudhYOEteQfTKLOhOPM1/oxr7VZJtIOpl7mhdu+XFOK7AzGrR8wYT4ZI+lT86jrBWG2F4I1eIxUGxAnlrAY4/3VSn4z5StEvmo9y31S9j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723799064; c=relaxed/simple;
-	bh=pDX6GMhW9bZ2vuYczaKu3+W4VoVHLRhJrw6tRP+aUMI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kQPD7DRjWZpc1jhQDfD51tY+q9NDM+Ht8oXYcXx382NyWUJmpBNaw/Klm7CY0aZ5lyGGnuY9MpgUtjJ942ppf45ESQsKAaLc6bM55oQtQlYAGXyclOdsbk7JbdzrI6lN/PsmJo73/DllE6R1fRh1x4jspzbAYyKQ4IckttBubyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=jCEp/m4s; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7aada2358fso439371866b.0
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 02:04:22 -0700 (PDT)
+	s=arc-20240116; t=1723799416; c=relaxed/simple;
+	bh=+447AkOnS1uBqMb8FHGHUkrDqwuwBEyFMUSUD/t7gbU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MIaW+Cexpcqj8CaPXj0SDr0X9Y0AwJNuxLhaY6UNG+BoeBFbOybfx0mQDnTkQyksUQN0nmuGeWaH3lBQhxqXU0UQcihVx2QKvmVoD1H042EtVFG+gY2cQAOYRwpe6S02/yOSmohUKe0bzugSnyFtZVrZWMOmU1f5qo41OIkPOpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=FeGL0h+s; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52f024f468bso2193006e87.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 02:10:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723799061; x=1724403861; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yaglbcQRS0B8CMCIbUY+hOynPS1WVyIRoX0QEvCxDUs=;
-        b=jCEp/m4stSM/WpsLYWuZV+WlkqSlNsqatWAD6u2/jty8dBBUzjIGkF0yFN36vq+Yzj
-         nDXG39gM0Mx31mALP3meQ9Uu409vP6kVKzcOBaWDA3eneDZwyKGXFAx07OsRcMjgFvNn
-         um+5ZetUup9Lm+39/fqH254yUaHIUhsDgqkzS6epccu2uVgA/cZjaZo4TTOysRf+vzjF
-         XQmqh7EAa6fhTk2CeOCJakJ/msN8lFyg2kNruBjkiWRmbsbUtwoPXZrNaVrikeL+F0NB
-         +6f9q1oOnZNwlR/3qLff7ZsugaCcAKGPc6M6Sp0f56Gnw4nK/XFFiCiha7I0dkobwQaN
-         ZSew==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723799412; x=1724404212; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I+OEH4A1p3/H1CuxcdmLsuPBbfALhVq7kSh25EJu5bk=;
+        b=FeGL0h+stBW8BNGOQ1BL/H2ddn8AmxOvTFUTXm5D2Y3u78Oe7eICm+jYY+eqgK1IUt
+         TgRJ4pJ/nZmCixTCmWYuhtSuZ1wQRoYlMs8xyTXW0hreFpcehwjOcBk8zi5W1cdyRe0K
+         5D8Zk4vgcXqIvqBgyo3Sq/srBz48ik3h3RuOhMj0eI3CAgExMLvNtQyYdLMnZ2hV2c22
+         IbenbcX0/iimnmWpe+2eLP4fk9BWLLAONrvi4581MrzagLhWRaUimZnqh0xIJDmR7M8I
+         sIwZOYVeTN3V0DJVTJz3h9g6p6TloDV2I0VMDK+OU6dbfOIkzNG++536vtePoitPAnBB
+         dC5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723799061; x=1724403861;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yaglbcQRS0B8CMCIbUY+hOynPS1WVyIRoX0QEvCxDUs=;
-        b=TdcKbZYm9yMgHXqbcL6CGcG0rjmRdqDat4qx0uLrCcH0xg0JjvqNvWJdhiAUik4fr+
-         YMpsrfQEt0TbrCNKPIgwCrU55odXxb4ip4pnrQ0qdWbDCIQ1Wh+tELmOhUtwjK7gZh1P
-         muqZmjIDnmdKvPItZu1yORjv3Dyp/0IlwhOA8R93nEoHo+hqMwx/S9bnbNQCD9GP0Vaq
-         c22fAbuV/DAHFDT78s0AGPtQl9Q3K0N7OBTggi8xmLHsKk4A0TPA/4TwY+LNXyKYUXE3
-         KOI412lVN4PxH4cFEgM/QfD2ukJp6KtzBoPyLN3+CXP6cnK6D+f/MvXSYP0wO0ExiMQx
-         /zcA==
-X-Gm-Message-State: AOJu0Yxthxabr/O5qoBfoECGt4CP85xTJCsBlPD3+MRLkW6zQmryzttB
-	LgJI7jZ1Ja1CHLtk/OjXHEsBfmapLkUD1s1RqggQQ0GTmuRledmA9YRmGDxJdDE=
-X-Google-Smtp-Source: AGHT+IEeN/gntW4tr96gv6yur4/odQE4uF/VHstTDrCj9PpmmffdRibKRmlLQbI5/PF52jrcXSTYpQ==
-X-Received: by 2002:a17:906:c107:b0:a72:7b17:5d68 with SMTP id a640c23a62f3a-a8394d69ff4mr154060966b.3.1723799060291;
-        Fri, 16 Aug 2024 02:04:20 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396d380sm221817466b.216.2024.08.16.02.04.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 02:04:19 -0700 (PDT)
-Message-ID: <bbb2c180-d38d-4bda-bc24-9500eb97cd65@blackwall.org>
-Date: Fri, 16 Aug 2024 12:04:18 +0300
+        d=1e100.net; s=20230601; t=1723799412; x=1724404212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I+OEH4A1p3/H1CuxcdmLsuPBbfALhVq7kSh25EJu5bk=;
+        b=nNNYHBW0O+Kywxnm0IHpVTH+Ja1kMnre2Aoxnel1tobBcIDD5Tl8a4r+iirWAbclHN
+         FKGxVcm3AcSGkVRCC0WZo194Zldoy22gzGW2Z2vCaemuw+GTbDpBjfVbwISp9C1d4N76
+         RnXHFBZiMlJVvbrH60XBchrGELjlal+GHlWcmGMw87xX7Rf0AdUmEyrIyfaNJIHox5Fy
+         sldjtjopsIJADELCuZl2m/OFzu9WDtS6o8r0+AgxWtXiwXBmj/GvDfY+0fL2ZeubEUbg
+         dpEfTP2yHo5L53Hd73L6OPgqdJTQaPXGR0XQw/EQUm1sP6jnmDP2nZ0RF5+S/0lFX775
+         oIBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiaOM9UqnuIY9ipcKb6pkaH5WCmCGcifR/0Jho7TkPrApFmeizOmaLwg1jG5fxtucjVvcGuc0JCRisLgBSPf9v5ZDkMI3N
+X-Gm-Message-State: AOJu0Yw7lrg8vFxY2PYduRxYVwA3I7LDMSeSPdMX1yfzaKXEE7AveNL9
+	wb/tTwcQYCghV/vp2j0DtshAenT5wW5hJXvHE0fGgT1JonUa3MYdqT63DB6HzLRGWoOGpRQieI4
+	e2XV372XnX6Qc+RFskc619j7ySnTzbOhZsp9vcg==
+X-Google-Smtp-Source: AGHT+IFB3aIW7Bm+lnja7PhaLnwXaRYjuWrHIHMzFAXmCtoDzMvBJ6bByky6rPgRVOj2x6JwSAi/BLj6VPI7F5SZiP8=
+X-Received: by 2002:a05:6512:2806:b0:530:ae0a:ab7a with SMTP id
+ 2adb3069b0e04-5331c6975abmr1399845e87.17.1723799411703; Fri, 16 Aug 2024
+ 02:10:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] Bonding: support new xfrm state offload
- functions
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <20240816035518.203704-1-liuhangbin@gmail.com>
- <334c87f5-cec8-46b5-a4d4-72b2165726d9@blackwall.org>
- <Zr8Ouho0gi_oKIBu@Laptop-X1>
- <13fecb7a-c88a-4f94-b076-b81631175f7f@blackwall.org>
-Content-Language: en-US
-In-Reply-To: <13fecb7a-c88a-4f94-b076-b81631175f7f@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
+In-Reply-To: <87a5hcyite.fsf@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 16 Aug 2024 11:10:00 +0200
+Message-ID: <CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Kalle Valo <kvalo@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16/08/2024 11:37, Nikolay Aleksandrov wrote:
-> On 16/08/2024 11:32, Hangbin Liu wrote:
->> On Fri, Aug 16, 2024 at 09:06:12AM +0300, Nikolay Aleksandrov wrote:
->>> On 16/08/2024 06:55, Hangbin Liu wrote:
->>>> I planned to add the new XFRM state offload functions after Jianbo's
->>>> patchset [1], but it seems that may take some time. Therefore, I am
->>>> posting these two patches to net-next now, as our users are waiting for
->>>> this functionality. If Jianbo's patch is applied first, I can update these
->>>> patches accordingly.
->>>>
->>>> [1] https://lore.kernel.org/netdev/20240815142103.2253886-2-tariqt@nvidia.com
->>>>
->>>> Hangbin Liu (2):
->>>>   bonding: Add ESN support to IPSec HW offload
->>>>   bonding: support xfrm state update
->>>>
->>>>  drivers/net/bonding/bond_main.c | 76 +++++++++++++++++++++++++++++++++
->>>>  1 file changed, 76 insertions(+)
->>>>
->>>
->>> (not related to this set, but to bond xfrm)
->>> By the way looking at bond's xfrm code, what prevents bond_ipsec_offload_ok()
->>> from dereferencing a null ptr?
->>> I mean it does:
->>>         curr_active = rcu_dereference(bond->curr_active_slave);
->>>         real_dev = curr_active->dev;
->>>
->>> If this is running only under RCU as the code suggests then
->>> curr_active_slave can change to NULL in parallel. Should there be a
->>> check for curr_active before deref or am I missing something?
->>
->> Yes, we can do like
->> real_dev = curr_active ? curr_active->dev : NULL;
->>
->> Thanks
->> Hangbin
-> 
-> Right, let me try and trigger it and I'll send a patch. :)
-> 
+On Fri, Aug 16, 2024 at 10:26=E2=80=AFAM Kalle Valo <kvalo@kernel.org> wrot=
+e:
+>
+> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Describe the inputs from the PMU of the ath11k module on WCN6855.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> > v1 -> v2:
+> > - update the example
+> >
+> >  .../net/wireless/qcom,ath11k-pci.yaml         | 29 +++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
+>
+> This goes to ath-next, not net-next.
+>
+> > diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k=
+-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.=
+yaml
+> > index 8675d7d0215c..a71fdf05bc1e 100644
+> > --- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.ya=
+ml
+> > +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.ya=
+ml
+> > @@ -50,6 +50,9 @@ properties:
+> >    vddrfa1p7-supply:
+> >      description: VDD_RFA_1P7 supply regulator handle
+> >
+> > +  vddrfa1p8-supply:
+> > +    description: VDD_RFA_1P8 supply regulator handle
+> > +
+> >    vddpcie0p9-supply:
+> >      description: VDD_PCIE_0P9 supply regulator handle
+> >
+> > @@ -77,6 +80,22 @@ allOf:
+> >          - vddrfa1p7-supply
+> >          - vddpcie0p9-supply
+> >          - vddpcie1p8-supply
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            const: pci17cb,1103
+> > +    then:
+> > +      required:
+> > +        - vddrfacmn-supply
+> > +        - vddaon-supply
+> > +        - vddwlcx-supply
+> > +        - vddwlmx-supply
+> > +        - vddrfa0p8-supply
+> > +        - vddrfa1p2-supply
+> > +        - vddrfa1p8-supply
+> > +        - vddpcie0p9-supply
+> > +        - vddpcie1p8-supply
+>
+> Like we discussed before, shouldn't these supplies be optional as not
+> all modules need them?
+>
 
-Just fyi I was able to trigger this null deref easily and one more
-thing - there is a second null deref after this one because real_dev is
-used directly :(
+The answer is still the same: the ATH11K inside a WCN6855 does - in
+fact - always need them. The fact that the X13s doesn't define them is
+bad representation of HW and I'm fixing it in a subsequent DTS patch.
 
-I'll send a patch to fix both in a bit.
+Bart
 
-
+> --
+> https://patchwork.kernel.org/project/linux-wireless/list/
+>
+> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
+tches
 
