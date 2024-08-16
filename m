@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-119330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4521D95528E
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 23:40:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3DB9552FE
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 00:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2931B20EB3
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 21:40:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05741285270
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467961C6884;
-	Fri, 16 Aug 2024 21:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5702713D882;
+	Fri, 16 Aug 2024 22:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xdi0RaRj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PbbBwFHg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2312C1C6880
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 21:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23EF12BF25;
+	Fri, 16 Aug 2024 22:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723844432; cv=none; b=ar5MYsOorNYDVXf9DuSrY38zz2m3KnBNxdp1TjgRnBwYquj63CDSj0vNqhZDf0TIs+XJw+bvUVyp9sWBq+HOlfKnA2elm4jQFVmCl9SEFjcAC7q2aPaIQ8j6IQFqHmC4iijq2jdv+hlrIJ24vxzL2byabSFUhJr6FXMjy38lOLo=
+	t=1723845697; cv=none; b=kLscyCHBjz8mZprLtRqRRLO1vz/zqGIo2w8MSU0USeq1bCZFxDNEUY+HcQh/5ndSl13wYMhVEd/YkS2GUSV1gG7AFRmwi++DYHnnvEn/PontI5cAb+39NDtJy1dK7UTGdU/tbCaA/AUlsoAW91LwZ+g91YqeqBblnbic4/fgLI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723844432; c=relaxed/simple;
-	bh=bA//3liUewtGBpq7C5Za5gSl5dAGa8Z27ODn4AWwh/Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kb3Ojqjb1CD9NpaOPhmxrrLUMB2900UCd+mpcFly442qrbyi6mhYtntPSvoNSss6tG+IlVBkQmrqQFcEjM39vdLGbr6YWmhxobddAaffmH4szG+S4dZHdy/xj8l8bRkM+uWIChU4nxpVRTOJd8UP9zUfl4a1eh4Y8FPJGRVSYqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xdi0RaRj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC272C32782;
-	Fri, 16 Aug 2024 21:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723844430;
-	bh=bA//3liUewtGBpq7C5Za5gSl5dAGa8Z27ODn4AWwh/Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Xdi0RaRjPn/VXJo3x8avRKeoIIl6ezCyLJWnollFHw4VLYTV1rffq6yNlC7fJhY3y
-	 naQgbNwMONIqfJSwV4ObchRNwARkcdevo0q2PZhyRDo5QkcASYxhHxggdu3kAExAAu
-	 3ggOK1z/K6LVs3MuHjh4Ane09b1rI16Umz+l+u9f3dBxpnuMvOguTl80WNLpidRWby
-	 UauHNQGnl703tQQaR9tf3ZTC7N17gJwixMnLVAJGwg2jf8h5EUS0Bq5JBpOg3z2trm
-	 6rtWSuEy0P5+C1kntxv/G+4MGxj8R6uuhwqE7HJufa2q5OkVPeP6BwSLx2VGoHHufv
-	 ikq4I8rz1mIKQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D1638231F8;
-	Fri, 16 Aug 2024 21:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1723845697; c=relaxed/simple;
+	bh=0HzA09g6sncaVFLN1ygOc655jpNPyx52cqfYOEjeFVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q0xpc6x8EaInp0HJxJFmVnAR98i2UjOGIBm3EMZj5xvn4Kpz4HdCnpxHUCQfIcAbKdFoUexwN1X2yTpYFGN3npc1JyUzosi+I0PDo7W+V6FFdmFC1KqMJkqLl27S71/CF/1cYmKaSy9gIBSbLU1BjxECftXa4VHm40bGGRXR7I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PbbBwFHg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=BkwwjSarLNtVM9B4pKtnQmkM8GKaYSD8cPtcvq8Zki4=; b=Pb
+	bBwFHgYCKHqAX6mRwOHPTGJWps+Cn82FX5I/w8cmN0nRLtej1YdfWw2fksk7lFBPS7kf8SJxTafTZ
+	4cVUOPXB1bgxktKIA/lytLcqP/AJW73ovbLviDeh+3HwUCVlWuNqgebqRoe1Xkg+CqmXupx8i8rle
+	arm2wRhyMSCFCwk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sf50J-004y4d-Nv; Sat, 17 Aug 2024 00:01:03 +0200
+Date: Sat, 17 Aug 2024 00:01:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: kunwu.chan@linux.dev
+Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+	jlayton@kernel.org, neilb@suse.de, kolga@netapp.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kunwu Chan <chentao@kylinos.cn>
+Subject: Re: [PATCH] SUNRPC: Fix -Wformat-truncation warning
+Message-ID: <a957b7bb-e5c2-480f-8f5c-2fa40637d8ba@lunn.ch>
+References: <20240814093853.48657-1-kunwu.chan@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] docs: networking: Align documentation with behavior
- change
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172384443000.3634446.7662477584198998934.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Aug 2024 21:40:30 +0000
-References: <20240815142343.2254247-1-tariqt@nvidia.com>
-In-Reply-To: <20240815142343.2254247-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, dtatulea@nvidia.com
+In-Reply-To: <20240814093853.48657-1-kunwu.chan@linux.dev>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 15 Aug 2024 17:23:43 +0300 you wrote:
-> Following commit 9f7e8fbb91f8 ("net/mlx5: offset comp irq index in name by one"),
-> which fixed the index in IRQ name to start once again from 0, we change
-> the documentation accordingly.
+On Wed, Aug 14, 2024 at 05:38:53PM +0800, kunwu.chan@linux.dev wrote:
+> From: Kunwu Chan <chentao@kylinos.cn>
 > 
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Increase size of the servername array to avoid truncated output warning.
 > 
-> [...]
+> net/sunrpc/clnt.c:582:75: error：‘%s’ directive output may be truncated
+> writing up to 107 bytes into a region of size 48
+> [-Werror=format-truncation=]
+>   582 |                   snprintf(servername, sizeof(servername), "%s",
+>       |                                                             ^~
+> 
+> net/sunrpc/clnt.c:582:33: note:‘snprintf’ output
+> between 1 and 108 bytes into a destination of size 48
+>   582 |                     snprintf(servername, sizeof(servername), "%s",
+>       |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   583 |                                          sun->sun_path);
 
-Here is the summary with links:
-  - [net-next] docs: networking: Align documentation with behavior change
-    https://git.kernel.org/netdev/net-next/c/9480fd0cd8a4
+I think this has come up before, but i could be mis-remembering.
+Please could you do a search for the discussion. The fact it is not
+solved suggests to me it is not so simple to fix. Maybe there is some
+protocol implications here.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+       Andrew
 
