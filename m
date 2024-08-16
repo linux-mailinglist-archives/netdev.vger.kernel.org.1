@@ -1,262 +1,113 @@
-Return-Path: <netdev+bounces-119228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3CA5954D9B
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:25:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C27954DA5
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95A21C22AD4
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:25:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A30091F242F1
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D481BD4E3;
-	Fri, 16 Aug 2024 15:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA791BC9F6;
+	Fri, 16 Aug 2024 15:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KipCaYZq"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="KbZARtv0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615F51BC9E6
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 15:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0052127E3A
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 15:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723821936; cv=none; b=Oo7DYYIdzvJvS79cJRFxnn5g7Hm30rtswCPezTvRKqkDIZhM16JjC2T5SMA820NTpz9+ne9n+eXFniqKqS6rrguN2SKEOZs4+phuTYw2IEcdTlXcAcfHKEQ4d0w1Io3MHcS8851eNgqGe1YcXCrbCFLDMs+4Lxp4h4pTknyYt1E=
+	t=1723822167; cv=none; b=LV9IyQDOBPdqIcZlVEskWvrv4mgz1nyoUl4+YtR5QIf7fwu2nMAYJz3hdTlNmu9z5a9U+nUMD6h92UBK5EBi3bF37XgvhrHN7el6g8JNaZd3GfYrlKHZIwdViMXR6ZKzwiz1kSnC2BFZBj2vRkDGcD2LtPGw7V0KIVzRcVM8AM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723821936; c=relaxed/simple;
-	bh=aBS448puOCLfZfdq/o3Me/oBWgsTW6EOTQ++9jhQTyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jpNW4a1/V+xLOQ2JqHX3Upe1tcmJ9ijv4Hp/UxwMJlzYj3hLmwX5tTUww0bKhMUykTLllTk8ef4wZDuWdyOoL97BvBV+jiiNydZTsPMfACV/MWMxrmxkAfNydYxQXjyyRVM5n0LLCJt33dvCqMvPfxfsQZrnxvgQ/pMn3IAsOfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KipCaYZq; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso15599305e9.1
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 08:25:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1723821932; x=1724426732; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cTUJbqayHrtVOvzwKnfAPewIumbIhGdXnQQAZNKKC+s=;
-        b=KipCaYZqK1SLPdNuB4qm3cu6GvOFIvJNNTWxln8kWwg4u7/SoPhiZlUStlpOUATdpv
-         nYf9sOAVAlblEkqJPbYjjS7nxx5ZKVLhYygAT4xnXb/JYXN1C49ttmhVMMi6JjulgREQ
-         Y2RBL9GOd3Y2saVZguY/O4K1593wYfJSuM5pQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723821932; x=1724426732;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cTUJbqayHrtVOvzwKnfAPewIumbIhGdXnQQAZNKKC+s=;
-        b=gu29wf8VwMAy4LA8n1TIT9jZ+oFyR/yjdK1Dc+5MpnZI8lU9uy1RvOQsH2OKPhEUOD
-         SGUYSUePN5yWp/4L+I8n9Ii2kHSFzVsAnA26ASTC2vTHC5vnLoUb7UmHdEojlqf1jrwJ
-         IUgSYCmgibjRMeNVFFHvYKuWsV3uQ7OSQy1VCh3ICEeXc6j1AKPNVIih+4bVk3dRsW6J
-         ipGtAm7s65nXWEvnj45ezRPJ0xCnldEv1xkjdR8pQ5hkqs9SCMAfy3bEa4jgXvpsqiwf
-         +Telv5zp5aHjiimUFNir+8iJw0w4KNQpIUGFGCyBH6h2/eMvVsf7ZCBMBkd3u5trTf2c
-         1bww==
-X-Forwarded-Encrypted: i=1; AJvYcCXrevRjI/mPr3T4ZCSTz2fWn4y/k/dar2rTCqljGU15WE9bTAQSq1r6EKHK2i2778l9EHD7/jfCTMff7QB57dMQ34F7lo7v
-X-Gm-Message-State: AOJu0Yw2kp8V52B8SGaqBlVHMu1Qk6yr+calusH28RdJJBThleYRAq1p
-	APOFOBCxoLxoV3PPb7TWRDORI9sgTYsWZkinwte16RKtlv/pYM4I95pO1uPjU9I=
-X-Google-Smtp-Source: AGHT+IHq47iCJYMwKCbcJghfwhSS/voGTaFRKxK9fCt6bzpworCDB98kJXJSD/II9rrHQu0kxbDLYA==
-X-Received: by 2002:a05:600c:4ecb:b0:427:ffa4:32d0 with SMTP id 5b1f17b1804b1-429ed7e4309mr20380495e9.28.1723821932332;
-        Fri, 16 Aug 2024 08:25:32 -0700 (PDT)
-Received: from LQ3V64L9R2 (default-46-102-197-122.interdsl.co.uk. [46.102.197.122])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ed65072asm25072915e9.13.2024.08.16.08.25.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 08:25:32 -0700 (PDT)
-Date: Fri, 16 Aug 2024 16:25:30 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin Karsten <mkarsten@uwaterloo.ca>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Breno Leitao <leitao@debian.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
-Message-ID: <Zr9vavqD-QHD-JcG@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Breno Leitao <leitao@debian.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <ZrqU3kYgL4-OI-qj@mini-arch>
- <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
- <Zrq8zCy1-mfArXka@mini-arch>
- <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
- <Zrrb8xkdIbhS7F58@mini-arch>
- <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
- <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
- <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
- <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
- <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1723822167; c=relaxed/simple;
+	bh=Dh/TqOKJ8mHwkl8blqkDVlbuxeVntZZ9shMGr4OSnvQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ELppl0wlxX7sRbQdsyNCIzm96wk+Tq8R4vX0UShJfmGmrPopKhbBfmAIQcDJq/thZdsmeuEAMwd4O08siL7XpPOLYsl77/l/CurMVAiwpR3aZwhXfypiSOUyRqbUmK0qi3OGJYPGCj3fluL0mzBxjvUdE9MMUIKclaYnE3cazBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=KbZARtv0; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dQYD/qZQ3mvhTuaq0enXT1CiNk17PagSiXwYv4Je7+E=; b=KbZARtv0mHnnNMl3Jnqclri56z
+	f1/lUA8HmqqigG5ex/Jd6bAYIGHk+whfcA5zhadRZJ2Y19Mbcms9kaLCk3QpO07WKwSMdx+Np82NX
+	Up8zJ+yTsPG+9R8RyyxbGmh3r/yGeSZ97JZPmdHZcFMolbrn5YRzFKn7hVnxL1p3WoJA=;
+Received: from p54ae95e7.dip0.t-ipconnect.de ([84.174.149.231] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1seytF-000MlX-1v;
+	Fri, 16 Aug 2024 17:29:21 +0200
+Message-ID: <2bb2f7ae-1175-4fff-ae4e-25c624295345@nbd.name>
+Date: Fri, 16 Aug 2024 17:29:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] net: remove NETIF_F_GSO_FRAGLIST from NETIF_F_GSO_SOFTWARE
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+References: <20240816075915.6245-1-nbd@nbd.name>
+ <66bf5e76d36cf_1341d52942a@willemb.c.googlers.com.notmuch>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <66bf5e76d36cf_1341d52942a@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 16, 2024 at 10:59:51AM -0400, Willem de Bruijn wrote:
-> Willem de Bruijn wrote:
-> > Martin Karsten wrote:
-> > > On 2024-08-14 15:53, Samiullah Khawaja wrote:
-> > > > On Tue, Aug 13, 2024 at 6:19 AM Martin Karsten <mkarsten@uwaterloo.ca> wrote:
-> > > >>
-> > > >> On 2024-08-13 00:07, Stanislav Fomichev wrote:
-> > > >>> On 08/12, Martin Karsten wrote:
-> > > >>>> On 2024-08-12 21:54, Stanislav Fomichev wrote:
-> > > >>>>> On 08/12, Martin Karsten wrote:
-> > > >>>>>> On 2024-08-12 19:03, Stanislav Fomichev wrote:
-> > > >>>>>>> On 08/12, Martin Karsten wrote:
-> > > >>>>>>>> On 2024-08-12 16:19, Stanislav Fomichev wrote:
-> > > >>>>>>>>> On 08/12, Joe Damato wrote:
-> > > >>>>>>>>>> Greetings:
-> > > 
-> > > [snip]
-> > > 
-> > > >>>>>> Note that napi_suspend_irqs/napi_resume_irqs is needed even for the sake of
-> > > >>>>>> an individual queue or application to make sure that IRQ suspension is
-> > > >>>>>> enabled/disabled right away when the state of the system changes from busy
-> > > >>>>>> to idle and back.
-> > > >>>>>
-> > > >>>>> Can we not handle everything in napi_busy_loop? If we can mark some napi
-> > > >>>>> contexts as "explicitly polled by userspace with a larger defer timeout",
-> > > >>>>> we should be able to do better compared to current NAPI_F_PREFER_BUSY_POLL
-> > > >>>>> which is more like "this particular napi_poll call is user busy polling".
-> > > >>>>
-> > > >>>> Then either the application needs to be polling all the time (wasting cpu
-> > > >>>> cycles) or latencies will be determined by the timeout.
-> > > > But if I understand correctly, this means that if the application
-> > > > thread that is supposed
-> > > > to do napi busy polling gets busy doing work on the new data/events in
-> > > > userspace, napi polling
-> > > > will not be done until the suspend_timeout triggers? Do you dispatch
-> > > > work to a separate worker
-> > > > threads, in userspace, from the thread that is doing epoll_wait?
-> > > 
-> > > Yes, napi polling is suspended while the application is busy between 
-> > > epoll_wait calls. That's where the benefits are coming from.
-> > > 
-> > > The consequences depend on the nature of the application and overall 
-> > > preferences for the system. If there's a "dominant" application for a 
-> > > number of queues and cores, the resulting latency for other background 
-> > > applications using the same queues might not be a problem at all.
-> > > 
-> > > One other simple mitigation is limiting the number of events that each 
-> > > epoll_wait call accepts. Note that this batch size also determines the 
-> > > worst-case latency for the application in question, so there is a 
-> > > natural incentive to keep it limited.
-> > > 
-> > > A more complex application design, like you suggest, might also be an 
-> > > option.
-> > > 
-> > > >>>> Only when switching back and forth between polling and interrupts is it
-> > > >>>> possible to get low latencies across a large spectrum of offered loads
-> > > >>>> without burning cpu cycles at 100%.
-> > > >>>
-> > > >>> Ah, I see what you're saying, yes, you're right. In this case ignore my comment
-> > > >>> about ep_suspend_napi_irqs/napi_resume_irqs.
-> > > >>
-> > > >> Thanks for probing and double-checking everything! Feedback is important
-> > > >> for us to properly document our proposal.
-> > > >>
-> > > >>> Let's see how other people feel about per-dev irq_suspend_timeout. Properly
-> > > >>> disabling napi during busy polling is super useful, but it would still
-> > > >>> be nice to plumb irq_suspend_timeout via epoll context or have it set on
-> > > >>> a per-napi basis imho.
-> > > > I agree, this would allow each napi queue to tune itself based on
-> > > > heuristics. But I think
-> > > > doing it through epoll independent interface makes more sense as Stan
-> > > > suggested earlier.
-> > > 
-> > > The question is whether to add a useful mechanism (one sysfs parameter 
-> > > and a few lines of code) that is optional, but with demonstrable and 
-> > > significant performance/efficiency improvements for an important class 
-> > > of applications - or wait for an uncertain future?
-> > 
-> > The issue is that this one little change can never be removed, as it
-> > becomes ABI.
-> > 
-> > Let's get the right API from the start.
-> > 
-> > Not sure that a global variable, or sysfs as API, is the right one.
+On 16.08.24 16:13, Willem de Bruijn wrote:
+> Felix Fietkau wrote:
+>> Several drivers set NETIF_F_GSO_SOFTWARE, but mangle fraglist GRO packets
+>> in a way that they can't be properly segmented anymore.
 > 
-> Sorry per-device, not global.
+> Can you share a bit more concrete detail: which driver, for instance, and
+> how does it mangle the packet?
 > 
-> My main concern is that it adds yet another user tunable integer, for
-> which the right value is not obvious.
+> I assume something with inserting or deleting tunnel headers. But the
+> fraglist skbs should be able to reproduce the modified header in
+> skb_segment_list?
 
-This is a feature for advanced users just like SO_INCOMING_NAPI_ID
-and countless other features.
+I've received bug reports from a variety of people, often with very 
+little context, usually crashing while segmenting fraglist skbs.
 
-The value may not be obvious, but guidance (in the form of
-documentation) can be provided.
+The ones that people were able to easily reproduce involved bridging 
+with vxlan or virtio net devices. People using those two reported that 
+my patch fixed their crashes.
 
-> If the only goal is to safely reenable interrupts when the application
-> stops calling epoll_wait, does this have to be user tunable?
-> 
-> Can it be either a single good enough constant, or derived from
-> another tunable, like busypoll_read.
+I will try to gather more information about the root cause of the crashes.
 
-I believe you meant busy_read here, is that right?
-
-At any rate:
-
-  - I don't think a single constant is appropriate, just as it
-    wasn't appropriate for the existing mechanism
-    (napi_defer_hard_irqs/gro_flush_timeout), and
-
-  - Deriving the value from a pre-existing parameter to preserve the
-    ABI, like busy_read, makes using this more confusing for users
-    and complicates the API significantly.
-
-I agree we should get the API right from the start; that's why we've
-submit this as an RFC ;)
-
-We are happy to take suggestions from the community, but, IMHO,
-re-using an existing parameter for a different purpose only in
-certain circumstances (if I understand your suggestions) is a much
-worse choice than adding a new tunable that clearly states its
-intended singular purpose.
-
-- Joe
+- Felix
 
