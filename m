@@ -1,247 +1,125 @@
-Return-Path: <netdev+bounces-119139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B43954530
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:10:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04A2954532
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A94BB21C40
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:10:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B030286C4E
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69CF13C667;
-	Fri, 16 Aug 2024 09:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06AC13D51B;
+	Fri, 16 Aug 2024 09:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JxOmGl5V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AaiFDElG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA80E13AA41
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 09:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723799430; cv=fail; b=O0a3Nx6K4Pj6wNfPpamdjI+pOvifsYWhdKgKkoSEFwXCsHEs3m0LB0RxaT+8wJD7Vz2iY/RtknYrw1wK3FbzY5WOfOQ1szfwuXBzCn+CR4TQo3YyiJtW4boKgc9scEl9QcPR48KkSB5VXUzH9y3HMYiTT+rmsQq8B9MFALx0vKs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723799430; c=relaxed/simple;
-	bh=sqQWku8yRCHvtJqh5Ud9tSARSxJIMSBYPwWUJ56lYMs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lxKUsnVAFAcmHxehjfK1miZutzWXd5FgYYIS+lY17MSZjlegOnV624qgv5CJ3UNL7s11XIh1e8470rCJWTVgzY9RVhfhftzpTZykrX5hyyYNKfrOYiDCVwbYhfZ0URwk4bIARw3PQ8NWjzKhQquwAy9fQYDK2Bg27ygkXJnU7VI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JxOmGl5V; arc=fail smtp.client-ip=40.107.236.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SNDnuH/oQkRs7RWeH3oJoOt7VUU/hjwrbQieq05QGaT0KAWF2jjgQFFIUkYRuhJqoKzvE3bZkyKH/rHPKGiHrdx/qa+a7nRhTl6VgyxghniSfqAauGr9yRwyM6GMjNpO+UQ6T/1MG9MP6SwJMvFP3Xrp6hCFKLQPfPL9s84+0zz9TKIB42l4IaIIQ1cdh+jafjIP5/gbSrIP5U4O8U+JjHkLdghiT+p0zSbHtxWb1XQgXrFtdeh3XqAOytv0F3kvR1XMYzDaZWymHdwoAruw0b5CW1YAG5b8M7RlMd1yzxs0uki3mMD1HkapcSx9iDok1bR2pkM4S/Ew2dXvPpR2eg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sqQWku8yRCHvtJqh5Ud9tSARSxJIMSBYPwWUJ56lYMs=;
- b=LDhuTtVMtKwYu56chuQM3W37jSWxhSKWJZFXN8KrSDYMuWWCi6qAc3ZWaeMjJTNOQAUQe3SAoDef3uRxRIyYdL92dgely3q6yJUFbo2MMcfACyXca7gl61EDF1JpCQu6jS83Iozb5260ItDj5KyGJZxoIqHl5klwbNqAtOVeLPERKCPvjR/9PyZMLUqr+BVq1fz7aYKLin2uYLj/LQ6VkPPl8Jcojjy1gLUEJHCBMx1O8B4jA5SRZOjTLLBmbGUyTPWiV/QRNTLmVYKVrYKbIKysISHeDTLXyozBfDafMU4ctb4jgktMSHncnUrtUS56NlVIE0oSGQ9MTm6zm6IrUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sqQWku8yRCHvtJqh5Ud9tSARSxJIMSBYPwWUJ56lYMs=;
- b=JxOmGl5VxEAYw+vxUTGucvCHKib9JUUXd+15K1lKAK0Xx7XDs0tNbcPSZUrOshmuAr7RY249OqqaVN06RcZfxzI06DZ5RMYmu65ruzJ5eJj+x/YGoZdHrcDL1Pbctxfk0cHnW8joSDnUFCjibPKCFj5cRv8eUn+KdaTIIiwy8gXI+ONEKu5wkESOcVjcXWULlqfdhL+nnqNaKfkZGykRgn7jyzUDZ/R3fS1cAFwl1vgZUd6qR3rk0s3m0FzV6turuWSzG4Vl4qQXnSATJWfOc9bbovJ42g0meCLanZu7WtooZd5Kk2M3Gc0XRYQO2SkFhfgyqGLoNe1RYMZd4IAnSQ==
-Received: from IA1PR12MB8554.namprd12.prod.outlook.com (2603:10b6:208:450::8)
- by LV3PR12MB9119.namprd12.prod.outlook.com (2603:10b6:408:1a2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Fri, 16 Aug
- 2024 09:10:25 +0000
-Received: from IA1PR12MB8554.namprd12.prod.outlook.com
- ([fe80::f8d:a30:6e41:546d]) by IA1PR12MB8554.namprd12.prod.outlook.com
- ([fe80::f8d:a30:6e41:546d%4]) with mapi id 15.20.7875.016; Fri, 16 Aug 2024
- 09:10:25 +0000
-From: Jianbo Liu <jianbol@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>, "liuhangbin@gmail.com"
-	<liuhangbin@gmail.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, Leon Romanovsky
-	<leonro@nvidia.com>, "andy@greyhouse.net" <andy@greyhouse.net>, Gal Pressman
-	<gal@nvidia.com>, "jv@jvosburgh.net" <jv@jvosburgh.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net V4 1/3] bonding: implement xdo_dev_state_free and call
- it after deletion
-Thread-Topic: [PATCH net V4 1/3] bonding: implement xdo_dev_state_free and
- call it after deletion
-Thread-Index: AQHa7x6jL7NB5X8oxkij4wjap8vVZrIpNLkAgABlSgA=
-Date: Fri, 16 Aug 2024 09:10:25 +0000
-Message-ID: <07bad330d9259f851a5b6354c1c6a72587048c0e.camel@nvidia.com>
-References: <20240815142103.2253886-1-tariqt@nvidia.com>
-	 <20240815142103.2253886-2-tariqt@nvidia.com> <Zr7CiE9Rw8cxvzPf@Laptop-X1>
-In-Reply-To: <Zr7CiE9Rw8cxvzPf@Laptop-X1>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.40.0-1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR12MB8554:EE_|LV3PR12MB9119:EE_
-x-ms-office365-filtering-correlation-id: c505f113-38ae-4635-e3cf-08dcbdd34403
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?WHBSemdjSEt4MFIxaW4rMnIrUjBLbzh5YnhtdmYvTVN4U2EvM2dkTjcyY0Ru?=
- =?utf-8?B?cEtML09XOTdDTHdCVTRZZ2pvNTJOdzgrMFNUSXYrV3RtWGdpTnZLYk15bE9Y?=
- =?utf-8?B?TE5LeVF3SWszclpLK1FmMENQeEhIaTA2bm0xOGxySy9lZDNVZ0c1RVRiWXR6?=
- =?utf-8?B?dXQxYVF2NDhHR0ZiM0hGT0ZFcThKZGFqeStVaGdmQVRJYXNUSFZoSlBvc1I1?=
- =?utf-8?B?YnRra1ZBNTB2Q203ZS9EWUx0dWxYaU9KYk9JWHliZ1U0RXJvRk5PWTJ4LzdW?=
- =?utf-8?B?YVN6QWlqQVFWdHllQkNwYmM1NmtYdW8xSzJudkZKOUhDenhJSkFlS0tzQnh5?=
- =?utf-8?B?MkZZcnlJbkpUeHh6QmE4OXVuRWIwdGxJQlFkeWhINVE0Wmk5ZHN0YmF1eW5P?=
- =?utf-8?B?RjV6NFM4SVVmVHZjUmNkNTk2NE9oWnc4ejNTQTlOWG43ZFB1MFJUeC9KTnJr?=
- =?utf-8?B?dlJpdlltbm5KV0YvUHJ0MjVRSVhyTG1xWDJ5cUQ0L1p6NkVRRHRLMUFJS1hh?=
- =?utf-8?B?OXdsM1Z3cDJ0NGRpMzNjY3hwU0w5a2lvN3FpTlVUTEtoRzRITk0vY01VODhU?=
- =?utf-8?B?dXc3UlBjWDdwK2g4YzZ4am4wYmNESXdpbzJBT1V6UWEzZEYvSGROVDhBa1Iy?=
- =?utf-8?B?STFSRWhZdy9MbEJiZXBUVDg1aCsxcmQrTzQwRDlZZ0M5TTk3dllVblAvWkQr?=
- =?utf-8?B?cUlYQkpDUFdKaFhPdzRWRllIZGxoOEpEWVlQMHVESkFOSTlHZnNUZ1J0MWhT?=
- =?utf-8?B?YkQveXozTmJqcHZwa0ZVZDVXOEdaM0N5QXVCU2ZCZkFVMnBXaDlSUFdBNGpZ?=
- =?utf-8?B?ZjgvVmNMcVV2bjdTa2ZMQStHZDU4UG1OdjJSNVRUekkrUHlVTUFVeDhsOWQv?=
- =?utf-8?B?Q01FSlBJSFByaWtOVWFLMFdFY2IvTmg0RjdDN2lDRmpyNXZtK2R0aDRzS2VN?=
- =?utf-8?B?OWxQaWNiYnpqbzM3YW1yNU9SZGFFWXR2SjJNT2dURXdlUXFYWjBzRi85bGJF?=
- =?utf-8?B?MjgyQ2R1VE5FdGpuNWE0d0YraFlQakpQb01vK2VjblRMd3lyOU9wTEVudzJy?=
- =?utf-8?B?WmJUTGY0ZUZUbjVIbWNiRmtqajFOdEprMmFLUGRTOTZBWmRIclhlVWp3aHp6?=
- =?utf-8?B?YWpTd0RETnBBaFl5TFdINEU0aGc3aXo1SUgyVEtmY2t2bVRTV1FaZ21EdmZW?=
- =?utf-8?B?UE1zdXlyY1dNZ21SQnlYWTRDMjUybk9kT2xqQWNWVHcvMlk2L0NmY1NSRjZN?=
- =?utf-8?B?ODZGV2t5eVB0OTJUN1NFRWdDbGo0VENVQ1d2dE9heGNWeFNlMzFpUm1hcGxL?=
- =?utf-8?B?NzI4VURiQUhaRFlhVEJCbG1IVUtvUFlnR0FaNldZejdDQlZISFdTZVJLVVNV?=
- =?utf-8?B?RFFRbHE3b3dHck5DK3VpeFU5aWhWZ01vUmJ1c01jTnFlSWRkVWcrTHdJbUI5?=
- =?utf-8?B?OE9OcVhOdmNjN0UrRFdmaWlUbVkyUFFwT1hpeTVWZkNRYytITElKaU1aWW9u?=
- =?utf-8?B?OUlYMnVJL2ZBbmxrVHBiMUVxdU0zOXpwY2J4VUp0clRlUGMrK3JOblBkMmRv?=
- =?utf-8?B?YSszbm1HRm03NWg4ZmpQaVF5UEJsR2tPbXAwMjZjSTJrYTdEWkRmN3RKMlRI?=
- =?utf-8?B?Tm93YnF3ejJoOWxjNnRHWkZkdERwcFNBb0FtVlhxSEx4UUxFc3U2V09jVmRr?=
- =?utf-8?B?Qmlqc1AyV20wak4rUm9sUXg2MWhzeTc0alIzOCtoaFhnMWMyRVU5cy9RNVc0?=
- =?utf-8?B?bDFTME9zVHFlbkJQUGlGVVMxYlo4ZzcwVGlndTJlM295dEF0cEc2d2k0ZDFD?=
- =?utf-8?B?NHZ5YUd2QnZnKy82NEwrblpJdjZyYTZCbjU4dUlJcnpnc3JWTkFGaDYwZDRy?=
- =?utf-8?B?amEyeEQrd0tNRWhHZ3UzcUZGM1kweXJUcW9SWitNYVhJZUE9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8554.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SVVBRTlXSThyNFBhb25CWmM3VGQ5eXhPcmlhMVhZUDNTRG8vbnNKdWUycTVl?=
- =?utf-8?B?czQ3WisvQ0xRZHRwcEVHR1FHODBzLzYycU9nNWtzRk9aL2svRW9WajZ6d0xn?=
- =?utf-8?B?MGhrT0RJbGhMWUdZZFZpU0ZDNm03c2JxenE0UXY1cTFvSUVlYUZYQzBmNXM1?=
- =?utf-8?B?SlZST1c0VFZxSEZMdkpCWWtYSXFiS0M2RTN2THdFS3cvWnlwcHIwV2lTMTc5?=
- =?utf-8?B?Wkg3akdtVUFyVkM5NW5WY2FZeTZ1aEMvTktGVkUyQlcyNWxlY2Fqb05ReFEx?=
- =?utf-8?B?eUg1azQ2S2RSY1JPbXI3SmlBcXNpNXJ0enpKWENnbmtiUjVsaGhlaVFmNTR2?=
- =?utf-8?B?WjU5T3A0TlF6T2dwR1J3S0RycGlsRkVEcHl0ZjRRWEoyRnBMbkJ5dVd6bmJ1?=
- =?utf-8?B?WHg0N3NxVEJldzhVdkVjVHJXb3l2c3Yxell3Mlh2OXF5WWFzaCtLMk12RmRI?=
- =?utf-8?B?VExvME9lSWJDejBkSGpLeDQ2R0Z2bUsxS3pVTlFhbjhYT3liODFDZUJCNHZY?=
- =?utf-8?B?SnU3b2IxZXo5WThkc09nSHRuQVJ6M1F5V2ptMnZaY3NTNVNzZlhZaVFJdnFw?=
- =?utf-8?B?SjJ2SDVMYS9JNXhNSjcydkwxOVF1Ump3bVMzY2w5d1Y3QkRKRjFoY0JPMG9Q?=
- =?utf-8?B?V2VLc1h5T2dQNTZJR2hlcFE5NktpeWxubU1tN3o4VFc2eWNFNHlPQlgxSjRH?=
- =?utf-8?B?S0JKajdGNEZ5eXJpdkxLWE52U3U0TE9CdzhadkRrM0ZUQ3JjWkoyTUt5cnpC?=
- =?utf-8?B?UENUUGtuUHZOejhBRzQ1dDNzNUVlNnlDMGhzcHNrZ1J5RVY3SVJ4dGJCSHBR?=
- =?utf-8?B?SjJPZVpvK3BkUXdtYVhYZlE4K0U5d01OalUraHdpTGc0T0RlWXk4Uk0wbWJw?=
- =?utf-8?B?MlhDdENJcmRQZE05TThlMThDTUJDRktpWTZteHkzNmh3OWpWZU04TlZNZzdv?=
- =?utf-8?B?YnQ5ZU5YVlo1dmIvMTNKMGVPYUJIbHdPdmVZOVRKTWZ0V0Vqdm05ei9WZkdR?=
- =?utf-8?B?a01kYmxUaVdwMWpUeHR6UXpHSUVKWm04ZS9qSFR6Uk1CQXhNVTYrRkFaUGJJ?=
- =?utf-8?B?RlNFeE9rZ2tycDZnSDVwS0FmZWtGdTg3QkozZmU4MHdPdTdrRm1qU1dNby9n?=
- =?utf-8?B?ejVQaG1wL3pJeGNBQzBhdnNMN0QwT29rellucDRBbG5xWWlxK1ZiMHAxOG04?=
- =?utf-8?B?ZmFLcWJ2dGdxKytPWEk5Wmx3Uk5Ld0ZYZFpFc2Q1ZmR1RmNiNFJtVWlWOEo5?=
- =?utf-8?B?aGVqUFdhajNIRWlmZHdMZStVYlRmV3BNSTNmekpHN3lIZlMzWkVvREVxN043?=
- =?utf-8?B?cU5lM2UzSXprdERBWEFXMjFUQXdFTnVyeU11eFdTeUJ6R3dubVZMZVBBUjYr?=
- =?utf-8?B?Zncrd2hEQlB6QTJCTnJIQk1hUlFSdlFsZmFvN1B2eks2YS84WWM2TG9LR0M0?=
- =?utf-8?B?bUljRzBaSjZvZjhPVGhLcUpZenh0Q3p3UlVSZ1gvcytWaXpNZzd3VElNSzYy?=
- =?utf-8?B?VWVaSlpBdDRTbXlzbzV6OUhEcEFqOUJXMlZzTHNlZUtuOVpjaFU5ZG5FTkkr?=
- =?utf-8?B?ek92dXUvVVBZbVlMTUpVRW9NaGdQNG1OWmoyVnA1QlNMekhCR0lzcFZzV2JR?=
- =?utf-8?B?ZFdXeDk4RXB6VFNxTnd0d0l4aUtlYVZtdWNycDJ2RnpJNHdGdnV3VXY5RnlS?=
- =?utf-8?B?WU9ZYmdycVJnY1lydmg2RktUUUxSRU1DYVBMUnFkYk5DVnI3bzBUMDhkSHBo?=
- =?utf-8?B?YnYvcW13Znp0dkJCTnJ1bUFES0QzYStkQ3cyN09IRDU4SFA1UFlPU0ZuaFpj?=
- =?utf-8?B?UnBPMDVKaU9WQ21JU1QwbkNsV3M0WlBsaVFkQXZTbEdJOVZ5ZEtGVm5jQzFi?=
- =?utf-8?B?c1BZMkp2ZEc2TE4wNVZ5dUVXRjZsTmd2Z3pZN1hzRmhpUFl1NmFGRmJkUG10?=
- =?utf-8?B?MjduRU01Wmw3Rlh5ejYwK1UxWENBanp1UGxGdDFnYy9SRDZzN1dNOFkzTXAv?=
- =?utf-8?B?TVp3aksxNnMrM2RpeUFmNVBhTHBaZlBLQysrcER4RE43c2JndzQzNlRHWHJx?=
- =?utf-8?B?bXZPTGVoeU83UVN3QW01OFhENFpvd2NKT3VGSDhCbUtmODE3cWsrT21mMTFk?=
- =?utf-8?B?NjJpeU13bEhObkZlYW5qQWlTbi90ejg0Ty9ZU292eHFhWXc5cUZUK2R5Y2cz?=
- =?utf-8?B?b0E9PQ==?=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BB313C801;
+	Fri, 16 Aug 2024 09:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723799433; cv=none; b=LewovBDfjnyjeS68Gpa4mtrEaC3/3kq0PhCVSTYK8qZ3GGBsGoBs/AztP1LbdFCakQ2QlaCV0PO5fhi1wlzO2RoF3C1qW035suDTM9+2TuwLrsJUVwf1D79c0dav3RaFVse7hg1KmmraV+GlpWwPBrvtkyRl1cNmNVQQ/pxKJbA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723799433; c=relaxed/simple;
+	bh=S9r9yGxVBVVt8iz8VZ6BiPMcB2RBNjLI7DiZjXXCPnM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bdG+jvkrF7X4mred0YKfl+dOaqlaEpO796/S0DMAuErhsNOKxDlTrlaLI7J0YGJpXp3jGCyUTE6ahfPoAjwQ4nZeqB1AKhsgY8X71SGwzoohhSzUqxxCzZn0f4SYon5IQFYWjtvenq13QF7VtmL9NkJISazjpT3iydqubcpfcvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AaiFDElG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0593AC4AF0E;
+	Fri, 16 Aug 2024 09:10:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723799433;
+	bh=S9r9yGxVBVVt8iz8VZ6BiPMcB2RBNjLI7DiZjXXCPnM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AaiFDElGcQlADY2h4llu8sBTpqefXgK+iL4Au8i8jzAi7VXApVT/OCSs+U5Ed6R4/
+	 EF8e9hQa5VysVYQXNdIK7FdMgak7LT6I41P6rC/s/mjdlxNndtc8G9Dzmt8U1ecu6e
+	 hn6NNbonoDUFWHkR28/hzNBMcS4zLEm83xpWcn8BPh1eMs4vx9ONdC3wQ7OsgwpDgC
+	 y8b44M2W9uRrm6VerRZyS5QsBn5H05WrhWG9XBrXsbVRn1aQU35FVWx55Faz6KjWRI
+	 rHgXDoIczxOBL+L3fB1Xqo7fJLEY+UKHeb0En/K6Pg5qrgDOcZN1H7emsCAx10hMzB
+	 Mr2H6Kd3kTQ5g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FB538231F8;
+	Fri, 16 Aug 2024 09:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <0CC4FB45F0AABD44B15E4699992A115A@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8554.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c505f113-38ae-4635-e3cf-08dcbdd34403
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Aug 2024 09:10:25.6188
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: G4V4wCGloExqY/ZL9+5pPlZ4xCRW0Z6IXjaSt2PdbNTtL4VEsOJaCUX8opKcV4NYq+rEPl1pCq8Pu+S5mzh56A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9119
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 00/14] VLAN fixes for Ocelot driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172379943226.3458201.417541764470956886.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Aug 2024 09:10:32 +0000
+References: <20240815000707.2006121-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240815000707.2006121-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, atenart@kernel.org,
+ UNGLinuxDriver@microchip.com, hongbo.wang@nxp.com, xiaoliang.yang_1@nxp.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, colin.foster@in-advantage.com,
+ horatiu.vultur@microchip.com, liuhangbin@gmail.com, petrm@nvidia.com,
+ idosch@nvidia.com, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-T24gRnJpLCAyMDI0LTA4LTE2IGF0IDExOjA3ICswODAwLCBIYW5nYmluIExpdSB3cm90ZToNCj4g
-T24gVGh1LCBBdWcgMTUsIDIwMjQgYXQgMDU6MjE6MDFQTSArMDMwMCwgVGFyaXEgVG91a2FuIHdy
-b3RlOg0KPiA+IEZyb206IEppYW5ibyBMaXUgPGppYW5ib2xAbnZpZGlhLmNvbT4NCj4gPiANCj4g
-PiBBZGQgdGhpcyBpbXBsZW1lbnRhdGlvbiBmb3IgYm9uZGluZywgc28gaGFyZHdhcmUgcmVzb3Vy
-Y2VzIGNhbiBiZQ0KPiA+IGZyZWVkIGZyb20gdGhlIGFjdGl2ZSBzbGF2ZSBhZnRlciB4ZnJtIHN0
-YXRlIGlzIGRlbGV0ZWQuIFRoZSBuZXRkZXYNCj4gPiB1c2VkIHRvIGludm9rZSB4ZG9fZGV2X3N0
-YXRlX2ZyZWUgY2FsbGJhY2ssIGlzIHNhdmVkIGluIHRoZSB4ZnJtDQo+ID4gc3RhdGUNCj4gPiAo
-eHMtPnhzby5yZWFsX2RldiksIHdoaWNoIGlzIGFsc28gdGhlIGJvbmQncyBhY3RpdmUgc2xhdmUu
-DQo+ID4gDQo+ID4gQW5kIGNhbGwgaXQgd2hlbiBkZWxldGluZyBhbGwgU0FzIGZyb20gb2xkIGFj
-dGl2ZSByZWFsIGludGVyZmFjZQ0KPiA+IHdoaWxlDQo+ID4gc3dpdGNoaW5nIGN1cnJlbnQgYWN0
-aXZlIHNsYXZlLg0KPiA+IA0KPiA+IEZpeGVzOiA5YTU2MDU1MDVkOWMgKCJib25kaW5nOiBBZGQg
-c3RydWN0IGJvbmRfaXBlc2MgdG8gbWFuYWdlIFNBIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBKaWFu
-Ym8gTGl1IDxqaWFuYm9sQG52aWRpYS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogVGFyaXEgVG91
-a2FuIDx0YXJpcXRAbnZpZGlhLmNvbT4NCj4gPiBSZXZpZXdlZC1ieTogSGFuZ2JpbiBMaXUgPGxp
-dWhhbmdiaW5AZ21haWwuY29tPg0KPiA+IC0tLQ0KPiA+IMKgZHJpdmVycy9uZXQvYm9uZGluZy9i
-b25kX21haW4uYyB8IDMyDQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4g
-PiDCoDEgZmlsZSBjaGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspDQo+ID4gDQo+ID4gZGlmZiAtLWdp
-dCBhL2RyaXZlcnMvbmV0L2JvbmRpbmcvYm9uZF9tYWluLmMNCj4gPiBiL2RyaXZlcnMvbmV0L2Jv
-bmRpbmcvYm9uZF9tYWluLmMNCj4gPiBpbmRleCAxY2Q5MmMxMmU3ODIuLmViNWU0Mzg2MDY3MCAx
-MDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ib25kaW5nL2JvbmRfbWFpbi5jDQo+ID4gKysr
-IGIvZHJpdmVycy9uZXQvYm9uZGluZy9ib25kX21haW4uYw0KPiA+IEBAIC01ODEsNiArNTgxLDgg
-QEAgc3RhdGljIHZvaWQgYm9uZF9pcHNlY19kZWxfc2FfYWxsKHN0cnVjdA0KPiA+IGJvbmRpbmcg
-KmJvbmQpDQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgX19mdW5jX18pOw0KPiA+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgfSBlbHNlIHsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBzbGF2ZS0+ZGV2LT54ZnJtZGV2X29wcy0NCj4gPiA+eGRvX2Rl
-dl9zdGF0ZV9kZWxldGUoaXBzZWMtPnhzKTsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChzbGF2ZS0+ZGV2LT54ZnJtZGV2X29wcy0NCj4gPiA+
-eGRvX2Rldl9zdGF0ZV9mcmVlKQ0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHNsYXZlLT5kZXYtPnhmcm1kZXZfb3BzLQ0K
-PiA+ID54ZG9fZGV2X3N0YXRlX2ZyZWUoaXBzZWMtPnhzKTsNCj4gPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoH0NCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlw
-c2VjLT54cy0+eHNvLnJlYWxfZGV2ID0gTlVMTDsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgfQ0KPiA+
-IEBAIC01ODgsNiArNTkwLDM1IEBAIHN0YXRpYyB2b2lkIGJvbmRfaXBzZWNfZGVsX3NhX2FsbChz
-dHJ1Y3QNCj4gPiBib25kaW5nICpib25kKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqByY3VfcmVhZF91
-bmxvY2soKTsNCj4gPiDCoH0NCj4gPiDCoA0KPiA+ICtzdGF0aWMgdm9pZCBib25kX2lwc2VjX2Zy
-ZWVfc2Eoc3RydWN0IHhmcm1fc3RhdGUgKnhzKQ0KPiA+ICt7DQo+ID4gK8KgwqDCoMKgwqDCoMKg
-c3RydWN0IG5ldF9kZXZpY2UgKmJvbmRfZGV2ID0geHMtPnhzby5kZXY7DQo+ID4gK8KgwqDCoMKg
-wqDCoMKgc3RydWN0IG5ldF9kZXZpY2UgKnJlYWxfZGV2Ow0KPiA+ICvCoMKgwqDCoMKgwqDCoHN0
-cnVjdCBib25kaW5nICpib25kOw0KPiA+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBzbGF2ZSAqc2xh
-dmU7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoMKgwqDCoGlmICghYm9uZF9kZXYpDQo+ID4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsNCj4gPiArDQo+ID4gK8KgwqDCoMKgwqDC
-oMKgcmN1X3JlYWRfbG9jaygpOw0KPiA+ICvCoMKgwqDCoMKgwqDCoGJvbmQgPSBuZXRkZXZfcHJp
-dihib25kX2Rldik7DQo+ID4gK8KgwqDCoMKgwqDCoMKgc2xhdmUgPSByY3VfZGVyZWZlcmVuY2Uo
-Ym9uZC0+Y3Vycl9hY3RpdmVfc2xhdmUpOw0KPiA+ICvCoMKgwqDCoMKgwqDCoHJlYWxfZGV2ID0g
-c2xhdmUgPyBzbGF2ZS0+ZGV2IDogTlVMTDsNCj4gPiArwqDCoMKgwqDCoMKgwqByY3VfcmVhZF91
-bmxvY2soKTsNCj4gDQo+IEFzIEkgcmVwbGllZCBpbiAgIA0KPiBodHRwczovL2xvcmUua2VybmVs
-Lm9yZy9uZXRkZXYvWnJ3Z1JhRGMxVm8wSmhjakBMYXB0b3AtWDEvLA0KPiANCg0KQXMgSSByZXBs
-aWVkLCB0aGUgUkNVIGxvY2sgaXMgdG8gcHJvdGVjdCB0aGUgcmVhZGluZyBvZiB0aGUgY29udGVu
-dA0KcG9pbnRlZCBieSBjdXJyX2FjdGl2ZV9zbGF2ZSwgbm90IHRoZSBzbGF2ZS0+ZGV2IGl0c2Vs
-Zi4NCg0KPiA+ICsNCj4gPiArwqDCoMKgwqDCoMKgwqBpZiAoIXNsYXZlKQ0KPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm47DQo+ID4gKw0KPiA+ICvCoMKgwqDCoMKgwqDC
-oGlmICgheHMtPnhzby5yZWFsX2RldikNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgcmV0dXJuOw0KPiA+ICsNCj4gPiArwqDCoMKgwqDCoMKgwqBXQVJOX09OKHhzLT54c28ucmVh
-bF9kZXYgIT0gcmVhbF9kZXYpOw0KPiA+ICsNCj4gPiArwqDCoMKgwqDCoMKgwqBpZiAocmVhbF9k
-ZXYgJiYgcmVhbF9kZXYtPnhmcm1kZXZfb3BzICYmDQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-IHJlYWxfZGV2LT54ZnJtZGV2X29wcy0+eGRvX2Rldl9zdGF0ZV9mcmVlKQ0KPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZWFsX2Rldi0+eGZybWRldl9vcHMtPnhkb19kZXZfc3Rh
-dGVfZnJlZSh4cyk7DQo+IA0KPiBIb3cgZG8geW91IG1ha2Ugc3VyZSB0aGUgc2xhdmUgbm90IGZy
-ZWVkIGFmdGVyIHJjdV9yZWFkX3VubG9jaygpPw0KPiANCg0KU28gZG8geW91IHdhbnQgdG8gbW92
-ZSByY3VfcmVhZF91bmxvY2sgYWZ0ZXIgeGRvX2Rldl9zdGF0ZV9mcmVlLCBqdXN0DQpsaWtlIHdo
-YXQgeW91IGRpZCBpbiB5b3VyIHBhdGNoZXM/IA0KIA0KDQpUaGFua3MhDQpKaWFuYm8NCg0KDQo=
+Hello:
+
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 15 Aug 2024 03:06:53 +0300 you wrote:
+> This is a collection of patches I've gathered over the past several
+> months.
+> 
+> Patches 1-6/14 are supporting patches for selftests.
+> 
+> Patch 9/14 fixes PTP TX from a VLAN upper of a VLAN-aware bridge port
+> when using the "ocelot-8021q" tagging protocol. Patch 7/14 is its
+> supporting selftest.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,01/14] selftests: net: local_termination: refactor macvlan creation/deletion
+    https://git.kernel.org/netdev/net/c/8d019b15ddd5
+  - [net,02/14] selftests: net: local_termination: parameterize sending interface
+    https://git.kernel.org/netdev/net/c/4261fa35185c
+  - [net,03/14] selftests: net: local_termination: parameterize test name
+    https://git.kernel.org/netdev/net/c/df7cf5cc551c
+  - [net,04/14] selftests: net: local_termination: add one more test for VLAN-aware bridges
+    https://git.kernel.org/netdev/net/c/5b8e74182ed3
+  - [net,05/14] selftests: net: local_termination: introduce new tests which capture VLAN behavior
+    https://git.kernel.org/netdev/net/c/5fea8bb00974
+  - [net,06/14] selftests: net: local_termination: don't use xfail_on_veth()
+    https://git.kernel.org/netdev/net/c/9aa3749ca4a8
+  - [net,07/14] selftests: net: local_termination: add PTP frames to the mix
+    https://git.kernel.org/netdev/net/c/237979504264
+  - [net,08/14] selftests: net: bridge_vlan_aware: test that other TPIDs are seen as untagged
+    https://git.kernel.org/netdev/net/c/e29b82ef2761
+  - [net,09/14] net: mscc: ocelot: use ocelot_xmit_get_vlan_info() also for FDMA and register injection
+    https://git.kernel.org/netdev/net/c/67c3ca2c5cfe
+  - [net,10/14] net: mscc: ocelot: fix QoS class for injected packets with "ocelot-8021q"
+    https://git.kernel.org/netdev/net/c/e1b9e80236c5
+  - [net,11/14] net: mscc: ocelot: serialize access to the injection/extraction groups
+    https://git.kernel.org/netdev/net/c/c5e12ac3beb0
+  - [net,12/14] net: dsa: provide a software untagging function on RX for VLAN-aware bridges
+    https://git.kernel.org/netdev/net/c/93e4649efa96
+  - [net,13/14] net: dsa: felix: fix VLAN tag loss on CPU reception with ocelot-8021q
+    https://git.kernel.org/netdev/net/c/f1288fd7293b
+  - [net,14/14] net: mscc: ocelot: treat 802.1ad tagged traffic as 802.1Q-untagged
+    https://git.kernel.org/netdev/net/c/36dd1141be70
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
