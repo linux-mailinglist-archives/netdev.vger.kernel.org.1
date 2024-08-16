@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-119110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A0D954121
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:27:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 265FC95412F
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D7211F2401D
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 05:27:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84B71F21BE5
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 05:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBAF7D417;
-	Fri, 16 Aug 2024 05:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217153307B;
+	Fri, 16 Aug 2024 05:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WoYtb5vC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKSFeQWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A063383A5;
-	Fri, 16 Aug 2024 05:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6FB10E6;
+	Fri, 16 Aug 2024 05:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723786058; cv=none; b=r7vkRtq4/FSbEAxnrlMZclIfBdMUp7oGdAhPXhjOns72mDJvFtuwFPjVpvxsHvVALgSN0KLLukUpm3rMRDgU9A1HB3sfA1Z2MaV7kgqb6t6ScXHOsLZfkmc/z8SloYhUDNYauEfYFh2gVf0mTnSqhnwiINGQsBeMKZP16DAHSJA=
+	t=1723786216; cv=none; b=RRYXIumFhiZcCpyt+E5vhdGY0XkJvHSmmmRm4qrc6hKbJ2Dz81hmbo4kHRDi4GybuGaAGfsfjbszoxVKF9TxUXj7V1slRzVj8+nY9QENJcLdMyAYFKhUxkA2Qu3hFx/vR6dQQWHTcst4y+yc9aQSC+d2VVFBmcMpphzkcjsv6lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723786058; c=relaxed/simple;
-	bh=C8JCEvLWQ5G/QX+Z+B3U2mu7/HOAbBoLrxCp/fUrX8w=;
+	s=arc-20240116; t=1723786216; c=relaxed/simple;
+	bh=SyLAUoU9C9P6cw+pghk6HIVDf5PMktIaOLThFtEQwHU=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=DucKsg1IyQz7mt0KUtYxfJDvrxFBdXgyY6SbVpRwbxSOL3lgtuyUUCsEn/PU34/StupMk2Bo/P1Gk7Zz/3xdi/LK/j2c1/mBPqprFo9hYh7mTWLUG7UvsBT+xWwm5c0/2qQaACHLcwhVSGOizKkG+QoGRteDx17CfsVfPmaqLM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WoYtb5vC; arc=none smtp.client-ip=209.85.214.173
+	 Mime-Version:Content-Type; b=GUcpqPabq6M+OLuwyDILJa/hoOnlJWWTkcwehsaV2Dfm1w0yEbYaDgx+8HYwVoMYDGju9KF3BCJOfMsp91p0woOPfZm8o6UcInvSAFlFfw4XMbZT/n8Hgz9kQC1Xoq2QdKY4BisF6vlS1Ht44ZEzLYiVust0TEONMwSnj4Vk6ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IKSFeQWB; arc=none smtp.client-ip=209.85.161.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-201f577d35aso1233525ad.1;
-        Thu, 15 Aug 2024 22:27:37 -0700 (PDT)
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5d5bb451631so163090eaf.2;
+        Thu, 15 Aug 2024 22:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723786056; x=1724390856; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723786213; x=1724391013; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YyB88pFGj7JzZ7sJwulMUE4+n3R2zoWCNUpzRWIdUSU=;
-        b=WoYtb5vCGMrzcPav3ipJ1bKZBRxbzT1fL2XU3wWD1vHJYdjYKdwcbJ19rEWekFupdk
-         Ln0Jbk8QMkwl19ZXDGeEFq6yN8VLQxh8el263r91XMg9YWi2CdUpIJx0P9n0Kcdm392r
-         mx5ul9fzeXoTXlOGyESdWfqbQ5R0NqxzsEGkmfWcfaICinSLPwXAkFiK/z6zlMAnIePn
-         MZ5HhW7SyCFktlUpkeERCddkInSVi9NG70FW3h6K5w8fUtiIvktvHgzLRxa2lhGYq5PQ
-         X04tq7E0JHpJGtae3pgtQzID4E4nmRn/4pq2aYJbJ6irQ4x2o8r7KymCysYeRE32xMb4
-         2Fmg==
+        bh=Q5MTPqOOZ40oHbSoMYyF57Fd3nuGSX9c9MurnKDvWnM=;
+        b=IKSFeQWBgpPl60ncyco/6dooAw7LDnKUDqNP9lGEXBGub+UoiIKQtpCsZNJR5CuKMZ
+         yV5LDBEzWfr+1+jFUb/m0XeAtEbyHmOce9sA7nQ95pGdBm9dYM+UY5u3H8soWI5V7bEV
+         rTkwVrfTcaFAdBCfUk/+EmNjj50DHc4V2r5N29Y0CwDQuYshJrz9B/gYdTTTFhgB/53g
+         1ZcKT+ZSZcRmCgNXtdOUlUAzFSBFiB5oYlNW2DdgyPvodUIG6XRsQQjN00z0Ydfe0k4Z
+         6J5R/RkGbb3DmE9UCPM/IQ7/q0FxSZ/1tW008Jb2qdxB45P6L8l3WoGQEPmKwjxao17/
+         Excw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723786056; x=1724390856;
+        d=1e100.net; s=20230601; t=1723786213; x=1724391013;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YyB88pFGj7JzZ7sJwulMUE4+n3R2zoWCNUpzRWIdUSU=;
-        b=n4jJq/qHopq+IBG6tusyb17UnZtL0JhUNzlnovGH/JPYfr9+mPtKN39LUPqItCzSLr
-         Ao1PRg2elHjviqNoOFw3VPraL+dnCzwkB3kZucgWtiV2SpMEOFWuv+XUQ5NJMi8N5rVk
-         GwTOcMl8hIf+tfTF4/M5FyjnhcqYvBmXFmIJdiT82kawejorK3gga0AawmQ4xpIwhBAk
-         dO2IDaaqqbPEYszdJ1uF3lLgIdFLOixBDlp5GCtfbsaOoexctFHlipxzlAB+YnflY8aa
-         cKP77SGXb06fmN6vT+/jA1lplAucDNPuUSTPJNiqbG2pAIL4D2cTcL6a1TLVf9j86B3G
-         pFyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8Ux2DiDXIZA4ep8YTzuKCHPG6adGuHg61lBJKM8bxmILP2/TdGEpcAxwgPqeqUjWuRv8Z0M3iZZNSBL/WjNGmReg0omq92TzdTF7rqsDZpOYxqEH6mXL8TGxMaCqY5YrOu0OhjhE=
-X-Gm-Message-State: AOJu0YzB27z2JeYKgEdxvwOG9jFNzt5+BKo19vmkIWMwXkaAInY64vy+
-	T2vuy2SBaCoxh/fdkaLzXG86C3y3byq0FJ5nxvECp2R8+3fIqmBT
-X-Google-Smtp-Source: AGHT+IGHm1R+J26Nli5IP7BHkYxLx1Oa6Kcv2MSBGSW++PXMxn059j0cYvaEFXBYbs0dQVITADgwNw==
-X-Received: by 2002:a17:902:ea10:b0:201:fed0:5169 with SMTP id d9443c01a7336-202040635d9mr12899125ad.11.1723786056248;
-        Thu, 15 Aug 2024 22:27:36 -0700 (PDT)
+        bh=Q5MTPqOOZ40oHbSoMYyF57Fd3nuGSX9c9MurnKDvWnM=;
+        b=aNGwn6BGj8qifMoQAmjsAA15aDQnX9cdRs6Na+p9R1frI7WV0rCriR2jAPLzeZ52W0
+         xlUDclV6AXhkp8wa6pEq8KXxfrATVLNs0z/Jy/j0KXfZFZDIOhJDDIsFzRj8h45+/HIS
+         cR+k9D0zSYkr8UTgKw7q6vDP9MUIwsk1N0/fSlAmEdnrxzyPU7cGVAHa4ysyyDo0K9ap
+         MjC0L9VuNorjkFba+rrGJ5sThfQWyThaiDZFWlTVdZSGWEoHhoybVmw5xgArTHl4LEln
+         M98hpo3gL4oWt9AeuOxDcewNo+xvLwnfjEZDmS62deaAHD4ZGnqeCmpFDymoYTseJLrT
+         SZGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmRoliqUVdvHx8GsWzJM4mamMf08nlY0R7ioujdViiz91/MtwxB4mcyv7N6u3gTFV6O/mFK8h0JYutno1LxOuzRhan50N0ppm0M43qWhPGueeCW4o8G7jpLC/PaMeeLTt8WTrJR1I=
+X-Gm-Message-State: AOJu0YwgWVsfqKL5DOfj88fTnL+kAsMrk0aCyvZy1Z7DobJWlIFoa9ub
+	0OtwDVEMxLB+F5bQxOneKOReadNoEgNdwRYPykJFG7sJ/GZ2ozXJ
+X-Google-Smtp-Source: AGHT+IE/sAo5vt4uME2C2L3MvOtP2Djydg7oc7vPiSEYp/z6hRJ+ZX8zZezJdxS79NUVdAwhNxLn/w==
+X-Received: by 2002:a05:6870:968e:b0:260:23eb:5669 with SMTP id 586e51a60fabf-2701c35477bmr1141864fac.2.1723786213482;
+        Thu, 15 Aug 2024 22:30:13 -0700 (PDT)
 Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f1c88834sm17131045ad.255.2024.08.15.22.27.33
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af416d4sm1877931b3a.190.2024.08.15.22.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 22:27:36 -0700 (PDT)
-Date: Fri, 16 Aug 2024 05:27:21 +0000 (UTC)
-Message-Id: <20240816.052721.12647889619015306.fujita.tomonori@gmail.com>
+        Thu, 15 Aug 2024 22:30:13 -0700 (PDT)
+Date: Fri, 16 Aug 2024 05:30:09 +0000 (UTC)
+Message-Id: <20240816.053009.1420518753499945384.fujita.tomonori@gmail.com>
 To: andrew@lunn.ch
 Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
  rust-for-linux@vger.kernel.org, tmgross@umich.edu,
  miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
  aliceryhl@google.com
-Subject: Re: [PATCH net-next v3 4/6] rust: net::phy unified read/write API
- for C22 and C45 registers
+Subject: Re: [PATCH net-next v3 5/6] rust: net::phy unified
+ genphy_read_status function for C22 and C45 registers
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <82db7404-4665-4563-8011-6d2d5e9c2685@lunn.ch>
+In-Reply-To: <b61b5eb4-ee73-405c-aeae-0c26c66445fc@lunn.ch>
 References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
-	<20240804233835.223460-5-fujita.tomonori@gmail.com>
-	<82db7404-4665-4563-8011-6d2d5e9c2685@lunn.ch>
+	<20240804233835.223460-6-fujita.tomonori@gmail.com>
+	<b61b5eb4-ee73-405c-aeae-0c26c66445fc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,21 +90,24 @@ Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Fri, 16 Aug 2024 03:09:31 +0200
+On Fri, 16 Aug 2024 03:19:51 +0200
 Andrew Lunn <andrew@lunn.ch> wrote:
 
-> So the problem is with the comment above. It would be better to say
-> something like:
+>> +///
+>> +///     // Checks the link status and updates current link state via C22.
+>> +///     dev.genphy_read_status::<phy::C22>();
+>> +///     // Checks the link status and updates current link state via C45.
+>> +///     dev.genphy_read_status::<phy::C45>();
 > 
-> This module provides support for accessing PHY registers in the
-> Ethernet management interface clauses 22 and 45 register namespaces, as
-> defined in IEEE 802.3.
-> 
-> Dropping the via, and adding register namespace should make it clear
-> we are talking about the registers themselves, not how you access
-> them.
+> Again, the word `via` is wrong here. You are looking at the link state
+> as reported by registers in the C22 namespace, or the C45 namespace.
 
-Makes sense. Replaced that comment with your version.
+Yeah, how about the followings?
 
-Thanks a lot!
+///     // Checks the link status as reported by registers in the C22 namespace
+///     // and updates current link state.
+///     dev.genphy_read_status::<phy::C22>();
+///     // Checks the link status as reported by registers in the C45 namespace
+///     // and updates current link state.
+///     dev.genphy_read_status::<phy::C45>();
 
