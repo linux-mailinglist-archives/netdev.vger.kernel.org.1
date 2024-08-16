@@ -1,129 +1,93 @@
-Return-Path: <netdev+bounces-119249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4DB954F79
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 19:02:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 489A0954F85
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 19:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C1691F22C24
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0497C282A7D
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 17:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEB91BD4EA;
-	Fri, 16 Aug 2024 17:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09841BF31C;
+	Fri, 16 Aug 2024 17:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZDxZnYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2069B1BE241;
-	Fri, 16 Aug 2024 17:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709C51BDA87;
+	Fri, 16 Aug 2024 17:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723827746; cv=none; b=iovbgcy5TyA6sutTUlWin1ySzjAQVAOdtetEOSzwIp+pZ6E4yluV4CMhkbQryj+82gkib+CIwPhgpaotdl0JgZX3cPcjDMn2IMwZrbSZ+b9ZCvXSuvP9Z/+/n/tHapxRYux1mgjYIuquoPSLUqgm7dzHO+4pbALPiPOsanHlAsE=
+	t=1723827940; cv=none; b=mXrgfSgzAgDGe7o4nYAQ7letMZMKe/q/9crZlpnlVJ3acvB3+6oB1wN3VRh3fsLOev+nMmcRjOMv33Em2td/0jXTmcOQahukdGJNolhrG6zErM7RnYyJDaCcJ4RFtwuRM04OLgbDwNLilmKG0KwwjoxS2q7xD3pUbi60eXlO/6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723827746; c=relaxed/simple;
-	bh=9718fqdYNAYzKJH1GW1xbNR/gKG0Y44y/Tp8v3ItV6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FVoPvW8XwgP4CSPS4bHl1+xCBdG5GVjjSDUH3LmUw8QKcFPrnc5jJeuiIdgH8PWJADm35Eav77ZDDNk7QWY52nluxYGJ4JSoQJHNnSrNnTYi38C/eyEzEsmR3ObIGJ8ffY5Q9qO67MVGgSU26Cyir/LvmTUnLbgq6Nu0G2kQ394=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4WlpFV0hMsz9sRy;
-	Fri, 16 Aug 2024 19:02:22 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id laL4b9KcLErP; Fri, 16 Aug 2024 19:02:21 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4WlpFT6bcbz9sRs;
-	Fri, 16 Aug 2024 19:02:21 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id BE7528B775;
-	Fri, 16 Aug 2024 19:02:21 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id TqPwP2e5NScu; Fri, 16 Aug 2024 19:02:21 +0200 (CEST)
-Received: from [192.168.232.147] (unknown [192.168.232.147])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 977708B764;
-	Fri, 16 Aug 2024 19:02:20 +0200 (CEST)
-Message-ID: <a1231b3a-cd4d-4e74-9266-95350f880449@csgroup.eu>
-Date: Fri, 16 Aug 2024 19:02:20 +0200
+	s=arc-20240116; t=1723827940; c=relaxed/simple;
+	bh=TKvbI1GAEeItb2bEFwK/yASbak4bQTgxXpY2SIvi1DU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CZ8P1KZ/j68ey9OWs4bOcqKwl/VF8mX1hfeIlwAehWOU60jHfU5lHmLbKguiHlYaUxsEfhiTVpt8CBr8xXPV5TSZgw/+pCYMYsY1gzhEU6UHZpp/YuUoWJs5mAkOFoM5Nbz6XjVY5cPB6Ll/Nbk4zogpripmu8lGYPIOf3Oyebw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZDxZnYh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9296C32782;
+	Fri, 16 Aug 2024 17:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723827940;
+	bh=TKvbI1GAEeItb2bEFwK/yASbak4bQTgxXpY2SIvi1DU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gZDxZnYhrb78J/hqA57WOJfo1+Dr08NPTYbnvgLhfkA6+9sAjqEcYIkkQ1z9FjdCZ
+	 zaLcmaacYWaBF+mzuLUc7HKMQkbJri8pgw8wQCbTcSzz1gT+MghqhUazDTnfHxEeLU
+	 UMefPPeouOulIMKPNdJoO57o6H6KIv4yru+q9m3SoEd18E8zL0sWrpRvZTAoEB+tSv
+	 a8dwwqOq2CttymwE8VXN7agwheSuiJ/9VzGwJ87QvE/Kcsw06eyihkzMjaUFlXHwPg
+	 0xGaLJj87Z01LhN3LPVJZC30oaxqSY6yFAcvD0zyoY4mDcMmYvKPftcTMHRM1oW+c1
+	 6gOgigVK8pHcw==
+Date: Fri, 16 Aug 2024 10:05:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <horms@kernel.org>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <andrew@lunn.ch>,
+ <corbet@lwn.net>, <linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
+ <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+ <devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
+ <ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
+ <vladimir.oltean@nxp.com>, <masahiroy@kernel.org>, <alexanderduyck@fb.com>,
+ <krzk+dt@kernel.org>, <robh@kernel.org>, <rdunlap@infradead.org>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+ <Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
+ <Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
+ <linux@bigler.io>, <markku.vorne@kempower.com>
+Subject: Re: [PATCH net-next v6 13/14] microchip: lan865x: add driver
+ support for Microchip's LAN865X MAC-PHY
+Message-ID: <20240816100537.7457ba58@kernel.org>
+In-Reply-To: <20240812102611.489550-14-Parthiban.Veerasooran@microchip.com>
+References: <20240812102611.489550-1-Parthiban.Veerasooran@microchip.com>
+	<20240812102611.489550-14-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v17 00/14] Introduce PHY listing and
- link_topology tracking
-To: Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Nathan Chancellor <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
- <20240715083106.479093a6@kernel.org> <20240716101626.3d54a95d@fedora-2.home>
- <20240717082658.247939de@kernel.org>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20240717082658.247939de@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub, Russell
+On Mon, 12 Aug 2024 15:56:10 +0530 Parthiban Veerasooran wrote:
+> +static void
+> +lan865x_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
+> +{
+> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> +	strscpy(info->bus_info, dev_name(netdev->dev.parent),
+> +		sizeof(info->bus_info));
+> +}
+> +
 
-Le 17/07/2024 à 17:26, Jakub Kicinski a écrit :
-> On Tue, 16 Jul 2024 10:16:26 +0200 Maxime Chevallier wrote:
->>> I lack the confidence to take this during the merge window, without
->>> Russell's acks. So Deferred, sorry :(
->>
->> Understood. Is there anything I can make next time to make that series
->> more digestable and easy to review ? I didn't want to split the netlink
->> part from the core part, as just the phy_link_topology alone doesn't
->> make much sense for now, but it that makes the lives of reviewers
->> easier I could submit these separately.
-> 
-> TBH I can only review this from coding and netlink perspective, and
-> it looks solid. Folk who actually know PHYs and SFPs may have more
-> meaningful feedback :(
+Could you check if deleting this function has any effect?
+Core should fill in the basic info automatically, modern
+drivers usually only have to fill in FW version, if at all.
 
-How can we progress on this ?
+If without the callback ethtool -i doesn't report the right
+info, please make sure SET_NETDEV_DEV() gets called.
 
-Russell, have you been able to have a look at that latest version of the 
-series ? I know you reviewed earlier versions already but I understand 
-Jakub is willing some feedback from you.
-
-Jakub, as you say it looks solid. I can add to that that I have been 
-using this series widely through the double Ethernet attachment on 
-several boards and it works well, it is stable and more performant than 
-the dirty home-made solution we had on v4.14.
-
-So it would be great if the series could be merged for v6.12, and I 
-guess the earliest it is merged into net-next the more time it spends in 
-linux-next before the merge window. Any chance to get it merged anytime 
-soon even without a formal feedback from Russell ? We are really looking 
-forward to getting that series merged and step forward with all the work 
-that depends on it and is awaiting.
-
-Thanks
-Christophe
 
