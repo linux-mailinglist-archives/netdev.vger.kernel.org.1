@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-119175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 794C9954817
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:31:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58598954845
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30A9E1F234B8
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:31:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCECCB20EE5
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C909C1A0B1E;
-	Fri, 16 Aug 2024 11:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174F119DF4F;
+	Fri, 16 Aug 2024 11:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BTA1Cice"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="QuFR1VL0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5FE198853
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3684D13C695
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723807869; cv=none; b=doy3xrbDGbceuehM4GJnOVu0bd1yy5zbkcg+J1fnR4DL4s9lnR5gA1C+Yiw9iymFxUzf+MMLtKRaN1g7npyQnej/1wFwIB47FxL8NaOYUvhuqkGVY6VnGn1fDRPaAkezPFGj5tH9gUx5gqrly30sXP6TP3ZPJnlrVd4dU8KmZG0=
+	t=1723809080; cv=none; b=m3UEGp47rboj1T/X+jqJlC7kHkZ7U25LELV76GyIWsaB6Nn4Khkr6a88mP7JkWavoW7KJ/pYtuXk65bCwuS2bP+ejhcwLomOMxNp7yahgy7te+lhTQbcHgwg/2s0IOzsZRGXwu30H50BSycX7LIkeutpt6KM0d0kSqzu1swkEp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723807869; c=relaxed/simple;
-	bh=1bktqQayWYWtMAKqssvWuw4y7zQFT4lfZb54Csz+S70=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cfxFTORoPvLMzzFDIvPAC6zJgc8m4VqVB/if+yZHuUJ1102XW7Kz5HNkXsVIS3G0MyddeasQtWJR2sjHpZ1/08a+mynPDbJNm6HZWW+o5gi7ZwPeXZ9d+03DcbFGX/0hYuKvDGaVyOHIvhyD7qJi9C96vn3KgbdusOMPjEgOC3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BTA1Cice; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723807866;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1bktqQayWYWtMAKqssvWuw4y7zQFT4lfZb54Csz+S70=;
-	b=BTA1CicesdoeBZfvBi/GX3WIjMnlu+PPMbNr2Jh5hoPfxBS7A6n68dxdlQ4lpM1kPUzOWZ
-	rlt8P3axtssCw9b+umnHbttUsSBAaCHo+Gq8KimrWe75Egz+wxhgnCYIvd8o8blTYOacno
-	ORE7uD2OToZI7dfGNAzgG8P5K3tYwnU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-436-m_0m6xEONzyfuWOFb42SgA-1; Fri, 16 Aug 2024 07:31:04 -0400
-X-MC-Unique: m_0m6xEONzyfuWOFb42SgA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3687529b63fso1027968f8f.2
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:31:04 -0700 (PDT)
+	s=arc-20240116; t=1723809080; c=relaxed/simple;
+	bh=UGZL/mAkZErDFt2CP/y/FIvs4tlYqejHbAabBlsj+NY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fvn9sYO6f35rXCbclrkUZoP9rsfEGnbMtJiHs7kdIpvuoksOrXrWT/mJGoRsSXnBqwdyAKjjedZOkR1XvKEnomZaLtB5vk4CUny3GFRTHa1kHFk69wzYilErWu320UqVJbceFYrL8Apwboq1EIOKLqMbhcXATrH+/rvlEhBs4V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=QuFR1VL0; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f16767830dso20379481fa.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:51:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723809075; x=1724413875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ld/u168ByXssnaaADdxVHAJdHsRQneSaRZiRwjZKgQQ=;
+        b=QuFR1VL09xuCG4OslP7kx5fFxsVbwvpCo3hlXcpx8VeEt8SObM1CcGk74QrGBVWK5g
+         eYH396VyZTViQfV+AzWeZX73GrayiQhXZGA3SDucjWCTQ1oCFmEkM6FIzy7eyy+weIvR
+         sCrlXTiIKfxe9Z3X0qbc4A0rQEzoVx5xnr6/A8vTMAgBpt2sGTKNTWFmpwPzdF9ExnG8
+         Y1EaPWUmBd8LUnCC8N93FfkZMSrg69R/+tYB6LH355gkRslgt9kbAFdI2AaDcl8EAY2v
+         o8BSzNjVRxTRZh8mHokBoUN7w86SVOqvk6FTu7bw3e2wzH2nlwBI0OZGj/3bwIGXYGzh
+         Z3Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723807863; x=1724412663;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bktqQayWYWtMAKqssvWuw4y7zQFT4lfZb54Csz+S70=;
-        b=N1oukrPSzl+u3ash8YIx6DV6ng/8U72sQMFmmSzn7pkL6rLtT6KWNkhkaKu0NPvaYO
-         5rOmYFSAyVt6wPyO8Sh23Ka9PaAsVtShtL0uG6LtQ88oqbc53WTQtQin60imQiM4/HbU
-         FSX+0Q/UOURAlESdRydo0OoR58Ou+Zh1rtYRPB9yM2HVtSjeHO9UnBxosPROBWzWyW0H
-         EvUldm5LsSXq1AMj/hoV835QmE7B9G/KIGmq7N2W5MOl8OvCrjFnBmNDHr9vbKR+lYbp
-         8pWdaGsiE+WMJRvV0wvUPpSsKGs8xfcuo9OG+FdW/hPwvVCVfhGgPmh8aUgca1h0A5E/
-         Uk4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW5qaOTGvV/ntSg+t9yEDPrt4/3WFwz9bohEeS2Ca/7TNG/sOcAmrCVNcZdI7rN0Og8QSoghetg62qdkobkI0Mm+MPG+Npl
-X-Gm-Message-State: AOJu0YwpejLS6aZUrUgPMu+BPTlEhnCrx8oioQHuhgkFGD8x1D0/gLFn
-	n2FkUmZNLCnxlbMcYTNUnx6oc/byaBzxw7Gd889PGON4VGq77DEjyc9XefjWCKaPA9bNxFP7Qas
-	5Xm5FptAUIajlfpj2LjzXaKqp1HcznF1+qR2soFpd9ISzDuTGHEP0Aw==
-X-Received: by 2002:a5d:5110:0:b0:34d:ae98:4e7 with SMTP id ffacd0b85a97d-3719469531fmr1542914f8f.41.1723807863419;
-        Fri, 16 Aug 2024 04:31:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSxwNIUjnAJ8rcUcO6moPhGgsuq5H2/SGprZmmZkrEska1ZBtlsqGNAmMt0ivJktdwkOTeew==
-X-Received: by 2002:a5d:5110:0:b0:34d:ae98:4e7 with SMTP id ffacd0b85a97d-3719469531fmr1542903f8f.41.1723807862844;
-        Fri, 16 Aug 2024 04:31:02 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded7dae0sm74202835e9.44.2024.08.16.04.31.02
+        d=1e100.net; s=20230601; t=1723809075; x=1724413875;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ld/u168ByXssnaaADdxVHAJdHsRQneSaRZiRwjZKgQQ=;
+        b=maQqXTDIXOSSezDlMBTWgWHtSsNGcIR7C4OtJQAOvvFr82kDrMIyULDy4m+sUb6Zn5
+         8wBDd4LiEDGnTNWoK1eljS75dhJwWWVT+Py9wHwM1OdX6If94+tyM9Z0wlutnUImQsMK
+         +tijEho58D0ECe+OrVEHpe02iGaNLHEwKTHc/XKD0b9Ql2lFtXTpnyGSMgCi7hQGfJaG
+         ZBUXTX6KJMjel6SaLj5t1lbbCfMYvy3lMbaWjuogEGUhUBErdS2cE3/kVe5KexS/oNLB
+         ht+AKx4rDEhqExbkl+KsLmqXLMb0kgu6lCSghoMzI6smKSCMlGaZbDm6o5NX3QaJVztQ
+         e7zA==
+X-Gm-Message-State: AOJu0Yw7lG5XQHv8TlBMaNPjWk+BVg33IDZ2/1Eqw0I1FA+npzs869GI
+	a93Vnpcc+KlxRwYa6ayi0q2e6sYHN5ztvyT+a1WA0w/vZ++ESM7Mg3+RoOLYVqBFpgGbGceyZKa
+	R
+X-Google-Smtp-Source: AGHT+IEUvPG0QNw61jYp8skGfLNABj72aBzRZIOMe11a/tP5xvcrbGt/ZaPA3PV5HmuKLqS+oS778w==
+X-Received: by 2002:a05:651c:546:b0:2ef:2c86:4d45 with SMTP id 38308e7fff4ca-2f3be5a6d5fmr19587121fa.27.1723809074989;
+        Fri, 16 Aug 2024 04:51:14 -0700 (PDT)
+Received: from debil.. ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2152845a12.39.2024.08.16.04.51.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 04:31:02 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id DD75114AE084; Fri, 16 Aug 2024 13:31:01 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Johannes Berg
- <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Michael Braun <michael-dev@fami-braun.de>
-Cc: Harsh Kumar Bijlani <hbijlani@qti.qualcomm.com>, Kalyan Tallapragada
- <ktallapr@qti.qualcomm.com>, Jyothi Chukkapalli
- <jchukkap@qti.qualcomm.com>, Anirban Sirkhell <anirban@qti.qualcomm.com>,
- Johannes Berg <johannes.berg@intel.com>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ath12k@lists.infradead.org, Jeff Johnson <quic_jjohnson@quicinc.com>
-Subject: Re: [PATCH] wifi: mac80211: Fix ieee80211_convert_to_unicast() logic
-In-Reply-To: <20240815-ieee80211_convert_to_unicast-v1-1-648f0c195474@quicinc.com>
-References: <20240815-ieee80211_convert_to_unicast-v1-1-648f0c195474@quicinc.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 16 Aug 2024 13:31:01 +0200
-Message-ID: <877ccgd7re.fsf@toke.dk>
+        Fri, 16 Aug 2024 04:51:14 -0700 (PDT)
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: netdev@vger.kernel.org
+Cc: Taehee Yoo <ap420073@gmail.com>,
+	davem@davemloft.net,
+	jv@jvosburgh.net,
+	andy@greyhouse.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jarod@redhat.com,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH net 0/4] bonding: fix xfrm offload bugs
+Date: Fri, 16 Aug 2024 14:48:09 +0300
+Message-ID: <20240816114813.326645-1-razor@blackwall.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+Hi,
+I noticed these problems while reviewing a bond xfrm patch recently.
+The fixes are straight-forward, please review carefully the last one
+because it has side-effects. This set has passed bond's selftests
+and my custom bond stress tests which crash without these fixes.
 
-> The current logic in ieee80211_convert_to_unicast() uses skb_clone()
-> to obtain an skb for each individual destination of a multicast
-> frame, and then updates the destination address in the cloned skb's
-> data buffer before placing that skb on the provided queue.
->
-> This logic is flawed since skb_clone() shares the same data buffer
-> with the original and the cloned skb, and hence each time the
-> destination address is updated, it overwrites the previous destination
-> address in this shared buffer. As a result, due to the special handing
-> of the first valid destination, all of the skbs will eventually be
-> sent to that first destination.
+Note the first patch is not critical, but it simplifies the next fix.
 
-Did you actually observe this happen in practice? ieee80211_change_da()
-does an skb_ensure_writable() check on the Ethernet header before
-writing it, so AFAICT it does not, in fact, overwrite the data of the
-original frame.
+Thanks,
+ Nik
 
-> Fix this issue by using skb_copy() instead of skb_clone(). This will
-> result in a duplicate data buffer being allocated for each
-> destination, and hence each skb will be transmitted to the proper
-> destination.
 
-Cf the above, it seems this change will just lead to more needless
-copying.
+Nikolay Aleksandrov (4):
+  bonding: fix bond_ipsec_offload_ok return type
+  bonding: fix null pointer deref in bond_ipsec_offload_ok
+  bonding: fix xfrm real_dev null pointer dereference
+  bonding: fix xfrm state handling when clearing active slave
 
--Toke
+ drivers/net/bonding/bond_main.c    | 21 ++++++++-------------
+ drivers/net/bonding/bond_options.c |  2 +-
+ 2 files changed, 9 insertions(+), 14 deletions(-)
+
+-- 
+2.44.0
 
 
