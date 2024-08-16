@@ -1,142 +1,107 @@
-Return-Path: <netdev+bounces-119060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C44C953F3E
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 04:06:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 802EA953F68
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 04:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7457284438
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 02:06:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00813B26752
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 02:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635E82AD16;
-	Fri, 16 Aug 2024 02:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nwjEBr4e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0152926AC3;
+	Fri, 16 Aug 2024 02:11:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0D844366;
-	Fri, 16 Aug 2024 02:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845205028C
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 02:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723773985; cv=none; b=nKAzOWujmKxv3cc/ujuqNbEu1at396IPPLZC69NFWkoFEmgcfij3kRQtVKumr3oTCbYYyU9EYk4b2OeZTH95GM3aM8Sf0g04khw9AaDOzKhXLI5IXwZtXSEgb4RtVYVdauSq3grSddzX+1lvoztlX1kbVN3s2uW1SFRGZVxgzmk=
+	t=1723774297; cv=none; b=J7VsY6cUWeaoxKFel5L1LlY1OiK7NZ8JHYsOFKl3jFvXAVE6u2Bw5GkYZDZN5cwsh4Y/56Pd4q4vPJyU+poXrHAC4cJkTUgmAjvkBWKfhlhbOUKBVDkD6FgwhXgo07M68C+7lRycXCb2/J5/DLhm8NtIXxcC3CJQcdqu401oyqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723773985; c=relaxed/simple;
-	bh=47+fk56Tyj0GO2N5YHYnzl40/6J2rlo+UehdDXrrluM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O7GgLrxCiBbbp64Av/qYyJMPLDVKOF52Lh2yahXGutzdBzv4wIhNmIHdMv2o500NwyPHtpo1owMvPM08F+h1BUnxAArMXHMUgaIR29tAChYy/y3IjuVknhvWpuDV5ax5ySwNtQugVj9BjzRZWiqlPzr8Cjyxcuak+9yMsPvuZho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nwjEBr4e; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1723773974; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=JpK1Qzyay7Udu8ko5NS0kM+1qIGbwme3O6OhStcAsw0=;
-	b=nwjEBr4eyQGX5STUZ7kWeOX7rK3PXPjdl39TZ1QgeuV5MQ1knZEdGpVKiEdf3L/Vyey4A/LMEiCrjeQJJib4FEHshyb2TFhbv1+7IdtVlpf4NxHCZg7LwLJxDTDQeuFbfTGyQDU6Z+vbFralgVEc8YWKNoi09PJuzQ2JurRIe4g=
-Received: from 30.221.149.18(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WCyRxl9_1723773972)
-          by smtp.aliyun-inc.com;
-          Fri, 16 Aug 2024 10:06:13 +0800
-Message-ID: <d21add89-7298-4574-9873-44c8e9dd8075@linux.alibaba.com>
-Date: Fri, 16 Aug 2024 10:06:12 +0800
+	s=arc-20240116; t=1723774297; c=relaxed/simple;
+	bh=7vcxT+pUVFnJ77dxkNir746F0h2i2FsWkS0BaTHhGuo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eppv96PqHgT/7QnXFTQcEh8Wb6OpO5kjNvCZ4l+sItx96ckEXlernRDTBSL7pVjbNcH2xxgRzmx7nH0TVyxpp6CytrJvRF4W4H3uBKNyC9MT9His1jnHa4P/X+55cS8LYMmTj26uZuOiB87NbExCYLjXQR3Ro93tjWVh6nPimSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WlQNH3J8FzQplD;
+	Fri, 16 Aug 2024 10:06:55 +0800 (CST)
+Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
+	by mail.maildlp.com (Postfix) with ESMTPS id A46311800A5;
+	Fri, 16 Aug 2024 10:11:31 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by kwepemf500003.china.huawei.com
+ (7.202.181.241) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 16 Aug
+ 2024 10:11:30 +0800
+From: Zhang Zekun <zhangzekun11@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>
+CC: <zhangzekun11@huawei.com>
+Subject: [PATCH] net: ethernet: ibm: Simpify code with for_each_child_of_node()
+Date: Fri, 16 Aug 2024 09:58:37 +0800
+Message-ID: <20240816015837.109627-1-zhangzekun11@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: add sysctl for smc_limit_hs
-To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1723726988-78651-1-git-send-email-alibuda@linux.alibaba.com>
- <67a37386-6d88-43b4-8cd4-fdbe263addb7@linux.alibaba.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <67a37386-6d88-43b4-8cd4-fdbe263addb7@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemf500003.china.huawei.com (7.202.181.241)
 
+for_each_child_of_node can help to iterate through the device_node,
+and we don't need to use while loop. No functional change with this
+conversion.
 
+Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
+---
+ drivers/net/ethernet/ibm/ehea/ehea_main.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-On 8/15/24 9:14 PM, Wen Gu wrote:
->
->
-> On 2024/8/15 21:03, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake 
->> workqueue congested"),
->> we introduce a mechanism to put constraint on SMC connections visit 
->> according to
->> the pressure of SMC handshake process.
->>
->> At that time, we believed that controlling the feature through 
->> netlink was sufficient,
->> However, most people have realized now that netlink is not convenient in
->> container scenarios, and sysctl is a more suitable approach.
->>
->> In addition, it is not reasonable for us to initialize limit_smc_hs in
->> smc_pnet_net_init, we made a mistable before. It should be initialized
->
-> nit: mistable -> mistake?
-
-Take it. Also, I suddenly realized that the reason for initializing 
-limit_smc_hs in smc_pnet_net_init before
-was because there was no smc_sysctl_net_init at that time ...
-
-D. Wythe
-
->
->> in smc_sysctl_net_init(), just like other systcl.
->>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->>   net/smc/smc_pnet.c   |  3 ---
->>   net/smc/smc_sysctl.c | 11 +++++++++++
->>   2 files changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->> index 2adb92b..1dd3623 100644
->> --- a/net/smc/smc_pnet.c
->> +++ b/net/smc/smc_pnet.c
->> @@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
->>         smc_pnet_create_pnetids_list(net);
->>   -    /* disable handshake limitation by default */
->> -    net->smc.limit_smc_hs = 0;
->> -
->>       return 0;
->>   }
->>   diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
->> index 13f2bc0..2fab645 100644
->> --- a/net/smc/smc_sysctl.c
->> +++ b/net/smc/smc_sysctl.c
->> @@ -90,6 +90,15 @@
->>           .extra1        = &conns_per_lgr_min,
->>           .extra2        = &conns_per_lgr_max,
->>       },
->> +    {
->> +        .procname    = "limit_smc_hs",
->> +        .data        = &init_net.smc.limit_smc_hs,
->> +        .maxlen        = sizeof(int),
->> +        .mode        = 0644,
->> +        .proc_handler    = proc_dointvec_minmax,
->> +        .extra1        = SYSCTL_ZERO,
->> +        .extra2        = SYSCTL_ONE,
->> +    },
->>   };
->>     int __net_init smc_sysctl_net_init(struct net *net)
->> @@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
->>       WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
->>       net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->>       net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
->> +    /* disable handshake limitation by default */
->> +    net->smc.limit_smc_hs = 0;
->>         return 0;
+diff --git a/drivers/net/ethernet/ibm/ehea/ehea_main.c b/drivers/net/ethernet/ibm/ehea/ehea_main.c
+index 1e29e5c9a2df..c41c3f1cc506 100644
+--- a/drivers/net/ethernet/ibm/ehea/ehea_main.c
++++ b/drivers/net/ethernet/ibm/ehea/ehea_main.c
+@@ -3063,14 +3063,13 @@ static void ehea_shutdown_single_port(struct ehea_port *port)
+ static int ehea_setup_ports(struct ehea_adapter *adapter)
+ {
+ 	struct device_node *lhea_dn;
+-	struct device_node *eth_dn = NULL;
++	struct device_node *eth_dn;
+ 
+ 	const u32 *dn_log_port_id;
+ 	int i = 0;
+ 
+ 	lhea_dn = adapter->ofdev->dev.of_node;
+-	while ((eth_dn = of_get_next_child(lhea_dn, eth_dn))) {
+-
++	for_each_child_of_node(lhea_dn, eth_dn) {
+ 		dn_log_port_id = of_get_property(eth_dn, "ibm,hea-port-no",
+ 						 NULL);
+ 		if (!dn_log_port_id) {
+@@ -3102,12 +3101,11 @@ static struct device_node *ehea_get_eth_dn(struct ehea_adapter *adapter,
+ 					   u32 logical_port_id)
+ {
+ 	struct device_node *lhea_dn;
+-	struct device_node *eth_dn = NULL;
++	struct device_node *eth_dn;
+ 	const u32 *dn_log_port_id;
+ 
+ 	lhea_dn = adapter->ofdev->dev.of_node;
+-	while ((eth_dn = of_get_next_child(lhea_dn, eth_dn))) {
+-
++	for_each_child_of_node(lhea_dn, eth_dn) {
+ 		dn_log_port_id = of_get_property(eth_dn, "ibm,hea-port-no",
+ 						 NULL);
+ 		if (dn_log_port_id)
+-- 
+2.17.1
 
 
