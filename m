@@ -1,83 +1,111 @@
-Return-Path: <netdev+bounces-119279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961919550AB
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 361409550C1
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40C851F23C75
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:18:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32A61F2366B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFD31C2319;
-	Fri, 16 Aug 2024 18:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8101E1C233D;
+	Fri, 16 Aug 2024 18:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Adrw3IOR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5/8dXii"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8687E8288C;
-	Fri, 16 Aug 2024 18:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183BB78B50
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723832292; cv=none; b=HBp2euvx5TvrfJngtXxkr4Xf7zjgngUx7kl3chj6DWQT7sU2udrjCeAhMNcdgbHqLjersVTHidrQGYjRbMQ40sCQGyqT5l8oCYKkIvxetA5yhI579XaDBfyJfK5yhBUEaHA446e6j3mArsuIVIQlcwdn9QXFw8yhzlm0B6Jz25Q=
+	t=1723832679; cv=none; b=D7nBsELbJSor1FDxttZ7+w4rbv853yKketPemfdFlYPEiizS1uEWSqGoSPZg9JtsIhigiO3PEn+B5/989jk4wCDmsiKXO6w3JTCHdg8EiK7sZbJ6uvOo2WyCsvzMUPo50D/VB7PzGlqHT9RYfdxNY3kSTFPkHfaeQgALxaYXrxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723832292; c=relaxed/simple;
-	bh=54UJubvXe6uN8iJpD8UZtkY1GLXwHibslRiJHaA2Bsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qSkPLsh7ZQfY1hX4qFB583azlqw2zfW8OMSljxKeussKXhM4ePhqENwoN9mWAvhXCkp0CEtdilbeWCoLiWT4esAAyqJDmYjdMpJnFl1OemxpiHgbU2l82ZaVfqVQBRIYxF7hUENlxRMj78tvzs0rYrQdhtwZLPxZFIAwZW0mNNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Adrw3IOR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A3AFC32782;
-	Fri, 16 Aug 2024 18:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723832292;
-	bh=54UJubvXe6uN8iJpD8UZtkY1GLXwHibslRiJHaA2Bsg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Adrw3IORhiqqD1LCaNz8aAnLZHvY0rbf3DuWy0bka+LT21WrLeNdHNq/gdz12DZQJ
-	 URoQDSgqIrFAkSSbGs3Gxu3rWdag6LNK0ZrsO5Dm6F90sfa2ekfXnsHBbQFAmOKEq0
-	 1DObPnqF24ZihGjahw3G4qV1kTYYfLEY3hpJ/jDGtaJjQS7JLIN82pkW/5qQW4xUnY
-	 hazdICTGB7zfZ6WASj/zawTy756u1BszWrEiTHg7e25XNE/J+ClrWxuiPPL6MDGZ65
-	 2xdE2CJe7MoOyCVK8xQyiDzh8Ud+oBrGaBl2NLb6yK6SnCEPRncLqxCnvgBG+w0hMm
-	 RZr1DeqXX4B2g==
-Date: Fri, 16 Aug 2024 11:18:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Divya Koppera <divya.koppera@microchip.com>
-Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v2 1/2] net: phy: Add phy library support to
- check supported list when autoneg is enabled
-Message-ID: <20240816111810.64355472@kernel.org>
-In-Reply-To: <20240813181515.863208-2-divya.koppera@microchip.com>
-References: <20240813181515.863208-1-divya.koppera@microchip.com>
-	<20240813181515.863208-2-divya.koppera@microchip.com>
+	s=arc-20240116; t=1723832679; c=relaxed/simple;
+	bh=KfdgmwNQlJhITu85hViAhQH2m912GxeX0PW2gdRLWZw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dHPxVsst+fNeeCylUGWJ4IKxgobvdtB2yzNbtuYGahmbuL6cmH51eiExi2sCCnW8sSRCUbzB64iPHPKwsfwGhUBS7kFMsp6t5u2EI5RvhLNvkz1bT7X3oSoOVl/RzYss8lI5hJmZJzdeY+JwXf5vARJosWXrcpt3sjcMLafWu6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5/8dXii; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d3acc5b48bso1916537a91.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:24:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723832677; x=1724437477; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4RwvB+WPYoDnWK8A0tq8EiazLJfKL2CtNS7fQiVukC0=;
+        b=e5/8dXiiuMVZ22VqZ7YcGmesNeG11fTVq1KX2B9gjOPL0XSpPiiErM3Nm55y+QCGTF
+         t+3p+o2v7oEPv89Z/okNk0MYa6gM3qRVYkM+9dRnP5E16MfQaIUN8/IWrBBm4mJbZ7KE
+         oWSjvlszLq/bp/C2PEAgsAgyMtD5WhnoDpWOZp53HjvfisDMl6h6O3cFaPjLYs7QcVUN
+         HgsNZNW0TpApEDjjA/eczHPr/eksgTFMpAVX3uLEUHc0jfnIp4plgyN4LaK8isA6ESR3
+         DdqNEgBIJ1YUFyBSOox0fHT1WJEMnH8L55RZ90xgSTWdTDV3GypoQhQE35cm4vhCQG6c
+         Q0ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723832677; x=1724437477;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4RwvB+WPYoDnWK8A0tq8EiazLJfKL2CtNS7fQiVukC0=;
+        b=WlsBKDGFWfRyvxpJrEGdJQ/ESqd7SBiY/cd6qDrgqlqh6BKjbYG+tRiwPoQIPe8S8b
+         OpSuChz7ES6tkWO9S645LkqCeg73Nz8s09LRQglmJxLH4nMR6qCoxjLHuCs2Vu6iYLk5
+         0SnDF3TyJiPt872jCOf5MMaA/LDxuuQ8b/ZE9/5aDAJ4lIkggLGPOInHrqUW25ON3Cjm
+         wL15CVODBigGGd+JfHfFSMnIoCuLLv7Uml+miLtkX2MBcS22mgy4jV7NSJjYa/7c0eZo
+         cj1wjRqzWhaSdIuQZe7a+dN1ouEF+IEf0ZqU5vR3+HfPhMilSvixORmftPQYjvOR0pSh
+         AzyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkigcSKJrcbmqrfLVvERQOGAHZ/pC85VyTn6+nCVKiIh/rE29jM4baA2+ZRPD4u0j93LPv/9Ldi1hBgt0BY8Vs60vhiFCe
+X-Gm-Message-State: AOJu0YycE7Dkex82h+wnD5slYeBN4OCePYN6CmRMErMZvv22vwac4BWR
+	JWbP5VBe8p1pNsjy04zUYz7KQORL29dSkEL4okx7l5p59ktmr7fHRmZz+oqE4jyTWsh3xNkDCca
+	tPQ==
+X-Google-Smtp-Source: AGHT+IFTs6mafYXYQyMdbVzMHx30DteW5lbCrThkaAk8B3G1fl2Zt7Rvnd8UnKlKrq/X37xDttudYA8SWrg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1906:b0:2c9:5ca5:4d20 with SMTP id
+ 98e67ed59e1d1-2d3c3723c6amr46011a91.0.1723832677231; Fri, 16 Aug 2024
+ 11:24:37 -0700 (PDT)
+Date: Fri, 16 Aug 2024 11:24:35 -0700
+In-Reply-To: <0000000000006eb03a061b20c079@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <0000000000006eb03a061b20c079@google.com>
+Message-ID: <Zr-ZY8HSGfVuoQpl@google.com>
+Subject: Re: [syzbot] [kvm?] general protection fault in get_work_pool (2)
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com>
+Cc: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 13 Aug 2024 23:45:14 +0530 Divya Koppera wrote:
-> -	if (autoneg == AUTONEG_ENABLE && linkmode_empty(advertising))
-> +	if (autoneg == AUTONEG_ENABLE &&
-> +	    (linkmode_empty(advertising) ||
-> +	     !(linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-> +				 phydev->supported))))
+On Mon, Jun 17, 2024, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16f23146980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=81c0d76ceef02b39
+> dashboard link: https://syzkaller.appspot.com/bug?extid=0dc211bc2adb944e1fd6
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: i386
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2ccbdf43.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/13cdb5bfbafa/vmlinux-2ccbdf43.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/7a14f5d07f81/bzImage-2ccbdf43.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com
 
-nti: no need to wrap the linkmode_test_bit() in brackets:
+See https://lore.kernel.org/all/Zr-Ydj8FBpiqmY_c@google.com for an explanation.
 
-	     !linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-				 phydev->supported)))
-
-otherwise LGTM.
-
-Please try to put links to previous versions into the cover letter.
--- 
-pw-bot: cr
+#syz invalid
 
