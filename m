@@ -1,108 +1,115 @@
-Return-Path: <netdev+bounces-119045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D865953EB2
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:06:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F0AB953EB5
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:07:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B3A283D1E
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:06:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EB36B210B8
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3BF1DFEB;
-	Fri, 16 Aug 2024 01:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A153179A3;
+	Fri, 16 Aug 2024 01:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Njirvktu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kuY3jY64"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FECBE6F
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 01:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B6515E88;
+	Fri, 16 Aug 2024 01:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723770381; cv=none; b=RSp0t8aKKO98rt4wwGduVELSDJLhrgDxlowO1HNsvZfshy+KEntsFUPTiaz9kMr/Adx6jPRqH08CELKNcTe6730NYv+72Gbfmg7BYveb3VEtAH+sjPC3UCSnvjbwjqf/YVNmfZQNAiYXdEsBYsJQGW/8LLXybveb1u58Uvkm5SI=
+	t=1723770463; cv=none; b=JKI/DZVhUSAlGm4Z0eQQxmQH8NJhu7b7b3VSpRNTlt2nMUNpqzTjtJ3+F8Gvr9j+6X+oARdltLVn21+FFCczRXySIrFJGKN5jsABQNhOU9PcAbJ3K4bYUdS3bO26SNzJkQj8f3YIJ0NlrwPkKaGRGwweVW6gX0mFN3Euc1Om+wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723770381; c=relaxed/simple;
-	bh=WOXZJW84ynJSFfpNkX4zLGzaLsDTmegbH86Is33NezY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KjUKiXxQVklOye6UPm2tLnMola4YiqY6S8K7U1D/Yk9n66Yqam5D1nc+SxGn4BL8ww8SnUmQ4qMvRzUM9jxvn8ltAiy+rAn3n2B41AeKvmzu542fpsBKTW2Tj864wJkTCNDFFt9JsBCCYcpsC0po9nDEtKu/K5RSLEkfc1AKD4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Njirvktu; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <be4d3e00-de84-420b-9979-277ecc9df6ce@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723770376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BL1lkFeKf4t8gBk76y4Qplq54IJRsbkvrXvzvPSFgRo=;
-	b=NjirvktuzHYJxzLLCwfCuMbwbEsCPPFPKnLn2zI0Yxfc6KPXB1CTJRCPW2lyjKWWK4gZMz
-	OUPwBgm5ExS8tVX1A+z+hLkwmWRZjcLfOkta1Lz2kr1Be/BrH+v1Lz9MGOW68RqLqJzZr2
-	bsM+fxATMwAUW1/FgHV/9CslOkDmYLM=
-Date: Thu, 15 Aug 2024 18:06:06 -0700
+	s=arc-20240116; t=1723770463; c=relaxed/simple;
+	bh=Gn/O3CNgEf1uDlPVDLWuU09BObBv32ZSZwlxzBncF3M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=SlXnRikRLeXzSWK0xPvQIwXej2HrOC+Qpr/4sIIr9BhLfATY6SjbLi5EfR6hyQhyhrsQrca2ZUqfrDDg+gpcwrFuIcXJG2mh++41+MFEEIbVaw4PmepcITX6k6R6ACSM2kG9YwVUs9nA75gz1rXt63dlPeJhi9yWjxwVYb3vDjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kuY3jY64; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723770462; x=1755306462;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=Gn/O3CNgEf1uDlPVDLWuU09BObBv32ZSZwlxzBncF3M=;
+  b=kuY3jY648spSu4qnBzDxXBiKSzsKUKsrLZNQsTP3uh0oswjq7UaKa/e8
+   1oHhCi6S3IhXW3HoYz6lsIP128YPbR9yN9lMsKbbNK1Z8yfwc9PNtPYDv
+   i+cXPLqRTm+6PAYoD3wgjE2juOdxG5NWIrQIi6/Eh3PA6UoYoKdCa/wCF
+   OzZcgigNsOQS1BfrowejPRvQPbs2mytZmREpjrkUxmr3jzhUvIEuCGVCM
+   XfGlp82fElpEbYDjKPZenNdoOgowZn5cKu0lUdEuLzvA8rc57RCLhWVdU
+   mV3V/WPfpt4F6baTTu6hzNozGDoR/JCtLw1QQFzx7dxMmAKIuyexyvIRm
+   g==;
+X-CSE-ConnectionGUID: TTHn3dq1QWajKCyLoouBLQ==
+X-CSE-MsgGUID: hOLegOBSShSFrU56wV/bVA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11165"; a="39511092"
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="39511092"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 18:07:41 -0700
+X-CSE-ConnectionGUID: XWUxB4GKTp2vqsOKXfD2pw==
+X-CSE-MsgGUID: XESAWVLEQU62V5HQcLJTvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="59162704"
+Received: from unknown (HELO vcostago-mobl3) ([10.241.225.92])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 18:07:40 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Daiwei Li <daiweili@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kurt@linutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, przemyslaw.kitszel@intel.com,
+ richardcochran@gmail.com, sasha.neftin@intel.com, Daiwei Li
+ <daiweili@google.com>
+Subject: Re: [PATCH iwl-net v3] igb: Fix not clearing TimeSync interrupts
+ for 82580
+In-Reply-To: <20240814045553.947331-1-daiweili@google.com>
+References: <20240814045553.947331-1-daiweili@google.com>
+Date: Thu, 15 Aug 2024 18:07:40 -0700
+Message-ID: <8734n5uvfn.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] bpf: cg_skb add get classid helper
-To: Feng zhou <zhoufeng.zf@bytedance.com>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, ast@kernel.org,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20240814095038.64523-1-zhoufeng.zf@bytedance.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240814095038.64523-1-zhoufeng.zf@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-On 8/14/24 2:50 AM, Feng zhou wrote:
-> From: Feng Zhou <zhoufeng.zf@bytedance.com>
-> 
-> At cg_skb hook point, can get classid for v1 or v2, allowing
-> users to do more functions such as acl.
-> 
-> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
-> ---
->   net/core/filter.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 78a6f746ea0b..d69ba589882f 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -8111,6 +8111,12 @@ cg_skb_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
->   		return &bpf_get_listener_sock_proto;
->   	case BPF_FUNC_skb_ecn_set_ce:
->   		return &bpf_skb_ecn_set_ce_proto;
-> +	case BPF_FUNC_get_cgroup_classid:
-> +		return &bpf_get_cgroup_classid_proto;
-> +#endif
-> +#ifdef CONFIG_CGROUP_NET_CLASSID
-> +	case BPF_FUNC_skb_cgroup_classid:
-> +		return &bpf_skb_cgroup_classid_proto;
+Daiwei Li <daiweili@google.com> writes:
 
-With this bpf_skb_cgroup_classid_proto, is the above 
-bpf_get_cgroup_classid_proto necessary?
-The cg_skb hook must have a skb->sk.
+> 82580 NICs have a hardware bug that makes it
+> necessary to write into the TSICR (TimeSync Interrupt Cause) register
+> to clear it:
+> https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
+>
+> Add a conditional so only for 82580 we write into the TSICR register,
+> so we don't risk losing events for other models.
+>
+> Without this change, when running ptp4l with an Intel 82580 card,
+> I get the following output:
+>
+>> timed out while polling for tx timestamp increasing tx_timestamp_timeout or
+>> increasing kworker priority may correct this issue, but a driver bug likely
+>> causes it
+>
+> This goes away with this change.
+>
+> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
+>
+> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
+> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
+> Tested-by: Daiwei Li <daiweili@google.com>
+> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Signed-off-by: Daiwei Li <daiweili@google.com>
 
-Please add a selftest and tag the subject with bpf-next.
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-pw-bot: cr
 
->   #endif
->   	default:
->   		return sk_filter_func_proto(func_id, prog);
-
+Cheers,
+-- 
+Vinicius
 
