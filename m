@@ -1,115 +1,148 @@
-Return-Path: <netdev+bounces-119046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0AB953EB5
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:07:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A020A953EC4
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EB36B210B8
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:07:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF43B24BD2
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A153179A3;
-	Fri, 16 Aug 2024 01:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C74117BA1;
+	Fri, 16 Aug 2024 01:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kuY3jY64"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="C5L/x9eL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B6515E88;
-	Fri, 16 Aug 2024 01:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778A429CEC;
+	Fri, 16 Aug 2024 01:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723770463; cv=none; b=JKI/DZVhUSAlGm4Z0eQQxmQH8NJhu7b7b3VSpRNTlt2nMUNpqzTjtJ3+F8Gvr9j+6X+oARdltLVn21+FFCczRXySIrFJGKN5jsABQNhOU9PcAbJ3K4bYUdS3bO26SNzJkQj8f3YIJ0NlrwPkKaGRGwweVW6gX0mFN3Euc1Om+wY=
+	t=1723770576; cv=none; b=Cf1/DFYctE4BhqD4xln7vw3Ybomj/khoQU3SsKxAuPs3zCnUYehn1GLINXzZ+oQSp2u55+sx8Qr/2t97Rj3nLfwqOx+FvksGZdGhls9qhn5FgTAAH7Qzf2Et6gdJ3Dh1vRdiM95kwzIzOtFDaVIlnMl/r8w5Rcpv+UN8SRJj1S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723770463; c=relaxed/simple;
-	bh=Gn/O3CNgEf1uDlPVDLWuU09BObBv32ZSZwlxzBncF3M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SlXnRikRLeXzSWK0xPvQIwXej2HrOC+Qpr/4sIIr9BhLfATY6SjbLi5EfR6hyQhyhrsQrca2ZUqfrDDg+gpcwrFuIcXJG2mh++41+MFEEIbVaw4PmepcITX6k6R6ACSM2kG9YwVUs9nA75gz1rXt63dlPeJhi9yWjxwVYb3vDjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kuY3jY64; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723770462; x=1755306462;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=Gn/O3CNgEf1uDlPVDLWuU09BObBv32ZSZwlxzBncF3M=;
-  b=kuY3jY648spSu4qnBzDxXBiKSzsKUKsrLZNQsTP3uh0oswjq7UaKa/e8
-   1oHhCi6S3IhXW3HoYz6lsIP128YPbR9yN9lMsKbbNK1Z8yfwc9PNtPYDv
-   i+cXPLqRTm+6PAYoD3wgjE2juOdxG5NWIrQIi6/Eh3PA6UoYoKdCa/wCF
-   OzZcgigNsOQS1BfrowejPRvQPbs2mytZmREpjrkUxmr3jzhUvIEuCGVCM
-   XfGlp82fElpEbYDjKPZenNdoOgowZn5cKu0lUdEuLzvA8rc57RCLhWVdU
-   mV3V/WPfpt4F6baTTu6hzNozGDoR/JCtLw1QQFzx7dxMmAKIuyexyvIRm
-   g==;
-X-CSE-ConnectionGUID: TTHn3dq1QWajKCyLoouBLQ==
-X-CSE-MsgGUID: hOLegOBSShSFrU56wV/bVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11165"; a="39511092"
-X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
-   d="scan'208";a="39511092"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 18:07:41 -0700
-X-CSE-ConnectionGUID: XWUxB4GKTp2vqsOKXfD2pw==
-X-CSE-MsgGUID: XESAWVLEQU62V5HQcLJTvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
-   d="scan'208";a="59162704"
-Received: from unknown (HELO vcostago-mobl3) ([10.241.225.92])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 18:07:40 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Daiwei Li <daiweili@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, kurt@linutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, przemyslaw.kitszel@intel.com,
- richardcochran@gmail.com, sasha.neftin@intel.com, Daiwei Li
- <daiweili@google.com>
-Subject: Re: [PATCH iwl-net v3] igb: Fix not clearing TimeSync interrupts
- for 82580
-In-Reply-To: <20240814045553.947331-1-daiweili@google.com>
-References: <20240814045553.947331-1-daiweili@google.com>
-Date: Thu, 15 Aug 2024 18:07:40 -0700
-Message-ID: <8734n5uvfn.fsf@intel.com>
+	s=arc-20240116; t=1723770576; c=relaxed/simple;
+	bh=Tg/lJR8GjLeXQ7Bu+bOxz02RC+jvCzoEK23yjTbs4RE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e3yGPJ6xvFGnFcGu8Q3d0RTo8LKAAoQIsMSIL/BtROubL1u4kcJ/qhEtfnUdQJt/Xz/tT7W7QeWO1iYSVgO59lmFg5kTDvXfyEqya5wOe3XTfnzLAmBwP6y0PfHYFKiqxbrTd/0I6g7mnso8d3ULmeVAWRYyxt608cXp9xmFw3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=C5L/x9eL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MBD3Zc+izpQo2xbgefhhtee5KH9AgmMTO8RzRtDfI+A=; b=C5L/x9eLleLvD0IxVPNCP2FiNN
+	N+WVImt91raIyGhuwvK3EudFwLiQ9lBGuBT4PuaAgX1KzoEoAKZSTqvOfNU9pv7ZEvf6EZXNHtWV0
+	JHGmUP/zyRRW7x5nL8sRvam8J6gf83ljSjwNZeCm7TSRHeS5gC8mDfg7utuR4AwO2X1c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1selT9-004t0w-6G; Fri, 16 Aug 2024 03:09:31 +0200
+Date: Fri, 16 Aug 2024 03:09:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me, aliceryhl@google.com
+Subject: Re: [PATCH net-next v3 4/6] rust: net::phy unified read/write API
+ for C22 and C45 registers
+Message-ID: <82db7404-4665-4563-8011-6d2d5e9c2685@lunn.ch>
+References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
+ <20240804233835.223460-5-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240804233835.223460-5-fujita.tomonori@gmail.com>
 
-Daiwei Li <daiweili@google.com> writes:
+> @@ -0,0 +1,193 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +// Copyright (C) 2024 FUJITA Tomonori <fujita.tomonori@gmail.com>
+> +
+> +//! PHY register interfaces.
+> +//!
+> +//! This module provides support for accessing PHY registers via Ethernet
+> +//! management interface clause 22 and 45, as defined in IEEE 802.3.
 
-> 82580 NICs have a hardware bug that makes it
-> necessary to write into the TSICR (TimeSync Interrupt Cause) register
-> to clear it:
-> https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
->
-> Add a conditional so only for 82580 we write into the TSICR register,
-> so we don't risk losing events for other models.
->
-> Without this change, when running ptp4l with an Intel 82580 card,
-> I get the following output:
->
->> timed out while polling for tx timestamp increasing tx_timestamp_timeout or
->> increasing kworker priority may correct this issue, but a driver bug likely
->> causes it
->
-> This goes away with this change.
->
-> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
->
-> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
-> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
-> Tested-by: Daiwei Li <daiweili@google.com>
-> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Signed-off-by: Daiwei Li <daiweili@google.com>
+Here we need to be very careful. The word `via` in the sentence above
+means we are talking about the access mechanism, c22 transfers, or c45
+transfers. A PHY driver should not care about the transfer mechanism,
+it should just care about the register in the C22 or C45 register
+namespace.
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> +impl Register for C22 {
+> +    fn read(&self, dev: &mut Device) -> Result<u16> {
+> +        let phydev = dev.0.get();
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
+> +        // So it's just an FFI call, open code of `phy_read()` with a valid `phy_device` pointer
+> +        // `phydev`.
+> +        let ret = unsafe {
+> +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.addr, self.0.into())
+> +        };
+> +        to_result(ret)?;
+> +        Ok(ret as u16)
+> +    }
+> +
+> +    fn write(&self, dev: &mut Device, val: u16) -> Result {
+> +        let phydev = dev.0.get();
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
+> +        // So it's just an FFI call, open code of `phy_write()` with a valid `phy_device` pointer
+> +        // `phydev`.
+> +        to_result(unsafe {
+> +            bindings::mdiobus_write((*phydev).mdio.bus, (*phydev).mdio.addr, self.0.into(), val)
+> +        })
+
+These two are O.K. You have to use C22 bus transfers to access the C22
+register namespace.
+
+> +impl Register for C45 {
+> +    fn read(&self, dev: &mut Device) -> Result<u16> {
+> +        let phydev = dev.0.get();
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
+> +        // So it's just an FFI call.
+> +        let ret =
+> +            unsafe { bindings::phy_read_mmd(phydev, self.devad.0.into(), self.regnum.into()) };
+> +        to_result(ret)?;
+> +        Ok(ret as u16)
+> +    }
+> +
+> +    fn write(&self, dev: &mut Device, val: u16) -> Result {
+> +        let phydev = dev.0.get();
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
+> +        // So it's just an FFI call.
+> +        to_result(unsafe {
+> +            bindings::phy_write_mmd(phydev, self.devad.0.into(), self.regnum.into(), val)
+> +        })
+> +    }
+
+And these are also O.K. There are two mechanisms to access the C45
+register namespace. By calling phy_write_mmd()/phy_write_mmd() you are
+leaving it upto the core to decide which mechanism to use. The driver
+itself does not care.
+
+So the problem is with the comment above. It would be better to say
+something like:
+
+This module provides support for accessing PHY registers in the
+Ethernet management interface clauses 22 and 45 register namespaces, as
+defined in IEEE 802.3.
+
+Dropping the via, and adding register namespace should make it clear
+we are talking about the registers themselves, not how you access
+them.
 
 
-Cheers,
--- 
-Vinicius
+    Andrew
+
+---
+pw-bot: cr
 
