@@ -1,92 +1,113 @@
-Return-Path: <netdev+bounces-119205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86319954B7D
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:57:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20600954BC8
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B93F91C24218
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:57:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C93C61F20CFE
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665001B8E84;
-	Fri, 16 Aug 2024 13:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AFB1C7B93;
+	Fri, 16 Aug 2024 14:00:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC161B8E92;
-	Fri, 16 Aug 2024 13:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78E31C7B6A
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 14:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723816635; cv=none; b=O37inelKE1L1ZiK64/aHy5vYyIzC5Cj15Ptx4pMUl/fNUbT8k5nObZyyKXimWWrT0mjpE6dr0cEAvaFBoiyweCZaFg8jX7KyRw7DusEThh1fhT4mEBgLVmZ+bSd9BvzWDhjFx/RVFTSlo8j2Vlf5vsVqnIlEMI7MJE5+oqNNTRk=
+	t=1723816836; cv=none; b=VyzyLvCMMKRgFEOybNr5emRfvxUY0sr6IFr45sUJu4GJa9D44TS1Rzs+TYwxLvDyVFpTm22oENEFl8HKri+tb4qu1yQ9OU2/ayEQUn5j9E47nELOrV8UGWaS6uveS1Inz7r02npgxisHCxaCUfMLkglukKB5d6Rx5qjMvTxa9lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723816635; c=relaxed/simple;
-	bh=020hZGJIzLJWA99tUJoWCXT0j5vGBw0TAHhBZbKmTPE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Yu/TQaeZIDA3Wc6uqBUCf4LV1x/JlcKvciDrTUfwVWM8e217wk/fu8Xb9GRUiEXNBZYF1uydSjICYLicbEhJp6hS/MbzoN0ZCmdbOHwvSCNJ4qn2Khbvfqj9g23yHOZ+DMNBtn2/Nss18LQBh4Y8IGlLIcSx5qq52KqRyOt29wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id C985492009D; Fri, 16 Aug 2024 15:57:09 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id C3A4792009C;
-	Fri, 16 Aug 2024 14:57:09 +0100 (BST)
-Date: Fri, 16 Aug 2024 14:57:09 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Matthew W Carlis <mattc@purestorage.com>
-cc: alex.williamson@redhat.com, Bjorn Helgaas <bhelgaas@google.com>, 
-    "David S. Miller" <davem@davemloft.net>, david.abdurachmanov@gmail.com, 
-    edumazet@google.com, helgaas@kernel.org, kuba@kernel.org, leon@kernel.org, 
-    linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-    linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, lukas@wunner.de, 
-    mahesh@linux.ibm.com, mika.westerberg@linux.intel.com, 
-    netdev@vger.kernel.org, npiggin@gmail.com, oohall@gmail.com, 
-    pabeni@redhat.com, pali@kernel.org, saeedm@nvidia.com, sr@denx.de, 
-    Jim Wilson <wilson@tuliptree.org>
-Subject: Re: PCI: Work around PCIe link training failures
-In-Reply-To: <20240815194059.28798-1-mattc@purestorage.com>
-Message-ID: <alpine.DEB.2.21.2408160312180.59022@angie.orcam.me.uk>
-References: <alpine.DEB.2.21.2408091356190.61955@angie.orcam.me.uk> <20240815194059.28798-1-mattc@purestorage.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1723816836; c=relaxed/simple;
+	bh=B2Q56HcNvOwAj4yHGR6co+HRtqtoSxh8NLyaHruwZqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T3w9WJsM7XXRVWcfQqvU8fb+lg404IblxE5M7xdfkh3nfdC3TQn8IT91heRKT9AXdS8VzMGSDkeQz0Jos3EnUMYU+WUMHySDueu86M71ofPcc9FyFkw4zLbCsPCOfzyNfgi/w2TLeU2hRSo/uyin4WMSlX0nsHbxmzBgtvdaeHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sexV7-0000Gb-Lu; Fri, 16 Aug 2024 16:00:21 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sexV6-000qmc-CH; Fri, 16 Aug 2024 16:00:20 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sexV6-006J54-0r;
+	Fri, 16 Aug 2024 16:00:20 +0200
+Date: Fri, 16 Aug 2024 16:00:20 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] phy: dp83td510: Utilize ALCD for cable
+ length measurement when link is active
+Message-ID: <Zr9bdJEG3sEdC6BI@pengutronix.de>
+References: <20240816105155.1850795-1-o.rempel@pengutronix.de>
+ <f026cabc-76d3-474c-90a1-47c355a7d673@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f026cabc-76d3-474c-90a1-47c355a7d673@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 15 Aug 2024, Matthew W Carlis wrote:
-
-> > Well, in principle in a setup with reliable links the LBMS bit may never 
-> > be set, e.g. this system of mine has been in 24/7 operation since the last 
-> > reboot 410 days ago and for the devices that support Link Active reporting 
-> > it shows:
-> > ...
-> > so out of 11 devices 6 have the LBMS bit clear.  But then 5 have it set, 
-> > perhaps worryingly, so of course you're right, that it will get set in the 
-> > field, though it's not enough by itself for your problem to trigger.
+On Fri, Aug 16, 2024 at 03:10:35PM +0200, Andrew Lunn wrote:
+> > The DP83TD510 PHY provides an alternative through ALCD (Active Link
+> > Cable Diagnostics), which allows for cable length measurement without
+> > disrupting an active link. Since a live link indicates no short or open
+> > cable states, ALCD can be used effectively to gather cable length
+> > information.
 > 
-> The way I look at it is that its essentially a probability distribution with time,
-> but I try to avoid learning too much about the physical layer because I would find
-> myself debugging more hardware issues lol. I also don't think LBMS/LABS being set
-> by itself is very interesting without knowing the rate at which it is being set.
+> Is this specific to TI?
 
- Agreed.  Ilpo's upcoming bandwidth controller will hopefully give us such 
-data.
+It seems to be, yes. I assume they are using echo cancellation values or
+some thing like this.
 
-> FWIW I have seen some devices in the past going into recovery state many times a
-> second & still never downtrain, but at the same time they were setting the
-> LBMS/LABS bits which maybe not quite spec compliant.
-> 
-> I would like to help test these changes, but I would like to avoid having to test
-> each mentioned change individually. Does anyone have any preferences in how I batch
-> the patches for testing? Would it be ok if I just pulled them all together on one go?
+> Did you compare ALCD to TDR length measurement? Are they about the
+> same?
 
- Certainly fine with me, especially as 3/4 and 4/4 aren't really related 
-to your failure scenario, and then you need 1/4 and 2/4 both at a time to 
-address both aspects of the issue you have reported.
+Default ALCD values are about 20meters off. Which seems to be ok for
+1000meter cable. TI describes calibration procedure for ALCD to provide
+better measurements, but so far it was good enough. The problem with
+this calibration is: it seems to be different for different cables, so
+it make no sense to integrate it in kernel.
 
-  Maciej
+> I'm just thinking about if we want to include an additional
+> attribute in ethnl_cable_test_fault_length() to indicate how the
+> measurement was performed.
+
+Sounds good. In this case user space will be able to know how to correct
+this values.
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
