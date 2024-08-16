@@ -1,102 +1,151 @@
-Return-Path: <netdev+bounces-119332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1B5C955334
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 00:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E42495533B
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 00:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 000D71C2129E
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90ECD1C2118B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A90F13F426;
-	Fri, 16 Aug 2024 22:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB541448E0;
+	Fri, 16 Aug 2024 22:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mQ0ktfPa"
+	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="wc0Yts33"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ma-mailsvcp-mx-lapp03.apple.com (ma-mailsvcp-mx-lapp03.apple.com [17.32.222.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1EEBA33;
-	Fri, 16 Aug 2024 22:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAFB78297
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 22:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.32.222.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723846573; cv=none; b=FR7Ul1wHQnr50arOkXjji0D2P/EpaMvuh6M+zxxPsWO6nZWMx5NsTgOW2Q1uif8fNREwKP1w5voyfT3LmmGdSvyHrirXuL2/yoHxdk0rsU9tup4LSUDneoPZiT5MbEbehaTqBsP295WnJcXoO6ENbBdn8vGWzbXnL6te0NKCdLQ=
+	t=1723846820; cv=none; b=TQndTYBFXs2X5NliSbYKkX/ftg7CRJ2WIZNayJ+8D7yDQgWjk+OpLOSLOLEgAO/Ted8K2B0Um2Ka671PhDGyzE5pdJdJLJz0vm+MgmX4qfVmDIvkpJ31K8g8TRDsa+4S41ByZygqXosg2+rTihkwAY7p93IPNBUXzM7+8EYNBZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723846573; c=relaxed/simple;
-	bh=M+NRfJND15DgXXHSYtlJHCFyMUTY/cbt4gOqY0fSQKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMCcQ8NnVH3TCsYEPXOxu0Uajxz3BeHT45RqU5hmVua6/HGMfclm6QYajA6oKNqY76+AZkmZg87iqNrABbwf+DWRF42XbBdVOrgKe7zMvZv8qjGzfTfXsdjfHyYJ0amQAiC9PaKMIDoYwm4yFc6vNnHVvzFG6JnLfq3Qsdbuhbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mQ0ktfPa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF1FC32782;
-	Fri, 16 Aug 2024 22:16:11 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mQ0ktfPa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1723846569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S0q5my1Gxzq5sbks3fTcsMFKFgho8smshyrb0IyHeLE=;
-	b=mQ0ktfPaKJsESX8PGs+iJxyLhHMGhfX7ELVZWdMlnGzpmLCL5qUJa0seVqE5J/uuPZV7IL
-	2Kb+ri7T0cvXYDAm6nzX/fHuKW++B9UzLHgg5VE3YFOetb4/pXxYKgCu8OaOtV9HBcbV1e
-	bL+me1+63vABwBzimD/a1Rz4d3ze6Yc=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1169246f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 16 Aug 2024 22:16:08 +0000 (UTC)
-Date: Fri, 16 Aug 2024 22:16:03 +0000
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: syzbot <syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Subject: Re: [syzbot] [kvm?] general protection fault in get_work_pool (2)
-Message-ID: <Zr_Po5Rj7wsDj_BX@zx2c4.com>
-References: <0000000000006eb03a061b20c079@google.com>
- <Zr-ZY8HSGfVuoQpl@google.com>
+	s=arc-20240116; t=1723846820; c=relaxed/simple;
+	bh=fIAIJzIE+w5YR76d5JK1JyT+qF2yTq9b9aXobNsIlcU=;
+	h=Content-type:MIME-version:Subject:From:In-reply-to:Date:Cc:
+	 Message-id:References:To; b=sxqhx5sFILbWlZcSUBDszdV29oVKx+eHQLngYzo5tagy7pnFp1FPPYW+gsqTMiw2+GdpPWyhdxHjgNal/xEJc0WM2RB7/XmJBGrt/ui0QsVKNb8WHRP0ez4SfOWLVFe9ui3v99gIwlMxDBndEzOvTt136x916CZ7V8NHRTTcweE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=apple.com; spf=pass smtp.mailfrom=apple.com; dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b=wc0Yts33; arc=none smtp.client-ip=17.32.222.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=apple.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apple.com
+Received: from rn-mailsvcp-mta-lapp02.rno.apple.com
+ (rn-mailsvcp-mta-lapp02.rno.apple.com [10.225.203.150])
+ by ma-mailsvcp-mx-lapp03.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) with ESMTPS id <0SIC00KYR0PIF200@ma-mailsvcp-mx-lapp03.apple.com> for
+ netdev@vger.kernel.org; Fri, 16 Aug 2024 15:20:11 -0700 (PDT)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-16_16,2024-08-16_01,2024-05-17_01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=20180706;
+ bh=fIAIJzIE+w5YR76d5JK1JyT+qF2yTq9b9aXobNsIlcU=;
+ b=wc0Yts331mFK32sChoX0r2apkB9qnOSK2lJUIZPMGsCqTWWhuiiPPGptbeHCAWD/Z9hw
+ NVexdM4+qjJuN1fX2x96cnLpU/JBuVeCqgufqeStVQ+T9SgIonPfm5ml+5XunkOJxw/R
+ 0ALYoxqZL5twrVbXMOp5tzjjlhLzsEJmChi3KFUhXuksEQIOGuQhFcdwMPlxaDn79ph3
+ aoM6eTzHkXVjJ8s62bwb8pwWrdCNZh8/LP2EEBDLDxnP+Jfx6Cs9M/GXEQAdA9OOIXPH
+ QswhIw0yqagtNAk4ILAs/yueJUlMGU1JaOeHWo2mS8p1TSXyQvtzVLbsNwJuCCNg1xck yw==
+Received: from mr55p01nt-mmpp08.apple.com
+ (mr55p01nt-mmpp08.apple.com [10.170.185.194])
+ by rn-mailsvcp-mta-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) with ESMTPS id <0SIC00YTR0PKNP30@rn-mailsvcp-mta-lapp02.rno.apple.com>;
+ Fri, 16 Aug 2024 15:20:09 -0700 (PDT)
+Received: from process_milters-daemon.mr55p01nt-mmpp08.apple.com by
+ mr55p01nt-mmpp08.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) id <0SIC2CD000KMVW00@mr55p01nt-mmpp08.apple.com>; Fri,
+ 16 Aug 2024 22:20:08 +0000 (GMT)
+X-Va-A:
+X-Va-T-CD: da671353dce2cf57e116168d65bb9d70
+X-Va-E-CD: ff03f9a5f60d1f628a918e6aa7c5e5be
+X-Va-R-CD: 74ece9fb46034c053602db6adc649075
+X-Va-ID: 8595ff7a-d18a-4771-940c-1853a3de05fe
+X-Va-CD: 0
+X-V-A:
+X-V-T-CD: da671353dce2cf57e116168d65bb9d70
+X-V-E-CD: ff03f9a5f60d1f628a918e6aa7c5e5be
+X-V-R-CD: 74ece9fb46034c053602db6adc649075
+X-V-ID: 5774c69a-ab45-4336-922f-4925b265c5fd
+X-V-CD: 0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-16_16,2024-08-16_01,2024-05-17_01
+Received: from smtpclient.apple ([17.192.155.209])
+ by mr55p01nt-mmpp08.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) with ESMTPSA id <0SIC2BH9O0PJTN00@mr55p01nt-mmpp08.apple.com>; Fri,
+ 16 Aug 2024 22:20:07 +0000 (GMT)
+Content-type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zr-ZY8HSGfVuoQpl@google.com>
+MIME-version: 1.0 (Mac OS X Mail 16.0 \(3826.200.5\))
+Subject: Re: [PATCH netnext] mpls: Reduce skb re-allocations due to skb_cow()
+From: Christoph Paasch <cpaasch@apple.com>
+In-reply-to: <20240816111843.GU632411@kernel.org>
+Date: Fri, 16 Aug 2024 15:20:03 -0700
+Cc: netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Roopa Prabhu <roopa@nvidia.com>,
+ Craig Taylor <cmtaylor@apple.com>
+Content-transfer-encoding: quoted-printable
+Message-id: <967C2745-1EDB-464E-9C80-46345CA91650@apple.com>
+References: <20240815161201.22021-1-cpaasch@apple.com>
+ <20240816111843.GU632411@kernel.org>
+To: Simon Horman <horms@kernel.org>
+X-Mailer: Apple Mail (2.3826.200.5)
 
-On Fri, Aug 16, 2024 at 11:24:35AM -0700, Sean Christopherson wrote:
-> On Mon, Jun 17, 2024, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot found the following issue on:
-> > 
-> > HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=16f23146980000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=81c0d76ceef02b39
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=0dc211bc2adb944e1fd6
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > userspace arch: i386
-> > 
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> > 
-> > Downloadable assets:
-> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2ccbdf43.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/13cdb5bfbafa/vmlinux-2ccbdf43.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/7a14f5d07f81/bzImage-2ccbdf43.xz
-> > 
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+0dc211bc2adb944e1fd6@syzkaller.appspotmail.com
-> 
-> See https://lore.kernel.org/all/Zr-Ydj8FBpiqmY_c@google.com for an explanation.
-> 
-> #syz invalid
+Hello!
 
-Oh. Thanks very much for following up on this. I spent some time puzzling
-over it and didn't find a wireguard bug. Glad that turned out to be so.
+> On Aug 16, 2024, at 4:18=E2=80=AFAM, Simon Horman <horms@kernel.org> =
+wrote:
+>=20
+> On Thu, Aug 15, 2024 at 09:12:01AM -0700, Christoph Paasch wrote:
+>> mpls_xmit() needs to prepend the MPLS-labels to the packet. That =
+implies
+>> one needs to make sure there is enough space for it in the headers.
+>>=20
+>> Calling skb_cow() implies however that one wants to change even the
+>> playload part of the packet (which is not true for MPLS). Thus, call
+>> skb_cow_head() instead, which is what other tunnelling protocols do.
+>>=20
+>> Running a server with this comm it entirely removed the calls to
+>> pskb_expand_head() from the callstack in mpls_xmit() thus having
+>> significant CPU-reduction, especially at peak times.
+>=20
+> Hi Christoph and Craig,
+>=20
+> Including some performance data here would be nice.
 
-Jason
+Getting exact production performance data is going to be a major =
+challenge. Not a technical challenge, but rather logistically, ...
+
+>> Cc: Roopa Prabhu <roopa@nvidia.com>
+>> Reported-by: Craig Taylor <cmtaylor@apple.com>
+>> Signed-off-by: Christoph Paasch <cpaasch@apple.com>
+>=20
+>=20
+> And one minor nit, which I do not think warrants a repost:
+> netnext -> net-next.
+
+Ugh - I was wondering why did patchwork thought it was a fix=E2=80=A6 =
+that explains it.
+
+If a respin is needed, please let me know.
+
+> In any case, this looks good to me.
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
+
+
+Thanks,
+Christoph
+
 
