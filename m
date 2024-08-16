@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-119276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3521955093
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:11:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE1D955095
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 799C5287D07
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:11:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961AE28789B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4459F1C3F29;
-	Fri, 16 Aug 2024 18:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CB71C4610;
+	Fri, 16 Aug 2024 18:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuP/0Xi6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8TCzzZS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB7F1C233D;
-	Fri, 16 Aug 2024 18:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1316C1C460C
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723831840; cv=none; b=GELYGXCbLG3xTYpNxfYpzIIlJzFeIjNebIMhZAmVLkkYas4dXvE8o2MnmOK4TFfXg9wt/RDmcM5Ty8yM/3gBPfXQrc8Zxl7oTyAbg9SidD/r5jVLaHmwTHazoEcBBdQtlmwc2EKVD+VEJOQhr/sNkoF042VbcKdsiFT/5vW5Yls=
+	t=1723831842; cv=none; b=gHDq32eT8xJnPsI2fQAODUhH4pOX1IZmHpxwz7AHl9Df5vyEgVK2MPOp1wbEenQuEfMIyqb0PviT+yWnMwAgfp+I1vnQTMRK8kNssWzW+3YEtaoJSvYf/oeIo2v0w+Gfr5eeqrylKa1cUp10rUp6kn1elFTpuP/4RItt2ELP/UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723831840; c=relaxed/simple;
-	bh=zVSWKO5JPnWSE1h3k2VU/7U4V5+RPNpKwGivKePi7Gc=;
+	s=arc-20240116; t=1723831842; c=relaxed/simple;
+	bh=kiePZnOrSYBCU2QUgPW4afzG5xvJHQYXJotwac7tUSQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h9ltSi4KYopm8MyDoYwolX+Dz2m9oV5Y3VZcXTjyFWoQmiptEgDXYhMo83mRcTJSLoyAkjYxxngXqIbH3QZZ4lTa93PrWC6qeWXq7FlZjWOAloKRoyOetJzuTiZuiGUJ+tpA71xthZTBlUkRGhGOBnoKEI5vTVVimYsEvN36skQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CuP/0Xi6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7118DC32782;
-	Fri, 16 Aug 2024 18:10:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CMM7Wg64xgxgDPdMVvROc/WEgVAo9wJdviffGfnSv7oQa8aIvUw8RIQvn/Y6bEkM0n8+uCzBbifw7K3GpdAdM8wevXdgBZ936U5MeGr6GmT64bojwAjPlQ4nMIuNtOtxsTaCM/deyH+8/zaRHh8RC455wZSrrRhBVtFw5lEfqQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8TCzzZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F3CC4AF0B;
+	Fri, 16 Aug 2024 18:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723831839;
-	bh=zVSWKO5JPnWSE1h3k2VU/7U4V5+RPNpKwGivKePi7Gc=;
+	s=k20201202; t=1723831840;
+	bh=kiePZnOrSYBCU2QUgPW4afzG5xvJHQYXJotwac7tUSQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CuP/0Xi6vX4U6E6tp+w9+9Dg0wi6ahKiXoXN+o45b9ib6vZXa97dLrSTPjNR9IHsN
-	 8fZdjWxa3ccMh/I7uSmwjQ3T6nC78E2ugltTVnj55GZX2CA7bPIzyOY+OmAl4ewEWm
-	 07RwRlYmE7awiiG5VnYcYms7XNqEqbH7qNykSYzs73xwLLzKnqGNnFob7zSG4qtNMV
-	 QUyaMVDe2q3seV93IkjZGISEbGmJkQUsRi9et+CRoTT+ZOWDz5LfN/sBI9tP7jkpLE
-	 qB/BrQilacCpUcFlGlXI2syedHw+829WXhK1a5Zvcoh7IEFtVhsEIKVV/M2imxdAU2
-	 F90rqy7cBNKow==
+	b=S8TCzzZSsrDRG/OZIvl28WbKSEzrcW9yVm+uelPGRN63B+rEwhLAmpoRFF330ir4i
+	 BCm1Wrq4tc7NTfpzbe4FX2IJYeVDCo8LAHzhfXoB4U2rRxzmribr8Ct/rrJKSGGzwZ
+	 1nqgZmVgjTQVL2JuhJ8ZxQ3rgJho/JGBbTE1IX48VxO/7UVhKoaje+IB60lNrK8pSe
+	 FNqo7v/NIOOLe8BfYnpxEyRiRPVBh5YC+xIWw8hlFXaCmA8b9K3kuVYLG4A4SMNI4o
+	 5BAYu9VBvvUAvmzQIRGbB5bNbnQNovj+9rxvf0QHON5hafXW0McrwDL3yPiYD3StuF
+	 XyS2Cur/ZqwLQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1D938232A9;
-	Fri, 16 Aug 2024 18:10:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F4D38232A9;
+	Fri, 16 Aug 2024 18:10:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] ipv6: Add
- ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
+Subject: Re: [PATCH net-next 0/5] selftests: fib_rule_tests: Cleanups and new
+ tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172383183868.3593066.6873916327349164311.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Aug 2024 18:10:38 +0000
-References: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
-In-Reply-To: <20240813-ipv6_addr-helpers-v2-0-5c974f8cca3e@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name,
- sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- yisen.zhuang@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+ <172383183999.3593066.2595045508928136516.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Aug 2024 18:10:40 +0000
+References: <20240814111005.955359-1-idosch@nvidia.com>
+In-Reply-To: <20240814111005.955359-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, gnault@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 13 Aug 2024 14:33:46 +0100 you wrote:
-> Hi,
+On Wed, 14 Aug 2024 14:10:00 +0300 you wrote:
+> This patchset performs some cleanups and adds new tests in preparation
+> for upcoming FIB rule DSCP selector.
 > 
-> This series adds and uses some new helpers,
-> ipv6_addr_{cpu_to_be32,be32_to_cpu}, which are intended to assist in
-> byte order manipulation of IPv6 addresses stored as as arrays.
-> 
+> Ido Schimmel (5):
+>   selftests: fib_rule_tests: Remove unused functions
+>   selftests: fib_rule_tests: Clarify test results
+>   selftests: fib_rule_tests: Add negative match tests
+>   selftests: fib_rule_tests: Add negative connect tests
+>   selftests: fib_rule_tests: Test TOS matching with input routes
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/3] ipv6: Add ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-    https://git.kernel.org/netdev/net-next/c/f40a455d01f8
-  - [net-next,v2,2/3] net: ethernet: mtk_eth_soc: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-    https://git.kernel.org/netdev/net-next/c/b908c722133e
-  - [net-next,v2,3/3] net: hns3: Use ipv6_addr_{cpu_to_be32,be32_to_cpu} helpers
-    https://git.kernel.org/netdev/net-next/c/c7be6e70d20c
+  - [net-next,1/5] selftests: fib_rule_tests: Remove unused functions
+    https://git.kernel.org/netdev/net-next/c/30dcdd6a3a6c
+  - [net-next,2/5] selftests: fib_rule_tests: Clarify test results
+    https://git.kernel.org/netdev/net-next/c/b1487d6abeb5
+  - [net-next,3/5] selftests: fib_rule_tests: Add negative match tests
+    https://git.kernel.org/netdev/net-next/c/9b6dcef32c2d
+  - [net-next,4/5] selftests: fib_rule_tests: Add negative connect tests
+    https://git.kernel.org/netdev/net-next/c/53f88ed85bdd
+  - [net-next,5/5] selftests: fib_rule_tests: Test TOS matching with input routes
+    https://git.kernel.org/netdev/net-next/c/5f1b4f1be2d2
 
 You are awesome, thank you!
 -- 
