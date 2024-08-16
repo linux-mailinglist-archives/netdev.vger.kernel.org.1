@@ -1,124 +1,219 @@
-Return-Path: <netdev+bounces-119125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06B6954374
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:55:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29D2954391
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612B728126D
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7007E1F211FD
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884861474CF;
-	Fri, 16 Aug 2024 07:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE78C77101;
+	Fri, 16 Aug 2024 07:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="BtP/w0Hj"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Ax3JBvIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F8C146017;
-	Fri, 16 Aug 2024 07:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B2776056
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 07:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723794692; cv=none; b=miMAF4DDCZyxhZYSJBNnwFm91NYIeoEG7/2FHx6oruWak5zGId95c51+n8Y+TzZlEbUWw8LosvsnksHEIOkZSP4NkSyH6umEkQWWob76aFWdJ5GRRWcjBR1W0oBwgESYymktMtIFuJFNC7tOfNoNq+MP01oxYs87S3sHs4o60wg=
+	t=1723795168; cv=none; b=mazSxrdIpxMF1ar6kRw5wSRQuoclzQpwPsNwxfvxcXJ5hwRp5wzfy6aU5P8exviX2HFr77dPZAoLVpkqcRNGqb7g7ZiKvjHu+9J3E1Wfmr0ds9HyzjY2MZUcNwSvx19Yu8waAqx4Sc9kEDBMzlgKpVPiHzMzZyMrtKCuczeQWmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723794692; c=relaxed/simple;
-	bh=bnyAfH+ev0FhWqNoOsERGAc1djGIBHFpQvIiRrY1a1w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VRQ8MDFBg+exEYiudDzz2HtQW7vf94KJ9lO5F9/A4Fu6ntv4smH2E/5hArSy+6dMOimd0PF6BIsnahj/wGHOIM5eHIkthYX3gJ+6PaGZtcYb0PloHHV+DefhItWecn49daTGQ/0GcgR060JalT7/glBIRhRF87DjxdnPqRtjt3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=BtP/w0Hj; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47G7okfV7817816, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1723794646; bh=bnyAfH+ev0FhWqNoOsERGAc1djGIBHFpQvIiRrY1a1w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=BtP/w0HjcA1Dqzf4wbW7XEXY3DfG75o9aT4FPpUdtYJJPp8VH3WAuKWeIGp7qC4i0
-	 DNfgaXSat/12+tWZPBWPbK8CuSWJF5cEr7r8WwejpjP+USQ8zACaypHiFwMX90euYo
-	 qx6qqZ2wcmYdthKBsDa8QT9KI2E2SMY3iB03cOAP1P6WwDDrRpYgkYGP4dNw2Jw9UR
-	 hWV+Ho9RGOgRMDosjTVd7FMs5pGY6AbwbGi164yLVQues2Fuff2Nx4jF0cQwDT/C0j
-	 0WHhxCV7doDGlHnZLcI+8RpB+OQPNtviJg5i3N7tKaHS9ouzET15I45zjj7LjY2Y01
-	 9vc6OvLyglqtA==
-Received: from mail.realtek.com (smtpsrv.realtek.com[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47G7okfV7817816
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Aug 2024 15:50:46 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 16 Aug 2024 15:50:46 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 16 Aug 2024 15:50:45 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
- RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
- 15.01.2507.035; Fri, 16 Aug 2024 15:50:45 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "rkannoth@marvell.com" <rkannoth@marvell.com>,
-        "jdamato@fastly.com" <jdamato@fastly.com>,
-        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v27 07/13] rtase: Implement a function to receive packets
-Thread-Topic: [PATCH net-next v27 07/13] rtase: Implement a function to
- receive packets
-Thread-Index: AQHa7IJbqA7Iv5MkSUushVJbxjZdzbIon3AAgADoo1A=
-Date: Fri, 16 Aug 2024 07:50:45 +0000
-Message-ID: <3adea6bbe1384e0ea6a06f4343d03ac2@realtek.com>
-References: <20240812063539.575865-1-justinlai0215@realtek.com>
-	<20240812063539.575865-8-justinlai0215@realtek.com>
- <20240815185452.3df3eea9@kernel.org>
-In-Reply-To: <20240815185452.3df3eea9@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1723795168; c=relaxed/simple;
+	bh=iyYYh8oyeWymlIufsrmZI29zvt3+kspCa0I7L7JnTTo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WGQw7+Lgk0iuWbx38KBebZo/CHMjKp0lGFNygme5A7PX8GtzuneSK6JyG7FSh9TqJhKL+UgZWdA2BvHFIboK2MC9yn4o8aig/eSh6NxxjGWKAE6m+EYTZYUBplGb5Nn1AMFAxcyFR+4qbU6pEBt4qqEGnr3G245fz/ORpr7m71w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Ax3JBvIf; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=f/UQx0tNgZIcC8b8mfys/Fd+OlOKSSNYuxJszAUv6+M=; b=Ax3JBvIftzEWnc6SQm1wrw1YmA
+	S5a2x8Y2a0EDMHpmRwlnqs1qQGPwnPSLPW3yqhSCIh3GKenVYRM6xEs1G8l9R7Tdak+0WqZR3mkNw
+	TXt0xjbFvX3TcHPXD/I1jE0/0UvOL0zll5T6zhbdfO01+FLB/Aq7QtaH7ZYC6X0ujH6E=;
+Received: from [2a01:599:100:4e89:dd66:6d46:4e54:e116] (helo=localhost.localdomain)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1serrg-000BJa-0B
+	for netdev@vger.kernel.org;
+	Fri, 16 Aug 2024 09:59:16 +0200
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org
+Subject: [RFC] net: remove NETIF_F_GSO_FRAGLIST from NETIF_F_GSO_SOFTWARE
+Date: Fri, 16 Aug 2024 09:59:15 +0200
+Message-ID: <20240816075915.6245-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> On Mon, 12 Aug 2024 14:35:33 +0800 Justin Lai wrote:
-> > +     if (!delta && workdone)
-> > +             netdev_info(dev, "no Rx buffer allocated\n");
-> > +
-> > +     ring->dirty_idx +=3D delta;
-> > +
-> > +     if ((ring->dirty_idx + RTASE_NUM_DESC) =3D=3D ring->cur_idx)
-> > +             netdev_emerg(dev, "Rx buffers exhausted\n");
->=20
-> Memory allocation failures happen, we shouldn't risk spamming the logs.
-> I mean these two messages and the one in rtase_alloc_rx_data_buf(), the
-> should be removed.
->=20
-> There is a alloc_fail statistic defined in include/net/netdev_queues.h th=
-at's the
-> correct way to report buffer allocation failures.
-> And you should have a periodic service task / work which checks for buffe=
-rs
-> being exhausted, and if they are schedule NAPI so that it tries to alloca=
-te.
+Several drivers set NETIF_F_GSO_SOFTWARE, but mangle fraglist GRO packets
+in a way that they can't be properly segmented anymore.
+In order to properly deal with this, remove fraglist GSO from
+NETIF_F_GSO_SOFTWARE and switch to NETIF_F_GSO_SOFTWARE_ALL (which includes
+fraglist GSO) in places where it's safe to add.
 
-Hi Jakub,
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ drivers/net/dummy.c                  | 2 +-
+ drivers/net/loopback.c               | 2 +-
+ drivers/net/macvlan.c                | 2 +-
+ include/linux/netdev_features.h      | 5 +++--
+ net/8021q/vlan.h                     | 2 +-
+ net/8021q/vlan_dev.c                 | 4 ++--
+ net/core/sock.c                      | 2 +-
+ net/mac80211/ieee80211_i.h           | 2 +-
+ net/openvswitch/vport-internal_dev.c | 2 +-
+ 9 files changed, 12 insertions(+), 11 deletions(-)
 
-Thank you for the comments you provided. I will modify it.
+diff --git a/drivers/net/dummy.c b/drivers/net/dummy.c
+index d29b5d7af0d7..e2d0837c953c 100644
+--- a/drivers/net/dummy.c
++++ b/drivers/net/dummy.c
+@@ -110,7 +110,7 @@ static void dummy_setup(struct net_device *dev)
+ 	dev->flags &= ~IFF_MULTICAST;
+ 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+ 	dev->features	|= NETIF_F_SG | NETIF_F_FRAGLIST;
+-	dev->features	|= NETIF_F_GSO_SOFTWARE;
++	dev->features	|= NETIF_F_GSO_SOFTWARE_ALL;
+ 	dev->features	|= NETIF_F_HW_CSUM | NETIF_F_HIGHDMA | NETIF_F_LLTX;
+ 	dev->features	|= NETIF_F_GSO_ENCAP_ALL;
+ 	dev->hw_features |= dev->features;
+diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
+index 2b486e7c749c..50cd6eb93eb7 100644
+--- a/drivers/net/loopback.c
++++ b/drivers/net/loopback.c
+@@ -172,7 +172,7 @@ static void gen_lo_setup(struct net_device *dev,
+ 	dev->flags		= IFF_LOOPBACK;
+ 	dev->priv_flags		|= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+ 	netif_keep_dst(dev);
+-	dev->hw_features	= NETIF_F_GSO_SOFTWARE;
++	dev->hw_features	= NETIF_F_GSO_SOFTWARE_ALL;
+ 	dev->features		= NETIF_F_SG | NETIF_F_FRAGLIST
+ 		| NETIF_F_GSO_SOFTWARE
+ 		| NETIF_F_HW_CSUM
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index 24298a33e0e9..cd0b50199354 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -897,7 +897,7 @@ static int macvlan_hwtstamp_set(struct net_device *dev,
+ static struct lock_class_key macvlan_netdev_addr_lock_key;
+ 
+ #define ALWAYS_ON_OFFLOADS \
+-	(NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE | \
++	(NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE_ALL | \
+ 	 NETIF_F_GSO_ROBUST | NETIF_F_GSO_ENCAP_ALL)
+ 
+ #define ALWAYS_ON_FEATURES (ALWAYS_ON_OFFLOADS | NETIF_F_LLTX)
+diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
+index 7c2d77d75a88..8b6d7f532065 100644
+--- a/include/linux/netdev_features.h
++++ b/include/linux/netdev_features.h
+@@ -219,13 +219,14 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
+ 
+ /* List of features with software fallbacks. */
+ #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
+-				 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
++				 NETIF_F_GSO_UDP_L4)
++#define NETIF_F_GSO_SOFTWARE_ALL (NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_FRAGLIST)
+ 
+ /*
+  * If one device supports one of these features, then enable them
+  * for all in netdev_increment_features.
+  */
+-#define NETIF_F_ONE_FOR_ALL	(NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ROBUST | \
++#define NETIF_F_ONE_FOR_ALL	(NETIF_F_GSO_SOFTWARE_ALL | NETIF_F_GSO_ROBUST | \
+ 				 NETIF_F_SG | NETIF_F_HIGHDMA |		\
+ 				 NETIF_F_FRAGLIST | NETIF_F_VLAN_CHALLENGED)
+ 
+diff --git a/net/8021q/vlan.h b/net/8021q/vlan.h
+index 5eaf38875554..4ce1e8cf6b2e 100644
+--- a/net/8021q/vlan.h
++++ b/net/8021q/vlan.h
+@@ -108,7 +108,7 @@ static inline netdev_features_t vlan_tnl_features(struct net_device *real_dev)
+ 	netdev_features_t ret;
+ 
+ 	ret = real_dev->hw_enc_features &
+-	      (NETIF_F_CSUM_MASK | NETIF_F_GSO_SOFTWARE |
++	      (NETIF_F_CSUM_MASK | NETIF_F_GSO_SOFTWARE_ALL |
+ 	       NETIF_F_GSO_ENCAP_ALL);
+ 
+ 	if ((ret & NETIF_F_GSO_ENCAP_ALL) && (ret & NETIF_F_CSUM_MASK))
+diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+index 217be32426b5..194fb71e8463 100644
+--- a/net/8021q/vlan_dev.c
++++ b/net/8021q/vlan_dev.c
+@@ -561,7 +561,7 @@ static int vlan_dev_init(struct net_device *dev)
+ 		dev->state |= (1 << __LINK_STATE_NOCARRIER);
+ 
+ 	dev->hw_features = NETIF_F_HW_CSUM | NETIF_F_SG |
+-			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE |
++			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE_ALL |
+ 			   NETIF_F_GSO_ENCAP_ALL |
+ 			   NETIF_F_HIGHDMA | NETIF_F_SCTP_CRC |
+ 			   NETIF_F_ALL_FCOE;
+@@ -654,7 +654,7 @@ static netdev_features_t vlan_dev_fix_features(struct net_device *dev,
+ 	if (lower_features & (NETIF_F_IP_CSUM|NETIF_F_IPV6_CSUM))
+ 		lower_features |= NETIF_F_HW_CSUM;
+ 	features = netdev_intersect_features(features, lower_features);
+-	features |= old_features & (NETIF_F_SOFT_FEATURES | NETIF_F_GSO_SOFTWARE);
++	features |= old_features & (NETIF_F_SOFT_FEATURES | NETIF_F_GSO_SOFTWARE_ALL);
+ 	features |= NETIF_F_LLTX;
+ 
+ 	return features;
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9abc4fe25953..1973e3092ed8 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2451,7 +2451,7 @@ void sk_setup_caps(struct sock *sk, struct dst_entry *dst)
+ 	if (sk_is_tcp(sk))
+ 		sk->sk_route_caps |= NETIF_F_GSO;
+ 	if (sk->sk_route_caps & NETIF_F_GSO)
+-		sk->sk_route_caps |= NETIF_F_GSO_SOFTWARE;
++		sk->sk_route_caps |= NETIF_F_GSO_SOFTWARE_ALL;
+ 	if (unlikely(sk->sk_gso_disabled))
+ 		sk->sk_route_caps &= ~NETIF_F_GSO_MASK;
+ 	if (sk_can_gso(sk)) {
+diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+index a3485e4c6132..8de4f8cabf3a 100644
+--- a/net/mac80211/ieee80211_i.h
++++ b/net/mac80211/ieee80211_i.h
+@@ -2009,7 +2009,7 @@ void ieee80211_color_collision_detection_work(struct work_struct *work);
+ /* interface handling */
+ #define MAC80211_SUPPORTED_FEATURES_TX	(NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | \
+ 					 NETIF_F_HW_CSUM | NETIF_F_SG | \
+-					 NETIF_F_HIGHDMA | NETIF_F_GSO_SOFTWARE | \
++					 NETIF_F_HIGHDMA | NETIF_F_GSO_SOFTWARE_ALL | \
+ 					 NETIF_F_HW_TC)
+ #define MAC80211_SUPPORTED_FEATURES_RX	(NETIF_F_RXCSUM)
+ #define MAC80211_SUPPORTED_FEATURES	(MAC80211_SUPPORTED_FEATURES_TX | \
+diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
+index 4b33133cbdff..6c4b231c3957 100644
+--- a/net/openvswitch/vport-internal_dev.c
++++ b/net/openvswitch/vport-internal_dev.c
+@@ -109,7 +109,7 @@ static void do_setup(struct net_device *netdev)
+ 
+ 	netdev->features = NETIF_F_LLTX | NETIF_F_SG | NETIF_F_FRAGLIST |
+ 			   NETIF_F_HIGHDMA | NETIF_F_HW_CSUM |
+-			   NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL;
++			   NETIF_F_GSO_SOFTWARE_ALL | NETIF_F_GSO_ENCAP_ALL;
+ 
+ 	netdev->vlan_features = netdev->features;
+ 	netdev->hw_enc_features = netdev->features;
+-- 
+2.44.0
 
-Thanks
-Justin
 
