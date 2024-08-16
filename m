@@ -1,219 +1,111 @@
-Return-Path: <netdev+bounces-119126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29D2954391
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:59:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C63954399
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 10:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7007E1F211FD
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:59:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B074B23747
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 08:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE78C77101;
-	Fri, 16 Aug 2024 07:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2528454645;
+	Fri, 16 Aug 2024 08:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Ax3JBvIf"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="0v8d7mbU"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B2776056
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8528F82863
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 08:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723795168; cv=none; b=mazSxrdIpxMF1ar6kRw5wSRQuoclzQpwPsNwxfvxcXJ5hwRp5wzfy6aU5P8exviX2HFr77dPZAoLVpkqcRNGqb7g7ZiKvjHu+9J3E1Wfmr0ds9HyzjY2MZUcNwSvx19Yu8waAqx4Sc9kEDBMzlgKpVPiHzMzZyMrtKCuczeQWmU=
+	t=1723795333; cv=none; b=I2CNTY9yXn4r1q8MRJ2F8EuFBAFJY6u1uIm1Vpvar3SpmQp6QxoWei4DSQNLvovQB/K1PhFhyAEH9rR65OwB/2OilWwix4o8F4IU25bxAPBEIAqQKaxGZFc8UP9L/nNA12jWTsQqbqnMx40IVf2RI92OtXeh9jUgJoy22djL+TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723795168; c=relaxed/simple;
-	bh=iyYYh8oyeWymlIufsrmZI29zvt3+kspCa0I7L7JnTTo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WGQw7+Lgk0iuWbx38KBebZo/CHMjKp0lGFNygme5A7PX8GtzuneSK6JyG7FSh9TqJhKL+UgZWdA2BvHFIboK2MC9yn4o8aig/eSh6NxxjGWKAE6m+EYTZYUBplGb5Nn1AMFAxcyFR+4qbU6pEBt4qqEGnr3G245fz/ORpr7m71w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Ax3JBvIf; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=f/UQx0tNgZIcC8b8mfys/Fd+OlOKSSNYuxJszAUv6+M=; b=Ax3JBvIftzEWnc6SQm1wrw1YmA
-	S5a2x8Y2a0EDMHpmRwlnqs1qQGPwnPSLPW3yqhSCIh3GKenVYRM6xEs1G8l9R7Tdak+0WqZR3mkNw
-	TXt0xjbFvX3TcHPXD/I1jE0/0UvOL0zll5T6zhbdfO01+FLB/Aq7QtaH7ZYC6X0ujH6E=;
-Received: from [2a01:599:100:4e89:dd66:6d46:4e54:e116] (helo=localhost.localdomain)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1serrg-000BJa-0B
-	for netdev@vger.kernel.org;
-	Fri, 16 Aug 2024 09:59:16 +0200
-From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org
-Subject: [RFC] net: remove NETIF_F_GSO_FRAGLIST from NETIF_F_GSO_SOFTWARE
-Date: Fri, 16 Aug 2024 09:59:15 +0200
-Message-ID: <20240816075915.6245-1-nbd@nbd.name>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1723795333; c=relaxed/simple;
+	bh=kFnbw+sCZmQBGBhaYY14lscRNj4u/DKGJfN+0MmCq0g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=uarZ36C7vK1Ar+NbL86ApznFEQEYmjTo9d4j0PIqttEhF3bjUFgj++/DETlEbc2939m9JrVpWgXkL0wfa8FnMNda0wGtxqUdLIqA7cqzQFJ98y1dxbhbTTiLnWVvq8WRRhzzBKxLk7zlbXa3/62L4AvfC1r27iYFjICjhERfnkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=0v8d7mbU; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:1:e533:7058:72ab:8493] (unknown [IPv6:2a02:8010:6359:1:e533:7058:72ab:8493])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id C84387DA1E;
+	Fri, 16 Aug 2024 09:02:03 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1723795324; bh=kFnbw+sCZmQBGBhaYY14lscRNj4u/DKGJfN+0MmCq0g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:From;
+	z=Message-ID:=20<8362db69-ba48-56fc-5995-4195b00a2b9f@katalix.com>|
+	 Date:=20Fri,=2016=20Aug=202024=2009:02:03=20+0100|MIME-Version:=20
+	 1.0|Subject:=20Re:=20[PATCH=20net-next=20v2]=20l2tp:=20use=20skb_q
+	 ueue_purge=20in=0D=0A=20l2tp_ip_destroy_sock|From:=20James=20Chapm
+	 an=20<jchapman@katalix.com>|To:=20netdev@vger.kernel.org|Cc:=20dav
+	 em@davemloft.net,=20edumazet@google.com,=20kuba@kernel.org,=0D=0A=
+	 20pabeni@redhat.com,=20dsahern@kernel.org,=20tparkin@katalix.com,=
+	 0D=0A=20xiyou.wangcong@gmail.com|References:=20<20240815074311.123
+	 8511-1-jchapman@katalix.com>|In-Reply-To:=20<20240815074311.123851
+	 1-1-jchapman@katalix.com>;
+	b=0v8d7mbUWWOwp589CllDSr4h/cYbAKWjwWmfVQKLd1JLKqs+U8A4FkbiMRp4HIPZb
+	 anaxgUzbaLUxtp966aKhrerncXsx8DBfyan4ktTTcjq2Y3IZymGsfVLMD/fistrfjd
+	 7AR1LyjZ3h785Qbvcm0AgmhDvnKH/ulYN4O8+vqmDXh1m/TBMtQ1N3uAKdbtVgaFiK
+	 J/ynoX/GtKgwez7wbdAZJFek+AK2FSSJe9SMjWAGQcqhfjV3GZ5cLRU9u+qHTuI9Sw
+	 nZlzY303e73lXiex1zp8sV4e4ZhOizS4o1TpUmtbtGBUXy5QiBQIVt9ABwGYprZ7+V
+	 4uqvMRDE43y2Q==
+Message-ID: <8362db69-ba48-56fc-5995-4195b00a2b9f@katalix.com>
+Date: Fri, 16 Aug 2024 09:02:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net-next v2] l2tp: use skb_queue_purge in
+ l2tp_ip_destroy_sock
+Content-Language: en-US
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com,
+ xiyou.wangcong@gmail.com
+References: <20240815074311.1238511-1-jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+In-Reply-To: <20240815074311.1238511-1-jchapman@katalix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Several drivers set NETIF_F_GSO_SOFTWARE, but mangle fraglist GRO packets
-in a way that they can't be properly segmented anymore.
-In order to properly deal with this, remove fraglist GSO from
-NETIF_F_GSO_SOFTWARE and switch to NETIF_F_GSO_SOFTWARE_ALL (which includes
-fraglist GSO) in places where it's safe to add.
+On 15/08/2024 08:43, James Chapman wrote:
+> Recent commit ed8ebee6def7 ("l2tp: have l2tp_ip_destroy_sock use
+> ip_flush_pending_frames") was incorrect in that l2tp_ip does not use
+> socket cork and ip_flush_pending_frames is for sockets that do. Use
+> skb_queue_purge instead and remove the unnecessary lock.
+> 
+> Also unexport ip_flush_pending_frames since it was originally exported
+> in commit 4ff8863419cd ("ipv4: export ip_flush_pending_frames") for
+> l2tp and is not used by other modules.
+> 
+> ---
+>    v2:
+>      - also unexport ip_flush_pending_frames (cong)
+>    v1: https://lore.kernel.org/all/20240813093914.501183-1-jchapman@katalix.com/
+> 
+> Suggested-by: xiyou.wangcong@gmail.com
+> Signed-off-by: James Chapman <jchapman@katalix.com>
+> ---
+>   net/ipv4/ip_output.c | 1 -
+>   net/l2tp/l2tp_ip.c   | 4 +---
+>   2 files changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> index 8a10a7c67834..b90d0f78ac80 100644
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
- drivers/net/dummy.c                  | 2 +-
- drivers/net/loopback.c               | 2 +-
- drivers/net/macvlan.c                | 2 +-
- include/linux/netdev_features.h      | 5 +++--
- net/8021q/vlan.h                     | 2 +-
- net/8021q/vlan_dev.c                 | 4 ++--
- net/core/sock.c                      | 2 +-
- net/mac80211/ieee80211_i.h           | 2 +-
- net/openvswitch/vport-internal_dev.c | 2 +-
- 9 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dummy.c b/drivers/net/dummy.c
-index d29b5d7af0d7..e2d0837c953c 100644
---- a/drivers/net/dummy.c
-+++ b/drivers/net/dummy.c
-@@ -110,7 +110,7 @@ static void dummy_setup(struct net_device *dev)
- 	dev->flags &= ~IFF_MULTICAST;
- 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
- 	dev->features	|= NETIF_F_SG | NETIF_F_FRAGLIST;
--	dev->features	|= NETIF_F_GSO_SOFTWARE;
-+	dev->features	|= NETIF_F_GSO_SOFTWARE_ALL;
- 	dev->features	|= NETIF_F_HW_CSUM | NETIF_F_HIGHDMA | NETIF_F_LLTX;
- 	dev->features	|= NETIF_F_GSO_ENCAP_ALL;
- 	dev->hw_features |= dev->features;
-diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
-index 2b486e7c749c..50cd6eb93eb7 100644
---- a/drivers/net/loopback.c
-+++ b/drivers/net/loopback.c
-@@ -172,7 +172,7 @@ static void gen_lo_setup(struct net_device *dev,
- 	dev->flags		= IFF_LOOPBACK;
- 	dev->priv_flags		|= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
- 	netif_keep_dst(dev);
--	dev->hw_features	= NETIF_F_GSO_SOFTWARE;
-+	dev->hw_features	= NETIF_F_GSO_SOFTWARE_ALL;
- 	dev->features		= NETIF_F_SG | NETIF_F_FRAGLIST
- 		| NETIF_F_GSO_SOFTWARE
- 		| NETIF_F_HW_CSUM
-diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-index 24298a33e0e9..cd0b50199354 100644
---- a/drivers/net/macvlan.c
-+++ b/drivers/net/macvlan.c
-@@ -897,7 +897,7 @@ static int macvlan_hwtstamp_set(struct net_device *dev,
- static struct lock_class_key macvlan_netdev_addr_lock_key;
- 
- #define ALWAYS_ON_OFFLOADS \
--	(NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE | \
-+	(NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE_ALL | \
- 	 NETIF_F_GSO_ROBUST | NETIF_F_GSO_ENCAP_ALL)
- 
- #define ALWAYS_ON_FEATURES (ALWAYS_ON_OFFLOADS | NETIF_F_LLTX)
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 7c2d77d75a88..8b6d7f532065 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -219,13 +219,14 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
- 
- /* List of features with software fallbacks. */
- #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
--				 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
-+				 NETIF_F_GSO_UDP_L4)
-+#define NETIF_F_GSO_SOFTWARE_ALL (NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_FRAGLIST)
- 
- /*
-  * If one device supports one of these features, then enable them
-  * for all in netdev_increment_features.
-  */
--#define NETIF_F_ONE_FOR_ALL	(NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ROBUST | \
-+#define NETIF_F_ONE_FOR_ALL	(NETIF_F_GSO_SOFTWARE_ALL | NETIF_F_GSO_ROBUST | \
- 				 NETIF_F_SG | NETIF_F_HIGHDMA |		\
- 				 NETIF_F_FRAGLIST | NETIF_F_VLAN_CHALLENGED)
- 
-diff --git a/net/8021q/vlan.h b/net/8021q/vlan.h
-index 5eaf38875554..4ce1e8cf6b2e 100644
---- a/net/8021q/vlan.h
-+++ b/net/8021q/vlan.h
-@@ -108,7 +108,7 @@ static inline netdev_features_t vlan_tnl_features(struct net_device *real_dev)
- 	netdev_features_t ret;
- 
- 	ret = real_dev->hw_enc_features &
--	      (NETIF_F_CSUM_MASK | NETIF_F_GSO_SOFTWARE |
-+	      (NETIF_F_CSUM_MASK | NETIF_F_GSO_SOFTWARE_ALL |
- 	       NETIF_F_GSO_ENCAP_ALL);
- 
- 	if ((ret & NETIF_F_GSO_ENCAP_ALL) && (ret & NETIF_F_CSUM_MASK))
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 217be32426b5..194fb71e8463 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -561,7 +561,7 @@ static int vlan_dev_init(struct net_device *dev)
- 		dev->state |= (1 << __LINK_STATE_NOCARRIER);
- 
- 	dev->hw_features = NETIF_F_HW_CSUM | NETIF_F_SG |
--			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE |
-+			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE_ALL |
- 			   NETIF_F_GSO_ENCAP_ALL |
- 			   NETIF_F_HIGHDMA | NETIF_F_SCTP_CRC |
- 			   NETIF_F_ALL_FCOE;
-@@ -654,7 +654,7 @@ static netdev_features_t vlan_dev_fix_features(struct net_device *dev,
- 	if (lower_features & (NETIF_F_IP_CSUM|NETIF_F_IPV6_CSUM))
- 		lower_features |= NETIF_F_HW_CSUM;
- 	features = netdev_intersect_features(features, lower_features);
--	features |= old_features & (NETIF_F_SOFT_FEATURES | NETIF_F_GSO_SOFTWARE);
-+	features |= old_features & (NETIF_F_SOFT_FEATURES | NETIF_F_GSO_SOFTWARE_ALL);
- 	features |= NETIF_F_LLTX;
- 
- 	return features;
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9abc4fe25953..1973e3092ed8 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2451,7 +2451,7 @@ void sk_setup_caps(struct sock *sk, struct dst_entry *dst)
- 	if (sk_is_tcp(sk))
- 		sk->sk_route_caps |= NETIF_F_GSO;
- 	if (sk->sk_route_caps & NETIF_F_GSO)
--		sk->sk_route_caps |= NETIF_F_GSO_SOFTWARE;
-+		sk->sk_route_caps |= NETIF_F_GSO_SOFTWARE_ALL;
- 	if (unlikely(sk->sk_gso_disabled))
- 		sk->sk_route_caps &= ~NETIF_F_GSO_MASK;
- 	if (sk_can_gso(sk)) {
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index a3485e4c6132..8de4f8cabf3a 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -2009,7 +2009,7 @@ void ieee80211_color_collision_detection_work(struct work_struct *work);
- /* interface handling */
- #define MAC80211_SUPPORTED_FEATURES_TX	(NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | \
- 					 NETIF_F_HW_CSUM | NETIF_F_SG | \
--					 NETIF_F_HIGHDMA | NETIF_F_GSO_SOFTWARE | \
-+					 NETIF_F_HIGHDMA | NETIF_F_GSO_SOFTWARE_ALL | \
- 					 NETIF_F_HW_TC)
- #define MAC80211_SUPPORTED_FEATURES_RX	(NETIF_F_RXCSUM)
- #define MAC80211_SUPPORTED_FEATURES	(MAC80211_SUPPORTED_FEATURES_TX | \
-diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
-index 4b33133cbdff..6c4b231c3957 100644
---- a/net/openvswitch/vport-internal_dev.c
-+++ b/net/openvswitch/vport-internal_dev.c
-@@ -109,7 +109,7 @@ static void do_setup(struct net_device *netdev)
- 
- 	netdev->features = NETIF_F_LLTX | NETIF_F_SG | NETIF_F_FRAGLIST |
- 			   NETIF_F_HIGHDMA | NETIF_F_HW_CSUM |
--			   NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL;
-+			   NETIF_F_GSO_SOFTWARE_ALL | NETIF_F_GSO_ENCAP_ALL;
- 
- 	netdev->vlan_features = netdev->features;
- 	netdev->hw_enc_features = netdev->features;
--- 
-2.44.0
+Gah, I notice tags are in the wrong place in the commit log. I'll send a v3.
+
+--
+pw-bot: cr
 
 
