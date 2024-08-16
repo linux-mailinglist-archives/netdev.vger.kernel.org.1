@@ -1,148 +1,92 @@
-Return-Path: <netdev+bounces-119204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91A7C954B7C
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:57:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86319954B7D
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 15:57:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E4471F239C3
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:57:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B93F91C24218
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423701BCA08;
-	Fri, 16 Aug 2024 13:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="djTjyzGW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665001B8E84;
+	Fri, 16 Aug 2024 13:57:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115F91B8EBD
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 13:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC161B8E92;
+	Fri, 16 Aug 2024 13:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723816616; cv=none; b=Mfw28NEDN2HySwGkm+3zBXUwwa8K2x/dafz822oBx4gewNCkrFVDi/bkPOXrHiqV4XskSSGCKURzii4vTM969U2LQUAQAERI88dAuXlO7dqaedPCQm7wZnce2+tdJm9mKrMDF4a18OC3g1bVgV3vpxezpPGM8AdNWSUlOyfyFbo=
+	t=1723816635; cv=none; b=O37inelKE1L1ZiK64/aHy5vYyIzC5Cj15Ptx4pMUl/fNUbT8k5nObZyyKXimWWrT0mjpE6dr0cEAvaFBoiyweCZaFg8jX7KyRw7DusEThh1fhT4mEBgLVmZ+bSd9BvzWDhjFx/RVFTSlo8j2Vlf5vsVqnIlEMI7MJE5+oqNNTRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723816616; c=relaxed/simple;
-	bh=l9MAxaCNe54/qqO/Y+exMLKMOMV8xf6Li74gXljpzr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bWAJlAmDLeiC/HG7UeXezYWtoYG20cbwTzoqeUEIuD2z8k9YGv66jmlDv7xIyblQV4qTdVbwSI0qB6DRu+iAYvtQrqJCtSkbvJb8PAxnLAJk5WDmiuVlCmh9pk1VddrS7eiULYvycKBhBU7Xmz+DKa2u7xMOYLfyIammA3YRTvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=djTjyzGW; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37186c2278bso1161667f8f.1
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 06:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723816611; x=1724421411; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WXX2C3wnh7+8WNV/qSncynwi6/HDTD/vyOk/QMV0TUQ=;
-        b=djTjyzGWtKWLKEYbuPG4VyWD46rmku+Cbncmua5RgE6+yjnHx/52DaiFUIyw/bVzjQ
-         JniurdlfaHT66rRZK3qduwM32/9I1DDz3RPt9k02p1N3g2GZmIqebX+SwGZTWWeAJ9yd
-         +lTzw8o/DjqVBVaHT+JLnt4HmdYkIIXQP3KBVJwxNqQfgiNaXIYsaBB/a2B4Q/zjfcEl
-         rk9FehhMG8YKBJnzCwBhvoxnxHi7pD3Sz2p8MSN3P6PLJPTEQf3DAjzoGy/wI8/8mdnA
-         qvsGv7q0zMTfXuqB2aGa3k9HCX56rPUR+/LD3VEDFUDFRHpUDoPs0K5Q5/Yubjt83TBC
-         Eblw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723816611; x=1724421411;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WXX2C3wnh7+8WNV/qSncynwi6/HDTD/vyOk/QMV0TUQ=;
-        b=pO0l8kDSqyTSpzgZK/s6NrHJsXQ2tjJQv9dw/s/1y1NQd7ADZGtFIMLzIzZayiu4wE
-         MNKl/4fEU4McR4JDznb+TNO+cMLO/6Mhu2I1ebyoOrvXHY2Zk9+coQmmp4mbGwkhKaxI
-         +nhFD/GjdA9KI5XFqUYaA70+EdColb2fzA3Eg+fdJiyCIqirZxjz80yTZjTNCPsRmEji
-         mKap1sA0kebzfH7uZvggAV/vh5T3a6SSAhe1O7al95Pr5xmjbxjWDC2QZgl8Bjlq0V32
-         b3cd2mnVMpi9S5x0ce6uAvN0kma36ac/U2VR+vURQTGIlcP3QOig2jEDOEiH4HseIlZi
-         Pm9A==
-X-Gm-Message-State: AOJu0YwNHsI0kV6906Ab449KUYGMmzopYBxji50VCvnf658uUVWtwQT6
-	lLJKfb05uaCa953cr3EXLc9F3mFXGwb2z1bgEf5hTkNyuNsRGW56wgt39dik/kWcX/VLow2Z58V
-	adTh35qMfGAW+WPBD04YQFWhL11H2hrm2AYVG
-X-Google-Smtp-Source: AGHT+IE0JOrXVLQSixhP01cdcARFbW0ccbM6G+qKTpkPzMcItcOgty9rR4OVVmPUNtu/xY88xZ5p9Oo2vXeH/2ggoXM=
-X-Received: by 2002:adf:fecd:0:b0:366:f455:e7c1 with SMTP id
- ffacd0b85a97d-37194c3390amr2137247f8f.27.1723816610994; Fri, 16 Aug 2024
- 06:56:50 -0700 (PDT)
+	s=arc-20240116; t=1723816635; c=relaxed/simple;
+	bh=020hZGJIzLJWA99tUJoWCXT0j5vGBw0TAHhBZbKmTPE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Yu/TQaeZIDA3Wc6uqBUCf4LV1x/JlcKvciDrTUfwVWM8e217wk/fu8Xb9GRUiEXNBZYF1uydSjICYLicbEhJp6hS/MbzoN0ZCmdbOHwvSCNJ4qn2Khbvfqj9g23yHOZ+DMNBtn2/Nss18LQBh4Y8IGlLIcSx5qq52KqRyOt29wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id C985492009D; Fri, 16 Aug 2024 15:57:09 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id C3A4792009C;
+	Fri, 16 Aug 2024 14:57:09 +0100 (BST)
+Date: Fri, 16 Aug 2024 14:57:09 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Matthew W Carlis <mattc@purestorage.com>
+cc: alex.williamson@redhat.com, Bjorn Helgaas <bhelgaas@google.com>, 
+    "David S. Miller" <davem@davemloft.net>, david.abdurachmanov@gmail.com, 
+    edumazet@google.com, helgaas@kernel.org, kuba@kernel.org, leon@kernel.org, 
+    linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+    linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, lukas@wunner.de, 
+    mahesh@linux.ibm.com, mika.westerberg@linux.intel.com, 
+    netdev@vger.kernel.org, npiggin@gmail.com, oohall@gmail.com, 
+    pabeni@redhat.com, pali@kernel.org, saeedm@nvidia.com, sr@denx.de, 
+    Jim Wilson <wilson@tuliptree.org>
+Subject: Re: PCI: Work around PCIe link training failures
+In-Reply-To: <20240815194059.28798-1-mattc@purestorage.com>
+Message-ID: <alpine.DEB.2.21.2408160312180.59022@angie.orcam.me.uk>
+References: <alpine.DEB.2.21.2408091356190.61955@angie.orcam.me.uk> <20240815194059.28798-1-mattc@purestorage.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240813211317.3381180-4-almasrymina@google.com> <20240815174852.48bbfccf@kernel.org>
-In-Reply-To: <20240815174852.48bbfccf@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 16 Aug 2024 09:56:36 -0400
-Message-ID: <CAHS8izN0Wb7isGbhO+cvYNfG+v2bsvvfy7P0cSsMD7USfd+4bQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v19 03/13] netdev: support binding dma-buf to netdevice
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Daniel Vetter <daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-On Thu, Aug 15, 2024 at 8:48=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 13 Aug 2024 21:13:05 +0000 Mina Almasry wrote:
-> > +int dev_get_max_mp_channel(const struct net_device *dev)
-> > +{
-> > +     int i, max =3D -1;
->
-> I presume the bug from yesterday is self evident once reported? :)
->
+On Thu, 15 Aug 2024, Matthew W Carlis wrote:
 
-Yes, my apologies. The int return value from this function was being
-implicitly cast to unsigned in the check I think, and that failed the
-check.
+> > Well, in principle in a setup with reliable links the LBMS bit may never 
+> > be set, e.g. this system of mine has been in 24/7 operation since the last 
+> > reboot 410 days ago and for the devices that support Link Active reporting 
+> > it shows:
+> > ...
+> > so out of 11 devices 6 have the LBMS bit clear.  But then 5 have it set, 
+> > perhaps worryingly, so of course you're right, that it will get set in the 
+> > field, though it's not enough by itself for your problem to trigger.
+> 
+> The way I look at it is that its essentially a probability distribution with time,
+> but I try to avoid learning too much about the physical layer because I would find
+> myself debugging more hardware issues lol. I also don't think LBMS/LABS being set
+> by itself is very interesting without knowing the rate at which it is being set.
 
-My test didn't catch that due to a test environment issue. I had 2
-ethtools installed by accident on the machine, and the test was
-invoking the wrong one. I think I have that ironed out now.
+ Agreed.  Ilpo's upcoming bandwidth controller will hopefully give us such 
+data.
 
-> > +     ASSERT_RTNL();
-> > +
-> > +     for (i =3D 0; i < dev->real_num_rx_queues; i++)
-> > +             if (dev->_rx[i].mp_params.mp_priv)
-> > +                     /* The number of queues is the idx plus 1. */
-> > +                     max =3D i + 1;
->
-> The +1 is odd. The function as it stands reports min channel count.
-> Not max_mp_channel, if you ask me. And if you renamed it, you don't
-> have to use -1 as "not installed".
->
+> FWIW I have seen some devices in the past going into recovery state many times a
+> second & still never downtrain, but at the same time they were setting the
+> LBMS/LABS bits which maybe not quite spec compliant.
+> 
+> I would like to help test these changes, but I would like to avoid having to test
+> each mentioned change individually. Does anyone have any preferences in how I batch
+> the patches for testing? Would it be ok if I just pulled them all together on one go?
 
-Will do.
+ Certainly fine with me, especially as 3/4 and 4/4 aren't really related 
+to your failure scenario, and then you need 1/4 and 2/4 both at a time to 
+address both aspects of the issue you have reported.
 
---
-Thanks,
-Mina
+  Maciej
 
