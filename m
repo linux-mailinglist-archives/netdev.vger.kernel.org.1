@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-119311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3435955229
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 22:59:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A62795522F
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 23:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D7CD1F22168
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:59:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB9DC2864D0
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 21:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359A21C68A8;
-	Fri, 16 Aug 2024 20:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EA481AD7;
+	Fri, 16 Aug 2024 21:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kw1iIC2z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L8hZYQAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E301C68A3;
-	Fri, 16 Aug 2024 20:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37855893
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 21:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723841936; cv=none; b=iSAoaEfkXbs5L4vOS5MlMMVDd6koGKXUpnRjOOhjSlK/550tLbuKpvTgfyTpiXF2hyLH6XpWrJjKFR0FVoi02s52rUxFuj5sDTw6QHCFPAdjl6EJvDOgHiJYbw9OeecYts3SFNXqWzvTamOocutwnZQj3EAnsvvf3hGTOfMPXsA=
+	t=1723842118; cv=none; b=VJaWjtcz2AkLlpCZh73zDEWXmF6P2AFu51VE8iMairkwaF1p21GwKdSjLCCqRMVtpoVMJSOCY/65kU3MOByTPUHyyJSoZW1iX+PN6KmLvjhk3I0RcFEn/cDFeGEam9Ml4jcqrNd81wFbeJ/JhKeheiHUJ8ihLT6Ss/FAFqvJZKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723841936; c=relaxed/simple;
-	bh=d/gXKV+rzSeF81+qiKEmv3B6KI33JDPBB1EQCC/niTM=;
+	s=arc-20240116; t=1723842118; c=relaxed/simple;
+	bh=yfv/5f3LO31w3lGqEJqEAwKGDf0CEiS72lCeG7B5ksg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwKDu4sOcjFF7nRaTDwBUr6mKkspJcMAB/q7zYPI4IHU1DT536SXatn+OQksv8KrC5thKSgw+yNUjUBt4Y4GXsFwZlcOLFiakstBOUIrH3vcl5QrnZZA4aHAdgvRrtMPktNFCsZ4iY9eC+dDIaX0tZEdA2tJ/ddcb9Zv45670gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kw1iIC2z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457AEC32782;
-	Fri, 16 Aug 2024 20:58:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723841935;
-	bh=d/gXKV+rzSeF81+qiKEmv3B6KI33JDPBB1EQCC/niTM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kw1iIC2zcVH425XaIRUmdpEBpaUSjqCwZYku3c7DZ5vF1vOdaC+XZAnCgtle39qlk
-	 /Ci2/W9Jx60laZCU4o5S9mVXxj5U1Asy7xZbMio8ay2z/QPfLmMQ1Bionk4fkF1cOt
-	 d3HPfhxnl/98Y9sFOHR4CCpXPegQHg0lLIRBrBLnAnfzuCk+6rkzVD5Wt3YrXjl98k
-	 zgSpJrwoWz/xl1WbpAYJIfp3Oqz1NsIZKOHWIgAG0IO2uL6WAZhoxsygt9mYOZm8Ra
-	 yLJa3llWeTZLioq72YQi0Cnx3LftF6/Ck3p0/VIMzjxtdzGCffdO21fLydL+lwL6fH
-	 4OyK8mud/e4og==
-Date: Fri, 16 Aug 2024 14:58:54 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	devicetree@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
-	imx@lists.linux.dev, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH v4 1/1] dt-bindings: net: mdio: change nodename match
- pattern
-Message-ID: <172384193319.2153392.2293896904577787066.robh@kernel.org>
-References: <20240815163408.4184705-1-Frank.Li@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oLFqHYEJbIZxrNAOQLJG4lNu6KyjZaNQaMy84VREpCzPJqRyUpd1b0TvJqPsNtEo9Dbl9Bi9WhvgoCxidhKalE7wbgxVI2Fq/xJaG+Es9f45gxzF5OTYyF7ezAksEMB8ebdfJvWCaqydgJkEQ41ftqPbsfo++lDJMKR4F5E9Le0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L8hZYQAG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Xd7VXcBl257GszwHi+LyPbSYSmxpqwT0rbxgq8qtS1I=; b=L8hZYQAG5pwjxsbJQgbpYPGTEm
+	7hBG/CxMuUvVib7ZCwCCegsLS03Cw44gAzJnVY0ElQ1XPGZ0Jo7aO75oeCptCvrSqS4gbZA/oludS
+	jxjhvp4RTRN9rv211GHA2gWrPXX7OkTVpS2DI+K6nAQaY73V2OMNuZelXSwcubAB+AUo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sf453-004xpS-Tf; Fri, 16 Aug 2024 23:01:53 +0200
+Date: Fri, 16 Aug 2024 23:01:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Martin Whitaker <foss@martin-whitaker.me.uk>
+Cc: netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Woojung.Huh@microchip.com, ceggers@arri.de,
+	arun.ramadoss@microchip.com
+Subject: Re: [PATCH net] net: dsa: microchip: fix PTP config failure when
+ using multiple ports
+Message-ID: <f80d7a6b-651f-4c00-a068-c0cba2ff7ca9@lunn.ch>
+References: <20240815083814.4273-1-foss@martin-whitaker.me.uk>
+ <f335b2b8-aec7-4679-993a-3e147bf65d1d@lunn.ch>
+ <b21de19d-db51-4d8e-b9be-d688f1c71be2@martin-whitaker.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,64 +62,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240815163408.4184705-1-Frank.Li@nxp.com>
+In-Reply-To: <b21de19d-db51-4d8e-b9be-d688f1c71be2@martin-whitaker.me.uk>
 
+On Fri, Aug 16, 2024 at 06:18:46PM +0100, Martin Whitaker wrote:
+> On 15/08/2024 15:38, Andrew Lunn wrote:
+> > On Thu, Aug 15, 2024 at 09:38:14AM +0100, Martin Whitaker wrote:
+> > > When performing the port_hwtstamp_set operation, ptp_schedule_worker()
+> > > will be called if hardware timestamoing is enabled on any of the ports.
+> > > When using multiple ports for PTP, port_hwtstamp_set is executed for
+> > > each port. When called for the first time ptp_schedule_worker() returns
+> > > 0. On subsequent calls it returns 1, indicating the worker is already
+> > > scheduled. Currently the ksz driver treats 1 as an error and fails to
+> > > complete the port_hwtstamp_set operation, thus leaving the timestamping
+> > > configuration for those ports unchanged.
+> > > 
+> > > This patch fixes this by ignoring the ptp_schedule_worker() return
+> > > value.
+> > 
+> > Hi Martin
+> > 
+> > Is this your first patch to netdev? Nicely done. A few minor
+> > improvements. You have the correct tree, net, since this is a fix. You
+> > should add a Fixes: tag indicating the patch which added the bug. And
+> > also Cc: stable@stable@vger.kernel.org
+> > 
+> > Thanks
+> > 	Andrew
+> 
+> Hi Andrew,
+> 
+> It's my second patch. Yes, I missed the Fixes: tag. It should be
+> 
+> Fixes: bb01ad30570b0 ("net: dsa: microchip: ptp: manipulating absolute
+> time using ptp hw clock")
+> 
+> Will you insert this, or do you need me to resend the patch?
 
-On Thu, 15 Aug 2024 12:34:07 -0400, Frank Li wrote:
-> Change mdio.yaml nodename match pattern to
-> 	'^mdio(-(bus|external))?(@.+|-([0-9]+))$'
-> 
-> Fix mdio.yaml wrong parser mdio controller's address instead phy's address
-> when mdio-mux exista.
-> 
-> For example:
-> mdio-mux-emi1@54 {
-> 	compatible = "mdio-mux-mmioreg", "mdio-mux";
-> 
->         mdio@20 {
-> 		reg = <0x20>;
-> 		       ^^^ This is mdio controller register
-> 
-> 		ethernet-phy@2 {
-> 			reg = <0x2>;
->                               ^^^ This phy's address
-> 		};
-> 	};
-> };
-> 
-> Only phy's address is limited to 31 because MDIO bus definition.
-> 
-> But CHECK_DTBS report below warning:
-> 
-> arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dtb: mdio-mux-emi1@54:
-> 	mdio@20:reg:0:0: 32 is greater than the maximum of 31
-> 
-> The reason is that "mdio-mux-emi1@54" match "nodename: '^mdio(@.*)?'" in
-> mdio.yaml.
-> 
-> Change to '^mdio(-(bus|external))?(@.+|-([0-9]+))?$' to avoid wrong match
-> mdio mux controller's node.
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
-> Change from v3 to v4
-> - add ? in end of pattern to allow mdio{}. not touch mdio-gpio.yaml.
-> 
-> Change from v2 to v3
-> - update mdio-gpio.yaml node name mdio to mdio-0 to fix dt_binding_check
-> error foud by rob's bot.
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mdio-gpio.example.dtb: mdio: $nodename:0: 'mdio' does not match '^mdio(-(bus|external))?(@.+|-([0-9]+))$'
-> 	from schema $id: http://devicetree.org/schemas/net/mdio-gpio.yaml#
-> 
-> Change from v1 to v2
-> - use rob's suggest to fix node name pattern.
-> ---
->  Documentation/devicetree/bindings/net/mdio.yaml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+Ideally, please resend it. patchwork might pickup the Fixes: tag from
+your reply, but since it was wrapped, it might get it wrong. Sometimes
+Jakub fixes things like this when merging patches, but it is easier
+for him if there is a new correct version. And it is a good learning
+exercise for somebody who i hope will submit more patches in the
+future..
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
+    Andrew
 
