@@ -1,98 +1,168 @@
-Return-Path: <netdev+bounces-119038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435D9953E7B
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 02:56:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94FF7953E9E
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3584282997
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:56:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5261B282BC9
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AEABA27;
-	Fri, 16 Aug 2024 00:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5thZ3pI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C94D8C07;
+	Fri, 16 Aug 2024 01:00:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9F61392;
-	Fri, 16 Aug 2024 00:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889D5BA33;
+	Fri, 16 Aug 2024 01:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723769757; cv=none; b=h8cvPFFX8XhTqcL7liAWy2zmtyljkv9NUIIiDDEn0fi+dD03JhNsV0WDZzVVh81hazZyXi3U54A2RpiQW3CFZ1tQCYI82P3oB5fD5RNHg1T7Vv7LIOH1qP4eZDhTYnFcaKkxdgw/tIeKF7R3wtPo3Tr1aDvHLyiTBLDphRLucP8=
+	t=1723770021; cv=none; b=nAfKAkNQhGcH4b7o1qyGFp8yNo5jW4SHOXcAxQ6FSJ7UW604T0wncMvX7Re44SIrXzaymEQuN11xcqiNRA9nt7/QdozM7jze8I4Tt9sr70UifSwMMGjKWtwP0zAuXGCx9IQeKqoCzgudvX8VYpPfhqG5Cb06oqY5eAKqyZifGNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723769757; c=relaxed/simple;
-	bh=ZcHo/CbFLNbPU3TGom7ZDR4V5kCpLxNvdVNXgVhQZtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HFRJbOovW4FZHEZ3y0I58RY/tH4BfJyAXzfNUsIkU1kVedVRgGdYwHCVFFcn0qKDQvngHXfmIm0FpQIaMD5jRUG+D5bNmhQUKnk34d7PjxAw3FT45hnBijr8albl/Kyuvh1lTFOU3zb2hrUAvd3mDOk9gdi1iMMZO32FLSdFRX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5thZ3pI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 191E9C4AF09;
-	Fri, 16 Aug 2024 00:55:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723769756;
-	bh=ZcHo/CbFLNbPU3TGom7ZDR4V5kCpLxNvdVNXgVhQZtI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D5thZ3pIG8CdZTJ7ULX66/YI+PW4xX2vuXdbIpeULwVF/4EhtQt+rxGELEUCN7/fK
-	 uVUKkj17/jDJllEyftu2zgNowQqVq+c12dY/Q+ZGfCBnYA2PJgEuSJdPU9lx91tViQ
-	 SPIk6cnl8p9R/vfLN7XYeBfVi+1OGgGgPS9UiypNGKXk2iTboS8UVF/Yn0dnwh8MDk
-	 DkyGkBwK2vbF14dHWxS26BO7IjCgkd+FuzxY6VuHQK9qo31BNgG2IoK6Jm8sFkZbrl
-	 us8xI4/cgRelVrDFTzCZakYFqcLo5kMWjIjiqj96VgGQJpkvazoYEFmVfHke7JA2Ga
-	 wRcm6f17hNcUw==
-Date: Thu, 15 Aug 2024 17:55:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
- Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
- Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Sumit
- Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
- <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
- Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v19 06/13] memory-provider: dmabuf devmem
- memory provider
-Message-ID: <20240815175553.51d9f0fe@kernel.org>
-In-Reply-To: <20240813211317.3381180-7-almasrymina@google.com>
-References: <20240813211317.3381180-7-almasrymina@google.com>
+	s=arc-20240116; t=1723770021; c=relaxed/simple;
+	bh=6Z1VJolCoXQLTemHjcVrm7KRpDaT1/mtr2A5nye3pUg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=arqSQZkMAjAlTpaEOopc8ScnaB0g4w8PezDP40+sVWWibWoGJN1mO1R0Exev/vZp9nJjtteNxb35mIDyvL3u7LgId+PvXOW8XSuOjcTXCcvsude2URnYYz4I2lcIIJT1fF4ggU/UtioRJruj1qz6wA+UneFSLLoBfVNuvg8salc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WlNp26qBSz20ldC;
+	Fri, 16 Aug 2024 08:55:38 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id A80CA180043;
+	Fri, 16 Aug 2024 09:00:14 +0800 (CST)
+Received: from mscphis02103.huawei.com (10.123.65.215) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 16 Aug 2024 09:00:12 +0800
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+Subject: [RFC PATCH v1 0/4] Implement performance impact measurement tool
+Date: Fri, 16 Aug 2024 08:59:39 +0800
+Message-ID: <20240816005943.1832694-1-ivanov.mikhail1@huawei-partners.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Tue, 13 Aug 2024 21:13:08 +0000 Mina Almasry wrote:
-> +EXPORT_SYMBOL(page_pool_mem_providers);
+Hello! This is v1 RFC patch dedicated to Landlock performance measurement.
 
-not sure if this export is needed, but it doesn't appear to be needed
-by this patch?
+Landlock LSM hooks are executed with many operations on Linux internal
+objects (files, sockets). This hooks can noticeably affect performance
+of such operations as it was demonstrated in the filesystem caching
+patchset [1]. Having ability to calculate Landlock performance overhead
+allows to compare kernel changes and estimate the acceptability
+of new features (e.g. [2], [3], [4]).
+
+A syscall execution time was chosen as the measured metric.
+Landlock performance overhead is defined as the difference between syscall
+duration in sandboxed mode and default mode.
+
+Initially, perf trace was chosen as tracer that measures syscalls
+durations. I've figured out that it can show imprecise values.
+It doesn't affect real overhead value, but it shows the wrong
+proportion of overhead relative to syscall baseline duration. Moreover,
+using perf trace caused some measurement noise.
+
+AFAICS all this happens due to its implementation and perf event handlers.
+Until someone figures out if it's possible to fix this issues somehow I
+suggest using libbpf-based simple program provided in this patchset
+that uses per-syscall tracepoints and calculates average durations for
+specified syscalls. In fact it has simple implementation based on a small
+BPF programs and provides more precise metrics.
+
+This patchset implements Landlock sandboxer which provides the ability to
+customize the ruleset in a variable way.
+
+Currently, following workloads are implemented:
+* Simple script for syscalls microbenchmarking with `openat` support.
+* Script that executes find tool under Linux source files with various
+  depth and sandboxer configurations.
+
+Microbenchmarks can have only simple rulesets with few number
+of rules but in the next patches they should be extended with support of
+large rulesets with different number of layers.
+
+Here is an example of how this tool can be used to measure read access
+Landlock overhead for workload that uses find tool on linux source files
+(with depth 5):
+
+    # ./bench/run.sh -t fs:.topology:4 -e openat -s -b \
+    #    $FIND $LINUX_SRC -mindepth 5 -maxdepth 5 -exec file '{}' \;
+
+    Tracing baseline workload...
+    376.294s elapsed
+    Tracing sandboxed workload...
+    381.298s elapsed
+
+    Tracing results
+    ===============
+    cmd: /usr/bin/find /root/linux -mindepth 5 -maxdepth 5 -exec file '{}' \;
+    syscalls: openat
+    access: 4
+    overhead:
+        syscall                  bcalls     scalls   duration+overhead(us)
+        =======                  ======     ======   =====================
+        syscall-257             1498623    1770882       1.88+0.46(+24.0%)
+
+Please, share your opinion on the design of the tool and your ideas for
+improving measurement and workloads!
+
+[1] https://lore.kernel.org/all/20210630224856.1313928-1-mic@digikod.net/
+[2] https://github.com/landlock-lsm/linux/issues/10
+[3] https://github.com/landlock-lsm/linux/issues/19
+[4] https://github.com/landlock-lsm/linux/issues/1
+
+Closes: https://github.com/landlock-lsm/linux/issues/24
+
+Mikhail Ivanov (4):
+  selftests/landlock: Implement performance impact measurement tool
+  selftests/landlock: Implement per-syscall microbenchmarks
+  selftests/landlock: Implement custom libbpf-based tracer
+  selftests/landlock: Add realworld workload based on find tool
+
+ tools/testing/selftests/Makefile              |   1 +
+ .../testing/selftests/landlock/bench/Makefile | 179 ++++++++
+ .../landlock/bench/bench_find_on_linux.sh     |  84 ++++
+ .../testing/selftests/landlock/bench/common.c | 283 ++++++++++++
+ .../testing/selftests/landlock/bench/common.h |  18 +
+ tools/testing/selftests/landlock/bench/config |  10 +
+ .../selftests/landlock/bench/microbench.c     | 192 ++++++++
+ .../selftests/landlock/bench/progs/tracer.c   | 126 ++++++
+ tools/testing/selftests/landlock/bench/run.sh | 409 ++++++++++++++++++
+ .../selftests/landlock/bench/sandboxer.c      | 117 +++++
+ .../testing/selftests/landlock/bench/tracer.c | 278 ++++++++++++
+ .../selftests/landlock/bench/tracer_common.h  |  15 +
+ 12 files changed, 1712 insertions(+)
+ create mode 100644 tools/testing/selftests/landlock/bench/Makefile
+ create mode 100755 tools/testing/selftests/landlock/bench/bench_find_on_linux.sh
+ create mode 100644 tools/testing/selftests/landlock/bench/common.c
+ create mode 100644 tools/testing/selftests/landlock/bench/common.h
+ create mode 100644 tools/testing/selftests/landlock/bench/config
+ create mode 100644 tools/testing/selftests/landlock/bench/microbench.c
+ create mode 100644 tools/testing/selftests/landlock/bench/progs/tracer.c
+ create mode 100755 tools/testing/selftests/landlock/bench/run.sh
+ create mode 100644 tools/testing/selftests/landlock/bench/sandboxer.c
+ create mode 100644 tools/testing/selftests/landlock/bench/tracer.c
+ create mode 100644 tools/testing/selftests/landlock/bench/tracer_common.h
+
+
+base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
+-- 
+2.34.1
+
 
