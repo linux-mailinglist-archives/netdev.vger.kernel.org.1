@@ -1,130 +1,108 @@
-Return-Path: <netdev+bounces-119106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B059540E4
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB38E954116
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 07:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28BC31F244FD
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 05:11:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3500C1F250D9
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 05:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834EB78C67;
-	Fri, 16 Aug 2024 05:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B2D78C7F;
+	Fri, 16 Aug 2024 05:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSj71rR9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1+9OE9c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5958178286;
-	Fri, 16 Aug 2024 05:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92169EDE;
+	Fri, 16 Aug 2024 05:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723785109; cv=none; b=KJySt9gJ6MWkPnzuFRphLdWCFqVikzIoTPSKYL9wpc2XUzmNu8W8YoFA1uSH2mdOqfQNHXJjWscRLHB7l+ZDbbfbf9MDQZ0QEFZ7lZcUGfU44F2p9ysy1CfDu77Qh/hOL+0MErNqENuMdMCTWvfRx4pPFvACck0GBirEamvbcb0=
+	t=1723785671; cv=none; b=g2UtfzlCCjQar4iMpjIvntu2AgzopI2R7hMdVm/TQRt3HhDrhpvt7Bl7ha8amR0qV/OOQ55BTD9pVJaq1oD6VqNPkahrJC2CG1R2v9IYHqQdzC/CJJvmAWxc9ym16Oc8QwRODnQXgoNmV3lTX1h8tO1XFwqjfkp9zrQz1imPGDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723785109; c=relaxed/simple;
-	bh=gOboejGRyPkSS58hwNf+muLniNB4uftHh4n2tVx0QHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tzrPXUGFEYv45L8PKhRHQ1KRco8aJD/jTroKYIJT9h67jBaWKsqZezFmS1bP+I+RLgmjVHxecGN7ihD8VmBCEBFFpA0NJzP247Ndn+ueJugSpqnKe/O7yGDThXI/Gmz5iTQ80ixZyFqCmLt7ffpDt+2Qml6XwZBsdfvFPVPKzR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSj71rR9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32EC5C32782;
-	Fri, 16 Aug 2024 05:11:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723785108;
-	bh=gOboejGRyPkSS58hwNf+muLniNB4uftHh4n2tVx0QHM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZSj71rR9sU3dhBshcQANCLxYnvmFeZ4dIOK1GJ8rdvrOQWyZZnFrU9OZjR5BRPc2N
-	 2s83jgyUAQSdRaBhiayNQGVWlR3wmol7njGRodx5VlYj+DLrfw83pg1Bl5mzVF7brK
-	 oToBYITbm+lPhRJvm0ULiaNgJ714xIkMALTWAVuLbDCcn027ehsX06+nHrAUumqzvn
-	 wE7/I3UQ2fBuXYVUrqvJITmNPOCFXLzEDORts5fooVq2kA+rziK8Q76h/u3aFqAzX0
-	 fA2mz8Jw9bu8DjLmplBArTVQFL0KoFsbIYpriaNqufhI9fvoVpDN7R+krQ/YfMExJG
-	 6WCVts8bqrMPw==
-Message-ID: <e1dd2de0-2263-4041-b494-70a1b3990143@kernel.org>
-Date: Fri, 16 Aug 2024 07:11:45 +0200
+	s=arc-20240116; t=1723785671; c=relaxed/simple;
+	bh=Q1StPvmYrIPDrCqVc1rknl7jqCQjLsJDaLzLSDzBkvg=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=aI5TLTHH5mtPSht7nctYPT+/jdi74n6tO7ln8QhdibKiDRZnkNR4mn9SvKPMB04+nXNQBx5AyD98pROzFzQePT73C+weFIQ4BJLU9LQ3ESVhLyuZInuHLHdvWAk4mL6tPPuo13iC0y7cZyD880IMtL/H75ssuqybLWAFQvB4AIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1+9OE9c; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70d19bfdabbso36975b3a.2;
+        Thu, 15 Aug 2024 22:21:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723785670; x=1724390470; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Kt4MLjhHN1/ECVknyeMFc6dLTiAulkcnJtVT+D32Bcg=;
+        b=f1+9OE9cnkct2fCOVam0nhA50tT/KHB2Wxk5Jlzk02VJ+znWkd4q13OoTuA/HS3dO+
+         BpaUI9lb+i/pgPluKYrsQrMLGy407UuYcQGrMZYYijJrYQ23T+mxaerpGBKkv+8BtjoJ
+         trMYTIvFuoczu/NICDblHvaA+QSrnCLm5GdMcufVEPvy5r9nJcqAfEaDJRqba7dlaFdV
+         kSaEVrrgQD9619lRV1uW/TdUArpiH7T4Kn3lGyFNfUfOXq1cCT+91Nld+2OzhRnG5YW/
+         MqwlNIxkVsCIIpf+P/42MA5FiFFz1xd+hag+0WPTFj5RquoMugK8QpGaxlaoXYWBKuD9
+         5V2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723785670; x=1724390470;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Kt4MLjhHN1/ECVknyeMFc6dLTiAulkcnJtVT+D32Bcg=;
+        b=uDK/cyJaNZgPH/DOuoeA5KBABSizVsd+IzuH7D8qvgof/2ThnoPqLPAGvVhAfV+F/n
+         zw2/OzOxUYGGgPJa8MU8OylVQfkkHr2GnWqGboI4PU5dgqDRWEUwV67N0x5bYWr4u0zs
+         1lCyepX3368896D5X7YF8PR15HQAqLGvSAMqwqLExwEUCszKbAFnU7zybdd0CwYFIr7Z
+         jST7SgQYR8EBcU/dhnL1yP6qymNCUs0Gmlw4HJBgCl/j79F9y5WWbT2u36SXi916IFPD
+         iV22WtOVvWwYOHBxMpCQVIZgIohPmvYpSTMvNqhbMfJZR34MjrCTjvRLWaMZk8+LYNcE
+         LCqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgftBe949AJkE+rfxmFhB6rnEZT0MgX+w1ok/JPlaaUk7jcUmfXqWOKaIosVwlfDbIroVT9OL8nRbMPNLuag5yg/cTs25sCF3PmvMdk9b7Vd3KgHWrEFhhCRVA6dwfLo5lJ75W7xo=
+X-Gm-Message-State: AOJu0YwOcROMRQa3Z3HN+drnB0cRolhpDz61lD9BEfDF41Tb8l6UXWf+
+	w76OyWq6Lt0gPJayEkrv1kfPjJDZUD8VdvyuQ7Orghgxm0HQRWYzPk4fTmzL
+X-Google-Smtp-Source: AGHT+IEozBvUEpc3aKQfOu8vFKNPgrKEPB+3Yp6nU10Ft4nyWdn9A/ATnBljSD7Qa0O42VO2lFcHLg==
+X-Received: by 2002:a05:6a00:3e06:b0:70d:2cf6:598 with SMTP id d2e1a72fcca58-713c56ae134mr1249619b3a.5.1723785669641;
+        Thu, 15 Aug 2024 22:21:09 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af1bc1dsm1922208b3a.170.2024.08.15.22.21.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 22:21:09 -0700 (PDT)
+Date: Fri, 16 Aug 2024 05:21:05 +0000 (UTC)
+Message-Id: <20240816.052105.1315142429490875559.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+ aliceryhl@google.com
+Subject: Re: [PATCH net-next v3 1/6] rust: sizes: add commonly used
+ constants
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <6b12ed3a-d846-41ff-9821-a3946bb88378@lunn.ch>
+References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
+	<20240804233835.223460-2-fujita.tomonori@gmail.com>
+	<6b12ed3a-d846-41ff-9821-a3946bb88378@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] nfc: mrvl: use scoped device node handling to
- simplify cleanup
-To: Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240813103904.75978-1-krzysztof.kozlowski@linaro.org>
- <20240815190826.076b7373@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240815190826.076b7373@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On 16/08/2024 04:08, Jakub Kicinski wrote:
-> On Tue, 13 Aug 2024 12:39:04 +0200 Krzysztof Kozlowski wrote:
->> -	matched_node = of_get_compatible_child(node, "marvell,nfc-uart");
->> +	struct device_node *matched_node __free(device_node) = of_get_compatible_child(node,
->> +										       "marvell,nfc-uart");
+On Fri, 16 Aug 2024 02:37:02 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 > 
-> The 100+ character line mixing declaration and code is more than 
-> I can bear. Sorry.
+> Your Signed-off-by: should come last. That keeps it together with the
+> others added by Maintainers as they handle the patch on its way to
+> mainline.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-If by mixing you mean declaration not on top of the code, that's the
-preferred style for __free() usage, as expressed by Linus. Constructor
-and destructor in one place.
+Fixed the order, along with the remaining ones.
 
-The 100 line, can be solved with wrapping after '=', but of course it is
-not particularly pretty.
-
-Let's drop the patch then.
-
-Best regards,
-Krzysztof
-
+Thanks!
 
