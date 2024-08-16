@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-119178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47B3954846
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:51:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9C7954848
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EB6B283A1B
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:51:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DD11B20DFC
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99B01ABEB4;
-	Fri, 16 Aug 2024 11:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFDB19DF4F;
+	Fri, 16 Aug 2024 11:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="NTuTsYTH"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="2hfyfYZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ACB198A2F
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913E61A4F04
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723809080; cv=none; b=ZTiSvD49sHYSIbeJRGm1QnOxcBc6u3JaaEjg5fgmtkfymE7b333DCYPBKPtMLmJ7LCD+rGxtwjzVzJ0NMFFz/AWd5CQONQ+xJajQZmUjx8xiuGifGBUvJUpxpq9t6GOHl9vui0xSTdL+F1gSqKp+RlgvZZlOsZydd6JfnBwqa0I=
+	t=1723809082; cv=none; b=kKFq7g4BXatwylAM2WMRKiwsfFCt4rTlZJr22GKg6Yd69gZRoZid4SGM6/RwLSHnkH/L8dUBcq/aLHxwQLN03gtR5aeilrpy9CLol2zQcOAMpFpm84HnEzP+Q+JnXHLLNnc9/DHBAOys1zjzkMcyiYfJWR8k5m9+PEdOZat4ztU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723809080; c=relaxed/simple;
-	bh=JO93xhbgSaTuYjxi+Cl4YUEu7bGerZYLXHtYiTT/wYY=;
+	s=arc-20240116; t=1723809082; c=relaxed/simple;
+	bh=e4yCprVhrRgw9grxhItSNzy/3aPExuxQDvLJ+oDK3Mc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ovFnfh5WDQ1oOhkNjskD4edoVTEcK1f3rilQuDSvQyeKwUHepKJOFza5hVPBGLecbwysO5IR2K6A+NJ4HmGxww4OSDIX9B9PsZpdUkmkZ42xM9YxvF9xO0egPYeqPa3diurwOAaFSaS1hAFzVnOA1+0VFkT9l4UtTIQXTYfBTSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=NTuTsYTH; arc=none smtp.client-ip=209.85.218.49
+	 MIME-Version; b=tMVW3WhyoS6rautM3gCUh6b+7QFOorn38dFqx7H0tKVyvfAjgSZNlHxcOSwW7tYBZHJxe4Z9RvR7waNgj82Z2ii5dpbtnh7+AMT2hsJ0rOd+fc8iF18zzifpvvUTSlh2ATghe8z7W/lCQQymb6+RAvghA/Kx/VdLL4LE1Ea6TI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=2hfyfYZK; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a80ea7084e9so105829766b.0
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:51:18 -0700 (PDT)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2f3b8eb3df5so18666601fa.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723809077; x=1724413877; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1723809078; x=1724413878; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=O29xCPNUIaer8YJvgLSvXVeHF8sRBOh8qRqEGZYZ06I=;
-        b=NTuTsYTHRg9zCGIA2ToaELGVVLBHy6uvR68Q01HXLaSQMU+AW0zf/IO7NdN+4fwean
-         61PIu68LmSIHNPh2/ZzI/Lku5pFIEblsxrTBdEoWsBa/sOBSXvv4lU03/PdO4owRecjT
-         yQWGTAmYTFY/P4kTwXXBLYBMlJ5w0KsFGHy97eCOtZx3/b2q2EkYQHGDtUHt76vCUwk3
-         qzgK7Mh+KMFX1xZtVeY4KxGnBiHYdfCsB1Q7HwBo+1flYFFd5GU60/TrtyT2Iwk5PEJN
-         eT7x4ZCbcLvNVRfACCwvplZTguM+Q1XDYVyBk8pvx0uE793ngMxuEDPduhSZEcLEbk6a
-         bpVw==
+        bh=UsP6OZY8FtG8kzDC28hz+qK5+Ulw5BlZI/hR6ZEydh4=;
+        b=2hfyfYZKo+QndD/foFjPxjWVZOzg1s8EIGKP5Dsy32ZOc/bcMeIUvP2X46S5GbnGQK
+         7kivW7JJI6XtBEhR/VghdHj6ZDARwGPG2qLaWt9Ub9uRewg+2IEBi1SMgcCCnT/iAE2L
+         i0wRweJtMjgYH2OJqK1MFN30T4TYPmmeeD02Rz6YQ0875oUioOPNQ2CTvhfKH13UsYvP
+         FpdWEZ420l1mO6S2VIEcQGx/F8vB0KGhtqdSLFlzyyllSdDrF+3RxxCAYkKCa5JKw/na
+         91onFZHhBg4eLoWSNyfCB5MmU7aBLghmMMBQEs680mmJorBVN3hiLOMBjs4WljA8Jnty
+         mqoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723809077; x=1724413877;
+        d=1e100.net; s=20230601; t=1723809078; x=1724413878;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O29xCPNUIaer8YJvgLSvXVeHF8sRBOh8qRqEGZYZ06I=;
-        b=jZg7Hq+Pwxf2tDSzLMerQpl88MI0S5AosNcDRiQr/oIehsSZyhE8qPP15+Wys5ajwO
-         h8PnToTGy7pUrAMZtakFXbmYSHFPg2wHICxkzdWAdHEFZvm/fv0k5WiDc34K1NhrK77a
-         smLmhpQZnLb+KV4rT3UUyT8BDLVhzgW2X3SyN2F9WJ5bPKdyMoH5XfBjJrm4MVUqWhad
-         s0wQf6/wsAmqfgfZoMUypyy2QqIL67D6XrMZaycAGpGc5HPYDR+CgY2iJg91sseqS13N
-         Pxz+bDPbwKK7CovFB+EZ31PW7wfFin32b0CQSSLZ8l4uCw81pVlxSKQ+7qgoPGoU7Uhv
-         s73g==
-X-Gm-Message-State: AOJu0Yy0mAg2CkUlERUoNSDVbdEF7esRogeq/HWZMBKpV/08vcC+Ldq5
-	vXk527GFwaHLlwQIcdt9TNZkdq1joLFmduuHLRwGqlASupCKynQW9Zi8gp3DFWOCNDTVphI7ZdG
-	m
-X-Google-Smtp-Source: AGHT+IE6Q/nHSMjbkfeXvNXGMkTgqve2YDIQIW9PCdqFyozXNBnlvN/G9zRZv5WkXP9EYvo1R1zXEg==
-X-Received: by 2002:a05:6402:50cb:b0:5a1:f9bc:7f13 with SMTP id 4fb4d7f45d1cf-5beca5ae7ccmr2228090a12.22.1723809076220;
-        Fri, 16 Aug 2024 04:51:16 -0700 (PDT)
+        bh=UsP6OZY8FtG8kzDC28hz+qK5+Ulw5BlZI/hR6ZEydh4=;
+        b=ueKI6hiT8SOZfWgrfXp5FP+91eSvPUrFT871ely3GDdlEcCRZTRVJbVDqZdbVNnuY8
+         p2bvtIpw9wU1OGKQRMLsKLwQLDgtkwb9b7ErGVrvdVx/5c1l1gdJiF3l30uFLgd8BIs3
+         ggv+CMbb1sYSJHSxDie5YiajJoDNcazqEJPPWuF2Zb8WgtiYtc0G8xUNuxIB0EyMlXWc
+         d5x3dqu2PnOqpuI1srIp/zOU9AD/pcDO5N3BCZq0jm3vhRvNtOq885kF1br7XFiG4Zl2
+         N2miBzK5oiuRwSmLRfAUhODb0f0ozlBZenewABylW4nHHhMNA0YfKSDWX4qp0UhxZs51
+         39ZQ==
+X-Gm-Message-State: AOJu0YyYLxAj+5U+rHUQPacPeqJK8nIwn99BEIqs9y8n/Goi1G4kFj+r
+	tjRRYn2qxx7x2p1u5Mhnxn1Zw1fPOwHajDn6PDI8c1IKymvfnaDevngh6UqV43C7KQA6MHOrGFz
+	u
+X-Google-Smtp-Source: AGHT+IG6CxhChwVrT/Qat9JiXfnPgV4L91W7mQyYBy8kFsVtGShhXw4KYTqnsErboWW/51T8Uah86Q==
+X-Received: by 2002:a2e:9d18:0:b0:2ef:26ec:44ea with SMTP id 38308e7fff4ca-2f3be60118fmr16538221fa.39.1723809077405;
+        Fri, 16 Aug 2024 04:51:17 -0700 (PDT)
 Received: from debil.. ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2152845a12.39.2024.08.16.04.51.15
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2152845a12.39.2024.08.16.04.51.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 04:51:15 -0700 (PDT)
+        Fri, 16 Aug 2024 04:51:16 -0700 (PDT)
 From: Nikolay Aleksandrov <razor@blackwall.org>
 To: netdev@vger.kernel.org
 Cc: Taehee Yoo <ap420073@gmail.com>,
@@ -78,9 +78,9 @@ Cc: Taehee Yoo <ap420073@gmail.com>,
 	pabeni@redhat.com,
 	jarod@redhat.com,
 	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH net 1/4] bonding: fix bond_ipsec_offload_ok return type
-Date: Fri, 16 Aug 2024 14:48:10 +0300
-Message-ID: <20240816114813.326645-2-razor@blackwall.org>
+Subject: [PATCH net 2/4] bonding: fix null pointer deref in bond_ipsec_offload_ok
+Date: Fri, 16 Aug 2024 14:48:11 +0300
+Message-ID: <20240816114813.326645-3-razor@blackwall.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240816114813.326645-1-razor@blackwall.org>
 References: <20240816114813.326645-1-razor@blackwall.org>
@@ -92,59 +92,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix the return type which should be bool.
+We must check if there is an active slave before dereferencing the pointer.
 
-Fixes: 955b785ec6b3 ("bonding: fix suspicious RCU usage in bond_ipsec_offload_ok()")
+Fixes: 18cb261afd7b ("bonding: support hardware encryption offload to slaves")
 Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- drivers/net/bonding/bond_main.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ drivers/net/bonding/bond_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 1cd92c12e782..85b5868deeea 100644
+index 85b5868deeea..65ddb71eebcd 100644
 --- a/drivers/net/bonding/bond_main.c
 +++ b/drivers/net/bonding/bond_main.c
-@@ -599,34 +599,28 @@ static bool bond_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
- 	struct net_device *real_dev;
- 	struct slave *curr_active;
- 	struct bonding *bond;
--	int err;
-+	bool ok = false;
- 
+@@ -604,6 +604,8 @@ static bool bond_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
  	bond = netdev_priv(bond_dev);
  	rcu_read_lock();
  	curr_active = rcu_dereference(bond->curr_active_slave);
++	if (!curr_active)
++		goto out;
  	real_dev = curr_active->dev;
  
--	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
--		err = false;
-+	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
- 		goto out;
--	}
- 
--	if (!xs->xso.real_dev) {
--		err = false;
-+	if (!xs->xso.real_dev)
- 		goto out;
--	}
- 
- 	if (!real_dev->xfrmdev_ops ||
- 	    !real_dev->xfrmdev_ops->xdo_dev_offload_ok ||
--	    netif_is_bond_master(real_dev)) {
--		err = false;
-+	    netif_is_bond_master(real_dev))
- 		goto out;
--	}
- 
--	err = real_dev->xfrmdev_ops->xdo_dev_offload_ok(skb, xs);
-+	ok = real_dev->xfrmdev_ops->xdo_dev_offload_ok(skb, xs);
- out:
- 	rcu_read_unlock();
--	return err;
-+	return ok;
- }
- 
- static const struct xfrmdev_ops bond_xfrmdev_ops = {
+ 	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
 -- 
 2.44.0
 
