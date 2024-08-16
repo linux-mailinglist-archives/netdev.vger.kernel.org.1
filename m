@@ -1,69 +1,78 @@
-Return-Path: <netdev+bounces-119155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC3F9545EC
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:39:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F9C95464C
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E61C1C220BD
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:39:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB9A9282136
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 09:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6253815575B;
-	Fri, 16 Aug 2024 09:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B8716EB63;
+	Fri, 16 Aug 2024 09:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TQVy1hjV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gXgbqc0g"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zxoZ0Clw";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WcH/q3OK"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BBB155731;
-	Fri, 16 Aug 2024 09:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150E336C;
+	Fri, 16 Aug 2024 09:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723801181; cv=none; b=Rrt8cioBmzXDvUIvdDv0f2KSBNgRfwx824NKeBusXrhNquPTCMJaCTamTpMTAb8r53LefsR477jN7YkD8SVWYofQpy8l/u3srwtfnuUg6Mi0jSxfSI8eeI1oDX0QHLG+79kHZu7eMRf/ij01fRSYH4dehTpTNSWFcP+0cBrFgM8=
+	t=1723802195; cv=none; b=rlT3xfseE3DwRHC68ChjgUFuisqQRH1kRJvP0BLspkQBfzXYIxv0gbtQ8P9CjhgsNPPrGTrR0TUkT9rmvOERzaq/I26JerkpcJqjy5XsydCIrqmnOb9Kl4xlRDH0Ekxg19DLnunv0/c+d4rWpTG4UAriZbDbSaRQUfzlC/BMMoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723801181; c=relaxed/simple;
-	bh=GCA8cQuwEwNBgoj9TYSkK4RVcQzIIkJrc8uQklmoBIc=;
+	s=arc-20240116; t=1723802195; c=relaxed/simple;
+	bh=jlH+C4Eli6MiwB2elRraHaVAE+LF4uXPyxrzxBdgyy0=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gPhSV364nxXOqewH9GY2lsMMPLWmCzov5Q5vIo19EG8UfgpOfulFCMy0ULgEEqSAC6tzGZtHlT3p3f1dzOVVEsnpSAbVoFq96CBh7EvLR5UxU4WYpIIoc2y056LB+wb/BUndC8ExZZdaWmYKoa9CrVETmAbwK6lMJ6EJ8oUZgqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TQVy1hjV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gXgbqc0g; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version:Content-Type; b=g3C4zVB9cMX9l02zR/atZQLigSL0fO14huO1ITNrChGOJwEBGozOqo08zChYZUdIZIq43KCHos2Ys0CyRrxL2OhZrA36vDH8T/WtN24fISK5+Nuy1VCkEVtSL0mTl2FSCLl7wfl0iaY/O7H7Ba0cbjnXjwTU1RHFJ/QjqWSKVvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zxoZ0Clw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WcH/q3OK; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Kurt Kanzenbach <kurt@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1723801178;
+	s=2020; t=1723802192;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GCA8cQuwEwNBgoj9TYSkK4RVcQzIIkJrc8uQklmoBIc=;
-	b=TQVy1hjVZkSV9/q3bVbtCwOGqJrYu9NfXUhRDEcF/rj044n1iOI+D5ozqLxJjTb3wPVS2p
-	Q4NxufMC50XeV8nZw517pExjPCH8dO6lvINlDs/gcF9DZ0xc/KiILYNBDh/Lbnl/sgP5WW
-	oi4BEZ4morJO7xfgRb/eOaX6SE1ZpoRga/ubc+KXJFrLBxHIW08BmdA/qdoIQM1wqZHQjY
-	qfVWZEd7nbhp85hE3hgb5G9MuvFos7NOcE/sNMyNY5RbMMHizvuA0fytWYoh4Zgm80BGQp
-	X8GIy+b4nogTfVweY+YAnbuj0xGFJKwbEZdCpTbQU/aTcbWXo5kDaWHPY7oeQw==
+	bh=jESmOZLP8UWnsshEocvlvp6ISx76GNAGMqVLR6BonUk=;
+	b=zxoZ0ClwFcz2e0qMb2F+ALD90vEBdUixozBxCrn+8jl1o66ulK6HCR/Jx68mLUUW8JKxiX
+	JW7WPfXzNeK33EQ2OZM4eyjMOSGT/GaTSYN0QBpNpw1tzPoKhK1Ez6MwFSF/ULk9FGj2sM
+	2a0m0seUPBc7vxAIaioWaw0haFt7nXE5tWbh9m5FR1h1ACLYM4H2VEl91f4yyQ5ACcUjQ0
+	Mr2k1izecsPLHuj/HGAMY9zmcUP0OYd+7EsDU4n6WJK1HuKYqEGJvP/v5dqrmaMcK5yqKE
+	SI+JeSHRySSZh5RYKSQRx3gdRqGAHBh0xj2aFA7Pm3NZeZeBKJNrMcseJAqVFw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1723801178;
+	s=2020e; t=1723802192;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GCA8cQuwEwNBgoj9TYSkK4RVcQzIIkJrc8uQklmoBIc=;
-	b=gXgbqc0g0YJpJuzLSKYVMtDgr3vTyKl1EcypXECeHHO7pfQGIrqOMhanWq31iqn/dsobvw
-	pe04TNc4f4K8ozCA==
-To: Daiwei Li <daiweili@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: vinicius.gomes@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- przemyslaw.kitszel@intel.com, richardcochran@gmail.com,
- sasha.neftin@intel.com, Daiwei Li <daiweili@google.com>
-Subject: Re: [PATCH iwl-net v3] igb: Fix not clearing TimeSync interrupts
- for 82580
-In-Reply-To: <20240814045553.947331-1-daiweili@google.com>
-References: <20240814045553.947331-1-daiweili@google.com>
-Date: Fri, 16 Aug 2024 11:39:36 +0200
-Message-ID: <8734n4vmav.fsf@kurt.kurt.home>
+	bh=jESmOZLP8UWnsshEocvlvp6ISx76GNAGMqVLR6BonUk=;
+	b=WcH/q3OK+suGA9AIiolbtMLY7MZCHuZMu0xnvBs7Cvzqk9bRQBQ/BRxhripc7H1sDbba5O
+	Wu6uPH1qesXZ4bAw==
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Richard
+ Cochran <richardcochran@gmail.com>, Sriram Yagnaraman
+ <sriram.yagnaraman@ericsson.com>, Benjamin Steinke
+ <benjamin.steinke@woks-audio.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, Sriram Yagnaraman
+ <sriram.yagnaraman@est.tech>
+Subject: Re: [PATCH iwl-next v6 1/6] igb: Always call
+ igb_xdp_ring_update_tail() under Tx lock
+In-Reply-To: <20240816093838.ZpGD38t-@linutronix.de>
+References: <20240711-b4-igb_zero_copy-v6-0-4bfb68773b18@linutronix.de>
+ <20240711-b4-igb_zero_copy-v6-1-4bfb68773b18@linutronix.de>
+ <20240816093838.ZpGD38t-@linutronix.de>
+Date: Fri, 16 Aug 2024 11:56:30 +0200
+Message-ID: <87wmkgu6y9.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,54 +84,50 @@ Content-Type: multipart/signed; boundary="=-=-=";
 
 --=-=-=
 Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-On Tue Aug 13 2024, Daiwei Li wrote:
-> 82580 NICs have a hardware bug that makes it
-> necessary to write into the TSICR (TimeSync Interrupt Cause) register
-> to clear it:
-> https://lore.kernel.org/all/CDCB8BE0.1EC2C%25matthew.vick@intel.com/
->
-> Add a conditional so only for 82580 we write into the TSICR register,
-> so we don't risk losing events for other models.
->
-> Without this change, when running ptp4l with an Intel 82580 card,
-> I get the following output:
->
->> timed out while polling for tx timestamp increasing tx_timestamp_timeout or
->> increasing kworker priority may correct this issue, but a driver bug likely
->> causes it
->
-> This goes away with this change.
->
-> This (partially) reverts commit ee14cc9ea19b ("igb: Fix missing time sync events").
->
-> Fixes: ee14cc9ea19b ("igb: Fix missing time sync events")
-> Closes: https://lore.kernel.org/intel-wired-lan/CAN0jFd1kO0MMtOh8N2Ztxn6f7vvDKp2h507sMryobkBKe=xk=w@mail.gmail.com/
-> Tested-by: Daiwei Li <daiweili@google.com>
-> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Signed-off-by: Daiwei Li <daiweili@google.com>
+On Fri Aug 16 2024, Sebastian Andrzej Siewior wrote:
+> On 2024-08-16 11:24:00 [+0200], Kurt Kanzenbach wrote:
+>> index 11be39f435f3..4d5e5691c9bd 100644
+>> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+>> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+>> @@ -2914,6 +2914,7 @@ static int igb_xdp(struct net_device *dev, struct =
+netdev_bpf *xdp)
+>>  	}
+>>  }
+>>=20=20
+>> +/* This function assumes __netif_tx_lock is held by the caller. */
+>>  static void igb_xdp_ring_update_tail(struct igb_ring *ring)
+>>  {
+>>  	/* Force memory writes to complete before letting h/w know there
+> This
+>   lockdep_assert_held(txring_txq(ring)->_xmit_lock);
+> would be more powerful than the comment ;)
 
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Probably yes :-).
+
+Thanks,
+Kurt
 
 --=-=-=
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAma/HlgTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzghDCEACx8T5zGnmrBjeSsXzemRWluHVJI6Ub
-7QnBxWCvIfrC8sUUzgsXYa08yMTXjTAkSh9pxTW0oVqpV01J+jd7NKJrz1qdZ1XV
-RDRF178k4DPKLSrP1/XkMaFV5DI+56OzRoZgEudq5rmSVwqcdYNh+wRrO8Oh7ucx
-xgQhXMhvzZruRCzsMNyStuqn3zF51M1YPBfgTLjk8UD9nnXGLRnwLFgv0OjUL89K
-rhD5TXZ3seFW82RelaNorkC2ALLkPAQB7Pd2GVejrcWcj23Una2aPZV44uqV1VMI
-iBnE1idHmJEO8/T4sLxwudHr1WJffb82PxadBdm7NGemqZh4OShc0GOWoWu2OEdY
-UojoM8OGofudAfol8HdUHESETaR3gK5ZIlKEl22nPWN/rDpaUCl+se7Kv7UGpacc
-vXd3AP+V/3oDb21evFjjqlQGsqodcTKD68C7OjvRZT0fSx7V0rnyxm4Lvou1zwWl
-KbWG112CXPgx1YSJNiPfsYNhJMU8wmSjM9PABy1PLLgbesLfKIbj8o1lF54Aq2Nn
-TyvhsWHYCnEPPfo2uRNtWX94h9uBZRo/Ll2kz4H4vVCD87RXkWMgNcdHcYzeiUIL
-NLnNi7PHcQtpclrQVDLyh5c8m9VKCOCFtE2g4IdiMjOV/ecP/iCknnqf3Zxs5Piy
-BTECwLhghJ5GKA==
-=sPWN
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAma/Ik4THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgvy7EACdXa4mHcircC6NlXZt/nWX6xwMHDiA
+9osVQPXuXOXab6fhrCOwI2QmaTcUHxKwK3yQZo+4CMopI4ne34357YpRYySXezrM
+65+LmiCkX6AJm72mT3PByWURiF7c8cdRl8u/WQF0+qXjUb2tEZutrOYKP2QlDzLN
+8N1NZPz8BDWSBnWR9PPRcO6oufuchIx6d1FKUshyH6EbQ/Xha9ixzt+UktTxpS1w
+ruwgUECR1zMulpTSwwdLVss2d8FsJwBoG0z3wMTtNYffyZ8eXJ+N7rjte8IpFckP
+ntjZSMR4iGT9rwvREegdPdMzovPYIIPIdvmPv+9iXwWTkgLRi9wsd8yHmYzR/0re
+XooZSoTqYZFAKJ38myZmmnr0V1GNbCHjISWgUGLSA6ZBDvYnr7Ci9XwK03a5XoWy
+BB8AXpRw8GDhqVws7lPV0Y/T9DcjL2ODUvF00sLaWTdrU1srjBf72r94VhpW8+CF
+vXP/M7luxP/LY0sfM66Cw+iN/HEsCbiKsaRsHohFddSY2cKZxuvTYPyFQZdJmlfe
+K1r7LeLAbV6WcIFC1ia33k8E6Va1n01w+KYCmWUKOfpOdE4JbUiBWIelNqWiDLfW
+sAKNscYy+D+m/5/A/rAdE4gcw/1704tRHf9rXnUbLvxK64QY4j6U2+mRZ4XbD7zm
+DvFijdRBa8Nl8A==
+=w0GY
 -----END PGP SIGNATURE-----
 --=-=-=--
 
