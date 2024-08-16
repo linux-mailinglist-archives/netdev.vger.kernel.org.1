@@ -1,293 +1,162 @@
-Return-Path: <netdev+bounces-119173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866E19547A4
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:12:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACB995479F
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 063221F2182C
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:12:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91DC02819C9
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EBB19E7E9;
-	Fri, 16 Aug 2024 11:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYeXurtm"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50E619A281;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9004D198E77;
 	Fri, 16 Aug 2024 11:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bzSJIscm"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8303F17BEB5
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723806750; cv=none; b=GvlPNun1faoITaiVgAV3GXu+qSOcLzwK46P9vOBoHxM3cVw036i6nSrHqYC6n0nYCCjH0c3eJg7zclAoPzOAr69WjFzerylPkXexvabb+GRMJPzSHK6VhMD4lGFq0tQDS5shh5BARbzAROt9mvX/MURW73/QO+flat4yKXZxiHw=
+	t=1723806749; cv=none; b=FD1dvgPxZALiO2Nlm/BikAkeAMLmUo5W+y2BmM7BkUFDxMfIdVSIGX2eZaU0S8iBh1X9+M1yXgWWH52VccsmgSCy3IOyE2KXAErV4MCTMIEdS79QGwRxIMPT1K5Lgo76k0xyz5WZZgOa0DtvHcXxRvx2/zeAvgchjxlwfi/aetI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723806750; c=relaxed/simple;
-	bh=Xvhko6m4gXDcrQOr/bnImNG8IdOv4SrzCD327herT1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C1/8SRPev3HaBf+E4b/XdlUxTcBL6QS7oS/ZCMzeKiG+r0G6wGCWMCLJHL+/9cyTLckmGuhx51HwfL1HyAfQfDYZ9eDiq2SArge6dDMe6ixzQInXE2vpj+fLCxtiCLh77y3hOuI87HTsm/LIsZuaxYYthZUBBgtVN0bPLCavjNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYeXurtm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCC8C32782;
-	Fri, 16 Aug 2024 11:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723806749;
-	bh=Xvhko6m4gXDcrQOr/bnImNG8IdOv4SrzCD327herT1c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gYeXurtmdnv5fR0Lvxwg11Rmuc4ghH5uPedjp9RUF9ZTVRnFe2KEe0exw3cCImVFK
-	 rCaAS7BmZxAY/8WKFqSPpuApwA/YreEZ9JZ14QNkvArFFGle3hRED2RvbCpLyCba2l
-	 rIPVVL5acPzqM+YeW9LejtpG8c61dmocnDYvshJQKqGbPQJB2fbGcmY9H6N30CodvY
-	 inuJJ0QRj7hpszFcgk6KmUmw7RkjTNRCuLb4pQX2F0ynh6meOkJZNOwdlryD6Dy8zV
-	 g7Vy8wfyyWx8LeA3HgxdqtkuHQaZe/I9xJVOX78DNQ2ZR0Dft1NVeuF8t5cTsweIxv
-	 AbnNlysFgTzuQ==
-Date: Fri, 16 Aug 2024 12:12:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
-Message-ID: <20240816111222.GT632411@kernel.org>
-References: <20240814203850.2240469-1-dhowells@redhat.com>
- <20240814203850.2240469-20-dhowells@redhat.com>
+	s=arc-20240116; t=1723806749; c=relaxed/simple;
+	bh=ev8gItlxT8GfFSSM6MbqNb6Y6y6p896g9CJuhyNyxNM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kY+X5wRTWnAMWj+b34bQHRSaCqcACTqPoWWQ2RmBGXoNnJbRJ8sEQDLk94EVbIJy1Ix+C2IDVdK2QHrGteAIF3S7rB/hqv2+he3ob9zHlPJOpKh6MAv3rQNalEJw8LNNx9esYvCyDApzoHB/yGFupexiWvZOVnXwLmtDV0e7moA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bzSJIscm; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a6135eso2933604a12.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:12:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1723806746; x=1724411546; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vu6p4NVjd5a5X5kDuNbFrcpGswZu1Bkp/8WsnSo57I8=;
+        b=bzSJIscmpaP6twqCKbKIVaLhtDGmWGORz1qMPcmN5aTxNMK/+WnyN0H8KT4FHNl39w
+         Djfj+iuDFg8stp10RdVW7yBVPOTfPH8ul+oC2Z14M9dIGCLZ2goGN8eg7FrWWHRmlSl9
+         JgsThPqSDnUm0xVo/MHBW32m50ae1Lktx5EeY2Rxsgdb4scdB70lBoIbSZCk7Gzim69J
+         nROz4+QTXGmMUYwUK4a/bfslCg54gY5+1ozPZcKI5PIF6hyI9DRKFhjXE36Y0y7aOMof
+         WoJi+NHX4gK03893leh6Y7uGgvJdRQaW22C3ERC8N9t8iOCz70I/uFVIEZidcKjapzRk
+         e/vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723806746; x=1724411546;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vu6p4NVjd5a5X5kDuNbFrcpGswZu1Bkp/8WsnSo57I8=;
+        b=VdokodXLtPIpNeU4HpfQ+y4rlDsVvW69W1PsCsyU6oZinO53X6dP+9u0/AnWNTLMmr
+         7QX06hUDy47iHs1xgG0nDJ5fLbeBKe5Qyi8V0flKvxfkf914/ndBw4wBZy8UFgHgF5O/
+         SKQsF/jciDsSseVjxrYwWC9LP+B1Hou9lWLeBDZq8VSoW21xw7xzKwG8xKd05mvNH9Mb
+         ZFsU+xpUFZR+SJfoR1dxInu+tICswt0MWxzl6qs5M9WPkAPWfmowxEoT+xutsi9sZ5I2
+         MGMP7EqJ11G23X/sHm1RDvV/kTxHFfpCdmYEWHpoB2Ltc3gGBAnlhrE1KAnT5C2b1mVW
+         jsJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVD0MN3yIBg74AJIX7G7YKLSr9JxSZp+jSgHURORmgWgrShOr7m8CE/fw5jeTH3s3kdBVkxpQ0ONgR1fP9On103BsyNYyxX
+X-Gm-Message-State: AOJu0YyLVQhe+CRWe3UlWI46e4h54pAV/eCpeBPoQ2OUdmzuPW8p6Wsy
+	zr0PlBOFTrStx32/nbZbThGusG4Vl9RorWPI41WXxou6XCbKii21yDtA+3aXhj8=
+X-Google-Smtp-Source: AGHT+IHrZPj0GDl8aLs3V6+bDceZfINTrVKI0dshA6qcSm27LFmTvVpr+cYRN/sN4aTRDpPHirLLag==
+X-Received: by 2002:a05:6402:520d:b0:57d:455:d395 with SMTP id 4fb4d7f45d1cf-5beb3a84f4cmr5719044a12.7.1723806745762;
+        Fri, 16 Aug 2024 04:12:25 -0700 (PDT)
+Received: from ?IPV6:2a07:de40:a101:3:ce70:3e6f:3b9c:9125? (megane.afterburst.com. [2a01:4a0:11::2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2111869a12.39.2024.08.16.04.12.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2024 04:12:25 -0700 (PDT)
+Message-ID: <2fd48f87-2521-4c34-8589-dbb7e91bb1c8@suse.com>
+Date: Fri, 16 Aug 2024 13:12:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240814203850.2240469-20-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+To: Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe
+ <jgg@nvidia.com>, James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240726142731.GG28621@pendragon.ideasonboard.com>
+ <66a43c48cb6cc_200582942d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <20240728111826.GA30973@pendragon.ideasonboard.com>
+ <2024072802-amendable-unwatched-e656@gregkh>
+ <2b4f6ef3fc8e9babf3398ed4a301c2e4964b9e4a.camel@HansenPartnership.com>
+ <2024072909-stopwatch-quartet-b65c@gregkh>
+ <206bf94bb2eb7ca701ffff0d9d45e27a8b8caed3.camel@HansenPartnership.com>
+ <20240801144149.GO3371438@nvidia.com>
+ <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.com>
+In-Reply-To: <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 14, 2024 at 09:38:39PM +0100, David Howells wrote:
-> Improve the efficiency of buffered reads in a number of ways:
+On 8/7/24 02:06, Dan Williams wrote:
+> Jason Gunthorpe wrote:
+>> On Wed, Jul 31, 2024 at 08:33:36AM -0400, James Bottomley wrote:
+>>
+>>> For the specific issue of discussing fwctl, the Plumbers session would
+>>> be better because it can likely gather all interested parties.
+>>
+>> Keep in mind fwctl is already at the end of a long journey of
+>> conference discussions and talks spanning 3 years back now. It now
+>> represents the generalized consensus between multiple driver
+>> maintainers for at least one side of the debate.
+>>
+>> There was also a fwctl presentation at netdev conf a few weeks ago.
+>>
+>> In as far as the cross-subsystem NAK, I don't expect more discussion
+>> to result in any change to people's opinions. RDMA side will continue
+>> to want access to the shared device FW, and netdev side will continue
+>> to want to deny access to the shared device FW.
 > 
->  (1) Overhaul the algorithm in general so that it's a lot more compact and
->      split the read submission code between buffered and unbuffered
->      versions.  The unbuffered version can be vastly simplified.
+> As I mentioned before, this is what I hoped to mediate. The on-list
+> discussion has seem to hit a deficit of trust roadblock, not a deficit
+> of technical merit.
 > 
->  (2) Read-result collection is handed off to a work queue rather than being
->      done in the I/O thread.  Multiple subrequests can be processes
->      simultaneously.
+> All I can say is the discussion is worth a try. With respect to a
+> precedent for a stalemate moving forward, I point to the MGLRU example.
+> That proposal had all of the technical merit on the list, but was not
+> making any clear progress to being merged. It was interesting to watch
+> that all thaw in real time at LSF/MM (2022) where in person
+> collaboration yielded strategy concessions, and mutual understanding
+> that email was never going to produce.
 > 
->  (3) When a subrequest is collected, any folios it fully spans are
->      collected and "spare" data on either side is donated to either the
->      previous or the next subrequest in the sequence.
-> 
-> Notes:
-> 
->  (*) Readahead expansion is massively slows down fio, presumably because it
->      causes a load of extra allocations, both folio and xarray, up front
->      before RPC requests can be transmitted.
-> 
->  (*) RDMA with cifs does appear to work, both with SIW and RXE.
-> 
->  (*) PG_private_2-based reading and copy-to-cache is split out into its own
->      file and altered to use folio_queue.  Note that the copy to the cache
->      now creates a new write transaction against the cache and adds the
->      folios to be copied into it.  This allows it to use part of the
->      writeback I/O code.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
+Well, my experience does not _quite_ match this, but I fully support
+the attempt to resolve it.
 
-...
+FWIW, we (ie 'me' with my SUSE distro hat on) are facing similar issues;
+every now and again vendors come along asking us to take this very 
+important out-of-tree module to allow them to configure their device.
+The SCSI stack is _littered_ with vendor-specific commands allowing them 
+to reprogram their devices (had a fun experiment once reflashing a 
+megaraid HBA to suddenly show up as mpt2sas ... try to code that in 
+command effects ...)
 
-> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+So yes, I'd be in favour having an interface for this kind of stuff.
+Less sure if there is a generic interface to be found; what we should
+try to avoid is having an too generic one (aka: send command with this 
+payload, get this result, and heaven knows what it did to the device).
+That would surely be useful, but security and operational aspects of
+that are a nightmare.
 
-...
+I'd be happy to participate on the discussion at LPC if and when it happens.
 
-> @@ -334,9 +344,8 @@ static void ceph_netfs_issue_read(struct netfs_io_subrequest *subreq)
->  	struct ceph_client *cl = fsc->client;
->  	struct ceph_osd_request *req = NULL;
->  	struct ceph_vino vino = ceph_vino(inode);
-> -	struct iov_iter iter;
-> -	int err = 0;
-> -	u64 len = subreq->len;
-> +	int err;
+Cheers,
 
-Hi David,
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.com                               +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
-err is set conditionally in various places in this function, and then read
-unconditionally near the end of this function. With this change isn't
-entirely clear that err is always initialised by the end of the function.
-
-Flagged by Smatch.
-
-> +	u64 len;
->  	bool sparse = IS_ENCRYPTED(inode) || ceph_test_mount_opt(fsc, SPARSEREAD);
->  	u64 off = subreq->start;
->  	int extent_cnt;
-
-...
-
-> @@ -410,17 +423,19 @@ static void ceph_netfs_issue_read(struct netfs_io_subrequest *subreq)
->  	req->r_inode = inode;
->  	ihold(inode);
->  
-> +	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
->  	ceph_osdc_start_request(req->r_osdc, req);
->  out:
->  	ceph_osdc_put_request(req);
->  	if (err)
-> -		netfs_subreq_terminated(subreq, err, false);
-> +		netfs_read_subreq_terminated(subreq, err, false);
->  	doutc(cl, "%llx.%llx result %d\n", ceph_vinop(inode), err);
->  }
-
-...
-
-> diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-
-...
-
-> +/*
-> + * Go through the list of failed/short reads, retrying all retryable ones.  We
-> + * need to switch failed cache reads to network downloads.
-> + */
-> +static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
-> +{
-> +	struct netfs_io_subrequest *subreq;
-> +	struct netfs_io_stream *stream0 = &rreq->io_streams[0];
-> +	LIST_HEAD(sublist);
-> +	LIST_HEAD(queue);
-> +
-> +	_enter("R=%x", rreq->debug_id);
-> +
-> +	if (list_empty(&rreq->subrequests))
-> +		return;
-> +
-> +	if (rreq->netfs_ops->retry_request)
-> +		rreq->netfs_ops->retry_request(rreq, NULL);
-> +
-> +	/* If there's no renegotiation to do, just resend each retryable subreq
-> +	 * up to the first permanently failed one.
-> +	 */
-> +	if (!rreq->netfs_ops->prepare_read &&
-> +	    !test_bit(NETFS_RREQ_COPY_TO_CACHE, &rreq->flags)) {
-> +		struct netfs_io_subrequest *subreq;
-> +
-> +		list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-> +			if (test_bit(NETFS_SREQ_FAILED, &subreq->flags))
-> +				break;
-> +			if (__test_and_clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
-> +				netfs_reset_iter(subreq);
-> +				netfs_reissue_read(rreq, subreq);
-> +			}
-> +		}
-> +		return;
-> +	}
-> +
-> +	/* Okay, we need to renegotiate all the download requests and flip any
-> +	 * failed cache reads over to being download requests and negotiate
-> +	 * those also.  All fully successful subreqs have been removed from the
-> +	 * list and any spare data from those has been donated.
-> +	 *
-> +	 * What we do is decant the list and rebuild it one subreq at a time so
-> +	 * that we don't end up with donations jumping over a gap we're busy
-> +	 * populating with smaller subrequests.  In the event that the subreq
-> +	 * we just launched finishes before we insert the next subreq, it'll
-> +	 * fill in rreq->prev_donated instead.
-> +
-> +	 * Note: Alternatively, we could split the tail subrequest right before
-> +	 * we reissue it and fix up the donations under lock.
-> +	 */
-> +	list_splice_init(&rreq->subrequests, &queue);
-> +
-> +	do {
-> +		struct netfs_io_subrequest *from;
-> +		struct iov_iter source;
-> +		unsigned long long start, len;
-> +		size_t part, deferred_next_donated = 0;
-> +		bool boundary = false;
-> +
-> +		/* Go through the subreqs and find the next span of contiguous
-> +		 * buffer that we then rejig (cifs, for example, needs the
-> +		 * rsize renegotiating) and reissue.
-> +		 */
-> +		from = list_first_entry(&queue, struct netfs_io_subrequest, rreq_link);
-> +		list_move_tail(&from->rreq_link, &sublist);
-> +		start = from->start + from->transferred;
-> +		len   = from->len   - from->transferred;
-> +
-> +		_debug("from R=%08x[%x] s=%llx ctl=%zx/%zx/%zx",
-> +		       rreq->debug_id, from->debug_index,
-> +		       from->start, from->consumed, from->transferred, from->len);
-> +
-> +		if (test_bit(NETFS_SREQ_FAILED, &from->flags) ||
-> +		    !test_bit(NETFS_SREQ_NEED_RETRY, &from->flags))
-> +			goto abandon;
-> +
-> +		deferred_next_donated = from->next_donated;
-> +		while ((subreq = list_first_entry_or_null(
-> +				&queue, struct netfs_io_subrequest, rreq_link))) {
-> +			if (subreq->start != start + len ||
-> +			    subreq->transferred > 0 ||
-> +			    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
-> +				break;
-> +			list_move_tail(&subreq->rreq_link, &sublist);
-> +			len += subreq->len;
-> +			deferred_next_donated = subreq->next_donated;
-> +			if (test_bit(NETFS_SREQ_BOUNDARY, &subreq->flags))
-> +				break;
-> +		}
-> +
-> +		_debug(" - range: %llx-%llx %llx", start, start + len - 1, len);
-> +
-> +		/* Determine the set of buffers we're going to use.  Each
-> +		 * subreq gets a subset of a single overall contiguous buffer.
-> +		 */
-> +		netfs_reset_iter(from);
-> +		source = from->io_iter;
-> +		source.count = len;
-> +
-> +		/* Work through the sublist. */
-> +		while ((subreq = list_first_entry_or_null(
-> +				&sublist, struct netfs_io_subrequest, rreq_link))) {
-> +			list_del(&subreq->rreq_link);
-> +
-> +			subreq->source	= NETFS_DOWNLOAD_FROM_SERVER;
-> +			subreq->start	= start - subreq->transferred;
-> +			subreq->len	= len   + subreq->transferred;
-> +			stream0->sreq_max_len = subreq->len;
-> +
-> +			__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
-> +			__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
-> +
-> +			spin_lock_bh(&rreq->lock);
-> +			list_add_tail(&subreq->rreq_link, &rreq->subrequests);
-> +			subreq->prev_donated += rreq->prev_donated;
-> +			rreq->prev_donated = 0;
-> +			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
-> +			spin_unlock_bh(&rreq->lock);
-> +
-> +			BUG_ON(!len);
-> +
-> +			/* Renegotiate max_len (rsize) */
-> +			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
-
-Earlier in this function it is assumed that prepare_read may be NULL.
-Can that also be the case here?
-
-Also flagged by Smatch.
-
-> +				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
-> +				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
-> +			}
-
-...
 
