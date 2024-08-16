@@ -1,99 +1,83 @@
-Return-Path: <netdev+bounces-119273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB009955081
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:06:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7B995508B
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 20:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17EAC1C21657
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 301991F22E47
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 18:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B178E1C3F18;
-	Fri, 16 Aug 2024 18:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBC21C378C;
+	Fri, 16 Aug 2024 18:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4voLZmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138F91C2334
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087681482F4;
+	Fri, 16 Aug 2024 18:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723831582; cv=none; b=BRGFaOke9YzR6IOv6ppcB7wCS9ZkELaOd2nnbcBrbA/hUr6GUdlhBdgO6QxD7upGqNseAMhiZ2eKQ3/jux253+jx0V2yP9oTT57flqYSzdTv0ToTuYkkgrNYBECuO5u8++2BBj7lOEspB/uPiEjg2kNWOKUqh/rkiP2Cl/Oe210=
+	t=1723831773; cv=none; b=Ot3cYLOBwBBEBOpTx+DCHvyhl8tatUbYxkaIBPl6HrsUMMgRI2ZGheVKAfODvP78adwh4vl6LjzzVW/pimU2TqfPCdBPfgDwz7MstYaBKysBFeFH5/+cibSW6/15UpH0NCP5ynF82O4Nn3b6SWdZ60pcjrtH2RkMrDEr9iZgs0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723831582; c=relaxed/simple;
-	bh=QY3ohNySnzo+hMm9ROgMKm7NiLqGJh/ZGAf76kr1LEc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=PXnjg2GircaPFEeEsBXy61IWeXIxnq8LFyVcSt8yKYNz3S4In44iBX0/ZBr2G49ZV5wrHROv/D79Wb1E06H28YotkYfs7ydu/IW9UVzROD2hnWnPQN47pAUYzWueOYBeD3WE0A+SaMkmPCE0dS16UsyWwntndeEbS3jXbAarvrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39d3061c2b5so4554865ab.1
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:06:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723831580; x=1724436380;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wk7VWIxUCGpPDcCbIVePL+r/gPaOsRfDlMifv32OdWU=;
-        b=OOLPFamzvr/AomvnXNcebVRMxWb7ft4JqGABIgTz5bzsMB5jjFD+mw6XDmZAvR7EOJ
-         8YnmhwfNlVP31kc5KSAwaKn6A1jST9MZCz3npmqXYvqSzmhe8UCjvPiUq7M4LX8/NejG
-         3Bz/NWexk40mtnn4Q4aw76nWchcP3UdMRxv8HCtpXcOwAsle7DfpdMJ91Hq0Pl6jXX4y
-         pgoz4EuHuTtXQrO9piydPi+h92IyHFwrfvDfmu5SoAJ250ivpkrnxLmwGmgnj9cvdldA
-         67I+nHqEe9qovO72HAIvSj1tiB4tAshHyv1yuZD6aIc1mioXHJZYgKDso4/bmJFTFqMN
-         TEuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXRQcFLfe1Kjh4lOH4v0QuyDrvTsyXP54HLwP9qiBq1ceU/9c+mQbSWytVR/N2pfuJWvmaoriK03670ZKtbex9PMzch7yuW
-X-Gm-Message-State: AOJu0YxlJXL/aGKil/BF5/cf+mm1rYu2fbV2+fdnSVlq7xt2GS6eY7wh
-	XQ4iKXB5VwbUQf8R57f8WMO1qey9FG7UPytnvTiLGV+/EHDZbneabaXAc3y+j+NNsi6firni58z
-	zCFqNAC+3TJ6gZxcn/RQq9UDlFYw0jmRzzNvWmBPaXTDONcW94Mnh3oA=
-X-Google-Smtp-Source: AGHT+IGfABZaedo0n2HrQEGufCpZDZGGnqM4DHsd9tztChw2PWGsN8G47lQwd4Gzke7RLXZRN4XRizt1Lh6fHwwDJhTOWKzB+8q0
+	s=arc-20240116; t=1723831773; c=relaxed/simple;
+	bh=2pwdYzQ2ojaf94uUSc3VfR/126ez82e5gZxfj8e+7BA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DIsHIdKwSrWuXfQZvJiwdE34oVT3gu5eISisLDXpNOOw2pW3kt9Uj/gDi3rP6WeV5WMx1T0Feiis1aJ7pIXvqXw2N+q5FGfdYTZZ/YhWNrwkX6S9sr0L7y4AM2pevwKp2aHToULuNTfY8QSbavG2cRQ2pNi+m+hOYWezNfvbZy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4voLZmR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2F8C4AF0E;
+	Fri, 16 Aug 2024 18:09:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723831771;
+	bh=2pwdYzQ2ojaf94uUSc3VfR/126ez82e5gZxfj8e+7BA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C4voLZmRQ5Wf7Hx+7sGeKAABNuyIbLbewF/VAV0+W+YSxA8X4e8A62Lo4Myd2tkCp
+	 qS4TMHCH0Bs0gG+Ra4ABe5l7fK8XozXgNK1T31AqzAJ3AYTCbD7LdXBS9SV1JvBI8o
+	 PWU+/tMTo2HqIV+CSEKqlm7w2NIDN+EBBRbFsG908yoOb1J4YosA7yRRM/pU+nYInN
+	 dFkUU4GFP4JRAO4NsgO68P8OEJgeaCd1L0ggEN+q0zYv7I8R8ygoWeiAth2rEA3hx7
+	 dM4yTPHqN9DD8IPgCT2iHNmU0jore++z0+JkyyXdQ47IWeq80GkFgAXMrb4MxB7SKS
+	 6WgQBHYw6atmg==
+Date: Fri, 16 Aug 2024 11:09:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: ende.tan@starfivetech.com
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, leyfoon.tan@starfivetech.com,
+ minda.chen@starfivetech.com, endeneer@gmail.com
+Subject: Re: [net-next,v1,1/1] net: stmmac: Introduce set_rx_ic() for
+ enabling RX interrupt-on-completion
+Message-ID: <20240816110928.1a75d223@kernel.org>
+In-Reply-To: <20240814092438.3129-1-ende.tan@starfivetech.com>
+References: <20240814092438.3129-1-ende.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c26:b0:39d:20a4:f42 with SMTP id
- e9e14a558f8ab-39d26ce4072mr1686585ab.2.1723831580184; Fri, 16 Aug 2024
- 11:06:20 -0700 (PDT)
-Date: Fri, 16 Aug 2024 11:06:20 -0700
-In-Reply-To: <Zr-VGSRrn0PDafoF@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fd6343061fd0d012@google.com>
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] INFO: task hung in __vhost_worker_flush
-From: syzbot <syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com>
-To: seanjc@google.com
-Cc: eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
-	seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> On Wed, May 29, 2024, syzbot wrote:
->> Hello,
->> 
->> syzbot found the following issue on:
->> 
->> HEAD commit:    9b62e02e6336 Merge tag 'mm-hotfixes-stable-2024-05-25-09-1..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=16cb0eec980000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=3e73beba72b96506
->> dashboard link: https://syzkaller.appspot.com/bug?extid=7f3bbe59e8dd2328a990
->> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
->> 
->> Unfortunately, I don't have any reproducer for this issue yet.
->> 
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/61b507f6e56c/disk-9b62e02e.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/6991f1313243/vmlinux-9b62e02e.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/65f88b96d046/bzImage-9b62e02e.xz
->> 
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com
->
-> #syz unset kvm
+On Wed, 14 Aug 2024 17:24:38 +0800 ende.tan@starfivetech.com wrote:
+> From: Tan En De <ende.tan@starfivetech.com>
+> 
+> Currently, some set_rx_owner() callbacks set interrupt-on-completion bit
+> in addition to OWN bit, without inserting a dma_wmb() barrier. This
+> might cause missed interrupt if the DMA sees the OWN bit before the
+> interrupt-on-completion bit is set.
+> 
+> Thus, let's introduce set_rx_ic() for enabling interrupt-on-completion,
+> and call it before dma_wmb() and set_rx_owner() in the main driver,
+> ensuring proper ordering and preventing missed interrupt.
 
-The following labels did not exist: kvm
-
+Having multiple indirect function calls to write a single descriptor 
+is really not great. Looks like it's always bit 31, can't this be coded
+up as common handler which sets bit 31 in the appropriate word (word
+offset specified per platform)?
 
