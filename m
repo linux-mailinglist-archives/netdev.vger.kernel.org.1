@@ -1,131 +1,101 @@
-Return-Path: <netdev+bounces-119054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A0DE953F0A
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:45:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB93953F11
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 03:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B63891F24136
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:45:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C27E284F18
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4121F937;
-	Fri, 16 Aug 2024 01:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731B22209B;
+	Fri, 16 Aug 2024 01:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kJbsMwMH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+KJRsXY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90161E515;
-	Fri, 16 Aug 2024 01:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A41B1D69E;
+	Fri, 16 Aug 2024 01:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723772716; cv=none; b=CyiaawOaNzlg7gmpeQkv94p5CYFnb3ethPBvYyw1HfaUfkkg3LLSFultDta9IPnRVI2RGbIN7oqvfxd/BiDDeEh/yZHp/sS2J1Yde5wkcl9FFldq1WlhOI/6SDyYLdjqMtDajz0Hg8cU+X1gsRpuLZiM+P5PQ4rb4L3uTzRncxg=
+	t=1723772797; cv=none; b=JyZfgXlbdg6GZVZuXQSMiTB0rrrDhB2sEi/nC2ni9f08blcEyanxaBuVs9CUSLUNx9HDQeSIZArmS7mP6zyGdk75gAfppW6T7p6HWhZTCmk6/gPuE9eH/HVeHfm+9D1JcnZjaefJ+4C/yz9N7UNvCgg5fImkB3MZIqclyX5ai3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723772716; c=relaxed/simple;
-	bh=AdvMryl6jBiNkZ7VRREtcROcphQN5lq8hj5nSWl+xwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eabOgm7vpxqUEReGHCbFO44I2ht5xzHs2BEn/Eq3qqNzW7ecOuIIUxIvwnZYReYPaC2AaVefXTS0WPuxeb0lamI06lEBKSR6ucSpLbaMMTH6ngVHCAw15tgrt76Y0b9U1yV2bBmwTKd99kYqC25ZC5pKDD3friC4lTsYljFUGXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kJbsMwMH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LMZ/H1f7EOgQSnMvzNXmSFFbE5G3GwsE9SktaoTmTpU=; b=kJbsMwMHJF842YbnZUGjRpyyQ3
-	sjozCqZsG0H7A7wbpPvgLSodBvSJe65KwudSXL1VVQSzK+OnNmgNKt+NxNNxvTg2R3ZX1SiOy5EWb
-	mvWiekp1l4JJB0tPv3Qo4pvcWE4mQgVOiGAYwufVoJNDOAU9drQOLYsmHgtLusyNshbQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sem1d-004tDC-PQ; Fri, 16 Aug 2024 03:45:09 +0200
-Date: Fri, 16 Aug 2024 03:45:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me, aliceryhl@google.com
-Subject: Re: [PATCH net-next v3 6/6] net: phy: add Applied Micro QT2025 PHY
- driver
-Message-ID: <0675cff9-5502-43e4-87ee-97d2e35d72da@lunn.ch>
-References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
- <20240804233835.223460-7-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1723772797; c=relaxed/simple;
+	bh=W5RlR6IOzzkUiWZtCi1XNt5G8fjNo236VeXd2ClDJUE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tC8txRlaHLwhz2AAODji31rrVyOUbuUW/TnY1XQ8PynuB2o+78OO5tz+lKbqxN01zc1LWmY7keP5gbSClUoJm2Cgg2/y6V/XjvkLqO4bjBrT+9C04z9WN+JqfpLhgFxYWLKTUjoHxQA0ABI8s1YyXmQggeSaahZqKJrk2PiJ1Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+KJRsXY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C338C32786;
+	Fri, 16 Aug 2024 01:46:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723772796;
+	bh=W5RlR6IOzzkUiWZtCi1XNt5G8fjNo236VeXd2ClDJUE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D+KJRsXYRlCEjPXztVWNO/Wi3OJBvrB4jPzXZhFLUWzKKazBRaw63hbuQEVd5xZCG
+	 +MEGurA+ZDBbfZJqEAA6RbMsmhL6RnEIR5j1vcPUUg5s47AcESqlIq6uS2NJy87tYU
+	 Oa9ZB1aM+N9VX5vERk6GfHXMJa2UlnZqyAACHcdoh4xszAXVHQ9ovdNuel2H9PHyty
+	 xBV31wdoNvrPxFlNxoKeb5t3qoexY51ejvfbRtAVVf0893WjPsvYw5Jfhnw+C4bWyl
+	 4oCyd9LY65pKhhU4LQs20tnPWm4CfmQaB0gbOHyw23wYbMrwxE6OX1E56M0uz1MEHP
+	 v0/tAYrrOlokQ==
+Date: Thu, 15 Aug 2024 18:46:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
+ <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
+ <jdamato@fastly.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v27 10/13] rtase: Implement ethtool function
+Message-ID: <20240815184635.4c074130@kernel.org>
+In-Reply-To: <20240812063539.575865-11-justinlai0215@realtek.com>
+References: <20240812063539.575865-1-justinlai0215@realtek.com>
+	<20240812063539.575865-11-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240804233835.223460-7-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +#[vtable]
-> +impl Driver for PhyQT2025 {
-> +    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
-> +    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043A400);
+On Mon, 12 Aug 2024 14:35:36 +0800 Justin Lai wrote:
+> +static void rtase_get_drvinfo(struct net_device *dev,
+> +			      struct ethtool_drvinfo *info)
+> +{
+> +	const struct rtase_private *tp = netdev_priv(dev);
 > +
-> +    fn probe(dev: &mut phy::Device) -> Result<()> {
-> +        // The hardware is configurable?
-> +        let hw_id = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
-> +        if (hw_id >> 8) & 0xff != 0xb3 {
-> +            return Ok(());
-> +        }
+> +	strscpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
+> +	strscpy(info->bus_info, pci_name(tp->pdev), sizeof(info->bus_info));
+> +}
 
-I don't understand this bit of code. At a guess, if the upper bytes of
-that register is not 0xb3, the firmware has already been loaded into
-the device?
+This shouldn't be necessary, can you delete this function from the
+driver and check if the output of ethtool -i changes?
+ethtool_get_drvinfo() should fill this in for you.
 
+> +static void rtase_get_pauseparam(struct net_device *dev,
+> +				 struct ethtool_pauseparam *pause)
+> +{
+> +	const struct rtase_private *tp = netdev_priv(dev);
+> +	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
 > +
-> +        // The 8051 will remain in the reset state.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0000)?;
-> +        // Configure the 8051 clock frequency.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC302), 0x0004)?;
-> +        // Non loopback mode.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC319), 0x0038)?;
-> +        // Global control bit to select between LAN and WAN (WIS) mode.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC31A), 0x0098)?;
-> +        dev.write(C45::new(Mmd::PCS, 0x0026), 0x0E00)?;
-> +        dev.write(C45::new(Mmd::PCS, 0x0027), 0x0893)?;
-> +        dev.write(C45::new(Mmd::PCS, 0x0028), 0xA528)?;
-> +        dev.write(C45::new(Mmd::PCS, 0x0029), 0x0003)?;
-
-802.3 says:
-
-3.38 through 3.4110/25GBASE-R PCS test pattern seed B ????
-
-> +        // Configure transmit and recovered clock.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC30A), 0x06E1)?;
-> +        // The 8051 will finish the reset state.
-> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0002)?;
-> +        // The 8051 will start running from the boot ROM.
-> +        dev.write(C45::new(Mmd::PCS, 0xE854), 0x00C0)?;
+> +	pause->autoneg = AUTONEG_DISABLE;
 > +
-> +        let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
-> +        if fw.data().len() > SZ_16K + SZ_8K {
-> +            return Err(code::EFBIG);
-> +        }
-> +
-> +        // The 24kB of program memory space is accessible by MDIO.
-> +        // The first 16kB of memory is located in the address range 3.8000h - 3.BFFFh.
-> +        // The next 8kB of memory is located at 4.8000h - 4.9FFFh.
-> +        let mut j = SZ_32K;
-> +        for (i, val) in fw.data().iter().enumerate() {
-> +            if i == SZ_16K {
-> +                j = SZ_32K;
-> +            }
-> +
-> +            let mmd = if i < SZ_16K { Mmd::PCS } else { Mmd::PHYXS };
-> +            dev.write(
-> +                C45::new(mmd, j as u16),
-> +                <u8 as Into<u16>>::into(*val).to_le(),
+> +	if ((value & (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) ==
+> +	    (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN)) {
+> +		pause->rx_pause = 1;
+> +		pause->tx_pause = 1;
+> +	} else if (value & RTASE_FORCE_TXFLOW_EN) {
+> +		pause->tx_pause = 1;
+> +	} else if (value & RTASE_FORCE_RXFLOW_EN) {
+> +		pause->rx_pause = 1;
+> +	}
 
-This is well past my level of Rust. I assume fw.data is a collection
-of bytes, and you enumerate it as bytes. A byte has no endiannes, so
-why do you need to convert it to little endian?
+This 3 if statements can be replaced with just two lines:
 
-	Andrew
+	pause->rx_pause = !!(value & RTASE_FORCE_RXFLOW_EN);
+	pause->tx_pause = !!(value & RTASE_FORCE_TXFLOW_EN);
 
