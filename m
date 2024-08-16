@@ -1,162 +1,91 @@
-Return-Path: <netdev+bounces-119172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DACB995479F
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:12:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C3E9547E7
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 13:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91DC02819C9
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:12:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E501C2162F
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 11:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9004D198E77;
-	Fri, 16 Aug 2024 11:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FDC143757;
+	Fri, 16 Aug 2024 11:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bzSJIscm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBual/tS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8303F17BEB5
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8A91AC8B9
+	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 11:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723806749; cv=none; b=FD1dvgPxZALiO2Nlm/BikAkeAMLmUo5W+y2BmM7BkUFDxMfIdVSIGX2eZaU0S8iBh1X9+M1yXgWWH52VccsmgSCy3IOyE2KXAErV4MCTMIEdS79QGwRxIMPT1K5Lgo76k0xyz5WZZgOa0DtvHcXxRvx2/zeAvgchjxlwfi/aetI=
+	t=1723807129; cv=none; b=sMQYo/NiCxLn2xbRXjVWInciOd5BUaU+sXZB1Y1fcNLePNi3uZM8bCmt544hHyBIB8cRnYpuWcxVwLT0+rKuQzHTm7KPquU9kQ7swvJqnLICjs7Hwg7QO6J/Pg9zvT1I+p1fhCQvnJy+BQ/ScqQr9iP58O0RExq2dfm9z1e+wJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723806749; c=relaxed/simple;
-	bh=ev8gItlxT8GfFSSM6MbqNb6Y6y6p896g9CJuhyNyxNM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kY+X5wRTWnAMWj+b34bQHRSaCqcACTqPoWWQ2RmBGXoNnJbRJ8sEQDLk94EVbIJy1Ix+C2IDVdK2QHrGteAIF3S7rB/hqv2+he3ob9zHlPJOpKh6MAv3rQNalEJw8LNNx9esYvCyDApzoHB/yGFupexiWvZOVnXwLmtDV0e7moA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bzSJIscm; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a6135eso2933604a12.0
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 04:12:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1723806746; x=1724411546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vu6p4NVjd5a5X5kDuNbFrcpGswZu1Bkp/8WsnSo57I8=;
-        b=bzSJIscmpaP6twqCKbKIVaLhtDGmWGORz1qMPcmN5aTxNMK/+WnyN0H8KT4FHNl39w
-         Djfj+iuDFg8stp10RdVW7yBVPOTfPH8ul+oC2Z14M9dIGCLZ2goGN8eg7FrWWHRmlSl9
-         JgsThPqSDnUm0xVo/MHBW32m50ae1Lktx5EeY2Rxsgdb4scdB70lBoIbSZCk7Gzim69J
-         nROz4+QTXGmMUYwUK4a/bfslCg54gY5+1ozPZcKI5PIF6hyI9DRKFhjXE36Y0y7aOMof
-         WoJi+NHX4gK03893leh6Y7uGgvJdRQaW22C3ERC8N9t8iOCz70I/uFVIEZidcKjapzRk
-         e/vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723806746; x=1724411546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vu6p4NVjd5a5X5kDuNbFrcpGswZu1Bkp/8WsnSo57I8=;
-        b=VdokodXLtPIpNeU4HpfQ+y4rlDsVvW69W1PsCsyU6oZinO53X6dP+9u0/AnWNTLMmr
-         7QX06hUDy47iHs1xgG0nDJ5fLbeBKe5Qyi8V0flKvxfkf914/ndBw4wBZy8UFgHgF5O/
-         SKQsF/jciDsSseVjxrYwWC9LP+B1Hou9lWLeBDZq8VSoW21xw7xzKwG8xKd05mvNH9Mb
-         ZFsU+xpUFZR+SJfoR1dxInu+tICswt0MWxzl6qs5M9WPkAPWfmowxEoT+xutsi9sZ5I2
-         MGMP7EqJ11G23X/sHm1RDvV/kTxHFfpCdmYEWHpoB2Ltc3gGBAnlhrE1KAnT5C2b1mVW
-         jsJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVD0MN3yIBg74AJIX7G7YKLSr9JxSZp+jSgHURORmgWgrShOr7m8CE/fw5jeTH3s3kdBVkxpQ0ONgR1fP9On103BsyNYyxX
-X-Gm-Message-State: AOJu0YyLVQhe+CRWe3UlWI46e4h54pAV/eCpeBPoQ2OUdmzuPW8p6Wsy
-	zr0PlBOFTrStx32/nbZbThGusG4Vl9RorWPI41WXxou6XCbKii21yDtA+3aXhj8=
-X-Google-Smtp-Source: AGHT+IHrZPj0GDl8aLs3V6+bDceZfINTrVKI0dshA6qcSm27LFmTvVpr+cYRN/sN4aTRDpPHirLLag==
-X-Received: by 2002:a05:6402:520d:b0:57d:455:d395 with SMTP id 4fb4d7f45d1cf-5beb3a84f4cmr5719044a12.7.1723806745762;
-        Fri, 16 Aug 2024 04:12:25 -0700 (PDT)
-Received: from ?IPV6:2a07:de40:a101:3:ce70:3e6f:3b9c:9125? (megane.afterburst.com. [2a01:4a0:11::2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbde7cd4sm2111869a12.39.2024.08.16.04.12.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 04:12:25 -0700 (PDT)
-Message-ID: <2fd48f87-2521-4c34-8589-dbb7e91bb1c8@suse.com>
-Date: Fri, 16 Aug 2024 13:12:24 +0200
+	s=arc-20240116; t=1723807129; c=relaxed/simple;
+	bh=l1y+UbmxceefYhRGfYFT8JhcHTibXLS9v/Suh6jPF8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TDpOG9js2Ltu2Be2LeNb7SHOYQMZC33Vd+BWjnAAewjYcq+6uS/qEzQZafYVwRSWalg1Yo3rjK0Z+qpzYQL5B3+wkJTgwv9RGoVVe9BNqu+mTmV6EAWHxQJLsX8nzqSfUdAn8iM93okHisUlS4vtp2ovUfBC6iXs1LxsgBQ5mHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBual/tS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DEC3C32782;
+	Fri, 16 Aug 2024 11:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723807128;
+	bh=l1y+UbmxceefYhRGfYFT8JhcHTibXLS9v/Suh6jPF8Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eBual/tSho0zJHtfqB4L8uNH7bbgG59BlC7EJwrylEvoM4XN/9jcSYIvknJeGhqTP
+	 wkVwY+a98VJO8nCMYfo23r5c1xb1kO78pmsHYpYB78COk8EwVPsKlTxMGTN0fk5t7t
+	 B+JrbLUltSa2bH11TFzBW/IJl0HPJV792e8WnG0et6SFwgCBRo3IzSfEfBzw8y3bFU
+	 M6IBZrR9oTfHqAgtvznJFVU2MyEBrXeSrR8NK6KX3nMuY1nRnn3RQmPiQXjvd1T/MU
+	 TcAGGDYk2VqGtBoML+wQcTnODm0QEZ6L2yG7TI5lcDLksk1SY1dVqWaEuVsoJuIIMh
+	 2ycxShIt8PfzA==
+Date: Fri, 16 Aug 2024 12:18:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Christoph Paasch <cpaasch@apple.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>, Roopa Prabhu <roopa@nvidia.com>,
+	Craig Taylor <cmtaylor@apple.com>
+Subject: Re: [PATCH netnext] mpls: Reduce skb re-allocations due to skb_cow()
+Message-ID: <20240816111843.GU632411@kernel.org>
+References: <20240815161201.22021-1-cpaasch@apple.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-To: Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe
- <jgg@nvidia.com>, James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>,
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <20240726142731.GG28621@pendragon.ideasonboard.com>
- <66a43c48cb6cc_200582942d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <20240728111826.GA30973@pendragon.ideasonboard.com>
- <2024072802-amendable-unwatched-e656@gregkh>
- <2b4f6ef3fc8e9babf3398ed4a301c2e4964b9e4a.camel@HansenPartnership.com>
- <2024072909-stopwatch-quartet-b65c@gregkh>
- <206bf94bb2eb7ca701ffff0d9d45e27a8b8caed3.camel@HansenPartnership.com>
- <20240801144149.GO3371438@nvidia.com>
- <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.com>
-In-Reply-To: <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815161201.22021-1-cpaasch@apple.com>
 
-On 8/7/24 02:06, Dan Williams wrote:
-> Jason Gunthorpe wrote:
->> On Wed, Jul 31, 2024 at 08:33:36AM -0400, James Bottomley wrote:
->>
->>> For the specific issue of discussing fwctl, the Plumbers session would
->>> be better because it can likely gather all interested parties.
->>
->> Keep in mind fwctl is already at the end of a long journey of
->> conference discussions and talks spanning 3 years back now. It now
->> represents the generalized consensus between multiple driver
->> maintainers for at least one side of the debate.
->>
->> There was also a fwctl presentation at netdev conf a few weeks ago.
->>
->> In as far as the cross-subsystem NAK, I don't expect more discussion
->> to result in any change to people's opinions. RDMA side will continue
->> to want access to the shared device FW, and netdev side will continue
->> to want to deny access to the shared device FW.
+On Thu, Aug 15, 2024 at 09:12:01AM -0700, Christoph Paasch wrote:
+> mpls_xmit() needs to prepend the MPLS-labels to the packet. That implies
+> one needs to make sure there is enough space for it in the headers.
 > 
-> As I mentioned before, this is what I hoped to mediate. The on-list
-> discussion has seem to hit a deficit of trust roadblock, not a deficit
-> of technical merit.
+> Calling skb_cow() implies however that one wants to change even the
+> playload part of the packet (which is not true for MPLS). Thus, call
+> skb_cow_head() instead, which is what other tunnelling protocols do.
 > 
-> All I can say is the discussion is worth a try. With respect to a
-> precedent for a stalemate moving forward, I point to the MGLRU example.
-> That proposal had all of the technical merit on the list, but was not
-> making any clear progress to being merged. It was interesting to watch
-> that all thaw in real time at LSF/MM (2022) where in person
-> collaboration yielded strategy concessions, and mutual understanding
-> that email was never going to produce.
-> 
-Well, my experience does not _quite_ match this, but I fully support
-the attempt to resolve it.
+> Running a server with this comm it entirely removed the calls to
+> pskb_expand_head() from the callstack in mpls_xmit() thus having
+> significant CPU-reduction, especially at peak times.
 
-FWIW, we (ie 'me' with my SUSE distro hat on) are facing similar issues;
-every now and again vendors come along asking us to take this very 
-important out-of-tree module to allow them to configure their device.
-The SCSI stack is _littered_ with vendor-specific commands allowing them 
-to reprogram their devices (had a fun experiment once reflashing a 
-megaraid HBA to suddenly show up as mpt2sas ... try to code that in 
-command effects ...)
+Hi Christoph and Craig,
 
-So yes, I'd be in favour having an interface for this kind of stuff.
-Less sure if there is a generic interface to be found; what we should
-try to avoid is having an too generic one (aka: send command with this 
-payload, get this result, and heaven knows what it did to the device).
-That would surely be useful, but security and operational aspects of
-that are a nightmare.
+Including some performance data here would be nice.
 
-I'd be happy to participate on the discussion at LPC if and when it happens.
+> Cc: Roopa Prabhu <roopa@nvidia.com>
+> Reported-by: Craig Taylor <cmtaylor@apple.com>
+> Signed-off-by: Christoph Paasch <cpaasch@apple.com>
 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.com                               +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+And one minor nit, which I do not think warrants a repost:
+netnext -> net-next.
 
+In any case, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
