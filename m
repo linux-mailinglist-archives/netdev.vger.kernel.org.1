@@ -1,80 +1,55 @@
-Return-Path: <netdev+bounces-119028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1EC953E11
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 01:49:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC3D953E4A
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 02:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EDDE1C21E88
-	for <lists+netdev@lfdr.de>; Thu, 15 Aug 2024 23:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B7A288BA1
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 00:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EAC155CB2;
-	Thu, 15 Aug 2024 23:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7009910FF;
+	Fri, 16 Aug 2024 00:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVXBqxRM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuPDTMF4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AC4370;
-	Thu, 15 Aug 2024 23:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EC310E4;
+	Fri, 16 Aug 2024 00:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723765768; cv=none; b=HaG7eciZPgg17NVTEx0PmIjNo02n059jKcvKrAnQkdEPEYsrCXBXjHKOWJTmRoMsyBlMeuuRc3jNdMiNMU26+3W0NEsn/bL6+JgjaYb60FbUOpqg8aE35pwy7WgipauwlXoPN3ret8BMT3Thya2PnhZYZnTDaEWdxWBWIuu/I3k=
+	t=1723768158; cv=none; b=AYO+/gaIzkoUc96uCZuMEcs5CSOjLAkg6FN1tDca45ruKahjuMLdg2pTThIxQo2VRpJX9Y9veRgZFr8hwMT2xJtKaBOHVmlE5oLka7CzQJeuM9Suedmb6LFqkTTcv6U7EfPkn+05bkFa/kuGexvskqlO+ebdMf3EVgmaxVu2cIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723765768; c=relaxed/simple;
-	bh=fWIsV9hFatQJdiwFfYJliIME9lY/73qLiUKyBkbpiUY=;
+	s=arc-20240116; t=1723768158; c=relaxed/simple;
+	bh=O+Sd2MWOnr5NJTgvYNtdWZBZ6/GH4gLkufhqIXqOLHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R8Ze7tAmevpCUwCoYlb+66Bnhj3PFq0yOfnsJyPly10oM8lzLKru1PELWNX7cwtKG2YwK4CnXCfpYjtaAULnZk4iILltMOrr7Ska/jeAsKVnPzcKVZXrWeKDBuqfnhtgf/Sz5i9egjlTt56Evu6sV8jrf50RPXh4uf8Z7/pDJLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVXBqxRM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4EC8C32786;
-	Thu, 15 Aug 2024 23:49:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=T9Ip1OWc8aeMz5nBEk5BpSzNIyqVVzepN7XCNXj2QDqrabxKAKpd0Vy754fQ7Ksu0pUDsOzdP7FHdktUfhCi6qS9T3thhXpLwh1AJRg7dgorUZ1LCYSJ45oXdkU+I7ddmsvxgAmxS7L+2xju+BLyYh94piEtCiLdw1tFUkk8Ek0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XuPDTMF4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79934C32786;
+	Fri, 16 Aug 2024 00:29:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723765767;
-	bh=fWIsV9hFatQJdiwFfYJliIME9lY/73qLiUKyBkbpiUY=;
+	s=k20201202; t=1723768157;
+	bh=O+Sd2MWOnr5NJTgvYNtdWZBZ6/GH4gLkufhqIXqOLHY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PVXBqxRMtiFwRkpu8TfmVW7mZSxnYl2qG7JzGdw3A0P7ERAwWseFYCcNx+3NJTvfY
-	 /f7xy1Plh+6MmP9qKbAQIs5OrhHGaADBS4mr6jCRDZ9EjgFiwY+uXuzWCaTwfX13Ze
-	 IuFeJkE8GkEsunDkRS7xkOTInNo8//ddF4H5l0qr+U9pVZhofbDutO5k8tCtPQv0Ti
-	 ug8h49NFwoM/ka8PqXz/ibpHLEmbcllmyFUXB5yJKg1QNiZ4B1/LdWIBbOTwJEUfMq
-	 w9AEADUyNdR5zAiBTJoD7abhg36HBBYxYDC5O02MLDuWChehM4F9ZNobSXYOJxqvjW
-	 X2qirOlapHK8A==
-Date: Thu, 15 Aug 2024 16:49:24 -0700
+	b=XuPDTMF4BxRKgelD87yEpQpi5rjmels+lSRcTgbJ4t7quIWZ5SR4ru4r01STP30XH
+	 OM5Rvz4x2rfriNcnaNl+Q/639Nz2BZrSTC8S99eBiH5+z7AIL7bVzcdgfWRsEyrz+i
+	 is4Jvn/tu9yvw5CqrDOEG6fTw9YvGJWMyaEe+aQuwlRUzuZ1jSqRe+LfCKy+Mrye3F
+	 lvnfWYQdS9HwBL07E7+YKUSmfCPVjZFXrPspNEHqM4BWLag+LQYxCh+tNAsUW5JnSw
+	 OaEcdO07phvpU6kD01NeBVYFWnzcutt/ylJhA+xgGlKcF+Qrk+FX2J1UPNFgni2vt9
+	 lipYxU2zYsCng==
+Date: Thu, 15 Aug 2024 17:29:16 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Allen <allen.lkml@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- jes@trained-monkey.org, kda@linux-powerpc.org, cai.huoqing@linux.dev,
- dougmill@linux.ibm.com, npiggin@gmail.com, christophe.leroy@csgroup.eu,
- aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
- tlfalcon@linux.ibm.com, cooldavid@cooldavid.org, marcin.s.wojtas@gmail.com,
- mlindner@marvell.com, stephen@networkplumber.org, nbd@nbd.name,
- sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- borisp@nvidia.com, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, louis.peens@corigine.com,
- richardcochran@gmail.com, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-acenic@sunsite.dk,
- linux-net-drivers@amd.com, netdev@vger.kernel.org, Sunil Goutham
- <sgoutham@marvell.com>
-Subject: Re: [net-next v3 05/15] net: cavium/liquidio: Convert tasklet API
- to new bottom half workqueue mechanism
-Message-ID: <20240815164924.6312eb47@kernel.org>
-In-Reply-To: <CAOMdWSLEWzdzSEzZqhZAMqfG7OtpLPeFGMuUVn1eYt1Pc_YhRA@mail.gmail.com>
-References: <20240730183403.4176544-1-allen.lkml@gmail.com>
-	<20240730183403.4176544-6-allen.lkml@gmail.com>
-	<20240731190829.50da925d@kernel.org>
-	<CAOMdWS+HJfjDpQX1yE+2O3nb1qAkQJC_GSiCjrrAJVrRB5r_rg@mail.gmail.com>
-	<20240801175756.71753263@kernel.org>
-	<CAOMdWSKRFXFdi4SF20LH528KcXtxD+OL=HzSh9Gzqy9HCqkUGw@mail.gmail.com>
-	<20240805123946.015b383f@kernel.org>
-	<CAOMdWS+=5OVmtez1NPjHTMbYy9br8ciRy8nmsnaFguTKJQiD9g@mail.gmail.com>
-	<20240807073752.01bce1d2@kernel.org>
-	<CAOMdWSJF3L+bj-f5yz5BULTHR1rsCV-rr_MK0bobpKgRwuM9kA@mail.gmail.com>
-	<20240809203606.69010c5b@kernel.org>
-	<CAOMdWSLEWzdzSEzZqhZAMqfG7OtpLPeFGMuUVn1eYt1Pc_YhRA@mail.gmail.com>
+To: Moon Yeounsu <yyyynoom@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: dlink: replace deprecated macro
+Message-ID: <20240815172916.555a992a@kernel.org>
+In-Reply-To: <20240810141502.175877-1-yyyynoom@gmail.com>
+References: <20240810141502.175877-1-yyyynoom@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,24 +59,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 Aug 2024 09:45:43 -0700 Allen wrote:
-> > Hm. Let me give you an example of what I was hoping to see for this
-> > patch (in addition to your explanation of the API difference):
-> >
-> >  The conversion for oct_priv->droq_bh_work should be safe. While
-> >  the work is per adapter, the callback (octeon_droq_bh()) walks all
-> >  queues, and for each queue checks whether the oct->io_qmask.oq mask
-> >  has a bit set. In case of spurious scheduling of the work - none of
-> >  the bits should be set, making the callback a noop.  
+On Sat, 10 Aug 2024 23:15:02 +0900 Moon Yeounsu wrote:
+> Macro `SIMPLE_DEV_PM_OPS()` is deprecated.
+> This patch replaces `SIMPLE_DEV_PM_OPS()` with
+> `DEFINE_SIMPLE_DEV_PM_OPS()` currently used.
 > 
-> Thank you. Really appreciate your patience and help.
-> 
-> Would you prefer a new series/or update this patch with this
-> additional info and resend it.
+> Expanded results are the same since remaining
+> member is initialized as zero (NULL):
 
-Just thinking from the perspective of getting the conversions merged,
-could you send out the drivers/net/ethernet conversions which don't
-include use of enable_and_queue_work() first? Those should be quick 
-to review and marge. And then separately if you could send the rest 
-with updated commit messages for each case that would be splendid
+FTR this has been merged, commit 2984e69a24af ("net: ethernet: dlink:
+replace deprecated macro") in net-next. Thank you!
 
