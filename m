@@ -1,113 +1,193 @@
-Return-Path: <netdev+bounces-119206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20600954BC8
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:05:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D508A954BD7
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 16:07:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C93C61F20CFE
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:05:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 615291F24E68
+	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 14:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AFB1C7B93;
-	Fri, 16 Aug 2024 14:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461851BC08C;
+	Fri, 16 Aug 2024 14:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARL1sMzl"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78E31C7B6A
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 14:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BC11A7056;
+	Fri, 16 Aug 2024 14:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723816836; cv=none; b=VyzyLvCMMKRgFEOybNr5emRfvxUY0sr6IFr45sUJu4GJa9D44TS1Rzs+TYwxLvDyVFpTm22oENEFl8HKri+tb4qu1yQ9OU2/ayEQUn5j9E47nELOrV8UGWaS6uveS1Inz7r02npgxisHCxaCUfMLkglukKB5d6Rx5qjMvTxa9lg=
+	t=1723816979; cv=none; b=FnQ9QtrPg8WU3M772bD3GOKjsV1aNtcs+mjRYokIq8XXYn+jgO+U6fR4Z7U6hbJIMcNHZZBRckW8GOARxxxTj73C9sX9QmeMzwBMoh/O34EruwHnm5o+jCiRsS4wttcbXK5zo1AYp8nZKLStRutpmVEWYnS1QNJmrmwEPP+RX5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723816836; c=relaxed/simple;
-	bh=B2Q56HcNvOwAj4yHGR6co+HRtqtoSxh8NLyaHruwZqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T3w9WJsM7XXRVWcfQqvU8fb+lg404IblxE5M7xdfkh3nfdC3TQn8IT91heRKT9AXdS8VzMGSDkeQz0Jos3EnUMYU+WUMHySDueu86M71ofPcc9FyFkw4zLbCsPCOfzyNfgi/w2TLeU2hRSo/uyin4WMSlX0nsHbxmzBgtvdaeHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sexV7-0000Gb-Lu; Fri, 16 Aug 2024 16:00:21 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sexV6-000qmc-CH; Fri, 16 Aug 2024 16:00:20 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sexV6-006J54-0r;
-	Fri, 16 Aug 2024 16:00:20 +0200
-Date: Fri, 16 Aug 2024 16:00:20 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] phy: dp83td510: Utilize ALCD for cable
- length measurement when link is active
-Message-ID: <Zr9bdJEG3sEdC6BI@pengutronix.de>
-References: <20240816105155.1850795-1-o.rempel@pengutronix.de>
- <f026cabc-76d3-474c-90a1-47c355a7d673@lunn.ch>
+	s=arc-20240116; t=1723816979; c=relaxed/simple;
+	bh=civKtibueFv97E1vQ2Yeb0wp4VVwG77dLophLcs3yLk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iU/zMshaYVH1pAttuoFqATdTwTa0JQMm5yfTkmN1V8wR4DrXayGoFIfWG7+sNIlN7357oUr6y4CmlBXqiOXzpfSt8sNPpGUTM2fphvq68lCBLRiWX8mTpHzXLSTR86Tt145bh0iUsZgXIIatDGEc1M9N3R+G0HG95eX8aBmbtfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARL1sMzl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117B3C32782;
+	Fri, 16 Aug 2024 14:02:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723816978;
+	bh=civKtibueFv97E1vQ2Yeb0wp4VVwG77dLophLcs3yLk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ARL1sMzlMT2Pt/X5HJ17Ktoi0lB+eR3+jd8c2pj02MQeYSW7gn/AS6Uig3FYdsBfz
+	 aFRDI2qZgQiF5bLWNs/OFNSAqUtz8eIKVdcLnOReag5nFpxLjb8M/OdpX0H4qgPii+
+	 1K6sZ/IOIeUhziLkK997BKxjTmtO9d0yh38qhkXK4fGd8mipW2Nq03mPQ21Zanw7FC
+	 hZupONgGd95+lxoPmKS8Y1zLbrk9EYGXai2B44fjU+NMMQCWYFx1ewPWqS+2rZJNLe
+	 LjbDYvLxjH9W5C/LnlirYeBlvykFdykEu/gxtlK+dHLPN9ntWSfbyWG4UzLAWgv5E9
+	 Lo1HmSO5z3R4A==
+Message-ID: <cd9473bb-36d5-4b62-8523-f9112dc176f2@kernel.org>
+Date: Fri, 16 Aug 2024 16:02:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f026cabc-76d3-474c-90a1-47c355a7d673@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v4] net: netconsole: selftests: Create a new
+ netconsole selftest
+Content-Language: en-GB
+To: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ liuhangbin@gmail.com, petrm@nvidia.com, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+ David Wei <dw@davidwei.uk>, open list <linux-kernel@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20240816132450.346744-1-leitao@debian.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240816132450.346744-1-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 16, 2024 at 03:10:35PM +0200, Andrew Lunn wrote:
-> > The DP83TD510 PHY provides an alternative through ALCD (Active Link
-> > Cable Diagnostics), which allows for cable length measurement without
-> > disrupting an active link. Since a live link indicates no short or open
-> > cable states, ALCD can be used effectively to gather cable length
-> > information.
+Hi Breno,
+
+On 16/08/2024 15:24, Breno Leitao wrote:
+> Adds a selftest that creates two virtual interfaces, assigns one to a
+> new namespace, and assigns IP addresses to both.
 > 
-> Is this specific to TI?
+> It listens on the destination interface using socat and configures a
+> dynamic target on netconsole, pointing to the destination IP address.
+> 
+> The test then checks if the message was received properly on the
+> destination interface.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+> Changelog:
+> 
+> v4:
+>  * Avoid sleeping in waiting for sockets and files (Matthieu Baerts)
+>  * Some other improvements (Matthieu Baerts)
+>  * Add configfs as a dependency (Jakub)
 
-It seems to be, yes. I assume they are using echo cancellation values or
-some thing like this.
+Thank you for the new version!
 
-> Did you compare ALCD to TDR length measurement? Are they about the
-> same?
+It looks good to me, but again, my review mainly focused on the
+Bash-related stuff, not on the netconsole test itself.
 
-Default ALCD values are about 20meters off. Which seems to be ok for
-1000meter cable. TI describes calibration procedure for ALCD to provide
-better measurements, but so far it was good enough. The problem with
-this calibration is: it seems to be different for different cables, so
-it make no sense to integrate it in kernel.
+I just have one question below, but not blocking.
 
-> I'm just thinking about if we want to include an additional
-> attribute in ethnl_cable_test_fault_length() to indicate how the
-> measurement was performed.
+(...)
 
-Sounds good. In this case user space will be able to know how to correct
-this values.
+> diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
+> new file mode 100755
+> index 000000000000..5c3686af1fe8
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
+> @@ -0,0 +1,249 @@
 
-Regards,
-Oleksij
+(...)
+
+> +check_file_size() {
+> +	local file="$1"
+> +
+> +	if [[ ! -f "$file" ]]; then
+> +		# File might not exist yet
+> +		return 1
+> +	fi
+> +
+> +	# Get file size
+> +	local size=$(stat -c %s "$file" 2>/dev/null)
+> +	# Check if stat command succeeded
+> +	if [[ $? -ne 0 ]]; then
+> +		return 1
+> +	fi
+> +
+> +	# Check if size is greater than zero
+> +	if [[ "$size" -gt 0 ]]; then
+> +		return 0  # file size > 0
+> +	else
+> +		return 1  # file size == 0
+> +	fi
+> +}
+
+(...)
+
+> +# Wait until socat saves the file to disk
+> +busywait "${BUSYWAIT_TIMEOUT}" check_file_size "${OUTPUT_FILE}"
+
+It looks like your 'check_file_size' helper is a reimplementation of
+'test -s <FILE>', no? Can you not simply use:
+
+  busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
+
+Apart from that, the rest looks good to me!
+
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Cheers,
+Matt
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Sponsored by the NGI0 Core fund.
+
 
