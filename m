@@ -1,158 +1,104 @@
-Return-Path: <netdev+bounces-119406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ABC49557BF
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 14:12:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD169557D3
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 14:39:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 844061C20DF0
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 12:12:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB7BF1C21109
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 12:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B3A1494D4;
-	Sat, 17 Aug 2024 12:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF6D14A4D9;
+	Sat, 17 Aug 2024 12:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="N7bs9hsR"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="FB8a73Q8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5298D145A1B
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 12:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9963A145FEB;
+	Sat, 17 Aug 2024 12:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723896726; cv=none; b=DHeMX6T165qfrkyZIaaA1wlpsNdN/3bb/2LkkNiLGbPlyKP5bwPmNQ1e/uMOLJ66sXBziF7gqNLX8Iw9CZHM5Y1TYce2i8etH9hMbuHO0XQJwKmYIYYnS2DqelrPD09igVvMko1jvZLtJ9U0LM3QQ6In2/fUWWgt8cuhOQbhdnU=
+	t=1723898380; cv=none; b=Ik+ldk5rUGyGV9HKKtAW8cc9Vb3Rr5S10d+rDEQKu387wJdnEe4Q85r2ksqz+E5T5FgbGdYoGrFZty2mKfzmE+YzczeXitVeHH+a7R9HGEgsB0AB+5erfg7UTWIf5/RZXl5w4ExEpXm68aspov5knJ7d6ALC/Lb3nDgToWoF6dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723896726; c=relaxed/simple;
-	bh=RpgsAJAKFLfvyQysO6pzJImVx4sx5Xm8ekUEp6z2kog=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RLSf4YR9blvzgC6w0MhxfxwBuyJzbz3dHE0mCEO5ZePCp/4gxBdR0EvEkY7v6TZHhMX2ICopLqFjn+BAjfqvl/aHG9xJ0RA9n2qs9HWVJbiRPPcb97tZU0C429DOunsPRhW3AFnuX474UrkWGdBPGJ3j+s+ndkyO4bfkdIoWioQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=N7bs9hsR; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-690e9001e01so27529967b3.3
-        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 05:12:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1723896723; x=1724501523; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4wa15Z2LS6tAGOhDHWkITGTtarUTEFItcjftQAV0dfE=;
-        b=N7bs9hsRvLs2Wl+lS0uswhhib6MvLOzAUlBl49oKN6BitB6po/BiFZe+STOj3/NnUe
-         1qB0h6v67NCvfZ3qQ/6A8OhgsKvX47XhQPDKlhQ2arzVKeZ+ClWn3CmCozhpz4/Cvn1B
-         3+9TUsM9BYIidsl0Wd78eUYX2/VeSbmbpptIjYH1r2ZJHMy/htgpg4rB8EsVaqL5MUc+
-         OlA95x0nuGkCY1S7IGyokaMCS4uGhPwFo3aF9FqANR6vMpiH6fDkbbvAXCpqTCqzINCO
-         9SOGHv8COu22NRi8+aVD62MI22wKoQjitXweUtVVejU8e93uibz57R6/vlc+H9ZCJbaB
-         rEfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723896723; x=1724501523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4wa15Z2LS6tAGOhDHWkITGTtarUTEFItcjftQAV0dfE=;
-        b=SHNHDRf2tdjzxPqAbHoXJCw2E+2HtIsf6u4Id1jYWa8uL2M5NY1P2CnCJFL66GGSLS
-         XB2BTEEakJGLd29xMgszNU/whs+IqdL3mknpxzDmv/+qRs5O87NN6tQqXTdwLD/MGp18
-         iqcYI0BIlBxDZfvK59kMNF9vHrFvBkFR0ULra07DtSUVq+y0W6g5GLqDUfw6ch0XPMmI
-         AYo+Q0z2fuh1GjgsYYh2muFCTktFkOhqj0NyMhzFE5j3FCqwOoBpdMPHIwQ4XG8jHpBw
-         YkKCV5MGQtPS/g78nFEWiuwXykYsyJfGueIRl0bMhGYt+K6Ovqr5oR3lxg2K/gewZvej
-         2C8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWgSKYXbwuZxEVwMZ432AHl9IdKQJvdIjpUyKjM9mnsDNNoBinRlfjrOznhm90SVv9MGRH6JrSLklw9At4tSHVaZDJLT1Cy
-X-Gm-Message-State: AOJu0YzSDSDxifDTrNpRIJ1XcxHTn3uoxRDgsJrumBhN22CvSJ5lCIGM
-	HKR/RVMlBWgy5Zv8aZiCoFpNns2O/vfUrkVNI3N10GWRBI5j6onNLam85one/cYEjYu/hqaxNKt
-	u04wn/22YvceCCyEv4v/bDNQnGYXZsGn2BgobfesSz62PuUOXz5MF
-X-Google-Smtp-Source: AGHT+IG1tZW2T9lJLSEufhGDgCb6dKP1KdXiuyUdzky3pB3O1PYH5F8Ejzr1CdkPIHVV4tORBJ8IFxBNeSG+QW4IZFo=
-X-Received: by 2002:a05:690c:688d:b0:6af:719e:cbb0 with SMTP id
- 00721157ae682-6b1bdb215f2mr60967087b3.36.1723896723217; Sat, 17 Aug 2024
- 05:12:03 -0700 (PDT)
+	s=arc-20240116; t=1723898380; c=relaxed/simple;
+	bh=yb1MC3sZ0+bn1v4KeNzIeMZUq/Bsl19ztRJ3on5qf2s=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=O39F3BaPT1PjWZuon+ssV97yUCgaTo8/FeZeKiqOEZgJi116iQCTHF8Fb4lMwIQTxHKvVE2lWcZJFxIC1aBjX7R6BF7MoywEoW2oYM3SziCIuw56+WP2EIlAGcid/vrbRiNBzxSHrMolcVofCuVfwlEeNgyb+2cFHEcDshgaeG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=FB8a73Q8; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1723898343; x=1724503143; i=markus.elfring@web.de;
+	bh=ICf7bpj+6uOFRWx1JCGajxQBSh+2HY/zNayuuHrMFdk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=FB8a73Q8hd1x8CsNhgMzL3OtYSyns5C8vkIsmOU8OhjTo6Dv6trfRpYRDbq4EmJu
+	 0DvTSdDrhA0UZaGSigsumGvy4oV9m5LkI80KN7isLO7Q+FsnkiXW7MvCpaYos3+SL
+	 9+LkG/S0zaGNhZS815Vxdg53A3qq4Jc3x80Iqge7Ktz5gXq8F52nUDvcjNdjBBj9o
+	 GtwEKwPfumSKVKWUBZa443v5m69pJ27dUIgz4dWZfgVUp0+BG5cJi1uO6cFVCmyBK
+	 nbLK6PXBlsbdBppxRrtJGrxKkqx8eHxz2bYcjj2ZCbjJxo9WGGvgXt1lK39+Ew4/Z
+	 lqpY5mxbg8dp8yUQ4Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MWQyX-1se0J21YjL-00HpcF; Sat, 17
+ Aug 2024 14:39:03 +0200
+Message-ID: <5fb96c5d-aac0-4cb6-8a1b-8d13990b05e6@web.de>
+Date: Sat, 17 Aug 2024 14:38:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816015355.688153-1-alex000young@gmail.com>
- <CAM0EoMmAcgbQWG7kQoe335079Y2UY_BmoYErL=44-itJ=p-B-Q@mail.gmail.com>
- <CAM0EoM=qvBxXS_1eheyhCKbNMRbK_qTTFMa1fFBFQp_hRbzpQQ@mail.gmail.com>
- <CAFC++j15p9Ey3qc4ZsY4CXBsL3LHn7TsFTi6=N9=H+_Yx_k=+Q@mail.gmail.com> <2024081722-reflex-reverend-4916@gregkh>
-In-Reply-To: <2024081722-reflex-reverend-4916@gregkh>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 17 Aug 2024 08:11:50 -0400
-Message-ID: <CAM0EoMmUSGEY_wGHmZJkP5s=sr0zPJ2sOyTf3Uy6P3pN8XmvhA@mail.gmail.com>
-Subject: Re: [PATCH] net: sched: use-after-free in tcf_action_destroy
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Alex Young <alex000young@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, security@kernel.org, xkaneiki@gmail.com, 
-	hackerzheng666@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: Frank Sae <Frank.Sae@motor-comm.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: LKML <linux-kernel@vger.kernel.org>, Hua Sun <hua.sun@motor-comm.com>,
+ Jie Han <jie.han@motor-comm.com>, Suting Hu <suting.hu@motor-comm.com>,
+ Xiaoyong Li <xiaoyong.li@motor-comm.com>,
+ Yuanlai Cui <yuanlai.cui@motor-comm.com>
+References: <20240816060955.47076-1-Frank.Sae@motor-comm.com>
+Subject: Re: [PATCH net-next v2 0/2] Add driver for Motorcomm yt8821 2.5G
+ ethernet phy
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240816060955.47076-1-Frank.Sae@motor-comm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:d5v5anlRpvsE7RK8ekGSmQo54K/g++GqAOQcA6rKXx6TUGqK5cD
+ ynCVfYyDJEZoiKRIlz9eOFj2KeqcZUsimU5252Ri63r8bWmpXOHUiAIglmBSoH+xwy/1es7
+ Fc1F7eCsPUUppBPQ4Vfq1l47RB4jGcl99J25EpdJFIJn73gKHt7UehHMruDoo5q5A+ea7iT
+ J90yc6CpfmOr4KO4q00Dg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:63GSw9z2n44=;ADBvyoDFe2U9JPPYdKpmAvxmmEm
+ U4Wk6hnVUxWhmRYxe1CKN3DcVFtvmGORm0U9SnYcanDBPF7kReVmUYZVwKqvZ49FaWFWSTLpf
+ fvP6IodIVKtKIL98cTK/ZWM4oCZGfOsTqKkLzKOHnhikNSurois0gMW5aPV/QPOucPPvMTnny
+ oIPE8mRGTCImri+aXdmVJgk2jBoKXwj4cZ93B+nC1huvXARiaiVtRFIraHRY7Zrp89DqWTBb2
+ J2xp37cpDd5aJjwweOFZGFv4bVNLv0ePLyp50442eRbqQHPBiJ5m95EtZISglPFQstQlFIpkT
+ hMwFjYz8IKEbQa8XOP0XO9BVoJcjPG1sUBnAoHryAawe88KYYKKvavGFUrWtvHknuuE+ToK3v
+ bQNcK7aLNyp9/oZRvXj8OTXfFsgMuqs01vQj/ZHAObFgW2BIUVonK7zHkzx+/81fajddzu/ha
+ Co8qa4bTBHyfZ3s8wdIgc5DSlKXZeR8tBPNnnWWhcP7Ij09WnMBxPeHMKlvB0JSU7tGbUn65N
+ WHLfTXKysV/yo2uYQIpQJaQTRiSDzRind+I39+qAkGBwNgZFAtMGeUQHgz+EgWoT1w38EzfbJ
+ Ko/moXYqxFjtKTI8pIgMdb/wxE61DvPbhHVXTY1vSWRo/3FA5yI7WWBwsR5BlkcdSWxy9nRuz
+ Ij469y3MYRs4K/C1bPOXbVc+EG1hgyRaWLdSn8uX/Q9yAxN4ELB+dyqjnVQiEy8gHRPGMkpy0
+ HA20He0kCEk0z6Y/foOTB2UCIyWhk66N22qPeUSVwwAh0KExzIKlncdZ0d2SuY06QsViQQhGG
+ ZJLzCXOpSo/CDI+xoJaVV+NQ==
 
-On Sat, Aug 17, 2024 at 5:35=E2=80=AFAM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Sat, Aug 17, 2024 at 05:27:17PM +0800, Alex Young wrote:
-> > Hi Jamal,
-> >
-> > Thanks your mention. I have reviewed the latest kernel code.
-> > I understand why these two tc function threads can enter the kernel at =
-the same
-> > time. It's because the request_module[2] function in tcf_action_init_1.=
- When the
-> > tc_action_init_1 function to add a new action, it will load the action
-> > module. It will
-> > call rtnl_unlock to let the Thread2 into the kernel space.
-> >
-> > Thread1                                                 Thread2
-> > rtnetlink_rcv_msg                                   rtnetlink_rcv_msg
-> >  rtnl_lock();
-> >  tcf_action_init
-> >   for(i;i<TCA_ACT_MAX_PRIO;i++)
-> >    act=3Dtcf_action_init_1 //[1]
-> >         if (rtnl_held)
-> >            rtnl_unlock(); //[2]
-> >         request_module("act_%s", act_name);
-> >
-> >                                                                 tcf_del=
-_walker
-> >
-> > idr_for_each_entry_ul(idr,p,id)
-> >
-> > __tcf_idr_release(p,false,true)
-> >
-> >  free_tcf(p) //[3]
-> > if (rtnl_held)
-> > rtnl_lock();
-> >
-> >    if(IS_ERR(act))
-> >     goto err
-> >    actions[i] =3D act
-> >
-> >   err:
-> >    tcf_action_destroy
-> >     a=3Dactions[i]
-> >     ops =3D a->ops //[4]
-> > I know this time window is small, but it can indeed cause the bug. And
-> > in the latest
-> > kernel, it have fixed the bug. But version 4.19.x is still a
-> > maintenance version.
->
-> 4.19.y is only going to be alive for 4 more months, and anyone still
-> using it now really should have their plans to move off of it finished
-> already (or almost finished.)
->
-> If this is a request_module issue, and you care about 4.19.y kernels,
-> just add that module to the modprobe exclude list in userspace which
-> will prevent it from being loaded automatically.  Or load it at boot
-> time.
->
-> And what specific commit resolved this issue in the older kernels?  Have
-> you attempted to just backport that change to 4.19.y?
->
+> yt8521 and yt8531s as Gigabit transiver use bit15:14(bit9 reserved defau=
+lt
+=E2=80=A6
 
-And if you or anyone cares, here it is:
-d349f997686887906b1183b5be96933c5452362a
+                                transceiver?
 
-cheers,
-jamal
+Regards,
+Markus
 
