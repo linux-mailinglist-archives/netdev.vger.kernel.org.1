@@ -1,191 +1,177 @@
-Return-Path: <netdev+bounces-119401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9664B955776
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 13:33:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE4795577A
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 13:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06040B2157C
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:33:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1151F21403
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B4B148855;
-	Sat, 17 Aug 2024 11:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C603614BFB0;
+	Sat, 17 Aug 2024 11:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="El0UzOc4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qKhT/DkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C211F83CDA;
-	Sat, 17 Aug 2024 11:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066FA1487E3;
+	Sat, 17 Aug 2024 11:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723894404; cv=none; b=VhvVyRB5EzyDAKfAAd++gHcZGe171BtJY2pmv3MqwQn4SBiWWGbEcWt1bY0Rjw+OD4YAAo9uPuE4Kja4AFTqPG5QPIJrtIXf+dTnwAtNedkI8MSkJ4S6k5603Ku3b74JsGn/qcOxDJHFSSkxL1l6pXF5n29l7TxkxgRBe3ufzCM=
+	t=1723894601; cv=none; b=dfftjKMn6A159rw6C+ZKJn3RPTXc47ZwN4IER3eFc8zleCLrDqc5NRgjNeTFoL3hFCxeUjpjckNtOlYywPhFxcH2dJtNYD/Vq+NUizBKbIRRSp/EnLdCn/CzarkOJLY00AZncsNF+HaeX52NrSxatPQmDS05k1C/AupTZ6ulBcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723894404; c=relaxed/simple;
-	bh=COftzJgG/EMMoQ2fnKwJOfvLWndf1mS/oh2j7AeVKig=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XMVv4CkroF+majjoO+jUgVrGtiAxxSf2azoxYZATesneaaT/rNIrtL7NgpbGm7+MQ7ICKjV+WrMoWIsDF5ofLYRfx43oxw3rXQqCuTwUBIS10i7NjIa2w8UOYg4/xlAwzraBPEW6R5wSJLLhEDrQZ/dznCvUopDkHvj0u5xBdbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=El0UzOc4; arc=none smtp.client-ip=209.85.219.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e115c8aa51fso2762364276.1;
-        Sat, 17 Aug 2024 04:33:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723894402; x=1724499202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SESKwucFxjDdZ8FkRu+VMQPyl3jzoCLi6zR1M+QPMa0=;
-        b=El0UzOc4Fw9JUF4e10sKIDrMAl64g/zwjVz7Iw6wkYqI2m2g6RHtpWhqs9Fph+F0os
-         SgTiR4wKCzwvxVowcSDcr5bo+OIEdMhL2mn0lnY6aDaZrVz8L/+EtfuSG/jdDx4NRx1p
-         8HsBKdeonh23JYPcfqtwRvIgGx2ZtsaUDElhE6J3zt8YwJQBDOZ10IGRgn16bBT3aoHu
-         aCHK3DwQ4NphzDp32oIaDGV3V3UcQr44jx/UtVqDlHGL9YcN2DX2xKI6AaWjhU4cmpxX
-         uik+J5IxUWXnxZsZ1wq/28gbKKsw3a1EMHpd3MHdDmmnwQItBtDdpXpj0sqjyKUgD4ni
-         ZgjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723894402; x=1724499202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SESKwucFxjDdZ8FkRu+VMQPyl3jzoCLi6zR1M+QPMa0=;
-        b=wI9kR+o30E+zy2NJXgS3QEE4Sh9Vs8LU/rqHWQsS3aSTT7PL5lIkmjY3Rm+2qEj7J/
-         ISJyyCH0f7tKXGNu9Lr/7UZ2Lqp6WlfdQTOTP/mJeUMkK1D2tW8l0jEDrWZKTGVE3r+L
-         rf4A0DNamlIN3ynSqKw2aiAVhfMHU/tXn9Ipa2H2wBW5mW6Pv5nfrOK0wpe8TFJbq2sI
-         5R4fXlsok65GS+E/0Ko5mmC7Z+r2oMy8WkEg7LFIa9Nk4ktt3FbJrdD+2sCjvAbDspfJ
-         fvfrMq/YDCl7JG2AKoUD1AjpwESOSqYpGnlb9K7VjUi+b0EFztDJKlYkfIo3SWv68FHm
-         G6Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXd28ELPL1s6wBeE3/rEPY4VDEt6ZcXkzcD7g9M90GYd2nI2auswW/+cdDRZEvfJoI3uXpPGk5WrNUKooXgHdNRqPnxBItZaUv2/b906CPSInGAZXJ1gaXTY/UItCRvgwuOGErt
-X-Gm-Message-State: AOJu0YzCg+VDxQ4v3fVMIYonKj0kNm6z62wSQ3CwpOBO17xxgYUAs+74
-	Qq6sYKi8t8WxQYu5w7cpEtC8RAZ8vksBzhwKUsWUznYffDH/wIfsJsEME3MoF2Bsm8KHfGJS4wD
-	0hoEDtpFOzsuyvtemQEEbva8iB7g=
-X-Google-Smtp-Source: AGHT+IEWZk1oHXltyZ1g79/emSVqRf5qSTKVkqIEaYhWNNk4GjD5HhRUVElse+KO330nH/ASwpW7c49M3bSmPGvsu4M=
-X-Received: by 2002:a05:6902:e12:b0:e13:ddd5:c6d4 with SMTP id
- 3f1490d57ef6-e13ddd5ea77mr531236276.38.1723894401550; Sat, 17 Aug 2024
- 04:33:21 -0700 (PDT)
+	s=arc-20240116; t=1723894601; c=relaxed/simple;
+	bh=FoXN34tCCnY5LpfkOruPe2wZCn8mbJnZQrAuXAAbunw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYCdtV9s8KzIrwCKbTbHpmbT/e0DLuVR6AEz2kMT0QDj7Zpq69TMgtS8q5mk78qBJ90r9DCT/IjOuKc3NtGc8JSRpS4HULHjvzsYlkaKuvTHI1j9W0+AgggE/dBG9r1JG2L8/Q2B97akA9MDidM5QbezPCA+d11+jZE+vHyZCj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qKhT/DkC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xIYM1b3GKgy5NSFhjv/KLy3Bp9KYexM4qTA6DMc+TkM=; b=qKhT/DkC8HXg8Uw6l8SEH+bzka
+	qw9pjtw3q0umgIEifX4qda243SK+kIRg75PtJFuBk0zvvp8oiLSSwGSIf0WfrX/WYxT3n4YR4LIUv
+	kdG1unk7f6vw/HbAqGWrDUQazxrqHwdQuVIkU8hL+wuR/hLi9EkFsT9w0oYEbBCTY6KancVLmUF0j
+	INspdQYdo2JVxwSUK+AUPpWgPemppA2gdoiGB4XxstKb/cY7v9DogvhOn8L3SlMRDXIn7/GF4ctru
+	30+LVTJDbda4gwPA/eDs+tSw6PYJBUuCLEg08JcXbXL/VCAhKqGlr2DvzYyUC2s/KbK7ho/0vSvHP
+	bQ2hjU7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55714)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sfHjD-0006oj-1P;
+	Sat, 17 Aug 2024 12:36:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sfHjF-00055c-GW; Sat, 17 Aug 2024 12:36:17 +0100
+Date: Sat, 17 Aug 2024 12:36:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Frank Sae <Frank.Sae@motor-comm.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+	xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com,
+	jie.han@motor-comm.com
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add driver for Motorcomm
+ yt8821 2.5G ethernet phy
+Message-ID: <ZsCLMQWoZcVV+7xR@shell.armlinux.org.uk>
+References: <20240816060955.47076-1-Frank.Sae@motor-comm.com>
+ <20240816060955.47076-3-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
- <20240815124302.982711-7-dongml2@chinatelecom.cn> <20240816192243.050d0b1f@kernel.org>
-In-Reply-To: <20240816192243.050d0b1f@kernel.org>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Sat, 17 Aug 2024 19:33:23 +0800
-Message-ID: <CADxym3ZEvUYwfvh2O5M+aYmLSMe_eZ8n=X_qBj8DiN8hh2OkaQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/10] net: vxlan: add skb drop reasons to vxlan_rcv()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, dongml2@chinatelecom.cn, idosch@nvidia.com, 
-	amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com, 
-	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240816060955.47076-3-Frank.Sae@motor-comm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Aug 17, 2024 at 10:22=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Thu, 15 Aug 2024 20:42:58 +0800 Menglong Dong wrote:
-> >  #define VXLAN_DROP_REASONS(R)                        \
-> > +     R(VXLAN_DROP_FLAGS)                     \
-> > +     R(VXLAN_DROP_VNI)                       \
-> > +     R(VXLAN_DROP_MAC)                       \
->
-> Drop reasons should be documented.
+On Thu, Aug 15, 2024 at 11:09:55PM -0700, Frank Sae wrote:
+> +static int yt8821_get_rate_matching(struct phy_device *phydev,
+> +				    phy_interface_t iface)
+> +{
+> +	int val;
+> +
+> +	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	if (FIELD_GET(YT8521_CCR_MODE_SEL_MASK, val) ==
+> +	    YT8821_CHIP_MODE_FORCE_BX2500)
+> +		return RATE_MATCH_PAUSE;
 
-Yeah, I wrote the code here just like what we did in
-net/openvswitch/drop.h, which makes the definition of
-enum ovs_drop_reason a call of VXLAN_DROP_REASONS().
+Does this device do rate matching for _any_ interface mode if it has
+this bit set - because that's what you're saying here by not testing
+"iface". From what I understand from your previous posting which
+included a DT update, this only applies when 2500base-X is being
+used as the interface mode.
 
-I think that we can define the enum ovs_drop_reason just like
-what we do in include/net/dropreason-core.h, which can make
-it easier to document the reasons.
+> +static int yt8821_aneg_done(struct phy_device *phydev)
+> +{
+> +	int link;
+> +
+> +	link = yt8521_aneg_done_paged(phydev, YT8521_RSSR_UTP_SPACE);
+> +
+> +	return link;
+> +}
 
-> I don't think name of a header field is a great fit for a reason.
->
+Why not just:
 
-Enn...Do you mean the "VXLAN_DROP_" prefix?
+	return yt8521_aneg_done_paged(phydev, YT8521_RSSR_UTP_SPACE);
 
-> >       /* deliberate comment for trailing \ */
-> >
-> >  enum vxlan_drop_reason {
-> > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_c=
-ore.c
-> > index e971c4785962..9a61f04bb95d 100644
-> > --- a/drivers/net/vxlan/vxlan_core.c
-> > +++ b/drivers/net/vxlan/vxlan_core.c
-> > @@ -1668,6 +1668,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_so=
-ck *vs, void *oiph,
-> >  /* Callback from net/ipv4/udp.c to receive packets */
-> >  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
-> >  {
-> > +     enum skb_drop_reason reason =3D pskb_may_pull_reason(skb, VXLAN_H=
-LEN);
->
-> Do not call complex functions inline as variable init..
+?
 
-Okay!
+> +/**
+> + * yt8821_config_init() - phy initializatioin
+> + * @phydev: a pointer to a &struct phy_device
+> + *
+> + * Returns: 0 or negative errno code
+> + */
+> +static int yt8821_config_init(struct phy_device *phydev)
+> +{
+> +	u8 mode = YT8821_CHIP_MODE_AUTO_BX2500_SGMII;
+> +	int ret;
+> +	u16 set;
+> +
+> +	if (phydev->interface == PHY_INTERFACE_MODE_2500BASEX)
+> +		mode = YT8821_CHIP_MODE_FORCE_BX2500;
 
->
-> >       struct vxlan_vni_node *vninode =3D NULL;
-> >       struct vxlan_dev *vxlan;
-> >       struct vxlan_sock *vs;
-> > @@ -1681,7 +1682,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_b=
-uff *skb)
-> >       int nh;
-> >
-> >       /* Need UDP and VXLAN header to be present */
-> > -     if (!pskb_may_pull(skb, VXLAN_HLEN))
-> > +     if (reason !=3D SKB_NOT_DROPPED_YET)
->
-> please don't compare against "not dropped yet", just:
->
+Hmm, I think this is tying us into situations we don't want. What if the
+host supports 2500base-X and SGMII, but does not support pause (for
+example, Marvell PP2 based hosts.) In that situation, we don't want to
+lock-in to using pause based rate adaption, which I fear will become
+a behaviour that would be risky to change later on.
 
-Okay!
+> +
+> +	set = FIELD_PREP(YT8521_CCR_MODE_SEL_MASK, mode);
+> +	ret = ytphy_modify_ext_with_lock(phydev,
+> +					 YT8521_CHIP_CONFIG_REG,
+> +					 YT8521_CCR_MODE_SEL_MASK,
+> +					 set);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (mode == YT8821_CHIP_MODE_AUTO_BX2500_SGMII) {
+> +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			  phydev->possible_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+> +			  phydev->possible_interfaces);
+> +
+> +		phydev->rate_matching = RATE_MATCH_NONE;
+> +	} else if (mode == YT8821_CHIP_MODE_FORCE_BX2500) {
 
->         if (reason)
->
-> > @@ -1815,8 +1831,9 @@ static int vxlan_rcv(struct sock *sk, struct sk_b=
-uff *skb)
-> >       return 0;
-> >
-> >  drop:
-> > +     SKB_DR_RESET(reason);
->
-> the name of this macro is very confusing, I don't think it should exist
-> in the first place. nothing should goto drop without initialing reason
->
+		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+			  phydev->possible_interfaces);
 
-It's for the case that we call a function which returns drop reasons.
-For example, the reason now is assigned from:
+so that phylink knows you're only going to be using a single interface
+mode. Even better, since this is always supported, move it out of these
+if() statements?
 
-  reason =3D pskb_may_pull_reason(skb, VXLAN_HLEN);
-  if (reason) goto drop;
 
-  xxxxxx
-  if (xx) goto drop;
+Also, it would be nice to have phydev->supported_interfaces populated
+(which has to be done when the PHY is probed) so that phylink knows
+before connecting with the PHY which interface modes are supported by
+the PHY. (Andrew - please can we make this a condition for any new PHYs
+supported by phylib in the future?)
 
-The reason now is SKB_NOT_DROPPED_YET when we "goto drop",
-as we don't set a drop reason here, which is unnecessary in some cases.
-And, we can't set the drop reason for every "drop" code path, can we?
-So, we need to check if the drop reason is SKB_NOT_DROPPED_YET
-when we call kfree_skb_reason().
+Note the point below in my signature.
 
-We use "SKB_DR_OR(drop_reason, NOT_SPECIFIED);" in tcp_v4_rcv()
-for this purpose. And we can remove SKB_DR_RESET and replace it
-with "SKB_DR_OR(drop_reason, NOT_SPECIFIED);" here if you think
-it's ok.
+-- 
+*** please note that I probably will only be occasionally responsive
+*** for an unknown period of time due to recent eye surgery making
+*** reading quite difficult.
 
-Thanks!
-Menglong Dong
-> >       /* Consume bad packet */
-> > -     kfree_skb(skb);
-> > +     kfree_skb_reason(skb, reason);
-> >       return 0;
-> >  }
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
