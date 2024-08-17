@@ -1,135 +1,129 @@
-Return-Path: <netdev+bounces-119398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA75895570B
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:57:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F006D955712
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 12:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53D49B20E94
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:57:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727DA1F21A40
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 10:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65E414883C;
-	Sat, 17 Aug 2024 09:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75894148FF9;
+	Sat, 17 Aug 2024 10:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b="bZFfWWfD";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Imv3ZnYa"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lv1S8Zby"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416512AF17;
-	Sat, 17 Aug 2024 09:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C52C7DA64
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 10:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723888643; cv=none; b=rXq4KAVn4+YA9P86Yde6yVpo1S3S7Rsk1j4+jlhZudxBBQVrye4MvWx4wdo/zhvRrdFnNFAaOrmFWpot1yKTGwy6Wq0HRJwPoQnTUMPIL5ki2O0lza220ur/4LtXka8LtVlKRMK5kvKNp6o5dFqOCHsBNncINorai3fGIVlVkFo=
+	t=1723888862; cv=none; b=OY/u7/82xdXT53rfjdY+cK8Z3UoOEiTeM+JPrd9uVusER7YiH0o8mcvNi00C29s6VxOxT8evsl5G/htZd2QuN/uME1fzTl0aBHHc/PJsLnEET0e0NIqSXTvmQMFOfg94gMnywCdlWjguFmRgWEffZ/F5lLWcbdn/73iBprqCj7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723888643; c=relaxed/simple;
-	bh=Gq5IKdEPeh2TkTrhizWAKJgB3fUPwD2pK/WZv+zSG2g=;
+	s=arc-20240116; t=1723888862; c=relaxed/simple;
+	bh=nDX73kmG43zD1h9uI+pb/oshet7B35SLo/HwmSmtjWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F3H9x+UoWFq71BLdhChcxYz52R5dvUdRg377mfFtdwRAXoOQezA3qNbdnOguZfaom5SV7PGSfKhcL+TrPLx+E8icnA9WIhDGZYKHg0SftPlN91X2XQ79sbbrnR1+zqEPiH5x4i0wHdSL6m/T25UrSLArs5pUb0Cu4jQ4uGy/EVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp; spf=pass smtp.mailfrom=sakamocchi.jp; dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b=bZFfWWfD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Imv3ZnYa; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sakamocchi.jp
-Received: from phl-compute-02.internal (phl-compute-02.nyi.internal [10.202.2.42])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 3C39C1151C0F;
-	Sat, 17 Aug 2024 05:57:20 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Sat, 17 Aug 2024 05:57:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sakamocchi.jp;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1723888640; x=
-	1723975040; bh=OKF032Y5YaEJsYf98SzFHHnezNjRg1rIhihP93Nchj8=; b=b
-	ZFfWWfDcBnv5lombjA1IJl0GfO4aEGdh62AvRsPn+F5NhzB4SV/DwAevomPXhK3m
-	wMpA7Ki3Rhrj3eHZ9e7DSz8HnyyYz72MocfNHY53RcElAyhZ720nhE9g94COi7sm
-	JXVWxjpC9Db62bpLvsmU1b5j/UHMg0X5j/pR3Xz+hvcdHPhnX4eK4IYSWI3MWc2D
-	LTj0t3F1rxMjXAmJNS5y6A+MZxeluYHtfG+SilC7tPI/9HIldaw1gKmpmymPE42Q
-	8ucr+cOdGECZ4wQqyeU3HorPmwJ7IqKQhQ8GlyF7j1GPxDKeXl2oFsAqw6rvrw/B
-	fsAYt2dQl+g3eEQVBE7Pg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1723888640; x=1723975040; bh=OKF032Y5YaEJsYf98SzFHHnezNjR
-	g1rIhihP93Nchj8=; b=Imv3ZnYaDANISjgAya4YvgZuWKfUAe8QJaDXtI+i7+ZR
-	9Ppha54V1JuAj0NsALq4HzQDDMixpECNZou7toTx/13imzTCBZt+mMt0khkmPjyP
-	zLBDmU8vJJiXSuBetGmlssats7CjY/qiGkTK4Z6ght3qzacDgs9VFPlHS1hKvnpM
-	yfeCjRPqT3dsJYsLbSokcfLhayzxNMtpYaaE47o4DTvaHyLOzNeDHYhLRTks6uhX
-	HdM8lSsA4tLSO6jzj8hIj6WHPyLn4NTFA8Z7xz1J/I9mvjBLa6JGLNhdX6D7bh2v
-	FZELGc8UJiy8VAvxZ6tjZbPNQuPd4p36yphhU6pdXQ==
-X-ME-Sender: <xms:_3PAZiQGiNzsBM-RkpaP63lz4084ytyOcE-u_NPdV4mRdsAAjw-LZg>
-    <xme:_3PAZnwRlUS990lxBydQsWK0IqIf-cVeok88fSmsICdxC27jpLLJX1Iii_PkOD3IO
-    BrF5QTZianhuL5-Ra4>
-X-ME-Received: <xmr:_3PAZv0x3r5FCBjkPrS9HRevmwZ4DsPX-KdGT-HTdwaltXPLBQYo97XZbvzWFU-gGL18BkOvmm55bLbwQNRzTcnILaF8qa-_d0s>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddutddgvdduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepvfgrkhgrshhhihcuufgrkhgrmhhothhouceoohdqthgrkhgrshhhihessh
-    grkhgrmhhotggthhhirdhjpheqnecuggftrfgrthhtvghrnhephefhhfettefgkedvieeu
-    ffevveeufedtlefhjeeiieetvdelfedtgfefuedukeeunecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomhepohdqthgrkhgrshhhihesshgrkhgrmhho
-    tggthhhirdhjphdpnhgspghrtghpthhtohepvddtpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopeiiihhjuhhnpghhuhesihgtlhhouhgurdgtohhmpdhrtghpthhtohepghhr
-    vghgkhhhsehlihhnuhigfhhouhhnuggrthhiohhnrdhorhhgpdhrtghpthhtoheprhgrfh
-    grvghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvgesshhtghholhgrsghs
-    rdhnvghtpdhrtghpthhtohepjhhonhgrthhhrghnrdgtrghmvghrohhnsehhuhgrfigvih
-    drtghomhdprhgtphhtthhopegurghvvgdrjhhirghnghesihhnthgvlhdrtghomhdprhgt
-    phhtthhopegrlhhishhonhdrshgthhhofhhivghlugesihhnthgvlhdrtghomhdprhgtph
-    htthhopehvihhshhgrlhdrlhdrvhgvrhhmrgesihhnthgvlhdrtghomhdprhgtphhtthho
-    pehirhgrrdifvghinhihsehinhhtvghlrdgtohhm
-X-ME-Proxy: <xmx:_3PAZuACpKWfoPblqQ01MJwp1wo3RAjdkFtoQhwuozkDny11StiGAw>
-    <xmx:_3PAZrg9LgTGT-P_8toKbxgS4Gxes-orU44HjnGanrDnqXIicqHrkQ>
-    <xmx:_3PAZqozqkkjP3kNoKc5NbNV819yG-3WpolZQHS1Pysxv5kW1msxpA>
-    <xmx:_3PAZuhMOMeMZAodihfKvYg-LBLoKJ8cKzklDa5KAQwA6JdF6oirYA>
-    <xmx:AHTAZuhMZ1CbAhPLeNvxNJ295fso3-68ZRztUQXgPS1VIkxzq3rNbGAz>
-Feedback-ID: ie8e14432:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 17 Aug 2024 05:57:15 -0400 (EDT)
-Date: Sat, 17 Aug 2024 18:57:13 +0900
-From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Timur Tabi <timur@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=qAC/RVa/oPcGqBj6S2Z23l9RdFzW5FQLZmL2w0yFrx+lVn/0CoI3uZh1TfcW0CVbscL051X89Yz2/N1uATHp+P02xrIOpz/dHi63tayIEpp+TYVzSrrXvnFZUaW87fBPn8O7rnuL+2ZP9k9/I+suw5zkBUEXE0GGUsGmRLgzpZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lv1S8Zby; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42817f1eb1fso20160495e9.1
+        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 03:01:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1723888859; x=1724493659; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/wOaVFGUPugW85pZ5rWgM4fAp/o3v69bNqYxxQVcnxU=;
+        b=lv1S8ZbyEjUwKXDdgjupMufQvasQooyDQ4NhmPA7EBF1U6r0DN4f3kqRBmsVS9k/NP
+         0/GsH0qehXsAPvT4LUTO4baNpr56q429aM7MIvzB7G1IIStovFsQUZ/0XQ4OLf2c5L+D
+         C29YQvjWdAv+Win6JgfibyzSMIVk5OZ+jCfO4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723888859; x=1724493659;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/wOaVFGUPugW85pZ5rWgM4fAp/o3v69bNqYxxQVcnxU=;
+        b=Z/QyWydDJsuOJLfVOBFth4yiWN+JAr44/5hri46cPcVuIX8GFOvrt0zSOzMtuJja50
+         hp0Oa3kkdgMoZASNq0f8dvqhDN38b7CMaymrdJ0x9xVNBtiqqS06yyQl+UcMJyW4c56M
+         63NyTpdjMvOPZTlWY/Leaoamn4gxPG5JdhUa+QrhZNs8X/bJQ1oNYegt4lzJF/tzIFLC
+         nCkOy5rjvRcHiGxzYIKY+aHFJephz0cTcG7oAdQ7cvSUZWukvsNVLecwMpLPrpw4O70C
+         WOuRgat8vAaE1QQYbOrl4hrX/is+JTw43eCbvDWNUxAFquNXMBlD/rg3SU7Y/L68pc+M
+         gwXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNv4auZgLs/G7o/zabAWQThcDTSuvqTK2Twhw7JPJFXKhP3ybOSAWCFSq4FB5daEoLy9FXLImKlRzgf00Y1nKLvhxv2/d0
+X-Gm-Message-State: AOJu0YygYwQnHcP2qJXKDArOCs4LlN/Pw9tLnHAqFToucX9nVILLsiu3
+	sKVYcN3DbciK6qmfjHQLXFikLTtYjzj3h5dZZ8yfxM8U0gWfN0Q0IlbXzTw5oi6G4Xnwlet5i+S
+	hxYA=
+X-Google-Smtp-Source: AGHT+IHfQWV98fZLeG84YWRpqKY4ur3K6QpUoQyzhtj2RkcLl3fzp/oRkmKTRxcOvBE8DiQ+VXR6gA==
+X-Received: by 2002:a05:600c:4445:b0:426:60e4:c691 with SMTP id 5b1f17b1804b1-429ed7891demr35901395e9.11.1723888858539;
+        Sat, 17 Aug 2024 03:00:58 -0700 (PDT)
+Received: from LQ3V64L9R2 (default-46-102-197-122.interdsl.co.uk. [46.102.197.122])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898aabf5sm5490505f8f.97.2024.08.17.03.00.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Aug 2024 03:00:58 -0700 (PDT)
+Date: Sat, 17 Aug 2024 11:00:56 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v2 3/4] firewire: core: Prevent device_find_child() from
- modifying caller's match data
-Message-ID: <20240817095713.GA182612@workstation.local>
-Mail-Followup-To: Zijun Hu <zijun_hu@icloud.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Timur Tabi <timur@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+Message-ID: <ZsB02OnFM1IhLkAt@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-3-8316b87b8ff9@quicinc.com>
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
+ <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+ <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
+ <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
+ <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
+ <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
+ <Zr9vavqD-QHD-JcG@LQ3V64L9R2>
+ <66bf85f635b2e_184d66294b9@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -138,226 +132,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240815-const_dfc_prepare-v2-3-8316b87b8ff9@quicinc.com>
+In-Reply-To: <66bf85f635b2e_184d66294b9@willemb.c.googlers.com.notmuch>
 
-Hi,
-
-On Thu, Aug 15, 2024 at 10:58:04PM +0800, Zijun Hu wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On Fri, Aug 16, 2024 at 01:01:42PM -0400, Willem de Bruijn wrote:
+> Joe Damato wrote:
+> > On Fri, Aug 16, 2024 at 10:59:51AM -0400, Willem de Bruijn wrote:
+[...]
+> > > Willem de Bruijn wrote:
+> > > If the only goal is to safely reenable interrupts when the application
+> > > stops calling epoll_wait, does this have to be user tunable?
+> > > 
+> > > Can it be either a single good enough constant, or derived from
+> > > another tunable, like busypoll_read.
+> > 
+> > I believe you meant busy_read here, is that right?
+> > 
+> > At any rate:
+> > 
+> >   - I don't think a single constant is appropriate, just as it
+> >     wasn't appropriate for the existing mechanism
+> >     (napi_defer_hard_irqs/gro_flush_timeout), and
+> > 
+> >   - Deriving the value from a pre-existing parameter to preserve the
+> >     ABI, like busy_read, makes using this more confusing for users
+> >     and complicates the API significantly.
+> > 
+> > I agree we should get the API right from the start; that's why we've
+> > submit this as an RFC ;)
+> > 
+> > We are happy to take suggestions from the community, but, IMHO,
+> > re-using an existing parameter for a different purpose only in
+> > certain circumstances (if I understand your suggestions) is a much
+> > worse choice than adding a new tunable that clearly states its
+> > intended singular purpose.
 > 
-> To prepare for constifying the following old driver core API:
-> 
-> struct device *device_find_child(struct device *dev, void *data,
-> 		int (*match)(struct device *dev, void *data));
-> to new:
-> struct device *device_find_child(struct device *dev, const void *data,
-> 		int (*match)(struct device *dev, const void *data));
-> 
-> The new API does not allow its match function (*match)() to modify
-> caller's match data @*data, but lookup_existing_device() as the old
-> API's match function indeed modifies relevant match data, so it is not
-> suitable for the new API any more, fixed by implementing a equivalent
-> fw_device_find_child() instead of the old API usage.
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  drivers/firewire/core-device.c | 37 +++++++++++++++++++++++++++++++++++--
->  1 file changed, 35 insertions(+), 2 deletions(-)
+> Ack. I was thinking whether an epoll flag through your new epoll
+> ioctl interface to toggle the IRQ suspension (and timer start)
+> would be preferable. Because more fine grained.
 
-Thanks for the patch.
+I understand why you are asking about this and I think it would be
+great if this were possible, but unfortunately it isn't.
 
-> Why to constify the API ?
-> 
-> (1) It normally does not make sense, also does not need to, for
-> such device finding operation to modify caller's match data which
-> is mainly used for comparison.
-> 
-> (2) It will make the API's match function and match data parameter
-> have the same type as all other APIs (bus|class|driver)_find_device().
-> 
-> (3) It will give driver author hints about choice between this API and
-> the following one:
-> int device_for_each_child(struct device *dev, void *data,
->                 int (*fn)(struct device *dev, void *data));
+epoll contexts can be associated with any NAPI ID, but the IRQ
+suspension is NAPI specific.
 
-I have found another issue in respect to this subsystem.
+As an example: imagine a user program creates an epoll context and
+adds fds with NAPI ID 1111 to the context. It then issues the ioctl
+to set the suspend timeout for that context. Then, for whatever
+reason, the user app decides to remove all the fds and add new ones,
+this time from NAPI ID 2222, which happens to be a different
+net_device.
 
-The whole procedure in 'lookup_existing_device()' in the call of
-'device_find_child()' is a bit superfluous, since it includes not only
-finding but also updating. The helper function passed to
-'device_find_child()' should do quick finding only.
+What does that mean for the suspend timeout? It's not clear to me
+what the right behavior would be in this situation (does it persist?
+does it get cleared when a new NAPI ID is added? etc) and it makes
+the user API much more complicated, with many more edge cases and
+possible bugs.
 
-I think we can change the relevant codes like the following patch. It
-would solve your concern, too. If you prefer the change, I'm going to
-evaluate it.
+> Also, the value is likely dependent more on the expected duration
+> of userspace processing? If so, it would be the same for all
+> devices, so does a per-netdev value make sense?
 
-======== 8< --------
+There is presently no way to set values like gro_timeout,
+defer_hard_irqs, or this new proposed value on a per-NAPI basis.
+IMHO, that is really where all of these values should live.
 
-From ceaa8a986ae07865eb3fec810de330e96b6d56e2 Mon Sep 17 00:00:00 2001
-From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-Date: Sat, 17 Aug 2024 17:52:53 +0900
-Subject: [PATCH] firewire: core: update fw_device outside of
- device_find_child()
+I mentioned on the list previously (and also in the cover letter),
+that time permitting, I think the correct evolution of this would be
+to support per-NAPI settings (via netdev-genl, I assume) so that
+user programs can set all 3 values on only the NAPIs they care
+about.
 
-When detecting updates of bus topology, the data of fw_device is newly
-allocated and caches the content of configuration ROM from the
-corresponding node. Then, the tree of device is sought to find the
-previous data of fw_device corresponding to the node, since in IEEE 1394
-specification numeric node identifier could be changed dynamically every
-generation of bus topology. If it is found, the previous data is updated
-and reused, then the newly allocated data is going to be released.
+Until that functionality is available, it would seem per-netdev is
+the only way for this feature to be added at the present time. I
+simply haven't had the time to add the above interface. This
+feature we're proposing has demonstrable performance value, but it
+doesn't seem sensible to block it until time permits me to add a
+per-NAPI interface for all of these values given that we already
+globally expose 2 of them.
 
-The above procedure is done in the call of device_find_child(), however it
-is a bit abusing against the intention of the helper function, since the
-call would not only find but also update.
+That said, I appreciate the thoughtfulness of your replies and I am
+open to other suggestions.
 
-This commit splits the update outside of the call.
----
- drivers/firewire/core-device.c | 109 ++++++++++++++++-----------------
- 1 file changed, 54 insertions(+), 55 deletions(-)
-
-diff --git a/drivers/firewire/core-device.c b/drivers/firewire/core-device.c
-index bc4c9e5a..62e8d839 100644
---- a/drivers/firewire/core-device.c
-+++ b/drivers/firewire/core-device.c
-@@ -928,56 +928,6 @@ static void fw_device_update(struct work_struct *work)
- 	device_for_each_child(&device->device, NULL, update_unit);
- }
- 
--/*
-- * If a device was pending for deletion because its node went away but its
-- * bus info block and root directory header matches that of a newly discovered
-- * device, revive the existing fw_device.
-- * The newly allocated fw_device becomes obsolete instead.
-- */
--static int lookup_existing_device(struct device *dev, void *data)
--{
--	struct fw_device *old = fw_device(dev);
--	struct fw_device *new = data;
--	struct fw_card *card = new->card;
--	int match = 0;
--
--	if (!is_fw_device(dev))
--		return 0;
--
--	guard(rwsem_read)(&fw_device_rwsem); // serialize config_rom access
--	guard(spinlock_irq)(&card->lock); // serialize node access
--
--	if (memcmp(old->config_rom, new->config_rom, 6 * 4) == 0 &&
--	    atomic_cmpxchg(&old->state,
--			   FW_DEVICE_GONE,
--			   FW_DEVICE_RUNNING) == FW_DEVICE_GONE) {
--		struct fw_node *current_node = new->node;
--		struct fw_node *obsolete_node = old->node;
--
--		new->node = obsolete_node;
--		new->node->data = new;
--		old->node = current_node;
--		old->node->data = old;
--
--		old->max_speed = new->max_speed;
--		old->node_id = current_node->node_id;
--		smp_wmb();  /* update node_id before generation */
--		old->generation = card->generation;
--		old->config_rom_retries = 0;
--		fw_notice(card, "rediscovered device %s\n", dev_name(dev));
--
--		old->workfn = fw_device_update;
--		fw_schedule_device_work(old, 0);
--
--		if (current_node == card->root_node)
--			fw_schedule_bm_work(card, 0);
--
--		match = 1;
--	}
--
--	return match;
--}
--
- enum { BC_UNKNOWN = 0, BC_UNIMPLEMENTED, BC_IMPLEMENTED, };
- 
- static void set_broadcast_channel(struct fw_device *device, int generation)
-@@ -1038,6 +988,17 @@ int fw_device_set_broadcast_channel(struct device *dev, void *gen)
- 	return 0;
- }
- 
-+static int compare_configuration_rom(struct device *dev, void *data)
-+{
-+	const struct fw_device *old = fw_device(dev);
-+	const u32 *config_rom = data;
-+
-+	if (!is_fw_device(dev))
-+		return 0;
-+
-+	return !!memcmp(old->config_rom, config_rom, 6 * 4);
-+}
-+
- static void fw_device_init(struct work_struct *work)
- {
- 	struct fw_device *device =
-@@ -1071,13 +1032,51 @@ static void fw_device_init(struct work_struct *work)
- 		return;
- 	}
- 
--	revived_dev = device_find_child(card->device,
--					device, lookup_existing_device);
-+	// If a device was pending for deletion because its node went away but its bus info block
-+	// and root directory header matches that of a newly discovered device, revive the
-+	// existing fw_device. The newly allocated fw_device becomes obsolete instead.
-+	//
-+	// serialize config_rom access.
-+	scoped_guard(rwsem_read, &fw_device_rwsem) {
-+		// TODO: The cast to 'void *' could be removed if Zijun Hu's work goes well.
-+		revived_dev = device_find_child(card->device, (void *)device->config_rom,
-+						compare_configuration_rom);
-+	}
- 	if (revived_dev) {
--		put_device(revived_dev);
--		fw_device_release(&device->device);
-+		struct fw_device *found = fw_device(revived_dev);
- 
--		return;
-+		// serialize node access
-+		guard(spinlock_irq)(&card->lock);
-+
-+		if (atomic_cmpxchg(&found->state,
-+				   FW_DEVICE_GONE,
-+				   FW_DEVICE_RUNNING) == FW_DEVICE_GONE) {
-+			struct fw_node *current_node = device->node;
-+			struct fw_node *obsolete_node = found->node;
-+
-+			device->node = obsolete_node;
-+			device->node->data = device;
-+			found->node = current_node;
-+			found->node->data = found;
-+
-+			found->max_speed = device->max_speed;
-+			found->node_id = current_node->node_id;
-+			smp_wmb();  /* update node_id before generation */
-+			found->generation = card->generation;
-+			found->config_rom_retries = 0;
-+			fw_notice(card, "rediscovered device %s\n", dev_name(revived_dev));
-+
-+			found->workfn = fw_device_update;
-+			fw_schedule_device_work(found, 0);
-+
-+			if (current_node == card->root_node)
-+				fw_schedule_bm_work(card, 0);
-+
-+			put_device(revived_dev);
-+			fw_device_release(&device->device);
-+
-+			return;
-+		}
- 	}
- 
- 	device_initialize(&device->device);
--- 
-2.43.0
-
-
-
-Regards
-
-Takashi Sakamoto
+- Joe
 
