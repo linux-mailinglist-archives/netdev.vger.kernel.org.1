@@ -1,81 +1,103 @@
-Return-Path: <netdev+bounces-119349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4FB95549B
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 03:30:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7AE9554BC
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 03:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 799CE284685
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:30:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4001F21F34
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D8A79E1;
-	Sat, 17 Aug 2024 01:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E59524C;
+	Sat, 17 Aug 2024 01:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3UxzhE0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6MS3zhy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE3979DE
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 01:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F804C6C;
+	Sat, 17 Aug 2024 01:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723858221; cv=none; b=tY8cKtePuEGOnxfPm25Iv/FFhKpKy11yxkQf8uPAzgEtVZhMJxtqsE1LpbW7t9dyGg1pO3obXVKxcPIrc5uhaPa+qB2pSvL6qfmXyYOar0CwGQ8SiJeyUbEN1fIhpnCIdG4qivdN5JtiYm5O9237gqqce2E8HtcIdyOWf414szs=
+	t=1723859888; cv=none; b=g8RQkH5cY8iGacrry3KXPOW7DtG5/tWFDjaEgYfHgqsjWmPJL7O5dESrbJwHgQX4xDQ1mTKtf1kzI2LfE9ulMm5Z6M/Eglm+MDtD2qelbjwIDen+brIVTQarbvl14N8LJpopo2gQG83ZzcQJxPjC3T+xLuNSAY98bvUfXPWKXxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723858221; c=relaxed/simple;
-	bh=95UIDwBjcVwTq+OiPtmd20i2N8Ozl3hfKyGxklsfXKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UyspQzhxUIBFmEci1uwZQrXUiNHpFBi3ASnwvMCkNL3ZMn9QttcYBn+pYr+u99GF2TW714dZyKFwgIvxU9YU3om4L+D/DoE3i3yY7J6L5oSMkcijwEbool5fSII9Fg6JVSJUfpi5611FP2ePhAADLoUCOlFA5ONh2Y1KxPUL1ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3UxzhE0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D787C32782;
-	Sat, 17 Aug 2024 01:30:20 +0000 (UTC)
+	s=arc-20240116; t=1723859888; c=relaxed/simple;
+	bh=qeg1lNzgCoGHgx7lqLL7Clol+O0nlePey0hI9eo5tck=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lQPKKWw/UYGVEhS1/OpULnerq38F3cys4vZLqkaY3vrFP4VoHnK97Cyei79bFA5JVsHfCCKXJJuIrRyiydbQzuN1/ll+zGUKhPrHMkYZR+vO/sLa/sZwbgzUQVQMRUXDJyU92g8IRUbzqQfLhUJmMaF+VqRHUP4ko+AlHQKgR8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6MS3zhy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6546BC32782;
+	Sat, 17 Aug 2024 01:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723858220;
-	bh=95UIDwBjcVwTq+OiPtmd20i2N8Ozl3hfKyGxklsfXKo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h3UxzhE0Wm+tEKdpK/EHtJBAuM168vGNRzg2trNpatA2ACDLAduPGBkLv/9P4WbYj
-	 y9PSzL91a19qZNgF3BBgWrJqVHRwlebp/HcpW5UhHBATVhGu9vzlo++t3ElGPuEOda
-	 MYjxUKZTWKLbnn8rbQpLYX2Bqyc+BfczvqZZfYOumx69U5+2HpYw0qkyxAyega5vpq
-	 K8BpgkRuaunYNznNhr/Vgw9C1t5qmHkSCcfCgtWjLr2MSFUh1/0gwnUdZVXJhP6/yQ
-	 1ihWRiUfZb042axCeHdAxWGEiYuqLI408MBkHeefH7vr6LAErwtHhaRfdlPY4qLu2w
-	 tkzadgzNnAXtg==
-Message-ID: <ccf2296a-f5c6-4618-87cb-891a6ff2d76f@kernel.org>
-Date: Fri, 16 Aug 2024 19:30:19 -0600
+	s=k20201202; t=1723859887;
+	bh=qeg1lNzgCoGHgx7lqLL7Clol+O0nlePey0hI9eo5tck=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R6MS3zhyw3BOOjdZ2XR01k6LCgAYN3e9FdCum/gCdfAoxbtG3nAQOXV6aIY0iR4wJ
+	 5gXdmxELH+4G2fOrEQVpdguSg6bQvxvIv3bRDwHMUwcBujB1F0t4XNHrNru0yvEJ4L
+	 0AKhJZdegLYZzWhvH588vwLNhdsOnPjhakcEp+rgEkmWEULdutdJ0SvraMhlq80OC7
+	 fjoQMz/VodQTPUxju2wUpoWpaN531ebskyXbZud5WmTg58aEVTMwGXUkkufLxzORvx
+	 XIhxhxf/fOpT5Q+NkwUNE2FWyU50/FAuu3V9hyQfA1f5Glcet6BGTAKXzJu++nmwfe
+	 jzHZYi093XgMw==
+Date: Fri, 16 Aug 2024 18:58:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Ajay Sharma
+ <sharmaajay@microsoft.com>, Simon Horman <horms@kernel.org>, Konstantin
+ Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
+ <schakrabarti@linux.microsoft.com>, Erick Archer
+ <erick.archer@outlook.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed
+ Zaki <ahmed.zaki@intel.com>, Colin Ian King <colin.i.king@gmail.com>,
+ Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: mana: Implement
+ get_ringparam/set_ringparam for mana
+Message-ID: <20240816185805.60e16145@kernel.org>
+In-Reply-To: <1723805303-11432-1-git-send-email-shradhagupta@linux.microsoft.com>
+References: <1723805303-11432-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tcp_metrics: use netlink policy for IPv6 addr
- len validation
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <20240816212245.467745-1-kuba@kernel.org>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240816212245.467745-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/16/24 3:22 PM, Jakub Kicinski wrote:
-> Use the netlink policy to validate IPv6 address length.
-> Destination address currently has policy for max len set,
-> and source has no policy validation. In both cases
-> the code does the real check. With correct policy
-> check the code can be removed.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: dsahern@kernel.org
-> ---
->  net/ipv4/tcp_metrics.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
+On Fri, 16 Aug 2024 03:48:23 -0700 Shradha Gupta wrote:
+> +	old_tx = apc->tx_queue_size;
+> +	old_rx = apc->rx_queue_size;
+> +	new_tx = clamp_t(u32, ring->tx_pending, MIN_TX_BUFFERS_PER_QUEUE, MAX_TX_BUFFERS_PER_QUEUE);
+> +	new_rx = clamp_t(u32, ring->rx_pending, MIN_RX_BUFFERS_PER_QUEUE, MAX_RX_BUFFERS_PER_QUEUE);
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+You can min(), the max side of clam is unnecessary. Core code won't let
+user requests above max provided by "get" thru.
 
+> +	if (!is_power_of_2(new_tx)) {
+> +		netdev_err(ndev, "%s:Tx:%d not supported. Needs to be a power of 2\n",
+> +			   __func__, new_tx);
+> +		return -EINVAL;
+> +	}
+
+The power of 2 vs clamp is a bit odd.
+On one hand you clamp the values to what's supported automatically.
+On the other you hard reject values which are not power of 2.
+Why not round them up?
+
+IDK whether checking or auto-correction is better, but mixing the two
+is odd.
+
+> +	if (!is_power_of_2(new_rx)) {
+> +		netdev_err(ndev, "%s:Rx:%d not supported. Needs to be a power of 2\n",
+> +			   __func__, new_rx);
+
+Instead of printing please use the extack passed in as an argument.
+-- 
+pw-bot: cr
 
