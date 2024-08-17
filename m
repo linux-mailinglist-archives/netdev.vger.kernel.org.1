@@ -1,71 +1,50 @@
-Return-Path: <netdev+bounces-119343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF779553F0
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:52:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A8395546F
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 03:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7900D1F22EC7
-	for <lists+netdev@lfdr.de>; Fri, 16 Aug 2024 23:52:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A744E1C21670
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9221448DF;
-	Fri, 16 Aug 2024 23:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491DD653;
+	Sat, 17 Aug 2024 01:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tBxQRKRi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TzjHAK4n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296B0146017
-	for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 23:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250F7623
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 01:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723852325; cv=none; b=A2b0zL6NV0RpFriIa8TxL0YAMMfy1XDVJ29q+ScF4BWCRqO4IrSyD9O+mWtFcsyJk8urG072TtKp9AUT1NDgk6J8tMNBB8xG/trRZJBdEhuNQQvfq5gL/pAScaYobrQ66OoGKU+ATfqHtQ2u1fJOoeSiBi8toCm6jOaJL5AUGr0=
+	t=1723856433; cv=none; b=M7/lEfjliSy4gXDmIzSUFXpjoQRvumxbpWojnEAICmWUTA4kd5naNVXACrW98bQ/yHAOS4qtHVEc/rJeS0cBKajM3Vnr1G//VIeUtHwQYOHjHeGv6OxdH9lBkYFM6yaiZvgRVuLIH227oSp/pNbYIUAneuwyu7quAYRUpb7p01o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723852325; c=relaxed/simple;
-	bh=2mEb5XYhdDTwuiFSw3s6bMUMsZyPzT1lX3nZNsT4b0M=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Am4c50PPn3WF3y8G9JlbNAkG+oq4VNPKtw91wZ8656aLvCo9OrbaSQJjcfsVOuX3+iaBQQfVAW2fOdC3GM9Wt3Hvln/rxiL9cGdVgY04qsz1nfwh3IOgVN+9Y0AnuR51sR76ckA3G0HLYDR0tV4Js/erjDEjynEtg2eogwzgADA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tBxQRKRi; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723852323; x=1755388323;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=vSgUSLbmUPeLHMB1BmhfAoDVxrYMIGpAzc5OaS9om5o=;
-  b=tBxQRKRirBV6xjX+1Ea8hAN4dgf9tyevRWV2JcM1inJHO4Pih2b7hRfL
-   Z7UIB2HqIu7CPFagtPYBtSZ0R8jjGSCkn2+EmtNpe2EQ2aLDdJfOMcUwL
-   iLtBvoAnJuuzlRkAogbdaXGVcc9Cop9G6dJ5WmHRsGwOisfZup5SnXbBU
-   s=;
-X-IronPort-AV: E=Sophos;i="6.10,153,1719878400"; 
-   d="scan'208";a="444703107"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2024 23:51:57 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:65406]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.118:2525] with esmtp (Farcaster)
- id a5d0e4e1-898c-4950-9b49-8e73fef04ad6; Fri, 16 Aug 2024 23:51:57 +0000 (UTC)
-X-Farcaster-Flow-ID: a5d0e4e1-898c-4950-9b49-8e73fef04ad6
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 16 Aug 2024 23:49:59 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.176.128) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 16 Aug 2024 23:39:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next] af_unix: Don't call skb_get() for OOB skb.
-Date: Fri, 16 Aug 2024 16:39:21 -0700
-Message-ID: <20240816233921.57800-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1723856433; c=relaxed/simple;
+	bh=PT3kNefJ7B6ma2kRFzojUUax2x6VzLCdWV9HQ7xbQ04=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gDFTZaEnQbQQVKnBSqztqtj06hSRZR1Jrl/Sss9DyxINEALvYnl97ad7l0T+dB0oAm9caasCSkvZj3cn/PjHG2H964xjksVoyjo3R/2PNFN4J9ApzDEy4u8+K2gRt23Bwubeqc71sfyon8+rlnpUJ3ggT65g4ZMgZGi0GCsKV8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TzjHAK4n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACC64C4AF09;
+	Sat, 17 Aug 2024 01:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723856432;
+	bh=PT3kNefJ7B6ma2kRFzojUUax2x6VzLCdWV9HQ7xbQ04=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TzjHAK4nR/FUjVePZ62vdryQ/Y4CEDl01rv/Xss9BdDT3MiJw64GMUZMF0nJhOEGI
+	 In3Vv/tIsQOagqPOmX4mc3BxXksgUzDEVIvtO2Xln7dWXHnYGgeTLfCz7ZBo3XsQFV
+	 2S4SLpD2gaoBdXjwCPOkill8fzMmCWYm8Mj7UbdjvWvMGgxjP+BOoZoImSfZ4t7eWL
+	 3c7HffO+Is0TC6lCISL2QKIMAEU1Cuv4V8zyD9Etc+LEtuBAv5DTJ24rGGg9FgW4a+
+	 tIcyV5dV8zTzNiZb/f6vJiBeteCMWez7hBFqsHku7fUrR0+IGaBvHnGKcVEg2kcezX
+	 USvEkJ1AMRpzg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EC438231F8;
+	Sat, 17 Aug 2024 01:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,150 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH netnext] mpls: Reduce skb re-allocations due to skb_cow()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172385643203.3669696.15606969328431040309.git-patchwork-notify@kernel.org>
+Date: Sat, 17 Aug 2024 01:00:32 +0000
+References: <20240815161201.22021-1-cpaasch@apple.com>
+In-Reply-To: <20240815161201.22021-1-cpaasch@apple.com>
+To: Christoph Paasch <cpaasch@apple.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, roopa@nvidia.com, cmtaylor@apple.com
 
-Since introduced, OOB skb holds an additional reference count with no
-special reason and caused many issues.
+Hello:
 
-Also, kfree_skb() and consume_skb() are used to decrement the count,
-which is confusing.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Let's drop the unnecessary skb_get() in queue_oob() and corresponding
-kfree_skb(), consume_skb(), and skb_unref().
+On Thu, 15 Aug 2024 09:12:01 -0700 you wrote:
+> mpls_xmit() needs to prepend the MPLS-labels to the packet. That implies
+> one needs to make sure there is enough space for it in the headers.
+> 
+> Calling skb_cow() implies however that one wants to change even the
+> playload part of the packet (which is not true for MPLS). Thus, call
+> skb_cow_head() instead, which is what other tunnelling protocols do.
+> 
+> [...]
 
-Now unix_sk(sk)->oob_skb is just a pointer to skb in the receive queue,
-so special handing is no longer needed in GC.
+Here is the summary with links:
+  - [netnext] mpls: Reduce skb re-allocations due to skb_cow()
+    https://git.kernel.org/netdev/net-next/c/f4ae8420f6eb
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 27 +++++----------------------
- net/unix/garbage.c | 16 ++--------------
- 2 files changed, 7 insertions(+), 36 deletions(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 0be0dcb07f7b..a1894019ebd5 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -693,10 +693,7 @@ static void unix_release_sock(struct sock *sk, int embrion)
- 	unix_state_unlock(sk);
- 
- #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--	if (u->oob_skb) {
--		kfree_skb(u->oob_skb);
--		u->oob_skb = NULL;
--	}
-+	u->oob_skb = NULL;
- #endif
- 
- 	wake_up_interruptible_all(&u->peer_wait);
-@@ -2226,13 +2223,9 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- 	}
- 
- 	maybe_add_creds(skb, sock, other);
--	skb_get(skb);
--
- 	scm_stat_add(other, skb);
- 
- 	spin_lock(&other->sk_receive_queue.lock);
--	if (ousk->oob_skb)
--		consume_skb(ousk->oob_skb);
- 	WRITE_ONCE(ousk->oob_skb, skb);
- 	__skb_queue_tail(&other->sk_receive_queue, skb);
- 	spin_unlock(&other->sk_receive_queue.lock);
-@@ -2640,8 +2633,6 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
- 
- 	if (!(state->flags & MSG_PEEK))
- 		WRITE_ONCE(u->oob_skb, NULL);
--	else
--		skb_get(oob_skb);
- 
- 	spin_unlock(&sk->sk_receive_queue.lock);
- 	unix_state_unlock(sk);
-@@ -2651,8 +2642,6 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
- 	if (!(state->flags & MSG_PEEK))
- 		UNIXCB(oob_skb).consumed += 1;
- 
--	consume_skb(oob_skb);
--
- 	mutex_unlock(&u->iolock);
- 
- 	if (chunk < 0)
-@@ -2694,12 +2683,10 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 			if (copied) {
- 				skb = NULL;
- 			} else if (!(flags & MSG_PEEK)) {
--				if (sock_flag(sk, SOCK_URGINLINE)) {
--					WRITE_ONCE(u->oob_skb, NULL);
--					consume_skb(skb);
--				} else {
-+				WRITE_ONCE(u->oob_skb, NULL);
-+
-+				if (!sock_flag(sk, SOCK_URGINLINE)) {
- 					__skb_unlink(skb, &sk->sk_receive_queue);
--					WRITE_ONCE(u->oob_skb, NULL);
- 					unlinked_skb = skb;
- 					skb = skb_peek(&sk->sk_receive_queue);
- 				}
-@@ -2710,10 +2697,7 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 
- 		spin_unlock(&sk->sk_receive_queue.lock);
- 
--		if (unlinked_skb) {
--			WARN_ON_ONCE(skb_unref(unlinked_skb));
--			kfree_skb(unlinked_skb);
--		}
-+		kfree_skb(unlinked_skb);
- 	}
- 	return skb;
- }
-@@ -2756,7 +2740,6 @@ static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
- 		unix_state_unlock(sk);
- 
- 		if (drop) {
--			WARN_ON_ONCE(skb_unref(skb));
- 			kfree_skb(skb);
- 			return -EAGAIN;
- 		}
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 06d94ad999e9..0068e758be4d 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -337,18 +337,6 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
- 	return true;
- }
- 
--static void unix_collect_queue(struct unix_sock *u, struct sk_buff_head *hitlist)
--{
--	skb_queue_splice_init(&u->sk.sk_receive_queue, hitlist);
--
--#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--	if (u->oob_skb) {
--		WARN_ON_ONCE(skb_unref(u->oob_skb));
--		u->oob_skb = NULL;
--	}
--#endif
--}
--
- static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
- {
- 	struct unix_vertex *vertex;
-@@ -371,11 +359,11 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
- 				struct sk_buff_head *embryo_queue = &skb->sk->sk_receive_queue;
- 
- 				spin_lock(&embryo_queue->lock);
--				unix_collect_queue(unix_sk(skb->sk), hitlist);
-+				skb_queue_splice_init(embryo_queue, hitlist);
- 				spin_unlock(&embryo_queue->lock);
- 			}
- 		} else {
--			unix_collect_queue(u, hitlist);
-+			skb_queue_splice_init(queue, hitlist);
- 		}
- 
- 		spin_unlock(&queue->lock);
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
