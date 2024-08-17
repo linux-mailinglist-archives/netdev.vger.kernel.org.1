@@ -1,153 +1,109 @@
-Return-Path: <netdev+bounces-119368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C85955526
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 04:59:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAEF595555A
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 06:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28A9F1F211D8
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 02:59:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67952283A7E
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 04:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A444B36126;
-	Sat, 17 Aug 2024 02:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4DC42047;
+	Sat, 17 Aug 2024 04:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2sXuh7Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FB+GRc/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A11C1119A;
-	Sat, 17 Aug 2024 02:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAF01E52C
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 04:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723863483; cv=none; b=ZYdBXLA7CYVxAuof8YR1U+hYovn5F/q71B+KnYAvPJe4hK4qsaa4ghaSjeb0AFzKa9PlJ4iW9l+JrcLRcnWqbS0U4k2imV69eAyVCabQ+eHpIZKkaD2eGchE0ZQbtN8yKqfbHyl2k7wFpuvjdHINuHIwbk6Uhevoa5PKqQT4HZg=
+	t=1723868961; cv=none; b=CWWFh4uXt5f6hTFwjRWQh1rYIlVGGIZpp04MaKV9l7CzvaWHiiU85nk4BUvJhP6kjpkzqsHoUSAn09GDjBdnVBebj7kMNfcwegJBMZGgHp5G3TU7HTlZuUu/EqUSB8rnOCmAzNK8h37RlV2mCO4ymDyslZHY8HDUnFcblms4PzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723863483; c=relaxed/simple;
-	bh=nYbscEvIPy0tfqXRvpq3fWIe2dCm3O45KAx2hY5jY7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C73bRweAdID/dGT1JgJFKUArk5XFM8qQIdTW/ZyHZa/lZ/jzBeuD5W+CmV7VaAGv2QJqIno6uoQOwQepz4kgkS1VLoHaisrsABbWpmcAXlF8b4xuMw3GATJeHKFCxDE1vSUr4TpmDWqfQlTv4V6ojhlWXnyQpH5Cl+6Qtudr/VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2sXuh7Q; arc=none smtp.client-ip=209.85.128.172
+	s=arc-20240116; t=1723868961; c=relaxed/simple;
+	bh=NPnfcTSMiC7ZjJKtZppSr+je4qz9KtE8tb8vTauVarc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BfrZTuaBlssdQsFDqyuuTEMpY79jyD01MzsdPtkEnEkL2PkWAo7akZVOtaDVykXUgeznSZWVUKPOLaYQXGZAyPN2y+e0kIlBUZR2ePNbI5jrpmZDpnJVDfpp4UksnhDg/117XFPpsIRN78GBN7rVz1eKy78zIOAU8ifH3E5LOow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FB+GRc/E; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-691c85525ebso24260017b3.0;
-        Fri, 16 Aug 2024 19:58:02 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fd8faa28fdso1084095ad.0
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 21:29:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723863481; x=1724468281; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PIeMfVPvNi2mFgQGi33u0WiVQIXgvCVnP/JNmg1PAVg=;
-        b=H2sXuh7QC6pRONah8ItkAbnRM7IYiyQA0XAowOdn8Tx6zPFY+Iz7X+SD1nVB1i/IE/
-         H2Qnp73U4aCrhO8j0a4h0ZNeV9UD2faSrpoGtqqEdcIExVi0iONQkFIkUJx8+A00hedd
-         dtun6Reb4qoSA4xDykOyy1N8PMTq/KE6gw5I3Ad97ciC5bhezO8DvIS9fq3N508xATA1
-         FJyMK57SAgr72feqNiKV9Sipw14bHfC/ReJi6rmD6U1PhONG/8BtgGUncDn/YrQZeJ5W
-         VKHmxj/WW301ulTH1EGxjBbJ09yYuYhfSxRCNouqke3NgVHivsCnt4no+s4KvyaG0hfJ
-         revw==
+        d=gmail.com; s=20230601; t=1723868959; x=1724473759; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P6X1xuy9IhznGlrFCNHBh1eBvOvcsVmKnPGuwd0/RZ0=;
+        b=FB+GRc/E9ITtNywBnWf2jrAMg1QQuoO9Fi2pE/aa3S46LRQ64aqDfVrcxna3dy/32N
+         VATdzEbaWiXC2W8YJoNs36Gpa6K/ZI9Ey/D2yIofnzdMWFJ67OIcrQx+ue8TPAkObzHV
+         cIx3g0YQF8ExtGp7slGceGRIyRjWcNDxK21tuPMIbFU27gQwkvXvhYMWVAgFaZ2mGeNW
+         fvQoQ8RYWN5FOuv+U0rEKZw4KX5aRZjsyDPT8LrlUd4Z+9ic30yw1O/34MqA7Owvix89
+         G8u9nwUM7xYVPzn4AFmU5F9Q+ZhAjJZ4P5DbESPF4WmoMDIy386r9msPlu1PmxaNrbAD
+         NiZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723863481; x=1724468281;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PIeMfVPvNi2mFgQGi33u0WiVQIXgvCVnP/JNmg1PAVg=;
-        b=fogkPgNTB5vhpv8R1DbutJ8rlLOoIoGMAZJXBcfRJOfOe1Fl4QjIULCh72dTGwfhje
-         yshDQRaLAGjeLFwGbbgZ93eYyukgOXTj9gmOuWn20EgT3yxlU8OBX4L9Q7z2eumdXpQP
-         5rl+vgFE6P7IKUeN7k3wOSTlQCm0oD0M617rCHasHnBe8VrwuMNdtijVf4ilLTMAM0oZ
-         yr+WRzjf+zEBb6m8h9hmPjJ+rbgnzIwVJbirCDLluHGg9CEE2U1eSjIGCj4MMNC6Ph0r
-         834T5xflpIxYYf44sW1tbLovAsJMULNYGuGW17xYbDkTLJpTN6yWn8rMUdgCygA4fTRP
-         zR+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVw9Nny1iuphVbx/5QWU4qK/dP++q+j219+gBvG21TovRaDQW/zIJZKWpoCwGf48LYJRCwkB6cSpW3NgqsNrE9ofR3VSKamKTML2uXrCigC2cDYiMVYRBh8Q2pQdCfm8HL80mChRsSd5srxW0zAAWf6mqSq18DYPLpn85X2YNoiEaLs9v8KLkMnmQAeRmYRId0/RC8lHagvff0cI4ClbTtHUbhKHhXeiKWgApmR17xfBVnTIBb15Om51qc9BhRSHH72tbZL0v8A4uW6NwmV4k9IL4o3gC3dY1yW6vO2vgF194BJyu2ux+voTYHk0GjYlnwkHDQ3bw==
-X-Gm-Message-State: AOJu0YywP5zavDycJ6nbfg6zZrAQZiF/Tlb0luC0S9CXnqVJwbARDcTw
-	CTtbmxWgHXuy4G/bYsA05APEJvMaMjF4il5jwaNeMORG6mDY89U0
-X-Google-Smtp-Source: AGHT+IHIEqe/Cmg7s9PimPuB+lj47WHhB9AJi/MthWBlVJ6PrU4Dd47Rx7cTZURpMhIAboN0X1uK+w==
-X-Received: by 2002:a05:690c:f01:b0:62f:f535:f38 with SMTP id 00721157ae682-6b1b9a64059mr67878767b3.8.1723863481074;
-        Fri, 16 Aug 2024 19:58:01 -0700 (PDT)
-Received: from localhost.localdomain ([183.193.177.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f031c5e1sm31801785ad.94.2024.08.16.19.57.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 16 Aug 2024 19:58:00 -0700 (PDT)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: akpm@linux-foundation.org
-Cc: torvalds@linux-foundation.org,
-	alx@kernel.org,
-	justinstitt@google.com,
-	ebiederm@xmission.com,
-	alexei.starovoitov@gmail.com,
-	rostedt@goodmis.org,
-	catalin.marinas@arm.com,
-	penguin-kernel@i-love.sakura.ne.jp,
-	linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	audit@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>
-Subject: [PATCH v7 8/8] drm: Replace strcpy() with strscpy()
-Date: Sat, 17 Aug 2024 10:56:24 +0800
-Message-Id: <20240817025624.13157-9-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
-In-Reply-To: <20240817025624.13157-1-laoar.shao@gmail.com>
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
+        d=1e100.net; s=20230601; t=1723868959; x=1724473759;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P6X1xuy9IhznGlrFCNHBh1eBvOvcsVmKnPGuwd0/RZ0=;
+        b=NQSCQJoMmbS6E6KS4IgFz/6djFE5qjNWayVkzt5ut2BcIraGP+YpgVnUTojck3KU2D
+         cm/7mc04/9LJ+dP8WlvCjXjGy3d8yBR13th5FrZeK3Udhu1v+i8VqllAZnih0Auxlm9r
+         ClSp1PWZjTOJRG7GNmJiCkyBa2+hVcsuJBhMXC7ZNMu2CxkXm2ITNm/dtjUJE7G6Fh94
+         lv4hgmGCr03I5+2w0jRYdjGtpvD9RwlC7Cc7rY648EAmXyjce5Z022d69veyNfg3LUHU
+         9zLJsDKyBq00MGnX1WKnoy+FZwRhF/v3jFt6lto3Elf0+Z/Cpex6L8tX61vycFOM26Q6
+         HeJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXN2cuh3cn90ssizzGGwnDniQ5pbhIfF1u7enCKyUbCiO6WLHIP8fBPFg7H6VFIk4cjpeJwi3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytwQvoGmmJMu61ayvuCJGvybuQAFfQijNZDRMiflEUxm6Y+KN2
+	V0LVEElIqdwnhroX8vhZT49K+VBBQIV8tTOBJ+J0Y1daP23XskoX
+X-Google-Smtp-Source: AGHT+IHf3X5uDygJx7hYjCN2yhyL1V7xAewy+Vh3tg78zzRCYAC/0nJwEXVKTYHhkrI7/jNfVQ+jPA==
+X-Received: by 2002:a17:902:c60c:b0:201:e4c9:5e95 with SMTP id d9443c01a7336-20203eeed06mr31809955ad.5.1723868959180;
+        Fri, 16 Aug 2024 21:29:19 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f038e26esm32471035ad.216.2024.08.16.21.29.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 21:29:18 -0700 (PDT)
+Date: Fri, 16 Aug 2024 21:29:16 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Maciek Machnikowski <maciek@machnikowski.net>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, darinzon@amazon.com, kuba@kernel.org
+Subject: Re: [RFC 0/3] ptp: Add esterror support
+Message-ID: <ZsAnHPmTV1eZpc3m@hoboy.vegasvil.org>
+References: <4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch>
+ <4fb35444-3508-4f77-9c66-22acf808b93c@linux.dev>
+ <e5fa3847-bb3d-4b32-bd7f-5162a10980b7@lunn.ch>
+ <166cb090-8dab-46a9-90a0-ff51553ef483@machnikowski.net>
+ <Zr17vLsheLjXKm3Y@hoboy.vegasvil.org>
+ <1ed179d2-cedc-40d3-95ea-70c80ef25d91@machnikowski.net>
+ <21ce3aec-7fd0-4901-bdb0-d782637510d1@lunn.ch>
+ <e148e28d-e0d2-4465-962d-7b09a7477910@machnikowski.net>
+ <Zr5uV8uLYRQo5qfX@hoboy.vegasvil.org>
+ <ed2519db-b3f8-4ab8-9c89-720633100490@machnikowski.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed2519db-b3f8-4ab8-9c89-720633100490@machnikowski.net>
 
-To prevent erros from occurring when the src string is longer than the
-dst string in strcpy(), we should use strscpy() instead. This
-approach also facilitates future extensions to the task comm.
+On Fri, Aug 16, 2024 at 12:06:51AM +0200, Maciek Machnikowski wrote:
 
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: David Airlie <airlied@gmail.com>
----
- drivers/gpu/drm/drm_framebuffer.c     | 2 +-
- drivers/gpu/drm/i915/i915_gpu_error.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> Also this is an RFC to help align work on this functionality across
+> different devices ] and validate if that's the right direction. If it is
+> - there will be a patch series with real drivers returning uncertainty
+> information using that interface.
 
-diff --git a/drivers/gpu/drm/drm_framebuffer.c b/drivers/gpu/drm/drm_framebuffer.c
-index 888aadb6a4ac..2d6993539474 100644
---- a/drivers/gpu/drm/drm_framebuffer.c
-+++ b/drivers/gpu/drm/drm_framebuffer.c
-@@ -868,7 +868,7 @@ int drm_framebuffer_init(struct drm_device *dev, struct drm_framebuffer *fb,
- 	INIT_LIST_HEAD(&fb->filp_head);
- 
- 	fb->funcs = funcs;
--	strcpy(fb->comm, current->comm);
-+	strscpy(fb->comm, current->comm);
- 
- 	ret = __drm_mode_object_add(dev, &fb->base, DRM_MODE_OBJECT_FB,
- 				    false, drm_framebuffer_free);
-diff --git a/drivers/gpu/drm/i915/i915_gpu_error.c b/drivers/gpu/drm/i915/i915_gpu_error.c
-index 625b3c024540..374378ac7c85 100644
---- a/drivers/gpu/drm/i915/i915_gpu_error.c
-+++ b/drivers/gpu/drm/i915/i915_gpu_error.c
-@@ -1411,7 +1411,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
- 	rcu_read_lock();
- 	task = pid_task(ctx->pid, PIDTYPE_PID);
- 	if (task) {
--		strcpy(e->comm, task->comm);
-+		strscpy(e->comm, task->comm);
- 		e->pid = task->pid;
- 	}
- 	rcu_read_unlock();
--- 
-2.43.5
+Please post a real world example with those real drivers.  That will
+help us understand what you are trying to accomplish.
 
+Thanks,
+Richard
 
