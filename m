@@ -1,174 +1,158 @@
-Return-Path: <netdev+bounces-119385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A74955622
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:22:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703C0955659
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 10:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171491C2154E
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 07:22:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F3D41F21E73
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 08:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6646F13E8B6;
-	Sat, 17 Aug 2024 07:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO8MazQF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4868E13C9C8;
+	Sat, 17 Aug 2024 08:15:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF3813CFA3;
-	Sat, 17 Aug 2024 07:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC50E13BC35
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 08:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723879338; cv=none; b=pKzg2jvRYILSgCbGPvvkQZzBEkGKsgwwD3wvl8qj5BBdX5TwC1fAZH2rJ9/CHUEb0XZkeTRa8VxlnkxJXCY9eYv88dXUmMS2sQBkDCtOOQz7KaqVN7iZIGxaZk2DmvMzGkcFiIfcwn0kmCzbrGHtdUR9HB6nQHGZc4IGDFDd9G0=
+	t=1723882530; cv=none; b=XHpxO0V0DtBCjiLmLcxj5TXVJAvb3tMYWV3eaRo7BJntbwccEuwkx+1/7+5DXi1lwcX0F/i7dGKyVO4/Z74CxbFDMZuU9EKsAoCmGSygS4SYlqGSf5DHIf8HFb9QHOk6pR6V2GhgP+tCZupgYoHD4P7Uq1Fr0dLMTiV2WeRACy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723879338; c=relaxed/simple;
-	bh=7cnVUeChjgu+H9+YLNcBRYkwu+eWF6JojTp+Wk1c2NE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HJwXNgH4TgeXgYCeF8hM+gTQoaacsoAcyvZMBxK3LW54hrlSo/OoZBHt82hyVe5tZdAuFPtY9bpvh+MqMMLcrOiOEed5PefMlYixvqd23lUlvQkFtHqwmElHIYeEYobNHYx8ZDOQyDfX62teSTJ/Reu8Wpjq2M/P8vC1q6xNZ4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO8MazQF; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3718eaf4046so1335954f8f.3;
-        Sat, 17 Aug 2024 00:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723879334; x=1724484134; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qv//cMXlZMFtqNbjMe4oj82em7Hd3JuMo8tNEDaIu4c=;
-        b=SO8MazQFX5LAfiZoFAIi1Y2AFqW1yhZle51xaUC9sEOMBR66by4SYC0xxpwJfVSgNN
-         ipnf3vudq6Tw1OxNfvbZT+q8K2pmWJevP3T4HcS0/o6JxGImXzJ6RdVYE9/rDr3U+62G
-         dzc5IuR4Ntrt9ojtoZQ3uOUN/RDDhHqfwiOkKYmWVA3DjEry6mo7dGTyVePN5Y3jth60
-         dRNe59EfG76eA0y7kPox2n1+9xRApCPi56a0BJtITSrD2qWZtX/iED67dDiY7W6/kgmM
-         +No+8A0A3nnXjbNTLzT7eDEBQ8ejx2GC0C6p+NQEomim5k637KT77MEMJW5IamvKledN
-         lj0Q==
+	s=arc-20240116; t=1723882530; c=relaxed/simple;
+	bh=e+stYyRMaVv/yiTzYLbeBVeKDcF5yc5e97grWMZtPsY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=S1McCqlQzyCb0yTYMIaITAytT9IA1Yw3hIriReq5q9qeafIVavtIp5WKV0VOhw2+HxI9H/9N32sYqA0TTQtJop7K/05CO82qYKt3BTMVdXxFPYKMMXhpmNUsg+SoT5Lu3vJI1yjisnlPCyM1NTTkzoMFF9HSCf8NW6p/EWJAujQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f7fa42463so227056639f.0
+        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 01:15:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723879334; x=1724484134;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qv//cMXlZMFtqNbjMe4oj82em7Hd3JuMo8tNEDaIu4c=;
-        b=QyaFUz7YRXw+rgrS3fwKtV8S3NKyTCQJAnh4zz66W5OFfEcw4qb32pLvI+NA+E3Dqf
-         XNqcubvvs3nexAHV9ZyuEV1eegTMfvoTOP3o30XcoATJ6CefxWZgJVJnYXWSfDxeeta8
-         qyQcdBypWH9WfLuzMXPdOQTv50XF9NOq0c/PVZh7Fq71J71Ufr4ozaqCV7VqL8Ck6/Bd
-         wSCwrn6vlIywLgaDEagCx8OzdyGpvZhIv24IF5A4enLqscw5mps1RrmZEya/rRpykkSP
-         arSN5IlyP+SFZGshczzk9VCEJadGR5BgtnxQ463W5CBwdX6jcgyJRYNK6uRRK9WDSVU7
-         vW9g==
-X-Forwarded-Encrypted: i=1; AJvYcCWg2tBth2ZOga0/sDMVJS2pjP4mU8VVbj4s6flxoI+B8QEqSOvkUurGbQsBnv4YXh6AVPYl+v6hL0cvHnnU/5sGxK6EleAFzpT1A+qsmUlfaTdSP8Nbp5953mNqXZEvNGqx9vJO80jI9E0MhZQlGKjZkVawg/a9DPzvwNcR005efP0TXhOzUcka4cruizjGViQx+6nH9PbhZYJ1
-X-Gm-Message-State: AOJu0YyF4pH8WdtmNMJE14/6JB/4sMlVyBLDxHmLTpgUpfR8VYdH6V/Y
-	qn6hglWMORIHmZyTLfnBd3GL9sreRB5bza0OzBS8y6PAgMf3Dj3pKAOLh6cM59F4YexT1Zfle99
-	mnLiPuEJxznmZUKXTzC6APiccyOQ=
-X-Google-Smtp-Source: AGHT+IGYPED+EDMmtWlfqZ30mThja6VK8NtB6YP/LLvy3rtLIhdo6cjAoEMDY3Rrqz+oI/iTzfyvpN6uMxgGM1b65vA=
-X-Received: by 2002:adf:facf:0:b0:368:4b9d:ee2c with SMTP id
- ffacd0b85a97d-3719443d206mr3972273f8f.19.1723879333453; Sat, 17 Aug 2024
- 00:22:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723882528; x=1724487328;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d5m/Qn5QvspbDf6FaUgEifp0ZqoRynM1xJ7SNfaqQyQ=;
+        b=b1DDC5M9hGTO+N1lTv99a4Y9zcxPY6Nmk7REKq13o2lKHZbv0Ap1F9+QApJV8bvZ8i
+         b6jCvPm5B0/dO2ioiJRxcwxBYAA/sKGptSm/N71k3fvL1URd/Lp+vApKI/0ocsjBYVHt
+         BH1Dmbj/qiIWU/q08fzQY0SaYUjK19Zt42U1IhCMQq3F/QZ+S8I5v9xSAUjT4Qxwmn4L
+         sWaDATgsivlku/m/R8ZwKGXJX8xfjt/UZa6Ti0v3qKCABoqUQ+GGYdaoB9KYhY/zsvK7
+         /sXTzffcfcEy68pjjzymEj5lhEr4HvsiTVKKRzyBe6fwOudZc9Lc2so83hyA+RLkh5NI
+         ckxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBR8CRh9Pi5Q3cHMCytW2+9hIZTBivNoWPqSP9h588S6hPfTTSXPHee0ADG+1HdtQziYMAnHzm5aZYzK+rHnlqoknqnn1r
+X-Gm-Message-State: AOJu0YzVrdxmfQFC/SZmR9E87rCRRTfVtDcgk0i3kW6lPz54OG0P0y4t
+	cJ63EXM1CEbdZAZEl6qZeVQCA5vyaDnhzS18qre8K4rs9brLdOobqfUEHfW4eUfskaADx+vaL5b
+	DNXImac0CzFWCp79QWehtRSUlTBRSamNkTXaK5uuSp0thMzgKKyXv9so=
+X-Google-Smtp-Source: AGHT+IEyECeB0aIQwlML6GEm8q5GVLFKxI0f4cdD+Lps2XXRndx9qjDJxZ5GS703ogEcQvA95E0CzCUYQbQm7AH8EqFDY2ITEnGr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816-ups-bpf-next-selftests-use-khdr-v1-0-1e19f3d5b17a@kernel.org>
- <20240816-ups-bpf-next-selftests-use-khdr-v1-1-1e19f3d5b17a@kernel.org>
-In-Reply-To: <20240816-ups-bpf-next-selftests-use-khdr-v1-1-1e19f3d5b17a@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sat, 17 Aug 2024 09:22:02 +0200
-Message-ID: <CAADnVQ+JBq8-6Rhi_LHX470uj2_2xxJAhgdUfg_abUxEDqpdJQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/2] selftests: bpf: use KHDR_INCLUDES for the
- UAPI headers
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
+X-Received: by 2002:a05:6602:6415:b0:805:e4ad:66d6 with SMTP id
+ ca18e2360f4ac-824f341ec01mr23049339f.0.1723882527697; Sat, 17 Aug 2024
+ 01:15:27 -0700 (PDT)
+Date: Sat, 17 Aug 2024 01:15:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b2bab3061fdcad9b@google.com>
+Subject: [syzbot] [net?] kernel BUG in __sock_sendmsg
+From: syzbot <syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 16, 2024 at 7:56=E2=80=AFPM Matthieu Baerts (NGI0)
-<matttbe@kernel.org> wrote:
->
-> Instead of duplicating UAPI header files in 'tools/include/uapi', the
-> BPF selftests can also look at the header files inside the kernel
-> source.
->
-> To do that, the kernel selftests infrastructure provides the
-> 'KHDR_INCLUDES' variable. This is what is being used in most selftests,
-> because it is what is recommended in the documentation [1]. If the
-> selftests are not executed from the kernel sources, it is possible to
-> override the variable, e.g.
->
->   make KHDR_INCLUDES=3D"-I${HDR_DIR}/include" -C "${KSFT_DIR}"
->
-> ... where ${HDR_DIR} has been generated by this command:
->
->   make headers_install INSTALL_HDR_PATH=3D"${HDR_DIR}"
->
-> Thanks to 'KHDR_INCLUDES', it is no longer needed to duplicate header
-> files for userspace test programs, and these programs can include UAPI
-> header files without the 'uapi' prefix.
->
-> Note that it is still required to use 'tools/include/uapi' -- APIDIR,
-> which corresponds to TOOLS_INCLUDES from lib.mk -- for the BPF programs,
-> not to conflict with what is already defined in vmlinux.h.
->
-> Link: https://docs.kernel.org/dev-tools/kselftest.html#contributing-new-t=
-ests-details [1]
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  tools/testing/selftests/bpf/Makefile                       | 2 +-
->  tools/testing/selftests/bpf/prog_tests/assign_reuse.c      | 2 +-
->  tools/testing/selftests/bpf/prog_tests/tc_links.c          | 4 ++--
->  tools/testing/selftests/bpf/prog_tests/tc_netkit.c         | 2 +-
->  tools/testing/selftests/bpf/prog_tests/tc_opts.c           | 2 +-
->  tools/testing/selftests/bpf/prog_tests/user_ringbuf.c      | 2 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_bonding.c       | 2 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c | 2 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c | 2 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c   | 2 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_link.c          | 2 +-
->  tools/testing/selftests/bpf/xdp_features.c                 | 4 ++--
->  12 files changed, 14 insertions(+), 14 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftes=
-ts/bpf/Makefile
-> index 4eceb491a8ae..6a7aeae7e206 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -37,7 +37,7 @@ CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic                  =
-                 \
->           -Wall -Werror -fno-omit-frame-pointer                         \
->           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)                    \
->           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)          \
-> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
-> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
->  LDFLAGS +=3D $(SAN_LDFLAGS)
->  LDLIBS +=3D $(LIBELF_LIBS) -lz -lrt -lpthread
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c b/tool=
-s/testing/selftests/bpf/prog_tests/assign_reuse.c
-> index 989ee4d9785b..3d06bf5a1ba4 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright (c) 2023 Isovalent */
-> -#include <uapi/linux/if_link.h>
-> +#include <linux/if_link.h>
+Hello,
 
-No. This is not an option.
-User space shouldn't include kernel headers like this.
-Long ago tools/include directory was specifically
-created to break such dependency.
-Back then it was done for perf.
+syzbot found the following issue on:
 
-pw-bot: cr
+HEAD commit:    d07b43284ab3 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15bd19cb980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9f3e2eb337834cdf
+dashboard link: https://syzkaller.appspot.com/bug?extid=58c03971700330ce14d8
+compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=120ce5ed980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=147a0de5980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-d07b4328.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b4b84226a2bb/vmlinux-d07b4328.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a0895c10c1cc/Image-d07b4328.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+kernel BUG at net/socket.c:733!
+Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
+Hardware name: linux,dummy-virt (DT)
+pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+pc : sock_sendmsg_nosec net/socket.c:733 [inline]
+pc : sock_sendmsg_nosec net/socket.c:728 [inline]
+pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
+lr : sock_sendmsg_nosec net/socket.c:730 [inline]
+lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
+sp : ffff800088ea3b30
+x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
+x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
+x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
+x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
+x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
+x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
+x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
+x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
+x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
+Call trace:
+ sock_sendmsg_nosec net/socket.c:733 [inline]
+ __sock_sendmsg+0x5c/0x60 net/socket.c:745
+ ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
+ ___sys_sendmsg+0xac/0x100 net/socket.c:2651
+ __sys_sendmsg+0x84/0xe0 net/socket.c:2680
+ __do_sys_sendmsg net/socket.c:2689 [inline]
+ __se_sys_sendmsg net/socket.c:2687 [inline]
+ __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+ el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000) 
+---[ end trace 0000000000000000 ]---
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
