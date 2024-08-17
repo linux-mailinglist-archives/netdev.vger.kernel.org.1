@@ -1,203 +1,79 @@
-Return-Path: <netdev+bounces-119418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D3EC955892
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 17:14:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04349558B6
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 17:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157AD2825F3
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 15:14:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8ACFB21134
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 15:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F57B15350B;
-	Sat, 17 Aug 2024 15:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D206D7D417;
+	Sat, 17 Aug 2024 15:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U9+1GQSU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V7sXCKsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8258F8063C
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 15:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CEC8F40;
+	Sat, 17 Aug 2024 15:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723907633; cv=none; b=dwoTP7Jhupde7J1vOXNEwxHK8C3Sw1+dByygxW1PX2ud83Gc1PsxQdVJ0W+aFfXOW+oBm9iZSgVS8TWv2YMJcNhk0Ah/XCOHJBFgl73fIXm/O98LwY172SdBAv5MS0NO5vVFvlda7IE6WA+jXv/PlUkQNAGEpYEJc0fdPxcElBU=
+	t=1723909132; cv=none; b=qWexu8QnUbQYmfT9qBXw8sCM1AH3hIwirpv69WgqWmLTe3MPGky3LHkqsNhI9MtK1xBhRvUd+qTeSYy99MEgxTreB3IyFNKYYUy2U3yacbbHs9JAxaIY7Vqn/ov67XWNPr3Bk8IOqwRyn/YRfuJCLDuo2NlxLqViuF1tPROzIi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723907633; c=relaxed/simple;
-	bh=f4FKGxVYQxxLRQXGi6/ad1xe8zUcE9oY9HGYW6YKezU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SWC41G1o1CK4pcYN5cJwphaU5CYKdf3pz+tnugTBYon7xk92qjMbIZx0xBrnZxWBJM2qxjVhmwRBtDLOT4QBFfYuHpDU4ysWJGKK2eD2NCJjqTDIEhTpY8uNbpEoosnMmVf+xQ33AAcRmpY2TDw7E1OMtmrr9lVLUs3E4u5HCsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U9+1GQSU; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6bf7f4a1334so8264196d6.2
-        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 08:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723907629; x=1724512429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h8fuP4rXSYs0IsxsahVa0Q55YFfnXxVc+PpufNcWYNA=;
-        b=U9+1GQSUeEWxIibtppep4qqj4OpdA4mm2tCOuBsqsxkbvUJXxxoHvC/1DD8XHYEu8i
-         WjEgJp64Wh0LjJMNctGnsHDdI4LWWS4i1de+9JlsKLbjhuxqNGnqQc6jEWF/WIZdyoE8
-         Ood0I9cMludlmhZXLRIR99I6NTR03YjLyd2UU8aPRBzFY2EVJN3zKFaiACpBDkuLmbAs
-         KhMnNOiWEb+OtTL7MMrHZDKy9Eh+cAn0nWsdeIFVr9qOqYdsd6BN0FHrwHGsI7Ewhy3K
-         sam5K1XJncYJcHKCyUHyfaQ13LVvQhnOQYzacwOTyK4ahx+PK34TLjUH1vu5Rlz3DzPk
-         osJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723907629; x=1724512429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h8fuP4rXSYs0IsxsahVa0Q55YFfnXxVc+PpufNcWYNA=;
-        b=eh5M2w0/s4QdyA49fjjhH3WtNrj7z388cdKTOWS65+aQTeXzLjp39G7qfcsgHQ082G
-         b68K6N2+BcaHPmW7T6OAbj/FRSo+o7bsNKxGyVYZsd3VEC83z4+2iZBZljX/Z7ymMGLj
-         IJ691swAHJiH5I75SvUNttyJ7rx27Blgh+TFulKOPOwyXHXzjz4JElVtC31QbO0S5MAF
-         YnuGWc4mbz/JcXDhyzuVxu1hk5uYqR77xTYYw4ky5ohQU+ZXeWc3bWfA8XKBVcuE2vOI
-         3IzNQA6a7+5aqc/LNhni373shKOe5QV5/9wZVJTXR2hWIxIK2gzqYqQaa1qpFNQSTW0B
-         EZkQ==
-X-Gm-Message-State: AOJu0YxtfaO2DbQR5QiZBmVutwZQWoRIrAXLvzRT0xWoJCCCnn9iKIrO
-	1gW7ayinn8Eq6JYWp7/TnJIBKHzJAYsSAjXmXzBzb7X150ZIEwd2SNWqPDLcw2fV61r2exGqYts
-	m7nCD9+/efbEhOY9bQ7YFMwTx2ow6w+S4xCsz
-X-Google-Smtp-Source: AGHT+IEVoTrHdVFvEzEpKQmmtV0mdfaBBccZW7R2wrmBmSZjuFbL1LJHUNlqx3hUH+/ws9eu5VXMD1mp4i3r/g0VSRU=
-X-Received: by 2002:a0c:f40d:0:b0:6bf:79c1:b9aa with SMTP id
- 6a1803df08f44-6bf8950a6c2mr26142936d6.33.1723907629272; Sat, 17 Aug 2024
- 08:13:49 -0700 (PDT)
+	s=arc-20240116; t=1723909132; c=relaxed/simple;
+	bh=5Uj2/LCT4xIeiI7PoyH1kJVm5dMofpNTE/pOQkqqHco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rX9T8Nc+ga0VdNQhO36VcxvgKqpGz7Fv+UiDBQSd6x+eoVCKJ9Daotr95dIkee05gpQCNy9lZPPDP/6UK+KODpgNf9XvyWnRyL4RJ7lJtdA6ibv6qyTV6+5+0LEpTEH3YRniM53cbV3XalrRc0fm+kv6Ua60pcW0N5DSBcItNTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V7sXCKsr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dddiX3MU+x7AJwuIy7HkslI+ScPQ1EPrha6bb8Jm4L8=; b=V7sXCKsrIDLSnQ9Qo3NOZGY0hX
+	1PMM0g7R7oRe8bPd5kmU0Mn9qInSq+FfbgCFl6nnc3+fE9qfZZDG3C1ZEoKOQBDp03RQ642oiJjpt
+	E/DnIC7TWU5YT0MFx5Dp7Vv4XSjyBigJvawjIbbZ4iMIvSqb7ykrHU5FplJneSgmDI84=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sfLVY-0050Gy-T1; Sat, 17 Aug 2024 17:38:24 +0200
+Date: Sat, 17 Aug 2024 17:38:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Frank Sae <Frank.Sae@motor-comm.com>, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuanlai.cui@motor-comm.com,
+	hua.sun@motor-comm.com, xiaoyong.li@motor-comm.com,
+	suting.hu@motor-comm.com, jie.han@motor-comm.com
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add driver for Motorcomm
+ yt8821 2.5G ethernet phy
+Message-ID: <13950b5b-d596-4205-a808-72219e78b158@lunn.ch>
+References: <20240816060955.47076-1-Frank.Sae@motor-comm.com>
+ <20240816060955.47076-3-Frank.Sae@motor-comm.com>
+ <ZsCLMQWoZcVV+7xR@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240813211317.3381180-10-almasrymina@google.com> <CAMArcTW=mg2gF_e6spPWOCuQdDAWSuKTCdCNPWGqcU1ciq30EQ@mail.gmail.com>
-In-Reply-To: <CAMArcTW=mg2gF_e6spPWOCuQdDAWSuKTCdCNPWGqcU1ciq30EQ@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sat, 17 Aug 2024 11:13:34 -0400
-Message-ID: <CAHS8izOqGMiZNkfQ6G-29UuG64GVo7L+fAzWn5A1713cDAgbgg@mail.gmail.com>
-Subject: Re: [PATCH net-next v19 09/13] tcp: RX path for devmem TCP
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZsCLMQWoZcVV+7xR@shell.armlinux.org.uk>
 
-On Sat, Aug 17, 2024 at 9:58=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> On Wed, Aug 14, 2024 at 6:13=E2=80=AFAM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
->
-> Hi Mina,
->
-> > In tcp_recvmsg_locked(), detect if the skb being received by the user
-> > is a devmem skb. In this case - if the user provided the MSG_SOCK_DEVME=
-M
-> > flag - pass it to tcp_recvmsg_devmem() for custom handling.
-> >
-> > tcp_recvmsg_devmem() copies any data in the skb header to the linear
-> > buffer, and returns a cmsg to the user indicating the number of bytes
-> > returned in the linear buffer.
-> >
-> > tcp_recvmsg_devmem() then loops over the unaccessible devmem skb frags,
-> > and returns to the user a cmsg_devmem indicating the location of the
-> > data in the dmabuf device memory. cmsg_devmem contains this information=
-:
-> >
-> > 1. the offset into the dmabuf where the payload starts. 'frag_offset'.
->
-> I have been testing this patch and I found a bug.
+> Also, it would be nice to have phydev->supported_interfaces populated
+> (which has to be done when the PHY is probed) so that phylink knows
+> before connecting with the PHY which interface modes are supported by
+> the PHY. (Andrew - please can we make this a condition for any new PHYs
+> supported by phylib in the future?)
 
-Thanks Taehee. It's exciting to see that you have gotten this far in
-your testing!! You seem to have devmem TCP (almost) fully working!!
-May I ask which driver this is? I assume it's bnxt. Do you have the
-driver support somewhere on github or something? I'm curious what your
-driver implementation looks like.
+O.K i will add it to my mental checklist.
 
-> While testing it with the ncdevmem cmd, it fails to validate buffers
-> after some period.
-> This is because tcp_recvmsg_dmabuf() can't handle skb properly when
-> the parameter offset !=3D 0.
-
-Sadly I'm unable to reproduce this issue, but I think I know where to
-suspect the bug is. Thanks for taking the time to root cause this and
-provide a fix.
-
-...
-
-> > +               offset =3D 0;
->
-> If the offset is 5000 and only 4500 bytes are skipped at this point,
-> the offset should be 500, not 0.
-> We need to add a condition to set the offset correctly.
->
-
-I highly suspect this is a regression that was introduced in v13. In
-v12 Pavel asked if offset can just be set to 0 here, and I didn't see
-any reason why not, so I made the change:
-
-    -+          offset =3D offset - start;
-    ++          offset =3D 0;
-
-It looks like we missed something. I suspect reverting that may
-resolve the issue, because __skb_copy_datagram() in earlier kernels
-modified offset like this and it's well tested. Can you test with this
-change reverted? Diff like so:
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 40e7335dae6e..984e28c5d096 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2522,7 +2522,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk,
-const struct sk_buff *skb,
-                 */
-                skb =3D skb_shinfo(skb)->frag_list ?: skb->next;
-
--               offset =3D 0;
-+               offset =3D offset - start;
-        } while (skb);
-
-        if (remaining_len) {
-
-I'm running a long test to try to reproduce this issue, but I have ran
-many long tests before and was not able to. For some reason my setup
-is not able to reproduce this edge case. Are you doing anything
-special with ncdevmem? Or simply running commands like these on the
-server client?
-
-server: ./ncdevmem -s SERVER -c CLIENT -l -p 5224 -v 7
-client: yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | tr \\n \\0 |
-nc SERVER 5224 -p 5224
-
-
---=20
-Thanks,
-Mina
+	Andrew
 
