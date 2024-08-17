@@ -1,93 +1,91 @@
-Return-Path: <netdev+bounces-119409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BA29557FD
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 15:15:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B77A955804
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 15:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF5E1C20D7B
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 13:15:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 535D91C20BAB
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 13:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F2E14C59A;
-	Sat, 17 Aug 2024 13:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C4414D28A;
+	Sat, 17 Aug 2024 13:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="DsBJMzwE"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="KbKb6G6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpdh17-su.aruba.it (smtpdh17-su.aruba.it [62.149.155.128])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD431459F6
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 13:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.155.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878C883A17;
+	Sat, 17 Aug 2024 13:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723900539; cv=none; b=uIJmXGnwDYRCWfgb77IiAlaib9Z2WaX83mQvi1yhG6YXq+r0nCQ/uEJQ/2tKXjVCi/SrT2B7ehxYbtqxbVywNaP+nR948+4Y4+Fo+h6f04b8GfzUvSLMqf9v4t+i0evVbQtXmFLzOVAid6ioB/MveOFd+BCcKXr7BYDxxOKycPg=
+	t=1723900711; cv=none; b=WtnFubBcPBYwAWcuar4IF7UrIr/iDyKHBH4/Q56Gg49oyN3+DF5u9IaROXghbtYXwhlDbPcv3Kfxbkec560jpQenbZ3GZAw9Ulyd+BGUcsSUMxftMBdUJ1ljuXg7w33sHldIXk0Ks5ECuKit6bHcmD5OOU/kXPLSXttJ5MrZgb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723900539; c=relaxed/simple;
-	bh=2F8nLXpu6utciwf73TEHErlUBn07rnVVcj0FX8O7uko=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=QJ7Z4t5vq27xzJShnWHy7nciIo2jvzSn8JXZ7bva/65irkLkz2UShozWxM6/LtitEJ7YQR4bLjF17FE3dwvcG9EKcG87ht9oY5Kwfp8uSFsVzOgSquV31LGkeOKf0FGPuPlNUF8VMFQi24wSnIYj5BM77K2nvJcQD1R6PDwh5Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org; spf=pass smtp.mailfrom=xhero.org; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=DsBJMzwE; arc=none smtp.client-ip=62.149.155.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xhero.org
-Received: from smtpclient.apple ([84.74.245.127])
-	by Aruba Outgoing Smtp  with ESMTPSA
-	id fJHIsuVgIJLbHfJHIsulm7; Sat, 17 Aug 2024 15:15:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1723900533; bh=2F8nLXpu6utciwf73TEHErlUBn07rnVVcj0FX8O7uko=;
-	h=Content-Type:Mime-Version:Subject:From:Date:To;
-	b=DsBJMzwEhUbJk9XnllJFQKQZh/t3xA3C8KAlVMv0kuRx9K0UQyVvqfm8b1TPP5nGX
-	 lzk1munk+k9e0BOKKyLZNh4CzsUNwZgmDHzqecyPZ324J1a/QpfQ7/Y2g7shHUnC4z
-	 jmItHJfpWbKfxi8Btjf0Hvi4ZShqackrI7A4rnV7cJ4t0AzB9C9XT4LhpLkR0QEQLw
-	 ndinMmOk5mwyt58ZUznt+QBt6FhoML1Jfxi45phanBejoXw57I0n8aFhr6QkzFfIDh
-	 UK6IBdfSP1C5GY03hMSCdCaTJzScJmg7AHGj3BTDjqZYBX+DAeplLeZDwmVOPw/ypI
-	 aY8/Yba/lzZeg==
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1723900711; c=relaxed/simple;
+	bh=HrSfnsFtNBSL3Ll3AO1k9QGFMqtExW2Cjt6YKQfpa/I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h/I0Ke5hT0EmTT0tnvCu5nwXNi1YxTxg6NU9Lc4QZTx6T5XW2Q+oG+MHhKpTIHueQ7MD6EdQ5RZYqv6dHHKxh5kNQOXCtDg0MdzdtnuFqKohmjsfTKPtIUSe2f5a2w3WbZIE++9KbTN0OU4EhQNzi92pfpKa+oKJsr1eJmo591Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=KbKb6G6x; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 7A04A200BE42;
+	Sat, 17 Aug 2024 15:18:27 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 7A04A200BE42
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1723900707;
+	bh=aSOs550sGKXT38iGfuI5W9QA85cxI3oGMnVNHjYv2lw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KbKb6G6xi+Fg2lshGPww3tjKRaypIIv+LIO9Q9qFey6HJDVRaiaUTuVxHqi/kBUVk
+	 TL9XaGIjZAZOVAu9GyB22FHxACh3sVrXWu2vZUv4Hq4Jhc+bsoxKk09bwVyxiSeqJG
+	 MDWuPKsA69rmjTxS12ctaIKThr7WuwPKGwyDTossotBOmGPdfINm1mviXQVGRMSJhV
+	 bXMS/8w4QTrX/8spBRmxVg42bpVkIfuEebjza0kshQTxlgr3ZpdN35Ws8tCptos/0O
+	 ngqOtCcHThBzpBMi8uG5rgAznPzjP7udIn1FwTti+cWvhE1XRFK6NgiJtsQ+DoLkUO
+	 O00exDhmkqA/A==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next v3 0/2] net: ipv6: ioam6: introduce tunsrc
+Date: Sat, 17 Aug 2024 15:18:16 +0200
+Message-Id: <20240817131818.11834-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: Re: [PATCH net-next 1/2] tty: Add N_TASHTALK line discipline for
- TashTalk Localtalk serial driver
-From: Rodolfo Zitellini <rwz@xhero.org>
-In-Reply-To: <2024081717-mating-uncle-6e4c@gregkh>
-Date: Sat, 17 Aug 2024 15:15:21 +0200
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Jiri Slaby <jirislaby@kernel.org>,
- netdev@vger.kernel.org,
- linux-doc@vger.kernel.org,
- linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Arnd Bergmann <arnd@arndb.de>,
- Doug Brown <doug@schmorgal.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <245045A2-2B0A-4232-8B3E-8FB29F0167CA@xhero.org>
-References: <20240817093258.9220-1-rwz@xhero.org>
- <2024081717-mating-uncle-6e4c@gregkh>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-X-Mailer: Apple Mail (2.3774.600.62)
-X-CMAE-Envelope: MS4xfNOvGofd9QYNAgEfrGFmsPeg9WvA4gVEyadhY3I2Nssi18CulYFa+uawW5HRhqrqiqGIXpPoaN8GmFOF6+OqQCQj5fSHjEAj84QWGPXOZk0KxXOqm2zC
- qjgOkjaHAwq35PYVjJkZ+tmKtIVJ98gFes3oxZUlmDwB2uhBNhI2StOJHNrOG1aGcaLKts++026e6/K0k3zI/f46gd2qL2A84hsnUi/ow7NP0haEVIqppQev
- Zz+WJBMDGuJUiZiAWO8vFCt390m0FruvgC+XID0EJsXaQNbIcLb84pRlKMkCwoyrGJosQM/jykIvpeK3xYwUW6XRQ7vYI/LW0DoqNz7wgdeaXGIp+npg+wTd
- xMw47wUWMWhPfTKu5Li34NGJ7UMZY9fqviEno0Ovb3eXGII9ZOJGjMIc3egRTKPWMQ8BIpEgCqDO4U4/dJILntbBJIxyrS0+UaFfNchjaXG5PJo0Xr5IcbBF
- z+iEb48f7MVQB7Hbn38J9xWa61t2X6YVb0DQjeOB2U0YH0DZczGWWu3O7ZsSfg2ecIWo4FJ4R4i/aMz621Tw8JY6flOK3iqcawh0hw==
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> Please look at the kernel documentation for best how to write =
-changelog
-> texts.  This needs a bit of work.
+This series introduces a new feature called "tunsrc" (just like seg6
+already does).
 
-Hi Greg,
-thanks for your review! I will absolutely improve the commit messages on =
-both patches in the next version of the series.
+v3:
+- address Jakub's comments
 
-Kind Regards,
-Rodolfo=
+v2:
+- add links to performance result figures (see patch#2 description)
+- move the ipv6_addr_any() check out of the datapath
+
+Justin Iurman (2):
+  net: ipv6: ioam6: code alignment
+  net: ipv6: ioam6: new feature tunsrc
+
+ include/uapi/linux/ioam6_iptunnel.h |  6 +++
+ net/ipv6/ioam6_iptunnel.c           | 74 ++++++++++++++++++++++++-----
+ 2 files changed, 68 insertions(+), 12 deletions(-)
+
+-- 
+2.34.1
+
 
