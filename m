@@ -1,117 +1,117 @@
-Return-Path: <netdev+bounces-119421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E572A9558BF
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 17:47:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05559558E9
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 18:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A193D2828C0
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 15:47:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36E6B1F21905
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 16:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19332575F;
-	Sat, 17 Aug 2024 15:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31A9155327;
+	Sat, 17 Aug 2024 16:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HVNf0LRT"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Wb8Qxq0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F26C8C0;
-	Sat, 17 Aug 2024 15:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8A1547F2
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 16:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723909651; cv=none; b=iyi9TahtKy+BLXViwXqrekH+cL8BJtg2K718mB+7XG5g9nOrfEyE3Jle2lGJzEe7qgGjKIB7Z8hOftb0DDPEYkefezATTMaU+geejw+2X7H4VMMUwtEAtCS6dEF4awdm5UERC3hTTxhq8RIiB/XJTcqP3d3saTcObz1JpXlt7dU=
+	t=1723912004; cv=none; b=cYonb/SdselsOr/YisKOYpNDSk8087EvEoWh6A7ebHZ+YdKX7o1d0tsI+VemuqKm3WpW0Ks6VkHVnjkO7kbc95cRMunvakUyY6qHcwNChbz5pLDJTmWktW3/8q/jnXwBvpOyDITIFrl4XZII7xVIzJolYsEF+9dUpbT71Jj4ohY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723909651; c=relaxed/simple;
-	bh=lmqePAThAmEXa5Omwlik3LsrOE7yjU2UB1JVB9/5sVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bOi8qlZ3o/d+cshDx61dJFUiwRRbPQ8pHS20bKzay4sIomc48rCLa4GiBEvda5EWxeJRrr1n0eJFwYkdeP6XNFzCITxPUlelBiDcaHHf7/IAVwCwKxfRIKLePlBzXdeFXo1C3+oGfTMuCmVDEsNYUqWYjT+eoqYfvd9Svj5UYV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HVNf0LRT; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A26FE0003;
-	Sat, 17 Aug 2024 15:47:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1723909641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4tAB4S3uOiq7D418XEUK0C4GJJ3oRKt4ozyQqoAZI8=;
-	b=HVNf0LRT2gRPTSsV2MNlX7GpF9q06DiFWgMH/cOem3yoGNOKDc1cmVtcqfcU7yh5Xeb/0Z
-	wqnoGzH50VnDSLcb8CZckiZmjtbZaCvGKBHtOnC5S3W4p7yszu/2NP+CMIsyd0dMbsWhUE
-	5bSO4CVfmYAV09S3O/Ca5VIAJCFWmWl9wVSSoO1nSdrAcbGY3TRdMrGX2sj+SoK5IsNkqE
-	1yTYJRclkUQfZNYGrEqN/VKYnGvgT84LwLnaO6Sn0xicuK7ZqWEFBh+LGURB1/Rgs8Hbhc
-	kCamJeKZ4MFWM/ni9icKK8d7gE26XfWIszklmi1s6IzF/wLKymB/LEAw2G0gEw==
-Date: Sat, 17 Aug 2024 17:47:15 +0200
-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Jakub Kicinski
- <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
- <atenart@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter
- <dan.carpenter@linaro.org>, Romain Gantois <romain.gantois@bootlin.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v17 00/14] Introduce PHY listing and
- link_topology tracking
-Message-ID: <20240817174715.77522d52@windsurf>
-In-Reply-To: <6b84cdf2-34c8-4e61-857e-79a1d5e782da@lunn.ch>
-References: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
-	<20240715083106.479093a6@kernel.org>
-	<20240716101626.3d54a95d@fedora-2.home>
-	<20240717082658.247939de@kernel.org>
-	<a1231b3a-cd4d-4e74-9266-95350f880449@csgroup.eu>
-	<6b84cdf2-34c8-4e61-857e-79a1d5e782da@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1723912004; c=relaxed/simple;
+	bh=9dkMY8jFzFQfn6EKGYFPV4tiA60zbFODArOLJ5YzeIA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EbV+smICeRpt9gCWNS3PMN+t1IZAsBohaI1acNeKf5VOlKBvAk7WLmkpEZg/NBz6ycg9InUu7vbef1CwfO1VBxKW3kPUOniM/dG2KNPFXm+7XDS4DvyUL6+keHpH+PrGU7xvilN+UYr8KZuMUeYfiqgMWxmw79+DMdfKmUnwplc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Wb8Qxq0Q; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-371b098e699so322195f8f.2
+        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 09:26:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1723912001; x=1724516801; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJUpF+ZilJ5tJUWYdG1B4XodSC5itu+LywsKXdFMvvc=;
+        b=Wb8Qxq0Q6QlvbrL4LYHVdGcdP1ReqQ6RM71H9fGG7sYMu2jIALrtu4opf2UmjB/bDW
+         EttNaZssMQoiZ5rBDaPL3jPPV56ajuJx59Z98XGZWo/EZ8HZEjBVvp1SZxOwQcJnm5HH
+         bUJgmTz4wZmxQT05vumNN2OOUSwr6LKhmtKYg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723912001; x=1724516801;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bJUpF+ZilJ5tJUWYdG1B4XodSC5itu+LywsKXdFMvvc=;
+        b=guYKm6Dv2kt9F5YEr9dnAZpGdIjgReX7n0WK5xwfNJJYY5JVZsaekweWV0cFCX+ZGB
+         ArS8CkjyipVogMoemqKitOei6bQU3ArjHjlNcNJLEfCdYfm5S97UIryAefoISkBYzGMs
+         ZBUSivfPGrAi6NPbALoJm+HbPGEbIHmzfFL+RzbGzybX+5UKWIl694Urdak8fPySH6Y5
+         z9V7I9KSDTufFpCoccKAmT/xt5WC02DkK7D5KEapglrKa/8+IdMcjH9n+5Ssmt7jhx4p
+         CHOaekOqwPKMJhDeqX29bJF/98+GAhZ6KouB5xUYa4gQemQtMKdPtAOPpVf2KVlWHgxI
+         5WtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDBHyXVOw2TBs1SRrGTuMrGFKNlu0VV0pngW6WcsmQxdElbA18IH1EB6pGo71DahPJRZWCclh46wHm/KBJbny8hfrPuLmi
+X-Gm-Message-State: AOJu0YzAnBjZpkbzIAM7q4NBZguh6jukEiVQqaKtn2kVs8W2v2qRKEIO
+	hqziSakLb93sUa3H6Jav6MZnHs9ifXAnY6/Y+DPvJqLIto1x5qb+rZrvhKUUutArSEWp7UQr7oF
+	rcyTBzA==
+X-Google-Smtp-Source: AGHT+IHxvaDhLQvAjPJK8gujLoHOvgoayMi/6g7UN8sodF98JiUox16kH4mweXCyMatYO1K6gLzPUA==
+X-Received: by 2002:a5d:5a15:0:b0:371:8e9c:e608 with SMTP id ffacd0b85a97d-371946a1a0dmr8285566f8f.52.1723912000690;
+        Sat, 17 Aug 2024 09:26:40 -0700 (PDT)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com. [209.85.208.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c67d3sm417758866b.1.2024.08.17.09.26.38
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Aug 2024 09:26:39 -0700 (PDT)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5bed92f638fso502193a12.2
+        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 09:26:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXi1CosyaHFi3SoZuhNP0lO1+n5u2YEg70iwk1wSQNKbpW/uqRR1FVTw1xCxEKnSSX/fTWD82FCoA4pVrbaqbzlRPR9LiVT
+X-Received: by 2002:a05:6402:278b:b0:5a1:b6d8:b561 with SMTP id
+ 4fb4d7f45d1cf-5beca527ec4mr6027442a12.9.1723911998605; Sat, 17 Aug 2024
+ 09:26:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: thomas.petazzoni@bootlin.com
+References: <20240817025624.13157-1-laoar.shao@gmail.com> <20240817025624.13157-6-laoar.shao@gmail.com>
+ <w6fx3gozq73slfpge4xucpezffrdioauzvoscdw2is5xf7viea@a4doumg264s4>
+In-Reply-To: <w6fx3gozq73slfpge4xucpezffrdioauzvoscdw2is5xf7viea@a4doumg264s4>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 17 Aug 2024 09:26:21 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi_U7S=R2ptr3dN21fOVbDGimY3-qpkSebeGtYh6pDCKA@mail.gmail.com>
+Message-ID: <CAHk-=wi_U7S=R2ptr3dN21fOVbDGimY3-qpkSebeGtYh6pDCKA@mail.gmail.com>
+Subject: Re: [PATCH v7 5/8] mm/util: Fix possible race condition in kstrdup()
+To: Alejandro Colomar <alx@kernel.org>
+Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org, justinstitt@google.com, 
+	ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org, 
+	catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Andrew,
+On Sat, 17 Aug 2024 at 01:48, Alejandro Colomar <alx@kernel.org> wrote:
+>
+> I would compact the above to:
+>
+>         len = strlen(s);
+>         buf = kmalloc_track_caller(len + 1, gfp);
+>         if (buf)
+>                 strcpy(mempcpy(buf, s, len), "");
 
-On Sat, 17 Aug 2024 17:43:52 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+No, we're not doing this kind of horror.
 
-> > Jakub, as you say it looks solid. I can add to that that I have been using
-> > this series widely through the double Ethernet attachment on several boards
-> > and it works well, it is stable and more performant than the dirty home-made
-> > solution we had on v4.14.  
-> 
-> Have you posted a Tested-by:
-> 
-> You can also post Reviewed-by: if you have taken a look at the
-> code. It won't have the same value as one from Rusell, but it does add
-> some degree of warm fuzzy feeling this code is O.K, and it starts
-> building your reputation as a reviewer.
+If _FORTIFY_SOURCE has problems with a simple "memcpy and add NUL",
+then _FORTIFY_SOURCE needs to be fixed.
 
-Hmm did you check the replies from Christophe to each patch of this
-series? He has already posted a Tested-by and Reviewed-by to every
-single patch in the series :-)
+We don't replace a "buf[len] = 0" with strcpy(,""). Yes, compilers may
+simplify it, but dammit, it's an unreadable incomprehensible mess to
+humans, and humans still matter a LOT more.
 
-Thanks!
-
-Thomas
--- 
-Thomas Petazzoni, co-owner and CEO, Bootlin
-Embedded Linux and Kernel engineering and training
-https://bootlin.com
+                Linus
 
