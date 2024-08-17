@@ -1,46 +1,74 @@
-Return-Path: <netdev+bounces-119347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6957F955489
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 03:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0016E95548E
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 03:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D6011C21C9E
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:11:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3141C2191F
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 01:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FC71FBA;
-	Sat, 17 Aug 2024 01:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D318256E;
+	Sat, 17 Aug 2024 01:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OLsl0z1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373F879CF;
-	Sat, 17 Aug 2024 01:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54F6443D
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 01:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723857096; cv=none; b=SKBizIQM1AS/kQBRnoqE3UFb1K11KUZxz8a6wepzmBSA3KvtdSM0Qbpo6bV+35rqfmTRifsKC4znTQj82YdxbRM+9Ko161dOq11swhsJV2nkudFbGJ+/xA5GJ8LLJatiEJ2rjvwp0+BmaH6QEQNXTn6L2wgeBPHi/0arWXNREQ0=
+	t=1723857683; cv=none; b=LK6dEPeO0jMpCEBpexyZKgTw4McWkKEM9uGsgS2ky0sxB9wm4L8KIgzGU2xLX5BRJOoilkjC0FKFvHT3PCI6I9YyWLLVYFJUfPj0yoc4nBkbffJNlaqUnYcH3ZW5efsp3H/keDhfdLzwNy0H2JHRzX8+PGoz+WiG8y68Bj7cjJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723857096; c=relaxed/simple;
-	bh=e6Ih+qDjS8hZTeJnLYRBVww5GDd/zQv2Vr3ZEKTKLX0=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=H1Fx+qzFBRQ7s4w0QyoWbOm5zKDFTciD+BK85b7SVe8Gvmj/pyecfpUeaRA4nyVxFbhNM9rbBz6eXCjV3iRFJqde4Cm3k84B8WubpngLhgMkw+hMVw2TG0U5hjt2w+Rh7dlqCTU49SyhsxhxmEx/D8WtYiwfOjmVykg1+zUZK4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wm13W4F8CzhXrp;
-	Sat, 17 Aug 2024 09:09:27 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0D185180100;
-	Sat, 17 Aug 2024 09:11:26 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 17 Aug 2024 09:11:25 +0800
-Message-ID: <ef78137e-d977-4da5-acfb-00865e3a9837@huawei.com>
-Date: Sat, 17 Aug 2024 09:11:24 +0800
+	s=arc-20240116; t=1723857683; c=relaxed/simple;
+	bh=OODqXCiJhPg+woCiq8WXdhOYLTNaos/7DCZCEwdXbew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rukl830KNvXfOT+tFN/Gb2ykBEfNi+ve4lsLCdpifnLOYT4NiPWNa/LWV3utdzA+j22eFWltvUFvK5IxaDyckHsZyN8GRFEIlE4hW2aYa6iiT9ZP8GRJlaLBxZK09Sp8fl2M1w4D6fjGcP421QKtNlkwP778FdAd2CubbyRwWPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OLsl0z1o; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5d80752933bso1786667eaf.1
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 18:21:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723857680; x=1724462480; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zXsUlx6Cs7x36yRBAbFP5lgG0Pv/3uIBTBdlRBKKqpg=;
+        b=OLsl0z1oD08B6TLKBPq/aypL0GyNJykmTktaT9o4KpMjJxXTyU3ZJaLEnxJyNBcQ7w
+         IaRDOT1ANJuU6AQDpYfPQoVOeeZCZgpedqba7veXGybxGPcxMNAIjC46QkiJhWzfNb/8
+         51yH/mfLC+RwbMZrzwSYI/YaTy/ecVcjfs+tnU0wKzNAliddlTZMF0tCjitAfj/i0D6G
+         nGJDMcGkDMOv4xhuMyRV3zPLUcm4CPJHCsOa/4erHBW9HOIoVPQVqb2/Dj2ouGvsLEIs
+         Sc3RH1Zwv/769V0OYaWZIXPi3PkKAafmAcfqqOsB+zFvrJyvEylw9z2BsTItsFha6w2G
+         d/2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723857680; x=1724462480;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zXsUlx6Cs7x36yRBAbFP5lgG0Pv/3uIBTBdlRBKKqpg=;
+        b=jJLSOKZQjkizWlqp4gk4NmbczIZhFrBVyCteQaSS42Lnjhl4U8BZtNLW91RqSI4ZgO
+         YZfbDUFmXig+1KOmskfJxGUGmrEOaTgwTcj5rMkDXFDHM7g9E5J1h3HnrBvrGQbDz6KV
+         42dOH63pStLf7JRrkpTU1FdsotssGmUPZbS9smQW+SIedCUs8CGxatHUbXXzcAPz+liS
+         XTj2As5n8mmVI2+q330xg5MfwNipafX+1EcpEYzLmOUa3x16mCnvZexmkZ9tjOrQ2AKK
+         KyicuvH9P1xeXTYmm3BgcYY8nSjO8xz88Udc+uh1xjijgeVEdW3Ut0ygJsToEQITQis4
+         UERA==
+X-Forwarded-Encrypted: i=1; AJvYcCXByWA4zD6DXUGQNNyoX3LVEX+xJEHw2HGl9MB7VTuYvcQSRgabpsH/NgggUzfQlLy0yzyZSCuq+6Bk9QcmAVMpovjy1HKe
+X-Gm-Message-State: AOJu0Yzqo5+owSCi4RsjImSc40Ly4yvMeWcjUCMVUKHWAn0NAPP+7eEy
+	6jTe9PPPuYQaXVpDkv8jVK8GPgO4aXJVwXb2NjTo2BknCpNlHmFH
+X-Google-Smtp-Source: AGHT+IF0mtPrumJFQx0mlav1Ul6vwsQYIZVV5FUqQpLsdrvKDrR/SgA1NL0V8P/XXo1F+uB+2mQDlQ==
+X-Received: by 2002:a05:6359:a396:b0:1ac:f854:b68 with SMTP id e5c5f4694b2df-1b393312c35mr572877455d.29.1723857680565;
+        Fri, 16 Aug 2024 18:21:20 -0700 (PDT)
+Received: from [10.64.61.212] ([129.93.161.236])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff02c8a7sm232681585a.16.2024.08.16.18.21.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2024 18:21:20 -0700 (PDT)
+Message-ID: <b91e1160-24c0-42c5-8a71-b10b3421147b@gmail.com>
+Date: Fri, 16 Aug 2024 20:21:19 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,78 +76,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<jdamato@fastly.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH V2 net-next 03/11] net: hibmcge: Add mdio and hardware
- configuration supported in this module
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20240813135640.1694993-1-shaojijie@huawei.com>
- <20240813135640.1694993-4-shaojijie@huawei.com>
- <79122634-093b-44a3-bbcd-479d6692affc@lunn.ch>
- <1ff7ba7c-3a25-46b5-a9de-a49d96926e64@huawei.com>
- <7bab865c-b5f6-4319-ba0f-1d0ddc09f9cd@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <7bab865c-b5f6-4319-ba0f-1d0ddc09f9cd@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Subject: Re: [PATCH net v3 3/3] tcp_cubic: fix to use emulated Reno cwnd one
+ RTT in the future
+To: Neal Cardwell <ncardwell@google.com>
+Cc: edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org,
+ Lisong Xu <xu@unl.edu>
+References: <20240815214035.1145228-1-mrzhang97@gmail.com>
+ <20240815214035.1145228-4-mrzhang97@gmail.com>
+ <CADVnQy=URvcxoU70b0TMJ9gpYVWgKE_CNwQXrP9r2ZJ3EGWgfg@mail.gmail.com>
+Content-Language: en-US
+From: Mingrui Zhang <mrzhang97@gmail.com>
+In-Reply-To: <CADVnQy=URvcxoU70b0TMJ9gpYVWgKE_CNwQXrP9r2ZJ3EGWgfg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-on 2024/8/17 5:04, Andrew Lunn wrote:
-> On Fri, Aug 16, 2024 at 02:10:36PM +0800, Jijie Shao wrote:
->> on 2024/8/16 10:25, Andrew Lunn wrote:
->>>> +struct hbg_mdio_command {
->>>> +	union {
->>>> +		struct {
->>>> +			u32 mdio_devad : 5;
->>>> +			u32 mdio_prtad :5;
->>>> +			u32 mdio_op : 2;
->>>> +			u32 mdio_st : 2;
->>>> +			u32 mdio_start : 1;
->>>> +			u32 mdio_clk_sel : 1;
->>>> +			u32 mdio_auto_scan : 1;
->>>> +			u32 mdio_clk_sel_exp : 1;
->>>> +			u32 rev : 14;
->>>> +		};
->>>> +		u32 bits;
->>>> +	};
->>>> +};
->>> This is generally not the way to do this. Please look at the macros in
->>> include/linux/bitfield.h. FIELD_PREP, GENMASK, BIT, FIELD_GET
->>> etc. These are guaranteed to work for both big and little endian, and
->>> you avoid issues where the compiler decides to add padding in your
->>> bitfields.
->>>
->>> 	Andrew
->> Thanks, I already know about macros like FIELD_PREP or FIELD_GET.
->> and these macros are already used in parts of this patch set.
+On 8/16/24 13:32, Neal Cardwell wrote:
+> On Thu, Aug 15, 2024 at 5:41 PM Mingrui Zhang <mrzhang97@gmail.com> wrote:
+>> The original code estimates RENO snd_cwnd using the estimated
+>> RENO snd_cwnd at the current time (i.e., tcp_cwnd).
 >>
->> But I think this writing style in here very convenient.
->> Although padding needs to be added during definition,
->> but you can use command.mdio_start or command->mdio_start
->> to access specific bitfields.
+>> The patched code estimates RENO snd_cwnd using the estimated
+>> RENO snd_cwnd after one RTT (i.e., tcp_cwnd_next_rtt),
+>> because ca->cnt is used to increase snd_cwnd for the next RTT.
 >>
->> Although FIELD_PREP/FIELD_GET is convenient,
->> But it also needs to define the mask using BIT or GENMASK,
->> and the mask can only be a static constant,
->> which makes it difficult to use sometimes.
-> Have a look around. How many drivers use this sort of union? How many
-> use bitfield.h. There is a reason the union is not used. I suspect
-> there is nothing in the C standard which guarantees it works.
+>> Fixes: 89b3d9aaf467 ("[TCP] cubic: precompute constants")
+>> Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
+>> Signed-off-by: Lisong Xu <xu@unl.edu>
+>> ---
+>> v2->v3: Corrent the "Fixes:" footer content
+>> v1->v2: Separate patches
+>>
+>>  net/ipv4/tcp_cubic.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+>> index 7bc6db82de66..a1467f99a233 100644
+>> --- a/net/ipv4/tcp_cubic.c
+>> +++ b/net/ipv4/tcp_cubic.c
+>> @@ -315,8 +315,11 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
+>>                         ca->tcp_cwnd++;
+>>                 }
+>>
+>> -               if (ca->tcp_cwnd > cwnd) {      /* if bic is slower than tcp */
+>> -                       delta = ca->tcp_cwnd - cwnd;
+>> +               /* Reno cwnd one RTT in the future */
+>> +               u32 tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
+>> +
+>> +               if (tcp_cwnd_next_rtt > cwnd) {  /* if bic is slower than Reno */
+>> +                       delta = tcp_cwnd_next_rtt - cwnd;
+>>                         max_cnt = cwnd / delta;
+>>                         if (ca->cnt > max_cnt)
+>>                                 ca->cnt = max_cnt;
+>> --
+> I'm getting a compilation error with clang:
 >
->        Andrew
+> net/ipv4/tcp_cubic.c:322:7: error: mixing declarations and code
+> is incompatible with standards before C99
+> [-Werror,-Wdeclaration-after-statement]
+>     u32 tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
+>
+> Can you please try something like the following:
+>
+> -               u32 scale = beta_scale;
+> +               u32 scale = beta_scale, tcp_cwnd_next_rtt;
+> ...
+> +               tcp_cwnd_next_rtt = ca->tcp_cwnd + (ca->ack_cnt + cwnd) / delta;
+>
+> Thanks!
+> neal
+Thank you, Neal,
+We have tried your suggested changes, and they also work for our compile and experiment tests.
+We did not find this issue because we have only tried to compile with the default Makefile with GCC.
+I agree with your changes, it is conform to the existing codes and compatible with that standards.
 
-Ok, thanks for the comment.
-I'll fix it in the next version.
-	
-	Jijie Shao
-
-
+Thanks,
+Mingrui
 
