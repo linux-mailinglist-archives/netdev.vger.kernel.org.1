@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-119372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3152955585
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 07:25:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C17955586
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 07:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E73FB1C21844
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 05:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4D312844AD
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 05:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279F583CDA;
-	Sat, 17 Aug 2024 05:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EF812C7FB;
+	Sat, 17 Aug 2024 05:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2OyNctA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBWci6Yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9D180BFC;
-	Sat, 17 Aug 2024 05:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37B285947;
+	Sat, 17 Aug 2024 05:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723872338; cv=none; b=FkEufa/Pwlj9rHBOfAUG+LwNoSwsGdILbC9dR3YhXNpbmtwLwti10a2N1UJ6QE0gQBfFKrQq8dWZlU/jt+drDmGQIWE00ilRz6cxJ2PS6NpAUCBRcDkLy3UWuc40MEnrvIuyYzmr43k14xh4pMzNAuu06whPDyeFmz5fR1UV21o=
+	t=1723872340; cv=none; b=npkEsS24oFbKW7WT6Cp8/K6c4wYKHMhg5cKDpvdCs3I9rvKTcytV+uzjHEbHlIvreY4J8IbZR8XscsHLcLUFw6NVnBIbZ4sJ/fOmeUuvilP6wjvchl1iPGWm6Mr0TNHc2n/HyQXFC0802Zvc1qugiWeSPTVJduYoi9C4w1ra5bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723872338; c=relaxed/simple;
-	bh=vmx+P1CuFEpMFLtehjO8rEQ6KRWpdZ78F9yfzsnhWGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UiGFB3Rta5G1jKm09nbI4FT8jVJHaz3nfv+muMBGZRiCivlauAuv4FOGvtPKsoFJuLDWkoT45R6ukQVWGruLvNqk+Ynt2YzK+mo8c8wFNhmLOLjZg9cKmsv0m+WJ/KTwOnJITmggCkgb3mdmAPyIZM+O+xgWQ9GnbG5ubKFAxQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2OyNctA; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1723872340; c=relaxed/simple;
+	bh=GGmTQ/DpZ1ivxAVL85XAJcvbvjdi7bdulyr9WEIIcaI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YRiMqIiK5YkM3/1z8eUE9cNprFdpU+7ox49AqaGclX8SoGS/3xUvgyFiFwp2bilBZehgBUsUKzMusp0uzKcFYvNuGe87ZgDd/LZ7h6pfkwh/bJVbpp8bd9V7QXdZGUp8FF8NBTv9Pu43f5tLizkF9sjpIEsFIbagAQw2PQQ3M9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CBWci6Yb; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-75abb359fa5so358513a12.0;
-        Fri, 16 Aug 2024 22:25:36 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2d3e6fd744fso228050a91.3;
+        Fri, 16 Aug 2024 22:25:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723872335; x=1724477135; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p42ho0GceISUkXinglAkKZPfvE6LNt/mzihc8FFx11c=;
-        b=H2OyNctAUk/cBmeoXKcJDBpirtAj7oPltmRGqZuSmph3ngljITnAg/jDk32X83Vkj7
-         6lY+wb4BeIWtCz8lbbbhz+QDI4Jsy73HL6iJ8LK7JHTVJasvPUGIkz++SjokCsidv3MB
-         n99oI08eJGPJbgC8MD264E6AGrXuf/5SK+LGDmkc7GhJjIUwBP260MOvU+KMpCFDbTdE
-         g/tHZjftvPLnEBmrOU7Pqwoxn4YKWXw5m5hdIxtxNdAzh5lmDVt0ZWBZXiDI4Ps9eloA
-         nHY094PRo1ZPO846j8iThF4CiVIeAFJVNQ1seZcAFBVouxyM/3PwObpXvFIyNgqj0np6
-         +NkA==
+        d=gmail.com; s=20230601; t=1723872338; x=1724477138; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BS8+RiZEmv0wlXGw1pCvo0HTl03EM7UdQxVuxn5OxZY=;
+        b=CBWci6Yby0uoiumLbfND8k0e9bOSEteCEZ4KjjcvLE9NWrRa4yTlCHErClv3ddc8I6
+         pOydgkJcEN88AbkzYbbcEI6ZpNrEP64XKdsXpNsmhTyU6kqYO8a+d9QgvgIdxYFGw1tG
+         R8hwmI16I6jQDOzvkXZakXnyY4/vfzdnb5fLaPTlglJVugfiUALeTfjI7F1jAZr92ZT/
+         9i99FuhvllKFDRR2Wr9gsT92NvHNmoZdvgJbhshs3f7GS4I8mJ2Wffn1oeHB0xoTK9un
+         nu+Vrh2szIXbGbrR/e8/7q2cf8XazkJe9q9HZZmHMviiIt+wwXE6sd022VVNz3cQ6sz0
+         H7Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723872335; x=1724477135;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p42ho0GceISUkXinglAkKZPfvE6LNt/mzihc8FFx11c=;
-        b=Tg5pvETKn1f1u7Rhlyq0StlUWp8CI43RpVxdpM0QjcyzR+djLnyaF9Cgv6jqR8Oo0X
-         9RuglRVMzxfKI/y0TuMbrlBOKlm6t2GmowI0x3Iy2ub9deUKBnA6Z48H7BPS2OxBO3Dk
-         vHaLktxho+YvkqqHZhIIwEMmEUltWl95U4cA3iOOKjfY18IrMy53r8TNkkkRA3pbYMaL
-         12MtDSgh8vnTISqYtfKcj7Aq/oFGpPgCGvAKC1LRDkDzq6TYEAroMG+gLH05SilxbOqS
-         SD7Vn1b1kp1IXN4xYGqQ2beg8Y8u6MCl7372B9bWi/1SJPjqN/b6RuRG+oFS6YN31AF/
-         nohQ==
-X-Gm-Message-State: AOJu0YwUm1CS5JHgtOcoc+KKjxQrBkTeOqqMgi5d+5Q6hzpupnuO+d4a
-	ZEoOay7sUhmsU0EfSh1yu3wemnbhulU4uni/Y42JYgrKRKGOYxH/R/1Ceq5U
-X-Google-Smtp-Source: AGHT+IGQhRld7X/X0M+1Z44rg/Add/4qe0B69pfNjrAYUav7vg4qbhjy/VoGx+th7WnhAa2Y0Zp7TQ==
-X-Received: by 2002:a17:90a:d517:b0:2d3:c488:fa6b with SMTP id 98e67ed59e1d1-2d3e151f6d8mr3336291a91.5.1723872335246;
-        Fri, 16 Aug 2024 22:25:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723872338; x=1724477138;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BS8+RiZEmv0wlXGw1pCvo0HTl03EM7UdQxVuxn5OxZY=;
+        b=FxYAdnbaKottKW9/Jyic0xgBONAKJw0YuPWX6KgRgJEGKPJwh9CUnanG+Ow5jODjDm
+         y3/M0JJz6YZhnabgUH32vSB78dFmwU0QV7UltCT7csCng2MEpJkD56d0BX/2/eVqTFgw
+         /mM6vNMfJeZBQtzBzEEEz13CtcR1jcAdPPfYroGd2ff7VB9um3SdBvegz25ClaZAVzk6
+         HNWHgR7rTfLdgy4ji92OfWEBps4F8Tu/35PwKjLr4jXMFMR5t4JEVCO7V1XhVo86jfji
+         vibAnxg8oygl6A94Mx7P+GLSYNIXxvP0PIoBTbWP4L9T6IGuMz1NYT6yL8BDeaxU4tgO
+         k03g==
+X-Gm-Message-State: AOJu0YyjDcqCIa18gTxvGF2R0lj7Ht+2yrQjSwjkXxwlBXyL5imn4WPu
+	IXDJEDakd5XDujRPHG1KJmtIKPO11QfLI40BKKgEXAEgWFKG6g8uHxttqsxx
+X-Google-Smtp-Source: AGHT+IEEy0Y/XAlhCUbj+gItKs0f4xPx1joKR8KvueFcw9K+Y1u5o0sAzkbWb+YG4X7r0qzML87bJw==
+X-Received: by 2002:a17:90b:146:b0:2c8:4623:66cd with SMTP id 98e67ed59e1d1-2d3e1a42e70mr3315416a91.1.1723872337402;
+        Fri, 16 Aug 2024 22:25:37 -0700 (PDT)
 Received: from localhost.localdomain (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e3c74e33sm2881655a91.39.2024.08.16.22.25.33
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e3c74e33sm2881655a91.39.2024.08.16.22.25.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 22:25:34 -0700 (PDT)
+        Fri, 16 Aug 2024 22:25:37 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: rust-for-linux@vger.kernel.org,
@@ -72,10 +74,12 @@ Cc: rust-for-linux@vger.kernel.org,
 	miguel.ojeda.sandonis@gmail.com,
 	benno.lossin@proton.me,
 	aliceryhl@google.com
-Subject: [PATCH net-next v4 0/6] net: phy: add Applied Micro QT2025 PHY driver
-Date: Sat, 17 Aug 2024 05:19:33 +0000
-Message-ID: <20240817051939.77735-1-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v4 1/6] rust: sizes: add commonly used constants
+Date: Sat, 17 Aug 2024 05:19:34 +0000
+Message-ID: <20240817051939.77735-2-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240817051939.77735-1-fujita.tomonori@gmail.com>
+References: <20240817051939.77735-1-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,74 +88,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset adds a PHY driver for Applied Micro Circuits Corporation
-QT2025.
+Add rust equivalent to include/linux/sizes.h, makes code more
+readable.
 
-The first patch adds Rust equivalent to include/linux/sizes.h, makes
-code more readable. The 2-5th patches update the PHYLIB Rust bindings.
-
-QT2025 PHY support was implemented as a part of an Ethernet driver for
-Tehuti Networks TN40xx chips. Multiple vendors (DLink, Asus, Edimax,
-QNAP, etc) developed adapters based on TN40xx chips. Tehuti Networks
-went out of business and the driver wasn't merged into mainline. But
-it's still distributed with some of the hardware (and also available
-on some vendor sites).
-
-The original driver handles multiple PHY hardware (AMCC QT2025, TI
-TLK10232, Aqrate AQR105, and Marvell MV88X3120, MV88X3310, and
-MV88E2010). I divided the original driver into MAC and PHY drivers and
-implemented a QT2025 PHY driver in Rust.
-
-The MAC driver for Tehuti Networks TN40xx chips was already merged in
-6.11-rc1. The MAC and this PHY drivers have been tested with Edimax
-EN-9320SFP+ 10G network adapter.
-
-v4:
-- fix the comments
-- add Andrew's Reviewed-by
-- fix the order of tags
-v3: https://lore.kernel.org/netdev/20240804233835.223460-1-fujita.tomonori@gmail.com/
-- use addr_of_mut!` to avoid intermediate mutable reference
-- update probe callback's Safety comment
-- add MODULE_FIRMWARE equivalent
-- add Alice's Reviewed-by
-v2: https://lore.kernel.org/netdev/20240731042136.201327-1-fujita.tomonori@gmail.com/
-- add comments in accordance with the hw datasheet
-- unify C22 and C45 APIs
-- load firmware in probe callback instead of config_init
-- use firmware API
-- handle firmware endian
-- check firmware size
-- use SZ_*K constants
-- avoid confusing phy_id variable
-v1: https://lore.kernel.org/netdev/20240415104701.4772-1-fujita.tomonori@gmail.com/
-
-FUJITA Tomonori (6):
-  rust: sizes: add commonly used constants
-  rust: net::phy support probe callback
-  rust: net::phy implement AsRef<kernel::device::Device> trait
-  rust: net::phy unified read/write API for C22 and C45 registers
-  rust: net::phy unified genphy_read_status function for C22 and C45
-    registers
-  net: phy: add Applied Micro QT2025 PHY driver
-
- MAINTAINERS                      |   8 ++
- drivers/net/phy/Kconfig          |   6 +
- drivers/net/phy/Makefile         |   1 +
- drivers/net/phy/ax88796b_rust.rs |   7 +-
- drivers/net/phy/qt2025.rs        |  90 +++++++++++++
- rust/kernel/lib.rs               |   1 +
- rust/kernel/net/phy.rs           |  78 ++++++-----
- rust/kernel/net/phy/reg.rs       | 222 +++++++++++++++++++++++++++++++
- rust/kernel/sizes.rs             |  26 ++++
- rust/uapi/uapi_helper.h          |   1 +
- 10 files changed, 402 insertions(+), 38 deletions(-)
- create mode 100644 drivers/net/phy/qt2025.rs
- create mode 100644 rust/kernel/net/phy/reg.rs
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+---
+ rust/kernel/lib.rs   |  1 +
+ rust/kernel/sizes.rs | 26 ++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
  create mode 100644 rust/kernel/sizes.rs
 
-
-base-commit: 399117317001d0f5bf4194feccaafa62b12e744f
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 274bdc1b0a82..58ed400198bf 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -43,6 +43,7 @@
+ pub mod page;
+ pub mod prelude;
+ pub mod print;
++pub mod sizes;
+ mod static_assert;
+ #[doc(hidden)]
+ pub mod std_vendor;
+diff --git a/rust/kernel/sizes.rs b/rust/kernel/sizes.rs
+new file mode 100644
+index 000000000000..834c343e4170
+--- /dev/null
++++ b/rust/kernel/sizes.rs
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Commonly used sizes.
++//!
++//! C headers: [`include/linux/sizes.h`](srctree/include/linux/sizes.h).
++
++/// 0x00000400
++pub const SZ_1K: usize = bindings::SZ_1K as usize;
++/// 0x00000800
++pub const SZ_2K: usize = bindings::SZ_2K as usize;
++/// 0x00001000
++pub const SZ_4K: usize = bindings::SZ_4K as usize;
++/// 0x00002000
++pub const SZ_8K: usize = bindings::SZ_8K as usize;
++/// 0x00004000
++pub const SZ_16K: usize = bindings::SZ_16K as usize;
++/// 0x00008000
++pub const SZ_32K: usize = bindings::SZ_32K as usize;
++/// 0x00010000
++pub const SZ_64K: usize = bindings::SZ_64K as usize;
++/// 0x00020000
++pub const SZ_128K: usize = bindings::SZ_128K as usize;
++/// 0x00040000
++pub const SZ_256K: usize = bindings::SZ_256K as usize;
++/// 0x00080000
++pub const SZ_512K: usize = bindings::SZ_512K as usize;
 -- 
 2.34.1
 
