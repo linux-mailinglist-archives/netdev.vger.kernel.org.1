@@ -1,158 +1,95 @@
-Return-Path: <netdev+bounces-119442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A7C955994
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 22:37:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0387E9559D8
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 23:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB1761F218D3
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 20:37:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 994B1B20FDE
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 21:34:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090231553BB;
-	Sat, 17 Aug 2024 20:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B86145A07;
+	Sat, 17 Aug 2024 21:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNoObTmd"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ErzlH8JN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D290D155337;
-	Sat, 17 Aug 2024 20:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD33712DD88
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 21:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723927021; cv=none; b=uTTBX/RmULVjhOHI5yem3aT2ctHXQDmZYOG1mgh4ipCZxr0HcLOE4x9Pv2t125kqC9mrK4zRZtn7iqy8uldVbrxqWNhBafegWamaByRH6OnavfLdyoHAIalMCS0OUDSpm89a87pGiahO7IvmkL1aUMGSLptp1NYN4mot9PHXcnA=
+	t=1723930464; cv=none; b=RTq8BUVWZ3QyQlwvWg0p6hxwpfFAwRUxZ1oPDiPAmh7pT0DdczAAy7ov0Xw2z95cKGwyDIuuLugo0z73L5lrMq42nqoYLJudFrfqoNGMuwAQyXQ5RVTXt62BPdQjeXON5pjK63HRwf1329jdkul/pChfQnD4+kwxl/KCdPvT+SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723927021; c=relaxed/simple;
-	bh=MXwbzLyYB0p5K3Jufjy7e8h3D/VBdQMI1clVMp3Vq9c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pLNtVQ74EqdPfpcnCioTskK+rRCXidZzHoqTBG3Dq+eNTjrMVxpoH8bIdM4hmYN021nkjcop/yxjsGj82OpJyTlTuYL/dWMTyOwhTITg/FeVdE2T46R3K64cM/Fb91qUXN/g7dD9t830wP3RtvbPuiKMlIvbz2B66Ly1bRd9pqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNoObTmd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E048DC4AF0B;
-	Sat, 17 Aug 2024 20:37:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723927021;
-	bh=MXwbzLyYB0p5K3Jufjy7e8h3D/VBdQMI1clVMp3Vq9c=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BNoObTmdvTfti18QnqRiFXffSI0jYbddonQugq3vCui2rgSGtjgMZEBfYxXRzvRqX
-	 OKhnxYpkjnhoSahpBnLwp6ke6P+xwv+MJ90LaWuFwMZPffBilE52zv1E/l0dQ2KS12
-	 ZSusiEOsM+wIqa4t2RxlyNSaNSBPmESNUt4GXL9r9LEx2Tyl5IqdhOy0U2kqPzYsfe
-	 5uaO1ANbFgTfC/OUyVQnv4KRvVi6nOUj4gEW/miEq+GFBOEewkEkxyUhvccsXqcGlM
-	 rc4Xh0tWz27gI8tMO9NsY4ZCN6PigW/5yMjmb6x3w3CyEw/ZwHunjxrK9XlurHoJRO
-	 8tqlqpK+So7tA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	idosch@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: net/forwarding: spawn sh inside vrf to speed up ping loop
-Date: Sat, 17 Aug 2024 13:36:59 -0700
-Message-ID: <20240817203659.712085-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1723930464; c=relaxed/simple;
+	bh=0UYgIPm2YXVY01BcojqkZIv0c3YHg8Js7c0MB1UcgIQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oYdZG8/TzpiqBHeG/CS5C4g7tnA5g+l5Wf+2kaSA5Wx0L/y+ogCcOGrTJIysJYTgEiAGIao28SHYfwDBVVbzZr3ZEqV0TxpWxk8bks58cKTgB6qaakaHNmT4PXmxKLShfxkr6ch/xf3eXsOq0Fy+NQBc+9d4pw1Jp/oeSkFxls0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ErzlH8JN; arc=none smtp.client-ip=185.70.40.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1723930459; x=1724189659;
+	bh=CPb7iY9MnNS1T2jgFqtK+We04HUrsHfv3IFGJARoxa8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=ErzlH8JNwNrb3rCAhJW98h+6UU56u+6FdNoMFoH5oyDJ0+BcEkED5sMh9AAZvcjxa
+	 DH8283jKz3J0tdExzpuehIWkY0ryPtJUnvzjUbok6vJEjggF+xZHV/JHeFxV909LHC
+	 053jd1rQqH30eDh7hHFFc5Lf85nddXxA5CzRr8QYur4gYFrC9wkPmG0b0h/WGrvaXS
+	 2XPK+3eC0pgOiYka7CgOQjUDRs+xpbLOY8gvMuv5LCjV6hS2OumOrEemc69BHeu1DD
+	 VPjZisbg5aofycqsEfIb24MuD2rhqkvMAC785OKPyXV1sX7vSsiwuL6AUASEA+lU4t
+	 Vfm+vAnQJPJyg==
+Date: Sat, 17 Aug 2024 21:34:13 +0000
+To: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v4 6/6] net: phy: add Applied Micro QT2025 PHY driver
+Message-ID: <7f835fe8-e641-4b84-a080-13f4841fb64a@proton.me>
+In-Reply-To: <9a7c687a-29a9-4a1a-ad69-39ce7edad371@lunn.ch>
+References: <20240817051939.77735-1-fujita.tomonori@gmail.com> <20240817051939.77735-7-fujita.tomonori@gmail.com> <9a7c687a-29a9-4a1a-ad69-39ce7edad371@lunn.ch>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: ef0d4e94ed0f65950868f1a1ae0caf34d6ea5def
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Looking at timestamped output of netdev CI reveals that
-most of the time in forwarding tests for custom route
-hashing is spent on a single case, namely the test which
-uses ping (mausezahn does not support flow labels).
+On 17.08.24 20:51, Andrew Lunn wrote:
+>> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
+>> +        dev.genphy_read_status::<C45>()
+>> +    }
+>=20
+> Probably a dumb Rust question. Shouldn't this have a ? at the end? It
+> can return a negative error code.
 
-On a non-debug kernel we spend 714 of 730 total test
-runtime (97%) on this test case. While having flow label
-support in a traffic gen tool / mausezahn would be best,
-we can significantly speed up the loop by putting ip vrf exec
-outside of the iteration.
+`read_status` returns a `Result<u16>` and `Device::genphy_read_status`
+also returns a `Result<u16>`. In the function body we just delegate to
+the latter, so no `?` is needed. We just return the entire result.
 
-In a test of 1000 pings using a normal loop takes 50 seconds
-to finish. While using:
+Here is the equivalent pseudo-C code:
 
-  ip vrf exec $vrf sh -c "$loop-body"
+    int genphy_read_status(struct phy_device *dev);
+   =20
+    int read_status(struct phy_device *dev)
+    {
+        return genphy_read_status(dev);
+    }
 
-takes 12 seconds (1/4 of the time).
+There you also don't need an if for the negative error code, since it's
+just propagated.
 
-Some of the slowness is likely due to our inefficient virtualization
-setup, but even on my laptop running "ip link help" 16k times takes
-25-30 seconds, so I think it's worth optimizing even for fastest
-setups.
+Hope this helps!
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: shuah@kernel.org
-CC: idosch@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/net/forwarding/custom_multipath_hash.sh     | 8 ++++----
- .../selftests/net/forwarding/gre_custom_multipath_hash.sh | 8 ++++----
- .../net/forwarding/ip6gre_custom_multipath_hash.sh        | 8 ++++----
- 3 files changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-index 1783c10215e5..7d531f7091e6 100755
---- a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
-@@ -224,10 +224,10 @@ send_dst_ipv6()
- send_flowlabel()
- {
- 	# Generate 16384 echo requests, each with a random flow label.
--	for _ in $(seq 1 16384); do
--		ip vrf exec v$h1 \
--			$PING6 2001:db8:4::2 -F 0 -c 1 -q >/dev/null 2>&1
--	done
-+	ip vrf exec v$h1 sh -c \
-+		"for _ in {1..16384}; do \
-+			$PING6 2001:db8:4::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+		done"
- }
- 
- send_src_udp6()
-diff --git a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-index 9788bd0f6e8b..dda11a4a9450 100755
---- a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
-@@ -319,10 +319,10 @@ send_dst_ipv6()
- send_flowlabel()
- {
- 	# Generate 16384 echo requests, each with a random flow label.
--	for _ in $(seq 1 16384); do
--		ip vrf exec v$h1 \
--			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1
--	done
-+	ip vrf exec v$h1 sh -c \
-+		"for _ in {1..16384}; do \
-+			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+		done"
- }
- 
- send_src_udp6()
-diff --git a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-index 2ab9eaaa5532..e28b4a079e52 100755
---- a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-+++ b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
-@@ -321,10 +321,10 @@ send_dst_ipv6()
- send_flowlabel()
- {
- 	# Generate 16384 echo requests, each with a random flow label.
--	for _ in $(seq 1 16384); do
--		ip vrf exec v$h1 \
--			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1
--	done
-+	ip vrf exec v$h1 sh -c \
-+		"for _ in {1..16384}; do \
-+			$PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1; \
-+		done"
- }
- 
- send_src_udp6()
--- 
-2.46.0
+Cheers,
+Benno
 
 
