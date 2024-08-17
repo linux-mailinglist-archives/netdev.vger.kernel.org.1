@@ -1,132 +1,174 @@
-Return-Path: <netdev+bounces-119384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBFC9555E8
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 08:52:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A74955622
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704251C21326
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 06:52:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171491C2154E
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 07:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB994136E01;
-	Sat, 17 Aug 2024 06:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6646F13E8B6;
+	Sat, 17 Aug 2024 07:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hy4ZgiM/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO8MazQF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E512F38B
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 06:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF3813CFA3;
+	Sat, 17 Aug 2024 07:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723877574; cv=none; b=LN9gbAqPFtsc5Wb6smueBgO71lv9/x8qXfcjnk+UQhArNTjqBKJX0Ts/w7rJHwafbUYiZ+r7dxOAvv9TO4S/mVJjq+FW48qBnjjSupRQ8Vb/dEKrh0o7Zgl6+T+u1dUzNRgyaTdgcxj1bsJpCFRM/iuwyPBjrrK6fr6pL3rTF1M=
+	t=1723879338; cv=none; b=pKzg2jvRYILSgCbGPvvkQZzBEkGKsgwwD3wvl8qj5BBdX5TwC1fAZH2rJ9/CHUEb0XZkeTRa8VxlnkxJXCY9eYv88dXUmMS2sQBkDCtOOQz7KaqVN7iZIGxaZk2DmvMzGkcFiIfcwn0kmCzbrGHtdUR9HB6nQHGZc4IGDFDd9G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723877574; c=relaxed/simple;
-	bh=CzHStjjH4V8sPZdoqAFqWMk+oxPdeCbL03cvp8dl/zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GEDaiuownivrOHf1oFzUwi+8sz6x8u+OD+wBFTIk7+Sjx96CetkHmJqk7vniVVceZzb2g6bC3BojkXpMCn8OnNQM36cxQ9wpLpgvVUuKV4piE+wN29Vv8JBBYxa06ej04Q8nV59by5Yri/CwhGvZ8J4w0+b2q8z6eicVDolSZl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hy4ZgiM/; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso27168465e9.3
-        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 23:52:52 -0700 (PDT)
+	s=arc-20240116; t=1723879338; c=relaxed/simple;
+	bh=7cnVUeChjgu+H9+YLNcBRYkwu+eWF6JojTp+Wk1c2NE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HJwXNgH4TgeXgYCeF8hM+gTQoaacsoAcyvZMBxK3LW54hrlSo/OoZBHt82hyVe5tZdAuFPtY9bpvh+MqMMLcrOiOEed5PefMlYixvqd23lUlvQkFtHqwmElHIYeEYobNHYx8ZDOQyDfX62teSTJ/Reu8Wpjq2M/P8vC1q6xNZ4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO8MazQF; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3718eaf4046so1335954f8f.3;
+        Sat, 17 Aug 2024 00:22:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723877571; x=1724482371; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iayHuQdCGfrgLfhcreNqaNDx16C6Jh397QJm/SbJkWE=;
-        b=hy4ZgiM/2D0kvCmQzX7EY6f74I182NKLsECGGQJxHlvdy/DiTjhAY1BYU9CXOFTQfB
-         YRvoRp6b2wWvjIVI1hsZ/sRefkQO9Vk6TisKbMMf6XwMSq1blf26mkVDyF3KSUcDB865
-         JMFhJQZ6+Yofnr50vk1SgeMlK7+LtixjxtNWLAbYaIxeXvxRAKiUnfUDb85b022Kaba4
-         p9fpSO2gT1yKwuKeYnqiV+zGR0ZMSb7bPUjZ4k7a7K2ZxiDrPeOhD5zG6+shEi+bygJM
-         LhWhSILjTvc797JrZh8yvQ0FrwPmEJXnWAqHbzROMPI15BhPG+8ldIXqKk93Q7Djv8qb
-         yGbA==
+        d=gmail.com; s=20230601; t=1723879334; x=1724484134; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qv//cMXlZMFtqNbjMe4oj82em7Hd3JuMo8tNEDaIu4c=;
+        b=SO8MazQFX5LAfiZoFAIi1Y2AFqW1yhZle51xaUC9sEOMBR66by4SYC0xxpwJfVSgNN
+         ipnf3vudq6Tw1OxNfvbZT+q8K2pmWJevP3T4HcS0/o6JxGImXzJ6RdVYE9/rDr3U+62G
+         dzc5IuR4Ntrt9ojtoZQ3uOUN/RDDhHqfwiOkKYmWVA3DjEry6mo7dGTyVePN5Y3jth60
+         dRNe59EfG76eA0y7kPox2n1+9xRApCPi56a0BJtITSrD2qWZtX/iED67dDiY7W6/kgmM
+         +No+8A0A3nnXjbNTLzT7eDEBQ8ejx2GC0C6p+NQEomim5k637KT77MEMJW5IamvKledN
+         lj0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723877571; x=1724482371;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iayHuQdCGfrgLfhcreNqaNDx16C6Jh397QJm/SbJkWE=;
-        b=U2/TJ0DgfZ+VpEK8sWcU/w5psnllRl7MCtVV3A6wqjF5A2V1u6fQSbsRdKqhb+FFS0
-         Gqhd366mg2cEXknOZY6uUiq2Hv/61mJOCoQZkRBzc+Qi1bXXVeGePPulKq56WUWAxJQp
-         UFqHOZpDWOfe8RNQBVF+WsaN88U/781eFptPAnjDdXfYDLVAl86UE2GORFpbxjsVO3bB
-         2RKX69/cBKtCE3FeXg8TE6788jIxFEit2k2QGRogvYon7wmyR82szfaMwau+0IO/TqNw
-         FbFH3kaNAoNj+33nfJsSw32z6xDaHi0BLNVBvKRcfUvh5bXDzDR7HREQozE9g9mXScMI
-         7JzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOXAN/jAXvvWzRXs+fPaNj51i/mJUA9i+qMss6O/5PT8+ussXYyx9EwxvdYFDyt6ZALAyqmzI4CsuKgy8Kb4skmw4ARkqJ
-X-Gm-Message-State: AOJu0YzNNdnHzBneUjmQpMMUvlYBXJKAcPjgpuYFiIPqEuehWUZMNwYd
-	mPP6QjiRIgJFwhGltY9JDfHaHE46vM9nkYA11umH1u4kPKZz/nVG/+XOUqxmtB8=
-X-Google-Smtp-Source: AGHT+IFNIXj9oV9+Ox0dNnq+TrIQ0ML3idpxQu8xxGwKVDp40dG1KGsNY1LaeHzxO7S57gOvqrDEzQ==
-X-Received: by 2002:a5d:5545:0:b0:366:ee01:30d6 with SMTP id ffacd0b85a97d-3719469ff15mr3757080f8f.49.1723877571207;
-        Fri, 16 Aug 2024 23:52:51 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898ab855sm5141246f8f.105.2024.08.16.23.52.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 23:52:50 -0700 (PDT)
-Date: Sat, 17 Aug 2024 09:52:46 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] dpaa2-switch: Fix error checking in
- dpaa2_switch_seed_bp()
-Message-ID: <eec27f30-b43f-42b6-b8ee-04a6f83423b6@stanley.mountain>
+        d=1e100.net; s=20230601; t=1723879334; x=1724484134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qv//cMXlZMFtqNbjMe4oj82em7Hd3JuMo8tNEDaIu4c=;
+        b=QyaFUz7YRXw+rgrS3fwKtV8S3NKyTCQJAnh4zz66W5OFfEcw4qb32pLvI+NA+E3Dqf
+         XNqcubvvs3nexAHV9ZyuEV1eegTMfvoTOP3o30XcoATJ6CefxWZgJVJnYXWSfDxeeta8
+         qyQcdBypWH9WfLuzMXPdOQTv50XF9NOq0c/PVZh7Fq71J71Ufr4ozaqCV7VqL8Ck6/Bd
+         wSCwrn6vlIywLgaDEagCx8OzdyGpvZhIv24IF5A4enLqscw5mps1RrmZEya/rRpykkSP
+         arSN5IlyP+SFZGshczzk9VCEJadGR5BgtnxQ463W5CBwdX6jcgyJRYNK6uRRK9WDSVU7
+         vW9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWg2tBth2ZOga0/sDMVJS2pjP4mU8VVbj4s6flxoI+B8QEqSOvkUurGbQsBnv4YXh6AVPYl+v6hL0cvHnnU/5sGxK6EleAFzpT1A+qsmUlfaTdSP8Nbp5953mNqXZEvNGqx9vJO80jI9E0MhZQlGKjZkVawg/a9DPzvwNcR005efP0TXhOzUcka4cruizjGViQx+6nH9PbhZYJ1
+X-Gm-Message-State: AOJu0YyF4pH8WdtmNMJE14/6JB/4sMlVyBLDxHmLTpgUpfR8VYdH6V/Y
+	qn6hglWMORIHmZyTLfnBd3GL9sreRB5bza0OzBS8y6PAgMf3Dj3pKAOLh6cM59F4YexT1Zfle99
+	mnLiPuEJxznmZUKXTzC6APiccyOQ=
+X-Google-Smtp-Source: AGHT+IGYPED+EDMmtWlfqZ30mThja6VK8NtB6YP/LLvy3rtLIhdo6cjAoEMDY3Rrqz+oI/iTzfyvpN6uMxgGM1b65vA=
+X-Received: by 2002:adf:facf:0:b0:368:4b9d:ee2c with SMTP id
+ ffacd0b85a97d-3719443d206mr3972273f8f.19.1723879333453; Sat, 17 Aug 2024
+ 00:22:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <20240816-ups-bpf-next-selftests-use-khdr-v1-0-1e19f3d5b17a@kernel.org>
+ <20240816-ups-bpf-next-selftests-use-khdr-v1-1-1e19f3d5b17a@kernel.org>
+In-Reply-To: <20240816-ups-bpf-next-selftests-use-khdr-v1-1-1e19f3d5b17a@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sat, 17 Aug 2024 09:22:02 +0200
+Message-ID: <CAADnVQ+JBq8-6Rhi_LHX470uj2_2xxJAhgdUfg_abUxEDqpdJQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] selftests: bpf: use KHDR_INCLUDES for the
+ UAPI headers
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The dpaa2_switch_add_bufs() function returns the number of bufs that it
-was able to add.  It returns BUFS_PER_CMD (7) for complete success or a
-smaller number if there are not enough pages available.  However, the
-error checking is looking at the total number of bufs instead of the
-number which were added on this iteration.  Thus the error checking
-only works correctly for the first iteration through the loop and
-subsequent iterations are always counted as a success.
+On Fri, Aug 16, 2024 at 7:56=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> Instead of duplicating UAPI header files in 'tools/include/uapi', the
+> BPF selftests can also look at the header files inside the kernel
+> source.
+>
+> To do that, the kernel selftests infrastructure provides the
+> 'KHDR_INCLUDES' variable. This is what is being used in most selftests,
+> because it is what is recommended in the documentation [1]. If the
+> selftests are not executed from the kernel sources, it is possible to
+> override the variable, e.g.
+>
+>   make KHDR_INCLUDES=3D"-I${HDR_DIR}/include" -C "${KSFT_DIR}"
+>
+> ... where ${HDR_DIR} has been generated by this command:
+>
+>   make headers_install INSTALL_HDR_PATH=3D"${HDR_DIR}"
+>
+> Thanks to 'KHDR_INCLUDES', it is no longer needed to duplicate header
+> files for userspace test programs, and these programs can include UAPI
+> header files without the 'uapi' prefix.
+>
+> Note that it is still required to use 'tools/include/uapi' -- APIDIR,
+> which corresponds to TOOLS_INCLUDES from lib.mk -- for the BPF programs,
+> not to conflict with what is already defined in vmlinux.h.
+>
+> Link: https://docs.kernel.org/dev-tools/kselftest.html#contributing-new-t=
+ests-details [1]
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+>  tools/testing/selftests/bpf/Makefile                       | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/assign_reuse.c      | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/tc_links.c          | 4 ++--
+>  tools/testing/selftests/bpf/prog_tests/tc_netkit.c         | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/tc_opts.c           | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/user_ringbuf.c      | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/xdp_bonding.c       | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c   | 2 +-
+>  tools/testing/selftests/bpf/prog_tests/xdp_link.c          | 2 +-
+>  tools/testing/selftests/bpf/xdp_features.c                 | 4 ++--
+>  12 files changed, 14 insertions(+), 14 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftes=
+ts/bpf/Makefile
+> index 4eceb491a8ae..6a7aeae7e206 100644
+> --- a/tools/testing/selftests/bpf/Makefile
+> +++ b/tools/testing/selftests/bpf/Makefile
+> @@ -37,7 +37,7 @@ CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic                  =
+                 \
+>           -Wall -Werror -fno-omit-frame-pointer                         \
+>           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)                    \
+>           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)          \
+> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
+>  LDFLAGS +=3D $(SAN_LDFLAGS)
+>  LDLIBS +=3D $(LIBELF_LIBS) -lz -lrt -lpthread
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c b/tool=
+s/testing/selftests/bpf/prog_tests/assign_reuse.c
+> index 989ee4d9785b..3d06bf5a1ba4 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (c) 2023 Isovalent */
+> -#include <uapi/linux/if_link.h>
+> +#include <linux/if_link.h>
 
-Fix this by checking only the bufs added in the current iteration.
+No. This is not an option.
+User space shouldn't include kernel headers like this.
+Long ago tools/include directory was specifically
+created to break such dependency.
+Back then it was done for perf.
 
-Fixes: 0b1b71370458 ("staging: dpaa2-switch: handle Rx path on control interface")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-From reviewing the code.  Not tested.
----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index a71f848adc05..a293b08f36d4 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -2638,13 +2638,14 @@ static int dpaa2_switch_refill_bp(struct ethsw_core *ethsw)
- 
- static int dpaa2_switch_seed_bp(struct ethsw_core *ethsw)
- {
--	int *count, i;
-+	int *count, ret, i;
- 
- 	for (i = 0; i < DPAA2_ETHSW_NUM_BUFS; i += BUFS_PER_CMD) {
-+		ret = dpaa2_switch_add_bufs(ethsw, ethsw->bpid);
- 		count = &ethsw->buf_count;
--		*count += dpaa2_switch_add_bufs(ethsw, ethsw->bpid);
-+		*count += ret;
- 
--		if (unlikely(*count < BUFS_PER_CMD))
-+		if (unlikely(ret < BUFS_PER_CMD))
- 			return -ENOMEM;
- 	}
- 
--- 
-2.43.0
-
+pw-bot: cr
 
