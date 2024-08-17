@@ -1,125 +1,206 @@
-Return-Path: <netdev+bounces-119393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D49C9556BE
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:28:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18609556BC
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:27:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A434281E5D
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:28:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D0C51F21ACC
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F801487CE;
-	Sat, 17 Aug 2024 09:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B2F1487C0;
+	Sat, 17 Aug 2024 09:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="YKYEfoyo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9vfKvEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpdh17-su.aruba.it (smtpdh17-su.aruba.it [62.149.155.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1970148317
-	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 09:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.155.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB81148317;
+	Sat, 17 Aug 2024 09:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723886930; cv=none; b=fqBzXQHEH8ZUbE5HEWCCEgkoA/6o8vkhlMdYtgl6mGB9+EwtSU7sZ2L9+5XWaeAKp+qbAc0xE7Vxc0UGzwt4ds6Rg7JFsUdiBIOMfcIiG8AmSI7h47FNT4efxaQEE1Z48Y7+U4G0C/W8YkfRZYeWs8sCax3Hi4YnL5yDFUft9cY=
+	t=1723886853; cv=none; b=UdPMgQQ+/OZzo0cx4lp2/AzsLBVrnsgUn3ZzaIHYXt4kVC2J4XaBG+ReltRsJhJ3Lofc3630TaJ1t9JifKzmow3Tvox7Cv25p6BcbXaqMoWY4ZS3WoLxvJIg8jjRYbGsX3q+gCXNTJ34VIG3gXRPK+DbEsGToDRUbsaoXiiIfkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723886930; c=relaxed/simple;
-	bh=4SvgcqjQqIApfuzqVr+Pfy0s3dgei0JUM6ZubilOR+c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mHL8P6KV6pHYqmP+h0mevoKMOex/vgZN/2s/5CZeo+QE7GQ2ZmmvatqpV12VBuro0YV6oV82hSx0VBTVd083sQMbm5DbLBUY+RRsIkVmfnphIeC8eg7aKcaFRzivacqHaxK3/780vVYygXr/XzEf5E3m/M/dmItBTvvCTcAWPqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org; spf=pass smtp.mailfrom=xhero.org; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=YKYEfoyo; arc=none smtp.client-ip=62.149.155.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xhero.org
-Received: from xhero.org ([84.74.245.127])
-	by Aruba Outgoing Smtp  with ESMTPSA
-	id fFglstT0CJLbHfFgmsuKXH; Sat, 17 Aug 2024 11:25:38 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1723886738; bh=4SvgcqjQqIApfuzqVr+Pfy0s3dgei0JUM6ZubilOR+c=;
-	h=From:To:Subject:Date:MIME-Version;
-	b=YKYEfoyomrbvGK3PRFT7GBW/aP1eMp2d1Fy2JkBNOVuNLN3qRsqRd6MLI08y/1hPK
-	 QJp5eN8XnL9yOBKzcaXXCPwvbpYTuarmk2MFVdGlNCS65OSU15RLDBS9WNurE6W4UF
-	 MOZCjGZB0QOKSntameMU6DCmQssC5gcwuyBkto20O7Cp6MUU1NEyNgT4BWAaAkJ253
-	 wJeqxnJq3BAwY7u387d5xuG3lhph+Q/fVFtMil+ZaQH10+hib3X+uE+tGRzIHoj5K+
-	 CNlx7FbFEBtvT2rgHd/6OuUGKnZX0qozBIyRbnYqMYgTbTBjmjXZu6tBK6gDeqkxYm
-	 /aelEe/HcM2CA==
-From: Rodolfo Zitellini <rwz@xhero.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Doug Brown <doug@schmorgal.com>,
-	Rodolfo Zitellini <rwz@xhero.org>
-Subject: [PATCH net-next 0/2] pull-request appletalk 2024-08-17
-Date: Sat, 17 Aug 2024 11:25:20 +0200
-Message-Id: <20240817092522.9193-1-rwz@xhero.org>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723886853; c=relaxed/simple;
+	bh=kGg9VSaWjG1r5mfWepw9eoy+c+ZwvFl5r/ZQEyLibDU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fhAkygMLmbmjqOTHANKwcQQOKcoadzdxsoTAeHP9nmFWUMCHDavD7dAJwkCy70Bt6OfbDEFYVu1xwHf124sIFOQd+BVwd37KewfpKu4mFn/rKMon41gSH8wO9QLMBuv5Ldrx2UClvB1Gg94Qj6OwVP5y+bjeLnrScPvgAEbVkJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9vfKvEI; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4519383592aso16525061cf.3;
+        Sat, 17 Aug 2024 02:27:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723886850; x=1724491650; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fgRw6teSk0Vsqncxx6wgpyYYiQXJoNo9naphE5dxvn4=;
+        b=Z9vfKvEI1qG9PPjTjvNfxXMlPGV7Zfzidv2/zHjYc+IImzmt64bl8rdr2sjc6XFMv5
+         7+eVr/fQ8Wi5vwGl9G3UVSEVcbKuriHKRjZ8p7Tz+7BUjjqexXwMH/dhw3VRKx75OMZa
+         X8v4n3mMKsJxUccGWHSPD/jzx/WAv0KT/zYy94KRiv5RA/HNTAEQfQ+cWNgCjpoWXAIA
+         2nfLprlvg+wCqiPR5907tGmnb8YvWkLwNj/9XKKpsnxc/OXMkQey0kSJ7oTQcx/JBLpS
+         +CFjZhfL5rGcT/rfq6k7cSUKz9rcohUxxlFWAWWJ0/95XYp4RobWpyPPg/C/SEA3naWK
+         Gcmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723886850; x=1724491650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fgRw6teSk0Vsqncxx6wgpyYYiQXJoNo9naphE5dxvn4=;
+        b=qtyM1pUEL14LeKVY/CB7Po+v79P/babw/ZscCHyT7C8qdfwUx5wFquXOAl2ZAzFvcT
+         8uBWrOVZZZmW98sl4WShBexD9+j7OJc+G42CJCdVDthhIRLgLdLtSxvknA5RVeJy5Vqs
+         beAooIgu0QUDxmoIi0YQknO9oeQByn+VNwa9Zo7z24wK9luVpZX0Zzmr3FWyN4MlCnsV
+         JqbcreNs+fAdtR8sK33Nzqaoqw5gbOKXHcaILpuLI3VMF3j+u2IpB6mhr3DJASOai3Jk
+         1oUT0GXboDZWzXvExbDZmmEP3F/UO0nI+oI8csGOAQ4bcFvkdqcSQZ2RwL3kMbgbs7LQ
+         BpbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGh5WmET5rsYdmV0l4rnNalWUuaO36ohoVVA7MYEsGjk8yllDOhUjQh+qLAGqlEq1iB3ecb68OV0V7UtexGBTzJVUu5z4I99MMLU7G
+X-Gm-Message-State: AOJu0Yxeyf4mlFJk6i/Bkou8Hmk3lW5ucvYUtuZyFLfsASLkz4WzHEEh
+	fZGoKjihQ/8Szn0NfukIk137jOFNgQLGQa1rTbwpU8eI4cfHjMMzQxaXfjqCi2htXSHZK7oQO+k
+	aU/8DdgVeIki09KGQG42rMdup1s8=
+X-Google-Smtp-Source: AGHT+IFVo1p+v3CrXFfk3Gw22BDMFxLp7295yMXwWc9k/Zmg+GCLMbW9UUNXC0cNHga0lCO400RQjVCpS/G4+q3VlGU=
+X-Received: by 2002:a05:622a:590c:b0:44f:c9ad:9cc2 with SMTP id
+ d75a77b69052e-453743aa05bmr73314661cf.50.1723886849734; Sat, 17 Aug 2024
+ 02:27:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfC0wUgpjHIW+1WgCBy3vFf/B9Zzdd8klNMYrRHRkzBN1ZBVWRqkddqbt7kR68RlyxvvA1Uv7EobfiXNbNntvYOYrJFM9CqHylj5EDNDRQhWN9r6OUe2K
- 85l17DIbAPrrZVmphvur6mDzGO77Zd/cPA2RGRq9vLKPlDWxSjCBubWbObuJppyZLbsWKZB8aLz2U6iysp8MGgnqHDb1qh9a0Y56V+bUzCmcGoTz6i4WlCBs
- cIhErSvCpcnuKOrmp/TGgYSnBrf7hB5pFQmyb6X2BXEAaV2JXJI7JdQ4RT8TbBHTou7tiUCLnoZfNP7WpneLOvOUgmtj2QTTT+jn+gT/qYmTeK48dW0Rt0XK
- ebnzUvdrQQ1XEFnsOacZ9t7sjzPv3W7DknuOOpyaB8SV3FRvueroZMItnIk7SmFzKuzq1n536AbmmkyU1FxevmYJpHRTTRZqyCixwW/6NpPNYj4PZ/Mc8yYY
- NAxqQJoi3Yw0dia8UNI7afu2NEM0ldTgK9BXsOU5LT1P4Y+A1THoFTIZrNBRG80ckwNwY+5lqU/5FlG6vP7p7eiN/XfmbrcUuDIzGnQsbctXPt51/DUmSHIN
- tK8=
+References: <20240816015355.688153-1-alex000young@gmail.com>
+ <CAM0EoMmAcgbQWG7kQoe335079Y2UY_BmoYErL=44-itJ=p-B-Q@mail.gmail.com> <CAM0EoM=qvBxXS_1eheyhCKbNMRbK_qTTFMa1fFBFQp_hRbzpQQ@mail.gmail.com>
+In-Reply-To: <CAM0EoM=qvBxXS_1eheyhCKbNMRbK_qTTFMa1fFBFQp_hRbzpQQ@mail.gmail.com>
+From: Alex Young <alex000young@gmail.com>
+Date: Sat, 17 Aug 2024 17:27:17 +0800
+Message-ID: <CAFC++j15p9Ey3qc4ZsY4CXBsL3LHn7TsFTi6=N9=H+_Yx_k=+Q@mail.gmail.com>
+Subject: Re: [PATCH] net: sched: use-after-free in tcf_action_destroy
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	security@kernel.org, xkaneiki@gmail.com, hackerzheng666@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Jamal,
 
-this is a pull request of 2 patches for net-next/master
+Thanks your mention. I have reviewed the latest kernel code.
+I understand why these two tc function threads can enter the kernel at the =
+same
+time. It's because the request_module[2] function in tcf_action_init_1. Whe=
+n the
+tc_action_init_1 function to add a new action, it will load the action
+module. It will
+call rtnl_unlock to let the Thread2 into the kernel space.
 
-The first patch introduces a new line discipline ID for the
-TashTalk line discipline.
+Thread1                                                 Thread2
+rtnetlink_rcv_msg                                   rtnetlink_rcv_msg
+ rtnl_lock();
+ tcf_action_init
+  for(i;i<TCA_ACT_MAX_PRIO;i++)
+   act=3Dtcf_action_init_1 //[1]
+        if (rtnl_held)
+           rtnl_unlock(); //[2]
+        request_module("act_%s", act_name);
 
-The second patch adds an Appletalk driver that serves as a
-drop-in replacement for the old COPS LocalTalk driver. It
-implements a line discipline that interfaces with a TashTalk
-device, an open-source project that provides the proper SDLC
-and FM0 encoding required on the LocalTalk bus. With a minimal
-amount of supporting components, it becomes possible to connect
-a modern PC to older devices (Macintoshes, Apple IIgs) on a
-LocalTalk bus. It is compatibile out of the box with Netatalk
-2.x and will also work with the upcoming 4.0 release which
-re-introduces Appletalk support.
+                                                                tcf_del_wal=
+ker
 
-Kind Regards,
-Rodolfo
+idr_for_each_entry_ul(idr,p,id)
 
-Rodolfo Zitellini (2):
-  tty: Add N_TASHTALK line discipline for TashTalk Localtalk serial
-    driver
-  appletalk: tashtalk: Add LocalTalk line discipline driver for
-    AppleTalk using a TashTalk adapter
+__tcf_idr_release(p,false,true)
 
- .../device_drivers/appletalk/index.rst        |   18 +
- .../device_drivers/appletalk/tashtalk.rst     |  139 +++
- .../networking/device_drivers/index.rst       |    1 +
- MAINTAINERS                                   |    7 +
- drivers/net/Kconfig                           |    2 +
- drivers/net/Makefile                          |    1 +
- drivers/net/appletalk/Kconfig                 |   33 +
- drivers/net/appletalk/Makefile                |    6 +
- drivers/net/appletalk/tashtalk.c              | 1003 +++++++++++++++++
- include/uapi/linux/tty.h                      |    3 +-
- 10 files changed, 1212 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/networking/device_drivers/appletalk/index.rst
- create mode 100644 Documentation/networking/device_drivers/appletalk/tashtalk.rst
- create mode 100644 drivers/net/appletalk/Kconfig
- create mode 100644 drivers/net/appletalk/Makefile
- create mode 100644 drivers/net/appletalk/tashtalk.c
+ free_tcf(p) //[3]
+if (rtnl_held)
+rtnl_lock();
 
--- 
-2.34.1
+   if(IS_ERR(act))
+    goto err
+   actions[i] =3D act
 
+  err:
+   tcf_action_destroy
+    a=3Dactions[i]
+    ops =3D a->ops //[4]
+I know this time window is small, but it can indeed cause the bug. And
+in the latest
+kernel, it have fixed the bug. But version 4.19.x is still a
+maintenance version.
+Is there anyone who can introduce this change into version 4.19.
+
+Best regards,
+Alex
+
+Jamal Hadi Salim <jhs@mojatatu.com> =E4=BA=8E2024=E5=B9=B48=E6=9C=8816=E6=
+=97=A5=E5=91=A8=E4=BA=94 23:04=E5=86=99=E9=81=93=EF=BC=9A
+
+>
+> On Fri, Aug 16, 2024 at 12:06=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> > On Thu, Aug 15, 2024 at 9:54=E2=80=AFPM yangzhuorao <alex000young@gmail=
+.com> wrote:
+> > >
+> > > There is a uaf bug in net/sched/act_api.c.
+> > > When Thread1 call [1] tcf_action_init_1 to alloc act which saves
+> > > in actions array. If allocation failed, it will go to err path.
+> > > Meanwhile thread2 call tcf_del_walker to delete action in idr.
+> > > So thread 1 in err path [3] tcf_action_destroy will cause
+> > > use-after-free read bug.
+> > >
+> > > Thread1                            Thread2
+> > >  tcf_action_init
+> > >   for(i;i<TCA_ACT_MAX_PRIO;i++)
+> > >    act=3Dtcf_action_init_1 //[1]
+> > >    if(IS_ERR(act))
+> > >     goto err
+> > >    actions[i] =3D act
+> > >                                    tcf_del_walker
+> > >                                     idr_for_each_entry_ul(idr,p,id)
+> > >                                      __tcf_idr_release(p,false,true)
+> > >                                       free_tcf(p) //[2]
+> > >   err:
+> > >    tcf_action_destroy
+> > >     a=3Dactions[i]
+> > >     ops =3D a->ops //[3]
+> > >
+> > > We add lock and unlock in tcf_action_init and tcf_del_walker function
+> > > to aviod race condition.
+> > >
+>
+> Hi Alex,
+>
+> Thanks for your valiant effort, unfortunately there's nothing to fix
+> here for the current kernels.
+> For your edification:
+>
+> This may have been an issue on the 4.x kernels you ran but i dont see
+> a valid codepath that would create the kernel parallelism scenario you
+> mentioned above (currently or ever actually). Kernel entry is
+> syncronized from user space via the rtnetlink lock - meaning you cant
+> have two control plane threads (as you show in your nice diagram above
+> in your commit) entering from user space in parallel to trigger the
+> bug.
+>
+> I believe the reason it happens in 4.x is there is likely a bug(hand
+> waving here) where within a short window upon a) creating a batch of
+> actions of the same kind b) followed by partial updates of said action
+> you then c) flush that action kind. Theory is the flush will trigger
+> the bug. IOW, it is not parallel but rather a single entry. I didnt
+> have time to look but whatever this bug is was most certainly fixed at
+> some point - perhaps nobody bothered to backport. If this fix is so
+> important to you please dig into newer kernels and backport.
+>
+> There are other technical issues with your solution but I hope the above =
+helps.
+> The repro doesnt cause any issues in newer kernels - but please verify
+> for yourself as well.
+>
+> So from me, I am afraid, this is a nack
+>
+> cheers,
+> jamal
 
