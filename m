@@ -1,84 +1,132 @@
-Return-Path: <netdev+bounces-119383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002E09555BB
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 08:15:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CBFC9555E8
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 08:52:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F4481F22A35
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 06:15:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704251C21326
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 06:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896B47D417;
-	Sat, 17 Aug 2024 06:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB994136E01;
+	Sat, 17 Aug 2024 06:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hy4ZgiM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781CB1E52C;
-	Sat, 17 Aug 2024 06:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E512F38B
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 06:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723875329; cv=none; b=aRaOGrd33jUPK6O3wfywVTuTtuXh0JUHyNg7SVIg4V5YLL7cSevKeo2VbHmhEqMd6fo8bx0R95uBYnAUFodcjxFoAq8RFOSzN9rjXQyZOPWRZYpx6O8D+5LnNm0tScllUqvLfDcDPlosmmt2Q9JP5w9RQbcoxvKV1xsUPL1aplQ=
+	t=1723877574; cv=none; b=LN9gbAqPFtsc5Wb6smueBgO71lv9/x8qXfcjnk+UQhArNTjqBKJX0Ts/w7rJHwafbUYiZ+r7dxOAvv9TO4S/mVJjq+FW48qBnjjSupRQ8Vb/dEKrh0o7Zgl6+T+u1dUzNRgyaTdgcxj1bsJpCFRM/iuwyPBjrrK6fr6pL3rTF1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723875329; c=relaxed/simple;
-	bh=AYQp8r4LWRwy7ODCGzAO9/jcbD6lhUJOm65ht+Gm7/s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YVOeDcUukK9L96LJpnMN1RiUm5q+xfETbEVXOogOAZIUMewJldaHa22qoXW9lukB+UKVU4yDMJlHyH9Ce2p+OcNJW9nk7iOoYG1DG9hZUfzrAt2f0fkt0kjML8un6aGs2w+H6nC6NDX2BCT118uG5BwlrKAem2yS52uowR6Q2TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Wm7pD4YMLz1xv56;
-	Sat, 17 Aug 2024 14:13:24 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4E8DB140138;
-	Sat, 17 Aug 2024 14:15:17 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 17 Aug 2024 14:15:16 +0800
-Message-ID: <adae952a-6a99-ea21-ac98-c304f4afcba0@huawei.com>
-Date: Sat, 17 Aug 2024 14:15:16 +0800
+	s=arc-20240116; t=1723877574; c=relaxed/simple;
+	bh=CzHStjjH4V8sPZdoqAFqWMk+oxPdeCbL03cvp8dl/zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=GEDaiuownivrOHf1oFzUwi+8sz6x8u+OD+wBFTIk7+Sjx96CetkHmJqk7vniVVceZzb2g6bC3BojkXpMCn8OnNQM36cxQ9wpLpgvVUuKV4piE+wN29Vv8JBBYxa06ej04Q8nV59by5Yri/CwhGvZ8J4w0+b2q8z6eicVDolSZl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hy4ZgiM/; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso27168465e9.3
+        for <netdev@vger.kernel.org>; Fri, 16 Aug 2024 23:52:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723877571; x=1724482371; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iayHuQdCGfrgLfhcreNqaNDx16C6Jh397QJm/SbJkWE=;
+        b=hy4ZgiM/2D0kvCmQzX7EY6f74I182NKLsECGGQJxHlvdy/DiTjhAY1BYU9CXOFTQfB
+         YRvoRp6b2wWvjIVI1hsZ/sRefkQO9Vk6TisKbMMf6XwMSq1blf26mkVDyF3KSUcDB865
+         JMFhJQZ6+Yofnr50vk1SgeMlK7+LtixjxtNWLAbYaIxeXvxRAKiUnfUDb85b022Kaba4
+         p9fpSO2gT1yKwuKeYnqiV+zGR0ZMSb7bPUjZ4k7a7K2ZxiDrPeOhD5zG6+shEi+bygJM
+         LhWhSILjTvc797JrZh8yvQ0FrwPmEJXnWAqHbzROMPI15BhPG+8ldIXqKk93Q7Djv8qb
+         yGbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723877571; x=1724482371;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iayHuQdCGfrgLfhcreNqaNDx16C6Jh397QJm/SbJkWE=;
+        b=U2/TJ0DgfZ+VpEK8sWcU/w5psnllRl7MCtVV3A6wqjF5A2V1u6fQSbsRdKqhb+FFS0
+         Gqhd366mg2cEXknOZY6uUiq2Hv/61mJOCoQZkRBzc+Qi1bXXVeGePPulKq56WUWAxJQp
+         UFqHOZpDWOfe8RNQBVF+WsaN88U/781eFptPAnjDdXfYDLVAl86UE2GORFpbxjsVO3bB
+         2RKX69/cBKtCE3FeXg8TE6788jIxFEit2k2QGRogvYon7wmyR82szfaMwau+0IO/TqNw
+         FbFH3kaNAoNj+33nfJsSw32z6xDaHi0BLNVBvKRcfUvh5bXDzDR7HREQozE9g9mXScMI
+         7JzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOXAN/jAXvvWzRXs+fPaNj51i/mJUA9i+qMss6O/5PT8+ussXYyx9EwxvdYFDyt6ZALAyqmzI4CsuKgy8Kb4skmw4ARkqJ
+X-Gm-Message-State: AOJu0YzNNdnHzBneUjmQpMMUvlYBXJKAcPjgpuYFiIPqEuehWUZMNwYd
+	mPP6QjiRIgJFwhGltY9JDfHaHE46vM9nkYA11umH1u4kPKZz/nVG/+XOUqxmtB8=
+X-Google-Smtp-Source: AGHT+IFNIXj9oV9+Ox0dNnq+TrIQ0ML3idpxQu8xxGwKVDp40dG1KGsNY1LaeHzxO7S57gOvqrDEzQ==
+X-Received: by 2002:a5d:5545:0:b0:366:ee01:30d6 with SMTP id ffacd0b85a97d-3719469ff15mr3757080f8f.49.1723877571207;
+        Fri, 16 Aug 2024 23:52:51 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898ab855sm5141246f8f.105.2024.08.16.23.52.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 23:52:50 -0700 (PDT)
+Date: Sat, 17 Aug 2024 09:52:46 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] dpaa2-switch: Fix error checking in
+ dpaa2_switch_seed_bp()
+Message-ID: <eec27f30-b43f-42b6-b8ee-04a6f83423b6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH net-next] gve: Remove unused declaration
- gve_rx_alloc_rings()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-CC: <jeroendb@google.com>, <pkaligineedi@google.com>, <shailend@google.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <willemb@google.com>, <hramamurthy@google.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240816101906.882743-1-yuehaibing@huawei.com>
- <20240816164513.GY632411@kernel.org>
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <20240816164513.GY632411@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
+The dpaa2_switch_add_bufs() function returns the number of bufs that it
+was able to add.  It returns BUFS_PER_CMD (7) for complete success or a
+smaller number if there are not enough pages available.  However, the
+error checking is looking at the total number of bufs instead of the
+number which were added on this iteration.  Thus the error checking
+only works correctly for the first iteration through the loop and
+subsequent iterations are always counted as a success.
 
-On 2024/8/17 0:45, Simon Horman wrote:
-> On Fri, Aug 16, 2024 at 06:19:06PM +0800, Yue Haibing wrote:
->> Commit f13697cc7a19 ("gve: Switch to config-aware queue allocation")
->> convert this function to gve_rx_alloc_rings_gqi().
->>
->> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> In future, please consider grouping similar changes, say up to 10,
-> in a patchset.
+Fix this by checking only the bufs added in the current iteration.
 
-ok, thanks for your review.
-> .
+Fixes: 0b1b71370458 ("staging: dpaa2-switch: handle Rx path on control interface")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+From reviewing the code.  Not tested.
+---
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+index a71f848adc05..a293b08f36d4 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+@@ -2638,13 +2638,14 @@ static int dpaa2_switch_refill_bp(struct ethsw_core *ethsw)
+ 
+ static int dpaa2_switch_seed_bp(struct ethsw_core *ethsw)
+ {
+-	int *count, i;
++	int *count, ret, i;
+ 
+ 	for (i = 0; i < DPAA2_ETHSW_NUM_BUFS; i += BUFS_PER_CMD) {
++		ret = dpaa2_switch_add_bufs(ethsw, ethsw->bpid);
+ 		count = &ethsw->buf_count;
+-		*count += dpaa2_switch_add_bufs(ethsw, ethsw->bpid);
++		*count += ret;
+ 
+-		if (unlikely(*count < BUFS_PER_CMD))
++		if (unlikely(ret < BUFS_PER_CMD))
+ 			return -ENOMEM;
+ 	}
+ 
+-- 
+2.43.0
+
 
