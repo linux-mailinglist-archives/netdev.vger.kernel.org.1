@@ -1,310 +1,125 @@
-Return-Path: <netdev+bounces-119391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B20995568C
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:05:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D49C9556BE
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 11:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC7281C20DD9
-	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A434281E5D
+	for <lists+netdev@lfdr.de>; Sat, 17 Aug 2024 09:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EFC145B2D;
-	Sat, 17 Aug 2024 09:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F801487CE;
+	Sat, 17 Aug 2024 09:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHZuxKob"
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="YKYEfoyo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpdh17-su.aruba.it (smtpdh17-su.aruba.it [62.149.155.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70EF2107;
-	Sat, 17 Aug 2024 09:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1970148317
+	for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 09:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.155.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723885513; cv=none; b=pPYnQu/ndU8y1Pldn1eP0/CTxBw4MVszWm0rifBwtw5As+v6+NrzsJg4Nh9zEdhDcOUMr1+E5R9x/LjAMBhTdkmQWBrv2HIA0rY0WziiNpeviOF/gmpjfs8aIi9y8BJ5+VMV4eOJ+nLiG9vRvmRZDqZbafOSBIZi8nN2FXcbVjg=
+	t=1723886930; cv=none; b=fqBzXQHEH8ZUbE5HEWCCEgkoA/6o8vkhlMdYtgl6mGB9+EwtSU7sZ2L9+5XWaeAKp+qbAc0xE7Vxc0UGzwt4ds6Rg7JFsUdiBIOMfcIiG8AmSI7h47FNT4efxaQEE1Z48Y7+U4G0C/W8YkfRZYeWs8sCax3Hi4YnL5yDFUft9cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723885513; c=relaxed/simple;
-	bh=v/bo9jddffzD66AkTiZN77T4QpmXWOzZY5qpNjnaKaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R3W/+v1pGlVgv+RjpRRpnPgZ5jz4bU7zTN4QGkj9aTR1xJEFgttlT+uTmB1vCERBDsnbp85asm1N89bG5S2l/CmCFSVs2+ndOApz3GtRzxLCN+ulokLiyB/1M7Xav/tg4a3ZklFNDcLjFmdRedar+0FVQRKFdHD57Xx45lFn/Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHZuxKob; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA74EC116B1;
-	Sat, 17 Aug 2024 09:05:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723885512;
-	bh=v/bo9jddffzD66AkTiZN77T4QpmXWOzZY5qpNjnaKaQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uHZuxKobkZPexs4wQXgy+BigHynUnVn2wGZXIYK3rG4h1ghhRi91iSqYmk1RnU63k
-	 MYVCdI6WXmjOKe7vXj9nBcdZr2YbbrM+4cxYpWJnBOzHYN8WBZYmnx6wTiP4pjScM+
-	 a/38aDduZcDlZxZVablIYLfBKHjroH/uEmZroFJijBXpSek36A1Vq0124G01TH8w0V
-	 349jwsrENGcMoLN4tKqn/Ly5mzH+uaU1bEjYR6cmhq5vnxcfuxX9XmftRtil9AjQ5X
-	 ZZp+c56fp7/mSI3ovhzAorNflOdFGMQvkdTuHSISLpP32Gg7Nqy6zjelHnwHbFIEv+
-	 WQ4Hzf798ofiA==
-Date: Sat, 17 Aug 2024 11:05:06 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v7 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-Message-ID: <qdzuvazxkvueook2a64qo2jcdrrbnkp2pn2dbury34ad47jvno@eu6ul4fso6yi>
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-7-laoar.shao@gmail.com>
- <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
+	s=arc-20240116; t=1723886930; c=relaxed/simple;
+	bh=4SvgcqjQqIApfuzqVr+Pfy0s3dgei0JUM6ZubilOR+c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mHL8P6KV6pHYqmP+h0mevoKMOex/vgZN/2s/5CZeo+QE7GQ2ZmmvatqpV12VBuro0YV6oV82hSx0VBTVd083sQMbm5DbLBUY+RRsIkVmfnphIeC8eg7aKcaFRzivacqHaxK3/780vVYygXr/XzEf5E3m/M/dmItBTvvCTcAWPqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org; spf=pass smtp.mailfrom=xhero.org; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=YKYEfoyo; arc=none smtp.client-ip=62.149.155.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xhero.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xhero.org
+Received: from xhero.org ([84.74.245.127])
+	by Aruba Outgoing Smtp  with ESMTPSA
+	id fFglstT0CJLbHfFgmsuKXH; Sat, 17 Aug 2024 11:25:38 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1723886738; bh=4SvgcqjQqIApfuzqVr+Pfy0s3dgei0JUM6ZubilOR+c=;
+	h=From:To:Subject:Date:MIME-Version;
+	b=YKYEfoyomrbvGK3PRFT7GBW/aP1eMp2d1Fy2JkBNOVuNLN3qRsqRd6MLI08y/1hPK
+	 QJp5eN8XnL9yOBKzcaXXCPwvbpYTuarmk2MFVdGlNCS65OSU15RLDBS9WNurE6W4UF
+	 MOZCjGZB0QOKSntameMU6DCmQssC5gcwuyBkto20O7Cp6MUU1NEyNgT4BWAaAkJ253
+	 wJeqxnJq3BAwY7u387d5xuG3lhph+Q/fVFtMil+ZaQH10+hib3X+uE+tGRzIHoj5K+
+	 CNlx7FbFEBtvT2rgHd/6OuUGKnZX0qozBIyRbnYqMYgTbTBjmjXZu6tBK6gDeqkxYm
+	 /aelEe/HcM2CA==
+From: Rodolfo Zitellini <rwz@xhero.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Doug Brown <doug@schmorgal.com>,
+	Rodolfo Zitellini <rwz@xhero.org>
+Subject: [PATCH net-next 0/2] pull-request appletalk 2024-08-17
+Date: Sat, 17 Aug 2024 11:25:20 +0200
+Message-Id: <20240817092522.9193-1-rwz@xhero.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4u7yqqf3o53fozhu"
-Content-Disposition: inline
-In-Reply-To: <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfC0wUgpjHIW+1WgCBy3vFf/B9Zzdd8klNMYrRHRkzBN1ZBVWRqkddqbt7kR68RlyxvvA1Uv7EobfiXNbNntvYOYrJFM9CqHylj5EDNDRQhWN9r6OUe2K
+ 85l17DIbAPrrZVmphvur6mDzGO77Zd/cPA2RGRq9vLKPlDWxSjCBubWbObuJppyZLbsWKZB8aLz2U6iysp8MGgnqHDb1qh9a0Y56V+bUzCmcGoTz6i4WlCBs
+ cIhErSvCpcnuKOrmp/TGgYSnBrf7hB5pFQmyb6X2BXEAaV2JXJI7JdQ4RT8TbBHTou7tiUCLnoZfNP7WpneLOvOUgmtj2QTTT+jn+gT/qYmTeK48dW0Rt0XK
+ ebnzUvdrQQ1XEFnsOacZ9t7sjzPv3W7DknuOOpyaB8SV3FRvueroZMItnIk7SmFzKuzq1n536AbmmkyU1FxevmYJpHRTTRZqyCixwW/6NpPNYj4PZ/Mc8yYY
+ NAxqQJoi3Yw0dia8UNI7afu2NEM0ldTgK9BXsOU5LT1P4Y+A1THoFTIZrNBRG80ckwNwY+5lqU/5FlG6vP7p7eiN/XfmbrcUuDIzGnQsbctXPt51/DUmSHIN
+ tK8=
 
+Hello,
 
---4u7yqqf3o53fozhu
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v7 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-7-laoar.shao@gmail.com>
- <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
-MIME-Version: 1.0
-In-Reply-To: <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
+this is a pull request of 2 patches for net-next/master
 
-On Sat, Aug 17, 2024 at 10:58:02AM GMT, Alejandro Colomar wrote:
-> Hi Yafang,
->=20
-> On Sat, Aug 17, 2024 at 10:56:22AM GMT, Yafang Shao wrote:
-> > These three functions follow the same pattern. To deduplicate the code,
-> > let's introduce a common helper __kmemdup_nul().
-> >=20
-> > Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-> > Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> > Cc: Simon Horman <horms@kernel.org>
-> > Cc: Matthew Wilcox <willy@infradead.org>
-> > ---
-> >  mm/util.c | 67 +++++++++++++++++++++----------------------------------
-> >  1 file changed, 26 insertions(+), 41 deletions(-)
-> >=20
-> > diff --git a/mm/util.c b/mm/util.c
-> > index 4542d8a800d9..310c7735c617 100644
-> > --- a/mm/util.c
-> > +++ b/mm/util.c
-> > @@ -45,33 +45,40 @@ void kfree_const(const void *x)
-> >  EXPORT_SYMBOL(kfree_const);
-> > =20
-> >  /**
-> > - * kstrdup - allocate space for and copy an existing string
-> > - * @s: the string to duplicate
-> > + * __kmemdup_nul - Create a NUL-terminated string from @s, which might=
- be unterminated.
-> > + * @s: The data to copy
-> > + * @len: The size of the data, including the null terminator
-> >   * @gfp: the GFP mask used in the kmalloc() call when allocating memory
-> >   *
-> > - * Return: newly allocated copy of @s or %NULL in case of error
-> > + * Return: newly allocated copy of @s with NUL-termination or %NULL in
-> > + * case of error
-> >   */
-> > -noinline
-> > -char *kstrdup(const char *s, gfp_t gfp)
-> > +static __always_inline char *__kmemdup_nul(const char *s, size_t len, =
-gfp_t gfp)
-> >  {
-> > -	size_t len;
-> >  	char *buf;
-> > =20
-> > -	if (!s)
-> > +	buf =3D kmalloc_track_caller(len, gfp);
-> > +	if (!buf)
-> >  		return NULL;
-> > =20
-> > -	len =3D strlen(s) + 1;
-> > -	buf =3D kmalloc_track_caller(len, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		/* During memcpy(), the string might be updated to a new value,
-> > -		 * which could be longer than the string when strlen() is
-> > -		 * called. Therefore, we need to add a null termimator.
-> > -		 */
-> > -		buf[len - 1] =3D '\0';
-> > -	}
-> > +	memcpy(buf, s, len);
-> > +	/* Ensure the buf is always NUL-terminated, regardless of @s. */
-> > +	buf[len - 1] =3D '\0';
-> >  	return buf;
-> >  }
-> > +
-> > +/**
-> > + * kstrdup - allocate space for and copy an existing string
-> > + * @s: the string to duplicate
-> > + * @gfp: the GFP mask used in the kmalloc() call when allocating memory
-> > + *
-> > + * Return: newly allocated copy of @s or %NULL in case of error
-> > + */
-> > +noinline
-> > +char *kstrdup(const char *s, gfp_t gfp)
-> > +{
-> > +	return s ? __kmemdup_nul(s, strlen(s) + 1, gfp) : NULL;
-> > +}
-> >  EXPORT_SYMBOL(kstrdup);
-> > =20
-> >  /**
-> > @@ -106,19 +113,7 @@ EXPORT_SYMBOL(kstrdup_const);
-> >   */
-> >  char *kstrndup(const char *s, size_t max, gfp_t gfp)
-> >  {
-> > -	size_t len;
-> > -	char *buf;
-> > -
-> > -	if (!s)
-> > -		return NULL;
-> > -
-> > -	len =3D strnlen(s, max);
-> > -	buf =3D kmalloc_track_caller(len+1, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		buf[len] =3D '\0';
-> > -	}
-> > -	return buf;
-> > +	return s ? __kmemdup_nul(s, strnlen(s, max) + 1, gfp) : NULL;
-> >  }
-> >  EXPORT_SYMBOL(kstrndup);
-> > =20
-> > @@ -192,17 +187,7 @@ EXPORT_SYMBOL(kvmemdup);
-> >   */
-> >  char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> >  {
-> > -	char *buf;
-> > -
-> > -	if (!s)
-> > -		return NULL;
-> > -
-> > -	buf =3D kmalloc_track_caller(len + 1, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		buf[len] =3D '\0';
-> > -	}
-> > -	return buf;
-> > +	return s ? __kmemdup_nul(s, len + 1, gfp) : NULL;
-> >  }
-> >  EXPORT_SYMBOL(kmemdup_nul);
->=20
-> I like the idea of the patch, but it's plagued with all those +1 and -1.
-> I think that's due to a bad choice of value being passed by.  If you
-> pass the actual length of the string (as suggested in my reply to the
-> previous patch) you should end up with a cleaner set of APIs.
->=20
-> The only remaining +1 is for kmalloc_track_caller(), which I ignore what
-> it does.
+The first patch introduces a new line discipline ID for the
+TashTalk line discipline.
 
-D'oh, of course that's the malloc.  Yes, it makes sense to have a +1
-there.
+The second patch adds an Appletalk driver that serves as a
+drop-in replacement for the old COPS LocalTalk driver. It
+implements a line discipline that interfaces with a TashTalk
+device, an open-source project that provides the proper SDLC
+and FM0 encoding required on the LocalTalk bus. With a minimal
+amount of supporting components, it becomes possible to connect
+a modern PC to older devices (Macintoshes, Apple IIgs) on a
+LocalTalk bus. It is compatibile out of the box with Netatalk
+2.x and will also work with the upcoming 4.0 release which
+re-introduces Appletalk support.
 
->=20
-> 	char *
-> 	__kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> 	{
-> 		char *buf;
->=20
-> 		buf =3D kmalloc_track_caller(len + 1, gfp);
-> 		if (!buf)
-> 			return NULL;
->=20
-> 		strcpy(mempcpy(buf, s, len), "");
-> 		return buf;
+Kind Regards,
+Rodolfo
 
-Alternatively, you can also rewrite the above two lines into one as:
+Rodolfo Zitellini (2):
+  tty: Add N_TASHTALK line discipline for TashTalk Localtalk serial
+    driver
+  appletalk: tashtalk: Add LocalTalk line discipline driver for
+    AppleTalk using a TashTalk adapter
 
-		return strncat(strcpy(buf, ""), s, len);
+ .../device_drivers/appletalk/index.rst        |   18 +
+ .../device_drivers/appletalk/tashtalk.rst     |  139 +++
+ .../networking/device_drivers/index.rst       |    1 +
+ MAINTAINERS                                   |    7 +
+ drivers/net/Kconfig                           |    2 +
+ drivers/net/Makefile                          |    1 +
+ drivers/net/appletalk/Kconfig                 |   33 +
+ drivers/net/appletalk/Makefile                |    6 +
+ drivers/net/appletalk/tashtalk.c              | 1003 +++++++++++++++++
+ include/uapi/linux/tty.h                      |    3 +-
+ 10 files changed, 1212 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/networking/device_drivers/appletalk/index.rst
+ create mode 100644 Documentation/networking/device_drivers/appletalk/tashtalk.rst
+ create mode 100644 drivers/net/appletalk/Kconfig
+ create mode 100644 drivers/net/appletalk/Makefile
+ create mode 100644 drivers/net/appletalk/tashtalk.c
 
-The good thing is that you have strncat() in the kernel, AFAICS.
-I reminded myself when checking the definitions that I wrote in shadow:
+-- 
+2.34.1
 
-	#define XSTRNDUP(s)                                           \
-	(                                                             \
-	    STRNCAT(strcpy(XMALLOC(strnlen(s, NITEMS(s)) + 1, char), ""), s) \
-	)
-	#define STRNDUPA(s)                                           \
-	(                                                             \
-	    STRNCAT(strcpy(alloca(strnlen(s, NITEMS(s)) + 1), ""), s) \
-	)
-
-
-Cheers,
-Alex
-
-> 	}
->=20
-> 	char *
-> 	kstrdup(const char *s, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, strlen(s), gfp) : NULL;
-> 	}
->=20
-> 	char *
-> 	kstrndup(const char *s, size_t n, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, strnlen(s, n), gfp) : NULL;
-> 	}
->=20
-> 	char *
-> 	kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, len, gfp) : NULL;
-> 	}
->=20
-> Have a lovely day!
-> Alex
->=20
-> --=20
-> <https://www.alejandro-colomar.es/>
-
-
-
---=20
-<https://www.alejandro-colomar.es/>
-
---4u7yqqf3o53fozhu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbAZ8IACgkQnowa+77/
-2zLvOA//Z/lDWnXjHMZFqj20EeCk/sOJvw2j0zS6ByjjhPwbF0QB4deovmQwO1rB
-UfUFQNBO+A+m7nw8x/mLrYWRp9QX1koU8+XGacYS2fA/3zREzEbEDkWgaRej0TkD
-lI5oQJysXdRk4zv0t+oSPS42Ga+OLoqOogKapp40DpFcY/PfC0lI/dP32nYeKIpL
-H6XRqcEwqTOSNl8LOg3YkNO6Z93l+zsqDRCeiqze77O0QnrxDYY5gZdQkBfTiWDv
-w5CzMOKn55JzbPrbPiQID2PKvokrMvtE0cS6WpBOjLNguoEyrPWaOJY9wTe3zJx0
-jYczxxaqMVJOy+e/JzejKO7/8UaL4BjsKRkQxDUqX9JT2M1Mx94U/x4NdJ74Qpjg
-BT5tAy0REvgQ5nfchZzwMxj94NK8fQ1kls54V3RcZ4SwF8Y8TL/UIXO0n3OHbHAZ
-dDSam/sQaJCtIDEfeSjIAMISt2mUPaSu+K9IUQl5xlL+7hvtP7YJzOy0W5cP87uT
-OIswibfrvvKaeBSmpPx2reAdydjV0ErJia59TA8Qr1gbtFl5N4y6V6KCAojgjKL/
-RMowH5Jeai7WuTHla5CCBRc9sSpx2BFHpdcfW1+Kt8SvhOQ9BOcEq42xaM2megcd
-weFqBQ6+YsgwWcVz7UNoMIi2UfQQpAvIflidVV9krOZsjk3OT9s=
-=BouQ
------END PGP SIGNATURE-----
-
---4u7yqqf3o53fozhu--
 
