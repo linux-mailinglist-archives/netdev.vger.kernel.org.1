@@ -1,147 +1,90 @@
-Return-Path: <netdev+bounces-119494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9193955E0E
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 19:30:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4255955E4C
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 19:39:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FC301F2144B
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 17:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E30E1F20FDA
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 17:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F5F156875;
-	Sun, 18 Aug 2024 17:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16DF80054;
+	Sun, 18 Aug 2024 17:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cu5/pbPB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ek0ON/Jd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A2114D29C
-	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 17:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222B11D551;
+	Sun, 18 Aug 2024 17:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724002159; cv=none; b=DqrG727Ic4rQQzPhy4vo1IDpao0dybBkC6VcOLdw50Fy3CYPIVhBaJaO/RgolCAMG+bx+AOn4RAeOKZByeh77pH1NDL5xskvTNofNxctcsANBm4d/QhG0poE5FMzXQJgVtia8g1kVit94c5/UfP/kyf+WlmRkveHsEXIAh4Kjro=
+	t=1724002768; cv=none; b=TpW75yVfvaR51vTGM4gW5KuOFpU5l8x4kYYHBBfngL3isE3e1HcubtfW+ZonQpHfgQ/COm3TGPtKL4xSFFGEf1u7F93L2pQtl70BaVd5PwGZJ/ZHLuKjf48/mwZ6Tb+sQxye+B9K5h1e+rkfBXn8qbNcMZeB1169hiu/9PYjnIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724002159; c=relaxed/simple;
-	bh=u3LI4Mk7eTmteZbd26ULN0NFsDdnlkh5zLeBBwZf8GU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KET/64z4Pp4XY4VRmL1D6PXkrreCPurMylbWY6Fg4H2H56PD9NANkcPwIayXMDp1lngDuspAW7/5jD4cwrQhXvpoBwe7fdV/mgrgyDO/SLAhd5ia/PfCYVmZr3m0lJilkXF8b+/kaNHXveCvIE23YSHZ4lGvuJr2NWBzCSbJnUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Cu5/pbPB; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-37193ef72a4so1556589f8f.1
-        for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 10:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724002156; x=1724606956; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l8es/l2u9z7YHRxm+My9mNPpeISEV38hkj5XsiYsgUE=;
-        b=Cu5/pbPB56Y3jYuYGzHZZFEG0lj0CJRvLUAjT5KRhGsLQs8ost3dBuxbf1+MnraAAg
-         Ur6KCrmmlpowZIAsL8w19BVI/b6+dhTL6KavtF+F+Y35wRJ8TLQ/1QeWVNohrzX4K/ty
-         UPGYc7Fl44DgG8fSFHSnERcRw9STLfMRogyxFRYs+XMu4d2W2b4p5wvPK+7DMuOOq3EO
-         Qj4m48MpGGzc+E9ddKiuCzEtRdl5vhftALOu1p6Qn8MQZCxPAvwpUjNQ76BrJcrGYHSh
-         RF7CmnN14yTkB0U474N9DUCjsDzdKmvfyCUQ0T1zmH4xvw8CWC4+zB2plKjA8xXiGgMZ
-         xSww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724002156; x=1724606956;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l8es/l2u9z7YHRxm+My9mNPpeISEV38hkj5XsiYsgUE=;
-        b=pskwxhLlgx1TsYcUiZ8hpCm40ETzZ9UxjBYCJbl9EVBs5yqyBrxIsZ96ca7wAsDk45
-         T7XvcV6DzRyiYboym+LVM3igbWvxiay/BLSKzVGJdtTHLonfsWJ17peJAv0+QAoWp72+
-         Mon4xPvWitInTKWDYJDlF/hW6H6/DjDtsaCPa1W6tDj/980e3cDoGU3vtUAbxREzlWzj
-         +5kUJ7VIadoTtgRLWugfN0DpjlTDTMye4S+dA/w36Np73+r8ISURCn8rqwXZmbiBO9vT
-         JlTIDQVWSy0LsfpERRfvI43HRy4qgDaau0LnKFs6LxE84OHoPoJ/4dxRICVlUasuBbS+
-         wb6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXPoRoOUXodMlfEdhbX/c8vOlo8smIsYYnVwHA4l/9U0K7CdKJ7FdFL9sK96usRZQ5Nkd+U9icE/j5DvzQuSkbFR9KxinW6
-X-Gm-Message-State: AOJu0YxxKfAkdr0Kp7KZ4DLr1DSw7uYi2m/WnK8O7CAUKPETLw4ZNLey
-	8vG1fjC7XHVxGtC850SuZ3+NW4xN021hGsw35zJI5Y3MFGvCIJHaE/fqgTEGlBLI4vkUpYV2e6C
-	u
-X-Google-Smtp-Source: AGHT+IGDihqENsu32+YwhVnlSe0afwAWIr3NedxRFUFDhgEflC/5EBBcl/lZ8aHqbdVFXfdVdizpFQ==
-X-Received: by 2002:a5d:4f0f:0:b0:362:8201:fa3 with SMTP id ffacd0b85a97d-3719465e8a6mr7100101f8f.34.1724002156139;
-        Sun, 18 Aug 2024 10:29:16 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.215.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718985a35fsm8510315f8f.59.2024.08.18.10.29.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Aug 2024 10:29:15 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next 4/4] dt-bindings: net: socionext,uniphier-ave4: add top-level constraints
-Date: Sun, 18 Aug 2024 19:29:05 +0200
-Message-ID: <20240818172905.121829-4-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240818172905.121829-1-krzysztof.kozlowski@linaro.org>
-References: <20240818172905.121829-1-krzysztof.kozlowski@linaro.org>
+	s=arc-20240116; t=1724002768; c=relaxed/simple;
+	bh=MUispAl9g8BbGpxRcKkTd+9L1jsuZPQybAuNsLB6KoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QsQ7VIdwpABFoOGWKAFMZjHChWWK+31IDkeTMzNHEInDANXW5GBrYUyKghQcreL0fDJIZmu4/RV3GZ+NPqgZ6Y4E74c20g94REl666azz6+1HR4g33DJJr6XweyrRHpku4m0ZiR9Fd9bl0BYK7Pn8uLLzVNKx1sxSmAz/cwOu2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ek0ON/Jd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wKSOkNO8Sg+YG0BLKTf4EZv5hDKZoidIasg9HDR/uto=; b=Ek0ON/JdiX/L6KWMeMx8fPwcGS
+	ZspKWJm6Jr3HF+kDo0ILqBKbXkUlAP+/LpHwHCxEIYhbdkyaqiRPl1amtuzwWijv5CkyALb2zoo//
+	2mxbjT4+R+3sXynFzgVofEdxkYeizheKorvCtbKXAd3e6Oox61neW7NjBHr95Z/Uylog=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sfjsC-0052z2-5c; Sun, 18 Aug 2024 19:39:24 +0200
+Date: Sun, 18 Aug 2024 19:39:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v4 6/6] net: phy: add Applied Micro QT2025 PHY
+ driver
+Message-ID: <bdfdac7c-edb0-4b78-b616-76be287c7597@lunn.ch>
+References: <20240817051939.77735-1-fujita.tomonori@gmail.com>
+ <20240817051939.77735-7-fujita.tomonori@gmail.com>
+ <9a7c687a-29a9-4a1a-ad69-39ce7edad371@lunn.ch>
+ <7f835fe8-e641-4b84-a080-13f4841fb64a@proton.me>
+ <1a717f2d-8512-47bd-a5b3-c5ceb9b44f03@lunn.ch>
+ <0797f8e8-ea3c-413d-b782-84dd97919ea9@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0797f8e8-ea3c-413d-b782-84dd97919ea9@proton.me>
 
-Properties with variable number of items per each device are expected to
-have widest constraints in top-level "properties:" block and further
-customized (narrowed) in "if:then:".  Add missing top-level constraints
-for clock-names and reset-names.
+> Then you get this error:
+> 
+>     error: unused `core::result::Result` that must be used
+>       --> drivers/net/phy/qt2025.rs:88:9
+>        |
+>     88 |         dev.genphy_read_status::<C45>();
+>        |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>        |
+>        = note: this `Result` may be an `Err` variant, which should be handled
+>        = note: `-D unused-must-use` implied by `-D warnings`
+>        = help: to override `-D warnings` add `#[allow(unused_must_use)]`
+>     help: use `let _ = ...` to ignore the resulting value
+>        |
+>     88 |         let _ = dev.genphy_read_status::<C45>();
+>        |         +++++++
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- .../devicetree/bindings/net/socionext,uniphier-ave4.yaml  | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+O.K, so the compiler tells you, which is great. The C compiler would
+not, which is why i tend to think of these things.
 
-diff --git a/Documentation/devicetree/bindings/net/socionext,uniphier-ave4.yaml b/Documentation/devicetree/bindings/net/socionext,uniphier-ave4.yaml
-index b0ebcef6801c..4eb63b303cff 100644
---- a/Documentation/devicetree/bindings/net/socionext,uniphier-ave4.yaml
-+++ b/Documentation/devicetree/bindings/net/socionext,uniphier-ave4.yaml
-@@ -41,13 +41,17 @@ properties:
-     minItems: 1
-     maxItems: 4
- 
--  clock-names: true
-+  clock-names:
-+    minItems: 1
-+    maxItems: 4
- 
-   resets:
-     minItems: 1
-     maxItems: 2
- 
--  reset-names: true
-+  reset-names:
-+    minItems: 1
-+    maxItems: 2
- 
-   socionext,syscon-phy-mode:
-     $ref: /schemas/types.yaml#/definitions/phandle-array
--- 
-2.43.0
-
+	Andrew
 
