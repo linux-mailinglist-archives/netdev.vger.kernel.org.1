@@ -1,164 +1,157 @@
-Return-Path: <netdev+bounces-119458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF890955BE9
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 10:25:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99155955C08
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 11:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54BE4282478
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 08:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B89C1F214D4
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 09:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35720179BF;
-	Sun, 18 Aug 2024 08:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8ADD17BBF;
+	Sun, 18 Aug 2024 09:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHZkHNV5"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="fyaVHF/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD964134B2;
-	Sun, 18 Aug 2024 08:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA28179AA
+	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 09:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723969537; cv=none; b=dB7Ouxn84zDLYwo7sCHwGLv2g3MaQCnknqf47H4XFAd1tvSgg6jctY71rXr1YxQscgnwz4d3VNspW197zPgkhkK847KeaD9Vg07RtB7P2POPvlYenX/tFQXb1vszhjAjtNQaKYqtH8/XdQMToQ1nM+ww4qECY6o3Iyx4Sj0Vacw=
+	t=1723971793; cv=none; b=kKj67riZT/dNstEbiyFsQs0LTNYCtEbAtcqTxBkCZIU0ZwCMhjca/C1xytDFu+o1P6327Ia6YKoonsqs3iRNUITO44fm8Kfoo/9XZ3Do9aB7U7+I2xjW4XirfYJbZ/U70pzELfnBXTRPOjgnj+ozgmIVdpv4fai9QvK1c1bkSAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723969537; c=relaxed/simple;
-	bh=HNPlU0M/3vqiQI+da9DTWN8QwJm2bLjTnAaFdwzaWig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KPttER1GaWchJ4kvblETLq+25BF4I2PXCI0HeMjCyrUXpZ+FYvTy+zSoXufvpk6/JY6E44icWs+FS1+V4BJqqTGXlSNEhqK/LstB4YFBj+IjOQpMPHl4zlWtIjZVoYGR5pGrDhNg2hZOwbeTs2ZtYi9D8tknvQTLK9XHOoeZylk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHZkHNV5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D79F9C32786;
-	Sun, 18 Aug 2024 08:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723969536;
-	bh=HNPlU0M/3vqiQI+da9DTWN8QwJm2bLjTnAaFdwzaWig=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vHZkHNV5oUFehXU9H208C3BbvikBh69Map7MNwYhsAz/H+RCy1qVmhkneBJXg6XjJ
-	 A4yHeH0HSJKwxa7FLYPOTmemN1bnz5cRIh6lcVsrPvla+TthtasHx5rjtn8C4jsDQk
-	 yFp0s7cOZozpGsEjAghDarTvbyerVUBwdhHxnSfOD9KlTBerTrANtAUJssjdzPrjNl
-	 EhSD2ZYUuJmNQNe1xBJ/twr+KdnK0XkPc9svL3TfLFPiHpoxVJoRf5gEij63/YgQR2
-	 vdZEieAN5ajY1WQBCTOuo56n3Dt/ZdoRgYqRpXRd3S9XddtW7UgbZC41BpdvWHqRIm
-	 XHhHkzQ8KNsPg==
-Date: Sun, 18 Aug 2024 10:25:30 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Quentin Monnet <qmo@kernel.org>
-Subject: Re: [PATCH v7 4/8] bpftool: Ensure task comm is always NUL-terminated
-Message-ID: <gmhyl3zdnxy6q2tn5wtasqbuhxpfbejmh7qxeuk7lnbhcdlfsc@b3b56vgdrzgm>
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-5-laoar.shao@gmail.com>
- <teajtay63uw2ukcwhna7yfblnjeyrppw4zcx2dfwtdz3tapspn@rntw3luvstci>
- <CALOAHbAzSAQMtts5x+OMDDy1ZY5icUJv2wAM5w74ffhtEbN1mQ@mail.gmail.com>
+	s=arc-20240116; t=1723971793; c=relaxed/simple;
+	bh=7RwrPBr/oRwzEHcMI2wi5whiGgomYmBC406LWG5eodA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wfsu/LgxXce7kO85YkKZ6R1M/MHQ+xTls81U0oXJCI7/3tzW4Vs1zyFOiOvY+kFrf64Lvo9uzGSHGqzBiYF/qdvgvLjVe59XniYED+nZr5NYih1dIFpIoMnLd0E7Z/Fsm/XBQX8uEEE1jGB+GJK53VJIUI/kIypyGxxGPV6NwZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=fyaVHF/L; arc=none smtp.client-ip=185.70.43.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1723971788; x=1724230988;
+	bh=RTOmJ5BzKsEqB+zrBzcRNwx4kmmU7UEBcqj6zA9zipQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=fyaVHF/LKIrYM5pCUTYKZiwQH4E+M+aDnf2mJX2olYbd47K8SInVZxZY2QF5/euAd
+	 9I92M/LAraN4f5NYf9h40yTMHCfW0u1m53H0uMoHD2l0Z+aC6nZUGHrmxBe1kW1JXs
+	 P+odMzYItIaOaPKv/kxJH1N3jmoDgKXMIy4Ttj9iwHrx4ocmBMbV0nZ6ZWm2IukorP
+	 zRAqQBjJeyRhue/b3/N20Rz0zkzepOxgJT/sxodUbRp95Mu4TvhBouuyyipD/uxbVa
+	 dsPEeUe3jHCFvxQv56Noju+ilVG22YGkxTYz5KIyPz6R74K9a8yiOQf4p4EYv0Nh6B
+	 1wbENRTOyVIeA==
+Date: Sun, 18 Aug 2024 09:03:01 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v4 3/6] rust: net::phy implement AsRef<kernel::device::Device> trait
+Message-ID: <f480eb03-78f5-497e-a71d-57ba4f596153@proton.me>
+In-Reply-To: <20240818.073603.398833722324231598.fujita.tomonori@gmail.com>
+References: <a8284afb-d01f-47c7-835f-49097708a53e@proton.me> <20240818.021341.1481957326827323675.fujita.tomonori@gmail.com> <9127c46d-688c-41ea-8f6c-2ca6bdcdd2cd@proton.me> <20240818.073603.398833722324231598.fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 01a0b019d2c2b7d7a1f4ef0712ffa43247ae0e8b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bqpbjdxuldrazcxq"
-Content-Disposition: inline
-In-Reply-To: <CALOAHbAzSAQMtts5x+OMDDy1ZY5icUJv2wAM5w74ffhtEbN1mQ@mail.gmail.com>
-
-
---bqpbjdxuldrazcxq
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Quentin Monnet <qmo@kernel.org>
-Subject: Re: [PATCH v7 4/8] bpftool: Ensure task comm is always NUL-terminated
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-5-laoar.shao@gmail.com>
- <teajtay63uw2ukcwhna7yfblnjeyrppw4zcx2dfwtdz3tapspn@rntw3luvstci>
- <CALOAHbAzSAQMtts5x+OMDDy1ZY5icUJv2wAM5w74ffhtEbN1mQ@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CALOAHbAzSAQMtts5x+OMDDy1ZY5icUJv2wAM5w74ffhtEbN1mQ@mail.gmail.com>
 
-Hi Yafang,
-
-On Sun, Aug 18, 2024 at 10:27:01AM GMT, Yafang Shao wrote:
-> On Sat, Aug 17, 2024 at 4:39=E2=80=AFPM Alejandro Colomar <alx@kernel.org=
-> wrote:
-> >
-> > Hi Yafang,
-> >
-> > On Sat, Aug 17, 2024 at 10:56:20AM GMT, Yafang Shao wrote:
-> > > Let's explicitly ensure the destination string is NUL-terminated. Thi=
-s way,
-> > > it won't be affected by changes to the source string.
-> > >
-> > > Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> > > Reviewed-by: Quentin Monnet <qmo@kernel.org>
-> > > ---
-> > >  tools/bpf/bpftool/pids.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/tools/bpf/bpftool/pids.c b/tools/bpf/bpftool/pids.c
-> > > index 9b898571b49e..23f488cf1740 100644
-> > > --- a/tools/bpf/bpftool/pids.c
-> > > +++ b/tools/bpf/bpftool/pids.c
-> > > @@ -54,6 +54,7 @@ static void add_ref(struct hashmap *map, struct pid=
-_iter_entry *e)
-> > >               ref =3D &refs->refs[refs->ref_cnt];
-> > >               ref->pid =3D e->pid;
-> > >               memcpy(ref->comm, e->comm, sizeof(ref->comm));
-> > > +             ref->comm[sizeof(ref->comm) - 1] =3D '\0';
-> >
-> > Why doesn't this use strscpy()?
+On 18.08.24 09:36, FUJITA Tomonori wrote:
+> On Sun, 18 Aug 2024 06:01:27 +0000
+> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>>> +        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phyde=
+v).mdio.dev)) }
+>>>>> +    }
+>>>>> +}
+>>>
+>>> SAFETY: A valid `phy_device` always have a valid `mdio.dev`.
+>>>
+>>> Better?
+>>
+>> It would be nice if you could add this on the invariants on
+>> `phy::Device` (you will also have to extend the INVAIRANTS comment that
+>> creates a `&'a mut Device`)
 >=20
-> bpftool is a userspace tool, so strscpy() is only applicable in kernel
-> code, correct?
+> How about the followings?
+>=20
+> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> index 5e8137a1972f..3e1d6c43ca33 100644
+> --- a/rust/kernel/net/phy.rs
+> +++ b/rust/kernel/net/phy.rs
+> @@ -7,8 +7,7 @@
+>  //! C headers: [`include/linux/phy.h`](srctree/include/linux/phy.h).
+>=20
+>  use crate::{error::*, prelude::*, types::Opaque};
+> -
+> -use core::marker::PhantomData;
+> +use core::{marker::PhantomData, ptr::addr_of_mut};
+>=20
+>  /// PHY state machine states.
+>  ///
+> @@ -60,6 +59,7 @@ pub enum DuplexMode {
+>  ///
+>  /// Referencing a `phy_device` using this struct asserts that you are in
+>  /// a context where all methods defined on this struct are safe to call.
+> +/// This struct always has a valid `mdio.dev`.
 
-Ahh, makes sense.  LGTM, then.  Maybe the closest user-space function to
-strscpy(9) would be strlcpy(3), but I don't know how old of a glibc you
-support.  strlcpy(3) is currently in POSIX, and supported by both glibc
-and musl, but that's too recent.
+Please turn this into a bullet point list.
 
-Have a lovely day!
-Alex
+>  ///
+>  /// [`struct phy_device`]: srctree/include/linux/phy.h
+>  // During the calls to most functions in [`Driver`], the C side (`PHYLIB=
+`) holds a lock that is
+> @@ -76,9 +76,9 @@ impl Device {
+>      ///
+>      /// # Safety
+>      ///
+> -    /// For the duration of 'a, the pointer must point at a valid `phy_d=
+evice`,
+> -    /// and the caller must be in a context where all methods defined on=
+ this struct
+> -    /// are safe to call.
+> +    /// For the duration of 'a, the pointer must point at a valid `phy_d=
+evice` with
+> +    /// a valid `mdio.dev`, and the caller must be in a context where al=
+l methods
+> +    /// defined on this struct are safe to call.
 
-> --
-> Regards
-> Yafang
+Also here.
 
---=20
-<https://www.alejandro-colomar.es/>
+>      unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Se=
+lf {
+>          // CAST: `Self` is a `repr(transparent)` wrapper around `binding=
+s::phy_device`.
+>          let ptr =3D ptr.cast::<Self>();
+> @@ -302,6 +302,14 @@ pub fn genphy_read_abilities(&mut self) -> Result {
+>      }
+>  }
+>=20
+> +impl AsRef<kernel::device::Device> for Device {
+> +    fn as_ref(&self) -> &kernel::device::Device {
+> +        let phydev =3D self.0.get();
+> +        // SAFETY: The struct invariant ensures that `mdio.dev` is valid=
+.
+> +        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phydev).m=
+dio.dev)) }
+> +    }
 
---bqpbjdxuldrazcxq
-Content-Type: application/pgp-signature; name="signature.asc"
+Just to be sure: the `phydev.mdio.dev` struct is refcounted and
+incrementing the refcount is fine, right?
 
------BEGIN PGP SIGNATURE-----
+---
+Cheers,
+Benno
 
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbBr/oACgkQnowa+77/
-2zKlWg//bIam9Z2S2oGYdx1Es2yhqgRhsYrxX1OVGAonZ9d+7XaXBTpsSjfcy8AT
-EqipznL0pk8B0uQ+sagT8w6h0H2StHg59E+gR4M8YKp5s/X6Rhq+aim+k19Qh53S
-afYHd+jfvzFBe1dXQXm5Pe80X1ncmIcISMqXh/O3ykzqpuPWanKo4torJlbqtXMM
-yGxL8yJu15D00/cwjEwT9mh7KB9zsmVNyHPiY3aTvtjd0F/tNlP9qvnxgi+81duU
-ciTElwVWSG14g9TcDFWHkNBarUuBiHe240JQE7ARDPJmPkZrzHo6GcpC4AdydU6Q
-yvA/1Hp4dCFLoiXspmTWmAyR3Q+Nnn1wetdU555oIpEhYk+dpgAdO1MAYOJ+izdh
-f71cefEGfG60FG0tkzgwkbpa4xPUaCEi5L/5Voms4yRIoj5eYvmQs0+/N8IM2Fbk
-HSLIjf+5YiMw0SycNUP0XKFZGJ2MbXU8c+MBM4pTwfl4MFhgVPvI53j0J+5D43x8
-AgvgLJ3kp44JOC+FoeCDgraJ7ZD5nasDl1YBaNUS7lCxAAJ80V4CMWzi9kX0YOrG
-HRB6XOquSAF0pGarE6FLeKCmwKRTcsrDTrVPRgkrHgxt/lYqJJFnaWY1lLKDQViF
-zUzZFqndM8ocPo0p3o645SxxtVDEvxgJolM+5sdOdjqMKUmKg+U=
-=rl7R
------END PGP SIGNATURE-----
+> +}
+> +
+>  /// Defines certain other features this PHY supports (like interrupts).
+>  ///
+>  /// These flag values are used in [`Driver::FLAGS`].
 
---bqpbjdxuldrazcxq--
 
