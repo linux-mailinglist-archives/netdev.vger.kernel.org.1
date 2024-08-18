@@ -1,325 +1,295 @@
-Return-Path: <netdev+bounces-119473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335C2955CF6
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 16:24:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631AD955D08
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 16:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B168A1F21746
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 14:24:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6754B21197
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 14:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997B0126F1E;
-	Sun, 18 Aug 2024 14:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19F4839F7;
+	Sun, 18 Aug 2024 14:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="ST2oh08o"
+	dkim=pass (1024-bit key) header.d=uwaterloo.ca header.i=@uwaterloo.ca header.b="hsNyQB4K"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10021401.me.com (pv50p00im-zteg10021401.me.com [17.58.6.47])
+Received: from esa.hc503-62.ca.iphmx.com (esa.hc503-62.ca.iphmx.com [216.71.131.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A3E1FDA
-	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 14:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723991083; cv=none; b=hmmszP54Q5GGeRx9zafPPszFj1yFIM0nNrIxAf6IakJXWFhDr0s4VA0PfPHPMrXDnvAydj7E7cZlBFbdpc02vUXeoZLYVpUi/54cCZ356aH7pwIJnGbcrCHyYzoofhIOsURULLbrX2IFAoovNF1Nxs3VksVDRtxw4oUHXa/dOU0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723991083; c=relaxed/simple;
-	bh=z+tfOpQbN5fJ3NhByqRml2Dj0aHW5tbD/YrQgELNBLE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BUmurlm6r4LUdhpFoBB1CcTE1Z6AK/Vj2eI2OwGrXWrhkHjHjD1FtjHN4qhSlURO3FOQICkPEmv6IqUqnfmqls5d35Lcn2QOz0ck2QRGFw3x2C4LWqPu7Sl6dRi8gE2KarQYF54BhOZUB1WU80LZTeWYhMTRKwpQwwoIFldLnn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=ST2oh08o; arc=none smtp.client-ip=17.58.6.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1723991081;
-	bh=dVKb0+xiVWMJj1VKLV7FqP+s7uyL5WIaFvx+KYYzJUQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=ST2oh08ofn4CjXGcQ5aTFulOYQERimyUK7LuXS8wbtT8HBsOpVuzGCvxBEqd+Qnj+
-	 /ZV/1oHnVpAhndhvqx36190mrlnw+duOiW5jKqRBY07hjvFapQ5Z27Govj1Ze1djUw
-	 C7rBZgGTryGVHvF6x6XyXupdOurN+2fpds/UfqCbiWAx2iFLv07oU3e4tvH0FTCTFD
-	 VCDWQmZv8pw5EHqGBiBFEckp2QyEYF7zjhcOybn6mKSDdDeRaB2Ux2DJyK4madj0q/
-	 izLYivmlCSCbFFLgrdt7K3CSt87fKtIKMCC/QDYuxdX+fUc8okHyqI68lmLVJi5gsP
-	 6TBiFuVvo4xkQ==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10021401.me.com (Postfix) with ESMTPSA id A51D78E0437;
-	Sun, 18 Aug 2024 14:24:34 +0000 (UTC)
-Message-ID: <11efcbb2-f69a-49b4-a593-34fce42d49ea@icloud.com>
-Date: Sun, 18 Aug 2024 22:24:30 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DE845007;
+	Sun, 18 Aug 2024 14:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.131.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723992679; cv=fail; b=aK5TPo4Tdva/0zapym/oXr7tIuJxxg3pamgunqsYGqLGvGMFFf0Bo7YdLvXbAkGLrnco+lIWHiqQVfiN+0aOcshnT+XM/AZxnpxHIfIu839Bnu7Q1tf3tYf1V7H6aAjPj2T7Et0nSbA/hH83nTJG3yKgUxZ0R2yRQS/UBpGqK5c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723992679; c=relaxed/simple;
+	bh=ne7n1cc9HZ3nZBUZhvruRcd13PPdvTyOdh97tAVyRDY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ktvkffS+fBLOXVgOft4HMiu4sjxhML5ThmnWRSdKb7GDkNROc8CymcDpTriprkQK7XxFzlWd65egXQWTo+ckkzl4P/pOJdj7RD2+iJm7Gp54eVKSrOfgtX6S2LUAn1NQW1KYYfH7K0jCLShPz/Oc7YMukBvf6pUOXUumRmBfOvg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uwaterloo.ca; spf=pass smtp.mailfrom=uwaterloo.ca; dkim=pass (1024-bit key) header.d=uwaterloo.ca header.i=@uwaterloo.ca header.b=hsNyQB4K; arc=fail smtp.client-ip=216.71.131.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uwaterloo.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uwaterloo.ca
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=uwaterloo.ca; i=@uwaterloo.ca; q=dns/txt; s=default;
+  t=1723992677; x=1755528677;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ne7n1cc9HZ3nZBUZhvruRcd13PPdvTyOdh97tAVyRDY=;
+  b=hsNyQB4KkfkwN8GCjjK5NaXsL90sMSsgdQ7vS3xmZSCXoUMuIyH42svd
+   aoj0dDdAoU2qBNp5OSgudnF3wvCJAN3udxqIbbGQyipmNbCGDAGLZocdc
+   V6OUYY3AM8YVb0TCsNPspYHwfpsRb768VeM6b8WiYXH9wuB7fll3YZTFO
+   s=;
+X-CSE-ConnectionGUID: K8hR5+3+T/+/D1xFYgT8uA==
+X-CSE-MsgGUID: J5xG0ZqVTcSwKYNfVztlCg==
+X-Talos-CUID: =?us-ascii?q?9a23=3AlTqVCmnweDAAk6UrWuYfQ8Ae3QjXOV6NzE2NYBT?=
+ =?us-ascii?q?7NSEqD5HMWXGh9580juM7zg=3D=3D?=
+X-Talos-MUID: =?us-ascii?q?9a23=3AHkN8DwxPgAnRQRY9Wj86r8+YOECaqIbzGG9Vo4w?=
+ =?us-ascii?q?4h8K/Kg9BHTmjniizaYByfw=3D=3D?=
+Received: from mail-canadacentralazlp17010005.outbound.protection.outlook.com (HELO YT3PR01CU008.outbound.protection.outlook.com) ([40.93.18.5])
+  by ob1.hc503-62.ca.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 10:51:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZO3CmRnI17LqNp9KLNaoioPIBl/qj7gprAwYXZMPFfjf/3qds3FBO71kf0KF52yY3urmXZ1EJ3Krwy3qkGpGwjUgBmDtbSX9wWSTZ2gLpyOcuDaDSAnO2x3x+Zx71KBNgNTbNon1VwhK+MZYFvwLFax0ZmrfNLCGPZ6V5TpXTy+XDG1LpljKWRyQh2AO+pjSqploY3d1qEXFEbAVmf3QFl70yGwQOSiGWdphzQrT4L0OlV36RK8RjokXy8gCj3CFOeBrJOOxFi4lSylEjsRl8STD050IoUh2q8lXJosMQ2KSuYvT7I9CoWxnmUK7gvb+Z9yzB/g+tltG9OAnVcOToA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mOpmF2/uyjwmOnFArLsZr5Iin4ZslICkE9PIhbedFUs=;
+ b=upVCRyB+ygzlYTEme5OyG17QlDhWuFfPGoBMFJ5hbuyCxj/cqeHjwbupvAjabH6aNe/7djjs6pcBeXHmlwosVcbZvHaTCxjJaa0+iyfr3WaXewoTDkCiAoLwZpKeGxDwg3sPQtF6yZUo1mhslCOs3ADgqcKjKOvmJabjNwH38Sk3HEgAxVw1pemUyFV0ct4MkAL8gf0j5qCsTvXI3jNPGYE3+hW41SWukDI7tDuohqbU5ut53RZ0n7+ZllLOS15udVFK0iw9C7l72wnZyWoJoCpY/eWs+7I3H5/ttFaHYOP7NMsSE+H6n3Y7LlTkaD/VQ0r7O8Da6xnH1xa3CSczcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=uwaterloo.ca; dmarc=pass action=none header.from=uwaterloo.ca;
+ dkim=pass header.d=uwaterloo.ca; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=uwaterloo.ca;
+Received: from YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:4b::13) by YT1PR01MB9099.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:ce::5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Sun, 18 Aug
+ 2024 14:51:07 +0000
+Received: from YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::d36e:ef93:93fd:930]) by YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::d36e:ef93:93fd:930%4]) with mapi id 15.20.7875.019; Sun, 18 Aug 2024
+ 14:51:07 +0000
+Message-ID: <4dc65899-e599-43e3-8f95-585d3489b424@uwaterloo.ca>
+Date: Sun, 18 Aug 2024 10:51:04 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Joe Damato <jdamato@fastly.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
+ Christian Brauner <brauner@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+ Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes.berg@intel.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ "open list:FILESYSTEMS (VFS and infrastructure)"
+ <linux-fsdevel@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
+ <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
+ <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+ <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
+ <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
+ <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
+ <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
+ <Zr9vavqD-QHD-JcG@LQ3V64L9R2>
+ <66bf85f635b2e_184d66294b9@willemb.c.googlers.com.notmuch>
+ <02091b4b-de85-457d-993e-0548f788f4a1@uwaterloo.ca>
+ <66bfbd88dc0c6_18d7b829435@willemb.c.googlers.com.notmuch>
+ <e4f6639e-53eb-412d-b998-699099570107@uwaterloo.ca>
+ <66c1ef2a2e94c_362202942d@willemb.c.googlers.com.notmuch>
+Content-Language: en-CA, de-DE
+From: Martin Karsten <mkarsten@uwaterloo.ca>
+In-Reply-To: <66c1ef2a2e94c_362202942d@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: YT4PR01CA0024.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:d1::29) To YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:4b::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] firewire: core: Prevent device_find_child() from
- modifying caller's match data
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Dan Williams <dan.j.williams@intel.com>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-3-8316b87b8ff9@quicinc.com>
- <20240817095713.GA182612@workstation.local>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20240817095713.GA182612@workstation.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: BHc0WGEMQ2Lt9gpcmxuvj_aj9GbKxoD7
-X-Proofpoint-ORIG-GUID: BHc0WGEMQ2Lt9gpcmxuvj_aj9GbKxoD7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-18_14,2024-08-16_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1015
- mlxlogscore=999 phishscore=0 mlxscore=0 spamscore=0 malwarescore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408180105
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: YQBPR0101MB6572:EE_|YT1PR01MB9099:EE_
+X-MS-Office365-Filtering-Correlation-Id: d03049da-3965-44a6-a18d-08dcbf9530be
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Rm5qVE1SUGg1QzNGVXFIb3UrcFUxMUsyNi9QZlNtSnc1a0F3M0ZNZE03aWU0?=
+ =?utf-8?B?VkRWclVoMCtmMG9VcDJVQnF6TitNRDdRYUduUGNDczRETzRJQUFNdFVJMzFQ?=
+ =?utf-8?B?T21KbURXRlVjUmQxUnlJWk1iSjdrNHJaRjBrN3ZZbHg4WjhuNS8wdy8yMUZ0?=
+ =?utf-8?B?MHZ6K0gwSC95TkVVY3RwdzJSWFp2OUNPNHRGVWZZeStXdnVBQ2JkSzRScWg3?=
+ =?utf-8?B?ZjJPR1NKZ0NPU1BvMjIrSHZqenN4L3k0RHo2amNIVEluN2JTTFlJckJBWVA2?=
+ =?utf-8?B?anFlZjNZNVZ6cG9idU9mdEZiVUY3U3loT0ExV25GRnVVS0l6K1p2MG00V21K?=
+ =?utf-8?B?WUt4NDQyR2FDQm1DRlRiYzBoaGdlY25vUENDeDRzTzFGNlJYcGN6d21tdFFr?=
+ =?utf-8?B?N0JzcVMxaG11YXU0d293UENRaSt0bkFsYUEyRytKMEx2V21HeXgrRkhoOGZD?=
+ =?utf-8?B?ZG5aMVRxL2pHdGdKdkVBaDUzc3pwOUJ2NTdleDNUR1ZRaWJoVTZ1a0tUZVVP?=
+ =?utf-8?B?aCs2MmgrNlZHazlDVFNXaUJpTGhEZUZQT0V6UUIyczJnZDk0QjBlVVVISXY0?=
+ =?utf-8?B?WnRpRGYvTWZNY0RjN2ZKeVVxc2pLOXZTZG9Pc1Q5azloQ0JDM0VpUEN4cko1?=
+ =?utf-8?B?WXJMVDQ3UGNkTW1kSGtTK1Y4cFZSVGJKQ29vLzFrRkVqcE1SQWxZWUhIMGJJ?=
+ =?utf-8?B?YVgyVzFQeW9GT0c0M3JhZCtmZ0lrZWRLbWpOSzI2LzhlV2o3Tmo5STRhaFMw?=
+ =?utf-8?B?VDNMSXBzSE0vemowM1locVFmRG1ELzFHUm53Y3lhZjhkc3dzQ3ppL1MyQU5u?=
+ =?utf-8?B?TzFJajhZN3N3ME0zYUdWMXdUQm15dkJCYVZ0bEkyenAyeXkyOFFobzlVKzh2?=
+ =?utf-8?B?ME1ERVptMDV4c0VVeC9UMlJ6QUtibHNhNE9NbTc1aW9jZ045eCtNT1QyaGVn?=
+ =?utf-8?B?NUlKNCtGcloxNmI4WGM1ZmMwaVNmdTBpbHk3enJ3NlNDbkZIUUVoWllMT3Rw?=
+ =?utf-8?B?Umd3ZmlYS1ZhRHJxQkVLZEZrY3ZsckN1ODdHUHBqU2RrZnFaUUZrMlk4UmlE?=
+ =?utf-8?B?TlFvZURlUnUzVXlFOFd5c2xGMndmdHRqaUhYU1BkdWRzUnNUVXJCWjgwdTlP?=
+ =?utf-8?B?Vm9mbUNCNE43MzNtcGtLenRLVXVNa2FRNDhqM0xBU1RNaG5tVisxRU1NckVV?=
+ =?utf-8?B?dFlZZnU1RzJHNHdndk1mUzJBVUsvdGk3RU5hMGZ1YXdVTEF6dGJDWXZaSEtt?=
+ =?utf-8?B?Sjg4NSttTUFXai9BRitiN3k5UXVtcEhuSWlVMnJ6YmYwUXFERGNvSlJlemQ0?=
+ =?utf-8?B?cGZNcys0T29yNXcydDdjNjZMTWVwVnlHSklSTGhBNUZwRzRWeS9pQVhnVWVp?=
+ =?utf-8?B?NkdaRGhSSTlZTms0RVl0L1crckxkdmxLQWNMQytGN1lnc1BWSS9veWt4YTNF?=
+ =?utf-8?B?eGxDU1M1eWkrNmRWOEl5SndveENvbFlIblVIZzVZTWFaMnIrQzlhdFdWWVMx?=
+ =?utf-8?B?M2VtZTBSelVmMTd5bWd1VFkyRFk2N2pXTkx4SWdSMWU5dG5VYi9IVVpKeHhu?=
+ =?utf-8?B?N0d4NzNIbTBYQytucS8yUk50Yk9rbHdZMldRRVFqUExTc0V5ZFEyUjlYMkQr?=
+ =?utf-8?B?c2F6cGFsK21hUTl2NjNzTHplWlNIS2lVOWNnQXRmck4vQWdmUm9QVkwrYzRy?=
+ =?utf-8?B?T2pvbzdLQmdoOWVtcUdFVmY2OC92YTc0KzJDbUs1ek5KWmxQbHYybmZMUkM4?=
+ =?utf-8?B?b2hVUjJ4WVNVQXRLZTkrWUM1aHBOVklnaVRFSCtRbWptZzY3L0NWeC81MmU5?=
+ =?utf-8?B?c1FlaVljM3FNenFmRGFkdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d1l0K1dibGZDbWk1N05yVXRxNkVDUUw4RDhRNlhEd09ScG11NlBzMG9uTzlI?=
+ =?utf-8?B?SlpySUg3cVZLVE4vaC81WkdBRXhJamhacHkwQlFmOE96NFlCbzNVeCtKLzVq?=
+ =?utf-8?B?OERYNlprUDE2dDlta2FCUVFaTThnM1NMQkVIYnNWUFBDak9CeXpmWmFtMFh3?=
+ =?utf-8?B?TFBVRGNFN2JqZ2gyVmIxWWlwem1XMTBmZmtaYlhBMW14b29xQjl2dHIrTzBM?=
+ =?utf-8?B?QmxmSDNiRDhQS2MwLzF4YnViSTFrS2JvTkZTM01SRHA0VzMyckM0UHUvZ2Vp?=
+ =?utf-8?B?MHpwU2tRMndwT0hnc2ZGWHQ4azF2WHUvMGlTc0RqZHVFdm9TMEpWMEN0Vi9m?=
+ =?utf-8?B?LzlpTjhzZUVFM0xFUzkveUVkbTU2akx1ZEVyTXRWd1hiam10QWZlQnRWZGty?=
+ =?utf-8?B?Vk5KMWhuODd2cVN1bWRjTXJzNVpBRCs3VUdtdUE1U2pPVEUwekx3UEVPL3cy?=
+ =?utf-8?B?UUtlZThPaGxOK1FINmNLeTVSTEwwRnhEdjBNODRsNzBaL0EreU1MZnhIcm5J?=
+ =?utf-8?B?YWFmVkw4UERYZGtpbE43SGRnSDRKSUwrUTZqeXlmSmthK1AvWElqc05tU2lv?=
+ =?utf-8?B?NGxrbUYybG1qREc5K3Z0eVNwa2ttNDB4SGtBNnUzT1NmMjMrMWYxSmd1ZVdU?=
+ =?utf-8?B?ejQxTVh2dy9ZTFJWSjZQL0tRdDBMRTVUR0c5NWlEaHpEWFU0dFlkZkxnQnc0?=
+ =?utf-8?B?MFJKNGFrZWtUWnVmMzhiSjd0QlZkLzNXYXJaQVEvY2dSSnJUcXplMEhBR1NU?=
+ =?utf-8?B?M2V1SzNKY3NTc3RjNzNhdGM3azFNQVByTkRVNmVQakh3dUtEM2I2ei9uQzhY?=
+ =?utf-8?B?aSs3a29tcnNOYitTckNQTTFkK08xZW84dmpiWGhTNXNTSmNlNXY4am5ySzhx?=
+ =?utf-8?B?WkJSakYyVFFvRzZnYUlkOUNSaUExdVRaUjZqM3VaN25JQ0JwaEF1djRlQ0pv?=
+ =?utf-8?B?enFVakRwUkYrdit1NFl5bXNmdWNLbnJaUHc1Y0hLM2RaV2kvbDFLR0FYUkR4?=
+ =?utf-8?B?U2oxUmhlZWpHWDRLS2NxaGtIL3U4dmdsZk1lemorNjZHVkxGRFoxK1RKQllW?=
+ =?utf-8?B?U3o5T1Vrbi9vVk13SHV2aUdYcVNhem1UcEgrbVRDaFA4UXFzaDl0Z1dWcEdn?=
+ =?utf-8?B?MWxVNnRsdVFPY0xwTU1DUllrNHpSRXdXWm44cnA1V1BkcmV3ZnR3QThzZjJV?=
+ =?utf-8?B?Y1AzWVBCdTZrZ1ZQM2pOd1hJOGpiQXN2Q2VheGR1QmU0a2dnaEltSHBVajJN?=
+ =?utf-8?B?ajJNeWR0ZVdWZE9qTEQyeHUvbEJMQzBROGVJcFdmY2Z1NnhwOUo5bGZyYmFt?=
+ =?utf-8?B?bWJRYVNQVHpra1JhaTNEZ3liWFUzSkt1SU5qdXYrOFNFaHFpYXlEN3NKVlQw?=
+ =?utf-8?B?R3gvck84RmNRNHlSZDkyc01tVUhWYWtJbGh0Z2ZvZ2NST0ovdUJBbmgxbGFj?=
+ =?utf-8?B?aGhEN2t3QVRoL25XNmVQNi9pcGhoeUlqcVVMT3FnLzdRTlNqUGpxU2xZOEhE?=
+ =?utf-8?B?ODJKWVJ4cjFvZVFwZlNFay9VSnJVc09Ta2hwQWJ2d3NVeDNYRDNndmxRRWVi?=
+ =?utf-8?B?d1JVdVdMdGVna3RrVUtSTUcrSTJOVmpFMithWWlyTTBETWhSMmt4WVlUeitC?=
+ =?utf-8?B?UFAwL2xKbTd5WVBsTCswK1NTR0lZZHZMcWswMnhyMGloemV1U2ZPTXA4aFp3?=
+ =?utf-8?B?VndxOFBuSmJRQXlGZFAxK1VoZWNLL0RSNStEZkN3U1ZTdEFRYTM2bTBWZGk5?=
+ =?utf-8?B?NEJOZW5ZbzJhYnUyMEFnOXVKM2pSak1MdE9jR0dEdUhSVHAyL0loaVVXZ2ti?=
+ =?utf-8?B?T1pWUEJlZkdVMmppN1BrdmFDaG91N2s1c3BxWlNFdHIyQ3pnMnpVUmYvM0o0?=
+ =?utf-8?B?aVdtWW9UYy9PVTc1eDJUK0J4UDJiYk1oV1E4VXBYUjNVTFUxOXpEb21sM1dF?=
+ =?utf-8?B?ZWV5OE1wN1Q4NWcwZllCYjRFRGQyS05TY2ZKdnB1U1daSHJ4QjYyd1grUEZO?=
+ =?utf-8?B?Wm5nc2dVbEplbEFMQWZaSFJmRXMwS3h3dzEzOEdkRVErREJrSkYwQVRpczFM?=
+ =?utf-8?B?SmxiTXVhNmM5STVOYjVBSnI4NHU0QnZvSy92TWFzUHBFQm5Pd1p6bGdkSVRK?=
+ =?utf-8?Q?C02GudLs7zGiaBXu4VEiT87Ip?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	SfjB1jWTPTPcJeFfbcGf8omPiA2J6aBMWNjE0CT6FH9zj+babwCbTtSYthwas2MNz8BX0gXttOANGpHyoQ9bZKFDTDIU58WK/AOmIRszCoe8Am9mjdC2j7d7qbl7hGqqehRKx4gx9t4boFmYBFyTo3uES/65MteG3NlXyI03ocSfE+DsoZiTmY6r39O86iMGhbxiJ/MNBHWL6gVtwNIUosF87vAK/LVvtC3hz+HGCc+8qTwToHKbDn5WrV+DnX8gGB9+FdQy6CH98URPbQxhEbjljcfQMYq+W2lzBJmwC2oC0qyFN1dsFKw4P0YhqmXeWB0ZU7MRYCoUxoohKZVAI0YLnd7613lNEmH3MrbINd8j23MLXBF4c92jaTIeqpsXN+Y7GH47P1yyg+AtJxj66DAsdPvYkE1KduTmMgkcjFZ7AiLJ11xiIIgoV2MsX0QVStuBueXXuKzsi96xcBKgtph2hUoIU0VGY8pKbeq5DMTRYJJCQjvkPaPXJ0n/fwpUwFlnKrrASUcXUk+8shtXbpMJgZedNFzUjHCiUQJn7F9SVqI5BmjHTrQr4FwG+X11qLfoJP18/rZ3vbQDIvFRkgDt9KeFu1ANbIhWZPOJt4ugFyRRlHskoej21XWcTJqp
+X-OriginatorOrg: uwaterloo.ca
+X-MS-Exchange-CrossTenant-Network-Message-Id: d03049da-3965-44a6-a18d-08dcbf9530be
+X-MS-Exchange-CrossTenant-AuthSource: YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2024 14:51:06.9596
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 723a5a87-f39a-4a22-9247-3fc240c01396
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ecNhwR9EmQ2BYdjUo1TYheBggHZbRGQiWtK879m9LfHg440YuguT4ImaML3wq272m/qEMD+7UKP72o1+dj9tfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: YT1PR01MB9099
 
-On 2024/8/17 17:57, Takashi Sakamoto wrote:
-> Hi,
-> 
-> On Thu, Aug 15, 2024 at 10:58:04PM +0800, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On 2024-08-18 08:55, Willem de Bruijn wrote:
+>>>>>> The value may not be obvious, but guidance (in the form of
+>>>>>> documentation) can be provided.
+>>>>>
+>>>>> Okay. Could you share a stab at what that would look like?
+>>>>
+>>>> The timeout needs to be large enough that an application can get a
+>>>> meaningful number of incoming requests processed without softirq
+>>>> interference. At the same time, the timeout value determines the
+>>>> worst-case delivery delay that a concurrent application using the same
+>>>> queue(s) might experience. Please also see my response to Samiullah
+>>>> quoted above. The specific circumstances and trade-offs might vary,
+>>>> that's why a simple constant likely won't do.
+>>>
+>>> Thanks. I really do mean this as an exercise of what documentation in
+>>> Documentation/networking/napi.rst will look like. That helps makes the
+>>> case that the interface is reasonably ease to use (even if only
+>>> targeting advanced users).
+>>>
+>>> How does a user measure how much time a process will spend on
+>>> processing a meaningful number of incoming requests, for instance.
+>>> In practice, probably just a hunch?
 >>
->> To prepare for constifying the following old driver core API:
+>> As an example, we measure around 1M QPS in our experiments, fully
+>> utilizing 8 cores and knowing that memcached is quite scalable. Thus we
+>> can conclude a single request takes about 8 us processing time on
+>> average. That has led us to a 20 us small timeout (gro_flush_timeout),
+>> enough to make sure that a single request is likely not interfered with,
+>> but otherwise as small as possible. If multiple requests arrive, the
+>> system will quickly switch back to polling mode.
 >>
->> struct device *device_find_child(struct device *dev, void *data,
->> 		int (*match)(struct device *dev, void *data));
->> to new:
->> struct device *device_find_child(struct device *dev, const void *data,
->> 		int (*match)(struct device *dev, const void *data));
+>> At the other end, we have picked a very large irq_suspend_timeout of
+>> 20,000 us to demonstrate that it does not negatively impact latency.
+>> This would cover 2,500 requests, which is likely excessive, but was
+>> chosen for demonstration purposes. One can easily measure the
+>> distribution of epoll_wait batch sizes and batch sizes as low as 64 are
+>> already very efficient, even in high-load situations.
+> 
+> Overall Ack on both your and Joe's responses.
+> 
+> epoll_wait disables the suspend if no events are found and ep_poll
+> would go to sleep. As the paper also hints, the timeout is only there
+> for misbehaving applications that stop calling epoll_wait, correct?
+> If so, then picking a value is not that critical, as long as not too
+> low to do meaningful work.
+
+Correct.
+
+>> Also see next paragraph.
 >>
->> The new API does not allow its match function (*match)() to modify
->> caller's match data @*data, but lookup_existing_device() as the old
->> API's match function indeed modifies relevant match data, so it is not
->> suitable for the new API any more, fixed by implementing a equivalent
->> fw_device_find_child() instead of the old API usage.
+>>> Playing devil's advocate some more: given that ethtool usecs have to
+>>> be chosen with a similar trade-off between latency and efficiency,
+>>> could a multiplicative factor of this (or gro_flush_timeout, same
+>>> thing) be sufficient and easier to choose? The documentation does
+>>> state that the value chosen must be >= gro_flush_timeout.
 >>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->>  drivers/firewire/core-device.c | 37 +++++++++++++++++++++++++++++++++++--
->>  1 file changed, 35 insertions(+), 2 deletions(-)
-> 
-> Thanks for the patch.
-> 
->> Why to constify the API ?
+>> I believe this would take away flexibility without gaining much. You'd
+>> still want some sort of admin-controlled 'enable' flag, so you'd still
+>> need some kind of parameter.
 >>
->> (1) It normally does not make sense, also does not need to, for
->> such device finding operation to modify caller's match data which
->> is mainly used for comparison.
->>
->> (2) It will make the API's match function and match data parameter
->> have the same type as all other APIs (bus|class|driver)_find_device().
->>
->> (3) It will give driver author hints about choice between this API and
->> the following one:
->> int device_for_each_child(struct device *dev, void *data,
->>                 int (*fn)(struct device *dev, void *data));
+>> When using our scheme, the factor between gro_flush_timeout and
+>> irq_suspend_timeout should *roughly* correspond to the maximum batch
+>> size that an application would process in one go (orders of magnitude,
+>> see above). This determines both the target application's worst-case
+>> latency as well as the worst-case latency of concurrent applications, if
+>> any, as mentioned previously.
 > 
-> I have found another issue in respect to this subsystem.
-> 
-> The whole procedure in 'lookup_existing_device()' in the call of
-> 'device_find_child()' is a bit superfluous, since it includes not only
-> finding but also updating. The helper function passed to
-> 'device_find_child()' should do quick finding only.
-> 
-> I think we can change the relevant codes like the following patch. It
-> would solve your concern, too. If you prefer the change, I'm going to
-> evaluate it.
-> 
+> Oh is concurrent applications the argument against a very high
+> timeout?
 
-thanks for your reply.
-of course, i prefer your change.
+Only in the error case. If suspend_irq_timeout is large enough as you 
+point out above, then as long as the target application behaves well, 
+its batching settings are the determining factor.
 
-> ======== 8< --------
-> 
-> From ceaa8a986ae07865eb3fec810de330e96b6d56e2 Mon Sep 17 00:00:00 2001
-> From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-> Date: Sat, 17 Aug 2024 17:52:53 +0900
-> Subject: [PATCH] firewire: core: update fw_device outside of
->  device_find_child()
-> 
-> When detecting updates of bus topology, the data of fw_device is newly
-> allocated and caches the content of configuration ROM from the
-> corresponding node. Then, the tree of device is sought to find the
-> previous data of fw_device corresponding to the node, since in IEEE 1394
-> specification numeric node identifier could be changed dynamically every
-> generation of bus topology. If it is found, the previous data is updated
-> and reused, then the newly allocated data is going to be released.
-> 
-> The above procedure is done in the call of device_find_child(), however it
-> is a bit abusing against the intention of the helper function, since the
-> call would not only find but also update.
-> 
-> This commit splits the update outside of the call.
-> ---
->  drivers/firewire/core-device.c | 109 ++++++++++++++++-----------------
->  1 file changed, 54 insertions(+), 55 deletions(-)
-> 
-> diff --git a/drivers/firewire/core-device.c b/drivers/firewire/core-device.c
-> index bc4c9e5a..62e8d839 100644
-> --- a/drivers/firewire/core-device.c
-> +++ b/drivers/firewire/core-device.c
-> @@ -928,56 +928,6 @@ static void fw_device_update(struct work_struct *work)
->  	device_for_each_child(&device->device, NULL, update_unit);
->  }
->  
-> -/*
-> - * If a device was pending for deletion because its node went away but its
-> - * bus info block and root directory header matches that of a newly discovered
-> - * device, revive the existing fw_device.
-> - * The newly allocated fw_device becomes obsolete instead.
-> - */
-> -static int lookup_existing_device(struct device *dev, void *data)
-> -{
-> -	struct fw_device *old = fw_device(dev);
-> -	struct fw_device *new = data;
-> -	struct fw_card *card = new->card;
-> -	int match = 0;
-> -
-> -	if (!is_fw_device(dev))
-> -		return 0;
-> -
-> -	guard(rwsem_read)(&fw_device_rwsem); // serialize config_rom access
-> -	guard(spinlock_irq)(&card->lock); // serialize node access
-> -
-> -	if (memcmp(old->config_rom, new->config_rom, 6 * 4) == 0 &&
-> -	    atomic_cmpxchg(&old->state,
-> -			   FW_DEVICE_GONE,
-> -			   FW_DEVICE_RUNNING) == FW_DEVICE_GONE) {
-> -		struct fw_node *current_node = new->node;
-> -		struct fw_node *obsolete_node = old->node;
-> -
-> -		new->node = obsolete_node;
-> -		new->node->data = new;
-> -		old->node = current_node;
-> -		old->node->data = old;
-> -
-> -		old->max_speed = new->max_speed;
-> -		old->node_id = current_node->node_id;
-> -		smp_wmb();  /* update node_id before generation */
-> -		old->generation = card->generation;
-> -		old->config_rom_retries = 0;
-> -		fw_notice(card, "rediscovered device %s\n", dev_name(dev));
-> -
-> -		old->workfn = fw_device_update;
-> -		fw_schedule_device_work(old, 0);
-> -
-> -		if (current_node == card->root_node)
-> -			fw_schedule_bm_work(card, 0);
-> -
-> -		match = 1;
-> -	}
-> -
-> -	return match;
-> -}
-> -
->  enum { BC_UNKNOWN = 0, BC_UNIMPLEMENTED, BC_IMPLEMENTED, };
->  
->  static void set_broadcast_channel(struct fw_device *device, int generation)
-> @@ -1038,6 +988,17 @@ int fw_device_set_broadcast_channel(struct device *dev, void *gen)
->  	return 0;
->  }
->  
-> +static int compare_configuration_rom(struct device *dev, void *data)
-> +{
-> +	const struct fw_device *old = fw_device(dev);
-> +	const u32 *config_rom = data;
-> +
-> +	if (!is_fw_device(dev))
-> +		return 0;
-> +
-> +	return !!memcmp(old->config_rom, config_rom, 6 * 4);
-
-!memcmp(old->config_rom, config_rom, 6 * 4) ?
-
-is this extra condition old->state == FW_DEVICE_GONE required ?
-
-namely, is it okay for  below return ?
-return  !memcmp(old->config_rom, config_rom, 6 * 4) && old->state ==
-FW_DEVICE_GONE
-
-> +}
-> +
->  static void fw_device_init(struct work_struct *work)
->  {
->  	struct fw_device *device =
-> @@ -1071,13 +1032,51 @@ static void fw_device_init(struct work_struct *work)
->  		return;
->  	}
->  
-> -	revived_dev = device_find_child(card->device,
-> -					device, lookup_existing_device);
-> +	// If a device was pending for deletion because its node went away but its bus info block
-> +	// and root directory header matches that of a newly discovered device, revive the
-> +	// existing fw_device. The newly allocated fw_device becomes obsolete instead.
-> +	//
-> +	// serialize config_rom access.
-> +	scoped_guard(rwsem_read, &fw_device_rwsem) {
-> +		// TODO: The cast to 'void *' could be removed if Zijun Hu's work goes well.
-
-may remove this TODO line since i will simply remove the cast with the
-other patch series as shown below:
-https://lore.kernel.org/all/20240811-const_dfc_done-v1-0-9d85e3f943cb@quicinc.com/
-
-
-> +		revived_dev = device_find_child(card->device, (void *)device->config_rom,
-> +						compare_configuration_rom);
-> +	}
->  	if (revived_dev) {
-> -		put_device(revived_dev);
-> -		fw_device_release(&device->device);
-> +		struct fw_device *found = fw_device(revived_dev);
->  
-> -		return;
-> +		// serialize node access
-> +		guard(spinlock_irq)(&card->lock);
-> +
-> +		if (atomic_cmpxchg(&found->state,
-> +				   FW_DEVICE_GONE,
-> +				   FW_DEVICE_RUNNING) == FW_DEVICE_GONE) {
-> +			struct fw_node *current_node = device->node;
-> +			struct fw_node *obsolete_node = found->node;
-> +
-> +			device->node = obsolete_node;
-> +			device->node->data = device;
-> +			found->node = current_node;
-> +			found->node->data = found;
-> +
-> +			found->max_speed = device->max_speed;
-> +			found->node_id = current_node->node_id;
-> +			smp_wmb();  /* update node_id before generation */
-> +			found->generation = card->generation;
-> +			found->config_rom_retries = 0;
-> +			fw_notice(card, "rediscovered device %s\n", dev_name(revived_dev));
-> +
-> +			found->workfn = fw_device_update;
-> +			fw_schedule_device_work(found, 0);
-> +
-> +			if (current_node == card->root_node)
-> +				fw_schedule_bm_work(card, 0);
-> +
-> +			put_device(revived_dev);
-> +			fw_device_release(&device->device);
-> +
-> +			return;
-> +		}
-
-is it okay to put_device() here as well ?
-put_device(revived_dev);
-
->  	}
->  
->  	device_initialize(&device->device);
+Thanks,
+Martin
 
 
