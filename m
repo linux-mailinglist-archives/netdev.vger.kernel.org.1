@@ -1,249 +1,272 @@
-Return-Path: <netdev+bounces-119468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E46955C4F
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 13:43:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B12E955C9F
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 14:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B13CEB20CA1
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 11:43:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5444D282A30
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 12:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3640518637;
-	Sun, 18 Aug 2024 11:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070F82D600;
+	Sun, 18 Aug 2024 12:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MB9NC0vT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlRIdFvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F0817557
-	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 11:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723981424; cv=fail; b=DWKQG4fnrbS2G2GkacgjnJY20kZ85GllGEQ625wv080P08rf6d+sI6PZ3MpUZPah2izXAOWytl5PF0IMOmamjK5wdWE+TeBiv+nS8KU3iFSB6UDtGOVeKEGg3Gv7hsd5uN9FFQvsim8ha1VwirZFUEcwHUluckzuGEFB/7xYbCo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723981424; c=relaxed/simple;
-	bh=Sg2N5HPav69EAhXOoyE9sTKA3uwVYeTaVrSebBxs/ho=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hk/wqL3XkxLJf0LAnFmj9NmcyV2DJX7oXa2CbFh85G7hX7qoK6u+Kuc+GaZPAt5fa4Ny9BF/dALMI+FgWEdQPHc6kX3e+sxbHsRCGZXGGW65UCvjJiZD5F92eiVJDQTRkc6QDrh/jJZ2IWyNDm0CEBbYCxrdmd4GsqSzVQJXeHc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MB9NC0vT; arc=fail smtp.client-ip=40.107.94.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fDf0fop3KLdusGVBDtaL5mfIs0GiRplLED7cIv3PAeeX8SlYTNr/Cv1HDgXmAEAvHd9Ve4Xp+6w1F4jRov7gf9w8JiehwH+Kdvu6746P+XYDFNGM268tx1X3SQgLm04tjhM5BYOycNPiatqmIvfJHIl3p/p5Z820TJ4xVcwECA0pBeCIVgMuhBtVD3C+j1S3VxTS5961zGoZJRW1N/Uh5STTZOToh+ZN7iuUdq4A/ikS+Fm5HgJ4I/rY/XBMoaZKzIb06bgUpAF//RwDED98uEwFQzI3INcBVLh8TyfyMrX2hZ76sZACOdsf5aD6ePoYtOGptigEepK9Nj1hOkeHDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L7pQgmhz67Hi6HyTh44DncdyvtO8aViCZ6+9n9rSpIo=;
- b=OtG3q1MAre2e50fEAVSvNexvCkHQjrOyQY8gIGvORz/hkxQKYVt/8oTvr/uaH35bHp9vY2y48aN3NCID6pIlmTSRp+PJLY2K72qKyj3acmI1u2EiYp4hqcsuiDWJ7Eyld5QD+qWEjbkVEfIqKA85QaTne5MZG05jIfLsEJ6VL0/he8cFanR4T3xMgGZ3rrNbhUiCiCvMiENuLsbe9Dmr96RMFiZIvn4VBpf9zUXe13zdsKnwBFRSDOVh8JciQDPNjVMom9SU0X+Y3dJ/NKHZxx5LhcRqFwnPPLAtp+WYQj+TG07YbwEawVPTPHj0FVZmCpl/qkfdy6jhuPuprChPGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L7pQgmhz67Hi6HyTh44DncdyvtO8aViCZ6+9n9rSpIo=;
- b=MB9NC0vT/gbuYEjLSTed7m9frPJO378WAfVO/62+mUOXNcCDbR28V3T+e4dWugNMCcKt4KSt1n7np1FHRD6o5HHrm1wkMnjn1JMw97lwOPwPjVSbTxLB2UUmqjDSZXrU7rtL00JGZuZULB7WClilrcN6QuaA20WX2IRBXSW2UZyOTV2sU2q+u2u8PPuHUcjVgemAlStuQ0VvwOdmeyc72FMc9Mp7P8sJNFdJpLhCpJpvn42piSCXrQJH0nUsQAAPt63M6446gUXUbd/RlFW6VWSI+a3zdJHtWJS34qtg1v/ak4PhbNjgEVi+CMV3jLfplC+MHaYLbxU+2PXErv7F0Q==
-Received: from SN6PR01CA0025.prod.exchangelabs.com (2603:10b6:805:b6::38) by
- DS0PR12MB8575.namprd12.prod.outlook.com (2603:10b6:8:164::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7875.21; Sun, 18 Aug 2024 11:43:35 +0000
-Received: from SN1PEPF0002529F.namprd05.prod.outlook.com
- (2603:10b6:805:b6:cafe::e9) by SN6PR01CA0025.outlook.office365.com
- (2603:10b6:805:b6::38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20 via Frontend
- Transport; Sun, 18 Aug 2024 11:43:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002529F.mail.protection.outlook.com (10.167.242.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7897.11 via Frontend Transport; Sun, 18 Aug 2024 11:43:35 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 18 Aug
- 2024 04:43:34 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 18 Aug
- 2024 04:43:33 -0700
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Sun, 18 Aug
- 2024 04:43:31 -0700
-From: Gal Pressman <gal@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>, Cosmin Ratiu
-	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next] net: Silence false field-spanning write warning in metadata_dst memcpy
-Date: Sun, 18 Aug 2024 14:43:51 +0300
-Message-ID: <20240818114351.3612692-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4349CCA6B;
+	Sun, 18 Aug 2024 12:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723985710; cv=none; b=AASvVm959CkF2gjPSJO9UBTxACxmtKY2ShegaNWCIYBrOO59B347T0lmmltIXRdjJFYwsITd88wOjTlUe6mH8yB5eewUd7iEdHpIXN4nD+ArnnFJ1DAEtipb9vYQNrzfdq9BfLJnD4i7DatoPTptR1/Z+VKMdCW8I1OgbjRRTGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723985710; c=relaxed/simple;
+	bh=Y3b3/eSoBdaAQ/aiYFD0jOOTCuomiR75iL8y6Ek3v+I=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RO+F03lumtW6glp4D0AlU8wxgVJgfhRp7cTfd/aPfOxrikIESkEygrOJd7EC0N+1iLeFACWWp39o1S4PqK34pTkAdLbnetH2bOQN8vl+p1cRyKKc+aWXpG1sRz1ULVyPabGrP4tmrbSZEXpwyw3qVryBad4C/SH5503X1Q6SolM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlRIdFvx; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a3574acafeso227535385a.1;
+        Sun, 18 Aug 2024 05:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723985708; x=1724590508; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjPNQ2hdnuzOp+Zw7QWesXyWkAdRx5XpbRcEGdtXU6Q=;
+        b=GlRIdFvx9E9B6TIrHeJKMv455q77yMeVl81EZ398CsAqRtRnKCAQrTbLeRpNJdDZ1y
+         Tdc8GAWmzwxPjeM6QmlrwKS41fK+si7TgdHwq+JW4e9FsxYpdQvZz358zsqUnvQP/qri
+         lCR5pfxBJkb/i80RCxdk9bE5UTCZqgRNZCiYJPcB0zEYDYUHQxcFjGamp2YkF1MmPf9f
+         UYssmv+XQGXlgCJmoW7IQ/jAkJo3T8ckYRpGHxt//mB+ifTK6j8LISlLnNzujAnwKVyH
+         tYyN9RwSYVTJy4qu0A6qxvlG8n8HxiNG9fdLlEYoCWcPxiXPH2QaHIbt9ipEWk0KiMSM
+         oDPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723985708; x=1724590508;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xjPNQ2hdnuzOp+Zw7QWesXyWkAdRx5XpbRcEGdtXU6Q=;
+        b=Y1aALEh2/CgA8PyB+1twWjsBGF5FKhiuAUQAJD+3rZerR98i36KpNxq4OE36HMgdeQ
+         xLMSSU1h5e8Ci9c/yYpWIsQBsaq9BLDm+sUQSQPJE0632OZbfYv+MG6g5e0jhBtah7f6
+         n/Vnxd004vEv6I8TQuQqRrrl2OMqmUa4UMbpXj+bTNq4ptVtX5z2STsKokTw+qAeLZhn
+         h3K5T0YAvzRsJ0ZpFJNnN16ydMY2POEP3uDcaFKRvAXQd8LAWq23z3q9hnInyU6avc9E
+         f9I8Uaw193pVyxMA5BWErpxvtbVar21yz5DYAr04o7k7y2S+PIiQU3Uooy9u68jwBj6J
+         a81Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVoh82GouYYhAY1KlwUqxPkesc295pZIbJAeEpM9u8gB3o/0M9uF9upKihY+5a4+Wqku0Cop/HPBgGjFUVlx7v4nK9HQS75cR9PsXjZC2YISrTIgVjtCMNix7mQ46Kuqqo6X4M2W29ruVLPfdgZLi2NWJX8/Rg2WZzevPa0FxCZ2kKtjFDdtfTqRBRwVJmF1IRfIg2/w+UAtLMMWXuJ5w==
+X-Gm-Message-State: AOJu0Ywr9hG4p9vF+Pj7IsygrI0nijv/JDEEfkbB7I9PEwGO7Ry6Yq2l
+	DkG/shqxbUyZuIuzs3qir78KSx4ir1nPGQDvSbkcCZfv0RkoUbbw
+X-Google-Smtp-Source: AGHT+IHXou7EVQZ4L9O73YUn4QevN6HlCLXEx1eNoii0u5tbjCLWMah8dxMkJ3k0lkAwqrBGWE+a7Q==
+X-Received: by 2002:a05:622a:4016:b0:453:15f2:a320 with SMTP id d75a77b69052e-453741b5a35mr102611211cf.12.1723985707905;
+        Sun, 18 Aug 2024 05:55:07 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45369fee649sm32610841cf.29.2024.08.18.05.55.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Aug 2024 05:55:06 -0700 (PDT)
+Date: Sun, 18 Aug 2024 08:55:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Martin Karsten <mkarsten@uwaterloo.ca>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Joe Damato <jdamato@fastly.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ netdev@vger.kernel.org, 
+ amritha.nambiar@intel.com, 
+ sridhar.samudrala@intel.com, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Breno Leitao <leitao@debian.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Jan Kara <jack@suse.cz>, 
+ Jiri Pirko <jiri@resnulli.us>, 
+ Johannes Berg <johannes.berg@intel.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ "open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, 
+ open list <linux-kernel@vger.kernel.org>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Message-ID: <66c1ef2a2e94c_362202942d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <e4f6639e-53eb-412d-b998-699099570107@uwaterloo.ca>
+References: <ZrqU3kYgL4-OI-qj@mini-arch>
+ <d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
+ <Zrq8zCy1-mfArXka@mini-arch>
+ <5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
+ <Zrrb8xkdIbhS7F58@mini-arch>
+ <6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
+ <CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
+ <d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
+ <66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
+ <66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
+ <Zr9vavqD-QHD-JcG@LQ3V64L9R2>
+ <66bf85f635b2e_184d66294b9@willemb.c.googlers.com.notmuch>
+ <02091b4b-de85-457d-993e-0548f788f4a1@uwaterloo.ca>
+ <66bfbd88dc0c6_18d7b829435@willemb.c.googlers.com.notmuch>
+ <e4f6639e-53eb-412d-b998-699099570107@uwaterloo.ca>
+Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529F:EE_|DS0PR12MB8575:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44cd4557-d567-46c8-991b-08dcbf7afe39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rNNkvcBPVMS61955XWRD0EKWxd5Iyr3iJlEtKOqdf96C+zswXudzS4XogEIK?=
- =?us-ascii?Q?9bzIslm3HAyJt3VPy21GE0gB2NOiz3skur5jU0ntuHUm6oAG4VO9K8twxoSf?=
- =?us-ascii?Q?Bkd6CnxfcJmdCC6YQXRUYwcZRILVOw1ouvUdtHB+4KMDeQoKguGQiQZBR4Pu?=
- =?us-ascii?Q?8wP17eoyc+mgOUH6KLfDGFoof5cNvcwkvq0KHV+OCdnyc1AeaNj6XYBAziwA?=
- =?us-ascii?Q?QFwlRMFDgzwqVdt9UtbIo2x92PfGrodtdh00hzq46rlNDv9CVaeA8x09lSql?=
- =?us-ascii?Q?nKrTvN5qmT8OXaekkGkS7v9Q07RkgAFUp/GWxX25JZyzI6mmhBdUjaJwGGKJ?=
- =?us-ascii?Q?RZQGl1Qy7s93GB3om5JiAP+v89aXL6KRnrroxkY9QAMb069zT1zUFgyZL29k?=
- =?us-ascii?Q?nX1O3Yobvi9PMemWrp0hKPBjOIgYgKqfaU3eWZH9fnghLSDIDKxP1iqgu2dI?=
- =?us-ascii?Q?w6SRwvTL38WBTBsTRolC57SjjST5tYorm2MB5iQ16qBLXc6G6cNeVs1AOLQ7?=
- =?us-ascii?Q?81rbOk475+So0oDj+Zk60+mDyKO2bXKa3TyWTz4NWsMgsppZxxCBLjC3uvAr?=
- =?us-ascii?Q?mJVTnWVBf4JRtbLdEwqKphvFFST27LpW8FEpfxC1RToWKDbDyKhvzJmJNgXv?=
- =?us-ascii?Q?J4M8a6oRYFyogRxPJISTg6aq1F9h/gb0bnZgMVPCqVjIF9h0tjeni9VpPsib?=
- =?us-ascii?Q?5ZdOenkF554okb4D+GxFUDxACLMmFQcUKTV1045FIPUK7uGvtTbF/0/bN3Yu?=
- =?us-ascii?Q?CY762jyLNpN2/hrZ6Yn0I+Cp2RQhzEpEjlExRrlZWhophsLKwvX3y582qU/s?=
- =?us-ascii?Q?TlkRGc8ATfuPmx+cbDGoROlLYspG8MqK750lVBzpP+oKTf7zQivyLDMG7wHr?=
- =?us-ascii?Q?bw2ul+EW4gKFUZoEndULPYF4eBNpWDg54VsB8kE/hxnASmHX0s6LNoRHfPRb?=
- =?us-ascii?Q?MZDjTy77MJoriwO9QGjnQD6+8UiE1f1yZ3Qr4yNAGe69M9zDLCD75+EYPvRu?=
- =?us-ascii?Q?eY+3BoUCeXeYVJTnO/dsuWpsxJD5hZg1pJ94WwlED8T0ovECFfD4SSaA9JdC?=
- =?us-ascii?Q?fucLyezGpJ4JIkCEIZq/rQgHBLFaNqJLBfXgxOUfYn4bG/WRMJtRU/jlswK1?=
- =?us-ascii?Q?VBVXL46sZugAd4S8j3VVbf6NjXgoYHdM85bhfOCsv0EVsdJEkzPfOV2uS5iY?=
- =?us-ascii?Q?GFPn0fskFRkKNA3UsLkcXdVp88AoDmcuqBwcP2HFQHp6ySW02yj8SZiYDA6Z?=
- =?us-ascii?Q?c8F+b0UCizTAl73m9Joholwvgy4rcQuVdbP4MoHlcpscp3w58TmLMkT5v4cK?=
- =?us-ascii?Q?lDG8x7F8fMb2nxgZJtNCA8kHX/ybZB1HhGaRJeK8WfxItMJiUtlDSwaCKj7X?=
- =?us-ascii?Q?F1apSbZmARbdKcmgOzBUKvU3wl21TTduIZAHCoOYpaheVRi5BYNdoqt2ax4b?=
- =?us-ascii?Q?z5S5wctZroFyZLWZfWdM+vg3wdjsQ8Fl?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2024 11:43:35.0465
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44cd4557-d567-46c8-991b-08dcbf7afe39
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529F.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8575
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-When metadata_dst struct is allocated (using metadata_dst_alloc()), it
-reserves room for options at the end of the struct.
+> >>>> The value may not be obvious, but guidance (in the form of
+> >>>> documentation) can be provided.
+> >>>
+> >>> Okay. Could you share a stab at what that would look like?
+> >>
+> >> The timeout needs to be large enough that an application can get a
+> >> meaningful number of incoming requests processed without softirq
+> >> interference. At the same time, the timeout value determines the
+> >> worst-case delivery delay that a concurrent application using the same
+> >> queue(s) might experience. Please also see my response to Samiullah
+> >> quoted above. The specific circumstances and trade-offs might vary,
+> >> that's why a simple constant likely won't do.
+> > 
+> > Thanks. I really do mean this as an exercise of what documentation in
+> > Documentation/networking/napi.rst will look like. That helps makes the
+> > case that the interface is reasonably ease to use (even if only
+> > targeting advanced users).
+> > 
+> > How does a user measure how much time a process will spend on
+> > processing a meaningful number of incoming requests, for instance.
+> > In practice, probably just a hunch?
+> 
+> As an example, we measure around 1M QPS in our experiments, fully 
+> utilizing 8 cores and knowing that memcached is quite scalable. Thus we 
+> can conclude a single request takes about 8 us processing time on 
+> average. That has led us to a 20 us small timeout (gro_flush_timeout), 
+> enough to make sure that a single request is likely not interfered with, 
+> but otherwise as small as possible. If multiple requests arrive, the 
+> system will quickly switch back to polling mode.
+> 
+> At the other end, we have picked a very large irq_suspend_timeout of 
+> 20,000 us to demonstrate that it does not negatively impact latency. 
+> This would cover 2,500 requests, which is likely excessive, but was 
+> chosen for demonstration purposes. One can easily measure the 
+> distribution of epoll_wait batch sizes and batch sizes as low as 64 are 
+> already very efficient, even in high-load situations.
 
-Change the memcpy() to unsafe_memcpy() as it is guaranteed that enough
-room (md_size bytes) was allocated and the field-spanning write is
-intentional.
+Overall Ack on both your and Joe's responses.
 
-This resolves the following warning:
-	------------[ cut here ]------------
-	memcpy: detected field-spanning write (size 104) of single field "&new_md-=
->u.tun_info" at include/net/dst_metadata.h:166 (size 96)
-	WARNING: CPU: 2 PID: 391470 at include/net/dst_metadata.h:166 tun_dst_uncl=
-one+0x114/0x138 [geneve]
-	Modules linked in: act_tunnel_key geneve ip6_udp_tunnel udp_tunnel act_vla=
-n act_mirred act_skbedit cls_matchall nfnetlink_cttimeout act_gact cls_flow=
-er sch_ingress sbsa_gwdt ipmi_devintf ipmi_msghandler xfrm_interface xfrm6_=
-tunnel tunnel6 tunnel4 xfrm_user xfrm_algo nvme_fabrics overlay optee openv=
-switch nsh nf_conncount ib_srp scsi_transport_srp rpcrdma rdma_ucm ib_iser =
-rdma_cm ib_umad iw_cm libiscsi ib_ipoib scsi_transport_iscsi ib_cm uio_pdrv=
-_genirq uio mlxbf_pmc pwr_mlxbf mlxbf_bootctl bluefield_edac nft_chain_nat =
-binfmt_misc xt_MASQUERADE nf_nat xt_tcpmss xt_NFLOG nfnetlink_log xt_recent=
- xt_hashlimit xt_state xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_i=
-pv4 xt_mark xt_comment ipt_REJECT nf_reject_ipv4 nft_compat nf_tables nfnet=
-link sch_fq_codel dm_multipath fuse efi_pstore ip_tables btrfs blake2b_gene=
-ric raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_=
-tx xor xor_neon raid6_pq raid1 raid0 nvme nvme_core mlx5_ib ib_uverbs ib_co=
-re ipv6 crc_ccitt mlx5_core crct10dif_ce mlxfw
-	 psample i2c_mlxbf gpio_mlxbf2 mlxbf_gige mlxbf_tmfifo
-	CPU: 2 PID: 391470 Comm: handler6 Not tainted 6.10.0-rc1 #1
-	Hardware name: https://www.mellanox.com BlueField SoC/BlueField SoC, BIOS =
-4.5.0.12993 Dec  6 2023
-	pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
-	pc : tun_dst_unclone+0x114/0x138 [geneve]
-	lr : tun_dst_unclone+0x114/0x138 [geneve]
-	sp : ffffffc0804533f0
-	x29: ffffffc0804533f0 x28: 000000000000024e x27: 0000000000000000
-	x26: ffffffdcfc0e8e40 x25: ffffff8086fa6600 x24: ffffff8096a0c000
-	x23: 0000000000000068 x22: 0000000000000008 x21: ffffff8092ad7000
-	x20: ffffff8081e17900 x19: ffffff8092ad7900 x18: 00000000fffffffd
-	x17: 0000000000000000 x16: ffffffdcfa018488 x15: 695f6e75742e753e
-	x14: 2d646d5f77656e26 x13: 6d5f77656e262220 x12: 646c65696620656c
-	x11: ffffffdcfbe33ae8 x10: ffffffdcfbe1baa8 x9 : ffffffdcfa0a4c10
-	x8 : 0000000000017fe8 x7 : c0000000ffffefff x6 : 0000000000000001
-	x5 : ffffff83fdeeb010 x4 : 0000000000000000 x3 : 0000000000000027
-	x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffffff80913f6780
-	Call trace:
-	 tun_dst_unclone+0x114/0x138 [geneve]
-	 geneve_xmit+0x214/0x10e0 [geneve]
-	 dev_hard_start_xmit+0xc0/0x220
-	 __dev_queue_xmit+0xa14/0xd38
-	 dev_queue_xmit+0x14/0x28 [openvswitch]
-	 ovs_vport_send+0x98/0x1c8 [openvswitch]
-	 do_output+0x80/0x1a0 [openvswitch]
-	 do_execute_actions+0x172c/0x1958 [openvswitch]
-	 ovs_execute_actions+0x64/0x1a8 [openvswitch]
-	 ovs_packet_cmd_execute+0x258/0x2d8 [openvswitch]
-	 genl_family_rcv_msg_doit+0xc8/0x138
-	 genl_rcv_msg+0x1ec/0x280
-	 netlink_rcv_skb+0x64/0x150
-	 genl_rcv+0x40/0x60
-	 netlink_unicast+0x2e4/0x348
-	 netlink_sendmsg+0x1b0/0x400
-	 __sock_sendmsg+0x64/0xc0
-	 ____sys_sendmsg+0x284/0x308
-	 ___sys_sendmsg+0x88/0xf0
-	 __sys_sendmsg+0x70/0xd8
-	 __arm64_sys_sendmsg+0x2c/0x40
-	 invoke_syscall+0x50/0x128
-	 el0_svc_common.constprop.0+0x48/0xf0
-	 do_el0_svc+0x24/0x38
-	 el0_svc+0x38/0x100
-	 el0t_64_sync_handler+0xc0/0xc8
-	 el0t_64_sync+0x1a4/0x1a8
-	---[ end trace 0000000000000000 ]---
+epoll_wait disables the suspend if no events are found and ep_poll
+would go to sleep. As the paper also hints, the timeout is only there
+for misbehaving applications that stop calling epoll_wait, correct?
+If so, then picking a value is not that critical, as long as not too
+low to do meaningful work.
 
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
----
- include/net/dst_metadata.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+> Also see next paragraph.
+> 
+> > Playing devil's advocate some more: given that ethtool usecs have to
+> > be chosen with a similar trade-off between latency and efficiency,
+> > could a multiplicative factor of this (or gro_flush_timeout, same
+> > thing) be sufficient and easier to choose? The documentation does
+> > state that the value chosen must be >= gro_flush_timeout.
+> 
+> I believe this would take away flexibility without gaining much. You'd 
+> still want some sort of admin-controlled 'enable' flag, so you'd still 
+> need some kind of parameter.
+> 
+> When using our scheme, the factor between gro_flush_timeout and 
+> irq_suspend_timeout should *roughly* correspond to the maximum batch 
+> size that an application would process in one go (orders of magnitude, 
+> see above). This determines both the target application's worst-case 
+> latency as well as the worst-case latency of concurrent applications, if 
+> any, as mentioned previously.
 
-diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
-index 4160731dcb6e..84c15402931c 100644
---- a/include/net/dst_metadata.h
-+++ b/include/net/dst_metadata.h
-@@ -163,8 +163,11 @@ static inline struct metadata_dst *tun_dst_unclone(str=
-uct sk_buff *skb)
- 	if (!new_md)
- 		return ERR_PTR(-ENOMEM);
-=20
--	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
--	       sizeof(struct ip_tunnel_info) + md_size);
-+	unsafe_memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
-+		      sizeof(struct ip_tunnel_info) + md_size,
-+		      /* metadata_dst_alloc() reserves room (md_size bytes) for
-+		       * options right after the ip_tunnel_info struct.
-+		       */);
- #ifdef CONFIG_DST_CACHE
- 	/* Unclone the dst cache if there is one */
- 	if (new_md->u.tun_info.dst_cache.cache) {
---=20
-2.40.1
+Oh is concurrent applications the argument against a very high
+timeout?
+
+> I believe the optimal factor will vary 
+> between different scenarios.
+> 
+> >>>>> If the only goal is to safely reenable interrupts when the application
+> >>>>> stops calling epoll_wait, does this have to be user tunable?
+> >>>>>
+> >>>>> Can it be either a single good enough constant, or derived from
+> >>>>> another tunable, like busypoll_read.
+> >>>>
+> >>>> I believe you meant busy_read here, is that right?
+> >>>>
+> >>>> At any rate:
+> >>>>
+> >>>>     - I don't think a single constant is appropriate, just as it
+> >>>>       wasn't appropriate for the existing mechanism
+> >>>>       (napi_defer_hard_irqs/gro_flush_timeout), and
+> >>>>
+> >>>>     - Deriving the value from a pre-existing parameter to preserve the
+> >>>>       ABI, like busy_read, makes using this more confusing for users
+> >>>>       and complicates the API significantly.
+> >>>>
+> >>>> I agree we should get the API right from the start; that's why we've
+> >>>> submit this as an RFC ;)
+> >>>>
+> >>>> We are happy to take suggestions from the community, but, IMHO,
+> >>>> re-using an existing parameter for a different purpose only in
+> >>>> certain circumstances (if I understand your suggestions) is a much
+> >>>> worse choice than adding a new tunable that clearly states its
+> >>>> intended singular purpose.
+> >>>
+> >>> Ack. I was thinking whether an epoll flag through your new epoll
+> >>> ioctl interface to toggle the IRQ suspension (and timer start)
+> >>> would be preferable. Because more fine grained.
+> >>
+> >> A value provided by an application through the epoll ioctl would not be
+> >> subject to admin oversight, so a misbehaving application could set an
+> >> arbitrary timeout value. A sysfs value needs to be set by an admin. The
+> >> ideal timeout value depends both on the particular target application as
+> >> well as concurrent applications using the same queue(s) - as sketched above.
+> > 
+> > I meant setting the value systemwide (or per-device), but opting in to
+> > the feature a binary epoll options. Really an epoll_wait flag, if we
+> > had flags.
+> > 
+> > Any admin privileged operations can also be protected at the epoll
+> > level by requiring CAP_NET_ADMIN too, of course. But fair point that
+> > this might operate in a multi-process environment, so values should
+> > not be hardcoded into the binaries.
+> > 
+> > Just asking questions to explore the option space so as not to settle
+> > on an API too soon. Given that, as said, we cannot remove it later.
+> 
+> I agree, but I believe we are converging? Also taking into account Joe's 
+> earlier response, given that the suspend mechanism dovetails so nicely 
+> with gro_flush_timeout and napi_defer_hard_irqs, it just seems natural 
+> to put irq_suspend_timeout at the same level and I haven't seen any 
+> strong reason to put it elsewhere.
+
+Yes, this sounds good.
+ 
+> >>> Also, the value is likely dependent more on the expected duration
+> >>> of userspace processing? If so, it would be the same for all
+> >>> devices, so does a per-netdev value make sense?
+> >>
+> >> It is per-netdev in the current proposal to be at the same granularity
+> >> as gro_flush_timeout and napi_defer_hard_irqs, because irq suspension
+> >> operates at the same level/granularity. This allows for more control
+> >> than a global setting and it can be migrated to per-napi settings along
+> >> with gro_flush_timeout and napi_defer_hard_irqs when the time comes.
+> > 
+> > Ack, makes sense. Many of these design choices and their rationale are
+> > good to explicitly capture in the commit message.
+> 
+> Agreed.
+> 
+> Thanks,
+> Martin
+
 
 
