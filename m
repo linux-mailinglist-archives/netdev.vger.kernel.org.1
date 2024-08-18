@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-119481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA02955D4B
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 17:45:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1D43955D4C
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 17:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C762281A45
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 15:45:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210111C20892
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 15:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE952148856;
-	Sun, 18 Aug 2024 15:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECD112B93;
+	Sun, 18 Aug 2024 15:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4wftUawp"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZWftPdMA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D342814883B;
-	Sun, 18 Aug 2024 15:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78562B674;
+	Sun, 18 Aug 2024 15:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723995894; cv=none; b=fYNAgBIu2+Ud6R29sXxFT+QeLuIbuPeTGLZwWWE6jVM6etPF/H7fEssvIniKRvWbkhZM/b8IWOgUHmiESpWuj8w6ltvA+50SsG+0nvvJ4jA420B6H+hgagqDQCiRQUQZwOryh+NjLagKSN/Uw0IR3UwAnvN+ALHRUOKRsbw1C3w=
+	t=1723995954; cv=none; b=cm4XfB3lfqU9stMLo3LlzCh3dWaIyS4skDSTgkqrSriPC5avAigzjFozvVaxNy6NGZCyWCL1uQsjLlSEruwa2U5d1jjf3G7hkmQxfiOEzA/bmfzHRJgcWp7gv6sZDz+3zoCZxRzYCQ1uqsmcHJmoqHf+V0+Pe2g1YR+le+Xi/xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723995894; c=relaxed/simple;
-	bh=PUyinxWjfUOPfACNm8w50oXOklVs0JiUI3Vo342p/bw=;
+	s=arc-20240116; t=1723995954; c=relaxed/simple;
+	bh=z9xApdF1WMxrW6YLFwWjHhD1OkHoOIrmh6OlJtErj90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KW8MGnUGXLe8K4eXyCTbyeWRIf5sjhsZY7AmxVXwrRPm3E7vKZViIvTbrz8zaw+nM9d09Ivrd/7Xqf8KtDzQy5d/62eO4LqYVGvHtAj0hG4o1E1R56pTZp3ODOTcuYWI0dbjkwnjt5/86WgMAZMDRGG82zo7HKRfnx4m0OAr19Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4wftUawp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SJVFrrWXKpqcQrELUI3D7UkflbTJVVx/NWFl5FdHBSw=; b=4wftUawpOmMjcqPOt4VN+C01zi
-	JxcX4uke/jBwPzgamL5JXHN4Pg7+j8pF6plL+dV/YBH79xTlNWA5SyQBC0VeNvr9+wtbicDnE5mjN
-	UYFK47o/S1FfyWVFDHTkuFeRlTYKIm3vN6+qltP4iS3FJbWgoHVLdSBGRo92AAhbowtI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sfi5E-0052b6-NG; Sun, 18 Aug 2024 17:44:44 +0200
-Date: Sun, 18 Aug 2024 17:44:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=AgrLbJWCGHYE/08rtomYifNGv/Lfq/7sKLubqz4mniS/mbTUrTTGDYGzX3QMTpJTlWkB4zZTLwFdpfqJF1QYavlKW0SZoV6u58XRZeYfvHHMfBeVR51NEI50usYDwxd10tBPOXtHZRsh0b7jdcU4ZB33DcMm4vjrzDMTYX8ktck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZWftPdMA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD23C32786;
+	Sun, 18 Aug 2024 15:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723995954;
+	bh=z9xApdF1WMxrW6YLFwWjHhD1OkHoOIrmh6OlJtErj90=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZWftPdMA5pK5X9LZNPBRSp2LTEMk/cIWoXcpnNp1IN2HYIVXW9bKARsQJsGA9r2gJ
+	 wdwkedUc/sXZuovMfk2EOUVuALqKR7aCEee/awF67LRqIVl5fXrWna56qIgwzRv4CM
+	 CWv/706cZl9qb/PGq6EGnyXRlADg+tEa9/cN+bP8=
+Date: Sun, 18 Aug 2024 17:45:51 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Benno Lossin <benno.lossin@proton.me>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
 	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
 	miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
-Subject: Re: [PATCH net-next v4 6/6] net: phy: add Applied Micro QT2025 PHY
- driver
-Message-ID: <1a717f2d-8512-47bd-a5b3-c5ceb9b44f03@lunn.ch>
-References: <20240817051939.77735-1-fujita.tomonori@gmail.com>
- <20240817051939.77735-7-fujita.tomonori@gmail.com>
- <9a7c687a-29a9-4a1a-ad69-39ce7edad371@lunn.ch>
- <7f835fe8-e641-4b84-a080-13f4841fb64a@proton.me>
+Subject: Re: [PATCH net-next v4 3/6] rust: net::phy implement
+ AsRef<kernel::device::Device> trait
+Message-ID: <2024081809-scoff-uncross-5061@gregkh>
+References: <a8284afb-d01f-47c7-835f-49097708a53e@proton.me>
+ <20240818.021341.1481957326827323675.fujita.tomonori@gmail.com>
+ <9127c46d-688c-41ea-8f6c-2ca6bdcdd2cd@proton.me>
+ <20240818.073603.398833722324231598.fujita.tomonori@gmail.com>
+ <f480eb03-78f5-497e-a71d-57ba4f596153@proton.me>
+ <1afb6d69-f850-455f-97e2-361d490a2637@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,46 +62,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7f835fe8-e641-4b84-a080-13f4841fb64a@proton.me>
+In-Reply-To: <1afb6d69-f850-455f-97e2-361d490a2637@lunn.ch>
 
-On Sat, Aug 17, 2024 at 09:34:13PM +0000, Benno Lossin wrote:
-> On 17.08.24 20:51, Andrew Lunn wrote:
-> >> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-> >> +        dev.genphy_read_status::<C45>()
-> >> +    }
-> > 
-> > Probably a dumb Rust question. Shouldn't this have a ? at the end? It
-> > can return a negative error code.
+On Sun, Aug 18, 2024 at 05:38:01PM +0200, Andrew Lunn wrote:
+> > Just to be sure: the `phydev.mdio.dev` struct is refcounted and
+> > incrementing the refcount is fine, right?
 > 
-> `read_status` returns a `Result<u16>` and `Device::genphy_read_status`
-> also returns a `Result<u16>`. In the function body we just delegate to
-> the latter, so no `?` is needed. We just return the entire result.
+> There is nothing special here. PHY devices are just normal Linux
+> devices. The device core is responsible for calling .probe() and
+> .remove() on a device, and these should be the first and last
+> operation on a device. The device core provides refcounting of the
+> struct device, so it should always be valid.
 > 
-> Here is the equivalent pseudo-C code:
-> 
->     int genphy_read_status(struct phy_device *dev);
->     
->     int read_status(struct phy_device *dev)
->     {
->         return genphy_read_status(dev);
->     }
-> 
-> There you also don't need an if for the negative error code, since it's
-> just propagated.
+> So i have to wounder if you are solving this at the correct
+> level. This should be generic to any device, so the Rust concept of a
+> device should be stating these guarantees, not each specific type of
+> device.
 
-O.K, it seems to work. But one of the things we try to think about in
-the kernel is avoiding future bugs. Say sometime in the future i
-extend it:
+It should, why isn't it using the rust binding to Device that we already
+have:
+	https://rust.docs.kernel.org/kernel/device/struct.Device.html
+or is it?  I'm confused now...
 
-    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-        dev.genphy_read_status::<C45>()
+thanks,
 
-        dev.genphy_read_foo()
-    }
-
-By forgetting to add the ? to dev.genphy_read_status, have i just
-introduced a bug? Could i have avoided that by always having the ?
-even when it is not needed?
-
-	Andrew
+greg k-h
 
