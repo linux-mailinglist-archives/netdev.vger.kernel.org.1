@@ -1,101 +1,89 @@
-Return-Path: <netdev+bounces-119486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEB5955D60
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 18:07:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 810A8955D62
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 18:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 903811F21064
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 16:07:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 170791F211A4
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 16:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C1A146000;
-	Sun, 18 Aug 2024 16:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839AB145335;
+	Sun, 18 Aug 2024 16:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pSV+rd4m"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="nSVNlwXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DD38F6E;
-	Sun, 18 Aug 2024 16:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9844433D5
+	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 16:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723997271; cv=none; b=dJ0YNkNIPsJ+kCyUHnHQYdZdk+m9cKLEraSFSgctg8whKJ2aEsOTZz6R1cuX533Kj1eq4XBStEP+lfT256QaQYCdVxxePIL7CnjM01pbw1suHUjGElOl97rglQ2gMJ5TONwQpBoCcafA9I25d5QJsBj4Z/Q1qLJ3U4SJEg+dhzo=
+	t=1723997437; cv=none; b=CA7y9hzIS9BY9K8RAy8QpwL7PtI0IyJBkTXgReJS4sRSjJpq2Y+vAJdDP8876W4/ZXgq8/tXqFWVYcUeZNRbKPOfszjnTDwb6o3eQLNTGPD7DXDnX6AprRX8RHTwL6Kejj8YuvV9il5IktcdMBtVKOaRuri+6GuRu11xLfY+DTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723997271; c=relaxed/simple;
-	bh=mcs4PVQSjRuRWq45Plieqdxgjn6imGdr088Dfey7QR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUxPX6KDShSS1j0oBqUVrUKMyPRRBBi8YmY5ZkytfK0i95VMj9Fa0NJhQdlE3j0RTCUIlMM7d5/9UIXbpuYRteKZgVdOAICWG2jUvD7mwch7XVFZ8A4IocnG+53hTy9r97otrNwpKSKnasfVk9J70KVxzoTcuIk6OQlsBvnwUGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pSV+rd4m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9A1DC32786;
-	Sun, 18 Aug 2024 16:07:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723997270;
-	bh=mcs4PVQSjRuRWq45Plieqdxgjn6imGdr088Dfey7QR8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pSV+rd4mhhLch4Hb2wQ/JD7sosK/sfdaeXSa0O7La/4tfRgdqYyY+XSSEg4O+vKY0
-	 GtGq3vXiQu61TkU+4hT+vclqgy48LdRM4U9YKuVrryfZAtczV/S4W5h6U9Nbm17u6V
-	 B3JKz+domndIxoO571OL+TUKLSap1B50WTenCj9sjudZsbcpeBUGoF956ZfTXZlADG
-	 zW5zjnF1rFRcdRfQWSl5khQInDDmPMlbqaR8TVI9pGoHIcorjsDBXGhfZcj799laPB
-	 07r/F+fyPfDjiMxXNnmS5dbOSPxW3q8x/8M+tmRUKvK+cWCrGwjlG1MfuKEJxg1ghh
-	 FhOgTPiJA63cA==
-Date: Sun, 18 Aug 2024 10:07:48 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Brian Norris <briannorris@chromium.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	imx@lists.linux.dev, Kalle Valo <kvalo@kernel.org>
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: wireless: convert
- marvel-8xxx.txt to yaml format
-Message-ID: <172399726749.169283.2858503269781464007.robh@kernel.org>
-References: <20240816171203.143486-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1723997437; c=relaxed/simple;
+	bh=F8OnVIia3qGwuM7GLBvb8U84chTOk/L+mpjyC30Yg90=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gkI8QaqV5QnaSorZ3imcKHyhLk/DE7VmTemOSCmDljkt9Zvtfu7XHHtToeTAI05ebi3qLOKAiyQrwHbMN4zmUNRT0JqtD0wZtTMUTv4hFaOkxuRNluOWwCXtFqSITl5K79kyQhsQrK6N2a/FW/aSeV9TAI5jwLokO4Vb48OdSjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=nSVNlwXs; arc=none smtp.client-ip=185.70.40.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1723997427; x=1724256627;
+	bh=bER8IFLJzVlzBiL6tP7y8HbB8JeD2NkMDdJZPLvqVX8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=nSVNlwXsh0GXcns+QEVVmi/OHNlmQpRHDCQvMJ/mEg7b7B0HpW/apc9RT7LFRdvXt
+	 60N2UNS9GHQQjmVqWFChTc9p8HEVipFQk5XBUl/uaRwBcq5LLQlSawk+8AqvN0BHkn
+	 WU7Dsn9jKvoaM3kIFJI9JuLP9dqii1rrzHildxq6qfhZGqBNUMZ/u/+8enesXxU7cM
+	 seWLL6OHRYBjGFxjN0P6mWEayjAKlUAFrofn5Jip3qvTUOJFG8wHjoj8mfUVI9XEcq
+	 8ksd2OZXjsPSlHbd5IFPvhsf2Oc6N/yK9nYzqscVTfVL1K9cVpYxEyFWgWkLxYu5Ir
+	 FFFd14Sk9LZpQ==
+Date: Sun, 18 Aug 2024 16:10:25 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v4 6/6] net: phy: add Applied Micro QT2025 PHY driver
+Message-ID: <aa02b004-7281-45d0-87b1-668545bb3493@proton.me>
+In-Reply-To: <20240817051939.77735-7-fujita.tomonori@gmail.com>
+References: <20240817051939.77735-1-fujita.tomonori@gmail.com> <20240817051939.77735-7-fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 90a370bf6dfee4705e7645cb5c57873e3fda941d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240816171203.143486-1-Frank.Li@nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 17.08.24 07:19, FUJITA Tomonori wrote:
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 7fddc8306d82..e0ff386d90cd 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -109,6 +109,12 @@ config ADIN1100_PHY
+>  =09  Currently supports the:
+>  =09  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
+>=20
+> +config AMCC_QT2025_PHY
+> +=09tristate "AMCC QT2025 PHY"
+> +=09depends on RUST_PHYLIB_ABSTRACTIONS
 
-On Fri, 16 Aug 2024 13:12:01 -0400, Frank Li wrote:
-> Convert binding doc marvel-8xxx.txt to yaml format.
-> Additional change:
-> - Remove marvell,caldata_00_txpwrlimit_2g_cfg_set in example.
-> - Remove mmc related property in example.
-> - Add wakeup-source property.
-> - Remove vmmc-supply and mmc-pwrseq.
-> 
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/imx8mp-beacon-kit.dtb: /soc@0/bus@30800000/mmc@30b40000/wifi@1:
-> failed to match any schema with compatible: ['marvell,sd8997']
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
-> Change from v1 to v2
-> - Add Brian Norris <briannorris@chromium.org as maintainer
-> - Remove vmmc-supply and mmc-pwrseq
-> - Add wakeup-source
-> - rename to marvell,sd8787.yaml by using one compatible string, suggestted
-> by conor dooley at other binding doc convert review
-> ---
->  .../bindings/net/wireless/marvell,sd8787.yaml | 93 +++++++++++++++++++
->  .../bindings/net/wireless/marvell-8xxx.txt    | 70 --------------
->  2 files changed, 93 insertions(+), 70 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
-> 
+This is missing a depends on RUST_FW_LOADER_ABSTRACTIONS.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+Cheers,
+Benno
+
+> +=09help
+> +=09  Adds support for the Applied Micro Circuits Corporation QT2025 PHY.
+> +
+>  source "drivers/net/phy/aquantia/Kconfig"
 
 
