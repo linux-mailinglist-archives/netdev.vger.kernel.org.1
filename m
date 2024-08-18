@@ -1,157 +1,129 @@
-Return-Path: <netdev+bounces-119460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56085955C09
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 11:15:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A026A955C19
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 12:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B30A2B213AB
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 09:15:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A33D91C20890
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 10:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1496117BA3;
-	Sun, 18 Aug 2024 09:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B8517BA2;
+	Sun, 18 Aug 2024 10:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmSm27VU"
+	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="0fl6nMZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.135])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948EE38C;
-	Sun, 18 Aug 2024 09:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21F9946C
+	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 10:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723972550; cv=none; b=k0mVo+O5sNJrfEaPce+8lEMWaj9v2DwkK0kEDaD3ad+HlkfKPMu9iVygcEH8HcRxsEr4CQF09RV3Jkfqao8+oq23RN6g9ZlPJUGqto8JK2onPLS8IUPwjkJWV787dIpt5oCr+JEgdCOhJnsESVylI5NFld14GpIZY0tkjLAbfVs=
+	t=1723976534; cv=none; b=J1cSBcMcMwl/E+ux3J8Z5plvmYKJ1nkvuvrsngmVfIbAz1I1cu8A6NPHTZwfSBtvwNvSHv5IBYmg8toDVZdx8/GwGIgSqnZsTqvlc9MZW77iTe7SzjEW7skSW+HD5266BCZQ3Bfh1/v/IjVHG1c7RRuh31wVHgv4Dy3gZ4aK9HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723972550; c=relaxed/simple;
-	bh=angU1JtYDNr07kSSnp/cyiZ/J7Osvm6y+lJ/V9O/HZs=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=aAY7TETE3D2sgUF5J8EPv9xutg0X/B5d8eMXl+74skIfQoO5n6sTRFuGNNjRclwPYmfOAOj5uvxixiRPHNHa1EIFQchRLGb3tjDNONPQHeCeM/xDe2D4x65LQClc2S0jmjZOjbe9brR13CDPf9i2QNiXW8Nb2ku0H3wPF4fXsUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmSm27VU; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2d3cc6170eeso590795a91.1;
-        Sun, 18 Aug 2024 02:15:48 -0700 (PDT)
+	s=arc-20240116; t=1723976534; c=relaxed/simple;
+	bh=OXw2dzcv9Jab2HPmt7MuahPac7G8KJx92L1+coByzBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V7fsT0ZeCGQwuAk5ipZnZeSjGccWwQ11yxzHyWrVhxEfhIDRST4weSLWyRmW+D3akC1t8Ov8bjiHs2+vNI0wlQv8UxRpwku+7YRbbiqGYelpdt0ZObu82ClXVYUxR+viQf4n2aplGepb4TDLo6HOg967zL0/RutIbBft8DOFhGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=0fl6nMZQ; arc=none smtp.client-ip=212.227.126.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723972548; x=1724577348; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QwX/d1L29zJUnAd7oNsQReRoZyznn9Hz89bALYLjHnQ=;
-        b=PmSm27VU0xJ4iRS3Dby1U8qOrshV5FuI/p82/IhsdEkZG2KEHPpejOv+1k06FyBP6O
-         A1YMQZtZufpTkjJ+kw2d5o5qJ/kZthbFmueH/uUXr3n/POHL4IPv1xlp+80pJ84OPpXF
-         f0HfSer2eK31ZdiuCUZkocvKhWg3stbMdkrAK9sKCAbcwFc5VrkJgz02QmeTqrUb8Q1d
-         d6/6qn4bclAs8Ds8uKrjw4ES6pisZxube/ISGI45A0bw7j10/4nBKf6droC2xlox0Q1H
-         uEud1Ae96J64ucNs3XtuHcju0SST6R5525ljzvgG+ujnZzQAsN8Dna960lwaNGyumGx5
-         C1/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723972548; x=1724577348;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QwX/d1L29zJUnAd7oNsQReRoZyznn9Hz89bALYLjHnQ=;
-        b=uttiOt/ak3xAlIr4dNDzYF9fpC43eLYr/kswVAagI1vytyc+2RTrhXUp65nInRCWPR
-         xdrqwjutGt3vXXpczveYNI/Q0TKqSLyhSBKMnVp41ly+cXtZM5btYV5Q+FEmSzRvTwnN
-         mP4vz/YP5+lz5kGF308ToSnfGwcA6pg4Ne8/V+5nD7hklzrm+ZcW5POZQ7qN5qRmcRkm
-         rYx1YOpyMN7oBlSrH4n2xaeGxxGmFiTko58TJgdhexRFbvPEMfiNqNpr56JALXhJ/VUR
-         Rqp8Zp7noJ3egfcZj+UDX8EIOQNICSRrP2wUUgBs0y9PpOLG/+Iaw9MFVDyQeKapwfR4
-         lp/w==
-X-Forwarded-Encrypted: i=1; AJvYcCU68uejImHGZSxrd2Gni2iEi1cqDoQhGgRWiTfTyb2AOLkyF032GD0pBbWNA7FGheOqhaS3egg=@vger.kernel.org, AJvYcCVy/rXInm1aJTZRThTc0zg6O1lUccogCGdLuf6R1DMAeWFKnXTI4Va67rypAhUlLOHVSOd7wotaeBn5ITANzmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzckuPCRR/DT5aaDEgRzhn84y1UgiKUSb5jLgL8tj0dDJyT1OQ
-	Ave1n6wcfYnVVvhGUsH33ctRh0X8yT19s6brJiMErPSwrglrhiZR5FK9QaXs
-X-Google-Smtp-Source: AGHT+IGTXJyZtpnri8sf+9MP5ipFUtJRRGyV5NGyYI4W57wgvGTvM8ewCFHnvJLb+8taUjyA9AG38w==
-X-Received: by 2002:a17:90a:fd01:b0:2d3:da94:171 with SMTP id 98e67ed59e1d1-2d3e05610a9mr4955995a91.5.1723972547529;
-        Sun, 18 Aug 2024 02:15:47 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e3d958cdsm5109931a91.49.2024.08.18.02.15.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Aug 2024 02:15:47 -0700 (PDT)
-Date: Sun, 18 Aug 2024 09:15:33 +0000 (UTC)
-Message-Id: <20240818.091533.348920797210419357.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, aliceryhl@google.com
-Subject: Re: [PATCH net-next v4 3/6] rust: net::phy implement
- AsRef<kernel::device::Device> trait
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <f480eb03-78f5-497e-a71d-57ba4f596153@proton.me>
-References: <9127c46d-688c-41ea-8f6c-2ca6bdcdd2cd@proton.me>
-	<20240818.073603.398833722324231598.fujita.tomonori@gmail.com>
-	<f480eb03-78f5-497e-a71d-57ba4f596153@proton.me>
+	d=martin-whitaker.me.uk; s=s1-ionos; t=1723976515; x=1724581315;
+	i=foss@martin-whitaker.me.uk;
+	bh=OXw2dzcv9Jab2HPmt7MuahPac7G8KJx92L1+coByzBc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=0fl6nMZQ/TYxLs0xqG6A1jLDM0SCrIqEFHXANqNPI60HUNDaL2pl8XbXajAJr9pg
+	 iaT638ZBAo4Yt9c3FQDe8S3HYDTmQNjJces53ObrKhcnIVnWZZQMJG0pmUK95c5Vy
+	 G5oudhpo+h0TQDEWAPx4ICyJ/s5wvAWpDb7ehebMMRuZLnRiDhHEIn+Oxtt3JZQjY
+	 VgK4CtDOP9vfC2gzGFj3ISRKvZZzCke3NeguualET3fSg5F8Ru78osjJA+miMBDGS
+	 l9CggwdXkD0U45rm6wsGTFa/a+tL1Y1U9jKbYXeaKiTNw99SiDRMo8+83vA40BaCr
+	 7PehqAdFSkG+JFN4ow==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from [192.168.1.16] ([194.120.133.17]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.163]) with ESMTPSA (Nemesis) id
+ 1Mzhzd-1rslcY1Hlp-010dV2; Sun, 18 Aug 2024 12:21:55 +0200
+Message-ID: <45a00063-b3a4-470a-bfd3-d14bdec6a48f@martin-whitaker.me.uk>
+Date: Sun, 18 Aug 2024 11:21:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: dsa: microchip: fix PTP config failure when
+ using multiple ports
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+ Woojung.Huh@microchip.com, ceggers@arri.de, arun.ramadoss@microchip.com
+References: <20240817094141.3332-1-foss@martin-whitaker.me.uk>
+ <ab474f83-aaba-4fe9-b6b7-17be2b075391@lunn.ch>
+From: Martin Whitaker <foss@martin-whitaker.me.uk>
+Content-Language: en-GB
+In-Reply-To: <ab474f83-aaba-4fe9-b6b7-17be2b075391@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/jlcJcrRGMnONI5ocqYBjDmzr6l5tlswxdBx+/bQh8DEiPNtuPW
+ vIRcqlOojCTtUA8bdpTxstYu7QxQXdv+krq1I/gsdMA61CDeMq4NxV6v25m3wm0nOTYEnHk
+ P6uBUm1zweAYpwjs1E1Qlj9Mv+vGZ+hBWlQLYtixYkba5+Dyde+Y0q8lTyA7dvnRrHJ7yde
+ xaoFmqTjcF6cEnL1ht1ew==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:KRM16u0cktA=;G7/LqygvZYE/VIr/7Y1ZyNGK8Cs
+ TUQrBM/NTJwyo5ra5Q/CiUMyIY0AXWV73P6PJLZ5FLbZBhEEspFe07P1v9gFPO1jNTl51q8GF
+ cLdL3BMvtQ449m+VQbjP3SyUpgSl4+xcGmRrpZPxukqRXfHRfCAxhf0dVBtLnK+FOcOp3qbbh
+ OCzoz9dxbGbQl4KYFJRNBM417+sDXySzpb6tH7035LAAoyGTSTa8kN4eg2h5yHabibjVxGDVv
+ SM4avlfzxBzNBQwCpBgqVQIpMSbrnOAgq/XeoK1zHjbcL7v2CeDAlGEzxvDp68SfokbViTSQx
+ raFLCUmOpDQgNPHH4/jtq1NQC6cxd+eWIO+gdvkqNhiPkniZ7KZylk/pUTW/kFvJOs/+ESuII
+ JciuaMSxpckrha2f/btiAQ7y7CvD7yPlE4joZ+5jZorqfVqGdMtsDROIJldmimSt/RQT5empF
+ 17INJ3x41C3oeNHd8DmYbP2xgKh3/SLSuC88zShZyPjQfJmvefRlFM0Je7+SXj6awQBMCcgw8
+ x1UTcl91sboCKZ+6vp9e74qgUAp7g/WvA2O3TV8p0J4IvGGcUfhI0PtB20rkMj0tAK98TFycH
+ pRdwDm0t52eDYDRUkGH20Vh2/9kg61GFG8SPn2LP+nHDi/3bKqdB9inuHDiJQfU4IqIUQjz7/
+ U5dELj0qC6DLfi+kkLPIoWiFDvaCDo4Eb68k4QcG3lTWebKDoSTBxG2zJWEFwu4EQ124ioxZc
+ Qz/iPbeswdbSumekTQ+FYzS0MA8ZZ5C4w==
 
-On Sun, 18 Aug 2024 09:03:01 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+On 17/08/2024 19:57, Andrew Lunn wrote:
+> On Sat, Aug 17, 2024 at 10:41:41AM +0100, Martin Whitaker wrote:
+>> When performing the port_hwtstamp_set operation, ptp_schedule_worker()
+>> will be called if hardware timestamoing is enabled on any of the ports.
+>> When using multiple ports for PTP, port_hwtstamp_set is executed for
+>> each port. When called for the first time ptp_schedule_worker() returns
+>> 0. On subsequent calls it returns 1, indicating the worker is already
+>> scheduled. Currently the ksz driver treats 1 as an error and fails to
+>> complete the port_hwtstamp_set operation, thus leaving the timestamping
+>> configuration for those ports unchanged.
+>>
+>> This patch fixes this by ignoring the ptp_schedule_worker() return
+>> value.
+>>
+>> Link: https://lore.kernel.org/netdev/7aae307a-35ca-4209-a850-7b2749d40f=
+90@martin-whitaker.me.uk/
+>> Fixes: bb01ad30570b0 ("net: dsa: microchip: ptp: manipulating absolute =
+time using ptp hw clock")
+>> Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk>
+>> Cc: stable@stable@vger.kernel.org
+>
+> One stable@ is sufficient. Did i mess that up when i asked you to add
+> it?
 
->>  /// PHY state machine states.
->>  ///
->> @@ -60,6 +59,7 @@ pub enum DuplexMode {
->>  ///
->>  /// Referencing a `phy_device` using this struct asserts that you are in
->>  /// a context where all methods defined on this struct are safe to call.
->> +/// This struct always has a valid `mdio.dev`.
-> 
-> Please turn this into a bullet point list.
+Yes. Annoyingly I noticed it when I first read your reply, but forgot
+when I later copy/pasted it into the commit message.
 
-/// - Referencing a `phy_device` using this struct asserts that you are in
-///   a context where all methods defined on this struct are safe to call.
-/// - This struct always has a valid `mdio.dev`.
+> Apart from that:
+>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>
+> It is better to put your Signed-off-by last, because each Maintainer
+> handling the patch appends there own. So it keeps them together. But
+> there is no need to repost.
 
-Looks fine?
-
->>  ///
->>  /// [`struct phy_device`]: srctree/include/linux/phy.h
->>  // During the calls to most functions in [`Driver`], the C side (`PHYLIB`) holds a lock that is
->> @@ -76,9 +76,9 @@ impl Device {
->>      ///
->>      /// # Safety
->>      ///
->> -    /// For the duration of 'a, the pointer must point at a valid `phy_device`,
->> -    /// and the caller must be in a context where all methods defined on this struct
->> -    /// are safe to call.
->> +    /// For the duration of 'a, the pointer must point at a valid `phy_device` with
->> +    /// a valid `mdio.dev`, and the caller must be in a context where all methods
->> +    /// defined on this struct are safe to call.
-> 
-> Also here.
-
-/// # Safety
-///
-/// For the duration of 'a,
-/// - the pointer must point at a valid `phy_device`, and the caller
-///   must be in a context where all methods defined on this struct
-///   are safe to call.
-/// - 'mdio.dev' must be a valid.
-
-Better?
-
->> +impl AsRef<kernel::device::Device> for Device {
->> +    fn as_ref(&self) -> &kernel::device::Device {
->> +        let phydev = self.0.get();
->> +        // SAFETY: The struct invariant ensures that `mdio.dev` is valid.
->> +        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phydev).mdio.dev)) }
->> +    }
-> 
-> Just to be sure: the `phydev.mdio.dev` struct is refcounted and
-> incrementing the refcount is fine, right?
-
-phydev.mdio.dev is valid after phydev is initialized.
-
-struct phy_device {
-	struct mdio_device mdio;
-	...
-
-struct mdio_device {
-	struct device dev;
-	...
+Thanks.
 
 
