@@ -1,227 +1,175 @@
-Return-Path: <netdev+bounces-119453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0540D955B12
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 08:06:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBE11955B5F
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 08:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F3A21C20E74
-	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 06:06:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54F4BB2113C
+	for <lists+netdev@lfdr.de>; Sun, 18 Aug 2024 06:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EACD512;
-	Sun, 18 Aug 2024 06:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1402D268;
+	Sun, 18 Aug 2024 06:37:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out28-124.mail.aliyun.com (out28-124.mail.aliyun.com [115.124.28.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38AEC8FF
-	for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 06:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B654EFC0A;
+	Sun, 18 Aug 2024 06:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723961186; cv=none; b=UTEO39IqsjL/6pksE0mHjehjKnlD8X02qw44Bes0reTHIXj6g86fdefteV/E4GeDQn8y8RBOxoUU0u1yitw991vNUf5Ls0OiRQ8lKDZrst/QTr7qpGmf1MkrGOfyLmx3XUBtnSN1IJZ3LzUG3Fe8xKC3ulNP/JW05xImIZeSIh8=
+	t=1723963051; cv=none; b=gsqwhJJ7bQi77Y9Fzb/QZIKtPuHIKOsRL5mLQPC8735gv7ggntgjXQ+/5AgRbCOxLEFx+EPK03/AYKS3Bo1XwT5piUY76tvJWBIrmGXUVxiOTSPRTIDYEczFUR7sLY7mZ1uBO9WrtwgCE6zNHU+RtJOvFoJuOFpKThU5kZT1c/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723961186; c=relaxed/simple;
-	bh=jz7twpM+7+6ff0ALSulET3mW0nfeOe/+biy+TCNXhCE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=b1ECFp5IIQJpvHJJpTFRLYfby+b34bK0Sk7eyQG37MKhqYGtsukNZw3NS5aGYACu9mUskRd11/NZGD+cAEMe533zLsK2M3rS2mjX3GEi/MWyqn2wGv3iK2/ZS15fJzau9xDM7ulOCeC7t3T5xCWg3UTlQ7xMxNzTjENX1ZPo2w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-81f81da0972so350672939f.1
-        for <netdev@vger.kernel.org>; Sat, 17 Aug 2024 23:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723961184; x=1724565984;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zLeaX4ZYCJfD/qs4gb+GcXtjCSYeyQ791Oq5hIK8L+0=;
-        b=EPIQnCI6biG4LPDa4L4s3PkruPKTj1aM+/Y3RYVqhEP6Dn3jpp0QT/1ruqJHcz1MrI
-         nM4BZfOQvm+wzEpoklWGqDBTIDKcCCDyOSrFNikMt36O10RtoWR01R1eXn/lLxvWSaOX
-         3DG0aZCpTKEvZ2u8rZpoFYjAGcaWCH8DMugpQjqAalX121GaU48Yk12Xygpvu7gRCCY3
-         E+KxnSFO1vytUfFFsxmjYNOX3mdXUacvFYGBWt6TY5pS8/MuMxGJ1G3qNuas3MbdQrDF
-         3dG+TppyXtH2RLaz58sxvNsVaJcuLpzlcXiFIFyrrTAPhKG5XeguljUfs6/KPxmuZDuI
-         uY+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVkKB9sL/jQ0iEOysk2+qH1hGaCShHMshVhoHcXBm5IzulP5e8Vdyispgp66kRY1cboC4ivM/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSu+WYFHEG4ZRxwCcTRvX7BJ/moPw1DAZnc5C0D1HBHGGttTXV
-	LjAKZ3Od2WFTNyMGj8YQOSLNTXFNPwjUI7wzrSc8DvKiIK4uir7842zuErXDorZ97cMlWTBqTc0
-	oG/rmEeCLVBW7saCYzkZiAif1f7vI8bUVOnUbovek1CDeCeBDH0MMONg=
-X-Google-Smtp-Source: AGHT+IEJCxuzGlogMXXEg0BKd1mVFe9tR628QCFxjm2ZeAqwHWmde9T2H0ftSQH48Qf95vFDQzngikaGTvkQFhSvC0+uiv2WRMGG
+	s=arc-20240116; t=1723963051; c=relaxed/simple;
+	bh=1FLRfl8oDMdmwSZEuccVBa3OVneT0Ya49b2lwc5PqdE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C5pp8E2HmF9SIYqStXCxsjsl1tpuuIYRcBnjUGvj2/rkIOHM43FpMMoW9QS6KD++NmjHdwB9bIMB6VcWZ6UD8OleeA6u7IFfhplt98nqJ96Ei91+2Ec0O2BQfJV9AVt/U//AisuUqXw4MK2uRP7vj32jicXKtjfA6EOX/NP+7lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from 192.168.208.130(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.YvIfKL8_1723962999)
+          by smtp.aliyun-inc.com;
+          Sun, 18 Aug 2024 14:37:13 +0800
+Message-ID: <0d4d3507-f095-47c6-866f-1e850cf7f3d8@motor-comm.com>
+Date: Sat, 17 Aug 2024 23:36:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:9807:b0:4c0:a90d:4a78 with SMTP id
- 8926c6da1cb9f-4cce173107cmr474656173.6.1723961183755; Sat, 17 Aug 2024
- 23:06:23 -0700 (PDT)
-Date: Sat, 17 Aug 2024 23:06:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f6f09e061feefd16@google.com>
-Subject: [syzbot] [btrfs?] general protection fault in __alloc_workqueue
-From: syzbot <syzbot+9fd43bb1ae7b5d9240c3@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, clm@fb.com, davem@davemloft.net, dsterba@suse.com, 
-	edumazet@google.com, josef@toxicpanda.com, kuba@kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    367b5c3d53e5 Add linux-next specific files for 20240816
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D12aa95f5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D61ba6f3b22ee546=
-7
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D9fd43bb1ae7b5d924=
-0c3
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debia=
-n) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15b868dd98000=
-0
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0b1b4e3cad3c/disk-=
-367b5c3d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5bb090f7813c/vmlinux-=
-367b5c3d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6674cb0709b1/bzI=
-mage-367b5c3d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+9fd43bb1ae7b5d9240c3@syzkaller.appspotmail.com
-
-workqueue: Failed to create a rescuer kthread for wq "wg-crypt-=18": -EINTR
-Oops: general protection fault, probably for non-canonical address 0xdffffc=
-0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 UID: 0 PID: 5585 Comm: syz-executor Not tainted 6.11.0-rc3-next-2024=
-0816-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 08/06/2024
-RIP: 0010:__lock_acquire+0x69/0x2040 kernel/locking/lockdep.c:5010
-Code: b6 04 30 84 c0 0f 85 87 16 00 00 45 31 f6 83 3d b8 08 a9 0e 00 0f 84 =
-ac 13 00 00 89 54 24 54 89 5c 24 68 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 1=
-2 4c 89 ff e8 49 5c 8c 00 48 be 00 00 00 00 00 fc
-RSP: 0018:ffffc9000306ec30 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff20318b6 R12: ffff88802c88bc00
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000555563814500(0000) GS:ffff8880b9000000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6ead045000 CR3: 0000000061be2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5762
- touch_wq_lockdep_map kernel/workqueue.c:3876 [inline]
- __flush_workqueue+0x1e3/0x1770 kernel/workqueue.c:3918
- drain_workqueue+0xc9/0x3a0 kernel/workqueue.c:4082
- destroy_workqueue+0xba/0xc40 kernel/workqueue.c:5830
- __alloc_workqueue+0x1c30/0x1fb0 kernel/workqueue.c:5745
- alloc_workqueue+0xd6/0x210 kernel/workqueue.c:5758
- wg_newlink+0x260/0x640 drivers/net/wireguard/device.c:343
- rtnl_newlink_create net/core/rtnetlink.c:3510 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
- rtnl_newlink+0x1591/0x20a0 net/core/rtnetlink.c:3743
- rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6647
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- __sys_sendto+0x3a8/0x500 net/socket.c:2204
- __do_sys_sendto net/socket.c:2216 [inline]
- __se_sys_sendto net/socket.c:2212 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2212
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f943557bd0c
-Code: 2a 5a 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b =
-54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff f=
-f 77 34 89 ef 48 89 44 24 08 e8 70 5a 02 00 48 8b
-RSP: 002b:00007ffd6d464f30 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f9436244620 RCX: 00007f943557bd0c
-RDX: 000000000000003c RSI: 00007f9436244670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffd6d464f84 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f9436244670 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__lock_acquire+0x69/0x2040 kernel/locking/lockdep.c:5010
-Code: b6 04 30 84 c0 0f 85 87 16 00 00 45 31 f6 83 3d b8 08 a9 0e 00 0f 84 =
-ac 13 00 00 89 54 24 54 89 5c 24 68 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 1=
-2 4c 89 ff e8 49 5c 8c 00 48 be 00 00 00 00 00 fc
-RSP: 0018:ffffc9000306ec30 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff20318b6 R12: ffff88802c88bc00
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000555563814500(0000) GS:ffff8880b9000000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6ead045000 CR3: 0000000061be2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	b6 04                	mov    $0x4,%dh
-   2:	30 84 c0 0f 85 87 16 	xor    %al,0x1687850f(%rax,%rax,8)
-   9:	00 00                	add    %al,(%rax)
-   b:	45 31 f6             	xor    %r14d,%r14d
-   e:	83 3d b8 08 a9 0e 00 	cmpl   $0x0,0xea908b8(%rip)        # 0xea908cd
-  15:	0f 84 ac 13 00 00    	je     0x13c7
-  1b:	89 54 24 54          	mov    %edx,0x54(%rsp)
-  1f:	89 5c 24 68          	mov    %ebx,0x68(%rsp)
-  23:	4c 89 f8             	mov    %r15,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 30 00          	cmpb   $0x0,(%rax,%rsi,1) <-- trapping instruct=
-ion
-  2e:	74 12                	je     0x42
-  30:	4c 89 ff             	mov    %r15,%rdi
-  33:	e8 49 5c 8c 00       	call   0x8c5c81
-  38:	48                   	rex.W
-  39:	be 00 00 00 00       	mov    $0x0,%esi
-  3e:	00 fc                	add    %bh,%ah
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add driver for Motorcomm yt8821
+ 2.5G ethernet phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+ xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com, jie.han@motor-comm.com
+References: <20240816060955.47076-1-Frank.Sae@motor-comm.com>
+ <20240816060955.47076-3-Frank.Sae@motor-comm.com>
+ <ZsCLMQWoZcVV+7xR@shell.armlinux.org.uk>
+Content-Language: en-US
+From: "Frank.Sae" <Frank.Sae@motor-comm.com>
+In-Reply-To: <ZsCLMQWoZcVV+7xR@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On 8/17/24 04:36, Russell King (Oracle) wrote:
+> On Thu, Aug 15, 2024 at 11:09:55PM -0700, Frank Sae wrote:
+>> +static int yt8821_get_rate_matching(struct phy_device *phydev,
+>> +				    phy_interface_t iface)
+>> +{
+>> +	int val;
+>> +
+>> +	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
+>> +	if (val < 0)
+>> +		return val;
+>> +
+>> +	if (FIELD_GET(YT8521_CCR_MODE_SEL_MASK, val) ==
+>> +	    YT8821_CHIP_MODE_FORCE_BX2500)
+>> +		return RATE_MATCH_PAUSE;
+> Does this device do rate matching for _any_ interface mode if it has
+> this bit set - because that's what you're saying here by not testing
+> "iface". From what I understand from your previous posting which
+> included a DT update, this only applies when 2500base-X is being
+> used as the interface mode.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Here not check parameter iface, it is not to say that iface has no relation
+with rate matching. when interface is configed with phy-mode property in
+DT, modify YT8521_CHIP_CONFIG_REG register bit2:0 dependent on
+phydev->interface in yt8821_config_init(), if phy-mode = "sgmii", bit2:0
+will be set 3'b000, if phy-mode = "2500base-x", bit2:0 will be set 3'b001.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+so that YT8521_CHIP_CONFIG_REG register bit2:0 may decide enable or disable
+rate matching feature in yt8821_get_rate_matching() and do not care input
+parameter iface here.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+>> +static int yt8821_aneg_done(struct phy_device *phydev)
+>> +{
+>> +	int link;
+>> +
+>> +	link = yt8521_aneg_done_paged(phydev, YT8521_RSSR_UTP_SPACE);
+>> +
+>> +	return link;
+>> +}
+> Why not just:
+>
+> 	return yt8521_aneg_done_paged(phydev, YT8521_RSSR_UTP_SPACE);
+>
+> ?
+>
+>> +/**
+>> + * yt8821_config_init() - phy initializatioin
+>> + * @phydev: a pointer to a &struct phy_device
+>> + *
+>> + * Returns: 0 or negative errno code
+>> + */
+>> +static int yt8821_config_init(struct phy_device *phydev)
+>> +{
+>> +	u8 mode = YT8821_CHIP_MODE_AUTO_BX2500_SGMII;
+>> +	int ret;
+>> +	u16 set;
+>> +
+>> +	if (phydev->interface == PHY_INTERFACE_MODE_2500BASEX)
+>> +		mode = YT8821_CHIP_MODE_FORCE_BX2500;
+> Hmm, I think this is tying us into situations we don't want. What if the
+> host supports 2500base-X and SGMII, but does not support pause (for
+> example, Marvell PP2 based hosts.) In that situation, we don't want to
+> lock-in to using pause based rate adaption, which I fear will become
+> a behaviour that would be risky to change later on.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+yt8821 is pin2pin realtek rtl8221.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+please refer to description about interface force 2500base-x and auto
+2500base-x_sgmii in datasheet.
 
-If you want to undo deduplication, reply with:
-#syz undup
+In AUTO_BX2500_SGMII mode, The internal flow control buffer is disabled in
+this mode.
+
+In FORCE_BX2500, SerDes always works as 2500BASE-X, internal flow control
+buffer will be activated if UTP doesn't work at 2.5GBASE-T.
+
+>> +
+>> +	set = FIELD_PREP(YT8521_CCR_MODE_SEL_MASK, mode);
+>> +	ret = ytphy_modify_ext_with_lock(phydev,
+>> +					 YT8521_CHIP_CONFIG_REG,
+>> +					 YT8521_CCR_MODE_SEL_MASK,
+>> +					 set);
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	if (mode == YT8821_CHIP_MODE_AUTO_BX2500_SGMII) {
+>> +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+>> +			  phydev->possible_interfaces);
+>> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+>> +			  phydev->possible_interfaces);
+>> +
+>> +		phydev->rate_matching = RATE_MATCH_NONE;
+>> +	} else if (mode == YT8821_CHIP_MODE_FORCE_BX2500) {
+> 		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> 			  phydev->possible_interfaces);
+>
+> so that phylink knows you're only going to be using a single interface
+> mode. Even better, since this is always supported, move it out of these
+> if() statements?
+
+it is ok.
+
+>
+>
+> Also, it would be nice to have phydev->supported_interfaces populated
+> (which has to be done when the PHY is probed) so that phylink knows
+> before connecting with the PHY which interface modes are supported by
+> the PHY. (Andrew - please can we make this a condition for any new PHYs
+> supported by phylib in the future?)
+
+now no supported_interfaces member in struct phy_device.
+
+> Note the point below in my signature.
+>
 
