@@ -1,145 +1,171 @@
-Return-Path: <netdev+bounces-119820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41F3957186
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:08:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B9B9570F1
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8831328344D
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:08:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB35C1C22F8F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25E91836D9;
-	Mon, 19 Aug 2024 17:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7F217AE0C;
+	Mon, 19 Aug 2024 16:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b="HjpYOp9z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xxfo23yQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o14.zoho.com (sender4-op-o14.zoho.com [136.143.188.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108AF48CFC;
-	Mon, 19 Aug 2024 17:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724087069; cv=pass; b=jMdD2yEVQYFSAraJ6gi8cbD6ZQRAe0gt3HVivDTJXcKFOOVLpS/jrEGrOkiUIcyl3Oz9pUPTd06sz7qKDf+cczQnxRGGKSFcPZUhAYVCAIRxqQrYnBdoJdIWabU4VLM0HHLr8V1Mvk8GiniK3nqLkVwdTnGK1ExTe0wm9hg3nVo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724087069; c=relaxed/simple;
-	bh=tvnBfqvPBRx+HDhCZhrrAy5UEzQvPjK5237fBaCqoVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=GKhMB9NuybmAffIq5mkxvbIi9WliIVzi7E/t3vAv47PxawCZgPBvWH+sBlvhfZuI6TgsVGXOLdTe4yZD1f09Asag7kplVnLAAtx6VjoPlG/ilWc8ife2B4AEOSVmwjCKUHKiptr/SqojptDn6v1VKSy1wng1eyy1u10q5qsdUGg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b=HjpYOp9z; arc=pass smtp.client-ip=136.143.188.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1724087022; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=n8uWCyB2elCluMJc278Nj13KMcZui0X3ZOO1H8htDvDly4zVwcZmPTja4DRogrv1m7coF5FuMzBPlaNGgdKXUaxNIyyzrgnoLZ/a9+SXkQaZKuCz8HC7se6peeXS8TAs/8rIa8IBDgNmCcoQy7jOgsg42fnD6n8zwkS8IytECDI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1724087022; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=tvnBfqvPBRx+HDhCZhrrAy5UEzQvPjK5237fBaCqoVU=; 
-	b=Sb+Ut17tdpEUH5QwvchUTtzM3nGb3h0uJ+13RWci//0gsE/6tEWxcqiCLcmF+rH42Ha5afAe+eLs9OAh+67edlTfH5cAgnJifVAr2W9MIG9f/5rIMrrsUhjouV9qdweJLt+WQuFjeiOPbRvMwqeLPFz94COYVGCyyWX3V2PpzGU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724087022;
-	s=zohomail; d=collabora.com; i=sebastian.reichel@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=tvnBfqvPBRx+HDhCZhrrAy5UEzQvPjK5237fBaCqoVU=;
-	b=HjpYOp9zsUV49NoOMAqnIKdMup1IV7jYjX9XXTerc7pA0z6dPminm2YS/59p2p89
-	Ok18E1GugjteLGxlUrNyIeNzOTpqve7f7AVNFc2m56ymMmOmgcIV3f/dGYcQu2k650J
-	+O/SfV72GdDQkC7XhnXZxMf0CU5OgKlfBkYTIsaA=
-Received: by mx.zohomail.com with SMTPS id 1724087019835273.7787678036623;
-	Mon, 19 Aug 2024 10:03:39 -0700 (PDT)
-Received: by jupiter.universe (Postfix, from userid 1000)
-	id 03A8B4800E2; Mon, 19 Aug 2024 18:42:43 +0200 (CEST)
-Date: Mon, 19 Aug 2024 18:42:43 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: jacobe.zang@wesion.com
-Cc: arend.vanspriel@broadcom.com, bhelgaas@google.com, 
-	brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev, christophe.jaillet@wanadoo.fr, 
-	conor+dt@kernel.org, davem@davemloft.net, devicetree@vger.kernel.org, 
-	duoming@zju.edu.cn, edumazet@google.com, gregkh@linuxfoundation.org, 
-	krzk+dt@kernel.org, kuba@kernel.org, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, megi@xff.cz, minipli@grsecurity.net, netdev@vger.kernel.org, 
-	pabeni@redhat.com, robh@kernel.org, saikrishnag@marvell.com, 
-	stern@rowland.harvard.edu, yajun.deng@linux.dev
-Subject: Re: [PATCH v11 0/4] Add AP6275P wireless support
-Message-ID: <uzmj5w6byisfguatjyy2ibo6zbn7w52bg2abgf7egych7usv6j@ec4xdmaofach>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9B3179206
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724086355; cv=none; b=N4CVO+0/Gev3T7PVOIG9E1ATdw7nUzBV+zUq8n7ra1XgW/uw6KcRASgrb0cEbHjSuHgHzdn6vKfisZPwWJJb9ANbzKiYBvlcCorfFVmhf+QYL12D5fSH2b3LITcV97Pz5P7Lf8WrUC+69jOjP95W8jyUtMbfJoohdpsdRWZr19c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724086355; c=relaxed/simple;
+	bh=StzfX7D+b5jZ3LVEyPb0XmRGLTAQPRkMUDb8wVYSh3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eaK/9eJ3nZNp/CcLvTM+zmB0IWg4klvyIgGg8UlCVR+ZDXU1k3dN5wmQtqOf8u/u/Vs+5yni3DverQl7jAPU/3/dVprKX+1t++KEF4jqrxjw58QMoTo5JILt1WQfrBDyZWJUCiL4KozV7k7waE8JV4lspRTo65+OO87499R/z/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xxfo23yQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724086352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oDgCmWXPsT/ByKSJo2B5hdxGUNecM9yTJg3LqwyPBvM=;
+	b=Xxfo23yQ0nYOA/N2Y8IbZpb9fgzE0BwTc3vrpbg+d/vjGa1oZJJvJGPbYjU6muPXtS1ERg
+	WY2bbIBgpTIC7Jr8bXvIcXxm7vAcqe462tYv5Jd/qawbuTZnF1+qzxw1XOKpVDLwHdY4LK
+	7PvBWaJoknlVrtsrXp1rI/r9Ry9imps=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-wZuLniyLP32bdy9kV0p_Iw-1; Mon, 19 Aug 2024 12:52:30 -0400
+X-MC-Unique: wZuLniyLP32bdy9kV0p_Iw-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-709376e8668so967460a34.2
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 09:52:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724086350; x=1724691150;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oDgCmWXPsT/ByKSJo2B5hdxGUNecM9yTJg3LqwyPBvM=;
+        b=oFxWkFgJ7uyqLL3RqsYStl2pXXVAPVEmhA5HQqTmDd4nu6eY0gpmzvLsUjunfzx0rh
+         SEkkcnrhKRlz8/1F7mVAKkpq/muE3q8FNgyVVOwQjBxzZWEPXIeBwsNghif9Zz5JdGW/
+         +rxhhYsRgr+YP++jpWZU6h4lYmmfwVpO5mXYppHBCn/fGhziJ9kLhUGMq+YnuHHpoMiT
+         qRWKWkmMqKtd0CtCQm2EFh7GB31jkPXJNxGLa0UzjJexJfBt5BHEJQnkH7zwcKowrue5
+         /DmfSC1RhYw6TVqC7ntNyYDM3DNv32/A0KP0UNVR0nKT2w5G3Z0/3ufgtNP8MSJH5uvO
+         ntRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeG16MudwBhFJ+yu8Tjg0bf28nXZm3KibhHgdEMxUBXxeSOaP5L83bI4r5gYCkAYuLSYjYiTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRGF1SR1AYsUp1cjDvm388hfUdl+Zl6RJ0pAPByCjQnhrjzzM+
+	YB0btxrx+FHyrnKp9dUBOKopvWOZ3Qvcc18cfrf7k9oyx9eAMBhiLCQcTbOFolHAyozFuQHHVf2
+	bF37YpnbEqq8LbwoTAiVtUklvuFw/G1wC5vW+Qp6t+x+/uT1SyvNAjw==
+X-Received: by 2002:a05:6359:4c87:b0:1ac:a26c:a5e8 with SMTP id e5c5f4694b2df-1b39333e0c1mr737789655d.4.1724086349987;
+        Mon, 19 Aug 2024 09:52:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEksR+Cpw2eRNuHRkEIfwdvURGCWFxAEIEKM8Aw05iYSBMnqj3x39V0KKigIE6pVo5nSVtsiQ==
+X-Received: by 2002:a05:6359:4c87:b0:1ac:a26c:a5e8 with SMTP id e5c5f4694b2df-1b39333e0c1mr737785755d.4.1724086349577;
+        Mon, 19 Aug 2024 09:52:29 -0700 (PDT)
+Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff01e293sm446579885a.26.2024.08.19.09.52.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 09:52:29 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: onathan Corbet <corbet@lwn.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH 0/9] PCI: Remove pcim_iounmap_regions()
+Date: Mon, 19 Aug 2024 18:51:40 +0200
+Message-ID: <20240819165148.58201-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="of7hfoh4fqko6jig"
-Content-Disposition: inline
-In-Reply-To: <20240816020635.1273911-1-jacobe.zang@wesion.com>
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.3.1/224.30.53
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
 
+Important things first:
+This series is based on [1] and [2] which Bjorn Helgaas has currently
+queued for v6.12 in the PCI tree.
 
---of7hfoh4fqko6jig
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series shall remove pcim_iounmap_regions() in order to make way to
+remove its brother, pcim_iomap_regions().
 
-Hi,
+@Bjorn: Feel free to squash the PCI commits.
 
-I tested this on RK3588 EVB1 and the driver is working fine. The DT
-bindings are not correct, though:
+Regards,
+P.
 
-linux/arch/arm64/boot/dts/rockchip/rk3588-evb1-v10.dtb: wifi@0,0:
-compatible: 'oneOf' conditional failed, one must be fixed:
+[1] https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
+[2] https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
 
-['pci14e4,449d', 'brcm,bcm4329-fmac'] is too long
-'pci14e4,449d' is not one of ['brcm,bcm43143-fmac', 'brcm,bcm4341b0-fmac',
-'brcm,bcm4341b4-fmac', 'brcm,bcm4341b5-fmac', 'brcm,bcm4329-fmac',
-'brcm,bcm4330-fmac', 'brcm,bcm4334-fmac', 'brcm,bcm43340-fmac',
-'brcm,bcm4335-fmac', 'brcm,bcm43362-fmac', 'brcm,bcm4339-fmac',
-'brcm,bcm43430a0-fmac', 'brcm,bcm43430a1-fmac', 'brcm,bcm43455-fmac',
-'brcm,bcm43456-fmac', 'brcm,bcm4354-fmac', 'brcm,bcm4356-fmac',
-'brcm,bcm4359-fmac', 'brcm,bcm4366-fmac', 'cypress,cyw4373-fmac',
-'cypress,cyw43012-fmac', 'infineon,cyw43439-fmac']
-=66rom schema $id: http://devicetree.org/schemas/net/wireless/brcm,bcm4329-=
-fmac.yaml#
+Philipp Stanner (9):
+  PCI: Make pcim_release_region() a public function
+  PCI: Make pcim_iounmap_region() a public function
+  fpga/dfl-pci.c: Replace deprecated PCI functions
+  block: mtip32xx: Replace deprecated PCI functions
+  gpio: Replace deprecated PCI functions
+  ethernet: cavium: Replace deprecated PCI functions
+  ethernet: stmicro: Simplify PCI devres usage
+  vdap: solidrun: Replace deprecated PCI functions
+  PCI: Remove pcim_iounmap_regions()
 
-It's easy to see the problem in the binding. It does not expect a
-fallback string after the PCI ID based compatible. Either the
-pci14e4,449d entry must be added to the first enum in the binding,
-which has the fallback compatible, or the fallback compatible
-should not be added to DTS.
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/block/mtip32xx/mtip32xx.c             | 11 +++--
+ drivers/fpga/dfl-pci.c                        |  9 ++--
+ drivers/gpio/gpio-merrifield.c                | 14 +++---
+ .../net/ethernet/cavium/common/cavium_ptp.c   | 10 ++--
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 25 +++-------
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 18 +++----
+ drivers/pci/devres.c                          | 25 ++--------
+ drivers/pci/pci.h                             |  1 -
+ drivers/vdpa/solidrun/snet_main.c             | 47 +++++++------------
+ include/linux/pci.h                           |  3 +-
+ 11 files changed, 57 insertions(+), 107 deletions(-)
 
-If the fallback compatible is missing in DTS, the compatible check in
-brcmf_of_probe() fails and the lpo clock is not requested resulting
-in the firmware startup failing. So that would require further
-driver changes.
+-- 
+2.46.0
 
-Greetings,
-
--- Sebastian
-
---of7hfoh4fqko6jig
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmbDdf4ACgkQ2O7X88g7
-+pr5KRAAjDSIh+I777ZC2eOvfPG2PAsPfp+nGcsq2aP34vzqdrUy9Q7Rd9CDPPGX
-7J5O5w7rLfSEHMRr8E6YaRtnDprVP3eLOKBriQQpfjRhcK9jv5CDjAHk7xkD80ya
-k6B1k8pWaQ/OMJwCcFpZUyFs6WJZebEieOphbGXuPc81wLt7b8K19MFVXvd5CkuQ
-dLLtdwNv0fjEw5rmGbLostKvW2b5QohkqRQDIip3VbK1mg9yKV/oqyvZtS0/YNob
-gyqdI4GTzAwqayM+M28tQuaB/oAAqDNjTRHefPmNzGfbO2Ls8/nL1s3div+ckh0z
-YEb0wKj23EjR2CslSYJWmkpG71w+sMdQ+ViPaxDCiD2r4plk7GLEQG0tpHr/Amgf
-FnpJsNRtyaxdDdOsV2GCj9Y+n8k3M8S9z7FSszCqboDvIMvDx2kcnbKPqA3aPAiM
-c5rb6iIwggiTqCxF1qBZbg7LGMZK4V19/5+Ifjg2+nKtlfepyvky9Hmka5SHp0Ep
-dHJj1sZiW4qBy3mDfiqMyLaNR/NFq5z4XrwOBmT47ThjuV/SfUsGOeF1ZHapnDOi
-gQcnZjkxafVeMvWCVTiyZBg4V38Daxp4hQJx37WyPFgWQr/1GA8gyK9bOH4bjz8R
-9IpWzOlAhFgTRCGodl1GFD298gUSPv7CzGIpIIiURZpEHbdzFP8=
-=jdlM
------END PGP SIGNATURE-----
-
---of7hfoh4fqko6jig--
 
