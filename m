@@ -1,274 +1,543 @@
-Return-Path: <netdev+bounces-119900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A00749576E2
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:53:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AC669576E5
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A31283EFB
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:53:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6CC7B22158
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E913F15C14B;
-	Mon, 19 Aug 2024 21:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6B3196C7C;
+	Mon, 19 Aug 2024 21:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RsnqoOJl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbkCTayd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6B71514EE
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724104425; cv=fail; b=YCoFgC3gwTFofsRyB+dAek4g/a1/AVWOAGmiJYT9CqLJQZJxn59BqjS81Aac6czvIkjq3vBKN3YEOKf1jnF4jB8BiDUL0P2t8czb6wKh63rcePyKekfiQEUcMP2tO0HkC3X3JDslg1yDbWZvcNCp8mSBtO3RRGKrI6qWAhqqpvE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724104425; c=relaxed/simple;
-	bh=xTNs0c2AvTPEi1UgJSPRUlKssGl7LGIzDUsi76iYB+U=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RFsYjkIjt47XgrQvUKndDVMhMcWTicSZMvrSBcsInB+nM719iuEHKXd3hK0wyBmQsEfD2JTSgCiNti5socUUxS2jYTYoZGLzmNjtj/5arqSQppJJS+JnhAu//Qfw0mtxoN8UmUzB4HLf7WOPGKIC8ro/BQ3WWIA1mEB1x7Uzvh8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RsnqoOJl; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724104424; x=1755640424;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xTNs0c2AvTPEi1UgJSPRUlKssGl7LGIzDUsi76iYB+U=;
-  b=RsnqoOJlWFrMkK1RuyPle5QIDT0a2XTIVRkt9bqcyFE/u+oGCsVwmriv
-   QIm04+rrhXQaPRCbmGh+UTCmHepfU1AvRc+i83dBSWvmn/dWq5oNY9Auw
-   xP0fiO+FIOcUUUkdSgrHaDAhguj/qXDNXx0JrOR/xWNVCjwg1FOQ67gA3
-   pQezVQYRk8QMHgxmiH8//ESsuurZ2H8D1QupO4A7PmCgZM0pa+agC7Ewb
-   tz1wzyIohsniV57SeMJtqvqt894VWhKeP0YUle2huKsumHeqDIsK5woaI
-   oR59n0ZAxFDifOE8RYRDWx6VTAB4GGm/3b+QRKoz16TV8by5LMREEq36n
-   A==;
-X-CSE-ConnectionGUID: mccKyMkXQo+zsTw3aWwpaQ==
-X-CSE-MsgGUID: WW5WGflCTrCynaXkE09VKw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="47770431"
-X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
-   d="scan'208";a="47770431"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 14:53:43 -0700
-X-CSE-ConnectionGUID: xojaOm/+QCqBa7lS5WtAng==
-X-CSE-MsgGUID: uGKnGMQ/ROSl02pSJm732Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
-   d="scan'208";a="60825746"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Aug 2024 14:53:43 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 19 Aug 2024 14:53:41 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 19 Aug 2024 14:53:41 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 19 Aug 2024 14:53:41 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 19 Aug 2024 14:53:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qIT0ti2rzY5uzGNJ26nJ5GsrvFDKVp2l5Q7yXlFxp/JChAqxoWqd0uoDYnJAepVk8RYuYWVb3bAMVC9oHSFyJ5KWMFY290SD0BxEFUcE/UxRS22iliJPAoRb20mOU3I5XwF07kMwMOoloEaFZkncTa3GriHTTzqflE6OyUepamItUlHV/64Ej7pV/kmHNS1D2w582kR3M78ahWVycgBbBhjlc7aVcCHG1VvzetA1WOVmtMsFFux/5g9ALcNlRJoc7z6eqPxPq3y149PccPbr+DleU99Ht0DOig4rn97X5jMLVB3Li40LCnIvS7kDZv117DsQIRjX8y5LTE5xXoRKng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sIuOMuw0a1eEsLxcuqL3BtgL66yZZDG0fE9fgAWDLoM=;
- b=QAPGOMiJexrVRF1Og+nCi3bUeztSj2zdHqEH9n5eVLa1PndmaiEkMVvbuzQfrz2D+pVfeG6p+dP/ZUMha4hc5ohM4Rf/TX5qCHr9D6QtA8m3Jrf4iD9vMdkQWw6LdNBygWvnLJf4UMKKd7jSRSzXBy7G8xx9CsQDYKC4zZ6kMxVMrnvAMO8yKvuB16BPRJcEsa70gP0F5+rMqLckYvhWLzxMElYNvUuFuUpXhcEwgRfFMG8UE4Saym4gYqDu7FeW9PbX06W9gFAXUZB8j7sLxE9vfV88H8E58E+hfAb239Jz3ZuEBk2hPNxrOWv7Cwa9GU42rU5LWF9l4v44aUeHWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CO1PR11MB4996.namprd11.prod.outlook.com (2603:10b6:303:90::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Mon, 19 Aug
- 2024 21:53:39 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%2]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
- 21:53:36 +0000
-Message-ID: <7d0e11a8-04c3-445b-89d3-fb347563dcd3@intel.com>
-Date: Mon, 19 Aug 2024 14:53:34 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: lib/packing.c behaving weird if buffer length is not multiple of
- 4 with QUIRK_LSW32_IS_FIRST
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <a0338310-e66c-497c-bc1f-a597e50aa3ff@intel.com>
- <0e523795-a4b2-4276-b665-969c745b20f6@intel.com>
- <20240818132910.jmsvqg363vkzbaxw@skbuf>
- <fcd9eaf4-3eb7-42e1-9b46-4c03e666db69@intel.com>
-Content-Language: en-US
-In-Reply-To: <fcd9eaf4-3eb7-42e1-9b46-4c03e666db69@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P223CA0029.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:303:80::34) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32AC1891D9
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724104431; cv=none; b=RCDqws/ALWa1v7ERvVG0kiC+MRBUy0gR4I0Ti0sVNqz1kiUWHn01SP3i2BjpQHdhEsUzfi7Hta8GulhjU/eFozNubxIS7ezS5pLmMUpw7g8pTw/szrPUyAPRqeBd5Pc/sJSUlrAaGS0G8gTilY+4QZ3uolY1OcXVeec6BdAvjls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724104431; c=relaxed/simple;
+	bh=B9CBBxmENm+hkJfUpva6l/DxI7LdYprG9Cs40gfK3hc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MqaiNkKlMciFLNOneb6+YgRmRE2SKakvmr8tQ7FbJCG2Azhz8LxJjjb44fxBfncICLAshK84FvALK0Q1cjTl7n9/Zjwz98eVOG6xP3pVo5tT7YKjoIR9P1ipfs2mejNvFS8KTvs1nH0xl+Q+646O2CcfVWYxA33vXMIzQtPttrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbkCTayd; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5bee6a8843eso1800494a12.3
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 14:53:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724104427; x=1724709227; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KmkZ4KEQdutgI8632letNnSaNiIG6gjx88DZgPNcRzA=;
+        b=IbkCTaydd3B2HHmAu44+DgOUOjIn885pyoU+vZ91Phg0/klfZycN799V2kg/JmUX30
+         O9ytL1+bAznPxIcNewi3EfFNfyGRK+5ZC244UYuL4XNrOL/tsdleSZVVi7GdwL2K40IW
+         +YLeD2M+bzxd6ZXU8OuZqShY2tcgFrdIslxccwEd/a2JAEqL3HDN1Ij+gladQgzKLkSi
+         697NNZaYcMfeGDdfjlKfI0YP3e3ZGoGK11RW9SfbLGA9/oC/DhMyHhghxAvOh8dkt2Jx
+         8wVodmiNk+isNZxRKd0+wqxLTbJklYCaQb+9JiXMOyqIgus45RRnfeuMx/mSzigwyJ1G
+         pe4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724104427; x=1724709227;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KmkZ4KEQdutgI8632letNnSaNiIG6gjx88DZgPNcRzA=;
+        b=kNj7JX2R6TpxlC3Vl2RB76RhRWcowMWrYaRzTulo2IlHaRSbqgvzAAj6sM8bdH6GJ8
+         5CYFN8mXrCA5bkgaNB2ByBu9Gl29mwbHK5Zg1NB7RpQnx0esKNNRTdD+di62aXa/+o0k
+         xtAH4N95j5X0tr3VG8ROM0w1O7nt6OAElD847UIM/tnFyx0YzFPU3GhtRlTN0hXM5rsL
+         oIehW7Zhkhnwz/rKDb9WmYjeZYP5JZlKEKkYZglvdz20bSLg4DYXDs3NvKeyJwvoij22
+         jjQjnHuuPBTPrP+XqvKumDD5tWy6ClYHD1vdzEj/ZG9hFs7jxRl6f4nPhsvs2EszIas+
+         vSbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUq5n02z3klCSEgUtgBZfel2wSIKzJYNr9ZEPCPG/zvjyxN1q8ssUB7JYrbDH7r+g8IiYpdQn4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0gScZ/v+M1kaEozGKbockxe+o51jkZ/F1FHzEQPGVzTfAhtzG
+	7n+nC0coJvr5mxK9zM9inFB73FRU6WLC8JhpPAoPIq66c/LuND8ERylYKNbTUqOnMZtvJDjBO4n
+	y3A==
+X-Google-Smtp-Source: AGHT+IGkSuSNa+k6El0+D1UJf0EsfFtxBV18YKFMRVSEC88F73OKl0z9LhFXnDvvY6eX99x6u1eE0Bd4Iqw=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:6402:3891:b0:59f:6a18:e058 with SMTP id
+ 4fb4d7f45d1cf-5beca2686e5mr13045a12.0.1724104426934; Mon, 19 Aug 2024
+ 14:53:46 -0700 (PDT)
+Date: Mon, 19 Aug 2024 23:53:44 +0200
+In-Reply-To: <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CO1PR11MB4996:EE_
-X-MS-Office365-Filtering-Correlation-Id: c45d5278-42f9-4b7a-1ee2-08dcc099606c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QjZWaVZ4M1p4V01IbmJrNWhJcmNmSmhML05iWkhrWHFDanV6cGhZZ0lZUDJJ?=
- =?utf-8?B?dmx1TldHV05obnF6QWorWlVLakVZdjB0UWlidnRHdEx0a2Y2RmRkMVdsT3Iv?=
- =?utf-8?B?SW40cWVRbTZWdnp3ZFJsWmJ1YTVnNHpzOHFhbWNpOEZxb0JDSlNkeGVzcHdC?=
- =?utf-8?B?U0N5UDN4d2NFMkF2T3k1Y2VTcnVKTktzVGJ5MjRndjBrdjRlcnl4ZnFDK2ZC?=
- =?utf-8?B?ZDE0SStzYVBLd3Z1ZFhXMDhJaGtZWXlJWHovTXVuZzY5Rm12Q01xK2pnMkVu?=
- =?utf-8?B?Tmh6c290UHFKak5kcXVKaXFqU1FCbVVuOTFEcXhvek9EVWI4RzdVSGszNjdr?=
- =?utf-8?B?QWFST2h0ZkxSNEZmRkJJWVF4Ym9IUUtZUGI1ZjFVSk4rMk1RalZJRFlTdE5h?=
- =?utf-8?B?UTlyVENoQVFnTlREMDdReHBJcC9WV1padWErc2g0L1c3Tzg0N0pIME9yZmM5?=
- =?utf-8?B?REp2a2NTQjNBL0x5Mk0yVzBPanhISjk5RnZleG5Jb0tBL2lMSWdmNnFNYkY3?=
- =?utf-8?B?eTUrbk9JVHlTalMvSnJsdXE4Q1J2YUpUbTlSbFI3WTE5MVNMKzllcHI2R0kv?=
- =?utf-8?B?VnM4UEpYS2dBZEJwV3Vma0MwOCswUTJQdzgrSG5XNmFHdHNMeldodXFna201?=
- =?utf-8?B?NjBuUzc4aXlhZmhwMnZ3b3hXUElReDViMGlQSk5hUTBGQng3eDlQS29ia1JV?=
- =?utf-8?B?cG8zUzlseVM2M1k1emlEWjFIcXNPRTZKSzRZSnA5Y3hhM096UXg0SDI1RjRD?=
- =?utf-8?B?V3JHbnlWZkhKS3Qxc3R5bi9ocFhvWmdDZElVZ0VtekZzanRlN0hsZW95Wldn?=
- =?utf-8?B?ZVBaWlNDeVRsM1E2VnJubEVSWStVdElIN3hKT2JlNHlqWk1LVnllTGdPR0M5?=
- =?utf-8?B?Vm9hNHNPL09IQmVPZFk3MFpHdStqeFVXVm5oSUlhRThndGhldkloY2pwS295?=
- =?utf-8?B?aVNha254R1d6VHlzV3IrQVh4MjFGaXgrUjZkZlJQSUdNanMvMmdTVE43SjBl?=
- =?utf-8?B?am15VmEraEZ5TXNvYmlsdEpzVG5zQkNBSW53bUFxakNsL3RwWDQwTzRkcjNw?=
- =?utf-8?B?NUk0ZTRxVzJFdzBWM3FrUGdLRG5CSDFBOFpSV0JqdDd6czJrNFR4d1l2cUxC?=
- =?utf-8?B?VkREQ0kycEN3dWtvL1h2NWtOMGZSblMyMUhaYXo2TC81eSt6M054bEs5K3o2?=
- =?utf-8?B?a2U1MEMwbFUrTUZTaURqWnNkSDhySDN5NkdUM0x0MWdDbTBDak9GVE92QWpZ?=
- =?utf-8?B?eHl5VlZreTJvakNZMlJzQlVoamtCdkFnclh5RUVJcHRWa2tQa1NPVEhJL0Mv?=
- =?utf-8?B?YUNWbFB4d3B5MkkxK2QraTd2UGszclVRdnNDcXVYd1lScmNsR0M2RFUrN0xI?=
- =?utf-8?B?eC9jaDd6ZzdienhGOExDbHd1cVh4bHphUUVYZUVVQzhjdWUxcHovUm5rOGtE?=
- =?utf-8?B?MWxyYStJaEdhVDVMcTlKU0RKSFNvbURoUSthMXd6Sng1c2pRWHhFWFgxZzdj?=
- =?utf-8?B?R0hoMTUyN1JVTS83WURIUVA4QllneUZLY29wYTZ5UElGRVpUUmh3R05XM3JT?=
- =?utf-8?B?cVVVMWtKNWNIbDNGT0s0YXpPd3E2T05JSGhSSU9UbXhkSmhMVkpVK0dmZU5S?=
- =?utf-8?B?OVpjaDl0d1lnSG1nY0l0WVhpR1lpMURLSVRDUzI5b0grUDh4YXVCYjdmeS9N?=
- =?utf-8?B?UWhqSUdaV2dwUTMzSCtxakI2UCttcGs4YUJ2V1B5U2ZzQUljQitVei9oOXJl?=
- =?utf-8?B?YVJ5SkhLcXYxUy96SkNJeUVDRnBZTG13T3NKSHBzK0ViVVNxN0ovTEtIajdC?=
- =?utf-8?B?QmsyZ2dFb3NrYzVXQ2svQT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cHpDRGJHMmk4MTQySmlpK1o1S1VlWW5TRXhIUVRnakFCcUIxUFdvZVBhRDZH?=
- =?utf-8?B?NjJKVmFIVWpXdUtJOHZGWTNDc2NVSTd5Zklxb0xnMHR2Y20vRDRFa2tZYXRs?=
- =?utf-8?B?dS9RaDRBS3dhS3I0MHBtMkFoa0hoSFA5cW9GVll5SUJuSFg3NzNhZC9nWkU5?=
- =?utf-8?B?M2l0N21KanBxNzdpKzJRVklOd2F5Zi8xTmNwYUh0aGF4d0g0RDFRcy9yVXdw?=
- =?utf-8?B?VER0dlo0R3hQSXJsWHVPdXYzQThRQ3d2U3kyV0VMN2I1dkdWVndEZnNNckkv?=
- =?utf-8?B?Z0ZSVVM1NmduMjJYbTRKNC9mZ0JwRm9XQWNPTDR2UmZiZitBTkYzV3NaVVFU?=
- =?utf-8?B?N3hHZjdXczJZQkZRU0p6dGxGcmJnOGE2T2h6Yy9hZmpKcjU1d0tjVWU4QVdS?=
- =?utf-8?B?ekptS0NFMVFmK0lSRFIrQ1dNSGNlSDdld3ZlYXFQOWZpMXRwQ24xamdKeGNN?=
- =?utf-8?B?Vldmc0ovbVNtL1lqb0JWQ205U2xsN01iZ3JQYkgvZ2paSW5zS2V0bmxuUE9G?=
- =?utf-8?B?Y0lPWEljNksrUGZaeGNReVM1VXJWcjQvdEx0a0orWEJxSFVwQ2FJYXY2T0NW?=
- =?utf-8?B?akhlcUVxbmtQWTMwaG9FQjN4NzQ4RkFnekZOM0JkbGY3dHIwUXM5UTBnSWR6?=
- =?utf-8?B?Q0ZIcVVINzdaWFZjUjNpb2JoRHRFSzFTR0txdEhHWEQ3SXBwSTZrT29SQTB1?=
- =?utf-8?B?QVZUNmF6L3dMUlhPTWh0VTJIVmIzOHZLbWJoL01NbzhHczBjV20xNmtPbVFU?=
- =?utf-8?B?UnhnTVZWRHdtNWV4bWJiTVlPcjhvWlY1cXpDc1ZVT05DQnpuMjFGY1VjZm1R?=
- =?utf-8?B?VzJnZWVjVW9iN3d6Z0xObGVaZHg1blptUGNRUTI1WkNVN1JER29jbFdURlR3?=
- =?utf-8?B?YWtsT084K0dBQUYyUjk4VGMwQWJRTnVIR0xteFpMbGhMTXJ4dzJQbnBSWlBH?=
- =?utf-8?B?a0YzS3hrWkE5TEpLL2ZpbjBHVWZ4cHBNVnV4NEZXREdYYjk2VFAxaHdoV1NY?=
- =?utf-8?B?OGtuSEMxV0Frd05ZNXpxamdkYU0zNFRoVCtOOHhqWXpXZDROZWxUNkIyaE8y?=
- =?utf-8?B?dnAzM29GQmFRUUtnYXpnWGxFeS9QV2pkUmREYmdzczFDWU95Y3VDcW1kczJQ?=
- =?utf-8?B?QlV2VVZTMEFDeEdSb0FwZHBqTEQyeFZnY2Z5YXBLR0Fic3NLUXA2T0NIa1lv?=
- =?utf-8?B?NktjSmtCcDlGZDR5UU0vbXo0cXJFR2o2a1UyU0hPZkRqbWF2UDdLWlBrMXZx?=
- =?utf-8?B?dE9OVkZwa2JvZVd2NnN2TVViTXczQTF3V21ZTm9CRlBDQkpVcUN6bEtXY2dq?=
- =?utf-8?B?S3BjZGNkck1lVUl4bE9LY0RoUE0zVzFyZ3hyZ0pycFVIeTRTbkd1Vk1qSTFZ?=
- =?utf-8?B?RHRHSWNUM2hndjZQaGM5WGZmT2huSCtOQjA3Z1l2dDMxSUcxUHo1M0M2OGhk?=
- =?utf-8?B?RzIwSFNLQXF4RGRZSkRJbU1WOVZ6YzJ3S3BvNnFYY3VzUk1jWFlzL2wrZUFM?=
- =?utf-8?B?Z05KalJxK256MlgzQWhVVXJEM2Z4SmlQYWZHK0IrazlHdi9NT1lHY2hQVUx3?=
- =?utf-8?B?VjdSVHAzbW9UWmRyZ0hickNCbDJMZVEzdUdOQkpVOW53UjQ1S1ZYTTBNNUFC?=
- =?utf-8?B?NzMrQnVVWUh2UGFzbU1tcFRramU5SS9HMGxKSDhiL0c1bDBydVFSN0JiNTJB?=
- =?utf-8?B?OFNwSXNONlY2MTFxbDZaZXlQTTM2dTRBbjJkT1NpZ3Z3RGZ4MXRoWDlXaHV5?=
- =?utf-8?B?c3Q4S2ZhZlhIYWtaU0FtRGRYOWk1ZU5CemYxMFRCR1JOanpiUDNqY3pTODls?=
- =?utf-8?B?dFkzdWZOZFBQaHMwemZSd211bHVNSWZFZ2hMZ2x5MHVSSXR2SXcrZmI1VTBo?=
- =?utf-8?B?eXF1SjNjSXI5U2FGblJhaGZWR1NHUXVPdTlpYkZyZTI1b0dGVnZvNldyTllX?=
- =?utf-8?B?eDNiT2RXWUt5dmg3Kys4ME5CZHhjNGVKZmdZNkwxMS9NS3ZEeVpleWFsMnFO?=
- =?utf-8?B?WlRXRTBDdWxlNzI5WW1kTWI2ZXRva2pyREZ2a2lPKzlwRVcydjd5MjNXM2lu?=
- =?utf-8?B?Z0pFWlREQXh5SE1pVXdXYzRkVThFWHlJYjFaV1ZUc2M1NXFQSDBya3d4bW1F?=
- =?utf-8?B?Y1IxaGJnV20vMDcvS3crNEFKVElmQWszbWs1K0FhQS9RVHNLNnh4K3hybDkw?=
- =?utf-8?B?UEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c45d5278-42f9-4b7a-1ee2-08dcc099606c
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2024 21:53:36.4399
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WtRG8pekzJkxnVHuXY2fwJuyYnQUNDw+3lyyQN5o+ZxV6ZOHANcU3fpUUGkjd6cH4w6Db4Yu8MaZaRfTwJdxP0VKb0cUVQ21FEojRr1YcZY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4996
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com> <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZsO-6EC1UYX5pHxl@google.com>
+Subject: Re: [RFC PATCH v2 3/9] selftests/landlock: Support LANDLOCK_ACCESS_NET_LISTEN_TCP
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+Some comment nits I forgot, see below.
 
+On Wed, Aug 14, 2024 at 11:01:45AM +0800, Mikhail Ivanov wrote:
+> * Add listen_variant() to simplify listen(2) return code checking.
+> * Rename test_bind_and_connect() to test_restricted_net_fixture().
+> * Extend current net rules with LANDLOCK_ACCESS_NET_LISTEN_TCP access.
+> * Rename test port_specific.bind_connect_1023 to
+>   port_specific.port_1023.
+> * Check little endian port restriction for listen in
+>   ipv4_tcp.port_endianness.
+> * Some local renames and comment changes.
+>=20
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+>  tools/testing/selftests/landlock/net_test.c | 198 +++++++++++---------
+>  1 file changed, 107 insertions(+), 91 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/=
+selftests/landlock/net_test.c
+> index f21cfbbc3638..8126f5c0160f 100644
+> --- a/tools/testing/selftests/landlock/net_test.c
+> +++ b/tools/testing/selftests/landlock/net_test.c
+> @@ -2,7 +2,7 @@
+>  /*
+>   * Landlock tests - Network
+>   *
+> - * Copyright =C2=A9 2022-2023 Huawei Tech. Co., Ltd.
+> + * Copyright =C2=A9 2022-2024 Huawei Tech. Co., Ltd.
+>   * Copyright =C2=A9 2023 Microsoft Corporation
+>   */
+> =20
+> @@ -22,6 +22,17 @@
+> =20
+>  #include "common.h"
+> =20
+> +/* clang-format off */
+> +
+> +#define ACCESS_LAST LANDLOCK_ACCESS_NET_LISTEN_TCP
+> +
+> +#define ACCESS_ALL ( \
+> +	LANDLOCK_ACCESS_NET_BIND_TCP | \
+> +	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
+> +	LANDLOCK_ACCESS_NET_LISTEN_TCP)
+> +
+> +/* clang-format on */
+> +
+>  const short sock_port_start =3D (1 << 10);
+> =20
+>  static const char loopback_ipv4[] =3D "127.0.0.1";
+> @@ -282,6 +293,16 @@ static int connect_variant(const int sock_fd,
+>  	return connect_variant_addrlen(sock_fd, srv, get_addrlen(srv, false));
+>  }
+> =20
+> +static int listen_variant(const int sock_fd, const int backlog)
+> +{
+> +	int ret;
+> +
+> +	ret =3D listen(sock_fd, backlog);
+> +	if (ret < 0)
+> +		return -errno;
+> +	return ret;
+> +}
+> +
+>  FIXTURE(protocol)
+>  {
+>  	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
+> @@ -438,9 +459,11 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_unix_=
+datagram) {
+>  	},
+>  };
+> =20
+> -static void test_bind_and_connect(struct __test_metadata *const _metadat=
+a,
+> -				  const struct service_fixture *const srv,
+> -				  const bool deny_bind, const bool deny_connect)
+> +static void test_restricted_net_fixture(struct __test_metadata *const _m=
+etadata,
+> +					const struct service_fixture *const srv,
+> +					const bool deny_bind,
+> +					const bool deny_connect,
+> +					const bool deny_listen)
+>  {
+>  	char buf =3D '\0';
+>  	int inval_fd, bind_fd, client_fd, status, ret;
+> @@ -512,8 +535,14 @@ static void test_bind_and_connect(struct __test_meta=
+data *const _metadata,
+>  		EXPECT_EQ(0, ret);
+> =20
+>  		/* Creates a listening socket. */
+> -		if (srv->protocol.type =3D=3D SOCK_STREAM)
+> -			EXPECT_EQ(0, listen(bind_fd, backlog));
+> +		if (srv->protocol.type =3D=3D SOCK_STREAM) {
+> +			ret =3D listen_variant(bind_fd, backlog);
+> +			if (deny_listen) {
+> +				EXPECT_EQ(-EACCES, ret);
+> +			} else {
+> +				EXPECT_EQ(0, ret);
+> +			}
+> +		}
+>  	}
+> =20
+>  	child =3D fork();
+> @@ -530,7 +559,7 @@ static void test_bind_and_connect(struct __test_metad=
+ata *const _metadata,
+>  		ret =3D connect_variant(connect_fd, srv);
+>  		if (deny_connect) {
+>  			EXPECT_EQ(-EACCES, ret);
+> -		} else if (deny_bind) {
+> +		} else if (deny_bind || deny_listen) {
+>  			/* No listening server. */
+>  			EXPECT_EQ(-ECONNREFUSED, ret);
+>  		} else {
+> @@ -545,7 +574,7 @@ static void test_bind_and_connect(struct __test_metad=
+ata *const _metadata,
+> =20
+>  	/* Accepts connection from the child. */
+>  	client_fd =3D bind_fd;
+> -	if (!deny_bind && !deny_connect) {
+> +	if (!deny_bind && !deny_connect && !deny_listen) {
+>  		if (srv->protocol.type =3D=3D SOCK_STREAM) {
+>  			client_fd =3D accept(bind_fd, NULL, 0);
+>  			ASSERT_LE(0, client_fd);
+> @@ -571,16 +600,15 @@ TEST_F(protocol, bind)
+>  {
+>  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
+>  		const struct landlock_ruleset_attr ruleset_attr =3D {
+> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +			.handled_access_net =3D ACCESS_ALL,
+>  		};
+> -		const struct landlock_net_port_attr tcp_bind_connect_p0 =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		const struct landlock_net_port_attr tcp_not_restricted_p0 =3D {
+> +			.allowed_access =3D ACCESS_ALL,
+>  			.port =3D self->srv0.port,
+>  		};
+> -		const struct landlock_net_port_attr tcp_connect_p1 =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		const struct landlock_net_port_attr tcp_denied_bind_p1 =3D {
+> +			.allowed_access =3D ACCESS_ALL &
+> +					  ~LANDLOCK_ACCESS_NET_BIND_TCP,
+>  			.port =3D self->srv1.port,
+>  		};
+>  		int ruleset_fd;
+> @@ -589,48 +617,47 @@ TEST_F(protocol, bind)
+>  						     sizeof(ruleset_attr), 0);
+>  		ASSERT_LE(0, ruleset_fd);
+> =20
+> -		/* Allows connect and bind for the first port.  */
+> +		/* Allows all actions for the first port. */
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_bind_connect_p0, 0));
+> +					    &tcp_not_restricted_p0, 0));
+> =20
+> -		/* Allows connect and denies bind for the second port. */
+> +		/* Allows all actions despite bind. */
 
-On 8/19/2024 11:45 AM, Jacob Keller wrote:
-> 
-> 
-> On 8/18/2024 6:29 AM, Vladimir Oltean wrote:
->> Hi Jake,
->>
->> On Fri, Aug 16, 2024 at 04:37:22PM -0700, Jacob Keller wrote:
->>> I'm honestly not sure what the right solution here is, because the way
->>> LITTLE_ENDIAN and LSW32_IS_FIRST work they effectively *require*
->>> word-aligned sizes. If we use a word-aligned size, then they both make
->>> sense, but my hardware buffer isn't word aligned. I can cheat, and just
->>> make sure I never use bits that access the invalid parts of the buffer..
->>> but that seems like the wrong solution... A larger size would break
->>> normal Big endian ordering without quirks...
->>
->> It is a use case that I would like to support. Thanks for having the
->> patience to explain the issue to me.
->>
-> 
-> Great, thank!
-> 
->>> Really, what my hardware buffer wants is to map the lowest byte of the
->>> data to the lowest byte of the buffer. This is what i would consider
->>> traditionally little endian ordering.
->>>
->>> This also happens to be is equivalent to LSW32_IS_FIRST and
->>> LITTLE_ENDIAN when sizes are multiples of 4.
->>
->> Yes, "traditionally little endian" would indeed translate into
->> QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN. Your use of the API seems
->> correct. I did need that further distinction between "little endian
->> within a group of 4 bytes" and "little endian among groups of 4 bytes"
->> because the NXP SJA1105 memory layout is weird like that, and is
->> "little endian" in one way but not in another. Anyway..
-> 
-> 
-> Yea, I figured the distinction was based on real hardware.
-> 
->>
->> I've attached 2 patches which hopefully make the API usable for your
->> driver. I've tested them locally and did not notice issues.
-> 
-> I'll check these out and get back to you!
-> 
-> Thanks,
-> Jake
-> 
+s/despite/except/ would be more conventional English, I believe.
 
-The patches work for my use-case! I also think it might be helpful to
-add some Kunit tests to cover the packing and unpacking, which I
-wouldn't mind trying to do.
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_connect_p1, 0));
+> +					    &tcp_denied_bind_p1, 0));
+> =20
+>  		enforce_ruleset(_metadata, ruleset_fd);
+>  		EXPECT_EQ(0, close(ruleset_fd));
+>  	}
+> +	bool restricted =3D is_restricted(&variant->prot, variant->sandbox);
+> =20
+>  	/* Binds a socket to the first port. */
+> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+> +				    false);
+> =20
+>  	/* Binds a socket to the second port. */
+> -	test_bind_and_connect(_metadata, &self->srv1,
+> -			      is_restricted(&variant->prot, variant->sandbox),
+> -			      false);
+> +	test_restricted_net_fixture(_metadata, &self->srv1, restricted, false,
+> +				    false);
+> =20
+>  	/* Binds a socket to the third port. */
+> -	test_bind_and_connect(_metadata, &self->srv2,
+> -			      is_restricted(&variant->prot, variant->sandbox),
+> -			      is_restricted(&variant->prot, variant->sandbox));
+> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+> +				    restricted, restricted);
+>  }
+> =20
+>  TEST_F(protocol, connect)
+>  {
+>  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
+>  		const struct landlock_ruleset_attr ruleset_attr =3D {
+> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +			.handled_access_net =3D ACCESS_ALL,
+>  		};
+> -		const struct landlock_net_port_attr tcp_bind_connect_p0 =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		const struct landlock_net_port_attr tcp_not_restricted_p0 =3D {
+> +			.allowed_access =3D ACCESS_ALL,
+>  			.port =3D self->srv0.port,
+>  		};
+> -		const struct landlock_net_port_attr tcp_bind_p1 =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP,
+> +		const struct landlock_net_port_attr tcp_denied_connect_p1 =3D {
+> +			.allowed_access =3D ACCESS_ALL &
+> +					  ~LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>  			.port =3D self->srv1.port,
+>  		};
+>  		int ruleset_fd;
+> @@ -639,28 +666,27 @@ TEST_F(protocol, connect)
+>  						     sizeof(ruleset_attr), 0);
+>  		ASSERT_LE(0, ruleset_fd);
+> =20
+> -		/* Allows connect and bind for the first port. */
+> +		/* Allows all actions for the first port. */
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_bind_connect_p0, 0));
+> +					    &tcp_not_restricted_p0, 0));
+> =20
+> -		/* Allows bind and denies connect for the second port. */
+> +		/* Allows all actions despite connect. */
 
-If/when you send the patches, feel free to add:
+Same here.
 
-Tested-by: Jacob Keller <jacob.e.keller@intel.com>
-
-Alternatively, I could send them as part of the series where I implement
-the changes to use lib/packing in the ice driver.
-
-Thanks,
-Jake
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_bind_p1, 0));
+> +					    &tcp_denied_connect_p1, 0));
+> =20
+>  		enforce_ruleset(_metadata, ruleset_fd);
+>  		EXPECT_EQ(0, close(ruleset_fd));
+>  	}
+> -
+> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+> -
+> -	test_bind_and_connect(_metadata, &self->srv1, false,
+> -			      is_restricted(&variant->prot, variant->sandbox));
+> -
+> -	test_bind_and_connect(_metadata, &self->srv2,
+> -			      is_restricted(&variant->prot, variant->sandbox),
+> -			      is_restricted(&variant->prot, variant->sandbox));
+> +	bool restricted =3D is_restricted(&variant->prot, variant->sandbox);
+> +
+> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+> +				    false);
+> +	test_restricted_net_fixture(_metadata, &self->srv1, false, restricted,
+> +				    false);
+> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+> +				    restricted, restricted);
+>  }
+> =20
+>  TEST_F(protocol, bind_unspec)
+> @@ -761,7 +787,7 @@ TEST_F(protocol, connect_unspec)
+>  	ASSERT_LE(0, bind_fd);
+>  	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+>  	if (self->srv0.protocol.type =3D=3D SOCK_STREAM)
+> -		EXPECT_EQ(0, listen(bind_fd, backlog));
+> +		EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+> =20
+>  	child =3D fork();
+>  	ASSERT_LE(0, child);
+> @@ -1127,8 +1153,8 @@ TEST_F(tcp_layers, ruleset_overlap)
+>  	 * Forbids to connect to the socket because only one ruleset layer
+>  	 * allows connect.
+>  	 */
+> -	test_bind_and_connect(_metadata, &self->srv0, false,
+> -			      variant->num_layers >=3D 2);
+> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+> +				    variant->num_layers >=3D 2, false);
+>  }
+> =20
+>  TEST_F(tcp_layers, ruleset_expand)
+> @@ -1208,11 +1234,12 @@ TEST_F(tcp_layers, ruleset_expand)
+>  		EXPECT_EQ(0, close(ruleset_fd));
+>  	}
+> =20
+> -	test_bind_and_connect(_metadata, &self->srv0, false,
+> -			      variant->num_layers >=3D 3);
+> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+> +				    variant->num_layers >=3D 3, false);
+> =20
+> -	test_bind_and_connect(_metadata, &self->srv1, variant->num_layers >=3D =
+1,
+> -			      variant->num_layers >=3D 2);
+> +	test_restricted_net_fixture(_metadata, &self->srv1,
+> +				    variant->num_layers >=3D 1,
+> +				    variant->num_layers >=3D 2, false);
+>  }
+> =20
+>  /* clang-format off */
+> @@ -1230,16 +1257,6 @@ FIXTURE_TEARDOWN(mini)
+>  {
+>  }
+> =20
+> -/* clang-format off */
+> -
+> -#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_TCP
+> -
+> -#define ACCESS_ALL ( \
+> -	LANDLOCK_ACCESS_NET_BIND_TCP | \
+> -	LANDLOCK_ACCESS_NET_CONNECT_TCP)
+> -
+> -/* clang-format on */
+> -
+>  TEST_F(mini, network_access_rights)
+>  {
+>  	const struct landlock_ruleset_attr ruleset_attr =3D {
+> @@ -1454,8 +1471,9 @@ TEST_F(mini, tcp_port_overflow)
+> =20
+>  	enforce_ruleset(_metadata, ruleset_fd);
+> =20
+> -	test_bind_and_connect(_metadata, &srv_denied, true, true);
+> -	test_bind_and_connect(_metadata, &srv_max_allowed, false, false);
+> +	test_restricted_net_fixture(_metadata, &srv_denied, true, true, false);
+> +	test_restricted_net_fixture(_metadata, &srv_max_allowed, false, false,
+> +				    false);
+>  }
+> =20
+>  FIXTURE(ipv4_tcp)
+> @@ -1485,22 +1503,21 @@ FIXTURE_TEARDOWN(ipv4_tcp)
+>  TEST_F(ipv4_tcp, port_endianness)
+>  {
+>  	const struct landlock_ruleset_attr ruleset_attr =3D {
+> -		.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		.handled_access_net =3D ACCESS_ALL,
+>  	};
+>  	const struct landlock_net_port_attr bind_host_endian_p0 =3D {
+>  		.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP,
+>  		/* Host port format. */
+>  		.port =3D self->srv0.port,
+>  	};
+> -	const struct landlock_net_port_attr connect_big_endian_p0 =3D {
+> -		.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +	const struct landlock_net_port_attr connect_listen_big_endian_p0 =3D {
+> +		.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP |
+> +				  LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>  		/* Big endian port format. */
+>  		.port =3D htons(self->srv0.port),
+>  	};
+> -	const struct landlock_net_port_attr bind_connect_host_endian_p1 =3D {
+> -		.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +	const struct landlock_net_port_attr not_restricted_host_endian_p1 =3D {
+> +		.allowed_access =3D ACCESS_ALL,
+>  		/* Host port format. */
+>  		.port =3D self->srv1.port,
+>  	};
+> @@ -1514,16 +1531,18 @@ TEST_F(ipv4_tcp, port_endianness)
+>  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>  				       &bind_host_endian_p0, 0));
+>  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -				       &connect_big_endian_p0, 0));
+> +				       &connect_listen_big_endian_p0, 0));
+>  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -				       &bind_connect_host_endian_p1, 0));
+> +				       &not_restricted_host_endian_p1, 0));
+>  	enforce_ruleset(_metadata, ruleset_fd);
+> =20
+>  	/* No restriction for big endinan CPU. */
+> -	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+> +				    little_endian, little_endian);
+> =20
+>  	/* No restriction for any CPU. */
+> -	test_bind_and_connect(_metadata, &self->srv1, false, false);
+> +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
+> +				    false);
+>  }
+> =20
+>  TEST_F(ipv4_tcp, with_fs)
+> @@ -1691,7 +1710,7 @@ TEST_F(port_specific, bind_connect_zero)
+>  	ret =3D bind_variant(bind_fd, &self->srv0);
+>  	EXPECT_EQ(0, ret);
+> =20
+> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+> =20
+>  	/* Connects on port 0. */
+>  	ret =3D connect_variant(connect_fd, &self->srv0);
+> @@ -1714,26 +1733,23 @@ TEST_F(port_specific, bind_connect_zero)
+>  	EXPECT_EQ(0, close(bind_fd));
+>  }
+> =20
+> -TEST_F(port_specific, bind_connect_1023)
+> +TEST_F(port_specific, port_1023)
+>  {
+>  	int bind_fd, connect_fd, ret;
+> =20
+> -	/* Adds a rule layer with bind and connect actions. */
+> +	/* Adds a rule layer with all actions. */
+>  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
+>  		const struct landlock_ruleset_attr ruleset_attr =3D {
+> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+> +			.handled_access_net =3D ACCESS_ALL
+>  		};
+>  		/* A rule with port value less than 1024. */
+> -		const struct landlock_net_port_attr tcp_bind_connect_low_range =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		const struct landlock_net_port_attr tcp_low_range_port =3D {
+> +			.allowed_access =3D ACCESS_ALL,
+>  			.port =3D 1023,
+>  		};
+>  		/* A rule with 1024 port. */
+> -		const struct landlock_net_port_attr tcp_bind_connect =3D {
+> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		const struct landlock_net_port_attr tcp_port_1024 =3D {
+> +			.allowed_access =3D ACCESS_ALL,
+>  			.port =3D 1024,
+>  		};
+>  		int ruleset_fd;
+> @@ -1744,10 +1760,10 @@ TEST_F(port_specific, bind_connect_1023)
+> =20
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_bind_connect_low_range, 0));
+> +					    &tcp_low_range_port, 0));
+>  		ASSERT_EQ(0,
+>  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> -					    &tcp_bind_connect, 0));
+> +					    &tcp_port_1024, 0));
+> =20
+>  		enforce_ruleset(_metadata, ruleset_fd);
+>  		EXPECT_EQ(0, close(ruleset_fd));
+> @@ -1771,7 +1787,7 @@ TEST_F(port_specific, bind_connect_1023)
+>  	ret =3D bind_variant(bind_fd, &self->srv0);
+>  	clear_cap(_metadata, CAP_NET_BIND_SERVICE);
+>  	EXPECT_EQ(0, ret);
+> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+> =20
+>  	/* Connects on the binded port 1023. */
+>  	ret =3D connect_variant(connect_fd, &self->srv0);
+> @@ -1791,7 +1807,7 @@ TEST_F(port_specific, bind_connect_1023)
+>  	/* Binds on port 1024. */
+>  	ret =3D bind_variant(bind_fd, &self->srv0);
+>  	EXPECT_EQ(0, ret);
+> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+> =20
+>  	/* Connects on the binded port 1024. */
+>  	ret =3D connect_variant(connect_fd, &self->srv0);
+> --=20
+> 2.34.1
+>=20
 
