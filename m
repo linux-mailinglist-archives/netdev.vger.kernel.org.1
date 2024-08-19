@@ -1,140 +1,167 @@
-Return-Path: <netdev+bounces-119669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA4299568AE
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:41:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 962549568C4
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6373283E82
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:41:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53EEB283166
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC51161319;
-	Mon, 19 Aug 2024 10:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A15215B138;
+	Mon, 19 Aug 2024 10:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWEIStYJ"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FEdK/rV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B23156F5F;
-	Mon, 19 Aug 2024 10:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567B4148315;
+	Mon, 19 Aug 2024 10:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724064079; cv=none; b=ADUApiwv6pqKpaRURbT6kNCFUmZRmYgrwcu+MgW5i8LDKyRnFYqj6BOSPUt7vegZtxReB39OlI4WUX9yr1AEphPGf6c+yEBuXFB+fRFsrM5os5CpDrwO7XHnIKlSJfBhLZVXeAn10T9twCojH5BVDg5KzHoNbLILbOA3JA5ijTY=
+	t=1724064710; cv=none; b=SoLQfR1wExy8EvJuq6IBfO09JbYmLZbSg+9bV9uYbKM+uETSsK06c5e9QgS4ZAfvzqpEAdF0Zs8czIJOwaM+3bqhaukU/c2T2Z4uaZzXnVjQI8EuEsRFhUQGlZjn8/SbBB5moDgHiEOV5BPP+OvfZCFGAx2cM+0FQleHx7uMujA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724064079; c=relaxed/simple;
-	bh=v5z6AULAsqrvamkmm47fcgWfrj/5hDRAYigHZr9uF3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dXzLKywZa+6SOmMTD30uurZJgbcGmX+Jb4BjgdSD+d7aYnsdF62/YF5o6WQNcNeXdjMCnerxsa3rS60TtMBf4dU0CH7WU7emmgtmjmOy7EDT6hLq+65qhSt6t88A4TEAV7ZxxG8bEcSx4b7Nk/SWZxMB3LR68laHMy0+HTFB1Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWEIStYJ; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5bec7d380caso3291996a12.3;
-        Mon, 19 Aug 2024 03:41:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724064076; x=1724668876; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SVKFniiYUmClbJ672Ev2Mb0P7iZLXweyclnrIo2HQ9U=;
-        b=YWEIStYJje1tquPl9uVngOLa1hfALYxGHi+j3iD62l8jhu+OOyOOUans6ap7+Am2Z3
-         uO1utKWXlB128GSFZ5YuXc21z7iW98Y5ZL2y/KZjyQYOevse2ZCxupgQjYlY84dx58uW
-         7zxGixxiY6zSfC2ybO3cEMcuUCjb7UxnXYQOBLwioolunEcO+qTU8tYXEQ/gayf3D5oP
-         XeIGdEOAbP6h00fa17fRrL0Vs+V/3yhEwb1paMEsIeksn6ckFEJN/x5sXUbd3kv+SnSD
-         rR4a9mft+qriT4Xb4s7/JDFk9tQKYDmuPzS7WFq89W3OyNUSe2o8pEYoIdgZniHus1/C
-         SgdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724064076; x=1724668876;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SVKFniiYUmClbJ672Ev2Mb0P7iZLXweyclnrIo2HQ9U=;
-        b=TKrGB+zbTDb3vW0WxCr0DE0sMUvc2P2MWG6z4urH6shk4K/mFGkelCAkAQpnMqYuwf
-         BOw1AU6VY6uxoGg7cKlec4bmFiwbBTf5vKJ4etOpLH8Nlof2MepZESD1D/0XMOxM8CsV
-         kf+K5EEASsaqSvPIF9oXoMcfnyLwu4fWdxkJzl6AdFOhmcjnUp9vPh0b4RD8KFtix97S
-         +ljjiW0AFhev7rezlDssIuXrux14XSxU5vM9yNTsuF9tkE5N1nH26ZM9cvc57byNXSYt
-         QSaPkkTAClx2we5uAPGOrGGDZxTkPtMsBMxjfw7L8zWwh2qQEq+U6VBZLBiKgxZnm4/c
-         KkFA==
-X-Forwarded-Encrypted: i=1; AJvYcCX0OTEe/GnLgPXlsSjzUNRT/c6g0UICw8NJ6UEekubPd62bCNKVAjKSWaZRFZLPVx6KN2Tb1gxhvM8zjt5KhguGg2U+iDdRYow2309SuweQW4Q9VwO+bu19oOjKzxBO+sT46ZEu
-X-Gm-Message-State: AOJu0YzuJAU8kwkJ/DhALwM4Bx0CWUZTUDsAK7wrH+E5fQ/ugGGiiDel
-	BJXObv/cB1WysEXANSc6aRisdBcs0V/6R86F/UblYnPOag/2R+O4
-X-Google-Smtp-Source: AGHT+IHs5GXee+OasG9e7/BpW3mRMBtLWO4BYF/yYqXrjn+ojBJZWBcii8jWJRvXvthItd2shWSoHw==
-X-Received: by 2002:a05:6402:5114:b0:5be:e1bc:2320 with SMTP id 4fb4d7f45d1cf-5bee1bc262emr4837315a12.4.1724064075382;
-        Mon, 19 Aug 2024 03:41:15 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbdffa57sm5444545a12.55.2024.08.19.03.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 03:41:14 -0700 (PDT)
-Date: Mon, 19 Aug 2024 13:41:12 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: vtpieter@gmail.com
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: add KSZ8
- change_tag_protocol support
-Message-ID: <20240819104112.gi2egnjbf3b67scu@skbuf>
-References: <20240819101238.1570176-1-vtpieter@gmail.com>
- <20240819101238.1570176-1-vtpieter@gmail.com>
- <20240819101238.1570176-2-vtpieter@gmail.com>
- <20240819101238.1570176-2-vtpieter@gmail.com>
+	s=arc-20240116; t=1724064710; c=relaxed/simple;
+	bh=Md9Uzo/jv1nZu/djVH7ZwzcrA+B55XC/J0D3CVIPd6o=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=mEGq+k9txK8MwoBa4TIqznYcLpSREz9IR5GszIbMYzOCvKCOrLEc71OWers0k+4AObx7sMX0VtXQvdpN6Zam6WYoW8iW/QFhGxzDzyZQVZdN7yFI+H6BLYCr4YEgvtvlr+ceNd1yr7D212Xg8QMavDUfKaGEcBi+5LbTAI/JS2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FEdK/rV3; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47JApTsU074689;
+	Mon, 19 Aug 2024 05:51:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1724064689;
+	bh=RXta3I2bystr0uzK6BSwjLHhBReD4UWbpFShef858x4=;
+	h=Date:Subject:From:To:CC:References:In-Reply-To;
+	b=FEdK/rV3JOxIBhayLJq6O9QxyFpjRM9mL29IdUyIGoafdEcP8+aYPA7ou3SGrn1M/
+	 Cxq/JUEcteh0bLS5jaBQ9GCfNGR5FUJCV7ZfpKHD2aR0lO3WipGqCg/hN6+UlQ1LL5
+	 pMuI6WdctF+oTK6cHHTCyd2ZCF+0Td3ry6waYhOg=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47JApTHW037964
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 19 Aug 2024 05:51:29 -0500
+Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 19
+ Aug 2024 05:51:28 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 19 Aug 2024 05:51:28 -0500
+Received: from [10.249.135.225] ([10.249.135.225])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47JApMLd127341;
+	Mon, 19 Aug 2024 05:51:23 -0500
+Message-ID: <4c8b3eec-c221-4184-a6cf-492fcb664a8a@ti.com>
+Date: Mon, 19 Aug 2024 16:21:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819101238.1570176-2-vtpieter@gmail.com>
- <20240819101238.1570176-2-vtpieter@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/7] net: ti: icssg-prueth: Add support for
+ HSR frame forward offload
+From: "Anwar, Md Danish" <a0501179@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
+CC: Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka
+	<jan.kiszka@siemens.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Javier
+ Carrasco <javier.carrasco.cruz@gmail.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-5-danishanwar@ti.com>
+ <082f81fc-c9ad-40d7-8172-440765350b48@lunn.ch>
+ <1ae38c1d-1f10-4bb9-abd7-5876f710bcb7@ti.com>
+ <5128f815-f710-4ab7-9ca9-828506054db2@lunn.ch>
+ <c1125924-bf7b-46c5-89d0-e15a330af58c@ti.com>
+Content-Language: en-US
+In-Reply-To: <c1125924-bf7b-46c5-89d0-e15a330af58c@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi Pieter,
 
-On Mon, Aug 19, 2024 at 12:12:35PM +0200, vtpieter@gmail.com wrote:
-> From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+
+On 8/14/2024 8:24 PM, Anwar, Md Danish wrote:
 > 
-> Add support for changing the KSZ8 switches tag protocol. In fact
-> these devices can only enable or disable the tail tag, so there's
-> really only three supported protocols:
-> - DSA_TAG_PROTO_KSZ8795 for KSZ87xx
-> - DSA_TAG_PROTO_KSZ9893 for KSZ88x3
-> - DSA_TAG_PROTO_NONE
 > 
-> When disabled, this can be used as a workaround for the 'Common
-> pitfalls using DSA setups' [1] to use the conduit network interface as
-> a regular one, admittedly forgoing most DSA functionality and using
-> the device as an unmanaged switch whilst allowing control
-> operations (ethtool, PHY management, WoL).
+> On 8/14/2024 7:32 PM, Andrew Lunn wrote:
+>>> Yes, the icssg_init_ and many other APIs are common for switch and hsr.
+>>> They can be renamed to indicate that as well.
+>>>
+>>> How does icssg_init_switch_or_hsr_mode() sound?
+>>
+>> I would say it is too long. And when you add the next thing, say
+>> bonding, will it become icssg_init_switch_or_hsr_or_bond_mode()?
+>>
+>> Maybe name the function after what it actually does, not why you call
+>> it.
+>>
 
-Concretely, what is it that you wish to accomplish? I see you chose to
-ignore my previous NACK due to the lack of a strong justification for
-disabling the tagging protocol.
-https://lore.kernel.org/netdev/20240801134401.h24ikzuoiakwg4i4@skbuf/
+Andrew, the functions are actually doing some configurations different
+than EMAC mode which are needed for offloading the frames for switch as
+well as HSR mode. icssg_init_emac_mode() doesn't do any configuration
+related to offloading. Perhaps naming these APIs to
+icssg_init_fw_offload_mode() will be a better fit?
 
-> Implementing the new software-defined DSA tagging protocol tag_8021q
-> [2] for these devices seems overkill for this use case at the time
-> being.
+Other Similar APIs can also be changed to use _fw_offload instead of
+_switch. How does this sound?
 
-I think there's a misunderstanding about tag_8021q. It does not disable
-the tagging protocol. But rather, it helps you implement a tagging
-protocol when the hardware does not want to cooperate. So I don't see
-how it would have helped you in your goal (whatever that is), and why
-mention it.
 
-tag_8021q exists because it is my goal for DSA_TAG_PROTO_NONE to
-eventually disappear. The trend is for drivers to be converted from
-DSA_TAG_PROTO_NONE to something else (like DSA_TAG_PROTO_VSC73XX_8021Q),
-not the other way around. It's a strong usability concern to not be able
-to ping through the port net devices.
+> Sure Andrew, I will try to come up with a proper name for these APIs.
+> 
+>>>>>  static struct icssg_firmwares icssg_switch_firmwares[] = {
+>>>>>  	{
+>>>>>  		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
+>>>>> @@ -152,6 +168,8 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
+>>>>>  
+>>>>>  	if (prueth->is_switch_mode)
+>>>>>  		firmwares = icssg_switch_firmwares;
+>>>>> +	else if (prueth->is_hsr_offload_mode)
+>>>>> +		firmwares = icssg_hsr_firmwares;
+>>>>
+>>>> Documentation/networking/netdev-features.rst
+>>>>
+>>>> * hsr-fwd-offload
+>>>>
+>>>> This should be set for devices which forward HSR (High-availability Seamless
+>>>> Redundancy) frames from one port to another in hardware.
+>>>>
+>>>> To me, this suggests if the flag is not set, you should keep in dual
+>>>> EMACS or switchdev mode and perform HSR in software.
+>>>
+>>>
+>>> Correct. This is the expected behavior. If the flag is not set we remain
+>>> in dual EMAC firmware and do HSR in software. Please see
+>>> prueth_hsr_port_link() for detail on this.
+>>
+>> O.K.
+>>
+>> 	Andrew
+> 
 
-At the very least we need consensus among the current DSA maintainers
-that accepting 'none' as an alternative tagging protocol is acceptable.
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
