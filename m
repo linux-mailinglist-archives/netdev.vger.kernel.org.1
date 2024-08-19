@@ -1,143 +1,246 @@
-Return-Path: <netdev+bounces-119727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D06956C61
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:44:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14937956C63
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56914B20DCA
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E1E91F225FB
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CB516C6A2;
-	Mon, 19 Aug 2024 13:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F3816C6AD;
+	Mon, 19 Aug 2024 13:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbXYDxNL"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DoJJlDWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F4B166F39;
-	Mon, 19 Aug 2024 13:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D4A16C448
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 13:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724075036; cv=none; b=mFgX6sbGfhrCBAkoUN54UJPMJNS4BQWJbZ9jex1dtyKZzvLaGvC7m13NjDXlPv3NdBpQLyktC4b+HT8Epw4iI8OGzRddvi76kt3ihZ3ki8ITK7bqDsQkSk4XeziKB8NKC3L3lbHAmS9XJ4wYP1nJLovNsAKpQ+s4+mIP2PT1TRI=
+	t=1724075082; cv=none; b=fHDrWuyvCJNP4MrT8HgHIjO+RNf4WiMuLgCdCotCGz/rIEB/Tb9pqdm2RB8uJLm/J3sQzo9NwWIC9LiU79wp3DNrTX/6iH1BwLMCDJw4OSjUU3qNNIlAHrfCmuYd/+2ipswH8u3ueoRIWVZ9HiMLO+XZhDl1GptmhheT3ZM7WsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724075036; c=relaxed/simple;
-	bh=lNFjR6FNCh6NEgR8GRinugqjCm1dLFqOxfHiz+SY8+0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZtHbJRWFuu0xFhi/UH0w53YboqR5ReCuzwQt5n/ykZit6Rrj4YDrqQ1tDUTUblM38wR/6BraA2aOqtnct0KlKl+T/u2gpwDRlqdmjr4Q1kusa1R9+64pS+M3uNR+Xn3sFMbg5dVFd0kbjCR5XulPl+x0vhMWj2ksGBILY/F5uZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hbXYDxNL; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5daa93677e1so1590196eaf.3;
-        Mon, 19 Aug 2024 06:43:54 -0700 (PDT)
+	s=arc-20240116; t=1724075082; c=relaxed/simple;
+	bh=E3+H36LrrYbYFOTje12tu0r/LFKn6i0tGjNHP89CbuI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XRWse6OMwLC5lgV1g+Nl+W4o83KZhQi0FHui4BwkAFL7H0/WgefTVVH3uEGDy/FHJwCUWyndeog/uwtS3CPps2kxaP/GJSDvrvNE6TW6MgDdaJtazZP+TFK6ZbporKvAfVEWpYbsvlOVwmF+d6xgL8TIyQH0gU1rgHnyhMqZhOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DoJJlDWY; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7de4364ca8so479358766b.2
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 06:44:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724075034; x=1724679834; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nDTgs4SC6fJPmkxSSLbCjmUrQ/DeEeUV3fZhZzG+MoA=;
-        b=hbXYDxNLrVc71ZU0wFv0USLa1Xk0l1W+vUtT5+7KPsPsxoMMhgoFkgs5ZWegp3M4sI
-         aKdDt+/OvLa8ulfFpx25sZ1Sjd1uelFl2/zQGbuvHWbZzw3QDqpdUSyexCKvWSdpxFcn
-         fmb+jG/t2o4t8+h51+sP7C1lstAftTN5iJ06GEjiJVVEFOU8AsPE3jPl2itscNDGDrBL
-         lrul4D7gOTSmnVjnup8oZXthM0PI6H0Mula7K/eeruTlHDqz5NaPV/1PufOQ85sGjzdj
-         9BsE6b8m2Voz4JAH+FIkqWHhADoBNB1Oaqc7sTAv/a259zuVR4a47Nida5L0lJ6XV6Zw
-         KvXQ==
+        d=cloudflare.com; s=google09082023; t=1724075078; x=1724679878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CrrxTX117vijzUvBlkMKUjEulnMWXb88Od42i1TC6PE=;
+        b=DoJJlDWYqkaplA4NHzy0ZPNZSZdvxahqNyZur8YUyGmilUIDlcWUnA3Eqj6mDIeqkO
+         0109VUGsyRh3Fj/ysuK/w3fwAKeMkBpKitf3AM6yhyeSfE9UNJuymcyR1/AQSz9vAtUp
+         ca1N0y6M/8AOSfQMFbME7579hubuWa7mk55RROLCPfdFdafLbN4+MKuFSZaZKNj1AkYp
+         Gl2w2NReWw2nD8rpWqczFLbtw8Q6OxUIazLqdqwOAH7LSJGcecq0Qq46r3scaVDmOiXa
+         pM9vAPHcB1l6+9acYAMftlIxX4QG6WdRf6b0nzQnZgBvKD1ou71E9gJed8LSbGx07yay
+         +Fhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724075034; x=1724679834;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nDTgs4SC6fJPmkxSSLbCjmUrQ/DeEeUV3fZhZzG+MoA=;
-        b=PpuewLLpQPwkJtBInKvaaMUQR7C4fMn080zfCw1hVS5ocds06TBlokuhbudyGbaeTQ
-         wB1XEYn6409/3tmPCF8fYRPkm4eGfb0qepKDndNhYVrnqQjeHbntQjawx6Rah0QIZhdt
-         RuvZy6gQ5wyVcIx860txHBhQv9As4AJMXR8uM+FGSYCDAnD1UBTEaFTgOt9RFe/lOF6n
-         VR4rzsVY2XAUc6Ed+oZ6nFSWloBemymu15MM5UnGMJVeFYpODiPghn3Z/jycL2NPkdky
-         FsuTxi+n9eAYrSJekk88pZVpf7w6LQSYXxD+xefg8ca0TuDE2+nOE19fzijTAFTCZXts
-         3IoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYQ08AfDYIq8GQWh/slq97rFgwRQrE1zrgDTHOeifzrangf94EuHJ7stM0ZrUvpdLYmUgj1vcS@vger.kernel.org, AJvYcCXjRKbJu8ThfF+tN9jCdfuQVBMQQp92dcV53mNxXDhSrs43oQ9WfclMMLT5UKZnwFGFkA5u2M3sWul3e2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiTk4TShfgm7r5eB5Lt3LqsFDoWDNU7vTLErusOWg8Eps517cl
-	FKPvNT7QL9F9E0G52hZAlFKpgATeseRKCsP3aSczXwjNlngLds5e4MAtGm6bdludBeta7tsxGvP
-	zQINRJH1egICAk7IxSCwt6zQX8Ki7ywCAeBzftg==
-X-Google-Smtp-Source: AGHT+IFtBaqUjJ1MmRN8st2zgV4pa3jigcjoZ90sQ0HydHesP322pBXlZW8Dah9TL3uSsz6uYjrnwlX0n2/j3ozLNuE=
-X-Received: by 2002:a05:6820:1acc:b0:5d5:d7fc:955c with SMTP id
- 006d021491bc7-5da9801a875mr11065976eaf.5.1724075033783; Mon, 19 Aug 2024
- 06:43:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724075078; x=1724679878;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CrrxTX117vijzUvBlkMKUjEulnMWXb88Od42i1TC6PE=;
+        b=n29+Mce5IiMV2ngmj6Q7jSmnxYCVq5tkt0THWsoeZDJkc+DFGm/dC9Qwws3fbReTcf
+         l6Fzr2uF+JosTN7ZZl2krzhm5+aSkGZhirDPnuECvw4gYVEP7MxKx2zdpV61A/PziStF
+         ZVZgJFOXoP23qQ0sdljK8P+0xc8kwfj0sfaWglXNQ6QySQ3QgAiqHz6ZYc7rLzs1nQ0H
+         pQ1O6SKTm1BZVzI5ClTcLh1fgM9Y3P7EzQPIocVe34/SBGyxatwvhYUU3MUrsbId91Mz
+         p+yMZUftj4pxBdvzcPZotOJ3Dgvka/867HIu8cOsU1vDwCRrUhxL/b5IUfxywsuG7Y45
+         GRWQ==
+X-Gm-Message-State: AOJu0YxtSn+LmLT9BgkO2zfu4CzQGa8/cSFaRCT/KfDqOclrSzvek2Vc
+	MATUd0jo/OINrLjGKd3reWlk3hHUxJzizmFdIrJFDxqYuR0LAwdfbAmhlikleWM=
+X-Google-Smtp-Source: AGHT+IGA/o7nezwkWzmkFtA4fGwF5k5K6vL2YqvtQKgE+AxSwEKaYs0dwEwCJwiCZvVhVmILhxAZxg==
+X-Received: by 2002:a17:907:d2c5:b0:a77:cdaa:889f with SMTP id a640c23a62f3a-a83928d7835mr791186666b.24.1724075078254;
+        Mon, 19 Aug 2024 06:44:38 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383935807sm635077066b.134.2024.08.19.06.44.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 06:44:37 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,  kernel-team@cloudflare.com
+Subject: Re: [PATCH RFC net-next] tcp: Allow TIME-WAIT reuse after 1
+ millisecond
+In-Reply-To: <CANn89iKB4GFd8sVzCbRttqw_96o3i2wDhX-3DraQtsceNGYwug@mail.gmail.com>
+	(Eric Dumazet's message of "Mon, 19 Aug 2024 13:59:40 +0200")
+References: <20240819-jakub-krn-909-poc-msec-tw-tstamp-v1-1-6567b5006fbe@cloudflare.com>
+	<CANn89iKB4GFd8sVzCbRttqw_96o3i2wDhX-3DraQtsceNGYwug@mail.gmail.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 19 Aug 2024 15:44:36 +0200
+Message-ID: <87ikvwr5iz.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240819101238.1570176-1-vtpieter@gmail.com> <20240819101238.1570176-2-vtpieter@gmail.com>
- <20240819104112.gi2egnjbf3b67scu@skbuf> <CAHvy4ApydUb273oJRLLyfBKTNU1YHMBp261uRXJnLO05Hd0XKQ@mail.gmail.com>
- <90009327-df9d-4ed7-ac6c-be87065421ba@lunn.ch> <CAHvy4Aq0-9+Z9oCSSb=18GHduAfciAzritGb6yhNy1xvO8gNkg@mail.gmail.com>
- <9e5cc632-3058-46b2-8920-30c521eb1bbd@lunn.ch>
-In-Reply-To: <9e5cc632-3058-46b2-8920-30c521eb1bbd@lunn.ch>
-From: Pieter <vtpieter@gmail.com>
-Date: Mon, 19 Aug 2024 15:43:42 +0200
-Message-ID: <CAHvy4Aq=as=K48NZHt3Ek8Yg_AzyFdsmTe92b8SFobzUBM9JNA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: add KSZ8
- change_tag_protocol support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>, 
-	UNGLinuxDriver@microchip.com, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, Pieter Van Trappen <pieter.van.trappen@cern.ch>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
-
-> > > > Previously I could not use DSA because of the macb driver limitation, now
-> > > > fixed (max_mtu increase, submitted here). Once I got that working, I notice
-> > > > that full DSA was not a compatible use case for my board because of
-> > > > requiring the conduit interface to behave as a regular ethernet interface.
-> > > > So it's really the unmanaged switch case, which I though I motivated well in
-> > > > the patch description here (PHY library, ethtool and switch WoL management).
-> > >
-> > > If its an unmanaged switch, you don't need DSA, or anything at all
-> > > other than MACB. Linux is just a plain host connected to a switch. It
-> > > is a little unusual that the switch is integrated into the same box,
-> > > rather than being a patch cable away, bit linux does not really see
-> > > this difference compared to any other unmanaged switch.
-> >
-> > That's true in theory but not in practice because without DSA I can't use
-> > the ksz_spi.c driver which gives me access to the full register set. I need
-> > this for the KSZ8794 I'm using to:
-> > - apply the EEE link drop erratum from ksz8795.c
-> > - active port WoL which is connected through its PME_N pin
-> > - use iproute2 for PHY and connection debugging (link up/down,
-> >   packets statistics etc.)
+On Mon, Aug 19, 2024 at 01:59 PM +02, Eric Dumazet wrote:
+> On Mon, Aug 19, 2024 at 1:31=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
+com> wrote:
+>>
+>> [This patch needs a description. Please see the RFC cover letter below.]
+>>
+>> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> ---
+>> Can we shorten the TCP connection reincarnation period?
+>>
+>> Situation
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> Currently, we can reuse a TCP 4-tuple (source IP + port, destination IP =
++ port)
+>> in the TIME-WAIT state to establish a new outgoing TCP connection after =
+a period
+>> of 1 second. This period, during which the 4-tuple remains blocked from =
+reuse,
+>> is determined by the granularity of the ts_recent_stamp / tw_ts_recent_s=
+tamp
+>> timestamp, which presently uses a 1 Hz clock (ktime_get_seconds).
+>>
+>> The TIME-WAIT block is enforced by __{inet,inet6}_check_established ->
+>> tcp_twsk_unique, where we check if the timestamp clock has ticked since =
+the last
+>> ts_recent_stamp update before allowing the 4-tuple to be reused.
+>>
+>> This mechanism, introduced in 2002 by commit b8439924316d ("Allow to bin=
+d to an
+>> already in use local port during connect") [1], protects the TCP receiver
+>> against segments from an earlier incarnation of the same connection (FIN
+>> retransmits), which could potentially corrupt the TCP stream, as describ=
+ed by
+>> RFC 7323 [2, 3].
+>>
+>> Problem
+>> =3D=3D=3D=3D=3D=3D=3D
+>>
+>> The one-second reincarnation period has not posed a problem when we had a
+>> sufficiently large pool of ephemeral ports (tens of thousands per host).
 >
-> Then it is not an unmanaged switch. You are managing it.
 >
-> > If there's another way to accomplish the above without DSA, I'd be
-> > happy to learn about it.
+> We now have network namespaces, and still ~30,000 ephemeral ports per net=
+ns :)
+
+It's just that we are short on public IPv4 addresses with certain traits
+we need to proxy on egress (like ownership, reputation, geolocation).
+Hence we had to share the addresses and divide the port space between
+hosts :-/
+
 >
-> Its go back to the beginning. Why cannot use you DSA, and use it as a
-> manage switch? None of your use-cases above are prevented by DSA.
+>> However, as we began sharing egress IPv4 addresses between hosts by part=
+itioning
+>> the available port range [4], the ephemeral port pool size has shrunk
+>> significantly=E2=80=94down to hundreds of ports per host.
+>>
+>> This reduction in port pool size has made it clear that a one-second con=
+nection
+>> reincarnation period can lead to ephemeral port exhaustion. Short-lived =
+TCP
+>> connections, such as DNS queries, can complete in milliseconds, yet the =
+TCP
+>> 4-tuple remains blocked for a period of time that is orders of magnitude=
+ longer.
+>>
+>> Solution
+>> =3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> We would like to propose to shorten the period during which the 4-tuple =
+is tied
+>> up. The intention is to enable TIME-WAIT reuse at least as quickly as it=
+ takes
+>> nowadays to perform of a short-lived TCP connection, from setup to teard=
+own.
+>>
+>> The ts_recent_stamp protection is based on the same principle as PAWS but
+>> extends it across TCP connections. As RFC 7323 outlines in Appendix B.2,=
+ point
+>> (b):
+>>
+>>     An additional mechanism could be added to the TCP, a per-host
+>>     cache of the last timestamp received from any connection.  This
+>>     value could then be used in the PAWS mechanism to reject old
+>>     duplicate segments from earlier incarnations of the connection,
+>>     if the timestamp clock can be guaranteed to have ticked at least
+>>     once since the old connection was open.  This would require that
+>>     the TIME-WAIT delay plus the RTT together must be at least one
+>>     tick of the sender's timestamp clock.  Such an extension is not
+>>     part of the proposal of this RFC.
+>
+> Note the RTT part here. I do not see this implemented in your patch.
+>
 
-Right so I'm managing it but I don't care from which port the packets
-originate, so I could disable the tagging in my case.
+Not sure I follow. I need to look into that more.
 
-My problem is that with tagging enabled, I cannot use the DSA conduit
-interface as a regular one to open sockets etc. I don't fully understand
-why I have to admit but it's documented here [1] and with wireshark I
-can see only control packets going through, the ingress data ones are
-not tagged and subsequently dropped by the switch with tagging enabled.
+My initial thinking here was that as long as TW delay (1 msec) is not
+shorter than one tick of the sender's TS clock (1 msec), then I can
+ignore the RTT and the requirement is still met.
 
-PS here are my iproute2 commands:
-ip link set lan1 up
-ip link set lan2 up
-ip link add br0 type bridge
-ip link set lan1 master br0
-ip link set lan2 master br0
-ip link set br0 up
+>>
+>> Due to that, we would want to follow the same guidelines as the for TSval
+>> timestamp clock, for which RFC 7323 recommends a frequency in the range =
+of 1 ms
+>> to 1 sec per tick [5], when reconsidering the default setting.
+>>
+>> (Note that the Linux TCP stack has recently introduced even finer granul=
+arity
+>> with microsecond TSval resolution in commit 614e8316aa4c "tcp: add suppo=
+rt for
+>> usec resolution in TCP TS values" [6] for use in private networks.)
+>>
+>> A simple implementation could be to switch from a second to a millisecon=
+d clock,
+>> as demonstrated by the following patch. However, this could also be a tu=
+nable
+>> option to allow administrators to adjust it based on their specific need=
+s and
+>> risk tolerance.
+>>
+>> A tunable also opens the door to letting users set the TIME-WAIT reuse p=
+eriod
+>> beyond the RFC 7323 recommended range at their own risk.
+>>
 
-Cheers, Pieter
+[...]
 
-[1] https://www.kernel.org/doc/html/latest/networking/dsa/dsa.html#common-pitfalls-using-dsa-setups
+>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>> index e37488d3453f..873a1cbd6d14 100644
+>> --- a/net/ipv4/tcp_input.c
+>> +++ b/net/ipv4/tcp_input.c
+>> @@ -3778,7 +3778,7 @@ static void tcp_send_challenge_ack(struct sock *sk)
+>>  static void tcp_store_ts_recent(struct tcp_sock *tp)
+>>  {
+>>         tp->rx_opt.ts_recent =3D tp->rx_opt.rcv_tsval;
+>> -       tp->rx_opt.ts_recent_stamp =3D ktime_get_seconds();
+>> +       tp->rx_opt.ts_recent_stamp =3D tcp_clock_ms();
+>
+> Please do not abuse tcp_clock_ms().
+>
+> Instead use tcp_time_stamp_ms(tp)
+>
+> Same remark for other parts of the patch, try to reuse tp->tcp_mstamp
+> if available.
+>
+> Also, (tcp_clock_ms() !=3D ts_recent_stamp) can be true even after one
+> usec has elapsed, due to rounding.
+>
+> The 'one second delay' was really: 'An average of 0.5 second delay'
+>
+> Solution : no longer use jiffies, but usec based timestamps, since we
+> already have this infrastructure in TCP stack.
+
+Thank you for feedback. Especially wrt the rounding bug - eye opening.
+
+Will rework it to move away from jiffies.
 
