@@ -1,432 +1,475 @@
-Return-Path: <netdev+bounces-119685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB3595694E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01CAB956970
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32F1283969
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:31:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1CE283951
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E1515DBB2;
-	Mon, 19 Aug 2024 11:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqnF5jHH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCC71684A7;
+	Mon, 19 Aug 2024 11:36:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC70517C7C;
-	Mon, 19 Aug 2024 11:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E660E1607A4
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724067071; cv=none; b=CqsEkVwsFJqJhSR3WF3ew0AQKBC7m7w5WncXu4M4JjOXiXu8CPc6hKlP2LFsl/v1safdO83wjzQ+cx+MBod7OzuefK30PeVPAhghCG3tR/uneuAj4AtWCdEEWMVkS3hFt5fapbEFP+MgFgOWc9Q/wTd6aWLVQb6+x8SvAnTvP9w=
+	t=1724067404; cv=none; b=CysKKMe7snsYjEF6Krs8UHK8DbxIVQNXu6N1jcTi3bVITuB82nSOCfaEbzH5DvVdQtLfxuUGRgGQAJT7f17onGZkwuqkUgyA8XWk4RGqfu+DBuVZkhkO5K88qBqW8/Eyhk9UGkVopqK9fZSWkhjiFJasbKGtrX/rsWv6Dtg8v9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724067071; c=relaxed/simple;
-	bh=pDtB7WH7jC4shgxlrBCghTofnpeeio7Z2/u0qf4ZM9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3Bd5HLu/L4z4EiWxXpecKJkjv9BhhUrYPGBjeLR4/pFtjVxo5iv8cF3azAb87203z4L6G5IsIleM1sBDvWvVlzqgWHDoLXCrYVzY5fpLJNWuOH0j4LKcLUoLGQxYD07BNFm1osr0QuHuUTkfiwcYsATbZoiB+DURcRb2PPRJII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqnF5jHH; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7aac70e30dso449795566b.1;
-        Mon, 19 Aug 2024 04:31:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724067068; x=1724671868; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ItBsaYaUYukKcs9mT8FxS4IiWnVvJXNxy3plA4auI4E=;
-        b=gqnF5jHHOwQAKgfSt62duYOAmGacpDbPb9gNAYvFtKoz4M/ZkhLAfOe7nT2yhdhKkb
-         8ucGLMG0jqiCa7rhtxV/Vm6iuJY4NUwINn2qVgRboMKczQYPWwgstiwCEI/T28SmMnoR
-         DhstR380HgDPSyoiQw1LnGWTQnxmrlIzxQSrveLvy4/Qohyz7eR4axULwm72+1C7bSx+
-         aenX3P0o04TC7bT7FWwky3t6wRgVi8M0ftvpuXjmQSShmG9eFLHY71ON4yCNSNSrH0qO
-         0oxDWh/MEvWi1ryQUrbrJyJq39R400FNlp0VnpzuKQ/uojMoM9wfMe9h0+aFua1Hc8Fi
-         L8eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724067068; x=1724671868;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ItBsaYaUYukKcs9mT8FxS4IiWnVvJXNxy3plA4auI4E=;
-        b=mChU47+8UPjMkBoNOq8qPIUNdodm2KRCKci8ttsGoSuv81rap7wQoF3lUv/6eC1hnH
-         UhwmWfqTD85LOxJkbGe6c1rEA+OxoQpRbGFgzV2UosYwxSxacHKhqeQkg1p+A/Pvd7iK
-         +X+9n0xbEyl6Qc3sBoPKFhSu51ctDKZPtO5TZkroBZa/mmTcKGbrbypatID9a43dwRBT
-         B3YHIITJsqq3/xVwe+XRu7yxzbPrymw4i+ppumGHJgsOs+bAbVIO/yIXm1JhpaiiA2Lt
-         hjApzZ8D1wstAv3Io/U3GNR/Ixe8mdEt3Zo/hRIEIoe/eMWLTsqBxSIAt77iAsfNeQYc
-         +aOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUByQupZbYPmrOOPyPyThVneyEFgq/0vovPZn6eGaYQVIhS6246jVF70uZgbhDeCuaJDBIYbwKnchPs6EY=@vger.kernel.org, AJvYcCUSws4fmKKdiqsyZqMGuBB2FuzYaL20gSPa9YMzwnm6RQLEddGI0wx86LDAc6n3cX0HHISiU7mV@vger.kernel.org
-X-Gm-Message-State: AOJu0YyL/DYpE5RgCQQ4XxmlzIUFBjjRroH4Db/fwS+aWJt2sofArezR
-	CZrbYbIeKk63f+2WjeV7iYHqk67+z/cKkwEKIiqB+2roFBX6gL3e
-X-Google-Smtp-Source: AGHT+IFw0X4PENWMjfNydLGal6c4vATRAbYzFtb8Tgkf8ezeSAUXVubLDH1teEvaB26Birvnfb9xyA==
-X-Received: by 2002:a17:907:f794:b0:a72:aeff:dfed with SMTP id a640c23a62f3a-a83929f124bmr748465066b.53.1724067067348;
-        Mon, 19 Aug 2024 04:31:07 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383934564sm619890466b.126.2024.08.19.04.31.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 04:31:06 -0700 (PDT)
-Date: Mon, 19 Aug 2024 14:31:04 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	s=arc-20240116; t=1724067404; c=relaxed/simple;
+	bh=mEOw45v1O8r9fl4DsfGxbNzIFV7bNDGCO5k3DMm3+0M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ea5ZCKQ7xhtYpfi86nwspkXvLu422POjZoXJmZnIFpZHJjQASLnrGm3bSxf2OxwJD6ZHoiC840tTET8/dV7s++c7GeZwe5cRzY0/8Y/pVaCtLCf2sq1fzUTmQ7eruORWl9MD6R3iccZfml3xvxWjUIP6zB2ghk8EUKjJSnNdC4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sg0gW-0001lO-4n; Mon, 19 Aug 2024 13:36:28 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sg0gU-001WSM-GB; Mon, 19 Aug 2024 13:36:26 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sg0gU-008h6E-1M;
+	Mon, 19 Aug 2024 13:36:26 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com
-Subject: Re: [PATCH net-next v3 3/7] net: stmmac: refactor FPE verification
- processe
-Message-ID: <20240819113104.u2v5s4tdfac2kqbj@skbuf>
-References: <cover.1724051326.git.0x1207@gmail.com>
- <c9da02a6376f1e85a11631a5ccf47dbdf24c7618.1724051326.git.0x1207@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v1 1/1] phy: dp83tg720: Add statistics support
+Date: Mon, 19 Aug 2024 13:36:25 +0200
+Message-Id: <20240819113625.2072283-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c9da02a6376f1e85a11631a5ccf47dbdf24c7618.1724051326.git.0x1207@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Interesting spelling of "process" in the title.
+Introduce statistics support for the DP83TG720 PHY driver, enabling
+detailed monitoring and reporting of link quality and packet-related
+metrics.
 
-On Mon, Aug 19, 2024 at 03:25:16PM +0800, Furong Xu wrote:
-> Drop driver defined stmmac_fpe_state, and switch to common
-> ethtool_mm_verify_status for local TX verification status.
-> 
-> Local side and remote side verification processes are completely
-> independent. There is no reason at all to keep a local state and
-> a remote state.
-> 
-> Add a spinlock to avoid races among ISR, workqueue, link update
-> and register configuration.
-> 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  20 +--
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 169 +++++++++---------
->  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   6 -
->  3 files changed, 97 insertions(+), 98 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 2c2181febb39..cb54f65753b2 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -146,14 +146,6 @@ struct stmmac_channel {
->  	u32 index;
->  };
->  
-> -/* FPE link state */
-> -enum stmmac_fpe_state {
-> -	FPE_STATE_OFF = 0,
-> -	FPE_STATE_CAPABLE = 1,
-> -	FPE_STATE_ENTERING_ON = 2,
-> -	FPE_STATE_ON = 3,
-> -};
-> -
->  /* FPE link-partner hand-shaking mPacket type */
->  enum stmmac_mpacket_type {
->  	MPACKET_VERIFY = 0,
-> @@ -166,10 +158,10 @@ enum stmmac_fpe_task_state_t {
->  };
->  
->  struct stmmac_fpe_cfg {
-> -	bool enable;				/* FPE enable */
-> -	bool hs_enable;				/* FPE handshake enable */
-> -	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
-> -	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
-> +	bool pmac_enabled;			/* see ethtool_mm_state */
-> +	bool verify_enabled;			/* see ethtool_mm_state */
-> +	u32 verify_time;			/* see ethtool_mm_state */
-> +	enum ethtool_mm_verify_status status;
->  	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
->  };
->  
-> @@ -366,6 +358,10 @@ struct stmmac_priv {
->  	struct workqueue_struct *wq;
->  	struct work_struct service_task;
->  
-> +	/* Serialize access to MAC Merge state between ethtool requests
-> +	 * and link state updates.
-> +	 */
-> +	spinlock_t mm_lock;
+To avoid double reading of certain registers, the implementation caches
+all relevant register values in a single operation. This approach
+ensures accurate and consistent data retrieval, particularly for
+registers that clear upon reading or require special handling.
 
-Given that it protects members of struct stmmac_fpe_cfg, would it make
-sense for it to be placed in that structure instead? fpe_cfg->lock.
+Some of the statistics, such as link training times, do not increment
+and therefore require special handling during the extraction process.
 
->  	struct stmmac_fpe_cfg fpe_cfg;
->  
->  	/* Workqueue for handling FPE hand-shaking */
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3072ad33b105..628354f60c54 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -969,17 +969,21 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
->  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&priv->mm_lock, flags);
->  
-> -	if (is_up && *hs_enable) {
-> +	if (!fpe_cfg->pmac_enabled)
-> +		goto __unlock_out;
-> +
-> +	if (is_up && fpe_cfg->verify_enabled)
->  		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
->  					MPACKET_VERIFY);
-> -	} else {
-> -		*lo_state = FPE_STATE_OFF;
-> -		*lp_state = FPE_STATE_OFF;
-> -	}
-> +	else
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-> +
-> +__unlock_out:
-> +	spin_unlock_irqrestore(&priv->mm_lock, flags);
->  }
->  
->  static void stmmac_mac_link_down(struct phylink_config *config,
-> @@ -3533,9 +3537,19 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
->  
->  	stmmac_set_hw_vlan_mode(priv, priv->hw);
->  
-> -	if (priv->dma_cap.fpesel)
-> +	if (priv->dma_cap.fpesel) {
->  		stmmac_fpe_start_wq(priv);
->  
-> +		/* phylink and irq are not enabled yet,
-> +		 * mm_lock is unnecessary here.
-> +		 */
-> +		stmmac_fpe_configure(priv, priv->ioaddr,
-> +				     &priv->fpe_cfg,
-> +				     priv->plat->tx_queues_to_use,
-> +				     priv->plat->rx_queues_to_use,
-> +				     false);
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/phy/dp83tg720.c | 330 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 330 insertions(+)
 
-This is probably unintended, but &priv->fpe_cfg has just been zeroed out
-earlier by __stmmac_open().
+diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+index 0ef4d7dba0656..80e72301c56c3 100644
+--- a/drivers/net/phy/dp83tg720.c
++++ b/drivers/net/phy/dp83tg720.c
+@@ -51,6 +51,20 @@
+ /* Register 0x0405: Unknown Register */
+ #define DP83TG720S_UNKNOWN_0405			0x405
+ 
++#define DP83TG720S_A2D_REG_66			0x442
++#define DP83TG720S_ESD_EVENT_COUNT_MASK		GENMASK(14, 9)
++
++#define DP83TG720S_LINK_QUAL_1			0x543
++#define DP83TG720S_LINK_TRAINING_TIME_MASK	GENMASK(7, 0)
++
++#define DP83TG720S_LINK_QUAL_2			0x544
++#define DP83TG720S_REMOTE_RECEIVER_TIME_MASK	GENMASK(15, 8)
++#define DP83TG720S_LOCAL_RECEIVER_TIME_MASK	GENMASK(7, 0)
++
++#define DP83TG720S_LINK_QUAL_3			0x547
++#define DP83TG720S_LINK_LOSS_CNT_MASK		GENMASK(15, 10)
++#define DP83TG720S_LINK_FAIL_CNT_MASK		GENMASK(9, 0)
++
+ /* Register 0x0576: TDR Master Link Down Control */
+ #define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
+ 
+@@ -60,6 +74,24 @@
+ /* In RGMII mode, Enable or disable the internal delay for TXD */
+ #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
+ 
++#define DP83TG720S_PKT_STAT_1			0x639
++#define DP83TG720S_TX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
++
++#define DP83TG720S_PKT_STAT_2			0x63A
++#define DP83TG720S_TX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
++
++#define DP83TG720S_PKT_STAT_3			0x63B
++#define DP83TG720S_TX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
++
++#define DP83TG720S_PKT_STAT_4			0x63C
++#define DP83TG720S_RX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
++
++#define DP83TG720S_PKT_STAT_5			0x63D
++#define DP83TG720S_RX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
++
++#define DP83TG720S_PKT_STAT_6			0x63E
++#define DP83TG720S_RX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
++
+ /* Register 0x083F: Unknown Register */
+ #define DP83TG720S_UNKNOWN_083F			0x83f
+ 
+@@ -69,6 +101,286 @@
+ 
+ #define DP83TG720_SQI_MAX			7
+ 
++struct dp83tg720_cache_reg {
++	u16 mmd;
++	u16 reg;
++};
++
++#define DP83TG720_FLAG_COUNTER BIT(0)
++
++struct dp83tg720_hw_stat {
++	const char *string;
++	u8 cache_index1;
++	u8 cache_index2;  /* If a statistic spans multiple registers */
++	u32 mask1;
++	u32 mask2;        /* Mask for the second register */
++	u8 shift1;
++	u8 shift2;        /* Shift for the second register */
++	u8 flags;
++};
++
++enum dp83tg720_cache_reg_idx {
++	DP83TG720_CACHE_A2D_REG_66 = 0,
++	DP83TG720_CACHE_LINK_QUAL_1,
++	DP83TG720_CACHE_LINK_QUAL_2,
++	DP83TG720_CACHE_LINK_QUAL_3,
++	DP83TG720_CACHE_PKT_STAT_1,
++	DP83TG720_CACHE_PKT_STAT_2,
++	DP83TG720_CACHE_PKT_STAT_3,
++	DP83TG720_CACHE_PKT_STAT_4,
++	DP83TG720_CACHE_PKT_STAT_5,
++	DP83TG720_CACHE_PKT_STAT_6,
++
++	DP83TG720_CACHE_EMPTY,
++};
++
++static const struct dp83tg720_cache_reg dp83tg720_cache_regs[] = {
++	[DP83TG720_CACHE_A2D_REG_66] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_A2D_REG_66,
++	},
++	[DP83TG720_CACHE_LINK_QUAL_1] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_LINK_QUAL_1,
++	},
++	[DP83TG720_CACHE_LINK_QUAL_2] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_LINK_QUAL_2,
++	},
++	[DP83TG720_CACHE_LINK_QUAL_3] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_LINK_QUAL_3,
++	},
++	[DP83TG720_CACHE_PKT_STAT_1] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_1,
++	},
++	[DP83TG720_CACHE_PKT_STAT_2] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_2,
++	},
++	[DP83TG720_CACHE_PKT_STAT_3] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_3,
++	},
++	[DP83TG720_CACHE_PKT_STAT_4] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_4,
++	},
++	[DP83TG720_CACHE_PKT_STAT_5] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_5,
++	},
++	[DP83TG720_CACHE_PKT_STAT_6] = {
++		.mmd = MDIO_MMD_VEND2,
++		.reg = DP83TG720S_PKT_STAT_6,
++	},
++};
++
++static const struct dp83tg720_hw_stat dp83tg720_hw_stats[] = {
++	{
++		.string = "esd_event_count",
++		.cache_index1 = DP83TG720_CACHE_A2D_REG_66,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_ESD_EVENT_COUNT_MASK,
++		.shift1 = 9,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "link_training_time",
++		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_1,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_LINK_TRAINING_TIME_MASK,
++	},
++	{
++		.string = "remote_receiver_time",
++		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_REMOTE_RECEIVER_TIME_MASK,
++		.shift1 = 8,
++	},
++	{
++		.string = "local_receiver_time",
++		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_LOCAL_RECEIVER_TIME_MASK,
++	},
++	{
++		.string = "link_loss_cnt",
++		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_3,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_LINK_LOSS_CNT_MASK,
++		.shift1 = 10,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "link_fail_cnt",
++		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_3,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_LINK_FAIL_CNT_MASK,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "tx_pkt_cnt",
++		.cache_index1 = DP83TG720_CACHE_PKT_STAT_1,
++		.cache_index2 = DP83TG720_CACHE_PKT_STAT_2,
++		.mask1 = DP83TG720S_TX_PKT_CNT_15_0_MASK,
++		.mask2 = DP83TG720S_TX_PKT_CNT_31_16_MASK,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "tx_err_pkt_cnt",
++		.cache_index1 = DP83TG720_CACHE_PKT_STAT_3,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_TX_ERR_PKT_CNT_MASK,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "rx_pkt_cnt",
++		.cache_index1 = DP83TG720_CACHE_PKT_STAT_4,
++		.cache_index2 = DP83TG720_CACHE_PKT_STAT_5,
++		.mask1 = DP83TG720S_RX_PKT_CNT_15_0_MASK,
++		.mask2 = DP83TG720S_RX_PKT_CNT_31_16_MASK,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++	{
++		.string = "rx_err_pkt_cnt",
++		.cache_index1 = DP83TG720_CACHE_PKT_STAT_6,
++		.cache_index2 = DP83TG720_CACHE_EMPTY,
++		.mask1 = DP83TG720S_RX_ERR_PKT_CNT_MASK,
++		.flags = DP83TG720_FLAG_COUNTER,
++	},
++};
++
++struct dp83tg720_priv {
++	u64 stats[ARRAY_SIZE(dp83tg720_hw_stats)];
++	u16 reg_cache[ARRAY_SIZE(dp83tg720_cache_regs)];
++};
++
++/**
++ * dp83tg720_cache_reg_values - Cache register values to avoid clearing counters.
++ * @phydev: Pointer to the phy_device structure.
++ *
++ * Reads and caches the values of all relevant registers.
++ *
++ * Returns: 0 on success, a negative error code on failure.
++ */
++static int dp83tg720_cache_reg_values(struct phy_device *phydev)
++{
++	struct dp83tg720_priv *priv = phydev->priv;
++	int i, ret;
++
++	for (i = 0; i < ARRAY_SIZE(dp83tg720_cache_regs); i++) {
++		const struct dp83tg720_cache_reg *cache_reg =
++			&dp83tg720_cache_regs[i];
++
++		ret = phy_read_mmd(phydev, cache_reg->mmd, cache_reg->reg);
++		if (ret < 0)
++			return ret;
++
++		priv->reg_cache[i] = (u16)ret;
++	}
++
++	return 0;
++}
++
++/**
++ * dp83tg720_extract_stat_value - Extract specific statistic value from cache.
++ * @phydev: Pointer to the phy_device structure.
++ * @i: Index of the statistic in the dp83tg720_hw_stats array.
++ *
++ * Extracts the specific statistic value from the cached register values.
++ *
++ * Returns: The extracted statistic value.
++ */
++static u64 dp83tg720_extract_stat_value(struct phy_device *phydev, int i)
++{
++	const struct dp83tg720_hw_stat *stat = &dp83tg720_hw_stats[i];
++	struct dp83tg720_priv *priv = phydev->priv;
++	u32 val1, val2 = 0;
++
++	val1 = (priv->reg_cache[stat->cache_index1] & stat->mask1);
++	val1 >>= stat->shift1;
++	if (stat->cache_index2 != DP83TG720_CACHE_EMPTY) {
++		val2 = (priv->reg_cache[stat->cache_index2] & stat->mask2);
++		val2 >>= stat->shift2;
++	}
++
++	if (stat->flags & DP83TG720_FLAG_COUNTER)
++		priv->stats[i] += val1 | (val2 << 16);
++	else
++		priv->stats[i] = val1 | (val2 << 16);
++
++	return priv->stats[i];
++}
++
++/**
++ * dp83tg720_get_sset_count - Get the number of statistics sets.
++ * @phydev: Pointer to the phy_device structure.
++ *
++ * Returns: The number of statistics sets.
++ */
++static int dp83tg720_get_sset_count(struct phy_device *phydev)
++{
++	return ARRAY_SIZE(dp83tg720_hw_stats);
++}
++
++/**
++ * dp83tg720_get_strings - Get the strings for the statistics.
++ * @phydev: Pointer to the phy_device structure.
++ * @data: Pointer to the buffer where the strings will be stored.
++ *
++ * Fills the buffer with the strings for the statistics
++ */
++static void dp83tg720_get_strings(struct phy_device *phydev, u8 *data)
++{
++	int i, j = 0;
++
++	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
++		strscpy(&data[j * ETH_GSTRING_LEN],
++			dp83tg720_hw_stats[i].string, ETH_GSTRING_LEN);
++		j++;
++	}
++}
++
++/**
++ * dp83tg720_get_stats - Get the statistics values.
++ * @phydev: Pointer to the phy_device structure.
++ * @stats: Pointer to the ethtool_stats structure.
++ * @data: Pointer to the buffer where the statistics values will be stored.
++ *
++ * Fills the buffer with the statistics values, filtering out those that are
++ * not applicable based on the PHY's operating mode (e.g., RGMII).
++ */
++static void dp83tg720_get_stats(struct phy_device *phydev,
++				struct ethtool_stats *stats, u64 *data)
++{
++	int i, j = 0;
++
++	dp83tg720_cache_reg_values(phydev);
++
++	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
++		data[j] = dp83tg720_extract_stat_value(phydev, i);
++		j++;
++	}
++}
++
++/**
++ * dp83tg720_update_stats - Update the statistics values.
++ * @phydev: Pointer to the phy_device structure.
++ *
++ * Updates the statistics values.
++ */
++static void dp83tg720_update_stats(struct phy_device *phydev)
++{
++	int i;
++
++	dp83tg720_cache_reg_values(phydev);
++
++	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++)
++		dp83tg720_extract_stat_value(phydev, i);
++}
++
+ /**
+  * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
+  * @phydev: Pointer to the phy_device structure.
+@@ -208,6 +520,7 @@ static int dp83tg720_read_status(struct phy_device *phydev)
+ 	u16 phy_sts;
+ 	int ret;
+ 
++	dp83tg720_update_stats(phydev);
+ 	phydev->pause = 0;
+ 	phydev->asym_pause = 0;
+ 
+@@ -341,12 +654,26 @@ static int dp83tg720_config_init(struct phy_device *phydev)
+ 	return genphy_c45_pma_baset1_read_master_slave(phydev);
+ }
+ 
++static int dp83tg720_probe(struct phy_device *phydev)
++{
++	struct dp83tg720_priv *priv;
++
++	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	phydev->priv = priv;
++
++	return 0;
++}
++
+ static struct phy_driver dp83tg720_driver[] = {
+ {
+ 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
+ 	.name		= "TI DP83TG720S",
+ 
+ 	.flags          = PHY_POLL_CABLE_TEST,
++	.probe		= dp83tg720_probe,
+ 	.config_aneg	= dp83tg720_config_aneg,
+ 	.read_status	= dp83tg720_read_status,
+ 	.get_features	= genphy_c45_pma_read_ext_abilities,
+@@ -355,6 +682,9 @@ static struct phy_driver dp83tg720_driver[] = {
+ 	.get_sqi_max	= dp83tg720_get_sqi_max,
+ 	.cable_test_start = dp83tg720_cable_test_start,
+ 	.cable_test_get_status = dp83tg720_cable_test_get_status,
++	.get_sset_count = dp83tg720_get_sset_count,
++	.get_strings	= dp83tg720_get_strings,
++	.get_stats	= dp83tg720_get_stats,
+ 
+ 	.suspend	= genphy_suspend,
+ 	.resume		= genphy_resume,
+-- 
+2.39.2
 
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -3978,6 +3992,12 @@ static int __stmmac_open(struct net_device *dev,
->  		}
->  	}
->  
-> +	/* phylink and irq are not enabled yet, mm_lock is unnecessary here */
-> +	priv->fpe_cfg.pmac_enabled = false;
-> +	priv->fpe_cfg.verify_time = 128; /* ethtool_mm_state.max_verify_time */
-> +	priv->fpe_cfg.verify_enabled = false;
-> +	priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-> +
-
-stmmac_set_mm() can be called before __stmmac_open(), which is entirely
-legal. You'd be overwriting the configuration made by the user in that
-case. Same is true for the snippet below from stmmac_release().
-Personally I think work items should be put on the fpe_wq only when
-netif_running() and during __stmmac_open(), but configuration changes
-should also be accepted while down. Maybe this also implies that during
-stmmac_get_mm() and stmmac_set_mm() it must temporarily use
-pm_runtime_resume_and_get() and pm_runtime_put(), and get whatever
-clocks are necessary for the registers to be accessible.
-
->  	ret = stmmac_hw_setup(dev, true);
->  	if (ret < 0) {
->  		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
-> @@ -4091,11 +4111,19 @@ static int stmmac_release(struct net_device *dev)
->  
->  	stmmac_release_ptp(priv);
->  
-> -	pm_runtime_put(priv->device);
-> -
-> -	if (priv->dma_cap.fpesel)
-> +	if (priv->dma_cap.fpesel) {
->  		stmmac_fpe_stop_wq(priv);
->  
-> +		/* phylink and irq have already disabled,
-> +		 * mm_lock is unnecessary here.
-> +		 */
-> +		priv->fpe_cfg.pmac_enabled = false;
-> +		priv->fpe_cfg.verify_enabled = false;
-> +		priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-> +	}
-> +
-> +	pm_runtime_put(priv->device);
-> +
->  	return 0;
->  }
->  
-> @@ -5979,44 +6007,34 @@ static int stmmac_set_features(struct net_device *netdev,
->  static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
->  
-> -	if (status == FPE_EVENT_UNKNOWN || !*hs_enable)
-> -		return;
-> +	spin_lock(&priv->mm_lock);
->  
-> -	/* If LP has sent verify mPacket, LP is FPE capable */
-> -	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER) {
-> -		if (*lp_state < FPE_STATE_CAPABLE)
-> -			*lp_state = FPE_STATE_CAPABLE;
-> +	if (!fpe_cfg->pmac_enabled || status == FPE_EVENT_UNKNOWN)
-> +		goto __unlock_out;
->  
-> -		/* If user has requested FPE enable, quickly response */
-> -		if (*hs_enable)
-> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> -						MPACKET_RESPONSE);
-> -	}
-> +	/* LP has sent verify mPacket */
-> +	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER)
-> +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
-> +					MPACKET_RESPONSE);
->  
-> -	/* If Local has sent verify mPacket, Local is FPE capable */
-> -	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER) {
-> -		if (*lo_state < FPE_STATE_CAPABLE)
-> -			*lo_state = FPE_STATE_CAPABLE;
-> -	}
-> +	/* Local has sent verify mPacket */
-> +	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER &&
-> +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED)
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
->  
-> -	/* If LP has sent response mPacket, LP is entering FPE ON */
-> +	/* LP has sent response mPacket */
->  	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
-> -		*lp_state = FPE_STATE_ENTERING_ON;
-> -
-> -	/* If Local has sent response mPacket, Local is entering FPE ON */
-> -	if ((status & FPE_EVENT_TRSP) == FPE_EVENT_TRSP)
-> -		*lo_state = FPE_STATE_ENTERING_ON;
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
->  
->  	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
->  	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
->  	    priv->fpe_wq) {
->  		queue_work(priv->fpe_wq, &priv->fpe_task);
->  	}
-> +
-> +__unlock_out:
-> +	spin_unlock(&priv->mm_lock);
->  }
->  
->  static void stmmac_common_interrupt(struct stmmac_priv *priv)
-> @@ -7372,50 +7390,47 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
->  	return ret;
->  }
->  
-> -#define SEND_VERIFY_MPAKCET_FMT "Send Verify mPacket lo_state=%d lp_state=%d\n"
-> -static void stmmac_fpe_lp_task(struct work_struct *work)
-> +static void stmmac_fpe_verify_task(struct work_struct *work)
->  {
->  	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
->  						fpe_task);
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> -	bool *enable = &fpe_cfg->enable;
-> -	int retries = 20;
-> -
-> -	while (retries-- > 0) {
-> -		/* Bail out immediately if FPE handshake is OFF */
-> -		if (*lo_state == FPE_STATE_OFF || !*hs_enable)
-> +	int verify_limit = 3; /* defined by 802.3 */
-> +	unsigned long flags;
-> +
-> +	while (1) {
-> +		msleep(fpe_cfg->verify_time);
-> +
-
-Sleep for 1 ms without having done anything prior?
-
-> +		if (!netif_running(priv->dev))
->  			break;
->  
-> -		if (*lo_state == FPE_STATE_ENTERING_ON &&
-> -		    *lp_state == FPE_STATE_ENTERING_ON) {
-> -			stmmac_fpe_configure(priv, priv->ioaddr,
-> -					     fpe_cfg,
-> -					     priv->plat->tx_queues_to_use,
-> -					     priv->plat->rx_queues_to_use,
-> -					     *enable);
-> +		spin_lock_irqsave(&priv->mm_lock, flags);
-
-Thanks for reconsidering the locking.
-
-Unless I'm missing something, it would be good to read fpe_cfg->verify_time
-also under the lock. You can save it to a temporary local variable, then
-release the lock and go to sleep (waiting for the IRQ to change the FPE
-state).
-
-Note that in between fpe_task sleeps, the user could in theory also
-change the FPE configuration. I think that in stmmac_set_mm() you should
-wait for the fpe_task that's currently in progress to finish, in order
-not to change its state from one spin_lock_irqsave() to another.
-flush_workqueue() should help with this - but needs to be done without
-holding the mm_lock.
-
->  
-> -			netdev_info(priv->dev, "configured FPE\n");
-> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_DISABLED ||
-> +		    fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
-> +		    !fpe_cfg->pmac_enabled || !fpe_cfg->verify_enabled) {
-> +			spin_unlock_irqrestore(&priv->mm_lock, flags);
-> +			break;
-> +		}
->  
-> -			*lo_state = FPE_STATE_ON;
-> -			*lp_state = FPE_STATE_ON;
-> -			netdev_info(priv->dev, "!!! BOTH FPE stations ON\n");
-> +		if (verify_limit == 0) {
-> +			fpe_cfg->verify_enabled = false;
-> +			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
-> +			stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-> +					     priv->plat->tx_queues_to_use,
-> +					     priv->plat->rx_queues_to_use,
-> +					     false);
-> +			spin_unlock_irqrestore(&priv->mm_lock, flags);
->  			break;
->  		}
->  
-> -		if ((*lo_state == FPE_STATE_CAPABLE ||
-> -		     *lo_state == FPE_STATE_ENTERING_ON) &&
-> -		     *lp_state != FPE_STATE_ON) {
-> -			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
-> -				    *lo_state, *lp_state);
-> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_VERIFYING)
-> +			stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
->  						MPACKET_VERIFY);
-> -		}
-> -		/* Sleep then retry */
-> -		msleep(500);
-> +
-> +		spin_unlock_irqrestore(&priv->mm_lock, flags);
-> +
-> +		verify_limit--;
->  	}
->  
->  	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
 
