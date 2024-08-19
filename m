@@ -1,175 +1,203 @@
-Return-Path: <netdev+bounces-119896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A0C957664
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F6A9576B2
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:37:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED54C1C21481
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B86151C220F4
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57D1158D8B;
-	Mon, 19 Aug 2024 21:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6581D6191;
+	Mon, 19 Aug 2024 21:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fo2pji4f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2mfnDNw+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B2983A18
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408471DD382
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724102289; cv=none; b=oWCC4uLMGiiD2fRJ6PlzoisOj2UxjXnMq0DeRVPn+frY1pd5QiA6z75r8zu1PlBmTkJe2XTMQYfCtta3CwO/+pSHpEEUgvgVt76UndBcWYJMcrrDSWsrAWnGRwE9FoEhCv4xfFh4gU52OTbhJ77rg2B8Sq4w1XQdLCDcNNxYofs=
+	t=1724103428; cv=none; b=FKfShxpNyjl2JH+X4kRqNfngOxPCiBbvGr32zA9qay6aQiL+1k+jLDJL6Iep6ZLibuS0QeuKSeQHix41Kk6+/QrO6B3FnXopCxzyo4ic8620tghjHcingI/gKw1jEAans2/wIHcJzVYqe9HzZe2/Nu/d8pXN5xSL2yAzD6Exi+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724102289; c=relaxed/simple;
-	bh=x73kZuGeZPO/zMICJM5bFMWIWhQjMQY30f8YDgfQWSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Si5cq7hr8TM1MkSp5aDzZztmmd2i+Ed6I6XCtgWbWSXQZW0hRAbxuY1BnKwxgoRDxo/Jh7DO2h+ebs8wGOIa9lKM39ooWTsTSQHzEbneKuLhcMZ3n2YoGJ2wT72fOY8qrLMRFlb21S4Sf7UkWTL64SqfEWZMpOEY98h92uQYWWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fo2pji4f; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724102288; x=1755638288;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=x73kZuGeZPO/zMICJM5bFMWIWhQjMQY30f8YDgfQWSc=;
-  b=fo2pji4ffV1esgvhPWba8+REJWrUKcGOh3ok7cO+rLfobw/NrzVwmOrk
-   vlq0vUGe++ZVTqc6YWLjVc5jbIE8IuG4fx5SER9w0Si3WW52+W0Q9okVO
-   bU2so9s+NwiTC25xXr68Qhh/8mtd53d7JfwWpgU4/3Sx53eFjHojfcg+k
-   Y+0vXQ9sX0HTCxW2OFsfl9TF0q8Z3Gts7+8LNgL+2SAFDh4kSV4g8IJVh
-   E/hCkTYaB+9XE/idu3tzu18r0eOuwI2W7hSYOJYmn6zSDaW1ewsRZ1NsX
-   KWpa624UW6TIHHkN6OuE/DlKrXsHdkdhVe7H4Yo+BTqLVpjiug+IxA+z6
-   w==;
-X-CSE-ConnectionGUID: TD/Xy5rxSdCUJO/R6cmpGQ==
-X-CSE-MsgGUID: BgFUHK/VS5SWuOLyT5eQMw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="22343201"
-X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
-   d="scan'208";a="22343201"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 14:18:07 -0700
-X-CSE-ConnectionGUID: 1ejfIbMFTVadCQuYlqne2Q==
-X-CSE-MsgGUID: DBGYolQdTuG4lV4wBH7/+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
-   d="scan'208";a="60463425"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 19 Aug 2024 14:18:04 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sg9lJ-0009Re-2N;
-	Mon, 19 Aug 2024 21:18:01 +0000
-Date: Tue, 20 Aug 2024 05:17:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: Re: [PATCHv2 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <202408200431.wjjkEZ2m-lkp@intel.com>
-References: <20240819075334.236334-3-liuhangbin@gmail.com>
+	s=arc-20240116; t=1724103428; c=relaxed/simple;
+	bh=vYAVcLDAzLHOXkjjsKxNHFJx5YFBFwRkGYiH4fkl7X8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DYR1CAsdp/PVVuzsvBiHxpenVmkGBcUkslvPPQGzm88futRg/tkKdQlBH4Z7+JUB2S/j/S2LeAr3bL2nWnwu0PRmAhR+INn7ZD6vvfHUhDLL4Ka7vOgGEKd6yhS/MiTsZ9uiPa11+YGHof6IcoDsr0Aa+SuLVlHVoWcko4mVbqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2mfnDNw+; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ad97b9a0fbso91083447b3.0
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 14:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724103426; x=1724708226; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WZ6C08RZa0gEr7q33GMAMFHHAHyuh6votb48gYCvR+E=;
+        b=2mfnDNw+QzpzHSmfcMEtGLpmg9kKMW3hPSniBG/IivzBLiXyT2Azyrng68xRlOYzf1
+         R/klQ4nobAuy4wy2zXdauK1IkpyBtEsNm0XvmZM2FXXwT1LviEf5nQTbjwvW9eNQZ2jt
+         ql4eQAFonbzGkb/R00tG4NOWfuKQV2wKog/kQwhfAdaBtptGMfLKB1/7XdJ9FoSH2OMV
+         OIFPQVhyPwI9DPlPRNXPDK5+EJvoszt6on5iVYdDOQ2AvsAuhay28SvlQPgKY8KI18K5
+         SjQRzUTqekfGnTSvhOSt6ebpHxs08FAJSRNYwKvqT0frbgrfAZ8kmHyYMcbtyqPW3rFC
+         iGjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724103426; x=1724708226;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WZ6C08RZa0gEr7q33GMAMFHHAHyuh6votb48gYCvR+E=;
+        b=uB8x707an+O8rtqRPCKZ5Z1I8Le67GbnyZoquS7cEIdrXUYMZ8Zcph8iz5Qo9e0Fl8
+         j/jwiNS8RBlPQlrfuvav9yrndeCxThyOXlFPcpNGMWBnjC9ppxHJ/jrfp8RkSTKdAOnZ
+         MLzy6+R9gxkEb7zIJnclokJ2+rs4N7F0x76kzVjrDKJLKF0rmctXQYVPQCQWYADnJRXR
+         5pYDiTGwA3ev5wA2IkWl/EStR1N31yUWk5aeNydHhQNLE2LYSkg+fnGo8tc9955yt6S8
+         QqZswbZ1qowu9onec5ftYq2kR8nAFW6C+47EU8GPDnJ1zxsrf3MigbK03l04Vm74kw9z
+         1EFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWx3V8vFzBK4p8gDeLqFKBc0vlVZV5W+buVa+tHFqrpVTXKwm4+HCZMMSdXisk4Vcd1WG1ix24=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztlwWANjM/gbQGQTIgm6EOL8aQOZR8/7q5XbJnKvEjBj2gYwLh
+	1zmPm3c9MhaNmR0gK9z4xePHLzB9tX9Br9hRwNFWa1oEubuBJbxfPZmXrsm3XQqPWmQwvf0wJnE
+	7lA==
+X-Google-Smtp-Source: AGHT+IFPWI3kkRHHFJIt3qwISrXOcJfxDYLchKswQv9BUwDwDDQf+NRjHU8hW/Z2gESKkKRMU8hTQubcmjo=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:690c:4606:b0:691:2f66:4b1c with SMTP id
+ 00721157ae682-6b1baeadc0amr935997b3.6.1724103425960; Mon, 19 Aug 2024
+ 14:37:05 -0700 (PDT)
+Date: Mon, 19 Aug 2024 23:37:03 +0200
+In-Reply-To: <20240814030151.2380280-2-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819075334.236334-3-liuhangbin@gmail.com>
+Mime-Version: 1.0
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com> <20240814030151.2380280-2-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZsO6_14c14BAn-kI@google.com>
+Subject: Re: [RFC PATCH v2 1/9] landlock: Refactor current_check_access_socket()
+ access right check
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Hangbin,
+Hello!
 
-kernel test robot noticed the following build errors:
+Thanks for sending round 2 of this patch set!
 
-[auto build test ERROR on net-next/main]
+On Wed, Aug 14, 2024 at 11:01:43AM +0800, Mikhail Ivanov wrote:
+> The current_check_access_socket() function contains a set of address
+> validation checks for bind(2) and connect(2) hooks. Separate them from
+> an actual port access right checking. It is required for the (future)
+> hooks that do not perform address validation.
+>=20
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+>  security/landlock/net.c | 41 ++++++++++++++++++++++++-----------------
+>  1 file changed, 24 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/security/landlock/net.c b/security/landlock/net.c
+> index c8bcd29bde09..669ba260342f 100644
+> --- a/security/landlock/net.c
+> +++ b/security/landlock/net.c
+> @@ -2,7 +2,7 @@
+>  /*
+>   * Landlock LSM - Network management and hooks
+>   *
+> - * Copyright =C2=A9 2022-2023 Huawei Tech. Co., Ltd.
+> + * Copyright =C2=A9 2022-2024 Huawei Tech. Co., Ltd.
+>   * Copyright =C2=A9 2022-2023 Microsoft Corporation
+>   */
+> =20
+> @@ -61,17 +61,34 @@ static const struct landlock_ruleset *get_current_net=
+_domain(void)
+>  	return dom;
+>  }
+> =20
+> -static int current_check_access_socket(struct socket *const sock,
+> -				       struct sockaddr *const address,
+> -				       const int addrlen,
+> -				       access_mask_t access_request)
+> +static int check_access_socket(const struct landlock_ruleset *const dom,
+> +			       __be16 port, access_mask_t access_request)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hangbin-Liu/bonding-add-common-function-to-check-ipsec-device/20240819-195504
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240819075334.236334-3-liuhangbin%40gmail.com
-patch subject: [PATCHv2 net-next 2/3] bonding: Add ESN support to IPSec HW offload
-config: x86_64-buildonly-randconfig-001-20240820 (https://download.01.org/0day-ci/archive/20240820/202408200431.wjjkEZ2m-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408200431.wjjkEZ2m-lkp@intel.com/reproduce)
+It might be worth briefly spelling out in documentation that access_request=
+ in
+current_check_access_socket() may only have a single bit set.  This is diff=
+erent
+to other places where access_mask_t is used, where combinations of these fl=
+ags
+are possible.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408200431.wjjkEZ2m-lkp@intel.com/
+These functions do checks for special cases using "if (access_request =3D=
+=3D
+LANDLOCK_ACCESS_NET_CONNECT_TCP)" and the same for "bind".  I think it's a
+reasonable way to simplify the implementation here, but we have to be caref=
+ul to
+not accidentally use it differently.
 
-All errors (new ones prefixed by >>):
-
-   drivers/net/bonding/bond_main.c:434:10: error: returning 'void *' from a function with incompatible result type 'struct net_device'
-     434 |                 return NULL;
-         |                        ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-       8 | #define NULL ((void *)0)
-         |              ^~~~~~~~~~~
-   drivers/net/bonding/bond_main.c:442:10: error: returning 'void *' from a function with incompatible result type 'struct net_device'
-     442 |                 return NULL;
-         |                        ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-       8 | #define NULL ((void *)0)
-         |              ^~~~~~~~~~~
-   drivers/net/bonding/bond_main.c:446:9: error: returning 'struct net_device *' from a function with incompatible result type 'struct net_device'; dereference with *
-     446 |         return real_dev;
-         |                ^~~~~~~~
-         |                *
-   drivers/net/bonding/bond_main.c:630:11: error: assigning to 'struct net_device *' from incompatible type 'struct net_device'
-     630 |         real_dev = bond_ipsec_dev(xs);
-         |                  ^ ~~~~~~~~~~~~~~~~~~
-   drivers/net/bonding/bond_main.c:658:11: error: assigning to 'struct net_device *' from incompatible type 'struct net_device'
-     658 |         real_dev = bond_ipsec_dev(xs);
-         |                  ^ ~~~~~~~~~~~~~~~~~~
->> drivers/net/bonding/bond_main.c:668:2: error: use of undeclared identifier 'rhel_dev'; did you mean 'real_dev'?
-     668 |         rhel_dev->xfrmdev_ops->xdo_dev_state_advance_esn(xs);
-         |         ^~~~~~~~
-         |         real_dev
-   drivers/net/bonding/bond_main.c:655:21: note: 'real_dev' declared here
-     655 |         struct net_device *real_dev;
-         |                            ^
-   6 errors generated.
+It is a preexisting issue, so I don't consider it a blocker, but it might b=
+e
+worth fixing while we are at it?
 
 
-vim +668 drivers/net/bonding/bond_main.c
+>  {
+> -	__be16 port;
+>  	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] =3D {};
+>  	const struct landlock_rule *rule;
+>  	struct landlock_id id =3D {
+>  		.type =3D LANDLOCK_KEY_NET_PORT,
+>  	};
+> +
+> +	id.key.data =3D (__force uintptr_t)port;
+> +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
+> +
+> +	rule =3D landlock_find_rule(dom, id);
+> +	access_request =3D landlock_init_layer_masks(
+> +		dom, access_request, &layer_masks, LANDLOCK_KEY_NET_PORT);
+> +	if (landlock_unmask_layers(rule, access_request, &layer_masks,
+> +				   ARRAY_SIZE(layer_masks)))
+> +		return 0;
+> +
+> +	return -EACCES;
+> +}
+> +
+> +static int current_check_access_socket(struct socket *const sock,
 
-   648	
-   649	/**
-   650	 * bond_advance_esn_state - ESN support for IPSec HW offload
-   651	 * @xs: pointer to transformer state struct
-   652	 **/
-   653	static void bond_advance_esn_state(struct xfrm_state *xs)
-   654	{
-   655		struct net_device *real_dev;
-   656	
-   657		rcu_read_lock();
-   658		real_dev = bond_ipsec_dev(xs);
-   659		if (!real_dev)
-   660			goto out;
-   661	
-   662		if (!real_dev->xfrmdev_ops ||
-   663		    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
-   664			pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
-   665			goto out;
-   666		}
-   667	
- > 668		rhel_dev->xfrmdev_ops->xdo_dev_state_advance_esn(xs);
-   669	out:
-   670		rcu_read_unlock();
-   671	}
-   672	
+Re-reading the implementation of this function, it was surprised how specia=
+lized
+it is towards the "connect" and "bind" use cases, which it has specific cod=
+e
+paths for.  This does not look like it would extend naturally to additional
+operations.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+After your refactoring, current_check_access_socket() is now (a) checking t=
+hat
+we are looking at a TCP address, and extracting the port, and then (b) doin=
+g
+connect- and bind-specific logic, and then (c) calling check_access_socket(=
+).
+
+Would it maybe be possible to turn the code logic around by creating a
+"get_tcp_port()" helper function for step (a), and then doing all of (a), (=
+b)
+and (c) directly from hook_socket_bind() and hook_socket_connect()?  It wou=
+ld
+have the upside that in step (b) you don't need to distinguish between bind=
+ and
+connect because it would be clear from the context which of the two cases w=
+e are
+in.  It would also remove the need for a function that only supports one bi=
+t in
+the access_mask_t, which is potentially surprising.
+
+Thanks,
+=E2=80=94G=C3=BCnther
+
 
