@@ -1,401 +1,230 @@
-Return-Path: <netdev+bounces-119630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91DA1956643
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:04:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9476D956657
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:07:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E04D282FEC
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:04:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAA4F1C2177F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6688815C149;
-	Mon, 19 Aug 2024 09:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9239815C123;
+	Mon, 19 Aug 2024 09:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="p5k/7rnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA0115C123;
-	Mon, 19 Aug 2024 09:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDBF15B54B
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 09:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724058268; cv=none; b=uUrLXngZ1uzZ8hBYIh2Ewh6ubjeic3bNmyW2n6QRlyBniA+eQpJF/hEMCf2CiKy7JVL+WOtSH7GfoBQRCnc2/ghlfS60uOTyDSNwc6bwm9FLlNB66jQiG+X7RYFyyVr4gbb3G39CLZ5LgGfwwmgGUj9PFmOCDxCe7ES+Y/IkxVg=
+	t=1724058465; cv=none; b=qtsnlePPhmAo6vIig6zF5QXvWVfKjqvW6mhvkTQLO/XlJo6fwrqwwbbhdt55EcxuBfRmj4fUkRooaeRSgdg9aA+3Q7DovP/WzoZ79xTdzvMjvQWGVhVN426etm8zFRxsNXEhvQdAie2TnyQD84EXdeDrRk9IAG1/j+hCr1ZdPco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724058268; c=relaxed/simple;
-	bh=+UcLassjRBluQPTGIrIjg0Er/I51U3zFpt5pm0dIgqw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JjjuwqMHoR8iA3KOAfjHwlWGAY3J499TaLGWJj9EWNCkbF7/Q3oTrdgXgeMTS4Ls2OOk06FaBsHFeZ3DFrgrOYHri9RSGSLfHj4Z3NVbSMEkkv7avPb1oWGtihLtAkCo519cselz9YAmcfB4BJNn8KtTDPHdFqrrLayvnGNK7/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7a843bef98so436534366b.2;
-        Mon, 19 Aug 2024 02:04:25 -0700 (PDT)
+	s=arc-20240116; t=1724058465; c=relaxed/simple;
+	bh=0ksC3JMD9/LB03gW2/IHzb/51BObj81BzqD4gUWtbGE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pi43hWWPHH5pzUiFTU4wLSbhoUhKu/Cnpo1NzXGCwvRA3Puv0TmZhZrG0wYzD1zyrSgVOzy+KP7opqiHnk6POvEYoWq9QRYV4TukMRds3JR/IG8EOVxDP5YnhHwqvSR8RwG8Y4T0tkpHUW55MoFfG8y1Gk9zhVFdkVnmFEzypEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=p5k/7rnY; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-68d30057ae9so37525467b3.1
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 02:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1724058461; x=1724663261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E5pxH0Wv82KaWtSz09+l7PjD8n6brxLfJzKsxVLOzpA=;
+        b=p5k/7rnYFnttZ0UsUkptcSEJIFkOK7tbYIR68mgtC0n4rYQqEPR8vKaJyD67psk96h
+         F/G9kPdayTnu305efP4YzDsc3CbsCmGvhVkCzFuuEfq6FXMYNuCk87KKyxu+zXvomFVs
+         4LHY8jtzbqNsGZO1SvnVossAyjfCK0lNGDF1Z/FE/1et6X8kfTIcLTTcJXLjLWozDxVP
+         OrNc1zNGFLPMBnhlFfViLQm8J6fpnPjN+TxZHmLKUZU818+tEdaoaX7l6skiYS4Kjwvl
+         RU5hXy9jNIi7b88djkdVciNaAQBJyGoXg2PULNX2oNNjW1a0rspqi4s1oxu4EFIaFqbk
+         brDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724058264; x=1724663064;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SWS/V+Ywzifgu/GyKD8QbUixNLvCG9vfNA7TfibtEIE=;
-        b=UirT/tOK97H9ead759pZvHeRK9AYzT3OzCP40LzmYPO29ez2sTwKhNMwRbMkw1mYBZ
-         H400b8RbDMJggw1jWWXjxAPmfEXW+Q/FUO2sAWu9mVgHk2WEVamR/rsHLFjnVgqFBPrj
-         X+nwBZs+cz6Ef5B4i1wR1wy7Q+4dLh/HzfIjVlPfOMMhhtZZFfWvgBcb3STHyzb8CKyW
-         X576bL0XCNe+G4Ouh9w0rVUhKSN2WqASv+zamZ7Qf0dQlnE2isArEjhJgrNDmMkYHLsX
-         0RjpYs5U0J+YLLd+tdgxrWsqLo9oMaMJ/9I9euDkrGFC7vSSM+X61+7iuIwSzDp3X/x3
-         hNbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgu9brxVNSTHrasr/DX4YsszwH6/O8vrYl/D5QiJSiG8/SG3cyy+rFaG3nJ8RcV+qHg/coyjwvo3dITwxetEx2Qt6/6W1HrRjmHr+lD7S9r8nIrj7ZH+ZDcnjIGuxFshSqwOfy6B7GM6bUkcM4
-X-Gm-Message-State: AOJu0YznQqpoysrRSHZ2fcTC/Oiq8CbceH4oEiAQiwCZ4kDGcV1QgPrU
-	wOpkaZF9+SM6EaYCqo+0v1fxtjRnmK2/v8GfxKa1OBJyc6J3ozjW
-X-Google-Smtp-Source: AGHT+IHFL9Q1mrNm6xFWpn4g2IVzm+xgsNT4kBEWk2bsIIpeOilITOlsG57C0G2inioYahveoZ8D8w==
-X-Received: by 2002:a17:907:e6e6:b0:a7a:ae85:f245 with SMTP id a640c23a62f3a-a8392953cdfmr710386266b.38.1724058263737;
-        Mon, 19 Aug 2024 02:04:23 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83839464d1sm614144766b.173.2024.08.19.02.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 02:04:23 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	liuhangbin@gmail.com,
-	petrm@nvidia.com,
-	matttbe@kernel.org,
-	Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Willem de Bruijn <willemb@google.com>,
-	David Wei <dw@davidwei.uk>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Subject: [PATCH net-next v5] net: netconsole: selftests: Create a new netconsole selftest
-Date: Mon, 19 Aug 2024 02:03:53 -0700
-Message-ID: <20240819090406.1441297-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
+        d=1e100.net; s=20230601; t=1724058461; x=1724663261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E5pxH0Wv82KaWtSz09+l7PjD8n6brxLfJzKsxVLOzpA=;
+        b=b00yMRWBMtoSVGwH6VvJ2v7wJCNTU6rroizLrf/cgHTtj4Kz3h7lVEqVc+TNBHeg+6
+         E/kJLfiTALHxtiEnG3vHc0TtXAw7omAssz9MR3OQjOe6vls4cDeaToPf1wononmYItB4
+         7zsNW9ba5DSZJcM171Ba4dOB4KR0SlCZHFA73YECKhpvAt4tjFU3alP1Hksx/fhM+Un5
+         WchBvE80bhonmY1gw2Lwt0zGRnelB3aKpffWisIZU5vXl9auDl/wXWTMijaACAXO9RpN
+         Y0H8ZCSlV4G6+QfYjG6RmdlKvZNHV2qskoliLPf9KcQXN7lQYHeTWAHbPRe04oDCZRyy
+         FMIQ==
+X-Gm-Message-State: AOJu0YzRaQ8r+dLytfMnXKVSM4p2ZCRCOd08rr3NywSZHqZiDLVXbfn9
+	dvp0ZIhEvSKzxnIWCuCjKEBg2AxCREpEPBjktDkIOQXwVfoH3MkGMv4J1U1z4BlWnUhHxIzIYlM
+	ORp601RH/3fZ2W0bG4PB0ftUp4THJIzr38otijf32TPGtP4lrG+c=
+X-Google-Smtp-Source: AGHT+IFZoh/Vo8yOpmmELJS5Vw6qZn89KiNK25SiDb2hf1NrmGPIUA51jAwqStuSpVERFGP5l6Bdox0KJchgH23uiiY=
+X-Received: by 2002:a05:690c:ec5:b0:6b0:52a6:6515 with SMTP id
+ 00721157ae682-6b1b9b5abbemr128653977b3.6.1724058461451; Mon, 19 Aug 2024
+ 02:07:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240819005345.84255-1-fujita.tomonori@gmail.com> <20240819005345.84255-7-fujita.tomonori@gmail.com>
+In-Reply-To: <20240819005345.84255-7-fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Mon, 19 Aug 2024 04:07:30 -0500
+Message-ID: <CALNs47siFZQDE8_N2FyLhCMfszrcX7f5Q=rj8c9dzO9Q=hQsmQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 6/6] net: phy: add Applied Micro QT2025 PHY driver
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me, aliceryhl@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Adds a selftest that creates two virtual interfaces, assigns one to a
-new namespace, and assigns IP addresses to both.
+On Sun, Aug 18, 2024 at 8:01=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> This driver supports Applied Micro Circuits Corporation QT2025 PHY,
+> based on a driver for Tehuti Networks TN40xx chips.
+>
+> The original driver for TN40xx chips supports multiple PHY hardware
+> (AMCC QT2025, TI TLK10232, Aqrate AQR105, and Marvell 88X3120,
+> 88X3310, and MV88E2010). This driver is extracted from the original
+> driver and modified to a PHY driver in Rust.
+>
+> This has been tested with Edimax EN-9320SFP+ 10G network adapter.
+>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  MAINTAINERS               |  7 +++
+>  drivers/net/phy/Kconfig   |  7 +++
+>  drivers/net/phy/Makefile  |  1 +
+>  drivers/net/phy/qt2025.rs | 90 +++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 105 insertions(+)
+>  create mode 100644 drivers/net/phy/qt2025.rs
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9dbfcf77acb2..d4464e59dfea 100644
 
-It listens on the destination interface using socat and configures a
-dynamic target on netconsole, pointing to the destination IP address.
+> +struct PhyQT2025;
+> +
+> +#[vtable]
+> +impl Driver for PhyQT2025 {
+> +    const NAME: &'static CStr =3D c_str!("QT2025 10Gpbs SFP+");
+> +    const PHY_DEVICE_ID: phy::DeviceId =3D phy::DeviceId::new_with_exact=
+_mask(0x0043A400);
+> +
+> +    fn probe(dev: &mut phy::Device) -> Result<()> {
+> +        // The vendor driver does the following checking but we have no =
+idea why.
 
-The test then checks if the message was received properly on the
-destination interface.
+In the module doc comment, could you add a note about where the vendor
+driver came from? I am not sure how to find it.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-Changelog:
+> +        let hw_id =3D dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+> +        if (hw_id >> 8) & 0xff !=3D 0xb3 {
+> +            return Err(code::ENODEV);
+> +        }
+> +
+> +        // The 8051 will remain in the reset state.
 
-v5:
- * Replace check_file_size() by "test -s" (Matthieu)
+What is the 8051 here?
 
-v4:
- * Avoid sleeping in waiting for sockets and files (Matthieu Baerts)
- * Some other improvements (Matthieu Baerts)
- * Add configfs as a dependency (Jakub)
- * https://lore.kernel.org/all/20240816132450.346744-1-leitao@debian.org/
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0000)?;
+> +        // Configure the 8051 clock frequency.
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC302), 0x0004)?;
+> +        // Non loopback mode.
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC319), 0x0038)?;
+> +        // Global control bit to select between LAN and WAN (WIS) mode.
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC31A), 0x0098)?;
+> +        dev.write(C45::new(Mmd::PCS, 0x0026), 0x0E00)?;
+> +        dev.write(C45::new(Mmd::PCS, 0x0027), 0x0893)?;
+> +        dev.write(C45::new(Mmd::PCS, 0x0028), 0xA528)?;
+> +        dev.write(C45::new(Mmd::PCS, 0x0029), 0x0003)?;
 
-v3:
- * Defined CONFIGs in config file (Jakub)
- * Identention fixes (Petr Machata)
- * Use setup_ns in a better way (Matthieu Baerts)
- * Add dependencies in TEST_INCLUDES (Hangbin Liu)
- * https://lore.kernel.org/all/20240815095157.3064722-1-leitao@debian.org/
+The above four writes should probably get a comment based on the
+discussion at [1].
 
-v2:
- * Change the location of the path (Jakub)
- * Move from veth to netdevsim
- * Other small changes in dependency checks and cleanup
- * https://lore.kernel.org/all/20240813183825.837091-1-leitao@debian.org/
+> +        // Configure transmit and recovered clock.
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC30A), 0x06E1)?;
+> +        // The 8051 will finish the reset state.
+> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0002)?;
+> +        // The 8051 will start running from the boot ROM.
+> +        dev.write(C45::new(Mmd::PCS, 0xE854), 0x00C0)?;
+> +
+> +        let fw =3D Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as=
+_ref())?;
 
-v1:
- * https://lore.kernel.org/all/ZqyUHN770pjSofTC@gmail.com/
+I don't know if this works, but can you put `qt2025-2.0.3.3.fw` in a
+const to use both here and in the `module_phy_driver!` macro?
 
- MAINTAINERS                                   |   1 +
- tools/testing/selftests/drivers/net/Makefile  |   5 +-
- tools/testing/selftests/drivers/net/config    |   4 +
- .../selftests/drivers/net/netcons_basic.sh    | 225 ++++++++++++++++++
- 4 files changed, 234 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/drivers/net/netcons_basic.sh
+> +        if fw.data().len() > SZ_16K + SZ_8K {
+> +            return Err(code::EFBIG);
+> +        }
+> +
+> +        // The 24kB of program memory space is accessible by MDIO.
+> +        // The first 16kB of memory is located in the address range 3.80=
+00h - 3.BFFFh.
+> +        // The next 8kB of memory is located at 4.8000h - 4.9FFFh.
+> +        let mut j =3D SZ_32K;
+> +        for (i, val) in fw.data().iter().enumerate() {
+> +            if i =3D=3D SZ_16K {
+> +                j =3D SZ_32K;
+> +            }
+> +
+> +            let mmd =3D if i < SZ_16K { Mmd::PCS } else { Mmd::PHYXS };
+> +            dev.write(C45::new(mmd, j as u16), (*val).into())?;
+> +
+> +            j +=3D 1;
+> +        }
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5dbf23cf11c8..9a371ddd8719 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15772,6 +15772,7 @@ M:	Breno Leitao <leitao@debian.org>
- S:	Maintained
- F:	Documentation/networking/netconsole.rst
- F:	drivers/net/netconsole.c
-+F:	tools/testing/selftests/drivers/net/netcons_basic.sh
- 
- NETDEVSIM
- M:	Jakub Kicinski <kuba@kernel.org>
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index e54f382bcb02..39fb97a8c1df 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -1,8 +1,11 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--TEST_INCLUDES := $(wildcard lib/py/*.py)
-+TEST_INCLUDES := $(wildcard lib/py/*.py) \
-+		 ../../net/net_helper.sh \
-+		 ../../net/lib.sh \
- 
- TEST_PROGS := \
-+	netcons_basic.sh \
- 	ping.py \
- 	queues.py \
- 	stats.py \
-diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
-index f6a58ce8a230..a2d8af60876d 100644
---- a/tools/testing/selftests/drivers/net/config
-+++ b/tools/testing/selftests/drivers/net/config
-@@ -1,2 +1,6 @@
- CONFIG_IPV6=y
- CONFIG_NETDEVSIM=m
-+CONFIG_CONFIGFS_FS=y
-+CONFIG_NETCONSOLE=m
-+CONFIG_NETCONSOLE_DYNAMIC=y
-+CONFIG_NETCONSOLE_EXTENDED_LOG=y
-diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
-new file mode 100755
-index 000000000000..137875505663
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
-@@ -0,0 +1,225 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test creates two netdevsim virtual interfaces, assigns one of them (the
-+# "destination interface") to a new namespace, and assigns IP addresses to both
-+# interfaces.
-+#
-+# It listens on the destination interface using socat and configures a dynamic
-+# target on netconsole, pointing to the destination IP address.
-+#
-+# Finally, it checks whether the message was received properly on the
-+# destination interface.  Note that this test may pollute the kernel log buffer
-+# (dmesg) and relies on dynamic configuration and namespaces being configured.
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+# Simple script to test dynamic targets in netconsole
-+SRCIF="" # to be populated later
-+SRCIP=192.168.1.1
-+DSTIF="" # to be populated later
-+DSTIP=192.168.1.2
-+
-+PORT="6666"
-+MSG="netconsole selftest"
-+TARGET=$(mktemp -u netcons_XXXXX)
-+NETCONS_CONFIGFS="/sys/kernel/config/netconsole"
-+NETCONS_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
-+# NAMESPACE will be populated by setup_ns with a random value
-+NAMESPACE=""
-+
-+# IDs for netdevsim
-+NSIM_DEV_1_ID=$((256 + RANDOM % 256))
-+NSIM_DEV_2_ID=$((512 + RANDOM % 256))
-+
-+# Used to create and delete namespaces
-+source "${SCRIPTDIR}"/../../net/lib.sh
-+source "${SCRIPTDIR}"/../../net/net_helper.sh
-+
-+# Create netdevsim interfaces
-+create_ifaces() {
-+	local NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
-+
-+	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_NEW"
-+	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_NEW"
-+	udevadm settle 2> /dev/null || true
-+
-+	local NSIM1=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_1_ID"
-+	local NSIM2=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_2_ID"
-+
-+	# These are global variables
-+	SRCIF=$(find "$NSIM1"/net -maxdepth 1 -type d ! \
-+		-path "$NSIM1"/net -exec basename {} \;)
-+	DSTIF=$(find "$NSIM2"/net -maxdepth 1 -type d ! \
-+		-path "$NSIM2"/net -exec basename {} \;)
-+}
-+
-+link_ifaces() {
-+	local NSIM_DEV_SYS_LINK="/sys/bus/netdevsim/link_device"
-+	local SRCIF_IFIDX=$(cat /sys/class/net/"$SRCIF"/ifindex)
-+	local DSTIF_IFIDX=$(cat /sys/class/net/"$DSTIF"/ifindex)
-+
-+	exec {NAMESPACE_FD}</var/run/netns/"${NAMESPACE}"
-+	exec {INITNS_FD}</proc/self/ns/net
-+
-+	# Bind the dst interface to namespace
-+	ip link set "${DSTIF}" netns "${NAMESPACE}"
-+
-+	# Linking one device to the other one (on the other namespace}
-+	if ! echo "${INITNS_FD}:$SRCIF_IFIDX $NAMESPACE_FD:$DSTIF_IFIDX"  > $NSIM_DEV_SYS_LINK
-+	then
-+		echo "linking netdevsim1 with netdevsim2 should succeed"
-+		cleanup
-+		exit "${ksft_skip}"
-+	fi
-+}
-+
-+function configure_ip() {
-+	# Configure the IPs for both interfaces
-+	ip netns exec "${NAMESPACE}" ip addr add "${DSTIP}"/24 dev "${DSTIF}"
-+	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" up
-+
-+	ip addr add "${SRCIP}"/24 dev "${SRCIF}"
-+	ip link set "${SRCIF}" up
-+}
-+
-+function set_network() {
-+	# setup_ns function is coming from lib.sh
-+	setup_ns NAMESPACE
-+
-+	# Create both interfaces, and assign the destination to a different
-+	# namespace
-+	create_ifaces
-+
-+	# Link both interfaces back to back
-+	link_ifaces
-+
-+	configure_ip
-+}
-+
-+function create_dynamic_target() {
-+	DSTMAC=$(ip netns exec "${NAMESPACE}" \
-+		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
-+
-+	# Create a dynamic target
-+	mkdir "${NETCONS_PATH}"
-+
-+	echo "${DSTIP}" > "${NETCONS_PATH}"/remote_ip
-+	echo "${SRCIP}" > "${NETCONS_PATH}"/local_ip
-+	echo "${DSTMAC}" > "${NETCONS_PATH}"/remote_mac
-+	echo "${SRCIF}" > "${NETCONS_PATH}"/dev_name
-+
-+	echo 1 > "${NETCONS_PATH}"/enabled
-+}
-+
-+function cleanup() {
-+	local NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
-+
-+	# delete netconsole dynamic reconfiguration
-+	echo 0 > "${NETCONS_PATH}"/enabled
-+	# Remove the configfs entry
-+	rmdir "${NETCONS_PATH}"
-+
-+	# Delete netdevsim devices
-+	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_DEL"
-+	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_DEL"
-+
-+	# this is coming from lib.sh
-+	cleanup_all_ns
-+}
-+
-+function listen_port_and_save_to() {
-+	local OUTPUT=${1}
-+	# Just wait for 2 seconds
-+	timeout 2 ip netns exec "${NAMESPACE}" \
-+		socat UDP-LISTEN:"${PORT}",fork "${OUTPUT}"
-+}
-+
-+function validate_result() {
-+	local TMPFILENAME="$1"
-+
-+	# Check if the file exists
-+	if [ ! -f "$TMPFILENAME" ]; then
-+		echo "FAIL: File was not generated." >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	if ! grep -q "${MSG}" "${TMPFILENAME}"; then
-+		echo "FAIL: ${MSG} not found in ${TMPFILENAME}" >&2
-+		cat "${TMPFILENAME}" >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	# Delete the file once it is validated, otherwise keep it
-+	# for debugging purposes
-+	rm "${TMPFILENAME}"
-+	exit "${ksft_pass}"
-+}
-+
-+function check_for_dependencies() {
-+	if [ "$(id -u)" -ne 0 ]; then
-+		echo "This test must be run as root" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	if ! which socat > /dev/null ; then
-+		echo "SKIP: socat(1) is not available" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	if ! which ip > /dev/null ; then
-+		echo "SKIP: ip(1) is not available" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	if ! which udevadm > /dev/null ; then
-+		echo "SKIP: udevadm(1) is not available" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	if [ ! -d "${NETCONS_CONFIGFS}" ]; then
-+		echo "SKIP: directory ${NETCONS_CONFIGFS} does not exist. Check if NETCONSOLE_DYNAMIC is enabled" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	if ip link show "${DSTIF}" 2> /dev/null; then
-+		echo "SKIP: interface ${DSTIF} exists in the system. Not overwriting it." >&2
-+		exit "${ksft_skip}"
-+	fi
-+}
-+
-+# ========== #
-+# Start here #
-+# ========== #
-+modprobe netdevsim 2> /dev/null || true
-+modprobe netconsole 2 > /dev/null || true
-+
-+# The content of kmsg will be save to the following file
-+OUTPUT_FILE="/tmp/${TARGET}"
-+
-+# Check for basic system dependency and exit if not found
-+check_for_dependencies
-+# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+echo "6 5" > /proc/sys/kernel/printk
-+# Remove the namespace, interfaces and netconsole target on exit
-+trap cleanup EXIT
-+# Create one namespace and two interfaces
-+set_network
-+# Create a dynamic target for netconsole
-+create_dynamic_target
-+# Listed for netconsole port inside the namespace and destination interface
-+listen_port_and_save_to "${OUTPUT_FILE}" &
-+# Wait for socat to start and listen to the port.
-+wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+# Send the message
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+# Wait until socat saves the file to disk
-+busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+
-+# Make sure the message was received in the dst part
-+# and exit
-+validate_result "${OUTPUT_FILE}"
--- 
-2.43.5
+Possibly:
 
+1. Hint the MMD name in the comments
+2. Give i and j descriptive names (I used `src_idx` and `dst_offset`)
+3. Set `mmd` once at the same time you reset the address offset
+4. Tracking the offset from 0 rather than from SZ_32K seems more readable
+
+E.g.:
+
+    // The 24kB of program memory space is accessible by MDIO.
+    // The first 16kB of memory is located in the address range
+3.8000h - 3.BFFFh (PCS).
+    // The next 8kB of memory is located at 4.8000h - 4.9FFFh (PHYXS).
+    let mut dst_offset =3D 0;
+    let mut dst_mmd =3D Mmd::PCS;
+    for (src_idx, val) in fw.data().iter().enumerate() {
+        if src_idx =3D=3D SZ_16K {
+            // Start writing to the next register with no offset
+            dst_offset =3D 0;
+            dst_mmd =3D Mmd::PHYXS;
+        }
+
+        dev.write(C45::new(dst_mmd, 0x8000 + dst_offset), (*val).into())?;
+
+        dst_offset +=3D 1;
+    }
+
+Alternatively you could split the iterator with
+`.by_ref().take(SZ_16K)`, but that may not be more readable.
+
+> +        // The 8051 will start running from SRAM.
+> +        dev.write(C45::new(Mmd::PCS, 0xE854), 0x0040)?;
+> +
+> +        Ok(())
+> +    }
+> +
+> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
+> +        dev.genphy_read_status::<C45>()
+> +    }
+> +}
+
+Overall this looks pretty reasonable to me, I just don't know what to
+reference for the initialization sequence.
+
+- Trevor
+
+[1]: https://lore.kernel.org/netdev/0675cff9-5502-43e4-87ee-97d2e35d72da@lu=
+nn.ch/
 
