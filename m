@@ -1,129 +1,156 @@
-Return-Path: <netdev+bounces-119513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D08956085
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 02:22:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27BF95608C
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 02:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A3F61C203DD
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 00:22:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A4CB1F21E11
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 00:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC902D531;
-	Mon, 19 Aug 2024 00:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA1F10A0C;
+	Mon, 19 Aug 2024 00:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlLW40F1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Euzu6ArG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AFDF4E2;
-	Mon, 19 Aug 2024 00:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB27812B8B
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 00:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724026941; cv=none; b=P2G6yXG5oj+n00Z91n3pzGTpUuf4BvxRdOPyd6MNUZgRtjGKp83VFyuJZnRM4Mk9b9BNXl7kl8qbGIq/OP04MSusLPDLUH/ycOrsuB2H+SYCf1fciivlaXUsNEZSgCIfAOcLwqTug7bZh0pAQPvgsIEUf7ihgef16uO3v7CCX0c=
+	t=1724027243; cv=none; b=k2vDkGCyYWBDvEs87LcbMxbRDqMudVM2/GVuHFnswCWzQSSaOEUlQBVIEec2GCzvTzme3Pp/ZNhLKHwHGVyoNjie9Nq3jDVn/gf8uez9BC+v2NJgzW1gPq3l/HUO+HLRuUN9qU0rdO+ve3UobR0icJVQtpZDyWgCGjwT7SInnzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724026941; c=relaxed/simple;
-	bh=hUlasCGs8bJ/CqR9HffjtbBB4lngk1f4AcPUhJq0AcU=;
+	s=arc-20240116; t=1724027243; c=relaxed/simple;
+	bh=zQmN6bhwYFWZmBiol4sctRLouWbFv7BSeGwZgCuSY00=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TQW2J97C+3PfJ7nW/kRnp+8ZIP+AigNSUTOMK1rqwMvMdeoPxyrY9tuMfGcdteVXYckG2WL7kKdWkS5PI8rJhF65qJ5frsoxsQ/PHT8u3YngKe/12oTTQa36V50jNBawfy2OoQmxwH/iJR6Cw3kZQIB6XrwF1/6bU/VTabRk/rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlLW40F1; arc=none smtp.client-ip=209.85.210.173
+	 To:Cc:Content-Type; b=T+CACqohXiK54C/d44Bw4NoR6+i6O60R3GQHzBE4LOmnBgt8Jg7oYE1gIyDBeJZk3M9MW5KJRdxkWUFf0HmyFT43OCuc0LL00YSaXT4C9usfz+zCkY7mtEdUmrxfuxS3qHBKssdwY7elzsWKJyrWDXdEp3aGSxXKKH+MHaNvUps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Euzu6ArG; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70eaf5874ddso2752789b3a.3;
-        Sun, 18 Aug 2024 17:22:20 -0700 (PDT)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d2256ee11so12131035ab.1
+        for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 17:27:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724026940; x=1724631740; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724027241; x=1724632041; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RYZfJCDZHiEEDuTx7TQepweKjjgoFmH0zVv9FmE6Nt4=;
-        b=OlLW40F1sgrvK7baYujl96VOaNfHJJ06rpkLjOtEmm1qPlOQ8o+g2rGu7jLtkcus8o
-         CQfWTlsSBo/bZDAuQeLOfYTP6hwIv7hctPS+90rDoAKaqYKUClr9ZVpRldJCWI4KNzKg
-         rq06OTfpAHsB+b7jt9/Ex5XAmx8x7Dnqt28EwGmTINsP0CkSwvRAFsv8VBaSFkP2b4h5
-         gQIp9A8ErydmpQEvsfw49cgXPCytG8VpIEavkStMipu5ntBPOltI3HpHF5ZffL8TV4p9
-         s/Rdf165t7YXpqTPv1lr0YM5xNu3Rm1QQ1LD+WZO1OJ7/ASjQv/QuM1Skvlfn0zSlC3g
-         28NA==
+        bh=EVNhoZssKpWpLm86UN5yzhBz5Yuourk9D5wC2j9y1mU=;
+        b=Euzu6ArGfNY55zWrGjNRcwD/joC+k4oL3G5Wf7gjUKPau0slqBRIT/aOv3eConNV06
+         +vCcfiVyRT/aGYDsxR+zuO3L282PgU6kpfeFL8mVB00ch7cEMu9mO1JgsIefwmr8SXdD
+         NpDjJBml1eiEjOnHHpVOwbZ8IUk+0pduybK8HS2xLnlkZGDktN2+M9nYLAhRq4PL+LnL
+         VOR06HWkaH414gLuUpeDhARF0g9oe1Q83ibQUN6iVW0LU0cLKTXP6IsF4HfgtfghJRf5
+         rjrsfiQEJDTRbDB1H+T2V7Ekuc3g1+6tdENSOLcBjfj4q8XWQjgBriyQFa/HIFxegLfr
+         rmlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724026940; x=1724631740;
+        d=1e100.net; s=20230601; t=1724027241; x=1724632041;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RYZfJCDZHiEEDuTx7TQepweKjjgoFmH0zVv9FmE6Nt4=;
-        b=RbeADj9+RSr/Y9PRLXP79z7tILqpuCUo6xnOAXGF1mLZYV8F086LMyqhvqQ7RFI0pa
-         iA5ia63GNJUxURSyV/p18G36Hp8TmXotqrSg7uOiE1S8PNhaP5xU3hxDCc0tz3sHvaE3
-         gVMrfHa6rH9GWex8ZqKCwhP2Q4foxk3vC2VhCJvp5ww7Bb6EJkXKl+gI/XG4z8r+8DrI
-         GRgweXou6ExBGZp86N9xMFoWiKBKfTLAJDtnBHExvjoG0EadENc0KG38iXJN96B0I4Za
-         w3AorbvfPdb2MM8nogv3XMUHOHLGapGTj7rwwfsEr9wN9CJSXtk3OIky+FaeUV/GZHMo
-         r5mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXEWUQ9PQII4iJhJcYxb5PQaxGS8PRg8KI9J22iBFRxxAWNucNxHEAlexCbiLhAUCt1oBYotV1yEv7+bympKaNVYc4qP4kYNgjKK1+2JkDOGj6/HDfHq7wOgJWw5haTCJNanDKYhuY=
-X-Gm-Message-State: AOJu0Yy9v+CEL9dtNguP7ZnpG9PSioI6k5wyMj6rXRvYnP/LiNR1yWZ/
-	2udYa/KVBnS5gIXPc7GE4OxpMfiCO+eEmNPMcU/ComwppUSnGYoNbuYxgFQzzykPLyPZqxTHG2r
-	90KiInSP9tINXTCP6adBmbqG5I6A=
-X-Google-Smtp-Source: AGHT+IEGKxijvM5mqkst0BgtqjvHPalpw5q93+BJyczPe2AiwKeMQbFced36aht9WX6/LWN2Dm8QtTLHyCRUk2OA61g=
-X-Received: by 2002:a05:6a00:66d9:b0:70d:37f4:2c73 with SMTP id
- d2e1a72fcca58-713c4ddc3abmr9471115b3a.10.1724026939632; Sun, 18 Aug 2024
- 17:22:19 -0700 (PDT)
+        bh=EVNhoZssKpWpLm86UN5yzhBz5Yuourk9D5wC2j9y1mU=;
+        b=kJhsCAfXnKhBooZFQft5I8CAHuVYHxya4+pjqfK9e3Zrh8Ciuy2I3UqF3/Ylktn4ge
+         G7lYN5xuB0kqbxxNLqY+lvOQxGuf8ADKHMazMshO/rEafxopF4Jdq/4Re4f+aQZ4uaEi
+         /08tpJxFX8ejB9QfU4bZ5Tm/Hm14Y26l1lnQwIsw/r224S1MRltjD8v2q5v8apPswyyK
+         6jG9o2NcHfIyPchZs0qPBmbb0J7fK3M+gAGAUg43eSodMVgZ+yCk+91uOW5+ONr/q08i
+         daFa8etWZbI5UUlmM7yeTSwg3Qti2iQUteeCks9xA+Lv75/8lg/jNPC6GBHm2KJf80Eo
+         o5PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSjK0FajJqG4NCoVIeJ6CNoiR7mty4ZPXgB28ZltJdQq7qpw+BTUtxlFuqLweLvmlHr4dDhrUHpK33+v4NfK5DaY1otM5e
+X-Gm-Message-State: AOJu0Yyo9wsByHH4X6EzhPKIr8yIAl4gQfRVQMDbJ/kzIWwLKi9Q1gjb
+	AJASMmpmaSPN/u1rAVpVV+XhVtxtNBGWkO6buCEEFHOLv8Iagw8blBRNLArwpCgq2jbvzjWb2z+
+	fdQROoQIydXa7qJrPoXd7TP8Ym2I=
+X-Google-Smtp-Source: AGHT+IHu4Bq/GO+A7v5R3++UaSnLHQlLqmMSaR+DKX4RNF6YXe4pmCyuBP5Ggb9G0eoAVNYGEud2N+MDpj1gIqMouqg=
+X-Received: by 2002:a05:6e02:1c04:b0:39a:ea4c:2982 with SMTP id
+ e9e14a558f8ab-39d26cfb468mr127600645ab.10.1724027240833; Sun, 18 Aug 2024
+ 17:27:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240817051939.77735-1-fujita.tomonori@gmail.com>
- <20240817051939.77735-7-fujita.tomonori@gmail.com> <9a7c687a-29a9-4a1a-ad69-39ce7edad371@lunn.ch>
- <7f835fe8-e641-4b84-a080-13f4841fb64a@proton.me> <1a717f2d-8512-47bd-a5b3-c5ceb9b44f03@lunn.ch>
- <0797f8e8-ea3c-413d-b782-84dd97919ea9@proton.me> <bdfdac7c-edb0-4b78-b616-76be287c7597@lunn.ch>
-In-Reply-To: <bdfdac7c-edb0-4b78-b616-76be287c7597@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 19 Aug 2024 02:22:07 +0200
-Message-ID: <CANiq72=Ga7usdPgACL6znOJ_=SQXy8ESbft4x0XewGL-Xf-M-g@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 6/6] net: phy: add Applied Micro QT2025 PHY driver
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Benno Lossin <benno.lossin@proton.me>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	aliceryhl@google.com
+References: <CAL+tcoDDXT4wBQK0akpg4FR+COfZ7dztz5GcWp6ah68nbvwzTg@mail.gmail.com>
+ <20240818184849.56807-1-kuniyu@amazon.com> <CAL+tcoASNGr58b7_vF9_CCungW=ZZubE2xHDxb3QCQraAwsMpw@mail.gmail.com>
+In-Reply-To: <CAL+tcoASNGr58b7_vF9_CCungW=ZZubE2xHDxb3QCQraAwsMpw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 19 Aug 2024 08:26:44 +0800
+Message-ID: <CAL+tcoDHKkObCn=_O6WE=hwgr4nz3LY-Xhm3P-OQ-eR3Ryqs1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: do not allow to connect with the four-tuple
+ symmetry socket
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: 0x7f454c46@gmail.com, davem@davemloft.net, dima@arista.com, 
+	dsahern@kernel.org, edumazet@google.com, kernelxing@tencent.com, 
+	kuba@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Aug 18, 2024 at 7:39=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Mon, Aug 19, 2024 at 7:48=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> O.K, so the compiler tells you, which is great. The C compiler would
-> not, which is why i tend to think of these things.
+> Hello Kuniyuki,
+>
+> On Mon, Aug 19, 2024 at 2:49=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.=
+com> wrote:
+> >
+> > From: Jason Xing <kerneljasonxing@gmail.com>
+> > Date: Sun, 18 Aug 2024 21:50:51 +0800
+> > > On Sun, Aug 18, 2024 at 1:16=E2=80=AFPM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
+> > > >
+> > > > On Sun, Aug 18, 2024 at 12:25=E2=80=AFPM Jason Xing <kerneljasonxin=
+g@gmail.com> wrote:
+> > > > >
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > Four-tuple symmetry here means the socket has the same remote/loc=
+al
+> > > > > port and ipaddr, like this, 127.0.0.1:8000 -> 127.0.0.1:8000.
+> > > > > $ ss -nat | grep 8000
+> > > > > ESTAB      0      0          127.0.0.1:8000       127.0.0.1:8000
+> > >
+> > > Thanks to the failed tests appearing in patchwork, now I'm aware of
+> > > the technical term called "self-connection" in English to describe
+> > > this case. I will update accordingly the title, body messages,
+> > > function name by introducing "self-connection" words like this in the
+> > > next submission.
+> > >
+> > > Following this clue, I saw many reports happening in these years, lik=
+e
+> > > [1][2]. Users are often astonished about this phenomenon and lost and
+> > > have to find various ways to workaround it. Since, in my opinion, the
+> > > self-connection doesn't have any advantage and usefulness,
+> >
+> > It's useful if you want to test simultaneous connect (SYN_SENT -> SYN_R=
+ECV)
+> > path as you see in TCP-AO tests.  See RFC 9293 and the (!ack && syn) ca=
+se
+> > in tcp_rcv_synsent_state_process().
+> >
+> >   https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5-7
+>
+> Yes, I noticed this one: self-connection is one particular case among
+> simultaneously open cases. Honestly, it's really strange that client
+> and server uses a single socket.
+>
+> >
+> > So you can't remove self-connect functionality, the recent main user is
+> > syzkaller though.
+>
+> Ah, thanks for reminding me. It seems that I have to drop this patch
+> and there is no good way to resolve the issue in the kernel.
+>
 
-For the unused result, there is `__must_check` of course, though it
-does not seem to apply to types in GCC like it is applied to `Result`
-in Rust (Clang is OK with it).
+Can we introduce one sysctl knob to control it since we can tell there
+are many user reports/complaints through the internet? Default setting
+of the new knob is to allow users to connect to itself like right now,
+not interfering with many years of habits, like what the test tools
+currently use.
 
-C23 brings `[[nodiscard]]`, which can be. GCC >=3D 11 and Clang >=3D 17
-support it, so one can do things like:
+Can I give it a shot?
 
-    typedef struct [[nodiscard]] Result {
-        ...
-    } Result;
-
-    Result g(void);
-
-    Result f(void)
-    {
-        g(); // will warn.
-        return g();
-    }
-
-https://godbolt.org/z/PqK36rjWY
-
-And have a `Result`-like type (or, rather, like our alias in the
-kernel, given the generics).
-
-So if one is happy using new types, that is great.
-
-It would be nice to be able to do something like:
-
-    #define Result __must_check int
-
-...but that faces trouble when using it for e.g. local variables.
-
-Cheers,
-Miguel
+Thanks,
+Jason
 
