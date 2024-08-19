@@ -1,210 +1,107 @@
-Return-Path: <netdev+bounces-119927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFF5295785A
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:06:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E3F95785E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8D9F1C23A6F
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:06:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BFBC2828ED
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A371DF668;
-	Mon, 19 Aug 2024 23:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33771DD384;
+	Mon, 19 Aug 2024 23:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NoGoMpzn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23541DD3A0
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 23:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543B615AAB8
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 23:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724108787; cv=none; b=lVpz2xh/3R8eSk9PJRURbpeo8KqCQw2ZB3+DZwD468Pg5ri3/LscVcg77OBj6TzGaFEy8yOSDDTXNlbwFXKzo2GMq+z08xwrYT+q6z3HVqJES8Nlh6Uhbx8zRi+5alQ9wRqRs4Mh4SURZ2W5ACS/HdWrBIHeCap1gl/j2P1y0U8=
+	t=1724108848; cv=none; b=CK+ntBYkEKOOkCqVOnlEHegBs542uZXmz/nygdoWUNmRoPcy0Ztwznkm9KNoZL1FURkwa60qz5vA+4UZhY8ljymgnMLr6jqpuK1tEr4NKYxBtSqPbbJSQCJoR05MK1bLWqTGNEGzYCjzcLObBTpVpRoe7v4W4Acg+KRHWVXGP3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724108787; c=relaxed/simple;
-	bh=u1njAj6+UfJ0WpyQt66qhpI6ohoE7RApXFZkn6BxuUQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=c75WBiEPdmQbMFrottnO6KymFAC1TUcBBGo4CJEV9jYhVZ1vvw8vsmGpbnrUTJ6s4O2HoP06JKiXgTEgwo+ypALaUjKTKd00566QRpRojvUEutMriM92urv+lDRCpxQ8CsjuzoM1X0vcD8UdQ3QVPA9QFS/ZSojgYyuibf7ZMCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39d4c656946so19089185ab.1
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:06:25 -0700 (PDT)
+	s=arc-20240116; t=1724108848; c=relaxed/simple;
+	bh=S9VEEGpGe7/nFnP8HNkfXZvi9SUHWX8PgXDcQ/2d/u4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/lp/jqyIEaDvDIZyrOAIwcPxKBJ3KYZVGyUYs3FW35s3XuAsuq4KEHu75kNj1nRwe88Sgq9l++jMg2Vp22ffGrsRqaw0/YsBYI9HnCh56fnlaLdjmJUqRJm28BEL7zJf6SGeHaXOxsSsF55VBREVjeREyXc8E8agWysQCZImKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NoGoMpzn; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-202146e93f6so33148855ad.3
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724108846; x=1724713646; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=STjIv1So/KEZnujCiw/3CsB2QFA4v7WDP/H7a9T55/Q=;
+        b=NoGoMpzn/oEflyR1leR2atVNxgkHz8/YC7WL1PbJV8WGK7qBS5hmGTflfDa0adItMT
+         iRM1Xa7IsF+/t3S19/XXqNDd6SoYmLh455VwnWyjwcdj+Uk1hqUT5Pg/LWKZrrp+43JM
+         DragwpB0X0hess0Mwcr3lKTmffirTjdryZyP/J3469AlVLthAzjjrBRl8gEo9m1glww6
+         8Hc8WZkyOs6FjLXVfG8QF7rB8JTcmFUwzTnP9OHftPhImfwePVP3BV5Zw6n04GlcXSdx
+         EwslZ08//bD/+prdqLHjMEBe0V1kObk0uQZBgIsDQAdETiyjHnVIT8vqii4y/9gu8CfB
+         PuFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724108785; x=1724713585;
-        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1724108846; x=1724713646;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mcqLAn/0WxmaTOn+9QeeAyIEyPR9eYIH/vhup2t6WV4=;
-        b=ZhYjOV+SyhuKFrGHlQQMvRt8O3AyKVdnr/QcRDE68gbXA37TSIpYcNJpLJ68M90vjk
-         ohy8iJiyQiJrxkHNbHAJz21TCyRAe2vOekqrtPOSzNyiOwBMSB3sA1Xr3AXXjNhAwvJF
-         S365Ol7Uq0tLyIS67ywBSGEio/sFAgVCX+cc7LGn3mlqVypvHLivsyi7/wWfjP0biI2W
-         YSnKzIACjoR1QtsobUFxuzxbVdgKyNvlVYLHoICQzNZ6v8pbQ4qbMqoqDszda6S2L2MM
-         VN3iIIplHUxbZsRmtTJ7lLxoP8cTj9nDK/fDli6bZog4YrUcxklQhBspw3URqhyiSi3D
-         Jd+g==
-X-Forwarded-Encrypted: i=1; AJvYcCX5bS9KLEMkgNTJkiR7izizoMsIpIGFbDkvztkODLoMy6ht/zT7tWBOOgq8XfH5xDWIjmgrQwI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM3vEnd7msf5HEJb8jpBASWjSZv9c4hMzh0/EWZ4bZkngxdjOy
-	pYKImkSGnDeM2gVww7YwR4jgfKXIc5mkDt5bWZYauKb0ydwKrXTeJPlelJF8RBPdLrOFmVy1O03
-	PbYTQ8uMi4dr/AUc62Hu7s1+QnZu2loj0ae0ekoAH0vTOCxmlme5BA3g=
-X-Google-Smtp-Source: AGHT+IFpdZ7oC/bG0cCQW9emo025+pIVRewECDg57asvxq3GaGoe7xmu6MGqkKYgdt98fl0AkpR9w1JYF9yoBi+ohv/pcIsMqrlA
+        bh=STjIv1So/KEZnujCiw/3CsB2QFA4v7WDP/H7a9T55/Q=;
+        b=KPBzUIF2hLFfg7izvIdQXQot5NsWw6a57obSpGurVeWBwGaOIDMtl/nRCmbYC8fZbU
+         Hcb3pThEqGHNAlzTvSKX7TeATcrOTkTuW/JrA19uWIBxqE6Pry2zP3LCQG7Y/2VvyW2o
+         W9ydwTC+gtUfZa91Gqw51h5BCwPAMLEg1JapASfyJt6VWAyaZFJrv5adGuTFbQ2q4mcV
+         Ey84H06XTM5fgayB8BWTaQ3i4jjZmHCdqetAigDGmAoDNImpc9RUI+bvbLp3/BkCmulE
+         TZVQ2ehWMCeeIBJ1EJm0LjeKANgHF3ruwPoYWUHxuhuZ6ubSfWIVrWHAH8tb7dWiYUwc
+         imGg==
+X-Gm-Message-State: AOJu0YyfisP21U2BqpGo8qbF2SpuggII8esNoEGpWIkwAY6DQxY6XpXG
+	Fp8hbVmL9axu6oEh72f41fTrDNfJ1BW9GAV+GNBStI7+g3z20Vxb
+X-Google-Smtp-Source: AGHT+IHJ7eVZyntyMsZDwZPWfg/rp1yw1pPIJ9EMUqaG+lDWTKr6kH929zhDeDm0X1CzojhDO3o47Q==
+X-Received: by 2002:a17:902:da8b:b0:1fd:a0b9:2be7 with SMTP id d9443c01a7336-20203e50d12mr161482825ad.13.1724108846593;
+        Mon, 19 Aug 2024 16:07:26 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f03933e4sm66647755ad.211.2024.08.19.16.07.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 16:07:26 -0700 (PDT)
+Date: Tue, 20 Aug 2024 07:07:20 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [PATCHv2 net-next 1/3] bonding: add common function to check
+ ipsec device
+Message-ID: <ZsPQKN3j4GvGgcz9@Laptop-X1>
+References: <20240819075334.236334-1-liuhangbin@gmail.com>
+ <20240819075334.236334-2-liuhangbin@gmail.com>
+ <20240819143753.GF11472@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3106:b0:39d:300f:e911 with SMTP id
- e9e14a558f8ab-39d300fec7fmr7563125ab.2.1724108784919; Mon, 19 Aug 2024
- 16:06:24 -0700 (PDT)
-Date: Mon, 19 Aug 2024 16:06:24 -0700
-In-Reply-To: <000000000000f6f09e061feefd16@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000adfbb70620115bdc@google.com>
-Subject: Re: [syzbot] [btrfs?] general protection fault in __alloc_workqueue
-From: syzbot <syzbot+9fd43bb1ae7b5d9240c3@syzkaller.appspotmail.com>
-To: clm@fb.com, davem@davemloft.net, dsterba@suse.com, edumazet@google.com, 
-	hdanton@sina.com, jason@zx2c4.com, josef@toxicpanda.com, kuba@kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819143753.GF11472@kernel.org>
 
-syzbot has found a reproducer for the following issue on:
+On Mon, Aug 19, 2024 at 03:37:53PM +0100, Simon Horman wrote:
+> > +static struct net_device bond_ipsec_dev(struct xfrm_state *xs)
+> 
+> Hi Hangbin,
+> 
+> Based on the implementation of the function, it looks like it should return
+> 'struct net_device *' rather than 'struct net_device' (a '*' is missing).
 
-HEAD commit:    367b5c3d53e5 Add linux-next specific files for 20240816
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D16ef69f5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D61ba6f3b22ee546=
-7
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D9fd43bb1ae7b5d924=
-0c3
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debia=
-n) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D17582fbb98000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1060bfc5980000
+Sigh, I noticed this but forgot the update the patch.. The build also passed
+due to missing CONFIG_XFRM_OFFLOAD=y, even I added CONFIG_XFRM_OFFLOAD=y to
+config file. I need to check the reason.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0b1b4e3cad3c/disk-=
-367b5c3d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5bb090f7813c/vmlinux-=
-367b5c3d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6674cb0709b1/bzI=
-mage-367b5c3d.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/af299b68d869=
-/mount_2.gz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+9fd43bb1ae7b5d9240c3@syzkaller.appspotmail.com
-
-workqueue: Failed to create a rescuer kthread for wq "btrfs-=18": -EINTR
-Oops: general protection fault, probably for non-canonical address 0xdffffc=
-0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 UID: 0 PID: 8040 Comm: syz-executor149 Not tainted 6.11.0-rc3-next-2=
-0240816-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 08/06/2024
-RIP: 0010:__lock_acquire+0x69/0x2040 kernel/locking/lockdep.c:5010
-Code: b6 04 30 84 c0 0f 85 87 16 00 00 45 31 f6 83 3d b8 08 a9 0e 00 0f 84 =
-ac 13 00 00 89 54 24 54 89 5c 24 68 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 1=
-2 4c 89 ff e8 49 5c 8c 00 48 be 00 00 00 00 00 fc
-RSP: 0018:ffffc9000e68f030 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff20318b6 R12: ffff88802b298000
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fbb7be9e6c0(0000) GS:ffff8880b9000000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055df1c2ef668 CR3: 000000002e318000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5762
- touch_wq_lockdep_map kernel/workqueue.c:3876 [inline]
- __flush_workqueue+0x1e3/0x1770 kernel/workqueue.c:3918
- drain_workqueue+0xc9/0x3a0 kernel/workqueue.c:4082
- destroy_workqueue+0xba/0xc40 kernel/workqueue.c:5830
- __alloc_workqueue+0x1c30/0x1fb0 kernel/workqueue.c:5745
- alloc_workqueue+0xd6/0x210 kernel/workqueue.c:5758
- btrfs_alloc_workqueue+0x1c8/0x2a0 fs/btrfs/async-thread.c:112
- btrfs_init_workqueues+0x3af/0x740 fs/btrfs/disk-io.c:2004
- open_ctree+0x122c/0x2a10 fs/btrfs/disk-io.c:3364
- btrfs_fill_super fs/btrfs/super.c:965 [inline]
- btrfs_get_tree_super fs/btrfs/super.c:1888 [inline]
- btrfs_get_tree+0xe7a/0x1920 fs/btrfs/super.c:2114
- vfs_get_tree+0x90/0x2a0 fs/super.c:1800
- fc_mount+0x1b/0xb0 fs/namespace.c:1231
- btrfs_get_tree_subvol fs/btrfs/super.c:2077 [inline]
- btrfs_get_tree+0x652/0x1920 fs/btrfs/super.c:2115
- vfs_get_tree+0x90/0x2a0 fs/super.c:1800
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
- do_mount fs/namespace.c:3847 [inline]
- __do_sys_mount fs/namespace.c:4055 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4032
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbb7bf1346a
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 1e 09 00 00 66 2e 0f 1f 84 =
-00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff f=
-f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fbb7be9e088 EFLAGS: 00000282 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007fbb7be9e0a0 RCX: 00007fbb7bf1346a
-RDX: 0000000020005100 RSI: 0000000020005140 RDI: 00007fbb7be9e0a0
-RBP: 0000000000000004 R08: 00007fbb7be9e0e0 R09: 0000000000005106
-R10: 0000000000000012 R11: 0000000000000282 R12: 00007fbb7be9e0e0
-R13: 0000000000000012 R14: 0000000000000003 R15: 0000000001000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__lock_acquire+0x69/0x2040 kernel/locking/lockdep.c:5010
-Code: b6 04 30 84 c0 0f 85 87 16 00 00 45 31 f6 83 3d b8 08 a9 0e 00 0f 84 =
-ac 13 00 00 89 54 24 54 89 5c 24 68 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 1=
-2 4c 89 ff e8 49 5c 8c 00 48 be 00 00 00 00 00 fc
-RSP: 0018:ffffc9000e68f030 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff20318b6 R12: ffff88802b298000
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fbb7be9e6c0(0000) GS:ffff8880b9000000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055df1c2ef668 CR3: 000000002e318000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	b6 04                	mov    $0x4,%dh
-   2:	30 84 c0 0f 85 87 16 	xor    %al,0x1687850f(%rax,%rax,8)
-   9:	00 00                	add    %al,(%rax)
-   b:	45 31 f6             	xor    %r14d,%r14d
-   e:	83 3d b8 08 a9 0e 00 	cmpl   $0x0,0xea908b8(%rip)        # 0xea908cd
-  15:	0f 84 ac 13 00 00    	je     0x13c7
-  1b:	89 54 24 54          	mov    %edx,0x54(%rsp)
-  1f:	89 5c 24 68          	mov    %ebx,0x68(%rsp)
-  23:	4c 89 f8             	mov    %r15,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 30 00          	cmpb   $0x0,(%rax,%rsi,1) <-- trapping instruct=
-ion
-  2e:	74 12                	je     0x42
-  30:	4c 89 ff             	mov    %r15,%rdi
-  33:	e8 49 5c 8c 00       	call   0x8c5c81
-  38:	48                   	rex.W
-  39:	be 00 00 00 00       	mov    $0x0,%esi
-  3e:	00 fc                	add    %bh,%ah
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Hangbin
 
