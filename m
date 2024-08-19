@@ -1,332 +1,118 @@
-Return-Path: <netdev+bounces-119806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9EA2957070
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:35:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C59A95702C
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C4531F24016
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:35:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF07B1C23008
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7BB176ABA;
-	Mon, 19 Aug 2024 16:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A74175548;
+	Mon, 19 Aug 2024 16:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=rjwysocki.net header.i=@rjwysocki.net header.b="fXkQH3GN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eA/sQj3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0FD175D20;
-	Mon, 19 Aug 2024 16:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EDE1741F8
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724085318; cv=none; b=QtT54bg81r/RsfgmimGZKiCs5VMxC5K8McO8ifNyTgBQOkpvAuODy8zhRWcAYEgKNdFIJpKoNgh00vCVMpPuHWv6bt5Jrw2s0S9SUr/0ohtvnGHeJuEWyOmnRfYZfBCz5S40TVz8q9jj0Au5gma38m/hOv7IQVmAVpbflHntB9I=
+	t=1724084749; cv=none; b=Cka6vH4ql91J2FaHpvCQZOsjwjsi/BACUTJggA+LY3kU/ybHdo5ssZ3IHO3Zm+EtSGWGlExC5hc5JYr41ZdhVt2UgrnUxU4WMp5Q62F6mIKojZTQagb4y/E3zmQslVmqCqreRZHyciLhmpupUSHCW6LFtljnA3XR1tZ0y4F2B/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724085318; c=relaxed/simple;
-	bh=6M1RFv1QmucOEj5xSInzRLYUjqK4ZH5JJM5Lw0+nIGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gLHJrzi1YQfz/AFI47wTCZneW0KWPweY5fh+PjURLtw/iJbixD+8o73o6gQvbxSZ2gNY1f85kZJNaV1CaP6jtRMPnSnimUpeQnMgVwRwZcxgl5tT+1iM3qgrdoTmI9EO+UsgYNCZcjn+9Qe0DTc9b4B+CyhREr5Vdk+Idjdl1pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; dkim=fail (2048-bit key) header.d=rjwysocki.net header.i=@rjwysocki.net header.b=fXkQH3GN reason="signature verification failed"; arc=none smtp.client-ip=79.96.170.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
-Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
- by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 6.2.0)
- id 257890579296d155; Mon, 19 Aug 2024 18:35:13 +0200
-Received: from kreacher.localnet (unknown [195.136.19.94])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by cloudserver094114.home.pl (Postfix) with ESMTPSA id 4ABE073B5D4;
-	Mon, 19 Aug 2024 18:35:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rjwysocki.net;
-	s=dkim; t=1724085313;
-	bh=6M1RFv1QmucOEj5xSInzRLYUjqK4ZH5JJM5Lw0+nIGo=;
-	h=From:Subject:Date;
-	b=fXkQH3GNAG6I21/sW5nn+7RbjxrfgLcjiRF9O+kYGle4LDdG62WMQxiK6BTnBjUgn
-	 F+L0Rf53K21KwsxglBy9yYjeGTZ0sAX1TNW4Kh4e87NUg2VJxIWZRiEtptWLRfDuQR
-	 rWkD890P2irqzq8PHyI8Er0WaHAuMzkUazk6x+JQRg9ZO0lCFMwa9XB2wjmspr+8rN
-	 ggMqZo5eSpb8Im2UfNuCxOud9NIJI1fJX1V8ujpbnS7KScjWxX9tvv3gSffLMdIyF5
-	 iEVHjHRXeW4nwevf60zuKRdPjmgkudDDFCwSoBP853bDHn/bKOssBxZaTJTJrT0/0L
-	 klobBvRfVOVmQ==
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To: Linux PM <linux-pm@vger.kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Lukasz Luba <lukasz.luba@arm.com>, Zhang Rui <rui.zhang@intel.com>,
- Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Subject:
- [PATCH v3 10/14] mlxsw: core_thermal:  Use the .should_bind() thermal zone
- callback
-Date: Mon, 19 Aug 2024 18:24:37 +0200
-Message-ID: <2216931.Icojqenx9y@rjwysocki.net>
-In-Reply-To: <2205737.irdbgypaU6@rjwysocki.net>
-References: <2205737.irdbgypaU6@rjwysocki.net>
+	s=arc-20240116; t=1724084749; c=relaxed/simple;
+	bh=6XxkigOfuCbJlQQVAQiT2aYyWek7LFQ5hykiafNBtmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ciofi5gxzrx1bOaWdSwi392GJNMcM1SfNqsKWyGj++OVhldd71Wf6L4dyrmeFz5qT+2T7W3tYyx0d95U5pAmNXxD/MlW1cT3r32zneLy4EUwDrmePv/J4JBssEjVjsq9OxGu8jIwZDrTti6dfoVXeKLLo4ievFkREBodcL6BmWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eA/sQj3L; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=b6YXkPOTUa3JYX7NS6++iAqKi6WZLW33mJcAC68c/aQ=; b=eA/sQj3L4dx61TeWW+1Ieam7UM
+	iiFyzVTVPpDBMBN7ion/8snl2iZoZb6HhydAdXd6FIk6w2X7Cm3P2vvzIz2oOhgLZNR36hpCipNvN
+	nV3yt4VlrQFwTv3FAyeiTt9y6xtdOFH6nZyZMoQqxnuBfUOW9C32AJTlREswBdcX4c8A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sg5CN-0058KP-LY; Mon, 19 Aug 2024 18:25:39 +0200
+Date: Mon, 19 Aug 2024 18:25:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Shane Francis <bigbeeshane@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [BUG] net: stmmac: crash within stmmac_rx()
+Message-ID: <1233c766-0260-497d-8700-87f0f76d2bcd@lunn.ch>
+References: <CABnpCuCLN6VNgmoWHwc4_8AT34xqmQnEoUHLncvE2yLqYZBaKg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"
-X-CLIENT-IP: 195.136.19.94
-X-CLIENT-HOSTNAME: 195.136.19.94
-X-VADE-SPAMSTATE: spam:low
-X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeeftddruddugedguddtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfjqffogffrnfdpggftiffpkfenuceurghilhhouhhtmecuudehtdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegoufhprghmkfhpucdlfedttddmnecujfgurhephffvvefufffkjghfggfgtgesthfuredttddtjeenucfhrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqeenucggtffrrghtthgvrhhnpeefudduuedtuefgleffudeigeeitdeufeelvdejgefftdethffhhfethfeljefgteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeduleehrddufeeirdduledrleegnecuufhprghmkfhppeduleehrddufeeirdduledrleegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelhedrudefiedrudelrdelgedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedpnhgspghrtghpthhtohepjedprhgtphhtthhopehlihhnuhigqdhpmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhdr
- lhgviigtrghnoheslhhinhgrrhhordhorhhgpdhrtghpthhtoheplhhukhgrshiirdhluhgsrgesrghrmhdrtghomhdprhgtphhtthhopehruhhirdiihhgrnhhgsehinhhtvghlrdgtohhmpdhrtghpthhtohepihguohhstghhsehnvhhiughirgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-DCC--Metrics: v370.home.net.pl 1024; Body=14 Fuz1=14 Fuz2=14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABnpCuCLN6VNgmoWHwc4_8AT34xqmQnEoUHLncvE2yLqYZBaKg@mail.gmail.com>
 
-From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+On Mon, Aug 19, 2024 at 01:26:37PM +0100, Shane Francis wrote:
+> Summary of the problem:
+> ===================
+> Crash observed within stmmac_rx when under high RX demand
+> 
+> Hardware : Rockchip RK3588 platform with an RTL8211F NIC
+> 
+> the issue seems identical to the one described here :
+> https://lore.kernel.org/netdev/20210514214927.GC1969@qmqm.qmqm.pl/T/
+> 
+> Full description of the problem/report:
+> =============================
+> I have observed that when under high upload scenarios the stmmac
+> driver will crash due to what I think is an overflow error, after some
+> debugging I found that stmmac_rx_buf2_len() is returning an
+> unexpectedly high value and assigning to buf2_len here
+> https://github.com/torvalds/linux/blob/v6.6/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L5466
+> 
+> an example value set that i have observed to causes the crash :
+>     buf1_len = 0
+>     buf2_len = 4294966330
+> 
+> from within the stmmac_rx_buf2_len function
+>     plen = 2106
+>     len = 3072
+> 
+> the return value would be plen-len or -966 (4294966330 as a uint32
+> that matches the buf2_len)
+> 
+> I am unsure on how to debug this further, would clamping
+> stmmac_rx_buf2_len function to return the dma_buf_sz if the return
+> value would have otherwise exceeded it ?
 
-Make the mlxsw core_thermal driver use the .should_bind() thermal zone
-callback to provide the thermal core with the information on whether or
-not to bind the given cooling device to the given trip point in the
-given thermal zone.  If it returns 'true', the thermal core will bind
-the cooling device to the trip and the corresponding unbinding will be
-taken care of automatically by the core on the removal of the involved
-thermal zone or cooling device.
+Clamping will just paper over the problem, not fix it. You need to
+keep debugging to really understand what the issue is.
 
-It replaces the .bind() and .unbind() thermal zone callbacks (in 3
-places) which assumed the same trip points ordering in the driver
-and in the thermal core (that may not be true any more in the
-future).  The .bind() callbacks used loops over trip point indices
-to call thermal_zone_bind_cooling_device() for the same cdev (once
-it had been verified) and all of the trip points, but they passed
-different 'upper' and 'lower' values to it for each trip.
+Clearly len > plen is a problem, so you could add a BUG_ON(len > plen)
+which will give you a stack trace. But i doubt that is very
+interesting. You probably want to get into stmmac_get_rx_frame_len()
+and see how it calculates plan. stmmac obfustication makes it hard to
+say which of:
 
-To retain the original functionality, the .should_bind() callbacks
-need to use the same 'upper' and 'lower' values that would be used
-by the corresponding .bind() callbacks when they are about to return
-'true'.  To that end, the 'priv' field of each trip is set during the
-thermal zone initialization to point to the corresponding 'state'
-object containing the maximum and minimum cooling states of the
-cooling device.
+dwmac4_descs.c:	.get_rx_frame_len = dwmac4_wrback_get_rx_frame_len,
+dwxgmac2_descs.c:	.get_rx_frame_len = dwxgmac2_get_rx_frame_len,
+enh_desc.c:	.get_rx_frame_len = enh_desc_get_rx_frame_len,
+norm_desc.c:	.get_rx_frame_len = ndesc_get_rx_frame_len,
 
-Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
+is being used. But they all look pretty similar.
 
-v2 -> v3:
-   * Add R-by from Ido
-   * Reorder (previously [13/17])
+What i find interesting is that both are greater than 1512, a typical
+ethernet frame size. Are you using jumbo packets? Is the hardware
+doing some sort of GRO?
 
-v1 -> v2:
-   * Fix typo in the changelog.
-   * Do not move the mlxsw_thermal_ops definition.
-   * Change ordering of local variables in mlxsw_thermal_module_should_bind().
-
-This patch only depends on the [06/14] introducing the .should_bind()
-thermal zone callback:
-
-https://lore.kernel.org/linux-pm/9334403.CDJkKcVGEf@rjwysocki.net/
-
----
- drivers/net/ethernet/mellanox/mlxsw/core_thermal.c |  115 +++++----------------
- 1 file changed, 31 insertions(+), 84 deletions(-)
-
-Index: linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-===================================================================
---- linux-pm.orig/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-+++ linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-@@ -165,52 +165,22 @@ static int mlxsw_get_cooling_device_idx(
- 	return -ENODEV;
- }
- 
--static int mlxsw_thermal_bind(struct thermal_zone_device *tzdev,
--			      struct thermal_cooling_device *cdev)
-+static bool mlxsw_thermal_should_bind(struct thermal_zone_device *tzdev,
-+				      const struct thermal_trip *trip,
-+				      struct thermal_cooling_device *cdev,
-+				      struct cooling_spec *c)
- {
- 	struct mlxsw_thermal *thermal = thermal_zone_device_priv(tzdev);
--	struct device *dev = thermal->bus_info->dev;
--	int i, err;
-+	const struct mlxsw_cooling_states *state = trip->priv;
- 
- 	/* If the cooling device is one of ours bind it */
- 	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
--		return 0;
--
--	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
--		const struct mlxsw_cooling_states *state = &thermal->cooling_states[i];
--
--		err = thermal_zone_bind_cooling_device(tzdev, i, cdev,
--						       state->max_state,
--						       state->min_state,
--						       THERMAL_WEIGHT_DEFAULT);
--		if (err < 0) {
--			dev_err(dev, "Failed to bind cooling device to trip %d\n", i);
--			return err;
--		}
--	}
--	return 0;
--}
--
--static int mlxsw_thermal_unbind(struct thermal_zone_device *tzdev,
--				struct thermal_cooling_device *cdev)
--{
--	struct mlxsw_thermal *thermal = thermal_zone_device_priv(tzdev);
--	struct device *dev = thermal->bus_info->dev;
--	int i;
--	int err;
-+		return false;
- 
--	/* If the cooling device is our one unbind it */
--	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
--		return 0;
-+	c->upper = state->max_state;
-+	c->lower = state->min_state;
- 
--	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
--		err = thermal_zone_unbind_cooling_device(tzdev, i, cdev);
--		if (err < 0) {
--			dev_err(dev, "Failed to unbind cooling device\n");
--			return err;
--		}
--	}
--	return 0;
-+	return true;
- }
- 
- static int mlxsw_thermal_get_temp(struct thermal_zone_device *tzdev,
-@@ -240,57 +210,27 @@ static struct thermal_zone_params mlxsw_
- };
- 
- static struct thermal_zone_device_ops mlxsw_thermal_ops = {
--	.bind = mlxsw_thermal_bind,
--	.unbind = mlxsw_thermal_unbind,
-+	.should_bind = mlxsw_thermal_should_bind,
- 	.get_temp = mlxsw_thermal_get_temp,
- };
- 
--static int mlxsw_thermal_module_bind(struct thermal_zone_device *tzdev,
--				     struct thermal_cooling_device *cdev)
-+static bool mlxsw_thermal_module_should_bind(struct thermal_zone_device *tzdev,
-+					     const struct thermal_trip *trip,
-+					     struct thermal_cooling_device *cdev,
-+					     struct cooling_spec *c)
- {
- 	struct mlxsw_thermal_module *tz = thermal_zone_device_priv(tzdev);
-+	const struct mlxsw_cooling_states *state = trip->priv;
- 	struct mlxsw_thermal *thermal = tz->parent;
--	int i, j, err;
- 
- 	/* If the cooling device is one of ours bind it */
- 	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
--		return 0;
--
--	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
--		const struct mlxsw_cooling_states *state = &tz->cooling_states[i];
-+		return false;
- 
--		err = thermal_zone_bind_cooling_device(tzdev, i, cdev,
--						       state->max_state,
--						       state->min_state,
--						       THERMAL_WEIGHT_DEFAULT);
--		if (err < 0)
--			goto err_thermal_zone_bind_cooling_device;
--	}
--	return 0;
--
--err_thermal_zone_bind_cooling_device:
--	for (j = i - 1; j >= 0; j--)
--		thermal_zone_unbind_cooling_device(tzdev, j, cdev);
--	return err;
--}
--
--static int mlxsw_thermal_module_unbind(struct thermal_zone_device *tzdev,
--				       struct thermal_cooling_device *cdev)
--{
--	struct mlxsw_thermal_module *tz = thermal_zone_device_priv(tzdev);
--	struct mlxsw_thermal *thermal = tz->parent;
--	int i;
--	int err;
-+	c->upper = state->max_state;
-+	c->lower = state->min_state;
- 
--	/* If the cooling device is one of ours unbind it */
--	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
--		return 0;
--
--	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
--		err = thermal_zone_unbind_cooling_device(tzdev, i, cdev);
--		WARN_ON(err);
--	}
--	return err;
-+	return true;
- }
- 
- static int mlxsw_thermal_module_temp_get(struct thermal_zone_device *tzdev,
-@@ -313,8 +253,7 @@ static int mlxsw_thermal_module_temp_get
- }
- 
- static struct thermal_zone_device_ops mlxsw_thermal_module_ops = {
--	.bind		= mlxsw_thermal_module_bind,
--	.unbind		= mlxsw_thermal_module_unbind,
-+	.should_bind	= mlxsw_thermal_module_should_bind,
- 	.get_temp	= mlxsw_thermal_module_temp_get,
- };
- 
-@@ -342,8 +281,7 @@ static int mlxsw_thermal_gearbox_temp_ge
- }
- 
- static struct thermal_zone_device_ops mlxsw_thermal_gearbox_ops = {
--	.bind		= mlxsw_thermal_module_bind,
--	.unbind		= mlxsw_thermal_module_unbind,
-+	.should_bind	= mlxsw_thermal_module_should_bind,
- 	.get_temp	= mlxsw_thermal_gearbox_temp_get,
- };
- 
-@@ -451,6 +389,7 @@ mlxsw_thermal_module_init(struct device
- 			  struct mlxsw_thermal_area *area, u8 module)
- {
- 	struct mlxsw_thermal_module *module_tz;
-+	int i;
- 
- 	module_tz = &area->tz_module_arr[module];
- 	/* Skip if parent is already set (case of port split). */
-@@ -465,6 +404,8 @@ mlxsw_thermal_module_init(struct device
- 	       sizeof(thermal->trips));
- 	memcpy(module_tz->cooling_states, default_cooling_states,
- 	       sizeof(thermal->cooling_states));
-+	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++)
-+		module_tz->trips[i].priv = &module_tz->cooling_states[i];
- }
- 
- static void mlxsw_thermal_module_fini(struct mlxsw_thermal_module *module_tz)
-@@ -579,7 +520,7 @@ mlxsw_thermal_gearboxes_init(struct devi
- 	struct mlxsw_thermal_module *gearbox_tz;
- 	char mgpir_pl[MLXSW_REG_MGPIR_LEN];
- 	u8 gbox_num;
--	int i;
-+	int i, j;
- 	int err;
- 
- 	mlxsw_reg_mgpir_pack(mgpir_pl, area->slot_index);
-@@ -606,6 +547,9 @@ mlxsw_thermal_gearboxes_init(struct devi
- 		       sizeof(thermal->trips));
- 		memcpy(gearbox_tz->cooling_states, default_cooling_states,
- 		       sizeof(thermal->cooling_states));
-+		for (j = 0; j < MLXSW_THERMAL_NUM_TRIPS; j++)
-+			gearbox_tz->trips[j].priv = &gearbox_tz->cooling_states[j];
-+
- 		gearbox_tz->module = i;
- 		gearbox_tz->parent = thermal;
- 		gearbox_tz->slot_index = area->slot_index;
-@@ -722,6 +666,9 @@ int mlxsw_thermal_init(struct mlxsw_core
- 	thermal->bus_info = bus_info;
- 	memcpy(thermal->trips, default_thermal_trips, sizeof(thermal->trips));
- 	memcpy(thermal->cooling_states, default_cooling_states, sizeof(thermal->cooling_states));
-+	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++)
-+		thermal->trips[i].priv = &thermal->cooling_states[i];
-+
- 	thermal->line_cards[0].slot_index = 0;
- 
- 	err = mlxsw_reg_query(thermal->core, MLXSW_REG(mfcr), mfcr_pl);
-
-
-
+      Andrew
 
