@@ -1,68 +1,70 @@
-Return-Path: <netdev+bounces-119672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC9D9568FB
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:07:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CCEA9568FC
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 635961C2156D
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:07:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07CC1F22E0D
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5131667C2;
-	Mon, 19 Aug 2024 11:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74ECC1662EC;
+	Mon, 19 Aug 2024 11:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LdBfj9Oe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Sb3jLBXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AE6166318
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9957615535B
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724065594; cv=none; b=DByrZUOd633FMlQtRhv4cYGH/9ZuxUKP2zUqMxJ0rnPVA6ve2vtgy50BwEn4LBVlqfJuXydgjU5wrevkX3ToMHjs1LAqUgbaM6UbqwLdX8mycPyVP3c+dWpme3xIrRQRcS6n6+TfZ7gwZqFqBtvPf+Pwgd8Bl/5OxOCZ+5JZpkQ=
+	t=1724065601; cv=none; b=Li5dE+/gjBvoK39rkqqS2QlN83GTvl0j1pzkFjIDYuYjzLo2QKmqM0IQWTTVcTI70ecCZLYJIaRDyRqRAhXBV8qx9uarMmKWKmDOQt9wxifcuwawTiS0rVqBM+Irrnth31wB88KXQmWsw6j2Rc4RbKf5nYQeAF0fYAn4D8VnCbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724065594; c=relaxed/simple;
-	bh=GGSo+oioPJd5pCibS8o1K0y/bCRre+gZJC3nbaun8qw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kqPdgojsyJ1v9M0zYrmDgLOu5b29ib224wIqABLZUmyd5rLlPUwa6b0WcWkd+V+CpX2AfpF/L/Dmds0b68hECoMv8AAHEjmmaLhs8/gndZsGKmWu5ExKggZ76BtVoiCyfWByfRCOkAcZDj30gCxpkh5SGmmO8FMxXHJvIeGkqkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LdBfj9Oe; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1724065601; c=relaxed/simple;
+	bh=xEAPvojJgqvr6PvJJHtBhFBxIdKTGTScam8mW+yLFYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XMQK1ARAD+4mIfwsKhzzQ3pFCj/g5ppzjkBZrBrk6sqG6FbALNM5YqSM+kwAzx5f16HS/zpjHJeheH5OKB6JmKKb2WezC6dxir7a9rbVn/0lNmAaQfL9pHkHQ2Vu/fGsXSH0lgapY7Gk6d2Afz7n+HST9n7Gu5ESdiT7q5k38QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Sb3jLBXJ; arc=none smtp.client-ip=209.85.160.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-44ff7cc5432so32875551cf.3
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 04:06:32 -0700 (PDT)
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-44fe58fcf2bso25832691cf.2
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 04:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724065591; x=1724670391; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=m7vNWvfsSX0MUcWWRVZHBIIv5oFl0x4bbuu1/Fj1paQ=;
-        b=LdBfj9OeEdh6bbe/3gdk0ZfeWXPfizkFncg2ezEt7uDlhHeZDZoZxzcYRBujti4u5B
-         oRaj7Zy1FfxC0GS4jVoyZdouLr649UFvpRGpr6l6UvCuCBDDJsJ7EDOHhol5xwtL6sON
-         UReeHDfK1mIisIPB0WNZxnpjhcZ3VPlPtHFjo=
+        d=broadcom.com; s=google; t=1724065598; x=1724670398; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZGFDxagONzXz7FVMHRPtOUOk+m8UJRKia/lDd9q95E=;
+        b=Sb3jLBXJAMOO3RrLQMemU85bJX4l6J032RJC7mmctYAn7lkoGAv/bBTJlDrSgeTWwf
+         eN+T8jQHVXaqw7MRt+eP95dp8MixtlRqgyp8b0GP1xh0qGvAp73LEPC1x/wKkg9ztXu4
+         G2yVly+KN2BBifN7jF++5bCQY80rTa9FtEqmk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724065591; x=1724670391;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m7vNWvfsSX0MUcWWRVZHBIIv5oFl0x4bbuu1/Fj1paQ=;
-        b=FEGbfWAXoRlR6EHR4It7PcESkDwuZT4hdVGvq4+y/sn2TZeNsTjDDCEdFGO+687xLu
-         /JQfTnXV2Oho9Z36qxVkKKrXa3fH9iIyrCg8HLtlZaWykLRyl9zvWaocowU1vPDsEZKM
-         LJTuiz1UdUmEoH/Xjl5YmbEaxIlysF9xeW29KaBxOt/mQmR5/+KJQ7tphfSdTMW7c8LL
-         cpAUE1YQVLUrHhgqyqucvfUpmrI+K1/e/CRZB3FRv/X0YeRS6IcGCFgiUkZojl0naov7
-         V1T3Tzp0E4NsjWxoalMD8N+x2nTguBAqIHyfNa0gVabGaRyIO8cLnVpK4lIJqlxTy67m
-         pp2Q==
-X-Gm-Message-State: AOJu0YwuwG7H0uHt9Ed1z051bkAd2f0bgXcH3bV94g9ypEooETWszdxZ
-	uf9+RK9PfATw7uFm+c/P+3TBq9uYiwsAToSkazrTt1jDMshB+RiX+vbNAhhBCdTI+y9jOxxhXCs
-	gGjiW1RAYZqTT2XhtUiIsta54xivccEWqjWNC6F1tp86QRxJqYw/R/vzysEVuN8rfSGAfvXARdc
-	Fnwvw5+ewkcKVYnNbpe1bgtQv05YXr0917TGIxM8OwrIlUs+IR
-X-Google-Smtp-Source: AGHT+IGXWbsIdyFfXIkoN4dRfEksACFVFr7ukp6Eg7fVS92nfQCiuCp/XRgimz/jmJPhemlOEBp4pw==
-X-Received: by 2002:a05:622a:5e16:b0:446:39f9:1491 with SMTP id d75a77b69052e-4537435a20cmr134746501cf.42.1724065591364;
-        Mon, 19 Aug 2024 04:06:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724065598; x=1724670398;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZZGFDxagONzXz7FVMHRPtOUOk+m8UJRKia/lDd9q95E=;
+        b=GShrYaaD74g98TY/xRkPhwGGAipKqgX33y4bLET7ZHmqKXlGkq5ZI8w2Vieoq8jMyO
+         +YF1D4AXYDYdRAqKVkru5BJ7y4y1r/7RsbpjrLvs7ZOReAX49U6UQhjcCzlzZb6KmpTF
+         Lnx9yMhKSCsNz5pbgshDeA0qabHXeaswVGsKV/LmnR3E+41W8GdaBWWk1/2/k2OQ/Lo/
+         NQwG9guY2wktThf/KcHeaFtTltoJskIvTAQ38MjVKQFNOMhLYiXzLofEuPv8TMz5CXNa
+         5FgVW11suIHVfj3b2c04Elu8XjIHkAVm/m4oAvc8eoLjkcK8JZvEbCrTOMsaLHk76Yd8
+         pYwA==
+X-Gm-Message-State: AOJu0YxXd1GOdlZnBD+2+IszZ529ByuzdRkrmgpOEb1CoubkOqnZEDf1
+	Jn30eFH053PAAtJlNjg/uMBn62TqRqV9KoWiMBju1K5Sb1xVH5wxI7LVzQrQ+h/Rafu6m43GrYP
+	hMS/UV7mDMPDT48hE5cqe3hwq58aZrWnmS7NJ1wmBViuxnNA/A4ScG85ld2IaDofHl6zHJZ1dj3
+	bV1H24ES5ACmhJfFCIo3EIwEcSo+Hzfe9UGdCAjTSv51gnO2sW
+X-Google-Smtp-Source: AGHT+IFXBuSSPVIEHAX7lrVuAdoXkNg0kj1cCNyYxaj2XgTLVCLTRZwtxYlg0aWhbKB+AahSw6a6TA==
+X-Received: by 2002:a05:622a:4ac9:b0:44f:dd14:5cd0 with SMTP id d75a77b69052e-453742facb4mr150315491cf.35.1724065597615;
+        Mon, 19 Aug 2024 04:06:37 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.250.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4536a072237sm38751911cf.86.2024.08.19.04.06.25
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4536a072237sm38751911cf.86.2024.08.19.04.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 04:06:30 -0700 (PDT)
+        Mon, 19 Aug 2024 04:06:37 -0700 (PDT)
 From: Boris Sukholitko <boris.sukholitko@broadcom.com>
 To: netdev@vger.kernel.org,
 	Martin KaFai Lau <martin.lau@linux.dev>,
@@ -97,10 +99,12 @@ To: netdev@vger.kernel.org,
 	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
 	Ido Schimmel <idosch@idosch.org>
 Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
-Subject: [PATCH net-next v3 0/3] tc: adjust network header after 2nd vlan push
-Date: Mon, 19 Aug 2024 14:06:06 +0300
-Message-ID: <20240819110609.101250-1-boris.sukholitko@broadcom.com>
+Subject: [PATCH net-next v3 1/3] tc: adjust network header after 2nd vlan push
+Date: Mon, 19 Aug 2024 14:06:07 +0300
+Message-ID: <20240819110609.101250-2-boris.sukholitko@broadcom.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20240819110609.101250-1-boris.sukholitko@broadcom.com>
+References: <20240819110609.101250-1-boris.sukholitko@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -264,35 +268,76 @@ semantics in the skb_vlan_push function. We do this by manipulating
 skb->network_header rather than skb->mac_len. skb_vlan_push callers are
 updated to do skb_reset_mac_len.
 
-More about the patch series:
+Signed-off-by: Boris Sukholitko <boris.sukholitko@broadcom.com>
+---
+ net/core/filter.c         | 1 +
+ net/core/skbuff.c         | 2 +-
+ net/openvswitch/actions.c | 8 ++++++--
+ net/sched/act_vlan.c      | 1 +
+ 4 files changed, 9 insertions(+), 3 deletions(-)
 
-* patch 1 fixes skb_vlan_push and the callers
-* patch 2 adds ingress tc_actions test
-* patch 3 adds egress tc_actions test
-
-Thanks,
-Boris.
-
-v3:
-    - rewrite to fix skb_vlan_push amending the callers
-    - fix ingress tc_actions test as suggested by Ido
-    - add egress tc_actions test
-
-v2:
-    - add test to tc_actions.sh
-
-Boris Sukholitko (3):
-  tc: adjust network header after 2nd vlan push
-  selftests: tc_actions: test ingress 2nd vlan push
-  selftests: tc_actions: test egress 2nd vlan push
-
- net/core/filter.c                             |  1 +
- net/core/skbuff.c                             |  2 +-
- net/openvswitch/actions.c                     |  8 +++-
- net/sched/act_vlan.c                          |  1 +
- .../selftests/net/forwarding/tc_actions.sh    | 46 ++++++++++++++++++-
- 5 files changed, 54 insertions(+), 4 deletions(-)
-
+diff --git a/net/core/filter.c b/net/core/filter.c
+index f3c72cf86099..74d2c906f35a 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -3189,6 +3189,7 @@ BPF_CALL_3(bpf_skb_vlan_push, struct sk_buff *, skb, __be16, vlan_proto,
+ 	bpf_push_mac_rcsum(skb);
+ 	ret = skb_vlan_push(skb, vlan_proto, vlan_tci);
+ 	bpf_pull_mac_rcsum(skb);
++	skb_reset_mac_len(skb);
+ 
+ 	bpf_compute_data_pointers(skb);
+ 	return ret;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index de2a044cc665..2c8f6f34c545 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6244,7 +6244,7 @@ int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
+ 			return err;
+ 
+ 		skb->protocol = skb->vlan_proto;
+-		skb->mac_len += VLAN_HLEN;
++		skb->network_header -= VLAN_HLEN;
+ 
+ 		skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
+ 	}
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index 101f9a23792c..16e260014684 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -237,14 +237,18 @@ static int pop_vlan(struct sk_buff *skb, struct sw_flow_key *key)
+ static int push_vlan(struct sk_buff *skb, struct sw_flow_key *key,
+ 		     const struct ovs_action_push_vlan *vlan)
+ {
++	int err;
++
+ 	if (skb_vlan_tag_present(skb)) {
+ 		invalidate_flow_key(key);
+ 	} else {
+ 		key->eth.vlan.tci = vlan->vlan_tci;
+ 		key->eth.vlan.tpid = vlan->vlan_tpid;
+ 	}
+-	return skb_vlan_push(skb, vlan->vlan_tpid,
+-			     ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK);
++	err = skb_vlan_push(skb, vlan->vlan_tpid,
++			    ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK);
++	skb_reset_mac_len(skb);
++	return err;
+ }
+ 
+ /* 'src' is already properly masked. */
+diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
+index 22f4b1e8ade9..9e2dbde3cc29 100644
+--- a/net/sched/act_vlan.c
++++ b/net/sched/act_vlan.c
+@@ -96,6 +96,7 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
+ 	if (skb_at_tc_ingress(skb))
+ 		skb_pull_rcsum(skb, skb->mac_len);
+ 
++	skb_reset_mac_header(skb);
+ 	return action;
+ 
+ drop:
 -- 
 2.42.0
 
