@@ -1,123 +1,79 @@
-Return-Path: <netdev+bounces-119829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5280195729A
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:02:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A029572A7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2945B23B3C
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:02:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADC281F23EDF
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3478B1684B9;
-	Mon, 19 Aug 2024 18:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F55188CD6;
+	Mon, 19 Aug 2024 18:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oP9L5NWg"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="NClCAvsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-8fa8.mail.infomaniak.ch (smtp-8fa8.mail.infomaniak.ch [83.166.143.168])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F301CAAF
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BD1188CDB
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.168
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724090553; cv=none; b=DJpKzya7TSNVmF9jhIhoaXrl0PTRBUxQprKzBNQcUKTrRX1D1ReCxv2//hlvXU3ACXa3l7uiyaSDGUEByicmboN8BBifQ1PkunMHufr+zaDls4UY1E2kQo/VwqIBSGcKrGfSDBj0Ms7kvF0+GpKZjfKCFjuPJFKIWse4caurTbQ=
+	t=1724090721; cv=none; b=IeRxqHsXl896tjbdg2ddpmrFDgeO0sj7xNkrTpjsbXWQ+6LZcbexfwLNG8i/NC0C6KBLdemCYgP7uy2Svi29fW/IWzPZdo+8pskwHcICLC2Q5DlRTu0ZOU1nyz0HWhLf95KuYLHhl3vAA2Qdzwn03Hy+IYPUea7VJ4ots5lzdLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724090553; c=relaxed/simple;
-	bh=VRHvAPebFfAseq2Kh6Ourg3/SmDHKbiJt3OL0yoVPy8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A9jMgdpIFctU5m+21osrBS+8cCzfp3hwq3u4Kbz8YlGh9C63APlhriSgJRQWpspLmMkKfUMlo77ZQsTgrStor0k/D+QFOO3N2jSHd3EV88mib1QmkdDcRZbT/fw558ERk/47HktU0fOM+V2KuvJByYYPNdoQf/bnLQaJRLKmxeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oP9L5NWg; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1724090552; x=1755626552;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xHLpj1LacH5tXh0997nWcZ7XkkBOQK3Ty8dP15MnlR4=;
-  b=oP9L5NWg3q2gpqGPLqwzz+fXkvif8jmg+f2TvGJVw6wB0Ly0tuD4bVTb
-   yM3/DJvujqmNBHMStw76AV//ahARh1bJZGRvMaa4tv9HQ2Y0dtb5KZ/pi
-   J5ntLjJ/AjE3pbf6WvvY+WgCuCz0C9HS74pFb4OOMmyYuVob+K9nDOt1+
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.10,159,1719878400"; 
-   d="scan'208";a="418072097"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 18:02:28 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:58375]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.153:2525] with esmtp (Farcaster)
- id d0213244-1b06-4e81-bcd2-e6e134952706; Mon, 19 Aug 2024 18:02:27 +0000 (UTC)
-X-Farcaster-Flow-ID: d0213244-1b06-4e81-bcd2-e6e134952706
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 19 Aug 2024 18:02:27 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 19 Aug 2024 18:02:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com>,
-	<tom@herbertland.com>
-Subject: Re: [PATCH v1 net] kcm: Serialise kcm_sendmsg() for the same socket.
-Date: Mon, 19 Aug 2024 11:02:16 -0700
-Message-ID: <20240819180216.15865-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iK60jxsJCzq29WPSZJnYNHHpPS09_ZmSi1JHmbkZ2GznA@mail.gmail.com>
-References: <CANn89iK60jxsJCzq29WPSZJnYNHHpPS09_ZmSi1JHmbkZ2GznA@mail.gmail.com>
+	s=arc-20240116; t=1724090721; c=relaxed/simple;
+	bh=o35qCvEZbu4T5kA4SvRlTOdbqIKV9iz8xf1om4OGwIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S4WRFaA7eU3mPeAhbvaPMLYgJJLc1kIDX9wa8Q3Z0XhQr6ytMXu+Erj7OQ/JvwF4422vSvPcYf6vSSf4a0M5yJFxvX24BgoSKGiLsAxnN86nZ+/1uUcpgG56cQEkCzR654wxuTb5Prc6Dn1Lg8yPEyM3pBypPCmvmybfYkRdWXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=NClCAvsR; arc=none smtp.client-ip=83.166.143.168
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WngKk3dMMzxMs;
+	Mon, 19 Aug 2024 19:57:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1724090250;
+	bh=Mkv7N3eK+fsZD7USRF4qFft68VEC4BZLCWR/hmSXw0g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NClCAvsRfZN0erdn5kwTp7MikRRs9KgfMhRrRWHxPHG6afsYPRuJe3pZMUds/pkJw
+	 W6WZCKmnvwHsIEHemS2lzqHUixQdgw8HdKs7xrdB8AcebslnEufnL++Q/mYWXvaxCj
+	 3ioiU8Otfy+lyH06pHvw2peza0KgU1Gf9Tf0QYto=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WngKj30pnzgrn;
+	Mon, 19 Aug 2024 19:57:29 +0200 (CEST)
+Date: Mon, 19 Aug 2024 19:57:26 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/6] Landlock: Adding file_send_sigiotask signal
+ scoping support
+Message-ID: <20240819.eiDie8sienah@digikod.net>
+References: <cover.1723680305.git.fahimitahera@gmail.com>
+ <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 19 Aug 2024 17:56:55 +0200
-> On Fri, Aug 16, 2024 at 12:04 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > syzkaller reported UAF in kcm_release(). [0]
-> >
-> > The scenario is
-> >
-> >   1. Thread A builds a skb with MSG_MORE and sets kcm->seq_skb.
-> >
-> >   2. Thread A resumes building skb from kcm->seq_skb but is blocked
-> >      by sk_stream_wait_memory()
-> >
-> >   3. Thread B calls sendmsg() concurrently, finishes building kcm->seq_skb
-> >      and puts the skb to the write queue
-> >
-> >   4. Thread A faces an error and finally frees skb that is already in the
-> >      write queue
-> >
-> >   5. kcm_release() does double-free the skb in the write queue
-> >
-> > When a thread is building a MSG_MORE skb, another thread must not touch it.
-> >
-> > Let's add a per-sk mutex and serialise kcm_sendmsg().
-> >
-> >
-> > Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
-> > Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
-> > Tested-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> 
-> I wonder if anyone is using KCM....
+On Thu, Aug 15, 2024 at 12:29:21PM -0600, Tahera Fahimi wrote:
+> This patch adds two new hooks "hook_file_set_fowner" and
+> "hook_file_free_security" to set and release a pointer to the
+> domain of the file owner. This pointer "fown_domain" in
+> "landlock_file_security" will be used in "file_send_sigiotask"
+> to check if the process can send a signal.
 
-Same impression :)
-Maybe it's time to remove KCM.
-https://lore.kernel.org/netdev/CALx6S37hSfQWw3Rku8vsavn8ejk0fndRk+=-=73gU7G-RbnK8Q@mail.gmail.com/
+We need to make sure this file_send_sigiotask hook is useful and can be
+triggered by user space code.  Currently, all tests pass without this
+patch.
 
