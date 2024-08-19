@@ -1,107 +1,241 @@
-Return-Path: <netdev+bounces-119688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 659FA95697E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1ED956987
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F47A1F2250A
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:40:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABD8C1F223D7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A5166F01;
-	Mon, 19 Aug 2024 11:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56D7166F0D;
+	Mon, 19 Aug 2024 11:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aG1c9G9y"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="kvpFPjnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-ztdg10021801.me.com (pv50p00im-ztdg10021801.me.com [17.58.6.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F627157A48;
-	Mon, 19 Aug 2024 11:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4996A15ADB1
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724067643; cv=none; b=lzp4yA56ZKrnjTm+5QxFIdIJK43jjpRmOyaymQk9rfF/KZs52SMZPlTNPf6OPc7K8MRUZQyOjzk69yzDN0wWAIZ81uVnhTQbpbF3vsxYO6HC9J/3x2R7ijLZjA4TUK5s9bzFttggl5P3+l6r3mwNwHhMuZ6FfF1U43aXAz5tAXk=
+	t=1724067688; cv=none; b=EIbrj5qenVp6BRSth80SOvRN8NI1OucGRggu3Cq6oNJWzzZc3Dd6lKZeVdKJGitglsZn0rU42bW79rA84NbTUw954COa8GPtRBZnVTzs/xnzlt4yQUGwkeXs3O8cjCH453gXUYrtFD4/5AsoF5DzkBZiXYhnGXBQCL7bSVapWgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724067643; c=relaxed/simple;
-	bh=gV/zmEgbR6nXqHllg32Eb6Nn1O1SKGVRk7PnZngwO0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cxdcX5RLrgssXZlmIpS7GJK7GtRF01kst1fsYlw1U3mQQk/ubP4WBIllSc143gWs5GFIeMdjWRm0XIDAK6o5LkBgmRQ/VCX2BOShCtf8YBiGQMRWPs5R5FTtoByJgtGJZMowFLxglt0KilZv91O4jGVQ7bMxWJoDc6yqq8NGpl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aG1c9G9y; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a7a94478a4eso909437466b.1;
-        Mon, 19 Aug 2024 04:40:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724067640; x=1724672440; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L1LPhpIw6zUplYseeK4Y27omRELGjVo6B0WUUXO19x8=;
-        b=aG1c9G9ywCsKKEx6SsQMTgzQxLCEym08MmRm6zpRfuCCFdJEUmzK5zfqe/cPnnSj0V
-         DajWDXqn+G1YjVmLREqDqg8rbrNo9iC6Q8mX3ZHm1dJsToOl+f6Ec3NqwbItJT8Qeghp
-         wcFahB8r+LQ4sbQHosNZ2JwSv9/fpbe/gfnyQRoe0tKBku/Hvi+0YLdOGc2oZ/J78bRc
-         dVj10x2YXlIhkYZkliKcrjvWGuT7QUzNXAHUjJa+Fl8s4bcK/T28UKbanAWo1xkkbJno
-         7Rw6qmHC3vz7kVPsMS55XOIvIHGVnaAnhFkULfl1m4enoC/hocI5fmd64Z7ZmMXbmI3v
-         IngQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724067640; x=1724672440;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L1LPhpIw6zUplYseeK4Y27omRELGjVo6B0WUUXO19x8=;
-        b=gU7Krb58xm7X5QWgGnCT7h40n5woBBVHjhUPhFaQeSqnMH7yWc7fmMVrxyHIVYpZsL
-         710zNvEImxJBNikyX3bkYL/RGcUFSBG6WR5/dIEAS1A0ZTbW14vQWGOxIEHfeMqNp2Oq
-         r4tYnF6+cFbe58qFOeJL0i8FDj/kCJakehy7RUKFvY4t92q6oAvphSRDm9DHFwgj6iG/
-         XNAYCXBO5H19c3VYvI4k1st9wnPEUyUALK3Z6awaZ/t147GP5gYB/ZXeE7Kdor9vnEJN
-         esl4MEVPM5ig1zkANN9KaxeC0Frziq4zhbCTZeRXjFuJa7EVyFpod5/pU5eFP5pCsGa3
-         gacA==
-X-Forwarded-Encrypted: i=1; AJvYcCVADNMuDCBfXdGUclxZpYs5WCnrscibnBWx6kdD+igEPrO7ReHHDqaxsALCbqJNskeW+VWTScsAq0fAkdcCkzceSzC3LYlBbYTWhrXOGLQrCN7x0gpzegQWkwlc7WFqCRfE/vLj
-X-Gm-Message-State: AOJu0YzO8knZa7RRZiTRg1wEvVTyv5yWmFDzQ9uDhllk1ERodjkPBTc6
-	N3nugnY8Egsvo9qxBC3IClhZwHftT2BD7/u+WKBO4D60vgrfNm2N
-X-Google-Smtp-Source: AGHT+IF3kiosIQALUEVpVEF+AHu5uPDBEnwfKksdilsy2OZ6truteS3BEbGZJ5aRsdPuzaV7qhc0FA==
-X-Received: by 2002:a17:907:970b:b0:a7a:87c1:26c4 with SMTP id a640c23a62f3a-a8394e16cb8mr900443366b.17.1724067639927;
-        Mon, 19 Aug 2024 04:40:39 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c67d3sm624082966b.1.2024.08.19.04.40.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 04:40:39 -0700 (PDT)
-Date: Mon, 19 Aug 2024 14:40:36 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com
-Subject: Re: [PATCH net-next v3 7/7] net: stmmac: silence FPE kernel logs
-Message-ID: <20240819114036.af7gjv6j3p2r3c75@skbuf>
-References: <cover.1724051326.git.0x1207@gmail.com>
- <375534116912f13cb744c386e33c856c953b258b.1724051326.git.0x1207@gmail.com>
+	s=arc-20240116; t=1724067688; c=relaxed/simple;
+	bh=StiwBl7gcsKPM4QUqdzPmLaOQDatwYYOr4RXGOWzdJE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=j1j4XCSwOq9kFaYrP7RNf9LG3c6SvRu5jfCW0vT385zFprbnuRYZlS5FHCXh6IgwLx8XxkUtk3FYDGzhk4SZ935lVix7Mz2YxZxEAsz0gV3uSWF1Tzie63aSoa7XIQW1APTrOE+7mm266scLMs9tAti3/ysZdb6JBUgD0+atE/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=kvpFPjnz; arc=none smtp.client-ip=17.58.6.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1724067686;
+	bh=M3gESBvhy0PNBB/+wlGjnZP9di3TeOOVucipNeSD7H0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=kvpFPjnzBoAxLz8VSNgZ8WtfdAMsgcSvB0r6OYe49PS9D60oLV4fzsQXyz1gQDxHC
+	 zIikMIP1OzDNKQ11XoYMtszN0mKKYZYvdCKUtSXXfNEXGweQvgHGXIEpYdHUfcP1kW
+	 9HXcVSeN4AqQZTFg7LKN6YOxojU68qfwbYOpHNbJ0sben1gjHEajIuOR5SkL12xarW
+	 3NMp9OZ2fT2SiMMYgxO42t+PITCWrSBU2WYwm3f03iDtecwT8dlEdAHDhfyi+d2TOx
+	 yHlm1ohFRofzGG+bVuO9Nwdx0fPc0GCroVh6g5sZlIe9np/9MwmYpYeeTNoBtO9jjp
+	 n2h5OE4ZYDcyA==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10021801.me.com (Postfix) with ESMTPSA id 6F2BD20103D2;
+	Mon, 19 Aug 2024 11:41:19 +0000 (UTC)
+Message-ID: <25131af2-17f2-4e3d-a11f-247cb1c4fff4@icloud.com>
+Date: Mon, 19 Aug 2024 19:41:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <375534116912f13cb744c386e33c856c953b258b.1724051326.git.0x1207@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] firewire: core: Prevent device_find_child() from
+ modifying caller's match data
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
+ <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>, Timur Tabi <timur@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20240819085847.GA252819@workstation.local>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20240819085847.GA252819@workstation.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: PKojMI1yXK7Etn5C1lLExPn4o5PTW2nf
+X-Proofpoint-ORIG-GUID: PKojMI1yXK7Etn5C1lLExPn4o5PTW2nf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-19_10,2024-08-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ phishscore=0 spamscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
+ malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2408190078
 
-On Mon, Aug 19, 2024 at 03:25:20PM +0800, Furong Xu wrote:
-> ethtool --show-mm can get real-time state of FPE.
-> Those kernel logs should keep quiet.
+On 2024/8/19 16:58, Takashi Sakamoto wrote:
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
+> Hi,
+> 
+> On 2024/8/18 22:34, Zijun Hu wrote:
+>> On 2024/8/17 17:57, Takashi Sakamoto wrote:
+>>> ======== 8< --------
+>>>
+>>> From ceaa8a986ae07865eb3fec810de330e96b6d56e2 Mon Sep 17 00:00:00 2001
+>>> From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
+>>> Date: Sat, 17 Aug 2024 17:52:53 +0900
+>>> Subject: [PATCH] firewire: core: update fw_device outside of
+>>>  device_find_child()
+>>>
+>>> When detecting updates of bus topology, the data of fw_device is newly
+>>> allocated and caches the content of configuration ROM from the
+>>> corresponding node. Then, the tree of device is sought to find the
+>>> previous data of fw_device corresponding to the node, since in IEEE 1394
+>>> specification numeric node identifier could be changed dynamically every
+>>> generation of bus topology. If it is found, the previous data is updated
+>>> and reused, then the newly allocated data is going to be released.
+>>>
+>>> The above procedure is done in the call of device_find_child(), however it
+>>> is a bit abusing against the intention of the helper function, since the
+>>> call would not only find but also update.
+>>>
+>>> This commit splits the update outside of the call.
+>>> ---
+>>>  drivers/firewire/core-device.c | 109 ++++++++++++++++-----------------
+>>>  1 file changed, 54 insertions(+), 55 deletions(-)
+>>>
+>>> diff --git a/drivers/firewire/core-device.c b/drivers/firewire/core-device.c
+>>> index bc4c9e5a..62e8d839 100644
+>>> --- a/drivers/firewire/core-device.c
+>>> +++ b/drivers/firewire/core-device.c
+>>> ...
+>>> @@ -1038,6 +988,17 @@ int fw_device_set_broadcast_channel(struct device *dev, void *gen)
+>>>  	return 0;
+>>>  }
+>>>  
+>>> +static int compare_configuration_rom(struct device *dev, void *data)
+>>> +{
+>>> +	const struct fw_device *old = fw_device(dev);
+>>> +	const u32 *config_rom = data;
+>>> +
+>>> +	if (!is_fw_device(dev))
+>>> +		return 0;
+>>> +
+>>> +	return !!memcmp(old->config_rom, config_rom, 6 * 4);
+>>
+>> !memcmp(old->config_rom, config_rom, 6 * 4) ?
+> 
+> Indeed.
+> 
+>> is this extra condition old->state == FW_DEVICE_GONE required ?
+>>
+>> namely, is it okay for  below return ?
+>> return  !memcmp(old->config_rom, config_rom, 6 * 4) && old->state ==
+>> FW_DEVICE_GONE
+> 
+> If so, atomic_read() should be used, however I avoid it since the access
+> to state member happens twice in in the path to reuse the instance.
+> 
 
-These prints are equally useless?
-	netdev_info(priv->dev, "FPE workqueue start");
-	netdev_info(priv->dev, "FPE workqueue stop");
+it sounds good to not append the extra condition.
+
+>>> +}
+>>> +
+>>>  static void fw_device_init(struct work_struct *work)
+>>>  {
+>>>  	struct fw_device *device =
+>>> @@ -1071,13 +1032,51 @@ static void fw_device_init(struct work_struct *work)
+>>>  		return;
+>>>  	}
+>>>  
+>>> -	revived_dev = device_find_child(card->device,
+>>> -					device, lookup_existing_device);
+>>> +	// If a device was pending for deletion because its node went away but its bus info block
+>>> +	// and root directory header matches that of a newly discovered device, revive the
+>>> +	// existing fw_device. The newly allocated fw_device becomes obsolete instead.
+>>> +	//
+>>> +	// serialize config_rom access.
+>>> +	scoped_guard(rwsem_read, &fw_device_rwsem) {
+>>> +		// TODO: The cast to 'void *' could be removed if Zijun Hu's work goes well.
+>>
+>> may remove this TODO line since i will simply remove the cast with the
+>> other patch series as shown below:
+>> https://lore.kernel.org/all/20240811-const_dfc_done-v1-0-9d85e3f943cb@quicinc.com/
+> 
+> Of course, I won't apply this patch as is. It is just a mark to hold
+> your attention.
+> 
+>>> +		revived_dev = device_find_child(card->device, (void *)device->config_rom,
+>>> +						compare_configuration_rom);
+>>> +	}
+>>>  	if (revived_dev) {
+>>> -		put_device(revived_dev);
+>>> -		fw_device_release(&device->device);
+>>> +		struct fw_device *found = fw_device(revived_dev);
+>>>  
+>>> -		return;
+>>> +		// serialize node access
+>>> +		guard(spinlock_irq)(&card->lock);
+>>> +
+>>> +		if (atomic_cmpxchg(&found->state,
+>>> +				   FW_DEVICE_GONE,
+>>> +				   FW_DEVICE_RUNNING) == FW_DEVICE_GONE) {
+>>> +			struct fw_node *current_node = device->node;
+>>> +			struct fw_node *obsolete_node = found->node;
+>>> +
+>>> +			device->node = obsolete_node;
+>>> +			device->node->data = device;
+>>> +			found->node = current_node;
+>>> +			found->node->data = found;
+>>> +
+>>> +			found->max_speed = device->max_speed;
+>>> +			found->node_id = current_node->node_id;
+>>> +			smp_wmb();  /* update node_id before generation */
+>>> +			found->generation = card->generation;
+>>> +			found->config_rom_retries = 0;
+>>> +			fw_notice(card, "rediscovered device %s\n", dev_name(revived_dev));
+>>> +
+>>> +			found->workfn = fw_device_update;
+>>> +			fw_schedule_device_work(found, 0);
+>>> +
+>>> +			if (current_node == card->root_node)
+>>> +				fw_schedule_bm_work(card, 0);
+>>> +
+>>> +			put_device(revived_dev);
+>>> +			fw_device_release(&device->device);
+>>> +
+>>> +			return;
+>>> +		}
+>>
+>> is it okay to put_device() here as well ?
+>> put_device(revived_dev);
+> 
+> Exactly. The call of put_device() should be done when the call of
+> device_find_child() returns non-NULL value.
+> 
+> Additionally, I realize that the call of fw_device_release() under
+> acquiring card->lock causes dead lock.
+> 
+>>>  	}
+>>>  
+>>>  	device_initialize(&device->device);
+> 
+> Anyway, I'll post take 2 and work for its evaluation.
+> 
+great
+> 
+> Thanks
+> 
+> Takashi Sakamoto
+
 
