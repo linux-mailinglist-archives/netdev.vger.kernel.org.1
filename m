@@ -1,241 +1,197 @@
-Return-Path: <netdev+bounces-119891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C67A9575B6
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:34:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7235D9575C4
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B6741F227FD
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:34:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29AB8283541
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04DC158DCD;
-	Mon, 19 Aug 2024 20:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BB915A87B;
+	Mon, 19 Aug 2024 20:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b="ML3pU1kp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jz5B4GRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC02158A09;
-	Mon, 19 Aug 2024 20:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724099641; cv=pass; b=gBrRicwGEIcqhUHm6Bgwj3+1JlJy/zYJpN9O/Io3tJOWYCoyuXa9cxMx1ICLrFc1fRvNxHXkCnQghZOvFzb0COq5D9hMjbI9wLBPSi/DjE5W+2tctrppOja9SXE5LPPTN6Aezk5FWE5T0nhM4xaiww/ikIKcpTn3dju0tZ8KE0g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724099641; c=relaxed/simple;
-	bh=FMIpa4swUiJlJeOECWbZrRU6dK2ymdZbCfev20eDAXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K7t9w4BSzJe2u+J/O2oYnh1+N11sqRtIuLRuXEZY9k65GppRz5eP8FgrkN4wGHBxrn+fzmt69BcD3uV2H6blpOE8Xp7aB2u0TMl8Vdf4+sYV/gk4NyrY/kdbZ87yUzcutVJZDWpYS14uduGlUsfAJbSieaPr/PL97YoOrPtPifA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b=ML3pU1kp; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1724099597; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=ep8EAWCuVkAP+X3TRh1fF/Kba0IPeYgKLHju44iCgVqsyRQUQlFo82vf573+4u/0ne0r73KGG/0/G7/9Mg61HYaVTF9ehycZ3ktbZZOAAonr4lvoyhbaM51lI0rh0n3r9E/2lCsODLHmbtV5cI4cTFtpnfg4F1ENdgj0ClpA1jU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1724099597; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=mk2cAEGzILC7tDRXUVAiWcCKesc9c/swlOrflT09qzc=; 
-	b=I+8XW4LcmIsdpYn8P34Xj/6N40PIC5PpRK0LN5/FE4lTQnax2RkfM8U9OlsqgF5DvsRWdC79UQvH4GBeiuvHjWqp6XSWsHijQ4/3LTOabxfmIU9D4dUdPlJug4BsMIBWxJGQFI9d3/j2553ztrRuHlhGvWMiKbi5LQ54sWsOs/s=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724099597;
-	s=zohomail; d=collabora.com; i=sebastian.reichel@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=mk2cAEGzILC7tDRXUVAiWcCKesc9c/swlOrflT09qzc=;
-	b=ML3pU1kpd6uUK235r2TPCZnf2prEsIvDJByLmKTHP7T4Guqf0z6SAVTYt8KqR6J9
-	LciPUvMZuPPXjeKJGA/Xkr36NsE5P43dGxqjICVO5dTBxmy0PXXi5vZPDtCV/Zgbw7f
-	qRPB5Rdd9j0pBUZcNBt3FF4reBEkcj99UCocog0g=
-Received: by mx.zohomail.com with SMTPS id 1724099595555476.38217330976886;
-	Mon, 19 Aug 2024 13:33:15 -0700 (PDT)
-Received: by mercury (Postfix, from userid 1000)
-	id EFD8B106045A; Mon, 19 Aug 2024 22:33:07 +0200 (CEST)
-Date: Mon, 19 Aug 2024 22:33:07 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Arend van Spriel <arend.vanspriel@broadcom.com>
-Cc: jacobe.zang@wesion.com, bhelgaas@google.com, 
-	brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev, christophe.jaillet@wanadoo.fr, 
-	conor+dt@kernel.org, davem@davemloft.net, devicetree@vger.kernel.org, 
-	duoming@zju.edu.cn, edumazet@google.com, gregkh@linuxfoundation.org, 
-	krzk+dt@kernel.org, kuba@kernel.org, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, megi@xff.cz, minipli@grsecurity.net, netdev@vger.kernel.org, 
-	pabeni@redhat.com, robh@kernel.org, saikrishnag@marvell.com, 
-	stern@rowland.harvard.edu, yajun.deng@linux.dev
-Subject: Re: [PATCH v11 0/4] Add AP6275P wireless support
-Message-ID: <xc5226th2sifhop3gnwnziok4lfl5s6yqbxq6wx4vygnuf4via@4475aaonnmaz>
-References: <uzmj5w6byisfguatjyy2ibo6zbn7w52bg2abgf7egych7usv6j@ec4xdmaofach>
- <67d67f15-4631-44ba-bc05-c8da6a1af1bf@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8076115A865
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 20:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724099766; cv=none; b=Dhi8qaO+OJJi7vrx+4OftgIOxU+gM7udxMbD70rsVaEq3CL+C+rUngyHC+ScAxVBbO1Mqzhuoxglw+xKay7CgCFcB4wDyqBCNclyUst5+lEcM8INcIaduwiUwtVORgps/xewkZIsGDuVbq0cxYosD1J8TvrctApNg940HgXR368=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724099766; c=relaxed/simple;
+	bh=FmtN5mSr/DMJQjcJYp5hV4BTgJ/0W4lO/ULDziYHPuc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HdfXLq5AdklfLtuGqEgEvEG47hOpM+ZKCQtxxv9QxFZzvBWa08TfdEEVKLxnAYpfTsqydKp96LkcdCVS9l8UOhuklfv1bGKJ0Is8SK/J6KE14qIvfgTccHYXKOmCNu4Sfm3yAlDDjWrTJkfdg74lOvCEGs5OUk5wniDgzgUBLKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jz5B4GRk; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39d2e4d73bcso12314135ab.1
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 13:36:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724099763; x=1724704563; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SeaWSJ1lhdQoAfviB1aV+IvqYuXAqXEbjPeGzVPN2jI=;
+        b=Jz5B4GRkVlMEw5KkuqhOTjZDtVU5h3UhXaQEcM/sek5jqUqHlTA4fhviZAaiTW4zt3
+         64OsKwDxmHweadKbteUImu7Mi/+S4kYHJZvbCxcl7PmBtk3ynfKVM+XQwRrgWmUmubW+
+         dJ6jJT7aMfS+xzbuYUDt/XBowghF8Lxqe019Pqy+7JZpZVHfNqgKe5d9iDCenC9NjrU4
+         deAew+SNWdzl3gvaJIaNH66wcoD3cE+P7Dnhfh2TUqaBM/HjL2ywlaBvy0hdoYEsTXLQ
+         VuHJp8/FvTkebYOYxWXSmzLib7Uv2zGriN78qKpU661gdVCfjYWj8y+x+5g8k/f65es8
+         Et/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724099763; x=1724704563;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SeaWSJ1lhdQoAfviB1aV+IvqYuXAqXEbjPeGzVPN2jI=;
+        b=CBEBvoa1fiT+IjQFGPrd96fdh6kl/6+JXn7+ks743VNnp+Vg5AQ9QVd8jdvEJ7dWWY
+         dm4oCW4FiWtnlLfxQnL7JiXc+CiEw3ohp+vFKmgbfTb6Dsp+A5R0ZM3HldoB5MdLGpEJ
+         Af1TfsrGHBbrYU9KvJLRJfUX1vb3LvZDpr3FbZqhFoZ81ul6a7dgMS09sY+wi0ZpkZQd
+         vZaPrZ4zM5fHEHvrlE8lgRlCyfN3bq/oJe2JXJFXyrXqnA52aE5/h6dej83H3SSqjJwR
+         SpTw2sBhLJVtthwMqpsL+eDLXadaIPSMUa2Lf49C9R9rpt37YBtOLVYPKVK2sfIwIRZx
+         fjhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTpoqesBerX3Bf+Cc9Hznyi9b9RtyZLI6nmrqqKeJk9/9zWf2Fvz1EV7rdLfk3vnS0wpSBMAbOHg71bsqc++SZiAaUhMTm
+X-Gm-Message-State: AOJu0YwJiBVgUhV/UB5YOl2bZAnt6FdtEDcAwava5B2qhih8o5uH7xJ8
+	1w4CYg18B50H35TV6BVuGtfe+tcEYu3txde9oKim9g7bps1tQQi3
+X-Google-Smtp-Source: AGHT+IHX4ZxIhN7pIL3I1AD7nYbhhvmet51bRh+V8H6F6dK9KGVVeUyFXbIEKrHTx80hgqxjHAFzzA==
+X-Received: by 2002:a05:6e02:1d1a:b0:39a:eb81:ff9a with SMTP id e9e14a558f8ab-39d585676a9mr1373305ab.10.1724099763356;
+        Mon, 19 Aug 2024 13:36:03 -0700 (PDT)
+Received: from [10.64.61.212] ([129.93.161.236])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ccd6f74b57sm3271235173.130.2024.08.19.13.36.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2024 13:36:03 -0700 (PDT)
+Message-ID: <573e24dc-81c7-471f-bdbf-2c6eb2dd488d@gmail.com>
+Date: Mon, 19 Aug 2024 15:36:02 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gns3fuhyhqprnogt"
-Content-Disposition: inline
-In-Reply-To: <67d67f15-4631-44ba-bc05-c8da6a1af1bf@broadcom.com>
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.3.1/223.982.64
-X-ZohoMailClient: External
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 1/3] tcp_cubic: fix to run bictcp_update() at least
+ once per RTT
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, ncardwell@google.com, netdev@vger.kernel.org,
+ Lisong Xu <xu@unl.edu>
+References: <20240817163400.2616134-1-mrzhang97@gmail.com>
+ <20240817163400.2616134-2-mrzhang97@gmail.com>
+ <CANn89iKwN8vCH4Dx0mYvLJexWEmz5TWkfvCFnxmqKGgTTzeraQ@mail.gmail.com>
+Content-Language: en-US
+From: Mingrui Zhang <mrzhang97@gmail.com>
+In-Reply-To: <CANn89iKwN8vCH4Dx0mYvLJexWEmz5TWkfvCFnxmqKGgTTzeraQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 8/19/24 04:00, Eric Dumazet wrote:
+> On Sat, Aug 17, 2024 at 6:35 PM Mingrui Zhang <mrzhang97@gmail.com> wrote:
+>> The original code bypasses bictcp_update() under certain conditions
+>> to reduce the CPU overhead. Intuitively, when last_cwnd==cwnd,
+>> bictcp_update() is executed 32 times per second. As a result,
+>> it is possible that bictcp_update() is not executed for several
+>> RTTs when RTT is short (specifically < 1/32 second = 31 ms and
+>> last_cwnd==cwnd which may happen in small-BDP networks),
+>> thus leading to low throughput in these RTTs.
+>>
+>> The patched code executes bictcp_update() 32 times per second
+>> if RTT > 31 ms or every RTT if RTT < 31 ms, when last_cwnd==cwnd.
+>>
+>> Fixes: df3271f3361b ("[TCP] BIC: CUBIC window growth (2.0)")
+>> Fixes: ac35f562203a ("tcp: bic, cubic: use tcp_jiffies32 instead of tcp_time_stamp")
+> I do not understand this Fixes: tag ?
+>
+> Commit  ac35f562203a was essentially a nop at that time...
+>
+I may misunderstood the use of Fixes tag and choose the latest commit of that line.
+ 
+Shall it supposed to be the very first commit with that behavior?
+That is, the very first commit (df3271f3361b ("[TCP] BIC: CUBIC window growth (2.0)")) when the code was first introduced?
+>> Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
+>> Signed-off-by: Lisong Xu <xu@unl.edu>
+>> ---
+>> v3->v4: Replace min() with min_t()
+>> v2->v3: Correct the "Fixes:" footer content
+>> v1->v2: Separate patches
+>>
+>>  net/ipv4/tcp_cubic.c | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+>> index 5dbed91c6178..00da7d592032 100644
+>> --- a/net/ipv4/tcp_cubic.c
+>> +++ b/net/ipv4/tcp_cubic.c
+>> @@ -218,8 +218,12 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
+>>
+>>         ca->ack_cnt += acked;   /* count the number of ACKed packets */
+>>
+>> +       /* Update 32 times per second if RTT > 1/32 second,
+>> +        * or every RTT if RTT < 1/32 second even when last_cwnd == cwnd
+>> +        */
+>>         if (ca->last_cwnd == cwnd &&
+>> -           (s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
+>> +           (s32)(tcp_jiffies32 - ca->last_time) <=
+>> +           min_t(s32, HZ / 32, usecs_to_jiffies(ca->delay_min)))
+> This looks convoluted to me and still limited if HZ=250 (some distros
+> still use 250 jiffies per second :/ )
+>
+> I would suggest switching to usec right away.
+Thank you for the suggestion, however, I may need more time to discuss with another author for this revision. :)
+Thank you
+>
+> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+> index 5dbed91c6178257df8d2ccd1c8690a10bdbaf56a..fae000a57bf7d3803c5dd854af64b6933c4e26dd
+> 100644
+> --- a/net/ipv4/tcp_cubic.c
+> +++ b/net/ipv4/tcp_cubic.c
+> @@ -211,26 +211,27 @@ static u32 cubic_root(u64 a)
+>  /*
+>   * Compute congestion window to use.
+>   */
+> -static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
+> +static inline void bictcp_update(struct tcp_sock *tp, struct bictcp *ca,
+> +                                u32 cwnd, u32 acked)
+>  {
+>         u32 delta, bic_target, max_cnt;
+>         u64 offs, t;
+>
+>         ca->ack_cnt += acked;   /* count the number of ACKed packets */
+>
+> -       if (ca->last_cwnd == cwnd &&
+> -           (s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
+> +       delta = tp->tcp_mstamp - ca->last_time;
+> +       if (ca->last_cwnd == cwnd && delta <= ca->delay_min)
+>                 return;
+>
+> -       /* The CUBIC function can update ca->cnt at most once per jiffy.
+> +       /* The CUBIC function can update ca->cnt at most once per ms.
+>          * On all cwnd reduction events, ca->epoch_start is set to 0,
+>          * which will force a recalculation of ca->cnt.
+>          */
+> -       if (ca->epoch_start && tcp_jiffies32 == ca->last_time)
+> +       if (ca->epoch_start && delta < USEC_PER_MSEC)
+>                 goto tcp_friendliness;
+>
+>         ca->last_cwnd = cwnd;
+> -       ca->last_time = tcp_jiffies32;
+> +       ca->last_time = tp->tcp_mstamp;
+>
+>         if (ca->epoch_start == 0) {
+>                 ca->epoch_start = tcp_jiffies32;        /* record beginning */
+> @@ -334,7 +335,7 @@ __bpf_kfunc static void cubictcp_cong_avoid(struct
+> sock *sk, u32 ack, u32 acked)
+>                 if (!acked)
+>                         return;
+>         }
+> -       bictcp_update(ca, tcp_snd_cwnd(tp), acked);
+> +       bictcp_update(tp, ca, tcp_snd_cwnd(tp), acked);
+>         tcp_cong_avoid_ai(tp, ca->cnt, acked);
+>  }
 
---gns3fuhyhqprnogt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hello,
-
-On Mon, Aug 19, 2024 at 09:35:12PM GMT, Arend van Spriel wrote:
-> On 8/19/2024 6:42 PM, Sebastian Reichel wrote:
-> > I tested this on RK3588 EVB1 and the driver is working fine. The DT
-> > bindings are not correct, though:
-> >=20
-> > linux/arch/arm64/boot/dts/rockchip/rk3588-evb1-v10.dtb: wifi@0,0:
-> > compatible: 'oneOf' conditional failed, one must be fixed:
-> >=20
-> > ['pci14e4,449d', 'brcm,bcm4329-fmac'] is too long
-> > 'pci14e4,449d' is not one of ['brcm,bcm43143-fmac', 'brcm,bcm4341b0-fma=
-c',
-> > 'brcm,bcm4341b4-fmac', 'brcm,bcm4341b5-fmac', 'brcm,bcm4329-fmac',
-> > 'brcm,bcm4330-fmac', 'brcm,bcm4334-fmac', 'brcm,bcm43340-fmac',
-> > 'brcm,bcm4335-fmac', 'brcm,bcm43362-fmac', 'brcm,bcm4339-fmac',
-> > 'brcm,bcm43430a0-fmac', 'brcm,bcm43430a1-fmac', 'brcm,bcm43455-fmac',
-> > 'brcm,bcm43456-fmac', 'brcm,bcm4354-fmac', 'brcm,bcm4356-fmac',
-> > 'brcm,bcm4359-fmac', 'brcm,bcm4366-fmac', 'cypress,cyw4373-fmac',
-> > 'cypress,cyw43012-fmac', 'infineon,cyw43439-fmac']
-> > from schema $id: http://devicetree.org/schemas/net/wireless/brcm,bcm432=
-9-fmac.yaml#
-> >=20
-> > It's easy to see the problem in the binding. It does not expect a
-> > fallback string after the PCI ID based compatible. Either the
-> > pci14e4,449d entry must be added to the first enum in the binding,
-> > which has the fallback compatible, or the fallback compatible
-> > should not be added to DTS.
->=20
-> Never understood why we ended up with such a large list. When the binding
-> was introduced there was one compatible, ie. brcm,bcm4329-fmac. People
-> wanted all the other flavors because it described a specific wifi chip and
-> no other reason whatsoever. The PCI ID based compatible do obfuscate that
-> info so those are even less useful in my opinion.
->=20
-> > If the fallback compatible is missing in DTS, the compatible check in
-> > brcmf_of_probe() fails and the lpo clock is not requested resulting
-> > in the firmware startup failing. So that would require further
-> > driver changes.
->=20
-> Right. The text based bindings file in 5.12 kernel clearly says:
->=20
-> Required properties:
->=20
->  - compatible : Should be "brcm,bcm4329-fmac".
->=20
-> In 5.13 kernel this was replaced by the json-schema yaml file. The PCI ID
-> based enum which was added later does also list brcm,bcm4329-fmac so why
-> does that not work for the compatible list ['pci14e4,449d',
-> 'brcm,bcm4329-fmac']? Looking at the compatible property in yaml which I
-> stripped a bit for brevity:
->=20
-> properties:
->   compatible:
->     oneOf:
->       - items:
->           - enum:
->               - brcm,bcm43143-fmac
->               - brcm,bcm4329-fmac
->               - infineon,cyw43439-fmac
->           - const: brcm,bcm4329-fmac
->       - enum:
->           - brcm,bcm4329-fmac
->           - pci14e4,43dc  # BCM4355
->           - pci14e4,4464  # BCM4364
->           - pci14e4,4488  # BCM4377
->           - pci14e4,4425  # BCM4378
->           - pci14e4,4433  # BCM4387
->=20
-> So how should I read this. Searching for some sort of syntax description I
-> found [1] which has an example schema with description that has a similar=
-ly
-> complicated compatible property. From that I think the above should be
-> changed to:
->=20
->  properties:
->    compatible:
->      oneOf:
->        - items:
->            - enum:
->                - brcm,bcm43143-fmac
-> -              - brcm,bcm4329-fmac
->                - infineon,cyw43439-fmac
->            - const: brcm,bcm4329-fmac
-> +      - items:
->            - enum:
-> -              - brcm,bcm4329-fmac
->                - pci14e4,43dc  # BCM4355
->                - pci14e4,4464  # BCM4364
->                - pci14e4,4488  # BCM4377
->                - pci14e4,4425  # BCM4378
->                - pci14e4,4433  # BCM4387
-> +          - const: brcm,bcm4329-fmac
-> +      - const: brcm,bcm4329-fmac
->=20
-> This poses a constraint in which the last string in the compatible list is
-> always 'brcm,bcm4329-fmac' even if it is the only string. At least that is
-> my understanding so if my understanding is wrong feel free to correct me =
-on
-> this.
->=20
-> [1] https://docs.kernel.org/devicetree/bindings/writing-schema.html
-
-Your proposed change should work as you describe. But it will result
-in DT check errors for some Apple devices, which followed the
-current binding and do not have the "brcm,bcm4329-fmac" fallback
-compatible:
-
-$ git grep -E "(pci14e4,43dc)|(pci14e4,4464)|(pci14e4,4488)|(pci14e4,4425)|=
-(pci14e4,4433)" arch/
-arch/arm64/boot/dts/apple/t8103-jxxx.dtsi:           compatible =3D "pci14e=
-4,4425";
-arch/arm64/boot/dts/apple/t8112-j413.dts:            compatible =3D "pci14e=
-4,4433";
-arch/arm64/boot/dts/apple/t8112-j493.dts:            compatible =3D "pci14e=
-4,4425";
-
-I guess patch 3/4 from this series will also introduce some
-regressions for these devices by moving the check. What is the
-purpose of the compatible check in brcmf_of_probe() in the first
-place? Can it just be dropped?
-
-I see it was introduced 10 years ago in 61f663dfc1a09, probably to
-avoid a spurious error message for systems not having the IRQ
-described in DT? The current code exits quietly when none of the
-optional resources are defined.
-
--- Sebastian
-
---gns3fuhyhqprnogt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmbDq/wACgkQ2O7X88g7
-+pp6ERAAlqr3X4QlCBWjoUyZqN3E8yPe/Ud9tonie+Snj1L6XDqOKy7bAXqSBXc1
-kHS5F0zEKgcn81wyF9FlIxQHT1r482Qt8wrlqZROT/7M3imKrgF6D3kCGT5E0BCr
-2gkjHIE6QG8/i26Z4tdopRN+7Yj1c77g7HOU7l5iKBeRxrIjKMkUADmymQ55s2Z1
-ly7qTrfHcsoYc6//K3hRrDFk1CGS/gwfZ/HBGiAqKbTYig0HJ9BojmrBYzszG5WL
-i/SjhdIK2G/3bD9kVOvIZZNm80RTpBLywvSXeMDT7Q6Lrs+dy8ekU7Nyc0Y1b5Gy
-/5jAni1HhlM185zhg6adFBGYVHM05hFGnQ/3G4+jMA3g+AU+gWWBeGt31Ft/UVrw
-SfKJj17OBazzhx8mdBkE1VqUNLR5DC7DQIB7GtNd6pKi2XugrU4AHtydiK0NkAg4
-nBRocei2fJoD/a9Dw8TL9Wj3X+bcaO18IXOrqNXl0Qa9BSwUyenI537aWdL/XvAW
-bbs5rr+GyZMRkRIjGgdUo8LMxVpnutRXxRtbaWklNm4RlsuWaORIUY+8FAOIwF8T
-DFXWjZ/eAXBrhCDIiIx1GEzHePgl2/h6m61VeltvF/9ix0P2Dj+jra9lm5/E+wi1
-nlynKg+25redhcq0g4tvbuYd5eeduz3OX8CDUC2Ekyq9OmYRpwE=
-=/l9m
------END PGP SIGNATURE-----
-
---gns3fuhyhqprnogt--
 
