@@ -1,75 +1,95 @@
-Return-Path: <netdev+bounces-119767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C3FF956E26
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:03:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF3B956E32
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9371C21CBA
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:03:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EC921C21D5B
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE631741F8;
-	Mon, 19 Aug 2024 15:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5468117556B;
+	Mon, 19 Aug 2024 15:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpAgZLjO"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="rFkyHwUr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C9A173355;
-	Mon, 19 Aug 2024 15:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919601741D9;
+	Mon, 19 Aug 2024 15:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724079798; cv=none; b=gtQOSEjiBzbTb4z5JLrN8lUHbX7x3dZaREcugJM9ED9KnSQfhB5CvVXRJ7oa1CIvQA8er+6AG5efIPTpBDhKU4Ode3hvFDDq0G3oyLaL5nor0L1T4S3QbD1ECm4sggfdZYUN+leWGdmTOvYFulcMLgLIwBljANz3+x8MW4UQ0cI=
+	t=1724080017; cv=none; b=Tq2aSZlSEjNvhIgXbZURrqHy69JJdJUYP+ML1UyNdvEdYSTaX2ElVJDuZ8a7dkl5W6OCXMZrRWtcGOtAnqM+HXZQ+rguNWgAcOOsRO/qTb7BoPAPa5g044AY17CReJEKO2kp8BxjNAk9z0hdGcDrKI0B6LrQaJVlXb07sft22sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724079798; c=relaxed/simple;
-	bh=aeHJLoOQWcaOWF0e9GClkYwXZFKKKkmjgYDEYtaX0zM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u0avBQ+dO/Hk5gzp7Rm3Bys2WOSZMqC/p/wJ6K47D2GBVuKfkmlOhHAT9O40npbWMPOznLjVgrClnlGPA3UD7pmzlY59ipvW2DgV5tL1mQMnvJUQijmrxAkPnjMQMIfzQ4p/7LBoblgexA8AMUKOs5g0K53bIcNksL5EjUJyKys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpAgZLjO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0234DC4AF0E;
-	Mon, 19 Aug 2024 15:03:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724079798;
-	bh=aeHJLoOQWcaOWF0e9GClkYwXZFKKKkmjgYDEYtaX0zM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FpAgZLjOw5+7uCjXAh0uU3dYKCCR/4ACaxTDo1B4641QVo2MplJeNXjgw2wxGcP+3
-	 wVPwVMwocdNkEwShjKprKDcO8+ws6qp04okcUfg+iaFstRHUDutlvIOYfypcNSg9CV
-	 irEJ1jtiexhmrHP0ovF3VliVPfIoMoazR9CTkimXEOD/xhXFxqcjuoi8J5p+LOdQp6
-	 FPYKPdY7UYfWpeQIuJiyI+MGxU7hrckdCW9yrtq5y/Nh8GfaLV1L8ZXP7aClxLycwE
-	 sYvCDNFp3nOLuY64M8sAqgeTIdVkiShZXi2FvjARBpsZhX/whVx8xSq3MK6s0iknSv
-	 xxVRX4fGeYwig==
-Date: Mon, 19 Aug 2024 16:03:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH v8 net-next 3/3] selftests: net: Use XFAIL for operations
- not supported by the driver
-Message-ID: <20240819150314.GI11472@kernel.org>
-References: <20240819121235.39514-1-jain.abhinav177@gmail.com>
- <20240819121235.39514-4-jain.abhinav177@gmail.com>
+	s=arc-20240116; t=1724080017; c=relaxed/simple;
+	bh=vns+adXAJLw8T/OM3pAthnwRhUMiPNaH/Eq3YdBkm+A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xhi1v9+a8/wgNKNBMsDxDtPi11mDa2Wd5Z8avemcO9DitQnJPVWRaKxocoHkXyU5vpx4yvPq5dwjy2QWGbVRBgJNOOSnJN11tPIA0pldc8FxY/ToQQZFjynnbtTbyB8IYv4coPl2Su0cOY3IS6Jv+3KtAYe1CQIiLmFtaS6Wmt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=rFkyHwUr; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=+nhzfS7nwlcduWA3b9lUiJN3hfhtWWmUh6PUuFzlJqw=; b=rFkyHwUrcD6xAjGPxd8Nzg9GlX
+	pmrtQ43Q66j2SONDJOffD7xHxDvMEVZImyiTzD/yQv8hisyBj3+I+jq0M0tmNLoReIbtJ0eHHg8GI
+	SDjIJjGxVtS4CQu029pvq7HyH3gv7VX4cau5pHnAeMVadHTjMOrpJxS4folDnUN185NM=;
+Received: from p5b2060c8.dip0.t-ipconnect.de ([91.32.96.200] helo=localhost.localdomain)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1sg3xq-001WcL-33;
+	Mon, 19 Aug 2024 17:06:35 +0200
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH net] udp: fix receiving fraglist GSO packets
+Date: Mon, 19 Aug 2024 17:06:21 +0200
+Message-ID: <20240819150621.59833-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819121235.39514-4-jain.abhinav177@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 19, 2024 at 05:42:35PM +0530, Abhinav Jain wrote:
-> Check if veth pair was created and if yes, xfail on setting IP address
-> logging an informational message.
-> Use XFAIL instead of SKIP for unsupported ethtool APIs.
-> 
-> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+When assembling fraglist GSO packets, udp4_gro_complete does not set
+skb->csum_start, which makes the extra validation in __udp_gso_segment fail.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ net/ipv4/udp_offload.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index b254a5dadfcf..d842303587af 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -279,7 +279,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	if (unlikely(skb_checksum_start(gso_skb) !=
+-		     skb_transport_header(gso_skb)))
++		     skb_transport_header(gso_skb) &&
++		     !(skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)))
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	/* We don't know if egress device can segment and checksum the packet
+-- 
+2.46.0
 
 
