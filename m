@@ -1,131 +1,148 @@
-Return-Path: <netdev+bounces-119653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67C19567EB
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:14:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC8C595680A
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8D181C21AC6
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96E111F22D13
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6BD15FA96;
-	Mon, 19 Aug 2024 10:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2ED15B13B;
+	Mon, 19 Aug 2024 10:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eYoy55Gy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3VfzCsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD15615F40A
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 10:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1E1154C14;
+	Mon, 19 Aug 2024 10:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724062446; cv=none; b=K7Hso7EwzPke1ngJL8dLlLlKJKanvoJ8lIlrPJsqGIiPO0UqryzUMwJX3vy6IfMCTbgmexLgjsjnCb3NrmAg51BK2EMVdJLVvcY9FfgET3g9V+xGXlJYShsaG4g3m9DWjrtXjwt9NYwmL8FhxlvPoetY8S0KVAab/rTQkAx6SOQ=
+	t=1724062524; cv=none; b=lwM+80iJc9dNl/0X2iGmQtJKa0cdPvNQ9MFd9flJR6ImTUFXkcTzqpHje7K8SFXCBTKvAxbBozTNyGd3NqDHqgRefPGStoLoojJm7FUWmORcRuS80BlAmMBwDa8gJuW/ZE3HnD8WDXbgRnViQoHatk+TBB4GZMxUhlOUEz/dxnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724062446; c=relaxed/simple;
-	bh=OdCIEHfgvFJ64xVjrEiuwnfedCAXa+QyPQoNYh8AiRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gEfIPrzolVr+9LpPcjh7LErcBKU8ImFbygwSv0/8zdos3OWM0HLpbE6QMDodfedvICb+MIoUriu1p2F6VQSV9VIOx20qE1mXCYQPuXGqSpCt3/JZh06to+Me9tEXb8feJh7FL+7F4MIm7Ih2KzCmTR/p0rJ618qcTGXPXs6Cd9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eYoy55Gy; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724062444; x=1755598444;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OdCIEHfgvFJ64xVjrEiuwnfedCAXa+QyPQoNYh8AiRI=;
-  b=eYoy55GyHW9WYmUhsK/78QOV2wWMIixILrG3r7T5lMCOIgJgiUlk9Xky
-   p/MjsXrKLaud8u3A1YK2l60ZxljX+e7TEbnt+BLR4mJ9rPKuRfpak+Hdv
-   +JSesoLzlWfTHvP/GIT/mrdKLKnPNl4NB97KS7EEMlKKHXgupjZZzSoy5
-   52YEmWW2QK8w/+3wOQJS+WYe5nI0shVspFZhCctQaJ4gu0sWbklqOkNpM
-   gAzP7vLjSXSWvoSY5ifAi8fQ+/ZyZt4tiV93YKuTQi+4X5KB5JXbhUviU
-   totL5UYIbS4RRYmop0wSYPjH5gZI0pr2I6QI5Qg9GM3ts1X/Re/8UBB9g
-   g==;
-X-CSE-ConnectionGUID: 1JHIJKC4S8i+AmhC8wYkig==
-X-CSE-MsgGUID: 7HcL4GzzSliAejJJ8QXivg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="13090090"
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="13090090"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 03:14:03 -0700
-X-CSE-ConnectionGUID: XDeJ29GoTMe+FR6D17qeLA==
-X-CSE-MsgGUID: +90gsaXuSDO8fi4+jvastw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="91097032"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa001.fm.intel.com with ESMTP; 19 Aug 2024 03:14:02 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	wojciech.drewek@intel.com,
-	przemyslaw.kitszel@intel.com
-Subject: [iwl-next v1] ice: set correct dst VSI in only LAN filters
-Date: Mon, 19 Aug 2024 12:14:01 +0200
-Message-ID: <20240819101401.67924-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1724062524; c=relaxed/simple;
+	bh=W/4+G33wfJf0p9CZaMWO+T+vpkDN5h6TeXfT0inzY9w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HWs6NFB9svzZjpcKD+KmH6sHQlwL0ev98Am7uquhVmPsaHYTYAiaUmpp4VhxQZWpxv4Iq1M18PtXyurZ3N8w8fjRl2HkqJDQbGPTeD8iNhJz5QeUXXKPth/RDZsvqeau+SlYSweRuHhl50CfQAp0E4wuRgbRoodEhKIUJg+rJm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3VfzCsZ; arc=none smtp.client-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-842efa905a5so634353241.0;
+        Mon, 19 Aug 2024 03:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724062522; x=1724667322; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/4+G33wfJf0p9CZaMWO+T+vpkDN5h6TeXfT0inzY9w=;
+        b=K3VfzCsZc7Xon76Y3ngsIXFU6Bh2bGhyjLMCo5o3uiEMBoz50uciOpiK3ehoFtLtXT
+         2UgzVViN2Nr4m3NAcxrT41jvvjmbAy9hxwycvwgX+1x2otm4VPnQxu9cAOqF+6jruYH7
+         jURQ3m29pCtfs+iSDLEODAaqdI953KpyPQOSvcv7FfX23TRHlP7Fkzg0At1YKPavsyOM
+         z6vwFpgpc1Gg97oBGfYr99nDR8i1kba7rctmfKyKGeXzYDX16gcLKmIc85k0tVkVoJRk
+         0w+fv9SQneFypbTVvWMi58j7LQi8DjhyHV8w5U7X3IF41nvP+zc5x5rDkk6qQJyPN++n
+         gnZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724062522; x=1724667322;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W/4+G33wfJf0p9CZaMWO+T+vpkDN5h6TeXfT0inzY9w=;
+        b=lo2xSc6HnNpTHC1/KZWiacocuhYkmrZOQHu4rvWCwT9+IsREee9HIIs3Tx+hA/U1x1
+         opGUZIPUH5RdTPmIttow0tNIjEJR8uoa3dDFEh2XzhX6bczkrfGYCYi30RIm/e6omOB8
+         qEHBF31FDzJXsWe2sTqonqQvFT8AvORnFrV5crMAg1anGSeHvxMj1nh3Eqe959NKZMat
+         LZ1oaPi/r7CJUtaXpPDI354QLBxYFPmWYoojp4E7F6UT9L6LXLkNJP/sVxHmvA344OxN
+         dpgiVcKSZV1ymtmSclpk4104716/NERDeGL7nb4AfCn34nKy6NBbGxa8QZpwRvaLJKXA
+         vhMA==
+X-Forwarded-Encrypted: i=1; AJvYcCWYn/HgwEhGmTiJZSWDsDCy/lDpQ1JLmuXiym6Hwvc29m8YNnG+HwydytWoh6aK8ztdS6g7kFN4aY/zPKaWRTsrFM8k4uHGILVyBd/grJiCPqMDBX4jMnyhtWW460XXQxTcuHqqkXlQD+mlEWvAMx/1dPvI/OLytQX41Cfpp6OdnQ==
+X-Gm-Message-State: AOJu0YwFghvaF6PwPtvj4gcTHNh5uSKT8GNbfyvMA4z4h6ED0g9hhQuB
+	9NnZlDGDVzYTHJnoNQcSsAbx6pJtqQDgyxsqYEj+x9qeYl6cgD3VbvQW3J4T6BerT+W9kao1HJJ
+	M5+RwusFfqSfBZaoGT/JPm9GbPyQ=
+X-Google-Smtp-Source: AGHT+IHXHOPPMPnKTFNdZAQssubTi+UQ7lmwwpLHN3BOZzE/rZ7VSX2tKTOKODtEg68AABNXSWQ3/PEspkNtDhT5ALA=
+X-Received: by 2002:a05:6102:304b:b0:493:e678:b760 with SMTP id
+ ada2fe7eead31-4977999cba4mr12758058137.28.1724062521858; Mon, 19 Aug 2024
+ 03:15:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240812082244.22810-1-e.velu@criteo.com> <3dcbfb0d-6e54-4450-a266-bf4701e77e08@gmail.com>
+ <ZrzDAlMiEK4fnLmn@yury-ThinkPad>
+In-Reply-To: <ZrzDAlMiEK4fnLmn@yury-ThinkPad>
+From: Erwan Velu <erwanaliasr1@gmail.com>
+Date: Mon, 19 Aug 2024 12:15:10 +0200
+Message-ID: <CAL2JzuzEBAdkQfRPLXQHry2a2M7_EsScOV_kheo+oXUuKM9rWA@mail.gmail.com>
+Subject: Re: [PATCH] net/mlx5: Use cpumask_local_spread() instead of custom code
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, Erwan Velu <e.velu@criteo.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Yury Norov <ynorov@nvidia.com>, Rahul Anand <raanand@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The filters set that will reproduce the problem:
-$ tc filter add dev $VF0_PR ingress protocol arp prio 0 flower \
-	skip_sw dst_mac ff:ff:ff:ff:ff:ff action mirred egress \
-	redirect dev $PF0
-$ tc filter add dev $VF0_PR ingress protocol arp prio 0 flower \
-	skip_sw dst_mac ff:ff:ff:ff:ff:ff src_mac 52:54:00:00:00:10 \
-	action mirred egress mirror dev $VF1_PR
+[...]
+> You may be interested in siblings-aware CPU distribution I've made
+> for mana ethernet driver in 91bfe210e196. This is also an example
+> where using for_each_numa_hop_mask() over simple cpumask_local_spread()
+> is justified.
 
-Expected behaviour is to set all broadcast from VF0 to the LAN. If the
-src_mac match the value from filters, send packet to LAN and to VF1.
+That's clearly a topic I'd like to discuss because the allocation
+strategy may vary depending on the hardware and/or usage.
+I've been investigating a case where the default mlx5 allocation isn't
+what I need.
 
-In this case both LAN_EN and LB_EN flags in switch is set in case of
-packet matching both filters. As dst VSI for the only LAN enable bit is
-PF VSI, the packet is being seen on PF. To fix this change dst VSI to
-the source VSI. It will block receiving any packet even when LB_EN is
-set by switch, because local loopback is clear on VF VSI during normal
-operation.
+1/ I noticed that using the smp_affinity in an RFS context didn't
+change the IRQ allocation and I was wondering if that is an expected
+behavior.
+This prevents any later tuning that an application could require.
+It would be super helpful to be able to influence the placement from
+the host to avoid hardcoded allocators that may not match a particular
+hardware configuration.
 
-Side note: if the second filters action is redirect instead of mirror
-LAN_EN is clear, because switch is AND-ing LAN_EN from each matched
-filters and OR-ing LB_EN.
+2/ I was also wondering if we shouldn't have a kernel module option to
+choose the allocation algorithm (I have a POC in that direction).
+The benefit could be allowing the platform owner to select the
+allocation algorithm that sys-admin needs.
+On single-package AMD EPYC servers, the numa topology is pretty handy
+for mapping the L3 affinity but it doesn't provide any particular hint
+about the actual "distance" to the network device.
+You can have up to 12 NUMA nodes on a single package but the actual
+distance to the nic is almost identical as each core needs to use the
+IOdie to reach the PCI devices.
+We can see in the NUMA allocation logic assumptions like "1 NUMA per
+package" logic that the actual distance between nodes should be
+considered in the allocation logic.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Fixes: 73b483b79029 ("ice: Manage act flags for switchdev offloads")
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+In my case, the NIC is reported to Numa node 6 (of 8) (inherited from
+the PXM configuration).
+With the current "proximity" logic all cores are consumed within this
+numa domain before reaching the next ones and so on.
+This leads to a very unbalanced configuration where a few numa domains
+are fully allocated when others are free.
+When SMT is enabled, consuming all cores from a NUMA domain also means
+using hyperthreads which could be less optimal than using real cores
+from adjacent nodes.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index e6923f8121a9..ea39b999a0d0 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -819,6 +819,17 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 		rule_info.sw_act.flag |= ICE_FLTR_TX;
- 		rule_info.sw_act.src = vsi->idx;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
-+		/* This is a specific case. The destination VSI index is
-+		 * overwritten by the source VSI index. This type of filter
-+		 * should allow the packet to go to the LAN, not to the
-+		 * VSI passed here. It should set LAN_EN bit only. However,
-+		 * the VSI must be a valid one. Setting source VSI index
-+		 * here is safe. Even if the result from switch is set LAN_EN
-+		 * and LB_EN (which normally will pass the packet to this VSI)
-+		 * packet won't be seen on the VSI, because local loopback is
-+		 * turned off.
-+		 */
-+		rule_info.sw_act.vsi_handle = vsi->idx;
- 	} else {
- 		/* VF to VF */
- 		rule_info.sw_act.flag |= ICE_FLTR_TX;
--- 
-2.42.0
+In a hypervisor-like use case, when multiple containers from various
+users run on the same system, having RFS enabled helps to have each
+user have its own toil of generating traffic.
+In such a configuration, it'd be better to let the allocator consume
+cores from each numa node of the same package one by one to get a
+balanced configuration, that would also have the advantage of avoiding
+consuming hyperthreads until at least 1 IRQ per physical core is
+reached.
 
+That allocation logic could be interesting to be shared between
+various drivers to allow sys admins to get a balanced IRQ mapping on
+modern, multi-nodes per socket, architecture.
+
+WDYT of having selectable logic and add this type of
+"package-balanced" allocator?
+Erwan,
 
