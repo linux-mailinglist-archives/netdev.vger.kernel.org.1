@@ -1,70 +1,119 @@
-Return-Path: <netdev+bounces-119604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B99956501
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:51:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A7C956507
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E895281FA5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:51:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 460451C2165E
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307A313BC1E;
-	Mon, 19 Aug 2024 07:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285A015AACA;
+	Mon, 19 Aug 2024 07:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tradeharmony.pl header.i=@tradeharmony.pl header.b="gEOCp2ka"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VhxzZRfl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tradeharmony.pl (mail.tradeharmony.pl [5.196.29.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F284D12C52E
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 07:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.196.29.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3B715A87F
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 07:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724053908; cv=none; b=nUnA1BsH5cF8PqhiVxdTtBu7GRePgwEribe4CBWg8jP/ngffpT59Mxd59FM3UGmE8X/MzfCnk7Z8wji+A5s9sC9o9+vDQi0R5ZMUkIyqI8nJPNtSHOomHQ1csFn5XuBroww/EeHZfb4Aa0BMz+i5KQJPfDAwKmQNnFg2wdwzz1I=
+	t=1724054029; cv=none; b=aN2emzZiEH7ahjgTMo1bWpDSmgfjheDzWNVRUCQgoHPYiPhOY9sv988sBpnKOUJxzba+G0bE+O+0SYk2uV9SGTsTzXpQXdyP6XGzkkkYpe3mlTmkiAl8W64bJsZutFmohP3Lk8bkynJEHJEe8U2zjnv38e1flvfpuA17s1K3w4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724053908; c=relaxed/simple;
-	bh=siHX5jVClg4W32F/NjlCmIL8w17yqZEkZP0Dfrdd7Ok=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=eaatszYCeNHhI/WGyIG5zFTKgrK7AcLA57Tfw5UGJCAPbyfNjN1QE8BV+FhdYLdXN/DswDuTQvZRUw5TAIQPFFI5a49MqPv2ftjomSUFkgQtvZxXC88n0iVrUiw8SX4bgI0B3jAq53TyXXg2WZIs8fMzqIqeSXdmMXvW5DN2LAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tradeharmony.pl; spf=pass smtp.mailfrom=tradeharmony.pl; dkim=pass (2048-bit key) header.d=tradeharmony.pl header.i=@tradeharmony.pl header.b=gEOCp2ka; arc=none smtp.client-ip=5.196.29.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tradeharmony.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tradeharmony.pl
-Received: by mail.tradeharmony.pl (Postfix, from userid 1002)
-	id CF44022969; Mon, 19 Aug 2024 09:51:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tradeharmony.pl;
-	s=mail; t=1724053896;
-	bh=siHX5jVClg4W32F/NjlCmIL8w17yqZEkZP0Dfrdd7Ok=;
-	h=Date:From:To:Subject:From;
-	b=gEOCp2kariBzu8v9SloXV9jrTGw20TVMrWfX7qlCadtCHeGuFYibzmdrDb91VZ1+s
-	 HqGEiEBuwlDMvaeijPrFNEQUT9bPWbAo33/mpEaPUyPlt5KDeNVCXBoeGJPR7YDyHE
-	 H4zvg3R/UGqh2v12ElvKMUEFn+LUO9h6rL9NMIIjxVm9a55RKB25dtCfmXz+CUWZoe
-	 +YYFSM0X4C6NI9qCyN2T1anjG/0SoocYczmwo80kyc7NDvSLpnx2sGQ9M/RhDp0BJm
-	 gKNy5efjAd6fhebkVFKqcxz+j+EYCaaCougE5V5ePLisPkQL/Kr+gwQqxnomBklGEs
-	 00Ew/ebQFvz9A==
-Received: by mail.tradeharmony.pl for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 07:50:58 GMT
-Message-ID: <20240819084500-0.1.84.2t9e7.0.e160nkoai7@tradeharmony.pl>
-Date: Mon, 19 Aug 2024 07:50:58 GMT
-From: "Karol Michun" <karol.michun@tradeharmony.pl>
-To: <netdev@vger.kernel.org>
-Subject: =?UTF-8?Q?Pytanie_o_samoch=C3=B3d_?=
-X-Mailer: mail.tradeharmony.pl
+	s=arc-20240116; t=1724054029; c=relaxed/simple;
+	bh=mHVAqpYu02YHlnZTa9Ag8PLdCzHWk2pFM2y0+C0zvok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q7vv8LEgHqAvYxJuusuR7uHE/+O7i7dP25kGtdxSnAllrA2HevQ4aOwQ5ETCjI+JLs9BwVDbK0sNDgaP35FRnfSGnKWe+toxlanTjJwXS9+nknh62SVm23DijRUXW68XkLmEFBE1BkFryvotxbPuhD1I0J3VSKi1muTdrwEUrEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VhxzZRfl; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-710ce81bf7dso2860438b3a.0
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 00:53:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724054027; x=1724658827; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=C/Rj5yr8yXCHksuinOFCCLntbnEFvlEWyxLTFoDjU3s=;
+        b=VhxzZRflVz0NBDDc0XJ9cUL8aDm+VfUD2GihTlVaB5IMz6leeI6NvGkdIb8vvoX/jA
+         dh9/6sOIaDRlbmgQ0fWptFcGvKZYFIhEV/p1GSf4X6i6MW4fg/9K08Ma8rfIHEgy6/fs
+         HcDxdFebmLf3L6agWEpv4gfhtQiryhCYg+ARTFCiT+V6RhHycvIjXlPeFB1Lfh7qfdC3
+         1oNqQH/R0uaP7CDjxrD5FAXEuZApKk+M95n7u9usPc2gmFGuB+LDcATY900lA9vcwUxo
+         kLSpE3UvPhCnAl7A4/Yhyo5yBbj1CBpC/Rkmsil2kHW9lVZk5qZwwMt8a1usc7fln799
+         SjIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724054027; x=1724658827;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C/Rj5yr8yXCHksuinOFCCLntbnEFvlEWyxLTFoDjU3s=;
+        b=HEZ794UyOaRm7N3pALmOeG+ywOKu36lANKGyJHkIXwIDyhIgfQqeHuxirul+jiKBIw
+         zwFykN+xq0OBjUEoCk2heb9y3VxuBp9NGw8pQzW552sXD8XLPVgUFLiv/fCiHpzn4bHc
+         7wuM066BSpGpz9dsRdqppIo8+kgUAF1CiC84Oqks0iwSBeSAMAa4922+zpCr+zVt/fXt
+         CB/fGhv/9GpfyqNBO11aP6IQrR6qX++I+pd5RigmmQ/ZZL9RE6c4exvakueQL5oLwygZ
+         Z6GG4FCDQkNWYCBst3OfKdNiAtbirY0qlJ+FgLceif/gk9Wo49AKrMyViNEKi3tv+Hpn
+         oBAg==
+X-Gm-Message-State: AOJu0YxbmIAYwY3bboroukIvU5HR3vBbxK6AVHeKy5il5ByS5UGezwby
+	Ui9yrA7oR4sWZpOQVoJrhC2nIUbwK9YDVG0CLCv1fjjvlw2Sg5XxPJRjWlMiRpZFQg==
+X-Google-Smtp-Source: AGHT+IH330uiq0pcsS0AKcGZINlGZjK4yr48daBeT8W2vgqbzt1jm3uiPUbcEFE6h3EVZZH+O7DWgA==
+X-Received: by 2002:a05:6a00:9155:b0:705:b284:d65b with SMTP id d2e1a72fcca58-713c4f28a79mr9228338b3a.20.1724054026695;
+        Mon, 19 Aug 2024 00:53:46 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127aef6eeesm6147151b3a.118.2024.08.19.00.53.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 00:53:46 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 0/2] Bonding: support new xfrm state offload functions
+Date: Mon, 19 Aug 2024 15:53:30 +0800
+Message-ID: <20240819075334.236334-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Dzie=C5=84 dobry,
+Add 2 new xfrm state offload functions xdo_dev_state_advance_esn and
+xdo_dev_state_update_stats for bonding. The xdo_dev_state_free will be
+added by Jianbo's patchset [1]. I will add the bonding xfrm policy offload
+in future.
 
-Czy interesuje Pa=C5=84stwa rozwi=C4=85zanie umo=C5=BCliwiaj=C4=85ce moni=
-torowanie samochod=C3=B3w firmowych oraz optymalizacj=C4=99 koszt=C3=B3w =
-ich utrzymania?=20
+I planned to add the new XFRM state offload functions after Jianbo's
+patchset [1], but it seems that may take some time. Therefore, I am
+posting these two patches to net-next now, as our users are waiting for
+this functionality. If Jianbo's patch is applied first, I can update these
+patches accordingly.
 
+[1] https://lore.kernel.org/netdev/20240815142103.2253886-2-tariqt@nvidia.com
 
-Pozdrawiam
-Karol Michun
+v2: Add a function to process the common device checking (Nikolay Aleksandrov)
+    Remove unused variable (Simon Horman)
+v1: lore.kernel.org/netdev/20240816035518.203704-1-liuhangbin@gmail.com
+
+Hangbin Liu (3):
+  bonding: add common function to check ipsec device
+  bonding: Add ESN support to IPSec HW offload
+  bonding: support xfrm state update
+
+ drivers/net/bonding/bond_main.c | 93 ++++++++++++++++++++++++++++-----
+ 1 file changed, 80 insertions(+), 13 deletions(-)
+
+-- 
+2.45.0
+
 
