@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-119771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6FCF956E9E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:21:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF65956E9F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 791E11F215A3
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:21:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A34B2B20979
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45C33A8F7;
-	Mon, 19 Aug 2024 15:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AB0347C7;
+	Mon, 19 Aug 2024 15:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0dtrpVx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kC6cTnM1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0963A8D0
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 15:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EB229D0C
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 15:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724080889; cv=none; b=mGgcbgjW2bZa/M6BPHOJlFmM+l649MctlV9mpa0OAPHDYjkM1VeVHYuU1haITtl2HN8Lm4HjiOuxS6Lw6IVcsOnAIchn3Gqzu3cE309eKzRJTGVc4dRjpFXLEBWQXEd8lJqDI7xSAvR05Ltrt94RahaZInC4/hRtkNNV1QA/MwE=
+	t=1724080943; cv=none; b=AZWxtR5FUMtYOOSnXpEpzyWEbsHV6S6rQoSLH7DtuzoynS1TdmsFU7NpaX6smJgpsDet1bwji2gUJTgozUsgI5Jz89Fr54pBfTrvTMjOI/6GFxmfjLNlU7IHB9MUhsyHYnuhDOATWGT98jKm/eROyookJUCCsPidEyLLTj5Hhnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724080889; c=relaxed/simple;
-	bh=aBcAqY1HN+qQxw/5Pog1o53oFOe+MJASXET9/gwKRb0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Grf0RttVqwwc7awjixkIU5E8GuTOQQu54TNaNzgxoOAW7R2wEyAtrNvYKba1O021nSoOxvCHg2fHifk0NZ1n8bXMW53hw+m0kYKeWTXmLPqYZ0Y3D2AfnqHIJB7iV9KEKjB/EHzVCepq7xFKO79ihhmVCvRnQURQmJEHHcFbP5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0dtrpVx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B11A8C32782;
-	Mon, 19 Aug 2024 15:21:28 +0000 (UTC)
+	s=arc-20240116; t=1724080943; c=relaxed/simple;
+	bh=a9qxI5n4LrlkWyR01mesv4VWM2o/xIBZk+h35g7/yxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lrzs93xzV/O1JcmAJ0b5asZLcu+/PljCvByAUlll/PhF9+Hv1gWCk/PMIroKVlc4lIH4TaW/akoIrvyxKp4t2y4TpCEW8LjCr7E9UG+1ux8HhogdLfGMco/hOIXKO4APB7dVJQkSYFvrVQX4zafl7RMfmtpGBJaB1TWo7B4wTJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kC6cTnM1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB8E6C32782;
+	Mon, 19 Aug 2024 15:22:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724080889;
-	bh=aBcAqY1HN+qQxw/5Pog1o53oFOe+MJASXET9/gwKRb0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a0dtrpVxgpUKunkV2U1kZaUiF2pyUSwwhorixqBUH5k5JL/WeM0TTabQRMY1qZsWl
-	 HDRddIiOQM7a6wqCQd3s3rFaSEd54MD79kaDyLXF3HlWT58H5MOwl9BPpozR8+1CjT
-	 Z/2MpLxGR4lHtyfEusLkdQaDTbrUmX0PtS0rhPSuWeHN1F4I717AAYQyDffIby+kNi
-	 RtcdEEeakEyTyUZKy254Nh0a4JWmacTGSoX5moEBCbwc2+u9JPZdh8ZcFI0C47Fvhg
-	 spKu7BYdkqapakFtufVdp7uzQRMj+Fw7Mk9t27Qk7EPrmVkEeXINg5EHRg/ZCRJtFX
-	 zh5gMvpUPW/8Q==
-Message-ID: <bda78aa1-d4bd-4f9a-9b54-d7b5444177e2@kernel.org>
-Date: Mon, 19 Aug 2024 09:21:27 -0600
+	s=k20201202; t=1724080943;
+	bh=a9qxI5n4LrlkWyR01mesv4VWM2o/xIBZk+h35g7/yxM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kC6cTnM19j9Od4xB2HxjZCbBINjN3UsndIH8vcvXMcyODV33YPPDPoYbUfVlnR6+b
+	 3cS6eaD0Zp3dkdrlUkqCRyZujZ3E960sgXCu30SFJwKsHtlMb/FXqgwM7ljXGZ70d2
+	 KQUl46Hm9HFwsOzH7fpPu5RDCMNYdO/Tv31EBYWugR7jPkANV0Ffol1f2Tj+nIg4Zb
+	 1TV38B8/Gew372YJ5DdPkSs+VOHsrR2xnL3StEq94buA77CvwfgJ232JZh8ClrvYyK
+	 NkJh/jrNtf69AovHmj3zJFXKRnAkc20k8+BIMLyY4VEpuZm7zDUu41Kf3lmj0pNGMp
+	 i1E7x2IvB0AEw==
+Date: Mon, 19 Aug 2024 08:22:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <przemyslaw.kitszel@intel.com>, <joshua.a.hay@intel.com>,
+ <michal.kubiak@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>
+Subject: Re: [PATCH net-next 0/9][pull request] idpf: XDP chapter II:
+ convert Tx completion to libeth
+Message-ID: <20240819082221.40614484@kernel.org>
+In-Reply-To: <33cd92d1-5d54-42d9-9e01-7c633543bfff@intel.com>
+References: <20240814173309.4166149-1-anthony.l.nguyen@intel.com>
+	<20240815191859.13a2dfa8@kernel.org>
+	<33cd92d1-5d54-42d9-9e01-7c633543bfff@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] ipv6: prevent possible UAF in ip6_xmit()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Vasily Averin <vvs@virtuozzo.com>
-References: <20240819134827.2989452-1-edumazet@google.com>
- <20240819134827.2989452-4-edumazet@google.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240819134827.2989452-4-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/19/24 7:48 AM, Eric Dumazet wrote:
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index 1b9ebee7308f02a626c766de1794e6b114ae8554..519690514b2d1520a311adbcfaa8c6a69b1e85d3 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -287,11 +287,15 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
->  		head_room += opt->opt_nflen + opt->opt_flen;
->  
->  	if (unlikely(head_room > skb_headroom(skb))) {
-> +		/* Make sure idev stays alive */
-> +		rcu_read_lock();
->  		skb = skb_expand_head(skb, head_room);
->  		if (!skb) {
-> +			rcu_read_unlock();
->  			IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
+On Mon, 19 Aug 2024 13:58:40 +0200 Alexander Lobakin wrote:
+> BTW can I send the netdev_feature_t to priv_flags conversion since
+> there's only one kdoc to fix and the rest was reviewed or should I wait
+> as well?
 
-rcu_read_unlock after INC_STATS
-
->  			return -ENOBUFS;
->  		}
-> +		rcu_read_unlock();
->  	}
->  
->  	if (opt) {
-
+You can post, the rate limits apply to vendor drivers only.
 
