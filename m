@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-119882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1667C9574F5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D56D957505
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FCC8B25BD3
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:51:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB914B23B9F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D9A1DD3AE;
-	Mon, 19 Aug 2024 19:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D35A196C9C;
+	Mon, 19 Aug 2024 19:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="1RpBJuJh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJW9YJ3r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F591DD39E
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 19:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C671728F3;
+	Mon, 19 Aug 2024 19:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724096952; cv=none; b=aaa5Ht7310JuDAkuQsUnMG2CPALKD1q8YfCEIJYjsZ+0RCoi5ZimhlurdVBb5624Md0oSufsss+xef4fZSJZn2mgpqi4muOVJzLgwcPnOw/zHESBwIgQsXdJivNJalsGtF9MI22nFe+QE6akdYcmnF4MhipmPI1qSmOvKz4zoyk=
+	t=1724097218; cv=none; b=unCQJoiJZ+amO90+AFM67G+IEo+u4kqGdYKjC3TAPnH4qcU6ML8qfUTaYuDGHOSXYYg7OcMqSrsHtuXaz1rdf7h7q14K4Kmmve5rbAvpnGnKIcfUlsCsC6HqzQcDwbi9GUsoC+seSoWCy/KQnTKMPHGfeC8r6z+ZyydhU/Rm6K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724096952; c=relaxed/simple;
-	bh=tbHoPE0VvmtElKliER9pfKhX6a4EXee9XD9DFCh1owc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGhjSJfAO5XrT4D+ClfbXDXsQ4ArJk8oCPj+997JM3GIniOrIywE7+8rDk7XgXaVnPRSHbagjV2utudR1LZGLMHPOEr6HZNPEDBn2k4HuURRs8HVN5HuDJVpmZJJsV9bK/jJ1uTfTlTtqtAh/gYAz+3K/B3lUCaWXPgsVP4DjPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=1RpBJuJh; arc=none smtp.client-ip=83.166.143.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WnjpW1HqnzsCn;
-	Mon, 19 Aug 2024 21:49:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1724096947;
-	bh=XXYTKUIhmb3g4TO0o6A/cG623xPk3XJMJW789prBuLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1RpBJuJhgnI7yHLSl+S6FB5nssMonj/Q+fYtYrthmDUMFxWm3oQ5PihvcGJ24nf1d
-	 A3tOPEWUDWuWuCnGyXm6HlRyppPDbruAIMtkLmWBU+Rd+E69ak+6SP3fASGFvgrhBq
-	 aEhcetaxPEMPghLcgWKcwPwN3VgZEa2Y8zml3fF8=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WnjpV5BJNz2TR;
-	Mon, 19 Aug 2024 21:49:06 +0200 (CEST)
-Date: Mon, 19 Aug 2024 21:49:03 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
-	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v9 5/5] Landlock: Document
- LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI versioning
-Message-ID: <20240816.ee2Ahkegooch@digikod.net>
-References: <cover.1723615689.git.fahimitahera@gmail.com>
- <c70649f74688605f31ab632350ab77d2a4453ab9.1723615689.git.fahimitahera@gmail.com>
+	s=arc-20240116; t=1724097218; c=relaxed/simple;
+	bh=jl5DpbQGRk/IPdWkCXB5oQDeDocBJf76OGsNDxelbg8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=i32NDL17vkdM4eruDss7PsyznIRMeL/ExP22AyEWCflDNLT2QA2iPib2bAAqLgXsYGJsFi6m+SjaDcO87yDwQJqmL5LvU0JEVN4aL5zNH7lwixWRjUxQnYObI/6bsClvRX9WXSJ+lZgDY9ArwaerfnLjBQrk43WB2uXPZIZMMfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJW9YJ3r; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6bf7ad1ec3aso24160246d6.0;
+        Mon, 19 Aug 2024 12:53:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724097216; x=1724702016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t4/rme6Y689f8B+BXTJquVeqNo6oJaW6GhfFKTCdo7w=;
+        b=NJW9YJ3rwzMEbAQgJliZSjBU9KtyYXChuwM4SYnuUaUg3VhAnYtIaQkQGcv+0PB4ju
+         imLtYx840ZE8xNxHOEfmzPSDiV3daYrkImy5mpFW1kHPi+VoC8wHuAAysIhyFKp5seCr
+         QKVB3It3DF3smu8fjzKZnkGigjIeSv+vqHwCZ/ihob2+dCmUPonZYGe6qeu+HZ1UHOCC
+         6lBMpHNjpRwei4IMQcjS81JY3I8Qtaew8YP1XkcMzoP1BdUvCzXCKAOY0m8AlzGn1Su3
+         s0IjRM3k5UWEL4ocUJdbiwnaDXH/+kHWlNlyWAllcIJiY4cc9LC6xr6/LwOu00TISU59
+         oWcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724097216; x=1724702016;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=t4/rme6Y689f8B+BXTJquVeqNo6oJaW6GhfFKTCdo7w=;
+        b=itE9EaF1CoqToanFG8KaGLjY+YPUJOcLMvvzIVgr1Fm4LhAx+AXAW+ME2Mx1ps6QqO
+         BAwIaDJL0XPbRDOH1AZ5jYv/NqKvxgXYMbL2SwGnOcvoGtNA3D1VZsYGUDQAdNMlZuio
+         MrkPoe/qDVh0HpPPVFmfoGcgmsrBQoMHxnAv4CG96ztU5F5c6r4cEew75c+FGF/sZZZM
+         bRXnZNRzkJrD1hxcdIXbTBIcZpxSfjtXRL+GEMqIC6Yt/kOyxsRcTGEy1gctEdlaS64B
+         UoHFh7ZhTirQBfnqkszBv4yc1pz6/055jYCHH2AI1xfCxBgvwn7+qS0BGM4t7D1R4yRc
+         v2Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmz8cj/StOyL7MYCbN5IQo/g7WktTiJY/suJ/8rEhu1HujuYUH97YBDPaa4yK/SagOBererE4WuNiTgO2w6ZfrOpuQ7dCN
+X-Gm-Message-State: AOJu0YxgjeZ8TixVg1pCZigK8I+W722Usvsh+0sv+Iic0sySnMrQS1+M
+	Eak7txoyg1O//D2gII+8Zn+xJ63HTybTTp+AcUsM7Hm0JsFjtwJx
+X-Google-Smtp-Source: AGHT+IGrCErCS7voHEMpDcxdGlY8K9w0YRGuQlDb3FWnmg8IUeCpV+e7n/Vngc03mUYasQ7B9wS55w==
+X-Received: by 2002:a05:6214:15c3:b0:6bf:828c:4fc4 with SMTP id 6a1803df08f44-6bf828c5339mr88038556d6.49.1724097215496;
+        Mon, 19 Aug 2024 12:53:35 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe10ddbsm45745856d6.49.2024.08.19.12.53.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 12:53:34 -0700 (PDT)
+Date: Mon, 19 Aug 2024 15:53:34 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>, 
+ netdev@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: linux-kernel@vger.kernel.org
+Message-ID: <66c3a2be81834_740b1294db@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240819150621.59833-1-nbd@nbd.name>
+References: <20240819150621.59833-1-nbd@nbd.name>
+Subject: Re: [PATCH net] udp: fix receiving fraglist GSO packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c70649f74688605f31ab632350ab77d2a4453ab9.1723615689.git.fahimitahera@gmail.com>
-X-Infomaniak-Routing: alpha
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 14, 2024 at 12:22:23AM -0600, Tahera Fahimi wrote:
-> Introducing LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET as an IPC scoping
-> mechanism in Landlock ABI version 6, and updating ruleset_attr,
-> Landlock ABI version, and access rights code blocks based on that.
+Felix Fietkau wrote:
+> When assembling fraglist GSO packets, udp4_gro_complete does not set
+> skb->csum_start, which makes the extra validation in __udp_gso_segment fail.
 > 
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
-> v8:
-> - Improving documentation by specifying differences between scoped and
->   non-scoped domains.
-> - Adding review notes of version 7.
-> - Update date
-> v7:
-> - Add "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" explanation to IPC scoping
->   section and updating ABI to version 6.
-> - Adding "scoped" attribute to the Access rights section.
-> - In current limitation, unnamed sockets are specified as sockets that
->   are not restricted.
-> - Update date
-> ---
->  Documentation/userspace-api/landlock.rst | 33 ++++++++++++++++++++++--
->  1 file changed, 31 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-> index 07b63aec56fa..0582f93bd952 100644
-> --- a/Documentation/userspace-api/landlock.rst
-> +++ b/Documentation/userspace-api/landlock.rst
-> @@ -8,7 +8,7 @@ Landlock: unprivileged access control
->  =====================================
->  
->  :Author: Mickaël Salaün
-> -:Date: April 2024
-> +:Date: July 2024
+> Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 
-"August"
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Please rebase the two patch series on v6.11-rc4
+Oh right, UDP GRO fraglist skbs are converted to CHECKSUM_UNNECSSARY
+with __skb_incr_checksum_unnecessary.
+
+Rather than to CHECKSUM_PARTIAL, as udp_gro_complete_segment does for
+non fraglist GRO packets.
+
+virtio_net_hdr_to_skb cannot generate fraglist packets, so this bad
+input check is unnecessary for SKB_GSO_FRAGLIST too.
+
+Thanks for the fix, Felix.
 
