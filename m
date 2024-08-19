@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-119788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EDA956F49
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:53:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16CB956F54
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058281C229A9
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:53:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 707731F218B3
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C817713957B;
-	Mon, 19 Aug 2024 15:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D22413698F;
+	Mon, 19 Aug 2024 15:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T3kwmFUL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEGegQAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB002941B;
-	Mon, 19 Aug 2024 15:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142484964D;
+	Mon, 19 Aug 2024 15:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724082818; cv=none; b=mdm4yqwpAn/XCSF9ULT3vIpF5WmrdwDfplBA/PPkBYyZJRb1+NGS5HWXVapiRrIjoodDuZ0UwGMpNBnSImHpJIZUMO5myfALI0coJzEBaeQNexCSYE9z8l2CenOrRhanwiHXrSGl9sBvfhGKXHrK9brGSttLaK9TD+3zL7XFKzQ=
+	t=1724082912; cv=none; b=nrHb105v5HG7Kugz4zoh4mXI0rIARR079rgQApmQTxJL1WCz5WtxyTGoOof91IgHjeoFz8eANNM7tJVMkDhW1qFICAnqLaZwHJQ/u+Yc4WAOBihLhSov1zXXzH77ItgMv/ZqMPAG0jHgS5e3O7x1BCwYrrLqV3hx1VCesACMtfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724082818; c=relaxed/simple;
-	bh=L5e6UEnKlHXBnCj8JRlPeRc1KwouxnXjwrgaNSrU/eA=;
+	s=arc-20240116; t=1724082912; c=relaxed/simple;
+	bh=nDiEC+oucoZKIe0++x2SH+xHDpiER8lsQQj93ua/syg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B3uPSp0FybF/CiRwacnvD3gk64SGTRJJAasdP4ZzINn/ndNL6qjLuPa3ivfD7ZfHdptbhla39hohbAlwth+lDY81OPyh4fLK3aaHPLm2ZEisxEBT6KXww+cOa1EO9FavYuGe4sitxBIscW/QM0q6suleVuqk49gkuGgrCu10r00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T3kwmFUL; arc=none smtp.client-ip=209.85.128.47
+	 To:Cc:Content-Type; b=YLkdOW3EvwK+HPmX65F1gJ2POxOhkIR88Lo9i9g7iMHH1sTQWRJhKg4uWouCx2/X7Fapml4rBAVfIXjZHGzATN83PfcN9I5Q2UQIj1WuML+1Yb6lHfQlD2yA1ff+PX0IhWvUlIZJfQYrVT9aHm+B0/c7c0AZWk9EARIIAcLA+5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LEGegQAg; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4280bca3960so39328695e9.3;
-        Mon, 19 Aug 2024 08:53:36 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-36d2a601c31so2625315f8f.0;
+        Mon, 19 Aug 2024 08:55:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724082815; x=1724687615; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724082909; x=1724687709; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yHjuzHLc6dVbH873UnnfxiBtXqzG2kypRsGylP+Qz8Q=;
-        b=T3kwmFULTSMt0C1qhiQyZrFYAnE1HZ4nxHdrDacxhxo0pFf0eS03iJsLZQVzWRiCXE
-         24KwyqUSQ+zYuUarzAKDAO1XQEcf+kS8vyYXSvRJvwpOfVius8qjhTro9bExUQKrgTsK
-         VYrtkzlZr3u7eYwoICaXCBO4QBECNIK11blVYFi/XiLcjlyDRrRQo4IQRp2Pfr+zFyyW
-         ndevL2uDZW/BylFqSEeusJulXC636KQi6aWEg56tJ4mMV8diU3jHBiNheuahElYq4GhC
-         rICX2rQnf0CFww6HbTmh3UxiHq8DAfNHYoQkYCKSCSuoI/wBN6LNo/y5jJeDQKLbQF85
-         HrCA==
+        bh=sIOAt7qcIh7yk+Ak6kXM6rwImTNnnUyR1orHAIYs4r4=;
+        b=LEGegQAgR/u/Pdp8PHauHk2xrJgMCZAbSXg17MdTqhvhkGgiQdwVs+BDXZfl/oDM5M
+         7zLRwRBxSRU+perNXuitonz8pw70SpMKJRela/GbT657vXPopPBF6TaDRE3l71jImLWw
+         8ptBH+DdAjJhAt51xQFHL+6lfAGg6Nn07Nc6N6edT3195VpQHQVxerLHp1NSmZJIYk/E
+         4UED7clX/gQXBJXE/Mhn+FHzXOEuFDseYH0Osvta3jQKkXD8OGwyn0GFTEX6Twt2Ndr4
+         4NUukM3NHw2g494hm8Q+5JIbs7DzznV55WawzgRdHs7Uptw7rgWGVyqdSUWCJUvwjqtI
+         9ziA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724082815; x=1724687615;
+        d=1e100.net; s=20230601; t=1724082909; x=1724687709;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yHjuzHLc6dVbH873UnnfxiBtXqzG2kypRsGylP+Qz8Q=;
-        b=izZKJblbxCEzqdKOh/L0y3dH8mbCUE81NyTrywOTwnVzUQEJyJe45dpi8MKyM/wZl/
-         jhEatWDBYpdzCm6X6ehdTkGxpl5lYZm5agWDM8QhoJptR1M9AEtDv33qOkuFyqHldHEY
-         sns5HpDxIjQ5RJtCN5S5mQZWZmR78C2A5HpyP2yb9fdxc+i/mjlmgCMLRMe4J3ScnLo0
-         mBhAO2CGnjGG4fF5HFiEkyO3NHCeGJpX7CWRGyzZnBG1R83BIslL6LtoUgieFEGt9WJb
-         D4VTWJ/VuuLViIxC9mf4RqbY5F1L6EcbkvQdh5bOXMustnCXgsXoGxLxtCQ6fC7L1Vn2
-         W1wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRjVpCFalHhBss56u6xa8lAC0dCH5BMCPwjnKOkNtjmGqTgkyNhrUd5gqeiSDz+svvfH8T+jCXtzkAmNl5VPnEnwiSM0Azfc+NSOyeW7sOnpgImnLwPWK49tGq5pvS0NAypqMT
-X-Gm-Message-State: AOJu0Yzc0P1g68L+JuZlwQScDqXEK98WTystsN+Y5wHU8bjvaV6OCi4G
-	YdreIrRGOTj1RYyy/RKaEd09kXyLU1fybLy093kmTqTXkAg0SBF5DEufqm6PpdrpWokyQF7LSz6
-	5j9rg9bKgInT9fw3I5YA6PMvLFe8=
-X-Google-Smtp-Source: AGHT+IGQebnGsoVvedM2mMyp/EghK9PoeWJVkJxA7xPAhuM5bYFyaz+0IQN7NgeQJW5stT9jK19xelNtf1qrHeubrms=
-X-Received: by 2002:a05:600c:1c8f:b0:428:23c8:1e54 with SMTP id
- 5b1f17b1804b1-429ed7b8360mr89105815e9.18.1724082814573; Mon, 19 Aug 2024
- 08:53:34 -0700 (PDT)
+        bh=sIOAt7qcIh7yk+Ak6kXM6rwImTNnnUyR1orHAIYs4r4=;
+        b=jJbF0X1dNiYKEr0DOtmmG/c/Bb/mSFTsxpubTiPs9/tStOFpSoxMggxn0Y65ZWE363
+         I0h6TsMImik1slPgI5ilvJmByTFCyzaZVQtcgMcTGBpYzwfB5dYBa1tZj62kADnP+b7n
+         QoiuEV2DuCdw6/pVSXiqDvQbvjNdeCiNKug8pLqgK+ozfTQjyVPcA96IqaW1ZRuCPP/M
+         mdplU9G9cd9rRxg4ISOxznjenM1YoYEz522IEFatY5qDOvMjuat4gUG1Z4mH3CpqN0Ke
+         YpdNII8ForTiC2N7p58fhrfKN95QHo/MwxTynE9bljvjdP7pmXBAZLsZY3/CWaq0x9nU
+         gKeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4l25kHT4WUCl1V+AytZ8wIUMhh5x1+x3sfav6L1rY62eT5RBgVQV4DmGr44Y+PfRraLvYcB09za4JFvNiiMmpjonyHb6Ne+k6/zRT5Q41q/MJR4FaXqDde8ZI9kU2ljbXACIt1HiLCFg/JNoO84ZMVS4x4PJGnrQTGyM3EWRRC4xY9OGl5YfauVn9wG4ihvulFVhtGG755rt4rS49LjAA1JiqYHkgX0aPR95FUbDNiihKDrg+cc20oGzRDQIp8Z7VrNeUQgzivr6F
+X-Gm-Message-State: AOJu0YyGvTGb7qmSz1y0QmIWJEO2ASdPnMsyEEx0ynD4iX/20ceqcObh
+	VxvVJ+QlzXKJD/5bxsc2t6OfHtkXMFZrpWtH0IlsJD43woSKXk2soXxxU7iIm2h9+zIYg2pI6Y+
+	xLINBffQmn8Gt+Y/KB7QM0U8aVag=
+X-Google-Smtp-Source: AGHT+IH+5SdMMmvczHHbCQS3d2lV+42NHIBp97s6EuIfp9v1lsrp5Tb1uRlaaTz2L+/Rjsor4cGm4qQ4+md5bQzOvmo=
+X-Received: by 2002:a05:6000:1006:b0:371:8eaf:3c49 with SMTP id
+ ffacd0b85a97d-371946a32a9mr7016301f8f.40.1724082909035; Mon, 19 Aug 2024
+ 08:55:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,209 +72,165 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-12-linyunsheng@huawei.com> <d9814d6628599b7b28ed29c71d6fb6631123fdef.camel@gmail.com>
- <7f06fa30-fa7c-4cf2-bd8e-52ea1c78f8aa@huawei.com> <CAKgT0Uetu1HA4hCGvBLwRgsgX6Y95FDw0epVf5S+XSnezScQ_w@mail.gmail.com>
- <5905bad4-8a98-4f9d-9bd6-b9764e299ac7@huawei.com>
-In-Reply-To: <5905bad4-8a98-4f9d-9bd6-b9764e299ac7@huawei.com>
+ <20240808123714.462740-5-linyunsheng@huawei.com> <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
+ <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com> <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
+ <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
+In-Reply-To: <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
 From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 19 Aug 2024 08:52:58 -0700
-Message-ID: <CAKgT0Ucz4R=xOCWgauDO_i6PX7=hgiohXngo2Mea5R8GC_s2qQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 11/14] mm: page_frag: introduce
- prepare/probe/commit API
+Date: Mon, 19 Aug 2024 08:54:32 -0700
+Message-ID: <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
 To: Yunsheng Lin <linyunsheng@huawei.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+	Subbaraya Sundeep <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Sagi Grimberg <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
+	bpf@vger.kernel.org, linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 16, 2024 at 5:01=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+On Fri, Aug 16, 2024 at 4:55=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
 m> wrote:
 >
-> On 2024/8/15 23:25, Alexander Duyck wrote:
-> > On Wed, Aug 14, 2024 at 8:05=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
+> On 2024/8/15 23:00, Alexander Duyck wrote:
+> > On Wed, Aug 14, 2024 at 8:00=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
 i.com> wrote:
 > >>
-> >> On 2024/8/15 5:00, Alexander H Duyck wrote:
-> >
-> > ...
-> >
-> >>>> +static inline void page_frag_alloc_abort(struct page_frag_cache *nc=
-,
-> >>>> +                                     unsigned int fragsz)
-> >>>> +{
-> >>>> +    nc->pagecnt_bias++;
-> >>>> +    nc->remaining +=3D fragsz;
-> >>>> +}
-> >>>> +
-> >>>
-> >>> This doesn't add up. Why would you need abort if you have commit? Isn=
-'t
-> >>> this more of a revert? I wouldn't think that would be valid as it is
-> >>> possible you took some sort of action that might have resulted in thi=
-s
-> >>> memory already being shared. We shouldn't allow rewinding the offset
-> >>> pointer without knowing that there are no other entities sharing the
-> >>> page.
-> >>
-> >> This is used for __tun_build_skb() in drivers/net/tun.c as below, main=
-ly
-> >> used to avoid performance penalty for XDP drop case:
-> >
-> > Yeah, I reviewed that patch. As I said there, rewinding the offset
-> > should be avoided unless you can verify you are the only owner of the
-> > page as you have no guarantees that somebody else didn't take an
-> > access to the page/data to send it off somewhere else. Once you expose
-> > the page to any other entity it should be written off or committed in
-> > your case and you should move on to the next block.
->
-> Yes, the expectation is that somebody else didn't take an access to the
-> page/data to send it off somewhere else between page_frag_alloc_va()
-> and page_frag_alloc_abort(), did you see expectation was broken in that
-> patch? If yes, we should fix that by using page_frag_free_va() related
-> API instead of using page_frag_alloc_abort().
-
-The problem is when you expose it to XDP there are a number of
-different paths it can take. As such you shouldn't be expecting XDP to
-not do something like that. Basically you have to check the reference
-count before you can rewind the page.
-
-> >
-> >
-> >>
-> >>>> +static struct page *__page_frag_cache_reload(struct page_frag_cache=
- *nc,
-> >>>> +                                         gfp_t gfp_mask)
-> >>>>  {
-> >>>> +    struct page *page;
-> >>>> +
-> >>>>      if (likely(nc->encoded_va)) {
-> >>>> -            if (__page_frag_cache_reuse(nc->encoded_va, nc->pagecnt=
-_bias))
-> >>>> +            page =3D __page_frag_cache_reuse(nc->encoded_va, nc->pa=
-gecnt_bias);
-> >>>> +            if (page)
-> >>>>                      goto out;
-> >>>>      }
+> >> On 2024/8/14 23:49, Alexander H Duyck wrote:
+> >>> On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> >>>> Currently the page_frag API is returning 'virtual address'
+> >>>> or 'va' when allocing and expecting 'virtual address' or
+> >>>> 'va' as input when freeing.
 > >>>>
-> >>>> -    if (unlikely(!__page_frag_cache_refill(nc, gfp_mask)))
-> >>>> -            return false;
-> >>>> +    page =3D __page_frag_cache_refill(nc, gfp_mask);
-> >>>> +    if (unlikely(!page))
-> >>>> +            return NULL;
+> >>>> As we are about to support new use cases that the caller
+> >>>> need to deal with 'struct page' or need to deal with both
+> >>>> 'va' and 'struct page'. In order to differentiate the API
+> >>>> handling between 'va' and 'struct page', add '_va' suffix
+> >>>> to the corresponding API mirroring the page_pool_alloc_va()
+> >>>> API of the page_pool. So that callers expecting to deal with
+> >>>> va, page or both va and page may call page_frag_alloc_va*,
+> >>>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
 > >>>>
-> >>>>  out:
-> >>>>      /* reset page count bias and remaining to start of new frag */
-> >>>>      nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> >>>>      nc->remaining =3D page_frag_cache_page_size(nc->encoded_va);
-> >>>> -    return true;
-> >>>> +    return page;
-> >>>> +}
-> >>>> +
+> >>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >>>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> >>>> Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> >>>> Acked-by: Sagi Grimberg <sagi@grimberg.me>
+> >>>> ---
+> >>>>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
+> >>>>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+> >>>>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+> >>>>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
+> >>>>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
+> >>>>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
+> >>>>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
+> >>>>  drivers/nvme/host/tcp.c                       |  8 +++----
+> >>>>  drivers/nvme/target/tcp.c                     | 22 +++++++++-------=
+---
+> >>>>  drivers/vhost/net.c                           |  6 ++---
+> >>>>  include/linux/page_frag_cache.h               | 21 +++++++++-------=
+--
+> >>>>  include/linux/skbuff.h                        |  2 +-
+> >>>>  kernel/bpf/cpumap.c                           |  2 +-
+> >>>>  mm/page_frag_cache.c                          | 12 +++++-----
+> >>>>  net/core/skbuff.c                             | 16 +++++++-------
+> >>>>  net/core/xdp.c                                |  2 +-
+> >>>>  net/rxrpc/txbuf.c                             | 15 +++++++------
+> >>>>  net/sunrpc/svcsock.c                          |  6 ++---
+> >>>>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
+> >>>>  19 files changed, 75 insertions(+), 70 deletions(-)
+> >>>>
 > >>>
-> >>> None of the functions above need to be returning page.
-> >>
-> >> Are you still suggesting to always use virt_to_page() even when it is
-> >> not really necessary? why not return the page here to avoid the
-> >> virt_to_page()?
-> >
-> > Yes. The likelihood of you needing to pass this out as a page should
-> > be low as most cases will just be you using the virtual address
-> > anyway. You are essentially trading off branching for not having to
-> > use virt_to_page. It is unnecessary optimization.
->
-> As my understanding, I am not trading off branching for not having to
-> use virt_to_page, the branching is already needed no matter we utilize
-> it to avoid calling virt_to_page() or not, please be more specific about
-> which branching is traded off for not having to use virt_to_page() here.
-
-The virt_to_page overhead isn't that high. It would be better to just
-use a consistent path rather than try to optimize for an unlikely
-branch in your datapath.
-
-> >
-> >
-> >>
-> >>>> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-> >>>> +                            unsigned int *offset, unsigned int frag=
-sz,
-> >>>> +                            gfp_t gfp)
-> >>>> +{
-> >>>> +    unsigned int remaining =3D nc->remaining;
-> >>>> +    struct page *page;
-> >>>> +
-> >>>> +    VM_BUG_ON(!fragsz);
-> >>>> +    if (likely(remaining >=3D fragsz)) {
-> >>>> +            unsigned long encoded_va =3D nc->encoded_va;
-> >>>> +
-> >>>> +            *offset =3D page_frag_cache_page_size(encoded_va) -
-> >>>> +                            remaining;
-> >>>> +
-> >>>> +            return virt_to_page((void *)encoded_va);
-> >>>> +    }
-> >>>> +
-> >>>> +    if (unlikely(fragsz > PAGE_SIZE))
-> >>>> +            return NULL;
-> >>>> +
-> >>>> +    page =3D __page_frag_cache_reload(nc, gfp);
-> >>>> +    if (unlikely(!page))
-> >>>> +            return NULL;
-> >>>> +
-> >>>> +    *offset =3D 0;
-> >>>> +    nc->remaining =3D remaining - fragsz;
-> >>>> +    nc->pagecnt_bias--;
-> >>>> +
-> >>>> +    return page;
-> >>>>  }
-> >>>> +EXPORT_SYMBOL(page_frag_alloc_pg);
+> >>> I still say no to this patch. It is an unnecessary name change and ad=
+ds
+> >>> no value. If you insist on this patch I will reject the set every tim=
+e.
 > >>>
-> >>> Again, this isn't returning a page. It is essentially returning a
-> >>> bio_vec without calling it as such. You might as well pass the bio_ve=
-c
-> >>> pointer as an argument and just have it populate it directly.
+> >>> The fact is it is polluting the git history and just makes things
+> >>> harder to maintain without adding any value as you aren't changing wh=
+at
+> >>> the function does and there is no need for this. In addition it just
 > >>
-> >> I really don't think your bio_vec suggestion make much sense  for now =
-as
-> >> the reason mentioned in below:
+> >> I guess I have to disagree with the above 'no need for this' part for
+> >> now, as mentioned in [1]:
 > >>
-> >> "Through a quick look, there seems to be at least three structs which =
-have
-> >> similar values: struct bio_vec & struct skb_frag & struct page_frag.
+> >> "There are three types of API as proposed in this patchset instead of
+> >> two types of API:
+> >> 1. page_frag_alloc_va() returns [va].
+> >> 2. page_frag_alloc_pg() returns [page, offset].
+> >> 3. page_frag_alloc() returns [va] & [page, offset].
 > >>
-> >> As your above agrument about using bio_vec, it seems it is ok to use a=
-ny
-> >> one of them as each one of them seems to have almost all the values we
-> >> are using?
-> >>
-> >> Personally, my preference over them: 'struct page_frag' > 'struct skb_=
-frag'
-> >>> 'struct bio_vec', as the naming of 'struct page_frag' seems to best m=
-atch
-> >> the page_frag API, 'struct skb_frag' is the second preference because =
-we
-> >> mostly need to fill skb frag anyway, and 'struct bio_vec' is the last
-> >> preference because it just happen to have almost all the values needed=
-.
+> >> You seemed to miss that we need a third naming for the type 3 API.
+> >> Do you see type 3 API as a valid API? if yes, what naming are you
+> >> suggesting for it? if no, why it is not a valid API?"
 > >
-> > That is why I said I would be okay with us passing page_frag in patch
-> > 12 after looking closer at the code. The fact is it should make the
-> > review of that patch set much easier if you essentially just pass the
-> > page_frag back out of the call. Then it could be used in exactly the
-> > same way it was before and should reduce the total number of lines of
-> > code that need to be changed.
+> > I didn't. I just don't see the point in pushing out the existing API
+> > to support that. In reality 2 and 3 are redundant. You probably only
+> > need 3. Like I mentioned earlier you can essentially just pass a
 >
-> So the your suggestion changed to something like below?
+> If the caller just expect [page, offset], do you expect the caller also
+> type 3 API, which return both [va] and [page, offset]?
 >
-> int page_frag_alloc_pfrag(struct page_frag_cache *nc, struct page_frag *p=
-frag);
->
-> The API naming of 'page_frag_alloc_pfrag' seems a little odd to me, any b=
-etter
-> one in your mind?
+> I am not sure if I understand why you think 2 and 3 are redundant here?
+> If you think 2 and 3 are redundant here, aren't 1 and 3 also redundant
+> as the similar agrument?
 
-Well at this point we are populating/getting/pulling a page frag from
-the page frag cache. Maybe look for a word other than alloc such as
-populate. Essentially what you are doing is populating the pfrag from
-the frag cache, although I thought there was a size value you passed
-for that isn't there?
+The big difference is the need to return page and offset. Basically to
+support returning page and offset you need to pass at least one value
+as a pointer so you can store the return there.
+
+The reason why 3 is just a redundant form of 2 is that you will
+normally just be converting from a va to a page and offset so the va
+should already be easily accessible.
+
+> > page_frag via pointer to the function. With that you could also look
+> > at just returning a virtual address as well if you insist on having
+> > something that returns all of the above. No point in having 2 and 3 be
+> > seperate functions.
+>
+> Let's be more specific about what are your suggestion here: which way
+> is the prefer way to return the virtual address. It seems there are two
+> options:
+>
+> 1. Return the virtual address by function returning as below:
+> void *page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio=
+);
+>
+> 2. Return the virtual address by double pointer as below:
+> int page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio,
+>                         void **va);
+
+I was thinking more of option 1. Basically this is a superset of
+page_frag_alloc_va that is also returning the page and offset via a
+page frag. However instead of bio_vec I would be good with "struct
+page_frag *" being the value passed to the function to play the role
+of container. Basically the big difference between 1 and 2/3 if I am
+not mistaken is the fact that for 1 you pass the size, whereas with
+2/3 you are peeling off the page frag from the larger page frag cache
+after the fact via a commit type action.
 
