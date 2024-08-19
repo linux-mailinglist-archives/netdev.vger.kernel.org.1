@@ -1,162 +1,110 @@
-Return-Path: <netdev+bounces-119750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95ABC956D31
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 737F8956D36
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95D31C22191
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:28:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A684E1C22AF8
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF69170A1F;
-	Mon, 19 Aug 2024 14:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B581714D1;
+	Mon, 19 Aug 2024 14:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mGY/s0Y+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ej0FynEN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ST0oRLSH"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C35916F91D;
-	Mon, 19 Aug 2024 14:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B5717109B;
+	Mon, 19 Aug 2024 14:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724077681; cv=none; b=MKG7iemK+LmGTddFFyr2MzHVZnG4fcMvC5jx5LWkL9MRhGpEL0ALlxW5JDHrySDqfCoxd1Z9ZPZdrulISmF7sf9Z2VOBmwybd8CUuIXOso/GxjodEDEd5mullOIAkjeIfRvGD2QYU9zuLk/GJKhxYdbooH7otfp7QUwhWy8ezWQ=
+	t=1724077745; cv=none; b=ZfZPRyhpkf+CXlpatodGZhhaETI6gGKFLk7NO2JqI66kALxhVGSfbkQzks5Eu88scKX7IPENkL7XBTEfghVEp6Hr+mFrixLdI7yhESs/kiSZUqwU2sRN4Sv3/r911SjZFm7yrf8BHYuffaABGd3rC7XuD/9Gm/zgzW+4TiOarhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724077681; c=relaxed/simple;
-	bh=T4kXcrf6U1ZzhbkT3a2rP7wxyAUDvWW2UaMwpDLxAzY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=V8BYE7UIwiknua35h4ZcKXOD1iqDy3SpWU5NiE0I6nej4Qnzm24/guRS2m+1YRz9fBhiEH651Mo7m2cGC/m0pyHwOFiF/gOafXp3Zc3JatiwVnphuwzsQoSrs9CLFfo9jpWeTD8XFK407hYyAu1hsKCQzib2OxlYOrfhLUsXrwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mGY/s0Y+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ej0FynEN; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1724077677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4kXcrf6U1ZzhbkT3a2rP7wxyAUDvWW2UaMwpDLxAzY=;
-	b=mGY/s0Y+57u6UEK597/ujos/ffBufRW9eUCjC9qc5dDtLx5Uq6MS2chEL4u4fugEQaeyWW
-	n1LFy9UzGgOIO++3+1i/3bRgZ8oOPsV5qEY9wo0VBS+DninOMs278lRaX64VvopviydTZ5
-	AEKCeHyIdR5ikUttitPdqjeVZubrOYYgkMkS0tyvpMIhRjAhoq8YR1iXjH7Cpg68UNExJQ
-	9R51NnkiHJMgKynhkYLJznOKA996LaQX/he0QXJgfzVP327KniJBOK0pkQo/cj3deXljP0
-	Agzr8w/y+ajnK8ZRa6C/s4p6wtro1cKrxSCfEhoAh2mqC3rcZzbHFowbRKA2Ng==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1724077677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4kXcrf6U1ZzhbkT3a2rP7wxyAUDvWW2UaMwpDLxAzY=;
-	b=ej0FynENLHM5oq6oeyFlle/rpZ+l0IohArldJYwavZ4ZAwo3bP/RG/GjAZom5lT0yglKHK
-	m7enlCFozqmxcxDA==
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, Sriram Yagnaraman
- <sriram.yagnaraman@ericsson.com>, Benjamin Steinke
- <benjamin.steinke@woks-audio.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Sriram Yagnaraman
- <sriram.yagnaraman@est.tech>
-Subject: Re: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structures and
- helpers
-In-Reply-To: <ZsNSc9moGwySgpcU@boxer>
-References: <20240711-b4-igb_zero_copy-v6-0-4bfb68773b18@linutronix.de>
- <20240711-b4-igb_zero_copy-v6-4-4bfb68773b18@linutronix.de>
- <ZsNGf66OjbqQSTid@boxer> <87r0ak8wan.fsf@kurt.kurt.home>
- <ZsNSc9moGwySgpcU@boxer>
-Date: Mon, 19 Aug 2024 16:27:55 +0200
-Message-ID: <87h6bg8u50.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1724077745; c=relaxed/simple;
+	bh=MdlQwQfefZ1L3XXxLQMT4cSITw5lmaaVPHUx7XMCkvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YlYzcBGOzgWcA/yWyS4s6cIZuXja33kyVF/t8hGphNKS8MJrdP7qiNgZumoKdy5oh9Hxwj5GQmFaAGWoBamc+PyJNRXJ891FrwfPJVGYWurUVHx6tCx5GhHoU/QayqxzCenDWo5b7bpSFTPUUq0QepOQlrk39+ZzmiQvqxxwlq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ST0oRLSH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Dzw80pACf9PyVIUJFbVzVkCMS0xplokp1d1HIwEGeIg=; b=ST0oRLSHEfDPMth9UZeInVBB1l
+	fuUb2vGYqGChci6u302h5RAq3buvcQ/mAYDf5FhycVHPtPpOkTBEgyaSCFebjLiGOJhwJQY2u2LzY
+	VaNkuwDgqY71H0o1l9qwTdDMs2XRp98lNwHRcc5U0r2EyY41sL9tNVFlQ4mrifXwx/Is=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sg3NM-0057W1-Si; Mon, 19 Aug 2024 16:28:52 +0200
+Date: Mon, 19 Aug 2024 16:28:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pieter <vtpieter@gmail.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: add KSZ8
+ change_tag_protocol support
+Message-ID: <a45ef0cf-068e-4535-8857-fbea25603f32@lunn.ch>
+References: <20240819101238.1570176-1-vtpieter@gmail.com>
+ <20240819101238.1570176-2-vtpieter@gmail.com>
+ <20240819104112.gi2egnjbf3b67scu@skbuf>
+ <CAHvy4ApydUb273oJRLLyfBKTNU1YHMBp261uRXJnLO05Hd0XKQ@mail.gmail.com>
+ <90009327-df9d-4ed7-ac6c-be87065421ba@lunn.ch>
+ <CAHvy4Aq0-9+Z9oCSSb=18GHduAfciAzritGb6yhNy1xvO8gNkg@mail.gmail.com>
+ <9e5cc632-3058-46b2-8920-30c521eb1bbd@lunn.ch>
+ <CAHvy4Aq=as=K48NZHt3Ek8Yg_AzyFdsmTe92b8SFobzUBM9JNA@mail.gmail.com>
+ <20240819140536.f33prrex2n3ifi7i@skbuf>
+ <CAHvy4AqRbsjvU4mtRXHuu6dvPCgGfvZUUiDc3OPbk_PtdNBpPg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHvy4AqRbsjvU4mtRXHuu6dvPCgGfvZUUiDc3OPbk_PtdNBpPg@mail.gmail.com>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Mon, Aug 19, 2024 at 04:20:31PM +0200, Pieter wrote:
+> Hi Vladimir,
+> 
+> > On Mon, Aug 19, 2024 at 03:43:42PM +0200, Pieter wrote:
+> > > Right so I'm managing it but I don't care from which port the packets
+> > > originate, so I could disable the tagging in my case.
+> > >
+> > > My problem is that with tagging enabled, I cannot use the DSA conduit
+> > > interface as a regular one to open sockets etc.
+> >
+> > Open the socket on the bridge interface then?
+> 
+> Assuming this works, how to tell all user space programs to use br0 instead
+> of eth0?
 
-On Mon Aug 19 2024, Maciej Fijalkowski wrote:
-> On Mon, Aug 19, 2024 at 03:41:20PM +0200, Kurt Kanzenbach wrote:
->> On Mon Aug 19 2024, Maciej Fijalkowski wrote:
->> > On Fri, Aug 16, 2024 at 11:24:03AM +0200, Kurt Kanzenbach wrote:
->> >> From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
->> >>=20
->> >> Add the following ring flag:
->> >> - IGB_RING_FLAG_TX_DISABLED (when xsk pool is being setup)
->> >>=20
->> >> Add a xdp_buff array for use with XSK receive batch API, and a pointer
->> >> to xsk_pool in igb_adapter.
->> >>=20
->> >> Add enable/disable functions for TX and RX rings.
->> >> Add enable/disable functions for XSK pool.
->> >> Add xsk wakeup function.
->> >>=20
->> >> None of the above functionality will be active until
->> >> NETDEV_XDP_ACT_XSK_ZEROCOPY is advertised in netdev->xdp_features.
->> >>=20
->> >> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
->> >
->> > Sriram's mail bounces unfortunately, is it possible to grab his current
->> > address?
->>=20
->> His current email address is in the Cc list. However, i wasn't sure if
->> it's okay to update the From and SoB of these patches?
->
-> Okay. Then I believe Sriram should provide a mailmap entry to map his old
-> mail to a new one.
->
->>=20
->> >
->> > You could also update the copyright date in igb_xsk.c.
->>=20
->> Ditto for the copyright. It probably has to be something like
->> Copyright(c) 2023 Ericsson?
->
-> It says 2018 Intel. I don't think Sriram was working under E/// employment
-> as he said he was forbidden to work on this further and that's why you
-> picked it up, right?
->
-> My intent was not stir up the copyright pot, though. It can be left as-is
-> or have something of a Linutronix/Sriram Yagnamaran mix :P
+How did you tell userspace to use eth0?
 
-Let's see if Sriram has something to say about the copyright. If not
-i'll just leave this as-is.
+In general, you don't tell userspace anything about interfaces. You
+open a client socket to a destination IP address, and the kernel
+routing tables are used to determine the egress interface. In general,
+it will use a public scope IP address from that interface as the
+source address.
 
-Thanks,
-Kurt
+The conduit interface should not have an IP address, its just
+plumbing, but not otherwise used. Your IP address is on br0, so by
+default the kernel will use the IP address from it.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+	Andrew
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmbDVmsTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgos6EAClRiQ46uuQdJSoVAuRS+Oy0h7N5gSX
-DLar3+UBIn0n2vd56pfsvptPA/KYR7bXnQc75LhOidWoXlrHsrP0yyDeoqvNGNM0
-Syl2uEeYkok7/C8WvXsMmOtMbIXxJ2H98/0SNwfl8HYp1jzUKVaYGkioi8CyktHN
-fPQqX33WMiBHyOMB3AB+Fh5MZ3BtrEc0NbiazK5Nuu0z4MD7tU82By8PS+4iBalk
-00lZNcsvufAy2/DBkUx+A5PEpHqd9wUGnGESu9Dyyw5pEJqlT62DjUgA8BEnpTUE
-G9iG/mA2/wFt0OIlEnrWMqRuHxO8JV4el4IkuKSrdkHbbA+zcwCnAEi2ApYhbW8s
-h5YxhFHMn54jwKUIpMdpdnBlaXq/tYtDkRZqC5fOLDW1gZvcJaK7KaL0p3RT/UPM
-dxnDAhMoiJO5iBOn9VgaEUudwl/QhWtGcXlKwFzpKYxZzws7Pgk0hFNFQxeNtPV/
-PQDjVf541S4XYf0C+TNL6rr97ffUqTdIx84EzYafw93d1huvWjQWIaa0LzjgTfJu
-rquJhAtCJLOfbbghbVao+nuTaTBl+AORwgEcGPJLPu5svP0LxP5h3ZkBRqI5Ozet
-mr4WP1MZvCujFjWGRyaV/JhI78MNNF3gppPz+6KNque/G3BjmoKx7xd2+3W2YZjM
-6YBuN700RJpouA==
-=oq9R
------END PGP SIGNATURE-----
---=-=-=--
 
