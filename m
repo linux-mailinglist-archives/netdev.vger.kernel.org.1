@@ -1,103 +1,111 @@
-Return-Path: <netdev+bounces-119931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA950957872
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:09:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C43B9578B9
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 728DDB22303
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:09:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 286D3B20E39
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901BC1DD3A0;
-	Mon, 19 Aug 2024 23:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAE31DF66F;
+	Mon, 19 Aug 2024 23:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QyqUujxr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="baGlINiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D3D159565;
-	Mon, 19 Aug 2024 23:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4905515A865
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 23:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724108940; cv=none; b=dkRb6wd0dsYCDrw7taZXBS92AqHUULNfns2yfSVAl7Bw8hgh2BIrD/i31yotNOweAqcj1+tv3gI8O7eSRQojX6TUX0PbE3xers0NcHvrLY/YPB0indAB5jtUlhM/yTuPKLEYH11bP9YbXIsStJAeujAf1EhYk30LxCpT9A3e0/g=
+	t=1724110755; cv=none; b=EbSTJgz2xGiOels1yx+oI/M5gu8JCWHNvDGwBFSq6sEgaBCu8t8DAolJ0rX/Wuh+csibPaZBu/dGvoIr2jaJf1Q3l5Ef9jFJXKAYL/hjtQUyxeUQ9RhHPM8O3JsNWCWMutNhNO8DjfabyoposilLsOI4qoqItYeMzewChd3dM7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724108940; c=relaxed/simple;
-	bh=huFSW0O9/vDWk3jLLuBeA3AMJ8s2sEkGg2pXPbb+s68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tjQlTJyaTendOQ/iOyH60AhR4ugpcU7ML6HpeMf5eiSWDKelP/+mlZSQ8t3f2tFjkKmyu17GapkqUD49rUtm0zCOyNUUyLT5fqxrSDH/YWH4KiyPAdb5eRA7HubUNjb+jhZBVIX7fBng3WS4B6Qv1RtSPyWwLqT5ApVYk+SrpCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QyqUujxr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA0CFC32782;
-	Mon, 19 Aug 2024 23:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724108939;
-	bh=huFSW0O9/vDWk3jLLuBeA3AMJ8s2sEkGg2pXPbb+s68=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QyqUujxrEN6dsd4ERQTt/YOI/cvdOUsxyzulCSEUBiuIHcUjbso3YoHhm+MDDjXT6
-	 kO9NWk4G1DxC2IVA3zkGg8srtPDyFLff5uhaOUiFK+NExsY+Ll691k0tYJtyjYNGGx
-	 R8ea/prAo67rf/R+QQhD3Rii19DVFFqisY3I2DnLQAE/IPfGUWcrv4lOPmRHd7VZGf
-	 JqTO87jDiHxQyeCkXr0+BfY4JpLeRz6Irhp6iVFLE8tq6EkfsJOK81XApXX7vxK3Wi
-	 PrCtt8OOS+xYZotvuJuNtHzD7KWzuisUw9dkFacyFCOLy1M7Z1lS5ujaSckETWGpk7
-	 a6Iem0/y3hWYQ==
-Message-ID: <39af5ef3-04f5-4cfe-a486-6f14504d6a52@kernel.org>
-Date: Tue, 20 Aug 2024 08:08:54 +0900
+	s=arc-20240116; t=1724110755; c=relaxed/simple;
+	bh=lZJol2DFHX/A1hfn6v8hzLcoNFs08ICgDCBu64glJ2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=E3Uh3Lh6i+XbSYN27YtzMUDhb6RhSCg3vjuscvpCmVj4V8fVXqTiKY2vp7sHnuP1IGOmtDTz2/rtLkEUCWOwseSUPrbJjb7MoygAgPcjwH4jRkHHECV5gGXkeWWC8F/T/keimWYw5XZN4eYgpik3kMKoi4muLJEmtEaX5b5+el0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=baGlINiF; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7c1f480593bso3204683a12.0
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:39:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724110753; x=1724715553; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lZJol2DFHX/A1hfn6v8hzLcoNFs08ICgDCBu64glJ2U=;
+        b=baGlINiFgz4U1Sx6Cq28OH5YVTfesSK+2ilmwJoK++axU2zUe4mcTan7m/NhB04xlj
+         pClknI4tu4+hopSmf872q0CS6yj9cnrz2HF7TgPbs+eikFSkdfOHIhnsAAJbgXG/ITIo
+         X8GEQ9kDGjfjzPv1VfLbnLmeAhe/BNeSmuD7A6h8j/aDid1JbVglAr6iBNLPrX2UtMiB
+         ZiIdams3G3182LYodQKJSOt3nUynsvwINkWkiNAiCMeVSimGTYAEwxlA2MhF0nDQ53Hv
+         cz342vD6eAQcZBO8DZ26G51Tn+ssVMIXUHLSdLYwDmwF4mR4K3hYrEY0J+HgAAO7mB14
+         cfbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724110753; x=1724715553;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lZJol2DFHX/A1hfn6v8hzLcoNFs08ICgDCBu64glJ2U=;
+        b=CdM+G838uFmrJmCs9E4nZGty8JxB33/NRm7wKUBlJup7e9pSBwcBRVePcfEXDF7GrZ
+         HXl4pHnoJiQWVx5/nFXeyAOUj3Vj3NR5Rj4RYTZO8+qYHBm1G/sgD/tIeRlfbQYC03Qr
+         gtxjPIpBMhIyXN+wVkoZNZvameOihwwtbTr2g5tPkkn8BqVDwd4pValyt5i3oxUuQWfY
+         mP3fPzluav0p0UDU2p7+vqm9g21n+XH6nFkUB0OHTj0DtUKSWRFlB45/o15w7pY+FOYO
+         EconpcKICn+DQ7MdDEjtkKq1crTegWqSpDaC3oJWqo/yqhq7JpRyoZ+IEZnQerm6yHp2
+         JZMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhyIgwZWTYwP3daASaQ3mjNMD/pCJ1KqK8ZaHj08Mnk4P2/mB9P3LMgyByE6YHEJPhLyLbiEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHGiHftFzxDwInDh1xDgg7ETba/AnAaJStol1rOBRbLjUNZJy7
+	z3Il/mvQuxJQMjlehK7vlZGOEXus/mTpV6VAC2/ZLK6VZ2hasK1I
+X-Google-Smtp-Source: AGHT+IGLTyszEiin1kCnEqKkkqqTsVge4EIf6IoNnCjNavqHHV7QR62mDjfDdVxNNZBMA92IE+KbUg==
+X-Received: by 2002:a17:90a:a016:b0:2c9:359c:b0c with SMTP id 98e67ed59e1d1-2d3e00f0c45mr10409656a91.28.1724110753210;
+        Mon, 19 Aug 2024 16:39:13 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e3d99200sm7835297a91.52.2024.08.19.16.39.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 16:39:12 -0700 (PDT)
+Date: Tue, 20 Aug 2024 07:39:08 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org
+Subject: [Question] Does CONFIG_XFRM_OFFLOAD depends any other configs?
+Message-ID: <ZsPXnKv6t4JjvFD9@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] PCI: Remove pcim_iounmap_regions()
-To: Philipp Stanner <pstanner@redhat.com>, onathan Corbet <corbet@lwn.net>,
- Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
- Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
- Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Alvaro Karsz <alvaro.karsz@solid-run.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Mark Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240819165148.58201-2-pstanner@redhat.com>
- <20240819165148.58201-11-pstanner@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20240819165148.58201-11-pstanner@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 8/20/24 01:51, Philipp Stanner wrote:
-> All users of pcim_iounmap_regions() have been removed by now.
-> 
-> Remove pcim_iounmap_regions().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+Hi Herbert, Jakub,
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Yesterday I tried to build the kernel with CONFIG_XFRM_OFFLOAD=y via `vng`[1],
+but the result .config actually doesn't contain CONFIG_XFRM_OFFLOAD=y. I saw
+XFRM_OFFLOAD in net/xfrm/Kconfig doesn't has any dependences. Do you know if
+I missed something?
 
--- 
-Damien Le Moal
-Western Digital Research
+Here are my steps:
 
+# cat tools/testing/selftests/drivers/net/bonding/config
+CONFIG_BONDING=y
+CONFIG_BRIDGE=y
+CONFIG_DUMMY=y
+CONFIG_IPV6=y
+CONFIG_MACVLAN=y
+CONFIG_NET_ACT_GACT=y
+CONFIG_NET_CLS_FLOWER=y
+CONFIG_NET_SCH_INGRESS=y
+CONFIG_NLMON=y
+CONFIG_VETH=y
+CONFIG_XFRM_OFFLOAD=y
+# vng --build --config tools/testing/selftests/drivers/net/bonding/config
+
+[1] https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+
+Thanks
+Hangbin
 
