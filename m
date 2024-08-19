@@ -1,96 +1,75 @@
-Return-Path: <netdev+bounces-119764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6F02956E15
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:01:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50EA6956E20
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5656828791B
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 846981C212CC
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253C217A5A1;
-	Mon, 19 Aug 2024 15:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD91F16D4DD;
+	Mon, 19 Aug 2024 15:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHmn3zN9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ei4cphZe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29FE17B4ED;
-	Mon, 19 Aug 2024 15:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806B52D045;
+	Mon, 19 Aug 2024 15:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724079639; cv=none; b=Kv0Sy/uCVJskOseRf40k5uYmBwKY/RIAwQhJY77X3zIfATSyn0LZmt5gXlyQ9LdIbCc1DicOdhllbNPX14ojiVYFyBI51h5Fpvxjy4bc9q5zQVlpDvtiXgt/vW3RrbmwpWhdd3KbXphl4d6P1YmId1Xrv4HbpoXrrvSJTQ135r8=
+	t=1724079774; cv=none; b=X0/6nf+Ei/oJkcD4LzW8hStkDe8t0MELONnCKZxtHoONsyY46nRbAjNDW57zzw3XrLP9uMRgQhz5XVPUWmjJNPHaq757WBHGsGsUM4FqyXUtcfeBwzP5zvgTvpoNh8RHGtt2VQUx3WJ7LMbCM/ZEW16uzpFUjSTU/4Htax3rIvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724079639; c=relaxed/simple;
-	bh=KsAhkAR4g78CU6faLNjOrc39dz5lk0aMMLeFujsvwZE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ibxmy7zvCbbLerKfgQNB0zlLCUDzCUeBj1eWlXVG3VAaTLFTQygoZQly3CU9H/GGSe6+XjOZxyOeC+1vKwS7qcCGveHQWmqg/ZiBvE0SpALX7/VDSm5TpNCkvuoZaZVnfmZG2P+MDCdPHYTHTkkMYHoQPCp41OiKStAL47cQrQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHmn3zN9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7B5CC4AF11;
-	Mon, 19 Aug 2024 15:00:38 +0000 (UTC)
+	s=arc-20240116; t=1724079774; c=relaxed/simple;
+	bh=z8WU0XzEzlQ+uAlhL7P0tKAi/MI8243f7k3AOnyv4hk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQ/LfNeUaGzR4sjmrgva4RdPLyyd1+46llgmmmIgkJRPfn6flS8jTjBUBBz8ttkRVnfDQIguWqAI4KV6CbS0AzNQlupESS3xnfGmaVGBQWEanxPRS54RJqcJsxKjyvNyXSOc73kNZRlMplF3MpEpSJ4pjNzTAJw0gKddxAC6wMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ei4cphZe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B23BEC32782;
+	Mon, 19 Aug 2024 15:02:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724079638;
-	bh=KsAhkAR4g78CU6faLNjOrc39dz5lk0aMMLeFujsvwZE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nHmn3zN9ZKgP1lH4Pyw9dbD/CPu6Cm0PG6hNCDHkw+Irea5Z8gQaodQZ32lKUV1hc
-	 WbFEjYJgMA3C0+dfRQ0W7UaDGReIubuWjaPJwtJ+9djNP8sBXC5udUVJldeac5Cf6V
-	 WEpph1Lvt2d2ZY25VS5LZzatRWkYOf762mqIVtYFYyR3pyFwvyEFevwrue3ZPlWgr4
-	 qEOcpA65RzZrMRMIqs8pF/nlyirYM2zJRB6XH4Bd8MQ0ZMlCd6homMDiDH72/J7loI
-	 ZzKqFgunNwL6PdUDNWYRPFmH3QN4kFqybXOqYGH5osnWMy37scMoR69YWXg3/cBKaq
-	 sOGP42dTgwGtg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D7C3823097;
-	Mon, 19 Aug 2024 15:00:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1724079773;
+	bh=z8WU0XzEzlQ+uAlhL7P0tKAi/MI8243f7k3AOnyv4hk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ei4cphZe6maWl/9Vsd1/5ZbKPQNbsNd2siuJzgNMhjp7nmv0dAjRv36785MPX13BF
+	 vTkADrkDsJMsTdHr6huDHQ7tEZ2Oiw/PuWdgcImgD4xfKD+TlaRA2NxYqJbZ55Payi
+	 oV5YtaIgzcK8fPLRKg/UrDRDbhPmD32LEDRhqkHdvNbc22OgP4CO9IM3p/Q2tTgpOs
+	 f+rawZ365yCrUgEilgMib4gpstgrz0ln1Ybw+Xk5pygtxEfQZ39I/ofRQyk47aafie
+	 7tVShKgYWQ1ppXf0GfkbMhdrdwisaDTyL4idO2NCBwii4075kcI/bF2IlfFSuF33IK
+	 4R7mNCBSBJi8w==
+Date: Mon, 19 Aug 2024 16:02:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Abhinav Jain <jain.abhinav177@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
+Subject: Re: [PATCH v8 net-next 1/3] selftests: net: Create veth pair for
+ testing in networkless kernel
+Message-ID: <20240819150249.GG11472@kernel.org>
+References: <20240819121235.39514-1-jain.abhinav177@gmail.com>
+ <20240819121235.39514-2-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] dt-bindings: bluetooth: bring the HW description closer to
- reality for wcn6855
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172407963825.558835.17672220206298391503.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Aug 2024 15:00:38 +0000
-References: <20240819074802.7385-1-brgl@bgdev.pl>
-In-Reply-To: <20240819074802.7385-1-brgl@bgdev.pl>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, bartosz.golaszewski@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819121235.39514-2-jain.abhinav177@gmail.com>
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 19 Aug 2024 09:48:01 +0200 you wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Mon, Aug 19, 2024 at 05:42:33PM +0530, Abhinav Jain wrote:
+> Check if the netdev list is empty and create veth pair to be used for
+> feature on/off testing.
+> Remove the veth pair after testing is complete.
 > 
-> Describe the inputs from the PMU that the Bluetooth module on wcn6855
-> consumes and drop the ones from the host. This breaks the current
-> contract but the only two users of wcn6855 upstream - sc8280xp based
-> boards - will be updated in DTS patches sent separately while the
-> hci_qca driver will remain backwards compatible with older DT sources.
-> 
-> [...]
+> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
 
-Here is the summary with links:
-  - [v2] dt-bindings: bluetooth: bring the HW description closer to reality for wcn6855
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0553b3a4ef28
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
