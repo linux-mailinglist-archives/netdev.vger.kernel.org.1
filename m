@@ -1,139 +1,102 @@
-Return-Path: <netdev+bounces-119559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F240195633C
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:32:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C26D395635A
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A893C28162E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 05:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EAA32817FC
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 05:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE0314AD2E;
-	Mon, 19 Aug 2024 05:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA82E14A4DB;
+	Mon, 19 Aug 2024 05:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="rFO6fyoB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF1B171CD;
-	Mon, 19 Aug 2024 05:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A26171CD
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 05:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724045574; cv=none; b=h9Z/4Fn8HBV21V2qZaLkg3gizQrGeTZ0o+zaQQUQhryaELMJ31OGAI+ITO0HBYKdTYyNnVTJN9Fts7T0uje0g/Bb1WqGTn9/fgK2IintiUokH9rFLXWM7LAWTRUwNpl1k9rjdn6EFMB3iwFWJcqyt1qZvjvfPWPf5PXXRDs4NSI=
+	t=1724046896; cv=none; b=GOIvv5Ja+prgiBAgCsvcxDW99109LGPD8JSSJOEPb1NwPxekF3K/IVwdYDy2ffz9miaDasjpT7RhhN5vVbqbVh32mY/h1KEihbrsNR5PdEJSzGfPv4b8cob2RBGi35z2UiA4hX4hewE/VIAGuwGx5aUb4g879U5l1ngcOb9QTiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724045574; c=relaxed/simple;
-	bh=gFB+mSRNZo2G+e/subS3Hm+9LhOICBxVnyzpnQpYACU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ON88FIZLaTE8Yd5DJu6irC0iOIzorn07uPNY8JFDqWgEF/8Lsm4+Ms9Tj7jHHZrg705dk969odnEAPhGJjjs9C9z3c5MVXC5kk5jcGHshiv+CCmwYlYl3j2Gu6if/2pZM49hMZBEgsVleeHVbptgy8OmYtGmJIXVOMa0nsbLSUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-429d2d7be1eso19871355e9.1;
-        Sun, 18 Aug 2024 22:32:52 -0700 (PDT)
+	s=arc-20240116; t=1724046896; c=relaxed/simple;
+	bh=MaBJh8Jz318XFOsD0b2IB7IspiHH9qIG5AIeiBoVYLQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GdirIRa1TKEyqFDcekrVBvszVDfERW28WdSQl5GdNJpQ1QdSscOVn4+NtwjItxC+k+EG47yR4MKKMprpu9fmIYk4/LkxnFoRtxdnzV7v6eQYw3Wf2Lr//SzJ8UGh3+5sRk53QYYseUXOiN/DU9My5jVRjlMYMlINJiHPZGw2xXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=rFO6fyoB; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6b44dd520ceso18201687b3.0
+        for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 22:54:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1724046892; x=1724651692; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YyanCl+W2oaRq7tR8CwFXZyhm3yAxQQx+CVxI8yAOkE=;
+        b=rFO6fyoBKMMqkoTQjy64wmAOy3jHAMGJc3ug4pIKZpuzyYZr8Y+ZWG3gdHaovkZuvh
+         0lrNV59Jz9Grft6iuYEL2Kg62fA2I4jOilSpVNXeGZfQ7RT5ijvsrSOt2O+V/T6gBIZZ
+         /X7HxAbt9lVZGHycI32Gtrf3J04G1PPZX31nE8yEbba7mB4qpOiPjwlzek0EI7srLwZe
+         3sSh4a9GIo43xtzIaC9ACKayWlPnTpCVbk9rcMYTE4TZPuaCxZpQ7NbsQOWz1xAqxL0z
+         Pve5ld0c72M0KDHXMFVFId3WrYNCSGLIiLx4oUsB64Ni4bfGs1W7cJEaX559STYo/y3n
+         n9gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724045571; x=1724650371;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oqR1a1HiKAAgYWlHks8ofVwGaWEISuz4ja6NXbdxVZg=;
-        b=TjM2W7gVJE7S/XEhIg25vW8vO39F8uL3jBnMjfVnPJu4sExqV2AGqwvuNRmKGM/iHJ
-         4g5aWpgPSErYxycJi6ssGcnTmDKRLKCic5TTjwhMfEyuGa2BYfcQR7zwwwzCT94Lj50v
-         jHfkn1LOKNWvzk8gu6Qjymx0rloBKO6Oyp1NckfISJy/RGdAhGAT749lwOiAEZa/GShR
-         rf/CIVpACgexq0vcsXnsEmI218dQpJh1mRmu/cUBoIoOX4n0gJIbbsOt1wcryPUM+uIM
-         ejSk1L2/W4QkFUj4PM/kVkL4sbMonsh0K7UTwJAAmPsHHjd0aN0tvbSS0ZjHODZg0TQ6
-         HqzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXP/DDHd5GzYz88ZxD43aPIUHHnJg/ZZdw5y0nBEPggZLA3rDSyXTjrAvsI2kZ8ZjmCqGeuu1XyrSQdaMTnb/w7qXgLdAHdfTIb2vv1TPCG5TeC3Do71ZG2z/HTy4RBfQ/G1eTx2bnVfAF72w9Lk38ZyoVNljOFdGVhRilyu5X05fvi6aeC
-X-Gm-Message-State: AOJu0YwlOpKoqE/NCpONbEukAXMeZ5Y8V2L22ePtu5ZM3b1N+UCHx0oU
-	ndXATk54vyoexlekgSUnGVI63DRAhpz4w26KUOuUYM9KoO0uRC1n
-X-Google-Smtp-Source: AGHT+IHc46Hd7xYUEjHbb/SA+4dkb95sfFevgU5KmMo/m5s+/Or0UoAebrH/zswgvhC5QTOyr1fkyQ==
-X-Received: by 2002:a05:600c:4f52:b0:426:5e32:4857 with SMTP id 5b1f17b1804b1-429ed8a3958mr67251665e9.0.1724045570798;
-        Sun, 18 Aug 2024 22:32:50 -0700 (PDT)
-Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:69? ([2a0b:e7c0:0:107::aaaa:69])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded287d0sm150001565e9.12.2024.08.18.22.32.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Aug 2024 22:32:50 -0700 (PDT)
-Message-ID: <e85236f6-ae6a-414d-9a0d-2aceb3311751@kernel.org>
-Date: Mon, 19 Aug 2024 07:32:49 +0200
+        d=1e100.net; s=20230601; t=1724046892; x=1724651692;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YyanCl+W2oaRq7tR8CwFXZyhm3yAxQQx+CVxI8yAOkE=;
+        b=kZQd8tFuzCF6FC4Bqsxv98+ur3jQU5Tmce53keaXn3nXTv3Av4NmTWLjVPHXVBQznv
+         pt0/jFLj6oXfWgCQ23Embcc0IMtpODDr+lSIK/ZlQ+Rc9tj1rQg5uZeabpxT676gzA8o
+         YlnRza5S3kofGsHZKLKpuFbmj3sd+/NrP417lwkI6Ue/aHbkrdu5lVSa8my55yTFBGCA
+         Kl3+s5/cXc2b5DyRHDUvkKWbT27xfA8cgm7hc1VGbcab7VkaVXO2b9wm4Dqmx9EFgM2M
+         VVVjpgbxEIEFEQPSlREpAm+2ioQhqV83myY4dwJE2i2si0pyENp7u3RWFc8JDUgYzbLA
+         KW3g==
+X-Gm-Message-State: AOJu0YwiZVa2wWPKfsRqNQQkgt+h709YLVb6fxrw7tiUb5pHz/WxjSSc
+	+H+qwi0HzYT7L2VcvuvONi8oqREo9ybxD+9W0P6Z06hUGWqB6xjqybPKNukBvu9+Rt8t6rpmZER
+	tKMaYmREjCTWNJvGdwMi+3AZqPLPUFJmq8vcjbWcQGoiYi41i
+X-Google-Smtp-Source: AGHT+IFxZ5+LFJ/3vKVkOEpvLhS6EG4HNHbHMjwC+MehOtQzX3N6262gLFLEvWB1VP7lyZkyox/CaaEUsVggncKjO8Y=
+X-Received: by 2002:a05:690c:2706:b0:644:2639:8645 with SMTP id
+ 00721157ae682-6b1b949d3ddmr88026407b3.26.1724046892173; Sun, 18 Aug 2024
+ 22:54:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] tty: Add N_TASHTALK line discipline for
- TashTalk Localtalk serial driver
-From: Jiri Slaby <jirislaby@kernel.org>
-To: Rodolfo Zitellini <rwz@xhero.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
- Arnd Bergmann <arnd@arndb.de>, Doug Brown <doug@schmorgal.com>
-References: <20240817093258.9220-1-rwz@xhero.org>
- <9f0e05fd-1e6b-4474-95e9-64af6ffa030d@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <9f0e05fd-1e6b-4474-95e9-64af6ffa030d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240819005345.84255-1-fujita.tomonori@gmail.com> <20240819005345.84255-2-fujita.tomonori@gmail.com>
+In-Reply-To: <20240819005345.84255-2-fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Mon, 19 Aug 2024 00:54:41 -0500
+Message-ID: <CALNs47uXqvu-48-H8HsdX=Rk=Ah9+UMj9q34J7kA=3JDB5WYSw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 1/6] rust: sizes: add commonly used constants
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me, aliceryhl@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 19. 08. 24, 7:16, Jiri Slaby wrote:
-> Where is 2/2?
-> 
-> It cannot be seen:
-> https://lore.kernel.org/all/20240817093258.9220-1-rwz@xhero.org/#r
+On Sun, Aug 18, 2024 at 8:00=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Add rust equivalent to include/linux/sizes.h, makes code more
+> readable.
+>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/kernel/lib.rs   |  1 +
+>  rust/kernel/sizes.rs | 26 ++++++++++++++++++++++++++
+>  2 files changed, 27 insertions(+)
+>  create mode 100644 rust/kernel/sizes.rs
 
-It's a separate <20240817093316.9239-1-rwz@xhero.org>. Please fix 
-threading when sending next time.
-
--- 
-js
-suse labs
-
+Reviewed-by: Trevor Gross <tmgross@umich.edu>
 
