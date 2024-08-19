@@ -1,122 +1,127 @@
-Return-Path: <netdev+bounces-119752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2FD956D3A
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:29:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DDD956D7F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 16:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE2771C22C3F
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:29:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FFB71F25972
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292881741D1;
-	Mon, 19 Aug 2024 14:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956CC171E40;
+	Mon, 19 Aug 2024 14:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kgtr1+9s"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="it3l6rB5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BEB173335;
-	Mon, 19 Aug 2024 14:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA33716C683
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 14:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724077749; cv=none; b=oNsatn95AOMRNiAp9pMjjiKhsBT8ZT7oiG8mZ2yQT6fICNv2PR4utbhRqoNakTzoLxqEgCwdIJHvjPBEIJOhN20oBaDL3KF5Z6UzTLm9odaQOOe9sqYcOrFbmvVojkXKFVyriNRhJHIX7ORctQwKrUE8f92oDsbpLm3jE0+pJR0=
+	t=1724078334; cv=none; b=UQcVLyrjGhsWPJrtSJYFoGfGxY/r0g4UTn7qzCrixxtA8VSEabD5SSNVWu3sR1gcSNBEw8E7Z0o70mzHPgOod0vyXVpaaXghhMUBioFD/Nz7RhKrVZ+/8WM4ohLr5Ne1maUL4pb4yMem5IHTqsPPnaIT1FVndfNV3N3YX21uEkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724077749; c=relaxed/simple;
-	bh=RnUGqsHXjmzPtaPPuX71ueTb0berosZ1ANglk0h5gY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OzqKt1u4IeiPkKQqaCX4RF7Rj9K3l+P5AZPFEWqefB2pUBLpvJSOTUaykM9MuxfoJMizs+XgI08WKgaAElEi1r//qm28+Ntd3Mvrr3atqpKtG/9zJE7kp0tiODn8zLGMsWF63xbHeM4N6C+xY53GMtbRBP9lffKefxm2H+QW6Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kgtr1+9s; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JBVWxJ006603;
-	Mon, 19 Aug 2024 14:28:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	RnUGqsHXjmzPtaPPuX71ueTb0berosZ1ANglk0h5gY0=; b=kgtr1+9sCei6+Sci
-	zbDjNfv7eGCvb/+lwVPX/ruaO0DMiVRmyDqxG77pXzqDJpjR01/qLUl3GEXn7RY4
-	aiSq9buS1cyzJQMQP6jaVQ7zFRdLi9x1/wO4cFjO+ogbJNE2hzuKTSO+Jhg6E8s7
-	3Rn35cDEOhefJkpe9RYu1mf7Hw/ecDWPwrj2RsLkysDQhgETiNEDJYqxpqx6wz9F
-	hUKrdh2PHiB0KH/U/QzEz78EFNvgKH3NsF8LIJfLZxoB2RwNN1Qmw8X1nz705hqf
-	Z7emNcqO/gZ9XC2KU9dnDOVgobXvnLlzOp1D7j8Ly4U8+pIwCB4vstbBeXagqyYx
-	aX3WtQ==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 412mmemd4b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 14:28:55 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47JESsfT014355
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 14:28:54 GMT
-Received: from [10.81.24.74] (10.49.16.6) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 19 Aug
- 2024 07:28:53 -0700
-Message-ID: <bbc26eb0-973f-4680-aff1-2be2f598a963@quicinc.com>
-Date: Mon, 19 Aug 2024 07:28:53 -0700
+	s=arc-20240116; t=1724078334; c=relaxed/simple;
+	bh=mwz+eB5scRaKMChxMLOVbPLn1aJGRoemg8HSzFt13Rg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Od+YDzDylGinDJvnDE5+Vp6KoDGuGOjgROS+jq4AsqKyHNJER7OYey+ni4C12KDzY5X+I06wPTTIO0EU0MaxMpCzN6xD/ZME0p3jn85fmTw2pqe1tQGCtYMv843yZ1Kqd3NPIWZJDqZM92mZSZmDLCapsnTcWEFZmoeKiRqvggQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=it3l6rB5; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:42ef:82e5:ff01:56ce])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 44C8A7D9B6;
+	Mon, 19 Aug 2024 15:33:33 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1724078013; bh=mwz+eB5scRaKMChxMLOVbPLn1aJGRoemg8HSzFt13Rg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
+	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
+	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
+	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
+	 hern@kernel.org,=0D=0A=09tparkin@katalix.com,=0D=0A=09xiyou.wangco
+	 ng@gmail.com|Subject:=20[PATCH=20net-next=20v4]=20l2tp:=20use=20sk
+	 b_queue_purge=20in=20l2tp_ip_destroy_sock|Date:=20Mon,=2019=20Aug=
+	 202024=2015:33:33=20+0100|Message-Id:=20<20240819143333.3204957-1-
+	 jchapman@katalix.com>|MIME-Version:=201.0;
+	b=it3l6rB5kSdPHIAwAHPwMep805I0tDnrMg055I90DQZ5s42VdjftXqbjiFtB6TFmJ
+	 FzxIl03pfUJvZRGmj1vnD8RAbA5O1IiMUQTS765J/TVhGd+baRyB146i6YvOJeJeDY
+	 +ragMZ5EQDaCXisue6Z5MxVRDMNX4FbhbhVPOxeiQmfKImH7PucWnuQuQVapKK2xzj
+	 xFZ6GRSgFvmJXmZwZgUWjutIB+okZfl/bLBwcb44ibUDWse0sRFo0VjeP5wFotk2mz
+	 1zHo65oyjoVfWyZJ2xWPZiLsDxPwzNwAb7+J9LBm+1qrriHj7/0xX5HJw+2UGHpiEs
+	 9DP+TkC1KnEbg==
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	tparkin@katalix.com,
+	xiyou.wangcong@gmail.com
+Subject: [PATCH net-next v4] l2tp: use skb_queue_purge in l2tp_ip_destroy_sock
+Date: Mon, 19 Aug 2024 15:33:33 +0100
+Message-Id: <20240819143333.3204957-1-jchapman@katalix.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] appletalk: tashtalk: Add LocalTalk line
- discipline driver for AppleTalk using a TashTalk adapter
-Content-Language: en-US
-To: Rodolfo Zitellini <rwz@xhero.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
-	<corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby
-	<jirislaby@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-serial@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann
-	<arnd@arndb.de>, Doug Brown <doug@schmorgal.com>
-References: <20240817093316.9239-1-rwz@xhero.org>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240817093316.9239-1-rwz@xhero.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: IjnG0bMvwOyH1Sk-aXGKU9xGpOvcn6fT
-X-Proofpoint-ORIG-GUID: IjnG0bMvwOyH1Sk-aXGKU9xGpOvcn6fT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_12,2024-08-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
- mlxlogscore=999 priorityscore=1501 bulkscore=0 impostorscore=0
- adultscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408190096
+Content-Transfer-Encoding: 8bit
 
-On 8/17/24 02:33, Rodolfo Zitellini wrote:
-...
-> +module_init(tashtalk_init);
-> +module_exit(tashtalk_exit);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_ALIAS_LDISC(N_TASHTALK);
+Recent commit ed8ebee6def7 ("l2tp: have l2tp_ip_destroy_sock use
+ip_flush_pending_frames") was incorrect in that l2tp_ip does not use
+socket cork and ip_flush_pending_frames is for sockets that do. Use
+__skb_queue_purge instead and remove the unnecessary lock.
 
-missing MODULE_DESCRIPTION()
+Also unexport ip_flush_pending_frames since it was originally exported
+in commit 4ff8863419cd ("ipv4: export ip_flush_pending_frames") for
+l2tp and is not used by other modules.
 
-Since commit 1fffe7a34c89 ("script: modpost: emit a warning when the
-description is missing"), a module without a MODULE_DESCRIPTION() will
-result in a warning when built with make W=1. Recently, multiple
-developers have been eradicating these warnings treewide, and very few
-are left, so please don't introduce a new one :)
+Suggested-by: xiyou.wangcong@gmail.com
+Signed-off-by: James Chapman <jchapman@katalix.com>
+---
+  v4:
+    - use __skb_queue_purge (eric)
+  v3: https://lore.kernel.org/netdev/20240816080751.2811310-1-jchapman@katalix.com/
+    - put signoff above change history
+  v2: https://lore.kernel.org/all/20240815074311.1238511-1-jchapman@katalix.com/
+    - also unexport ip_flush_pending_frames (cong)
+  v1: https://lore.kernel.org/all/20240813093914.501183-1-jchapman@katalix.com/
+---
+ net/ipv4/ip_output.c | 1 -
+ net/l2tp/l2tp_ip.c   | 4 +---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-/jeff
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 8a10a7c67834..b90d0f78ac80 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1534,7 +1534,6 @@ void ip_flush_pending_frames(struct sock *sk)
+ {
+ 	__ip_flush_pending_frames(sk, &sk->sk_write_queue, &inet_sk(sk)->cork.base);
+ }
+-EXPORT_SYMBOL_GPL(ip_flush_pending_frames);
+ 
+ struct sk_buff *ip_make_skb(struct sock *sk,
+ 			    struct flowi4 *fl4,
+diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
+index 39f3f1334c4a..4bc24fddfd52 100644
+--- a/net/l2tp/l2tp_ip.c
++++ b/net/l2tp/l2tp_ip.c
+@@ -258,9 +258,7 @@ static void l2tp_ip_destroy_sock(struct sock *sk)
+ {
+ 	struct l2tp_tunnel *tunnel;
+ 
+-	lock_sock(sk);
+-	ip_flush_pending_frames(sk);
+-	release_sock(sk);
++	__skb_queue_purge(&sk->sk_write_queue);
+ 
+ 	tunnel = l2tp_sk_to_tunnel(sk);
+ 	if (tunnel) {
+-- 
+2.34.1
+
 
