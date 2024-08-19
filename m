@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-119819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247DD957161
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:02:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4889571E8
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51A251C20294
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:02:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0E31F23550
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBED49620;
-	Mon, 19 Aug 2024 17:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE28F18950F;
+	Mon, 19 Aug 2024 17:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OC+U2BTl"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3F9F9DA;
-	Mon, 19 Aug 2024 17:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A13188010;
+	Mon, 19 Aug 2024 17:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724086938; cv=none; b=PQOcZLcESqH65OS+kvGw42mzryuyKfBqe18IlMzkYo40YCPbiWc+6CX0RxobawlBTSN6J1Q/3bbJVYL8AVLmpvrj42FP/BhpBGqch8Dvb03xt/g/I0wb1nmNVlydrO1ATT+8/ozVQQuOn1vjl+NwIvX/5Mfkgh2bZDDWTl7Nc08=
+	t=1724087707; cv=none; b=kSt5OI6dHU1Ujh7ilUVIk/yDZQt/h2628g2DgjEz5fC0w4xrib+QSoYK7H/SO0v0nS1AAb/LvTp4qdhn7Qh15OdFNk3cLELzhwe0G1XRLH2Ig+4SSesNzev7gTdi+OlHLSh0zKISeCSAXL1vanZ50jzOEqJ5j8UkOCLt+tta5dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724086938; c=relaxed/simple;
-	bh=0/yX71sibvy6y6xr5ja3FRC+MNBNWio0ehxkcewZnHU=;
+	s=arc-20240116; t=1724087707; c=relaxed/simple;
+	bh=OE/RHkNYDMlFrxPN4ocnZguUrifbzdwI4ehlWTxsrR4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NN2Brqf5llgDKMkApzxk4CXtHJVqZ+7JL/33YcDipTBBwOoEvGUzurDYXLU9Y4R1t1u6S4U0joCQdUMXH9xkmXXAz7YbpFZgfZ98MlC2Yq0VZqOHlC/PdhaHi4V17/t0MUEJegfJnlliw6J8NiyJFeOB/4jJt8uZWmqzmPBE74Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=49820 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sg5li-005buT-7V; Mon, 19 Aug 2024 19:02:12 +0200
-Date: Mon, 19 Aug 2024 19:02:09 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Liu Jing <liujing@cmss.chinamobile.com>
-Cc: kadlec@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] netfilter: remove unnecessary assignment in
- translate_table
-Message-ID: <ZsN6kQLn9fqMpNCm@calendula>
-References: <20240701115302.7246-1-liujing@cmss.chinamobile.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f52/2PcA9WVX9isZ07YGbtVS6k0nIcfFLDpakJAbGWLG7TORlrQYD57YTf6h0f/2HU6jgIL35DcbKrWrHBzntOBH74MVhxQJGZTu93wWhqDcu5DpX6grVYNHIyHhNvdNS+7InN6fv4UbGE/28XE+p5monzc8XSVAG3G5JqNh9No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OC+U2BTl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD85C32782;
+	Mon, 19 Aug 2024 17:15:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724087707;
+	bh=OE/RHkNYDMlFrxPN4ocnZguUrifbzdwI4ehlWTxsrR4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OC+U2BTlj2oEcHBpjVJY4h1rRr5Wd0NGSzTcMVxjtIqe+BXa7bbGZ8TcLx/UKA3I+
+	 dofXLiCOsl3QuvEmQa2It6cIM8FrFRthx+2gybF3ZmNOD4cRITrchGPfgJVHiTYCdJ
+	 mRs8cWl5gDJS8a/rY3W6d0ba3+dTYHqpRoJUPITODA8OQv3Wt97hURYw1ad+OR0qZx
+	 5nlzGpAZLYfwxBN/wTULm+5NBCCDiUvbANzmHLZCZN0ibYaHLR+W4UBbZm3VkDgNl3
+	 R623TEP7NclNwMAxGCYk1XTWwC5LE5QXekd8X5oDyOiQZRNr2nWrapCVn1JZp6Iv9b
+	 kNRvwGxrput+g==
+Date: Mon, 19 Aug 2024 11:15:05 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: linux-renesas-soc@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>,
+	"David S. Miller" <davem@davemloft.net>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Eric Dumazet <edumazet@google.com>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	linux-mediatek@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: mediatek,net: narrow
+ interrupts per variants
+Message-ID: <172408770465.1699134.17451371912936634019.robh@kernel.org>
+References: <20240818172905.121829-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240701115302.7246-1-liujing@cmss.chinamobile.com>
-X-Spam-Score: -1.9 (-)
+In-Reply-To: <20240818172905.121829-1-krzysztof.kozlowski@linaro.org>
 
-On Mon, Jul 01, 2024 at 07:53:02PM +0800, Liu Jing wrote:
-> in translate_table, the initialized value of 'ret' is unused,
-> because it will be assigned in the rear. thus remove it.
+
+On Sun, 18 Aug 2024 19:29:02 +0200, Krzysztof Kozlowski wrote:
+> Each variable-length property like interrupts must have fixed
+> constraints on number of items for given variant in binding.  The
+> clauses in "if:then:" block should define both limits: upper and lower.
 > 
-> Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > ---
->  net/ipv4/netfilter/ip_tables.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  Documentation/devicetree/bindings/net/mediatek,net.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-> index fe89a056eb06..c9b34d7d7558 100644
-> --- a/net/ipv4/netfilter/ip_tables.c
-> +++ b/net/ipv4/netfilter/ip_tables.c
-> @@ -664,7 +664,7 @@ translate_table(struct net *net, struct xt_table_info *newinfo, void *entry0,
->  	struct ipt_entry *iter;
->  	unsigned int *offsets;
->  	unsigned int i;
-> -	int ret = 0;
-> +	int ret;
 
-ip6_tables is a copy&paste from ip_tables, so it is arp_tables.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-I think all of them have the same unnecessary initialization.
-
-Would you still post v2?
 
