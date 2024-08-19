@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-119660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC97956805
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:16:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81B129567E7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC49D1F2230E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:16:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F0B7281221
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D39166F21;
-	Mon, 19 Aug 2024 10:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE3715F418;
+	Mon, 19 Aug 2024 10:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YKGXSNNK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WqSjIXCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250AB160877;
-	Mon, 19 Aug 2024 10:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0C915F3EE;
+	Mon, 19 Aug 2024 10:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724062488; cv=none; b=alu33OlEOav1BMXbfr4dHLQJQ9WklLmia0Oz5JlRG6hHMkfuaWUDquV4QUkTloHeooXRdMPbyY39RS8q53kRtvWkXeMXN/hoSbY0fagmEDmILwBiuOvXf7gyIG5UJihdrsBMPtBbhmz7vmkh1owylYqq1fP7cZUWPwJO3mTz+m8=
+	t=1724062407; cv=none; b=QboAHB0KsWJbyiOWO51yTqhujaQ3yO2IZR44uoVHz2EkWpblDQYmGzF/Ur1Mct/spUb8S4KVf5K/lrR9i64j3tlrIOcvCVy0/Up4v1FhJOZMYix6tGq8eL91N2GObapjGH9ALDuOLU+lb6+huqviCmr7O4QSbxq3MDBzV/8UXNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724062488; c=relaxed/simple;
-	bh=BZbAeQBRJtf9RQXcFzMZFwW66IGoQY7q0aYyBv8LzSE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iwo1YHaJ1IQJ3+Gn5uD9mSXW+WLW+BEpBICgqIUmKJj8QPtTHr6GIeC3YqYReYD2bLAA8YDYt3RVhe1lL1kwXsMtvKvcWVtvn+Oo/h2hAMcV5q5OMgqcpxzLYM7sHcXrwSUg5t3xCXARimNDx5GDy1HE/IvibF+T4StZUTqjBmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YKGXSNNK; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724062486; x=1755598486;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BZbAeQBRJtf9RQXcFzMZFwW66IGoQY7q0aYyBv8LzSE=;
-  b=YKGXSNNKDVXhc6mDSh9SEaw7qWedzvR/1wpv55goUcD9FJg0R6Irlu3U
-   j1w7LBax+KNgxZK6Q+C5Hld/LuSxHDStiZbZco/4vDPp9auBsjZGcHLbR
-   exSRCuJl6Rfc3uRei+mlAeW8+7fE9FyY04kfioIOwW8yrnQrBcQuytskZ
-   n2/1tJM+GSFMIkoroYALIq37QNWPBn3hv7iY8Gjb8O/pApSZc/PsHjRlH
-   o6FPeHKjZfzVS+EazreRCF+5EDBIgUI44Tsr93V45eJ3KnRTKHYC+fTZm
-   nfA8bpPo/xDehMNxbJLpl2voNkyDoFSWUsbxzOSDCQHMSlxYMEZUuzawZ
-   Q==;
-X-CSE-ConnectionGUID: 8cr+KrYPRTCmNdZKm8EHrQ==
-X-CSE-MsgGUID: KxAFGylBT+O1Ai7BIRdMqA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="13090191"
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="13090191"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 03:14:45 -0700
-X-CSE-ConnectionGUID: W/E1x5PtQMCB88SGrGLaOg==
-X-CSE-MsgGUID: TUYcUm+NT9+L516gU5IxFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="91097110"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa001.fm.intel.com with ESMTP; 19 Aug 2024 03:14:41 -0700
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3F11D28188;
-	Mon, 19 Aug 2024 11:14:40 +0100 (IST)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	s=arc-20240116; t=1724062407; c=relaxed/simple;
+	bh=YQLM8o9fy5idEF5/z9F97EikKv6l6cGrw63nJ9lhSTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pb9Y3dRcQ5T8ppdVjqnCS1TNfqkSQnTouwxDk0XK/bafCC4G8toeOdQn5deXEg9bM/Uq7Gj9wraHQYg+hrrrIOZqaS7EiSTKRYtjLFrCkeM/pOlEmrX+gpPi82dRThXZxsHpyiuU1uUCpogjnYhsTihQx0/TDuvskN1xs5dfUOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WqSjIXCK; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7a9185e1c0so294169866b.1;
+        Mon, 19 Aug 2024 03:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724062404; x=1724667204; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpmXjvt65dcgn9PdN1lHowqP9gEPK3up9i/guynjyLI=;
+        b=WqSjIXCK81C/Z2neOei6GM0oMWPUt+nDRK8acUJQ1pixFav9UY3fKAkNgHgGtw4Zy3
+         ZtzYkIcbgy+BrFwnwiYcmoUWvN5o7sz2rNPN2d+WOhYD32gSZUwjvhxyCjAaRkyM4YLR
+         OGZsS6eAFjCgc4mhrPCxIiRoAPxJ5/XG/GVdZReisYvnVexm8OXsygQe2zU7Wvmw/eP2
+         aWlCGtw6TElFG3fsP/aQEuJzzqI8kmOV87xiqgjzoSL9J3AFkRxvzNcxvY+kHn0MhphG
+         rEQ7ov0jfLvrRf8+kdnE2I6X3aO57SD7R+BiCn0akQNwgMy4CsKKBR9w+EM0emTUXdib
+         SQag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724062404; x=1724667204;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rpmXjvt65dcgn9PdN1lHowqP9gEPK3up9i/guynjyLI=;
+        b=H8QA/h1074fRubyzOTjPavgEZTdGxkRX7YJq5XG9xTMMnUTL9h3ZzUkTpeBdyc+u/d
+         gtXt41AEj7OTHE3o7ElMjrM8GkfVZUfnGovLQ6f6s3D/cc42/7oFddUYUa6Rrp4MIiDU
+         mpCOn4iaK456W5Gr0+8kAfXxWov1+D1/4vcuSZ4fngTEq0XEv0BPlg+2TJPrKtL6Avde
+         2AT/CoHZP7gs6zp6nb5YD2hsHsewT6P0RwZ9k2qBshp+Kl7qRldYed+iWdJfptdQEEbi
+         7rIOnIV618LDWTtAcm7zKhHsSMlpqak9SSr+vtyJ/In6E8sPw24cazTcRmvSsAk+SBuK
+         Q5gA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVK/LLJEyjXe9CzUbnaQVR5mq1twU2BFjsYTasMJOCTtPobyjQKoUBx+nXjPUb1oxHJj09MQJD@vger.kernel.org, AJvYcCWBGot41jWmWm3qbukcI7OrA+aRAgadgZmzYWi/0QX8mV0x0Uiy/8qGBUHRtREiCxCmqWrIVs8AduikC2US@vger.kernel.org, AJvYcCWIlye49xLJFPXsd0Z9hmz9Ey1EjORsiILscv6mnAZ7PcH0YDSL/BJutMNZXZ6QJLW+s6Lp23vO6nVT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz509f0UuJ3XWSbWS0r1jKD+wWmyjl0k47OWnVENqY+GZqgsUU6
+	r6WINjOfJkAhKxrHKlBT1+22200lCcE30jcmjgChCvyslZrWIwkb
+X-Google-Smtp-Source: AGHT+IF/Q5IwAxhEZ9N40GS+cHzsfayz5XPtSNhFPGp2kJsv97tryUwH34I7AnFdI4kOb7swbe7VGg==
+X-Received: by 2002:a17:907:6d2a:b0:a77:d773:54ec with SMTP id a640c23a62f3a-a83928a35abmr860206366b.8.1724062403490;
+        Mon, 19 Aug 2024 03:13:23 -0700 (PDT)
+Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396d5a7sm612749366b.217.2024.08.19.03.13.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 03:13:22 -0700 (PDT)
+From: vtpieter@gmail.com
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jacob Keller <jacob.e.keller@intel.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Pieter Van Trappen <pieter.van.trappen@cern.ch>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH iwl-net v3 6/6] ice: do not bring the VSI up, if it was down before the XDP setup
-Date: Mon, 19 Aug 2024 12:05:43 +0200
-Message-ID: <20240819100606.15383-7-larysa.zaremba@intel.com>
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/2] dt-bindings: net: dsa: add none to dsa-tag-protocol enum
+Date: Mon, 19 Aug 2024 12:12:34 +0200
+Message-ID: <20240819101238.1570176-1-vtpieter@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240819100606.15383-1-larysa.zaremba@intel.com>
-References: <20240819100606.15383-1-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,48 +92,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After XDP configuration is completed, we bring the interface up
-unconditionally, regardless of its state before the call to .ndo_bpf().
+From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-Preserve the information whether the interface had to be brought down and
-later bring it up only in such case.
+This allows the switch to disable tagging all together, for the use
+case of an unmanaged switch for example.
 
-Fixes: efc2214b6047 ("ice: Add support for XDP")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ Documentation/devicetree/bindings/net/dsa/dsa-port.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index a718763d2370..d3277d5d3bd2 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -2984,8 +2984,8 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		   struct netlink_ext_ack *extack)
- {
- 	unsigned int frame_size = vsi->netdev->mtu + ICE_ETH_PKT_HDR_PAD;
--	bool if_running = netif_running(vsi->netdev);
- 	int ret = 0, xdp_ring_err = 0;
-+	bool if_running;
- 
- 	if (prog && !prog->aux->xdp_has_frags) {
- 		if (frame_size > ice_max_xdp_frame_size(vsi)) {
-@@ -3002,8 +3002,11 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		return 0;
- 	}
- 
-+	if_running = netif_running(vsi->netdev) &&
-+		     !test_and_set_bit(ICE_VSI_DOWN, vsi->state);
-+
- 	/* need to stop netdev while setting up the program for Rx rings */
--	if (if_running && !test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
-+	if (if_running) {
- 		ret = ice_down(vsi);
- 		if (ret) {
- 			NL_SET_ERR_MSG_MOD(extack, "Preparing device for XDP attach failed");
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+index 480120469953..ded8019b6ba6 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+@@ -53,6 +53,7 @@ properties:
+     enum:
+       - dsa
+       - edsa
++      - none
+       - ocelot
+       - ocelot-8021q
+       - rtl8_4
+
+base-commit: 1bf8e07c382bd4f04ede81ecc05267a8ffd60999
 -- 
 2.43.0
 
