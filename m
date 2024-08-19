@@ -1,129 +1,175 @@
-Return-Path: <netdev+bounces-119895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F39F957653
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:03:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A0C957664
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:18:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 343181F238D8
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:03:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED54C1C21481
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E872C158DD8;
-	Mon, 19 Aug 2024 21:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57D1158D8B;
+	Mon, 19 Aug 2024 21:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hrmstc5Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fo2pji4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660471591E3
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B2983A18
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724101403; cv=none; b=MGX/FTFNlHi/FlCrHsVZ7udjTp6yeZRohVMbrGAYgTyFb5B2xrwsprCaF6DPEate+XJl/aisaHqg+Rb2tmb1UYHJPIfoiwzKRgW4ug+euogndUvp7lMj75GbfKDryptiwRTNTr36k+e9L25isr+Dr9LiqG8NSX9ZqGFIqitp184=
+	t=1724102289; cv=none; b=oWCC4uLMGiiD2fRJ6PlzoisOj2UxjXnMq0DeRVPn+frY1pd5QiA6z75r8zu1PlBmTkJe2XTMQYfCtta3CwO/+pSHpEEUgvgVt76UndBcWYJMcrrDSWsrAWnGRwE9FoEhCv4xfFh4gU52OTbhJ77rg2B8Sq4w1XQdLCDcNNxYofs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724101403; c=relaxed/simple;
-	bh=9Tb0kq05khWT7O94ce6l3/EAz3jdv5NQs2Ugo70A+3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LLbQXNrrtvdRm3vHaIEd+66Tjg4rIIF3oObbtMAKACok60a7Nf/UFc0vhOXpx5yxL975dGi5bTbmyISCGWB9XRfEaaKfOCOhqmvT3AvSsbOMEsu+Zvd25zSAEmbPwCD7QP3Ph2d4FVwhxrx2FGs0MMS47OHbr00ppl3GP/VMIeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hrmstc5Z; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-81f8f0198beso165314239f.1
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 14:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724101401; x=1724706201; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9Tb0kq05khWT7O94ce6l3/EAz3jdv5NQs2Ugo70A+3Q=;
-        b=Hrmstc5ZEIjZSCHnH0w4h8+gvZiUh4PTdd0kmZrC1K/UTqas0kKMpV9/esmLH0hyMM
-         vZeYJ78eDApJr0QxRhy0lntDfclqfRygVJwyw/V8KxXrA/XrQee8g54YGB2DBXMnXAAD
-         5ZzHZQTW3VoBDEwUAv0IznC4tJ/4oIMKJJLmQA1vOj9X14Fox1SyBNe9IQQi3uFpK6rE
-         cotrJObhA+eJhCSWeifGdXYkkW5KPAIE5DPhTs+N95DjeBTnfIxOohzxaij/x9owhePh
-         JbdQ/otZ5aBI070mYmVCRsmS7VsoQk99puw/lMgj6XE34NSwar0gEQdwEfkYhR31DSCt
-         SSAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724101401; x=1724706201;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Tb0kq05khWT7O94ce6l3/EAz3jdv5NQs2Ugo70A+3Q=;
-        b=lwH6BcUHXGC6BL1tkhm5h1TNDBX55GVnPFTZJRmV48T/y005Ma0UMyGlDRAy3u3mAK
-         qr6JFaPhe+5j1HwzvpVF0I/qHos/FN9xbLSG5r8vnJxsORaMjIE984icc46mUV2S5uxQ
-         gA896svD1WlgMVdJ6hZMNROjvHSCDwiF+ZdJW7ErlceS0PWMsX5j1a/Om3LXaFy8vLAP
-         1GtCfuqMZNZ4M5YeOoqHUYk7MIFFUGNvxcVaH0Vok2InPpoT3vqA+h4EZuYhNpavY2+6
-         0ilH+Y5hCPhizCdb/rE8gkCQu1B0B14qHabWmBJvjQbv7pfV6lo/xpXX8ZoVtaPuc95q
-         pO7A==
-X-Forwarded-Encrypted: i=1; AJvYcCW9zzkSQiF4BVq9MGb7y8sJKBdMndK5r8574s945MI5WkHfYgqNbsLRmUHWOPYiu4Ucfg8pR6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkHjTwLDJMmcy5TiAJTuSibtSJJNpnpISfLF1wHAKPMpfD8loc
-	u0GVuNxoxNX2PbcXN5QsHhZcpKlEBxba2+BRC/9Npj7NHXxD67U/
-X-Google-Smtp-Source: AGHT+IE5NdfDauglm2+uBOlPYEKxcKEpKcZvsV3utkV0/On4GK7OVxmR3q8XjtkIXw/33H2UOk+1OA==
-X-Received: by 2002:a05:6602:15d3:b0:7fa:a253:a1cc with SMTP id ca18e2360f4ac-824f263255fmr1482192039f.3.1724101401202;
-        Mon, 19 Aug 2024 14:03:21 -0700 (PDT)
-Received: from [10.64.61.212] ([129.93.161.236])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ccd6f3e3f2sm3336973173.100.2024.08.19.14.03.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2024 14:03:20 -0700 (PDT)
-Message-ID: <adb76a64-18de-41b4-a12d-e6bc3e288252@gmail.com>
-Date: Mon, 19 Aug 2024 16:03:20 -0500
+	s=arc-20240116; t=1724102289; c=relaxed/simple;
+	bh=x73kZuGeZPO/zMICJM5bFMWIWhQjMQY30f8YDgfQWSc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Si5cq7hr8TM1MkSp5aDzZztmmd2i+Ed6I6XCtgWbWSXQZW0hRAbxuY1BnKwxgoRDxo/Jh7DO2h+ebs8wGOIa9lKM39ooWTsTSQHzEbneKuLhcMZ3n2YoGJ2wT72fOY8qrLMRFlb21S4Sf7UkWTL64SqfEWZMpOEY98h92uQYWWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fo2pji4f; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724102288; x=1755638288;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=x73kZuGeZPO/zMICJM5bFMWIWhQjMQY30f8YDgfQWSc=;
+  b=fo2pji4ffV1esgvhPWba8+REJWrUKcGOh3ok7cO+rLfobw/NrzVwmOrk
+   vlq0vUGe++ZVTqc6YWLjVc5jbIE8IuG4fx5SER9w0Si3WW52+W0Q9okVO
+   bU2so9s+NwiTC25xXr68Qhh/8mtd53d7JfwWpgU4/3Sx53eFjHojfcg+k
+   Y+0vXQ9sX0HTCxW2OFsfl9TF0q8Z3Gts7+8LNgL+2SAFDh4kSV4g8IJVh
+   E/hCkTYaB+9XE/idu3tzu18r0eOuwI2W7hSYOJYmn6zSDaW1ewsRZ1NsX
+   KWpa624UW6TIHHkN6OuE/DlKrXsHdkdhVe7H4Yo+BTqLVpjiug+IxA+z6
+   w==;
+X-CSE-ConnectionGUID: TD/Xy5rxSdCUJO/R6cmpGQ==
+X-CSE-MsgGUID: BgFUHK/VS5SWuOLyT5eQMw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="22343201"
+X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
+   d="scan'208";a="22343201"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 14:18:07 -0700
+X-CSE-ConnectionGUID: 1ejfIbMFTVadCQuYlqne2Q==
+X-CSE-MsgGUID: DBGYolQdTuG4lV4wBH7/+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
+   d="scan'208";a="60463425"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 19 Aug 2024 14:18:04 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sg9lJ-0009Re-2N;
+	Mon, 19 Aug 2024 21:18:01 +0000
+Date: Tue, 20 Aug 2024 05:17:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: Re: [PATCHv2 net-next 2/3] bonding: Add ESN support to IPSec HW
+ offload
+Message-ID: <202408200431.wjjkEZ2m-lkp@intel.com>
+References: <20240819075334.236334-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 2/3] tcp_cubic: fix to match Reno additive
- increment
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, ncardwell@google.com, netdev@vger.kernel.org,
- Lisong Xu <xu@unl.edu>
-References: <20240817163400.2616134-1-mrzhang97@gmail.com>
- <20240817163400.2616134-3-mrzhang97@gmail.com>
- <CANn89iKPnJzZA3NopjpVE_5wiJtxf6q2Run8G2S8Q4kvwPT-QA@mail.gmail.com>
-Content-Language: en-US
-From: Mingrui Zhang <mrzhang97@gmail.com>
-In-Reply-To: <CANn89iKPnJzZA3NopjpVE_5wiJtxf6q2Run8G2S8Q4kvwPT-QA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819075334.236334-3-liuhangbin@gmail.com>
 
-On 8/19/24 03:22, Eric Dumazet wrote:
-> On Sat, Aug 17, 2024 at 6:35 PM Mingrui Zhang <mrzhang97@gmail.com> wrote:
->> The original code follows RFC 8312 (obsoleted CUBIC RFC).
->>
->> The patched code follows RFC 9438 (new CUBIC RFC):
-> Please give the precise location in the RFC (4.3 Reno-Friendly Region)
+Hi Hangbin,
 
-Thank you, Eric,
-I will write it more clearly in the next version patch to submit.
+kernel test robot noticed the following build errors:
 
->
->> "Once _W_est_ has grown to reach the _cwnd_ at the time of most
->> recently setting _ssthresh_ -- that is, _W_est_ >= _cwnd_prior_ --
->> the sender SHOULD set α__cubic_ to 1 to ensure that it can achieve
->> the same congestion window increment rate as Reno, which uses AIMD
->> (1,0.5)."
->>
->> Add new field 'cwnd_prior' in bictcp to hold cwnd before a loss event
->>
->> Fixes: 89b3d9aaf467 ("[TCP] cubic: precompute constants")
-> RFC 9438 is brand new, I think we should not backport this patch to
-> stable linux versions.
->
-> This would target net-next, unless there is clear evidence that it is
-> absolutely safe.
+[auto build test ERROR on net-next/main]
 
-I agree with you that this patch would target net-next.
+url:    https://github.com/intel-lab-lkp/linux/commits/Hangbin-Liu/bonding-add-common-function-to-check-ipsec-device/20240819-195504
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240819075334.236334-3-liuhangbin%40gmail.com
+patch subject: [PATCHv2 net-next 2/3] bonding: Add ESN support to IPSec HW offload
+config: x86_64-buildonly-randconfig-001-20240820 (https://download.01.org/0day-ci/archive/20240820/202408200431.wjjkEZ2m-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408200431.wjjkEZ2m-lkp@intel.com/reproduce)
 
-> Note the existence of tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
-> and tools/testing/selftests/bpf/progs/bpf_cubic.c
->
-> If this patch was a fix, I presume we would need to fix these files ?
-In my understanding, the bpf_cubic.c and bpf_cc_cubic.c are not designed to create a fully equivalent version of tcp_cubic, but more focus on BPF logic testing usage.
-For example, the up-to-date bpf_cubic does not involve the changes in commit 9957b38b5e7a ("tcp_cubic: make hystart_ack_delay() aware of BIG TCP")
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408200431.wjjkEZ2m-lkp@intel.com/
 
-Maybe we would ask BPF maintainers whether to fix these BPF files?
+All errors (new ones prefixed by >>):
+
+   drivers/net/bonding/bond_main.c:434:10: error: returning 'void *' from a function with incompatible result type 'struct net_device'
+     434 |                 return NULL;
+         |                        ^~~~
+   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+       8 | #define NULL ((void *)0)
+         |              ^~~~~~~~~~~
+   drivers/net/bonding/bond_main.c:442:10: error: returning 'void *' from a function with incompatible result type 'struct net_device'
+     442 |                 return NULL;
+         |                        ^~~~
+   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+       8 | #define NULL ((void *)0)
+         |              ^~~~~~~~~~~
+   drivers/net/bonding/bond_main.c:446:9: error: returning 'struct net_device *' from a function with incompatible result type 'struct net_device'; dereference with *
+     446 |         return real_dev;
+         |                ^~~~~~~~
+         |                *
+   drivers/net/bonding/bond_main.c:630:11: error: assigning to 'struct net_device *' from incompatible type 'struct net_device'
+     630 |         real_dev = bond_ipsec_dev(xs);
+         |                  ^ ~~~~~~~~~~~~~~~~~~
+   drivers/net/bonding/bond_main.c:658:11: error: assigning to 'struct net_device *' from incompatible type 'struct net_device'
+     658 |         real_dev = bond_ipsec_dev(xs);
+         |                  ^ ~~~~~~~~~~~~~~~~~~
+>> drivers/net/bonding/bond_main.c:668:2: error: use of undeclared identifier 'rhel_dev'; did you mean 'real_dev'?
+     668 |         rhel_dev->xfrmdev_ops->xdo_dev_state_advance_esn(xs);
+         |         ^~~~~~~~
+         |         real_dev
+   drivers/net/bonding/bond_main.c:655:21: note: 'real_dev' declared here
+     655 |         struct net_device *real_dev;
+         |                            ^
+   6 errors generated.
+
+
+vim +668 drivers/net/bonding/bond_main.c
+
+   648	
+   649	/**
+   650	 * bond_advance_esn_state - ESN support for IPSec HW offload
+   651	 * @xs: pointer to transformer state struct
+   652	 **/
+   653	static void bond_advance_esn_state(struct xfrm_state *xs)
+   654	{
+   655		struct net_device *real_dev;
+   656	
+   657		rcu_read_lock();
+   658		real_dev = bond_ipsec_dev(xs);
+   659		if (!real_dev)
+   660			goto out;
+   661	
+   662		if (!real_dev->xfrmdev_ops ||
+   663		    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
+   664			pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
+   665			goto out;
+   666		}
+   667	
+ > 668		rhel_dev->xfrmdev_ops->xdo_dev_state_advance_esn(xs);
+   669	out:
+   670		rcu_read_unlock();
+   671	}
+   672	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
