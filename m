@@ -1,314 +1,233 @@
-Return-Path: <netdev+bounces-119546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74527956227
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 05:59:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31F4956247
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 06:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC17BB21DB7
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 03:59:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68118281D61
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 04:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1FE142E77;
-	Mon, 19 Aug 2024 03:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8B5157490;
+	Mon, 19 Aug 2024 03:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fMukm2d+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PMoVXURT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3A213D896
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 03:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724039723; cv=none; b=Sd15hVpNSPXtejWXDihSnwX88qMLox/mU498vSIwZosytPZxNlwkU6G/wRzj7ItK5XqWfVmwmAV4JxRm1yWJZrDgUSsmAlax+KYxWNImyvzlk68g6O1H55oMNsFAGmJy9cmSzHVYP+W4OdpmFUOcDOjICmrXmwvH+G0KUn03MYg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724039723; c=relaxed/simple;
-	bh=G7DEbNSfdulJZL7B+4tp/pE0LZ4T6ArGyQS38ScvR+s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cfTyzbsM7+ZanZcOwbOPOcGH110YX+yMqQokN5YEwfwllx7qTS48G/tKS3BxzRobVD0ODHgICR+Exy7ejC6X6ec2O42AoRrJc9kaKgoFPNlCE7Ptq3ahyZ0dYzxsOuORsdbZW3uL/c1BNJWRrqNGHiByW9CAxvtjFs6207N35Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fMukm2d+; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0b3d35ccfbso5532844276.3
-        for <netdev@vger.kernel.org>; Sun, 18 Aug 2024 20:55:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724039716; x=1724644516; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=boXjESgdTWQLiG6t6XpDdGr7L3LSCk/sMDntOjdOAS4=;
-        b=fMukm2d+3KhsH1vI0yyrxQorPVqcLv4Xn905/wJBZu+wU9owBsTVZuMq/blXx/I51i
-         pyRWAbnidvHXt33Ck65PG8Zw9wGrGbU0qm8NZpoUC5kWm74H4rRZdDnG7CAyYwZ7aCQ3
-         SzvNZdy6E9bgDW4kzT18m1k4rGigE/8VuZwwylZLbx0l85dmGq5itK2ffU0WTr/sxZFm
-         coDBFErnnX/oVa+Tm+9JJi1GrSDhTP2LNkYne4keh+c/Fbq7+Oe79ytUUx65An5VUcnZ
-         K94XEVXcV2GUucJX8B/lYasl3kwMGK5VI36oMeZnmiLDGwGutWMoZemLZxAYb/dtEySa
-         qEqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724039716; x=1724644516;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=boXjESgdTWQLiG6t6XpDdGr7L3LSCk/sMDntOjdOAS4=;
-        b=kQh1XUH/Q0vwo4c67FGOjZL53MzZs6arlU6husNxT49GRWipcXSV5dXZUJMfLrdDcf
-         oYshp4Sdgroqws6HhYsdPMLtVCAaCWPR4ChsaIxgkPD+B0r7tRzkNYo+rBi6eYCGJjJj
-         8vWz9B8nkgS/9cYdEhQKDH5qDYMOG8/wyliugQq5lKnj65EbNXf8s02qSl3IFZ2fa+B7
-         tt9ECOakl2J6DpTDW2GqeI92kWod19LXk0XeZ9KF3Sv5k/4P1AWNgEekyLJyN0WqE5q7
-         IBokyuC7eA+L/oKVrtm5LGqhfKnmHURauVoYIZB63tKTa0DpVvWGTKtW6JfvWnW34gD2
-         It/w==
-X-Gm-Message-State: AOJu0Ywh8gYzjzPSjNjj79gi9uqIX/umafzFIK2NE23Wubs/bYoTc32e
-	khTnN6OqxC87L983GKDyU4zrdY6VKr6nKaH/e6MhDSlrA1CEUGN8gJpsPe4WpGJ6ebgR+V4SrD3
-	qKGhLhbNb3gTQkEo17fw9TtwtQSBDAtQfcuNv0k4J/stJ+xLMuAzFskcNPhGbRQb+M5CBzH4Aqm
-	p2phWAiET6/6K09hO+4Td/LfCu3dxVkSe+jjrCxAy0PzDlyY2kYjHjbSVVpnM=
-X-Google-Smtp-Source: AGHT+IGYA+amTKThCk7veM6D3f5sThh4Cg+j7ljIkYvvrsRv3uMSTVwGF5elitD5+B+ElOczfN8dTxbGAnzb+sPMzA==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:1005:b0:e0e:4350:d7de with
- SMTP id 3f1490d57ef6-e1180f71ae2mr23359276.9.1724039715311; Sun, 18 Aug 2024
- 20:55:15 -0700 (PDT)
-Date: Mon, 19 Aug 2024 03:54:48 +0000
-In-Reply-To: <20240819035448.2473195-1-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF41641C6E
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 03:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724039898; cv=fail; b=aRNpPREEPbVHXB/uOzheaIch25pI1BIIMKbUXW73S3Ypjrgg/Kwr/ZDZgn92NxZax4L+nKVf3K5zs/QjcCXno85Ks+3LQtQqBBPi1lf2OsVJuMLQ5nbMcSay4FSzFtU6SB6bMIxkxiLT/cmfOq0eZ8GR/yl8xnzknabF4B8yI1s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724039898; c=relaxed/simple;
+	bh=b8iB6xNkHFKsaKaxZJJg/ipxZOmiFLYjwfGLPdUptCg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EwRN6CaEi+4i+gVvH+O23lz1prhEIMrbwtVYqg4UW7vPAeDQ+lQrqC5C4Yo/qmhdRO28Q/sudwOYTvEVxUvzOQOlW3eyzP4JALFiWyVd4OiLK4606qE4LT0Es5I6bwIvvVDNLSkP3chbXSJgvsiYtY35sasOI5D50c8f3y96BAg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PMoVXURT; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724039897; x=1755575897;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=b8iB6xNkHFKsaKaxZJJg/ipxZOmiFLYjwfGLPdUptCg=;
+  b=PMoVXURTBypjPG7OSRuiTWG1OQQtu0zYpzY/yHlj0MCEej9ApI4Z7Tdd
+   rRM1LMjd8PAbJsRTMIKgA36YV+t2ndYPihhJN0opME3DQgmVv67E6zBhS
+   G3A+iALXY2XnkbTMCesA/0/IV+y/IZ4HGBNe5HEowz5FTZ/U0ycIQB6+8
+   wfCU2co8u0U/Al/DH9RiwEhMnfvXmwullMEWYpn88nRns7BzA+n4mtd03
+   PKMwn2tUp89pNFLbZGoJB3gK4lF69xYVJBBGPEetNbU68x34ckOfgTt3S
+   a3ElP9ltRjo66Ukj4S2F7q6yf+rstu1t6o7Wdew3VOJ80pOpBUDWD38fl
+   w==;
+X-CSE-ConnectionGUID: WLkFG1NbTgGn8mrUfnOhcA==
+X-CSE-MsgGUID: 1X9QL0NHS9yvYAUvi0Fw0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="33413784"
+X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
+   d="scan'208";a="33413784"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 20:58:16 -0700
+X-CSE-ConnectionGUID: PvESohklS6CH+W9zpk7yzA==
+X-CSE-MsgGUID: JF2wiNerRYayYhprxEdUgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
+   d="scan'208";a="60523827"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Aug 2024 20:58:15 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 18 Aug 2024 20:58:14 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sun, 18 Aug 2024 20:58:14 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sun, 18 Aug 2024 20:58:14 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fHr8Bt/AwbRHNSFVx4KD3FHXbget1dUEuq5gPjObSR6rKhpYidiQc5twLLbkA073QZtOvXvV3V97dHvsd9KWMVA6KzMMN0BPKQhAZH354+h6103JAQYRQtDj2/Ce3NM2s8i3P+ja1SQlA4DC9f4WlG0kKDZzDowhHVPyTvq5zNEBbQwDNUAODMj/K/b0pEWYpgt4DPi6fsSM3pScKddOVMyIb3uFlBUPG7qTaExc4SSXw8oVn1XyNh3MdvBf7LcoDMwiphhRiUdI/ezt3robc+IBIgmTMm53Qp78hgrqNGeGxaWD7EebLv4NgYkqUtTudyURY1n2W29BXQG6OXeohw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t3fj8e4ar1toAxhyuy3xXvOGAIKQrIVa3J8+fhLDzNc=;
+ b=pTgVwsgvEnrWQrGK7A8rDDTKlDxzILQvq6oIUhwcJjY6lj8wZ/F7QGEEz/udb954CTvQ6vyu3Ohra7k1Cp23Klaff3pr15Y1sOWLZDGNejGthghJTajhMB8/o7MpvuERmE6yV9rHvi6OEQd5heICj4yBr6ODyyIGEv/gF2SB83M2ICOzfdK1/zxD2C1a71jRyLjmd+TtraHZ/iihwwwI9oyhM3zJIhTTmpQW0JRD40L9vcbdPaNlTUpan9xop4fDVDX6rxhueXPV9SIfwGXwbssfM4rvrwtX3DFfZj7pp/OxyXrDLN3pnrohdrGmYMg1gsiYtLsaUTTWiz3pddQ12g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by SJ0PR11MB6792.namprd11.prod.outlook.com (2603:10b6:a03:485::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Mon, 19 Aug
+ 2024 03:58:11 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%4]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
+ 03:58:11 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Hagvi, Yochai" <yochai.hagvi@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2 iwl-next 6/7] ice: Read SDP section
+ from NVM for pin definitions
+Thread-Topic: [Intel-wired-lan] [PATCH v2 iwl-next 6/7] ice: Read SDP section
+ from NVM for pin definitions
+Thread-Index: AQHazIYt5hqHSRlDFkm0KaTLpPA6bbIuPopA
+Date: Mon, 19 Aug 2024 03:58:11 +0000
+Message-ID: <CYYPR11MB8429135A784FAA0B10594CEABD8C2@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240702134448.132374-9-karol.kolacinski@intel.com>
+ <20240702134448.132374-15-karol.kolacinski@intel.com>
+In-Reply-To: <20240702134448.132374-15-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|SJ0PR11MB6792:EE_
+x-ms-office365-filtering-correlation-id: 78388bfa-531e-44b1-e00d-08dcc00324f5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?m8OUlivN7bM69fpOAOEZA3ZQlW+2yE6NdazlswRCMq0886Js3BRW3nAKgYh9?=
+ =?us-ascii?Q?jseAY3q/XW5NqtOjE+1QNhmNJAc3zHcdi8i80vCwjMRyPUd8ZhWzn47FSB/Y?=
+ =?us-ascii?Q?y1fRfhDVcA9pOlDyf5OcKDWcl6uP2fixZtTG3Dve48TqyHIPVGgUe6cRqrrK?=
+ =?us-ascii?Q?r5VcuIjQ2mQ+COIstlBah7ySak0Wu9S6u13VRMEHl59X4oZryrMH9R78C2/W?=
+ =?us-ascii?Q?bT1ScxopuCTugmzJwVQ/Z4ssQcdnw+jKJYfDAS+JQB2QfsDlI1lXasez8l5I?=
+ =?us-ascii?Q?Gy4TZT+Isl+c+Rp3zc0dGenfcg6jwfbQ4tVSjQwwMIdFSp5tejQmWbqYMtPr?=
+ =?us-ascii?Q?ZAXuteN3inMkpGEWHudN8/oaBOwMVpCCGOxZSwy/QRXHlJK25SFb4YdyWMWn?=
+ =?us-ascii?Q?EJNLJyqPKYpYOKrbUpws34elVnlcTNpRgs7b8oKgpUPlQZvpKRI+3BgwNd+I?=
+ =?us-ascii?Q?zWloJd6VvRsW3jIpxRS9w8RIB+GBS9S/Eem2fbLgx4RE/Laqqseg+x4DH3hb?=
+ =?us-ascii?Q?ioN0K1ZD6WD4uhTdn9sUKnZKv5v/fJSqHHq9wWVuwMfHLq0Kw/Okl4JxL+pz?=
+ =?us-ascii?Q?XhkGVY7wwfRHRpJ+FHptMaCpFgF5JKP23HqHCedi4T6ydaeI/TMk0AdS/dU6?=
+ =?us-ascii?Q?WEKNZQUt6GXrJI2zsWLRiQKKjfVxPN3BUeLGvsMv5vh59npd8BmfQwqXxND+?=
+ =?us-ascii?Q?s3QtP9q7wAdL9eYtEcKPj4ze3Q4L4rUr3P6gNGBvz0ALaLfxqLl+5IkmQ4By?=
+ =?us-ascii?Q?JQxu92CsVgDup2gFB+/2AlbJSPx2w8iKRNQ6ZeASqN+O7tsqJcW9cNkXC+Ms?=
+ =?us-ascii?Q?UOCf4jH7n+MQOrzW163XPdDuyR1mBX/k9npOLGgU/Mc7HoFvgVKv69Nzls3r?=
+ =?us-ascii?Q?u0Z9QP9e3xl8fuazmFM9G1oEMPtkzN/TZjSwyG00onfNA+GT/e5Ct7lovzIj?=
+ =?us-ascii?Q?9MSEMtb73Vf2yynjZP6l1em3v9aIzXjbEh26TNBL8p/lKcerzdQwOh9AYnIB?=
+ =?us-ascii?Q?w9tJjdXwGuh+QHZkhp4wQW2KNmYi1HGAwwSoWNtx9xgUGauTkDPmk9xSCtvB?=
+ =?us-ascii?Q?dn1pMSUUVqv/bzbI2/219dFY2sslswBpS+q9pSrysuvC8ASg6t6+ntCtRpql?=
+ =?us-ascii?Q?MCPyNIrFo1u3XK65Yb5UWDOdjvNRy6JW0Y7Z7drWO2gw1gbwiVHIcYSOJouF?=
+ =?us-ascii?Q?HsbAnU3k29KvdnD/PVhRO+VDSD3vAOHy+0YFKWl4IzRuBcn0ZPEhUBKbf7JD?=
+ =?us-ascii?Q?SKYVl7nJ2RrKBjdJSvoWJUH10tCV58icYKtTvYMky5HYJhIMGqsJgMJULVS8?=
+ =?us-ascii?Q?57fjmv7UsE65BR3vfDrNkv0/vpBpjIIDOyjZYohe8aNGLNoUwKkPRnJPNzDF?=
+ =?us-ascii?Q?fEJfVm6Z+RhLbvYpnpdAWZVuFTitQ8KqAuHJ3QMAdrC6KGxH0g=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IwumV23FoB+fSEQXBheG3RyXmBlNrlyaZ6O+sP5xR0LGVNyakCfhFu6w3ADN?=
+ =?us-ascii?Q?NQe6qoP8g9zn1w9twb14zSRdKKaAc3hKvIZ5xz8T03P/G8XI+Y9lL86iLJvK?=
+ =?us-ascii?Q?YfmwBK5civ8OuuEkKWxsPB3ZtGcm/qq5TH39Jf6KCHZSiwSJ/7SWdmVVeoe2?=
+ =?us-ascii?Q?MP0uldhH1ga4yS3LZgdeFD/mz3dehVj+v79x0fqJ7Tc8ksnidEiWqiw0XzYT?=
+ =?us-ascii?Q?z/hF70FK/5Da6eWgo9OL6rs4KPjDvwn03ZNFbs/UmhhtPx/8tpEXL1/oFRqX?=
+ =?us-ascii?Q?+vM1gtQLKnARyLAwr/nCIPovfBHACOo02W+gA3iv8E4VnRPK7LgFrbN5GqIT?=
+ =?us-ascii?Q?3CzvpssH5vsr5fOmO42V5vn2lm4ktQVRa/ETeiVmbFqkFsDitwhSf4T9W/z+?=
+ =?us-ascii?Q?NifZHlRur6rJhwLD+y3ifRBD+fZ3mSAnhO/+i6gcho9O68pFzjiJDAGUSt/v?=
+ =?us-ascii?Q?KKS85eO6sKU/Q5by0/KUwLEorWnrsL4iSoLyc/eWh8+XVdVX6tJ5hPQOtlJY?=
+ =?us-ascii?Q?wU7qcHDM/gw/1msY3Pxeu4LTfJ5aqmavGhkAFoUjJlW1tN1KCD/f+vAuM6SD?=
+ =?us-ascii?Q?PLaKrCkm8uY6Ruv1chuDmxBpK4dNlbJXzwFcdvzBMK6rj2Z8FFTCy7lyfVdy?=
+ =?us-ascii?Q?/KfMbSDIMKsyp2s2ehqIZlL/pcxOxvdFA1pFS7d8HfSwzbTCDDyzzlffkCIx?=
+ =?us-ascii?Q?WG/6h4U6cHhmJGpd/8GHdjqWCZuQd1fl+3vqcPpLCQAA6Wo3oLOAekWhsDgP?=
+ =?us-ascii?Q?lC5AxVSaJNL/nzSsMpln2gp0c2xdYaTLZ+9nOYhn1i81FyLu6EdrNWPNZiA8?=
+ =?us-ascii?Q?0Qxb03aax35kLYn+JrDLaKL4nNV9tZ8kISk8FGGxC2Hh4mA6NWhfroHbZIso?=
+ =?us-ascii?Q?gyFb2xq7Aiq1uGU3jsFzdkF/2/Hjj9QamxNSEn+3bdDa8uN5Hxol2MhkM41h?=
+ =?us-ascii?Q?cVTYDQchsLP04GnEdP3apOI/R672Lq39e/WUXjuP/2yCktw4gIiMLw0QApaf?=
+ =?us-ascii?Q?y3u1PumKUfBnsnu2RHVXv9unblH0GzKJvUiPwTQ4YTfOUyNBwZMIl8UhTKpw?=
+ =?us-ascii?Q?DKewym1hChhSiH0a6AiRPsNZxmZjYJcz6/K9f7vuvxHyDisalwruNJ2HIynv?=
+ =?us-ascii?Q?d6EAMjPWLhloytvtTI60jIAOemY9VC/zFNJ+jaQiMnV/rHUUiyzwazxk5mMk?=
+ =?us-ascii?Q?U5wFTB2mFFxYCkoE/sSDw1Ij9AfFUlvA5Sj17N1vhQ/FnjND74wtYvAVwoNn?=
+ =?us-ascii?Q?pESsw0gEGkX7wqSNH6S2jCx81qxcOsV/u9u25ntGSuQknT9Og+c/skEo8X2y?=
+ =?us-ascii?Q?AyG/nUCoiPINrp3BnjrR6McNfjF3rY/Wwpe2AnveH/P7wsvuvgu+VdkRJkPe?=
+ =?us-ascii?Q?wYAKjuJnOeUZ2NwkoAy7pR2M8r32IKweqkTN5zAY2oskHwqLiYin2rlewb0J?=
+ =?us-ascii?Q?Rxrs0ypLlEN8Icj633pGOt3ZTkjPrFolzKZzWK3D5TudNhXGb871OubuKTAY?=
+ =?us-ascii?Q?XKkHVINJMmoHzCM3xxl29f+EdCaWDubblwrkuirXetTvRhF+z0fH7h/F6Cmm?=
+ =?us-ascii?Q?Hvfk5aQiU8ebkg8ZClF578ZBLmdH4jhNjGCit25ycs9zSunhH1RZGxDJrDGw?=
+ =?us-ascii?Q?ww=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240819035448.2473195-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
-Message-ID: <20240819035448.2473195-14-almasrymina@google.com>
-Subject: [PATCH net-next v20 13/13] netdev: add dmabuf introspection
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78388bfa-531e-44b1-e00d-08dcc00324f5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2024 03:58:11.7170
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O9Zq4kDiGkoPjY9K7K5/BMlQKSkZBhhQHurZRo1iv+jGWyEcdP5JbK8ILFg+Lv1D1ybSNPBLyTyw38yNdNa4h5XzKlhWYRtbo6Sau3A78vGyyRWFyWICye6ExY4fZl3f
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6792
+X-OriginatorOrg: intel.com
 
-Add dmabuf information to page_pool stats:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Tuesday, July 2, 2024 7:12 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
+ntel.com>; Kolacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony =
+L <anthony.l.nguyen@intel.com>; Hagvi, Yochai <yochai.hagvi@intel.com>; Kit=
+szel, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v2 iwl-next 6/7] ice: Read SDP section =
+from NVM for pin definitions
+>
+> From: Yochai Hagvi <yochai.hagvi@intel.com>
+>
+> PTP pins assignment and their related SDPs (Software Definable Pins) are =
+currently hardcoded.
+> Fix that by reading NVM section instead on products supporting this, whic=
+h are E810 products.
+> If SDP section is not defined in NVM, the driver continues to use the har=
+dcoded table.
+>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Yochai Hagvi <yochai.hagvi@intel.com>
+> Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   9 ++
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      | 138 ++++++++++++++----
+>  drivers/net/ethernet/intel/ice/ice_ptp.h      |   6 +-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  60 ++++++++
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+>  5 files changed, 186 insertions(+), 28 deletions(-)
+>
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump page-pool-get
-...
- {'dmabuf': 10,
-  'id': 456,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 455,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 454,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 453,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 452,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 451,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 450,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 449,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
-
-And queue stats:
-
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump queue-get
-...
-{'dmabuf': 10, 'id': 8, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 9, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 10, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 11, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 12, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 13, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 14, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 15, 'ifindex': 3, 'type': 'rx'},
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-
----
- Documentation/netlink/specs/netdev.yaml | 10 ++++++++++
- include/uapi/linux/netdev.h             |  2 ++
- net/core/netdev-genl.c                  | 10 ++++++++++
- net/core/page_pool_user.c               |  4 ++++
- tools/include/uapi/linux/netdev.h       |  2 ++
- 5 files changed, 28 insertions(+)
-
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 0c747530c275..08412c279297 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -167,6 +167,10 @@ attribute-sets:
-           "re-attached", they are just waiting to disappear.
-           Attribute is absent if Page Pool has not been detached, and
-           can still be used to allocate new memory.
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf this page-pool is attached to.
-+        type: u32
-   -
-     name: page-pool-info
-     subset-of: page-pool
-@@ -268,6 +272,10 @@ attribute-sets:
-         name: napi-id
-         doc: ID of the NAPI instance which services this queue.
-         type: u32
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf attached to this queue, if any.
-+        type: u32
- 
-   -
-     name: qstats
-@@ -543,6 +551,7 @@ operations:
-             - inflight
-             - inflight-mem
-             - detach-time
-+            - dmabuf
-       dump:
-         reply: *pp-reply
-       config-cond: page-pool
-@@ -607,6 +616,7 @@ operations:
-             - type
-             - napi-id
-             - ifindex
-+            - dmabuf
-       dump:
-         request:
-           attributes:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 4201f9555772..c2ae57e7f291 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -293,6 +293,7 @@ static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding;
- 	struct netdev_rx_queue *rxq;
- 	struct netdev_queue *txq;
- 	void *hdr;
-@@ -312,6 +313,15 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
- 					     rxq->napi->napi_id))
- 			goto nla_put_failure;
-+
-+		binding = (struct net_devmem_dmabuf_binding *)
-+				  rxq->mp_params.mp_priv;
-+		if (binding) {
-+			if (nla_put_u32(rsp, NETDEV_A_QUEUE_DMABUF,
-+					binding->id))
-+				goto nla_put_failure;
-+		}
-+
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 9b69066cc07e..7995c1e3477d 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -213,6 +213,7 @@ static int
- page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 		  const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
- 	size_t inflight, refsz;
- 	void *hdr;
- 
-@@ -242,6 +243,9 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 			 pool->user.detach_time))
- 		goto err_cancel;
- 
-+	if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
-+		goto err_cancel;
-+
- 	genlmsg_end(rsp, hdr);
- 
- 	return 0;
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
--- 
-2.46.0.184.g6999bdac58-goog
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
