@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-119902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E639576EF
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0318B957712
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1908283B20
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:57:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94EC4284D75
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A92D166F25;
-	Mon, 19 Aug 2024 21:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C9D158D81;
+	Mon, 19 Aug 2024 22:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PHEQisVR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z3T48oZd"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B785B3F9CC;
-	Mon, 19 Aug 2024 21:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA9B3C482;
+	Mon, 19 Aug 2024 22:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724104665; cv=none; b=n9qtA8/l633CcSVxsV38vkPT8nyeo0HGD/Y3t7TuvfzrZxBWHqVBX4SQtK9wSuUZ5n7nwjY+OUPrq75GjgD+r8lelNkbKvFUdg+8DP1xYoHZ9hFsA/kR4p1C9qOA4UNzRoTXu3VvFhCirEeK6dmQgoyOy9Zq+TQWO48Xt0ppKK0=
+	t=1724105009; cv=none; b=rW9MXLlUzeKLuPUmj0zCexTu5urLzA+23FY3QJkoBi2JZes/HLOxpwDfvZLv1WxFNzKLj52atcBm3hYX+kYnXQfaaHWVeLwvkb6mo0EYu+5PDQ+eva8YFWIWSTjrCaFZjRCeBbwxAZlUjM170jcnb5NwDEOYCc2vQ3q8LgegLSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724104665; c=relaxed/simple;
-	bh=KYn8p+NSJrYcziwVjY5bQIV7LvNtaGg8Jd5Cp/ncoys=;
+	s=arc-20240116; t=1724105009; c=relaxed/simple;
+	bh=/Um0RmFIuy0u5RdZIhDz546qnr0gm/N6GzujyLXJNkI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lgjJXWGPCFRZDI3C6tJpRL1HPqNWOg4UZPG7RROddUkhwD86NgA3A9dikwwi0gZ7mtnnY6n/K6BJ378OP48rf/0baG+QjdEAWJY+fe5oCjqc5xX+KmeMAcegRDo9/P6wt47lmY49WryMsJiknINx0iperExSM4qUwoq67gncGMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PHEQisVR; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=VyegC4q8z3OY/qwUDgG3iDPYPZRiOLiJNUyd17KLDsw9yyB5a4TaYd/wMcs9cOiHH7VspVRw2jXozo8qC5UmlbwBjhjoo6URws7yx1YhHPX3G3EFaoe52boVGSDdKuEyRselv1e4eRRnh4uvcH4HgzZph9Q7YWxJjb4i3UM5q0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z3T48oZd; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,25 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KWELWY8kP/e75VfClS8JEpAm5DcwZJmSJ36xnxJNPlM=; b=PHEQisVR6CN9sYcF7ahqoZMg+4
-	GTK2kCo5TLmd772RH2HB9AHh2Gb1ad0CYo22wTG9w9cvOojgM+zL7RlGM/iZk51gfPxtL/h3UZfNu
-	zQ6kkPv8jYSyty5BJguoTXWOBLXSnsva9bNkU5VSYI6CSrPnUnVosVyPqcIkNo7Ey7gA=;
+	bh=1LSVFIQjALML3OzkHveITrXnxye6r3UuLFjLqf6lVYo=; b=Z3T48oZdGQ/QyDrcC9NuMixr9Q
+	5tTbQAQEkzSopHVOetbs0YJaEmsLG0BXTwNtJb0L+d7+cVce2gDgHK9iKhSrdx5v9omzKvjTVoLUV
+	zz0n/twjYrqn0AGAXTo/ic0E0kdbZUGO14f+pR+V9pjIPMVfBoJ+ge2SLJJXauIGQVWI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sgANS-0059lF-KD; Mon, 19 Aug 2024 23:57:26 +0200
-Date: Mon, 19 Aug 2024 23:57:26 +0200
+	id 1sgAT7-0059oX-8C; Tue, 20 Aug 2024 00:03:17 +0200
+Date: Tue, 20 Aug 2024 00:03:17 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] phy: dp83tg720: Add statistics support
-Message-ID: <654c3a17-fea7-4e28-be36-5229eb106737@lunn.ch>
-References: <20240819113625.2072283-1-o.rempel@pengutronix.de>
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 1/3] ethtool: Extend cable testing interface
+ with result source information
+Message-ID: <b2ecfecd-997e-40b5-9478-c7b240bf0a21@lunn.ch>
+References: <20240819141241.2711601-1-o.rempel@pengutronix.de>
+ <20240819141241.2711601-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,54 +65,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240819113625.2072283-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240819141241.2711601-2-o.rempel@pengutronix.de>
 
-> +static const struct dp83tg720_hw_stat dp83tg720_hw_stats[] = {
-> +	{
-> +		.string = "esd_event_count",
-> +		.cache_index1 = DP83TG720_CACHE_A2D_REG_66,
-> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
-> +		.mask1 = DP83TG720S_ESD_EVENT_COUNT_MASK,
-> +		.shift1 = 9,
-> +		.flags = DP83TG720_FLAG_COUNTER,
-> +	},
-> +	{
-> +		.string = "link_training_time",
-> +		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_1,
-> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
-> +		.mask1 = DP83TG720S_LINK_TRAINING_TIME_MASK,
-> +	},
-> +	{
-> +		.string = "remote_receiver_time",
-> +		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
-> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
-> +		.mask1 = DP83TG720S_REMOTE_RECEIVER_TIME_MASK,
-> +		.shift1 = 8,
-> +	},
+> @@ -573,15 +573,25 @@ enum {
+>  	ETHTOOL_A_CABLE_RESULT_UNSPEC,
+>  	ETHTOOL_A_CABLE_RESULT_PAIR,		/* u8 ETHTOOL_A_CABLE_PAIR_ */
+>  	ETHTOOL_A_CABLE_RESULT_CODE,		/* u8 ETHTOOL_A_CABLE_RESULT_CODE_ */
+> +	ETHTOOL_A_CABLE_RESULT_SRC,		/* u32 */
 
-If i remember correctly, some of these are part of an Open Alliance
-standard. Ideally, we want all PHYs which follow the standard to use
-the same names of these statistics.
-
-Maybe add to the open alliance header something like
-
-#define TC42_ESD_EVENT_COUNT "esd_event_count"
-
-Given that the Open Alliance failed to define the registers, i don't
-think we can do much more than that?
-
-> +static void dp83tg720_get_strings(struct phy_device *phydev, u8 *data)
-> +{
-> +	int i, j = 0;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
-> +		strscpy(&data[j * ETH_GSTRING_LEN],
-> +			dp83tg720_hw_stats[i].string, ETH_GSTRING_LEN);
-
-ethtool_puts()
+Please follow the convention of given the prefix of values,
+ETHTOOL_A_CABLE_INF_SRC_ in the comment. I also wounder if a u8 would
+be more in keeping with the API. _PAIR and _CODE are u8.
 
 	Andrew
-
----
-pw-bot: cr
 
