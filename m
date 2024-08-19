@@ -1,82 +1,95 @@
-Return-Path: <netdev+bounces-119904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF72095771F
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:07:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43BA95773E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AE9B285A72
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9071E2845DD
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A1A189912;
-	Mon, 19 Aug 2024 22:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3590B1D54D8;
+	Mon, 19 Aug 2024 22:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jC8em0ss"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PeXJCiNY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B4F14D70E;
-	Mon, 19 Aug 2024 22:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3B815DBC1;
+	Mon, 19 Aug 2024 22:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724105228; cv=none; b=Drtlg99jUhc2r5jYQjmQkfq5MTwhmLAh1KYOVD3296cy4/0I3VkqCl9oZfcYgdlWoJqHfyR/h+nO5dojy0WGSBILMBeRl3AEVs0sroRdOiWEchkJCi3/03mnTiR5wQ0ImviFD64BP3jGl0BcnCkPINlN4IcmZYx/zKC+HS2irfE=
+	t=1724105550; cv=none; b=oKEHAQ7VMrtAwNviEU8uuLqJs/cdIDTto3CShr5xNZQAonp/C0i9Jz/c/+ZSlFKdr//vINfhCJWoJ+yyX25rZ9vp801LMsN/zdmIQvHKKmavRJ59WtPW+FYKKAFHmsi/leWsy3YjKvUqeTW8F2eCDLp628xt3iGHfCk8kj7Nqfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724105228; c=relaxed/simple;
-	bh=XrkBY75V13GbM24tskzyLi2gFXCxHOpvM1sre5vZJBQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iLWcA3w+uk2A01XuwKrpAHmeJJ8NzlZYIXZ9SRIQgtfFK3aQ3TX4rH7QtfmbC0eRMY2JwrJ0fcwLi/1Y1Anb86HJbJ2sN+rvH+1H49aE6N4/sW+uCjKGDH/sMq2ip5n/mtEbWs1qgDf4GC1S/QS6nIVVlLhKs8l3j3z7Pl+5jOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jC8em0ss; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uZczDJCmCCm41DMXVQTJRndcBOAdnPJvp8hRXnZ3XcE=; b=jC8em0ssHCR+duLHyI03Yn3ERk
-	4O5DrdD2Y4//EokTq0ok2xQ98jCOIcho1cn7NQMbLjJNpPiUBat9YsiJAJluXs5UkCbRy2x6CwYNP
-	yd1KbMke2XcVgUnObKzRCG0jpmif817kXEgqqwdImIBLBs7/RvDMkKU0LDSB0tTy1rss=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgAWe-0059pi-KV; Tue, 20 Aug 2024 00:06:56 +0200
-Date: Tue, 20 Aug 2024 00:06:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v1 1/3] ethtool: Extend cable testing interface
- with result source information
-Message-ID: <a4d44aa6-e679-4ce0-8d9b-33a40f85e322@lunn.ch>
-References: <20240819141241.2711601-1-o.rempel@pengutronix.de>
- <20240819141241.2711601-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1724105550; c=relaxed/simple;
+	bh=mOCSROjK77ZUEQOVe4BWD0EOfDX+YvbVKxsURSW04xs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=plAWQXaSvIOKmQwTLTbu02LDN3wTxaj/+zxBbSWbRysmWeJznL91I4asztu/Pzuc4nmNhFIvqKzgqe0Ut0N7IuHtuShIGJ/SdT5+mHpB9wNETYxyfo98s0CvpZXwUob5HaWrUKR1pwU5piIDli7RFu2CMxlxKaGH+iiacdpyMmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PeXJCiNY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73DCC32782;
+	Mon, 19 Aug 2024 22:12:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724105549;
+	bh=mOCSROjK77ZUEQOVe4BWD0EOfDX+YvbVKxsURSW04xs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PeXJCiNY7p8gFVHA/JqXkV4txa1ieQg1VHwf0npNL5pTt1ematMVCGI9z2itHoarr
+	 OEPT9hZaQcPFA1KKKeQFg7xKkAiVrh5rIXW0CaIPzQ3A08bn0s2MHWtFTPojwsE7Am
+	 5yApOQUHQ7rGKzzduviJgpiA8HnAjW3h/+7VUC+4lut/cLQKxKEOTzZQUDaG3u3skm
+	 3Rd4azSz8fH4W2rUAW+Upc5PtXFz6fjOW9N7oh0TpH7n29LLDHsMapIcmkqKeMTFn2
+	 4pcnm+E6qz7sd7mptNlVbbmJ/z9r8TBZ2JUuHutcECUzbGBlIDiiXaE6cmBSdeJZId
+	 HKmFJMrqeMkOw==
+Date: Mon, 19 Aug 2024 15:12:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: teigland@redhat.com, gfs2@lists.linux.dev, song@kernel.org,
+ yukuai3@huawei.com, agruenba@redhat.com, mark@fasheh.com,
+ jlbec@evilplan.org, joseph.qi@linux.alibaba.com,
+ gregkh@linuxfoundation.org, rafael@kernel.org, akpm@linux-foundation.org,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, netdev@vger.kernel.org,
+ vvidic@valentin-vidic.from.hr, heming.zhao@suse.com, lucien.xin@gmail.com
+Subject: Re: [PATCH dlm/next 11/12] dlm: add nldlm net-namespace aware UAPI
+Message-ID: <20240819151227.4d7f9e99@kernel.org>
+In-Reply-To: <20240819183742.2263895-12-aahringo@redhat.com>
+References: <20240819183742.2263895-1-aahringo@redhat.com>
+	<20240819183742.2263895-12-aahringo@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819141241.2711601-2-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +/* Information source for specific results. */
-> +enum {
-> +	/* Results provided by the Time Domain Reflectometry (TDR) */
-> +	ETHTOOL_A_CABLE_INF_SRC_TDR,
-> +	/* Results provided by the Active Link Cable Diagnostic (ALCD) */
-> +	ETHTOOL_A_CABLE_INF_SRC_ALCD,
-> +};
+On Mon, 19 Aug 2024 14:37:41 -0400 Alexander Aring wrote:
+> Recent patches introduced support to separate DLM lockspaces on a per
+> net-namespace basis. Currently the file based configfs mechanism is used
+> to configure parts of DLM. Due the lack of namespace awareness (and it's
+> probably complicated to add support for this) in configfs we introduce a
+> socket based UAPI using "netlink". As the DLM subsystem offers now a
+> config layer it can simultaneously being used with configfs, just that
+> nldlm is net-namespace aware.
+> 
+> Most of the current configfs functionality that is necessary to
+> configure DLM is being adapted for now. The nldlm netlink interface
+> offers also a multicast group for lockspace events NLDLM_MCGRP_EVENT.
+> This event group can be used as alternative to the already existing udev
+> event behaviour just it only contains DLM related subsystem events.
+> 
+> Attributes e.g. nodeid, port, IP addresses are expected from the user
+> space to fill those numbers as they appear on the wire. In case of DLM
+> fields it is using little endian byte order.
+> 
+> The dumps are being designed to scale in future with high numbers of
+> members in a lockspace. E.g. dump members require an unique lockspace
+> identifier (currently only the name) and nldlm is using a netlink dump
+> behaviour to be prepared if all entries may not fit into one netlink
+> message.
 
-It is pretty typical for such enums to have a _UNSPEC for the first
-entry.
-
-	Andrew
+Did you consider using the YAML spec stuff to code gen the policies 
+and make user space easier?
 
