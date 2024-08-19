@@ -1,191 +1,335 @@
-Return-Path: <netdev+bounces-119709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCC0956AE0
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:28:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74645956AE5
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CFA7B25DB4
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:28:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99CDB1C238EA
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174A416CD37;
-	Mon, 19 Aug 2024 12:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050A616B3B6;
+	Mon, 19 Aug 2024 12:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wz63z6oV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="maO7IBPZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA6C16B75F
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 12:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DE616B396
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 12:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724070411; cv=none; b=jAo9iFlQZiBMeI6ciy3oIOPz4S35+hkhsWOOHEoO0pUvS1uDasE+hfrkAcxktmik1ebHDhq0GjBTTjuNVoaYvNL6AVFxZ5oWinITeCFSdtrzoguhIh0K8Y4kAXvRXkdrbdyl7VuMy5pgwUVw+wYRXQ0nNqZfYDaP+ytWI18/+xY=
+	t=1724070470; cv=none; b=P8J7I9TH/nhg8NE9OKyBpPb6C0JpDiqdjmSK2NPFNT399LnTaWltEw7xlrO2YD8EabhEE49sw8OST8g8x9P6dbRF7GpDgrKVJuxudipq7X5wpMy6L5L2pUbdZpXA3SMbtOwZ+m8bmXfbSXbcNvNjpoqG+1XnxQqAgXKx8XrVzno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724070411; c=relaxed/simple;
-	bh=RwyJOPoVAvdlverc0AdDGz/CEbDpLABbNYEYt28YRY0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AxpMfgfhhvKsJzJcGr/G9Z0aZlTcEoLewy7pfgTTKcQ3Qg+Yf+OTcZVLEJUUR6uQAHs/Tf5NYYhHGegIRXeK7WdVvF10k3JFOes/5Nx9/RbaxzsTFGlTIZpGhf2ki0NtRMzwv6D3e/XkRktwAPzypoUl329GmYddf6crKWaoVhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wz63z6oV; arc=none smtp.client-ip=209.85.128.174
+	s=arc-20240116; t=1724070470; c=relaxed/simple;
+	bh=dGHw/2GnAO0DMtN64kqN9WpwBeA9i93MLvQ2F4+QvxY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JlhIhh6cugVZ76YjM5me7tqntIBeBicmWmCXCx5zoChMCozCGOBRlPJHi81oxjNqm4XR2wEaTpkLDskhZIxs01aygB7kWMez1NmPGIPgSOsFUQBMvIwnSDINFBOLK/qcrt2DsPl46zrjZXSuNO+pv4EVRFlazeZSbBs3qiCfeq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=maO7IBPZ; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6aef423f80aso38915537b3.2
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 05:26:49 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-37636c3872bso16988935ab.3
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 05:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724070408; x=1724675208; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uo/c7CXBHX8zkeJwDZfQBkHDwgduPiVmrh0bvYsjlj8=;
-        b=Wz63z6oVYDqNBkis5Ba28JWure1EV+9ZmkCogAMcfwu1JmcFUvGlrvYm00x7nv78G2
-         5Lz2PR1XEQ4Wv0N7Pbj5ZwBDKbY9KbYtJb/h7kFmS2VeByMt044MbVFS5+nTUbvylbBJ
-         delL52PpuM8A4Y7cj1i4CI8TLndNfzNPu0DMEHZYaKU6gh2UizA3N4GnOQJnXBnTnHqe
-         DjDz20nMTjNxutROUSp77qClClwjF6p/m9ruoujbvs/qKL/9s251PZZ1zPyk/ImtsUXz
-         uO+UsITzJFRGlCsR5Fw2wE6z40Vlh6BAU+31MpTQEAw/GtWCXdcf/vU5ZG/iUocrlNRX
-         Vcfw==
+        d=gmail.com; s=20230601; t=1724070468; x=1724675268; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i4E9Dy3UeksFEmBl4cfLUPHZ+Scds2QtEu1cYvfJwY8=;
+        b=maO7IBPZU+cJL+nAQM0mwpHC7NG+e9/jpHQq6r++0vLjOCdSt6ZK35mF8S0tMaE5wX
+         ebJzPmhFg29HmnLU3iZAAPhCYKDweSjnBVaproxns0f6BKuZQVzgPPwpfSNQP9PakGLl
+         U0rObSE2pYZqI5FNd32NX5doP5PUmO+ndMknFuzj9MkSR/svmAvOrVJiirlYm37Fl2iR
+         D+S/4iKkhFxjXjnaZif6KnOpb6yG6WJDXe52ZNi5k9ndXt0Q6wdf1zFSkXYKymMIjC7E
+         oYzMVaJiCgqkv3+K5K6e7WWC2FpZk23tfofQt6ReOLTag+/G9WDolwSmzZH8cpV7de2p
+         48ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724070408; x=1724675208;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uo/c7CXBHX8zkeJwDZfQBkHDwgduPiVmrh0bvYsjlj8=;
-        b=Pbys0m9wB1y2uEVlTgF9fsd2Wk2G4xXJc41yBvE+VcUsE6tcsbR59qRk+z0xnu451I
-         G1NI1j1JQrdDqUHsdwbIEU+EQdSeWpu0nSiVkNImrxfPTfhAEYggAenDWtFyb9D4yIui
-         WnZ/xPrWmENEzcnosOjbf1YkNgqpexXudvsnwBjsLsg475ZtG/1DyMqgJF+WMA7HiEYG
-         i2h65fj4pVWOuYlnOgs8RfBh6mZvnT13t5HKsGVG48/7/iOk2K99RJWshkDiJDIUShep
-         hM+d/h0eEop8LIvaAAuDYY6T9EqCwylw87yJx1hzXV8+8TBkvdEDkI396mo+H7J9sVxE
-         TtYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1L29bE7iUOGU1v6AoyxcrDoAqGJbf2UGpyFXOecoLNs5Jom5Q/5ms96wlH9+OyjxGMjpob3kcjiu4yGrKjzGHRWBZeNj8
-X-Gm-Message-State: AOJu0Yz65VFi7WDjZo8jQ9apUqokunUHpQ/eMR4KcEOs0cGorIWb7D2d
-	8PrmFhEZVEItMD6eXwDZCVVe85XAkhx7KxiDg24tAH3ZPKurQKrfPu/HpUeCEg7CqgesgXx/JQc
-	+BdyV72LzgkGahZuiWf3W1WDGYL4=
-X-Google-Smtp-Source: AGHT+IHt013X0xj9oerfRFQgEmZXelRKA+BuNAkuIgLoHYXPFhltjRVqju/HMWU9kj9ukELA/cKA80h6m4QabUPB6+U=
-X-Received: by 2002:a05:690c:60c5:b0:61b:3304:b702 with SMTP id
- 00721157ae682-6b1b73a894amr119145937b3.5.1724070408263; Mon, 19 Aug 2024
- 05:26:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724070468; x=1724675268;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i4E9Dy3UeksFEmBl4cfLUPHZ+Scds2QtEu1cYvfJwY8=;
+        b=PVXGIP1X3AGFhKEk3p5oysVDdIrDyz8dv6bNI/eA1kEMWstoYtPfSd8caCxA3fydsW
+         IqO5cm/MiJhDod9OM2YmWRUkwqY9X1MOPzfWNYOwtB4XKQidMQmyex9ZT9ol70SUB7Iy
+         u3h2C+8roJ64ddkFYl9oGXca9dwkNEaJrNOpODvGi5lx4CsZOZ/ZLt6au52VYs4zn2zW
+         GOrnLbVcxUFeF/Kb0Ucu5JPSXDPmPiSO+fN9Rfmlgvk6IuygPmZ3K7xO4fgSq4kMk60r
+         Lv31JpiOEysuwQAxc2/D33QIOBg/O1RTNBm/XBnvXXum9Jc9VuUyV9Fa1B+zDb+qYmOT
+         GYug==
+X-Gm-Message-State: AOJu0YyL6lZttxCPELQuJ5R1CmETTgw3yigBUlFWIHnnldyxaTKjnPfI
+	OKg/xAXHLo10ZndeGgXtKoHi3EYpW3yOAQLJ36JE90PgzjRWty1jiDnTHaqSEWUMvNF2pmxXHs9
+	KMEiPaMkOekeEuRl43ZCqINLgEjk=
+X-Google-Smtp-Source: AGHT+IHoVZ0YxUcglXCoIF9wlJ/TSyjm/N4K4t1AymaeJGz2jIW6ubuGxWS2h5Hnb78SEVIy8nxwIP972+rj3CIaNiI=
+X-Received: by 2002:a05:6e02:1989:b0:39b:25dc:7bd6 with SMTP id
+ e9e14a558f8ab-39d26cde6a7mr127160725ab.4.1724070467971; Mon, 19 Aug 2024
+ 05:27:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Shane Francis <bigbeeshane@gmail.com>
-Date: Mon, 19 Aug 2024 13:26:37 +0100
-Message-ID: <CABnpCuCLN6VNgmoWHwc4_8AT34xqmQnEoUHLncvE2yLqYZBaKg@mail.gmail.com>
-Subject: [BUG] net: stmmac: crash within stmmac_rx()
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+References: <20240819-jakub-krn-909-poc-msec-tw-tstamp-v1-1-6567b5006fbe@cloudflare.com>
+In-Reply-To: <20240819-jakub-krn-909-poc-msec-tw-tstamp-v1-1-6567b5006fbe@cloudflare.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 19 Aug 2024 20:27:11 +0800
+Message-ID: <CAL+tcoD9BA_Y26dSz+rkvi2_ZEc6D29zVEBhSQ5++OtOqJ3Xvw@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next] tcp: Allow TIME-WAIT reuse after 1 millisecond
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, kernel-team@cloudflare.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Summary of the problem:
-===================
-Crash observed within stmmac_rx when under high RX demand
+Hello Jakub,
 
-Hardware : Rockchip RK3588 platform with an RTL8211F NIC
+On Mon, Aug 19, 2024 at 7:31=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> [This patch needs a description. Please see the RFC cover letter below.]
+>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
+> Can we shorten the TCP connection reincarnation period?
+>
+> Situation
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Currently, we can reuse a TCP 4-tuple (source IP + port, destination IP +=
+ port)
+> in the TIME-WAIT state to establish a new outgoing TCP connection after a=
+ period
+> of 1 second. This period, during which the 4-tuple remains blocked from r=
+euse,
+> is determined by the granularity of the ts_recent_stamp / tw_ts_recent_st=
+amp
+> timestamp, which presently uses a 1 Hz clock (ktime_get_seconds).
+>
+> The TIME-WAIT block is enforced by __{inet,inet6}_check_established ->
+> tcp_twsk_unique, where we check if the timestamp clock has ticked since t=
+he last
+> ts_recent_stamp update before allowing the 4-tuple to be reused.
+>
+> This mechanism, introduced in 2002 by commit b8439924316d ("Allow to bind=
+ to an
+> already in use local port during connect") [1], protects the TCP receiver
+> against segments from an earlier incarnation of the same connection (FIN
+> retransmits), which could potentially corrupt the TCP stream, as describe=
+d by
+> RFC 7323 [2, 3].
+>
+> Problem
+> =3D=3D=3D=3D=3D=3D=3D
+>
+> The one-second reincarnation period has not posed a problem when we had a
+> sufficiently large pool of ephemeral ports (tens of thousands per host).
+> However, as we began sharing egress IPv4 addresses between hosts by parti=
+tioning
+> the available port range [4], the ephemeral port pool size has shrunk
+> significantly=E2=80=94down to hundreds of ports per host.
+>
+> This reduction in port pool size has made it clear that a one-second conn=
+ection
+> reincarnation period can lead to ephemeral port exhaustion. Short-lived T=
+CP
+> connections, such as DNS queries, can complete in milliseconds, yet the T=
+CP
+> 4-tuple remains blocked for a period of time that is orders of magnitude =
+longer.
+>
+> Solution
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>
+> We would like to propose to shorten the period during which the 4-tuple i=
+s tied
+> up. The intention is to enable TIME-WAIT reuse at least as quickly as it =
+takes
+> nowadays to perform of a short-lived TCP connection, from setup to teardo=
+wn.
+>
+> The ts_recent_stamp protection is based on the same principle as PAWS but
+> extends it across TCP connections. As RFC 7323 outlines in Appendix B.2, =
+point
+> (b):
+>
+>     An additional mechanism could be added to the TCP, a per-host
+>     cache of the last timestamp received from any connection.  This
+>     value could then be used in the PAWS mechanism to reject old
+>     duplicate segments from earlier incarnations of the connection,
+>     if the timestamp clock can be guaranteed to have ticked at least
+>     once since the old connection was open.  This would require that
+>     the TIME-WAIT delay plus the RTT together must be at least one
+>     tick of the sender's timestamp clock.  Such an extension is not
+>     part of the proposal of this RFC.
+>
+> Due to that, we would want to follow the same guidelines as the for TSval
+> timestamp clock, for which RFC 7323 recommends a frequency in the range o=
+f 1 ms
+> to 1 sec per tick [5], when reconsidering the default setting.
+>
+> (Note that the Linux TCP stack has recently introduced even finer granula=
+rity
+> with microsecond TSval resolution in commit 614e8316aa4c "tcp: add suppor=
+t for
+> usec resolution in TCP TS values" [6] for use in private networks.)
+>
+> A simple implementation could be to switch from a second to a millisecond=
+ clock,
+> as demonstrated by the following patch. However, this could also be a tun=
+able
+> option to allow administrators to adjust it based on their specific needs=
+ and
+> risk tolerance.
+>
+> A tunable also opens the door to letting users set the TIME-WAIT reuse pe=
+riod
+> beyond the RFC 7323 recommended range at their own risk.
+>
+> Workaround
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Today, when an application has only a small ephemeral port pool available=
+, we
+> work around the 1-second reincarnation period by manually selecting the l=
+ocal
+> port with an explicit bind().
+>
+> This has been possible since the introduction of the ts_recent_stamp prot=
+ection
+> mechanism [1]. However, it is unclear why this is allowed for egress
+> connections.
+>
+> To guide readers to the relevant code: if the local port is selected by t=
+he
+> user, we do not pass a TIME-WAIT socket to the check_established helper f=
+rom
+> __inet_hash_connect. This way we circumvent the timestamp check in
+> tcp_twsk_unique [7] (as twp is NULL).
+>
+> However, relying on this workaround conflicts with our goal of delegating=
+ TCP
+> local port selection to the network stack, using the IP_BIND_ADDRESS_NO_P=
+ORT [8]
+> and IP_LOCAL_PORT_RANGE [9] socket options.
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3Db8439924316d5bcb266d165b93d632a4b4b859af
+> [2] https://datatracker.ietf.org/doc/html/rfc7323#section-5.8
+> [3] https://datatracker.ietf.org/doc/html/rfc7323#appendix-B
+> [4] https://lpc.events/event/16/contributions/1349/
+> [5] https://datatracker.ietf.org/doc/html/rfc7323#section-5.4
+> [6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3D614e8316aa4cafba3e204cb8ee48bd12b92f3d93
+> [7] https://elixir.bootlin.com/linux/v6.10/source/net/ipv4/tcp_ipv4.c#L15=
+6
+> [8] https://manpages.debian.org/unstable/manpages/ip.7.en.html#IP_BIND_AD=
+DRESS_NO_PORT
+> [9] https://manpages.debian.org/unstable/manpages/ip.7.en.html#IP_LOCAL_P=
+ORT_RANGE
+> ---
+>
+> ---
+>  drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c | 2 +-
+>  include/linux/tcp.h                                         | 4 ++--
+>  net/ipv4/tcp_input.c                                        | 2 +-
+>  net/ipv4/tcp_ipv4.c                                         | 5 ++---
+>  net/ipv4/tcp_minisocks.c                                    | 9 ++++++--=
+-
+>  5 files changed, 12 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c =
+b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+> index 6f6525983130..b15b26db8902 100644
+> --- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+> +++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+> @@ -1866,7 +1866,7 @@ static void chtls_timewait(struct sock *sk)
+>         struct tcp_sock *tp =3D tcp_sk(sk);
+>
+>         tp->rcv_nxt++;
+> -       tp->rx_opt.ts_recent_stamp =3D ktime_get_seconds();
+> +       tp->rx_opt.ts_recent_stamp =3D tcp_clock_ms();
+>         tp->srtt_us =3D 0;
+>         tcp_time_wait(sk, TCP_TIME_WAIT, 0);
+>  }
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 6a5e08b937b3..174257114ee4 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -110,7 +110,7 @@ struct tcp_sack_block {
+>
+>  struct tcp_options_received {
+>  /*     PAWS/RTTM data  */
+> -       int     ts_recent_stamp;/* Time we stored ts_recent (for aging) *=
+/
+> +       u32     ts_recent_stamp;/* Time we stored ts_recent (for aging) *=
+/
+>         u32     ts_recent;      /* Time stamp to echo next              *=
+/
+>         u32     rcv_tsval;      /* Time stamp value                     *=
+/
+>         u32     rcv_tsecr;      /* Time stamp echo reply                *=
+/
+> @@ -543,7 +543,7 @@ struct tcp_timewait_sock {
+>         /* The time we sent the last out-of-window ACK: */
+>         u32                       tw_last_oow_ack_time;
+>
+> -       int                       tw_ts_recent_stamp;
+> +       u32                       tw_ts_recent_stamp;
+>         u32                       tw_tx_delay;
+>  #ifdef CONFIG_TCP_MD5SIG
+>         struct tcp_md5sig_key     *tw_md5_key;
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index e37488d3453f..873a1cbd6d14 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -3778,7 +3778,7 @@ static void tcp_send_challenge_ack(struct sock *sk)
+>  static void tcp_store_ts_recent(struct tcp_sock *tp)
+>  {
+>         tp->rx_opt.ts_recent =3D tp->rx_opt.rcv_tsval;
+> -       tp->rx_opt.ts_recent_stamp =3D ktime_get_seconds();
+> +       tp->rx_opt.ts_recent_stamp =3D tcp_clock_ms();
+>  }
+>
+>  static void tcp_replace_ts_recent(struct tcp_sock *tp, u32 seq)
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index fd17f25ff288..47e2dcda4eae 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -116,7 +116,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *skt=
+w, void *twp)
+>         const struct inet_timewait_sock *tw =3D inet_twsk(sktw);
+>         const struct tcp_timewait_sock *tcptw =3D tcp_twsk(sktw);
+>         struct tcp_sock *tp =3D tcp_sk(sk);
+> -       int ts_recent_stamp;
+> +       u32 ts_recent_stamp;
+>
+>         if (reuse =3D=3D 2) {
+>                 /* Still does not detect *everything* that goes through
+> @@ -157,8 +157,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *skt=
+w, void *twp)
+>          */
+>         ts_recent_stamp =3D READ_ONCE(tcptw->tw_ts_recent_stamp);
+>         if (ts_recent_stamp &&
+> -           (!twp || (reuse && time_after32(ktime_get_seconds(),
+> -                                           ts_recent_stamp)))) {
+> +           (!twp || (reuse && (u32)tcp_clock_ms() !=3D ts_recent_stamp))=
+) {
 
-the issue seems identical to the one described here :
-https://lore.kernel.org/netdev/20210514214927.GC1969@qmqm.qmqm.pl/T/
+At first glance, I wonder whether 1 ms is really too short, especially
+for most cases? If the rtt is 2-3 ms which is quite often seen in
+production, we may lose our opportunity to change the sub-state of
+timewait socket and finish the work that should be done as expected.
+One second is safe for most cases, of course, since I obscurely
+remember I've read one paper (tuning the initial window to 10) saying
+in Google the cases exceeding 100ms rtt is rare but exists. So I still
+feel a fixed short value is not that appropriate...
 
-Full description of the problem/report:
-=============================
-I have observed that when under high upload scenarios the stmmac
-driver will crash due to what I think is an overflow error, after some
-debugging I found that stmmac_rx_buf2_len() is returning an
-unexpectedly high value and assigning to buf2_len here
-https://github.com/torvalds/linux/blob/v6.6/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L5466
+Like you said, how about converting the fixed value into a tunable one
+and keeping 1 second as the default value?
 
-an example value set that i have observed to causes the crash :
-    buf1_len = 0
-    buf2_len = 4294966330
+After you submit the next version, I think I can try it and test it
+locally :) It's interesting!
 
-from within the stmmac_rx_buf2_len function
-    plen = 2106
-    len = 3072
-
-the return value would be plen-len or -966 (4294966330 as a uint32
-that matches the buf2_len)
-
-I am unsure on how to debug this further, would clamping
-stmmac_rx_buf2_len function to return the dma_buf_sz if the return
-value would have otherwise exceeded it ?
-
-This only happens when exceeding 500mbps upload speeds, I have been
-unable to replicate the issue when limiting the speed to sub 500mbps
-
-
-Kernel version (from /proc/version):
-===========================
-6.6.45
-
-
-Crash Log
-========
-[  120.746602] Mem abort info:
-[  120.746848]   ESR = 0x000000009600014f
-[  120.747189]   EC = 0x25: DABT (current EL), IL = 32 bits
-[  120.747668]   SET = 0, FnV = 0
-[  120.747943]   EA = 0, S1PTW = 0
-[  120.748225]   FSC = 0x0f: level 3 permission fault
-[  120.748650] Data abort info:
-[  120.748908]   ISV = 0, ISS = 0x0000014f, ISS2 = 0x00000000
-[  120.749392]   CM = 1, WnR = 1, TnD = 0, TagAccess = 0
-[  120.749835]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[  120.750311] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000003ddd000
-[  120.750902] [ffff000003210000] pgd=18000001ffff8003,
-p4d=18000001ffff8003, pud=18000001ffff7003, pmd=18000001fffde003,
-pte=0060000003210783
-[  120.752014] Internal error: Oops: 000000009600014f [#1] PREEMPT SMP
-[  120.752562] Modules linked in: pppoe ppp_async nft_fib_inet
-nf_flow_table_inet pppox ppp_generic nft_reject_ipv6 nft_reject_ipv4
-nft_reject_inet nft_reject nft_redir nft_quota nft_numgen nft_nat
-nft_masq nft_log nft_limit nft_hash nft_flow_offload nft
-_fib_ipv6 nft_fib_ipv4 nft_fib nft_ct nft_chain_nat nf_tables nf_nat
-nf_flow_table nf_conntrack slhc r8169 nfnetlink nf_reject_ipv6
-nf_reject_ipv4 nf_log_syslog nf_defrag_ipv6 nf_defrag_ipv4 crc_ccitt
-gpio_button_hotplug(O)
-[  120.756247] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G           O
-   6.6.45 #0
-[  120.756894] Hardware name: FriendlyElec NanoPi R6S (DT)
-[  120.757351] pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[  120.757959] pc : dcache_inval_poc+0x40/0x58
-[  120.758331] lr : arch_sync_dma_for_cpu+0x2c/0x3c
-[  120.758739] sp : ffff80008000bcf0
-[  120.759030] x29: ffff80008000bcf0 x28: ffff0001018e8900 x27: ffff000104920000
-[  120.759657] x26: 0000000000000000 x25: ffff000103d28500 x24: ffff0001018e8900
-[  120.760284] x23: ffff0001018ec900 x22: 00000000fffffc36 x21: 0000000000000002
-[  120.760910] x20: ffff000100bf6410 x19: 0000000000589000 x18: 0000000000000000
-[  120.761537] x17: 1128298ef1fd0a08 x16: 01010000efc30001 x15: ffffffffffffffff
-[  120.762164] x14: ffffffffffffffff x13: ffffffffffffffff x12: ffffffffffffffff
-[  120.762790] x11: ffffffffffffffff x10: ffffffffffffffff x9 : ffffffffffffffff
-[  120.763417] x8 : ffffffffffffffff x7 : 0000000000000640 x6 : dead00000000003f
-[  120.764043] x5 : 0000000000000001 x4 : 0000000000000000 x3 : 000000000000003f
-[  120.764670] x2 : 0000000000000040 x1 : ffff000100588c00 x0 : ffff000003210000
-[  120.765296] Call trace:
-[  120.765512]  dcache_inval_poc+0x40/0x58
-[  120.765849]  dma_sync_single_for_cpu+0xec/0x110
-[  120.766250]  stmmac_napi_poll_rx+0x30c/0xd9c
-[  120.766628]  __napi_poll+0x38/0x178
-[  120.766939]  net_rx_action+0x114/0x23c
-[  120.767270]  handle_softirqs+0x108/0x248
-[  120.767617]  __do_softirq+0x14/0x20
-[  120.767926]  ____do_softirq+0x10/0x1c
-[  120.768249]  call_on_irq_stack+0x24/0x4c
-[  120.768594]  do_softirq_own_stack+0x1c/0x28
-[  120.768963]  irq_exit_rcu+0xbc/0xd8
-[  120.769272]  el1_interrupt+0x38/0x68
-[  120.769590]  el1h_64_irq_handler+0x18/0x24
-[  120.769951]  el1h_64_irq+0x68/0x6c
-[  120.770251]  cpuidle_enter_state+0x130/0x2f0
-[  120.770625]  cpuidle_enter+0x38/0x50
-[  120.770941]  do_idle+0x19c/0x1f0
-[  120.771229]  cpu_startup_entry+0x38/0x3c
-[  120.771575]  __cpu_disable+0x0/0xdc
-[  120.771883]  __secondary_switched+0xb8/0xbc
-[  120.772255] Code: 8a230000 54000060 d50b7e20 14000002 (d5087620)
-[  120.772787] ---[ end trace 0000000000000000 ]---
-[  120.773192] Kernel panic - not syncing: Oops: Fatal exception in interrupt
-[  120.773790] SMP: stopping secondary CPUs
-[  120.774203] Kernel Offset: disabled
-[  120.774507] CPU features: 0x0,c0000000,70028141,1000700b
-[  120.774971] Memory Limit: none
+Thanks,
+Jason
 
