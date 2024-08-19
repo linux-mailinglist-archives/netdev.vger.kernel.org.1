@@ -1,161 +1,200 @@
-Return-Path: <netdev+bounces-119633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30172956661
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:10:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7EA956687
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:14:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CB2B1F238CD
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:10:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0E851F2277E
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3A6158845;
-	Mon, 19 Aug 2024 09:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9596315B11F;
+	Mon, 19 Aug 2024 09:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="sueNo7e8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zjzPWMPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F0A148FE0
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 09:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D1015B12A
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 09:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724058602; cv=none; b=W6fgeB2dV2Scjm9VaFTd/gFEPx839+idn3uovGgkmcLyFmAClOv0YVRE553lHBsaUQM+17kPAzKjjOcU6rZFDdW5OsYNaTmvPTFtgMYvdxiIQBlMkAeI3PmsgpkSb03R7c25EzryCh472+29MrOMK2QDr52Zvoi8L2wrpWlhUiE=
+	t=1724058828; cv=none; b=JZ7TuoYp1WK/IgchwXQOR+feGrz52yvZx5Pnh3hVDDUD0nNRoUZUXUPpGXnAB7g8uY/Ov8kEVotSJQ8YOn26RZgnTisbkSdTIq1uhtLmKpDofQkBVGdOlPj9i4j3oQLDx8T2qeAK+r83MVjcndVAax3SfjsPyUSzuWGav+YOTt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724058602; c=relaxed/simple;
-	bh=H4qwsIP7lSkUiFnZ2TwGN7NkBRU7qfQXzAJlke5nVMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pY+JY0XSMrUFDWCIXvELsVRaovmMIrRw+TLCKKD6bAoa3lG7YalSVleDSrqGAAA9HmN+OqT5tjKR/xYXLmFbNDk15Y3F5pOJGD4NIThg9vp0liCUFUFPEawP35rtK3iUlZ5CydDEIJTa45NbUmvWf65aAASda0ZhEsF7HxYEp0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=sueNo7e8; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=MtMcJFNwJiyCOLkUOkk1+PNy8WkGXe15FL+rE7N/ctE=; t=1724058599; x=1725268199; 
-	b=sueNo7e8Zvo+P4ai8JQFg1IRsz0VwLKY9IxIkr3UjtglGekYMvQW0VKVUem1a+7QQd4RIdcQ8VX
-	+LB6+5Iue7eLHpNTx0C/e3sMydvpC6Lf4fJjr0e1SRAFCZZeK4+YNkHRyDyPwj861TmC1oP2ETI5v
-	Q5E57GokAspAO7WaX6p+jVoYqbbk5VL0BazRBAVEKcEt/7Z2rw3VifINRnmBE5D42ic2zY+rOGDS3
-	DhZvzud0wcexNwgUUgAmethQutI2n91VY1vd92GLigowvI/ylA2AhciMtaZrp7WB/5vBpJ02TFNx9
-	ZDuJ+UYid08WhI1GjA4hB22iJj9cOw8hZEGg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sfyOh-00000007KfD-277m;
-	Mon, 19 Aug 2024 11:09:55 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH v2] net: drop special comment style
-Date: Mon, 19 Aug 2024 11:09:43 +0200
-Message-ID: <20240819110950.9602c7ae8daa.Ic187fbc5ba452463ef28feebbd5c18668adb0fec@changeid>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1724058828; c=relaxed/simple;
+	bh=TtnJmSlrXyV6J/ni8WdY53wD6/CYK1VXWag9BG9YZ40=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CNYl/2JYeKuvAhxunOAFWq0ZPyD44ncK/OKi6WZeC3/cXHRVtpT9qkFd4uttGxWmv7iIH9cy4QJ+5fthPsgDQxHYI75rQ6f3xy/7UpYoB2mi8ss3JMlrD2yZn1eB8ozBeOOYRumPV/MT4Qc9E1MHOFgRZUE5YGwhjYn+BDqw4pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zjzPWMPs; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f16d2f2b68so58041631fa.3
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 02:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724058825; x=1724663625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XIMsl1ookSA1DyUgN8UuW8SMlUC0glIxT4g4JKXaVdU=;
+        b=zjzPWMPsgTS5MAFE0rszbPO1O0PtIfXTff074GqJTRV9ANpBBLV1L8NxYo9LtdFK46
+         VVK57WOWfH/6EW3ve6UyzOlxWs9rZODMrfKIbEliv04kA3oRtqBRgcJHefIyfiO/JsnJ
+         fO4bGcqr78BVLwy3ZnZLZhwbQERfHeB1LDNnZzovK7J71vOTwS0FZjteOSaKT7hyxUDh
+         57QtAnYjkCCyEj0/nAb59jZ5G1tyjfOD1N5taOKA0haVsivwsAfIdjPU2UbyLTdydtS4
+         dOkIfQvwv95tpXxmLSQ/IArCdE/P74qgl8S73zskKfuVR1YZj07DS+UEFM4Z+1MPbSca
+         INDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724058825; x=1724663625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XIMsl1ookSA1DyUgN8UuW8SMlUC0glIxT4g4JKXaVdU=;
+        b=K9rJqYEC3heloBpBaNd1Rracvq1lOdrzsMmRsrclItPeIrX3Oi9S2qJx7z6O6iNkDB
+         iwksXqG0hKbrFSJ64X9eDcgkMueRpYougOcdrXofoOQfLHgDSVNyFD2tPQlIuYfXh+O8
+         n2HbRuXnTNRwOtgRRpt3pLJxnCdx5HCvP9CznwaIvQzDKtaHWyfdzLVvZmWejgf5vkBK
+         KIBM0ZroAGUGrlXUP75S1X2dfXN3QMGikTOKvzRDJLDEDWpMgftO2ThSSdPsgPyVence
+         i564rqyTbns/MllcWKSzQkFDYC4n1lOo/Zen0YxTa4cGysaXFSUIVl5pHXIAF+bhIjnm
+         HqqQ==
+X-Gm-Message-State: AOJu0YwbIGjiAOXIewiAatHKU5NfxmQjp/01BD1f1CP/tk0VKYZQaEp5
+	dFCqTJzwzNImUHYTFKReBTnt0TEosRefiT4FuvuPmPSGmakNK5zefpkQrw7cOtyCx8KBAqr9yAg
+	OQfRBBD5DqI5i3wI8I7EitvGX1HTutLIK9DMS0FfKPrzRJ2OkxLge
+X-Google-Smtp-Source: AGHT+IFOZG4WMA3ByLVTlGA87b7bgPZg8l2Jlfvs7m1bi8xHPKgfIE9xY9QB2B3aIl9fWxotTq3p7F1FeB2f8sINkIQ=
+X-Received: by 2002:a2e:742:0:b0:2ef:2677:7b74 with SMTP id
+ 38308e7fff4ca-2f3be5f02eemr74527771fa.41.1724058824221; Mon, 19 Aug 2024
+ 02:13:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240819082513.27176-1-Tze-nan.Wu@mediatek.com>
+In-Reply-To: <20240819082513.27176-1-Tze-nan.Wu@mediatek.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Aug 2024 11:13:33 +0200
+Message-ID: <CANn89iJ04bbS4iaB8dpgbtZTWF_JVt1JawwxFah16zN1aj3HWw@mail.gmail.com>
+Subject: Re: [PATCH] net/socket: Acquire cgroup_lock in do_sock_getsockopt
+To: Tze-nan Wu <Tze-nan.Wu@mediatek.com>, Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, bobule.chang@mediatek.com, 
+	wsd_upstream@mediatek.com, Yanghui Li <yanghui.li@mediatek.com>, 
+	Cheng-Jui Wang <cheng-jui.wang@mediatek.com>, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Mon, Aug 19, 2024 at 10:27=E2=80=AFAM Tze-nan Wu <Tze-nan.Wu@mediatek.co=
+m> wrote:
+>
+> The return value from `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` can change
+> between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+> `BPF_CGROUP_RUN_PROG_GETSOCKOPT`.
+>
+> If `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` changes from "false" to
+> "true"
+> between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+> `BPF_CGROUP_RUN_PROG_GETSOCKOPT`,
+> `BPF_CGROUP_RUN_PROG_GETSOCKOPT` will receive an -EFAULT from
+> `__cgroup_bpf_run_filter_getsockopt(max_optlen=3D0)` due to `get_user()`
+> had not reached in `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`.
+>
+> Scenario shown as below:
+>
+>            `process A`                      `process B`
+>            -----------                      ------------
+>   BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+>                                             enable CGROUP_GETSOCKOPT
+>   BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
+>
+> Prevent `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` change between
+> `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and `BPF_CGROUP_RUN_PROG_GETSOCKOPT`
+> by acquiring cgroup_lock.
+>
+> Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
+> Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
+> Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+>
+> ---
+>
+> We have encountered this issue by observing that process A could sometime=
+s
+> get an -EFAULT from getsockopt() during our device boot-up, while another
+> process B triggers the race condition by enabling CGROUP_GETSOCKOPT
+> through bpf syscall at the same time.
+>
+> The race condition is shown below:
+>
+>            `process A`                        `process B`
+>            -----------                        ------------
+>   BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+>
+>                                               bpf syscall
+>                                         (CGROUP_GETSOCKOPT enabled)
+>
+>   BPF_CGROUP_RUN_PROG_GETSOCKOPT
+>   -> __cgroup_bpf_run_filter_getsockopt
+>     (-EFAULT)
+>
+> __cgroup_bpf_run_filter_getsockopt return -EFAULT at the line shown below=
+:
+>         if (optval && (ctx.optlen > max_optlen || ctx.optlen < 0)) {
+>                 if (orig_optlen > PAGE_SIZE && ctx.optlen >=3D 0) {
+>                         pr_info_once("bpf getsockopt: ignoring program bu=
+ffer with optlen=3D%d (max_optlen=3D%d)\n",
+>                                      ctx.optlen, max_optlen);
+>                         ret =3D retval;
+>                         goto out;
+>                 }
+>                 ret =3D -EFAULT; <=3D=3D return EFAULT here
+>                 goto out;
+>         }
+>
+> This patch should fix the race but not sure if it introduces any potentia=
+l
+> side effects or regression.
+>
+> And we wondering if this is a real issue in do_sock_getsockopt or if
+> getsockopt() is designed to expect such race conditions.
+> Should the userspace caller always anticipate an -EFAULT from getsockopt(=
+)
+> if another process enables CGROUP_GETSOCKOPT at the same time?
+>
+> Any comment will be appreciated!
+>
+> BTW, I added Chengjui and Yanghui to Co-developed due to we have several
+> discussions on this issue. And we both spend some time on this issue.
+>
+> ---
+>  net/socket.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index fcbdd5bc47ac..e0b2b16fd238 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -2370,8 +2370,10 @@ int do_sock_getsockopt(struct socket *sock, bool c=
+ompat, int level,
+>         if (err)
+>                 return err;
+>
+> -       if (!compat)
+> +       if (!compat) {
+> +               cgroup_lock();
+>                 max_optlen =3D BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
+> +       }
+>
 
-As we discussed in the room at netdevconf earlier this week,
-drop the requirement for special comment style for netdev.
+Acquiring cgroup_lock mutex in socket getsockopt() fast path ?
 
-For checkpatch, the general check accepts both right now, so
-simply drop the special request there as well.
+There is no way we can accept such a patch, please come up with a
+reasonable patch.
 
-Acked-by: Stephen Hemminger <stephen@networkplumber.org>
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
-v2:
- - drop paragraph from Documentation/process/coding-style.rst
-   (Alexandra Winter)
- - collect Stephen's acked-by
----
- Documentation/process/coding-style.rst      | 12 ------------
- Documentation/process/maintainer-netdev.rst | 17 -----------------
- scripts/checkpatch.pl                       | 10 ----------
- 3 files changed, 39 deletions(-)
-
-diff --git a/Documentation/process/coding-style.rst b/Documentation/process/coding-style.rst
-index 04f6aa377a5d..8e30c8f7697d 100644
---- a/Documentation/process/coding-style.rst
-+++ b/Documentation/process/coding-style.rst
-@@ -629,18 +629,6 @@ The preferred style for long (multi-line) comments is:
- 	 * with beginning and ending almost-blank lines.
- 	 */
- 
--For files in net/ and drivers/net/ the preferred style for long (multi-line)
--comments is a little different.
--
--.. code-block:: c
--
--	/* The preferred comment style for files in net/ and drivers/net
--	 * looks like this.
--	 *
--	 * It is nearly the same as the generally preferred comment style,
--	 * but there is no initial almost-blank line.
--	 */
--
- It's also important to comment data, whether they are basic types or derived
- types.  To this end, use just one data declaration per line (no commas for
- multiple data declarations).  This leaves you room for a small comment on each
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index fe8616397d63..30d24eecdaaa 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -355,23 +355,6 @@ just do it. As a result, a sequence of smaller series gets merged quicker and
- with better review coverage. Re-posting large series also increases the mailing
- list traffic.
- 
--Multi-line comments
--~~~~~~~~~~~~~~~~~~~
--
--Comment style convention is slightly different for networking and most of
--the tree.  Instead of this::
--
--  /*
--   * foobar blah blah blah
--   * another line of text
--   */
--
--it is requested that you make it look like this::
--
--  /* foobar blah blah blah
--   * another line of text
--   */
--
- Local variable ordering ("reverse xmas tree", "RCS")
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 39032224d504..4427572b2477 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -4015,16 +4015,6 @@ sub process {
- 			}
- 		}
- 
--# Block comment styles
--# Networking with an initial /*
--		if ($realfile =~ m@^(drivers/net/|net/)@ &&
--		    $prevrawline =~ /^\+[ \t]*\/\*[ \t]*$/ &&
--		    $rawline =~ /^\+[ \t]*\*/ &&
--		    $realline > 3) { # Do not warn about the initial copyright comment block after SPDX-License-Identifier
--			WARN("NETWORKING_BLOCK_COMMENT_STYLE",
--			     "networking block comments don't use an empty /* line, use /* Comment...\n" . $hereprev);
--		}
--
- # Block comments use * on subsequent lines
- 		if ($prevline =~ /$;[ \t]*$/ &&			#ends in comment
- 		    $prevrawline =~ /^\+.*?\/\*/ &&		#starting /*
--- 
-2.46.0
-
+cgroup_bpf_enabled() should probably be used once.
 
