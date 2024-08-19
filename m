@@ -1,543 +1,116 @@
-Return-Path: <netdev+bounces-119901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC669576E5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:53:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E639576EF
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6CC7B22158
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:53:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1908283B20
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6B3196C7C;
-	Mon, 19 Aug 2024 21:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A92D166F25;
+	Mon, 19 Aug 2024 21:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbkCTayd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PHEQisVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32AC1891D9
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B785B3F9CC;
+	Mon, 19 Aug 2024 21:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724104431; cv=none; b=RCDqws/ALWa1v7ERvVG0kiC+MRBUy0gR4I0Ti0sVNqz1kiUWHn01SP3i2BjpQHdhEsUzfi7Hta8GulhjU/eFozNubxIS7ezS5pLmMUpw7g8pTw/szrPUyAPRqeBd5Pc/sJSUlrAaGS0G8gTilY+4QZ3uolY1OcXVeec6BdAvjls=
+	t=1724104665; cv=none; b=n9qtA8/l633CcSVxsV38vkPT8nyeo0HGD/Y3t7TuvfzrZxBWHqVBX4SQtK9wSuUZ5n7nwjY+OUPrq75GjgD+r8lelNkbKvFUdg+8DP1xYoHZ9hFsA/kR4p1C9qOA4UNzRoTXu3VvFhCirEeK6dmQgoyOy9Zq+TQWO48Xt0ppKK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724104431; c=relaxed/simple;
-	bh=B9CBBxmENm+hkJfUpva6l/DxI7LdYprG9Cs40gfK3hc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MqaiNkKlMciFLNOneb6+YgRmRE2SKakvmr8tQ7FbJCG2Azhz8LxJjjb44fxBfncICLAshK84FvALK0Q1cjTl7n9/Zjwz98eVOG6xP3pVo5tT7YKjoIR9P1ipfs2mejNvFS8KTvs1nH0xl+Q+646O2CcfVWYxA33vXMIzQtPttrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbkCTayd; arc=none smtp.client-ip=209.85.208.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5bee6a8843eso1800494a12.3
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 14:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724104427; x=1724709227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KmkZ4KEQdutgI8632letNnSaNiIG6gjx88DZgPNcRzA=;
-        b=IbkCTaydd3B2HHmAu44+DgOUOjIn885pyoU+vZ91Phg0/klfZycN799V2kg/JmUX30
-         O9ytL1+bAznPxIcNewi3EfFNfyGRK+5ZC244UYuL4XNrOL/tsdleSZVVi7GdwL2K40IW
-         +YLeD2M+bzxd6ZXU8OuZqShY2tcgFrdIslxccwEd/a2JAEqL3HDN1Ij+gladQgzKLkSi
-         697NNZaYcMfeGDdfjlKfI0YP3e3ZGoGK11RW9SfbLGA9/oC/DhMyHhghxAvOh8dkt2Jx
-         8wVodmiNk+isNZxRKd0+wqxLTbJklYCaQb+9JiXMOyqIgus45RRnfeuMx/mSzigwyJ1G
-         pe4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724104427; x=1724709227;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KmkZ4KEQdutgI8632letNnSaNiIG6gjx88DZgPNcRzA=;
-        b=kNj7JX2R6TpxlC3Vl2RB76RhRWcowMWrYaRzTulo2IlHaRSbqgvzAAj6sM8bdH6GJ8
-         5CYFN8mXrCA5bkgaNB2ByBu9Gl29mwbHK5Zg1NB7RpQnx0esKNNRTdD+di62aXa/+o0k
-         xtAH4N95j5X0tr3VG8ROM0w1O7nt6OAElD847UIM/tnFyx0YzFPU3GhtRlTN0hXM5rsL
-         oIehW7Zhkhnwz/rKDb9WmYjeZYP5JZlKEKkYZglvdz20bSLg4DYXDs3NvKeyJwvoij22
-         jjQjnHuuPBTPrP+XqvKumDD5tWy6ClYHD1vdzEj/ZG9hFs7jxRl6f4nPhsvs2EszIas+
-         vSbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUq5n02z3klCSEgUtgBZfel2wSIKzJYNr9ZEPCPG/zvjyxN1q8ssUB7JYrbDH7r+g8IiYpdQn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0gScZ/v+M1kaEozGKbockxe+o51jkZ/F1FHzEQPGVzTfAhtzG
-	7n+nC0coJvr5mxK9zM9inFB73FRU6WLC8JhpPAoPIq66c/LuND8ERylYKNbTUqOnMZtvJDjBO4n
-	y3A==
-X-Google-Smtp-Source: AGHT+IGkSuSNa+k6El0+D1UJf0EsfFtxBV18YKFMRVSEC88F73OKl0z9LhFXnDvvY6eX99x6u1eE0Bd4Iqw=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:3891:b0:59f:6a18:e058 with SMTP id
- 4fb4d7f45d1cf-5beca2686e5mr13045a12.0.1724104426934; Mon, 19 Aug 2024
- 14:53:46 -0700 (PDT)
-Date: Mon, 19 Aug 2024 23:53:44 +0200
-In-Reply-To: <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1724104665; c=relaxed/simple;
+	bh=KYn8p+NSJrYcziwVjY5bQIV7LvNtaGg8Jd5Cp/ncoys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lgjJXWGPCFRZDI3C6tJpRL1HPqNWOg4UZPG7RROddUkhwD86NgA3A9dikwwi0gZ7mtnnY6n/K6BJ378OP48rf/0baG+QjdEAWJY+fe5oCjqc5xX+KmeMAcegRDo9/P6wt47lmY49WryMsJiknINx0iperExSM4qUwoq67gncGMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PHEQisVR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KWELWY8kP/e75VfClS8JEpAm5DcwZJmSJ36xnxJNPlM=; b=PHEQisVR6CN9sYcF7ahqoZMg+4
+	GTK2kCo5TLmd772RH2HB9AHh2Gb1ad0CYo22wTG9w9cvOojgM+zL7RlGM/iZk51gfPxtL/h3UZfNu
+	zQ6kkPv8jYSyty5BJguoTXWOBLXSnsva9bNkU5VSYI6CSrPnUnVosVyPqcIkNo7Ey7gA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sgANS-0059lF-KD; Mon, 19 Aug 2024 23:57:26 +0200
+Date: Mon, 19 Aug 2024 23:57:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] phy: dp83tg720: Add statistics support
+Message-ID: <654c3a17-fea7-4e28-be36-5229eb106737@lunn.ch>
+References: <20240819113625.2072283-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com> <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZsO-6EC1UYX5pHxl@google.com>
-Subject: Re: [RFC PATCH v2 3/9] selftests/landlock: Support LANDLOCK_ACCESS_NET_LISTEN_TCP
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819113625.2072283-1-o.rempel@pengutronix.de>
 
-Some comment nits I forgot, see below.
+> +static const struct dp83tg720_hw_stat dp83tg720_hw_stats[] = {
+> +	{
+> +		.string = "esd_event_count",
+> +		.cache_index1 = DP83TG720_CACHE_A2D_REG_66,
+> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
+> +		.mask1 = DP83TG720S_ESD_EVENT_COUNT_MASK,
+> +		.shift1 = 9,
+> +		.flags = DP83TG720_FLAG_COUNTER,
+> +	},
+> +	{
+> +		.string = "link_training_time",
+> +		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_1,
+> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
+> +		.mask1 = DP83TG720S_LINK_TRAINING_TIME_MASK,
+> +	},
+> +	{
+> +		.string = "remote_receiver_time",
+> +		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
+> +		.cache_index2 = DP83TG720_CACHE_EMPTY,
+> +		.mask1 = DP83TG720S_REMOTE_RECEIVER_TIME_MASK,
+> +		.shift1 = 8,
+> +	},
 
-On Wed, Aug 14, 2024 at 11:01:45AM +0800, Mikhail Ivanov wrote:
-> * Add listen_variant() to simplify listen(2) return code checking.
-> * Rename test_bind_and_connect() to test_restricted_net_fixture().
-> * Extend current net rules with LANDLOCK_ACCESS_NET_LISTEN_TCP access.
-> * Rename test port_specific.bind_connect_1023 to
->   port_specific.port_1023.
-> * Check little endian port restriction for listen in
->   ipv4_tcp.port_endianness.
-> * Some local renames and comment changes.
->=20
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
->  tools/testing/selftests/landlock/net_test.c | 198 +++++++++++---------
->  1 file changed, 107 insertions(+), 91 deletions(-)
->=20
-> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/=
-selftests/landlock/net_test.c
-> index f21cfbbc3638..8126f5c0160f 100644
-> --- a/tools/testing/selftests/landlock/net_test.c
-> +++ b/tools/testing/selftests/landlock/net_test.c
-> @@ -2,7 +2,7 @@
->  /*
->   * Landlock tests - Network
->   *
-> - * Copyright =C2=A9 2022-2023 Huawei Tech. Co., Ltd.
-> + * Copyright =C2=A9 2022-2024 Huawei Tech. Co., Ltd.
->   * Copyright =C2=A9 2023 Microsoft Corporation
->   */
-> =20
-> @@ -22,6 +22,17 @@
-> =20
->  #include "common.h"
-> =20
-> +/* clang-format off */
-> +
-> +#define ACCESS_LAST LANDLOCK_ACCESS_NET_LISTEN_TCP
-> +
-> +#define ACCESS_ALL ( \
-> +	LANDLOCK_ACCESS_NET_BIND_TCP | \
-> +	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
-> +	LANDLOCK_ACCESS_NET_LISTEN_TCP)
-> +
-> +/* clang-format on */
-> +
->  const short sock_port_start =3D (1 << 10);
-> =20
->  static const char loopback_ipv4[] =3D "127.0.0.1";
-> @@ -282,6 +293,16 @@ static int connect_variant(const int sock_fd,
->  	return connect_variant_addrlen(sock_fd, srv, get_addrlen(srv, false));
->  }
-> =20
-> +static int listen_variant(const int sock_fd, const int backlog)
+If i remember correctly, some of these are part of an Open Alliance
+standard. Ideally, we want all PHYs which follow the standard to use
+the same names of these statistics.
+
+Maybe add to the open alliance header something like
+
+#define TC42_ESD_EVENT_COUNT "esd_event_count"
+
+Given that the Open Alliance failed to define the registers, i don't
+think we can do much more than that?
+
+> +static void dp83tg720_get_strings(struct phy_device *phydev, u8 *data)
 > +{
-> +	int ret;
+> +	int i, j = 0;
 > +
-> +	ret =3D listen(sock_fd, backlog);
-> +	if (ret < 0)
-> +		return -errno;
-> +	return ret;
-> +}
-> +
->  FIXTURE(protocol)
->  {
->  	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
-> @@ -438,9 +459,11 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_unix_=
-datagram) {
->  	},
->  };
-> =20
-> -static void test_bind_and_connect(struct __test_metadata *const _metadat=
-a,
-> -				  const struct service_fixture *const srv,
-> -				  const bool deny_bind, const bool deny_connect)
-> +static void test_restricted_net_fixture(struct __test_metadata *const _m=
-etadata,
-> +					const struct service_fixture *const srv,
-> +					const bool deny_bind,
-> +					const bool deny_connect,
-> +					const bool deny_listen)
->  {
->  	char buf =3D '\0';
->  	int inval_fd, bind_fd, client_fd, status, ret;
-> @@ -512,8 +535,14 @@ static void test_bind_and_connect(struct __test_meta=
-data *const _metadata,
->  		EXPECT_EQ(0, ret);
-> =20
->  		/* Creates a listening socket. */
-> -		if (srv->protocol.type =3D=3D SOCK_STREAM)
-> -			EXPECT_EQ(0, listen(bind_fd, backlog));
-> +		if (srv->protocol.type =3D=3D SOCK_STREAM) {
-> +			ret =3D listen_variant(bind_fd, backlog);
-> +			if (deny_listen) {
-> +				EXPECT_EQ(-EACCES, ret);
-> +			} else {
-> +				EXPECT_EQ(0, ret);
-> +			}
-> +		}
->  	}
-> =20
->  	child =3D fork();
-> @@ -530,7 +559,7 @@ static void test_bind_and_connect(struct __test_metad=
-ata *const _metadata,
->  		ret =3D connect_variant(connect_fd, srv);
->  		if (deny_connect) {
->  			EXPECT_EQ(-EACCES, ret);
-> -		} else if (deny_bind) {
-> +		} else if (deny_bind || deny_listen) {
->  			/* No listening server. */
->  			EXPECT_EQ(-ECONNREFUSED, ret);
->  		} else {
-> @@ -545,7 +574,7 @@ static void test_bind_and_connect(struct __test_metad=
-ata *const _metadata,
-> =20
->  	/* Accepts connection from the child. */
->  	client_fd =3D bind_fd;
-> -	if (!deny_bind && !deny_connect) {
-> +	if (!deny_bind && !deny_connect && !deny_listen) {
->  		if (srv->protocol.type =3D=3D SOCK_STREAM) {
->  			client_fd =3D accept(bind_fd, NULL, 0);
->  			ASSERT_LE(0, client_fd);
-> @@ -571,16 +600,15 @@ TEST_F(protocol, bind)
->  {
->  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
->  		const struct landlock_ruleset_attr ruleset_attr =3D {
-> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +			.handled_access_net =3D ACCESS_ALL,
->  		};
-> -		const struct landlock_net_port_attr tcp_bind_connect_p0 =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		const struct landlock_net_port_attr tcp_not_restricted_p0 =3D {
-> +			.allowed_access =3D ACCESS_ALL,
->  			.port =3D self->srv0.port,
->  		};
-> -		const struct landlock_net_port_attr tcp_connect_p1 =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		const struct landlock_net_port_attr tcp_denied_bind_p1 =3D {
-> +			.allowed_access =3D ACCESS_ALL &
-> +					  ~LANDLOCK_ACCESS_NET_BIND_TCP,
->  			.port =3D self->srv1.port,
->  		};
->  		int ruleset_fd;
-> @@ -589,48 +617,47 @@ TEST_F(protocol, bind)
->  						     sizeof(ruleset_attr), 0);
->  		ASSERT_LE(0, ruleset_fd);
-> =20
-> -		/* Allows connect and bind for the first port.  */
-> +		/* Allows all actions for the first port. */
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_bind_connect_p0, 0));
-> +					    &tcp_not_restricted_p0, 0));
-> =20
-> -		/* Allows connect and denies bind for the second port. */
-> +		/* Allows all actions despite bind. */
+> +	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
+> +		strscpy(&data[j * ETH_GSTRING_LEN],
+> +			dp83tg720_hw_stats[i].string, ETH_GSTRING_LEN);
 
-s/despite/except/ would be more conventional English, I believe.
+ethtool_puts()
 
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_connect_p1, 0));
-> +					    &tcp_denied_bind_p1, 0));
-> =20
->  		enforce_ruleset(_metadata, ruleset_fd);
->  		EXPECT_EQ(0, close(ruleset_fd));
->  	}
-> +	bool restricted =3D is_restricted(&variant->prot, variant->sandbox);
-> =20
->  	/* Binds a socket to the first port. */
-> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
-> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
-> +				    false);
-> =20
->  	/* Binds a socket to the second port. */
-> -	test_bind_and_connect(_metadata, &self->srv1,
-> -			      is_restricted(&variant->prot, variant->sandbox),
-> -			      false);
-> +	test_restricted_net_fixture(_metadata, &self->srv1, restricted, false,
-> +				    false);
-> =20
->  	/* Binds a socket to the third port. */
-> -	test_bind_and_connect(_metadata, &self->srv2,
-> -			      is_restricted(&variant->prot, variant->sandbox),
-> -			      is_restricted(&variant->prot, variant->sandbox));
-> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
-> +				    restricted, restricted);
->  }
-> =20
->  TEST_F(protocol, connect)
->  {
->  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
->  		const struct landlock_ruleset_attr ruleset_attr =3D {
-> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +			.handled_access_net =3D ACCESS_ALL,
->  		};
-> -		const struct landlock_net_port_attr tcp_bind_connect_p0 =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		const struct landlock_net_port_attr tcp_not_restricted_p0 =3D {
-> +			.allowed_access =3D ACCESS_ALL,
->  			.port =3D self->srv0.port,
->  		};
-> -		const struct landlock_net_port_attr tcp_bind_p1 =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP,
-> +		const struct landlock_net_port_attr tcp_denied_connect_p1 =3D {
-> +			.allowed_access =3D ACCESS_ALL &
-> +					  ~LANDLOCK_ACCESS_NET_CONNECT_TCP,
->  			.port =3D self->srv1.port,
->  		};
->  		int ruleset_fd;
-> @@ -639,28 +666,27 @@ TEST_F(protocol, connect)
->  						     sizeof(ruleset_attr), 0);
->  		ASSERT_LE(0, ruleset_fd);
-> =20
-> -		/* Allows connect and bind for the first port. */
-> +		/* Allows all actions for the first port. */
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_bind_connect_p0, 0));
-> +					    &tcp_not_restricted_p0, 0));
-> =20
-> -		/* Allows bind and denies connect for the second port. */
-> +		/* Allows all actions despite connect. */
+	Andrew
 
-Same here.
-
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_bind_p1, 0));
-> +					    &tcp_denied_connect_p1, 0));
-> =20
->  		enforce_ruleset(_metadata, ruleset_fd);
->  		EXPECT_EQ(0, close(ruleset_fd));
->  	}
-> -
-> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
-> -
-> -	test_bind_and_connect(_metadata, &self->srv1, false,
-> -			      is_restricted(&variant->prot, variant->sandbox));
-> -
-> -	test_bind_and_connect(_metadata, &self->srv2,
-> -			      is_restricted(&variant->prot, variant->sandbox),
-> -			      is_restricted(&variant->prot, variant->sandbox));
-> +	bool restricted =3D is_restricted(&variant->prot, variant->sandbox);
-> +
-> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
-> +				    false);
-> +	test_restricted_net_fixture(_metadata, &self->srv1, false, restricted,
-> +				    false);
-> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
-> +				    restricted, restricted);
->  }
-> =20
->  TEST_F(protocol, bind_unspec)
-> @@ -761,7 +787,7 @@ TEST_F(protocol, connect_unspec)
->  	ASSERT_LE(0, bind_fd);
->  	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
->  	if (self->srv0.protocol.type =3D=3D SOCK_STREAM)
-> -		EXPECT_EQ(0, listen(bind_fd, backlog));
-> +		EXPECT_EQ(0, listen_variant(bind_fd, backlog));
-> =20
->  	child =3D fork();
->  	ASSERT_LE(0, child);
-> @@ -1127,8 +1153,8 @@ TEST_F(tcp_layers, ruleset_overlap)
->  	 * Forbids to connect to the socket because only one ruleset layer
->  	 * allows connect.
->  	 */
-> -	test_bind_and_connect(_metadata, &self->srv0, false,
-> -			      variant->num_layers >=3D 2);
-> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
-> +				    variant->num_layers >=3D 2, false);
->  }
-> =20
->  TEST_F(tcp_layers, ruleset_expand)
-> @@ -1208,11 +1234,12 @@ TEST_F(tcp_layers, ruleset_expand)
->  		EXPECT_EQ(0, close(ruleset_fd));
->  	}
-> =20
-> -	test_bind_and_connect(_metadata, &self->srv0, false,
-> -			      variant->num_layers >=3D 3);
-> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
-> +				    variant->num_layers >=3D 3, false);
-> =20
-> -	test_bind_and_connect(_metadata, &self->srv1, variant->num_layers >=3D =
-1,
-> -			      variant->num_layers >=3D 2);
-> +	test_restricted_net_fixture(_metadata, &self->srv1,
-> +				    variant->num_layers >=3D 1,
-> +				    variant->num_layers >=3D 2, false);
->  }
-> =20
->  /* clang-format off */
-> @@ -1230,16 +1257,6 @@ FIXTURE_TEARDOWN(mini)
->  {
->  }
-> =20
-> -/* clang-format off */
-> -
-> -#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_TCP
-> -
-> -#define ACCESS_ALL ( \
-> -	LANDLOCK_ACCESS_NET_BIND_TCP | \
-> -	LANDLOCK_ACCESS_NET_CONNECT_TCP)
-> -
-> -/* clang-format on */
-> -
->  TEST_F(mini, network_access_rights)
->  {
->  	const struct landlock_ruleset_attr ruleset_attr =3D {
-> @@ -1454,8 +1471,9 @@ TEST_F(mini, tcp_port_overflow)
-> =20
->  	enforce_ruleset(_metadata, ruleset_fd);
-> =20
-> -	test_bind_and_connect(_metadata, &srv_denied, true, true);
-> -	test_bind_and_connect(_metadata, &srv_max_allowed, false, false);
-> +	test_restricted_net_fixture(_metadata, &srv_denied, true, true, false);
-> +	test_restricted_net_fixture(_metadata, &srv_max_allowed, false, false,
-> +				    false);
->  }
-> =20
->  FIXTURE(ipv4_tcp)
-> @@ -1485,22 +1503,21 @@ FIXTURE_TEARDOWN(ipv4_tcp)
->  TEST_F(ipv4_tcp, port_endianness)
->  {
->  	const struct landlock_ruleset_attr ruleset_attr =3D {
-> -		.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		.handled_access_net =3D ACCESS_ALL,
->  	};
->  	const struct landlock_net_port_attr bind_host_endian_p0 =3D {
->  		.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP,
->  		/* Host port format. */
->  		.port =3D self->srv0.port,
->  	};
-> -	const struct landlock_net_port_attr connect_big_endian_p0 =3D {
-> -		.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +	const struct landlock_net_port_attr connect_listen_big_endian_p0 =3D {
-> +		.allowed_access =3D LANDLOCK_ACCESS_NET_CONNECT_TCP |
-> +				  LANDLOCK_ACCESS_NET_LISTEN_TCP,
->  		/* Big endian port format. */
->  		.port =3D htons(self->srv0.port),
->  	};
-> -	const struct landlock_net_port_attr bind_connect_host_endian_p1 =3D {
-> -		.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +	const struct landlock_net_port_attr not_restricted_host_endian_p1 =3D {
-> +		.allowed_access =3D ACCESS_ALL,
->  		/* Host port format. */
->  		.port =3D self->srv1.port,
->  	};
-> @@ -1514,16 +1531,18 @@ TEST_F(ipv4_tcp, port_endianness)
->  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->  				       &bind_host_endian_p0, 0));
->  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -				       &connect_big_endian_p0, 0));
-> +				       &connect_listen_big_endian_p0, 0));
->  	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -				       &bind_connect_host_endian_p1, 0));
-> +				       &not_restricted_host_endian_p1, 0));
->  	enforce_ruleset(_metadata, ruleset_fd);
-> =20
->  	/* No restriction for big endinan CPU. */
-> -	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
-> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
-> +				    little_endian, little_endian);
-> =20
->  	/* No restriction for any CPU. */
-> -	test_bind_and_connect(_metadata, &self->srv1, false, false);
-> +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
-> +				    false);
->  }
-> =20
->  TEST_F(ipv4_tcp, with_fs)
-> @@ -1691,7 +1710,7 @@ TEST_F(port_specific, bind_connect_zero)
->  	ret =3D bind_variant(bind_fd, &self->srv0);
->  	EXPECT_EQ(0, ret);
-> =20
-> -	EXPECT_EQ(0, listen(bind_fd, backlog));
-> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
-> =20
->  	/* Connects on port 0. */
->  	ret =3D connect_variant(connect_fd, &self->srv0);
-> @@ -1714,26 +1733,23 @@ TEST_F(port_specific, bind_connect_zero)
->  	EXPECT_EQ(0, close(bind_fd));
->  }
-> =20
-> -TEST_F(port_specific, bind_connect_1023)
-> +TEST_F(port_specific, port_1023)
->  {
->  	int bind_fd, connect_fd, ret;
-> =20
-> -	/* Adds a rule layer with bind and connect actions. */
-> +	/* Adds a rule layer with all actions. */
->  	if (variant->sandbox =3D=3D TCP_SANDBOX) {
->  		const struct landlock_ruleset_attr ruleset_attr =3D {
-> -			.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP
-> +			.handled_access_net =3D ACCESS_ALL
->  		};
->  		/* A rule with port value less than 1024. */
-> -		const struct landlock_net_port_attr tcp_bind_connect_low_range =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		const struct landlock_net_port_attr tcp_low_range_port =3D {
-> +			.allowed_access =3D ACCESS_ALL,
->  			.port =3D 1023,
->  		};
->  		/* A rule with 1024 port. */
-> -		const struct landlock_net_port_attr tcp_bind_connect =3D {
-> -			.allowed_access =3D LANDLOCK_ACCESS_NET_BIND_TCP |
-> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		const struct landlock_net_port_attr tcp_port_1024 =3D {
-> +			.allowed_access =3D ACCESS_ALL,
->  			.port =3D 1024,
->  		};
->  		int ruleset_fd;
-> @@ -1744,10 +1760,10 @@ TEST_F(port_specific, bind_connect_1023)
-> =20
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_bind_connect_low_range, 0));
-> +					    &tcp_low_range_port, 0));
->  		ASSERT_EQ(0,
->  			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> -					    &tcp_bind_connect, 0));
-> +					    &tcp_port_1024, 0));
-> =20
->  		enforce_ruleset(_metadata, ruleset_fd);
->  		EXPECT_EQ(0, close(ruleset_fd));
-> @@ -1771,7 +1787,7 @@ TEST_F(port_specific, bind_connect_1023)
->  	ret =3D bind_variant(bind_fd, &self->srv0);
->  	clear_cap(_metadata, CAP_NET_BIND_SERVICE);
->  	EXPECT_EQ(0, ret);
-> -	EXPECT_EQ(0, listen(bind_fd, backlog));
-> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
-> =20
->  	/* Connects on the binded port 1023. */
->  	ret =3D connect_variant(connect_fd, &self->srv0);
-> @@ -1791,7 +1807,7 @@ TEST_F(port_specific, bind_connect_1023)
->  	/* Binds on port 1024. */
->  	ret =3D bind_variant(bind_fd, &self->srv0);
->  	EXPECT_EQ(0, ret);
-> -	EXPECT_EQ(0, listen(bind_fd, backlog));
-> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
-> =20
->  	/* Connects on the binded port 1024. */
->  	ret =3D connect_variant(connect_fd, &self->srv0);
-> --=20
-> 2.34.1
->=20
+---
+pw-bot: cr
 
