@@ -1,68 +1,72 @@
-Return-Path: <netdev+bounces-119665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE619568A2
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B13CB9568A4
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:36:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AECD281A5E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:36:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F9ED28193B
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B2515CD58;
-	Mon, 19 Aug 2024 10:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F9E165F06;
+	Mon, 19 Aug 2024 10:36:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43B315B972;
-	Mon, 19 Aug 2024 10:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576F815B972;
+	Mon, 19 Aug 2024 10:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724063785; cv=none; b=JHO5xOvtf2tpI/woxGj6750MSeXTRGsaF4bAL92G0Opf38MkIvm75/uECGqXoPay8+mPo9zKPX5m0RIEVRdkBonBbnPvjhvp43xi3atYF7zN3EaSalyKCEY1T4nzNeoUEqbyeK4tlcW6Gi00sfQcjvSt7kb+Y51p1NENI7iQB2k=
+	t=1724063789; cv=none; b=CGC78RK/7NxP2B5oMbMKDDQ20zeYF46eHtr1sq2sXoRVuUPrE4cmk7kTaS1tshdwuOEp2KE+d4v7+PPB8hFkXSnTyudIdY7/7hK0ZksCBQ+9DCMWtB0Wxd6RFgcexfvcQuTyA8Tv27oIg+Y391wEZRiGX++P6k6RMZcNflSGEOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724063785; c=relaxed/simple;
-	bh=UYxsxD6yoehB7K7pT2SFsXMGr4b4YQ7evFAGlbxj/dA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fPGyTStiremKajuu7aVrEYXCIKlPhAVpWh/KvO6tl/Z/a0myG7EKckfK6k978NskdUu8QW5m1u0A9zghGgDxzmAq0HrgilsfBU4XRoOJCRKtooAJ+mqpDWW1JcxtCdpyMfn6UZahlo9zAvI2RaQ/V3m5zMF7hNjxmni4GcX6lrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+	s=arc-20240116; t=1724063789; c=relaxed/simple;
+	bh=GSSumoePGy/k2KhOJ0WiruHhGU8APi0PaNgrZE9NWRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SMxdmNe04JQmFOjJr8SdPpYRrz3P+Ikk1xTLgk5YqfcZ5j1AnbEj66UoaMrLIptlqC3hL0oDoJj8t4lhhhoNsSqGISz2FlmHAuOo8wMQjtdpdvrXNJkVCLFay/BZnnqsqceM4wJxVO/1WznUsyhSMBhQ/WURktxjrCEInGHfKx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a7a9185e1c0so295818766b.1;
-        Mon, 19 Aug 2024 03:36:23 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ef23d04541so50273061fa.2;
+        Mon, 19 Aug 2024 03:36:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724063782; x=1724668582;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p+iWfezDg/+ri7ZmQdxEtPFY0++fEilW8G7oHDpy/rI=;
-        b=h7eQCAnK7LDI7r3ueIhjqY5J+tnT0WICFigEMblaEqWk/lY8AjGflxJmMeLrV6/wsw
-         E4ZiJe8yWr6HlimIKg9A+TDRO3gQNY+C+Q7eegBvqktowtWjf4psgfVrsTTrAiILZRSp
-         /uRc8oIDtjMxiFqCQ1Xf+EWPWRdQHPO01ULJaoglT3dMwyk9JzPfRS4/2UdPiSjqKMlO
-         bZmDaordyq6t4D1rbFjoAN8/oEUGzd6yJifFCR5LIBGVsiUclVIBjYnem//CzyPP5wCk
-         Hi9nkUN/hU2VbMU11RYB4R4I0Jm7yGPHsip5t/m/Nzud0ClYoT4KFEy9wJqoOZLN0PNJ
-         7vtw==
-X-Forwarded-Encrypted: i=1; AJvYcCXyYf/BQzj/xlv4soZYQ/Mw1K+cOC9NJtkftSDVCNbo3SAvCfikSgvpkGTXx/UXBxu8xkjrgdiYiGIIf67CQnoTfmt4/pmjVWQZvNZH
-X-Gm-Message-State: AOJu0YwOoOW7MO54s7CGZ3jKifinOx/ge7UoEmOiarZevgrys0PgKPoK
-	rujZWJ5TvVfIuLPmZhjfEK2kN3KondwvR683fe+p022X7xfcR6xa
-X-Google-Smtp-Source: AGHT+IHVmcmqJT+thDxFnN2AlqjlYqbiQyHPslu+SVAuOd/ivla648RYhv/dUK1MY5ns6c6vQytoqg==
-X-Received: by 2002:a17:907:96a4:b0:a83:7ecb:1d1f with SMTP id a640c23a62f3a-a8392a03bc1mr723470866b.46.1724063781477;
-        Mon, 19 Aug 2024 03:36:21 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383946517sm613200066b.169.2024.08.19.03.36.20
+        d=1e100.net; s=20230601; t=1724063785; x=1724668585;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rYTB7lUCin1+ML6M/dmlT1uvokEWXxQUZVupmBcApdc=;
+        b=ivi2LTfp4GqgNK2kyr+cFWy914GcOrbO5FC4189WkTv7bU3DU3WbbixzFfG50kEru2
+         wJP09imkxLLcoA10SPmk+mGPo6IJD6pEiZ2RFOOlB2cMbfAifNp78+ikWJ+ACuWQ4wCu
+         /dvTWEQUfjog7cbXeMEV+t3xo3PSqtDYTvtYMmsXQAO66A6+wb7E727/yiV3sYiUAiGh
+         PKP2vVXIkkcBSzOncIqwj+5zixFDbnviLGRdYP25GZhU9M4r9bsOkyHNNRntlALwXYzI
+         nRTaxqDRF0ADos+Pd+Xh+qNN7xNjX9o6yP2iT/FxntTsTvlXTvhSxBzExLNIIQILj1N/
+         MBdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXo94XUkaHpdV9hcD4MIDIHZYQF6IP0I5wwzhdp6v0K904hp+/qdqyqOXqqw0qjio07y/TZ749mJIHhRf3U2tgM3TzbgGd2JSMSkf0X
+X-Gm-Message-State: AOJu0Yz/0UfWxLFKEy24HLrPRP8X5kRSMobSKun+/dFYd0h3qDfxj0XB
+	uxAVNrqKPlF8dAcFhWKNeo2rb9ahlthSS5vPaVl+n1T2rIc1mgD4
+X-Google-Smtp-Source: AGHT+IE+e0XTwBYtDKtsWVK5dTzQxesFBt5NXqXyTAbOtR50JIQ3BFITMTPjGnzBOlRh7WqVMb1IoQ==
+X-Received: by 2002:a2e:9d44:0:b0:2f0:1fd5:2f29 with SMTP id 38308e7fff4ca-2f3be586ab8mr67293721fa.19.1724063784943;
+        Mon, 19 Aug 2024 03:36:24 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5becf1f3442sm3997799a12.31.2024.08.19.03.36.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 03:36:20 -0700 (PDT)
+        Mon, 19 Aug 2024 03:36:24 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 0/3] netconsole: Populate dynamic entry even if netpoll fails
-Date: Mon, 19 Aug 2024 03:36:10 -0700
-Message-ID: <20240819103616.2260006-1-leitao@debian.org>
+	linux-kernel@vger.kernel.org,
+	Rik van Riel <riel@surriel.com>
+Subject: [PATCH net-next v2 1/3] netpoll: Ensure clean state on setup failures
+Date: Mon, 19 Aug 2024 03:36:11 -0700
+Message-ID: <20240819103616.2260006-2-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20240819103616.2260006-1-leitao@debian.org>
+References: <20240819103616.2260006-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,44 +75,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The current implementation of netconsole removes the entry and fails
-entirely if netpoll fails to initialize. This approach is suboptimal, as
-it prevents reconfiguration or re-enabling of the target through
-configfs.
+Modify netpoll_setup() and __netpoll_setup() to ensure that the netpoll
+structure (np) is left in a clean state if setup fails for any reason.
+This prevents carrying over misconfigured fields in case of partial
+setup success.
 
-While this issue might seem minor if it were rare, it actually occurs
-frequently when the network module is configured as a loadable module.
+Key changes:
+- np->dev is now set only after successful setup, ensuring it's always
+  NULL if netpoll is not configured or if netpoll_setup() fails.
+- np->local_ip is zeroed if netpoll setup doesn't complete successfully.
+- Added DEBUG_NET_WARN_ON_ONCE() checks to catch unexpected states.
+- Reordered some operations in __netpoll_setup() for better logical flow.
 
-In such cases, the network is unavailable when netconsole initializes,
-causing netpoll to fail. This failure forces users to reconfigure the
-target from scratch, discarding any settings provided via the command
-line.
+These changes improve the reliability of netpoll configuration, since it
+assures that the structure is fully initialized or totally unset.
 
-The proposed change would keep the target available in configfs, albeit
-in a disabled state. This modification allows users to adjust settings
-or simply re-enable the target once the network module has loaded,
-providing a more flexible and user-friendly solution.
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/netpoll.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-Changelog:
-
-v2:
-  * Avoid late cleanup, and always returning an np in a clear slate when
-    failing (Paolo)
-  * Added another commit to log (pr_err) when netconsole doesn't fail,
-    avoiding silent failures.
-
-v1:
-  * https://lore.kernel.org/all/20240809161935.3129104-1-leitao@debian.org/
-
-Breno Leitao (3):
-  netpoll: Ensure clean state on setup failures
-  netconsole: pr_err() when netpoll_setup fails
-  netconsole: Populate dynamic entry even if netpoll fails
-
- drivers/net/netconsole.c | 17 +++++++++++++----
- net/core/netpoll.c       | 16 +++++++++++-----
- 2 files changed, 24 insertions(+), 9 deletions(-)
-
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index a58ea724790c..c5577d250a21 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -626,12 +626,10 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 	const struct net_device_ops *ops;
+ 	int err;
+ 
+-	np->dev = ndev;
+-	strscpy(np->dev_name, ndev->name, IFNAMSIZ);
+-
++	DEBUG_NET_WARN_ON_ONCE(np->dev);
+ 	if (ndev->priv_flags & IFF_DISABLE_NETPOLL) {
+ 		np_err(np, "%s doesn't support polling, aborting\n",
+-		       np->dev_name);
++		       ndev->name);
+ 		err = -ENOTSUPP;
+ 		goto out;
+ 	}
+@@ -649,7 +647,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 
+ 		refcount_set(&npinfo->refcnt, 1);
+ 
+-		ops = np->dev->netdev_ops;
++		ops = ndev->netdev_ops;
+ 		if (ops->ndo_netpoll_setup) {
+ 			err = ops->ndo_netpoll_setup(ndev, npinfo);
+ 			if (err)
+@@ -660,6 +658,8 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 		refcount_inc(&npinfo->refcnt);
+ 	}
+ 
++	np->dev = ndev;
++	strscpy(np->dev_name, ndev->name, IFNAMSIZ);
+ 	npinfo->netpoll = np;
+ 
+ 	/* last thing to do is link it to the net device structure */
+@@ -677,6 +677,7 @@ EXPORT_SYMBOL_GPL(__netpoll_setup);
+ int netpoll_setup(struct netpoll *np)
+ {
+ 	struct net_device *ndev = NULL;
++	bool ip_overwritten = false;
+ 	struct in_device *in_dev;
+ 	int err;
+ 
+@@ -740,6 +741,7 @@ int netpoll_setup(struct netpoll *np)
+ 				goto put;
+ 			}
+ 
++			ip_overwritten = true;
+ 			np->local_ip.ip = ifa->ifa_local;
+ 			np_info(np, "local IP %pI4\n", &np->local_ip.ip);
+ 		} else {
+@@ -757,6 +759,7 @@ int netpoll_setup(struct netpoll *np)
+ 					    !!(ipv6_addr_type(&np->remote_ip.in6) & IPV6_ADDR_LINKLOCAL))
+ 						continue;
+ 					np->local_ip.in6 = ifp->addr;
++					ip_overwritten = true;
+ 					err = 0;
+ 					break;
+ 				}
+@@ -787,6 +790,9 @@ int netpoll_setup(struct netpoll *np)
+ 	return 0;
+ 
+ put:
++	DEBUG_NET_WARN_ON_ONCE(np->dev);
++	if (ip_overwritten)
++		memset(&np->local_ip, 0, sizeof(np->local_ip));
+ 	netdev_put(ndev, &np->dev_tracker);
+ unlock:
+ 	rtnl_unlock();
 -- 
 2.43.5
 
