@@ -1,311 +1,118 @@
-Return-Path: <netdev+bounces-119851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9C9573A5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D5F9573B7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6B61C2098E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:42:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 960681C23211
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3679818E02D;
-	Mon, 19 Aug 2024 18:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56ABF18A6B8;
+	Mon, 19 Aug 2024 18:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtgrYvIo"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="SCtttJRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD9B18DF8A
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F21A189F5B
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724092724; cv=none; b=F9saHmk/26M0RhVpQiFahUJRbsXkRkFT828DVaD9HWj79K7Xe6fttkJPdOSgINFZltlQCdH5aYVzaf9uiMTr83nQqrrnHr8a8d5Dq0oGo8rSBRBHU/XzhxtTSftlOpqLRWAisaxXlKip6659m9FryGXQGEhH3tL3AO84Rv2LEx0=
+	t=1724092758; cv=none; b=Zu8bFBv0sBjiNN3/W7uDXzh98NnHxV6a3jcAXmVjXbgIHsCT47tkTEzFoVnIA4sob6dI/Xx5/EuVyIZ2k3pJwhDW7AxB8lg3jFnVWdvFwTzquJ8DpvYJ1U7qn/zG5v2Ri+nXeRZiozSwix1fpjrdoWcrMAUbjnMNICAdQJ4OADs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724092724; c=relaxed/simple;
-	bh=VUzHL3QNYD0cUq81xthTlN1+buVz0eiw5Ir9rnD7ZrU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BNJWtNLoHZORmiupTNWtuWNL9kMeG6whRwhlP+A7wiPIAjbOKJfn0N/ihNo2fVI43EkTUBcFxtmlF5gRo79E55ifkIphngYF0pPBeZonl9XglZXRTuRtnmAapPDCciDyuFhqjl+tqRuZkISWNjihaGbEm15gYO5A5whrpTcUN1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QtgrYvIo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724092719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BABeo0vZVeSf6PLvIml9jA7oT8qWCYSq8pbNYVtFiIQ=;
-	b=QtgrYvIoC58JhZ3hrROGULvN/4f5g6OeR8lFTtQNJfnhUQHgqW2YIJ6t5/xZDhdi6ILtdg
-	G32kKH6lh+x2/WWkFusWNfV1EYvxWgokWKaTuEcLZt+bNCJRX6SLsxVmECqhL3TnEzvCH9
-	jVO3tFF44hZN7d0Fd4ikpexiDqtL2ok=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-QoHuBwXFNbqSg5k8vIkOPw-1; Mon,
- 19 Aug 2024 14:38:36 -0400
-X-MC-Unique: QoHuBwXFNbqSg5k8vIkOPw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91CA51955D4F;
-	Mon, 19 Aug 2024 18:38:33 +0000 (UTC)
-Received: from fs-i40c-03.mgmt.fast.eng.rdu2.dc.redhat.com (fs-i40c-03.mgmt.fast.eng.rdu2.dc.redhat.com [10.6.24.150])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F24AC1955F45;
-	Mon, 19 Aug 2024 18:38:30 +0000 (UTC)
-From: Alexander Aring <aahringo@redhat.com>
-To: teigland@redhat.com
-Cc: gfs2@lists.linux.dev,
-	song@kernel.org,
-	yukuai3@huawei.com,
-	agruenba@redhat.com,
-	mark@fasheh.com,
-	jlbec@evilplan.org,
-	joseph.qi@linux.alibaba.com,
-	gregkh@linuxfoundation.org,
-	rafael@kernel.org,
-	akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev,
-	netdev@vger.kernel.org,
-	vvidic@valentin-vidic.from.hr,
-	heming.zhao@suse.com,
-	lucien.xin@gmail.com,
-	aahringo@redhat.com
-Subject: [PATCH dlm/next 12/12] gfs2: separate mount context by net-namespaces
-Date: Mon, 19 Aug 2024 14:37:42 -0400
-Message-ID: <20240819183742.2263895-13-aahringo@redhat.com>
-In-Reply-To: <20240819183742.2263895-1-aahringo@redhat.com>
-References: <20240819183742.2263895-1-aahringo@redhat.com>
+	s=arc-20240116; t=1724092758; c=relaxed/simple;
+	bh=SWpGCGgfSTInA73Lkq9d3XSm6SVeqmrSlW6/NUDvBMM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RGuN0JdeiE+1VOtTK5cfYmCvT9VjMawHIxQNv22sv02m6G2Pmb2IHLAqjj6iQSJdReKGSOYOPJy4zLUDimolNroYogAuPVx0YWWcIO5qq3UsLgiDMbazdSafZd8iuiUdIUbY52LRF+4RR1IuKO6wZJKJBfhkFj5JSKsY1xIyPaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=SCtttJRn; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52f00ad303aso6042602e87.2
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:39:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1724092753; x=1724697553; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SWpGCGgfSTInA73Lkq9d3XSm6SVeqmrSlW6/NUDvBMM=;
+        b=SCtttJRnlJKd16RTxmcFD1U1owjkDsprv8a39TbNtF0p7lRdNaz4bt2Y/UuGzNTQSk
+         8U9A9sMQ9KpCMdmc/+PSBvJczvHgSLsMVStporF4BgdFU+eYloTd8SzMF+uHJUsQ/EMF
+         Lghuw209b+k1qh/6WaQYAjAF5v/kLHXAmxC8nKOfk/yZRnHUrIiwgkxq/MLHOFEp1nN6
+         Rp0sPapA5U5xZEq528Ye1J7ZNQaOOi5Oj4FVDWB4wR/lz7hN0lTvoisqq0ggAplAyGx5
+         jiV6MVc7z9A5vP6t/JjxeulgAQOb4wyCZWceNYHvNBgDE04PPpKhruYD9pZgNN38AMi4
+         d1UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724092753; x=1724697553;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SWpGCGgfSTInA73Lkq9d3XSm6SVeqmrSlW6/NUDvBMM=;
+        b=uGF0x8GS4gIojomhYPoJanzE33koHVe0dfZKtYDaj3JnLO6IQ+6KRIS2tuAAd/9E+F
+         YaZhOSykp8EaGnZtQjQqnAGCqMWBbvvZnvy6cBS8emYosVxsN3K6v59gJTqJ3PAfOWu9
+         ZnqcbiRmK6xbP/ry8uvpJzTnFsH9/HWetOzEP/iPZhTsPk0oG5k33fI7fxPPMi3A6PVO
+         hDQn1ucMz7SPo0bGuu2+lr6s7lWTtIJYSILybLlOLa79rsHxOVGdaqj+s6RxBFF+SncH
+         u8EPJLEqdtRJbzjqwp23e3AK7o75xNQHLNnfraJFi+qYX+oVpceCxFisBCdNCXp/2bm/
+         vvPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBPruB6rBYxrTJTTcQ04EFekqKFmI8qa4E0hGQDtGcWcyobX0Y864x9sLkldXb6JkV0mMHkYIobTQz02TSjh/JAnsUXjh3
+X-Gm-Message-State: AOJu0YxSCx1xMPp/ZGNILnbawCXD7e4oeDNZVoNVC4W5dysOjDSjEREe
+	OKNEIMBncr6VJxWMV9cZ6hsUqrAhA+LxCoperLOnlnMEhAVZdKTI1pLXgy27zkOTnXQMDhoLqtr
+	ywMfoavOBeEftAYVqt0ozipqU4IvIxqPz+i0zUA==
+X-Google-Smtp-Source: AGHT+IHelUVu+3Ik9JdWKk+zeumpW2YAF7qu0Ohxq5buMaU2cv0DmlPnfzkmnuU6AUlGRzMu60+m9UNlwGENsdtWTIk=
+X-Received: by 2002:a05:6512:3e22:b0:533:d3e:16e6 with SMTP id
+ 2adb3069b0e04-5331c6af14dmr8387737e87.25.1724092752397; Mon, 19 Aug 2024
+ 11:39:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20240819165148.58201-2-pstanner@redhat.com> <20240819165148.58201-7-pstanner@redhat.com>
+In-Reply-To: <20240819165148.58201-7-pstanner@redhat.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Mon, 19 Aug 2024 20:39:01 +0200
+Message-ID: <CAMRc=MdLsLeXqm+40wb4O2PmNX9C-g0is13berDF6yDQ1EBh+w@mail.gmail.com>
+Subject: Re: [PATCH 5/9] gpio: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, 
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, 
+	Andy Shevchenko <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	David Lechner <dlechner@baylibre.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Hannes Reinecke <hare@suse.de>, 
+	Damien Le Moal <dlemoal@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch changes gfs2 to be the first user of the recently introduced
-net-namespace feature of DLM. It uses the current net-namespace context
-of the get_tree() callback of "struct fs_context_operations" that is
-e.g. being called by syscalls of the coreutils mount process.
+On Mon, Aug 19, 2024 at 6:53=E2=80=AFPM Philipp Stanner <pstanner@redhat.co=
+m> wrote:
+>
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+>
+> Replace those functions with calls to pcim_iomap_region().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> ---
 
-Debugfs is being disabled for non "init_net" net-namespaces as debugfs
-is not net-namespace aware. Otherwise we would see kernel log error
-messages about existing debugfs entries. There might be in future
-another ways to get similar information with an UAPI mechanism that is
-namespace aware.
-
-With this patch you can setup a cluster in one machine without using
-multiple Linux kernel instances. The idea is to use this for
-developing/testing as a first use-case. Especially scale testing, a gfs2
-file system with a lot of members can be setup without running a large
-set of virtual machines.
-
-There is a small example script how it works:
-
-https://gitlab.com/netcoder/gfs2ns-examples/-/blob/main/three_nodes
-
-it uses multiple loop block devices references to the same file to
-provide a kind of shared block device (an alternative could be using dm
-linear mapping, but loop block device also works). After setting up
-multiple net-namespaces with a virtual bridge interface DLM can be
-configured by using nldlmd that is using the recently introduced
-net-namespace aware nldlm netlink API. Over a shell command like:
-
-ip netns exec node1 sh -c "mount /dev/loop1 /cluster/node1"
-ip netns exec node2 sh -c "mount /dev/loop2 /cluster/node2"
-...
-
-every cluster "node" (hereby identifier with a "node#" string in the
-iproute2 namespace management mechanism) can mount the shared block
-device e.g. /dev/loop1, /dev/loop# that references to the same block
-image on a different file system. Note that the caller in the script
-will be unmount the file system if the last user left the namespace. I
-currently workaround this use case by mountbind each block device again
-in a kind of "default" namespace (usually it should be where "init_net"
-references to).
-
-Then each mountpoint of "/cluster/node#" acts like being a cluster node
-access to the gfs2 file system with DLM locking enabled. This offers us
-new possibilities to write testcases as we operate on a single machine
-and can "easier" synchronize vfs syscalls in our testcase as no
-"remote machine" kind network communication is being involved.
-
-The mount sysfs directory for gfs2 needs to be separated by
-net-namespace as our mount call is from namespace view separated and be
-treated as per "node" (machine) call. Otherwise we would run into
-conflicts on files/directories that already exists as the cluster wide
-unique identifiers are already being in use.
-
-The gfs2 file system has some global variables and it seems it is not
-necessary to separate them by net-namespace as they store a unique per
-mount identifier. I didn't had problems yet and it seems it is currently
-okay to do that, otherwise there might be issues with "things" that are
-not net-namespace aware in gfs2 yet. However we only should find issues
-only when we using net-namespaces. If a user only uses "init_net" as
-this is the current default, there should not be any problems.
-
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
----
- fs/gfs2/glock.c      |  8 ++++++++
- fs/gfs2/incore.h     |  2 ++
- fs/gfs2/lock_dlm.c   |  2 +-
- fs/gfs2/ops_fstype.c |  5 +++++
- fs/gfs2/sys.c        | 27 ++++++++++++++++++++++++++-
- 5 files changed, 42 insertions(+), 2 deletions(-)
-
-diff --git a/fs/gfs2/glock.c b/fs/gfs2/glock.c
-index 12a769077ea0..21c72c1f6c61 100644
---- a/fs/gfs2/glock.c
-+++ b/fs/gfs2/glock.c
-@@ -2898,6 +2898,10 @@ DEFINE_SEQ_ATTRIBUTE(gfs2_sbstats);
- 
- void gfs2_create_debugfs_file(struct gfs2_sbd *sdp)
- {
-+	/* debugfs is only available for init_net users */
-+	if (!net_eq(read_pnet(&sdp->net), &init_net))
-+		return;
-+
- 	sdp->debugfs_dir = debugfs_create_dir(sdp->sd_table_name, gfs2_root);
- 
- 	debugfs_create_file("glocks", S_IFREG | S_IRUGO, sdp->debugfs_dir, sdp,
-@@ -2915,6 +2919,10 @@ void gfs2_create_debugfs_file(struct gfs2_sbd *sdp)
- 
- void gfs2_delete_debugfs_file(struct gfs2_sbd *sdp)
- {
-+	/* debugfs is only available for init_net users */
-+	if (!net_eq(read_pnet(&sdp->net), &init_net))
-+		return;
-+
- 	debugfs_remove_recursive(sdp->debugfs_dir);
- 	sdp->debugfs_dir = NULL;
- }
-diff --git a/fs/gfs2/incore.h b/fs/gfs2/incore.h
-index aa4ef67a34e0..1273ef3dbef5 100644
---- a/fs/gfs2/incore.h
-+++ b/fs/gfs2/incore.h
-@@ -710,6 +710,8 @@ struct gfs2_sbd {
- 
- 	/* Lock Stuff */
- 
-+	possible_net_t net;
-+	netns_tracker tracker;	/* keep track of net references */
- 	struct lm_lockstruct sd_lockstruct;
- 	struct gfs2_holder sd_live_gh;
- 	struct gfs2_glock *sd_rename_gl;
-diff --git a/fs/gfs2/lock_dlm.c b/fs/gfs2/lock_dlm.c
-index 6c5dce57a2ee..d8e1bb99dac2 100644
---- a/fs/gfs2/lock_dlm.c
-+++ b/fs/gfs2/lock_dlm.c
-@@ -1328,7 +1328,7 @@ static int gdlm_mount(struct gfs2_sbd *sdp, const char *table)
- 	 * create/join lockspace
- 	 */
- 
--	error = dlm_new_lockspace(&init_net, fsname, cluster, flags,
-+	error = dlm_new_lockspace(read_pnet(&sdp->net), fsname, cluster, flags,
- 				  GDLM_LVB_SIZE, &gdlm_lockspace_ops, sdp,
- 				  &ops_result, &ls->ls_dlm);
- 	if (error) {
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index ff1f3e3dc65c..15ee0b2228a5 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -64,6 +64,8 @@ static void gfs2_tune_init(struct gfs2_tune *gt)
- 
- void free_sbd(struct gfs2_sbd *sdp)
- {
-+	put_net_track(read_pnet(&sdp->net), &sdp->tracker);
-+
- 	if (sdp->sd_lkstats)
- 		free_percpu(sdp->sd_lkstats);
- 	kfree(sdp);
-@@ -71,6 +73,7 @@ void free_sbd(struct gfs2_sbd *sdp)
- 
- static struct gfs2_sbd *init_sbd(struct super_block *sb)
- {
-+	struct net *net = current->nsproxy->net_ns;
- 	struct gfs2_sbd *sdp;
- 	struct address_space *mapping;
- 
-@@ -78,6 +81,8 @@ static struct gfs2_sbd *init_sbd(struct super_block *sb)
- 	if (!sdp)
- 		return NULL;
- 
-+	/* store the net-namespace the sdp is created into */
-+	write_pnet(&sdp->net, get_net_track(net, &sdp->tracker, GFP_KERNEL));
- 	sdp->sd_vfs = sb;
- 	sdp->sd_lkstats = alloc_percpu(struct gfs2_pcpu_lkstats);
- 	if (!sdp->sd_lkstats)
-diff --git a/fs/gfs2/sys.c b/fs/gfs2/sys.c
-index ecc699f8d9fc..9c23bafc592b 100644
---- a/fs/gfs2/sys.c
-+++ b/fs/gfs2/sys.c
-@@ -16,6 +16,7 @@
- #include <linux/uaccess.h>
- #include <linux/gfs2_ondisk.h>
- #include <linux/blkdev.h>
-+#include <linux/netdevice.h>
- 
- #include "gfs2.h"
- #include "incore.h"
-@@ -57,6 +58,20 @@ static const struct sysfs_ops gfs2_attr_ops = {
- 
- static struct kset *gfs2_kset;
- 
-+/* gfs2 sysfs is separated by net-namespaces */
-+static const struct kobj_ns_type_operations *
-+gfs2_sysfs_object_child_ns_type(const struct kobject *kobj)
-+{
-+	return &net_ns_type_operations;
-+}
-+
-+static const struct kobj_type gfs2_kset_ktype = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.release	= kset_release,
-+	.get_ownership  = kset_get_ownership,
-+	.child_ns_type  = gfs2_sysfs_object_child_ns_type,
-+};
-+
- static ssize_t id_show(struct gfs2_sbd *sdp, char *buf)
- {
- 	return snprintf(buf, PAGE_SIZE, "%u:%u\n",
-@@ -383,10 +398,19 @@ static void gfs2_sbd_release(struct kobject *kobj)
- 	complete(&sdp->sd_kobj_unregister);
- }
- 
-+/* return the net-namespace the kobj belonging to */
-+static const void *gfs2_kobj_namespace(const struct kobject *kobj)
-+{
-+	struct gfs2_sbd *sdp = container_of(kobj, struct gfs2_sbd, sd_kobj);
-+
-+	return read_pnet(&sdp->net);
-+}
-+
- static struct kobj_type gfs2_ktype = {
- 	.release = gfs2_sbd_release,
- 	.default_groups = gfs2_groups,
- 	.sysfs_ops     = &gfs2_attr_ops,
-+	.namespace = gfs2_kobj_namespace,
- };
- 
- 
-@@ -797,7 +821,8 @@ static const struct kset_uevent_ops gfs2_uevent_ops = {
- 
- int gfs2_sys_init(void)
- {
--	gfs2_kset = kset_create_and_add("gfs2", &gfs2_uevent_ops, fs_kobj);
-+	gfs2_kset = kset_type_create_and_add("gfs2", &gfs2_uevent_ops,
-+					     fs_kobj, &gfs2_kset_ktype);
- 	if (!gfs2_kset)
- 		return -ENOMEM;
- 	return 0;
--- 
-2.43.0
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
