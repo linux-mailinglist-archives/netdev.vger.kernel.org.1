@@ -1,119 +1,148 @@
-Return-Path: <netdev+bounces-119570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66621956434
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:14:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8333F956437
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235D52812F3
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:14:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5B461C212E6
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 07:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F64156C71;
-	Mon, 19 Aug 2024 07:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB73B155C83;
+	Mon, 19 Aug 2024 07:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcllQhjg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MyNYVoIq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D831150996;
-	Mon, 19 Aug 2024 07:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B717813BC1E;
+	Mon, 19 Aug 2024 07:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724051683; cv=none; b=D+KpHMehdxHHz1H68vj/7BtB8t0qvSHS3VhO10zfaeSb7M5YPWJxOOqdxbZydg/RfNt7ZzGmbwzyFf8q2DJD3DriI3jkRhBhq+XUe5Muz5IptgD0xT3cHEyaafhyKdVxPF9U+6DokPSr/QzDaDmGt6SZt8Wg9vDfHvPcl4L1OS0=
+	t=1724051810; cv=none; b=YyV/pJfU5muZPuSsNJLjWymVvyAn9UhFXsJ2hBJDC0oZqA96MlWsTCt4GwWwXf5ORcpxtCfTcLlnHVwgSBF+mPa3KB2OAg7H84Pr/mzuGHykBy8SVrVW51D0ar4Xt64bMX6M/loC2uxtND1vitTSAMzsdWfTfVRYU83NeveZ3v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724051683; c=relaxed/simple;
-	bh=/5SWAe76ctyLJGTMsKhPgMIzXNKnDPQ8hhETXknGonY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dV3cMhC8dD9u9W0GbJvpX3VIvfUejeEZjQAFEkAgd/D36v5tkEPm3feO1v+LEZT8xNVU19D/Me6F48l55Xaga/21s0mbrx0XWYgCoSU5ukzCrvUJKMtE+8Btl7F2Mgn5KiHTKQ6K9H31hQ/7ryv7Y9POHg9Z7dP6A2TZagPcTC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcllQhjg; arc=none smtp.client-ip=209.85.222.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-84303532b90so1071542241.3;
-        Mon, 19 Aug 2024 00:14:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724051681; x=1724656481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D4sm2NzhCNlcOkfjD+CTTUTOYmrc4iWK7QWosAZNznM=;
-        b=kcllQhjgfsYPusx8E93BkKclQRVKtGEYA/CGOCWscC7z+oeKD4dH53zjKXwCCI02Bv
-         AsKwWQmipfTWDfN/H/IR6DcFQ8jbrFarm4a55c8uobDartKRlCnxVQ3CCsQGHfsZ386u
-         3AzEOwKrBlC6BipaDQPhPGNcAqQd0X8pXTTb3RbRLa5+jevL3rTRrKjouUGdV6wddTDx
-         QpnKinBcm9mJxHRVWEQz1jChpebSVRpw8lM0SOmEYnCn1dDxd0SnUtAHvMz1kTON4eR0
-         WIrOXRJatqrmlqZgXi3rDMFPrXyW7/J4egh4ewZsAbsGOBDPg/iRidSfuxE4A7NRqQZo
-         AT5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724051681; x=1724656481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D4sm2NzhCNlcOkfjD+CTTUTOYmrc4iWK7QWosAZNznM=;
-        b=dDUeYzBP5cSx1G8byhC+3ok9+JrAH3ZNWo11dAFrg0OWEdYMLXHr5eM2e4WHgYPeOh
-         +pHP81hbvqmBD85c7Qjz1MWsN26i05XPkMhdH3gZP3G+m2E56pLc7yaz3rpNDS5Ar/Ip
-         +uBM8EgkLVW22uCjihpwnjnY0N8RN2t86PNC+sWrmDoxHegFtE9vUij09h1hC0yMIiXX
-         kj5PbQtCMd2RadgTa9xhefVAnupMTUYsTn8Ls0uV83mA3qe4ig9dhCBXCtMDpBw5D2Cs
-         zHcQmmGA29wT6CsKAfeSjHqry8xvDgGiKlkDomKQkTlItWv0Vb+g52NLTkH7GSLDZ1NT
-         aGfA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7XzxLMELm2LDJTtA5abXhVM6gy96KoBjVI3B3HrXmLWd4yb5Zv+0m44+3o/gGJFbDom3ikCDBuZ8r/CObCmB4LKN6o188nwhNvO7ihERIxfAw91HGD/giMrNnGKdoNUkekWPH
-X-Gm-Message-State: AOJu0YyYlXh4L0AvmdKH6o0CqJ3yhP49pPnOYXZdTFMjB3Zb3cQVMQPK
-	WSPPv8nXuSgrm7kj17iiO0aCK4MGTgo9dGq1pUgK8nU/gpXuHZAv57jAhrIOxPPCqGN8/T2jj8N
-	VJ5QsWece0V6u/lQRJO/QPUJ40vo=
-X-Google-Smtp-Source: AGHT+IHib+RG/ZejzSYJ7BtLWgELQo0mAN5A+EwmYXyJsv7x9OZlrBhzI+E/TZx2UxnlXI0P7JwJ38P+h+DTknYZ+Bs=
-X-Received: by 2002:a05:6102:5126:b0:48f:db3d:593e with SMTP id
- ada2fe7eead31-4977993e583mr12209590137.14.1724051681216; Mon, 19 Aug 2024
- 00:14:41 -0700 (PDT)
+	s=arc-20240116; t=1724051810; c=relaxed/simple;
+	bh=gbqRb8eqdOhl9QnV30s4P2pDnpCPKAOf7zpii/ldhAY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HPM4cY1O/9cdV2MZWwrHhJiC6S9wFzaKl9nxEjeLJPpybLTkQgOvNMg0rmaxdOQ3KKloZksPHwjg2ksHjbufQvC35ngCARoWCfUzYcYgvt+FeXDBCUQSOSIXRHWhwu2RGuhvxutak0y+iHl0QZHMHY0ylksKZE+ZcuIuV18xp48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=MyNYVoIq; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47J7GIhR018652;
+	Mon, 19 Aug 2024 02:16:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1724051778;
+	bh=TmM2Jr4Uss+zQnpejCEuiHwcaQEhi9LieP76+lIBa+4=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=MyNYVoIqgPfXLvWySFVyE+eRtkuyCOsFq2l1pJvgGcuB0fwCC0PDFNwSUu84MmwcZ
+	 rn2QQ4+NXaSJMURLgHK2iiAWAdFKTzKzvZ1yIsuxA/hFvLxjACeysykE4bsVh2FGi+
+	 hF9/UsacKPb6wG9NT83rXuomKyTxPg8+m8abzYdo=
+Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47J7GIeV115793
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 19 Aug 2024 02:16:18 -0500
+Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 19
+ Aug 2024 02:16:18 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 19 Aug 2024 02:16:18 -0500
+Received: from [10.249.135.225] ([10.249.135.225])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47J7G8fG056945;
+	Mon, 19 Aug 2024 02:16:09 -0500
+Message-ID: <d28ddf04-9b31-4920-92f8-23f11e4476b4@ti.com>
+Date: Mon, 19 Aug 2024 12:46:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKrymDQ48QK5Wu5n1NJK8TouqA0cmg1ZkiALCM+W8KHFxraWgg@mail.gmail.com>
- <CANn89iKkeM7s-ZbPR+d7P8PNZn_x3n15-e0Mvto7z-+5CWJSGA@mail.gmail.com>
-In-Reply-To: <CANn89iKkeM7s-ZbPR+d7P8PNZn_x3n15-e0Mvto7z-+5CWJSGA@mail.gmail.com>
-From: =?UTF-8?B?6rmA66+87ISx?= <ii4gsp@gmail.com>
-Date: Mon, 19 Aug 2024 16:14:30 +0900
-Message-ID: <CAKrymDRCzCJsNJcVffRvYV+wg8zB_nLhBcDNFsh0eLP73A-mcw@mail.gmail.com>
-Subject: Re: general protection fault in qdisc_reset
-To: Eric Dumazet <edumazet@google.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, 
-	netdev@vger.kernel.org, kuba@kernel.org, jiri@resnulli.us, 
-	linux-kernel@vger.kernel.org, davem@davemloft.net, syzkaller@googlegroups.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/7] net: ti: icssg-prueth: Add support for
+ HSR frame forward offload
+To: Simon Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
+CC: Dan Carpenter <dan.carpenter@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-5-danishanwar@ti.com>
+ <20240815151415.GK632411@kernel.org>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20240815151415.GK632411@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Thanks for the tip!
 
-2024=EB=85=84 8=EC=9B=94 19=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 4:13, E=
-ric Dumazet <edumazet@google.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> On Mon, Aug 19, 2024 at 9:11=E2=80=AFAM =EA=B9=80=EB=AF=BC=EC=84=B1 <ii4g=
-sp@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > I have been fuzzing Linux 6.10.0-rc3 with Syzkaller and found.
-> >
-> > kernel config: https://github.com/ii4gsp/etc/blob/main/200767fee68b8d90=
-c9cf284390e34fa9b17542c9/config_v6.10.0_rc3
-> > C repro: https://github.com/ii4gsp/etc/blob/main/200767fee68b8d90c9cf28=
-4390e34fa9b17542c9/repro.cprog
-> > repro syscall steps:
-> > https://github.com/ii4gsp/etc/blob/main/200767fee68b8d90c9cf284390e34fa=
-9b17542c9/repro.prog
->
-> Please do not fuzz old rc kernels, this will avoid finding issues that
-> were already fixed.
->
-> For instance, this problem has been fixed two months ago
->
-> commit bab4923132feb3e439ae45962979c5d9d5c7c1f1
-> Author: Yunseong Kim <yskelg@gmail.com>
-> Date:   Tue Jun 25 02:33:23 2024 +0900
->
->     tracing/net_sched: NULL pointer dereference in perf_trace_qdisc_reset=
-()
+
+On 8/15/2024 8:44 PM, Simon Horman wrote:
+> On Tue, Aug 13, 2024 at 01:12:30PM +0530, MD Danish Anwar wrote:
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index f678d656a3ed..40bc3912b6ae 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -239,6 +239,7 @@ struct icssg_firmwares {
+>>   * @iep1: pointer to IEP1 device
+>>   * @vlan_tbl: VLAN-FID table pointer
+>>   * @hw_bridge_dev: pointer to HW bridge net device
+>> + * @hsr_dev: pointer to the HSR net device
+>>   * @br_members: bitmask of bridge member ports
+>>   * @prueth_netdevice_nb: netdevice notifier block
+>>   * @prueth_switchdev_nb: switchdev notifier block
+> 
+> I think you also need to add Kernel doc entries for @hsr_members and
+> @is_hsr_offload_mode.
+> 
+> Flagged by W=1 builds and ./scripts/kernel-doc -none
+
+Sure Simon, I'll do that.
+
+> 
+>> @@ -274,11 +275,14 @@ struct prueth {
+>>  	struct prueth_vlan_tbl *vlan_tbl;
+>>  
+>>  	struct net_device *hw_bridge_dev;
+>> +	struct net_device *hsr_dev;
+>>  	u8 br_members;
+>> +	u8 hsr_members;
+>>  	struct notifier_block prueth_netdevice_nb;
+>>  	struct notifier_block prueth_switchdev_nb;
+>>  	struct notifier_block prueth_switchdev_bl_nb;
+>>  	bool is_switch_mode;
+>> +	bool is_hsr_offload_mode;
+>>  	bool is_switchmode_supported;
+>>  	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
+>>  	int default_vlan;
+>> -- 
+>> 2.34.1
+>>
+
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
