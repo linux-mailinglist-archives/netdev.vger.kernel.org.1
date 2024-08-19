@@ -1,182 +1,203 @@
-Return-Path: <netdev+bounces-119682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7C3956938
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:19:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D17956944
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A342B2832B5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:19:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B544F1C21479
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA7F166F2E;
-	Mon, 19 Aug 2024 11:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974CD161320;
+	Mon, 19 Aug 2024 11:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MfIdfbbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8DB1667CD
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6CE1662E8;
+	Mon, 19 Aug 2024 11:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724066359; cv=none; b=LFvZS8EVRXsRDpH6fb4Xc9d/w+p2hcw+M+xR8emdjfV06BLGNEIopsZ8N3gA0F7DJH0DDFDa1STc383PUIbc6/m8liD43Av8ceDg2VQe3KvPHjijaJJfdjmi24w0vvIj6RIO6mNPhpe3N5L/l99P41EeJZddu/GDuZVknscrArg=
+	t=1724066619; cv=none; b=Wf9QSVb18uD5DmxJ6LMoSD9mCl/gFPdxkQXZ5yh6SNOsM6RAOPDXHEezRHhPG1S7EemdLo/k7zliYwzNIRuuaUwag8xnIok+GpBTVnlJD46JnS8JP+d/NePoA7yX3+2Y705uaou0eOBKHDhodieGsuRayoRAfY1xAO6UUnTTNEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724066359; c=relaxed/simple;
-	bh=RS4wtplt+HKtdiOLZDctHqkTH4N/qes2PKYA7J+1upk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=aHtD7eOpQBeUeJHKJJNrPKVxdp1OMDGqpxPA6YgGpsi2t5cuHVuJQSFJurQRd7v3rq5Eh/+KTpp9kuv62ZY6gswFthMwx64ZcjIrNRr3O9YOml11IjmeHwdpblc5pOYbby0srLmYaUERdlgVz5d48sh0iUFdRkjbeFWNRqjpE3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-39d5537a659so152605ab.1
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 04:19:17 -0700 (PDT)
+	s=arc-20240116; t=1724066619; c=relaxed/simple;
+	bh=ci1K0h7zlYlyjvo5jHiSOoPSyGYj0n1gsgMafZ6bY9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EuYZ8q8+rN3tz0gQwi6FkPzXl7Gzkl/a58I6NB7lybcPiDmIl1uz1ilqPPIBUG/ahYhksl4flL3fNs0VExQscldDGNRlnCyRDa0/keijzkIgTnFuaqRVBov+iaPwyfcxw9KEFYLw9w0P6pswidC0dDl5U/lk0Km1DWqSQqVSU78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MfIdfbbz; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f1a7faa4d5so52325111fa.3;
+        Mon, 19 Aug 2024 04:23:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724066616; x=1724671416; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tprFxrKfsDYUogvcMoI1LKxJEeb7f1ZyOv21fW+7YTg=;
+        b=MfIdfbbzK8aRJiiYVO7ZSSBu8yjGc8tV0QLbpeHcQm0EehY/dGJwnVyrrXXOv6WqN4
+         RjQcm5vW4ha+bayOqWyddpTAugGhLBeGXYfiSqwYHA2wB0R4m3/BXnjZ2zByQitBuWRj
+         2aHkga35Szsq8/y5435TYeQ9gCKKmUmgpgNJFvabe4U8VK0a9p0iRsQOa72NW9J2FTAN
+         pv4Z66ytHdnPTYD0eBX9T7jZ/W2bbh+Zqw88tTayXbzLSKjeL8NLA2c/UN7/Qs0RS9KH
+         +87TvOaGhD2/qa74cJUkLaG4XXP51Ru8lR5A1eFZ7E/a4l93LA9ZttDKAOpE/boPo2fJ
+         Y95w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724066356; x=1724671156;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1724066616; x=1724671416;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dpN45RjAlqBKLgRPOwbVK0ppWriQo5EfgnOPvbL1jb0=;
-        b=Ti1dDHMAES9mZLwqFNrU7QgoIb1oV9R0ofxZ+T4hUKyN1CvaWSv7oOMWNc2tESangM
-         uGBc0y36SGsmAfIm85er2/fjHS378Qkyj/XcGFyBQPfOUWSxTQwWSvoFxfENK3Wd6CTZ
-         d9sonB2FPiO6YsIaHjcireIMNA3b33th+skJJMEy4ZqKjpCU3xqcDKQzp01bvE4Hzg0Z
-         Nido/Pf6/NMtV57NrqQ9hoDxpvi9yIn2eaEx7TTiJqzfu5huBqOg7Oz2KBoLUQJlTgCN
-         HpCPTSVAFsE06ptjPEAc5PTOegTKJOxKu9ca+OE6xOiwY2wOnoPDk2ae9G6sQfp9UJU8
-         S3kw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYhSiHE6qi89zMm+P9U7M7FgvKpzfOKDOn1X8coetqZeskI+/XMjODN1q0mUV37lQvnFqax78kpkmANqruPt1fu8gq634/
-X-Gm-Message-State: AOJu0YzEnA4y8H1Qtd87temf56E7i88l2sz42PiILk4vJrSpPamYVnMw
-	Y5rVaMhrm/Z41GoVGReHnqXh8PAkj9ZhrH1r2Vy84KvclEkajE6evoMZeYS+x+c2GEyZAXSkrtx
-	FSLOl6kWwNxrXKoNhZegmXb9lF5TZ/5hI3JeTH5TZ8Hci1sQ/Mbje+7w=
-X-Google-Smtp-Source: AGHT+IHwtPfJYQR9uUi9WkVWWjAHs+VbSsR3j0gfzWxGUbay2suHV+0fWZiPXfFr+G+RqNZHiy+9jgZ+BE9SsTQ7QQGNBC/ErYfF
+        bh=tprFxrKfsDYUogvcMoI1LKxJEeb7f1ZyOv21fW+7YTg=;
+        b=cxDAb1AipehAbvOOri0x0/FEolXSmV6OJ6KJGwb72OnFsYhAPDkGUx3pTGUv+3WSGQ
+         Y0Hn6MaimwTpdRQ82fZEEvVx0aignGby5nlfqDIbe/zreUj9LHH0cAKlXIV76fgs9IpD
+         +zOyUnEnO07GTUuid0AU7TaO4JlwRdG0HG0zDDrpdfJzKdOFLxn3u8/ig9k6/k9fzHT3
+         SMBj9s9B/1yLxbiy+rd2w+H4sQQM3YE6OGENlzZ9Ot7ZWooCmmwxsYtORa04h7qv0A0j
+         BJhuyugq4XWUpdiEpH+aSQ4zrvQWQ6aQsgSF7DhsrFVpPlgsJLO9pvev9dCunqTV993c
+         /wsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCLo4443RnlC+gazb0VkmfME2wkpiCmROvLikAHJR3+gvJZK5/5CcBg4zO0kc/SWFbWAUttoPGaw4YHmRnoY39rzgVpC2IKsCQIyBSZW+Buao6q74Flo05dkHDjzC8sLNaVu87
+X-Gm-Message-State: AOJu0YyBJn3HzrP7DUSHPhNS1ukq/FGsb8cqZLM/K6poXkfATP/vmCDJ
+	Il2Mgor1KVWhTAtnLrW5YsdQkO5caTAm8arvarMW0Yd7WKRjBnMnF25ajQ==
+X-Google-Smtp-Source: AGHT+IGqHw5aq4Yu5IwvBHPNFj0C3R+/6U8ytKFwReL7XY64X9J8HjO+AB7srHVJE+zt2fnxZzC+qA==
+X-Received: by 2002:a05:6512:1086:b0:52e:9b2f:c313 with SMTP id 2adb3069b0e04-5331c6ac976mr7551084e87.22.1724066615124;
+        Mon, 19 Aug 2024 04:23:35 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5330d425c0fsm1456167e87.298.2024.08.19.04.23.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 04:23:34 -0700 (PDT)
+Date: Mon, 19 Aug 2024 14:23:31 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, dl-S32 <S32@nxp.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 2/6] net: stmmac: Expand clock rate variables
+Message-ID: <r5jc6kzvalommas5gs6pxmxpsygjkuj6zi6pz6qtdlya2n2kqv@4rtqdorr5iw7>
+References: <AM9PR04MB85062693F5ACB16F411FD0CFE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
+ <ciueb72cjvfkmo3snnb5zcrfqtbum5x54kgurkkouwe6zrdrjj@vi54y7cczow3>
+ <AM9PR04MB8506994625600CA8C4727CFAE2832@AM9PR04MB8506.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:170e:b0:39a:eb4d:23c5 with SMTP id
- e9e14a558f8ab-39d26c36cfamr10296045ab.0.1724066356570; Mon, 19 Aug 2024
- 04:19:16 -0700 (PDT)
-Date: Mon, 19 Aug 2024 04:19:16 -0700
-In-Reply-To: <CANp29Y6xOzoQ4UKKta2_a6zaQv-xqadZD0q5QrLtVNj1uPe3BQ@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c117fe0620077a1e@google.com>
-Subject: Re: [syzbot] [net?] UBSAN: array-index-out-of-bounds in cake_enqueue
-From: syzbot <syzbot+7fe7b81d602cc1e6b94d@syzkaller.appspotmail.com>
-To: nogikh@google.com
-Cc: cake@lists.bufferbloat.net, davem@davemloft.net, edumazet@google.com, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, nogikh@google.com, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, toke@toke.dk, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM9PR04MB8506994625600CA8C4727CFAE2832@AM9PR04MB8506.eurprd04.prod.outlook.com>
 
-> #syz upstream
+Hi Jan
 
-Can't upstream, this is final destination.
+On Sun, Aug 18, 2024 at 06:54:01PM +0000, Jan Petrous (OSS) wrote:
+> > -----Original Message-----
+> > From: Serge Semin <fancer.lancer@gmail.com>
+> > Sent: Tuesday, 6 August, 2024 12:18
+> > To: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
+> > <alexandre.torgue@foss.st.com>; dl-S32 <S32@nxp.com>; linux-
+> > kernel@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-
+> > arm-kernel@lists.infradead.org; Claudiu Manoil <claudiu.manoil@nxp.com>;
+> > netdev@vger.kernel.org
+> > Subject: Re: [PATCH 2/6] net: stmmac: Expand clock rate variables
+> > 
+> > On Sun, Aug 04, 2024 at 08:49:49PM +0000, Jan Petrous (OSS) wrote:
+> > > The clock API clk_get_rate() returns unsigned long value.
+> > > Expand affected members of stmmac platform data.
+> > >
+> > > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > 
+> > Since you are fixing this anyway, please convert the
+> > stmmac_clk_csr_set() and dwmac4_core_init() methods to defining the
+> > unsigned long clk_rate local variables.
+> 
+> OK, will add it to v2.
+> 
+> > 
+> > After taking the above into account feel free to add:
+> > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> > 
+> > -Serge(y)
+> > 
+> > > ---
+> > >  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 2 +-
+> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c   | 2 +-
+> > >  include/linux/stmmac.h                                  | 6 +++---
+> > >  3 files changed, 5 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > > index 901a3c1959fa..2a5b38723635 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > > @@ -777,7 +777,7 @@ static void ethqos_ptp_clk_freq_config(struct
+> > stmmac_priv *priv)
+> > >  		netdev_err(priv->dev, "Failed to max out clk_ptp_ref: %d\n",
+> > err);
+> > >  	plat_dat->clk_ptp_rate = clk_get_rate(plat_dat->clk_ptp_ref);
+> > >
+> > > -	netdev_dbg(priv->dev, "PTP rate %d\n", plat_dat->clk_ptp_rate);
+> > > +	netdev_dbg(priv->dev, "PTP rate %lu\n", plat_dat->clk_ptp_rate);
+> > >  }
+> > >
+> > >  static int qcom_ethqos_probe(struct platform_device *pdev)
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > > index ad868e8d195d..b1e4df1a86a0 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > > @@ -639,7 +639,7 @@ stmmac_probe_config_dt(struct platform_device
+> > *pdev, u8 *mac)
+> > >  		dev_info(&pdev->dev, "PTP uses main clock\n");
+> > >  	} else {
+> > >  		plat->clk_ptp_rate = clk_get_rate(plat->clk_ptp_ref);
+> > > -		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
+> > > +		dev_dbg(&pdev->dev, "PTP rate %lu\n", plat->clk_ptp_rate);
+> > >  	}
+> > >
+> > >  	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
+> > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > > index 7caaa5ae6674..47a763699916 100644
+> > > --- a/include/linux/stmmac.h
+> > > +++ b/include/linux/stmmac.h
+> > > @@ -279,8 +279,8 @@ struct plat_stmmacenet_data {
+> > >  	struct clk *stmmac_clk;
+> > >  	struct clk *pclk;
+> > >  	struct clk *clk_ptp_ref;
+> > > -	unsigned int clk_ptp_rate;
+> > > -	unsigned int clk_ref_rate;
+> > > +	unsigned long clk_ptp_rate;
+> > > +	unsigned long clk_ref_rate;
+> > >  	unsigned int mult_fact_100ns;
+> > >  	s32 ptp_max_adj;
+> > >  	u32 cdc_error_adj;
+> > > @@ -292,7 +292,7 @@ struct plat_stmmacenet_data {
+> > >  	int mac_port_sel_speed;
+> > >  	int has_xgmac;
+> > >  	u8 vlan_fail_q;
+> > 
+> > > -	unsigned int eee_usecs_rate;
+> > > +	unsigned long eee_usecs_rate;
+> > 
+> > Sigh... One another Intel clumsy stuff: this field is initialized by
+> > the Intel glue-drivers and utilized in there only. Why on earth has it
+> > been added to the generic plat_stmmacenet_data structure?.. The
+> > only explanation is that the Intel developers were lazy to refactor
+> > the glue-driver a bit so the to be able to reach the platform data at
+> > the respective context.
+> 
 
->
-> On Mon, Aug 19, 2024 at 11:54=E2=80=AFAM syzbot
-> <syzbot+7fe7b81d602cc1e6b94d@syzkaller.appspotmail.com> wrote:
->>
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    a99ef548bba0 bnx2x: Set ivi->vlan field as an integer
->> git tree:       net-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=3D10baacfd9800=
-00
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D7229118d88b4=
-a71b
->> dashboard link: https://syzkaller.appspot.com/bug?extid=3D7fe7b81d602cc1=
-e6b94d
->> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for De=
-bian) 2.40
->>
->> Unfortunately, I don't have any reproducer for this issue yet.
->>
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/d555f757c854/di=
-sk-a99ef548.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/8e46d450e252/vmlin=
-ux-a99ef548.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/bc2197d1b6a7/=
-bzImage-a99ef548.xz
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the com=
-mit:
->> Reported-by: syzbot+7fe7b81d602cc1e6b94d@syzkaller.appspotmail.com
->>
->> ------------[ cut here ]------------
->> UBSAN: array-index-out-of-bounds in net/sched/sch_cake.c:1876:6
->> index 65535 is out of range for type 'u16[1025]' (aka 'unsigned short[10=
-25]')
->> CPU: 0 UID: 0 PID: 5282 Comm: kworker/0:6 Not tainted 6.11.0-rc3-syzkall=
-er-00482-ga99ef548bba0 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS =
-Google 08/06/2024
->> Workqueue: wg-crypt-wg0 wg_packet_tx_worker
->> Call Trace:
->>  <TASK>
->>  __dump_stack lib/dump_stack.c:93 [inline]
->>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
->>  ubsan_epilogue lib/ubsan.c:231 [inline]
->>  __ubsan_handle_out_of_bounds+0x121/0x150 lib/ubsan.c:429
->>  cake_enqueue+0x785e/0x9340 net/sched/sch_cake.c:1876
->>  dev_qdisc_enqueue+0x4b/0x290 net/core/dev.c:3775
->>  __dev_xmit_skb net/core/dev.c:3871 [inline]
->>  __dev_queue_xmit+0xf4a/0x3e90 net/core/dev.c:4389
->>  dev_queue_xmit include/linux/netdevice.h:3073 [inline]
->>  neigh_hh_output include/net/neighbour.h:526 [inline]
->>  neigh_output include/net/neighbour.h:540 [inline]
->>  ip6_finish_output2+0xfc2/0x1680 net/ipv6/ip6_output.c:137
->>  ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
->>  ip6tunnel_xmit include/net/ip6_tunnel.h:161 [inline]
->>  udp_tunnel6_xmit_skb+0x590/0x9d0 net/ipv6/ip6_udp_tunnel.c:111
->>  send6+0x6da/0xaf0 drivers/net/wireguard/socket.c:152
->>  wg_socket_send_skb_to_peer+0x115/0x1d0 drivers/net/wireguard/socket.c:1=
-78
->>  wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
->>  wg_packet_tx_worker+0x1bf/0x810 drivers/net/wireguard/send.c:276
->>  process_one_work kernel/workqueue.c:3231 [inline]
->>  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
->>  worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
->>  kthread+0x2f0/0x390 kernel/kthread.c:389
->>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->>  </TASK>
->> ---[ end trace ]---
->>
->>
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->>
->> If the report is already addressed, let syzbot know by replying with:
->> #syz fix: exact-commit-title
->>
->> If you want to overwrite report's subsystems, reply with:
->> #syz set subsystems: new-subsystem
->> (See the list of subsystem names on the web dashboard)
->>
->> If the report is a duplicate of another one, reply with:
->> #syz dup: exact-subject-of-another-report
->>
->> If you want to undo deduplication, reply with:
->> #syz undup
->>
->> --
->> You received this message because you are subscribed to the Google Group=
-s "syzkaller-bugs" group.
->> To unsubscribe from this group and stop receiving emails from it, send a=
-n email to syzkaller-bugs+unsubscribe@googlegroups.com.
->> To view this discussion on the web visit https://groups.google.com/d/msg=
-id/syzkaller-bugs/00000000000071e6110620064b4c%40google.com.
+> I guess it is home work for Intel developers, right?
+
+Mainly yes, plus to that it's a one more crying out loud from deep
+inside my soul about another clumsy solution incorporated into the
+poor STMMAC driver.)
+
+-Serge(y)
+
+> 
+> Thanks for review.
+> /Jan
 
