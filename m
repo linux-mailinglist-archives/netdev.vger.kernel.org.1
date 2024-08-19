@@ -1,86 +1,99 @@
-Return-Path: <netdev+bounces-119774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B00956EB5
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:27:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46805956ED7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0200F280F1F
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:27:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798961C22AC9
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 15:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4FF3BBF2;
-	Mon, 19 Aug 2024 15:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E95E54FB5;
+	Mon, 19 Aug 2024 15:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ql3peRzY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM5kY8Ah"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824C31BC59;
-	Mon, 19 Aug 2024 15:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DB1335BA;
+	Mon, 19 Aug 2024 15:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724081269; cv=none; b=C/mzBkWC3DWKsQbLBteFjjxjrpBhI3sDMBGdFisHlD+Sttl0HzoLlCFXeTaBkF9PCCegXSmwmfjuiPXVr22QnsHjhwPA5t56S8d/Y0LSA1d118roaWdnZtG19XKgmFAJt8MO9cv1mOS/aSmGjFLVSIveiq5KDEnhSJleIwgtxOo=
+	t=1724081668; cv=none; b=hdG0rIMsYKVx/w+Nu42CUzU3IoYMaEjs+DWD1abkfY5+V3NSymemfdAx4CCcbvvrc3ZOvfDFVbfnne1dPq9Xx96TE+nLoleSUi/q10YjT/WuPteOgLTBLwHCrhh6/oEhyUF4nRS4S8mOkv0WTfZmKiiycWf5LLEN23yb2ff5TQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724081269; c=relaxed/simple;
-	bh=qeQgtKomB5cd6jQ08sQEldXRUMgKAV4Meg42eZK5Yqs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DFt4TukjpUirI54Pix3GmYuAQhwB4WCAJcXhjve2VxQcqlttBn4nTBpfurEA4lCapUNXZs64WTcthzzljPy3qIbbFdigX0JceC2HOnrw5x6AYnHrAfXnF92IdOZcy7GWScZ5R5UEgiEFdhwgKWBIaGqFakbPCIdx28rvN6BvPHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ql3peRzY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D81C32782;
-	Mon, 19 Aug 2024 15:27:46 +0000 (UTC)
+	s=arc-20240116; t=1724081668; c=relaxed/simple;
+	bh=4VrjSRXNUm0qxK9qDXOgGH/nx+QchNmk1s/6OZfvNV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=buMjUp4eMJfQGA0M7vQD9YW/OfVkNVE91wi4wy6W0nJ+631ZWCVyRJK7N/DO889yJr/+bVoTmnUSEWgrkH9DU4r3TQniX4VlxTM5uVOB6wRqI5P1zcXMQwbaKXbWj6V3OJiLMubKcU6wJ5B3o0mnJtZzVITZYozNDorhJJv7e8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM5kY8Ah; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64669C32782;
+	Mon, 19 Aug 2024 15:34:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724081269;
-	bh=qeQgtKomB5cd6jQ08sQEldXRUMgKAV4Meg42eZK5Yqs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ql3peRzYCiZzWaW5HHgk69sLXnu0TLikVLegHU83NRAojUt/h8OxLaBZ6GXtBYi+9
-	 clJAHYTC5a0kbph+aYFm5uMn8L9L7uVksW21taoM1gFYvuaEQoPC6QzrGB2xoma8X6
-	 tS4IdKThz4xWxMH/gna8U2fvUwfcOVPNBF6WQjg0+LVYnQflvQ8RDE+SNS1brrZHFP
-	 hsJLcQ3HYuhvz0bOU+CrEmTHWUctCeFjQUtDx45O4PVYjDefhszwtLX9B0lpGvfbH3
-	 VEvimfjMvaPYOJBQQ0/UhR38Z5rAcndQzOsAhxxX0bwv9FL9ihkGd3j7SAMko0vIfT
-	 a49ZIdDy+h+xA==
-Date: Mon, 19 Aug 2024 16:27:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com,
-	lcherian@marvell.com, ndabilpuram@marvell.com
-Subject: Re: [net PATCH v2] octeontx2-af: Fix CPT AF register offset
- calculation
-Message-ID: <20240819152744.GA543198@kernel.org>
-References: <20240819123237.490603-1-bbhushan2@marvell.com>
+	s=k20201202; t=1724081667;
+	bh=4VrjSRXNUm0qxK9qDXOgGH/nx+QchNmk1s/6OZfvNV4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PM5kY8Ahw+OIrEDWQ8tMat2J6tItd92GDnACtD3sm/S7CHbknbbM16IuAWOn9YBLX
+	 vcreb29/dauJM4d922rdfNCAXKhkzm1bXiLNyVoG6rPLpEaGZnyDxUWfOOd3ZXUeP+
+	 RbmIf1/jLqEiqHHzc2npfp22lzpQ1mdjNKOXrbhluzrzMvk18i9wn/qlNjUFrt7nnI
+	 etXB8AFg4FHrFTDY+BPzBWXG78/384cTQE0UPXdcYQ6bn5r0j4Lb1fYewHFA1MN4Zn
+	 17cQGl7VkNPnu4mIAIp/dgYfOVSDXxS7SpQ5EhN+TJHobxJ2EKNxgh6K5AOyDEf8Os
+	 fT11CnZM3JlmQ==
+Date: Mon, 19 Aug 2024 08:34:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Erwan Velu <erwanaliasr1@gmail.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Tariq Toukan
+ <ttoukan.linux@gmail.com>, Erwan Velu <e.velu@criteo.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+ <tariqt@nvidia.com>, Yury Norov <ynorov@nvidia.com>, Rahul Anand
+ <raanand@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/mlx5: Use cpumask_local_spread() instead of custom
+ code
+Message-ID: <20240819083426.1aebc18f@kernel.org>
+In-Reply-To: <CAL2JzuzEBAdkQfRPLXQHry2a2M7_EsScOV_kheo+oXUuKM9rWA@mail.gmail.com>
+References: <20240812082244.22810-1-e.velu@criteo.com>
+	<3dcbfb0d-6e54-4450-a266-bf4701e77e08@gmail.com>
+	<ZrzDAlMiEK4fnLmn@yury-ThinkPad>
+	<CAL2JzuzEBAdkQfRPLXQHry2a2M7_EsScOV_kheo+oXUuKM9rWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819123237.490603-1-bbhushan2@marvell.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 19, 2024 at 06:02:37PM +0530, Bharat Bhushan wrote:
-> Some CPT AF registers are per LF and others are global.
-> Translation of PF/VF local LF slot number to actual LF slot
-> number is required only for accessing perf LF registers.
-> CPT AF global registers access do not require any LF
-> slot number.
-> 
-> Also there is no reason CPT PF/VF to know actual lf's register
-> offset.
-> 
-> Fixes: bc35e28af789 ("octeontx2-af: replace cpt slot with lf id on reg write")
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> ---
+On Mon, 19 Aug 2024 12:15:10 +0200 Erwan Velu wrote:
+> 2/ I was also wondering if we shouldn't have a kernel module option to
+> choose the allocation algorithm (I have a POC in that direction).
+> The benefit could be allowing the platform owner to select the
+> allocation algorithm that sys-admin needs.
+> On single-package AMD EPYC servers, the numa topology is pretty handy
+> for mapping the L3 affinity but it doesn't provide any particular hint
+> about the actual "distance" to the network device.
+> You can have up to 12 NUMA nodes on a single package but the actual
+> distance to the nic is almost identical as each core needs to use the
+> IOdie to reach the PCI devices.
+> We can see in the NUMA allocation logic assumptions like "1 NUMA per
+> package" logic that the actual distance between nodes should be
+> considered in the allocation logic.
 
-Hi Bharat,
+I think user space has more information on what the appropriate
+placement is than the kernel. We can have a reasonable default,
+and maybe try not to stupidly reset the settings when config
+changes (I don't think mlx5 does that but other drivers do);
+but having a way to select algorithm would only work if there
+was a well understood and finite set of algorithms.
 
-It would be very nice to have links (to lore) to earlier version and
-descriptions of what has changed between versions here.
-
-Using b4 to manage patch submissions will help with this.
+IMHO we should try to sell this task to systemd-networkd or some other 
+user space daemon. We now have netlink access to NAPI information,
+including IRQ<>NAPI<>queue mapping. It's possible to implement a
+completely driver-agnostic IRQ mapping support from user space
+(without the need to grep irq names like we used to)
 
