@@ -1,182 +1,217 @@
-Return-Path: <netdev+bounces-119907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27560957762
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:23:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05EB09577F6
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA6C01F2416E
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:23:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B602C283B33
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E0A1DC49B;
-	Mon, 19 Aug 2024 22:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6AD1E210F;
+	Mon, 19 Aug 2024 22:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="lLcRj612";
+	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="eId3v114"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-000eb902.pphosted.com (mx0b-000eb902.pphosted.com [205.220.177.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6D915A843;
-	Mon, 19 Aug 2024 22:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724106196; cv=none; b=f1HRgkfZB2QYftrk/rkWmWMa6QXLfgh+8J5tRfNCwzxY7QONc7luHC9vPhDlzq3ZrwTYizbi7yz5aCXEY4FFx1MzCC3LvoP7nIthCGvR5mKHGfGGAOajwoYNIXcA1HFsUkXcJctaixxtwxIxsVHi6eEqyRRZRRjRPCO9hDznUU8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724106196; c=relaxed/simple;
-	bh=tz4yofYq+XhKDOjLrjsV/Hw50t1cBVsD7gcCCQwHLdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nCD/nfHd7oaW1Rs4uAXQmro3Kmd44Xgi6cpOQlVHbrhqA5JVELggYZWdATqMtM0ppZqv0j3NIsi8ZxWics0hFxj6cudKHwqs9qUuXqt6WXdUFouitbvdq+f4HMwpfa6r0dDrqDKmlOb79KXFp4WS8xpFONBIzRzW5X9W5XlPxx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F6A8C32782;
-	Mon, 19 Aug 2024 22:23:15 +0000 (UTC)
-Date: Mon, 19 Aug 2024 18:23:40 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [PATCH v5 0/4] tracing: improve symbolic printing
-Message-ID: <20240819182340.3bd23d67@gandalf.local.home>
-In-Reply-To: <20240614081956.19832-6-johannes@sipsolutions.net>
-References: <20240614081956.19832-6-johannes@sipsolutions.net>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCE41DF68A;
+	Mon, 19 Aug 2024 22:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.212
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724107490; cv=fail; b=FK7TAqoohkTGmnbVDzX/wKnXtYx6YSdnPquNKLoqh6uBSRICsK3ejCOlgvc5vhUnqS3EdZkGDjVVXLl89XowrDXJ65nc04IWULvFgG2z4oahVl/hwWpGFSX2eYPJIIVJQXrtzJKolwzX7l6R2HlVACX8WVxjqhExpH7YQhSTF3Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724107490; c=relaxed/simple;
+	bh=JcNUPBa0yUfLmGkCyN86lHBcACxIteer9QsLdGWCx7E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d5ozbCkl680sEqyE6A4vs+YXuoI7kJo47KKOorTKDBTGLEDoYOlN1GTZmyFxL2CVgmpUU2UIQRFxsEgc6A4EfQTutjvkXx0YVAcRZlISIO2XIeZIWdY6rBAT43AVuAGCMSSfImrEkB82Aiw063cY+8JHJB04zOL35Qpd5Y4pab0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=garmin.com; spf=pass smtp.mailfrom=garmin.com; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=lLcRj612; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=eId3v114; arc=fail smtp.client-ip=205.220.177.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=garmin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garmin.com
+Received: from pps.filterd (m0220297.ppops.net [127.0.0.1])
+	by mx0a-000eb902.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JLsPNA007527;
+	Mon, 19 Aug 2024 17:27:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps1; bh=6txOXufq+uLSTxnBX4DlTQc+SzU
+	ZlPqpD7pWY8sl76w=; b=lLcRj612g/RaL/bcHlR67ewFuugz2qGZ3WUkFFO2fWM
+	rlgsPyk0Z+aphOCNJ/L/+neoT5QPbYLk2RjZknxwlDzn7kSXvUf4vEtcBpmYToMk
+	r3ABIGpyV8PKHVjC7ZF0c/489eDQA4soHgINu0ZrECfAOsmDJP1ACm4yRAIKS7us
+	fSzqITZTnRIUVVGRuvGndlDy6//pgo/4vkZrG2q/M+fkEQzKIfA0K8J4lSTyKNP/
+	RJeKVSoMiAligpraQqnVII2niWCaPKDcOHoa1AwrF0ih26wF8GIbuQLGvoHuq7z0
+	xhuYnf+7pdA/MlxAmBOlx7Fe1TwET/xflUne//fcPFw==
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
+	by mx0a-000eb902.pphosted.com (PPS) with ESMTPS id 41455216sx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Aug 2024 17:27:02 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bg06MmStoxJWJIJioyBz/MKcLHT3sMkWWds1grZaBmi+ox0I+8ltRUClrlQ8/n+6y8nrjnXEhQGgmLXJ+XURG2qlwulrb65bK7yTkNEQARscEHHP+xKfVxpgq96ZndDbA+swnwfDxhZdsWtX/UccHO7jVKmIcKzz/kd2YlewYGv24sa5c33U8JH61wtOlGA/W3iT2K8N3C2xhFM89tCA4BvO2Wwqve6jgi6Kc84JqtteHghdBpTwMZEvk4C2oMR0jkcwGy8isgD4QQERPSS5c3nA2xRkF3ZwvRVpRUAvPqrQhvC/ldSSBDSTDdH8BIlLQ8/y2nAplM9HuJyh1CAPQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6txOXufq+uLSTxnBX4DlTQc+SzUZlPqpD7pWY8sl76w=;
+ b=otJWQWdVHurOsrEN1+7f2TRBvULqGynR11ZyquuCdiqzMkU378+xlkjqF4auPQ2l5qQVGFlSASPW9htYu2kFWO34Sv4OUL0cZ+TFg60JxCJikbqQ71sZHmp/lW4ezMZZUqnq3/iDxG2VSnkFgKO8wDOKIVbzzPdnj51vxBRYseOIC5V/pda2hR+KcN4bStZswGVEr2LAH4N82xovPG0ZyC73ADXiSDYb7AbjxYBpWNlCM5ds2UDlF+9haubNYHA6PQIsIF2A6PXXoO6wHLIY2QERS83MhwgiJayHgDstOpkZrE12nGEDPEjcGNistadXgvTcKF8dO9l9hX6z+EvJdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 204.77.163.244) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=garmin.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=garmin.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6txOXufq+uLSTxnBX4DlTQc+SzUZlPqpD7pWY8sl76w=;
+ b=eId3v114SgVlFt+VIxWQ6Ou2VM/mvad9+hocc0+erp61a6zxiYHMQzSWl6i/QHBj8SJuBGWwW5hkbZkaP9y4nSyUome2JxpI2/Ntfwt69mt2lN1Ulgxy+vM8tAJ+an8c8JbFDI02O/r0iWe804NJT6/Uy9qxpEt9hrtvVcUxO1HujPIlw08YKk5RNpbgT7vojkTancyV/6xPAQczN987Z3NY9QFvo2ckflpASVllReU/1tw2kcYhmYIGMObo+urpPZ1rce+yFzajkQqYsYsi9A4clY1O2Pp07mKY2RhsypfOQ3gZEcmn+y8edjcG/zPH0Aqn1vo/DY+LvC71M7e3dA==
+Received: from BN8PR15CA0022.namprd15.prod.outlook.com (2603:10b6:408:c0::35)
+ by SA2PR04MB7660.namprd04.prod.outlook.com (2603:10b6:806:147::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.22; Mon, 19 Aug
+ 2024 22:26:59 +0000
+Received: from BN3PEPF0000B371.namprd21.prod.outlook.com
+ (2603:10b6:408:c0:cafe::a) by BN8PR15CA0022.outlook.office365.com
+ (2603:10b6:408:c0::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21 via Frontend
+ Transport; Mon, 19 Aug 2024 22:26:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 204.77.163.244)
+ smtp.mailfrom=garmin.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=garmin.com;
+Received-SPF: Pass (protection.outlook.com: domain of garmin.com designates
+ 204.77.163.244 as permitted sender) receiver=protection.outlook.com;
+ client-ip=204.77.163.244; helo=edgetransport.garmin.com; pr=C
+Received: from edgetransport.garmin.com (204.77.163.244) by
+ BN3PEPF0000B371.mail.protection.outlook.com (10.167.243.168) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.4 via Frontend Transport; Mon, 19 Aug 2024 22:26:59 +0000
+Received: from kc3wpa-exmb4.ad.garmin.com (10.65.32.84) by cv1wpa-edge1
+ (10.60.4.251) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Mon, 19 Aug
+ 2024 17:26:56 -0500
+Received: from kc3wpa-exmb3.ad.garmin.com (10.65.32.83) by
+ kc3wpa-exmb4.ad.garmin.com (10.65.32.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 19 Aug 2024 17:26:56 -0500
+Received: from CAR-4RCMR33.ad.garmin.com (10.5.209.17) by mail.garmin.com
+ (10.65.32.83) with Microsoft SMTP Server id 15.2.1258.34 via Frontend
+ Transport; Mon, 19 Aug 2024 17:26:56 -0500
+From: Joseph Huang <Joseph.Huang@garmin.com>
+To: <netdev@vger.kernel.org>
+CC: Joseph Huang <Joseph.Huang@garmin.com>, Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net 1/1] net: dsa: mv88e6xxx: Fix out-of-bound access
+Date: Mon, 19 Aug 2024 18:26:40 -0400
+Message-ID: <20240819222641.1292308-1-Joseph.Huang@garmin.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B371:EE_|SA2PR04MB7660:EE_
+X-MS-Office365-Filtering-Correlation-Id: baaaf131-62e5-426f-2fc3-08dcc09e0a9b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?JlBO0JWdrW01ABqPeYUP2tADk7Sbizo34Tn7JABuV8tn6vCs9IIzK06ElNJo?=
+ =?us-ascii?Q?/gDgFGdI3ozIv0ZJEe0Q9trzJjP9Z3MfzElqURIi7j2z8+qDfhEpGbAMRseU?=
+ =?us-ascii?Q?LuWriwS4FtqXp6HfVMpfr2b5xYIWC/6RKFkGDGF69WWUYmdBgahYzuzXmkw4?=
+ =?us-ascii?Q?k/9vOZN5KQyZgcNM75LA0xv++Le4DLR+zQvCdmkypaQKKOxaYThxCTk9wfNc?=
+ =?us-ascii?Q?A71tTpHAK9UVs9m1nX9549VaWOP+Mk+gdCTEpxeeYo7cV/fapwhbeB75hWr0?=
+ =?us-ascii?Q?2KODDJQWSu99wb3q3TPCI6AkuyeuFpuM6jFClviXVAd3gNE4e2Zl9RJmEsNY?=
+ =?us-ascii?Q?7BgUZmQ6DJG0+qOHEZJ1H2UBaV0IdB9rePQmhQIK3VaC28MrbUJm/NQzQ5/p?=
+ =?us-ascii?Q?LgZDUO7R0r7hZAgJnHYzyI4fRwa41REnrzGBlKFGIIVq7OlSdRXde9beSyPY?=
+ =?us-ascii?Q?n9hBQ8U27V4aEo5Jp1c2PebH5VfjdXKrjqOC1b8j3jxlz05Z9mr1Tr0veHzo?=
+ =?us-ascii?Q?QVS17ScMKC9aWUSt7zfvZO1rTnqffGpJaGGNXJs1ctw54Z+PaXWC9iNzoCub?=
+ =?us-ascii?Q?lMxqAJGEBY7tyPPwgZKBhoopl7veRI8k+VArfedahbs9xdc3KCqxD4FR8DyS?=
+ =?us-ascii?Q?Xf+Zk+a+mmgdO41QlKt1UXt0xvpaZwp0UPFr0hsRrLj4x7+3tbS+GJTQAo6e?=
+ =?us-ascii?Q?buubvB8n8Q5mBiSgmdAVrEpW61ZIc3Id8JKWezKeLpwC8LDRXIuF0jfBDOMN?=
+ =?us-ascii?Q?uftq4uKICWAjZeE57t84NubHM/dkiyarlNmjDnF4BSl9KRtTcCo0SBJe7GyV?=
+ =?us-ascii?Q?Fzb8BqXqcqk0MEVzLdEBhO7yjpH68cOdPkHzgmLw0qVfLnQkU98rWAUFlDD9?=
+ =?us-ascii?Q?hyAh7I9LdvNVNfSxLYEuzTciE1CLdE8xh00m9D88eSMpTEItwFUIzfvGQ8XN?=
+ =?us-ascii?Q?vFG44va6FJiRQCIWPS9h5iRU4aoEKi2wtWhvxL6YdM7snzLaR3y9hQYgEIK9?=
+ =?us-ascii?Q?SwGVbShrpc3gIhv8bwfu4aPzOIVCYZs8k8EmKGgc+qZxnuQpTnbi9i6nGIJ7?=
+ =?us-ascii?Q?j5Bqj6THBbb5GLPvSZpZjKAk2Rrshpr1cJ2BeHFX+geNe/ICvE+6ekq45Dok?=
+ =?us-ascii?Q?BiturZoNxGCXEdLwsauyPwx0HBRNJLnAdofybVg6yzfv4Gs4iVBIiqBaEosT?=
+ =?us-ascii?Q?DzhQZjohuCQuuW96oMfRfRFTAgefz+RQkHWI+wEyEfWp1jfHC9rMpsm+M4H4?=
+ =?us-ascii?Q?QS2/1+IY9osHbrM327mjvGEmfdiv5Gj2sJioMvSg1dRb4CR4c3v+MQ8181wc?=
+ =?us-ascii?Q?Lg16oZyNptSbos47oEIsu9qrBbev3QgowvyYjtmR885IL8ktfxjE0eglJBrL?=
+ =?us-ascii?Q?SJw8rQVl0H6Q1qhxWSaBLkTvHhcdS9xzJC/N8ER+9q74A982qRd0p6NTc8ke?=
+ =?us-ascii?Q?ixxKX2huBs2oIySwsHr9NM2E2Wh9cJfx?=
+X-Forefront-Antispam-Report:
+	CIP:204.77.163.244;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:edgetransport.garmin.com;PTR:extedge.garmin.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1102;
+X-OriginatorOrg: garmin.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2024 22:26:59.3669
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: baaaf131-62e5-426f-2fc3-08dcc09e0a9b
+X-MS-Exchange-CrossTenant-Id: 38d0d425-ba52-4c0a-a03e-2a65c8e82e2d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=38d0d425-ba52-4c0a-a03e-2a65c8e82e2d;Ip=[204.77.163.244];Helo=[edgetransport.garmin.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B371.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7660
+X-Authority-Analysis: v=2.4 cv=U5/ADvru c=1 sm=1 tr=0 ts=66c3c6b6 cx=c_pps a=28bFCgguF5sZfysLuYgbMw==:117 a=YA0UzX50FYCGjWi3QxTvkg==:17 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=yoJbH4e0A30A:10 a=FS7-D2N0u7gA:10 a=ShUJUk9rLtwA:10 a=NbHB2C0EAAAA:8
+ a=PTDLi0RsCyGZMGRiyFwA:9 cc=ntf
+X-Proofpoint-ORIG-GUID: WVeUih0WIQlau1og8iM4_Vc452PV3Peh
+X-Proofpoint-GUID: WVeUih0WIQlau1og8iM4_Vc452PV3Peh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-19_16,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=924 malwarescore=0 clxscore=1011 adultscore=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408190149
 
+If an ATU violation was caused by a CPU Load operation, the SPID is 0xf,
+which is larger than DSA_MAX_PORTS (the size of mv88e6xxx_chip.ports[]
+array).
 
-Hi Johannes,
+Fixes: 75c05a74e745 ("net: dsa: mv88e6xxx: Fix counting of ATU violations")
+Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+---
+ drivers/net/dsa/mv88e6xxx/global1.h     | 1 +
+ drivers/net/dsa/mv88e6xxx/global1_atu.c | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-I finally got around to testing your patches.
+diff --git a/drivers/net/dsa/mv88e6xxx/global1.h b/drivers/net/dsa/mv88e6xxx/global1.h
+index 3dbb7a1b8fe1..9676e2d42c9e 100644
+--- a/drivers/net/dsa/mv88e6xxx/global1.h
++++ b/drivers/net/dsa/mv88e6xxx/global1.h
+@@ -162,6 +162,7 @@
+ #define MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC_AVB_NRL_PO	0x000d
+ #define MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC_DA_MGMT_PO	0x000e
+ #define MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC_PO		0x000f
++#define MV88E6XXX_G1_ATU_DATA_SPID_CPU				0x000f
+ 
+ /* Offset 0x0D: ATU MAC Address Register Bytes 0 & 1
+  * Offset 0x0E: ATU MAC Address Register Bytes 2 & 3
+diff --git a/drivers/net/dsa/mv88e6xxx/global1_atu.c b/drivers/net/dsa/mv88e6xxx/global1_atu.c
+index ce3b3690c3c0..b6f15ae22c20 100644
+--- a/drivers/net/dsa/mv88e6xxx/global1_atu.c
++++ b/drivers/net/dsa/mv88e6xxx/global1_atu.c
+@@ -457,7 +457,8 @@ static irqreturn_t mv88e6xxx_g1_atu_prob_irq_thread_fn(int irq, void *dev_id)
+ 		trace_mv88e6xxx_atu_full_violation(chip->dev, spid,
+ 						   entry.portvec, entry.mac,
+ 						   fid);
+-		chip->ports[spid].atu_full_violation++;
++		if (spid != MV88E6XXX_G1_ATU_DATA_SPID_CPU)
++			chip->ports[spid].atu_full_violation++;
+ 	}
+ 
+ 	return IRQ_HANDLED;
+-- 
+2.17.1
 
-I did the following:
-
- # cat /sys/kernel/tracing/events/*/*/format
-
-and hit this:
-
-BUG: unable to handle page fault for address: ffffffff8e6333d0
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 183c40067 P4D 183c40067 PUD 183c41063 PMD 1003ef063 PTE 800ffffe7b9cc062
-Oops: Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 7 UID: 0 PID: 893 Comm: cat Not tainted 6.11.0-rc4-test-00004-g4ce2836f008b #56 68afcee1248519f8b3b088836c40746e4a6b69d3
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:f_show (kernel/trace/trace_events.c:1601 kernel/trace/trace_events.c:1651 kernel/trace/trace_events.c:1689)
-Code: 33 63 8e 48 2d d0 33 63 8e 48 c1 f8 03 85 c0 74 67 89 c0 4c 89 c3 49 8d 04 c0 48 89 04 24 eb 0a 48 83 c3 08 48 39 1c 24 74 4e <4c> 8b 3b 4d 85 ff 74 ee 49 8b 45 10 48 8b 00 49 39 07 75 e2 49 8b
-All code
-========
-   0:   33 63 8e                xor    -0x72(%rbx),%esp
-   3:   48 2d d0 33 63 8e       sub    $0xffffffff8e6333d0,%rax
-   9:   48 c1 f8 03             sar    $0x3,%rax
-   d:   85 c0                   test   %eax,%eax
-   f:   74 67                   je     0x78
-  11:   89 c0                   mov    %eax,%eax
-  13:   4c 89 c3                mov    %r8,%rbx
-  16:   49 8d 04 c0             lea    (%r8,%rax,8),%rax
-  1a:   48 89 04 24             mov    %rax,(%rsp)
-  1e:   eb 0a                   jmp    0x2a
-  20:   48 83 c3 08             add    $0x8,%rbx
-  24:   48 39 1c 24             cmp    %rbx,(%rsp)
-  28:   74 4e                   je     0x78
-  2a:*  4c 8b 3b                mov    (%rbx),%r15              <-- trapping instruction
-  2d:   4d 85 ff                test   %r15,%r15
-  30:   74 ee                   je     0x20
-  32:   49 8b 45 10             mov    0x10(%r13),%rax
-  36:   48 8b 00                mov    (%rax),%rax
-  39:   49 39 07                cmp    %rax,(%r15)
-  3c:   75 e2                   jne    0x20
-  3e:   49                      rex.WB
-  3f:   8b                      .byte 0x8b
-
-Code starting with the faulting instruction
-===========================================
-   0:   4c 8b 3b                mov    (%rbx),%r15
-   3:   4d 85 ff                test   %r15,%r15
-   6:   74 ee                   je     0xfffffffffffffff6
-   8:   49 8b 45 10             mov    0x10(%r13),%rax
-   c:   48 8b 00                mov    (%rax),%rax
-   f:   49 39 07                cmp    %rax,(%r15)
-  12:   75 e2                   jne    0xfffffffffffffff6
-  14:   49                      rex.WB
-  15:   8b                      .byte 0x8b
-RSP: 0018:ffffb43981457ca8 EFLAGS: 00010202
-RAX: ffffffff8e6333e0 RBX: ffffffff8e6333d0 RCX: 00000000000002cd
-RDX: ffff942b4b0bd000 RSI: 000000000000006e RDI: ffff942b42f9cc30
-RBP: ffff942b42f9cc30 R08: ffffffff8e6333d0 R09: 63696c6f626d7973
-R10: 735f746e6972705f R11: 2863696c6f626d79 R12: 0000000000000000
-R13: ffffffff8de44880 R14: ffffffff8de44516 R15: ffffffff8de44515
-FS:  00007f556c562740(0000) GS:ffff942cbdfc0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffff8e6333d0 CR3: 000000010a1d0006 CR4: 0000000000170ef0
-Call Trace:
-<TASK>
-? __die (arch/x86/kernel/dumpstack.c:421 arch/x86/kernel/dumpstack.c:434)
-? page_fault_oops (arch/x86/mm/fault.c:715)
-? search_module_extables (kernel/module/main.c:3280)
-? search_bpf_extables (kernel/bpf/core.c:799)
-? exc_page_fault (arch/x86/mm/fault.c:1198 arch/x86/mm/fault.c:1479 arch/x86/mm/fault.c:1539)
-? asm_exc_page_fault (arch/x86/include/asm/idtentry.h:623)
-? f_show (kernel/trace/trace_events.c:1601 kernel/trace/trace_events.c:1651 kernel/trace/trace_events.c:1689)
-? f_show (kernel/trace/trace_events.c:1623 kernel/trace/trace_events.c:1689)
-seq_read_iter (fs/seq_file.c:273)
-seq_read (fs/seq_file.c:163)
-vfs_read (fs/read_write.c:474)
-? __handle_mm_fault (mm/memory.c:3945 mm/memory.c:5521 mm/memory.c:5664)
-ksys_read (fs/read_write.c:619)
-do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) arch/x86/entry/common.c:83 (discriminator 1))
-? handle_mm_fault (mm/memory.c:5744 (discriminator 1) mm/memory.c:5840 (discriminator 1))
-? exc_page_fault (arch/x86/mm/fault.c:1342 arch/x86/mm/fault.c:1481 arch/x86/mm/fault.c:1539)
-? irqentry_exit_to_user_mode (arch/x86/include/asm/entry-common.h:57 (discriminator 1) include/linux/entry-common.h:330 (discriminator 1) kernel/entry/common.c:231 (discriminator 1))
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-RIP: 0033:0x7f556c65ca5d
-Code: 31 c0 e9 c6 fe ff ff 50 48 8d 3d a6 60 0a 00 e8 a9 08 02 00 66 0f 1f 84 00 00 00 00 00 80 3d 81 3b 0e 00 00 74 17 31 c0 0f 05 <48> 3d 00 f0 ff ff 77 5b c3 66 2e 0f 1f 84 00 00 00 00 00 48 83 ec
-All code
-========
-   0:   31 c0                   xor    %eax,%eax
-   2:   e9 c6 fe ff ff          jmp    0xfffffffffffffecd
-   7:   50                      push   %rax
-   8:   48 8d 3d a6 60 0a 00    lea    0xa60a6(%rip),%rdi        # 0xa60b5
-   f:   e8 a9 08 02 00          call   0x208bd
-  14:   66 0f 1f 84 00 00 00    nopw   0x0(%rax,%rax,1)
-  1b:   00 00
-  1d:   80 3d 81 3b 0e 00 00    cmpb   $0x0,0xe3b81(%rip)        # 0xe3ba5
-  24:   74 17                   je     0x3d
-  26:   31 c0                   xor    %eax,%eax
-  28:   0f 05                   syscall
-  2a:*  48 3d 00 f0 ff ff       cmp    $0xfffffffffffff000,%rax         <-- trapping instruction
-  30:   77 5b                   ja     0x8d
-  32:   c3                      ret
-  33:   66 2e 0f 1f 84 00 00    cs nopw 0x0(%rax,%rax,1)
-  3a:   00 00 00
-  3d:   48                      rex.W
-  3e:   83                      .byte 0x83 
-  3f:   ec                      in     (%dx),%al
-
-Code starting with the faulting instruction
-===========================================
-   0:   48 3d 00 f0 ff ff       cmp    $0xfffffffffffff000,%rax
-   6:   77 5b                   ja     0x63
-   8:   c3                      ret
-   9:   66 2e 0f 1f 84 00 00    cs nopw 0x0(%rax,%rax,1)
-  10:   00 00 00
-  13:   48                      rex.W
-  14:   83                      .byte 0x83 
-  15:   ec                      in     (%dx),%al
-RSP: 002b:00007ffc88ecb878 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007f556c65ca5d
-RDX: 0000000000020000 RSI: 00007f556c541000 RDI: 0000000000000003
-RBP: 0000000000020000 R08: 00000000ffffffff R09: 0000000000000000
-R10: 0000000000000022 R11: 0000000000000246 R12: 00007f556c541000
-R13: 0000000000000003 R14: 0000000000020000 R15: 0000000000000000
-</TASK>
-Modules linked in: snd_hda_intel snd_intel_dspcfg snd_intel_sdw_acpi snd_hda_codec snd_hwdep snd_hda_core
-CR2: ffffffff8e6333d0
----[ end trace 0000000000000000 ]---
-
--- Steve
 
