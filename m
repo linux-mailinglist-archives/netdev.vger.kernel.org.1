@@ -1,335 +1,316 @@
-Return-Path: <netdev+bounces-119684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8290095694C
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:29:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E372956950
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 13:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5B221C215BF
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:29:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72FA01C211F0
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5265F166312;
-	Mon, 19 Aug 2024 11:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1707B15ADB1;
+	Mon, 19 Aug 2024 11:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="onG9EXBE"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JiVSMqs/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83182142900;
-	Mon, 19 Aug 2024 11:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724066940; cv=fail; b=YsECgHzPe7VjJsBJXdhtZhCoqcY+zMMU86ZwZUdA2GPWjqmTvFfX8A5o2wMueXzN/QqVLg6mip11JYXSn9V4ko1kFEe7WXvpwu7Hj3sj4pnlz3+LxznhvfLB/M1itgz3xY/4nnARoHLKKAUGrRLZGfvyrH+4DkxahlcIYAKeJB0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724066940; c=relaxed/simple;
-	bh=eJRvKhC5qSzhrTs3Jmjr00IhBq9VudKtI/fdHTEy3Yw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iY73gft65FXFxMxUQ61FdOIbn+2f1CKw79HshTu9Ggx8VhdeRJ7+XhKaq5V29BmrCtsO2rI8nM+kUXsvy8/6EiaTf7p3o7NCzU6Ceu9wXuZfPErO29RX0mh0Rrp2WrtVXXq7g3GDPP+z1s0kk8bH1JWOqHa+BOVHHP9qEIQveyE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=onG9EXBE; arc=fail smtp.client-ip=40.107.94.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KiBF8g3yGfJkGbev+rWI9HDPLDmM+VUGVIZ935wnQUz93q71X9FEgPfvg7YvAW8fiVEUnwRU4VXSB7f6Md0WmK1nU7CUn8FHSwN8w5LJ8qvofmNkBNJwEK9wPkNMnPUbUslTknvd8Q9Jxj8MgNlIsmAxh8QiOTMTAIZ2ffYsXqWIw1McV9CvS11PtScUu1BXm8RVXf05XxH2okIfq6NXFtKZrBR5MvI4OrWYftdqV9vJMVVIrjrxEigvh6U62hDBotLp6O2ZeLs6M2weE3EgfrSSqIjx23eieApRJgZ9PihYixDncztS4aqd+uBxshbpX0DXiDyZNWSIOjrWGNZvow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XI+wivW1YLw6RBWEp3vriP5eFuxx+/AIk/W7yXMSFPs=;
- b=i7CvpGuYXtClRgbKMF7mgFJt6gwob3bGnlCZdj5e4aauuiN2bhVIOOaAOgYJ74i5RPswqK4JwUxZT8TrrINWk/MVLg1y50ZFcc2Tbt+YFeQm/SErJNXh8q7RRUyQVFmEg5gsbOeZM1llZBMKgSTYEikCRXRcuX8eOfdqWegqvscGG7+M3Zvi+oSPgfebQGwbWGV5jtNR1ujjtxuxYmg0dPfsRZ0iK8cf8KjfJlQotvDxPVX+z26l8rcrXHUnGP0L0tDsfnl5k4sI6sHoZUm7Tt7ymuS5wrvkVZPG8yoHHtczfl0csutq12qiaPP/+yJ13S6YMJvlJp/Vvv7QPOiOBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XI+wivW1YLw6RBWEp3vriP5eFuxx+/AIk/W7yXMSFPs=;
- b=onG9EXBEbjcrkvyF4BtCBj82DEvrIYp/hhU9dZbJB33JiwSAu/X+fLDbphvxV80gGn3O9+/9cQyNyq2CbbpP7vB1FVyt3mVREIbiBdwMnsR4rfU5nsf+4czUCdReP1D4faSrW0YY22e/0E+0UfzcJRVKBI2yZC+hwu3AsF4kOeA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by DS0PR12MB7970.namprd12.prod.outlook.com (2603:10b6:8:149::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Mon, 19 Aug
- 2024 11:28:56 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
- 11:28:55 +0000
-Message-ID: <24600a48-a173-7a32-445f-83337b035285@amd.com>
-Date: Mon, 19 Aug 2024 12:28:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 02/15] cxl: add function for type2 cxl regs setup
-Content-Language: en-US
-To: Zhi Wang <zhiw@nvidia.com>, Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, richard.hughes@amd.com,
- targupta@nvidia.com, vsethi@nvidia.com, zhiwang@kernel.org
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
- <20240715172835.24757-3-alejandro.lucero-palau@amd.com>
- <20240804181529.00004aa9@Huawei.com>
- <5d8f8771-8e43-6559-c510-0b8b26171c05@amd.com>
- <20240815174035.00005bb0@Huawei.com>
- <20240818110720.00004e16.zhiw@nvidia.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20240818110720.00004e16.zhiw@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO6P123CA0008.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:338::16) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7106B1607A4
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 11:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724067090; cv=none; b=FJlSg3TqXttqoRBlOJLIr69IMLKPR8xTFKrGZFvNSQQAHJjx/fDRyRMq2VWpUct/jcfkig2MuH1dI3kv+g+id5AIeo/7+GQ1s72+eZ3mHp8u0lI+cRnirdQvdgBax1K7l3wFmJsronlh34C5VGq7fmLt4S/ki3b0P86TvkIxlLg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724067090; c=relaxed/simple;
+	bh=gQPjdtNwb1HLr7Awhkw66Y735dchEy2hNUQ5CLJ6lEo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ktvBMu7jbFjhE0Kld/DrlsY8UqFLu8Iej3lYxyY6adPc63VjXAnVgXfYiiQQBu3t1Lzl33EKHZWAJJgMRlKPH1yLt5+YowCjehGGQyj4wbjhJ0hzLAmeQLrByEmzRWnGJ1W/ORicI1YySPUHDVhb6HyEDr425qfMe1iB0tp+X2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JiVSMqs/; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5320d8155b4so5531339e87.3
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 04:31:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1724067085; x=1724671885; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fOG2PhhRuxszLOK8NJF/+vJDFgCa2c6jSVZK8oxFKNc=;
+        b=JiVSMqs/PfB/2LeGvLr8f5pT6jAPdjEFbUoCsUWdEiu3sdml8YUAOI2z1fLQbw5epO
+         wLeYOjGw7vfoDUPYy6pg+CsNYFQQGO5RV1d83/8AHZX7xRDJoi6fAh4pXtLZdMVVnrIZ
+         D3DztNJLiyT2imKLtV9rYJw+ehTG8Gxhj1mpTiie+BZIl2Nth84CSLKbKBFqS3i6TveF
+         5bu7xW6bBbxA3F1+V55MjFDU0GQFZXJv6jHoM7XSww5ewwbLdTZIjkrcTePfarXt/hQr
+         73TqApJIxZvaqg3YUocVU8USGr3rb7ThATfu9RzBJHNQLgQum6258uF5mwWlDhW+fniU
+         h0bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724067085; x=1724671885;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fOG2PhhRuxszLOK8NJF/+vJDFgCa2c6jSVZK8oxFKNc=;
+        b=EBXH735534cX4IH5uIat3SbIwLqutHEyvn5igKMczrNcXGWwCs+l6Kxxe/1x8QOkQR
+         kcWyR/KZUNlkcq3dBrcx5UKfmXziaCh/LJpn/KXu8FlDFhXeST0ccdxcodtHz13DX7Oe
+         ehwFvX7W+XYkeZ02cPRqXMAQIUmFMfaFiZbYENnAvmlZLBn2rNKVy0ghS3HGbEJejnFq
+         Qv7t27sME2iyoFqdA8Md6EFT1R3yGo4tZ73ZK5xIiqhv5kTOTuDSUPYDc8H9jx+a60S4
+         AyUQpaqj0ZfrtJtQftSWuR7pB/hDBbbccCaq/3KXyMXY5Wm2XMA4Umbvt80JQApohS8z
+         OWYQ==
+X-Gm-Message-State: AOJu0YwztHQ+8J3V4qhRr8La4aieO/jLMDWSNCsDcqN4PK4iDe3qDm8G
+	JVKtxsowPnONpthdLqC7dDIMPcxV1nT6ylAhdsq94tl0622f9SVJ6kR8FPKhNdc=
+X-Google-Smtp-Source: AGHT+IGLPhdDO7pRt3bBLB/HTmhT6jn/PiAjDsJAdbXEEoMCh1K3Csdt1t+RiI4FscPM/06BAFaaDQ==
+X-Received: by 2002:a05:6512:224e:b0:52e:9cc7:4461 with SMTP id 2adb3069b0e04-5331c6900a4mr6652939e87.5.1724067085168;
+        Mon, 19 Aug 2024 04:31:25 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383935807sm621926966b.134.2024.08.19.04.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 04:31:24 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Date: Mon, 19 Aug 2024 13:31:02 +0200
+Subject: [PATCH RFC net-next] tcp: Allow TIME-WAIT reuse after 1
+ millisecond
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DS0PR12MB7970:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5f99a45-f46f-444f-efb7-08dcc0421c5e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NXVmcW5SdzQzYktmMUVIQkFpcXdTMjdld2tHTjRuMm9GSDhSZHQyUE9RdFAw?=
- =?utf-8?B?MHpJZzhpNkdaUW5WMnNrcW1McmZTVERDWXM1Lzl4OXI4K09tVFBKK0tlNXRR?=
- =?utf-8?B?U2J2MGh5SjlrRzVJTzFNZFZuUlMzaCsrQzhQMUZGOEhYeERzUEY5N2theDVP?=
- =?utf-8?B?RDhYbVV3OGprR2dGUXR3UFQvS0FJZlVqMW1ZSlYvL0lQUnpjckVwMjN6WXdq?=
- =?utf-8?B?Z0ZLZHlkOXVUMldNNGdaS3NwdDloWDZEQmFyS2c0WkZ5T2xsVXRJeUdOWUtU?=
- =?utf-8?B?a1ZEL25paXBvTzEvcXpiZUtvNFlxV0s2aVNNdXNtY2Q5U2ViQUx3S3pLOE1j?=
- =?utf-8?B?b3o4SjdsUkRhalNHMkM0YWJOWm1yOVZVa3JYVUJ4Q3RxYTNiMmNGNXRXREpp?=
- =?utf-8?B?ak9TQ05oK1RaUkhSYnNORHQyZldtTVBERU1NRVNrSjgxMGVsSFlzdFp2S0tM?=
- =?utf-8?B?djR6UVcrQlRvODkzMkJpTUNteEJKR2Zkb051QnF2VEpWTkpnZWgzc2pGMGxY?=
- =?utf-8?B?UEdBMmdKa1l6MEJXT1FGN29uUHRGblZybG5aVWxzQWdybUlXa0R4WExiS1RJ?=
- =?utf-8?B?Z1k0S1U5YytYcGlMcWhweU0xTWx1OVBVeituWUZBOWl6bHYxb1VuT3ZvWVJx?=
- =?utf-8?B?RlBpa05ZNVFQbXhRNEF5ZWx4R2p6c0dqVGhWMm1nYm9oTkRNSkxaS2lZUk5r?=
- =?utf-8?B?SGo2QjFFVkUxNEpnWGRKT2tPaVllKzllZHhkcjNWQXNPYlhJN0hmQ1JpZnBW?=
- =?utf-8?B?TVVXMU5aZHdVK2FVZWdxeURBQ0dwWjBCMjA5bWF2Ly83Sko5Mmx6S25pdTVj?=
- =?utf-8?B?NmxoVG5mR2tIY2QxcGpoN3p0cWZrY3BPMFVuUllFZ1ZiTzF4blcxczl0bkE5?=
- =?utf-8?B?RGZjZndqbEVNaUp4ZndOMHNCRGFlcHQzSjU1MjR6RzdVcE1jRmhqQUlxM0to?=
- =?utf-8?B?dHhXbkZ1a29ITUkrb2FPdlJHNTRacjJjejJTc3k2K0FDWEc2L3haRURzV0x3?=
- =?utf-8?B?WDRuVmpId24rYWtaZ0xiNkJXb2xXaS9Rd2NSNktmenhMc1JIUUpMSGVyakpC?=
- =?utf-8?B?eXdaV1lldWl0ZEhTOGxOa1drT3lveGkzWlV4NEoyVFY5cjNsOWF1bS9WNXRk?=
- =?utf-8?B?cEc5dUFEeTNDcmlsVWZvQThaWU8xUVBMZ2E2TmhDeDJlck1RZDBEZHFkZmlO?=
- =?utf-8?B?a3c3eE0wV1E1cnRNK2xQWkQzakZ3M2NDZE8rMloxdDhvY1JhUnlFQURFY0xW?=
- =?utf-8?B?UnVFL2NQL1BuWVlpUU5zOVZaT0NBV2FoWExhbklEWm13MTFVV1F5Sk5NeUxN?=
- =?utf-8?B?NlFvU2pEM2Q1dHRSVnhmK3VTZldJczJuZU0zWmhLbVBDa2xpR1VCUlpUL3Rr?=
- =?utf-8?B?Z0QxNEZiSkFoN0E4ZmRvb2FuQUtKWHYvQkJlWGlQSkdidFN4YU1vSExJVHpt?=
- =?utf-8?B?QytvRE1LSHV3SndxeXhSOXBYaWszNERjd3ZDVDVuRkhUVXZiTUt5Z29RbjJ0?=
- =?utf-8?B?T3pENU5Gb3ZDMlV5dnFGY2VDQWpVS2hSOW1IdHpjS21FZVVKUnZIU0oySlNp?=
- =?utf-8?B?Y0R4VW1DeUdIRTBhR0RMZU1MM1dVaUFDRmxUbkh5VmhxU2w3cWpabjREWlFF?=
- =?utf-8?B?cDdIVGUySklVNmMvSGt0SjcxMHhSY01mWWRlSi9qeFNFMzluUjVvc090K0Ja?=
- =?utf-8?B?WkYvZGJ5OGx5dURZbWdib1dvWGU4T2hLZ29QSEFDNS9seXNpUUFXeWM1QXBs?=
- =?utf-8?B?UWVtZHRpV2VUWVp2TE4wMjcvZXZYd3YzQk82YmFKd0JCRlNBcmNXMW9ybEND?=
- =?utf-8?B?S1ZmeUc5STRkcU1LU3RUQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b1h1U2w2VmVYc21kYkxmLzNtRkpaM1puVFB4NXFtZEVHNFVpcUY4OXZzSEN1?=
- =?utf-8?B?RTQxOXZNK3Rrc0RRajd0ZTg2dlpTN2pBQ3BnM1FiTk9TaFNuSkNWakFlR2F6?=
- =?utf-8?B?TU5wcEJQaEhmV1lyNzZLMEtqeGI0SlJsc3JwSGlmQnNETDdaVXVWdnczQ2l3?=
- =?utf-8?B?K2V3WnpzNEtHQjU0YWJITFFhcWRZZkg1VVI5T1RzSnJhbFVZL3RwK0pqam5u?=
- =?utf-8?B?VlR0RW5oc2dHTWxGTUNGNmhTNFB1em5qVWdVVW1NQndpK29raEg4LzZZUVg5?=
- =?utf-8?B?bHd1UmRQdHJOcE0xSDlic28yQ1JVUmk2YnprZUU4UHJYekRzdTFZTWptOFcr?=
- =?utf-8?B?dHF5ekdlanEzNVROR3gvWHduU3dJaVNybElPcXVTelJLRzlXRGVpRUlkNlZG?=
- =?utf-8?B?MS9TMWNpcG1VaEk2bFlYZDMxMWphc0s4cW81MVNWNUsvbUptbVErNk1UaGNo?=
- =?utf-8?B?ZXYzVWVkQ2lVcU95aHBIK0FoSlJUSGN2Z0JDSzFUTnlQL3YxZVN1RW5iemZX?=
- =?utf-8?B?S281VkhjK0V0em5DUHdXeVZwbGpjNHZ0RzhmSVI0a3dkRzZQc1R4U2U5cFlT?=
- =?utf-8?B?M1Z1NlhUeUJTVmZSWi9wQzhDOFVIU0NGQlR6MGdOZzFlSSt4SlBORGZrTDB3?=
- =?utf-8?B?NlNmUzNaN3JuUlpLdWhzYlpqejBycGVRR20yVURTTjczOGlDQjNtK2JPNkE5?=
- =?utf-8?B?bVpEQWtRZnBsZ2dLT3ZLU2tSVW53U1FBUkJRM1NnbXF1TFhwZWRJZEV4OHp2?=
- =?utf-8?B?US9Db3lRa01FeDlWQmZaejlob2dyZmprOEsrL2JsZzdzSTU4NTZMQVRORTJW?=
- =?utf-8?B?UGt4ZmQ4Nk1wb3JOLzdOOFMwQkhvYTVocEY3R1ZyNlpoKy9KMC9vNHVRbzhQ?=
- =?utf-8?B?NG8rb1VQZlRWUENraEhMRWNLZjByNUs0cUJJdllRL1Fiem9zZGtKRUtIeEJI?=
- =?utf-8?B?ZktXTUV6V2JTRkRUS0YxelFNdXBoZ1ZuNDB6YWpUUkRYNGZxTXZHYytpbDhv?=
- =?utf-8?B?dHAvc2gxMWZBZVVKSUNWdjlyT1BKQmU2TDFhVDJvM01Wc08zME5jZ3ZQUHpC?=
- =?utf-8?B?aGZzZnhTSW1GN3llTys0a2dNbGRhTHhFYkhqSnZlWUFlb1dScEFZcFFhVHQw?=
- =?utf-8?B?ZFZvSUZQeWVLU29qdWJmNk9qSFRvUk9OeWtNeXp6V1duV2REdUVrOUlNaWRS?=
- =?utf-8?B?WlkxSHhxcWhwNzhrMFZROUxKVHU4dkZ1Y2RtL1U3YmR1RkFBdUEzdnV2K205?=
- =?utf-8?B?K0Y3b2JxdW1uQWJvUjh2aGtLdlZEQkt1TFNtb3M3cExURlBrM3FETkh5cGdI?=
- =?utf-8?B?eVc3OXRrSjdTbThsT3J1T1pFcWcvOTVQYzdJSGtnbi84ZDdpU3dobEVMbDI2?=
- =?utf-8?B?ZEFSVU1jY2lvSkp4aHROWVI1ZlNKdUdQS3ovN0I2RUFTRHlrUmtqYUo5ZGlj?=
- =?utf-8?B?dVJQb2NZVy9XTm1CYVFUUGRkYVdmSVpNamFkV3NScHAvQWo0dFh3aFg4YVpm?=
- =?utf-8?B?UEFVQVlCcHlHNFlIdCsvd2x1MndaRzBSRFJjbWRXQ1gxeHc3Tm5WOGc0VERB?=
- =?utf-8?B?cUlERTZ5TDh2TTc2Y2c0S3BOVzQ1SzJ5UkVjMlBFY1lBbWV1Mzlsb2NJVjVU?=
- =?utf-8?B?U2RBT3pnbU15TWtmdW0zWGdKUVlFTnpLRmh3eVpCME9ObGNadnZBS1g5SGZp?=
- =?utf-8?B?NWk4ckZIczliUkhsTDR4d2pCa01hdFJ1SU5ZREszQXpqR2NBQzVWVFhoQmI4?=
- =?utf-8?B?cVcyYkkzQUZUZUQ2aVJIV1YwKzVCajNyZTlNVWxyaGRBbkFLeDhMZWVGakQr?=
- =?utf-8?B?UitIVEZzbWNTM3JBdElmMU5wY2I5eDdTSUhjZ1RDYTBEYXc4OUJPNHllUHRa?=
- =?utf-8?B?OUJKNzBTNVV4WmgwRWgyR1hmeDltQTd5QUFLMllaM0FiOXJSMENyQTVPVkJU?=
- =?utf-8?B?bUVvMGYxQUpNbVhuUjVEK0ErdmVwWG5tTnc4VXFYeUtvRU1zUGFoTXhZa0xI?=
- =?utf-8?B?QVRmelpnMEwvK3hjZHZZcVphNi9Bc0tQVkRmVW1Zc3k3L05SUnJBcWxkbThm?=
- =?utf-8?B?ZENkOTRqM3ZYcFh4N1M4VkNjWXBTSGlYeC9JcUlqcEdMek95VDN3U2o2WTFq?=
- =?utf-8?Q?lhbn+Pb8bDUjZFN0A+3EU/CWd?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5f99a45-f46f-444f-efb7-08dcc0421c5e
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2024 11:28:55.8982
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 35FLw9WQOWiq0teQTrr6JTnKO1c4KsVrIAyLWVsyl/EXGu5YvdGujfCZbWikY7FlA5HtxMyvVlx7tUkLgK4+NA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7970
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20240819-jakub-krn-909-poc-msec-tw-tstamp-v1-1-6567b5006fbe@cloudflare.com>
+X-B4-Tracking: v=1; b=H4sIAPUsw2YC/42NSw6CMBRFt0Le2GdaPkodmZi4AKeGQS0PrUBL2
+ oIYwt5tWIHDk3tzzgKenCYPp2QBR5P22poIfJeAeknzJNR1ZEhZmrOSF/iW7fjA1hkUTOBgFfa
+ eFIYPBh9kPyArpKyLQ5bLYw5RMzhq9Lwl7nC7XhJDAQ3NAaq4vrQP1n23/sS3z/+piSNHKQpRK
+ p4x0aiz6uxYN510tFe2h2pd1x+2qfcz4wAAAA==
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, kernel-team@cloudflare.com
+X-Mailer: b4 0.14.1
 
+[This patch needs a description. Please see the RFC cover letter below.]
 
-On 8/18/24 09:07, Zhi Wang wrote:
-> On Thu, 15 Aug 2024 17:40:35 +0100
-> Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
->
->> On Wed, 14 Aug 2024 08:56:35 +0100
->> Alejandro Lucero Palau <alucerop@amd.com> wrote:
->>
->>> On 8/4/24 18:15, Jonathan Cameron wrote:
->>>> On Mon, 15 Jul 2024 18:28:22 +0100
->>>> alejandro.lucero-palau@amd.com wrote:
->>>>   
->>>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>>
->>>>> Create a new function for a type2 device initialising the opaque
->>>>> cxl_dev_state struct regarding cxl regs setup and mapping.
->>>>>
->>>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->>>>> ---
->>>>>    drivers/cxl/pci.c                  | 28
->>>>> ++++++++++++++++++++++++++++ drivers/net/ethernet/sfc/efx_cxl.c
->>>>> |  3 +++ include/linux/cxl_accel_mem.h      |  1 +
->>>>>    3 files changed, 32 insertions(+)
->>>>>
->>>>> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
->>>>> index e53646e9f2fb..b34d6259faf4 100644
->>>>> --- a/drivers/cxl/pci.c
->>>>> +++ b/drivers/cxl/pci.c
->>>>> @@ -11,6 +11,7 @@
->>>>>    #include <linux/pci.h>
->>>>>    #include <linux/aer.h>
->>>>>    #include <linux/io.h>
->>>>> +#include <linux/cxl_accel_mem.h>
->>>>>    #include "cxlmem.h"
->>>>>    #include "cxlpci.h"
->>>>>    #include "cxl.h"
->>>>> @@ -521,6 +522,33 @@ static int cxl_pci_setup_regs(struct
->>>>> pci_dev *pdev, enum cxl_regloc_type type, return
->>>>> cxl_setup_regs(map); }
->>>>>    
->>>>> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct
->>>>> cxl_dev_state *cxlds) +{
->>>>> +	struct cxl_register_map map;
->>>>> +	int rc;
->>>>> +
->>>>> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV,
->>>>> &map);
->>>>> +	if (rc)
->>>>> +		return rc;
->>>>> +
->>>>> +	rc = cxl_map_device_regs(&map,
->>>>> &cxlds->regs.device_regs);
->>>>> +	if (rc)
->>>>> +		return rc;
->>>>> +
->>>>> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
->>>>> +				&cxlds->reg_map);
->>>>> +	if (rc)
->>>>> +		dev_warn(&pdev->dev, "No component registers
->>>>> (%d)\n", rc);
->>>> Not fatal?  If we think it will happen on real devices, then
->>>> dev_warn is too strong.
->>>
->>> This is more complex than what it seems, and it is not properly
->>> handled with the current code.
->>>
->>> I will cover it in another patch in more detail, but the fact is
->>> those calls to cxl_pci_setup_regs need to be handled better,
->>> because Type2 has some of these registers as optional.
->> I'd argue you don't have to support all type 2 devices with your
->> first code.  Things like optionality of registers can come in when
->> a device shows up where they aren't present.
->>
->> Jonathan
->>
-> I think it is more like we need to change those register
-> probe routines to probe and return the result, but not decide
-> if the result is fatal or not. Let the caller decide it. E.g. type-3
-> assumes some registers group must be present, then the caller of type-3
-> can throw a fatal. While, type-2 just need to remember if the register
-> group is present or not. A register group is missing might not be fatal
-> to a type-2.
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Can we shorten the TCP connection reincarnation period?
 
+Situation
+=========
 
-I agree.
+Currently, we can reuse a TCP 4-tuple (source IP + port, destination IP + port)
+in the TIME-WAIT state to establish a new outgoing TCP connection after a period
+of 1 second. This period, during which the 4-tuple remains blocked from reuse,
+is determined by the granularity of the ts_recent_stamp / tw_ts_recent_stamp
+timestamp, which presently uses a 1 Hz clock (ktime_get_seconds).
 
+The TIME-WAIT block is enforced by __{inet,inet6}_check_established ->
+tcp_twsk_unique, where we check if the timestamp clock has ticked since the last
+ts_recent_stamp update before allowing the 4-tuple to be reused.
 
-> E.g.
->
-> 1) moving the judges out of cxl_probe_regs() and wrap them into a
-> function. e.g. cxl_check_check_device_regs():
->          case CXL_REGLOC_RBI_MEMDEV:
->                  dev_map = &map->device_map;
->                  cxl_probe_device_regs(host, base, dev_map);
->
-> 		/* Moving the judeges out of here. */
->                  if (!dev_map->status.valid ||
->                      ((caps & CXL_DRIVER_CAP_MBOX) &&
->                  !dev_map->mbox.valid) || !dev_map->memdev.valid) {
->                          dev_err(host, "registers not found: %s%s%s\n",
->                                  !dev_map->status.valid ? "status " : "",
->                                  ((caps & CXL_DRIVER_CAP_MBOX) &&
->                  !dev_map->mbox.valid) ? "mbox " : "",
->                  !dev_map->memdev.valid ? "memdev " : ""); return -ENXIO;
->                  }
->
-> 2) At the top caller for type-3 cxl_pci_probe():
->
->          rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map,
->                                  cxlds->capabilities);
->          if (rc)
->                  return rc;
->
-> 	/* call cxl_check_device_regs() here, if fail, throw fatal! */
->
-> 3) At the top caller for type-2 cxl_pci_accel_setup_regs():
->
-> 	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map,
->                                  cxlds->capabilities);
->          if (rc)
->                  return rc;
->
-> /* call cxl_check_device_regs() here,
->   * if succeed, map the registers
->   * if fail, move on, no need to throw fatal.
->   */
-> 	rc = cxl_map_device_regs(&map, &cxlds->regs.device_regs);
->          if (rc)
->                  return rc;
->
-> With the changes, we can let the CXL core detects what the registers the
-> device has, maybe the driver even doesn't need to tell the CXL core,
-> what caps the driver/device has, then we don't need to introduce the
-> cxlds->capabilities? the CXL core just go to check if a register group's
-> vaddr mapping is present, then it knows if the device has a
-> register group or not, after the cxl_pci_accel_setup_regs().
+This mechanism, introduced in 2002 by commit b8439924316d ("Allow to bind to an
+already in use local port during connect") [1], protects the TCP receiver
+against segments from an earlier incarnation of the same connection (FIN
+retransmits), which could potentially corrupt the TCP stream, as described by
+RFC 7323 [2, 3].
 
+Problem
+=======
 
-I thought about building up the device capabilities based on what the 
-registers show instead of explicitly stated by the driver, what I think 
-it is your point, but I think we need those capabilities in one way or 
-another, not just for pure information purposes but also for finding out 
-if other initialization should fail or not, what was the original goal 
-behind this patch. The driver could also define those capabilities to 
-expect and check out after identified by the registers initialization if 
-they match.
+The one-second reincarnation period has not posed a problem when we had a
+sufficiently large pool of ephemeral ports (tens of thousands per host).
+However, as we began sharing egress IPv4 addresses between hosts by partitioning
+the available port range [4], the ephemeral port pool size has shrunk
+significantly—down to hundreds of ports per host.
 
+This reduction in port pool size has made it clear that a one-second connection
+reincarnation period can lead to ephemeral port exhaustion. Short-lived TCP
+connections, such as DNS queries, can complete in milliseconds, yet the TCP
+4-tuple remains blocked for a period of time that is orders of magnitude longer.
 
-So yes, I think it could go this way, but I would prefer to do such a 
-refactoring after this initial type2 support.
+Solution
+========
 
+We would like to propose to shorten the period during which the 4-tuple is tied
+up. The intention is to enable TIME-WAIT reuse at least as quickly as it takes
+nowadays to perform of a short-lived TCP connection, from setup to teardown.
 
-> Thanks,
-> Zhi.
->
+The ts_recent_stamp protection is based on the same principle as PAWS but
+extends it across TCP connections. As RFC 7323 outlines in Appendix B.2, point
+(b):
+
+    An additional mechanism could be added to the TCP, a per-host
+    cache of the last timestamp received from any connection.  This
+    value could then be used in the PAWS mechanism to reject old
+    duplicate segments from earlier incarnations of the connection,
+    if the timestamp clock can be guaranteed to have ticked at least
+    once since the old connection was open.  This would require that
+    the TIME-WAIT delay plus the RTT together must be at least one
+    tick of the sender's timestamp clock.  Such an extension is not
+    part of the proposal of this RFC.
+
+Due to that, we would want to follow the same guidelines as the for TSval
+timestamp clock, for which RFC 7323 recommends a frequency in the range of 1 ms
+to 1 sec per tick [5], when reconsidering the default setting.
+
+(Note that the Linux TCP stack has recently introduced even finer granularity
+with microsecond TSval resolution in commit 614e8316aa4c "tcp: add support for
+usec resolution in TCP TS values" [6] for use in private networks.)
+
+A simple implementation could be to switch from a second to a millisecond clock,
+as demonstrated by the following patch. However, this could also be a tunable
+option to allow administrators to adjust it based on their specific needs and
+risk tolerance.
+
+A tunable also opens the door to letting users set the TIME-WAIT reuse period
+beyond the RFC 7323 recommended range at their own risk.
+
+Workaround
+==========
+
+Today, when an application has only a small ephemeral port pool available, we
+work around the 1-second reincarnation period by manually selecting the local
+port with an explicit bind().
+
+This has been possible since the introduction of the ts_recent_stamp protection
+mechanism [1]. However, it is unclear why this is allowed for egress
+connections.
+
+To guide readers to the relevant code: if the local port is selected by the
+user, we do not pass a TIME-WAIT socket to the check_established helper from
+__inet_hash_connect. This way we circumvent the timestamp check in
+tcp_twsk_unique [7] (as twp is NULL).
+
+However, relying on this workaround conflicts with our goal of delegating TCP
+local port selection to the network stack, using the IP_BIND_ADDRESS_NO_PORT [8]
+and IP_LOCAL_PORT_RANGE [9] socket options.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b8439924316d5bcb266d165b93d632a4b4b859af
+[2] https://datatracker.ietf.org/doc/html/rfc7323#section-5.8
+[3] https://datatracker.ietf.org/doc/html/rfc7323#appendix-B
+[4] https://lpc.events/event/16/contributions/1349/
+[5] https://datatracker.ietf.org/doc/html/rfc7323#section-5.4
+[6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=614e8316aa4cafba3e204cb8ee48bd12b92f3d93
+[7] https://elixir.bootlin.com/linux/v6.10/source/net/ipv4/tcp_ipv4.c#L156
+[8] https://manpages.debian.org/unstable/manpages/ip.7.en.html#IP_BIND_ADDRESS_NO_PORT
+[9] https://manpages.debian.org/unstable/manpages/ip.7.en.html#IP_LOCAL_PORT_RANGE
+---
+
+---
+ drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c | 2 +-
+ include/linux/tcp.h                                         | 4 ++--
+ net/ipv4/tcp_input.c                                        | 2 +-
+ net/ipv4/tcp_ipv4.c                                         | 5 ++---
+ net/ipv4/tcp_minisocks.c                                    | 9 ++++++---
+ 5 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+index 6f6525983130..b15b26db8902 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+@@ -1866,7 +1866,7 @@ static void chtls_timewait(struct sock *sk)
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 
+ 	tp->rcv_nxt++;
+-	tp->rx_opt.ts_recent_stamp = ktime_get_seconds();
++	tp->rx_opt.ts_recent_stamp = tcp_clock_ms();
+ 	tp->srtt_us = 0;
+ 	tcp_time_wait(sk, TCP_TIME_WAIT, 0);
+ }
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 6a5e08b937b3..174257114ee4 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -110,7 +110,7 @@ struct tcp_sack_block {
+ 
+ struct tcp_options_received {
+ /*	PAWS/RTTM data	*/
+-	int	ts_recent_stamp;/* Time we stored ts_recent (for aging) */
++	u32	ts_recent_stamp;/* Time we stored ts_recent (for aging) */
+ 	u32	ts_recent;	/* Time stamp to echo next		*/
+ 	u32	rcv_tsval;	/* Time stamp value             	*/
+ 	u32	rcv_tsecr;	/* Time stamp echo reply        	*/
+@@ -543,7 +543,7 @@ struct tcp_timewait_sock {
+ 	/* The time we sent the last out-of-window ACK: */
+ 	u32			  tw_last_oow_ack_time;
+ 
+-	int			  tw_ts_recent_stamp;
++	u32			  tw_ts_recent_stamp;
+ 	u32			  tw_tx_delay;
+ #ifdef CONFIG_TCP_MD5SIG
+ 	struct tcp_md5sig_key	  *tw_md5_key;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e37488d3453f..873a1cbd6d14 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3778,7 +3778,7 @@ static void tcp_send_challenge_ack(struct sock *sk)
+ static void tcp_store_ts_recent(struct tcp_sock *tp)
+ {
+ 	tp->rx_opt.ts_recent = tp->rx_opt.rcv_tsval;
+-	tp->rx_opt.ts_recent_stamp = ktime_get_seconds();
++	tp->rx_opt.ts_recent_stamp = tcp_clock_ms();
+ }
+ 
+ static void tcp_replace_ts_recent(struct tcp_sock *tp, u32 seq)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index fd17f25ff288..47e2dcda4eae 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -116,7 +116,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+ 	const struct inet_timewait_sock *tw = inet_twsk(sktw);
+ 	const struct tcp_timewait_sock *tcptw = tcp_twsk(sktw);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+-	int ts_recent_stamp;
++	u32 ts_recent_stamp;
+ 
+ 	if (reuse == 2) {
+ 		/* Still does not detect *everything* that goes through
+@@ -157,8 +157,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+ 	 */
+ 	ts_recent_stamp = READ_ONCE(tcptw->tw_ts_recent_stamp);
+ 	if (ts_recent_stamp &&
+-	    (!twp || (reuse && time_after32(ktime_get_seconds(),
+-					    ts_recent_stamp)))) {
++	    (!twp || (reuse && (u32)tcp_clock_ms() != ts_recent_stamp))) {
+ 		/* inet_twsk_hashdance_schedule() sets sk_refcnt after putting twsk
+ 		 * and releasing the bucket lock.
+ 		 */
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index a19a9dbd3409..d2a62c88806f 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -101,7 +101,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	struct tcp_options_received tmp_opt;
+ 	struct tcp_timewait_sock *tcptw = tcp_twsk((struct sock *)tw);
+ 	bool paws_reject = false;
+-	int ts_recent_stamp;
++	u32 ts_recent_stamp;
+ 
+ 	tmp_opt.saw_tstamp = 0;
+ 	ts_recent_stamp = READ_ONCE(tcptw->tw_ts_recent_stamp);
+@@ -576,7 +576,7 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
+ 	if (newtp->rx_opt.tstamp_ok) {
+ 		newtp->tcp_usec_ts = treq->req_usec_ts;
+ 		newtp->rx_opt.ts_recent = READ_ONCE(req->ts_recent);
+-		newtp->rx_opt.ts_recent_stamp = ktime_get_seconds();
++		newtp->rx_opt.ts_recent_stamp = tcp_clock_ms();
+ 		newtp->tcp_header_len = sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALIGNED;
+ 	} else {
+ 		newtp->tcp_usec_ts = 0;
+@@ -659,6 +659,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 		tcp_parse_options(sock_net(sk), skb, &tmp_opt, 0, NULL);
+ 
+ 		if (tmp_opt.saw_tstamp) {
++			unsigned int rsk_timeout;
++
+ 			tmp_opt.ts_recent = READ_ONCE(req->ts_recent);
+ 			if (tmp_opt.rcv_tsecr)
+ 				tmp_opt.rcv_tsecr -= tcp_rsk(req)->ts_off;
+@@ -666,7 +668,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 			 * it can be estimated (approximately)
+ 			 * from another data.
+ 			 */
+-			tmp_opt.ts_recent_stamp = ktime_get_seconds() - reqsk_timeout(req, TCP_RTO_MAX) / HZ;
++			rsk_timeout = jiffies_to_msecs(reqsk_timeout(req, TCP_RTO_MAX));
++			tmp_opt.ts_recent_stamp = tcp_clock_ms() - rsk_timeout;
+ 			paws_reject = tcp_paws_reject(&tmp_opt, th->rst);
+ 		}
+ 	}
+
 
