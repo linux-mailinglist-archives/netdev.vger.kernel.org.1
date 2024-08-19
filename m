@@ -1,166 +1,94 @@
-Return-Path: <netdev+bounces-119622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965E79565F7
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:49:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C9F956602
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40EAB1F25D06
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 08:49:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 412D5283EB1
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 08:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8552315B546;
-	Mon, 19 Aug 2024 08:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B620715B560;
+	Mon, 19 Aug 2024 08:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K8xOYRzT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PF4C8kI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A6715CD58
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 08:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEEB14BF8A;
+	Mon, 19 Aug 2024 08:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724057317; cv=none; b=RBlwo97Mun2cgzTztuhtlLddzG7A5L9X84VRjnjTXReR9vW/GiInTCR8cM+oD0t2owJznMenwp0MW45sN00z3Ayg/WxWx/4uI+ix636OM4gVh17vFMApu+yZilGx8oFhl6H7S7OC00dAylC/oISs9d4xgo6ocAw2g9BqNHGVNgM=
+	t=1724057425; cv=none; b=FyTNy0PuRwtP+dOePmzqrd8Chk7WRjsT20WVE8TxYFx0680ZWAMbmfsxEXkzv1zZDsYaiVuAb3bvvvp7XkJf5u072LdFi2HKh/uzNMcRyYP7udMd2JjSHZz4eA/isEO91vp6N2ux1WWyFkH+hpmYwBh+dgPB+VvWhWNpW+by5bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724057317; c=relaxed/simple;
-	bh=QgWNdxuaXxowMM7Zad8szQ8kTHb3DEg2AE7frDExoyk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tT8+te4OlzeOHjeEwOYovIMmb9nNbhbJQBlwrsAoDQuP10yd+JhCLgytgj4r29QhZI8UwFPAKzCAcsyyZb9twOefF9UAKwS62dmtrYB3HjusLl35Cr6OVZZV26QQ1+DSiWVAfYiXkbf4RlgTUIsLmJ7Ctsn4g97CxB0cP/wK2Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=K8xOYRzT; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a83597ce5beso613156266b.1
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 01:48:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1724057314; x=1724662114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Fg7adxtw1wHc/80Fw03H7ZBiEBIGBaYUl+MvLIdJnU=;
-        b=K8xOYRzTaT5dLW4VYeKaOHoS4v82bNV33Zdh14BJ4AhKoCQw1WQaLEzC4vcXaH/9zu
-         vAHcsL0pShWBAboYmZy4F1vRl2jHUS+ILmBhJ2kcP8iwyrgdbZntwtHJkWjLabiNmPrT
-         BFp1x0JttFd9RuURjHrZnVt0nhlKUOsuZFxuQdiPj1KxRwGRPtWYuFIJ6SK/ALCQql3Z
-         zxo+ZRYalu9dJdlq76wCq+5UtYtkF0neqiD84tT4GDfK4beMugDDya3DInXCtbEPQDKY
-         BBYbIfNFWQYJ1gAFDTEN+JqzWdX/AKivuOgSTUHZQLd11A5MM2wEh9FL+M4WcQVzUrf6
-         jqAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724057314; x=1724662114;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Fg7adxtw1wHc/80Fw03H7ZBiEBIGBaYUl+MvLIdJnU=;
-        b=twSZ48qdNx4YCwlYsx9mvlaoxxoF0hMYooZVHEU59PO8MqUCVFMrwgz9zTkg3uMSFE
-         lbHe0845vjbwWFa+WNwvWGcmZ5bkWmJfa7tQfVmVz8PK/WI2xFY0ysoAlqxHvgCYgYWy
-         MgUOGkxIrgdvNHk4H7e96bSwYxohmqmYuuTSYBMubEbRByaw14WBEUV1rQv1mCN18iVQ
-         ZnTBkXd+RRq/o/LzsJOc6HOsEw2mnjBiTJSds58mtucTW1crIJFKq+C+ldVaMqSQUj0W
-         jnHMiLddGCFOku9N7culUL1RmR+P+4jS8t6vBGPgWIDTgc5Q0+Y6oWR/jelrqGy0IOE5
-         h4iQ==
-X-Gm-Message-State: AOJu0YzrDQ0QwHjir79D2TRFRCZhD9YkrvnOUVcl8c52XKElcvNz4V/i
-	MekNK4AHVEldqyJR41tfQy1a8FHGlRFZpMCegRDUL2oi1G471xgbeHDe7Yke2o0=
-X-Google-Smtp-Source: AGHT+IFPJMZp1Zs/cpJsATp7EFOjfpi5/Ke8sqnNIdnRsaYtIlkv656ev5mPGA9YjYhrj+nB4yBerw==
-X-Received: by 2002:a17:907:7f15:b0:a77:f5fc:cb61 with SMTP id a640c23a62f3a-a8394afbf80mr925164666b.0.1724057313592;
-        Mon, 19 Aug 2024 01:48:33 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838cfe4csm606490066b.89.2024.08.19.01.48.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2024 01:48:33 -0700 (PDT)
-Message-ID: <b591649f-ada5-42c1-984c-7e358c0337fa@blackwall.org>
-Date: Mon, 19 Aug 2024 11:48:32 +0300
+	s=arc-20240116; t=1724057425; c=relaxed/simple;
+	bh=OCRaPalAGsDxHnsThodnFYpon6u+zr5gMnTg0RBz0iU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N37omILYWh9g6+pnV86ILH4Xsh1SZRXeohrOqto67YqSA6TvOb7e7NP/gDAWaX7O5iLkFLgL4+50K/1S2Y3Rs45fmghpM4AW/XBiGgg9/c+5V2/Q5k/KvCS9inyQrFalG1ZY1+gmvnpGHFQxXVwcYHAMPrnWKldSyJ27fcWoRn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PF4C8kI0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11AABC32782;
+	Mon, 19 Aug 2024 08:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724057425;
+	bh=OCRaPalAGsDxHnsThodnFYpon6u+zr5gMnTg0RBz0iU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PF4C8kI0co60PfDbF+RsNfA1uS7Y4OTN9qiSz/Cuv/mVcrnF5rc5aM5kcgXti4IAr
+	 oPZ91DiecIhisuFsQ3dItPlsTC8LqBbMLDwZ52iLSCb8JJLyA9iZMadmmIaazvOSsF
+	 hErhKQk7hnWuBNEDaB9xluI+D6IsdsiYus4b8nYdt3H8hdGuVB68qXxDlOYbVg3Pm1
+	 6hy2fBNtb0a1kXaa8k3jIvGDu7yPNLGCl7qDMgxQ7VVVEErHalSXE1ZZYy7ZxxxFqY
+	 hsT+AKbkpyu7xwLxvivZCsP+q3t/h4m0aEGzrghOqxGDA2NX0mnqVwCzIlVExBRsB1
+	 C+rOmk/yzok4w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD733823097;
+	Mon, 19 Aug 2024 08:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next 1/3] bonding: add common function to check
- ipsec device
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <20240819075334.236334-1-liuhangbin@gmail.com>
- <20240819075334.236334-2-liuhangbin@gmail.com>
- <a60116a2-bcbd-4d0f-9cfb-7717c188e26f@blackwall.org>
- <ZsMFspiLZojq3EIO@Laptop-X1>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <ZsMFspiLZojq3EIO@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/1] dt-binding: ptp: fsl,ptp: add pci1957,ee02 compatible
+ string for fsl,enetc-ptp
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172405742451.466743.15434541397168706407.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Aug 2024 08:50:24 +0000
+References: <20240814204619.4045222-1-Frank.Li@nxp.com>
+In-Reply-To: <20240814204619.4045222-1-Frank.Li@nxp.com>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: yangbo.lu@nxp.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, richardcochran@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
 
-On 19/08/2024 11:43, Hangbin Liu wrote:
-> On Mon, Aug 19, 2024 at 11:02:14AM +0300, Nikolay Aleksandrov wrote:
->>> +static struct net_device bond_ipsec_dev(struct xfrm_state *xs)
->>> +{
->>> +	struct net_device *bond_dev = xs->xso.dev;
->>> +	struct net_device *real_dev;
->>> +	struct bonding *bond;
->>> +	struct slave *slave;
->>> +
->>> +	if (!bond_dev)
->>> +		return NULL;
->>> +
->>> +	bond = netdev_priv(bond_dev);
->>> +	slave = rcu_dereference(bond->curr_active_slave);
->>> +	real_dev = slave ? slave->dev : NULL;
->>> +
->>> +	if ((BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) ||
->>> +	    !slave || !real_dev || !xs->xso.real_dev)
->>> +		return NULL;
->>
->> No need to check !slave again here.  !real_dev implies !slave and
->> vice-versa, if it is set then we must have had a slave.
-> 
-> Ah yes, I missed this.
-> 
+Hello:
 
-This is exactly my point about it being easier to follow if it's not all
-combined in this way.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
->> I prefer the more obvious way - check slave after deref and
->> bail out, similar to my fix, I think it is easier to follow the
->> code and more obvious. Although I don't feel strong about that
->> it's just a preference. :)
+On Wed, 14 Aug 2024 16:46:18 -0400 you wrote:
+> fsl,enetc-ptp is embedded pcie device. Add compatible string pci1957,ee02.
 > 
-> I don't have a inclination, I just want to check all the error and fail out.
-> If we check each one separately, do you think if I should do like
+> Fix warning:
+> arch/arm64/boot/dts/freescale/fsl-ls1028a-kontron-kbox-a-230-ls.dtb: ethernet@0,4:
+> 	compatible:0: 'pci1957,ee02' is not one of ['fsl,etsec-ptp', 'fsl,fman-ptp-timer', 'fsl,dpaa2-ptp', 'fsl,enetc-ptp']
 > 
-> 	if (!bond_dev)
-> 		return NULL;
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > 
-> 	bond = netdev_priv(bond_dev);
-> 	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
-> 		return NULL;
-> 
-> 	slave = rcu_dereference(bond->curr_active_slave);
-> 	if (!slave)
-> 		return NULL;
-> 
+> [...]
 
-I like this, even though it's more verbose, it's also easier to follow.
-The alternative I have to track all code above and then verify the
-combined check below. Depending on how complex it is, might be ok.
-As I said it's a preference, if you prefer the other way - I don't mind.
+Here is the summary with links:
+  - [1/1] dt-binding: ptp: fsl,ptp: add pci1957,ee02 compatible string for fsl,enetc-ptp
+    https://git.kernel.org/netdev/net-next/c/1bf8e07c382b
 
->>> +	WARN_ON(xs->xso.real_dev != slave->dev);
-> 
-> Here as you said, the WARN_ON would be triggered easily, do you think if I
-> should change to pr_warn or salve_warn?
-> 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I haven't verified it, but yeah. Given how these are synced, it should be something
-that's limited (we're talking about packets here, we shouldn't flood the logs) and
-not a WARN_ON(). We can see any mid-state while changing.
-
-> Thanks
-> Hangbin
-
-Cheers,
- Nik
 
 
