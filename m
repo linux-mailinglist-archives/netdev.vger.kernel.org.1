@@ -1,197 +1,153 @@
-Return-Path: <netdev+bounces-119888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4FD95757B
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:16:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFFFE957587
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 22:17:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA7B81C20E81
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:16:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 567C21F21436
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93FC156C70;
-	Mon, 19 Aug 2024 20:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72281581F9;
+	Mon, 19 Aug 2024 20:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BGZEe2eU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="agmrdRYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3C17FBC2;
-	Mon, 19 Aug 2024 20:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4F549627
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 20:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724098568; cv=none; b=t5nwUx7yENhf+qH5f7nWxiNX0//PUz4cMCLaq4tPFstK4ozy4FIKdhff+Yks+KUy+F+28JEUwXvt5slIfYWl2cLTmYQ3m6+E0Os/+mwNJwl7rmVKRBAqfKrI/DMQ5B5TEohJnAVkkIuc2zcHBbBnw0MINV8OngeZOiitdZomQBw=
+	t=1724098627; cv=none; b=e1WNQRDggvmJZnYOBP3mTs5iQpEe7rQGjHUZZZixXSToDkb6z7JoUG8uKKfT66o0+JxmlrGwp8n81oTFLOhBwo1+IIRn4vTlssRN1Lf1s7FaiJ11H/jEvGW5luZm1dZQOFj1xoK1wyiyah8PI7yyq4xaMLPcsv67kKjwwwp6EDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724098568; c=relaxed/simple;
-	bh=tKSoRUQpXePqqNTuO8rItPgcLe8nqBrJWVuADpXoCjA=;
+	s=arc-20240116; t=1724098627; c=relaxed/simple;
+	bh=vx21SrjktdsbtSbDIQ40rp5dy3lmYsFI0PrEODgHFiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jbxOGApVhngVmtnGZnMljgS8pTUw4lwLhyXMfwX1Vyy8CXqOitviVt56B7x6HIUloqFnPbJ75T2jaXv5VQ4tGgRlrhyOKTbuN8X+ZM8Y9IfKR8k9sRVIE5I8xW81+vaNPbalcgF0UKnzTV1wj61XOf9fpW3EcWKpWRN5aaDI4z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BGZEe2eU; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7126d62667bso2746461b3a.3;
-        Mon, 19 Aug 2024 13:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724098566; x=1724703366; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FrgAIDdpTJtQEBQLOPROESfX8lbaYtW70SZKJ96zmp0=;
-        b=BGZEe2eUViAtDk5fK3O5GqyuIrkDtbjjz1UJ408lEOnwMFrmimNtPxRLdf08T5POqW
-         qMayShKaLiqn49CH/sKnXyHWMjcN2eUJmRt1bruo6Ktl3LVf6qw8DxZTpwzevwnA0dwO
-         kn8HEOvvIEqIVrbZyoNLPz5esIT3M2RBP41kuCXAuLuhbJBPcIhNLfrvG8d8WQVwQh7z
-         NbM+nN/ain33GBomm3giWA5aqL+dPM43sHzMPgbw3eyATQTwJDPCQHni68gCm1JRZO0M
-         roXR/CcLarOfFmnEw78wfyQG21i5pIUQ73K2q8HULQx1Zr5nWqfVXrFwkySRUBqjiM7m
-         FTtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724098566; x=1724703366;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FrgAIDdpTJtQEBQLOPROESfX8lbaYtW70SZKJ96zmp0=;
-        b=sRhro2CZ5SOMh5XXd2zK64iEHptLmAcwHPjXu4z0HuwiUzCYRGcm4LyNJbhU3lOigD
-         s7wNaMjrV4zo7repr1RjDVdfduFvcbWNAdoLwLG//H3DlYLfm0FTQtxPNiOFyQ5m2SsV
-         Orf9BvnHfIgxq5B5PYetIGnJvEdryPVOZr6Mj9R2l0w5Bm1qdAYksd/SnjfRsY9pLXeU
-         c9G45ghjrPaHB0BY6CL3WE9iorsIQFY12MnGPZKFUeTS5DuPxhYBxbcqg7XkA1MlSoTo
-         M4z+QZ1bkR0R6QoYdbKqhX/5XmsfQvRAG+Qj2iPnUG8VnTNkR4TtALo1tX1jlcRNk6aU
-         Ts5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUPAzbZ4VmJWQcT82sscz6UyUfaAylmdkbCmpvu94j+CLnpMo1/IscBoSnKlqyeoZ0pz08IsDLYc3dGBB3cnlUuzE41zdlDm+jWFw0cAMG8SHt5BEZSYbKsSDDPr0+6lHU7sQbXyNjfQveX6Y0MZ8JF35NgxgcWDzsg1xmXDsW9l7d8zf9OCFyY2xRT
-X-Gm-Message-State: AOJu0Yx4l8wqUhj3I0jSXmtBwMNLfC4F+TuJlk5Kaql+cT+w7Qlqu2IZ
-	z+UV+ByT+eeBhM8igivsV6RKD0gH11u2RvGxvMzwp6+Govh2SDtl
-X-Google-Smtp-Source: AGHT+IE0lM+jGCdajVXpacBz0vUoVs56Q6/TR5ea1dfxBHh0n6IZGwrc2PgaGKjQ0BSjJfw4NK2NwA==
-X-Received: by 2002:a05:6a00:174c:b0:713:f127:ad5c with SMTP id d2e1a72fcca58-713f127b28amr3702328b3a.28.1724098566420;
-        Mon, 19 Aug 2024 13:16:06 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af3f690sm6888850b3a.211.2024.08.19.13.16.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 13:16:06 -0700 (PDT)
-Date: Mon, 19 Aug 2024 14:16:04 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com,
-	jmorris@namei.org, serge@hallyn.com,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bjorn3_gh@protonmail.com, jannh@google.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v9 0/5] Landlock: Add abstract unix socket connect
- restriction
-Message-ID: <ZsOoBPpNZ+8KXKus@tahera-OptiPlex-5000>
-References: <cover.1723615689.git.fahimitahera@gmail.com>
- <20240819.Gie1thiegeek@digikod.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ULP+qPhGPsbf+GEM4eJOAspxpQRCzuTLzW92+EyvUCNh1B+F3ga008S+03MkA4lvKeYXIsG5sJxNY8+Hlsm90xP06R11TElMZBz8LCxidx13DUxYReWIhOuJf0W8/k3D9B39edlmqI0xoEZHQSle2UsDdQzpt9JTDCE+dZPRjkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=agmrdRYZ; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724098625; x=1755634625;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vx21SrjktdsbtSbDIQ40rp5dy3lmYsFI0PrEODgHFiM=;
+  b=agmrdRYZ/LrB3mByA6B8kXB8DHIfZyvGIkHqMn7ZurzBkeRc8oayH78f
+   FvUWGaZxQQ72at6NsaSLcj6BHVwzziGXKFsDoUJU3QT74j6Tm7fGo8Q0a
+   bMlqMH2wYVNYSQEgpPOga/tl/qB5Nzg5lTxeWICBeI952GYvyo8baXk0+
+   dzKTvEpU7gsPgur0jQztk+9eVcgYuvDVAEeMoTf7GnvGbckVqsM8UPNUB
+   B0SuB5jZL0dfQyyjI+zKq2jOLe+WZDtl21+Jw1OBC/AxJzOuYZdohrFbl
+   01gNxi/EiILUDV+80mS6Ugg5m6bGCZIYKtnnmwS6ZVVVmLZdfN48JIeUx
+   g==;
+X-CSE-ConnectionGUID: Jiks7p2RRJqT7CalVd3CSg==
+X-CSE-MsgGUID: p4ii7BhQRfSIpIjZFGpKnQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="22545674"
+X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
+   d="scan'208";a="22545674"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 13:17:04 -0700
+X-CSE-ConnectionGUID: UgnlM4QSR5ikTJm33iWR3Q==
+X-CSE-MsgGUID: 6pE7TPDrTfm5TlXm6RDu0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,160,1719903600"; 
+   d="scan'208";a="60454383"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 19 Aug 2024 13:17:02 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sg8oF-0009Ou-1t;
+	Mon, 19 Aug 2024 20:16:59 +0000
+Date: Tue, 20 Aug 2024 04:16:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: Re: [PATCHv2 net-next 1/3] bonding: add common function to check
+ ipsec device
+Message-ID: <202408200345.a4DQ8ecT-lkp@intel.com>
+References: <20240819075334.236334-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240819.Gie1thiegeek@digikod.net>
+In-Reply-To: <20240819075334.236334-2-liuhangbin@gmail.com>
 
-On Mon, Aug 19, 2024 at 09:58:27PM +0200, Mickaël Salaün wrote:
-> There are still some issues (mainly with tests) but overall the kernel
-> part looks good!  I pushed this patch series to the -next branch.  I'll
-> update with the next versions of this series.
-Thank you :) 
-> I'll do the same with the next signal scoping patch series once the
-> lifetime issue that Jann reported is fixed.
-I have already applied those changes, but still need to add a test case
-for file_send_sigiotask()
-> On Wed, Aug 14, 2024 at 12:22:18AM -0600, Tahera Fahimi wrote:
-> > This patch series adds scoping mechanism for abstract unix sockets.
-> > Closes: https://github.com/landlock-lsm/linux/issues/7
-> > 
-> > Problem
-> > =======
-> > 
-> > Abstract unix sockets are used for local inter-process communications
-> > independent of the filesystem. Currently, a sandboxed process can
-> > connect to a socket outside of the sandboxed environment, since Landlock
-> > has no restriction for connecting to an abstract socket address(see more
-> > details in [1,2]). Access to such sockets for a sandboxed process should
-> > be scoped the same way ptrace is limited.
-> > 
-> > [1] https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
-> > [2] https://lore.kernel.org/all/20231102.MaeWaepav8nu@digikod.net/
-> > 
-> > Solution
-> > ========
-> > 
-> > To solve this issue, we extend the user space interface by adding a new
-> > "scoped" field to Landlock ruleset attribute structure. This field can
-> > contains different rights to restrict different functionalities. For
-> > abstract unix sockets, we introduce
-> > "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" field to specify that a ruleset
-> > will deny any connection from within the sandbox domain to its parent
-> > (i.e. any parent sandbox or non-sandbox processes).
-> > 
-> > Example
-> > =======
-> > 
-> > Starting a listening socket with socat(1):
-> > 	socat abstract-listen:mysocket -
-> > 
-> > Starting a sandboxed shell from $HOME with samples/landlock/sandboxer:
-> > 	LL_FS_RO=/ LL_FS_RW=. LL_SCOPED="a" ./sandboxer /bin/bash
-> > 
-> > If we try to connect to the listening socket, the connection would be
-> > refused.
-> > 	socat - abstract-connect:mysocket --> fails
-> > 
-> > 
-> > Notes of Implementation
-> > =======================
-> > 
-> > * Using the "scoped" field provides enough compatibility and flexibility
-> >   to extend the scoping mechanism for other IPCs(e.g. signals).
-> > 
-> > * To access the domain of a socket, we use its credentials of the file's FD
-> >   which point to the credentials of the process that created the socket.
-> >   (see more details in [3]). Cases where the process using the socket has
-> >   a different domain than the process created it are covered in the 
-> >   unix_sock_special_cases test.
-> > 
-> > [3]https://lore.kernel.org/all/20240611.Pi8Iph7ootae@digikod.net/
-> > 
-> > Previous Versions
-> > =================
-> > v8: https://lore.kernel.org/all/cover.1722570749.git.fahimitahera@gmail.com/
-> > v7: https://lore.kernel.org/all/cover.1721269836.git.fahimitahera@gmail.com/
-> > v6: https://lore.kernel.org/all/Zn32CYZiu7pY+rdI@tahera-OptiPlex-5000/
-> > and https://lore.kernel.org/all/Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000/
-> > v5: https://lore.kernel.org/all/ZnSZnhGBiprI6FRk@tahera-OptiPlex-5000/
-> > v4: https://lore.kernel.org/all/ZnNcE3ph2SWi1qmd@tahera-OptiPlex-5000/
-> > v3: https://lore.kernel.org/all/ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000/
-> > v2: https://lore.kernel.org/all/ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000/
-> > v1: https://lore.kernel.org/all/ZgXN5fi6A1YQKiAQ@tahera-OptiPlex-5000/
-> > 
-> > Tahera Fahimi (5):
-> >   Landlock: Add abstract unix socket connect restriction
-> >   selftests/Landlock: Abstract unix socket restriction tests
-> >   selftests/Landlock: Adding pathname Unix socket tests
-> >   sample/Landlock: Support abstract unix socket restriction
-> >   Landlock: Document LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI
-> >     versioning
-> > 
-> >  Documentation/userspace-api/landlock.rst      |   33 +-
-> >  include/uapi/linux/landlock.h                 |   27 +
-> >  samples/landlock/sandboxer.c                  |   58 +-
-> >  security/landlock/limits.h                    |    3 +
-> >  security/landlock/ruleset.c                   |    7 +-
-> >  security/landlock/ruleset.h                   |   23 +-
-> >  security/landlock/syscalls.c                  |   17 +-
-> >  security/landlock/task.c                      |  129 ++
-> >  tools/testing/selftests/landlock/base_test.c  |    2 +-
-> >  tools/testing/selftests/landlock/common.h     |   38 +
-> >  tools/testing/selftests/landlock/net_test.c   |   31 +-
-> >  .../landlock/scoped_abstract_unix_test.c      | 1146 +++++++++++++++++
-> >  12 files changed, 1469 insertions(+), 45 deletions(-)
-> >  create mode 100644 tools/testing/selftests/landlock/scoped_abstract_unix_test.c
-> > 
-> > -- 
-> > 2.34.1
-> > 
-> > 
+Hi Hangbin,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Hangbin-Liu/bonding-add-common-function-to-check-ipsec-device/20240819-195504
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240819075334.236334-2-liuhangbin%40gmail.com
+patch subject: [PATCHv2 net-next 1/3] bonding: add common function to check ipsec device
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20240820/202408200345.a4DQ8ecT-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408200345.a4DQ8ecT-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408200345.a4DQ8ecT-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/uapi/linux/posix_types.h:5,
+                    from include/uapi/linux/types.h:14,
+                    from include/linux/types.h:6,
+                    from include/linux/kasan-checks.h:5,
+                    from include/asm-generic/rwonce.h:26,
+                    from ./arch/m68k/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:314,
+                    from include/linux/array_size.h:5,
+                    from include/linux/kernel.h:16,
+                    from drivers/net/bonding/bond_main.c:35:
+   drivers/net/bonding/bond_main.c: In function 'bond_ipsec_dev':
+>> include/linux/stddef.h:8:14: error: incompatible types when returning type 'void *' but 'struct net_device' was expected
+       8 | #define NULL ((void *)0)
+         |              ^
+   drivers/net/bonding/bond_main.c:434:24: note: in expansion of macro 'NULL'
+     434 |                 return NULL;
+         |                        ^~~~
+>> include/linux/stddef.h:8:14: error: incompatible types when returning type 'void *' but 'struct net_device' was expected
+       8 | #define NULL ((void *)0)
+         |              ^
+   drivers/net/bonding/bond_main.c:442:24: note: in expansion of macro 'NULL'
+     442 |                 return NULL;
+         |                        ^~~~
+>> drivers/net/bonding/bond_main.c:446:16: error: incompatible types when returning type 'struct net_device *' but 'struct net_device' was expected
+     446 |         return real_dev;
+         |                ^~~~~~~~
+   drivers/net/bonding/bond_main.c: In function 'bond_ipsec_offload_ok':
+>> drivers/net/bonding/bond_main.c:630:20: error: incompatible types when assigning to type 'struct net_device *' from type 'struct net_device'
+     630 |         real_dev = bond_ipsec_dev(xs);
+         |                    ^~~~~~~~~~~~~~
+
+
+vim +8 include/linux/stddef.h
+
+^1da177e4c3f41 Linus Torvalds   2005-04-16  6  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  7  #undef NULL
+^1da177e4c3f41 Linus Torvalds   2005-04-16 @8  #define NULL ((void *)0)
+6e218287432472 Richard Knutsson 2006-09-30  9  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
