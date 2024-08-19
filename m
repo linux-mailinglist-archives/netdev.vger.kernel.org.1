@@ -1,204 +1,140 @@
-Return-Path: <netdev+bounces-119631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46651956651
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 11:06:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C9895654F
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7881B209D3
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 09:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA0A1F22C8C
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 08:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6917715B999;
-	Mon, 19 Aug 2024 09:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CB515B10D;
+	Mon, 19 Aug 2024 08:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="bUquSnXb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ecq3Y/Lp"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E7A15B560;
-	Mon, 19 Aug 2024 09:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B1E15B0F2
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 08:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724058356; cv=none; b=uMd7OEZZSxjzP0TIPMLdyl2EzyffXN6WWyvm7V9yBllipBiMz980gtAf1Cq0LNPNseREDB/jftlfughOll+KYLZtmrP0YxQOl2VrqTkGnUyFuTzNPr9SSKq/cz8JlExd6leUj9MoXrDCLUhO2qJoK3rHAcPwtiL0dWi5B7KRYro=
+	t=1724055153; cv=none; b=omZQEblL3tOcBMgykGyz0cVwOacc0RUV70Je4qY2qtvqYePa8heUyCtuh3OEhXulMzNY6D28EMwZ1ocMmbMvdorgA+uzl+MMg7LtPEAwikPrbRBH31B2Qb3AQ96e/uXHSbFTbfk180b56ZQ6LdjqeTGkdsgCBrerO5CZblu1niw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724058356; c=relaxed/simple;
-	bh=lR2WZd/P0NWVFQpF5VOo611F5KnOE/Raog9Y5v8jRSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pwp0oCnxAI8jpIHgmdCyvJCp7Bu06ZeiFL+V8emg+U28VBrNr1CMunOBL8XJtbi5O6IehlzHuTrJXKksyN+Zch1D5suNd5lMcugA5p75VePuwv1oPkxFpZx56FOSwgMeZpTKa01vcCxAHRj4BWl0NQmFOVcESmAW3pbKqleOSS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=bUquSnXb; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47J7FfIb014306;
-	Mon, 19 Aug 2024 02:15:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1724051741;
-	bh=0vsrItiP+UOuGajC7NCZTlPPCFYcRA8XAnCYPGpz6CY=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=bUquSnXby+EIUCpW7ZzEe4Ar3hHMOjtdKafPUf7hARC5ZjzvIJT73k+Rlyqz+4eIc
-	 mrjWcdP9ay9xONwaeGiMN0/96GxVUoMs+SkPhtY+O7gvOj73xKmUW2ZI274f8FA/tw
-	 h4OSozP0aJ8YN33a2OvxkoyPZHyFlEpEGBaRZlp4=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47J7Ff7S013071
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 19 Aug 2024 02:15:41 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 19
- Aug 2024 02:15:41 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 19 Aug 2024 02:15:41 -0500
-Received: from [10.249.135.225] ([10.249.135.225])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47J7FVGi056124;
-	Mon, 19 Aug 2024 02:15:32 -0500
-Message-ID: <2ee6f2eb-9a3f-4e04-a6d5-059c4381cbd8@ti.com>
-Date: Mon, 19 Aug 2024 12:45:30 +0530
+	s=arc-20240116; t=1724055153; c=relaxed/simple;
+	bh=lM0fIpjZjg4/XuokPszymKQGUdvfnYHj/CXpdQTpVBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkWkGx24YF3uyHIrXfctjBuCba6JMlR2rU56PUKIStuYhEz72ONo5ay7no6Auu/95HRA4kykWPmfIXn4tzC1Xh5ib8Hsm+69wrBRWf6EDwcVXItm8d4NG4fE/keFglZu4b5v2CctSJXLa7GsnqAlbsKSgduOUbHqoAeqYW0CA7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ecq3Y/Lp; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7b8884631c4so1583177a12.2
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 01:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724055151; x=1724659951; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DVaXvMkv8vDEE/Zf2G2u7hhrmGEB//VPykx9k4HgcT4=;
+        b=Ecq3Y/LpGOUDO14TfE6jVjllTyUs9LYlq07hjWEr8WvQ6gcPzk4BbkFph5lqFN4e34
+         z0BM2izgYNKRjMhM2kEUhqCnKERsyoZoZOVy4td5xHr1Q5aMfUTzvu7wob0pKPUgQie1
+         lkLFud9gdcc885PL7XmTexBbXcae4X78doKHbB/dzr7hXI568YkcRdkxCirH0ko6tO40
+         7Bt2qEyQVyA5PKfzxRGbh3fhagkUFW0aZRfxtm+iwr2RCB/wLh5DzgX/NlIL6S1TBL8h
+         gbbjB7NHhZmKk7dOxNEGTMFIJjcpL2H4LnaCwH0tzwEAoHJfuNqLcZ0i1fvPN3uoaDZ2
+         XJ/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724055151; x=1724659951;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DVaXvMkv8vDEE/Zf2G2u7hhrmGEB//VPykx9k4HgcT4=;
+        b=goVEDjEBjXv680IJujEzfa2n2pVBp9t25+R5LeM4tkAtj2psB5Xcy5EtdeUTVDPg/k
+         ywqARvC3pav87rxZ0wAAWSq3JwTWjdoyJzjHAI52vJn+tmI4j7PZwddbWBjhzYgOdC3w
+         FbtggtZ+vFWyE81BfOtDAWZLLOrw7UY5Z6YwVH1DtUQxh59/XmPvqkOGumhoobZvfaR4
+         8sxYF7y90CfEjltX5rt59wohv1CSBQoaIH26Rsz7S70sNGxnjd98KONaur+J78MEyWLa
+         SkkWgaPH9ns4xQ6RwZsBK6uOmUhxZaSaQFbEV4QVBDoTnyFkclj00ThED3scAxrP8xvF
+         q09g==
+X-Gm-Message-State: AOJu0Yzh5n8MWBI3XglCg97k3dHmBus+d+/LK3gxY+2SKdVQBFWYKPq2
+	TXY8WpA4J7lMKJBQdWuL53Jet9g9BxE8XwwoFnWAsfu1hFLHFIHZ
+X-Google-Smtp-Source: AGHT+IH84PejePqGDYRDLae6nGsmktIMiB4Sogpgtp3zj3gCRQ7X6J6tisaD3yEc4RqgOsq+JjJUNQ==
+X-Received: by 2002:a05:6a21:3946:b0:1c4:b4d5:e140 with SMTP id adf61e73a8af0-1c90506e42fmr12523052637.47.1724055151265;
+        Mon, 19 Aug 2024 01:12:31 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d42a1dc5edsm2615141a91.33.2024.08.19.01.12.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 01:12:30 -0700 (PDT)
+Date: Mon, 19 Aug 2024 16:12:25 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, Taehee Yoo <ap420073@gmail.com>,
+	davem@davemloft.net, jv@jvosburgh.net, andy@greyhouse.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jarod@redhat.com
+Subject: Re: [PATCH net 2/4] bonding: fix null pointer deref in
+ bond_ipsec_offload_ok
+Message-ID: <ZsL-aVPLJ1EmM53y@Laptop-X1>
+References: <20240816114813.326645-1-razor@blackwall.org>
+ <20240816114813.326645-3-razor@blackwall.org>
+ <ZsKzmpnXsKLAneIe@Laptop-X1>
+ <a8ebc617-dc20-4803-9332-246d54ccf8d8@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/2] net: ti: icssg-prueth: Add support for PA
- Stats
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-        MD Danish Anwar
-	<danishanwar@ti.com>
-CC: Suman Anna <s-anna@ti.com>, Sai Krishna <saikrishnag@marvell.com>,
-        Jan
- Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
-        Diogo Ivo
-	<diogo.ivo@siemens.com>,
-        Kory Maincent <kory.maincent@bootlin.com>,
-        Heiner
- Kallweit <hkallweit1@gmail.com>,
-        Simon Horman <horms@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Roger Quadros
-	<rogerq@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Rob Herring <robh@kernel.org>,
-        Santosh Shilimkar
-	<ssantosh@kernel.org>, Nishanth Menon <nm@ti.com>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <srk@ti.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>
-References: <20240814092033.2984734-1-danishanwar@ti.com>
- <20240814092033.2984734-3-danishanwar@ti.com>
- <cd15268f-f6d3-4fca-bd7f-c94011f55996@stanley.mountain>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <cd15268f-f6d3-4fca-bd7f-c94011f55996@stanley.mountain>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8ebc617-dc20-4803-9332-246d54ccf8d8@blackwall.org>
 
-
-
-On 8/15/2024 4:58 PM, Dan Carpenter wrote:
-> On Wed, Aug 14, 2024 at 02:50:33PM +0530, MD Danish Anwar wrote:
->> Add support for dumping PA stats registers via ethtool.
->> Firmware maintained stats are stored at PA Stats registers.
->> Also modify emac_get_strings() API to use ethtool_puts().
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 17 +++++-----
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  6 ++++
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  5 ++-
->>  drivers/net/ethernet/ti/icssg/icssg_stats.c   | 19 +++++++++--
->>  drivers/net/ethernet/ti/icssg/icssg_stats.h   | 32 +++++++++++++++++++
->>  5 files changed, 67 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
->> index 5688f054cec5..51bb509d37c7 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
->> @@ -83,13 +83,11 @@ static void emac_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
->>  
->>  	switch (stringset) {
->>  	case ETH_SS_STATS:
->> -		for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++) {
->> -			if (!icssg_all_stats[i].standard_stats) {
->> -				memcpy(p, icssg_all_stats[i].name,
->> -				       ETH_GSTRING_LEN);
->> -				p += ETH_GSTRING_LEN;
->> -			}
->> -		}
->> +		for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++)
->> +			if (!icssg_all_stats[i].standard_stats)
->> +				ethtool_puts(&p, icssg_all_stats[i].name);
->> +		for (i = 0; i < ICSSG_NUM_PA_STATS; i++)
+On Mon, Aug 19, 2024 at 10:25:37AM +0300, Nikolay Aleksandrov wrote:
+> On 19/08/2024 05:53, Hangbin Liu wrote:
+> > On Fri, Aug 16, 2024 at 02:48:11PM +0300, Nikolay Aleksandrov wrote:
+> >> We must check if there is an active slave before dereferencing the pointer.
+> >>
+> >> Fixes: 18cb261afd7b ("bonding: support hardware encryption offload to slaves")
+> >> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+> >> ---
+> >>  drivers/net/bonding/bond_main.c | 2 ++
+> >>  1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> >> index 85b5868deeea..65ddb71eebcd 100644
+> >> --- a/drivers/net/bonding/bond_main.c
+> >> +++ b/drivers/net/bonding/bond_main.c
+> >> @@ -604,6 +604,8 @@ static bool bond_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
+> >>  	bond = netdev_priv(bond_dev);
+> >>  	rcu_read_lock();
+> >>  	curr_active = rcu_dereference(bond->curr_active_slave);
+> >> +	if (!curr_active)
+> >> +		goto out;
+> >>  	real_dev = curr_active->dev;
+> >>  
+> >>  	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
+> >> -- 
+> >> 2.44.0
+> >>
+> > 
+> > BTW, the bond_ipsec_offload_ok() only checks !xs->xso.real_dev, should we also
+> > add WARN_ON(xs->xso.real_dev != slave->dev) checking?
+> > 
+> > Thanks
+> > Hangbin
 > 
-> It would probably be better to use ARRAY_SIZE(icssg_all_pa_stats) so that it's
-> consistent with the loop right before.
+> We could, but not a warn_on() because I bet it can be easily triggered
+> by changing the active slave in parallel. real_dev is read without a
 
-Sure Dan.
+OK, maybe a pr_warn or salve_warn()?
 
-> 
->> +			ethtool_puts(&p, icssg_all_pa_stats[i].name);
->>  		break;
->>  	default:
->>  		break;
->> @@ -100,13 +98,16 @@ static void emac_get_ethtool_stats(struct net_device *ndev,
->>  				   struct ethtool_stats *stats, u64 *data)
->>  {
->>  	struct prueth_emac *emac = netdev_priv(ndev);
->> -	int i;
->> +	int i, j;
->>  
->>  	emac_update_hardware_stats(emac);
->>  
->>  	for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++)
->>  		if (!icssg_all_stats[i].standard_stats)
->>  			*(data++) = emac->stats[i];
->> +
->> +	for (j = 0; j < ICSSG_NUM_PA_STATS; j++)
->> +		*(data++) = emac->stats[i + j];
-> 
-> Here i is not an iterator.  It's a stand in for ARRAY_SIZE(icssg_all_stats).
-> It would be more readable to do that directly.
-> 
-> 	for (i = 0; i < ICSSG_NUM_PA_STATS; i++)
-> 		*(data++) = emac->stats[ARRAY_SIZE(icssg_all_stats) + i];
-> 
-> To be honest, putting the pa_stats at the end of ->stats would have made sense
-> if we could have looped over the whole array, but since they have to be treated
-> differently we should probably just put them into their own ->pa_stats array.
-> 
+> lock here so we cannot guarantee a sane state if policies are changed
+> under us. I think the callback should handle it by checking that the
+> new device doesn't have the policy setup yet, because the case happens
+> when an active slave changes which means policies are about to be
+> installed on the new one.
 
-Sure Dan. It will make more sense to have different array for pa_stats.
-I will do this change and update.
+Hmm, how to check if a device has policy setup except ipsec->xs->xso.real_dev?
 
-> I haven't tested this so maybe I've missed something obvious.
-> 
-> The "all" in "icssg_all_stats" doesn't really make sense anymore btw...
-> 
-
-Correct, the "icssg_all_stats" should be renamed to "icssg_mii_g_rt_stats".
-
-> Sorry for being so nit picky on a v5 patch. :(
-> 
-
-It's okay. Thanks for the review. I will address all these comments and
-send out a v6.
-
-> regards,
-> dan carpenter
-> 
-
--- 
-Thanks and Regards,
-Md Danish Anwar
+Hangbin
 
