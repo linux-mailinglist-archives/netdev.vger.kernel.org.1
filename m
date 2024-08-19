@@ -1,249 +1,132 @@
-Return-Path: <netdev+bounces-119880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91A019574EB
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:50:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F7F9574F0
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 21:50:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C61D1F22044
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 251601C23D8B
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D62201256;
-	Mon, 19 Aug 2024 19:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3333B1DD388;
+	Mon, 19 Aug 2024 19:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Te+T++sB"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="r/zgoQk4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559A020124E;
-	Mon, 19 Aug 2024 19:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5DA1DC49B
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 19:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724096770; cv=none; b=Kkdb+C30XorSwYU8zPG3o0he53eg2bfC6IpbsKFuXr6ef5GOuv8Y+ALE4l7flqfnAgSkT/jHoQwlT3YaR8XtUM6zklOINnJqAe0yznrA9Xrc27KqJqnInuJaQGpoV9/SF5QWm0DhbKpuurOYcWoDGXGpBWsbt/TdL1PCp24pFH0=
+	t=1724096854; cv=none; b=B7sPr1wGSbtRCHOzQzPx4Hfk5afoFqtYO/ihL1D0/pvIWdAoQTCq2Mq0UyxLALWzYucToA14NGBJMMDYKCIItggOJKUsvBGw0oH9J206L/BGLpazTyRvxna7LlGdXtCLGvawjRapVOB+RZolB1SoHY9Ta/0mlbrZZCKxH62ovqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724096770; c=relaxed/simple;
-	bh=S/G3H+zWXhU4Ysa/76xvg601REXC5HLy4Uhd8tkcCIY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=g78GsheATKD7Q7cIgk2XMX//ggrqaxnzLxUj0pfPZh8BLCeURvKB0/OdYfvlBErcfzodPvTwR3O2z2059Ld3gtNmv70TW8E0uMmRXXCHOuO97Q+RfFmwLAr6DYAIhTKTeYVlkBNYmzYv3WizrdI65AEyKzAOfhuu4CosME8zbcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Te+T++sB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 910A9C4AF13;
-	Mon, 19 Aug 2024 19:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724096770;
-	bh=S/G3H+zWXhU4Ysa/76xvg601REXC5HLy4Uhd8tkcCIY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Te+T++sBuBbkjdkdu+lo0RsreBVV1B0VE4LauCftSKVImsnXk+qHZ/ZW3W++kT1BE
-	 Jt09DP8+JS0okm1S1+FXCjfLAJ07wMJUlcSdKDfhZTKG0ZgdgLAw1Kjy6E0R9LInp5
-	 j+RtlSUeaEvtimHfup4u6+xo8SQd5ehVhbwrEpER4y0g+pEd8yAllBDfisiwBSyDMr
-	 e+tFTIva7mH4v+dN+2z79sLrnHcSwGOyev82dwJ68T/3pjcU9VWRJdmSQC6Mejx4uf
-	 /PQzUKDsfSMpVRm5szAhrOa723shz2nuPHYzMVqjFutahtunt8m1gUrWu3hC8sWl6C
-	 wUCloFAs2VaJQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 19 Aug 2024 21:45:32 +0200
-Subject: [PATCH net 14/14] mptcp: pm: avoid possible UaF when selecting
- endp
+	s=arc-20240116; t=1724096854; c=relaxed/simple;
+	bh=aFO8S6ptrA9vRatPbkASy+wPxZ+69fy3yw2vN8gDmyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ikm5947u+J95qByp96/JklrBuhZGnVnJaDaqGmEiUjah2uagPHsEzkEfHwdUsPHkDLCFjvN4j3qxOhZMI43fQA0rKD77VzRHdrh6zIGFlhHYza/F5bvnQ/hgP8AwvNuvbHnkjk+JO4xNUcl00jXxMQgpGSb4S6ZXEAWqn/CcpxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=r/zgoQk4; arc=none smtp.client-ip=84.16.66.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Wnjmb1n0vzl56;
+	Mon, 19 Aug 2024 21:47:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1724096847;
+	bh=47ZixQsG6Q3QUb7QdsnWS5gr698drar7jhvYV9oZYqM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r/zgoQk4IAhjbwAJg5XLXENBvlZ/P26MVDkiXM/bF3Gf1X2mLHq1aDGmtwX0Pvx1e
+	 79Mb28wAS+xfG1/FeBqVWUEXKucJp1a10gO4JWtbEsferxfgoEZ5aMhNkKNsk6ctBf
+	 p4e6hkfHM6RusnwKzCgDvyVkRugQyKI5GTLe//fo=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WnjmZ55z7z27s;
+	Mon, 19 Aug 2024 21:47:26 +0200 (CEST)
+Date: Mon, 19 Aug 2024 21:47:23 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v9 3/5] selftests/Landlock: Adding pathname Unix socket
+ tests
+Message-ID: <20240819.Ohph6ahphohH@digikod.net>
+References: <cover.1723615689.git.fahimitahera@gmail.com>
+ <df1c54690beeab024534f6671ee9a3266270d9e1.1723615689.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240819-net-mptcp-pm-reusing-id-v1-14-38035d40de5b@kernel.org>
-References: <20240819-net-mptcp-pm-reusing-id-v1-0-38035d40de5b@kernel.org>
-In-Reply-To: <20240819-net-mptcp-pm-reusing-id-v1-0-38035d40de5b@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5507; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=S/G3H+zWXhU4Ysa/76xvg601REXC5HLy4Uhd8tkcCIY=;
- b=kA0DAAgB9reCT0JpoHMByyZiAGbDoNOjBCnpnGhGTWSMeyQztma46JXJb2M0L5L5ZU+o5onq/
- okCMwQAAQgAHRYhBOjLhfdodwV6bif3eva3gk9CaaBzBQJmw6DTAAoJEPa3gk9CaaBzMbUP/A3d
- MfwJcEXPb1VeckKa35cNxanJVUG6ocURH8bqw1oDbR76hX7BYgcu2Chbd+FGwOGgeegCkOIlyXi
- 5J/a1cHkrYyFOTXy1AnhP8SqtHOzF+/NG1Wn1Rb+M0g4EIxry5ly2dEBN4WwcFHwt6/bNZ6IP/p
- q+4N7jY0VCNsgNLyCM+kv9E+bqGKN4GHz1h0pcYyGBcGd5+JFStu0EyZc/s/sy3tn/8Zpp2cZnh
- 8X4i52eV1lAEvmz4Cly6tkK27hipVDU7L5vcfxnsXi1Nk9tHtGS6XoEiqYiwHQJTx/nn1Zw7Vud
- 5q/+Q3IAb3D3J3lEB6ky/n0IVSPKDrR55mZs4Y+UVUUGAK1SNNtj+HTM0tLz6U7a0cYaQize84k
- Zaks5McUTgBoap1lqIPMBREC5y59Uu+43g7iGRQ6Q5+GXdGjOLJQQeMGiJ9BswTxMkxe+5cNE0+
- 6eHJOpDVSpE3FdzMTUWbP/kXP+aOJtFZBD8GcjlL0WdY/Y8+NTt21SzPABKZEp9WH8qehFVcY3o
- tZbDo25HLD3udEFQlhAoC66KK5j6HRiSCLi74axmZQQP1lnyAQWvHTltQTGoQuEuvBM7UHri1mG
- WnNWPiYPDJhkc5wgSobo0QG1Z0W4gpRQ561pDKcHd9UY7nv+m9Plx5GUHYLGF+aBLWITzyngeL/
- yhwAp
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <df1c54690beeab024534f6671ee9a3266270d9e1.1723615689.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-select_local_address() and select_signal_address() both select an
-endpoint entry from the list inside an RCU protected section, but return
-a reference to it, to be read later on. If the entry is dereferenced
-after the RCU unlock, reading info could cause a Use-after-Free.
+On Wed, Aug 14, 2024 at 12:22:21AM -0600, Tahera Fahimi wrote:
+> This patch expands abstract Unix socket restriction tests by
+> testing pathname sockets connection with scoped domain.
+> 
+> pathname_address_sockets ensures that Unix sockets bound to
+> a null-terminated filesystem can still connect to a socket
 
-A simple solution is to copy the required info while inside the RCU
-protected section to avoid any risk of UaF later. The address ID might
-need to be modified later to handle the ID0 case later, so a copy seems
-OK to deal with.
+"bound to a filesystem path name"
 
-Reported-by: Paolo Abeni <pabeni@redhat.com>
-Closes: https://lore.kernel.org/45cd30d3-7710-491c-ae4d-a1368c00beb1@redhat.com
-Fixes: 01cacb00b35c ("mptcp: add netlink-based PM")
-Cc: stable@vger.kernel.org
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_netlink.c | 64 +++++++++++++++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 30 deletions(-)
+> outside of their scoped domain. This means that even if the
+> domain is scoped with LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
+> the socket can connect to a socket outside the scoped domain.
+> 
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+> ---
+> changes in versions:
+> v9:
+> - Moving remove_path() back to fs_test.c, and using unlink(2)
+>   and rmdir(2) instead.
+> - Removing hard-coded numbers and using "backlog" instead.
+> V8:
+> - Adding pathname_address_sockets to cover all types of address
+>   formats for unix sockets, and moving remove_path() to
+>   common.h to reuse in this test.
+> ---
+>  .../landlock/scoped_abstract_unix_test.c      | 204 ++++++++++++++++++
+>  1 file changed, 204 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/landlock/scoped_abstract_unix_test.c b/tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+> index 232c3b767b8a..21285a7158b6 100644
+> --- a/tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+> +++ b/tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+> @@ -939,4 +939,208 @@ TEST_F(unix_sock_special_cases, socket_with_different_domain)
+>  	    WEXITSTATUS(status) != EXIT_SUCCESS)
+>  		_metadata->exit_code = KSFT_FAIL;
+>  }
+> +
+> +static const char path1[] = TMP_DIR "/s1_variant1";
+> +static const char path2[] = TMP_DIR "/s2_variant1";
+> +
+> +/* clang-format off */
+> +FIXTURE(pathname_address_sockets) {
+> +	struct service_fixture stream_address, dgram_address;
+> +};
+> +
+> +/* clang-format on */
 
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index a2e37ab1c40f..3e4ad801786f 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -143,11 +143,13 @@ static bool lookup_subflow_by_daddr(const struct list_head *list,
- 	return false;
- }
- 
--static struct mptcp_pm_addr_entry *
-+static bool
- select_local_address(const struct pm_nl_pernet *pernet,
--		     const struct mptcp_sock *msk)
-+		     const struct mptcp_sock *msk,
-+		     struct mptcp_pm_addr_entry *new_entry)
- {
--	struct mptcp_pm_addr_entry *entry, *ret = NULL;
-+	struct mptcp_pm_addr_entry *entry;
-+	bool found = false;
- 
- 	msk_owned_by_me(msk);
- 
-@@ -159,17 +161,21 @@ select_local_address(const struct pm_nl_pernet *pernet,
- 		if (!test_bit(entry->addr.id, msk->pm.id_avail_bitmap))
- 			continue;
- 
--		ret = entry;
-+		*new_entry = *entry;
-+		found = true;
- 		break;
- 	}
- 	rcu_read_unlock();
--	return ret;
-+
-+	return found;
- }
- 
--static struct mptcp_pm_addr_entry *
--select_signal_address(struct pm_nl_pernet *pernet, const struct mptcp_sock *msk)
-+static bool
-+select_signal_address(struct pm_nl_pernet *pernet, const struct mptcp_sock *msk,
-+		      struct mptcp_pm_addr_entry *new_entry)
- {
--	struct mptcp_pm_addr_entry *entry, *ret = NULL;
-+	struct mptcp_pm_addr_entry *entry;
-+	bool found = false;
- 
- 	rcu_read_lock();
- 	/* do not keep any additional per socket state, just signal
-@@ -184,11 +190,13 @@ select_signal_address(struct pm_nl_pernet *pernet, const struct mptcp_sock *msk)
- 		if (!(entry->flags & MPTCP_PM_ADDR_FLAG_SIGNAL))
- 			continue;
- 
--		ret = entry;
-+		*new_entry = *entry;
-+		found = true;
- 		break;
- 	}
- 	rcu_read_unlock();
--	return ret;
-+
-+	return found;
- }
- 
- unsigned int mptcp_pm_get_add_addr_signal_max(const struct mptcp_sock *msk)
-@@ -512,9 +520,10 @@ __lookup_addr(struct pm_nl_pernet *pernet, const struct mptcp_addr_info *info)
- 
- static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
- {
--	struct mptcp_pm_addr_entry *local, *signal_and_subflow = NULL;
- 	struct sock *sk = (struct sock *)msk;
-+	struct mptcp_pm_addr_entry local;
- 	unsigned int add_addr_signal_max;
-+	bool signal_and_subflow = false;
- 	unsigned int local_addr_max;
- 	struct pm_nl_pernet *pernet;
- 	unsigned int subflows_max;
-@@ -565,23 +574,22 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
- 		if (msk->pm.addr_signal & BIT(MPTCP_ADD_ADDR_SIGNAL))
- 			return;
- 
--		local = select_signal_address(pernet, msk);
--		if (!local)
-+		if (!select_signal_address(pernet, msk, &local))
- 			goto subflow;
- 
- 		/* If the alloc fails, we are on memory pressure, not worth
- 		 * continuing, and trying to create subflows.
- 		 */
--		if (!mptcp_pm_alloc_anno_list(msk, &local->addr))
-+		if (!mptcp_pm_alloc_anno_list(msk, &local.addr))
- 			return;
- 
--		__clear_bit(local->addr.id, msk->pm.id_avail_bitmap);
-+		__clear_bit(local.addr.id, msk->pm.id_avail_bitmap);
- 		msk->pm.add_addr_signaled++;
--		mptcp_pm_announce_addr(msk, &local->addr, false);
-+		mptcp_pm_announce_addr(msk, &local.addr, false);
- 		mptcp_pm_nl_addr_send_ack(msk);
- 
--		if (local->flags & MPTCP_PM_ADDR_FLAG_SUBFLOW)
--			signal_and_subflow = local;
-+		if (local.flags & MPTCP_PM_ADDR_FLAG_SUBFLOW)
-+			signal_and_subflow = true;
- 	}
- 
- subflow:
-@@ -592,26 +600,22 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
- 		bool fullmesh;
- 		int i, nr;
- 
--		if (signal_and_subflow) {
--			local = signal_and_subflow;
--			signal_and_subflow = NULL;
--		} else {
--			local = select_local_address(pernet, msk);
--			if (!local)
--				break;
--		}
-+		if (signal_and_subflow)
-+			signal_and_subflow = false;
-+		else if (!select_local_address(pernet, msk, &local))
-+			break;
- 
--		fullmesh = !!(local->flags & MPTCP_PM_ADDR_FLAG_FULLMESH);
-+		fullmesh = !!(local.flags & MPTCP_PM_ADDR_FLAG_FULLMESH);
- 
- 		msk->pm.local_addr_used++;
--		__clear_bit(local->addr.id, msk->pm.id_avail_bitmap);
--		nr = fill_remote_addresses_vec(msk, &local->addr, fullmesh, addrs);
-+		__clear_bit(local.addr.id, msk->pm.id_avail_bitmap);
-+		nr = fill_remote_addresses_vec(msk, &local.addr, fullmesh, addrs);
- 		if (nr == 0)
- 			continue;
- 
- 		spin_unlock_bh(&msk->pm.lock);
- 		for (i = 0; i < nr; i++)
--			__mptcp_subflow_connect(sk, &local->addr, &addrs[i]);
-+			__mptcp_subflow_connect(sk, &local.addr, &addrs[i]);
- 		spin_lock_bh(&msk->pm.lock);
- 	}
- 	mptcp_pm_nl_check_work_pending(msk);
+Please minimize the use of these tags (e.g. don't include new lines) and
+remove them when they don't change the formatting.
 
--- 
-2.45.2
+> +	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
+> +	    WEXITSTATUS(status) != EXIT_SUCCESS)
+> +		_metadata->exit_code = KSFT_FAIL;
+> +}
 
+Please always add a newline before TEST_HARNESS_MAIN.
+`check-linux.sh all` prints an error.
+
+>  TEST_HARNESS_MAIN
+> -- 
+> 2.34.1
+> 
+> 
 
