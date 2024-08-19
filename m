@@ -1,218 +1,123 @@
-Return-Path: <netdev+bounces-119828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 554C895728C
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 19:58:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5280195729A
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 20:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9D41F23889
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 17:58:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2945B23B3C
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 18:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE05B188CAF;
-	Mon, 19 Aug 2024 17:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3478B1684B9;
+	Mon, 19 Aug 2024 18:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="mSSIx/59"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oP9L5NWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7C4176AB9
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 17:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F301CAAF
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724090286; cv=none; b=sL/CI9GeEd73nydWOPalt5UKQtadiIb7RA44lJP6NJZgZCP+kTPRKX23DLDN6kOmaKuOJDKp/3wMRs0wX0PT2g5stlzGciDRNXWJ4OHo7t6nwp+xklrZb0LSz94KnmPkGsHO349ZB8krG2F37tgTjco6m/8ezmniy+GPCcm6Kp4=
+	t=1724090553; cv=none; b=DJpKzya7TSNVmF9jhIhoaXrl0PTRBUxQprKzBNQcUKTrRX1D1ReCxv2//hlvXU3ACXa3l7uiyaSDGUEByicmboN8BBifQ1PkunMHufr+zaDls4UY1E2kQo/VwqIBSGcKrGfSDBj0Ms7kvF0+GpKZjfKCFjuPJFKIWse4caurTbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724090286; c=relaxed/simple;
-	bh=I74Nsd/hv/7Z1KBPIywZQhxoLRuZY2jSJNhcyK2ch8A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LLqz12t/nJS89AbfObeQOTMdoh7wr+qw207Lct52+Uqm8MtgoeOnVy1oQD+OJzGd3IKW4LKKZVHpl1DXLmq1xoxfkOosFT8blK/di0rp22nTJ+0nMD8szoKVdyKGivwIIeydnWbKg20yuBRZib32kIxVKt1pUSInPqTBuRMR8Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=mSSIx/59; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d3d58d6e08so3082330a91.3
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 10:58:03 -0700 (PDT)
+	s=arc-20240116; t=1724090553; c=relaxed/simple;
+	bh=VRHvAPebFfAseq2Kh6Ourg3/SmDHKbiJt3OL0yoVPy8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A9jMgdpIFctU5m+21osrBS+8cCzfp3hwq3u4Kbz8YlGh9C63APlhriSgJRQWpspLmMkKfUMlo77ZQsTgrStor0k/D+QFOO3N2jSHd3EV88mib1QmkdDcRZbT/fw558ERk/47HktU0fOM+V2KuvJByYYPNdoQf/bnLQaJRLKmxeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oP9L5NWg; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1724090283; x=1724695083; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fj/JRnUiS2ccvYLpltbwZnQSUIfTnOEAJgrq5esozr0=;
-        b=mSSIx/598POFlBCVGOMvkDcO4hFH/qqTIQZ9RBqX+vygWbn+HPVV0oDhcYz34zFWeQ
-         pY7FvkRY8dBY8mbRIqBiszOZerQbc92S/aIJRDBzzlsfPNLpa4HFwoVf+n03mIL1pwOs
-         2/lp9g/eZNlS09/H+gy+xxs+acwd+l7L3e/wfnuj9t6JludxO9s8I6HpSS+lVX8Z4UEo
-         8QT3LbYX00SaP5zcBSUV2neoGDzZxK6nbtnILDMsgwt4A9u52w/huxF9RfeZV+UFdTTq
-         2DQDCrvoW+Hpm/Zuy3HNV8bvZizHjgHa9l04hNADXVlYRnu9iaqIe4mMdYlto0/2Njgz
-         3JCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724090283; x=1724695083;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fj/JRnUiS2ccvYLpltbwZnQSUIfTnOEAJgrq5esozr0=;
-        b=TkTlW8021fdAO2hzXG6zKl6ha9FGisiEi59gNk/KC6Oho+nR2pszYbb8/I0jVuEl+Q
-         1Ww3zaZiH2Ms1Iqqw6YTtZJtIvFE9PrksKpevqjIgqfo71bS548qkP0kdmFaVuue+UZt
-         yYrSsb0KmcA8mBUWZTT4im5R8vJv1DAqmdkBn/QRMNOMxkbnChwhrnly2tTsXg9WfmhL
-         R6JkYcO703JgKWSHIvQUcJ9ja3hGemLVakLy7lIK6coenkhYufTRjWKxWXSzlwSsbvA+
-         S4MDPkHxS1yUO4D/uV5DbpOdB1iK40N9qVR+ysGN0vO6h4Jo8shQbL/nB3EY+9dYTKn1
-         0cJA==
-X-Gm-Message-State: AOJu0YyZLMzM81+83I1fobWNpPNXiL8TPawzTbNA6dngGzvNr0zo4ueu
-	AObq34ut4s3CpBMrSJLTGeA3rKzvRPxLg4hvYO4MsWWHkQGmBE89fyznDPxABK9+9wmVVRYl0q4
-	q+x8=
-X-Google-Smtp-Source: AGHT+IFgWVEx6cbuYxIpkjpE7FNl342NnFixb6XDIp1xkcfwI2POSDxplq/p6uHN0KhZi8o+IkJkOg==
-X-Received: by 2002:a17:90a:db86:b0:2ca:5ec8:576c with SMTP id 98e67ed59e1d1-2d3dfda7e42mr12432690a91.5.1724090283352;
-        Mon, 19 Aug 2024 10:58:03 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3c0b87dc8sm9635504a91.38.2024.08.19.10.58.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 10:58:02 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Budimir Markovic <markovicbudimir@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sheng Lan <lansheng@huawei.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] netem: fix return value if duplicate enqueue fails
-Date: Mon, 19 Aug 2024 10:56:45 -0700
-Message-ID: <20240819175753.5151-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1724090552; x=1755626552;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xHLpj1LacH5tXh0997nWcZ7XkkBOQK3Ty8dP15MnlR4=;
+  b=oP9L5NWg3q2gpqGPLqwzz+fXkvif8jmg+f2TvGJVw6wB0Ly0tuD4bVTb
+   yM3/DJvujqmNBHMStw76AV//ahARh1bJZGRvMaa4tv9HQ2Y0dtb5KZ/pi
+   J5ntLjJ/AjE3pbf6WvvY+WgCuCz0C9HS74pFb4OOMmyYuVob+K9nDOt1+
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.10,159,1719878400"; 
+   d="scan'208";a="418072097"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 18:02:28 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:58375]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.153:2525] with esmtp (Farcaster)
+ id d0213244-1b06-4e81-bcd2-e6e134952706; Mon, 19 Aug 2024 18:02:27 +0000 (UTC)
+X-Farcaster-Flow-ID: d0213244-1b06-4e81-bcd2-e6e134952706
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 19 Aug 2024 18:02:27 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.26) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 19 Aug 2024 18:02:24 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com>,
+	<tom@herbertland.com>
+Subject: Re: [PATCH v1 net] kcm: Serialise kcm_sendmsg() for the same socket.
+Date: Mon, 19 Aug 2024 11:02:16 -0700
+Message-ID: <20240819180216.15865-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iK60jxsJCzq29WPSZJnYNHHpPS09_ZmSi1JHmbkZ2GznA@mail.gmail.com>
+References: <CANn89iK60jxsJCzq29WPSZJnYNHHpPS09_ZmSi1JHmbkZ2GznA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-There is a bug in netem_enqueue() introduced by
-commit 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
-that can lead to a use-after-free.
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Aug 2024 17:56:55 +0200
+> On Fri, Aug 16, 2024 at 12:04 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > syzkaller reported UAF in kcm_release(). [0]
+> >
+> > The scenario is
+> >
+> >   1. Thread A builds a skb with MSG_MORE and sets kcm->seq_skb.
+> >
+> >   2. Thread A resumes building skb from kcm->seq_skb but is blocked
+> >      by sk_stream_wait_memory()
+> >
+> >   3. Thread B calls sendmsg() concurrently, finishes building kcm->seq_skb
+> >      and puts the skb to the write queue
+> >
+> >   4. Thread A faces an error and finally frees skb that is already in the
+> >      write queue
+> >
+> >   5. kcm_release() does double-free the skb in the write queue
+> >
+> > When a thread is building a MSG_MORE skb, another thread must not touch it.
+> >
+> > Let's add a per-sk mutex and serialise kcm_sendmsg().
+> >
+> >
+> > Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
+> > Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
+> > Tested-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> 
+> I wonder if anyone is using KCM....
 
-This commit made netem_enqueue() always return NET_XMIT_SUCCESS
-when a packet is duplicated, which can cause the parent qdisc's q.qlen to be
-mistakenly incremented. When this happens qlen_notify() may be skipped on the
-parent during destruction, leaving a dangling pointer for some classful qdiscs
-like DRR.
-
-There are two ways for the bug happen:
-
-- If the duplicated packet is dropped by rootq->enqueue() and then the original
-  packet is also dropped.
-- If rootq->enqueue() sends the duplicated packet to a different qdisc and the
-  original packet is dropped.
-
-In both cases NET_XMIT_SUCCESS is returned even though no packets are enqueued
-at the netem qdisc.
-
-The fix is to defer the enqueue of the duplicate packet until after the
-original packet has been guaranteed to return NET_XMIT_SUCCESS.
-
-Fixes: 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
-Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- net/sched/sch_netem.c | 47 ++++++++++++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 18 deletions(-)
-
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index edc72962ae63..0f8d581438c3 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -446,12 +446,10 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	struct netem_sched_data *q = qdisc_priv(sch);
- 	/* We don't fill cb now as skb_unshare() may invalidate it */
- 	struct netem_skb_cb *cb;
--	struct sk_buff *skb2;
-+	struct sk_buff *skb2 = NULL;
- 	struct sk_buff *segs = NULL;
- 	unsigned int prev_len = qdisc_pkt_len(skb);
- 	int count = 1;
--	int rc = NET_XMIT_SUCCESS;
--	int rc_drop = NET_XMIT_DROP;
- 
- 	/* Do not fool qdisc_drop_all() */
- 	skb->prev = NULL;
-@@ -480,19 +478,11 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		skb_orphan_partial(skb);
- 
- 	/*
--	 * If we need to duplicate packet, then re-insert at top of the
--	 * qdisc tree, since parent queuer expects that only one
--	 * skb will be queued.
-+	 * If we need to duplicate packet, then clone it before
-+	 * original is modified.
- 	 */
--	if (count > 1 && (skb2 = skb_clone(skb, GFP_ATOMIC)) != NULL) {
--		struct Qdisc *rootq = qdisc_root_bh(sch);
--		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
--
--		q->duplicate = 0;
--		rootq->enqueue(skb2, rootq, to_free);
--		q->duplicate = dupsave;
--		rc_drop = NET_XMIT_SUCCESS;
--	}
-+	if (count > 1)
-+		skb2 = skb_clone(skb, GFP_ATOMIC);
- 
- 	/*
- 	 * Randomized packet corruption.
-@@ -504,7 +494,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		if (skb_is_gso(skb)) {
- 			skb = netem_segment(skb, sch, to_free);
- 			if (!skb)
--				return rc_drop;
-+				goto finish_segs;
-+
- 			segs = skb->next;
- 			skb_mark_not_on_list(skb);
- 			qdisc_skb_cb(skb)->pkt_len = skb->len;
-@@ -530,7 +521,24 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		/* re-link segs, so that qdisc_drop_all() frees them all */
- 		skb->next = segs;
- 		qdisc_drop_all(skb, sch, to_free);
--		return rc_drop;
-+		if (skb2)
-+			__qdisc_drop(skb2, to_free);
-+		return NET_XMIT_DROP;
-+	}
-+
-+	/*
-+	 * If doing duplication then re-insert at top of the
-+	 * qdisc tree, since parent queuer expects that only one
-+	 * skb will be queued.
-+	 */
-+	if (skb2) {
-+		struct Qdisc *rootq = qdisc_root_bh(sch);
-+		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
-+
-+		q->duplicate = 0;
-+		rootq->enqueue(skb2, rootq, to_free);
-+		q->duplicate = dupsave;
-+		skb2 = NULL;
- 	}
- 
- 	qdisc_qstats_backlog_inc(sch, skb);
-@@ -601,9 +609,12 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	}
- 
- finish_segs:
-+	if (skb2)
-+		__qdisc_drop(skb2, to_free);
-+
- 	if (segs) {
- 		unsigned int len, last_len;
--		int nb;
-+		int rc, nb;
- 
- 		len = skb ? skb->len : 0;
- 		nb = skb ? 1 : 0;
--- 
-2.43.0
-
+Same impression :)
+Maybe it's time to remove KCM.
+https://lore.kernel.org/netdev/CALx6S37hSfQWw3Rku8vsavn8ejk0fndRk+=-=73gU7G-RbnK8Q@mail.gmail.com/
 
