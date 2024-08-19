@@ -1,107 +1,110 @@
-Return-Path: <netdev+bounces-119928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E3F95785E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:07:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1E5957863
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BFBC2828ED
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:07:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 563831C22F47
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 23:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33771DD384;
-	Mon, 19 Aug 2024 23:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECC51E2111;
+	Mon, 19 Aug 2024 23:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NoGoMpzn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXYPoQAR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543B615AAB8
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 23:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8B61DF696;
+	Mon, 19 Aug 2024 23:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724108848; cv=none; b=CK+ntBYkEKOOkCqVOnlEHegBs542uZXmz/nygdoWUNmRoPcy0Ztwznkm9KNoZL1FURkwa60qz5vA+4UZhY8ljymgnMLr6jqpuK1tEr4NKYxBtSqPbbJSQCJoR05MK1bLWqTGNEGzYCjzcLObBTpVpRoe7v4W4Acg+KRHWVXGP3w=
+	t=1724108850; cv=none; b=j9Lp1TDy3FxgKuzhqdZVVG9mbfMHw1ir+mrttaTxKNhwqBck6FWUXdPtppvRrxLRPT2fTDN9vqteXsTsaos1eQ41PbnbO3Ughmo0si8NrNqrIwOfvXtSiu9lOotwhhYQRv1cpyAAkTwffMfWT/qezavwhYJZuBg3f0BYvxu1nmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724108848; c=relaxed/simple;
-	bh=S9VEEGpGe7/nFnP8HNkfXZvi9SUHWX8PgXDcQ/2d/u4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/lp/jqyIEaDvDIZyrOAIwcPxKBJ3KYZVGyUYs3FW35s3XuAsuq4KEHu75kNj1nRwe88Sgq9l++jMg2Vp22ffGrsRqaw0/YsBYI9HnCh56fnlaLdjmJUqRJm28BEL7zJf6SGeHaXOxsSsF55VBREVjeREyXc8E8agWysQCZImKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NoGoMpzn; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-202146e93f6so33148855ad.3
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 16:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724108846; x=1724713646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=STjIv1So/KEZnujCiw/3CsB2QFA4v7WDP/H7a9T55/Q=;
-        b=NoGoMpzn/oEflyR1leR2atVNxgkHz8/YC7WL1PbJV8WGK7qBS5hmGTflfDa0adItMT
-         iRM1Xa7IsF+/t3S19/XXqNDd6SoYmLh455VwnWyjwcdj+Uk1hqUT5Pg/LWKZrrp+43JM
-         DragwpB0X0hess0Mwcr3lKTmffirTjdryZyP/J3469AlVLthAzjjrBRl8gEo9m1glww6
-         8Hc8WZkyOs6FjLXVfG8QF7rB8JTcmFUwzTnP9OHftPhImfwePVP3BV5Zw6n04GlcXSdx
-         EwslZ08//bD/+prdqLHjMEBe0V1kObk0uQZBgIsDQAdETiyjHnVIT8vqii4y/9gu8CfB
-         PuFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724108846; x=1724713646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=STjIv1So/KEZnujCiw/3CsB2QFA4v7WDP/H7a9T55/Q=;
-        b=KPBzUIF2hLFfg7izvIdQXQot5NsWw6a57obSpGurVeWBwGaOIDMtl/nRCmbYC8fZbU
-         Hcb3pThEqGHNAlzTvSKX7TeATcrOTkTuW/JrA19uWIBxqE6Pry2zP3LCQG7Y/2VvyW2o
-         W9ydwTC+gtUfZa91Gqw51h5BCwPAMLEg1JapASfyJt6VWAyaZFJrv5adGuTFbQ2q4mcV
-         Ey84H06XTM5fgayB8BWTaQ3i4jjZmHCdqetAigDGmAoDNImpc9RUI+bvbLp3/BkCmulE
-         TZVQ2ehWMCeeIBJ1EJm0LjeKANgHF3ruwPoYWUHxuhuZ6ubSfWIVrWHAH8tb7dWiYUwc
-         imGg==
-X-Gm-Message-State: AOJu0YyfisP21U2BqpGo8qbF2SpuggII8esNoEGpWIkwAY6DQxY6XpXG
-	Fp8hbVmL9axu6oEh72f41fTrDNfJ1BW9GAV+GNBStI7+g3z20Vxb
-X-Google-Smtp-Source: AGHT+IHJ7eVZyntyMsZDwZPWfg/rp1yw1pPIJ9EMUqaG+lDWTKr6kH929zhDeDm0X1CzojhDO3o47Q==
-X-Received: by 2002:a17:902:da8b:b0:1fd:a0b9:2be7 with SMTP id d9443c01a7336-20203e50d12mr161482825ad.13.1724108846593;
-        Mon, 19 Aug 2024 16:07:26 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f03933e4sm66647755ad.211.2024.08.19.16.07.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 16:07:26 -0700 (PDT)
-Date: Tue, 20 Aug 2024 07:07:20 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [PATCHv2 net-next 1/3] bonding: add common function to check
- ipsec device
-Message-ID: <ZsPQKN3j4GvGgcz9@Laptop-X1>
-References: <20240819075334.236334-1-liuhangbin@gmail.com>
- <20240819075334.236334-2-liuhangbin@gmail.com>
- <20240819143753.GF11472@kernel.org>
+	s=arc-20240116; t=1724108850; c=relaxed/simple;
+	bh=mJXaRxbMWM39dMzH9l5kYZ7g7ouNmwcruKXMK8gNkX8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CkPcn6iqTIizIvy/OjjDykZ849cq43lQJta2dtDOVgX4bGTI1mT3vy+UmmqANWwipwKKvOsDn9/Q2nBo3vHRc9hNZ5nKQUN+1BW7cKxiIqbgD3/9MlzO4LS7NjevATYRjjikLB775eDSFoBYgBVmCp//qFWqebBS1+2OemXgEOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXYPoQAR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998EFC32782;
+	Mon, 19 Aug 2024 23:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724108849;
+	bh=mJXaRxbMWM39dMzH9l5kYZ7g7ouNmwcruKXMK8gNkX8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gXYPoQARvA+Pn4TQep5aX8uvhPU06HBEZC8s7nU3NeDTwzfpLC4/XPM6bcOXpcSMR
+	 j+IioWHWPS2jmBGAlBK1B9w6GJyxDfWblqCclt4caiicnCA4GBGM38I8o3Wblu0AP3
+	 dyxIzG3yJQASecBEF/gSzYD/687723usA4TQIOs+wgv5E29VuZVe0NMUe/oBuVzBWH
+	 xrzpEWN4Fm1cKpkkXgUIF9REemYttOrPNk7l+ICyrUhzfayvlwbNxHb00+Ex6nyLrn
+	 Ie4odNMEAbURIqwPUcl7Yv6kPnkV6S6rKmEzfrv1Zk+soK0dsfO56hb9jEPD/y50K/
+	 K5TiLUSIvFf4A==
+Message-ID: <0a51e728-8005-404f-b2f2-16fc31834d2f@kernel.org>
+Date: Tue, 20 Aug 2024 08:07:23 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819143753.GF11472@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] PCI: Make pcim_release_region() a public function
+To: Philipp Stanner <pstanner@redhat.com>, onathan Corbet <corbet@lwn.net>,
+ Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+ Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+ Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Alvaro Karsz <alvaro.karsz@solid-run.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Mark Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-3-pstanner@redhat.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20240819165148.58201-3-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 19, 2024 at 03:37:53PM +0100, Simon Horman wrote:
-> > +static struct net_device bond_ipsec_dev(struct xfrm_state *xs)
+On 8/20/24 01:51, Philipp Stanner wrote:
+> pcim_release_region() is the managed counterpart of
+> pci_release_region(). It can be useful in some cases where drivers want
+> to manually release a requested region before the driver's remove()
+> callback is invoked.
 > 
-> Hi Hangbin,
+> Make pcim_release_region() a public function.
 > 
-> Based on the implementation of the function, it looks like it should return
-> 'struct net_device *' rather than 'struct net_device' (a '*' is missing).
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Sigh, I noticed this but forgot the update the patch.. The build also passed
-due to missing CONFIG_XFRM_OFFLOAD=y, even I added CONFIG_XFRM_OFFLOAD=y to
-config file. I need to check the reason.
+Looks fine to me. But I think this should be squashed with patch 2 (I do not see
+the point of having 2 patches to export 2 functions that are complementary).
+Either way:
 
-Hangbin
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+-- 
+Damien Le Moal
+Western Digital Research
+
 
