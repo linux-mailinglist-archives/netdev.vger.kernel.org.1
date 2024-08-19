@@ -1,306 +1,166 @@
-Return-Path: <netdev+bounces-119621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793A79565EB
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 965E79565F7
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 10:49:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0221F250F2
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 08:47:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40EAB1F25D06
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 08:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D6815B130;
-	Mon, 19 Aug 2024 08:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8552315B546;
+	Mon, 19 Aug 2024 08:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fQlejTBU"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K8xOYRzT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226C914BF8A
-	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 08:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724057255; cv=fail; b=DAGBVIvxBjZoPg39MVI7+OFRS+nhYKFdVJ5Nh5Gpc9PfbyR8Zsm7xclcZHSuGPkDMMgCEIWpuPyG0ndbstEbhAZp2oK0mw4VVf/SUC1jrgo2cim7QHps6tOiNHdiya9zXKs+2s9vIJzrU+KA0jHfJVzqihryyLjLrELFtBannaU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724057255; c=relaxed/simple;
-	bh=sgEUtGekB50OZL0gV0A/tvvGUARzK8Ax1601VHGR8fg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=B3TgTZyjLf1sSaS2afh9a+DBB6Gilsf4NxgQdLeWKujxubLdWgmqVNyyPJI+IOZuHGuQW3+u/qX6NPLaVv47JTMOK/4peiC/69SNmXxls+zUT5jHofAHJ4QtCKGYkkJ3sq6ZNOUDjC6yiFH1y45HUhc0GbIaf8pLoc9dc5S754o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fQlejTBU; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724057254; x=1755593254;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sgEUtGekB50OZL0gV0A/tvvGUARzK8Ax1601VHGR8fg=;
-  b=fQlejTBUll5M2/SeaV5rE21NgMKrcX6RetOpbwgyj2yShf1vFuDItGAw
-   KVbnyOFZSyorSiOKeGatFvm0ma1Z185/ayF9eH/SS+elgrycYoxgiwVvu
-   ldLmxIhnuLlrv1SRBsJ20G3Hf+EnSn6zf9LIBQ8yGUL51WaqPVslzGye9
-   /A+vgEmyct2Qn8fjkKy1N++9Hv/h4MY4HzCT2/kUoUYAwn2PgIM5g5frK
-   vUWnRyHRZ1Z6SwSA1KiByjUHkD+ACDK3Oqp3ZVN1cY54Z0lhSbB2lQNJQ
-   gc/TXJy1eM+L5JQfraE8N6YxStvUTG/7S4XX9DvH9k7sWG4r+/ns6shul
-   Q==;
-X-CSE-ConnectionGUID: d2Dyt471RqWt8BdyfY2PkA==
-X-CSE-MsgGUID: JedztQi9Q6+++DJ831mr+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="21835948"
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="21835948"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2024 01:47:33 -0700
-X-CSE-ConnectionGUID: SvJHFZzBR3CNqeCIjy4HlQ==
-X-CSE-MsgGUID: vezwy8zMRGqBrbCD96FVgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="91081697"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Aug 2024 01:47:33 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 19 Aug 2024 01:47:32 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 19 Aug 2024 01:47:32 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 19 Aug 2024 01:47:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=y3z7cg+DLt+e+3KWjEzgYCpRhjgLC+vRmuVa82kS6rLiQixaZedQEV5SiTiyrvAD63fKYys6Hp215i8RGC3Ta+yf9qDCBfRYdgBIoKktVlUIBKiiHHl3b+kmQhK1uPS6JdmIX9bdWcRBgF8k0Y1YlXFILFgsDztpqt/7Z/29CG86ZoEWia7dx2s54vUmVf6hIwvADMPY2cHVEySwZJgtphzGIt3zoN9pOIzmzma1nZbNBmY1Ly3jDVXblWrhA+vOLWi8VpohBqeT3O0aIQ88ydy6J0MyQQ17FR9L5dWRM3E6EPL9WjtY1H1H6Nj2gr4cBXz3jHeZs9vU4fKFbYZycA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=URkEQJJ33aQd36OeNXgVlBq/XurJPms7+1V92QTO8Y0=;
- b=XbMR2INdlW9ZLICpXVvBlYT91c5O2nKR5sTY6WW4AxhfqU8OIpKo+aRDbKK298XhlCOF+NjD+LhfdV7DU3fdm23eJI5Hf+vDVdLpa1vBngL0fGSnJcJ+eHTkq7G9qGEMZuXPLbs3SlYvrd89dqHHs3zft3pPPL46GtTFAMYxg9DCLTDo91mKRH2iYfrRcv69m/T/mRflrhd945RZLD7z28G2icum5GJSRixeSsmDygJrOd6cSK87fgbp6gBT93NQ0LVk9+ylaBqBZOsSdo8MxBxn3mI6mV3tuM7sg9dfpVJHzuOgN4kEB5cf3Wrz+JkrBlUMJiB3vSxbES9rslxC+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA1PR11MB7697.namprd11.prod.outlook.com (2603:10b6:806:33a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Mon, 19 Aug
- 2024 08:47:24 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
- 08:47:24 +0000
-Message-ID: <ba76710b-c3e2-442a-b398-2b2a87f3642c@intel.com>
-Date: Mon, 19 Aug 2024 10:47:19 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v3] ice: Add netif_device_attach/detach into PF
- reset flow
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-CC: <netdev@vger.kernel.org>, <larysa.zaremba@intel.com>,
-	<maciej.fijalkowski@intel.com>, <kalesh-anakkur.purayil@broadcom.com>, "Jakub
- Kicinski" <kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, Igor
- Bagnucki <igor.bagnucki@intel.com>
-References: <20240819082146.101755-1-dawid.osuchowski@linux.intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240819082146.101755-1-dawid.osuchowski@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0287.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8a::20) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A6715CD58
+	for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 08:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724057317; cv=none; b=RBlwo97Mun2cgzTztuhtlLddzG7A5L9X84VRjnjTXReR9vW/GiInTCR8cM+oD0t2owJznMenwp0MW45sN00z3Ayg/WxWx/4uI+ix636OM4gVh17vFMApu+yZilGx8oFhl6H7S7OC00dAylC/oISs9d4xgo6ocAw2g9BqNHGVNgM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724057317; c=relaxed/simple;
+	bh=QgWNdxuaXxowMM7Zad8szQ8kTHb3DEg2AE7frDExoyk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tT8+te4OlzeOHjeEwOYovIMmb9nNbhbJQBlwrsAoDQuP10yd+JhCLgytgj4r29QhZI8UwFPAKzCAcsyyZb9twOefF9UAKwS62dmtrYB3HjusLl35Cr6OVZZV26QQ1+DSiWVAfYiXkbf4RlgTUIsLmJ7Ctsn4g97CxB0cP/wK2Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=K8xOYRzT; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a83597ce5beso613156266b.1
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 01:48:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1724057314; x=1724662114; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Fg7adxtw1wHc/80Fw03H7ZBiEBIGBaYUl+MvLIdJnU=;
+        b=K8xOYRzTaT5dLW4VYeKaOHoS4v82bNV33Zdh14BJ4AhKoCQw1WQaLEzC4vcXaH/9zu
+         vAHcsL0pShWBAboYmZy4F1vRl2jHUS+ILmBhJ2kcP8iwyrgdbZntwtHJkWjLabiNmPrT
+         BFp1x0JttFd9RuURjHrZnVt0nhlKUOsuZFxuQdiPj1KxRwGRPtWYuFIJ6SK/ALCQql3Z
+         zxo+ZRYalu9dJdlq76wCq+5UtYtkF0neqiD84tT4GDfK4beMugDDya3DInXCtbEPQDKY
+         BBYbIfNFWQYJ1gAFDTEN+JqzWdX/AKivuOgSTUHZQLd11A5MM2wEh9FL+M4WcQVzUrf6
+         jqAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724057314; x=1724662114;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Fg7adxtw1wHc/80Fw03H7ZBiEBIGBaYUl+MvLIdJnU=;
+        b=twSZ48qdNx4YCwlYsx9mvlaoxxoF0hMYooZVHEU59PO8MqUCVFMrwgz9zTkg3uMSFE
+         lbHe0845vjbwWFa+WNwvWGcmZ5bkWmJfa7tQfVmVz8PK/WI2xFY0ysoAlqxHvgCYgYWy
+         MgUOGkxIrgdvNHk4H7e96bSwYxohmqmYuuTSYBMubEbRByaw14WBEUV1rQv1mCN18iVQ
+         ZnTBkXd+RRq/o/LzsJOc6HOsEw2mnjBiTJSds58mtucTW1crIJFKq+C+ldVaMqSQUj0W
+         jnHMiLddGCFOku9N7culUL1RmR+P+4jS8t6vBGPgWIDTgc5Q0+Y6oWR/jelrqGy0IOE5
+         h4iQ==
+X-Gm-Message-State: AOJu0YzrDQ0QwHjir79D2TRFRCZhD9YkrvnOUVcl8c52XKElcvNz4V/i
+	MekNK4AHVEldqyJR41tfQy1a8FHGlRFZpMCegRDUL2oi1G471xgbeHDe7Yke2o0=
+X-Google-Smtp-Source: AGHT+IFPJMZp1Zs/cpJsATp7EFOjfpi5/Ke8sqnNIdnRsaYtIlkv656ev5mPGA9YjYhrj+nB4yBerw==
+X-Received: by 2002:a17:907:7f15:b0:a77:f5fc:cb61 with SMTP id a640c23a62f3a-a8394afbf80mr925164666b.0.1724057313592;
+        Mon, 19 Aug 2024 01:48:33 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838cfe4csm606490066b.89.2024.08.19.01.48.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2024 01:48:33 -0700 (PDT)
+Message-ID: <b591649f-ada5-42c1-984c-7e358c0337fa@blackwall.org>
+Date: Mon, 19 Aug 2024 11:48:32 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB7697:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c65ce02-19e3-45d7-4031-08dcc02b8bdb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?L3NSMUlFR3BwL2pYY3VReTM0b21mRGJHTTBrd2pPYm8xVUhyRXFIZVdNS3Qr?=
- =?utf-8?B?YTRDZ0t3TU0vOGxyMktnSDRsM3ZqbStzVDIrTkF5YzhjQVEraVlYaFUwMDFx?=
- =?utf-8?B?THhEbXA1eHJ4MHoweUkyejYwVnFUTVQxN2JtR01ZTDBTSktQQ3ZhTzNVQ20v?=
- =?utf-8?B?NVJXMzg5TWp2U04xc3F3WkIwVDdiekpzdTBZb005bi9hSXZibURkKzZFRGNz?=
- =?utf-8?B?NndHWXk1bEVRUmo2SVA2YVR4NU5XS1hSTFNqSlVXUUVCdGg3aWZucHcyRnhI?=
- =?utf-8?B?RzB6eWwxbDJqZjNVWG1zclZiaGtycDVTU1YrdmhKWUV1c3FJb2RDUmE4aG1L?=
- =?utf-8?B?STlHclBCa3JHc2oycUp6OG13dEtOUVRPQzY1alUwNzFaUXRiVUFyT3lRR0Fm?=
- =?utf-8?B?a2ZIVk4wTTM1Y083UFppU2k1eFJEdFVDT0tPR3BSclJJUlMyNDhxMjliNTJF?=
- =?utf-8?B?MXk2NkhzMitIRTQ4QUFPRm05SVREYVcySVhzYUc0R2lYNU1jSUtlVDBsczM2?=
- =?utf-8?B?My9SMFR3bk9abXEvY3haOFcxdDVaMFNMRXRicnp5N1ZRWnNVSVVvRXlmYlJq?=
- =?utf-8?B?Rlhia1MxemE1NzdtUlFjalk0L2d1a3E3RTdJaU5pcWE2Tmo5WHROVXcxM05B?=
- =?utf-8?B?b0Z6V3dZN0x1R2hhN0xTbkx2d1pITjZHd0tzQVB1eGpPeHljQXErM0NvWmxu?=
- =?utf-8?B?cmJhbklDYmxmOThkVzhvQllRbExIMHB0aUhoSGdVcjUrTmRYazE3WVF3S1Fs?=
- =?utf-8?B?d3pMT1gvNjlvVkJVUTVhcGcvVjVEZEpaeEpqeUhhYmJ5WWdQNVpYa2Exa0xJ?=
- =?utf-8?B?dDJyWWc0S3grRTM0S1d2aDY1NVVVemRCUU0yT2VFRDBkNW9MeHJ1a0Rsb25h?=
- =?utf-8?B?eDdzUkZOYUc4NEJONDlGbldIdURFM1dOU1phVU95Qmp1eGF1UHVhc1Z6OVlx?=
- =?utf-8?B?Z1VkTDJ3MXNURXBaU0QxOXhKWjArUlF4WWxBRk15bzlOYVJXSEN1V1h5bU00?=
- =?utf-8?B?MUFGWlFpQ2dlTk8xWldrUXUyZEZUK2NlanlGa0hFZWllV2JqN1JnZTBQbXpG?=
- =?utf-8?B?VHVuekVobHRXWXRLUDJHU1hUdWVhMUl2K1NaekJJNzlTTjRTZFlYVG1RZlIz?=
- =?utf-8?B?eGJRZmFTL0ZBaTZpSUxMQzJhVGJuQ0ZUSkdZaU5LMXFKWCtDRktUd0F2WkhZ?=
- =?utf-8?B?RWJKOUtyVWxCQVRUK1J3Z0VPTW80d2FVYUFpakpYbUp2TzB6QW9ldExEblZw?=
- =?utf-8?B?NGxvTC9pVWFJRExrQmQ5NTNrdGFmYmk4OVZpN2R6TWVodXNheXdYc2tiTXhP?=
- =?utf-8?B?d3JOeXpGcXBkaVRtSVFoYi9ZUTRXWUVHbXpHck1XMmtoTWNJMWt6c3pPL1Fk?=
- =?utf-8?B?OWUrZmpKRnYzMWFxYmxsY0hkS2FRekJWS25DZTlCbnc1b1hqa2RwaWtrek9E?=
- =?utf-8?B?b3ltaWRtTDNTR1ZoTy9GTm53WElzUk5YYkVqYnpDdjN5SCtiWloweGR1UlRB?=
- =?utf-8?B?Z0xDNkQyOTIzYklnM2svdFFuY1pPQ25hNkFHbjBXTzFWT3JBM1NxOWxoZ0gr?=
- =?utf-8?B?WjBoRFhsaFd3VWlBYWRGSThXaFVVZzdsMUdwZzVETjdCUGIrY0RxaWM3Y0hs?=
- =?utf-8?B?QWpRSndJdkQrVWF3aUZobDRzY3pQTm8rSk9SMm9kMWtsUHlHd3dzT09uU25p?=
- =?utf-8?B?WmduYUtySE5TbXcyMzVQWEFUUmJRbW5tTjcwNzh2MzFueWczVzNvNlNmMlpO?=
- =?utf-8?Q?Qxaobp74jv9EEc9ykhG36Jvbv8771DwM0q7ng7o?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bTMybUVOVHJwMFVUa251MGdsanNYam1zLzl5eHIyS01WbTFsVmw3Y3Q1VnpD?=
- =?utf-8?B?VlRaUDJjWEtLeWU3bDVxVytXSUswUkRLSUJIeWhHM2VqRWFHdy9XTFZ2cGNp?=
- =?utf-8?B?YVdIcmdGZXp6S1E5dzZhR01wbmFtUW1NNURFeTNiZWFqQmg0Y3l6UmRWb2Rv?=
- =?utf-8?B?M3dsV3Z6L3N6b1hDSFgwNU5rRGRYSjE1blV1cWZmOEduWlYrVjBhRk5sTzI4?=
- =?utf-8?B?MEZBVEtrSzQ1UUJkK1RFQlh4RWRrUEJaREQ2U2hPTkhWS2EvTWtsd0FFdmYz?=
- =?utf-8?B?RTZPMjdwVzZNV1dnNmVYODkrYnBYL05XNC9pbDAvdVVLblpZWnFsU0NQUjky?=
- =?utf-8?B?OWtEdGhQcDN2VFNUbUw2WFZpeFRBTmYvbVlSM1RySk9BbS9hNW5iV2xrVW5I?=
- =?utf-8?B?RHBKb25WM05zMUp3ai9TMXJWZVlQdk5nRjlaSTdkS1FtZk9BS3RNNlBFbXRG?=
- =?utf-8?B?SklpdHdTL1ZkR0dnRU8zcDB2eERzdm9lMk9DV3M5RjhBRlE2TUlqVysxZUtT?=
- =?utf-8?B?NldzWWt0RGYxbkxsVlZqUDlvWGhlSnkvbWh4NHdpT3dObXArTEE5Yko5SU9n?=
- =?utf-8?B?VUJmS0FJNEFrREx3eW5GYURURUVhMjJXWFdoZTBLUEZ0dlh4ek5xbk5oTFp5?=
- =?utf-8?B?bndhUkJCRG5VcjJIMXAzM0tSMDd1N2pXZWFraENjTHdNeVh4Zm9jVWZrUjlV?=
- =?utf-8?B?YUtqLzFCeTBTT3ovR0hiSUU0cUZuWDNMdjdEd2RYVmYySC9JbkJCeWJzK3FP?=
- =?utf-8?B?Y1d3OVhzNk4wNU4zNXRNa1ZDUU5lcWpsTStxVVBPZ0NpNXpST0FlTkk3aU03?=
- =?utf-8?B?VXhtM3lLdlIvNFRmVVdTOVNLNWFzczBIcDNkaXI2TTEwUG1ZZFBZZFRCa2sy?=
- =?utf-8?B?WUhId0w4Z081NjIrYUxUVGc5R0NoS1Fhc2YwM25RZFQzVXQvWDBTVmZKTXV2?=
- =?utf-8?B?T2gxbzFZUlc1MFVyUGNUV2JQTEZQTjMwek5EaFZPNzNSVWphUTdHa2lrYVoy?=
- =?utf-8?B?NEx2aDlhaDF2MXNZZVYvVlZhSk5iMEJtdXdxMWpUNGpaRU9WSzMrdjg4anpl?=
- =?utf-8?B?VHptenhHS1FrUHI5d2VRSEtubXFJYzdaVUFKSGRhQ3JuODBQTFNrb0FEZnY2?=
- =?utf-8?B?TTdCeTdZOGdPVStlQVJRbkpXNGE4ZHpHUUtvWG9tNzNnTGpYdEpBcWZoRUNw?=
- =?utf-8?B?UXBVbTRzdE43N2NPbjJycFVmYmhnV1ltU0o5L1p1akFibU5jRDU4SkpWYkk4?=
- =?utf-8?B?T3FHSERKTGt6aGwrYzZwTzZoYXRhbjZjVm1FN2IyM0tLTkZBL0VaeUtJVDBy?=
- =?utf-8?B?N0dTeGpZaVRoTnMzZlJ5RUJSRGR0NTBEdllSRytHTUIwUEdxaUN2Rnl3L2hq?=
- =?utf-8?B?NE5sSVpWb3dpSVlIZ1hBUlQyTjAwSVpJOVlxZktyeEZOTkdpUzJsdTlIYWZm?=
- =?utf-8?B?MEVVVkl4aWRqdFczcVJVRWpDTUxyUm5NTzVPaWFmY2ExYzQvWTF5NW5Mcmp6?=
- =?utf-8?B?RVNDMmVJZUtiS1RqVEJkSmVZUGMybGMxeGxsL1dMVkZrZ0hSSnZWQU9OZWJt?=
- =?utf-8?B?N1A3MkpSY0ZuQjVRZm8yVXdpSTEvbzJWeUo1Q3FpSGNkRUppZVNaK0F5SzRl?=
- =?utf-8?B?dnJiWG0vNFNtMnpZZXc0TGhxRk56UDlUYVZmWWpYMG1LWnMrZ3N4OVZJNVhK?=
- =?utf-8?B?VC9sTWJFSlordGUzNEE1OHNFRS9QMEJtSDRwQXIyV08rUGt5YkpLMFVERDhB?=
- =?utf-8?B?N2dBWW9jUXQwZnZEbUcwWUZMQkk5MzVNU0pPTFBqNE1WSXZtT2pxc0VaVmZ1?=
- =?utf-8?B?OUhUTW9MRnQxdVE4QzNmMUlVTnRTYnVTTHZiZW1XNjRFM3B2a3pwcFZIOElp?=
- =?utf-8?B?VVAxWDQ2aTB5clg1VlBwYWh2THRTR3l0TE53dENTZVI0S05zVGhBVTc3WFVU?=
- =?utf-8?B?YkpVUE5GYk1WZ25jRHRJM0dodDhNUXNpRmxZODZSTXZFUXFaVlhwYkRIcXFu?=
- =?utf-8?B?d2pZUGxZMGcxM3FOdXZBQjFiRGxHOEhXZ0VwbG15Ni8ydWpBVTNWQlVwcmFW?=
- =?utf-8?B?cENFMmhyZk9UV3d5TkVtcGxIVVl1eW5odXRQMGNHRFlRY3V2Tk9RVkZpZ0s1?=
- =?utf-8?B?T0l2QS9OSCt1MUhxNGF0d0NnZCtTMkpjbldnUEdqRzZ3R1VmUEVXRS83TGhv?=
- =?utf-8?B?OWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c65ce02-19e3-45d7-4031-08dcc02b8bdb
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2024 08:47:24.3092
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6oLUWcPmJrpBsIcIfSyTh8fjJq9pQdAdRC8k1YcxelQjeWg6Q1RGGwZUsqZNXD4Ou7vnSh58k6FtYblUDOZo/9AbieflcTHS3unYE7TLlKs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7697
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net-next 1/3] bonding: add common function to check
+ ipsec device
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <20240819075334.236334-1-liuhangbin@gmail.com>
+ <20240819075334.236334-2-liuhangbin@gmail.com>
+ <a60116a2-bcbd-4d0f-9cfb-7717c188e26f@blackwall.org>
+ <ZsMFspiLZojq3EIO@Laptop-X1>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZsMFspiLZojq3EIO@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 8/19/24 10:21, Dawid Osuchowski wrote:
-> Ethtool callbacks can be executed while reset is in progress and try to
-> access deleted resources, e.g. getting coalesce settings can result in a
-> NULL pointer dereference seen below.
+On 19/08/2024 11:43, Hangbin Liu wrote:
+> On Mon, Aug 19, 2024 at 11:02:14AM +0300, Nikolay Aleksandrov wrote:
+>>> +static struct net_device bond_ipsec_dev(struct xfrm_state *xs)
+>>> +{
+>>> +	struct net_device *bond_dev = xs->xso.dev;
+>>> +	struct net_device *real_dev;
+>>> +	struct bonding *bond;
+>>> +	struct slave *slave;
+>>> +
+>>> +	if (!bond_dev)
+>>> +		return NULL;
+>>> +
+>>> +	bond = netdev_priv(bond_dev);
+>>> +	slave = rcu_dereference(bond->curr_active_slave);
+>>> +	real_dev = slave ? slave->dev : NULL;
+>>> +
+>>> +	if ((BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) ||
+>>> +	    !slave || !real_dev || !xs->xso.real_dev)
+>>> +		return NULL;
+>>
+>> No need to check !slave again here.  !real_dev implies !slave and
+>> vice-versa, if it is set then we must have had a slave.
 > 
-> Reproduction steps:
-> Once the driver is fully initialized, trigger reset:
-> 	# echo 1 > /sys/class/net/<interface>/device/reset
-> when reset is in progress try to get coalesce settings using ethtool:
-> 	# ethtool -c <interface>
+> Ah yes, I missed this.
 > 
-> BUG: kernel NULL pointer dereference, address: 0000000000000020
-> PGD 0 P4D 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+ #7
-> RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
-> RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
-> RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
-> R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
-> FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0
-> Call Trace:
-> <TASK>
-> ice_get_coalesce+0x17/0x30 [ice]
-> coalesce_prepare_data+0x61/0x80
-> ethnl_default_doit+0xde/0x340
-> genl_family_rcv_msg_doit+0xf2/0x150
-> genl_rcv_msg+0x1b3/0x2c0
-> netlink_rcv_skb+0x5b/0x110
-> genl_rcv+0x28/0x40
-> netlink_unicast+0x19c/0x290
-> netlink_sendmsg+0x222/0x490
-> __sys_sendto+0x1df/0x1f0
-> __x64_sys_sendto+0x24/0x30
-> do_syscall_64+0x82/0x160
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> RIP: 0033:0x7faee60d8e27
-> 
-> Calling netif_device_detach() before reset makes the net core not call
-> the driver when ethtool command is issued, the attempt to execute an
-> ethtool command during reset will result in the following message:
-> 
->      netlink error: No such device
-> 
-> instead of NULL pointer dereference. Once reset is done and
-> ice_rebuild() is executing, the netif_device_attach() is called to allow
-> for ethtool operations to occur again in a safe manner.
-> 
-> Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> ---
-> Changes since v1:
-> * Changed Fixes tag to point to another commit
-> * Minified the stacktrace
-> 
-> Changes since v2:
-> * Moved netif_device_attach() directly into ice_rebuild() and perform it
->    only on main vsi
-> 
-> Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5be90@kernel.org/
-> Previous attempt (dropped because it introduced regression with link up): https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@linux.intel.com/
-> ---
->   drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index eaa73cc200f4..27ec5d8d5810 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -608,6 +608,8 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
->   			memset(&vsi->mqprio_qopt, 0, sizeof(vsi->mqprio_qopt));
->   		}
->   	}
-> +	if (vsi->netdev)
-> +		netif_device_detach(vsi->netdev);
->   skip:
->   
->   	/* clear SW filtering DB */
-> @@ -7731,6 +7733,10 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
->   		ice_rebuild_arfs(pf);
->   	}
->   
-> +	struct ice_vsi *vsi = ice_get_main_vsi(pf);
 
-you should separate declaration statements from expressions by one blank
-line; we also put declarations at the very front of the scope
+This is exactly my point about it being easier to follow if it's not all
+combined in this way.
 
-> +	if (vsi && vsi->netdev)
-> +		netif_device_attach(vsi->netdev);
-> +
->   	ice_update_pf_netdev_link(pf);
->   
->   	/* tell the firmware we are up */
+>> I prefer the more obvious way - check slave after deref and
+>> bail out, similar to my fix, I think it is easier to follow the
+>> code and more obvious. Although I don't feel strong about that
+>> it's just a preference. :)
+> 
+> I don't have a inclination, I just want to check all the error and fail out.
+> If we check each one separately, do you think if I should do like
+> 
+> 	if (!bond_dev)
+> 		return NULL;
+> 
+> 	bond = netdev_priv(bond_dev);
+> 	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
+> 		return NULL;
+> 
+> 	slave = rcu_dereference(bond->curr_active_slave);
+> 	if (!slave)
+> 		return NULL;
+> 
+
+I like this, even though it's more verbose, it's also easier to follow.
+The alternative I have to track all code above and then verify the
+combined check below. Depending on how complex it is, might be ok.
+As I said it's a preference, if you prefer the other way - I don't mind.
+
+>>> +	WARN_ON(xs->xso.real_dev != slave->dev);
+> 
+> Here as you said, the WARN_ON would be triggered easily, do you think if I
+> should change to pr_warn or salve_warn?
+> 
+
+I haven't verified it, but yeah. Given how these are synced, it should be something
+that's limited (we're talking about packets here, we shouldn't flood the logs) and
+not a WARN_ON(). We can see any mid-state while changing.
+
+> Thanks
+> Hangbin
+
+Cheers,
+ Nik
 
 
