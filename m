@@ -1,112 +1,120 @@
-Return-Path: <netdev+bounces-119714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F513956B10
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:41:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D4A956B11
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 14:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AF88281AFC
-	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:41:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81DF41C20446
+	for <lists+netdev@lfdr.de>; Mon, 19 Aug 2024 12:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4F716B3B8;
-	Mon, 19 Aug 2024 12:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BDA16B3BF;
+	Mon, 19 Aug 2024 12:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBcrUdh8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDoWFCsv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D72C16B396;
-	Mon, 19 Aug 2024 12:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F4616B396;
+	Mon, 19 Aug 2024 12:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724071290; cv=none; b=sP/e4FYgszqxA2E8Zxz1r3+7Ti94zeTqIwVnB7XmijR1lp61lSNrOXIuAY8Nqk1BcOKOZ8lFVV6+opIeTLl0oSaPstZd/8HcdSjKdJSV3aCd+Orhs1uMh3Y8SmwRzpJ2zt4sEmBkvr+019HqjIqkfO587sNA5GySIfF/st0q6aQ=
+	t=1724071317; cv=none; b=A3i6edVIPCG8kND5YsV6DskQK2+yJI9tvJ1rvad/EebNqfDb/Yf6NTqccAMX9h+d9ihFEzg81wsZGCpOELnOK552i0IyNM2wH06ykx2LTPIUM7Xkl1Tlgp6+0rEMj/TaOwb3n1flD7xLhUwBWPIcL+mS9BW1dyo5AuheVCwo1mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724071290; c=relaxed/simple;
-	bh=lRaPX6S1bZ8indFiMb4mf48fCGz25lNpXfx+CkGAmB8=;
+	s=arc-20240116; t=1724071317; c=relaxed/simple;
+	bh=HkorkWo41c7o1W5la+gTTbeuOE1bBXcPoKgZ7ULoVb4=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=dJIcqyAtsLbiMgcTERFgjsfuwUlCd++eYbrTfApnTFtoSsw8hnsNVXsGiLo589yyHV6Lq6UJIlX+u2SSXXUuMYltiNeSl8uFEQYZfm4+FxyTmuFk6YlxYOnfskP1lL0GFn/vjtdo2s83c7ijdoPdqTir/uhKiTeO2bWM5f2vunM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBcrUdh8; arc=none smtp.client-ip=209.85.214.171
+	 Mime-Version:Content-Type; b=ZoZYs1lngX2VuYXC+4eLKqNPDWeWLnwdFOiQmndAdOVl+VwQJqwcf+VSA/LS0LuX43WNkzKdKJyaXraTw4mJYmbXXbEaRE0qgyRoIGnb6gkPdT6vAM0zUDZtG+rarfHnSP4vBCcinyGrApzfuFsK7MTj/M85pr/cVwTq6+JhUJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDoWFCsv; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20212f701c9so1712245ad.1;
-        Mon, 19 Aug 2024 05:41:28 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20201433461so1041725ad.3;
+        Mon, 19 Aug 2024 05:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724071288; x=1724676088; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724071316; x=1724676116; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lRaPX6S1bZ8indFiMb4mf48fCGz25lNpXfx+CkGAmB8=;
-        b=LBcrUdh8i4ZEZxdGVdsIzDz1ykhY5IqY4mF7KA8qYBO0EvcQLNaeskszH8l46lNxjJ
-         5YYy+6hdijG2ON8qN26wHxxY/M9oXDZ+jtJqHsV8ltps8EWrti7ftKr/OZaI62SltfCo
-         2cAGXSPaWx9MJRPXamwF3ZvoWGQNMaqMBvipkV+7Z0SCzhMiSUzDOBvk5DWq2+wf4SkZ
-         mT1cVG6gZFq9wBctvl/F9nJssXaMTJMnf2v+MuDuXCWTDcD9dDvqO4qUBkOUaCaXIEef
-         gmRjegh1/GB4WlHATlHIhsY4h3ObgLNCv337epTfu6QhbUrbmq+Ew1/JVmmVnMWbPBdL
-         GBhA==
+        bh=egIIq2Tij2yZlcDUiB3SS6h443dfxA40vwxckLIt5Xk=;
+        b=hDoWFCsvFG9i0JLewgiCj0n3aistsdQp4W2AslAPu2l82060tWCVDzxuTVArlvwPDK
+         spgz4e7gty2MCBrY//L2M58qjReQ/T+SYyFRlGfzwG1rlkYg1otkJjxmnTix8ieWeWjt
+         d7Iht8xKgdUZt68t1djfmUBDx/1gfr6DmiiEsTqmRbRWheCrFDHWgMLFcCTYa/jf/MJi
+         Z1LgsXAIEFUatJtk6z/69upJuLiB5pH9DLDJ6VyJO8XApuyoK4sQ+GgP7zcrkAZcEQHT
+         WGx7+WFECRUqzntb6iK4VWGMykueuAONW9w+6xCazLnAIE17czkNLHva6DaR5BxUwzuC
+         HJ7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724071288; x=1724676088;
+        d=1e100.net; s=20230601; t=1724071316; x=1724676116;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=lRaPX6S1bZ8indFiMb4mf48fCGz25lNpXfx+CkGAmB8=;
-        b=G6uq9ilQxyI6IaF3FMiS9PmCX2V/rmELToNJdRJSe7h4vhw0VYKUjer8M8fDx+zM9/
-         csUD6SXVq0lJSbSGhJobA3UNnVUK2q8t4Ynk7D1ZFyMBrYJ/QrhsCPbZ6e7nVtNwmygd
-         Rxm45dvABRo9BF6P0kKz9WLu0E2TuTX4lHs7TeiAZ1SwrAf8rSpLUv+/Hg+t2WbrFSgL
-         VbK3BE+aFk/SNZrJRmM8nfTCXElQq3gzngw1G4FCwiNPOm/PZ1H+TiisZWT/aZkhvSHo
-         s3LXVwQq/PFuNJZp0DrG+0R++HPga4sxyekzts83oBkLYbEBaniHgBkhLrGhiOm+iCkM
-         LbYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUdtQ9PBivTI+3Dk+RA+RhUedCc9Re5FmDMsZ3VclrfQoig1qcoM29sqVTAjkjSdhN/UhpGwGtEmhEoVnutqzmt4ZWYR57fGqeWx/yiZaqtXH5qU3g6Kw84NlaXPFetiw7EVg/q0Bw=
-X-Gm-Message-State: AOJu0YweXJi3FUIEgexWOudbqjrSDn9753ZapCNNMiYZzuW5hBRwl8Pg
-	5Fdnr3oiZF1pLnogni9xHUGpTEely5pmnLKAyFxjF7zlRf7FYIOF
-X-Google-Smtp-Source: AGHT+IHB087+0ykuohY71edkUQhHL9oXB6wMzHqn9CYQaSbAwH6U5RW37/Vr7eJwZII7dMPqzbEh/g==
-X-Received: by 2002:a05:6a20:72a6:b0:1c4:84ee:63d1 with SMTP id adf61e73a8af0-1c9a2a975e7mr9391801637.9.1724071288058;
-        Mon, 19 Aug 2024 05:41:28 -0700 (PDT)
+        bh=egIIq2Tij2yZlcDUiB3SS6h443dfxA40vwxckLIt5Xk=;
+        b=DVeaSagHEajHzYlJVX5CE036n1zt7YTA5vmb8gn8uQEsh7BW8Hrx6+BdgsHCxtE8Dj
+         h5EKOdbn2dmIrCwVuIy0cR04ofcq5+w1Qtw0Y7Axa4cqe914qQOT3sfazYVnN/zNgLsS
+         XXTpR/jT/JpPVwL1KE1/7ApTTAcET3zJjz6UpgJ3uLZ+RnFZxkWTx4y48PtngEk3nvL+
+         lft/stE3n1WiJAsbEh6G+QmRxZcJkjIU/enVxV7Uim8ZZ6GY4LFFHXYv0ejUG0Fiz/ae
+         BGwR31Ia0eqP+GWe0reDG336N3jryXRU46ddU88rXUn9roZz6U3ziXtKWATuLke6jYFe
+         oylQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFNG2Xw4E5pTqHJvjIwOOZnn9DZltO6hDWV04honAPAkAHz9jtAHDUtMcWQ3ekz8rTJptj5WU=@vger.kernel.org, AJvYcCWusZ5CZDjW6k/ol//G+gnwWz+3THfEgZYKsYmf5COv1cM16upUQUKX2hJ0jOKORZpiRpStDkYngvpWwGsQZgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweYru61aju2uYU+0b4DL6UZjMzm5UfkpSPhM5NlnoEGkJANe8J
+	HLEHXIAW5uX7Qrtb69StJPq1ksO9NNGwIVJx3iEQpDjIqTykgbmd
+X-Google-Smtp-Source: AGHT+IGD5oXHKY8DggbLbs8785+A8clBy8pdJNgZXfBNsRUm5YwKDS1Z4yCcAFD98Yp0yZ0QWfC2Ww==
+X-Received: by 2002:a17:902:f545:b0:202:41cb:7d73 with SMTP id d9443c01a7336-20241cb80c9mr20775625ad.11.1724071315637;
+        Mon, 19 Aug 2024 05:41:55 -0700 (PDT)
 Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f039e9ccsm62082535ad.247.2024.08.19.05.41.25
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f022c72bsm62249535ad.0.2024.08.19.05.41.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 05:41:27 -0700 (PDT)
-Date: Mon, 19 Aug 2024 12:41:13 +0000 (UTC)
-Message-Id: <20240819.124113.785655943995048226.fujita.tomonori@gmail.com>
+        Mon, 19 Aug 2024 05:41:55 -0700 (PDT)
+Date: Mon, 19 Aug 2024 12:41:52 +0000 (UTC)
+Message-Id: <20240819.124152.1149996909347890108.fujita.tomonori@gmail.com>
 To: tmgross@umich.edu
 Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
  rust-for-linux@vger.kernel.org, andrew@lunn.ch,
  miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
  aliceryhl@google.com
-Subject: Re: [PATCH net-next v5 4/6] rust: net::phy unified read/write API
- for C22 and C45 registers
+Subject: Re: [PATCH net-next v5 3/6] rust: net::phy implement
+ AsRef<kernel::device::Device> trait
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CALNs47tLDD2SQDeJ7h24Sakd6N244OXM8HvPsHQMds4XjwOTQw@mail.gmail.com>
+In-Reply-To: <CALNs47s6oscYosRT-xgdTtC_4SG7W2iwEzrB+7w0Bc=P4G6tPw@mail.gmail.com>
 References: <20240819005345.84255-1-fujita.tomonori@gmail.com>
-	<20240819005345.84255-5-fujita.tomonori@gmail.com>
-	<CALNs47tLDD2SQDeJ7h24Sakd6N244OXM8HvPsHQMds4XjwOTQw@mail.gmail.com>
+	<20240819005345.84255-4-fujita.tomonori@gmail.com>
+	<CALNs47s6oscYosRT-xgdTtC_4SG7W2iwEzrB+7w0Bc=P4G6tPw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-T24gTW9uLCAxOSBBdWcgMjAyNCAwMjozNzowMiAtMDUwMA0KVHJldm9yIEdyb3NzIDx0bWdyb3Nz
-QHVtaWNoLmVkdT4gd3JvdGU6DQoNCj4gT24gU3VuLCBBdWcgMTgsIDIwMjQgYXQgODowMeKAr1BN
-IEZVSklUQSBUb21vbm9yaQ0KPiA8ZnVqaXRhLnRvbW9ub3JpQGdtYWlsLmNvbT4gd3JvdGU6DQo+
-Pg0KPj4gQWRkIHRoZSB1bmlmaWVkIHJlYWQvd3JpdGUgQVBJIGZvciBDMjIgYW5kIEM0NSByZWdp
-c3RlcnMuIFRoZQ0KPj4gYWJzdHJhY3Rpb25zIHN1cHBvcnQgYWNjZXNzIHRvIG9ubHkgQzIyIHJl
-Z2lzdGVycyBub3cuIEluc3RlYWQgb2YNCj4+IGFkZGluZyByZWFkL3dyaXRlX2M0NSBtZXRob2Rz
-IHNwZWNpZmljYWxseSBmb3IgQzQ1LCBhIG5ldyByZWcgbW9kdWxlDQo+PiBzdXBwb3J0cyB0aGUg
-dW5pZmllZCBBUEkgdG8gYWNjZXNzIEMyMiBhbmQgQzQ1IHJlZ2lzdGVycyB3aXRoIHRyYWl0LA0K
-Pj4gYnkgY2FsbGluZyBhbiBhcHByb3ByaWF0ZSBwaHlsaWIgZnVuY3Rpb25zLg0KPj4NCj4+IFJl
-dmlld2VkLWJ5OiBUcmV2b3IgR3Jvc3MgPHRtZ3Jvc3NAdW1pY2guZWR1Pg0KPj4gUmV2aWV3ZWQt
-Ynk6IEJlbm5vIExvc3NpbiA8YmVubm8ubG9zc2luQHByb3Rvbi5tZT4NCj4+IFJldmlld2VkLWJ5
-OiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+DQo+PiBTaWduZWQtb2ZmLWJ5OiBGVUpJVEEg
-VG9tb25vcmkgPGZ1aml0YS50b21vbm9yaUBnbWFpbC5jb20+DQo+PiAtLS0NCj4gDQo+IElmIHRo
-ZXJlIHdpbmRzIHVwIGJlaW5nIGFub3RoZXIgdmVyc2lvbiwgY291bGQgeW91IGxpbmsgdGhlIHBy
-ZXZpb3VzDQo+IGNoYWluIGZvciB0aGVzZSB0d28gcGF0Y2hlcyAoWzFdKSBpbiB0aGUgY292ZXIg
-bGV0dGVyPyBJIGtuZXcgaXQgd2FzDQo+IGZhbWlsaWFyIGJ1dCBjb3VsZG4ndCBmaWd1cmUgb3V0
-IHdoZXJlIEkgaGFkIHNlZW4gaXQgYmVmb3JlIDopDQo+IA0KPiBbMV06IGh0dHBzOi8vbG9yZS5r
-ZXJuZWwub3JnL3J1c3QtZm9yLWxpbnV4LzIwMjQwNjA3MDUyMTEzLjY5MDI2LTEtZnVqaXRhLnRv
-bW9ub3JpQGdtYWlsLmNvbS8NCg0KU3VyZSwgSSdsbCBhZGQuDQo=
+On Mon, 19 Aug 2024 02:21:03 -0500
+Trevor Gross <tmgross@umich.edu> wrote:
+
+>> @@ -76,9 +76,11 @@ impl Device {
+>>      ///
+>>      /// # Safety
+>>      ///
+>> -    /// For the duration of 'a, the pointer must point at a valid `phy_device`,
+>> -    /// and the caller must be in a context where all methods defined on this struct
+>> -    /// are safe to call.
+>> +    /// For the duration of 'a,
+> 
+> Nit, backticks around `'a`
+
+Oops, I'll add.
+
+>> +    /// - the pointer must point at a valid `phy_device`, and the caller
+>> +    ///   must be in a context where all methods defined on this struct
+>> +    ///   are safe to call.
+>> +    /// - `(*ptr).mdio.dev` must be a valid.
+>>      unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+>>          // CAST: `Self` is a `repr(transparent)` wrapper around `bindings::phy_device`.
+>>          let ptr = ptr.cast::<Self>();
+> 
+> Reviewed-by: Trevor Gross <tmgross@umich.edu>
+
+Thanks!
 
