@@ -1,131 +1,118 @@
-Return-Path: <netdev+bounces-120153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A016D958754
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:49:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1BBC958759
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1171C21B77
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:49:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A1021F228CB
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1476A18FDA6;
-	Tue, 20 Aug 2024 12:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D131518E039;
+	Tue, 20 Aug 2024 12:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SogOe8+b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRY5MUfZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7584618DF97
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A8818DF6D
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724158153; cv=none; b=QelLke/hI49M7F1qSqBbFDbBPxsP1pWnuPMwMfdJCq/Al9VvNcbkiK7aKpWPT9oQG6x6myfNc0tge5RXNQpLdj5jwEpNKAA2bDOaPIGiwmkdMO+QpqqCki3p51CyMT3CViGQfa5JeqpJKW12E3w9s/kpqdBogPCyYHthxxoVxsw=
+	t=1724158258; cv=none; b=N818JgubkauZl9xx67hNbs7LVG7jFcahiEdldPYMDkJgAKPzl8zhluf5Jq05Ib9cdbVPXFC5nc4A0WzV1hISkGaNgtkqj8stOIVXLZnZuXPFHdrXTf5sbAbbSte+B3DuP9/oN0Au+xaJjIrhkHdOEg0QGkdPvAZQbitYdS1Bc2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724158153; c=relaxed/simple;
-	bh=1Sbs6eQl2iCqdSwxfE6pIQkD2Iw+7sq2JAkoE4cztJU=;
+	s=arc-20240116; t=1724158258; c=relaxed/simple;
+	bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SmiKckTkh2rqDWembT3POSAq0V0LaKmcaSRM+z0Gv9xAqN4Jt1fA4F/0zaCvLV91pMveBGyNGfQVwuwJvlTr0U4Lp8LAUBTOqPpPNjPVaTAU9NptdxWVFqpRaUkANCLVL24fZW7r//cM027KGjrhKzopZaVE4E8uRaSrIX2cQwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SogOe8+b; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a83597ce5beso827675966b.1
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 05:49:11 -0700 (PDT)
+	 To:Cc:Content-Type; b=s6ax/dVblqZdC0CaT18lQstw6yCyFInbIdfoSXABXxj3ZckRRE2Vh500ayEfRbPEwYA6mQEUoZLiUjnjqXFFHOVtTwL/3KXwQWjKeA4qADdGZneDH1LN2g93CsMRav1fNRAobblE7t26iTDaBDv/069hY6Z5bRL5SYziSryVZYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRY5MUfZ; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39d3872e542so11052105ab.2
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 05:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724158150; x=1724762950; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724158256; x=1724763056; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hkcpd9YjkBve1E3v11AvpsRGi8t+U6b6eWmy9I0Lke0=;
-        b=SogOe8+bUgDZTYf9BvUKa7KPTiSa+CztO1ubgqTeWKggAI9HcT5HH24Jj6VGa8tfk1
-         meE3T0odp8D2A8UsnXOG6npQnK65nOVMERdHYOTLHHHAXQWLPP6Vss7vUeqhwFn5ywYf
-         hnOyC0OUmdBVDzEkbm1NgUxSRsiL48o9dAIOLeciZEpyPi+W0uTyGTGTATuEJXTE8Kii
-         dpadUT49x/Oj4i2IFMQvOHZ5ccqanfjuuqfDtogqRRnG6r7HSAb4gHfi6k447CeDjnPS
-         mggIzUxpr2WSpDi/S/dGYwi5eIkhBXvSzvW0O1+cwFz2OF4XrPU529hI4vUwllol4HRQ
-         yEYQ==
+        bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
+        b=eRY5MUfZU3a3yCEyLoPXkxgCQxWNc4MIRZcD4wP8g7OewRrRjrUcqlVxk67bIoGx7C
+         rgwOlTFIIyyoPF5Kord8NhR60x+tErH83IGJNhKllCFg75NtHxZZYTue4PSiYvritm0+
+         jiSK/RGUzELj3k7n6vDMJbKQw+/IAYzOdOMj8eH8Cgh2t7xpIk1vajMAt/GBWVCPU2hI
+         1Oty6PU3rEHUSvOAagqin20JjMOeMd2P0EFBWaTL0Fc0hT1F3pqmp9plzsKPVTxGF35K
+         AkTO1d0RtFD8RnA2y/F+l1MXprTRcEtlMq/cYOVcmIFo93/nIUWE6nX/ib24uV1mrglA
+         vzWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724158150; x=1724762950;
+        d=1e100.net; s=20230601; t=1724158256; x=1724763056;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hkcpd9YjkBve1E3v11AvpsRGi8t+U6b6eWmy9I0Lke0=;
-        b=sDhcC1T6xKnYOxPGQ1rkpsIgdzr8edOQ2CLy4OupNZjWOyGTgPuIIU85NS/z7vAYL8
-         RzSMm3rfv3B9LC4Ugs9KR8WDPBC+9aTgjgrzomEi741N8kWipW8Ycay5U/YTdNGQOGWG
-         xNKhbN99HqLugAO9s6wn0AayauCdde9Ib5EqmPeEugZ9BONY8qDr+QqF6K52jTo4iBBt
-         l2Dc7qft/RNmgMIXJOeyMz664kjsHy244oKabZwO9s2X72GoKUKk90K48JI4vA3owDwN
-         2e60udBENnndOk42kT7AZ4Zn4aYE0C7HuWmEaRFkvXasx5nkQOQkjZ9/uqMBvyCscuW5
-         fSog==
-X-Forwarded-Encrypted: i=1; AJvYcCWSw+FJ0T5E+B10jg5Ne7zfi5Ulizns07Uphy1zWsSi/s5HII09ICv6Hz2PW1hL2qp+7UFlH0zLN3BV41nMzjEKqIcCfnkR
-X-Gm-Message-State: AOJu0Yz8AhFp4gR3Ba6F5vNN1DDeGYeNouOpcP8kxPpyTwrHdx5vstfL
-	Li+bgs0ec6EX6uDtgmtDilAqNIfyLuwbMEA6xlU/G0F3GtBvHgM2Y8AsY90NhlPEa2VIfMTd6xH
-	LqLa1coCaHS0A1BRqBO4DHAuTm3MqLkF1iq02
-X-Google-Smtp-Source: AGHT+IEn9KaHhvgLkNx4C288H1MOvSj4VDl4aH4ZGXp6/aFM03ti3t2cri37LJzMl5DrhmRSLeoPKHKdyfVfGRIQBSo=
-X-Received: by 2002:a17:907:9285:b0:a7a:8284:c8d6 with SMTP id
- a640c23a62f3a-a8643fd84a0mr361818166b.24.1724158149039; Tue, 20 Aug 2024
- 05:49:09 -0700 (PDT)
+        bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
+        b=s7KbOFFNoSdxZQAnSGfXtP5xIYHPoiWepBw2NnD5C/9FVDv2wZ+WiM4bsd6lzkcZKw
+         asgd76AiHok9VclK+OyIyKTenhnlJfHhjvJwTBViCHi5N1dygaZ3sk9GWsRfaiPm8k/D
+         ZVIiNT50qpbKG1/I2KlX/0+yyxrzY1ja7BVLtwJGPa6/vJvgyogY/myzG5ugJPXLolRX
+         Fvk0X8e7rdcLbzTuXbSqxrSFDYspH1OEo/uEcigEvP5bxcGbsKSXgytkTyaNbqfvParo
+         RFl4M3kQghhOZJ3W499MEMEEz1Oa7sGOAIaKTDm5+HpzEhdwa5HD2PI3BGwTXpqGpF/K
+         PgCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVs3CsSBCgme/jkCSyPwxQCkbrcj0c9HNyws+XSoYelHGzepm2n0CfswN5Qd0jPl1BJvNv+eDRslQ1pKgm0Yy7HHh0KQOZ9
+X-Gm-Message-State: AOJu0YxUqlulgvcurgbAzRa2ED2g8aYiMDCRYoPGsr04sbrorhQZ369K
+	Ga93jew9lQzEyczT199FOFnJ6Tig3DVHrGOwaOWrpWOv9YfnoDFOQs06+ReHCf+OuC2+Wogg1VJ
+	Srkix5rsMALs8pK5JP3h29DH2GDY=
+X-Google-Smtp-Source: AGHT+IFVxQ43R1DJd6akbV18b6pyczSK14XaTu16dBY59vXNpdDIaQCLmgqUMOpNyGXjAchHGzKrDl3RBz2gofMBJp0=
+X-Received: by 2002:a05:6e02:1e06:b0:39a:eb4d:4335 with SMTP id
+ e9e14a558f8ab-39d26cdf9f2mr151062465ab.4.1724158256249; Tue, 20 Aug 2024
+ 05:50:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820121312.380126-1-aha310510@gmail.com> <20240820121526.380245-1-aha310510@gmail.com>
-In-Reply-To: <20240820121526.380245-1-aha310510@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Aug 2024 14:48:58 +0200
-Message-ID: <CANn89iJrPpmHvidEdd7G7oPrm1+VWsdprvrzQiN4OwTKjU3KsQ@mail.gmail.com>
-Subject: Re: [PATCH net,v6,1/2] net/smc: modify smc_sock structure
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, utz.bacher@de.ibm.com, 
-	dust.li@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
+References: <20240815113745.6668-1-kerneljasonxing@gmail.com> <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
+In-Reply-To: <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 20 Aug 2024 20:50:19 +0800
+Message-ID: <CAL+tcoDnaVVGVgTxwqYnYZvc8ErD62hGB=HNOU6_3Mwo7M6cSQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
+ find port in connect() process
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	dsahern@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
+	Jade Dong <jadedong@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 20, 2024 at 2:15=E2=80=AFPM Jeongjun Park <aha310510@gmail.com>=
- wrote:
->
-> Since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
->
-> To solve this, we need to modify the smc_sock structure.
->
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Fixes: ac7138746e14 ("smc: establish new socket family")
+Hello Paolo,
 
-Are you sure this Fixes: tag is correct ?
-
-Hint : This commit is from 2017, but IPPROTO_SMC was added in 2024.
-
-
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->  net/smc/smc.h | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+On Tue, Aug 20, 2024 at 7:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index 34b781e463c4..f23f76e94a66 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -283,7 +283,10 @@ struct smc_connection {
->  };
+> On 8/15/24 13:37, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > We found that one close-wait socket was reset by the other side
+> > which is beyond our expectation,
 >
->  struct smc_sock {                              /* smc sock container */
-> -       struct sock             sk;
-> +       union {
-> +               struct sock             sk;     /* for AF_SMC */
-> +               struct inet_sock        inet;   /* for IPPROTO_SMC */
-> +       };
->         struct socket           *clcsock;       /* internal tcp socket */
->         void                    (*clcsk_state_change)(struct sock *sk);
->                                                 /* original stat_change f=
-ct. */
-> --
+> I'm unsure if you should instead reconsider your expectation: what if
+> the client application does:
+>
+> shutdown(fd, SHUT_WR)
+> close(fd); // with unread data
+
+Thanks for the review.
+
+Perhaps, I didn't clearly describe the details here. I'm not surprised
+that the close-wait socket could be reset like you said. It's normal
+behaviour. I'm surprised that the close-wait socket is reset by
+another flow just because of the tw-reuse feature.
+
+Can we reuse the port and then reset the previous connection which
+stays in the close-wait state, I wonder?
+
+Thanks,
+Jason
 
