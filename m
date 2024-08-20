@@ -1,116 +1,114 @@
-Return-Path: <netdev+bounces-120112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E51F958560
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:04:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C73958562
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 097D5B22CA4
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:04:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FC22820D0
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892B918D625;
-	Tue, 20 Aug 2024 11:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D20A18D63E;
+	Tue, 20 Aug 2024 11:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9Ln0aCX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jw0BLTbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0481B18C020
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 11:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1A118C020;
+	Tue, 20 Aug 2024 11:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724151878; cv=none; b=M90n7TbeGlrOTL77jgk+b7dL3hstEXYIf35nhGObrjTOf4ZV4oW1veJ8dadPhGL07SXBMEKVRdktHCTiHurtstb1Oy/cfitbwXe7VovTxyNcU3x95QhKptLrmVe2LP4S9NSF63M+98TaCFZkJat73xkrmg/Hgzev9QRRzLLI1Us=
+	t=1724151933; cv=none; b=fz11ZEukkL/5noa/yC1pdjqTbYe78PS7p2pbtmUPu+neWrpQAEisuimMnHY7gSMDLtLItzlrJpCRcUrqwKClgUH14YKMoopBvJU+43JKQppgN4S4/Z7h3bRWXgI4/TwBeAwYNJPr5Kms3cRweiu9KjV2+b1IE3RTtb2215cFkOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724151878; c=relaxed/simple;
-	bh=14bfwB8I4A9Gc7sKfVRW208/c8s+Ns66Xn+NWCQUnZc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=puTshJNtSJ+Udu9UV+gEK6/IQTgXHi1NkMakF0i2sfTQE/os2OOF3qbpODNzMQV0gT4P9Lok6KpQQBejHkzVASkzLmg+3xcn7eIiiO9vmWKI4uVVs4WSOH23Gq+VhHGythVAriImre8k48Ly8T8xyEgr64UjFBvnftneYxMpGO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9Ln0aCX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724151875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k6PGBPw0FL13SJbdnlSXI2jV9MiQK34AZDi4iKAI8MA=;
-	b=Y9Ln0aCXT9Gr8kH4J5C48NntByWGzseQezY8adMfWJBOil43MqXsmJN2ZlU9pEGNd8PVGs
-	+O8cP71j3yeNYloGP2U66bHcjVRRdSHPWqMVmgbzOfRklKn2/0GxhcqpxZ5FD/466qyEVi
-	+9SgdP5DB0Lh6lnrcUBLMev2KN9Cb34=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-Mi3GuXJXNZa7lg2qvE-Qkw-1; Tue, 20 Aug 2024 07:04:34 -0400
-X-MC-Unique: Mi3GuXJXNZa7lg2qvE-Qkw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-429e937ed37so9283605e9.3
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 04:04:34 -0700 (PDT)
+	s=arc-20240116; t=1724151933; c=relaxed/simple;
+	bh=OxCnhvkorxY3S0tJNhughjddra01+nWSPD25c6IIYFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lMVmuMfwq6m/9TnnTY0zLPaTVsJC2V8SxyaTEEh+TGhPzWg/qNVn/QMR+UEAFrjBJqcWayb0/1/QK0rvvYRjQfoYkQA+b7F4lQoj9RMIsGOfznH8eie8mXFNwMfZxg272TViSa0Bzc3O0CJT4JpmVmKgbjeDriAn7rS1Up5x+9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jw0BLTbz; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e0885b4f1d5so5543247276.1;
+        Tue, 20 Aug 2024 04:05:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724151931; x=1724756731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L+n4/Jh8QBSS9BLK9hKFeLg+6zZZeNzCZQ+YqPx/qfo=;
+        b=Jw0BLTbzmYrBd4p8gPYphE+DGgayTZuWs/QMujC/WxOK7bQdLaTX6AShAiInw+zVYu
+         qWcHmKqzdOx3wrkes0WDOV5J2OFUA/6q7QS1H7MVm3cpI02cdqc16s0OeQnvJZo4YM8V
+         A5t1TqfMZekWffCOb4bPpxf+zxpSdy1OnW7Z1zvU2q5yfZs+9fMKcyCXpDMkZ014RXTK
+         HXDyF+rs6+bIX/+w4vfqx2/r5/fYzpFgwDg51SZ2z3v6ZVvLb7BooWf7jEhVWm6ax1s5
+         9XU4E8Z1fUEeN+dYlB3wD0l7KmamoXUXHz+RyN5sjpS8L3CXZ8lBc0ABt/rY+49MlWto
+         cPxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724151873; x=1724756673;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k6PGBPw0FL13SJbdnlSXI2jV9MiQK34AZDi4iKAI8MA=;
-        b=hfJ+8mswGzermDlV+Be37ZLdcI1yEczFZ/LrkANJIZI6Yu7bP2mg0Fd9fTiALFiGI1
-         /wRlWUXpmcsWWaIFOgvyg2u+FxpHtb390oWb0DzsGWJIIGdxyNKVsD96SLnAbpEGuDO9
-         kHpZv91dt8buet4hF8YSbOA/EY3Nj/JUJAzzIVSoEA+tRVTQj2RaN2b74sfx1ZoXD8r8
-         54iCB0ge4mMTQ/jn9u2pBhYqYMhukaAgzpRfoe7QQrs7e/XMOD6go7mf0jb0kLmc07M6
-         NozO8yE9KPyNkl92q2xZzPhMGBcyjG2h8GRv7KojFaz1FPT4CcBmM8nJhtrocUsb9w12
-         gq5g==
-X-Gm-Message-State: AOJu0YzP7CshcuZvVvPCFsumoo6wWcBHaQmGoibX0vOZQXx9TtZA0BJf
-	aMdhDfK1lnE6DQ2fXDexVDVTPBd5PiB6JwjficIm1WH09EbdFCxHY2PgHGroxHSx9cpdF0lIAnz
-	yf1rnFrwMWz6ZoLMANOZIBHg7fkY2qNBYDOwOINKVwje6TsBCY/4B/A==
-X-Received: by 2002:a05:6000:184c:b0:368:aa2:2b4e with SMTP id ffacd0b85a97d-3719443d93amr5179850f8f.4.1724151873466;
-        Tue, 20 Aug 2024 04:04:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFBfSN7rcRCN6YaZHBe4c8eqWnpHNwpwMslPKUWNq/YZGBhF7jG7Dqv8btB84+yTdVIrFmoQw==
-X-Received: by 2002:a05:6000:184c:b0:368:aa2:2b4e with SMTP id ffacd0b85a97d-3719443d93amr5179827f8f.4.1724151873004;
-        Tue, 20 Aug 2024 04:04:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5? ([2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded720eesm192828645e9.33.2024.08.20.04.04.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Aug 2024 04:04:32 -0700 (PDT)
-Message-ID: <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
-Date: Tue, 20 Aug 2024 13:04:30 +0200
+        d=1e100.net; s=20230601; t=1724151931; x=1724756731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L+n4/Jh8QBSS9BLK9hKFeLg+6zZZeNzCZQ+YqPx/qfo=;
+        b=P2t8YdHpo8CkMV3DVA6uM7kgFEVzqZpmjFE/k4SEiIMkXlApSklSe4gSbbZrgRIxoj
+         tC+JxFapGByqKNi3trDn82Y2IJsr3/NktiI1YpB9SSPdlUghCsV4HWpuX47bMZudZNhJ
+         x+OithpRSFcnbv5N2brZqNyrU3QuZPDww8AtqD/uXTvYNN7HnUytWOjprsQqOg0rjVGz
+         yleqr0admi98LSLFGKzS3qXVCRLpMXa7725visvEmJvqCAaKVJei7TTNPgX5k2IRBPIp
+         gNdmeU72BrZFfTKpcAImxbfjHSIia16HvmyBLj61H/mtiBa0ffTBwLwfwcVYF7cNGq5N
+         HtVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpUqI+y/tlHCTjWeEg87C78T0deg8LYKS+H3EQrzHiosbGupu1CfS9J4cblfi6SWSg63ZpyLWdHUAsnm0=@vger.kernel.org, AJvYcCXJJZ/O7I7YNSn5UpmBSrVM+vh1F/62n2iXaTt9GGpmdWeEFmWQHbxY+7CyuKosVWN+ylaj/uNX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkxECQvx6qdgDe3Zkh1Uo6zVRTCpTzuqLvn3xD2W9yBuLVvmgh
+	G36B/CrcYphMuAniFWjd6RMl15D6o5ngrBdIQ/4wXjIXJ2wcAXPNOFthbZGhrnujENs5PBe0YZY
+	zOH6evlkG2c0K4rCXwvCqkZq1ivPLFzrX
+X-Google-Smtp-Source: AGHT+IGBXZe/BfoQhGCcBUpDtYusZ5oTp7Ld736K+fHn48Fnl9vHhDtZFGbiC6K32A5n5fssAOBdM0goD7CTfYusWGE=
+X-Received: by 2002:a05:690c:26c7:b0:6af:9fdc:4bbd with SMTP id
+ 00721157ae682-6b1b890d1c8mr137102297b3.16.1724151930592; Tue, 20 Aug 2024
+ 04:05:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
- find port in connect() process
-To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
- ncardwell@google.com, kuniyu@amazon.com
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>,
- Jade Dong <jadedong@tencent.com>
-References: <20240815113745.6668-1-kerneljasonxing@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240815113745.6668-1-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240819123237.490603-1-bbhushan2@marvell.com> <20240819172806.6bf3bd63@kernel.org>
+In-Reply-To: <20240819172806.6bf3bd63@kernel.org>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Tue, 20 Aug 2024 16:35:19 +0530
+Message-ID: <CAAeCc_nV7MYqeMYmjg=E4AJyTBW9QEfoK-4C4Ujcpas6zhJePg@mail.gmail.com>
+Subject: Re: [net PATCH v2] octeontx2-af: Fix CPT AF register offset calculation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com, 
+	sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, jerinj@marvell.com, 
+	lcherian@marvell.com, ndabilpuram@marvell.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/15/24 13:37, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> We found that one close-wait socket was reset by the other side
-> which is beyond our expectation, 
+On Tue, Aug 20, 2024 at 5:58=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 19 Aug 2024 18:02:37 +0530 Bharat Bhushan wrote:
+> > Some CPT AF registers are per LF and others are global.
+> > Translation of PF/VF local LF slot number to actual LF slot
+> > number is required only for accessing perf LF registers.
+> > CPT AF global registers access do not require any LF
+> > slot number.
+>
+> You need to add examples of features which are broken without this fix
+> into the commit message.
 
-I'm unsure if you should instead reconsider your expectation: what if 
-the client application does:
+okay, will update below to commit message
 
-shutdown(fd, SHUT_WR)
-close(fd); // with unread data
+"    Without this fix microcode loading will fail, VFs cannot be created
+    and hardware is not usable.
+"
 
-?
+Thanks
+-Bharat
 
-Thanks,
-
-Paolo
-
+> --
+> pw-bot: cr
+>
 
