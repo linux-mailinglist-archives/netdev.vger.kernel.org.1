@@ -1,111 +1,131 @@
-Return-Path: <netdev+bounces-120073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D7B95835C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:57:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A171A958363
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA7F3285A97
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EC70286202
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382A818C927;
-	Tue, 20 Aug 2024 09:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D138D18C34F;
+	Tue, 20 Aug 2024 09:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/5wyE8S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O9enyykS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD4F18C348;
-	Tue, 20 Aug 2024 09:56:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A2E18A923;
+	Tue, 20 Aug 2024 09:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724147800; cv=none; b=RMaIZ4Iy/Qbp5uBt5bwYUvCjI1pz/89UG1dknOjYyHfuqPDMK6BEIR7fkFbDyF6cpKpwXZqOA0jP/05G35aXg18RqVPEU1+cWauG4FRT3uNSrGGMecDFK2cgMyICyo5Wy3qc02rhAAtnEUJAWy6GIIQNMzbhkAF1YQgjl7QpHnQ=
+	t=1724147848; cv=none; b=SRX5bhFiLPvUDjr8+b1rSNmLc6r3tuEftlpJctG5Ewjc1cViSVs49zY2l6rOJ3tueiOXfYjLZ4RuXX97vIjfuVEfFxKFeRvaAlMFzVenBqhMYjoX/2fIlgbc7LfbFUhedQWJzk2StTz6afQKTx9PPeQzSGGpZ468Hg39fm0wNvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724147800; c=relaxed/simple;
-	bh=a7twMUtRFY0MSBU8qzSf94QDny5wAuarNSPlg2DyCpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VReY7GqscxRKzg26ZEqwnjl8ct9c69HgXC6JlOW3cRAq9HhcFxGYfiKe/Yh2JjNOucJaIzqV98ZJ0xJPGUzqv1cR5QsziBkrQ25g+zBnBKqDhQmvAytPmzp4hTR4EsJG55SUXtswaExlMNozvPQLTxNT3ttLKiIjtOSgkqd/NPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/5wyE8S; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7d26c2297eso607552266b.2;
-        Tue, 20 Aug 2024 02:56:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724147797; x=1724752597; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c/NIrAB2SV5MwsEF/06Wpke0eOaZ94Do2IfzazTumNE=;
-        b=Y/5wyE8SWseLNBG5UH5qxLYz1BISM8NXckqlAwPCfab9P7xI2t2/CKLhp9T72KLV9j
-         FU681dihI4Xm5soKRHI0Kye31NbQriheVKGHvC7gCR1/g2Aieg17JfYeOPnjlAmx4Fq2
-         ykr454nA8+OEZlKhsAEvIZfvRZa1gXCxPvXHiklHMRG6pGxyuslwAsAwxN/k1uS3S1OB
-         MKJ23ty/RFqNobbWVxFGwKJgX/V29/ez4TZ7GJNZajWVhNvW7K9WZLrdSL59ar0L1pIV
-         V/73FREhQWp71f/MXDyHgyb2da+KydFm39aUTUGBc2WML4jldDydu68DbstBf5gOrvSu
-         eviA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724147797; x=1724752597;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c/NIrAB2SV5MwsEF/06Wpke0eOaZ94Do2IfzazTumNE=;
-        b=O9/BRRmNQxEpjPgRRKm4TTGQj4GPwNpjWNXyFiUifyPDg626a4hWCHU+zXW1kJ4lb7
-         OgbM0bV2RCfmkTbJyHhAqp9q6MsFJft94hwQC59mb118sA09qUs0nsS0sdfwGUJa4OPa
-         4jyUDYep2w/Th52s/YfTJ2dAlbMOy4RcJn9P2kga9L81MRwxHpj3w+vfV+o2fuAZ11sg
-         ww3tM5yvP2ileNaaa4rqzTVRCY98nrtLdTlaUKiL0cKBEGI5JQ3txHKyStpJtR3Qznyw
-         +jHHfj69G3LSzuVJUDA35kAXvttLXuCrcFxGIEk2cDGwMULVF1570ab9a9YPdp4roZMg
-         URsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUYwHsDuzft+rUfw+QRgzHGYj2/tLw5kbg/3xM31g/2BDCYZ/qJSc9uqlEk5tTsYGeVJ8rUkUDr@vger.kernel.org, AJvYcCXpmwgmBdzMQBfRJ/iM4SYdsrAFdyzbMgUUTe0TpsaSXpndN4Dm0t1GNM0kCZUFdKkRzwwHSVhsxIH6QfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziLxgD2mP8avosmN1sh31kcb8FOVLSwkIz2cN7CSBXlojOuFPY
-	uAoB4gucwGOogwcLOZWqQXGHiIDUcTI4DeE509lW3VZkfIVT252m
-X-Google-Smtp-Source: AGHT+IFWHx+VAD/A4mKL8+WTe1PuCUsQw6T0RzjJayT9ijFF56U9ZXHwSJnRiRbqZ6qYNlq9L9Dj6w==
-X-Received: by 2002:a17:906:c147:b0:a80:d683:4d23 with SMTP id a640c23a62f3a-a8392a46e45mr964146466b.62.1724147796275;
-        Tue, 20 Aug 2024 02:56:36 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83839472basm746539166b.170.2024.08.20.02.56.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 02:56:35 -0700 (PDT)
-Date: Tue, 20 Aug 2024 12:56:32 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com
-Subject: Re: [PATCH net-next v4 2/7] net: stmmac: drop stmmac_fpe_handshake
-Message-ID: <20240820095632.3y6dwjpt5sy3raq7@skbuf>
-References: <cover.1724145786.git.0x1207@gmail.com>
- <cover.1724145786.git.0x1207@gmail.com>
- <4358074eebdfedf4d129ccce40434af5f6e2b3f9.1724145786.git.0x1207@gmail.com>
- <4358074eebdfedf4d129ccce40434af5f6e2b3f9.1724145786.git.0x1207@gmail.com>
+	s=arc-20240116; t=1724147848; c=relaxed/simple;
+	bh=JKx8rbUCK+tZTbkSZV2GYfmXRjLpAY2UdSqmrMkGDjk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qATxdsMGuRgqf7U66Vg9fomXSA9VL6efDE7yM2X0+a1Jy+gjMTTP8kSmSoWTOTSu1OZWFdtctWRz3+a537FTGAZT7gehh7S4CX5LT5Jumaq9TL3yU7R97YVGyZFYqVJysMgKZV1MsYU9J4yVCjieLLxUTVi0ghnSgGWLixPxaU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O9enyykS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 466DDC4AF0B;
+	Tue, 20 Aug 2024 09:57:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724147848;
+	bh=JKx8rbUCK+tZTbkSZV2GYfmXRjLpAY2UdSqmrMkGDjk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=O9enyykSSx1UnpSIjnFHwHHSL0wEo7XgIl5w+5h/1jYkul/x5sgw/94ny7Xrto3lK
+	 eAPbyvYMxuaFvlYDkN2g25mQzGIvAcS2R2H6ShKKltpr0EQ1hYVKZtS4ZPw92fi578
+	 4OyMJ5+QlcHW8TevPNqxgtpKOLZSHTGHwx1o9JRmNNdOSZRzz8TeTwEWl6EuHA8mRx
+	 FRfOLxRyCeNP83fGV9wn3FeDmEXwn+eVQbj9bPtoqhM3pv4j3CVBHEljwyG9fmrkDy
+	 CjUWOJHH5I7N0HO0xxuAxWUB25p5XuDBIwNuFjGVmv86XDI6Rl80fjgfNK0WZu/5u0
+	 /b0OEzU71SXjA==
+Message-ID: <c1dd239f-7b07-4a98-a346-2b6b525dafc4@kernel.org>
+Date: Tue, 20 Aug 2024 11:57:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4358074eebdfedf4d129ccce40434af5f6e2b3f9.1724145786.git.0x1207@gmail.com>
- <4358074eebdfedf4d129ccce40434af5f6e2b3f9.1724145786.git.0x1207@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] clk: qcom: Add support for GCC on QCS8300
+To: Imran Shaik <quic_imrashai@quicinc.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Cc: Ajit Pandey <quic_ajipan@quicinc.com>, Taniya Das
+ <quic_tdas@quicinc.com>, Jagadeesh Kona <quic_jkona@quicinc.com>,
+ Satya Priya Kakitapalli <quic_skakitap@quicinc.com>,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 20, 2024 at 05:38:30PM +0800, Furong Xu wrote:
-> ethtool --set-mm can trigger FPE verification processe by calling
-
-nitpick: process
-
-> stmmac_fpe_send_mpacket, stmmac_fpe_handshake should be gone.
+On 20/08/2024 11:36, Imran Shaik wrote:
+> This series adds the dt-bindings and driver support for GCC on QCS8300 platform.
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
+> Please note that this series is dependent on [1] which adds support
+> for QCS8275/QCS8300 SoC ID.
+> 
+> [1] https://lore.kernel.org/all/20240814072806.4107079-1-quic_jingyw@quicinc.com/
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+How do the depend? What is exactly the dependency?
+
+If so this cannot be merged...
+
+Best regards,
+Krzysztof
+
 
