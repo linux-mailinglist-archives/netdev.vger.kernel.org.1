@@ -1,389 +1,549 @@
-Return-Path: <netdev+bounces-120295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52257958DF7
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:25:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73894958DFE
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 768891C21A8C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:25:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36E49B21471
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9FD1C463F;
-	Tue, 20 Aug 2024 18:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NwcpOedu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A284194149;
+	Tue, 20 Aug 2024 18:27:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD0F1C0DCE
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 18:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EAE1BDAB6;
+	Tue, 20 Aug 2024 18:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724178338; cv=none; b=DALkaUR5ougTYbEcN3AdbIBfcFBdylb79skgs3j9C2ON3qW9k/1kcNdvfhvIn7iPkJGJ4gFftqtXryo9vbSoPcFv1SSITpTHpgBIuu5TUyCkrQG4D0TW0r/SfaFongE2vwF/mMjtAToelf8jCBeN82lp9UJ/FUYFQU/xuCq5JQI=
+	t=1724178446; cv=none; b=WyU0aR11R/Et0oCa5RmEZ12pY8TsrqIbOdkAN68uR4Rx/BJ4KC4gyMrIe5koOi8uw+ehZGkx90OL3PyieiGl42MjQx/ziaNTYFCqW6tgL8L3/7Y5z3ZvDszFmg3tFW/dlljKUg7WK2BufLVJUHV9zcCyJfDk+0oVHL3Zkd/CI6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724178338; c=relaxed/simple;
-	bh=RYPhYKet/y4eF3WxxWxL3s24b9wbnEh7rG7jHTrAVlA=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ivF7gBTSkNYhl++mQp9rkwooiM7w0nzLUtmzdGRkZaRCd4qwlZc1hIACIjqr4BzdP3A56R08QUXJ5AL44fOoCgwKokkRZyunZMZeENmIJwHREN9irxRKGa3wS26EURhzxEw9kDGteOd2Klk1FWjFQQGUX0pKuTSLC6ea6wfwgNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NwcpOedu; arc=none smtp.client-ip=209.85.218.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-a7a843bef98so654594266b.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 11:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724178332; x=1724783132; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pzB+pVm4vidLwC7IhpAgP8goZjSzlYTi2C47Cf22oE8=;
-        b=NwcpOedu/k5U6Zd3tQ1+HX1+pKAM7KED9P9cXd7X5r6FA8S264huwLKogD2zc0Dort
-         ZZttgqmgJcetg+ScTsUG9sGcUp4fXknqpF8x8F4kT6u3MV7nwSSSFmcwc9KjFc71yQ0+
-         2MvMvxyoj+wCorT+MqstQHh2J5QqJJemaoHN5IUTp1IzwvVj4NIPxQNSNlosFclVeRDj
-         ABdXSCVmz+1Ig2MvkovycyPOrg/+vVdQg2Rgt5rl0uD5xccVHjybYcxXRAtAXKYqRo/v
-         zgJijZMaddrh8K8o4Y9DM0dPiMNAkci+iE2wVg3JFe0m3HKj25ZPYq+QH0U0lY1eH+FT
-         bhBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724178332; x=1724783132;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pzB+pVm4vidLwC7IhpAgP8goZjSzlYTi2C47Cf22oE8=;
-        b=sNvkXl2KIUcghO1NMGJGgMRdHDM1y7EcRgzGBlK/jRnuzJmyP6899ORABWW9Pu3EnU
-         4E1XTC372kBGvnLfNCe9zdyU8TvLsCUSSsYhRV98ZDYl9ZM7RTZVIw36vvSSSFHlj4V1
-         damg5mh9NTG2KXcjnjRCh33BgHNtys80n5YU0aGGmHoNVNkbEAOGUvg7JqktO2R4WK7X
-         XOp6y7aw2hxhCBQXlJe+00scCXvcvwhC0VW7DlbtdDBHXzPRl06WlQxFIFCAuFsN+wjO
-         762lZa9xkGq7+JD+q9ISdVtx6+7YVyOOKOm+5Ag3E/UAMLEBL2ltBJWrwlAmh3P9QRLJ
-         0YBw==
-X-Forwarded-Encrypted: i=1; AJvYcCX7qQPaAi8MMNB1o3ux87j+9WBoZSa+DWUsNnQxe7Fx50jchNe9Vs1EPWUPtglnKsKl9INCMpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgnI1gIz6pdB85mQRN3cFy41zypOzL1vPcQThbk7+SUxYB4EWr
-	QLaBhArB2QMD4AkOfjF7GqFMLE//LWCod4C99Q/pWR9DODBmP46TXYwa9hhG81M=
-X-Google-Smtp-Source: AGHT+IG1zerY3WZqBBj0fKqRcI0KxUASN52ZzNxukv/UVKdcU3SIfQByHNmYhpZbSqxGa74FoAWAfQ==
-X-Received: by 2002:a17:907:f769:b0:a7d:a080:baa with SMTP id a640c23a62f3a-a83929516e5mr1176804066b.34.1724178332067;
-        Tue, 20 Aug 2024 11:25:32 -0700 (PDT)
-Received: from localhost ([87.13.33.30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c6777sm801629166b.10.2024.08.20.11.25.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 11:25:31 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Tue, 20 Aug 2024 20:25:36 +0200
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 01/11] dt-bindings: clock: Add RaspberryPi RP1 clock
- bindings
-Message-ID: <ZsTfoC3aKLdmFPCL@apocalypse>
-Mail-Followup-To: Conor Dooley <conor@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <8d7dd7ca5da41f2a96e3ef4e2e3f29fd0d71906a.1724159867.git.andrea.porta@suse.com>
- <20240820-baritone-delegate-5711f7a0bc76@spud>
+	s=arc-20240116; t=1724178446; c=relaxed/simple;
+	bh=ghq0lebpUW+hx5lmIv7jFz34Nkpr+LNZz1Td5Jorx28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=aJMo7H1rXFh9BUVrBsSVWKXadviEJp2ixqwbroQbYyvZl018abx9/VuZJwLK4OFr1eDrGJn4XflZu7OMp1IXaCR8Bzc7nIKpBQLCaO1QJq0+2dCoPgTkBa5ygGR0t6yHB6MCtmZlLpAG7BevHa/3+vE7ROGbKM0x0czFQO5aiSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WpHxd3c3Lz2Cn4m;
+	Wed, 21 Aug 2024 02:27:17 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id E7FBA1A0188;
+	Wed, 21 Aug 2024 02:27:18 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 21 Aug 2024 02:27:15 +0800
+Message-ID: <be3f4eea-3203-8af1-2e7f-e80fde30c45f@huawei-partners.com>
+Date: Tue, 20 Aug 2024 21:27:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240820-baritone-delegate-5711f7a0bc76@spud>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/9] selftests/landlock: Support
+ LANDLOCK_ACCESS_NET_LISTEN_TCP
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
+ <ZsO-pIGsTl6T5AL1@google.com> <ZsSW0H4FR3ElOPAy@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZsSW0H4FR3ElOPAy@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-Hi Conor,
-
-On 17:19 Tue 20 Aug     , Conor Dooley wrote:
-> On Tue, Aug 20, 2024 at 04:36:03PM +0200, Andrea della Porta wrote:
-> > Add device tree bindings for the clock generator found in RP1 multi
-> > function device, and relative entries in MAINTAINERS file.
-> > 
-> > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> > ---
-> >  .../clock/raspberrypi,rp1-clocks.yaml         | 87 +++++++++++++++++++
-> >  MAINTAINERS                                   |  6 ++
-> >  include/dt-bindings/clock/rp1.h               | 56 ++++++++++++
-> >  3 files changed, 149 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
-> >  create mode 100644 include/dt-bindings/clock/rp1.h
-> > 
-> > diff --git a/Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml b/Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
-> > new file mode 100644
-> > index 000000000000..b27db86d0572
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
-> > @@ -0,0 +1,87 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/clock/raspberrypi,rp1-clocks.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: RaspberryPi RP1 clock generator
-> > +
-> > +maintainers:
-> > +  - Andrea della Porta <andrea.porta@suse.com>
-> > +
-> > +description: |
-> > +  The RP1 contains a clock generator designed as three PLLs (CORE, AUDIO,
-> > +  VIDEO), and each PLL output can be programmed though dividers to generate
-> > +  the clocks to drive the sub-peripherals embedded inside the chipset.
-> > +
-> > +  Link to datasheet:
-> > +  https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: raspberrypi,rp1-clocks
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  '#clock-cells':
-> > +    description:
-> > +      The index in the assigned-clocks is mapped to the output clock as per
-> > +      definitions in dt-bindings/clock/rp1.h.
-> > +    const: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - '#clock-cells'
-> > +  - clocks
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/rp1.h>
-> > +
-> > +    rp1 {
-> > +        #address-cells = <2>;
-> > +        #size-cells = <2>;
-> > +
-> > +        rp1_clocks: clocks@18000 {
+8/20/2024 4:14 PM, Günther Noack wrote:
+> On Mon, Aug 19, 2024 at 11:52:36PM +0200, Günther Noack wrote:
+>> On Wed, Aug 14, 2024 at 11:01:45AM +0800, Mikhail Ivanov wrote:
+>>> * Add listen_variant() to simplify listen(2) return code checking.
+>>> * Rename test_bind_and_connect() to test_restricted_net_fixture().
+>>> * Extend current net rules with LANDLOCK_ACCESS_NET_LISTEN_TCP access.
+>>> * Rename test port_specific.bind_connect_1023 to
+>>>    port_specific.port_1023.
+>>> * Check little endian port restriction for listen in
+>>>    ipv4_tcp.port_endianness.
+>>> * Some local renames and comment changes.
+>>>
+>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>>> ---
+>>>   tools/testing/selftests/landlock/net_test.c | 198 +++++++++++---------
+>>>   1 file changed, 107 insertions(+), 91 deletions(-)
+>>>
+>>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>>> index f21cfbbc3638..8126f5c0160f 100644
+>>> --- a/tools/testing/selftests/landlock/net_test.c
+>>> +++ b/tools/testing/selftests/landlock/net_test.c
+>>> @@ -2,7 +2,7 @@
+>>>   /*
+>>>    * Landlock tests - Network
+>>>    *
+>>> - * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
+>>> + * Copyright © 2022-2024 Huawei Tech. Co., Ltd.
+>>>    * Copyright © 2023 Microsoft Corporation
+>>>    */
+>>>   
+>>> @@ -22,6 +22,17 @@
+>>>   
+>>>   #include "common.h"
+>>>   
+>>> +/* clang-format off */
+>>> +
+>>> +#define ACCESS_LAST LANDLOCK_ACCESS_NET_LISTEN_TCP
+>>> +
+>>> +#define ACCESS_ALL ( \
+>>> +	LANDLOCK_ACCESS_NET_BIND_TCP | \
+>>> +	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
+>>> +	LANDLOCK_ACCESS_NET_LISTEN_TCP)
+>>> +
+>>> +/* clang-format on */
+>>> +
+>>>   const short sock_port_start = (1 << 10);
+>>>   
+>>>   static const char loopback_ipv4[] = "127.0.0.1";
+>>> @@ -282,6 +293,16 @@ static int connect_variant(const int sock_fd,
+>>>   	return connect_variant_addrlen(sock_fd, srv, get_addrlen(srv, false));
+>>>   }
+>>>   
+>>> +static int listen_variant(const int sock_fd, const int backlog)
+>>
+>> I believe socket_variant(), connect_variant() and bind_variant() were called
+>> like that because they got an instance of a service_fixture as an argument.  The
+>> fixture instances are called variants.  But we don't use these fixtures here.
+>>
+>> In fs_test.c, we also have some functions that behave much like system calls,
+>> but clean up after themselves and return errno, for easier use in assert.  The
+>> naming scheme we have used there is "test_foo" (e.g. test_open()).  I think this
+>> would be more appropriate here as a name?
+>>
+>>> +{
+>>> +	int ret;
+>>> +
+>>> +	ret = listen(sock_fd, backlog);
+>>> +	if (ret < 0)
+>>> +		return -errno;
+>>> +	return ret;
 > 
-> The unit address does not match the reg property. I'm surprised that
-> dtc doesn't complain about that.
+> listen() can only return -1 or 0.  It might be simpler to just return 0 here,
+> to make it more obvious that this returns an error code.
 
-Agreed. I'll update the address with the reg value in the next release
-
-> 
-> > +            compatible = "raspberrypi,rp1-clocks";
-> > +            reg = <0xc0 0x40018000 0x0 0x10038>;
-> 
-> This is a rather oddly specific size. It leads me to wonder if this
-> region is inside some sort of syscon area?
-
-From downstream source code and RP1 datasheet it seems that the last addressable
-register is at 0xc040028014 while the range exposed through teh devicetree ends
-up at 0xc040028038, so it seems more of a little safe margin. I wouldn't say it
-is a syscon area since those register are quite specific for video clock
-generation and not to be intended to be shared among different peripherals.
-Anyway, the next register aperture is at 0xc040030000 so I would say we can 
-extend the clock mapped register like the following:
-
-reg = <0xc0 0x40018000 0x0 0x18000>;
-
-if you think it is more readable.
+Agreed, thanks. I'll do such refactoring for the connect_variant() as
+well.
 
 > 
-> > +            #clock-cells = <1>;
-> > +            clocks = <&clk_xosc>;
-> > +
-> > +            assigned-clocks = <&rp1_clocks RP1_PLL_SYS_CORE>,
+>>> +}
+> 
+> Another remark about listen_variant(): The helper functions in net_test.c return
+> negative error codes, whereas the ones in fs_test.c return positive error codes.
+> We should probably make that more consistent.
 
-> FWIW, I don't think any of these assigned clocks are helpful for the
-> example. That said, why do you need to configure all of these assigned
-> clocks via devicetree when this node is the provider of them?
+socket_variant() returns positive descriptor in a case of success, so
+let's use negative ones.
 
-Not sure to understand what you mean here, the example is there just to
-show how to compile the dt node, maybe you're referring to the fact that
-the consumer should setup the clock freq? Consider that the rp1-clocks
-is coupled to the peripherals contained in the same RP1 chip so there is
-not much point in letting the peripherals set the clock to their leisure.
+Should it be a separate patch btw?
 
 > 
-> > +                              <&rp1_clocks RP1_PLL_AUDIO_CORE>,
-> > +                              /* RP1_PLL_VIDEO_CORE and dividers are now managed by VEC,DPI drivers */
-> 
-> Comments like this also do not seem relevant to the binding.
-
-Agreed, will drop in the next release.
-
-> 
-> 
-> Cheers,
-> Conor.
->
-
-Many thanks,
-Andrea
- 
-> 
-> > +                              <&rp1_clocks RP1_PLL_SYS>,
-> > +                              <&rp1_clocks RP1_PLL_SYS_SEC>,
-> > +                              <&rp1_clocks RP1_PLL_AUDIO>,
-> > +                              <&rp1_clocks RP1_PLL_AUDIO_SEC>,
-> > +                              <&rp1_clocks RP1_CLK_SYS>,
-> > +                              <&rp1_clocks RP1_PLL_SYS_PRI_PH>,
-> > +                              /* RP1_CLK_SLOW_SYS is used for the frequency counter (FC0) */
-> > +                              <&rp1_clocks RP1_CLK_SLOW_SYS>,
-> > +                              <&rp1_clocks RP1_CLK_SDIO_TIMER>,
-> > +                              <&rp1_clocks RP1_CLK_SDIO_ALT_SRC>,
-> > +                              <&rp1_clocks RP1_CLK_ETH_TSU>;
-> > +
-> > +            assigned-clock-rates = <1000000000>, // RP1_PLL_SYS_CORE
-> > +                                   <1536000000>, // RP1_PLL_AUDIO_CORE
-> > +                                   <200000000>,  // RP1_PLL_SYS
-> > +                                   <125000000>,  // RP1_PLL_SYS_SEC
-> > +                                   <61440000>,   // RP1_PLL_AUDIO
-> > +                                   <192000000>,  // RP1_PLL_AUDIO_SEC
-> > +                                   <200000000>,  // RP1_CLK_SYS
-> > +                                   <100000000>,  // RP1_PLL_SYS_PRI_PH
-> > +                                   /* Must match the XOSC frequency */
-> > +                                   <50000000>, // RP1_CLK_SLOW_SYS
-> > +                                   <1000000>, // RP1_CLK_SDIO_TIMER
-> > +                                   <200000000>, // RP1_CLK_SDIO_ALT_SRC
-> > +                                   <50000000>; // RP1_CLK_ETH_TSU
-> > +        };
-> > +    };
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 42decde38320..6e7db9bce278 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -19116,6 +19116,12 @@ F:	Documentation/devicetree/bindings/media/raspberrypi,pispbe.yaml
-> >  F:	drivers/media/platform/raspberrypi/pisp_be/
-> >  F:	include/uapi/linux/media/raspberrypi/
-> >  
-> > +RASPBERRY PI RP1 PCI DRIVER
-> > +M:	Andrea della Porta <andrea.porta@suse.com>
-> > +S:	Maintained
-> > +F:	Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
-> > +F:	include/dt-bindings/clock/rp1.h
-> > +
-> >  RC-CORE / LIRC FRAMEWORK
-> >  M:	Sean Young <sean@mess.org>
-> >  L:	linux-media@vger.kernel.org
-> > diff --git a/include/dt-bindings/clock/rp1.h b/include/dt-bindings/clock/rp1.h
-> > new file mode 100644
-> > index 000000000000..1ed67b8a5229
-> > --- /dev/null
-> > +++ b/include/dt-bindings/clock/rp1.h
-> > @@ -0,0 +1,56 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-> > +/*
-> > + * Copyright (C) 2021 Raspberry Pi Ltd.
-> > + */
-> > +
-> > +#define RP1_PLL_SYS_CORE		0
-> > +#define RP1_PLL_AUDIO_CORE		1
-> > +#define RP1_PLL_VIDEO_CORE		2
-> > +
-> > +#define RP1_PLL_SYS			3
-> > +#define RP1_PLL_AUDIO			4
-> > +#define RP1_PLL_VIDEO			5
-> > +
-> > +#define RP1_PLL_SYS_PRI_PH		6
-> > +#define RP1_PLL_SYS_SEC_PH		7
-> > +#define RP1_PLL_AUDIO_PRI_PH		8
-> > +
-> > +#define RP1_PLL_SYS_SEC			9
-> > +#define RP1_PLL_AUDIO_SEC		10
-> > +#define RP1_PLL_VIDEO_SEC		11
-> > +
-> > +#define RP1_CLK_SYS			12
-> > +#define RP1_CLK_SLOW_SYS		13
-> > +#define RP1_CLK_DMA			14
-> > +#define RP1_CLK_UART			15
-> > +#define RP1_CLK_ETH			16
-> > +#define RP1_CLK_PWM0			17
-> > +#define RP1_CLK_PWM1			18
-> > +#define RP1_CLK_AUDIO_IN		19
-> > +#define RP1_CLK_AUDIO_OUT		20
-> > +#define RP1_CLK_I2S			21
-> > +#define RP1_CLK_MIPI0_CFG		22
-> > +#define RP1_CLK_MIPI1_CFG		23
-> > +#define RP1_CLK_PCIE_AUX		24
-> > +#define RP1_CLK_USBH0_MICROFRAME	25
-> > +#define RP1_CLK_USBH1_MICROFRAME	26
-> > +#define RP1_CLK_USBH0_SUSPEND		27
-> > +#define RP1_CLK_USBH1_SUSPEND		28
-> > +#define RP1_CLK_ETH_TSU			29
-> > +#define RP1_CLK_ADC			30
-> > +#define RP1_CLK_SDIO_TIMER		31
-> > +#define RP1_CLK_SDIO_ALT_SRC		32
-> > +#define RP1_CLK_GP0			33
-> > +#define RP1_CLK_GP1			34
-> > +#define RP1_CLK_GP2			35
-> > +#define RP1_CLK_GP3			36
-> > +#define RP1_CLK_GP4			37
-> > +#define RP1_CLK_GP5			38
-> > +#define RP1_CLK_VEC			39
-> > +#define RP1_CLK_DPI			40
-> > +#define RP1_CLK_MIPI0_DPI		41
-> > +#define RP1_CLK_MIPI1_DPI		42
-> > +
-> > +/* Extra PLL output channels - RP1B0 only */
-> > +#define RP1_PLL_VIDEO_PRI_PH		43
-> > +#define RP1_PLL_AUDIO_TERN		44
-> > -- 
-> > 2.35.3
-> > 
-
-
+>>> +
+>>>   FIXTURE(protocol)
+>>>   {
+>>>   	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
+>>> @@ -438,9 +459,11 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_unix_datagram) {
+>>>   	},
+>>>   };
+>>>   
+>>> -static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>> -				  const struct service_fixture *const srv,
+>>> -				  const bool deny_bind, const bool deny_connect)
+>>> +static void test_restricted_net_fixture(struct __test_metadata *const _metadata,
+>>> +					const struct service_fixture *const srv,
+>>> +					const bool deny_bind,
+>>> +					const bool deny_connect,
+>>> +					const bool deny_listen)
+>>>   {
+>>>   	char buf = '\0';
+>>>   	int inval_fd, bind_fd, client_fd, status, ret;
+>>> @@ -512,8 +535,14 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>>   		EXPECT_EQ(0, ret);
+>>>   
+>>>   		/* Creates a listening socket. */
+>>> -		if (srv->protocol.type == SOCK_STREAM)
+>>> -			EXPECT_EQ(0, listen(bind_fd, backlog));
+>>> +		if (srv->protocol.type == SOCK_STREAM) {
+>>> +			ret = listen_variant(bind_fd, backlog);
+>>> +			if (deny_listen) {
+>>> +				EXPECT_EQ(-EACCES, ret);
+>>> +			} else {
+>>> +				EXPECT_EQ(0, ret);
+>>> +			}
+>>
+>> Hmm, passing the expected error code instead of a boolean to this function was not possible?
+>> Then you could just write
+>>
+>>    EXPECT_EQ(expected_listen_error, listen_variant(bind_fd, backlog));
+>>
+>> ?  (Apologies if this was discussed already.)
+>>
+>>> +		}
+>>>   	}
+>>>   
+>>>   	child = fork();
+>>> @@ -530,7 +559,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>>   		ret = connect_variant(connect_fd, srv);
+>>>   		if (deny_connect) {
+>>>   			EXPECT_EQ(-EACCES, ret);
+>>> -		} else if (deny_bind) {
+>>> +		} else if (deny_bind || deny_listen) {
+>>>   			/* No listening server. */
+>>>   			EXPECT_EQ(-ECONNREFUSED, ret);
+>>>   		} else {
+>>> @@ -545,7 +574,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>>   
+>>>   	/* Accepts connection from the child. */
+>>>   	client_fd = bind_fd;
+>>> -	if (!deny_bind && !deny_connect) {
+>>> +	if (!deny_bind && !deny_connect && !deny_listen) {
+>>>   		if (srv->protocol.type == SOCK_STREAM) {
+>>>   			client_fd = accept(bind_fd, NULL, 0);
+>>>   			ASSERT_LE(0, client_fd);
+>>> @@ -571,16 +600,15 @@ TEST_F(protocol, bind)
+>>>   {
+>>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +			.handled_access_net = ACCESS_ALL,
+>>>   		};
+>>> -		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>>> +			.allowed_access = ACCESS_ALL,
+>>>   			.port = self->srv0.port,
+>>>   		};
+>>> -		const struct landlock_net_port_attr tcp_connect_p1 = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		const struct landlock_net_port_attr tcp_denied_bind_p1 = {
+>>> +			.allowed_access = ACCESS_ALL &
+>>> +					  ~LANDLOCK_ACCESS_NET_BIND_TCP,
+>>>   			.port = self->srv1.port,
+>>>   		};
+>>>   		int ruleset_fd;
+>>> @@ -589,48 +617,47 @@ TEST_F(protocol, bind)
+>>>   						     sizeof(ruleset_attr), 0);
+>>>   		ASSERT_LE(0, ruleset_fd);
+>>>   
+>>> -		/* Allows connect and bind for the first port.  */
+>>> +		/* Allows all actions for the first port. */
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_bind_connect_p0, 0));
+>>> +					    &tcp_not_restricted_p0, 0));
+>>>   
+>>> -		/* Allows connect and denies bind for the second port. */
+>>> +		/* Allows all actions despite bind. */
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_connect_p1, 0));
+>>> +					    &tcp_denied_bind_p1, 0));
+>>>   
+>>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>>   	}
+>>> +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
+>>>   
+>>>   	/* Binds a socket to the first port. */
+>>> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+>>> +				    false);
+>>>   
+>>>   	/* Binds a socket to the second port. */
+>>> -	test_bind_and_connect(_metadata, &self->srv1,
+>>> -			      is_restricted(&variant->prot, variant->sandbox),
+>>> -			      false);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv1, restricted, false,
+>>> +				    false);
+>>>   
+>>>   	/* Binds a socket to the third port. */
+>>> -	test_bind_and_connect(_metadata, &self->srv2,
+>>> -			      is_restricted(&variant->prot, variant->sandbox),
+>>> -			      is_restricted(&variant->prot, variant->sandbox));
+>>> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+>>> +				    restricted, restricted);
+>>>   }
+>>>   
+>>>   TEST_F(protocol, connect)
+>>>   {
+>>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +			.handled_access_net = ACCESS_ALL,
+>>>   		};
+>>> -		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>>> +			.allowed_access = ACCESS_ALL,
+>>>   			.port = self->srv0.port,
+>>>   		};
+>>> -		const struct landlock_net_port_attr tcp_bind_p1 = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>>> +		const struct landlock_net_port_attr tcp_denied_connect_p1 = {
+>>> +			.allowed_access = ACCESS_ALL &
+>>> +					  ~LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>>   			.port = self->srv1.port,
+>>>   		};
+>>>   		int ruleset_fd;
+>>> @@ -639,28 +666,27 @@ TEST_F(protocol, connect)
+>>>   						     sizeof(ruleset_attr), 0);
+>>>   		ASSERT_LE(0, ruleset_fd);
+>>>   
+>>> -		/* Allows connect and bind for the first port. */
+>>> +		/* Allows all actions for the first port. */
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_bind_connect_p0, 0));
+>>> +					    &tcp_not_restricted_p0, 0));
+>>>   
+>>> -		/* Allows bind and denies connect for the second port. */
+>>> +		/* Allows all actions despite connect. */
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_bind_p1, 0));
+>>> +					    &tcp_denied_connect_p1, 0));
+>>>   
+>>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>>   	}
+>>> -
+>>> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+>>> -
+>>> -	test_bind_and_connect(_metadata, &self->srv1, false,
+>>> -			      is_restricted(&variant->prot, variant->sandbox));
+>>> -
+>>> -	test_bind_and_connect(_metadata, &self->srv2,
+>>> -			      is_restricted(&variant->prot, variant->sandbox),
+>>> -			      is_restricted(&variant->prot, variant->sandbox));
+>>> +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
+>>> +
+>>> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+>>> +				    false);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv1, false, restricted,
+>>> +				    false);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+>>> +				    restricted, restricted);
+>>>   }
+>>>   
+>>>   TEST_F(protocol, bind_unspec)
+>>> @@ -761,7 +787,7 @@ TEST_F(protocol, connect_unspec)
+>>>   	ASSERT_LE(0, bind_fd);
+>>>   	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+>>>   	if (self->srv0.protocol.type == SOCK_STREAM)
+>>> -		EXPECT_EQ(0, listen(bind_fd, backlog));
+>>> +		EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>>   
+>>>   	child = fork();
+>>>   	ASSERT_LE(0, child);
+>>> @@ -1127,8 +1153,8 @@ TEST_F(tcp_layers, ruleset_overlap)
+>>>   	 * Forbids to connect to the socket because only one ruleset layer
+>>>   	 * allows connect.
+>>>   	 */
+>>> -	test_bind_and_connect(_metadata, &self->srv0, false,
+>>> -			      variant->num_layers >= 2);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>>> +				    variant->num_layers >= 2, false);
+>>>   }
+>>>   
+>>>   TEST_F(tcp_layers, ruleset_expand)
+>>> @@ -1208,11 +1234,12 @@ TEST_F(tcp_layers, ruleset_expand)
+>>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>>   	}
+>>>   
+>>> -	test_bind_and_connect(_metadata, &self->srv0, false,
+>>> -			      variant->num_layers >= 3);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>>> +				    variant->num_layers >= 3, false);
+>>>   
+>>> -	test_bind_and_connect(_metadata, &self->srv1, variant->num_layers >= 1,
+>>> -			      variant->num_layers >= 2);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv1,
+>>> +				    variant->num_layers >= 1,
+>>> +				    variant->num_layers >= 2, false);
+>>>   }
+>>>   
+>>>   /* clang-format off */
+>>> @@ -1230,16 +1257,6 @@ FIXTURE_TEARDOWN(mini)
+>>>   {
+>>>   }
+>>>   
+>>> -/* clang-format off */
+>>> -
+>>> -#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_TCP
+>>> -
+>>> -#define ACCESS_ALL ( \
+>>> -	LANDLOCK_ACCESS_NET_BIND_TCP | \
+>>> -	LANDLOCK_ACCESS_NET_CONNECT_TCP)
+>>> -
+>>> -/* clang-format on */
+>>> -
+>>>   TEST_F(mini, network_access_rights)
+>>>   {
+>>>   	const struct landlock_ruleset_attr ruleset_attr = {
+>>> @@ -1454,8 +1471,9 @@ TEST_F(mini, tcp_port_overflow)
+>>>   
+>>>   	enforce_ruleset(_metadata, ruleset_fd);
+>>>   
+>>> -	test_bind_and_connect(_metadata, &srv_denied, true, true);
+>>> -	test_bind_and_connect(_metadata, &srv_max_allowed, false, false);
+>>> +	test_restricted_net_fixture(_metadata, &srv_denied, true, true, false);
+>>> +	test_restricted_net_fixture(_metadata, &srv_max_allowed, false, false,
+>>> +				    false);
+>>>   }
+>>>   
+>>>   FIXTURE(ipv4_tcp)
+>>> @@ -1485,22 +1503,21 @@ FIXTURE_TEARDOWN(ipv4_tcp)
+>>>   TEST_F(ipv4_tcp, port_endianness)
+>>>   {
+>>>   	const struct landlock_ruleset_attr ruleset_attr = {
+>>> -		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		.handled_access_net = ACCESS_ALL,
+>>>   	};
+>>>   	const struct landlock_net_port_attr bind_host_endian_p0 = {
+>>>   		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>>>   		/* Host port format. */
+>>>   		.port = self->srv0.port,
+>>>   	};
+>>> -	const struct landlock_net_port_attr connect_big_endian_p0 = {
+>>> -		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +	const struct landlock_net_port_attr connect_listen_big_endian_p0 = {
+>>> +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP |
+>>> +				  LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>>>   		/* Big endian port format. */
+>>>   		.port = htons(self->srv0.port),
+>>>   	};
+>>> -	const struct landlock_net_port_attr bind_connect_host_endian_p1 = {
+>>> -		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +	const struct landlock_net_port_attr not_restricted_host_endian_p1 = {
+>>> +		.allowed_access = ACCESS_ALL,
+>>>   		/* Host port format. */
+>>>   		.port = self->srv1.port,
+>>>   	};
+>>> @@ -1514,16 +1531,18 @@ TEST_F(ipv4_tcp, port_endianness)
+>>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>>   				       &bind_host_endian_p0, 0));
+>>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -				       &connect_big_endian_p0, 0));
+>>> +				       &connect_listen_big_endian_p0, 0));
+>>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -				       &bind_connect_host_endian_p1, 0));
+>>> +				       &not_restricted_host_endian_p1, 0));
+>>>   	enforce_ruleset(_metadata, ruleset_fd);
+>>>   
+>>>   	/* No restriction for big endinan CPU. */
+>>> -	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>>> +				    little_endian, little_endian);
+>>>   
+>>>   	/* No restriction for any CPU. */
+>>> -	test_bind_and_connect(_metadata, &self->srv1, false, false);
+>>> +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
+>>> +				    false);
+>>>   }
+>>>   
+>>>   TEST_F(ipv4_tcp, with_fs)
+>>> @@ -1691,7 +1710,7 @@ TEST_F(port_specific, bind_connect_zero)
+>>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>>   	EXPECT_EQ(0, ret);
+>>>   
+>>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>>   
+>>>   	/* Connects on port 0. */
+>>>   	ret = connect_variant(connect_fd, &self->srv0);
+>>> @@ -1714,26 +1733,23 @@ TEST_F(port_specific, bind_connect_zero)
+>>>   	EXPECT_EQ(0, close(bind_fd));
+>>>   }
+>>>   
+>>> -TEST_F(port_specific, bind_connect_1023)
+>>> +TEST_F(port_specific, port_1023)
+>>>   {
+>>>   	int bind_fd, connect_fd, ret;
+>>>   
+>>> -	/* Adds a rule layer with bind and connect actions. */
+>>> +	/* Adds a rule layer with all actions. */
+>>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+>>> +			.handled_access_net = ACCESS_ALL
+>>>   		};
+>>>   		/* A rule with port value less than 1024. */
+>>> -		const struct landlock_net_port_attr tcp_bind_connect_low_range = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		const struct landlock_net_port_attr tcp_low_range_port = {
+>>> +			.allowed_access = ACCESS_ALL,
+>>>   			.port = 1023,
+>>>   		};
+>>>   		/* A rule with 1024 port. */
+>>> -		const struct landlock_net_port_attr tcp_bind_connect = {
+>>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>> +		const struct landlock_net_port_attr tcp_port_1024 = {
+>>> +			.allowed_access = ACCESS_ALL,
+>>>   			.port = 1024,
+>>>   		};
+>>>   		int ruleset_fd;
+>>> @@ -1744,10 +1760,10 @@ TEST_F(port_specific, bind_connect_1023)
+>>>   
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_bind_connect_low_range, 0));
+>>> +					    &tcp_low_range_port, 0));
+>>>   		ASSERT_EQ(0,
+>>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> -					    &tcp_bind_connect, 0));
+>>> +					    &tcp_port_1024, 0));
+>>>   
+>>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>> @@ -1771,7 +1787,7 @@ TEST_F(port_specific, bind_connect_1023)
+>>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>>   	clear_cap(_metadata, CAP_NET_BIND_SERVICE);
+>>>   	EXPECT_EQ(0, ret);
+>>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>>   
+>>>   	/* Connects on the binded port 1023. */
+>>>   	ret = connect_variant(connect_fd, &self->srv0);
+>>> @@ -1791,7 +1807,7 @@ TEST_F(port_specific, bind_connect_1023)
+>>>   	/* Binds on port 1024. */
+>>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>>   	EXPECT_EQ(0, ret);
+>>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>>   
+>>>   	/* Connects on the binded port 1024. */
+>>>   	ret = connect_variant(connect_fd, &self->srv0);
+>>> -- 
+>>> 2.34.1
+>>>
+>>
+>> —Günther
 
