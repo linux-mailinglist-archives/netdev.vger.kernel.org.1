@@ -1,178 +1,109 @@
-Return-Path: <netdev+bounces-119960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03274957AC0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:07:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8217C957AC1
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B0D1C209F0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:07:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99A8F1C20BF6
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 01:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A893712E5B;
-	Tue, 20 Aug 2024 01:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D56134D1;
+	Tue, 20 Aug 2024 01:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHJYXjiL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCVPdB/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEB815AC4
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 01:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19535101C4;
+	Tue, 20 Aug 2024 01:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724116065; cv=none; b=pRrLBll+E4jMTB45lxeL+D9Fn07E+6Mywp9t+4zHfAuDtnR1hDV6eqNwujiRxmLnEgVznIN4249cNuyPxRC1p4wXsE8RcFGQQZb8OjedJrJG+L0igFvxWWuo06RXrMzogC64GHQxJODlKIIBRne8rYw7lLFu/FOwRd1J+CsYnmY=
+	t=1724116079; cv=none; b=dkjNbCcXPDGTif4PjjydQglAo7ANcHKiUDIOix3yvoS6LuNqXUv89+YmzhNmW55Nq4mvMqWtSVJyIRPG4ZlJb0WTj6jLZKRJ9aouKwgq3yMbWf2BklJqmAkI/lduisoRDGrj6CVB3HqR97O3U3uGt1m6F3k4YgcK0xb21JyuSO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724116065; c=relaxed/simple;
-	bh=R5EWHRRgULrkrgsvftgyhz11ARuffjoc2UftL9CnaXk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dMn2OYQjwKv79bRFZCGIeNnimcxwRQxOnEqsDh2oTJKLntEL3tCg2dROM/utt2mucUeIhzdvUmI5I30nqaS93TpfWKrO+0XHHv/yPInxNxukujXu95wpcBiH5a6DHvDwvFWbPE0sKprL7/GwpIxLKXxE6DGPNIDN7BNLHQI5juI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHJYXjiL; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1724116079; c=relaxed/simple;
+	bh=8pCLvRPG4vgUWMwhpSX2k+B4vS50nxxwKI3EYcger/A=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=lQhhMbOCyXkxMYqc5qCag/k9MZK2jtFCZzRmrwph5PT5US5AnEa/uAtpPQAfPYYSXbcdOtcfB/XsqhjNPeaV9tyd22dBFaH+fs77LEIu3GV/7onvjmII3rMLSE6NbmZFqHh9kiVoGo5kUf815HsCsqdlKSP+e0P79jwbSewCv6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCVPdB/Y; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-39d37d9767dso9415665ab.3
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 18:07:43 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2d3ed48c748so714899a91.3;
+        Mon, 19 Aug 2024 18:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724116063; x=1724720863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FyRnzDkG/Pln44P5pCQmOiQQdovqH8KptYz9pT67ZgQ=;
-        b=IHJYXjiLaqZ2lupEqTCztk8eQ/ZxuRYfN2imbcSWSpO3zh1mvr05YoI6mOixLpNZWX
-         RgHXdFv04lNZkHkGVX8tJx46n09jVLJmGsxq8k7zWy1vsdZP1ocXo/qb/s9b+GHQSdVh
-         toSPLChnVVTA5/F84jESx0qFZzJNJg3hux3X1AD9fW19q+Vh+9uUDeVuNef2ZOdOO9Uv
-         38SlmLEG5eo+Zbw2hSMkXkh1wCFYx1HaVCxyVnK8Y7iIPqRvKSSWA3zho7oRRYySdcsh
-         TUd5DTdwlx9rxjHk2eiMTWuRExSkgY2N2h1m70DIL1wxG/ytH+e7Rg4KnbgV96hy2Xev
-         7Q/Q==
+        d=gmail.com; s=20230601; t=1724116077; x=1724720877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FJLjhXumluvEXGs+t8WvUNcMLDpSA9d0j5Qakf+/Ks0=;
+        b=CCVPdB/YODvSiG+OBKxgiccJIuamJaqGnfJc7IixiPcNgkhBLygsijjZd/rDgEEVno
+         Q3HMz7nMVLgGYPdBcroIFSffXGrDpDJklkAEwCwXCUeYeOfFGqPm/mxGc8WnHgJyyJoJ
+         4RMvUHP5esPlg3kYch+TTFQu+k12awHs9lRMH3Suc+0pzaGafm3wbmmqf2oyl2iLFASp
+         /3+h6yyqmEUVbZf6felOHIZAHPpGqUpm5WLlZm34ZZTk1ZJsIKVb/qpXD6dK6PfBG1Rs
+         VI7FIeqvDLIjYQfHNG3vRAovusJ5xDft9ZhOppG6b6yTa9FN1esgKFNRe2JSM2QzVXl6
+         s3DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724116063; x=1724720863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FyRnzDkG/Pln44P5pCQmOiQQdovqH8KptYz9pT67ZgQ=;
-        b=KJnl9wENZLARENOZ5oFcWw/T91noX5yJUPKbj7UKnTy6wWyRCgJOyBozBNAdNHyjSC
-         F15qDEZ+mR0q38yPujWJ5oYGPkA85t/rt6ywC/gZOfaQ0v8fZUDRsTJxGEI9qNHWjMD/
-         SLZzFusTjxn0lKAKZqyDf96QfCb9jceNeL9iFWljkl6+ru7XNiMkabsZSFZfNh4HsFn4
-         XUQ696EY2Z4AWe21tHxa/3gd2gE7S0rY7nBoen62Wef2I0OY5Wo5i+ZQpXCrWjZ0izkh
-         NLuTbmLkASC+ZWwy0tx++PdnI21UFiWdz7/wSc4X9g/uR5vrZg9GKSCaygs4ZjskD5Yw
-         i7yg==
-X-Gm-Message-State: AOJu0YxzicrzKapPcFZVrJru7kBmCizZsCwGXgFJZHLhv0VxCzjdjXWb
-	LviRqNShmh8ihJOntm9TpZrLf+sv2Gt9Qn2g0nV3AHaynAGuXxbRbEMDwK3FSNlS+aSQxQ1iTe8
-	QIP81PFyQshufGrk5k25eqmpjqDA=
-X-Google-Smtp-Source: AGHT+IGTtaDbkc153y3v1BQBxHWN1uD3/LHsH1y41QDQhnc9eNJLt0/GWoLaFDJ8OgWe1HQ+v5uffzAlr87WonU4BDI=
-X-Received: by 2002:a05:6e02:50b:b0:39d:2c94:45e0 with SMTP id
- e9e14a558f8ab-39d2c9446b0mr113872285ab.26.1724116063166; Mon, 19 Aug 2024
- 18:07:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724116077; x=1724720877;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FJLjhXumluvEXGs+t8WvUNcMLDpSA9d0j5Qakf+/Ks0=;
+        b=T12JzRpGuTqgLj3lcuVa0BC/vnJajS4CGbN3aSv9l0hJUYm/Ajdroh1+SWSgN/STM+
+         b5ul7IDusVJeZUoLWYcDpVjBZ+/Mz1BxXSJtl60iV6vZJjCqmWEHoR+HnIAWePUHOTtd
+         eR9VUrVf6Pw6olcNpF2TfAhCKlCdS/7+QbwThIcVio92wcGzDnKXzS1U7RJU7VpgnI6B
+         wOGbS0AzPjMP8NVrwfWKhg5VqzddcuxSOa/uckApLaMd2XPAt6MfpKaG4sQ+wh+UafTx
+         utxxo0lUrzIJTTJKzGPw6jFvZYv5x99y2lZRShXniAI8YRilnh8ugZNgkBLWzIL/n5T7
+         oIWA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1HDxO1PPoxebY3beep9/qszMVYZRlszQcE8nayJTv36Hk0cSGG08EqEKUWbJtocu4lMShHWA=@vger.kernel.org, AJvYcCXJDUrXGOBmGvWfvHbt28YwvZTkOW/WDFIGAw4TBppbdz6C0T8fmesSAAZY38wlU9ziUatevLTa9MwpiAqgjfc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+bh91FHtyqYIB9yEbt8t0TQ46faCOssYYrZjQEjnwtFtEADvy
+	OxcXx1kf3cI/LZXBWqJOyOwELpc/45kA+0EqFblPQCAs3nM5bNCf
+X-Google-Smtp-Source: AGHT+IElPVxr9HUXP2x9gBR+LSW2l11InNVV2F8rmy5Md0Z0Xmr9FjogKoH1t3Xw14utHjE3NkGECg==
+X-Received: by 2002:a17:90b:209:b0:2d3:d6fd:7218 with SMTP id 98e67ed59e1d1-2d3dfc69c13mr7900076a91.2.1724116076991;
+        Mon, 19 Aug 2024 18:07:56 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3e2b64e7bsm7950878a91.9.2024.08.19.18.07.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 18:07:56 -0700 (PDT)
+Date: Tue, 20 Aug 2024 01:07:43 +0000 (UTC)
+Message-Id: <20240820.010743.20238453596963731.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: tmgross@umich.edu, fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+ benno.lossin@proton.me, aliceryhl@google.com
+Subject: Re: [PATCH net-next v5 6/6] net: phy: add Applied Micro QT2025 PHY
+ driver
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <5a063eb5-923e-4743-b72e-57f3fbf82107@lunn.ch>
+References: <20240819.121936.1897793847560374944.fujita.tomonori@gmail.com>
+	<CALNs47u8=J14twTLGos6MM6fZWSiR5GVVyooLt7mxUyX4XhHcQ@mail.gmail.com>
+	<5a063eb5-923e-4743-b72e-57f3fbf82107@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240815113745.6668-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240815113745.6668-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 20 Aug 2024 09:07:07 +0800
-Message-ID: <CAL+tcoDURf_krTOSKxM8fhPgR9h7rGaqTPFERVai=n3v6bG-sg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
- find port in connect() process
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, ncardwell@google.com, 
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
-	Jade Dong <jadedong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Hello Eric,
+On Tue, 20 Aug 2024 00:46:25 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On Thu, Aug 15, 2024 at 7:37=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> We found that one close-wait socket was reset by the other side
-> which is beyond our expectation, so we have to investigate the
-> underlying reason. The following experiment is conducted in the
-> test environment. We limit the port range from 40000 to 40010
-> and delay the time to close() after receiving a fin from the
-> active close side, which can help us easily reproduce like what
-> happened in production.
->
-> Here are three connections captured by tcpdump:
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-> // a few seconds later, within 60 seconds
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-> // later, very quickly
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
->
-> As we can see, the first flow is reset because:
-> 1) client starts a new connection, I mean, the second one
-> 2) client tries to find a suitable port which is a timewait socket
->    (its state is timewait, substate is fin_wait2)
-> 3) client occupies that timewait port to send a SYN
-> 4) server finds a corresponding close-wait socket in ehash table,
->    then replies with a challenge ack
-> 5) client sends an RST to terminate this old close-wait socket.
->
-> I don't think the port selection algo can choose a FIN_WAIT2 socket
-> when we turn on tcp_tw_reuse because on the server side there
-> remain unread data. If one side haven't call close() yet, we should
-> not consider it as expendable and treat it at will.
->
-> Even though, sometimes, the server isn't able to call close() as soon
-> as possible like what we expect, it can not be terminated easily,
-> especially due to a second unrelated connection happening.
->
-> After this patch, we can see the expected failure if we start a
-> connection when all the ports are occupied in fin_wait2 state:
-> "Ncat: Cannot assign requested address."
->
-> Reported-by: Jade Dong <jadedong@tencent.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> v2
-> Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxing@=
-gmail.com/
-> 1. change from fin_wait2 to timewait test statement, no functional
-> change (Kuniyuki)
-> ---
->  net/ipv4/inet_hashtables.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index 9bfcfd016e18..b95215fc15f6 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -563,7 +563,8 @@ static int __inet_check_established(struct inet_timew=
-ait_death_row *death_row,
->                         continue;
->
->                 if (likely(inet_match(net, sk2, acookie, ports, dif, sdif=
-))) {
-> -                       if (sk2->sk_state =3D=3D TCP_TIME_WAIT) {
-> +                       if (sk2->sk_state =3D=3D TCP_TIME_WAIT &&
-> +                           inet_twsk(sk2)->tw_substate =3D=3D TCP_TIME_W=
-AIT) {
->                                 tw =3D inet_twsk(sk2);
->                                 if (sk->sk_protocol =3D=3D IPPROTO_TCP &&
->                                     tcp_twsk_unique(sk, sk2, twp))
-> --
-> 2.37.3
->
+>>     //! This driver is based on the vendor driver `qt2025_phy.c` This source
+>>     //! and firmware can be downloaded on the EN-9320SFP+ support site.
+>> 
+>> so anyone reading in the future knows what to look for without relying
+>> on a link. But I don't know what the policy is here.
+>  
+> Ideally, the firmware should be added to linux-firmware. It will then
+> appear in most distros. That however requires there is a clear license
+> which allows distribution.
 
-Not rushing you, so please please don't get me wrong. I'm a little bit
-worried if this email is submerged in the mailing list. So please also
-help me review this one :)
+The firmware is an array in the header file in the source code
+distributed under GPL. I plan to add it to linux-firmware after this
+driver is merged.
 
-Thanks,
-Jason
 
