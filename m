@@ -1,163 +1,434 @@
-Return-Path: <netdev+bounces-120251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9470F958AE0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:14:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E19958AEA
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9431F258E8
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:14:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5621E1C20B28
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C2F1922EB;
-	Tue, 20 Aug 2024 15:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE877191F89;
+	Tue, 20 Aug 2024 15:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hs3bidrT"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ZDVrKP3A"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9D318EFC9;
-	Tue, 20 Aug 2024 15:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B55343AB2
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724166861; cv=none; b=Q76dH/mz/52KHB2icfxxVP0lapQjT97WH5x07363QZrt6tbwUFV0SBS5fdP1xJJUtxqP40AcA3K7jTc8LxraA+hTrtQ2bOyhQ7Yj6j2ERwh2yTBy969cdR0E5I2+CfbE/OKr3zB67sBK3JfrV6s2l6yaxJyNgb/xVN2SkhJhTVc=
+	t=1724167003; cv=none; b=Z6y/3KjRynZez0t85aqlyVsb4FCBRKeo1e9RDzhw4X/XQcohpnnZRLFgwaue3UysQN+O92zEJ98Qvuy/rV0P3KY8yLV/MUFOkSqq3zD4jEh5EICFi7uv1D/eBFI5YZDHLoVahTBZcoEkdRfWqQhsQpeD/t5Hjmd9L/iX0Gh/9rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724166861; c=relaxed/simple;
-	bh=HEp2O9Yg+xFVobpRrcPzfJ17tFgUBl3wrHGCOvMurYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9Cia/EwPmrCFVj+7/pqRPoP5eFSjUmhLO+agMKXLAcCVzbnBpsZFSPSSqDpDWFtHeFnB25CyyI7dRXv0YDWoPjnAzZxRa++4DIiyCK9whqhyzMqtvNuxTyDxFn1wNqyMVaeMmk45hfqoEkYGUIBGnF/VTX+7AVIn2udtjXcWzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hs3bidrT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Mj0xb+mKKtlxydaY/lPIxOqJwc7T/yLIdICGlctTCsA=; b=hs3bidrTIdT3d9wsjsAk5IF+tP
-	EhBSP23m2Zp5+ctd2b+yclSD9n2h/JqDGHeXAjvdLUnhRbi15qMm5yNb7m8b6ZCEdDQQpZD1TnIm0
-	3KVPjhWYJFxfsO+eljPP2JOZVPYWTGDDYrMFFJRrPcq24qC9f4TtL8K0Ypiqj9MRIjBg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgQYY-005Ew0-6K; Tue, 20 Aug 2024 17:13:58 +0200
-Date: Tue, 20 Aug 2024 17:13:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 10/11] net: macb: Add support for RP1's MACB variant
-Message-ID: <c33fe03d-2097-4d26-b3db-8a3d6c793cd1@lunn.ch>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+	s=arc-20240116; t=1724167003; c=relaxed/simple;
+	bh=2q7d2KrNGNMT9YkQQWK5LwTAPTKgcYB39CKnSHinHDQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k8cNnyg+j0PJa0gje+ugidenAHvsJYz1fDD+Dpgt/kAFki2sSvd2hOAeVNgwtPML4/3Y+334aOhp+Oxdk8LZqPpTuWzZEAVQH2KDH0yLN6891pkaRGSv4r1OcZjRD8Dy+1AIxK6dBoPVZhBc05hsix3N2UpV5eM/Ztlo3Tb4cjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ZDVrKP3A; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47K2i1OT007049;
+	Tue, 20 Aug 2024 08:16:27 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=lcy
+	MPyMPEdHzi8NBpwb4rE+l5YxsMqaxijlUcyDeDY4=; b=ZDVrKP3A62zMDYCnzZM
+	bFEEMhX/o1129KMYNunNIhAFcvSCTPyLRyrf+ravroe7yK759Akn7cFZjns/LNF8
+	zMbc0Efw30Ztw1/8Wn00LwT1gs4bZRiNtW24A6DkMGEeQO/F5LGgH62OONW4UE4F
+	boTSdFntpPcqH+9vgVSLdPVj5p+/CXkwfHSc62BLgFF6KxvGGBAI/g7VeLHgebY8
+	daLLFYf9aIUehHe6IK73UnKIogXFGMrNwVwAfl3GWeFZNNVtZD6P8exZ3sZHNJ3V
+	U6aQNIsOafmC1eC3fGDB4P5hbCRnSEP5UWO+XauD3QGslqT0702gQOwBts1FF4MX
+	OIg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 414jkkb4dh-15
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 20 Aug 2024 08:16:27 -0700 (PDT)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
+ 15.2.1544.11; Tue, 20 Aug 2024 15:16:25 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Jiri Slaby
+	<jirislaby@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
+Subject: [PATCH net v4 1/2] ptp: ocp: adjust sysfs entries to expose tty information
+Date: Tue, 20 Aug 2024 08:16:16 -0700
+Message-ID: <20240820151617.3835870-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: VX8U9tEXUXrvXhKeZzmOQyt-UovVI2z7
+X-Proofpoint-GUID: VX8U9tEXUXrvXhKeZzmOQyt-UovVI2z7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-20_11,2024-08-19_03,2024-05-17_01
 
-> +static unsigned int txdelay = 35;
-> +module_param(txdelay, uint, 0644);
+Starting v6.8 the serial port subsystem changed the hierarchy of devices
+and symlinks are not working anymore. Previous discussion made it clear
+that the idea of symlinks for tty devices was wrong by design [1].
+Implement additional attributes to expose the information. Fixes tag
+points to the commit which introduced the change.
 
-Networking does not like module parameters.
+[1] https://lore.kernel.org/netdev/2024060503-subsonic-pupil-bbee@gregkh/
 
-This is also unused in this patch! So i suggest you just delete it.
-
-> +
->  /* This structure is only used for MACB on SiFive FU540 devices */
->  struct sifive_fu540_macb_mgmt {
->  	void __iomem *reg;
-> @@ -334,7 +337,7 @@ static int macb_mdio_wait_for_idle(struct macb *bp)
->  	u32 val;
->  
->  	return readx_poll_timeout(MACB_READ_NSR, bp, val, val & MACB_BIT(IDLE),
-> -				  1, MACB_MDIO_TIMEOUT);
-> +				  100, MACB_MDIO_TIMEOUT);
->  }
-  
-Please take this patch out of the series, and break it up. This is one
-patch, with a good explanation why you need 1->100.
-
->  static int macb_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
-> @@ -493,6 +496,19 @@ static int macb_mdio_write_c45(struct mii_bus *bus, int mii_id,
->  	return status;
->  }
->  
-> +static int macb_mdio_reset(struct mii_bus *bus)
-> +{
-> +	struct macb *bp = bus->priv;
-> +
-> +	if (bp->phy_reset_gpio) {
-> +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 1);
-> +		msleep(bp->phy_reset_ms);
-> +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 0);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static void macb_init_buffers(struct macb *bp)
->  {
->  	struct macb_queue *queue;
-> @@ -969,6 +985,7 @@ static int macb_mii_init(struct macb *bp)
->  	bp->mii_bus->write = &macb_mdio_write_c22;
->  	bp->mii_bus->read_c45 = &macb_mdio_read_c45;
->  	bp->mii_bus->write_c45 = &macb_mdio_write_c45;
-> +	bp->mii_bus->reset = &macb_mdio_reset;
-
-This is one patch.
-
->  	snprintf(bp->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
->  		 bp->pdev->name, bp->pdev->id);
->  	bp->mii_bus->priv = bp;
-> @@ -1640,6 +1657,11 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
->  
->  		macb_init_rx_ring(queue);
->  		queue_writel(queue, RBQP, queue->rx_ring_dma);
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-> +			macb_writel(bp, RBQPH,
-> +				    upper_32_bits(queue->rx_ring_dma));
-> +#endif
-
-How does this affect a disto kernel? Do you actually need the #ifdef?
-What does bp->hw_dma_cap contain when CONFIG_ARCH_DMA_ADDR_T_64BIT is
-not defined?
-
-Again, this should be a patch of its own, with a good commit message.
-
-Interrupt coalescing should be a patch of its own, etc.
-
-    Andrew
-
+Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 ---
-pw-bot: cr
+v3 -> v4:
+- re-organize info printing to use ptp_ocp_tty_port_name()
+- keep uintptr_t to be consistent with other code
+v2 -> v3:
+- replace serial ports definitions with array and enum for index
+- replace pointer math with direct array access
+- nit in documentation spelling
+v1 -> v2:
+- add Documentation/ABI changes
+---
+ drivers/ptp/ptp_ocp.c | 168 +++++++++++++++++++++++++-----------------
+ 1 file changed, 102 insertions(+), 66 deletions(-)
+
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index ee2ced88ab34..11d96045e5ec 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -316,6 +316,15 @@ struct ptp_ocp_serial_port {
+ #define OCP_SERIAL_LEN			6
+ #define OCP_SMA_NUM			4
+ 
++enum {
++	PORT_GNSS,
++	PORT_GNSS2,
++	PORT_MAC, /* miniature atomic clock */
++	PORT_NMEA,
++
++	__PORT_COUNT,
++};
++
+ struct ptp_ocp {
+ 	struct pci_dev		*pdev;
+ 	struct device		dev;
+@@ -357,10 +366,7 @@ struct ptp_ocp {
+ 	struct delayed_work	sync_work;
+ 	int			id;
+ 	int			n_irqs;
+-	struct ptp_ocp_serial_port	gnss_port;
+-	struct ptp_ocp_serial_port	gnss2_port;
+-	struct ptp_ocp_serial_port	mac_port;   /* miniature atomic clock */
+-	struct ptp_ocp_serial_port	nmea_port;
++	struct ptp_ocp_serial_port	port[__PORT_COUNT];
+ 	bool			fw_loader;
+ 	u8			fw_tag;
+ 	u16			fw_version;
+@@ -655,28 +661,28 @@ static struct ocp_resource ocp_fb_resource[] = {
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(gnss_port),
++		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
+ 		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 115200,
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(gnss2_port),
++		OCP_SERIAL_RESOURCE(port[PORT_GNSS2]),
+ 		.offset = 0x00170000 + 0x1000, .irq_vec = 4,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 115200,
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(mac_port),
++		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
+ 		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 57600,
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(nmea_port),
++		OCP_SERIAL_RESOURCE(port[PORT_NMEA]),
+ 		.offset = 0x00190000 + 0x1000, .irq_vec = 10,
+ 	},
+ 	{
+@@ -740,7 +746,7 @@ static struct ocp_resource ocp_art_resource[] = {
+ 		.offset = 0x01000000, .size = 0x10000,
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(gnss_port),
++		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
+ 		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 115200,
+@@ -839,7 +845,7 @@ static struct ocp_resource ocp_art_resource[] = {
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(mac_port),
++		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
+ 		.offset = 0x00190000, .irq_vec = 7,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 9600,
+@@ -950,14 +956,14 @@ static struct ocp_resource ocp_adva_resource[] = {
+ 		.offset = 0x00220000, .size = 0x1000,
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(gnss_port),
++		OCP_SERIAL_RESOURCE(port[PORT_GNSS]),
+ 		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 9600,
+ 		},
+ 	},
+ 	{
+-		OCP_SERIAL_RESOURCE(mac_port),
++		OCP_SERIAL_RESOURCE(port[PORT_MAC]),
+ 		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
+ 		.extra = &(struct ptp_ocp_serial_port) {
+ 			.baud = 115200,
+@@ -1649,6 +1655,15 @@ ptp_ocp_tod_gnss_name(int idx)
+ 	return gnss_name[idx];
+ }
+ 
++static const char *
++ptp_ocp_tty_port_name(int idx)
++{
++	static const char * const tty_name[] = {
++		"GNSS", "GNSS2", "MAC", "NMEA"
++	};
++	return tty_name[idx];
++}
++
+ struct ptp_ocp_nvmem_match_info {
+ 	struct ptp_ocp *bp;
+ 	const void * const tag;
+@@ -3346,6 +3361,54 @@ static EXT_ATTR_RO(freq, frequency, 1);
+ static EXT_ATTR_RO(freq, frequency, 2);
+ static EXT_ATTR_RO(freq, frequency, 3);
+ 
++static ssize_t
++ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct dev_ext_attribute *ea = to_ext_attr(attr);
++	struct ptp_ocp *bp = dev_get_drvdata(dev);
++	struct ptp_ocp_serial_port *port;
++
++	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
++}
++
++static umode_t
++ptp_ocp_timecard_tty_is_visible(struct kobject *kobj, struct attribute *attr, int n)
++{
++	struct ptp_ocp *bp = dev_get_drvdata(kobj_to_dev(kobj));
++	struct ptp_ocp_serial_port *port;
++	struct device_attribute *dattr;
++	struct dev_ext_attribute *ea;
++
++	if (strncmp(attr->name, "tty", 3))
++		return attr->mode;
++
++	dattr = container_of(attr, struct device_attribute, attr);
++	ea = container_of(dattr, struct dev_ext_attribute, attr);
++	port = &bp->port[(uintptr_t)ea->var];
++	return port->line == -1 ? 0 : 0444;
++}
++#define EXT_TTY_ATTR_RO(_name, _val)			\
++	struct dev_ext_attribute dev_attr_tty##_name =	\
++		{ __ATTR(tty##_name, 0444, ptp_ocp_tty_show, NULL), (void *)_val }
++
++static EXT_TTY_ATTR_RO(GNSS, PORT_GNSS);
++static EXT_TTY_ATTR_RO(GNSS2, PORT_GNSS2);
++static EXT_TTY_ATTR_RO(MAC, PORT_MAC);
++static EXT_TTY_ATTR_RO(NMEA, PORT_NMEA);
++static struct attribute *ptp_ocp_timecard_tty_attrs[] = {
++	&dev_attr_ttyGNSS.attr.attr,
++	&dev_attr_ttyGNSS2.attr.attr,
++	&dev_attr_ttyMAC.attr.attr,
++	&dev_attr_ttyNMEA.attr.attr,
++	NULL,
++};
++
++static const struct attribute_group ptp_ocp_timecard_tty_group = {
++	.name = "tty",
++	.attrs = ptp_ocp_timecard_tty_attrs,
++	.is_visible = ptp_ocp_timecard_tty_is_visible,
++};
++
+ static ssize_t
+ serialnum_show(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+@@ -3775,6 +3838,7 @@ static const struct attribute_group fb_timecard_group = {
+ 
+ static const struct ocp_attr_group fb_timecard_groups[] = {
+ 	{ .cap = OCP_CAP_BASIC,	    .group = &fb_timecard_group },
++	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
+ 	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
+ 	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
+ 	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal2_group },
+@@ -3814,6 +3878,7 @@ static const struct attribute_group art_timecard_group = {
+ 
+ static const struct ocp_attr_group art_timecard_groups[] = {
+ 	{ .cap = OCP_CAP_BASIC,	    .group = &art_timecard_group },
++	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
+ 	{ },
+ };
+ 
+@@ -3841,6 +3906,7 @@ static const struct attribute_group adva_timecard_group = {
+ 
+ static const struct ocp_attr_group adva_timecard_groups[] = {
+ 	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_group },
++	{ .cap = OCP_CAP_BASIC,	    .group = &ptp_ocp_timecard_tty_group },
+ 	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
+ 	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
+ 	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
+@@ -3960,16 +4026,11 @@ ptp_ocp_summary_show(struct seq_file *s, void *data)
+ 	bp = dev_get_drvdata(dev);
+ 
+ 	seq_printf(s, "%7s: /dev/ptp%d\n", "PTP", ptp_clock_index(bp->ptp));
+-	if (bp->gnss_port.line != -1)
+-		seq_printf(s, "%7s: /dev/ttyS%d\n", "GNSS1",
+-			   bp->gnss_port.line);
+-	if (bp->gnss2_port.line != -1)
+-		seq_printf(s, "%7s: /dev/ttyS%d\n", "GNSS2",
+-			   bp->gnss2_port.line);
+-	if (bp->mac_port.line != -1)
+-		seq_printf(s, "%7s: /dev/ttyS%d\n", "MAC", bp->mac_port.line);
+-	if (bp->nmea_port.line != -1)
+-		seq_printf(s, "%7s: /dev/ttyS%d\n", "NMEA", bp->nmea_port.line);
++	for (i = 0; i < __PORT_COUNT; i++) {
++		if (bp->port[i].line != -1)
++			seq_printf(s, "%7s: /dev/ttyS%d\n", ptp_ocp_tty_port_name(i),
++				   bp->port[i].line);
++	}
+ 
+ 	memset(sma_val, 0xff, sizeof(sma_val));
+ 	if (bp->sma_map1) {
+@@ -4279,7 +4340,7 @@ ptp_ocp_dev_release(struct device *dev)
+ static int
+ ptp_ocp_device_init(struct ptp_ocp *bp, struct pci_dev *pdev)
+ {
+-	int err;
++	int i, err;
+ 
+ 	mutex_lock(&ptp_ocp_lock);
+ 	err = idr_alloc(&ptp_ocp_idr, bp, 0, 0, GFP_KERNEL);
+@@ -4292,10 +4353,10 @@ ptp_ocp_device_init(struct ptp_ocp *bp, struct pci_dev *pdev)
+ 
+ 	bp->ptp_info = ptp_ocp_clock_info;
+ 	spin_lock_init(&bp->lock);
+-	bp->gnss_port.line = -1;
+-	bp->gnss2_port.line = -1;
+-	bp->mac_port.line = -1;
+-	bp->nmea_port.line = -1;
++
++	for (i = 0; i < __PORT_COUNT; i++)
++		bp->port[i].line = -1;
++
+ 	bp->pdev = pdev;
+ 
+ 	device_initialize(&bp->dev);
+@@ -4352,22 +4413,6 @@ ptp_ocp_complete(struct ptp_ocp *bp)
+ 	struct pps_device *pps;
+ 	char buf[32];
+ 
+-	if (bp->gnss_port.line != -1) {
+-		sprintf(buf, "ttyS%d", bp->gnss_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS");
+-	}
+-	if (bp->gnss2_port.line != -1) {
+-		sprintf(buf, "ttyS%d", bp->gnss2_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS2");
+-	}
+-	if (bp->mac_port.line != -1) {
+-		sprintf(buf, "ttyS%d", bp->mac_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyMAC");
+-	}
+-	if (bp->nmea_port.line != -1) {
+-		sprintf(buf, "ttyS%d", bp->nmea_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyNMEA");
+-	}
+ 	sprintf(buf, "ptp%d", ptp_clock_index(bp->ptp));
+ 	ptp_ocp_link_child(bp, buf, "ptp");
+ 
+@@ -4416,23 +4461,22 @@ ptp_ocp_info(struct ptp_ocp *bp)
+ 	};
+ 	struct device *dev = &bp->pdev->dev;
+ 	u32 reg;
++	int i;
+ 
+ 	ptp_ocp_phc_info(bp);
+ 
+-	ptp_ocp_serial_info(dev, "GNSS", bp->gnss_port.line,
+-			    bp->gnss_port.baud);
+-	ptp_ocp_serial_info(dev, "GNSS2", bp->gnss2_port.line,
+-			    bp->gnss2_port.baud);
+-	ptp_ocp_serial_info(dev, "MAC", bp->mac_port.line, bp->mac_port.baud);
+-	if (bp->nmea_out && bp->nmea_port.line != -1) {
+-		bp->nmea_port.baud = -1;
++	for (i = 0; i < __PORT_COUNT; i++) {
++		if (i == PORT_NMEA && bp->nmea_out && bp->port[PORT_NMEA].line != -1) {
++			bp->port[PORT_NMEA].baud = -1;
++
++			reg = ioread32(&bp->nmea_out->uart_baud);
++			if (reg < ARRAY_SIZE(nmea_baud))
++				bp->port[PORT_NMEA].baud = nmea_baud[reg];
++		}
++		ptp_ocp_serial_info(dev, ptp_ocp_tty_port_name(i), bp->port[i].line,
++				    bp->port[i].baud);
+ 
+-		reg = ioread32(&bp->nmea_out->uart_baud);
+-		if (reg < ARRAY_SIZE(nmea_baud))
+-			bp->nmea_port.baud = nmea_baud[reg];
+ 
+-		ptp_ocp_serial_info(dev, "NMEA", bp->nmea_port.line,
+-				    bp->nmea_port.baud);
+ 	}
+ }
+ 
+@@ -4441,9 +4485,6 @@ ptp_ocp_detach_sysfs(struct ptp_ocp *bp)
+ {
+ 	struct device *dev = &bp->dev;
+ 
+-	sysfs_remove_link(&dev->kobj, "ttyGNSS");
+-	sysfs_remove_link(&dev->kobj, "ttyGNSS2");
+-	sysfs_remove_link(&dev->kobj, "ttyMAC");
+ 	sysfs_remove_link(&dev->kobj, "ptp");
+ 	sysfs_remove_link(&dev->kobj, "pps");
+ }
+@@ -4473,14 +4514,9 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+ 	for (i = 0; i < 4; i++)
+ 		if (bp->signal_out[i])
+ 			ptp_ocp_unregister_ext(bp->signal_out[i]);
+-	if (bp->gnss_port.line != -1)
+-		serial8250_unregister_port(bp->gnss_port.line);
+-	if (bp->gnss2_port.line != -1)
+-		serial8250_unregister_port(bp->gnss2_port.line);
+-	if (bp->mac_port.line != -1)
+-		serial8250_unregister_port(bp->mac_port.line);
+-	if (bp->nmea_port.line != -1)
+-		serial8250_unregister_port(bp->nmea_port.line);
++	for (i = 0; i < __PORT_COUNT; i++)
++		if (bp->port[i].line != -1)
++			serial8250_unregister_port(bp->port[i].line);
+ 	platform_device_unregister(bp->spi_flash);
+ 	platform_device_unregister(bp->i2c_ctrl);
+ 	if (bp->i2c_clk)
+-- 
+2.43.5
+
 
