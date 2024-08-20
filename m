@@ -1,148 +1,180 @@
-Return-Path: <netdev+bounces-120315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3D0958E8B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 21:22:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70831958E8D
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 21:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B0AE1C21727
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 19:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F991C22068
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 19:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCADF156228;
-	Tue, 20 Aug 2024 19:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E611115ADBB;
+	Tue, 20 Aug 2024 19:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGV+OM1j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GqqfuyaF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41667149C4F;
-	Tue, 20 Aug 2024 19:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43EA1547C9
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 19:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724181721; cv=none; b=VOCC93McheAxZYA8RwGq0gzmMvbgo4qcCcX5VNOW3zbhXYpoImHt7+TNEV0e7g7mqtL6K3PLnfdHdeH6sP84wwOPq//DFukTi8c05fQC+QBAI5NNVHHkuG7u/PeiNKho2nYSS3ZDYqrPhIhbGs6+t2WxtSnxFcZrk0S4H+kh6do=
+	t=1724181734; cv=none; b=uHan4ffvzDAv+af5TUuU6+mXwcYRqP2KCMhnLCGiCbcsoL/GGFt8rfxCAOnHs0AGEYaYVJkZRR4P4hVFaqLCqW1DK2uGFFdxjvVWBx5w3RFjGT9cTudWp/QtP8SD8J1LfMlyue218Vayp/OCMD69Y7Gb7FN8ekulBUwiib8bAbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724181721; c=relaxed/simple;
-	bh=HDmjUSPeQ052zs214EJwkKI/aCj9sfJ3LSxztQ1ThtE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GtvfbIQ7n/s4pLxxIoldbhnNgTyTTwJjJOoWG5VNdggnA6ew+xgngUo7M/+cCT1xevMV9U6X3PuMa/4npdYG2/9WYodRRIdhnAZ+a4b4W6mqKIme/Hb7qGIEIeT+4FQ/MKj8myzWUbq/gw8TptWlafzTddbrwczVK1O8xCUKp0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGV+OM1j; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e026a2238d8so6019001276.0;
-        Tue, 20 Aug 2024 12:22:00 -0700 (PDT)
+	s=arc-20240116; t=1724181734; c=relaxed/simple;
+	bh=BpPOfDmirINhx2FeN9v389nMMWzGfbW4wtOzqy53by0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=l8AhNdHjVJr6N3mcLDfvR/4hnXgpnHvtP1hqprcNvpHXjcISM4a8PB43jVsbufMcggIluwWUzD9XfPamARiMrqpf05FwecGhxXyqx4WHnsMXODKDTiEfxo8Q0p2TYadLvMf0ySjHqN1NrSPl7u0sUea3PpWYyYxoImDL2z1+yFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GqqfuyaF; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52efd08e6d9so6979851e87.1
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724181719; x=1724786519; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VCul4K8TK7hOnoga2HB22Aaiz/M42naHXOD36F/mvuI=;
-        b=ZGV+OM1jj3t1SGGav5eZ6gvXWFxH16efkowBnVMkjOwuRtAWeX/NxTNlYCo3H2RkWU
-         YP3fBvJHzbSBWKnzefB3uALwzuIrpouLEtQHHVBhBJ0AvHHcbHPuD92i4fqWr29HIYEb
-         /pf/p0/pksz3pHZMppTBJrbG96YWaui++VJ+yPva3riRVwL1ORxAmIMsWDBo4S0LPiWJ
-         mc7P+ujOpj83VGEkuur+rup35esTipuKM/3Ei8b9+wO/SQvkUH94JlmEPZH5xpX4+alt
-         GOohCXByQV3PrQonC8mquxxWcEn5GoWnCZVgM3qWF2rNnADBCjrPEhB0byK8jxRO6ZK1
-         E55Q==
+        d=linaro.org; s=google; t=1724181731; x=1724786531; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s5Vgh7cIhAR8EzOC5rIRmEerU1CHjbVHuOqeMf4SYoY=;
+        b=GqqfuyaFrczJIO0IV/vAphGWaAGSYtyFrF113NgV23mmWSpAsPAD/P661UqQcCzdfn
+         oIVmowVJAIOexyEkN9uKnrHkxvtN7TAAWRUNligN3k9DSO9PWMI0FqRlKV4VJsWYQX/e
+         zAA/K4S80VkJiTZIgSgo0x82HA5oww0rU43f7cUDcuElMBd6WPtLdI/4vS2Wc7/bu6RG
+         1R4YoQtUaFTDB8wYPVUdSh7UxwZrSGEn4Cldbphk+9VshFEoIO/BadRqumtvfv4s+Dt9
+         i9hKQuzMAyURhs4+x2pwXr94q8qdOQguCGZRGw3Mlr5R/1ITORMMiY1+42QccIuhKgX6
+         on0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724181719; x=1724786519;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VCul4K8TK7hOnoga2HB22Aaiz/M42naHXOD36F/mvuI=;
-        b=Xoxdm82CciJdHVFD7Jork/RRA4yENu+mCiD6UWsXPZtwTdCJ5yZzRXcVz99zEMuFbA
-         L1it+3IHA4UfYcy4TSINvLka+ajZWZK6D0v6kcELFIQxfWUxPQzhHvgnO6NuOaagBAvB
-         zLNpfegHMwm6uKrc82jfawOJx5xe8Epb23q0ieOXtrjrvXjnd5kWHvXU4XW0pLo6xQd3
-         ErOekmZINUhVa5C+qF7c+6NvOmmis4q4TckYFw2u7QCYDcnkn4ZV0jL3XdR9MusujtFI
-         rEH58rKz2r37rAIfEZQuLFOqN3ExRd0R3oS2b2Xz7FcNX5f3id+64FLgPkMkwZe/80wI
-         OkKg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2aBaznrXyk5O3KhCwS7fH1st7t+9vvRHV2EANfBah5veXfuoszxF3Kcp4seCkAgdgUcqTRkKW@vger.kernel.org, AJvYcCU5WWypVSvJ/rk4SX7fNyfFMh/16zgCZ8lnEJljwLmhbt993jRd+mjv82z4VKCwSMDG6hNiHmYYpco/wqQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxxQHlnyLdDxrwiHXdfayZzUuRQH2hjdjGae7FNrMFt9Fu07kz
-	aNKy6BHJ+UVm+9VyeagXGnVpqzcLSuu94642Pf6nQBMFN7UPvxfm
-X-Google-Smtp-Source: AGHT+IEN7cfA8HiV+XJ3Q8Kc62chmHznInuvA/GTxOfNCnzP3xP108YdXw1/joPMkH8sxpftaLdPeg==
-X-Received: by 2002:a05:690c:6591:b0:6ad:ba92:1731 with SMTP id 00721157ae682-6c0a0ae8507mr3422167b3.41.1724181719104;
-        Tue, 20 Aug 2024 12:21:59 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6af99410fcfsm20057547b3.3.2024.08.20.12.21.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Aug 2024 12:21:58 -0700 (PDT)
-Message-ID: <5da4cc4d-2e68-424c-8d91-299d3ccb6dc8@gmail.com>
-Date: Tue, 20 Aug 2024 15:21:57 -0400
+        d=1e100.net; s=20230601; t=1724181731; x=1724786531;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s5Vgh7cIhAR8EzOC5rIRmEerU1CHjbVHuOqeMf4SYoY=;
+        b=byL3qXFhFJwgs/GFr+fVx8U4llz5R0AeOxV9WXLazQTtKYcVYJIaeyDfibtnfBsNik
+         GuAgIwZQm2M+OVc+L2YK8Z2qW2jCLq/pbvdIxwL3hOG/PgIyHN+0UwaOIRuq5mHur1F3
+         MHEpsE2PhSi7fIKtg5F4sN2s6qXyV7v0jacYcLS4Hs8GWzTJu9BShMNeR9pGq+poln76
+         2Yh2rTxgPQ7EhMFZMEv9XK7gccyOzG6h0ew20mzz1JDWEaT0xkU5uQCzKMGESWDhZNX5
+         ua2t+lYnS9LAsrYacjgY2RM1Ugr9l3r6mjmkEyWrwGmSKY+fhlMVUgz0C8xGnkSFWGMP
+         ZfVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWP3rf8pYeoLBUwbxdCBZAND/cqgR807/aPThEAv/R3M3zfU6xMYOaMde71kgKVaP/5Qth2JCk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4BbWfRXti00Kg9y84SaxSeZUVInsSuK4cL1+yBq/omCRB7DM1
+	PnepFCshnZU8RL8WYSSkop7GCGuVSsXCQgT4j7RuWTBnD40a1XoDHu+k9BE31JgJLa/bTPJ2V7j
+	A
+X-Google-Smtp-Source: AGHT+IHf7Tbewe2gDUqpiwgN6v47D7zLV+pEDL7AQ0VkyE9qIIIroi+fCDpfoFTJLhwZIOCQ0RIEIA==
+X-Received: by 2002:a05:6512:230a:b0:52c:8aa6:4e9d with SMTP id 2adb3069b0e04-5331c6b010bmr11047307e87.29.1724181730489;
+        Tue, 20 Aug 2024 12:22:10 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396d0cdsm799992266b.219.2024.08.20.12.22.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 12:22:09 -0700 (PDT)
+Date: Tue, 20 Aug 2024 22:22:05 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Alexander Aring <aahringo@redhat.com>,
+	teigland@redhat.com
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, gfs2@lists.linux.dev,
+	song@kernel.org, yukuai3@huawei.com, agruenba@redhat.com,
+	mark@fasheh.com, jlbec@evilplan.org, joseph.qi@linux.alibaba.com,
+	gregkh@linuxfoundation.org, rafael@kernel.org,
+	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+	netdev@vger.kernel.org, vvidic@valentin-vidic.from.hr,
+	heming.zhao@suse.com, lucien.xin@gmail.com, aahringo@redhat.com
+Subject: Re: [PATCH dlm/next 10/12] dlm: separate dlm lockspaces per
+ net-namespace
+Message-ID: <2a99ef8c-9475-4843-87e7-c8f03c756e2b@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] net: dsa: mv88e6xxx: Fix out-of-bound access
-To: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-References: <20240819222641.1292308-1-Joseph.Huang@garmin.com>
- <72e02a72-ab98-4a64-99ac-769d28cfd758@lunn.ch>
- <20240820183202.GA2898@kernel.org>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <20240820183202.GA2898@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819183742.2263895-11-aahringo@redhat.com>
 
-On 8/20/2024 2:32 PM, Simon Horman wrote:
-> On Tue, Aug 20, 2024 at 12:58:05AM +0200, Andrew Lunn wrote:
->> On Mon, Aug 19, 2024 at 06:26:40PM -0400, Joseph Huang wrote:
->> > If an ATU violation was caused by a CPU Load operation, the SPID is 0xf,
->> > which is larger than DSA_MAX_PORTS (the size of mv88e6xxx_chip.ports[]
->> > array).
->> 
->> The 6390X datasheet says "IF SPID = 0x1f the source of the violation
->> was the CPU's registers interface."
->> 
->> > +#define MV88E6XXX_G1_ATU_DATA_SPID_CPU				0x000f
->> 
->> So it seems to depend on the family.
->> 
->> >  
->> >  /* Offset 0x0D: ATU MAC Address Register Bytes 0 & 1
->> >   * Offset 0x0E: ATU MAC Address Register Bytes 2 & 3
->> > diff --git a/drivers/net/dsa/mv88e6xxx/global1_atu.c b/drivers/net/dsa/mv88e6xxx/global1_atu.c
->> > index ce3b3690c3c0..b6f15ae22c20 100644
->> > --- a/drivers/net/dsa/mv88e6xxx/global1_atu.c
->> > +++ b/drivers/net/dsa/mv88e6xxx/global1_atu.c
->> > @@ -457,7 +457,8 @@ static irqreturn_t mv88e6xxx_g1_atu_prob_irq_thread_fn(int irq, void *dev_id)
->> >  		trace_mv88e6xxx_atu_full_violation(chip->dev, spid,
->> >  						   entry.portvec, entry.mac,
->> >  						   fid);
->> > -		chip->ports[spid].atu_full_violation++;
->> > +		if (spid != MV88E6XXX_G1_ATU_DATA_SPID_CPU)
->> > +			chip->ports[spid].atu_full_violation++;
->> 
->> So i think it would be better to do something like:
->> 
->> 		if (spid < ARRAY_SIZE(chip->ports))
->> 			chip->ports[spid].atu_full_violation++;
-> 
-> Hi Joseph,
-> 
-> I am curious to know if bounds checking should also
-> be added to other accesses to chip->ports[spid] within this function.
-> 
+Hi Alexander,
 
-Hi Simon,
+kernel test robot noticed the following build warnings:
 
- From the spec it is unclear to me whether the Load operation could 
-actually cause other exceptions. I was only able to reproduce and verify 
-the full violation, and that's why I only included that one in the patch.
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I guess we could proactively include the fix for other exceptions as 
-well, but without a way to verify them, they could be just dead code and 
-never be exercised. Perhaps people who are more familiar with the chip 
-than me could chime in. I'm fine either way.
+url:    https://github.com/intel-lab-lkp/linux/commits/Alexander-Aring/dlm-introduce-dlm_find_lockspace_name/20240820-024440
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/teigland/linux-dlm.git next
+patch link:    https://lore.kernel.org/r/20240819183742.2263895-11-aahringo%40redhat.com
+patch subject: [PATCH dlm/next 10/12] dlm: separate dlm lockspaces per net-namespace
+config: x86_64-randconfig-161-20240820 (https://download.01.org/0day-ci/archive/20240821/202408210031.QCBHr27k-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
 
-Thanks,
-Joseph
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202408210031.QCBHr27k-lkp@intel.com/
+
+New smatch warnings:
+fs/dlm/lock.c:4989 dlm_receive_buffer() error: we previously assumed 'ls' could be null (see line 4988)
+
+
+vim +/ls +4989 fs/dlm/lock.c
+
+bde0f4dba584ae Alexander Aring 2024-08-19  4961  void dlm_receive_buffer(struct dlm_net *dn, const union dlm_packet *p,
+bde0f4dba584ae Alexander Aring 2024-08-19  4962  			int nodeid)
+c36258b5925e6c David Teigland  2007-09-27  4963  {
+1151935182b40b Alexander Aring 2023-08-01  4964  	const struct dlm_header *hd = &p->header;
+c36258b5925e6c David Teigland  2007-09-27  4965  	struct dlm_ls *ls;
+c36258b5925e6c David Teigland  2007-09-27  4966  	int type = 0;
+c36258b5925e6c David Teigland  2007-09-27  4967  
+c36258b5925e6c David Teigland  2007-09-27  4968  	switch (hd->h_cmd) {
+c36258b5925e6c David Teigland  2007-09-27  4969  	case DLM_MSG:
+00e99ccde75722 Alexander Aring 2022-04-04  4970  		type = le32_to_cpu(p->message.m_type);
+c36258b5925e6c David Teigland  2007-09-27  4971  		break;
+c36258b5925e6c David Teigland  2007-09-27  4972  	case DLM_RCOM:
+2f9dbeda8dc04b Alexander Aring 2022-04-04  4973  		type = le32_to_cpu(p->rcom.rc_type);
+c36258b5925e6c David Teigland  2007-09-27  4974  		break;
+c36258b5925e6c David Teigland  2007-09-27  4975  	default:
+c36258b5925e6c David Teigland  2007-09-27  4976  		log_print("invalid h_cmd %d from %u", hd->h_cmd, nodeid);
+c36258b5925e6c David Teigland  2007-09-27  4977  		return;
+c36258b5925e6c David Teigland  2007-09-27  4978  	}
+c36258b5925e6c David Teigland  2007-09-27  4979  
+3428785a65dabf Alexander Aring 2022-04-04  4980  	if (le32_to_cpu(hd->h_nodeid) != nodeid) {
+c36258b5925e6c David Teigland  2007-09-27  4981  		log_print("invalid h_nodeid %d from %d lockspace %x",
+3428785a65dabf Alexander Aring 2022-04-04  4982  			  le32_to_cpu(hd->h_nodeid), nodeid,
+3428785a65dabf Alexander Aring 2022-04-04  4983  			  le32_to_cpu(hd->u.h_lockspace));
+c36258b5925e6c David Teigland  2007-09-27  4984  		return;
+c36258b5925e6c David Teigland  2007-09-27  4985  	}
+c36258b5925e6c David Teigland  2007-09-27  4986  
+bde0f4dba584ae Alexander Aring 2024-08-19  4987  	ls = dlm_find_lockspace_global(dn, le32_to_cpu(hd->u.h_lockspace));
+c36258b5925e6c David Teigland  2007-09-27 @4988  	if (!ls) {
+bde0f4dba584ae Alexander Aring 2024-08-19 @4989  		log_limit(ls, "dlm: invalid lockspace %u from %d cmd %d type %d\n",
+                                                                          ^^
+ls is NULL here so this doesn't work.
+
+3428785a65dabf Alexander Aring 2022-04-04  4990  			  le32_to_cpu(hd->u.h_lockspace), nodeid,
+3428785a65dabf Alexander Aring 2022-04-04  4991  			  hd->h_cmd, type);
+c36258b5925e6c David Teigland  2007-09-27  4992  
+c36258b5925e6c David Teigland  2007-09-27  4993  		if (hd->h_cmd == DLM_RCOM && type == DLM_RCOM_STATUS)
+bde0f4dba584ae Alexander Aring 2024-08-19  4994  			dlm_send_ls_not_ready(dn, nodeid, &p->rcom);
+c36258b5925e6c David Teigland  2007-09-27  4995  		return;
+c36258b5925e6c David Teigland  2007-09-27  4996  	}
+c36258b5925e6c David Teigland  2007-09-27  4997  
+c36258b5925e6c David Teigland  2007-09-27  4998  	/* this rwsem allows dlm_ls_stop() to wait for all dlm_recv threads to
+c36258b5925e6c David Teigland  2007-09-27  4999  	   be inactive (in this ls) before transitioning to recovery mode */
+c36258b5925e6c David Teigland  2007-09-27  5000  
+578acf9a87a875 Alexander Aring 2024-04-02  5001  	read_lock_bh(&ls->ls_recv_active);
+c36258b5925e6c David Teigland  2007-09-27  5002  	if (hd->h_cmd == DLM_MSG)
+eef7d739c218cb Al Viro         2008-01-25  5003  		dlm_receive_message(ls, &p->message, nodeid);
+f45307d395da7a Alexander Aring 2022-08-15  5004  	else if (hd->h_cmd == DLM_RCOM)
+eef7d739c218cb Al Viro         2008-01-25  5005  		dlm_receive_rcom(ls, &p->rcom, nodeid);
+f45307d395da7a Alexander Aring 2022-08-15  5006  	else
+f45307d395da7a Alexander Aring 2022-08-15  5007  		log_error(ls, "invalid h_cmd %d from %d lockspace %x",
+f45307d395da7a Alexander Aring 2022-08-15  5008  			  hd->h_cmd, nodeid, le32_to_cpu(hd->u.h_lockspace));
+578acf9a87a875 Alexander Aring 2024-04-02  5009  	read_unlock_bh(&ls->ls_recv_active);
+c36258b5925e6c David Teigland  2007-09-27  5010  
+c36258b5925e6c David Teigland  2007-09-27  5011  	dlm_put_lockspace(ls);
+c36258b5925e6c David Teigland  2007-09-27  5012  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
