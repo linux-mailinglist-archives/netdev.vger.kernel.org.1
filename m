@@ -1,169 +1,204 @@
-Return-Path: <netdev+bounces-120037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4E8958006
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:40:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C6095800B
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F8831F25217
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:40:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA76C1C24193
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6DD189BBD;
-	Tue, 20 Aug 2024 07:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33491898F2;
+	Tue, 20 Aug 2024 07:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NR22vrcr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frH76/Tv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF351189B99
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 07:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D02F17C204;
+	Tue, 20 Aug 2024 07:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724139623; cv=none; b=k/vswyAWuUfrjYZ1LyeC51jC+LJ7vPe5kDH2AyxJe2E7oFqcRNTydPX0TCE6+gebKHlBTiOoWbrKI1KsfWbiEZWEU6Gqcb9Wg7LVrEL9hfV3UEY2eRQpLK+Dc1NvJVILWAkCwe2u4iJpy1zkljnWw5733tXi9LgshbgulMpwRGU=
+	t=1724139629; cv=none; b=KIsm/Rd7NYk+tn0AVj5+zatkS8P7l0NB7GrQxBa8VkEBkfcOAdGU2Ibv3uTV5TGB0gBBFTtkMGdWe2j5iv+8YrwrsRgdNVyrYGipqpO9oZlnny1rNa1ThOQaBP3LWdoOx+yMIiyFzVS6TtxPV5G6JQ8LXTj00OU7HbI6Uy3ReLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724139623; c=relaxed/simple;
-	bh=aYkN9CyGqEIYAw2LdxUgvvFJ/GqgBaxXltVMI7LxkmY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PU51j59Zfkl6fh8EBeqhU0xcBt96kzEdRbbSOsrTT11fWV5ocb4JcfKxtuTGq6MznoXOuilABPLsjD6wvf2doYddnT7wYyiNw9BPLnkzr7h3SwLiZssRHbzqbK8xbZIAIdCrI7tW21RFkcEYbz4A3wxM/DAzQ3NgK4lgtxfrr80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NR22vrcr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724139620;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LI6kfa5oLV045Jmdu7a0CojUb3GQJzHs7H4OiymNEbE=;
-	b=NR22vrcrL5WHiVsh3++iAVWVQMrIyTOnupWW3H/zYjlNAQAKxOcq0zEFfmmcfe7U6XBLMB
-	TEHqQaS5rzK27GNU6wn62IRfjO4LEup2OKtgiX5KyNCkPD51v8duHIeAzqNDUuRDnBgEn1
-	XkHWodkDOnifyB1O8go6cXmWoKjVSXQ=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-vgWSjCSmP4KPX8vs2GlJKw-1; Tue, 20 Aug 2024 03:40:14 -0400
-X-MC-Unique: vgWSjCSmP4KPX8vs2GlJKw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2f3f157cd18so136461fa.0
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:40:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724139612; x=1724744412;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LI6kfa5oLV045Jmdu7a0CojUb3GQJzHs7H4OiymNEbE=;
-        b=cuTDXJbD1YRrTEEUnvi3AjZ+2LECi2mfsh5NLAGenHBvDYDv3IRyzUadRdESgbjEqs
-         /NcZHCMEY5yoettDTgMjW9ZRdQfx/KCayRoU2Y/h/j+s/CVEciu8GROW1IKUhADysIt5
-         iILNeg7R9+43+hI7OWPIGWfroNjQxCzpb9t9ql9bMEv7xvOM4rSfJYo30gKXZ8VzCzgv
-         CpDKwUQ7m0PpxcgO7rD89a75+tVCGJpMhYdgjjeA8PiyRRJJY0V0n5lKWfINbVZ+DBZe
-         0E1Je32ILJyFbvnqzOGjvReIWiluLtGFaJ5wURNe34BnwELwWtdv6TzKAWXHPfiL0Qrx
-         ALZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWom9PvBo+xgfIetd9aKcFzBWE+lZoojGBeWzp2xRs+MfOYiQto3dQEWwuiC1VAbGFO0F47cPk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDueOxxn01xBO8Ffv9u5bj2kh3bZ5VzCgsq7BtkRs6qgQn4pJq
-	8lsIsD5v1R9OAPPcsFE0LSiJWMJnwM+tuKdgbTupz3r54MZ2zlyVSnGiAhqev6vazqYW5ykhtiQ
-	nfrULizR61R5kBJLOm+LRvfX5XTEVIcI8bXRzPVNXWMhq/jgK+m2UNQ==
-X-Received: by 2002:a05:6512:3d04:b0:52f:c0dd:d168 with SMTP id 2adb3069b0e04-5331c6e53bfmr4778902e87.7.1724139612396;
-        Tue, 20 Aug 2024 00:40:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGuY9Bjt5iBWcm2YKpDyt42mNkBOnX16tyh4gc9tacJQihXtDb0AW33sxGPjl0kWgtMyZPzMQ==
-X-Received: by 2002:a05:6512:3d04:b0:52f:c0dd:d168 with SMTP id 2adb3069b0e04-5331c6e53bfmr4778883e87.7.1724139611750;
-        Tue, 20 Aug 2024 00:40:11 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3dcc:1f00:bec1:681e:45eb:77e2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83839344fdsm726051366b.100.2024.08.20.00.40.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 00:40:11 -0700 (PDT)
-Message-ID: <5d70794731198ec7bc59bd95e50a8aa81cf97c7b.camel@redhat.com>
-Subject: Re: [PATCH 6/9] ethernet: cavium: Replace deprecated PCI functions
-From: Philipp Stanner <pstanner@redhat.com>
-To: Andy Shevchenko <andy@kernel.org>
-Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
- <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
- <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>,  Eugenio =?ISO-8859-1?Q?P=E9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Mark
- Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>, Uwe
- =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Jonathan
- Cameron <Jonathan.Cameron@huawei.com>,  Hannes Reinecke <hare@suse.de>,
- Damien Le Moal <dlemoal@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-Date: Tue, 20 Aug 2024 09:40:09 +0200
-In-Reply-To: <ZsONiNkdXGMKMbRL@smile.fi.intel.com>
-References: <20240819165148.58201-2-pstanner@redhat.com>
-	 <20240819165148.58201-8-pstanner@redhat.com>
-	 <ZsONiNkdXGMKMbRL@smile.fi.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1724139629; c=relaxed/simple;
+	bh=hawFFnGsZ8QIvUfjOYbiKz9xBDXapD08x6QGiLvAwPs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUwQKV4o0S770zQ72NcHcQUKsdouCZBAhYeabV+NYjmU/RDi73sfEZvFS3RDCY9pudDaNQP03KFc+saDvDCL/l68s6UKMdQWKi3YwrAsyl6wUe0RwZ+K+YrunzpIooHV0opeJ6z9HICduIgPmZe0SPsOnMLwwOltbm1isSX9Uog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frH76/Tv; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724139627; x=1755675627;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hawFFnGsZ8QIvUfjOYbiKz9xBDXapD08x6QGiLvAwPs=;
+  b=frH76/Tv+9ifIDSxpBY3VH9ps0y884t7IF5Ex8vS36mYiIv2KrTqe5Ak
+   a68PyDpHcufaHPlMTPcQX3Cgl0T/DeDmKMLNTovUNz503NMPSqwzB3JFw
+   +3PAlVG20arGqaehpl1fqE0KaZgC/FjbXJutzb7iJ/sebRYb9QAX4lNmJ
+   0a1875KkqgGUs1CpgyYtUxbkQQJhPgxGHCyEMnthvX/HFP8snkBXIK03L
+   oMaymjYIkHQTJk08dOndFwDGlCeahbaNbAd/oc4Jcbv51mrKnMiuG8aU7
+   MRgy3gxvSHrUcf/P0EpZx0XNsJQLYqyohYQFJ44TYAzl+CRTlqknh2p+1
+   g==;
+X-CSE-ConnectionGUID: cJuFwCDUSvSsuj5U8wUp4g==
+X-CSE-MsgGUID: J28V70cRSy6BmsJtGdwlLw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="39926457"
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="39926457"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 00:40:25 -0700
+X-CSE-ConnectionGUID: u+Uf2G9mTouWtcLGx/72Lw==
+X-CSE-MsgGUID: Ni+zAIHISxyEEUBu7A5x+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="91406661"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 20 Aug 2024 00:40:21 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sgJTW-0009r2-39;
+	Tue, 20 Aug 2024 07:40:18 +0000
+Date: Tue, 20 Aug 2024 15:40:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Alexander Aring <aahringo@redhat.com>, teigland@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	gfs2@lists.linux.dev, song@kernel.org, yukuai3@huawei.com,
+	agruenba@redhat.com, mark@fasheh.com, jlbec@evilplan.org,
+	joseph.qi@linux.alibaba.com, gregkh@linuxfoundation.org,
+	rafael@kernel.org, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	ocfs2-devel@lists.linux.dev, netdev@vger.kernel.org,
+	vvidic@valentin-vidic.from.hr, heming.zhao@suse.com,
+	lucien.xin@gmail.com, aahringo@redhat.com
+Subject: Re: [PATCH dlm/next 11/12] dlm: add nldlm net-namespace aware UAPI
+Message-ID: <202408201509.g1VKeeOl-lkp@intel.com>
+References: <20240819183742.2263895-12-aahringo@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819183742.2263895-12-aahringo@redhat.com>
 
-On Mon, 2024-08-19 at 21:23 +0300, Andy Shevchenko wrote:
-> On Mon, Aug 19, 2024 at 06:51:46PM +0200, Philipp Stanner wrote:
-> > pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
-> > the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> >=20
-> > Replace these functions with the function pcim_iomap_region().
->=20
-> ...
->=20
-> cavium_ptp_probe()
->=20
-> > -	pcim_iounmap_regions(pdev, 1 << PCI_PTP_BAR_NO);
-> > +	pcim_iounmap_region(pdev, PCI_PTP_BAR_NO);
-> > =C2=A0
-> > =C2=A0error_free:
-> > =C2=A0	devm_kfree(dev, clock);
->=20
-> Both are questionable. Why do we need either of them?
+Hi Alexander,
 
-You seem to criticize my pcim_iounmap_region() etc. in other unwind
-paths, too. I think your criticism is often justified. This driver
-here, however, was the one which made me suspicious and hesitate and
-removing those calls; because of the code below:
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on teigland-dlm/next]
+[also build test WARNING on next-20240820]
+[cannot apply to gfs2/for-next driver-core/driver-core-testing driver-core/driver-core-next driver-core/driver-core-linus linus/master v6.11-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Alexander-Aring/dlm-introduce-dlm_find_lockspace_name/20240820-024440
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/teigland/linux-dlm.git next
+patch link:    https://lore.kernel.org/r/20240819183742.2263895-12-aahringo%40redhat.com
+patch subject: [PATCH dlm/next 11/12] dlm: add nldlm net-namespace aware UAPI
+config: x86_64-buildonly-randconfig-001-20240820 (https://download.01.org/0day-ci/archive/20240820/202408201509.g1VKeeOl-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408201509.g1VKeeOl-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408201509.g1VKeeOl-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> fs/dlm/nldlm.c:195:2: warning: variable 'ls' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
+     195 |         list_for_each_entry(ls_iter, &dn->lockspaces, list) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/list.h:779:7: note: expanded from macro 'list_for_each_entry'
+     779 |              !list_entry_is_head(pos, head, member);                    \
+         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   fs/dlm/nldlm.c:202:7: note: uninitialized use occurs here
+     202 |         if (!ls) {
+         |              ^~
+   fs/dlm/nldlm.c:195:2: note: remove the condition if it is always true
+     195 |         list_for_each_entry(ls_iter, &dn->lockspaces, list) {
+         |         ^
+   include/linux/list.h:779:7: note: expanded from macro 'list_for_each_entry'
+     779 |              !list_entry_is_head(pos, head, member);                    \
+         |              ^
+   fs/dlm/nldlm.c:185:23: note: initialize the variable 'ls' to silence this warning
+     185 |         struct dlm_cfg_ls *ls, *ls_iter = NULL;
+         |                              ^
+         |                               = NULL
+>> fs/dlm/nldlm.c:918:11: warning: variable 'log_level' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+     918 |         else if (dn->config.ci_log_debug)
+         |                  ^~~~~~~~~~~~~~~~~~~~~~~
+   fs/dlm/nldlm.c:921:50: note: uninitialized use occurs here
+     921 |         rv = nla_put_u32(skb, NLDLM_CFG_ATTR_LOG_LEVEL, log_level);
+         |                                                         ^~~~~~~~~
+   fs/dlm/nldlm.c:918:7: note: remove the 'if' if its condition is always true
+     918 |         else if (dn->config.ci_log_debug)
+         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     919 |                 log_level = NLDLM_LOG_LEVEL_DEBUG;
+   fs/dlm/nldlm.c:868:20: note: initialize the variable 'log_level' to silence this warning
+     868 |         uint32_t log_level;
+         |                           ^
+         |                            = 0
+   2 warnings generated.
 
 
-	pcim_iounmap_region(pdev, PCI_PTP_BAR_NO);
+vim +195 fs/dlm/nldlm.c
 
-error_free:
-	devm_kfree(dev, clock);
+   181	
+   182	static int nldlm_get_ls(struct sk_buff *msg, struct genl_info *info)
+   183	{
+   184		struct dlm_net *dn = dlm_pernet(sock_net(msg->sk));
+ > 185		struct dlm_cfg_ls *ls, *ls_iter = NULL;
+   186		char lsname[DLM_LOCKSPACE_LEN];
+   187		struct sk_buff *skb;
+   188		int rv;
+   189	
+   190		rv = nldlm_parse_ls(info->attrs[NLDLM_ATTR_LS], lsname);
+   191		if (rv < 0)
+   192			return rv;
+   193	
+   194		mutex_lock(&dn->cfg_lock);
+ > 195		list_for_each_entry(ls_iter, &dn->lockspaces, list) {
+   196			if (!strncmp(ls_iter->name, lsname, DLM_LOCKSPACE_LEN)) {
+   197				ls = ls_iter;
+   198				break;
+   199			}
+   200		}
+   201	
+   202		if (!ls) {
+   203			rv = -ENOENT;
+   204			goto err;
+   205		}
+   206	
+   207		skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
+   208		if (!skb) {
+   209			rv = -ENOMEM;
+   210			goto err;
+   211		}
+   212	
+   213		rv = __nldlm_get_ls(skb, ls, info->snd_portid,
+   214				    info->snd_seq, NULL, 0);
+   215		if (rv < 0) {
+   216			nlmsg_free(skb);
+   217			goto err;
+   218		}
+   219	
+   220		rv = genlmsg_reply(skb, info);
+   221	
+   222	err:
+   223		mutex_unlock(&dn->cfg_lock);
+   224		return rv;
+   225	}
+   226	
 
-error:
-	/* For `cavium_ptp_get()` we need to differentiate between the case
-	 * when the core has not tried to probe this device and the case when
-	 * the probe failed.  In the later case we pretend that the
-	 * initialization was successful and keep the error in
-	 * `dev->driver_data`.
-	 */
-	pci_set_drvdata(pdev, ERR_PTR(err));
-	return 0;
-}
-
-
-So in case of an error they return 0 and do... stuff.
-
-I don't want to touch that without someone who maintains (and, ideally,
-understands) the code details what's going on here.
-
-
-P.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
