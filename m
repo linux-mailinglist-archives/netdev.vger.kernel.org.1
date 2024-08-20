@@ -1,204 +1,105 @@
-Return-Path: <netdev+bounces-120038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C6095800B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:40:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3539095800E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA76C1C24193
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:40:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E84DC281DCC
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33491898F2;
-	Tue, 20 Aug 2024 07:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frH76/Tv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2416F188CD6;
+	Tue, 20 Aug 2024 07:40:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D02F17C204;
-	Tue, 20 Aug 2024 07:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE91188CBB;
+	Tue, 20 Aug 2024 07:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724139629; cv=none; b=KIsm/Rd7NYk+tn0AVj5+zatkS8P7l0NB7GrQxBa8VkEBkfcOAdGU2Ibv3uTV5TGB0gBBFTtkMGdWe2j5iv+8YrwrsRgdNVyrYGipqpO9oZlnny1rNa1ThOQaBP3LWdoOx+yMIiyFzVS6TtxPV5G6JQ8LXTj00OU7HbI6Uy3ReLI=
+	t=1724139654; cv=none; b=NGRnqEwQY76MWHEUaBWZ6bHu1SdgD0zK/ZoknMpkfh7Err1Z4F/+nBSuK3WS9TPwE214vqrXZrvlAO59vX3lvvl8fEUUPnZVKfHvTPqjFi4QY4B5D6TmOhQKslBXyOkgISeBf/etJO14h3DJdMemPxn60JfYx32m57k8DfVupZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724139629; c=relaxed/simple;
-	bh=hawFFnGsZ8QIvUfjOYbiKz9xBDXapD08x6QGiLvAwPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TUwQKV4o0S770zQ72NcHcQUKsdouCZBAhYeabV+NYjmU/RDi73sfEZvFS3RDCY9pudDaNQP03KFc+saDvDCL/l68s6UKMdQWKi3YwrAsyl6wUe0RwZ+K+YrunzpIooHV0opeJ6z9HICduIgPmZe0SPsOnMLwwOltbm1isSX9Uog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frH76/Tv; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724139627; x=1755675627;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hawFFnGsZ8QIvUfjOYbiKz9xBDXapD08x6QGiLvAwPs=;
-  b=frH76/Tv+9ifIDSxpBY3VH9ps0y884t7IF5Ex8vS36mYiIv2KrTqe5Ak
-   a68PyDpHcufaHPlMTPcQX3Cgl0T/DeDmKMLNTovUNz503NMPSqwzB3JFw
-   +3PAlVG20arGqaehpl1fqE0KaZgC/FjbXJutzb7iJ/sebRYb9QAX4lNmJ
-   0a1875KkqgGUs1CpgyYtUxbkQQJhPgxGHCyEMnthvX/HFP8snkBXIK03L
-   oMaymjYIkHQTJk08dOndFwDGlCeahbaNbAd/oc4Jcbv51mrKnMiuG8aU7
-   MRgy3gxvSHrUcf/P0EpZx0XNsJQLYqyohYQFJ44TYAzl+CRTlqknh2p+1
-   g==;
-X-CSE-ConnectionGUID: cJuFwCDUSvSsuj5U8wUp4g==
-X-CSE-MsgGUID: J28V70cRSy6BmsJtGdwlLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="39926457"
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="39926457"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 00:40:25 -0700
-X-CSE-ConnectionGUID: u+Uf2G9mTouWtcLGx/72Lw==
-X-CSE-MsgGUID: Ni+zAIHISxyEEUBu7A5x+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="91406661"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 20 Aug 2024 00:40:21 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sgJTW-0009r2-39;
-	Tue, 20 Aug 2024 07:40:18 +0000
-Date: Tue, 20 Aug 2024 15:40:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alexander Aring <aahringo@redhat.com>, teigland@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	gfs2@lists.linux.dev, song@kernel.org, yukuai3@huawei.com,
-	agruenba@redhat.com, mark@fasheh.com, jlbec@evilplan.org,
-	joseph.qi@linux.alibaba.com, gregkh@linuxfoundation.org,
-	rafael@kernel.org, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev, netdev@vger.kernel.org,
-	vvidic@valentin-vidic.from.hr, heming.zhao@suse.com,
-	lucien.xin@gmail.com, aahringo@redhat.com
-Subject: Re: [PATCH dlm/next 11/12] dlm: add nldlm net-namespace aware UAPI
-Message-ID: <202408201509.g1VKeeOl-lkp@intel.com>
-References: <20240819183742.2263895-12-aahringo@redhat.com>
+	s=arc-20240116; t=1724139654; c=relaxed/simple;
+	bh=JdIQBI8pfCPEIloS9LRgdMusjlgJmiV9AUDWnZhVXSI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pwtQ5RFJG3BGByqc02hFjybj2yB/z2TRIfuiqXlFn3VXBbQ4KNHL2Pm1rleD4TbGUoMqOAAKm7PuXAsJ48G91Pm0S0xqQmeE2/myHrQKACMLTsCyisZvrVgE80d97/v9z3nL31MCTp+vArN36qafPWf4cawGs4CFpvKJQNzeb/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wp1VG4F6nz20m3L;
+	Tue, 20 Aug 2024 15:36:06 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id 000BB18001B;
+	Tue, 20 Aug 2024 15:40:46 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
+ (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 20 Aug
+ 2024 15:40:46 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <vladimir.oltean@nxp.com>, <claudiu.manoil@nxp.com>,
+	<alexandre.belloni@bootlin.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH -next] net: dsa: ocelot: Simplify with scoped for each OF child loop
+Date: Tue, 20 Aug 2024 15:48:05 +0800
+Message-ID: <20240820074805.680674-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819183742.2263895-12-aahringo@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-Hi Alexander,
+Use scoped for_each_available_child_of_node_scoped() when iterating over
+device nodes to make code a bit simpler.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ drivers/net/dsa/ocelot/felix.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-[auto build test WARNING on teigland-dlm/next]
-[also build test WARNING on next-20240820]
-[cannot apply to gfs2/for-next driver-core/driver-core-testing driver-core/driver-core-next driver-core/driver-core-linus linus/master v6.11-rc4]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Alexander-Aring/dlm-introduce-dlm_find_lockspace_name/20240820-024440
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/teigland/linux-dlm.git next
-patch link:    https://lore.kernel.org/r/20240819183742.2263895-12-aahringo%40redhat.com
-patch subject: [PATCH dlm/next 11/12] dlm: add nldlm net-namespace aware UAPI
-config: x86_64-buildonly-randconfig-001-20240820 (https://download.01.org/0day-ci/archive/20240820/202408201509.g1VKeeOl-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408201509.g1VKeeOl-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408201509.g1VKeeOl-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> fs/dlm/nldlm.c:195:2: warning: variable 'ls' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
-     195 |         list_for_each_entry(ls_iter, &dn->lockspaces, list) {
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/list.h:779:7: note: expanded from macro 'list_for_each_entry'
-     779 |              !list_entry_is_head(pos, head, member);                    \
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   fs/dlm/nldlm.c:202:7: note: uninitialized use occurs here
-     202 |         if (!ls) {
-         |              ^~
-   fs/dlm/nldlm.c:195:2: note: remove the condition if it is always true
-     195 |         list_for_each_entry(ls_iter, &dn->lockspaces, list) {
-         |         ^
-   include/linux/list.h:779:7: note: expanded from macro 'list_for_each_entry'
-     779 |              !list_entry_is_head(pos, head, member);                    \
-         |              ^
-   fs/dlm/nldlm.c:185:23: note: initialize the variable 'ls' to silence this warning
-     185 |         struct dlm_cfg_ls *ls, *ls_iter = NULL;
-         |                              ^
-         |                               = NULL
->> fs/dlm/nldlm.c:918:11: warning: variable 'log_level' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-     918 |         else if (dn->config.ci_log_debug)
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~
-   fs/dlm/nldlm.c:921:50: note: uninitialized use occurs here
-     921 |         rv = nla_put_u32(skb, NLDLM_CFG_ATTR_LOG_LEVEL, log_level);
-         |                                                         ^~~~~~~~~
-   fs/dlm/nldlm.c:918:7: note: remove the 'if' if its condition is always true
-     918 |         else if (dn->config.ci_log_debug)
-         |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     919 |                 log_level = NLDLM_LOG_LEVEL_DEBUG;
-   fs/dlm/nldlm.c:868:20: note: initialize the variable 'log_level' to silence this warning
-     868 |         uint32_t log_level;
-         |                           ^
-         |                            = 0
-   2 warnings generated.
-
-
-vim +195 fs/dlm/nldlm.c
-
-   181	
-   182	static int nldlm_get_ls(struct sk_buff *msg, struct genl_info *info)
-   183	{
-   184		struct dlm_net *dn = dlm_pernet(sock_net(msg->sk));
- > 185		struct dlm_cfg_ls *ls, *ls_iter = NULL;
-   186		char lsname[DLM_LOCKSPACE_LEN];
-   187		struct sk_buff *skb;
-   188		int rv;
-   189	
-   190		rv = nldlm_parse_ls(info->attrs[NLDLM_ATTR_LS], lsname);
-   191		if (rv < 0)
-   192			return rv;
-   193	
-   194		mutex_lock(&dn->cfg_lock);
- > 195		list_for_each_entry(ls_iter, &dn->lockspaces, list) {
-   196			if (!strncmp(ls_iter->name, lsname, DLM_LOCKSPACE_LEN)) {
-   197				ls = ls_iter;
-   198				break;
-   199			}
-   200		}
-   201	
-   202		if (!ls) {
-   203			rv = -ENOENT;
-   204			goto err;
-   205		}
-   206	
-   207		skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
-   208		if (!skb) {
-   209			rv = -ENOMEM;
-   210			goto err;
-   211		}
-   212	
-   213		rv = __nldlm_get_ls(skb, ls, info->snd_portid,
-   214				    info->snd_seq, NULL, 0);
-   215		if (rv < 0) {
-   216			nlmsg_free(skb);
-   217			goto err;
-   218		}
-   219	
-   220		rv = genlmsg_reply(skb, info);
-   221	
-   222	err:
-   223		mutex_unlock(&dn->cfg_lock);
-   224		return rv;
-   225	}
-   226	
-
+diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+index e554699f06d4..800711c2b6cb 100644
+--- a/drivers/net/dsa/ocelot/felix.c
++++ b/drivers/net/dsa/ocelot/felix.c
+@@ -1265,9 +1265,8 @@ static int felix_parse_ports_node(struct felix *felix,
+ 				  phy_interface_t *port_phy_modes)
+ {
+ 	struct device *dev = felix->ocelot.dev;
+-	struct device_node *child;
+ 
+-	for_each_available_child_of_node(ports_node, child) {
++	for_each_available_child_of_node_scoped(ports_node, child) {
+ 		phy_interface_t phy_mode;
+ 		u32 port;
+ 		int err;
+@@ -1276,7 +1275,6 @@ static int felix_parse_ports_node(struct felix *felix,
+ 		if (of_property_read_u32(child, "reg", &port) < 0) {
+ 			dev_err(dev, "Port number not defined in device tree "
+ 				"(property \"reg\")\n");
+-			of_node_put(child);
+ 			return -ENODEV;
+ 		}
+ 
+@@ -1286,7 +1284,6 @@ static int felix_parse_ports_node(struct felix *felix,
+ 			dev_err(dev, "Failed to read phy-mode or "
+ 				"phy-interface-type property for port %d\n",
+ 				port);
+-			of_node_put(child);
+ 			return -ENODEV;
+ 		}
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
