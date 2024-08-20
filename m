@@ -1,122 +1,93 @@
-Return-Path: <netdev+bounces-120307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC66958E4E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:52:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216AC958E53
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 213C6B2291E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C24FF1F243BD
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470EB1537C7;
-	Tue, 20 Aug 2024 18:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210D51537A2;
+	Tue, 20 Aug 2024 18:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1UB/WKBa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hw9/UfYB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DD1130499
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 18:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1999A31
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 18:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724179960; cv=none; b=iV9hJKVA7b++h27CdgSqWwWruzHvr4Snc8mW5nU5itjCWxx/SB2cMOTOEmkRe2sRztTriaUgxE1UzTUHpKXOVlyFXH/UEakbpW6dN9Fdd8esrg3nBf+EBQnLnQvlwa95w5PFIPG55jYlWEvA0ju0toyru28+j2rlMOpafauqMEg=
+	t=1724180298; cv=none; b=V23NjU8IAqUEKg7DwsUdbPuvyTa/P836kM7m/PpOaRL44xOSUAPEuplJs3zB6jdANkU5Vp/ki1TKLSNVIuDwJfAzr6dWmLbPOoNaSQ/NAB2Ec0IL5jZAH54vWoVittCAitdfy7YfaGpo9qlElhB4QLbUIzZoWKLHPzaYrfGu7fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724179960; c=relaxed/simple;
-	bh=QDgHftprLEbyAagP+9tD9LXCAP4ZoqlTSpN8OAlO+A0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RUaJXsw+MtEZiFtvPsPVmxOQky12ZMxbg/9OyTYwuyTi8FPaL6IWUow2CwnF48d1V53MFx7NbFvKhxXFQPO5/AH7Ane5Kj9Dt6DZHDfTK8qVEHyxcw9Y6HZ3b8qH29HpLpBRyyIJR7W79P4zzYWI6xgIomiUB/jShd590Ir0uwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1UB/WKBa; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a7d26c2297eso669632966b.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 11:52:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724179957; x=1724784757; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bt9yHYNeM460PfDzTwuaVKqN87p2jchKeryLrqdp3EI=;
-        b=1UB/WKBaWZx1haTXWw9k+7xYKY6j4o+XKKcQMlbohlF8EXjqV4G84U7rGWhZ2UsPvo
-         4He4zdphGqSXGEQXnrlzMqY+jWo7gUgne6c+iGfeO+wpJX82t9RI1tZ8KwylEQksP3ZT
-         9TCld6WSEXgSxomvHcnV0CNpZuoTDJHre68ywF7FoVREPntFOAuT8fuMrsVRmVSqZexX
-         mK8k2uUHVQKyX0GPQskAMDWGZKClfDWMPCOpaZGr+RGLdvte9JwKCI4qaPeFnXCmke6k
-         B42VRnxsH5yV1+n6XedL9VUBxCLMtByqbxCpQtFDF1vwxsO1lh9uKIm3b7FEsLt62MJB
-         m+CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724179957; x=1724784757;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bt9yHYNeM460PfDzTwuaVKqN87p2jchKeryLrqdp3EI=;
-        b=tAo+kd1XXdYlLwRTy0j13Vm/MWyav5t7lkZ1ICCNG6BG6I9WyqMJcvyWxh5aKyFrIn
-         FX8+RGgTJ57huNl7Cb6T1thvuSBla7C0mJd+zws8lABkAhAoWMTcN0XrEhBTqD69vNf6
-         deorP3rVrBen5BTzPTZOno7ulWodk5RZMIBkYy8HCaTVYvaDTLIf96PcPmZxY2HYATUl
-         sfqmeNX/UD6Dwwj+fUo1Al8pWFGP2k4rxrlYCUAQteHyaMy6CHQBfVHVw3rqD5XJyjwO
-         pCkJ8/zMJjDBH1bgRyt0Fvb9/5L2h/kzddKo0LC6vh8MfezShyhK+qtatAwBLE3oP2tt
-         C1hg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCwfIfKVfEg4WU53tIIaBXBZ6zEmVXfszCOrO3QrAwWXFureD9lG7bOHtIgCl0QPU/pk23kL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUOEhlawSIS+nOQScTRraE2cVUWgotqbgU7cRSaxXRL9Aj0gp5
-	+bBZY983E9xNJ0p5PDqqU7xSvJT5Km6faKjHMUBpYNdR9e2jFCpOXAPZfEXs5132OEkScVjMn2S
-	f31RmVDO4+4udXvrVX0s24IHruvF1M3s1anft
-X-Google-Smtp-Source: AGHT+IEGQM5whJ3Od7eV8UeQbStQvqbfA5b47vgZXnDfkzksNO4vzPX1nrfWO1BE3rrETNjEb15DG//fso2XDvVMtJk=
-X-Received: by 2002:a17:907:f1de:b0:a80:f358:5d55 with SMTP id
- a640c23a62f3a-a8392953a55mr1123092866b.33.1724179956277; Tue, 20 Aug 2024
- 11:52:36 -0700 (PDT)
+	s=arc-20240116; t=1724180298; c=relaxed/simple;
+	bh=yRNVQrRDmvjkofLtO2ZqgR6JHXjWetWzEUqac1E1GSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HyJYnMBKI/Gjv1qV56+A/c0m5QLoByKYwWXaNLT96U2kBQjxzPxYSCkx6Cz9VK2/LqzDlctAoRN0EoaIrcjqG4vkq/O598z0nNrVTA3sshkoJx7fCPefvqHnPxM+0ur7YznFFSDYxFKBPXLDcRIPIlZCSgHAMXkIejzcERRw5IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hw9/UfYB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1BBC4AF09;
+	Tue, 20 Aug 2024 18:58:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724180297;
+	bh=yRNVQrRDmvjkofLtO2ZqgR6JHXjWetWzEUqac1E1GSI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hw9/UfYBT0rJqKXVHlPuDNlDjM1xkUJ7fSZzvExy4ifoINw7E49FiqqtIuodTsXzY
+	 iaD+PGak8aqR1UXOU285Iv2Z07I81j7DWgc5d/URz0RGfGzbsNuaBI8W2jyTHRvFTl
+	 +DLlir/h4W8YmCqKma1bhepjSSxqfJgzaoeM1+P9rq9dr8s7guWka1o8W0+fKoxnzh
+	 3m0gZlJh037e7jW4eQqZ2ccNpnuC7AOjjS9FmbkRE/IJYBhu6mt3eQwUE1B9hUZMO6
+	 TSgqUshu892hMmC67wJ1rDdhUnoxZwY0OvJGxbrpN0SiAT5irOTSenlLO9R37oim/Q
+	 oaOXi6rwOPW7w==
+Message-ID: <2e40c724-7a88-4271-bac5-900cd338e002@kernel.org>
+Date: Tue, 20 Aug 2024 12:58:16 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815214527.2100137-1-tom@herbertland.com> <20240815214527.2100137-5-tom@herbertland.com>
-In-Reply-To: <20240815214527.2100137-5-tom@herbertland.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Aug 2024 20:52:22 +0200
-Message-ID: <CANn89iJqv_5Qg-EAZsqmTnu9Jv15Tg1SvALhscvmdquuSmJhog@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 04/12] flow_dissector: UDP encap infrastructure
-To: Tom Herbert <tom@herbertland.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	felipe@sipanda.io, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 1/3] ipv6: prevent UAF in ip6_send_skb()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot <syzkaller@googlegroups.com>
+References: <20240820160859.3786976-1-edumazet@google.com>
+ <20240820160859.3786976-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240820160859.3786976-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 15, 2024 at 11:46=E2=80=AFPM Tom Herbert <tom@herbertland.com> =
-wrote:
->
-> Add infrastructure for parsing into UDP encapsulations
->
-> Add function __skb_flow_dissect_udp that is called for IPPROTO_UDP.
-> The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsing of UDP
-> encapsulations. If the flag is set when parsing a UDP packet then
-> a socket lookup is performed. The offset of the base network header,
-> either an IPv4 or IPv6 header, is tracked and passed to
-> __skb_flow_dissect_udp so that it can perform the socket lookup
->
-> If a socket is found and it's for a UDP encapsulation (encap_type is
-> set in the UDP socket) then a switch is performed on the encap_type
-> value (cases are UDP_ENCAP_* values)
->
-> An encapsulated packet in UDP can either be indicated by an
-> EtherType or IP protocol. The processing for dissecting a UDP encap
-> protocol returns a flow dissector return code. If
-> FLOW_DISSECT_RET_PROTO_AGAIN or FLOW_DISSECT_RET_IPPROTO_AGAIN is
-> returned then the corresponding  encapsulated protocol is dissected.
-> The nhoff is set to point to the header to process.  In the case
-> FLOW_DISSECT_RET_PROTO_AGAIN the EtherType protocol is returned and
-> the IP protocol is set to zero. In the case of
-> FLOW_DISSECT_RET_IPPROTO_AGAIN, the IP protocol is returned and
-> the EtherType protocol is returned unchanged
->
-> Signed-off-by: Tom Herbert <tom@herbertland.com>
+On 8/20/24 10:08 AM, Eric Dumazet wrote:
+> syzbot reported an UAF in ip6_send_skb() [1]
+> 
+> After ip6_local_out() has returned, we no longer can safely
+> dereference rt, unless we hold rcu_read_lock().
+> 
+> A similar issue has been fixed in commit
+> a688caa34beb ("ipv6: take rcu lock in rawv6_send_hdrinc()")
+> 
+> Another potential issue in ip6_finish_output2() is handled in a
+> separate patch.
+> 
 
-I am a bit confused.
+...
 
-How is this series netns ready ?
+> 
+> Fixes: 0625491493d9 ("ipv6: ip6_push_pending_frames() should increment IPSTATS_MIB_OUTDISCARDS")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> ---
+>  net/ipv6/ip6_output.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-tunnel decap devices can be in different netns from the lower device.
 
-socket lookups need the correct net pointer.
 
