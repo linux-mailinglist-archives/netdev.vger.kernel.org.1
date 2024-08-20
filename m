@@ -1,101 +1,86 @@
-Return-Path: <netdev+bounces-120260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9F9958B80
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:42:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1800958B87
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19AAF284471
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:42:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F0FE285B56
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4E719408B;
-	Tue, 20 Aug 2024 15:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980721922CE;
+	Tue, 20 Aug 2024 15:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gDIcatl3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPyGgIEd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DC129424;
-	Tue, 20 Aug 2024 15:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11028FA;
+	Tue, 20 Aug 2024 15:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724168538; cv=none; b=DrAlpSP4t8IGy6ce2UeCrp7I7TdcNilNb0q4ltUX9D3cIXz4hXb44JI7QjjJUZCUCMtkpAwyVnS8/3OTICFvOzPPIliyGnEAyVaNUYeOhVu0yCf3FSh0GpsTRuyJrH7CDYGDSTuUbXRWYbQC0xfWJjM16rit4OjFsu1p0ZfeWRU=
+	t=1724168654; cv=none; b=jVxX0zg+UgewRyJ0RLXS+DZ1zF3ud+N3HnS6wCGK4H8QLzxIx1Skx8osIyW17fRnRhr/GhxheRIEyrD2gc0QMLa+VVJGuhybEgYr9WGrbpFOpiujSu5x/p2+WyF2qD7dcExf4TnUix6BbqssENtcj4ba5+NxO1F82xeiCc8t2Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724168538; c=relaxed/simple;
-	bh=lmuRyV4NQ8UodvrsiA1FLpIhdu2vJrHiCkDrYwz0N/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oogx9DU+9ltb+5mkkNOXca9TE7LiUTN37hKZk1s5XEF8B9uMTgxOp7xlEIc8nwuQO/QAEYi48clM63ob7rfbqnuKtJntBad2Z29A0pfF4QB9sV3YzqZ/i+1+m+r3/VhmJGtJyqwgZp/dWRnyhEMVSMaP+nEsMkDe91+upuGXZ0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gDIcatl3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71484C4AF0B;
-	Tue, 20 Aug 2024 15:42:15 +0000 (UTC)
+	s=arc-20240116; t=1724168654; c=relaxed/simple;
+	bh=LJHIjjZmTeHPbvbylPUDocAOSUXKU4/fe6hYJ39l/Jc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gm3ckTdYbEv1Kob+bgDL2wd8S+gn0zHcyZDvZzz+tzDsiFEs3jxKfTZw8wFav9VTXv8t9ZQVTKPXKJ5fDRPWPn9QohQe6+A3EMJypi0K4+JD3FPDPQlZ7j5kq3KNTsXm5+uZBKIB1oSDAsQDFqjfaq4uJytLXqHharPGZnmLDFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPyGgIEd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E580C4AF0B;
+	Tue, 20 Aug 2024 15:44:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724168537;
-	bh=lmuRyV4NQ8UodvrsiA1FLpIhdu2vJrHiCkDrYwz0N/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gDIcatl391XgHGrd8Wvml2PykpIUL6Jcxhq5I/jzoF0dWCjky7RkyhrJvR9N5H/bx
-	 y36eSjEU9q0wAOzv82n5UBtVMATwLL7UPCjScQT9mWKhlYgNo74qeXaQIZMxxfO5DJ
-	 NkfI+1dRkmzOeBFyXHU0V7orKqt1Jk5i2Jc2PH/IvFexQcKXTUeofRNxm+EIKCnpvw
-	 +ft0ydVAnhWgih1y0bIqWOecLBpMu5Agz96vIHFtsyyrjYnMhumo9274gJMj495mkU
-	 mypiwe9Cf7heFGlNiKVXPxYCpJYhFe6ARM49W/sGz/VXhe8pRGznx2gswzw8cYocCg
-	 sk5+2gQesGzLA==
-Date: Tue, 20 Aug 2024 16:42:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Budimir Markovic <markovicbudimir@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sheng Lan <lansheng@huawei.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netem: fix return value if duplicate enqueue fails
-Message-ID: <20240820154213.GA1962@kernel.org>
-References: <20240819175753.5151-1-stephen@networkplumber.org>
+	s=k20201202; t=1724168654;
+	bh=LJHIjjZmTeHPbvbylPUDocAOSUXKU4/fe6hYJ39l/Jc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mPyGgIEdP3WlUsYf9EgnhV3vJ+69e4hpvnc5K9hLaZLc+J1JOIV456zwKvPIt23On
+	 pU2yOwj6GlLL4Gw2Enc+i1I2hqFEmhRNpV7/Om16wDFIA0w83ysiKrsBvUVWHeh4ps
+	 rVpwVJ+iPQHFAM0/ACz6jEKS4SdDCy1Ly0dLiIIKCSFPeptCz+JFwsPmwBmNMz8alG
+	 HPMJDo7aF24B1EF/HwTq54yIcj+i8JYn0D8o010T2nM62kHdvxlGQW0O9F5bOS1rp2
+	 ciMhdgDybY7DotkBpz9Nb6dMx+IuGMkxaAO1xwcoTJDIRJ4AWUTecn3f9OpAZizt5f
+	 cixEuk86zn6RQ==
+Date: Tue, 20 Aug 2024 08:44:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, Ido
+ Schimmel <idosch@idosch.org>
+Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
+ nettest is available
+Message-ID: <20240820084412.4aa6abfb@kernel.org>
+In-Reply-To: <ZsQLFwkNa-JnymGg@Laptop-X1>
+References: <20240820004217.1087392-1-kuba@kernel.org>
+	<ZsQLFwkNa-JnymGg@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819175753.5151-1-stephen@networkplumber.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 19, 2024 at 10:56:45AM -0700, Stephen Hemminger wrote:
-> There is a bug in netem_enqueue() introduced by
-> commit 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
-> that can lead to a use-after-free.
-> 
-> This commit made netem_enqueue() always return NET_XMIT_SUCCESS
-> when a packet is duplicated, which can cause the parent qdisc's q.qlen to be
-> mistakenly incremented. When this happens qlen_notify() may be skipped on the
-> parent during destruction, leaving a dangling pointer for some classful qdiscs
-> like DRR.
-> 
-> There are two ways for the bug happen:
-> 
-> - If the duplicated packet is dropped by rootq->enqueue() and then the original
->   packet is also dropped.
-> - If rootq->enqueue() sends the duplicated packet to a different qdisc and the
->   original packet is dropped.
-> 
-> In both cases NET_XMIT_SUCCESS is returned even though no packets are enqueued
-> at the netem qdisc.
-> 
-> The fix is to defer the enqueue of the duplicate packet until after the
-> original packet has been guaranteed to return NET_XMIT_SUCCESS.
-> 
-> Fixes: 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
-> Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+On Tue, 20 Aug 2024 11:18:47 +0800 Hangbin Liu wrote:
+> Excuse me, what's profile used here? I can't find the definition in
+> Documentation/dev-tools/kselftest.rst.
 
-Thanks Stephen,
+Ah, sorry, I added timestamping output as a local patch for NIPA.
 
-The code changes all make sense to me.
+Random example:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+TAP version 13
+1..1
+# overriding timeout to 7200
+# selftests: net: amt.sh
+# 13.15 [+13.15] TEST: amt discovery                                                 [ OK ]
+# 16.27 [+3.12] TEST: IPv4 amt multicast forwarding                                 [ OK ]
+# 19.14 [+2.86] TEST: IPv6 amt multicast forwarding                                 [ OK ]
+# 670.88 [+651.74] TEST: IPv4 amt traffic forwarding torture                           [ OK ]
+# 1203.28 [+532.40] TEST: IPv6 amt traffic forwarding torture                           [ OK ]
+ok 1 selftests: net: amt.sh
+
+It's not great, makes the lines longer and misaligned.
+But it's helpful for debugging slow tests.
 
