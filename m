@@ -1,70 +1,164 @@
-Return-Path: <netdev+bounces-120256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8A3958B2E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:27:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1A8958B52
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 708091C20A79
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:27:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91E0FB21558
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DF41922D3;
-	Tue, 20 Aug 2024 15:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3210E193081;
+	Tue, 20 Aug 2024 15:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/VAVt1v"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jR/RfzQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB4BFC11;
-	Tue, 20 Aug 2024 15:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B88A193071;
+	Tue, 20 Aug 2024 15:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724167575; cv=none; b=JLHfX6XRil2myKXRRwz7ZSUGgMhyUHlxvqG/F3YyRlHGzitIwGuczMpkk27CLoIRwhvTBBS/DA21wJCyNMPR5zDCsjVz5Dgat71yZL6hLwV393uCVvdwnJwMUiHTuwRkJCQqmtIhiyO5wk7opszs+l0KKzBJK5UmF0XKdTbgTmY=
+	t=1724167771; cv=none; b=V1gvGcLflDS/J8dbv/k/Eo6qCQ7iPWUTymWn1TY8hkjIrandMg52LlWnbINCtxzRbSQ4chqHiUqE1h20qMa4tiRQoeuDYXgfSyI6WLKsQs2cShrPgCjqTXhZB3VoaN/CRiEKwLyu/OdG53FQK3qeT0xWbYnlhlTrLqhhtjv222A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724167575; c=relaxed/simple;
-	bh=0N2hky20qHVrd1H0pYNXeX1ioHqZ/ak6QZOSVXGCN3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R1wkllhysItrcgYPRyVhb1Hro+BJ3HbcP9cn8ja7emzh5PDmFkBCnNvpQ5+fc4nhPfeGC7hTVN4aDqoWE7oKuI340Ck/kd1SJT3T2ZaycRNmCOheLY5TYG2aOOGLjrN9uQN98teS8HwEh8IIhd1xRXEjm51Kg9Ou4gE9bzpdfSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/VAVt1v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10FD1C4AF0F;
-	Tue, 20 Aug 2024 15:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724167575;
-	bh=0N2hky20qHVrd1H0pYNXeX1ioHqZ/ak6QZOSVXGCN3k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l/VAVt1vt18f7fUvxJBc0b0J0MM0Vz/422bZlgjZnWyEsQjVuyGyhawhjt3EbBs/H
-	 oDOXq6UmcVBE/eL/RLoMKWIBAMq6b3JmGi9QKpHYTRJDRt4QWUP3GK7Y67e0l97Ipg
-	 Lu+g4C5tuCTuqSu9vfUZDijr+EBBnLmNzof+ufFOp2Hy0PJGl8Vhz/JlgWhoUAQSmo
-	 MyV9R2ovScfRbRtA8MyrGRLUzxdkeBT+l1hp7ykiGgvdrsuZqtl2n2M8yg36th3Gd9
-	 sEQ2/E4jSNmQKfLJJd10c+v1VP8ftc3cwQqKmtb19EvunroAofuoAaC7TV8Mx+R0d2
-	 8ASDurBl0brsA==
-Date: Tue, 20 Aug 2024 08:26:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] nfc: st95hf: switch to using sleeping variants
- of gpiod API
-Message-ID: <20240820082614.0e9e9192@kernel.org>
-In-Reply-To: <ZsPtCPwnXAyHG2Jq@google.com>
-References: <ZsPtCPwnXAyHG2Jq@google.com>
+	s=arc-20240116; t=1724167771; c=relaxed/simple;
+	bh=KbR9Z5dA+UQWywHjxVmp/37dcVUsfNC0p+2b4VpqyDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eIVLiwrv7qwla87GDZCh6XlCSJZrobweQ7Z1Bi5BJm6zBy/hgDLCgJ0J+R8q1sE4atxTX+SJED6G2QIRoI/eocdfQmXtVanE8iMTrPO91i9C1pbDZp5FL3JNtmss9Gskef/bn1K6+VivzuWCFLFOfjU7OkNqVFaiTnN8MKw/bDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jR/RfzQT; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47KDnPU5014197;
+	Tue, 20 Aug 2024 15:29:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=xETE7DSKr+Zv/9nlZb4rsqzdzPP6r970NW5xRyy
+	dMHg=; b=jR/RfzQT7R4JEv/t4odIml7GkfQpp2ZA92hMzP+Xo0y5CDzjt7oQb7K
+	EOKp+/K7JVJQHEAyYvsE642w3fHs3P7Mms7f2V2rGJwh/ldLZmRuJSs95rp4Ux7/
+	FSqI5yMVXmWqugcgXqPlWo0qs2YEWuVS7iKpPhTax9w2cpj3oLKiiBBCjBlMOQxv
+	JXK3kwhWEZJhEwhEBJ/bJWqcM+rocOZrVvzHIkQjco9k0bxCGLNETrexnL+LjSC3
+	I1Bnnvt+4BmYTg+It3RMjFPaD4ek+9qiQF92NxRpw8oXQlhbIl5B1Ql2cDwqbZ+F
+	pgU8777uTT3+bM9Ae/10466ol8HqR/g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcydwjj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 15:29:19 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47KFMgrU016403;
+	Tue, 20 Aug 2024 15:29:19 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcydwjc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 15:29:19 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47KFFnVF019123;
+	Tue, 20 Aug 2024 15:29:18 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376puf70-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 15:29:18 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47KFTC7x30081298
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Aug 2024 15:29:14 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 19B0A2004D;
+	Tue, 20 Aug 2024 15:29:12 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 06F8A2004B;
+	Tue, 20 Aug 2024 15:29:12 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 20 Aug 2024 15:29:11 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 7CF05E024A; Tue, 20 Aug 2024 17:29:11 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH net v3] s390/iucv: Fix vargs handling in iucv_alloc_device()
+Date: Tue, 20 Aug 2024 17:29:11 +0200
+Message-ID: <20240820152911.3701814-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: a-9Xw3jUsYxRBoXMz02DcrQ8EurX0pt9
+X-Proofpoint-GUID: d0F_at3YRvjxGQItmz95bp-hjKFNrje8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-20_10,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1011
+ suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2408200112
 
-On Mon, 19 Aug 2024 18:10:32 -0700 Dmitry Torokhov wrote:
-> The driver does not not use gpiod API calls in an atomic context. Switch
-> to gpiod_set_value_cansleep() calls to allow using the driver with GPIO
-> controllers that might need process context to operate.
+iucv_alloc_device() gets a format string and a varying number of
+arguments. This is incorrectly forwarded by calling dev_set_name() with
+the format string and a va_list, while dev_set_name() expects also a
+varying number of arguments.
 
-Could you explain why? Are you using this device? Is it part of some
-larger effort to remove an API?
+Symptoms:
+Corrupted iucv device names, which can result in log messages like:
+sysfs: cannot create duplicate filename '/devices/iucv/hvc_iucv1827699952'
+
+Fixes: 4452e8ef8c36 ("s390/iucv: Provide iucv_alloc_device() / iucv_release_device()")
+Link: https://bugzilla.suse.com/show_bug.cgi?id=1228425
+Reference-ID: https://bugzilla.linux.ibm.com/show_bug.cgi?id=208008
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+v2 -> v3: use "%s" (Przemek Kitszel)
+Discussion of v1:
+Link: https://lore.kernel.org/all/2024081326-shifter-output-cb8f@gregkh/T/#mf8ae979de8acdc01f7ede0b94af6f2e110eea209
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202408091131.ATGn6YSh-lkp@intel.com/
+Vasily Gorbik asked me to send this version via the netdev mailing list.
+---
+ net/iucv/iucv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 1e42e13ad24e..d3e9efab7f4b 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -86,13 +86,15 @@ struct device *iucv_alloc_device(const struct attribute_group **attrs,
+ {
+ 	struct device *dev;
+ 	va_list vargs;
++	char buf[20];
+ 	int rc;
+ 
+ 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+ 	if (!dev)
+ 		goto out_error;
+ 	va_start(vargs, fmt);
+-	rc = dev_set_name(dev, fmt, vargs);
++	vsnprintf(buf, sizeof(buf), fmt, vargs);
++	rc = dev_set_name(dev, "%s", buf);
+ 	va_end(vargs);
+ 	if (rc)
+ 		goto out_error;
+-- 
+2.39.3 (Apple Git-146)
+
 
