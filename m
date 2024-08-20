@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-120083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185409583CE
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:13:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE08F9583D3
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DB44B246AC
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:13:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74C0028758E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FE818CC05;
-	Tue, 20 Aug 2024 10:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E38F18DF90;
+	Tue, 20 Aug 2024 10:13:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9C618C93E
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 10:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F8618CBEA
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 10:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724148791; cv=none; b=X/tuFJCGS0Y0JoF0mkqrejIUlWhRlJvxaUWbalDG37T6uYw53XzEEwCGb5ll3mfQfC5NSPUdBO/0V3WJfXaVPwl//ULMNQfFTvZ6Nhm8Im4Ob2OlRkQr+wymyosgVssJE05YpxxWf0GiIpyL+knj278j2FPS6Gz0k5aYky4EvFA=
+	t=1724148792; cv=none; b=WKIidY1faF1VBLKpb+52zB1OQKyv950P8HJNIodpcQgoeIbYvxLXvvloO80XlnayOlLQ/fHzskiL9QenjwX/AzoSuwuSWVXDVOfJ3i2544VjwH9+V9LgiwrTMi8uyoUS2Kogh0n1OYG3taMzk4YjM0XEP2IGDfs+UcbyxhJgO8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724148791; c=relaxed/simple;
-	bh=BetCfAwKKqKx3GzydWwVLt96Iq6eCFymkc8TE6tmS34=;
+	s=arc-20240116; t=1724148792; c=relaxed/simple;
+	bh=9IUUvDGWncpQ1R9yern4OJjTiZtjNc/snV8ss71L6K4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Gnopf2Bs1jFEjfMEHw60p0gdDTr4alxDQbxLrl45JWW2fblPfxOV7PDqkmt7CQga8KQ/cGy2m4fu+QGS4bb/HDDiy05ULK/w5+KrdTrokGTDnQums3zNumcYqQNLn0yQofAf81ya7VM/EYqzeaLFyr1zReyX5wpkUrR7qW3DUhg=
+	 MIME-Version; b=bOwChpZjKZdVR1waR/fMg+grPkANcbNF64tHsk+YE8kqWlTVwlUiVA1uIA0e66BhIaYGAOlLc01c5+Cbl1HPlXhhSP/YAZogpA7+niledywpx2VqpIvaVPnhf9hZ7cVWm/yr6DA5tCv0Y/DWB886AvUr8aSMDYyL6/XtyACtzwc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sgLrH-0000hp-Q1; Tue, 20 Aug 2024 12:12:59 +0200
+	id 1sgLrI-0000ir-Oe; Tue, 20 Aug 2024 12:13:00 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sgLrH-001kNk-CZ; Tue, 20 Aug 2024 12:12:59 +0200
+	id 1sgLrI-001kNo-7m; Tue, 20 Aug 2024 12:13:00 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sgLrH-006Jua-10;
-	Tue, 20 Aug 2024 12:12:59 +0200
+	id 1sgLrI-006Jul-0V;
+	Tue, 20 Aug 2024 12:13:00 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net-next v2 2/3] ethtool: Add support for specifying information source in cable test results
-Date: Tue, 20 Aug 2024 12:12:55 +0200
-Message-Id: <20240820101256.1506460-3-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v2 3/3] phy: dp83td510: Utilize ALCD for cable length measurement when link is active
+Date: Tue, 20 Aug 2024 12:12:56 +0200
+Message-Id: <20240820101256.1506460-4-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820101256.1506460-1-o.rempel@pengutronix.de>
 References: <20240820101256.1506460-1-o.rempel@pengutronix.de>
@@ -74,147 +74,161 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Enhance the ethtool cable test interface by introducing the ability to
-specify the source of the diagnostic information for cable test results.
-This is particularly useful for PHYs that offer multiple diagnostic
-methods, such as Time Domain Reflectometry (TDR) and Active Link Cable
-Diagnostic (ALCD).
+In industrial environments where 10BaseT1L PHYs are replacing existing
+field bus systems like CAN, it's often essential to retain the existing
+cable infrastructure. After installation, collecting metrics such as
+cable length is crucial for assessing the quality of the infrastructure.
+Traditionally, TDR (Time Domain Reflectometry) is used for this purpose.
+However, TDR requires interrupting the link, and if the link partner
+remains active, the TDR measurement will fail.
 
-Key changes:
-- Added `ethnl_cable_test_result_with_src` and
-  `ethnl_cable_test_fault_length_with_src` functions to allow specifying
-  the information source when reporting cable test results.
-- Updated existing `ethnl_cable_test_result` and
-  `ethnl_cable_test_fault_length` functions to use TDR as the default
-  source, ensuring backward compatibility.
-- Modified the UAPI to support these new attributes, enabling drivers to
-  provide more detailed diagnostic information.
+Unlike multi-pair systems, where TDR can be attempted during the MDI-X
+switching window, 10BaseT1L systems face greater challenges. The TDR
+sequence on 10BaseT1L is longer and coincides with uninterrupted
+autonegotiation pulses, making TDR impossible when the link partner is
+active.
+
+The DP83TD510 PHY provides an alternative through ALCD (Active Link
+Cable Diagnostics), which allows for cable length measurement without
+disrupting an active link. Since a live link indicates no short or open
+cable states, ALCD can be used effectively to gather cable length
+information.
+
+Enhance the dp83td510 driver by:
+- Leveraging ALCD to measure cable length when the link is active.
+- Bypassing TDR when a link is detected, as ALCD provides the required
+  information without disruption.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
-changes v2:
-- use u8 instead of u32 for src
-- do not send src field if src is ETHTOOL_A_CABLE_INF_SRC_UNSPEC
----
- include/linux/ethtool_netlink.h | 29 +++++++++++++++++++++++------
- net/ethtool/cabletest.c         | 19 +++++++++++++++----
- 2 files changed, 38 insertions(+), 10 deletions(-)
+ drivers/net/phy/dp83td510.c | 83 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 77 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/ethtool_netlink.h b/include/linux/ethtool_netlink.h
-index fae0dfb9a9c82..a21e5c7b9435f 100644
---- a/include/linux/ethtool_netlink.h
-+++ b/include/linux/ethtool_netlink.h
-@@ -23,8 +23,10 @@ struct phy_device;
- int ethnl_cable_test_alloc(struct phy_device *phydev, u8 cmd);
- void ethnl_cable_test_free(struct phy_device *phydev);
- void ethnl_cable_test_finished(struct phy_device *phydev);
--int ethnl_cable_test_result(struct phy_device *phydev, u8 pair, u8 result);
--int ethnl_cable_test_fault_length(struct phy_device *phydev, u8 pair, u32 cm);
-+int ethnl_cable_test_result_with_src(struct phy_device *phydev, u8 pair,
-+				     u8 result, u8 src);
-+int ethnl_cable_test_fault_length_with_src(struct phy_device *phydev, u8 pair,
-+					   u32 cm, u8 src);
- int ethnl_cable_test_amplitude(struct phy_device *phydev, u8 pair, s16 mV);
- int ethnl_cable_test_pulse(struct phy_device *phydev, u16 mV);
- int ethnl_cable_test_step(struct phy_device *phydev, u32 first, u32 last,
-@@ -54,14 +56,14 @@ static inline void ethnl_cable_test_free(struct phy_device *phydev)
- static inline void ethnl_cable_test_finished(struct phy_device *phydev)
- {
- }
--static inline int ethnl_cable_test_result(struct phy_device *phydev, u8 pair,
--					  u8 result)
-+static inline int ethnl_cable_test_result_with_src(struct phy_device *phydev,
-+						   u8 pair, u8 result, u8 src)
- {
- 	return -EOPNOTSUPP;
- }
+diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+index 551e37786c2da..10a46354ad2b8 100644
+--- a/drivers/net/phy/dp83td510.c
++++ b/drivers/net/phy/dp83td510.c
+@@ -169,6 +169,10 @@ static const u16 dp83td510_mse_sqi_map[] = {
+ #define DP83TD510E_UNKN_030E				0x30e
+ #define DP83TD510E_030E_VAL				0x2520
  
--static inline int ethnl_cable_test_fault_length(struct phy_device *phydev,
--						u8 pair, u32 cm)
-+static inline int ethnl_cable_test_fault_length_with_src(struct phy_device *phydev,
-+							 u8 pair, u32 cm, u8 src)
- {
- 	return -EOPNOTSUPP;
- }
-@@ -119,4 +121,19 @@ static inline bool ethtool_dev_mm_supported(struct net_device *dev)
- }
- 
- #endif /* IS_ENABLED(CONFIG_ETHTOOL_NETLINK) */
++#define DP83TD510E_ALCD_STAT				0xa9f
++#define DP83TD510E_ALCD_COMPLETE			BIT(15)
++#define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
 +
-+static inline int ethnl_cable_test_result(struct phy_device *phydev, u8 pair,
-+					  u8 result)
+ static int dp83td510_config_intr(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -327,6 +331,16 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
+ {
+ 	int ret;
+ 
++	/* If link partner is active, we won't be able to use TDR, since
++	 * we can't force link partner to be silent. The autonegotiation
++	 * pulses will be too frequent and the TDR sequence will be
++	 * too long. So, TDR will always fail. Since the link is established
++	 * we already know that the cable is working, so we can get some
++	 * extra information line the cable length using ALCD.
++	 */
++	if (phydev->link)
++		return 0;
++
+ 	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_CTRL,
+ 			       DP83TD510E_CTRL_HW_RESET);
+ 	if (ret)
+@@ -402,8 +416,8 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
+ }
+ 
+ /**
+- * dp83td510_cable_test_get_status - Get the status of the cable test for the
+- *                                   DP83TD510 PHY.
++ * dp83td510_cable_test_get_tdr_status - Get the status of the TDR test for the
++ *                                       DP83TD510 PHY.
+  * @phydev: Pointer to the phy_device structure.
+  * @finished: Pointer to a boolean that indicates whether the test is finished.
+  *
+@@ -411,13 +425,11 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
+  *
+  * Returns: 0 on success or a negative error code on failure.
+  */
+-static int dp83td510_cable_test_get_status(struct phy_device *phydev,
+-					   bool *finished)
++static int dp83td510_cable_test_get_tdr_status(struct phy_device *phydev,
++					       bool *finished)
+ {
+ 	int ret, stat;
+ 
+-	*finished = false;
+-
+ 	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_TDR_CFG);
+ 	if (ret < 0)
+ 		return ret;
+@@ -459,6 +471,65 @@ static int dp83td510_cable_test_get_status(struct phy_device *phydev,
+ 	return phy_init_hw(phydev);
+ }
+ 
++/**
++ * dp83td510_cable_test_get_alcd_status - Get the status of the ALCD test for the
++ *                                        DP83TD510 PHY.
++ * @phydev: Pointer to the phy_device structure.
++ * @finished: Pointer to a boolean that indicates whether the test is finished.
++ *
++ * The function sets the @finished flag to true if the test is complete.
++ * The function reads the cable length and reports it to the user.
++ *
++ * Returns: 0 on success or a negative error code on failure.
++ */
++static int dp83td510_cable_test_get_alcd_status(struct phy_device *phydev,
++						bool *finished)
 +{
-+	return ethnl_cable_test_result_with_src(phydev, pair, result,
-+						ETHTOOL_A_CABLE_INF_SRC_TDR);
++	unsigned int location;
++	int ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_ALCD_STAT);
++	if (ret < 0)
++		return ret;
++
++	if (!(ret & DP83TD510E_ALCD_COMPLETE))
++		return 0;
++
++	location = FIELD_GET(DP83TD510E_ALCD_CABLE_LENGTH, ret) * 100;
++
++	ethnl_cable_test_fault_length_with_src(phydev, ETHTOOL_A_CABLE_PAIR_A,
++					       location,
++					       ETHTOOL_A_CABLE_INF_SRC_ALCD);
++
++	ethnl_cable_test_result_with_src(phydev, ETHTOOL_A_CABLE_PAIR_A,
++					 ETHTOOL_A_CABLE_RESULT_CODE_OK,
++					 ETHTOOL_A_CABLE_INF_SRC_ALCD);
++	*finished = true;
++
++	return 0;
 +}
 +
-+static inline int ethnl_cable_test_fault_length(struct phy_device *phydev,
-+						u8 pair, u32 cm)
++/**
++ * dp83td510_cable_test_get_status - Get the status of the cable test for the
++ *                                   DP83TD510 PHY.
++ * @phydev: Pointer to the phy_device structure.
++ * @finished: Pointer to a boolean that indicates whether the test is finished.
++ *
++ * The function sets the @finished flag to true if the test is complete.
++ *
++ * Returns: 0 on success or a negative error code on failure.
++ */
++static int dp83td510_cable_test_get_status(struct phy_device *phydev,
++					   bool *finished)
 +{
-+	return ethnl_cable_test_fault_length_with_src(phydev, pair, cm,
-+						      ETHTOOL_A_CABLE_INF_SRC_TDR);
++	*finished = false;
++
++	if (!phydev->link)
++		return dp83td510_cable_test_get_tdr_status(phydev, finished);
++
++	return dp83td510_cable_test_get_alcd_status(phydev, finished);
 +}
 +
- #endif /* _LINUX_ETHTOOL_NETLINK_H_ */
-diff --git a/net/ethtool/cabletest.c b/net/ethtool/cabletest.c
-index f6f136ec7ddfc..97ef7895997e2 100644
---- a/net/ethtool/cabletest.c
-+++ b/net/ethtool/cabletest.c
-@@ -160,7 +160,8 @@ void ethnl_cable_test_finished(struct phy_device *phydev)
- }
- EXPORT_SYMBOL_GPL(ethnl_cable_test_finished);
- 
--int ethnl_cable_test_result(struct phy_device *phydev, u8 pair, u8 result)
-+int ethnl_cable_test_result_with_src(struct phy_device *phydev, u8 pair,
-+				     u8 result, u8 src)
+ static int dp83td510_get_features(struct phy_device *phydev)
  {
- 	struct nlattr *nest;
- 	int ret = -EMSGSIZE;
-@@ -173,6 +174,10 @@ int ethnl_cable_test_result(struct phy_device *phydev, u8 pair, u8 result)
- 		goto err;
- 	if (nla_put_u8(phydev->skb, ETHTOOL_A_CABLE_RESULT_CODE, result))
- 		goto err;
-+	if (src != ETHTOOL_A_CABLE_INF_SRC_UNSPEC) {
-+		if (nla_put_u8(phydev->skb, ETHTOOL_A_CABLE_RESULT_SRC, src))
-+			goto err;
-+	}
- 
- 	nla_nest_end(phydev->skb, nest);
- 	return 0;
-@@ -181,9 +186,10 @@ int ethnl_cable_test_result(struct phy_device *phydev, u8 pair, u8 result)
- 	nla_nest_cancel(phydev->skb, nest);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(ethnl_cable_test_result);
-+EXPORT_SYMBOL_GPL(ethnl_cable_test_result_with_src);
- 
--int ethnl_cable_test_fault_length(struct phy_device *phydev, u8 pair, u32 cm)
-+int ethnl_cable_test_fault_length_with_src(struct phy_device *phydev, u8 pair,
-+					   u32 cm, u8 src)
- {
- 	struct nlattr *nest;
- 	int ret = -EMSGSIZE;
-@@ -197,6 +203,11 @@ int ethnl_cable_test_fault_length(struct phy_device *phydev, u8 pair, u32 cm)
- 		goto err;
- 	if (nla_put_u32(phydev->skb, ETHTOOL_A_CABLE_FAULT_LENGTH_CM, cm))
- 		goto err;
-+	if (src != ETHTOOL_A_CABLE_INF_SRC_UNSPEC) {
-+		if (nla_put_u8(phydev->skb, ETHTOOL_A_CABLE_FAULT_LENGTH_SRC,
-+			       src))
-+			goto err;
-+	}
- 
- 	nla_nest_end(phydev->skb, nest);
- 	return 0;
-@@ -205,7 +216,7 @@ int ethnl_cable_test_fault_length(struct phy_device *phydev, u8 pair, u32 cm)
- 	nla_nest_cancel(phydev->skb, nest);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(ethnl_cable_test_fault_length);
-+EXPORT_SYMBOL_GPL(ethnl_cable_test_fault_length_with_src);
- 
- static const struct nla_policy cable_test_tdr_act_cfg_policy[] = {
- 	[ETHTOOL_A_CABLE_TEST_TDR_CFG_FIRST]	= { .type = NLA_U32 },
+ 	/* This PHY can't respond on MDIO bus if no RMII clock is enabled.
 -- 
 2.39.2
 
