@@ -1,189 +1,326 @@
-Return-Path: <netdev+bounces-120273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7DD958C0C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:16:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF201958C17
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50F6C284549
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:16:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54DECB22756
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF303F9CC;
-	Tue, 20 Aug 2024 16:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2F71A01D2;
+	Tue, 20 Aug 2024 16:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KEcCTSYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tobTzhPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA4C208D7
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 16:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4223B16C68F;
+	Tue, 20 Aug 2024 16:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724170606; cv=none; b=BHGPEZPO1Z/gX7P9BCiEr/dSdgV4TJjETZMG3/ZbqWDR8mwvPdOA/98dJzFjskxjdkyxccyYp7N0MMES3t0RnNcuS73IRk+u75NQ5eMCOknrnE7Tw/yvzOo0nAW/S1O8V3BDLaBuYOFXgaWfdzQTLwdjHy4ms7mFFakdb2HOVNo=
+	t=1724170752; cv=none; b=BUdHU4Sy5Ddnk7Ktv30/9Z8BjlS41DPY+5Gk7JkFjISqeCsolh8Aa7uaMLpXqr3Dxle5oxlEPugEiCz2M8rC77/Teqy1/WIecJBWZfcCFMH3XY036pe1AnDjxnvyjYmy8uKo/RQPYDRyAUQAzz8YltR9QGlXT890bpOVk8125dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724170606; c=relaxed/simple;
-	bh=mCCvaMkdnhuYW+qISu3LkjPeWGUYJVB6928qIq6h5xQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OJMPHvdTBzIt1L9NtL+GJrb0g6cv0vwI+nNg4bWZIJpJPT4sszcI+D8z2MVJRrgpOsckCEo2baI+dviuTAhePyFN81WzwylujXTBR7TO88a5trY6IBx72rqCbEZ1EMzC3nwYYW+UljJMjBFU2thOMASL6+uqtpp4V70aZT3OkIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KEcCTSYp; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724170605; x=1755706605;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mCCvaMkdnhuYW+qISu3LkjPeWGUYJVB6928qIq6h5xQ=;
-  b=KEcCTSYpC3LUjL6zR2cPFZvYgp3QxGPy1S+O5HAB24grgBkkG0arFXjr
-   bvCKUwaqVdUV5JHGvYP/LBgEY42EZE7Sv02UEBRkb/PXV0yITdD8lfZSQ
-   8J0jxVoUTTgPL1pmtqAs1jKFjSTsvOicZYg4WPBfFPUk48UKslwjkI8En
-   Q+fFCvchR1oDyzgJzH7Ce/7fbjVkKcC3vL+IS0Ou+uQDGDvGs15tw9e67
-   Fkd4KENHGHlEDTnf1W/JIQ0fwRJyJCiJFvL/Ve1rswXyD/VsUwaxBha4u
-   pzngL6qXfuT3zgqc+UgqSPMVmbNP5rA2hp6bThqMRNcR6se8QhHJR0zF0
-   g==;
-X-CSE-ConnectionGUID: CA5h5+kaR3mnvFiAsRpxYg==
-X-CSE-MsgGUID: jWaWIIhkRAOk0R7n/yttog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="22452820"
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="22452820"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 09:15:53 -0700
-X-CSE-ConnectionGUID: 6zDUOe6XTTu9DbWTyc7pjw==
-X-CSE-MsgGUID: jRtI3O3LSLC5n78td7lzEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="91502808"
-Received: from pae-dbg-x10sri-f_n1_f.igk.intel.com (HELO localhost.igk.intel.com) ([10.91.240.220])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 09:15:50 -0700
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	larysa.zaremba@intel.com,
-	maciej.fijalkowski@intel.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Igor Bagnucki <igor.bagnucki@intel.com>
-Subject: [PATCH iwl-net v4] ice: Add netif_device_attach/detach into PF reset flow
-Date: Tue, 20 Aug 2024 18:15:24 +0200
-Message-ID: <20240820161524.108578-1-dawid.osuchowski@linux.intel.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1724170752; c=relaxed/simple;
+	bh=pOzWwlq758NDy7hCtoqxqNAZPS9J0GrazJ338IMw0qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R04OhIIcewHskoMHjZqEIruXXhIh58CPcBJix8/y7Wyyyehh0BdSe3DvsAu29Fpp6iG55BGCR1oTcgKbuAIudpxUf/Qkdw4N9Xppu6Hv9w4P231Wq1HpIeFRZi6DvBiYZHUgqpB5guZZnPeIMBRxaoXQDBIM1ZWwBkYP01d3AVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tobTzhPs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ACF3C4AF15;
+	Tue, 20 Aug 2024 16:19:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724170751;
+	bh=pOzWwlq758NDy7hCtoqxqNAZPS9J0GrazJ338IMw0qs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tobTzhPsSnwT3P4c4pzo3kzTaRfVFg/MedD0Pm8AJD1KmiiAucdwWbKSKvypkN092
+	 zOYLTz6mYHOCx4Y6L4zv0vT+Y8p+rFirikrKds4HgAQYY9j0jTbQ5OWO3JBsdKCI9p
+	 WyzdXM1Rcn/ojqcVgi1QYK+GPC2x32qRo+WXXbCRXUgLtoRnLTMvR6zQ7vnEK0pMpY
+	 7hB1zUWHzzt99r1z9eEkBJICbnZVIlkBd+A8OYPvmwnD3l93Bit19TdI1ZSFLTE+Ur
+	 6rRMN7IwyqxdQFPuT/WL1XNr++trxxSuebVDGasvwE+ruQ4lfyGogd4EYQlnBXf6J2
+	 KO01dBGnogsAg==
+Date: Tue, 20 Aug 2024 17:19:02 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 01/11] dt-bindings: clock: Add RaspberryPi RP1 clock
+ bindings
+Message-ID: <20240820-baritone-delegate-5711f7a0bc76@spud>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <8d7dd7ca5da41f2a96e3ef4e2e3f29fd0d71906a.1724159867.git.andrea.porta@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="044jvUAtXTI8rtBJ"
+Content-Disposition: inline
+In-Reply-To: <8d7dd7ca5da41f2a96e3ef4e2e3f29fd0d71906a.1724159867.git.andrea.porta@suse.com>
 
-Ethtool callbacks can be executed while reset is in progress and try to
-access deleted resources, e.g. getting coalesce settings can result in a
-NULL pointer dereference seen below.
 
-Reproduction steps:
-Once the driver is fully initialized, trigger reset:
-	# echo 1 > /sys/class/net/<interface>/device/reset
-when reset is in progress try to get coalesce settings using ethtool:
-	# ethtool -c <interface>
+--044jvUAtXTI8rtBJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-BUG: kernel NULL pointer dereference, address: 0000000000000020
-PGD 0 P4D 0
-Oops: Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+ #7
-RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
-RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
-RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
-R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
-FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0
-Call Trace:
-<TASK>
-ice_get_coalesce+0x17/0x30 [ice]
-coalesce_prepare_data+0x61/0x80
-ethnl_default_doit+0xde/0x340
-genl_family_rcv_msg_doit+0xf2/0x150
-genl_rcv_msg+0x1b3/0x2c0
-netlink_rcv_skb+0x5b/0x110
-genl_rcv+0x28/0x40
-netlink_unicast+0x19c/0x290
-netlink_sendmsg+0x222/0x490
-__sys_sendto+0x1df/0x1f0
-__x64_sys_sendto+0x24/0x30
-do_syscall_64+0x82/0x160
-entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7faee60d8e27
+On Tue, Aug 20, 2024 at 04:36:03PM +0200, Andrea della Porta wrote:
+> Add device tree bindings for the clock generator found in RP1 multi
+> function device, and relative entries in MAINTAINERS file.
+>=20
+> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+> ---
+>  .../clock/raspberrypi,rp1-clocks.yaml         | 87 +++++++++++++++++++
+>  MAINTAINERS                                   |  6 ++
+>  include/dt-bindings/clock/rp1.h               | 56 ++++++++++++
+>  3 files changed, 149 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/clock/raspberrypi,r=
+p1-clocks.yaml
+>  create mode 100644 include/dt-bindings/clock/rp1.h
+>=20
+> diff --git a/Documentation/devicetree/bindings/clock/raspberrypi,rp1-cloc=
+ks.yaml b/Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.ya=
+ml
+> new file mode 100644
+> index 000000000000..b27db86d0572
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
+> @@ -0,0 +1,87 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/clock/raspberrypi,rp1-clocks.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: RaspberryPi RP1 clock generator
+> +
+> +maintainers:
+> +  - Andrea della Porta <andrea.porta@suse.com>
+> +
+> +description: |
+> +  The RP1 contains a clock generator designed as three PLLs (CORE, AUDIO,
+> +  VIDEO), and each PLL output can be programmed though dividers to gener=
+ate
+> +  the clocks to drive the sub-peripherals embedded inside the chipset.
+> +
+> +  Link to datasheet:
+> +  https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
+> +
+> +properties:
+> +  compatible:
+> +    const: raspberrypi,rp1-clocks
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  '#clock-cells':
+> +    description:
+> +      The index in the assigned-clocks is mapped to the output clock as =
+per
+> +      definitions in dt-bindings/clock/rp1.h.
+> +    const: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - '#clock-cells'
+> +  - clocks
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/rp1.h>
+> +
+> +    rp1 {
+> +        #address-cells =3D <2>;
+> +        #size-cells =3D <2>;
+> +
+> +        rp1_clocks: clocks@18000 {
 
-Calling netif_device_detach() before reset makes the net core not call
-the driver when ethtool command is issued, the attempt to execute an
-ethtool command during reset will result in the following message:
+The unit address does not match the reg property. I'm surprised that
+dtc doesn't complain about that.
 
-    netlink error: No such device
+> +            compatible =3D "raspberrypi,rp1-clocks";
+> +            reg =3D <0xc0 0x40018000 0x0 0x10038>;
 
-instead of NULL pointer dereference. Once reset is done and
-ice_rebuild() is executing, the netif_device_attach() is called to allow
-for ethtool operations to occur again in a safe manner.
+This is a rather oddly specific size. It leads me to wonder if this
+region is inside some sort of syscon area?
 
-Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
----
-Changes since v1:
-* Changed Fixes tag to point to another commit
-* Minified the stacktrace
+> +            #clock-cells =3D <1>;
+> +            clocks =3D <&clk_xosc>;
+> +
+> +            assigned-clocks =3D <&rp1_clocks RP1_PLL_SYS_CORE>,
 
-Changes since v2:
-* Moved netif_device_attach() directly into ice_rebuild() and perform it
-  only on main vsi
+FWIW, I don't think any of these assigned clocks are helpful for the
+example. That said, why do you need to configure all of these assigned
+clocks via devicetree when this node is the provider of them?
 
-Changes since v3:
-* Style changes requested by Przemek Kitszel
+> +                              <&rp1_clocks RP1_PLL_AUDIO_CORE>,
+> +                              /* RP1_PLL_VIDEO_CORE and dividers are now=
+ managed by VEC,DPI drivers */
 
-Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5be90@kernel.org/
-Previous attempt (dropped because it introduced regression with link up): https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@linux.intel.com/
----
- drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Comments like this also do not seem relevant to the binding.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index eaa73cc200f4..a840690f2385 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -608,6 +608,9 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 			memset(&vsi->mqprio_qopt, 0, sizeof(vsi->mqprio_qopt));
- 		}
- 	}
-+
-+	if (vsi->netdev)
-+		netif_device_detach(vsi->netdev);
- skip:
- 
- 	/* clear SW filtering DB */
-@@ -7591,6 +7594,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- {
- 	struct device *dev = ice_pf_to_dev(pf);
- 	struct ice_hw *hw = &pf->hw;
-+	struct ice_vsi *vsi = ice_get_main_vsi(pf);
- 	bool dvm;
- 	int err;
- 
-@@ -7731,6 +7735,9 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 		ice_rebuild_arfs(pf);
- 	}
- 
-+	if (vsi && vsi->netdev)
-+		netif_device_attach(vsi->netdev);
-+
- 	ice_update_pf_netdev_link(pf);
- 
- 	/* tell the firmware we are up */
--- 
-2.44.0
 
+Cheers,
+Conor.
+
+
+> +                              <&rp1_clocks RP1_PLL_SYS>,
+> +                              <&rp1_clocks RP1_PLL_SYS_SEC>,
+> +                              <&rp1_clocks RP1_PLL_AUDIO>,
+> +                              <&rp1_clocks RP1_PLL_AUDIO_SEC>,
+> +                              <&rp1_clocks RP1_CLK_SYS>,
+> +                              <&rp1_clocks RP1_PLL_SYS_PRI_PH>,
+> +                              /* RP1_CLK_SLOW_SYS is used for the freque=
+ncy counter (FC0) */
+> +                              <&rp1_clocks RP1_CLK_SLOW_SYS>,
+> +                              <&rp1_clocks RP1_CLK_SDIO_TIMER>,
+> +                              <&rp1_clocks RP1_CLK_SDIO_ALT_SRC>,
+> +                              <&rp1_clocks RP1_CLK_ETH_TSU>;
+> +
+> +            assigned-clock-rates =3D <1000000000>, // RP1_PLL_SYS_CORE
+> +                                   <1536000000>, // RP1_PLL_AUDIO_CORE
+> +                                   <200000000>,  // RP1_PLL_SYS
+> +                                   <125000000>,  // RP1_PLL_SYS_SEC
+> +                                   <61440000>,   // RP1_PLL_AUDIO
+> +                                   <192000000>,  // RP1_PLL_AUDIO_SEC
+> +                                   <200000000>,  // RP1_CLK_SYS
+> +                                   <100000000>,  // RP1_PLL_SYS_PRI_PH
+> +                                   /* Must match the XOSC frequency */
+> +                                   <50000000>, // RP1_CLK_SLOW_SYS
+> +                                   <1000000>, // RP1_CLK_SDIO_TIMER
+> +                                   <200000000>, // RP1_CLK_SDIO_ALT_SRC
+> +                                   <50000000>; // RP1_CLK_ETH_TSU
+> +        };
+> +    };
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 42decde38320..6e7db9bce278 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -19116,6 +19116,12 @@ F:	Documentation/devicetree/bindings/media/raspb=
+errypi,pispbe.yaml
+>  F:	drivers/media/platform/raspberrypi/pisp_be/
+>  F:	include/uapi/linux/media/raspberrypi/
+> =20
+> +RASPBERRY PI RP1 PCI DRIVER
+> +M:	Andrea della Porta <andrea.porta@suse.com>
+> +S:	Maintained
+> +F:	Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
+> +F:	include/dt-bindings/clock/rp1.h
+> +
+>  RC-CORE / LIRC FRAMEWORK
+>  M:	Sean Young <sean@mess.org>
+>  L:	linux-media@vger.kernel.org
+> diff --git a/include/dt-bindings/clock/rp1.h b/include/dt-bindings/clock/=
+rp1.h
+> new file mode 100644
+> index 000000000000..1ed67b8a5229
+> --- /dev/null
+> +++ b/include/dt-bindings/clock/rp1.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
+> +/*
+> + * Copyright (C) 2021 Raspberry Pi Ltd.
+> + */
+> +
+> +#define RP1_PLL_SYS_CORE		0
+> +#define RP1_PLL_AUDIO_CORE		1
+> +#define RP1_PLL_VIDEO_CORE		2
+> +
+> +#define RP1_PLL_SYS			3
+> +#define RP1_PLL_AUDIO			4
+> +#define RP1_PLL_VIDEO			5
+> +
+> +#define RP1_PLL_SYS_PRI_PH		6
+> +#define RP1_PLL_SYS_SEC_PH		7
+> +#define RP1_PLL_AUDIO_PRI_PH		8
+> +
+> +#define RP1_PLL_SYS_SEC			9
+> +#define RP1_PLL_AUDIO_SEC		10
+> +#define RP1_PLL_VIDEO_SEC		11
+> +
+> +#define RP1_CLK_SYS			12
+> +#define RP1_CLK_SLOW_SYS		13
+> +#define RP1_CLK_DMA			14
+> +#define RP1_CLK_UART			15
+> +#define RP1_CLK_ETH			16
+> +#define RP1_CLK_PWM0			17
+> +#define RP1_CLK_PWM1			18
+> +#define RP1_CLK_AUDIO_IN		19
+> +#define RP1_CLK_AUDIO_OUT		20
+> +#define RP1_CLK_I2S			21
+> +#define RP1_CLK_MIPI0_CFG		22
+> +#define RP1_CLK_MIPI1_CFG		23
+> +#define RP1_CLK_PCIE_AUX		24
+> +#define RP1_CLK_USBH0_MICROFRAME	25
+> +#define RP1_CLK_USBH1_MICROFRAME	26
+> +#define RP1_CLK_USBH0_SUSPEND		27
+> +#define RP1_CLK_USBH1_SUSPEND		28
+> +#define RP1_CLK_ETH_TSU			29
+> +#define RP1_CLK_ADC			30
+> +#define RP1_CLK_SDIO_TIMER		31
+> +#define RP1_CLK_SDIO_ALT_SRC		32
+> +#define RP1_CLK_GP0			33
+> +#define RP1_CLK_GP1			34
+> +#define RP1_CLK_GP2			35
+> +#define RP1_CLK_GP3			36
+> +#define RP1_CLK_GP4			37
+> +#define RP1_CLK_GP5			38
+> +#define RP1_CLK_VEC			39
+> +#define RP1_CLK_DPI			40
+> +#define RP1_CLK_MIPI0_DPI		41
+> +#define RP1_CLK_MIPI1_DPI		42
+> +
+> +/* Extra PLL output channels - RP1B0 only */
+> +#define RP1_PLL_VIDEO_PRI_PH		43
+> +#define RP1_PLL_AUDIO_TERN		44
+> --=20
+> 2.35.3
+>=20
+
+--044jvUAtXTI8rtBJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZsTB9gAKCRB4tDGHoIJi
+0hdEAQDmLFxE5g1AcfR7ObteXxBVesin0HSMEH3qgvXnimSDngEA1MMPFeXt983K
+4vCKIAC+wEmRMiAoUhwYVOlp+zLDVgE=
+=Vq3Z
+-----END PGP SIGNATURE-----
+
+--044jvUAtXTI8rtBJ--
 
