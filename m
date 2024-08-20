@@ -1,55 +1,60 @@
-Return-Path: <netdev+bounces-119937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300EE957A66
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:22:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6313957A78
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:26:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDBC01F236B1
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35219283DA8
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BAA632;
-	Tue, 20 Aug 2024 00:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1104C66;
+	Tue, 20 Aug 2024 00:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZju0QkW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ffzGbqZB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C172DDA0
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4736AA50;
+	Tue, 20 Aug 2024 00:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724113354; cv=none; b=OWqdC4yAmud0Y/dmDcAlwv4qPtrW+GjbDMKeGZGa5NW0EhhTna9AFB3u4ltf6P+K5RqdLTHg9FFxQjzHroOIgy3WAbgsxYCKIdzowFDwlggwXCoDUAZjFUACDLuqa+3Qxhfns0ECr5wmnmwSprW7bhacTNg+vBlgqoivBm+a76g=
+	t=1724113570; cv=none; b=Mn7j01YaHphIRGyqZhnPJgzRRcIlEgouu24AYYPbwDu4Tk4c1QwHjJJ0KqpavJfmiXwNs20zbGbAnUZrLvf4TJIDi431VbpbKKZD88fo9nltBlIiiv4wqVFM3i38WVwscPnWtcSVUgacvTMckXy7m0zGbro4itPGWrMIu6EvYL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724113354; c=relaxed/simple;
-	bh=f3poAltAY/fXATGbRi2kvrHFOXjjTPbPVVHqUPp5sLM=;
+	s=arc-20240116; t=1724113570; c=relaxed/simple;
+	bh=sRXxrYGsvqAwlJZMOO4J9ngwjq8KmLev6usREKg7EQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QtYXyTV6brO+zAmZxzWVXikrFvb0T1KD6RzRDU8rj6FI5me5XfK1zgW+Sw8v8o2Erw1seg9HrXg4wxb+WAE1ssXCrmo46CsHVTLeLLqR29tish2uZ32y0riSk2t3xZBsLWAiWllu2aCQ0D8MaygPNq8i0n/ZuXMvL4dx6Uowm1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZju0QkW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB36FC32782;
-	Tue, 20 Aug 2024 00:22:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pXClaxFiC5dowZIDvceyfvaRGz/KRSuso8kGxRlR/GGvc7c6VmedOV4Md6IbDCkep4725ACO9RCx0dmUZiO/rdBZvB0gd25LDJYAP6dsYmiwGRbNaUIbKGIhZeNvgJFqPTiJo4PpCXMyctak/0jayaXpjVuBRwm8hr9w/xP4oW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ffzGbqZB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C31C32782;
+	Tue, 20 Aug 2024 00:26:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724113353;
-	bh=f3poAltAY/fXATGbRi2kvrHFOXjjTPbPVVHqUPp5sLM=;
+	s=k20201202; t=1724113570;
+	bh=sRXxrYGsvqAwlJZMOO4J9ngwjq8KmLev6usREKg7EQM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CZju0QkWWzivPx01MEIdZ8Pt1MetuhmLwvCStQK1HuK7KxMQSWNVhNeIoMibVwcbs
-	 84n8AfutpVO5AoBA1t5JBhIZ7jkvNDeBuWKp9YgYMFXGpiDz9hSaWiE5hEOZu3dbVt
-	 PAz+Y5YsEH2y+O04AHBymM46mgUeVcUW7k/VAwcEoQGMgKiFu3AIAcA96xn0rj88ud
-	 4UsjMgqrhGXEKaXSQkf7yNKcND+hU5AW60yNTRksiNRObhGmocqbZXlA0iNXUJg6kS
-	 eenV7rR0Qf2sQVULi1YIqB5DPgCJATwiK0O0fUO9zKJ6tWd9EQ27wH58vds73Ow0yO
-	 JM/6LnoRC62Bg==
-Date: Mon, 19 Aug 2024 17:22:32 -0700
+	b=ffzGbqZBjngJhcweA6YvS9YSLaj9CpiUbjbytOIb0KYYO1uQhRJRpWAHfg/Pu7Sdb
+	 NlTGceGnbVSOoqoosPZgnS/VNm6ZapJ8FkL8C66gxIpj5oDLDhil58q6XgBuOCk3O9
+	 xS7I+59LNBMURATvJ0Tbxh34Jorc5GymzxDnrWQRhLl3sPZ1aykGmLTY5car8ZvCi1
+	 CQzpdcGM0xp6U6WupcKHTeJQ8Ozd3J/E2bamphzZA5JnyvK1pqZyTtE3Mg26N+Zwus
+	 xQkn0sJxUKAiMnvRqzYUo1GaOkpDs+zdQOLbHNgQ/A3rVmggs37yMnMF0zMiowTKDs
+	 R0s4PjFJtpzNA==
+Date: Mon, 19 Aug 2024 17:26:08 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
- <steffen.klassert@secunet.com>, netdev@vger.kernel.org
-Subject: Re: [Question] Does CONFIG_XFRM_OFFLOAD depends any other configs?
-Message-ID: <20240819172232.34bf6e9d@kernel.org>
-In-Reply-To: <ZsPXnKv6t4JjvFD9@Laptop-X1>
-References: <ZsPXnKv6t4JjvFD9@Laptop-X1>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 1/3] ethtool: Extend cable testing interface
+ with result source information
+Message-ID: <20240819172608.2ca87928@kernel.org>
+In-Reply-To: <20240819141241.2711601-2-o.rempel@pengutronix.de>
+References: <20240819141241.2711601-1-o.rempel@pengutronix.de>
+	<20240819141241.2711601-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,13 +64,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 20 Aug 2024 07:39:08 +0800 Hangbin Liu wrote:
-> Yesterday I tried to build the kernel with CONFIG_XFRM_OFFLOAD=y via `vng`[1],
-> but the result .config actually doesn't contain CONFIG_XFRM_OFFLOAD=y. I saw
-> XFRM_OFFLOAD in net/xfrm/Kconfig doesn't has any dependences. Do you know if
-> I missed something?
+On Mon, 19 Aug 2024 16:12:39 +0200 Oleksij Rempel wrote:
+> --- a/include/uapi/linux/ethtool_netlink.h
+> +++ b/include/uapi/linux/ethtool_netlink.h
+> @@ -573,15 +573,25 @@ enum {
+>  	ETHTOOL_A_CABLE_RESULT_UNSPEC,
+>  	ETHTOOL_A_CABLE_RESULT_PAIR,		/* u8 ETHTOOL_A_CABLE_PAIR_ */
+>  	ETHTOOL_A_CABLE_RESULT_CODE,		/* u8 ETHTOOL_A_CABLE_RESULT_CODE_ */
+> +	ETHTOOL_A_CABLE_RESULT_SRC,		/* u32 */
+>  
+>  	__ETHTOOL_A_CABLE_RESULT_CNT,
+>  	ETHTOOL_A_CABLE_RESULT_MAX = (__ETHTOOL_A_CABLE_RESULT_CNT - 1)
+>  };
+>  
+> +/* Information source for specific results. */
+> +enum {
+> +	/* Results provided by the Time Domain Reflectometry (TDR) */
+> +	ETHTOOL_A_CABLE_INF_SRC_TDR,
+> +	/* Results provided by the Active Link Cable Diagnostic (ALCD) */
+> +	ETHTOOL_A_CABLE_INF_SRC_ALCD,
+> +};
+> +
+>  enum {
+>  	ETHTOOL_A_CABLE_FAULT_LENGTH_UNSPEC,
+>  	ETHTOOL_A_CABLE_FAULT_LENGTH_PAIR,	/* u8 ETHTOOL_A_CABLE_PAIR_ */
+>  	ETHTOOL_A_CABLE_FAULT_LENGTH_CM,	/* u32 */
+> +	ETHTOOL_A_CABLE_FAULT_LENGTH_SRC,	/* u32 */
 
-It's a hidden config option, not directly controlled by the user.
-You should enable INET_ESP_OFFLOAD and INET6_ESP_OFFLOAD instead
-(which "select" it)
+Please keep Documentation/netlink/specs/ethtool.yaml up to date
 
