@@ -1,119 +1,189 @@
-Return-Path: <netdev+bounces-120047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C0C958107
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:31:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A264595810B
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE701F253ED
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:31:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DD01F25485
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B47918A955;
-	Tue, 20 Aug 2024 08:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FA518A6BD;
+	Tue, 20 Aug 2024 08:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JaqxX9g8"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VG8ajf6B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A405176252
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 08:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2FB18A6A8
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 08:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724142078; cv=none; b=TU43JWteC08cprukG5F1pPNNNPNXWgXTSaizt1j7E08PVtrPC/Dc8zRYmD5Q+1fOvdpeuA3ktSZ74cnNNG3du1TFG7D+2TfpRFwe80oDrUXrEai/2pWL9w0t5h9jqAiJNCO9pmlVuPkHH8s4623EtF+lYJGR4QUqONXXW2GzyJY=
+	t=1724142787; cv=none; b=pPX9gOogM4Mmz0ytS7N3jPWvv2DdCiZTTzqQSIIzywxhFguIESq2ppL5KfCnb5aSfni5Xdr6h/+9MZyRnO2oRpZKIi4GwX8bWnMnniYEHpbicZhHn+27ea/5Hp2D9Y9k1xHMyJMaGS2dl8/ACgLi092R7okoBlRolfuc9tHXT/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724142078; c=relaxed/simple;
-	bh=o8MrEUd5M2Gu8KypNHZU9u1pS5gdjyw19lhXla6B7po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GeBs34EGQY4NLEDdhBKQX9AJQxyvL1aiUEThh893htIzse3i5NKU4kG2Lbj7Avop9fIxghHDZF+8VdF2weWKqBiDylf0x624SjzbX9WzXyPTq0yzqwhn1CXryzNJImC9ZOncVS8jS/V6cNLX6NiX7TPyVX0fQRjpzTsrRnTt7mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JaqxX9g8; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3718706cf8aso3261993f8f.3
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 01:21:16 -0700 (PDT)
+	s=arc-20240116; t=1724142787; c=relaxed/simple;
+	bh=sSUYkM8HYmaJN7xqG+tfsAHvEYV5RAq6szVJelU+X+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k5JRV1hap3wL3btXHOzAKEeC6t+Al7n02haYDVEeJFzB7KzesL3eNWsEoD6Ebth5ezTRoq074vSsBbbKSLYWFn2ZVMwS5nR7IjM1e8CElCnaJvk7d1KfQN8/ZkTlvcnZtP0Gxg3KylyyxcR8LcWpdLbegbRvpEicxPWldCS3DzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VG8ajf6B; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7d26c2297eso598942666b.2
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 01:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724142075; x=1724746875; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DK7xKT5QiLIyWpzl0HT94Urloq/3djnO1+ZdzfVqpLM=;
-        b=JaqxX9g8F7I3c9emEI31oZsiQExVjj04ySr4/DImVnNpP08A4xHFspb/ttMZSfDxB9
-         YXpEvMyhXLN7JD//WtN7K9f+9bNtL7/k3SJdHSODWoWQyGcrUyAEz32XGSKaVi3RJ1Tx
-         KNh9GlAkmTThU/pGhLF4r03k9AbAPmBQEEx/93rbb3DON+ZaSbtoSLQVxlUgSZvJ6bXt
-         OJcDQOL2qDHcv00xC1UW3Gvbw/ZR1Roo/LHukD6/M5vrSrKr5YEs67SML1ZDGqjkYqL3
-         ytW1j+eYJVN+eJj1BdnYw1lBukr7ueEzYgMTVszA10jbQpI3r+y0wqhWI0LdTyuf5+f1
-         Hv6Q==
+        d=fastly.com; s=google; t=1724142784; x=1724747584; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XNQ9tyNfl4ljX/BPGLUOjjoGD0Ou+TIYM+qPExssLvc=;
+        b=VG8ajf6BuTNmkSG0citgtyRIslAki+3nxKaQreOE/2Jt+XtQq867Hbt6IZQKqYcZIy
+         Jah6u7gnrTVuJMlWiAlwcqZxMRsbpB8G9sGpIMHVAIwMhDn6Chc2+I4tonuf1y1MhNdL
+         F8BFC3GhlV619NSvDG4KxYAMFyyT5dW/57ES4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724142075; x=1724746875;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1724142784; x=1724747584;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DK7xKT5QiLIyWpzl0HT94Urloq/3djnO1+ZdzfVqpLM=;
-        b=ORdnTQ6w0HpZfUWvKas7VM0llWkG1WKXLjCEr4KpT9GqEszGzKpJXP2wTyvnB5+cP0
-         SSYydgjdM9g56anjnDsiWTyNeTE+8DFJ8cMkomApssOaX43zYmyPxMmZwPvdGlyckUCN
-         Xf1+K2AEIj6dw4tTBSgW2TkG0T/I86sttYS7zzu5PWgCGMpjLjOrXY1caSTj3cgLq5EW
-         FjmmiPYcdi0oInci8GdFPg+HhuzdfpyyK0cnTXVPgszd8ydPiA3QQB848Lc1fMIEsbEv
-         1N4oeknNXb60fg+7lLrwYJd+iHjj3S6Pr1csPeiMAszSLBlXtDra29ykK0WNnUem/kPX
-         5KSQ==
-X-Gm-Message-State: AOJu0YyxSqhuztUUxKd1X4Bp9dotCF5qaJ5/e+gQOEHmJ1PqeYIupHmD
-	XoOVYX9PY4C5gQnn3QOsbfrFFGbsV2Jc3GhGM5TJLgkJN4CCJkb58vmBlSmm5zI=
-X-Google-Smtp-Source: AGHT+IFfCic8OEGMweFYZXCw5OpXMNxeLZKvnaf95xbyXG3CHg33opQAkZz0NNj6BlAlwK4stFAZ4Q==
-X-Received: by 2002:adf:f843:0:b0:371:8eea:24b4 with SMTP id ffacd0b85a97d-371946d5dd2mr7577443f8f.61.1724142074333;
-        Tue, 20 Aug 2024 01:21:14 -0700 (PDT)
-Received: from ?IPV6:2001:a61:130c:6601:848f:4ba9:91cb:3485? ([2001:a61:130c:6601:848f:4ba9:91cb:3485])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429eea70115sm130843145e9.36.2024.08.20.01.21.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Aug 2024 01:21:13 -0700 (PDT)
-Message-ID: <22bd911b-b328-4536-92bc-e5d89d0eb9ab@suse.com>
-Date: Tue, 20 Aug 2024 10:21:13 +0200
+        bh=XNQ9tyNfl4ljX/BPGLUOjjoGD0Ou+TIYM+qPExssLvc=;
+        b=n/fx5zjIwpHFkL1Bl02FbxG97kluQ4SFQeS+qkiTX/3aPmqpyw8kRkibEvpgou2keA
+         +4IIbfzWTt74Oe8MMw1VKdNSz7KuVp4Mc8NfytcAtTJCe4Yh1X5QbCnbVnFaIM1wDDmV
+         893bf0KhLmRlIo8H6pJejnfF3xx49qWwFEFF1VQvJuTM5ohyPt5hY4SZ+BrQMDS3xPWF
+         S3y6wYAgz5mMc99w8kqB6QMlqxwKhMpGAG7MDCjXvbCDfACMLOSnjSADIgJP8AL39EWn
+         aEqp0tZtyGP5oGNJGabPErpnSacxpzegqCGKxzzbQ3HgpdYTvY5S5vpBJc0/VL7WETgK
+         ZL0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWeYUOqr+Jy+O050C7I6LkaaIcZA/QiEhKdl7+0Lw01K+fHrvuXucKub9LWEsfmQjbDaKvjfnfygKMQTyzgrdG/8LTDaAQX
+X-Gm-Message-State: AOJu0Yy58ETfaSnuroqNwrT3HkhSa4NaUgyEenDPx9rcJkjNoN7qihix
+	6puGUj+OjKJrKz2JHbgDG49+k+cKTgWzLdeSWAe9hPBF4sGW4lG53G1P8cL7980=
+X-Google-Smtp-Source: AGHT+IHdCu1gJlayHwi4drLhhfQxyfMUzMC+JYbFPtj9dlU1JF6GxmGI/OuqVO5LTmVnsfb9hkmppA==
+X-Received: by 2002:a17:907:97cf:b0:a6f:59dc:4ece with SMTP id a640c23a62f3a-a83928a4023mr845774466b.2.1724142783295;
+        Tue, 20 Aug 2024 01:33:03 -0700 (PDT)
+Received: from LQ3V64L9R2.home ([2a02:c7c:f016:fc00:3906:31c:255a:bf09])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83aeb6eb4dsm435559766b.35.2024.08.20.01.33.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 01:33:03 -0700 (PDT)
+Date: Tue, 20 Aug 2024 09:33:01 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Shay Drori <shayd@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
+Message-ID: <ZsRUvcOKLnTw16wD@LQ3V64L9R2.home>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Shay Drori <shayd@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Shailend Chand <shailend@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+References: <20240813171710.599d3f01@kernel.org>
+ <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
+ <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
+ <20240814080915.005cb9ac@kernel.org>
+ <ZrzLEZs01KVkvBjw@LQ3V64L9R2>
+ <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
+ <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
+ <20240814172046.7753a62c@kernel.org>
+ <Zr3XA-VIE_pAu_k0@LQ3V64L9R2>
+ <fe5c6b4b-6c78-402b-b454-837e3760c668@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] USB: ipeth: race between ipeth_close and error handling
-To: Foster Snowhill <forst@pen.gy>, Oliver Neukum <oneukum@suse.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, gvalkov@gmail.com
-References: <0E5elkMIg5-dqmrTakb-xo6Yx_VnD_6Fc1Wud6LijP3iooYsrIjbLHxx2m9MVKe1conEc0Tjke_LjHS4mToF0A==@protonmail.internalid>
- <20231121144330.3990-1-oneukum@suse.com>
- <40b8002c-927c-434f-a82c-73443e0207f7@pen.gy>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <40b8002c-927c-434f-a82c-73443e0207f7@pen.gy>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe5c6b4b-6c78-402b-b454-837e3760c668@nvidia.com>
 
-
-
-On 01.08.24 21:42, Foster Snowhill wrote:
-> Hello Oliver,
+On Tue, Aug 20, 2024 at 09:40:31AM +0300, Shay Drori wrote:
 > 
-> Thank you for the patch and patience!
 > 
->> ipheth_sndbulk_callback() can submit carrier_work
->> as a part of its error handling. That means that
->> the driver must make sure that the work is cancelled
->> after it has made sure that no more URB can terminate
->> with an error condition.
->>
->> Hence the order of actions in ipeth_close() needs
->> to be inverted.
+> On 15/08/2024 13:22, Joe Damato wrote:
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > On Wed, Aug 14, 2024 at 05:20:46PM -0700, Jakub Kicinski wrote:
+> > > On Wed, 14 Aug 2024 19:01:40 +0100 Joe Damato wrote:
+> > > > If it is, then the only option is to have the drivers pass in their
+> > > > IRQ affinity masks, as Stanislav suggested, to avoid adding that
+> > > > call to the hot path.
+> > > > 
+> > > > If not, then the IRQ from napi_struct can be used and the affinity
+> > > > mask can be generated on every napi poll. i40e/gve/iavf would need
+> > > > calls to netif_napi_set_irq to set the IRQ mapping, which seems to
+> > > > be straightforward.
+> > > 
+> > > It's a bit sad to have the generic solution blocked.
+> > > cpu_rmap_update() is exported. Maybe we can call it from our notifier?
+> > > rmap lives in struct net_device
+> > 
+> > I agree on the sadness. I will take a look today.
+> > 
+> > I guess if we were being really ambitious, we'd try to move ARFS
+> > stuff into the core (as RSS was moved into the core).
 > 
-> The change looks reasonable to me. It's been a while, but do you perhaps
-> recall how you stumbled upon this? Was that a proactive fix, or was it
-> in response to an issue you (or someone else) encountered? Basically
-> wondering if this is something I could test/reproduce.
+> 
+> Sorry for the late reply. Maybe we can modify affinity notifier infra to
+> support more than a single notifier per IRQ.
+> @Thomas, do you know why only a single notifier per IRQ is supported?
 
-Hi,
+Sorry for the delayed response as well on my side; I've been in
+between lots of different kernel RFCs :)
 
-sorry I was on vacation. I think I looked at the driver because of
-an unrelated patch and saw this issue. That bug type is not exactly uncommon.
+Jakub: the issue seems to be that the internals in lib/cpu_rmap.c
+are needed to call cpu_rmap_update. It's probably possible to expose
+them somehow so that a generic IRQ notifier could call
+cpu_rmap_update, as you mentioned, but some rewiring is going to be
+needed, I think.
 
-	HTH
-		Oliver
+I had a couple ideas for rewiring stuff, but I haven't had time to
+context switch back on to this work as I've been busy with a few
+other things (the IRQ suspension stuff and another mlx5 thing I have
+yet to send upstream).
 
+I hope to take another look at it this week, but I welcome any
+suggestions from Shay/Thomas in the meantime.
+
+- Joe
 
