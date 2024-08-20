@@ -1,164 +1,156 @@
-Return-Path: <netdev+bounces-120257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1A8958B52
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:30:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FA3958B6D
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91E0FB21558
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2580B1F210EC
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3210E193081;
-	Tue, 20 Aug 2024 15:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jR/RfzQT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE5518FDAB;
+	Tue, 20 Aug 2024 15:34:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B88A193071;
-	Tue, 20 Aug 2024 15:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD3A1922F7
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724167771; cv=none; b=V1gvGcLflDS/J8dbv/k/Eo6qCQ7iPWUTymWn1TY8hkjIrandMg52LlWnbINCtxzRbSQ4chqHiUqE1h20qMa4tiRQoeuDYXgfSyI6WLKsQs2cShrPgCjqTXhZB3VoaN/CRiEKwLyu/OdG53FQK3qeT0xWbYnlhlTrLqhhtjv222A=
+	t=1724168056; cv=none; b=TqEBD6lcd7wveOgMbYTifx9mDhvNYzI7lnnXpMStSeAXK/li0qEvvWRlNa3RGQXshUHu7BiGAq0mfvmCf/rgBTWgLY56fOgE9bbT667OtYzRtoEw1Alikw2Ol0BR8nJiRA5Z9edEzmr5hyZOAWiwV6sBm7Ffd2X5z4zxDvvnvT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724167771; c=relaxed/simple;
-	bh=KbR9Z5dA+UQWywHjxVmp/37dcVUsfNC0p+2b4VpqyDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eIVLiwrv7qwla87GDZCh6XlCSJZrobweQ7Z1Bi5BJm6zBy/hgDLCgJ0J+R8q1sE4atxTX+SJED6G2QIRoI/eocdfQmXtVanE8iMTrPO91i9C1pbDZp5FL3JNtmss9Gskef/bn1K6+VivzuWCFLFOfjU7OkNqVFaiTnN8MKw/bDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jR/RfzQT; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47KDnPU5014197;
-	Tue, 20 Aug 2024 15:29:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:content-transfer-encoding
-	:mime-version; s=pp1; bh=xETE7DSKr+Zv/9nlZb4rsqzdzPP6r970NW5xRyy
-	dMHg=; b=jR/RfzQT7R4JEv/t4odIml7GkfQpp2ZA92hMzP+Xo0y5CDzjt7oQb7K
-	EOKp+/K7JVJQHEAyYvsE642w3fHs3P7Mms7f2V2rGJwh/ldLZmRuJSs95rp4Ux7/
-	FSqI5yMVXmWqugcgXqPlWo0qs2YEWuVS7iKpPhTax9w2cpj3oLKiiBBCjBlMOQxv
-	JXK3kwhWEZJhEwhEBJ/bJWqcM+rocOZrVvzHIkQjco9k0bxCGLNETrexnL+LjSC3
-	I1Bnnvt+4BmYTg+It3RMjFPaD4ek+9qiQF92NxRpw8oXQlhbIl5B1Ql2cDwqbZ+F
-	pgU8777uTT3+bM9Ae/10466ol8HqR/g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcydwjj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 15:29:19 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47KFMgrU016403;
-	Tue, 20 Aug 2024 15:29:19 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcydwjc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 15:29:19 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47KFFnVF019123;
-	Tue, 20 Aug 2024 15:29:18 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376puf70-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 15:29:18 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47KFTC7x30081298
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Aug 2024 15:29:14 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 19B0A2004D;
-	Tue, 20 Aug 2024 15:29:12 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 06F8A2004B;
-	Tue, 20 Aug 2024 15:29:12 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 20 Aug 2024 15:29:11 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 7CF05E024A; Tue, 20 Aug 2024 17:29:11 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH net v3] s390/iucv: Fix vargs handling in iucv_alloc_device()
-Date: Tue, 20 Aug 2024 17:29:11 +0200
-Message-ID: <20240820152911.3701814-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: a-9Xw3jUsYxRBoXMz02DcrQ8EurX0pt9
-X-Proofpoint-GUID: d0F_at3YRvjxGQItmz95bp-hjKFNrje8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1724168056; c=relaxed/simple;
+	bh=Z6e5duGcUZO/LsiFxq3oIb0/JzZ0GTraJ9Z9+AAkisY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=UAavzcPyLef7YldDkjd5ghnNjilQCsVgTLRBBmNh7/A5VYirW35Y/A0OKEA2XuW62XI8Ba2b2G0JLA678YBYlQzGTPg3oypRD+uSzaQriYS4G5eqjx8ZTH5WwLhJ30dSugC5K+akcvWtX2vjIIOA6549lpbIsOzkXdXcrmZHKSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-gPYJl3sWPJ-lWzXRdjPp8Q-1; Tue,
+ 20 Aug 2024 11:34:07 -0400
+X-MC-Unique: gPYJl3sWPJ-lWzXRdjPp8Q-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B37521954225;
+	Tue, 20 Aug 2024 15:34:05 +0000 (UTC)
+Received: from hog (unknown [10.39.192.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 150273001FF1;
+	Tue, 20 Aug 2024 15:34:00 +0000 (UTC)
+Date: Tue, 20 Aug 2024 17:33:58 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
+ offload
+Message-ID: <ZsS3Zh8bT-qc46s7@hog>
+References: <20240820004840.510412-1-liuhangbin@gmail.com>
+ <20240820004840.510412-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-20_10,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1011
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408200112
+In-Reply-To: <20240820004840.510412-3-liuhangbin@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-iucv_alloc_device() gets a format string and a varying number of
-arguments. This is incorrectly forwarded by calling dev_set_name() with
-the format string and a va_list, while dev_set_name() expects also a
-varying number of arguments.
+Hi Hangbin,
 
-Symptoms:
-Corrupted iucv device names, which can result in log messages like:
-sysfs: cannot create duplicate filename '/devices/iucv/hvc_iucv1827699952'
+(adding Steffen since we're getting a bit into details of IPsec)
 
-Fixes: 4452e8ef8c36 ("s390/iucv: Provide iucv_alloc_device() / iucv_release_device()")
-Link: https://bugzilla.suse.com/show_bug.cgi?id=1228425
-Reference-ID: https://bugzilla.linux.ibm.com/show_bug.cgi?id=208008
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-v2 -> v3: use "%s" (Przemek Kitszel)
-Discussion of v1:
-Link: https://lore.kernel.org/all/2024081326-shifter-output-cb8f@gregkh/T/#mf8ae979de8acdc01f7ede0b94af6f2e110eea209
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202408091131.ATGn6YSh-lkp@intel.com/
-Vasily Gorbik asked me to send this version via the netdev mailing list.
----
- net/iucv/iucv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+2024-08-20, 08:48:39 +0800, Hangbin Liu wrote:
+> Currently, users can see that bonding supports IPSec HW offload via ethto=
+ol.
+> However, this functionality does not work with NICs like Mellanox cards w=
+hen
+> ESN (Extended Sequence Numbers) is enabled, as ESN functions are not yet
+> supported. This patch adds ESN support to the bonding IPSec device offloa=
+d,
+> ensuring proper functionality with NICs that support ESN.
+>=20
+> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+>=20
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+> index 560e3416f6f5..24747fceef66 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -651,10 +651,35 @@ static bool bond_ipsec_offload_ok(struct sk_buff *s=
+kb, struct xfrm_state *xs)
+>  =09return err;
+>  }
+> =20
+> +/**
+> + * bond_advance_esn_state - ESN support for IPSec HW offload
+> + * @xs: pointer to transformer state struct
+> + **/
+> +static void bond_advance_esn_state(struct xfrm_state *xs)
+> +{
+> +=09struct net_device *real_dev;
+> +
+> +=09rcu_read_lock();
+> +=09real_dev =3D bond_ipsec_dev(xs);
+> +=09if (!real_dev)
+> +=09=09goto out;
+> +
+> +=09if (!real_dev->xfrmdev_ops ||
+> +=09    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
+> +=09=09pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __fu=
+nc__, real_dev->name);
 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 1e42e13ad24e..d3e9efab7f4b 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -86,13 +86,15 @@ struct device *iucv_alloc_device(const struct attribute_group **attrs,
- {
- 	struct device *dev;
- 	va_list vargs;
-+	char buf[20];
- 	int rc;
- 
- 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
- 	if (!dev)
- 		goto out_error;
- 	va_start(vargs, fmt);
--	rc = dev_set_name(dev, fmt, vargs);
-+	vsnprintf(buf, sizeof(buf), fmt, vargs);
-+	rc = dev_set_name(dev, "%s", buf);
- 	va_end(vargs);
- 	if (rc)
- 		goto out_error;
--- 
-2.39.3 (Apple Git-146)
+xdo_dev_state_advance_esn is called on the receive path for every
+packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
+xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
+be ratelimited.
+
+
+But this CB is required to make offload with ESN work. If it's not
+implemented on a lower device, I expect things will break. I wonder
+what the best behavior would be:
+
+ - just warn (this patch) -- but things will break for users
+
+ - don't allow mixing devices that support ESN with devices that don't
+   in the same bond (really bad if the user doesn't care about ESN)
+
+ - don't allow enslaving devices that don't support ESN if an xfrm
+   state using ESN has been added to the bond, and don't allow
+   creating ESN states if the bond has one non-ESN slave
+
+ - disable re-offloading the state if we have to migrate it from an
+   ESN-enabled to a non-ESN device (when changing the active slave)
+   -- and fall back to the (slow) SW implementation
+
+ - other options that I'm not thinking about?
+
+
+Sorry I'm only noticing this at v3 :(
+
+--=20
+Sabrina
 
 
