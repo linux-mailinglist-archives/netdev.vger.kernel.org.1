@@ -1,131 +1,145 @@
-Return-Path: <netdev+bounces-120019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E315957F3C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:19:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EAD2957F43
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA58DB22EF5
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:19:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D3A9B209B2
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 07:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9898F156F21;
-	Tue, 20 Aug 2024 07:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE461898E1;
+	Tue, 20 Aug 2024 07:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SdjEnzRh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gQsk0Jih"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A7818E341
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 07:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2822C181B9A;
+	Tue, 20 Aug 2024 07:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724138366; cv=none; b=YrrGMf+mB5jZsz3NZ0qQATl+fZvz3utKjdMJjOOreWWzN1o+XnKD0gNgB2UxkpKgpqv4B/SeStgTUx6FTtM45EpbFdOBxp0RJhPdtuHnFLLk90MrFbbAGGZhkvlOBrQsv6nQa5hY6wqT97EaWU5pvqtjXM/As+VF6QWFPlnbLM0=
+	t=1724138429; cv=none; b=bWF77HE7BtHAdX/+fiaOlio/Xfocj57e/pr3wPNl78Rcs8rPQe8BkU3fYfKAdJVtM0sMmp08vs9RLeYNCH/Dojf9kFuv4D4gpPjk3fImv3MrI1RYM/IgahKxHvINn2gmB/KU/4yqEv52HJiW7yG4x/mwLmAZAHVOLkupjbpHfKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724138366; c=relaxed/simple;
-	bh=+4y3tpuUKVecJJYH20PqlsMjT8xAJpgyyEhguCNXpS0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i6JVX3g6gOxkgiZJJzW4iN7wdF1/YkKAPtXlsng83ColDjKu02eoOO7A6iiDdmV5jiiICNMAXkK81b4srxuVLBLagC6UG21dt7EpukjY9uxJh6YRBTFmDQmHqn0Srxx17+mKN3zv4a4lMRXVv+F9hlA35kQDFHse2jJ4F70+S/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SdjEnzRh; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1724138354; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=u5yUtFgvGZJkLvmTaub6owlArqgNe3SkGG9nd6+xSAo=;
-	b=SdjEnzRhE/Ae4jgsNOEA/HpacF4HcLJNxo/eBm1xxhKUlpMtMbaRQHf/BGL8lRc3yJUvzByX6TsCXCBqt9KAfKk/S4KnTX7ERtuvjYW4GUXFB9323NWvhfacuFwxwUAsIYmiNQzhobw7WBF77fNMovJ/vnaN3V+TZjLSRcFsukE=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WDHeSNR_1724138353)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Aug 2024 15:19:14 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	s=arc-20240116; t=1724138429; c=relaxed/simple;
+	bh=SKFbGFSwJ55rWUmbm1hpW9JrvmpDPslIScuSlfAiMQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BU7vgJwTnHkqme9k+KbSLji8Ufh70M/z3dUP7apvTspkWQp2Ge6SIBMPH+jCz//OGHSJ9MmW1ROgfu6jwem3B+lgayXLpJdDdcpu8I94sduxpLTGtYEhwGGv43PfA9Tmuu9gpsrzLBn81Wri7o2stAkmR0FI2OD4evvJ0ldRsyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gQsk0Jih; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724138428; x=1755674428;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SKFbGFSwJ55rWUmbm1hpW9JrvmpDPslIScuSlfAiMQU=;
+  b=gQsk0Jihhb/7QHr/fu8MzYyj2wtn0WIjMwWZMeiqFtHp8GCWStKPySgg
+   rVcwv9VTev5/DtViNjDp2YuHiCD+r9EOf0VOmTwl2xx4HpnCbwkfUlxna
+   uugxVJ+ehhZSvXXlJ4PaJSVPVYpTHq3cwKGkjne6heSJB1RxEW1RB3YQX
+   M+z4XlUCjQtoDuK+6h0jnlX9nu+U5NOvZIUU5Egnb9BQM7531UmNl8uR+
+   wuxN74WWGK54v5Rl5Ou6du91+VWTZwT5UBSudz/luDYPUfUuK9d2dKnGR
+   L7bLidAkE3HcB10PkzKJ2SgVkb73YwvRVuH1o7ykXzRT88TZo6cRonrnc
+   g==;
+X-CSE-ConnectionGUID: 04Gf8w/dTU6YmMlMaHQXxw==
+X-CSE-MsgGUID: gEEPg8hHQgmfu5dw1LLj2Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="13106938"
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="13106938"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 00:20:27 -0700
+X-CSE-ConnectionGUID: OyIb2tPlTIeb0hT0TnPI+Q==
+X-CSE-MsgGUID: Wiuvg/1ST0uhXBN1FEW5qA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="60682926"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 20 Aug 2024 00:20:20 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sgJAA-0009q2-1A;
+	Tue, 20 Aug 2024 07:20:18 +0000
+Date: Tue, 20 Aug 2024 15:19:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Matteo Croce <technoboy85@gmail.com>, bpf@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Matt Bobrowski <mattbobrowski@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev,
-	"Si-Wei Liu" <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>
-Subject: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Tue, 20 Aug 2024 15:19:13 +0800
-Message-Id: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH bpf-next] bpf: use kfunc hooks instead of program types
+Message-ID: <202408201510.KPb6hCTA-lkp@intel.com>
+References: <20240820000245.61787-1-technoboy85@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 1e2a77031d94
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820000245.61787-1-technoboy85@gmail.com>
 
-leads to regression on VM with the sysctl value of:
+Hi Matteo,
 
-- net.core.high_order_alloc_disable=1
+kernel test robot noticed the following build warnings:
 
-which could see reliable crashes or scp failure (scp a file 100M in size
-to VM):
+[auto build test WARNING on bpf-next/master]
 
-The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-of a new frag. When the frag size is larger than PAGE_SIZE,
-everything is fine. However, if the frag is only one page and the
-total size of the buffer and virtnet_rq_dma is larger than one page, an
-overflow may occur. In this case, if an overflow is possible, I adjust
-the buffer size. If net.core.high_order_alloc_disable=1, the maximum
-buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
-the first buffer of the frag is affected.
+url:    https://github.com/intel-lab-lkp/linux/commits/Matteo-Croce/bpf-use-kfunc-hooks-instead-of-program-types/20240820-080354
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20240820000245.61787-1-technoboy85%40gmail.com
+patch subject: [PATCH bpf-next] bpf: use kfunc hooks instead of program types
+config: i386-buildonly-randconfig-001-20240820 (https://download.01.org/0day-ci/archive/20240820/202408201510.KPb6hCTA-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408201510.KPb6hCTA-lkp@intel.com/reproduce)
 
-Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
-Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408201510.KPb6hCTA-lkp@intel.com/
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c6af18948092..e5286a6da863 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
- 	void *buf, *head;
- 	dma_addr_t addr;
- 
--	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
--		return NULL;
--
- 	head = page_address(alloc_frag->page);
- 
- 	dma = head;
-@@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
- 	len = SKB_DATA_ALIGN(len) +
- 	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 
-+	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-+		return -ENOMEM;
-+
- 	buf = virtnet_rq_alloc(rq, len, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
-@@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
- 	 */
- 	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
- 
-+	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-+		return -ENOMEM;
-+
-+	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-+		len -= sizeof(struct virtnet_rq_dma);
-+
- 	buf = virtnet_rq_alloc(rq, len + room, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
+All warnings (new ones prefixed by >>):
+
+>> net/core/filter.c:12084:38: warning: unused variable 'bpf_kfunc_set_sock_addr' [-Wunused-const-variable]
+    12084 | static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+          |                                      ^~~~~~~~~~~~~~~~~~~~~~~
+   1 warning generated.
+
+
+vim +/bpf_kfunc_set_sock_addr +12084 net/core/filter.c
+
+05421aecd4ed65 Joanne Koong  2023-03-01  12083  
+53e380d2144190 Daan De Meyer 2023-10-11 @12084  static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+53e380d2144190 Daan De Meyer 2023-10-11  12085  	.owner = THIS_MODULE,
+53e380d2144190 Daan De Meyer 2023-10-11  12086  	.set = &bpf_kfunc_check_set_sock_addr,
+53e380d2144190 Daan De Meyer 2023-10-11  12087  };
+53e380d2144190 Daan De Meyer 2023-10-11  12088  
+
 -- 
-2.32.0.3.g01195cf9f
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
