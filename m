@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-120360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05DD79590AF
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 00:50:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 082589590B2
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 00:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC332853BA
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:50:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8C61C208EE
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FDD1C8FAD;
-	Tue, 20 Aug 2024 22:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E8E1C8FD7;
+	Tue, 20 Aug 2024 22:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2yCUJWN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtxvZB3M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9EE165EE1;
-	Tue, 20 Aug 2024 22:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830F81C8FD4
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 22:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724194232; cv=none; b=VvzECqyNUKeUD2XVesMrOGlrwgA669wy4/rW/bmeOp8sqlNI28zCBpTayHT+KA56TgAXLu9zW1TM43Qb16yrSNo4mfLOwBl6FRQrFrsmBRkav40NIXEtWZ4OHn20ra5x4j9nuUmYkv3uNyeFeN2Ywa4agQi1b548Q4tW1ebaKug=
+	t=1724194234; cv=none; b=H14W3TXTKZWzPZ1iQ5Eokwt+1D7C4NQFoMb+fJ+wJt1iKMMMQJppm5koPkAzC2pEjBAG1QKQ4grDpSdUEoVvl0V/JciEuoQIcfX2LZWLMbmTWFVKqZZZyMlRuS9cc74xq/yGW0edXOnSE+kwIC1Qrq6xhBIXp7iGuyReJMxWZJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724194232; c=relaxed/simple;
-	bh=pqvKM3YsTg0DCxYSvHYm+rcDIq5rfuDj/WdG2+04eBo=;
+	s=arc-20240116; t=1724194234; c=relaxed/simple;
+	bh=XpvPdnUwZFHnszo7SdZAbWPN07qUpA+Mhj+bDbu2mJw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a8qbHG4UG2kRMFBr4Qu0AtGaHlPzJfR4SeZhVuM8pliVqwY4vdedi7pnzVpDxoJ+pNDtscxtJaaGtTt3oSHpyGpyVervZatVX1vKuM7KiaGHurM1uW8n1NVoSOCU2kjQK5rbD2S3wdnLI6QVMwoaWbFx5YBgGKhhKkEdQjN7AbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2yCUJWN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19F9C4AF13;
-	Tue, 20 Aug 2024 22:50:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rWZEUMjd0ZglalY5pqqYAgrw/PFmVgYw/5kgu7nIOFQhNNLLze7LIIR7/hFwc5wpp5gLFIrSRPlDP7iA9Otrvn22xkopO2nT1yXfH36khIvlOrAln5mGwrC6ob5VYhz9eDg2j4R1tXN48qldVU55ggKrgLlt282uoVdsIZ2TRIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtxvZB3M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04526C4AF15;
+	Tue, 20 Aug 2024 22:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724194231;
-	bh=pqvKM3YsTg0DCxYSvHYm+rcDIq5rfuDj/WdG2+04eBo=;
+	s=k20201202; t=1724194234;
+	bh=XpvPdnUwZFHnszo7SdZAbWPN07qUpA+Mhj+bDbu2mJw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l2yCUJWNTNwnKJShsgxrPzgMypuQ73UgxnzmNMLR7wSzo29Dga3x91TL2rQbVVf/p
-	 rewu1v27VkxP6igRLb3rB9jo5LCIL8ioA47RGmDhR9HvOvQwVcXApDmoYQozqmhnSm
-	 Y+aadu1zqPWfOJCLecM3HROsfFx6bqeoYpQ7Ahm8LV1VHDR6QDCTS/sD8g6GCjWMLS
-	 Sbuktv4/ff/4LVEWi/dIuj+TnoKnyi1AleImOsjwPH5YIzvr5cAAXJM2pf+QB8cYFY
-	 EfreGc4LC/KBrIn5BItZk8McNORajLXBFlhib6ehKGvAHXzDMM/u0T6rNtks64fs3j
-	 m8bHHS9ppvB8w==
+	b=dtxvZB3MuGMje9aSsceCxCsZV/EF3pgYTOcf9I5QIVkgmjpsa4n4AC/F+/O7/c/1p
+	 J8ZCXjWWmGtJnV0eW4VHn8ROz5R1NMqPWE0hhyne1T8VdNMizYxWBT7vrSRfa5U7Pd
+	 JHFwUJvDN0LUBEKAmtwU90c5ACsiJoBlPqsv2PIyLj7HhwfhBMyKCGlJv8BydL6SsX
+	 Eltms7BdFUEt8TpWnlj1O71JiVsFs1lbKLi+UqM//g2952znINT1W5DvTSxvjun8Tm
+	 mK6NrCAQqRLDznhRhbyD+Mes0suUq/kNJBy9D42QBRFTx/zdQkKkSm9Tw0L7sXePEf
+	 eBkm2w6NO8//Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710323804CAE;
-	Tue, 20 Aug 2024 22:50:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE5DA3804CAE;
+	Tue, 20 Aug 2024 22:50:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] cxgb4: add forgotten u64 ivlan cast before shift
+Subject: Re: [PATCH net v2] igb: cope with large MAX_SKB_FRAGS
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172419423128.1259589.15479208242990083277.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Aug 2024 22:50:31 +0000
-References: <20240819075408.92378-1-kniv@yandex-team.ru>
-In-Reply-To: <20240819075408.92378-1-kniv@yandex-team.ru>
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, lvc-project@linuxtesting.org, kumaras@chelsio.com,
- bharat@chelsio.com, rahul.lakkireddy@chelsio.com, ganeshgr@chelsio.com,
- davem@davemloft.net, horms@kernel.org
+ <172419423251.1259589.15378788577530176816.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Aug 2024 22:50:32 +0000
+References: <20240816152034.1453285-1-vinschen@redhat.com>
+In-Reply-To: <20240816152034.1453285-1-vinschen@redhat.com>
+To: Corinna Vinschen <vinschen@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, maciej.fijalkowski@intel.com,
+ anthony.l.nguyen@intel.com, jtluka@redhat.com, jhladky@redhat.com,
+ sd@queasysnail.net, himasekharx.reddy.pucha@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 19 Aug 2024 10:54:08 +0300 you wrote:
-> It is done everywhere in cxgb4 code, e.g. in is_filter_exact_match()
-> There is no reason it should not be done here
+On Fri, 16 Aug 2024 17:20:34 +0200 you wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE
+> Sabrina reports that the igb driver does not cope well with large
+> MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
+> corruption on TX.
 > 
-> Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
-> Cc: stable@vger.kernel.org
-> Fixes: 12b276fbf6e0 ("cxgb4: add support to create hash filters")
-> Reviewed-by: Simon Horman <horms@kernel.org>
+> An easy reproducer is to run ssh to connect to the machine.  With
+> MAX_SKB_FRAGS=17 it works, with MAX_SKB_FRAGS=45 it fails.  This has
+> been reported originally in
+> https://bugzilla.redhat.com/show_bug.cgi?id=2265320
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] cxgb4: add forgotten u64 ivlan cast before shift
-    https://git.kernel.org/netdev/net/c/80a1e7b83bb1
+  - [net,v2] igb: cope with large MAX_SKB_FRAGS
+    https://git.kernel.org/netdev/net/c/8aba27c4a502
 
 You are awesome, thank you!
 -- 
