@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-119979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13263957C17
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:50:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76934957C18
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61F1F2882D7
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:50:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AA441C22A95
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6A83A1A8;
-	Tue, 20 Aug 2024 03:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD8D3A1DA;
+	Tue, 20 Aug 2024 03:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="X4CGhDA1"
+	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="wEKVX1Fm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADC21798C
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 03:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E220739AD6
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 03:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724125830; cv=none; b=armihA0j1gho0TLA13x7CPCGoX1+bfGMz/8eTUF8kyeXluytR0O0GbymvlHc/4wfFJO+uVbevfnTaGgrQ551yJXtEw9uJ7LsMGE8sjIr+Bya5qt2bZOGyw9hnK41zPmw5g0CDegSTcsYkuMkCFr7HCGY3NqF4Imcbb69D/Ys7MU=
+	t=1724125874; cv=none; b=ERFhLwwxACKnGGZJNmwSmywcTsSCthpoapEYNlfivSFpTEDIM3aFljzQ/KFRS4ixzj9+vL/pDADZnRqm2Wp2QwPhsHfMU/TvF1dCT3TxrQelRkmu+7WUlBttfVewClIbyRoYoFTFTkoUFUPOOjnyD2iW6649vQZyBs2wa8eVGhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724125830; c=relaxed/simple;
-	bh=Pt5waskMZMVIKLtZnSPO44a1s/byvbPgd5xCGwpQyUU=;
+	s=arc-20240116; t=1724125874; c=relaxed/simple;
+	bh=xrpOkY7XIDD94mTGQ+Gc7UeOPt/W+Nkltxv/+xmKjYs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDO22Ott5TiIFDdZc8l+xXERcdmjqWp0MXp3CBTW5UbLwVz1zCxKxfDxSEodIAwt/Hj0aD+ABc+BoeiLhqxkaRdewNaKklyLygr/sN3I+rFX5PEOmJsog7ntxV+lMAmCr2YearkMKytWSD4V+n+rxOpafIkiBxPgwSb+4dgV+RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=X4CGhDA1; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=oiNnQs0I8uo+I7DGpJO7BppWjApXitJjbxXsCNPzZalUh/xFxcuE0RwK5hS1G7+cjwLMTVaWio3ANAGzJ9BoX0mLWfkzlvqrgoeEbOEwYzrXGDePX9axLihLFC3GtcH2MHUhHrgbUj+m45wsMDPsmjpPqbjiLIkeelZ0RUDarGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=wEKVX1Fm; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazon201209; t=1724125828; x=1755661828;
+  s=amazon201209; t=1724125869; x=1755661869;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tGKEukXxHIUnOPxa0EUkZ9/XpceVO6QUaDM+pLVigm4=;
-  b=X4CGhDA1IfWw+w4lCKKaKTWxfOzqNIeZc98LB6Ok74t26uwdvtKb1FGm
-   wIvWIDpC9iPZMLPdgC3o7QJdaXXEmabsnLjNRsxWlqFr2q9bZ1Q4hfM23
-   BZInuuxXPoVMiAiCFOOXSHucttHGK5mWJGdZfGgp22Dudf6WAj5CLfQew
-   0=;
+  bh=jkjjceUGdKUOF+bM8ANMLtvyrcmkDeIY7OqLCUcCEsc=;
+  b=wEKVX1FmzZx+Jjd4wCr5QtgT6ZPadRwLfGBoWJZGmkxTAnb1bMEJhtky
+   TmylfmukfNnwP1fpKRCkB7P1O6E2cBiiQs/Ay2WyW6tn4OT3q1XZHIx4X
+   /M9xTEW8eKqHcEvtzHUl9ancVMNfRjSpraESE1d4bmzi2ZfnscBloJ4De
+   c=;
 X-IronPort-AV: E=Sophos;i="6.10,160,1719878400"; 
-   d="scan'208";a="117047994"
+   d="scan'208";a="445390513"
 Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:50:28 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:50615]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.141:2525] with esmtp (Farcaster)
- id 5f4b3d4a-1eba-4b7f-afc7-6cb843a0084c; Tue, 20 Aug 2024 03:50:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 5f4b3d4a-1eba-4b7f-afc7-6cb843a0084c
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:50:56 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:57014]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.18:2525] with esmtp (Farcaster)
+ id 76894b81-1c0b-4484-9067-4d7c99dbdb40; Tue, 20 Aug 2024 03:50:56 +0000 (UTC)
+X-Farcaster-Flow-ID: 76894b81-1c0b-4484-9067-4d7c99dbdb40
 Received: from EX19D005ANA004.ant.amazon.com (10.37.240.178) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 20 Aug 2024 03:50:27 +0000
+ Tue, 20 Aug 2024 03:50:55 +0000
 Received: from 682f678c4465.ant.amazon.com (10.119.0.197) by
  EX19D005ANA004.ant.amazon.com (10.37.240.178) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 20 Aug 2024 03:50:23 +0000
+ Tue, 20 Aug 2024 03:50:52 +0000
 From: Takamitsu Iwai <takamitz@amazon.co.jp>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Takamitsu Iwai
 	<takamitz@amazon.co.jp>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 1/2] tcp: Don't drop head OOB when queuing new OOB.
-Date: Tue, 20 Aug 2024 12:49:19 +0900
-Message-ID: <20240820034920.77419-2-takamitz@amazon.co.jp>
+Subject: [PATCH v1 net 2/2] tcp: Don't recv() OOB twice.
+Date: Tue, 20 Aug 2024 12:49:20 +0900
+Message-ID: <20240820034920.77419-3-takamitz@amazon.co.jp>
 X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 In-Reply-To: <20240820034920.77419-1-takamitz@amazon.co.jp>
 References: <20240820034920.77419-1-takamitz@amazon.co.jp>
@@ -75,181 +75,184 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
  EX19D005ANA004.ant.amazon.com (10.37.240.178)
 
-If OOB is not at the head of recvq, it's not dropped when a new OOB is
-queued.
+commit 36893ef0b661 ("af_unix: Don't stop recv() at consumed ex-OOB
+skb.") finds a bug that TCP reads OOB which has been already recv()ed.
 
-OTOH, as commit f5ea0768a255 ("selftest: af_unix: Add
-non-TCP-compliant test cases in msg_oob.c.") points out, TCP drops OOB
-data at the head of recvq when queuing a new OOB data subsequently.
+This bug is caused because current TCP code does not have a process to
+check and skip consumed OOB data. So OOB exists until it is recv()ed
+even if it is already consumed through recv() with MSG_OOB option.
 
-This behavior has been introduced in tcp_check_urg() by deleting
-preceding skb when next MSG_OOB data is received. This process is
-weird OOB handling, and the comment also says this is wrong.
+We add code to check and skip consumed OOB when reading skbs.
 
-We remove this code block for appropriate OOB handling.
+In this patch, we introduce urg_skb in tcp_sock to keep track of skbs
+containing consumed OOB. We make tcp_try_coalesce() avoid coalescing skb to
+urg_skb to locate OOB data at the last byte of urg_skb.
 
-Now TCP works exactly the same way as AF_UNIX, so this patch enables
-kernel to pass the test when removing tcp_incompliant braces.
+I tried not to modify tcp_try_coalesce() by decrementing end_seq when
+OOB data is recv()ed. But this hack does not work when OOB data is at
+the middle of skb by coalescing OOB and normal skbs. Also, when the
+next OOB data comes in, we’ll lose the seq# of the consumed OOB to
+skip during the normal recv().
 
- #  RUN           msg_oob.no_peek.inline_ex_oob_drop ...
- #            OK  msg_oob.no_peek.inline_ex_oob_drop
- ok 18 msg_oob.no_peek.inline_ex_oob_drop
- #  RUN           msg_oob.peek.ex_oob_drop ...
- #            OK  msg_oob.peek.ex_oob_drop
- ok 28 msg_oob.peek.ex_oob_drop
- #  RUN           msg_oob.peek.ex_oob_drop_2 ...
- #            OK  msg_oob.peek.ex_oob_drop_2
- ok 29 msg_oob.peek.ex_oob_drop_2
+Consequently, the code to prevent coalescing is now located within
+tcp_try_coalesce().
 
-Fixes tag refers to the commit of Linux-2.6.12-rc2, but this code was
-written at v2.4.4 which is older than this version.
+This patch enables TCP to pass msg_oob selftests when removing
+tcp_incompliant braces in inline_oob_ahead_break and
+ex_oob_ahead_break tests.
 
-This is a long-standing bug since then, and technically the patch
-slightly changes uAPI, but RFC 6091, published in 2011, suggests TCP
-urgent mechanism should not be used for newer applications in 2011.
+ #  RUN           msg_oob.no_peek.ex_oob_ahead_break ...
+ #            OK  msg_oob.no_peek.ex_oob_ahead_break
+ ok 11 msg_oob.no_peek.ex_oob_ahead_break
+ #  RUN           msg_oob.no_peek.inline_oob_ahead_break ...
+ #            OK  msg_oob.no_peek.inline_oob_ahead_break
+ ok 15 msg_oob.no_peek.inline_oob_ahead_break
+
+We will rewrite existing other code to use urg_skb and remove urg_data
+and urg_seq, which have the same functionality as urg_skb
 
 Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
 ---
- net/ipv4/tcp_input.c                          | 25 ---------
- tools/testing/selftests/net/af_unix/msg_oob.c | 55 ++++++++-----------
- 2 files changed, 22 insertions(+), 58 deletions(-)
+ include/linux/tcp.h                           |  1 +
+ include/net/tcp.h                             |  3 ++-
+ net/ipv4/tcp.c                                | 15 ++++++++++-----
+ net/ipv4/tcp_input.c                          |  5 +++++
+ tools/testing/selftests/net/af_unix/msg_oob.c | 10 ++--------
+ 5 files changed, 20 insertions(+), 14 deletions(-)
 
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 6a5e08b937b3..63234e8680e3 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -243,6 +243,7 @@ struct tcp_sock {
+ 	struct  minmax rtt_min;
+ 	/* OOO segments go in this rbtree. Socket lock must be held. */
+ 	struct rb_root	out_of_order_queue;
++	struct sk_buff *urg_skb;
+ 	u32	snd_ssthresh;	/* Slow start size threshold		*/
+ 	u8	recvmsg_inq : 1;/* Indicate # of bytes in queue upon recvmsg */
+ 	__cacheline_group_end(tcp_sock_read_rx);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 2aac11e7e1cc..4eb0929c0744 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -961,7 +961,8 @@ struct tcp_skb_cb {
+ 	__u8		txstamp_ack:1,	/* Record TX timestamp for ack? */
+ 			eor:1,		/* Is skb MSG_EOR marked? */
+ 			has_rxtstamp:1,	/* SKB has a RX timestamp	*/
+-			unused:5;
++			consumed_urg:1, /* urg data in SKB has already read */
++			unused:4;
+ 	__u32		ack_seq;	/* Sequence number ACK'd	*/
+ 	union {
+ 		struct {
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e03a342c9162..463e89849d6d 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1402,8 +1402,10 @@ static int tcp_recv_urg(struct sock *sk, struct msghdr *msg, int len, int flags)
+ 		msg->msg_flags |= MSG_OOB;
+ 
+ 		if (len > 0) {
+-			if (!(flags & MSG_TRUNC))
++			if (!(flags & MSG_TRUNC)) {
+ 				err = memcpy_to_msg(msg, &c, 1);
++				TCP_SKB_CB(tp->urg_skb)->consumed_urg = true;
++			}
+ 			len = 1;
+ 		} else
+ 			msg->msg_flags |= MSG_TRUNC;
+@@ -2491,11 +2493,13 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 			used = len;
+ 
+ 		/* Do we have urgent data here? */
+-		if (unlikely(tp->urg_data)) {
+-			u32 urg_offset = tp->urg_seq - *seq;
++		if (unlikely(tp->urg_skb == skb || TCP_SKB_CB(skb)->consumed_urg)) {
++			u32 urg_offset = TCP_SKB_CB(skb)->end_seq - *seq - 1;
++
+ 			if (urg_offset < used) {
+ 				if (!urg_offset) {
+-					if (!sock_flag(sk, SOCK_URGINLINE)) {
++					if (!sock_flag(sk, SOCK_URGINLINE) ||
++					    TCP_SKB_CB(skb)->consumed_urg) {
+ 						WRITE_ONCE(*seq, *seq + 1);
+ 						urg_hole++;
+ 						offset++;
+@@ -2530,6 +2534,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ skip_copy:
+ 		if (unlikely(tp->urg_data) && after(tp->copied_seq, tp->urg_seq)) {
+ 			WRITE_ONCE(tp->urg_data, 0);
++			tp->urg_skb = NULL;
+ 			tcp_fast_path_check(sk);
+ 		}
+ 
+@@ -4726,7 +4731,7 @@ static void __init tcp_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rtt_min);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, out_of_order_queue);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 77);
+ 
+ 	/* TX read-write hotpath cache lines */
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, segs_out);
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index e37488d3453f..648d0f3ade78 100644
+index 648d0f3ade78..47eb7b7f31c4 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -5830,31 +5830,6 @@ static void tcp_check_urg(struct sock *sk, const struct tcphdr *th)
- 	/* Tell the world about our new urgent pointer. */
- 	sk_send_sigurg(sk);
+@@ -4851,6 +4851,10 @@ static bool tcp_try_coalesce(struct sock *sk,
  
--	/* We may be adding urgent data when the last byte read was
--	 * urgent. To do this requires some care. We cannot just ignore
--	 * tp->copied_seq since we would read the last urgent byte again
--	 * as data, nor can we alter copied_seq until this data arrives
--	 * or we break the semantics of SIOCATMARK (and thus sockatmark())
--	 *
--	 * NOTE. Double Dutch. Rendering to plain English: author of comment
--	 * above did something sort of 	send("A", MSG_OOB); send("B", MSG_OOB);
--	 * and expect that both A and B disappear from stream. This is _wrong_.
--	 * Though this happens in BSD with high probability, this is occasional.
--	 * Any application relying on this is buggy. Note also, that fix "works"
--	 * only in this artificial test. Insert some normal data between A and B and we will
--	 * decline of BSD again. Verdict: it is better to remove to trap
--	 * buggy users.
--	 */
--	if (tp->urg_seq == tp->copied_seq && tp->urg_data &&
--	    !sock_flag(sk, SOCK_URGINLINE) && tp->copied_seq != tp->rcv_nxt) {
--		struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
--		tp->copied_seq++;
--		if (skb && !before(tp->copied_seq, TCP_SKB_CB(skb)->end_seq)) {
--			__skb_unlink(skb, &sk->sk_receive_queue);
--			__kfree_skb(skb);
--		}
--	}
--
- 	WRITE_ONCE(tp->urg_data, TCP_URG_NOTYET);
- 	WRITE_ONCE(tp->urg_seq, ptr);
+ 	*fragstolen = false;
  
++	/* avoid coalescing to urgent skb since last byte is OOB data*/
++	if (tcp_sk(sk)->urg_skb)
++		return false;
++
+ 	/* Its possible this segment overlaps with prior segment in queue */
+ 	if (TCP_SKB_CB(from)->seq != TCP_SKB_CB(to)->end_seq)
+ 		return false;
+@@ -5857,6 +5861,7 @@ static void tcp_urg(struct sock *sk, struct sk_buff *skb, const struct tcphdr *t
+ 			if (skb_copy_bits(skb, ptr, &tmp, 1))
+ 				BUG();
+ 			WRITE_ONCE(tp->urg_data, TCP_URG_VALID | tmp);
++			tp->urg_skb = skb;
+ 			if (!sock_flag(sk, SOCK_DEAD))
+ 				sk->sk_data_ready(sk);
+ 		}
 diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
-index 535eb2c3d7d1..f3435575dfa5 100644
+index f3435575dfa5..3eee7930b6ed 100644
 --- a/tools/testing/selftests/net/af_unix/msg_oob.c
 +++ b/tools/testing/selftests/net/af_unix/msg_oob.c
-@@ -484,20 +484,17 @@ TEST_F(msg_oob, ex_oob_drop)
+@@ -534,10 +534,7 @@ TEST_F(msg_oob, ex_oob_ahead_break)
+ 	epollpair(true);
+ 	siocatmarkpair(false);
+ 
+-	tcp_incompliant {
+-		recvpair("hellowol", 8, 10, 0);	/* TCP recv()s "helloworl", why "r" ?? */
+-	}
+-
++	recvpair("hellowol", 8, 10, 0);
  	epollpair(true);
  	siocatmarkpair(true);
  
--	sendpair("y", 1, MSG_OOB);		/* TCP drops "x" at this moment. */
-+	sendpair("y", 1, MSG_OOB);
- 	epollpair(true);
-+	siocatmarkpair(false);
- 
--	tcp_incompliant {
--		siocatmarkpair(false);
--
--		recvpair("x", 1, 1, 0);		/* TCP drops "y" by passing through it. */
--		epollpair(true);
--		siocatmarkpair(true);
-+	recvpair("x", 1, 1, 0);
-+	epollpair(true);
-+	siocatmarkpair(true);
- 
--		recvpair("y", 1, 1, MSG_OOB);	/* TCP returns -EINVAL. */
--		epollpair(false);
--		siocatmarkpair(true);
--	}
-+	recvpair("y", 1, 1, MSG_OOB);
-+	epollpair(false);
-+	siocatmarkpair(true);
- }
- 
- TEST_F(msg_oob, ex_oob_drop_2)
-@@ -506,23 +503,17 @@ TEST_F(msg_oob, ex_oob_drop_2)
- 	epollpair(true);
- 	siocatmarkpair(true);
- 
--	sendpair("y", 1, MSG_OOB);		/* TCP drops "x" at this moment. */
-+	sendpair("y", 1, MSG_OOB);
- 	epollpair(true);
--
--	tcp_incompliant {
--		siocatmarkpair(false);
--	}
-+	siocatmarkpair(false);
- 
- 	recvpair("y", 1, 1, MSG_OOB);
+@@ -623,10 +620,7 @@ TEST_F(msg_oob, inline_oob_ahead_break)
  	epollpair(false);
-+	siocatmarkpair(false);
- 
--	tcp_incompliant {
--		siocatmarkpair(false);
--
--		recvpair("x", 1, 1, 0);		/* TCP returns -EAGAIN. */
--		epollpair(false);
--		siocatmarkpair(true);
--	}
-+	recvpair("x", 1, 1, 0);
-+	epollpair(false);
-+	siocatmarkpair(true);
- }
- 
- TEST_F(msg_oob, ex_oob_ahead_break)
-@@ -692,22 +683,20 @@ TEST_F(msg_oob, inline_ex_oob_drop)
- 	epollpair(true);
  	siocatmarkpair(true);
  
--	sendpair("y", 1, MSG_OOB);		/* TCP drops "x" at this moment. */
-+	sendpair("y", 1, MSG_OOB);
- 	epollpair(true);
- 
- 	setinlinepair();
- 
 -	tcp_incompliant {
--		siocatmarkpair(false);
-+	siocatmarkpair(false);
- 
--		recvpair("x", 1, 1, 0);		/* TCP recv()s "y". */
--		epollpair(true);
--		siocatmarkpair(true);
-+	recvpair("x", 1, 1, 0);
-+	epollpair(true);
-+	siocatmarkpair(true);
- 
--		recvpair("y", 1, 1, 0);		/* TCP returns -EAGAIN. */
--		epollpair(false);
--		siocatmarkpair(false);
+-		recvpair("world", 5, 6, 0);	/* TCP recv()s "oworld", ... "o" ??? */
 -	}
-+	recvpair("y", 1, 1, 0);
-+	epollpair(false);
-+	siocatmarkpair(false);
+-
++	recvpair("world", 5, 6, 0);
+ 	epollpair(false);
+ 	siocatmarkpair(false);
  }
- 
- TEST_F(msg_oob, inline_ex_oob_siocatmark)
 -- 
 2.39.3 (Apple Git-145)
 
