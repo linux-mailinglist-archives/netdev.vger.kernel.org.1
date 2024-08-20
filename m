@@ -1,145 +1,115 @@
-Return-Path: <netdev+bounces-120055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C759581F3
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:18:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8724958203
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:23:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940781C23F70
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:18:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A37981C240A7
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0E318B48D;
-	Tue, 20 Aug 2024 09:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEB118B468;
+	Tue, 20 Aug 2024 09:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIOPiq+V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xh02ydBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CF418A95B;
-	Tue, 20 Aug 2024 09:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDCF18A6C6
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 09:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724145477; cv=none; b=Z1hXmkUEBU7DfhpGeoVEuO78JKQ7zADxo7wkEFjtJa/lTxAIbIAo3JXWa2RNDNhenCk0mecj4kby++/RSFXSlfOrkCpVz/cHrgMNaSMHlqjrvUZ7LqyL5DRzVV7s6pAv+hY/TydDX3+YXSn1uswLnCnplDOwiAVnztHVuusQpKg=
+	t=1724145803; cv=none; b=WQZoP0uxi2HZ3maLDD+dgDrinOTxz/CLSEWDh87x57yBu9j9TXZS7U03DqWrSni8Np1YG85ZEqtdjP/1jpobtS2x0hI3bfYlyGyhuqNoIvu2uyTmiGp7+lRdaMom7vBn7gNYSocS4OOuPV5Z1FP6wB3E8/VBv55wNUTh4FI5ttg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724145477; c=relaxed/simple;
-	bh=D1PblbAhDtG6zJFqDLsx5Mo/b+pVrfHqprGLRoQp7jQ=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=gOdfveig0k7YcrEDez6Gu3h3jH1pd/zUS3UY06GC4GA9KnvG0LYK4meEx+qYvNs7SzDOFB5fSogP1fdY3EQQ8XbqJIPnCCFLlWunAaQVDXcDFj3e8editQc0uUqYKdfAwdVFtugnUi+mct7TEbN11YgKEe0E7sxg62xol5t5J5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIOPiq+V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C558FC4AF0B;
-	Tue, 20 Aug 2024 09:17:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724145476;
-	bh=D1PblbAhDtG6zJFqDLsx5Mo/b+pVrfHqprGLRoQp7jQ=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=MIOPiq+VjVknGOfFscs8z9icMzZJT62JmZJS9BR75KMj4V2ds5+4ObHiuwPzMBTAB
-	 NVK58WTPXrQ0/hyiK9+Lwq+JbDGW3mHkSvDN8pC4Jr9sZG7kC3uvk4Y7WX4u2TpPZO
-	 DPzRGpj6ndUeBuBdeYmA4kdTJraf4PD5SN0BXqn8xqsnOonJppt3m6C4CgsKkcGaN2
-	 ECVxXu9440DPvn3XJsJo0HOBRX2sZEDA8TOGfQ3VJeEGRs8emp26jOc3Rl++5q5K9z
-	 /oFLSXGf/n0eSjLYacul4N4+JaNti5sPIgMdsyoTDlpo2wyZDcuzk02EjTm1nZ8o42
-	 Hmz436P9x5kaQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Brian Norris <briannorris@chromium.org>
-Cc: Frank Li <Frank.Li@nxp.com>,  "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,
-  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor Dooley
- <conor+dt@kernel.org>,  "open list:NETWORKING DRIVERS (WIRELESS)"
- <linux-wireless@vger.kernel.org>,  "open list:NETWORKING DRIVERS"
- <netdev@vger.kernel.org>,  "open list:OPEN FIRMWARE AND FLATTENED DEVICE
- TREE BINDINGS" <devicetree@vger.kernel.org>,  open list
- <linux-kernel@vger.kernel.org>,  imx@lists.linux.dev
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: wireless: convert
- marvel-8xxx.txt to yaml format
-References: <20240816171203.143486-1-Frank.Li@nxp.com>
-	<ZsPccHaCMRgbNk4L@google.com>
-Date: Tue, 20 Aug 2024 12:17:51 +0300
-In-Reply-To: <ZsPccHaCMRgbNk4L@google.com> (Brian Norris's message of "Mon, 19
-	Aug 2024 16:59:44 -0700")
-Message-ID: <87seuzwo1s.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1724145803; c=relaxed/simple;
+	bh=WTK4GJtOEVJl3seAV6d04PdoGeLaK3tCiKuWtnZNVsQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N4zU2EL6nBIrYTQIAFnkl4cRWvQz1IG8UFAXHiPVppUUqLzp/K7a5Atu6gdoVyu34iA69Fv2bF1o4lZsuH8Kk0PbIvYK2Cc9TGp5UuHmLy3Dq7At643X66b6zQf2p963Z52jU3/Q761FNOMyLew1MKcn4qu79jFriPr72gCLRTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xh02ydBV; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-81f96eaa02aso285623139f.2
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 02:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724145801; x=1724750601; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WTK4GJtOEVJl3seAV6d04PdoGeLaK3tCiKuWtnZNVsQ=;
+        b=Xh02ydBV6a+dteJWVF/tSFVeexPbrrLaVzw0PyIwpU61znUL5JFcPI6+51D/9fdFU9
+         OiLWe1tytVXr7zla+Hj1cbSWWf1GkaE9Rl59LhOzI9SsghcFolD4t5mI+z4Jhh+d2XmI
+         jjhUeSd6FdHt70yROCs17NUETDarN8IKzE666Y/NojclCE+Eg8WgwmamhVlYRzlpp2rs
+         /6b3lyyKHFTd1r6ch9pb5AOMYH8uNosnKMqNz/ZiBC0ZLGAn0htuOhmbuAhNf41JEYrB
+         bvRkcRGpbR8uoEULYh36GNfzV7312ZvwTJjyoa5kIplnvRC/CYMQjYVIxLhxJQtJuT+O
+         OwzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724145801; x=1724750601;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WTK4GJtOEVJl3seAV6d04PdoGeLaK3tCiKuWtnZNVsQ=;
+        b=k4eSlt3ppCUtyWgOEqON42n0XiDgnY65dY8jOGbtLXy4qbGfTVVcWy23aJXXUg1lj3
+         GLgOvq/v+gUWJFuFslkokZwyX7UFC967aAB6L7WIGH2a8xemQ/ZQeuwphy6CpncvmEE/
+         qiFruITiKlFim2Ir7CQR8KSNZXSNZVeQGSy6AdU3kIsQJ8GHhRhHX0GQbGQJ8rq5+ccf
+         C4q49Tigpml52QG7jB/eLWeQKhfaxd2KpQkHb4hdM167favho4Rs3d7ZK18rEPE92s5B
+         ZA59WylSn8rgSZ9JQ634hiOfVVpl0H2k/tllJ51BZpY6sKzKyJKSSeFqMuJTGZCcaWRl
+         cO3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUqwnPbncbPdjzlrSagdGd6iYQBokDYCz54GMCzcw2DeR+Ofud20u73wVPIYz0Z/bMz5YTNEiLxGJzoRPskqGxsXQkzi2E0
+X-Gm-Message-State: AOJu0YwcorbXy6bBflMTXVYuZYSNEUvIeEWlSl8sRBi9pAnbjQsKlzuJ
+	FhbJEq6ftlbW3Ob57XzLoUOM7SuK4H65d3aT3Hj22fyVOTBKfeM/Rk21AgHn02n+sDiTHCqbf0t
+	Kk2BxXFZLKxz+Uq+uIoL9OF5IfBM=
+X-Google-Smtp-Source: AGHT+IHiE/bDZ1UN85PB40I3cbKn8VeE9RenUH5dhxBskiAX/It2bk//QSEmdepvzSQpD3MWbnbjIotFhM5Vi/xWZUU=
+X-Received: by 2002:a05:6e02:1689:b0:397:d9a9:8769 with SMTP id
+ e9e14a558f8ab-39d26d6ef73mr148560885ab.24.1724145800925; Tue, 20 Aug 2024
+ 02:23:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CAL+tcoAJic7sWergDhVqAvLLu2tto+b7A8FU_pkwLhq=9qCE1w@mail.gmail.com>
+ <20240820045319.4134-1-kuniyu@amazon.com>
+In-Reply-To: <20240820045319.4134-1-kuniyu@amazon.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 20 Aug 2024 17:22:44 +0800
+Message-ID: <CAL+tcoBO9Y1+aX6hrt5cG_2V2WOXNvEJ58G8pBw2Nt9+VV3pnA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: change source port selection at bind() time
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kernelxing@tencent.com, kuba@kernel.org, ncardwell@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Brian Norris <briannorris@chromium.org> writes:
+Hello Kuniyuki,
 
-> Hi Frank,
+[...]
+> > To be more concise, I would like to state 3 points to see if they are valid:
+> > (1) Extending the option for bind() is the last puzzle of using an
+> > older algorithm for some users. Since we have one in connect(), how
+> > about adding it in bind() to provide for the people favouring the
+> > older algorithm.
 >
-> On Fri, Aug 16, 2024 at 01:12:01PM -0400, Frank Li wrote:
->> Convert binding doc marvel-8xxx.txt to yaml format.
->> Additional change:
->> - Remove marvell,caldata_00_txpwrlimit_2g_cfg_set in example.
->> - Remove mmc related property in example.
->> - Add wakeup-source property.
->> - Remove vmmc-supply and mmc-pwrseq.
->> 
->> Fix below warning:
->> arch/arm64/boot/dts/freescale/imx8mp-beacon-kit.dtb: /soc@0/bus@30800000/mmc@30b40000/wifi@1:
->> failed to match any schema with compatible: ['marvell,sd8997']
->> 
->> Signed-off-by: Frank Li <Frank.Li@nxp.com>
->> ---
->> Change from v1 to v2
->> - Add Brian Norris <briannorris@chromium.org as maintainer
->> - Remove vmmc-supply and mmc-pwrseq
->> - Add wakeup-source
->> - rename to marvell,sd8787.yaml by using one compatible string, suggestted
->> by conor dooley at other binding doc convert review
->> ---
->>  .../bindings/net/wireless/marvell,sd8787.yaml | 93 +++++++++++++++++++
->>  .../bindings/net/wireless/marvell-8xxx.txt    | 70 --------------
->>  2 files changed, 93 insertions(+), 70 deletions(-)
->>  create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
->>  delete mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
->> 
->> diff --git a/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml b/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
->> new file mode 100644
->> index 0000000000000..c6647672b7b1e
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
->> @@ -0,0 +1,93 @@
+> Why do they want to use bind() to pick a random port in the first place ?
 >
->> +  marvell,caldata-txpwrlimit-5g-sub0:
->> +    $ref: /schemas/types.yaml#/definitions/uint8-array
->> +    description: Calibration data for sub-band 0 in the 5GHz band..
->
-> You have an extra period in this line.
->
->> +  marvell,caldata-txpwrlimit-5g-sub1:
->> +    $ref: /schemas/types.yaml#/definitions/uint8-array
->> +    description: Calibration data for sub-band 1 in the 5GHz band..
->
-> Same.
->
->> +    maxItems: 688
->> +
->> +  marvell,caldata-txpwrlimit-5g-sub2:
->> +    $ref: /schemas/types.yaml#/definitions/uint8-array
->> +    description: Calibration data for sub-band 2 in the 5GHz band..
->
-> Same.
->
-> Otherwise, this looks good to me, so feel free to carry my:
->
-> Acked-by: Brian Norris <briannorris@chromium.org>
->
-> (Sometimes Kalle will make trivial fixes like this when applying. I'm
-> not sure if that means you should send v3 anyway, or see if he'll apply
-> this on his own soon enough.)
 
-For wireless-next patches I can easily edit commit messages but not the
-actual patch, so please send v3.
+I feel sorry to bother you again.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+Interesting thing is that I just found some of my personal records
+that show to me: a lot of applications start active connections using
+bind() to find a proper port in Google :) I'm not the only one :p
+Probably coming up with the new algo selecting odd/even ports is the
+reason/compromise for the bind() and non-bind() users. It gave range/2
+for active flow using bind().
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+That's what I want to share with you :) Hope it will waste you and
+Eric precious time :)
+
+In my opinion, whatever the result is, technical communication is
+important which can help the community grow. No hard feelings :)
+
+Thanks,
+Jason
 
