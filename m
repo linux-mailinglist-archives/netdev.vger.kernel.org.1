@@ -1,107 +1,103 @@
-Return-Path: <netdev+bounces-119973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE17957BC0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:06:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45337957BDD
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:19:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D85221F22BF9
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:06:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0A08284550
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A70D1BC58;
-	Tue, 20 Aug 2024 03:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CDA3B796;
+	Tue, 20 Aug 2024 03:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cB6Kxem6"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059B433F9;
-	Tue, 20 Aug 2024 03:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76FF2D627;
+	Tue, 20 Aug 2024 03:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724123158; cv=none; b=EafOL37AV8muTTeFzhdPmNZjJS+HAOfKHQVnYeXlxjEu8lyKHj4O9CxzzrJmUAijEfi5CkIzMkpqM+lM+aGbfFi60gKTcowtsfefoQhEMdgDqbnRhopotiL61hY0dz1uLJB05FT7mPmbj0yAm4yYbxBcfG+SGYo2rXiML8likbM=
+	t=1724123936; cv=none; b=gsVHstHbJqD6knjGqnr4ZRfRFyA7oiqCbbGCzZZvvYoroV+5Sff2LTCTRLAfaeRNcThDnOXiYUjVi+JhwtLBfmyonOuCH4ujcTGS3LqKFr4TGxqR4RlWA0UBlpm3o3E9NZ8B/dAdjondRHQPA8jfVg5y6SiOZuWERETwUQigsVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724123158; c=relaxed/simple;
-	bh=h+lJj32e5Les/AKmys15hgtO+gemKk3QMI/MW5nfIz0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UagTMqbN7jjUOT413paTeEuzLx1z1WoChRs1XSQ16/edixCRBhw8eHJpUggCIYG28vVoKJulAMjdhg3sLRmctwQUP1/iwJL7WHUiWH0vo6GH0NMnPJva65EleJaKfKucLSvogY+JLTyGwXWHDAmWdKqydTKdzXLUvsqwhLGlFIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=43.154.197.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz4t1724123083troqc9q
-X-QQ-Originating-IP: P77o5A9NWfznVPAyzaFB39dZc3GenpqjoGvKa0RjKFQ=
-Received: from localhost.localdomain ( [122.235.140.94])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 20 Aug 2024 11:04:28 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 563778973539283072
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	andrew@lunn.ch,
-	jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com,
-	stable@vger.kernel.org,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net v3] net: ngbe: Fix phy mode set to external phy
-Date: Tue, 20 Aug 2024 11:04:25 +0800
-Message-ID: <E6759CF1387CF84C+20240820030425.93003-1-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1724123936; c=relaxed/simple;
+	bh=Ikp8QHUlGZoFRoqxKC8atllBCgCFtLH80Zna8JP54co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMgNK+ssInM7jHaYBbhVaNNvq8p6TtnbIDcyN/6xc+eBkLrxoKYCGOhQ5YG7rQo3kSHRSCKyQ/NTlGQp/RS8bxkW3Ezezmbcg5538CDyZevzl7IG2K0hKU2mz9mJGuE8Ty1Bl4XJdyV6fMe8ialchjjqwanZsD2glr5U03eb4b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cB6Kxem6; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7126d62667bso2949816b3a.3;
+        Mon, 19 Aug 2024 20:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724123934; x=1724728734; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XfsT65hlvXfFbOFYU/Lw5WoFD/4WxaMOTOIKCSFSVUQ=;
+        b=cB6Kxem6HDcxUmKJE/4mUaX8phIL6i6VodG82KXPc8XUzM2VupX16Nn9H+WOE9deYN
+         nHIIr82naPKqqgRth5cbSwj9OwZH3m+KFF6Q3YjtI8fIGhQ9mT6GJhcqg4C6oGsJcDVZ
+         KRcDO2+8sTqUL9reKHGhGj0gGAZYy0a6nelLGl494nWELrR10U0nM2uIQ2tGlqtJffAv
+         vNJB7C2tpwV5aZki6PAyUGJfsCMyUrhG0YSVE0ICp1XsYFkfQ1X8cDCs1CWLTaej55L6
+         aw8KFdAw3RIqfsbndfdwr947gydDh//BWu77wf9QF62K1ixbThN745Bi9MJfFyV6bdzt
+         B9BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724123934; x=1724728734;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XfsT65hlvXfFbOFYU/Lw5WoFD/4WxaMOTOIKCSFSVUQ=;
+        b=wkJ6/pVKoQR/NryIfPhp4zRZSZ1tamKk8HsIDwoZ1RZFrwL5e6dmTvI8oiwOnQK2iz
+         3MxOD8whsObCuDqC9GrCRf7webvH7HJTjyE4HYxCCgrPtPkZX0nDWhgvnNuCjNpqRGWe
+         HJRae7UE1fUxyCmi9vNPjdkqbCt5Q66kker3utYoVF6ZcYKznUgAmPoaeVpXvQNlr/RJ
+         WBICIWPG16cDK6qAG+BHffNgqvDTqH0TmkrjRIlpO/knGPRddBvBIUGhVNVzc8bG8DI2
+         lo/PnR6LMb60wfrbjBcnYu/SWqmSq0VctkqUsrjNsIDaaXpxONnHsJd7WD97cnMUxZph
+         r+4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXRII8oiqOshZyKXuvFemePRAWnsRkg7/Z1RjP+kzl+u0Qt3dB/rvADU75QugRqcoNvRABcrvyNuoGF/qrXYVNc5ibNduyf41+IKyp/epsRWS2PBocrT/j2uyhxXzyavmSXfUk+8RbE
+X-Gm-Message-State: AOJu0YwJg8KlSFX4m+5MRrMi6gRlb2NTknwUW232LloO9llWWMlGurtl
+	7rx+ojkRbWLbkUjw4YVc8bWYlvW0LCewYdpZ0/3yjJGAbbhH2eVXk8xpDi1xAy2v3A==
+X-Google-Smtp-Source: AGHT+IFmMu0Cx/ptoT4ytm3gGO3H29Yb+5vLyFa/dIE5iXrUeHoXU3JXMYvYHZ+kP5OLXOU2auHAQA==
+X-Received: by 2002:a05:6a00:3cc9:b0:70e:98e2:fdb5 with SMTP id d2e1a72fcca58-713c5224896mr11687381b3a.29.1724123933914;
+        Mon, 19 Aug 2024 20:18:53 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127aef65acsm7267100b3a.117.2024.08.19.20.18.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 20:18:53 -0700 (PDT)
+Date: Tue, 20 Aug 2024 11:18:47 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, Ido Schimmel <idosch@idosch.org>
+Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
+ nettest is available
+Message-ID: <ZsQLFwkNa-JnymGg@Laptop-X1>
+References: <20240820004217.1087392-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820004217.1087392-1-kuba@kernel.org>
 
-The MAC only has add the TX delay and it can not be modified.
-MAC and PHY are both set the TX delay cause transmission problems.
-So just disable TX delay in PHY, when use rgmii to attach to
-external phy, set PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
-And it is does not matter to internal phy.
+On Mon, Aug 19, 2024 at 05:42:17PM -0700, Jakub Kicinski wrote:
+> diff --git a/tools/testing/selftests/net/settings b/tools/testing/selftests/net/settings
+> index ed8418e8217a..a38764182822 100644
+> --- a/tools/testing/selftests/net/settings
+> +++ b/tools/testing/selftests/net/settings
+> @@ -1 +1,2 @@
+>  timeout=3600
+> +profile=1
 
-Fixes: bc2426d74aa3 ("net: ngbe: convert phylib to phylink")
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: stable@vger.kernel.org # 6.3+
----
-v3:
--Rebase the fix commit for net.
-v2:
--Add a comment for the code modification.
--Add the problem in commit messages.
-https://lore.kernel.org/netdev/E9C427FDDCF0CBC3+20240812103025.42417-1-mengyuanlou@net-swift.com/
-v1:
-https://lore.kernel.org/netdev/C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com/
+Excuse me, what's profile used here? I can't find the definition in
+Documentation/dev-tools/kselftest.rst.
 
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-index ec54b18c5fe7..a5e9b779c44d 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-@@ -124,8 +124,12 @@ static int ngbe_phylink_init(struct wx *wx)
- 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
- 	config->mac_managed_pm = true;
- 
--	phy_mode = PHY_INTERFACE_MODE_RGMII_ID;
--	__set_bit(PHY_INTERFACE_MODE_RGMII_ID, config->supported_interfaces);
-+	/* The MAC only has add the Tx delay and it can not be modified.
-+	 * So just disable TX delay in PHY, and it is does not matter to
-+	 * internal phy.
-+	 */
-+	phy_mode = PHY_INTERFACE_MODE_RGMII_RXID;
-+	__set_bit(PHY_INTERFACE_MODE_RGMII_RXID, config->supported_interfaces);
- 
- 	phylink = phylink_create(config, NULL, phy_mode, &ngbe_mac_ops);
- 	if (IS_ERR(phylink))
--- 
-2.43.2
-
+Thanks
+Hangbin
 
