@@ -1,158 +1,183 @@
-Return-Path: <netdev+bounces-120180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB60958811
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:37:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98721958814
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D93912824E3
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:37:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42A1E1F231CB
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90EEA18FDD0;
-	Tue, 20 Aug 2024 13:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ADDA190663;
+	Tue, 20 Aug 2024 13:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WjV+UP6D"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="Cb+Hix1/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-ztdg10011301.me.com (pv50p00im-ztdg10011301.me.com [17.58.6.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C642418A6D1
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADEC19049E
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724161022; cv=none; b=PMyWAoIJKevIeAqupLFlIf3qRYfF96kegi1WMPvNN1U9O0MoqP2sxW1/4wAbi279JrAfhyeC9VzKP7E3eki1sUnRwE9gLqdMOr01moa4oOIyv35Pisn5auehmY74l7MYqmOsD3jQuhiKV+IOOi2WJxP3dy6ppO8I7v/i45VaAiw=
+	t=1724161241; cv=none; b=pePiF5k7byeaXoIJP7RIN6bDptDwLv89+pMNyZtNiQCKsRod12o+BdqJ5WsIP/3jY1ie9dsnOTkVIXWpb+WnBHzjZjuJ37bKWraSNLMa3uN1O8ic9hE1vB9s0dBOurPysqX4Gszm5wO6wydpCINzPOfrhyjk72E24LlZaw7YbpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724161022; c=relaxed/simple;
-	bh=JwfZ3dO5//EIH0Z7LPjYPuhrt7OHpRqI/6XxsjYKDt4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lnnS30b7CDuLgoQQ0EFFYw/nkwJDoYRyENeB7fcrJXr+SPJDnXsO8WX619iDFih4iC1K5h4llxOed5dzDqOkDGgrGCPI15YGp8JyfNFHjzsWbIsN+bUrhlCv4TUuorDItlhJb6EE1GvhIBlYqulGF3B7cz8oUVCS+23KwSJKaJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WjV+UP6D; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a86412d696cso143182166b.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:37:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724161019; x=1724765819; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5RlVnc0o1/OnWyz4BKHc28R1UWiq/NHOMsWRG8ChrMA=;
-        b=WjV+UP6DUt13cI7a5/8hPV4OQKnGO+x35e7/cxDiUY8OJWkRnk8wwiyuVpIcZoscX3
-         35nFlp0OzH0SIzzZScwjKVoSUNe+CzueiLs3+Upj3rYGnj2aztpYlIFhArrVgXSKocc9
-         txKt6WoeOEopQoHe/6oFDhJ29BKLQkVl0UWeeLfSIQ8SFLcirEtW7J/iU4oQvrPZOOvd
-         JQ4usOWh0p6u+3xKIImZ/x9TWpJ+z8gFCAI0djDuPcm1ijUAbgx989p0YAMKVCCBhLwb
-         rvvJHNDDjZ1OCcrl9XKvmjflt9vdKfErz9vINLuamS01GUKuU7zcrEFwB9n4zXdFCoXA
-         1oug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724161019; x=1724765819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5RlVnc0o1/OnWyz4BKHc28R1UWiq/NHOMsWRG8ChrMA=;
-        b=Bfbn8qAIMlRyPCAALCXQDBm/3Kv0XB3BXo9hOfAk0flnKTZTMQWej2UUqoVmGKRkXs
-         bKvtjjHvP41Gm8B8z9WEF57fusrQ0stCYlmeVeLVIvxnvBEC6096y8FrCPpD5a1+dtjg
-         njku2HSy8UwRSterdqg4KuJZDjy2ly3M2ksYzb1uEge3gt+R5dnMitkx1Q1nWFONy4zB
-         0gtXgxvr+AQli4+7NEpW9QM1PujzGIxO8nc/TJxtN/nl1AngYAKmAN7XrH9yR9K0YBs5
-         zRJK6zfE1IAeSuPBeJwG1Ic2jQcKeDCIW5mfPqQrQubA3pLTfhYrjyWV1Su83CKJa/mK
-         HGuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtOZZo5t+0DRat+eHnqDUrDS3EDqIRDhW1RABEqcVCN/Tn7ddhbmWplfCoDX67t4jtTBrdgI7oQt0b1OkUUXn2L82o7NCR
-X-Gm-Message-State: AOJu0YwjU7lNFLQMo0Bkbqg8acbB2nauIGvIURUxx8Q+sz1D7TuB+rga
-	3xloa4Oi2ygJYc/DmZ0L1kLnnEUbQuY/FOrmhvYd8Ocmctzh1W5QgnPxn4QsTnX8GwEu0jEn6BM
-	Ho+3guqtUJvhY6mz1jaPw31rJ/YfmgrnfIOtC
-X-Google-Smtp-Source: AGHT+IH/rJZy6k+rb2FhCa1jLDG0uwBUrZTrzBgSBlVT9TK80NHJMNT5UflArk1pRWJ7IiGv4Bw4+ODzBg5cAQQEqMY=
-X-Received: by 2002:a17:907:d85d:b0:a77:dd1c:6274 with SMTP id
- a640c23a62f3a-a8392a497e0mr975786566b.69.1724161018386; Tue, 20 Aug 2024
- 06:36:58 -0700 (PDT)
+	s=arc-20240116; t=1724161241; c=relaxed/simple;
+	bh=upamO/zsB6rxCI8+LBk1aglbA8pmuHyWtSjpsXZ4qY0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kt7zH7OBWo1eFhtX5Dt3bCt6DGU6US3OCEBGPlzbpoIBOAmH0SJej4ZxE1frus17rw6t8aVPKiB6hrjsyg4v3kCx/1RPAN4Uf+EDfnygE/DlyODtnpLtPZbm/3gKWs0cXk2RxgjLd+gl+OjJ1Tk0dDmiApvmzyyO3Ui+eyp/n58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=Cb+Hix1/; arc=none smtp.client-ip=17.58.6.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1724161239;
+	bh=TT/LBHFFfw+sqeDq9jX/+oamVLetFWgvhvk3Yjmswbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=Cb+Hix1/TL1c++twUnSuWXKWrAsrSpMhHY0xo3hTBVK0IQQL6HGC48SDeSPgpEynM
+	 LcyI3b7qGXi56Q4O3AegpN/gTuPtQ71p6tFxEY5L5HNb9nX/QuSUTiUpO2JirxNiel
+	 wvGipsD5ERi9fH4ahZ+0MA1jVPW2VVuqSucOEFtVbjzLrwa2wyutCi9idp7TqsBPhp
+	 8z6ERTajDMXBRN5vsMJGg8fOcqcDEjkxum0rgaj6ZEL/JuCDFCmQ0AFzSHJk9xrV59
+	 n3Hl2sj+9VLS59xH9V2oejrVb41UJah6/5FC+1XxSh/eT9L+uMMyfMSzaDQhIakkFV
+	 W3/fh+FzXqoDg==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id 33BC1180418;
+	Tue, 20 Aug 2024 13:40:28 +0000 (UTC)
+Message-ID: <2b9fc661-e061-4699-861b-39af8bf84359@icloud.com>
+Date: Tue, 20 Aug 2024 21:40:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820034920.77419-1-takamitz@amazon.co.jp> <20240820034920.77419-3-takamitz@amazon.co.jp>
-In-Reply-To: <20240820034920.77419-3-takamitz@amazon.co.jp>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Aug 2024 15:36:47 +0200
-Message-ID: <CANn89i+cLhi8t04=+3LYh_8qDQA3fYZmKyGBuqitX+==KOvLLQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net 2/2] tcp: Don't recv() OOB twice.
-To: Takamitsu Iwai <takamitz@amazon.co.jp>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] driver core: Make parameter check consistent for
+ API cluster device_(for_each|find)_child()
+To: Ira Weiny <ira.weiny@intel.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
+ <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
+ <20240815-const_dfc_prepare-v2-1-8316b87b8ff9@quicinc.com>
+ <66c491c32091d_2ddc24294e8@iweiny-mobl.notmuch>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <66c491c32091d_2ddc24294e8@iweiny-mobl.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: YdqiHEQoPhOMJYBRg-96x8Cf4_TimD2Z
+X-Proofpoint-ORIG-GUID: YdqiHEQoPhOMJYBRg-96x8Cf4_TimD2Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-20_09,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ clxscore=1015 bulkscore=0 phishscore=0 adultscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2408200101
 
-On Tue, Aug 20, 2024 at 5:51=E2=80=AFAM Takamitsu Iwai <takamitz@amazon.co.=
-jp> wrote:
->
-> commit 36893ef0b661 ("af_unix: Don't stop recv() at consumed ex-OOB
-> skb.") finds a bug that TCP reads OOB which has been already recv()ed.
->
-> This bug is caused because current TCP code does not have a process to
-> check and skip consumed OOB data. So OOB exists until it is recv()ed
-> even if it is already consumed through recv() with MSG_OOB option.
->
-> We add code to check and skip consumed OOB when reading skbs.
->
-> In this patch, we introduce urg_skb in tcp_sock to keep track of skbs
-> containing consumed OOB. We make tcp_try_coalesce() avoid coalescing skb =
-to
-> urg_skb to locate OOB data at the last byte of urg_skb.
->
-> I tried not to modify tcp_try_coalesce() by decrementing end_seq when
-> OOB data is recv()ed. But this hack does not work when OOB data is at
-> the middle of skb by coalescing OOB and normal skbs. Also, when the
-> next OOB data comes in, we=E2=80=99ll lose the seq# of the consumed OOB t=
-o
-> skip during the normal recv().
->
-> Consequently, the code to prevent coalescing is now located within
-> tcp_try_coalesce().
->
-> This patch enables TCP to pass msg_oob selftests when removing
-> tcp_incompliant braces in inline_oob_ahead_break and
-> ex_oob_ahead_break tests.
->
->  #  RUN           msg_oob.no_peek.ex_oob_ahead_break ...
->  #            OK  msg_oob.no_peek.ex_oob_ahead_break
->  ok 11 msg_oob.no_peek.ex_oob_ahead_break
->  #  RUN           msg_oob.no_peek.inline_oob_ahead_break ...
->  #            OK  msg_oob.no_peek.inline_oob_ahead_break
->  ok 15 msg_oob.no_peek.inline_oob_ahead_break
->
-> We will rewrite existing other code to use urg_skb and remove urg_data
-> and urg_seq, which have the same functionality as urg_skb
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
-> ---
->  include/linux/tcp.h                           |  1 +
->  include/net/tcp.h                             |  3 ++-
->  net/ipv4/tcp.c                                | 15 ++++++++++-----
->  net/ipv4/tcp_input.c                          |  5 +++++
->  tools/testing/selftests/net/af_unix/msg_oob.c | 10 ++--------
->  5 files changed, 20 insertions(+), 14 deletions(-)
->
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 6a5e08b937b3..63234e8680e3 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -243,6 +243,7 @@ struct tcp_sock {
->         struct  minmax rtt_min;
->         /* OOO segments go in this rbtree. Socket lock must be held. */
->         struct rb_root  out_of_order_queue;
-> +       struct sk_buff *urg_skb;
->         u32     snd_ssthresh;   /* Slow start size threshold            *=
-/
->         u8      recvmsg_inq : 1;/* Indicate # of bytes in queue upon recv=
-msg */
->         __cacheline_group_end(tcp_sock_read_rx);
+On 2024/8/20 20:53, Ira Weiny wrote:
+> Zijun Hu wrote:
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> The following API cluster takes the same type parameter list, but do not
+>> have consistent parameter check as shown below.
+>>
+>> device_for_each_child(struct device *parent, ...)  // check (!parent->p)
+>> device_for_each_child_reverse(struct device *parent, ...) // same as above
+>> device_find_child(struct device *parent, ...)      // check (!parent)
+>>
+> 
+> Seems reasonable.
+> 
+> What about device_find_child_by_name()?
+> 
 
-NACK, sorry, we will not change URG behavior, add yet another
-dangerous dangling pointer.
+Plan to simplify this API implementation by * atomic * API
+device_find_child() as following:
 
-We should not give users the impression this is maintained, useful,
-and works as intended on various OS/kernels.
+https://lore.kernel.org/all/20240811-simply_api_dfcbn-v2-1-d0398acdc366@quicinc.com
+struct device *device_find_child_by_name(struct device *parent,
+ 					 const char *name)
+{
+	return device_find_child(parent, name, device_match_name);
+}
+
+>> Fixed by using consistent check (!parent || !parent->p) for the cluster.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>>  drivers/base/core.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/base/core.c b/drivers/base/core.c
+>> index 1688e76cb64b..b1dd8c5590dc 100644
+>> --- a/drivers/base/core.c
+>> +++ b/drivers/base/core.c
+>> @@ -4004,7 +4004,7 @@ int device_for_each_child(struct device *parent, void *data,
+>>  	struct device *child;
+>>  	int error = 0;
+>>  
+>> -	if (!parent->p)
+>> +	if (!parent || !parent->p)
+>>  		return 0;
+>>  
+>>  	klist_iter_init(&parent->p->klist_children, &i);
+>> @@ -4034,7 +4034,7 @@ int device_for_each_child_reverse(struct device *parent, void *data,
+>>  	struct device *child;
+>>  	int error = 0;
+>>  
+>> -	if (!parent->p)
+>> +	if (!parent || !parent->p)
+>>  		return 0;
+>>  
+>>  	klist_iter_init(&parent->p->klist_children, &i);
+>> @@ -4068,7 +4068,7 @@ struct device *device_find_child(struct device *parent, void *data,
+>>  	struct klist_iter i;
+>>  	struct device *child;
+>>  
+>> -	if (!parent)
+>> +	if (!parent || !parent->p)
+> 
+> Perhaps this was just a typo which should have been.
+> 
+> 	if (!parent->p)
+> ?
+> 
+maybe, but the following device_find_child_by_name() also use (!parent).
+
+> I think there is an expectation that none of these are called with a NULL
+> parent.
+>
+
+this patch aim is to make these atomic APIs have consistent checks as
+far as possible, that will make other patches within this series more
+acceptable.
+
+i combine two checks to (!parent || !parent->p) since i did not know
+which is better.
+
+> Ira
+> 
+>>  		return NULL;
+>>  
+>>  	klist_iter_init(&parent->p->klist_children, &i);
+>>
+>> -- 
+>> 2.34.1
+>>
+> 
+> 
+
 
