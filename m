@@ -1,297 +1,670 @@
-Return-Path: <netdev+bounces-120237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D48958ACA
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:12:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25E4958ADA
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE8FE1F2575A
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:12:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2D791C21DF4
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F44918E77E;
-	Tue, 20 Aug 2024 15:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E975D1922FE;
+	Tue, 20 Aug 2024 15:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MxZVsfii"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYYN5VJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7BA18EFC9
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724166765; cv=fail; b=XEeRPHA1n6fJFLeaO/wpvxZVFAczDPanyGnIew5XIY10/zvXXND3Q5KXgH44XWhDRAFYg6qPbmErgq7vmkaXN0f42RPd/TTbjUzcx3uza1zNLa0Mt2El4tCX+IP1GZq2tanDPY6GeIn+FBpb0di9P1MOUkKY+YCwpVdMW+93sNc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724166765; c=relaxed/simple;
-	bh=PyXhtFb7rgXG3oBaNddSHij3Brl5Ecv2YqzYV3eSLO0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SZcrJtKXhKLcNOk/NYvQkSqv6tMPBuYNpcak78d6Uw1Wn8t7aI/SJZbiXQzFvbSOhlVKUQf/eaZkrlnycWpM7mGMlMFdbqRqPAUgYvPnxy+Hhf6JuAd39iXFvwDi7YwfyhbHPxfKhDcsPdiyWdWN3uklieeUAV+bIcFOCKPsXgI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MxZVsfii; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724166763; x=1755702763;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PyXhtFb7rgXG3oBaNddSHij3Brl5Ecv2YqzYV3eSLO0=;
-  b=MxZVsfiiFZ0V6kHNCj3VI025fbmWz9Oqui/vLBkaFMg7oXIbIAzWuE+h
-   3PmcPHmOiuaa/1DM9YMJ/Bs5PLGlM7n6+IfpKdhJr7ye1xQQ+x5/hEyF5
-   b1UUwlvA5xK0jbuB6T0qbmm+sJH8pq9eGe+/Z/VYpdzQHXCmK6y/GriSd
-   3lGvro0TssP0uz5T3GI3JQUlTtNRsj6yRJ3csn/uWZm7rq9cQi5RGOoik
-   NXGCBAdUNLboQt45Dy4LD6886XoQC8ylnVo68OcXfKrRoKO4IXtQ2eZ2U
-   HkY4zCzYstXqTCoMnU3uInWCdN+eTiwaYADrXmOfJZeP+ut6SIYblrBXo
-   g==;
-X-CSE-ConnectionGUID: VjopOQxzQXCoFZ76h2MuBA==
-X-CSE-MsgGUID: SxGPoSZhSbm9lY1TnrIE8w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="22358574"
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="22358574"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 08:12:41 -0700
-X-CSE-ConnectionGUID: wofLB+TJRfekynZhAcxXZQ==
-X-CSE-MsgGUID: TXh+dkdeRY2MAMvcEOPSmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="60412883"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Aug 2024 08:12:41 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 20 Aug 2024 08:12:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 20 Aug 2024 08:12:40 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 20 Aug 2024 08:12:40 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 20 Aug 2024 08:12:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hAPc7v8HzdhRBjoNgMNyVJ18eQehkZoiCeS8jptAGUvmefF91TMjddAY5Po0aON3UM17DhFLIXorA0YvmjJGUEH/BnYeQCLWcvUZXMb/Yhwc0teLJeCkaClH7CwF86XONNq72tQuX2noGWX7VaWaM/pR6FYZ5YXaNpyVnlImfjDLwbxQOAepWkfVZBRhkb8wr2HneP4e7QoyYG6mTkHAwzjobXaHlwIQF9OBj6PS3XLyEUSXQOZ0QHr8p6/dxCsfrqHjVsyR6f144woXUZJ4FOw3Xd3sB+BXTepFbttyg+T0g1NL3r1uvTgbdSiUOzWSdAql4/D9DAoEEPNJnDzZcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H0y62f5kd2JzJnYIXG8maqB7Av0bS+dEycnB0CcAxUY=;
- b=wHmLr15liLbZrQ1RKe5yLASDsNdZbNYe32/YLbebpTl+AgExQzZ2TER/GSMIxQGVf/d2Ve+TM4wjbA7M4M/Lu5EQf1aEdNQ4mZFG6j73v/d+pcBwJ6Fw7rSR51EInNQpbpfLLJFhLsOaIFeDA/ggOb+z/TgL2YYXqyinhjXuJ8Qm+4sQpFV0TOmwYXW5Luc5DTtO4G+hvdccIQvyhmliLOTtDlUAcAicmDRahSmYA7u1SD3xpiwdcFOmw3ICoLfwGAY1CVqgea79enShvPDZ/VFQsdRapflHc9pcaIsNmsKdvK+dJwdw/+fyI1qML6SSQBEoH2OiWEiRycju7+wf3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MW3PR11MB4569.namprd11.prod.outlook.com (2603:10b6:303:54::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Tue, 20 Aug
- 2024 15:12:37 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Tue, 20 Aug 2024
- 15:12:37 +0000
-Message-ID: <d3745969-df9b-47fa-8854-6654867f94e4@intel.com>
-Date: Tue, 20 Aug 2024 17:12:31 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-CC: <netdev@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, "Jason
- Wang" <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
-	<eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <virtualization@lists.linux.dev>, Si-Wei Liu
-	<si-wei.liu@oracle.com>, Darren Kenny <darren.kenny@oracle.com>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0336.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7d::15) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CF4190049
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724166831; cv=none; b=PA1Ryyc2rgnMz6RL4jxTrpMdSI4wzRuokHBLuq73UIQNbYd7sQQfx52PIA9zzSVps5pPQfcsIu4dy8FMmG+4lrf/lkFMQB1BUsuN7dGvzTRoA2+7cqA08RAo9eO+RtLQBErwbCnpo/klD0oK881xPVxUED8XIFK9JfX3nJrDrLc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724166831; c=relaxed/simple;
+	bh=OCKq2dJmQkF3TJuyyVvr7MplBEArtRIwismqsb6XWCc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mEMBvUB9mcpf1Uh0idhpcDhHXkMgPjbLuLdhl1RyTlFcfTM2AA5QxjCw1lV9nK4G7gjUCxwsXtOF6J1wp6LfdeHRb8NioNBLY4wAhZ/i/4RLyS0js2g4Zbkch7wb/iO5oPPEXs2bLwM26N53t8bkB4zVczC+SHG6K6LpkLSRjao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UYYN5VJG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724166828;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sPNY1ym5QzQJaKDF1TLkJ0LJPpmzFQxHe+BJxkknXsc=;
+	b=UYYN5VJGy7x6lMM7DwNLprpLYgqMPmMA9vCowb9PM35/wvhMITKFweQCMMnYtFD0gxNa3I
+	sh3bpTJ3M1wL119WLx3mzMS5iNBd+BMOq46rjaB5lCTWnjIHm5vfYq2/PUhnjiOfx94B0D
+	MKDqpMOcItW1GzxvUq2PBbb6QFcYleM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-198-2lHIsRssNFGNpXWdvVckcg-1; Tue,
+ 20 Aug 2024 11:13:45 -0400
+X-MC-Unique: 2lHIsRssNFGNpXWdvVckcg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F241A1955BF1;
+	Tue, 20 Aug 2024 15:13:40 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.213])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 31EE419560AA;
+	Tue, 20 Aug 2024 15:13:36 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH v4 net-next 11/12] ice: Support VF queue rate limit and quanta size configuration
+Date: Tue, 20 Aug 2024 17:12:32 +0200
+Message-ID: <cd538b7e540da34f2d3405a5b35cbb54a2812029.1724165948.git.pabeni@redhat.com>
+In-Reply-To: <cover.1724165948.git.pabeni@redhat.com>
+References: <cover.1724165948.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW3PR11MB4569:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08d7f098-9745-4525-d2b5-08dcc12a86ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?b3dsVktxWlNzZllnaVhJVEZaRWw4SUxoSnBxZ1dLcjJsYThVa3RBVXRET3Z0?=
- =?utf-8?B?eVBHQ1Q3am1BNHNTTFlLWEtlWE9abmFvSEJSdVNLWHExQ2JhenlXT2pRSE9o?=
- =?utf-8?B?TTVQVjkxbmUwbjh5TGlSeFkzVkZPN04wM1N3bTZPN3Q4ZHVTMDRZaEozMWs2?=
- =?utf-8?B?STNjcWlseVJKQ21DclJUZFBYekJid0kzcWNhVUtxTE93dXNSV2hKdUIvR09W?=
- =?utf-8?B?UGxLMmRQQzJMc2Nvd2NoMFRTL0hGVmZkT2dFQ25pNVZxQTI2WFlHbjh1V3pM?=
- =?utf-8?B?eG9Qa3h5QzRYeE5NdEpjZUF2L09QQTBNck5vaXNpb0tsOVZCUTV3enBXajA3?=
- =?utf-8?B?dytqbC80SVZsait3ZVdPaUJCQlNta2RxM01QclhCTFo1ODdZMjBPQUJVZGJY?=
- =?utf-8?B?ckpwUk9qdEs5SllGRzE0b0tmZUFlVVBJWnJGRGlxQStwMkcrZDJhbENSQUNR?=
- =?utf-8?B?em9HMEtlTldHVS9HVXhRWHY5MGNzWWl5L1ZyVC9iV2t0NGg2eWQyOTB5c25i?=
- =?utf-8?B?bFExVkFoeERCTHVJMG9iWDFoYXNuaFZrenEzdFF3M0J4R3dMcG9HQjRuclpT?=
- =?utf-8?B?WDJoWU1UT1pMNFVUanJUajZJNlNEUUl6VFNiL3FPdkhmeExUWFROV3h2K0sy?=
- =?utf-8?B?RXg4M2VrYXN6UUFsVkoxMHgzeURWV2J5a2dpMEsvQWQ2WUtLUThGNjdNTTZq?=
- =?utf-8?B?cXZPcjQ5aGlqTEJrTnBRN1QzaDNuVTVOY3EvNXBpZjJyVmtETkdFbURhaUZj?=
- =?utf-8?B?QlcrVkx3N3o2a1pmSXdEV2pHZGJ1ZGZGYjAyR2xVNmIzODdqU3VCUmFObWxa?=
- =?utf-8?B?ZjVWWmJCcEFMT1I3VmhndGptcTJQOG9FeFVvbG5Ka0crbVRyVnl3eitDaHJh?=
- =?utf-8?B?YUE4UHdFY3ZSeEFPMDg5eGhMME5SU1EySHpkOGdCVmpLRkFDZEltNzk0MFdq?=
- =?utf-8?B?NmNOaGZEc2VsT1FPcnp5UUlObWdiRTVUaXd2NVRpU09RdlMrL0tTRFkzeTJo?=
- =?utf-8?B?SWVrK01BbVF0VEVpcDhyeUJhUXlFbWFtMEVVanNzYkkwdy9jMWFSZHNCTTJ1?=
- =?utf-8?B?MzV3TTN0NzU0RklOUGNrenlLRWlIMlg5WDFucVIzYjRnSG5PTnp2Ky83RC9E?=
- =?utf-8?B?OTF4ZG9NRDJYK0tETGo4aWtpV2lGaDBpY3UwMGY5aUtVbE9kYzY0TEIwdHdn?=
- =?utf-8?B?QUs4RG9ZNnVOWXBZSmV0Q2g2SEFTV3V5ZFRSMkRyWEdvT0pvUDlvYjJqS0Jx?=
- =?utf-8?B?Y0w5R0dWOFBUNWZocG5lSzZSR3ZxREcwOTNOTWIrTW9SVURpLyt5UkhEeGpn?=
- =?utf-8?B?dVIram03djhMVXFVUmcrVUNtUWNvUWtUZnhtc0hxYmhpb3VZdnpXTWZLWll1?=
- =?utf-8?B?SVJMbzRrZHIySC9NN2Q3cHN4WHk2d3RMK0NSUGp5alRNVW5TQmkzT0IwSHZn?=
- =?utf-8?B?eGlGVXJRZ3NDY1IyU0o4eU9hOU9YZ3BpcWJJY21MVy9ORmlLNlpTYllDN1Fu?=
- =?utf-8?B?N2JrWWg5U05RaWM5RG1VblJLcllKL1ZXMm92NGQ0V1hML1pYVkhvbk9UQUQw?=
- =?utf-8?B?Q09aVmdmdlRaNGhZd2xLTlFqWUYwUEYrQnRudDlPL25tenJ4M2xhK2FFN254?=
- =?utf-8?B?K1RVUERhSlpxbldVZDhlNXBXRWxBbVhzejRqQkQrZ2YrSzE0OHc4Z0J3T0NW?=
- =?utf-8?B?VlJLRVBTQU9VRVdET1NGUFpsMXR3RnZnN0l6eWpMRCtuMmxOalAwOXBIaDNQ?=
- =?utf-8?Q?Um/XkCqkMMAwZU+iOo=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UU83d2VGeDFQdEFSRE9CM042YVN3Yy9jV21HMFBZV084eStqcmdGSEtMdHJH?=
- =?utf-8?B?d1FscXY5S3QrcVh3R2Job1M3ZndsSjh2WkxOL2FIRTd1ODRZVW1VWnhMQU9R?=
- =?utf-8?B?OG1OU0VsNHQ0NEFMRFBobkNjTjA1L2FVN0hxakRsQ01JRGNMdUJ4RGtONktj?=
- =?utf-8?B?a2JyQUpxcHZabGFlTW85V3dvMnJJZi9oSEtsVGs0aHgrRE5RL2IzaUdIdkRU?=
- =?utf-8?B?VmpHNzdobm5XSm9hYWpld1FoSXQ4MVNLRHN3TE1tU2ZMbTdrdC81MnFsYjJz?=
- =?utf-8?B?T2pUTCszczB4WTRBVzZoemoreFJmaCtEaE5EdmF5ay9JQk1iZjlNaTZvZEVq?=
- =?utf-8?B?TVhWUjlpOXZLNzJvTEZncjlxR2tTREpFVmRGenJCUSsyODhIc1BXSEVnTjFP?=
- =?utf-8?B?Y1FyMk9Uck84RXlVU3J1MUh2YmNvamJRd3BiRnBnWXVxZ25QZVg2ZjVJeDV0?=
- =?utf-8?B?bnN3TkpqK1lqWEx1cHMwelptdzM0Tk1oRmE3TEtJT1ZFTHB2Z3VqWVowZERJ?=
- =?utf-8?B?UTZmZjVhUXVpdnBEdm95SFZKTmxtU0VLai9ONFhhSy9PN2EvclFaV2JPaWE0?=
- =?utf-8?B?WDFqNCtubFo2RVBvaW10dWtrSmVSbHFWWDkxalRtQnhlSW1rTGh6aE5Rd2tM?=
- =?utf-8?B?Y3U1NWcxZUs2N1ZEV2JGUENZdnBOa2ZWM1BFZXBXS3BReUg1WDU0MjBucWJq?=
- =?utf-8?B?UTFlWGVubUlHSWhPVTUrMjZ4cWZjT2ZYL0JpL0pJU2FNTy9OUEdQUVBhaEFZ?=
- =?utf-8?B?bE4raENib0pCMWFHUVh2cXJLeHBVeXYwdlpwcWxjUnNtNEtIY2kwVzdxL2FX?=
- =?utf-8?B?Y3IyZk5YYkFobXd1MjQzUW0rSTFyU2pDVk9Gd0ljQkhTcG95dVdybWVQVHZv?=
- =?utf-8?B?UlkrSHBjUkxrYm5obnlqb1lXZXlHbUFEYWxtd0hoUUE3dVlmYUg3MlFKRWdh?=
- =?utf-8?B?bXNVMWdmaDhtTzZMZkNzclpKa2lhV2d4T2Z6RWVJOVNqWTJYLyt3Ly9ZU1Zu?=
- =?utf-8?B?d3BUR1lYVnhaUTdCV3cxRi9pa29hWi9mazRMWVhFb284RGlTRmFwNzJpWDBv?=
- =?utf-8?B?WGVEVE1hbFVxVkZVVkt2b29tU2hRVWtzKzBnMG51akY0c2kza1V4VDBTVFVx?=
- =?utf-8?B?ZDk4a09TRVZRR0V0SDVFMnMwNDM3QWtyMzZnS1pjQk9LNkRaVFJ1V3E0d3c2?=
- =?utf-8?B?R0dyWmV0aHJtS1RhRWFXd0xCY3dsVGpQNXduRkwraExLdzdWM21YYnBrclpm?=
- =?utf-8?B?ZjF6RUJjSDJudVBtd200SFF6WUtCbEthM1NqMGczdTh4U3dsT2lIT3d2bk9Q?=
- =?utf-8?B?a2dEN2doaSs0Q0pkdDBxTitpTS91b1Y1S2o5Q2xFOW0rdkFxUVVCT05KaHBq?=
- =?utf-8?B?Z0d3YlpZNVFBanMySlRhMFJkYk1TOHBYRmlMMTE4MFZnMjVNTEV4eitFZTl1?=
- =?utf-8?B?T2ZsZzdqQlZRd0YxOS9IeHdXWFZ3cU1sbWhKWUZmanQxNVQyRTRNTWpzNWpa?=
- =?utf-8?B?a1NvY1BQUVp1QXA3T2IrVEgrUTcrS3ZoVDRsTU5PYW56Wk9OMlByc2xmazhu?=
- =?utf-8?B?VElQdHplL1VmdHJBYUsrM2JDaFpESVdvQXptbStLU2xCMW0zL29DN3FZU3lu?=
- =?utf-8?B?RXQ4ZHNDcld0OTZ5REZsZXFHZWtPd3JUY1J3Mk1VRk4zeDhENW5ldnBNOTdH?=
- =?utf-8?B?Q2FKaW14NTk5SGlLQVhpV1J0OVJESnFnT3AwN1BNTDl1T2hQeDdhUmxhTTAz?=
- =?utf-8?B?QUJSSEZsaTNGSjZrZnBwcm4wYWk2N3I3V010SjhzcDdBYTNQZ0IxYVkwSTFP?=
- =?utf-8?B?QW5CWm9zQ3dPNk1GQ013ZGp6VXdrZWdZaituS25iTjBZTHNJekh1QkpRcHVY?=
- =?utf-8?B?azkvNkVmbDlpY0lyZFBiV0VpNmQ4VGkzQ2tsQVVFWTJaV05iVmJtL3RHaFRT?=
- =?utf-8?B?UFNETlZQVVR4ZnFZNGdacFdhanpTVm9USG0way9DdnpVV0xRM0xGaHNBTkpY?=
- =?utf-8?B?empwTHVCV2dvZU9qcmk0Um9JdXpYdHZ2QXBERU1XSzlWSGdnNXZ1NlpxSmZ5?=
- =?utf-8?B?RSsvNE4xdDIybmhLSFBkMjd4eXFyb1pYMFRUUm9nNDk5cG1ET1I5dTRjSmhM?=
- =?utf-8?B?N1V4Z1BUZ3pReFllL3Z4d0xoQ1dIbXZEcFRaWU92ZmtVZTlWOFJiYkxmdElL?=
- =?utf-8?B?aWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08d7f098-9745-4525-d2b5-08dcc12a86ec
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 15:12:37.7851
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h8wjzy0diP3mt74tvUvrTmqCwMJz1vTgr9b06FzpzwTXqfvtRjKx05ScA9NPiaetrnDYQmLsABfXln1kwXecz19q+EB11I6WOZVJhcQgBDo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4569
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Date: Tue, 20 Aug 2024 15:19:13 +0800
+From: Wenjun Wu <wenjun1.wu@intel.com>
 
-> leads to regression on VM with the sysctl value of:
+Add support to configure VF queue rate limit and quanta size.
 
-Where's the beginning of the sentence? You mean, "This overflow leads"?
+For quanta size configuration, the quanta profiles are divided evenly
+by PF numbers. For each port, the first quanta profile is reserved for
+default. When VF is asked to set queue quanta size, PF will search for
+an available profile, change the fields and assigned this profile to the
+queue.
 
-> 
-> - net.core.high_order_alloc_disable=1
+Signed-off-by: Wenjun Wu <wenjun1.wu@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |   2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  21 ++
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 333 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |  11 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
+ 10 files changed, 393 insertions(+)
 
-This `- ` can be removed - at least some syntax highlighters color it in
-red :D
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index caaa10157909..35ace1907a62 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -659,6 +659,8 @@ struct ice_pf {
+ 	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
+ 	struct ice_dplls dplls;
+ 	struct device *hwmon_dev;
++
++	u8 num_quanta_prof_used;
+ };
+ 
+ extern struct workqueue_struct *ice_lag_wq;
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 1facf179a96f..100d4644cfd4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -349,6 +349,8 @@ ice_setup_tx_ctx(struct ice_tx_ring *ring, struct ice_tlan_ctx *tlan_ctx, u16 pf
+ 		break;
+ 	}
+ 
++	tlan_ctx->quanta_prof_idx = ring->quanta_prof_id;
++
+ 	tlan_ctx->tso_ena = ICE_TX_LEGACY;
+ 	tlan_ctx->tso_qnum = pf_q;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 009716a12a26..b22e71dc59d4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2436,6 +2436,25 @@ ice_parse_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
+ 	ice_recalc_port_limited_caps(hw, &func_p->common_cap);
+ }
+ 
++/**
++ * ice_func_id_to_logical_id - map from function id to logical pf id
++ * @active_function_bitmap: active function bitmap
++ * @pf_id: function number of device
++ *
++ * Return: logical PF ID.
++ */
++static int ice_func_id_to_logical_id(u32 active_function_bitmap, u8 pf_id)
++{
++	u8 logical_id = 0;
++	u8 i;
++
++	for (i = 0; i < pf_id; i++)
++		if (active_function_bitmap & BIT(i))
++			logical_id++;
++
++	return logical_id;
++}
++
+ /**
+  * ice_parse_valid_functions_cap - Parse ICE_AQC_CAPS_VALID_FUNCTIONS caps
+  * @hw: pointer to the HW struct
+@@ -2453,6 +2472,8 @@ ice_parse_valid_functions_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+ 	dev_p->num_funcs = hweight32(number);
+ 	ice_debug(hw, ICE_DBG_INIT, "dev caps: num_funcs = %d\n",
+ 		  dev_p->num_funcs);
++
++	hw->logical_pf_id = ice_func_id_to_logical_id(number, hw->pf_id);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+index 91cbae1eec89..af9302f0e376 100644
+--- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
++++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+@@ -6,6 +6,14 @@
+ #ifndef _ICE_HW_AUTOGEN_H_
+ #define _ICE_HW_AUTOGEN_H_
+ 
++#define GLCOMM_QUANTA_PROF(_i)			(0x002D2D68 + ((_i) * 4))
++#define GLCOMM_QUANTA_PROF_MAX_INDEX		15
++#define GLCOMM_QUANTA_PROF_QUANTA_SIZE_S	0
++#define GLCOMM_QUANTA_PROF_QUANTA_SIZE_M	ICE_M(0x3FFF, 0)
++#define GLCOMM_QUANTA_PROF_MAX_CMD_S		16
++#define GLCOMM_QUANTA_PROF_MAX_CMD_M		ICE_M(0xFF, 16)
++#define GLCOMM_QUANTA_PROF_MAX_DESC_S		24
++#define GLCOMM_QUANTA_PROF_MAX_DESC_M		ICE_M(0x3F, 24)
+ #define QTX_COMM_DBELL(_DBQM)			(0x002C0000 + ((_DBQM) * 4))
+ #define QTX_COMM_HEAD(_DBQM)			(0x000E0000 + ((_DBQM) * 4))
+ #define QTX_COMM_HEAD_HEAD_S			0
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index feba314a3fe4..ea2fae9035b5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -406,6 +406,7 @@ struct ice_tx_ring {
+ #define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
+ 	u8 flags;
+ 	u8 dcb_tc;			/* Traffic class of ring */
++	u16 quanta_prof_id;
+ } ____cacheline_internodealigned_in_smp;
+ 
+ static inline bool ice_ring_uses_build_skb(struct ice_rx_ring *ring)
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index b9e443232335..953576003425 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -904,6 +904,7 @@ struct ice_hw {
+ 	u8 revision_id;
+ 
+ 	u8 pf_id;		/* device profile info */
++	u8 logical_pf_id;
+ 
+ 	u16 max_burst_size;	/* driver sets this value */
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index be4266899690..4261fe1c2bcd 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -59,6 +59,13 @@ struct ice_fdir_prof_info {
+ 	u64 fdir_active_cnt;
+ };
+ 
++struct ice_vf_qs_bw {
++	u32 committed;
++	u32 peak;
++	u16 queue_id;
++	u8 tc;
++};
++
+ /* VF operations */
+ struct ice_vf_ops {
+ 	enum ice_disq_rst_src reset_type;
+@@ -140,6 +147,7 @@ struct ice_vf {
+ 	struct devlink_port devlink_port;
+ 
+ 	u16 num_msix;			/* num of MSI-X configured on this VF */
++	struct ice_vf_qs_bw qs_bw[ICE_MAX_RSS_QS_PER_VF];
+ };
+ 
+ /* Flags for controlling behavior of ice_reset_vf */
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 59f62306b9cb..ae330381b995 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -495,6 +495,9 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
+ 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_USO)
+ 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_USO;
+ 
++	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_QOS)
++		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_QOS;
++
+ 	vfres->num_vsis = 1;
+ 	/* Tx and Rx queue are equal for VF */
+ 	vfres->num_queue_pairs = vsi->num_txq;
+@@ -1034,6 +1037,191 @@ static int ice_vc_config_rss_hfunc(struct ice_vf *vf, u8 *msg)
+ 				     NULL, 0);
+ }
+ 
++/**
++ * ice_vc_get_qos_caps - Get current QoS caps from PF
++ * @vf: pointer to the VF info
++ *
++ * Get VF's QoS capabilities, such as TC number, arbiter and
++ * bandwidth from PF.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_get_qos_caps(struct ice_vf *vf)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	struct virtchnl_qos_cap_list *cap_list = NULL;
++	u8 tc_prio[ICE_MAX_TRAFFIC_CLASS] = { 0 };
++	struct virtchnl_qos_cap_elem *cfg = NULL;
++	struct ice_vsi_ctx *vsi_ctx;
++	struct ice_pf *pf = vf->pf;
++	struct ice_port_info *pi;
++	struct ice_vsi *vsi;
++	u8 numtc, tc;
++	u16 len = 0;
++	int ret, i;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	pi = pf->hw.port_info;
++	numtc = vsi->tc_cfg.numtc;
++
++	vsi_ctx = ice_get_vsi_ctx(pi->hw, vf->lan_vsi_idx);
++	if (!vsi_ctx) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	len = struct_size(cap_list, cap, numtc);
++	cap_list = kzalloc(len, GFP_KERNEL);
++	if (!cap_list) {
++		v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
++		len = 0;
++		goto err;
++	}
++
++	cap_list->vsi_id = vsi->vsi_num;
++	cap_list->num_elem = numtc;
++
++	/* Store the UP2TC configuration from DCB to a user priority bitmap
++	 * of each TC. Each element of prio_of_tc represents one TC. Each
++	 * bitmap indicates the user priorities belong to this TC.
++	 */
++	for (i = 0; i < ICE_MAX_USER_PRIORITY; i++) {
++		tc = pi->qos_cfg.local_dcbx_cfg.etscfg.prio_table[i];
++		tc_prio[tc] |= BIT(i);
++	}
++
++	for (i = 0; i < numtc; i++) {
++		cfg = &cap_list->cap[i];
++		cfg->tc_num = i;
++		cfg->tc_prio = tc_prio[i];
++		cfg->arbiter = pi->qos_cfg.local_dcbx_cfg.etscfg.tsatable[i];
++		cfg->weight = VIRTCHNL_STRICT_WEIGHT;
++		cfg->type = VIRTCHNL_BW_SHAPER;
++		cfg->shaper.committed = vsi_ctx->sched.bw_t_info[i].cir_bw.bw;
++		cfg->shaper.peak = vsi_ctx->sched.bw_t_info[i].eir_bw.bw;
++	}
++
++err:
++	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_QOS_CAPS, v_ret,
++				    (u8 *)cap_list, len);
++	kfree(cap_list);
++	return ret;
++}
++
++/**
++ * ice_vf_cfg_qs_bw - Configure per queue bandwidth
++ * @vf: pointer to the VF info
++ * @num_queues: number of queues to be configured
++ *
++ * Configure per queue bandwidth.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vf_cfg_qs_bw(struct ice_vf *vf, u16 num_queues)
++{
++	struct ice_hw *hw = &vf->pf->hw;
++	struct ice_vsi *vsi;
++	int ret;
++	u16 i;
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi)
++		return -EINVAL;
++
++	for (i = 0; i < num_queues; i++) {
++		u32 p_rate, min_rate;
++		u8 tc;
++
++		p_rate = vf->qs_bw[i].peak;
++		min_rate = vf->qs_bw[i].committed;
++		tc = vf->qs_bw[i].tc;
++		if (p_rate)
++			ret = ice_cfg_q_bw_lmt(hw->port_info, vsi->idx, tc,
++					       vf->qs_bw[i].queue_id,
++					       ICE_MAX_BW, p_rate);
++		else
++			ret = ice_cfg_q_bw_dflt_lmt(hw->port_info, vsi->idx, tc,
++						    vf->qs_bw[i].queue_id,
++						    ICE_MAX_BW);
++		if (ret)
++			return ret;
++
++		if (min_rate)
++			ret = ice_cfg_q_bw_lmt(hw->port_info, vsi->idx, tc,
++					       vf->qs_bw[i].queue_id,
++					       ICE_MIN_BW, min_rate);
++		else
++			ret = ice_cfg_q_bw_dflt_lmt(hw->port_info, vsi->idx, tc,
++						    vf->qs_bw[i].queue_id,
++						    ICE_MIN_BW);
++
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * ice_vf_cfg_q_quanta_profile - Configure quanta profile
++ * @vf: pointer to the VF info
++ * @quanta_prof_idx: pointer to the quanta profile index
++ * @quanta_size: quanta size to be set
++ *
++ * This function chooses available quanta profile and configures the register.
++ * The quanta profile is evenly divided by the number of device ports, and then
++ * available to the specific PF and VFs. The first profile for each PF is a
++ * reserved default profile. Only quanta size of the rest unused profile can be
++ * modified.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vf_cfg_q_quanta_profile(struct ice_vf *vf, u16 quanta_size,
++				       u16 *quanta_prof_idx)
++{
++	const u16 n_desc = calc_quanta_desc(quanta_size);
++	struct ice_hw *hw = &vf->pf->hw;
++	const u16 n_cmd = 2 * n_desc;
++	struct ice_pf *pf = vf->pf;
++	u16 per_pf, begin_id;
++	u8 n_used;
++	u32 reg;
++
++	begin_id = (GLCOMM_QUANTA_PROF_MAX_INDEX + 1) / hw->dev_caps.num_funcs *
++		   hw->logical_pf_id;
++
++	if (quanta_size == ICE_DFLT_QUANTA) {
++		*quanta_prof_idx = begin_id;
++	} else {
++		per_pf = (GLCOMM_QUANTA_PROF_MAX_INDEX + 1) /
++			 hw->dev_caps.num_funcs;
++		n_used = pf->num_quanta_prof_used;
++		if (n_used < per_pf) {
++			*quanta_prof_idx = begin_id + 1 + n_used;
++			pf->num_quanta_prof_used++;
++		} else {
++			return -EINVAL;
++		}
++	}
++
++	reg = FIELD_PREP(GLCOMM_QUANTA_PROF_QUANTA_SIZE_M, quanta_size) |
++	      FIELD_PREP(GLCOMM_QUANTA_PROF_MAX_CMD_M, n_cmd) |
++	      FIELD_PREP(GLCOMM_QUANTA_PROF_MAX_DESC_M, n_desc);
++	wr32(hw, GLCOMM_QUANTA_PROF(*quanta_prof_idx), reg);
++
++	return 0;
++}
++
+ /**
+  * ice_vc_cfg_promiscuous_mode_msg
+  * @vf: pointer to the VF info
+@@ -1635,6 +1823,139 @@ static int ice_vc_cfg_irq_map_msg(struct ice_vf *vf, u8 *msg)
+ 				     NULL, 0);
+ }
+ 
++/**
++ * ice_vc_cfg_q_bw - Configure per queue bandwidth
++ * @vf: pointer to the VF info
++ * @msg: pointer to the msg buffer which holds the command descriptor
++ *
++ * Configure VF queues bandwidth.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_cfg_q_bw(struct ice_vf *vf, u8 *msg)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	struct virtchnl_queues_bw_cfg *qbw =
++		(struct virtchnl_queues_bw_cfg *)msg;
++	struct ice_vsi *vsi;
++	u16 i;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states) ||
++	    !ice_vc_isvalid_vsi_id(vf, qbw->vsi_id)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	if (qbw->num_queues > ICE_MAX_RSS_QS_PER_VF ||
++	    qbw->num_queues > min_t(u16, vsi->alloc_txq, vsi->alloc_rxq)) {
++		dev_err(ice_pf_to_dev(vf->pf), "VF-%d trying to configure more than allocated number of queues: %d\n",
++			vf->vf_id, min_t(u16, vsi->alloc_txq, vsi->alloc_rxq));
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	for (i = 0; i < qbw->num_queues; i++) {
++		if (qbw->cfg[i].shaper.peak != 0 && vf->max_tx_rate != 0 &&
++		    qbw->cfg[i].shaper.peak > vf->max_tx_rate)
++			dev_warn(ice_pf_to_dev(vf->pf), "The maximum queue %d rate limit configuration may not take effect because the maximum TX rate for VF-%d is %d\n",
++				 qbw->cfg[i].queue_id, vf->vf_id, vf->max_tx_rate);
++		if (qbw->cfg[i].shaper.committed != 0 && vf->min_tx_rate != 0 &&
++		    qbw->cfg[i].shaper.committed < vf->min_tx_rate)
++			dev_warn(ice_pf_to_dev(vf->pf), "The minimum queue %d rate limit configuration may not take effect because the minimum TX rate for VF-%d is %d\n",
++				 qbw->cfg[i].queue_id, vf->vf_id, vf->max_tx_rate);
++	}
++
++	for (i = 0; i < qbw->num_queues; i++) {
++		vf->qs_bw[i].queue_id = qbw->cfg[i].queue_id;
++		vf->qs_bw[i].peak = qbw->cfg[i].shaper.peak;
++		vf->qs_bw[i].committed = qbw->cfg[i].shaper.committed;
++		vf->qs_bw[i].tc = qbw->cfg[i].tc;
++	}
++
++	if (ice_vf_cfg_qs_bw(vf, qbw->num_queues))
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++
++err:
++	/* send the response to the VF */
++	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++				    v_ret, NULL, 0);
++}
++
++/**
++ * ice_vc_cfg_q_quanta - Configure per queue quanta
++ * @vf: pointer to the VF info
++ * @msg: pointer to the msg buffer which holds the command descriptor
++ *
++ * Configure VF queues quanta.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_cfg_q_quanta(struct ice_vf *vf, u8 *msg)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	u16 quanta_prof_id, quanta_size, start_qid, end_qid, i;
++	struct virtchnl_quanta_cfg *qquanta =
++		(struct virtchnl_quanta_cfg *)msg;
++	struct ice_vsi *vsi;
++	int ret;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	end_qid = qquanta->queue_select.start_queue_id +
++		  qquanta->queue_select.num_queues;
++	if (end_qid > ICE_MAX_RSS_QS_PER_VF ||
++	    end_qid > min_t(u16, vsi->alloc_txq, vsi->alloc_rxq)) {
++		dev_err(ice_pf_to_dev(vf->pf), "VF-%d trying to configure more than allocated number of queues: %d\n",
++			vf->vf_id, min_t(u16, vsi->alloc_txq, vsi->alloc_rxq));
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	quanta_size = qquanta->quanta_size;
++	if (quanta_size > ICE_MAX_QUANTA_SIZE ||
++	    quanta_size < ICE_MIN_QUANTA_SIZE) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	if (quanta_size % 64) {
++		dev_err(ice_pf_to_dev(vf->pf), "quanta size should be the product of 64\n");
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	ret = ice_vf_cfg_q_quanta_profile(vf, quanta_size,
++					  &quanta_prof_id);
++	if (ret) {
++		v_ret = VIRTCHNL_STATUS_ERR_NOT_SUPPORTED;
++		goto err;
++	}
++
++	start_qid = qquanta->queue_select.start_queue_id;
++	for (i = start_qid; i < end_qid; i++)
++		vsi->tx_rings[i]->quanta_prof_id = quanta_prof_id;
++
++err:
++	/* send the response to the VF */
++	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_QUANTA,
++				     v_ret, NULL, 0);
++}
++
+ /**
+  * ice_vc_cfg_qs_msg
+  * @vf: pointer to the VF info
+@@ -3821,6 +4142,9 @@ static const struct ice_virtchnl_ops ice_virtchnl_dflt_ops = {
+ 	.dis_vlan_stripping_v2_msg = ice_vc_dis_vlan_stripping_v2_msg,
+ 	.ena_vlan_insertion_v2_msg = ice_vc_ena_vlan_insertion_v2_msg,
+ 	.dis_vlan_insertion_v2_msg = ice_vc_dis_vlan_insertion_v2_msg,
++	.get_qos_caps = ice_vc_get_qos_caps,
++	.cfg_q_bw = ice_vc_cfg_q_bw,
++	.cfg_q_quanta = ice_vc_cfg_q_quanta,
+ };
+ 
+ /**
+@@ -4177,6 +4501,15 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event,
+ 	case VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2:
+ 		err = ops->dis_vlan_insertion_v2_msg(vf, msg);
+ 		break;
++	case VIRTCHNL_OP_GET_QOS_CAPS:
++		err = ops->get_qos_caps(vf);
++		break;
++	case VIRTCHNL_OP_CONFIG_QUEUE_BW:
++		err = ops->cfg_q_bw(vf, msg);
++		break;
++	case VIRTCHNL_OP_CONFIG_QUANTA:
++		err = ops->cfg_q_quanta(vf, msg);
++		break;
+ 	case VIRTCHNL_OP_UNKNOWN:
+ 	default:
+ 		dev_err(dev, "Unsupported opcode %d from VF %d\n", v_opcode,
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+index 3a4115869153..0c629aef9baf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+@@ -13,6 +13,13 @@
+ /* Restrict number of MAC Addr and VLAN that non-trusted VF can programmed */
+ #define ICE_MAX_VLAN_PER_VF		8
+ 
++#define ICE_DFLT_QUANTA 1024
++#define ICE_MAX_QUANTA_SIZE 4096
++#define ICE_MIN_QUANTA_SIZE 256
++
++#define calc_quanta_desc(x)	\
++	max_t(u16, 12, min_t(u16, 63, (((x) + 66) / 132) * 2 + 4))
++
+ /* MAC filters: 1 is reserved for the VF's default/perm_addr/LAA MAC, 1 for
+  * broadcast, and 16 for additional unicast/multicast filters
+  */
+@@ -61,6 +68,10 @@ struct ice_virtchnl_ops {
+ 	int (*dis_vlan_stripping_v2_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*ena_vlan_insertion_v2_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*dis_vlan_insertion_v2_msg)(struct ice_vf *vf, u8 *msg);
++	int (*get_qos_caps)(struct ice_vf *vf);
++	int (*cfg_q_tc_map)(struct ice_vf *vf, u8 *msg);
++	int (*cfg_q_bw)(struct ice_vf *vf, u8 *msg);
++	int (*cfg_q_quanta)(struct ice_vf *vf, u8 *msg);
+ };
+ 
+ #ifdef CONFIG_PCI_IOV
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
+index d796dbd2a440..c105a82ee136 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
+@@ -84,6 +84,11 @@ static const u32 fdir_pf_allowlist_opcodes[] = {
+ 	VIRTCHNL_OP_ADD_FDIR_FILTER, VIRTCHNL_OP_DEL_FDIR_FILTER,
+ };
+ 
++static const u32 tc_allowlist_opcodes[] = {
++	VIRTCHNL_OP_GET_QOS_CAPS, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++	VIRTCHNL_OP_CONFIG_QUANTA,
++};
++
+ struct allowlist_opcode_info {
+ 	const u32 *opcodes;
+ 	size_t size;
+@@ -104,6 +109,7 @@ static const struct allowlist_opcode_info allowlist_opcodes[] = {
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF, adv_rss_pf_allowlist_opcodes),
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_FDIR_PF, fdir_pf_allowlist_opcodes),
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_VLAN_V2, vlan_v2_allowlist_opcodes),
++	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_QOS, tc_allowlist_opcodes),
+ };
+ 
+ /**
+-- 
+2.45.2
 
-But I think you can just drop this reference to
-high_order_alloc_disable. Just write that if the backing page is
-order-0, then this happens.
-
-> 
-> which could see reliable crashes or scp failure (scp a file 100M in size
-> to VM):
-> 
-> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-> of a new frag. When the frag size is larger than PAGE_SIZE,
-> everything is fine. However, if the frag is only one page and the
-> total size of the buffer and virtnet_rq_dma is larger than one page, an
-> overflow may occur. In this case, if an overflow is possible, I adjust
-> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
-> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
-> the first buffer of the frag is affected.
-> 
-> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
-> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c6af18948092..e5286a6da863 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
->  	void *buf, *head;
->  	dma_addr_t addr;
->  
-> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
-> -		return NULL;
-> -
->  	head = page_address(alloc_frag->page);
->  
->  	dma = head;
-> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
->  	len = SKB_DATA_ALIGN(len) +
->  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->  
-> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-> +		return -ENOMEM;
-
-Why did you move this call into the call sites?
-
-> +
->  	buf = virtnet_rq_alloc(rq, len, gfp);
->  	if (unlikely(!buf))
->  		return -ENOMEM;
-> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
->  	 */
->  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
->  
-> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-> +		return -ENOMEM;
-> +
-> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-> +		len -= sizeof(struct virtnet_rq_dma);
-> +
->  	buf = virtnet_rq_alloc(rq, len + room, gfp);
-
-`len + room` is referenced 3 times here, perhaps is worth a variable?
-
-Is it fine that you decrease @len here?
-
->  	if (unlikely(!buf))
->  		return -ENOMEM;
-
-Thanks,
-Olek
 
