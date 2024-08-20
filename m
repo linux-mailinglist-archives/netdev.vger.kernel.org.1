@@ -1,186 +1,221 @@
-Return-Path: <netdev+bounces-120235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1808A958A36
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:54:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47073958A98
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C33EB288D52
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:54:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9649CB23155
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4D192B6D;
-	Tue, 20 Aug 2024 14:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3052E194A40;
+	Tue, 20 Aug 2024 15:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A3mVYPcn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JpEEjBMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DF61922E9;
-	Tue, 20 Aug 2024 14:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724165640; cv=none; b=NMMg/PKG890pcvi9Mqm/zGI28dNSuXPjAGYW/OgVXOb9wO8xu+IKgd114KRi571pxzC8zbUyGhHuEIagvs+gemo+FSk6h/S/bjgJZkK6s5p/d0OqrMmmPIASltCS1K0aINnoG4QVBVxqIcDJC6yjMMizHIsjVlzrNj+ZBvL31mI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724165640; c=relaxed/simple;
-	bh=PDqL5T42bwr0/utcT1Ml7l0u88ldWUK4M8dTnabKW5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IcLIorNbfWUbuwOFpn9V2jtb0PJ0eeXIep6vxQBTWJURxuTeJtVFlw/sPCXpJzHtO6uHXuQWB2Fs8eaiNS1iGLaQMR6qRrRFPgcF6O0rwhh9Pelizd/9UW5FS5eM9Kr8+fkA0WHszx9BqvFaGZqTfyy60EvfnLc4rbrSNC4/aVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A3mVYPcn; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ef2c0f35f2so4919391fa.1;
-        Tue, 20 Aug 2024 07:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724165637; x=1724770437; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5lPcHvpv1sRtwbunJR9ClPnsil30TdbQ3ASxEknkIMw=;
-        b=A3mVYPcn4IBnh7xXu0vbUitG1qQPlk8KUS2ndLPWwOORxLWU01f/E6zFkff6p+8cuI
-         InMa5P+nR2/CI7foAyuqNxsK/GbWM5Bn2W2CkiB4/FLu0VLAesJ9E1oXx9BULItuUB3I
-         0fCOu3J0ITpscpGPGnT37R48TP48bW8vMesohFEljSyhioONfMCkTEhpFKPMHPz+NLwB
-         lB70scckd8erVTr30oBzjQEvxCxbf/nMlviGOIxDIJ/iQKavX4lqYj1Rz4AkzC/cV/+x
-         VW7uyH//crYDdlX3svfFTZLI181od2ZRn5NH47usYyU8CEPuHw6QuX0JXZ/kaoutDvrT
-         U2eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724165637; x=1724770437;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5lPcHvpv1sRtwbunJR9ClPnsil30TdbQ3ASxEknkIMw=;
-        b=Db62flApackkXNwwV3J4lsADfF0zHxs3lUBgDHjL9xVMpoFqYtDz4kO7rFxWTJ0g8K
-         GWGRFO0utdqOSUKkm9lKpPxUoSEJwgAs0xrj2nqjj7Ye43Hzo+TB1AdACUlMXqLYHxGp
-         qNzy6RtjYv6OBCj1/K2tAJ/bNbQFlvXimYOSacerG9mZbE3ohNhslfzqyHp4hxvIUZR+
-         xWFOIUWSNPJ8ZvGwEqeqdtOTK8qjPyMdRLwnIueiX8bz4lD8gBnl2i2rkqV3vfgUMJoz
-         5UvufFM7sQPgWh7z0/w2APHEh+JLQSqslXbLk+eBy0taL0IlpB+QufusSvxTRJnQrXvd
-         WTUw==
-X-Forwarded-Encrypted: i=1; AJvYcCU645AGujkESdIfTaZXEkQBOpBNN0gT5vr7Kz4zpzQCT8tKnbRbAJnU0GSnJuszWjypyMclGUe0WV2MZHpILzXUWW/0Ft82sLjXnGpp2wSNkuGpDKE+N3jlfQJWrd1yDY9IWepq
-X-Gm-Message-State: AOJu0YyHypHik83TIUTF5WSRgt5nX3QNkPa2MTiTQ03a0y0PsiWEvTbC
-	OrV3fm5+/mmygNH2ZVHDmwx+U/g77My/zELR005xMytYEiWO+S6U
-X-Google-Smtp-Source: AGHT+IFoUVSwvX/j2zn5P5gwCmqWAcX48W3j1vfyGyPqmumyT/lLiUAIbbKhnxvW5iYBBS69JiNtjQ==
-X-Received: by 2002:a05:651c:19a9:b0:2ef:23af:f1f2 with SMTP id 38308e7fff4ca-2f3be78709cmr58117921fa.9.1724165636185;
-        Tue, 20 Aug 2024 07:53:56 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbe7f3e0sm6853312a12.71.2024.08.20.07.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 07:53:55 -0700 (PDT)
-Date: Tue, 20 Aug 2024 17:53:52 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com
-Subject: Re: [PATCH net-next v5 5/7] net: stmmac: support fp parameter of
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D476319004D;
+	Tue, 20 Aug 2024 15:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724166040; cv=fail; b=rAWgLJVScfpvULbCIFuLZI3kXIleRpWuOQEfb8RwWxB02e/JvvIljgl9Y4NfItDK8yH29+iVfMelEKHkoRL2VwaxkuhoUhefgJZT61Z6uMd60D1sFHpOdagG2jYAkqRyiFpEO8amK3Tuspi6E4HpTI2fEvknxPOTctJmR367j6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724166040; c=relaxed/simple;
+	bh=azGnc6d+2Qgp0axmKqlDCUQL0n1AinU+O++Yn9DdhRk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mdxTGMkcdj5OZ2W+0KiOc9pcUdGuEiG0zGONs6Ok1d4wBeS5pRFd/PsYrBap2QxmPu1Y0eS6I0L1a/Jh/M36cH15ylQ1AH9S+PANc6Woe1gu4j3V17X0hHGV+WDR1arp+TcIcTr24ajPVb/uuUVGk9V7sgMnjtNVp0bmFsTsPhA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JpEEjBMG; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724166038; x=1755702038;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=azGnc6d+2Qgp0axmKqlDCUQL0n1AinU+O++Yn9DdhRk=;
+  b=JpEEjBMGuXeuRQamWP1nhStanGOdGc1gWOsn/XR1HWV1q+6AA4iqYpVC
+   2PQZI76sU7yco/b0vrubF3OKGpsFRLs2KPF0iDJDPAdFaOzmi2rxwdpdB
+   tuE4dzZC8Hiv5n9xMmpRLRBaS114Vfx3CurWnEbjPQHpDN9vkug9rnWGF
+   OhhldoshIayaI7NmvmVkLAWaM8XcMS+9dyWeXe1p9xjJnbAK3CdHY0lwk
+   7zIojzHlkz4/RlaadiepQJwciqAygmKscrYHH6PrWHd72dWKonbzoACVH
+   txUN79HZSF1KL/VidduEp5OBrzD5dKQvGBJL7FDIrsYK7wLps44sVRmtv
+   g==;
+X-CSE-ConnectionGUID: wDADTki4Ss2gsSddjE8gbA==
+X-CSE-MsgGUID: Ddsny98rQnWXQZJKGIhD0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="13114584"
+X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
+   d="scan'208";a="13114584"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 08:00:37 -0700
+X-CSE-ConnectionGUID: boaFTkzkTcC5Mzz+ctxWqQ==
+X-CSE-MsgGUID: pWVbrmEKQL6fzvVXuYIMuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
+   d="scan'208";a="98230531"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Aug 2024 08:00:37 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 20 Aug 2024 08:00:36 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 20 Aug 2024 08:00:36 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 08:00:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=A/RIcvzqOxK3ePyUeALSBWpjAK8lmNeYm8ghdS5d3PgxOiPUL4DIuOrjXLHnHd7wY4Ai3mQO/JW5lYORYlP/p+jeJO7I0aHFGccGW4lW7sw611PVJefYI6CSBp0VzO2fvoyM4jiuZyWWWSPlPOJm1LpcsL3bH5Ei/2gG02KLjpP8RWQ4fWP+3HYGQH5KNaIxd5u69B7jq8BEToJiPv6gtOctoe1QIpqn2eZW68MsJzEbOdB9kBmdXEMCb/oFTvSSG0R7dtaEkQD9ZFHCUNw0PIptiT8YUjBgEvjxxbYLDYGSAE6FnwpTsSHE4+hGyRuq5RWsK1Ptkv0/AqJy1kTKIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XXPX7NitPgb1pXIPV4f+h6/5FBdK3hkto97k1oLAo74=;
+ b=KQVOVTJPyiYRML19YSelh396fZL+vQIMJucm0lvVsm6USKOpPF6xOU0ogFzafP4ZZmMU/Is8diUDhf+JWs4qAqChrsf8fMg8hqha2u+iyDLo/9kvGSFnBbjtuIw0yT7vW5Z3q8jqRCkcyL4xU0X+FvVuFLuctNalpGxPE6LGHrcxfg0Wb+hW3J5A76H4JHa4FndPPiEUrHVvFC/PwBx55bGlgYRd/z1NuUZFZBG0fKfIhLnX1+N9XKMMsqZK5XsZ1WlB6AqSbziD3JuqfKXJSXH5v54o/5il0pz30Ipm8hjeNSuMH3VabMZWG8c5gja9JU1NaldBRTtlVsko/vA9Vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by BL1PR11MB6049.namprd11.prod.outlook.com (2603:10b6:208:391::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.19; Tue, 20 Aug
+ 2024 15:00:25 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Tue, 20 Aug 2024
+ 15:00:25 +0000
+Message-ID: <821f0baf-8e40-4623-b342-1028c92e5519@intel.com>
+Date: Tue, 20 Aug 2024 17:00:18 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 5/7] net: stmmac: support fp parameter of
  tc-mqprio
-Message-ID: <20240820145352.kfhvdipr37iivt4l@skbuf>
-References: <cover.1724152528.git.0x1207@gmail.com>
- <cover.1724152528.git.0x1207@gmail.com>
- <d816e312349d0ee4740f5c3068cbcbed17e8d6e3.1724152528.git.0x1207@gmail.com>
- <d816e312349d0ee4740f5c3068cbcbed17e8d6e3.1724152528.git.0x1207@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+CC: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>,
+	<netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<xfr@outlook.com>
+References: <cover.1724145786.git.0x1207@gmail.com>
+ <413a36781a9b215c857bd8ec3c9ee03462e861d7.1724145786.git.0x1207@gmail.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <413a36781a9b215c857bd8ec3c9ee03462e861d7.1724145786.git.0x1207@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0019.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::16) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d816e312349d0ee4740f5c3068cbcbed17e8d6e3.1724152528.git.0x1207@gmail.com>
- <d816e312349d0ee4740f5c3068cbcbed17e8d6e3.1724152528.git.0x1207@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|BL1PR11MB6049:EE_
+X-MS-Office365-Filtering-Correlation-Id: f285ebf2-e6bc-49f5-30a8-08dcc128d26d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VUhOZTVBQXhOM3h3eWpQSG4wRXA5dHNxWEdiWXQ0QmdCbnNMYzNOZFlSQUdo?=
+ =?utf-8?B?SjVPVlhjTmJNUzc1SDdZYXZQNWZLL2EzNGs5WWNWUm5hMGR2Z29OVjA0d25q?=
+ =?utf-8?B?VVpSVGw3VXVHaDMrbitnRWxjSVh4WmdvZUZNNEFNWGZwUkxiV3FvVTBVYitq?=
+ =?utf-8?B?dFcwVHBKWGZKMy9mQmlDNEU0THNwbStKTDZQdjdNSFBmWnRYUVhjUXArL3hD?=
+ =?utf-8?B?QVJud2ZGdTBlKzRxR0tZV0t5c2J2Y0FubHg1a1d0UUdWeWxXSVNabnBnTXJX?=
+ =?utf-8?B?Nks3aSs0cnFuTHE5TzZZR1NmTCsxMWEvNjJKVmYxbU1BZ3NEc1h2M2dHNVh5?=
+ =?utf-8?B?S0RxMFFHSnZSbk5URGt6VkorUHVzakl0MG52SytzMXh6WG5yNEdEVFEwK2RQ?=
+ =?utf-8?B?TVNqeGtTZDNZVDBVekQ5b21zbGgzV3cvRkJHL3FhSDA1NmtLVE1aWXgrK1oy?=
+ =?utf-8?B?bzNtcVpEZjFSUlFjY3c5c3c5VEo1RUxidmgreHVBWXNoRDM0d0l1bjVBVDdt?=
+ =?utf-8?B?ZDZaUTcrSW5TQW15YUE0T1VuVGpEaGxSeWdNRmZndzQ3ZDB3OWlNc1ZYYyt4?=
+ =?utf-8?B?UU11c0V2cFFKK1BYTlNHanZhWFRWeG03TnBHdXZ2QS9ieEswYVF4T3dLQm1P?=
+ =?utf-8?B?cXMwVFVVbFFaRENUNFkvcWM4M3RPeXFWenNpSkRKSzZYWitCNXFEYmZJUmo0?=
+ =?utf-8?B?VUQxWk5NdC9SZVVvcEhHZnpGaUxaSEdtN0JUNGdzeEU0bFY4K1p1Y0kzeGVl?=
+ =?utf-8?B?a211N3lhWHJONnpKbDBmYmhyNEhPL3BvY25SUDlOZlJidi96TGFHV3VqMElm?=
+ =?utf-8?B?amxRWmY3ekR2VDVicWVGUXFoLzl0cVZzU2x2TXJGSXJSQzZaK3I2bXRycHBY?=
+ =?utf-8?B?M2JIeWRUbmVMZHBYZ0YvQ3B4a2F5aVgvMTI1c1FMVHg2SzUvbTNHUmE4dVU1?=
+ =?utf-8?B?OXByUDFZemZNbm9OWlJZbXIvazBjeC9vOEdtV0FDY2RPM3pTaSttS0ZmRnM1?=
+ =?utf-8?B?RzYxeEtGZDJ0TjFIV0h5M0ZCcjdSYURvTTgrUThnblBYN1hZR0tlMnlIYkdC?=
+ =?utf-8?B?UGZscVRhMEtkWG00ZENrRktPU3RDa0pwbGhQcjZqaDBuUUp0TDVSWkJxNHFi?=
+ =?utf-8?B?NDd6L3UwUnVncHVtbUUyNlMvdHRDQm5YZ1c4Tlo2MXArQ281d29qVDB3OXo4?=
+ =?utf-8?B?emtEV0tVNjIrMHFrQzg5aTdRU3dPaVU1WDZLMlpCQ3JtNmhRa1grMlVQL2RP?=
+ =?utf-8?B?ajZCUGQ5K1VpQkI1SjcyaDlSa3hjREFMREtqaTVZVGwzbGdCMjFxeUdHaXlK?=
+ =?utf-8?B?SXZpOHZLamdOenl6cVYwN2pIY0xMeTBRNnhnelQ5N1IwdnNNWGdWK3d5Vmha?=
+ =?utf-8?B?a2ZFRDZqcXZQUitBa1l3VXpHNnhwNmU2ZGZIRjdpMVM1Q21WSnhPQnBrcmxV?=
+ =?utf-8?B?RHFtR2lXUk1wQ2JTWUswWHRpdStMc2gyTytiREYwVnJjcFVVYXBpMThIQktl?=
+ =?utf-8?B?T25zT2NQSHpsejBCR1gyRWRQQll6V0RsRnlIWElXWXNyQkZSVGMvVmVRV1Yx?=
+ =?utf-8?B?UStHYTBSZlROR2FySWdhNXh3NWh1anUzNGVndXEweWEyL1hsckRaTExGdkJQ?=
+ =?utf-8?B?c1g5VTVJT3p2LzB1N29YVm8zcUpWcXc9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZktsOGdWRnVicFQxdnBuNDFKNWZ3c2F5OVZoNXo1ZWJLbFduM09jd0tibWFa?=
+ =?utf-8?B?RU4zZS85WGdkdU5LeU9CQlpkSWh6RVVJTVFwWkxMQ1RIT2VTZGYvWHdyQ3Z5?=
+ =?utf-8?B?ZGFlUWV1WVR3dmh5OTB1MjhzQWM2MGNwcitqSGhKS05aSEdYdzloN0NJbUdV?=
+ =?utf-8?B?bTdlTFhtV3V1d212MGlUSzZXd1k1cDE4L1hqWXRSTFNtSkRQQk5rQmhmaTJr?=
+ =?utf-8?B?cWZqS2JYUi84TVhjdWxMMDdQRERNalRYdnk2OXp5Z2F5dzNYU1UrbmZrQko4?=
+ =?utf-8?B?WGxoNWZjTklMb1U0WUFwem85OTlVN205a1JQdzAzS3NKUytabFM0MFd2K215?=
+ =?utf-8?B?d0FCOVVxd2NWNDlHU1pGcW9rUUQ1ZzM0R3FpRjRCMFlhM3JOSHJUL1ZWb2pB?=
+ =?utf-8?B?MVQwQTNvT3B5bW5kYmNIYVF5WkRoU3BMS0xwUEsyKzZnSVZoQzlLUnFjY0x1?=
+ =?utf-8?B?dmo3azZNVksyUDdYUjJGVnhUcmNUZU9WNFBVQjA3ZFpweTg0VG9GNjhZcXdt?=
+ =?utf-8?B?dGxqTHJsWkpPRE15Rlo3K3pGQlowbmhYSTV2cFVGVnFZSTFqUFNlU296TDkv?=
+ =?utf-8?B?ZndmVjRQMzVnVnZGbERwMU9iejR0R0h0eWVqUlF4TWMzRTUvWFNkT1E4bUVx?=
+ =?utf-8?B?ajJXVGtPd0Q5ak9BemNZc3J4dGJvTUhBbk42NnRmT0t4RC9GTGxjZFVHd0NO?=
+ =?utf-8?B?bWZ2OU9BM1JBRytPdXRxaElvTnBmZUczZnJvaTl4c0dETUZ5OVEvSHF3cFdH?=
+ =?utf-8?B?S2VwL0IxcTNvcG9BeGprdUd2MS9NOUtXMy93RndIcTBReW93UjVoNHh5V0Rw?=
+ =?utf-8?B?anNMWkJ3ekhnajA0ZlJDOXlPQ29kMDE0UzRxOGh5eGRQMWZPWWNpZExCYjN0?=
+ =?utf-8?B?bUpSeDdmWC90cVl1WCtXVlBlTjRlK2xXVkxTby9YQ1N4K1RMandoelRZMFVx?=
+ =?utf-8?B?ODNJa25PbXhQTlBGNTVDeVFtSDFCRFVMTm1SSGxSUTZqcWJ2RGcvcTZtdVE3?=
+ =?utf-8?B?ekhJTXNldS80enZZbEw3SUgzb3N5YlFSRVNIMzFMRFp4VWhPR2NPaHlUU3FS?=
+ =?utf-8?B?RmFzWFJSVGxKZVc2YXk2V1RyUUJtQzJjbHR5RDNobVVaRjRUQkMrSjZMRDVx?=
+ =?utf-8?B?dlJLTElvRHRKaC9RamlQRi9tQUJEQmNQa3MvZUM5WGJoUWFwLzIwdWtCS3hs?=
+ =?utf-8?B?MmsyN1RxSndsMkhaR0JOemNjS20yRmdZU2huRHB6ZWFUVHFVc205R2o0YXN0?=
+ =?utf-8?B?a2NRcW1FaUg0OTYxd0RwY2VCQXFpWVp4QVhJR3d3UUFPaDJ2Vys3QkU3bWxh?=
+ =?utf-8?B?NVZuWDlITmgzakw3NENRcllvNzlGcytuQTk0NExacHcwL1B2SEpidlRCaVhU?=
+ =?utf-8?B?ZXA1UXF1c0MzL1ZTUTNnOVcvajIvSDl4NW1mQ2JKMUQzOVM1TW1UN0dHdTJC?=
+ =?utf-8?B?NzhTMTJ1VVVmdTRkYU9TbzNYbzF0SFB3S2kxZ0dpTXJ1MVJTcnEzYWRJdEhR?=
+ =?utf-8?B?MWJNRWNFOVBuZjdOZ1JnVmFTY0l0b0RWWFZOOWtZK2Noa3ZNczdmRXRzeWps?=
+ =?utf-8?B?RENUODUwazBDVDlEKzVpU204eGdwY3RHOHVoTWMyK3VFVXBXRDc3bVVUQ3JH?=
+ =?utf-8?B?am5vK0ZVSHNRcU9EUFlEQ29SVU5EbU05a3orbkRMaTRGaXRJVjNnUEVjVVJl?=
+ =?utf-8?B?TDF5WSs5dlg0ek9lcjVUZk45V3NHdDBRclk1dlcyZGVxTGNnQjhtbWtzdWkx?=
+ =?utf-8?B?M0FGZDRWM0lFU0lBb3NsbWlabTlUU2F0NUE1WmQ0M0phK09EbGdCQ0N5cGxQ?=
+ =?utf-8?B?aWI0elNzWGtYbUd6RGZ2Z3dsTnVuZEdoekNQUlBDTWtibjk1YWFEODU4eVA4?=
+ =?utf-8?B?NWdrUEZ4VEYxQXNyRGd5aW02SGl0WnduYjdBTmNmL05RRm1GaGhZMmtNMzFa?=
+ =?utf-8?B?UmpzZDNMbjU2dFN5SGtUV0Y4cXhWSnVpa1ByZHNVSE9IRFcxRUZaUHJvNE90?=
+ =?utf-8?B?SWY3MERwcUp1aXNDbTdWSlRNM0x0Rm9yVmIzUWNEWjFOWTcva1c3T1NWZThV?=
+ =?utf-8?B?VkR2REE2akVYZ2lLNmRzZFVTbGtPV0VnWDhyd3J6UzdKQUJGYm1GL1dDaDV3?=
+ =?utf-8?B?dnRiUXp5VzZteFhSaS9JSkV4cjQ1RFRaN1Axclp4cVBTRUw2VkpTa1VHcnk5?=
+ =?utf-8?B?dkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f285ebf2-e6bc-49f5-30a8-08dcc128d26d
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 15:00:25.4370
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J2KCOzNhKtmVSenYPimNXF2i6MV0Va1ModI+dngYiTSloCgSA7im0n/5zy74otXpIVqXJAsSMQYtYBKIl+jHd64gRC6eiUCfJpSOEG1A+G4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6049
+X-OriginatorOrg: intel.com
 
-On Tue, Aug 20, 2024 at 07:20:39PM +0800, Furong Xu wrote:
+From: Furong Xu <0x1207@gmail.com>
+Date: Tue, 20 Aug 2024 17:38:33 +0800
+
 > tc-mqprio can select whether traffic classes are express or preemptible.
 > 
 > After some traffic tests, MAC merge layer statistics are all good.
-> 
-> Local device:
-> ethtool --include-statistics --json --show-mm eth1
-> [ {
->         "ifname": "eth1",
->         "pmac-enabled": true,
->         "tx-enabled": true,
->         "tx-active": true,
->         "tx-min-frag-size": 60,
->         "rx-min-frag-size": 60,
->         "verify-enabled": true,
->         "verify-time": 100,
->         "max-verify-time": 128,
->         "verify-status": "SUCCEEDED",
->         "statistics": {
->             "MACMergeFrameAssErrorCount": 0,
->             "MACMergeFrameSmdErrorCount": 0,
->             "MACMergeFrameAssOkCount": 0,
->             "MACMergeFragCountRx": 0,
->             "MACMergeFragCountTx": 35105,
->             "MACMergeHoldCount": 0
->         }
->     } ]
-> 
-> Remote device:
-> ethtool --include-statistics --json --show-mm end1
-> [ {
->         "ifname": "end1",
->         "pmac-enabled": true,
->         "tx-enabled": true,
->         "tx-active": true,
->         "tx-min-frag-size": 60,
->         "rx-min-frag-size": 60,
->         "verify-enabled": true,
->         "verify-time": 100,
->         "max-verify-time": 128,
->         "verify-status": "SUCCEEDED",
->         "statistics": {
->             "MACMergeFrameAssErrorCount": 0,
->             "MACMergeFrameSmdErrorCount": 0,
->             "MACMergeFrameAssOkCount": 35105,
->             "MACMergeFragCountRx": 35105,
->             "MACMergeFragCountTx": 0,
->             "MACMergeHoldCount": 0
->         }
->     } ]
-> 
-> Tested on DWMAC CORE 5.10a
-> 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  2 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 52 +++++++++++++
->  drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  4 +
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    | 10 +++
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +
->  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 75 +++++++++++++++++++
->  6 files changed, 145 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> index 679efcc631f1..4722bac7e3d4 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> @@ -1266,6 +1266,7 @@ const struct stmmac_ops dwmac410_ops = {
->  	.fpe_irq_status = dwmac5_fpe_irq_status,
->  	.fpe_get_add_frag_size = dwmac5_fpe_get_add_frag_size,
->  	.fpe_set_add_frag_size = dwmac5_fpe_set_add_frag_size,
-> +	.fpe_set_preemptible_tcs = dwmac5_fpe_set_preemptible_tcs,
->  	.add_hw_vlan_rx_fltr = dwmac4_add_hw_vlan_rx_fltr,
->  	.del_hw_vlan_rx_fltr = dwmac4_del_hw_vlan_rx_fltr,
->  	.restore_hw_vlan_rx_fltr = dwmac4_restore_hw_vlan_rx_fltr,
-> @@ -1320,6 +1321,7 @@ const struct stmmac_ops dwmac510_ops = {
->  	.fpe_irq_status = dwmac5_fpe_irq_status,
->  	.fpe_get_add_frag_size = dwmac5_fpe_get_add_frag_size,
->  	.fpe_set_add_frag_size = dwmac5_fpe_set_add_frag_size,
-> +	.fpe_set_preemptible_tcs = dwmac5_fpe_set_preemptible_tcs,
->  	.add_hw_vlan_rx_fltr = dwmac4_add_hw_vlan_rx_fltr,
->  	.del_hw_vlan_rx_fltr = dwmac4_del_hw_vlan_rx_fltr,
->  	.restore_hw_vlan_rx_fltr = dwmac4_restore_hw_vlan_rx_fltr,
+
+[...]
+
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
 > index 4c91fa766b13..1e87dbc9a406 100644
 > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
@@ -195,30 +230,36 @@ On Tue, Aug 20, 2024 at 07:20:39PM +0800, Furong Xu wrote:
 > +				   unsigned long tcs)
 > +{
 > +	struct stmmac_priv *priv = netdev_priv(ndev);
+
+Can't it be const?
+
 > +	void __iomem *ioaddr = priv->ioaddr;
 > +	unsigned long queue_tcs = 0;
+
+Why is @tcs and @queue_tcs unsigned long? You write @queue_tcs via
+writel(), IOW it can't go past %U32_MAX.
+
 > +	int num_tc = ndev->num_tc;
 > +	u32 value, queue_weight;
 > +	u16 offset, count;
+
+Just use u32 here for all three.
+
 > +	int tc, i;
 > +
 > +	if (!tcs)
 > +		goto __update_queue_tcs;
 > +
 > +	for (tc = 0; tc < num_tc; tc++) {
+
+@tc can be declared right here in the loop declaration.
+Also it's u32 as it can't be negative.
+
 > +		count = ndev->tc_to_txq[tc].count;
 > +		offset = ndev->tc_to_txq[tc].offset;
 > +
 > +		if (tcs & BIT(tc))
 > +			queue_tcs |= GENMASK(offset + count - 1, offset);
-
-What does the name "queue_tcs" mean?
-Would this be more descriptively named "preemptible_txqs"?
-
-Also, what is the maximum acceptable plat->tx_queues_to_use value for
-the driver? I assume that the preemptible_txqs bit mask will always fit
-into an unsigned long value (32 or 64 bits)?
-
 > +
 > +		/* This is 1:1 mapping, go to next TC */
 > +		if (count == 1)
@@ -231,6 +272,9 @@ into an unsigned long value (32 or 64 bits)?
 > +
 > +		queue_weight = priv->plat->tx_queues_cfg[offset].weight;
 > +		for (i = 1; i < count; i++) {
+
+Same as with @tc for everything.
+
 > +			if (queue_weight != priv->plat->tx_queues_cfg[offset + i].weight) {
 > +				NL_SET_ERR_MSG_FMT_MOD(extack, "TXQ weight [%u] differs across other TXQs in TC: [%u]",
 > +						       queue_weight, tc);
@@ -240,12 +284,18 @@ into an unsigned long value (32 or 64 bits)?
 > +	}
 > +
 > +__update_queue_tcs:
+
+Again underscores.
+
 > +	value = readl(ioaddr + MTL_FPE_CTRL_STS);
 > +
 > +	value &= ~PEC;
 > +	value |= FIELD_PREP(PEC, queue_tcs);
 > +
 > +	writel(value, ioaddr + MTL_FPE_CTRL_STS);
+
+These are also u32_replace_bits() as in the previous patch.
+
 > +
 > +	return 0;
 > +}
@@ -258,95 +308,16 @@ into an unsigned long value (32 or 64 bits)?
 >  
 >  #define MTL_FPE_CTRL_STS		0x00000c90
 > +#define PEC				GENMASK(15, 8)
+
+Again some driver prefix would be nice to see.
+
 >  #define AFSZ				GENMASK(1, 0)
 >  
 >  #define MTL_RXP_CONTROL_STATUS		0x00000ca0
-> @@ -114,5 +115,8 @@ void dwmac5_fpe_send_mpacket(void __iomem *ioaddr,
->  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev);
->  int dwmac5_fpe_get_add_frag_size(void __iomem *ioaddr);
->  void dwmac5_fpe_set_add_frag_size(void __iomem *ioaddr, u32 add_frag_size);
-> +int dwmac5_fpe_set_preemptible_tcs(struct net_device *ndev,
-> +				   struct netlink_ext_ack *extack,
-> +				   unsigned long tcs);
->  
->  #endif /* __DWMAC5_H__ */
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index ba4418eaa8ba..37e8fecaf042 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -7,6 +7,7 @@
->  
->  #include <linux/netdevice.h>
->  #include <linux/stmmac.h>
-> +#include <net/pkt_cls.h>
->  
->  #define stmmac_do_void_callback(__priv, __module, __cname,  __arg0, __args...) \
->  ({ \
-> @@ -428,6 +429,9 @@ struct stmmac_ops {
->  	int (*fpe_irq_status)(void __iomem *ioaddr, struct net_device *dev);
->  	int (*fpe_get_add_frag_size)(void __iomem *ioaddr);
->  	void (*fpe_set_add_frag_size)(void __iomem *ioaddr, u32 add_frag_size);
-> +	int (*fpe_set_preemptible_tcs)(struct net_device *ndev,
-> +				       struct netlink_ext_ack *extack,
-> +				       unsigned long tcs);
->  };
->  
->  #define stmmac_core_init(__priv, __args...) \
-> @@ -536,6 +540,8 @@ struct stmmac_ops {
->  	stmmac_do_callback(__priv, mac, fpe_get_add_frag_size, __args)
->  #define stmmac_fpe_set_add_frag_size(__priv, __args...) \
->  	stmmac_do_void_callback(__priv, mac, fpe_set_add_frag_size, __args)
-> +#define stmmac_fpe_set_preemptible_tcs(__priv, __args...) \
-> +	stmmac_do_callback(__priv, mac, fpe_set_preemptible_tcs, __args)
->  
->  /* PTP and HW Timer helpers */
->  struct stmmac_hwtimestamp {
-> @@ -623,6 +629,8 @@ struct stmmac_tc_ops {
->  			 struct tc_etf_qopt_offload *qopt);
->  	int (*query_caps)(struct stmmac_priv *priv,
->  			  struct tc_query_caps_base *base);
-> +	int (*setup_mqprio)(struct stmmac_priv *priv,
-> +			    struct tc_mqprio_qopt_offload *qopt);
 
-I don't really understand this (the driver authors really love function pointers).
+[...]
 
-We have stmmac_tc_ops, but all hwifs either set it to dwmac510_tc_ops, or NULL?
-And within dwmac510_tc_ops, we have the second round of function pointers,
-for fpe_set_preemptible_tcs(), depending on the _actual_ hwif?!
-
-Shouldn't any differentiation among mqprio implementations be done primarily
-at this stage here?
-
->  };
->  
->  #define stmmac_tc_init(__priv, __args...) \
-> @@ -639,6 +647,8 @@ struct stmmac_tc_ops {
->  	stmmac_do_callback(__priv, tc, setup_etf, __args)
->  #define stmmac_tc_query_caps(__priv, __args...) \
->  	stmmac_do_callback(__priv, tc, query_caps, __args)
-> +#define stmmac_tc_setup_mqprio(__priv, __args...) \
-> +	stmmac_do_callback(__priv, tc, setup_mqprio, __args)
->  
->  struct stmmac_counters;
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3df9cad0848b..dcf2b5ea7b4f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -6274,6 +6274,8 @@ static int stmmac_setup_tc(struct net_device *ndev, enum tc_setup_type type,
->  	switch (type) {
->  	case TC_QUERY_CAPS:
->  		return stmmac_tc_query_caps(priv, priv, type_data);
-> +	case TC_SETUP_QDISC_MQPRIO:
-> +		return stmmac_tc_setup_mqprio(priv, priv, type_data);
->  	case TC_SETUP_BLOCK:
->  		return flow_block_cb_setup_simple(type_data,
->  						  &stmmac_block_cb_list,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> index a58282d6458c..08fda0ed5ff3 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> @@ -1174,6 +1174,13 @@ static int tc_query_caps(struct stmmac_priv *priv,
+> @@ -1174,6 +1175,13 @@ static int tc_query_caps(struct stmmac_priv *priv,
 >  			 struct tc_query_caps_base *base)
 >  {
 >  	switch (base->type) {
@@ -354,13 +325,16 @@ at this stage here?
 > +		struct tc_mqprio_caps *caps = base->caps;
 > +
 > +		caps->validate_queue_counts = true;
+
+Why not base->caps->blah directly? I think it would fit 80 cols?
+
 > +
 > +		return 0;
 > +	}
 >  	case TC_SETUP_QDISC_TAPRIO: {
 >  		struct tc_taprio_caps *caps = base->caps;
 >  
-> @@ -1190,6 +1197,73 @@ static int tc_query_caps(struct stmmac_priv *priv,
+> @@ -1190,6 +1198,78 @@ static int tc_query_caps(struct stmmac_priv *priv,
 >  	}
 >  }
 >  
@@ -384,11 +358,19 @@ at this stage here?
 > +	int num_stack_tx_queues = 0;
 > +	int num_tc = qopt->num_tc;
 > +	u16 offset, count;
+
+Also u32 for most of these.
+
 > +	int tc, err;
 > +
 > +	if (!num_tc) {
 > +		stmmac_reset_tc_mqprio(ndev, extack);
 > +		return 0;
+> +	}
+> +
+> +	if (mqprio->preemptible_tcs && !ethtool_dev_mm_supported(ndev)) {
+> +		NL_SET_ERR_MSG_MOD(extack, "Device does not support preemption");
+> +		return -EOPNOTSUPP;
 > +	}
 > +
 > +	err = netdev_set_num_tc(ndev, num_tc);
@@ -397,7 +379,7 @@ at this stage here?
 > +
 > +	/* DWMAC CORE4+ can not programming TC:TXQ mapping to hardware.
 
-s/can not programming TC:TXQ/cannot program the TC:TXQ/
+"can't program" or "can't do programming" or "doesn't support programming".
 
 > +	 * Synopsys Databook:
 > +	 * "The number of Tx DMA channels is equal to the number of Tx queues,
@@ -408,69 +390,8 @@ s/can not programming TC:TXQ/cannot program the TC:TXQ/
 > +	 * Thus preemptible_tcs should be handled in a per core manner.
 > +	 */
 
-What is the justification for programming the TC:TXQ mapping, for the
-hwifs where that is configurable, in a method named fpe_set_preemptible_tcs()
-though? Your intention is for that method to do so much more than its
-name would suggest, at least for DWXGMAC. Either restrict its purpose to
-just deal with the preemptible TCs as described, or rename it to make it
-clear that it applies an entire mqprio queue configuration.
+[...]
 
-> +	for (tc = 0; tc < num_tc; tc++) {
-> +		offset = qopt->offset[tc];
-> +		count = qopt->count[tc];
-> +		num_stack_tx_queues += count;
-> +
-> +		err = netdev_set_tc_queue(ndev, tc, count, offset);
-> +		if (err)
-> +			goto err_reset_tc;
-> +	}
-> +
-> +	err = netif_set_real_num_tx_queues(ndev, num_stack_tx_queues);
-> +	if (err)
-> +		goto err_reset_tc;
-> +
-> +	err = stmmac_fpe_set_preemptible_tcs(priv, ndev, extack,
-> +					     mqprio->preemptible_tcs);
-> +	if (err)
-> +		goto err_reset_tc;
-
-Oh, the pains of stmmac_do_callback().... If the hwif does not
-implement stmmac_ops :: fpe_set_preemptible_tcs(), this will
-return -EINVAL and not set any extack message, leading the user
-to ask himself "which parameter is invalid?!". The tc subsystem is
-notorious for being cryptic in its errors, and we should try to not
-make that any worse.
-
-Also, since the check for the presence of the function pointer is
-bundled up with the call itself, you are forced to do a lot of useless
-work when you could have tested at the very beginning for the presence
-of the function, and returned -EOPNOTSUPP prior to having changed
-anything. It is an antipattern which actively results in worse code by
-using it.
-
-Would you be against "open-coding" it, and testing the function pointer
-early, to return -EOPNOTSUPP and set the extack message?
-
-> +
-> +	return 0;
-> +
-> +err_reset_tc:
-> +	stmmac_reset_tc_mqprio(ndev, extack);
-> +
-> +	return err;
-> +}
-> +
->  const struct stmmac_tc_ops dwmac510_tc_ops = {
->  	.init = tc_init,
->  	.setup_cls_u32 = tc_setup_cls_u32,
-> @@ -1198,4 +1272,5 @@ const struct stmmac_tc_ops dwmac510_tc_ops = {
->  	.setup_taprio = tc_setup_taprio,
->  	.setup_etf = tc_setup_etf,
->  	.query_caps = tc_query_caps,
-> +	.setup_mqprio = tc_setup_mqprio,
->  };
-> -- 
-> 2.34.1
-> 
-
+Thanks,
+Olek
 
