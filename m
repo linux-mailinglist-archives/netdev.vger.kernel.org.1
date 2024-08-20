@@ -1,148 +1,108 @@
-Return-Path: <netdev+bounces-119950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB51E957A9E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:54:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ECCB957AA3
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DBD31F23617
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:54:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A1728458E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61188A94F;
-	Tue, 20 Aug 2024 00:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F57917BB4;
+	Tue, 20 Aug 2024 00:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Orgs93pA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1jYPkt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17628BE0
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAE417BA4
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724115272; cv=none; b=saBERbafVXdMY9PGtFnTz8ql2GdB7IpbgRTAWqxUYULmJz6rbvgnWpS7VhwZwn+asOLVKFXSyOTncfvzUFRNLp0aLSBDvQCYOy8WLZxi2rqsAe9pSprlAMjHljeVpylTKkMKxVM4VcLQQHIegN9u4uzVyBDh/L6PDwEYeebxHJU=
+	t=1724115538; cv=none; b=Y3MMhWSQsE51pKqj0ncU5pKZ1vXkNaZxHtOPOv5OCsHDJjIXzibZXnwUbebmsf6vvKULQCf1nPO7E/QKcmQV+KVPgNxvxqLOJf6d7R0Yw/bRKPGqLyGPk9FK/bcT2MwskQgQ1YJNsAvWLJkGVE5V8c9CUmFelW+/IRD+l0wrBQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724115272; c=relaxed/simple;
-	bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GOOdPRG2+zadMc2bu2Myi3/++EHnU41KOA7W4W+L1lgNQxOOh232FicYlXXHC8sqgXcwHgcK+AZC0BkjgaAipWp7qtiYvip25oq0WxigLr4G9UIwJ01ue01qKU1JlS7P87IRUCSQgji4hcLpBh0NaS1M6Pp4/6vSPGHkYFy4Y3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Orgs93pA; arc=none smtp.client-ip=209.85.166.172
+	s=arc-20240116; t=1724115538; c=relaxed/simple;
+	bh=HbXRahyRQ6PpB6I30XAn8tIdi3t+cE0Zkao9pNlXiew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uufQ/4m5fZkOk/pc5z0zVb84mHR5WS8q32l+gX3pXkUFCAGC8R3IfrBk0iu4LI1eDGAJVd59LXvJaVgEAAg2wRMwpGhKldLxfwCBdzdmr24kwiyo2zEifv7U+HXLMQyQsvAvXk3oEgHDxVW6cwC+UnjiRG0eYHWrZRjEPWNUxkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1jYPkt3; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-39d46ae7863so5843745ab.0
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 17:54:30 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2d3d662631aso3316716a91.1
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 17:58:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724115269; x=1724720069; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
-        b=Orgs93pAbZAZEsoRJXhb1NL3rlsrZ03YPSJ9beLiSl1wGH48UE/9O063ZXk2uDhvjK
-         zdxr5YmPmpgLJ4ga1kdV8roCouR37K0Em3ORl4Y4XwwlCM8HXzZYvbjPRy1qIjqY7vzx
-         FLh5Qh3mLEWw76kLyDkH8WBkJQt0QE0uCNmHZV/XuwiuFR704J7ORrVtRb1TqDQb/Pwe
-         MUuz6wMsKudZLlRofWR/xZV1dPt72zLEThnNxCW8XR8xIywePxm0/aRTM1I7VQuVR+F7
-         YkBw+GMpi+PW3C8VIwj/v2w6RocjXucZkpGoUQa+n/GbP8Lrx1D75sZqRhh2nCoK0sKE
-         PFHA==
+        d=gmail.com; s=20230601; t=1724115536; x=1724720336; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oe9ob00k00Oma+vP7QfBVswLmNcdDPZmN+qvhP/jD0M=;
+        b=K1jYPkt3OVO/8M70b9cy5+L7inLoLPnyc7+khJmAvduLGoLV02Bq04QtvIS3C5I0C2
+         /xCr/1EP3x6eJEuN4DIGdv7PNKOg8bUpFgBfIVEGEFTaHcoyGcJ0KLjs+Qad7DFAoknD
+         xRamM2dGUcaD9/eUa7qgwl7QxYxOkvSRASAa8WK+iDbxCmxOdKKvT3+dzx5zEuWVstcC
+         VjLl7BVhMSPAX4oG3Y5ZU7ansQFDuSifIOPE9fy6BVA2zNSL09KD42Y1iVgf0/WBXFso
+         pv++7TU//CgTvgQAC2VO9dkPKsMzExmeQLXd32FAygETOLLa89BdAvRsTLz+EZWfZ5Rd
+         1OyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724115269; x=1724720069;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
-        b=C9tNauhH7H9MOATXsVcn1TUfmgRxsRUGb55tP97pTzI5H2MViJF0tYz4h8LcsMGmCO
-         2T3cZ9+2nOSZ/bZmAStOm6ws4JMfjf1FmqN9tPMEVL2TAU6enASeJokEguKzAo+l8hOs
-         MiRJbmfwzILr1VT6u5nv+Cw5B6TAulx4Qzpdlyhb3o9OVkQblyR4ZyhJkOe7un1iJ6zk
-         wlzYTsUzcaSl86jpuEg2T/fQDnyj2hcrfqKZLxrvFzMtWKgNQy5DZr+z35wZvTWqjxUe
-         lsa8tc1TPssAdWL8jbFzyqOJRmI4oXH+yupEXDGooQQsZmtiNRucWlQ3+k/KJuJl1baz
-         DYuA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6s0tsZOujRyV9H3bugBDvYRlKX+NwJzsLEbNAnFZL7VtBhmXqG9NcPww/gu3shwu4j/5RIBcDfYfqsCVclTfr6L+2TWvr
-X-Gm-Message-State: AOJu0Yx0Vn2B3nUmPiGNJWJkSncN/hYSPBhYteFiBnA82lB1/n7MkGtm
-	Yf0pNv9GMCEHYUedC+q16OLnnwoF59ppvs44sMYc+NwY3Gq+t41lCm2AnIvBnjK+KoPxThMHij9
-	bgMcss81wb9saRa47QKyM5vAUQzc=
-X-Google-Smtp-Source: AGHT+IHLWDfmiygFJk6fTZuBAGGazX8AO1dCbpejO74nj2Y0VR8PlRjm0NoRXfExteHeuTW6e0Il2dK3JPPakVvyXPk=
-X-Received: by 2002:a05:6e02:1c0c:b0:39b:3244:a355 with SMTP id
- e9e14a558f8ab-39d56e42e4fmr17431355ab.11.1724115269381; Mon, 19 Aug 2024
- 17:54:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724115536; x=1724720336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oe9ob00k00Oma+vP7QfBVswLmNcdDPZmN+qvhP/jD0M=;
+        b=j+lz6V6S74C3pEBNmEZ3rVNUZHKkTvbZRj8dsfvNp+iPNc3XfYl/Zwph4xxjyZGz3e
+         rvwW7l/pP4qNcTQTlosxCiOzYsxi9q9LFVdSHd3GyVJzOlrvbHOFWgY8pLuZ3v+PvpU6
+         o47WQ43vWafwqoBRLZTRGeuFhqsiKZpyfqr1upqX4XC8A0Mwyn8QKwTrw2SbFdetvC3m
+         7ioqNOlnyiT0RECVzkgKtp5SsxkklJVS3cwYglmk+RP1ZxSs+XsKc9FaGtw4sae1awfY
+         c97nfYDZUGW3giz2CEWNziI+wHTC7FS+jfHARiOQuMFkO12HUXgShjYiceagerPw2q5o
+         rSxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYRKfDpyGXe6QMzdssIaBZnHvb+GwbH9bZQt0tBkb3kl63WebCWBRL8bPp2phOoYFXeCdKACvgVlgjoXR11DfGbKN2OWsq
+X-Gm-Message-State: AOJu0YxgVdeza5ZIg2CrQR60jRYYwDV5SRXGeGrg19/EMAowcd6kV5Ee
+	1jzbzJv6xak3nBFMADE5zsAcSzTeHt0034BcEyLvFSmluP8BY/P3kpFhLjPLkhk=
+X-Google-Smtp-Source: AGHT+IH3i64QbCJWd4oM30WKJh8BDld3k3HFWC4pUN+v8XawPv6aq5mX7LJaRPZQnlr9IfCuSmdOhQ==
+X-Received: by 2002:a17:90a:ec06:b0:2d3:ce3d:84d9 with SMTP id 98e67ed59e1d1-2d3dfdaab99mr13421423a91.7.1724115535930;
+        Mon, 19 Aug 2024 17:58:55 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d3d68dce02sm8643867a91.41.2024.08.19.17.58.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 17:58:55 -0700 (PDT)
+Date: Tue, 20 Aug 2024 08:58:51 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+Subject: Re: [Question] Does CONFIG_XFRM_OFFLOAD depends any other configs?
+Message-ID: <ZsPqS6oFNpRmadxZ@Laptop-X1>
+References: <ZsPXnKv6t4JjvFD9@Laptop-X1>
+ <20240819172232.34bf6e9d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816153204.93787-1-kerneljasonxing@gmail.com> <CANn89iJZ8RwFX-iy-2HkE=xD8gnsJ26BO5j=o0460yUt7HiYcA@mail.gmail.com>
-In-Reply-To: <CANn89iJZ8RwFX-iy-2HkE=xD8gnsJ26BO5j=o0460yUt7HiYcA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 20 Aug 2024 08:53:53 +0800
-Message-ID: <CAL+tcoAJic7sWergDhVqAvLLu2tto+b7A8FU_pkwLhq=9qCE1w@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: change source port selection at bind() time
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819172232.34bf6e9d@kernel.org>
 
-Hello Eric,
+Hi Jakub,
+On Mon, Aug 19, 2024 at 05:22:32PM -0700, Jakub Kicinski wrote:
+> On Tue, 20 Aug 2024 07:39:08 +0800 Hangbin Liu wrote:
+> > Yesterday I tried to build the kernel with CONFIG_XFRM_OFFLOAD=y via `vng`[1],
+> > but the result .config actually doesn't contain CONFIG_XFRM_OFFLOAD=y. I saw
+> > XFRM_OFFLOAD in net/xfrm/Kconfig doesn't has any dependences. Do you know if
+> > I missed something?
+> 
+> It's a hidden config option, not directly controlled by the user.
+> You should enable INET_ESP_OFFLOAD and INET6_ESP_OFFLOAD instead
+> (which "select" it)
 
-On Mon, Aug 19, 2024 at 11:45=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Fri, Aug 16, 2024 at 5:33=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > This is a follow-up patch to an eariler commit 207184853dbd ("tcp/dccp:
-> > change source port selection at connect() time").
-> >
-> > This patch extends the use of IP_LOCAL_PORT_RANGE option, so that we
-> > don't need to iterate every two ports which means only favouring odd
-> > number like the old days before 2016, which can be good for some
-> > users who want to keep in consistency with IP_LOCAL_PORT_RANGE in
-> > connect().
->
-> Except that bind() with a port reservation is not as common as a connect(=
-).
-> This is highly discouraged.
->
-> See IP_BIND_ADDRESS_NO_PORT
->
-> Can you provide a real use case ?
->
-> I really feel like you are trying to push patches 'just because you can'.=
-..
->
-> 'The old days' before 2016 were not very nice, we had P0 all the time
-> because of port exhaustion.
-> Since 2016 and IP_BIND_ADDRESS_NO_PORT I no longer have war rooms stories=
-.
+Thanks for your reply. How to know if an option is hide other than review all
+`make menuconfig` result?
 
-As you mentioned last night, the issues happening in connect() are
-relatively more than in bind().
+Should we add a "depends on" for XFRM_OFFLOAD?
 
-To be more concise, I would like to state 3 points to see if they are valid=
-:
-(1) Extending the option for bind() is the last puzzle of using an
-older algorithm for some users. Since we have one in connect(), how
-about adding it in bind() to provide for the people favouring the
-older algorithm.
-(2) This patch will not hurt any users like in Google as an example
-which prefers odd/even port selection, which is, I admit, indeed more
-advanced.
-(3) This patch does not come out of thin air, but from some users who I con=
-tact.
-?
-
-In my opinion, using and adjusting to the new algorithm needs some
-changes in applications. For some old applications, they still need
-more time to keep pace with a more workable solution.
-
-After considering it a whole night, I would like to push this tiny
-feature into the upstream kernel, I wonder if you can help me review
-it? Thanks in advance, Eric.
-
-Thanks,
-Jason
+Regards
+Hangbin
 
