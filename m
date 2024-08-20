@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-120166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D00958795
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:08:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E096F958799
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:08:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62A41C21B7A
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:08:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 650892834A6
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9280119066D;
-	Tue, 20 Aug 2024 13:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161C6190463;
+	Tue, 20 Aug 2024 13:08:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C74A190667;
-	Tue, 20 Aug 2024 13:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98FA17B4ED;
+	Tue, 20 Aug 2024 13:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159260; cv=none; b=iy4iBbDpfxEuy5OT+AadfaZIrgNeJrvZyo5Dhgd2C0ZcJVjSvwPSDFUUznrGvzljHSMedo+WErM4aKsggLj1c8AMFNKs9kyv3BJbeX2OZhfNOwUq3QoeSxU8CefdPe9OJLOz5RlTrakLbTMaGx7m+0gomgsBDbtQu0jOFH5iCdM=
+	t=1724159290; cv=none; b=iSED1bYoIb1dvuS4B5h9n4eEWAj20R/C5ibemoTyDDhzDKt4+rY0DFk6l/mKzRT5Ukf2vDEWcGSP5Zhzv2I2+ompxlCu5A1MxcU4hSjtF0yo1mORWkFqRXf5jvO1EgGlyJ7Ug72Ivb+jA/7cctXVeJtF4+cvhjUSfAxFCLdAqmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159260; c=relaxed/simple;
-	bh=JO6RWeMlWaObYRyseZlU/Pqn9dKedWmcF4CIwKnCdJ8=;
+	s=arc-20240116; t=1724159290; c=relaxed/simple;
+	bh=RpCKBDqMTsj/+QOE8XMbCFaxwEtCyitUh5A+Zn9qtLM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cefnfAjJhBxTY1m1MB72uu65BizHBw/Ya3a+QbCstsNJaMBUxheG2dvc1mijVq8gAMxNiaXOwDIj3RyYDXmDu/QDwuWEJcpYglY4SibiIiVtDwmvTDibBnTgH5LYbvXLhR9j9xIqzDec5EsHewqXAntNMBGsrT/5SXjhsWl1otQ=
+	 In-Reply-To:Content-Type; b=RUnK8anCMAe8EuFDZpNTb9NG+BsrfVOgBdZAn0Q5/TRywSYCujYccaSRxDxU+fO2vStqMxxwbBhuhpQRreOOe+pDFKVvJrH3TD6s/wuWJF+xE6PtL/yi+AZBrhKYUoJv+Od2gXg3jysvL8WQkrx9YuyDDx3ovpNVTPC5KMK+8RY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wp8lF0HMDzQptG;
-	Tue, 20 Aug 2024 21:02:49 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wp8lv5K1LzQq66;
+	Tue, 20 Aug 2024 21:03:23 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1EF6B140138;
-	Tue, 20 Aug 2024 21:07:30 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id D1AFE140133;
+	Tue, 20 Aug 2024 21:08:04 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 20 Aug 2024 21:07:29 +0800
-Message-ID: <98ceade3-8d60-45bf-a419-ff3982a96101@huawei.com>
-Date: Tue, 20 Aug 2024 21:07:29 +0800
+ 15.2.1544.11; Tue, 20 Aug 2024 21:08:04 +0800
+Message-ID: <37fc4b01-43f1-4a2c-af35-96cf3f7fe3d5@huawei.com>
+Date: Tue, 20 Aug 2024 21:08:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,156 +48,214 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
+Subject: Re: [PATCH net-next v13 11/14] mm: page_frag: introduce
+ prepare/probe/commit API
 To: Alexander Duyck <alexander.duyck@gmail.com>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, Sagi Grimberg
-	<sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
 References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-5-linyunsheng@huawei.com>
- <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
- <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
- <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
- <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
- <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
+ <20240808123714.462740-12-linyunsheng@huawei.com>
+ <d9814d6628599b7b28ed29c71d6fb6631123fdef.camel@gmail.com>
+ <7f06fa30-fa7c-4cf2-bd8e-52ea1c78f8aa@huawei.com>
+ <CAKgT0Uetu1HA4hCGvBLwRgsgX6Y95FDw0epVf5S+XSnezScQ_w@mail.gmail.com>
+ <5905bad4-8a98-4f9d-9bd6-b9764e299ac7@huawei.com>
+ <CAKgT0Ucz4R=xOCWgauDO_i6PX7=hgiohXngo2Mea5R8GC_s2qQ@mail.gmail.com>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
+In-Reply-To: <CAKgT0Ucz4R=xOCWgauDO_i6PX7=hgiohXngo2Mea5R8GC_s2qQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/8/19 23:54, Alexander Duyck wrote:
+On 2024/8/19 23:52, Alexander Duyck wrote:
 
-...
+>>
+>> Yes, the expectation is that somebody else didn't take an access to the
+>> page/data to send it off somewhere else between page_frag_alloc_va()
+>> and page_frag_alloc_abort(), did you see expectation was broken in that
+>> patch? If yes, we should fix that by using page_frag_free_va() related
+>> API instead of using page_frag_alloc_abort().
+> 
+> The problem is when you expose it to XDP there are a number of
+> different paths it can take. As such you shouldn't be expecting XDP to
+> not do something like that. Basically you have to check the reference
 
->>>>
->>>> "There are three types of API as proposed in this patchset instead of
->>>> two types of API:
->>>> 1. page_frag_alloc_va() returns [va].
->>>> 2. page_frag_alloc_pg() returns [page, offset].
->>>> 3. page_frag_alloc() returns [va] & [page, offset].
->>>>
->>>> You seemed to miss that we need a third naming for the type 3 API.
->>>> Do you see type 3 API as a valid API? if yes, what naming are you
->>>> suggesting for it? if no, why it is not a valid API?"
+Even if XDP operations like xdp_do_redirect() or tun_xdp_xmit() return
+failure, we still can not do that? It seems odd that happens.
+If not, can we use page_frag_alloc_abort() with fragsz being zero to avoid
+atomic operation?
+
+> count before you can rewind the page.
+> 
 >>>
->>> I didn't. I just don't see the point in pushing out the existing API
->>> to support that. In reality 2 and 3 are redundant. You probably only
->>> need 3. Like I mentioned earlier you can essentially just pass a
+>>>
+>>>>
+>>>>>> +static struct page *__page_frag_cache_reload(struct page_frag_cache *nc,
+>>>>>> +                                         gfp_t gfp_mask)
+>>>>>>  {
+>>>>>> +    struct page *page;
+>>>>>> +
+>>>>>>      if (likely(nc->encoded_va)) {
+>>>>>> -            if (__page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias))
+>>>>>> +            page = __page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias);
+>>>>>> +            if (page)
+>>>>>>                      goto out;
+>>>>>>      }
+>>>>>>
+>>>>>> -    if (unlikely(!__page_frag_cache_refill(nc, gfp_mask)))
+>>>>>> -            return false;
+>>>>>> +    page = __page_frag_cache_refill(nc, gfp_mask);
+>>>>>> +    if (unlikely(!page))
+>>>>>> +            return NULL;
+>>>>>>
+>>>>>>  out:
+>>>>>>      /* reset page count bias and remaining to start of new frag */
+>>>>>>      nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+>>>>>>      nc->remaining = page_frag_cache_page_size(nc->encoded_va);
+>>>>>> -    return true;
+>>>>>> +    return page;
+>>>>>> +}
+>>>>>> +
+>>>>>
+>>>>> None of the functions above need to be returning page.
+>>>>
+>>>> Are you still suggesting to always use virt_to_page() even when it is
+>>>> not really necessary? why not return the page here to avoid the
+>>>> virt_to_page()?
+>>>
+>>> Yes. The likelihood of you needing to pass this out as a page should
+>>> be low as most cases will just be you using the virtual address
+>>> anyway. You are essentially trading off branching for not having to
+>>> use virt_to_page. It is unnecessary optimization.
 >>
->> If the caller just expect [page, offset], do you expect the caller also
->> type 3 API, which return both [va] and [page, offset]?
->>
->> I am not sure if I understand why you think 2 and 3 are redundant here?
->> If you think 2 and 3 are redundant here, aren't 1 and 3 also redundant
->> as the similar agrument?
+>> As my understanding, I am not trading off branching for not having to
+>> use virt_to_page, the branching is already needed no matter we utilize
+>> it to avoid calling virt_to_page() or not, please be more specific about
+>> which branching is traded off for not having to use virt_to_page() here.
 > 
-> The big difference is the need to return page and offset. Basically to
-> support returning page and offset you need to pass at least one value
-> as a pointer so you can store the return there.
-> 
-> The reason why 3 is just a redundant form of 2 is that you will
-> normally just be converting from a va to a page and offset so the va
-> should already be easily accessible.
+> The virt_to_page overhead isn't that high. It would be better to just
+> use a consistent path rather than try to optimize for an unlikely
+> branch in your datapath.
 
-I am assuming that by 'easily accessible', you meant the 'va' can be
-calculated as below, right?
+I am not sure if I understand what do you mean by 'consistent path' here.
+If I understand your comment correctly, the path is already not consistent
+to avoid having to fetch size multiple times multiple ways as mentioned in
+[1]. As below, doesn't it seems nature to avoid virt_to_page() calling while
+avoiding page_frag_cache_page_size() calling, even if it is an unlikely case
+as you mentioned:
 
-va = encoded_page_address(encoded_va) +
-		(page_frag_cache_page_size(encoded_va) - remaining);
-
-I guess it is easily accessible, but it is not without some overhead
-to calculate the 'va' here.
-
-> 
->>> page_frag via pointer to the function. With that you could also look
->>> at just returning a virtual address as well if you insist on having
->>> something that returns all of the above. No point in having 2 and 3 be
->>> seperate functions.
->>
->> Let's be more specific about what are your suggestion here: which way
->> is the prefer way to return the virtual address. It seems there are two
->> options:
->>
->> 1. Return the virtual address by function returning as below:
->> void *page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio);
->>
->> 2. Return the virtual address by double pointer as below:
->> int page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio,
->>                         void **va);
-> 
-> I was thinking more of option 1. Basically this is a superset of
-> page_frag_alloc_va that is also returning the page and offset via a
-> page frag. However instead of bio_vec I would be good with "struct
-> page_frag *" being the value passed to the function to play the role
-> of container. Basically the big difference between 1 and 2/3 if I am
-> not mistaken is the fact that for 1 you pass the size, whereas with
-> 2/3 you are peeling off the page frag from the larger page frag cache
-
-Let's be clear here: The callers just expecting [page, offset] also need
-to call type 3 API, which return both [va] and [page, offset]? and it
-is ok to ignore the overhead of calculating the 'va' for those kinds
-of callers just because we don't want to do the renaming for a existing
-API and can't come up with good naming for that?
-
-> after the fact via a commit type action.
-
-Just be clear here, there is no commit type action for some subtype of
-type 2/3 API.
-
-For example, for type 2 API in this patchset, it has below subtypes:
-
-subtype 1: it does not need a commit type action, it just return
-           [page, offset] instead of page_frag_alloc_va() returning [va],
-           and it does not return the allocated fragsz back to the caller
-           as page_frag_alloc_va() does not too:
 struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
                                 unsigned int *offset, unsigned int fragsz,
                                 gfp_t gfp)
+{
+        unsigned int remaining = nc->remaining;
+        struct page *page;
 
-subtype 2: it does need a commit type action, and @fragsz is returned to
-           the caller and caller used that to commit how much fragsz to
-           commit.
-struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
-                                        unsigned int *offset,
-                                        unsigned int *fragsz, gfp_t gfp)
+        VM_BUG_ON(!fragsz);
+        if (likely(remaining >= fragsz)) {
+                unsigned long encoded_va = nc->encoded_va;
 
-Do you see subtype 1 as valid API? If no, why?
-If yes, do you also expect the caller to use "struct page_frag *" as the
-container? If yes, what is the caller expected to do with the size field in
-"struct page_frag *" from API perspective? Just ignore it?
+                *offset = page_frag_cache_page_size(encoded_va) -
+                                remaining;
 
+                return virt_to_page((void *)encoded_va);
+        }
+
+        if (unlikely(fragsz > PAGE_SIZE))
+                return NULL;
+
+        page = __page_frag_cache_reload(nc, gfp);
+        if (unlikely(!page))
+                return NULL;
+
+        *offset = 0;
+        nc->remaining -= fragsz;
+        nc->pagecnt_bias--;
+
+        return page;
+}
+
+1. https://lore.kernel.org/all/CAKgT0UeQ9gwYo7qttak0UgXC9+kunO2gedm_yjtPiMk4VJp9yQ@mail.gmail.com/
+
+> 
+>>>
+>>>
+>>>>
+>>>>>> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
+>>>>>> +                            unsigned int *offset, unsigned int fragsz,
+>>>>>> +                            gfp_t gfp)
+>>>>>> +{
+>>>>>> +    unsigned int remaining = nc->remaining;
+>>>>>> +    struct page *page;
+>>>>>> +
+>>>>>> +    VM_BUG_ON(!fragsz);
+>>>>>> +    if (likely(remaining >= fragsz)) {
+>>>>>> +            unsigned long encoded_va = nc->encoded_va;
+>>>>>> +
+>>>>>> +            *offset = page_frag_cache_page_size(encoded_va) -
+>>>>>> +                            remaining;
+>>>>>> +
+>>>>>> +            return virt_to_page((void *)encoded_va);
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    if (unlikely(fragsz > PAGE_SIZE))
+>>>>>> +            return NULL;
+>>>>>> +
+>>>>>> +    page = __page_frag_cache_reload(nc, gfp);
+>>>>>> +    if (unlikely(!page))
+>>>>>> +            return NULL;
+>>>>>> +
+>>>>>> +    *offset = 0;
+>>>>>> +    nc->remaining = remaining - fragsz;
+>>>>>> +    nc->pagecnt_bias--;
+>>>>>> +
+>>>>>> +    return page;
+>>>>>>  }
+>>>>>> +EXPORT_SYMBOL(page_frag_alloc_pg);
+>>>>>
+>>>>> Again, this isn't returning a page. It is essentially returning a
+>>>>> bio_vec without calling it as such. You might as well pass the bio_vec
+>>>>> pointer as an argument and just have it populate it directly.
+>>>>
+>>>> I really don't think your bio_vec suggestion make much sense  for now as
+>>>> the reason mentioned in below:
+>>>>
+>>>> "Through a quick look, there seems to be at least three structs which have
+>>>> similar values: struct bio_vec & struct skb_frag & struct page_frag.
+>>>>
+>>>> As your above agrument about using bio_vec, it seems it is ok to use any
+>>>> one of them as each one of them seems to have almost all the values we
+>>>> are using?
+>>>>
+>>>> Personally, my preference over them: 'struct page_frag' > 'struct skb_frag'
+>>>>> 'struct bio_vec', as the naming of 'struct page_frag' seems to best match
+>>>> the page_frag API, 'struct skb_frag' is the second preference because we
+>>>> mostly need to fill skb frag anyway, and 'struct bio_vec' is the last
+>>>> preference because it just happen to have almost all the values needed.
+>>>
+>>> That is why I said I would be okay with us passing page_frag in patch
+>>> 12 after looking closer at the code. The fact is it should make the
+>>> review of that patch set much easier if you essentially just pass the
+>>> page_frag back out of the call. Then it could be used in exactly the
+>>> same way it was before and should reduce the total number of lines of
+>>> code that need to be changed.
+>>
+>> So the your suggestion changed to something like below?
+>>
+>> int page_frag_alloc_pfrag(struct page_frag_cache *nc, struct page_frag *pfrag);
+>>
+>> The API naming of 'page_frag_alloc_pfrag' seems a little odd to me, any better
+>> one in your mind?
+> 
+> Well at this point we are populating/getting/pulling a page frag from
+> the page frag cache. Maybe look for a word other than alloc such as
+> populate. Essentially what you are doing is populating the pfrag from
+> the frag cache, although I thought there was a size value you passed
+> for that isn't there?
+
+'struct page_frag' does have a size field, but I am not sure if I
+understand what do you mean by  'although I thought there was a size
+value you passed for that isn't there?‘ yet.
 
