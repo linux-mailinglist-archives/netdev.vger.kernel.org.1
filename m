@@ -1,886 +1,523 @@
-Return-Path: <netdev+bounces-120148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9129958717
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:35:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9799A95871B
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65AE9282810
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:35:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE9B1C21FFA
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E19A18FC8F;
-	Tue, 20 Aug 2024 12:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="doOJNdrv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5311B18FDC4;
+	Tue, 20 Aug 2024 12:35:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A3E1CAAC;
-	Tue, 20 Aug 2024 12:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA0C1CAAC;
+	Tue, 20 Aug 2024 12:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724157305; cv=none; b=WGBbqiA+MV02iDrJLJfVJUHyObxrk2vpe+rQkLfFrVCBqpPD0JiDIlb2EXljc2QRX1KdlNMRxaWSoOdS0nU6djTOMqNjl+RL/P+VVwzA/79XAcX3ucwmXK1HVP7BXVRXhO8EI4bJzrjDH7s8eivzpxaXvL3NP3fKkl/qpbMBt3I=
+	t=1724157319; cv=none; b=iQZIbpDwA7zp1dTAzbvj8XsUlHjgdYDD8iHK0PCSwCvmSFvCHJyH269IElfoF8VadANZ56EIlb72Mbs9QUMOwnOUl2QA77cdovq/j8rxyISkXqH/XcwcVOUXJ1Ib85YoRZAEhhBJ6bn2rfhzpJ4vjGiguJFn8ChaJeHzUipf5Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724157305; c=relaxed/simple;
-	bh=OFFbWVomErqVDJ1QlW0KdifzN+X4cNUoTYjA6waeA8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dH3puOOl3v430lLVLdc+n4Yg/OYOTgo3qHMfJHYtwZWL6Jaqsp/xDwTHOBervrcxCkri9p1QC59LUO4eOhNwA+I0Q3OPVHjiVDr5Q2R5c1LnbtgdqJrSMggk+ZzvXkTQvydMJAiHF5NjMha5krNnb+9lY48gHOl1201u2/euyHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=doOJNdrv; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5bec87ececeso4450023a12.0;
-        Tue, 20 Aug 2024 05:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724157301; x=1724762101; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/VHGZt1R2aqOcWKdCxk8PVxhDicABM+R1yiEYakU1s0=;
-        b=doOJNdrv//J19K0hfDLTGnbHVyt2BTsDkjEaZ+d+4X3W6gF/ud8hZFRVngiYx3nqcK
-         AaKQxMFNmDqlmzHQsm27J4j2++w7d6r3V7UcNU5C5lztjGh3pCjezAyLrZFUwF9GmBio
-         KvLoA7tm80WIUNMh/ohTslkco+cjZHGXqT4nl0lQ2LyTl3j9Zzc2P9dVZkXLIll2VfvO
-         3/u0yImOwuIv0CmtCbifNnSzDJSkM356qhNCjOI5ahqxCCczQPbUCzD8V4luoEGfENwb
-         L3rjhU8aM69DsnSIUsW2pGOhKze8c1iDahd3ob6y74YWnnWbyS+xJKnXsYL60xhJsjn3
-         O+Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724157301; x=1724762101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/VHGZt1R2aqOcWKdCxk8PVxhDicABM+R1yiEYakU1s0=;
-        b=i49nd4DUfebACR6M+DZjqVxCCdT4we2hNcyk60KRjIDVVamgUqN8+0rc/I+XTqDEC2
-         zjZ5fSj0Poe+MbEPz4MqoGQf/apJjcghOEVBfmRxjChG3elZqb5ngjGCRyJFVD/0mzv1
-         qClmFrWDfD5XboDJa5wsp8BlbtX0iuh1rFDUZSHBwRNw+8g1kVsDXqfYrwkh2oAmbLLA
-         OKZMHRCOpKeKV2+mKSfoiELc7jHGyhn4EqXlQ825qgN0QUIQcLDlFG0yav14Kbqid9xZ
-         etrO/j0TZsSL3ZBHHXLvTcFvDEGffxyhQPuMOkdQza6k5Yoi53Ki7D8E6P+oVcJdtfGD
-         lS7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUteTSVan8kZAIOuu8U6uD35PtL8SZyS6EZ6I8iXXflJO6i8nWMZCv/PzFwbjPFZ6cG50pnF426vf3fx1o=@vger.kernel.org, AJvYcCXDvHBvsWGr9GdbKauZToG1SP0n+h+5Jl4ypye4HmGKhSyHcEkGI/GXbu5tPZSRmTHJ/VAVa/ie@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP5fsmMUp7oCkKSQ0zMUo9jENmCnaR9AdWbz2UfdDF7H8B34br
-	nUYIeAamNGqvyQ1yqWCDohwS8Tg1hlqYWHxIOiKvJf57A4lntyHU
-X-Google-Smtp-Source: AGHT+IF6uYBW9R6jzN702jDQ9saKget2CSs108Txn3oN6qQ6VWBBn4r2ghfXbAlhLU9xpNVAIt0uWw==
-X-Received: by 2002:a05:6402:11c9:b0:5be:ffe1:6539 with SMTP id 4fb4d7f45d1cf-5beffe1666fmr3978232a12.24.1724157300170;
-        Tue, 20 Aug 2024 05:35:00 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bec82e5eacsm5909592a12.19.2024.08.20.05.34.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 05:34:59 -0700 (PDT)
-Date: Tue, 20 Aug 2024 15:34:56 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com
-Subject: Re: [PATCH net-next v4 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240820123456.qbt4emjdjg5pouym@skbuf>
-References: <cover.1724145786.git.0x1207@gmail.com>
- <bc4940c244c7e261bb00c2f93e216e9d7a925ba6.1724145786.git.0x1207@gmail.com>
+	s=arc-20240116; t=1724157319; c=relaxed/simple;
+	bh=415Fb8uqy2cFtBUvuX9/gHoPeXRnPBzOx+JeiNL8l7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Pag5Yd0wE4tUm/s5hBcfR91lkFrS5YfaJq5nVE/SX3yqMF8yVsfkr9ZR0XNWnhhAnSidW1pu8h0kl5Q5XIiaDmJOnYGDFdbjn1f/l7a+B9ZeUK0025VQmaW8c3JHPP/5UTf+JVCl32xMGK1ph4GmaMlCQkVE7LiuSagGchqNfgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Wp85B1tdNz1xvR6;
+	Tue, 20 Aug 2024 20:33:18 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5EEDC1A0188;
+	Tue, 20 Aug 2024 20:35:12 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 20:35:08 +0800
+Message-ID: <90d249af-0c6a-252d-7c91-668f31fb94e1@huawei-partners.com>
+Date: Tue, 20 Aug 2024 15:35:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="n5bc2hehdh25qze3"
-Content-Disposition: inline
-In-Reply-To: <bc4940c244c7e261bb00c2f93e216e9d7a925ba6.1724145786.git.0x1207@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/9] selftests/landlock: Support
+ LANDLOCK_ACCESS_NET_LISTEN_TCP
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-4-ivanov.mikhail1@huawei-partners.com>
+ <ZsO-6EC1UYX5pHxl@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZsO-6EC1UYX5pHxl@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-
---n5bc2hehdh25qze3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Aug 20, 2024 at 05:38:31PM +0800, Furong Xu wrote:
-> Drop driver defined stmmac_fpe_state, and switch to common
-> ethtool_mm_verify_status for local TX verification status.
+8/20/2024 12:53 AM, Günther Noack wrote:
+> Some comment nits I forgot, see below.
 > 
-> Local side and remote side verification processes are completely
-> independent. There is no reason at all to keep a local state and
-> a remote state.
+> On Wed, Aug 14, 2024 at 11:01:45AM +0800, Mikhail Ivanov wrote:
+>> * Add listen_variant() to simplify listen(2) return code checking.
+>> * Rename test_bind_and_connect() to test_restricted_net_fixture().
+>> * Extend current net rules with LANDLOCK_ACCESS_NET_LISTEN_TCP access.
+>> * Rename test port_specific.bind_connect_1023 to
+>>    port_specific.port_1023.
+>> * Check little endian port restriction for listen in
+>>    ipv4_tcp.port_endianness.
+>> * Some local renames and comment changes.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   tools/testing/selftests/landlock/net_test.c | 198 +++++++++++---------
+>>   1 file changed, 107 insertions(+), 91 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index f21cfbbc3638..8126f5c0160f 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -2,7 +2,7 @@
+>>   /*
+>>    * Landlock tests - Network
+>>    *
+>> - * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
+>> + * Copyright © 2022-2024 Huawei Tech. Co., Ltd.
+>>    * Copyright © 2023 Microsoft Corporation
+>>    */
+>>   
+>> @@ -22,6 +22,17 @@
+>>   
+>>   #include "common.h"
+>>   
+>> +/* clang-format off */
+>> +
+>> +#define ACCESS_LAST LANDLOCK_ACCESS_NET_LISTEN_TCP
+>> +
+>> +#define ACCESS_ALL ( \
+>> +	LANDLOCK_ACCESS_NET_BIND_TCP | \
+>> +	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
+>> +	LANDLOCK_ACCESS_NET_LISTEN_TCP)
+>> +
+>> +/* clang-format on */
+>> +
+>>   const short sock_port_start = (1 << 10);
+>>   
+>>   static const char loopback_ipv4[] = "127.0.0.1";
+>> @@ -282,6 +293,16 @@ static int connect_variant(const int sock_fd,
+>>   	return connect_variant_addrlen(sock_fd, srv, get_addrlen(srv, false));
+>>   }
+>>   
+>> +static int listen_variant(const int sock_fd, const int backlog)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = listen(sock_fd, backlog);
+>> +	if (ret < 0)
+>> +		return -errno;
+>> +	return ret;
+>> +}
+>> +
+>>   FIXTURE(protocol)
+>>   {
+>>   	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
+>> @@ -438,9 +459,11 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_unix_datagram) {
+>>   	},
+>>   };
+>>   
+>> -static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>> -				  const struct service_fixture *const srv,
+>> -				  const bool deny_bind, const bool deny_connect)
+>> +static void test_restricted_net_fixture(struct __test_metadata *const _metadata,
+>> +					const struct service_fixture *const srv,
+>> +					const bool deny_bind,
+>> +					const bool deny_connect,
+>> +					const bool deny_listen)
+>>   {
+>>   	char buf = '\0';
+>>   	int inval_fd, bind_fd, client_fd, status, ret;
+>> @@ -512,8 +535,14 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>   		EXPECT_EQ(0, ret);
+>>   
+>>   		/* Creates a listening socket. */
+>> -		if (srv->protocol.type == SOCK_STREAM)
+>> -			EXPECT_EQ(0, listen(bind_fd, backlog));
+>> +		if (srv->protocol.type == SOCK_STREAM) {
+>> +			ret = listen_variant(bind_fd, backlog);
+>> +			if (deny_listen) {
+>> +				EXPECT_EQ(-EACCES, ret);
+>> +			} else {
+>> +				EXPECT_EQ(0, ret);
+>> +			}
+>> +		}
+>>   	}
+>>   
+>>   	child = fork();
+>> @@ -530,7 +559,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>   		ret = connect_variant(connect_fd, srv);
+>>   		if (deny_connect) {
+>>   			EXPECT_EQ(-EACCES, ret);
+>> -		} else if (deny_bind) {
+>> +		} else if (deny_bind || deny_listen) {
+>>   			/* No listening server. */
+>>   			EXPECT_EQ(-ECONNREFUSED, ret);
+>>   		} else {
+>> @@ -545,7 +574,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+>>   
+>>   	/* Accepts connection from the child. */
+>>   	client_fd = bind_fd;
+>> -	if (!deny_bind && !deny_connect) {
+>> +	if (!deny_bind && !deny_connect && !deny_listen) {
+>>   		if (srv->protocol.type == SOCK_STREAM) {
+>>   			client_fd = accept(bind_fd, NULL, 0);
+>>   			ASSERT_LE(0, client_fd);
+>> @@ -571,16 +600,15 @@ TEST_F(protocol, bind)
+>>   {
+>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +			.handled_access_net = ACCESS_ALL,
+>>   		};
+>> -		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>> +			.allowed_access = ACCESS_ALL,
+>>   			.port = self->srv0.port,
+>>   		};
+>> -		const struct landlock_net_port_attr tcp_connect_p1 = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		const struct landlock_net_port_attr tcp_denied_bind_p1 = {
+>> +			.allowed_access = ACCESS_ALL &
+>> +					  ~LANDLOCK_ACCESS_NET_BIND_TCP,
+>>   			.port = self->srv1.port,
+>>   		};
+>>   		int ruleset_fd;
+>> @@ -589,48 +617,47 @@ TEST_F(protocol, bind)
+>>   						     sizeof(ruleset_attr), 0);
+>>   		ASSERT_LE(0, ruleset_fd);
+>>   
+>> -		/* Allows connect and bind for the first port.  */
+>> +		/* Allows all actions for the first port. */
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_bind_connect_p0, 0));
+>> +					    &tcp_not_restricted_p0, 0));
+>>   
+>> -		/* Allows connect and denies bind for the second port. */
+>> +		/* Allows all actions despite bind. */
 > 
-> Add a spinlock to avoid races among ISR, workqueue, link update
-> and register configuration.
+> s/despite/except/ would be more conventional English, I believe.
+
+will be fixed, thanks!
+
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  21 +--
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 172 ++++++++++--------
->  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   6 -
->  3 files changed, 102 insertions(+), 97 deletions(-)
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_connect_p1, 0));
+>> +					    &tcp_denied_bind_p1, 0));
+>>   
+>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>   	}
+>> +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
+>>   
+>>   	/* Binds a socket to the first port. */
+>> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+>> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+>> +				    false);
+>>   
+>>   	/* Binds a socket to the second port. */
+>> -	test_bind_and_connect(_metadata, &self->srv1,
+>> -			      is_restricted(&variant->prot, variant->sandbox),
+>> -			      false);
+>> +	test_restricted_net_fixture(_metadata, &self->srv1, restricted, false,
+>> +				    false);
+>>   
+>>   	/* Binds a socket to the third port. */
+>> -	test_bind_and_connect(_metadata, &self->srv2,
+>> -			      is_restricted(&variant->prot, variant->sandbox),
+>> -			      is_restricted(&variant->prot, variant->sandbox));
+>> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+>> +				    restricted, restricted);
+>>   }
+>>   
+>>   TEST_F(protocol, connect)
+>>   {
+>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +			.handled_access_net = ACCESS_ALL,
+>>   		};
+>> -		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>> +			.allowed_access = ACCESS_ALL,
+>>   			.port = self->srv0.port,
+>>   		};
+>> -		const struct landlock_net_port_attr tcp_bind_p1 = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>> +		const struct landlock_net_port_attr tcp_denied_connect_p1 = {
+>> +			.allowed_access = ACCESS_ALL &
+>> +					  ~LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>>   			.port = self->srv1.port,
+>>   		};
+>>   		int ruleset_fd;
+>> @@ -639,28 +666,27 @@ TEST_F(protocol, connect)
+>>   						     sizeof(ruleset_attr), 0);
+>>   		ASSERT_LE(0, ruleset_fd);
+>>   
+>> -		/* Allows connect and bind for the first port. */
+>> +		/* Allows all actions for the first port. */
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_bind_connect_p0, 0));
+>> +					    &tcp_not_restricted_p0, 0));
+>>   
+>> -		/* Allows bind and denies connect for the second port. */
+>> +		/* Allows all actions despite connect. */
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 458d6b16ce21..407b59f2783f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -146,14 +146,6 @@ struct stmmac_channel {
->  	u32 index;
->  };
->  
-> -/* FPE link state */
-> -enum stmmac_fpe_state {
-> -	FPE_STATE_OFF = 0,
-> -	FPE_STATE_CAPABLE = 1,
-> -	FPE_STATE_ENTERING_ON = 2,
-> -	FPE_STATE_ON = 3,
-> -};
-> -
->  /* FPE link-partner hand-shaking mPacket type */
->  enum stmmac_mpacket_type {
->  	MPACKET_VERIFY = 0,
-> @@ -166,11 +158,16 @@ enum stmmac_fpe_task_state_t {
->  };
->  
->  struct stmmac_fpe_cfg {
-> -	bool enable;				/* FPE enable */
-> -	bool hs_enable;				/* FPE handshake enable */
-> -	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
-> -	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
-> +	/* Serialize access to MAC Merge state between ethtool requests
-> +	 * and link state updates.
-> +	 */
-> +	spinlock_t lock;
-> +
->  	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
-> +	u32 verify_time;			/* see ethtool_mm_state */
-> +	bool pmac_enabled;			/* see ethtool_mm_state */
-> +	bool verify_enabled;			/* see ethtool_mm_state */
-> +	enum ethtool_mm_verify_status status;
->  };
->  
->  struct stmmac_tc_entry {
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3072ad33b105..6ae95f20b24f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -969,17 +969,21 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
->  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
-> +
-> +	if (!fpe_cfg->pmac_enabled)
-> +		goto __unlock_out;
->  
-> -	if (is_up && *hs_enable) {
-> +	if (is_up && fpe_cfg->verify_enabled)
->  		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
->  					MPACKET_VERIFY);
-> -	} else {
-> -		*lo_state = FPE_STATE_OFF;
-> -		*lp_state = FPE_STATE_OFF;
-> -	}
-> +	else
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+> Same here.
 
-The fpe_task may be scheduled here. When you unlock, it may run and
-overwrite the fpe_cfg->status you've just set.
+will be fixed also
 
-Although I don't actually recommend setting ETHTOOL_MM_VERIFY_STATUS_DISABLED
-unless cfg->verify_enabled=false.
-
-> +
-> +__unlock_out:
-> +	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
->  }
->  
->  static void stmmac_mac_link_down(struct phylink_config *config,
-> @@ -4091,11 +4095,25 @@ static int stmmac_release(struct net_device *dev)
->  
->  	stmmac_release_ptp(priv);
->  
-> -	pm_runtime_put(priv->device);
-> -
-> -	if (priv->dma_cap.fpesel)
-> +	if (priv->dma_cap.fpesel) {
->  		stmmac_fpe_stop_wq(priv);
->  
-> +		/* stmmac_ethtool_ops.begin() guarantees that all ethtool
-> +		 * requests to fail with EBUSY when !netif_running()
-> +		 *
-> +		 * Prepare some params here, then fpe_cfg can keep consistent
-> +		 * with the register states after a SW reset by __stmmac_open().
-> +		 */
-> +		priv->fpe_cfg.pmac_enabled = false;
-> +		priv->fpe_cfg.verify_enabled = false;
-> +		priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-> +
-> +		/* Reset MAC_FPE_CTRL_STS reg cache */
-> +		priv->fpe_cfg.fpe_csr = 0;
-> +	}
-
-With this block of code, you're saying that you're deliberately okay for
-the ethtool-mm state to be lost after a stmmac_release() call. Mind you,
-some of the call sites of this are:
-- stmmac_change_mtu()
-- stmmac_reinit_queues()
-- stmmac_reinit_ringparam()
-
-I disagree that it's okay to lose the state configured by user space.
-Instead, you should reprogram the saved state once lost.
-
-Note that because stmmac_release() calls phylink_stop(), I think that
-restoring the state in stmmac_fpe_link_state_handle() is enough. Because
-there will always be a link drop.
-
-> +
-> +	pm_runtime_put(priv->device);
-> +
->  	return 0;
->  }
->  
-> @@ -5979,44 +5997,34 @@ static int stmmac_set_features(struct net_device *netdev,
->  static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
->  
-> -	if (status == FPE_EVENT_UNKNOWN || !*hs_enable)
-> -		return;
-> +	spin_lock(&priv->fpe_cfg.lock);
->  
-> -	/* If LP has sent verify mPacket, LP is FPE capable */
-> -	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER) {
-> -		if (*lp_state < FPE_STATE_CAPABLE)
-> -			*lp_state = FPE_STATE_CAPABLE;
-> +	if (!fpe_cfg->pmac_enabled || status == FPE_EVENT_UNKNOWN)
-> +		goto __unlock_out;
->  
-> -		/* If user has requested FPE enable, quickly response */
-> -		if (*hs_enable)
-> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> -						MPACKET_RESPONSE);
-> -	}
-> +	/* LP has sent verify mPacket */
-> +	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER)
-> +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
-> +					MPACKET_RESPONSE);
->  
-> -	/* If Local has sent verify mPacket, Local is FPE capable */
-> -	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER) {
-> -		if (*lo_state < FPE_STATE_CAPABLE)
-> -			*lo_state = FPE_STATE_CAPABLE;
-> -	}
-> +	/* Local has sent verify mPacket */
-> +	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER &&
-> +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED)
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
->  
-> -	/* If LP has sent response mPacket, LP is entering FPE ON */
-> +	/* LP has sent response mPacket */
->  	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
-> -		*lp_state = FPE_STATE_ENTERING_ON;
-> -
-> -	/* If Local has sent response mPacket, Local is entering FPE ON */
-> -	if ((status & FPE_EVENT_TRSP) == FPE_EVENT_TRSP)
-> -		*lo_state = FPE_STATE_ENTERING_ON;
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
->  
->  	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
->  	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
->  	    priv->fpe_wq) {
->  		queue_work(priv->fpe_wq, &priv->fpe_task);
->  	}
-> +
-> +__unlock_out:
-> +	spin_unlock(&priv->fpe_cfg.lock);
->  }
->  
->  static void stmmac_common_interrupt(struct stmmac_priv *priv)
-> @@ -7372,50 +7380,57 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
->  	return ret;
->  }
->  
-> -#define SEND_VERIFY_MPAKCET_FMT "Send Verify mPacket lo_state=%d lp_state=%d\n"
-> -static void stmmac_fpe_lp_task(struct work_struct *work)
-> +static void stmmac_fpe_verify_task(struct work_struct *work)
->  {
->  	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
->  						fpe_task);
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> -	bool *enable = &fpe_cfg->enable;
-> -	int retries = 20;
-> -
-> -	while (retries-- > 0) {
-> -		/* Bail out immediately if FPE handshake is OFF */
-> -		if (*lo_state == FPE_STATE_OFF || !*hs_enable)
-> +	int verify_limit = 3; /* defined by 802.3 */
-> +	unsigned long flags;
-> +	u32 sleep_ms;
-> +
-> +	spin_lock(&priv->fpe_cfg.lock);
-> +	sleep_ms = fpe_cfg->verify_time;
-> +	spin_unlock(&priv->fpe_cfg.lock);
-> +
-> +	while (1) {
-> +		/* The initial VERIFY was triggered by linkup event or
-> +		 * stmmac_set_mm(), sleep then check MM_VERIFY_STATUS.
-> +		 */
-> +		msleep(sleep_ms);
-
-Thanks for the added comment. But why don't you just use queue_delayed_work()
-instead of queue_work() and sleeping at the very beginning?
-
-With this, you really don't need to drop the lock and read fpe_cfg->verify_time
-twice.
-
-But I think what is needed here is better suited for a timer, especially
-because of the required coordination with the IRQ. See the end and the
-attachment for more details.
-
-> +
-> +		if (!netif_running(priv->dev))
->  			break;
->  
-> -		if (*lo_state == FPE_STATE_ENTERING_ON &&
-> -		    *lp_state == FPE_STATE_ENTERING_ON) {
-> -			stmmac_fpe_configure(priv, priv->ioaddr,
-> -					     fpe_cfg,
-> -					     priv->plat->tx_queues_to_use,
-> -					     priv->plat->rx_queues_to_use,
-> -					     *enable);
-> +		spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
->  
-> -			netdev_info(priv->dev, "configured FPE\n");
-> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_DISABLED ||
-> +		    fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
-> +		    !fpe_cfg->pmac_enabled || !fpe_cfg->verify_enabled) {
-> +			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
-> +			break;
-> +		}
->  
-> -			*lo_state = FPE_STATE_ON;
-> -			*lp_state = FPE_STATE_ON;
-> -			netdev_info(priv->dev, "!!! BOTH FPE stations ON\n");
-> +		if (verify_limit == 0) {
-> +			fpe_cfg->verify_enabled = false;
-
-I don't understand why turn off verify_enabled after failure? Only the
-user should be able to modify this.
-
-> +			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
-> +			stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-> +					     priv->plat->tx_queues_to_use,
-> +					     priv->plat->rx_queues_to_use,
-> +					     false);
-
-I don't understand why turn off tx_enabled after failure, rather than
-not turning it on at all until success?
-
-This really has me thinking. This hardware does not have the explicit
-notion of the verification state - it is purely a driver construct.
-So I wonder if the EFPE bit in MAC_FPE_CTRL_STS isn't actually what
-corresponds to "tx_active" rather than "tx_enabled"?
-(definitions at https://docs.kernel.org/networking/ethtool-netlink.html)
-
-And "tx_enabled" would just correspond to a state variable in the driver,
-which does nothing until verification is actually complete.
-
-There is a test in manual_failed_verification() which checks the
-correctness of the tx_enabled/tx_active behavior. If tx_enabled=true but
-verification fails (and also _up until_ that point), the MM layer is
-supposed to send packets through the eMAC (because tx_active=false).
-But for your driver, that test is inconclusive, because you don't report
-ethtool stats broken down by eMAC/pMAC, just aggregate. So we don't know
-unless we take a closer look manually at the driver in that state.
-
-> +			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
->  			break;
->  		}
->  
-> -		if ((*lo_state == FPE_STATE_CAPABLE ||
-> -		     *lo_state == FPE_STATE_ENTERING_ON) &&
-> -		     *lp_state != FPE_STATE_ON) {
-> -			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
-> -				    *lo_state, *lp_state);
-> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_VERIFYING)
-> +			stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
->  						MPACKET_VERIFY);
-> -		}
-> -		/* Sleep then retry */
-> -		msleep(500);
-> +
-> +		sleep_ms = fpe_cfg->verify_time;
-> +
-> +		spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
-> +
-> +		verify_limit--;
->  	}
-
-I took the liberty of rewriting the fpe_task to a timer, and delete the
-workqueue. Here is a completely untested patch, which at least is less
-complex, has less code and is easier to understand. What do you think?
-
---n5bc2hehdh25qze3
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-net-stmmac-replace-FPE-workqueue-with-timer.patch"
-
-From 6ce277245128638160385d948583a3e6d2561a94 Mon Sep 17 00:00:00 2001
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Tue, 20 Aug 2024 14:50:32 +0300
-Subject: [PATCH] net: stmmac: replace FPE workqueue with timer
-
-What remains in the fpe_task after decoupling RX from TX appears
-overengineered to use a workqueue. A timer which retransmits Verify
-mPackets until the verify_limit expires, or enables transmission on
-success, seems enough.
-
-In the INITIAL state, the timer sends MPACKET_VERIFY. Eventually the
-stmmac_fpe_event_status() IRQ fires and advances the state to VERIFYING,
-then rearms the timer after verify_time ms. If a subsequent IRQ comes in
-and modifies the state to SUCCEEDED after getting MPACKET_RESPONSE, the
-timer sees this. It must enable the EFPE bit now. Otherwise, it
-decrements the verify_limit counter and tries again. Eventually it
-moves the status to FAILED, from which the IRQ cannot move it anywhere
-else, except for another stmmac_fpe_apply() call.
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  16 +-
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  35 +--
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 212 +++++++-----------
- 3 files changed, 100 insertions(+), 163 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 407b59f2783f..dd15f71e1663 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -152,21 +152,18 @@ enum stmmac_mpacket_type {
- 	MPACKET_RESPONSE = 1,
- };
- 
--enum stmmac_fpe_task_state_t {
--	__FPE_REMOVING,
--	__FPE_TASK_SCHED,
--};
--
- struct stmmac_fpe_cfg {
- 	/* Serialize access to MAC Merge state between ethtool requests
- 	 * and link state updates.
- 	 */
- 	spinlock_t lock;
--
-+	struct timer_list verify_timer;
- 	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
- 	u32 verify_time;			/* see ethtool_mm_state */
- 	bool pmac_enabled;			/* see ethtool_mm_state */
- 	bool verify_enabled;			/* see ethtool_mm_state */
-+	bool tx_enabled;
-+	int verify_limit;
- 	enum ethtool_mm_verify_status status;
- };
- 
-@@ -364,10 +361,6 @@ struct stmmac_priv {
- 	struct work_struct service_task;
- 
- 	/* Frame Preemption feature (FPE) */
--	unsigned long fpe_task_state;
--	struct workqueue_struct *fpe_wq;
--	struct work_struct fpe_task;
--	char wq_name[IFNAMSIZ + 4];
- 	struct stmmac_fpe_cfg fpe_cfg;
- 
- 	/* TC Handling */
-@@ -422,7 +415,8 @@ bool stmmac_eee_init(struct stmmac_priv *priv);
- int stmmac_reinit_queues(struct net_device *dev, u32 rx_cnt, u32 tx_cnt);
- int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size);
- int stmmac_bus_clks_config(struct stmmac_priv *priv, bool enabled);
--void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable);
-+void stmmac_fpe_apply(struct stmmac_priv *priv);
-+void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg);
- 
- static inline bool stmmac_xdp_is_enabled(struct stmmac_priv *priv)
- {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index a8cdcacecc26..3eb5344e2412 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -1293,14 +1293,7 @@ static int stmmac_get_mm(struct net_device *ndev,
- 	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
- 	 */
- 	state->max_verify_time = 128;
--
--	/* Cannot read MAC_FPE_CTRL_STS register here, or FPE interrupt events
--	 * can be lost.
--	 *
--	 * See commit 37e4b8df27bc ("net: stmmac: fix FPE events losing")
--	 */
--	state->tx_enabled = !!(priv->fpe_cfg.fpe_csr == EFPE);
--
-+	state->tx_enabled = priv->fpe_cfg.tx_enabled;
- 	/* FPE active if common tx_enabled and verification success or disabled (forced) */
- 	state->tx_active = state->tx_enabled &&
- 			   (state->verify_status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
-@@ -1326,34 +1319,28 @@ static int stmmac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
- 	if (!priv->dma_cap.fpesel)
- 		return -EOPNOTSUPP;
- 
--	/* Wait for the fpe_task that's currently in progress to finish */
--	flush_workqueue(priv->fpe_wq);
--
- 	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size,
- 					      &add_frag_size, extack);
- 	if (err)
- 		return err;
- 
--	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
-+	/* Wait for the verification that's currently in progress to finish */
-+	del_timer_sync(&fpe_cfg->verify_timer);
-+
-+	spin_lock_irqsave(&fpe_cfg->lock, flags);
- 
- 	fpe_cfg->pmac_enabled = cfg->pmac_enabled;
-+	fpe_cfg->tx_enabled = cfg->tx_enabled;
- 	fpe_cfg->verify_time = cfg->verify_time;
- 	fpe_cfg->verify_enabled = cfg->verify_enabled;
--
--	stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
--			     priv->plat->tx_queues_to_use,
--			     priv->plat->rx_queues_to_use,
--			     cfg->tx_enabled, cfg->pmac_enabled);
-+	fpe_cfg->verify_limit = 3; /* IEEE 802.3 constant */
-+	if (!cfg->verify_enabled)
-+		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
- 
- 	stmmac_fpe_set_add_frag_size(priv, priv->ioaddr, add_frag_size);
-+	stmmac_fpe_apply(priv);
- 
--	if (cfg->verify_enabled)
--		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
--					MPACKET_VERIFY);
--	else
--		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
--
--	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
-+	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a5d01162fcc5..fa74504f3ad5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -971,19 +971,22 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
- 	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
-+	del_timer_sync(&fpe_cfg->verify_timer);
- 
--	if (!fpe_cfg->pmac_enabled)
--		goto __unlock_out;
-+	spin_lock_irqsave(&fpe_cfg->lock, flags);
- 
--	if (is_up && fpe_cfg->verify_enabled)
--		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
--					MPACKET_VERIFY);
--	else
--		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-+	if (is_up) {
-+		/* New link => maybe new partner => new verification process */
-+		stmmac_fpe_apply(priv);
-+	} else {
-+		/* No link => turn off EFPE */
-+		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-+				     priv->plat->tx_queues_to_use,
-+				     priv->plat->rx_queues_to_use,
-+				     false, false);
-+	}
- 
--__unlock_out:
--	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
-+	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
- }
- 
- static void stmmac_mac_link_down(struct phylink_config *config,
-@@ -3362,27 +3365,6 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
- 	}
- }
- 
--static int stmmac_fpe_start_wq(struct stmmac_priv *priv)
--{
--	char *name;
--
--	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
--	clear_bit(__FPE_REMOVING,  &priv->fpe_task_state);
--
--	name = priv->wq_name;
--	sprintf(name, "%s-fpe", priv->dev->name);
--
--	priv->fpe_wq = create_singlethread_workqueue(name);
--	if (!priv->fpe_wq) {
--		netdev_err(priv->dev, "%s: Failed to create workqueue\n", name);
--
--		return -ENOMEM;
--	}
--	netdev_dbg(priv->dev, "FPE workqueue start");
--
--	return 0;
--}
--
- /**
-  * stmmac_hw_setup - setup mac in a usable state.
-  *  @dev : pointer to the device structure.
-@@ -3537,22 +3519,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 
- 	stmmac_set_hw_vlan_mode(priv, priv->hw);
- 
--	if (priv->dma_cap.fpesel) {
--		/* A SW reset just happened in stmmac_init_dma_engine(),
--		 * we should restore fpe_cfg to HW, or FPE will stop working
--		 * from suspend/resume.
--		 */
--		spin_lock(&priv->fpe_cfg.lock);
--		stmmac_fpe_configure(priv, priv->ioaddr,
--				     &priv->fpe_cfg,
--				     priv->plat->tx_queues_to_use,
--				     priv->plat->rx_queues_to_use,
--				     false, priv->fpe_cfg.pmac_enabled);
--		spin_unlock(&priv->fpe_cfg.lock);
--
--		stmmac_fpe_start_wq(priv);
--	}
--
- 	return 0;
- }
- 
-@@ -4049,18 +4015,6 @@ static int stmmac_open(struct net_device *dev)
- 	return ret;
- }
- 
--static void stmmac_fpe_stop_wq(struct stmmac_priv *priv)
--{
--	set_bit(__FPE_REMOVING, &priv->fpe_task_state);
--
--	if (priv->fpe_wq) {
--		destroy_workqueue(priv->fpe_wq);
--		priv->fpe_wq = NULL;
--	}
--
--	netdev_dbg(priv->dev, "FPE workqueue stop");
--}
--
- /**
-  *  stmmac_release - close entry point of the driver
-  *  @dev : device pointer.
-@@ -4108,22 +4062,8 @@ static int stmmac_release(struct net_device *dev)
- 
- 	stmmac_release_ptp(priv);
- 
--	if (priv->dma_cap.fpesel) {
--		stmmac_fpe_stop_wq(priv);
--
--		/* stmmac_ethtool_ops.begin() guarantees that all ethtool
--		 * requests to fail with EBUSY when !netif_running()
--		 *
--		 * Prepare some params here, then fpe_cfg can keep consistent
--		 * with the register states after a SW reset by __stmmac_open().
--		 */
--		priv->fpe_cfg.pmac_enabled = false;
--		priv->fpe_cfg.verify_enabled = false;
--		priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
--
--		/* Reset MAC_FPE_CTRL_STS reg cache */
--		priv->fpe_cfg.fpe_csr = 0;
--	}
-+	if (priv->dma_cap.fpesel)
-+		del_timer_sync(&priv->fpe_cfg.verify_timer);
- 
- 	pm_runtime_put(priv->device);
- 
-@@ -6030,11 +5970,7 @@ static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
- 	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
- 		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
- 
--	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
--	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
--	    priv->fpe_wq) {
--		queue_work(priv->fpe_wq, &priv->fpe_task);
--	}
-+	stmmac_fpe_verify_timer_arm(fpe_cfg);
- 
- __unlock_out:
- 	spin_unlock(&priv->fpe_cfg.lock);
-@@ -7395,60 +7331,82 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
- 	return ret;
- }
- 
--static void stmmac_fpe_verify_task(struct work_struct *work)
-+/**
-+ * stmmac_fpe_verify_timer - Timer for MAC Merge verification
-+ * @t:  timer_list struct containing private info
-+ *
-+ * Verify the MAC Merge capability in the local TX direction, by
-+ * transmitting Verify mPackets up to 3 times. Wait until link
-+ * partner responds with a Response mPacket, otherwise fail.
-+ */
-+static void stmmac_fpe_verify_timer(struct timer_list *t)
- {
--	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
--						fpe_task);
--	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
--	int verify_limit = 3; /* defined by 802.3 */
--	unsigned long flags;
--	u32 sleep_ms;
-+	struct stmmac_fpe_cfg *fpe_cfg = from_timer(fpe_cfg, t, verify_timer);
-+	struct stmmac_priv *priv = container_of(fpe_cfg, struct stmmac_priv,
-+						fpe_cfg);
-+	bool rearm = false;
- 
--	spin_lock(&priv->fpe_cfg.lock);
--	sleep_ms = fpe_cfg->verify_time;
--	spin_unlock(&priv->fpe_cfg.lock);
-+	spin_lock(&fpe_cfg->lock);
- 
--	while (1) {
--		/* The initial VERIFY was triggered by linkup event or
--		 * stmmac_set_mm(), sleep then check MM_VERIFY_STATUS.
--		 */
--		msleep(sleep_ms);
--
--		if (!netif_running(priv->dev))
--			break;
--
--		spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
--
--		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_DISABLED ||
--		    fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
--		    !fpe_cfg->pmac_enabled || !fpe_cfg->verify_enabled) {
--			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
--			break;
--		}
--
--		if (verify_limit == 0) {
--			fpe_cfg->verify_enabled = false;
-+	switch (fpe_cfg->status) {
-+	case ETHTOOL_MM_VERIFY_STATUS_INITIAL:
-+	case ETHTOOL_MM_VERIFY_STATUS_VERIFYING:
-+		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
-+					MPACKET_VERIFY);
-+		if (fpe_cfg->verify_limit != 0) {
-+			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
-+			rearm = true;
-+		} else {
- 			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
--			stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
--					     priv->plat->tx_queues_to_use,
--					     priv->plat->rx_queues_to_use,
--					     false, fpe_cfg->pmac_enabled);
--			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
--			break;
- 		}
-+		fpe_cfg->verify_limit--;
-+		break;
-+	case ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED:
-+		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-+				     priv->plat->tx_queues_to_use,
-+				     priv->plat->rx_queues_to_use,
-+				     true, true);
-+		break;
-+	default:
-+		break;
-+	}
- 
--		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_VERIFYING)
--			stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
--						MPACKET_VERIFY);
--
--		sleep_ms = fpe_cfg->verify_time;
-+	if (rearm) {
-+		mod_timer(&fpe_cfg->verify_timer,
-+			  msecs_to_jiffies(fpe_cfg->verify_time));
-+	}
- 
--		spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
-+	spin_unlock(&fpe_cfg->lock);
-+}
- 
--		verify_limit--;
-+void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg)
-+{
-+	if (fpe_cfg->pmac_enabled && fpe_cfg->tx_enabled &&
-+	    fpe_cfg->verify_enabled &&
-+	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_FAILED &&
-+	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED) {
-+		mod_timer(&fpe_cfg->verify_timer,
-+			  msecs_to_jiffies(fpe_cfg->verify_time));
- 	}
-+}
- 
--	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
-+void stmmac_fpe_apply(struct stmmac_priv *priv)
-+{
-+	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-+
-+	/* If verification is disabled, configure FPE right away.
-+	 * Otherwise let the timer code do it.
-+	 */
-+	if (!fpe_cfg->verify_enabled) {
-+		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-+				     priv->plat->tx_queues_to_use,
-+				     priv->plat->rx_queues_to_use,
-+				     fpe_cfg->tx_enabled,
-+				     fpe_cfg->pmac_enabled);
-+	} else {
-+		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
-+		stmmac_fpe_verify_timer_arm(fpe_cfg);
-+	}
- }
- 
- static int stmmac_xdp_rx_timestamp(const struct xdp_md *_ctx, u64 *timestamp)
-@@ -7565,9 +7523,6 @@ int stmmac_dvr_probe(struct device *device,
- 
- 	INIT_WORK(&priv->service_task, stmmac_service_task);
- 
--	/* Initialize FPE verify workqueue */
--	INIT_WORK(&priv->fpe_task, stmmac_fpe_verify_task);
--
- 	/* Override with kernel parameters if supplied XXX CRS XXX
- 	 * this needs to have multiple instances
- 	 */
-@@ -7733,6 +7688,7 @@ int stmmac_dvr_probe(struct device *device,
- 	mutex_init(&priv->lock);
- 
- 	spin_lock_init(&priv->fpe_cfg.lock);
-+	timer_setup(&priv->fpe_cfg.verify_timer, stmmac_fpe_verify_timer, 0);
- 	priv->fpe_cfg.pmac_enabled = false;
- 	priv->fpe_cfg.verify_time = 128; /* ethtool_mm_state.max_verify_time */
- 	priv->fpe_cfg.verify_enabled = false;
-@@ -7912,7 +7868,7 @@ int stmmac_suspend(struct device *dev)
- 	rtnl_unlock();
- 
- 	if (priv->dma_cap.fpesel)
--		stmmac_fpe_stop_wq(priv);
-+		del_timer_sync(&priv->fpe_cfg.verify_timer);
- 
- 	priv->speed = SPEED_UNKNOWN;
- 	return 0;
--- 
-2.34.1
-
-
---n5bc2hehdh25qze3--
+> 
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_bind_p1, 0));
+>> +					    &tcp_denied_connect_p1, 0));
+>>   
+>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>   	}
+>> -
+>> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
+>> -
+>> -	test_bind_and_connect(_metadata, &self->srv1, false,
+>> -			      is_restricted(&variant->prot, variant->sandbox));
+>> -
+>> -	test_bind_and_connect(_metadata, &self->srv2,
+>> -			      is_restricted(&variant->prot, variant->sandbox),
+>> -			      is_restricted(&variant->prot, variant->sandbox));
+>> +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
+>> +
+>> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
+>> +				    false);
+>> +	test_restricted_net_fixture(_metadata, &self->srv1, false, restricted,
+>> +				    false);
+>> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
+>> +				    restricted, restricted);
+>>   }
+>>   
+>>   TEST_F(protocol, bind_unspec)
+>> @@ -761,7 +787,7 @@ TEST_F(protocol, connect_unspec)
+>>   	ASSERT_LE(0, bind_fd);
+>>   	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+>>   	if (self->srv0.protocol.type == SOCK_STREAM)
+>> -		EXPECT_EQ(0, listen(bind_fd, backlog));
+>> +		EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>   
+>>   	child = fork();
+>>   	ASSERT_LE(0, child);
+>> @@ -1127,8 +1153,8 @@ TEST_F(tcp_layers, ruleset_overlap)
+>>   	 * Forbids to connect to the socket because only one ruleset layer
+>>   	 * allows connect.
+>>   	 */
+>> -	test_bind_and_connect(_metadata, &self->srv0, false,
+>> -			      variant->num_layers >= 2);
+>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>> +				    variant->num_layers >= 2, false);
+>>   }
+>>   
+>>   TEST_F(tcp_layers, ruleset_expand)
+>> @@ -1208,11 +1234,12 @@ TEST_F(tcp_layers, ruleset_expand)
+>>   		EXPECT_EQ(0, close(ruleset_fd));
+>>   	}
+>>   
+>> -	test_bind_and_connect(_metadata, &self->srv0, false,
+>> -			      variant->num_layers >= 3);
+>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>> +				    variant->num_layers >= 3, false);
+>>   
+>> -	test_bind_and_connect(_metadata, &self->srv1, variant->num_layers >= 1,
+>> -			      variant->num_layers >= 2);
+>> +	test_restricted_net_fixture(_metadata, &self->srv1,
+>> +				    variant->num_layers >= 1,
+>> +				    variant->num_layers >= 2, false);
+>>   }
+>>   
+>>   /* clang-format off */
+>> @@ -1230,16 +1257,6 @@ FIXTURE_TEARDOWN(mini)
+>>   {
+>>   }
+>>   
+>> -/* clang-format off */
+>> -
+>> -#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> -
+>> -#define ACCESS_ALL ( \
+>> -	LANDLOCK_ACCESS_NET_BIND_TCP | \
+>> -	LANDLOCK_ACCESS_NET_CONNECT_TCP)
+>> -
+>> -/* clang-format on */
+>> -
+>>   TEST_F(mini, network_access_rights)
+>>   {
+>>   	const struct landlock_ruleset_attr ruleset_attr = {
+>> @@ -1454,8 +1471,9 @@ TEST_F(mini, tcp_port_overflow)
+>>   
+>>   	enforce_ruleset(_metadata, ruleset_fd);
+>>   
+>> -	test_bind_and_connect(_metadata, &srv_denied, true, true);
+>> -	test_bind_and_connect(_metadata, &srv_max_allowed, false, false);
+>> +	test_restricted_net_fixture(_metadata, &srv_denied, true, true, false);
+>> +	test_restricted_net_fixture(_metadata, &srv_max_allowed, false, false,
+>> +				    false);
+>>   }
+>>   
+>>   FIXTURE(ipv4_tcp)
+>> @@ -1485,22 +1503,21 @@ FIXTURE_TEARDOWN(ipv4_tcp)
+>>   TEST_F(ipv4_tcp, port_endianness)
+>>   {
+>>   	const struct landlock_ruleset_attr ruleset_attr = {
+>> -		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		.handled_access_net = ACCESS_ALL,
+>>   	};
+>>   	const struct landlock_net_port_attr bind_host_endian_p0 = {
+>>   		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>>   		/* Host port format. */
+>>   		.port = self->srv0.port,
+>>   	};
+>> -	const struct landlock_net_port_attr connect_big_endian_p0 = {
+>> -		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +	const struct landlock_net_port_attr connect_listen_big_endian_p0 = {
+>> +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP |
+>> +				  LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>>   		/* Big endian port format. */
+>>   		.port = htons(self->srv0.port),
+>>   	};
+>> -	const struct landlock_net_port_attr bind_connect_host_endian_p1 = {
+>> -		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +	const struct landlock_net_port_attr not_restricted_host_endian_p1 = {
+>> +		.allowed_access = ACCESS_ALL,
+>>   		/* Host port format. */
+>>   		.port = self->srv1.port,
+>>   	};
+>> @@ -1514,16 +1531,18 @@ TEST_F(ipv4_tcp, port_endianness)
+>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>   				       &bind_host_endian_p0, 0));
+>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -				       &connect_big_endian_p0, 0));
+>> +				       &connect_listen_big_endian_p0, 0));
+>>   	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -				       &bind_connect_host_endian_p1, 0));
+>> +				       &not_restricted_host_endian_p1, 0));
+>>   	enforce_ruleset(_metadata, ruleset_fd);
+>>   
+>>   	/* No restriction for big endinan CPU. */
+>> -	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+>> +	test_restricted_net_fixture(_metadata, &self->srv0, false,
+>> +				    little_endian, little_endian);
+>>   
+>>   	/* No restriction for any CPU. */
+>> -	test_bind_and_connect(_metadata, &self->srv1, false, false);
+>> +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
+>> +				    false);
+>>   }
+>>   
+>>   TEST_F(ipv4_tcp, with_fs)
+>> @@ -1691,7 +1710,7 @@ TEST_F(port_specific, bind_connect_zero)
+>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>   	EXPECT_EQ(0, ret);
+>>   
+>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>   
+>>   	/* Connects on port 0. */
+>>   	ret = connect_variant(connect_fd, &self->srv0);
+>> @@ -1714,26 +1733,23 @@ TEST_F(port_specific, bind_connect_zero)
+>>   	EXPECT_EQ(0, close(bind_fd));
+>>   }
+>>   
+>> -TEST_F(port_specific, bind_connect_1023)
+>> +TEST_F(port_specific, port_1023)
+>>   {
+>>   	int bind_fd, connect_fd, ret;
+>>   
+>> -	/* Adds a rule layer with bind and connect actions. */
+>> +	/* Adds a rule layer with all actions. */
+>>   	if (variant->sandbox == TCP_SANDBOX) {
+>>   		const struct landlock_ruleset_attr ruleset_attr = {
+>> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> +			.handled_access_net = ACCESS_ALL
+>>   		};
+>>   		/* A rule with port value less than 1024. */
+>> -		const struct landlock_net_port_attr tcp_bind_connect_low_range = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		const struct landlock_net_port_attr tcp_low_range_port = {
+>> +			.allowed_access = ACCESS_ALL,
+>>   			.port = 1023,
+>>   		};
+>>   		/* A rule with 1024 port. */
+>> -		const struct landlock_net_port_attr tcp_bind_connect = {
+>> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> -					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> +		const struct landlock_net_port_attr tcp_port_1024 = {
+>> +			.allowed_access = ACCESS_ALL,
+>>   			.port = 1024,
+>>   		};
+>>   		int ruleset_fd;
+>> @@ -1744,10 +1760,10 @@ TEST_F(port_specific, bind_connect_1023)
+>>   
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_bind_connect_low_range, 0));
+>> +					    &tcp_low_range_port, 0));
+>>   		ASSERT_EQ(0,
+>>   			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> -					    &tcp_bind_connect, 0));
+>> +					    &tcp_port_1024, 0));
+>>   
+>>   		enforce_ruleset(_metadata, ruleset_fd);
+>>   		EXPECT_EQ(0, close(ruleset_fd));
+>> @@ -1771,7 +1787,7 @@ TEST_F(port_specific, bind_connect_1023)
+>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>   	clear_cap(_metadata, CAP_NET_BIND_SERVICE);
+>>   	EXPECT_EQ(0, ret);
+>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>   
+>>   	/* Connects on the binded port 1023. */
+>>   	ret = connect_variant(connect_fd, &self->srv0);
+>> @@ -1791,7 +1807,7 @@ TEST_F(port_specific, bind_connect_1023)
+>>   	/* Binds on port 1024. */
+>>   	ret = bind_variant(bind_fd, &self->srv0);
+>>   	EXPECT_EQ(0, ret);
+>> -	EXPECT_EQ(0, listen(bind_fd, backlog));
+>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>>   
+>>   	/* Connects on the binded port 1024. */
+>>   	ret = connect_variant(connect_fd, &self->srv0);
+>> -- 
+>> 2.34.1
+>>
 
