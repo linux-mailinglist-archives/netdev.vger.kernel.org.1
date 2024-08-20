@@ -1,297 +1,372 @@
-Return-Path: <netdev+bounces-120305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7877B958E36
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC607958E49
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04A191F24558
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:47:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA3A1F26757
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677FC14D444;
-	Tue, 20 Aug 2024 18:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E990157485;
+	Tue, 20 Aug 2024 18:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loUgWwac"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A22A1CAB8;
-	Tue, 20 Aug 2024 18:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A248130499;
+	Tue, 20 Aug 2024 18:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724179632; cv=none; b=ZbnCN6Ga6C+XKSFRkaWkVwU6TToRS2QqJkNzELp4WEYLKYR6niu9ZaA5ULmNA4EpAvpsswpr4sPxhCQeylFxkdotBsQ4yzuuIV1S6Q8SFX3OTbu6udjS6vEIyH5Xish42jp7qpMhT17iIkU68xtQxql8XA1lO6XoJvchNkT1Zvs=
+	t=1724179770; cv=none; b=eqQ5IkWu6w87PgJFMln/ZJ6w/c3h4Brs1N5OSVH6UiAfpRA+98IJnBFc6m3euXjfknaJFsSyVTR7vsx0RqpnZX8Xsnk213pNKGYTRQ29xNHb8ilZ60mwu/VdoGGdn9bbJlaxtAuZtqHHQrRO30AIQA61WseiTMghp1a2zdEa7MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724179632; c=relaxed/simple;
-	bh=MI+6+AbYWVXAmOCQRTxhN1stH6g3sRSpWQLKOnWqCXk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=F/7xrYfWLQeQ6cX/GDsTUOJIH11aCytOyKn+4YwIluwtUsrvSW8uDFfgN09nPtf94v6NUfJPOgJQP5wyto6nMmSGdBq/Y+4FKaigh3j3wCOvCumPDPwsQDVMkOlKzd2WIeDxEupbMvWYYqVXi+RcMreHZPXCVFwRVJEsed6soJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WpJNQ6MF8z1S8DL;
-	Wed, 21 Aug 2024 02:47:02 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id E56991A0188;
-	Wed, 21 Aug 2024 02:47:04 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 21 Aug 2024 02:47:00 +0800
-Message-ID: <22dcebae-dc5d-0bf1-c686-d2f444558106@huawei-partners.com>
-Date: Tue, 20 Aug 2024 21:46:56 +0300
+	s=arc-20240116; t=1724179770; c=relaxed/simple;
+	bh=gyhe0JlTNt+mfblLvFCfzEN71MyH2AiH4+ibll4gIac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XfLMnmALrmykxN7Xpd7s4b/Dd+SyIAmVaHwx58ALzC3yX5raHE3qLCqP8zaF7oGUIvcMKn37V0drHV5TlOFHYt3m+tFHw611J7IOXDzUxoqbR4ifvIhnU1Zf7Q2hUjc93r3Lz4itXO6xtpz4CZ65sQ1oo4jdCh1Pm0awGtRTV/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loUgWwac; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A04C2C4AF09;
+	Tue, 20 Aug 2024 18:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724179769;
+	bh=gyhe0JlTNt+mfblLvFCfzEN71MyH2AiH4+ibll4gIac=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=loUgWwacJGE7rLBK8gbmylwUy20YkkbfT7OMrRIfymkGGLlYfNjNQgoSaVsPL025d
+	 wDyRpteyIRDHSmEXUr2W+ad2faB5jfe2vRvHH2/vYx5CcPA7aaUnxABEavzJLQoHjL
+	 8KPadM44cXCRpExu57Dk2J74umeHl6fIt4Ts3fBy9MmuT5X6xlPtP+ujfjgD+1DHMK
+	 1T97c8ddWFBUvIJDbIt+b9bMotW2aXb3j+t76Q0IP24ZGS8k9bxz1BavrGIUJSgrWw
+	 pH81CKYRVqbCmY+0myT4dyJUpV2PAeNfRk1uBdl0LgWXU9R9CJqyRleZNUQ9xzZVyq
+	 ePt6HMR6hrPUw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 0C210CE0DE1; Tue, 20 Aug 2024 11:49:29 -0700 (PDT)
+Date: Tue, 20 Aug 2024 11:49:29 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] softirq: remove parameter from action callback
+Message-ID: <6648a8f0-0af1-4351-95b9-8380df8f336d@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <0f19dd9a-e2fd-4221-aaf5-bafc516f9c32@kernel.dk>
+ <20240815171549.3260003-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 4/9] selftests/landlock: Test listening restriction
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-5-ivanov.mikhail1@huawei-partners.com>
- <ZsSMe1Ce4OiysGRu@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZsSMe1Ce4OiysGRu@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815171549.3260003-1-csander@purestorage.com>
 
-8/20/2024 3:31 PM, Günther Noack wrote:
-> On Wed, Aug 14, 2024 at 11:01:46AM +0800, Mikhail Ivanov wrote:
->> Add a test for listening restriction. It's similar to protocol.bind and
->> protocol.connect tests.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   tools/testing/selftests/landlock/net_test.c | 44 +++++++++++++++++++++
->>   1 file changed, 44 insertions(+)
->>
->> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
->> index 8126f5c0160f..b6fe9bde205f 100644
->> --- a/tools/testing/selftests/landlock/net_test.c
->> +++ b/tools/testing/selftests/landlock/net_test.c
->> @@ -689,6 +689,50 @@ TEST_F(protocol, connect)
->>   				    restricted, restricted);
->>   }
->>   
->> +TEST_F(protocol, listen)
->> +{
->> +	if (variant->sandbox == TCP_SANDBOX) {
->> +		const struct landlock_ruleset_attr ruleset_attr = {
->> +			.handled_access_net = ACCESS_ALL,
->> +		};
->> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
->> +			.allowed_access = ACCESS_ALL,
->> +			.port = self->srv0.port,
->> +		};
->> +		const struct landlock_net_port_attr tcp_denied_listen_p1 = {
->> +			.allowed_access = ACCESS_ALL &
->> +					  ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
->> +			.port = self->srv1.port,
->> +		};
->> +		int ruleset_fd;
->> +
->> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> +						     sizeof(ruleset_attr), 0);
+On Thu, Aug 15, 2024 at 11:15:40AM -0600, Caleb Sander Mateos wrote:
+> When softirq actions are called, they are passed a pointer to the entry
+> in the softirq_vec table containing the action's function pointer. This
+> pointer isn't very useful, as the action callback already knows what
+> function it is. And since each callback handles a specific softirq, the
+> callback also knows which softirq number is running.
 > 
-> Nit: The declaration and the assignment of ruleset_fd can be merged into one
-> line and made const.  (Not a big deal, but it was done a bit more consistently
-> in the rest of the code, I think.)
-
-Current variant is performed in every TEST_F() method. I assume that
-this is required in order to not make a mess by combining the
-ruleset_attr and several rule structures with the operation of creating
-ruleset. WDYT?
-
+> No softirq action callbacks actually use this parameter, so remove it
+> from the function pointer signature. This clarifies that softirq actions
+> are global routines and makes it slightly cheaper to call them.
 > 
->> +		ASSERT_LE(0, ruleset_fd);
->> +
->> +		/* Allows all actions for the first port. */
->> +		ASSERT_EQ(0,
->> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->> +					    &tcp_not_restricted_p0, 0));
->> +
->> +		/* Allows all actions despite listen. */
->> +		ASSERT_EQ(0,
->> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->> +					    &tcp_denied_listen_p1, 0));
->> +
->> +		enforce_ruleset(_metadata, ruleset_fd);
->> +		EXPECT_EQ(0, close(ruleset_fd));
->> +	}
+> v2: use full 72 characters in commit description lines, add Reviewed-by
 > 
-> This entire "if (variant->sandbox == TCP_SANDBOX)" conditional does the exact
-> same thing as the one from patch 5/9.  Should that (or parts of it) get
-> extracted into a suitable helper?
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-I don't think replacing
-	if (variant->sandbox == TCP_SANDBOX)
-with
-	if (is_tcp_sandbox(variant))
-will change anything, this condition is already quite simple. If
-you think that such helper is more convenient, I can add it.
+For the RCU pieces:
 
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+
+> ---
+>  block/blk-mq.c            |  2 +-
+>  include/linux/interrupt.h |  4 ++--
+>  kernel/rcu/tiny.c         |  2 +-
+>  kernel/rcu/tree.c         |  2 +-
+>  kernel/sched/fair.c       |  2 +-
+>  kernel/softirq.c          | 15 +++++++--------
+>  kernel/time/hrtimer.c     |  2 +-
+>  kernel/time/timer.c       |  2 +-
+>  lib/irq_poll.c            |  2 +-
+>  net/core/dev.c            |  4 ++--
+>  10 files changed, 18 insertions(+), 19 deletions(-)
 > 
->> +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
->> +
->> +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
->> +				    false);
->> +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
->> +				    restricted);
->> +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
->> +				    restricted, restricted);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e3c3c0c21b55..aa28157b1aaf 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1126,11 +1126,11 @@ static void blk_complete_reqs(struct llist_head *list)
+>  
+>  	llist_for_each_entry_safe(rq, next, entry, ipi_list)
+>  		rq->q->mq_ops->complete(rq);
+>  }
+>  
+> -static __latent_entropy void blk_done_softirq(struct softirq_action *h)
+> +static __latent_entropy void blk_done_softirq(void)
+>  {
+>  	blk_complete_reqs(this_cpu_ptr(&blk_cpu_done));
+>  }
+>  
+>  static int blk_softirq_cpu_dead(unsigned int cpu)
+> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+> index 3f30c88e0b4c..694de61e0b38 100644
+> --- a/include/linux/interrupt.h
+> +++ b/include/linux/interrupt.h
+> @@ -592,11 +592,11 @@ extern const char * const softirq_to_name[NR_SOFTIRQS];
+>   * asm/hardirq.h to get better cache usage.  KAO
+>   */
+>  
+>  struct softirq_action
+>  {
+> -	void	(*action)(struct softirq_action *);
+> +	void	(*action)(void);
+>  };
+>  
+>  asmlinkage void do_softirq(void);
+>  asmlinkage void __do_softirq(void);
+>  
+> @@ -607,11 +607,11 @@ static inline void do_softirq_post_smp_call_flush(unsigned int unused)
+>  {
+>  	do_softirq();
+>  }
+>  #endif
+>  
+> -extern void open_softirq(int nr, void (*action)(struct softirq_action *));
+> +extern void open_softirq(int nr, void (*action)(void));
+>  extern void softirq_init(void);
+>  extern void __raise_softirq_irqoff(unsigned int nr);
+>  
+>  extern void raise_softirq_irqoff(unsigned int nr);
+>  extern void raise_softirq(unsigned int nr);
+> diff --git a/kernel/rcu/tiny.c b/kernel/rcu/tiny.c
+> index 4402d6f5f857..b3b3ce34df63 100644
+> --- a/kernel/rcu/tiny.c
+> +++ b/kernel/rcu/tiny.c
+> @@ -103,11 +103,11 @@ static inline bool rcu_reclaim_tiny(struct rcu_head *head)
+>  	rcu_lock_release(&rcu_callback_map);
+>  	return false;
+>  }
+>  
+>  /* Invoke the RCU callbacks whose grace period has elapsed.  */
+> -static __latent_entropy void rcu_process_callbacks(struct softirq_action *unused)
+> +static __latent_entropy void rcu_process_callbacks(void)
+>  {
+>  	struct rcu_head *next, *list;
+>  	unsigned long flags;
+>  
+>  	/* Move the ready-to-invoke callbacks to a local list. */
+> diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> index e641cc681901..93bd665637c0 100644
+> --- a/kernel/rcu/tree.c
+> +++ b/kernel/rcu/tree.c
+> @@ -2853,11 +2853,11 @@ static __latent_entropy void rcu_core(void)
+>  	// If strict GPs, schedule an RCU reader in a clean environment.
+>  	if (IS_ENABLED(CONFIG_RCU_STRICT_GRACE_PERIOD))
+>  		queue_work_on(rdp->cpu, rcu_gp_wq, &rdp->strict_work);
+>  }
+>  
+> -static void rcu_core_si(struct softirq_action *h)
+> +static void rcu_core_si(void)
+>  {
+>  	rcu_core();
+>  }
+>  
+>  static void rcu_wake_cond(struct task_struct *t, int status)
+> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+> index 9057584ec06d..8dc9385f6da4 100644
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -12481,11 +12481,11 @@ static int sched_balance_newidle(struct rq *this_rq, struct rq_flags *rf)
+>   * - directly from the local scheduler_tick() for periodic load balancing
+>   *
+>   * - indirectly from a remote scheduler_tick() for NOHZ idle balancing
+>   *   through the SMP cross-call nohz_csd_func()
+>   */
+> -static __latent_entropy void sched_balance_softirq(struct softirq_action *h)
+> +static __latent_entropy void sched_balance_softirq(void)
+>  {
+>  	struct rq *this_rq = this_rq();
+>  	enum cpu_idle_type idle = this_rq->idle_balance;
+>  	/*
+>  	 * If this CPU has a pending NOHZ_BALANCE_KICK, then do the
+> diff --git a/kernel/softirq.c b/kernel/softirq.c
+> index 02582017759a..d082e7840f88 100644
+> --- a/kernel/softirq.c
+> +++ b/kernel/softirq.c
+> @@ -549,11 +549,11 @@ static void handle_softirqs(bool ksirqd)
+>  		prev_count = preempt_count();
+>  
+>  		kstat_incr_softirqs_this_cpu(vec_nr);
+>  
+>  		trace_softirq_entry(vec_nr);
+> -		h->action(h);
+> +		h->action();
+>  		trace_softirq_exit(vec_nr);
+>  		if (unlikely(prev_count != preempt_count())) {
+>  			pr_err("huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n",
+>  			       vec_nr, softirq_to_name[vec_nr], h->action,
+>  			       prev_count, preempt_count());
+> @@ -698,11 +698,11 @@ void __raise_softirq_irqoff(unsigned int nr)
+>  	lockdep_assert_irqs_disabled();
+>  	trace_softirq_raise(nr);
+>  	or_softirq_pending(1UL << nr);
+>  }
+>  
+> -void open_softirq(int nr, void (*action)(struct softirq_action *))
+> +void open_softirq(int nr, void (*action)(void))
+>  {
+>  	softirq_vec[nr].action = action;
+>  }
+>  
+>  /*
+> @@ -758,12 +758,11 @@ static bool tasklet_clear_sched(struct tasklet_struct *t)
+>  		  t->use_callback ? (void *)t->callback : (void *)t->func);
+>  
+>  	return false;
+>  }
+>  
+> -static void tasklet_action_common(struct softirq_action *a,
+> -				  struct tasklet_head *tl_head,
+> +static void tasklet_action_common(struct tasklet_head *tl_head,
+>  				  unsigned int softirq_nr)
+>  {
+>  	struct tasklet_struct *list;
+>  
+>  	local_irq_disable();
+> @@ -803,20 +802,20 @@ static void tasklet_action_common(struct softirq_action *a,
+>  		__raise_softirq_irqoff(softirq_nr);
+>  		local_irq_enable();
+>  	}
+>  }
+>  
+> -static __latent_entropy void tasklet_action(struct softirq_action *a)
+> +static __latent_entropy void tasklet_action(void)
+>  {
+>  	workqueue_softirq_action(false);
+> -	tasklet_action_common(a, this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
+> +	tasklet_action_common(this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
+>  }
+>  
+> -static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
+> +static __latent_entropy void tasklet_hi_action(void)
+>  {
+>  	workqueue_softirq_action(true);
+> -	tasklet_action_common(a, this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
+> +	tasklet_action_common(this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
+>  }
+>  
+>  void tasklet_setup(struct tasklet_struct *t,
+>  		   void (*callback)(struct tasklet_struct *))
+>  {
+> diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
+> index b8ee320208d4..836157e09e25 100644
+> --- a/kernel/time/hrtimer.c
+> +++ b/kernel/time/hrtimer.c
+> @@ -1755,11 +1755,11 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
+>  				hrtimer_sync_wait_running(cpu_base, flags);
+>  		}
+>  	}
+>  }
+>  
+> -static __latent_entropy void hrtimer_run_softirq(struct softirq_action *h)
+> +static __latent_entropy void hrtimer_run_softirq(void)
+>  {
+>  	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
+>  	unsigned long flags;
+>  	ktime_t now;
+>  
+> diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+> index 64b0d8a0aa0f..760bbeb1f331 100644
+> --- a/kernel/time/timer.c
+> +++ b/kernel/time/timer.c
+> @@ -2438,11 +2438,11 @@ static void run_timer_base(int index)
+>  }
+>  
+>  /*
+>   * This function runs timers and the timer-tq in bottom half context.
+>   */
+> -static __latent_entropy void run_timer_softirq(struct softirq_action *h)
+> +static __latent_entropy void run_timer_softirq(void)
+>  {
+>  	run_timer_base(BASE_LOCAL);
+>  	if (IS_ENABLED(CONFIG_NO_HZ_COMMON)) {
+>  		run_timer_base(BASE_GLOBAL);
+>  		run_timer_base(BASE_DEF);
+> diff --git a/lib/irq_poll.c b/lib/irq_poll.c
+> index 2d5329a42105..08b242bbdbdf 100644
+> --- a/lib/irq_poll.c
+> +++ b/lib/irq_poll.c
+> @@ -73,11 +73,11 @@ void irq_poll_complete(struct irq_poll *iop)
+>  	__irq_poll_complete(iop);
+>  	local_irq_restore(flags);
+>  }
+>  EXPORT_SYMBOL(irq_poll_complete);
+>  
+> -static void __latent_entropy irq_poll_softirq(struct softirq_action *h)
+> +static void __latent_entropy irq_poll_softirq(void)
+>  {
+>  	struct list_head *list = this_cpu_ptr(&blk_cpu_iopoll);
+>  	int rearm = 0, budget = irq_poll_budget;
+>  	unsigned long start_time = jiffies;
+>  
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 751d9b70e6ad..3ac02b0ca29e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -5246,11 +5246,11 @@ int netif_rx(struct sk_buff *skb)
+>  		local_bh_enable();
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(netif_rx);
+>  
+> -static __latent_entropy void net_tx_action(struct softirq_action *h)
+> +static __latent_entropy void net_tx_action(void)
+>  {
+>  	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+>  
+>  	if (sd->completion_queue) {
+>  		struct sk_buff *clist;
+> @@ -6919,11 +6919,11 @@ static int napi_threaded_poll(void *data)
+>  		napi_threaded_poll_loop(napi);
+>  
+>  	return 0;
+>  }
+>  
+> -static __latent_entropy void net_rx_action(struct softirq_action *h)
+> +static __latent_entropy void net_rx_action(void)
+>  {
+>  	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+>  	unsigned long time_limit = jiffies +
+>  		usecs_to_jiffies(READ_ONCE(net_hotdata.netdev_budget_usecs));
+>  	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+> -- 
+> 2.45.2
 > 
-> If we start having logic and conditionals in the test implementation (in this
-> case, in test_restricted_test_fixture()), this might be a sign that that test
-> implementation should maybe be split apart?  Once the test is as complicated as
-> the code under test, it does not simplify our confidence in the code much any
-> more?
-> 
-> (It is often considered bad practice to put conditionals in tests, e.g. in
-> https://testing.googleblog.com/2014/07/testing-on-toilet-dont-put-logic-in.html)
-> 
-> Do you think we have a way to simplify that?
-
-I agree.. using 3 external booleans to control behavior of the
-test is really messy. I believe the best we can do to avoid this is to
-split "test_restricted_net_fixture()" into few independent tests. For
-example we can turn this call:
-
-	test_restricted_net_fixture(_metadata, &self->srv0, false,
-		false, false);
-
-into multiple smaller tests:
-
-	/* Tries to bind with invalid and minimal addrlen. */
-	EXPECT_EQ(0, TEST_BIND(&self->srv0));
-
-	/* Tries to connect with invalid and minimal addrlen. */
-	EXPECT_EQ(0, TEST_CONNECT(&self->srv0));
-
-	/* Tries to listen. */
-	EXPECT_EQ(0, TEST_LISTEN(&self->srv0));
-
-	/* Connection tests. */
-	EXPECT_EQ(0, TEST_CLIENT_SERVER(&self->srv0));
-
-Each test is wrapped in a macro that implicitly passes _metadata argument.
-
-This case in which every access is allowed can be wrapped in a macro:
-
-	TEST_UNRESTRICTED_NET_FIXTURE(&self->srv0);
-
-Such approach has following cons though:
-* A lot of duplicated code. These small helpers should be added to every
-   test that uses "test_restricted_net_fixture()". Currently there
-   are 16 calls of this helper.
-
-* There is wouldn't be a single entity that is used to test a network
-   under different sandbox scenarios. If we split the helper each test
-   should care about (1) sandboxing, (2) running all required tests. For
-   example TEST_LISTEN() and TEST_CLIENT_SERVER() could not be called if
-   bind is restricted.
-
-For example protocol.bind test would have following lines after
-"test_restricted_net_fixture()" is removed:
-
-	TEST_UNRESTRICTED_NET_FIXTURE(&self->srv0);
-
-	if (is_restricted(&variant->prot, variant->sandbox)) {
-		EXPECT_EQ(-EACCES, TEST_BIND(&self->srv1));
-		EXPECT_EQ(0, TEST_CONNECT(&self->srv1));
-
-		EXPECT_EQ(-EACCES, TEST_BIND(&self->srv2));
-		EXPECT_EQ(-EACCES, TEST_CONNECT(&self->srv2));
-	} else {
-		TEST_UNRESTRICTED_NET_FIXTURE(&self->srv1);
-		TEST_UNRESTRICTED_NET_FIXTURE(&self->srv2);
-	}
-
-I suggest leaving "test_restricted_net_fixture()" and refactor this
-booleans (in the way you suggested) in order not to lose simplicity in
-the testing:
-
-	bool restricted = is_restricted(&variant->prot,
-		variant->sandbox);
-
-	test_restricted_net_fixture(_metadata, &self->srv0,
-		(struct expected_net_enforcement){
-		.deny_bind = false,
-		.deny_connect = false,
-		.deny_listen = false
-	});
-	test_restricted_net_fixture(_metadata, &self->srv1,
-		(struct expected_net_enforcement){
-		.deny_bind = false,
-		.deny_connect = restricted,
-		.deny_listen = false
-	});
-	test_restricted_net_fixture(_metadata, &self->srv2,
-		(struct expected_net_enforcement){
-		.deny_bind = restricted,
-		.deny_connect = restricted,
-		.deny_listen = restricted
-	});
-
-But it's really not obvious design issue and splitting helper can really
-be a better solution. WDYT?
-
-> 
-> 
-> Readability remark: I am not that strongly invested in this idea, but in the
-> call to test_restricted_net_fixture(), it is difficult to understand "false,
-> false, false", without jumping around in the file.  Should we try to make this
-> more explicit?
-> 
-> I wonder whether we should just pass a struct, so that everything at least has a
-> name?
-> 
->    test_restricted_net_fixture((struct expected_net_enforcement){
->      .deny_bind = false,
->      .deny_connect = false,
->      .deny_listen = false,
->    });
-> 
-> Then it would be clearer which boolean is which,
-> and you could use the fact that unspecified struct fields are zero-initialized?
-> 
-> (Alternatively, you could also spell out error codes here, instead of booleans.)
-
-Agreed, this is a best option for refactoring.
-
-I've also tried adding access_mask field to the service_fixture struct
-with all accesses allowed by default. In a test, then you just need to
-remove the necessary accesses after sandboxing:
-
-	if (is_restricted(&variant->prot, variant->sandbox))
-		clear_access(&self->srv2,
-			     LANDLOCK_ACCESS_NET_BIND_TCP |
-				     LANDLOCK_ACCESS_NET_CONNECT_TCP);
-
-	test_restricted_net_fixture(_metadata, &self->srv2);
-
-But this solution is too implicit for the helper. Passing struct would
-be better.
-
-> 
->> +}
->> +
->>   TEST_F(protocol, bind_unspec)
->>   {
->>   	const struct landlock_ruleset_attr ruleset_attr = {
->> -- 
->> 2.34.1
->>
-> 
-> —Günther
 
