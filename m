@@ -1,123 +1,162 @@
-Return-Path: <netdev+bounces-120012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B934E957DFC
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:21:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E90A957E03
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019631C22282
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 06:21:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71AC41C21ED6
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 06:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D763C16A95F;
-	Tue, 20 Aug 2024 06:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ehgnlcSh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96E816B389;
+	Tue, 20 Aug 2024 06:24:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC6F2A1B2
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46B12A1B2
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724134866; cv=none; b=M7SEmoeuAmNi2sBR47R/9BxZy86JX69XMf6qCWgXF3ExozYu0WCJKLfKqsBfEpyLQiWBeVTcQ8h56mc+gVoZNNeQEV9Y9DGXKZAs0T/CA4/vr63DuDT7o3XplWh0OV5dF044WJE3IhDIv77ejFGDHdpNoYfso3spgHVh+1VmVqY=
+	t=1724135058; cv=none; b=Qc9lp58lRwcPeq7hlT3Ptla5yFa8ARlkfm+av6ONkTrkuD4RSCEoSjf1nsH9DX0rEAzuuOkU5Qu5a0vbbmHnRKuJVsweTd8KHRctlxeEEVCH1wykx55KkP8Q2CNHnDmay5RifQfnP4es9EvcYZoERK+zimqxriLw1Us2M+CI7KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724134866; c=relaxed/simple;
-	bh=HN/gqSUG72SvYiIjtM1v/nfEHRMWbyqMna1vKY9LjqM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=CQj9bcYv9jRGIkNQy0ff1bkh1i4NLfb1jrfVXYUr8yDafmldw/hzRxIzp13fRz7AvncxTiWq05fB4geXnFnaGwZfs1phlXKopQAl01cQRJiklGfgxmX8si4f1jdGCiRF4reFQ+labSsJbxOwbhchRoRbVLwRGpPVkP5XPU++6pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ehgnlcSh; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1724134855; h=Message-ID:Subject:Date:From:To;
-	bh=14Pe3SLqdbqr5ua24G1iMx9ClrRaNFm8prbboqDtRjI=;
-	b=ehgnlcShJ8bHEBy/XPfda85q+g2skdRyOLu3dzneKbuImd4AHHlIlEfq9/RbrcgPIcEulw9AQ8OdU+HEL5G55HllBt9KZgWxyRY9zR4zUKk7ZImPml+Mnk5Hw4KVGXrn3yaQgtakGgwxbuMajPIqS+kgSFRX1y6y1CZSP7J9qAY=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WDHX2Kv_1724134854)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Aug 2024 14:20:54 +0800
-Message-ID: <1724134768.1456072-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 1/4] virtio_ring: enable premapped mode whatever use_dma_api
-Date: Tue, 20 Aug 2024 14:19:28 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Si-Wei Liu" <si-wei.liu@oracle.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- Darren Kenny <darren.kenny@oracle.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
- <20240511031404.30903-2-xuanzhuo@linux.alibaba.com>
- <8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com>
- <1723900832.273505-1-xuanzhuo@linux.alibaba.com>
- <b4b3df48-d0c9-df99-5c47-7b193a5f70fd@oracle.com>
-In-Reply-To: <b4b3df48-d0c9-df99-5c47-7b193a5f70fd@oracle.com>
+	s=arc-20240116; t=1724135058; c=relaxed/simple;
+	bh=hp7QMa3czmD2i09u00AThfclDCW0adRYLwzkstVdCHY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iAcHKiP6wzXNOF4d/1vlTrHqSvCvnImq/eA6iq+yeUr/d8/LC5WKiyObUOZ270VUCBHzm+eOpBSMci7b9MTf0doRCrRQIR7SUgOuw2FIud3WXOeXMSKDff+t/kK3/JhG2NvcLCTMd/GPTlUxqFDMoKG/EBk4/JvM1UUflT6I8KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgIHh-0003dP-2u; Tue, 20 Aug 2024 08:24:01 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgIHe-001hyp-F3; Tue, 20 Aug 2024 08:23:58 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgIHe-00DZKm-16;
+	Tue, 20 Aug 2024 08:23:58 +0200
+Date: Tue, 20 Aug 2024 08:23:58 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kyle Swenson <kyle.swenson@est.tech>
+Cc: "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: pse-pd: tps23881: support reset-gpios
+Message-ID: <ZsQ2fuqWkMYwq_kh@pengutronix.de>
+References: <20240819190151.93253-1-kyle.swenson@est.tech>
+ <20240819190151.93253-3-kyle.swenson@est.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240819190151.93253-3-kyle.swenson@est.tech>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 19 Aug 2024 18:06:07 -0700, "Si-Wei Liu" <si-wei.liu@oracle.com> wrote:
-> Hi,
->
-> May I know if this is really an intended fix to post officially, or just
-> a workaround/probe to make the offset in page_frag happy when
-> net_high_order_alloc_disable is true? In case it's the former, even
-> though this could fix the issue, I would assume clamping to a smaller
-> page_frag than a regular page size for every buffer may have certain
-> performance regression for the merge-able buffer case? Can you justify
-> the performance impact with some benchmark runs with larger MTU and
-> merge-able rx buffers to prove the regression is negligible? You would
-> need to compare against where you don't have the inadvertent
-> virtnet_rq_dma cost on any page i.e. getting all 4 patches of this
-> series reverted. Both tests with net_high_order_alloc_disable set to on
-> and off are needed.
+Hi Kyle,
 
+thank you for you patch.
 
-I will post a PATCH, let we discuss under that.
+On Mon, Aug 19, 2024 at 07:02:14PM +0000, Kyle Swenson wrote:
+> The TPS23880/1 has an active-low reset pin that some boards connect to
+> the SoC to control when the TPS23880 is pulled out of reset.
+> 
+> Add support for this via a reset-gpios property in the DTS.
+> 
+> Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>
+> ---
+>  drivers/net/pse-pd/tps23881.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+> index 2ea75686a319..837e1a2119ee 100644
+> --- a/drivers/net/pse-pd/tps23881.c
+> +++ b/drivers/net/pse-pd/tps23881.c
+> @@ -6,16 +6,16 @@
+>   */
+>  
+>  #include <linux/bitfield.h>
+>  #include <linux/delay.h>
+>  #include <linux/firmware.h>
+> +#include <linux/gpio/consumer.h>
+>  #include <linux/i2c.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pse-pd/pse.h>
+> -
 
-Thanks.
+No need to remove space here.
 
->
-> Thanks,
-> -Siwei
->
-> On 8/17/2024 6:20 AM, Xuan Zhuo wrote:
-> > Hi, guys, I have a fix patch for this.
-> > Could anybody test it?
-> >
-> > Thanks.
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index af474cc191d0..426d68c2d01d 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -2492,13 +2492,15 @@ static unsigned int get_mergeable_buf_len(struct receive_queue *rq,
-> >   {
-> >          struct virtnet_info *vi = rq->vq->vdev->priv;
-> >          const size_t hdr_len = vi->hdr_len;
-> > -       unsigned int len;
-> > +       unsigned int len, max_len;
-> > +
-> > +       max_len = PAGE_SIZE - ALIGN(sizeof(struct virtnet_rq_dma), L1_CACHE_BYTES);
-> >
-> >          if (room)
-> > -               return PAGE_SIZE - room;
-> > +               return max_len - room;
-> >
-> >          len = hdr_len + clamp_t(unsigned int, ewma_pkt_len_read(avg_pkt_len),
-> > -                               rq->min_buf_len, PAGE_SIZE - hdr_len);
-> > +                               rq->min_buf_len, max_len - hdr_len);
-> >
-> >          return ALIGN(len, L1_CACHE_BYTES);
-> >   }
->
+>  #define TPS23881_MAX_CHANS 8
+>  
+>  #define TPS23881_REG_PW_STATUS	0x10
+>  #define TPS23881_REG_OP_MODE	0x12
+>  #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
+> @@ -735,10 +735,11 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
+>  
+>  static int tps23881_i2c_probe(struct i2c_client *client)
+>  {
+>  	struct device *dev = &client->dev;
+>  	struct tps23881_priv *priv;
+> +	struct gpio_desc *reset;
+>  	int ret;
+>  	u8 val;
+>  
+>  	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+>  		dev_err(dev, "i2c check functionality failed\n");
+> @@ -747,10 +748,20 @@ static int tps23881_i2c_probe(struct i2c_client *client)
+>  
+>  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+>  	if (!priv)
+>  		return -ENOMEM;
+>  
+> +	reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
+> +	if (IS_ERR(reset))
+> +		return dev_err_probe(&client->dev, PTR_ERR(reset), "Failed to get reset GPIO\n");
+> +
+> +	if (reset) {
+> +		usleep_range(1000, 10000);
+> +		gpiod_set_value_cansleep(reset, 0); /* De-assert reset */
+> +		usleep_range(1000, 10000);
+
+According to the datasheet, page 13:
+https://www.ti.com/lit/ds/symlink/tps23880.pdf
+
+Minimal reset time is 5 microseconds and the delay after power on reset should
+be at least 20 milliseconds. Both sleep values should be corrected.
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
