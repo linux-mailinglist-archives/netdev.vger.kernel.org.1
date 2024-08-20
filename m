@@ -1,123 +1,84 @@
-Return-Path: <netdev+bounces-120206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AACC9588C5
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:15:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE1C95891A
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4CB7B22E4A
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:15:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19B721F22630
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACC822EE4;
-	Tue, 20 Aug 2024 14:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782B84C62A;
+	Tue, 20 Aug 2024 14:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E7tg9rWk"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Pjsq6K73"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013047.outbound.protection.outlook.com [52.101.67.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74EA2E405;
-	Tue, 20 Aug 2024 14:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52A2191476;
+	Tue, 20 Aug 2024 14:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724163309; cv=fail; b=WY6CG854TQRMcOCHLkllTNXLRhbNRvxG7vCkUPteOuxvGUi1CeVgPNVBblXRhKILYoeAW0++t9VpZwuQ4jVeqLJ0VdUIhPvATCdGxiqY6WVCy3Ajnv7vQQKQnWOdAwybTjldS6XCXHqfv1BxT5RX8YXOn14P1pnx0181xFffvsk=
+	t=1724163727; cv=fail; b=hLz7AzljKTNDq6FP1fxewjYw9GfvV5EiSCCpK6aEB6Qw67lJjd/texa9ZMS7mGkwc5d2rtQLKO8BIrV5OY2ScYRFZQ8kzPUl4vX7C1yTTO5D6xnIuRIld8sDHQbIyfxh8Q1RRv1IPmNPG902JSOgU2ep9UhijGPWd2bCX4TX0y4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724163309; c=relaxed/simple;
-	bh=OuAmu/GvvfdNfuzMYlUPkr7L0uxNEULRQdO+IqKR18c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=gdltkVDAAQ3eVh4k7FjEq4+8wQqJS6xUgVrcrJwfprNnDQ36sieJ5pwjn2SJKOk0woJK7TXiQqQcAK6Oi9UtcmkSrqWUyg+jvwJLUE1tMfkj9jMMBN7yEbHcmCwSQKbgbWfTHkUMxsavxtj4X6B8eDqVsRV2ru/fjcUQBDSSMrA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E7tg9rWk; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724163307; x=1755699307;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=OuAmu/GvvfdNfuzMYlUPkr7L0uxNEULRQdO+IqKR18c=;
-  b=E7tg9rWkTbuts1H5GtDvvfeYn1OqoBjf1is91+onssG8OR2TOMGV6cUD
-   xjBjni/GJ5l1W4zVANYZ1P3P55c8NnAka8PAJkF5KPJJDaNOdaW+CsNtu
-   WVUWbHmeuCvZo4lNci/BAnSncirkcUOFvEHPmbAPWcyUph/jcY3LdP/BD
-   3VeTfINTWl0D6mr9tW0mb7TUlbyuEJwSuIIP+B18xHm+urLqXjIdHThyK
-   4dWY9g7/Z4dkjfauIOHZeGgCjQG1bvpG23mwS682/EvhQBofhOhBGcYhz
-   o4IVrn+/s+wx1+1MpNTPErD/2V2S6K4zkC1EnNmf88jPWN6KnQZJeVZdO
-   w==;
-X-CSE-ConnectionGUID: 3OqwhSCWTnu9nc5C+AljCg==
-X-CSE-MsgGUID: 3eJcaKCzTHip3KtjDvvNdg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="39921124"
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="39921124"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 07:15:06 -0700
-X-CSE-ConnectionGUID: XD68Z4XSQQqXpR2Bwl6Pfw==
-X-CSE-MsgGUID: /ccwdmmtS2euWrx0Fh0Hig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="60709163"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Aug 2024 07:15:07 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 20 Aug 2024 07:15:06 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 20 Aug 2024 07:15:06 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 20 Aug 2024 07:15:06 -0700
+	s=arc-20240116; t=1724163727; c=relaxed/simple;
+	bh=hpZh9h1y2szZppJaZmJzZsu4en1NWLPcjq33NBB5c9g=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=VYrd8/ICpcE4MM3H3N/ekbgUvbxetLsVr4axIH64xzhHr46enfMc3Hti8GjfV5rsB0hl6YeMnQgBAHSPN6emdCW8JZv/Ly2dkpmgkyeeRuMlO5PO/bJgQD3qAcOk2Or5w/ysD5Ij8cHgAaGa+zpscYKPEzK8+6CUgyy8d0cOX6Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Pjsq6K73; arc=fail smtp.client-ip=52.101.67.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OePsS9DrqsllhlQmO3f20xAzs7CnG/YDaTyNf/Hog7wt7NbEOcjZgtJgAlcgauUGN1poIQp/YyR1BrHqNGd5lw0hQDoIS0QPW4v4bWv4iy131E9S4gyIS5MWqQnEZwWEU6oMFOqAuhGEzQAWXsc58ar37GwXqL1LkOJJIAqUGl7sDLYZUtig5R4dnxfJpEFnWdGNVUSkCQ925Er5aAEPK2mYaJZ0uMSavCxHT9JqmWwoY55tZZeEmlNrqq0N229O6BKUnuezYEQ4LAJ2sdSBm6k0IHHiR/3lgTCiDWpaKvY0480GJVpLK7J+ToxOl5HElPl0xJG26LxlbsP+0Kfp8Q==
+ b=Eb2d+5j1i6TCkODNVCPOcIBpKiOicpZPmw9h4d3dT8uR4qoRvUUhRvJY6VctJeRySLBeqC1pJp+/qQX3GCHbCDg/SFr+lCR2gNCpD/Hq0keBO7T0frMES7+ofgb+TAmavT0e/SiDLGOciVBef3r0HoNZlolqXyzCeu3B5moC6Bboo1jchmv6FDT5dYTGpUv/Eo5tynoyQGyE2d0KbTaF8zfPVrOfMefCkrWpyB+Bj9oWHx4XPyJdiQo8oQ0TGf1VmUT3NjxRIbMh+bhARqP3wkDwsLOj+Dc8Ps+lZjYC68IOuseOS5alP8Ua6VhkFbbhBJvQ7AIKBZem8TOs55KkOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rfbu5XPeoP9WDNuCOufENk6NWcf7B2g6efUeKd4OTY0=;
- b=y5pdiCL4vJkIHIADLz84rvkGO7/rstThp/LeH4Xyf+ARMsXkysbcMfzsktKNKg/3gtyuKPc1oBksHsOVEoSVJs1DK9GJCDSMrtGiGwe11W47EotKXVdztQxybHBqnr6J9PDfSWCh500qzCvohz/qBvrHGbHYgqaFeYYM+6QhuOqJPriYnj/eb9+07h6wTgNgJGTd1HcCL4V8DSNB1Sfx12GHb7yiRQ46/HjWCBAIuIu0R0S0cNjCVf9ZL9TN5dCiKN4qp2C6MalIipbrYMt0Mf2eLMwXEE/65PYeam7e18Yk+A0RT3OLfa+7sQA/jI6wEc3NUTbdtanMnLKifLt8ag==
+ bh=4Ty132pww1tqqI0mlq7bYxe67A059DGGMH8JUYGratY=;
+ b=kvoOGQoxJpy1t2Wn5TScbHPCkb1Vy3rqEB4dj/uagvuz2+0uLzCxD28JxMNPUUqp2XYiR0V1kvz4s9ftRJs//uOYID9+9l3AxNpeo0wEflcr8WVw+LQnaAsndDhkshaJhDiBtK1XaX7gVppZ4XqPZw26ZPXYK/W5eRFHfo+qzQ2nLhlBE0DuhjnVtiZoUKuOQ5+KBxsGmevJ89Fie3I8NcUlDNjW+PfM6yfEiLLt8+t8y/e5d/yZi8P8YwV8oUqx1J6mT0QnhjBdtjiv1iLiPU4nKx3ZTc4ldDSxtshy5wvdQIOJ1Kx8nomIZWNxgKyYqNCNWyC7G8XCpO15rz6MyQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4Ty132pww1tqqI0mlq7bYxe67A059DGGMH8JUYGratY=;
+ b=Pjsq6K73WKI2wuae8ahS5EKO6CnwUwJdZMj9qXaDhk4NIADwUVMCCum8jjpVvxxiFe7Z0+783Z7yCxn6JTdHBSEcylYLvUcWHAxeGr5hFQN/b7NxssaCbqqTMmnIJTXnbvb3OqKwuiK/8LVeFsv8hpkPi1lHq1Zq7daqOd3Q4JN9mGM5dm65zr7Z6jfMdTPNfNmmo6JyvFETlARtd6k2oHQOZTbTvEqMh1/+1VDNLa8KShLbPCxL3JVC7W+sihKoGK2hZdC9494C5S/nVBq28etNbObOg/sYl50qQtXnJMJaFAbrtJY95Z7lafJwMjz3dTCkQLxlS/MMiDX4FofXXA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SA1PR11MB6733.namprd11.prod.outlook.com (2603:10b6:806:25c::17)
- by DS0PR11MB7580.namprd11.prod.outlook.com (2603:10b6:8:148::21) with
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by DB8PR04MB7163.eurprd04.prod.outlook.com (2603:10a6:10:fe::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.25; Tue, 20 Aug
- 2024 14:15:03 +0000
-Received: from SA1PR11MB6733.namprd11.prod.outlook.com
- ([fe80::cf7d:9363:38f4:8c57]) by SA1PR11MB6733.namprd11.prod.outlook.com
- ([fe80::cf7d:9363:38f4:8c57%6]) with mapi id 15.20.7875.019; Tue, 20 Aug 2024
- 14:15:03 +0000
-Date: Tue, 20 Aug 2024 09:14:57 -0500
-From: Ira Weiny <ira.weiny@intel.com>
-To: Zijun Hu <zijun_hu@icloud.com>, Ira Weiny <ira.weiny@intel.com>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
-	<rafael@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, Dave Jiang <dave.jiang@intel.com>, "Alison
- Schofield" <alison.schofield@intel.com>, Vishal Verma
-	<vishal.l.verma@intel.com>, Dan Williams <dan.j.williams@intel.com>, "Takashi
- Sakamoto" <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-	<linux1394-devel@lists.sourceforge.net>, <netdev@vger.kernel.org>, Zijun Hu
-	<quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v2 1/4] driver core: Make parameter check consistent for
- API cluster device_(for_each|find)_child()
-Message-ID: <66c4a4e15302b_2f02452943@iweiny-mobl.notmuch>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-1-8316b87b8ff9@quicinc.com>
- <66c491c32091d_2ddc24294e8@iweiny-mobl.notmuch>
- <2b9fc661-e061-4699-861b-39af8bf84359@icloud.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2b9fc661-e061-4699-861b-39af8bf84359@icloud.com>
-X-ClientProxiedBy: MW4PR03CA0167.namprd03.prod.outlook.com
- (2603:10b6:303:8d::22) To SA1PR11MB6733.namprd11.prod.outlook.com
- (2603:10b6:806:25c::17)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Tue, 20 Aug
+ 2024 14:22:02 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%3]) with mapi id 15.20.7875.019; Tue, 20 Aug 2024
+ 14:22:01 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Brian Norris <briannorris@chromium.org>,
+	linux-wireless@vger.kernel.org (open list:NETWORKING DRIVERS (WIRELESS)),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: imx@lists.linux.dev
+Subject: [PATCH v3 1/1] dt-bindings: net: wireless: convert marvel-8xxx.txt to yaml format
+Date: Tue, 20 Aug 2024 10:21:42 -0400
+Message-Id: <20240820142143.443151-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY1P220CA0010.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:a03:59d::12) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -125,168 +86,289 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR11MB6733:EE_|DS0PR11MB7580:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85aff468-86e5-4eb1-8013-08dcc1227bd4
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|DB8PR04MB7163:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f8b8944-1450-462c-0d67-08dcc123755a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|921020;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?HN1j6JPSDgmOt943DPGDm8JewUIABoU8Ci5T6yjxnuX0wDsaV9/bEeIKhNxm?=
- =?us-ascii?Q?7M5I9FV6q1qlf2SxgH53/o1dp/6X24+Uhz42UZuUfNIQX+HbsT24iFI2dfAq?=
- =?us-ascii?Q?3t8Mx7fUIQDo+qcbNsveFDyNav5CxybDgEZLQBCsT22cbjLB9xdoj3lJ2atG?=
- =?us-ascii?Q?CS5UNbM9NcsqgaCjX+gU7WIfuirkuBjdu3bapluUKRmaE323HgbjSoYTB8/s?=
- =?us-ascii?Q?a+Ph90dZn3R9bfzSnsfSA8zVJydrr/yhdYaSXUOj9dqsHhStgjblNuFSTB6K?=
- =?us-ascii?Q?X1VZeQYHLDUiU6MQiNri/uwOVt/FAcUMVr6wKepENTF4rjyyvH9DpZKOh5WS?=
- =?us-ascii?Q?nqF6T6XRainuxs6DBmWE99YQ9Cip0xemGYw8Yxcdc/6uCGxM1KzQbLo1Gd/H?=
- =?us-ascii?Q?HaFxcA3hQRAitaJSpWIGkci2PDekVUROBIwrFx2GEGtDJk+We+JK32sq36wK?=
- =?us-ascii?Q?mH4QlXNPDTwksBOZPw2j3nj9bw5fenic0j0zu+i9qzvBwkJ7HweGjMWJbe0y?=
- =?us-ascii?Q?zE3ZLKpPCilILmAPn3qE3qoQl8wk2566jp8YlPy5kuNceu7vnRgA/JwICsu3?=
- =?us-ascii?Q?bbAVaRcaiYNXlGTunrMfkH63VNAso/hU83k5RHObVv2VkF+MJXnuKuFULosN?=
- =?us-ascii?Q?R74hjySsqtrh4czwnfLs1i7mhZbKId7SQ6O+U5WJqzBg0kZ/bsA+J5owkj/W?=
- =?us-ascii?Q?7Vpn1PxIDs0cnBJqcZ1qMEQOkFMZgzxfHn388HguJr7lU8l66tF961oQbvgO?=
- =?us-ascii?Q?woUCIbIUZPZj0qLi04NTqu9Fy2kgzcMqc20I652oVjS/SmW7usSsG2GkWe92?=
- =?us-ascii?Q?lE7GESgoWL8EtpO5UfLGBamruRmPPF9fnD6EAGxcuVmJF41NjWEp1BpD09Vi?=
- =?us-ascii?Q?av317JFHEjnzrHP8Num3SeSRn27Z7CyGoVPgeGKTIoo8iNxgdrwHYIcM+jnW?=
- =?us-ascii?Q?qcZ1B6IuPFrPWSQ0Xwt0cupGfmE0XCk1u7FEhqavhvkUZ35xIK5D8sXteEz9?=
- =?us-ascii?Q?LF10TzHP0sdvlVlEdXmhr01feHh9yerPxo6P0ND2QumO6Em8I/SnVgEcxzQC?=
- =?us-ascii?Q?Lu3yFJvrtxu6PNNr7ESX3KWICTVemrPrTlXPLIvsrD9FJaUKIBT5cBTQhkjL?=
- =?us-ascii?Q?OoLVTco6Qt2uOCoM3kjwroO4DOIQlp9il7Q9gfCw+qxi2legtlsU04gIn6QT?=
- =?us-ascii?Q?DqXAJNmoQHBjIlE/4EwkHDVC1pvNlMpVzEweKMoaK22nPnhNEFlfNQy/mmIs?=
- =?us-ascii?Q?RRLqcT525JC6EhJz43kGqB19OrgM/vmNwlnu2rDWk406qG4BQXGtJp00B1jr?=
- =?us-ascii?Q?MWxi5JLCDNiVr6Ouj2lBOGzOCpJrvYZeiLzCQgKEftTy/1/ke5t04vZJJ9Ff?=
- =?us-ascii?Q?8WlTA9FeSIslCWRjkh4lFTTy7czQ?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6733.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(921020);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|7416014|376014|1800799024|366016|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?s1nk965p59HMXPddKwE36qgfe0RkyR4SGw3ruAZglBYa5a99iRJX0n/FPpie?=
+ =?us-ascii?Q?cg2usnVoXePegzPnlqDXdqMWLBYE5eGkg5mEgn17+mPOmmdV7yZKJySlQEGx?=
+ =?us-ascii?Q?XYxsUYbHUAC3qaiIy+uSbDF9HigKlXEXbBDsQkS4bvpVT82LEcB7LRlcsX2k?=
+ =?us-ascii?Q?T/NGsJhl9QIQRxWJtu4hCPpI5PKhKUfbHNK1FJs2SMRjhQ3SDnsltxgo6ZO7?=
+ =?us-ascii?Q?/sw/KE3ZxH+pizLcojQks75dqbbT+cBRdXfBaTx45jn9zwbYieN9Qz/AlTlh?=
+ =?us-ascii?Q?OPekA4c5hQz4iT3VRmCFqtwIkjSbKwiY82Z5pcC8DMcvYl5kzvHbp5HTBPG7?=
+ =?us-ascii?Q?noRSKkaEi8+qX+u1Sbzbv8iLwhPnHZn3ZpnxlysyeF3QQJNY6FFj2CURjb7N?=
+ =?us-ascii?Q?dTrPbv7ubywuhtbPUwRSKfqDFkeQuj0rYj1Hbbpt7zjl14U4MrvBVLEniUt+?=
+ =?us-ascii?Q?WDInUflJQyARvXKHTLfdnP3g+MCRqpBiAil8+VwNji+BAPfY+uX5ImrVf7bJ?=
+ =?us-ascii?Q?kE1Zq9Jg76fwYxEAxiTQbfX1q41RdwubLaqW8k1umMXPQkbWyYUj61LvyavL?=
+ =?us-ascii?Q?uh18qKNSphTwd/g5YT1MkLSO8kgn3FS7KBJlyCr3Oh0q8YdPYXksukduYjPN?=
+ =?us-ascii?Q?ol4BIOqSjNTngjZnVxHAKKMiv0+/PbBRPsUgRkAAFJVbAy4kBUAYCeAYKDmZ?=
+ =?us-ascii?Q?G68TANbs4yhi+sLK0BgD/zP9q7xipZ0Lkw43bsOYaQyFnibrVA49JRSBUSKi?=
+ =?us-ascii?Q?ImEZ+ULEF6VWyfEMXmKO+e8uclMf6odcjX1M5jXMn2d9u5wtBs30lzmqXk9p?=
+ =?us-ascii?Q?OaJuuFGerqTgJYs078eqzd2B+oPXx1M74JZ0yLYcPljkXih/TVZiN4wSiNuj?=
+ =?us-ascii?Q?9Sj2iIbPMe1UKob0ZT9R1jw7rN/KaKhW9bvHIkb2gJi95lNUwReuVSgTWJp1?=
+ =?us-ascii?Q?KfOlD2UY6/wPMfHMF2eobZAdWv5aZ0aIfQs75C/KRNiXzoZ7mE424fOwWsiE?=
+ =?us-ascii?Q?2BZZv/NPEv/V20wQacNawcAjHvISAqxHQj5GNceq9sfmQzsQZj+AqKf2uii+?=
+ =?us-ascii?Q?nOivDhGF11WCMLDnZESIv5Ar5mJPGsHqfBnDqBnOgQppeC7TBPcfE/yQivWT?=
+ =?us-ascii?Q?3RYZ2zQgHyp+aTUmQ8hMfGYi00pu6+iJC5mYrlAUUSvBMvW+/unpdp9jb46M?=
+ =?us-ascii?Q?TvFtNSMqQR+EMGvNxHcn961dOc1LC3f4o6ZTexo6TcfmgThn4fAQyxEgkWcr?=
+ =?us-ascii?Q?lBNJXKzUMmMuDeKdHS6UBQmfxQpFxOumqFotOJ1A2CTVT72Z/pEBNH7CEFWT?=
+ =?us-ascii?Q?NQbbSJA21Pf7QT/DVWpQtMgF+spV2bQsKPqH23Vhlr1GTcILglN3Pn+0eYbC?=
+ =?us-ascii?Q?TmubXVQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Qqw7BneEFf+UZLJzNL8RB6/ScECTQ3iLFs7gkVrROcAizXaNuuKe7OdsTK5U?=
- =?us-ascii?Q?insxQYLXZGthpzXu4VoOgq/Xki9nkWW4MBzMEwCEV2PeVPHhKcbcM7LSHNfU?=
- =?us-ascii?Q?EhYRzfXhY+W/heeKxfL2z0i2X73UGvzPZlVgEYqZdM0GZHATpO/05Ke8oKgA?=
- =?us-ascii?Q?U303EFh7M15SU9Ax3i1v2hwO0u/v5Q0lzm55HZlDOzeDvORXUmbzl1/jBCn2?=
- =?us-ascii?Q?lfG8Js7QrUcx/yNTIsIrwIsDeBJAFy4aBPSxLkyg8Q+V0EHFGT5rAPoXz0UE?=
- =?us-ascii?Q?uikzwm1iAt1UkErBuW3VFTvCQdRbmoWU4+WkJ/Njuri1XeqND5SVtyLV2nFB?=
- =?us-ascii?Q?1+x7qlPWorgTTpxZ9piP3oqtnt5HnCGvAh+Z/YNfcAAw2ohiqL3WbMUHSRY3?=
- =?us-ascii?Q?hUPy/LKbod+iogi/I91Wt1Iz9Pwnh8Yr+tWpwOTTPh2onk/OQpmSQ2FTpFNU?=
- =?us-ascii?Q?tSvmIhjI03m8KlUMot++LE236qW6O79L8hs725zgQ0+vsEJjZQqengJlfbJ5?=
- =?us-ascii?Q?ltNhC1S7M4NWPw8Vuy4ma3ec8MD5fygeNm0Emg+KZLs3nj7h1U3gOs/ycn5K?=
- =?us-ascii?Q?kj8QpeTTotCNvm+t2FbtSQ2o10BPmCUNf4yM2Rd90w86bJh4FxzjkN1Fj+yR?=
- =?us-ascii?Q?7gh6DxxNXqfDkyjlpICp+HuM/pemAQVSl32a5BS9hRNz5yvrRgMcBPfwxpQC?=
- =?us-ascii?Q?OrRH8MgSdNCTmv8fS9sxAKLDbrV25/7RHBrUn94PmPbkz5dMLRNBkj3WAtMf?=
- =?us-ascii?Q?BdySPkaZFuXELNt3sxGxQoT7cSxjd2TGPfphCi9gAcYIVdxoILlBlH0Iv1q4?=
- =?us-ascii?Q?pVCW2tBTw+0oY/HRD6eGoQPY4gxu22wMaDmZkNqRMRlFbGs6EkcvwoHJVdXV?=
- =?us-ascii?Q?PM1Fl6SQ5IQMFgHIGXDUwoBJcY//+LVg3FuePl3IzewKqAnkXJ3eVRGcBulx?=
- =?us-ascii?Q?VAHg5QVyEvgyyV+MwWbn9KF69WDpCLobY4XnKoD5SOClER5tmbt8gAweZO9V?=
- =?us-ascii?Q?piBOE8GB9drIMUxkDFHsnwxMQP71aCJyR/6oryip37wo12q0v0A0BwJiRGsY?=
- =?us-ascii?Q?LU/A6q2DdrEcJG4eXNWewFofv6PSZwcdiGRosszInYnyklEt7jZJfdt6LbML?=
- =?us-ascii?Q?rfXg3JqB25Cj768QQTcTB5RLgCPJiH8ITglU3NzEA/NgTU1IyFiM3saKgaoj?=
- =?us-ascii?Q?gq4lBMbCn8vHkbmcRCdpDA3V05gfNz8UiWOFHjUIbd9NKz2GJdeS9rFh65op?=
- =?us-ascii?Q?Wv29KEVRtkI7YzMNKATC7ptZWAcVFTPenktzYpkrTgAxEmcq50ZSeo1yzY+6?=
- =?us-ascii?Q?xRUzq026RDOYEShleVtgKH/jw1xEOngyuP5Dv2Zu3uiEtHy01KVgCpVe7yW3?=
- =?us-ascii?Q?UKCkioWZyBbrwdABUgzbUbYxpo4WiYVsGOQ2v/KPJ4CIzZB8KU0dRs7+u3yq?=
- =?us-ascii?Q?R16EqCphMrWcmuqUzQsgmL1pQ0FlU8kMrWbx99l2eiU9skXh7jTb8ESDIfr9?=
- =?us-ascii?Q?D+GD24uEWxEIGIOLB8k/in8E3HIguahnkgY0W5ivFJlTTzKTLeeWJlDdIOpQ?=
- =?us-ascii?Q?1DymNYDYBzElrVaCxuYV0PEHcacM5FOOpmXmU14s?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85aff468-86e5-4eb1-8013-08dcc1227bd4
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6733.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?D3hXWefhqhAPU9q0v4oAa5NlrhAjfV9Xmfcci3otWMzMTpNDgS2/vHPcYe/P?=
+ =?us-ascii?Q?IpSpl3I5xr+94sdBcFe5/MZb1gNYCC/b8StjBWSKsM6HCgJ1EnYsQ/nMt36b?=
+ =?us-ascii?Q?MYxvVwkO5G0sTTfX/GAj5MkEvwyP4h/D2Fvtb9Ygrwa1f3Y426yp3mwv3ysV?=
+ =?us-ascii?Q?B8tE3iHtMQ4MjKUv3uhaqvpaWN6u5o02vas+5oGHR90PDjo6/VQPbHH4zVyi?=
+ =?us-ascii?Q?weyLDqk0moScDmh/lpk2Wl/+xg6nlTwGUsn7BYroRpgiwazCh8mosw9ixdjz?=
+ =?us-ascii?Q?e9+kiDXYOPW6aVLR4kjuL7oivXPoT5RaIhnzWzSjhGdEHr5pORbkredo51+4?=
+ =?us-ascii?Q?SY5hFOgiCrvnhhpGie3iMVA6yPjtzYfY1Crb4QiMIdmXwAt5IkNIX5te06DM?=
+ =?us-ascii?Q?hsLvZUuGIldDmYVLvU41qt+KQ3lybz4k7Fjp7gzHb0hPIR2uqXydQkrW5nvS?=
+ =?us-ascii?Q?JFEg9mtnHzWbfoq+FowqW2Z97BYKuIM6LbwBcE762bqPcuvSd3BogjTyqSzm?=
+ =?us-ascii?Q?myWpxN7OnV7N3hYEUDJUG8VXCrcacjfLCssWjPdSeT3XW2tEJ1+fA8JHg5fP?=
+ =?us-ascii?Q?mdSe4jTTCNIiuA7oyuq06pYcsRdHoFiik1vcxpmAAKfnbDwzOjnzeb/caOuU?=
+ =?us-ascii?Q?Z2Ouck1HumI/auBG+ecRU4cu1ep7HLWuokNAoLpYUhWmwC+wrZnHGTFc6PqY?=
+ =?us-ascii?Q?TPpEmKxIHGmG/JIeO1dAh1bfIjjdA+ej+kcG1V6boEXsPx919QobbVZp+9xR?=
+ =?us-ascii?Q?4LVOcklxTN79VyU5tyj38uAS1DkiGbeI1hVldmIqYcxVke6TJ9aUo++Syo6r?=
+ =?us-ascii?Q?VqSN9ozAM3a/DlF5+JYEN1iBmiWs1nGgG/RIEpUoC5UZkv2D3hnM84573WmY?=
+ =?us-ascii?Q?l5aqC6gQIOmqU9V+G4xF8vf0u5y50AvnSSdvlwNNTM5jv3qxIdRP6mvm1vmd?=
+ =?us-ascii?Q?e+ttUBqdMH3ERBMgpicOvbTAQgOZ6aMM7RSMILJTk6gtB6kaDgYLd1A1vwjI?=
+ =?us-ascii?Q?l03LJY8hy6ZWTO/0/pgYJOwIhLOgX2KdB5Igv9xg6HF0UWpp5w1MU7egyATU?=
+ =?us-ascii?Q?Bj/8buc8ce/yVVKSGdKxZXyVjfXlwo7JCxZV11rTGsSjFReXfE1Ir9kHNksv?=
+ =?us-ascii?Q?703XZGm8SOYJgPpqdo7B+6eVKjjuSOOd4cwXzDY/gR+/wcb6GfqcATUWF5/1?=
+ =?us-ascii?Q?i3f9LpTIvHemFKtFoc7wALT24BJwC6oDD9U6DolzPH3MJP/F/Jivt6qbKaVL?=
+ =?us-ascii?Q?wg0Zs6z7BWQNT3baKxW0Jbh5cZEjoRIGPB5yBFUmpdomO5e6pi6/ubjoJoPT?=
+ =?us-ascii?Q?cw16lRZeBdKYot9V+1Md1pD1jtpf9lCZx5uxpR7KZRb3ScCuwDg2uBeP06W8?=
+ =?us-ascii?Q?oqdkcl9Fl1kzgL9u5Eh9ZRFWYfILbC7SQjVvkfuqySubqCDqYP/iezPqMZGq?=
+ =?us-ascii?Q?Am1SgC38PR7QB6fRvLsS7QsAU11vE2lAjcbkLFMDdbMnb6OlMsq3hC536u4k?=
+ =?us-ascii?Q?0e82mP8egkw56cE7u2P0IRzrDHO/7xGmdzln3DO0mX6WW2LmYLcDNoE9y5cj?=
+ =?us-ascii?Q?NWonf+s6ZyXjRlqGQao=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f8b8944-1450-462c-0d67-08dcc123755a
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 14:15:03.2682
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 14:22:01.8130
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WyewlwpTTz+hgRqncpu1eV9QZdcYrEqGAkXOXQ+jYh9Vr9YVVl/q6PZjQUC0dvUMoP5yAOdjlDLmmWoHa9dLYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7580
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: sarmALmr6BMi12GmS5P88K2jVGNYky8y5+QwKHBX59wCzJqAXm7jcqW2SGWWKziXDBblAvG8q5kMwWT8meM2Ww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7163
 
-Zijun Hu wrote:
-> On 2024/8/20 20:53, Ira Weiny wrote:
-> > Zijun Hu wrote:
-> >> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> >>
-> >> The following API cluster takes the same type parameter list, but do not
-> >> have consistent parameter check as shown below.
-> >>
-> >> device_for_each_child(struct device *parent, ...)  // check (!parent->p)
-> >> device_for_each_child_reverse(struct device *parent, ...) // same as above
-> >> device_find_child(struct device *parent, ...)      // check (!parent)
-> >>
-> > 
-> > Seems reasonable.
-> > 
-> > What about device_find_child_by_name()?
-> > 
-> 
-> Plan to simplify this API implementation by * atomic * API
-> device_find_child() as following:
-> 
-> https://lore.kernel.org/all/20240811-simply_api_dfcbn-v2-1-d0398acdc366@quicinc.com
-> struct device *device_find_child_by_name(struct device *parent,
->  					 const char *name)
-> {
-> 	return device_find_child(parent, name, device_match_name);
-> }
+Convert binding doc marvel-8xxx.txt to yaml format.
+Additional change:
+- Remove marvell,caldata_00_txpwrlimit_2g_cfg_set in example.
+- Remove mmc related property in example.
+- Add wakeup-source property.
+- Remove vmmc-supply and mmc-pwrseq.
 
-Ok.  Thanks.
+Fix below warning:
+arch/arm64/boot/dts/freescale/imx8mp-beacon-kit.dtb: /soc@0/bus@30800000/mmc@30b40000/wifi@1:
+failed to match any schema with compatible: ['marvell,sd8997']
 
-> 
-> >> Fixed by using consistent check (!parent || !parent->p) for the cluster.
-> >>
-> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >> ---
-> >>  drivers/base/core.c | 6 +++---
-> >>  1 file changed, 3 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/base/core.c b/drivers/base/core.c
-> >> index 1688e76cb64b..b1dd8c5590dc 100644
-> >> --- a/drivers/base/core.c
-> >> +++ b/drivers/base/core.c
-> >> @@ -4004,7 +4004,7 @@ int device_for_each_child(struct device *parent, void *data,
-> >>  	struct device *child;
-> >>  	int error = 0;
-> >>  
-> >> -	if (!parent->p)
-> >> +	if (!parent || !parent->p)
-> >>  		return 0;
-> >>  
-> >>  	klist_iter_init(&parent->p->klist_children, &i);
-> >> @@ -4034,7 +4034,7 @@ int device_for_each_child_reverse(struct device *parent, void *data,
-> >>  	struct device *child;
-> >>  	int error = 0;
-> >>  
-> >> -	if (!parent->p)
-> >> +	if (!parent || !parent->p)
-> >>  		return 0;
-> >>  
-> >>  	klist_iter_init(&parent->p->klist_children, &i);
-> >> @@ -4068,7 +4068,7 @@ struct device *device_find_child(struct device *parent, void *data,
-> >>  	struct klist_iter i;
-> >>  	struct device *child;
-> >>  
-> >> -	if (!parent)
-> >> +	if (!parent || !parent->p)
-> > 
-> > Perhaps this was just a typo which should have been.
-> > 
-> > 	if (!parent->p)
-> > ?
-> > 
-> maybe, but the following device_find_child_by_name() also use (!parent).
-> 
-> > I think there is an expectation that none of these are called with a NULL
-> > parent.
-> >
-> 
-> this patch aim is to make these atomic APIs have consistent checks as
-> far as possible, that will make other patches within this series more
-> acceptable.
-> 
-> i combine two checks to (!parent || !parent->p) since i did not know
-> which is better.
+Acked-by: Brian Norris <briannorris@chromium.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+---
+Change from v2 to v3
+- Add Rob review tag
+- Add brian ack tag
+- remove extra .
 
-I'm not entirely clear either.  But checking the member p makes more sense
-to me than the parent parameter.  I would expect that iterating the
-children of a device must be done only when the parent device is not NULL.
+Change from v1 to v2
+- Add Brian Norris <briannorris@chromium.org as maintainer
+- Remove vmmc-supply and mmc-pwrseq
+- Add wakeup-source
+- rename to marvell,sd8787.yaml by using one compatible string, suggestted
+by conor dooley at other binding doc convert review
+---
+ .../bindings/net/wireless/marvell,sd8787.yaml | 93 +++++++++++++++++++
+ .../bindings/net/wireless/marvell-8xxx.txt    | 70 --------------
+ 2 files changed, 93 insertions(+), 70 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
 
-parent->p is more subtle.  I'm unclear why the API would need to allow
-that to run without error.
+diff --git a/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml b/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
+new file mode 100644
+index 0000000000000..1715b22e0dcf8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
+@@ -0,0 +1,93 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/wireless/marvell,sd8787.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Marvell 8787/8897/8978/8997 (sd8787/sd8897/sd8978/sd8997/pcie8997) SDIO/PCIE devices
++
++maintainers:
++  - Brian Norris <briannorris@chromium.org>
++  - Frank Li <Frank.Li@nxp.com>
++
++description:
++  This node provides properties for describing the Marvell SDIO/PCIE wireless device.
++  The node is expected to be specified as a child node to the SDIO/PCIE controller that
++  connects the device to the system.
++
++properties:
++  compatible:
++    enum:
++      - marvell,sd8787
++      - marvell,sd8897
++      - marvell,sd8978
++      - marvell,sd8997
++      - nxp,iw416
++      - pci11ab,2b42
++      - pci1b4b,2b42
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  wakeup-source: true
++
++  marvell,caldata-txpwrlimit-2g:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: Calibration data for the 2GHz band.
++    maxItems: 566
++
++  marvell,caldata-txpwrlimit-5g-sub0:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: Calibration data for sub-band 0 in the 5GHz band.
++    maxItems: 502
++
++  marvell,caldata-txpwrlimit-5g-sub1:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: Calibration data for sub-band 1 in the 5GHz band.
++    maxItems: 688
++
++  marvell,caldata-txpwrlimit-5g-sub2:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: Calibration data for sub-band 2 in the 5GHz band.
++    maxItems: 750
++
++  marvell,caldata-txpwrlimit-5g-sub3:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: Calibration data for sub-band 3 in the 5GHz band.
++    maxItems: 502
++
++  marvell,wakeup-pin:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      Provides the pin number for the wakeup pin from the device's point of
++      view. The wakeup pin is used for the device to wake the host system
++      from sleep. This property is only necessary if the wakeup pin is
++      wired in a non-standard way, such that the default pin assignments
++      are invalid.
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    mmc {
++         #address-cells = <1>;
++         #size-cells = <0>;
++
++         wifi@1 {
++             compatible = "marvell,sd8897";
++             reg = <1>;
++             interrupt-parent = <&pio>;
++             interrupts = <38 IRQ_TYPE_LEVEL_LOW>;
++             marvell,wakeup-pin = <3>;
++        };
++    };
++
+diff --git a/Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt b/Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
+deleted file mode 100644
+index cdc303caf5f45..0000000000000
+--- a/Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
++++ /dev/null
+@@ -1,70 +0,0 @@
+-Marvell 8787/8897/8978/8997 (sd8787/sd8897/sd8978/sd8997/pcie8997) SDIO/PCIE devices
+-------
+-
+-This node provides properties for controlling the Marvell SDIO/PCIE wireless device.
+-The node is expected to be specified as a child node to the SDIO/PCIE controller that
+-connects the device to the system.
+-
+-Required properties:
+-
+-  - compatible : should be one of the following:
+-	* "marvell,sd8787"
+-	* "marvell,sd8897"
+-	* "marvell,sd8978"
+-	* "marvell,sd8997"
+-	* "nxp,iw416"
+-	* "pci11ab,2b42"
+-	* "pci1b4b,2b42"
+-
+-Optional properties:
+-
+-  - marvell,caldata* : A series of properties with marvell,caldata prefix,
+-		      represent calibration data downloaded to the device during
+-		      initialization. This is an array of unsigned 8-bit values.
+-		      the properties should follow below property name and
+-		      corresponding array length:
+-	"marvell,caldata-txpwrlimit-2g" (length = 566).
+-	"marvell,caldata-txpwrlimit-5g-sub0" (length = 502).
+-	"marvell,caldata-txpwrlimit-5g-sub1" (length = 688).
+-	"marvell,caldata-txpwrlimit-5g-sub2" (length = 750).
+-	"marvell,caldata-txpwrlimit-5g-sub3" (length = 502).
+-  - marvell,wakeup-pin : a wakeup pin number of wifi chip which will be configured
+-		      to firmware. Firmware will wakeup the host using this pin
+-		      during suspend/resume.
+-  - interrupts : interrupt pin number to the cpu. driver will request an irq based on
+-		 this interrupt number. during system suspend, the irq will be enabled
+-		 so that the wifi chip can wakeup host platform under certain condition.
+-		 during system resume, the irq will be disabled to make sure
+-		 unnecessary interrupt is not received.
+-  - vmmc-supply: a phandle of a regulator, supplying VCC to the card
+-  - mmc-pwrseq:  phandle to the MMC power sequence node. See "mmc-pwrseq-*"
+-		 for documentation of MMC power sequence bindings.
+-
+-Example:
+-
+-Tx power limit calibration data is configured in below example.
+-The calibration data is an array of unsigned values, the length
+-can vary between hw versions.
+-IRQ pin 38 is used as system wakeup source interrupt. wakeup pin 3 is configured
+-so that firmware can wakeup host using this device side pin.
+-
+-&mmc3 {
+-	vmmc-supply = <&wlan_en_reg>;
+-	mmc-pwrseq = <&wifi_pwrseq>;
+-	bus-width = <4>;
+-	cap-power-off-card;
+-	keep-power-in-suspend;
+-
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-	mwifiex: wifi@1 {
+-		compatible = "marvell,sd8897";
+-		reg = <1>;
+-		interrupt-parent = <&pio>;
+-		interrupts = <38 IRQ_TYPE_LEVEL_LOW>;
+-
+-		marvell,caldata_00_txpwrlimit_2g_cfg_set = /bits/ 8 <
+-	0x01 0x00 0x06 0x00 0x08 0x02 0x89 0x01>;
+-		marvell,wakeup-pin = <3>;
+-	};
+-};
+-- 
+2.34.1
 
-Ira
 
