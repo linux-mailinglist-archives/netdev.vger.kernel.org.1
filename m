@@ -1,123 +1,98 @@
-Return-Path: <netdev+bounces-120228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DE869589EE
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:45:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935AE9589F9
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C07811C21EDD
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50638287DC4
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBF11946C3;
-	Tue, 20 Aug 2024 14:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8389191F9B;
+	Tue, 20 Aug 2024 14:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O32OhsOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561221940B7
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 14:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF78191F94;
+	Tue, 20 Aug 2024 14:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724164718; cv=none; b=Ie7OwfPRWeVx80umA0hJMP2BNWrzAPcUzbYhtwgL4HhvhIJbO3XTlolCptJFYArMr1Hl4jSafRhIHhve5/HN2WzukeJQxn63jYAnIJB7+cZOWQ9JlhUXtfqvE0YxjkEtBlWtqdGTPgBr6gYzwYlh8EsV8A+7SPOPwDaYhJvpRCU=
+	t=1724164864; cv=none; b=UbTsGWpARBciDuBvmnrRsZYSpiDj8SuRNWcKgN2/QvC9CE36ZOZvRuips5pFfmaU46TxsJr2rcUOjGLXjGDTyanEFlJGz5hHL4WQop/bvv7JCqy9lUaWxOEXVGqClu/xqtj798h+4wv3hrqo6ipooFf1fhGU1T/pmn+DwdR1Ujg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724164718; c=relaxed/simple;
-	bh=WxotiNE0yNj1Dr5MFrPyVsllSmCNRWqBsnhOwq0Z1h4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=pY2RsIq7m8jutIRjajMhBGmAFctNV6FDKQ0THkAKFrb67TULbm6EqIq6eIPI1jvZp+Azg1j7nfzajUI/WfHQzTFVHgSJ5s03FIke9WEGuqzz0+5YnIx5u4xJrCM4zCP/E8TMZXydoCMeFGWypTIOZRZI08fLNJUFV9yNPtIoWIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-134-KofZUxcjMnS9UfmBkMPACA-1; Tue,
- 20 Aug 2024 10:38:25 -0400
-X-MC-Unique: KofZUxcjMnS9UfmBkMPACA-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 475451955BF9;
-	Tue, 20 Aug 2024 14:38:23 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3F531955F66;
-	Tue, 20 Aug 2024 14:38:18 +0000 (UTC)
-Date: Tue, 20 Aug 2024 16:38:16 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 3/3] bonding: support xfrm state update
-Message-ID: <ZsSqWO-zbgYSQIdY@hog>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-4-liuhangbin@gmail.com>
+	s=arc-20240116; t=1724164864; c=relaxed/simple;
+	bh=MZ+n+nKmV2N6aH3srELSOnz9POMtf3OdquRNxHry29w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eWrNr9/5To4OGRX5g9cSyW7Wg99TBqBo6RIJdtRYOSDsecNpNV1cLC1ZNdobGimG8a1q9SDRPPXqzSqlPqls6/r4/2MTZBPskbxC8O/wkMJPBpxNbWHBTha09WA5Rp6kwG79DxEAQReAvWbfiOyOEEU1eXwnHstyQnY6Hni+im4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O32OhsOS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CF81C4AF0B;
+	Tue, 20 Aug 2024 14:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724164864;
+	bh=MZ+n+nKmV2N6aH3srELSOnz9POMtf3OdquRNxHry29w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O32OhsOSY2qbVyuWpCYx4r8brPLbVpbN15TRMNK99JdOObKBZt30mkkijGytohSeW
+	 H/sXgoqUD4lxEhncYy67EXHaMoOZHZqcbkpRQLWThtXzEG8DMdu53AfFEnXzzWcUq+
+	 hwnmOrxOYzgRl3smFi2CZrQzLNN7rzGUwdkGLRdiDMJ51FrBssDshY6FdCC36vWU5A
+	 05sxSZnEHiiz250yy9+ptmdlDIyxoGw/WJ7jTgTiS7iMLVi+xGdOB9wYe1RjY6X1L9
+	 37K7PXNwC9BAlsqbatMpVZWnMxsZqXI50vzhB98rF1qd4YdQWNaH9d24jrHMmiXZEp
+	 DIAE1HrWLNntA==
+Date: Tue, 20 Aug 2024 07:41:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Larry Chiu <larry.chiu@realtek.com>
+Cc: Justin Lai <justinlai0215@realtek.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+ "jiri@resnulli.us" <jiri@resnulli.us>, "horms@kernel.org"
+ <horms@kernel.org>, "rkannoth@marvell.com" <rkannoth@marvell.com>,
+ "jdamato@fastly.com" <jdamato@fastly.com>, Ping-Ke Shih
+ <pkshih@realtek.com>
+Subject: Re: [PATCH net-next v27 07/13] rtase: Implement a function to
+ receive packets
+Message-ID: <20240820074102.52c7c43a@kernel.org>
+In-Reply-To: <5317e88a6e334e4db222529287f643ec@realtek.com>
+References: <20240812063539.575865-1-justinlai0215@realtek.com>
+	<20240812063539.575865-8-justinlai0215@realtek.com>
+	<20240815185452.3df3eea9@kernel.org>
+	<5317e88a6e334e4db222529287f643ec@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240820004840.510412-4-liuhangbin@gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Hangbin,
+On Tue, 20 Aug 2024 05:13:32 +0000 Larry Chiu wrote:
+> > Memory allocation failures happen, we shouldn't risk spamming the logs.
+> > I mean these two messages and the one in rtase_alloc_rx_data_buf(),
+> > the should be removed.
+> > 
+> > There is a alloc_fail statistic defined in include/net/netdev_queues.h
+> > that's the correct way to report buffer allocation failures.  
+> 
+> Hi, Jakub,
+> Can we just count the rx_alloc_fail here?
+> If we implement the "netdev_stat_ops", we can report this counter.
 
-2024-08-20, 08:48:40 +0800, Hangbin Liu wrote:
-> The patch add xfrm statistics update for bonding IPsec offload.
->=20
-> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/bonding/bond_main.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->=20
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
-> index 24747fceef66..4a4a1d9c8cca 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -675,11 +675,36 @@ static void bond_advance_esn_state(struct xfrm_stat=
-e *xs)
->  =09rcu_read_unlock();
->  }
-> =20
-> +/**
-> + * bond_xfrm_update_stats - Update xfrm state
-> + * @xs: pointer to transformer state struct
-> + **/
-> +static void bond_xfrm_update_stats(struct xfrm_state *xs)
-> +{
-> +=09struct net_device *real_dev;
-> +
-> +=09rcu_read_lock();
-> +=09real_dev =3D bond_ipsec_dev(xs);
-> +=09if (!real_dev)
-> +=09=09goto out;
-> +
-> +=09if (!real_dev->xfrmdev_ops ||
-> +=09    !real_dev->xfrmdev_ops->xdo_dev_state_update_stats) {
-> +=09=09pr_warn("%s: %s doesn't support xdo_dev_state_update_stats\n", __f=
-unc__, real_dev->name);
+I think so.
 
-I'm not convinced we should warn here. Most drivers don't implement
-xdo_dev_state_update_stats, so if we're using one of those drivers
-(for example netdevsim), we'll get one line in dmesg for every "ip
-xfrm state" command run by the user. At most it should be ratelimited,
-but since it's an optional callback, I think no warning would be fine.
+> > And you should have a periodic service task / work which checks for
+> > buffers being exhausted, and if they are schedule NAPI so that it tries
+> > to allocate.  
+> 
+> We will redefine the rtase_rx_ring_fill() to check the buffers and
+> try to get page from the pool.
+> Should we return the budget to schedule this NAPI if there are some
+> empty buffers?
 
---=20
-Sabrina
-
+I wouldn't recommend that. If system is under memory stress 
+we shouldn't be adding extra load by rescheduling NAPI.
 
