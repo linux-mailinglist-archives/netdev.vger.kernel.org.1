@@ -1,63 +1,105 @@
-Return-Path: <netdev+bounces-120128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA31958656
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:59:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4869586A6
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307D01F23A89
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:59:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F54CB246C5
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6671E18EFD7;
-	Tue, 20 Aug 2024 11:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120A318FDB7;
+	Tue, 20 Aug 2024 12:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZ1Q9DGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A531818E02C;
-	Tue, 20 Aug 2024 11:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934B918F2C8;
+	Tue, 20 Aug 2024 12:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724155183; cv=none; b=LJgHvErOZSNiGFNrjvELDlsF42he51Fl2ErmUEPpPOS64Xtlsft/PF0pTCXP77dkV7rbZa4h4AaeZwC1YMTE7BOSJJZMh09WJcV+HChLPz9NIluRNw+NoompYE25xSERyrKUPdAll7boMlXw1aFvC53QBwKifbLcSj5pjE80X6c=
+	t=1724156001; cv=none; b=PMgpf2yDvTzLJT0UAdWdpRoPzQxa+BS6dFODzpsnqLhixN1rmzo30ydlr58MXBgSK4fddKvoi9uP3/RK3dXd6riueaTnU8MSRSotIfzulc4k78o6/SzEy9oJS1Q0AYYsmzbuZppCErAxE+VHOvQgdq2tnJk/DHGlztZ63Ebvk+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724155183; c=relaxed/simple;
-	bh=AZ0pSABjIpoBEalEF73L1k+W3ZHvD0m6HPUWROW2Bsw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MOwDebsxo/ex+pTq8wcGubZ/b5IixCzKWhtz0/QoKm5y4CdXfMHhVHTpAu5Y/RVKPislCFfiecWGuzE0AsbxZffuIdUbe4vGeJ6dvLByYpqHapkRtLoBDf8BjSReksMiaJG6EANMlAEXRlVawqRDlDbAPzXX0Y0+MzTYC8ly6jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sgNWJ-0005Ph-VN; Tue, 20 Aug 2024 13:59:27 +0200
-Date: Tue, 20 Aug 2024 13:59:27 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Xi Huang <xuiagnh@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	s=arc-20240116; t=1724156001; c=relaxed/simple;
+	bh=sjoksWZ8Am0KeIIGjVG0E4j+q+NHl4a2vZP83KMzPa4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=br9CZmM17XRwh2VAfAeMVOQC9UKaJFNouAy7hMt0wkQTYUZrntNVJX1z0dMEWRkgx/70RJnCDPrR4qU+TjCn8tSTlG3tcRQe/kGberDTyg4oG0qujQTFiFPtpM9WKaNOMxW7fO1cRHjZk35c2Pno/Ucfy4XxybYbLbICW4tnAPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lZ1Q9DGo; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-201fbd0d7c2so33942825ad.0;
+        Tue, 20 Aug 2024 05:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724155999; x=1724760799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hoL2v+PkNQmrjvvc83i9ktW//U4xDXc8wzaEFkS8wz8=;
+        b=lZ1Q9DGo/+kXXf/rczq7zB7HbbK3DjxFpvkFLgg3x6WvS59vkyJ41ezPu2qQbQKWCw
+         cjy3G93+uZoRuAFDC6LG97nhDcMR0mk7wKA11CEMAyTFK8ZknSNjcmPdgxm+kQ7A/SyD
+         7MoDH0MOmLHDsWoz6Lh3CX5Rd9aI4G8jFmjyso6qdcVsLhDqwt9yksZ5LRwMd7GS30h4
+         M0peuU7cbwGdDBaTcJCR3DYGTVpe+hoQrjODH7hfjzdhoPYb0Tmh5z3NxZBrsNqyB0JT
+         HcqZTa5cfm/z0GT6hgJd/dPH8XKIkh1pPtlrlABoi7nhYu70hyMGfGoiC4HbqPXlRjLJ
+         4H5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724155999; x=1724760799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hoL2v+PkNQmrjvvc83i9ktW//U4xDXc8wzaEFkS8wz8=;
+        b=VsmvWd+jyEnlSuP4fvCJ7d+fAJVcgehlhMQdwLXJ6qr+RArSIaqbu9V+JVF/qEItG9
+         wNRrrGqM59RMlCq6fymOA5LZstgRN1ckr7i1hIkXPgCtoZg/+MzDCI87p+xMSIpbIXfG
+         a9iSa3pRDFuMrFpCnjesghd57A63VdmtNr8SckkYvLyncIty2lgbgPJbSdbmkQRjvZSl
+         sypsz+SKUXSLvWvcjLBI/PFYL24IVMzH262bktuMUfRwKJyhNajeD2IZRwgmlbCxmfKH
+         MncNOuLN4oblEPrVLNx7xm8W+0Khl6lRmtNLQd3SxSHlUF0UKBOqDpH9TmoTKkVDeEKl
+         cyZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9cs1kVI4dFloZWpAuYQBAlB1xRmNJR7rC5ljhlEUePM8W0F7PaLiL2mI1klwd+9vUkvxNrEPT@vger.kernel.org, AJvYcCVTsJHBIU1TcU8zxl82IJxIBkrYNwPOolZcqFAM8AlqIOIPUaXSNFr+lCRnLbCYVLG+FA9caaFYiYZhBw==@vger.kernel.org, AJvYcCWD1Xom4qJ9Ytx8frTc+jxqT95Lbe2D+g+LPHLzDcryzTrOJdC0E7WRHhw2x8of2bbjxjbebtoNmSQ9Q5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIBS+1+uQ6aYBhdmdq9F2R2Mysk/EmaTpLrEwtcMs6/RxU4BFI
+	BrV8pdZzi3tQ64JHuXC5XRXbz+OwQu5QED2mJzKPLGbnbmOKQ/WsUUNt7UyPz7U=
+X-Google-Smtp-Source: AGHT+IE5m+P2JgvEeVsaTU0x5+8ycE2UTgoPNVpJRCgV6O/FXWgCaEmhjgXc4RredOg+4KFqmfqBhw==
+X-Received: by 2002:a17:902:ea0a:b0:202:32cf:5dbe with SMTP id d9443c01a7336-20232cf5e3emr67545435ad.58.1724155998752;
+        Tue, 20 Aug 2024 05:13:18 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f038df95sm76339535ad.227.2024.08.20.05.13.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 05:13:18 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	utz.bacher@de.ibm.com,
+	dust.li@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ipv6: remove redundant check
-Message-ID: <20240820115927.GA19599@breakpoint.cc>
-References: <20240820115442.49366-1-xuiagnh@gmail.com>
+Subject: [PATCH net,v6,0/2] net/smc: prevent NULL pointer dereference in txopt_get
+Date: Tue, 20 Aug 2024 21:13:12 +0900
+Message-Id: <20240820121312.380126-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240820115442.49366-1-xuiagnh@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 
-Xi Huang <xuiagnh@gmail.com> wrote:
-> err varibale will be set everytime,like -ENOBUFS and in if (err < 0),
->  when code gets into this path. This check will just slowdown
-> the execution and that's all.
+This patch is to resolve vulnerabilities that occur in the process of
+creating an IPv6 socket with IPPROTO_SMC.
 
-Compiler agrees, those conditionals get removed at compile time.
+Jeongjun Park (2):
+  net/smc: modify smc_sock structure
+  net/smc: initialize ipv6_pinfo_offset in smc_inet6_prot and add smc6_sock structure
 
-Reviewed-by: Florian Westphal <fw@strlen.de>
+ net/smc/smc.h 		| 5 ++++-
+ net/smc/smc_inet.c	| 8 +++++++-
+ 2 file changed, 11 insertions(+), 2 deletion(-)
 
