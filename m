@@ -1,85 +1,59 @@
-Return-Path: <netdev+bounces-120184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42816958821
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:44:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A0295882E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:46:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4931B21F51
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:43:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BB331F2300D
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F181F19049A;
-	Tue, 20 Aug 2024 13:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99270189F3F;
+	Tue, 20 Aug 2024 13:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iRLTn5dt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KT4sLJxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3945A18FC80
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778F617557E;
+	Tue, 20 Aug 2024 13:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724161433; cv=none; b=Qb8vWcm3wCS1l3a9RrWCPOYrX9XxdNlhd2K7FJIsCUgGZ1xz4wKExTmnhhtetAEzfqsyAx5W/9k8a0zYxTRVR6c66UdEilcf5/EPvcQchYe4TCf3kjm9IsXx7JmPA5F65llTuUSW4jULzY2EH1W9I224VH5s03TJbdSEvLwqCo0=
+	t=1724161577; cv=none; b=TQciFQiNE4o4KVpYsPt93yBrJvmtkwCgitDUDpMEMBk7SKphWP5hfupNjw6dxksZibIbJzf93kIlkg6HDrB/PZB5etwolBUq8anr/hInSG+NCIO2hlKssZpk2pGZV4+L1NILsr9BQ0CVUmbFs3MKQFNErP3LeFIFRvj21AbRTCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724161433; c=relaxed/simple;
-	bh=CRbyTO4VHkSm+ayF0Ti8oPicH/UIR4BZeHQJvPd6J8I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ogGR025nYQ3E2rtI/cA0MThKI5V2DmaN4mvQdOvAw3RYpyTmNzUgaSbz01Uwkny3oMB4ZguNUqugvPxmRt65cI9P1803N8djKxDg10RLWkH2DFPjItXJle7JeLdWn0ziJ/FH+KOukkryigjZ9hrCr5JSGUZGDtRuBhO859Loxo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iRLTn5dt; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso60723605e9.3
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724161430; x=1724766230; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j1XMeyDmodCe7KZthl+BnWSu3Nbgczd7OGGhn6K/W/g=;
-        b=iRLTn5dtQdtXI31/3LFx53DVMcS/VumZOATKoqMSzh4uNBXIHm8wxTJDUxg+mTzjZj
-         ZnBFhCby7lYCU17ePQzat6t2+u3bfmFpLz/4zUqD3mfpsP3bPnElKz9kXXx7j8cKGmZk
-         BQkDmrLMX7/DXqhNX7x/SpsrMka7pBV5nEWGBJebTmJe9J1OyTwgWyQIpZ1wHh+I42gj
-         rXmuhReE/kWdguEhx+r7Kf7W8j+XITnWzz8X3QjtFPwn0mm0pJ4PZM4FZtON5VphJy1P
-         3H1fwO0QMBRL2wckbkRkxXjr570x8AVcTg7ysJYjbFvKTGQCj3AVLECwnSxuVBAXCbKj
-         f9ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724161430; x=1724766230;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1XMeyDmodCe7KZthl+BnWSu3Nbgczd7OGGhn6K/W/g=;
-        b=T9no8ET/MxrBwCxW8V3ka4RiuZITjkuWqpwVA4PvENTYxRfxKiV5YLzKMrC+hmyFWK
-         1DSWHv3KCcX56erRUvoeJGP1I43mR1r9AaxGuQUYGFzKugwNGPaK8pGD8BacaiXsHpZF
-         KlqIVfJZXn5oR4SL4OMBRqUCORYsrq6/fFagfeX4nYwZSOmcdaJPy5AyUDN+/TNw44tJ
-         YmrCBrIUJbG4/OKzwlnZn9u09iM3r/G92821i820/t5X03oTXb3kA+93holJUtWybJGl
-         PjwnCAtAza4AHzH+uoxHTo7DW3zZ9LTYJ6ppjrFG+EabdjtqEZHbfPwuY3AnSexINQg3
-         9Oew==
-X-Forwarded-Encrypted: i=1; AJvYcCXmnqBsq80+gCHwmBFMEa/MEZzsBvdYZYN51zNdWZJlGuwsXBs7YIbpkSr0lD2AffdqKOOlsvl1DykOBVVqajj/xMTFnmyb
-X-Gm-Message-State: AOJu0YzoYyFeNu8uyRLwixwh7rv6/14C44L2PadzUNPFoTx3p5eEqdui
-	dLD1UuSLwU45rDawioVQqtuBmCxwRuU42ciYW6g2hiRoXHMc1GdrYly8wXdgZBc=
-X-Google-Smtp-Source: AGHT+IHBWCmam+ulMm2FM1FGLnrPJ/iowdO3I8ObDwrPHCtP4njXnNaxIQIGXyL+mmo/wO6NYs+ySQ==
-X-Received: by 2002:a5d:55cd:0:b0:371:8bce:7a7c with SMTP id ffacd0b85a97d-371943155f6mr11277051f8f.13.1724161430386;
-        Tue, 20 Aug 2024 06:43:50 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c6a42sm762670166b.44.2024.08.20.06.43.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 06:43:50 -0700 (PDT)
-Date: Tue, 20 Aug 2024 16:43:46 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Junfeng Guo <junfeng.guo@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	s=arc-20240116; t=1724161577; c=relaxed/simple;
+	bh=nw9dGn0eCjC0mjmiSOVdSWfX/cHuHSXyIKTyut7Yfz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+FKDYGev2FPpoHaq9jB2xsy/E2n4Rpb107s0fZdtXjUrvSVaLBreFaYzj64aOPmjj5L7Ep31k6jWOrprhGvXJg8SEZwZmpd9sBtpMxdlgzbeD5NuJu6bZZxqtqos2jlCNXJHCswhKznGhVGXi9ijWASsuQsZQX8l6TMpSLLvAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KT4sLJxf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SwvzyDocEWp1csi0DKUVdJMiBrm+Lb26EA4HjpmmBfI=; b=KT4sLJxfZWzCJYWFMZMylejVo3
+	Ovi6xOdkg4dxPDBjPAXFjRF7gsMa5s/iXxZs9fmtT5hyw3M1BtduMRIIYdapy3Y1LxW/ZjK/Zv/tQ
+	hVG/Jp5WuIAHcoKfqPiLOLZ8Cd2ZusyMbA1WMs6TrjN371URrpHbO82of+f8LNcpfjAE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sgPBU-005E7B-9m; Tue, 20 Aug 2024 15:46:04 +0200
+Date: Tue, 20 Aug 2024 15:46:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qi Zhang <qi.z.zhang@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] ice: Fix a 32bit bug
-Message-ID: <ddc231a8-89c1-4ff4-8704-9198bcb41f8d@stanley.mountain>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/1] net: dsa: mv88e6xxx: Fix out-of-bound access
+Message-ID: <a3859770-353b-4594-acd6-4a6dbedecbc1@lunn.ch>
+References: <20240819235251.1331763-1-Joseph.Huang@garmin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,38 +62,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <20240819235251.1331763-1-Joseph.Huang@garmin.com>
 
-BIT() is unsigned long but ->pu.flg_msk and ->pu.flg_val are u64 type.
-On 32 bit systems, unsigned long is a u32 and the mismatch between u32
-and u64 will break things for the high 32 bits.
+On Mon, Aug 19, 2024 at 07:52:50PM -0400, Joseph Huang wrote:
+> If an ATU violation was caused by a CPU Load operation, the SPID could
+> be larger than DSA_MAX_PORTS (the size of mv88e6xxx_chip.ports[] array).
+> 
+> Fixes: 75c05a74e745 ("net: dsa: mv88e6xxx: Fix counting of ATU violations")
+> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
 
-Fixes: 9a4c07aaa0f5 ("ice: add parser execution main loop")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/intel/ice/ice_parser_rt.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_parser_rt.c b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
-index d5bcc266b01e..dedf5e854e4b 100644
---- a/drivers/net/ethernet/intel/ice/ice_parser_rt.c
-+++ b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
-@@ -377,11 +377,11 @@ static void ice_pg_exe(struct ice_parser_rt *rt)
- 
- static void ice_flg_add(struct ice_parser_rt *rt, int idx, bool val)
- {
--	rt->pu.flg_msk |= BIT(idx);
-+	rt->pu.flg_msk |= BIT_ULL(idx);
- 	if (val)
--		rt->pu.flg_val |= BIT(idx);
-+		rt->pu.flg_val |= BIT_ULL(idx);
- 	else
--		rt->pu.flg_val &= ~BIT(idx);
-+		rt->pu.flg_val &= ~BIT_ULL(idx);
- 
- 	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Pending update for flag %d value %d\n",
- 		  idx, val);
--- 
-2.43.0
-
+    Andrew
 
