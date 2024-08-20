@@ -1,99 +1,218 @@
-Return-Path: <netdev+bounces-120181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C97C958813
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:40:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3153958819
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B0241C20C18
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:40:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADD802846BB
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549FD18FC80;
-	Tue, 20 Aug 2024 13:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNNcAVVB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0849F190462;
+	Tue, 20 Aug 2024 13:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3069E1AACB
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662E518C91C;
+	Tue, 20 Aug 2024 13:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724161235; cv=none; b=Ym8EakseIa02wk6M2IBjFeMToz3S6CdXtYjy+l9mkqBegJM8ntsrM0orMmY0OqlCwuYnAhAcbTqCgppb0W6Otc7tqakZcMbcyNEXqYm7zDJREDUfUR2cq4JFQQlsuPsEJA28Iun8jrf78/IJTOQCOLMUhCSdfEgMlR8KoZ7LLJc=
+	t=1724161353; cv=none; b=TL21SNr4Q6Nsj3hpq75Y22tSEbhJJC7jCJOqIdeYgsSUXOdnNlpF/toVhHPAyHPBb7oh+jUHDyyd9Ua2vHCt4z0gQXaM1X892IDKUr4mEDT/a4TEbDW/v+EarlKX7kx6VItAsfDphb1s9mPn4fwRhSgQYEgcC2ekk6eYkZ2maps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724161235; c=relaxed/simple;
-	bh=0MgIG8SrgetwxakMOnTUop7i726OUCw3MImWE910ul0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bZ9GQo5OGwjNlMs7l4/GZqrAphMM+2xMJUbL+L6b+RDc9eI4dex9cJiviWWRPKNq9DuDhAJzg0YnFtKdysknWbA4vV8AyLb+/WTFQUMCX+aBNNQ1B7NvmaMwx/PMFnof5x40DesrkTJHxtsoH3NTwFqUEL8ju75axlfOOikpXng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNNcAVVB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3A3C4AF0B;
-	Tue, 20 Aug 2024 13:40:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724161234;
-	bh=0MgIG8SrgetwxakMOnTUop7i726OUCw3MImWE910ul0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gNNcAVVBoS32rPCotmazbhi483CzAlvYZlrIjC0B/+QTfjuRnUsddFfyYFld1XTtf
-	 bbPMJnLAKZika2FIEpl8pNJKNKBeASdopXRHO8Bg++hBDhrsOIs7Rd7wIJbn8piuU6
-	 tVbaQVm7Cer7qyMiVuZ8a5WeTZ714KQ9ssS05K/sLGicVSmuZN2dN6CbOudedjflHK
-	 ijhKZVQ1NRkpAJo2VQaPx3fKxNdH9lGSvzf40SVlF/n8J9w3mmaEPnZL3cFx3isJUP
-	 F4O1Le8lJ0+fc4QWNCR4RSQD4EsEpnFpfs2wBbgy/m6JMi0go012aqY6x/JRY9BDxp
-	 qsKVYva2+QpqA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C5D3804CA6;
-	Tue, 20 Aug 2024 13:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1724161353; c=relaxed/simple;
+	bh=5kSZeaHScVa2+RQkGNUbFnACDfjLIwo5tfRBvYLVY78=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=h7ZTQclggMqfjv/kW/2WyOCl7RjBN8vHPpahRCSCC6oSdSeK6UhIHiR9ax4u/nx8M5Mzw3hqvmWTwu8s+F9ys1Hx2bYXaQHju6FOjWzrko6oUWYgSASWHnGowhQO8a9Up6C11+o0/TnvsVWEbx2zyN26FuHz9gDzdyFP9NUUhgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Wp9cB1Bq1z13j65;
+	Tue, 20 Aug 2024 21:41:46 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id EFE68140138;
+	Tue, 20 Aug 2024 21:42:23 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 21:42:20 +0800
+Message-ID: <79d21a08-ec8c-14e7-7040-38dd9c7d441f@huawei-partners.com>
+Date: Tue, 20 Aug 2024 16:42:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 5/9] selftests/landlock: Test listen on connected
+ socket
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-6-ivanov.mikhail1@huawei-partners.com>
+ <ZsSTouBzDOHFKC1L@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZsSTouBzDOHFKC1L@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] bonding: fix xfrm offload bugs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172416123426.1143013.18023670009748670619.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Aug 2024 13:40:34 +0000
-References: <20240816114813.326645-1-razor@blackwall.org>
-In-Reply-To: <20240816114813.326645-1-razor@blackwall.org>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, ap420073@gmail.com, davem@davemloft.net,
- jv@jvosburgh.net, andy@greyhouse.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jarod@redhat.com
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 16 Aug 2024 14:48:09 +0300 you wrote:
-> Hi,
-> I noticed these problems while reviewing a bond xfrm patch recently.
-> The fixes are straight-forward, please review carefully the last one
-> because it has side-effects. This set has passed bond's selftests
-> and my custom bond stress tests which crash without these fixes.
+8/20/2024 4:01 PM, Günther Noack wrote:
+> On Wed, Aug 14, 2024 at 11:01:47AM +0800, Mikhail Ivanov wrote:
+>> Test checks that listen(2) doesn't wrongfully return -EACCES instead
+>> of -EINVAL when trying to listen for an incorrect socket state.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>
+>> Changes since v1:
+>> * Uses 'protocol' fixture instead of 'ipv4_tcp'.
+>> * Minor fixes.
+>> ---
+>>   tools/testing/selftests/landlock/net_test.c | 74 +++++++++++++++++++++
+>>   1 file changed, 74 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index b6fe9bde205f..551891b18b7a 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -926,6 +926,80 @@ TEST_F(protocol, connect_unspec)
+>>   	EXPECT_EQ(0, close(bind_fd));
+>>   }
+>>   
+>> +TEST_F(protocol, listen_on_connected)
+>> +{
+>> +	int bind_fd, status;
+>> +	pid_t child;
+>> +
+>> +	if (variant->sandbox == TCP_SANDBOX) {
+>> +		const struct landlock_ruleset_attr ruleset_attr = {
+>> +			.handled_access_net = ACCESS_ALL,
+>> +		};
+>> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>> +			.allowed_access = ACCESS_ALL,
+>> +			.port = self->srv0.port,
+>> +		};
+>> +		const struct landlock_net_port_attr tcp_denied_listen_p1 = {
+>> +			.allowed_access = ACCESS_ALL &
+>> +					  ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>> +			.port = self->srv1.port,
+>> +		};
+>> +		int ruleset_fd;
+>> +
+>> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>> +						     sizeof(ruleset_attr), 0);
+>> +		ASSERT_LE(0, ruleset_fd);
+>> +
+>> +		/* Allows all actions for the first port. */
+>> +		ASSERT_EQ(0,
+>> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> +					    &tcp_not_restricted_p0, 0));
+>> +
+>> +		/* Denies listening for the second port. */
+>> +		ASSERT_EQ(0,
+>> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> +					    &tcp_denied_listen_p1, 0));
+>> +
+>> +		enforce_ruleset(_metadata, ruleset_fd);
+>> +		EXPECT_EQ(0, close(ruleset_fd));
+>> +	}
 > 
-> Note the first patch is not critical, but it simplifies the next fix.
+> Same remarks as in the previous commit apply here as well:
 > 
-> [...]
+>    - The if condition does the same thing, can maybe be deduplicated.
+>    - Can merge ruleset_fd declaration and assignment into one line.
+>      (This happens in a few more tests in later commits as well,
+>      please double check these as well.)
 
-Here is the summary with links:
-  - [net,1/4] bonding: fix bond_ipsec_offload_ok return type
-    https://git.kernel.org/netdev/net/c/fc59b9a5f720
-  - [net,2/4] bonding: fix null pointer deref in bond_ipsec_offload_ok
-    https://git.kernel.org/netdev/net/c/95c90e4ad89d
-  - [net,3/4] bonding: fix xfrm real_dev null pointer dereference
-    https://git.kernel.org/netdev/net/c/f8cde9805981
-  - [net,4/4] bonding: fix xfrm state handling when clearing active slave
-    https://git.kernel.org/netdev/net/c/c4c5c5d2ef40
+Thanks for mentioning! You can check my reply in the previous commit
+discussion.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+>> +
+>> +	if (variant->prot.type != SOCK_STREAM)
+>> +		SKIP(return, "listen(2) is supported only on stream sockets");
+>> +
+>> +	/* Initializes listening socket. */
+>> +	bind_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, bind_fd);
+>> +	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+> 
+> I believe if bind() or listen() fail here, it does not make sense to continue
+> the test execution, so ASSERT_EQ would be more appropriate than EXPECT_EQ.
 
+Will be fixed, thanks.
 
+> 
+> 
+>> +
+>> +	child = fork();
+>> +	ASSERT_LE(0, child);
+>> +	if (child == 0) {
+>> +		int connect_fd;
+>> +
+>> +		/* Closes listening socket for the child. */
+>> +		EXPECT_EQ(0, close(bind_fd));
+> 
+> You don't need to do this from a child process, you can just connect() from the
+> same process to the listening port.  (Since you are not calling accept(), the
+> server won't pick up the phone on the other end, but that is still enough to
+> connect successfully.)  It would simplify the story of correctly propagating
+> test exit statuses as well.
+
+Thanks, I'll fix this.
+
+> 
+>> +
+>> +		connect_fd = socket_variant(&self->srv1);
+>> +		ASSERT_LE(0, connect_fd);
+>> +		EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+>> +
+>> +		/* Tries to listen on connected socket. */
+>> +		EXPECT_EQ(-EINVAL, listen_variant(connect_fd, backlog));
+> 
+> Since this assertion is the actual point of the test,
+> maybe we could emphasize it a bit more with a comment here?
+> 
+> e.g:
+> 
+> /*
+>   * Checks that we always return EINVAL
+>   * and never accidentally return EACCES, if listen(2) fails.
+>   */
+
+You're right.. current description doesn't give an understanding of why
+this test is needed at all. I'll change it.
+
+> 
+>> +
+>> +		EXPECT_EQ(0, close(connect_fd));
+>> +		_exit(_metadata->exit_code);
+>> +		return;
+>> +	}
+>> +
+>> +	EXPECT_EQ(child, waitpid(child, &status, 0));
+>> +	EXPECT_EQ(1, WIFEXITED(status));
+>> +	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+>> +
+>> +	EXPECT_EQ(0, close(bind_fd));
+>> +}
+>> +
+>>   FIXTURE(ipv4)
+>>   {
+>>   	struct service_fixture srv0, srv1;
+>> -- 
+>> 2.34.1
+>>
 
