@@ -1,118 +1,216 @@
-Return-Path: <netdev+bounces-120057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C511B958219
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B8C695823C
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53CD0B239F6
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:25:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3668B25465
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9811918C004;
-	Tue, 20 Aug 2024 09:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1417018B49E;
+	Tue, 20 Aug 2024 09:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eelhvZbm"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ctfNXpTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1E218B498
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 09:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE7018B496;
+	Tue, 20 Aug 2024 09:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724145919; cv=none; b=PnK6wkMdccUXGH1HgfMYVI5+AJXfDLyN8nzDYWRRKnsMRv6tXdaQogu6fswtVJyUZM5TI5FPlQX20KYDrxM5SVZ/MDjZ8iIck6XK8sxDA/UXFtec5I76bKB5sCIGBTiyLYyp1G//kDIvn9Zgvx0op+Ryq6zdKFOyekKaR4zMtWg=
+	t=1724146196; cv=none; b=Prtmp+z2HcT7a7RIN2P64sZ8/3iTxA/+kO7m3FNnj+d0HQfBkDw+qqPyjOFm9hxr2KbTahBLQuyzxf2r0O2x1SeLLhlKbbeJWUAEAYQX4wWagYLWqddaKYmfujKaaeb9cjC4fGBUPq1VH6llPyzLWCQ/SBgHThJ0sW93uzdjOgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724145919; c=relaxed/simple;
-	bh=IP5eBMGrlbsjH3D+N9j4JdS9viZRQVvfgWquXq+3hZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Is6YA4A5gBQjbBiwJ2vl0swA1Yj76VvbmAgdA7BKO5gS5i0h08PN1EZXKfg7Q1RizYOTqUl0lMk+piIngUhi/DRYbsuITSOB4XPK1Lz4iccp8/g69aAuqhTJCJI7av6tgyxWbyetUuyZpwYvBkNKfzDB3uaAiGGVRSQ6U8a2JF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eelhvZbm; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-81fb419f77bso260749039f.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 02:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724145917; x=1724750717; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IP5eBMGrlbsjH3D+N9j4JdS9viZRQVvfgWquXq+3hZE=;
-        b=eelhvZbmAPDTPTtG8hfCBf8oHRwNE97eEWh0rxer0baxyL1stJ0st4DtiwbFdbTqI/
-         0s6eOzR64Ry8nd9bsIQpx2UnhszCAE3f4WYkZARrxhI3eImSIGKTwd6FvMkdNzbYLlcD
-         EQvrzNTSnQhU0ewwJIhba5bxp3LEk42a67BGEMlVqulr0xrtWSlUyo37i1LlrnsivdOs
-         o4m+p6V7pXCw3tVRmkn32XmJZgDTGSjGbZ32pHyNiSLp2sIVljfcecVNyWVsxdxNJbMZ
-         Ay0C5nTUhTNgI+EQgbXcaiHnkGxkdtVHHC/VF4Jx5oTgXWZdduAhO4E818mh0nM1cl40
-         h+vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724145917; x=1724750717;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IP5eBMGrlbsjH3D+N9j4JdS9viZRQVvfgWquXq+3hZE=;
-        b=WoujKsoSnoB4aNuUJhaKP/zVjnPVuV/AOTDT6YnrG2FL0blKf8WokjKb6mgmBoSjfb
-         tJ3ifTpY0WIibRnxPFftkQaHw5MWrkYO8fdMCvSvqkAxJUjh8CBe+NLsxaB966V/xIVb
-         n5WlQtSs4IPys1OIUngiKDYoivFQG1X2u6Qnt6IZJNGh/GomsQGlfcU0FLEORNHTrdbo
-         G5TpksTvEobleQPcX/ZcvcKxcmCRV24EO54hTuWCNUMPFyJ7PAv2Q2H7PYCWzbSUVAW2
-         aRsTAVb8cWeQbOxwxJiQYcRbRFQwd8xgzlQ3gktgbOAZwgllkIWwVuciHWMadxcpZIm8
-         cqAg==
-X-Forwarded-Encrypted: i=1; AJvYcCW94HdYenrgrZe/am6dOLG/8qLdnVfrUhuh/eIoNf/Xuzf6y6zPR6qpcOifVVryHUNb0p/Me/tILa2Lt9QY4r5bMHYLZljx
-X-Gm-Message-State: AOJu0Yy5V014qhgfeVITl2qZSO7iZT/DlGpGfaSozy/U9L6++HgAdnpx
-	TsUILOKTpNUOwAjnlOY83CwUeEusXqQv8lDF5idlI52eaiCDwooDDKezhXGD7BZwq4iKR/hXRH8
-	J77GzT7ZX2zVw+pSgjLZSkC+3Ca0=
-X-Google-Smtp-Source: AGHT+IEHbmb4Pw0NC4KBy1OCgPC7DYMAHTp+SuQVsPHm7MBIXznyB8sSmbRUdlVVgu0wz6GvbDO2LYHdeik4m9xI0cY=
-X-Received: by 2002:a05:6e02:1a6b:b0:39b:33b5:5cc1 with SMTP id
- e9e14a558f8ab-39d585c7e62mr16965485ab.24.1724145916963; Tue, 20 Aug 2024
- 02:25:16 -0700 (PDT)
+	s=arc-20240116; t=1724146196; c=relaxed/simple;
+	bh=FhUN9+AUBTdYnKXDrh+pGWH85hZAd0MaIfyiYj0ktM0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DWYxAsaPps6+FapVF9V7Q9yjOpbWJb4FaieLoizJIkdGMOgxpRvPXDKtFT/5AvfqFthY380H7FTJSWBEd+5T9Xxi4/vDKHZTVpiErCeqDWOi2I6TIIQgQH3J8QiiI9rbUnOnG2AD0iCtDxAWixGs1QRyK4u4Bozp5bnp8yia+PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ctfNXpTB; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: bdbd74085ed611ef8b96093e013ec31c-20240820
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=qcpbxZTpMQHjU70kP0bCyCvXXCDagI/iPE2XuZLBzN4=;
+	b=ctfNXpTBw9OzUN0384X6CE1puJzxQLCOzWNGv90u3uSmx2pVLW+ba2XTWUGKUP/kTHeh8PLLfKUYrFJENKOIcCCgoMZvptlSPWJ/yddud5KXqhYU/NmKWKJYyNSmVYdH9QjqnYxmtcj1GPXpK/72H73HVF5JPhIhPEGbegZqdTM=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:8387e6a4-b346-4155-946e-00b34210ba26,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6dc6a47,CLOUDID:1c62a4be-d7af-4351-93aa-42531abf0c7b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: bdbd74085ed611ef8b96093e013ec31c-20240820
+Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw02.mediatek.com
+	(envelope-from <tze-nan.wu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 533411009; Tue, 20 Aug 2024 17:29:47 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 20 Aug 2024 17:29:47 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 20 Aug 2024 17:29:47 +0800
+From: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Stanislav Fomichev
+	<sdf@fomichev.me>
+CC: <bobule.chang@mediatek.com>, <wsd_upstream@mediatek.com>,
+	<linux-kernel@vger.kernel.org>, <linux-mediatek@lists.infradead.org>, Tze-nan
+ Wu <Tze-nan.Wu@mediatek.com>, Yanghui Li <yanghui.li@mediatek.com>, Cheng-Jui
+ Wang <cheng-jui.wang@mediatek.com>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+	<john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+	<kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+	<jolsa@kernel.org>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v3] net/socket: Check cgroup_bpf_enabled() only once in do_sock_getsockopt()
+Date: Tue, 20 Aug 2024 17:29:42 +0800
+Message-ID: <20240820092942.16654-1-Tze-nan.Wu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL+tcoAJic7sWergDhVqAvLLu2tto+b7A8FU_pkwLhq=9qCE1w@mail.gmail.com>
- <20240820045319.4134-1-kuniyu@amazon.com> <CAL+tcoBO9Y1+aX6hrt5cG_2V2WOXNvEJ58G8pBw2Nt9+VV3pnA@mail.gmail.com>
-In-Reply-To: <CAL+tcoBO9Y1+aX6hrt5cG_2V2WOXNvEJ58G8pBw2Nt9+VV3pnA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 20 Aug 2024 17:24:41 +0800
-Message-ID: <CAL+tcoCYhvB2wB7kxD_ZVEgwMgpLyzzLVZcNjSjDw+NLu7dARQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: change source port selection at bind() time
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kernelxing@tencent.com, kuba@kernel.org, ncardwell@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Tue, Aug 20, 2024 at 5:22=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Hello Kuniyuki,
->
-> [...]
-> > > To be more concise, I would like to state 3 points to see if they are=
- valid:
-> > > (1) Extending the option for bind() is the last puzzle of using an
-> > > older algorithm for some users. Since we have one in connect(), how
-> > > about adding it in bind() to provide for the people favouring the
-> > > older algorithm.
-> >
-> > Why do they want to use bind() to pick a random port in the first place=
- ?
-> >
->
-> I feel sorry to bother you again.
->
-> Interesting thing is that I just found some of my personal records
-> that show to me: a lot of applications start active connections using
-> bind() to find a proper port in Google :) I'm not the only one :p
-> Probably coming up with the new algo selecting odd/even ports is the
-> reason/compromise for the bind() and non-bind() users. It gave range/2
-> for active flow using bind().
->
-> That's what I want to share with you :) Hope it will waste you and
-> Eric precious time :)
+The return value from `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` can change
+between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+`BPF_CGROUP_RUN_PROG_GETSOCKOPT`.
 
-Sorry, it should be "it won't"...
+If `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` changes from "false" to
+"true" between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+`BPF_CGROUP_RUN_PROG_GETSOCKOPT`, `BPF_CGROUP_RUN_PROG_GETSOCKOPT` will
+receive an -EFAULT from `__cgroup_bpf_run_filter_getsockopt(max_optlen=0)`
+due to `get_user()` was not reached in `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`.
+
+Scenario shown as below:
+
+           `process A`                      `process B`
+           -----------                      ------------
+  BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+                                            enable CGROUP_GETSOCKOPT
+  BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
+
+To prevent this, invoke `cgroup_bpf_enabled()` only once and cache the
+result in a newly added local variable `enabled`.
+Both `BPF_CGROUP_*` macros in `do_sock_getsockopt` will then check their
+condition using the same `enabled` variable as the condition variable,
+instead of using the return values from `cgroup_bpf_enabled` called by
+themselves as the condition variable(which could yield different results).
+This ensures that either both `BPF_CGROUP_*` macros pass the condition
+or neither does.
+
+Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
+Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
+Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+---
+
+Chagnes from v1 to v2: https://lore.kernel.org/all/20240819082513.27176-1-Tze-nan.Wu@mediatek.com/
+  Instead of using cgroup_lock in the fastpath, invoke cgroup_bpf_enabled
+  only once and cache the value in the newly added variable `enabled`.
+  `BPF_CGROUP_*` macros in do_sock_getsockopt can then both check their
+  condition with the new variable `enable`, ensuring that either they both
+  passing the condition or both do not.
+
+Chagnes from v2 to v3: https://lore.kernel.org/all/20240819155627.1367-1-Tze-nan.Wu@mediatek.com/
+  Hide cgroup_bpf_enabled in the macro, and some modifications to adapt
+  the coding style.
+
+---
+ include/linux/bpf-cgroup.h | 15 ++++++++-------
+ net/socket.c               |  5 +++--
+ 2 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
+index fb3c3e7181e6..5afa2ac76aae 100644
+--- a/include/linux/bpf-cgroup.h
++++ b/include/linux/bpf-cgroup.h
+@@ -390,20 +390,20 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
+ 	__ret;								       \
+ })
+ 
+-#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)			       \
++#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled)		       \
+ ({									       \
+ 	int __ret = 0;							       \
+-	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))			       \
++	enabled = cgroup_bpf_enabled(CGROUP_GETSOCKOPT);		       \
++	if (enabled)							       \
+ 		copy_from_sockptr(&__ret, optlen, sizeof(int));		       \
+ 	__ret;								       \
+ })
+ 
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, optlen,   \
+-				       max_optlen, retval)		       \
++				       max_optlen, retval, enabled)	       \
+ ({									       \
+ 	int __ret = retval;						       \
+-	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT) &&			       \
+-	    cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))		       \
++	if (enabled && cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))       \
+ 		if (!(sock)->sk_prot->bpf_bypass_getsockopt ||		       \
+ 		    !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
+ 					tcp_bpf_bypass_getsockopt,	       \
+@@ -518,9 +518,10 @@ static inline int bpf_percpu_cgroup_storage_update(struct bpf_map *map,
+ #define BPF_CGROUP_RUN_PROG_SOCK_OPS(sock_ops) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_DEVICE_CGROUP(atype, major, minor, access) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_SYSCTL(head,table,write,buf,count,pos) ({ 0; })
+-#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen) ({ 0; })
++#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, \
+-				       optlen, max_optlen, retval) ({ retval; })
++				       optlen, max_optlen, retval, \
++				       enabled) ({ retval; })
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT_KERN(sock, level, optname, optval, \
+ 					    optlen, retval) ({ retval; })
+ #define BPF_CGROUP_RUN_PROG_SETSOCKOPT(sock, level, optname, optval, optlen, \
+diff --git a/net/socket.c b/net/socket.c
+index fcbdd5bc47ac..0b465dc8a789 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2363,6 +2363,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		       int optname, sockptr_t optval, sockptr_t optlen)
+ {
+ 	int max_optlen __maybe_unused;
++	bool enabled __maybe_unused;
+ 	const struct proto_ops *ops;
+ 	int err;
+ 
+@@ -2371,7 +2372,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		return err;
+ 
+ 	if (!compat)
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled);
+ 
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+@@ -2390,7 +2391,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 	if (!compat)
+ 		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+ 						     optval, optlen, max_optlen,
+-						     err);
++						     err, enabled);
+ 
+ 	return err;
+ }
+-- 
+2.45.2
+
 
