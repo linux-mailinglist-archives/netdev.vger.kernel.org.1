@@ -1,479 +1,136 @@
-Return-Path: <netdev+bounces-120139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D829586ED
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:29:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03E879586F1
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A956B1F21F51
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:29:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE7F8284DC2
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FD919046E;
-	Tue, 20 Aug 2024 12:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478022745C;
+	Tue, 20 Aug 2024 12:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvKM4N/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BFC18FC9E
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B3710F4;
+	Tue, 20 Aug 2024 12:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724156970; cv=none; b=tw5hum3tgpnXtx/TlyMYrRUuBtduG2NSlgNmhDmjaCuAJsfK6fji8Aoh3QHl9D1oL8tzTOVjHyGUGy9YoptLKZFP/211E7Le3AWOJbG8v0z0CmmsbE9x2zceoZQwv8maMoi7RCsg+I5eKGvJgJKykMG4X1PGLhhL2IsT907LAdA=
+	t=1724157035; cv=none; b=Eg+3JqPa6h2Rzqf/hgXfaCo1nRM/IGvYwBlBiLpw/0TDMT4szgwpINv2XREsSMqgt9j/WVroc9oq7X8Y3W8oqmiibTusILjSz/MBvd72TVjJfY/Z6WPTG+bFIep6mhXfFGFlPhvs3b3OwjGTbu9siOJHkY6Cr+gBUqiV7Dn4ORM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724156970; c=relaxed/simple;
-	bh=B3wC63KUBfBMnD8KXezLklSZglr7bQftlfmuYMPfNRU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UTYaKc8vYzthwde2YqFo9wjqFp9yqLklw4OqkfF5DVQzOEm4e88izH1mxffW2DabsTA5CPiytIjVvpCoMCYRhSUQFQYVnAxc7rovFt6lbRy1+PgQMnR4Z+jczWzms3zn6NRc/C0Iqfpphdw/WkRb0VL7DlhDfWYyu6GUD/Zli1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgNzA-0004N0-7x; Tue, 20 Aug 2024 14:29:16 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgNz8-001lnU-VA; Tue, 20 Aug 2024 14:29:14 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgNz8-008DcE-2q;
-	Tue, 20 Aug 2024 14:29:14 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] phy: dp83tg720: Add statistics support
-Date: Tue, 20 Aug 2024 14:29:14 +0200
-Message-Id: <20240820122914.1958664-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240820122914.1958664-1-o.rempel@pengutronix.de>
-References: <20240820122914.1958664-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1724157035; c=relaxed/simple;
+	bh=EPO7sxDfECUl81PRwQ5c2+xh+Wg6Fp82gY7TKAkiFDU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KPaZ4SMRvo37IWB9UPVKQbCQYszN9BLK9D1ngxFQtpDF2m8u70dWU8zfYs44+rLs4zpVgYMgl/1xnVqb7uEzlx17L43PyJGHKZRQeDPQQ80O6GC9NtW3EctKfuk3IBnfsR87V3KQ73gJ64b/f+3HxI/rzp+07ph/NG5dW52759M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvKM4N/n; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6bf7a2035d9so41474386d6.1;
+        Tue, 20 Aug 2024 05:30:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724157032; x=1724761832; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GUVLT7Lr8a8VUjwmWyFcHbjj2T0BS/10mTwTLlgLpKM=;
+        b=UvKM4N/nOacTq1jn0ldItKInbB4+ACy5b+YfDLbwKmdYf3KxhZZ/NFfp814/UtEGzP
+         71bjfb1iaaCChZPow/xsA9HAWomPehFfZ3O+LxJnrKgIG4vACV4x4yj33ZVjpubHtPQ0
+         lmmyp2Vn0DX1tVYU3+9k6sZ6Ty9o3gmYudypoSAGQGekjHP2PUKttn30l42DD4juov1G
+         LxWSL3HU8gYDk4uIjTEMG1Zad9LcDH+771Rn1rQ2C37+8h1vIY7BKPAxdFnwZvmQvP5r
+         Mm7a+BvXvZa8pD30QB60HJ/o8jgciPLkdz/vS0A3mVpmG5iQn97v/GTGg5XKOBWD2K2U
+         W2Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724157032; x=1724761832;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GUVLT7Lr8a8VUjwmWyFcHbjj2T0BS/10mTwTLlgLpKM=;
+        b=jIODz7tiCaWXTW0opDzTkCBIUd7rCP+/YTTsYm9g6sszAJHs0sMsgiLje9dmbyCAQF
+         iE/3zOnyPOqcudpUpSWYn/oggzo/cEwEQGfF6bVAbhk86zwE0t3FwP6cKjFJIgcl3bSy
+         h7UVU9axou3xC5unvjNMD/vMvDYpH88P3iUjyw8GL0gei7mmeABYKUnQ5hP++1P6vg7i
+         q2ytnrqyoGidtm4UikClXE7sj11hwOanoOL2C9/z2uQei0ucJokYn76NR7MubxjLcl0N
+         tdyZIEmRBAM9xmQhastRqSBCbkujmZ4LwbGcl6eD1kQspXYUvx+H0hl21m9Ri3C03xQQ
+         HHEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUT3fx6t+P9ddtt+Cr/0hrRhxEPQJVSBphvWLicT73t8ydL6a0bbMzR1Vk/8v579CgEwZpHJXRPWEG3vA==@vger.kernel.org, AJvYcCVDcKo7Y8C8z4SjTpLc1Kk5/Ft6C32axiUN9NIXIVvMnBRlTDQc0ra1/VgeGhAEmTT8+rOqCmoUo4TDCyM=@vger.kernel.org, AJvYcCXXIbLFulRUXcFl9SBi9CHFIu2v9nCKWS8iikpq76QgJxSS7BzrYaFjd7Z7gZ0lXG7giF66ZKMO@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiSiyr4eoLab3nQBdsw+QWT7W7d+kvXC1uoH1yS9w9HFq3eVCY
+	l5aw74ZMOMpVIahRh776/3xUKnPOoQIz85w/hwgo3LgMSDecheMjRCv5aFeiiuahAuYkzCIwnbN
+	a1HxR3D9n+o+ohhuJUercR4U4CmAW49wSS2o=
+X-Google-Smtp-Source: AGHT+IEtdEFUB9cHd4F2rUXhzKykUPBOkRnfVOYYkiqIXNfaZr9MDZ+O2xAv3ufc1v7BgzmziANuPVFZOwTFOQ6k5MI=
+X-Received: by 2002:a05:6214:481:b0:6b7:923c:e0b7 with SMTP id
+ 6a1803df08f44-6bfa8a689ebmr58386916d6.21.1724157032477; Tue, 20 Aug 2024
+ 05:30:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20240820121312.380126-1-aha310510@gmail.com> <20240820121548.380342-1-aha310510@gmail.com>
+In-Reply-To: <20240820121548.380342-1-aha310510@gmail.com>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Tue, 20 Aug 2024 21:30:19 +0900
+Message-ID: <CAO9qdTHyj_vUEtixmpiO-VPzBUBAggx2VWjvvzjtmgs2qSGbLQ@mail.gmail.com>
+Subject: Re: [PATCH net,v6,2/2] net/smc: initialize ipv6_pinfo_offset in
+ smc_inet6_prot and add smc6_sock structure
+To: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com, 
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, utz.bacher@de.ibm.com, dust.li@linux.alibaba.com, 
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Introduce statistics support for the DP83TG720 PHY driver, enabling
-detailed monitoring and reporting of link quality and packet-related
-metrics.
+Jeongjun Park wrote:
+>
+> Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
+> copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
+>
+> To solve this, you need to create a smc6_sock struct and add code to
+> smc_inet6_prot to initialize ipv6_pinfo_offset.
+>
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> ---
+>  net/smc/smc_inet.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+> index bece346dd8e9..26587a1b8c56 100644
+> --- a/net/smc/smc_inet.c
+> +++ b/net/smc/smc_inet.c
+> @@ -60,6 +60,11 @@ static struct inet_protosw smc_inet_protosw = {
+>  };
+>
+>  #if IS_ENABLED(CONFIG_IPV6)
+> +struct smc6_sock {
+> +       struct smc_sock         smc;
+> +       struct ipv6_pinfo       inet6;
+> +};
+> +
+>  static struct proto smc_inet6_prot = {
+>         .name           = "INET6_SMC",
+>         .owner          = THIS_MODULE,
+> @@ -67,9 +72,10 @@ static struct proto smc_inet6_prot = {
+>         .hash           = smc_hash_sk,
+>         .unhash         = smc_unhash_sk,
+>         .release_cb     = smc_release_cb,
+> -       .obj_size       = sizeof(struct smc_sock),
+> +       .obj_size       = sizeof(struct smc6_sock),
+>         .h.smc_hash     = &smc_v6_hashinfo,
+>         .slab_flags     = SLAB_TYPESAFE_BY_RCU,
+> +       .ipv6_pinfo_offset      = offsetof(struct smc6_sock, inet6);
+>  };
 
-To avoid double reading of certain registers, the implementation caches
-all relevant register values in a single operation. This approach
-ensures accurate and consistent data retrieval, particularly for
-registers that clear upon reading or require special handling.
+Oh, I didn't check for typos properly. I'll fix the typos and send you
+a new patch tomorrow.
 
-Some of the statistics, such as link training times, do not increment
-and therefore require special handling during the extraction process.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- use ethtool_puts()
-- use defines for statistic names
----
- drivers/net/phy/dp83tg720.c | 327 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 327 insertions(+)
-
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 0ef4d7dba0656..080cac71d1d0b 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -51,6 +51,20 @@
- /* Register 0x0405: Unknown Register */
- #define DP83TG720S_UNKNOWN_0405			0x405
- 
-+#define DP83TG720S_A2D_REG_66			0x442
-+#define DP83TG720S_ESD_EVENT_COUNT_MASK		GENMASK(14, 9)
-+
-+#define DP83TG720S_LINK_QUAL_1			0x543
-+#define DP83TG720S_LINK_TRAINING_TIME_MASK	GENMASK(7, 0)
-+
-+#define DP83TG720S_LINK_QUAL_2			0x544
-+#define DP83TG720S_REMOTE_RECEIVER_TIME_MASK	GENMASK(15, 8)
-+#define DP83TG720S_LOCAL_RECEIVER_TIME_MASK	GENMASK(7, 0)
-+
-+#define DP83TG720S_LINK_QUAL_3			0x547
-+#define DP83TG720S_LINK_LOSS_CNT_MASK		GENMASK(15, 10)
-+#define DP83TG720S_LINK_FAIL_CNT_MASK		GENMASK(9, 0)
-+
- /* Register 0x0576: TDR Master Link Down Control */
- #define DP83TG720S_TDR_MASTER_LINK_DOWN		0x576
- 
-@@ -60,6 +74,24 @@
- /* In RGMII mode, Enable or disable the internal delay for TXD */
- #define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
- 
-+#define DP83TG720S_PKT_STAT_1			0x639
-+#define DP83TG720S_TX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
-+
-+#define DP83TG720S_PKT_STAT_2			0x63A
-+#define DP83TG720S_TX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
-+
-+#define DP83TG720S_PKT_STAT_3			0x63B
-+#define DP83TG720S_TX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
-+
-+#define DP83TG720S_PKT_STAT_4			0x63C
-+#define DP83TG720S_RX_PKT_CNT_15_0_MASK		GENMASK(15, 0)
-+
-+#define DP83TG720S_PKT_STAT_5			0x63D
-+#define DP83TG720S_RX_PKT_CNT_31_16_MASK	GENMASK(15, 0)
-+
-+#define DP83TG720S_PKT_STAT_6			0x63E
-+#define DP83TG720S_RX_ERR_PKT_CNT_MASK		GENMASK(15, 0)
-+
- /* Register 0x083F: Unknown Register */
- #define DP83TG720S_UNKNOWN_083F			0x83f
- 
-@@ -69,6 +101,283 @@
- 
- #define DP83TG720_SQI_MAX			7
- 
-+struct dp83tg720_cache_reg {
-+	u16 mmd;
-+	u16 reg;
-+};
-+
-+#define DP83TG720_FLAG_COUNTER BIT(0)
-+
-+struct dp83tg720_hw_stat {
-+	const char *string;
-+	u8 cache_index1;
-+	u8 cache_index2;  /* If a statistic spans multiple registers */
-+	u32 mask1;
-+	u32 mask2;        /* Mask for the second register */
-+	u8 shift1;
-+	u8 shift2;        /* Shift for the second register */
-+	u8 flags;
-+};
-+
-+enum dp83tg720_cache_reg_idx {
-+	DP83TG720_CACHE_A2D_REG_66 = 0,
-+	DP83TG720_CACHE_LINK_QUAL_1,
-+	DP83TG720_CACHE_LINK_QUAL_2,
-+	DP83TG720_CACHE_LINK_QUAL_3,
-+	DP83TG720_CACHE_PKT_STAT_1,
-+	DP83TG720_CACHE_PKT_STAT_2,
-+	DP83TG720_CACHE_PKT_STAT_3,
-+	DP83TG720_CACHE_PKT_STAT_4,
-+	DP83TG720_CACHE_PKT_STAT_5,
-+	DP83TG720_CACHE_PKT_STAT_6,
-+
-+	DP83TG720_CACHE_EMPTY,
-+};
-+
-+static const struct dp83tg720_cache_reg dp83tg720_cache_regs[] = {
-+	[DP83TG720_CACHE_A2D_REG_66] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_A2D_REG_66,
-+	},
-+	[DP83TG720_CACHE_LINK_QUAL_1] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_LINK_QUAL_1,
-+	},
-+	[DP83TG720_CACHE_LINK_QUAL_2] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_LINK_QUAL_2,
-+	},
-+	[DP83TG720_CACHE_LINK_QUAL_3] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_LINK_QUAL_3,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_1] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_1,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_2] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_2,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_3] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_3,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_4] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_4,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_5] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_5,
-+	},
-+	[DP83TG720_CACHE_PKT_STAT_6] = {
-+		.mmd = MDIO_MMD_VEND2,
-+		.reg = DP83TG720S_PKT_STAT_6,
-+	},
-+};
-+
-+static const struct dp83tg720_hw_stat dp83tg720_hw_stats[] = {
-+	{
-+		.string = OA_LQ_LFL_ESD_EVENT_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_A2D_REG_66,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_ESD_EVENT_COUNT_MASK,
-+		.shift1 = 9,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = OA_LQ_LINK_TRAINING_TIME,
-+		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_1,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_LINK_TRAINING_TIME_MASK,
-+	},
-+	{
-+		.string = OA_LQ_REMOTE_RECEIVER_TIME,
-+		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_REMOTE_RECEIVER_TIME_MASK,
-+		.shift1 = 8,
-+	},
-+	{
-+		.string = OA_LQ_LOCAL_RECEIVER_TIME,
-+		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_2,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_LOCAL_RECEIVER_TIME_MASK,
-+	},
-+	{
-+		.string = OA_LQ_LFL_LINK_LOSS_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_3,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_LINK_LOSS_CNT_MASK,
-+		.shift1 = 10,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = OA_LQ_LFL_LINK_FAILURE_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_LINK_QUAL_3,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_LINK_FAIL_CNT_MASK,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = PHY_TX_PKT_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_PKT_STAT_1,
-+		.cache_index2 = DP83TG720_CACHE_PKT_STAT_2,
-+		.mask1 = DP83TG720S_TX_PKT_CNT_15_0_MASK,
-+		.mask2 = DP83TG720S_TX_PKT_CNT_31_16_MASK,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = PHY_TX_ERR_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_PKT_STAT_3,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_TX_ERR_PKT_CNT_MASK,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = PHY_RX_PKT_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_PKT_STAT_4,
-+		.cache_index2 = DP83TG720_CACHE_PKT_STAT_5,
-+		.mask1 = DP83TG720S_RX_PKT_CNT_15_0_MASK,
-+		.mask2 = DP83TG720S_RX_PKT_CNT_31_16_MASK,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+	{
-+		.string = PHY_RX_ERR_COUNT,
-+		.cache_index1 = DP83TG720_CACHE_PKT_STAT_6,
-+		.cache_index2 = DP83TG720_CACHE_EMPTY,
-+		.mask1 = DP83TG720S_RX_ERR_PKT_CNT_MASK,
-+		.flags = DP83TG720_FLAG_COUNTER,
-+	},
-+};
-+
-+struct dp83tg720_priv {
-+	u64 stats[ARRAY_SIZE(dp83tg720_hw_stats)];
-+	u16 reg_cache[ARRAY_SIZE(dp83tg720_cache_regs)];
-+};
-+
-+/**
-+ * dp83tg720_cache_reg_values - Cache register values to avoid clearing counters.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * Reads and caches the values of all relevant registers.
-+ *
-+ * Returns: 0 on success, a negative error code on failure.
-+ */
-+static int dp83tg720_cache_reg_values(struct phy_device *phydev)
-+{
-+	struct dp83tg720_priv *priv = phydev->priv;
-+	int i, ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(dp83tg720_cache_regs); i++) {
-+		const struct dp83tg720_cache_reg *cache_reg =
-+			&dp83tg720_cache_regs[i];
-+
-+		ret = phy_read_mmd(phydev, cache_reg->mmd, cache_reg->reg);
-+		if (ret < 0)
-+			return ret;
-+
-+		priv->reg_cache[i] = (u16)ret;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * dp83tg720_extract_stat_value - Extract specific statistic value from cache.
-+ * @phydev: Pointer to the phy_device structure.
-+ * @i: Index of the statistic in the dp83tg720_hw_stats array.
-+ *
-+ * Extracts the specific statistic value from the cached register values.
-+ *
-+ * Returns: The extracted statistic value.
-+ */
-+static u64 dp83tg720_extract_stat_value(struct phy_device *phydev, int i)
-+{
-+	const struct dp83tg720_hw_stat *stat = &dp83tg720_hw_stats[i];
-+	struct dp83tg720_priv *priv = phydev->priv;
-+	u32 val1, val2 = 0;
-+
-+	val1 = (priv->reg_cache[stat->cache_index1] & stat->mask1);
-+	val1 >>= stat->shift1;
-+	if (stat->cache_index2 != DP83TG720_CACHE_EMPTY) {
-+		val2 = (priv->reg_cache[stat->cache_index2] & stat->mask2);
-+		val2 >>= stat->shift2;
-+	}
-+
-+	if (stat->flags & DP83TG720_FLAG_COUNTER)
-+		priv->stats[i] += val1 | (val2 << 16);
-+	else
-+		priv->stats[i] = val1 | (val2 << 16);
-+
-+	return priv->stats[i];
-+}
-+
-+/**
-+ * dp83tg720_get_sset_count - Get the number of statistics sets.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * Returns: The number of statistics sets.
-+ */
-+static int dp83tg720_get_sset_count(struct phy_device *phydev)
-+{
-+	return ARRAY_SIZE(dp83tg720_hw_stats);
-+}
-+
-+/**
-+ * dp83tg720_get_strings - Get the strings for the statistics.
-+ * @phydev: Pointer to the phy_device structure.
-+ * @data: Pointer to the buffer where the strings will be stored.
-+ *
-+ * Fills the buffer with the strings for the statistics
-+ */
-+static void dp83tg720_get_strings(struct phy_device *phydev, u8 *data)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++)
-+		ethtool_puts(&data, dp83tg720_hw_stats[i].string);
-+}
-+
-+/**
-+ * dp83tg720_get_stats - Get the statistics values.
-+ * @phydev: Pointer to the phy_device structure.
-+ * @stats: Pointer to the ethtool_stats structure.
-+ * @data: Pointer to the buffer where the statistics values will be stored.
-+ *
-+ * Fills the buffer with the statistics values, filtering out those that are
-+ * not applicable based on the PHY's operating mode (e.g., RGMII).
-+ */
-+static void dp83tg720_get_stats(struct phy_device *phydev,
-+				struct ethtool_stats *stats, u64 *data)
-+{
-+	int i, j = 0;
-+
-+	dp83tg720_cache_reg_values(phydev);
-+
-+	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
-+		data[j] = dp83tg720_extract_stat_value(phydev, i);
-+		j++;
-+	}
-+}
-+
-+/**
-+ * dp83tg720_update_stats - Update the statistics values.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * Updates the statistics values.
-+ */
-+static void dp83tg720_update_stats(struct phy_device *phydev)
-+{
-+	int i;
-+
-+	dp83tg720_cache_reg_values(phydev);
-+
-+	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++)
-+		dp83tg720_extract_stat_value(phydev, i);
-+}
-+
- /**
-  * dp83tg720_cable_test_start - Start the cable test for the DP83TG720 PHY.
-  * @phydev: Pointer to the phy_device structure.
-@@ -208,6 +517,7 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 	u16 phy_sts;
- 	int ret;
- 
-+	dp83tg720_update_stats(phydev);
- 	phydev->pause = 0;
- 	phydev->asym_pause = 0;
- 
-@@ -341,12 +651,26 @@ static int dp83tg720_config_init(struct phy_device *phydev)
- 	return genphy_c45_pma_baset1_read_master_slave(phydev);
- }
- 
-+static int dp83tg720_probe(struct phy_device *phydev)
-+{
-+	struct dp83tg720_priv *priv;
-+
-+	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
-+	return 0;
-+}
-+
- static struct phy_driver dp83tg720_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
- 	.name		= "TI DP83TG720S",
- 
- 	.flags          = PHY_POLL_CABLE_TEST,
-+	.probe		= dp83tg720_probe,
- 	.config_aneg	= dp83tg720_config_aneg,
- 	.read_status	= dp83tg720_read_status,
- 	.get_features	= genphy_c45_pma_read_ext_abilities,
-@@ -355,6 +679,9 @@ static struct phy_driver dp83tg720_driver[] = {
- 	.get_sqi_max	= dp83tg720_get_sqi_max,
- 	.cable_test_start = dp83tg720_cable_test_start,
- 	.cable_test_get_status = dp83tg720_cable_test_get_status,
-+	.get_sset_count = dp83tg720_get_sset_count,
-+	.get_strings	= dp83tg720_get_strings,
-+	.get_stats	= dp83tg720_get_stats,
- 
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--- 
-2.39.2
-
+>
+>  static const struct proto_ops smc_inet6_stream_ops = {
+> --
 
