@@ -1,443 +1,163 @@
-Return-Path: <netdev+bounces-120250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A3F958ADB
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:14:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9470F958AE0
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526841F25D73
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:14:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9431F258E8
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E27191F89;
-	Tue, 20 Aug 2024 15:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C2F1922EB;
+	Tue, 20 Aug 2024 15:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+ACRMhm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hs3bidrT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557D81922F7
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9D318EFC9;
+	Tue, 20 Aug 2024 15:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724166833; cv=none; b=lBYlC6b5Sl24IwqeizRWHT7i6tUqk3sEdUBIXGwOAg0U3YCXElWZDgwCbX0D9zHRIb5KNxQtskK6HmBSH7QxnB3YEo6BDxd6SIg1wDV+VWNd8f+Ws4+D1YP4GLpaUepp4C1hmGfRxL/ogWbpb8TjU78mVe/TSbmnP0hunVpZYlo=
+	t=1724166861; cv=none; b=Q76dH/mz/52KHB2icfxxVP0lapQjT97WH5x07363QZrt6tbwUFV0SBS5fdP1xJJUtxqP40AcA3K7jTc8LxraA+hTrtQ2bOyhQ7Yj6j2ERwh2yTBy969cdR0E5I2+CfbE/OKr3zB67sBK3JfrV6s2l6yaxJyNgb/xVN2SkhJhTVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724166833; c=relaxed/simple;
-	bh=2fCncmrgrl4RHXXm7k1eKgP5AvJijvi1O94cx849xU8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CS2bJhMpSN+dZ8Vdy7ImqonXiHb/dv3bo/01g/2PDmqhUkz8QnoZVO4p/piwwUI6CKG4qNvh2QZMLSSGcLXpAPeEGN7K4c6R1oITXFJYW+GsamxVZ+gzthd6yhBfm2wZopHCYmIMfetO26ZG0o6YIe83ETnu43UPH4mDSea4HjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X+ACRMhm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724166830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/Vz5XOmDJqT1dhTjMmMWxDCFiatR5YNuO17jCP0ErOA=;
-	b=X+ACRMhmXbOtsFMj510hQxOZFUzXaPToCvIFIBDrULUNmZ5787lFwGJFq6rlQXHdlZEu/9
-	AyCJiXfQHPfOkDIuFg6Nj744jqLmQUTIx/oiLGpodtX/Fn1bT8QgEqBni5ZGn0pqAcS4/F
-	mcYjauok6gowP3LkoLyk1nbbY7BI4rg=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-14-Sk5lwWlTOYGptgltkHXfbg-1; Tue,
- 20 Aug 2024 11:13:46 -0400
-X-MC-Unique: Sk5lwWlTOYGptgltkHXfbg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27B021955BF7;
-	Tue, 20 Aug 2024 15:13:45 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.213])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6279319560AA;
-	Tue, 20 Aug 2024 15:13:41 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH v4 net-next 12/12] iavf: Add net_shaper_ops support
-Date: Tue, 20 Aug 2024 17:12:33 +0200
-Message-ID: <08cd87e754552c5f413ead220abdaf1ccfadf21c.1724165948.git.pabeni@redhat.com>
-In-Reply-To: <cover.1724165948.git.pabeni@redhat.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
+	s=arc-20240116; t=1724166861; c=relaxed/simple;
+	bh=HEp2O9Yg+xFVobpRrcPzfJ17tFgUBl3wrHGCOvMurYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q9Cia/EwPmrCFVj+7/pqRPoP5eFSjUmhLO+agMKXLAcCVzbnBpsZFSPSSqDpDWFtHeFnB25CyyI7dRXv0YDWoPjnAzZxRa++4DIiyCK9whqhyzMqtvNuxTyDxFn1wNqyMVaeMmk45hfqoEkYGUIBGnF/VTX+7AVIn2udtjXcWzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hs3bidrT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Mj0xb+mKKtlxydaY/lPIxOqJwc7T/yLIdICGlctTCsA=; b=hs3bidrTIdT3d9wsjsAk5IF+tP
+	EhBSP23m2Zp5+ctd2b+yclSD9n2h/JqDGHeXAjvdLUnhRbi15qMm5yNb7m8b6ZCEdDQQpZD1TnIm0
+	3KVPjhWYJFxfsO+eljPP2JOZVPYWTGDDYrMFFJRrPcq24qC9f4TtL8K0Ypiqj9MRIjBg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sgQYY-005Ew0-6K; Tue, 20 Aug 2024 17:13:58 +0200
+Date: Tue, 20 Aug 2024 17:13:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 10/11] net: macb: Add support for RP1's MACB variant
+Message-ID: <c33fe03d-2097-4d26-b3db-8a3d6c793cd1@lunn.ch>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
 
-From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+> +static unsigned int txdelay = 35;
+> +module_param(txdelay, uint, 0644);
 
-Implement net_shaper_ops support for IAVF. This enables configuration
-of rate limiting on per queue basis. Customer intends to enforce
-bandwidth limit on Tx traffic steered to the queue by configuring
-rate limits on the queue.
+Networking does not like module parameters.
 
-To set rate limiting for a queue, update shaper object of given queues
-in driver and send VIRTCHNL_OP_CONFIG_QUEUE_BW to PF to update HW
-configuration.
+This is also unused in this patch! So i suggest you just delete it.
 
-Deleting shaper configured for queue is nothing but configuring shaper
-with bw_max 0. The PF restores the default rate limiting config
-when bw_max is zero.
+> +
+>  /* This structure is only used for MACB on SiFive FU540 devices */
+>  struct sifive_fu540_macb_mgmt {
+>  	void __iomem *reg;
+> @@ -334,7 +337,7 @@ static int macb_mdio_wait_for_idle(struct macb *bp)
+>  	u32 val;
+>  
+>  	return readx_poll_timeout(MACB_READ_NSR, bp, val, val & MACB_BIT(IDLE),
+> -				  1, MACB_MDIO_TIMEOUT);
+> +				  100, MACB_MDIO_TIMEOUT);
+>  }
+  
+Please take this patch out of the series, and break it up. This is one
+patch, with a good explanation why you need 1->100.
 
-Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+>  static int macb_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
+> @@ -493,6 +496,19 @@ static int macb_mdio_write_c45(struct mii_bus *bus, int mii_id,
+>  	return status;
+>  }
+>  
+> +static int macb_mdio_reset(struct mii_bus *bus)
+> +{
+> +	struct macb *bp = bus->priv;
+> +
+> +	if (bp->phy_reset_gpio) {
+> +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 1);
+> +		msleep(bp->phy_reset_ms);
+> +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 0);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static void macb_init_buffers(struct macb *bp)
+>  {
+>  	struct macb_queue *queue;
+> @@ -969,6 +985,7 @@ static int macb_mii_init(struct macb *bp)
+>  	bp->mii_bus->write = &macb_mdio_write_c22;
+>  	bp->mii_bus->read_c45 = &macb_mdio_read_c45;
+>  	bp->mii_bus->write_c45 = &macb_mdio_write_c45;
+> +	bp->mii_bus->reset = &macb_mdio_reset;
+
+This is one patch.
+
+>  	snprintf(bp->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
+>  		 bp->pdev->name, bp->pdev->id);
+>  	bp->mii_bus->priv = bp;
+> @@ -1640,6 +1657,11 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
+>  
+>  		macb_init_rx_ring(queue);
+>  		queue_writel(queue, RBQP, queue->rx_ring_dma);
+> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> +		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> +			macb_writel(bp, RBQPH,
+> +				    upper_32_bits(queue->rx_ring_dma));
+> +#endif
+
+How does this affect a disto kernel? Do you actually need the #ifdef?
+What does bp->hw_dma_cap contain when CONFIG_ARCH_DMA_ADDR_T_64BIT is
+not defined?
+
+Again, this should be a patch of its own, with a good commit message.
+
+Interrupt coalescing should be a patch of its own, etc.
+
+    Andrew
+
 ---
- drivers/net/ethernet/intel/Kconfig            |   1 +
- drivers/net/ethernet/intel/iavf/iavf.h        |   3 +
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 150 ++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_txrx.h   |   2 +
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  65 ++++++++
- 5 files changed, 221 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 0375c7448a57..20bc40eec487 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -258,6 +258,7 @@ config I40E_DCB
- config IAVF
- 	tristate
- 	select LIBIE
-+	select NET_SHAPER
- 
- config I40EVF
- 	tristate "Intel(R) Ethernet Adaptive Virtual Function support"
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index 48cd1d06761c..a84bdbfbb0f7 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -34,6 +34,7 @@
- #include <net/tc_act/tc_gact.h>
- #include <net/tc_act/tc_mirred.h>
- #include <net/tc_act/tc_skbedit.h>
-+#include <net/net_shaper.h>
- 
- #include "iavf_type.h"
- #include <linux/avf/virtchnl.h>
-@@ -336,6 +337,7 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_DISABLE_CTAG_VLAN_INSERTION	BIT_ULL(36)
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
-+#define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -581,6 +583,7 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- int iavf_config_rss(struct iavf_adapter *adapter);
- int iavf_lan_add_device(struct iavf_adapter *adapter);
- int iavf_lan_del_device(struct iavf_adapter *adapter);
-+void iavf_cfg_queues_bw(struct iavf_adapter *adapter);
- void iavf_enable_channels(struct iavf_adapter *adapter);
- void iavf_disable_channels(struct iavf_adapter *adapter);
- void iavf_add_cloud_filter(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index f782402cd789..a8c3a152b0b5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2085,6 +2085,11 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return 0;
- 	}
- 
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW) {
-+		iavf_cfg_queues_bw(adapter);
-+		return 0;
-+	}
-+
- 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
- 		iavf_configure_queues(adapter);
- 		return 0;
-@@ -2918,6 +2923,30 @@ static void iavf_disable_vf(struct iavf_adapter *adapter)
- 	dev_info(&adapter->pdev->dev, "Reset task did not complete, VF disabled\n");
- }
- 
-+/**
-+ * iavf_reconfig_qs_bw - Call-back task to handle hardware reset
-+ * @adapter: board private structure
-+ *
-+ * After a reset, the shaper parameters of queues need to be replayed again.
-+ * Since the net_shaper_info object inside TX rings persists across reset,
-+ * set the update flag for all queues so that the virtchnl message is triggered
-+ * for all queues.
-+ **/
-+static void iavf_reconfig_qs_bw(struct iavf_adapter *adapter)
-+{
-+	int i, num = 0;
-+
-+	for (i = 0; i < adapter->num_active_queues; i++)
-+		if (adapter->tx_rings[i].q_shaper.bw_min ||
-+		    adapter->tx_rings[i].q_shaper.bw_max) {
-+			adapter->tx_rings[i].q_shaper_update = true;
-+			num++;
-+		}
-+
-+	if (num)
-+		adapter->aq_required |= IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+}
-+
- /**
-  * iavf_reset_task - Call-back task to handle hardware reset
-  * @work: pointer to work_struct
-@@ -3124,6 +3153,8 @@ static void iavf_reset_task(struct work_struct *work)
- 		iavf_up_complete(adapter);
- 
- 		iavf_irq_enable(adapter, true);
-+
-+		iavf_reconfig_qs_bw(adapter);
- 	} else {
- 		iavf_change_state(adapter, __IAVF_DOWN);
- 		wake_up(&adapter->down_waitqueue);
-@@ -4893,6 +4924,124 @@ static netdev_features_t iavf_fix_features(struct net_device *netdev,
- 	return iavf_fix_strip_features(adapter, features);
- }
- 
-+static int iavf_verify_handle(struct net_device *dev,
-+			      const struct net_shaper_handle *handle,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(dev);
-+	enum net_shaper_scope scope = handle->scope;
-+	int qid = handle->id;
-+
-+	if (scope != NET_SHAPER_SCOPE_QUEUE) {
-+		NL_SET_ERR_MSG_FMT(extack, "Invalid shaper handle, unsupported scope %d",
-+				   scope);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (qid >= adapter->num_active_queues) {
-+		NL_SET_ERR_MSG_FMT(extack, "Invalid shaper handle, queued id %d max %d",
-+				   qid, adapter->num_active_queues);
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
-+/**
-+ * iavf_shaper_set - check that shaper info received
-+ * @dev: pointer to netdev
-+ * @shaper: configuration of shaper.
-+ * @extack: Netlink extended ACK for reporting errors
-+ *
-+ * Returns:
-+ * * %0 - Success
-+ * * %-EOPNOTSUPP - Driver doesn't support this scope.
-+ * * %-EINVAL - Invalid queue number in input
-+ **/
-+static int
-+iavf_shaper_set(struct net_device *dev,
-+		const struct net_shaper_handle *handle,
-+		const struct net_shaper_info *shaper,
-+		struct netlink_ext_ack *extack)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(dev);
-+	bool need_cfg_update = false;
-+	int ret = 0;
-+
-+	ret = iavf_verify_handle(dev, handle, extack);
-+	if (ret)
-+		return ret;
-+
-+	if (handle->scope == NET_SHAPER_SCOPE_QUEUE) {
-+		struct iavf_ring *tx_ring = &adapter->tx_rings[handle->id];
-+
-+		tx_ring->q_shaper.bw_min = div_u64(shaper->bw_min, 1000);
-+		tx_ring->q_shaper.bw_max = div_u64(shaper->bw_max, 1000);
-+		tx_ring->q_shaper_update = true;
-+		need_cfg_update = true;
-+	}
-+
-+	if (need_cfg_update)
-+		adapter->aq_required |= IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+
-+	return 0;
-+}
-+
-+static int iavf_shaper_del(struct net_device *dev,
-+			   const struct net_shaper_handle *handle,
-+			   struct netlink_ext_ack *extack)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(dev);
-+	bool need_cfg_update = false;
-+	int ret;
-+
-+	ret = iavf_verify_handle(dev, handle, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (handle->scope == NET_SHAPER_SCOPE_QUEUE) {
-+		struct iavf_ring *tx_ring = &adapter->tx_rings[handle->id];
-+
-+		tx_ring->q_shaper.bw_min = 0;
-+		tx_ring->q_shaper.bw_max = 0;
-+		tx_ring->q_shaper_update = true;
-+		need_cfg_update = true;
-+	}
-+
-+	if (need_cfg_update)
-+		adapter->aq_required |= IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+
-+	return 0;
-+}
-+
-+static int iavf_shaper_group(struct net_device *dev, int leaves_count,
-+			     const struct net_shaper_handle *leaves_handles,
-+			     const struct net_shaper_info *leaves,
-+			     const struct net_shaper_handle *root_handle,
-+			     const struct net_shaper_info *root,
-+			     struct netlink_ext_ack *extack)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int iavf_shaper_cap(struct net_device *dev, enum net_shaper_scope scope,
-+			   unsigned long *flags)
-+{
-+	if (scope != NET_SHAPER_SCOPE_QUEUE)
-+		return -EOPNOTSUPP;
-+
-+	*flags = BIT(NET_SHAPER_A_CAPABILITIES_SUPPORT_BW_MIN) |
-+		 BIT(NET_SHAPER_A_CAPABILITIES_SUPPORT_BW_MAX) |
-+		 BIT(NET_SHAPER_A_CAPABILITIES_SUPPORT_METRIC_BPS);
-+	return 0;
-+}
-+
-+static const struct net_shaper_ops iavf_shaper_ops = {
-+	.set = iavf_shaper_set,
-+	.delete = iavf_shaper_del,
-+	.group = iavf_shaper_group,
-+	.capabilities = iavf_shaper_cap,
-+};
-+
- static const struct net_device_ops iavf_netdev_ops = {
- 	.ndo_open		= iavf_open,
- 	.ndo_stop		= iavf_close,
-@@ -4908,6 +5057,7 @@ static const struct net_device_ops iavf_netdev_ops = {
- 	.ndo_fix_features	= iavf_fix_features,
- 	.ndo_set_features	= iavf_set_features,
- 	.ndo_setup_tc		= iavf_setup_tc,
-+	.net_shaper_ops		= &iavf_shaper_ops,
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index d7b5587aeb8e..dd503ee50b7f 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -296,6 +296,8 @@ struct iavf_ring {
- 					 */
- 
- 	u32 rx_buf_len;
-+	struct net_shaper_info q_shaper;
-+	bool q_shaper_update;
- } ____cacheline_internodealigned_in_smp;
- 
- #define IAVF_ITR_ADAPTIVE_MIN_INC	0x0002
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 7e810b65380c..f719a6724774 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -1507,6 +1507,60 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
- 		adapter->link_speed = vpe->event_data.link_event.link_speed;
- }
- 
-+/**
-+ * iavf_cfg_queues_bw - configure bandwidth of allocated queues
-+ * @adapter: iavf adapter structure instance
-+ *
-+ * This function requests PF to configure queue bandwidth of allocated queues
-+ */
-+void iavf_cfg_queues_bw(struct iavf_adapter *adapter)
-+{
-+	struct virtchnl_queues_bw_cfg *qs_bw_cfg;
-+	struct net_shaper_info *q_shaper;
-+	int qs_to_update = 0;
-+	int i, inx = 0;
-+	size_t len;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set tc queue bw, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	for (i = 0; i < adapter->num_active_queues; i++) {
-+		if (adapter->tx_rings[i].q_shaper_update)
-+			qs_to_update++;
-+	}
-+	len = struct_size(qs_bw_cfg, cfg, qs_to_update);
-+	qs_bw_cfg = kzalloc(len, GFP_KERNEL);
-+	if (!qs_bw_cfg)
-+		return;
-+
-+	qs_bw_cfg->vsi_id = adapter->vsi.id;
-+	qs_bw_cfg->num_queues = qs_to_update;
-+
-+	for (i = 0; i < adapter->num_active_queues; i++) {
-+		struct iavf_ring *tx_ring = &adapter->tx_rings[i];
-+
-+		q_shaper = &tx_ring->q_shaper;
-+		if (tx_ring->q_shaper_update) {
-+			qs_bw_cfg->cfg[inx].queue_id = i;
-+			qs_bw_cfg->cfg[inx].shaper.peak = q_shaper->bw_max;
-+			qs_bw_cfg->cfg[inx].shaper.committed = q_shaper->bw_min;
-+			qs_bw_cfg->cfg[inx].tc = 0;
-+			inx++;
-+		}
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUEUE_BW;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUEUE_BW,
-+			 (u8 *)qs_bw_cfg, len);
-+	kfree(qs_bw_cfg);
-+}
-+
- /**
-  * iavf_enable_channels
-  * @adapter: adapter structure
-@@ -2227,6 +2281,10 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 					VIRTCHNL_RSS_ALG_TOEPLITZ_SYMMETRIC;
- 
- 			break;
-+		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
- 		default:
- 			dev_err(&adapter->pdev->dev, "PF returned error %d (%s) to our request %d\n",
- 				v_retval, iavf_stat_str(&adapter->hw, v_retval),
-@@ -2569,6 +2627,13 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (!v_retval)
- 			iavf_netdev_features_vlan_strip_set(netdev, false);
- 		break;
-+	case VIRTCHNL_OP_CONFIG_QUEUE_BW: {
-+		int i;
-+		/* shaper configuration is successful for all queues */
-+		for (i = 0; i < adapter->num_active_queues; i++)
-+			adapter->tx_rings[i].q_shaper_update = false;
-+	}
-+		break;
- 	default:
- 		if (adapter->current_op && (v_opcode != adapter->current_op))
- 			dev_warn(&adapter->pdev->dev, "Expected response %d from PF, received %d\n",
--- 
-2.45.2
-
+pw-bot: cr
 
