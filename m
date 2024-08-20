@@ -1,144 +1,168 @@
-Return-Path: <netdev+bounces-120051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F92095818B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:59:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE299581EE
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:18:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1A0C1C23C97
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:59:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E199B1C22A53
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 09:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6877818A944;
-	Tue, 20 Aug 2024 08:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE1C18C35B;
+	Tue, 20 Aug 2024 09:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NPQTC7v7"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="KqaHAff8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBF218A92D
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 08:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE3318C356;
+	Tue, 20 Aug 2024 09:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724144368; cv=none; b=SulhSqzQroZb3bWR3lfLdMhsMipKK6vxv0qPQAYGAMUvI3p7ufbtE0FnkUSjA+itF8FaXRctLY/haQKcCr0P1RpKZF5nEpyhH0E1jG41Y4oW8KTRdiuiPvQ3n7H2eTa/Fii+ijN35h34Mp/v1Ra0eyK3SIqN9cjpDj47oxlKPwA=
+	t=1724145450; cv=none; b=qICqX2OqX12hxo/1F7SxDC3m7mFoEN2BrQnqc6OKsnokRGtVcFtF1Rj09KgD7IFi/JRr37sumsaN9BfSCwtbOVHy+BDjuV+coHGNGhUNpmTRmganSXWGR23z4+pWTBIkH7sQ2L2V995D6OtkYhqUd5ZT8QXz013Q0aE7b/pbx+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724144368; c=relaxed/simple;
-	bh=RjeixHYVLHHf45eXa/OFpm6POVOyDrf2UJ/lLn54E4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzTKleQOET4KZd8gvB0pfETW4qp5KLyI7j1kWro3LSpcXIqSD8Xrg8wZgxn5z/WTpl0dQXSkw58xfkX3w6SzEnseGzcjwrvjpRuVgIkKkHI5rR1kwwiPRNvG/xQAGEG7yKu902rMo5JRu4AqiinME7qwz2gy6cD5MKBlNc86z/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NPQTC7v7; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <99567c3c-1f45-4a3f-a739-b35f014127b5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724144363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=deFt1RItMiAcKZnzOmo0EZwe3WAWajcCcK+fbFD3Z4w=;
-	b=NPQTC7v7xZvvAsgOKfBRVGfrY+h0BK8SRZUG3Qqyg/Mrrs2RiEHEsGIX2hjmqzSvvnDyEp
-	GFHqYOprrhxyNSc2kgWnJrZn3KdBf2GZp2vlxNjfd/Xw+F/eVOTjGZ7a0HrzhotWNronHD
-	/veoxk0i37Ea3CVWE/u9h9Oj+JHVJVc=
-Date: Tue, 20 Aug 2024 09:59:19 +0100
+	s=arc-20240116; t=1724145450; c=relaxed/simple;
+	bh=6WqQ9bZ1jNERH1OVyT+68qPMJh4OGz7I3i6jzAqYrsY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cm3pKVAW10i3PHOxM7smzKifbvCh6/yl+1pNKfjW6AxzRUDBH6NTvlzfYgzdPKV8+a8co4vMMkbIvfXqV3Afw2ainFhIn8RzXxklzdUVXr4yVOVigvZi7BEdYSJCFpmSrAY7ceTK29RRt6LhOH5IrdwNqGAhtCAzZB/mlSM9zh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=KqaHAff8; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47K9H0Zb007330;
+	Tue, 20 Aug 2024 04:17:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1724145420;
+	bh=I7ZRMszLONWGT9rU/+fUWOeX9vZN1R9Vo1ubOC9KAFo=;
+	h=From:To:CC:Subject:Date;
+	b=KqaHAff8YVoPGjm4cMn4GZHAjC1AhAV9Q1nr23+ro9ulk4FAG8WIRuVZ2v+kSljCs
+	 l8lJsh3s/21E3hHzfBnrp5TFq19PzcsJT0I/PyNbN28kpLPSaaO0rKhOw5LIGKeIkc
+	 iqgxbz53za6VvgcGCYokjRpC5yaw7p6stQYy81VA=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47K9H0nn028025
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 20 Aug 2024 04:17:00 -0500
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 20
+ Aug 2024 04:17:00 -0500
+Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 20 Aug 2024 04:16:59 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47K9H0WB084730;
+	Tue, 20 Aug 2024 04:17:00 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 47K9Gxn2016984;
+	Tue, 20 Aug 2024 04:16:59 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Suman Anna <s-anna@ti.com>, Sai Krishna <saikrishnag@marvell.com>,
+        Jan
+ Kiszka <jan.kiszka@siemens.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Kory Maincent <kory.maincent@bootlin.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        Simon
+ Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Roger Quadros <rogerq@kernel.org>,
+        MD Danish Anwar
+	<danishanwar@ti.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Santosh Shilimkar
+	<ssantosh@kernel.org>, Nishanth Menon <nm@ti.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: [PATCH net-next v6 0/2] Add support for ICSSG PA_STATS
+Date: Tue, 20 Aug 2024 14:46:55 +0530
+Message-ID: <20240820091657.4068304-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net/wireless] Question about `cfg80211_conn_scan` func: misuse
- of __counted_by
-To: Haoyu Li <lihaoyu499@gmail.com>
-Cc: netdev@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>,
- "David S. Miller" <davem@davemloft.net>, linux-wireless@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>
-References: <CAPbMC760=5UeaU2wwNZkBMi2ZMVhr2GQgG+VkM8Z7zNbt-FtTA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAPbMC760=5UeaU2wwNZkBMi2ZMVhr2GQgG+VkM8Z7zNbt-FtTA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 19/08/2024 20:19, Haoyu Li wrote:
-> Dear Linux Developers for NETWORKING and CFG80211/NL80211,
-> 
-> We are curious about the use of `struct cfg80211_scan_request *request`
-> in function `cfg80211_conn_scan`.
-> The definition of `struct cfg80211_scan_request` is at
-> https://elixir.bootlin.com/linux/v6.10.6/source/include/net/cfg80211.h#L2675.
-> ```
-> struct cfg80211_scan_request {
-> struct cfg80211_ssid *ssids;
-> int n_ssids;
-> u32 n_channels;
-> const u8 *ie;
-> size_t ie_len;
-> u16 duration;
-> bool duration_mandatory;
-> u32 flags;
-> 
-> u32 rates[NUM_NL80211_BANDS];
-> 
-> struct wireless_dev *wdev;
-> 
-> u8 mac_addr[ETH_ALEN] __aligned(2);
-> u8 mac_addr_mask[ETH_ALEN] __aligned(2);
-> u8 bssid[ETH_ALEN] __aligned(2);
-> 
-> /* internal */
-> struct wiphy *wiphy;
-> unsigned long scan_start;
-> struct cfg80211_scan_info info;
-> bool notified;
-> bool no_cck;
-> bool scan_6ghz;
-> u32 n_6ghz_params;
-> struct cfg80211_scan_6ghz_params *scan_6ghz_params;
-> s8 tsf_report_link_id;
-> 
-> /* keep last */
-> struct ieee80211_channel *channels[] __counted_by(n_channels);
-> };
-> ```
-> 
-> Our question is: The `channels` member of `struct
-> cfg80211_scan_request` is annotated
-> with "__counted_by", which means the array size is indicated by
-> `n_channels`. Only if we set `n_channels` before accessing
-> `channels[i]`, the flexible
-> member `hws` can be properly bounds-checked at run-time when enabling
-> CONFIG_UBSAN_BOUNDS and CONFIG_FORTIFY_SOURCE. Or there will be a
-> warning from each array access that is prior to the initialization
-> because the number of elements is zero.
-> 
-> In function `cfg80211_conn_scan` at
-> https://elixir.bootlin.com/linux/v6.10.6/source/net/wireless/sme.c#L117,
-> we think it's needed to relocate `request->n_channels = n_channels` before
-> accessing `request->channels[...]`.
-> 
-> Here is a fix example of a similar situation :
-> https://lore.kernel.org/stable/20240613113225.898955993@linuxfoundation.org/.
-> 
-> Please kindly correct us if we missed any key information. Looking
-> forward to your response!
+Hi,
 
-You are quite right that the case when (wdev->conn->params.channel !=
-NULL) should initialize n_channels to 1 first.
+This series adds support for PA_STATS. Previously this series was a
+standalone patch adding documentation for PA_STATS in dt-bindings file
+ti,pruss.yaml.
 
-The other question is if it's legal to take address beyond the end of
-array. I'm talking about
-request->ssids = (void *)&request->channels[n_channels];
-But you can easily check it yourself with pretty simple program.
+As discussed in v4, posting driver and binding patch together.
+
+Changes since v5:
+*) Used ARRAY_SIZE(icssg_all_pa_stats) instead of ICSSG_NUM_PA_STATS so
+   that it's consistent with the loop as suggested by Dan Carpenter
+   <dan.carpenter@linaro.org>
+*) Created emac->pa_stats array for storing pa_stats as suggested by
+   Dan Carpenter <dan.carpenter@linaro.org>
+*) Renamed `icssg_all_stats` to `icssg_mii_g_rt_stats`.
+*) Added entry for pa_stats in kernel doc for structure prueth as asked by
+   Simon Horman <horms@kernel.org>.
+*) Improved syntax for kernel doc of pa_stats_regs register by dropping
+   u32 from kernel doc.
+
+Changes since v4:
+*) Added net-next to both driver and binding patch as they are both now
+   meant to be merged via net-next.
+*) Added Acked by tag of Nishanth Menon <nm@ti.com>
+*) Dropped device tree patches as they don't need merge now.
+*) Modified patch 2 to use ethtool_puts() as suggested by Jakub Kicinski
+   <kuba@kernel.org>
+
+Changes since v3:
+*) Added full series as asked by Nishanth Menon <nm@ti.com>
+
+Changes from v2 to v3:
+*) Added RB tag of Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> to
+   patch 2/2
+*) Added patch 1/2 to the series as the binding file is orphan.
+
+Changes from v1 to v2:
+*) Added ^ in pa-stats as suggested by Krzysztof Kozlowski
+   <krzk@kernel.org>
+*) Moved additionalProperties: false to right after type:object as
+   suggested by Krzysztof Kozlowski <krzk@kernel.org>
+*) Updated description of pa-stats to explain the purpose of PA_STATS
+   module in context of ICSSG.
+
+v1 https://lore.kernel.org/all/20240430121915.1561359-1-danishanwar@ti.com/
+v2 https://lore.kernel.org/all/20240529115149.630273-1-danishanwar@ti.com/
+v3 https://lore.kernel.org/all/20240625153319.795665-1-danishanwar@ti.com/
+v4 https://lore.kernel.org/all/20240729113226.2905928-1-danishanwar@ti.com/
+v5 https://lore.kernel.org/all/20240814092033.2984734-1-danishanwar@ti.com/
+
+MD Danish Anwar (2):
+  dt-bindings: soc: ti: pruss: Add documentation for PA_STATS support
+  net: ti: icssg-prueth: Add support for PA Stats
+
+ .../devicetree/bindings/soc/ti/ti,pruss.yaml  | 20 +++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 19 ++++++-----
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  6 ++++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  9 +++--
+ drivers/net/ethernet/ti/icssg/icssg_stats.c   | 31 ++++++++++++-----
+ drivers/net/ethernet/ti/icssg/icssg_stats.h   | 34 ++++++++++++++++++-
+ 6 files changed, 98 insertions(+), 21 deletions(-)
 
 
-
-> Best,
-> Haoyu Li
+base-commit: dca9d62a0d7684a5510645ba05960529c5066457
+-- 
+2.34.1
 
 
