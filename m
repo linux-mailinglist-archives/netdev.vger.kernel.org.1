@@ -1,148 +1,148 @@
-Return-Path: <netdev+bounces-119949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BEE3957A9C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:49:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB51E957A9E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA87E1F23BB1
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:49:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DBD31F23617
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 00:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A61E541;
-	Tue, 20 Aug 2024 00:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61188A94F;
+	Tue, 20 Aug 2024 00:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ObXYXMuC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Orgs93pA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57F319478
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17628BE0
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 00:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724114948; cv=none; b=sjWKD4q7xr529cPzVNi/1h7waSU2mOoJCd6aj00wN11VbdbrbnkQPpiXhfUMHiZCkgR7ESx/0TKrjPKq81PbSs+9blvj/Au1lxcojJBddY3gQrPKnXoZRianwcWH6VXHSLkwdhzyNcXNoL55+XO6f7HYoJHmXbu1d2+N97/D6KA=
+	t=1724115272; cv=none; b=saBERbafVXdMY9PGtFnTz8ql2GdB7IpbgRTAWqxUYULmJz6rbvgnWpS7VhwZwn+asOLVKFXSyOTncfvzUFRNLp0aLSBDvQCYOy8WLZxi2rqsAe9pSprlAMjHljeVpylTKkMKxVM4VcLQQHIegN9u4uzVyBDh/L6PDwEYeebxHJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724114948; c=relaxed/simple;
-	bh=0s+SKheHmDsntXrpZ41L4KTwsIhFZvohAAJrkM5ibx8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HyrvcYImlRYOdXlbrDidmRf/GEp1PxLkAXbOIy4I7DEWmvmYZT3pmMPcIfmq/cfv0rQ5RB47jTvAq88jrOyqdvo4daXM514ki9hUAFjKCiJ3vE6zFhju0xdQCGQOaA1K7B6hrPWhK6PWLNKkQuK08tp4CakEcZRVfpuHpFAKwok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ObXYXMuC; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1724115272; c=relaxed/simple;
+	bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GOOdPRG2+zadMc2bu2Myi3/++EHnU41KOA7W4W+L1lgNQxOOh232FicYlXXHC8sqgXcwHgcK+AZC0BkjgaAipWp7qtiYvip25oq0WxigLr4G9UIwJ01ue01qKU1JlS7P87IRUCSQgji4hcLpBh0NaS1M6Pp4/6vSPGHkYFy4Y3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Orgs93pA; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20219a0fe4dso21899695ad.2
-        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 17:49:06 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-39d46ae7863so5843745ab.0
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 17:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724114946; x=1724719746; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724115269; x=1724720069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fvEsBVaU9vacqW8jEWHgaimLveKbFN8Ava8ep4RfZhc=;
-        b=ObXYXMuCFdN9EjNB7GnMmQWbPk3KRcvIJIIE0mXV8yUfT7OWNQKEIb9CWg4/aFZ0BI
-         46FwuYJXRLN32fzyEIr8QZc3FD9tFIyKxjmOhaS2JU3fz34BQdc48a07LON813i7Plru
-         uXYdAKef8giwvbeg1l9F/L41g9adtAzv6i3nS2TT9ncaNKa/H0ya/eit7VCKHiVxGPXD
-         3zM2mIevKORSQztGEiMU7OZxrvoYEDvP+qQF98tTAW+ihEMVALnk7GeoShqDVwU2dgdi
-         7SjK1ScKfPVAfW/9wNP9lSrFie0utuZR4FOdAUuX0asDOvZBJ2g7kio8MxFFe/FnTTYL
-         bEbw==
+        bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
+        b=Orgs93pAbZAZEsoRJXhb1NL3rlsrZ03YPSJ9beLiSl1wGH48UE/9O063ZXk2uDhvjK
+         zdxr5YmPmpgLJ4ga1kdV8roCouR37K0Em3ORl4Y4XwwlCM8HXzZYvbjPRy1qIjqY7vzx
+         FLh5Qh3mLEWw76kLyDkH8WBkJQt0QE0uCNmHZV/XuwiuFR704J7ORrVtRb1TqDQb/Pwe
+         MUuz6wMsKudZLlRofWR/xZV1dPt72zLEThnNxCW8XR8xIywePxm0/aRTM1I7VQuVR+F7
+         YkBw+GMpi+PW3C8VIwj/v2w6RocjXucZkpGoUQa+n/GbP8Lrx1D75sZqRhh2nCoK0sKE
+         PFHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724114946; x=1724719746;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724115269; x=1724720069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fvEsBVaU9vacqW8jEWHgaimLveKbFN8Ava8ep4RfZhc=;
-        b=QTGCAsD5iEV6jec0VSdh7+QZK5OAoAs2R2ZdFEokOQUHBtVOwU4VvzC3ijTrdkfBn6
-         CS5DCUz+RjuG5pYaZLtx0pmB4DrUQCdah0oK1qQSYvNKfKVwM92M0IX7pyQJGOK3oPMS
-         zKxOAg4d/Si7XvxvqcArDokfmHwF3R1UiOQm/by5J2kAAIr1hUZNgCvCpLpwc7Hd6FAn
-         CrNkffJjZxwEb2MVFFxL1mljyt6Mak+iokn43Boqx+GY1TNtPGQxeODRNe8mle4SuoRW
-         DQfngtVwHtosnyr4NjGeCJOwbC8NyzaWVj6BVybbmT/RuJK7a1AQOlwzu/4G9Kg+1QjM
-         O39w==
-X-Gm-Message-State: AOJu0Yycpks/TGtAD+DJGD9+IHkHJbtTYwZVHJrMPE9J8UdCVuPZTPtz
-	IonkC/tFTGiKL4puGlC66UfrSisGZ8nk10ThGJmk4WVXPPXWzzsaMMILmq4DDTQ=
-X-Google-Smtp-Source: AGHT+IGzNdO4WMK/r4TPpAJt3zg9m23EtXpUlrHfuS/iNZYLdK2Zq2FBWPgH/BSlYzSVB/QlAjwgtQ==
-X-Received: by 2002:a17:902:d50d:b0:202:3469:2c8c with SMTP id d9443c01a7336-2031517c8e6mr11562545ad.40.1724114945752;
-        Mon, 19 Aug 2024 17:49:05 -0700 (PDT)
-Received: from localhost.localdomain ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0300522sm67861455ad.6.2024.08.19.17.49.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 17:49:05 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Simon Horman <horms@kernel.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 3/3] bonding: support xfrm state update
-Date: Tue, 20 Aug 2024 08:48:40 +0800
-Message-ID: <20240820004840.510412-4-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240820004840.510412-1-liuhangbin@gmail.com>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
+        bh=u+5KZK5nAA6lm6uXAgzbelSqD/iPDXqg92adfN9usGg=;
+        b=C9tNauhH7H9MOATXsVcn1TUfmgRxsRUGb55tP97pTzI5H2MViJF0tYz4h8LcsMGmCO
+         2T3cZ9+2nOSZ/bZmAStOm6ws4JMfjf1FmqN9tPMEVL2TAU6enASeJokEguKzAo+l8hOs
+         MiRJbmfwzILr1VT6u5nv+Cw5B6TAulx4Qzpdlyhb3o9OVkQblyR4ZyhJkOe7un1iJ6zk
+         wlzYTsUzcaSl86jpuEg2T/fQDnyj2hcrfqKZLxrvFzMtWKgNQy5DZr+z35wZvTWqjxUe
+         lsa8tc1TPssAdWL8jbFzyqOJRmI4oXH+yupEXDGooQQsZmtiNRucWlQ3+k/KJuJl1baz
+         DYuA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6s0tsZOujRyV9H3bugBDvYRlKX+NwJzsLEbNAnFZL7VtBhmXqG9NcPww/gu3shwu4j/5RIBcDfYfqsCVclTfr6L+2TWvr
+X-Gm-Message-State: AOJu0Yx0Vn2B3nUmPiGNJWJkSncN/hYSPBhYteFiBnA82lB1/n7MkGtm
+	Yf0pNv9GMCEHYUedC+q16OLnnwoF59ppvs44sMYc+NwY3Gq+t41lCm2AnIvBnjK+KoPxThMHij9
+	bgMcss81wb9saRa47QKyM5vAUQzc=
+X-Google-Smtp-Source: AGHT+IHLWDfmiygFJk6fTZuBAGGazX8AO1dCbpejO74nj2Y0VR8PlRjm0NoRXfExteHeuTW6e0Il2dK3JPPakVvyXPk=
+X-Received: by 2002:a05:6e02:1c0c:b0:39b:3244:a355 with SMTP id
+ e9e14a558f8ab-39d56e42e4fmr17431355ab.11.1724115269381; Mon, 19 Aug 2024
+ 17:54:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240816153204.93787-1-kerneljasonxing@gmail.com> <CANn89iJZ8RwFX-iy-2HkE=xD8gnsJ26BO5j=o0460yUt7HiYcA@mail.gmail.com>
+In-Reply-To: <CANn89iJZ8RwFX-iy-2HkE=xD8gnsJ26BO5j=o0460yUt7HiYcA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 20 Aug 2024 08:53:53 +0800
+Message-ID: <CAL+tcoAJic7sWergDhVqAvLLu2tto+b7A8FU_pkwLhq=9qCE1w@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: change source port selection at bind() time
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The patch add xfrm statistics update for bonding IPsec offload.
+Hello Eric,
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- drivers/net/bonding/bond_main.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+On Mon, Aug 19, 2024 at 11:45=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Fri, Aug 16, 2024 at 5:33=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > This is a follow-up patch to an eariler commit 207184853dbd ("tcp/dccp:
+> > change source port selection at connect() time").
+> >
+> > This patch extends the use of IP_LOCAL_PORT_RANGE option, so that we
+> > don't need to iterate every two ports which means only favouring odd
+> > number like the old days before 2016, which can be good for some
+> > users who want to keep in consistency with IP_LOCAL_PORT_RANGE in
+> > connect().
+>
+> Except that bind() with a port reservation is not as common as a connect(=
+).
+> This is highly discouraged.
+>
+> See IP_BIND_ADDRESS_NO_PORT
+>
+> Can you provide a real use case ?
+>
+> I really feel like you are trying to push patches 'just because you can'.=
+..
+>
+> 'The old days' before 2016 were not very nice, we had P0 all the time
+> because of port exhaustion.
+> Since 2016 and IP_BIND_ADDRESS_NO_PORT I no longer have war rooms stories=
+.
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 24747fceef66..4a4a1d9c8cca 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -675,11 +675,36 @@ static void bond_advance_esn_state(struct xfrm_state *xs)
- 	rcu_read_unlock();
- }
- 
-+/**
-+ * bond_xfrm_update_stats - Update xfrm state
-+ * @xs: pointer to transformer state struct
-+ **/
-+static void bond_xfrm_update_stats(struct xfrm_state *xs)
-+{
-+	struct net_device *real_dev;
-+
-+	rcu_read_lock();
-+	real_dev = bond_ipsec_dev(xs);
-+	if (!real_dev)
-+		goto out;
-+
-+	if (!real_dev->xfrmdev_ops ||
-+	    !real_dev->xfrmdev_ops->xdo_dev_state_update_stats) {
-+		pr_warn("%s: %s doesn't support xdo_dev_state_update_stats\n", __func__, real_dev->name);
-+		goto out;
-+	}
-+
-+	real_dev->xfrmdev_ops->xdo_dev_state_update_stats(xs);
-+out:
-+	rcu_read_unlock();
-+}
-+
- static const struct xfrmdev_ops bond_xfrmdev_ops = {
- 	.xdo_dev_state_add = bond_ipsec_add_sa,
- 	.xdo_dev_state_delete = bond_ipsec_del_sa,
- 	.xdo_dev_offload_ok = bond_ipsec_offload_ok,
- 	.xdo_dev_state_advance_esn = bond_advance_esn_state,
-+	.xdo_dev_state_update_stats = bond_xfrm_update_stats,
- };
- #endif /* CONFIG_XFRM_OFFLOAD */
- 
--- 
-2.45.0
+As you mentioned last night, the issues happening in connect() are
+relatively more than in bind().
 
+To be more concise, I would like to state 3 points to see if they are valid=
+:
+(1) Extending the option for bind() is the last puzzle of using an
+older algorithm for some users. Since we have one in connect(), how
+about adding it in bind() to provide for the people favouring the
+older algorithm.
+(2) This patch will not hurt any users like in Google as an example
+which prefers odd/even port selection, which is, I admit, indeed more
+advanced.
+(3) This patch does not come out of thin air, but from some users who I con=
+tact.
+?
+
+In my opinion, using and adjusting to the new algorithm needs some
+changes in applications. For some old applications, they still need
+more time to keep pace with a more workable solution.
+
+After considering it a whole night, I would like to push this tiny
+feature into the upstream kernel, I wonder if you can help me review
+it? Thanks in advance, Eric.
+
+Thanks,
+Jason
 
