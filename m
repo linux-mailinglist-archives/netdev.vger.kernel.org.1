@@ -1,161 +1,115 @@
-Return-Path: <netdev+bounces-120100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 913F295849B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:32:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BF9584A4
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E56128258F
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:32:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0411F243B9
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A216C18D651;
-	Tue, 20 Aug 2024 10:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE9118CC02;
+	Tue, 20 Aug 2024 10:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNIp/3gq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4677581F;
-	Tue, 20 Aug 2024 10:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C5418E34B;
+	Tue, 20 Aug 2024 10:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724149952; cv=none; b=qa3lPxb6XLn8x4Rxy6Ogu3msWbxcM+zz810tcFkwOSTotukIwvM10vaZWHkk6ViMqDrDbP+ohquJmICVBj+kOHL/Q/hqj24ahTyNuHRS3meLfP0Lw50xEFhRnb8lm8BVlYObHtbtU6GJO65WqdA45Aju9syfxqUTR3Bpn8K7ifE=
+	t=1724150075; cv=none; b=WtJseDE/cLoofj/f7PCrWVqU9WBqdzs3+3IywZH3p+6JlTbSqjIsVQsR1rA20Wm8j+f9fWv1s/vTH682io8Ta0aVHaPHKtEFRR4nkvNvC1R1PrEg4g0PS8p9YLqso2YtKFZO8lsHoMJno95kCm1Pivvn4BAKZqQ8k46h7vuEMlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724149952; c=relaxed/simple;
-	bh=lvkk7J36LjRCGB119bYJqgPFRlniQe5agdKkcWjCUcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SlVMziyuKzksxEwOa+xWpB4FbWqfnG5fwYk6HTG81BqaPw7IbS+KfoSOm8u7C1uS6I4u3jRqIozDKq622lRm3zrlAVsWTcCvb+Lo2MnL3vSBV3RkVsMsZJM59LAu08MGGLI6wwKT4cfXmMlTynOYxzhJrabv/rsH9d7+jvnpNfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: 2dy3JasJS1GhUUHSGEoytw==
-X-CSE-MsgGUID: iJ1Pfo9rQ36zDeQto52ScQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="22324643"
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="22324643"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:32:30 -0700
-X-CSE-ConnectionGUID: bgvkjWUKT6CGVtHoylpWSw==
-X-CSE-MsgGUID: 3ydoSxXsQZCyk4cZEMBrXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="91458848"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:32:21 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy@kernel.org>)
-	id 1sgM9w-0000000HGS5-2gMy;
-	Tue, 20 Aug 2024 13:32:16 +0300
-Date: Tue, 20 Aug 2024 13:32:16 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH 6/9] ethernet: cavium: Replace deprecated PCI functions
-Message-ID: <ZsRwsDWQT6dmwC1p@smile.fi.intel.com>
-References: <20240819165148.58201-2-pstanner@redhat.com>
- <20240819165148.58201-8-pstanner@redhat.com>
- <ZsONiNkdXGMKMbRL@smile.fi.intel.com>
- <5d70794731198ec7bc59bd95e50a8aa81cf97c7b.camel@redhat.com>
+	s=arc-20240116; t=1724150075; c=relaxed/simple;
+	bh=2vQ7xgz31tdsyYufAygdLLr+hpkpWW4htgArJk0EyzI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dyVUjd6FyEc3/U1rtl1VmXA7qZ31nCvkWGEmJJXPHoufLQWvmzzkzbSXl+Egs5n/0tfIpNWEGV+VlCHQiCPwzrCdvK4iliJZ3JGIIJZpfyX+99CKW48+TP+8qT9DK3yIVJGXqpkwjqkeFH79bUQM0Ups95F94u7VHeesu4l1D0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNIp/3gq; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fc611a0f8cso40943625ad.2;
+        Tue, 20 Aug 2024 03:34:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724150073; x=1724754873; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zYLnq2zDE0SQRgr4NTaRjzGrrtpAL6dNIJ7/StYnv8Y=;
+        b=jNIp/3gqNYmZHETRjFDuu1WoJUAzlPejDvV2/aIle4Ugm24jqq6TEO+ikzzRVqNchf
+         8FoAU+nCP0ZCfZgwaWtb7kr48evBRYyOXAGieFu7IrLK4tS+d4vBnN6d6i/oGlBhEbdJ
+         KN5ym/rI1JRjXtbnNsB9GLht8PPYEKsP2ebLwVamai11bNZj3ENG2E7Wz850CM/qg2sx
+         MJJe7xVaQ2ceBfWzcasovIg00JBBALU7pFcWwC4Dz/xjQq1byTLwuZ3S2W11xWhz2Crz
+         Q5rfNcplBB4i2mVLluysqumjOIVRJQoKgI41NBRjwHSPs2VW9yfpkKwM0Uwpet5/zXUa
+         QpYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724150073; x=1724754873;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zYLnq2zDE0SQRgr4NTaRjzGrrtpAL6dNIJ7/StYnv8Y=;
+        b=X08idkcchaZwO7KBd9nysonG7Xfo4B/6cGZy0TPm5bQJ69pwN3B2hE5wIJHSF6h/Mn
+         Ji1IbOve128851Fvki/x5Bk5O9fFTZluTtZupy8UaO0hF6IY1KKf6NtGM1WnipnpCPip
+         MSZ5FhaBkm6hdleFfTYlxjKEAwkczyLfTluzdcbfBgajID0par542hS5Y3TayO8qJ40Q
+         6JGJV7Q8XGRkJS6Ue6GwlK7EIXJfpWREgG3h3ghF6WCx1Kx5saEtUNGdwK6fP+jCUHeS
+         J7bvPnaGvIreN7szGU5/PSIfa897m/nPL4ghOYA6CAv5pBuu7C2p0TsJ6X8jxYU15cwR
+         zoFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVB2cM6Aw44Bi6v4P1KHsbdbp8nqls5RGh/UBLjCz00y1B+NmDy9+ixdr6wAslT0XwohNR6xu8WvHZAP/U=@vger.kernel.org, AJvYcCW95TB9QQuwBefsGxrdIbQhsza4NrX25GuoBg6pYzwnSK+D444HqUDox1kVqOZ8LRkMIDQQ+MBfHLxl0g==@vger.kernel.org, AJvYcCX0/6KKZGC7g15KBpQ8kcRVmFn3UtymdzONCgfQ20bT7zdDMFIT8qTzXXcghecOBB5jgFNtWhYr@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgDkejDnS54Fg4wJBMB1mj/vkITHtbIb5ffijzZqWOaWuNyFPv
+	wz8BPV4IFCJ30jIod1kmVnK5VULXKslAngZ4SXQryeCJ/caB9oE4
+X-Google-Smtp-Source: AGHT+IGJig1neYGceqF6j95MwaETMQHaposqjvhWHU+H3jMdgmHSiWGAimrcsFATSH71KEU4UDUarQ==
+X-Received: by 2002:a17:902:f545:b0:202:4666:f023 with SMTP id d9443c01a7336-2024666f51emr52014045ad.57.1724150073337;
+        Tue, 20 Aug 2024 03:34:33 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20219baeb13sm47696505ad.224.2024.08.20.03.34.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 03:34:33 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: aha310510@gmail.com
+Cc: alibuda@linux.alibaba.com,
+	davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	tonylu@linux.alibaba.com,
+	ubraun@linux.vnet.ibm.com,
+	utz.bacher@de.ibm.com,
+	wenjia@linux.ibm.com,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net,v5,2/2] net/smc: modify smc_sock structure
+Date: Tue, 20 Aug 2024 19:34:25 +0900
+Message-Id: <20240820103425.338094-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240815043904.38959-1-aha310510@gmail.com>
+References: <20240815043904.38959-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5d70794731198ec7bc59bd95e50a8aa81cf97c7b.camel@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Aug 20, 2024 at 09:40:09AM +0200, Philipp Stanner wrote:
-> On Mon, 2024-08-19 at 21:23 +0300, Andy Shevchenko wrote:
-> > On Mon, Aug 19, 2024 at 06:51:46PM +0200, Philipp Stanner wrote:
-
-...
-
-> > cavium_ptp_probe()
-> > 
-> > > -	pcim_iounmap_regions(pdev, 1 << PCI_PTP_BAR_NO);
-> > > +	pcim_iounmap_region(pdev, PCI_PTP_BAR_NO);
-> > >  
-> > >  error_free:
-> > >  	devm_kfree(dev, clock);
-> > 
-> > Both are questionable. Why do we need either of them?
+Jeongjun Park wrote:
+> Since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
+> point to the same address, when smc_create_clcsk() stores the newly
+> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
+> into clcsock. This causes NULL pointer dereference and various other
+> memory corruptions.
 > 
-> You seem to criticize my pcim_iounmap_region() etc. in other unwind
-> paths, too.
-
-Yes, having devm/pcim/etc_m in the clean up / error paths seems at bare minimum
-confusing, or reveals wrong use of them or even misunderstanding the concept...
-
-And it's not your fault, it was already in those drivers like that...
-
-> I think your criticism is often justified. This driver
-> here, however, was the one which made me suspicious and hesitate and
-> removing those calls; because of the code below:
+> To solve this, we need to modify the smc_sock structure.
 > 
-> 
-> 	pcim_iounmap_region(pdev, PCI_PTP_BAR_NO);
-> 
-> error_free:
-> 	devm_kfree(dev, clock);
-> 
-> error:
-> 	/* For `cavium_ptp_get()` we need to differentiate between the case
-> 	 * when the core has not tried to probe this device and the case when
-> 	 * the probe failed.  In the later case we pretend that the
-> 	 * initialization was successful and keep the error in
-> 	 * `dev->driver_data`.
-> 	 */
-> 	pci_set_drvdata(pdev, ERR_PTR(err));
-> 	return 0;
-> }
-> 
-> So in case of an error they return 0 and do... stuff.
-> 
-> I don't want to touch that without someone who maintains (and, ideally,
-> understands) the code details what's going on here.
+> Fixes: ac7138746e14 ("smc: establish new socket family")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 
-Thanks for elaboration, indeed it was not enough context to see the full
-picture. This seems like an ugly hack that has to be addressed at some point.
-But again, not your fault.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Reported-by: syzkaller <syzkaller@googlegroups.com>
 
