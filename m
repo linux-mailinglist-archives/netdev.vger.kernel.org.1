@@ -1,77 +1,184 @@
-Return-Path: <netdev+bounces-120185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A0295882E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:46:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0858B958833
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BB331F2300D
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7F7E284974
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99270189F3F;
-	Tue, 20 Aug 2024 13:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KT4sLJxf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECFB18FDC3;
+	Tue, 20 Aug 2024 13:46:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778F617557E;
-	Tue, 20 Aug 2024 13:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914874C91;
+	Tue, 20 Aug 2024 13:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724161577; cv=none; b=TQciFQiNE4o4KVpYsPt93yBrJvmtkwCgitDUDpMEMBk7SKphWP5hfupNjw6dxksZibIbJzf93kIlkg6HDrB/PZB5etwolBUq8anr/hInSG+NCIO2hlKssZpk2pGZV4+L1NILsr9BQ0CVUmbFs3MKQFNErP3LeFIFRvj21AbRTCY=
+	t=1724161592; cv=none; b=ZOTHNatcvJwaZPkW/uOJMgi52Ej2mNfAbKfeH1N55rQQXQzhPTv05nlq6jBjpHFwfAM/Z062wKkpengKMA4oGUd87I1U16H5TjUWt2Zy/qmLpaub4UxAUS8yOPKNkXO+Uk6ecty2dwTHDmFdNYwwEgQ+A+N14VR/InBqaIDKBlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724161577; c=relaxed/simple;
-	bh=nw9dGn0eCjC0mjmiSOVdSWfX/cHuHSXyIKTyut7Yfz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G+FKDYGev2FPpoHaq9jB2xsy/E2n4Rpb107s0fZdtXjUrvSVaLBreFaYzj64aOPmjj5L7Ep31k6jWOrprhGvXJg8SEZwZmpd9sBtpMxdlgzbeD5NuJu6bZZxqtqos2jlCNXJHCswhKznGhVGXi9ijWASsuQsZQX8l6TMpSLLvAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KT4sLJxf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SwvzyDocEWp1csi0DKUVdJMiBrm+Lb26EA4HjpmmBfI=; b=KT4sLJxfZWzCJYWFMZMylejVo3
-	Ovi6xOdkg4dxPDBjPAXFjRF7gsMa5s/iXxZs9fmtT5hyw3M1BtduMRIIYdapy3Y1LxW/ZjK/Zv/tQ
-	hVG/Jp5WuIAHcoKfqPiLOLZ8Cd2ZusyMbA1WMs6TrjN371URrpHbO82of+f8LNcpfjAE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgPBU-005E7B-9m; Tue, 20 Aug 2024 15:46:04 +0200
-Date: Tue, 20 Aug 2024 15:46:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Joseph Huang <Joseph.Huang@garmin.com>
-Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 1/1] net: dsa: mv88e6xxx: Fix out-of-bound access
-Message-ID: <a3859770-353b-4594-acd6-4a6dbedecbc1@lunn.ch>
-References: <20240819235251.1331763-1-Joseph.Huang@garmin.com>
+	s=arc-20240116; t=1724161592; c=relaxed/simple;
+	bh=YH6HpoQO2pQo8AiI6P28NZ2yfEHkhOzM/CXWi32w12U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ET2QZBnf/1NpzFuYG5ZjAbmBizNzLkJ3YbGFWC0X7oS82OOor6SgwIzhf6TjP5KPAbijItYYpdJubQxcbBa3jxBc5PWkupwxaEFwjPvPwu26wtPC+NZCqMG2bfuyeTwLOOlrkFDPdk8XwhAkGNRQ1ld+VMB77HYBwkPrOBjWMDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wp9gF54hTzhXx0;
+	Tue, 20 Aug 2024 21:44:25 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id D5BE7140135;
+	Tue, 20 Aug 2024 21:46:25 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 21:46:21 +0800
+Message-ID: <58b328fc-aa98-c4f1-eb11-2d59e50ec407@huawei-partners.com>
+Date: Tue, 20 Aug 2024 16:46:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819235251.1331763-1-Joseph.Huang@garmin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 6/9] selftests/landlock: Test listening without
+ explicit bind restriction
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-7-ivanov.mikhail1@huawei-partners.com>
+ <ZsST6Nk3Bf8F5lmJ@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZsST6Nk3Bf8F5lmJ@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Mon, Aug 19, 2024 at 07:52:50PM -0400, Joseph Huang wrote:
-> If an ATU violation was caused by a CPU Load operation, the SPID could
-> be larger than DSA_MAX_PORTS (the size of mv88e6xxx_chip.ports[] array).
+8/20/2024 4:02 PM, Günther Noack wrote:
+> On Wed, Aug 14, 2024 at 11:01:48AM +0800, Mikhail Ivanov wrote:
+>> Test scenarios where listen(2) call without explicit bind(2) is allowed
+>> and forbidden.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   tools/testing/selftests/landlock/net_test.c | 83 +++++++++++++++++++++
+>>   1 file changed, 83 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index 551891b18b7a..92c042349596 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -1851,6 +1851,89 @@ TEST_F(port_specific, bind_connect_zero)
+>>   	EXPECT_EQ(0, close(bind_fd));
+>>   }
+>>   
+>> +TEST_F(port_specific, listen_without_bind_allowed)
+>> +{
+>> +	if (variant->sandbox == TCP_SANDBOX) {
+>> +		const struct landlock_ruleset_attr ruleset_attr = {
+>> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> +					      LANDLOCK_ACCESS_NET_LISTEN_TCP
+>> +		};
+>> +		const struct landlock_net_port_attr tcp_listen_zero = {
+>> +			.allowed_access = LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>> +			.port = 0,
+>> +		};
+>> +		int ruleset_fd;
+>> +
+>> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>> +						     sizeof(ruleset_attr), 0);
+>> +		ASSERT_LE(0, ruleset_fd);
+>> +
+>> +		/*
+>> +		 * Allow listening without explicit bind
+>> +		 * (cf. landlock_net_port_attr).
+>> +		 */
+>> +		EXPECT_EQ(0,
+>> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> +					    &tcp_listen_zero, 0));
+>> +
+>> +		enforce_ruleset(_metadata, ruleset_fd);
+>> +		EXPECT_EQ(0, close(ruleset_fd));
+>> +	}
+>> +	int listen_fd, connect_fd;
+>> +	__u64 port;
+>> +
+>> +	listen_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, listen_fd);
+>> +
+>> +	connect_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, connect_fd);
+>> +	/*
+>> +	 * Allow listen(2) to select a random port for the socket,
+>> +	 * since bind(2) wasn't called.
+>> +	 */
+>> +	EXPECT_EQ(0, listen_variant(listen_fd, backlog));
+>> +
+>> +	/* Connects on the binded port. */
+>> +	port = get_binded_port(listen_fd, &variant->prot);
 > 
-> Fixes: 75c05a74e745 ("net: dsa: mv88e6xxx: Fix counting of ATU violations")
-> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+> Please rename "binded" to "bound" when you come across it.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Can I do such refactoring in the 3/9 patch?
 
-    Andrew
+> 
+> 
+>> +	EXPECT_NE(0, port);
+>> +	set_port(&self->srv0, port);
+>> +	EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+>> +
+>> +	EXPECT_EQ(0, close(connect_fd));
+>> +	EXPECT_EQ(0, close(listen_fd));
+>> +}
+>> +
+>> +TEST_F(port_specific, listen_without_bind_denied)
+>> +{
+>> +	if (variant->sandbox == TCP_SANDBOX) {
+>> +		const struct landlock_ruleset_attr ruleset_attr = {
+>> +			.handled_access_net = LANDLOCK_ACCESS_NET_LISTEN_TCP
+>> +		};
+>> +		int ruleset_fd;
+>> +
+>> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>> +						     sizeof(ruleset_attr), 0);
+>> +		ASSERT_LE(0, ruleset_fd);
+>> +
+>> +		/* Deny listening. */
+>> +		enforce_ruleset(_metadata, ruleset_fd);
+>> +		EXPECT_EQ(0, close(ruleset_fd));
+>> +	}
+>> +	int listen_fd, ret;
+>> +
+>> +	listen_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, listen_fd);
+>> +
+>> +	/* Checks that listening without explicit binding is prohibited. */
+>> +	ret = listen_variant(listen_fd, backlog);
+>> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> +		/* Denied by Landlock. */
+>> +		EXPECT_EQ(-EACCES, ret);
+>> +	} else {
+>> +		EXPECT_EQ(0, ret);
+>> +	}
+>> +}
+>> +
+>>   TEST_F(port_specific, port_1023)
+>>   {
+>>   	int bind_fd, connect_fd, ret;
+>> -- 
+>> 2.34.1
+>>
 
