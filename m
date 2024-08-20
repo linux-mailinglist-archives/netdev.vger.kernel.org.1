@@ -1,189 +1,160 @@
-Return-Path: <netdev+bounces-120048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A264595810B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2522995814D
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DD01F25485
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:33:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C48E31F25069
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FA518A6BD;
-	Tue, 20 Aug 2024 08:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDA2189F3F;
+	Tue, 20 Aug 2024 08:45:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VG8ajf6B"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EACtiQTA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2FB18A6A8
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 08:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F26189BA3;
+	Tue, 20 Aug 2024 08:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724142787; cv=none; b=pPX9gOogM4Mmz0ytS7N3jPWvv2DdCiZTTzqQSIIzywxhFguIESq2ppL5KfCnb5aSfni5Xdr6h/+9MZyRnO2oRpZKIi4GwX8bWnMnniYEHpbicZhHn+27ea/5Hp2D9Y9k1xHMyJMaGS2dl8/ACgLi092R7okoBlRolfuc9tHXT/w=
+	t=1724143545; cv=none; b=fKOZQ36zrOiCgnLfytlmECYgbf7uuHXtD/4jeH/08g3YdweI1CaqThPyzUL6k6U8abyigDPkkWk/vdUENj/i5aR079SDwXfM0fUeyYrNQVKgfcBiy0+XKZ4E2ZuzIk7oMo3pEbWr88Zme569/+gj46hgTjw+9ULzf51CsVHBAm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724142787; c=relaxed/simple;
-	bh=sSUYkM8HYmaJN7xqG+tfsAHvEYV5RAq6szVJelU+X+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k5JRV1hap3wL3btXHOzAKEeC6t+Al7n02haYDVEeJFzB7KzesL3eNWsEoD6Ebth5ezTRoq074vSsBbbKSLYWFn2ZVMwS5nR7IjM1e8CElCnaJvk7d1KfQN8/ZkTlvcnZtP0Gxg3KylyyxcR8LcWpdLbegbRvpEicxPWldCS3DzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VG8ajf6B; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7d26c2297eso598942666b.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 01:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1724142784; x=1724747584; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XNQ9tyNfl4ljX/BPGLUOjjoGD0Ou+TIYM+qPExssLvc=;
-        b=VG8ajf6BuTNmkSG0citgtyRIslAki+3nxKaQreOE/2Jt+XtQq867Hbt6IZQKqYcZIy
-         Jah6u7gnrTVuJMlWiAlwcqZxMRsbpB8G9sGpIMHVAIwMhDn6Chc2+I4tonuf1y1MhNdL
-         F8BFC3GhlV619NSvDG4KxYAMFyyT5dW/57ES4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724142784; x=1724747584;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XNQ9tyNfl4ljX/BPGLUOjjoGD0Ou+TIYM+qPExssLvc=;
-        b=n/fx5zjIwpHFkL1Bl02FbxG97kluQ4SFQeS+qkiTX/3aPmqpyw8kRkibEvpgou2keA
-         +4IIbfzWTt74Oe8MMw1VKdNSz7KuVp4Mc8NfytcAtTJCe4Yh1X5QbCnbVnFaIM1wDDmV
-         893bf0KhLmRlIo8H6pJejnfF3xx49qWwFEFF1VQvJuTM5ohyPt5hY4SZ+BrQMDS3xPWF
-         S3y6wYAgz5mMc99w8kqB6QMlqxwKhMpGAG7MDCjXvbCDfACMLOSnjSADIgJP8AL39EWn
-         aEqp0tZtyGP5oGNJGabPErpnSacxpzegqCGKxzzbQ3HgpdYTvY5S5vpBJc0/VL7WETgK
-         ZL0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWeYUOqr+Jy+O050C7I6LkaaIcZA/QiEhKdl7+0Lw01K+fHrvuXucKub9LWEsfmQjbDaKvjfnfygKMQTyzgrdG/8LTDaAQX
-X-Gm-Message-State: AOJu0Yy58ETfaSnuroqNwrT3HkhSa4NaUgyEenDPx9rcJkjNoN7qihix
-	6puGUj+OjKJrKz2JHbgDG49+k+cKTgWzLdeSWAe9hPBF4sGW4lG53G1P8cL7980=
-X-Google-Smtp-Source: AGHT+IHdCu1gJlayHwi4drLhhfQxyfMUzMC+JYbFPtj9dlU1JF6GxmGI/OuqVO5LTmVnsfb9hkmppA==
-X-Received: by 2002:a17:907:97cf:b0:a6f:59dc:4ece with SMTP id a640c23a62f3a-a83928a4023mr845774466b.2.1724142783295;
-        Tue, 20 Aug 2024 01:33:03 -0700 (PDT)
-Received: from LQ3V64L9R2.home ([2a02:c7c:f016:fc00:3906:31c:255a:bf09])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83aeb6eb4dsm435559766b.35.2024.08.20.01.33.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 01:33:03 -0700 (PDT)
-Date: Tue, 20 Aug 2024 09:33:01 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Shay Drori <shayd@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC net-next 0/6] Cleanup IRQ affinity checks in several drivers
-Message-ID: <ZsRUvcOKLnTw16wD@LQ3V64L9R2.home>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Shay Drori <shayd@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Leon Romanovsky <leon@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shailend Chand <shailend@google.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-References: <20240813171710.599d3f01@kernel.org>
- <ZrxZaHGDTO3ohHFH@LQ3V64L9R2.home>
- <ZryfGDU9wHE0IrvZ@LQ3V64L9R2.home>
- <20240814080915.005cb9ac@kernel.org>
- <ZrzLEZs01KVkvBjw@LQ3V64L9R2>
- <701eb84c-8d26-4945-8af3-55a70e05b09c@nvidia.com>
- <ZrzxBAWwA7EuRB24@LQ3V64L9R2>
- <20240814172046.7753a62c@kernel.org>
- <Zr3XA-VIE_pAu_k0@LQ3V64L9R2>
- <fe5c6b4b-6c78-402b-b454-837e3760c668@nvidia.com>
+	s=arc-20240116; t=1724143545; c=relaxed/simple;
+	bh=d29y/b3+dKXfOMPqWOlo2Dtzlow8gPxFqqkprMyHMY8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RyTR2+BUAUA4HIKlhdffYkxD/E1HaMuDtDxDOG3xk7UtTi83NeLS9p7kx7fl23uTf/X2i5lr8yf1WNJiTGqKHgD2vEZYAoGwQoHcyKQqgmpTKLx/1tRzMrKwTItaURFHO9Sxx6KQ6ZoA449pE4cLK86orFbH6OMuR/KgZDPSqQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EACtiQTA; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JI9HGp029570;
+	Tue, 20 Aug 2024 08:45:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=n9f5U4YE8l6gZQ2iTUJ1QoBma3VmGjgKP36BNqG
+	tl2E=; b=EACtiQTAY0cQUHxjVrT2EvwA+fN1oUyXwu2JLptjlt8ZNZfalFgC6VO
+	tdIrkl+JnI/oYRgklvAjEUgGA3folcQGwyB7q738zbEwoNhwyEtNUtdAvI/gPXJo
+	4g4qM6UruegPewjL8Ckj6+2IzhxuzOn3Hh60v9MKklJp/kKVTU77ZHvd1SNTph0O
+	+g7Q9eGlllX+sFT31vBNB7nGtfAzPjiMeffaI2wgu4XyL5/RfdtVAMd0iC9Qaica
+	fXff0eVQA+ousSLum+WTecKcrPvTxHRS6fxiT9NEGso0tYfo5qhMu60sjZb9YmGu
+	P2xztokuCIbZ8ExEUjSvms6YHFUG0fg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04uuj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 08:45:35 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47K8jZkG001556;
+	Tue, 20 Aug 2024 08:45:35 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04uuc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 08:45:34 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47K5UIOl013098;
+	Tue, 20 Aug 2024 08:45:34 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41366u2a2b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 08:45:33 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47K8jSjv54854042
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Aug 2024 08:45:30 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7601B20043;
+	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6393920040;
+	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 2D390E024A; Tue, 20 Aug 2024 10:45:28 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH net v2] s390/iucv: Fix vargs handling in iucv_alloc_device()
+Date: Tue, 20 Aug 2024 10:45:28 +0200
+Message-ID: <20240820084528.2396537-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VCvFKZmyXU-3VMFAXO5jLsqU9XmmkbYj
+X-Proofpoint-ORIG-GUID: n536KPVuErnDYQ_BJtHRxyuPOH6i7UNL
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe5c6b4b-6c78-402b-b454-837e3760c668@nvidia.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-19_16,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ mlxlogscore=999 lowpriorityscore=0 phishscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 adultscore=0 impostorscore=0 suspectscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408200062
 
-On Tue, Aug 20, 2024 at 09:40:31AM +0300, Shay Drori wrote:
-> 
-> 
-> On 15/08/2024 13:22, Joe Damato wrote:
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > On Wed, Aug 14, 2024 at 05:20:46PM -0700, Jakub Kicinski wrote:
-> > > On Wed, 14 Aug 2024 19:01:40 +0100 Joe Damato wrote:
-> > > > If it is, then the only option is to have the drivers pass in their
-> > > > IRQ affinity masks, as Stanislav suggested, to avoid adding that
-> > > > call to the hot path.
-> > > > 
-> > > > If not, then the IRQ from napi_struct can be used and the affinity
-> > > > mask can be generated on every napi poll. i40e/gve/iavf would need
-> > > > calls to netif_napi_set_irq to set the IRQ mapping, which seems to
-> > > > be straightforward.
-> > > 
-> > > It's a bit sad to have the generic solution blocked.
-> > > cpu_rmap_update() is exported. Maybe we can call it from our notifier?
-> > > rmap lives in struct net_device
-> > 
-> > I agree on the sadness. I will take a look today.
-> > 
-> > I guess if we were being really ambitious, we'd try to move ARFS
-> > stuff into the core (as RSS was moved into the core).
-> 
-> 
-> Sorry for the late reply. Maybe we can modify affinity notifier infra to
-> support more than a single notifier per IRQ.
-> @Thomas, do you know why only a single notifier per IRQ is supported?
+iucv_alloc_device() gets a format string and a varying number of
+arguments. This is incorrectly forwarded by calling dev_set_name() with
+the format string and a va_list, while dev_set_name() expects also a
+varying number of arguments.
 
-Sorry for the delayed response as well on my side; I've been in
-between lots of different kernel RFCs :)
+Symptoms:
+Corrupted iucv device names, which can result in log messages like:
+sysfs: cannot create duplicate filename '/devices/iucv/hvc_iucv1827699952'
 
-Jakub: the issue seems to be that the internals in lib/cpu_rmap.c
-are needed to call cpu_rmap_update. It's probably possible to expose
-them somehow so that a generic IRQ notifier could call
-cpu_rmap_update, as you mentioned, but some rewiring is going to be
-needed, I think.
+Fixes: 4452e8ef8c36 ("s390/iucv: Provide iucv_alloc_device() / iucv_release_device()")
+Link: https://bugzilla.suse.com/show_bug.cgi?id=1228425
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
+---
+Discussion of v1:
+Link: https://lore.kernel.org/all/2024081326-shifter-output-cb8f@gregkh/T/#mf8ae979de8acdc01f7ede0b94af6f2e110eea209
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202408091131.ATGn6YSh-lkp@intel.com/
+Vasily Gorbik asked me to send this version via the netdev mailing list.
+---
+ net/iucv/iucv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I had a couple ideas for rewiring stuff, but I haven't had time to
-context switch back on to this work as I've been busy with a few
-other things (the IRQ suspension stuff and another mlx5 thing I have
-yet to send upstream).
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 1e42e13ad24e..2e615641a4e5 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -86,13 +86,15 @@ struct device *iucv_alloc_device(const struct attribute_group **attrs,
+ {
+ 	struct device *dev;
+ 	va_list vargs;
++	char buf[20];
+ 	int rc;
+ 
+ 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+ 	if (!dev)
+ 		goto out_error;
+ 	va_start(vargs, fmt);
+-	rc = dev_set_name(dev, fmt, vargs);
++	vsnprintf(buf, sizeof(buf), fmt, vargs);
++	rc = dev_set_name(dev, buf);
+ 	va_end(vargs);
+ 	if (rc)
+ 		goto out_error;
+-- 
+2.39.3 (Apple Git-146)
 
-I hope to take another look at it this week, but I welcome any
-suggestions from Shay/Thomas in the meantime.
-
-- Joe
 
