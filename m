@@ -1,62 +1,90 @@
-Return-Path: <netdev+bounces-120283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895D2958C97
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:49:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE995958C99
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59DA2841E5
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:49:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9141C20E9B
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E676A19DF85;
-	Tue, 20 Aug 2024 16:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7542A19DF85;
+	Tue, 20 Aug 2024 16:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aY2D6wyf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLqIjVaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9687E59A;
-	Tue, 20 Aug 2024 16:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A07C7E59A
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 16:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724172553; cv=none; b=IRqx5+yJDspOk4jU9/jbpeZ7zPV5wgtZMutZSdq0aYiq5F0jwvn2Qggzd2eblirK8KIgVb9/RQb2yP/vRbmC68mW/MbtJkJRgwXmosvQ3Eb9GT8m1I819QjXfnrDVhI5qg5ziB2nM4G31BjaYggla4p4k6AgXTWhNgXY9w2+5Ts=
+	t=1724172651; cv=none; b=FA5CfOvKWHczaLdw6K8GpLXUku6ru7izGuA0j1XbZQuj9Yv5zp1WftCl9enm3tw5ESVQOThA0f1hceomKKeHbe4w4QkTY0PXh9MoO9lkk853oZW52L0AiT6MMWvpHePqFvJJwe42FvSyjXxlzl9J7U1rc0ZaB71uyj4IDtSvdtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724172553; c=relaxed/simple;
-	bh=CVigt6U9/LTrKxeFgQiSEgLNzF5xgZtMMGsdFZPRPGc=;
+	s=arc-20240116; t=1724172651; c=relaxed/simple;
+	bh=iRRJm5hnANTCCbMz3TFjJ+p/itYxSWlkd70jymZn400=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spSWxzmXweHQ2JCsdICSPuYeJ8ovi2bi+D0OPoL3BsADgq0kAIS7b0GXY9IjWdjm7ssTGsoqY0f1Xd0NwxbdcVJcJ0IXHFKuakHRRjLaZjxfs+0kC1C5/16zcLMHh7H9dg/huK/XO/8kcDB32s8LbLfn38Rnyy56m7lg90bJEfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aY2D6wyf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fVuICFdLW+JEgDFIP8zzlKLICsdLVoGfci5aYhFsYP4=; b=aY2D6wyfgPPwCOI7K7fRH1MXW8
-	InUxzj9yI8k2afuPSogDfwpqGo5lsxbSFqM8M7ukVv0GdQSzmZqrKmkkQRf2biRHt7T0ECslreH1c
-	NIqbnw1owVpVzEVPdcrAArId62tGmcH+ZabV7PFgYEsfllAlwBTRcmCboHF6q4jlGaKw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgS2W-005FRw-CS; Tue, 20 Aug 2024 18:49:00 +0200
-Date: Tue, 20 Aug 2024 18:49:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=mTJuFbeTZJCbsOsVGwXJm6ZX/dbNK6AtM92/JnWYqwSO6ltffCx5HgJ5m1vIBWGN0mZzjJ8OOht+6D6+Cc0VNIZJ9B6sxepf+l9tdcTcOklMwtQS/rBBisovrXH0rvrbga8aRCLIIaRQ+E99WAnOkxF9agC6ApeNgkh2ZAs4+5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FLqIjVaD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724172648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pSrnuWgvFayGHBrJKp41lIH2eBIptiQndAvaubL6bOo=;
+	b=FLqIjVaDsXDasOc4Jo+nTgGeQwlAT3xPhT21W8X5QdyseRmB49nqSO0XihITkmW1dhjJk8
+	80TbO64gMegDbaBL8l6KegkWQo67M5atsMScvb6KrKFF6mR2eRj9S7FZkGwraH+eyiJtqb
+	zWiBtp3RKLoL1M2sY7OlI5HcKud0Z1Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-350-vXkSDCvyPaGzaVRH2Stk_A-1; Tue, 20 Aug 2024 12:50:47 -0400
+X-MC-Unique: vXkSDCvyPaGzaVRH2Stk_A-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-429097df54bso46209475e9.1
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 09:50:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724172646; x=1724777446;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pSrnuWgvFayGHBrJKp41lIH2eBIptiQndAvaubL6bOo=;
+        b=VVoLGgsIUo9C8Z9fylQXHX9d1F8EqgDIxGlngrJMXSKNtbFlXXDNXHaU/2dvyV8+7J
+         0xxDFl25efYWh93nkl65EYwuLUToxBbXG5HhYMv5HtvYe3IhzS/HUojM5vbqRkVZe+PD
+         YDKt8G9E4Jky/T8o0AA2qN6Dpyzcx8Q1SMNpJxPoN7tUzU7jwFNbzHS/9Zh4kfNGZhqu
+         PIibThjQWVIwiNaDmbx4xEe9lHZePBivWKpDsL+NPlz//jnzMkI5mTmS7HMZg2nxIyCm
+         jTQCwIrfNya4ToF+X0dorxZxCLdXCF1eLYuJSOF+8fMEJJXbfxs8QV+1f/FmULcqCTpC
+         KE+A==
+X-Gm-Message-State: AOJu0YyFf3C2Q386LsqV+/4XV72VwAfDkIzCueG4fkW2T9dH4sET7TIB
+	F9c+P3Y5GpzXoCh29ivgHicqgnvmi0HkYDUNzDkMql8gar38gf7741w6wHOdgyeDID8F/OjPEcT
+	90oDpO+QycpRTEEua5JkwNdQaxOsON/KC4B118CSJVEqTiz7xOKuAYg+psWqD8g==
+X-Received: by 2002:a05:600c:3b83:b0:426:6688:2421 with SMTP id 5b1f17b1804b1-429ed7ba99dmr92131615e9.11.1724172645777;
+        Tue, 20 Aug 2024 09:50:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVSre1isLav46+Pl58gyrfdKG0OOq/aM+82s+Wgpt/eMCCTkpP6nwYmfBfXDXr6SqR1mHPDw==
+X-Received: by 2002:a05:600c:3b83:b0:426:6688:2421 with SMTP id 5b1f17b1804b1-429ed7ba99dmr92131395e9.11.1724172644905;
+        Tue, 20 Aug 2024 09:50:44 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:443:61f9:60b2:d178:7b81:4387])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded180e7sm201783445e9.3.2024.08.20.09.50.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 09:50:44 -0700 (PDT)
+Date: Tue, 20 Aug 2024 12:50:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v2 3/3] phy: dp83td510: Utilize ALCD for cable
- length measurement when link is active
-Message-ID: <a02698f3-94b6-4e6c-b13a-7fbeba2ce42f@lunn.ch>
-References: <20240820101256.1506460-1-o.rempel@pengutronix.de>
- <20240820101256.1506460-4-o.rempel@pengutronix.de>
+	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
+	Darren Kenny <darren.kenny@oracle.com>,
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Message-ID: <20240820125006-mutt-send-email-mst@kernel.org>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +93,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240820101256.1506460-4-o.rempel@pengutronix.de>
+In-Reply-To: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
 
-On Tue, Aug 20, 2024 at 12:12:56PM +0200, Oleksij Rempel wrote:
-> In industrial environments where 10BaseT1L PHYs are replacing existing
-> field bus systems like CAN, it's often essential to retain the existing
-> cable infrastructure. After installation, collecting metrics such as
-> cable length is crucial for assessing the quality of the infrastructure.
-> Traditionally, TDR (Time Domain Reflectometry) is used for this purpose.
-> However, TDR requires interrupting the link, and if the link partner
-> remains active, the TDR measurement will fail.
+On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> leads to regression on VM with the sysctl value of:
 > 
-> Unlike multi-pair systems, where TDR can be attempted during the MDI-X
-> switching window, 10BaseT1L systems face greater challenges. The TDR
-> sequence on 10BaseT1L is longer and coincides with uninterrupted
-> autonegotiation pulses, making TDR impossible when the link partner is
-> active.
+> - net.core.high_order_alloc_disable=1
+
+
+
+
+> which could see reliable crashes or scp failure (scp a file 100M in size
+> to VM):
 > 
-> The DP83TD510 PHY provides an alternative through ALCD (Active Link
-> Cable Diagnostics), which allows for cable length measurement without
-> disrupting an active link. Since a live link indicates no short or open
-> cable states, ALCD can be used effectively to gather cable length
-> information.
+> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> of a new frag. When the frag size is larger than PAGE_SIZE,
+> everything is fine. However, if the frag is only one page and the
+> total size of the buffer and virtnet_rq_dma is larger than one page, an
+> overflow may occur. In this case, if an overflow is possible, I adjust
+> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> the first buffer of the frag is affected.
 > 
-> Enhance the dp83td510 driver by:
-> - Leveraging ALCD to measure cable length when the link is active.
-> - Bypassing TDR when a link is detected, as ALCD provides the required
->   information without disruption.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+
+Darren, could you pls test and confirm?
+
 > ---
->  drivers/net/phy/dp83td510.c | 83 ++++++++++++++++++++++++++++++++++---
->  1 file changed, 77 insertions(+), 6 deletions(-)
+>  drivers/net/virtio_net.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
-> index 551e37786c2da..10a46354ad2b8 100644
-> --- a/drivers/net/phy/dp83td510.c
-> +++ b/drivers/net/phy/dp83td510.c
-> @@ -169,6 +169,10 @@ static const u16 dp83td510_mse_sqi_map[] = {
->  #define DP83TD510E_UNKN_030E				0x30e
->  #define DP83TD510E_030E_VAL				0x2520
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c6af18948092..e5286a6da863 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+>  	void *buf, *head;
+>  	dma_addr_t addr;
 >  
-> +#define DP83TD510E_ALCD_STAT				0xa9f
-> +#define DP83TD510E_ALCD_COMPLETE			BIT(15)
-> +#define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
-> +
->  static int dp83td510_config_intr(struct phy_device *phydev)
->  {
->  	int ret;
-> @@ -327,6 +331,16 @@ static int dp83td510_cable_test_start(struct phy_device *phydev)
->  {
->  	int ret;
+> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> -		return NULL;
+> -
+>  	head = page_address(alloc_frag->page);
 >  
-> +	/* If link partner is active, we won't be able to use TDR, since
-> +	 * we can't force link partner to be silent. The autonegotiation
-> +	 * pulses will be too frequent and the TDR sequence will be
-> +	 * too long. So, TDR will always fail. Since the link is established
-> +	 * we already know that the cable is working, so we can get some
-> +	 * extra information line the cable length using ALCD.
-> +	 */
-> +	if (phydev->link)
-> +		return 0;
+>  	dma = head;
+> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+>  	len = SKB_DATA_ALIGN(len) +
+>  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>  
+> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> +		return -ENOMEM;
 > +
-
-> +static int dp83td510_cable_test_get_status(struct phy_device *phydev,
-> +					   bool *finished)
-> +{
-> +	*finished = false;
+>  	buf = virtnet_rq_alloc(rq, len, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>  	 */
+>  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+>  
+> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> +		return -ENOMEM;
 > +
-> +	if (!phydev->link)
-> +		return dp83td510_cable_test_get_tdr_status(phydev, finished);
+> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> +		len -= sizeof(struct virtnet_rq_dma);
 > +
-> +	return dp83td510_cable_test_get_alcd_status(phydev, finished);
+>  	buf = virtnet_rq_alloc(rq, len + room, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+> -- 
+> 2.32.0.3.g01195cf9f
 
-Sorry, missed this earlier. It seems like there is a race here. It
-could be the cable test was started without link, but when phylib
-polls a few seconds later link could of established. Will valid ALCD
-results be returned?
-
-	Andrew
 
