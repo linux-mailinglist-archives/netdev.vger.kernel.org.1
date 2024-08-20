@@ -1,259 +1,175 @@
-Return-Path: <netdev+bounces-119980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76934957C18
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:51:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51302957C26
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 06:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AA441C22A95
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:51:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFEBF2820A0
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 04:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD8D3A1DA;
-	Tue, 20 Aug 2024 03:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC32413C81B;
+	Tue, 20 Aug 2024 04:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="wEKVX1Fm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RvyK86HW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E220739AD6
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 03:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABF261FDF
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 04:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724125874; cv=none; b=ERFhLwwxACKnGGZJNmwSmywcTsSCthpoapEYNlfivSFpTEDIM3aFljzQ/KFRS4ixzj9+vL/pDADZnRqm2Wp2QwPhsHfMU/TvF1dCT3TxrQelRkmu+7WUlBttfVewClIbyRoYoFTFTkoUFUPOOjnyD2iW6649vQZyBs2wa8eVGhY=
+	t=1724126479; cv=none; b=VZhGNxw83HtNtNBPnHyfKyRYs+Dc+bOZbu6OEpcyV51MHe4nOuO4KdYZ7ATOpRnG6ZsnmB5h+dsXvudmHbpUCt8jDx8lPiW5H4z8LcieQ0qpJWmy+9LdYRMuuIWyxK1pMweffxO4vx/o8IXG60zJVC3RxQlOqzbgmX6hQPSQQcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724125874; c=relaxed/simple;
-	bh=xrpOkY7XIDD94mTGQ+Gc7UeOPt/W+Nkltxv/+xmKjYs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oiNnQs0I8uo+I7DGpJO7BppWjApXitJjbxXsCNPzZalUh/xFxcuE0RwK5hS1G7+cjwLMTVaWio3ANAGzJ9BoX0mLWfkzlvqrgoeEbOEwYzrXGDePX9axLihLFC3GtcH2MHUhHrgbUj+m45wsMDPsmjpPqbjiLIkeelZ0RUDarGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=wEKVX1Fm; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1724126479; c=relaxed/simple;
+	bh=1NEjRuBY5BA17scWt+Chi0mbM4dw/JTo2pkLIZspGCk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WqSFdiJUQwRvB7x2ghAwQiavEyigJsj37nCgZiWfYB6uu/w1PD8rZEGh8MDw2sYo+nsez8Svu2MrzlqWycPrQrLDt3tKWA2WLdHhzjddXJsY35lF+UK4W2QnXiOvBMKMmZOwo7nkcsIShzGPHT3yyhBbfDujkjzXkuLcXDOxczU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RvyK86HW; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6b44dd520ceso29091307b3.0
+        for <netdev@vger.kernel.org>; Mon, 19 Aug 2024 21:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazon201209; t=1724125869; x=1755661869;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jkjjceUGdKUOF+bM8ANMLtvyrcmkDeIY7OqLCUcCEsc=;
-  b=wEKVX1FmzZx+Jjd4wCr5QtgT6ZPadRwLfGBoWJZGmkxTAnb1bMEJhtky
-   TmylfmukfNnwP1fpKRCkB7P1O6E2cBiiQs/Ay2WyW6tn4OT3q1XZHIx4X
-   /M9xTEW8eKqHcEvtzHUl9ancVMNfRjSpraESE1d4bmzi2ZfnscBloJ4De
-   c=;
-X-IronPort-AV: E=Sophos;i="6.10,160,1719878400"; 
-   d="scan'208";a="445390513"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:50:56 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:57014]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.18:2525] with esmtp (Farcaster)
- id 76894b81-1c0b-4484-9067-4d7c99dbdb40; Tue, 20 Aug 2024 03:50:56 +0000 (UTC)
-X-Farcaster-Flow-ID: 76894b81-1c0b-4484-9067-4d7c99dbdb40
-Received: from EX19D005ANA004.ant.amazon.com (10.37.240.178) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 20 Aug 2024 03:50:55 +0000
-Received: from 682f678c4465.ant.amazon.com (10.119.0.197) by
- EX19D005ANA004.ant.amazon.com (10.37.240.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 20 Aug 2024 03:50:52 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Takamitsu Iwai
-	<takamitz@amazon.co.jp>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 2/2] tcp: Don't recv() OOB twice.
-Date: Tue, 20 Aug 2024 12:49:20 +0900
-Message-ID: <20240820034920.77419-3-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
-In-Reply-To: <20240820034920.77419-1-takamitz@amazon.co.jp>
-References: <20240820034920.77419-1-takamitz@amazon.co.jp>
+        d=google.com; s=20230601; t=1724126476; x=1724731276; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=91poigCWUpxkIrphB8LTAAUF4NvT94tKi0OG/MNIdXA=;
+        b=RvyK86HWdzzlz1l0psp1w46bjiWWXvMg0YcTdoSNEgrs+TdZHmmzJ5xrfsolACmpZ8
+         S7EFWBozbtXKWqonUo2BWJL4kjNl9xVxInLr/2JvEGtilxnIKNHRxFtL7R34cPqu59Mc
+         /PoM+ey9SOz9NhMZAnfmgSG0CQUU2EtmMzPZWOfJz7/FRXPDkv5zIGeuXg9kcG+X4/54
+         BpR3oRQPcQAJIK07lLsX16d6QkLLTCiTLuWACT1QN4UOGX72RBoih1L2Tok6bGFdUISG
+         WvHNcjn7K3b/yq+brWoebGFnvSv/6gIIOxWQbExV2qgYyOdKKlvWVsgaTiYVLAc36MOO
+         b90Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724126476; x=1724731276;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=91poigCWUpxkIrphB8LTAAUF4NvT94tKi0OG/MNIdXA=;
+        b=SrKMxBHuQow/Zd4lx5z2djvleLCDe7AmSkKyjLBlMLasboAEyv6EOSnVB6TY3rsDm3
+         +dWpPKqRxrO72mgeYhe8c6IwtnuErZ9rkrg+geoSCq7A9TMnahhDVpb4ncb14XqDSV5s
+         58In35OobBXitARlxa3aSypk38BGmWxI3a0EfoCRTve6n/SkgdvDWGGTQw17qrXAaFGe
+         ZtvG0Pnt9pjMur5cS/p4XHjL2okNlU3kaA1MWIkTj0StBkMAB4HvM1JppFb/46lS7xXx
+         tDQlpi51GNDsPRKPuz8XD5vK2CA2rNu9t3lwoNSQTS+wffqUeExyimB5BCCkxwKz7kJ/
+         +ZBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNDKhzakI3V6Pki09TdlkkVbf+2IircA1kfqc/fcTpLtxcN+QtlSbIILJwfa8vbFQxLdYLmfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkNVoSDCdUBDtByoT2gmEMnWSnUO5dQwybYHO/9exmQN5bXXBi
+	I7RYAIfBsXgDe4Q0U4+7wBFzJQ6DVOrsDlVPfFUn7lPpymEZFpHN6dt2SNsekLb3kYn6IfQuOun
+	YXesq7TbkTSwy/ezQXnvoCBemrXshTxihQNil
+X-Google-Smtp-Source: AGHT+IHL4a8LRpwayEoQ60nOlF+jCofnGmOL57d389F39z0O/Ch4wlx8nI+0Mq8+7YKwjKglCY5bW1U/rwrYO3XPVyM=
+X-Received: by 2002:a05:6902:1b04:b0:e16:1ebf:2945 with SMTP id
+ 3f1490d57ef6-e161ebf2f84mr5591540276.27.1724126476152; Mon, 19 Aug 2024
+ 21:01:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240813211317.3381180-4-almasrymina@google.com>
+ <CAMArcTWWxjsg_zwS6waWkLpyHhwdXDm_NJeVGm_dr+eT5QDZiA@mail.gmail.com> <20240819155257.1148e869@kernel.org>
+In-Reply-To: <20240819155257.1148e869@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 20 Aug 2024 00:01:02 -0400
+Message-ID: <CAHS8izPL4YdqFjkTpYavdxQn816=kkUv0xravQJF4Uno7Bn3ZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 03/13] netdev: support binding dma-buf to netdevice
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Daniel Vetter <daniel.vetter@ffwll.ch>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
- EX19D005ANA004.ant.amazon.com (10.37.240.178)
+Content-Transfer-Encoding: quoted-printable
 
-commit 36893ef0b661 ("af_unix: Don't stop recv() at consumed ex-OOB
-skb.") finds a bug that TCP reads OOB which has been already recv()ed.
+On Mon, Aug 19, 2024 at 6:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 19 Aug 2024 00:44:27 +0900 Taehee Yoo wrote:
+> > > @@ -9537,6 +9540,10 @@ static int dev_xdp_attach(struct net_device *d=
+ev, struct netlink_ext_ack *extack
+> > >                         NL_SET_ERR_MSG(extack, "Native and generic XD=
+P can't be active at the same time");
+> > >                         return -EEXIST;
+> > >                 }
+> > > +               if (dev_get_max_mp_channel(dev) !=3D -1) {
+> > > +                       NL_SET_ERR_MSG(extack, "XDP can't be installe=
+d on a netdev using memory providers");
+> > > +                       return -EINVAL;
+> > > +               }
+> >
+> > Should we consider virtual interfaces like bonding, bridge, etc?
+> > Virtual interfaces as an upper interface of physical interfaces can
+> > still install XDP prog.
+> >
+> > # ip link add bond0 type bond
+> > # ip link set eth0 master bond0
+> > # ip link set bond0 xdp pin /sys/fs/bpf/x/y
+> > and
+> > # ip link set bond0 xdpgeneric pin /sys/fs/bpf/x/y
+> >
+> > All virtual interfaces can install generic XDP prog.
+> > The bonding interface can install native XDP prog.
+>
+> Good point. We may need some common helpers to place the checks for XDP.
+> They are spread all over the place now.
 
-This bug is caused because current TCP code does not have a process to
-check and skip consumed OOB data. So OOB exists until it is recv()ed
-even if it is already consumed through recv() with MSG_OOB option.
+Took a bit of a look here. Forgive me, I'm not that familiar with XDP
+and virtual interfaces, so I'm a bit unsure what to do here.
 
-We add code to check and skip consumed OOB when reading skbs.
+For veth, it seems, the device behind the veth is stored in
+veth_priv->peer, so it seems maybe a dev_get_max_mp_channel() check on
+veth_priv->peer is the way to go to disable this for veth? I think we
+need to do this check on creation of the veth and on the ndo_bpf of
+veth.
 
-In this patch, we introduce urg_skb in tcp_sock to keep track of skbs
-containing consumed OOB. We make tcp_try_coalesce() avoid coalescing skb to
-urg_skb to locate OOB data at the last byte of urg_skb.
+For bonding, it seems we need to add mp channel check in bond_xdp_set,
+and bond_enslave?
 
-I tried not to modify tcp_try_coalesce() by decrementing end_seq when
-OOB data is recv()ed. But this hack does not work when OOB data is at
-the middle of skb by coalescing OOB and normal skbs. Also, when the
-next OOB data comes in, we’ll lose the seq# of the consumed OOB to
-skip during the normal recv().
+There are a few other drivers that define ndo_add_slave, seems a check
+in br_add_slave is needed as well.
 
-Consequently, the code to prevent coalescing is now located within
-tcp_try_coalesce().
+This seems like a potentially deep rabbit hole with a few checks to
+add all of the place. Is this blocking the series? AFAICT if XDP fails
+with mp-bound queues with a benign error, that seems fine to me; I
+don't have a use case for memory providers + xdp yet. This should only
+be blocking if someone can repro a very serious error (kernel crash)
+or something with this combination.
 
-This patch enables TCP to pass msg_oob selftests when removing
-tcp_incompliant braces in inline_oob_ahead_break and
-ex_oob_ahead_break tests.
+I can try to add these checks locally and propose as a follow up
+series. Let me know if I'm on the right track with figuring out how to
+implement this, and, if you feel like it's blocking.
 
- #  RUN           msg_oob.no_peek.ex_oob_ahead_break ...
- #            OK  msg_oob.no_peek.ex_oob_ahead_break
- ok 11 msg_oob.no_peek.ex_oob_ahead_break
- #  RUN           msg_oob.no_peek.inline_oob_ahead_break ...
- #            OK  msg_oob.no_peek.inline_oob_ahead_break
- ok 15 msg_oob.no_peek.inline_oob_ahead_break
-
-We will rewrite existing other code to use urg_skb and remove urg_data
-and urg_seq, which have the same functionality as urg_skb
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
----
- include/linux/tcp.h                           |  1 +
- include/net/tcp.h                             |  3 ++-
- net/ipv4/tcp.c                                | 15 ++++++++++-----
- net/ipv4/tcp_input.c                          |  5 +++++
- tools/testing/selftests/net/af_unix/msg_oob.c | 10 ++--------
- 5 files changed, 20 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 6a5e08b937b3..63234e8680e3 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -243,6 +243,7 @@ struct tcp_sock {
- 	struct  minmax rtt_min;
- 	/* OOO segments go in this rbtree. Socket lock must be held. */
- 	struct rb_root	out_of_order_queue;
-+	struct sk_buff *urg_skb;
- 	u32	snd_ssthresh;	/* Slow start size threshold		*/
- 	u8	recvmsg_inq : 1;/* Indicate # of bytes in queue upon recvmsg */
- 	__cacheline_group_end(tcp_sock_read_rx);
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 2aac11e7e1cc..4eb0929c0744 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -961,7 +961,8 @@ struct tcp_skb_cb {
- 	__u8		txstamp_ack:1,	/* Record TX timestamp for ack? */
- 			eor:1,		/* Is skb MSG_EOR marked? */
- 			has_rxtstamp:1,	/* SKB has a RX timestamp	*/
--			unused:5;
-+			consumed_urg:1, /* urg data in SKB has already read */
-+			unused:4;
- 	__u32		ack_seq;	/* Sequence number ACK'd	*/
- 	union {
- 		struct {
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e03a342c9162..463e89849d6d 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1402,8 +1402,10 @@ static int tcp_recv_urg(struct sock *sk, struct msghdr *msg, int len, int flags)
- 		msg->msg_flags |= MSG_OOB;
- 
- 		if (len > 0) {
--			if (!(flags & MSG_TRUNC))
-+			if (!(flags & MSG_TRUNC)) {
- 				err = memcpy_to_msg(msg, &c, 1);
-+				TCP_SKB_CB(tp->urg_skb)->consumed_urg = true;
-+			}
- 			len = 1;
- 		} else
- 			msg->msg_flags |= MSG_TRUNC;
-@@ -2491,11 +2493,13 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- 			used = len;
- 
- 		/* Do we have urgent data here? */
--		if (unlikely(tp->urg_data)) {
--			u32 urg_offset = tp->urg_seq - *seq;
-+		if (unlikely(tp->urg_skb == skb || TCP_SKB_CB(skb)->consumed_urg)) {
-+			u32 urg_offset = TCP_SKB_CB(skb)->end_seq - *seq - 1;
-+
- 			if (urg_offset < used) {
- 				if (!urg_offset) {
--					if (!sock_flag(sk, SOCK_URGINLINE)) {
-+					if (!sock_flag(sk, SOCK_URGINLINE) ||
-+					    TCP_SKB_CB(skb)->consumed_urg) {
- 						WRITE_ONCE(*seq, *seq + 1);
- 						urg_hole++;
- 						offset++;
-@@ -2530,6 +2534,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- skip_copy:
- 		if (unlikely(tp->urg_data) && after(tp->copied_seq, tp->urg_seq)) {
- 			WRITE_ONCE(tp->urg_data, 0);
-+			tp->urg_skb = NULL;
- 			tcp_fast_path_check(sk);
- 		}
- 
-@@ -4726,7 +4731,7 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rtt_min);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, out_of_order_queue);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 77);
- 
- 	/* TX read-write hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, segs_out);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 648d0f3ade78..47eb7b7f31c4 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4851,6 +4851,10 @@ static bool tcp_try_coalesce(struct sock *sk,
- 
- 	*fragstolen = false;
- 
-+	/* avoid coalescing to urgent skb since last byte is OOB data*/
-+	if (tcp_sk(sk)->urg_skb)
-+		return false;
-+
- 	/* Its possible this segment overlaps with prior segment in queue */
- 	if (TCP_SKB_CB(from)->seq != TCP_SKB_CB(to)->end_seq)
- 		return false;
-@@ -5857,6 +5861,7 @@ static void tcp_urg(struct sock *sk, struct sk_buff *skb, const struct tcphdr *t
- 			if (skb_copy_bits(skb, ptr, &tmp, 1))
- 				BUG();
- 			WRITE_ONCE(tp->urg_data, TCP_URG_VALID | tmp);
-+			tp->urg_skb = skb;
- 			if (!sock_flag(sk, SOCK_DEAD))
- 				sk->sk_data_ready(sk);
- 		}
-diff --git a/tools/testing/selftests/net/af_unix/msg_oob.c b/tools/testing/selftests/net/af_unix/msg_oob.c
-index f3435575dfa5..3eee7930b6ed 100644
---- a/tools/testing/selftests/net/af_unix/msg_oob.c
-+++ b/tools/testing/selftests/net/af_unix/msg_oob.c
-@@ -534,10 +534,7 @@ TEST_F(msg_oob, ex_oob_ahead_break)
- 	epollpair(true);
- 	siocatmarkpair(false);
- 
--	tcp_incompliant {
--		recvpair("hellowol", 8, 10, 0);	/* TCP recv()s "helloworl", why "r" ?? */
--	}
--
-+	recvpair("hellowol", 8, 10, 0);
- 	epollpair(true);
- 	siocatmarkpair(true);
- 
-@@ -623,10 +620,7 @@ TEST_F(msg_oob, inline_oob_ahead_break)
- 	epollpair(false);
- 	siocatmarkpair(true);
- 
--	tcp_incompliant {
--		recvpair("world", 5, 6, 0);	/* TCP recv()s "oworld", ... "o" ??? */
--	}
--
-+	recvpair("world", 5, 6, 0);
- 	epollpair(false);
- 	siocatmarkpair(false);
- }
--- 
-2.39.3 (Apple Git-145)
-
+--=20
+Thanks,
+Mina
 
