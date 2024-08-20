@@ -1,109 +1,116 @@
-Return-Path: <netdev+bounces-120111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E888D95855E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:03:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E51F958560
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:04:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A6D21C24507
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:03:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 097D5B22CA4
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 11:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8ACA18DF6F;
-	Tue, 20 Aug 2024 11:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892B918D625;
+	Tue, 20 Aug 2024 11:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9Ln0aCX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD7418C020;
-	Tue, 20 Aug 2024 11:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0481B18C020
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 11:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724151786; cv=none; b=a0KMjAuHR9/XST21PV4sVY1VV3rYS5jermQx/7uacsZFksu99t6lFFjivar2VwmH3qEG9lFA/JcAilNl2NF6UbdJjMIR9PYr+eCMMFs5a14Ht/W1czOehRxRUqNCnzq3K93GpQieXIPu4P+2MRSvXyA7LDgkOPU7TihRa7DTxD0=
+	t=1724151878; cv=none; b=M90n7TbeGlrOTL77jgk+b7dL3hstEXYIf35nhGObrjTOf4ZV4oW1veJ8dadPhGL07SXBMEKVRdktHCTiHurtstb1Oy/cfitbwXe7VovTxyNcU3x95QhKptLrmVe2LP4S9NSF63M+98TaCFZkJat73xkrmg/Hgzev9QRRzLLI1Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724151786; c=relaxed/simple;
-	bh=HoaPV/fSjPPgZQ5KsJkTOE8xyAsJCORttngoT1ZLyEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=okbj86uLaQ/efAYG3Ke5fJQPSzHyz7lN2Xlv+bpFYno8TyfC/FPdthDZJbfDPNZhriBK1Q1UwTbAEjp8W0er+YVHl0/JU22IUcJ1gtOIQRc7+7F0TzHJIVV38VMo8x/kDSPWGFIGyJicbSpB+A5eUbQO54nwm0XRBRULp4XraXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-371b015572cso2329737f8f.1;
-        Tue, 20 Aug 2024 04:03:04 -0700 (PDT)
+	s=arc-20240116; t=1724151878; c=relaxed/simple;
+	bh=14bfwB8I4A9Gc7sKfVRW208/c8s+Ns66Xn+NWCQUnZc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=puTshJNtSJ+Udu9UV+gEK6/IQTgXHi1NkMakF0i2sfTQE/os2OOF3qbpODNzMQV0gT4P9Lok6KpQQBejHkzVASkzLmg+3xcn7eIiiO9vmWKI4uVVs4WSOH23Gq+VhHGythVAriImre8k48Ly8T8xyEgr64UjFBvnftneYxMpGO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9Ln0aCX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724151875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k6PGBPw0FL13SJbdnlSXI2jV9MiQK34AZDi4iKAI8MA=;
+	b=Y9Ln0aCXT9Gr8kH4J5C48NntByWGzseQezY8adMfWJBOil43MqXsmJN2ZlU9pEGNd8PVGs
+	+O8cP71j3yeNYloGP2U66bHcjVRRdSHPWqMVmgbzOfRklKn2/0GxhcqpxZ5FD/466qyEVi
+	+9SgdP5DB0Lh6lnrcUBLMev2KN9Cb34=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-Mi3GuXJXNZa7lg2qvE-Qkw-1; Tue, 20 Aug 2024 07:04:34 -0400
+X-MC-Unique: Mi3GuXJXNZa7lg2qvE-Qkw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-429e937ed37so9283605e9.3
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 04:04:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724151783; x=1724756583;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1uSbusyjca75DM3uPFt41Mi7fTzEOWCLLIWEIvrKa5o=;
-        b=tknuC/cXYbepJQh5g5OTlS/m9Gcj5jtU8jvw93o39+a7Askq10gsJgE5KLZtjaOTC2
-         rq/JQLp+ToLmTC/jKUSwwjVGEIPDCSeytEha1nzDA4aRVA5XS0aV24YmQl8HYKelumq+
-         f8019X9mO8YWNzv3CQP5WHfolEz3sMYOC0nVcFsJ4uG6HLrlYPNF8Z+T1mEwlHPWNCjj
-         IvGSlVg6aSiwfW5uD55Wi8IUwyyTon2J58/2kn6bLI/IpKxwhyR9tx0UZ8Fe3BmOgSs7
-         1Y79mDaUfSpr8zfu6s6sFtk87FrztCAl6YH5c7x7Di7wYn9ev7+0MrNCZLKkq/xi3qD1
-         QE3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUSAHKaZcT5A6YiNHQ2WK+TeSMRyTMw/Lv4bxCvFu0Eq70whihLWjxiuEP89XLPC05w66JHQDB8qqixMBJAkw==@vger.kernel.org, AJvYcCVa4ezmooHBfY31lvLoYCjWHW1edBGUFrHUZ7yR36mxWMa5A5ekLQGhGVROhBOSNRAQJyYgV43JnRb2@vger.kernel.org, AJvYcCVwdDk02PZIXdT5Ado/PD1XeZB7puG9JN2B1A2Akv4tH4juu19EZpD3gmueM02xm3xGul6OzCBEt9bp7x6a@vger.kernel.org, AJvYcCWtIzOkhBZ1NBwk6jeiS0SD+heqjFI5jWjB+GKIveiIFOI3Hf9Ho/ytb3KQiJAglDUaAZP3WN0eJArc@vger.kernel.org, AJvYcCX0keSfx910Iq/EGD8efCGKsWSEMYzN4DML9pNzP4JS2uaxk112Q4lcSfL4TUdhiOJ+PDChgNxC@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyiy/IQTiAZNpFlbZ7c/uklrrMgWeau9jW149Mser4aUDL4AQE4
-	51b1Cq1vVebzhtwv8RFyauKxFGLX8oLcM1TYbo7sUejDt1xRpYmEgAZS15mc
-X-Google-Smtp-Source: AGHT+IFT9bFKeLhKs/xtBpkkK/ON8CFh0OUF6n4KfBdOT9wAl8DndMiltOVoJhuy3Zu4jx6yXnKCmg==
-X-Received: by 2002:a5d:4644:0:b0:371:7d3c:51bd with SMTP id ffacd0b85a97d-371943285b7mr10354707f8f.14.1724151782649;
-        Tue, 20 Aug 2024 04:03:02 -0700 (PDT)
-Received: from krzk-bin ([178.197.215.209])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3718985a6ddsm12843904f8f.58.2024.08.20.04.03.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 04:03:02 -0700 (PDT)
-Date: Tue, 20 Aug 2024 13:02:59 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Imran Shaik <quic_imrashai@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Ajit Pandey <quic_ajipan@quicinc.com>, 
-	Taniya Das <quic_tdas@quicinc.com>, Jagadeesh Kona <quic_jkona@quicinc.com>, 
-	Satya Priya Kakitapalli <quic_skakitap@quicinc.com>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 0/2] clk: qcom: Add support for GCC on QCS8300
-Message-ID: <c6t35o5pnqw25x6gho725qvpgyr6bl2xkpsurq4jtjgii2v5mq@mvdl64azwpz4>
-References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
- <c1dd239f-7b07-4a98-a346-2b6b525dafc4@kernel.org>
- <5011eeb2-61e3-495a-85b3-e7c608340a82@quicinc.com>
+        d=1e100.net; s=20230601; t=1724151873; x=1724756673;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k6PGBPw0FL13SJbdnlSXI2jV9MiQK34AZDi4iKAI8MA=;
+        b=hfJ+8mswGzermDlV+Be37ZLdcI1yEczFZ/LrkANJIZI6Yu7bP2mg0Fd9fTiALFiGI1
+         /wRlWUXpmcsWWaIFOgvyg2u+FxpHtb390oWb0DzsGWJIIGdxyNKVsD96SLnAbpEGuDO9
+         kHpZv91dt8buet4hF8YSbOA/EY3Nj/JUJAzzIVSoEA+tRVTQj2RaN2b74sfx1ZoXD8r8
+         54iCB0ge4mMTQ/jn9u2pBhYqYMhukaAgzpRfoe7QQrs7e/XMOD6go7mf0jb0kLmc07M6
+         NozO8yE9KPyNkl92q2xZzPhMGBcyjG2h8GRv7KojFaz1FPT4CcBmM8nJhtrocUsb9w12
+         gq5g==
+X-Gm-Message-State: AOJu0YzP7CshcuZvVvPCFsumoo6wWcBHaQmGoibX0vOZQXx9TtZA0BJf
+	aMdhDfK1lnE6DQ2fXDexVDVTPBd5PiB6JwjficIm1WH09EbdFCxHY2PgHGroxHSx9cpdF0lIAnz
+	yf1rnFrwMWz6ZoLMANOZIBHg7fkY2qNBYDOwOINKVwje6TsBCY/4B/A==
+X-Received: by 2002:a05:6000:184c:b0:368:aa2:2b4e with SMTP id ffacd0b85a97d-3719443d93amr5179850f8f.4.1724151873466;
+        Tue, 20 Aug 2024 04:04:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFBfSN7rcRCN6YaZHBe4c8eqWnpHNwpwMslPKUWNq/YZGBhF7jG7Dqv8btB84+yTdVIrFmoQw==
+X-Received: by 2002:a05:6000:184c:b0:368:aa2:2b4e with SMTP id ffacd0b85a97d-3719443d93amr5179827f8f.4.1724151873004;
+        Tue, 20 Aug 2024 04:04:33 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5? ([2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded720eesm192828645e9.33.2024.08.20.04.04.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Aug 2024 04:04:32 -0700 (PDT)
+Message-ID: <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
+Date: Tue, 20 Aug 2024 13:04:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5011eeb2-61e3-495a-85b3-e7c608340a82@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
+ find port in connect() process
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
+ ncardwell@google.com, kuniyu@amazon.com
+Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>,
+ Jade Dong <jadedong@tencent.com>
+References: <20240815113745.6668-1-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240815113745.6668-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 20, 2024 at 03:38:39PM +0530, Imran Shaik wrote:
+On 8/15/24 13:37, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> 
-> On 8/20/2024 3:27 PM, Krzysztof Kozlowski wrote:
-> > On 20/08/2024 11:36, Imran Shaik wrote:
-> > > This series adds the dt-bindings and driver support for GCC on QCS8300 platform.
-> > > 
-> > > Please note that this series is dependent on [1] which adds support
-> > > for QCS8275/QCS8300 SoC ID.
-> > > 
-> > > [1] https://lore.kernel.org/all/20240814072806.4107079-1-quic_jingyw@quicinc.com/
-> > 
-> > How do the depend? What is exactly the dependency?
-> > 
-> > If so this cannot be merged...
-> > 
-> 
-> They are not functionally dependent, but we want to ensure the base QCS8300
-> changes to merge first and then our GCC changes. Hence added the dependency.
+> We found that one close-wait socket was reset by the other side
+> which is beyond our expectation, 
 
-This does not work like that, these are different trees, even if they go
-via Bjorn.
+I'm unsure if you should instead reconsider your expectation: what if 
+the client application does:
 
-Why do you insist on some specific workflow, different than every
-upstreaming process? What is so special here?
+shutdown(fd, SHUT_WR)
+close(fd); // with unread data
 
-If you keep insisting, I will keep disagreeing, because it is not
-justified and just complicates things unnecessarily.
+?
+
+Thanks,
+
+Paolo
+
 
