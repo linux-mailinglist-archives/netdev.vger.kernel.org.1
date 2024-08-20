@@ -1,134 +1,131 @@
-Return-Path: <netdev+bounces-120321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D75958F22
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:21:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006C7958F27
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3605D1F2483F
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:21:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 314241C20DFD
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA7D17D341;
-	Tue, 20 Aug 2024 20:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664FD1B8E8A;
+	Tue, 20 Aug 2024 20:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTLiv6lj"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FzZsSiNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B4E1862;
-	Tue, 20 Aug 2024 20:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC9815B999
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 20:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724185285; cv=none; b=Gi/SL4J6yVbAEDxbNdDXCfgWgiXb8oPXrxxeawtmi5JV/1+vcPvxhjHrOY+kEkgupqJFvnZ9mr7n5YzGNkjKtNjzUU7IlV7c6CNcb2IUJKc6OB3vmbgvVJPboRIezWzdutHOTxip2MBIgH8HWp+Yx2ORMzj4pb5aQ3hXtQliFxc=
+	t=1724185375; cv=none; b=hXPW1b7ApsRllNAMdTYguk01tMLi0sd76n22y0fw2dvkID6rHvnhDnuatcr+3MzcUcYTbFEN0Nes1AnwhIwLi/YmT8QlXOcp2CH2Nz5qpK/n7pLLBTRJ1h7he/jTCkl9Bo6r3P9rf/AG+NV6K4p9NNpcC42hMOEnY3LUxxBcQ7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724185285; c=relaxed/simple;
-	bh=JNXm6zh8O5hiz+5AL9a6a4NLacnvRdEGlOvyHC/2e5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qpy3A2zpN6NkChCk+N0z/wwrfVh6tETiEzLrCys9zd8uCLNpWriDGEUGvBKRtwvWbP7wvx3+Iy+ZpZEs1nA60s198ZrbMbhVR75nrci993GGxYzQK90FYZjmK5E/87r1QXl6Ll8NcAvKSXlDifXwHd3AOZ8q1CzfdPl1kVopTYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bTLiv6lj; arc=none smtp.client-ip=209.85.217.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-49297fca3c2so2092832137.1;
-        Tue, 20 Aug 2024 13:21:23 -0700 (PDT)
+	s=arc-20240116; t=1724185375; c=relaxed/simple;
+	bh=E+kXUwICZYj2HydsIt5fBb+0o9o/27hUbjZYZRkzVD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PFA0XBG7PrOt8qBbUiFRoqhDKRhB8OmKjxu4YwH3krpZ1Hm1bLwZmywIcEnnhOD9yVmklNiOw9LIPYh3NwmhetTQzFNKXM54VUBRoP6rLhSRvhkhXzX7SYaG4+sf+xAP5Guc2YQGxJFEFddnCNJxxOH1U1UGj7l4mkf32Jl8rSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FzZsSiNi; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2d3da94f059so3459249a91.2
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:22:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724185283; x=1724790083; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R/C8RebMTwv4Hl6gkOymdVXtdDOAA7fmhZDVJ5EQS/Y=;
-        b=bTLiv6ljSun2YOqP2ZutSrsBZb5EXD4ZB7YW8ifErOyuIjvUflB0R4kRnJIaaT7Zac
-         iTtt+7OMVehZwZBmrInYdWUP4eL0DU53Vcq1NT4K7RYaYzA5gQKQrHorWTTRNAe/vbqn
-         i/zXuQc6XLcbPssIsO78W+ltq5aGMha9Kyl0hY82ohFV/zFHmH90Tbs7BIbohamrIHJF
-         cVXHaZZ+lA5tGupZFTsOSdgI+ZIJnhqMwdLErq78UgLDkuT//gNphojLq1ke65URS4G4
-         2+AWv/Tv1N6z2Kfm25pcA38J3jZwRbReJw46ISScEoRG5GRo6PS7evaFlQosJ3Rn6uuM
-         XIjw==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1724185372; x=1724790172; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LF1xGAzBc+XfrnIu1OYyumZPOyMqmVIc0vNTJwylp/c=;
+        b=FzZsSiNiiHRJb6SBmzZcPb/FCH5SuK9YvBKiirHPKah8fL+0eXbpZKe4gB3f/h1L2j
+         GWo2VfvBb+2qmTY1No3ActH5q//Z+b//6YxOJc/bFZld+hvIT3/E4USX5tkCugBQ4x+z
+         Ju1uHaXHvdiWYhv5yVArgCow0GbuwRp9bQ5EEytL5Tb2oj0OHwl7uobw9NSrvysF5glJ
+         Gf2x1jdhxjxQLpaSDZfIeH0Bj2YXaazMtU/zDr/jwevjm0nkWd9riFZtaUPJrMT3/9nJ
+         7Xzah2A8FoLqYPI0fZE7BCfhEC1veY03C9CTeJAgtCQbjsG7SukLC60U/jtPQayuY5de
+         /nqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724185283; x=1724790083;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R/C8RebMTwv4Hl6gkOymdVXtdDOAA7fmhZDVJ5EQS/Y=;
-        b=Mr0mfC1oJfxV0Pp+hyaTP6GJE0LaJLK48KxIFhXO9v4kuijnpnSUf9wDqNXDelzRta
-         MERNWgnHD7bbQc8UZ4fwn19CuM52O2pfPpkfN7t0VyslVE5oyUJj6P/qvrolKbZVq8I+
-         rzSU1X3k3ARKcvyZyjeQTDHvQF/LXCbS1wnLCF1F9c0Q3g3fWwLBEx/rQI+5ZUHZg7wo
-         Qp/d4FHpAOH73FjFjV4NQHt1usUdaP+UUaSzhJ7LzxvdT7uyPNn+VnOv5yMhQDNfx09M
-         6ALO7QJ0Wim/picla5fceWNhb83LdVm+4If4AFOSyRw+N98Rsn11rWg/TlLvV2fPUDqt
-         C6oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaAeHWs4diMNHqTkSGCLQ5YfIYylA1d4drOWII+tdiclL+kgIHEGjwqqidfBvrZwbLHikFwjErJl3f/5XzsrxO@vger.kernel.org, AJvYcCXfNXvIPSujRExuLwaotvhzkp/wJOO0HHItoxOhU+xL44nl4Og0rCsxzTxEq41ICuGhwzi9pBkIMi7mBAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjWudTN61uYmQ7WYBNZbkDYtHexm8cjt2tWC+4CxORC8Q/VpLM
-	fUMikZRpi8KuKzvyJhYEuXIu7QrvmBE/kVutPORLz6hoXUqhYFu7
-X-Google-Smtp-Source: AGHT+IGlR9IDLGdqKoGibFyrrU7/zY7z/pqdmRB3n9fnYsxREhK/TqV6/hmuKFKHQHSlOPHO57TD3g==
-X-Received: by 2002:a05:6102:2ad1:b0:497:1b98:1f82 with SMTP id ada2fe7eead31-498d2e999d9mr493418137.6.1724185282850;
-        Tue, 20 Aug 2024 13:21:22 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-842fb9d5e85sm1638775241.37.2024.08.20.13.21.21
+        d=1e100.net; s=20230601; t=1724185372; x=1724790172;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LF1xGAzBc+XfrnIu1OYyumZPOyMqmVIc0vNTJwylp/c=;
+        b=ITVoy/jPFERpQKoNEmIx5b1WtepyOWYdRZGQ52ji0DHHQ+jS+cjRF01psK3ayVZnsO
+         T7qt9Rmbj4lazKtRd8iGz0j8uItESW2pcsV8T7Qf2K+EVozOQ0Z0MVpJG1WhbESRJFcL
+         ypbNllxnihXImcgS1hhrH1tNUHNiWM254vypwvrmLjStWi5uAJZFfjMj7zq8Rsf1Uf+V
+         i0ULKSaK4oq77/h2cdx712zetg0zIkR9orZC7RduWp6h7f/B6cFJrV8lOFsYloc6DjXI
+         CIhe2+FkmrCvquNUmtIQCKhHMa44G0f9I8n95IDiBPZc9P1KjhAr+EXEw7Ma+J6VgtUO
+         HERA==
+X-Gm-Message-State: AOJu0Ywq1K6/vDmRojQEyhKiWvXsRig8yRirbyTJfmGGhR1hzUtsB2A1
+	v8T7pVYpFHI36SIoQHG+hN+pV8ktGVVPb2dO0HP2ChqHvoxOVkjeebZeteZw/DA=
+X-Google-Smtp-Source: AGHT+IFKLaWCI6pTbg4pWG94rAcL0fmef+3g+t3F0g+/j22778SV3QfJxKbW/f6NTPaLJkCpG2fINw==
+X-Received: by 2002:a17:90a:e147:b0:2c9:7a8d:43f7 with SMTP id 98e67ed59e1d1-2d5e9a43943mr115861a91.23.1724185372511;
+        Tue, 20 Aug 2024 13:22:52 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d5c2e163a8sm1371608a91.1.2024.08.20.13.22.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 13:21:22 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	javier.carrasco.cruz@gmail.com,
-	david.hunter.linux@gmail.com
-Subject: [PATCH 1/1] Improve missing mods error message and make shell script executable
-Date: Tue, 20 Aug 2024 16:21:16 -0400
-Message-ID: <20240820202116.6124-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 20 Aug 2024 13:22:52 -0700 (PDT)
+Date: Tue, 20 Aug 2024 13:22:50 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Budimir Markovic <markovicbudimir@gmail.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Sheng Lan <lansheng@huawei.com>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] netem: fix return value if duplicate enqueue fails
+Message-ID: <20240820132250.28bd507b@hermes.local>
+In-Reply-To: <20240820154213.GA1962@kernel.org>
+References: <20240819175753.5151-1-stephen@networkplumber.org>
+	<20240820154213.GA1962@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Make the test executable. Currently, tests in this shell script are not
-executable, so the scipt file is skipped entirely.
+On Tue, 20 Aug 2024 16:42:13 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-Also, the error message descirbing the required modules is inaccurate.
-Currently, only  "SKIP: Need act_mirred module" is shown. As a result,
-users might only that module; however, three modules are actually
-required and if any of them are missing, the build will fail with the
-same message.
+> On Mon, Aug 19, 2024 at 10:56:45AM -0700, Stephen Hemminger wrote:
+> > There is a bug in netem_enqueue() introduced by
+> > commit 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
+> > that can lead to a use-after-free.
+> > 
+> > This commit made netem_enqueue() always return NET_XMIT_SUCCESS
+> > when a packet is duplicated, which can cause the parent qdisc's q.qlen to be
+> > mistakenly incremented. When this happens qlen_notify() may be skipped on the
+> > parent during destruction, leaving a dangling pointer for some classful qdiscs
+> > like DRR.
+> > 
+> > There are two ways for the bug happen:
+> > 
+> > - If the duplicated packet is dropped by rootq->enqueue() and then the original
+> >   packet is also dropped.
+> > - If rootq->enqueue() sends the duplicated packet to a different qdisc and the
+> >   original packet is dropped.
+> > 
+> > In both cases NET_XMIT_SUCCESS is returned even though no packets are enqueued
+> > at the netem qdisc.
+> > 
+> > The fix is to defer the enqueue of the duplicate packet until after the
+> > original packet has been guaranteed to return NET_XMIT_SUCCESS.
+> > 
+> > Fixes: 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
+> > Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
+> > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>  
+> 
+> Thanks Stephen,
+> 
+> The code changes all make sense to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Fix the error message to show any/all modules needed for the script file
-upon failure.
-
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
- .../testing/selftests/net/test_ingress_egress_chaining.sh | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
- mode change 100644 => 100755 tools/testing/selftests/net/test_ingress_egress_chaining.sh
-
-diff --git a/tools/testing/selftests/net/test_ingress_egress_chaining.sh b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-old mode 100644
-new mode 100755
-index 08adff6bb3b6..b1a3d68e0ec2
---- a/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-+++ b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-@@ -13,8 +13,14 @@ if [ "$(id -u)" -ne 0 ];then
- fi
- 
- needed_mods="act_mirred cls_flower sch_ingress"
-+mods_missing=""
-+
-+for mod in $needed_mods; do 
-+	modinfo $mod &>/dev/null || mods_missing="$mods_missing$mod "
-+done
-+
- for mod in $needed_mods; do
--	modinfo $mod &>/dev/null || { echo "SKIP: Need act_mirred module"; exit $ksft_skip; }
-+	modinfo $mod &>/dev/null || { echo "SKIP: modules needed: $mods_missing"; exit $ksft_skip; }
- done
- 
- ns="ns$((RANDOM%899+100))"
--- 
-2.43.0
-
+Reported by doesn't really do enough credit here. The commit log is from
+the original bug report which had more detail. Fixing it was the easy part.
 
