@@ -1,261 +1,141 @@
-Return-Path: <netdev+bounces-120167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E096F958799
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:08:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 696B095879F
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 650892834A6
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:08:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA5231F2292F
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161C6190463;
-	Tue, 20 Aug 2024 13:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B545A190064;
+	Tue, 20 Aug 2024 13:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7yxTLBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98FA17B4ED;
-	Tue, 20 Aug 2024 13:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEF618E039
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159290; cv=none; b=iSED1bYoIb1dvuS4B5h9n4eEWAj20R/C5ibemoTyDDhzDKt4+rY0DFk6l/mKzRT5Ukf2vDEWcGSP5Zhzv2I2+ompxlCu5A1MxcU4hSjtF0yo1mORWkFqRXf5jvO1EgGlyJ7Ug72Ivb+jA/7cctXVeJtF4+cvhjUSfAxFCLdAqmk=
+	t=1724159472; cv=none; b=E4Vxy/f2Q+7x+EnGg7r12L3MxDMtVt+kzuh6m7+K2syw7pzqHvDpv981NeulhEgwZJcBCUV/ZZjD16ML45U41DFJVEwdWy0yn9dxPRmovLpAiUlDJ/g34UWPF9SkrYgW1gr59lYJ+zNyC6uTv2+6RJo6xCnyqjv2RNDRfl9kOkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159290; c=relaxed/simple;
-	bh=RpCKBDqMTsj/+QOE8XMbCFaxwEtCyitUh5A+Zn9qtLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RUnK8anCMAe8EuFDZpNTb9NG+BsrfVOgBdZAn0Q5/TRywSYCujYccaSRxDxU+fO2vStqMxxwbBhuhpQRreOOe+pDFKVvJrH3TD6s/wuWJF+xE6PtL/yi+AZBrhKYUoJv+Od2gXg3jysvL8WQkrx9YuyDDx3ovpNVTPC5KMK+8RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wp8lv5K1LzQq66;
-	Tue, 20 Aug 2024 21:03:23 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id D1AFE140133;
-	Tue, 20 Aug 2024 21:08:04 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 20 Aug 2024 21:08:04 +0800
-Message-ID: <37fc4b01-43f1-4a2c-af35-96cf3f7fe3d5@huawei.com>
-Date: Tue, 20 Aug 2024 21:08:04 +0800
+	s=arc-20240116; t=1724159472; c=relaxed/simple;
+	bh=3qafc2OtfbKMD67zdtCMW7d/5pfl70D+vhA8CVrXaco=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UDTgZ8TWmie9dxxlI+Jzszmm1ORXTdYCAHWU80E2BOhBF/09hlioZNOOoMmpVdzkxAMgOBolufahw3KfJUIH8UaWodnkeVamTOBeJQwb9trcdIwT5NYDalyHFmQDCQvEFeJDf9TMy+7UO9mvkmBLdiPFiFeDg6olC89kIRt39bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I7yxTLBa; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6adcb88da08so108665877b3.3
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:11:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724159470; x=1724764270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lN3Gj5I1BDXWTy6NzwpPJel+5B5UpY04jbUUblrWOvE=;
+        b=I7yxTLBa830HckJCV1o92/ReyjfJkaSKi8RV3ynL4Hnz/vSrY+u5sFo+mIeyW9JJ5f
+         Tew/WjTqx0DajkvBuSFkBIciDXCRnTgK7YoH9dCIgeBUYPiZ5dmqmHeqm7EHfBj4sKe1
+         eeMXkl9yzW9ZMkoLGgTrCd3OE6sYS941HoZ5wo9xw8nA5QLL+1Oo7CDkH+7VsxldDinG
+         5ymRd+ZVaGcVVllc9j4Hyb79UGoCPi3PHjcNoe510Ph1asxvCXpUzu1rvLababm6H5Js
+         7HDmW+djbkl+x5EfRq9TjwbIMTSrQcF/uMWo+sd/Zlten+20g9CYiMglUHz/fSBmJBdQ
+         9ioQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724159470; x=1724764270;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lN3Gj5I1BDXWTy6NzwpPJel+5B5UpY04jbUUblrWOvE=;
+        b=sjcJ0Uovl+wg9YRgdSX5djlKyxlHEDctZBbSz5z8BOgHRXCggeMsj+7MukAgIrCYbv
+         eVKfPbzGa4yvySDTfUBZbWcs4+An0Sbc+pw01x+hh0UGnMQFnaJZTB9AQXkDbdqFw+5B
+         nQfKHDGOMGhzjuxBmW9T0WnZ+ZpkyQ23RKh77Sf5WhbvrPuhl97Hqu5kE9VFrWK6ZtH6
+         Ctr8sfM2sIBvaXhjOAm4kl6fbWlOwnhtTiphS2ZWNcNhJhLiWeKctJh4TdJkWZC4U+fD
+         FXXAkUYRn8qMGTzCE0lUasDplDugjWcHYjfqBp6ewyR/jOMIAYOqstMGdK+xvSXFrYtM
+         pmlg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeuqcOAbR1sDMAIUixJJF17yqbyhmYXfwR7U1o4H5hODrO8e3UFMhmjLjZbQq3FS4J3g9U8yQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyayGhiW5/qkGWK27RumqkDx8KTM8lPMUJr2+y9eZXejkLjFeUL
+	H460/CgcpYSDgSqO7nCNPgbnuH5ovQIzY0vSHv/bbF6yBDd/1M3xa28/1T9WaTLvLVTBO6rZESn
+	vNA==
+X-Google-Smtp-Source: AGHT+IGd0tHf+ddVWWyu0feS9WCvfyhikk3VUfmkmDZIVdINwxfp8bFrvgSQd145+65vuI0fKXQsQlsYiX0=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:690c:4e0e:b0:64a:d1b0:4f24 with SMTP id
+ 00721157ae682-6b1bba55dd5mr2667257b3.7.1724159470085; Tue, 20 Aug 2024
+ 06:11:10 -0700 (PDT)
+Date: Tue, 20 Aug 2024 15:11:07 +0200
+In-Reply-To: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 11/14] mm: page_frag: introduce
- prepare/probe/commit API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-12-linyunsheng@huawei.com>
- <d9814d6628599b7b28ed29c71d6fb6631123fdef.camel@gmail.com>
- <7f06fa30-fa7c-4cf2-bd8e-52ea1c78f8aa@huawei.com>
- <CAKgT0Uetu1HA4hCGvBLwRgsgX6Y95FDw0epVf5S+XSnezScQ_w@mail.gmail.com>
- <5905bad4-8a98-4f9d-9bd6-b9764e299ac7@huawei.com>
- <CAKgT0Ucz4R=xOCWgauDO_i6PX7=hgiohXngo2Mea5R8GC_s2qQ@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0Ucz4R=xOCWgauDO_i6PX7=hgiohXngo2Mea5R8GC_s2qQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Mime-Version: 1.0
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZsSV6-o1guJdpPfu@google.com>
+Subject: Re: [RFC PATCH v2 0/9] Support TCP listen access-control
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/8/19 23:52, Alexander Duyck wrote:
+Hello!
 
->>
->> Yes, the expectation is that somebody else didn't take an access to the
->> page/data to send it off somewhere else between page_frag_alloc_va()
->> and page_frag_alloc_abort(), did you see expectation was broken in that
->> patch? If yes, we should fix that by using page_frag_free_va() related
->> API instead of using page_frag_alloc_abort().
-> 
-> The problem is when you expose it to XDP there are a number of
-> different paths it can take. As such you shouldn't be expecting XDP to
-> not do something like that. Basically you have to check the reference
+Thanks for sending v2 of this patchset!
 
-Even if XDP operations like xdp_do_redirect() or tun_xdp_xmit() return
-failure, we still can not do that? It seems odd that happens.
-If not, can we use page_frag_alloc_abort() with fragsz being zero to avoid
-atomic operation?
+On Wed, Aug 14, 2024 at 11:01:42AM +0800, Mikhail Ivanov wrote:
+> Hello! This is v2 RFC patch dedicated to restriction of listening sockets=
+.
+>=20
+> It is based on the landlock's mic-next branch on top of 6.11-rc1 kernel
+> version.
+>=20
+> Description
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+> ports to forbid a malicious sandboxed process to impersonate a legitimate
+> server process. However, bind(2) might be used by (TCP) clients to set th=
+e
+> source port to a (legitimate) value. Controlling the ports that can be
+> used for listening would allow (TCP) clients to explicitly bind to ports
+> that are forbidden for listening.
+>=20
+> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+> access right that restricts listening on undesired ports with listen(2).
+>=20
+> It's worth noticing that this access right doesn't affect changing=20
+> backlog value using listen(2) on already listening socket. For this case
+> test ipv4_tcp.double_listen is provided.
 
-> count before you can rewind the page.
-> 
->>>
->>>
->>>>
->>>>>> +static struct page *__page_frag_cache_reload(struct page_frag_cache *nc,
->>>>>> +                                         gfp_t gfp_mask)
->>>>>>  {
->>>>>> +    struct page *page;
->>>>>> +
->>>>>>      if (likely(nc->encoded_va)) {
->>>>>> -            if (__page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias))
->>>>>> +            page = __page_frag_cache_reuse(nc->encoded_va, nc->pagecnt_bias);
->>>>>> +            if (page)
->>>>>>                      goto out;
->>>>>>      }
->>>>>>
->>>>>> -    if (unlikely(!__page_frag_cache_refill(nc, gfp_mask)))
->>>>>> -            return false;
->>>>>> +    page = __page_frag_cache_refill(nc, gfp_mask);
->>>>>> +    if (unlikely(!page))
->>>>>> +            return NULL;
->>>>>>
->>>>>>  out:
->>>>>>      /* reset page count bias and remaining to start of new frag */
->>>>>>      nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->>>>>>      nc->remaining = page_frag_cache_page_size(nc->encoded_va);
->>>>>> -    return true;
->>>>>> +    return page;
->>>>>> +}
->>>>>> +
->>>>>
->>>>> None of the functions above need to be returning page.
->>>>
->>>> Are you still suggesting to always use virt_to_page() even when it is
->>>> not really necessary? why not return the page here to avoid the
->>>> virt_to_page()?
->>>
->>> Yes. The likelihood of you needing to pass this out as a page should
->>> be low as most cases will just be you using the virtual address
->>> anyway. You are essentially trading off branching for not having to
->>> use virt_to_page. It is unnecessary optimization.
->>
->> As my understanding, I am not trading off branching for not having to
->> use virt_to_page, the branching is already needed no matter we utilize
->> it to avoid calling virt_to_page() or not, please be more specific about
->> which branching is traded off for not having to use virt_to_page() here.
-> 
-> The virt_to_page overhead isn't that high. It would be better to just
-> use a consistent path rather than try to optimize for an unlikely
-> branch in your datapath.
+This is a good catch, btw, that seems like the right thing to do. =F0=9F=91=
+=8D
 
-I am not sure if I understand what do you mean by 'consistent path' here.
-If I understand your comment correctly, the path is already not consistent
-to avoid having to fetch size multiple times multiple ways as mentioned in
-[1]. As below, doesn't it seems nature to avoid virt_to_page() calling while
-avoiding page_frag_cache_page_size() calling, even if it is an unlikely case
-as you mentioned:
 
-struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-                                unsigned int *offset, unsigned int fragsz,
-                                gfp_t gfp)
-{
-        unsigned int remaining = nc->remaining;
-        struct page *page;
+I am overall happy with this patch set, but left a few remarks in the tests=
+ so
+far.  There are a few style nits here and there.
 
-        VM_BUG_ON(!fragsz);
-        if (likely(remaining >= fragsz)) {
-                unsigned long encoded_va = nc->encoded_va;
+A thing that makes me uneasy is that the tests have a lot of logic in
+test_restricted_net_fixture(), where instead of the test logic being
+straightforward, there are conditionals to tell apart different scenarios a=
+nd
+expect different results.  I wish that the style of these tests was more li=
+near.
+This patch set is making it a little bit worse, because the logic in
+test_restricted_net_fixture() increases.
 
-                *offset = page_frag_cache_page_size(encoded_va) -
-                                remaining;
+I have also made some restructuring suggestions for the kernel code, in the=
+ hope
+that they simplify things.  If they don't because I overlooked something, w=
+e can
+skip that though.
 
-                return virt_to_page((void *)encoded_va);
-        }
-
-        if (unlikely(fragsz > PAGE_SIZE))
-                return NULL;
-
-        page = __page_frag_cache_reload(nc, gfp);
-        if (unlikely(!page))
-                return NULL;
-
-        *offset = 0;
-        nc->remaining -= fragsz;
-        nc->pagecnt_bias--;
-
-        return page;
-}
-
-1. https://lore.kernel.org/all/CAKgT0UeQ9gwYo7qttak0UgXC9+kunO2gedm_yjtPiMk4VJp9yQ@mail.gmail.com/
-
-> 
->>>
->>>
->>>>
->>>>>> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
->>>>>> +                            unsigned int *offset, unsigned int fragsz,
->>>>>> +                            gfp_t gfp)
->>>>>> +{
->>>>>> +    unsigned int remaining = nc->remaining;
->>>>>> +    struct page *page;
->>>>>> +
->>>>>> +    VM_BUG_ON(!fragsz);
->>>>>> +    if (likely(remaining >= fragsz)) {
->>>>>> +            unsigned long encoded_va = nc->encoded_va;
->>>>>> +
->>>>>> +            *offset = page_frag_cache_page_size(encoded_va) -
->>>>>> +                            remaining;
->>>>>> +
->>>>>> +            return virt_to_page((void *)encoded_va);
->>>>>> +    }
->>>>>> +
->>>>>> +    if (unlikely(fragsz > PAGE_SIZE))
->>>>>> +            return NULL;
->>>>>> +
->>>>>> +    page = __page_frag_cache_reload(nc, gfp);
->>>>>> +    if (unlikely(!page))
->>>>>> +            return NULL;
->>>>>> +
->>>>>> +    *offset = 0;
->>>>>> +    nc->remaining = remaining - fragsz;
->>>>>> +    nc->pagecnt_bias--;
->>>>>> +
->>>>>> +    return page;
->>>>>>  }
->>>>>> +EXPORT_SYMBOL(page_frag_alloc_pg);
->>>>>
->>>>> Again, this isn't returning a page. It is essentially returning a
->>>>> bio_vec without calling it as such. You might as well pass the bio_vec
->>>>> pointer as an argument and just have it populate it directly.
->>>>
->>>> I really don't think your bio_vec suggestion make much sense  for now as
->>>> the reason mentioned in below:
->>>>
->>>> "Through a quick look, there seems to be at least three structs which have
->>>> similar values: struct bio_vec & struct skb_frag & struct page_frag.
->>>>
->>>> As your above agrument about using bio_vec, it seems it is ok to use any
->>>> one of them as each one of them seems to have almost all the values we
->>>> are using?
->>>>
->>>> Personally, my preference over them: 'struct page_frag' > 'struct skb_frag'
->>>>> 'struct bio_vec', as the naming of 'struct page_frag' seems to best match
->>>> the page_frag API, 'struct skb_frag' is the second preference because we
->>>> mostly need to fill skb frag anyway, and 'struct bio_vec' is the last
->>>> preference because it just happen to have almost all the values needed.
->>>
->>> That is why I said I would be okay with us passing page_frag in patch
->>> 12 after looking closer at the code. The fact is it should make the
->>> review of that patch set much easier if you essentially just pass the
->>> page_frag back out of the call. Then it could be used in exactly the
->>> same way it was before and should reduce the total number of lines of
->>> code that need to be changed.
->>
->> So the your suggestion changed to something like below?
->>
->> int page_frag_alloc_pfrag(struct page_frag_cache *nc, struct page_frag *pfrag);
->>
->> The API naming of 'page_frag_alloc_pfrag' seems a little odd to me, any better
->> one in your mind?
-> 
-> Well at this point we are populating/getting/pulling a page frag from
-> the page frag cache. Maybe look for a word other than alloc such as
-> populate. Essentially what you are doing is populating the pfrag from
-> the frag cache, although I thought there was a size value you passed
-> for that isn't there?
-
-'struct page_frag' does have a size field, but I am not sure if I
-understand what do you mean by  'although I thought there was a size
-value you passed for that isn't there?‘ yet.
+=E2=80=94G=C3=BCnther
 
