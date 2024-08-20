@@ -1,118 +1,94 @@
-Return-Path: <netdev+bounces-119970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A3C957B4E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 04:08:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 421AA957B5E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 04:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2A9F1C22F1E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:08:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3449B22E79
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225041CF83;
-	Tue, 20 Aug 2024 02:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A568224D6;
+	Tue, 20 Aug 2024 02:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="myNqlT37"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9LLoVWm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27A02C181;
-	Tue, 20 Aug 2024 02:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D600217FE
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 02:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724119678; cv=none; b=K5XQ6i+8rAN4RuiwQFe+F5SUPhRsK3c3BQhK0oWx0xVVdJDOJJHQHGTNdpewGruUUrfNzRJrDnszhWdBYzQN0IGjyITJ6ScAwC/Vc6W2/A4myUkSobxpRYQQ5JD1eTysCP6o1z/v0ob64STcOLCOH+7QJ9jHa81UvrP+Fh0GHWA=
+	t=1724120429; cv=none; b=tOSxR4fQ/c8s2xAPdQKOZSWXIxXu1TNhW/5ybKtj+XW2+U/33HQscIHZADkLQiiFVZmGGsIDXQJ+Sf3GrI8TuATqTd0TXFqvxWsAhrxXhy6NRE77cYTwl2aeThNZSfEV49hS7IL2vvT4MNwkl0Ta01wNSM27iuXdP95trQ9Y9lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724119678; c=relaxed/simple;
-	bh=ZddIw0tW5VAH05vy47Klfjadp2F4VUA1vxpIRu/A+Ls=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YAARtdAqE27E4fraw5oyqaASdQZ9XzTwg2dpvfmnLJ7Ra9BWEMFjVJXavLcrtHmq+7F9xsEcRX3FYZZLQ33cUe+dxXvLhvh3JrJmZ10fqUYFPz97KtKfGH7yplJYWWHFeKlEFxdGZOA2bvx0sCNazLHaUe+9DMsCPV7W+uReDdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=myNqlT37; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7436EC32782;
-	Tue, 20 Aug 2024 02:07:56 +0000 (UTC)
+	s=arc-20240116; t=1724120429; c=relaxed/simple;
+	bh=7M3V9fh5n1XK8+YQAMaiXimwhj4EEYS/+cfokGhiq0M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TJbr3GZBbBqtsIi+r1UKpxfE7+4o4/lLs7yzP4sARNEPg65LUOqu0vQ8hmlq4QK1uD+GCpjfAlsHpQnigHLhbjGsoTM6+xExGcSgfGX3pvJPCHoVORKk+JKN5vNxhaeZGGO3JQJItwtY+VSgG4rhXArYpGdGdH6ZDAy1iGi+XA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9LLoVWm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 736D8C32782;
+	Tue, 20 Aug 2024 02:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724119677;
-	bh=ZddIw0tW5VAH05vy47Klfjadp2F4VUA1vxpIRu/A+Ls=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=myNqlT37f5YJBFa59OcSKafME3odE0VUtB9AlIel9C9PgsOU1FIwhkkIpgLW9/H82
-	 /Ad0i7FaYYInZyZSFTRTfqP4M3N8aVKI+1RAkyVl/mkQz95EG1zHicpg2b/iBFq/vF
-	 bH1T3KTrUpE1KP5Qp/5kEDe1GduqhAPtG5wREEth4J55933AYVcHDTPe1dViVtpROX
-	 qcz0eQgfmeJrzzhk+ZoSYxkBA8MZDICEHfeDqQ0Yf8LKAhrk/udLe3xjF9fOtN7QDY
-	 QbGwVUN4QsIk8Sjti2igRtGMkDrifQd7Gogjs7mOl91fjOLncD0xTBwcVxF/qSRLIW
-	 3NWBexXhwJCKw==
-Date: Mon, 19 Aug 2024 19:07:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Martin Karsten <mkarsten@uwaterloo.ca>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, Joe Damato
- <jdamato@fastly.com>, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Christian Brauner <brauner@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jan Kara
- <jack@suse.cz>, Jiri Pirko <jiri@resnulli.us>, Johannes Berg
- <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, "open
- list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:FILESYSTEMS
- (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
-Message-ID: <20240819190755.0ed0a959@kernel.org>
-In-Reply-To: <15bec172-490f-4535-bd07-442c1be75ed9@uwaterloo.ca>
-References: <20240812125717.413108-1-jdamato@fastly.com>
-	<ZrpuWMoXHxzPvvhL@mini-arch>
-	<2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca>
-	<20240813171015.425f239e@kernel.org>
-	<15bec172-490f-4535-bd07-442c1be75ed9@uwaterloo.ca>
+	s=k20201202; t=1724120429;
+	bh=7M3V9fh5n1XK8+YQAMaiXimwhj4EEYS/+cfokGhiq0M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o9LLoVWmR/8ZyLE9iKBLMnF6YZCzSpQ6qmWm3BBzMTsfF9A6SnSfOULfOOHQT9ZeQ
+	 ajVx2y36xfGPitp9Qfop7n4CshzsYPvsVu0zSrTTFrljj9j43u/kd//ZjsrqXZ5+MZ
+	 gd1rbPJC1oLudnqwY49Vwmz4IP7pl8jycop9ck15ydDCuf4Oly4kDE1VHyWTkTfpca
+	 A9yr9cLM8fANrHL9G0bbHggiVZ6jASCwf0tXGQoxKgA+gb2n0+I7M+NIgSJwQjl1/p
+	 JNFaLW1PwtfGzPGcb3iYfc3VGkhrwL3tXqDelG39+1l7g/NoWG+Aol8rUhxi1HBqjT
+	 Hbb1oUES7hO2Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C0E3823271;
+	Tue, 20 Aug 2024 02:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] kcm: Serialise kcm_sendmsg() for the same socket.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172412042902.711456.5002721309460516473.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Aug 2024 02:20:29 +0000
+References: <20240815220437.69511-1-kuniyu@amazon.com>
+In-Reply-To: <20240815220437.69511-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, tom@herbertland.com, kuni1840@gmail.com,
+ netdev@vger.kernel.org, syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
 
-On Tue, 13 Aug 2024 21:14:40 -0400 Martin Karsten wrote:
-> > What about NIC interrupt coalescing. defer_hard_irqs_count was supposed
-> > to be used with NICs which either don't have IRQ coalescing or have a
-> > broken implementation. The timeout of 200usec should be perfectly within
-> > range of what NICs can support.
-> > 
-> > If the NIC IRQ coalescing works, instead of adding a new timeout value
-> > we could add a new deferral control (replacing defer_hard_irqs_count)
-> > which would always kick in after seeing prefer_busy_poll() but also
-> > not kick in if the busy poll harvested 0 packets.  
-> Maybe I am missing something, but I believe this would have the same 
-> problem that we describe for gro-timeout + defer-irq. When busy poll 
-> does not harvest packets and the application thread is idle and goes to 
-> sleep, it would then take up to 200 us to get the next interrupt. This 
-> considerably increases tail latencies under low load.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 15 Aug 2024 15:04:37 -0700 you wrote:
+> syzkaller reported UAF in kcm_release(). [0]
 > 
-> In order get low latencies under low load, the NIC timeout would have to 
-> be something like 20 us, but under high load the application thread will 
-> be busy for longer than 20 us and the interrupt (and softirq) will come 
-> too early and cause interference.
+> The scenario is
+> 
+>   1. Thread A builds a skb with MSG_MORE and sets kcm->seq_skb.
+> 
+>   2. Thread A resumes building skb from kcm->seq_skb but is blocked
+>      by sk_stream_wait_memory()
+> 
+> [...]
 
-An FSM-like diagram would go a long way in clarifying things :)
+Here is the summary with links:
+  - [v1,net] kcm: Serialise kcm_sendmsg() for the same socket.
+    https://git.kernel.org/netdev/net/c/807067bf014d
 
-> It is tempting to think of the second timeout as 0 and in fact re-enable 
-> interrupts right away. We have tried it, but it leads to a lot of 
-> interrupts and corresponding inefficiencies, since a system below 
-> capacity frequently switches between busy and idle. Using a small 
-> timeout (20 us) for modest deferral and batching when idle is a lot more 
-> efficient.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I see. I think we are on the same page. What I was suggesting is to use
-the HW timer instead of the short timer. But I suspect the NIC you're
-using isn't really good at clearing IRQs before unmasking. Meaning that
-when you try to reactivate HW control there's already an IRQ pending
-and it fires pointlessly. That matches my experience with mlx5. 
-If the NIC driver was to clear the IRQ state before running the NAPI
-loop, we would have no pending IRQ by the time we unmask and activate
-HW IRQs.
 
-Sorry for the delay.
 
