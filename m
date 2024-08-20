@@ -1,86 +1,119 @@
-Return-Path: <netdev+bounces-120261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1800958B87
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:44:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7050958B9A
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 17:46:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F0FE285B56
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:44:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E4E51F242C8
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980721922CE;
-	Tue, 20 Aug 2024 15:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8643018FDA9;
+	Tue, 20 Aug 2024 15:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPyGgIEd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qt7tqFwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11028FA;
-	Tue, 20 Aug 2024 15:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F48E18C931
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 15:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724168654; cv=none; b=jVxX0zg+UgewRyJ0RLXS+DZ1zF3ud+N3HnS6wCGK4H8QLzxIx1Skx8osIyW17fRnRhr/GhxheRIEyrD2gc0QMLa+VVJGuhybEgYr9WGrbpFOpiujSu5x/p2+WyF2qD7dcExf4TnUix6BbqssENtcj4ba5+NxO1F82xeiCc8t2Y0=
+	t=1724168752; cv=none; b=oVZqi8GTZsy6fNkfuPrWWx+LUWJJ4BAxuu1MJV52WYhd1gjGar5lgwfx3qg7BjGUVjFVz5Bne6NlKvzQ42SaIHtaQFfe0x6t3Z5Oq/UuhzBavUjRc7tTjXp7WS1+BNZqxt6SECqN0mg3rpfjWOB59RRs4psUJ5q2EbdXIQkwDAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724168654; c=relaxed/simple;
-	bh=LJHIjjZmTeHPbvbylPUDocAOSUXKU4/fe6hYJ39l/Jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gm3ckTdYbEv1Kob+bgDL2wd8S+gn0zHcyZDvZzz+tzDsiFEs3jxKfTZw8wFav9VTXv8t9ZQVTKPXKJ5fDRPWPn9QohQe6+A3EMJypi0K4+JD3FPDPQlZ7j5kq3KNTsXm5+uZBKIB1oSDAsQDFqjfaq4uJytLXqHharPGZnmLDFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPyGgIEd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E580C4AF0B;
-	Tue, 20 Aug 2024 15:44:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724168654;
-	bh=LJHIjjZmTeHPbvbylPUDocAOSUXKU4/fe6hYJ39l/Jc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mPyGgIEdP3WlUsYf9EgnhV3vJ+69e4hpvnc5K9hLaZLc+J1JOIV456zwKvPIt23On
-	 pU2yOwj6GlLL4Gw2Enc+i1I2hqFEmhRNpV7/Om16wDFIA0w83ysiKrsBvUVWHeh4ps
-	 rVpwVJ+iPQHFAM0/ACz6jEKS4SdDCy1Ly0dLiIIKCSFPeptCz+JFwsPmwBmNMz8alG
-	 HPMJDo7aF24B1EF/HwTq54yIcj+i8JYn0D8o010T2nM62kHdvxlGQW0O9F5bOS1rp2
-	 ciMhdgDybY7DotkBpz9Nb6dMx+IuGMkxaAO1xwcoTJDIRJ4AWUTecn3f9OpAZizt5f
-	 cixEuk86zn6RQ==
-Date: Tue, 20 Aug 2024 08:44:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, Ido
- Schimmel <idosch@idosch.org>
-Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
- nettest is available
-Message-ID: <20240820084412.4aa6abfb@kernel.org>
-In-Reply-To: <ZsQLFwkNa-JnymGg@Laptop-X1>
-References: <20240820004217.1087392-1-kuba@kernel.org>
-	<ZsQLFwkNa-JnymGg@Laptop-X1>
+	s=arc-20240116; t=1724168752; c=relaxed/simple;
+	bh=fEL3k3VH9vKHkg+zWLMd02Gj9zqu6GenXTUXkYtaHq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fMOPxhDWm+3gHFxZ3b6NGoKZ9HWzbuQmz7ByavrWhuYwOPMKq0WR2iB669hiq/GICIaOX6TXQAG2saXiG+o6+Do8WogNMQbmWoAkSHexfCxo6eW2VTXfYhXAhhtVsAupt3JUBRRbwJCvOKBDVJfzpbrXwr119FV3BZE9TPbpmgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qt7tqFwm; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b01f7a4a-733c-4f38-a29e-893dc15fc79d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724168747;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MvGWCUYzijj0bEkxNqakeGax4hSKytFK7FM4L0Ab6Ig=;
+	b=Qt7tqFwmG0BecNjRTLCHiRiPMyRIU79a3rk5aku1IrCmyMgdqPU9+V6T7soWvrSaKap3BJ
+	vlI/i0pudTNWX+cCgGE/46Vfg6MTN1BfaSDfGp4qJHaGJZfcZ7PNNv3GM9HeUYUCI6KVj9
+	qFsMm6YGx+HiCT0Sbkij/8FLOvFQRYw=
+Date: Tue, 20 Aug 2024 16:45:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net v4 1/2] ptp: ocp: adjust sysfs entries to expose tty
+ information
+To: Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, Jiri Slaby
+ <jirislaby@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+References: <20240820151617.3835870-1-vadfed@meta.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240820151617.3835870-1-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 20 Aug 2024 11:18:47 +0800 Hangbin Liu wrote:
-> Excuse me, what's profile used here? I can't find the definition in
-> Documentation/dev-tools/kselftest.rst.
+On 20/08/2024 16:16, Vadim Fedorenko wrote:
+> Starting v6.8 the serial port subsystem changed the hierarchy of devices
+> and symlinks are not working anymore. Previous discussion made it clear
+> that the idea of symlinks for tty devices was wrong by design [1].
+> Implement additional attributes to expose the information. Fixes tag
+> points to the commit which introduced the change.
+> 
+> [1] https://lore.kernel.org/netdev/2024060503-subsonic-pupil-bbee@gregkh/
+> 
+> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
+> v3 -> v4:
+> - re-organize info printing to use ptp_ocp_tty_port_name()
+> - keep uintptr_t to be consistent with other code
+> v2 -> v3:
+> - replace serial ports definitions with array and enum for index
+> - replace pointer math with direct array access
+> - nit in documentation spelling
+> v1 -> v2:
+> - add Documentation/ABI changes
+> ---
+>   drivers/ptp/ptp_ocp.c | 168 +++++++++++++++++++++++++-----------------
+>   1 file changed, 102 insertions(+), 66 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index ee2ced88ab34..11d96045e5ec 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
 
-Ah, sorry, I added timestamping output as a local patch for NIPA.
+[ .. snip .. ]
 
-Random example:
+> @@ -3346,6 +3361,54 @@ static EXT_ATTR_RO(freq, frequency, 1);
+>   static EXT_ATTR_RO(freq, frequency, 2);
+>   static EXT_ATTR_RO(freq, frequency, 3);
+>   
+> +static ssize_t
+> +ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
+> +{
+> +	struct dev_ext_attribute *ea = to_ext_attr(attr);
+> +	struct ptp_ocp *bp = dev_get_drvdata(dev);
+> +	struct ptp_ocp_serial_port *port;
 
-TAP version 13
-1..1
-# overriding timeout to 7200
-# selftests: net: amt.sh
-# 13.15 [+13.15] TEST: amt discovery                                                 [ OK ]
-# 16.27 [+3.12] TEST: IPv4 amt multicast forwarding                                 [ OK ]
-# 19.14 [+2.86] TEST: IPv6 amt multicast forwarding                                 [ OK ]
-# 670.88 [+651.74] TEST: IPv4 amt traffic forwarding torture                           [ OK ]
-# 1203.28 [+532.40] TEST: IPv6 amt traffic forwarding torture                           [ OK ]
-ok 1 selftests: net: amt.sh
+looks like this fix didn't get to the series for some reasons.
+I'll definitely send v5 with this part removed, but other code
+is good to review
 
-It's not great, makes the lines longer and misaligned.
-But it's helpful for debugging slow tests.
+> +
+> +	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
+> +}
+> +
 
