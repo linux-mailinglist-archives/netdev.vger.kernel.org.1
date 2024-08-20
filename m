@@ -1,80 +1,55 @@
-Return-Path: <netdev+bounces-120104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93261958515
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:46:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A5895852B
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 259B4B26764
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:46:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4E51C23E01
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0433718E028;
-	Tue, 20 Aug 2024 10:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A6718DF6B;
+	Tue, 20 Aug 2024 10:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3PXx2j+"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ruGjHovj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AE818DF84
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 10:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33B8178376;
+	Tue, 20 Aug 2024 10:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150710; cv=none; b=HvoWn7v+R/TF8CjNsLKHrG4oLGUUrHZE+c8nroEFZy4QMQ9GAehA4Q5gkrxptNShGr+BZV0bQrcbZE8vmYB2cXxVCAi8Jj/HhOINChEiLWoG9r+fZq47OkmNIiiNB7hZcmrlpPSVJCtbqwjzsLG6wgLpjp9NrN2E2+tHcyD6Y5Q=
+	t=1724151028; cv=none; b=qtpybK4nSX1yVjrHd/YMnFHxk/7wfZE/CiiO69+hsFDkito4vXK757BEdePXhDXyTRt4e5KpTAaUH8h0FBhc7ougaa38LLIuPX/SsPAngR27/s8bLl2jF2MSCg07EJr3uvL0gBc5s+Kvgbz85TeyfYUsebPf8Dr6mbcsnBQgU8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724150710; c=relaxed/simple;
-	bh=sFVfJBKE5ac/TDph1oBNvCoOGF/b+CejLCy2FTFfdW0=;
+	s=arc-20240116; t=1724151028; c=relaxed/simple;
+	bh=BW1vJ2JdPKxvBDkkh/Ej1m8/rVRSPIhmWDHII2qDfoQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qpXWKlqqrsEgO1HwHFnayGtIFb+psE6RprDgtwfAGWX2YJfB68YEA1+b0MygUvyrksJfpLyw0nZxlzaUwEd3b+eG5DIXl1lMESU55BB7ppJQj3GuNKVH4RIH71ifUfsCyHLdahX9NagNkJsgte53ZBdvaZjdLrKXc13fXJFIRbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3PXx2j+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724150707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EGfup/GIC5d/0ml/A8/AQVsp8wsdLNzZ4+eJ30JsWZ4=;
-	b=H3PXx2j+aWAC2SYyUbMzvqCti4fE98Xvp9Yl5O6ctN3z/xH1eYwRpV0U35pvlHDKr6lin3
-	ag1/4DWwukkpMSzdbHiexTcN0inIx4dCJ4KEGkCLUmqGJF50mULl/Lxjo8vbA9tTq+i0pt
-	ejLVzpoLB7tnCwtCjNJayNoZqgBibpQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-EwJZMJNwOO6TrU2zDQh0_g-1; Tue, 20 Aug 2024 06:45:04 -0400
-X-MC-Unique: EwJZMJNwOO6TrU2zDQh0_g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42808f5d32aso9827815e9.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 03:45:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724150703; x=1724755503;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGfup/GIC5d/0ml/A8/AQVsp8wsdLNzZ4+eJ30JsWZ4=;
-        b=WtLffOjFU2V9dKdFEI8yq43UwOUXGmxZE7lzRIKeIw8LqIYCv58VKE+bu8flazEkbi
-         0XnlXf5Z9sOSCabYrlM26EcPqfvdWUfGp+fpuk0+rPJ0dRdT/Opy+N2andVddpTssD3Y
-         qDpe9NdNEP4QRMAC0EFpDkoTZ3i3bXap+pCbJbQGgVUBHmBXug6esuoEmtfhJfXOWYZ3
-         zopyl/MzSsiOQOXzAIbbAo0LZbkSj9aH51DuGBp3EW0ed4OzSsq3lC7EQOGXsmrhV7yq
-         uVgVk9Pmt4t5LW62+qEznG+NSn20S+IO3p9NtG9ck1ujbjB1t1ofAr7su0uYMHgX7uj1
-         d5RA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaOL6QdHkWDbBKSpzIggh4jVhX4gSXHp//gmuJDWpAOcSiwhxQd17OqfX4HtT+rVtIzzxgzoucFwbqk6C0p8kphfapqBbd
-X-Gm-Message-State: AOJu0Yx6ijlL9m6mlPkkTc5kQjc+8ljALzjkWefHfM30APt0tmta0Dq2
-	vpz7Lqe+Ih+h/XV0aeb7RLxxhiHe225rKe7d/1ZGaE/hzc51pxZAMK3kgid8kRb7QUGPTfBKOOw
-	be1f29ypOFF4VIIQHe/4Sblq/+Ss1EwLEMhikWz3aFaK1ZEWASl98/g==
-X-Received: by 2002:a05:600c:1d12:b0:427:9f71:16ba with SMTP id 5b1f17b1804b1-429ed7fdbe1mr57450245e9.5.1724150703481;
-        Tue, 20 Aug 2024 03:45:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8cTXnqRWYqqm0XpVAVQ8pCeuWaYsky+/icxWWxftsJM5lZe26M/fHr1QH1BCVYmmEycldNA==
-X-Received: by 2002:a05:600c:1d12:b0:427:9f71:16ba with SMTP id 5b1f17b1804b1-429ed7fdbe1mr57450055e9.5.1724150703020;
-        Tue, 20 Aug 2024 03:45:03 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5? ([2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718983a31csm12842627f8f.17.2024.08.20.03.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Aug 2024 03:45:02 -0700 (PDT)
-Message-ID: <e0f35083-7604-4766-990a-f77554e0202f@redhat.com>
-Date: Tue, 20 Aug 2024 12:45:00 +0200
+	 In-Reply-To:Content-Type; b=VGTXTXgqUakveRplJD2+/caFHDFKNKr6YjBEnmJqlVb27Cju3ACZaXxHwnZ2FGbJ6IR30KMlP/Vw4eDvUTW/g81shNcWr8VpR6k0bMV2heD5iQmS3OHqSZcrVG7bJtrGuxZSeGAXV6IyonOfo08ny3v9Q05yGHCCg/uisBQm4b8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ruGjHovj; arc=none smtp.client-ip=80.12.242.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id gMRNs7LZjwSfLgMRNsuK6W; Tue, 20 Aug 2024 12:50:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1724151023;
+	bh=X3DOniTI7c55GuiMpK8pOTIVjxNvcVnLEOswNdsJKGk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=ruGjHovjwVAFHkPZLxFnKlkVPSR2sH1Tu8Yzl2KCNT+h0UXE/4BbQPCozyF2XbFZ/
+	 nwpCjlw+zrln9JtbDFUk46hZna6dmbneDRXpOg01Mqh2+FB/bqt95uevMJ3jixrJ8Z
+	 TmWJa0R+gQavq69twWk3XNGOruh6Eq2n3ZCW6/MGUfq2zHrWZCSjaIQwUIlowhHpzZ
+	 Fnt8K3hVLPlc6xZYMbYmpijRyRIRLbtYz5iQZ/UWazGyJUHpfitv6UATNyixmJUbQG
+	 vMGb1d4pU/44nDXBHLabcwHkENzJjyG4ymuJRiApewfa/DL4KqayoEDn/VuMTmoWWl
+	 zWOsqj6Kbw+bQ==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Tue, 20 Aug 2024 12:50:23 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <d35a962d-dc95-4469-867e-95b704cca474@wanadoo.fr>
+Date: Tue, 20 Aug 2024 12:50:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,72 +57,166 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net,v5,2/2] net/smc: modify smc_sock structure
-To: Jeongjun Park <aha310510@gmail.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- dust.li@linux.alibaba.com, ubraun@linux.vnet.ibm.com, utz.bacher@de.ibm.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240815043714.38772-1-aha310510@gmail.com>
- <20240815043904.38959-1-aha310510@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240815043904.38959-1-aha310510@gmail.com>
+Subject: Re: [PATCH 8/9] vdap: solidrun: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: alexandre.torgue@foss.st.com, alvaro.karsz@solid-run.com,
+ andy@kernel.org, axboe@kernel.dk, bhelgaas@google.com, brgl@bgdev.pl,
+ broonie@kernel.org, christophe.jaillet@wanadoo.fr, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+ hao.wu@intel.com, jasowang@redhat.com, joabreu@synopsys.com,
+ kuba@kernel.org, linus.walleij@linaro.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ mcoquelin.stm32@gmail.com, mdf@kernel.org, mst@redhat.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ trix@redhat.com, virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+ yilun.xu@intel.com
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-10-pstanner@redhat.com>
+ <74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr>
+ <3e4288bb7300f3fd0883ff07b75ae69d0532019b.camel@redhat.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <3e4288bb7300f3fd0883ff07b75ae69d0532019b.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-
-
-On 8/15/24 06:39, Jeongjun Park wrote:
-> Since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
+Le 20/08/2024 à 10:09, Philipp Stanner a écrit :
+>>> @@ -556,33 +556,24 @@ static const struct vdpa_config_ops
+>>> snet_config_ops = {
+>>>    static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet
+>>> *psnet)
+>>>    {
+>>>    	char name[50];
+>>> -	int ret, i, mask = 0;
+>>> +	int i;
+>>> +
+>>> +	snprintf(name, sizeof(name), "psnet[%s]-bars",
+>>> pci_name(pdev));
+>>> +
+>>>    	/* We don't know which BAR will be used to communicate..
+>>>    	 * We will map every bar with len > 0.
+>>>    	 *
+>>>    	 * Later, we will discover the BAR and unmap all other
+>>> BARs.
+>>>    	 */
+>>>    	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>>> -		if (pci_resource_len(pdev, i))
+>>> -			mask |= (1 << i);
+>>> -	}
+>>> -
+>>> -	/* No BAR can be used.. */
+>>> -	if (!mask) {
+>>> -		SNET_ERR(pdev, "Failed to find a PCI BAR\n");
+>>> -		return -ENODEV;
+>>> -	}
+>>> -
+>>> -	snprintf(name, sizeof(name), "psnet[%s]-bars",
+>>> pci_name(pdev));
+>>> -	ret = pcim_iomap_regions(pdev, mask, name);
+>>> -	if (ret) {
+>>> -		SNET_ERR(pdev, "Failed to request and map PCI
+>>> BARs\n");
+>>> -		return ret;
+>>> -	}
+>>> +		if (pci_resource_len(pdev, i)) {
+>>> +			psnet->bars[i] = pcim_iomap_region(pdev,
+>>> i, name);
+>>
+>> Hi,
+>>
+>> Unrelated to the patch, but is is safe to have 'name' be on the
+>> stack?
+>>
+>> pcim_iomap_region()
+>> --> __pcim_request_region()
+>> --> __pcim_request_region_range()
+>> --> request_region() or __request_mem_region()
+>> --> __request_region()
+>> --> __request_region_locked()
+>> --> res->name = name;
+>>
+>> So an address on the stack ends in the 'name' field of a "struct
+>> resource".
 > 
-> To solve this, we need to modify the smc_sock structure.
+> Oh oh...
 > 
-> Fixes: ac7138746e14 ("smc: establish new socket family")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->   net/smc/smc.h | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> According to a few grep, it looks really unusual.
+>>
+>> I don't know if it is used, but it looks strange to me.
 > 
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index 34b781e463c4..0d67a02a6ab1 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -283,7 +283,10 @@ struct smc_connection {
->   };
->   
->   struct smc_sock {				/* smc sock container */
-> -	struct sock		sk;
-> +	union {
-> +		struct sock		sk;
-> +		struct inet_sock	inet;
-> +	};
->   	struct socket		*clcsock;	/* internal tcp socket */
->   	void			(*clcsk_state_change)(struct sock *sk);
->   						/* original stat_change fct. */
+> 
+> I have seen it used in the kernel ringbuffer log when you try to
+> request something that's already owned. I think it's here, right in
+> __request_region_locked():
+> 
+> /*
+>   * mm/hmm.c reserves physical addresses which then
+>   * become unavailable to other users.  Conflicts are
+>   * not expected.  Warn to aid debugging if encountered.
+>   */
+> if (conflict->desc == IORES_DESC_DEVICE_PRIVATE_MEMORY) {
+> 	pr_warn("Unaddressable device %s %pR conflicts with %pR",
+> 		conflict->name, conflict, res);
+> }
+> 
+> 
+> Assuming I interpret the code correctly:
+> The conflicting resource is found when a new caller (e.g. another
+> driver) tries to get the same region. So conflict->name on the original
+> requester's stack is by now gone and you do get UB.
+> 
+> Very unlikely UB, since only rarely drivers race for the same resource,
+> but still UB.
+> 
+> But there's also a few other places. Grep for "conflict->name".
+> 
+>>
+>>
+>> If it is an issue, it was apparently already there before this patch.
+> 
+> I think this has to be fixed.
+> 
+> Question would just be whether one wants to fix it locally in this
+> driver, or prevent it from happening globally by making the common
+> infrastructure copy the string.
+> 
+> 
+> P.
+> 
 
-As per the running discussion here:
+Not a perfect script, but the below coccinelle script only find this 
+place, so I would +1 only fixing things here only.
 
-https://lore.kernel.org/all/5ad4de6f-48d4-4d1b-b062-e1cd2e8b3600@linux.ibm.com/#t
+Agree?
 
-you should include at least a add a comment to the union, describing 
-which one is used in which case.
+CJ
 
-My personal preference would be directly replacing 'struct sk' with
-'struct inet_sock inet;' and adjust all the smc->sk access accordingly, 
-likely via a new helper.
 
-I understand that would be much more invasive, but would align with 
-other AF.
 
-Thanks,
+@@
+identifier name;
+expression x;
+constant N;
+@@
+	char name[N];
+	...
+(
+*	pcim_iomap_region(..., name, ...);
+|
+*	pcim_iomap_regions(..., name, ...);
+|
+*	request_region(..., name, ...);
+|
+*	x = pcim_iomap_region(..., name, ...);
+|
+*	x = pcim_iomap_regions(..., name, ...);
+|
+*	x = request_region(..., name, ...);
+)
 
-Paolo
 
 
