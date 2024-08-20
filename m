@@ -1,156 +1,113 @@
-Return-Path: <netdev+bounces-120098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F30958476
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:28:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91CCF958496
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035181F276F5
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:28:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50E2A2825A9
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30B618CC02;
-	Tue, 20 Aug 2024 10:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC2A15C12F;
+	Tue, 20 Aug 2024 10:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WMny8QmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E0E7581F;
-	Tue, 20 Aug 2024 10:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857D518CC1F;
+	Tue, 20 Aug 2024 10:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724149713; cv=none; b=qUwxUOO6YqmqE4zfVmiVrIfwl7sFLX5i4h/w+gWUuu8TuIo913vCVN+ArjS8LahKLkMYzsjNLKXoPC36n09FRUI1iGjLWISq4L+szMad3Zpy1n7XAy4ZGeTDZUWPTneHNzLsocPW5p4Li4336Zd/xY/Vf3SKjlnG1ziO7150m4Y=
+	t=1724149922; cv=none; b=pqAtirZoouJXMiNRGKVEXTvThZSQU1qKr1kI1PpASTsw8blgI/9C/Vqk8nO9JCks6TF6qQmv2MSTj5+/pRJGb4lzfSpKW2rYA+z8W7hHBeDnZhs8GcVHdk77z//ueHZC5a4OgLrPySHmu3CwAh8yCNBRnsHyzw30fCE69E6P6a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724149713; c=relaxed/simple;
-	bh=O5k60SiozUItOe57/Mfcp/M4CbNdahVcbyT/Wm67rEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d9gDwZHGHVtGUPm/N0fKMwl7hnU+j24r5Gw4YaXnMV6KU/gEQ5xfC+caWQCH3xvJj9U2fDQffnw8iMofV4CbiAUuUoo4rN0eSGG/e2XRBb8tBs7rpBrY4U4l8oDVc9qD25/CzP4iE+eRZNAYIZ7g9Wo2+115J7VmMIDoA9fPmGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: SJHUM3mGQFGy0SMvf5/nCg==
-X-CSE-MsgGUID: kT+KZVUQR0W9gpqzwdmEBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="26306108"
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="26306108"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:28:31 -0700
-X-CSE-ConnectionGUID: i2TeOzYIRg25kacmae/h/Q==
-X-CSE-MsgGUID: FG1tjdHOT4uS3xW62Fnj5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
-   d="scan'208";a="60664479"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:28:23 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy@kernel.org>)
-	id 1sgM65-0000000HGOZ-3tRE;
-	Tue, 20 Aug 2024 13:28:17 +0300
-Date: Tue, 20 Aug 2024 13:28:17 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH 4/9] block: mtip32xx: Replace deprecated PCI functions
-Message-ID: <ZsRvwVCzpLEQovmU@smile.fi.intel.com>
-References: <20240819165148.58201-2-pstanner@redhat.com>
- <20240819165148.58201-6-pstanner@redhat.com>
- <ZsOJONEA2x93bSpO@smile.fi.intel.com>
- <e406ba06180571564b47872f090623b19e4ad87e.camel@redhat.com>
+	s=arc-20240116; t=1724149922; c=relaxed/simple;
+	bh=duvv9iXl6bCaWXnoXdJU+2UgdcthjSXBUQp9V4nE5P0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=k2/Q4pQiobVwExhlInqO7Fe/YziwYgifrGEcVUiBOA/R+M/bzYQkQl+R5vKwQ0MpWO+gGJMCl9Vwkazh+ea3XEO9pFzOzaKXQpCmDrcryvjrox4TTj1HO+he+bvsDsrK6EizISZMxhQMVQJBIYWs87h4ALc+/DKgYOW2HQ0Rpew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WMny8QmW; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70d23caf8ddso4361208b3a.0;
+        Tue, 20 Aug 2024 03:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724149921; x=1724754721; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+LYknRxmxZhwkaY/3EByoVTqMfeWJl1Dz7XyYSW73hU=;
+        b=WMny8QmWbv2a6nuoGZxbdTFa5VS1BXCZ7gXkiBIeGDA1aRAIBMaUL5aEgoaudid7jx
+         XvbD+Wig8J1Z3chRosyBV/UtIACgXh6sUYZyEmtu2k9ArrPwdfmOGHkJArG+Oo+S9+i9
+         IEQu8OqHMLiMcMQ10DNqOvO51g6aoXmmrW7EVjzEXWToxQWmNJP5uDxX/YY4UuVMcq3P
+         3+2EUovcnqTsc1MQWTneOsI7H4n4R9QuvL+lc/pEr6BVQZN2IfO/pmC1TGa7/0jIaAzf
+         aXzuJysjuLvlrFRE6tA0SONQERORLPWxpHhOjXG+ZTI/RxYce2w4HcDygRvvnpW8NE/D
+         ZfRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724149921; x=1724754721;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+LYknRxmxZhwkaY/3EByoVTqMfeWJl1Dz7XyYSW73hU=;
+        b=ITpgdIOF/CghxWZxUclSlC4cZVnrxuMn+SSTAtuAvEJs1tC9ku3Y0dacTqchOqanvT
+         2liN1+MOOQl0MhzlxjFsZ90fxfip9jgwB3npBROeDWx7IMd6S7w28oOnOu1DcZTee7qK
+         sKUwR0R7Y8YE4BU0gqLWn1h66m2Y8ot9zCxDgiKVbD88MD+PF3KWBPiPEpTr+zmcHBQR
+         nJNhYhdnWW+Z+CMlLgMZE1/7vv3Fpj8ITyN39gBSmqGh/4AhzhgcqJVMIEv7u/sBxdXK
+         zfYko5fAM1QxbRTbk73c/iiWbtJcEVvXV3Q9YnAIuJbI8iDNpTyMSFaglDM0oeaHddXl
+         gudQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAfOWnM3bP6iesIx3kn7ivtqhJvtPJCh3+pLarOnZBDweFh+kdJS3jqCkhTe2QHSSIQ4hkCZTJDGwThX5WgUPi6n8qaMc6GkJeobHu15eXXq2xl6wK8HorJ24TTAFfzBLnPaiAaesHAWGgXSHMrgYKbA1yijMRUMO8Db9jR0FFXg==
+X-Gm-Message-State: AOJu0Yx0owF9/YwJz5D85ngkz4nyLILg6tmbck3PzY/NORNVQmr4vg2G
+	QsJNZD4t36I2w5NTj1F5g6oKgZz8NO5EEk+Iv7J3+tV5Nfjxtjgw
+X-Google-Smtp-Source: AGHT+IGnnPdxAw+Fi4Vu9kUTtkIaWdxJFr0nMLCwqPlwY5RQOvDfHfRPVq/sbngDpx5c7XLeXyQ5yg==
+X-Received: by 2002:a05:6a20:9c99:b0:1c0:e997:7081 with SMTP id adf61e73a8af0-1c904fb6619mr16269021637.29.1724149920673;
+        Tue, 20 Aug 2024 03:32:00 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2035040319dsm8575905ad.23.2024.08.20.03.31.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 03:32:00 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: aha310510@gmail.com
+Cc: alibuda@linux.alibaba.com,
+	davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	tonylu@linux.alibaba.com,
+	ubraun@linux.vnet.ibm.com,
+	utz.bacher@de.ibm.com,
+	wenjia@linux.ibm.com,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net,v5,1/2] net/smc: initialize ipv6_pinfo_offset in smc_inet6_prot and add smc6_sock structure
+Date: Tue, 20 Aug 2024 19:31:52 +0900
+Message-Id: <20240820103152.337880-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240815043845.38871-1-aha310510@gmail.com>
+References: <20240815043845.38871-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e406ba06180571564b47872f090623b19e4ad87e.camel@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Aug 20, 2024 at 09:29:52AM +0200, Philipp Stanner wrote:
-> On Mon, 2024-08-19 at 21:04 +0300, Andy Shevchenko wrote:
-> > On Mon, Aug 19, 2024 at 06:51:44PM +0200, Philipp Stanner wrote:
-
-...
-
-> > int mtip_pci_probe()
-> > 
-> > >  setmask_err:
-> > > -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
-> > > +	pcim_release_region(pdev, MTIP_ABAR);
-> > 
-> > But why?
+Jeongjun Park wrote:
+> Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
+> copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
 > 
-> EMOREINFOREQUIRED
-> Why I replace it or why I don't remove it completely?
-
-The latter one: Why did you leave it and not remove?
-
-...
-
-> > mtip_pci_remove()
-> > 
-> > >  	pci_disable_msi(pdev);
-> > >  
-> > > -	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
-> > 
-> > This is okay.
+> To solve this, we need to add code to smc_inet6_prot to initialize 
+> ipv6_pinfo_offset.
 > 
-> Removing it is okay, you mean.
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 
-Yes!
-
-...
-
-> > >  	pci_set_drvdata(pdev, NULL);
-> > 
-> > Side note: This is done by driver core for the last 10+ years…
-> 
-> Ah you know Andy, kernel programmers be like: "When you're hunting you
-> better make sure the wild sow is really dead before you load it in your
-> trunk" ;p
-
-Indeed, I had been told many times myself to improve / cleanup things unrelated
-to the working area before actually considering my little work...
-
-But, I specifically mark it as a "Side note:", so it's up to you to address
-or not.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Reported-by: syzkaller <syzkaller@googlegroups.com>
 
