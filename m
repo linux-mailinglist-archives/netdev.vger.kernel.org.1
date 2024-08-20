@@ -1,84 +1,233 @@
-Return-Path: <netdev+bounces-120298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4783958E07
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60482958E0F
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2548BB210D0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:30:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A1AEB227A3
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CAEEAC5;
-	Tue, 20 Aug 2024 18:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E16314B96B;
+	Tue, 20 Aug 2024 18:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vGVUmM50"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XG/5LE3T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCEC28F0;
-	Tue, 20 Aug 2024 18:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5FB14B94B
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 18:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724178637; cv=none; b=KvqTR3HkzKClBiXpSE8s3SbdCVqeVdd7whdM26RhfO3WSVK1sVynrJH/VQX8ZzuFFs59zJ03Y1JAk1e4kMrUsJ1V4Foof7NsuNKsmlOj4zji/eqwzEoRlBUz9+cSKeIo2Fsj5Y3IYYzp4zQEeCIxp0BMZeYo5gyBRq9eF58hgeE=
+	t=1724178697; cv=none; b=l1WKaNyDg6jBGva+RxxdBaxs/H11rhfIWrG8PGJADsbgxwrRSGHZxuuWj8dZTP7NWBJTWCdO1PMH9YMP4nCPAZ265DsC+yyn4GdfbUwoBmZKmoRb4/zhF1A8ACu8xvUrYji7e6y2SnxpGwO4HE9NT9OIu+iFNHGCwXqskrkTSFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724178637; c=relaxed/simple;
-	bh=dn831CvReeE95oeyJnj7kcLxps/9Y9GiSL2V6cuxAZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=H+u2jq8OsCaU/4JRaHuS4GhtVPqISB6Pqk413bLwOTj4DzJU7dozS219Y7ItTTdQ6orcf/0nPDa4n02SrpdJVty/7vtuMbjO2sSM9QVR+lReHQs43kMVtd4TI4tYRG79lCIUEKVz5uy7szFiw8dOGqVLyHiwhBlxbk8N3fTapCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vGVUmM50; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CC91C4AF0F;
-	Tue, 20 Aug 2024 18:30:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724178636;
-	bh=dn831CvReeE95oeyJnj7kcLxps/9Y9GiSL2V6cuxAZI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=vGVUmM50fyG1MRa0QI7uq18I0ljXIZCF0G53FR8Ut3WgCtv9vW1mn56/QbGFuXBId
-	 k1fi4NxlGLAjpp8kBe+DTTSVhwjawRkkC6p5SxeBudRfUMSf/ZZagmQbUWg5k+vNwK
-	 L6EbT5u3inGGIs9savRifLmwydBRxxOiJei8p0A7AbhSRGxVtN7rsQEXpd2c9UlRkW
-	 fH+rNbO1X53xf7zkng1ULNr2dSXU6j6CppMAB9KASbyGTlPn5oNKeYcq+hDNO7iefN
-	 uegS+Tr0wEMtRftGoHTljyozAK0UWDUm+YsNExT+9QtrlYGRBNyBVIj03/lIu3WXKY
-	 p8LMZ+Zl76Kfg==
-Date: Tue, 20 Aug 2024 11:30:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Kalle Valo <kvalo@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Marc Kleine-Budde <mkl@pengutronix.de>, Matthieu
- Baerts <matttbe@kernel.org>
-Subject: [ANN] net-next shutdown plans around LPC
-Message-ID: <20240820113034.73448a88@kernel.org>
+	s=arc-20240116; t=1724178697; c=relaxed/simple;
+	bh=XSYdjKiKvyThLATmIh9N2JQAPLRS7wiEijXbWwiDs/M=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BN3gZVO9cn+XayOX7rbNVywE3scuCXwkNCP4JtyB7tRwnoBtsI4jCKjRqMmJfwWvT2UqTvH2xYzoeWaWlUX4VhjLoTNRlyruDaoD/o5hn96I0h1pFuJ+mSX/9gwcw4VO/f9lYVdLL0JDtnNWErX2wZgY9QS++KoadYU6/ekAHT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XG/5LE3T; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7aada2358fso1073191466b.0
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 11:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724178693; x=1724783493; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C07kwkQPZHrXmRCk/7LVIjuwNmyBogh+obKLGkkmYFE=;
+        b=XG/5LE3T3o+gzqyCCzm34nba+qmCfXalrQDA360AoPJk3mlkvXoCh6/QfeZvip7m88
+         mjk3ucHDwb1pAgb+EPb5v+NwSsgFfp+LTToHWPRvGmwFGhvSKgH6uKsBqTSHIcq7ayfe
+         igGCVo7l+Anll1eM0oRtiUphZEDoR+Sfvkjr7iCAN4UCUx7MlAUSS1Ogur2VJ3W9YkXg
+         rtoaO1gBhVsVxBa3dMTKrMgQ7EwAJDPFJPhjFa5I97vK/G9xcmb35+CrJ9aJ/gqkTBWF
+         O6g9ox9cp3GKkztqS2IAN3YAPU5DLU1qODsl1PoGrL1fZ+bCdUMj0TPUOTv3TRdDIgx9
+         CLKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724178693; x=1724783493;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C07kwkQPZHrXmRCk/7LVIjuwNmyBogh+obKLGkkmYFE=;
+        b=clfhGOkZQdWpaq2gqi+bgAafxGLMwg2hjn3Uhp84GcWeSdz+lGP+9MvtghqSn9mDGQ
+         Oaj4eHlfbup60yCR5fpwsmL8jxBFVCTgSBAOBq25uT2e86Um00onu9l3VEW+nbe2KPnA
+         4IxjuctlHn5jUY53diFkD70i2OTWqEyPv6lSHxwjc9XEDAbXGqrT8jZpL5iavRhCU8mL
+         DJBjoxcE9LbZ7oPGs8SIBoDLvLXfhNMpL+8y9ebaWf5Tj2TMetx9dgyhBnfJuk8yY/MA
+         0/BUmpcVNdag5Cpl9jqqHeX6hQdcynMrVUXgyf3kL+MQByp3Jw722fYUFqNT6Wzp8lea
+         ceNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUidoa2sG1gbvUb7oMSEVxt0JklE7Z8zK+glNEKGCcKFJUjiDe0rH91xH5fsEL3VWCNEm2Gey8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF71uIsygcgeEz3EYrG8zP0A6LlV4APO0NKEFqgoSe+SZSn87Q
+	logHLOlq+3dnHX61vnTQgc+KbgI8nvqzxUvQU+rWVR9++tksRh5NYJQ/Pu6bIhk=
+X-Google-Smtp-Source: AGHT+IGOs6VYvfV4LBlh3n6XPG9LIKhdxKViotPxcCB+fUrUkrU6+w914efXSB1ZJv8NT+vGMTojLg==
+X-Received: by 2002:a17:907:1b13:b0:a86:6a9a:d719 with SMTP id a640c23a62f3a-a866a9adcddmr29207866b.29.1724178693023;
+        Tue, 20 Aug 2024 11:31:33 -0700 (PDT)
+Received: from localhost ([87.13.33.30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396940fsm796113566b.189.2024.08.20.11.31.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 11:31:32 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Tue, 20 Aug 2024 20:31:38 +0200
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 10/11] net: macb: Add support for RP1's MACB variant
+Message-ID: <ZsThCh45-WX_TDmP@apocalypse>
+Mail-Followup-To: Andrew Lunn <andrew@lunn.ch>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+ <c33fe03d-2097-4d26-b3db-8a3d6c793cd1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c33fe03d-2097-4d26-b3db-8a3d6c793cd1@lunn.ch>
 
-Hi!
+Hi Andrew,
 
-LPC 2024 will begin less than a month from now, on Sept 18th.
+On 17:13 Tue 20 Aug     , Andrew Lunn wrote:
+> > +static unsigned int txdelay = 35;
+> > +module_param(txdelay, uint, 0644);
+> 
+> Networking does not like module parameters.
+> 
+> This is also unused in this patch! So i suggest you just delete it.
+> 
+> > +
+> >  /* This structure is only used for MACB on SiFive FU540 devices */
+> >  struct sifive_fu540_macb_mgmt {
+> >  	void __iomem *reg;
+> > @@ -334,7 +337,7 @@ static int macb_mdio_wait_for_idle(struct macb *bp)
+> >  	u32 val;
+> >  
+> >  	return readx_poll_timeout(MACB_READ_NSR, bp, val, val & MACB_BIT(IDLE),
+> > -				  1, MACB_MDIO_TIMEOUT);
+> > +				  100, MACB_MDIO_TIMEOUT);
+> >  }
+>   
+> Please take this patch out of the series, and break it up. This is one
+> patch, with a good explanation why you need 1->100.
+> 
+> >  static int macb_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
+> > @@ -493,6 +496,19 @@ static int macb_mdio_write_c45(struct mii_bus *bus, int mii_id,
+> >  	return status;
+> >  }
+> >  
+> > +static int macb_mdio_reset(struct mii_bus *bus)
+> > +{
+> > +	struct macb *bp = bus->priv;
+> > +
+> > +	if (bp->phy_reset_gpio) {
+> > +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 1);
+> > +		msleep(bp->phy_reset_ms);
+> > +		gpiod_set_value_cansleep(bp->phy_reset_gpio, 0);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static void macb_init_buffers(struct macb *bp)
+> >  {
+> >  	struct macb_queue *queue;
+> > @@ -969,6 +985,7 @@ static int macb_mii_init(struct macb *bp)
+> >  	bp->mii_bus->write = &macb_mdio_write_c22;
+> >  	bp->mii_bus->read_c45 = &macb_mdio_read_c45;
+> >  	bp->mii_bus->write_c45 = &macb_mdio_write_c45;
+> > +	bp->mii_bus->reset = &macb_mdio_reset;
+> 
+> This is one patch.
+> 
+> >  	snprintf(bp->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
+> >  		 bp->pdev->name, bp->pdev->id);
+> >  	bp->mii_bus->priv = bp;
+> > @@ -1640,6 +1657,11 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
+> >  
+> >  		macb_init_rx_ring(queue);
+> >  		queue_writel(queue, RBQP, queue->rx_ring_dma);
+> > +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> > +		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> > +			macb_writel(bp, RBQPH,
+> > +				    upper_32_bits(queue->rx_ring_dma));
+> > +#endif
+> 
+> How does this affect a disto kernel? Do you actually need the #ifdef?
+> What does bp->hw_dma_cap contain when CONFIG_ARCH_DMA_ADDR_T_64BIT is
+> not defined?
+> 
+> Again, this should be a patch of its own, with a good commit message.
+> 
+> Interrupt coalescing should be a patch of its own, etc.
+> 
+>     Andrew
+>
 
-The conference will take place very close to the merge window 
-(either during the first week of the merge window, or the week
-before it). Since a lot of the maintainers and reviewers will 
-be attending LPC, netconf, maintainer summit etc. - we plan 
-to shut down net-next on Sept 13th (end of the week before LPC).
+Thanks for the feedback, I agree on all the observations. Please do note
+however that, as mentioned in the cover letter, this patch is not intended
+to be included upstream and is provided just as a quick way for anyone
+interested in testing the RP1 functionality using the Ethernet MAC. 
+As such, this patch has not been polished nor splitted into manageable bits.
+Ii'm taknge note of your comments however and will come back to them in a
+future patch that deals specifically with macb.
 
-If Linus cuts final 6.11 on the 15th - this will be a non-event.
-If he doesn't - we will operate for a week with 2 trees in 
-"fixes only mode", with net-next only accepting fixes for
-code already in it (and net operating as usual).
-
-For sub-trees which feed net-next, we would appreciate if
-the PRs were posted by Sept 12th. We may still pull extra
-stuff the week of LPC if merge window doesn't open, but
-would prefer not to :)
-
- - netdev maintainers
+Many thanks,
+Andrea
+ 
+> ---
+> pw-bot: cr
 
