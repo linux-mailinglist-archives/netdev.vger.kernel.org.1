@@ -1,115 +1,107 @@
-Return-Path: <netdev+bounces-119972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-119973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B065F957B7B
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 04:36:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE17957BC0
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 05:06:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3B71C23AB5
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 02:36:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D85221F22BF9
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 03:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8CC38DDB;
-	Tue, 20 Aug 2024 02:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mr0dkDEK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A70D1BC58;
+	Tue, 20 Aug 2024 03:05:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E0D376F1;
-	Tue, 20 Aug 2024 02:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059B433F9;
+	Tue, 20 Aug 2024 03:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724121373; cv=none; b=cKJZdkI8i+a3MbXXpOVaP1+yUuD7BTgJHsATegruUMxx2y+O812MNR6w9noBLF7zwFGHpV3VN0WNlMWCzrOQA5euvVaqfwXjT5iRyqgG+X23DrFQbkULOMzyTpJSrAdCWI4FcZXAXPfhxieVSiU4bRrsBAsYP0iarMhbjuak4vk=
+	t=1724123158; cv=none; b=EafOL37AV8muTTeFzhdPmNZjJS+HAOfKHQVnYeXlxjEu8lyKHj4O9CxzzrJmUAijEfi5CkIzMkpqM+lM+aGbfFi60gKTcowtsfefoQhEMdgDqbnRhopotiL61hY0dz1uLJB05FT7mPmbj0yAm4yYbxBcfG+SGYo2rXiML8likbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724121373; c=relaxed/simple;
-	bh=12cr/hbwQKqkr5tTboxeAWJWK4VicP7eoqPbiF2HlG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mkXEg7DKmWHNKkfR0KomyrVDLOdnsSFqPe7WKOo7SH9IlIV2ZkOt86diBa4Hp5zvqy13cUHF8nWVh2LvBNY31uKnrNNuKRFwWaAcumsEsWu6R9dssGySFRrpuFKUxKxtY2DyXYbDeeWwzLmQTER8vcydhQ/yCMnjOqsrdFcNdZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mr0dkDEK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5FA7C32782;
-	Tue, 20 Aug 2024 02:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724121372;
-	bh=12cr/hbwQKqkr5tTboxeAWJWK4VicP7eoqPbiF2HlG4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Mr0dkDEKInTMdt3g+6wda/6vUnMDji+lh+78jE+MQX7XaTQO63jyJUAGURy1E1wkl
-	 2EVhDu9zanyD8YmHJUOovMdKp2DXIKeSoshmbjd0EqtMSyun2iUZ+P/Jt2qtx6cUrQ
-	 OAnYEQo1gcuG68XEkF90g7ZUCWtxLDQ2XdUPBPkteGr492v+p7gib4JFrYeYQU6VYr
-	 Li/35+evsg50rhIstrMn7b87pLJBJJpZVS3W4ZGZhF1ugcPtSUvWCSJ7WfVuSDhuTo
-	 Esc/97nIJdWIinhqA4iG7mHx7KjIiedSgl+Ql+YQoyeMDZ9mVMGkr1cIMC/mh3EuEU
-	 K2U2pkqLqnSRw==
-Date: Mon, 19 Aug 2024 19:36:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Martin Karsten <mkarsten@uwaterloo.ca>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Joe Damato <jdamato@fastly.com>
-Cc: Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev
- <sdf@fomichev.me>, netdev@vger.kernel.org, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Christian Brauner <brauner@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jan Kara
- <jack@suse.cz>, Jiri Pirko <jiri@resnulli.us>, Johannes Berg
- <johannes.berg@intel.com>, Jonathan Corbet <corbet@lwn.net>, "open
- list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:FILESYSTEMS
- (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Subject: Re: [RFC net-next 0/5] Suspend IRQs during preferred busy poll
-Message-ID: <20240819193610.5f416199@kernel.org>
-In-Reply-To: <4dc65899-e599-43e3-8f95-585d3489b424@uwaterloo.ca>
-References: <ZrqU3kYgL4-OI-qj@mini-arch>
-	<d53e8aa6-a5eb-41f4-9a4c-70d04a5ca748@uwaterloo.ca>
-	<Zrq8zCy1-mfArXka@mini-arch>
-	<5e52b556-fe49-4fe0-8bd3-543b3afd89fa@uwaterloo.ca>
-	<Zrrb8xkdIbhS7F58@mini-arch>
-	<6f40b6df-4452-48f6-b552-0eceaa1f0bbc@uwaterloo.ca>
-	<CAAywjhRsRYUHT0wdyPgqH82mmb9zUPspoitU0QPGYJTu+zL03A@mail.gmail.com>
-	<d63dd3e8-c9e2-45d6-b240-0b91c827cc2f@uwaterloo.ca>
-	<66bf61d4ed578_17ec4b294ba@willemb.c.googlers.com.notmuch>
-	<66bf696788234_180e2829481@willemb.c.googlers.com.notmuch>
-	<Zr9vavqD-QHD-JcG@LQ3V64L9R2>
-	<66bf85f635b2e_184d66294b9@willemb.c.googlers.com.notmuch>
-	<02091b4b-de85-457d-993e-0548f788f4a1@uwaterloo.ca>
-	<66bfbd88dc0c6_18d7b829435@willemb.c.googlers.com.notmuch>
-	<e4f6639e-53eb-412d-b998-699099570107@uwaterloo.ca>
-	<66c1ef2a2e94c_362202942d@willemb.c.googlers.com.notmuch>
-	<4dc65899-e599-43e3-8f95-585d3489b424@uwaterloo.ca>
+	s=arc-20240116; t=1724123158; c=relaxed/simple;
+	bh=h+lJj32e5Les/AKmys15hgtO+gemKk3QMI/MW5nfIz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UagTMqbN7jjUOT413paTeEuzLx1z1WoChRs1XSQ16/edixCRBhw8eHJpUggCIYG28vVoKJulAMjdhg3sLRmctwQUP1/iwJL7WHUiWH0vo6GH0NMnPJva65EleJaKfKucLSvogY+JLTyGwXWHDAmWdKqydTKdzXLUvsqwhLGlFIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=43.154.197.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz4t1724123083troqc9q
+X-QQ-Originating-IP: P77o5A9NWfznVPAyzaFB39dZc3GenpqjoGvKa0RjKFQ=
+Received: from localhost.localdomain ( [122.235.140.94])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 20 Aug 2024 11:04:28 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 563778973539283072
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	kuba@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	andrew@lunn.ch,
+	jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	stable@vger.kernel.org,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net v3] net: ngbe: Fix phy mode set to external phy
+Date: Tue, 20 Aug 2024 11:04:25 +0800
+Message-ID: <E6759CF1387CF84C+20240820030425.93003-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-On Sun, 18 Aug 2024 10:51:04 -0400 Martin Karsten wrote:
-> >> I believe this would take away flexibility without gaining much. You'd
-> >> still want some sort of admin-controlled 'enable' flag, so you'd still
-> >> need some kind of parameter.
-> >>
-> >> When using our scheme, the factor between gro_flush_timeout and
-> >> irq_suspend_timeout should *roughly* correspond to the maximum batch
-> >> size that an application would process in one go (orders of magnitude,
-> >> see above). This determines both the target application's worst-case
-> >> latency as well as the worst-case latency of concurrent applications, if
-> >> any, as mentioned previously.  
-> > 
-> > Oh is concurrent applications the argument against a very high
-> > timeout?  
-> 
-> Only in the error case. If suspend_irq_timeout is large enough as you 
-> point out above, then as long as the target application behaves well, 
-> its batching settings are the determining factor.
+The MAC only has add the TX delay and it can not be modified.
+MAC and PHY are both set the TX delay cause transmission problems.
+So just disable TX delay in PHY, when use rgmii to attach to
+external phy, set PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
+And it is does not matter to internal phy.
 
-Since the discussion is still sort of going on let me ask something
-potentially stupid (I haven't read the paper, yet). Are the cores
-assumed to be fully isolated (ergo the application can only yield 
-to the idle thread)? Do we not have to worry about the scheduler
-deciding to schedule the process out involuntarily?
+Fixes: bc2426d74aa3 ("net: ngbe: convert phylib to phylink")
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: stable@vger.kernel.org # 6.3+
+---
+v3:
+-Rebase the fix commit for net.
+v2:
+-Add a comment for the code modification.
+-Add the problem in commit messages.
+https://lore.kernel.org/netdev/E9C427FDDCF0CBC3+20240812103025.42417-1-mengyuanlou@net-swift.com/
+v1:
+https://lore.kernel.org/netdev/C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com/
+
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index ec54b18c5fe7..a5e9b779c44d 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -124,8 +124,12 @@ static int ngbe_phylink_init(struct wx *wx)
+ 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+ 	config->mac_managed_pm = true;
+ 
+-	phy_mode = PHY_INTERFACE_MODE_RGMII_ID;
+-	__set_bit(PHY_INTERFACE_MODE_RGMII_ID, config->supported_interfaces);
++	/* The MAC only has add the Tx delay and it can not be modified.
++	 * So just disable TX delay in PHY, and it is does not matter to
++	 * internal phy.
++	 */
++	phy_mode = PHY_INTERFACE_MODE_RGMII_RXID;
++	__set_bit(PHY_INTERFACE_MODE_RGMII_RXID, config->supported_interfaces);
+ 
+ 	phylink = phylink_create(config, NULL, phy_mode, &ngbe_mac_ops);
+ 	if (IS_ERR(phylink))
+-- 
+2.43.2
+
 
