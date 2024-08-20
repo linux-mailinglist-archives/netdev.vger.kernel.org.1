@@ -1,130 +1,120 @@
-Return-Path: <netdev+bounces-120380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7446959148
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:41:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C7C959154
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:45:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76CB31F232CC
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 23:41:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12BC4284440
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 23:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B5B1C8FAB;
-	Tue, 20 Aug 2024 23:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6581C8FAD;
+	Tue, 20 Aug 2024 23:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fjzrP2UC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X94LOzhv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEE414A4F0;
-	Tue, 20 Aug 2024 23:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF1718E351
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 23:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724197288; cv=none; b=CuwIgjokmDnVHEETJeKR+Kpz8h/YmY19AoyFFld4tgIemPBiSgc/o1H4K0Coet5tWN1K3TAiDBDDMslRUv0Xm5/gB7+wXvdLKdiyUtIlkjvIU7NdnbbBUJFfL+XyWB80nsAJ6kGLg18AHhctUpnqRzxw+SVzi9gof1pyrPxwQz0=
+	t=1724197525; cv=none; b=DogMejXzZdVlpOG1pTOKo/xyqsgFYA37LQqW7STMBotwWUsjeeIBST7TRBEZy35NuCsNjv13qlLWSQTDzYGDSEkN/COQTU3pQDClw6VOqejT2FkIFOWZC53ngW5CKGgem+M5Ivn/DKfLGZwmF5Q7DAf5f5mOWkEVzWJX/iH7rlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724197288; c=relaxed/simple;
-	bh=2C1+fevqxPQfpmLOWSDAXkqFMWb31NM79hCoChzWAJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kQ7txzFIpmkWthBDjd0lrWXM4sySNiwrWiinbBIsHhc+2/6Cy7H0ww8xFqG4aifX04eLZBLBn1+5RQeTHwHl5THJ6paT6dKkDIL1Bx+YS0TxuGPMWi4HpqVAB5cQDjeKfi5t6nbSmMXhPrge387U7xFMWDfBU3MpZdUQ/1juLGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fjzrP2UC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8FFCC4AF09;
-	Tue, 20 Aug 2024 23:41:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1724197288;
-	bh=2C1+fevqxPQfpmLOWSDAXkqFMWb31NM79hCoChzWAJk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fjzrP2UCDe6P96m/i5mMRm6/os3z55k5saXaXiGdplqziJR08esyx4eDTYs1VSvJn
-	 Td+wjiMx7UgbU3VkkYwo9zPncFLdH1smgsbP0GbqqGdRK1D+ofiZqPm6xwvsJDeCbT
-	 iFcbWtGGcF/TQJdRQwRQ6YIiKpNJAu/sVU0I0FAM=
-Date: Wed, 21 Aug 2024 07:41:24 +0800
-From: Greg KH <gregkh@linuxfoundation.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me, aliceryhl@google.com
-Subject: Re: [PATCH net-next v6 1/6] rust: sizes: add commonly used constants
-Message-ID: <2024082121-anemic-reformed-de75@gregkh>
-References: <20240820225719.91410-1-fujita.tomonori@gmail.com>
- <20240820225719.91410-2-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1724197525; c=relaxed/simple;
+	bh=7ygrf7pk+qqh/taYw3aR0+XAuH6nI4qlY7LlbL2goN0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fsQz/bSMH8johjYnaMzJvPGYW4xpZ7p53Fc2vpVv13IO6RMjWckyov/t1oJ83rDmvZUySt0kFAEUuPh2PzegeDSlTWsPmcB4hcbFp7P+butr/oiN6uXoW4weGqv8gwxnUBqSgidy3Gli9cToSAdbgd+dha4terN+odLQ8Ft4uyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X94LOzhv; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <026dc2a7-7f43-43a3-b138-3a4fedf41a5f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724197521;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jOMk6nKdU/OadJM5Jw+DEbKFriLlwrQLkyoJvB74aPU=;
+	b=X94LOzhvuUUoTZgkLED1+PiitTkGsST+HZTDpWuzpeOQsXTT6ZRaisAB7H3hrXL4qQoXWU
+	DD8twRI/XnTQbiw2ooE5Fn/mO4A9pZwCxzsxqe+h4YHFHMsrI4SudfCt6PL+/1t6H6BEK1
+	ltR4LozCn02uw5ZUxyOD+9Ug/Xdpe+Q=
+Date: Tue, 20 Aug 2024 16:45:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240820225719.91410-2-fujita.tomonori@gmail.com>
+Subject: Re: [PATCH v3] net/socket: Check cgroup_bpf_enabled() only once in
+ do_sock_getsockopt()
+To: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ bobule.chang@mediatek.com, wsd_upstream@mediatek.com,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ Yanghui Li <yanghui.li@mediatek.com>,
+ Cheng-Jui Wang <cheng-jui.wang@mediatek.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, bpf@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240820092942.16654-1-Tze-nan.Wu@mediatek.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240820092942.16654-1-Tze-nan.Wu@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 20, 2024 at 10:57:14PM +0000, FUJITA Tomonori wrote:
-> Add rust equivalent to include/linux/sizes.h, makes code more
-> readable.
+On 8/20/24 2:29 AM, Tze-nan Wu wrote:
+> The return value from `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` can change
+> between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+> `BPF_CGROUP_RUN_PROG_GETSOCKOPT`.
 > 
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/kernel/lib.rs   |  1 +
->  rust/kernel/sizes.rs | 26 ++++++++++++++++++++++++++
->  2 files changed, 27 insertions(+)
->  create mode 100644 rust/kernel/sizes.rs
+> If `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` changes from "false" to
+> "true" between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
+> `BPF_CGROUP_RUN_PROG_GETSOCKOPT`, `BPF_CGROUP_RUN_PROG_GETSOCKOPT` will
+> receive an -EFAULT from `__cgroup_bpf_run_filter_getsockopt(max_optlen=0)`
+> due to `get_user()` was not reached in `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`.
 > 
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index 274bdc1b0a82..58ed400198bf 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -43,6 +43,7 @@
->  pub mod page;
->  pub mod prelude;
->  pub mod print;
-> +pub mod sizes;
->  mod static_assert;
->  #[doc(hidden)]
->  pub mod std_vendor;
-> diff --git a/rust/kernel/sizes.rs b/rust/kernel/sizes.rs
-> new file mode 100644
-> index 000000000000..834c343e4170
-> --- /dev/null
-> +++ b/rust/kernel/sizes.rs
-> @@ -0,0 +1,26 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Commonly used sizes.
-> +//!
-> +//! C headers: [`include/linux/sizes.h`](srctree/include/linux/sizes.h).
-> +
-> +/// 0x00000400
-> +pub const SZ_1K: usize = bindings::SZ_1K as usize;
-> +/// 0x00000800
-> +pub const SZ_2K: usize = bindings::SZ_2K as usize;
-> +/// 0x00001000
-> +pub const SZ_4K: usize = bindings::SZ_4K as usize;
-> +/// 0x00002000
-> +pub const SZ_8K: usize = bindings::SZ_8K as usize;
-> +/// 0x00004000
-> +pub const SZ_16K: usize = bindings::SZ_16K as usize;
-> +/// 0x00008000
-> +pub const SZ_32K: usize = bindings::SZ_32K as usize;
-> +/// 0x00010000
-> +pub const SZ_64K: usize = bindings::SZ_64K as usize;
-> +/// 0x00020000
-> +pub const SZ_128K: usize = bindings::SZ_128K as usize;
-> +/// 0x00040000
-> +pub const SZ_256K: usize = bindings::SZ_256K as usize;
-> +/// 0x00080000
-> +pub const SZ_512K: usize = bindings::SZ_512K as usize;
+> Scenario shown as below:
+> 
+>             `process A`                      `process B`
+>             -----------                      ------------
+>    BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+>                                              enable CGROUP_GETSOCKOPT
+>    BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
+> 
+> To prevent this, invoke `cgroup_bpf_enabled()` only once and cache the
+> result in a newly added local variable `enabled`.
+> Both `BPF_CGROUP_*` macros in `do_sock_getsockopt` will then check their
+> condition using the same `enabled` variable as the condition variable,
+> instead of using the return values from `cgroup_bpf_enabled` called by
+> themselves as the condition variable(which could yield different results).
+> This ensures that either both `BPF_CGROUP_*` macros pass the condition
+> or neither does.
+> 
+> Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
+> Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
+> Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
 
-Why only some of the values in sizes.h?
+Please tag bpf in the subject and add a Fixes tag.
 
-And why can't sizes.h be directly translated into rust code without
-having to do it "by hand" here?  We do that for other header file
-bindings, right?
+[cc: Stanislav]
 
-thanks,
+pw-bot: cr
 
-greg k-h
 
