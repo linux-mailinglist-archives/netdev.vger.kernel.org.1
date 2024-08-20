@@ -1,115 +1,150 @@
-Return-Path: <netdev+bounces-120101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BF9584A4
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:34:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FE99584AF
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:35:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0411F243B9
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:34:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C49C28385C
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE9118CC02;
-	Tue, 20 Aug 2024 10:34:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNIp/3gq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F34018DF71;
+	Tue, 20 Aug 2024 10:35:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C5418E34B;
-	Tue, 20 Aug 2024 10:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DC318E34B;
+	Tue, 20 Aug 2024 10:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150075; cv=none; b=WtJseDE/cLoofj/f7PCrWVqU9WBqdzs3+3IywZH3p+6JlTbSqjIsVQsR1rA20Wm8j+f9fWv1s/vTH682io8Ta0aVHaPHKtEFRR4nkvNvC1R1PrEg4g0PS8p9YLqso2YtKFZO8lsHoMJno95kCm1Pivvn4BAKZqQ8k46h7vuEMlU=
+	t=1724150115; cv=none; b=UzKS74N4gwJDVipo1JmzuVWxq+EIdIoMzNvhMyjOhAqRgZVocef6f90o24Fiu9MnOVxd2XLndzDFhCffQExSvyLLu/QvNA/GzkDI6NrUA4W9OrpFF98GOQ2pMYswoDv9cQIyncycpMYZT/mF+fMgXDGfhxM+UKpv9Z0xrhtAee4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724150075; c=relaxed/simple;
-	bh=2vQ7xgz31tdsyYufAygdLLr+hpkpWW4htgArJk0EyzI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dyVUjd6FyEc3/U1rtl1VmXA7qZ31nCvkWGEmJJXPHoufLQWvmzzkzbSXl+Egs5n/0tfIpNWEGV+VlCHQiCPwzrCdvK4iliJZ3JGIIJZpfyX+99CKW48+TP+8qT9DK3yIVJGXqpkwjqkeFH79bUQM0Ups95F94u7VHeesu4l1D0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNIp/3gq; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fc611a0f8cso40943625ad.2;
-        Tue, 20 Aug 2024 03:34:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724150073; x=1724754873; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zYLnq2zDE0SQRgr4NTaRjzGrrtpAL6dNIJ7/StYnv8Y=;
-        b=jNIp/3gqNYmZHETRjFDuu1WoJUAzlPejDvV2/aIle4Ugm24jqq6TEO+ikzzRVqNchf
-         8FoAU+nCP0ZCfZgwaWtb7kr48evBRYyOXAGieFu7IrLK4tS+d4vBnN6d6i/oGlBhEbdJ
-         KN5ym/rI1JRjXtbnNsB9GLht8PPYEKsP2ebLwVamai11bNZj3ENG2E7Wz850CM/qg2sx
-         MJJe7xVaQ2ceBfWzcasovIg00JBBALU7pFcWwC4Dz/xjQq1byTLwuZ3S2W11xWhz2Crz
-         Q5rfNcplBB4i2mVLluysqumjOIVRJQoKgI41NBRjwHSPs2VW9yfpkKwM0Uwpet5/zXUa
-         QpYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724150073; x=1724754873;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zYLnq2zDE0SQRgr4NTaRjzGrrtpAL6dNIJ7/StYnv8Y=;
-        b=X08idkcchaZwO7KBd9nysonG7Xfo4B/6cGZy0TPm5bQJ69pwN3B2hE5wIJHSF6h/Mn
-         Ji1IbOve128851Fvki/x5Bk5O9fFTZluTtZupy8UaO0hF6IY1KKf6NtGM1WnipnpCPip
-         MSZ5FhaBkm6hdleFfTYlxjKEAwkczyLfTluzdcbfBgajID0par542hS5Y3TayO8qJ40Q
-         6JGJV7Q8XGRkJS6Ue6GwlK7EIXJfpWREgG3h3ghF6WCx1Kx5saEtUNGdwK6fP+jCUHeS
-         J7bvPnaGvIreN7szGU5/PSIfa897m/nPL4ghOYA6CAv5pBuu7C2p0TsJ6X8jxYU15cwR
-         zoFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVB2cM6Aw44Bi6v4P1KHsbdbp8nqls5RGh/UBLjCz00y1B+NmDy9+ixdr6wAslT0XwohNR6xu8WvHZAP/U=@vger.kernel.org, AJvYcCW95TB9QQuwBefsGxrdIbQhsza4NrX25GuoBg6pYzwnSK+D444HqUDox1kVqOZ8LRkMIDQQ+MBfHLxl0g==@vger.kernel.org, AJvYcCX0/6KKZGC7g15KBpQ8kcRVmFn3UtymdzONCgfQ20bT7zdDMFIT8qTzXXcghecOBB5jgFNtWhYr@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgDkejDnS54Fg4wJBMB1mj/vkITHtbIb5ffijzZqWOaWuNyFPv
-	wz8BPV4IFCJ30jIod1kmVnK5VULXKslAngZ4SXQryeCJ/caB9oE4
-X-Google-Smtp-Source: AGHT+IGJig1neYGceqF6j95MwaETMQHaposqjvhWHU+H3jMdgmHSiWGAimrcsFATSH71KEU4UDUarQ==
-X-Received: by 2002:a17:902:f545:b0:202:4666:f023 with SMTP id d9443c01a7336-2024666f51emr52014045ad.57.1724150073337;
-        Tue, 20 Aug 2024 03:34:33 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20219baeb13sm47696505ad.224.2024.08.20.03.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 03:34:33 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: aha310510@gmail.com
-Cc: alibuda@linux.alibaba.com,
-	davem@davemloft.net,
-	dust.li@linux.alibaba.com,
-	edumazet@google.com,
-	guwen@linux.alibaba.com,
-	jaka@linux.ibm.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	tonylu@linux.alibaba.com,
-	ubraun@linux.vnet.ibm.com,
-	utz.bacher@de.ibm.com,
-	wenjia@linux.ibm.com,
-	syzkaller <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net,v5,2/2] net/smc: modify smc_sock structure
-Date: Tue, 20 Aug 2024 19:34:25 +0900
-Message-Id: <20240820103425.338094-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240815043904.38959-1-aha310510@gmail.com>
-References: <20240815043904.38959-1-aha310510@gmail.com>
+	s=arc-20240116; t=1724150115; c=relaxed/simple;
+	bh=kjiriu1vVPG9LFUBsJpUYaqmI0gKbM2aHKLUbsf8NlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DojLfRsNZ7ceUt1DTZthLP2LtJ8IvbTd9dKukOyhFpbw764iaAeLGlcIa8b0MamW9cTYfkM8s6hlalRQww26nyF1xa98xkkKyQiUWizok98z3GSdynTDdKJoslrtyV37p6tUK3yzeQMBwWkHmfi0RSfWCEFglCqH3x7Swlvn+L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: U+o1BIA3TOCCKgWPw3CPXg==
+X-CSE-MsgGUID: itEKMXgWTFOuxzEIFlctdQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11169"; a="33102941"
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="33102941"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:35:13 -0700
+X-CSE-ConnectionGUID: jPFRCu2HTpiBmNIFCKNJFw==
+X-CSE-MsgGUID: pNVVVqHdTHK/wYhkKlAIQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,161,1719903600"; 
+   d="scan'208";a="60745183"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 03:35:06 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1sgMCb-0000000HGUy-3xzl;
+	Tue, 20 Aug 2024 13:35:01 +0300
+Date: Tue, 20 Aug 2024 13:35:01 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	onathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 8/9] vdap: solidrun: Replace deprecated PCI functions
+Message-ID: <ZsRxVUmTpT5nHncc@smile.fi.intel.com>
+References: <20240819165148.58201-2-pstanner@redhat.com>
+ <20240819165148.58201-10-pstanner@redhat.com>
+ <74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr>
+ <ZsOQPbVGQFtUYSww@smile.fi.intel.com>
+ <419e91cb2b698a450497dfc1fb86f2c46eb7d8fb.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <419e91cb2b698a450497dfc1fb86f2c46eb7d8fb.camel@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Jeongjun Park wrote:
-> Since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
-> 
-> To solve this, we need to modify the smc_sock structure.
-> 
-> Fixes: ac7138746e14 ("smc: establish new socket family")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+On Tue, Aug 20, 2024 at 10:13:40AM +0200, Philipp Stanner wrote:
+> On Mon, 2024-08-19 at 21:34 +0300, Andy Shevchenko wrote:
+> > On Mon, Aug 19, 2024 at 08:19:28PM +0200, Christophe JAILLET wrote:
+> > > Le 19/08/2024 à 18:51, Philipp Stanner a écrit :
 
-Reported-by: syzkaller <syzkaller@googlegroups.com>
+...
+
+> > > Unrelated to the patch, but is is safe to have 'name' be on the
+> > > stack?
+> > > 
+> > > pcim_iomap_region()
+> > > --> __pcim_request_region()
+> > > --> __pcim_request_region_range()
+> > > --> request_region() or __request_mem_region()
+> > > --> __request_region()
+> > > --> __request_region_locked()
+> > > --> res->name = name;
+> > > 
+> > > So an address on the stack ends in the 'name' field of a "struct
+> > > resource".
+> > > 
+> > > According to a few grep, it looks really unusual.
+> > > 
+> > > I don't know if it is used, but it looks strange to me.
+> > 
+> > It might be used when printing /proc/iomem, but I don't remember by
+> > heart.
+> > 
+> > > If it is an issue, it was apparently already there before this
+> > > patch.
+> > 
+> > This series seems to reveal a lot of issues with the probe/remove in
+> > many
+> > drivers. I think it's better to make fixes of them before this series
+> > for
+> > the sake of easier backporting.
+> 
+> Just so we're in sync:
+> I think the only real bug here so far is the one found by Christophe.
+> 
+> The usages of pci_disable_device(), pcim_iounmap_regions() and the like
+> in remove() and error unwind paths are not elegant and make devres kind
+> of useless – but they are not bugs. So I wouldn't backport them.
+
+Agree.
+
+> > If here is a problem, the devm_kasprintf() should be used.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
