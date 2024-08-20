@@ -1,160 +1,146 @@
-Return-Path: <netdev+bounces-120049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2522995814D
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:45:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD39958158
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 10:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C48E31F25069
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:45:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F5141C23C50
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 08:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDA2189F3F;
-	Tue, 20 Aug 2024 08:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF7D18A928;
+	Tue, 20 Aug 2024 08:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EACtiQTA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyXyLvZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F26189BA3;
-	Tue, 20 Aug 2024 08:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D636D18E35E;
+	Tue, 20 Aug 2024 08:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724143545; cv=none; b=fKOZQ36zrOiCgnLfytlmECYgbf7uuHXtD/4jeH/08g3YdweI1CaqThPyzUL6k6U8abyigDPkkWk/vdUENj/i5aR079SDwXfM0fUeyYrNQVKgfcBiy0+XKZ4E2ZuzIk7oMo3pEbWr88Zme569/+gj46hgTjw+9ULzf51CsVHBAm4=
+	t=1724143792; cv=none; b=iqbh7cdxOu5hq8FapXy4yB0V8172rOh0QKtpjyJaCYcYp9St0Ug56vT1oZU+nvzEPqYEq4+E0vxmN/293PTPEkEoHKqnZ6PftMHbRVxuQQVV7xcnzZutsACN9BChrW3yaWaK3jUpNtTCryBnpHN6eaD+xcLmO2jdrBadSBEmgSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724143545; c=relaxed/simple;
-	bh=d29y/b3+dKXfOMPqWOlo2Dtzlow8gPxFqqkprMyHMY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RyTR2+BUAUA4HIKlhdffYkxD/E1HaMuDtDxDOG3xk7UtTi83NeLS9p7kx7fl23uTf/X2i5lr8yf1WNJiTGqKHgD2vEZYAoGwQoHcyKQqgmpTKLx/1tRzMrKwTItaURFHO9Sxx6KQ6ZoA449pE4cLK86orFbH6OMuR/KgZDPSqQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EACtiQTA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JI9HGp029570;
-	Tue, 20 Aug 2024 08:45:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:content-transfer-encoding
-	:mime-version; s=pp1; bh=n9f5U4YE8l6gZQ2iTUJ1QoBma3VmGjgKP36BNqG
-	tl2E=; b=EACtiQTAY0cQUHxjVrT2EvwA+fN1oUyXwu2JLptjlt8ZNZfalFgC6VO
-	tdIrkl+JnI/oYRgklvAjEUgGA3folcQGwyB7q738zbEwoNhwyEtNUtdAvI/gPXJo
-	4g4qM6UruegPewjL8Ckj6+2IzhxuzOn3Hh60v9MKklJp/kKVTU77ZHvd1SNTph0O
-	+g7Q9eGlllX+sFT31vBNB7nGtfAzPjiMeffaI2wgu4XyL5/RfdtVAMd0iC9Qaica
-	fXff0eVQA+ousSLum+WTecKcrPvTxHRS6fxiT9NEGso0tYfo5qhMu60sjZb9YmGu
-	P2xztokuCIbZ8ExEUjSvms6YHFUG0fg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04uuj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 08:45:35 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47K8jZkG001556;
-	Tue, 20 Aug 2024 08:45:35 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04uuc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 08:45:34 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47K5UIOl013098;
-	Tue, 20 Aug 2024 08:45:34 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41366u2a2b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 08:45:33 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47K8jSjv54854042
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Aug 2024 08:45:30 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7601B20043;
-	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6393920040;
-	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 20 Aug 2024 08:45:28 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 2D390E024A; Tue, 20 Aug 2024 10:45:28 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH net v2] s390/iucv: Fix vargs handling in iucv_alloc_device()
-Date: Tue, 20 Aug 2024 10:45:28 +0200
-Message-ID: <20240820084528.2396537-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VCvFKZmyXU-3VMFAXO5jLsqU9XmmkbYj
-X-Proofpoint-ORIG-GUID: n536KPVuErnDYQ_BJtHRxyuPOH6i7UNL
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1724143792; c=relaxed/simple;
+	bh=ZuLJpDNd6eqRAPO6Aa71nXLB1ln53B/diFlYAIMMu6o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OBDd9BxmBDIAQW7ddw33uzWyLfh5JmQ8hriSBkbHfNl+XmmTELcUUKJUtJB417xJX5bsK+QD6DW+8Y49Sz9cAuMbFGnxiUHXF6ntQIqAPT5Y7eOEAYUAPDMwe0Boi+63qNs9ISMa5xrbH6cd+lJukqVFd2VRACc+stK+SDbOnPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IyXyLvZT; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3718eaf4046so3319115f8f.3;
+        Tue, 20 Aug 2024 01:49:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724143789; x=1724748589; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lg9dJIN/hiobsnuENkgWKW4tMAbr4qvFo2moMhu7vdU=;
+        b=IyXyLvZTmSyRs1S2BfRPIBxXmAeUvrBOJyuvwwLehtxaDVRLtdpE5lCdWnmIRrQCP/
+         X6GJeNET1BjxBjyObWYaZz45y8lZycSXjhICEIxq4CBMLWyadfc66uBvAzz99YsNPuUp
+         SzdLH6cTcvcI6F3Wxxv3cunWIPqOXmRwQvCQGE+aXDc24p5PbR76sbZZ9AwIj98BdLx1
+         EtJIjiK6yNZljMfmsXLKd7FTTNlrnRvvRsPcBkMqZjgJ4/o0dmR7+5j+53VFs5JEeep0
+         AX9sHDcugR7QO1NdTp4RfGw8ZxiUamzAZC3yYMWiut116c3pFEYhzmm2RQS93XJ9Eo8G
+         0axA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724143789; x=1724748589;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lg9dJIN/hiobsnuENkgWKW4tMAbr4qvFo2moMhu7vdU=;
+        b=JTqjY+envmtySA4EwImb/TMHnYI0pFbw+FgekLlnLluNunPMcD6IwkKfGMQDnMFDR1
+         wuNqC7iOZxMpQ+Hh5FU8EoO3egobtZK5/1TJ18mODvgnuGeX21SuEL2Bd2mX3ltuYsTG
+         tVQu0clW0ebOipGqCEWcbyk+PqY6kUs86H/biQRcumWatTniyE2xN00YQs7UfghUbA0B
+         87O1thDVG/Yc5HYbZ6GS3FcP/Uz3e7Q9HAsN74AQSJc9mhvQDtzZ4hadOwCoCZRetnwA
+         eP8K/gPqWKz/ANPQyZqJY5B47cG5E7jyWRfcnkuq9pZrt42MjRC13bUd4YUFCnC9R3/w
+         FYFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgGe3TOtGUdXSsMBUhUKXpYJVNre2VFcrNOzo0nR94WifyLNWrbwAGmWDsO7f3/tpqjlwjC2fO@vger.kernel.org, AJvYcCWmvVXkkl16RJSrhqg/oXKeH4KJjBTLMrPoncJzXrbHnp6A6YnNJ77L3/qVE4mCDmLByIwwhTaaEwM=@vger.kernel.org, AJvYcCXDJPdhmNGsp7kR4t1iZY47rbzj5JfrPi0Ec+0TdBAHN1gDYFTjfkpUJrB0txF558ZTjN7U90NqlsFiTfc=@vger.kernel.org, AJvYcCXawiiUVf5TN4sY8zmnTe3FraN13Efu96keKMTFoOAO127qwjW4lx/pGKOHkwpyKtj+eAZN8SagrKj92Kvs0g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0B6AvltUeDcreuIJsty+5jFKIP0SM82zYkGvTf+hkbVqkXo6N
+	9CukAzQWtgRGF6yr7d+1VSvE3/HnLi7u6QENeg5eD3vu92p97CGYqBH6bl/fdY+DMOiP8PqHfQ/
+	uxKDAuWgjRTkh/3e7CptP4l+G2P4=
+X-Google-Smtp-Source: AGHT+IFl1anUYNa4FEC9klpgIUgBfM1uAYHx0Cm1xw4Sl52EjyYY0wMF0UPRDb7vLO5PAlVajoCL0hkHQ/xxsJo/UCg=
+X-Received: by 2002:a5d:6751:0:b0:367:90cc:fe8b with SMTP id
+ ffacd0b85a97d-37194649ca0mr9476564f8f.27.1724143788583; Tue, 20 Aug 2024
+ 01:49:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_16,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 spamscore=0 malwarescore=0
- bulkscore=0 adultscore=0 impostorscore=0 suspectscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408200062
+References: <20240820000245.61787-1-technoboy85@gmail.com> <202408201433.eqBpp8z9-lkp@intel.com>
+In-Reply-To: <202408201433.eqBpp8z9-lkp@intel.com>
+From: Matteo Croce <technoboy85@gmail.com>
+Date: Tue, 20 Aug 2024 10:49:12 +0200
+Message-ID: <CAFnufp2zP-J7r_0zh=NYBbeMMpJkFnHvm6aZB2RP4Y1rR+7h+Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf: use kfunc hooks instead of program types
+To: kernel test robot <lkp@intel.com>
+Cc: bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Jiri Kosina <jikos@kernel.org>, 
+	Benjamin Tissoires <bentiss@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Matt Bobrowski <mattbobrowski@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-iucv_alloc_device() gets a format string and a varying number of
-arguments. This is incorrectly forwarded by calling dev_set_name() with
-the format string and a va_list, while dev_set_name() expects also a
-varying number of arguments.
+Il giorno mar 20 ago 2024 alle ore 08:59 kernel test robot
+<lkp@intel.com> ha scritto:
+>
+> Hi Matteo,
+>
+> kernel test robot noticed the following build warnings:
+>
+> [auto build test WARNING on bpf-next/master]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Matteo-Croce/bpf-use-kfunc-hooks-instead-of-program-types/20240820-080354
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+> patch link:    https://lore.kernel.org/r/20240820000245.61787-1-technoboy85%40gmail.com
+> patch subject: [PATCH bpf-next] bpf: use kfunc hooks instead of program types
+> config: arc-randconfig-002-20240820 (https://download.01.org/0day-ci/archive/20240820/202408201433.eqBpp8z9-lkp@intel.com/config)
+> compiler: arc-elf-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240820/202408201433.eqBpp8z9-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202408201433.eqBpp8z9-lkp@intel.com/
+>
+> All warnings (new ones prefixed by >>):
+>
+> >> net/core/filter.c:12084:38: warning: 'bpf_kfunc_set_sock_addr' defined but not used [-Wunused-const-variable=]
+>    12084 | static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+>          |                                      ^~~~~~~~~~~~~~~~~~~~~~~
+>
+>
+> vim +/bpf_kfunc_set_sock_addr +12084 net/core/filter.c
+>
+> 05421aecd4ed65 Joanne Koong  2023-03-01  12083
+> 53e380d2144190 Daan De Meyer 2023-10-11 @12084  static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+> 53e380d2144190 Daan De Meyer 2023-10-11  12085          .owner = THIS_MODULE,
+> 53e380d2144190 Daan De Meyer 2023-10-11  12086          .set = &bpf_kfunc_check_set_sock_addr,
+> 53e380d2144190 Daan De Meyer 2023-10-11  12087  };
+> 53e380d2144190 Daan De Meyer 2023-10-11  12088
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
-Symptoms:
-Corrupted iucv device names, which can result in log messages like:
-sysfs: cannot create duplicate filename '/devices/iucv/hvc_iucv1827699952'
+It seems that I removed one too many calls, the last one was using
+bpf_kfunc_set_sock_addr and needs to be kept.
 
-Fixes: 4452e8ef8c36 ("s390/iucv: Provide iucv_alloc_device() / iucv_release_device()")
-Link: https://bugzilla.suse.com/show_bug.cgi?id=1228425
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
----
-Discussion of v1:
-Link: https://lore.kernel.org/all/2024081326-shifter-output-cb8f@gregkh/T/#mf8ae979de8acdc01f7ede0b94af6f2e110eea209
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202408091131.ATGn6YSh-lkp@intel.com/
-Vasily Gorbik asked me to send this version via the netdev mailing list.
----
- net/iucv/iucv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 1e42e13ad24e..2e615641a4e5 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -86,13 +86,15 @@ struct device *iucv_alloc_device(const struct attribute_group **attrs,
- {
- 	struct device *dev;
- 	va_list vargs;
-+	char buf[20];
- 	int rc;
- 
- 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
- 	if (!dev)
- 		goto out_error;
- 	va_start(vargs, fmt);
--	rc = dev_set_name(dev, fmt, vargs);
-+	vsnprintf(buf, sizeof(buf), fmt, vargs);
-+	rc = dev_set_name(dev, buf);
- 	va_end(vargs);
- 	if (rc)
- 		goto out_error;
 -- 
-2.39.3 (Apple Git-146)
+Matteo Croce
 
+perl -e 'for($t=0;;$t++){print chr($t*($t>>8|$t>>13)&255)}' |aplay
 
