@@ -1,192 +1,213 @@
-Return-Path: <netdev+bounces-120374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7139590EB
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:11:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D138959103
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:18:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A08041C222CF
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 23:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30FBB1C2253E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 23:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37E71C824F;
-	Tue, 20 Aug 2024 23:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A5218E035;
+	Tue, 20 Aug 2024 23:18:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LQCWaqjW"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eeVY0+BW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E821C8245
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 23:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73E9189BB6;
+	Tue, 20 Aug 2024 23:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724195454; cv=none; b=pmvyzPT6BNLeFrY6yZLI2zZnZzwOZ5K8Ndn357frio8F8WneEgQh3+VS43yxewv5AevGm0gEBcP2I1fz4ooQCEE55v3QkQs9IgZWHrn5/o5t95RVREPR5DTqfVdfOrDXxPEmoiMOnIlX+rlORDNf8+Bd/v3/TdJKaXuqkP01TDY=
+	t=1724195900; cv=none; b=eoJxPi/dQPParbiEb7LkFGJIQll534aF1sVU7RK2CjWKUSMDfsGBs29frstTRPrYba8gmXiSJ6idiHepa6je9a1ksowTJJZhL12ypLkJlvqm3E480+7Bp/72aX5nUdCwt0nKKyBstqtfML/3CCvnu8ZF6JUIURO3lS6uLvcbZvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724195454; c=relaxed/simple;
-	bh=XtIk+kD00iSoE4z1imrAKe0aG7GWpS0xE5lCIpWyzeU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=guYVLPPd9deeE8/7fdncVszmptwBNvmBJCSpK1g7VAdqY4J3KwAfzd7zEA6vIeEx0K6Do/J1fLQFfx6lG9nfeRcfsIeeqAB1yXCIhm8f1n4Pau/v87DgiuEaGv9lRQnP2zRqLQdcf26l8Nmdqzc4g0tOimpqylhTwNXHMnjuJ4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LQCWaqjW; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2d3c098792bso4735934a91.1
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 16:10:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724195452; x=1724800252; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z5f2w4LZM4TRAbHrkXGO8wWfBGvh6M9E2Z4iDQZHMiQ=;
-        b=LQCWaqjW3jMllS3ufVvAiGnmAc6diNGBEd+xGKCw7FLeDOd9d7V1IPEZVr6deKV2Me
-         BnLOnEYsAKh/B3zxoTAi7xYkjmQicJN3VV2xGpXP10lk8fhhPorg6rRfni2MDHcMJVBT
-         YL7u/gyIigf4kdvqDFbUpieptzTsgP6vLrwqM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724195452; x=1724800252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z5f2w4LZM4TRAbHrkXGO8wWfBGvh6M9E2Z4iDQZHMiQ=;
-        b=cV/ovecfJmY0VdRvC2KQtQEAle/3Z7Pqc7wcMTB9p0b34hDRQJYQIVkFr9bn+8nKWq
-         TToaoyjrBgw1HWA7ej6uVRenA2oYonUv2EI5W9GGuDabzI5ITLcbjgJX4GNvlQUndIGz
-         9CqdlthV035yqzmegaVMvJJwU6d8LkyFKGOg9reIq4s9SofWYWu6yHxoOmyfXP0zdWAH
-         jhb57K2TzHE5UnfhcpFb4Fi9ECtCQMx9jD5hJkqm1WLUXtLrLz0/7o4MqLXduQMlUfav
-         42prKXKxfr3AUBbSgg/r6CqiblsHouXkSN1OyjSvkTD0dmIoAokm44vU28Qe7t1GMj5Y
-         t+Zw==
-X-Gm-Message-State: AOJu0Yx2JNi9Vx0mvUHIQ8qRBjRuWkB0DzpFMkl6teGwdCH3E64QVVK9
-	4+DNux9CZDoLXc+omsIGZ+MZLoMZ5ChSYwaCe6GHHvPK7EhDSAMmB3HdzRZ5ZWd609eXQIIr3LW
-	rVj9AIviLD0UzI8froXxUiO4NwwdriLckFFYH
-X-Google-Smtp-Source: AGHT+IFGNMXXmYcdXaQzr5Tz8USVmNU5xbNdMKeKaadN4lTbxlZnVc1egcdct5/lyGa8CAVi5X81ldwsfwop3kkiM1o=
-X-Received: by 2002:a17:90b:23d3:b0:2c9:321:1bf1 with SMTP id
- 98e67ed59e1d1-2d5e9ed08f1mr498981a91.39.1724195452084; Tue, 20 Aug 2024
- 16:10:52 -0700 (PDT)
+	s=arc-20240116; t=1724195900; c=relaxed/simple;
+	bh=nPfBSobHC8+jfRoUOFOFdAJ50B5o+72hFzHIT5ZtUi4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PUfxqHI/wc7ULC+G4JNUjSBDg2V1ddc16auA2XR6J9EGd5iuqKBqFU87Gr9xORjcBQ0IWr7a1vU4I/+KB63NZlJ4VJW9tlVySrEQB6PjaFWaQ894xWOscPHQBCC/YLlCkuzejVAI3BmKFXn8POt9UvIlDaieOx3EN0cgD7igcM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eeVY0+BW; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47KJDEfS010532;
+	Tue, 20 Aug 2024 23:12:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	NprW64KSKzwOFF6jo1JC3Lh788yHamO3HdbBMZJQ/MI=; b=eeVY0+BW5Y003jD1
+	wWZSdsM7V5k9PGOpndK7aMp2cq1IULmj4qA25ufm/M9+ubY5c3gSFwvjgd1ifgVU
+	/qr4ZsdysYOCm3MedjKKDXVkdxhTmeK3tGKoyc1hg0aoTNEi07Q2VaYNFArRrezj
+	Ubbgx9zUyGcpaYNfAOvdBrynBV/AP9lvxEFrYRoUXkQ9XdV59VJxyuRAMTJu/Em9
+	5JIcyEcFZzVzjtlultQ05s23D3lE2MwigFLeHKSmRBILaqktepa8FHZqqLsdWC2Q
+	2jm4WQIxZqBo/DQksue0niBfVQFxE4YEIV4Ttvx5H5ehXAWsnXSpd4pzLK38Foa0
+	ob6v3w==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 413qxg6vef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 23:12:54 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47KNCref023267
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Aug 2024 23:12:53 GMT
+Received: from [10.110.47.196] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 20 Aug
+ 2024 16:12:52 -0700
+Message-ID: <cab82577-9979-464f-84a2-02962b1641fc@quicinc.com>
+Date: Tue, 20 Aug 2024 16:12:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v4 1/5] net: stmmac: Add HDMA mapping for dw25gmac
+ support
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+CC: <netdev@vger.kernel.org>, <alexandre.torgue@foss.st.com>,
+        <joabreu@synopsys.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+        <bcm-kernel-feedback-list@broadcom.com>, <richardcochran@gmail.com>,
+        <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+        <john.fastabend@gmail.com>, <fancer.lancer@gmail.com>,
+        <rmk+kernel@armlinux.org.uk>, <ahalaney@redhat.com>,
+        <xiaolei.wang@windriver.com>, <rohan.g.thomas@intel.com>,
+        <Jianheng.Zhang@synopsys.com>, <leong.ching.swee@intel.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <bpf@vger.kernel.org>,
+        <andrew@lunn.ch>, <linux@armlinux.org.uk>, <horms@kernel.org>,
+        <florian.fainelli@broadcom.com>,
+        Sagar Cheluvegowda
+	<quic_scheluve@quicinc.com>
 References: <20240814221818.2612484-1-jitendra.vegiraju@broadcom.com>
- <20240814221818.2612484-2-jitendra.vegiraju@broadcom.com> <2ad03012-8a10-49fc-9e80-3b91762b9cc3@quicinc.com>
-In-Reply-To: <2ad03012-8a10-49fc-9e80-3b91762b9cc3@quicinc.com>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Tue, 20 Aug 2024 16:10:40 -0700
-Message-ID: <CAMdnO-LH0xNeMO_Y+WhSmbyNrK33zb=AtVd9ZRTObQ-n8BWR6w@mail.gmail.com>
-Subject: Re: [net-next v4 1/5] net: stmmac: Add HDMA mapping for dw25gmac support
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
-	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
-	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
-	leong.ching.swee@intel.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com, 
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+ <20240814221818.2612484-2-jitendra.vegiraju@broadcom.com>
+ <2ad03012-8a10-49fc-9e80-3b91762b9cc3@quicinc.com>
+ <CAMdnO-LH0xNeMO_Y+WhSmbyNrK33zb=AtVd9ZRTObQ-n8BWR6w@mail.gmail.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <CAMdnO-LH0xNeMO_Y+WhSmbyNrK33zb=AtVd9ZRTObQ-n8BWR6w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: ZR126PUREwqS3M4XNHxBzJ3D4QSZwj2G
+X-Proofpoint-GUID: ZR126PUREwqS3M4XNHxBzJ3D4QSZwj2G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-20_17,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0
+ adultscore=0 mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2408200170
 
-On Thu, Aug 15, 2024 at 4:30=E2=80=AFPM Abhishek Chauhan (ABC)
-<quic_abchauha@quicinc.com> wrote:
->
->
->
-> On 8/14/2024 3:18 PM, jitendra.vegiraju@broadcom.com wrote:
-> > From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> >
-> > Add hdma configuration support in include/linux/stmmac.h file.
-> > The hdma configuration includes mapping of virtual DMAs to physical DMA=
-s.
-> > Define a new data structure stmmac_hdma_cfg to provide the mapping.
-> >
-> > Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> > ---
-> >  include/linux/stmmac.h | 50 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 50 insertions(+)
-> >
-> > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> > index 338991c08f00..1775bd2b7c14 100644
-> > --- a/include/linux/stmmac.h
-> > +++ b/include/linux/stmmac.h
-> > @@ -89,6 +89,55 @@ struct stmmac_mdio_bus_data {
-> >       bool needs_reset;
-> >  };
-> >
-> > +/* DW25GMAC Hyper-DMA Overview
-> > + * Hyper-DMA allows support for large number of Virtual DMA(VDMA)
-> > + * channels using a smaller set of physical DMA channels(PDMA).
-> > + * This is supported by the  mapping of VDMAs to Traffic Class (TC)
-> > + * and PDMA to TC in each traffic direction as shown below.
-> > + *
-> > + *        VDMAs            Traffic Class      PDMA
-> > + *       +--------+          +------+         +-----------+
-> > + *       |VDMA0   |--------->| TC0  |-------->|PDMA0/TXQ0 |
-> > + *TX     +--------+   |----->+------+         +-----------+
-> > + *Host=3D> +--------+   |      +------+         +-----------+ =3D> MAC
-> > + *SW     |VDMA1   |---+      | TC1  |    +--->|PDMA1/TXQ1 |
-> > + *       +--------+          +------+    |    +-----------+
-> > + *       +--------+          +------+----+    +-----------+
-> > + *       |VDMA2   |--------->| TC2  |-------->|PDMA2/TXQ1 |
-> > + *       +--------+          +------+         +-----------+
-> > + *            .                 .                 .
-> > + *       +--------+          +------+         +-----------+
-> > + *       |VDMAn-1 |--------->| TCx-1|-------->|PDMAm/TXQm |
-> > + *       +--------+          +------+         +-----------+
-> > + *
-> > + *       +------+          +------+         +------+
-> > + *       |PDMA0 |--------->| TC0  |-------->|VDMA0 |
-> > + *       +------+   |----->+------+         +------+
-> > + *MAC =3D> +------+   |      +------+         +------+
-> > + *RXQs   |PDMA1 |---+      | TC1  |    +--->|VDMA1 |  =3D> Host
-> > + *       +------+          +------+    |    +------+
-> > + *            .                 .                 .
-> > + */
-> > +
-> > +#define STMMAC_DW25GMAC_MAX_NUM_TX_VDMA              128
-> > +#define STMMAC_DW25GMAC_MAX_NUM_RX_VDMA              128
-> > +
-> > +#define STMMAC_DW25GMAC_MAX_NUM_TX_PDMA              8
-> > +#define STMMAC_DW25GMAC_MAX_NUM_RX_PDMA              10
-> > +
-> I have a query here.
->
-> Why do we need to hardcode the number of TX PDMA and RX PDMA to 8 an 10. =
-On some platforms the number of supported TXPDMA and RXPDMA are 11 and 11 r=
-espectively ?
->
-> how do we overcome this problem, do we increase the value in such case?
->
-Hi Abhishek,
-Agreed, we can make the mapping tables more generic.
-We will replace static arrays with dynamically allocated memory by
-reading the TXPDMA and RXPDMA counts from hardware.
-Thanks
-> > +#define STMMAC_DW25GMAC_MAX_TC                       8
-> > +
-> > +/* Hyper-DMA mapping configuration
-> > + * Traffic Class associated with each VDMA/PDMA mapping
-> > + * is stored in corresponding array entry.
-> > + */
-> > +struct stmmac_hdma_cfg {
-> > +     u8 tvdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_VDMA];
-> > +     u8 rvdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_VDMA];
-> > +     u8 tpdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_PDMA];
-> > +     u8 rpdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_PDMA];
-> > +};
-> > +
-> >  struct stmmac_dma_cfg {
-> >       int pbl;
-> >       int txpbl;
-> > @@ -101,6 +150,7 @@ struct stmmac_dma_cfg {
-> >       bool multi_msi_en;
-> >       bool dche;
-> >       bool atds;
-> > +     struct stmmac_hdma_cfg *hdma_cfg;
-> >  };
-> >
-> >  #define AXI_BLEN     7
+
+
+On 8/20/2024 4:10 PM, Jitendra Vegiraju wrote:
+> On Thu, Aug 15, 2024 at 4:30 PM Abhishek Chauhan (ABC)
+> <quic_abchauha@quicinc.com> wrote:
+>>
+>>
+>>
+>> On 8/14/2024 3:18 PM, jitendra.vegiraju@broadcom.com wrote:
+>>> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+>>>
+>>> Add hdma configuration support in include/linux/stmmac.h file.
+>>> The hdma configuration includes mapping of virtual DMAs to physical DMAs.
+>>> Define a new data structure stmmac_hdma_cfg to provide the mapping.
+>>>
+>>> Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+>>> ---
+>>>  include/linux/stmmac.h | 50 ++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 50 insertions(+)
+>>>
+>>> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+>>> index 338991c08f00..1775bd2b7c14 100644
+>>> --- a/include/linux/stmmac.h
+>>> +++ b/include/linux/stmmac.h
+>>> @@ -89,6 +89,55 @@ struct stmmac_mdio_bus_data {
+>>>       bool needs_reset;
+>>>  };
+>>>
+>>> +/* DW25GMAC Hyper-DMA Overview
+>>> + * Hyper-DMA allows support for large number of Virtual DMA(VDMA)
+>>> + * channels using a smaller set of physical DMA channels(PDMA).
+>>> + * This is supported by the  mapping of VDMAs to Traffic Class (TC)
+>>> + * and PDMA to TC in each traffic direction as shown below.
+>>> + *
+>>> + *        VDMAs            Traffic Class      PDMA
+>>> + *       +--------+          +------+         +-----------+
+>>> + *       |VDMA0   |--------->| TC0  |-------->|PDMA0/TXQ0 |
+>>> + *TX     +--------+   |----->+------+         +-----------+
+>>> + *Host=> +--------+   |      +------+         +-----------+ => MAC
+>>> + *SW     |VDMA1   |---+      | TC1  |    +--->|PDMA1/TXQ1 |
+>>> + *       +--------+          +------+    |    +-----------+
+>>> + *       +--------+          +------+----+    +-----------+
+>>> + *       |VDMA2   |--------->| TC2  |-------->|PDMA2/TXQ1 |
+>>> + *       +--------+          +------+         +-----------+
+>>> + *            .                 .                 .
+>>> + *       +--------+          +------+         +-----------+
+>>> + *       |VDMAn-1 |--------->| TCx-1|-------->|PDMAm/TXQm |
+>>> + *       +--------+          +------+         +-----------+
+>>> + *
+>>> + *       +------+          +------+         +------+
+>>> + *       |PDMA0 |--------->| TC0  |-------->|VDMA0 |
+>>> + *       +------+   |----->+------+         +------+
+>>> + *MAC => +------+   |      +------+         +------+
+>>> + *RXQs   |PDMA1 |---+      | TC1  |    +--->|VDMA1 |  => Host
+>>> + *       +------+          +------+    |    +------+
+>>> + *            .                 .                 .
+>>> + */
+>>> +
+>>> +#define STMMAC_DW25GMAC_MAX_NUM_TX_VDMA              128
+>>> +#define STMMAC_DW25GMAC_MAX_NUM_RX_VDMA              128
+>>> +
+>>> +#define STMMAC_DW25GMAC_MAX_NUM_TX_PDMA              8
+>>> +#define STMMAC_DW25GMAC_MAX_NUM_RX_PDMA              10
+>>> +
+>> I have a query here.
+>>
+>> Why do we need to hardcode the number of TX PDMA and RX PDMA to 8 an 10. On some platforms the number of supported TXPDMA and RXPDMA are 11 and 11 respectively ?
+>>
+>> how do we overcome this problem, do we increase the value in such case?
+>>
+> Hi Abhishek,
+> Agreed, we can make the mapping tables more generic.
+> We will replace static arrays with dynamically allocated memory by
+> reading the TXPDMA and RXPDMA counts from hardware.
+> Thanks
+
+That's a great idea. Thanks Jitendra. This way we do not have to hard code anything. 
+
+>>> +#define STMMAC_DW25GMAC_MAX_TC                       8
+>>> +
+>>> +/* Hyper-DMA mapping configuration
+>>> + * Traffic Class associated with each VDMA/PDMA mapping
+>>> + * is stored in corresponding array entry.
+>>> + */
+>>> +struct stmmac_hdma_cfg {
+>>> +     u8 tvdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_VDMA];
+>>> +     u8 rvdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_VDMA];
+>>> +     u8 tpdma_tc[STMMAC_DW25GMAC_MAX_NUM_TX_PDMA];
+>>> +     u8 rpdma_tc[STMMAC_DW25GMAC_MAX_NUM_RX_PDMA];
+>>> +};
+>>> +
+>>>  struct stmmac_dma_cfg {
+>>>       int pbl;
+>>>       int txpbl;
+>>> @@ -101,6 +150,7 @@ struct stmmac_dma_cfg {
+>>>       bool multi_msi_en;
+>>>       bool dche;
+>>>       bool atds;
+>>> +     struct stmmac_hdma_cfg *hdma_cfg;
+>>>  };
+>>>
+>>>  #define AXI_BLEN     7
 
