@@ -1,118 +1,111 @@
-Return-Path: <netdev+bounces-120154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1BBC958759
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:51:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 690F295875A
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A1021F228CB
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:51:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B5821C20FBC
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D131518E039;
-	Tue, 20 Aug 2024 12:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257A318FDA6;
+	Tue, 20 Aug 2024 12:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRY5MUfZ"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="wW6meeFv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A8818DF6D
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5D318FC81
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 12:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724158258; cv=none; b=N818JgubkauZl9xx67hNbs7LVG7jFcahiEdldPYMDkJgAKPzl8zhluf5Jq05Ib9cdbVPXFC5nc4A0WzV1hISkGaNgtkqj8stOIVXLZnZuXPFHdrXTf5sbAbbSte+B3DuP9/oN0Au+xaJjIrhkHdOEg0QGkdPvAZQbitYdS1Bc2g=
+	t=1724158274; cv=none; b=fIkA8Id4e17uk1FTStLP5iY152C83I7hsUj72MgMYr512F+qgkHM8OS+ZOQINrls/9/Gjm1+UQ3QEhZBwSKJE2lOxHtcdotT+Wryn361SdO3Noq8HUy4MfaQaosNy3Ov9G5+QT6716hzheFiAWl6V8NL0R19QeCSDdbcIDBuucE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724158258; c=relaxed/simple;
-	bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s6ax/dVblqZdC0CaT18lQstw6yCyFInbIdfoSXABXxj3ZckRRE2Vh500ayEfRbPEwYA6mQEUoZLiUjnjqXFFHOVtTwL/3KXwQWjKeA4qADdGZneDH1LN2g93CsMRav1fNRAobblE7t26iTDaBDv/069hY6Z5bRL5SYziSryVZYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRY5MUfZ; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39d3872e542so11052105ab.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 05:50:57 -0700 (PDT)
+	s=arc-20240116; t=1724158274; c=relaxed/simple;
+	bh=6hKhagBBJjQI2SW5tWYvwEixQVJ9tM/nzXa0Cu3Lzns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X+SSOpkE2NEpDcz25rEfOxcKNl87dan3uX8caQJqfoM91IIitc+L9PL8qRjOfnTJV/QBMW5xhOJxJ1lYhGA+Jj9jw24zUDqruptonYSvuXe+7jpU3YsVApiH5EgFP71CdN4PNvQolSBZz3jymNHgRi6GYBIqRlE9QbktNy5Voq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=wW6meeFv; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a7a9185e1c0so395424766b.1
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 05:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724158256; x=1724763056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
-        b=eRY5MUfZU3a3yCEyLoPXkxgCQxWNc4MIRZcD4wP8g7OewRrRjrUcqlVxk67bIoGx7C
-         rgwOlTFIIyyoPF5Kord8NhR60x+tErH83IGJNhKllCFg75NtHxZZYTue4PSiYvritm0+
-         jiSK/RGUzELj3k7n6vDMJbKQw+/IAYzOdOMj8eH8Cgh2t7xpIk1vajMAt/GBWVCPU2hI
-         1Oty6PU3rEHUSvOAagqin20JjMOeMd2P0EFBWaTL0Fc0hT1F3pqmp9plzsKPVTxGF35K
-         AkTO1d0RtFD8RnA2y/F+l1MXprTRcEtlMq/cYOVcmIFo93/nIUWE6nX/ib24uV1mrglA
-         vzWg==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1724158270; x=1724763070; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UYcA78G5RhJo7Uos3s8dtpmIaAs2azh93tN9QBu7tds=;
+        b=wW6meeFvBK8pAY76Z194ly0iCFsD7mUFH6iot//0Pz1+vL2aldNx7r5i+Mf5Y1lDJO
+         2YjV9VpO68n1GS5B8atiwzaky5WazJPH5A0UsHCZs4sq2AADythFKxIzBJMID1mIg/R8
+         W8PWjImKSkq8td13ZvOmjGTU2BeVdV4yayFU59FrnwG3Z4nC4FprixccKToq4ngVrq++
+         0qKxfGq0NyygnLu1kNBgZvRn7xBjSvxm65D6EZzaQW0wJ0zx8M1JJxApeBsWSVubbswI
+         Hiy45UPk4l3vK78IrJY98iK5TbBDRRQcWvDNVkBY3+3KoFOMxeuowUBg0ZyPH4dH3D5H
+         syxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724158256; x=1724763056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s8MWPtR3uO+2gRcNSfNeD+/PBxQZUdD+N+6nlWLLGfE=;
-        b=s7KbOFFNoSdxZQAnSGfXtP5xIYHPoiWepBw2NnD5C/9FVDv2wZ+WiM4bsd6lzkcZKw
-         asgd76AiHok9VclK+OyIyKTenhnlJfHhjvJwTBViCHi5N1dygaZ3sk9GWsRfaiPm8k/D
-         ZVIiNT50qpbKG1/I2KlX/0+yyxrzY1ja7BVLtwJGPa6/vJvgyogY/myzG5ugJPXLolRX
-         Fvk0X8e7rdcLbzTuXbSqxrSFDYspH1OEo/uEcigEvP5bxcGbsKSXgytkTyaNbqfvParo
-         RFl4M3kQghhOZJ3W499MEMEEz1Oa7sGOAIaKTDm5+HpzEhdwa5HD2PI3BGwTXpqGpF/K
-         PgCA==
-X-Forwarded-Encrypted: i=1; AJvYcCVs3CsSBCgme/jkCSyPwxQCkbrcj0c9HNyws+XSoYelHGzepm2n0CfswN5Qd0jPl1BJvNv+eDRslQ1pKgm0Yy7HHh0KQOZ9
-X-Gm-Message-State: AOJu0YxUqlulgvcurgbAzRa2ED2g8aYiMDCRYoPGsr04sbrorhQZ369K
-	Ga93jew9lQzEyczT199FOFnJ6Tig3DVHrGOwaOWrpWOv9YfnoDFOQs06+ReHCf+OuC2+Wogg1VJ
-	Srkix5rsMALs8pK5JP3h29DH2GDY=
-X-Google-Smtp-Source: AGHT+IFVxQ43R1DJd6akbV18b6pyczSK14XaTu16dBY59vXNpdDIaQCLmgqUMOpNyGXjAchHGzKrDl3RBz2gofMBJp0=
-X-Received: by 2002:a05:6e02:1e06:b0:39a:eb4d:4335 with SMTP id
- e9e14a558f8ab-39d26cdf9f2mr151062465ab.4.1724158256249; Tue, 20 Aug 2024
- 05:50:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724158270; x=1724763070;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYcA78G5RhJo7Uos3s8dtpmIaAs2azh93tN9QBu7tds=;
+        b=vob67tZDwvhYNAGYZPK2OJgQ5YKPfN8m0q8dOA+Kj/LbAgZTeEVWUv6dDX3mWyqOKJ
+         orVkWujOg+LurdSbEOtQBrf25Ckviz058XbXQBwJ3vMqAr6swSrA3IdD5Ye9G8rEy+K4
+         UFHkY6bwGM3F557pKkDwTPryVUJMShO3XkJ4NIXz/l00L3L+S9SUPv+qmOTWCGPbdSux
+         ZGDwJY6pofqIffpLDO4DenSR88UifHLtkEVxhzG8jk/HeMg9RNhQ7fMA0fPYcd73ZIhP
+         BErw0+kxtGg3Tu4NxV2nPgmKBPteGJ20FrQmCIAYjPqpxT9GYlOQCvBDjSnjs4rXTXP9
+         Qo9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVNsXnb4Dh1qXm2A7KlZCLNhJIm5qfSJet7cbd5TO8EljRTewVsPsbWJdukn+rkJEN/vbbKfa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0TiTIRoA/jHncks0gy1zMp6RGgVTfpZ7bCiHAilHcC0bseSeH
+	et+ocFV+P+1298P9eMPZ1PrZIEYsYQS+oFQhsk/b+vbNI1ASS3pNTLILmJTiRBg=
+X-Google-Smtp-Source: AGHT+IHTa06NbX/kCgJascBw6CQ5ajUwd6PH8fTI2ZNrUr0LWfAYkWF3PBQRTnU6zKM08DzlPxRrxA==
+X-Received: by 2002:a17:907:9717:b0:a72:6b08:ab24 with SMTP id a640c23a62f3a-a83928a4178mr1099677766b.14.1724158270057;
+        Tue, 20 Aug 2024 05:51:10 -0700 (PDT)
+Received: from [192.168.51.243] ([78.128.78.220])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838cfe4csm758097366b.89.2024.08.20.05.51.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Aug 2024 05:51:09 -0700 (PDT)
+Message-ID: <1635feb8-eef2-47ef-bcde-eb55dbde19e5@blackwall.org>
+Date: Tue, 20 Aug 2024 15:51:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815113745.6668-1-kerneljasonxing@gmail.com> <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
-In-Reply-To: <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 20 Aug 2024 20:50:19 +0800
-Message-ID: <CAL+tcoDnaVVGVgTxwqYnYZvc8ErD62hGB=HNOU6_3Mwo7M6cSQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
- find port in connect() process
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	dsahern@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
-	Jade Dong <jadedong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 net-next 1/3] bonding: add common function to check
+ ipsec device
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>
+References: <20240820004840.510412-1-liuhangbin@gmail.com>
+ <20240820004840.510412-2-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240820004840.510412-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Paolo,
+On 20/08/2024 03:48, Hangbin Liu wrote:
+> This patch adds a common function to check the status of IPSec devices.
+> This function will be useful for future implementations, such as IPSec ESN
+> and state offload callbacks.
+> 
+> Suggested-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>   drivers/net/bonding/bond_main.c | 48 ++++++++++++++++++++++++---------
+>   1 file changed, 35 insertions(+), 13 deletions(-)
+> 
 
-On Tue, Aug 20, 2024 at 7:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 8/15/24 13:37, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > We found that one close-wait socket was reset by the other side
-> > which is beyond our expectation,
->
-> I'm unsure if you should instead reconsider your expectation: what if
-> the client application does:
->
-> shutdown(fd, SHUT_WR)
-> close(fd); // with unread data
+Looks good to me,
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Thanks for the review.
 
-Perhaps, I didn't clearly describe the details here. I'm not surprised
-that the close-wait socket could be reset like you said. It's normal
-behaviour. I'm surprised that the close-wait socket is reset by
-another flow just because of the tw-reuse feature.
-
-Can we reuse the port and then reset the previous connection which
-stays in the close-wait state, I wonder?
-
-Thanks,
-Jason
 
