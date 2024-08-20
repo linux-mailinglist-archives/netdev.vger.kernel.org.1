@@ -1,289 +1,886 @@
-Return-Path: <netdev+bounces-120147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAC5595870E
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:34:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9129958717
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C0021C2117D
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:34:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65AE9282810
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E572719007D;
-	Tue, 20 Aug 2024 12:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E19A18FC8F;
+	Tue, 20 Aug 2024 12:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W5tg7/MM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="doOJNdrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A11C190064;
-	Tue, 20 Aug 2024 12:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724157226; cv=fail; b=NopdyD/8dKndnX6a6B1zwbZQcwOJxKz4ELPRyXsjV5mQOUhAvOvbR13vZc22RZHVBL2besJN83xPY60ooI75thQzfH2Ywnrg5CrYogS6IYMyav+Bsm2TQHWzrKcdObbO+bum1RljWLKEM4ifuQQtGeKCO78w3YKWitpbKwDZqBc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724157226; c=relaxed/simple;
-	bh=CroV2LavqEiDCPgdOhSC/bQqzDveKVkiS26Dd5MJIyE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AgezXwFgoyMHftzZdaeEZ/lFYkHdZF007gdqVikkj9dOlZuDvQhL7r5OMmGz0NYG0h0XmLQnJR1gyVFBGXIFBuNlmpNXRq+5ZcYVnyz+htn7bYiiNsahrXQKxtl5FgveodEVIe/Da8PYdILFVNfCntjCMW/3/WUAbTXS+LRUvTg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W5tg7/MM; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724157225; x=1755693225;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CroV2LavqEiDCPgdOhSC/bQqzDveKVkiS26Dd5MJIyE=;
-  b=W5tg7/MMvJr3LrkCI5ssFQt0wLV5IvfS+weyWETwbpejVvM5HikL0RAq
-   TSHFS6C0myqi5MHs0fvJGdFouMzT13Eyq71QLHMdMMxEI2YQjAUYvA0Uk
-   pNj4chhQcNKGxJ6bYEoSvCSV8iid2OLmYDY4jMGK+8svIQrl3tMPwL9nE
-   zsSsZPIdZRoBhhAttnLQgbLt+zl+wC+rrvMdRCCvmQDxRnHbLgo5D8F9F
-   oPO9YMbC5d0Yb6u7k6kLcNw6l9YSYg7lswLZifGhC9EOVMikbk3XFhzet
-   jiiVKwg47YaSqHny172Fiyb67SqSR7veWVUBOeqwEawzSZJMOdQjuFLCP
-   Q==;
-X-CSE-ConnectionGUID: L/qayYjzQOWgRUlLJouQMQ==
-X-CSE-MsgGUID: CzgtdTx2ToeneWkk1bA+Xg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="33840444"
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="33840444"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 05:33:44 -0700
-X-CSE-ConnectionGUID: 4c5BajykTZiQ0yJnYATOXw==
-X-CSE-MsgGUID: PkoRUN5fT0OP7/QnhIjT9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,162,1719903600"; 
-   d="scan'208";a="60770500"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Aug 2024 05:33:44 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 20 Aug 2024 05:33:43 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 20 Aug 2024 05:33:42 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 20 Aug 2024 05:33:42 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.44) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 20 Aug 2024 05:33:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X+MGrZghJ2Y9R2mBzlCDiinIoGwVR02sNEbsfcPKw7K44jESwiGk7qdsW4vM8nrIv1u7dqmYLQnw7m7cPnpCiq8RFZQY86sEW1cmoYInzCU5HNYNPdPHESBCM2sKrtPasISOHgThT1XwaOuNubJr7ofmPWJ26SGgRf0faPPK2miosv9lXZpLJFTU8/wr8DGwlUfMERPCE+cJWKNwCOCxbWLTdp7wg2GQ17J44P70usRYbhrpcWxBiCyZ5GIIZIVjeVKBnvvSdcGs4qLuWtBD6kj2NttAf5mdG++FiRNm7U5rBrYxadBkvNkifRQsLZv3o7ACaSQwrfwvtq9o054aXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CroV2LavqEiDCPgdOhSC/bQqzDveKVkiS26Dd5MJIyE=;
- b=Ta/HqID0P1jl1YwoLcNTyn4ZhwfZF8hcmIw72ccQN8dfKXt0dcwQ8EZYUBT/z6Z0OHw5E/6Ea9yhBApk20YCFlleLmYcgE2lrWGxFdjeAKP+KQtB9F33APFSoWPuzo51jLsiStDibTJDTVzokRnov6fderROmA2+2slk0sG+2Qxq4ksiZKW/9mrHfNYcLJE9Z6OIjcVCc6pT/2o02MNa46fGOOTqNWAwgjddd5aYRvgS3S4T43sNeF/4a4YsQMUZ4CYMmxxVLVXr25wc21oRWUNg02bRieEj/gcOY5EW19azCfu8zx70mG8n79dXCHrbxcEBhtJqU77CGOGJN6ZWMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- IA1PR11MB6194.namprd11.prod.outlook.com (2603:10b6:208:3ea::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Tue, 20 Aug
- 2024 12:33:40 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.7897.014; Tue, 20 Aug 2024
- 12:33:39 +0000
-From: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>, Sriram Yagnaraman
-	<sriram.yagnaraman@ericsson.com>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-	"Daniel Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Richard Cochran
-	<richardcochran@gmail.com>, Benjamin Steinke
-	<benjamin.steinke@woks-audio.com>, Sebastian Andrzej Siewior
-	<bigeasy@linutronix.de>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "Georg
- Kunz" <georg.kunz@ericsson.com>
-Subject: RE: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structures and
- helpers
-Thread-Topic: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structures and
- helpers
-Thread-Index: AQHa774yuHk6dVxMp0yVid1EycfUSrIulX6AgAAF9wCAAAhJgIAAWk4AgAEaOACAAAJc4A==
-Date: Tue, 20 Aug 2024 12:33:39 +0000
-Message-ID: <DM4PR11MB611732376D8E671D7C513633828D2@DM4PR11MB6117.namprd11.prod.outlook.com>
-References: <20240711-b4-igb_zero_copy-v6-0-4bfb68773b18@linutronix.de>
- <20240711-b4-igb_zero_copy-v6-4-4bfb68773b18@linutronix.de>
- <ZsNGf66OjbqQSTid@boxer> <87r0ak8wan.fsf@kurt.kurt.home>
- <ZsNSc9moGwySgpcU@boxer>
- <AS4PR07MB84123D29A27BEB30CECC5FAA908C2@AS4PR07MB8412.eurprd07.prod.outlook.com>
- <87frqzidql.fsf@kurt.kurt.home>
-In-Reply-To: <87frqzidql.fsf@kurt.kurt.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6117:EE_|IA1PR11MB6194:EE_
-x-ms-office365-filtering-correlation-id: 014eda4f-da6d-49b6-65db-08dcc1145201
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?DNjgZkFd4SRDGNLZIHOQM84suTH2xVZmTXD124vNkTk4gwNlyKe6kbRlb7GX?=
- =?us-ascii?Q?G1Oy2O3EipVFzqQfYyJ6WDixo4Lh2+lNhh/lHsErjHAGg5q7/eCrUms309cl?=
- =?us-ascii?Q?9dNzje4D5/k7eU1erLVyylvMPAZyn2wH/PSNYt6M033e1h97VNmaHbtFEbOA?=
- =?us-ascii?Q?4dNrk2EtzaYnR3F7ELD4Yl/FwECsAHAGSPpM8vL4CTIpjxw/jrbnajI8Es3/?=
- =?us-ascii?Q?dnVtlAaPDcHVgLfx/+zr6Rzmy29BXA53dhPGt7tn5rNL/TUSLdUiAc9PdlFA?=
- =?us-ascii?Q?SuPgEWLvYl6HEgdTj25sWDQSk/6QmORvlm/J5wzJNTgQXaLbYhg2XhIwOVkM?=
- =?us-ascii?Q?XzOR5dJQ1uRiGjh/f+r8kmHVsQI+2j71VVaWXOIqTu4QDIB0pj5sz91Dk4sK?=
- =?us-ascii?Q?044xv1DqUa0TFEiurjAWLfqhj72z0kKHthwOpj8oessMIDqC9+AVg0X0e0qc?=
- =?us-ascii?Q?op+CSW8M7ZU8QG58WIO4a4zHfyPWHotTD+G1Tr6aFSEdBkC0B4qqpGLEP9QQ?=
- =?us-ascii?Q?/Ww5yH7PijHm83zJwo59rbfb1OPaM1vf2wAeEnijuoSwEmOLEPYNs3TTnxJ9?=
- =?us-ascii?Q?NOqzk0iPrQLUUpzNEweTQl2VWCpie0lA7Gzb8Z71ApLNs6ec7ARLkruorVhM?=
- =?us-ascii?Q?YDZOpMVwn03zMdIEbYO7EQjpwWUtdUfXXp66FLFWlAmR0s9Z4S4sPW/slPqq?=
- =?us-ascii?Q?fLtYcTh+Za9qpr6q64gJlWcaPKPWdji3zAnzG9QzBC3XThk6uvBkExinJ3V+?=
- =?us-ascii?Q?0Uo/JYFOdv5kbJQ3Il88afcwZgEe1njlZu2H3Zw8gEI8ixhRG8YfkddfN0V+?=
- =?us-ascii?Q?z/IHbnrpNyoGcGTGLpGlIpXYvWqliWxU8hXFaDIXdg6lQnPMsF4qbvpjkta+?=
- =?us-ascii?Q?Qk3hnUcFMzpnU5/yP1dRle+3k7KKb3L+hJLJJK1nm0z0EdM5sdzMDhYYAAPz?=
- =?us-ascii?Q?EBuguGkMg3GQQTwznKGeMPnuVTly6h/2Y2R5CXV9zqWjmxitLr2nho9bGwBU?=
- =?us-ascii?Q?LrEZpchcTaLiIcfhw8HuK1oriqMCUWFZsAQeor4KWqJqAlnUEhA3F520JkzF?=
- =?us-ascii?Q?nNd6JQQIYju1wolKYKx4QSWSvU6IF8MYrtQ67OLgqD1oG3sK2hbQcDfvf+XS?=
- =?us-ascii?Q?DsCyogtIRgty1nJ5BLtlQRNl8sJiLD9M8sn1Fr0RA7iYcPY+oJJl4uJ7xZdp?=
- =?us-ascii?Q?4GPu0PHhgVDrRcDKtaLSxH0HQ37afk7/KCe37Gv2v8SQFK4R+d4rUXlo+DiN?=
- =?us-ascii?Q?8hz6DCqyh2ll2LKFLew4xd2ryHAk3z8aTY7/rzwFaWkohWIyTfetdJkQ4dVZ?=
- =?us-ascii?Q?ZTtsRtqeGnZQRkOPkujwZEQLwIwixoHCl+ok98AoYK0LIkfcn1lD4f7Er/PZ?=
- =?us-ascii?Q?pkUqiLD7xam2aJnnb0SSQ1FYYWs9Vm2Ost0+n8t6daoVP+p1lA=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?koEb2x+QB+mdQpon3vN/HGB9RWVpb9w8Mb734MJjkfOVhERe2SPdOlGbpPtt?=
- =?us-ascii?Q?LEM6vkwVt+aCfRQxowY8tvaM0Nsa/R9dWzazNAr0GdMd9rhM8uXEJ3ZTo5yP?=
- =?us-ascii?Q?o9E2xrmgjI8aWlSi6U3ilaeZ532WEz8l2V0cX6nH73CQ9v1W9jYF+FKqbheL?=
- =?us-ascii?Q?X+eDfYpL9uq4M6PZ3dN3aPjrmHXN/NIP4YFoQR4BX6STgIcWRK023aUg2LVN?=
- =?us-ascii?Q?oeEICr/elYGF6rAnYnQQUnSJ2efo4E1QAdf6Vo+tSwciG4KqqGQhs9Sr9f24?=
- =?us-ascii?Q?nk6dmu/Dhfj99iUoEiTYGRVyLCfx0n4O0W00mGd5CwYuO4HljXoyK/C6sHTD?=
- =?us-ascii?Q?C4H4yEph/COmXMHxLmBI9klLNvD63Sij+If+BCHqPfmQs10JoyJmIS65pAOV?=
- =?us-ascii?Q?E6ho1EbDatjkl2KMBYpW6CRTxu/jb0yDduUFWO9033lgD4vFFFFFugL8ZWVJ?=
- =?us-ascii?Q?qCkzceCp926TmMk1CHbIY72Q8kKeQO841EhGgmpPBmnT6DZGjUvW8G9d5RjM?=
- =?us-ascii?Q?OgVRMFadiVrTfjhIQTJKG1tbXkAKsm3VI7KupEMRLU3Jm18BHxOwvHPAyjqC?=
- =?us-ascii?Q?34NXkHNdj/WvNdu1+t0Umaa/qfEvfM/YnlSZURQgnbwkgPnTVLRp8DfvWzzf?=
- =?us-ascii?Q?Co4gPmuEDtAFXUYQN4lwfdheTYNsvaO5WV4snGRfS0h5jQ4srbsL3I4IZHb2?=
- =?us-ascii?Q?Oxs7Omnu/ZtopjPrjnvBDM6vGYelXLxTDVxuqavn7lzl6kBQ7jPeKnStI8p/?=
- =?us-ascii?Q?UwawH4+exLfeiXvmUq/Q9WHsHVg78xoFw2cyZ1UlFl53IkVRFwnlOtQEeW6T?=
- =?us-ascii?Q?fK0z4NjznOYWmzezFkHLc6YuxIQ69jBRsvMZfbdw1CW1gseg92MlKJq3V3Hz?=
- =?us-ascii?Q?6bL0kDZfBMYo+fAx3N4cdEZiw3tLbIa1/ks3JTzd7spDuapHNijcEnQQVHZ8?=
- =?us-ascii?Q?9xGlUXeml2ciHwxuR+qpdVmuereUn7c+tD10lM9j/qPqNpl5UBE44o+Zqv2R?=
- =?us-ascii?Q?4ZP9GMNZKAr2mEPDommv92Fad4v42kxfqK4F/8+X81/L5FQDD1JDhmseZFLf?=
- =?us-ascii?Q?rK9viFGUy6UJgscbJsUfjaK1EWtXBHUVNO4breav1Uv81T2U3KOd9Qiy7rWz?=
- =?us-ascii?Q?EW7xLhCreUSDH6h8yy2owsg+kK0AXIm/ygv0pusR9bKn+aV8A52BDMKYwLKP?=
- =?us-ascii?Q?DuBVR4qCzsUe905MEZlkLXLcPimc5TMJlvWCL7QiRBzVsf+ly2pSVraE/sLw?=
- =?us-ascii?Q?YxsyGXp+EQWL39bt/wkVstFtmYP131PE8l8Mmp/6h+9W6bBD7vzQ0Kw1qT2s?=
- =?us-ascii?Q?N6duw05BoklbrqAPooui2w6GcjZgFoKSkvpkfzCFj/iZc8AeaTHEqFgNSCrc?=
- =?us-ascii?Q?TMJ+SATP3RdrsCm3UrBJPegPMtW+H1Vb6CrWow2EqSU3QkAiu0RkYm7yQPF4?=
- =?us-ascii?Q?7m9+7jMeCpzletrL9lY6c65RRQxTOyTC40h6VWk7SdF9lNNwglWXbwcwKzx4?=
- =?us-ascii?Q?Hce5tSVRv7C7Y7DLYQGfWCWeKOwoyhQNZDL3+zVC30tJxFcZLuepgTNf8LR3?=
- =?us-ascii?Q?hzl5mWi21F1NwQf1dYq86jzC9VIEA6SGUzlrVBUp?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A3E1CAAC;
+	Tue, 20 Aug 2024 12:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724157305; cv=none; b=WGBbqiA+MV02iDrJLJfVJUHyObxrk2vpe+rQkLfFrVCBqpPD0JiDIlb2EXljc2QRX1KdlNMRxaWSoOdS0nU6djTOMqNjl+RL/P+VVwzA/79XAcX3ucwmXK1HVP7BXVRXhO8EI4bJzrjDH7s8eivzpxaXvL3NP3fKkl/qpbMBt3I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724157305; c=relaxed/simple;
+	bh=OFFbWVomErqVDJ1QlW0KdifzN+X4cNUoTYjA6waeA8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dH3puOOl3v430lLVLdc+n4Yg/OYOTgo3qHMfJHYtwZWL6Jaqsp/xDwTHOBervrcxCkri9p1QC59LUO4eOhNwA+I0Q3OPVHjiVDr5Q2R5c1LnbtgdqJrSMggk+ZzvXkTQvydMJAiHF5NjMha5krNnb+9lY48gHOl1201u2/euyHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=doOJNdrv; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5bec87ececeso4450023a12.0;
+        Tue, 20 Aug 2024 05:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724157301; x=1724762101; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/VHGZt1R2aqOcWKdCxk8PVxhDicABM+R1yiEYakU1s0=;
+        b=doOJNdrv//J19K0hfDLTGnbHVyt2BTsDkjEaZ+d+4X3W6gF/ud8hZFRVngiYx3nqcK
+         AaKQxMFNmDqlmzHQsm27J4j2++w7d6r3V7UcNU5C5lztjGh3pCjezAyLrZFUwF9GmBio
+         KvLoA7tm80WIUNMh/ohTslkco+cjZHGXqT4nl0lQ2LyTl3j9Zzc2P9dVZkXLIll2VfvO
+         3/u0yImOwuIv0CmtCbifNnSzDJSkM356qhNCjOI5ahqxCCczQPbUCzD8V4luoEGfENwb
+         L3rjhU8aM69DsnSIUsW2pGOhKze8c1iDahd3ob6y74YWnnWbyS+xJKnXsYL60xhJsjn3
+         O+Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724157301; x=1724762101;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/VHGZt1R2aqOcWKdCxk8PVxhDicABM+R1yiEYakU1s0=;
+        b=i49nd4DUfebACR6M+DZjqVxCCdT4we2hNcyk60KRjIDVVamgUqN8+0rc/I+XTqDEC2
+         zjZ5fSj0Poe+MbEPz4MqoGQf/apJjcghOEVBfmRxjChG3elZqb5ngjGCRyJFVD/0mzv1
+         qClmFrWDfD5XboDJa5wsp8BlbtX0iuh1rFDUZSHBwRNw+8g1kVsDXqfYrwkh2oAmbLLA
+         OKZMHRCOpKeKV2+mKSfoiELc7jHGyhn4EqXlQ825qgN0QUIQcLDlFG0yav14Kbqid9xZ
+         etrO/j0TZsSL3ZBHHXLvTcFvDEGffxyhQPuMOkdQza6k5Yoi53Ki7D8E6P+oVcJdtfGD
+         lS7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUteTSVan8kZAIOuu8U6uD35PtL8SZyS6EZ6I8iXXflJO6i8nWMZCv/PzFwbjPFZ6cG50pnF426vf3fx1o=@vger.kernel.org, AJvYcCXDvHBvsWGr9GdbKauZToG1SP0n+h+5Jl4ypye4HmGKhSyHcEkGI/GXbu5tPZSRmTHJ/VAVa/ie@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP5fsmMUp7oCkKSQ0zMUo9jENmCnaR9AdWbz2UfdDF7H8B34br
+	nUYIeAamNGqvyQ1yqWCDohwS8Tg1hlqYWHxIOiKvJf57A4lntyHU
+X-Google-Smtp-Source: AGHT+IF6uYBW9R6jzN702jDQ9saKget2CSs108Txn3oN6qQ6VWBBn4r2ghfXbAlhLU9xpNVAIt0uWw==
+X-Received: by 2002:a05:6402:11c9:b0:5be:ffe1:6539 with SMTP id 4fb4d7f45d1cf-5beffe1666fmr3978232a12.24.1724157300170;
+        Tue, 20 Aug 2024 05:35:00 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bec82e5eacsm5909592a12.19.2024.08.20.05.34.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 05:34:59 -0700 (PDT)
+Date: Tue, 20 Aug 2024 15:34:56 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com
+Subject: Re: [PATCH net-next v4 3/7] net: stmmac: refactor FPE verification
+ process
+Message-ID: <20240820123456.qbt4emjdjg5pouym@skbuf>
+References: <cover.1724145786.git.0x1207@gmail.com>
+ <bc4940c244c7e261bb00c2f93e216e9d7a925ba6.1724145786.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 014eda4f-da6d-49b6-65db-08dcc1145201
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Aug 2024 12:33:39.8896
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SkRd/ibzb+ICRG6gwsagTBRE6WdrxNtxNbjA3o3Y/+qK21M34A9OQObprCdhDNVkpVvnGvB6Rgz5i6n+DLIqZL1Q49xpX6tn399iC5eca8I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6194
-X-OriginatorOrg: intel.com
+Content-Type: multipart/mixed; boundary="n5bc2hehdh25qze3"
+Content-Disposition: inline
+In-Reply-To: <bc4940c244c7e261bb00c2f93e216e9d7a925ba6.1724145786.git.0x1207@gmail.com>
 
-> Hi Sriram,
->=20
-> On Mon Aug 19 2024, Sriram Yagnaraman wrote:
-> >> -----Original Message-----
-> >> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> >> Sent: Monday, 19 August 2024 16:11
-> >> To: Kurt Kanzenbach <kurt@linutronix.de>
-> >> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>; Przemek Kitszel
-> >> <przemyslaw.kitszel@intel.com>; David S. Miller <davem@davemloft.net>;
-> >> Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
-> >> Paolo Abeni <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>;
-> >> Daniel Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
-> >> <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>; Richard
-> >> Cochran <richardcochran@gmail.com>; Sriram Yagnaraman
-> >> <sriram.yagnaraman@ericsson.com>; Benjamin Steinke
-> >> <benjamin.steinke@woks-audio.com>; Sebastian Andrzej Siewior
-> >> <bigeasy@linutronix.de>; intel-wired-lan@lists.osuosl.org;
-> >> netdev@vger.kernel.org; bpf@vger.kernel.org; Sriram Yagnaraman
-> >> <sriram.yagnaraman@est.tech>
-> >> Subject: Re: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structure=
-s and
-> >> helpers
-> >>
-> >> On Mon, Aug 19, 2024 at 03:41:20PM +0200, Kurt Kanzenbach wrote:
-> >> > On Mon Aug 19 2024, Maciej Fijalkowski wrote:
-> >> > > On Fri, Aug 16, 2024 at 11:24:03AM +0200, Kurt Kanzenbach wrote:
-> >> > >> From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-> >> > >>
-> >> > >> Add the following ring flag:
-> >> > >> - IGB_RING_FLAG_TX_DISABLED (when xsk pool is being setup)
-> >> > >>
-> >> > >> Add a xdp_buff array for use with XSK receive batch API, and a
-> >> > >> pointer to xsk_pool in igb_adapter.
-> >> > >>
-> >> > >> Add enable/disable functions for TX and RX rings.
-> >> > >> Add enable/disable functions for XSK pool.
-> >> > >> Add xsk wakeup function.
-> >> > >>
-> >> > >> None of the above functionality will be active until
-> >> > >> NETDEV_XDP_ACT_XSK_ZEROCOPY is advertised in netdev-
-> >> >xdp_features.
-> >> > >>
-> >> > >> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-> >> > >
-> >> > > Sriram's mail bounces unfortunately, is it possible to grab his
-> >> > > current address?
-> >> >
-> >> > His current email address is in the Cc list. However, i wasn't sure =
-if
-> >> > it's okay to update the From and SoB of these patches?
-> >>
-> >> Okay. Then I believe Sriram should provide a mailmap entry to map his =
-old
-> >> mail to a new one.
-> >
-> > Please feel free to remove my "est.tech" address from From: and
-> > Signed-of-By:
->=20
-> Ok, I'll replace your est.tech email address with your ericsson one in
-> all patches. Or do you have a personal address (like gmail), which you
-> prefer?
 
-Personal mail is probably best choice.
+--n5bc2hehdh25qze3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->=20
-> What about the copyright in igb_xsk.c? Does it belong to you, or Intel
-> or to your previous employer?
->=20
-> > I am just glad that my work has not gone to waste. Thank you for that.
->=20
-> You're welcome.
->=20
-> > I will check with my company's *lawyers* to see if I can provide a
-> > mailmap to my current address :(
->=20
-> Good luck with that :-).
->=20
-> Thanks,
-> Kurt
+On Tue, Aug 20, 2024 at 05:38:31PM +0800, Furong Xu wrote:
+> Drop driver defined stmmac_fpe_state, and switch to common
+> ethtool_mm_verify_status for local TX verification status.
+> 
+> Local side and remote side verification processes are completely
+> independent. There is no reason at all to keep a local state and
+> a remote state.
+> 
+> Add a spinlock to avoid races among ISR, workqueue, link update
+> and register configuration.
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  21 +--
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 172 ++++++++++--------
+>  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   6 -
+>  3 files changed, 102 insertions(+), 97 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> index 458d6b16ce21..407b59f2783f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> @@ -146,14 +146,6 @@ struct stmmac_channel {
+>  	u32 index;
+>  };
+>  
+> -/* FPE link state */
+> -enum stmmac_fpe_state {
+> -	FPE_STATE_OFF = 0,
+> -	FPE_STATE_CAPABLE = 1,
+> -	FPE_STATE_ENTERING_ON = 2,
+> -	FPE_STATE_ON = 3,
+> -};
+> -
+>  /* FPE link-partner hand-shaking mPacket type */
+>  enum stmmac_mpacket_type {
+>  	MPACKET_VERIFY = 0,
+> @@ -166,11 +158,16 @@ enum stmmac_fpe_task_state_t {
+>  };
+>  
+>  struct stmmac_fpe_cfg {
+> -	bool enable;				/* FPE enable */
+> -	bool hs_enable;				/* FPE handshake enable */
+> -	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
+> -	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
+> +	/* Serialize access to MAC Merge state between ethtool requests
+> +	 * and link state updates.
+> +	 */
+> +	spinlock_t lock;
+> +
+>  	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
+> +	u32 verify_time;			/* see ethtool_mm_state */
+> +	bool pmac_enabled;			/* see ethtool_mm_state */
+> +	bool verify_enabled;			/* see ethtool_mm_state */
+> +	enum ethtool_mm_verify_status status;
+>  };
+>  
+>  struct stmmac_tc_entry {
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3072ad33b105..6ae95f20b24f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -969,17 +969,21 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
+>  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+>  {
+>  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+> -	bool *hs_enable = &fpe_cfg->hs_enable;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
+> +
+> +	if (!fpe_cfg->pmac_enabled)
+> +		goto __unlock_out;
+>  
+> -	if (is_up && *hs_enable) {
+> +	if (is_up && fpe_cfg->verify_enabled)
+>  		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+>  					MPACKET_VERIFY);
+> -	} else {
+> -		*lo_state = FPE_STATE_OFF;
+> -		*lp_state = FPE_STATE_OFF;
+> -	}
+> +	else
+> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+
+The fpe_task may be scheduled here. When you unlock, it may run and
+overwrite the fpe_cfg->status you've just set.
+
+Although I don't actually recommend setting ETHTOOL_MM_VERIFY_STATUS_DISABLED
+unless cfg->verify_enabled=false.
+
+> +
+> +__unlock_out:
+> +	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+>  }
+>  
+>  static void stmmac_mac_link_down(struct phylink_config *config,
+> @@ -4091,11 +4095,25 @@ static int stmmac_release(struct net_device *dev)
+>  
+>  	stmmac_release_ptp(priv);
+>  
+> -	pm_runtime_put(priv->device);
+> -
+> -	if (priv->dma_cap.fpesel)
+> +	if (priv->dma_cap.fpesel) {
+>  		stmmac_fpe_stop_wq(priv);
+>  
+> +		/* stmmac_ethtool_ops.begin() guarantees that all ethtool
+> +		 * requests to fail with EBUSY when !netif_running()
+> +		 *
+> +		 * Prepare some params here, then fpe_cfg can keep consistent
+> +		 * with the register states after a SW reset by __stmmac_open().
+> +		 */
+> +		priv->fpe_cfg.pmac_enabled = false;
+> +		priv->fpe_cfg.verify_enabled = false;
+> +		priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+> +
+> +		/* Reset MAC_FPE_CTRL_STS reg cache */
+> +		priv->fpe_cfg.fpe_csr = 0;
+> +	}
+
+With this block of code, you're saying that you're deliberately okay for
+the ethtool-mm state to be lost after a stmmac_release() call. Mind you,
+some of the call sites of this are:
+- stmmac_change_mtu()
+- stmmac_reinit_queues()
+- stmmac_reinit_ringparam()
+
+I disagree that it's okay to lose the state configured by user space.
+Instead, you should reprogram the saved state once lost.
+
+Note that because stmmac_release() calls phylink_stop(), I think that
+restoring the state in stmmac_fpe_link_state_handle() is enough. Because
+there will always be a link drop.
+
+> +
+> +	pm_runtime_put(priv->device);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -5979,44 +5997,34 @@ static int stmmac_set_features(struct net_device *netdev,
+>  static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
+>  {
+>  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+> -	bool *hs_enable = &fpe_cfg->hs_enable;
+>  
+> -	if (status == FPE_EVENT_UNKNOWN || !*hs_enable)
+> -		return;
+> +	spin_lock(&priv->fpe_cfg.lock);
+>  
+> -	/* If LP has sent verify mPacket, LP is FPE capable */
+> -	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER) {
+> -		if (*lp_state < FPE_STATE_CAPABLE)
+> -			*lp_state = FPE_STATE_CAPABLE;
+> +	if (!fpe_cfg->pmac_enabled || status == FPE_EVENT_UNKNOWN)
+> +		goto __unlock_out;
+>  
+> -		/* If user has requested FPE enable, quickly response */
+> -		if (*hs_enable)
+> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> -						fpe_cfg,
+> -						MPACKET_RESPONSE);
+> -	}
+> +	/* LP has sent verify mPacket */
+> +	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER)
+> +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+> +					MPACKET_RESPONSE);
+>  
+> -	/* If Local has sent verify mPacket, Local is FPE capable */
+> -	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER) {
+> -		if (*lo_state < FPE_STATE_CAPABLE)
+> -			*lo_state = FPE_STATE_CAPABLE;
+> -	}
+> +	/* Local has sent verify mPacket */
+> +	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER &&
+> +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED)
+> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
+>  
+> -	/* If LP has sent response mPacket, LP is entering FPE ON */
+> +	/* LP has sent response mPacket */
+>  	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
+> -		*lp_state = FPE_STATE_ENTERING_ON;
+> -
+> -	/* If Local has sent response mPacket, Local is entering FPE ON */
+> -	if ((status & FPE_EVENT_TRSP) == FPE_EVENT_TRSP)
+> -		*lo_state = FPE_STATE_ENTERING_ON;
+> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
+>  
+>  	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
+>  	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
+>  	    priv->fpe_wq) {
+>  		queue_work(priv->fpe_wq, &priv->fpe_task);
+>  	}
+> +
+> +__unlock_out:
+> +	spin_unlock(&priv->fpe_cfg.lock);
+>  }
+>  
+>  static void stmmac_common_interrupt(struct stmmac_priv *priv)
+> @@ -7372,50 +7380,57 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
+>  	return ret;
+>  }
+>  
+> -#define SEND_VERIFY_MPAKCET_FMT "Send Verify mPacket lo_state=%d lp_state=%d\n"
+> -static void stmmac_fpe_lp_task(struct work_struct *work)
+> +static void stmmac_fpe_verify_task(struct work_struct *work)
+>  {
+>  	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
+>  						fpe_task);
+>  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+> -	bool *hs_enable = &fpe_cfg->hs_enable;
+> -	bool *enable = &fpe_cfg->enable;
+> -	int retries = 20;
+> -
+> -	while (retries-- > 0) {
+> -		/* Bail out immediately if FPE handshake is OFF */
+> -		if (*lo_state == FPE_STATE_OFF || !*hs_enable)
+> +	int verify_limit = 3; /* defined by 802.3 */
+> +	unsigned long flags;
+> +	u32 sleep_ms;
+> +
+> +	spin_lock(&priv->fpe_cfg.lock);
+> +	sleep_ms = fpe_cfg->verify_time;
+> +	spin_unlock(&priv->fpe_cfg.lock);
+> +
+> +	while (1) {
+> +		/* The initial VERIFY was triggered by linkup event or
+> +		 * stmmac_set_mm(), sleep then check MM_VERIFY_STATUS.
+> +		 */
+> +		msleep(sleep_ms);
+
+Thanks for the added comment. But why don't you just use queue_delayed_work()
+instead of queue_work() and sleeping at the very beginning?
+
+With this, you really don't need to drop the lock and read fpe_cfg->verify_time
+twice.
+
+But I think what is needed here is better suited for a timer, especially
+because of the required coordination with the IRQ. See the end and the
+attachment for more details.
+
+> +
+> +		if (!netif_running(priv->dev))
+>  			break;
+>  
+> -		if (*lo_state == FPE_STATE_ENTERING_ON &&
+> -		    *lp_state == FPE_STATE_ENTERING_ON) {
+> -			stmmac_fpe_configure(priv, priv->ioaddr,
+> -					     fpe_cfg,
+> -					     priv->plat->tx_queues_to_use,
+> -					     priv->plat->rx_queues_to_use,
+> -					     *enable);
+> +		spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
+>  
+> -			netdev_info(priv->dev, "configured FPE\n");
+> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_DISABLED ||
+> +		    fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
+> +		    !fpe_cfg->pmac_enabled || !fpe_cfg->verify_enabled) {
+> +			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+> +			break;
+> +		}
+>  
+> -			*lo_state = FPE_STATE_ON;
+> -			*lp_state = FPE_STATE_ON;
+> -			netdev_info(priv->dev, "!!! BOTH FPE stations ON\n");
+> +		if (verify_limit == 0) {
+> +			fpe_cfg->verify_enabled = false;
+
+I don't understand why turn off verify_enabled after failure? Only the
+user should be able to modify this.
+
+> +			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
+> +			stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
+> +					     priv->plat->tx_queues_to_use,
+> +					     priv->plat->rx_queues_to_use,
+> +					     false);
+
+I don't understand why turn off tx_enabled after failure, rather than
+not turning it on at all until success?
+
+This really has me thinking. This hardware does not have the explicit
+notion of the verification state - it is purely a driver construct.
+So I wonder if the EFPE bit in MAC_FPE_CTRL_STS isn't actually what
+corresponds to "tx_active" rather than "tx_enabled"?
+(definitions at https://docs.kernel.org/networking/ethtool-netlink.html)
+
+And "tx_enabled" would just correspond to a state variable in the driver,
+which does nothing until verification is actually complete.
+
+There is a test in manual_failed_verification() which checks the
+correctness of the tx_enabled/tx_active behavior. If tx_enabled=true but
+verification fails (and also _up until_ that point), the MM layer is
+supposed to send packets through the eMAC (because tx_active=false).
+But for your driver, that test is inconclusive, because you don't report
+ethtool stats broken down by eMAC/pMAC, just aggregate. So we don't know
+unless we take a closer look manually at the driver in that state.
+
+> +			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+>  			break;
+>  		}
+>  
+> -		if ((*lo_state == FPE_STATE_CAPABLE ||
+> -		     *lo_state == FPE_STATE_ENTERING_ON) &&
+> -		     *lp_state != FPE_STATE_ON) {
+> -			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
+> -				    *lo_state, *lp_state);
+> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> -						fpe_cfg,
+> +		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_VERIFYING)
+> +			stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+>  						MPACKET_VERIFY);
+> -		}
+> -		/* Sleep then retry */
+> -		msleep(500);
+> +
+> +		sleep_ms = fpe_cfg->verify_time;
+> +
+> +		spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+> +
+> +		verify_limit--;
+>  	}
+
+I took the liberty of rewriting the fpe_task to a timer, and delete the
+workqueue. Here is a completely untested patch, which at least is less
+complex, has less code and is easier to understand. What do you think?
+
+--n5bc2hehdh25qze3
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-net-stmmac-replace-FPE-workqueue-with-timer.patch"
+
+From 6ce277245128638160385d948583a3e6d2561a94 Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Tue, 20 Aug 2024 14:50:32 +0300
+Subject: [PATCH] net: stmmac: replace FPE workqueue with timer
+
+What remains in the fpe_task after decoupling RX from TX appears
+overengineered to use a workqueue. A timer which retransmits Verify
+mPackets until the verify_limit expires, or enables transmission on
+success, seems enough.
+
+In the INITIAL state, the timer sends MPACKET_VERIFY. Eventually the
+stmmac_fpe_event_status() IRQ fires and advances the state to VERIFYING,
+then rearms the timer after verify_time ms. If a subsequent IRQ comes in
+and modifies the state to SUCCEEDED after getting MPACKET_RESPONSE, the
+timer sees this. It must enable the EFPE bit now. Otherwise, it
+decrements the verify_limit counter and tries again. Eventually it
+moves the status to FAILED, from which the IRQ cannot move it anywhere
+else, except for another stmmac_fpe_apply() call.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  16 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  35 +--
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 212 +++++++-----------
+ 3 files changed, 100 insertions(+), 163 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 407b59f2783f..dd15f71e1663 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -152,21 +152,18 @@ enum stmmac_mpacket_type {
+ 	MPACKET_RESPONSE = 1,
+ };
+ 
+-enum stmmac_fpe_task_state_t {
+-	__FPE_REMOVING,
+-	__FPE_TASK_SCHED,
+-};
+-
+ struct stmmac_fpe_cfg {
+ 	/* Serialize access to MAC Merge state between ethtool requests
+ 	 * and link state updates.
+ 	 */
+ 	spinlock_t lock;
+-
++	struct timer_list verify_timer;
+ 	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
+ 	u32 verify_time;			/* see ethtool_mm_state */
+ 	bool pmac_enabled;			/* see ethtool_mm_state */
+ 	bool verify_enabled;			/* see ethtool_mm_state */
++	bool tx_enabled;
++	int verify_limit;
+ 	enum ethtool_mm_verify_status status;
+ };
+ 
+@@ -364,10 +361,6 @@ struct stmmac_priv {
+ 	struct work_struct service_task;
+ 
+ 	/* Frame Preemption feature (FPE) */
+-	unsigned long fpe_task_state;
+-	struct workqueue_struct *fpe_wq;
+-	struct work_struct fpe_task;
+-	char wq_name[IFNAMSIZ + 4];
+ 	struct stmmac_fpe_cfg fpe_cfg;
+ 
+ 	/* TC Handling */
+@@ -422,7 +415,8 @@ bool stmmac_eee_init(struct stmmac_priv *priv);
+ int stmmac_reinit_queues(struct net_device *dev, u32 rx_cnt, u32 tx_cnt);
+ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size);
+ int stmmac_bus_clks_config(struct stmmac_priv *priv, bool enabled);
+-void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable);
++void stmmac_fpe_apply(struct stmmac_priv *priv);
++void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg);
+ 
+ static inline bool stmmac_xdp_is_enabled(struct stmmac_priv *priv)
+ {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index a8cdcacecc26..3eb5344e2412 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -1293,14 +1293,7 @@ static int stmmac_get_mm(struct net_device *ndev,
+ 	 * variable has a range between 1 and 128 ms inclusive. Limit to that.
+ 	 */
+ 	state->max_verify_time = 128;
+-
+-	/* Cannot read MAC_FPE_CTRL_STS register here, or FPE interrupt events
+-	 * can be lost.
+-	 *
+-	 * See commit 37e4b8df27bc ("net: stmmac: fix FPE events losing")
+-	 */
+-	state->tx_enabled = !!(priv->fpe_cfg.fpe_csr == EFPE);
+-
++	state->tx_enabled = priv->fpe_cfg.tx_enabled;
+ 	/* FPE active if common tx_enabled and verification success or disabled (forced) */
+ 	state->tx_active = state->tx_enabled &&
+ 			   (state->verify_status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
+@@ -1326,34 +1319,28 @@ static int stmmac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
+ 	if (!priv->dma_cap.fpesel)
+ 		return -EOPNOTSUPP;
+ 
+-	/* Wait for the fpe_task that's currently in progress to finish */
+-	flush_workqueue(priv->fpe_wq);
+-
+ 	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size,
+ 					      &add_frag_size, extack);
+ 	if (err)
+ 		return err;
+ 
+-	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
++	/* Wait for the verification that's currently in progress to finish */
++	del_timer_sync(&fpe_cfg->verify_timer);
++
++	spin_lock_irqsave(&fpe_cfg->lock, flags);
+ 
+ 	fpe_cfg->pmac_enabled = cfg->pmac_enabled;
++	fpe_cfg->tx_enabled = cfg->tx_enabled;
+ 	fpe_cfg->verify_time = cfg->verify_time;
+ 	fpe_cfg->verify_enabled = cfg->verify_enabled;
+-
+-	stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
+-			     priv->plat->tx_queues_to_use,
+-			     priv->plat->rx_queues_to_use,
+-			     cfg->tx_enabled, cfg->pmac_enabled);
++	fpe_cfg->verify_limit = 3; /* IEEE 802.3 constant */
++	if (!cfg->verify_enabled)
++		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+ 
+ 	stmmac_fpe_set_add_frag_size(priv, priv->ioaddr, add_frag_size);
++	stmmac_fpe_apply(priv);
+ 
+-	if (cfg->verify_enabled)
+-		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+-					MPACKET_VERIFY);
+-	else
+-		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+-
+-	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
++	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index a5d01162fcc5..fa74504f3ad5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -971,19 +971,22 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+ 	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+ 	unsigned long flags;
+ 
+-	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
++	del_timer_sync(&fpe_cfg->verify_timer);
+ 
+-	if (!fpe_cfg->pmac_enabled)
+-		goto __unlock_out;
++	spin_lock_irqsave(&fpe_cfg->lock, flags);
+ 
+-	if (is_up && fpe_cfg->verify_enabled)
+-		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+-					MPACKET_VERIFY);
+-	else
+-		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
++	if (is_up) {
++		/* New link => maybe new partner => new verification process */
++		stmmac_fpe_apply(priv);
++	} else {
++		/* No link => turn off EFPE */
++		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
++				     priv->plat->tx_queues_to_use,
++				     priv->plat->rx_queues_to_use,
++				     false, false);
++	}
+ 
+-__unlock_out:
+-	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
++	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
+ }
+ 
+ static void stmmac_mac_link_down(struct phylink_config *config,
+@@ -3362,27 +3365,6 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
+ 	}
+ }
+ 
+-static int stmmac_fpe_start_wq(struct stmmac_priv *priv)
+-{
+-	char *name;
+-
+-	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
+-	clear_bit(__FPE_REMOVING,  &priv->fpe_task_state);
+-
+-	name = priv->wq_name;
+-	sprintf(name, "%s-fpe", priv->dev->name);
+-
+-	priv->fpe_wq = create_singlethread_workqueue(name);
+-	if (!priv->fpe_wq) {
+-		netdev_err(priv->dev, "%s: Failed to create workqueue\n", name);
+-
+-		return -ENOMEM;
+-	}
+-	netdev_dbg(priv->dev, "FPE workqueue start");
+-
+-	return 0;
+-}
+-
+ /**
+  * stmmac_hw_setup - setup mac in a usable state.
+  *  @dev : pointer to the device structure.
+@@ -3537,22 +3519,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+ 
+ 	stmmac_set_hw_vlan_mode(priv, priv->hw);
+ 
+-	if (priv->dma_cap.fpesel) {
+-		/* A SW reset just happened in stmmac_init_dma_engine(),
+-		 * we should restore fpe_cfg to HW, or FPE will stop working
+-		 * from suspend/resume.
+-		 */
+-		spin_lock(&priv->fpe_cfg.lock);
+-		stmmac_fpe_configure(priv, priv->ioaddr,
+-				     &priv->fpe_cfg,
+-				     priv->plat->tx_queues_to_use,
+-				     priv->plat->rx_queues_to_use,
+-				     false, priv->fpe_cfg.pmac_enabled);
+-		spin_unlock(&priv->fpe_cfg.lock);
+-
+-		stmmac_fpe_start_wq(priv);
+-	}
+-
+ 	return 0;
+ }
+ 
+@@ -4049,18 +4015,6 @@ static int stmmac_open(struct net_device *dev)
+ 	return ret;
+ }
+ 
+-static void stmmac_fpe_stop_wq(struct stmmac_priv *priv)
+-{
+-	set_bit(__FPE_REMOVING, &priv->fpe_task_state);
+-
+-	if (priv->fpe_wq) {
+-		destroy_workqueue(priv->fpe_wq);
+-		priv->fpe_wq = NULL;
+-	}
+-
+-	netdev_dbg(priv->dev, "FPE workqueue stop");
+-}
+-
+ /**
+  *  stmmac_release - close entry point of the driver
+  *  @dev : device pointer.
+@@ -4108,22 +4062,8 @@ static int stmmac_release(struct net_device *dev)
+ 
+ 	stmmac_release_ptp(priv);
+ 
+-	if (priv->dma_cap.fpesel) {
+-		stmmac_fpe_stop_wq(priv);
+-
+-		/* stmmac_ethtool_ops.begin() guarantees that all ethtool
+-		 * requests to fail with EBUSY when !netif_running()
+-		 *
+-		 * Prepare some params here, then fpe_cfg can keep consistent
+-		 * with the register states after a SW reset by __stmmac_open().
+-		 */
+-		priv->fpe_cfg.pmac_enabled = false;
+-		priv->fpe_cfg.verify_enabled = false;
+-		priv->fpe_cfg.status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+-
+-		/* Reset MAC_FPE_CTRL_STS reg cache */
+-		priv->fpe_cfg.fpe_csr = 0;
+-	}
++	if (priv->dma_cap.fpesel)
++		del_timer_sync(&priv->fpe_cfg.verify_timer);
+ 
+ 	pm_runtime_put(priv->device);
+ 
+@@ -6030,11 +5970,7 @@ static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
+ 	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
+ 		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
+ 
+-	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
+-	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
+-	    priv->fpe_wq) {
+-		queue_work(priv->fpe_wq, &priv->fpe_task);
+-	}
++	stmmac_fpe_verify_timer_arm(fpe_cfg);
+ 
+ __unlock_out:
+ 	spin_unlock(&priv->fpe_cfg.lock);
+@@ -7395,60 +7331,82 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
+ 	return ret;
+ }
+ 
+-static void stmmac_fpe_verify_task(struct work_struct *work)
++/**
++ * stmmac_fpe_verify_timer - Timer for MAC Merge verification
++ * @t:  timer_list struct containing private info
++ *
++ * Verify the MAC Merge capability in the local TX direction, by
++ * transmitting Verify mPackets up to 3 times. Wait until link
++ * partner responds with a Response mPacket, otherwise fail.
++ */
++static void stmmac_fpe_verify_timer(struct timer_list *t)
+ {
+-	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
+-						fpe_task);
+-	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+-	int verify_limit = 3; /* defined by 802.3 */
+-	unsigned long flags;
+-	u32 sleep_ms;
++	struct stmmac_fpe_cfg *fpe_cfg = from_timer(fpe_cfg, t, verify_timer);
++	struct stmmac_priv *priv = container_of(fpe_cfg, struct stmmac_priv,
++						fpe_cfg);
++	bool rearm = false;
+ 
+-	spin_lock(&priv->fpe_cfg.lock);
+-	sleep_ms = fpe_cfg->verify_time;
+-	spin_unlock(&priv->fpe_cfg.lock);
++	spin_lock(&fpe_cfg->lock);
+ 
+-	while (1) {
+-		/* The initial VERIFY was triggered by linkup event or
+-		 * stmmac_set_mm(), sleep then check MM_VERIFY_STATUS.
+-		 */
+-		msleep(sleep_ms);
+-
+-		if (!netif_running(priv->dev))
+-			break;
+-
+-		spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
+-
+-		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_DISABLED ||
+-		    fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
+-		    !fpe_cfg->pmac_enabled || !fpe_cfg->verify_enabled) {
+-			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+-			break;
+-		}
+-
+-		if (verify_limit == 0) {
+-			fpe_cfg->verify_enabled = false;
++	switch (fpe_cfg->status) {
++	case ETHTOOL_MM_VERIFY_STATUS_INITIAL:
++	case ETHTOOL_MM_VERIFY_STATUS_VERIFYING:
++		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
++					MPACKET_VERIFY);
++		if (fpe_cfg->verify_limit != 0) {
++			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
++			rearm = true;
++		} else {
+ 			fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
+-			stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
+-					     priv->plat->tx_queues_to_use,
+-					     priv->plat->rx_queues_to_use,
+-					     false, fpe_cfg->pmac_enabled);
+-			spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+-			break;
+ 		}
++		fpe_cfg->verify_limit--;
++		break;
++	case ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED:
++		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
++				     priv->plat->tx_queues_to_use,
++				     priv->plat->rx_queues_to_use,
++				     true, true);
++		break;
++	default:
++		break;
++	}
+ 
+-		if (fpe_cfg->status == ETHTOOL_MM_VERIFY_STATUS_VERIFYING)
+-			stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+-						MPACKET_VERIFY);
+-
+-		sleep_ms = fpe_cfg->verify_time;
++	if (rearm) {
++		mod_timer(&fpe_cfg->verify_timer,
++			  msecs_to_jiffies(fpe_cfg->verify_time));
++	}
+ 
+-		spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
++	spin_unlock(&fpe_cfg->lock);
++}
+ 
+-		verify_limit--;
++void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg)
++{
++	if (fpe_cfg->pmac_enabled && fpe_cfg->tx_enabled &&
++	    fpe_cfg->verify_enabled &&
++	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_FAILED &&
++	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED) {
++		mod_timer(&fpe_cfg->verify_timer,
++			  msecs_to_jiffies(fpe_cfg->verify_time));
+ 	}
++}
+ 
+-	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
++void stmmac_fpe_apply(struct stmmac_priv *priv)
++{
++	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
++
++	/* If verification is disabled, configure FPE right away.
++	 * Otherwise let the timer code do it.
++	 */
++	if (!fpe_cfg->verify_enabled) {
++		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
++				     priv->plat->tx_queues_to_use,
++				     priv->plat->rx_queues_to_use,
++				     fpe_cfg->tx_enabled,
++				     fpe_cfg->pmac_enabled);
++	} else {
++		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
++		stmmac_fpe_verify_timer_arm(fpe_cfg);
++	}
+ }
+ 
+ static int stmmac_xdp_rx_timestamp(const struct xdp_md *_ctx, u64 *timestamp)
+@@ -7565,9 +7523,6 @@ int stmmac_dvr_probe(struct device *device,
+ 
+ 	INIT_WORK(&priv->service_task, stmmac_service_task);
+ 
+-	/* Initialize FPE verify workqueue */
+-	INIT_WORK(&priv->fpe_task, stmmac_fpe_verify_task);
+-
+ 	/* Override with kernel parameters if supplied XXX CRS XXX
+ 	 * this needs to have multiple instances
+ 	 */
+@@ -7733,6 +7688,7 @@ int stmmac_dvr_probe(struct device *device,
+ 	mutex_init(&priv->lock);
+ 
+ 	spin_lock_init(&priv->fpe_cfg.lock);
++	timer_setup(&priv->fpe_cfg.verify_timer, stmmac_fpe_verify_timer, 0);
+ 	priv->fpe_cfg.pmac_enabled = false;
+ 	priv->fpe_cfg.verify_time = 128; /* ethtool_mm_state.max_verify_time */
+ 	priv->fpe_cfg.verify_enabled = false;
+@@ -7912,7 +7868,7 @@ int stmmac_suspend(struct device *dev)
+ 	rtnl_unlock();
+ 
+ 	if (priv->dma_cap.fpesel)
+-		stmmac_fpe_stop_wq(priv);
++		del_timer_sync(&priv->fpe_cfg.verify_timer);
+ 
+ 	priv->speed = SPEED_UNKNOWN;
+ 	return 0;
+-- 
+2.34.1
+
+
+--n5bc2hehdh25qze3--
 
