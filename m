@@ -1,143 +1,219 @@
-Return-Path: <netdev+bounces-120162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE64B95877C
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:01:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D595695877F
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 15:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F491C21A80
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:01:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F80282FE4
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 13:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFD319004A;
-	Tue, 20 Aug 2024 13:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4231419007E;
+	Tue, 20 Aug 2024 13:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJXTlzYp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RsW14a0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038B32BAEB;
-	Tue, 20 Aug 2024 13:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C05188CD9
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724158887; cv=none; b=gAgOfOS0eSFMsWTE2X9+HrhhMueQrM3HjLR5w1XAaDMfAkSyKo+NlFhqZCOcONcXGBvV1u5QouwoeF3XQi0Dt66uF+5tdnDg6aph492NT+mzOTKVPZy0y0ICvHmiZO5VPkxOF4FFhiENc6QIMZz3Kendd00P/wyLJzE0K5PZK+I=
+	t=1724158888; cv=none; b=cHMisUy/2Nhevs1MqVNVBefJ4zGRah/JKAth+stR1UM/kUvYIJYMN+nfTTMf/8oVyVCn+xWDqbco+5szgy+2MygVHATjL56Q0XVser0Z3UXXwiU8v4zFHVrtE8wCCzQpg6uKEx/65Dfea7Ons5N7vaQtkjVR7ORXBe6l5njXZhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724158887; c=relaxed/simple;
-	bh=ZzYV8R7oLNooWuBF+41kJ1zL7ccQfq+wmFXy2bObT5Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=urFmd8rRyfIoHemvfr1/yp34MSDhFWso8EPc+T3HoEprq/+8EZ44prdvXL3pU5yuIMcXEl1FvAYkiaaX477xA07Wt7OF5/FqZrVtGfvikcWgmGWnIcAbSY3uvUiV0hZIGBxaGp9o0jO1O61egkeLGjU5e8MKC1uL5qkWhZpApzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bJXTlzYp; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6bf7658f4aaso27112916d6.0;
-        Tue, 20 Aug 2024 06:01:25 -0700 (PDT)
+	s=arc-20240116; t=1724158888; c=relaxed/simple;
+	bh=KZEVo7pLpRsfB5Q6b6kEdFNEWymLaLjJuokEiDN0ViU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Qud3S3inZZA4sCfSJyd60CalhPrKPR4JS5pg6wARdUZDBqeETOOds3KrcZg3PLmpkV4AUI4RZVBS6I3jNkcbmI8fSv5+H0IK89Z5wuBpKzQIirZWQQQalaLzlBhk7/yRnyTwuMFEtg8iToEmIG9PEi9wnqSid9Rp7T3nQdS2omA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RsW14a0z; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-a7a999275f8so225121366b.1
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 06:01:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724158885; x=1724763685; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bzrfdMM7ZdY4mCivAH1uqZtZFRpJQqic8ZQayP8T1MA=;
-        b=bJXTlzYp2+u44Q5rGhP/0HZSb2BchiaAKKKFRDjlcBmJw093DRNPyUAFesG/cT5AOw
-         MLPV4aR5vnqeZdGk1LDqe/W5IVTZs5naC9X36Kxc3gLlgknO0y79HaStyH2CysZJw+mu
-         axpjkUwk32v6ooUkCNM4FhfBqbdjY4Bn93O/+9IrVJ1ue1zPensAHYTVO5toLyTX/LYB
-         7W+/5Wz5uOlzZ8YIS2NRr2UoDMUhkNn+KdHPxeBsRTXRL4wiuibZb4wCV/bycU0PDFU0
-         5B1BD6cStrB44aVV6s9pQMOKyvFrS6dBbJnenQJCv1cbQBnVcSSq/IbcmeoalqGdyEzJ
-         3f8g==
+        d=google.com; s=20230601; t=1724158885; x=1724763685; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BEKfFspd2Zit7uxjfliIJNLSfniyz2DRkiJ2PyNFH0=;
+        b=RsW14a0zEd7UY2PsaRnkF3/BnFY2ceogSe7cdnRGjcXo3Hlsgjv3kgHqT4sAApvtM7
+         KdgGBR7RkjwQrkXdbklZ5EGEXhCw6Hm+j9MwxIHguZjGacBHzDAtEXPfRoNoYrFaUHYc
+         PeeM2YzNOY6a0YaMXmgCG6JXFH9qYClXs3LFj2oYCb9B+h8N0FWtGEg/oF4S9aevbJvf
+         uWBTyULLowKRA31h319ODX8+tfM18Fe3vpkq+b2Jxzym/KDqL5i/RSawVs8lECGuKqga
+         LahLF11x4Zf0x5Ak29LAAhB4EGdBzjempw52ARCurGpm5rvWpOqFkfoBVCr50OjJNpvr
+         CsgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1724158885; x=1724763685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bzrfdMM7ZdY4mCivAH1uqZtZFRpJQqic8ZQayP8T1MA=;
-        b=iHks3n5nihWTk7X9kWhKyCBhsMPHbW+gewVO3AHLhnFIRBPfHGWbLWodAq9/wnP3Su
-         LJ0WiuNofEviimBtKyCqETRoGpceYHlb7fJNm6n3S3puZtvV3+/Jipgpgb9fq4+gNhAl
-         P+f6zmzX5LEuii9ZFIGXEd/FV2VaeKcpKPVSx1OgE9WwqHCubbmjiDk1bSKdmd55MmC5
-         xZqRxZX3B43GypiHI2qCrQLKcEgaGXhDaX0rcWORnGSPH4levk5cHCdds7zL8SFZxb9y
-         Wd7XPoq3JXDMzbpLebFY2U/BACkhAk8pIcXPehXOIamD95MfNEEEUlg394Emsy6R47Co
-         +Opw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHBLwPJhI2mGziN+qhvK33mopKjqn+znz5h86j/kHff+jorv5oBLSEeJgN0OUKp8oppoUIt0i40k5o+IJWX4WP5EHIpfdl57gf5zvW5EJy49b/hY7eukZjz6EIc3uO0aeb5Deo9eBt0utJW1jW5cohAkm6amNf7f0XxmDRte0lcg==
-X-Gm-Message-State: AOJu0YxDs1cJvR1r/eKKZcnr+9c9HbWE45kIqKn78bd2yO8D/CkYdU3o
-	umx2NgnBwnxs83qbJ13crXAQj1iei9qzT+b0n2rDVVNBRMEpudC0r9SZ4unK16GQU8uGNY9ORlr
-	ayaGf302RQ8Dap8r6dd5uNPnQk5w=
-X-Google-Smtp-Source: AGHT+IHu1R21Ij4m0PIa1a51kH4IMrN30SRA67hu1vg5+f5lv8vLg6Vzi0dyh6/vbeiQjsKNdbTSqdMHYbbpciASF8M=
-X-Received: by 2002:a05:6214:4286:b0:6bf:6e7d:81ab with SMTP id
- 6a1803df08f44-6bf7cd79088mr174747606d6.1.1724158884593; Tue, 20 Aug 2024
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BEKfFspd2Zit7uxjfliIJNLSfniyz2DRkiJ2PyNFH0=;
+        b=f58vnjkdoePmAC7aVTvU9OCeAMkU4g6S2HDx9czcIOKWqa4txws7iJQOy4o3Cr/Cfo
+         sNzY3NSPJf95sYt5CI9WWyVC9g31JinOQvD3TtM461yzMccf6ox+bHyufWnkdTRDBQch
+         RLTjWkh8+Z3LoMd6DqGzh0nup41XEpqCo63fv2JRvQx5eqfaLncnNJ9ACIW3sgT90NtC
+         RreokvK1+G8xoTZXBekaVaD/YluyD8kDLBkTYMMT9Jb5b28WfEX0ueg80PZ2MJICFU1j
+         rzBN3S4B9shHtZSWkm9+8l4TCraFSVdzOMvFMZkkj+E6hx9jRzAKiyG9Wxkb6yKjRAO7
+         3Waw==
+X-Forwarded-Encrypted: i=1; AJvYcCVH4O8qsRu16l/qFT0RgttUiV89+hpbWqE8SCXr9c2x4970jmPapIxlYAYNgXr7VdS0vKB6qIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRmHqwoD7ibMDkWw6wtnopqDMxMKicP/1einpQE9vRwkqYq14W
+	6xI0dEa7zq6/kWW/j7r4UCO67RfYDntmO5LDAS66BRnMdOoGfmmToDD+T8I8+LdlvTrVegnGoZZ
+	7mw==
+X-Google-Smtp-Source: AGHT+IFjFxkDEFgwTALnbjQqttd/xtDKHZG9ENeNSlVYU7p8wcECHX8vVJ9SLMwO1lktfch/kKZ1zzECFBk=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:6402:360e:b0:59e:f6e7:5476 with SMTP id
+ 4fb4d7f45d1cf-5beca4a1653mr12915a12.2.1724158884208; Tue, 20 Aug 2024
  06:01:24 -0700 (PDT)
+Date: Tue, 20 Aug 2024 15:01:22 +0200
+In-Reply-To: <20240814030151.2380280-6-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240820121312.380126-1-aha310510@gmail.com> <20240820121526.380245-1-aha310510@gmail.com>
- <CANn89iJrPpmHvidEdd7G7oPrm1+VWsdprvrzQiN4OwTKjU3KsQ@mail.gmail.com>
-In-Reply-To: <CANn89iJrPpmHvidEdd7G7oPrm1+VWsdprvrzQiN4OwTKjU3KsQ@mail.gmail.com>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Tue, 20 Aug 2024 22:01:11 +0900
-Message-ID: <CAO9qdTFiCEoDnckBq7tQDxtZ2LonC6+rMC5rq8H9UnOHL-iqUg@mail.gmail.com>
-Subject: Re: [PATCH net,v6,1/2] net/smc: modify smc_sock structure
-To: Eric Dumazet <edumazet@google.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, utz.bacher@de.ibm.com, 
-	dust.li@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com> <20240814030151.2380280-6-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZsSTouBzDOHFKC1L@google.com>
+Subject: Re: [RFC PATCH v2 5/9] selftests/landlock: Test listen on connected socket
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
 
-Eric Dumazet wrote:
->
-> On Tue, Aug 20, 2024 at 2:15=E2=80=AFPM Jeongjun Park <aha310510@gmail.co=
-m> wrote:
-> >
-> > Since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> > point to the same address, when smc_create_clcsk() stores the newly
-> > created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupte=
-d
-> > into clcsock. This causes NULL pointer dereference and various other
-> > memory corruptions.
-> >
-> > To solve this, we need to modify the smc_sock structure.
-> >
-> > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > Fixes: ac7138746e14 ("smc: establish new socket family")
->
-> Are you sure this Fixes: tag is correct ?
->
-> Hint : This commit is from 2017, but IPPROTO_SMC was added in 2024.
->
+On Wed, Aug 14, 2024 at 11:01:47AM +0800, Mikhail Ivanov wrote:
+> Test checks that listen(2) doesn't wrongfully return -EACCES instead
+> of -EINVAL when trying to listen for an incorrect socket state.
+> 
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+> 
+> Changes since v1:
+> * Uses 'protocol' fixture instead of 'ipv4_tcp'.
+> * Minor fixes.
+> ---
+>  tools/testing/selftests/landlock/net_test.c | 74 +++++++++++++++++++++
+>  1 file changed, 74 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+> index b6fe9bde205f..551891b18b7a 100644
+> --- a/tools/testing/selftests/landlock/net_test.c
+> +++ b/tools/testing/selftests/landlock/net_test.c
+> @@ -926,6 +926,80 @@ TEST_F(protocol, connect_unspec)
+>  	EXPECT_EQ(0, close(bind_fd));
+>  }
+>  
+> +TEST_F(protocol, listen_on_connected)
+> +{
+> +	int bind_fd, status;
+> +	pid_t child;
+> +
+> +	if (variant->sandbox == TCP_SANDBOX) {
+> +		const struct landlock_ruleset_attr ruleset_attr = {
+> +			.handled_access_net = ACCESS_ALL,
+> +		};
+> +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+> +			.allowed_access = ACCESS_ALL,
+> +			.port = self->srv0.port,
+> +		};
+> +		const struct landlock_net_port_attr tcp_denied_listen_p1 = {
+> +			.allowed_access = ACCESS_ALL &
+> +					  ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
+> +			.port = self->srv1.port,
+> +		};
+> +		int ruleset_fd;
+> +
+> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+> +						     sizeof(ruleset_attr), 0);
+> +		ASSERT_LE(0, ruleset_fd);
+> +
+> +		/* Allows all actions for the first port. */
+> +		ASSERT_EQ(0,
+> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +					    &tcp_not_restricted_p0, 0));
+> +
+> +		/* Denies listening for the second port. */
+> +		ASSERT_EQ(0,
+> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +					    &tcp_denied_listen_p1, 0));
+> +
+> +		enforce_ruleset(_metadata, ruleset_fd);
+> +		EXPECT_EQ(0, close(ruleset_fd));
+> +	}
 
-After listening, I realized that the Fixes tag was wrong.
+Same remarks as in the previous commit apply here as well:
 
-When sending the v7 patch, you only need to use the Fixes tag for the
-d25a92ccae6b commit, so we will send it by combining the existing patches.
+  - The if condition does the same thing, can maybe be deduplicated.
+  - Can merge ruleset_fd declaration and assignment into one line.
+    (This happens in a few more tests in later commits as well,
+    please double check these as well.)
 
->
-> > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> > ---
-> >  net/smc/smc.h | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/smc/smc.h b/net/smc/smc.h
-> > index 34b781e463c4..f23f76e94a66 100644
-> > --- a/net/smc/smc.h
-> > +++ b/net/smc/smc.h
-> > @@ -283,7 +283,10 @@ struct smc_connection {
-> >  };
-> >
-> >  struct smc_sock {                              /* smc sock container *=
-/
-> > -       struct sock             sk;
-> > +       union {
-> > +               struct sock             sk;     /* for AF_SMC */
-> > +               struct inet_sock        inet;   /* for IPPROTO_SMC */
-> > +       };
-> >         struct socket           *clcsock;       /* internal tcp socket =
-*/
-> >         void                    (*clcsk_state_change)(struct sock *sk);
-> >                                                 /* original stat_change=
- fct. */
-> > --
+> +
+> +	if (variant->prot.type != SOCK_STREAM)
+> +		SKIP(return, "listen(2) is supported only on stream sockets");
+> +
+> +	/* Initializes listening socket. */
+> +	bind_fd = socket_variant(&self->srv0);
+> +	ASSERT_LE(0, bind_fd);
+> +	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+
+I believe if bind() or listen() fail here, it does not make sense to continue
+the test execution, so ASSERT_EQ would be more appropriate than EXPECT_EQ.
+
+
+> +
+> +	child = fork();
+> +	ASSERT_LE(0, child);
+> +	if (child == 0) {
+> +		int connect_fd;
+> +
+> +		/* Closes listening socket for the child. */
+> +		EXPECT_EQ(0, close(bind_fd));
+
+You don't need to do this from a child process, you can just connect() from the
+same process to the listening port.  (Since you are not calling accept(), the
+server won't pick up the phone on the other end, but that is still enough to
+connect successfully.)  It would simplify the story of correctly propagating
+test exit statuses as well.
+
+> +
+> +		connect_fd = socket_variant(&self->srv1);
+> +		ASSERT_LE(0, connect_fd);
+> +		EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+> +
+> +		/* Tries to listen on connected socket. */
+> +		EXPECT_EQ(-EINVAL, listen_variant(connect_fd, backlog));
+
+Since this assertion is the actual point of the test,
+maybe we could emphasize it a bit more with a comment here?
+
+e.g:
+
+/*
+ * Checks that we always return EINVAL
+ * and never accidentally return EACCES, if listen(2) fails.
+ */
+
+> +
+> +		EXPECT_EQ(0, close(connect_fd));
+> +		_exit(_metadata->exit_code);
+> +		return;
+> +	}
+> +
+> +	EXPECT_EQ(child, waitpid(child, &status, 0));
+> +	EXPECT_EQ(1, WIFEXITED(status));
+> +	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+> +
+> +	EXPECT_EQ(0, close(bind_fd));
+> +}
+> +
+>  FIXTURE(ipv4)
+>  {
+>  	struct service_fixture srv0, srv1;
+> -- 
+> 2.34.1
+> 
 
