@@ -1,84 +1,55 @@
-Return-Path: <netdev+bounces-120324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B47958F31
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:35:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B8A958F5C
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D17FCB21B0A
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:35:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C03E41F2312E
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D59F165F1A;
-	Tue, 20 Aug 2024 20:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E0C1C3798;
+	Tue, 20 Aug 2024 20:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WbGSgdi0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtJZv+8K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8564118E37E
-	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 20:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9011F125D5
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 20:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724186105; cv=none; b=U/hkb5lXtTbDA0c89/2HB9J03/a1hL+HU/v14BmJcjJBfz2qJZ5dnf9ZGxrZMjZBduJsWkssL+OT01i2vns+kWOdZGrnoDLx9Eu9G9XPwiUf6EOftX0a8mh7V1x9h4kNZp8FVEGJapw0qwu9AoPEkw+3F2919/Wq4ExqNoxgth0=
+	t=1724187082; cv=none; b=AsOi5DJm0W/CVGttSg/90wzghYmMWjefuhhHZ9/PuY2FUiQ/ZydpPKSBfV01X0sHA1hWEQimZpb+I3tYE6CuqRsGwvhybfweN+soZgRFd+2g+Ws4JjvQwshA8h7qiL+rsvncbBF8c6/ssrV/G461ZIKFZ7lNtUBAGk5FCTd0Gm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724186105; c=relaxed/simple;
-	bh=UiczpnbBY3ZrF68vlz5ytjzBn/z07xuHXqZM60adjKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AMbfYgUQcrA2I70cZBwpBsJeu7Cz8BUerRBl6bUMRDHIu1x+61PsBLs3kjsxCMNmQQrozr3PSSfEr8fEpSvA4nKoWDxWjk+R3uZqQc5bLnpg+VWy79JqCB0Jqhrj0wzu2N0j4DIDPEigzlwXsMBAHop1kmQ+SIja8V2lx5lnCb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WbGSgdi0; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a501dd544eso362308285a.2
-        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724186102; x=1724790902; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dj06AlN8Lo1JxvByc4fI5xdYlUnQGyATuG5tkQv6ggQ=;
-        b=WbGSgdi0XFc8Yh7HBQ/Kxeho4vGLMSUNCFUwHqgxEqBqmE1KtX6qQjbIRtq6FxR/7l
-         nk3U4QqowGanj0eQuUNkxw4qlCP9wsdUBikVEERd2Z0jm5VC8yvIgFa5wLNRg7HbNKmX
-         EBA+CfkVpdF/Yd53HUU9Qh5v3mqtNiXGVYyrQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724186102; x=1724790902;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dj06AlN8Lo1JxvByc4fI5xdYlUnQGyATuG5tkQv6ggQ=;
-        b=PrKGz+UFgQVkhoZ/LSq1gJlRfDioAc+m6bisRE108TKzmgBMIPx0FkTKsbSkoElgMI
-         /JNO8njBqEgb9QQ4M6rTUffPtnM3AOw1RW7Hpl9Ph2xU6ObCQGTKygbH4mw3ea+m/n9z
-         6LHXsqvDXW9k5cQMnQsELj9k+ZTBHWoliV0DwCyDqm2L5kZOZL/o2rA8iO2ku4JbtXNx
-         ++ZhJK2pRVuW74zxQSsFzUHANQItDX9gr0l/2ezw8+qO6lmhmDt7TcBGg6XJjmBFg0Ye
-         Lh148urWPhzb3DQCHtcPI6nBVtPAxgRAyRelSzfR5Keq60j2LyCZrCn8LDLHmlxOte1w
-         YZnQ==
-X-Gm-Message-State: AOJu0YzBcgA94lW7sj4IqLSA9qOGImNLOZOzHT7I2KSWF4g74rNZsmWj
-	BhuO5SZ2UtaDIrpS6qrHitmIuHDq1INU+19rSUywnZWmpNwVKIw6Pqc9rCgeUQ==
-X-Google-Smtp-Source: AGHT+IGng1Asyl6Ga00/ocSE7KzAegomxLJh6UiteGdzu4R/6yIcI2ZETWHdEDWTOEsn2pDDoTswDw==
-X-Received: by 2002:a05:620a:3906:b0:7a2:32e:3c47 with SMTP id af79cd13be357-7a67404bd69mr51869285a.34.1724186102238;
-        Tue, 20 Aug 2024 13:35:02 -0700 (PDT)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff0e04f6sm559619285a.82.2024.08.20.13.35.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Aug 2024 13:35:01 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
+	s=arc-20240116; t=1724187082; c=relaxed/simple;
+	bh=4DwSFhYi3/R04RA2JCl5MzJ2Vh7D4zUu1KRylp0htnw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TT3af5SUHbiWHmwK9YFnqrXfptO76fltz8oAVhfBpVDgf5pWa78BHkNgUl0kjWhegZ0jel9Na+E3AsmnYIHmalFoiZQPNWZzR0ciTqeN9FJiScamAuJEDKdXpnWiYVrQ14PjG/vKL5OaKfH+k8VtIgz9+9cGRLR1l6/+Oy/PqTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtJZv+8K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6022C4AF09;
+	Tue, 20 Aug 2024 20:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724187082;
+	bh=4DwSFhYi3/R04RA2JCl5MzJ2Vh7D4zUu1KRylp0htnw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FtJZv+8KvIFd840j31l18L6OeIMMndGnNR7yC7H1R/MEPj01O1+V8LmwqobfKpxPv
+	 BzLkvTcfWjh1DNvcVtrz/6TueEAgbdam5LY7/58cELyQa/BSUcAObdY37h4WrZhQVV
+	 jTjCjFN0kiosShF9d5pT7nAgTK4wTkSefay+yn8arUt3P5G7I2vLLoMnubPHZimHW2
+	 R6ZR4A+Uj5dSODemTso2XSCKp89t4Nh+ZD7rM6SoqNOmaQUwBpk32pU+HbcZurk/eb
+	 VEPahNJLneeTDUHPOSHtEpZ+RBJzGbgyKA4XJPC+zoc028o6Quladul6JtWSgrwH0r
+	 ywJQ+p4/Aifeg==
+From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	bpf@vger.kernel.org,
-	hawk@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net] bnxt_en: Fix double DMA unmapping for XDP_REDIRECT
-Date: Tue, 20 Aug 2024 13:34:15 -0700
-Message-ID: <20240820203415.168178-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] net: repack struct netdev_queue
+Date: Tue, 20 Aug 2024 13:51:19 -0700
+Message-ID: <20240820205119.1321322-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,69 +58,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Somnath Kotur <somnath.kotur@broadcom.com>
+Adding the NAPI pointer to struct netdev_queue made it grow into another
+cacheline, even though there was 44 bytes of padding available.
 
-Remove the dma_unmap_page_attrs() call in the driver's XDP_REDIRECT
-code path.  This should have been removed when we let the page pool
-handle the DMA mapping.  This bug causes the warning:
+The struct was historically grouped as follows:
 
-WARNING: CPU: 7 PID: 59 at drivers/iommu/dma-iommu.c:1198 iommu_dma_unmap_page+0xd5/0x100
-CPU: 7 PID: 59 Comm: ksoftirqd/7 Tainted: G        W          6.8.0-1010-gcp #11-Ubuntu
-Hardware name: Dell Inc. PowerEdge R7525/0PYVT1, BIOS 2.15.2 04/02/2024
-RIP: 0010:iommu_dma_unmap_page+0xd5/0x100
-Code: 89 ee 48 89 df e8 cb f2 69 ff 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 e9 ab 17 71 00 <0f> 0b 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 c9
-RSP: 0018:ffffab1fc0597a48 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff99ff838280c8 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffab1fc0597a78 R08: 0000000000000002 R09: ffffab1fc0597c1c
-R10: ffffab1fc0597cd3 R11: ffff99ffe375acd8 R12: 00000000e65b9000
-R13: 0000000000000050 R14: 0000000000001000 R15: 0000000000000002
-FS:  0000000000000000(0000) GS:ffff9a06efb80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000565c34c37210 CR3: 00000005c7e3e000 CR4: 0000000000350ef0
-? show_regs+0x6d/0x80
-? __warn+0x89/0x150
-? iommu_dma_unmap_page+0xd5/0x100
-? report_bug+0x16a/0x190
-? handle_bug+0x51/0xa0
-? exc_invalid_op+0x18/0x80
-? iommu_dma_unmap_page+0xd5/0x100
-? iommu_dma_unmap_page+0x35/0x100
-dma_unmap_page_attrs+0x55/0x220
-? bpf_prog_4d7e87c0d30db711_xdp_dispatcher+0x64/0x9f
-bnxt_rx_xdp+0x237/0x520 [bnxt_en]
-bnxt_rx_pkt+0x640/0xdd0 [bnxt_en]
-__bnxt_poll_work+0x1a1/0x3d0 [bnxt_en]
-bnxt_poll+0xaa/0x1e0 [bnxt_en]
-__napi_poll+0x33/0x1e0
-net_rx_action+0x18a/0x2f0
+    /* read-mostly stuff (align) */
+    /* ... random control path fields ... */
+    /* write-mostly stuff (align) */
+    /* ... 40 byte hole ... */
+    /* struct dql (align) */
 
-Fixes: 578fcfd26e2a ("bnxt_en: Let the page pool manage the DMA mapping")
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+It seems that people want to add control path fields after
+the read only fields. struct dql looks pretty innocent
+but it forces its own alignment and nothing indicates that
+there is a lot of empty space above it.
+
+Move dql above the xmit_lock. This shifts the empty space
+to the end of the struct rather than in the middle of it.
+Move two example fields there to set an example.
+Hopefully people will now add new fields at the end of
+the struct. A lot of the read-only stuff is also control
+path-only, but if we move it all we'll have another hole
+in the middle.
+
+Before:
+	/* size: 384, cachelines: 6, members: 16 */
+	/* sum members: 284, holes: 3, sum holes: 100 */
+
+After:
+        /* size: 320, cachelines: 5, members: 16 */
+        /* sum members: 284, holes: 1, sum holes: 8 */
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 5 -----
- 1 file changed, 5 deletions(-)
+---
+ include/linux/netdevice.h | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 345681d5007e..f88b641533fc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -297,11 +297,6 @@ bool bnxt_rx_xdp(struct bnxt *bp, struct bnxt_rx_ring_info *rxr, u16 cons,
- 		 * redirect is coming from a frame received by the
- 		 * bnxt_en driver.
- 		 */
--		rx_buf = &rxr->rx_buf_ring[cons];
--		mapping = rx_buf->mapping - bp->rx_dma_offset;
--		dma_unmap_page_attrs(&pdev->dev, mapping,
--				     BNXT_RX_PAGE_SIZE, bp->rx_dir,
--				     DMA_ATTR_WEAK_ORDERING);
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0ef3eaa23f4b..614ec5d3d75b 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -644,9 +644,6 @@ struct netdev_queue {
+ 	struct Qdisc __rcu	*qdisc_sleeping;
+ #ifdef CONFIG_SYSFS
+ 	struct kobject		kobj;
+-#endif
+-#if defined(CONFIG_XPS) && defined(CONFIG_NUMA)
+-	int			numa_node;
+ #endif
+ 	unsigned long		tx_maxrate;
+ 	/*
+@@ -660,13 +657,13 @@ struct netdev_queue {
+ #ifdef CONFIG_XDP_SOCKETS
+ 	struct xsk_buff_pool    *pool;
+ #endif
+-	/* NAPI instance for the queue
+-	 * Readers and writers must hold RTNL
+-	 */
+-	struct napi_struct      *napi;
++
+ /*
+  * write-mostly part
+  */
++#ifdef CONFIG_BQL
++	struct dql		dql;
++#endif
+ 	spinlock_t		_xmit_lock ____cacheline_aligned_in_smp;
+ 	int			xmit_lock_owner;
+ 	/*
+@@ -676,8 +673,16 @@ struct netdev_queue {
  
- 		/* if we are unable to allocate a new buffer, abort and reuse */
- 		if (bnxt_alloc_rx_data(bp, rxr, rxr->rx_prod, GFP_ATOMIC)) {
+ 	unsigned long		state;
+ 
+-#ifdef CONFIG_BQL
+-	struct dql		dql;
++/*
++ * slow- / control-path part
++ */
++	/* NAPI instance for the queue
++	 * Readers and writers must hold RTNL
++	 */
++	struct napi_struct	*napi;
++
++#if defined(CONFIG_XPS) && defined(CONFIG_NUMA)
++	int			numa_node;
+ #endif
+ } ____cacheline_aligned_in_smp;
+ 
 -- 
-2.30.1
+2.46.0
 
 
