@@ -1,189 +1,189 @@
-Return-Path: <netdev+bounces-120132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE4F9586D3
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:24:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 052819586D8
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97A4B2818D0
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:24:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29F451C210FA
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 12:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7497218FC68;
-	Tue, 20 Aug 2024 12:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36EBE18FC89;
+	Tue, 20 Aug 2024 12:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cGEYvTXn";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ly5HL7PT"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Yjwodawr"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2080.outbound.protection.outlook.com [40.107.92.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A083D18F2F9;
-	Tue, 20 Aug 2024 12:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724156664; cv=none; b=fODN+kYU/ZQ4TPyn7GZZNv6+Opp8jc5KS3uLs3NfxrcyuTrpjUrqvNAj86wcKi8TKHtPId74Q3ws/gwhTqC2lPUnky+sNY0GEmW3vz7JL69DobAxrLVhJoDemx8/NLBINhkH/+MVwGf/SKpzqB63aYDOOoCO3Wbu8ARiOUdayxI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724156664; c=relaxed/simple;
-	bh=uoTE5a6aWpLtaIBQRdoTYQPSHqUjfKBd4l/YRCLQ42E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QZx8J+GEqGRqecrwVrARd4Yrqh6qftmGY0nQYljbKiXQaAXbyhBCoDdkVbkyfmjkcMp4SlE2cyvx+TG4Z9GkDf6fFTpkxvAhnPt9AVlFoudXcILlA3S+cP1jcGDfiqiseVIf2P8E59d4716cnPaXfVBzZMhPo8cCdEXLEr+RXmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cGEYvTXn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ly5HL7PT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1724156660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uoTE5a6aWpLtaIBQRdoTYQPSHqUjfKBd4l/YRCLQ42E=;
-	b=cGEYvTXndXAP+01WmGPjfMiBag9F+jEvc8/58sZa4+RaYWYmDhjwdHRTMOGuKck4LBvszi
-	k3QkO0+03L1tReUptxZ9yATfWJMKkvjzzL2TqVMojqBaoeEotrk956+mvCT8W2bcpnYyD7
-	k8DY/TeeqomH/GHfPNYY3+t+22C5t25qzgZ5dr/f+1y4IWmndnUEmFprTwkHQ6YAjghtSU
-	+3yOTZwwigJVRk5sP9J91TGyusB0Ad5rpUieG6Z3Vb4vNch4hBxSz0uuQnJZS9JL2/AarA
-	DDPEzYg+fEaAueUX/TDIARbGEghib0h/Q9pM+9Fxmec2wJedPhVJiz/hUBXMQQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1724156660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uoTE5a6aWpLtaIBQRdoTYQPSHqUjfKBd4l/YRCLQ42E=;
-	b=Ly5HL7PTzwADtNLVLKl36kqSBDya28e805WoLgOQ4WCoPSUv4aiRVhKwVwArASRgA/DDCs
-	Oc1TwXfiYMBs2dBw==
-To: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John
- Fastabend <john.fastabend@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, Benjamin Steinke
- <benjamin.steinke@woks-audio.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- Georg
- Kunz <georg.kunz@ericsson.com>
-Subject: RE: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structures and
- helpers
-In-Reply-To: <AS4PR07MB84123D29A27BEB30CECC5FAA908C2@AS4PR07MB8412.eurprd07.prod.outlook.com>
-References: <20240711-b4-igb_zero_copy-v6-0-4bfb68773b18@linutronix.de>
- <20240711-b4-igb_zero_copy-v6-4-4bfb68773b18@linutronix.de>
- <ZsNGf66OjbqQSTid@boxer> <87r0ak8wan.fsf@kurt.kurt.home>
- <ZsNSc9moGwySgpcU@boxer>
- <AS4PR07MB84123D29A27BEB30CECC5FAA908C2@AS4PR07MB8412.eurprd07.prod.outlook.com>
-Date: Tue, 20 Aug 2024 14:24:18 +0200
-Message-ID: <87frqzidql.fsf@kurt.kurt.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C47718A6BC;
+	Tue, 20 Aug 2024 12:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724156702; cv=fail; b=K44snJulU+3TzfDtrr0se/az/RoHOAcNnXHuKUmFw+wem0XWVYB82KPP50TOlT4u3dnY952Jx0cgjKFLvMUItFa767WEe3oIwrH+3UfBTG6pzjrz24jQZClRZUHQRjK65YIXR+MW1XjEOA8IB+6uoKk6mlMQu8iHB79WxjNDrSQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724156702; c=relaxed/simple;
+	bh=a/GrVtZPOUWw6jR88qUoywjlijLd1DxTi7euhnVboqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WuenXc526T1z06ywxEB4b6o1eDaBLE6rol/15cLG3KKZ1yKKkpl6Mqfyhc4VZRsm0EO8tvPo6Dp1n3rDA8igB7t8fbJkhozSszlM2sQJKiLCuDI+SAzf2PGtyjoObsFiS3zoeCc5BqWO2eb4eio6PJFaFTrK33DZkkX+WAoa3x8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Yjwodawr; arc=fail smtp.client-ip=40.107.92.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O3IFb4MW3SOblVFZ1QRhBu97AxhbPHqnUlfQDLNEEs9gAFqAdbyLv2nXfukz7u6+E+Qiy+Rul0WowzNzHjd25RphMpzHUKBmfWWYnPefkk31qyHwgMsklqKVPLR2L1mnwst5eIxWTJu550S90rzJ1nasZeojgkN1KUpml5JG3X4buzT/Sv4sDo7FyXXNcm0SOT0+IuDMJZj6PK/RpCybvGmducBGibbxIksoniwfbpJKQr2wVtd69BC4GrELm5fybwseZ+4q79f4hpn2tkqVMbn7z7UcF5XxIo73463b6kPnaNbuAsifXheuraWcSompMdz4a08fCYdLG69pgiGkhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EfxBISUtdvP+4sZ+24t+oEmelBZk+FIml+egaKW182w=;
+ b=iB/FTmgLVga5sTj7VEcJitD7KEh5jWvRmqVlsFgEbLgI8bnGy+PvqChWqaQWc7qrXOLeQRwnjj64TJrj9RPqXSDWaXF5tbCS7GKlsO/JbgZHGwXlO4DSC77NKULC6jbOeKxGx/bs6gZyhJRv2QtCGhyEESB9I+3B8SLAsvz3CxFfSzWZkSKuQyLXfEhd60YJXIWDBEQMCZKvmOqAsojgRsjJuQ8+wa5rP8eFS06f2Zkayk1Va/dzExOFod3XeSE2oDtf5Y5Xg2gErNv/ikNroyGFXQXaVO+nuWEZKqOQ51+sR9370M11KjAaOXzj2brG1tOFbEevPbxd7Ep1qcPwSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EfxBISUtdvP+4sZ+24t+oEmelBZk+FIml+egaKW182w=;
+ b=YjwodawrZ4bhuZBjHWDxfdcavba1OpAh+CG9X9ysOFZkbEbLVygu5IvwOqa5FyZ8sMewbB2cQEvjuxTRAjrEAcctW5vHYPT9IuAO0qpE60TL8j7DXJJ3fTUJZWIQKoS3rMA7WgzTTKqlKyinsDtCfP2BbCeXkqNqRspFsxytbioIJ+vOmRYXhSgEtslyEYdNj9bWpSPN73xAmG2B8xK7mlgu3LMjA8B4D4NGSXPU1Hf80bVOq12k522mKsWoiirbQ7wwhS+J3RgtxAAHXaLEXyk0DdDVkWBD9aeJA7fXwr196Zob7eqYIUgXdTJaAOXBbGLUY+ZtWu+1uPQypS5Rdg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by IA0PR12MB8325.namprd12.prod.outlook.com (2603:10b6:208:407::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Tue, 20 Aug
+ 2024 12:24:51 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f%5]) with mapi id 15.20.7875.023; Tue, 20 Aug 2024
+ 12:24:51 +0000
+Date: Tue, 20 Aug 2024 15:24:39 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, dsahern@kernel.org, dongml2@chinatelecom.cn,
+	amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com,
+	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 02/10] net: skb: add SKB_DR_RESET
+Message-ID: <ZsSLB8pJInb7xbEc@shredder.mtl.com>
+References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
+ <20240815124302.982711-3-dongml2@chinatelecom.cn>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815124302.982711-3-dongml2@chinatelecom.cn>
+X-ClientProxiedBy: TL2P290CA0009.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::10) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|IA0PR12MB8325:EE_
+X-MS-Office365-Filtering-Correlation-Id: 632adcd1-d0e5-428c-4faf-08dcc1131700
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LJ9EtD8r0Du+azoqKIsPCKqQWTH2xU9SXPFFOIbwsBGC+Qb/gZeldNHVqsMr?=
+ =?us-ascii?Q?hOAibq3x2/JbE57hRjHA7iEoEvfIUiv0vSKcR5d9xEcWHiwDjIWbHHx3VJdh?=
+ =?us-ascii?Q?5sHg6HYagPjbNrirSDelkQ7x29HUorCYlw4EyaCnn3vGgHlhUE2Mu6ZrWgUL?=
+ =?us-ascii?Q?HWXiS5vUCPad9ozcD4mcMVtjduNSSL+NAhEUzf3Ixk+4534fvFOnF7C2kLUE?=
+ =?us-ascii?Q?myUdzzdxwD4C9DjqNC4ymxVa4aRTNsCfCeEazzS/NbhD8XqLfPCkqSVbifAB?=
+ =?us-ascii?Q?Nz/gnhyoGKr27V/VXK7/9HPq2A5Sg9FttLKccG6msmEa6XQQ9AYq4bPhpErR?=
+ =?us-ascii?Q?P2dAV5JBCCDgQaeUajlSyKXBTcSgFtXCmV0742u3xoJEutPmJ4bcAD16sl0z?=
+ =?us-ascii?Q?k6+d89hTIXchLs6KyjIAuyN4lCyLjI3yIfxqbQJdtyrbVAfkJ5f33L/dDNBC?=
+ =?us-ascii?Q?a+weAVT0GsIYuO3i6q607sRFL2E/ebKFvVyCEi1iFyPt2ZmUAnaw+PtLxNHn?=
+ =?us-ascii?Q?qVu+2mGwMAykl+FkBzj0qnJ6uyvyB1RqfFqqW9hT+1wf/QXQ5e7U/uBzzNzO?=
+ =?us-ascii?Q?g7maE98oTcwAv0xFcd5Ewdcdp7i90XTGeqyNkxsTNOB6BnZXNYAeCRETwCTD?=
+ =?us-ascii?Q?5/wJcDJbMniIs95SD2qqxn3XXvFpZpk9eKHEEI2Z9Qv25FCHrC1AOvCjMbsE?=
+ =?us-ascii?Q?i38HbdmV/QIXhKxYiZZpMAZ8Unm6mBe9t8uigrN9R0u2FHcadm5WW9XzlLq/?=
+ =?us-ascii?Q?C/iWeKAOORqCNl2um6VcXcDm4LbJURruV07NjifOs3/wRwMuME4+GvoEA+No?=
+ =?us-ascii?Q?H0YB2mNr9msxLMda2Up/On3WoS1uBBBVc1LDGHYisHeEb1UCHa/1DsOlHwf5?=
+ =?us-ascii?Q?eI8Y7L3YxyPHh1wV9CIhNxikr3yk7CV3QdIA7UFb+Ajk1O7oQuIyKOqkGs7Z?=
+ =?us-ascii?Q?LFtcLpSnIR05V0mGSVRuvIg2lyHWTQE9Ya+iOGqL/ggC5TsCfMRNRHPfpWaZ?=
+ =?us-ascii?Q?zm7D5jIgCVzuz16n8bGQdRd77MvYMNN8Wt9ZvHBwVxvr5eP2nbFu6mGTt66O?=
+ =?us-ascii?Q?JDABoBgQVl8v5kOhI7WqU1mzcAcbAktO44TOcDvyq89JJYo0HwyVxA3BL2Z+?=
+ =?us-ascii?Q?u4GW5RQa7p/dekAGwad8Z2++aJuNjNBZe4XmCaC2HAbZnaQN9dMj0pB0xS6u?=
+ =?us-ascii?Q?kIU4qyD8r16R/YIAjagG88ds/agoU/NjGTN2An9LzgzocPiZPua0xcr4q38y?=
+ =?us-ascii?Q?olOpI1oPxLQV5NJsiBv0n2ZAzxm1+WDgmW4F7VQYCFTKVZS0k27WEW45WqB1?=
+ =?us-ascii?Q?XUoFQ7J6M5Z+8Vr5TFFSu8brhf95vDRO/A+8LEsK32RljA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?njL1OTYGTN/KysvIekypVHea/vx9oLXYzm28OAwvhHWRt9IThF0W10Q+Vn9V?=
+ =?us-ascii?Q?iX2AyHeMPAsTT3VbEgzTJHnWZEFxEkZt571SEgTLKgKEWNPbL8VGLhonAJ3G?=
+ =?us-ascii?Q?GCDkgDN6ttNgbul+/BA8Y8xJpgHWPJy/UMzUBxcfaJwIV4zw1hJyoeRuuFRW?=
+ =?us-ascii?Q?X0LXkna/nu4WoX5930iocMkyyV/1v+Ym4t1+YxkOPoC4KIIOEnOuzHMPCrdg?=
+ =?us-ascii?Q?A9GmYBifjoSKZrmse5hC2v0tepeHVqTNAg1EaNdgIskBbMhselMaq1ptfZxG?=
+ =?us-ascii?Q?xzrZ7nc0YQG0c7bLeyOloasubMrlkTJPw7RLmNvaOr2+Xx/llwJOiIdiRCda?=
+ =?us-ascii?Q?fr37ak+BWQSVq9MgElC21UD8TxfZrh+pc/Xc53bxyLcP3qgJy87NkZYmDWFU?=
+ =?us-ascii?Q?5WMJrirfMPfS9THEM4vQ/2hJEl0Iyby86waQyrBUbek0eNdAuPoB5UUsKc5F?=
+ =?us-ascii?Q?VCkR/4ivUXqaYlM3C3+BNXkG4cYza5YDNfW6DCZWsGZSP84Dqt5+6SVvtLfQ?=
+ =?us-ascii?Q?J0r7qZji11iSU2SJi8lc4V7Iad8vcjN4m6thIQWT7odIGhBZ2d00fmtrB2b2?=
+ =?us-ascii?Q?nFrLjYYwNSX3dz3a5Xcapku0rXHeqLgZ5M+gJkdkOKhamLd3dDoeTbIfJcTE?=
+ =?us-ascii?Q?E3XydW1Ue5Xf3H9mi6+Ldj8FzlogjPu1oNZAoBUgP1su9xu2BSVJkYffPgI4?=
+ =?us-ascii?Q?/Bk5jL1+GE1WhJp1ZFXdCT+7gn2Mx1BjcKZ0qTz9RDcH9fxVC0MS3phovmsJ?=
+ =?us-ascii?Q?P62TkY2PT1IbvPTBfHZYBL9oJPQ9gta4PZ5WY72VTTHNkJKRjAEorVFBFTFJ?=
+ =?us-ascii?Q?HUTmbWhBkcU3cHqSDOVRubkM21xnFdlkDTR2Vk3WdDYOvoaD7HMnTzHfIKEC?=
+ =?us-ascii?Q?uJtBGmgHFdtpGW8qtEGRxJ7YAIb4MkkzGRNnDi3TBevV/Gma0CZ+e1LmSCWq?=
+ =?us-ascii?Q?8W7fzC85ivGcrbNdT41CoSuvExb7Ucx8EF/bWYENJ0dqiQhF2dpZxElZML50?=
+ =?us-ascii?Q?CDkeG3FasoE+HrBe4XNO6dNl7reEJvuMbsFLbd82hjQtPkRWOzrTbpyC+P5g?=
+ =?us-ascii?Q?UfI6rM+NAFFopoIQ2OsdmdHkPHjSA+1t7eMNnos891EwMMTxsjcA6qUqpbrl?=
+ =?us-ascii?Q?OqFjeaFppxN9rFiNGaI7/LSPUgPMJyy0KPok7bz7P4S7oxXGna7N34FZ9iWy?=
+ =?us-ascii?Q?ehzNlu8G0nrCvMt1PrnIAyHLtFFuo2YlQe3MdsjjAoXK4vO42c8RkmeFDvhM?=
+ =?us-ascii?Q?dwL0aRQQc7TtQqr7QdvzBejJuqC4mOWkG6bnlfiTgbK2w3tk1Dr5+YCs9BcB?=
+ =?us-ascii?Q?U90Jo13qb2aEnG076cDAgk3GqdSqgPsyg51LLlxuWgQXryE/FQJpEBhg7EVj?=
+ =?us-ascii?Q?+ICTGB6KDxFlBt7UA257trWS1Wc54LRl7HB95FamG/TOMAT4VJXlwznX9erx?=
+ =?us-ascii?Q?q5uH37z3YOO40pW1B++1lgVdW1Nu+j3FEWLADuWNHQ+sFR2JK6fY5CMRq89/?=
+ =?us-ascii?Q?VlBwt40Qz18pXETB9A2GuLU6ekqqpQf3Ro3WULopGmc3gc85CsbJwzXtE3Vn?=
+ =?us-ascii?Q?i2wkia0GM2ZAKUXV9wKe/mr0pqxoJkWqdq81dnND?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 632adcd1-d0e5-428c-4faf-08dcc1131700
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 12:24:51.5294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pYjHVTLl5znSMN6Gj5f7BFh77zPfsMEqfBqiJ9o+lMaUsPORgls2vLuaFKf5V9Y6w9DjM2aSuWE7UH/22OdeKQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8325
 
---=-=-=
-Content-Type: text/plain
+On Thu, Aug 15, 2024 at 08:42:54PM +0800, Menglong Dong wrote:
+> For now, the skb drop reason can be SKB_NOT_DROPPED_YET, which makes the
+> kfree_skb_reason call consume_skb.
 
-Hi Sriram,
+Maybe I'm missing something, but kfree_skb_reason() only calls
+trace_consume_skb() if reason is SKB_CONSUMED. With SKB_NOT_DROPPED_YET
+you will get a warning.
 
-On Mon Aug 19 2024, Sriram Yagnaraman wrote:
->> -----Original Message-----
->> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->> Sent: Monday, 19 August 2024 16:11
->> To: Kurt Kanzenbach <kurt@linutronix.de>
->> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>; Przemek Kitszel
->> <przemyslaw.kitszel@intel.com>; David S. Miller <davem@davemloft.net>;
->> Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
->> Paolo Abeni <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>;
->> Daniel Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
->> <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>; Richard
->> Cochran <richardcochran@gmail.com>; Sriram Yagnaraman
->> <sriram.yagnaraman@ericsson.com>; Benjamin Steinke
->> <benjamin.steinke@woks-audio.com>; Sebastian Andrzej Siewior
->> <bigeasy@linutronix.de>; intel-wired-lan@lists.osuosl.org;
->> netdev@vger.kernel.org; bpf@vger.kernel.org; Sriram Yagnaraman
->> <sriram.yagnaraman@est.tech>
->> Subject: Re: [PATCH iwl-next v6 4/6] igb: Introduce XSK data structures and
->> helpers
->>
->> On Mon, Aug 19, 2024 at 03:41:20PM +0200, Kurt Kanzenbach wrote:
->> > On Mon Aug 19 2024, Maciej Fijalkowski wrote:
->> > > On Fri, Aug 16, 2024 at 11:24:03AM +0200, Kurt Kanzenbach wrote:
->> > >> From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
->> > >>
->> > >> Add the following ring flag:
->> > >> - IGB_RING_FLAG_TX_DISABLED (when xsk pool is being setup)
->> > >>
->> > >> Add a xdp_buff array for use with XSK receive batch API, and a
->> > >> pointer to xsk_pool in igb_adapter.
->> > >>
->> > >> Add enable/disable functions for TX and RX rings.
->> > >> Add enable/disable functions for XSK pool.
->> > >> Add xsk wakeup function.
->> > >>
->> > >> None of the above functionality will be active until
->> > >> NETDEV_XDP_ACT_XSK_ZEROCOPY is advertised in netdev-
->> >xdp_features.
->> > >>
->> > >> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
->> > >
->> > > Sriram's mail bounces unfortunately, is it possible to grab his
->> > > current address?
->> >
->> > His current email address is in the Cc list. However, i wasn't sure if
->> > it's okay to update the From and SoB of these patches?
->>
->> Okay. Then I believe Sriram should provide a mailmap entry to map his old
->> mail to a new one.
->
-> Please feel free to remove my "est.tech" address from From: and
-> Signed-of-By:
-
-Ok, I'll replace your est.tech email address with your ericsson one in
-all patches. Or do you have a personal address (like gmail), which you
-prefer?
-
-What about the copyright in igb_xsk.c? Does it belong to you, or Intel
-or to your previous employer?
-
-> I am just glad that my work has not gone to waste. Thank you for that.
-
-You're welcome.
-
-> I will check with my company's *lawyers* to see if I can provide a
-> mailmap to my current address :(
-
-Good luck with that :-).
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmbEivITHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgsmkD/0Ty5gZjp0LX3isSDnM5Rmv66yqAmjy
-ekDqKQRgrwlSw2WcYb5L/6kT0Lt4+pzEc30b+ye7X+oJiWoOTrI50kFH97h/67/Z
-sMx6EXhKfCj5QE5wntyM1TtezRO3ywUoniurk3loHf/qUHvpInlchVe944kPcIJl
-Clx0/EtYSUFadLifS5Ny7P3mwFKFt8gM2mDsf2GCESvIopEP/J31XInlVyaov92j
-alTFaPA6Hpz9DYro3MPguAvZAin1kX0ayNL00nKDnBQyrw2CiM9/aSfzd4sKBJ46
-8KDutbSiWkCW1hVz1+s2nLW0VQl9Iys91f9R1QNoH3DFvnPLVnCTD74mKnVjZ4yl
-UxnHliFMzwsUga2HP7zhfp62511xLHVDvXqUTEOAE8vD+fCk/ya3J4F2rgf/FvEl
-KJNykfPkt5OPf0D/B2SgmNHwO+1TtZBHvVX7ETQNtt5NQXzX8XyJLV8YNaJ5MBO1
-KXv9c3FbwyV8idTxFo9LRZownb+4y7ta9/TZxpW5VBIdoQh7k2IqCfzEpWl7OXjM
-qPna6tsTfcC29AKU9rGryYRDNINQGaFaKjvW2kkhN4genh8y8YXaLJjNi1Ii7eME
-a9APoqh6pHFHjquyaZzMWN8lj016PDP328Eloli6XR0uGC1m3KDxJDZk2TLVa1JF
-NTDaap0WIa5GSA==
-=rszS
------END PGP SIGNATURE-----
---=-=-=--
+> In some case, we need to make sure that
+> kfree_skb is called, which means the reason can't be SKB_NOT_DROPPED_YET.
+> Introduce SKB_DR_RESET() to reset the reason to NOT_SPECIFIED if it is
+> SKB_NOT_DROPPED_YET.
+> 
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
+>  include/net/dropreason-core.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index 9707ab54fdd5..8da0129d1ed6 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -445,5 +445,6 @@ enum skb_drop_reason {
+>  		    name == SKB_NOT_DROPPED_YET)		\
+>  			SKB_DR_SET(name, reason);		\
+>  	} while (0)
+> +#define SKB_DR_RESET(name) SKB_DR_OR(name, NOT_SPECIFIED)
+>  
+>  #endif
+> -- 
+> 2.39.2
+> 
 
