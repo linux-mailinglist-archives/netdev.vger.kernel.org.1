@@ -1,198 +1,234 @@
-Return-Path: <netdev+bounces-120214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5AD3958955
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:31:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A8E9958980
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 317651F210AC
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:31:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAF561F22CEF
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EAB3D982;
-	Tue, 20 Aug 2024 14:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334861917FB;
+	Tue, 20 Aug 2024 14:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DcN3D1xp"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KKXDE6+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7195012E5B;
-	Tue, 20 Aug 2024 14:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-lf1-f67.google.com (mail-lf1-f67.google.com [209.85.167.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEC3383AB
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 14:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724164272; cv=none; b=IS141ZKCurXKbLR+u7VIdxphYq/HZLesD4+alwOh3lxsBLHkbaIh0QPlzo88NpIeuI1CqV1ksC3FVLCIquTjTnERlP2u6Rnu5MaAXUcJbShsHRvCrGwcY+EJ9j2g44TabnqQlXW9bdCVh8O8kbC1ROOy9IIKfHxTY1mMFYEy4GY=
+	t=1724164577; cv=none; b=tgisEJaLXRgocV+I93cK6bXUYF1syaWhAmZL3z8Kb/Fd/UzOS8sISzcYkOmRA8TqSGfnco47yOsvxP8p/gkycXwegiXH3x9olfs7Epz8oXxrzUI2DrddHRBk2XyPQt9lsOTjJcx+TO6PKKqqllKyznkzpbuhFZQJcOZbNk5p+w0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724164272; c=relaxed/simple;
-	bh=Nx41brjKEDFFos0q0F3Oabrix0OEde0yAxnb5FLy4ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MpQnLrkGzeqUfrbn929WXnpMOp399wUlmFSraS2wCalmC528kszZF+8MCMCSYK8zfIJMQTT2cGljtnc93Ri2p5qUt66lDJX1nsE6BAJZZbyW5IvlepkeguTusVr8t8JrRmG0t6dmF6jfYZRPI4aH9NPA2d9rPW5o2udlnYs6INw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=DcN3D1xp; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id EA73A20B7165; Tue, 20 Aug 2024 07:31:10 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EA73A20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724164270;
-	bh=IoNKfxiL4MfdGcXY3hsvWv5FPlsBVMMfZLN/22/WZ6M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DcN3D1xpI48X11un6qTVo2asl4kQHeOYsA7oaGwbBFl7ggX0G8pc7VD33oqTQAv+k
-	 IvwXBIgeEE8W9xSYPtnBcooJAMq7mqRfy8pFH3pNbQcGznv2w9fneF3fAH6ocg+86P
-	 keXJNAMOiGwPfCxJ8STlyuTO0taeLKTrc7kYs7yI=
-Date: Tue, 20 Aug 2024 07:31:10 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	yury.norov@gmail.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com
-Subject: Re: [PATCH net] net: mana: Fix error handling in
- mana_create_txq/rxq's NAPI cleanup
-Message-ID: <20240820143110.GA15699@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1724149347-14430-1-git-send-email-schakrabarti@linux.microsoft.com>
+	s=arc-20240116; t=1724164577; c=relaxed/simple;
+	bh=nbes6SGqdEbR+eyIYqDvar9JyRtfpfTelp/Kn/mm0qE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Nlu30lK5Ia6jGLU38/P5F4VFzEO2sR8aUolJQmA6Qql8IPS4G1FB//uoGdl7DsRnznKBVdziVVTaKSYdha894YHauCjG7byNKOpQGoFAqpkUUAt3YRtqkqlxIpQs2vFCPKHZuObtjDtsvSgRJgh2rzAv0g5LkYpfjk5iR9iKTfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KKXDE6+V; arc=none smtp.client-ip=209.85.167.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lf1-f67.google.com with SMTP id 2adb3069b0e04-533462b9428so353373e87.3
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 07:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724164572; x=1724769372; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfyTQeSSkPZ+QzWWZU+FNyyT4+itZMzr8DmOygd/33U=;
+        b=KKXDE6+VlWxMwU68/tuVqlu9RQlRNHMaF6Z34J4PJ43FtC60HeUzBrXTUP7Q4DIfeS
+         PWxXfLORCxZm0LrljfFDH5dyMGxyQTOL/SVSxyfYROYqimYM7f4F1eWtgXa3Fbiaxelw
+         8Y40wOmM+3QUMM5gVacy+l5unwQ5urO4uvVAniDP81If5tIfVU00Fw+X6GDF2nxALs4O
+         9c15gcz4VvGTG+a8mv3n2xTM73n9H0v73rwnNhKVZB+gE1snnUKU6iEtX3A8y5Ujenxj
+         zgdWfDihJHN8JpMj/C3S8WhSZ99tTeJcP/ry6D4+0WIb4YdiGbG1JdCnDK6TWgtahFyz
+         ecAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724164572; x=1724769372;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfyTQeSSkPZ+QzWWZU+FNyyT4+itZMzr8DmOygd/33U=;
+        b=ZWKap3SULI2tk/V6wwq+WWYhLZdXiKKJULQoBYUmjNMaQ22gpxZena8ut6lnUOIdVg
+         GXeDbT+JyTtQzk5zbHRDfRLeeSBzAYwvYgbcpvuHUM3aK2nCdn6o5Wr9giNEUbsZAI2H
+         cHSm2AHUc3eCAG9sRkuedkCxrD0H1I7/rWDkLd77ig79om3GcnhLch6YFJDpgrJxb9v1
+         EDUSZRcY4iVj332hVECLlcVF84SYrWMK+93CpYicN+J1keljUgQhOxHMQ+6rGpiBbCeg
+         IWHQBsG/XaONa6CIUN+dhqIu/XRgJdDU/UOxbDrdUre5FIK7T+g9d5fakveSGDMjZALE
+         E19A==
+X-Forwarded-Encrypted: i=1; AJvYcCUaCrxMZfUAv9JIC53N9xviKrYv/L8Qwh227w9DEnRjJgff+nnkuXVlociIxPtX19/5epNGkBBEJfloaWSQpKnjYLfTa5Lz
+X-Gm-Message-State: AOJu0YxwMzLxbS7xd2nD7U+H4s3qokdOItZw6y8+5IgTGfYtZRO5HS6y
+	3lJt3HfMhaysXipd8pnTvTBDbzGcuodDuAXwwqAaSMRD7Axeqnsw1ZYrcVsVRCo=
+X-Google-Smtp-Source: AGHT+IFLUQVFBJiZPnU1UIStc9VMSRLEpQuaGd1PxEKJ/fpKdzW6906wlGxbUZmW87C0ek7drDgHNg==
+X-Received: by 2002:a05:6512:3b8b:b0:52e:fa5f:b6a7 with SMTP id 2adb3069b0e04-5331c6a0569mr10710062e87.13.1724164571458;
+        Tue, 20 Aug 2024 07:36:11 -0700 (PDT)
+Received: from localhost ([87.13.33.30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a838396940fsm772692466b.189.2024.08.20.07.36.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 07:36:11 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+To: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a DT overlay
+Date: Tue, 20 Aug 2024 16:36:02 +0200
+Message-ID: <cover.1724159867.git.andrea.porta@suse.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1724149347-14430-1-git-send-email-schakrabarti@linux.microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 20, 2024 at 03:22:27AM -0700, Souradeep Chakrabarti wrote:
-> Currently napi_disable() gets called during rxq and txq cleanup,
-> even before napi is enabled and hrtimer is initialized. It causes
-> kernel panic.
-> 
-> ? page_fault_oops+0x136/0x2b0
->   ? page_counter_cancel+0x2e/0x80
->   ? do_user_addr_fault+0x2f2/0x640
->   ? refill_obj_stock+0xc4/0x110
->   ? exc_page_fault+0x71/0x160
->   ? asm_exc_page_fault+0x27/0x30
->   ? __mmdrop+0x10/0x180
->   ? __mmdrop+0xec/0x180
->   ? hrtimer_active+0xd/0x50
->   hrtimer_try_to_cancel+0x2c/0xf0
->   hrtimer_cancel+0x15/0x30
->   napi_disable+0x65/0x90
->   mana_destroy_rxq+0x4c/0x2f0
->   mana_create_rxq.isra.0+0x56c/0x6d0
->   ? mana_uncfg_vport+0x50/0x50
->   mana_alloc_queues+0x21b/0x320
->   ? skb_dequeue+0x5f/0x80
-> 
-> Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
-> 
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 41 +++++++++++++------
->  1 file changed, 28 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 39f56973746d..882b05e087b9 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -1862,7 +1862,7 @@ static void mana_deinit_txq(struct mana_port_context *apc, struct mana_txq *txq)
->  	mana_gd_destroy_queue(gd->gdma_context, txq->gdma_sq);
->  }
->  
-> -static void mana_destroy_txq(struct mana_port_context *apc)
-> +static void mana_cleanup_napi_txq(struct mana_port_context *apc)
->  {
->  	struct napi_struct *napi;
->  	int i;
-> @@ -1875,7 +1875,17 @@ static void mana_destroy_txq(struct mana_port_context *apc)
->  		napi_synchronize(napi);
->  		napi_disable(napi);
->  		netif_napi_del(napi);
-> +	}
-> +}
-> +
-> +static void mana_destroy_txq(struct mana_port_context *apc)
-> +{
-> +	int i;
-> +
-> +	if (!apc->tx_qp)
-> +		return;
->  
-> +	for (i = 0; i < apc->num_queues; i++) {
->  		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
->  
->  		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
-> @@ -2007,6 +2017,21 @@ static int mana_create_txq(struct mana_port_context *apc,
->  	return err;
->  }
-I think the mana_cleanup_napi_txq() call should also be added in the out
-path of mana_create_txq(). Consider this, the napi enable for first few
-tx queue succeeds but if queue creation for any further SQ fails, we
-don't cleanup the napi's for previously successful ones.
->  
-> +static void mana_cleanup_napi_rxq(struct mana_port_context *apc,
-> +				  struct mana_rxq *rxq, bool validate_state)
-> +{
-> +	struct napi_struct *napi;
-> +
-> +	if (!rxq)
-> +		return;
-> +
-> +	napi = &rxq->rx_cq.napi;
-> +	if (validate_state)
-> +		napi_synchronize(napi);
-> +	napi_disable(napi);
-> +	netif_napi_del(napi);
-> +}
-> +
->  static void mana_destroy_rxq(struct mana_port_context *apc,
->  			     struct mana_rxq *rxq, bool validate_state)
->  
-> @@ -2014,24 +2039,14 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
->  	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
->  	struct mana_recv_buf_oob *rx_oob;
->  	struct device *dev = gc->dev;
-> -	struct napi_struct *napi;
->  	struct page *page;
->  	int i;
->  
->  	if (!rxq)
->  		return;
->  
-> -	napi = &rxq->rx_cq.napi;
-> -
-> -	if (validate_state)
-> -		napi_synchronize(napi);
-> -
-> -	napi_disable(napi);
-> -
->  	xdp_rxq_info_unreg(&rxq->xdp_rxq);
->  
-> -	netif_napi_del(napi);
-> -
->  	mana_destroy_wq_obj(apc, GDMA_RQ, rxq->rxobj);
->  
->  	mana_deinit_cq(apc, &rxq->rx_cq);
-> @@ -2336,11 +2351,11 @@ static void mana_destroy_vport(struct mana_port_context *apc)
->  		rxq = apc->rxqs[rxq_idx];
->  		if (!rxq)
->  			continue;
-> -
-> +		mana_cleanup_napi_rxq(apc, rxq, true);
->  		mana_destroy_rxq(apc, rxq, true);
->  		apc->rxqs[rxq_idx] = NULL;
->  	}
-> -
-> +	mana_cleanup_napi_txq(apc);
->  	mana_destroy_txq(apc);
->  	mana_uncfg_vport(apc);
->  
-> -- 
-> 2.34.1
-> 
-> 
+RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
+a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
+etc.) whose registers are all reachable starting from an offset from the
+BAR address.  The main point here is that while the RP1 as an endpoint
+itself is discoverable via usual PCI enumeraiton, the devices it contains
+are not discoverable and must be declared e.g. via the devicetree.
+
+This patchset is an attempt to provide a minimum infrastructure to allow
+the RP1 chipset to be discovered and perpherals it contains to be added
+from a devictree overlay loaded during RP1 PCI endpoint enumeration.
+Followup patches should add support for the several peripherals contained
+in RP1.
+
+This work is based upon dowstream drivers code and the proposal from RH
+et al. (see [1] and [2]). A similar approach is also pursued in [3].
+
+The patches are ordered as follows:
+
+-PATCHES 1 and 2: add binding schemas for clock and gpio peripherals 
+ found in RP1. They are needed to support the other peripherals, e.g.
+ the ethernet mac depends on a clock generated by RP1 and the phy is
+ reset though the on-board gpio controller.
+
+-PATCHES 3, 4 and 5: preparatory patches that fix the address mapping
+ translation (especially wrt dma-ranges) and permit to place the dtbo
+ binary blob to be put in non transient section.
+
+-PATCH 6 and 7: add clock and gpio device drivers.
+
+-PATCH 8: this is the main patch to support RP1 chipset and peripherals
+ enabling through dtb overlay. It contains the dtso since its intimately
+ coupled with the driver and will be linked in as binary blob in the driver
+ obj, but of course it can be easily split in a separate patch if the
+ maintainer feels it so. The real dtso is in devicetree folder while
+ the dtso in driver folder is just a placeholder to include the real dtso.
+ In this way it is possible to check the dtso against dt-bindings.
+
+-PATCH 9: add the relevant kernel CONFIG_ options to defconfig.
+
+-PATCHES 10 and 11: these (still unpolished) patches are not intended to
+ be upstreamed (yet), they serve just as a test reference to be able to
+ use the ethernet MAC contained in RP1.
+
+This patchset is also a first attempt to be more agnostic wrt hardware
+description standards such as OF devicetree and ACPI, where 'agnostic'
+means "using DT in coexistence with ACPI", as been alredy promoted
+by e.g. AL (see [4]). Although there's currently no evidence it will also
+run out of the box on purely ACPI system, it is a first step towards
+that direction.
+
+Please note that albeit this patchset has no prerequisites in order to
+be applied cleanly, it still depends on Stanimir's WIP patchset for BCM2712
+PCIe controller (see [5]) in order to work at runtime.
+
+Many thanks,
+Andrea della Porta
+
+Link:
+- [1]: https://lpc.events/event/17/contributions/1421/attachments/1337/2680/LPC2023%20Non-discoverable%20devices%20in%20PCI.pdf
+- [2]: https://lore.kernel.org/lkml/20230419231155.GA899497-robh@kernel.org/t/
+- [3]: https://lore.kernel.org/all/20240808154658.247873-1-herve.codina@bootlin.com/#t
+- [4]: https://lore.kernel.org/all/73e05c77-6d53-4aae-95ac-415456ff0ae4@lunn.ch/
+- [5]: https://lore.kernel.org/all/20240626104544.14233-1-svarbanov@suse.de/
+
+Andrea della Porta (11):
+  dt-bindings: clock: Add RaspberryPi RP1 clock bindings
+  dt-bindings: pinctrl: Add RaspberryPi RP1 gpio/pinctrl/pinmux bindings
+  PCI: of_property: Sanitize 32 bit PCI address parsed from DT
+  of: address: Preserve the flags portion on 1:1 dma-ranges mapping
+  vmlinux.lds.h: Preserve DTB sections from being discarded after init
+  clk: rp1: Add support for clocks provided by RP1
+  pinctrl: rp1: Implement RaspberryPi RP1 gpio support
+  misc: rp1: RaspberryPi RP1 misc driver
+  arm64: defconfig: Enable RP1 misc/clock/gpio drivers as built-in
+  net: macb: Add support for RP1's MACB variant
+  arm64: dts: rp1: Add support for MACB contained in RP1
+
+ .../clock/raspberrypi,rp1-clocks.yaml         |   87 +
+ .../pinctrl/raspberrypi,rp1-gpio.yaml         |  177 ++
+ MAINTAINERS                                   |   12 +
+ arch/arm64/boot/dts/broadcom/rp1.dtso         |  175 ++
+ arch/arm64/configs/defconfig                  |    3 +
+ drivers/clk/Kconfig                           |    9 +
+ drivers/clk/Makefile                          |    1 +
+ drivers/clk/clk-rp1.c                         | 1655 +++++++++++++++++
+ drivers/misc/Kconfig                          |    1 +
+ drivers/misc/Makefile                         |    1 +
+ drivers/misc/rp1/Kconfig                      |   20 +
+ drivers/misc/rp1/Makefile                     |    3 +
+ drivers/misc/rp1/rp1-pci.c                    |  333 ++++
+ drivers/misc/rp1/rp1-pci.dtso                 |    8 +
+ drivers/net/ethernet/cadence/macb.h           |   25 +
+ drivers/net/ethernet/cadence/macb_main.c      |  152 +-
+ drivers/of/address.c                          |    3 +-
+ drivers/pci/of_property.c                     |    5 +-
+ drivers/pci/quirks.c                          |    1 +
+ drivers/pinctrl/Kconfig                       |   10 +
+ drivers/pinctrl/Makefile                      |    1 +
+ drivers/pinctrl/pinctrl-rp1.c                 |  719 +++++++
+ include/asm-generic/vmlinux.lds.h             |    2 +-
+ include/dt-bindings/clock/rp1.h               |   56 +
+ include/dt-bindings/misc/rp1.h                |  235 +++
+ include/linux/pci_ids.h                       |    3 +
+ 26 files changed, 3692 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
+ create mode 100644 Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.yaml
+ create mode 100644 arch/arm64/boot/dts/broadcom/rp1.dtso
+ create mode 100644 drivers/clk/clk-rp1.c
+ create mode 100644 drivers/misc/rp1/Kconfig
+ create mode 100644 drivers/misc/rp1/Makefile
+ create mode 100644 drivers/misc/rp1/rp1-pci.c
+ create mode 100644 drivers/misc/rp1/rp1-pci.dtso
+ create mode 100644 drivers/pinctrl/pinctrl-rp1.c
+ create mode 100644 include/dt-bindings/clock/rp1.h
+ create mode 100644 include/dt-bindings/misc/rp1.h
+
+-- 
+2.35.3
+
 
