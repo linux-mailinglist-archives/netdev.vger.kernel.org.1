@@ -1,68 +1,89 @@
-Return-Path: <netdev+bounces-120192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFFB958889
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:07:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29929588AB
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 16:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBB3F2848F8
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D19E1F23FDF
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 14:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5EB19409C;
-	Tue, 20 Aug 2024 14:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B329195F17;
+	Tue, 20 Aug 2024 14:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w3FRcgwN"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kZANOZN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA261922CD;
-	Tue, 20 Aug 2024 14:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C847919409C;
+	Tue, 20 Aug 2024 14:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724162771; cv=none; b=p5WGlpSoqkGWENjk/hH7Ti7KXWEVaau4gvsuPlEvDHA/lt5g8ZHGQjcsByl2T37Hy9ErBC4x9IsTw2rm5VAVc3lre70x9hxmW5Qbf8JSq9y5GdBUVCN8N5FI2rkpQb5/1ePag+zhhRXDJYvzOs8KzF92yHA8xbw3nn2PL+CziIQ=
+	t=1724162921; cv=none; b=sDmz28w8L8w4Fu4Ro1bkJziA+AX1bU2Ka9qVMHmkHzlqz4AYDOsS3AAMyHKTvk6paAzKt6hixNf7w+5vJXr4jFQnnniWdiKz50rYNGzivqRyLVw6N/JmqSMaSYSJYJrcj5PCSJafP9zHm9OTXsIJfc77oDr/EhwqSwtR93yUYwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724162771; c=relaxed/simple;
-	bh=9gOvJxkyuNcwjkjB/DjAJ9EuvFjOEdaBEkYKQsoZ+w0=;
+	s=arc-20240116; t=1724162921; c=relaxed/simple;
+	bh=GWNelTh3ZbbX0X7L0QDhwF2X1aKVlbBiANE3TaBt0DY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwOjBFP58n9WsIlAxuX5SeONovvBDgzbhMJCvwzO4Jo9Xktyt8YSn3pga3xhQbzGzVCi43csN9wnLgJ3cSq9147BtUIN4AJaaF5W84Td8FUNxGrwsLRcvp9C9NpdZylfHoHDUM1ZKHcFnWXr/l8OvIRPUguEpKiBlxrXJrFXGMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w3FRcgwN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aBwtM7ry0exKaagPxt9MGTGB2xPl9mXToUPSwaqEOyw=; b=w3FRcgwN4IzbI050+qjcuAgaru
-	nkIlIKxdfxgPfZPZJI3+9G3P7PlkVUpmVbrso7n6PZNk492u2KUhF7TpknKqLPNm6nIuheHpgB0d3
-	lz38vxy9tGLIN9th0NtJIn6YSxQEL64uxm3rTZBNQ0LzUrC/Z0omJKdtuBkxj3Hi2Ha4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgPUp-005EFD-Ur; Tue, 20 Aug 2024 16:06:03 +0200
-Date: Tue, 20 Aug 2024 16:06:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Imran Shaik <quic_imrashai@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Ajit Pandey <quic_ajipan@quicinc.com>,
-	Taniya Das <quic_tdas@quicinc.com>,
-	Jagadeesh Kona <quic_jkona@quicinc.com>,
-	Satya Priya Kakitapalli <quic_skakitap@quicinc.com>,
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] clk: qcom: Add support for Global Clock Controller
- on QCS8300
-Message-ID: <a7afdd6d-47a1-41c7-8a0d-27919cf5af90@lunn.ch>
-References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
- <20240820-qcs8300-gcc-v1-2-d81720517a82@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ev8xEFoPzX5LCc/OoSrFyZFeNf+jhxsWfQJy4lpgxgJmuMdw1QW1N4v1iwAn1CZWKTbOlF8lgAbdQO440/wc6A37k2B67G37ctgsfpf9fU9PFSQLLQAGC0W7EVHSdTJdbIl4YeckpwI0CX1a71lnsHMpZjhcZJeJXj5Tw+XrojQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kZANOZN3; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-03.internal (phl-compute-03.nyi.internal [10.202.2.43])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id E6E071151A91;
+	Tue, 20 Aug 2024 10:08:37 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Tue, 20 Aug 2024 10:08:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1724162917; x=1724249317; bh=kEfYQeLPTow8jHAH+gKTn8OFS8ak
+	MGlN/WqVFVkSklE=; b=kZANOZN35uNBToTAebxk6RQbQS0cIfsgQP34Fxh/IAz1
+	3wR16yLrj9A1q6A3tXxDJfN7QCVL6zZ+FQTf7TGXBEPRvH1gKcDO/QuzwUgn6tnU
+	MzY+8rw7vKokzr3ixx3CCrZJwko538JREeWzy+eeSSMEhWjjsPGMnKhWRDYevFp0
+	j54jxPFEgSf0scbiQFbhmCts+9a2Ln6fXtZQDQ+lX27X5z31evxPzoeQTxWeFIer
+	QIjmbKsbPAXHRIA2jmbonbuXu97XhjaXBPki+eyteYl70ceEV5nx2ZfOvAvhqVLW
+	CB7Kf+x0FbEfv186xzPEvck3zHusvAf6t+RiRF1RIg==
+X-ME-Sender: <xms:ZaPEZlnpRegO60vWI_C30xt_9zOacKjEnOJLjQ-phVNlxspCHrP-Jg>
+    <xme:ZaPEZg1tbElTBL2n48v4rEoejjQYRxraRETRG6kZ02VmikySZ6DBrCNy77wpG-vKk
+    HXZtPodk89TA4A>
+X-ME-Received: <xmr:ZaPEZrp0gHKgy8wwNTMG5jU1nMQW9mZVB3ZwsMY5gY5dNuH6TbUUmnezwGb_D5J5NLckH2OtYxFmdJmz2KgLG4NtHYL_Og>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudduiedgjeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvve
+    fukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcu
+    oehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpedvudefve
+    ekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfenucevlhhushht
+    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguoh
+    hstghhrdhorhhgpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesug
+    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehshhhu
+    rghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvsh
+    htsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:ZaPEZlk77FWp5qoZqvmJcGJcyjFgYL19YfFv4hMIyquzXH0IUK4C2g>
+    <xmx:ZaPEZj3_NvM95Jf1wj_lQGN6MVAB9fKa7olw_w1p7LaRkt7mpMpfVw>
+    <xmx:ZaPEZksX3qp2-B9JkWYO_41ztt3JbIrWrfd5UwUxbS5TZzoSzWDUxw>
+    <xmx:ZaPEZnXePj-31QgrCTZdbMJREA2iKWIyEBf6u7Ab7JRR4Xp6NzhuNQ>
+    <xmx:ZaPEZtpWVE2qq8E0JzCXz8CZlHmDovGxQBQKF9MMcF0npJszWrI1b__b>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 20 Aug 2024 10:08:36 -0400 (EDT)
+Date: Tue, 20 Aug 2024 17:08:33 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
+ nettest is available
+Message-ID: <ZsSjYQV66Sn25iv9@shredder.mtl.com>
+References: <20240820004217.1087392-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,36 +92,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240820-qcs8300-gcc-v1-2-d81720517a82@quicinc.com>
+In-Reply-To: <20240820004217.1087392-1-kuba@kernel.org>
 
-> +static int gcc_qcs8300_probe(struct platform_device *pdev)
-> +{
-> +	struct regmap *regmap;
-> +	int ret;
-> +
-> +	regmap = qcom_cc_map(pdev, &gcc_qcs8300_desc);
-> +	if (IS_ERR(regmap))
-> +		return PTR_ERR(regmap);
-> +
-> +	ret = qcom_cc_register_rcg_dfs(regmap, gcc_dfs_clocks,
-> +				       ARRAY_SIZE(gcc_dfs_clocks));
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Keep some clocks always enabled */
-> +	qcom_branch_set_clk_en(regmap, 0x32004); /* GCC_CAMERA_AHB_CLK */
-> +	qcom_branch_set_clk_en(regmap, 0x32020); /* GCC_CAMERA_XO_CLK */
+On Mon, Aug 19, 2024 at 05:42:17PM -0700, Jakub Kicinski wrote:
+> A few tests check if nettest exists in the $PATH before adding
+> $PWD to $PATH and re-checking. They don't discard stderr on
+> the first check (and nettest is built as part of selftests,
+> so it's pretty normal for it to not be available in system $PATH).
+> This leads to output noise:
+> 
+>   which: no nettest in (/home/virtme/tools/fs/bin:/home/virtme/tools/fs/sbin:/home/virtme/tools/fs/usr/bin:/home/virtme/tools/fs/usr/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin)
+> 
+> Add a common helper for the check which does silence stderr.
+> 
+> There is another small functional change hiding here, because pmtu.sh
+> and fib_rule_tests.sh used to return from the test case rather than
+> completely exit. Building nettest is not hard, there should be no need
+> to maintain the ability to selectively skip cases in its absence.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-It would be good to document why. Why does the camera driver not
-enable the clock when it loads?
+Like Hangbin I am also not sure what "profile=1" is about, but looks
+fine otherwise, so:
 
-> +	qcom_branch_set_clk_en(regmap, 0x33004); /* GCC_DISP_AHB_CLK */
-> +	qcom_branch_set_clk_en(regmap, 0x33018); /* GCC_DISP_XO_CLK */
-> +	qcom_branch_set_clk_en(regmap, 0x7d004); /* GCC_GPU_CFG_AHB_CLK */
-> +	qcom_branch_set_clk_en(regmap, 0x34004); /* GCC_VIDEO_AHB_CLK */
-> +	qcom_branch_set_clk_en(regmap, 0x34024); /* GCC_VIDEO_XO_CLK */
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-Why cannot the display driver enable the clock when it loads?
-
-	Andrew
+Thanks!
 
