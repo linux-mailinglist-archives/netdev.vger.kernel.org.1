@@ -1,99 +1,155 @@
-Return-Path: <netdev+bounces-120323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5C9958F29
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:23:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B47958F31
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 22:35:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678761C20F83
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:23:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D17FCB21B0A
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343A21BBBF0;
-	Tue, 20 Aug 2024 20:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D59F165F1A;
+	Tue, 20 Aug 2024 20:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gBjE2KGj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WbGSgdi0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B90154C15;
-	Tue, 20 Aug 2024 20:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8564118E37E
+	for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 20:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724185400; cv=none; b=UdsBjsvWXpPc1w23nP/0+njvpbkPpTYI9Fbidw+4ylo56HL6LEIm6vbRHC9MK6CbStYMUhlqcKUCLW6NVAgQu1IPPxgdIAr6ZxQlI9Rp6GzppJmMmEdecwU1eX4AtuBDKJAFZNn+jYx/ssDgv/R6HJLPzYy75UCdGWtoEtGWZyQ=
+	t=1724186105; cv=none; b=U/hkb5lXtTbDA0c89/2HB9J03/a1hL+HU/v14BmJcjJBfz2qJZ5dnf9ZGxrZMjZBduJsWkssL+OT01i2vns+kWOdZGrnoDLx9Eu9G9XPwiUf6EOftX0a8mh7V1x9h4kNZp8FVEGJapw0qwu9AoPEkw+3F2919/Wq4ExqNoxgth0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724185400; c=relaxed/simple;
-	bh=N0kVamxQdbaq3r2k8x+FouJskbpisdpD1nQK/n9DuAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YV4ZF0hjqzpQArGtekDHhfYx1qd/Qw3s1d53lYKxhdJquiiyRoKlvpdbQBfaSh4jN+KYh2Os8BjlGZI6SQpCFEQNgq3Oo4MpBJLWJjebI3zhgd/8NN+Cmd5EKc5+07wFlRqL0vfodylUUUba/9MD+SEQiLTm7wEqTVSJqjxrBGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gBjE2KGj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ALmsTdvvNrRc81t5o913qxK+GrVh4ybAsT1NnrRbgNc=; b=gBjE2KGjUbnVfn7FlCW3130nbN
-	JeEloYKiTn8iicp6goLGNEWSwKSZRRc+NGIUYTlxlRTTZ2v1tAItcKujWf9ktvatuQyaj3t11qn72
-	UB+s0EiVr3MdjwdQnTdzqBCdiQv3hllAq4X1iK9xlMjADDProveHYXzhAA3Qb3cvWEf0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sgVNo-005G29-Uj; Tue, 20 Aug 2024 22:23:12 +0200
-Date: Tue, 20 Aug 2024 22:23:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"Katakam, Harini" <harini.katakam@amd.com>
-Subject: Re: [PATCH net-next v4 2/2] net: xilinx: axienet: Add statistics
- support
-Message-ID: <98441cee-193d-404c-8dc5-9cf2061ce2e4@lunn.ch>
-References: <20240820175343.760389-1-sean.anderson@linux.dev>
- <20240820175343.760389-3-sean.anderson@linux.dev>
- <MN0PR12MB5953C46BA150B0382F222534B78D2@MN0PR12MB5953.namprd12.prod.outlook.com>
- <b7f66966-f97a-4890-b452-2a8a5e20b953@linux.dev>
+	s=arc-20240116; t=1724186105; c=relaxed/simple;
+	bh=UiczpnbBY3ZrF68vlz5ytjzBn/z07xuHXqZM60adjKI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AMbfYgUQcrA2I70cZBwpBsJeu7Cz8BUerRBl6bUMRDHIu1x+61PsBLs3kjsxCMNmQQrozr3PSSfEr8fEpSvA4nKoWDxWjk+R3uZqQc5bLnpg+VWy79JqCB0Jqhrj0wzu2N0j4DIDPEigzlwXsMBAHop1kmQ+SIja8V2lx5lnCb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WbGSgdi0; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a501dd544eso362308285a.2
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 13:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1724186102; x=1724790902; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dj06AlN8Lo1JxvByc4fI5xdYlUnQGyATuG5tkQv6ggQ=;
+        b=WbGSgdi0XFc8Yh7HBQ/Kxeho4vGLMSUNCFUwHqgxEqBqmE1KtX6qQjbIRtq6FxR/7l
+         nk3U4QqowGanj0eQuUNkxw4qlCP9wsdUBikVEERd2Z0jm5VC8yvIgFa5wLNRg7HbNKmX
+         EBA+CfkVpdF/Yd53HUU9Qh5v3mqtNiXGVYyrQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724186102; x=1724790902;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dj06AlN8Lo1JxvByc4fI5xdYlUnQGyATuG5tkQv6ggQ=;
+        b=PrKGz+UFgQVkhoZ/LSq1gJlRfDioAc+m6bisRE108TKzmgBMIPx0FkTKsbSkoElgMI
+         /JNO8njBqEgb9QQ4M6rTUffPtnM3AOw1RW7Hpl9Ph2xU6ObCQGTKygbH4mw3ea+m/n9z
+         6LHXsqvDXW9k5cQMnQsELj9k+ZTBHWoliV0DwCyDqm2L5kZOZL/o2rA8iO2ku4JbtXNx
+         ++ZhJK2pRVuW74zxQSsFzUHANQItDX9gr0l/2ezw8+qO6lmhmDt7TcBGg6XJjmBFg0Ye
+         Lh148urWPhzb3DQCHtcPI6nBVtPAxgRAyRelSzfR5Keq60j2LyCZrCn8LDLHmlxOte1w
+         YZnQ==
+X-Gm-Message-State: AOJu0YzBcgA94lW7sj4IqLSA9qOGImNLOZOzHT7I2KSWF4g74rNZsmWj
+	BhuO5SZ2UtaDIrpS6qrHitmIuHDq1INU+19rSUywnZWmpNwVKIw6Pqc9rCgeUQ==
+X-Google-Smtp-Source: AGHT+IGng1Asyl6Ga00/ocSE7KzAegomxLJh6UiteGdzu4R/6yIcI2ZETWHdEDWTOEsn2pDDoTswDw==
+X-Received: by 2002:a05:620a:3906:b0:7a2:32e:3c47 with SMTP id af79cd13be357-7a67404bd69mr51869285a.34.1724186102238;
+        Tue, 20 Aug 2024 13:35:02 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff0e04f6sm559619285a.82.2024.08.20.13.35.00
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 20 Aug 2024 13:35:01 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	hawk@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net] bnxt_en: Fix double DMA unmapping for XDP_REDIRECT
+Date: Tue, 20 Aug 2024 13:34:15 -0700
+Message-ID: <20240820203415.168178-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7f66966-f97a-4890-b452-2a8a5e20b953@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-> > Is that a standard convention to retain/persist counter values across 
-> > link up/down?
-> 
-> IEEE 802.3 section 30.2.1 says
-> 
-> | All counters defined in this specification are assumed to be
-> | wrap-around counters. Wrap-around counters are those that
-> | automatically go from their maximum value (or final value) to zero and
-> | continue to operate. These unsigned counters do not provide for any
-> | explicit means to return them to their minimum (zero), i.e., reset.
-> 
-> And get_eth_mac_stats implements these counters for Linux. So I would
-> say that resetting the counters on link up/down would be non-conformant.
-> 
-> Other drivers also preserve stats across link up/down. For example,
-> MACB/GEM doesn't reset it stats either. And keeping the stats is also
-> more friendly for users and monitoring tools.
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Agreed.
+Remove the dma_unmap_page_attrs() call in the driver's XDP_REDIRECT
+code path.  This should have been removed when we let the page pool
+handle the DMA mapping.  This bug causes the warning:
 
-Some driver get this wrong, and clear them. But as a reviewer, it try
-to spot this.
+WARNING: CPU: 7 PID: 59 at drivers/iommu/dma-iommu.c:1198 iommu_dma_unmap_page+0xd5/0x100
+CPU: 7 PID: 59 Comm: ksoftirqd/7 Tainted: G        W          6.8.0-1010-gcp #11-Ubuntu
+Hardware name: Dell Inc. PowerEdge R7525/0PYVT1, BIOS 2.15.2 04/02/2024
+RIP: 0010:iommu_dma_unmap_page+0xd5/0x100
+Code: 89 ee 48 89 df e8 cb f2 69 ff 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 c9 31 f6 31 ff 45 31 c0 e9 ab 17 71 00 <0f> 0b 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 c9
+RSP: 0018:ffffab1fc0597a48 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff99ff838280c8 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffab1fc0597a78 R08: 0000000000000002 R09: ffffab1fc0597c1c
+R10: ffffab1fc0597cd3 R11: ffff99ffe375acd8 R12: 00000000e65b9000
+R13: 0000000000000050 R14: 0000000000001000 R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ffff9a06efb80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000565c34c37210 CR3: 00000005c7e3e000 CR4: 0000000000350ef0
+? show_regs+0x6d/0x80
+? __warn+0x89/0x150
+? iommu_dma_unmap_page+0xd5/0x100
+? report_bug+0x16a/0x190
+? handle_bug+0x51/0xa0
+? exc_invalid_op+0x18/0x80
+? iommu_dma_unmap_page+0xd5/0x100
+? iommu_dma_unmap_page+0x35/0x100
+dma_unmap_page_attrs+0x55/0x220
+? bpf_prog_4d7e87c0d30db711_xdp_dispatcher+0x64/0x9f
+bnxt_rx_xdp+0x237/0x520 [bnxt_en]
+bnxt_rx_pkt+0x640/0xdd0 [bnxt_en]
+__bnxt_poll_work+0x1a1/0x3d0 [bnxt_en]
+bnxt_poll+0xaa/0x1e0 [bnxt_en]
+__napi_poll+0x33/0x1e0
+net_rx_action+0x18a/0x2f0
 
-   Andrew
+Fixes: 578fcfd26e2a ("bnxt_en: Let the page pool manage the DMA mapping")
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+index 345681d5007e..f88b641533fc 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+@@ -297,11 +297,6 @@ bool bnxt_rx_xdp(struct bnxt *bp, struct bnxt_rx_ring_info *rxr, u16 cons,
+ 		 * redirect is coming from a frame received by the
+ 		 * bnxt_en driver.
+ 		 */
+-		rx_buf = &rxr->rx_buf_ring[cons];
+-		mapping = rx_buf->mapping - bp->rx_dma_offset;
+-		dma_unmap_page_attrs(&pdev->dev, mapping,
+-				     BNXT_RX_PAGE_SIZE, bp->rx_dir,
+-				     DMA_ATTR_WEAK_ORDERING);
+ 
+ 		/* if we are unable to allocate a new buffer, abort and reuse */
+ 		if (bnxt_alloc_rx_data(bp, rxr, rxr->rx_prod, GFP_ATOMIC)) {
+-- 
+2.30.1
+
 
