@@ -1,105 +1,117 @@
-Return-Path: <netdev+bounces-120300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368FB958E16
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:32:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD8F958E18
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 20:33:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5E6AB21CB3
-	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:32:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 658C91F21E14
+	for <lists+netdev@lfdr.de>; Tue, 20 Aug 2024 18:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90B01494A8;
-	Tue, 20 Aug 2024 18:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E28C146D6B;
+	Tue, 20 Aug 2024 18:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcWrMyYs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mz+iFhM8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15A9146D6B;
-	Tue, 20 Aug 2024 18:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD23EAC5;
+	Tue, 20 Aug 2024 18:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724178726; cv=none; b=RyCH9qm7rMLyhfAPmu3G1bqAtpB4UdQq8aRdgSZODMxgL+DoJYZiDtG3Wu7Q3Eq15LaofpoJPTfiSxN30XcW/l/C/poFkrCDVpvMnD0fT5eiB77DFoTPuvW8tH32aM1g2cP+r15bwDBiRJe/2Qq5wVzn+P75B2wlR6nCxIma9WA=
+	t=1724178821; cv=none; b=ICWW4MGNHShHyrcli2BabMGFdRyVNHWydSsvu1GtRjfFOaQ7d9GmexhGpLn83Pd1EseXoRBA3aOc0ZN9YCQbAm2JprJGZVOXgq5FGIo0Lwxb9CsgAE44STCgEUFh4EhBKt+hcahgZWfmwAoUP4Mo2pNIp8BeIOrDYfbMIZMY3Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724178726; c=relaxed/simple;
-	bh=TKArvj95GKzIUhpxrYU7tygE4hNlR5jO9uS9RfXTQF0=;
+	s=arc-20240116; t=1724178821; c=relaxed/simple;
+	bh=HOynmsngE3UkqL88UINGscqF08HnLAab0FpdwkbJdlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RO6wpyePtgdfOQFDhfLFIbMczT45ZPHUFzkhjqQuOPLjIAzGG9f7xzrN9qZQDhuM1xwUaOU5+nBvxOfgbJITUJkElSlIRqXPIG1Ny0s+MGqtMFJ9wTvMv++hrz2gTjn6wUxGFMNJO/nr8WD25uC6FO/hK9vWR/MfKJVDgFsZmNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FcWrMyYs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35706C4AF0B;
-	Tue, 20 Aug 2024 18:32:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=JYVtwRElz5AhE+zIG0D9jRksjDMG3IPyTCrwMKuQnbCOAbC9yzPQPkzYEGfmCTyzh6hVCM/0qnKifX0aOtXfr4kce3BSDkePLZhiVp74VYIzU7WHiW2zFUpcbXoAEc1V1U4kEAi4s4UCwbnFKQbiSjsW0o1ovz2HTz1kZZqW4Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mz+iFhM8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96DA1C4AF0B;
+	Tue, 20 Aug 2024 18:33:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724178726;
-	bh=TKArvj95GKzIUhpxrYU7tygE4hNlR5jO9uS9RfXTQF0=;
+	s=k20201202; t=1724178820;
+	bh=HOynmsngE3UkqL88UINGscqF08HnLAab0FpdwkbJdlw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FcWrMyYsCe+s5Uff9GVKmUw3tYDP/0mZVZHo6SNfaSymM66kHa9I5r1vzrVcLw8Hi
-	 uIiKFH+Llz6X1hSyEq83cAZYSzqw9RYlsOz0EyO53qPOaFYwix5Ip/PIIS8X62O9zT
-	 4NOJLctbd32dhCn+Ambvw9ERVwUaS599skt/4IX0mJxsMzhBcWYCjlHz9Kb4z4vF2v
-	 vgaV9ykzAgo260xXLpO6pOb5BVFeu8M1/MImh5rAGWwz3/s5ZHF+zrTIeASZzPO7jC
-	 dqywvtJhz3Y6ZXhWp9/sBDeui4EnOyndn4kO1TJdcrW1r8oRRP8GJosM/RuqkzcVd+
-	 +P06HxV1hrqEA==
-Date: Tue, 20 Aug 2024 19:32:02 +0100
+	b=mz+iFhM8jJT+4IW7O3cA6zMJ1cHj8l7TGeCiHBo8qbua4eIeDYc+V7r/2mExZfX5Q
+	 z9gy7iQyvQ5DSRLBL0Ewt2S4aXzTINFNLLgwa1/IsDoZkzyrHrLaqwl9pnpfn99YwZ
+	 iJsTtzOflQ6VpSnPJTQZn0wwXAfY5+i10xA3sXRZELtPo2JOSX4uh0fAB5mzmsdHTm
+	 2d4OlV30rqIRIMmWLLiVEytmquHXzCV8NQKsQGHaT9w5uinAVtUm1MCzNd+O0tCPJI
+	 oIFBf5+zzaZTr+71VXmyANwxecilwZDz2rWHxu5EEEHJGxWDPNIATjLtGvtgZ3DjPB
+	 bQHgLFozhPa+g==
+Date: Tue, 20 Aug 2024 19:33:35 +0100
 From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/1] net: dsa: mv88e6xxx: Fix out-of-bound access
-Message-ID: <20240820183202.GA2898@kernel.org>
-References: <20240819222641.1292308-1-Joseph.Huang@garmin.com>
- <72e02a72-ab98-4a64-99ac-769d28cfd758@lunn.ch>
+To: Bharat Bhushan <bharatb.linux@gmail.com>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jerinj@marvell.com, lcherian@marvell.com,
+	ndabilpuram@marvell.com
+Subject: Re: [net PATCH v2] octeontx2-af: Fix CPT AF register offset
+ calculation
+Message-ID: <20240820183335.GB2898@kernel.org>
+References: <20240819123237.490603-1-bbhushan2@marvell.com>
+ <20240819152744.GA543198@kernel.org>
+ <CAAeCc_ngtvx7LNWB2CMgfA6Vyitx8BTZbahJby+ZDgTEC5JYbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <72e02a72-ab98-4a64-99ac-769d28cfd758@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAeCc_ngtvx7LNWB2CMgfA6Vyitx8BTZbahJby+ZDgTEC5JYbA@mail.gmail.com>
 
-On Tue, Aug 20, 2024 at 12:58:05AM +0200, Andrew Lunn wrote:
-> On Mon, Aug 19, 2024 at 06:26:40PM -0400, Joseph Huang wrote:
-> > If an ATU violation was caused by a CPU Load operation, the SPID is 0xf,
-> > which is larger than DSA_MAX_PORTS (the size of mv88e6xxx_chip.ports[]
-> > array).
+On Tue, Aug 20, 2024 at 04:37:02PM +0530, Bharat Bhushan wrote:
+> On Mon, Aug 19, 2024 at 8:57 PM Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Mon, Aug 19, 2024 at 06:02:37PM +0530, Bharat Bhushan wrote:
+> > > Some CPT AF registers are per LF and others are global.
+> > > Translation of PF/VF local LF slot number to actual LF slot
+> > > number is required only for accessing perf LF registers.
+> > > CPT AF global registers access do not require any LF
+> > > slot number.
+> > >
+> > > Also there is no reason CPT PF/VF to know actual lf's register
+> > > offset.
+> > >
+> > > Fixes: bc35e28af789 ("octeontx2-af: replace cpt slot with lf id on reg write")
+> > > Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+> > > ---
+> >
+> > Hi Bharat,
+> >
+> > It would be very nice to have links (to lore) to earlier version and
+> > descriptions of what has changed between versions here.
 > 
-> The 6390X datasheet says "IF SPID = 0x1f the source of the violation
-> was the CPU's registers interface."
+> Hi Simon,
 > 
-> > +#define MV88E6XXX_G1_ATU_DATA_SPID_CPU				0x000f
-> 
-> So it seems to depend on the family.
-> 
-> >  
-> >  /* Offset 0x0D: ATU MAC Address Register Bytes 0 & 1
-> >   * Offset 0x0E: ATU MAC Address Register Bytes 2 & 3
-> > diff --git a/drivers/net/dsa/mv88e6xxx/global1_atu.c b/drivers/net/dsa/mv88e6xxx/global1_atu.c
-> > index ce3b3690c3c0..b6f15ae22c20 100644
-> > --- a/drivers/net/dsa/mv88e6xxx/global1_atu.c
-> > +++ b/drivers/net/dsa/mv88e6xxx/global1_atu.c
-> > @@ -457,7 +457,8 @@ static irqreturn_t mv88e6xxx_g1_atu_prob_irq_thread_fn(int irq, void *dev_id)
-> >  		trace_mv88e6xxx_atu_full_violation(chip->dev, spid,
-> >  						   entry.portvec, entry.mac,
-> >  						   fid);
-> > -		chip->ports[spid].atu_full_violation++;
-> > +		if (spid != MV88E6XXX_G1_ATU_DATA_SPID_CPU)
-> > +			chip->ports[spid].atu_full_violation++;
-> 
-> So i think it would be better to do something like:
-> 
-> 		if (spid < ARRAY_SIZE(chip->ports))
-> 			chip->ports[spid].atu_full_violation++;
+> Will add below in next version of this patch
 
-Hi Joseph,
+Thanks, much appreciated.
 
-I am curious to know if bounds checking should also
-be added to other accesses to chip->ports[spid] within this function.
+> v3:
+>   - Updated patch description about what's broken without this fix
+>   - Added patch history
+> 
+> v2: https://lore.kernel.org/netdev/20240819152744.GA543198@kernel.org/T/
+>   - Spelling fixes in patch description
+> 
+> v1: https://lore.kernel.org/lkml/CAAeCc_nJtR2ryzoaXop8-bbw_0RGciZsniiUqS+NVMg7dHahiQ@mail.gmail.com/T/
+>   - Added "net" in patch subject prefix, missed in previous patch:
+>     https://lore.kernel.org/lkml/20240806070239.1541623-1-bbhushan2@marvell.com/
+> 
+> 
+> Thanks
+> -Bharat
+> 
+> >
+> > Using b4 to manage patch submissions will help with this.
+> >
+> 
 
