@@ -1,89 +1,80 @@
-Return-Path: <netdev+bounces-120591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03DFE959E98
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:26:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB2F959EA0
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4FE32834E6
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:26:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14E551C210A3
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB16192D90;
-	Wed, 21 Aug 2024 13:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A381D199FBB;
+	Wed, 21 Aug 2024 13:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mamsNsDv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8y/D6aj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2D7196C86
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4FC19994C;
+	Wed, 21 Aug 2024 13:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724246769; cv=none; b=U921eU4HheN+VC3SsbBI7iQVUiCYOBBlaUsHUVjhO5GK1VgXN0gbxlEBDF8BmZWvsI3giWwYGda7B7629u6Hmk01fMcgU5Ndm98ACKnaTBi4lNWkD4quhWR6M1YllNbTIFcTUqxbRWXmgNZeTCVciP9m9EC9peahDMd+BKjuudQ=
+	t=1724246884; cv=none; b=kr04tKg/lcnmdCmy8hzVpDWA+x4ZrgTyg3+WItg0mUl1mydGDQB38TS8rwPnT4ajL9mG5Ib06AQa3wUo4ceKSS6UfjkMlPmdfseFWvScHrfp1DD1V2lD1JmRI+sGks+K+gIAFENGkiBaPqZ8WV5mR8Va3SFu+Rj045olP+rLGOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724246769; c=relaxed/simple;
-	bh=uB6l2qA644Qvz5iw9yueUj3dh8aLOpKegsDXd70dPCI=;
+	s=arc-20240116; t=1724246884; c=relaxed/simple;
+	bh=EfwypYdM33lZ/G4fq92xQyPXwP/Q8lFk9UP+Y3zqev8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MCNRyE13TXAuDe2gKE0T2ZfBwPEEfoOgrC82F8UFybMtYtDbuCX9Bn4/6UmqllzQOLM/IQS+pvpTJY6W9cgdUis7ehB6kcddgX1VYCerWwLJiGCttzEafJ8QW0dFfPjHPS8FRxjbUv+6b5bMpqdCKq+SIlbb48s9ApO/vXCBumM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mamsNsDv; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2d3c05ec278so4699849a91.0
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 06:26:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724246767; x=1724851567; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=izAZlKs3Y2RGKb64FPkDsSdJcYsJKDXkxfcAGQrQRis=;
-        b=mamsNsDvmPUugbVqNN735+odSiuQoO4JM2nd4W0FjVJViS0OZxcMnVWQK6CxIIfDwn
-         q/qoOAJHmw/RYtcZRK6MXr28ZPl8LZXDHxmzvT71i/OWo/W8mbgBoGAb7iRIdHxABOCO
-         Je2benWkaZkStHGxjIpYNa3gIm6rUEOqXoGZFZA0qb7QjZ6nVQrgAGp59aawq6ytP+dc
-         +xXJbGn2UZSEOs0lE/gFDmPLjOU9nZcDSTQxNT13y3l1dQrNuCjK1ajzjp0qOdRosYo9
-         uBvwFWZNqomgwbJXWCf0vzLu1v8B4XNNSHZmDVaEO3pVZKVrHlCXJv/j2tPP2neopJaj
-         OhzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724246767; x=1724851567;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=izAZlKs3Y2RGKb64FPkDsSdJcYsJKDXkxfcAGQrQRis=;
-        b=Q1GtdSeoHOwDvHZT4Yf4NT658nJ1RENxZjVOuT2nvalfOE/RsEZaGFq3xqsng6eO2S
-         NbpgpZd6Udm6Dr5MXvpbBhG/aCC6nx17CGJu+MiPaPNl/ZP8lTo4/r4ODzlbY6H6jU7k
-         NGmTuLn+xrArOn+k51k2PnHAB3T0HhVcWWS/tUO6DVcDewsD7ef1G3nOYpfUgBZ2qJe4
-         kirzk5+1ZjPRu6u4VdFD3XsPqdTzaxJs+ijWqB3DDNkcccAh8kGOQL9R/0jCPH6V0db1
-         rtQZGeoIDuqsesqpI9Zdmq4IlVRdPmNvBr/ENdEFKNmBepewNqubwyjQ1bnukC5VDj5s
-         3f1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUDHs7ZwL/AoUytBixuiZbaqi5KZ4O4s1SUKvgeK1bjzA/MkyfHcrfWEWaB1WPahTvsr57STu4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjkFUikVKzpIdVXB2xVc+dWIxqx2luT84bP379/tWCB1d4W+RA
-	S9S4UJtyeJG/m0pJQNq5QMoRmk+cYPbniyyM3FYjfHGyK/TkFJxe
-X-Google-Smtp-Source: AGHT+IHHXbzHhCtmJHg9uziDcOT5GJI8bwifEpCoM3cvgbI7dio3FN/3cAY72i+o/eF+o/x2SXDODQ==
-X-Received: by 2002:a17:90a:dd85:b0:2c8:81b:e798 with SMTP id 98e67ed59e1d1-2d5e9da9ccdmr2292379a91.30.1724246766801;
-        Wed, 21 Aug 2024 06:26:06 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d5eba2e44bsm1792942a91.13.2024.08.21.06.26.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 06:26:06 -0700 (PDT)
-Date: Wed, 21 Aug 2024 21:26:00 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETz4WqG+fhH3JTRrxLtLlammYzJ25doooN5qMPRErnyF0reEIRsX54sBAYRDCn7o56lSf1eWfGbNOcKi4HKMylzvoU6V1Kqjq1R4CAHx5zv9oykr6fTF7L3maCy7TomWsQgmurFg3B0jj965hb19wxDf+nRdVS7kaVX79rRADpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8y/D6aj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 913DFC4AF0C;
+	Wed, 21 Aug 2024 13:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724246882;
+	bh=EfwypYdM33lZ/G4fq92xQyPXwP/Q8lFk9UP+Y3zqev8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N8y/D6ajVEV0BAph5QjS9IHl8V1bvulMD2qXUH9Q329DJmK+yb2x2l0ySSjgh0jM7
+	 7/Q0QvG+wLcf6PqhaFlxQqY1ELM375gZZzB/4FykmIP405NOoDF+1h+mrRwcMBuG/0
+	 2s3YycJls0/7SB/Fbw6aGK1kbi2sSueaGCscT8OYR7I5faFBfDcygYB6qH9qeaqY08
+	 qnDenq4c3K3Mi00VqH1ClQy5fvXOIkQVAceypb2DEXf5bD2nNYSTfTPGRfGGs1QkWS
+	 denv1ouRjB1LTDk4dt3OYgly9vkwtPm1XYK8fqNcvosizMDRoo+uTa70uTUAfXRg98
+	 qI9Wpn51OmS2Q==
+Date: Wed, 21 Aug 2024 14:27:54 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <ZsXq6BAxdkVQmsID@Laptop-X1>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-3-liuhangbin@gmail.com>
- <ZsS3Zh8bT-qc46s7@hog>
- <ZsXd8adxUtip773L@gauss3.secunet.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
+ support
+Message-ID: <20240821132754.GC6387@kernel.org>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,38 +83,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZsXd8adxUtip773L@gauss3.secunet.de>
+In-Reply-To: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
 
-On Wed, Aug 21, 2024 at 02:30:41PM +0200, Steffen Klassert wrote:
-> > > +/**
-> > > + * bond_advance_esn_state - ESN support for IPSec HW offload
-> > > + * @xs: pointer to transformer state struct
-> > > + **/
-> > > +static void bond_advance_esn_state(struct xfrm_state *xs)
-> > > +{
-> > > +	struct net_device *real_dev;
-> > > +
-> > > +	rcu_read_lock();
-> > > +	real_dev = bond_ipsec_dev(xs);
-> > > +	if (!real_dev)
-> > > +		goto out;
-> > > +
-> > > +	if (!real_dev->xfrmdev_ops ||
-> > > +	    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
-> > > +		pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
-> > 
-> > xdo_dev_state_advance_esn is called on the receive path for every
-> > packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
-> > xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
-> > be ratelimited.
+On Tue, Aug 20, 2024 at 04:36:09PM +0200, Andrea della Porta wrote:
+> The RP1 is an MFD supporting a gpio controller and /pinmux/pinctrl.
+> Add minimum support for the gpio only portion. The driver is in
+> pinctrl folder since upcoming patches will add the pinmux/pinctrl
+> support where the gpio part can be seen as an addition.
 > 
-> How does xfrm_state offload work on bonding?
-> Does every slave have its own negotiated SA?
+> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
 
-Yes and no. Bonding only supports xfrm offload with active-backup mode. So only
-current active slave keep the SA. When active slave changes, the sa on
-previous slave is deleted and re-added on new active slave.
+...
 
-Thanks
-Hangbin
+> diff --git a/drivers/pinctrl/pinctrl-rp1.c b/drivers/pinctrl/pinctrl-rp1.c
+
+...
+
+> +const struct rp1_iobank_desc rp1_iobanks[RP1_NUM_BANKS] = {
+> +	/*         gpio   inte    ints     rio    pads */
+> +	{  0, 28, 0x0000, 0x011c, 0x0124, 0x0000, 0x0004 },
+> +	{ 28,  6, 0x4000, 0x411c, 0x4124, 0x4000, 0x4004 },
+> +	{ 34, 20, 0x8000, 0x811c, 0x8124, 0x8000, 0x8004 },
+> +};
+
+rp1_iobanks seems to only be used in this file.
+If so, it should be static.
+
+Flagged by Sparse.
+
+...
 
