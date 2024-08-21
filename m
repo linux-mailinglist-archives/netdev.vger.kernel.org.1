@@ -1,153 +1,109 @@
-Return-Path: <netdev+bounces-120589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D442A959E7E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:18:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C65D959E86
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9931F22325
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:18:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFD6A1C20DB9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E290119995F;
-	Wed, 21 Aug 2024 13:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gt5sU611"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B2D19994C;
+	Wed, 21 Aug 2024 13:20:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A268F188A33;
-	Wed, 21 Aug 2024 13:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F9218991D;
+	Wed, 21 Aug 2024 13:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724246286; cv=none; b=jOc8l4I/GUfnFxhMpeDryu5GDu0Fp2h7eRyQOhE478+aUfkBxlBXdwRJSQOz44UYZ2e3/AFIHi1q5byaMcJZyAe9CG+X0pEUs4PBaSYhiXvP4R9MX7XB2p6TraOav4uHiV+HGvOgifzMtV4fNTM8FK+edkgT1k3oeSmmKCb//Yo=
+	t=1724246422; cv=none; b=nsTg2sOUzJv7Sx8NiJXtEmQGMGroioBPqTe8FEAG6ykwiUuX2b/IDDdfPXo+NxKJIxEJVzdc/gOOIp1ttBTk1kHpy5GgEhA3KBbB0OzyK/s0BoLHfbv+yO7sJAPOMULL/2Y0gYfAdoTA2NPRIgGv/maasdsDwaX8bZYgwF+/JAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724246286; c=relaxed/simple;
-	bh=4J5Z1SoLstMKvuEFmueN5cD92XhXbF48rhCyXiWqfc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n5FWs69e56flx3XlUUxnvB41e7bPd5vI1bKKTEccrSV8205l4Xx3Hy9xdic75KfsqrEwRqyTcJzsESdjAa+9EUPdjSRIU4HgI3w8oAB9ah67MhFxQyVTKFylWyb8kvSXNTVLb7sIsZeqDXxbQpwl2Am+LVB7B/rxu4dgW45Y+Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gt5sU611; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D13AC32782;
-	Wed, 21 Aug 2024 13:17:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724246286;
-	bh=4J5Z1SoLstMKvuEFmueN5cD92XhXbF48rhCyXiWqfc8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gt5sU611t1gy+i8JnErfPLmmKuJIbmOK6bDfgnJfFMunesDxEgSJWKQHJH7HorUt2
-	 KWMOlcQ2O1Y2uFn29Q9JrGDY84kKO6op6X2DWdH0So1eEgpqTG1GhN4NgBAPFFYjR3
-	 6iQ8eTcht9a9xvQEVwWrUygQ9Gc7PxiX1Zd3Cm8WKs8qT7kAKv90AZ4QRmEnyxazHL
-	 Mo5+8Rox6+uBq9xMTj6WH7xnRuesauC+3GrfvSULC9u/Vm/wW431RGkU17h/qsRTI0
-	 GoXlW0w4qVTdOb4tgA679+OVfJJO9DHJuJiU8Cx2HwVAKabf9gbL6BvtxF+vMe/BTP
-	 CrKWiO7SWrtqw==
-Date: Wed, 21 Aug 2024 14:17:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 06/11] clk: rp1: Add support for clocks provided by RP1
-Message-ID: <20240821131757.GB6387@kernel.org>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <a378cc652b7e92b4022141dd2f20711e1771eb72.1724159867.git.andrea.porta@suse.com>
+	s=arc-20240116; t=1724246422; c=relaxed/simple;
+	bh=q7qLJeQFM8AN8cjONf6OYwdIl/+88D+A22GU5a/5Uvk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LCmEnoDPPS2TnVKwB7K1dSvxOKkb6brZzkCmxlt1wLOBe6QQyAPrLIjieJMzjs3xVZMr60Vr0isOB0v0SG32hJyySJ6TYBcyESrUDMu47LmSfFhfnIiDu5xCkmo2NqKY9jLK/08tOPgjJv/B0hsbyjqxSA/G5B7l9yKS4hM6nrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-05 (Coremail) with SMTP id zQCowAA3Hzp26cVmrW63CA--.48365S2;
+	Wed, 21 Aug 2024 21:20:00 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: vkoul@kernel.org,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	niklas.cassel@linaro.org
+Cc: netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: stmmac: Check NULL ptr on lvts_data in qcom_ethqos_probe()
+Date: Wed, 21 Aug 2024 21:19:49 +0800
+Message-Id: <20240821131949.1465949-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a378cc652b7e92b4022141dd2f20711e1771eb72.1724159867.git.andrea.porta@suse.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAA3Hzp26cVmrW63CA--.48365S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZr13try3AFW8ZFWxGFy8Zrb_yoWkCrg_uF
+	1jvFWfXF1DKrW0yr47J3y3ZrySv3WqqFWxJF4ktayfCaykWrn0grZ5uw4kJFZrur4IyFnr
+	Jw1xt3ySv3W7tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
+	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU122NtUUUUU==
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On Tue, Aug 20, 2024 at 04:36:08PM +0200, Andrea della Porta wrote:
-> RaspberryPi RP1 is an MFD providing, among other peripherals, several
-> clock generators and PLLs that drives the sub-peripherals.
-> Add the driver to support the clock providers.
-> 
-> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+of_device_get_match_data() can return NULL if of_match_device failed, and
+the pointer 'data' was dereferenced without checking against NULL. Add
+checking of pointer 'data' in qcom_ethqos_probe().
 
-...
+Cc: stable@vger.kernel.org
+Fixes: a7c30e62d4b8 ("net: stmmac: Add driver for Qualcomm ethqos")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> diff --git a/drivers/clk/clk-rp1.c b/drivers/clk/clk-rp1.c
-> new file mode 100644
-> index 000000000000..d18e711c0623
-> --- /dev/null
-> +++ b/drivers/clk/clk-rp1.c
-> @@ -0,0 +1,1655 @@
-> +// SPDX-License-Identifier: GPL
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 901a3c1959fa..f18393fe58a4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -838,6 +838,9 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 	ethqos->mac_base = stmmac_res.addr;
+ 
+ 	data = of_device_get_match_data(dev);
++	if (!data)
++		return -ENODEV;
++
+ 	ethqos->por = data->por;
+ 	ethqos->num_por = data->num_por;
+ 	ethqos->rgmii_config_loopback_en = data->rgmii_config_loopback_en;
+-- 
+2.25.1
 
-checkpatch says:
-
-WARNING: 'SPDX-License-Identifier: GPL' is not supported in LICENSES/...
-
-...
-
-> +static int rp1_clock_set_parent(struct clk_hw *hw, u8 index)
-> +{
-> +	struct rp1_clock *clock = container_of(hw, struct rp1_clock, hw);
-> +	struct rp1_clockman *clockman = clock->clockman;
-> +	const struct rp1_clock_data *data = clock->data;
-> +	u32 ctrl, sel;
-> +
-> +	spin_lock(&clockman->regs_lock);
-> +	ctrl = clockman_read(clockman, data->ctrl_reg);
-> +
-> +	if (index >= data->num_std_parents) {
-> +		/* This is an aux source request */
-> +		if (index >= data->num_std_parents + data->num_aux_parents)
-
-It looks like &clockman->regs_lock needs to be unlocked here.
-
-Flagged by Smatch, Sparse. and Coccinelle.
-
-> +			return -EINVAL;
-> +
-> +		/* Select parent from aux list */
-> +		ctrl = set_register_field(ctrl, index - data->num_std_parents,
-> +					  CLK_CTRL_AUXSRC_MASK,
-> +					  CLK_CTRL_AUXSRC_SHIFT);
-> +		/* Set src to aux list */
-> +		ctrl = set_register_field(ctrl, AUX_SEL, data->clk_src_mask,
-> +					  CLK_CTRL_SRC_SHIFT);
-> +	} else {
-> +		ctrl = set_register_field(ctrl, index, data->clk_src_mask,
-> +					  CLK_CTRL_SRC_SHIFT);
-> +	}
-> +
-> +	clockman_write(clockman, data->ctrl_reg, ctrl);
-> +	spin_unlock(&clockman->regs_lock);
-> +
-> +	sel = rp1_clock_get_parent(hw);
-> +	WARN(sel != index, "(%s): Parent index req %u returned back %u\n",
-> +	     data->name, index, sel);
-> +
-> +	return 0;
-> +}
-
-...
 
