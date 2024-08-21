@@ -1,121 +1,167 @@
-Return-Path: <netdev+bounces-120734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC42995A681
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:23:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16EB95A68D
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08B3C1C224F7
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:23:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F60EB2512C
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA99B17BB04;
-	Wed, 21 Aug 2024 21:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12027175D45;
+	Wed, 21 Aug 2024 21:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="cE72wCy4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="e2srs40r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta38.uswest2.a.cloudfilter.net (omta38.uswest2.a.cloudfilter.net [35.89.44.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BEB17B50A
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EDF170A12
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724275376; cv=none; b=gmNM+g+hQlQHH2NQdUiPDmrGJkGHgmaM6X8x3wOYu/qbAf4Cp+mIGKLaPj0bWtKX3twTTL4otaFpbhYci+m+cB+u+P0EX+/04ZI7Dpx/Vgmpqh82adRC8sSSqj1xQPik2c4ewKdegKHdPXTMuViOFNs4w8O9xnnlBAU6lM47NuU=
+	t=1724275566; cv=none; b=ntyXhuNEshIcZ/LA94gPX/IRWYD8ZNfCF7svqn4Bu19WRNmNXXQkvJKBE/lXg/HuN6ZaW9Y0jNQFuQdINTscvvtmq8pY1Fito0Byt3SN9qf+c+EKhyenuFVh8Gk8jJfqH3b6TpNzDJImSHMzC0akW9zHq/HicPBe/qyYykQ+PGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724275376; c=relaxed/simple;
-	bh=J4jhXfuZXVsA1fnIFK2aBdNRhCqvs1bcYCs4askDyfE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S2HJSfxTGwnQdM4eSxF3rv2a5yynAEtITbmiJH5E6bs0YEcspKhzSaES4EE6aX0SxCO4EJBMm/o+JUPcqLEtOV4XqnFb0u/MoC9CBjst0Sd57q+1tPYtKIdlxFStTBzjDhDV3ezZ4SB+qlsST64G1rqLbAec0HqdYfTZ3yDWSrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=cE72wCy4; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20219a0fe4dso1322285ad.2
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1724275375; x=1724880175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DWlusxC/4B0Tt61cIudea7r7QbRBK/lDmlXELXrJz3M=;
-        b=cE72wCy4ZBc0/+0WNT87HK3J9cAklPodIGlL5+BOF9+3G7b+gj/e+3BO1rGU0L2VFw
-         5LwejM+SovcjvFSdgXUcJ68wA7oUt0gSgRHATlO2+vX8B84HtxcnN8PORm9LjS8wMRhr
-         VELXamehS74j48oKC0AfqdXSExR9hXXMyRBATlAWSjkZK1ffbisYV89JYfSGtIAOX50u
-         NU/zP0NC+bHgNyGsq76WE+4UpzLd6wnDCP46+aGMnLM0abtvAS5eD5h8sUS1HfkKdENO
-         iWsf3c9O+GX/V5+xRr6rv2IcDwUNwGWbBvrLZkUoW0vi2s2gLGabwEt3iprFR1mbVKUZ
-         Qb0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724275375; x=1724880175;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DWlusxC/4B0Tt61cIudea7r7QbRBK/lDmlXELXrJz3M=;
-        b=MmYL0iMKuGi8iKbW0YqC1FGarbooCqUtEyGiwXg6b909WoFspbR9qFwXPgA5TD7lrc
-         GSJq5cOYSYXdfFJZAweCBQoVqpoGUtQXfZ12dc0bQYarFBMYvtxzzAhj41SWxTmMJdIe
-         JOb9rfV5m11gyUoInNmz/NeXAZZhk3DKwA0vuOOq68YwP0tNb7bm6o2TheeLUS16cJx4
-         roWS43u5hgRGqeqwQnaDjIqFOTvPik2ceHYDl7Ag2Cvq++arGuUTRmD3mJPo8JLYgcJH
-         v6NPQxyLLQLxVTL+knrqzE+x0eTRvoq8c1Yt/5GJIPaoJu5I4CAK2cTWoIno4JtCRAx4
-         FtKg==
-X-Forwarded-Encrypted: i=1; AJvYcCV/KbjJfCCSqzFZkLUvqpiWFQBKyC9ld9qN0FRvqWPvT6KckwjiBKHGyBPPgqQO1MVRRYMm6qc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNjb+wKjPSHC/uh8PoNSRjuTH04le8ySlKoOfy+8AhdOzGK3gd
-	xr2ORkpdfJSTbrBXukqfEQeUWxl6FviW5EozmUbr76Xsk8wnBWEL4XMtRcO40g==
-X-Google-Smtp-Source: AGHT+IESiY6uqwnmtMIbInVxU4n1CDlMMGRMdJ7VdPyUHrT0bhOlkUfkdS5w3apy4szvXnLNBbf02A==
-X-Received: by 2002:a17:902:e546:b0:1fb:8245:fdeb with SMTP id d9443c01a7336-203681c3183mr39163705ad.64.1724275374698;
-        Wed, 21 Aug 2024 14:22:54 -0700 (PDT)
-Received: from TomsPC.home ([2601:646:8300:55f0:7a19:cf52:b518:f0d2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385ae701dsm388265ad.236.2024.08.21.14.22.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 14:22:54 -0700 (PDT)
-From: Tom Herbert <tom@herbertland.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	felipe@sipanda.io,
-	willemdebruijn.kernel@gmail.com,
-	pablo@netfilter.org,
-	laforge@gnumonks.org,
-	xeb@mail.ru
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v3 13/13] flow_dissector: Add case in ipproto switch for NEXTHDR_NONE
-Date: Wed, 21 Aug 2024 14:22:12 -0700
-Message-Id: <20240821212212.1795357-14-tom@herbertland.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240821212212.1795357-1-tom@herbertland.com>
-References: <20240821212212.1795357-1-tom@herbertland.com>
+	s=arc-20240116; t=1724275566; c=relaxed/simple;
+	bh=jqI5uPtkQOCuHuZx0IKYUp40Xka6BvRF4D+HCb/dws0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rxhdjMin3NkB/igh4KvjX+zMby6ThnPWLxmBEqCso00Uz/OiHHMfnDFdSPX6yeNausXGIbkodmspMPO5R7g4/4uxfiIzDvVWb5oRLinkEquSmSLQ8YWomTo+J7nOft9iAtdW476SGnsDuzwKWnz2VwNd86/5GxaLebOkvyGQNuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=e2srs40r; arc=none smtp.client-ip=35.89.44.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6001a.ext.cloudfilter.net ([10.0.30.140])
+	by cmsmtp with ESMTPS
+	id gnPOsjikeumtXgsq6stpUR; Wed, 21 Aug 2024 21:25:58 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id gsq5sLq5lZlJQgsq5sF3hQ; Wed, 21 Aug 2024 21:25:57 +0000
+X-Authority-Analysis: v=2.4 cv=DMBE4DNb c=1 sm=1 tr=0 ts=66c65b66
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=frY+GlAHrI6frpeK1MvySw==:17
+ a=IkcTkHD0fZMA:10 a=yoJbH4e0A30A:10 a=VwQbUJbxAAAA:8 a=fvnvuae_TkRx4EM278wA:9
+ a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22 a=Xt_RvD8W3m28Mn_h3AK8:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=59nlnOmbwxXF7SPkM/tf0B08dO77gGtbNswEQSGJ8uE=; b=e2srs40r0TGWPoBDcKoSZFLbzu
+	evrOHUuEkKa2s8+qH53UQq9wrZkFLc7ytsrDiPIppt3+jfIpmLNrxjJPi9/vZrwiPOnxrKGav1zkQ
+	Pg+06QLya3Ed5iyxC3wRrdaCLaZemjBjmF+DeUP5BNh9P+6cP9YphuLRuOCACOyeUsIg2AGvTuC7q
+	V+v0ALHkZZd4TP8g2GMkMgJPSOwz8BbiYG7T5xRVoAr8Q0Jo4GdEUr8SBkqTCUkKo7VG7J2bhw8iM
+	3FouKCoMsyzjPvI61hgWsHWhiCwHbLrWmhB7D75IsC9OfsKyLmreOe5dAdf8I9VWaaBDA2H+ilyoE
+	iNSkwO/w==;
+Received: from [201.172.173.139] (port=56500 helo=[192.168.15.5])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1sgsq2-0021C5-2U;
+	Wed, 21 Aug 2024 16:25:54 -0500
+Message-ID: <0627c008-a3f9-4b2e-a3b9-72c6a1a287b0@embeddedor.com>
+Date: Wed, 21 Aug 2024 15:25:52 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] wifi: mwifiex: Replace one-element arrays with
+ flexible-array members
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Amitkumar Karwar <amitkarwar@gmail.com>,
+ Ganapathi Bhat <ganapathi017@gmail.com>,
+ Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+ Xinming Hu <huxinming820@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <Y9xkECG3uTZ6T1dN@work> <ZsZNgfnEwOcPdCly@black.fi.intel.com>
+ <93b3f91a-baa4-48e1-b3eb-01f738fa8fc1@embeddedor.com>
+ <ZsZWxnfy21CpOLoR@smile.fi.intel.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <ZsZWxnfy21CpOLoR@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.173.139
+X-Source-L: No
+X-Exim-ID: 1sgsq2-0021C5-2U
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.5]) [201.172.173.139]:56500
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfPrNHx/2+BuXbM6F4jJuyazoj9EFqVU6WkIGkyK6TeMh/tJi8PsVE179tBgYPo70L9RyOziyypTtiTIzxdgRWLzjfVuD9GsM3Rda1qH06kVezvJ07faV
+ YzZ2bPDcZlVzBUX/3V0ZxQJH+tTj93CagBLKGWisqZIjWqadmsE/BbKEQVQnTR9gECWHAflbj99OXiqcu3mc2ozG7HiNxCShBbQ=
 
-Protocol number 59 (no-next-header) means nothing follows the
-IP header, break out of the flow dissector loop on
-FLOW_DISSECT_RET_OUT_GOOD when encountered in a packet
 
-Signed-off-by: Tom Herbert <tom@herbertland.com>
----
- net/core/flow_dissector.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index ee80c2d2531c..e34c1b6c36e3 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -1991,6 +1991,9 @@ bool __skb_flow_dissect(const struct net *net,
- 		fdret = FLOW_DISSECT_RET_OUT_GOOD;
- 		break;
- 	}
-+	case NEXTHDR_NONE:
-+		fdret = FLOW_DISSECT_RET_OUT_GOOD;
-+		break;
- 	case IPPROTO_IPIP:
- 		if (flags & FLOW_DISSECTOR_F_STOP_BEFORE_ENCAP) {
- 			fdret = FLOW_DISSECT_RET_OUT_GOOD;
--- 
-2.34.1
+On 21/08/24 15:06, Andy Shevchenko wrote:
+> On Wed, Aug 21, 2024 at 02:59:34PM -0600, Gustavo A. R. Silva wrote:
+>> On 21/08/24 14:26, Andy Shevchenko wrote:
+>>> On Thu, Feb 02, 2023 at 07:32:00PM -0600, Gustavo A. R. Silva wrote:
+>>>> One-element arrays are deprecated, and we are replacing them with flexible
+>>>> array members instead. So, replace one-element arrays with flexible-array
+>>>> members in multiple structures.
+>>>>
+>>>> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE
+>>>> routines on memcpy() and help us make progress towards globally
+>>>> enabling -fstrict-flex-arrays=3 [1].
+>>>>
+>>>> This results in no differences in binary output.
+>>>
+>>> Sorry for blast from the past, but I have a question here.
+>>>
+>>> This change seems converts many of the flexible arrays in this driver.
+>>> But what's behind this one?
+>>>
+>>> struct host_cmd_ds_802_11_scan_ext {
+>>>           u32   reserved;
+>>>           u8    tlv_buffer[1];
+>>> } __packed;
+>>>
+>>>
+>>> AFAIU this needs also some care. On the real machine I have got this
+>>>
+>>> elo 16 17:51:58 surfacebook kernel: ------------[ cut here ]------------
+>>> elo 16 17:51:58 surfacebook kernel: memcpy: detected field-spanning write (size 243) of single field "ext_scan->tlv_buffer" at drivers/net/wireless/marvell/mwifiex/scan.c:2239 (size 1)
+>>> elo 16 17:51:58 surfacebook kernel: WARNING: CPU: 0 PID: 498 at drivers/net/wireless/marvell/mwifiex/scan.c:2239 mwifiex_cmd_802_11_scan_ext+0x83/0x90 [mwifiex]
+>>>
+>>> which leads to
+>>>
+>>>           memcpy(ext_scan->tlv_buffer, scan_cfg->tlv_buf, scan_cfg->tlv_buf_len);
+>>>
+>>> but the code allocates 2k or more for the command buffer, so this seems
+>>> quite enough for 243 bytes.
+>>>
+>>
+>> I think this would do it:
+> 
+> Thank you for the prompt respond! Can you send it as a formal patch?
+> Or do you want me to test it first? (If the second one, it might take
+> weeks as this is my home laptop that I don't reboot too often. I think
+> it's can be sent anyway.)
+> 
 
+Done:
+https://lore.kernel.org/linux-hardening/ZsZa5xRcsLq9D+RX@elsanto/
+
+Thanks for reporting this. :)
+--
+Gustavo
 
