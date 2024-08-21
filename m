@@ -1,174 +1,144 @@
-Return-Path: <netdev+bounces-120604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81A75959EF3
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:43:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D9D959EFF
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAA0A2842FA
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:43:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3B3A28436F
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237361AD5E0;
-	Wed, 21 Aug 2024 13:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6220B1AF4D6;
+	Wed, 21 Aug 2024 13:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdWjgVWs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dolPsNWv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B971A4ADA;
-	Wed, 21 Aug 2024 13:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9430A1547D7
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724247778; cv=none; b=lhy3vidZWX6XEEHHhVZ1aJXYNwMeHsiB8YSf49LAAgAfkt7BS2oE0fo7H78IYKR8HPjDSH025qwasDj4dBmYCVHAO+v9Vf8Gi9dSoUHceCbHMecxNJA64K77buYl6rOiFWn1P4a4MVBKNmUE8We4tXOrIfm3kmmTzEZd2r1HIFI=
+	t=1724248067; cv=none; b=JkQlFQB3Wdn907Ottr445T4zJJpD42MhJqV0xZ0T6CSZ61CKQ+rkiZfivSoDS6UjDvNjLH+0HfdFIGw3W7Y2WAMW5iz0GOTmhSqcJV0eBuHlnl2a2NuRUViS+G0q0caIZrti4xJw9HQJ5JX95x0/a95d7RsabdIRWmserCnRtRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724247778; c=relaxed/simple;
-	bh=THhE5eMnjlNKxQ/R+oGQK3EpvB9KEoAA4Y/el7UyCgc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=qHZbKCM+iW36IWepI1qV4IK3O7qU8eVZ3fNiMC1Z8/DiV4epcNPfn0HkHZZVBU3rgYZoQjmEv6fUd/2Zl3X0iLY1oqyhaBIv30HOslxTN8wsJNvDl9JZ/uTimXRZDeP1LlRFwWfpDKWygoBC8x0tHB9Kziv23BkHsJYKrJuyz8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdWjgVWs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93C26C32782;
-	Wed, 21 Aug 2024 13:42:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724247777;
-	bh=THhE5eMnjlNKxQ/R+oGQK3EpvB9KEoAA4Y/el7UyCgc=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=gdWjgVWsHis3krlbmQZ3X58rj8MsjRM1ldVftrS82nR67XO9gkDMSWmV4mjNersqt
-	 Cm/vJl3tAEb+1jV3iL7kICq6Vd30uPtwc/LgrqOvo/0p39YdXB+JY4//E1Uxqu9dFH
-	 GaF06vqkKCkP7I15FnBE/WwLLlgtUeqjdL+pxtJ8Rrc98zmECQrrcWugU98PlHr0xv
-	 EEmpRrbkzfvpLlS6WH0ojzR5c/B71UbhFdHQYz0kXhwT0LyQgbAxNfWd2FsMyVCzPi
-	 HC1vpoU5nDkNpbkqF8T8cISPeCyIlcevgZ3C3Et+mpWH0JJElDQB8funuTwZaBnVWJ
-	 ki8IS+/1FqBuA==
-Message-ID: <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
-Date: Wed, 21 Aug 2024 15:42:45 +0200
+	s=arc-20240116; t=1724248067; c=relaxed/simple;
+	bh=gwLjHNTsXHMmlKgeIfCrG8pO4t2Y8x/pcVf6IX7HJS0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N2Gx3jp14gTp/VkAs81aM2zt41N4M3QtIiTgj1g+xVv8ldMeLo+DkgJYn/Yb8A9CVt3pw3lQoqx6P1K2vZsvekwU/AwlCvqcuSAhiaC5CSbJwnA3k0naMMUMKphelHYcUFWhZeruzX4uanCdiJLQpInPsodk+4ePrSxpa5t8Frg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dolPsNWv; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-429ec9f2155so48418185e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 06:47:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724248064; x=1724852864; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ZR2V02XpqNEW9fvu30UGOqjOdE3SQr9bcH8M/YKkZE=;
+        b=dolPsNWvrSeN1bjtX6ZyZ4JT8coc+48QIJvDg6MwxbHw4pe3mbqEbesmqh2lL+eRSt
+         ReiP3BYXHER5gTs/Jgp7JRX0IWMn6sHNnDz11HD7NaNDq9cJKYxk1YaAP+epj1nRgN9h
+         Sj7nO0Ht/2ie9fOWrMi51EH3Vy6GHn3Gk0K0fchKPqn9daRfq3eI4R9HalWAJ9asFj6h
+         GMAfKvdYGyPmjpsjCxvrZm+xtqrdrSYM4MTJ6uJQuR94rao+lhvsaPPrk/apjYCHkvpX
+         YFgneHgTgJYG89FU7AH00ltJjxOda2SnkXlEoYvjNcTsNKeQlI8Q1W/gIeDUqATCQfRg
+         3ckw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724248064; x=1724852864;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+ZR2V02XpqNEW9fvu30UGOqjOdE3SQr9bcH8M/YKkZE=;
+        b=Gx16ljDc/jiDKUy1QDGEVUk/pakHDf5PD1ZAB1qmfeiyh9KSx1G932P2YCQ8l9L9RX
+         BAN1zF4MGrRfQOaPmFZR/fWGvd1VgsJpPj7uLo85nFWJi51SxoeeGRCrNjWQPYNrrps4
+         ooBf3T/nKvFXKA7gewGiPj5rftj4cifg1QZr/oVT9DlMv8U3P7LHoDlFN8zu9lHNLPbB
+         r6RC4jzw0qgs9ElfyUuewJBw9L58FEiouL2gb+uabrZs8kmtUsakSkNHrAbHqNsL5+Cn
+         dIpW+gbnJjKpJkIFQJ3kLx8HDxk990OqIwQxgeW9oqE4KVLyvg/l0yxWWcWwBPOTSG4l
+         haBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWekusfWEeKt8VUNUdYLNo5NAB8UQMMCaZdXPTsstqg+ZqRXITj6WSCOdq1BTDZX+hZXXE4E6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAou88uUKIUF0KSp4qaqE9lnMMite5S8mbxR+bC1PQshWEzfkD
+	bcrC1ig1IXV+x2sh85Frobf1EO1PEC0s3TL8vlLudAWaiDHtI1KjXngM092Q9IIAUoAFCu0Hpjj
+	9WX5DMfv7cjnDk0jYgNRW4CVwAhHwUZiJGyIz
+X-Google-Smtp-Source: AGHT+IE+WRPQ5cxJkts/8lQ1Pyrz4IDfgbmZOe9kRkxkJ6+Ctq49hnrFtuGR4cuPoH3txY4c4UXweZZ+1LQnmVHuF+A=
+X-Received: by 2002:a05:600c:4e91:b0:426:6f5f:9da6 with SMTP id
+ 5b1f17b1804b1-42abf096794mr15321995e9.27.1724248063553; Wed, 21 Aug 2024
+ 06:47:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
- DT overlay
-To: Andrea della Porta <andrea.porta@suse.com>
-References: <cover.1724159867.git.andrea.porta@suse.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Cc: Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <cover.1724159867.git.andrea.porta@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240819153656.28807-2-vadorovsky@protonmail.com> <CAH5fLghOFYxwCOGrk8NYX0V9rgrJJ70YOa+dY1O0pbNB-CoK=w@mail.gmail.com>
+In-Reply-To: <CAH5fLghOFYxwCOGrk8NYX0V9rgrJJ70YOa+dY1O0pbNB-CoK=w@mail.gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Wed, 21 Aug 2024 15:47:31 +0200
+Message-ID: <CAH5fLgiRPOVRsF5yz6d-fOciHg1EcwjD21eAgu4sSynSSsgf5A@mail.gmail.com>
+Subject: Re: [PATCH RESEND v5] rust: str: Use `core::CStr`, remove the custom
+ `CStr` implementation
+To: Michal Rostecki <vadorovsky@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Martin Rodriguez Reboredo <yakoyoku@gmail.com>, 
+	Finn Behrens <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>, 
+	Valentin Obst <kernel@valentinobst.de>, Yutaro Ohno <yutaro.ono.418@gmail.com>, 
+	Asahi Lina <lina@asahilina.net>, Danilo Krummrich <dakr@redhat.com>, Tiago Lam <tiagolam@gmail.com>, 
+	Charalampos Mitrodimas <charmitro@posteo.net>, Tejun Heo <tj@kernel.org>, Roland Xu <mu001999@outlook.com>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20/08/2024 16:36, Andrea della Porta wrote:
-> RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
-> a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
-> etc.) whose registers are all reachable starting from an offset from the
-> BAR address.  The main point here is that while the RP1 as an endpoint
-> itself is discoverable via usual PCI enumeraiton, the devices it contains
-> are not discoverable and must be declared e.g. via the devicetree.
-> 
-> This patchset is an attempt to provide a minimum infrastructure to allow
-> the RP1 chipset to be discovered and perpherals it contains to be added
-> from a devictree overlay loaded during RP1 PCI endpoint enumeration.
-> Followup patches should add support for the several peripherals contained
-> in RP1.
-> 
-> This work is based upon dowstream drivers code and the proposal from RH
-> et al. (see [1] and [2]). A similar approach is also pursued in [3].
+On Wed, Aug 21, 2024 at 2:08=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> w=
+rote:
+>
+> On Mon, Aug 19, 2024 at 5:39=E2=80=AFPM Michal Rostecki <vadorovsky@gmail=
+.com> wrote:
+> >
+> > From: Michal Rostecki <vadorovsky@gmail.com>
+> >
+> > `CStr` became a part of `core` library in Rust 1.75. This change replac=
+es
+> > the custom `CStr` implementation with the one from `core`.
+> >
+> > `core::CStr` behaves generally the same as the removed implementation,
+> > with the following differences:
+> >
+> > - It does not implement `Display`.
+> > - It does not provide `from_bytes_with_nul_unchecked_mut` method.
+> > - It has `as_ptr()` method instead of `as_char_ptr()`, which also retur=
+ns
+> >   `*const c_char`.
+> >
+> > The first two differences are handled by providing the `CStrExt` trait,
+> > with `display()` and `from_bytes_with_nul_unchecked_mut()` methods.
+> > `display()` returns a `CStrDisplay` wrapper, with a custom `Display`
+> > implementation.
+> >
+> > `DerefMut` implementation for `CString` is removed here, as it's not
+> > being used anywhere.
+> >
+> > Signed-off-by: Michal Rostecki <vadorovsky@gmail.com>
+>
+> A few comments:
+>
+> * I would probably add CStrExt to the kernel prelude.
+> * I would probably remove `from_bytes_with_nul_unchecked_mut` and keep
+> `DerefMut for CString` instead of the other way around.
+> * Perhaps we should remove the `c_str!` macro and use c"" instead?
 
-Looking briefly at findings it seems this was not really tested by
-automation and you expect reviewers to find issues which are pointed out
-by tools. That's not nice approach. Reviewer's time is limited, while
-tools do it for free. And the tools are free - you can use them without
-any effort.
+Ah, also, please add this tag:
 
-It does not look like you tested the DTS against bindings. Please run
-`make dtbs_check W=1` (see
-Documentation/devicetree/bindings/writing-schema.rst or
-https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-for instructions).
+Closes: https://github.com/Rust-for-Linux/linux/issues/1075
 
-Please run standard kernel tools for static analysis, like coccinelle,
-smatch and sparse, and fix reported warnings. Also please check for
-warnings when building with W=1. Most of these commands (checks or W=1
-build) can build specific targets, like some directory, to narrow the
-scope to only your code. The code here looks like it needs a fix. Feel
-free to get in touch if the warning is not clear.
-
-Please run scripts/checkpatch.pl and fix reported warnings. Then please
-run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
-Some warnings can be ignored, especially from --strict run, but the code
-here looks like it needs a fix. Feel free to get in touch if the warning
-is not clear.
-
-
-Best regards,
-Krzysztof
-
+Alice
 
