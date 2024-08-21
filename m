@@ -1,167 +1,112 @@
-Return-Path: <netdev+bounces-120735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16EB95A68D
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:26:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6E9995A6BE
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F60EB2512C
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:26:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9350F2817D8
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12027175D45;
-	Wed, 21 Aug 2024 21:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB37317557E;
+	Wed, 21 Aug 2024 21:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="e2srs40r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dYc8pAIF"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta38.uswest2.a.cloudfilter.net (omta38.uswest2.a.cloudfilter.net [35.89.44.37])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EDF170A12
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B685B13A3E8;
+	Wed, 21 Aug 2024 21:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724275566; cv=none; b=ntyXhuNEshIcZ/LA94gPX/IRWYD8ZNfCF7svqn4Bu19WRNmNXXQkvJKBE/lXg/HuN6ZaW9Y0jNQFuQdINTscvvtmq8pY1Fito0Byt3SN9qf+c+EKhyenuFVh8Gk8jJfqH3b6TpNzDJImSHMzC0akW9zHq/HicPBe/qyYykQ+PGk=
+	t=1724276209; cv=none; b=kNp2lHlR9s+63BsQdqDcNIznGUdT/NBr5CJECDSqnNdX2eLYimw5/gSAs5KI7IiswHeIkDwlcSSF9XSVzDxe9gQ7awoXU4aZMhtwhj9KaWRN8KGlai/nAhmO8bllPROfZ3VCgu86y2PLdR1ZivLiPpI+3zA/kljnwtacpi1khvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724275566; c=relaxed/simple;
-	bh=jqI5uPtkQOCuHuZx0IKYUp40Xka6BvRF4D+HCb/dws0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rxhdjMin3NkB/igh4KvjX+zMby6ThnPWLxmBEqCso00Uz/OiHHMfnDFdSPX6yeNausXGIbkodmspMPO5R7g4/4uxfiIzDvVWb5oRLinkEquSmSLQ8YWomTo+J7nOft9iAtdW476SGnsDuzwKWnz2VwNd86/5GxaLebOkvyGQNuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=e2srs40r; arc=none smtp.client-ip=35.89.44.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6001a.ext.cloudfilter.net ([10.0.30.140])
-	by cmsmtp with ESMTPS
-	id gnPOsjikeumtXgsq6stpUR; Wed, 21 Aug 2024 21:25:58 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id gsq5sLq5lZlJQgsq5sF3hQ; Wed, 21 Aug 2024 21:25:57 +0000
-X-Authority-Analysis: v=2.4 cv=DMBE4DNb c=1 sm=1 tr=0 ts=66c65b66
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=frY+GlAHrI6frpeK1MvySw==:17
- a=IkcTkHD0fZMA:10 a=yoJbH4e0A30A:10 a=VwQbUJbxAAAA:8 a=fvnvuae_TkRx4EM278wA:9
- a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22 a=Xt_RvD8W3m28Mn_h3AK8:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=59nlnOmbwxXF7SPkM/tf0B08dO77gGtbNswEQSGJ8uE=; b=e2srs40r0TGWPoBDcKoSZFLbzu
-	evrOHUuEkKa2s8+qH53UQq9wrZkFLc7ytsrDiPIppt3+jfIpmLNrxjJPi9/vZrwiPOnxrKGav1zkQ
-	Pg+06QLya3Ed5iyxC3wRrdaCLaZemjBjmF+DeUP5BNh9P+6cP9YphuLRuOCACOyeUsIg2AGvTuC7q
-	V+v0ALHkZZd4TP8g2GMkMgJPSOwz8BbiYG7T5xRVoAr8Q0Jo4GdEUr8SBkqTCUkKo7VG7J2bhw8iM
-	3FouKCoMsyzjPvI61hgWsHWhiCwHbLrWmhB7D75IsC9OfsKyLmreOe5dAdf8I9VWaaBDA2H+ilyoE
-	iNSkwO/w==;
-Received: from [201.172.173.139] (port=56500 helo=[192.168.15.5])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1sgsq2-0021C5-2U;
-	Wed, 21 Aug 2024 16:25:54 -0500
-Message-ID: <0627c008-a3f9-4b2e-a3b9-72c6a1a287b0@embeddedor.com>
-Date: Wed, 21 Aug 2024 15:25:52 -0600
+	s=arc-20240116; t=1724276209; c=relaxed/simple;
+	bh=GiM+0ExQI9l2UFIsmfkehIGcth+Vvekiu0LRbZOTSMA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQ66be38mWWTgm+3Bme/Jqp5MxytLY8x2E/d7IGb/JfPJ7fni66eaZqZHsKcpAOF4U64apNdnjIGH/KSPai1smdF7ILD19l9uGcZu4KDOP1yXvMz21AoL29Rfrn2SfM5Ia4GCYFrOLPyGuN50u06pKtP1fInYhGItKablbmUWwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dYc8pAIF; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724276208; x=1755812208;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GiM+0ExQI9l2UFIsmfkehIGcth+Vvekiu0LRbZOTSMA=;
+  b=dYc8pAIFlZxSlL2cqa+sdZkEb8Wx814j7r1sfOIKCeDpb2BjizH2qaAE
+   SGSxF6t3wyARwxsHbLuGQ/a8PYN6+3uPFp3MXMiGHmJAo5UD2hijIiIzk
+   xa2EhYqp5RorBG0MPtVmbUQi59zi8riMJtPLLEPCmEAqbZ3Cv/3jrpnUk
+   HItRCzEhd/AV4JjPcVj3OTvxi1avIxLowTduc0QYTI6Ly/h+N2wX85Cci
+   JqxtDKF7C05wrxHqhkl6xfbz3WSTiizW/gDGuTBWzFOVIVvnjJqqmnjZ7
+   dkR8DirPcub5Xt5FRDJnR3W0ceSWWZUlH6cfNkiI+tSgjmh0tFI2ZvSBS
+   g==;
+X-CSE-ConnectionGUID: 8SDY2GhSQFmoB47Lb3cyQA==
+X-CSE-MsgGUID: RmAmsGBJR5uvV/PjZ1iVcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="34083804"
+X-IronPort-AV: E=Sophos;i="6.10,165,1719903600"; 
+   d="scan'208";a="34083804"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 14:36:39 -0700
+X-CSE-ConnectionGUID: bugj+qDySomfpUN6XsXw3Q==
+X-CSE-MsgGUID: wjXeT6GXSZCZY2UkzDQ2+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,165,1719903600"; 
+   d="scan'208";a="98724613"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orviesa001.jf.intel.com with ESMTP; 21 Aug 2024 14:36:36 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: netdev@vger.kernel.org
+Cc: vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	corbet@lwn.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	donald.hunter@gmail.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v2 0/2] Add Embedded SYNC feature for a dpll's pin
+Date: Wed, 21 Aug 2024 23:32:16 +0200
+Message-Id: <20240821213218.232900-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] wifi: mwifiex: Replace one-element arrays with
- flexible-array members
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Amitkumar Karwar <amitkarwar@gmail.com>,
- Ganapathi Bhat <ganapathi017@gmail.com>,
- Sharvari Harisangam <sharvari.harisangam@nxp.com>,
- Xinming Hu <huxinming820@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <Y9xkECG3uTZ6T1dN@work> <ZsZNgfnEwOcPdCly@black.fi.intel.com>
- <93b3f91a-baa4-48e1-b3eb-01f738fa8fc1@embeddedor.com>
- <ZsZWxnfy21CpOLoR@smile.fi.intel.com>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <ZsZWxnfy21CpOLoR@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.173.139
-X-Source-L: No
-X-Exim-ID: 1sgsq2-0021C5-2U
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.5]) [201.172.173.139]:56500
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfPrNHx/2+BuXbM6F4jJuyazoj9EFqVU6WkIGkyK6TeMh/tJi8PsVE179tBgYPo70L9RyOziyypTtiTIzxdgRWLzjfVuD9GsM3Rda1qH06kVezvJ07faV
- YzZ2bPDcZlVzBUX/3V0ZxQJH+tTj93CagBLKGWisqZIjWqadmsE/BbKEQVQnTR9gECWHAflbj99OXiqcu3mc2ozG7HiNxCShBbQ=
+Content-Transfer-Encoding: 8bit
+
+Introduce and allow DPLL subsystem users to get/set capabilities of
+Embedded SYNC on a dpll's pin.
+
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+
+Arkadiusz Kubalewski (2):
+  dpll: add Embedded SYNC feature for a pin
+  ice: add callbacks for Embedded SYNC enablement on dpll pins
+
+ Documentation/driver-api/dpll.rst         |  21 ++
+ Documentation/netlink/specs/dpll.yaml     |  24 +++
+ drivers/dpll/dpll_netlink.c               | 130 ++++++++++++
+ drivers/dpll/dpll_nl.c                    |   5 +-
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 230 +++++++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.h |   1 +
+ include/linux/dpll.h                      |  15 ++
+ include/uapi/linux/dpll.h                 |   3 +
+ 8 files changed, 424 insertions(+), 5 deletions(-)
 
 
+base-commit: d785ed945de6955361aafc2d540d9bb7c6a69a65
+-- 
+2.38.1
 
-On 21/08/24 15:06, Andy Shevchenko wrote:
-> On Wed, Aug 21, 2024 at 02:59:34PM -0600, Gustavo A. R. Silva wrote:
->> On 21/08/24 14:26, Andy Shevchenko wrote:
->>> On Thu, Feb 02, 2023 at 07:32:00PM -0600, Gustavo A. R. Silva wrote:
->>>> One-element arrays are deprecated, and we are replacing them with flexible
->>>> array members instead. So, replace one-element arrays with flexible-array
->>>> members in multiple structures.
->>>>
->>>> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE
->>>> routines on memcpy() and help us make progress towards globally
->>>> enabling -fstrict-flex-arrays=3 [1].
->>>>
->>>> This results in no differences in binary output.
->>>
->>> Sorry for blast from the past, but I have a question here.
->>>
->>> This change seems converts many of the flexible arrays in this driver.
->>> But what's behind this one?
->>>
->>> struct host_cmd_ds_802_11_scan_ext {
->>>           u32   reserved;
->>>           u8    tlv_buffer[1];
->>> } __packed;
->>>
->>>
->>> AFAIU this needs also some care. On the real machine I have got this
->>>
->>> elo 16 17:51:58 surfacebook kernel: ------------[ cut here ]------------
->>> elo 16 17:51:58 surfacebook kernel: memcpy: detected field-spanning write (size 243) of single field "ext_scan->tlv_buffer" at drivers/net/wireless/marvell/mwifiex/scan.c:2239 (size 1)
->>> elo 16 17:51:58 surfacebook kernel: WARNING: CPU: 0 PID: 498 at drivers/net/wireless/marvell/mwifiex/scan.c:2239 mwifiex_cmd_802_11_scan_ext+0x83/0x90 [mwifiex]
->>>
->>> which leads to
->>>
->>>           memcpy(ext_scan->tlv_buffer, scan_cfg->tlv_buf, scan_cfg->tlv_buf_len);
->>>
->>> but the code allocates 2k or more for the command buffer, so this seems
->>> quite enough for 243 bytes.
->>>
->>
->> I think this would do it:
-> 
-> Thank you for the prompt respond! Can you send it as a formal patch?
-> Or do you want me to test it first? (If the second one, it might take
-> weeks as this is my home laptop that I don't reboot too often. I think
-> it's can be sent anyway.)
-> 
-
-Done:
-https://lore.kernel.org/linux-hardening/ZsZa5xRcsLq9D+RX@elsanto/
-
-Thanks for reporting this. :)
---
-Gustavo
 
