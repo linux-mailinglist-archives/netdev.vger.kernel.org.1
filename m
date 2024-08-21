@@ -1,110 +1,171 @@
-Return-Path: <netdev+bounces-120411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B13C9592F4
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:41:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69AC1959329
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 05:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA32F1C20DB7
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:41:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB282B214D1
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 03:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9995D14C585;
-	Wed, 21 Aug 2024 02:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DDC14D2A4;
+	Wed, 21 Aug 2024 03:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXN8qx7d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdM4VeE6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA042B9B3;
-	Wed, 21 Aug 2024 02:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9668D3FF1;
+	Wed, 21 Aug 2024 03:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724208103; cv=none; b=ja41dDgW29yaIXKSs5on5fCs9CSd3N53vp6LHg2LoCsK5zIMpkXBhXGNSEu3wOVZqYx1EnRhH+J4iRUPR6hucHuSh4aWJszfDgbcs0ag6yUf8aZprbilBmUibcrqoTSLOULyXhfE8Wlg0aDk8p3Yv36Q5DynPdEut0GdZPTdy2s=
+	t=1724209691; cv=none; b=gpRV/uaiNnXCe5d7x06QM5tnrzuhEVeKXLnmYORXYQsxvhEOvIwKI3HLHr1iXcH2TlLc+Sltm+t8jNzJlQD2yGzy0Xe7caKjG0z957j0L3Uzfy8Gmzv0hrGLdLbDRJHo2Zl7xW7CQJ0YyOiMaAsyfiBGCTeZMnFyN4sh782CDuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724208103; c=relaxed/simple;
-	bh=Fm75PL9EjmbWl2YAjD9O5BKNbElsVbmfWrYqQxL3UL0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pr5w4FQrXkaaSypLVoMmxpkfcWUV7hmhqnehLgyd9eohmsyG+6ILb9LY40joUm03pMhojcKLxlxkFCdOxzhecJhFAYTmoxK/nkTacYUN155KmCnTJfWdmR6BsnFVV5fRA62By4rrl5hEUhyhicMjhpB1ZoYghYhi30dOAcvRHCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXN8qx7d; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1724209691; c=relaxed/simple;
+	bh=bVNwORlRdJmHiJxBuirTCV/r+gzCqkmi/3IrtQSQvmo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u9LV6EsZK5s7KqEr0kcWjj6HOq2mVdHX87jw5QOs2vsf5R6uiC7Qmo1W2iAPfZ/Bi5R97vAd7ZB4j3kyWEZjbvfnCxWu0m8hLzXwmv99j711u9I6AKsf+xqzfV+GeflW4rwcBPRSKha8IpRkyVCosNWjYCAYI0hBLDUVfIRmMdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hdM4VeE6; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7141b04e7a3so752172b3a.3;
-        Tue, 20 Aug 2024 19:41:41 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70f5ef740b7so5582142b3a.2;
+        Tue, 20 Aug 2024 20:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724208101; x=1724812901; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+CcK4onmz3Ym2jFPKhCXT1QW3YMtaxDAwzngzEDZ2JM=;
-        b=EXN8qx7dQ0nzq+Bh/0ovAI4IRUnGihzVTuG9P9XNe0jdBS9jFFPmI5qQT/sTO+dUB1
-         vpvP05XxVbz5Zles0koMLpEHoLyU8l63+ypMG1XNEbvEdFa4M1K5JcifRcnbBgNsm1O5
-         ++uMvzBTnrI2GmpEcKmev56UJ6PTSCWqYxp2ClmInBNKAlgU7g3CzEuk6y7xpfCnnq6K
-         KjZViQ7FoF90maArwk6G8iN41pObQtGsTiZlyHs2BgxdSAaufIBlnOAfW5VXPKTecxgq
-         d3DgGz1m++tc1dftIE6fWppmJF8PZt01lK9YQNetjSW23oPT0qJKMDAe+2Y9BIHnoML7
-         CALA==
+        d=gmail.com; s=20230601; t=1724209688; x=1724814488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ysc84ktuJkruKkhoctNQyWbQyN7dUXlVIHB4wrqTpuU=;
+        b=hdM4VeE6kO9RJHx1IUgS1bfUY/rsU7aEAQiTzUOmed+6iDzUC13EOAk01ArazwyaVU
+         8WU8K27Tn2VyEQWDVKyh6k8Y5mEjT+2RGgfidM7gPOhkbW9+ypPhyWe4xTD2okBbptAQ
+         pR71UQzydZ/k+G+qxDLhkMKKEmYdkQQ21TnCKBnNQWFGPYrW3OQ3X9D/TEHLRnMJ2vnj
+         1erONoyKLye23Ps28BXc0ON72CZ98KrXQWRmryZiFclKb/zyheFYXgCIRU0ybZqMJtCD
+         fzVO8nC5yCDL+gldcDYwEgi6WYzI4SVWmsvoZyGaLZFrHYtqJHQMH0Q66FdYJnocErqm
+         PISg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724208101; x=1724812901;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+CcK4onmz3Ym2jFPKhCXT1QW3YMtaxDAwzngzEDZ2JM=;
-        b=G78Fws4fllWIRdktbjkBFXBzzlBCS6h2HxYEOkg6EUkUYpkyKcrIsLBDQxvY78OFsJ
-         L7aisR6V2wopjvpW8IqhhRrUhmXG5FFUiQHGJylK23Gbcs4aIp78Z5euPvjdok1AxFZF
-         fWSsX8YMXxeLvtags3kTgPld1lM0tXNY4EsLtnyHKeXZZkkZX05K5nwc+q2APK+qjFts
-         kYtt00oeNeaRUSUw8u6jZpEwiGVhP54reuXOAXEmgi7jYBws2LsnXqs1b3dJcDRYNA7y
-         oa6eySoCU7jJLiqW6rKhPHat1hQecidAOwamCtuHOQGJl4oTaJoqeYk6YGKTpRlQF2ym
-         GUgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcHcMgwOZzzbdQZLQmM56KTtvJkdG+bGQWhFArNkV2NPJYezwXdYgs+Kv4dJ7+IL1PAtLPzGWt@vger.kernel.org, AJvYcCUxJbqKwD4NIRLGT4BOdlb7tCeTLZ5Si0rAHQshJ19HaqQmUUdoKfqHM9eC9VhnjJku+rdxnhrJQFX5yWiT+zo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/ZIl1t/w+kuUar6/kRkosrW8wyz38ErPZU/xLWNOjLmZGWt+q
-	tNAE/FEcC4J+KbBLgt1ZIyrUZPc+eFK6jgh9xfAU7HO2P5eO1MCn
-X-Google-Smtp-Source: AGHT+IE8tObT0gYzk7mwyUFkdDc69vCuRGcFyKErNdokR4UtN3ZWAl6g7lHQJlBOH+d5lADNggBhcQ==
-X-Received: by 2002:a05:6a20:2d23:b0:1c3:a63a:cf04 with SMTP id adf61e73a8af0-1cada05535cmr1257301637.20.1724208101111;
-        Tue, 20 Aug 2024 19:41:41 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20246816eb4sm36526295ad.87.2024.08.20.19.41.38
+        d=1e100.net; s=20230601; t=1724209688; x=1724814488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ysc84ktuJkruKkhoctNQyWbQyN7dUXlVIHB4wrqTpuU=;
+        b=CDjMcujHRKyI9Q5RZKgamG2t8la1uZMStUMBzcRyLxd47tCG9fYz7dDXLLVpPigY43
+         0OOMuTaGFVky++AtKu6lu3lxc8Rorf4h79aJlZSltmPgMzEo/jZ0/+wpYtVHEf5iWddC
+         arzOXv5MggM74frjkisBzELSy5rOWrX3oAMF106cF0UbPoIa8Q8nllclNzMojDnboiMI
+         HcyLIzYywRvFKzNJOTR4xyEqMWC1SSxOl+/iKBhnAR88xpSlO1AXFqwgBz39XDa2EiFp
+         AnGGGXp82zkbm1bVpg21Q0TFMDwZzKlVQahQMjLuR58jQmls3nNKLccnHSYGeWHjDJrf
+         Zi3w==
+X-Gm-Message-State: AOJu0YzZMmSTuzMojmVKWvcSXBAme0nj5Rrl7MrbZ7h3lK6AxqaBXjhg
+	AerVCl/MLQS4sGAHncMU+3gxJdZygtYFGEC8SWQmmbQbPvZ3lDMPSNrI7g==
+X-Google-Smtp-Source: AGHT+IGQ8e3HdvHRNyrZ1Dxk82HHFf5ab2en8P9N824Mu+UsDhLL8veJqUKKh9fCqo6dXs1N6IHPdA==
+X-Received: by 2002:a05:6a20:841e:b0:1c4:818c:299d with SMTP id adf61e73a8af0-1cad7f72934mr1838306637.11.1724209688479;
+        Tue, 20 Aug 2024 20:08:08 -0700 (PDT)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:a83:7ca8:f92a:b089])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f02fb470sm84603105ad.9.2024.08.20.20.08.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 19:41:40 -0700 (PDT)
-Date: Wed, 21 Aug 2024 10:41:35 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, idosch@idosch.org,
-	Ido Schimmel <idosch@nvidia.com>, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3] selftests: net: add helper for checking if
- nettest is available
-Message-ID: <ZsVT3yuLAhfw91XE@Laptop-X1>
-References: <20240821012227.1398769-1-kuba@kernel.org>
+        Tue, 20 Aug 2024 20:08:07 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [Patch bpf] tcp_bpf: fix return value of tcp_bpf_sendmsg()
+Date: Tue, 20 Aug 2024 20:07:44 -0700
+Message-Id: <20240821030744.320934-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240821012227.1398769-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 20, 2024 at 06:22:27PM -0700, Jakub Kicinski wrote:
-> A few tests check if nettest exists in the $PATH before adding
-> $PWD to $PATH and re-checking. They don't discard stderr on
-> the first check (and nettest is built as part of selftests,
-> so it's pretty normal for it to not be available in system $PATH).
-> This leads to output noise:
-> 
->   which: no nettest in (/home/virtme/tools/fs/bin:/home/virtme/tools/fs/sbin:/home/virtme/tools/fs/usr/bin:/home/virtme/tools/fs/usr/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin)
-> 
-> Add a common helper for the check which does silence stderr.
-> 
-> There is another small functional change hiding here, because pmtu.sh
-> and fib_rule_tests.sh used to return from the test case rather than
-> completely exit. Building nettest is not hard, there should be no need
-> to maintain the ability to selectively skip cases in its absence.
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+From: Cong Wang <cong.wang@bytedance.com>
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+When we cork messages in psock->cork, the last message triggers the
+flushing will result in sending a sk_msg larger than the current
+message size. In this case, in tcp_bpf_send_verdict(), 'copied' becomes
+negative at least in the following case:
+
+468         case __SK_DROP:
+469         default:
+470                 sk_msg_free_partial(sk, msg, tosend);
+471                 sk_msg_apply_bytes(psock, tosend);
+472                 *copied -= (tosend + delta); // <==== HERE
+473                 return -EACCES;
+
+Therefore, it could lead to the following BUG with a proper value of
+'copied' (thanks to syzbot). We should not use negative 'copied' as a
+return value here.
+
+  ------------[ cut here ]------------
+  kernel BUG at net/socket.c:733!
+  Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
+  Hardware name: linux,dummy-virt (DT)
+  pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+  pc : sock_sendmsg_nosec net/socket.c:733 [inline]
+  pc : sock_sendmsg_nosec net/socket.c:728 [inline]
+  pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
+  lr : sock_sendmsg_nosec net/socket.c:730 [inline]
+  lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
+  sp : ffff800088ea3b30
+  x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
+  x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
+  x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
+  x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
+  x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
+  x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+  x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
+  x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
+  x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
+  x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
+  Call trace:
+   sock_sendmsg_nosec net/socket.c:733 [inline]
+   __sock_sendmsg+0x5c/0x60 net/socket.c:745
+   ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
+   ___sys_sendmsg+0xac/0x100 net/socket.c:2651
+   __sys_sendmsg+0x84/0xe0 net/socket.c:2680
+   __do_sys_sendmsg net/socket.c:2689 [inline]
+   __se_sys_sendmsg net/socket.c:2687 [inline]
+   __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
+   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+   invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+   el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+   do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+   el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
+   el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+   el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+  Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000)
+  ---[ end trace 0000000000000000 ]---
+
+Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
+Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>
+Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+---
+ net/ipv4/tcp_bpf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index 53b0d62fd2c2..fe6178715ba0 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -577,7 +577,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 		err = sk_stream_error(sk, msg->msg_flags, err);
+ 	release_sock(sk);
+ 	sk_psock_put(sk, psock);
+-	return copied ? copied : err;
++	return copied > 0 ? copied : err;
+ }
+ 
+ enum {
+-- 
+2.34.1
+
 
