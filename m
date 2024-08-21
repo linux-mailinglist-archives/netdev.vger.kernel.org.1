@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-120472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4989597ED
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:43:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9B69597EF
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:43:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8E811F22AFF
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:43:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 291E51F22A23
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBD91A4B84;
-	Wed, 21 Aug 2024 08:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B241B3B39;
+	Wed, 21 Aug 2024 08:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVXW2Bmg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TibkXgn8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADF41A4ABA
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6301531F3
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724230019; cv=none; b=g7Q2GOT069noZJWTlWGxWr1iPu92sdVw6SFDg4cvYdcDz/D2rfm6GIH+9lKOTp65A9kWb1X7gelfYJyMiqZWiUp7nquz//JHFuhgheILMFYsih7+YKwwV5BWCQyDptRp1gRuMKP2N7LOI7lDPT3whRTrPrzj+fwhIqtXTGQiHuA=
+	t=1724230021; cv=none; b=S9sUB/yBxOnU66WPepmELGimMLBE/SKEfvIV3qKtsawMgqjZ/RSnemK6OtW6MB8Tiu1/1YmZCHwWqZvBZc1oMzq2fo2Jd1qxX587B5LnN4T7wuj5Y8Kwj12ZYOw0mGrdyapqkxQZoNK+kzdxY3MN/L2/fyOp2VeXXlKmquiSvlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724230019; c=relaxed/simple;
-	bh=hflxzg9wTZcvaLmFqc3rwQHLsNSr7cJAgJZVaNI8H48=;
+	s=arc-20240116; t=1724230021; c=relaxed/simple;
+	bh=H2TDaiqZYzOyYCq0VSiQLOb/ZMsbpZg32lxy9IBwK9o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=agiV0JYbsrh9VCBiHyR+P7AYkaXQlbmEyV3zL9N5BzWPKlCJmhAkgoO+CL69W+SYJBd1HFbNPMyiZvV3E/p1rCgmNl8YDpC7h0fZCJJdcnqpz9y7yq6v+QedlPtFWRyivlPJExMREnVJ6IR2591ZAvOaFdB5xTm1oyeymfnsric=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fVXW2Bmg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D6D8C4AF0E;
-	Wed, 21 Aug 2024 08:46:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QsKGf63LUCR/t1utjF7HQjk+De6qUyuCQC4lQXaYYiap/p/ghR+NEiJDoc0wfGE2Qaj1EI18Lj0kQGo12RjLLSc2H7vw+gIruMVcjCKfJg/RduT7P2TsV1xyh4XoNFBqn7KxU49raJjdyUBFKpCLbn2ARnmNGt4RIPg0Nm1L768=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TibkXgn8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BE8EC32782;
+	Wed, 21 Aug 2024 08:46:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724230018;
-	bh=hflxzg9wTZcvaLmFqc3rwQHLsNSr7cJAgJZVaNI8H48=;
+	s=k20201202; t=1724230021;
+	bh=H2TDaiqZYzOyYCq0VSiQLOb/ZMsbpZg32lxy9IBwK9o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fVXW2BmgDXFAZ6TqLmryoXJeGZSnGgFd4p4uAd081AKNVYvyFOevaRm8K3lvCtMOA
-	 nOkxNz9ZnrkLm5JX9RqC+4fH6KzDbocAUa7JLnBs/6gEcBFxGh+aART0f8l8+D1aP0
-	 +2VxpXptBRMurj2kN6dHT7NBpkpB6SS67baWAMicVLowkLXuG1KDeJygq7idtki4HU
-	 fyxH6AySI04WSDumE7+CcDznCOEz9a9lcZj2KeNEPnTYC/PxdHV39NYc3aKVqjgwWD
-	 NHPLcJwCLBJuK1P8OtFFtYrvLMqrKKbojIuNBJLthebUs3UG9AQ7SXrPa+XR0g9V6J
-	 N28uAskF0/wog==
+	b=TibkXgn8h2L9eP3eB/cMA4f5VumZU282OG5YCYzo1oLC17c66DjMKU+qKJT9gBA0k
+	 XdHdYwrFWsQry7qRgBQCp+j2aUURpUcu7t9LwHf4HF5QEaHAAMm5b5b172MwipJ6Vj
+	 ovayQry6NRWi7wkhFjSjuE2aFoEkbm/r7rMKehpkLLnrubDtysaB95xMZPmwclWrzg
+	 +rioVmMsp2F1lwVCe35CWivL0yZOTE79O8uobuA0DWSU9pE7EVLadC5y0s2GlvzBYX
+	 Wz98XoJSDwuS3CwH6AmwQ02B6+7uP/XaUmwttv2Lj649NvTNuf0KDEYHrrXKQhtOoI
+	 UKDYEPHvEkGqg==
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 21 Aug 2024 09:46:45 +0100
-Subject: [PATCH net v2 2/5] MAINTAINERS: Add net_tstamp.h to SOCKET
- TIMESTAMPING section
+Date: Wed, 21 Aug 2024 09:46:46 +0100
+Subject: [PATCH net v2 3/5] MAINTAINERS: Add limited globs for Networking
+ headers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240821-net-mnt-v2-2-59a5af38e69d@kernel.org>
+Message-Id: <20240821-net-mnt-v2-3-59a5af38e69d@kernel.org>
 References: <20240821-net-mnt-v2-0-59a5af38e69d@kernel.org>
 In-Reply-To: <20240821-net-mnt-v2-0-59a5af38e69d@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -66,34 +66,87 @@ Cc: Breno Leitao <leitao@debian.org>, Chas Williams <3chas3@gmail.com>,
  linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org
 X-Mailer: b4 0.14.0
 
-This is part of an effort to assign a section in MAINTAINERS to header
-files that relate to Networking. In this case the files with "net" in
-their name.
+This aims to add limited globs to improve the coverage of header files
+in the NETWORKING DRIVERS and NETWORKING [GENERAL] sections.
 
-Cc: Richard Cochran <richardcochran@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+It is done so in a minimal way to exclude overlap with other sections.
+And so as not to require "X" entries to exclude files otherwise
+matched by these new globs.
+
+While imperfect, due to it's limited nature, this does extend coverage
+of header files by these sections. And aims to automatically cover
+new files that seem very likely belong to these sections.
+
+The include/linux/netdev* glob (both sections)
++ Subsumes the entries for:
+  - include/linux/netdevice.h
++ Extends the sections to cover
+  - include/linux/netdevice_xmit.h
+  - include/linux/netdev_features.h
+
+The include/uapi/linux/netdev* globs: (both sections)
++ Subsumes the entries for:
+  - include/linux/netdevice.h
++ Extends the sections to cover
+  - include/linux/netdev.h
+
+The include/linux/skbuff* glob (NETWORKING [GENERAL] section only):
++ Subsumes the entry for:
+  - include/linux/skbuff.h
++ Extends the section to cover
+  - include/linux/skbuff_ref.h
+
+A include/uapi/linux/net_* glob was not added to the NETWORKING [GENERAL]
+section. Although it would subsume the entry for
+include/uapi/linux/net_namespace.h, which is fine, it would also extend
+coverage to:
+- include/uapi/linux/net_dropmon.h, which belongs to the
+   NETWORK DROP MONITOR section
+- include/uapi/linux/net_tstamp.h which, as per an earlier patch in this
+  series, belongs to the SOCKET TIMESTAMPING section
+
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-v2: Add to SOCKET TIMESTAMPING rather than PTP HARDWARE CLOCK SUPPORT
-    section.  This seems more appropriate given that
-    include/uapi/linux/net_tstamp.h is already in the SOCKET
-    TIMESTAMPING section.
+v2:
+* New patch
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ MAINTAINERS | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index c682203915a2..e5b9a4d9bc21 100644
+index e5b9a4d9bc21..03d571b131eb 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -21057,6 +21057,7 @@ SOCKET TIMESTAMPING
- M:	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
- S:	Maintained
- F:	Documentation/networking/timestamping.rst
-+F:	include/linux/net_tstamp.h
- F:	include/uapi/linux/net_tstamp.h
- F:	tools/testing/selftests/net/so_txtime.c
+@@ -15884,10 +15884,10 @@ F:	include/linux/fddidevice.h
+ F:	include/linux/hippidevice.h
+ F:	include/linux/if_*
+ F:	include/linux/inetdevice.h
+-F:	include/linux/netdevice.h
++F:	include/linux/netdev*
+ F:	include/uapi/linux/cn_proc.h
+ F:	include/uapi/linux/if_*
+-F:	include/uapi/linux/netdevice.h
++F:	include/uapi/linux/netdev*
+ F:	tools/testing/selftests/drivers/net/
+ X:	drivers/net/wireless/
  
+@@ -15940,13 +15940,13 @@ F:	include/linux/framer/framer.h
+ F:	include/linux/in.h
+ F:	include/linux/indirect_call_wrapper.h
+ F:	include/linux/net.h
+-F:	include/linux/netdevice.h
+-F:	include/linux/skbuff.h
++F:	include/linux/netdev*
++F:	include/linux/skbuff*
+ F:	include/net/
+ F:	include/uapi/linux/in.h
+ F:	include/uapi/linux/net.h
+ F:	include/uapi/linux/net_namespace.h
+-F:	include/uapi/linux/netdevice.h
++F:	include/uapi/linux/netdev*
+ F:	lib/net_utils.c
+ F:	lib/random32.c
+ F:	net/
 
 -- 
 2.43.0
