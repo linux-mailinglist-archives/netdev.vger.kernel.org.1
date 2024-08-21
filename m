@@ -1,201 +1,239 @@
-Return-Path: <netdev+bounces-120415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2F3A9593B4
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 06:45:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2136E9593BF
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 06:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D79371C213CE
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:45:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D50D428482B
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BB05588F;
-	Wed, 21 Aug 2024 04:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0F7161936;
+	Wed, 21 Aug 2024 04:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0V7Dwul5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8E72B9B7
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 04:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF9615F41F
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 04:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724215554; cv=none; b=I3tXbwq8mrbriQE+wFpn6EmPOWbKichdZ00XAP5tHTYTNBzHfdtQT/Jj4+g/wNKskj0pzTYRTOI/dKrrVUSPmb6JCxEk30HhcD/tX6wuQLCtOwsoAF5yYROgkFlj+C6E7kkUNZGF/tpIO9mlmDptP4NKTqUw+JVZXvB8JOTFHrk=
+	t=1724216194; cv=none; b=JAjjtW8xbD//PgC6CR4iIsELC+Tci8jNpJhOpMOePQiPjzZEA+gNnmlF7cYa6DYNS8/uqTHWiBH640SG2sWGeZ7lK5TzNsVc8um5kYfENSe05Cl+epiiRxDrM+Fhpc5SZ9J8IoOLiq2IcSt3n/zn1j+JF/KFBjq/scWDctO1cGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724215554; c=relaxed/simple;
-	bh=jZz3LWN68RnPgIUqgxrVPxpg+fdNLalxNbimRc3RCE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cRAvhxId4WGOu8uCO5ZpuTq6p4wg4pokyL9kSS+C9J5aP0I4hGvINmdQ+8zvNiC6SI7gTRWWgHIN7lOUh2a7zwUDoq86yJJrF8D/E120xnwb7tEcvYXXMHm+B3v04di8LPV0jo0Veg9dWSLeWmlUQcbScw8o8molGb/B3i2KClw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgdDu-00077x-HS; Wed, 21 Aug 2024 06:45:30 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgdDs-001vi2-ME; Wed, 21 Aug 2024 06:45:28 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sgdDs-00FNkZ-1l;
-	Wed, 21 Aug 2024 06:45:28 +0200
-Date: Wed, 21 Aug 2024 06:45:28 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kyle Swenson <kyle.swenson@est.tech>
-Cc: "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: pse-pd: tps23881: support reset-gpios
-Message-ID: <ZsVw6NkVGNEfS-4R@pengutronix.de>
-References: <20240819190151.93253-1-kyle.swenson@est.tech>
- <20240819190151.93253-3-kyle.swenson@est.tech>
- <ZsQ2fuqWkMYwq_kh@pengutronix.de>
- <ZsUFLDaMdVPQQ98I@p620>
- <ZsUGbsnkvCr_tyqS@p620>
+	s=arc-20240116; t=1724216194; c=relaxed/simple;
+	bh=s5P37GIKG3G2oO0kyQUYXjGllNocGKKr7kNww5rDLSc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YTczPRUXLjlyV4cdWobQlj/ikTMgcOPnd7LWNxmdPfL/h60G3CggfOQ0cVA+Pi2xIDfwzVAjeEls2gosFfpH4Mc7V3MkzOXtxxdZ9/u4dvIu5ww3pv5o5zjpam9t+7RpkIiiy4G7Fwu+DJCz4BKsa9N4tmNryNo1qHqXi41UF28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0V7Dwul5; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1df50db2so412199b3a.0
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 21:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724216192; x=1724820992; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=n8H8zZJTSLIZA5Kni0eGxHGJpUzBApQQ4vV/yayZ8VI=;
+        b=0V7Dwul5eeaZ8FDpKPnpM4Nt8TFN0CALvHABPBFno5Ob+uHsC8gWiIDrJcXH6+52ix
+         bJTyulhHgDoAsG+TM1CGl9b9GLLl6/lUQa2BqslI2/g+u6GSI6BIcAMCRCsc6mNwbsbB
+         D5mLZ23YkrvvnsG/2QVLDXNPgN/RbukUgDxrEmUWqAbQb2UWQY+5FdaBbiYOWc+cVwpN
+         QNAnjDn4aGdW0Gr3jw+fsS5OhYK5MHf3lmmoBrLvL0sW7gpGsM7zDjzdoxsLb5++sbsd
+         WOiQNEiKXa5K9lelNQWU9C0dS3AS6gw/9aKXUB+eGpwHFICuRZu2ad7JRbRWvrp4BfqJ
+         VLpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724216192; x=1724820992;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n8H8zZJTSLIZA5Kni0eGxHGJpUzBApQQ4vV/yayZ8VI=;
+        b=XSHpY2ZV2lvwraqPxViKo4Oj52S3S4/bw0Gf5O83NHTKrNK8mbkYmSnReqqWJ8OlIM
+         FtgiiJYJ2//vIFNhHtaLKuRjEDEzUlQKQqP++NHZ1lNqCZUTwokY1B+bNXfm3BvLxSW9
+         arvRlviOBeYVe3V3YDLBYVkkPmb9ysOcNFpqJRu07RQgjp+HzqpeCBqY7ir9edYbdHOO
+         r/p0QGFQ8DrMaki9m5EvOyxiWi80fuR9a8rOJ//bZLbVnw5i5Ge2HVI9+ZVPqn4dSjax
+         BaLxjTtsofzYiTVZ9eZLHCJXxaKbEDhal1Ldz75wio923Neq+DmVEkYACA99NVNBPGuw
+         lGXQ==
+X-Gm-Message-State: AOJu0YwfuRdSovPHITQ0iTEatMwAy12fEGEJUj2RiUCwNKCE+YfEoOlk
+	wC4uREncYzZ9r3zFgXZYoRnjd8KqHfKQHMdWhv9UnyUoOYFf1jgaUAHHnOSYRCkas8ZEamj8/Pr
+	5DjJ4ef7apXyRWdZB3ixyRMY8xzH7Zn8BCPPs4aKlnuECM6onAiW5y+Dyvo8QtwCVs/Rp8PICgo
+	K6BrWCFR3c8LPYIIZYWOtaMTkm++pjfqmb6+cNYzKtuPm7SLenntZIwJopuEw=
+X-Google-Smtp-Source: AGHT+IFh2y500D6uKb4c3MFUUFmM4E7777mmV19vX5QgPa3qn+uNgh1Vax2bsLm5Q0SW4nQDq3/gqZfFU3Z5EFbNvQ==
+X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
+ (user=almasrymina job=sendgmr) by 2002:a05:6a00:6f48:b0:714:1fad:bd2d with
+ SMTP id d2e1a72fcca58-71423f10777mr22515b3a.3.1724216191415; Tue, 20 Aug 2024
+ 21:56:31 -0700 (PDT)
+Date: Wed, 21 Aug 2024 04:56:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZsUGbsnkvCr_tyqS@p620>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
+Message-ID: <20240821045629.2856641-1-almasrymina@google.com>
+Subject: [PATCH net-next v21] net: refactor ->ndo_bpf calls into dev_xdp_propagate
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Jay Vosburgh <jv@jvosburgh.net>, 
+	Andy Gospodarek <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?=" <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Kyle,
+When net devices propagate xdp configurations to slave devices, or when
+core propagates xdp configuration to a device, we will need to perform
+a memory provider check to ensure we're not binding xdp to a device
+using unreadable netmem.
 
-On Tue, Aug 20, 2024 at 09:11:22PM +0000, Kyle Swenson wrote:
-> On Tue, Aug 20, 2024 at 03:06:19PM -0600, Kyle Swenson wrote:
-> > Hi Oleksij,
-> > 
-> > On Tue, Aug 20, 2024 at 08:23:58AM +0200, Oleksij Rempel wrote:
-> > > Hi Kyle,
-> > > 
-> > > thank you for you patch.
-> > Thanks for the review!
-> > > 
-> > > On Mon, Aug 19, 2024 at 07:02:14PM +0000, Kyle Swenson wrote:
-> > > > The TPS23880/1 has an active-low reset pin that some boards connect to
-> > > > the SoC to control when the TPS23880 is pulled out of reset.
-> > > > 
-> > > > Add support for this via a reset-gpios property in the DTS.
-> > > > 
-> > > > Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>
-> > > > ---
-> > > >  drivers/net/pse-pd/tps23881.c | 13 ++++++++++++-
-> > > >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-> > > > index 2ea75686a319..837e1a2119ee 100644
-> > > > --- a/drivers/net/pse-pd/tps23881.c
-> > > > +++ b/drivers/net/pse-pd/tps23881.c
-> > > > @@ -6,16 +6,16 @@
-> > > >   */
-> > > >  
-> > > >  #include <linux/bitfield.h>
-> > > >  #include <linux/delay.h>
-> > > >  #include <linux/firmware.h>
-> > > > +#include <linux/gpio/consumer.h>
-> > > >  #include <linux/i2c.h>
-> > > >  #include <linux/module.h>
-> > > >  #include <linux/of.h>
-> > > >  #include <linux/platform_device.h>
-> > > >  #include <linux/pse-pd/pse.h>
-> > > > -
-> > > 
-> > > No need to remove space here.
-> > 
-> > Sorry about this, somehow I missed this gratuitous diff
-> > 
-> > > 
-> > > >  #define TPS23881_MAX_CHANS 8
-> > > >  
-> > > >  #define TPS23881_REG_PW_STATUS	0x10
-> > > >  #define TPS23881_REG_OP_MODE	0x12
-> > > >  #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
-> > > > @@ -735,10 +735,11 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
-> > > >  
-> > > >  static int tps23881_i2c_probe(struct i2c_client *client)
-> > > >  {
-> > > >  	struct device *dev = &client->dev;
-> > > >  	struct tps23881_priv *priv;
-> > > > +	struct gpio_desc *reset;
-> > > >  	int ret;
-> > > >  	u8 val;
-> > > >  
-> > > >  	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-> > > >  		dev_err(dev, "i2c check functionality failed\n");
-> > > > @@ -747,10 +748,20 @@ static int tps23881_i2c_probe(struct i2c_client *client)
-> > > >  
-> > > >  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-> > > >  	if (!priv)
-> > > >  		return -ENOMEM;
-> > > >  
-> > > > +	reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
-> > > > +	if (IS_ERR(reset))
-> > > > +		return dev_err_probe(&client->dev, PTR_ERR(reset), "Failed to get reset GPIO\n");
-> > > > +
-> > > > +	if (reset) {
-> > > > +		usleep_range(1000, 10000);
-> > > > +		gpiod_set_value_cansleep(reset, 0); /* De-assert reset */
-> > > > +		usleep_range(1000, 10000);
-> > > 
-> > > According to the datasheet, page 13:
-> > > https://www.ti.com/lit/ds/symlink/tps23880.pdf
-> > > 
-> > > Minimal reset time is 5 microseconds and the delay after power on reset should
-> > > be at least 20 milliseconds. Both sleep values should be corrected.
-> > 
-> > Sounds reasonable, I'll change the first delay to be closer to the 5us
-> > minimum reset time.  I need to review the docs around delays to pick the
-> > correct one for this case.
-> > 
-> > For the 2nd delay, I (now) see the 20ms you're referring to in the datasheet.
-> > 
-> > I was looking at the SRAM programming document
-> > (https://www.ti.com/lit/pdf/SLVAE1) and it indicates we should delay the
-> 
-> Sorry, this is the wrong link.  Let me try again:
-> 
-> https://www.ti.com/lit/pdf/slvae12
-> 
-> 
-> > SRAM and parity programming by at least 50ms after initial power on.
-> > 
-> > Should we guarantee we meet that 50ms requirement with the 2nd delay or
-> > would you prefer I just meet the 20ms requirement in the datasheet?
+Currently ->ndo_bpf calls are all over the place. Adding checks to all
+these places would not be ideal.
 
-Ah, I see. The easiest way would be to wait 50ms, otherwise we will need
-to do some more code to get this 50ms requirement.
-Please add comments to the code describing the reason for one or another
-delay. And, please use name and revision of documentation you used for this
-choice.
+Refactor all the ->ndo_bpf calls into one place where we can add this
+check in the future.
 
-Regards,
-Oleksij
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+---
+ drivers/net/bonding/bond_main.c | 8 ++++----
+ drivers/net/hyperv/netvsc_bpf.c | 2 +-
+ include/linux/netdevice.h       | 1 +
+ kernel/bpf/offload.c            | 2 +-
+ net/core/dev.c                  | 9 +++++++++
+ net/xdp/xsk_buff_pool.c         | 4 ++--
+ 6 files changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index f9633a6f8571..73f9416c6c1b 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2258,7 +2258,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 			goto err_sysfs_del;
+ 		}
+ 
+-		res = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
++		res = dev_xdp_propagate(slave_dev, &xdp);
+ 		if (res < 0) {
+ 			/* ndo_bpf() sets extack error message */
+ 			slave_dbg(bond_dev, slave_dev, "Error %d calling ndo_bpf\n", res);
+@@ -2394,7 +2394,7 @@ static int __bond_release_one(struct net_device *bond_dev,
+ 			.prog	 = NULL,
+ 			.extack  = NULL,
+ 		};
+-		if (slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp))
++		if (dev_xdp_propagate(slave_dev, &xdp))
+ 			slave_warn(bond_dev, slave_dev, "failed to unload XDP program\n");
+ 	}
+ 
+@@ -5584,7 +5584,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			goto err;
+ 		}
+ 
+-		err = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
++		err = dev_xdp_propagate(slave_dev, &xdp);
+ 		if (err < 0) {
+ 			/* ndo_bpf() sets extack error message */
+ 			slave_err(dev, slave_dev, "Error %d calling ndo_bpf\n", err);
+@@ -5616,7 +5616,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		if (slave == rollback_slave)
+ 			break;
+ 
+-		err_unwind = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
++		err_unwind = dev_xdp_propagate(slave_dev, &xdp);
+ 		if (err_unwind < 0)
+ 			slave_err(dev, slave_dev,
+ 				  "Error %d when unwinding XDP program change\n", err_unwind);
+diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
+index 4a9522689fa4..e01c5997a551 100644
+--- a/drivers/net/hyperv/netvsc_bpf.c
++++ b/drivers/net/hyperv/netvsc_bpf.c
+@@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
+ 	xdp.command = XDP_SETUP_PROG;
+ 	xdp.prog = prog;
+ 
+-	ret = vf_netdev->netdev_ops->ndo_bpf(vf_netdev, &xdp);
++	ret = dev_xdp_propagate(vf_netdev, &xdp);
+ 
+ 	if (ret && prog)
+ 		bpf_prog_put(prog);
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0ef3eaa23f4b..a4f876767423 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3918,6 +3918,7 @@ struct sk_buff *dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,
+ 
+ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
+ u8 dev_xdp_prog_count(struct net_device *dev);
++int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
+ 
+ int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
+diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+index 1a4fec330eaa..a5b06bd5fe9b 100644
+--- a/kernel/bpf/offload.c
++++ b/kernel/bpf/offload.c
+@@ -130,7 +130,7 @@ static int bpf_map_offload_ndo(struct bpf_offloaded_map *offmap,
+ 	/* Caller must make sure netdev is valid */
+ 	netdev = offmap->netdev;
+ 
+-	return netdev->netdev_ops->ndo_bpf(netdev, &data);
++	return dev_xdp_propagate(netdev, &data);
+ }
+ 
+ static void __bpf_map_offload_destroy(struct bpf_offloaded_map *offmap)
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e7260889d4cb..165e9778d422 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9369,6 +9369,15 @@ u8 dev_xdp_prog_count(struct net_device *dev)
+ }
+ EXPORT_SYMBOL_GPL(dev_xdp_prog_count);
+ 
++int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
++{
++	if (!dev->netdev_ops->ndo_bpf)
++		return -EOPNOTSUPP;
++
++	return dev->netdev_ops->ndo_bpf(dev, bpf);
++}
++EXPORT_SYMBOL_GPL(dev_xdp_propagate);
++
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
+ {
+ 	struct bpf_prog *prog = dev_xdp_prog(dev, mode);
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index c0e0204b9630..f44d68c8d75d 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -149,7 +149,7 @@ static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
+ 		bpf.xsk.pool = NULL;
+ 		bpf.xsk.queue_id = pool->queue_id;
+ 
+-		err = pool->netdev->netdev_ops->ndo_bpf(pool->netdev, &bpf);
++		err = dev_xdp_propagate(pool->netdev, &bpf);
+ 
+ 		if (err)
+ 			WARN(1, "Failed to disable zero-copy!\n");
+@@ -215,7 +215,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	bpf.xsk.pool = pool;
+ 	bpf.xsk.queue_id = queue_id;
+ 
+-	err = netdev->netdev_ops->ndo_bpf(netdev, &bpf);
++	err = dev_xdp_propagate(netdev, &bpf);
+ 	if (err)
+ 		goto err_unreg_pool;
+ 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.46.0.184.g6999bdac58-goog
+
 
