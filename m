@@ -1,110 +1,87 @@
-Return-Path: <netdev+bounces-120693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5354D95A3CB
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:22:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DE895A3D5
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:26:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1034B21AA1
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:22:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3E411F213F7
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD261B2526;
-	Wed, 21 Aug 2024 17:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3661B2533;
+	Wed, 21 Aug 2024 17:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwwShDyu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVltTT5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269A71494D1;
-	Wed, 21 Aug 2024 17:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331781494D1;
+	Wed, 21 Aug 2024 17:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724260917; cv=none; b=ScRqABtBmmH90D6QUa73GjQkIFEi2Z7fsax/4TKzofFFs7bDnTEHTPfkLM9MFN9YQffMxZdWtgbk8Ba19cxdb+b8yQ0YILKeIlii7tDL4KxjFQQfPkBqRz+Pl8jbleKZ6lv1xeV107n+7EABE+iI0JS/KQhyqVJ2QJf7eng6nVE=
+	t=1724261203; cv=none; b=Qx6EZ2LoKDQT0wcmvxdGhMbzrKeO83Rqnpi7+2C2j9onnNTsHdLAApwPxOsd7etPTd/caWGGOtPiT2U3juDiIvQgviHZadD/oFuNK0/4QwQbkD5X7KdJR5CYukIHJ0Ks4looX/HpkgJ2/fmeOwfUk/ia6kNF8Lw3DPYYIned7hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724260917; c=relaxed/simple;
-	bh=sKPoAYf57+hToI6UbeW+ihZav4oxCix0Plxz/d46A88=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AKV+Q+14zk3BSAchxJPMHumyigOZWQxFJTPJ4GZME1eXrN67A8+Ha3N2gmHK+eIIv1xUSezQ28XXRH6vIl1CGvH1wbceZl2Rv5rpLDSPJBHbh5cr9C6hRKwn9u1dmtHHdOW8jJdXeje0eHdx95+mkzr8tZb/UgLljNlj2w7goFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gwwShDyu; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-27032e6dbf2so2667824fac.1;
-        Wed, 21 Aug 2024 10:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724260915; x=1724865715; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BRHLUFe+LywX38Cr1uTxqwwQ3KNcmiw4BEYPfkJSfA0=;
-        b=gwwShDyuiRKgUEfqYQmSjYzHHSCW0PgQLnj5Ow8wAYodVsRx3aQeqQIj0MCTlDyHCY
-         7TR/N+MUxAOSlUVB+oDFUJY7OxJ/SkdBCYtMOLDWyS3T+q9XIPIQeqECKstkLGokq6xM
-         h407sMmfPo9Uvvc0lqXlHB8RmPoSBIR3Q5s18ew1S2rjGiNHYvXYlRJ0yv884tIw2Dd7
-         qQCMe5SEi4qHVydEr5HfmApIXLULMaschKN3LsE+VfFEI69XLWNyZT3DqDow3T5Ftthx
-         JjrnGwpI2bb20bMxgi1J0pZUZ60FxvTUV64Ke6Yrt+N3v9vNC3Wxn8FIK0w7PICr2H2m
-         DErA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724260915; x=1724865715;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BRHLUFe+LywX38Cr1uTxqwwQ3KNcmiw4BEYPfkJSfA0=;
-        b=VGjeJ8nvabcMZM/RBcuEU42iv8Ozo8g8sNg3fho4E6aQhRGZFBNlv2JPpUm4hYEG5Q
-         9Ehllyh5wW4U5csqigkPmtargxLIJ96lKJyivPlU0zJ/60k7W7tMvfDZDlpsAz32v8bV
-         pfEmPInp+n38EL9h15Cucq/AQeIe8T/xl2Pa+F5+iJDMh5XAMDrMf5Ntpw7EScq+dv0x
-         t++Oh0Q0zLqJTOq90ibStStHKU1ZCZXp/Cm9rFCMOFL3ygf52+FLTIrAsAoQsiKcdD0h
-         yv1/DQnHp9tGtBV+GmoN519xvb0va1lrx8PxPK0IAU3VSJdjD4wFxYkjAFKZ/FqTQRRJ
-         3qMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSrRD4rFUq7rBKGucQlJvfGM3vyws1BPUZSKpCWU9UIGqQHHOQFjdSUx37nJLyvP0rODJxtKck@vger.kernel.org, AJvYcCUgRKPyXiDPyDP5rzMiY7CauRhBaCRr0Je+7urM5GiDi4jmGSRT7+T50WZfwoMJEbOaI1ys9PVY/pYgR5M=@vger.kernel.org, AJvYcCVxE2bUYhvihxFc1lQzTfMcrqgNFHtA7uHrYVGa6nq0oAOADUHOOU7tOp72c1ZHCmJUr5vK/2MoRLRSWfk9+sRW@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyFyGJxpqS0/nul4pqxY3REh+kzWHFIGq9EFqYmq87vFILpNch
-	cWCNRJBUxhtR6dKpQF06Lq0fclU9rLbdegjZhAGZgUqDYd2Cr1mpP/Ms6g==
-X-Google-Smtp-Source: AGHT+IERO1RjXSPMs8qscc9E/L4klT06zKW3kuVa0lcGArWZ+HlEMKphefnuwaYC8NSC3/ob7hYjmw==
-X-Received: by 2002:a05:6870:3286:b0:260:3ae9:c94 with SMTP id 586e51a60fabf-2738bee13d5mr2707937fac.51.1724260915117;
-        Wed, 21 Aug 2024 10:21:55 -0700 (PDT)
-Received: from dev0.. ([2405:201:6803:30b3:2256:a75d:4176:9e6a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af3d945sm10185388b3a.189.2024.08.21.10.21.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 10:21:54 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jain.abhinav177@gmail.com,
-	javier.carrasco.cruz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v8 net-next 1/3] selftests: net: Create veth pair for testing in networkless kernel
-Date: Wed, 21 Aug 2024 22:51:46 +0530
-Message-Id: <20240821172146.118441-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240821090041.53df4147@kernel.org>
-References: <20240821090041.53df4147@kernel.org>
+	s=arc-20240116; t=1724261203; c=relaxed/simple;
+	bh=DM8/2KFRUJTePMGmJN4jQx4medejbfrHu9JQdUL0RtQ=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Hd7lWGoceAh9z3jhzM6hYzLegiRWcftBp4wNUOkv1wS35GM8rgMp3JC9B1o2furbc+/7Tuu71nOya4/wMaWG0MAvkfZCx1sZchZZmU8e+KDg1Okrr98wWV2ZS2rIJlp4kJX7nYARFNYkc20ARfZhzLLwdGI7LaaYv5ejs3A7lK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVltTT5r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9E5CC32781;
+	Wed, 21 Aug 2024 17:26:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724261202;
+	bh=DM8/2KFRUJTePMGmJN4jQx4medejbfrHu9JQdUL0RtQ=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=gVltTT5rSL/gfwr+3AtiExA4fRwSWLVf9YuL1pwgCEJifq24xclEDNpz/filNrGVt
+	 1N4n5Ipw8nk+3vk3hFFKTMhT91/US58monOE0XKgASeSl6kpBp0HcleXzwbSfVmGk2
+	 7WVhCu5rxRsJAv68HVy1cD2is38HuuVlw9dpIskRbAv3jNjQYR0NJOJxszVKjSgOaV
+	 whughWqvifpvqvmpdzFGQnTlqZeYHGVyIQslLbYLYw9UOLmgDxkKxPtL9IkqhpeJWg
+	 9NAG+agYdA/IJeLNuFy1a77eQVTH4jRKZbeXmui+yiiOh+rHZ9YgPGQ6u70jDe0dyE
+	 ppv+R6tWhspcA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Yu Jiaoliang <yujiaoliang@vivo.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  opensource.kernel@vivo.com
+Subject: Re: [PATCH v2] wifi: cfg80211: Use kmemdup_array instead of kmemdup
+ for multiple allocation
+References: <20240821111250.591558-1-yujiaoliang@vivo.com>
+Date: Wed, 21 Aug 2024 20:26:38 +0300
+In-Reply-To: <20240821111250.591558-1-yujiaoliang@vivo.com> (Yu Jiaoliang's
+	message of "Wed, 21 Aug 2024 19:12:50 +0800")
+Message-ID: <87a5h5hjn5.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Wed, 21 Aug 2024 09:00:41 -0700, Jakub Kicinski wrote:
->> I presumed that we would want to run the interface up/down, setup and ethtool tests on both veth.
->> If this is not required, should I submit a v9 removing veth1 from the temp list?
+Yu Jiaoliang <yujiaoliang@vivo.com> writes:
+
+> Let the kememdup_array() take care about multiplication and possible
+> overflows.
 >
-> Yes, please.
+> v2:
+> -Change sizeof(limits[0]) to sizeof(*limits)
+> -Fix title prefix
 >
->> Also, while sending v9, do I add the Review tag from Simon or it has to be reviewed again?
-> 
-> Yes, you should add the review tags
+> Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
+> Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Reviewed-by: Kalle Valo <kvalo@kernel.org>
 
-Thanks for confirming, I have sent v9 accordingly:
-https://lore.kernel.org/all/20240821171903.118324-1-jain.abhinav177@gmail.com
+No, I did not review your patch. Do not add any tags (like Reviewed-by)
+unless a person gives you that in a reply.
 
-Please review, thanks again.
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
