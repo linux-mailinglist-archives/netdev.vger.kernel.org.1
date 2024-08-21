@@ -1,220 +1,173 @@
-Return-Path: <netdev+bounces-120492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B4F9598D9
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:02:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204029598EE
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:03:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DAFD1F22751
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:02:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4515F1C20D20
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602B31B7910;
-	Wed, 21 Aug 2024 09:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4948A1F2FCC;
+	Wed, 21 Aug 2024 09:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="dY4mfA5S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHkDx0dd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA731EED07;
-	Wed, 21 Aug 2024 09:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EDD1F2FC5
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 09:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724232642; cv=none; b=QrdwBXnu3t3+bfGLkV8KpgZ0UEt6H+RtTkZZMjtlexX295OFoG8/07n9SyB41E0lVjMK3C2Zj9yIL8h6UJXvKaiyhWqdye7GcRoKjgZepTcl1SBSLy/cjEf6KsnbmfCQUJEkCGyO/1n7dk+DY1E84m3at9ukR2ieuvIm6mfExdE=
+	t=1724233005; cv=none; b=DON1Q733pgvO1FYpORObG/uAEifSPphIiDrrm3dqDSGvoqeHvN+yyi2z6NaxkgZtzBvfTdo/R+dSyCuSYBwbg9GAN+CFFejE8+3Xf1OcViZdVChQ1hCsxICRd07YiJ1Tgs+mtOGOJRQK1ITrOmbvAO+7dXqkKa4juWtj5339PS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724232642; c=relaxed/simple;
-	bh=SdO128jSaf+sYa64CYea8M0yL/ZkVkv914YMWqYQWc4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jJekv3ut2Y2AGrxPNU/f4dJRpdszXIeIupLJH43Paq3ZSheOCKLbv7R+VG6CmxsFK9ykBRenEFMrvzjMVP48xDQnOWdlgI/P+PgJ5vS4ycesoIaeQ0WTSP9jYc8/fQREnyOZ4COa7gqQE4wz6S72P5+Ng0YvzWqAFWO0NBK+o7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=dY4mfA5S; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 01494d905fa011ef8593d301e5c8a9c0-20240821
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=7E84GIHXbOx7jBLbf+I8NSxdpVEuRrIuEkSs5jTJbGg=;
-	b=dY4mfA5SAWAH1wA7HHE+KmF880YigIByq+AX4F1np4lfA3bpf+gSbf11fNcfx215c6vJxHdoC8uv5eFPA1j4MzA+/WvrYxq4SBAm2wdgYZ1Zs+gVr/fFwRu++q6EjAEXG/cl6etgXNI089BuaSd2jEO6qso88nUFKgUh2NeMn+U=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:3e2c2a9e-953b-4784-a01d-20cce319686e,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:6dc6a47,CLOUDID:74eeb3be-d7af-4351-93aa-42531abf0c7b,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 01494d905fa011ef8593d301e5c8a9c0-20240821
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
-	(envelope-from <tze-nan.wu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1073799371; Wed, 21 Aug 2024 17:30:29 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 21 Aug 2024 02:30:31 -0700
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 21 Aug 2024 17:30:31 +0800
-From: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
-To: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
-	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, Stanislav Fomichev
-	<sdf@fomichev.me>
-CC: <bobule.chang@mediatek.com>, <wsd_upstream@mediatek.com>,
-	<linux-kernel@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Tze-nan Wu <Tze-nan.Wu@mediatek.com>,
-	Yanghui Li <yanghui.li@mediatek.com>, Cheng-Jui Wang
-	<cheng-jui.wang@mediatek.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH net v4] bpf, net: Check cgroup_bpf_enabled() only once in do_sock_getsockopt()
-Date: Wed, 21 Aug 2024 17:30:16 +0800
-Message-ID: <20240821093016.2533-1-Tze-nan.Wu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	s=arc-20240116; t=1724233005; c=relaxed/simple;
+	bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tXxJ4Gz64gKKOq8VYnGVbzSS73lcE9yDdm++6OKIUUBuSbcXlW8/ITeXiGdyvtWKxNdtMOne/sUL6aKoHDQYwfOySxOYbLD9FU+xE+GxEG7+1ojDdVSrKUTxbtQrWwS8eW6pFTCVnzXhRn/dRaKl2q004nBId49Xa5LyEl/LLJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bHkDx0dd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724233002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+	b=bHkDx0ddCEFI8t/8uRHPFqkUgQvuBIZzwvG2rVs6WIlji9mQ6zSL/DxNP5+Jos3cuk8weZ
+	P3zOPib9b57sylumo40uE2Z40PI9DW7uOozFE6s6J8W1SC/smgvzFVKQ3CDEuPbYTXxK+S
+	Hg1AxXm+2OVxukak7lkeM+lam5XJYHA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-P1hXZUTYNzichgBk1NrcUw-1; Wed, 21 Aug 2024 05:36:40 -0400
+X-MC-Unique: P1hXZUTYNzichgBk1NrcUw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-428fc34f41bso56147985e9.3
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 02:36:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724232999; x=1724837799;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Jj5eIkUkWg3KtRXn0z2L0PWnJAu5W4Pyl+E7wKNe/xw=;
+        b=TRArQoEwR0mQZv+KjyXPM2CPrhrNcAC0AQlXcyP1IIdczpLO4faaTIImI8siTIATQy
+         zqya8eXsEA5aPXo9pP2KmmimqAIBeocVT5wfEx68w1OgcNnag7ElsirIh9YasDB07DEP
+         3GalPcykN3vqUFs5EcHcmGOPKqi9VVC7PhGdHIYnACncFdt9DhEkCsgQ4cAQe0TQFa8O
+         SHNBjfMOhYSo+6aOYwlP5RfKlqJftdMqKPnWC1LfOyJpjk81Xg7S4bnRUTmkeaKy6aH+
+         TxD7mB1z76j/Jku7/8nPJKp6xoNPAtBoFdSdcBJXH4yDbkE09ubw4D8QnHTLmULD1LA9
+         Eozw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNWXPJrwxnN4TgoK7uhdNuNDpSnUpdPi1/GbkIp8ubmZZvbakH7f5qKwUeLCJN/s4xU055+PY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkpW/34aBdj2SCes3sxNMTIkpMqWZ/i4wKCEvTOwSgSs2zgGEv
+	xsXr+6tEUwW1yrKZ5mnYmBxiT4N3xFliy3olgYueEVsv6RTpvcvqQflqbNHbXOdUf97Ishj3A+C
+	t9ponUbv4NnvR5XqtxNQNB1hr4vu61TlIcWPkHlQOr27YqVhM2LjtSA==
+X-Received: by 2002:a05:600c:3ba2:b0:426:6ed5:fd5 with SMTP id 5b1f17b1804b1-42abd112115mr13371775e9.6.1724232999143;
+        Wed, 21 Aug 2024 02:36:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5uFdtqh3Nnxq7uvkwhVWuYvEqJNhXSjOOFCdMvyLVN5q9k/xJob4MdVvdN0iwQqkOmix49g==
+X-Received: by 2002:a05:600c:3ba2:b0:426:6ed5:fd5 with SMTP id 5b1f17b1804b1-42abd112115mr13371545e9.6.1724232998634;
+        Wed, 21 Aug 2024 02:36:38 -0700 (PDT)
+Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee8bcecsm19203885e9.17.2024.08.21.02.36.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 02:36:38 -0700 (PDT)
+Message-ID: <be1c2f6fb63542ccdcb599956145575293625c37.camel@redhat.com>
+Subject: Re: [PATCH v2 6/9] ethernet: stmicro: Simplify PCI devres usage
+From: Philipp Stanner <pstanner@redhat.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
+ <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
+ <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko
+ <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, Alvaro
+ Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, David Lechner
+ <dlechner@baylibre.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>, Damien Le Moal <dlemoal@kernel.org>, 
+ Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
+ linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org,  linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+Date: Wed, 21 Aug 2024 11:36:36 +0200
+In-Reply-To: <CAHp75VduuT=VLtXS+zha4ZNe3ZvBV-jgZpn2oP4WkzDdt6Pnog@mail.gmail.com>
+References: <20240821071842.8591-2-pstanner@redhat.com>
+	 <20240821071842.8591-8-pstanner@redhat.com>
+	 <CAHp75VduuT=VLtXS+zha4ZNe3ZvBV-jgZpn2oP4WkzDdt6Pnog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 
-The return value from `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` can change
-between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
-`BPF_CGROUP_RUN_PROG_GETSOCKOPT`.
+On Wed, 2024-08-21 at 11:14 +0300, Andy Shevchenko wrote:
+> On Wed, Aug 21, 2024 at 10:19=E2=80=AFAM Philipp Stanner
+> <pstanner@redhat.com> wrote:
+> >=20
+> > stmicro uses PCI devres in the wrong way. Resources requested
+> > through pcim_* functions don't need to be cleaned up manually in
+> > the
+> > remove() callback or in the error unwind path of a probe()
+> > function.
+>=20
+> > Moreover, there is an unnecessary loop which only requests and
+> > ioremaps
+> > BAR 0, but iterates over all BARs nevertheless.
+>=20
+> Seems like loongson was cargo-culted a lot without a clear
+> understanding of this code in the main driver...
+>=20
+> > Furthermore, pcim_iomap_regions() and pcim_iomap_table() have been
+> > deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI:
+> > Deprecate
+> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> >=20
+> > Replace these functions with pcim_iomap_region().
+> >=20
+> > Remove the unnecessary manual pcim_* cleanup calls.
+> >=20
+> > Remove the unnecessary loop over all BARs.
+>=20
+> ...
+>=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < PCI_STD_NUM_BAR=
+S; i++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (pci_resource_len(pdev, i) =3D=3D 0)
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 pcim_iounmap_regions(pdev, BIT(i));
+>=20
+> Here is the BARx, which contradicts the probe :-)
 
-If `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` changes from "false" to
-"true" between the invocations of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` and
-`BPF_CGROUP_RUN_PROG_GETSOCKOPT`, `BPF_CGROUP_RUN_PROG_GETSOCKOPT` will
-receive an -EFAULT from `__cgroup_bpf_run_filter_getsockopt(max_optlen=0)`
-due to `get_user()` was not reached in `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`.
+I'm not sure what should be done about it. The only interesting
+question is whether the other code with pcim_iomap_regions(... BIT(i)
+does also only grap BAR 0.
+In that case the driver wouldn't even be knowing what its own hardware
+is / does, though.
 
-Scenario shown as below:
 
-           `process A`                      `process B`
-           -----------                      ------------
-  BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
-                                            enable CGROUP_GETSOCKOPT
-  BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
+P.
 
-To prevent this, invoke `cgroup_bpf_enabled()` only once and cache the
-result in a newly added local variable `enabled`.
-Both `BPF_CGROUP_*` macros in `do_sock_getsockopt` will then check their
-condition using the same `enabled` variable as the condition variable,
-instead of using the return values from `cgroup_bpf_enabled` called by
-themselves as the condition variable(which could yield different results).
-This ensures that either both `BPF_CGROUP_*` macros pass the condition
-or neither does.
-
-Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
-Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
-Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
-Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
-Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
-Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
----
-
-Chagnes from v1 to v2: https://lore.kernel.org/all/20240819082513.27176-1-Tze-nan.Wu@mediatek.com/
-  Instead of using cgroup_lock in the fastpath, invoke cgroup_bpf_enabled
-  only once and cache the value in the newly added variable `enabled`.
-  `BPF_CGROUP_*` macros in do_sock_getsockopt can then both check their
-  condition with the new variable `enable`, ensuring that either they both
-  passing the condition or both do not.
-
-Chagnes from v2 to v3: https://lore.kernel.org/all/20240819155627.1367-1-Tze-nan.Wu@mediatek.com/
-  Hide cgroup_bpf_enabled in the macro, and some modifications to adapt
-  the coding style.
-
-Chagnes from v3 to v4: https://lore.kernel.org/all/20240820092942.16654-1-Tze-nan.Wu@mediatek.com/
-  Add bpf tag to subject, and Fixes tag in body.
-
----
- include/linux/bpf-cgroup.h | 15 ++++++++-------
- net/socket.c               |  5 +++--
- 2 files changed, 11 insertions(+), 9 deletions(-)
-
-diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
-index fb3c3e7181e6..5afa2ac76aae 100644
---- a/include/linux/bpf-cgroup.h
-+++ b/include/linux/bpf-cgroup.h
-@@ -390,20 +390,20 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
- 	__ret;								       \
- })
- 
--#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)			       \
-+#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled)		       \
- ({									       \
- 	int __ret = 0;							       \
--	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))			       \
-+	enabled = cgroup_bpf_enabled(CGROUP_GETSOCKOPT);		       \
-+	if (enabled)							       \
- 		copy_from_sockptr(&__ret, optlen, sizeof(int));		       \
- 	__ret;								       \
- })
- 
- #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, optlen,   \
--				       max_optlen, retval)		       \
-+				       max_optlen, retval, enabled)	       \
- ({									       \
- 	int __ret = retval;						       \
--	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT) &&			       \
--	    cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))		       \
-+	if (enabled && cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))       \
- 		if (!(sock)->sk_prot->bpf_bypass_getsockopt ||		       \
- 		    !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
- 					tcp_bpf_bypass_getsockopt,	       \
-@@ -518,9 +518,10 @@ static inline int bpf_percpu_cgroup_storage_update(struct bpf_map *map,
- #define BPF_CGROUP_RUN_PROG_SOCK_OPS(sock_ops) ({ 0; })
- #define BPF_CGROUP_RUN_PROG_DEVICE_CGROUP(atype, major, minor, access) ({ 0; })
- #define BPF_CGROUP_RUN_PROG_SYSCTL(head,table,write,buf,count,pos) ({ 0; })
--#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen) ({ 0; })
-+#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled) ({ 0; })
- #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, \
--				       optlen, max_optlen, retval) ({ retval; })
-+				       optlen, max_optlen, retval, \
-+				       enabled) ({ retval; })
- #define BPF_CGROUP_RUN_PROG_GETSOCKOPT_KERN(sock, level, optname, optval, \
- 					    optlen, retval) ({ retval; })
- #define BPF_CGROUP_RUN_PROG_SETSOCKOPT(sock, level, optname, optval, optlen, \
-diff --git a/net/socket.c b/net/socket.c
-index fcbdd5bc47ac..0b465dc8a789 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2363,6 +2363,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
- 		       int optname, sockptr_t optval, sockptr_t optlen)
- {
- 	int max_optlen __maybe_unused;
-+	bool enabled __maybe_unused;
- 	const struct proto_ops *ops;
- 	int err;
- 
-@@ -2371,7 +2372,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
- 		return err;
- 
- 	if (!compat)
--		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
-+		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, enabled);
- 
- 	ops = READ_ONCE(sock->ops);
- 	if (level == SOL_SOCKET) {
-@@ -2390,7 +2391,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
- 	if (!compat)
- 		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
- 						     optval, optlen, max_optlen,
--						     err);
-+						     err, enabled);
- 
- 	return err;
- }
--- 
-2.45.2
+>=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 break;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
 
 
