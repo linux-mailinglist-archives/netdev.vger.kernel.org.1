@@ -1,209 +1,385 @@
-Return-Path: <netdev+bounces-120615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552E2959F9E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:21:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33314959FA4
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:21:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C592D1F23D14
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:21:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B70421F2420F
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA29E1B251A;
-	Wed, 21 Aug 2024 14:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7909F1B1D5A;
+	Wed, 21 Aug 2024 14:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prMfycAE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b4bom0g+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCF21B1D74;
-	Wed, 21 Aug 2024 14:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724250037; cv=none; b=MQVOyQyrXLUhu2axnPfqyK2aC7OT3XkCRU05wgP55H1PqOtma78/0fpvojw0V2ckNI/+RPbq08yHk2oLn8ftgkRaQhWPUZdl/8JNGEVBuLbMbpvsZO1td3ufHORsZVQIwMMJEI7qDF9XEj+/Utg+LgTK5zyQgQcO/U1jVmPEBZA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724250037; c=relaxed/simple;
-	bh=z8k7swx1sZ/TSYEtz4/ugUGeVq6w/e+UPk/Tst1C1Tk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DbYLfuNG4p2rpj07Okih5vilXwpYDFVBJRtMndakL6pyEtqsf1aLP2VwEZuEhmR0NyF3NrKPPSNMA652hytfl0jPurQZLYGCvrTAvfTx/YuMcVv8orYrsLJKSfevJzmNRTNWm9yvqmpTjr92IJjwaE8jNXHdYrSj5Xb2ki/X3dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prMfycAE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19203C32781;
-	Wed, 21 Aug 2024 14:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724250037;
-	bh=z8k7swx1sZ/TSYEtz4/ugUGeVq6w/e+UPk/Tst1C1Tk=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=prMfycAEZkBaodFZQaIdGBd3Oe0umJ1nmxxczXEL7cG6R4UQcbOa3l0y0BJo6ySwC
-	 1mzVIdPTCW7KgMW7fG5ByLsl4ltSXxgAdrHO0RdVyMa+ziiG103OFKyvpK5l0K8S1v
-	 Q5ocnvxu3r+154PZCffp/SDsTl2+pX3ImyBii3vhgNjU8OCO+XR/VuKaDmRLFbhoys
-	 SvZ5thyX8Nb97eXmD+E/Nq8tth5II3S9fN0ULIr4cnabZ1oxic0b63r2uROJQoyphz
-	 8vhkNZc/6zVA8AnGCLLzro/mcGTUDJjQWxteUNYLakIj4YFH3X0jINVHeSgSBMSu7X
-	 ZIdpKVmu2RvqA==
-Message-ID: <400486cd-e23c-4501-98c0-aa999aa45f75@kernel.org>
-Date: Wed, 21 Aug 2024 16:20:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7431B1D4B
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724250061; cv=fail; b=GCKFdXHs5GTyCW6BxQF8+7VDN2uY5RJX4DStHAjkFcckRWFV0HaGWj9RfzPk6slYFw2hD/w3fr1FPTb3bSVlQYZl5c8ZTqCQwChHqjWLoPZ/q4rxSryS5s+XE/DgpO/ym0gCHFv5Cn4ISNyEnAukIUQesOhm+SYJGRTCo9Xcyq4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724250061; c=relaxed/simple;
+	bh=49J689qtnWWVFLm8/tCyaIDAo1mt271Ng3MYFBrhXcs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=WOcQ9lhe1tL5kyxn/Nh+j6V6KPJSzik7Y4iKL3MLuT14AKZ+UiBZruv5xTj1n9zfYTnCRpve1NpwZz8LIDDDBixeBrBOC/CeKwzG+KU5yytBVu2vo4bkiZB8xyqGjAVU5z0uXZQvxALo9qaV0F92A/udbMobk8DspvitCt4eGOg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b4bom0g+; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724250059; x=1755786059;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=49J689qtnWWVFLm8/tCyaIDAo1mt271Ng3MYFBrhXcs=;
+  b=b4bom0g+bGs3AKglNXRLmwcCog9r5Rzohy65gk96QW5vZ5/kJRQBfCAx
+   0XI/u2SIWtQ6rOHLQAatMrfuhmlIVEy/wjHoek7Yaw/JvYaIb3CAPq1Tp
+   nFkvkmTPpLUqSPg3i267Seb0NxsIaM132vOzYVL/3fwBqvgIytmnbTwCu
+   rK39OZdScHhgd98bGsdcCMiX61cm1YNCquw9WpBiK5iz+2Fk0h/m6StyW
+   4u6Em3iTb/OK9n3yQrVZucfLnU4E5/k7r8C9JHTI5PhBYyo9nsGEBZ1LY
+   y4oI0yU24jOgzUY7jBywIgvNgYpR+RhmxStINJAfhG2cx1UA/90nzfLd4
+   A==;
+X-CSE-ConnectionGUID: 1WeV4gSdQvybJCfk52+CUg==
+X-CSE-MsgGUID: OXGczHzySSGOegZVdTDD8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="22761998"
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="22761998"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 07:20:57 -0700
+X-CSE-ConnectionGUID: RlfmgtdnT1Kgrx46sxl6Mw==
+X-CSE-MsgGUID: 7BQdUlQITTO9IGVNZu0YFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="61087003"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Aug 2024 07:20:56 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 21 Aug 2024 07:20:55 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 21 Aug 2024 07:20:55 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 21 Aug 2024 07:20:55 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 21 Aug 2024 07:20:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CtdnFzYgibiwaWSBSaRyTNbcGk/RtRacbSF/igI5r746uwyyUxsYt8LPu3zlAbXY6fZhELzsBXwqmD8JufAH9C/c8PxRnDLG9NLDy3tT/U/bu8z3+41DL4vPmkLyO34gQ82xpHQfquIvOX7kMWO3J0dYH+ULjKE38I+jmHLRfWW33FwCR8LNU3jYkw/Wp8VlVeJ2KPGCGNxKpMFWC58Fd59P2UNxPpTg7f51LJ5JabuUYAX+MY+Ig+kpj1K1ibKs/On7QnI6Tk1FAUjx9A69rau8oHNFpX3w7KxYYXXgJBA0wbv3Ixb3km1bFN0oCw1KFp8VP7E77ii71k6bf/a+dg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TXnNdjSWh4ibWdTdRG4/eSFCc+OUmf37COlNs16Qa9s=;
+ b=Gl6+ifZ44cYhxOom7JAXDO+YN9POuf+swOpmnzN0tOEH7aZqum8T0h1Hs7y3s7QD0o8PHBpUreSwAr6hNcpcR8vZw9e9zmOCjdE3Ou8iw/epqw5BDtqoa/HGwowGzvWHb85y4BhM+x4v1VSmbH+qHsE7mTlhmYFCOw7QFuV3RRwYgDZcAB9aWwrF42AFJFPc5poO3oVqkfTajyWqq5fqccM0hCRQekxAcncXWKTsypkS71LfJqviGJ1OmY2MZuDXyMz0NBLJGnUIqPfkOap16AASMmtXG8/bMUvHhn79Jpard4RvFGdNKb2GpLzWh2Bxn+pZIdoq1V5lAg35vnY0lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MW4PR11MB8265.namprd11.prod.outlook.com (2603:10b6:303:1e1::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20; Wed, 21 Aug
+ 2024 14:20:52 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
+ 14:20:52 +0000
+Message-ID: <3278c207-b450-4ef0-b240-0fd4cfc0b1df@intel.com>
+Date: Wed, 21 Aug 2024 16:20:46 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v10 06/14] iavf: add initial framework for
+ registering PTP clock
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<horms@kernel.org>, <anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
+	<alexandr.lobakin@intel.com>
+References: <20240821121539.374343-1-wojciech.drewek@intel.com>
+ <20240821121539.374343-7-wojciech.drewek@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240821121539.374343-7-wojciech.drewek@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0189.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:44::6) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
- <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW4PR11MB8265:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b43aff0-01f8-46b5-0eed-08dcc1ec7668
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WExGM055Y1pGUVNHMlpINDVnU0JGQXpEYzRqdUQ5am1tMFp3R0hObFI2Yndz?=
+ =?utf-8?B?R2I4VWdVZm0ya2E1N2pGcWpldnlmeDkyQTNWc2VyOUtXTTIxOUozWnlSeEVo?=
+ =?utf-8?B?ek45Y0o4Z01CazNsQmxtNUkyUGVoUWVZelZMVVdBYXkyeFZWS1pTaVJSMHZr?=
+ =?utf-8?B?bGRKYUZrSzdBb21LWHlsd2FrMkFIWDI1MWY3ZWE0K09qaWlQdTAxQytQME16?=
+ =?utf-8?B?MkpKcmxpbEtTRkp2V0tKOFQrVCtWUGlqU0lVRXJheEYvbGJmbnFTY1o0TXNv?=
+ =?utf-8?B?MncxVWtjRmhLbzFNaFpNV0w4YkhxWG1HM0F5ZEtkcm92aTdNcy9QUDRjalkr?=
+ =?utf-8?B?K3Y4TzdyMlJ2U1dwM1czd2pDT0pXQ2tjQUhLR1JaU3J3UTgzTi9pdWtlaE8z?=
+ =?utf-8?B?ekZnNWVNSWJuWmNnR2k5UkR4UDcrd2dNck5hYXNPQkNNbU9vbjUzVnJ1WUJ5?=
+ =?utf-8?B?R0twMDQ2OEY4YjgzV3BrT2FCaTc5TkxwWnZkMGNSTjVWNU10d3hRU1VwaUtO?=
+ =?utf-8?B?czFwaXpvamFqYm1HM3BieHdwV1FEajRidHczdlpsZHBiM0ZZdG1tSWl4YlBF?=
+ =?utf-8?B?aTlhcU9xTEtaSFMrZmxIZlpoR2ZxMElEeGR0Q2toSVIvdWFPTEVWcmZrUkhl?=
+ =?utf-8?B?S2hWZnFBMW5KUWVhZm5iSnVuZ0V3TGxMZ0E1bHhuNmhsWGhzY2gxNm12Q3JZ?=
+ =?utf-8?B?Wk9JbXlGS2xmQk9rTEpKUkJxSjNRUktONzR2WjRYU1I1Q1VvMVpGUVdkZDE1?=
+ =?utf-8?B?UHFCSTI3Vm1oUHJGM2t1NXVHemdOYTZUTjZ0aitQWEN0NVY5cVgxenFCUkV6?=
+ =?utf-8?B?dFQ3T0Q5cE1SVmdlc0hZVmZNOEozSUYydGlBczF6dzlQT1M0cTNESU1DYzQz?=
+ =?utf-8?B?d2xYQ0lvVFZ4UCt6NG5rR2Jac1dOQ3ZCZUR3MlFLZVFJUnVFUXo3YWZkNDlt?=
+ =?utf-8?B?c1B4bVM0TW1abEhDVHc3Q3pNNmlHbkFUYmhibDNSK3hMamVQMzZ3dnREdUFo?=
+ =?utf-8?B?c1hQbzQwcG1HV2lxMG81Qlh4Uld6WDUxdXF0VExvcityUUlqV3I1b2EybWp3?=
+ =?utf-8?B?VFk3alNzM0ZMaUdKeVFxbzRNdEFlNHRVd1hUQUcxRTNxVXlTaGJ2N283WWRE?=
+ =?utf-8?B?RDBMZkZyZTNQU1MzUzRFMXpzcHZtU1JOUGlkb0lXZkxHbFZKMkdkb1pVTTRI?=
+ =?utf-8?B?dFJ4M0JlMmhvdDNuT3Z4MWZ4WEFsQVFVWHJhZXRTMVBSZHJJZHBZZVBXVGx6?=
+ =?utf-8?B?TUNzdko5a0pUNUZrSzlYUWhtYkhDTnZJc2RaR0YvNVJDZDNFa1g2QWRON0Iv?=
+ =?utf-8?B?aWErR1BESVlYazJqNnRUZURFa2xTeHMwa2c3M0kzbUJ3QStTVUx6RDBhWXZn?=
+ =?utf-8?B?dXR4aGNaZytsUFQrR1lMbnp4ejRDVDl2aENXcXJKMjI1MkpmT1MzRDNwTFFz?=
+ =?utf-8?B?S0twOVVCMy8vemR5blk1ZlpyUWMyUDNsZ3BQajVSTXJKRlpYQno0ek9KQmtp?=
+ =?utf-8?B?bFpmR1BqbmNBS1dvcGwwdWkzWHpDWGIrTHd4N051clIzeXhCdkJ1WVpZUDNz?=
+ =?utf-8?B?MC9RM3VYc0gxZ3FGNDRFeTVvdmoxbk5yaFQ4MnNncWRzeC9MdkNrKy9IVlpk?=
+ =?utf-8?B?dWxjTDhhQk0zdVZPU0hRN0JoUlNJWmNSVXdhVDFZaHMzcmdGS3Jjdjk3T2hj?=
+ =?utf-8?B?QzR4THhuT0hhTGszWG1OVWFaOXBiQjEzUjFQWGdScFNpRU1EM3pPQXdSS0U5?=
+ =?utf-8?B?cVZrZUZ0endWZlllMDRycDBsem1tVkNCNGZnOUNQaEJIdkJRR2k4T1FTNEZr?=
+ =?utf-8?B?Vm1uWkxkeDJ3TVJid0ppQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UFR4ZTBlKzRtM2Q4d2drVFRMbXFDdW9RbEovL3pBRUZ2TzNmV0JMaWVKSThz?=
+ =?utf-8?B?K3h3dUhZSkJFSlBZN0psNnBUdzFwaG9QczN4aXZMc3I5T09CdVVwbVVRS0E0?=
+ =?utf-8?B?NmR5aGxIaTcza2xjYndZbzJDb0YxdEtkZmZvMnFjZWxwaDhDOEMrd20vcTV6?=
+ =?utf-8?B?QlJ4aDM0OHAvb1UrYnh6bk9kbzA1V2V3WjZOVFdMTmhSU0Vyb05rdk9QQWtm?=
+ =?utf-8?B?alRLcG5qblNhTTBUUU5UTUVDK240L0lja0ZqaUp6Z0QzcFFaMkVOSDRUNnJ6?=
+ =?utf-8?B?bk5ma3BoS1V3SnpZTFIvY2lMYUhaUFh3bkNndEEwM0J2T0tmVzRpbEwzM0c2?=
+ =?utf-8?B?a2U3MHdJZnU5enlKUnJIaTNOUVVvemZaZTJwNG1KNUNRdDRyYVJjblpENmUz?=
+ =?utf-8?B?NWxTVVBMZ2ZWQ2Q5d1p3Z2JjMC9CMjlxYUVwdkM4NHgwLzBCZXRxS0k1dnhm?=
+ =?utf-8?B?V1FrUUZIOVErREw5MGJuUEY2Wmg5V3RIcXI3WjhOTExMK1N5WDg0SGxwTWpw?=
+ =?utf-8?B?SFhrRWh1My9MOGtLTS9RQi9yRzBjM1oyWnUwVVliOVFRWTBNMUVvdytLclF1?=
+ =?utf-8?B?cGNPSXNYUDkvVEpXcjJDeG9nYkowYnZZTzM3cFJsb2ZwL3BybnNVblNrZlFI?=
+ =?utf-8?B?OHRlTXZscjBPVnJOYjlxaGd5S2MyRWlyaVFMS0cxRjZVVkZvN3I4S3BzREtD?=
+ =?utf-8?B?RFFOYnVGeVRTd1kxSWM0dCtZbUVJeW04eUdPa3l6RVRndEF6Wm5TYURJdnor?=
+ =?utf-8?B?N2pTMzNDb01ZQW9yd25Nd0wrMU1oL1RJcWlNblVmVHNiVDBWMGVZWXArdm92?=
+ =?utf-8?B?TlVHODdkcndXQzFPcHNTSWl2SHNSbHdyRGJTRExGdTdmRnN0U3paMzNQRE9F?=
+ =?utf-8?B?Uk1Mc1JocVdxZnE4ZUtINFJkWGE5ekV3U1JxNlFuQVlRblM0RFF6T1drNEFz?=
+ =?utf-8?B?UTlpSlRqUlBJQ0hudWhIbjJpZmNqUjkrWWtSMVhqcmRPaG4vRi9pbHJoNzRK?=
+ =?utf-8?B?dzhRTDg2WHB6SWM1NXFlTGQwb3lDTzZ4Y1ZMcDhwdWlUalBEa0oyVTRTVVVO?=
+ =?utf-8?B?WDUveFQyQmJCTkVvS3pzQ29rQUs4KzFNNktTcjZONzJyMXVydlgrNExUMWNS?=
+ =?utf-8?B?dkJDZXNBMDhsdE0vaFhxUkxSUUUvNFZKZkdMQWlZbC9Fb1J1bExYb2Nyc1hN?=
+ =?utf-8?B?aDdQZTdKaHRYWi84ZzNwemFlYUdVRzIraDV2Y1J1bjVrWEVIbGtXeDk1M3dE?=
+ =?utf-8?B?ZWw2WHZlSzV5bEQ4ekc2RkU2NkxSejhta1VTRUNRNi9qTXFNVjVSWStxa04y?=
+ =?utf-8?B?NWZ3ZVRmaXpxaDRET2JWT1RzRUMzRFpsSzlDSXVXRktRVjBEMDdlOWxad3FW?=
+ =?utf-8?B?SDQ3MEVNaHkwVXRqVUwrbGhmNGg5RkFUQkVLRVpiS1M1L0gvUjNVZnd2ZEVR?=
+ =?utf-8?B?NEMyeGszUTV3NXFqbTVhMzlTakdSSE92SHRTT2ZvVlJldmVqRGNXK2kxNmNL?=
+ =?utf-8?B?RlBoUlZyOWpIZjNialRtelcxREdYU0d6cWNvNk05dWkwQTdCNHMwZndBdFFk?=
+ =?utf-8?B?NTNjcFI0TVpHajZtelc2eGFQYURISzVadWNoVmdUL1FzZjQ2V2JEVGs3Y0cy?=
+ =?utf-8?B?QkRHZmM1cDh0ZEdYcldtM0hnZXE0c0lyd21lYlowa09OTXFtaXg0LzJxdmRW?=
+ =?utf-8?B?eHBhRTNNU3F3am1lRXhUUWpHSTdwTFlVOEs4aTF5bmdIcUwxYmxMSkw2OGNF?=
+ =?utf-8?B?dVNsQmoreDRzaGx5enZzU1ViTHl0SHhJUHpFdGNXejVlN0pQYXBuV2JVWkR5?=
+ =?utf-8?B?MXNCdThCK0QzQ250cGordGxKcGxGeWFQVXJKMkdGYytFZ2pURDZvVXNiKzRL?=
+ =?utf-8?B?ZUFBNUYxZHJpV3N2NUFrclAvekRadlFVaEVrRVo0WVU0THkzbGNrWURCV3NZ?=
+ =?utf-8?B?djBLbGpMNVplbHF1K2tJemNCS0c0NjMyUTJmOUJVdkhBZHFRamFTdlhKQzF4?=
+ =?utf-8?B?d05NdzZ0dENML2hiZ2p1K2pHaHZVeEF0T3FZalc4RVhpQXJMbzZWcHhmN0RV?=
+ =?utf-8?B?N2NveE50ZWxHUlR3ekl2Z1Z2UmF5dDN2V0p5ZWtvblFqUFFlVVBpdzVhamp2?=
+ =?utf-8?B?Q1YrSENHOVJ2bmg1ODFWQ01hUit2WTJyWEREeDB0SXYyaVlVOGszTlZtKzFS?=
+ =?utf-8?B?bnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b43aff0-01f8-46b5-0eed-08dcc1ec7668
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 14:20:52.5068
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R6b2gTZayrAreeui+DdTQr/laPEbxLyhZ/3n0Erltv50YMEp7V/VyIY1xYlH/SxjaIGelwrSC3JAEqz76cp7uWdGvpmABV5nIworOFGv3jA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB8265
+X-OriginatorOrg: intel.com
 
-On 21/08/2024 10:38, Krzysztof Kozlowski wrote:
-> On Tue, Aug 20, 2024 at 04:36:10PM +0200, Andrea della Porta wrote:
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+Date: Wed, 21 Aug 2024 14:15:31 +0200
 
-...
-
->>  drivers/misc/Kconfig                  |   1 +
->>  drivers/misc/Makefile                 |   1 +
->>  drivers/misc/rp1/Kconfig              |  20 ++
->>  drivers/misc/rp1/Makefile             |   3 +
->>  drivers/misc/rp1/rp1-pci.c            | 333 ++++++++++++++++++++++++++
->>  drivers/misc/rp1/rp1-pci.dtso         |   8 +
->>  drivers/pci/quirks.c                  |   1 +
->>  include/linux/pci_ids.h               |   3 +
->>  10 files changed, 524 insertions(+)
->>  create mode 100644 arch/arm64/boot/dts/broadcom/rp1.dtso
->>  create mode 100644 drivers/misc/rp1/Kconfig
->>  create mode 100644 drivers/misc/rp1/Makefile
->>  create mode 100644 drivers/misc/rp1/rp1-pci.c
->>  create mode 100644 drivers/misc/rp1/rp1-pci.dtso
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 67f460c36ea1..1359538b76e8 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -19119,9 +19119,11 @@ F:	include/uapi/linux/media/raspberrypi/
->>  RASPBERRY PI RP1 PCI DRIVER
->>  M:	Andrea della Porta <andrea.porta@suse.com>
->>  S:	Maintained
->> +F:	arch/arm64/boot/dts/broadcom/rp1.dtso
->>  F:	Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
->>  F:	Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.yaml
->>  F:	drivers/clk/clk-rp1.c
->> +F:	drivers/misc/rp1/
->>  F:	drivers/pinctrl/pinctrl-rp1.c
->>  F:	include/dt-bindings/clock/rp1.h
->>  F:	include/dt-bindings/misc/rp1.h
->> diff --git a/arch/arm64/boot/dts/broadcom/rp1.dtso b/arch/arm64/boot/dts/broadcom/rp1.dtso
->> new file mode 100644
->> index 000000000000..d80178a278ee
->> --- /dev/null
->> +++ b/arch/arm64/boot/dts/broadcom/rp1.dtso
->> @@ -0,0 +1,152 @@
->> +// SPDX-License-Identifier: (GPL-2.0 OR MIT)
->> +
->> +#include <dt-bindings/gpio/gpio.h>
->> +#include <dt-bindings/interrupt-controller/irq.h>
->> +#include <dt-bindings/clock/rp1.h>
->> +#include <dt-bindings/misc/rp1.h>
->> +
->> +/dts-v1/;
->> +/plugin/;
->> +
->> +/ {
->> +	fragment@0 {
->> +		target-path="";
->> +		__overlay__ {
->> +			#address-cells = <3>;
->> +			#size-cells = <2>;
->> +
->> +			rp1: rp1@0 {
->> +				compatible = "simple-bus";
->> +				#address-cells = <2>;
->> +				#size-cells = <2>;
->> +				interrupt-controller;
->> +				interrupt-parent = <&rp1>;
->> +				#interrupt-cells = <2>;
->> +
->> +				// ranges and dma-ranges must be provided by the includer
->> +				ranges = <0xc0 0x40000000
->> +					  0x01/*0x02000000*/ 0x00 0x00000000
->> +					  0x00 0x00400000>;
+> From: Jacob Keller <jacob.e.keller@intel.com>
 > 
-> Are you 100% sure you do not have here dtc W=1 warnings?
+> Add the iavf_ptp.c file and fill it in with a skeleton framework to
+> allow registering the PTP clock device.
+> Add implementation of helper functions to check if a PTP capability
+> is supported and handle change in PTP capabilities.
+> Enabling virtual clock would be possible, though it would probably
+> perform poorly due to the lack of direct time access.
 
-One more thing, I do not see this overlay applied to any target, which
-means it cannot be tested. You miss entry in Makefile.
+[...]
 
-Best regards,
-Krzysztof
+> +/**
+> + * iavf_ptp_register_clock - Register a new PTP for userspace
+> + * @adapter: private adapter structure
+> + *
+> + * Allocate and register a new PTP clock device if necessary.
+> + *
+> + * Return: 0 if success, error otherwise
 
+Period ('.') at the end is desired at the end of kdoc.
+
+> + */
+> +static int iavf_ptp_register_clock(struct iavf_adapter *adapter)
+> +{
+> +	struct ptp_clock_info *ptp_info = &adapter->ptp.info;
+> +	struct device *dev = &adapter->pdev->dev;
+> +
+> +	memset(ptp_info, 0, sizeof(*ptp_info));
+
+Is this needed? adapter is allocated using kzalloc() I think?
+
+> +
+> +	snprintf(ptp_info->name, sizeof(ptp_info->name), "%s-%s-clk",
+> +		 dev_driver_string(dev), dev_name(dev));
+
+dev_driver_string() can be just KBUILD_MODNAME when it's called inside
+the actual module. It's mostly used when you need to get a module name
+from a different module or core kernel code.
+
+> +	ptp_info->owner = THIS_MODULE;
+> +
+> +	adapter->ptp.clock = ptp_clock_register(ptp_info, dev);
+> +	if (IS_ERR(adapter->ptp.clock)) {
+> +		adapter->ptp.clock = NULL;
+> +
+> +		return PTR_ERR(adapter->ptp.clock);
+
+Braino here.
+You first set ptp.clock to %NULL and then return PTR_ERR(ptp.clock).
+IOW, this error path will always return 0.
+
+I usually use temporary variables to avoid this.
+
+	clock = ptp_clock_register(ptp_info, dev);
+	if (IS_ERR(clock))
+		return PTR_ERR(clock);
+
+	adapter->ptp.clock = clock;
+
+
+> +	}
+> +
+> +	dev_dbg(&adapter->pdev->dev, "PTP clock %s registered\n",
+> +		adapter->ptp.info.name);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * iavf_ptp_init - Initialize PTP support if capability was negotiated
+> + * @adapter: private adapter structure
+> + *
+> + * Initialize PTP functionality, based on the capabilities that the PF has
+> + * enabled for this VF.
+> + */
+> +void iavf_ptp_init(struct iavf_adapter *adapter)
+> +{
+> +	int err;
+> +
+> +	if (!iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC)) {
+> +		pci_warn(adapter->pdev,
+> +			 "Device does not have PTP clock support\n");
+
+I think it's pci_notice() or even pci_dbg(). A device can miss PTP
+clock, but it's not a failure. _warn() is when something went wrong, but
+not as wrong as _err() :D
+
+> +		return;
+> +	}
+> +
+> +	err = iavf_ptp_register_clock(adapter);
+> +	if (err) {
+> +		pci_err(adapter->pdev,
+> +			"Failed to register PTP clock device (%p)\n",
+> +			ERR_PTR(err));
+> +		return;
+> +	}
+
+Why does this function return void if there's an error path? To make
+sure the driver works even if PTP fails to register? But I think it's
+better to bail out if something failed than to work without certain
+functionality?
+
+> +
+> +	adapter->ptp.initialized = true;
+> +}
+> +
+> +/**
+> + * iavf_ptp_release - Disable PTP support
+> + * @adapter: private adapter structure
+> + *
+> + * Release all PTP resources that were previously initialized.
+> + */
+> +void iavf_ptp_release(struct iavf_adapter *adapter)
+> +{
+> +	adapter->ptp.initialized = false;
+> +
+> +	if (!IS_ERR_OR_NULL(adapter->ptp.clock)) {
+
+Since you always assign clock to %NULL when the initialization failed,
+this could be just
+
+	if (adapter->ptp.clock)
+
+> +		dev_dbg(&adapter->pdev->dev, "removing PTP clock %s\n",
+> +			adapter->ptp.info.name);
+
+pci_dbg()
+
+> +		ptp_clock_unregister(adapter->ptp.clock);
+> +		adapter->ptp.clock = NULL;
+> +	}
+
+...but I'd invert the condition to avoid +1 indent level.
+
+	if (!adapter->ptp.clock)
+		return;
+
+	pci_dbg() ...
+
+> +}
+> +
+> +/**
+> + * iavf_ptp_process_caps - Handle change in PTP capabilities
+> + * @adapter: private adapter structure
+> + *
+> + * Handle any state changes necessary due to change in PTP capabilities, such
+> + * as after a device reset or change in configuration from the PF.
+> + */
+> +void iavf_ptp_process_caps(struct iavf_adapter *adapter)
+> +{
+> +	bool read_phc = iavf_ptp_cap_supported(adapter,
+> +					       VIRTCHNL_1588_PTP_CAP_READ_PHC);
+
+Maybe split the declaration and initialization to avoid line break? My
+editor says it would fit in 80 if you make the variable name shorter,
+e.g. 'phc'.
+
+> +
+> +	/* Check if the device gained or lost necessary access to support the
+> +	 * PTP hardware clock. If so, driver must respond appropriately by
+> +	 * creating or destroying the PTP clock device.
+> +	 */
+> +	if (adapter->ptp.initialized && !read_phc)
+> +		iavf_ptp_release(adapter);
+> +	else if (!adapter->ptp.initialized && read_phc)
+> +		iavf_ptp_init(adapter);
+> +}
+
+Thanks,
+Olek
 
