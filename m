@@ -1,176 +1,198 @@
-Return-Path: <netdev+bounces-120560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC89959C5D
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:51:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55453959C71
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30A61C21940
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7982B1C21FF7
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51918199920;
-	Wed, 21 Aug 2024 12:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4409E192D6A;
+	Wed, 21 Aug 2024 12:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbReuA+P"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cyX8JagZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD29F194149;
-	Wed, 21 Aug 2024 12:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724244679; cv=none; b=u/30+Uy6f3yQmWvoL8iMRg/K5RDzSAaUjVM7jjRuUjkAvPnRiImIuK+72stZSBKOb2e5fhr7mJUR0dh8OCEiYmG1Ubd7TuWg4Q6CgN4T/1tZEHlAxEaYS1nsJFFr5UAJApLN9YbCteE2NJejNQ2X8cbbOtEY9tk8MJwNJ9pSde4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724244679; c=relaxed/simple;
-	bh=Rc2cFQqSSkeKecWE2PK134m4tNeSj3uwEtJwvX22JVU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jiVDnDNUB1on+py/ILLTZdgatbc47+E7Zxe8cosIwr2rx3ufz++5c0djApR+qfGHhpobkCrFBHYYize2liN6RZmGPCDz5ZeBur5Hl6JdELLPlJ4YvjmEWw+GcbwosevzGUGyzj5sNWIsisW/2PsfE+Q6dIXdHOlnuOiT64H5tCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cbReuA+P; arc=none smtp.client-ip=209.85.219.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-e1161ee54f7so6880765276.2;
-        Wed, 21 Aug 2024 05:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724244677; x=1724849477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GOG++QJ0OGWqR78GWEt1ZiOHgTX65k5yfxlanPv90zo=;
-        b=cbReuA+P9TGarG9p6DV7iH7fAUEMnjaUSGsrlfIbQrSYB+vJeBIFW+P2QkqKu4BKLM
-         EIOYaCdmwnRfq28IQsi1g7qIGHYhJaxAa4OmnDPKkkoz5s0ySyrHD+/W6aBExTLjIvU7
-         finhCbM1L8q+xl70Dz502GkwHxDcAiv5JDigqIYZVFvWyqc+crbvcnx8vr9y9qtAR9x1
-         qn8L9tPcg0b/Sa4y8epc9poEaYWRW44GXK5EGxgNHgnx4THRZGx3JqTXzG+2hhQNGysm
-         GpnQi8Ti47Iec6P5BpaM4rUitKV+6A061unqwzV18Pj4aOa11opzesbYdL8l0+51wIcV
-         1Iag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724244677; x=1724849477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GOG++QJ0OGWqR78GWEt1ZiOHgTX65k5yfxlanPv90zo=;
-        b=pJsOu/hFAXh4a8HlNTBDLTzCFpkFOM+L38A4Cv0MmdiKDIleHOQw6mPQYtcnJSIX+g
-         aH4Pa4SvXcpf1t19/+XZTmm0exyki/QYxXDDJX9R7QeQk5bf73DaoezbXkNrIfKJ8pYB
-         SvbUyE/G+q567gmB49/SQEoP8azQc81O+Ee3P/V2KfKe4p1gNFImk87LEvX4vAuCP2Z6
-         WMfnu7fv7IRAujD5scAS/E123zi0srypgxJFyBXGov493JSpHUT621TPn0gB+Zn8Z+ZU
-         Yzbh5aMdeTXltxW5ggZpg1Xh5oC1CBXX3sbEDYKZSfdLYQKCSB2Rc27ZVzKCGWzULYLZ
-         wAyA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBkknkyG4pBANTgwNokAjJPlG95TanhssOSBfXJqxYkMSo/IE15wvO1ue5Ih3lbR8L8FQBlK+u+99q9lc=@vger.kernel.org, AJvYcCXI+7i/pW8yhnddCfEcbukcPOrbd0eDo14QD1FQ7JzSh7Nbw+gja0dyw9Hz2txk1uvVDe4vIH6L@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRmHOGwtRevjfirlABA2ZQ0qk1c079U6KUSeh3wV/wWXRu0Q0D
-	J73cok+sK3JkNLDRhNF+PQGdwAnMuuYjgS+sxE6qGYhrNa9IX2ktLsfQLU+pktcZB2oZvtIw0KP
-	lgNXJkZlUPNanPaLmA3H7RrSZp1Q=
-X-Google-Smtp-Source: AGHT+IFShhXAcE2WpXk6hmJXVDhg0nd8THEMBUPGls6mk3mwrVGCadfHo/LViWOs4YP6ymvT4rv+POJ2M7PJoI6Hf8I=
-X-Received: by 2002:a05:6902:18d0:b0:e11:baf6:a323 with SMTP id
- 3f1490d57ef6-e16664c873dmr2478013276.39.1724244676458; Wed, 21 Aug 2024
- 05:51:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB66155307;
+	Wed, 21 Aug 2024 12:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724244895; cv=fail; b=FxWKivK/W2Q3Ulz9qlhvaorx+s2+oQ5Hibx5ScsM0cJZTjrBk18xKlP6ssQKcncZFBf+6QjI+MR+ge5NZrkJPDibvZ08YXHw11uptaUNiIAcTcKmZqpNm3Ci45j4NtZLHQAg03ir9yOaqcNVAdOEJ5WZYeHU73qQ90MZxeXq/F0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724244895; c=relaxed/simple;
+	bh=Vficdu+h/xmCWYEpzJHzTasLcgrdGTy9HdrKYaSKXzY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nPKNn08Y3ApyoROInMIGedGTwXX5/6lh2+J26CW49LNZRhBgW+xbKHpAf3m0mL7GLZ7uUtmuKAJiPG0dfb0F+C+rjs/59ctojcmXhjjEhmehK4Wg2g3ZvPtWPcMy2m1KnKd1e5pb54CiDmDSr60HUc8Lv0/Y6ziwFSUG7M1Xn+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cyX8JagZ; arc=fail smtp.client-ip=40.107.93.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dKNdULK5963hEGdANS04akmTprncKxQfVBqysFHaEKt9rzskZ5yZC/9hNJvvWZofyCw5AlDGKkyyMOKJ7IcUtgNl+1R7N+aSCbMBpIWOBW0Ay4m/3k/2KzF+s90voqpZXTGyq2pM1lhBvWmjGu2ai81937S3Nn9Kzykou6mtYK/cdhJeVSwylEL3P96kX7rWpt2CwPfBD6Hj/0vTfZBGWQf2b0U6bRUWnC4GIMwWIxghIoPWwTe1QN7zu8FOmZtrrsTNXtP3clHTmf6yVsVfGyfSnojxeLyQWvi+obm9qKo6X8dHuvkAY+LDjwOdBotjSo7tOyi4ORyMqdINC1Sl4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IE7/cOwSpEUTeoTUjz48Awg8gombbskwHT+xDbuj5wQ=;
+ b=kdBAuECF5aCoP7kgrmuGUHh7kwk3ki4tar9w8L5yp961DHfIHgsEgkpAtQHfTkygbQsRtO8ewImO8PbMNt7/CG4Gm9zwnL1avOZ0KaHN1opiBMPJtggNNX/+LUQiaje4H48++FjkriEcjRyVBMl41ZxQ9A0gxq+BLgxLvHoe8036IBe7BfKLL6Ai5Gmhmddx+tbQZ3oFHvGfO9lR4v0OYvh5eF8L9HZSuH8rpq8C02EsiSG1Ud6Obkh4h/ByGscCVSD7m9iTtAF8N8vHF87V2I+ZoUK7C6k0xgrZLtzffupJC2DiMRX9OLgOmJ//3eSxK1SeNk7zEUocuWim08UOPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IE7/cOwSpEUTeoTUjz48Awg8gombbskwHT+xDbuj5wQ=;
+ b=cyX8JagZE0Di6VNd2tIeNe+r7aTKyRIWl3VLEnc9x42Oi8PJ3iAGzXWcJCJJ2V1rRYN9Kyg/RTOq0vcb5XsJU2BuvmLRfVbpuA3G3LPd5fgtEhL8E15mT4ekG1UWx+Rnu7pEZ3/88zAjHkpMfrWu4B4/L+DkIY3iCgCgfUZL56dnGDc5qo0MZ+hCBPu8LSjD4sU0lQ+wt5Uaq37kh2AU70z0RTIDB07MANjSy3FU917A7CUFhSlQPtt2ef3vCIJeBUqK0rDlfkHklcMDeKvrWH/cyhnsz6/OytCpFdOJd/BTZ6rHv10Sv0WmH2XLuZfvLNaNTt+4nlZoCoknX8CGuA==
+Received: from SA9PR13CA0021.namprd13.prod.outlook.com (2603:10b6:806:21::26)
+ by SJ2PR12MB8978.namprd12.prod.outlook.com (2603:10b6:a03:545::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 21 Aug
+ 2024 12:54:50 +0000
+Received: from SA2PEPF000015C6.namprd03.prod.outlook.com
+ (2603:10b6:806:21:cafe::93) by SA9PR13CA0021.outlook.office365.com
+ (2603:10b6:806:21::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.13 via Frontend
+ Transport; Wed, 21 Aug 2024 12:54:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF000015C6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.11 via Frontend Transport; Wed, 21 Aug 2024 12:54:50 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 21 Aug
+ 2024 05:54:37 -0700
+Received: from shredder.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 21 Aug
+ 2024 05:54:32 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <gnault@redhat.com>, <dsahern@kernel.org>,
+	<fw@strlen.de>, <martin.lau@linux.dev>, <daniel@iogearbox.net>,
+	<john.fastabend@gmail.com>, <ast@kernel.org>, <pablo@netfilter.org>,
+	<kadlec@netfilter.org>, <willemdebruijn.kernel@gmail.com>,
+	<bpf@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<coreteam@netfilter.org>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next 00/12] Unmask upper DSCP bits - part 1
+Date: Wed, 21 Aug 2024 15:52:39 +0300
+Message-ID: <20240821125251.1571445-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
- <20240815124302.982711-7-dongml2@chinatelecom.cn> <20240816192243.050d0b1f@kernel.org>
- <CADxym3ZEvUYwfvh2O5M+aYmLSMe_eZ8n=X_qBj8DiN8hh2OkaQ@mail.gmail.com> <20240819155945.19871372@kernel.org>
-In-Reply-To: <20240819155945.19871372@kernel.org>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Wed, 21 Aug 2024 20:51:12 +0800
-Message-ID: <CADxym3YTH_AGnr6AZUO5PWL0nWDak7Kx+x-niA+Z-fmdsZ_OUA@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/10] net: vxlan: add skb drop reasons to vxlan_rcv()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, dongml2@chinatelecom.cn, idosch@nvidia.com, 
-	amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com, 
-	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C6:EE_|SJ2PR12MB8978:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d34cfa7-4d2c-45f5-d904-08dcc1e071c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HI1X2q1mN1z1A0h9i4OwgnmbqogSdvpD8+54WiJlutp6tlRgOeS8MY03Q1zP?=
+ =?us-ascii?Q?J3VyAqE2G2roxX4no7o2p2eZMuv/gHyUSSPlhYEcq3wIUUOVNQjdB9xCylsb?=
+ =?us-ascii?Q?WyhcQEG3P15JcvXYx5S31AAWUQq5ricGa+WLeLfqUaY25sQCzF0Y+hVpUqnS?=
+ =?us-ascii?Q?EusJwXQMXYUJb58D5CeeY1CWkyz47KgBZTFORLANXpwaylieZDsRnwLuIXH6?=
+ =?us-ascii?Q?quajIkQ3OigDSmli4YO1n2wyJ9thYn0KRXTfPxCzS33iYFRIhjPbCo0ndKtq?=
+ =?us-ascii?Q?92NssIZcJV9pL2fznXQekt9WNVJR92Qv8UCLDhVdu0Nz26hWpvEW8wz0g+Jr?=
+ =?us-ascii?Q?mrCWyMMhBK2ILedENjRivPSlOXEvIx1YrbAGym4aljHM1HTKrceKQeXQr7eQ?=
+ =?us-ascii?Q?jZBL/PavCTNzqYvmNRRviC8ZjnLvWFzDU0eUY9IV/YsoUycKIXTZqkhIfM2L?=
+ =?us-ascii?Q?bEOSEEqutZFTTMVfqwEFnkooGk1aOzNxExAh5Dm2mhDTHkV1kkTiUtN3paHj?=
+ =?us-ascii?Q?4CnLtgx0D5TuqHuQ+h3Yfy7iQWPJqczDpz5sZ5JsOBI7b1j23LX6IWd0xbAb?=
+ =?us-ascii?Q?KCkfDJqRhshxW1MX2bABxb8ScWSUOKtEBM2FCpD/IZlvjI6JvZnDasCJETYN?=
+ =?us-ascii?Q?3+mQ5iynvTZWuAd+FZ+atkLf9UxQRiGHu+Bn4Cf4S6gOCwaIVBIfv9Vffzi5?=
+ =?us-ascii?Q?nt6vXUEYDxdYuxjdYembNyq+Hb5XGDP8bgby803wwAdC3+mmofmsEjZw0uIj?=
+ =?us-ascii?Q?ft1ebfNsnxgswYjb8n7mA1dsYknieoDiSwoZLzuBNsoK/bCjJrp9BFTAzYLG?=
+ =?us-ascii?Q?QEgJfw5kt5sw37txCF8+6PbMPoSHNwwDIKxzyGHbyMEY453VkegnRsR69ehQ?=
+ =?us-ascii?Q?bFZeZfJBlvL6HzVAu6ATQow7vy3Tn+p/X2j99LOx/NBuYuJBVpSBgx72/Yln?=
+ =?us-ascii?Q?0BJkHTiv7TwXbTDfueJw4sK0jLvMLh/CFjMVb/ZQCYJxRlboHDH6IoPWqozf?=
+ =?us-ascii?Q?h1GydamIdzb0ysv7AG4Nj+xXQ/n79YCjfh+tPTFrhfh3hyqn5TkN82xjS4zv?=
+ =?us-ascii?Q?JLWna0elHI3VeXod/CUkJW8cIViz5X6eg8pOkvp0nWfRWllWaS7eKzieCjob?=
+ =?us-ascii?Q?HZ8k1EAF70Clb9eFQvbYBzC5HknQ6QihA1SG1egK9GIki2KtFWUX3kPRwKlU?=
+ =?us-ascii?Q?agbwdz2qsGhkcrF53Ua4IjVMR7oTUhxbxA7rcAf6RZ9z8E/+JoiplNJaj9mQ?=
+ =?us-ascii?Q?vdQLxNlDMAR8JG8R9ehWjTBC+UFKTVP9bPnEpqPSw1m5JPd9rrdg2a3AwbB9?=
+ =?us-ascii?Q?xjMCmP05V11g2OlXz3XW76MYWnVkmmnGeQNzCDVxQ6O39vOqzwEWNV+B60S7?=
+ =?us-ascii?Q?SWyfZYkOW4HGv91e5hBcFHyYmtWEUgP9HKsrzgV2+f1R9CK/TGwyYKVHquHk?=
+ =?us-ascii?Q?w+L0GLxtbMGm5ej+Z8CoIvWXoGCBGFFC?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 12:54:50.4250
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d34cfa7-4d2c-45f5-d904-08dcc1e071c9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8978
 
-On Tue, Aug 20, 2024 at 6:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat, 17 Aug 2024 19:33:23 +0800 Menglong Dong wrote:
-> > On Sat, Aug 17, 2024 at 10:22=E2=80=AFAM Jakub Kicinski <kuba@kernel.or=
-g> wrote:
-> > >
-> > > On Thu, 15 Aug 2024 20:42:58 +0800 Menglong Dong wrote:
-> > > >  #define VXLAN_DROP_REASONS(R)                        \
-> > > > +     R(VXLAN_DROP_FLAGS)                     \
-> > > > +     R(VXLAN_DROP_VNI)                       \
-> > > > +     R(VXLAN_DROP_MAC)                       \
-> > >
-> > > Drop reasons should be documented.
-> >
-> > Yeah, I wrote the code here just like what we did in
-> > net/openvswitch/drop.h, which makes the definition of
-> > enum ovs_drop_reason a call of VXLAN_DROP_REASONS().
-> >
-> > I think that we can define the enum ovs_drop_reason just like
-> > what we do in include/net/dropreason-core.h, which can make
-> > it easier to document the reasons.
-> >
-> > > I don't think name of a header field is a great fit for a reason.
-> > >
-> >
-> > Enn...Do you mean the "VXLAN_DROP_" prefix?
->
-> No, I mean the thing after VXLAN_DROP_, it's FLAGS, VNI, MAC,
-> those are names of header fields.
->
+tl;dr - This patchset starts to unmask the upper DSCP bits in the IPv4
+flow key in preparation for allowing IPv4 FIB rules to match on DSCP. No
+functional changes are expected.
 
-Yeah, the reason here seems too simple. I use VXLAN_DROP_FLAGS
-for any dropping out of vxlan flags. Just like what Ido advised, we can use
-more descriptive reasons here, such as VXLAN_DROP_INVALID_HDR
-for FLAGS, VXLAN_DROP_NO_VNI for vni not found, etc.
+The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+lookup to match against the TOS selector in FIB rules and routes.
 
-> > > > @@ -1815,8 +1831,9 @@ static int vxlan_rcv(struct sock *sk, struct =
-sk_buff *skb)
-> > > >       return 0;
-> > > >
-> > > >  drop:
-> > > > +     SKB_DR_RESET(reason);
-> > >
-> > > the name of this macro is very confusing, I don't think it should exi=
-st
-> > > in the first place. nothing should goto drop without initialing reaso=
-n
-> > >
-> >
-> > It's for the case that we call a function which returns drop reasons.
-> > For example, the reason now is assigned from:
-> >
-> >   reason =3D pskb_may_pull_reason(skb, VXLAN_HLEN);
-> >   if (reason) goto drop;
-> >
-> >   xxxxxx
-> >   if (xx) goto drop;
-> >
-> > The reason now is SKB_NOT_DROPPED_YET when we "goto drop",
-> > as we don't set a drop reason here, which is unnecessary in some cases.
-> > And, we can't set the drop reason for every "drop" code path, can we?
->
-> Why? It's like saying "we can't set return code before jumping to
-> an error label". In my mind drop reasons and function return codes
-> are very similar. So IDK why we need all the SK_DR_ macros when
-> we are just fine without them for function return codes.
+It is currently impossible for user space to configure FIB rules that
+match on the DSCP value as the upper DSCP bits are either masked in the
+various call sites that initialize the IPv4 flow key or along the path
+to the FIB core.
 
-Of course we can. In my example above, we need to set
-reason to SKB_DROP_REASON_NOT_SPECIFIED before we
-jump to an error label:
+In preparation for adding a DSCP selector to IPv4 and IPv6 FIB rules, we
+need to make sure the entire DSCP value is present in the IPv4 flow key.
+This patchset starts to unmask the upper DSCP bits in the various places
+that invoke the core FIB lookup functions directly (patches #1-#7) and
+in the input route path (patches #8-#12). Future patchsets will do the
+same in the output route path.
 
-reason =3D pskb_may_pull_reason(skb, VXLAN_HLEN);
-if (reason) goto drop;
+No functional changes are expected as commit 1fa3314c14c6 ("ipv4:
+Centralize TOS matching") moved the masking of the upper DSCP bits to
+the core where 'flowi4_tos' is matched against the TOS selector.
 
-xxxxxx
-// we need to set reason here, or a WARN will be printed in
-// kfree_skb_reason(), as reason now is SKB_NOT_DROPPED_YET.
-reason =3D SKB_DROP_REASON_NOT_SPECIFIED;
-if (xx) goto drop;
+Ido Schimmel (12):
+  bpf: Unmask upper DSCP bits in bpf_fib_lookup() helper
+  ipv4: Unmask upper DSCP bits in NETLINK_FIB_LOOKUP family
+  ipv4: Unmask upper DSCP bits when constructing the Record Route option
+  netfilter: rpfilter: Unmask upper DSCP bits
+  netfilter: nft_fib: Unmask upper DSCP bits
+  ipv4: ipmr: Unmask upper DSCP bits in ipmr_rt_fib_lookup()
+  ipv4: Unmask upper DSCP bits in fib_compute_spec_dst()
+  ipv4: Unmask upper DSCP bits in input route lookup
+  ipv4: Unmask upper DSCP bits in RTM_GETROUTE input route lookup
+  ipv4: icmp: Pass full DS field to ip_route_input()
+  ipv4: udp: Unmask upper DSCP bits during early demux
+  ipv4: Unmask upper DSCP bits when using hints
 
-Should it be better to do it this way?
+ net/core/filter.c                 | 3 ++-
+ net/ipv4/fib_frontend.c           | 4 ++--
+ net/ipv4/icmp.c                   | 2 +-
+ net/ipv4/ipmr.c                   | 3 ++-
+ net/ipv4/netfilter/ipt_rpfilter.c | 3 ++-
+ net/ipv4/netfilter/nft_fib_ipv4.c | 3 ++-
+ net/ipv4/route.c                  | 8 ++++----
+ net/ipv4/udp.c                    | 3 ++-
+ 8 files changed, 17 insertions(+), 12 deletions(-)
 
-Thanks!
-Menglong Dong
+-- 
+2.46.0
+
 
