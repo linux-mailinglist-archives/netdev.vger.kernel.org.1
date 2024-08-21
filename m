@@ -1,144 +1,199 @@
-Return-Path: <netdev+bounces-120662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D420795A216
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:57:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A5295A21E
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 899821F222CA
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:57:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91E18B24988
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA44414F131;
-	Wed, 21 Aug 2024 15:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47F214F9DB;
+	Wed, 21 Aug 2024 15:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUVpGx0P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+wm3+p1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8DF364D6;
-	Wed, 21 Aug 2024 15:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAF113A243
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724255496; cv=none; b=T68qlpp5LuEJLk6qAykbFDJZjV0iG7M63NkZiQivXGY1ki7UUEcrnWa1TAUIgzsL5XHmQja+UjG1rupfUSMb9AwyfRzmegfr4tiB+r6nW/SPr8Z0JHJotZ+14ewzIHQkyYy0NAXLzdB60nom1QaTsoYEbny/QGsyGfMM4+vNaQk=
+	t=1724255557; cv=none; b=B0G4xN29YJwKFIJZi4cHqan/zjdxXTYAvMm4B9zQXUIdnjzEBTIPIMLLbA+j9Ta15K9no/ERJygmg3BXXNnN0Wrtqv5PccptLInAdEUWgay2o00V5BKPxSwjSI12QSywsFpBVnnRsCm/6sLrZwZMtvFRzXvHEDRPvvrHqevUH7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724255496; c=relaxed/simple;
-	bh=LvfsOPV5WTTE/9i+sY57uXAFjDrQxLeMEwlGd8FRtwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CyRgzcZAjQdALBRLs2mybbwi0twUsTl1FmQff1YwAVOaNwDXibhU6teI/EyCeRcskpwRrszgnZww3aAd+T5mgtLcUXkvncsQto/QObCcNN4GrruvPeQowxybR7VYc4VP0vAmEOK50QZyu6TqSXWXsSyidngOKGwiqCxwpKK20dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUVpGx0P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52C9AC32781;
-	Wed, 21 Aug 2024 15:51:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724255496;
-	bh=LvfsOPV5WTTE/9i+sY57uXAFjDrQxLeMEwlGd8FRtwo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XUVpGx0PTpZcfj0k8iP4WRODu2/t5/Trj774++85nyLg4eTeATNjQ9YDXKssM5c6K
-	 ZlACrP2GJsUDbzsg1uATXVdmBZ3bcMg5TS8EFNEn4iM3RbywM0Xb4+9WI5y0LQsZTF
-	 P2m0cSrzlxDKd4NyixaRIlHKC9dmG2UsvG2KeHaKjyEBD3EyUzG2E17nQNGu5qmiwI
-	 zV+M8ILlEb/p9l9EEFz8eeNEnwKVpQcxAPZY7HghxqVdECTA0/viEgxpykZsIJZJQc
-	 9gW61ho5pJl8nJnGgN60j1fGXTRqaM1Dvly05uQIcTf3oTPhKcKaLAe0vg73bvQwI/
-	 a5QaZcZ/02+YA==
-Date: Wed, 21 Aug 2024 16:51:30 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Chad Monroe <chad.monroe@adtran.com>,
-	John Crispin <john@phrozen.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: marvell,aquantia: add
- properties to override MDI_CFG
-Message-ID: <20240821-unbalance-postage-8d232da0ed18@spud>
-References: <5173302f9f1a52d7487e1fb54966673c448d6928.1724244281.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1724255557; c=relaxed/simple;
+	bh=Z2rk8F1sAa4DjsncrsJTX95BsXswhbabq43OrRH6C/8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l4Nh9bCUTxkdkIvbc0RBf62nGgYZHurURyBT91dlFFiP1sZI/VlClpARdjqgwklJ6lx+pXiX2lEpjBxQinF044Y6FQo5dlAfy3kP7xKwTzErqFz680rbu89pjdvaS7WLIHhBGPRR/7W1pGBgZtYLYUu9XXBZ/gHG5GgRYugfT80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k+wm3+p1; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39d4a4e4931so12047095ab.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724255555; x=1724860355; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j+5BMo6/Z/W0oZYh3JtHgFtjCGzZvmSBqYqy2iscuOg=;
+        b=k+wm3+p1flwwYxbLrYVbHDkDqDGCFCrt3mF5i0qHm/RFJGxt0q5+CH8Z30BTV7efth
+         kt0wW52EV0jZ1inhOhv9osmjIN1IoohSRQ9OIxu1NWpqY2j+Pw6KDlPquEKjzJzIyMFH
+         sZwt5lisBtBdeX075PN6wVm7cL6gco0SeRIB7h7WRtMnmNlg9J76xj46Kzqy27usXnfO
+         Q2rnAUao1dnQomdyp4y8ddE0tMnaKDiwqFn4hqR85uLoUB6PM2tYAf1JsDil0lomIQ3P
+         4eo7QvS11TSoJGqJ2+Ea6O6Kd20lK1YoDmEQXyQ5E68z1UKd9b0nGUeLGsatEgsvIucs
+         yHLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724255555; x=1724860355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j+5BMo6/Z/W0oZYh3JtHgFtjCGzZvmSBqYqy2iscuOg=;
+        b=IVOY/tjy2IFW8Br2wV90MInzRDlbkvsX0nUURnClOV0ZL2FKI4yo0EZnqIHWA3o6f9
+         ZnzkxOJQorhuZgtViBAzug0RMPMikh8Q2ejq0upq3DalgqwoINQzfrYIU7q1ZzA/oXuc
+         z9u+EZ4ug2N31idwpXsp342twfAa+ZJMRoma8ym1W/0u/GRaaX+mIhPzP6tBKmhD0s2Q
+         YraIiixt5UiWC/UIvCEOnogOQrLL8/KWO6ufsHRLFeJFOVwh+Ykm7kqo0ATRtN1LDJxy
+         0ol+OW+ut7Wa1hyF8F3SwZlik+8xYr319RBRjNuS0SdudMv8tpExhuCphJFJ0aNpLiwF
+         tGIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUL3/9Un89Wx7lvS2e2ZYND3QlVlfIiA3pdyZXMEmejvJGN4QFab3s+OI5E3N0//L5w01xlpMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7Du0xQNn+W52JRo63mu/BDRo9WR1oeYpbaQHp9I6/nUQtu2zM
+	zX8H663bfnXZ0/Xk4XRBgmgp9Jfj1IFLz24zmPVL+D3dgGgEDuicTCEmBCRYmk110g8JVMIYWl6
+	G40K+ilbJtckrB0RGbUL344clDLE=
+X-Google-Smtp-Source: AGHT+IGUJKeDwysRebWT93N4EdUKB/8NepKXfmay1fsMC0XfdcFuE6KZyD/zbEQaB3BbZXiyyRyffg9PXMSRtKZeHXY=
+X-Received: by 2002:a05:6e02:17c9:b0:39d:1a7d:71ea with SMTP id
+ e9e14a558f8ab-39d6c3b975amr30266635ab.19.1724255555202; Wed, 21 Aug 2024
+ 08:52:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XauK46RmXEaQfOa2"
-Content-Disposition: inline
-In-Reply-To: <5173302f9f1a52d7487e1fb54966673c448d6928.1724244281.git.daniel@makrotopia.org>
-
-
---XauK46RmXEaQfOa2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240821153325.3204-1-kerneljasonxing@gmail.com> <CANn89iKovApWCsnFWAVTywCmWH9bFfBRCvc75+b_tjASj22SJQ@mail.gmail.com>
+In-Reply-To: <CANn89iKovApWCsnFWAVTywCmWH9bFfBRCvc75+b_tjASj22SJQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 21 Aug 2024 23:51:59 +0800
+Message-ID: <CAL+tcoCgnjp-iSjpk6ow1TFByKg0YPL+OpphD6aCdOAb826mbA@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
+ find port in connect() process
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Jade Dong <jadedong@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 21, 2024 at 01:46:30PM +0100, Daniel Golle wrote:
-> Usually the MDI pair order reversal configuration is defined by
-> bootstrap pin MDI_CFG. Some designs, however, require overriding the MDI
-> pair order and force either normal or reverse order.
+On Wed, Aug 21, 2024 at 11:47=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Wed, Aug 21, 2024 at 5:33=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > We found that one close-wait socket was reset by the other side
+> > due to a new connection reusing the same port which is beyond our
+> > expectation, so we have to investigate the underlying reason.
+> >
+> > The following experiment is conducted in the test environment. We
+> > limit the port range from 40000 to 40010 and delay the time to close()
+> > after receiving a fin from the active close side, which can help us
+> > easily reproduce like what happened in production.
+> >
+> > Here are three connections captured by tcpdump:
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
+> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
+> > // a few seconds later, within 60 seconds
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
+> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
+> > // later, very quickly
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
+> > 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
+> > 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+> >
+> > As we can see, the first flow is reset because:
+> > 1) client starts a new connection, I mean, the second one
+> > 2) client tries to find a suitable port which is a timewait socket
+> >    (its state is timewait, substate is fin_wait2)
+> > 3) client occupies that timewait port to send a SYN
+> > 4) server finds a corresponding close-wait socket in ehash table,
+> >    then replies with a challenge ack
+> > 5) client sends an RST to terminate this old close-wait socket.
+> >
+> > I don't think the port selection algo can choose a FIN_WAIT2 socket
+> > when we turn on tcp_tw_reuse because on the server side there
+> > remain unread data. In some cases, if one side haven't call close() yet=
+,
+> > we should not consider it as expendable and treat it at will.
+> >
+> > Even though, sometimes, the server isn't able to call close() as soon
+> > as possible like what we expect, it can not be terminated easily,
+> > especially due to a second unrelated connection happening.
+> >
+> > After this patch, we can see the expected failure if we start a
+> > connection when all the ports are occupied in fin_wait2 state:
+> > "Ncat: Cannot assign requested address."
+> >
+> > Reported-by: Jade Dong <jadedong@tencent.com>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > v3
+> > Link: https://lore.kernel.org/all/20240815113745.6668-1-kerneljasonxing=
+@gmail.com/
+> > 1. take the ipv6 case into consideration. (Eric)
+> >
+> > v2
+> > Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxin=
+g@gmail.com/
+> > 1. change from fin_wait2 to timewait test statement, no functional
+> > change (Kuniyuki)
+> > ---
+> >  net/ipv4/tcp_ipv4.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > index fd17f25ff288..b37c70d292bc 100644
+> > --- a/net/ipv4/tcp_ipv4.c
+> > +++ b/net/ipv4/tcp_ipv4.c
+> > @@ -144,6 +144,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *s=
+ktw, void *twp)
+> >                         reuse =3D 0;
+> >         }
+> >
+> > +       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
+> > +               reuse =3D 0;
+> > +
+>
+> sysctl_tcp_tw_reuse default value being 2, I would suggest doing this
+> test earlier,
+> to avoid unneeded work.
 
-Is that a PC way of saying that someone messed up and wired the pins
-incorrectly? A concrete example of why this is required would be good ;)
-
->=20
-> Add properties 'marvell,force-mdi-order-normal' and
-> 'marvell,force-mdi-order-reverse' for that purpose.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../devicetree/bindings/net/marvell,aquantia.yaml      | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml =
-b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-> index 9854fab4c4db0..c82d0be48741d 100644
-> --- a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-> +++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-> @@ -48,6 +48,16 @@ properties:
->    firmware-name:
->      description: specify the name of PHY firmware to load
-> =20
-> +  marvell,force-mdi-order-normal:
-> +    type: boolean
-> +    description:
-> +      force normal order of MDI pairs, overriding MDI_CFG bootstrap pin.
-> +
-> +  marvell,force-mdi-order-reverse:
-> +    type: boolean
-> +    description:
-> +      force reverse order of MDI pairs, overriding MDI_CFG bootstrap pin.
-
-These properties are mutually exclusive, right? If so, the binding
-should enforce that.
+Thanks. I should have thought of that. I will submit it ~24 hours later.
 
 Thanks,
-Conor.
+Jason
 
+>
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index c2860480099f216d69fc570efdb991d2304be785..9af18d0293cd6655faf4eeb60=
+ff3d41ce94ae843
+> 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -118,6 +118,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock
+> *sktw, void *twp)
+>         struct tcp_sock *tp =3D tcp_sk(sk);
+>         int ts_recent_stamp;
+>
+> +       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
+> +               reuse =3D 0;
 > +
->    nvmem-cells:
->      description: phandle to the firmware nvmem cell
->      maxItems: 1
-> --=20
-> 2.46.0
-
---XauK46RmXEaQfOa2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZsYNAgAKCRB4tDGHoIJi
-0uv4AP4sDFx+0OHGsYIGxFsOqVNv+LbfrlrzN534UARau8+OvwEA8P7JcMGBXVXP
-EWBoanCGKqZLwKAWVd/rnpU+b5c7WAk=
-=rFet
------END PGP SIGNATURE-----
-
---XauK46RmXEaQfOa2--
+>         if (reuse =3D=3D 2) {
+>                 /* Still does not detect *everything* that goes through
+>                  * lo, since we require a loopback src or dst address
 
