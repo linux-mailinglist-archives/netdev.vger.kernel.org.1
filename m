@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-120502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E48959A02
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:32:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 425F6959A03
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31A1EB24508
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B93281E45
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69361188A3A;
-	Wed, 21 Aug 2024 10:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4301918E34B;
+	Wed, 21 Aug 2024 10:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaxGXfLv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BHUROTqt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CC115FA92
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2A815FA92
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724237414; cv=none; b=EOOXsNki7HQWiNMaUV0lBgZDH5lWjA2qfi18WbdNIt5iq7l2824GBHj7KsTcsrP98Ow3OvD41iEGiuaMVFQzzwJHrlQ3jTCoA5ahrhbRijPVIvNVH7dCEfpfEHKVaG/W/r+v4Me+gXsmYYAY6NIrDtyAkid8nlL11uNBePcYark=
+	t=1724237419; cv=none; b=qYc8/U4GwFGOMACTClVWca2iipyfbUZY9fGHdRid8hh1Px1f40GR5xtzZ+YZrgYuG8xhwjLpI1CBWVoFE12RTMW9GJPLpVB7AkbX+E6QggUD0j69d5K7Sa4/BI69vTKf7dK4t25z/F/bJHmPD8k2MlYLAJNgPMts6rfqrJfRTD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724237414; c=relaxed/simple;
-	bh=8A/yDlYUuLem+jt0fQ7OOU1ocp5mmvbf7igItTc6j1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d6rkW6Qb3zHHwYefQtKhgcUR6HAxTqj4NqzaDLJ+wGrN+77oSebwZqXL2uFgpyvBTsB6wKRanurY4kJ2W9wfJGQoA+JMlS5N4/S9QlnSFLD2WdBk8BU9ww58sNgG116e70nXDNdXlm08Y+/BUfaVyWnhT3+clJ2lPPMn6ylAoCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VaxGXfLv; arc=none smtp.client-ip=209.85.160.41
+	s=arc-20240116; t=1724237419; c=relaxed/simple;
+	bh=Zq+0/3Gr2e57AJZa0AMF5OcxcxRIYB7VnkX/NnfF42c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gpPefo6wWTp2zIPbr8mwcp7rV4o7IDxVr2g8fynjTWAjuOS/GSmDCDLUn5tqEh6ow9b6FADqmPeItag5Lm3bs/eC+iFoz2ohwevr8NNPZoh8brUwTMwbtqMDPz0BozR9cyDE6datCT3yLvJavPNsGgFrTMI+WhhgljaeBnQgFCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BHUROTqt; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-27020fca39aso3815465fac.0
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 03:50:12 -0700 (PDT)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7093d565310so4876850a34.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 03:50:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724237412; x=1724842212; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ZNcml2j6cMLK8UYTALoSOK/S3cE3NXupQBO9ck/clk=;
-        b=VaxGXfLvacJwz5xmmyCRuRsfO+97Pc++62Mrp4czY6EnbIfnwrEZAVisG1eBjdTp+N
-         UJWmMOQUQd6HCABnj6eWNlvtYfEHSb0iprQg2+GhQr0blN/k1OR3YQ0TU8e/9Mgh9Ll1
-         Lf7d6yWmogqttPuh0KIUsj6UYj5DJoPzd9IJnx7Blq+zzeIOj5JHohULkYU2ptoV1IU7
-         2nEZB3cqfpJUW9KpDZ/vDl0xWUf6vw8yEv2ZYEyrw6WPT2v3fHUH6ZgqObgUxIXI3Kix
-         L3DFiKOpaotpDBPX8I5uVJbpqh7TtLnayg50jFmDeV5uUu1ZoaRVMc6JBcTovd51Wg6a
-         baUw==
+        d=gmail.com; s=20230601; t=1724237416; x=1724842216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5gCfqc2cR0PpKpPsbaJjvf5TzqEN3O3X8g14GOIR6FQ=;
+        b=BHUROTqt0CSFzvBQkV6V0m1k+F2ZlRJU5+cNlZ7ASg9ED5TyQjWUupTyzQK1MlcHJ+
+         EnVN8eBdRePOQjVfoEVcdsJlKVovDWAzSq3yq+v0yrTPUAQjTcXf9dA1mrq9G7OBKdZa
+         bDCVd8qiXpvQDWuSdd9yQXMm+N1pELvq+BmbyPnZO+oXLbfyirdW1QpG7ywy+4+Q57ip
+         4FWofW8IixXdK4BklIoFxnIM8Q1WLszmrcSokKXIXY6UdYAl1lVfUqn1pZheFRol9tTN
+         GWbc6hgB+PjNtKvYzCpLeDOg6V26oerGR+O2ErV3/SaoLcYD/z/M2AG80kC+G6w+zrRJ
+         MLVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724237412; x=1724842212;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ZNcml2j6cMLK8UYTALoSOK/S3cE3NXupQBO9ck/clk=;
-        b=FTxtmekGHAZbu03luiHayJ/QHSTPQx1ALnrhQVM6mqsdsVkchDQYzvdCkrDkj+Sfc2
-         N6RPgmwu9qeVRJ+VuVcP50Cz3WAy+6YOU1LDdwbzn7JoPCfxi9uKK8Z0XndOlxmQ7l4A
-         eW0xLS49vziq4VsvOWVCx0VmpfFSB7qZftam7SN2DxhgO8k/ACjv6wgQPSL3RJwwx1l6
-         UFub4gvK4yw+hddAj/CJ9bJ7purGWIbcSTSfWlLt/MP6kwDPxwUuuOZcR9iflVQk4W2x
-         U+WANUJ7GXK/zhF7/rrtTTm4CIPhdZOmqNF4lTWT8AUdHO6tcIEfjw/QancYypDbgFKB
-         cOfw==
-X-Gm-Message-State: AOJu0YxILzeLN3hvGTGbJnud+FmxV9Q8leJDxbxXc89rMMKGsMuP+3k6
-	kSh7JOQjkkeqAclA0taELXx2I8ljyqLD+3Y2Ayl81t0RZIHfAfGF29Li7kdGyoA=
-X-Google-Smtp-Source: AGHT+IHnIpDNm32KNpeHiLtPi8l7iYiNu54tWwfyhu4u3ejNEpg4rd/gpHWN0wwi6VnZLlO6zFMS3Q==
-X-Received: by 2002:a05:6870:b294:b0:251:2755:5a33 with SMTP id 586e51a60fabf-2738be2f33dmr1800668fac.39.1724237411524;
-        Wed, 21 Aug 2024 03:50:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724237416; x=1724842216;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5gCfqc2cR0PpKpPsbaJjvf5TzqEN3O3X8g14GOIR6FQ=;
+        b=NCUT830MikaFCXXN1o6XuBf09xG+X6AGodJg3rhIdz/TQJA7JOozFsaheXWi53URQf
+         u357VeJON+xqF2/QlUQ/P0ZD+3Cv322bO4N9YZcJRaN6ddYiDoI2kK9IqY9Ln54qRltP
+         /ARXKg3LqlcUxtsPUBoIplMegsia1AHrcYniyHn++Wx2hdwcx0g+HEIsPcayRWknJeaB
+         fulJ4PEWGC3CEd7o1ylnzo5mBPo3iFG0k9hZb/uSkCfzZHnMYRiUqN76uGO1vMcdEx2B
+         cDwkLCDcw+Iqk1kKuLG1CwtXprjKgPabceVaMu4VmY/Xa0ErJFyEFKso/RDxkYpNQYxB
+         tW8g==
+X-Gm-Message-State: AOJu0YwVzklDxcsAIOitn5ElYUFQIEDljU4Fmw7WBgB6DcvsR3j8UIQj
+	6hQhDvDMLjYNCCdBKzjF5lK8da/gXdXgHBE1/GICkAqIVnHEWG2UTtrMwG5JeJU=
+X-Google-Smtp-Source: AGHT+IEHhImaH/xn4Kfl/bEXPeBSR9N8v+DAhgGVwWA+IsdFL4OIoZEiF/AxiKDchr9nV0cEBxJ4EA==
+X-Received: by 2002:a05:6870:2116:b0:264:9161:82e9 with SMTP id 586e51a60fabf-2738be910acmr1621666fac.41.1724237416188;
+        Wed, 21 Aug 2024 03:50:16 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127add6db6sm9652521b3a.20.2024.08.21.03.50.07
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127add6db6sm9652521b3a.20.2024.08.21.03.50.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 03:50:11 -0700 (PDT)
+        Wed, 21 Aug 2024 03:50:15 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -78,10 +80,12 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net-next 0/3] Bonding: support new xfrm state offload functions
-Date: Wed, 21 Aug 2024 18:50:00 +0800
-Message-ID: <20240821105003.547460-1-liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 1/3] bonding: add common function to check ipsec device
+Date: Wed, 21 Aug 2024 18:50:01 +0800
+Message-ID: <20240821105003.547460-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240821105003.547460-1-liuhangbin@gmail.com>
+References: <20240821105003.547460-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,27 +94,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add 2 new xfrm state offload functions xdo_dev_state_advance_esn and
-xdo_dev_state_update_stats for bonding. The xdo_dev_state_free will be
-added by Jianbo's patchset [1]. I will add the bonding xfrm policy offload
-in future.
+This patch adds a common function to check the status of IPSec devices.
+This function will be useful for future implementations, such as IPSec ESN
+and state offload callbacks.
 
-v4: Ratelimit pr_warn (Sabrina Dubroca)
-v3: Re-format bond_ipsec_dev, use slave_warn instead of WARN_ON (Nikolay Aleksandrov)
-    Fix bond_ipsec_dev defination, add *. (Simon Horman, kernel test robot)
-    Fix "real" typo (kernel test robot)
-v2: Add a function to process the common device checking (Nikolay Aleksandrov)
-    Remove unused variable (Simon Horman)
-v1: lore.kernel.org/netdev/20240816035518.203704-1-liuhangbin@gmail.com
+Suggested-by: Nikolay Aleksandrov <razor@blackwall.org>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ drivers/net/bonding/bond_main.c | 47 ++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 13 deletions(-)
 
-Hangbin Liu (3):
-  bonding: add common function to check ipsec device
-  bonding: Add ESN support to IPSec HW offload
-  bonding: support xfrm state update
-
- drivers/net/bonding/bond_main.c | 97 ++++++++++++++++++++++++++++-----
- 1 file changed, 84 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index f9633a6f8571..fe10ac66f26e 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -418,6 +418,38 @@ static int bond_vlan_rx_kill_vid(struct net_device *bond_dev,
+ /*---------------------------------- XFRM -----------------------------------*/
+ 
+ #ifdef CONFIG_XFRM_OFFLOAD
++/**
++ * bond_ipsec_dev - return the device for ipsec offload, or NULL if not exist
++ *                  caller must hold rcu_read_lock.
++ * @xs: pointer to transformer state struct
++ **/
++static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
++{
++	struct net_device *bond_dev = xs->xso.dev;
++	struct bonding *bond;
++	struct slave *slave;
++
++	if (!bond_dev)
++		return NULL;
++
++	bond = netdev_priv(bond_dev);
++	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
++		return NULL;
++
++	slave = rcu_dereference(bond->curr_active_slave);
++	if (!slave)
++		return NULL;
++
++	if (!xs->xso.real_dev)
++		return NULL;
++
++	if (xs->xso.real_dev != slave->dev)
++		pr_warn_ratelimited("%s: (slave %s): not same with IPsec offload real dev %s\n",
++				    bond_dev->name, slave->dev->name, xs->xso.real_dev->name);
++
++	return slave->dev;
++}
++
+ /**
+  * bond_ipsec_add_sa - program device with a security association
+  * @xs: pointer to transformer state struct
+@@ -595,23 +627,12 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+  **/
+ static bool bond_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
+ {
+-	struct net_device *bond_dev = xs->xso.dev;
+ 	struct net_device *real_dev;
+-	struct slave *curr_active;
+-	struct bonding *bond;
+ 	int err;
+ 
+-	bond = netdev_priv(bond_dev);
+ 	rcu_read_lock();
+-	curr_active = rcu_dereference(bond->curr_active_slave);
+-	real_dev = curr_active->dev;
+-
+-	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP) {
+-		err = false;
+-		goto out;
+-	}
+-
+-	if (!xs->xso.real_dev) {
++	real_dev = bond_ipsec_dev(xs);
++	if (!real_dev) {
+ 		err = false;
+ 		goto out;
+ 	}
 -- 
 2.45.0
 
