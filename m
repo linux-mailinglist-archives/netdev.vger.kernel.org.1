@@ -1,96 +1,87 @@
-Return-Path: <netdev+bounces-120392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0186C9591EE
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:40:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB299591F9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC9821F235FB
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 00:40:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42C3FB20D62
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 00:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BC91758F;
-	Wed, 21 Aug 2024 00:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2863318E2A;
+	Wed, 21 Aug 2024 00:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="krJzJmzF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQYbwm9/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99637482;
-	Wed, 21 Aug 2024 00:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014DBC8DF
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 00:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724200832; cv=none; b=ntwX+xm3uzVBkJWa7T268Xx4vg2+oBTb3fCkfFCIKHFGIqZFZuiz6K3NrahlGwP2r3hKoy+1el20vR4J3zpwu6/65he9dxNDo3kAbaT/udSmorJTlhht6kBaK7U6JyqyKHNgUlvFH1nxZWR/qjsAQjlsMTqBELcXkfklzcnFkMk=
+	t=1724201741; cv=none; b=QEsaKgPpNYpmIVuszPiI1SvHMhAGYlSDCpqjdRMxEB6xrqDlzRak19zPjxf8z3QqKvdlCoKEbCmK4xrY89bUc68gMRi+8pSLlJaPy2092rmyTgeRlg7Y/6WUbmSv1yNaoBQYqKmu9qj39BL4iHRHltU3cTaEFMDSZuO1AcFwsMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724200832; c=relaxed/simple;
-	bh=Gjz1hlAA+B/3AVszMI2pyR5RCXsyw2opJkBuoUJlKSs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y2idfSMIW1xC5h2QX8wsIkXhqStBBMYsxJbCJv5lc5eRFHtJnPlBBysGBqf+/A+LJA4HrN+Y5IsaE4tUeCtDFDR+7uMunsYiAQ8KO0+HG4w61d8rh/Es7e/Z3y1N39jfEg/2R+qiyxmXlcKZhewPfkeWm4cRKLCWuvbLrknAoCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=krJzJmzF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38BB6C4AF0B;
-	Wed, 21 Aug 2024 00:40:32 +0000 (UTC)
+	s=arc-20240116; t=1724201741; c=relaxed/simple;
+	bh=RruTJLnnwoas/6fTfRTK9701zQy9kxWvpxCazOc+UiM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XxH3Tk8c+loE0ZI3BB87nckhBS0EW73kAYvXWreMm+zWHomJYTDl6HHdXUTB2zJKIdxgvN2SV/0p2Zhs4p89JUM2iLqGBsU1BfcaNyfklAQuvQkRvPdEWjWl5qEyYKpcVcphW5txkrAo3tH3Fc61q/g/QRoq6zCJowJTq++E13k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQYbwm9/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2579DC4AF09;
+	Wed, 21 Aug 2024 00:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724200832;
-	bh=Gjz1hlAA+B/3AVszMI2pyR5RCXsyw2opJkBuoUJlKSs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=krJzJmzFo2UrOxhMP8hu22I3Wu1UXWZMpfs+GHQU63l67hXZznIWJwQhKGfuGP9UD
-	 bwl1KpRr8ft8K8TIG3ngS9LhDG0P60kdRn1OQHyQ00yerfYHk5XqMdnkOYy6Y1b5G/
-	 2xa8aKlg9St8KIL6Vjll1aXFJdibWUiz4j3KIroGmZwLlfcimN1Rp8jhS7EPC3YGyM
-	 ouCvFJ5DX73CSlb4WlEnqAgq4kW8JiMse92DzXuvIZ6ZqVHOwJf7Z30z5ns+hesSn+
-	 C2NQvEx2ZzR3s28YOXmbATBsqmw5qxlFLFxUFMMczz4LLhoB90yZRAPqBAIXWigZLR
-	 65SmTZegqW5ww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFB33804CB5;
-	Wed, 21 Aug 2024 00:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1724201740;
+	bh=RruTJLnnwoas/6fTfRTK9701zQy9kxWvpxCazOc+UiM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CQYbwm9/ho53Nr2AlZ5FFkhaI2kHyCE4sReC5NOwFUF+TzcPHQ0098K+4kdE9EJ8h
+	 /c6OAsasNxMIvCYxxzqEHCgflqbFDuef6kAAUZ6cEQfBSouUstEOExZrf0LMXiCYDb
+	 tgJcDInqMk6ueJu+3Do9QnVCcc75USg1SB3DMBx9VUKJQ/C0BN/iwG+bZhvItGG0QK
+	 am4gGsjyVwZbZajh5GOqB/IjkwhQsJriaQNdN2tL4cOZVqLnTGj9D9P5QcWIxwJVVr
+	 Ci+ZMiTV/pc+NcO6ZQcRjJCowoZUFrwOmKGpSaYoWG0tl8PaIW3xTJEJo81u8ZeX2h
+	 OktVlCH+uazZA==
+Date: Tue, 20 Aug 2024 17:55:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ przemyslaw.kitszel@intel.com, joshua.a.hay@intel.com,
+ michal.kubiak@intel.com, nex.sw.ncis.osdt.itp.upstreaming@intel.com, "Jose
+ E . Marchesi" <jose.marchesi@oracle.com>
+Subject: Re: [PATCH net-next v2 1/9] unroll: add generic loop unroll helpers
+Message-ID: <20240820175539.6b1cec2b@kernel.org>
+In-Reply-To: <20240819223442.48013-2-anthony.l.nguyen@intel.com>
+References: <20240819223442.48013-1-anthony.l.nguyen@intel.com>
+	<20240819223442.48013-2-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] netem: fix return value if duplicate enqueue fails
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172420083178.1283142.17547445579493801272.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Aug 2024 00:40:31 +0000
-References: <20240819175753.5151-1-stephen@networkplumber.org>
-In-Reply-To: <20240819175753.5151-1-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, markovicbudimir@gmail.com, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, lansheng@huawei.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 19 Aug 2024 10:56:45 -0700 you wrote:
-> There is a bug in netem_enqueue() introduced by
-> commit 5845f706388a ("net: netem: fix skb length BUG_ON in __skb_to_sgvec")
-> that can lead to a use-after-free.
+On Mon, 19 Aug 2024 15:34:33 -0700 Tony Nguyen wrote:
+> There are cases when we need to explicitly unroll loops. For example,
+> cache operations, filling DMA descriptors on very high speeds etc.
+> Add compiler-specific attribute macros to give the compiler a hint
+> that we'd like to unroll a loop.
+> Example usage:
 > 
-> This commit made netem_enqueue() always return NET_XMIT_SUCCESS
-> when a packet is duplicated, which can cause the parent qdisc's q.qlen to be
-> mistakenly incremented. When this happens qlen_notify() may be skipped on the
-> parent during destruction, leaving a dangling pointer for some classful qdiscs
-> like DRR.
+>  #define UNROLL_BATCH 8
 > 
-> [...]
+> 	unrolled_count(UNROLL_BATCH)
+> 	for (u32 i = 0; i < UNROLL_BATCH; i++)
+> 		op(priv, i);
+> 
+> Note that sometimes the compilers won't unroll loops if they think this
+> would have worse optimization and perf than without unrolling, and that
+> unroll attributes are available only starting GCC 8. For older compiler
+> versions, no hints/attributes will be applied.
+> For better unrolling/parallelization, don't have any variables that
+> interfere between iterations except for the iterator itself.
 
-Here is the summary with links:
-  - netem: fix return value if duplicate enqueue fails
-    https://git.kernel.org/netdev/net/c/c07ff8592d57
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please run the submissions thru get_maintainers
 
