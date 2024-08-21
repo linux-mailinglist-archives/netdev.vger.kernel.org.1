@@ -1,108 +1,142 @@
-Return-Path: <netdev+bounces-120453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42AC9596B6
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:40:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6D09596C2
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF122283C77
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 08:40:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14ED8B20F62
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 08:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3424F1B81C9;
-	Wed, 21 Aug 2024 08:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32E01A4B98;
+	Wed, 21 Aug 2024 08:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBacKJXY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AC3e5rfE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCF41B81B5
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4305158D8F;
+	Wed, 21 Aug 2024 08:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724227829; cv=none; b=ZI3LUknNBOzbK0iqWYBK8gMDSKmS19NqOkjNBGV08ab2dAwKDT6pmXdGK1h0X9lfcMQDTLXx+J3Xcllv3zvPoyuwJzCqZWG1iurQqyV+BPazq5Myc37m2MFnjfhr98ZKJ1xhu3LAFrlc+qV7Leuu3bpMEpAlE84DAMqFj7FHZyY=
+	t=1724228101; cv=none; b=aHL1FI7RMayoTO0CM/3SyITYFOCjpDPYHo/oDHsTOtF+Axgxfq8fmLV+O8MdK4m1o9iZC/9RIb6SW2AqEWjU6mcGBGR7MtdRXMUIyaf3aDl1PAxe/bazrfpwgWZ65447mjq7gFfDgsdwQ+lSxmicAFn+XdtlDmQCZCLcmSsGCb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724227829; c=relaxed/simple;
-	bh=ivvgB0cUn8JdRpMYm+PJMRBdz3lefpAdaf3PnAKhIUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=matK4QIm8xM/1Cj1xv6mUggx07wiYFGoj7zMo1aQhHknC+Hgm5v/sQG5sm/0fr+e2IRHF5ouJVTr2134ycrbB4jsAPX4ct1HBRHe6VDox0FpammDqFQ0M4YR0Oh1QMXBSROICjUfie7ewilBwxmRwac4U9UE+aOfwoV+FxN0cZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OBacKJXY; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724227827; x=1755763827;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ivvgB0cUn8JdRpMYm+PJMRBdz3lefpAdaf3PnAKhIUs=;
-  b=OBacKJXYuNsPWYjo1IYQOsE9vvOCfBbe5eGmfb45NlByfrl14zOWbBLI
-   WTxSV+tJgC/7npTvuTRFCeg+nlp6ZS3Eshf64W/nucuTsChIew3Fpo5aY
-   QTV+qEZkciXIhutyv9h8zqIHHg/3+FL2aL+r4wuM9R6zar6H5YXx4vxa1
-   L2LDNV1CFTw6FeW2E1tWwb600WEbPiIUHFoZnVJ82hhvBIL8kKkgbeeVW
-   w6giil8hSFHVtfEZ702GI3LT1eACXaAynYnE1DZmVq7gOThqFH+EJNQnH
-   rtXrZKSkEA10zxwLMVV4WBZHCKxdK3jWXaif5EPC6IfCMqDGF7xqgO51+
-   w==;
-X-CSE-ConnectionGUID: 7VWBbzYvTAupoNxBlpJGIA==
-X-CSE-MsgGUID: ZPvxx1LYQYWwi0kLbn8x5g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="33233751"
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="33233751"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 01:10:26 -0700
-X-CSE-ConnectionGUID: 6cieWzGsQGKcvRqJz0aKWA==
-X-CSE-MsgGUID: GxR05bmhT1CNDvyRB5Pb7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="61545390"
-Received: from dosuchow-mobl2.ger.corp.intel.com (HELO [10.246.27.111]) ([10.246.27.111])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 01:10:25 -0700
-Message-ID: <25c69f6d-bd04-429e-a1d5-c6985b6555bf@linux.intel.com>
-Date: Wed, 21 Aug 2024 10:10:21 +0200
+	s=arc-20240116; t=1724228101; c=relaxed/simple;
+	bh=kMSf+iw07WfE6MO+gcL/KBxzg692lQ/LMRuhXYnUPvI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jgXCERYVKkoUFcqD+IlmR+babFqBfNszsxeYMjsr411GByrFlQpRSt+2gGHdc087ePkHWM1lhy+J8xVqSocMgYGOo+vTe2o9lkvJLjZ+1KOiSB6VRvjmqKfQLAhnApgphGM1xCdmRJ/7kx78qsCXPYzYg7x5kIUNC72Ph2JTNNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AC3e5rfE; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7a94478a4eso93314966b.1;
+        Wed, 21 Aug 2024 01:14:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724228098; x=1724832898; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4/bwSEYo5Qt1Y4vdeeF4jF0uVtsiIk4nNlCmcuIeMvU=;
+        b=AC3e5rfEQLUn65M6ZGm2EryJ2KYDXhPFMNIFe+xVRwBFuFoimuFuDIqy509XPMt9wG
+         V0DsGksVapuLHQUdRoFSsVlb9oWg3+M8XSCVteWYnxKmm3BpR1qM2ugqZqqW4mWLJB6U
+         LfoY61P4O5LO+SeOvL+y/paeBC/2ipvH/srC6pqJgtX7KEuyncrfwrE8OyEPXcYlkj02
+         yaudSOy0izTjPuoaeogpg0ndk0ERLUhVTcW9ISsyQOQ+NT9l/B31XGA3eyyicYFwyjpM
+         b2ovZKkfAXKwoG7483EhJcppuProVjHxH8zBBXNG87Dvf/yYhwFeLrT/T/pZSmNauPSj
+         uqzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724228098; x=1724832898;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4/bwSEYo5Qt1Y4vdeeF4jF0uVtsiIk4nNlCmcuIeMvU=;
+        b=KD+em2ugLrirnG+jRh6bLCs+btGV3s27HolLa1xcznOLHLl8gJVhkTaQoxn/RCR8Ld
+         ng5JoyncSH2O7Y2+ApPT4PzDGsoSG0uWzhSTy7ryUO1wC0CO4eflnYjoLUfGEDwUp2A6
+         FlVPUx6rTaABwepqdcPAcmJkhZ8Wvvf98EQdJVRb2KGk9EidsQC9ZIWcLZu+czkx4NgA
+         xgMJ3tTiSspWxwCkvTiD0T1Sars1cTIbqvz7ZPQ0f3ugOh/DECBOkhH5eRhVocthqd89
+         hKgedLZePjwb7kurZxte2/uleVEMMFOZCYbD/hj+BceSbmtE+2aVvwYVa6FHTra7jR3+
+         z0dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6gD27JQqxwo3CTjWK28o07NCw1mdkRl0PwkKsXrA82mfNaVs02xon8V3GagtFRTaflhNQ9mLqDBh62u9f@vger.kernel.org, AJvYcCWUcBPFEsjacyDg/alxpR4zU2cbd31wiRM0hhcKHUyBy+7LVNr6amnob+MESCYgVwdLcgNzHHl3MS0Q2g==@vger.kernel.org, AJvYcCXX8KKOgoI8GwQw7peoz9ol25OctcGkA1YsYnTkcjy8QGkDkGwLnb1ptBab8sLNXKnsNor87jBP3vTaIw==@vger.kernel.org, AJvYcCXl1WScUAYKf22T7KEv2BYvso+DhAiXFB0tsV4eCvcNhwFsFB+vuW4OZgXddh7763oh9HM6e2esMh2Thw==@vger.kernel.org, AJvYcCXlJEGbV3JhrVPCtAIJGlKs7WuJlu0HBb/oMlxOdlkkwHhrDywfVi1ZGKctlhAA78XrkN1sLxz33JNP@vger.kernel.org, AJvYcCXpsqQ5dvS2owwdirDxocrzSDsoYKu1V5ZUj/SfjWDbIJWyKbYmVS+0wBg4BuMY9vUr5ITPbBlc@vger.kernel.org, AJvYcCXxvYXXjzjq8COzHyxdYKw/1+wKI72IxBAipK1OKb6siW8bPcazaNo+btvBej4HmzApRcweNK5kzPsU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpemufWcEfdBr+BwsOotEbOXif5/KEv5FBekKOt8/N7nxEAXP5
+	WVAtNcQVqihGDdWnVCjw/juIiSYeV2CaLNTTcWXfRJyFOXK8ctl9QCLQ0kMlEfu9m0nSbgiNDk3
+	8iV1vxwo723S9X8nrrsXIZN8mzdg=
+X-Google-Smtp-Source: AGHT+IHXeDFRnTQE0pLZlEZNONDmr3JlN5sqQBHhtFZ2nKA4GnNGhGlYKiud1j1pywVXDIqvTC/jKaVR2p6DxNez5+c=
+X-Received: by 2002:a17:907:1b1e:b0:a80:f616:5cf9 with SMTP id
+ a640c23a62f3a-a866fbfda68mr155136066b.0.1724228097818; Wed, 21 Aug 2024
+ 01:14:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v4] ice: Add netif_device_attach/detach into PF
- reset flow
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- larysa.zaremba@intel.com, kalesh-anakkur.purayil@broadcom.com,
- Jakub Kicinski <kuba@kernel.org>, Igor Bagnucki <igor.bagnucki@intel.com>
-References: <20240820161524.108578-1-dawid.osuchowski@linux.intel.com>
- <ZsWHsaUbYo9Qb6v2@boxer>
-Content-Language: pl
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <ZsWHsaUbYo9Qb6v2@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240821071842.8591-2-pstanner@redhat.com> <20240821071842.8591-8-pstanner@redhat.com>
+In-Reply-To: <20240821071842.8591-8-pstanner@redhat.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 21 Aug 2024 11:14:21 +0300
+Message-ID: <CAHp75VduuT=VLtXS+zha4ZNe3ZvBV-jgZpn2oP4WkzDdt6Pnog@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] ethernet: stmicro: Simplify PCI devres usage
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, 
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, 
+	Andy Shevchenko <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	David Lechner <dlechner@baylibre.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21.08.2024 08:22, Maciej Fijalkowski wrote:
-> On Tue, Aug 20, 2024 at 06:15:24PM +0200, Dawid Osuchowski wrote:
->> @@ -7591,6 +7594,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
->>   {
->>   	struct device *dev = ice_pf_to_dev(pf);
->>   	struct ice_hw *hw = &pf->hw;
->> +	struct ice_vsi *vsi = ice_get_main_vsi(pf);
-> 
-> we have an unwritten rule that is called 'reverse christmas tree' which
-> requires us to have declarations of variables sorted from longest to
-> shortest.
-> 
-> 	struct ice_vsi *vsi = ice_get_main_vsi(pf);
-> 	struct device *dev = ice_pf_to_dev(pf);
-> 	struct ice_hw *hw = &pf->hw;
-> 	bool dvm;
-> 	int err;
+On Wed, Aug 21, 2024 at 10:19=E2=80=AFAM Philipp Stanner <pstanner@redhat.c=
+om> wrote:
 >
+> stmicro uses PCI devres in the wrong way. Resources requested
+> through pcim_* functions don't need to be cleaned up manually in the
+> remove() callback or in the error unwind path of a probe() function.
 
-My apologies, I was not aware of that unwritten rule. Will fix in next 
-revision, thanks. Other than that, does the rest of the changes look 
-okay to you?
+> Moreover, there is an unnecessary loop which only requests and ioremaps
+> BAR 0, but iterates over all BARs nevertheless.
 
---Dawid
+Seems like loongson was cargo-culted a lot without a clear
+understanding of this code in the main driver...
+
+> Furthermore, pcim_iomap_regions() and pcim_iomap_table() have been
+> deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+>
+> Replace these functions with pcim_iomap_region().
+>
+> Remove the unnecessary manual pcim_* cleanup calls.
+>
+> Remove the unnecessary loop over all BARs.
+
+...
+
+> -       for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
+> -               if (pci_resource_len(pdev, i) =3D=3D 0)
+> -                       continue;
+> -               pcim_iounmap_regions(pdev, BIT(i));
+
+Here is the BARx, which contradicts the probe :-)
+
+> -               break;
+> -       }
+
+--=20
+With Best Regards,
+Andy Shevchenko
 
