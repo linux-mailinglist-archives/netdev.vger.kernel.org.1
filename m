@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-120626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC6795A068
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:51:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DCCD95A075
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A7F28574B
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:51:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1B4284095
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C291B1B2524;
-	Wed, 21 Aug 2024 14:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4C31B250D;
+	Wed, 21 Aug 2024 14:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecBKSrpl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDuaVkYW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9661B251A
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2253199FC9
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724251855; cv=none; b=qX2jEsnoXhVBT4GhVRJqrMsPQNoBKVYPJBGNKZ9Kr3W7F7zGUDUQvGdLpaW1J2h4tYtCYuyHpfn7Re43jctYf4JM3TL5SEnFpDN/7rCLLT/tSzweAtYBatavP7b/ppJy/o7f8xrE981JFKMw3jr6tpTd3gkZDufDy5zQEkLLXZU=
+	t=1724252015; cv=none; b=LYfq2z+9anFt4sW8GJae1p1OKU7rCWVDX6hJGRSia/pKr8Jm9goQFmftkXR5gmz/sg6d+YqX4y9HCGSzUEyr86EzL9LIwKJpI9gmxxEj/g7AIw6oQv30ve8EUBS7o7yPPkAwfDfgqNVC8Bk0WYqZ8gcB0TLRzMh0KVmgaQm2oBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724251855; c=relaxed/simple;
-	bh=Lz4JP4RGDLHi9RLgMyWvSGuFnZvOp5ENEyuoAWs/zpo=;
+	s=arc-20240116; t=1724252015; c=relaxed/simple;
+	bh=QRowLw6jeaZM96Gx0RTdiyjBbs/u63cqCTb4+mz3jVY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTdM5UMy8mTwkDbENTSLMJgN61TDsRVhYzzH9PCXMuH+epj9lTU5E+va1b6cFRVrRZ49O7Pie5gmYx+UIbvwlhK0EjrYM6bhviXEj11eIT0UvrD6UbXN0OCkbj2uibb0kwK9v2hMfR3xdF2m8BQQwuWRRQUoCKE3J/+EK8n6G7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ecBKSrpl; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=kij5SZ5JO31EzcLVu2Thz1G5Vr5nwvyMTPUux8Ypv12LCnF+dmHJQHQ9mLKYSoewamAZONIqgTBZfxaho+BznCnfNlYCXwnzrHUbbrYN0zaCiR10OB7I8ufIyZNnRbCvEIlgEeGJXfYeIM5VkYwMyECndXTRzkqZAYrRk++jG3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZDuaVkYW; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724251852;
+	s=mimecast20190719; t=1724252012;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y6RL4UN+IajAch5jP7ub0jIzRqoNQWJh8Odhf9HIiPk=;
-	b=ecBKSrplnR/wvN3lB+9riYvk83SHHxOC9IBW/HKylT+8dGdXrnw6GtDiqrHMYq7a3H6/qm
-	cEGqExBxigadVITNFIh7Gn7q/ECooja1ppUpzUogsTps5cr00oUYFa/OUTAT0jnlYZkFK4
-	BLkh+FyrvxOKIyn157yfrmarkpSUbws=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QRowLw6jeaZM96Gx0RTdiyjBbs/u63cqCTb4+mz3jVY=;
+	b=ZDuaVkYW9ebhghUiNuCuqZJyS7A/mV8zB9NP+pdRhtVsAIgknpS/GM4+lJGLvbs4eM8WG7
+	O0sRYLyfkWrb2nwblkzNWWgL7J0DMKYHxU0TiAvqsrCgfuV0GgXQmdmm7iB1yjb+T08aPx
+	Prhdapyxb+Omb2JXMAEKOvfoLiehW/E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-8bQ28gR_NX6wEhzIBQXonA-1; Wed, 21 Aug 2024 10:50:51 -0400
-X-MC-Unique: 8bQ28gR_NX6wEhzIBQXonA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42820c29a76so58680235e9.2
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 07:50:51 -0700 (PDT)
+ us-mta-595-f2XUDNcLPxiv4kcibEKlIw-1; Wed, 21 Aug 2024 10:53:30 -0400
+X-MC-Unique: f2XUDNcLPxiv4kcibEKlIw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3718d9d9267so3443193f8f.0
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 07:53:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724251850; x=1724856650;
+        d=1e100.net; s=20230601; t=1724252009; x=1724856809;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y6RL4UN+IajAch5jP7ub0jIzRqoNQWJh8Odhf9HIiPk=;
-        b=hJqWxgzUYDhemgrDakLcwtdeWt0TCoGYKNoAdJw8aD7Zf7u3ucCx/Mcv8DrmfJ0iC0
-         6RVDNldv8LFwSus6hNeYkUMmsmgG2tN0WYx0VQwVWfnJnrOjdQCWlWnHytnXQcmzZ6z8
-         vgskNitvYPlbctp7b0+q+HugvdBfp81EqD+XRcXFISFJvS1/KTxj2Nvs9sT/vT5GNgb8
-         CsirvIYYYORc+dKYEi4Iibs9U9Q5C4ldxsS616/ImqkWfjG5yioNFavkU5xEg47TC/R5
-         /DaYe1GVpicvr14R6cFYWHP/jDjRSgRK/ARUsEj3spyqb5kQNTMqZ0GDksq7rvX83AUP
-         NTew==
-X-Gm-Message-State: AOJu0YxOOtNow+J3CCHULW0zqE/z1n/m+k5iL4qYhKf7qXUB56mIuLlK
-	Qk/T/vuv9oZ6p9d6wpz2aqPMSWuL0F19HJvDjc4HZUOh7T9rr9QPZ/oi+dO4FgMCd/eAGtZJ48z
-	0VTrhAkEswzXIqF+w9WmFq05/lMAeaQ8GyXPDh5i0QsydSfr3RKG8vg==
-X-Received: by 2002:a05:600c:a0e:b0:427:ac40:d4b1 with SMTP id 5b1f17b1804b1-42abd244b8bmr17110535e9.27.1724251850378;
-        Wed, 21 Aug 2024 07:50:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSJZTO+za0Tzl6ZmOTOOjQhPQJN9bYwFdrr8NJSzjsMoBaqfx4mSpjWqlRxORsBcqVfFoCkA==
-X-Received: by 2002:a05:600c:a0e:b0:427:ac40:d4b1 with SMTP id 5b1f17b1804b1-42abd244b8bmr17110235e9.27.1724251849543;
-        Wed, 21 Aug 2024 07:50:49 -0700 (PDT)
+        bh=QRowLw6jeaZM96Gx0RTdiyjBbs/u63cqCTb4+mz3jVY=;
+        b=W6OokH6HctGYIcKU96M5vm3eZ55R2cJu6KVVzbUx9Z2FwXm1LyjHQP568MOtAC2+8G
+         EvGHYpBSsmtnnnNd6nzqG9hLgCfzRAFeqhUDc6dVM9DsCGnhDUd84g8e6HST/vtAEU4Q
+         4s31Nn03tfkdKnvZm50xxWkYmkYbi8UnZOSRvdI0d8D7mwnhs9uxPWLPAs6phE0Tmoo0
+         7/q8sc7mrE4zWQ8aev6rxHZxfgwssMAs6S9ankOKAOrHKi46Ep0g2zd4kMPcpzMBwkpv
+         SA2DPF1VbXBnXeKk+2GHfqfJncuogFH3R/FYZBK+EHLRUwbDmSwsPS3Wtofz0Wf+n5Ni
+         0u0g==
+X-Gm-Message-State: AOJu0YyxdxO3a9fTostIQ0bb58Id2DhKNeet7MYjCzKtINuoDlqWZ83H
+	NUylzKkmkn7EVKzWxDxdZNrDRHk05U7Rkay3j8N6DCpbXeW3Im08jbTcFpwe3E9ZxeGNtscTrJj
+	lSBwBNqZopRJafgdxbcOJ1mBEMmFW812nx+2CCwcZ5Bfa76e435djxA==
+X-Received: by 2002:adf:f892:0:b0:366:eade:bfbb with SMTP id ffacd0b85a97d-372fd70ce60mr1529928f8f.46.1724252009418;
+        Wed, 21 Aug 2024 07:53:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFZDr7ggR+/eNYCST3LZgSsI550O5ufyI8DRdkzvxCJn3F00o3+I4ON3GXaiIZw6yjPzdqQRg==
+X-Received: by 2002:adf:f892:0:b0:366:eade:bfbb with SMTP id ffacd0b85a97d-372fd70ce60mr1529902f8f.46.1724252008552;
+        Wed, 21 Aug 2024 07:53:28 -0700 (PDT)
 Received: from debian (2a01cb058d23d60064c1847f55561cf4.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:64c1:847f:5556:1cf4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee8bd36sm27422815e9.18.2024.08.21.07.50.48
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abed91071sm29081695e9.1.2024.08.21.07.53.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 07:50:49 -0700 (PDT)
-Date: Wed, 21 Aug 2024 16:50:47 +0200
+        Wed, 21 Aug 2024 07:53:28 -0700 (PDT)
+Date: Wed, 21 Aug 2024 16:53:26 +0200
 From: Guillaume Nault <gnault@redhat.com>
 To: Ido Schimmel <idosch@nvidia.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
@@ -81,11 +81,10 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
 	kadlec@netfilter.org, willemdebruijn.kernel@gmail.com,
 	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
 	coreteam@netfilter.org
-Subject: Re: [PATCH net-next 04/12] netfilter: rpfilter: Unmask upper DSCP
- bits
-Message-ID: <ZsX+x32u37WIYqVA@debian>
+Subject: Re: [PATCH net-next 05/12] netfilter: nft_fib: Unmask upper DSCP bits
+Message-ID: <ZsX/ZlsFqN3YnQ3h@debian>
 References: <20240821125251.1571445-1-idosch@nvidia.com>
- <20240821125251.1571445-5-idosch@nvidia.com>
+ <20240821125251.1571445-6-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,16 +93,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240821125251.1571445-5-idosch@nvidia.com>
+In-Reply-To: <20240821125251.1571445-6-idosch@nvidia.com>
 
-On Wed, Aug 21, 2024 at 03:52:43PM +0300, Ido Schimmel wrote:
-> The rpfilter match performs a reverse path filter test on a packet by
-> performing a FIB lookup with the source and destination addresses
-> swapped.
-> 
-> Unmask the upper DSCP bits of the DS field of the tested packet so that
-> in the future the FIB lookup could be performed according to the full
-> DSCP value.
+On Wed, Aug 21, 2024 at 03:52:44PM +0300, Ido Schimmel wrote:
+> In a similar fashion to the iptables rpfilter match, unmask the upper
+> DSCP bits of the DS field of the currently tested packet so that in the
+> future the FIB lookup could be performed according to the full DSCP
+> value.
 
 Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
