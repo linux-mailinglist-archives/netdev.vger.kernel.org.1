@@ -1,184 +1,136 @@
-Return-Path: <netdev+bounces-120513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6929959ABE
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:52:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65025959AE9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BD971F240D3
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:52:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16BF91F2434A
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D73199FC3;
-	Wed, 21 Aug 2024 11:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A9F1AD5FF;
+	Wed, 21 Aug 2024 11:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="RmzjChlD"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZmVm91D1"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2045.outbound.protection.outlook.com [40.107.215.45])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6175B199FB3;
-	Wed, 21 Aug 2024 11:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724240306; cv=fail; b=MBajLmhUig3MtBi9uYJLRZIu5QNBMFdXysNjFOYsD+PVQhaOxCwc9cPUC+xjCAQqZzxkcLzq4PLODwusZ0rwAcD0fd+ClOEN2gr2nEzpmwiMiq1lEKWx+p+eXXIIACvqY1LNLRtaazHdC3mIPQPER2QkeQ4poflcd2lOqb9x6/w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724240306; c=relaxed/simple;
-	bh=9dLHJxATbWNl9zcVR9pr+NCzhq1GkQcagQKOnHD6gl0=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=n2xkGNrjpe/qRbiUK8B0wLUusIFqf1hYTVgbnwX/7JdGvCBzZECXdhA5zVr7B5jIf6Bd2WZ06yL/C+Vigx6M70sR/w+AxZXxYxWYJgKxWqN0yZzxCN10R5QzfhuE3A+mRsAJnGBdkXV2y7pYr/ALGmouDDgqnncOtw0KySMC2Ck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=RmzjChlD; arc=fail smtp.client-ip=40.107.215.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CkJ4YY1P3N9UlpEbVWvT4STVTvXk69fcHocwQGAjdvU4UqSerF9/5YJbJdeGS29OKZSPJYGcqBjdt6SBiAj4uU3+KWU/FevHqeUQcvYJ9znmzM7EbsDCA3Cury60a8DHef5fob2mRSSdejlY+l7oosTcw1sMWliKO7qZutz2oKmC37bNEKaEQzx/WO33xgkJboD1b9bgPYZQM78cEtjteFhPwpN8TLgW+2Q6p4eyDmm9ix3qNQtK5MWfrBx9bYDv94zwuK3Ozw1XWji+SUIHVqPgyzgGKop9Pnw/m+4vmBZDii1LXIp1cQIj+3zt7C/36ZCRgddKku0TLJl32Zr+Ig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CbmNoin8YCkJC+iXQeIcINvMvShvQL9lyYdGJ+/Pze4=;
- b=Weol4BsBIcU3mnurmp0xob189rUeRZbV4E9KkLKL5mFFB/Cc5N5gJhjbkzwhVZMAskEZz7ufH1hmTQJ31PNBzMrDUUc+8q5UDV1LHhYBidEVSyKmF07gttYJ5dR+7drmvbc/Ya0VkxMLa6lt35Rk1midO+PpmB3sk/1HQkBltw4gYkfLDKSQW/JKqFugFkqqQKHPJftMwOhYEXqZQb0P666O0I4GPZ8TWd9c5jfkvQK4KVYH+mHAtkqqpX0bTQIlhILvu/9EDP1KfgYvbryNUBRcGijZHKfwHvor9fg2SkqoUqMKt36ONiP/x5ISdWpUkVVJ5FcSH20NI5PU+moIdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CbmNoin8YCkJC+iXQeIcINvMvShvQL9lyYdGJ+/Pze4=;
- b=RmzjChlD0THB3Cyp8jJO1d3mkjiI0ujx1OT4gxO21aLEcAQMOcLoA9+LYYTd/smvM8EbSn87G7xD2CXHIdw2OJu3D5miWaljpE5XCMzLasBqdndbmxsYAxvVxea960wjzUa5phmItuv12jIVFhq0TeYTnnwUO+GyCHry4C/m0vtdGF3OW0APg91gOubP86KhkU+hMobfF/BVBm2tCKoe2eJLRZAGPW4fT14AW+N0/9hhubsIMCvjqoAsceZLQ3F7+Qo70Aua304WlPRf5FI9ex+jMBHasmcgwPftFmxF0yxysagDhR00/xnAhQUmkoOhWCBBNevTE9N4NIaU4dNGsA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from TYZPR06MB6263.apcprd06.prod.outlook.com (2603:1096:400:33d::14)
- by KL1PR06MB6070.apcprd06.prod.outlook.com (2603:1096:820:c9::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20; Wed, 21 Aug
- 2024 11:38:21 +0000
-Received: from TYZPR06MB6263.apcprd06.prod.outlook.com
- ([fe80::bd8:d8ed:8dd5:3268]) by TYZPR06MB6263.apcprd06.prod.outlook.com
- ([fe80::bd8:d8ed:8dd5:3268%6]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
- 11:38:21 +0000
-From: Yang Ruibin <11162571@vivo.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com,
-	Yang Ruibin <11162571@vivo.com>
-Subject: [PATCH v1] net:xfrm:use IS_ERR() with __xfrm_policy_eval_candidates()
-Date: Wed, 21 Aug 2024 07:38:06 -0400
-Message-Id: <20240821113808.6744-1-11162571@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCP286CA0015.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:26c::19) To TYZPR06MB6263.apcprd06.prod.outlook.com
- (2603:1096:400:33d::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B72199FA5;
+	Wed, 21 Aug 2024 11:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724240682; cv=none; b=tSUnGPRxh/NdcIEB0vSRn5GsIrTFjXZiwRPq81UKUo5Gd6g7I3vuIU9BmVCUIySY8NJHYypw4tOSgqsyhJTDgMGAiFsqUADAPIBfiVrW+PjRcWHX4DRwgkjGh4MeMkMUQiW8Qp3u5+u0rYkWzy8Quotbog6CbMbIA9tXBVDAIc4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724240682; c=relaxed/simple;
+	bh=ML42OdiINuuJ5vMS4VacMsbUkosKHy8A4IQhFyKN6zA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eiY1AuxRzNyFuFKuRHwSYzFU+aBKoZHJ6PQFEvQio/CXhwBRWv824iXLBbbDEfQW9PdxaQFAf33F8KN2qxqVZjyIQ8d1/9QSd0dk+4ESeJ1nWeD/EJu6Dw28Li2Y7pA9c+rqBqadxPscGSCTw07TiT5PapaOLAZXFI3T12iO1/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZmVm91D1; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1724240669; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=+R5xOCFE8oBczmIJyK4y5RJEco64ATuR56HQDIbBO20=;
+	b=ZmVm91D1yNPdPcKONlx7zv539vM02ysCVzxu3CaK2dSF+xXVHnblKm3JGGb+iiSv67HU+gJIJP0lyBQObYCTu4La9XdtKRzawkdFONCSScqdre393e0Bk473Gpwqqe9wfKPLIBkUoLp79qIiNJC2NJCmrqQrJ3nwioX9RkF/arY=
+Received: from 30.221.128.127(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WDLhbjs_1724240667)
+          by smtp.aliyun-inc.com;
+          Wed, 21 Aug 2024 19:44:28 +0800
+Message-ID: <2fd14650-2294-4285-b3a5-88b443367a79@linux.alibaba.com>
+Date: Wed, 21 Aug 2024 19:44:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYZPR06MB6263:EE_|KL1PR06MB6070:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ed2b46a-e85d-4faa-0c08-08dcc1d5c201
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|52116014|366016|1800799024|38350700014|81742002;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7NpM3cBcJ1KlLFHdPGZud2pa/9hUTOgEWaIW+fybAc7gPzmttLnCnvVZiKgM?=
- =?us-ascii?Q?BdbQTyNLs1NAf97J6yJNJTx8UPasyZ2Gj4A9/EIXdsQMEoDmyO3pAWgmemr5?=
- =?us-ascii?Q?CMC5mOlqsKve3+0TdRObUA5yUX+9RIFgMfDL3e7/9LLAT7FWyNnzdi5uCaWA?=
- =?us-ascii?Q?Fw2Tp3VNA94nmEjNst3QtuPjAJmDO4AAyw8iiRknqoKm+JP6myE954gVpspB?=
- =?us-ascii?Q?Jz1qH4w6BKqnMTHxH0Q9NY06NAXsEhi2ZzyLZM5dCNALGg0/3nolQE9OXyH6?=
- =?us-ascii?Q?J+vaO1V2l1DcJpaGyggbfVsA2RA3S6GO5A16YWHfoPYpJxeRePeDYOS1bkLy?=
- =?us-ascii?Q?ElUbrV4ZMKDYBnHMtRqhDzpV7//wcdlSVU0FCrJ4BOlW1AGA6K2g0L1cG+S+?=
- =?us-ascii?Q?3XGmbZMU6TdeGo4UJNDNJsaDVVOrWhAMnVm7D7NHYbdCirowkuASKrBJhxcA?=
- =?us-ascii?Q?m4VH+D0hnd4yRrueYr8XWtymzTIYU0xdkvnk1khO7y45nGbgHzG6PsqAncUX?=
- =?us-ascii?Q?lafHa+ysbDVNBF/ww36VZeFb74omrKufBtti3SbWlosbdt/4teDSpbDb+xb4?=
- =?us-ascii?Q?ibWUxGln5dwHQNslCqrJMnf+Ja7xP3iaDQYf9fGUfNKmpn5k/yr5Xr7Wv8UE?=
- =?us-ascii?Q?ffWItbhWeHKgUy9DIKmrk+NBQuoOdatm9gxaufdeZ5ECncmBYelcyibAi33A?=
- =?us-ascii?Q?ZfsE+BTeLl7iDR6wDuAl8/V7o5TOhF0w7TaIEK8Jr9rH0r1vrF+Elo7pFiJd?=
- =?us-ascii?Q?l2uxcFtGpzbH7FIQHS2Hpx9yX3CJGevxPJJJUBLduJ8nJuXMFQd4zwh9Rh8w?=
- =?us-ascii?Q?RFE8FWx4AiL68tnynI1Xf8kKPQumPKGYrckNiX6OOs9IllbomEckymk9bDps?=
- =?us-ascii?Q?zdnPMaHPgeTrOaJYA0WXeSQHq2jKywydJVt9d+/hZcBIQM/fWcZFT9SMASqU?=
- =?us-ascii?Q?pLeahUi4L5N4f6PKCsriPncSB1OP7QfhGRZ26xy8emVmUJNwxG/jcMOZvjuw?=
- =?us-ascii?Q?Mob2GZDtWKb2gwBKoP2EQsMMXDjIoxBj1rnojGC3XM9lmlFaczkrtNBJab57?=
- =?us-ascii?Q?UIGMOldK2iill/hpBhxMJ/AXJz220EBiAIhQVGq+V6/k9rS/F1oDGiWcSjRE?=
- =?us-ascii?Q?zrUCgrHM+8+fx28nt+d2soyEogit8TBsAMMzDDqZ1N26bXRNiRUK/idDzShw?=
- =?us-ascii?Q?AZaRjpn9jpl605R7MIiq90FH68qQ09my0V/flai2mD47BkApo5P/zuOOu65x?=
- =?us-ascii?Q?ObN4BcA06U5ajwGrGxCYfrKFhZrTSR+6JREGNWO9UjXc17gi1Y80zyiirGca?=
- =?us-ascii?Q?MirZAVN23x2IXDZJP8tLe9oWRuk6EmgAYFB3GUl0Ez3/bitDFx7K+/6BrOhD?=
- =?us-ascii?Q?PFIMBkvTCFmzCjA1a9dOBLPFfd2mC23U3KvuITsLdoOiY1zde/QOdaxC7AOQ?=
- =?us-ascii?Q?o/U1NZid6U4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB6263.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(366016)(1800799024)(38350700014)(81742002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6z66KdEekyFgb79DUeuGQGA149wIOC3Q7NXA/shWt2hbJ08LkawEUkkX2d+q?=
- =?us-ascii?Q?n20sotfGDrmE4NmdY8721wgWE17gIF2zRw/PqQ5ZuMgG6gmOm1qfUPkEjeRB?=
- =?us-ascii?Q?s7KRR1wpkNNXlsPVPWviWbtsTx9nAB/FH738zI9Ffhynduy0paooEy5BpVNZ?=
- =?us-ascii?Q?FZOMIPGdbTaCovIqUm98FAHC/7IH0w4wD/jwOEY/yEiSfCEo9k9Oi6gizLfc?=
- =?us-ascii?Q?YLOdxSlexSwMXPx9vrQK6V0zyU4ZQDn5GLUV/y5DJIGuUKjYcSo0jEuEJUs4?=
- =?us-ascii?Q?3cM4DvM/f1i7+miVG//10+Y2uRXsi01J/j/9a3ZVKFQzNQZ9MEYsC3z4XeTY?=
- =?us-ascii?Q?JyDauB7vuxEY0JGkXi/OLpzaF34WypweaQiQYYvEDe9M9N1QiQS1NubOkwGu?=
- =?us-ascii?Q?iUrFW9D34XcgPhY4lcIq52JbZE8a2CyXZj4oMrPjdYKXkvD8C1V7ZuBQItJ4?=
- =?us-ascii?Q?0JLkwclkguk6GPWfahjBF9oOXjeKPw0naSslt9ASgqMY2GV11oxREYzkcYDw?=
- =?us-ascii?Q?Cn/iv9VNZj37Q2B1QzAJ2i5zVlSLEDtzjxrWzThHZ2533E52qk0Y82lyLX3e?=
- =?us-ascii?Q?NUraoLDuaYijnZ6hb1P7F3alQO0wLfrLJbv27f6YbrrOn9AY86lql1GIY+rx?=
- =?us-ascii?Q?ECPKHxAiJ/qaKAytZszgYgVXAtb/DX0X5xi97H9BHbZOq46ByrqYyeVRMvCS?=
- =?us-ascii?Q?9nPjXojDQX8jwZsN2UwWhYQV/idy6a5S/P5Q/lljZQMSLtFTiyDJEOfNoHpf?=
- =?us-ascii?Q?hCyOinLfF16nS/OdFQSY9XSOyZogZtqz/PBzVBnzZkvbecl45TaGaCbyPTwb?=
- =?us-ascii?Q?rvY5LmcPfVRkqNXmOh0/qQFqf5cbyfvQh/nRTLHATlmza0YzofhZfVUY7aWq?=
- =?us-ascii?Q?pIyLzIRhiLkxcjrXHtCFZ566ufdABqeVoBUNGFHFKO+pPF4fKxNK8HyMQF5h?=
- =?us-ascii?Q?cWw1id9CAWL0q2Zv5YmL7tCpllCnyknNx25NIA7W0fCv5U2U1qDI79hYSHn1?=
- =?us-ascii?Q?gnGhcTBqlWcaMXP0uUpY8eOaVZMEYaNO71yFxraW9cwpsbvTCgTivT2LocqR?=
- =?us-ascii?Q?KXYucScXH1e7sx2K5hOzJpMVf3yHFd6NJXQRGRs1DsqARjW4C/Q6DYRPlEUO?=
- =?us-ascii?Q?cpLscfGUMX1BZu2y4vyrdIQiaTTSYfZUy/rRy9fbpIB+IF+eZUIpv/hl1r1f?=
- =?us-ascii?Q?R13QuiPT2GpK/BOnWYS4kx4ZIMzj15qtKssqRH/Iugze2HnRDtrXM1ZqsMX3?=
- =?us-ascii?Q?Y8JTUHcGc+14TJRsiMixMfrr4sK9HxsuowvhOoKbN4BXutQLxLdMnjVTsxpt?=
- =?us-ascii?Q?sxABbMXus0w9Nb++jgEKlyMeiVjg9dp1kls+gOHtzdxh37j4vf9mcO8TGGya?=
- =?us-ascii?Q?ZtEGFsBCjc+8ScUOOTd6xCBYY1MJIsBKqmGiT8yEaVjKMSnDJyFszBqCP1t+?=
- =?us-ascii?Q?KQ58FI3FqxhAUkEkOc5eUv2b8RZdxu7LOI5iFTgtgBZlJJ9gRh98svlg2b4Y?=
- =?us-ascii?Q?laHq8yHUexyD+AOJoS1oAgecYNkSmBssvaV7ZfyNMzmyilN5yQwpJxNaexdj?=
- =?us-ascii?Q?39GYilN3KeWN4WvGGESgIfq/3N3Dchlm/fhWvC6k?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ed2b46a-e85d-4faa-0c08-08dcc1d5c201
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB6263.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 11:38:20.9550
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IbMDrea+ZuYAm4CJxAdIqx2gj2Ub0I8a+c0RhsrP89eAmRZKiIclGTA44DthBtPqEKHS4ohKeJf1XuDD3Qmgtg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR06MB6070
+User-Agent: Mozilla Thunderbird
+Subject: Re: Question: Move BPF_SK_LOOKUP ahead of connected UDP sk lookup?
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: bpf <bpf@vger.kernel.org>, netdev@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, kernel-team <kernel-team@cloudflare.com>
+References: <6e239bb7-b7f9-4a40-bd1d-a522d4b9529c@linux.alibaba.com>
+ <87bk1mdybf.fsf@cloudflare.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <87bk1mdybf.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-__xfrm_policy_eval_candidates() function maybe returns
-error pointers,So use IS_ERR() to check it.
+Hi Jakub,
 
-Signed-off-by: Yang Ruibin <11162571@vivo.com>
+On 2024/8/21 17:23, Jakub Sitnicki wrote:
+> Hi Philo,
+> 
+> [CC Eric and Paolo who have more context than me here.]
+> 
+> On Tue, Aug 20, 2024 at 08:31 PM +08, Philo Lu wrote:
+>> Hi all, I wonder if it is feasible to move BPF_SK_LOOKUP ahead of connected UDP
+>> sk lookup?
+>>
+...
+>>
+>> So is there any other problem on it？Or I'll try to work on it and commit
+>> patches later.
+>>
+>> [0]https://lore.kernel.org/bpf/20190618130050.8344-1-jakub@cloudflare.com/
+>>
+>> Thank you for your time.
+> 
+> It was done like that to maintain the connected UDP socket guarantees.
+> Similarly to the established TCP sockets. The contract is that if you
+> are bound to a 4-tuple, you will receive the packets destined to it.
+> 
+
+Thanks for your explaination. IIUC, bpf_sk_lookup was designed to skip 
+connected socket lookup (established for TCP and connected for UDP), so 
+it is not supposed to run before connected UDP lookup.
+(though it seems so close to solve our problem...)
+
+> It sounds like you are looking for an efficient way to lookup a
+> connected UDP socket. We would be interested in that as well. We use> connected UDP/QUIC on egress where we don't expect the peer to roam and
+> change its address. There's a memory cost on the kernel side to using
+> them, but they make it easier to structure your application, because you
+> can have roughly the same design for TCP and UDP transport.
+> 
+Yes, we have exactly the same problem.
+
+> So what if instead of doing it in BPF, we make it better for everyone
+> and introduce a hash table keyed by 4-tuple for connected sockets in the
+> udp stack itself (counterpart of ehash in tcp)?
+
+This solution is also ok to me. But I'm not sure are there previous 
+attempts or technical problems on it?
+
+In fact, I have done a simple test with 4-tuple UDP lookup, and it does 
+make a difference:
+(kernel-5.10, 1000 connected UDP socket on server, use sockperf to send 
+msg to one of them, and take average for 5s)
+
+Without 4-tuple lookup:
+
+%Cpu0: 0.0 us, 0.0 sy, 0.0 ni,  0.0 id, 0.0 wa, 0.0 hi, 100.0 si, 0.0 st
+%Cpu1: 0.2 us, 0.2 sy, 0.0 ni, 99.4 id, 0.0 wa, 0.2 hi,   0.0 si, 0.0 st
+MiB Mem :7625.1 total,   6761.5 free,    210.2 used,    653.4 buff/cache
+MiB Swap:   0.0 total,      0.0 free,      0.0 used.   7176.2 avail Mem
+
 ---
- net/xfrm/xfrm_policy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+With 4-tuple lookup:
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c56c61b0c12e..2e412a48b981 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -2156,7 +2156,7 @@ xfrm_policy_eval_candidates(struct xfrm_pol_inexact_candidates *cand,
- 		tmp = __xfrm_policy_eval_candidates(cand->res[i],
- 						    prefer,
- 						    fl, type, family, if_id);
--		if (!tmp)
-+		if (IS_ERR(tmp))
- 			continue;
- 
- 		if (IS_ERR(tmp))
+%Cpu0: 0.2 us, 0.4 sy, 0.0 ni, 48.1 id, 0.0 wa, 1.2 hi, 50.1 si,  0.0 st
+%Cpu1: 0.6 us, 0.4 sy, 0.0 ni, 98.8 id, 0.0 wa, 0.2 hi,  0.0 si,  0.0 st
+MiB Mem :7625.1 total,   6759.9 free,    211.9 used,    653.3 buff/cache
+MiB Swap:   0.0 total,      0.0 free,      0.0 used.   7174.6 avail Mem
+
+> 
+> Thanks,
+> (the other) Jakub
+
+Thanks.
 -- 
-2.34.1
+Philo
 
 
