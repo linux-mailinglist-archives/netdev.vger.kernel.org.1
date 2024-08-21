@@ -1,137 +1,155 @@
-Return-Path: <netdev+bounces-120611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A33959F39
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:03:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6386959F42
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98CEEB2235F
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:03:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CBD6282D18
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B27A1B1D57;
-	Wed, 21 Aug 2024 14:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396241AF4D3;
+	Wed, 21 Aug 2024 14:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wwb/OO/7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IxmCPib1"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141E21AF4EE
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724248988; cv=none; b=ZHXSXRjf5bXZlf/Iep20oMRKBFf9gaLJBBijTT5Kc2zXYk53MzyqvukCLPPtyD6LzfzmCptFE2eUlcDNZPGBN3oS1zUZsoZ7e0Z8HbvXJqTHxFZ5BCfrXjuh4pUQ3jsAI2+L/nhRHAPKlTS66zw4d6pz6t5V8JN6/jU8YJpC+yo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724248988; c=relaxed/simple;
-	bh=x7WZnnWv3HtVb6+7egCVuPRH9ReRe+5SJ97qmPWeLSU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OqzU54PgW4U81sFK5cx1bpbbEVO72/xFtsSm0TCODrD/Ero1NNSw1nYKTnhd9y7/NP5POBTnrN46DtyEvGMCPTDL2JClTW8Xb/sNnm6pAdwknhCzMqMOyOOzKazyiOi2PDXwrK0tX4m4SH8TEOHwDiw3MKmGOitJWCpkDrWrocA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wwb/OO/7; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id F2AE6208B0;
-	Wed, 21 Aug 2024 16:03:02 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5H37G0_8W0K4; Wed, 21 Aug 2024 16:03:02 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 63988208AA;
-	Wed, 21 Aug 2024 16:03:02 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 63988208AA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724248982;
-	bh=2KipRSTjy1f+yZK0K2r7B5rc8gFuRPH5HOp2Xrz9VWE=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=wwb/OO/7QX0ccN86kc2sTC0dFbTdhT1qpk9TKRB5ehyyM2+tF+ocew2k2YvZoyaOr
-	 WbQAfYZ1TSQUOsKYFYnRYA1zBQTT7VNx3HVYcdvI64lWV7kdUqagpKgPm0xNSxl/KF
-	 WobKthnI6zuABi0HgYWkSqF+BjvVMDFp9hNWvA+FOWceESGqUs5av3EoK1Cu/0Nkra
-	 8gso6O5gGjD94YgiE5FxHx9usOlfEjsob8Zh/5GDqL6HXgunzmc1VEU71xuGSycPV/
-	 webKbj3sIL3x7FtKGRIYfssLepYJ/ifclyw0vLVy3Xvbk8LQaUkcT+dKtWx+g8ad1o
-	 Fs5navFCQ9C3A==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 21 Aug 2024 16:03:02 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 21 Aug
- 2024 16:03:01 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 74C9C3183CDE; Wed, 21 Aug 2024 16:03:01 +0200 (CEST)
-Date: Wed, 21 Aug 2024 16:03:01 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: Hangbin Liu <liuhangbin@gmail.com>, <netdev@vger.kernel.org>, Jay Vosburgh
-	<j.vosburgh@gmail.com>, "David S . Miller" <davem@davemloft.net>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>, "Tariq
- Toukan" <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Simon Horman
-	<horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <ZsXzlQQjMNymDkhJ@gauss3.secunet.de>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-3-liuhangbin@gmail.com>
- <ZsS3Zh8bT-qc46s7@hog>
- <ZsXd8adxUtip773L@gauss3.secunet.de>
- <ZsXq6BAxdkVQmsID@Laptop-X1>
- <ZsXuJD4PEnakVA-W@hog>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC5119992E;
+	Wed, 21 Aug 2024 14:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724249130; cv=none; b=YeFb2LsTcbTr6E+MEwuqtJnRrmDjC2Jh/BI8RhtYMibyy+FXkHCG4LjeM5BeaWA4jBCz1vk3eTrEKFxz6u3RWDAC6UnE75HuudtvfzCNuq2sbprj1viIXSCLAxfhIr6FTTuB3cKyebiwv8WuMCepUM5e/r5woy+kVLKPxHZ8UCQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724249130; c=relaxed/simple;
+	bh=3qQFyXAWi9BA6zTGMeLTr7gI4YHzoN6OU5PpClQonHM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=j6XUomFtXT7KTFr7RvslwT/38m+DaKwaOSi7hXPYwNAGJmjA+IJeIAzSlaI5k/069CXEbI4qnQCbV9uqc9oWF7I1s58WtosCMpA3c0GHIu8Xb3nonBtlDaQMUQA1FikbZrO2nUagFgqC8lH/sIQM6rpW3e3gvp61C6OsetqOdk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IxmCPib1; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6c159151013so3225366d6.3;
+        Wed, 21 Aug 2024 07:05:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724249127; x=1724853927; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fN4YJkNsiA5cBzIHKP1gu1fWJlmOWyJm4B0nMxoX820=;
+        b=IxmCPib1iOX/J2c/D67A8pwFlQapEEEXWv/6Ns+0Po2DtK/mUSw19kWh/PnuTJGAqy
+         XidFosAV6YWbZiiMkfxEsiaAjY6X25Y7ECM77n3+20HDmY2Q5dND9QuAF5Ld7NUtvn1V
+         /2Qx0hDo/LTeuEFrvbPYplzpmQv10BSNP5wUAtYWECU24O97sFdelDWffh0zaMXWbnKX
+         2j6RYfG2nVGEKsHoTvfbzqnVfMU4SzJ2SK77hoSoQ6L0+Y3TN3hJeIHwcazPRWcvuJpa
+         XmltDzYcSMkeX6nj68BathtVU+KVTLNHjfohgymRC8RGWV2AKpuzJjC0JKlGSGOlT0UJ
+         hYdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724249127; x=1724853927;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fN4YJkNsiA5cBzIHKP1gu1fWJlmOWyJm4B0nMxoX820=;
+        b=SXP+6XOwL8C32dz1iCra+BN89lbTwJZMulkPjRIZ0enD/z39UQXOfQXdmuWIuoEUKu
+         wdI2gM8VC2X89Kek3H4PuGM3fj1fakta5pbUtBeOE+HEFG5srOGfyMST+z0V+1c+I+9X
+         E0WjNBR3qBXYo7MNTk69FkUzrMaGTwwwp4g8qFqMTiQIsGWFn0aV5VdOQ2moKesN5JJs
+         yvhtdnHJrxI7q/t/nVbfRONjkMYl7MoVJUFHf2XAGFO5MvDoHKBM489ASOt4BzCbaki1
+         Ui7YaZU8X4waOHLLkli3AU/uUD6ucWAJlc7GkdeyEgcJaJIZgD3U+L8kEWEfVQjF/vbn
+         zKGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVC4ke9VdO2qHhyNI/6c5+uqEWx8979pNmXI2oCSM2tR1+D0yquRWrSc8pjMZuVAf7Ey+qh1ZVy@vger.kernel.org, AJvYcCW0pXubz5VY/Em9OrpwITMkTaDtNfQx8ngA6EStWSJm9IoaYKzpinZHViFYrQjVWs3myIFj7lo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweCMsZjxOJxkjFQ86KkAUtpDSxGQGDfYxh0YP7QA7cXD8mRlGH
+	JWeMry8+pugqpThHYW8rDlc48+vCK4CWxykedUUfGQg09DzshW0V
+X-Google-Smtp-Source: AGHT+IEFETWqaRrGa4osaJCinLoV2tBEtUd7FpTCWAuWzdefV/2detzXaXFZ//Bm1Pdul4NYn2NnRQ==
+X-Received: by 2002:a05:6214:5a0a:b0:6bf:940d:286f with SMTP id 6a1803df08f44-6c155e1f98fmr32497436d6.50.1724249127257;
+        Wed, 21 Aug 2024 07:05:27 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe115absm61625666d6.38.2024.08.21.07.05.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 07:05:18 -0700 (PDT)
+Date: Wed, 21 Aug 2024 10:05:12 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vitaly Chikunov <vt@altlinux.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Christian Heusel <christian@heusel.eu>, 
+ Adrian Vladu <avladu@cloudbasesolutions.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Greg KH <gregkh@linuxfoundation.org>, 
+ "alexander.duyck@gmail.com" <alexander.duyck@gmail.com>, 
+ "arefev@swemel.ru" <arefev@swemel.ru>, 
+ "davem@davemloft.net" <davem@davemloft.net>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "jasowang@redhat.com" <jasowang@redhat.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "stable@vger.kernel.org" <stable@vger.kernel.org>, 
+ "willemb@google.com" <willemb@google.com>, 
+ "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Message-ID: <66c5f41884850_da1e7294d2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <zkpazbrdirbgp6xgrd54urzjv2b5o3gjfubj6hi673uf35aep3@hrqxcdd7vj5c>
+References: <2024080703-unafraid-chastise-acf0@gregkh>
+ <146d2c9f-f2c3-4891-ac48-a3e50c863530@heusel.eu>
+ <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+ <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+ <20240814055408-mutt-send-email-mst@kernel.org>
+ <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
+ <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
+ <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+ <66bcb6f68172f_adbf529471@willemb.c.googlers.com.notmuch>
+ <zkpazbrdirbgp6xgrd54urzjv2b5o3gjfubj6hi673uf35aep3@hrqxcdd7vj5c>
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZsXuJD4PEnakVA-W@hog>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 21, 2024 at 03:39:48PM +0200, Sabrina Dubroca wrote:
-> 2024-08-21, 21:26:00 +0800, Hangbin Liu wrote:
-> > On Wed, Aug 21, 2024 at 02:30:41PM +0200, Steffen Klassert wrote:
-> > > > > +/**
-> > > > > + * bond_advance_esn_state - ESN support for IPSec HW offload
-> > > > > + * @xs: pointer to transformer state struct
-> > > > > + **/
-> > > > > +static void bond_advance_esn_state(struct xfrm_state *xs)
-> > > > > +{
-> > > > > +	struct net_device *real_dev;
-> > > > > +
-> > > > > +	rcu_read_lock();
-> > > > > +	real_dev = bond_ipsec_dev(xs);
-> > > > > +	if (!real_dev)
-> > > > > +		goto out;
-> > > > > +
-> > > > > +	if (!real_dev->xfrmdev_ops ||
-> > > > > +	    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
-> > > > > +		pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
-> > > > 
-> > > > xdo_dev_state_advance_esn is called on the receive path for every
-> > > > packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
-> > > > xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
-> > > > be ratelimited.
-> > > 
-> > > How does xfrm_state offload work on bonding?
-> > > Does every slave have its own negotiated SA?
-> > 
-> > Yes and no. Bonding only supports xfrm offload with active-backup mode. So only
-> > current active slave keep the SA. When active slave changes, the sa on
-> > previous slave is deleted and re-added on new active slave.
+Vitaly Chikunov wrote:
+> Willem,
 > 
-> It's the same SA, there's no DELSA+NEWSA when we change the active
-> slave (but we call xdo_dev_state_delete/xdo_dev_state_add to inform
-> the driver/HW), and only a single NEWSA to install the offloaded SA on
-> the bond device (which calls the active slave's xdo_dev_state_add).
+> On Wed, Aug 14, 2024 at 09:53:58AM GMT, Willem de Bruijn wrote:
+> > Christian Heusel wrote:
+> > > On 24/08/14 10:10AM, Adrian Vladu wrote:
+> > > > Hello,
+> > > > 
+> > > > The 6.6.y branch has the patch already in the stable queue -> https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/?id=3e713b73c01fac163a5c8cb0953d1e300407a773, and it should be available in the 6.6.46 upcoming minor.
+> > > > 
+> > > > Thanks, Adrian.
+> > > 
+> > > Yeah it's also queued up for 6.10, which I both missed (sorry for that!).
+> > > If I'm able to properly backport the patch for 6.1 I'll send that one,
+> > > but my hopes are not too high that this will work ..
+> > 
+> > There are two conflicts.
+> > 
+> > The one in include/linux/virtio_net.h is resolved by first backporting
+> > commit fc8b2a6194693 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4
+> > validation")
+> > 
+> > We did not backport that to stable because there was some slight risk
+> > that applications might be affected. This has not surfaced.
+> > 
+> > The conflict in net/ipv4/udp_offload.c is not so easy to address.
+> > There were lots of patches between v6.1 and linus/master, with far
+> > fewer of these betwee v6.1 and linux-stable/linux-6.1.y.
+> 
+> BTW, we successfully cherry-picked 3 suggested[1] commits over v6.1.105 in
+> ALT, and there is no reported problems as of yet.
+> 
+>   89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
+>   fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
+>   9840036786d9 ("gso: fix dodgy bit handling for GSO_UDP_L4")
+> 
+> [1] https://lore.kernel.org/all/2024081147-altitude-luminous-19d1@gregkh/
 
-Maybe I miss something, but how is the sequence number, replay window
-etc. transfered from the old to the new active slave?
+That's good to hear.
+
+These are all fine to go to 6.1 stable.
 
