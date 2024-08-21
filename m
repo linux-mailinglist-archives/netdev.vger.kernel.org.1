@@ -1,144 +1,139 @@
-Return-Path: <netdev+bounces-120577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25493959CAD
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:02:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 053F1959E29
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1E141F21B87
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:02:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3834D1C22233
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FA01662E9;
-	Wed, 21 Aug 2024 13:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F9C19992C;
+	Wed, 21 Aug 2024 13:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADA8eyfK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CCg9Qwwk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00A41E4A6;
-	Wed, 21 Aug 2024 13:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0D51531FF;
+	Wed, 21 Aug 2024 13:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724245349; cv=none; b=W7XtysCVlOfSVNbv2bIK4z8kGvV4dJNJMhB9u8VAgu1ztVZL3IRTwx9VLwikAkFOMOHSHnhl7/SiVwBq/tGwyYuHyUDGKb1eHkkB4mEzszbT2PbcDMVhjeRM6SPO8PdwFI1fTnlFo01bQi4MotyXgIUPtBK/ZVPSaNW838Ss2pQ=
+	t=1724245722; cv=none; b=rDmxcnty8ZkVhH8Fxlt5LcLm3maCI3MjaDKAJtdGbSFzs8QIngdNHLeiSdcANHoVVbEQr8eal9wWeRIEDlT9hPqbZagJN2q8p5/U6th1s/Z7Kd+5pIirrAYIcoD/dh86RdSW0KRHa/R1MZpPaseq/MI4G4QGyzRWtbR4scnqnlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724245349; c=relaxed/simple;
-	bh=oCNseJu1oVOwi0Sw13GWojhDjnP+oaE40buNaPrwiIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pw1hGtuwQNN+a6frm15P+F6R2LaVDfkFe1ZhQzOqjr6QzQYieZUGd7zCqpEnCUZuqPuJV3sVYeLikvAms20U6UDvs69cLoCl/qwNdm1E4YaeLaYWNA2DW97hrpROEGKhtXfjd/MI72A3EJ4cmQkW6HPEunVoAVq2MnWPFH4K19I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADA8eyfK; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e16518785c2so1877471276.1;
-        Wed, 21 Aug 2024 06:02:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724245347; x=1724850147; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h8JMlEkkGkcT8DbSa/JgcLoqosvKmqa7Vif2q4dbzDc=;
-        b=ADA8eyfKx3WzINmAopZmXXgi1RieJon72iVuplfq8V+90FztvgqRjb3xEYjAUZkRLT
-         CAV76pmOxMoq6ljz82UQvWfo5J8xpvtw71UYzevFviq8LEaasY8cHdZxhCZ23M3wH1TB
-         NEZHN2C5o8JDcrYpzbdhAnyzJmp/XWINbpVHwonHRUMeKwG6zpk4vbZk2fWmSaWZt6eb
-         CdO14v5TJx5q3cNxdhCziTmwkaWEimms888n5QhWn5ga/JhyuhwpdYdv0KgYR7ylmcBv
-         x5AW4SFIPDCA0fg4EmlxstpnQv9w/C9bwMfO4KP0qS8eSxgg+81McCGuP7RaQj+Sj6v1
-         O4FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724245347; x=1724850147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h8JMlEkkGkcT8DbSa/JgcLoqosvKmqa7Vif2q4dbzDc=;
-        b=N1U3YL49DzlPqejnXDa8rvOeUiI2T7hhuGQKEl9loFqJjbmBuzNnOSYs7qckbv16yq
-         k9442+zuY36CXzgRufRaUnXYw39FB/gmH4YKd6dVOSGCzLAzppkbwBH8pazPbM1AFKSA
-         G8rKtjHWHMdgxpGq3oCmk3aAoBBbNBhH3jTBqzQo9KfzGXBOXD93uhmQqPfPcfiyeglg
-         IOn7dDcaWAnbQVPcTYVYSZrfZzjUQwxlp6OsLaifJY/jCgj7TL1uFR0do+iDKPORUnX+
-         lVHBJ6wXuJGqCc1xsyy+Wie2WgA8wkgat3QhzqcEayTbFJLq3lY3YTI4RexSTMkj1P4d
-         nLig==
-X-Forwarded-Encrypted: i=1; AJvYcCVhyGCXRUNbHXqrEHLnYZ1IThlm5NN+B7f/QAtm+Cc+tLSdzQSrKwZIcvmQ91cbPvWCkILkcrjc@vger.kernel.org, AJvYcCXhLuP/NyqoSoPajjh/ETBrnhKlkr+tm+diZT8kQgLof2EmOPLKjT6PV58GOYflCAf8hsoXSG+AoGVUca0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv87k3jp+StABL/2IiEXAJW7JqDkPVLTSuJowFWuwjjuCGc11g
-	n27B/x/D6czNzMRcELdeyIAWFxsIb01PK60pUMUzaMdlYU/SzFpKRyKGtyAS1LY8XeSm4NY/wAE
-	2t4iFECW7FdYuY8ci9isDALr7Yjk=
-X-Google-Smtp-Source: AGHT+IElh1u85daxbEguq3pTKjBgv6FSvo7NBWkZhnDkxJnF2X7Kunet3ejp2sMViHkY5+S9+CpZKjFE8yvGMiU05J4=
-X-Received: by 2002:a05:6902:102e:b0:e11:7db3:974c with SMTP id
- 3f1490d57ef6-e166552fc37mr2882904276.35.1724245346354; Wed, 21 Aug 2024
- 06:02:26 -0700 (PDT)
+	s=arc-20240116; t=1724245722; c=relaxed/simple;
+	bh=HxD5PKFw4t2INAVoKOQOIEkGPgNXjHSau3NtdeM2Psc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uBFvPGyBIMY+X8fNic3reSqsFObbWVCiDPIuDN9dnsVWiTSuqL9wa80Hk95P79amOxlwMk/3djAZeGJ4iNvC4k+/BEu9TSn//k6MLVfr+gbo/OIdJv/hPB+WkuaLSNi91w9I3mJKsgRsv/rGdO6LWHwo7gvF6Tb5uZi0Qq3aBqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CCg9Qwwk; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724245721; x=1755781721;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HxD5PKFw4t2INAVoKOQOIEkGPgNXjHSau3NtdeM2Psc=;
+  b=CCg9Qwwk5PmA/9eKar2yTfRcfR5ZNDqtYdCI8YCN3ORZtsgdL1JjpaMv
+   Xw0XHaLcRJko51E1q5WeBHu26p/Xlr7Z1Ag8+f6IOQVKP8ZD1jVlnGOfX
+   mUsOipltdSE2AGHLtw1r0ZmHH07VetnFEokHSfywRUDJ4fex1Tof6zvpT
+   2qfPJbz9UBzPIlyaTDzmT3YIW0zND/52hQOb+cEp1qPTQpiDJR/NPgtzk
+   2u1abV74PaWKQDX8TyFglICsJWsmux1pwjfOQXZbfdN5TBuMKFwelj8Yg
+   o4Ng8HwCXPIr0hPc1tMTv0ck6K5R9B+QK1SUTvrUfYuMeY8va46Ri/LB4
+   Q==;
+X-CSE-ConnectionGUID: lDiNAlvATCGd3EkAdHnUYg==
+X-CSE-MsgGUID: oVVEJy2MQlOPhwWc88AHqg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="26356367"
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="26356367"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 06:08:39 -0700
+X-CSE-ConnectionGUID: u9ZtNQ84SJSBThVsNTEQ8w==
+X-CSE-MsgGUID: prRA43ncRvC/UokwmIRIXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="65295730"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 21 Aug 2024 06:08:32 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sgl4f-000BNS-2Z;
+	Wed, 21 Aug 2024 13:08:29 +0000
+Date: Wed, 21 Aug 2024 21:07:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <helgaas@kernel.org>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+Message-ID: <202408212017.eN5JVu0P-lkp@intel.com>
+References: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
- <20240815124302.982711-9-dongml2@chinatelecom.cn> <ZsSNFMyN-MivgkKU@shredder.mtl.com>
-In-Reply-To: <ZsSNFMyN-MivgkKU@shredder.mtl.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Wed, 21 Aug 2024 21:02:22 +0800
-Message-ID: <CADxym3asqw=EErQdUNdLCRhF+L-rp-1LET-LCK3v1TLUE4FJEA@mail.gmail.com>
-Subject: Re: [PATCH net-next 08/10] net: vxlan: add drop reasons support to vxlan_xmit_one()
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, dsahern@kernel.org, dongml2@chinatelecom.cn, 
-	amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com, 
-	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
 
-On Tue, Aug 20, 2024 at 8:33=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Thu, Aug 15, 2024 at 08:43:00PM +0800, Menglong Dong wrote:
-> > diff --git a/drivers/net/vxlan/drop.h b/drivers/net/vxlan/drop.h
-> > index da30cb4a9ed9..542f391b1273 100644
-> > --- a/drivers/net/vxlan/drop.h
-> > +++ b/drivers/net/vxlan/drop.h
-> > @@ -14,6 +14,7 @@
-> >       R(VXLAN_DROP_MAC)                       \
-> >       R(VXLAN_DROP_TXINFO)                    \
-> >       R(VXLAN_DROP_REMOTE)                    \
-> > +     R(VXLAN_DROP_REMOTE_IP)                 \
-> >       /* deliberate comment for trailing \ */
-> >
-> >  enum vxlan_drop_reason {
-> > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_c=
-ore.c
-> > index 22e2bf532ac3..c1bae120727f 100644
-> > --- a/drivers/net/vxlan/vxlan_core.c
-> > +++ b/drivers/net/vxlan/vxlan_core.c
-> > @@ -2375,6 +2375,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct n=
-et_device *dev,
-> >       bool xnet =3D !net_eq(vxlan->net, dev_net(vxlan->dev));
-> >       bool no_eth_encap;
-> >       __be32 vni =3D 0;
-> > +     SKB_DR(reason);
-> >
-> >       no_eth_encap =3D flags & VXLAN_F_GPE && skb->protocol !=3D htons(=
-ETH_P_TEB);
-> >       if (!skb_vlan_inet_prepare(skb, no_eth_encap))
-> > @@ -2396,6 +2397,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct n=
-et_device *dev,
-> >                                                  default_vni, true);
-> >                               return;
-> >                       }
-> > +                     reason =3D (u32)VXLAN_DROP_REMOTE_IP;
->
-> This looks quite obscure to me. I didn't know you can add 0.0.0.0 as
-> remote and I'm not sure what is the use case. Personally I wouldn't
-> bother with this reason.
->
+Hi Andrea,
 
-I know. I'm hesitant about this commit, as I don't find a case
-for this dropping, and the remote seems can't be 0.0.0.0.
-I add this reason as the code drops the packet here.
+kernel test robot noticed the following build warnings:
 
-Enn...I will abandon this commit.
+[auto build test WARNING on clk/clk-next]
+[also build test WARNING on robh/for-next char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.11-rc4 next-20240821]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks!
-Menglong Dong
+url:    https://github.com/intel-lab-lkp/linux/commits/Andrea-della-Porta/dt-bindings-clock-Add-RaspberryPi-RP1-clock-bindings/20240821-023901
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+patch link:    https://lore.kernel.org/r/5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta%40suse.com
+patch subject: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+config: sparc-kismet-CONFIG_PCI_DYNAMIC_OF_NODES-CONFIG_MISC_RP1-0-0 (https://download.01.org/0day-ci/archive/20240821/202408212017.eN5JVu0P-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20240821/202408212017.eN5JVu0P-lkp@intel.com/reproduce)
 
-> >                       goto drop;
-> >               }
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408212017.eN5JVu0P-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for PCI_DYNAMIC_OF_NODES when selected by MISC_RP1
+   WARNING: unmet direct dependencies detected for PCI_DYNAMIC_OF_NODES
+     Depends on [n]: PCI [=y] && OF_IRQ [=n]
+     Selected by [y]:
+     - MISC_RP1 [=y] && PCI [=y] && PCI_QUIRKS [=y]
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
