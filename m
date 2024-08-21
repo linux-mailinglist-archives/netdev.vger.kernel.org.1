@@ -1,111 +1,189 @@
-Return-Path: <netdev+bounces-120660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6752A95A1EC
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:52:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF67E95A206
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242D228D7EF
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:52:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5F341F259C4
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332F114F9E1;
-	Wed, 21 Aug 2024 15:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F8814E2C5;
+	Wed, 21 Aug 2024 15:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvhxToZB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3j4aKiQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820B814D71F
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA3F14D70A
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724255015; cv=none; b=bZ6hHPEmxacWS2q7gWVUlFsCC1s/BiuaFf5lpskQvXOjt3ntAGGiBDr9eGSjgoqwBGPxutND14VlHYLsbG5OxSqwsqrt4shyyoMawdnxJtT4duJQBOSbICcFdA+vDLteb3f7f5FLpguDrcEZuQW/SIzHnzuSlDb3sSkDbUt8yEM=
+	t=1724255263; cv=none; b=dVni3a0Uv4XfPuOUnm3zlwtDhUwnqWDYDJQXcSTUvjFG2uoV2UX6L86IsQ3eJLgOrPG0S/30ZFeYWlMu7vk9MV4MnaiZBD5XzrZaLnkZL3Wnc3czu1XHJUeZ4KTrBlGI4E/B1TANfjLr5wp2NICTibSTba6/hNxXYyoWbL+J2zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724255015; c=relaxed/simple;
-	bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
+	s=arc-20240116; t=1724255263; c=relaxed/simple;
+	bh=sgHJ6YptOkcKpLQK2JxauQSVKBQRRzsbtyikXIwWbDk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eiVHCrKkikYAqMva9OwEAiPYEcGg4eklsmjOG9v9u9MCc2qe6kHwUwufPKz6Ok/VJ/eT/ipGSBb25CEuqby0v4FBxvDkIFI9Kpa5+Dc2DfBHQkGrYDTdaaCwet4M0HVlyGVEMUJS8DjoAvgPkCMorlHKNSiESw4mAK/dUo1WtTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvhxToZB; arc=none smtp.client-ip=209.85.218.52
+	 To:Cc:Content-Type; b=uPVIJijHWPc4hh4SZ6fTPQytX/aYZfvj8ot7/FHQTZuFXu3FwJlFOt/5OYlXpNT0q1Mrayz/r5/P62hNfi1O1w+2sG73ePe/JSjZ9o82RYXPA1LgBKL8Bos9trODizTBKBV3wZFZwBi5ZYLSVgOmD0slktgnp1KKL92eNHAiiac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3j4aKiQu; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7aabb71bb2so752060066b.2
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:43:33 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5bed83487aeso5581392a12.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724255012; x=1724859812; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724255260; x=1724860060; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
-        b=fvhxToZBeFVduwXh5P1sqnp/H0MBFjS8mLvyAwEqiHLl3ig0HhoKGlNgjhCq0djQZG
-         9B8K4IXWhN69uLuPZmh+CgrMbrIbf42bA00oMpIJTjg47YFWCsflLs7K/Ppe7vHmgC0/
-         TB8aimcd+/8f0v4KRZXgLbFugXpEoPBL4K5EDQq6O7WdxLTYAy6Q1m5rCz5ura/Idpui
-         FAisZiT2EwcpV6BC3O6xNwvz3fFFPbO4SQGJcwP/glU3bxeKrujpMynwOy+hbdZauFGI
-         qlefeMIs8RxSUaLNMmLBWKGVGzqKN7A8CEq9BnuFWU0l0vE9Vlu26PSgX/Pgnbyn0ItT
-         8RDg==
+        bh=rUnXYk1aJPUKmKqgAFtikPHUrK72trazpkSKJV6ucMM=;
+        b=3j4aKiQuBArsAeDP8RFJiCAvyKMjyAtDK+2+p/4pb92gYH3wT6ES1EYzRA4q59RPHl
+         6unWACbHO1eJyQO11NoJOp0NMayJ7BWa2ptQp4Qyhbx2F8CgFR6ZRgqNqUe2Aby34TgT
+         lPvWrQknM6iHpasXzdpGFFLpH4ChCS2SVYOZ8/yGnL6BuCHaC7lUrdbTgraEW27h25pn
+         2p2EIJKr3otJZBkiv9A86bPMQ2SWqfMjxUf1jSfgOvmpcH9WxiBvFY7mMksoFLpc8ny8
+         EI5vT18LGLWWgRp/yFHttjJ4Wo6HvH1vBeZaN3ELlHMNkgY0u5PxXD6RUrgQfkCT/Mst
+         T4ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724255012; x=1724859812;
+        d=1e100.net; s=20230601; t=1724255260; x=1724860060;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
-        b=xEValnVrlQpWIKqX5hNUo3yAievi+tRLNFJI+11veW0JnOTWpweU3f/9nDVqXnRfet
-         WpwNDSuQZ5k/HUIpMD0zJSKC1NjFXNCPniTuIuPQkPuSOUlVCF7jghT4L1vToBQMCZBW
-         GakQe5o7j9SMldaYmA+k6/lb9wzHXhBlCBlOJCfwOlXpnWDl/6rKcGoaq+lTt9oehYyy
-         O3wF9N6f9e+uKIkz/XxMssw7OhoVubL2kbDQFUUZL8rY6MTk6YQt8yOs+we2/fKmFtoP
-         DYBSKvbswxS/D44qz/HtP0Ma1lkTkGUk4K10adgKlvLN0BlxOjLFIPRx3ks5xIGs0Yhw
-         ngOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWs11G8bl9zudW5lHF1W0zu+JeUjRRk2zt5N+T3HoZjYZxdPOqCtvJH1eEHtCN0QxbIy6oUYhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4Pk45pqxGesGw/ryP6yXhzITtZJvmLMaUTky6kf1lg0QIE0Eq
-	JbekuDk5s8taBHSOPPrRGBQuTb9UVpOD9poZTjoC8ovPwNsQUQ9XtuLfmAHQZ5Th/zE6MekxFt5
-	FLZKWfwsFMv5qiDq1P8UOr2zMfnzCmSBnakZK
-X-Google-Smtp-Source: AGHT+IFXM1haTH3Tft82GioemDeMyJeWgfsUvV1Z0FDSHL0znQ9kGlTog6+S/Takg6dPBnQDSWoR4E6wLJW9Oj0YiHI=
-X-Received: by 2002:a17:907:c7c9:b0:a7a:81b6:ea55 with SMTP id
- a640c23a62f3a-a866f9d2804mr249205766b.56.1724255010853; Wed, 21 Aug 2024
- 08:43:30 -0700 (PDT)
+        bh=rUnXYk1aJPUKmKqgAFtikPHUrK72trazpkSKJV6ucMM=;
+        b=ZHbZ8WdsF2FZ3ALJEcmAZL7skN6QPNesITH2wu0z7Z1WpWJiwMelYsrexzYcGJPdJa
+         RSIP8J6uUxe01DbfQsngAHTxj84LKaTJv2qUy0/UG+ZOXAL/o4XJUm69Ce4Nv81iQuc4
+         L+EoqNsMlocuIYKryQqQ2RAwsKMJCxxw07kP7QcbHEJk+KzIEye4QGx+GW03EV7p2wcg
+         Tv5fH4WQ4ARvKRtqUML9NjYREhgbKrn1bIkhtsBfPfiKvsSO8LtBXZhjyOwpN+E8PEt1
+         WcbI01TQ7j6KntB+2eUCqRlpN0mBQayonCGnNIAWjyEXpjFVm0p44kPuybQQz3K+yPSp
+         ZHCg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxvfyetlQgHOVewlJkUDTTw8uDoBpRdtov4qj44NttPZbaH/D3200erIY6jqJ8lQFKr+PBW/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7eC56Q1/+utZYHy8H39XFe1o52R/vOMEFq8DPy8OONjqD59Jq
+	Eizl6phYn1lBL8b04feXDCmBcyyuO+2fNVRA611eizWU5uGfIX95iFusU++od+O0+5ILRSRi4kH
+	bpRniOHqMKlKpcNF3WL2dBTeZ48YxU1l8WoMa
+X-Google-Smtp-Source: AGHT+IEq9na6xHANtfysrHCYRcGY8V6pfa3wOBMKVcS+Wg0vJ9UMeil1Rzc2KdFHxjkwKEzVRmt/WTJUhujdvhZGUxE=
+X-Received: by 2002:a17:907:2cc6:b0:a80:7c30:a836 with SMTP id
+ a640c23a62f3a-a866f894098mr241822966b.56.1724255259550; Wed, 21 Aug 2024
+ 08:47:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821150700.1760518-1-aleksander.lobakin@intel.com> <20240821150700.1760518-3-aleksander.lobakin@intel.com>
-In-Reply-To: <20240821150700.1760518-3-aleksander.lobakin@intel.com>
+References: <20240821153325.3204-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240821153325.3204-1-kerneljasonxing@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 21 Aug 2024 17:43:16 +0200
-Message-ID: <CANn89iL+VTJ6tEe-PZ24h+0U9BYs0t4gZDndiy7j1DwuKMBEFg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/6] netdev_features: remove unused __UNUSED_NETIF_F_1
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Wed, 21 Aug 2024 17:47:28 +0200
+Message-ID: <CANn89iKovApWCsnFWAVTywCmWH9bFfBRCvc75+b_tjASj22SJQ@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
+ find port in connect() process
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Jade Dong <jadedong@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 21, 2024 at 5:07=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
+On Wed, Aug 21, 2024 at 5:33=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> NETIF_F_NO_CSUM was removed in 3.2-rc2 by commit 34324dc2bf27
-> ("net: remove NETIF_F_NO_CSUM feature bit") and became
-> __UNUSED_NETIF_F_1. It's not used anywhere in the code.
-> Remove this bit waste.
+> From: Jason Xing <kernelxing@tencent.com>
 >
-> It wasn't needed to rename the flag instead of removing it as
-> netdev features are not uAPI/ABI. Ethtool passes their names
-> and values separately with no fixed positions and the userspace
-> Ethtool code doesn't have any hardcoded feature names/bits, so
-> that new Ethtool will work on older kernels and vice versa.
+> We found that one close-wait socket was reset by the other side
+> due to a new connection reusing the same port which is beyond our
+> expectation, so we have to investigate the underlying reason.
+>
+> The following experiment is conducted in the test environment. We
+> limit the port range from 40000 to 40010 and delay the time to close()
+> after receiving a fin from the active close side, which can help us
+> easily reproduce like what happened in production.
+>
+> Here are three connections captured by tcpdump:
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
+> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
+> // a few seconds later, within 60 seconds
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
+> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
+> // later, very quickly
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
+> 127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
+> 127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+>
+> As we can see, the first flow is reset because:
+> 1) client starts a new connection, I mean, the second one
+> 2) client tries to find a suitable port which is a timewait socket
+>    (its state is timewait, substate is fin_wait2)
+> 3) client occupies that timewait port to send a SYN
+> 4) server finds a corresponding close-wait socket in ehash table,
+>    then replies with a challenge ack
+> 5) client sends an RST to terminate this old close-wait socket.
+>
+> I don't think the port selection algo can choose a FIN_WAIT2 socket
+> when we turn on tcp_tw_reuse because on the server side there
+> remain unread data. In some cases, if one side haven't call close() yet,
+> we should not consider it as expendable and treat it at will.
+>
+> Even though, sometimes, the server isn't able to call close() as soon
+> as possible like what we expect, it can not be terminated easily,
+> especially due to a second unrelated connection happening.
+>
+> After this patch, we can see the expected failure if we start a
+> connection when all the ports are occupied in fin_wait2 state:
+> "Ncat: Cannot assign requested address."
+>
+> Reported-by: Jade Dong <jadedong@tencent.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+> v3
+> Link: https://lore.kernel.org/all/20240815113745.6668-1-kerneljasonxing@g=
+mail.com/
+> 1. take the ipv6 case into consideration. (Eric)
+>
+> v2
+> Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxing@=
+gmail.com/
+> 1. change from fin_wait2 to timewait test statement, no functional
+> change (Kuniyuki)
+> ---
+>  net/ipv4/tcp_ipv4.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index fd17f25ff288..b37c70d292bc 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -144,6 +144,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *skt=
+w, void *twp)
+>                         reuse =3D 0;
+>         }
+>
+> +       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
+> +               reuse =3D 0;
+> +
 
-This is only true for recent enough ethtool (>=3D 3.4)
+sysctl_tcp_tw_reuse default value being 2, I would suggest doing this
+test earlier,
+to avoid unneeded work.
 
-You might refine the changelog to not claim this "was not needed".
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index c2860480099f216d69fc570efdb991d2304be785..9af18d0293cd6655faf4eeb60ff=
+3d41ce94ae843
+100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -118,6 +118,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock
+*sktw, void *twp)
+        struct tcp_sock *tp =3D tcp_sk(sk);
+        int ts_recent_stamp;
 
-Back in 2011 (and linux-2.6.39) , this was needed for sure.
-
-I am not sure we have a documented requirement about ethtool versions.
++       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
++               reuse =3D 0;
++
+        if (reuse =3D=3D 2) {
+                /* Still does not detect *everything* that goes through
+                 * lo, since we require a loopback src or dst address
 
