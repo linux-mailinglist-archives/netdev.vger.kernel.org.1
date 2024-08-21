@@ -1,270 +1,174 @@
-Return-Path: <netdev+bounces-120654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1AC95A118
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:12:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B4795A137
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8E7B1F22817
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367B0283A83
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CD01B3B2C;
-	Wed, 21 Aug 2024 15:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5581386DF;
+	Wed, 21 Aug 2024 15:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PuNQeUjl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mM+trEPg"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24EF013D53E;
-	Wed, 21 Aug 2024 15:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BF414884E
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724253042; cv=none; b=DXIBAw+oIElNI278XAqkpXsfk+X9uHaGSsvJXZ3SebRbaRjZ5l0WdKRXM+tFtBOnY6KNC04q9lQcL1EqLlGafhOzw60zWj5rGUfj0pad/2WjRPxer3SNqHqqsHw90btxFLOLJQD52BXCBjlJ2fT33ygIE0qzPLhPB7oS4ADgi+A=
+	t=1724253584; cv=none; b=X4X0aP3NYf4bjmuc0ZriIZUoK1Jo0h2GhDS/s9+L0vqv2H3BpdqjHQ1KDnea5uVcIKNFMu/z8is6arpaM4n4IziWGE+arZjeG85YmJIj3Ep7FULyJsod9bJ42TaAo8ICfUmRjUZBSK2onHZXvWBRcREoVoRhvOYoPN5k7a0nGus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724253042; c=relaxed/simple;
-	bh=svnwW+51eA5NmsjQhUKciu7Dt69pwQqFHAgSFl/uyGg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IuBeJu8rTPizfYN+TWCk0S6VyHXtAGCaXWQNuqrqxxBrAPMYGp+YI3EO1OSH5lfQW43kZIi60DKYEU5T7PW9fAPC3cmUP8/r/5lHNNxfeKS/COQUimPdjN31xciUJlvZmVZzWfywmpkEbh5TnIRvpZIrWWM77PFN4+ZTkdJc3eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PuNQeUjl; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AA57240002;
-	Wed, 21 Aug 2024 15:10:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724253037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FeFz2REgJ5Cu9Uyp5uPiEHWrqWRI+ecTPYClbo8H/3I=;
-	b=PuNQeUjlcaBKJo8meYnbr7MSFBq1Rgs1kjNZezO3PEtmGFxF0l73oJlvCCts/bkqKSeDBd
-	7kBDC4XDvS4QEShePOc/WYh1xS9TLmhG/sRCvHGtv5oBgPbnR/mfb/cfWq3x4uGftO2BSx
-	AXZkLCveGV8yMDDLGguJAHJIghBjzCmHlO+xt156OgZFbVbc97YsQTaSOV+vCJ6yG17kSy
-	++B76xUy6XW0YFgc9rmGzmPGsmsTCKTz7hNDVsQg4nitlM3FYghn/rX71d0md8ETKJRxgQ
-	MPRqm15VnD1v8NY0xdI9UVS9Gq281639vA3WqGvkkRJHIOWfivkb1w7ZRGbFKg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v18 13/13] Documentation: networking: document phy_link_topology
-Date: Wed, 21 Aug 2024 17:10:07 +0200
-Message-ID: <20240821151009.1681151-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
-References: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1724253584; c=relaxed/simple;
+	bh=DABmbJ5xr3+kPxzdPgH1KDbNkWt8A7gTW6ZNALitISM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nRO6zHvb1NuxDLDyhK3AyEdliNaKKrpHOgQHvANMnojDYFeUvD598m1IJrF2vSugwDlhDzdzkJZfiUXqkarOkoQtiwgRDqHriIibIJ9CNAEmiR8T7malioxMYripHTPbb51K+4BjtBh5bh3dDYkdprnbHaJKMmFEIvfgE2XQLaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mM+trEPg; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-39d29ba04f2so20472805ab.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:19:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724253582; x=1724858382; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dmAWRsQ+ClmFs3Y1VK+ml/3QqAeWk+oloMwXv5uGD8M=;
+        b=mM+trEPgNLdV6tmwz4Vcnnt6AaiwsMiRACzG3Exz3M13MVKstjHE09kmY+naa44h0L
+         lIeq7vMr8lCW+42tqlERg7byKOI4qf1dyiBRqC2Iohxs4i4Rv4R6EfhC23KxFWlsO8Bh
+         STJnLQlgsPDlcSv50dDQveWiMQI63u8uA0Z/JAPXDCTpIc/KLKDDyvXSvtbMUk7zzNVH
+         BvnY29Ya3N6bxBkd3MGOJXYu/EMMsv5ZtBKFe7m6feC0BWluvQeZF0/b2lFxgpB7zYVp
+         D3dns9LW5lz+XKE87NBgnqD+NMiOhoA5RzoFT4UeMmjaHlddjvYdwGMu1cAyLjajbfcV
+         gkGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724253582; x=1724858382;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dmAWRsQ+ClmFs3Y1VK+ml/3QqAeWk+oloMwXv5uGD8M=;
+        b=qr/boFrMlHbsZjK3GgCDU4TuWY0WgA2RL0xYhD5NO+Plc4ay8z5srVz3SFgWs/IQAV
+         JVGw9+ac7NM/E12culzd9rSo6IHmBBpN1a0Is5GvjIL+l9owDR2I6JvPUGmcm/4SLhbI
+         AYvNHxeRRc03GD9WJoL22Oiar8IlFn0No7i1zJYlfdSu5B5HQh2+baXZNsIbZ6VgZFuB
+         V+WeBPnHeiVAA9h/68C4sMOV0+nNyd3aCypNlkY1vWk5ZAbpN3wDX6TOqQFjh4/VZ37T
+         S1OCXxfXHaDbMu8xGdH615E7f8GVoJfaH+7F8lXCeReZmRYKd8W3lDcyEYfTwbqowcrQ
+         GsLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcsAPHWqxOVMLkMfrrgmXMN1p3wD6vFrh5NL4l6WOfbbnwUDBiYsspAl6MesivvOMt1PnPcng=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypWULKxlmHRt0xUVnQa562z8FowFSvKX0XGfLIP4AeektyWZg2
+	dIq3xig2YYawJ+4gtjyVQv9XEj5ZH7Cr2YaLDr92/93Dp/qcuRLBX/X00W6OZIjjGedXR7jpB7V
+	2arOFL8CZzP6lBq15ydGhCuTaJAc=
+X-Google-Smtp-Source: AGHT+IHaFVabeJSgtwoDJUzYGNnHMmfbyIMSlhOm9uNtiTk0L1JresCp77Agm2tEyGcO34K7dpKnak/OADLt+HNnqYw=
+X-Received: by 2002:a05:6e02:1a86:b0:39b:3a44:fe8a with SMTP id
+ e9e14a558f8ab-39d6c353a36mr26132485ab.4.1724253582044; Wed, 21 Aug 2024
+ 08:19:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20240815113745.6668-1-kerneljasonxing@gmail.com>
+ <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com> <CANn89iLn4=TnBE-0LNvT+ucXDQoUd=Ph+nEoLQOSz0pbdu3upw@mail.gmail.com>
+ <CAL+tcoCxGMNrcuDW1VBqSCFtsrvCoAGiX+AjnuNkh8Ukyzfaaw@mail.gmail.com>
+ <CAL+tcoAMJ+OwVp6NP4Nb0-ryij4dBC_c9O6ZiDsBWqa+iaHhmw@mail.gmail.com> <CANn89iKNQw9x388P45BtbTiGFjj6PCC6vwDF7M9DJFUPhtNWJw@mail.gmail.com>
+In-Reply-To: <CANn89iKNQw9x388P45BtbTiGFjj6PCC6vwDF7M9DJFUPhtNWJw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 21 Aug 2024 23:19:05 +0800
+Message-ID: <CAL+tcoBcLRREwwrEsmzOD-OhzABEOQRqZc8Co_xK3UPXOSrnxA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
+ find port in connect() process
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org, 
+	dsahern@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
+	Jade Dong <jadedong@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The newly introduced phy_link_topology tracks all ethernet PHYs that are
-attached to a netdevice. Document the base principle, internal and
-external APIs. As the phy_link_topology is expected to be extended, this
-documentation will hold any further improvements and additions made
-relative to topology handling.
+On Wed, Aug 21, 2024 at 8:39=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Aug 21, 2024 at 12:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >
+> > Hello Eric,
+> >
+> > On Tue, Aug 20, 2024 at 8:54=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > Hello Eric,
+> > >
+> > > On Tue, Aug 20, 2024 at 8:39=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Tue, Aug 20, 2024 at 1:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.=
+com> wrote:
+> > > > >
+> > > > > On 8/15/24 13:37, Jason Xing wrote:
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > We found that one close-wait socket was reset by the other side
+> > > > > > which is beyond our expectation,
+> > > > >
+> > > > > I'm unsure if you should instead reconsider your expectation: wha=
+t if
+> > > > > the client application does:
+> > > > >
+> > > > > shutdown(fd, SHUT_WR)
+> > > > > close(fd); // with unread data
+> > > > >
+> > > >
+> > > > Also, I was hoping someone would mention IPv6 at some point.
+> > >
+> > > Thanks for reminding me. I'll dig into the IPv6 logic.
+> > >
+> > > >
+> > > > Jason, instead of a lengthy ChatGPT-style changelog, I would prefer=
+ a
+> > >
+> > > LOL, but sorry, I manually control the length which makes it look
+> > > strange, I'll adjust it.
+> > >
+> > > > packetdrill test exactly showing the issue.
+> > >
+> > > I will try the packetdrill.
+> > >
+> >
+> > Sorry that I'm not that good at writing such a case, I failed to add
+> > TS option which will be used in tcp_twsk_unique. So I think I need
+> > more time.
+>
+> The following patch looks better to me, it covers the case where twp =3D=
+=3D NULL,
+> and is family independent.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- Documentation/networking/ethtool-netlink.rst  |   3 +
- Documentation/networking/index.rst            |   1 +
- .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
- 3 files changed, 125 insertions(+)
- create mode 100644 Documentation/networking/phy-link-topology.rst
+Right, thanks for your help!
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 8c152871c23c..44cb9e29f325 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -2198,10 +2198,13 @@ Retrieve information about a given Ethernet PHY sitting on the link. The DO
- operation returns all available information about dev->phydev. User can also
- specify a PHY_INDEX, in which case the DO request returns information about that
- specific PHY.
-+
- As there can be more than one PHY, the DUMP operation can be used to list the PHYs
- present on a given interface, by passing an interface index or name in
- the dump request.
- 
-+For more information, refer to :ref:`phy_link_topology`
-+
- Request contents:
- 
-   ====================================  ======  ==========================
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index d1af04b952f8..c71b87346178 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -91,6 +91,7 @@ Contents:
-    operstates
-    packet_mmap
-    phonet
-+   phy-link-topology
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
-new file mode 100644
-index 000000000000..4dec5d7d6513
---- /dev/null
-+++ b/Documentation/networking/phy-link-topology.rst
-@@ -0,0 +1,121 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _phy_link_topology:
-+
-+=================
-+PHY link topology
-+=================
-+
-+Overview
-+========
-+
-+The PHY link topology representation in the networking stack aims at representing
-+the hardware layout for any given Ethernet link.
-+
-+An Ethernet interface from userspace's point of view is nothing but a
-+:c:type:`struct net_device <net_device>`, which exposes configuration options
-+through the legacy ioctls and the ethtool netlink commands. The base assumption
-+when designing these configuration APIs were that the link looks something like ::
-+
-+  +-----------------------+        +----------+      +--------------+
-+  | Ethernet Controller / |        | Ethernet |      | Connector /  |
-+  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
-+  +-----------------------+        +----------+      +--------------+
-+  struct net_device               struct phy_device
-+
-+Commands that needs to configure the PHY will go through the net_device.phydev
-+field to reach the PHY and perform the relevant configuration.
-+
-+This assumption falls apart in more complex topologies that can arise when,
-+for example, using SFP transceivers (although that's not the only specific case).
-+
-+Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
-+interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
-+10GBaseR, etc.
-+
-+The link topology then looks like this (when an SFP module is inserted) ::
-+
-+  +-----+  SGMII  +------------+
-+  | MAC | ------- | SFP Module |
-+  +-----+         +------------+
-+
-+Knowing that some modules embed a PHY, the actual link is more like ::
-+
-+  +-----+  SGMII   +--------------+
-+  | MAC | -------- | PHY (on SFP) |
-+  +-----+          +--------------+
-+
-+In this case, the SFP PHY is handled by phylib, and registered by phylink through
-+its SFP upstream ops.
-+
-+Now some Ethernet controllers aren't able to output a serialized interface, so
-+we can't directly connect them to an SFP cage. However, some PHYs can be used
-+as media-converters, to translate the non-serialized MAC MII interface to a
-+serialized MII interface fed to the SFP ::
-+
-+  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
-+  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
-+  +-----+         +-----------------------+         +--------------+
-+
-+This is where the model of having a single net_device.phydev pointer shows its
-+limitations, as we now have 2 PHYs on the link.
-+
-+The phy_link topology framework aims at providing a way to keep track of every
-+PHY on the link, for use by both kernel drivers and subsystems, but also to
-+report the topology to userspace, allowing to target individual PHYs in configuration
-+commands.
-+
-+API
-+===
-+
-+The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
-+resource, that gets initialized at netdevice creation. Once it's initialized,
-+it is then possible to register PHYs to the topology through :
-+
-+:c:func:`phy_link_topo_add_phy`
-+
-+Besides registering the PHY to the topology, this call will also assign a unique
-+index to the PHY, which can then be reported to userspace to refer to this PHY
-+(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
-+0 is reserved to indicate the PHY doesn't belong to any topology yet.
-+
-+The PHY can then be removed from the topology through
-+
-+:c:func:`phy_link_topo_del_phy`
-+
-+These function are already hooked into the phylib subsystem, so all PHYs that
-+are linked to a net_device through :c:func:`phy_attach_direct` will automatically
-+join the netdev's topology.
-+
-+PHYs that are on a SFP module will also be automatically registered IF the SFP
-+upstream is phylink (so, no media-converter).
-+
-+PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
-+and :c:func:`phy_sfp_detach_phy`, which can be used as a
-+.attach_phy / .detach_phy implementation for the
-+:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
-+
-+UAPI
-+====
-+
-+There exist a set of netlink commands to query the link topology from userspace,
-+see ``Documentation/networking/ethtool-netlink.rst``.
-+
-+The whole point of having a topology representation is to assign the phyindex
-+field in :c:type:`struct phy_device <phy_device>`. This index is reported to
-+userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
-+will result in all PHYs from all net_device being listed. The DUMP command
-+accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
-+to be passed in the request to filter the DUMP to a single net_device.
-+
-+The retrieved index can then be passed as a request parameter using the
-+``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
-+
-+* ``ETHTOOL_MSG_STRSET_GET`` to get the stats string set from a given PHY
-+* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
-+  cable testing on a given PHY on the link (most likely the outermost PHY)
-+* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
-+* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
-+  to set the PLCA (Physical Layer Collision Avoidance) parameters
-+
-+Note that the PHY index can be passed to other requests, which will silently
-+ignore it if present and irrelevant.
--- 
-2.45.2
+Thanks,
+Jason
 
+> It is also clear it will not impact DCCP without having to think about it=
+.
+>
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index fd17f25ff288a47fca3ec1881c87d56bd9989709..43a3362e746f331ac64b5e4e6=
+de6878ecd27e115
+> 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -144,6 +144,8 @@ int tcp_twsk_unique(struct sock *sk, struct sock
+> *sktw, void *twp)
+>                         reuse =3D 0;
+>         }
+>
+> +       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
+> +               reuse =3D 0;
+>         /* With PAWS, it is safe from the viewpoint
+>            of data integrity. Even without PAWS it is safe provided seque=
+nce
+>            spaces do not overlap i.e. at data rates <=3D 80Mbit/sec.
 
