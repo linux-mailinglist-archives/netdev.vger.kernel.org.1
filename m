@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-120633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F42395A0E8
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:07:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7968E95A0EA
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80EC6B21227
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:07:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E10AEB216E3
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B20136348;
-	Wed, 21 Aug 2024 15:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9084D13D8B6;
+	Wed, 21 Aug 2024 15:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q1GGnuJt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dUJJiEAy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D309F84E1C;
-	Wed, 21 Aug 2024 15:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D95513A241;
+	Wed, 21 Aug 2024 15:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724252827; cv=none; b=UcSBoV8DdNUgvuQGx1cH475Oqvk5l7W3BXMWfTT5ipKSVs8zAXi4tHagy7b0Q38z8K3aNcF263W0yaHBxYb3xnRY1dQS2uHeXDJH3GB3oHlWWmadTIklpJwXH31tQjgcv86GfFaiu47xQa/C7xmaaQ9YKmtrNAO8xQVoYBXDt8Q=
+	t=1724252830; cv=none; b=nNwuNk9M2XtCO+61uQLlIfS2LUlW+9uCwP91WW5Kbcg7TLGGV+e2UEtfXcmPjDANBCZ/KtbD9zpwrkUt9QaMOrYnt+IHWrZt1bL5bxJjXMmK1MuXA+5CyEb0h+ygvlip3jZ48CoSGPq7Pd7WNdQD87W/L3cvOz1qgfCFT7Jdt+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724252827; c=relaxed/simple;
-	bh=x+WoOn6PC6SQ9Q/BAgJI5en/94dawkxansxzliMTw4M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FKzuWlJW8uslAUvqcsSSB+rs8e4FOvu5hAIby2LoTaoL0Ip6cJX/qNLVY7aUyrPwh/hb9sOcZlYNFxp4mMiHmVrmK7z3bVFvcGUkiCEjj59d5siOx1lH5crDMqbr287hCPFs22PZkgz5cc0LS7YQeQP/MCKJdA5CnCuoZ9m8PHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q1GGnuJt; arc=none smtp.client-ip=198.175.65.18
+	s=arc-20240116; t=1724252830; c=relaxed/simple;
+	bh=mIkH2Nkq5XkkwF2vroK0XoAlQn+KDyN4Es+KTQiTcr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e7XbIgcOdGoWl/pLvdZ2hd+T59NMmKcWugFfYr2r8PhtGszF2ud4XV5tWw1hvx9jNJb6+VJxEsgHNeClzsGf3dnsd8tns76GLphdsWyvgzw/Nzqjs2mhUcgRzz7YjmQSOdm4LallrL6GFqcb1lYK69txJCCFl//sMi4x285HBSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dUJJiEAy; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724252826; x=1755788826;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=x+WoOn6PC6SQ9Q/BAgJI5en/94dawkxansxzliMTw4M=;
-  b=Q1GGnuJtUGoskpzEbs9uX4lRKHPFtcsXtIm6Jo5pMN1J1+J5FuF3SPz1
-   PqSnB5WpoSbMVJ1LuCVnR6HiD5APS5FrOc9KHhgev947ReGvplQsiUttb
-   YnyvpwDu6GI1lJZ/2UV+dj/GnLYjUo1vgtlAa9K74Sy8ij2+vK7pC2OOr
-   2crl/CESwpXirbdBTbshhCwacYAS2yf0x+a8iSi0Lgx8bwrY2RAnPj9iy
-   qTzLpYACsjtrhfXElg2ekoq7uF2dckiBAnvmGlp26ru8p5Fi2z2TYVqGG
-   M+2+gpqfhdS2/AA6y4BkTOFMw1eLG7TY1xtdYKAja6DdSo42WjMifzx4K
-   Q==;
-X-CSE-ConnectionGUID: +ysTcH6/RkqIicawi9ihXA==
-X-CSE-MsgGUID: X5ohaiAER/OxFTJhD3tfMg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="22769193"
+  t=1724252829; x=1755788829;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=mIkH2Nkq5XkkwF2vroK0XoAlQn+KDyN4Es+KTQiTcr8=;
+  b=dUJJiEAya/Pmp2dRmQK+hGi1F+qu92Vm+kJB1ctfBhwB7/EVK8t7i0jo
+   jRGZIq8JgNFmwJzUnhp6mW/xRYyL/PF8F8ri4DHVlLq/2jIsNtovxF3lj
+   3moYV6Z5PwG5dPRraOdYsIA1TCBdU3m/DtASuTR/qPzQQzdYZOL78eACx
+   AdNqAGuqjaYjLohiFYQJK6T8VPVXPLwJJfrsPGIhBeRjEKanO2GdeZ6iQ
+   aE4bvD6KdqLjdkvP1GwitBmBimod+xzgw7sylHw3yXgTBr96YvqAlu2Qt
+   FGYpB2Mo+jlTvccZJNlVyzXzlAc0BgXKfT+CU3SB+IfCK/S4MPvDPkbmK
+   w==;
+X-CSE-ConnectionGUID: lLfMnruOQ9ekYG+603Z5YA==
+X-CSE-MsgGUID: 3k4aqadzTcGgbeJ1Tf832g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="22769208"
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="22769193"
+   d="scan'208";a="22769208"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 08:07:05 -0700
-X-CSE-ConnectionGUID: PeZTTbiPTfCQ/0z7Wh7opA==
-X-CSE-MsgGUID: Doejf1WtS32M3hDVk2nb0g==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 08:07:08 -0700
+X-CSE-ConnectionGUID: sAZ6loRbRnu3feyta/njWQ==
+X-CSE-MsgGUID: sUJSTvQATAC488+4mp9Ewg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="84291245"
+   d="scan'208";a="84291251"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 21 Aug 2024 08:07:02 -0700
+  by fmviesa002.fm.intel.com with ESMTP; 21 Aug 2024 08:07:05 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -70,10 +71,12 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 0/6] netdev_features: start cleaning netdev_features_t up
-Date: Wed, 21 Aug 2024 17:06:54 +0200
-Message-ID: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
+Subject: [PATCH net-next v4 1/6] netdevice: convert private flags > BIT(31) to bitfields
+Date: Wed, 21 Aug 2024 17:06:55 +0200
+Message-ID: <20240821150700.1760518-2-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
+References: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,159 +85,278 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-NETDEV_FEATURE_COUNT is currently 64, which means we can't add any new
-features as netdev_features_t is u64.
-As per several discussions, instead of converting netdev_features_t to
-a bitmap, which would mean A LOT of changes, we can try cleaning up
-netdev feature bits.
-There's a bunch of bits which don't really mean features, rather device
-attributes/properties that can't be changed via Ethtool in any of the
-drivers. Such attributes can be moved to netdev private flags without
-losing any functionality.
+Make dev->priv_flags `u32` back and define bits higher than 31 as
+bitfield booleans as per Jakub's suggestion. This simplifies code
+which accesses these bits with no optimization loss (testb both
+before/after), allows to not extend &netdev_priv_flags each time,
+but also scales better as bits > 63 in the future would only add
+a new u64 to the structure with no complications, comparing to
+that extending ::priv_flags would require converting it to a bitmap.
+Note that I picked `unsigned long :1` to not lose any potential
+optimizations comparing to `bool :1` etc.
 
-Start converting some read-only netdev features to private flags from
-the ones that are most obvious, like lockless Tx, inability to change
-network namespace etc. I was able to reduce NETDEV_FEATURE_COUNT from
-64 to 60, which mean 4 free slots for new features. There are obviously
-more read-only features to convert, such as highDMA, "challenged VLAN",
-HSR (4 bits) - this will be done in subsequent series.
-Please note that netdev features are not uAPI/ABI by any means. Ethtool
-passes their names and bits to the userspace separately and there are no
-hardcoded names/bits in the userspace, so that new Ethtool could work
-on older kernels and vice versa. Even shell scripts won't most likely
-break since the removed bits were always read-only, meaning nobody would
-try touching them from a script.
-
-Alexander Lobakin (6):
-  netdevice: convert private flags > BIT(31) to bitfields
-  netdev_features: remove unused __UNUSED_NETIF_F_1
-  netdev_features: convert NETIF_F_LLTX to dev->lltx
-  netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local
-  netdev_features: convert NETIF_F_FCOE_MTU to dev->fcoe_mtu
-  netdev_features: remove NETIF_F_ALL_FCOE
-
- .../networking/net_cachelines/net_device.rst  |  7 +++-
- Documentation/networking/netdev-features.rst  | 15 -------
- Documentation/networking/netdevices.rst       |  4 +-
- Documentation/networking/switchdev.rst        |  4 +-
- drivers/net/ethernet/tehuti/tehuti.h          |  2 +-
- include/linux/netdev_features.h               | 14 +------
- include/linux/netdevice.h                     | 42 +++++++++++++------
- drivers/net/amt.c                             |  4 +-
- drivers/net/bareudp.c                         |  2 +-
- drivers/net/bonding/bond_main.c               |  8 ++--
- drivers/net/dummy.c                           |  3 +-
- drivers/net/ethernet/adi/adin1110.c           |  2 +-
- drivers/net/ethernet/chelsio/cxgb/cxgb2.c     |  3 +-
- .../net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c   |  6 +--
- .../net/ethernet/freescale/dpaa/dpaa_eth.c    |  3 +-
- .../net/ethernet/freescale/dpaa2/dpaa2-eth.c  |  3 +-
- .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |  4 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 11 ++---
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  4 +-
- .../ethernet/marvell/prestera/prestera_main.c |  3 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  4 +-
- .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  3 +-
- .../net/ethernet/mellanox/mlxsw/spectrum.c    |  6 ++-
- .../ethernet/microchip/lan966x/lan966x_main.c |  2 +-
- .../net/ethernet/netronome/nfp/nfp_net_repr.c |  3 +-
- drivers/net/ethernet/pasemi/pasemi_mac.c      |  5 ++-
- .../net/ethernet/qualcomm/rmnet/rmnet_vnd.c   |  2 +-
- drivers/net/ethernet/rocker/rocker_main.c     |  3 +-
- drivers/net/ethernet/sfc/ef100_rep.c          |  4 +-
- drivers/net/ethernet/tehuti/tehuti.c          |  4 +-
- drivers/net/ethernet/ti/cpsw_new.c            |  3 +-
- drivers/net/ethernet/toshiba/spider_net.c     |  3 +-
- drivers/net/geneve.c                          |  2 +-
- drivers/net/gtp.c                             |  2 +-
- drivers/net/hamradio/bpqether.c               |  2 +-
- drivers/net/ipvlan/ipvlan_main.c              |  3 +-
- drivers/net/loopback.c                        |  4 +-
- drivers/net/macsec.c                          |  4 +-
- drivers/net/macvlan.c                         |  6 ++-
- drivers/net/net_failover.c                    |  4 +-
- drivers/net/netkit.c                          |  3 +-
- drivers/net/nlmon.c                           |  4 +-
- drivers/net/ppp/ppp_generic.c                 |  2 +-
- drivers/net/rionet.c                          |  2 +-
- drivers/net/team/team_core.c                  |  8 ++--
- drivers/net/tun.c                             |  5 ++-
- drivers/net/veth.c                            |  2 +-
- drivers/net/vrf.c                             |  4 +-
- drivers/net/vsockmon.c                        |  4 +-
- drivers/net/vxlan/vxlan_core.c                |  5 ++-
- drivers/net/wireguard/device.c                |  2 +-
- drivers/scsi/fcoe/fcoe.c                      |  4 +-
- drivers/staging/octeon/ethernet.c             |  2 +-
- lib/test_bpf.c                                |  3 +-
- net/8021q/vlan_dev.c                          | 10 +++--
- net/8021q/vlanproc.c                          |  4 +-
- net/batman-adv/soft-interface.c               |  5 ++-
- net/bridge/br_device.c                        |  6 ++-
- net/core/dev.c                                |  8 ++--
- net/core/dev_ioctl.c                          |  9 ++--
- net/core/net-sysfs.c                          |  3 +-
- net/core/rtnetlink.c                          |  2 +-
- net/dsa/user.c                                |  3 +-
- net/ethtool/common.c                          |  3 --
- net/hsr/hsr_device.c                          | 12 +++---
- net/ieee802154/6lowpan/core.c                 |  2 +-
- net/ieee802154/core.c                         | 10 ++---
- net/ipv4/ip_gre.c                             |  4 +-
- net/ipv4/ip_tunnel.c                          |  2 +-
- net/ipv4/ip_vti.c                             |  2 +-
- net/ipv4/ipip.c                               |  2 +-
- net/ipv4/ipmr.c                               |  2 +-
- net/ipv6/ip6_gre.c                            |  7 ++--
- net/ipv6/ip6_tunnel.c                         |  4 +-
- net/ipv6/ip6mr.c                              |  2 +-
- net/ipv6/sit.c                                |  4 +-
- net/l2tp/l2tp_eth.c                           |  2 +-
- net/openvswitch/vport-internal_dev.c          | 11 ++---
- net/wireless/core.c                           | 10 ++---
- net/xfrm/xfrm_interface_core.c                |  2 +-
- tools/testing/selftests/net/forwarding/README |  2 +-
- 83 files changed, 205 insertions(+), 195 deletions(-)
-
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
-From v3[0]:
-* 0001: fix kdoc for priv_flags_fast (it doesn't support describing
-  struct_groups()s yet) (Jakub);
-* 0006: fix subject prefix (make it consistent with the rest).
+ .../networking/net_cachelines/net_device.rst  |  4 ++-
+ include/linux/netdevice.h                     | 28 ++++++++++++-------
+ .../ethernet/microchip/lan966x/lan966x_main.c |  2 +-
+ drivers/net/macvlan.c                         |  3 +-
+ drivers/net/vxlan/vxlan_core.c                |  3 +-
+ net/8021q/vlanproc.c                          |  4 +--
+ net/core/dev.c                                |  4 +--
+ net/core/dev_ioctl.c                          |  9 +++---
+ net/core/rtnetlink.c                          |  2 +-
+ 9 files changed, 35 insertions(+), 24 deletions(-)
 
-From v2[1]:
-* rebase on top of the latest net-next;
-* 0003: don't remove the paragraph saying "LLTX is deprecated for real
-  HW drivers" (Willem);
-* 0006: new, remove %NETIF_F_ALL_FCOE used only 2 times in 1 file
-  (Jakub);
-* no functional changes.
-
-From v1[2]:
-* split bitfield priv flags into "hot" and "cold", leave the first
-  placed where the old ::priv_flags is and move the rest down next
-  to ::threaded (Jakub);
-* document all the changes in Documentation/networking/net_cachelines/
-  net_device.rst;
-* #3: remove the "-1 cacheline on Tx" paragraph, not really true (Eric).
-
-From RFC[3]:
-* drop:
-  * IFF_LOGICAL (as (LLTX | IFF_NO_QUEUE)) - will be discussed later;
-  * NETIF_F_HIGHDMA conversion - requires priv flags inheriting etc.,
-    maybe later;
-  * NETIF_F_VLAN_CHALLENGED conversion - same as above;
-* convert existing priv_flags > BIT(31) to bitfield booleans and define
-  new flags the same way (Jakub);
-* mention a couple times that netdev features are not uAPI/ABI by any
-  means (Andrew).
-
-[0] https://lore.kernel.org/netdev/20240808152757.2016725-1-aleksander.lobakin@intel.com
-[1] https://lore.kernel.org/netdev/20240703150342.1435976-1-aleksander.lobakin@intel.com
-[2] https://lore.kernel.org/netdev/20240625114432.1398320-1-aleksander.lobakin@intel.com
-[3] https://lore.kernel.org/netdev/20240405133731.1010128-1-aleksander.lobakin@intel.com
+diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+index 70c4fb9d4e5c..d7ba48ff5559 100644
+--- a/Documentation/networking/net_cachelines/net_device.rst
++++ b/Documentation/networking/net_cachelines/net_device.rst
+@@ -7,6 +7,7 @@ net_device struct fast path usage breakdown
+ 
+ Type                                Name                    fastpath_tx_access  fastpath_rx_access  Comments
+ ..struct                            ..net_device                                                    
++unsigned_long:32                    priv_flags              read_mostly         -                   __dev_queue_xmit(tx)
+ char                                name[16]                -                   -                   
+ struct_netdev_name_node*            name_node                                                       
+ struct_dev_ifalias*                 ifalias                                                         
+@@ -23,7 +24,6 @@ struct_list_head                    ptype_specific
+ struct                              adj_list                                                        
+ unsigned_int                        flags                   read_mostly         read_mostly         __dev_queue_xmit,__dev_xmit_skb,ip6_output,__ip6_finish_output(tx);ip6_rcv_core(rx)
+ xdp_features_t                      xdp_features                                                    
+-unsigned_long_long                  priv_flags              read_mostly         -                   __dev_queue_xmit(tx)
+ struct_net_device_ops*              netdev_ops              read_mostly         -                   netdev_core_pick_tx,netdev_start_xmit(tx)
+ struct_xdp_metadata_ops*            xdp_metadata_ops                                                
+ int                                 ifindex                 -                   read_mostly         ip6_rcv_core
+@@ -163,6 +163,8 @@ struct_lock_class_key*              qdisc_tx_busylock
+ bool                                proto_down                                                      
+ unsigned:1                          wol_enabled                                                     
+ unsigned:1                          threaded                -                   -                   napi_poll(napi_enable,dev_set_threaded)
++unsigned_long:1                     see_all_hwtstamp_requests                                       
++unsigned_long:1                     change_proto_down                                               
+ struct_list_head                    net_notifier_list                                               
+ struct_macsec_ops*                  macsec_ops                                                      
+ struct_udp_tunnel_nic_info*         udp_tunnel_nic_info                                             
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0ef3eaa23f4b..e2c1fa44048f 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1608,7 +1608,8 @@ struct net_device_ops {
+  * userspace; this means that the order of these flags can change
+  * during any kernel release.
+  *
+- * You should have a pretty good reason to be extending these flags.
++ * You should add bitfield booleans after either net_device::priv_flags
++ * (hotpath) or ::threaded (slowpath) instead of extending these flags.
+  *
+  * @IFF_802_1Q_VLAN: 802.1Q VLAN device
+  * @IFF_EBRIDGE: Ethernet bridging device
+@@ -1647,10 +1648,6 @@ struct net_device_ops {
+  * @IFF_NO_ADDRCONF: prevent ipv6 addrconf
+  * @IFF_TX_SKB_NO_LINEAR: device/driver is capable of xmitting frames with
+  *	skb_headlen(skb) == 0 (data starts from frag0)
+- * @IFF_CHANGE_PROTO_DOWN: device supports setting carrier via IFLA_PROTO_DOWN
+- * @IFF_SEE_ALL_HWTSTAMP_REQUESTS: device wants to see calls to
+- *	ndo_hwtstamp_set() for all timestamp requests regardless of source,
+- *	even if those aren't HWTSTAMP_SOURCE_NETDEV.
+  */
+ enum netdev_priv_flags {
+ 	IFF_802_1Q_VLAN			= 1<<0,
+@@ -1685,8 +1682,6 @@ enum netdev_priv_flags {
+ 	IFF_L3MDEV_RX_HANDLER		= 1<<29,
+ 	IFF_NO_ADDRCONF			= BIT_ULL(30),
+ 	IFF_TX_SKB_NO_LINEAR		= BIT_ULL(31),
+-	IFF_CHANGE_PROTO_DOWN		= BIT_ULL(32),
+-	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
+ };
+ 
+ /* Specifies the type of the struct net_device::ml_priv pointer */
+@@ -1718,6 +1713,9 @@ enum netdev_reg_state {
+  *	data with strictly "high-level" data, and it has to know about
+  *	almost every data structure used in the INET module.
+  *
++ *	@priv_flags:	flags invisible to userspace defined as bits, see
++ *			enum netdev_priv_flags for the definitions
++ *
+  *	@name:	This is the first field of the "visible" part of this structure
+  *		(i.e. as seen by users in the "Space.c" file).  It is the name
+  *		of the interface.
+@@ -1784,8 +1782,6 @@ enum netdev_reg_state {
+  *
+  *	@flags:		Interface flags (a la BSD)
+  *	@xdp_features:	XDP capability supported by the device
+- *	@priv_flags:	Like 'flags' but invisible to userspace,
+- *			see if.h for the definitions
+  *	@gflags:	Global flags ( kept as legacy )
+  *	@priv_len:	Size of the ->priv flexible array
+  *	@priv:		Flexible array containing private data
+@@ -1958,6 +1954,12 @@ enum netdev_reg_state {
+  *
+  *	@threaded:	napi threaded mode is enabled
+  *
++ *	@see_all_hwtstamp_requests: device wants to see calls to
++ *			ndo_hwtstamp_set() for all timestamp requests
++ *			regardless of source, even if those aren't
++ *			HWTSTAMP_SOURCE_NETDEV
++ *	@change_proto_down: device supports setting carrier via IFLA_PROTO_DOWN
++ *
+  *	@net_notifier_list:	List of per-net netdev notifier block
+  *				that follow this device when it is moved
+  *				to another network namespace.
+@@ -2008,7 +2010,9 @@ struct net_device {
+ 
+ 	/* TX read-mostly hotpath */
+ 	__cacheline_group_begin(net_device_read_tx);
+-	unsigned long long	priv_flags;
++	struct_group(priv_flags_fast,
++		unsigned long		priv_flags:32;
++	);
+ 	const struct net_device_ops *netdev_ops;
+ 	const struct header_ops *header_ops;
+ 	struct netdev_queue	*_tx;
+@@ -2343,6 +2347,10 @@ struct net_device {
+ 	bool			proto_down;
+ 	bool			threaded;
+ 
++	/* priv_flags_slow, ungrouped to save space */
++	unsigned long		see_all_hwtstamp_requests:1;
++	unsigned long		change_proto_down:1;
++
+ 	struct list_head	net_notifier_list;
+ 
+ #if IS_ENABLED(CONFIG_MACSEC)
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index ec672af12e25..534d4716d5f7 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -816,7 +816,7 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
+ 			 NETIF_F_HW_VLAN_STAG_TX |
+ 			 NETIF_F_HW_TC;
+ 	dev->hw_features |= NETIF_F_HW_TC;
+-	dev->priv_flags |= IFF_SEE_ALL_HWTSTAMP_REQUESTS;
++	dev->see_all_hwtstamp_requests = true;
+ 	dev->needed_headroom = IFH_LEN_BYTES;
+ 
+ 	eth_hw_addr_gen(dev, lan966x->base_mac, p + 1);
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index 24298a33e0e9..b45f137f365e 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -1213,7 +1213,8 @@ void macvlan_common_setup(struct net_device *dev)
+ 	dev->max_mtu		= ETH_MAX_MTU;
+ 	dev->priv_flags	       &= ~IFF_TX_SKB_SHARING;
+ 	netif_keep_dst(dev);
+-	dev->priv_flags	       |= IFF_UNICAST_FLT | IFF_CHANGE_PROTO_DOWN;
++	dev->priv_flags	       |= IFF_UNICAST_FLT;
++	dev->change_proto_down	= true;
+ 	dev->netdev_ops		= &macvlan_netdev_ops;
+ 	dev->needs_free_netdev	= true;
+ 	dev->priv_destructor	= macvlan_dev_free;
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 8983e75e9881..a92866986f3b 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -3332,7 +3332,8 @@ static void vxlan_setup(struct net_device *dev)
+ 	dev->hw_features |= NETIF_F_RXCSUM;
+ 	dev->hw_features |= NETIF_F_GSO_SOFTWARE;
+ 	netif_keep_dst(dev);
+-	dev->priv_flags |= IFF_NO_QUEUE | IFF_CHANGE_PROTO_DOWN;
++	dev->priv_flags |= IFF_NO_QUEUE;
++	dev->change_proto_down = true;
+ 
+ 	/* MTU range: 68 - 65535 */
+ 	dev->min_mtu = ETH_MIN_MTU;
+diff --git a/net/8021q/vlanproc.c b/net/8021q/vlanproc.c
+index 87b959da00cd..fa67374bda49 100644
+--- a/net/8021q/vlanproc.c
++++ b/net/8021q/vlanproc.c
+@@ -238,9 +238,9 @@ static int vlandev_seq_show(struct seq_file *seq, void *offset)
+ 
+ 	stats = dev_get_stats(vlandev, &temp);
+ 	seq_printf(seq,
+-		   "%s  VID: %d	 REORDER_HDR: %i  dev->priv_flags: %llx\n",
++		   "%s  VID: %d	 REORDER_HDR: %i  dev->priv_flags: %x\n",
+ 		   vlandev->name, vlan->vlan_id,
+-		   (int)(vlan->flags & 1), vlandev->priv_flags);
++		   (int)(vlan->flags & 1), (u32)vlandev->priv_flags);
+ 
+ 	seq_printf(seq, fmt64, "total frames received", stats->rx_packets);
+ 	seq_printf(seq, fmt64, "total bytes received", stats->rx_bytes);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e7260889d4cb..c35aa3440b51 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9272,7 +9272,7 @@ EXPORT_SYMBOL(netdev_port_same_parent_id);
+  */
+ int dev_change_proto_down(struct net_device *dev, bool proto_down)
+ {
+-	if (!(dev->priv_flags & IFF_CHANGE_PROTO_DOWN))
++	if (!dev->change_proto_down)
+ 		return -EOPNOTSUPP;
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+@@ -11905,7 +11905,7 @@ static struct pernet_operations __net_initdata default_device_ops = {
+ static void __init net_dev_struct_check(void)
+ {
+ 	/* TX read-mostly hotpath */
+-	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, priv_flags);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, priv_flags_fast);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, netdev_ops);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, header_ops);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, _tx);
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index 8592c052c0f4..473c437b6b53 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -317,8 +317,7 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
+  * should take precedence in front of hardware timestamping provided by the
+  * netdev. If the netdev driver needs to perform specific actions even for PHY
+  * timestamping to work properly (a switch port must trap the timestamped
+- * frames and not forward them), it must set IFF_SEE_ALL_HWTSTAMP_REQUESTS in
+- * dev->priv_flags.
++ * frames and not forward them), it must set dev->see_all_hwtstamp_requests.
+  */
+ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 			    struct kernel_hwtstamp_config *cfg,
+@@ -332,13 +331,13 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 
+ 	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
+ 
+-	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
++	if (phy_ts && dev->see_all_hwtstamp_requests) {
+ 		err = ops->ndo_hwtstamp_get(dev, &old_cfg);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+-	if (!phy_ts || (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
++	if (!phy_ts || dev->see_all_hwtstamp_requests) {
+ 		err = ops->ndo_hwtstamp_set(dev, cfg, extack);
+ 		if (err) {
+ 			if (extack->_msg)
+@@ -347,7 +346,7 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 		}
+ 	}
+ 
+-	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS))
++	if (phy_ts && dev->see_all_hwtstamp_requests)
+ 		changed = kernel_hwtstamp_config_changed(&old_cfg, cfg);
+ 
+ 	if (phy_ts) {
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 73fd7f543fd0..0c050a305d6b 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -2724,7 +2724,7 @@ static int do_set_proto_down(struct net_device *dev,
+ 	bool proto_down;
+ 	int err;
+ 
+-	if (!(dev->priv_flags & IFF_CHANGE_PROTO_DOWN)) {
++	if (!dev->change_proto_down) {
+ 		NL_SET_ERR_MSG(extack,  "Protodown not supported by device");
+ 		return -EOPNOTSUPP;
+ 	}
 -- 
 2.46.0
 
