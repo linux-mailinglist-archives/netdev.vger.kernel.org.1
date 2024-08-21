@@ -1,152 +1,124 @@
-Return-Path: <netdev+bounces-120461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2DA95974B
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:43:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 280CD959789
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:15:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFCD1C2117B
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 09:43:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC2A01F20FFB
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BC51CDFBB;
-	Wed, 21 Aug 2024 08:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9DA19259A;
+	Wed, 21 Aug 2024 08:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DhLGASOm"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jon1dStJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300F71CDFB3;
-	Wed, 21 Aug 2024 08:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61BD1607A0;
+	Wed, 21 Aug 2024 08:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724228715; cv=none; b=I5HZcM34HjXacwdBKrWS87j+pwb1QMOOkATo2443h07BzY0q+0R7B7H5UXz8qsONk1jSu73bALMkqZkhpY6kC0nfOOr1h+JXmbXEB3HZas1VEBktHNcV+UYJ5LrngVPjLTs9Iy5dkHspIRxv2rCbfkUEWPz2wHUmUQ/ofSeVJ6g=
+	t=1724229482; cv=none; b=BtdfXzclVXhhAvYwObgwHq0yBLCE2+d7g7wurU6tgJVZMa+NOHMRf0A/sNgPH/QwaJ/JcGFxivoiVS6LlGu8VPYfwTSPRePTevv711IYEnEd0Et+rYXcV2uQtaIze3VVlie5Jw95W113ad4nEMv9cDCOhn9SIq81S0I7HhWD1Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724228715; c=relaxed/simple;
-	bh=ksEwtx6MK1MO29JZVBLTZ/zuhbAx+9T13AxqU65ha+I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mZjprMh2fH7z5T6Y56wP2AdNcq+3YusY1kBEtHEtPE4k5EXgspsZ78jkt4Yu/ITR3VqKcJdnKRLe6w9uT48AlILPNPLUa7BOVmkexppu+QYv+fY0PMzxw4fX8s3HjQkLGn4ZzUfP7CcxPqNN+5ajAH96PDGJuB6cr0HTcSvj+f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DhLGASOm; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L65Ta8024473;
-	Wed, 21 Aug 2024 08:25:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	tQFN63z5zVyACKkqiHRlSRLD7DQ1AMvOTunOX5dSs54=; b=DhLGASOmP/sYoKFz
-	CUeQdo+LMppl2Otp48CfFzrrXb1EAqdDrZlyFT1iWhEHbPbULFwLpM2X8r5+lL9K
-	5tUGkhpJkON76rOQeS+SC9RjxWImdJ3LTZJ5as3tu67ac0m2q/bA7PwYRyf7jPp/
-	WsHnH8lNYZ64/ASnd/kVlUvaWXHJQFKyRODqViwqV1owQ2+8pp6dlqTEypu9yw+S
-	F+Ar3tygRhZ4T+n9AijnSVImVU7KLrKHWRJ4r4Lc6hb7nkDyocsuJhXGoa1/u97l
-	VIPPFl8MrEDGsEfEITnGR+NV2MSgmKp6uNiMatW4ybZ9HYhcSqyfmeRzWgsQjyQr
-	Mv3ZBA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmus3j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 08:25:07 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47L8P5j5025859
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 08:25:05 GMT
-Received: from [10.216.8.12] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 21 Aug
- 2024 01:25:00 -0700
-Message-ID: <6016f2ec-6918-471c-a8dc-0aa98fc2b824@quicinc.com>
-Date: Wed, 21 Aug 2024 13:54:57 +0530
+	s=arc-20240116; t=1724229482; c=relaxed/simple;
+	bh=uabQm7ZYUZLzAKgUc+bSaZLsoAHNfHfQdgMMrc030bw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VlcDENskz2tgcixD1gJySHKye4/4u2ZE70E0n6Qbgg2FcSnWwFwbOc3WQVPA4HXWvkBDxS9O0n+IRRLmKoBFvOUURzuqgiXifg05/a0qIVvS4ItgQuKphOJ6ZHOiM8e+2oAQSo10iSgrzJl5fHUch04gw7LJSumZMe5zYQ68wZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jon1dStJ; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay5-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::225])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 66654C31EC;
+	Wed, 21 Aug 2024 08:16:33 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3119A1C0007;
+	Wed, 21 Aug 2024 08:16:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1724228185;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IJeKwYOdnVrbwcx1BXhsYNmdVn78L0iOo9pD8KulKgA=;
+	b=jon1dStJRSD9xeQ/OyZmNELKzotCTnjuoGx85fBcVvA8POxxUXhAwTwEa84A4qKM3DhFGa
+	xBrrkVV+cYW+OAO+VciBzi0d6O4A0qtBvlMF9ZDKryBtomwm0H3wrF9ne8CHA81q9lW3gE
+	vnDOX+icKNiC4zvjU+8SyYlV6pjsKxA1L1erzhZ1MT+L9XmtP63am+W2uXYCYaliucJLq5
+	4YVWiHXoB9Gaw9WYuCBYnYrxMYg3G6WmvdIQXtuhE8T4Q4F/yzuBt8PRTs94bQX1gk7Xz3
+	j4V/R5KoTfCsia6yZp9f7+dVX65ZZE5Vpgg1cFyWGZmC25C/3+njM8yB8zTZ+g==
+Date: Wed, 21 Aug 2024 10:16:22 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] phy: dp83tg720: Add statistics support
+Message-ID: <20240821101622.3ef23d29@fedora-3.home>
+In-Reply-To: <20240820122914.1958664-4-o.rempel@pengutronix.de>
+References: <20240820122914.1958664-1-o.rempel@pengutronix.de>
+	<20240820122914.1958664-4-o.rempel@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] clk: qcom: Add support for Global Clock Controller on
- QCS8300
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Ajit
- Pandey" <quic_ajipan@quicinc.com>,
-        Taniya Das <quic_tdas@quicinc.com>,
-        Jagadeesh Kona <quic_jkona@quicinc.com>,
-        Satya Priya Kakitapalli
-	<quic_skakitap@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
- <20240820-qcs8300-gcc-v1-2-d81720517a82@quicinc.com>
- <a7afdd6d-47a1-41c7-8a0d-27919cf5af90@lunn.ch>
-Content-Language: en-US
-From: Imran Shaik <quic_imrashai@quicinc.com>
-In-Reply-To: <a7afdd6d-47a1-41c7-8a0d-27919cf5af90@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 90ASgeUzY0yu7HUlsbJzQvY0H5JxiK8b
-X-Proofpoint-GUID: 90ASgeUzY0yu7HUlsbJzQvY0H5JxiK8b
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_07,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
- priorityscore=1501 malwarescore=0 suspectscore=0 clxscore=1011
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408210060
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello Oleksij,
 
+On Tue, 20 Aug 2024 14:29:14 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-On 8/20/2024 7:36 PM, Andrew Lunn wrote:
->> +static int gcc_qcs8300_probe(struct platform_device *pdev)
->> +{
->> +	struct regmap *regmap;
->> +	int ret;
->> +
->> +	regmap = qcom_cc_map(pdev, &gcc_qcs8300_desc);
->> +	if (IS_ERR(regmap))
->> +		return PTR_ERR(regmap);
->> +
->> +	ret = qcom_cc_register_rcg_dfs(regmap, gcc_dfs_clocks,
->> +				       ARRAY_SIZE(gcc_dfs_clocks));
->> +	if (ret)
->> +		return ret;
->> +
->> +	/* Keep some clocks always enabled */
->> +	qcom_branch_set_clk_en(regmap, 0x32004); /* GCC_CAMERA_AHB_CLK */
->> +	qcom_branch_set_clk_en(regmap, 0x32020); /* GCC_CAMERA_XO_CLK */
+> Introduce statistics support for the DP83TG720 PHY driver, enabling
+> detailed monitoring and reporting of link quality and packet-related
+> metrics.
 > 
-> It would be good to document why. Why does the camera driver not
-> enable the clock when it loads?
+> To avoid double reading of certain registers, the implementation caches
+> all relevant register values in a single operation. This approach
+> ensures accurate and consistent data retrieval, particularly for
+> registers that clear upon reading or require special handling.
 > 
->> +	qcom_branch_set_clk_en(regmap, 0x33004); /* GCC_DISP_AHB_CLK */
->> +	qcom_branch_set_clk_en(regmap, 0x33018); /* GCC_DISP_XO_CLK */
->> +	qcom_branch_set_clk_en(regmap, 0x7d004); /* GCC_GPU_CFG_AHB_CLK */
->> +	qcom_branch_set_clk_en(regmap, 0x34004); /* GCC_VIDEO_AHB_CLK */
->> +	qcom_branch_set_clk_en(regmap, 0x34024); /* GCC_VIDEO_XO_CLK */
-> 
-> Why cannot the display driver enable the clock when it loads?
-> 
+> Some of the statistics, such as link training times, do not increment
+> and therefore require special handling during the extraction process.
 
-These clocks require for DISPCC and CAMCC drivers for register access, 
-hence kept enabled at GCC driver probe. The same approach is followed 
-for all the targets.
+This all looks good to me, I do have one small nit bellow :
+
+> +/**
+> + * dp83tg720_get_stats - Get the statistics values.
+> + * @phydev: Pointer to the phy_device structure.
+> + * @stats: Pointer to the ethtool_stats structure.
+> + * @data: Pointer to the buffer where the statistics values will be stored.
+> + *
+> + * Fills the buffer with the statistics values, filtering out those that are
+> + * not applicable based on the PHY's operating mode (e.g., RGMII).
+
+I don't see how this filtering is actually implemented, is this comment
+correct ?
+
+> + */
+> +static void dp83tg720_get_stats(struct phy_device *phydev,
+> +				struct ethtool_stats *stats, u64 *data)
+> +{
+> +	int i, j = 0;
+> +
+> +	dp83tg720_cache_reg_values(phydev);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(dp83tg720_hw_stats); i++) {
+> +		data[j] = dp83tg720_extract_stat_value(phydev, i);
+> +		j++;
+> +	}
+> +}
 
 Thanks,
-Imran
-> 	Andrew
+
+Maxime
 
