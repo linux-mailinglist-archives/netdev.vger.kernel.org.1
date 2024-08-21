@@ -1,245 +1,111 @@
-Return-Path: <netdev+bounces-120659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91AA495A17A
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:37:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6752A95A1EC
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6C681C224A5
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:37:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242D228D7EF
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBAE14E2E9;
-	Wed, 21 Aug 2024 15:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332F114F9E1;
+	Wed, 21 Aug 2024 15:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VawqCO9A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvhxToZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC8A14D28E
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820B814D71F
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724254609; cv=none; b=G+DI9V1B4Ch+v1IvpbWh4wfhG0+3AjtY/OIyLZWwwiN+4Zh/L22IJ9am79oVoxhoHC9fx3wU1+dr0cAvkaMD9UelHNvQfjOEHBW9FwrgnXH6BVWvs8huuOVmrSFi71nJIC4W5bfnySKBrJ4tjRMxJS9xIcHCwKz3e5USjRKbNEE=
+	t=1724255015; cv=none; b=bZ6hHPEmxacWS2q7gWVUlFsCC1s/BiuaFf5lpskQvXOjt3ntAGGiBDr9eGSjgoqwBGPxutND14VlHYLsbG5OxSqwsqrt4shyyoMawdnxJtT4duJQBOSbICcFdA+vDLteb3f7f5FLpguDrcEZuQW/SIzHnzuSlDb3sSkDbUt8yEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724254609; c=relaxed/simple;
-	bh=lRtlmbjL10N9pND329duqEBS2XO74LAzcfVhekR0HYk=;
+	s=arc-20240116; t=1724255015; c=relaxed/simple;
+	bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TOZYebgErHJ9fdu2BJt5QgxHkezN/yJOC+suibdx62KuE409AbisYapv5K6jYv0pvE+Shd1BvaPiSpuuwrMqUHZv10A7v8Tbb5P17dBLZGLMRWmRoFTPEtqNI9EAiqte8aiziVKzpl0SD1raWW5I3XywtE87gpES6qIE6oBibSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VawqCO9A; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=eiVHCrKkikYAqMva9OwEAiPYEcGg4eklsmjOG9v9u9MCc2qe6kHwUwufPKz6Ok/VJ/eT/ipGSBb25CEuqby0v4FBxvDkIFI9Kpa5+Dc2DfBHQkGrYDTdaaCwet4M0HVlyGVEMUJS8DjoAvgPkCMorlHKNSiESw4mAK/dUo1WtTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvhxToZB; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-44fee2bfd28so325171cf.1
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:36:45 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7aabb71bb2so752060066b.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724254605; x=1724859405; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724255012; x=1724859812; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XUZoeSiNO641pI3EuPxhZcOUo6QCsmcEaLeGMupG+Zk=;
-        b=VawqCO9Ap+dfG9m5J2m0lw/Kt22zqA+IUqPCZmZb15ns7NM1w7XhIHRfB0KFAyxY8W
-         vFYidURPYefAUs0AoQdCss4vjJs0hRhqr43gVHbsFiw1B9ldI0kIQS0dPYFs4nkxhRBO
-         VWr9iHG8WuLjsD5se9v2lReEV4/I+6inz0ZPbW5M9F4umNk5sbLVejBxxOMS+TUrfZEO
-         CONEh2i35AR7tfgTyzMzRYcMqBG/TbKMsxIKZneIW745qgGVc/CHc/VkwvNYZ3ELJxSH
-         Dr/c81HgwIJYlN3IKpB4dL58faG9ZHOBRQcc1OoHLmOX2F1tfDbzZOV877FLg9cCkcPw
-         8cPw==
+        bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
+        b=fvhxToZBeFVduwXh5P1sqnp/H0MBFjS8mLvyAwEqiHLl3ig0HhoKGlNgjhCq0djQZG
+         9B8K4IXWhN69uLuPZmh+CgrMbrIbf42bA00oMpIJTjg47YFWCsflLs7K/Ppe7vHmgC0/
+         TB8aimcd+/8f0v4KRZXgLbFugXpEoPBL4K5EDQq6O7WdxLTYAy6Q1m5rCz5ura/Idpui
+         FAisZiT2EwcpV6BC3O6xNwvz3fFFPbO4SQGJcwP/glU3bxeKrujpMynwOy+hbdZauFGI
+         qlefeMIs8RxSUaLNMmLBWKGVGzqKN7A8CEq9BnuFWU0l0vE9Vlu26PSgX/Pgnbyn0ItT
+         8RDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724254605; x=1724859405;
+        d=1e100.net; s=20230601; t=1724255012; x=1724859812;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XUZoeSiNO641pI3EuPxhZcOUo6QCsmcEaLeGMupG+Zk=;
-        b=lWVjqi4EW5NlL87HrP8cF+xWEwSW0pM3w/nf5yBVnWHQice5H9M4a67IOmqeop9mRD
-         3rw7ZvcNvq8ASbZZN3z2+4mY5kZQLDSD/qp0pBnuskRSvjcHMwaVb861Nz4GOGYDT2FN
-         UclSjMRd66JiQ9DiXoZZR8Gecn5YcnZNQIPzbr/7t+SGTFFKfIq7CxUvxtKZuUZfAryo
-         bYhSOR+aKCCNGWnffVbJAq44tafMVjTmKuP+u1K5Lbxyq1ulpXVMGdUgLHqH8yV65wuF
-         ko1Mw3/DAlGiv8RzLgEYkzeLy81KlWTAeBEXXa17K17NBaa7KD+SIBvg7dInJZMIaRT3
-         GL8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVcNTddV2ZRvJUbFNDQi3n4odztCqCdZvF21rfD8tvHrjgOSCVsHiOx5o1pqZx9n7K9a9ykTgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyJiTNVCUCiG6dVLGy/8dNP8x6xIKajmnuzWrvfx4aOiEInxLD
-	e/703586nRTaK4FTvlEmpaSWZYXe6U7bIf3nqlwsbBQFTmx5VykoHV2RfaySPBJifDcFIBHSjel
-	nYC1WqWCCpr3KSABo+eKTAIRQxSfT5gDgn1o7
-X-Google-Smtp-Source: AGHT+IGfHATnjXtnGmfmB/4D15ItV4+y4fk90XQNkiarco8smx060mhOYYV6TW3lde4cXDjE7q2OcPZA07rGH+zC+AM=
-X-Received: by 2002:a05:622a:1816:b0:447:d555:7035 with SMTP id
- d75a77b69052e-454e86e342amr6626771cf.13.1724254604541; Wed, 21 Aug 2024
- 08:36:44 -0700 (PDT)
+        bh=FE4aY/q5CVtWooWDCyJ3ysUxrUcqnG1S++u6HwB/bVY=;
+        b=xEValnVrlQpWIKqX5hNUo3yAievi+tRLNFJI+11veW0JnOTWpweU3f/9nDVqXnRfet
+         WpwNDSuQZ5k/HUIpMD0zJSKC1NjFXNCPniTuIuPQkPuSOUlVCF7jghT4L1vToBQMCZBW
+         GakQe5o7j9SMldaYmA+k6/lb9wzHXhBlCBlOJCfwOlXpnWDl/6rKcGoaq+lTt9oehYyy
+         O3wF9N6f9e+uKIkz/XxMssw7OhoVubL2kbDQFUUZL8rY6MTk6YQt8yOs+we2/fKmFtoP
+         DYBSKvbswxS/D44qz/HtP0Ma1lkTkGUk4K10adgKlvLN0BlxOjLFIPRx3ks5xIGs0Yhw
+         ngOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWs11G8bl9zudW5lHF1W0zu+JeUjRRk2zt5N+T3HoZjYZxdPOqCtvJH1eEHtCN0QxbIy6oUYhw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4Pk45pqxGesGw/ryP6yXhzITtZJvmLMaUTky6kf1lg0QIE0Eq
+	JbekuDk5s8taBHSOPPrRGBQuTb9UVpOD9poZTjoC8ovPwNsQUQ9XtuLfmAHQZ5Th/zE6MekxFt5
+	FLZKWfwsFMv5qiDq1P8UOr2zMfnzCmSBnakZK
+X-Google-Smtp-Source: AGHT+IFXM1haTH3Tft82GioemDeMyJeWgfsUvV1Z0FDSHL0znQ9kGlTog6+S/Takg6dPBnQDSWoR4E6wLJW9Oj0YiHI=
+X-Received: by 2002:a17:907:c7c9:b0:a7a:81b6:ea55 with SMTP id
+ a640c23a62f3a-a866f9d2804mr249205766b.56.1724255010853; Wed, 21 Aug 2024
+ 08:43:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240813211317.3381180-4-almasrymina@google.com>
- <CAMArcTWWxjsg_zwS6waWkLpyHhwdXDm_NJeVGm_dr+eT5QDZiA@mail.gmail.com>
- <20240819155257.1148e869@kernel.org> <CAHS8izPL4YdqFjkTpYavdxQn816=kkUv0xravQJF4Uno7Bn3ZQ@mail.gmail.com>
- <CAMArcTXvccYBPZTEuW-z=uTK7W67utd9-xjPzfxEOvUWhPS7bg@mail.gmail.com>
-In-Reply-To: <CAMArcTXvccYBPZTEuW-z=uTK7W67utd9-xjPzfxEOvUWhPS7bg@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 21 Aug 2024 11:36:31 -0400
-Message-ID: <CAHS8izPZ9Jiu9Gj+Kk3cQ_+t22M4n4-mbPLhx+fti_HiWzL57Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v19 03/13] netdev: support binding dma-buf to netdevice
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Daniel Vetter <daniel.vetter@ffwll.ch>
+References: <20240821150700.1760518-1-aleksander.lobakin@intel.com> <20240821150700.1760518-3-aleksander.lobakin@intel.com>
+In-Reply-To: <20240821150700.1760518-3-aleksander.lobakin@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 21 Aug 2024 17:43:16 +0200
+Message-ID: <CANn89iL+VTJ6tEe-PZ24h+0U9BYs0t4gZDndiy7j1DwuKMBEFg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/6] netdev_features: remove unused __UNUSED_NETIF_F_1
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 21, 2024 at 5:15=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
+On Wed, Aug 21, 2024 at 5:07=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> On Tue, Aug 20, 2024 at 1:01=E2=80=AFPM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > On Mon, Aug 19, 2024 at 6:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Mon, 19 Aug 2024 00:44:27 +0900 Taehee Yoo wrote:
-> > > > > @@ -9537,6 +9540,10 @@ static int dev_xdp_attach(struct net_devic=
-e *dev, struct netlink_ext_ack *extack
-> > > > >                         NL_SET_ERR_MSG(extack, "Native and generi=
-c XDP can't be active at the same time");
-> > > > >                         return -EEXIST;
-> > > > >                 }
-> > > > > +               if (dev_get_max_mp_channel(dev) !=3D -1) {
-> > > > > +                       NL_SET_ERR_MSG(extack, "XDP can't be inst=
-alled on a netdev using memory providers");
-> > > > > +                       return -EINVAL;
-> > > > > +               }
-> > > >
-> > > > Should we consider virtual interfaces like bonding, bridge, etc?
-> > > > Virtual interfaces as an upper interface of physical interfaces can
-> > > > still install XDP prog.
-> > > >
-> > > > # ip link add bond0 type bond
-> > > > # ip link set eth0 master bond0
-> > > > # ip link set bond0 xdp pin /sys/fs/bpf/x/y
-> > > > and
-> > > > # ip link set bond0 xdpgeneric pin /sys/fs/bpf/x/y
-> > > >
-> > > > All virtual interfaces can install generic XDP prog.
-> > > > The bonding interface can install native XDP prog.
-> > >
-> > > Good point. We may need some common helpers to place the checks for X=
-DP.
-> > > They are spread all over the place now.
-> >
-> > Took a bit of a look here. Forgive me, I'm not that familiar with XDP
-> > and virtual interfaces, so I'm a bit unsure what to do here.
-> >
-> > For veth, it seems, the device behind the veth is stored in
-> > veth_priv->peer, so it seems maybe a dev_get_max_mp_channel() check on
-> > veth_priv->peer is the way to go to disable this for veth? I think we
-> > need to do this check on creation of the veth and on the ndo_bpf of
-> > veth.
-> >
-> > For bonding, it seems we need to add mp channel check in bond_xdp_set,
-> > and bond_enslave?
-> >
-> > There are a few other drivers that define ndo_add_slave, seems a check
-> > in br_add_slave is needed as well.
-> >
-> > This seems like a potentially deep rabbit hole with a few checks to
-> > add all of the place. Is this blocking the series? AFAICT if XDP fails
-> > with mp-bound queues with a benign error, that seems fine to me; I
-> > don't have a use case for memory providers + xdp yet. This should only
-> > be blocking if someone can repro a very serious error (kernel crash)
-> > or something with this combination.
-> >
-> > I can try to add these checks locally and propose as a follow up
-> > series. Let me know if I'm on the right track with figuring out how to
-> > implement this, and, if you feel like it's blocking.
-> >
-> > --
-> > Thanks,
-> > Mina
+> NETIF_F_NO_CSUM was removed in 3.2-rc2 by commit 34324dc2bf27
+> ("net: remove NETIF_F_NO_CSUM feature bit") and became
+> __UNUSED_NETIF_F_1. It's not used anywhere in the code.
+> Remove this bit waste.
 >
-> I agree with the current approach, which uses the
-> dev_get_min_mp_channel_count() in the dev_xdp_attach().
-> The only problem that I am concerned about is the
-> dev_get_min_mp_channel_count() can't check lower interfaces.
-> So, how about just making the current code to be able to check lower
-> interfaces?
+> It wasn't needed to rename the flag instead of removing it as
+> netdev features are not uAPI/ABI. Ethtool passes their names
+> and values separately with no fixed positions and the userspace
+> Ethtool code doesn't have any hardcoded feature names/bits, so
+> that new Ethtool will work on older kernels and vice versa.
 
-Thank you for the code snippet! It's very useful! I have been
-wondering how to walk lower/upper devices!
+This is only true for recent enough ethtool (>=3D 3.4)
 
-To be honest, I think maybe Jakub's suggestion to refactor all the
-->ndo_bpf calls needs to happen anyway. The reason is that there are
-->ndo_bpf calls in the core net stack, like net/xdp/xsk_buff_pool.c
-and kernel/bpf/offload.c. AFAICT we need to add checks in these places
-as well, so refactoring them into one place is nice?
+You might refine the changelog to not claim this "was not needed".
 
-Note I sent the refactor for review. Sorry, I forgot to CC Taehee:
-https://patchwork.kernel.org/project/netdevbpf/patch/20240821045629.2856641=
--1-almasrymina@google.com/
+Back in 2011 (and linux-2.6.39) , this was needed for sure.
 
-Additionally I'm wondering if we should disable adding mp-bound
-devices as slaves completely, regardless of xdp. My concern is that if
-the lower device is using unreadable memory, then the upper device may
-see unreadable memory in its code paths, and will not be expecting
-that, so it may break. From the look at the code, it looks like
-net/batman-adv calls ndo_add_slave, and a bunch of code that touches
-skb_frags:
-
-$ ackc -i ndo_add_slave
-soft-interface.c
-889:    .ndo_add_slave =3D batadv_softif_slave_add,
-
-$ ackc -i skb_frag
-fragmentation.c
-403:    struct sk_buff *skb_fragment;
-407:    skb_fragment =3D dev_alloc_skb(ll_reserved + mtu + tailroom);
-408:    if (!skb_fragment)
-411:    skb_fragment->priority =3D skb->priority;
-414:    skb_reserve(skb_fragment, ll_reserved + header_size);
-415:    skb_split(skb, skb_fragment, skb->len - fragment_size);
-418:    skb_push(skb_fragment, header_size);
-419:    memcpy(skb_fragment->data, frag_head, header_size);
-422:    return skb_fragment;
-441:    struct sk_buff *skb_fragment;
-513:            skb_fragment =3D batadv_frag_create(net_dev, skb, &frag_hea=
-der,
-515:            if (!skb_fragment) {
-522:                               skb_fragment->len + ETH_HLEN);
-523:            ret =3D batadv_send_unicast_skb(skb_fragment, neigh_node);
-
-If we disable ndo_add_slave on mp devices, then we don't need to walk
-lower or upper devices. What do you think? If we don't disable mp
-lower devices entirely, then yes, we can make
-dev_get_min_mp_channel_count() do a recursive check.
-
-Note that we can add support for mp bound devices as slaves in the
-future if we have a use case for it, and it's well tested to be safe
-with selftests added.
-
-If we disable adding mp devices as lower devices, then during the mp
-binding we should also check if the device has upper devices.
+I am not sure we have a documented requirement about ethtool versions.
 
