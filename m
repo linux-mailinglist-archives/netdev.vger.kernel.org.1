@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-120395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF6A959218
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 03:18:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AEDC959222
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 03:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 122C6283CD3
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0A811F24385
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 01:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41F34687;
-	Wed, 21 Aug 2024 01:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE260C8DF;
+	Wed, 21 Aug 2024 01:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KE3mxqOp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKxkhDic"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05D181E
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 01:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B7CBE4F;
+	Wed, 21 Aug 2024 01:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724203079; cv=none; b=IZW2E9lOnkGa1/X1DO9RuKzwoBx5W+aDWVDNnfFAo8n06xZ9682eMJwSY5OWyTK8ag/+UiKFO+h1Y4I03/OEXfxD2l3ObQ4zQo1DfuaNnyZwUDoJWfME+J4h2wPNkjY26USQy4ld59QtJIFYP9w5FqInrtzLxpm45+uN9XqPl9g=
+	t=1724203310; cv=none; b=VS19WlqWFx8PPg834uVBtz6hTDEvcYusXTof3Zgcl8Ta99icSkIFVqXavup2JuMBnhwm4fLe/fyfkEr/oUn4GoDWxd6IOIq0HdAeQj/+KE/Is7qP8Fu3BLbtNnw4TAa81YxhnkEvxCTkuN0scMUMTgnu5VuqEaNi9WT/5BolQ/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724203079; c=relaxed/simple;
-	bh=pCmEd14y5e2wIsg6PoTlTbtRUwDdYTsuc/XbVubWU7M=;
+	s=arc-20240116; t=1724203310; c=relaxed/simple;
+	bh=NfHpS/2oNy8BbhVFvSHovdHAcJTYTcOjR0L8joeVgd0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TgWrGshqeHV5Y8fe2dZD9Cag3YYA8lzCNuYIkJe09WMkmd0vT/AOC7+wHVZcAyRsW032/6nvjR9OOcqNOWguRBLOBo5Xh6ndnPLT+Y/+bYcOv5c3RBRbHuf6LDJaJQ/pTwc7xa25Mp3fXxaAaeWlSIGKgqEnKLhhDXMnyFTG0bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KE3mxqOp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D25C4AF1B;
-	Wed, 21 Aug 2024 01:17:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lJ1NGLyNDSlzFNZ/xCyrhpPalfuQH59TF9IqFiM+ilWhW4xxxUFliwXMZ/hJnIkAZZLPMKTFkpj0N6qKhS5eRqgT+SoRHa4f90K2QnAiUddCFrotbjJClLnmY6gTCUn/aqE+PBEcs0JkOmTrNAhguDPwS56DVfe9M3J/vIkGSyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKxkhDic; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC69C4AF0E;
+	Wed, 21 Aug 2024 01:21:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724203079;
-	bh=pCmEd14y5e2wIsg6PoTlTbtRUwDdYTsuc/XbVubWU7M=;
+	s=k20201202; t=1724203310;
+	bh=NfHpS/2oNy8BbhVFvSHovdHAcJTYTcOjR0L8joeVgd0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KE3mxqOpxBG13oc0RF4BesSWbthcbdsV6ZrZTkp4TDkKrldWzCqd3d9S4NIXkATmR
-	 L9Lz1hALBCl7tsCvlKeXaAhB0yHOEcDXrsrPstSHnaOEI9F38o5j1LZQGJSYrnfOaa
-	 zsqKkg0shH8wTudGEYE5rZ0WqGxBzGS1eCm9R2zJnHJKTr+hkzLXkXBdkvmhcUbr0c
-	 tnmMR3BRM2MYW9mAsvbVI01QUzP0AmikX4LnoaZoNaiB353eQSUXH47kBG/9wR0WN6
-	 yGBK+P0VAm8ibPvz2JnPrKYTPxha9I3pukiKYPNyZoI6QF1caA65dz4nrw95sAwyhe
-	 IBWVJYLhZwqvA==
-Date: Tue, 20 Aug 2024 18:17:57 -0700
+	b=OKxkhDicgLuBzpwhc+B+zbksY6DYE4BviMp2Y+2BGJrwGPiV5tUWc8ZPlPLCAsTSK
+	 A22owBVKOqcHyd8AdSJr5LTFXr61u09wrtS3ExRAGJOGgCcOTmvL0tRgaxXW6QpD/G
+	 jqxxRHXBm+eQtV3flGeJ2io9H0ct/akl4KsrjjG0omCRiIG3uoVpRVQc5R6ovUkBfZ
+	 lJrM5rs86vz5uQ4ckeTFFd9+flT9LttH6SFdBd/EwuD868stw+Oxjf9bDSOp1uEXPU
+	 YzS1rztvyos/I2gQRo4VStZQn8S7KKyckhe3mxAVSsuWFAbPqsEVjxldZDAjxvVt89
+	 VCw6f5X76BUlQ==
+Date: Tue, 20 Aug 2024 18:21:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, Alexander Lobakin <aleksander.lobakin@intel.com>,
- przemyslaw.kitszel@intel.com, joshua.a.hay@intel.com,
- michal.kubiak@intel.com, nex.sw.ncis.osdt.itp.upstreaming@intel.com
-Subject: Re: [PATCH net-next v2 2/9] libeth: add common queue stats
-Message-ID: <20240820181757.02d83f15@kernel.org>
-In-Reply-To: <20240819223442.48013-3-anthony.l.nguyen@intel.com>
-References: <20240819223442.48013-1-anthony.l.nguyen@intel.com>
-	<20240819223442.48013-3-anthony.l.nguyen@intel.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, Ido
+ Schimmel <idosch@idosch.org>
+Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
+ nettest is available
+Message-ID: <20240820182147.462226f2@kernel.org>
+In-Reply-To: <20240820084412.4aa6abfb@kernel.org>
+References: <20240820004217.1087392-1-kuba@kernel.org>
+	<ZsQLFwkNa-JnymGg@Laptop-X1>
+	<20240820084412.4aa6abfb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,83 +63,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 19 Aug 2024 15:34:34 -0700 Tony Nguyen wrote:
-> + * Return: new &net_device on success, %NULL on error.
-> + */
-> +struct net_device *__libeth_netdev_alloc(u32 priv, u32 rqs, u32 sqs,
-> +					 u32 xdpsqs)
+On Tue, 20 Aug 2024 08:44:12 -0700 Jakub Kicinski wrote:
+> On Tue, 20 Aug 2024 11:18:47 +0800 Hangbin Liu wrote:
+> > Excuse me, what's profile used here? I can't find the definition in
+> > Documentation/dev-tools/kselftest.rst.  
+> 
+> Ah, sorry, I added timestamping output as a local patch for NIPA.
 
-The netdev alloc / free / set num queues can be a separate patch
+To be clear the profile=1 enables the timestamps from my local patch
 
-> +MODULE_DESCRIPTION("Common Ethernet library");
+> Random example:
+> 
+> TAP version 13
+> 1..1
+> # overriding timeout to 7200
+> # selftests: net: amt.sh
+> # 13.15 [+13.15] TEST: amt discovery                                                 [ OK ]
+> # 16.27 [+3.12] TEST: IPv4 amt multicast forwarding                                 [ OK ]
+> # 19.14 [+2.86] TEST: IPv6 amt multicast forwarding                                 [ OK ]
+> # 670.88 [+651.74] TEST: IPv4 amt traffic forwarding torture                           [ OK ]
+> # 1203.28 [+532.40] TEST: IPv6 amt traffic forwarding torture                           [ OK ]
+> ok 1 selftests: net: amt.sh
+> 
+> It's not great, makes the lines longer and misaligned.
+> But it's helpful for debugging slow tests.
 
-BTW for Intel? Or you want this to be part of the core?
-I thought Intel, but you should tell us if you have broader plans.
-
-> +	const struct libeth_netdev_priv *priv = netdev_priv(dev);	      \
-> +									      \
-> +	memset(stats, 0, sizeof(*stats));				      \
-> +	u64_stats_init(&stats->syncp);					      \
-> +									      \
-> +	mutex_init(&priv->base_##pfx##s[qid].lock);			      \
-
-the mutex is only for writes or for reads of base too?
-mutex is a bad idea for rtnl stats
-
-> +/* Netlink stats. Exported fields have the same names as in the NL structs */
-> +
-> +struct libeth_stats_export {
-> +	u16	li;
-> +	u16	gi;
-> +};
-> +
-> +#define LIBETH_STATS_EXPORT(lpfx, gpfx, field) {			      \
-> +	.li = (offsetof(struct libeth_##lpfx##_stats, field) -		      \
-> +	       offsetof(struct libeth_##lpfx##_stats, raw)) /		      \
-> +	      sizeof_field(struct libeth_##lpfx##_stats, field),	      \
-> +	.gi = offsetof(struct netdev_queue_stats_##gpfx, field) /	      \
-> +	      sizeof_field(struct netdev_queue_stats_##gpfx, field)	      \
-> +}
-
-humpf
-
-> +#define LIBETH_STATS_DEFINE_EXPORT(pfx, gpfx)				      \
-> +static void								      \
-> +libeth_get_queue_stats_##gpfx(struct net_device *dev, int idx,		      \
-> +			      struct netdev_queue_stats_##gpfx *stats)	      \
-> +{									      \
-> +	const struct libeth_netdev_priv *priv = netdev_priv(dev);	      \
-> +	const struct libeth_##pfx##_stats *qs;				      \
-> +	u64 *raw = (u64 *)stats;					      \
-> +	u32 start;							      \
-> +									      \
-> +	qs = READ_ONCE(priv->live_##pfx##s[idx]);			      \
-> +	if (!qs)							      \
-> +		return;							      \
-> +									      \
-> +	do {								      \
-> +		start = u64_stats_fetch_begin(&qs->syncp);		      \
-> +									      \
-> +		libeth_stats_foreach_export(pfx, exp)			      \
-> +			raw[exp->gi] = u64_stats_read(&qs->raw[exp->li]);     \
-> +	} while (u64_stats_fetch_retry(&qs->syncp, start));		      \
-> +}									      \
-
-ugh. Please no
-
-> +									      \
-> +static void								      \
-> +libeth_get_##pfx##_base_stats(const struct net_device *dev,		      \
-> +			      struct netdev_queue_stats_##gpfx *stats)	      \
-> +{									      \
-> +	const struct libeth_netdev_priv *priv = netdev_priv(dev);	      \
-> +	u64 *raw = (u64 *)stats;					      \
-> +									      \
-> +	memset(stats, 0, sizeof(*(stats)));				      \
-
-Have you read the docs for any of the recent stats APIs?
-
-Nack. Just implement the APIs in the driver, this does not seem like 
-a sane starting point _at all_. You're going to waste more time coming
-up with such abstraction than you'd save implementing it for 10 drivers.
 
