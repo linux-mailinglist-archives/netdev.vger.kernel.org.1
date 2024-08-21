@@ -1,128 +1,135 @@
-Return-Path: <netdev+bounces-120697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FE395A429
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:53:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F2E95A442
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:58:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 454421C212AD
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:53:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B751C22325
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF1D1B2516;
-	Wed, 21 Aug 2024 17:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772AB1B3B0A;
+	Wed, 21 Aug 2024 17:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFV74yNN"
+	dkim=pass (2048-bit key) header.d=nilsfuhler.de header.i=@nilsfuhler.de header.b="ljuD3SAV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B6D4206B
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 17:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D1813E40F;
+	Wed, 21 Aug 2024 17:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724262823; cv=none; b=HBEp3126CfB8f4L+Rs90bvUKnw4y8M+R5xACxAdqx0IjFv4NygNRANtWS2y8Yv517e0ExeIzjjdvR1ekOeDxbesjpp0INQ8RCWcOTGTIxe0tNGTyQsRyTT/RD2X5NQ58AmJbxkLUp3dsyS885hsbD9WD1QJ0LEUXfX+2G2U6IPE=
+	t=1724263093; cv=none; b=MJ/YZ6BJ3D6da8WPix5l3ffWS6a4gYcU1IuVE3JlMjiE1yAWEhOyoxyh8saUHZkRctyhLabHjS4AEAen8OyAEaJxwAVOPBpqjBoj3wuA0doU+uDVW1s5dAxnx9JBvRf9QXHEAQfwLBgPMFnVVQ5r532imargVGXOpXbPuuabcpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724262823; c=relaxed/simple;
-	bh=wvIq78vKflWxIe1//9kI5ZOXJKEh9H+pWVQk9dkiOsA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BEEtORPJ1OXkMOrqp4s6P6B+iO+SRlTqFLVUQyQFJPw2RCxbI935WXT5XW/jnIkvjYAcRGCBPno8QLpgxvLZz52uCKL8ZqHbu7NylELu3ibFBxV+abV6cRfmRyVZZiiiWb2Qsk2uqo6YRLjvxspmYhtRPD3pjzAopoGHr83icM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fFV74yNN; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6b46d8bc153so74671047b3.2
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724262820; x=1724867620; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/CzOcdMWgptLPxpLQDWNF6iSLdDNs4WEmOScSsRe5K0=;
-        b=fFV74yNNmTkRcxl4LxC/A14CiYnpSvkCw4nd25bOcaxhvy8VwmGg1VqOZMUYiX5Fdc
-         o6G9qc8hacBWEWw80WDExOl52VYa9M1fI49Fc4Pu9QXMlgckxkmZTci2JeWMwtQMnhfV
-         pwS52m/eA70f4Q7A8ZmjxErzT+kAUxO7gbV+rbbS0sTRjl9s22JZ4r6kJl8HzV6i7K3T
-         IAi+Ebpo7N0ocrDKIXEBo5xLiiGyT9zsOOVJtEwnWqQyY2kFKo00idS9eyIGcFKgm1ql
-         PRy0PN3Aj5iVC0wjKMGzJBRPaFEzIs92zVGsxHV9jizEjgwRVUj5qxI8+q8fgq5EQsz1
-         RN6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724262820; x=1724867620;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/CzOcdMWgptLPxpLQDWNF6iSLdDNs4WEmOScSsRe5K0=;
-        b=t/dXnuehvSlW+WSWtRq800VbV1WFBHNdFF1I9y+YcAtLgRyhMnxHPBfLLByv7fFsxE
-         i44vj9GqZkMj3p+Cn3EqKYLlOwQJcWo2oNwgWIKFhghYfJpE+Lq8d6k5GwkfI4apt5G+
-         2flYIP0wbt5lQdgq6vBOg9zDdWGA9A4vMzt8Uxoxthxg5N9yhxYN0K+dluwMeC1nZ6rH
-         41npbneR+42iyefiowrO+2eobQYOYnuAbu/c2cp0Ho2U1Ieqs+4MYfUhyvDvZ/WBKfRY
-         oHV8Fd2BabKFlnEZecjAFJ5kTQo3zO/li9hgDmgzHKQJ/JHwLkpizUE8lLsRar6ypK9w
-         V+Sg==
-X-Gm-Message-State: AOJu0YzZUw9bNi1qmDZ5iNsIn+I9xLozx7VuGq4LgvV4RMO/83towC0Y
-	wKlz2KwASmDR56vDqZZD0ChdUoDEqUiWRwvbvYUsU6xQB6O2i1KwOwy4ceDobvG69++eBP7HLgu
-	cHKzWvLaljw==
-X-Google-Smtp-Source: AGHT+IGNr08bdLBCGU0GtIYqg1ESEjUmFKQzpVvJr03iAmqIH7KxsLwVaf/8R1ZrN5xckhJJM84tnZ6kdJYaTw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:ab07:0:b0:e11:7105:956a with SMTP id
- 3f1490d57ef6-e166541157bmr4709276.3.1724262820491; Wed, 21 Aug 2024 10:53:40
- -0700 (PDT)
-Date: Wed, 21 Aug 2024 17:53:39 +0000
+	s=arc-20240116; t=1724263093; c=relaxed/simple;
+	bh=Z9H1ZOw1PDu4npyWo4XjX8LokfU06nz18XJk55zwSi4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kg/ByBxxnPmuFyQe3kCy1gG582haThDkV3fT+xn4nKhaZuWXchP6ZWqtto2jJUnHSdW5mLoTBVrx2qlM0mJG0myY0BUVuazX7A1fau7ZWj2nlX/jwh+YwJvGDFEQzsJ2eOPuJpfJjCVORO8Tj9Q2sBPSMvXS0003c1Kyb5pxhT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nilsfuhler.de; spf=pass smtp.mailfrom=nilsfuhler.de; dkim=pass (2048-bit key) header.d=nilsfuhler.de header.i=@nilsfuhler.de header.b=ljuD3SAV; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nilsfuhler.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nilsfuhler.de
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4WpvFN3s4Jz9tSc;
+	Wed, 21 Aug 2024 19:58:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nilsfuhler.de;
+	s=202311; t=1724263078;
+	bh=Z9H1ZOw1PDu4npyWo4XjX8LokfU06nz18XJk55zwSi4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ljuD3SAVAYG2RjIyRV+eCL+93gzML3HIP/VITlS7qgOvxHxmewQWnkwREamdif4h+
+	 HdUOUrpDUOeSdjft94OXTG7nITRr7u0rjgQCwZohqf4BWl6TqyLd3eGqTTmR8BNWp7
+	 vyiuCHwaC/gknjX784nJihkpUst19RsuG91qR4HzDtJ205Cnf3F43v2VK55rhLnhmx
+	 Zopi9ZEF4xroeR1lDrvG6LUDiY5lvet3gJFaGAg+FLDPxWgOFSFmYokUY3MLCb2564
+	 yr8VF/SB5SChqbmE1ucPxOonSWvznPTYq0Va2m9pUDoJQCG7X2l/Edxz4CTDAK/RJ5
+	 QvAjoIS9VwlRw==
+Message-ID: <fcb4b7d9-08e1-4a8b-8218-a7301e6930f5@nilsfuhler.de>
+Date: Wed, 21 Aug 2024 19:57:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
-Message-ID: <20240821175339.1191779-1-edumazet@google.com>
-Subject: [PATCH net] pktgen: use cpus_read_lock() in pg_net_init()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] net: ip6: ndisc: fix incorrect forwarding of proxied
+ ns packets
+To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nils@nilsfuhler.de
+References: <20240815151809.16820-2-nils@nilsfuhler.de>
+ <a95f1211-0f1b-4957-8e31-1b53af888cb5@redhat.com>
+Content-Language: en-US
+From: Nils Fuhler <nils@nilsfuhler.de>
+In-Reply-To: <a95f1211-0f1b-4957-8e31-1b53af888cb5@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4WpvFN3s4Jz9tSc
 
-I have seen the WARN_ON(smp_processor_id() != cpu) firing
-in pktgen_thread_worker() during tests.
 
-We must use cpus_read_lock()/cpus_read_unlock()
-around the for_each_online_cpu(cpu) loop.
 
-While we are at it use WARN_ON_ONCE() to avoid a possible syslog flood.
+On 20/08/2024 15:13, Paolo Abeni wrote:
+> 
+> 
+> On 8/15/24 17:18, Nils Fuhler wrote:
+>> When enabling proxy_ndp per interface instead of globally, neighbor
+>> solicitation packets sent to proxied global unicast addresses are
+>> forwarded instead of generating a neighbor advertisement. When
+>> proxy_ndp is enabled globally, these packets generate na responses as
+>> expected.
+>>
+>> This patch fixes this behaviour. When an ns packet is sent to a
+>> proxied unicast address, it generates an na response regardless
+>> whether proxy_ndp is enabled per interface or globally.
+>>
+>> Signed-off-by: Nils Fuhler <nils@nilsfuhler.de>
+> 
+> I have mixed feeling WRT this patch. It looks like a fix, but it's changing an established behaviour that is there since a lot of time.
+> 
+> I think it could go via the net-next tree, without fixes
+> tag to avoid stable backports. As such I guess it deserves a self-test script validating the new behavior.
+> 
+That is probably the best option.
+Although I'm not sure whether it would really break something. The
+forwarded packets have a hoplimit of 254 and are therefore not valid
+ndisc packets anymore.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/pktgen.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index ea55a758a475ab0ee22d9ac91f0ac9f0a6975e1f..197a50ef8e2e1bbe9f3906dfb80e80d913534b81 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -3654,7 +3654,7 @@ static int pktgen_thread_worker(void *arg)
- 	struct pktgen_dev *pkt_dev = NULL;
- 	int cpu = t->cpu;
- 
--	WARN_ON(smp_processor_id() != cpu);
-+	WARN_ON_ONCE(smp_processor_id() != cpu);
- 
- 	init_waitqueue_head(&t->queue);
- 	complete(&t->start_done);
-@@ -3989,6 +3989,7 @@ static int __net_init pg_net_init(struct net *net)
- 		goto remove;
- 	}
- 
-+	cpus_read_lock();
- 	for_each_online_cpu(cpu) {
- 		int err;
- 
-@@ -3997,6 +3998,7 @@ static int __net_init pg_net_init(struct net *net)
- 			pr_warn("Cannot create thread for cpu %d (%d)\n",
- 				   cpu, err);
- 	}
-+	cpus_read_unlock();
- 
- 	if (list_empty(&pn->pktgen_threads)) {
- 		pr_err("Initialization failed for all threads\n");
--- 
-2.46.0.184.g6999bdac58-goog
+>> ---
+>> v1 -> v2: ensure that idev is not NULL
+>>
+>>   net/ipv6/ip6_output.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+>> index ab504d31f0cd..0356c8189e21 100644
+>> --- a/net/ipv6/ip6_output.c
+>> +++ b/net/ipv6/ip6_output.c
+>> @@ -551,8 +551,8 @@ int ip6_forward(struct sk_buff *skb)
+>>           return -ETIMEDOUT;
+>>       }
+>>   -    /* XXX: idev->cnf.proxy_ndp? */
+>> -    if (READ_ONCE(net->ipv6.devconf_all->proxy_ndp) &&
+>> +    if ((READ_ONCE(net->ipv6.devconf_all->proxy_ndp) ||
+>> +         (idev && READ_ONCE(idev->cnf.proxy_ndp))) &&
+>>           pneigh_lookup(&nd_tbl, net, &hdr->daddr, skb->dev, 0)) {
+>>           int proxied = ip6_forward_proxy_check(skb);
+>>           if (proxied > 0) {
+> 
+> Note that there is similar chunk in ndisc_recv_na() that also ignores idev->cnf.proxy_ndp, why don't you need to such function, too?
+
+I have noticed the chunk in ndisc_recv_na() and did some quick testing
+but I was not able to get an obviously wrong behavior out of it.
+I have to admit, though, that I am not sure if I understand the
+condition correctly. At the start, it checks that the lladdr of the
+received na packet is equal to the lladdr of the reciving interface.
+That can only happen, when the interface receives its own packet, right?
+Is there a valid case where that can happen? Or am I missing something?
+
+Greetings,
+Nils
 
 
