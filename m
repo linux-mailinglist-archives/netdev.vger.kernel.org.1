@@ -1,125 +1,189 @@
-Return-Path: <netdev+bounces-120516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5CF959B01
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:59:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9199959B04
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEE001C22979
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:59:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A92A1F2202A
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9008A1D1312;
-	Wed, 21 Aug 2024 11:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ia1rwMwO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF34C14B979;
+	Wed, 21 Aug 2024 11:52:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2644B134AC
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 11:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E6A134AC;
+	Wed, 21 Aug 2024 11:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724241163; cv=none; b=JV8KdoCytEBT+dlN2zbMCx+bR3yVnfH89lMgO0V4ECZJlgEjbZhlxzqW0ijfB6k1AzvpXmtApCjtmY8aVO8ADhA2HmwCxG2d505BN+MnmqMszsD4U/dwGu0uvF3UGBYgdXoyTk7KOXJalLAn1OemprV2ocCoZXcMqnBGdVd8Bzc=
+	t=1724241176; cv=none; b=KIEO2uwXvVhRT64dyYNnU1qrjWHgFWuaz1fJVoEiP6wiNqvXh6erEjVsbV27lRk2Ore9fAxwx+jjUnLcTvkY0jl85xchf3aDUXAjw8pnjh66N9tn0Pi7cHl7A+Nw3d9XIJRWbVfO2VKUek32tyQpNtnnfvh2VvEcCUeNqfp0y7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724241163; c=relaxed/simple;
-	bh=pQnQrdy5EdtwqN2xEhrdTh+SfDe4Y5cSsMar+RnhBU0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cpmnVmfCqtc8vvObKWkf2oZIwnG6qVChzpR0nIlySXRAsk8K8VW1ejFAko1kXtUEfsGR1IsYQka4eNqwU5KQOVM2CpK0O2GY8K3U7on0zvE0mu2u7VLJWMnXYzxucvFDErKvMwKhx9kBKLqQPGPa/cuDARdAxFN88maNJ5bSA/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ia1rwMwO; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E2CF6208A2;
-	Wed, 21 Aug 2024 13:52:31 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zxiRIIcnVP1Z; Wed, 21 Aug 2024 13:52:31 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 051AD207F4;
-	Wed, 21 Aug 2024 13:52:31 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 051AD207F4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724241151;
-	bh=ICgCuM7WnGOr46hqWyCWQr02wQLo1aHJ4g0nhlbGEgw=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ia1rwMwO1fZUKa+/FMiI6+1vwNVbvJJQpYdXKeUWIleBv/ZNOyVvvVdYgCz+h2YDt
-	 syVPg0BmyUizTYj4C8e50PNKNdcl8YiGat2bPBo8b4zdDPKzj8BAv8w0IOLycccerp
-	 o/xTauYs8O1tkwQ/gL9nf0hpnB4TpixQ5FEcFnqVY4XN0PZF0veR0rFKR/8bPR81xp
-	 fkzxj8+7vURW2WQy27FyJEocOqLnsAeSFvleATyY/tDppQM+1WjHhGZ35TjyB75oKk
-	 GWqJYVNTfV5rC1kFbcnQUCtJHOrgTaQhyWyf8qOkVNcoj1jTLu4NICHl52EAEm4hJD
-	 /AGO1tXU4yNng==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 21 Aug 2024 13:52:30 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 21 Aug
- 2024 13:52:30 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 348C03183CDE; Wed, 21 Aug 2024 13:52:30 +0200 (CEST)
-Date: Wed, 21 Aug 2024 13:52:30 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Christian Hopps <chopps@chopps.org>
-CC: <devel@linux-ipsec.org>, <netdev@vger.kernel.org>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Florian Westphal
-	<fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
-	<horms@kernel.org>, Antony Antony <antony@phenome.org>, Christian Hopps
-	<chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v4 1/1] net: add copy from skb_seq_state to
- buffer function
-Message-ID: <ZsXU/pneNZFC+Goe@gauss3.secunet.de>
-References: <20240815172114.696205-1-chopps@chopps.org>
+	s=arc-20240116; t=1724241176; c=relaxed/simple;
+	bh=r4TmNIC6JJelSj6jfu58Oaz4qMKQPjqXVKp4zwQxDOo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=X6z8Jsa7SftwsSgZ5tOHKJssDaW4Jb5W3OKZVp/5OAFySOHnHeMcpUA1kz8/iEM0JJevHa42+gFjru4JuChfgIQIxE+E0XLneZdb6sLgYG9kceyjixKqwzJ/TL1gQwpXlgWNgWUasjnZ0JCswqSGFMWN8c3hk1a7FS9lQmBbMFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Wpl780ZkYz13Vj2;
+	Wed, 21 Aug 2024 19:52:04 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1C38518009B;
+	Wed, 21 Aug 2024 19:52:43 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 21 Aug 2024 19:52:39 +0800
+Message-ID: <4aae6528-cfed-efc5-a7bc-d967a8d43153@huawei-partners.com>
+Date: Wed, 21 Aug 2024 14:52:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240815172114.696205-1-chopps@chopps.org>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 6/9] selftests/landlock: Test listening without
+ explicit bind restriction
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-7-ivanov.mikhail1@huawei-partners.com>
+ <ZsST6Nk3Bf8F5lmJ@google.com>
+ <58b328fc-aa98-c4f1-eb11-2d59e50ec407@huawei-partners.com>
+In-Reply-To: <58b328fc-aa98-c4f1-eb11-2d59e50ec407@huawei-partners.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Thu, Aug 15, 2024 at 01:21:14PM -0400, Christian Hopps wrote:
-> From: Christian Hopps <chopps@labn.net>
+8/20/2024 4:46 PM, Mikhail Ivanov wrote:
+> 8/20/2024 4:02 PM, Günther Noack wrote:
+>> On Wed, Aug 14, 2024 at 11:01:48AM +0800, Mikhail Ivanov wrote:
+>>> Test scenarios where listen(2) call without explicit bind(2) is allowed
+>>> and forbidden.
+>>>
+>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>>> ---
+>>>   tools/testing/selftests/landlock/net_test.c | 83 +++++++++++++++++++++
+>>>   1 file changed, 83 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/landlock/net_test.c 
+>>> b/tools/testing/selftests/landlock/net_test.c
+>>> index 551891b18b7a..92c042349596 100644
+>>> --- a/tools/testing/selftests/landlock/net_test.c
+>>> +++ b/tools/testing/selftests/landlock/net_test.c
+>>> @@ -1851,6 +1851,89 @@ TEST_F(port_specific, bind_connect_zero)
+>>>       EXPECT_EQ(0, close(bind_fd));
+>>>   }
+>>> +TEST_F(port_specific, listen_without_bind_allowed)
+>>> +{
+>>> +    if (variant->sandbox == TCP_SANDBOX) {
+>>> +        const struct landlock_ruleset_attr ruleset_attr = {
+>>> +            .handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>>> +                          LANDLOCK_ACCESS_NET_LISTEN_TCP
+>>> +        };
+>>> +        const struct landlock_net_port_attr tcp_listen_zero = {
+>>> +            .allowed_access = LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>>> +            .port = 0,
+>>> +        };
+>>> +        int ruleset_fd;
+>>> +
+>>> +        ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>>> +                             sizeof(ruleset_attr), 0);
+>>> +        ASSERT_LE(0, ruleset_fd);
+>>> +
+>>> +        /*
+>>> +         * Allow listening without explicit bind
+>>> +         * (cf. landlock_net_port_attr).
+>>> +         */
+>>> +        EXPECT_EQ(0,
+>>> +              landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>> +                        &tcp_listen_zero, 0));
+>>> +
+>>> +        enforce_ruleset(_metadata, ruleset_fd);
+>>> +        EXPECT_EQ(0, close(ruleset_fd));
+>>> +    }
+>>> +    int listen_fd, connect_fd;
+>>> +    __u64 port;
+>>> +
+>>> +    listen_fd = socket_variant(&self->srv0);
+>>> +    ASSERT_LE(0, listen_fd);
+>>> +
+>>> +    connect_fd = socket_variant(&self->srv0);
+>>> +    ASSERT_LE(0, connect_fd);
+>>> +    /*
+>>> +     * Allow listen(2) to select a random port for the socket,
+>>> +     * since bind(2) wasn't called.
+>>> +     */
+>>> +    EXPECT_EQ(0, listen_variant(listen_fd, backlog));
+>>> +
+>>> +    /* Connects on the binded port. */
+>>> +    port = get_binded_port(listen_fd, &variant->prot);
+>>
+>> Please rename "binded" to "bound" when you come across it.
 > 
-> Add an skb helper function to copy a range of bytes from within
-> an existing skb_seq_state.
-> 
-> Signed-off-by: Christian Hopps <chopps@labn.net>
-> ---
-> This is used in a followup patchset implementing IP-TFS/AggFrag
-> encapsulation (https://www.rfc-editor.org/rfc/rfc9347.txt)
-> 
-> Patchset History:
-> 
->   v1 (8/9/2024)
->     - Created from IP-TFS patchset v9
-> 
->   v2 (8/9/2024)
->     - resend with corrected CC list.
-> 
->   v3 (8/15/2024)
->     - removed ___copy_skb_header refactoring
-> 
->   v4 (8/15/2024)
->     - change returned error from -ENOMEM to -EINVAL
-> ---
->  include/linux/skbuff.h |  1 +
->  net/core/skbuff.c      | 35 +++++++++++++++++++++++++++++++++++
->  2 files changed, 36 insertions(+)
+> Can I do such refactoring in the 3/9 patch?
 
-Applied, thanks Chris!
+I mean, can I replace all "binded" occurrences in net_test in 3/9 patch?
 
-Looking forward to the IP-TFS pachset...
+> 
+>>
+>>
+>>> +    EXPECT_NE(0, port);
+>>> +    set_port(&self->srv0, port);
+>>> +    EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+>>> +
+>>> +    EXPECT_EQ(0, close(connect_fd));
+>>> +    EXPECT_EQ(0, close(listen_fd));
+>>> +}
+>>> +
+>>> +TEST_F(port_specific, listen_without_bind_denied)
+>>> +{
+>>> +    if (variant->sandbox == TCP_SANDBOX) {
+>>> +        const struct landlock_ruleset_attr ruleset_attr = {
+>>> +            .handled_access_net = LANDLOCK_ACCESS_NET_LISTEN_TCP
+>>> +        };
+>>> +        int ruleset_fd;
+>>> +
+>>> +        ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>>> +                             sizeof(ruleset_attr), 0);
+>>> +        ASSERT_LE(0, ruleset_fd);
+>>> +
+>>> +        /* Deny listening. */
+>>> +        enforce_ruleset(_metadata, ruleset_fd);
+>>> +        EXPECT_EQ(0, close(ruleset_fd));
+>>> +    }
+>>> +    int listen_fd, ret;
+>>> +
+>>> +    listen_fd = socket_variant(&self->srv0);
+>>> +    ASSERT_LE(0, listen_fd);
+>>> +
+>>> +    /* Checks that listening without explicit binding is prohibited. */
+>>> +    ret = listen_variant(listen_fd, backlog);
+>>> +    if (is_restricted(&variant->prot, variant->sandbox)) {
+>>> +        /* Denied by Landlock. */
+>>> +        EXPECT_EQ(-EACCES, ret);
+>>> +    } else {
+>>> +        EXPECT_EQ(0, ret);
+>>> +    }
+>>> +}
+>>> +
+>>>   TEST_F(port_specific, port_1023)
+>>>   {
+>>>       int bind_fd, connect_fd, ret;
+>>> -- 
+>>> 2.34.1
+>>>
 
