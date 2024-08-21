@@ -1,173 +1,123 @@
-Return-Path: <netdev+bounces-120407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 224FA9592AD
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:19:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B409592EB
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4771D1C20E10
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:19:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E904728306B
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EC95FBB1;
-	Wed, 21 Aug 2024 02:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F201E2AD31;
+	Wed, 21 Aug 2024 02:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="j93X8NX+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikbjvzuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2032.outbound.protection.outlook.com [40.92.59.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92401C683;
-	Wed, 21 Aug 2024 02:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724206746; cv=fail; b=jSIQ1iQqGcVqioUdD3OODaRxMAVZmWitd7C8zR4OgLpCS7Dfs5wk8cU+kq46CsrFvzf0ZEf34CbJM7NJnRGANFXGoF0flqM6ks/yVuIimImBjm5m06HC9DspmvGIpR7TIpcsOozz2eDa6+S+YF5Ha3X20FRGP2w4fhRVW8pk/Vg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724206746; c=relaxed/simple;
-	bh=3TmF6lxb+xkb1StF5ZnIAf0B8EIp67LlodA8xwQfUdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=acJF9w3ldSEUni+w8MdcxgdMutyXJq40iJbexUMelW3Oh1MxQ2DsOtKkjUB9SIV67d+jYJrH6sVEU5gXjLmeIbodnKwwE6+DoroVkG/o5MCnQB+Sd2Qs0P4IIQeRxWJyLHBNhb7q6YN2Q27iYyAssy2RNDTRczk6CNAsjR7wSPU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=j93X8NX+; arc=fail smtp.client-ip=40.92.59.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RvBG0JmdOuK5FWfwHboj1GZRvYtVn0nNjVvDetn0YhrLkqAeFIn4RywIDqCX08cO8AQrLG3YqeSAUgEe3uwHk2+REFewzcbAA9JFXoq6jrIrI3/Pzoc91Pw5AcB0v8Gd8v5Yee19+KT2uXRqvGFecAPbZLcC1+5Jze/dUoV/JSs8WIisdAfU759b51dJ96tpLgyzjM9bCywBfBMtiBKR9QumlNdhvgWk8qliOkKX1NBJRlRnP2PGoxmBqMnaHLotYEFfC/qmH6l5yv6HTNfavuw/FWK+qdjokwFTU2mOlBSbZrzc3iO+DxX058TbHsi3z2YsSKD3jGXU5DWbY014zA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FOn7AFbC0Jy8vtgEjLKTJtejBdvkF6UQI1tySM7exX8=;
- b=y1afA4pUxAbNykRcD8nh9tae8W0akZOz0vF2EJw/DPMI7sW9DTNRBnd5y30t/GIQioXWsl9zWFfNk4psrLrrfp1Kv7RbLNxpzWSHqQYEHHa0pAiMa6VRR4NVPOMfzuTKLm4ekqExJJ5HxOhjuu8Le2v+m8MM77SDLH8Va5almMWnQ4zvjPswBuvLpy4OFR17bFur5qShS1ZK1j337GWeKmPeHlNCBn7/b9vAzZjFdWGX4BRJkDEZWrzgOE/rqSKoTiC2oVXVDm6vhMDMjuTQduhN2svWUrLXzzyzvt/bUP60qkFxr/GXGSUXDFOEF4JG/r1mMQ0dilY4kXgX4W3cKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FOn7AFbC0Jy8vtgEjLKTJtejBdvkF6UQI1tySM7exX8=;
- b=j93X8NX+fpKeLytawUqdhFSRROAoN255pP0gfY1v2WyouKQObz1nb1JjQJwAkJvl0sht6JC+IE+y3Cwt1KQCrictmsYz/mZwdTXBSaYnrJYLdL8PJZjGfyoHk4cas8AhHen4H31MfrcKMwuKczZhGVYcjoETGxV744VrsA+8ISSbip5IG16mOm4i0FHmEFhhE7unYfGwp75/S4cv1NoY+qe55AJ743nfSJpG2oRk9vNX0kLwhJGgDau6kFzL5dFYZN/klUupodpi16PsA660QMdxs60sTlX2R5mg6Ko9A2t1R1gtzuNtufebbIw6Cksd5nfSSrdSM/SzC3XJVBXXNg==
-Received: from PAWP192MB2128.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:33c::16)
- by PAXP192MB1632.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:28c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 21 Aug
- 2024 02:19:01 +0000
-Received: from PAWP192MB2128.EURP192.PROD.OUTLOOK.COM
- ([fe80::8e98:b988:5136:a608]) by PAWP192MB2128.EURP192.PROD.OUTLOOK.COM
- ([fe80::8e98:b988:5136:a608%5]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
- 02:19:01 +0000
-From: Sava Jakovljev <sjakovljev@outlook.com>
-To:
-Cc: savaj@meyersound.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F0345038
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 02:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724207585; cv=none; b=Kbel4FDxGsujZeQ+MXL2rwmGlmSv3cAGlPTgabeduRX7Ak9v7046sihfAZT5PH51GUgniP/bxKOVYODUkh0Gatnp4UxGMVMZoqosDtbNLk96YxgKGin9AlJ66lCF5GQPFZ6pzry3dEoNaer50ZIdI6qIv69Bemh4AdLRSyNJ7dw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724207585; c=relaxed/simple;
+	bh=oXUv1/HwUyIXHFGcnAp2K9/g7taXSeVN/mkf4gi0p8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W0ZV+qdKKB+045C3uiz21gzGuds4UaaWv40uMPndUGrHzKmxlHVFxhCnMUZBiJFso5kzHY67NfmBVtGRgQZ5oaaBSCsIkQW5dJ9UADyN0/qOGJk0zVXMz14zQqVz7COenRRXjGkXPWzbu6gQL2Aj0Q3FQyXpdLHgLk7SI5/kjos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ikbjvzuD; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70ea2f25bfaso4606840b3a.1
+        for <netdev@vger.kernel.org>; Tue, 20 Aug 2024 19:33:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724207584; x=1724812384; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ljlgs2lWksxGBdCItxotoYcEGSPRb3zay8TR1Y09hBc=;
+        b=ikbjvzuDJ3axMGJTcQatAVu7b7b6cYP5Ehy1EGM+h3DuPmGG2TPvjBQXEctX3n4f+M
+         TYKHlPT7O5kQr9ukn59AL7gW6AKxXPRBl0x0DI6+pawyr+wD7nS8eze8g7t34VE8ks3V
+         YBim95YRUAUDU6vTc93l27I1uxXA1H8i7ZIKJOwdEKOeH2AJoAd98rGGW/xXxTuiYnf9
+         AP5G0Y+jL5GCa5noRABgssJsONYoYS6zlwQidFbBdplDMqKMmeZntxPcVbvIUK26F//Q
+         9n+TNFR22tpyikA4phlJhGfr+Z5/sUDZFuZu3fev/Nyxnzh3GYnV2GhEUMuE0i+uxfUK
+         08vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724207584; x=1724812384;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ljlgs2lWksxGBdCItxotoYcEGSPRb3zay8TR1Y09hBc=;
+        b=h7Vv5FwYPsHVSpKEdmIZJiTHEhIfGgIx8gKVa0HuWMQNNhJTmivytGYfFAMkaYC9eY
+         bVeD6WFC+hbEq/lRCSCHgzsKjwwKgJmyhNw5JSRQQeisr2wk1HG74ylIjWOU4I7nawUF
+         kOjIOQLonxwx6T9aquPoR45WD00O4VHHITs2EUDPlaP2TggAeAgSed7yq1irRM+vknUc
+         WbgwCnm/cuQs2xKflZBBgc18zjgkOgU0CoOmGA8moCN/Q/XiI6NcqMbpoGX8xT0sRWv2
+         kra4FciLgPus/UwliZUHvgI5HOOaVNP84M8KOfkCelQuWe49UzDjpsQWdD+P4RNKdg/O
+         ttwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWzuwPkS6xQitSffrS9maHADpUPrf1WJ9jRTmjvABp7ouFoSQ+KTnUI3PQwLlUzzOlxT9Byos0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoaRoz3cdU5UG+Bt9+LT01RKAZk6R2Es5UKrWrvSorAZgoyg7r
+	LV147cHCg0+i3Bh2hSIyiDXdqwz1AHVTXR7gOHvB4S5RxzfifPNE
+X-Google-Smtp-Source: AGHT+IGd8NHOivadxvB4dcEsbrxKxOfTwwXteNhY3MR9FdFzKVJBF7BfPs6T3U45QkR4GHHX+I3fLg==
+X-Received: by 2002:a05:6a21:3995:b0:1c2:8d2f:65f4 with SMTP id adf61e73a8af0-1cad820689bmr1655109637.44.1724207583483;
+        Tue, 20 Aug 2024 19:33:03 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f038a836sm84364885ad.194.2024.08.20.19.32.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 19:33:03 -0700 (PDT)
+Date: Wed, 21 Aug 2024 10:32:54 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Marek Vasut <marex@denx.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: phy: realtek: Fix setting of PHY LEDs Mode B bit on RTL8211F
-Date: Wed, 21 Aug 2024 04:16:57 +0200
-Message-ID:
- <PAWP192MB21287372F30C4E55B6DF6158C38E2@PAWP192MB2128.EURP192.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.46.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [BvxXU1qQsRDZinLKgBQAUPrBTA1EK9Eq]
-X-ClientProxiedBy: FR3P281CA0192.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a4::16) To PAWP192MB2128.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:102:33c::16)
-X-Microsoft-Original-Message-ID:
- <20240821021704.2536074-1-sjakovljev@outlook.com>
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
+ offload
+Message-ID: <ZsVR1otPt36kVv2E@Laptop-X1>
+References: <20240820004840.510412-1-liuhangbin@gmail.com>
+ <20240820004840.510412-3-liuhangbin@gmail.com>
+ <ZsS3Zh8bT-qc46s7@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAWP192MB2128:EE_|PAXP192MB1632:EE_
-X-MS-Office365-Filtering-Correlation-Id: 37941fab-383a-49c8-84b7-08dcc1879ee1
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|5072599009|461199028|15080799003|19110799003|8060799006|440099028|3412199025;
-X-Microsoft-Antispam-Message-Info:
-	3Y7E47Qdjsi5PNmQQ+kA2neoqJolrkWXjLa1qXICZa3k55m3YUC3JXrn5D5KqNdW4wBrog/657p5qUBMfu4IVOtghczfFh7xF/VBITUybTiHRzxH+tl1mvFkTecpZ8YwFIQ6ov0b5IQcpItTtk4Eft2OnMGlbtygUwBdMoFUa4VobzIjltbjjxIFJQrAuyFbJme1PnuoHGAFVOUPyNDlznrWBVC9NKtDShs6o6N6ljHCYON1ij5OTcFep5y7kewmy6Pl/S4ac0mGzPTOdO0dSN33eqSIu2xudvioV7V+Nve7271ADOa8u+rRbYV253Mogwh54EpIdAcuhcyW8WZdHwDBhAnDiRJ0ej/PxGQFAbu3I5Jo3iY8nD30eNpoexcUegU3eCOR7jfRtCtb2iDuEVYwJVIDXaK3pfcdoZG1uCZPXaMUr9+7xJ6tGLRNGpIa5ErBXc5cLXBwm8C2G7MyG5kl8qTJ8QO3LZwNKmbYxJPLJaC8/TXManB4YPNwX5iweLgyQHNzwnXQKNNTua2uOCYBQSlpY4bCuHLD1m7iXphIu0KBDUEsldqsj1siXdqwJzeZ2tNTU06480W0ykYKmIpx/boPk+D7DMlom/oz3P7zmgS4OP83UYtyw40gODiFdZDTC220VrA7s1AgxQAM+EohaDw9KmoBKEFVOE3M/UOjJ6TUZAifClu9wvmNxmVza1IOlc68uV/kgb7pDh31VA==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?u7n/vQXOmpk02SsEh3XpZuvWBsRW7WTok0DFp/EZ+YEweui21ts9t1l7iYid?=
- =?us-ascii?Q?SqowO6HphnvA15b5NzQQVz4G2F4hGu4QH/Fshaf+5dqUgy6VKVPiMuwafYb9?=
- =?us-ascii?Q?yTbWX+5ZylqeYWm+cj3/Ha2xCdAne9zPpJtoLqjFkSduxJXk8imvqIAUkMqP?=
- =?us-ascii?Q?efaKb4dK8eFmmMRH37yj0KyudyFvqkf6dJhE6xS9OvP6HSP7rYGuKIUiqgF7?=
- =?us-ascii?Q?kf+iDznva/y0cenCXtf4Sauuuc4OvaAyPvvNFwVP6vMZm5d8jocoajpFW28p?=
- =?us-ascii?Q?WNcU6XoPHeaRSk2ccCWjz/Wl0onq6p8e620wfURvTge21S7mFbO1U8ynnzMe?=
- =?us-ascii?Q?6D0lcFldhELs8SQTUH2/cH0nEyUb5Es216/jZYWthT2qpMCOeNZkiq8v3vOr?=
- =?us-ascii?Q?IY+Ic0nOZ/nPDlJ0Mz7pdY41FbaGqDRYASbYLHRv6GQstMKyfW8B3x1Zn9ee?=
- =?us-ascii?Q?zvdw3wLNAkByOiaTujxhmsV7XfxUaEUxcnhLONwx7dYvR5/JYNM+JseKWOUY?=
- =?us-ascii?Q?mS59qg1lugKb6wWJOu7BwJ0FTccbpPUn8Ns6b1AokG+r6+0J23vH98PYH7mX?=
- =?us-ascii?Q?66S5v1755EdtBIO3dFA86TKiuhl62k4NXthNPANoubZWFS4nehvEd19lnbLq?=
- =?us-ascii?Q?geXrOlNQTRFzJNK+ZGG3Gc5CMWSqOpMMzkd/GO35Kp/lMDAImfpKhhYmblRL?=
- =?us-ascii?Q?oXt47YdmiehR01u58p7StiUXSZV4yQinLeG1s/m0pKfJmp4a8VVK52JcguuS?=
- =?us-ascii?Q?9kaQn6y3d+NPD88vvCi6R6O9DGXadJk955JlO0dKnPpvgYhQLvuDnzEStSlX?=
- =?us-ascii?Q?loHReOmPRoFSWBkmCX53sNy/yd4vmTzTJfDcMeITzlTyR7jchwK5NZtqgxe0?=
- =?us-ascii?Q?QNxeBv0lmUe8ybQCiFyavIXpeqryKYLNNjaxjU08RwG+eaY8GeDQLMcIdnG9?=
- =?us-ascii?Q?mDvcGsA6RB/eg4+SCZzSfIxupVGKSzaJukq9+9wsF1gnoIwYUknz8PxE8e8B?=
- =?us-ascii?Q?6Y6Je+OjcBl6lrKlgZPCo1dKZF5Li5OVoVKn/5iZ6yi5VuDNkhazPuldmamm?=
- =?us-ascii?Q?9HyYOYwA2vjebHeFH77+Wu6pa+3zROXyCo7Ou5mIWdu8aFvmyCWToxDckLpq?=
- =?us-ascii?Q?1Tl9i47QSJ4kG0p3mAA1Zj71DwA/xbm4IFG7WPeq1ThFFefA/z0vyy2k6XD7?=
- =?us-ascii?Q?mOaoOe5JKHGoaqjQgFeX3iEsJUb2YmL5p2Uvn5Z2w8d7HeCfESdrrLpEXmI?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37941fab-383a-49c8-84b7-08dcc1879ee1
-X-MS-Exchange-CrossTenant-AuthSource: PAWP192MB2128.EURP192.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 02:19:01.2272
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP192MB1632
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZsS3Zh8bT-qc46s7@hog>
 
-From: Sava Jakovljev <savaj@meyersound.com>
+On Tue, Aug 20, 2024 at 05:33:58PM +0200, Sabrina Dubroca wrote:
+> > +	if (!real_dev->xfrmdev_ops ||
+> > +	    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
+> > +		pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
+> 
+> xdo_dev_state_advance_esn is called on the receive path for every
+> packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
+> xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
+> be ratelimited.
 
-The current implementation incorrectly sets the mode bit of the PHY chip.
-Bit 15 (RTL8211F_LEDCR_MODE) should not be shifted together with the
-configuration nibble of a LED- it should be set independently of the
-index of the LED being configured.
-As a consequence, the RTL8211F LED control is actually operating in Mode A.
-Fix the error by or-ing final register value to write with a const-value of
-RTL8211F_LEDCR_MODE, thus setting Mode bit explicitly.
+You are right. Warn on adding/deleting is OK. But during packets receiving
+we need to limit it.
 
-Fixes: 17784801d888 ("net: phy: realtek: Add support for PHY LEDs on RTL8211F")
+> 
+> 
+> But this CB is required to make offload with ESN work. If it's not
+> implemented on a lower device, I expect things will break. I wonder
+> what the best behavior would be:
+> 
+>  - just warn (this patch) -- but things will break for users
 
-Signed-off-by: Sava Jakovljev <savaj@meyersound.com>
----
- drivers/net/phy/realtek.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I would prefer this way, which is what we do currently. The warn could
+let user know the ESN is not supported. They should use ESN supported device
+or disable it.
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index 87865918dab6..25e5bfbb6f89 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -555,7 +555,7 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
- 				       unsigned long rules)
- {
- 	const u16 mask = RTL8211F_LEDCR_MASK << (RTL8211F_LEDCR_SHIFT * index);
--	u16 reg = RTL8211F_LEDCR_MODE;	/* Mode B */
-+	u16 reg = 0;
- 
- 	if (index >= RTL8211F_LED_COUNT)
- 		return -EINVAL;
-@@ -575,6 +575,7 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
- 	}
- 
- 	reg <<= RTL8211F_LEDCR_SHIFT * index;
-+	reg |= RTL8211F_LEDCR_MODE;	 /* Mode B */
- 
- 	return phy_modify_paged(phydev, 0xd04, RTL8211F_LEDCR, mask, reg);
- }
--- 
-2.46.0
-
+Thanks
+Hangbin
 
