@@ -1,121 +1,174 @@
-Return-Path: <netdev+bounces-120603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52E60959EE4
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81A75959EF3
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:43:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 102CC282A44
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:40:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAA0A2842FA
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CBF1ACE0A;
-	Wed, 21 Aug 2024 13:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237361AD5E0;
+	Wed, 21 Aug 2024 13:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdWjgVWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CBB1ACDFB
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B971A4ADA;
+	Wed, 21 Aug 2024 13:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724247611; cv=none; b=QoLB4v0rJxQo5gKYLjsWGC+xOtBodjH8ggI5kJr3C+fyOemGP6P5KvR/X58SwU1we7QrXxuIqLDPUsdXtkoO0VUq8XFTgXnpFg/6lxUPKWcHk9TResItahRgZQxuSybTeX2VmDvUTtjFFSN6sMTb4jDsi+FxPpHSNoykR6sIjbo=
+	t=1724247778; cv=none; b=lhy3vidZWX6XEEHHhVZ1aJXYNwMeHsiB8YSf49LAAgAfkt7BS2oE0fo7H78IYKR8HPjDSH025qwasDj4dBmYCVHAO+v9Vf8Gi9dSoUHceCbHMecxNJA64K77buYl6rOiFWn1P4a4MVBKNmUE8We4tXOrIfm3kmmTzEZd2r1HIFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724247611; c=relaxed/simple;
-	bh=ZpHRSLONSgywh3IYV5sXpj7FPybyYpdkyGP2cYdeoFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=PNJeyhd1Z+Kr2J8fFz7u5g10NFiwXGQLBuWN3lqhc5CZvsLXzN7njBA1KnJP5YRbL1wWhq/KWj1AbpOXJEmXhV0tat5BENDRFT1xMEVNSHfAYX/vMyKNnOOzw3PaYO1tLq0i+M/b1HRDOg/gz3FKk6xa43vBCPnTbGTcgpowV94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-WVomOFIWOumCtWNeXs695g-1; Wed,
- 21 Aug 2024 09:39:57 -0400
-X-MC-Unique: WVomOFIWOumCtWNeXs695g-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 731BB1955F3F;
-	Wed, 21 Aug 2024 13:39:55 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF5B519560AA;
-	Wed, 21 Aug 2024 13:39:50 +0000 (UTC)
-Date: Wed, 21 Aug 2024 15:39:48 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <ZsXuJD4PEnakVA-W@hog>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-3-liuhangbin@gmail.com>
- <ZsS3Zh8bT-qc46s7@hog>
- <ZsXd8adxUtip773L@gauss3.secunet.de>
- <ZsXq6BAxdkVQmsID@Laptop-X1>
+	s=arc-20240116; t=1724247778; c=relaxed/simple;
+	bh=THhE5eMnjlNKxQ/R+oGQK3EpvB9KEoAA4Y/el7UyCgc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=qHZbKCM+iW36IWepI1qV4IK3O7qU8eVZ3fNiMC1Z8/DiV4epcNPfn0HkHZZVBU3rgYZoQjmEv6fUd/2Zl3X0iLY1oqyhaBIv30HOslxTN8wsJNvDl9JZ/uTimXRZDeP1LlRFwWfpDKWygoBC8x0tHB9Kziv23BkHsJYKrJuyz8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdWjgVWs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93C26C32782;
+	Wed, 21 Aug 2024 13:42:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724247777;
+	bh=THhE5eMnjlNKxQ/R+oGQK3EpvB9KEoAA4Y/el7UyCgc=;
+	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
+	b=gdWjgVWsHis3krlbmQZ3X58rj8MsjRM1ldVftrS82nR67XO9gkDMSWmV4mjNersqt
+	 Cm/vJl3tAEb+1jV3iL7kICq6Vd30uPtwc/LgrqOvo/0p39YdXB+JY4//E1Uxqu9dFH
+	 GaF06vqkKCkP7I15FnBE/WwLLlgtUeqjdL+pxtJ8Rrc98zmECQrrcWugU98PlHr0xv
+	 EEmpRrbkzfvpLlS6WH0ojzR5c/B71UbhFdHQYz0kXhwT0LyQgbAxNfWd2FsMyVCzPi
+	 HC1vpoU5nDkNpbkqF8T8cISPeCyIlcevgZ3C3Et+mpWH0JJElDQB8funuTwZaBnVWJ
+	 ki8IS+/1FqBuA==
+Message-ID: <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+Date: Wed, 21 Aug 2024 15:42:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZsXq6BAxdkVQmsID@Laptop-X1>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
+ DT overlay
+To: Andrea della Porta <andrea.porta@suse.com>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Cc: Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <cover.1724159867.git.andrea.porta@suse.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-2024-08-21, 21:26:00 +0800, Hangbin Liu wrote:
-> On Wed, Aug 21, 2024 at 02:30:41PM +0200, Steffen Klassert wrote:
-> > > > +/**
-> > > > + * bond_advance_esn_state - ESN support for IPSec HW offload
-> > > > + * @xs: pointer to transformer state struct
-> > > > + **/
-> > > > +static void bond_advance_esn_state(struct xfrm_state *xs)
-> > > > +{
-> > > > +=09struct net_device *real_dev;
-> > > > +
-> > > > +=09rcu_read_lock();
-> > > > +=09real_dev =3D bond_ipsec_dev(xs);
-> > > > +=09if (!real_dev)
-> > > > +=09=09goto out;
-> > > > +
-> > > > +=09if (!real_dev->xfrmdev_ops ||
-> > > > +=09    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
-> > > > +=09=09pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n"=
-, __func__, real_dev->name);
-> > >=20
-> > > xdo_dev_state_advance_esn is called on the receive path for every
-> > > packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
-> > > xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
-> > > be ratelimited.
-> >=20
-> > How does xfrm_state offload work on bonding?
-> > Does every slave have its own negotiated SA?
->=20
-> Yes and no. Bonding only supports xfrm offload with active-backup mode. S=
-o only
-> current active slave keep the SA. When active slave changes, the sa on
-> previous slave is deleted and re-added on new active slave.
+On 20/08/2024 16:36, Andrea della Porta wrote:
+> RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
+> a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
+> etc.) whose registers are all reachable starting from an offset from the
+> BAR address.  The main point here is that while the RP1 as an endpoint
+> itself is discoverable via usual PCI enumeraiton, the devices it contains
+> are not discoverable and must be declared e.g. via the devicetree.
+> 
+> This patchset is an attempt to provide a minimum infrastructure to allow
+> the RP1 chipset to be discovered and perpherals it contains to be added
+> from a devictree overlay loaded during RP1 PCI endpoint enumeration.
+> Followup patches should add support for the several peripherals contained
+> in RP1.
+> 
+> This work is based upon dowstream drivers code and the proposal from RH
+> et al. (see [1] and [2]). A similar approach is also pursued in [3].
 
-It's the same SA, there's no DELSA+NEWSA when we change the active
-slave (but we call xdo_dev_state_delete/xdo_dev_state_add to inform
-the driver/HW), and only a single NEWSA to install the offloaded SA on
-the bond device (which calls the active slave's xdo_dev_state_add).
+Looking briefly at findings it seems this was not really tested by
+automation and you expect reviewers to find issues which are pointed out
+by tools. That's not nice approach. Reviewer's time is limited, while
+tools do it for free. And the tools are free - you can use them without
+any effort.
 
---=20
-Sabrina
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check W=1` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
+
+Please run standard kernel tools for static analysis, like coccinelle,
+smatch and sparse, and fix reported warnings. Also please check for
+warnings when building with W=1. Most of these commands (checks or W=1
+build) can build specific targets, like some directory, to narrow the
+scope to only your code. The code here looks like it needs a fix. Feel
+free to get in touch if the warning is not clear.
+
+Please run scripts/checkpatch.pl and fix reported warnings. Then please
+run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
+Some warnings can be ignored, especially from --strict run, but the code
+here looks like it needs a fix. Feel free to get in touch if the warning
+is not clear.
+
+
+Best regards,
+Krzysztof
 
 
