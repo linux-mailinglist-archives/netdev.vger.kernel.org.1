@@ -1,140 +1,189 @@
-Return-Path: <netdev+bounces-120491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1D79598A8
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5FC9598A5
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F17E1C2139B
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C37C282E32
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13001E6167;
-	Wed, 21 Aug 2024 09:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B0A1C93B0;
+	Wed, 21 Aug 2024 09:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FIq/czgs"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EVEViz/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF11F1CBEAD;
-	Wed, 21 Aug 2024 09:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B155D199949
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 09:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724232214; cv=none; b=dWpgxjWZindRdIhOPcFq8CVnKbxAee62j6qRWUQ2PkMYRQ9u1EwmavQMBs0SC2HnTB/1oKT/N5PIYxd7NJkjvDlOMDrf8CLoJAgYZJ4liq5nu8NZ0Mmy/0HuhcxHs6hyhWQUoKX+ub2cTy3LsEczwdQpTRK9ihlEDtnCDm1zMgA=
+	t=1724232202; cv=none; b=Dp073RjioNx3xtxLWIjBpFwesxHX79dnue4wGYgGzjMuqYErgNeSbPCKvptmihasM+8pr+e4StU54f2RcxCuNY7ONgWe2hre+4NMcD07oixDw+jrYRSWcwCDNEQ+g4XOPXJIn0ojmT4xMnE43qZh0YCvEPHlHabHE6ijIZ5rhUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724232214; c=relaxed/simple;
-	bh=t/CSQvrauuMm+CtOl+ntlCgIHDDtGtHS2ZDMZbNdyCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ml92B5lK6gDLOXFl2bzoipYEmJtB8STHLWk6l/vlBMpgO/MOFCrSvysmOI6RADnZdVkz2ybM3dRKJ8LHeWgmNo14q7J8j7cHkx6yEVLAnHArLX0Qc1hR1ZWjSLZWZ1xZBETjd4UisrqperLy+2hek6a22Z/kzDnA4K+IsAeMrHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FIq/czgs; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724232212; x=1755768212;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=t/CSQvrauuMm+CtOl+ntlCgIHDDtGtHS2ZDMZbNdyCw=;
-  b=FIq/czgsZW0BAKYkCNwGas3HzgNxtkBD26c/TXqAp2CBvTf9lhrkHfeT
-   uBfigJjOMgLjoCriCoUxac3smtjLnT3FYN4oK4Jt/HhEg6U4D+zfQK32T
-   Ekxj+51f9YJL9OIsuzQ98ReQOEksgwfaLbcanrUqK8idfOnpYNGKBa3nS
-   R1t8L9dzY8FyDOXzeUmBHNclllwBJlIB+gHe5xnrhOHboeamJe+rTGUCa
-   Oq4O1Ja2QlBj9lRwaR/WRs6vDW0O+XNWIklbZOmQtdnHndRDcKy8CDwM6
-   zs/NLnL1F/ki5vguA43HbXdixFiaAD+8NvK4q0yHWP+MeFldDNc70iA3U
-   g==;
-X-CSE-ConnectionGUID: Ex2hzCZ5QYG8zzERjAjZeQ==
-X-CSE-MsgGUID: U7AWMTtUSCKngkaRPvSGpQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="40037663"
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="40037663"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 02:23:31 -0700
-X-CSE-ConnectionGUID: siL8DPxaQxKhLChs3QZt+g==
-X-CSE-MsgGUID: RbN4J6lASDiEeCMso/RH+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="61570021"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 21 Aug 2024 02:23:25 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sghYm-000B9u-35;
-	Wed, 21 Aug 2024 09:23:20 +0000
-Date: Wed, 21 Aug 2024 17:22:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <helgaas@kernel.org>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
- support
-Message-ID: <202408211702.1WVqlgTb-lkp@intel.com>
-References: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+	s=arc-20240116; t=1724232202; c=relaxed/simple;
+	bh=d0HaBTQXXRypBVAlllqPljWMAXRz7z1v+0XOXOylDrw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Wel49W1TbF+bJDc4WOIjnaUcWsO9CcSSYjAQ569VHxm3oB8XfAbY5xLfGtdlELRDSC0Hn/5e6GnwxoBx+5ErQN+LWQIpjFpzCSw9Jw5GjNXjALi7yJ7vjQbMDdlt1CfNb8vXUv9+ldWd/iyPqYT0wH0FOR1k+0rTzDMtef3nevQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EVEViz/g; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5bed05c0a2fso5726140a12.3
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 02:23:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1724232199; x=1724836999; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eDS6EsIq/KBd/jIekHf5yf430h3uz3GCHdbbNrSHAc4=;
+        b=EVEViz/gEI/ucTAXA9ArvX8O443jZ8hS3Rdu2pHJtEDhn115keYKSa8KMJCn36JWjE
+         WEDBvWNAt9Y1pywt+H7q+qne+CgxM4qzF09NcXkPUKoL3MLxEmQkM8gCx6awOwjrAbHv
+         FZwEQYX+6aW4nt2BonFyTrCau9G+a55l12vRmQQN7o71IfNRapYeoehyl29N2C2G/udC
+         6o8N7fMcM0KLBVgNS6r4FD3USnqPSmdo66VArUFC7MvYSkAjGso6uFH0Qcu6OXg5KjxO
+         Lu5kYm9q+ZOdJyPuvXXtbKJFnpP0FzpO2OTEsKrUsmVWU2Nld5GtfTrK+ex7DDnBuUv8
+         ZCxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724232199; x=1724836999;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eDS6EsIq/KBd/jIekHf5yf430h3uz3GCHdbbNrSHAc4=;
+        b=jT5R0CqYecwUiEFkjaT9zY9aBwmJ0txmIubpp1b8MXpc34ZQ+zySdOKGg3qmruvRH+
+         lhmuM6K+3Oabh+1E/G2tWSqVqCeA2St2QKaWqVRj18zceMAwod0T69x0oKjm8QEphJU1
+         OAxxsi31OKrPJkDkkXxn7bjjjhwceEPvc/FpJN3wJcDfOaDKfV1u+1X6PnmwWncfJvGe
+         m+gJyKwsmVZ0J5i97Ay6EQB9Iv34Crh/7gsaDyJ1MfZrdZ0Dd28uN+gPjNiSdUiXvdS0
+         01+0gZSOUq5Kj09TVftBi4+2s9uy0CFVCs3JH8VVBXeFMLzgj1ncSvAJzx2dUPm8y6od
+         vcIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbitG6QyZBf1VYBF8t9cx7a8cmIUSps0/xUtxJK+pDiu0VKzgc20ywiOSUMC95x1I9QarZV20=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx9yhIharm29LFYiB6b/NdvRwIjCrG+8uM20cAngrsJL6aOL/b
+	MtEhm+YDIL4d824cWsOni9TGdBIOBZE+WWd5vIvsnDSZeKFO8auT1qOC6rHUcWs=
+X-Google-Smtp-Source: AGHT+IGyCf+2YZsiggyP5MLbhpGf9T+G4qgugt1YVFdwRCZpKPdsXzZ9ffwiQgFV6vDGInkriWW0ig==
+X-Received: by 2002:a05:6402:254d:b0:5be:fa53:f81 with SMTP id 4fb4d7f45d1cf-5bf1f28a6damr1293389a12.37.1724232198883;
+        Wed, 21 Aug 2024 02:23:18 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4d])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbdfad42sm7903800a12.47.2024.08.21.02.23.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 02:23:18 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: bpf <bpf@vger.kernel.org>,  netdev@vger.kernel.org,  ast@kernel.org,
+  daniel@iogearbox.net,  andrii@kernel.org, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, kernel-team
+ <kernel-team@cloudflare.com>
+Subject: Re: Question: Move BPF_SK_LOOKUP ahead of connected UDP sk lookup?
+In-Reply-To: <6e239bb7-b7f9-4a40-bd1d-a522d4b9529c@linux.alibaba.com> (Philo
+	Lu's message of "Tue, 20 Aug 2024 20:31:00 +0800")
+References: <6e239bb7-b7f9-4a40-bd1d-a522d4b9529c@linux.alibaba.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Wed, 21 Aug 2024 11:23:16 +0200
+Message-ID: <87bk1mdybf.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrea,
+Hi Philo,
 
-kernel test robot noticed the following build warnings:
+[CC Eric and Paolo who have more context than me here.]
 
-[auto build test WARNING on clk/clk-next]
-[also build test WARNING on robh/for-next char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.11-rc4 next-20240821]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Tue, Aug 20, 2024 at 08:31 PM +08, Philo Lu wrote:
+> Hi all, I wonder if it is feasible to move BPF_SK_LOOKUP ahead of connect=
+ed UDP
+> sk lookup?
+>
+> That is something like:
+> (i.e., move connected udp socket lookup behind bpf sk lookup prog)
+> ```
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index ddb86baaea6c8..9a1408775bcb1 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -493,13 +493,6 @@ struct sock *__udp4_lib_lookup(const struct net *net,
+> __be32 saddr,
+>         slot2 =3D hash2 & udptable->mask;
+>         hslot2 =3D &udptable->hash2[slot2];
+>
+> -       /* Lookup connected or non-wildcard socket */
+> -       result =3D udp4_lib_lookup2(net, saddr, sport,
+> -                                 daddr, hnum, dif, sdif,
+> -                                 hslot2, skb);
+> -       if (!IS_ERR_OR_NULL(result) && result->sk_state =3D=3D TCP_ESTABL=
+ISHED)
+> -               goto done;
+> -
+>         /* Lookup redirect from BPF */
+>         if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
+>             udptable =3D=3D net->ipv4.udp_table) {
+> @@ -512,6 +505,13 @@ struct sock *__udp4_lib_lookup(const struct net *net,
+> __be32 saddr,
+>                 }
+>         }
+>
+> +       /* Lookup connected or non-wildcard socket */
+> +       result =3D udp4_lib_lookup2(net, saddr, sport,
+> +                                 daddr, hnum, dif, sdif,
+> +                                 hslot2, skb);
+> +       if (!IS_ERR_OR_NULL(result) && result->sk_state =3D=3D TCP_ESTABL=
+ISHED)
+> +               goto done;
+> +
+>         /* Got non-wildcard socket or error on first lookup */
+>         if (result)
+>                 goto done;
+> ```
+>
+> This will be useful, e.g., if there are many concurrent udp sockets of a =
+same
+> ip:port, where udp4_lib_lookup2() may induce high softirq overhead, becau=
+se it
+> computes score for all sockets of the ip:port. With bpf sk_lookup prog, w=
+e can
+> implement 4-tuple hash for udp socket lookup to solve the problem (if bpf=
+ prog
+> runs before udp4_lib_lookup2).
+>
+> Currently, in udp, bpf sk lookup runs after connected socket lookup. IIUC=
+, this
+> is because the early version of SK_LOOKUP[0] modified local_ip/local_port=
+ to
+> redirect socket. This may interact wrongly with udp lookup because udp us=
+es
+> score to select socket, and setting local_ip/local_port cannot guarantee =
+the
+> result socket selected. However, now we get socket directly from map in b=
+pf
+> sk_lookup prog, so the above problem no longer exists.
+>
+> So is there any other problem on it=EF=BC=9FOr I'll try to work on it and=
+ commit
+> patches later.
+>
+> [0]https://lore.kernel.org/bpf/20190618130050.8344-1-jakub@cloudflare.com/
+>
+> Thank you for your time.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andrea-della-Porta/dt-bindings-clock-Add-RaspberryPi-RP1-clock-bindings/20240821-023901
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
-patch link:    https://lore.kernel.org/r/eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta%40suse.com
-patch subject: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio support
-config: nios2-kismet-CONFIG_GPIOLIB_IRQCHIP-CONFIG_PINCTRL_RP1-0-0 (https://download.01.org/0day-ci/archive/20240821/202408211702.1WVqlgTb-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20240821/202408211702.1WVqlgTb-lkp@intel.com/reproduce)
+It was done like that to maintain the connected UDP socket guarantees.
+Similarly to the established TCP sockets. The contract is that if you
+are bound to a 4-tuple, you will receive the packets destined to it.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408211702.1WVqlgTb-lkp@intel.com/
+It sounds like you are looking for an efficient way to lookup a
+connected UDP socket. We would be interested in that as well. We use
+connected UDP/QUIC on egress where we don't expect the peer to roam and
+change its address. There's a memory cost on the kernel side to using
+them, but they make it easier to structure your application, because you
+can have roughly the same design for TCP and UDP transport.
 
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for GPIOLIB_IRQCHIP when selected by PINCTRL_RP1
-   WARNING: unmet direct dependencies detected for GPIOLIB_IRQCHIP
-     Depends on [n]: GPIOLIB [=n]
-     Selected by [y]:
-     - PINCTRL_RP1 [=y] && PINCTRL [=y]
+So what if instead of doing it in BPF, we make it better for everyone
+and introduce a hash table keyed by 4-tuple for connected sockets in the
+udp stack itself (counterpart of ehash in tcp)?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+(the other) Jakub
 
