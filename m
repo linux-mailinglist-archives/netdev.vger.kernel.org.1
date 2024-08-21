@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-120752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEB995A87A
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:46:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86BE95A887
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11C2E1F22AED
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:46:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03527B22354
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6FD1D12F4;
-	Wed, 21 Aug 2024 23:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A23317DFE6;
+	Wed, 21 Aug 2024 23:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pef1j/RS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neVs1xXt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15B417DE06;
-	Wed, 21 Aug 2024 23:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3E817D8BB;
+	Wed, 21 Aug 2024 23:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724283997; cv=none; b=MLJ0VWCCcAr7G5kzszQJ4SqxXLNkJnnnnaPDTf8vk9BiHFpIECYsqPyJrHTmgA96woTy6J0kyOf0pKuLRBAzw8Itq6/wLKaEszbMSc99W1SW0CkJGw6CWZsENC7ycc8UunQCxL5RPYlzx8UBElUiaV8fkOlcCAh6HKQMyVIIPfY=
+	t=1724284372; cv=none; b=DOnPISnbBJmD0RdqAbG/XIgbQIYra5Vx2qYAZcHaQeM2iZvmiRVjMvr3YGIISUCx4drJg55Km0bLwc8uZ7Ig5kloJdubWS+oREYtP1II2fuDAEOFf82ZADegRDyd0usXAFX2PVzerpoEfg8+QCandk6+bwS6DkpMnb/fEBBeBEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724283997; c=relaxed/simple;
-	bh=pHeCE0JVeBpqF0rxOABye6Px2xKWYIb6b4GGiS88vb8=;
+	s=arc-20240116; t=1724284372; c=relaxed/simple;
+	bh=IoQNstbn7ku069/liwRFklbAC8jJAjqUOq1rB9ugBzk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sbWngB36Wqcmz/mUFYqFEnsaqbzC8Q12F2mD97I4kSWsH9NCR0Km75IcS/QDATypr+qJUmtV/nx2MVUzCcPktED5wVTwpU4O3svRBENVzGT24c1PAFc8g/3rEpvCBDnXluAB9AgEd86c01XbliifdrYX+PJRGc51bzdUxJTqunM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pef1j/RS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F06C32781;
-	Wed, 21 Aug 2024 23:46:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=f58wzkD7E1E7ocBNCC5GeBmsLJUO/dZU8pA1suoNibPC2CAq37bNBrA7rJXeLKK2WzIaLMrgZ5ykuYSPI6P/SzYUXZ+h/FJMqhHMVSf3MZFmjWKvwlybEgvrnKKyWfOGwiSjNDeO1Coq977iuOhLu/HYzQghTFraH3GnGkvU+MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neVs1xXt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FCEEC32781;
+	Wed, 21 Aug 2024 23:52:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724283997;
-	bh=pHeCE0JVeBpqF0rxOABye6Px2xKWYIb6b4GGiS88vb8=;
+	s=k20201202; t=1724284371;
+	bh=IoQNstbn7ku069/liwRFklbAC8jJAjqUOq1rB9ugBzk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pef1j/RSk0THDa3D2Kuhbl0KAsA3FtZRxKx4IUjmzzgjCqLnmKSjIXqPorKVC3aKU
-	 jxi4ZbI0rsUSHj2YNvHPwO64w5LjqXm6IyLYqtnbFlAQ8hGXUk0tRvb7KsxCG0Uol0
-	 mJB08HccrDyJU7lU+mKZFJi9Bj42snSFU7Jap3yC6KyJdyidgEI/rl/Mj7lcgHoyX4
-	 xnJdBetz3JOsPZtVbnXJWpCyJwnmQgfVEKKOFcRjKytqUBxvD6LjFOzwXBf0uWob3b
-	 gLr5w6vompltmD2ktuXjInBfWSQaurMumM8RR3P8g8pQB59rb5F2CZW8/2pdGoqsvX
-	 MsUNgHjqZvjlw==
-Date: Wed, 21 Aug 2024 16:46:36 -0700
+	b=neVs1xXt9m5m1lP4p0w1/mMArTaYHTRD4e/JEgPKDjzXemd2ECV3dJNg7xfXvYe1q
+	 qgG2a5whJw4uVNQ92+sqfBomWx+cZxCKS0Y3jx/ma7br3WvCLfmTpeLXenhT3nnnR0
+	 bbLNR8KzM2k64JiR3WYKeJ85URLIAr7MFyLXgUfhUOEhydAPdIINlprMO631sy1dYs
+	 TwZDAbaqakIo0aRtSBvRkvDJ5U8YgH+2zg9/5vHiJU3SLL3HRZdSf6I/UqQbypkZJo
+	 a4vglNGfYqzSTsEUNDSpcttZLWY6pVxlLCuIL5M3aGua6r0U4A5WQUaUwSPpbCdTrX
+	 68h6rlBvtd45w==
+Date: Wed, 21 Aug 2024 16:52:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, pabeni@redhat.com,
- edumazet@google.com
-Subject: Re: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
-Message-ID: <20240821164636.555dfe9f@kernel.org>
-In-Reply-To: <abd79f44-aed2-4e01-a7f8-7d806f5bc755@linux.ibm.com>
-References: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
-	<abd79f44-aed2-4e01-a7f8-7d806f5bc755@linux.ibm.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, edumazet@google.com,
+ pabeni@redhat.com, liuhangbin@gmail.com, petrm@nvidia.com, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Willem de Bruijn <willemb@google.com>, David Wei
+ <dw@davidwei.uk>, open list <linux-kernel@vger.kernel.org>, "open
+ list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v6] net: netconsole: selftests: Create a new
+ netconsole selftest
+Message-ID: <20240821165250.08e345ec@kernel.org>
+In-Reply-To: <1a667d36-d44d-4c34-b8ef-cbc3326622fa@kernel.org>
+References: <20240821080826.3753521-1-leitao@debian.org>
+	<1a667d36-d44d-4c34-b8ef-cbc3326622fa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,10 +65,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 21 Aug 2024 10:03:49 +0200 Jan Karcher wrote:
-> If so, why is it inconvenient to use netlink in containers?
-> Can this be changed?
+On Wed, 21 Aug 2024 11:50:40 +0200 Matthieu Baerts wrote:
+> > +		echo "SKIP: IPs already in use. Skippig it" >&2  
+> 
+> Skippig: is it because netconsole is vegetarian?
 
-Adding a YAML spec for the link to make it easily accessible from
-C/C++/Python applications seems like a better direction.
+Let's do one more rev :)
+-- 
+pw-bot: cr
 
