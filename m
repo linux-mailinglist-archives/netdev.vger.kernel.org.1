@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-120596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 275A8959ED8
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:39:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8CA959ED9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A99C1C22797
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:39:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99B4D1C227D3
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF78A1A7AE0;
-	Wed, 21 Aug 2024 13:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300701A7AFF;
+	Wed, 21 Aug 2024 13:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBPWDRgP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YtMAH+1a"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086FB1A7AD1
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8CC1A7AD5
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724247455; cv=none; b=X3x1GqqpLMZT2TcVwVWxyicX5bYUaWROmQbuE2eWsbbuYe+NcnlGrIuzppUOceIwDVN9N9YTwI58bIuEERxhMLOwUvN48Fu0JWTxuI5B2fwDSTD0JdrYcdIk7WOEnsRoIp2xztDRSwrEUC3Ic7ADcoigfCjtd9Kz2gadig8HXZ4=
+	t=1724247457; cv=none; b=i1bLisaOmW/5N/+zITTIpGt+LigLlKWb0ba9kz7OFj4glTfDrXGlzx0mLWaLmd3UDbtNZ+h9PA1kL0XgGJugnIncCRkV30iEwPMX3HCdp5zBW2hEKo8Q8wd63c8pbJ+MbnVGueJR9VvSjAtz6wqjs2JYqKFUr2TUCG2pkIe7TXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724247455; c=relaxed/simple;
-	bh=C4YGL94zd28OY9b3SHsBgN1gjLYmukUt1HPDlsN5xx0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lxha6yHVa+BLVEtJJbuEj3SD31tf+fe5ERHu0176F7aPlKiCFYC8HsdPZKUXtdrjD6m0rohPg9zLguPe2vBigwkZ+KabCdqtHSNX/NNqYKVx3CwQT5xRGCXN+ZqYkiXL5Xud9vEkl1IK5HGBO+nxSZIu+xHc3SvwtEvTgegtsbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MBPWDRgP; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1724247457; c=relaxed/simple;
+	bh=C8ttAvSNO0SlJh14VqyZzsFEn/LBgTrhy1JJwP90Xqw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=V7AMDUEpbsTJCeTr7Dd1kp8wvSQxmKig9PVhAFTw1MrcH2AUW3AcMlqhiJTFggRCnIMNCQPXp90EWRzUvUGnsa+aQACOdZ42SrfBztAmQ1sgGnt4nTz3siuksrI1SEzuhWmednkOaKRIwW7ZfnIZH5sWAihQ1cqF4nsYk6McSVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YtMAH+1a; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724247455; x=1755783455;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=C4YGL94zd28OY9b3SHsBgN1gjLYmukUt1HPDlsN5xx0=;
-  b=MBPWDRgPduCK4OfTC9aym8hRRGehlUuUfqrmb3nMEG+dDVEukSjlu3E5
-   NRoxWDJoGgEP81Tywj4M8rE57d/dpq4oInebHWnaBFUtYprgL+b6600ac
-   B/aRpXdH2cbr6nX5Z31nKh9H4f2KJ7/4xcHdkoF3P0lW56i2TiGZTVXIp
-   W1tdm9Vwvyptr/t1VBI+7z97yWa8Qfd7fvS0K4qJ9vE6VDpXDjAdSJSvH
-   p9G/fJb+HOF4yP9UlDDNOMCtLDXIM8g+gTayk1kruqfJg3cBEmAfwhbUG
-   r5L0+OEekemI8x1aEV8Chaj+zrRwZNxjoCnWlDsg4EDGzZkU2JQyJfXfn
-   Q==;
-X-CSE-ConnectionGUID: YZyd3yhbTGqR0DEc61mF6w==
-X-CSE-MsgGUID: OIpfOSj7QK+1444wmFMcKQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="45131405"
+  t=1724247456; x=1755783456;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=C8ttAvSNO0SlJh14VqyZzsFEn/LBgTrhy1JJwP90Xqw=;
+  b=YtMAH+1aQoJxw9FDl+kNrP6slZpO8i/NiQeCEwcjUYfr1KJZfoAD5kyo
+   72FP2U+X/KWrljW34aM+rab1UHQYRJPnGHf3UqwJTx7dUmtblKs7LDK69
+   Agjhog+X97pcp8qnw0ZtnnKG4F++C2aMZI6QGNggxxPxJrIBWp5TxFnNA
+   VYJjrDEBC5oicnnF6cGwV78iH5CaRhIaAnxqGcERmlzhNWb3aJ9S6EXrs
+   CKEWbVco7lA0MaqBIk4Rbq1R0hVwwL/EqTDC/5E1nR/vqDgO/wYKn73Hr
+   7QguvH2fAKIRmr3RNHsesNAvATCvUefmhIt2SU2afyfRvyE4G3nlbAyGE
+   g==;
+X-CSE-ConnectionGUID: qsy6KPSxS4eLafA7WsGrJg==
+X-CSE-MsgGUID: KMDIyS4/QpGAbS0H9a0INg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="45131421"
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="45131405"
+   d="scan'208";a="45131421"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 06:37:34 -0700
-X-CSE-ConnectionGUID: ptWVRNfGQeWM7abrUttSgA==
-X-CSE-MsgGUID: 3A+IInRBR1mPbfXWksXaBA==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 06:37:35 -0700
+X-CSE-ConnectionGUID: fNRBsvOzQiqaDIwWjW+qyg==
+X-CSE-MsgGUID: yBz4ED8wSNyTjDDGjTxQQQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="61071242"
+   d="scan'208";a="61071255"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 21 Aug 2024 06:37:30 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 21 Aug 2024 06:37:31 -0700
 Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id EE17F2878C;
-	Wed, 21 Aug 2024 14:37:27 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id F2B782878D;
+	Wed, 21 Aug 2024 14:37:28 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Jiri Pirko <jiri@resnulli.us>,
@@ -76,11 +77,16 @@ Cc: netdev@vger.kernel.org,
 	lukas.bulwahn@gmail.com,
 	akpm@linux-foundation.org,
 	willemb@google.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v3 0/6] ice: add support for devlink health events
-Date: Wed, 21 Aug 2024 15:37:08 +0200
-Message-Id: <20240821133714.61417-1-przemyslaw.kitszel@intel.com>
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [PATCH iwl-next v3 1/6] checkpatch: don't complain on _Generic() use
+Date: Wed, 21 Aug 2024 15:37:09 +0200
+Message-Id: <20240821133714.61417-2-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240821133714.61417-1-przemyslaw.kitszel@intel.com>
+References: <20240821133714.61417-1-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,60 +95,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Reports for two kinds of events are implemented, Malicious Driver
-Detection (MDD) and Tx hang.
+Improve CamelCase recognition logic to avoid reporting on
+_Generic() use.
 
-Patches 1, 2, 3: core improvements (checkpatch.pl, devlink extension)
-Patches 3, 4, 5: ice devlink health infra + reporters
+Other C keywords, such as _Bool, are intentionally omitted, as those
+should be rather avoided in new source code.
 
-Mateusz did good job caring for this series, and hardening the code,
-but he's on long vacation now :)
-
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-v3: - extracted devlink_fmsg_dump_skb(), and thus removed ugly copy-pasta
-      present in v2 (Jakub);
-    - tx hang reported is now called from service_task, to resolve calling
-      it from atomic (watchog) context - patch 4
+ scripts/checkpatch.pl | 2 ++
+ 1 file changed, 2 insertions(+)
 
-v2: patch 3 (patch 4 in v3)
-    - added additional cast to long in ice_tx_hang_reporter_dump()
-    - removed size_mul() in devlink_fmsg_binary_pair_put() call
-https://lore.kernel.org/netdev/20240712093251.18683-1-mateusz.polchlopek@intel.com
-
-v1:
-https://lore.kernel.org/netdev/20240703125922.5625-1-mateusz.polchlopek@intel.com
----
-
-Ben Shelton (1):
-  ice: Add MDD logging via devlink health
-
-Mateusz Polchlopek (1):
-  devlink: add devlink_fmsg_dump_skb() function
-
-Przemek Kitszel (4):
-  checkpatch: don't complain on _Generic() use
-  devlink: add devlink_fmsg_put() macro
-  ice: add Tx hang devlink health reporter
-  ice: dump ethtool stats and skb by Tx hang devlink health reporter
-
- drivers/net/ethernet/intel/ice/Makefile       |   1 +
- scripts/checkpatch.pl                         |   2 +
- .../intel/ice/devlink/devlink_health.h        |  59 ++++
- drivers/net/ethernet/intel/ice/ice.h          |   2 +
- drivers/net/ethernet/intel/ice/ice_ethtool.h  |   2 +
- .../ethernet/intel/ice/ice_ethtool_common.h   |  19 ++
- include/net/devlink.h                         |  13 +
- .../intel/ice/devlink/devlink_health.c        | 302 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |  10 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |  24 +-
- net/devlink/health.c                          |  67 ++++
- 11 files changed, 491 insertions(+), 10 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_health.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_ethtool_common.h
- create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_health.c
-
-
-base-commit: 5c820c0d09067ec782a6a84b5362e899662eafea
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 39032224d504..d609d47144ff 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -5858,6 +5858,8 @@ sub process {
+ #CamelCase
+ 			if ($var !~ /^$Constant$/ &&
+ 			    $var =~ /[A-Z][a-z]|[a-z][A-Z]/ &&
++#Ignore C keywords
++			    $var !~ /^_Generic$/ &&
+ #Ignore some autogenerated defines and enum values
+ 			    $var !~ /^(?:[A-Z]+_){1,5}[A-Z]{1,3}[a-z]/ &&
+ #Ignore Page<foo> variants
 -- 
 2.39.3
 
