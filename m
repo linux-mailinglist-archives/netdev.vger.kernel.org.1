@@ -1,177 +1,261 @@
-Return-Path: <netdev+bounces-120699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3FBD95A457
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 20:03:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B280395A468
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 20:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A20F28348A
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:03:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651F2282181
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE211B2ED6;
-	Wed, 21 Aug 2024 18:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC911B3B31;
+	Wed, 21 Aug 2024 18:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZRWY20wJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CJ2d4SFx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0361B2EC8
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 18:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49BB1494D1;
+	Wed, 21 Aug 2024 18:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724263417; cv=none; b=DZXjvSc1p4CAjYw1+9nhUxAqa1CEYZJ9ZH5wEhexur4LFZsJcEdGp0ItGefRuv/JyFAnA+6kS6vwQS8FrLmYI4R3GiQufUCfIGTd2vN0pXnanmUvMPNVaksOu1VjOpAVQSssBe84j5Q7DBYFnnDSakZtGvwW89YPGlWqKyjOSOU=
+	t=1724263736; cv=none; b=dWkKMDNzHjVaGHt7DCObmUFdO0cWnEBWKv+8gMx+VTnhFVae6ap6jCY6NwugJ/GayysGuQN2Qc0yOraDZY/230bwNEbOr5LMTLhN0nHEP8c2/Q3Vb3x7oQEWjjzpQP5kh282PYTaQ5+3RvjAod3ABiFna52lUj/duvFhZem9o28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724263417; c=relaxed/simple;
-	bh=BDfRHq7rDy7s2TYl7OFK0DCOVkCIMnB7hMpGCZ1d0H0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jGT0q35D7Ii4uo7XyyIjdHaK4nzf8fCFJlTZS1UvLcLKBR19Z1TlxGI2o94+9r4wOPPLDD8yK7BKd2paJ+7E3x26jF+78FaAqE/IrPALNRmbpTuCeWvw61lUBAoXzIlhkiNMpm7xLT8enK1jccQvgrXcD3BP9P/7kgi3Dnya90s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZRWY20wJ; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1724263416; x=1755799416;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BDfRHq7rDy7s2TYl7OFK0DCOVkCIMnB7hMpGCZ1d0H0=;
-  b=ZRWY20wJypgaiev3O9O76plViSddpGZrDW7Raw2GAWXyIBnAGw1ZoStR
-   O4OOXMZwiVAgKzEQixvrHweTpHZnb9LfLoTdYLgz/EK2nuWk2xsofprp8
-   DYCo1LuSQ7mSJv0i4uovPneElqnu4SeOz25Fk7hqQTu02NAzDazhc32wQ
-   M=;
-X-IronPort-AV: E=Sophos;i="6.10,164,1719878400"; 
-   d="scan'208";a="20402654"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 18:03:31 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:33412]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.60:2525] with esmtp (Farcaster)
- id 97ba5892-f684-44d8-a4d5-22a51ac8898e; Wed, 21 Aug 2024 18:03:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 97ba5892-f684-44d8-a4d5-22a51ac8898e
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 21 Aug 2024 18:03:28 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 21 Aug 2024 18:03:27 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.034; Wed, 21 Aug 2024 18:03:27 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: "Arinzon, David" <darinzon@amazon.com>, Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin" <mst@redhat.com>
-CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky,
- Alexander" <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson,
- Matt" <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara,
- Nafea" <nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi,
- Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
-	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "Beider, Ron"
-	<rbeider@amazon.com>, "Chauskin, Igor" <igorch@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, Parav Pandit <parav@nvidia.com>, Cornelia Huck
-	<cohuck@redhat.com>
-Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
- reporting support
-Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
- reporting support
-Thread-Index: AQHa8/RshWVir0gVjEGCWM9asSmDOA==
-Date: Wed, 21 Aug 2024 18:03:27 +0000
-Message-ID: <460b64a1f3e8405fb553fbc04cef2db3@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
-	<20240812185852.46940666@kernel.org>
-	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
-	<20240813081010.02742f87@kernel.org>
-	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
-	<20240814121145.37202722@kernel.org>
-	<6236150118de4e499304ba9d0a426663@amazon.com>
- <20240816190148.7e915604@kernel.org>
- <0b222f4ddde14f9093d037db1a68d76a@amazon.com>
-In-Reply-To: <0b222f4ddde14f9093d037db1a68d76a@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1724263736; c=relaxed/simple;
+	bh=/Gi8iWabs4ywesTqUytFjU5VLWGq7rK1B8LWGnTuEeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q54ZCFrIDLiVc/ZIMmPh82yNEorq27Me6ZOvYcX+/reA9gfs1NaxnAe0M4JNxy0NFabuVZGDFnB7sBjSGSqOhcR9IbdfYiJfpVb10XyAWiotUGyAbU6EWLrDnAJvMyRdnlzh6ncyD1CV4CmgUR9wUj4li5VbT1WnckvMs5i94kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CJ2d4SFx; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724263735; x=1755799735;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/Gi8iWabs4ywesTqUytFjU5VLWGq7rK1B8LWGnTuEeE=;
+  b=CJ2d4SFxUvZv6UiuX8c1MPogsEE6TDJMkyRwAqkI6LcCiN2b73mC/rC6
+   5k+X7N6pWyb/Yhy5EkrfYmQ0gB610SkGKx0WzENQZYVARlcCWBtppz7oI
+   z8/M4mCHE96rY24kZcYvVTWWpzN9AIvfgbCCZZKXqHL+oD6oFqv+VEN3s
+   fcj26NaMnsid97VbXNT1JRmzETxwT1xRBgoAlK2Z4Z147iG+ViI656S7h
+   VU85uMiKB6YSlb6e9TYbVAEH9Tj8KpDPli07QZ3TfNAU8rF+IQgmVFLFp
+   jaIa0KjbedwT6NgLKmNjj3gb4J5cFRg+v4fpXUQ415WEmohV3uEpNTafb
+   w==;
+X-CSE-ConnectionGUID: oo44aWvvQtC7/2wqxn6Gwg==
+X-CSE-MsgGUID: slyDIQfaTGiiyh2LZeK7OQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="40155089"
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="40155089"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 10:57:59 -0700
+X-CSE-ConnectionGUID: 6mXNKCatQ/SxV8fNv/rOyQ==
+X-CSE-MsgGUID: FJVZXk0iRJ2t2K1mrYqp9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
+   d="scan'208";a="61027135"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 21 Aug 2024 10:57:52 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sgpaf-000Bl6-2a;
+	Wed, 21 Aug 2024 17:57:49 +0000
+Date: Thu, 22 Aug 2024 01:56:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <helgaas@kernel.org>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+Message-ID: <202408220150.bmFMT5Bk-lkp@intel.com>
+References: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
 
-> > > > Xuan, Michael, the virtio spec calls out drops due to b/w limit
-> > > > being exceeded, but AWS people say their NICs also count packets
-> > > > buffered but not dropped towards a similar metric.
-> > > >
-> > > > I presume the virtio spec is supposed to cover the same use cases.
-> > > > Have the stats been approved? Is it reasonable to extend the
-> > > > definition of the "exceeded" stats in the virtio spec to cover
-> > > > what AWS
-> > specifies?
-> > > > Looks like PR is still open:
-> > > > https://github.com/oasis-tcs/virtio-spec/issues/180
-> > >
-> > > How do we move forward with this patchset?
-> > > Regarding the counter itself, even though we don't support this at
-> > > the moment, I would recommend to keep the queued and dropped as
-> > > split
-> > (for
-> > > example, add tx/rx-hw-queued-ratelimits, or something similar, if
-> > > that makes sense).
-> >
-> > Could you share some background for your recommendation?
-> > As you say, the advice contradicts your own code :S Let's iron this
-> > out for virtio's benefit.
-> >
->=20
-> The links I've shared before are of public AWS documentation, therefore,
-> this is what AWS currently supports.
-> When looking at the definition of what queued and what dropped means,
-> having such a separation will benefit customers better as it will provide=
- them
-> more detailed information about the limits that they're about to exceed o=
-r
-> are already exceeding. A queued packet will be received with a delay, whi=
-le a
-> dropped packet wouldn't arrive to the destination.
-> In both cases, customers need to look into their applications and network
-> loads and see what should be changed, but when I'm looking at a case wher=
-e
-> packets are dropped, it is more dire (in some use-cases) that when packet=
-s
-> are being delayed, which is possibly more transparent to some network loa=
-ds
-> that are not looking for cases like low latency.
->=20
-> Even though the ENA driver can't support it at the moment, given that the
-> stats interface is aiming for other drivers to implement (based on their =
-level
-> of support), the level of granularity and separation will be more generic=
- and
-> more beneficial to customers. In my opinion, the suggestion to virtio is =
-more
-> posing a limitation based on what AWS currently supports than creating
-> something generic that other drivers will hopefully implement based on th=
-eir
-> NICs.
->=20
-> > You can resend the first patch separately in the meantime.
->=20
-> I prefer them to be picked up together.
->=20
+Hi Andrea,
 
-I see that there's no feedback from Xuan or Michael.
+kernel test robot noticed the following build warnings:
 
-Jakub, what are your thoughts about my suggestion?
+[auto build test WARNING on clk/clk-next]
+[also build test WARNING on robh/for-next char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.11-rc4 next-20240821]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Andrea-della-Porta/dt-bindings-clock-Add-RaspberryPi-RP1-clock-bindings/20240821-023901
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+patch link:    https://lore.kernel.org/r/5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta%40suse.com
+patch subject: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20240822/202408220150.bmFMT5Bk-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240822/202408220150.bmFMT5Bk-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408220150.bmFMT5Bk-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/linux/device.h:15,
+                    from include/linux/pci.h:37,
+                    from drivers/misc/rp1/rp1-pci.c:18:
+   drivers/misc/rp1/rp1-pci.c: In function 'dump_bar':
+>> drivers/misc/rp1/rp1-pci.c:75:18: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 4 has type 'resource_size_t' {aka 'unsigned int'} [-Wformat=]
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:160:58: note: in expansion of macro 'dev_fmt'
+     160 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                          ^~~~~~~
+   drivers/misc/rp1/rp1-pci.c:74:9: note: in expansion of macro 'dev_info'
+      74 |         dev_info(&pdev->dev,
+         |         ^~~~~~~~
+   drivers/misc/rp1/rp1-pci.c:75:34: note: format string is defined here
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                               ~~~^
+         |                                  |
+         |                                  long long unsigned int
+         |                               %x
+   drivers/misc/rp1/rp1-pci.c:75:18: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 5 has type 'resource_size_t' {aka 'unsigned int'} [-Wformat=]
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:160:58: note: in expansion of macro 'dev_fmt'
+     160 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                          ^~~~~~~
+   drivers/misc/rp1/rp1-pci.c:74:9: note: in expansion of macro 'dev_info'
+      74 |         dev_info(&pdev->dev,
+         |         ^~~~~~~~
+   drivers/misc/rp1/rp1-pci.c:75:48: note: format string is defined here
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                                             ~~~^
+         |                                                |
+         |                                                long long unsigned int
+         |                                             %x
+   drivers/misc/rp1/rp1-pci.c:75:18: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 6 has type 'resource_size_t' {aka 'unsigned int'} [-Wformat=]
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:160:58: note: in expansion of macro 'dev_fmt'
+     160 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                          ^~~~~~~
+   drivers/misc/rp1/rp1-pci.c:74:9: note: in expansion of macro 'dev_info'
+      74 |         dev_info(&pdev->dev,
+         |         ^~~~~~~~
+   drivers/misc/rp1/rp1-pci.c:75:60: note: format string is defined here
+      75 |                  "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+         |                                                         ~~~^
+         |                                                            |
+         |                                                            long long unsigned int
+         |                                                         %x
+
+
+vim +75 drivers/misc/rp1/rp1-pci.c
+
+  > 18	#include <linux/pci.h>
+    19	#include <linux/platform_device.h>
+    20	#include <linux/reset.h>
+    21	
+    22	#include <dt-bindings/misc/rp1.h>
+    23	
+    24	#define RP1_B0_CHIP_ID		0x10001927
+    25	#define RP1_C0_CHIP_ID		0x20001927
+    26	
+    27	#define RP1_PLATFORM_ASIC	BIT(1)
+    28	#define RP1_PLATFORM_FPGA	BIT(0)
+    29	
+    30	#define RP1_DRIVER_NAME		"rp1"
+    31	
+    32	#define RP1_ACTUAL_IRQS		RP1_INT_END
+    33	#define RP1_IRQS		RP1_ACTUAL_IRQS
+    34	#define RP1_HW_IRQ_MASK		GENMASK(5, 0)
+    35	
+    36	#define RP1_SYSCLK_RATE		200000000
+    37	#define RP1_SYSCLK_FPGA_RATE	60000000
+    38	
+    39	enum {
+    40		SYSINFO_CHIP_ID_OFFSET	= 0,
+    41		SYSINFO_PLATFORM_OFFSET	= 4,
+    42	};
+    43	
+    44	#define REG_SET			0x800
+    45	#define REG_CLR			0xc00
+    46	
+    47	/* MSIX CFG registers start at 0x8 */
+    48	#define MSIX_CFG(x) (0x8 + (4 * (x)))
+    49	
+    50	#define MSIX_CFG_IACK_EN        BIT(3)
+    51	#define MSIX_CFG_IACK           BIT(2)
+    52	#define MSIX_CFG_TEST           BIT(1)
+    53	#define MSIX_CFG_ENABLE         BIT(0)
+    54	
+    55	#define INTSTATL		0x108
+    56	#define INTSTATH		0x10c
+    57	
+    58	extern char __dtbo_rp1_pci_begin[];
+    59	extern char __dtbo_rp1_pci_end[];
+    60	
+    61	struct rp1_dev {
+    62		struct pci_dev *pdev;
+    63		struct device *dev;
+    64		struct clk *sys_clk;
+    65		struct irq_domain *domain;
+    66		struct irq_data *pcie_irqds[64];
+    67		void __iomem *bar1;
+    68		int ovcs_id;
+    69		bool level_triggered_irq[RP1_ACTUAL_IRQS];
+    70	};
+    71	
+    72	static void dump_bar(struct pci_dev *pdev, unsigned int bar)
+    73	{
+    74		dev_info(&pdev->dev,
+  > 75			 "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+    76			 bar,
+    77			 pci_resource_len(pdev, bar),
+    78			 pci_resource_start(pdev, bar),
+    79			 pci_resource_end(pdev, bar),
+    80			 pci_resource_flags(pdev, bar));
+    81	}
+    82	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
