@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-120725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA5B95A678
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:23:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BE095A679
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2040B21D14
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:23:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3981C2266C
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA24A175D3A;
-	Wed, 21 Aug 2024 21:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60054178CE4;
+	Wed, 21 Aug 2024 21:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="KJsB4Iif"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="KYpiWJer"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FEA177981
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDB6178372
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724275363; cv=none; b=VUkq/O9/u7y8JBchLQ7vuyuEdAltmHDMjqIrebUz8Fpwyd+jF7c15QDTvwAM3E8hIXdEgaVWP2RHqqMP38mQfsHhiEsbHaWQqJIJfhB/nMb0w8wVEAxkHy4JJtNupHDTBiZn2Gu0kYGv8JxG5mVpqnRIUcFHiyluk2YZXHNEadM=
+	t=1724275365; cv=none; b=U+zTkxZOmdQG0cmIIoU+EnziXpDtXoVoy7KPGT+VOUZ8H/oUwaekucfi7bf0xEEdih2Vi8GkMd1m8ji/yMfwf3hbc//fuVh4iKUHsJYjYgLMnEEoNdzq93kufSipiczGQ+Ra4jN9lON4tijGc/5OGY5vn9VczeIaxt9ngTeyZhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724275363; c=relaxed/simple;
-	bh=nYu8yZ/VN1Dg7+BXBxyOnOybgHomc2LXxWLVKv9ctjk=;
+	s=arc-20240116; t=1724275365; c=relaxed/simple;
+	bh=jB9SApiU0tAER5vbQmJHPWj6fZXj0wdImfazAaQNBCs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BjXjDuES31e7yBoGpI6x/It153F8VQoYLudjPQS8EZyq5m8P+poXu2p8yVCdupW79mX7dyNeEAXQMeBulP2gYoRNG9ufsrCNtraRZLNvBctviXcsgmDz2L/T8UJ9JytH0jAGKFhFlyqkwKpF39WTfChxIcA+bIERF4dNQfZ1piI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=KJsB4Iif; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=JzbozKHf74YBjvWSAjC3CriyYbqJJx3deSfnVvKO84dZBnVKqjL5AH29y+u026r02Ks6Ov7up5kmj3ofyIAZiUo4MpdyCdXWP5vjPVJZ0TXka5fW5TXUihJlHwy5lICbM0ZtlcHm2G2dTWBw2JbrU25Uu4eMlOrJusSiqe83J3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=KYpiWJer; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20227ba378eso1366165ad.0
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:22:41 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20219a0fe4dso1320895ad.2
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:22:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1724275361; x=1724880161; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1724275363; x=1724880163; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e1sb8cWs53jZLxOrCKQjc0PrlsqOnPbedcs+Sjt1xik=;
-        b=KJsB4Iifb5Jf5gaW0cTt1P/jOk2lXdwFzmuUkipGv1PsN0H+1BnhJvKvAois+LI6CV
-         5PPgDK+oNxrYPLnJQcjJ/SuNPz9JT/ut4oHDRoRUMdQObMQdL/JL5NzOGyF95RVUqoK8
-         8WN1WD5+BzY4Re5RzOAjY0XoMOiSPzMNwigYBjh++bJs3dzMiAil3cu1bmUPKB8YtrT2
-         XeLNXc6sYuK4DN/l1C6eJvKtW4CbLy6kEYw6gvAlrx0OY79CfJ6FRN72siT+SJOgeX9L
-         jmsj2COeTAUUi1h1pRJqJlSOzuOkoaCL+pPb+VEL4hDM0EWJEmFYqBA3c5oQr4957fPU
-         aWMg==
+        bh=2ybmEWSVMNWJwoyiaxSSrSx1YuGX6mif+IMJnoCq4og=;
+        b=KYpiWJer7aOxJfjgSYzDoiKzp4tf67N1XYHdwXmTWwqSgzWaHzZ4JZ/iSWzMtNoCxz
+         GgMsvzacwm0NF877t3jovO+mnyYPxbAyGQ0eKxMvk+gQAeHxa9hXDTe2nH589xClYhSW
+         E7Iu+8WS47IzhpT3Sf2o/q2diwnp3zUQD/lkCNx/xYIuCI3RuBDRDeVRuqggh5Z9JoJ3
+         AqtRTWQ+klsekMX0frrFBtJIV+Nvx3Khln0Y7pXHesqSewi/FN8nWec+nbfsdbuECmLx
+         mTwIDFs8+Qx9X8Yyp9rcDV1LYzn8HU2ifa/cguzuFaxnfuKRk/1m77FACyM6Q1bN1iPB
+         VaAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724275361; x=1724880161;
+        d=1e100.net; s=20230601; t=1724275363; x=1724880163;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e1sb8cWs53jZLxOrCKQjc0PrlsqOnPbedcs+Sjt1xik=;
-        b=a2XRUDQhClSaubImuH2mvfcTieTMNUI+tWQognav7E5RmurzUm48UhtfbZq4YzrWSv
-         pIDvXEPE5ud4CX45Q5gCa4f6fd95OtKcnGzGW6u1jCcMJ8ApMU7Du90ZIpq/EyPXytVH
-         bZ9S0zZX6clvMHoqgb8UmwmuvJu971TDYTo1jzNDIHBqw7wz4q4jyiffUi2BxESl3PQP
-         z6ebZ4oHFSEi5maLFxU9oUbwbNd35YB+rQNNJvFdNbwN73BKSONFiOWtDN2T7V8zBtr1
-         6Xqw/s9Ai+YxKyWYVDCuo4YYtumBIriwUIyd3mVkHbW+GpALeI/WSmSMxjkrMeGSEHSY
-         YxZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUE4DLjAN4PjleJnusdAgIOdsvA+XX2cmlvoFT1UjLCevGkYYPIdzQ7WGdj9ye69U/7XlbuIMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzDtp2YZn792lFGUi/GVLobjShZ5LOiKVUpVPNQLRXikcnao+e
-	dCPfUySXuJcK+TBAPO1t1bWPJCvuyJNGMBVGmYc0fVZLvef3HDpe4YW2KR5DwA==
-X-Google-Smtp-Source: AGHT+IFXKARSVoeNligjxtsRnyn1JW0zZ/uZYDNRnRpsrSzMqCMhER5LhmYxY9QXrPWHRQNlNocUUg==
-X-Received: by 2002:a17:902:e544:b0:202:2b3c:9ace with SMTP id d9443c01a7336-20367d31d30mr42397725ad.30.1724275361162;
-        Wed, 21 Aug 2024 14:22:41 -0700 (PDT)
+        bh=2ybmEWSVMNWJwoyiaxSSrSx1YuGX6mif+IMJnoCq4og=;
+        b=k7OqYP8U5IBSK0yZ3Q+QvKdShQ7xrYgfQ2Dd09SifYimeWtqn9OXpY8tKeItz0Sxxc
+         ZJBLRvJMh5gfdt2hEuVpVWASOlcpKvsADRm70BYH4CflEal5juEUZk+XYCGh+uguXzby
+         PxQjZpnvaxrwkuNYc/H/UJDgKVTKZXJXkHnfdRueiAJXqJYOUX+Q37c49jeJMJv54rT7
+         zj4qUyds19tZId0xEfaYQS9NLkF7+L0FvxrEF6n+vlSXPJrev0mYAAnoBFOfEk9hEyH9
+         i7DfPGDJLClVi9/osYUOjZRIg0ydc2yIqVksB16HqV24GFeYhxmqc/EAsPuk1SeT0//L
+         1euw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkmeOIAbTpbCtHcEBhDnhRtjWS0riFLNTlwPJ4bHuEkLZ1oUjZCXpkIpKVjQ+Quc9bmalxzaM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKRAjJtOGYwaMtVNsliumOr2cWEmZGvortD47iCAJyUrPL4m9v
+	mo1b2JtI3Q7GWu9fDRvkbyzWCD95gSoa8HQ6ZA0PQuw4QCnmEA5kB+cYmA8WVg==
+X-Google-Smtp-Source: AGHT+IG9+X14WEqdtQsvr4xCnkYsw7ZtpxYZS16ZtQutl9BAgR8l1Uqave/nQXRbdwG07BLScKaNOA==
+X-Received: by 2002:a17:902:facc:b0:201:fcd1:e430 with SMTP id d9443c01a7336-20367af1ec9mr32615315ad.11.1724275362601;
+        Wed, 21 Aug 2024 14:22:42 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:7a19:cf52:b518:f0d2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385ae701dsm388265ad.236.2024.08.21.14.22.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385ae701dsm388265ad.236.2024.08.21.14.22.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 14:22:40 -0700 (PDT)
+        Wed, 21 Aug 2024 14:22:42 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -77,11 +77,10 @@ To: davem@davemloft.net,
 	pablo@netfilter.org,
 	laforge@gnumonks.org,
 	xeb@mail.ru
-Cc: Tom Herbert <tom@herbertland.com>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v3 04/13] udp_encaps: Set proper UDP_ENCAP types in tunnel setup
-Date: Wed, 21 Aug 2024 14:22:03 -0700
-Message-Id: <20240821212212.1795357-5-tom@herbertland.com>
+Cc: Tom Herbert <tom@herbertland.com>
+Subject: [PATCH net-next v3 05/13] flow_dissector: UDP encap infrastructure
+Date: Wed, 21 Aug 2024 14:22:04 -0700
+Message-Id: <20240821212212.1795357-6-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240821212212.1795357-1-tom@herbertland.com>
 References: <20240821212212.1795357-1-tom@herbertland.com>
@@ -93,170 +92,224 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of just setting UDP tunnel config encap_type to 1,
-use the appropriate constat for the tunnel type. This value
-can be used to determine the encapsulated protocol in UDP
-by looking at the socket
+Add infrastructure for parsing into UDP encapsulations
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Add function __skb_flow_dissect_udp that is called for IPPROTO_UDP.
+The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsing of UDP
+encapsulations. If the flag is set when parsing a UDP packet then
+a socket lookup is performed. The offset of the base network header,
+either an IPv4 or IPv6 header, is tracked and passed to
+__skb_flow_dissect_udp so that it can perform the socket lookup
+
+If a socket is found and it's for a UDP encapsulation (encap_type is
+set in the UDP socket) then a switch is performed on the encap_type
+value (cases are UDP_ENCAP_* values)
+
+An encapsulated packet in UDP can either be indicated by an
+EtherType or IP protocol. The processing for dissecting a UDP encap
+protocol returns a flow dissector return code. If
+FLOW_DISSECT_RET_PROTO_AGAIN or FLOW_DISSECT_RET_IPPROTO_AGAIN is
+returned then the corresponding  encapsulated protocol is dissected.
+The nhoff is set to point to the header to process.  In the case
+FLOW_DISSECT_RET_PROTO_AGAIN the EtherType protocol is returned and
+the IP protocol is set to zero. In the case of
+FLOW_DISSECT_RET_IPPROTO_AGAIN, the IP protocol is returned and
+the EtherType protocol is returned unchanged
+
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- drivers/infiniband/sw/rxe/rxe_net.c | 2 +-
- drivers/net/amt.c                   | 2 +-
- drivers/net/bareudp.c               | 2 +-
- drivers/net/geneve.c                | 2 +-
- drivers/net/pfcp.c                  | 2 +-
- drivers/net/vxlan/vxlan_core.c      | 3 ++-
- drivers/net/wireguard/socket.c      | 2 +-
- net/ipv4/fou_core.c                 | 3 ++-
- net/sctp/protocol.c                 | 2 +-
- net/tipc/udp_media.c                | 2 +-
- 10 files changed, 12 insertions(+), 10 deletions(-)
+ include/net/flow_dissector.h |   1 +
+ net/core/flow_dissector.c    | 137 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 138 insertions(+)
 
-diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
-index 75d1407db52d..1c2bb88132c5 100644
---- a/drivers/infiniband/sw/rxe/rxe_net.c
-+++ b/drivers/infiniband/sw/rxe/rxe_net.c
-@@ -193,7 +193,7 @@ static struct socket *rxe_setup_udp_tunnel(struct net *net, __be16 port,
- 	if (err < 0)
- 		return ERR_PTR(err);
+diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
+index ced79dc8e856..8a868a88a6f1 100644
+--- a/include/net/flow_dissector.h
++++ b/include/net/flow_dissector.h
+@@ -384,6 +384,7 @@ enum flow_dissector_key_id {
+ #define FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL	BIT(1)
+ #define FLOW_DISSECTOR_F_STOP_AT_ENCAP		BIT(2)
+ #define FLOW_DISSECTOR_F_STOP_BEFORE_ENCAP	BIT(3)
++#define FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS	BIT(4)
  
--	tnl_cfg.encap_type = 1;
-+	tnl_cfg.encap_type = UDP_ENCAP_RXE;
- 	tnl_cfg.encap_rcv = rxe_udp_encap_recv;
+ struct flow_dissector_key {
+ 	enum flow_dissector_key_id key_id;
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 5170676a224c..a5b1b1badc67 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -13,6 +13,7 @@
+ #include <net/gre.h>
+ #include <net/pptp.h>
+ #include <net/tipc.h>
++#include <net/udp.h>
+ #include <linux/igmp.h>
+ #include <linux/icmp.h>
+ #include <linux/sctp.h>
+@@ -806,6 +807,133 @@ __skb_flow_dissect_batadv(const struct sk_buff *skb,
+ 	return FLOW_DISSECT_RET_PROTO_AGAIN;
+ }
  
- 	/* Setup UDP tunnel */
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 6d15ab3bfbbc..fc421cf2c032 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -2970,7 +2970,7 @@ static int amt_socket_create(struct amt_dev *amt)
- 	/* Mark socket as an encapsulation socket */
- 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
- 	tunnel_cfg.sk_user_data = amt;
--	tunnel_cfg.encap_type = 1;
-+	tunnel_cfg.encap_type = UDP_ENCAP_AMT;
- 	tunnel_cfg.encap_rcv = amt_rcv;
- 	tunnel_cfg.encap_err_lookup = amt_err_lookup;
- 	tunnel_cfg.encap_destroy = NULL;
-diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index d5c56ca91b77..007fb8c5168b 100644
---- a/drivers/net/bareudp.c
-+++ b/drivers/net/bareudp.c
-@@ -248,7 +248,7 @@ static int bareudp_socket_create(struct bareudp_dev *bareudp, __be16 port)
- 	/* Mark socket as an encapsulation socket */
- 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
- 	tunnel_cfg.sk_user_data = bareudp;
--	tunnel_cfg.encap_type = 1;
-+	tunnel_cfg.encap_type = UDP_ENCAP_BAREUDP;
- 	tunnel_cfg.encap_rcv = bareudp_udp_encap_recv;
- 	tunnel_cfg.encap_err_lookup = bareudp_err_lookup;
- 	tunnel_cfg.encap_destroy = NULL;
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 838e85ddec67..923c573b6e5c 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -611,7 +611,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
- 	/* Mark socket as an encapsulation socket */
- 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
- 	tunnel_cfg.sk_user_data = gs;
--	tunnel_cfg.encap_type = 1;
-+	tunnel_cfg.encap_type = UDP_ENCAP_GENEVE;
- 	tunnel_cfg.gro_receive = geneve_gro_receive;
- 	tunnel_cfg.gro_complete = geneve_gro_complete;
- 	tunnel_cfg.encap_rcv = geneve_udp_encap_recv;
-diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
-index 69434fd13f96..c7e4fa606b16 100644
---- a/drivers/net/pfcp.c
-+++ b/drivers/net/pfcp.c
-@@ -170,7 +170,7 @@ static struct socket *pfcp_create_sock(struct pfcp_dev *pfcp)
++static enum flow_dissect_ret
++__skb_flow_dissect_udp(const struct sk_buff *skb, const struct net *net,
++		       struct flow_dissector *flow_dissector,
++		       void *target_container, const void *data,
++		       int *p_nhoff, int hlen, __be16 *p_proto,
++		       u8 *p_ip_proto, int base_nhoff, unsigned int flags,
++		       unsigned int num_hdrs)
++{
++	enum flow_dissect_ret ret;
++	const struct udphdr *udph;
++	struct udphdr _udph;
++	struct sock *sk;
++	__u8 encap_type;
++	int nhoff;
++
++	if (!(flags & FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS))
++		return FLOW_DISSECT_RET_OUT_GOOD;
++
++	/* Check that the netns for the skb device is the same as the caller's,
++	 * and only dissect UDP if we haven't yet encountered any encapsulation.
++	 * The goal is to ensure that the socket lookup is being done in the
++	 * right netns. Encapsulations may push packets into different name
++	 * spaces, so this scheme is restricting UDP dissection to cases where
++	 * they are in the same name spaces or at least the original name space.
++	 * This should capture the majority of use cases for UDP encaps, and
++	 * if we do encounter a UDP encapsulation within a different namespace
++	 * then the only effect is we don't attempt UDP dissection
++	 */
++	if (dev_net(skb->dev) != net || num_hdrs > 0)
++		return FLOW_DISSECT_RET_OUT_GOOD;
++
++	switch (*p_proto) {
++#ifdef CONFIG_INET
++	case htons(ETH_P_IP): {
++		const struct iphdr *iph;
++		struct iphdr _iph;
++
++		iph = __skb_header_pointer(skb, base_nhoff, sizeof(_iph), data,
++					   hlen, &_iph);
++		if (!iph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		udph = __skb_header_pointer(skb, *p_nhoff, sizeof(_udph), data,
++					    hlen, &_udph);
++		if (!udph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		rcu_read_lock();
++		/* Look up the UDPv4 socket and get the encap_type */
++		sk = __udp4_lib_lookup(net, iph->saddr, udph->source,
++				       iph->daddr, udph->dest,
++				       inet_iif(skb), inet_sdif(skb),
++				       net->ipv4.udp_table, NULL);
++		if (!sk || !udp_sk(sk)->encap_type) {
++			rcu_read_unlock();
++			return FLOW_DISSECT_RET_OUT_GOOD;
++		}
++
++		encap_type = udp_sk(sk)->encap_type;
++		rcu_read_unlock();
++
++		break;
++	}
++#if IS_ENABLED(CONFIG_IPV6)
++	case htons(ETH_P_IPV6): {
++		const struct ipv6hdr *iph;
++		struct ipv6hdr _iph;
++
++		if (!likely(ipv6_stub))
++			return FLOW_DISSECT_RET_OUT_GOOD;
++
++		iph = __skb_header_pointer(skb, base_nhoff, sizeof(_iph), data,
++					   hlen, &_iph);
++		if (!iph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		udph = __skb_header_pointer(skb, *p_nhoff, sizeof(_udph), data,
++					    hlen, &_udph);
++		if (!udph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		rcu_read_lock();
++		/* Look up the UDPv6 socket and get the encap_type */
++		sk = ipv6_stub->udp6_lib_lookup(net,
++				&iph->saddr, udph->source,
++				&iph->daddr, udph->dest,
++				inet_iif(skb), inet_sdif(skb),
++				net->ipv4.udp_table, NULL);
++
++		if (!sk || !udp_sk(sk)->encap_type) {
++			rcu_read_unlock();
++			return FLOW_DISSECT_RET_OUT_GOOD;
++		}
++
++		encap_type = udp_sk(sk)->encap_type;
++		rcu_read_unlock();
++
++		break;
++	}
++#endif /* CONFIG_IPV6 */
++#endif /* CONFIG_INET */
++	default:
++		return FLOW_DISSECT_RET_OUT_GOOD;
++	}
++
++	nhoff = *p_nhoff + sizeof(_udph);
++	ret = FLOW_DISSECT_RET_OUT_GOOD;
++
++	switch (encap_type) {
++	default:
++		break;
++	}
++
++	switch (ret) {
++	case FLOW_DISSECT_RET_PROTO_AGAIN:
++		*p_ip_proto = 0;
++		fallthrough;
++	case FLOW_DISSECT_RET_IPPROTO_AGAIN:
++		*p_nhoff = nhoff;
++		break;
++	default:
++		break;
++	}
++
++	return ret;
++}
++
+ static void
+ __skb_flow_dissect_tcp(const struct sk_buff *skb,
+ 		       struct flow_dissector *flow_dissector,
+@@ -1046,6 +1174,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 	int mpls_lse = 0;
+ 	int num_hdrs = 0;
+ 	u8 ip_proto = 0;
++	int base_nhoff;
+ 	bool ret;
  
- 	tuncfg.sk_user_data = pfcp;
- 	tuncfg.encap_rcv = pfcp_encap_recv;
--	tuncfg.encap_type = 1;
-+	tuncfg.encap_type = UDP_ENCAP_PFCP;
+ 	if (!data) {
+@@ -1168,6 +1297,7 @@ bool __skb_flow_dissect(const struct net *net,
  
- 	setup_udp_tunnel_sock(net, sock, &tuncfg);
+ proto_again:
+ 	fdret = FLOW_DISSECT_RET_CONTINUE;
++	base_nhoff = nhoff;
  
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 8983e75e9881..e02cbc018b8c 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3572,7 +3572,8 @@ static struct vxlan_sock *vxlan_socket_create(struct net *net, bool ipv6,
- 	/* Mark socket as an encapsulation socket. */
- 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
- 	tunnel_cfg.sk_user_data = vs;
--	tunnel_cfg.encap_type = 1;
-+	tunnel_cfg.encap_type = vs->flags & VXLAN_F_GPE ?
-+			UDP_ENCAP_VXLAN_GPE : UDP_ENCAP_VXLAN;
- 	tunnel_cfg.encap_rcv = vxlan_rcv;
- 	tunnel_cfg.encap_err_lookup = vxlan_err_lookup;
- 	tunnel_cfg.encap_destroy = NULL;
-diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
-index 0414d7a6ce74..f4b5bd14fd56 100644
---- a/drivers/net/wireguard/socket.c
-+++ b/drivers/net/wireguard/socket.c
-@@ -352,7 +352,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	int ret;
- 	struct udp_tunnel_sock_cfg cfg = {
- 		.sk_user_data = wg,
--		.encap_type = 1,
-+		.encap_type = UDP_ENCAP_WIREGUARD,
- 		.encap_rcv = wg_receive
- 	};
- 	struct socket *new4 = NULL, *new6 = NULL;
-diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
-index 0abbc413e0fe..8241f762e45b 100644
---- a/net/ipv4/fou_core.c
-+++ b/net/ipv4/fou_core.c
-@@ -578,19 +578,20 @@ static int fou_create(struct net *net, struct fou_cfg *cfg,
- 	fou->sock = sock;
- 
- 	memset(&tunnel_cfg, 0, sizeof(tunnel_cfg));
--	tunnel_cfg.encap_type = 1;
- 	tunnel_cfg.sk_user_data = fou;
- 	tunnel_cfg.encap_destroy = NULL;
- 
- 	/* Initial for fou type */
- 	switch (cfg->type) {
- 	case FOU_ENCAP_DIRECT:
-+		tunnel_cfg.encap_type = UDP_ENCAP_FOU;
- 		tunnel_cfg.encap_rcv = fou_udp_recv;
- 		tunnel_cfg.gro_receive = fou_gro_receive;
- 		tunnel_cfg.gro_complete = fou_gro_complete;
- 		fou->protocol = cfg->protocol;
+ 	switch (proto) {
+ 	case htons(ETH_P_IP): {
+@@ -1649,6 +1779,13 @@ bool __skb_flow_dissect(const struct net *net,
+ 				       data, nhoff, hlen);
  		break;
- 	case FOU_ENCAP_GUE:
-+		tunnel_cfg.encap_type = UDP_ENCAP_GUE;
- 		tunnel_cfg.encap_rcv = gue_udp_recv;
- 		tunnel_cfg.gro_receive = gue_gro_receive;
- 		tunnel_cfg.gro_complete = gue_gro_complete;
-diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-index 5a7436a13b74..290ebcf17a48 100644
---- a/net/sctp/protocol.c
-+++ b/net/sctp/protocol.c
-@@ -876,7 +876,7 @@ int sctp_udp_sock_start(struct net *net)
- 		return err;
- 	}
  
--	tuncfg.encap_type = 1;
-+	tuncfg.encap_type = UDP_ENCAP_SCTP;
- 	tuncfg.encap_rcv = sctp_udp_rcv;
- 	tuncfg.encap_err_lookup = sctp_udp_v4_err;
- 	setup_udp_tunnel_sock(net, sock, &tuncfg);
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index 439f75539977..3c081b7b9d67 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -771,7 +771,7 @@ static int tipc_udp_enable(struct net *net, struct tipc_bearer *b,
- 	if (err)
- 		goto err;
- 	tuncfg.sk_user_data = ub;
--	tuncfg.encap_type = 1;
-+	tuncfg.encap_type = UDP_ENCAP_TIPC;
- 	tuncfg.encap_rcv = tipc_udp_recv;
- 	tuncfg.encap_destroy = NULL;
- 	setup_udp_tunnel_sock(net, ub->ubsock, &tuncfg);
++	case IPPROTO_UDP:
++		fdret = __skb_flow_dissect_udp(skb, net, flow_dissector,
++					       target_container, data, &nhoff,
++					       hlen, &proto, &ip_proto,
++					       base_nhoff, flags, num_hdrs);
++		break;
++
+ 	case IPPROTO_ICMP:
+ 	case IPPROTO_ICMPV6:
+ 		__skb_flow_dissect_icmp(skb, flow_dissector, target_container,
 -- 
 2.34.1
 
