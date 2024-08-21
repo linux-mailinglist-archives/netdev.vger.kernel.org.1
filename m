@@ -1,190 +1,108 @@
-Return-Path: <netdev+bounces-120469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B9369597E0
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:42:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2CD39597E8
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E93F1C20E8E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8474228401D
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EA01A7AF0;
-	Wed, 21 Aug 2024 08:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E851BA285;
+	Wed, 21 Aug 2024 08:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScxUpvDk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A1E1A7AD3;
-	Wed, 21 Aug 2024 08:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229AA1BA27E
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724229910; cv=none; b=AFN8xyMi1gAK6iTED0ys3iYCL5VwOT//AUFVJM8m1AYGLjpjpL1BvVjaUqiFdDV7yvkgiSR33VokpIXXmK+bFlfeXqECm2vZLpttjyyILErpL4bUqVcK67af6Wr21x9HlJSoHcZiUDrAAG+b3uwJNTB14ykcFLhpbzpBdSTXP2k=
+	t=1724230014; cv=none; b=V2oAjm9RYUfbqywIj3PFEnh/Bkmss+FA0EMOBY7+wT8mQg3HpF+woDt82/HpjIiF59Oc7eABzIi3GpJiZdhlgPnOsNXRGUJGDGgwWEGZUVuKoY7ip52FnPrv7DjRuRtxJA3QQ2v/SNThY0wWzta+u1ylSKrLMN2JZqo7S3FI/ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724229910; c=relaxed/simple;
-	bh=qRHRsbmRDvbIyXABIKEaaMk2OJDVFBz9OKDrgIfMiu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r3biBuTbnIJ9HOTWy7PEz/7zZyMc3AEluwi87dIMqj8dFkUUHy0cxYTjCLMju+Gcp8DIStXjRm511xtNX+uz2Bm6j9CjHs/gaa0DCby15R2hBPoRBA2ZaDHrmM89O9AnbOdQgDZEJXpHPMsNplRSpK+UaKCl/MtpkCeBlupFrZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-371b015572cso3204713f8f.1;
-        Wed, 21 Aug 2024 01:45:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724229907; x=1724834707;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vebzIfVKrkPnVYzJ3Le9GL91uwlzLYfp0d5U/T68YJ8=;
-        b=J9CA4uoE/YT9/AZxTlnI+pmt2zYPS3W1dhDlINf+KxB0RBWgNFInfHqHkX1ZS2BLSS
-         9ztY65Fr7S4lydew2zKtcnQvdTEka7VuPEfzNGnVLHb3+1FrjzsiRFasa2cxKSDFt4/6
-         YCPrw0SmDNTc6nhTcxmaMZqKzDBQYQ/E3eczAz7brbw85tWTvMroswFpVy7fTaBtR8Fg
-         6QL8LJpMqXPhV4AlGSMM4eztCDGFz9M3YlxiH7YGtyWUvfJQa7srZu8gFNH4PMEfUw0V
-         K3Ylz2BQO7XxoIYddwB9vNpD5rVF+odfPJg7cecmCRYSOrH63eVBFjy7q3WpZ1/3+DNZ
-         eRSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUAI3BFNf3uGHGFfqJ9EmO64X33kUghtBRHFvgjbA+AkdR95tW53cZ3nFWKzR2iEJCNcT33VEufYF5crw==@vger.kernel.org, AJvYcCUxsGkNP/TuaEITT3adrnMw/cXHyp22dQRNiSyf1HHVnMLg+GEhEYuCQ/l8AeoQ5APDNsedTo22yE+o8g==@vger.kernel.org, AJvYcCVHydiGf0JifPRQ9kpawhDbuHskil+7wCnlKlFcVbVspIpXOhCXm9ML3xBTKPCEEx9ezG0AQOcJ5HRx@vger.kernel.org, AJvYcCXM9huIo4KQInkJg9ZyxY/xIUz3Z2tt070ns8NEABsaEcw5hfn3oFa2+o5dP70bE2oLuSy81ImpkyCV@vger.kernel.org, AJvYcCXQa4Hgr8T84YFM4vfN3i6UT+Pc5flDCrczSstt7qsNsPQd+SqNOx5cXXf1t2GebNvK/5NcVpGFnfv2@vger.kernel.org, AJvYcCXQx8tBiI/UHvMoD5BkvK8H/P+R9o0t0y/x+kiFhyCtNkLM9IUGlX/Ht8ZApt6mC8IrlkIVfCEjbX2m5lWn@vger.kernel.org, AJvYcCXeXBZbI//vmDntaBBKLMDlROIJWdGZyTvJGye+1AdHJGrBkVD2xOhbOUE3M0ESTUdG1/lWWedZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqlnZbctpPZM9cbIg1GIaMH4xRdQEGenNc7Zb4J6QGlZj6atwT
-	LDDrl/OsGF6ruIxwOiDIvuAeMnkYpapiX60VnCI6XEbizEjFHCNj
-X-Google-Smtp-Source: AGHT+IHKaaVpmQDW4zkcKLIQEKPER5kx2Q85aw0jAdWSxY/jqDtMu5zXmXnjno2J10fTqpaZgDn8NQ==
-X-Received: by 2002:a5d:5f56:0:b0:368:3f6a:1dea with SMTP id ffacd0b85a97d-372fd57f1eamr1516016f8f.6.1724229907231;
-        Wed, 21 Aug 2024 01:45:07 -0700 (PDT)
-Received: from krzk-bin ([178.197.215.209])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42abed90ef7sm17385485e9.9.2024.08.21.01.45.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 01:45:06 -0700 (PDT)
-Date: Wed, 21 Aug 2024 10:45:03 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org, linux-arch@vger.kernel.org, 
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
- support
-Message-ID: <l4xijmtxz5i5kkkd5tt25ls33drnnhxp26r42lab5ev343e4zh@ctknkjzbpwqz>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+	s=arc-20240116; t=1724230014; c=relaxed/simple;
+	bh=T9lkho/vKYy7rjGfIPXPBgoEClB/ES6Bv7rSqDdhTW4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=G6aj8jDiF8X1vBu0zO6mm49X9MWCoEJ1KliWeyPR/6M11KLx7unhO3AfbHVC1KCsVvj7AURVx6DAEnegEW531eoAWg6wagB6LCiPaLphE/lKQS1OmkOA0CSgskpEAfFDHwyDv4h0E7W8h5PMM6s1zR213xEgql61jVMwU3iDQVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScxUpvDk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51F49C32782;
+	Wed, 21 Aug 2024 08:46:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724230013;
+	bh=T9lkho/vKYy7rjGfIPXPBgoEClB/ES6Bv7rSqDdhTW4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ScxUpvDkYlSvHgP/1Gqv6JX3Jfr8ycDXrYhIv2SiJdFZ8jeCAz63O7nrZF6swVOjM
+	 WPNwpXcQv9R8LfggxHik+5x9jd3tF86IacsenVi4oztVKXH0E+Ivjwt0RXVu5XnZqk
+	 xHhOeavloEnVufTNRW+s6nffJ+yGaBIGkLPWVXJzzo26wEcvKEq3DQKTpvw+p9/3zG
+	 lr3iaqR4xs38j5aXcWQmvRTAEGdCa5NVCHBNzVoX3iUkXtl/m6tttKBR8NNdc0McTt
+	 fVJxerkKBndTjcsn3tiaDgdSGCy1PqsezKS80UAuJyk6Oy6TeRHkDkG5xEC7GiVF/5
+	 sJC0VaJXCs0uw==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2 0/5] MAINTAINERS: Networking updates
+Date: Wed, 21 Aug 2024 09:46:43 +0100
+Message-Id: <20240821-net-mnt-v2-0-59a5af38e69d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHOpxWYC/2WMyw7CIBBFf6WZtWOAYH2s/A/TRYGhJSo0QIim4
+ d8lbF2ee0/ODomiowS3YYdIxSUXfANxGECvs18InWkMggnJLnxETxnfPqO0QkmhjD7NHJq9RbL
+ u00sPaBJMbVxdyiF+e73wfv2FCkeGZK9yVPKsycj7k6Kn1zHEBaZa6w9+N3gGpAAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Breno Leitao <leitao@debian.org>, Chas Williams <3chas3@gmail.com>, 
+ Guo-Fu Tseng <cooldavid@cooldavid.org>, Moon Yeounsu <yyyynoom@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Tue, Aug 20, 2024 at 04:36:09PM +0200, Andrea della Porta wrote:
-> The RP1 is an MFD supporting a gpio controller and /pinmux/pinctrl.
-> Add minimum support for the gpio only portion. The driver is in
-> pinctrl folder since upcoming patches will add the pinmux/pinctrl
-> support where the gpio part can be seen as an addition.
-> 
-> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> ---
->  MAINTAINERS                   |   1 +
->  drivers/pinctrl/Kconfig       |  10 +
->  drivers/pinctrl/Makefile      |   1 +
->  drivers/pinctrl/pinctrl-rp1.c | 719 ++++++++++++++++++++++++++++++++++
->  4 files changed, 731 insertions(+)
->  create mode 100644 drivers/pinctrl/pinctrl-rp1.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4ce7b049d67e..67f460c36ea1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19122,6 +19122,7 @@ S:	Maintained
->  F:	Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
->  F:	Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.yaml
->  F:	drivers/clk/clk-rp1.c
-> +F:	drivers/pinctrl/pinctrl-rp1.c
->  F:	include/dt-bindings/clock/rp1.h
->  F:	include/dt-bindings/misc/rp1.h
->  
-> diff --git a/drivers/pinctrl/Kconfig b/drivers/pinctrl/Kconfig
-> index 7e4f93a3bc7a..18bb1a8bd102 100644
-> --- a/drivers/pinctrl/Kconfig
-> +++ b/drivers/pinctrl/Kconfig
-> @@ -565,6 +565,16 @@ config PINCTRL_MLXBF3
->  	  each pin. This driver can also be built as a module called
->  	  pinctrl-mlxbf3.
->  
-> +config PINCTRL_RP1
-> +	bool "Pinctrl driver for RP1"
-> +	select PINMUX
-> +	select PINCONF
-> +	select GENERIC_PINCONF
-> +	select GPIOLIB_IRQCHIP
-> +	help
-> +	  Enable the gpio and pinctrl/mux  driver for RaspberryPi RP1
-> +	  multi function device. 
-> +
->  source "drivers/pinctrl/actions/Kconfig"
->  source "drivers/pinctrl/aspeed/Kconfig"
->  source "drivers/pinctrl/bcm/Kconfig"
-> diff --git a/drivers/pinctrl/Makefile b/drivers/pinctrl/Makefile
-> index cc809669405a..f1ca23b563f6 100644
-> --- a/drivers/pinctrl/Makefile
-> +++ b/drivers/pinctrl/Makefile
-> @@ -45,6 +45,7 @@ obj-$(CONFIG_PINCTRL_PIC32)	+= pinctrl-pic32.o
->  obj-$(CONFIG_PINCTRL_PISTACHIO)	+= pinctrl-pistachio.o
->  obj-$(CONFIG_PINCTRL_RK805)	+= pinctrl-rk805.o
->  obj-$(CONFIG_PINCTRL_ROCKCHIP)	+= pinctrl-rockchip.o
-> +obj-$(CONFIG_PINCTRL_RP1)       += pinctrl-rp1.o
->  obj-$(CONFIG_PINCTRL_SCMI)	+= pinctrl-scmi.o
->  obj-$(CONFIG_PINCTRL_SINGLE)	+= pinctrl-single.o
->  obj-$(CONFIG_PINCTRL_ST) 	+= pinctrl-st.o
-> diff --git a/drivers/pinctrl/pinctrl-rp1.c b/drivers/pinctrl/pinctrl-rp1.c
-> new file mode 100644
-> index 000000000000..c035d2014505
-> --- /dev/null
-> +++ b/drivers/pinctrl/pinctrl-rp1.c
-> @@ -0,0 +1,719 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Driver for Raspberry Pi RP1 GPIO unit
-> + *
-> + * Copyright (C) 2023 Raspberry Pi Ltd.
-> + *
-> + * This driver is inspired by:
-> + * pinctrl-bcm2835.c, please see original file for copyright information
-> + */
-> +
-> +#include <linux/bitmap.h>
-> +#include <linux/bitops.h>
-> +#include <linux/bug.h>
-> +#include <linux/delay.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
-> +#include <linux/gpio/driver.h>
-> +#include <linux/io.h>
-> +#include <linux/irq.h>
-> +#include <linux/irqdesc.h>
-> +#include <linux/init.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of.h>
-> +#include <linux/of_irq.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/seq_file.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/types.h>
+Hi,
 
-Half of these headers are not used. Drop them.
+This series includes Networking-related updates to MAINTAINERS.
 
-Best regards,
-Krzysztof
+* Patches 1-4 aim to assign header files with "*net*' and '*skbuff*'
+  in their name to Networking-related sections within Maintainers.
+
+  There are a few such files left over after this patches.
+  I have to sent separate patches to add them to SCSI SUBSYSTEM
+  and NETWORKING DRIVERS (WIRELESS) sections [1][2].
+
+  [1] https://lore.kernel.org/linux-scsi/20240816-scsi-mnt-v1-1-439af8b1c28b@kernel.org/
+  [2] https://lore.kernel.org/linux-wireless/20240816-wifi-mnt-v1-1-3fb3bf5d44aa@kernel.org/
+
+* Patch 5 updates the status of the JME driver to 'Odd Fixes'
+
+---
+Changes in v2:
+- [PATCH 2/5] Add to SOCKET TIMESTAMPING rather than PTP HARDWARE CLOCK
+  SUPPORT section.  This seems more appropriate given that
+  include/uapi/linux/net_tstamp.h is already in the SOCKET TIMESTAMPING
+  section.
+- [PATCH 3/5] New patch. Use globs to match files in Networking sections.
+  As suggested by Jakub Kicinski
+- [PATCH 4/5] Dropped net_shaper.h as it is not present upstream
+- Link to v1: https://lore.kernel.org/r/20240816-net-mnt-v1-0-ef946b47ced4@kernel.org
+
+---
+Simon Horman (5):
+      MAINTAINERS: Add sonet.h to ATM section of MAINTAINERS
+      MAINTAINERS: Add net_tstamp.h to SOCKET TIMESTAMPING section
+      MAINTAINERS: Add limited globs for Networking headers
+      MAINTAINERS: Add header files to NETWORKING sections
+      MAINTAINERS: Mark JME Network Driver as Odd Fixes
+
+ MAINTAINERS | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+base-commit: 0d76fc7e27b2097e18ee128e484d107ed6d45e88
 
 
