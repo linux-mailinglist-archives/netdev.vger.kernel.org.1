@@ -1,241 +1,212 @@
-Return-Path: <netdev+bounces-120720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C6E95A66A
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:20:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793BA95A673
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 23:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0160A1F236B9
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:20:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3F61C208C1
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 21:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7BB171066;
-	Wed, 21 Aug 2024 21:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99426172BD0;
+	Wed, 21 Aug 2024 21:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KgckRsr4"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="EfMqN3QM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4942586AFA;
-	Wed, 21 Aug 2024 21:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724275249; cv=fail; b=CIQin3/YyKSR7dYHcd0OdsSFx3GAACq9dioa967lj+wpAuq9tiaZly29atF99Hf+aRzwA/o0lv4tueo0m4ey5e6b9JjRJ9Jr2e2EonoPadeLD9eb7syHWW3SnSf12NQFAqMwIGSyb/hg0VugvBVEkU/oV+n934sUhYxXndzwEEY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724275249; c=relaxed/simple;
-	bh=7JjkjdfnT18z2/air/zc4YocHDx61ZhtRzJMfIm69OY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PF+rblhaeUpMYyodbEjM4xzZ0YogeR9nFJ6zEd30suvYDG+i2ipnkUICjBujGoEP75+k3yDlB7RcZo/tlZo+DNd0dDR0Doqpay/9nsL/dZr9b/5DcSIPtM15a7nkEchywO1mH6OlIU0wLYSQ8cgABICZCcTIF6Jx1LXAijlMvKk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KgckRsr4; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724275248; x=1755811248;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7JjkjdfnT18z2/air/zc4YocHDx61ZhtRzJMfIm69OY=;
-  b=KgckRsr4QSq64rYoxKF9vyGIczHVsM4kL4F5Azleffi1rH23s/oAxCnW
-   ZzEpjJgzqJ9aFcMn4AMeWuJntp72NQiSAiHPAMLxCm9EcR3yJFMvWgE7v
-   RKyIdP+Xih7emYJVqXgEkdhBvfTUyYz7mhKpCr3/4Ev8Z2L00/xh8kDDp
-   XhvvWIwXgRmuxep1VngQ3Bw2owDc/4wCLQa9vR+OtXdttmGHywsM59uS0
-   rwARKgBLV9Sz8u/4DQC5n6GPndgdXhIHd/nI4Tt9M7JgUec0WXyGIKSck
-   zULyhbZozqXy1WQe2pUBW1lRp8nPspC7XEPigfqMWhqyz7Opo7R1i2zFr
-   A==;
-X-CSE-ConnectionGUID: tQyvcAQORIuw+hrq9MmVKw==
-X-CSE-MsgGUID: dPDyBlj6TLi3Fm+UfD4f5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="33231129"
-X-IronPort-AV: E=Sophos;i="6.10,165,1719903600"; 
-   d="scan'208";a="33231129"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 14:20:47 -0700
-X-CSE-ConnectionGUID: zVmmqm1cQhyg9nfU6eFqoQ==
-X-CSE-MsgGUID: QQiHmp6SQnKWQbtHRsuEdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,165,1719903600"; 
-   d="scan'208";a="61750261"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Aug 2024 14:20:46 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 21 Aug 2024 14:20:46 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 21 Aug 2024 14:20:46 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 21 Aug 2024 14:20:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JJdU2yUsIhIZhlT+uLjrd6XvEC2IIhQSPHOwqU2RySaJOC5JZcwGyenxFv2GDOVtEfD1hDONFHjI+8KSBcUx9J7rU47aMjpMwiDMzk6ss7M3TSFVk5XxbLTUU+C9Ny/skj104a0WaEGuaax8DgsbrC9qwh6lVByjar4cFW70Mqv+1KHciZLw9wtz4tdD/73OVVwLgisD50ChIf8z+lONe7/5GQcsBIc1iub/pHIdWX2yILknCGcoo6LzVlkMynnagEJK9hHEboVmsmqqCibRoc/L6j5rNV69jaHHdj24zp0fEd3jR/0YFm4hoJuTKp8BegmdJieJYGuPxJ+ze14g3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GBjRMrF4kze6xDxjQ3c0girr9se4gan1QuWQU+gbMjQ=;
- b=rch6YLBbdfowQfVuT/7SHboC2M/GJQx6P6T8sEMh+I+3Ng21EdPvudTeV81meY2bByW5ncsCRJQh0PkBX4nb8AyMvCvO/0mxlWkbfmkb0rBMdLZYVooBO9I/JmP7/yexErZLetEBhAu0ltLz3JJVydXPUo7RV/7PDCgy8d5ClrXdEnXPfJVXRy+oYl/o8oGq6E04SNCr22IK7fRviiGIbnG2hvDEiFFEOHqL4d8vaFiGKfChGt9xTLvW4MKibUkFeH4/wjr4gGBmjrSQ7YHzydKgeUwzogcx/+K1dmTsVNdgfg7yCspRJlSIugVd8jRevPnPYXyloQA0sMpZKe2DiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by PH0PR11MB5079.namprd11.prod.outlook.com (2603:10b6:510:3d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.18; Wed, 21 Aug
- 2024 21:20:43 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab%2]) with mapi id 15.20.7875.023; Wed, 21 Aug 2024
- 21:20:39 +0000
-Message-ID: <599caa46-3723-1a54-8122-90474bfccfe1@intel.com>
-Date: Wed, 21 Aug 2024 14:20:34 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH iwl-net v3 1/6] ice: move netif_queue_set_napi to
- rtnl-protected sections
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
-	<larysa.zaremba@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, "David S. Miller"
-	<davem@davemloft.net>, Jacob Keller <jacob.e.keller@intel.com>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
- Fastabend" <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<magnus.karlsson@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>, Amritha Nambiar
-	<amritha.nambiar@intel.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
-References: <20240819100606.15383-1-larysa.zaremba@intel.com>
- <20240819100606.15383-2-larysa.zaremba@intel.com> <ZsSMt3O4a+Jq0e65@boxer>
- <ZsSQY14RCWlG/Bxd@lzaremba-mobl.ger.corp.intel.com> <ZsSZnLt9k7zn8G6T@boxer>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <ZsSZnLt9k7zn8G6T@boxer>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR16CA0028.namprd16.prod.outlook.com
- (2603:10b6:a03:1a0::41) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F1C16EBE7
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 21:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724275357; cv=none; b=lw2+mgyEVNEny5R6XjuAD+eedOOpHYP4Xj+1H1FoLWRT0iTPdWe6i1ryPwUYl1AZrnQpOrp0QFE1SBS5wRXFWiGpeHbdhj0mDh8Fh2HA1AKll61N3yKI/UZVEQ3chJjDWhvg5RcX4HjgSCuEFkEiuqeET/CFmVoTTd6jc0yGX4A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724275357; c=relaxed/simple;
+	bh=Z1VdPj6d3Aq/eKPH6l/XlmFe8HdfRo9QvZGV2DLPOyA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oRH9fXLC1W24quEnBwjz1w0Eeca2az7MQHDC215FDwD4rS/9snhHaX2vJzFhU2z8C59abkUK+OAL4Wrbi89cH0vPHXIEehDg+KhonVO3KecKJYsihX5S2r1GQR2RTn5EG7Hro5uk8+KLghElZ5vud3qO7AtfnIgO+RVl65pVmiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=EfMqN3QM; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-202146e9538so1216535ad.3
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=herbertland.com; s=google; t=1724275355; x=1724880155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JUCAsJNLG6lNtD5vFpRzGgWdhHaPs59EZgR5f+AL2aQ=;
+        b=EfMqN3QMc0t5ninP635dxbRyYO0247h2exVWIXDXsF/0yKxFL14HTjT5cEXOdUsa12
+         DaXEs8U4DmelesTgLuAwy6KIyd//crJdD2rWwO/EnRsFn5oue/DM4a6lC5AEHarqKMfo
+         Q9uPWphQpALy1Cu28ypUGh1E5kOetPCKecgXXCag4994b5zpyfHtSRLKNus/B8UvWeX1
+         LGPwd96g+QaSU98kYIdaU6eyWA0sWyEnBS4+uX0nhpOhjZRiUMD8H6Eqox4ztsty8Bqr
+         UKB+s+mIYUVyYdBkFiZbB+af6E88MXF2EI4KxvwXnKw4vn/WejsTOw3VZrN1YBvbBxjW
+         1D+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724275355; x=1724880155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JUCAsJNLG6lNtD5vFpRzGgWdhHaPs59EZgR5f+AL2aQ=;
+        b=Gr2SHkqJo+5j6cBbPb+S7091k4ArVgirlhKwiNrR6cE2ITF+NF77rXhtUNuvdcnjhu
+         z0j9WxohPdFlT786VEhhFlkwVpOIhl960rdHRh8Mifm/hubaiAC5g4uoY3L1sr85h/YP
+         mzkHRh8PatyKpsvUHWOkIvHsm7lSbrLURNHQSQOPn8pvmWZ3OFxQKU2K0NMFaMVnJ0jF
+         sdn9QcfpcAeXGOuxAieE+jtbE+h14eHILRVCbr0QhodWcaKPGRR/FKEjzqqsRdJKlvOF
+         YeiMpQV9lSm8JYymV31Eh2SeOgdbNo9zMNGyBcqtqF+S3gugzByys0GJdRt/jqd6xhiP
+         gzDg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7ZgpGWioyQbKk2S9cO7BzoK1o3GCm2gN6t1bpoGx14saQS3ScpeCMg/nzQtT/RMps+LMcuCY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjL1g4PLx4APbf9S/wmQyUzOuDZYSt7Fg4OUh6htwutQ4KpnBu
+	O3CBxKBGgzcAMMxOY8ceFJXOEN7eFIW0QFDYHE85D7C899/95/3nl9lQ4rDqOA==
+X-Google-Smtp-Source: AGHT+IFAS7VgCMPFcSztOlCKNLA5W2WZzwOHMGEL12hf1bpvgYUmokVjjNbumcCR56zmzKhj3aRhDA==
+X-Received: by 2002:a17:903:bcf:b0:201:ed48:f11a with SMTP id d9443c01a7336-20368094d0fmr32744795ad.42.1724275354864;
+        Wed, 21 Aug 2024 14:22:34 -0700 (PDT)
+Received: from TomsPC.home ([2601:646:8300:55f0:7a19:cf52:b518:f0d2])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385ae701dsm388265ad.236.2024.08.21.14.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 14:22:34 -0700 (PDT)
+From: Tom Herbert <tom@herbertland.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	felipe@sipanda.io,
+	willemdebruijn.kernel@gmail.com,
+	pablo@netfilter.org,
+	laforge@gnumonks.org,
+	xeb@mail.ru
+Cc: Tom Herbert <tom@herbertland.com>
+Subject: [PATCH net-next v3 00/13] flow_dissector: Dissect UDP encapsulation protocols
+Date: Wed, 21 Aug 2024 14:21:59 -0700
+Message-Id: <20240821212212.1795357-1-tom@herbertland.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH0PR11MB5079:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6d3cd41a-548f-484c-806f-08dcc2271b2c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?OXRvNzhidkVnVW9TSmNsVkRxaG5UR3lleEtieFRsakhZZ1Zwdit2S3RvNU03?=
- =?utf-8?B?dXM5eVl5N2h3WWh2V2lIaUdVNmhhVTVzbU1vT25Hcm1sV1dhejRVenh3VThY?=
- =?utf-8?B?M0ZZUkYxRXM5R3ZrOGlxeVJteVczMGdrS0JWa2pHTk92ZGhZZUJnMEpMeC9o?=
- =?utf-8?B?YUpXLzlnQ3BRRkJvRE0xTVR6eURHaVEyRnpZU2lWT1B2VGk5c2VwZHlRMzg0?=
- =?utf-8?B?cTE0bXNHQW9oQWNIWnd6YjdXbjhhOS9jb01Qd2VrcUtCeW9FQWF6eUlpRzJv?=
- =?utf-8?B?Mjl5WnNwTWJONTVDL0ZUZDNPVk5XejliL25uWDMwYVdCSFY2QXhKZ2lJcG9r?=
- =?utf-8?B?SlYyeDRlcjNaSUo3OUhPNHlRaEF4cXJiajI1RGV5YVNESWoxTStUNEZRVHcw?=
- =?utf-8?B?Qk5ZNXA0WFRRNHJtMVhkYVVYbWJOemJ0ODRtNm1adEN1RjJJSmhkcUpVNzE2?=
- =?utf-8?B?M1Ztd2s5WGdQYkRpd0EzaWNiTEs1cHlPQ0IraDZVekRtN2d5TElTZHdaMEVW?=
- =?utf-8?B?WWxSU1YrOWp4UkNWZFg1bmdhdW00NHMxaWgva3d6RW15a1d6UkIyYmV0NjYz?=
- =?utf-8?B?VXY0QTNGbDZVMHowdCtwZm5Zc3lIeUZRMWhHQ2xiQWppZ0Z4ZCsySTJTV1NI?=
- =?utf-8?B?dDJNWDJDSVZESUdLN3BnRWNpaGdROTEwZXVuZFBSL0oweGpBZEgxYVk4d1cw?=
- =?utf-8?B?c1NHSUJTc0V5RWhsMnVtMytqUWc0Si9SVFp6dVdqOC9UcEkwdXFBY0lSTnkv?=
- =?utf-8?B?cEFMR1U0LzJkdisyV3Q1anh2QngxS3V6NTFFSGgrTFZIUFpwaVRnd0cwTnkx?=
- =?utf-8?B?RjhHM0Y3NFhvWlNaU1ZtWnZKRTB6c3g4azZmb2paUGdKMkFBSW5Ia1U2T3Z3?=
- =?utf-8?B?MzJsZjVjaHNKQ0RvYUJyMVdvR2dFdko1SlUzWnU0NkdKdjZRYnY1YXFrL2ZF?=
- =?utf-8?B?WWNRZURJMTZSQmN2bkJ2V3ZmeERYNXR0ZXBIV3JubDI4d01LQlkxOUNvSEZZ?=
- =?utf-8?B?dVpZb3c1N3RKYXIraWdqSEJ2TzBtbUwraEU2SDZDL3lhY0tRWGd0UVkxT3FQ?=
- =?utf-8?B?ZUxlMUgwbHEyendSY0lsQi9JNit1VkorYVFMSGJBOFQ3QVJFeEJrTEpvY0NJ?=
- =?utf-8?B?QlNlRFgzVXQ0aEFrdzNqcnFsWGg3R1pZSFY4a0R6bFBaWmZVL2NjSkVtWHQz?=
- =?utf-8?B?TnVJNDcwS3FwK3FQWTJDajBuRHMrUjVOcU5BVlhzb1k1M1N4cThZRWFqbGtY?=
- =?utf-8?B?V09yR2VwNGZFa29RN2RTUlU4aVBwd1hrWHQ4L3EyTVJMalZXd29UeDF6QlNR?=
- =?utf-8?B?TW11bmk1Z0RZa3JVejZwNFFCMVJMdVBuejRoZXV6ZXQ4U0g0VUlteHZlQnNX?=
- =?utf-8?B?eW9WZDJXZFpnU3lSdTYrTnJQV1FqSk42YUV6OEdGOU92blBUTlBFUjU5dmdC?=
- =?utf-8?B?Nm05NE5MMHNqbFh0a1pCRm5BMGZ6Y294YWYrZHNaV2xDRjIzR1BsbVZiOXBY?=
- =?utf-8?B?ekJmME1jU2dMS21mS0o2WkxsWU9ZejJKSDBBT0Z5N2t4RkJWZWdlYjNmekZs?=
- =?utf-8?B?SnluaU5hUkZiM2lBdnhpanJGN3U4eEdCa05Yak5pb2FaaC9RZmovYThmcEd1?=
- =?utf-8?B?N0tvejQ2dGoxV1VNTlV6dlI2ZndjdHFhbnJZdCt3V2o0dFd5NWdvWEhubGI5?=
- =?utf-8?B?NGVzQ3JQSlNpZnM1djR0eTZmdW5iSW55enh1YUp0NDRKUTlaRGZFYkM0cnB2?=
- =?utf-8?B?eitOL0FXS2laYUN6SkNZM1ByV0lOMklHSjMzVnU2MGpEYldTaWRRcTllOHht?=
- =?utf-8?B?aGJLc2hIZnB3L08vQVlPZz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RFFNNWlrZk5ncll5ZzFGczFBdGZ1MUxBWitKMy82Q1YwV21qTG5ReUU1SGZu?=
- =?utf-8?B?aHVVbStJNDd3c25LTHR3b1VnakNjdEQ3SDF2aDdDQktSbU9XZllVcExpWFU1?=
- =?utf-8?B?MG9zOTY0SktrRTY2MGwvK01FTTVXRHIwc3dpYml1STBTcVhXV2xFbWY4YUk1?=
- =?utf-8?B?SkwvY2x2Y0J6bVlGV0E1LzE3eUE3TTNXMEZmYnE5cVpLMGRweWRZNW05STBD?=
- =?utf-8?B?ZTJ0NkZZTnhXTTRidzlFM3ZFbTBuZzVIcnRDdzZTSEladU9UZHNncTZNK1VS?=
- =?utf-8?B?eXRSYU8xT3BLeldnVndtSmFURU85N1pTZU5TcmRCWnhTQ3hZWmdVZWEwVXJP?=
- =?utf-8?B?aGE3NzVzbDF4SlhjZG1wYXRVem1ZZWRKVDE5eXM4MjRFQVFKN2JnWmJ3dmhL?=
- =?utf-8?B?NGtSZ2Q1a3JRaGRlYWJOQ2VNejdCOGFBYWNKVUpaUDRyMi8rbkEvMHBDbjVq?=
- =?utf-8?B?SnVMdWF2bnVMRkFaWGk2WU83TUwxR1FxYzVWb09xazhSOUpSYzlBVCszVFhI?=
- =?utf-8?B?QmJ1Z3puUlF6V0JjdnB3MVFqMk4zbXJEMjJyY3ZUSnZkb0o0VWMydWNUS1ZY?=
- =?utf-8?B?VmkzV0h2UU00U01teGtKaGNTdnh1YVhldW5YV3JMVmNFaW5GbDZwMzh2R3dU?=
- =?utf-8?B?M29zS2VxUS9FaDJkSEV4N1hjSk5JdGxWUmFhV3FUWS9hemthSEd0MFRDdTM3?=
- =?utf-8?B?TXJxTzFYQ1hEdHpXd0N1c1ZOWFU5d01Vb3JkRmltQTJUcnBEd0haMjI3QkRo?=
- =?utf-8?B?QkVsazlDSzlMU1F4TWlXVktNNm9NcjZtSFBTTkM1a3JNWUUwekVlcWYxWjVO?=
- =?utf-8?B?TzRkaUxFOEtJQ3ZDSkVXRzRyekxYN0pXU3dLL0NENldFN2s3WmdHd2tzQ2Jt?=
- =?utf-8?B?eEVNU29ZSHJ0bGs2cnRPZ3NQSllGZU1oN011T2VHWkhIMkxNQ1ViWXY0cjl0?=
- =?utf-8?B?YjcxVXhET3dOckoxNkV3OTg3TkNKUnZ1eENYUWd5bzJkenJEck9kc0gzMVF4?=
- =?utf-8?B?VVVZazJMcEg2ZVB6SDBLUHBlL0FTeUNWZUtBZHpyMXJZVWpXeURZNld2ckg1?=
- =?utf-8?B?TUd3elN4VHhwZTc0RGNNenp0SGJ4cGhERmJNQy80TGlPNkJwajJrUnVXYXA0?=
- =?utf-8?B?N1o0Tm5yaENZbzVkYmdqQTVUSytMZmpZdU9BbENQMjJXSDBTLzRqNjMrNnJh?=
- =?utf-8?B?a3N4THYxZmtlaTlhM2dpNUhZQXZqTE14dDlFMDhBSzJraXJOSFdsQlNxV1VZ?=
- =?utf-8?B?aE9PTlo1anhoU1NNWW9OKzJyOG1jTWVJOGNQZjFmd3VRVnMvazRMMnE3NExi?=
- =?utf-8?B?MiszcTRvNEtiTVRuanoyT3lJekZkOVFic0ZoVlIwOU5IY2ZkbldHWC9yckRy?=
- =?utf-8?B?a0thS1VUVUt6M0l4UlJTcjFpVm5wVmk0NXAwN3lUdmFqRitzbW1Held1MFBB?=
- =?utf-8?B?ajFaRUxNdzdDbVdUUWNuUlEvVlFjOXE5SzgwNllONTBiNFRQMlBKaHpkVmh5?=
- =?utf-8?B?TVczcXBLUG5QTUNmTGhFbGN4TlVmanVqZHhPZ2p4YzQ4OUtHMWwxbnVxWkNX?=
- =?utf-8?B?cHV5c1pma3VlRXgvU2VsZjJ6MWVMcjBDR052VEdEcW9YUHk3VDVjazJ6a2dk?=
- =?utf-8?B?YW5Vbkh3aitIMmlXWkNXR3dXbWJCQjlQVStEL2cybG8ramZDQWptZ1BtTnR0?=
- =?utf-8?B?bU5DYm5TRmtiRzNZaU0wN01qczFMK2MySnpQTHdYOW4zcTA2MUpiSVZPaVRm?=
- =?utf-8?B?RlVROFNLdUY4VVJYb1V5NU50R0ZOeFNjQ0hRUGZwd0NQRmx4YnhQMVJNNUdw?=
- =?utf-8?B?YlgrcUNyV1NncVdrcmhaZElCSktqK0JORTBHVzZFK1NHZ2Z4eVRiYXUyU2R3?=
- =?utf-8?B?MjVzZXVzS2dUMXM0S0JiZnVIQjRma1krb3RYMmhLWjd5dCtGMEh4Wkd6RHAw?=
- =?utf-8?B?c3lDU1VDZUVrYkxwcTY3d3FXQ3VIc2tDTmNuZndwYkNkbVM2S0kyY3E5ejRt?=
- =?utf-8?B?QjBTU0E2VnR2c04veFpTdmN3OHp5Z2pNOXpHNXZYZHpEaFdWL2w3ak1hZVAx?=
- =?utf-8?B?VWlRNk00RTQzcnlCOE5FVTZqMGpyellhSzhyVFIxSlB1L3hrT3g2Z25FNkdG?=
- =?utf-8?B?Slh3WnZOK1UxN2JLZHhGNnZzMm1RMUtRdUozV0I4bUNNZGxoZzg2aUdSMExm?=
- =?utf-8?B?V0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d3cd41a-548f-484c-806f-08dcc2271b2c
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 21:20:39.7156
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2wgp43MdykxWniE9HAXsxEoBn+wq2p8dw0OntNuA5ObmbscN0e9QAjSJgzx9Cb4aclvLWnG8aq9uyJQQW/IIcJb5qONwQ2aLs139YOjoNsc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5079
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 8/20/2024 6:26 AM, Maciej Fijalkowski wrote:
+Add support in flow_dissector for dissecting into UDP
+encapsulations like VXLAN. __skb_flow_dissect_udp is called for
+IPPROTO_UDP. The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsing
+of UDP encapsulations. If the flag is set when parsing a UDP packet then
+a socket lookup is performed. The offset of the base network header,
+either an IPv4 or IPv6 header, is tracked and passed to
+__skb_flow_dissect_udp so that it can perform the socket lookup.
+If a socket is found and it's for a UDP encapsulation (encap_type is
+set in the UDP socket) then a switch is performed on the encap_type
+value (cases are UDP_ENCAP_* values)
 
-...
+Changes in the patch set:
 
->>>> Fixes: 080b0c8d6d26 ("ice: Fix ASSERT_RTNL() warning during certain scenarios")
->>>
->>> Shouldn't you include:
->>> Fixes: 91fdbce7e8d6 ("ice: Add support in the driver for associating queue with napi")
->>>
->>> as we were iterating over XDP rings that were attached to q_vectors from
->>> the very beginning?
->>>
->>
->> I probably should have done this.
-> 
-> Maybe this could be included while applying or sending the pull request by
-> Tony. I'll go through the rest of set today to see if I have any comments,
-> if there won't be anything outstanding then it won't make sense to send
-> next revision just to fix the fixes tags.
+- Unconstantify struct net argument in flowdis functions so we can call
+  UDP socket lookup functions
+- Dissect ETH_P_TEB in main flow dissector loop, move ETH_P_TEB check
+  out of __skb_flow_dissect_gre and process it in main loop
+- Add UDP_ENCAP constants for tipc, fou, gue, sctp, rxe, pfcp,
+  wireguard, bareudp, vxlan, vxlan_gpe, geneve, and amt
+- For the various UDP encapsulation protocols, Instead of just setting
+  UDP tunnel encap type to 1, set it to the corresponding UDP_ENCAP
+  constant. This allows identify the encapsulation protocol for a
+  UDP socket by the encap_type
+- Add function __skb_flow_dissect_udp in flow_dissector and call it for
+  UDP packets. If a UDP encapsulation is present then the function
+  returns either FLOW_DISSECT_RET_PROTO_AGAIN or
+  FLOW_DISSECT_RET_IPPROTO_AGAIN
+- Add flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS that indicates UDP
+  encapsulations should be dissected
+- Add __skb_flow_dissect_vxlan which is called when encap_type is
+  UDP_ENCAP_VXLAN or UDP_ENCAP_VXLAN_GPE. Dissect VXLAN and return
+  a next protocol and offset
+- Add __skb_flow_dissect_fou which is called when encap_type is
+  UDP_ENCAP_FOU. Dissect FOU and return a next protocol and offset
+- Add support for ESP, L2TP, and SCTP in UDP in __skb_flow_dissect_udp.
+  All we need to do is return FLOW_DISSECT_RET_IPPROTO_AGAIN and the
+  corresponding IP protocol number
+- Add __skb_flow_dissect_geneve which is called when encap_type is
+  UDP_ENCAP_GENEVE. Dissect geneve and return a next protocol and offset
+- Add __skb_flow_dissect_gue which is called when encap_type is
+  UDP_ENCAP_GUE. Dissect gue and return a next protocol and offset
+- Add __skb_flow_dissect_gtp which is called when encap_type is
+  UDP_ENCAP_GTP. Dissect gtp and return a next protocol and offset
 
-Yes, I can add that in.
+Tested: Verified fou, gue, vxlan, and geneve are properly dissected for
+IPv4 and IPv6 cases. This includes testing ETH_P_TEB case
 
-Thanks,
-Tony
+v2:
+- Add #if IS_ENABLED(CONFIG_IPV6) around IPv6 cases when dissecting UDP.
+  Also, c all ipv6_bpf_stub->udp6_lib_lookup instead of udp6_lib_lookup
+  directly since udp6_lib_lookup in the IPv6 module
+- Drop patch to unconstantify struct net argument in flowdis functions,
+  edumazet added const to ne argument in UDP socket lookup functions
+- As support in flowdis ipproto switch for no-next-hdr. Just exit
+  flowdis on good result when this is seen
+- Merge patches that move TEB processing out of GRE and moved into
+  main protocol switch
+- Rename bpoff in UDP flow dissector functions to be base_nhoff for
+  clarity
+- Parse GTPv1 extension headers (part of this is moving
+  gtp_parse_exthdrs to a header file
+- Exit flowdis on good result if NPDU or SEQ GTPv1 flags are set
+
+v3:
+- Add udp6_lib_lookup to ipv6_stubs
+- Call ipv6_stubs->udp6_lib_lookup instead of ipv6_bpf_stubs variant
+- Use _HF_ variants of VLXAN flags (those in network byte order)
+- Use encap type from socket to determine if a packet is VXLAN-GPE instead
+  of getting this from flags
+- Protect both IPv4 and IPv6 cases with #ifdef CONFIG_INET
+- Added a comment why UDP_ENCAP constants are in uapi
+- Added a comment in ETH_P_TEB case why NET_IP_ALIGN is needed
+- Add a check in __skb_flow_dissect_udp that the netns for the
+  skb device is the same as the caller's netns, and also only
+  dissect UDP is we haven't yet encountered any encapsulation.
+  The goal is to ensure that the socket lookup is being done in the
+  right netns. Encapsulations may push packets into different name
+  spaces, so this scheme is restricting UDP dieesction to cases where
+  there are not name spaces or at least the original name space.
+  This should capture the majority of use cases for UDP encaps,
+  if we do encounter a UDP encapsulation within a different namespace
+  then the only effect is we don't attempt UDP dissection
+
+Tom Herbert (13):
+  ipv6: Add udp6_lib_lookup to IPv6 stubs
+  flow_dissector: Parse ETH_P_TEB and move out of GRE
+  udp_encaps: Add new UDP_ENCAP constants
+  udp_encaps: Set proper UDP_ENCAP types in tunnel setup
+  flow_dissector: UDP encap infrastructure
+  flow_dissector: Parse vxlan in UDP
+  flow_dissector: Parse foo-over-udp (FOU)
+  flow_dissector: Parse ESP, L2TP, and SCTP in UDP
+  flow_dissector: Parse Geneve in UDP
+  flow_dissector: Parse GUE in UDP
+  gtp: Move gtp_parse_exthdrs into net/gtp.h
+  flow_dissector: Parse gtp in UDP
+  flow_dissector: Add case in ipproto switch for NEXTHDR_NONE
+
+ drivers/infiniband/sw/rxe/rxe_net.c |   2 +-
+ drivers/net/amt.c                   |   2 +-
+ drivers/net/bareudp.c               |   2 +-
+ drivers/net/geneve.c                |   2 +-
+ drivers/net/gtp.c                   |  37 ---
+ drivers/net/pfcp.c                  |   2 +-
+ drivers/net/vxlan/vxlan_core.c      |   3 +-
+ drivers/net/wireguard/socket.c      |   2 +-
+ include/net/flow_dissector.h        |   1 +
+ include/net/fou.h                   |  16 +
+ include/net/gtp.h                   |  38 +++
+ include/net/ipv6_stubs.h            |   5 +
+ include/uapi/linux/udp.h            |  19 +-
+ net/core/flow_dissector.c           | 468 ++++++++++++++++++++++++++--
+ net/ipv4/fou_core.c                 |  19 +-
+ net/ipv6/af_inet6.c                 |   1 +
+ net/sctp/protocol.c                 |   2 +-
+ net/tipc/udp_media.c                |   2 +-
+ 18 files changed, 533 insertions(+), 90 deletions(-)
+
+-- 
+2.34.1
+
 
