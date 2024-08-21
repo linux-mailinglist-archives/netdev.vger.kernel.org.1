@@ -1,201 +1,416 @@
-Return-Path: <netdev+bounces-120451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5599596AB
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:36:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E50829596B0
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 155AAB217F1
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 08:36:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45DC01F21676
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 08:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548571A4AA6;
-	Wed, 21 Aug 2024 08:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aU3WO78p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815381ACE0A;
+	Wed, 21 Aug 2024 08:08:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21951199FD4;
-	Wed, 21 Aug 2024 08:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC1B1A4AA4;
+	Wed, 21 Aug 2024 08:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724227450; cv=none; b=qTW7vgR7wAEi4VPteCA2StbcRr00qNk7zgtNfash9to6KpJw9YM9ixnfyVpO8/TgVEK1zpzOfAddqI6A+ZznD/9ZcK4DJuQ+thqJyXAm9KjgupsRxbhc6Y9Yj6O8bGhH8iAO5ThwzpacJMGND9I+rgSUje9h4ojjiAOis+0iUeE=
+	t=1724227718; cv=none; b=DjyPWrajhPRVbJlkLu15zobjPIap95VfVmA+9R+vZ8hyjycO/uHeb94GAfkfuDuoKhuEwdbwOq0okAWvv8x3jG6odce61VqsXAXq1/t+J4/CDpMIinxQFSwBRlvtmJz/h+iS9RuNkxbrikJQeQN1a+e0w4RiHMZyWemOgQ58K4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724227450; c=relaxed/simple;
-	bh=qgW83UIoQ7pWyW15PTf3qHwr2FjmRlWXMov5IjtgcRU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u14MOOJahI77UZEmCE7lLVFcnuXEbTeXN+UDrZSv6zLclXhRk6H/8dcwMHe2YFcXKM+b3iBdLVDGt7DOEmIJ5ttwNOKGJYK0ToSL3Ddms/y6ariXreCnNKjH6qre8quqCcUq1pYmzOExyHN38TnXGFjDB3CrF+1Sm59SMgWGPv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aU3WO78p; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L46X44005334;
-	Wed, 21 Aug 2024 08:04:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=F
-	aPU/c4SEBSQEsYQziRQKRtVbtDPX4blFqUGQiqdOJo=; b=aU3WO78pe2tRDeRCj
-	7i5LKER2623OaRIs+r9d4zvndOH4DFvFORTwno0nb49Ejq5/Lvjmkjzi/B4ES9IX
-	bEjaKE+NluXoU96AgqSa+N/nm7CLhZR8w3klgE3F5TaJEjjpEdVQLeTzTXXs84Q5
-	E8+RX3AGfeA/NYnxlE0bsGPHITa0pvZkSOigeeBj6/MrnS0v+3JDftIu3glQOnaH
-	WWkGuVCgE1V1XaDF0fIZ7tcXV3On1K0bTQaDQJ2fhkReNvXaVZMmBl+UFNgJBqx+
-	9hUmU7N79c+yS3d5kbtPhqOwnFG4nIpc0IWSMkWWQSCykcV7YM6qEoSX/JxcdY9g
-	YSDJg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5snqr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 08:04:02 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47L842OU006252;
-	Wed, 21 Aug 2024 08:04:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mb5snpt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 08:04:01 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47L4UREm019105;
-	Wed, 21 Aug 2024 08:03:57 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376pxsnh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 08:03:57 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47L83pwV51970446
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Aug 2024 08:03:53 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 696ED20079;
-	Wed, 21 Aug 2024 08:03:51 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A8E252007A;
-	Wed, 21 Aug 2024 08:03:50 +0000 (GMT)
-Received: from [9.179.3.132] (unknown [9.179.3.132])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 21 Aug 2024 08:03:50 +0000 (GMT)
-Message-ID: <abd79f44-aed2-4e01-a7f8-7d806f5bc755@linux.ibm.com>
-Date: Wed, 21 Aug 2024 10:03:49 +0200
+	s=arc-20240116; t=1724227718; c=relaxed/simple;
+	bh=zTxu6mYpXPqqfcVOQkH5vTI2G03NzIOAZCm9ip9+PYQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HMNYTeIgzlhLWKrE+OyGIGveVokQfGBr/lQcgAlzh9pn+/5H46qQ4puxZmOUfMdFWdsE5w5x0thdJ4RSWC4EAWgAkel8U6dso4WX7L+vIfejWg1O8582TZCuvXuAkq4HuyXEXLm79NG8M189UQ/tpVx/x48VpTRM4Na1uV6YUxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f3cb747ed7so47103681fa.0;
+        Wed, 21 Aug 2024 01:08:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724227714; x=1724832514;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lk7/AsQlvvtllAyHOIeYJHZvMNlH39tJAP/b3aogg40=;
+        b=OUB+3G1Hp5mcZGIcGYlF7P79IxzMsIWW/4o61puf1FsjrL3qRzxH+4WdsBZXAF+I4C
+         NhMR+aJo7AvMSZoK98WzjQ64YSdzyForNEjyYx3IHgoGd3veBe2AmzpnXSxO71rdDle4
+         XxSS4UFQgp/92+z2wTmX+C6iJsq4QeRb3SlrqATc/U7WkeAClq3o1w1Oq3xSg39ZFb24
+         tS+jTryxmfanD7klO0/Rh6P61eGsYilaypz0MpGTqcRK3AObUw7K/X8I1QBGVItiCdmq
+         85JTDD5h007WodMxCBLCAgpV2gvy3rK9XH81xp9jTWfKTszTSjBvtDgx7dCfObnuVZ0P
+         SgcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuCFDCSDgN4qQqtsQo1VMluR34pMLVX0lk8+qetD39f03LWVk7eWyHGib1PA8PWgUcmYYbWmq8bU32m/U=@vger.kernel.org, AJvYcCWuh1wQwPfoOfnMKcRWcjU5B2VbytAlwrYJiWJbmIHIjpmDOl0qj1EIJzdmXtbxOuc3yileXeGymKdvbGe6fDv8@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyTVPID3V/qjd+9LRiGUAUyOA9lFUZopR5V24mcaMJBkKCbj+q
+	onJO6BSfftP9dZuKVOFTtzhkIuVjesH927Wj9yig2Qae/UHkvwI8
+X-Google-Smtp-Source: AGHT+IEr5Pd8j5QNfFeY6BEELHaAL7djhXY2/jIYT7eZjHop457xYSu88Tbk0qFZo5an/o11UOOU3A==
+X-Received: by 2002:a2e:bc13:0:b0:2f3:c029:d7e with SMTP id 38308e7fff4ca-2f3f88b843cmr12162741fa.18.1724227713572;
+        Wed, 21 Aug 2024 01:08:33 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5becd9d53e2sm6573727a12.38.2024.08.21.01.08.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 01:08:32 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	liuhangbin@gmail.com,
+	petrm@nvidia.com,
+	matttbe@kernel.org,
+	Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Willem de Bruijn <willemb@google.com>,
+	David Wei <dw@davidwei.uk>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
+Subject: [PATCH net-next v6] net: netconsole: selftests: Create a new netconsole selftest
+Date: Wed, 21 Aug 2024 01:08:13 -0700
+Message-ID: <20240821080826.3753521-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        wenjia@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
-From: Jan Karcher <jaka@linux.ibm.com>
-Organization: IBM - Network Linux on Z
-In-Reply-To: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LnusoTT6XFEOP9ueUBXVua-2Pf7ntffU
-X-Proofpoint-GUID: OAUrfRP1cDb1kkq_nu-U63WpPDVtuNjI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_07,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408210057
+Content-Transfer-Encoding: 8bit
+
+Adds a selftest that creates two virtual interfaces, assigns one to a
+new namespace, and assigns IP addresses to both.
+
+It listens on the destination interface using socat and configures a
+dynamic target on netconsole, pointing to the destination IP address.
+
+The test then checks if the message was received properly on the
+destination interface.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changelog:
+
+v6:
+ * Check for SRC and DST ip before starting the test (Jakub)
+ * Revert the printk configuration at the end of the test (Jakub)
+ * Fix the modprobe stderr redirection (Jakub)
+
+v5:
+ * Replace check_file_size() by "test -s" (Matthieu)
+ * https://lore.kernel.org/all/20240819090406.1441297-1-leitao@debian.org/#t
+
+v4:
+ * Avoid sleeping in waiting for sockets and files (Matthieu Baerts)
+ * Some other improvements (Matthieu Baerts)
+ * Add configfs as a dependency (Jakub)
+ * https://lore.kernel.org/all/20240816132450.346744-1-leitao@debian.org/
+
+v3:
+ * Defined CONFIGs in config file (Jakub)
+ * Identention fixes (Petr Machata)
+ * Use setup_ns in a better way (Matthieu Baerts)
+ * Add dependencies in TEST_INCLUDES (Hangbin Liu)
+ * https://lore.kernel.org/all/20240815095157.3064722-1-leitao@debian.org/
+
+v2:
+ * Change the location of the path (Jakub)
+ * Move from veth to netdevsim
+ * Other small changes in dependency checks and cleanup
+ * https://lore.kernel.org/all/20240813183825.837091-1-leitao@debian.org/
+
+v1:
+ * https://lore.kernel.org/all/ZqyUHN770pjSofTC@gmail.com/
 
 
+ MAINTAINERS                                   |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ tools/testing/selftests/drivers/net/config    |   4 +
+ .../selftests/drivers/net/netcons_basic.sh    | 234 ++++++++++++++++++
+ 4 files changed, 243 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/netcons_basic.sh
 
-On 21/08/2024 04:36, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
-> we introduce a mechanism to put constraint on SMC connections visit
-> according to the pressure of SMC handshake process.
-> 
-> At that time, we believed that controlling the feature through netlink
-> was sufficient. However, most people have realized now that netlink is
-> not convenient in container scenarios, and sysctl is a more suitable
-> approach.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5dbf23cf11c8..9a371ddd8719 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15772,6 +15772,7 @@ M:	Breno Leitao <leitao@debian.org>
+ S:	Maintained
+ F:	Documentation/networking/netconsole.rst
+ F:	drivers/net/netconsole.c
++F:	tools/testing/selftests/drivers/net/netcons_basic.sh
+ 
+ NETDEVSIM
+ M:	Jakub Kicinski <kuba@kernel.org>
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index e54f382bcb02..39fb97a8c1df 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -1,8 +1,11 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-TEST_INCLUDES := $(wildcard lib/py/*.py)
++TEST_INCLUDES := $(wildcard lib/py/*.py) \
++		 ../../net/net_helper.sh \
++		 ../../net/lib.sh \
+ 
+ TEST_PROGS := \
++	netcons_basic.sh \
+ 	ping.py \
+ 	queues.py \
+ 	stats.py \
+diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
+index f6a58ce8a230..a2d8af60876d 100644
+--- a/tools/testing/selftests/drivers/net/config
++++ b/tools/testing/selftests/drivers/net/config
+@@ -1,2 +1,6 @@
+ CONFIG_IPV6=y
+ CONFIG_NETDEVSIM=m
++CONFIG_CONFIGFS_FS=y
++CONFIG_NETCONSOLE=m
++CONFIG_NETCONSOLE_DYNAMIC=y
++CONFIG_NETCONSOLE_EXTENDED_LOG=y
+diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
+new file mode 100755
+index 000000000000..b4bfb451ccb6
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
+@@ -0,0 +1,234 @@
++#!/usr/bin/env bash
++# SPDX-License-Identifier: GPL-2.0
++
++# This test creates two netdevsim virtual interfaces, assigns one of them (the
++# "destination interface") to a new namespace, and assigns IP addresses to both
++# interfaces.
++#
++# It listens on the destination interface using socat and configures a dynamic
++# target on netconsole, pointing to the destination IP address.
++#
++# Finally, it checks whether the message was received properly on the
++# destination interface.  Note that this test may pollute the kernel log buffer
++# (dmesg) and relies on dynamic configuration and namespaces being configured.
++#
++# Author: Breno Leitao <leitao@debian.org>
++
++set -euo pipefail
++
++SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
++
++# Simple script to test dynamic targets in netconsole
++SRCIF="" # to be populated later
++SRCIP=192.168.1.1
++DSTIF="" # to be populated later
++DSTIP=192.168.1.2
++
++PORT="6666"
++MSG="netconsole selftest"
++TARGET=$(mktemp -u netcons_XXXXX)
++DEFAULT_PRINTK_VALUES=$(cat /proc/sys/kernel/printk)
++NETCONS_CONFIGFS="/sys/kernel/config/netconsole"
++NETCONS_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
++# NAMESPACE will be populated by setup_ns with a random value
++NAMESPACE=""
++
++# IDs for netdevsim
++NSIM_DEV_1_ID=$((256 + RANDOM % 256))
++NSIM_DEV_2_ID=$((512 + RANDOM % 256))
++
++# Used to create and delete namespaces
++source "${SCRIPTDIR}"/../../net/lib.sh
++source "${SCRIPTDIR}"/../../net/net_helper.sh
++
++# Create netdevsim interfaces
++create_ifaces() {
++	local NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
++
++	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_NEW"
++	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_NEW"
++	udevadm settle 2> /dev/null || true
++
++	local NSIM1=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_1_ID"
++	local NSIM2=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_2_ID"
++
++	# These are global variables
++	SRCIF=$(find "$NSIM1"/net -maxdepth 1 -type d ! \
++		-path "$NSIM1"/net -exec basename {} \;)
++	DSTIF=$(find "$NSIM2"/net -maxdepth 1 -type d ! \
++		-path "$NSIM2"/net -exec basename {} \;)
++}
++
++link_ifaces() {
++	local NSIM_DEV_SYS_LINK="/sys/bus/netdevsim/link_device"
++	local SRCIF_IFIDX=$(cat /sys/class/net/"$SRCIF"/ifindex)
++	local DSTIF_IFIDX=$(cat /sys/class/net/"$DSTIF"/ifindex)
++
++	exec {NAMESPACE_FD}</var/run/netns/"${NAMESPACE}"
++	exec {INITNS_FD}</proc/self/ns/net
++
++	# Bind the dst interface to namespace
++	ip link set "${DSTIF}" netns "${NAMESPACE}"
++
++	# Linking one device to the other one (on the other namespace}
++	if ! echo "${INITNS_FD}:$SRCIF_IFIDX $NAMESPACE_FD:$DSTIF_IFIDX"  > $NSIM_DEV_SYS_LINK
++	then
++		echo "linking netdevsim1 with netdevsim2 should succeed"
++		cleanup
++		exit "${ksft_skip}"
++	fi
++}
++
++function configure_ip() {
++	# Configure the IPs for both interfaces
++	ip netns exec "${NAMESPACE}" ip addr add "${DSTIP}"/24 dev "${DSTIF}"
++	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" up
++
++	ip addr add "${SRCIP}"/24 dev "${SRCIF}"
++	ip link set "${SRCIF}" up
++}
++
++function set_network() {
++	# setup_ns function is coming from lib.sh
++	setup_ns NAMESPACE
++
++	# Create both interfaces, and assign the destination to a different
++	# namespace
++	create_ifaces
++
++	# Link both interfaces back to back
++	link_ifaces
++
++	configure_ip
++}
++
++function create_dynamic_target() {
++	DSTMAC=$(ip netns exec "${NAMESPACE}" \
++		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
++
++	# Create a dynamic target
++	mkdir "${NETCONS_PATH}"
++
++	echo "${DSTIP}" > "${NETCONS_PATH}"/remote_ip
++	echo "${SRCIP}" > "${NETCONS_PATH}"/local_ip
++	echo "${DSTMAC}" > "${NETCONS_PATH}"/remote_mac
++	echo "${SRCIF}" > "${NETCONS_PATH}"/dev_name
++
++	echo 1 > "${NETCONS_PATH}"/enabled
++}
++
++function cleanup() {
++	local NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
++
++	# delete netconsole dynamic reconfiguration
++	echo 0 > "${NETCONS_PATH}"/enabled
++	# Remove the configfs entry
++	rmdir "${NETCONS_PATH}"
++
++	# Delete netdevsim devices
++	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_DEL"
++	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_DEL"
++
++	# this is coming from lib.sh
++	cleanup_all_ns
++
++	# Restoring printk configurations
++	echo "${DEFAULT_PRINTK_VALUES}" > /proc/sys/kernel/printk
++}
++
++function listen_port_and_save_to() {
++	local OUTPUT=${1}
++	# Just wait for 2 seconds
++	timeout 2 ip netns exec "${NAMESPACE}" \
++		socat UDP-LISTEN:"${PORT}",fork "${OUTPUT}"
++}
++
++function validate_result() {
++	local TMPFILENAME="$1"
++
++	# Check if the file exists
++	if [ ! -f "$TMPFILENAME" ]; then
++		echo "FAIL: File was not generated." >&2
++		exit "${ksft_fail}"
++	fi
++
++	if ! grep -q "${MSG}" "${TMPFILENAME}"; then
++		echo "FAIL: ${MSG} not found in ${TMPFILENAME}" >&2
++		cat "${TMPFILENAME}" >&2
++		exit "${ksft_fail}"
++	fi
++
++	# Delete the file once it is validated, otherwise keep it
++	# for debugging purposes
++	rm "${TMPFILENAME}"
++	exit "${ksft_pass}"
++}
++
++function check_for_dependencies() {
++	if [ "$(id -u)" -ne 0 ]; then
++		echo "This test must be run as root" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which socat > /dev/null ; then
++		echo "SKIP: socat(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which ip > /dev/null ; then
++		echo "SKIP: ip(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which udevadm > /dev/null ; then
++		echo "SKIP: udevadm(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if [ ! -d "${NETCONS_CONFIGFS}" ]; then
++		echo "SKIP: directory ${NETCONS_CONFIGFS} does not exist. Check if NETCONSOLE_DYNAMIC is enabled" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ip link show "${DSTIF}" 2> /dev/null; then
++		echo "SKIP: interface ${DSTIF} exists in the system. Not overwriting it." >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ip addr list | grep -E "inet.*(${SRCIP}|${DSTIP})" 2> /dev/null; then
++		echo "SKIP: IPs already in use. Skippig it" >&2
++		exit "${ksft_skip}"
++	fi
++}
++
++# ========== #
++# Start here #
++# ========== #
++modprobe netdevsim 2> /dev/null || true
++modprobe netconsole 2> /dev/null || true
++
++# The content of kmsg will be save to the following file
++OUTPUT_FILE="/tmp/${TARGET}"
++
++# Check for basic system dependency and exit if not found
++check_for_dependencies
++# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
++echo "6 5" > /proc/sys/kernel/printk
++# Remove the namespace, interfaces and netconsole target on exit
++trap cleanup EXIT
++# Create one namespace and two interfaces
++set_network
++# Create a dynamic target for netconsole
++create_dynamic_target
++# Listed for netconsole port inside the namespace and destination interface
++listen_port_and_save_to "${OUTPUT_FILE}" &
++# Wait for socat to start and listen to the port.
++wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
++# Send the message
++echo "${MSG}: ${TARGET}" > /dev/kmsg
++# Wait until socat saves the file to disk
++busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
++
++# Make sure the message was received in the dst part
++# and exit
++validate_result "${OUTPUT_FILE}"
+-- 
+2.43.5
 
-Hi D.
-
-thanks for your contribution.
-What i wonder is should we prefer the use of netlink > sysctl or not?
-To the upstream maintainers: Is there a prefernce for the net tree?
-
-My impression from past discussions is that netlink should be chosen 
-over sysctl.
-If so, why is it inconvenient to use netlink in containers?
-Can this be changed?
-
-Other then the general discussion the changhes look good to me.
-
-Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
-
-
-> 
-> In addition, since commit 462791bbfa35 ("net/smc: add sysctl interface for SMC")
-> had introcuded smc_sysctl_net_init(), it is reasonable for us to
-> initialize limit_smc_hs in it instead of initializing it in
-> smc_pnet_net_int().
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
-> v1 -> v2:
-> 
-> Modified the description in the commit and removed the incorrect
-> spelling.
-> 
->   net/smc/smc_pnet.c   |  3 ---
->   net/smc/smc_sysctl.c | 11 +++++++++++
->   2 files changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 2adb92b..1dd3623 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
-> @@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
->   
->   	smc_pnet_create_pnetids_list(net);
->   
-> -	/* disable handshake limitation by default */
-> -	net->smc.limit_smc_hs = 0;
-> -
->   	return 0;
->   }
->   
-> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-> index 13f2bc0..2fab645 100644
-> --- a/net/smc/smc_sysctl.c
-> +++ b/net/smc/smc_sysctl.c
-> @@ -90,6 +90,15 @@
->   		.extra1		= &conns_per_lgr_min,
->   		.extra2		= &conns_per_lgr_max,
->   	},
-> +	{
-> +		.procname	= "limit_smc_hs",
-> +		.data		= &init_net.smc.limit_smc_hs,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ZERO,
-> +		.extra2		= SYSCTL_ONE,
-> +	},
->   };
->   
->   int __net_init smc_sysctl_net_init(struct net *net)
-> @@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
->   	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
->   	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->   	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-> +	/* disable handshake limitation by default */
-> +	net->smc.limit_smc_hs = 0;
->   
->   	return 0;
->   
 
