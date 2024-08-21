@@ -1,314 +1,146 @@
-Return-Path: <netdev+bounces-120551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31CF2959BD4
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:31:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48848959BE0
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57BA01C21568
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:31:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2631C20FDF
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A9B188909;
-	Wed, 21 Aug 2024 12:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A103166F04;
+	Wed, 21 Aug 2024 12:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQyAf9pV"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C9916631D;
-	Wed, 21 Aug 2024 12:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A391531C1;
+	Wed, 21 Aug 2024 12:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724243458; cv=none; b=sGsKMC58wAk0eIR167a1cCYVmbPACu+JnyAYgZl2/41/o6HTTDJXdDaRL9i8+Ux9Kwq6rwdz/o480La56MAKM7gJJBUgInPCvMHgJ4iu01a31L+uXplONSA1TS1bpCn8nTy1WNnjBjAj44uBo75QPsxNdmSlSTZ6qVaZKZQNlmk=
+	t=1724243607; cv=none; b=ngeZoyZVn46qneihGPjBq66eHF3Ub+diprlCkCJxvbaGJAk4hwk/goq9b/WXnRQfITAlElH57GHtXQmBKQAzqAGs0GD0HTm5IENX3QlwhhmclWe+1NJD1/nIL3kdRLC/OnvG/leA6a6nCM4YWdy4osiyNGsk2w6viSpFmA8PYeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724243458; c=relaxed/simple;
-	bh=oz/jfZaFSmvJqx6w/vsYoeXpQ5+JrJ81yoV9tPzH1xA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QrN7boDBHp/BhW6/RUA04MnGxoO/pI+mNuFdiCSEZ6B7RC7yHNkcbD96taNV7GsRtP9g20hXr0c6CnsqcgzPso/ahcGYGd75ZegX5/jECHXC0cTfQ8OCzBiEZcAkqio83hCYHQlKHzuGTc+AtcTIEu6CxMOQp4AaVpMYMgqZIV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Wplz86jc4z13X0G;
-	Wed, 21 Aug 2024 20:30:12 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EF9A9140138;
-	Wed, 21 Aug 2024 20:30:51 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 21 Aug 2024 20:30:51 +0800
-Message-ID: <ec27c801-db0a-4e57-b0bd-03a695e70e56@huawei.com>
-Date: Wed, 21 Aug 2024 20:30:51 +0800
+	s=arc-20240116; t=1724243607; c=relaxed/simple;
+	bh=OymAE/ZZBR4mv0HhBIalO0BOicWD78n6nDWqYyMqynA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ehmmvrM9jyxfIq9A/10WbADM4xRHLlUkAU8b2/vRt6mGQTNFqtHvqN2JNjF+1oEuoU+JjlupCgSrfQafie0SKAnVH1i7EmqBW8R673q/nQRMDzNp1NbhXra7CEE8DFd4k2aQxSTaRqzb0xdfQeNVDMxzcE7pRtoaSuE+pJYX2Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQyAf9pV; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-201fba05363so46063705ad.3;
+        Wed, 21 Aug 2024 05:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724243604; x=1724848404; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=38LzfASOFmg17IvE+tEedmZUU9vVFKl4gZEqe47LcGA=;
+        b=HQyAf9pVjfNcfKn3cOL0X3eWQmltQG70t5Mnq1AB9BYmAorUz1cS8+ajdtWJWFuJhS
+         yrv94/hoWucVgXDW+ODS/0/VlglveV005FE+acUxpDjHZq0+XwlQUGtbDmP0XRmOdsml
+         hFvAbzdEX3SwNdlNv6HbX+HgEW7uUHIkWwThjIV3O6NqQhvrxGWMqz7oqQtI3xIR+zpj
+         BjSuV6Dvt05yp346t2yovBiFhvV++v/D3zjy5FS4yrGJg6P34b6Cq2eGy3httssDrb5J
+         xNAcqTbcGbx8sCDuc3g/hT6UGq20RlVJndJJo3ZT4S3p8ni27JdVh4kx/PW7742ATOlv
+         g8XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724243604; x=1724848404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=38LzfASOFmg17IvE+tEedmZUU9vVFKl4gZEqe47LcGA=;
+        b=jsoVNIofyXzlYt2U8iNQp4DUcOuYO1uVdD8cMvQIco2gvuJZ/iN/8dqWOnpK+vSKpT
+         ERofg2gOsSmFlgy92TV+tqE6VRQCWM11i6ucEfFvUU8XRID9y0gbTziLCnxDlqhcDuEg
+         EgTBSukLKc+RFD4dYDcN5TqNKJhTUfuRaPHQFtoipg9fDCVcKIrUDdg8FV9G60krDZK5
+         ME5z5maOFyOfgOpU8/BBxBetl/VexY7hVBnPH6LfdRGzHu20SffYPxoNINzABIuv0m+0
+         8/ev7We9wdyfeIiOeO1svWbmod+CI62cb7pgIBrsSKdUME7vIAtuKQIhSCUiSV0Rg8ok
+         ZT5g==
+X-Forwarded-Encrypted: i=1; AJvYcCU62T4nGH0LHVPjeCh0hr10rMotYbjIUmHdcxNDTm4wAZ9mhf9UCzpIRWhRdIMfgU5ccRwKeo1rW5iFMMM=@vger.kernel.org, AJvYcCWrzvLelLz9RUe0NX6vQQ+lBVl3Dj/Zep+zSpT2q6lgAyBkyHxly+SZ6qY7ywDfTyx11nBZj8rN@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmKaRYJT4XGaKBaBRiDGkaMsm7h0gZuetyXS+z6O8fTI9Bo4B5
+	zq5xnnND4lMv85fv+wn+npUzKaAGXPQKkUEVVPiwj5Tm9gn87TFc
+X-Google-Smtp-Source: AGHT+IFOmUSISQmx1QZwKATxecp9bbNULKQetnFCCRoqRL+BE/zW5AmnieetnrrBmOwR66LzoJOLNg==
+X-Received: by 2002:a17:902:ec92:b0:1fd:93d2:fba4 with SMTP id d9443c01a7336-2036819f4bfmr20217855ad.48.1724243603576;
+        Wed, 21 Aug 2024 05:33:23 -0700 (PDT)
+Received: from localhost.localdomain ([43.129.25.208])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0375631sm92534605ad.154.2024.08.21.05.33.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 05:33:23 -0700 (PDT)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: kuba@kernel.org
+Cc: pshelar@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	amorenoz@redhat.com,
+	netdev@vger.kernel.org,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Menglong Dong <dongml2@chinatelecom.cn>
+Subject: [PATCH net] net: ovs: fix ovs_drop_reasons error
+Date: Wed, 21 Aug 2024 20:32:52 +0800
+Message-Id: <20240821123252.186305-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, Sagi Grimberg
-	<sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-5-linyunsheng@huawei.com>
- <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
- <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
- <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
- <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
- <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
- <98ceade3-8d60-45bf-a419-ff3982a96101@huawei.com>
- <CAKgT0Uc+e3MUb4CK1i7H7F=y-fHTxiGF8zddBFiqFRdbd6ofLg@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0Uc+e3MUb4CK1i7H7F=y-fHTxiGF8zddBFiqFRdbd6ofLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/8/21 0:02, Alexander Duyck wrote:
-> On Tue, Aug 20, 2024 at 6:07 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2024/8/19 23:54, Alexander Duyck wrote:
->>
->> ...
->>
->>>>>>
->>>>>> "There are three types of API as proposed in this patchset instead of
->>>>>> two types of API:
->>>>>> 1. page_frag_alloc_va() returns [va].
->>>>>> 2. page_frag_alloc_pg() returns [page, offset].
->>>>>> 3. page_frag_alloc() returns [va] & [page, offset].
->>>>>>
->>>>>> You seemed to miss that we need a third naming for the type 3 API.
->>>>>> Do you see type 3 API as a valid API? if yes, what naming are you
->>>>>> suggesting for it? if no, why it is not a valid API?"
->>>>>
->>>>> I didn't. I just don't see the point in pushing out the existing API
->>>>> to support that. In reality 2 and 3 are redundant. You probably only
->>>>> need 3. Like I mentioned earlier you can essentially just pass a
->>>>
->>>> If the caller just expect [page, offset], do you expect the caller also
->>>> type 3 API, which return both [va] and [page, offset]?
->>>>
->>>> I am not sure if I understand why you think 2 and 3 are redundant here?
->>>> If you think 2 and 3 are redundant here, aren't 1 and 3 also redundant
->>>> as the similar agrument?
->>>
->>> The big difference is the need to return page and offset. Basically to
->>> support returning page and offset you need to pass at least one value
->>> as a pointer so you can store the return there.
->>>
->>> The reason why 3 is just a redundant form of 2 is that you will
->>> normally just be converting from a va to a page and offset so the va
->>> should already be easily accessible.
->>
->> I am assuming that by 'easily accessible', you meant the 'va' can be
->> calculated as below, right?
->>
->> va = encoded_page_address(encoded_va) +
->>                 (page_frag_cache_page_size(encoded_va) - remaining);
->>
->> I guess it is easily accessible, but it is not without some overhead
->> to calculate the 'va' here.
-> 
-> It is just the encoded_page_address + offset that you have to
-> calculate anyway. So the only bit you actually have to do is 2
-> instructions, one to mask the encoded_va and then the addition of the
-> offset that you provided to the page. As it stands those instruction
-> can easily be slipped in while you are working on converting the va to
-> a page.
+There is something wrong with ovs_drop_reasons. ovs_drop_reasons[0] is
+"OVS_DROP_LAST_ACTION", but OVS_DROP_LAST_ACTION == __OVS_DROP_REASON + 1,
+which means that ovs_drop_reasons[1] should be "OVS_DROP_LAST_ACTION".
 
-Well, with your suggestions against other optimizations like avoiding
-a checking in fast patch and avoid calling virt_to_page(), the overhead
-is kind of added up.
+And as Adrian tested, without the patch, adding flow to drop packets
+results in:
 
-And I am really surprised by your above suggestion about deciding the
-API for users according to the internal implementation detail here. As
-the overhead of calculating 'va' is really depending on the layout of
-'struct page_frag_cache' here, what if we change the implementation and
-the overhead of calculating 'va' becomes bigger? Do we expect to change
-the API for the callers when we change the internal implementation of
-page_frag_cache?
+drop at: do_execute_actions+0x197/0xb20 [openvsw (0xffffffffc0db6f97)
+origin: software
+input port ifindex: 8
+timestamp: Tue Aug 20 10:19:17 2024 859853461 nsec
+protocol: 0x800
+length: 98
+original length: 98
+drop reason: OVS_DROP_ACTION_ERROR
 
-> 
-> 
->>>
->>>>> page_frag via pointer to the function. With that you could also look
->>>>> at just returning a virtual address as well if you insist on having
->>>>> something that returns all of the above. No point in having 2 and 3 be
->>>>> seperate functions.
->>>>
->>>> Let's be more specific about what are your suggestion here: which way
->>>> is the prefer way to return the virtual address. It seems there are two
->>>> options:
->>>>
->>>> 1. Return the virtual address by function returning as below:
->>>> void *page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio);
->>>>
->>>> 2. Return the virtual address by double pointer as below:
->>>> int page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio,
->>>>                         void **va);
->>>
->>> I was thinking more of option 1. Basically this is a superset of
->>> page_frag_alloc_va that is also returning the page and offset via a
->>> page frag. However instead of bio_vec I would be good with "struct
->>> page_frag *" being the value passed to the function to play the role
->>> of container. Basically the big difference between 1 and 2/3 if I am
->>> not mistaken is the fact that for 1 you pass the size, whereas with
->>> 2/3 you are peeling off the page frag from the larger page frag cache
->>
->> Let's be clear here: The callers just expecting [page, offset] also need
->> to call type 3 API, which return both [va] and [page, offset]? and it
->> is ok to ignore the overhead of calculating the 'va' for those kinds
->> of callers just because we don't want to do the renaming for a existing
->> API and can't come up with good naming for that?
->>
->>> after the fact via a commit type action.
->>
->> Just be clear here, there is no commit type action for some subtype of
->> type 2/3 API.
->>
->> For example, for type 2 API in this patchset, it has below subtypes:
->>
->> subtype 1: it does not need a commit type action, it just return
->>            [page, offset] instead of page_frag_alloc_va() returning [va],
->>            and it does not return the allocated fragsz back to the caller
->>            as page_frag_alloc_va() does not too:
->> struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
->>                                 unsigned int *offset, unsigned int fragsz,
->>                                 gfp_t gfp)
->>
->> subtype 2: it does need a commit type action, and @fragsz is returned to
->>            the caller and caller used that to commit how much fragsz to
->>            commit.
->> struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
->>                                         unsigned int *offset,
->>                                         unsigned int *fragsz, gfp_t gfp)
->>
->> Do you see subtype 1 as valid API? If no, why?
-> 
-> Not really, it is just a wrapper for page_frag_alloc that is
-> converting the virtual address to a page and offset. They are the same
-> data and don't justify the need for two functions. It kind of explains
+With the patch, the same results in:
 
-I am supposing you meant something like below:
-struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-				unsigned int *offset, unsigned int fragsz,
-				gfp_t gfp)
-{
-	struct page *page;
-	void *va;
+drop at: do_execute_actions+0x197/0xb20 [openvsw (0xffffffffc0db6f97)
+origin: software
+input port ifindex: 8
+timestamp: Tue Aug 20 10:16:13 2024 475856608 nsec
+protocol: 0x800
+length: 98
+original length: 98
+drop reason: OVS_DROP_LAST_ACTION
 
-	va = page_frag_alloc_va(nc, fragsz, gfp);
-	if (!va)
-		return NULL;
+Fix this by initializing ovs_drop_reasons with index.
 
-	page = virt_to_head_page(va);
-	*offset = va - page_to_virt(page);
+Fixes: 9d802da40b7c ("net: openvswitch: add last-action drop reason")
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+Tested-by: Adrian Moreno <amorenoz@redhat.com>
+Reviewed-by: Adrian Moreno <amorenoz@redhat.com>
+---
+ net/openvswitch/datapath.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	return page;
-}
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index 99d72543abd3..78d9961fcd44 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -2706,7 +2706,7 @@ static struct pernet_operations ovs_net_ops = {
+ };
+ 
+ static const char * const ovs_drop_reasons[] = {
+-#define S(x)	(#x),
++#define S(x) [(x) & ~SKB_DROP_REASON_SUBSYS_MASK] = (#x),
+ 	OVS_DROP_REASONS(S)
+ #undef S
+ };
+-- 
+2.39.2
 
-If yes, I really think you are caring about maintainability too much by
-trading off too much performance here by not only recalculating the offset
-here, but also sometimes calling virt_to_head_page() unnecessarily.
-
-If no, please share the pseudo code in your mind.
-
-> one of the complaints I had about this code. Supposedly it was
-> refactoring and combining several different callers into one, but what
-> it is actually doing is fracturing the code path into 3 different
-> variants based on little if any actual difference as it is doing
-> unnecessary optimization.
-
-I am supposing the 3 different variants meant the below, right?
-1. page_frag_alloc_va() returns [va].
-2. page_frag_alloc_pg() returns [page, offset].
-3. page_frag_alloc() returns [va] & [page, offset].
-
-And there is others 3 different variants for prepare API too:
-4. page_frag_alloc_va_prepare() returns [va].
-5. page_frag_alloc_pg_prepare() returns [page, offset].
-6. page_frag_alloc_prepare() returns [va] & [page, offset].
-
-Side note: I just found the '4. page_frag_alloc_va_prepare()' API is
-not used/called currently and can be removed in next revision for this
-patchset.
-
-It seems what you really want is 3 & 2 to be a wrapper for 1, and
-5 & 6 to be a wrapper for 4?
-
-If yes, too much performance is traded off here as my understanding.
-Does't the introducing of __page_frag_cache_reload() already enable the
-balance between performance and maintainability as much as possible in
-patch 8?
-
-> 
->> If yes, do you also expect the caller to use "struct page_frag *" as the
->> container? If yes, what is the caller expected to do with the size field in
->> "struct page_frag *" from API perspective? Just ignore it?
-> 
-> It should be populated. You passed a fragsz, so you should populate
-> the output fragsz so you can get the truesize in the case of network
-> packets. The removal of the page_frag from the other callers is making
-> it much harder to review your code anyway. If we keep the page_frag
-> there it should reduce the amount of change needed when you replace
-> page_frag with the page_frag_cache.
-
-I am not starting to use page_frag as the container yet, but the above
-part is something that I am probably agreed with.
-
-> 
-> Honestly this is eating up too much of my time. As I said before this
-> patch set is too big and it is trying to squeeze in more than it
-> really should for a single patch set to be reviewable. Going forward
-> please split up the patch set as I had suggested before and address my
-> comments. Ideally you would have your first patch just be some
-> refactor and cleanup to get the "offset" pointer moving in the
-> direction you want. With that we can at least get half of this set
-> digested before we start chewing into all this refactor for the
-> replacement of page_frag with the page_frag_cache.
-
-I don't really think breaking this patchset into more patchsets without
-a newcase is helping to speed up the process here, it might slow down
-the process instead, as the different idea about the refactoring and
-new API naming is not going to disappear by breaking the patchset, and
-the breaking may make the discussion harder without a bigger picture
-and context.
 
